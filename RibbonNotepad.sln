@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RibbonNotepad", "src\RibbonNotepad.vcxproj", "{F767677D-B0FE-4C4F-B886-09E501C543B2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scintilla", "ext\scintilla\Scintilla.vcxproj", "{5877B917-512B-49F5-B514-1B4159E7A9CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,14 @@ Global
 		{F767677D-B0FE-4C4F-B886-09E501C543B2}.Release|Win32.Build.0 = Release|Win32
 		{F767677D-B0FE-4C4F-B886-09E501C543B2}.Release|x64.ActiveCfg = Release|x64
 		{F767677D-B0FE-4C4F-B886-09E501C543B2}.Release|x64.Build.0 = Release|x64
+		{5877B917-512B-49F5-B514-1B4159E7A9CA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5877B917-512B-49F5-B514-1B4159E7A9CA}.Debug|Win32.Build.0 = Debug|Win32
+		{5877B917-512B-49F5-B514-1B4159E7A9CA}.Debug|x64.ActiveCfg = Debug|x64
+		{5877B917-512B-49F5-B514-1B4159E7A9CA}.Debug|x64.Build.0 = Debug|x64
+		{5877B917-512B-49F5-B514-1B4159E7A9CA}.Release|Win32.ActiveCfg = Release|Win32
+		{5877B917-512B-49F5-B514-1B4159E7A9CA}.Release|Win32.Build.0 = Release|Win32
+		{5877B917-512B-49F5-B514-1B4159E7A9CA}.Release|x64.ActiveCfg = Release|x64
+		{5877B917-512B-49F5-B514-1B4159E7A9CA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
