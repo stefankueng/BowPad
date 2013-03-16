@@ -97,11 +97,18 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -110,11 +117,18 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -125,6 +139,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -132,6 +147,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -142,6 +163,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,17 +171,51 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClInclude Include="..\ext\sktoolslib\AeroControls.h" />
+    <ClInclude Include="..\ext\sktoolslib\AeroGlass.h" />
+    <ClInclude Include="..\ext\sktoolslib\BaseDialog.h" />
+    <ClInclude Include="..\ext\sktoolslib\BaseWindow.h" />
+    <ClInclude Include="..\ext\sktoolslib\ClipboardHelper.h" />
+    <ClInclude Include="..\ext\sktoolslib\CmdLineParser.h" />
+    <ClInclude Include="..\ext\sktoolslib\CreateProcessHelper.h" />
+    <ClInclude Include="..\ext\sktoolslib\DebugOutput.h" />
+    <ClInclude Include="..\ext\sktoolslib\DlgResizer.h" />
+    <ClInclude Include="..\ext\sktoolslib\FormatMessageWrapper.h" />
+    <ClInclude Include="..\ext\sktoolslib\hyperlink.h" />
+    <ClInclude Include="..\ext\sktoolslib\SimpleIni.h" />
+    <ClInclude Include="..\ext\sktoolslib\SmartHandle.h" />
+    <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="CommandHandler.h" />
+    <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="RibbonFramework.h" />
     <ClInclude Include="RibbonNotepad.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\ext\sktoolslib\AeroControls.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\AeroGlass.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\BaseDialog.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\BaseWindow.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\CmdLineParser.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\DebugOutput.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\DlgResizer.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\hyperlink.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="CommandHandler.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="RibbonFramework.cpp" />
     <ClCompile Include="RibbonNotepad.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -174,6 +230,22 @@
   <ItemGroup>
     <Image Include="RibbonNotepad.ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="res\RibbonNotepad.xml">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">uicc.exe res\RibbonNotepad.xml $(IntDir)RibbonNotepad.bml /header:$(IntDir)RibbonNotepadUI.h /res:$(IntDir)RibbonNotepadUI.rc /name:RibbonNotepad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building RibbonNotepad.xml</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">uicc.exe res\RibbonNotepad.xml $(IntDir)RibbonNotepad.bml /header:$(IntDir)RibbonNotepadUI.h /res:$(IntDir)RibbonNotepadUI.rc /name:RibbonNotepad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building RibbonNotepad.xml</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">uicc.exe res\RibbonNotepad.xml $(IntDir)RibbonNotepad.bml /header:$(IntDir)RibbonNotepadUI.h /res:$(IntDir)RibbonNotepadUI.rc /name:RibbonNotepad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building RibbonNotepad.xml</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">uicc.exe res\RibbonNotepad.xml $(IntDir)RibbonNotepad.bml /header:$(IntDir)RibbonNotepadUI.h /res:$(IntDir)RibbonNotepadUI.rc /name:RibbonNotepad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building RibbonNotepad.xml</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
