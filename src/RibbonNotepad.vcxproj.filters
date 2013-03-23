@@ -81,6 +81,9 @@
     <ClInclude Include="TabBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ScintillaWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -123,6 +126,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TabBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScintillaWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -10,6 +10,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
     , m_TabBar(hInst)
+    , m_scintilla(hInst)
     , m_cRef(1)
 {
 }
@@ -232,7 +233,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             GetClientRect(*this, &rect);
             MoveWindow(m_StatusBar, rect.left, rect.bottom-m_StatusBar.GetHeight(), rect.right-rect.left, m_StatusBar.GetHeight(), true);
             MoveWindow(m_TabBar, rect.left, rect.top+m_RibbonHeight, rect.right-rect.left, rect.bottom-rect.top, true);
-            TabCtrl_AdjustRect(m_TabBar, FALSE, &rect);
+            RECT tabrc;
+            TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
+            MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
+            MoveWindow(m_scintilla, rect.left, tabrc.bottom, rect.right-rect.left+5, rect.bottom-rect.top-tabrc.bottom-m_StatusBar.GetHeight(), true);
         }
         break;
     case WM_GETMINMAXINFO:
@@ -290,6 +294,7 @@ LRESULT CMainWindow::DoCommand(int id)
 
 bool CMainWindow::Initialize()
 {
+    m_scintilla.Init(hResource, *this);
     m_StatusBar.Init(hResource, *this, 5);
     m_TabBar.Init(hResource, *this);
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
