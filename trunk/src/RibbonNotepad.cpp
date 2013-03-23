@@ -3,7 +3,6 @@
 
 #include "stdafx.h"
 #include "RibbonNotepad.h"
-#include "RibbonFramework.h"
 #include "MainWindow.h"
 
 

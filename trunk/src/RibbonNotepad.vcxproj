@@ -193,13 +193,12 @@
     <ClInclude Include="..\ext\sktoolslib\SimpleIni.h" />
     <ClInclude Include="..\ext\sktoolslib\SmartHandle.h" />
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="CommandHandler.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="RibbonFramework.h" />
     <ClInclude Include="RibbonNotepad.h" />
+    <ClInclude Include="StatusBar.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TabBar.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -212,22 +211,28 @@
     <ClCompile Include="..\ext\sktoolslib\DlgResizer.cpp" />
     <ClCompile Include="..\ext\sktoolslib\hyperlink.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="CommandHandler.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="RibbonFramework.cpp" />
     <ClCompile Include="RibbonNotepad.cpp" />
+    <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TabBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RibbonNotepad.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\closeTabButton.bmp" />
+    <Image Include="res\closeTabButton_hover.bmp" />
+    <Image Include="res\closeTabButton_inact.bmp" />
+    <Image Include="res\closeTabButton_push.bmp" />
+    <Image Include="res\readonly.ico" />
+    <Image Include="res\saved.ico" />
+    <Image Include="res\unsaved.ico" />
     <Image Include="RibbonNotepad.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
@@ -246,6 +251,12 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building RibbonNotepad.xml</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\drag.cur" />
+    <None Include="res\drag_interdit.cur" />
+    <None Include="res\drag_out.cur" />
+    <None Include="res\drag_plus.cur" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
