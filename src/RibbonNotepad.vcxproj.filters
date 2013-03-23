@@ -30,15 +30,6 @@
     <ClInclude Include="RibbonNotepad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommandHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RibbonFramework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MainWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -84,21 +75,18 @@
     <ClInclude Include="..\ext\sktoolslib\hyperlink.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="StatusBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TabBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RibbonNotepad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RibbonFramework.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MainWindow.cpp">
@@ -131,6 +119,12 @@
     <ClCompile Include="..\ext\sktoolslib\hyperlink.cpp">
       <Filter>sktoolslib</Filter>
     </ClCompile>
+    <ClCompile Include="StatusBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TabBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RibbonNotepad.rc">
@@ -144,8 +138,43 @@
     <Image Include="RibbonNotepad.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\closeTabButton.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\closeTabButton_hover.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\closeTabButton_inact.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\closeTabButton_push.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\readonly.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\saved.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\unsaved.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="res\RibbonNotepad.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\drag.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\drag_interdit.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\drag_out.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\drag_plus.cur">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

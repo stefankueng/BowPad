@@ -106,7 +106,7 @@
         <String Id ="280">MRU List</String>
       </Command.LabelTitle>
     </Command>
-    <Command Name="cmdExit" Symbol="IDC_CMD_EXIT">
+    <Command Name="cmdExit">
       <Command.LabelTitle>
         <String Id ="290">Exit Button</String>
       </Command.LabelTitle>
