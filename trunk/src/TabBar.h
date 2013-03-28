@@ -40,15 +40,15 @@ public :
         , m_nItems(0)
         , m_bHasImgList(false)
         , m_hFont(NULL)
-        , m_ctrlID(0)
+        , m_ctrlID(-1)
         , m_bIsDragging(false)
         , m_bIsDraggingInside(false)
-        , m_nSrcTab(0)
-        , m_nTabDragged(0)
+        , m_nSrcTab(-1)
+        , m_nTabDragged(-1)
         , m_TabBarDefaultProc(NULL)
-        , m_currentHoverTabItem(0)
+        , m_currentHoverTabItem(-1)
         , m_bIsCloseHover(false)
-        , m_whichCloseClickDown(0)
+        , m_whichCloseClickDown(-1)
         , m_lmbdHit(false)
     {
         Gdiplus::GdiplusStartupInput gdiplusStartupInput;
@@ -84,7 +84,8 @@ protected:
 
     static void                 SetColour(COLORREF colour2Set, tabColourIndex i);
 
-    static LRESULT CALLBACK     TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+    static LRESULT CALLBACK     TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+    {
         return (((CTabBar *)(::GetWindowLongPtr(hwnd, GWLP_USERDATA)))->RunProc(hwnd, Message, wParam, lParam));
     };
     void                        ExchangeItemData(POINT point);
