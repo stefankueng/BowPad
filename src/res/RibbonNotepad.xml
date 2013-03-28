@@ -114,6 +114,14 @@
         <Image Id ="291">res/ExitL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdNew">
+      <Command.LabelTitle>
+        <String Id ="292">New Document</String>
+      </Command.LabelTitle>
+      <Command.LargeImages>
+        <Image Id ="293">res/NewL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -123,6 +131,7 @@
             <RecentItems CommandName="cmdMRUList" MaxCount="1" />
           </ApplicationMenu.RecentItems>
           <MenuGroup Class="MajorItems">
+            <Button CommandName="cmdNew" />
             <Button CommandName="cmdExit" />
           </MenuGroup>
         </ApplicationMenu>

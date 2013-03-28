@@ -12,6 +12,12 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
         return false;
     }
 
+    m_pSciMsg = (SciFnDirect)SendMessage(*this, SCI_GETDIRECTFUNCTION, 0, 0);
+    m_pSciWndData = (sptr_t)SendMessage(*this, SCI_GETDIRECTPOINTER, 0, 0);
+
+    if (m_pSciMsg==nullptr || m_pSciWndData==0)
+        return false;
+
     return true;
 }
 
