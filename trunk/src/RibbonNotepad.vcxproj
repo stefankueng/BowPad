@@ -201,6 +201,7 @@
     <ClInclude Include="..\ext\sktoolslib\SimpleIni.h" />
     <ClInclude Include="..\ext\sktoolslib\SmartHandle.h" />
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
+    <ClInclude Include="DocumentManager.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RibbonNotepad.h" />
@@ -220,6 +221,7 @@
     <ClCompile Include="..\ext\sktoolslib\DlgResizer.cpp" />
     <ClCompile Include="..\ext\sktoolslib\hyperlink.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
+    <ClCompile Include="DocumentManager.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="RibbonNotepad.cpp" />
     <ClCompile Include="ScintillaWnd.cpp" />

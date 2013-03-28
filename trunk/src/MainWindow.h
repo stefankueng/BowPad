@@ -3,6 +3,7 @@
 #include "resource.h"
 #include "StatusBar.h"
 #include "TabBar.h"
+#include "DocumentManager.h"
 #include "ScintillaWnd.h"
 
 #include <UIRibbon.h>
@@ -68,4 +69,5 @@ private:
     CStatusBar          m_StatusBar;
     CTabBar             m_TabBar;
     CScintillaWnd       m_scintilla;
+    CDocumentManager    m_DocManager;
 };

@@ -178,6 +178,14 @@ STDMETHODIMP CMainWindow::Execute(
             ::PostQuitMessage(0);
         }
         break;
+    case cmdNew:
+        {
+            Document doc = m_scintilla.Call(SCI_CREATEDOCUMENT);
+            m_DocManager.AddDocumentAtEnd(doc);
+            int index = m_TabBar.InsertAtEnd(L"New");
+            m_TabBar.ActivateAt(index);
+        }
+        break;
     default:
         break;
     }
@@ -252,14 +260,30 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_NOTIFY:
         {
-            switch (((LPNMHDR)lParam)->code)
+            LPNMHDR pNMHDR = reinterpret_cast<LPNMHDR>(lParam);
+            if ((pNMHDR->idFrom == (UINT_PTR)&m_TabBar) ||
+                (pNMHDR->hwndFrom == m_TabBar))
             {
-            case TCN_GETCOLOR:
-                if (((LPNMHDR)lParam)->idFrom == (UINT_PTR)&m_TabBar)
+                TBHDR * pnmhdr = reinterpret_cast<TBHDR*>(lParam);
+
+                switch (((LPNMHDR)lParam)->code)
                 {
-                    return RGB(0, 255, 0);
+                case TCN_GETCOLOR:
+                        return RGB(0, 255, 0);
+                    break; 
+                case TCN_SELCHANGE:
+                    {
+                        // document got activated
+                        int tab = m_TabBar.GetCurrentTabIndex();
+                        if (tab < m_DocManager.GetCount())
+                        {
+                            Document oldDoc = m_scintilla.Call(SCI_GETDOCPOINTER);
+                            m_scintilla.Call(SCI_ADDREFDOCUMENT, 0, oldDoc);
+                            m_scintilla.Call(SCI_SETDOCPOINTER, 0, m_DocManager.GetDocument(tab));
+                        }
+                    }
+                    break;
                 }
-                break; 
             }
         }
         break;
@@ -302,7 +326,6 @@ bool CMainWindow::Initialize()
     ImageList_AddIcon(hImgList, hIcon);
     ::DestroyIcon(hIcon);
     m_TabBar.SetImageList(hImgList);
-    m_TabBar.InsertAtEnd(L"Test");
     // Here we instantiate the Ribbon framework object.
     HRESULT hr = CoCreateInstance(CLSID_UIRibbonFramework, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&g_pFramework));
     if (FAILED(hr))
