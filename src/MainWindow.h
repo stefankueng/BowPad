@@ -58,6 +58,9 @@ protected:
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
     LRESULT             DoCommand(int id);
 
+private:
+    void                ResizeChildWindows();
+private:
     LONG                m_cRef;
     IUIRibbon *         m_pRibbon;
     UINT                m_RibbonHeight;
