@@ -117,6 +117,7 @@ STDMETHODIMP CMainWindow::OnViewChanged(
                 {
                     // Call to the framework to determine the desired height of the Ribbon.
                     hr = m_pRibbon->GetHeight(&m_RibbonHeight);
+                    ResizeChildWindows();
                 }
             }
             break;
@@ -229,14 +230,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_SIZE:
         {
-            RECT rect;
-            GetClientRect(*this, &rect);
-            MoveWindow(m_StatusBar, rect.left, rect.bottom-m_StatusBar.GetHeight(), rect.right-rect.left, m_StatusBar.GetHeight(), true);
-            MoveWindow(m_TabBar, rect.left, rect.top+m_RibbonHeight, rect.right-rect.left, rect.bottom-rect.top, true);
-            RECT tabrc;
-            TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
-            MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
-            MoveWindow(m_scintilla, rect.left, tabrc.bottom, rect.right-rect.left+5, rect.bottom-rect.top-tabrc.bottom-m_StatusBar.GetHeight(), true);
+            ResizeChildWindows();
         }
         break;
     case WM_GETMINMAXINFO:
@@ -332,5 +326,17 @@ bool CMainWindow::Initialize()
     }
 
     return true;
+}
+
+void CMainWindow::ResizeChildWindows()
+{
+    RECT rect;
+    GetClientRect(*this, &rect);
+    MoveWindow(m_StatusBar, rect.left, rect.bottom-m_StatusBar.GetHeight(), rect.right-rect.left, m_StatusBar.GetHeight(), true);
+    MoveWindow(m_TabBar, rect.left, rect.top+m_RibbonHeight, rect.right-rect.left, rect.bottom-rect.top, true);
+    RECT tabrc;
+    TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
+    MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
+    MoveWindow(m_scintilla, rect.left, tabrc.bottom, rect.right-rect.left+5, rect.bottom-rect.top-tabrc.bottom-m_StatusBar.GetHeight(), true);
 }
 
