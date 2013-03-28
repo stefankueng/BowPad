@@ -283,6 +283,13 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         }
                     }
                     break;
+                case TCN_TABDROPPED:
+                    {
+                        int src = m_TabBar.GetSrcTab();
+                        int dst = m_TabBar.GetDstTab();
+                        m_DocManager.ExchangeDocs(src, dst);
+                    }
+                    break;
                 }
             }
         }
