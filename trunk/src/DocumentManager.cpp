@@ -365,7 +365,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
             char * writeBuf = buf;
             do
             {
-                int charStart = UTF8Helper::characterStart(writeBuf, min(blockSize, lengthDoc));
+                int charStart = UTF8Helper::characterStart(writeBuf, (int)min(blockSize, lengthDoc));
                 int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), widebufSize);
                 if (doc.m_encoding == 1201)
                 {
@@ -403,7 +403,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
             char * writeBuf = buf;
             do 
             {
-                int charStart = UTF8Helper::characterStart(writeBuf, min(blockSize, lengthDoc));
+                int charStart = UTF8Helper::characterStart(writeBuf, (int)min(blockSize, lengthDoc));
                 int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), widebufSize);
 
                 LPCWSTR p_In = (LPCWSTR)widebuf.get();
@@ -480,7 +480,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
             char * writeBuf = buf;
             do 
             {
-                int charStart = UTF8Helper::characterStart(writeBuf, min(blockSize, lengthDoc));
+                int charStart = UTF8Helper::characterStart(writeBuf, (int)min(blockSize, lengthDoc));
                 int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), widebufSize);
                 int charlen = WideCharToMultiByte(doc.m_encoding, 0, widebuf.get(), widelen, charbuf.get(), charbufSize, 0, NULL);
                 if ((!WriteFile(hFile, charbuf.get(), charlen, &bytesWritten, NULL) || (charlen != int(bytesWritten))))
