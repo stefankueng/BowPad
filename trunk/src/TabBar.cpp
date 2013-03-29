@@ -75,6 +75,8 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
 
 LRESULT CALLBACK CTabBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+    if (prevWndProc)
+        return CallWindowProc(prevWndProc, hwnd, uMsg, wParam, lParam);
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
