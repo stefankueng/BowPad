@@ -1,8 +1,11 @@
 #include "stdafx.h"
 #include "MainWindow.h"
+#include "RibbonNotepad.h"
 #include "RibbonNotepadUI.h"
+#include "StringUtils.h"
 
 #include <memory>
+#include <Shobjidl.h>
 
 IUIFramework *g_pFramework = NULL;  // Reference to the Ribbon framework.
 
@@ -171,24 +174,7 @@ STDMETHODIMP CMainWindow::Execute(
     UNREFERENCED_PARAMETER(key);
     UNREFERENCED_PARAMETER(verb);
 
-    switch (nCmdID)
-    {
-    case cmdExit:
-        {
-            ::PostQuitMessage(0);
-        }
-        break;
-    case cmdNew:
-        {
-            Document doc = m_scintilla.Call(SCI_CREATEDOCUMENT);
-            m_DocManager.AddDocumentAtEnd(doc);
-            int index = m_TabBar.InsertAtEnd(L"New");
-            m_TabBar.ActivateAt(index);
-        }
-        break;
-    default:
-        break;
-    }
+    DoCommand(nCmdID);
     return S_OK;
 }
 
@@ -204,7 +190,8 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.cbWndExtra = 0;
     wcx.hInstance = hResource;
     wcx.hCursor = NULL;
-    wcx.lpszClassName = ResString(hResource, IDC_RIBBONNOTEPAD);
+    ResString clsName(hResource, IDC_RIBBONNOTEPAD);
+    wcx.lpszClassName = clsName;
     wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_SMALL));
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
     wcx.lpszMenuName = NULL;
@@ -311,9 +298,74 @@ LRESULT CMainWindow::DoCommand(int id)
 {
     switch (id)
     {
+    case cmdExit:
+        {
+            ::PostQuitMessage(0);
+        }
+        break;
+    case cmdNew:
+        {
+            static int newCount = 0;
+            newCount++;
+            Document doc = m_scintilla.Call(SCI_CREATEDOCUMENT);
+            m_DocManager.AddDocumentAtEnd(doc);
+            ResString newRes(hInst, IDS_NEW_TABTITLE);
+            std::wstring s = CStringUtils::Format(newRes, newCount);
+            int index = m_TabBar.InsertAtEnd(s.c_str());
+            m_TabBar.ActivateAt(index);
+        }
+        break;
+    case cmdOpen:
+        {
+            std::vector<std::wstring> paths;
+            CComPtr<IFileOpenDialog> pfd = NULL;
+
+            HRESULT hr = pfd.CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER);
+            if (SUCCEEDED(hr))
+            {
+                // Set the dialog options
+                DWORD dwOptions;
+                if (SUCCEEDED(hr = pfd->GetOptions(&dwOptions)))
+                {
+                    hr = pfd->SetOptions(dwOptions | FOS_FILEMUSTEXIST | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_ALLOWMULTISELECT);
+                }
+
+                // Set a title
+                if (SUCCEEDED(hr))
+                {
+                    pfd->SetTitle(L"RibbonNotepad");
+                }
+
+                // Show the save/open file dialog
+                if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(*this)))
+                {
+                    CComPtr<IShellItemArray> psiaResults;
+                    hr = pfd->GetResults(&psiaResults);
+                    if (SUCCEEDED(hr))
+                    {
+                        DWORD count = 0;
+                        hr = psiaResults->GetCount(&count);
+                        for (DWORD i = 0; i < count; ++i)
+                        {
+                            CComPtr<IShellItem> psiResult = NULL;
+                            hr = psiaResults->GetItemAt(i, &psiResult);
+                            PWSTR pszPath = NULL;
+                            hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
+                            if (SUCCEEDED(hr))
+                            {
+                                paths.push_back(pszPath);
+                            }
+                        }
+                    }
+                }
+            }
+            if (SUCCEEDED(hr))
+                OpenFiles(paths);
+        }
+        break;
     default:
         break;
-    };
+    }
     return 1;
 }
 
@@ -368,5 +420,30 @@ void CMainWindow::ResizeChildWindows()
     TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
     MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
     MoveWindow(m_scintilla, rect.left, tabrc.bottom, rect.right-rect.left+5, rect.bottom-rect.top-tabrc.bottom-m_StatusBar.GetHeight(), true);
+}
+
+bool CMainWindow::OpenFiles( const std::vector<std::wstring>& files )
+{
+    bool bRet = true;
+    for (auto file: files)
+    {
+        int encoding = -1;
+        bool hasBOM = false;
+        FormatType format;
+        Document doc = m_DocManager.LoadFile(*this, file, encoding, hasBOM, &format);
+        if (doc)
+        {
+            m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc);
+            m_DocManager.AddDocumentAtEnd(doc);
+            std::wstring sFileName = file.substr(file.find_last_of('\\')+1);
+            int index = m_TabBar.InsertAtEnd(sFileName.c_str());
+            m_TabBar.ActivateAt(index);
+        }
+        else
+        {
+            bRet = false;
+        }
+    }
+    return bRet;
 }
 

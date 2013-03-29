@@ -13,6 +13,7 @@ public :
     virtual ~CScintillaWnd(){}
 
     bool Init(HINSTANCE hInst, HWND hParent);
+    bool InitScratch(HINSTANCE hInst);
 
     sptr_t Call(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0)
     {

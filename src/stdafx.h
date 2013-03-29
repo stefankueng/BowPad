@@ -10,6 +10,7 @@
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
 #include <windows.h>
+#include <windowsx.h>
 
 // C RunTime Header Files
 #include <stdlib.h>
@@ -24,6 +25,8 @@
 
 #define DEBUGOUTPUTREGPATH L"Software\\RibbonNotepad\\DebugOutputString"
 #include "DebugOutput.h"
+
+#include "Language.h"
 
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "shlwapi.lib")
