@@ -46,6 +46,8 @@ bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts)
 
 LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+    if (prevWndProc)
+        return prevWndProc(hwnd, uMsg, wParam, lParam);
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 

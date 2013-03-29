@@ -20,9 +20,9 @@ public :
         return m_pSciMsg(m_pSciWndData, iMessage, wParam, lParam);
     }
 
+    void UpdateLineNumberWidth();
 protected:
     virtual LRESULT CALLBACK WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-
 private:
     SciFnDirect                 m_pSciMsg;
     sptr_t                      m_pSciWndData;

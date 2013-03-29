@@ -102,6 +102,9 @@
     <ClInclude Include="..\ext\sktoolslib\StringUtils.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="XPMIcons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

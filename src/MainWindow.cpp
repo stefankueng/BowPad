@@ -279,6 +279,20 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     break;
                 }
             }
+            else if ((pNMHDR->idFrom == (UINT_PTR)&m_scintilla) ||
+                (pNMHDR->hwndFrom == m_scintilla))
+            {
+                Scintilla::SCNotification * pScn = reinterpret_cast<Scintilla::SCNotification *>(lParam);
+                switch (pScn->nmhdr.code)
+                {
+                case SCN_PAINTED:
+                    {
+                        m_scintilla.UpdateLineNumberWidth();
+                    }
+                    break;
+                }
+
+            }
         }
         break;
     case WM_DESTROY:
