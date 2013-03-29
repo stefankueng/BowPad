@@ -5,6 +5,7 @@
 #include "RibbonNotepad.h"
 #include "MainWindow.h"
 
+HINSTANCE hInst;
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -21,7 +22,9 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
-    MSG msg;
+    hInst = hInstance;
+
+    MSG msg = {0};
     CMainWindow mainWindow(hInstance);
     if (mainWindow.RegisterAndCreateWindow())
     {

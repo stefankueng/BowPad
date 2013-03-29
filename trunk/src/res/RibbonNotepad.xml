@@ -122,6 +122,14 @@
         <Image Id ="293">res/NewL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdOpen">
+      <Command.LabelTitle>
+        <String Id ="294">Open File</String>
+      </Command.LabelTitle>
+      <Command.LargeImages>
+        <Image Id ="295">res/OpenL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -132,6 +140,7 @@
           </ApplicationMenu.RecentItems>
           <MenuGroup Class="MajorItems">
             <Button CommandName="cmdNew" />
+            <Button CommandName="cmdOpen" />
             <Button CommandName="cmdExit" />
           </MenuGroup>
         </ApplicationMenu>

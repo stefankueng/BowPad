@@ -61,6 +61,7 @@ protected:
 
 private:
     void                ResizeChildWindows();
+    bool                OpenFiles(const std::vector<std::wstring>& files);
 private:
     LONG                m_cRef;
     IUIRibbon *         m_pRibbon;
