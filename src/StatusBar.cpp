@@ -3,7 +3,7 @@
 
 #include <Commctrl.h>
 
-bool CStatusBar::Init(HINSTANCE hInst, HWND hParent, int nbParts)
+bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts)
 {
     InitCommonControls();
 

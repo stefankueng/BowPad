@@ -5,8 +5,26 @@
 
 typedef uptr_t Document;
 
-enum FormatType { WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT };
+enum FormatType { UNKNOWN_FORMAT, WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT };
 
+class CDocument
+{
+public:
+    CDocument()
+        : m_document(NULL)
+        , m_format(UNKNOWN_FORMAT)
+        , m_bHasBOM(false)
+        , m_encoding(-1)
+    {
+    }
+
+
+    Document                m_document;
+    FormatType              m_format;
+    bool                    m_bHasBOM;
+    int                     m_encoding;
+    std::wstring            m_path;
+};
 
 class CDocumentManager
 {
@@ -14,17 +32,19 @@ public:
     CDocumentManager(void);
     ~CDocumentManager(void);
 
-    void AddDocumentAtEnd(Document doc);
+    void AddDocumentAtEnd(CDocument doc);
     size_t GetCount() const { return m_documents.size(); }
-    Document GetDocument(int index) const { return m_documents.at(index); }
+    CDocument GetDocument(int index) const { return m_documents.at(index); }
+    Document GetScintillaDocument(int index) const { return m_documents.at(index).m_document; }
     void ExchangeDocs(int src, int dst);
 
-    Document LoadFile(HWND hWnd, const std::wstring& path, int & encoding, bool & hasBOM, FormatType * pFormat);
+    CDocument LoadFile(HWND hWnd, const std::wstring& path, int encoding);
+    bool SaveFile(HWND hWnd, const CDocument& doc);
 private:
-    int getEOLFormatForm(const char *data) const;
+    FormatType GetEOLFormatForm(const char *data) const;
 
 private:
-    std::vector<Document>   m_documents;
+    std::vector<CDocument>  m_documents;
     CScintillaWnd           m_scratchScintilla;
 };
 

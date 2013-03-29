@@ -251,7 +251,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             if ((pNMHDR->idFrom == (UINT_PTR)&m_TabBar) ||
                 (pNMHDR->hwndFrom == m_TabBar))
             {
-                TBHDR * pnmhdr = reinterpret_cast<TBHDR*>(lParam);
+                //TBHDR * pnmhdr = reinterpret_cast<TBHDR*>(lParam);
 
                 switch (((LPNMHDR)lParam)->code)
                 {
@@ -266,7 +266,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         {
                             Document oldDoc = m_scintilla.Call(SCI_GETDOCPOINTER);
                             m_scintilla.Call(SCI_ADDREFDOCUMENT, 0, oldDoc);
-                            m_scintilla.Call(SCI_SETDOCPOINTER, 0, m_DocManager.GetDocument(tab));
+                            m_scintilla.Call(SCI_SETDOCPOINTER, 0, m_DocManager.GetScintillaDocument(tab));
                         }
                     }
                     break;
@@ -307,7 +307,8 @@ LRESULT CMainWindow::DoCommand(int id)
         {
             static int newCount = 0;
             newCount++;
-            Document doc = m_scintilla.Call(SCI_CREATEDOCUMENT);
+            CDocument doc;
+            doc.m_document = m_scintilla.Call(SCI_CREATEDOCUMENT);
             m_DocManager.AddDocumentAtEnd(doc);
             ResString newRes(hInst, IDS_NEW_TABTITLE);
             std::wstring s = CStringUtils::Format(newRes, newCount);
@@ -361,6 +362,53 @@ LRESULT CMainWindow::DoCommand(int id)
             }
             if (SUCCEEDED(hr))
                 OpenFiles(paths);
+        }
+        break;
+    case cmdSave:
+        {
+            int tab = m_TabBar.GetCurrentTabIndex();
+            if (tab < m_DocManager.GetCount())
+            {
+                CDocument doc = m_DocManager.GetDocument(tab);
+                if (doc.m_path.empty())
+                {
+                    CComPtr<IFileSaveDialog> pfd = NULL;
+
+                    HRESULT hr = pfd.CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_INPROC_SERVER);
+                    if (SUCCEEDED(hr))
+                    {
+                        // Set the dialog options
+                        DWORD dwOptions;
+                        if (SUCCEEDED(hr = pfd->GetOptions(&dwOptions)))
+                        {
+                            hr = pfd->SetOptions(dwOptions | FOS_FORCEFILESYSTEM | FOS_OVERWRITEPROMPT);
+                        }
+
+                        // Set a title
+                        if (SUCCEEDED(hr))
+                        {
+                            pfd->SetTitle(L"RibbonNotepad");
+                        }
+
+                        // Show the save/open file dialog
+                        if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(*this)))
+                        {
+                            CComPtr<IShellItem> psiResult = NULL;
+                            hr = pfd->GetResult(&psiResult);
+                            if (SUCCEEDED(hr))
+                            {
+                                PWSTR pszPath = NULL;
+                                hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
+                                if (SUCCEEDED(hr))
+                                {
+                                    doc.m_path = pszPath;
+                                }
+                            }
+                        }
+                    }
+                }
+                m_DocManager.SaveFile(*this, doc);
+            }
         }
         break;
     default:
@@ -428,12 +476,10 @@ bool CMainWindow::OpenFiles( const std::vector<std::wstring>& files )
     for (auto file: files)
     {
         int encoding = -1;
-        bool hasBOM = false;
-        FormatType format;
-        Document doc = m_DocManager.LoadFile(*this, file, encoding, hasBOM, &format);
-        if (doc)
+        CDocument doc = m_DocManager.LoadFile(*this, file, encoding);
+        if (doc.m_document)
         {
-            m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc);
+            m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
             m_DocManager.AddDocumentAtEnd(doc);
             std::wstring sFileName = file.substr(file.find_last_of('\\')+1);
             int index = m_TabBar.InsertAtEnd(sFileName.c_str());

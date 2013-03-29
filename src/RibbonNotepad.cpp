@@ -14,7 +14,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-
+    UNREFERENCED_PARAMETER(nCmdShow);
 
     HRESULT hr = CoInitialize(NULL);
     if (FAILED(hr))
