@@ -130,6 +130,14 @@
         <Image Id ="295">res/OpenL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdSave">
+      <Command.LabelTitle>
+        <String Id ="296">Save File</String>
+      </Command.LabelTitle>
+      <Command.LargeImages>
+        <Image Id ="297">res/SaveL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -141,6 +149,7 @@
           <MenuGroup Class="MajorItems">
             <Button CommandName="cmdNew" />
             <Button CommandName="cmdOpen" />
+            <Button CommandName="cmdSave" />
             <Button CommandName="cmdExit" />
           </MenuGroup>
         </ApplicationMenu>

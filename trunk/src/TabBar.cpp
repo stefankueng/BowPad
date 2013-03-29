@@ -25,7 +25,7 @@ CTabBar::~CTabBar()
     Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
-bool CTabBar::Init(HINSTANCE hInst, HWND hParent)
+bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
 {
     INITCOMMONCONTROLSEX icce;
     icce.dwSize = sizeof(icce);
@@ -524,7 +524,7 @@ void CTabBar::DrawItem(DRAWITEMSTRUCT *pDrawItemStruct)
     if (hImgLst && tci.iImage >= 0)
     {
         IMAGEINFO info;
-        int yPos = 0, xPos = 0;
+        int yPos = 0;
         int marge = 0;
 
         ImageList_GetImageInfo(hImgLst, tci.iImage, &info);
