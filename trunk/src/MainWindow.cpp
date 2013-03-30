@@ -560,19 +560,28 @@ bool CMainWindow::OpenFiles( const std::vector<std::wstring>& files )
     for (auto file: files)
     {
         int encoding = -1;
-        CDocument doc = m_DocManager.LoadFile(*this, file, encoding);
-        if (doc.m_document)
+        size_t index = m_DocManager.GetIndexForPath(file);
+        if (index != -1)
         {
-            CMRU::Instance().AddPath(file);
-            m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-            m_DocManager.AddDocumentAtEnd(doc);
-            std::wstring sFileName = file.substr(file.find_last_of('\\')+1);
-            int index = m_TabBar.InsertAtEnd(sFileName.c_str());
-            m_TabBar.ActivateAt(index);
+            // document already open
+            m_TabBar.ActivateAt((int)index);
         }
         else
         {
-            bRet = false;
+            CDocument doc = m_DocManager.LoadFile(*this, file, encoding);
+            if (doc.m_document)
+            {
+                CMRU::Instance().AddPath(file);
+                m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+                m_DocManager.AddDocumentAtEnd(doc);
+                std::wstring sFileName = file.substr(file.find_last_of('\\')+1);
+                int index = m_TabBar.InsertAtEnd(sFileName.c_str());
+                m_TabBar.ActivateAt(index);
+            }
+            else
+            {
+                bRet = false;
+            }
         }
     }
     return bRet;

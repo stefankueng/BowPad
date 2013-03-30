@@ -34,6 +34,7 @@ public:
 
     void AddDocumentAtEnd(CDocument doc);
     size_t GetCount() const { return m_documents.size(); }
+    size_t GetIndexForPath(const std::wstring& path) const;
     CDocument GetDocument(int index) const { return m_documents.at(index); }
     Document GetScintillaDocument(int index) const { return m_documents.at(index).m_document; }
     void ExchangeDocs(int src, int dst);

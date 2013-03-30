@@ -499,3 +499,13 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
     return true;
 }
+
+size_t CDocumentManager::GetIndexForPath( const std::wstring& path ) const
+{
+    for (size_t i = 0; i < m_documents.size(); ++i)
+    {
+        if (m_documents[i].m_path.compare(path)==0)
+            return i;
+    }
+    return (size_t)-1;
+}
