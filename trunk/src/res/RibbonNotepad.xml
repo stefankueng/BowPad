@@ -6,7 +6,7 @@
 
     <Command Name="cmdTab1"
              Comment="These comments are optional and are inserted into the header file."
-             Symbol="IDC_CMD_TAB1" 
+             Symbol="IDC_CMD_TAB1"
              Id="10000" >
       <Command.LabelTitle>
         <String Id ="200">Tab 1</String>
@@ -106,36 +106,24 @@
         <String Id ="280">MRU List</String>
       </Command.LabelTitle>
     </Command>
-    <Command Name="cmdExit">
-      <Command.LabelTitle>
-        <String Id ="290">Exit Button</String>
-      </Command.LabelTitle>
+    <Command Name="cmdExit" LabelTitle="Exit">
       <Command.LargeImages>
-        <Image Id ="291">res/ExitL.bmp</Image>
+        <Image>res/ExitL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdNew">
-      <Command.LabelTitle>
-        <String Id ="292">New Document</String>
-      </Command.LabelTitle>
+    <Command Name="cmdNew" LabelTitle="New" TooltipTitle="New Document" TooltipDescription="Creates a new tab with an empty document">
       <Command.LargeImages>
-        <Image Id ="293">res/NewL.bmp</Image>
+        <Image>res/NewL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdOpen">
-      <Command.LabelTitle>
-        <String Id ="294">Open File</String>
-      </Command.LabelTitle>
+    <Command Name="cmdOpen" LabelTitle="Open" TooltipTitle="Open Files" TooltipDescription="Opens one or more files">
       <Command.LargeImages>
-        <Image Id ="295">res/OpenL.bmp</Image>
+        <Image>res/OpenL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdSave">
-      <Command.LabelTitle>
-        <String Id ="296">Save File</String>
-      </Command.LabelTitle>
+    <Command Name="cmdSave" LabelTitle="Save" TooltipTitle="Save File" TooltipDescription="Saves the current tab">
       <Command.LargeImages>
-        <Image Id ="297">res/SaveL.bmp</Image>
+        <Image>res/SaveL.bmp</Image>
       </Command.LargeImages>
     </Command>
   </Application.Commands>
@@ -144,12 +132,14 @@
       <Ribbon.ApplicationMenu>
         <ApplicationMenu CommandName="cmdFileMenu">
           <ApplicationMenu.RecentItems>
-            <RecentItems CommandName="cmdMRUList" MaxCount="1" />
+            <RecentItems CommandName="cmdMRUList" EnablePinning="true" />
           </ApplicationMenu.RecentItems>
           <MenuGroup Class="MajorItems">
             <Button CommandName="cmdNew" />
             <Button CommandName="cmdOpen" />
             <Button CommandName="cmdSave" />
+          </MenuGroup>
+          <MenuGroup>
             <Button CommandName="cmdExit" />
           </MenuGroup>
         </ApplicationMenu>

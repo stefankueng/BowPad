@@ -7,6 +7,7 @@
 #include "ScintillaWnd.h"
 
 #include <UIRibbon.h>
+#include <UIRibbonPropertyHelpers.h>
 
 class CMainWindow : public CWindow, public IUIApplication, public IUICommandHandler
 {
