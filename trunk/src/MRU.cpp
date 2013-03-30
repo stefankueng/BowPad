@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "MRU.h"
-#include "PropertySet.h"
 
 #include <iostream>
 #include <fstream>
