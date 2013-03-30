@@ -132,7 +132,7 @@
       <Ribbon.ApplicationMenu>
         <ApplicationMenu CommandName="cmdFileMenu">
           <ApplicationMenu.RecentItems>
-            <RecentItems CommandName="cmdMRUList" EnablePinning="true" />
+            <RecentItems CommandName="cmdMRUList" EnablePinning="true" MaxCount="20"/>
           </ApplicationMenu.RecentItems>
           <MenuGroup Class="MajorItems">
             <Button CommandName="cmdNew" />
