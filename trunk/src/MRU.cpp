@@ -194,10 +194,12 @@ void CMRU::AddPath( const std::wstring& path )
     if (!m_bLoaded)
         Load();
 
+    bool pinned = false;
     for (auto it = m_mruVec.begin(); it != m_mruVec.end(); ++it)
     {
         if (path.compare(std::get<0>(*it))==0)
         {
+            pinned = std::get<1>(*it);
             m_mruVec.erase(it);
             break;
         }
@@ -214,7 +216,24 @@ void CMRU::AddPath( const std::wstring& path )
         }
     }
 
-    m_mruVec.push_back(std::make_tuple(path, false));
+    m_mruVec.push_back(std::make_tuple(path, pinned));
+    Save();
+}
+
+void CMRU::RemovePath( const std::wstring& path, bool removeEvenIfPinned )
+{
+    if (!m_bLoaded)
+        Load();
+
+    for (auto it = m_mruVec.begin(); it != m_mruVec.end(); ++it)
+    {
+        if (path.compare(std::get<0>(*it))==0)
+        {
+            if (removeEvenIfPinned || !std::get<1>(*it))
+                m_mruVec.erase(it);
+            break;
+        }
+    }
     Save();
 }
 
