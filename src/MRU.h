@@ -13,6 +13,7 @@ public:
 
     HRESULT                         PopulateRibbonRecentItems(PROPVARIANT* pvarValue);
     void                            AddPath(const std::wstring& path);
+    void                            RemovePath(const std::wstring& path, bool removeEvenIfPinned);
     void                            PinPath(const std::wstring& path, bool bPin);
 
 private:

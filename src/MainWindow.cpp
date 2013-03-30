@@ -580,6 +580,7 @@ bool CMainWindow::OpenFiles( const std::vector<std::wstring>& files )
             }
             else
             {
+                CMRU::Instance().RemovePath(file, false);
                 bRet = false;
             }
         }
