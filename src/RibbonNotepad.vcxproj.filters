@@ -105,6 +105,12 @@
     <ClInclude Include="XPMIcons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MRU.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertySet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -166,6 +172,12 @@
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp">
       <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="MRU.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertySet.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

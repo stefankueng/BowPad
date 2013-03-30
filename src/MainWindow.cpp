@@ -3,6 +3,7 @@
 #include "RibbonNotepad.h"
 #include "RibbonNotepadUI.h"
 #include "StringUtils.h"
+#include "MRU.h"
 
 #include <memory>
 #include <Shobjidl.h>
@@ -154,12 +155,31 @@ STDMETHODIMP CMainWindow::UpdateProperty(
     const PROPVARIANT* ppropvarCurrentValue,
     PROPVARIANT* ppropvarNewValue)
 {
-    UNREFERENCED_PARAMETER(nCmdID);
-    UNREFERENCED_PARAMETER(key);
     UNREFERENCED_PARAMETER(ppropvarCurrentValue);
     UNREFERENCED_PARAMETER(ppropvarNewValue);
 
-    return E_NOTIMPL;
+    HRESULT hr = E_NOTIMPL;
+    //if(UI_PKEY_Enabled == key)
+    //{
+    //    return UIInitPropertyFromBoolean(UI_PKEY_Enabled, GetStatus(nCmdID), newValue);
+    //}
+
+    switch(nCmdID)
+    {
+    case cmdMRUList:
+        if (UI_PKEY_RecentItems == key)
+        {
+            hr = CMRU::Instance().PopulateRibbonRecentItems(ppropvarNewValue);
+        }
+        break;
+    default:
+        //if (UI_PKEY_BooleanValue == key)
+        //{
+        //    hr = UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, GetStatus(nCmdID) & OLECMDF_LATCHED, newValue);
+        //}
+        break;
+    }
+    return hr;
 }
 
 STDMETHODIMP CMainWindow::Execute(
@@ -174,8 +194,58 @@ STDMETHODIMP CMainWindow::Execute(
     UNREFERENCED_PARAMETER(key);
     UNREFERENCED_PARAMETER(verb);
 
+    HRESULT hr = S_OK;
+    if (nCmdID == cmdMRUList)
+    {
+        if (*key == UI_PKEY_RecentItems)
+        {
+            if (ppropvarValue)
+            {
+                SAFEARRAY * psa = V_ARRAY(ppropvarValue);
+                LONG lstart, lend;
+                hr = SafeArrayGetLBound( psa, 1, &lstart );
+                if (FAILED(hr))
+                    return hr;
+                hr = SafeArrayGetUBound( psa, 1, &lend );
+                if (FAILED(hr))
+                    return hr;
+                IUISimplePropertySet ** data;
+                hr = SafeArrayAccessData(psa,(void **)&data);
+                for (LONG idx = lstart; idx <= lend; ++idx)
+                {
+                    IUISimplePropertySet * ppset = (IUISimplePropertySet *)data[idx];
+                    if (ppset)
+                    {
+                        PROPVARIANT var;
+                        ppset->GetValue(UI_PKEY_LabelDescription, &var);
+                        std::wstring path = var.bstrVal;
+                        PropVariantClear(&var);
+                        ppset->GetValue(UI_PKEY_Pinned, &var);
+                        bool bPinned = VARIANT_TRUE==var.boolVal;
+                        PropVariantClear(&var);
+                        CMRU::Instance().PinPath(path, bPinned);
+                    }
+                }
+                hr = SafeArrayUnaccessData(psa);
+            }
+        }
+        if (*key == UI_PKEY_SelectedItem)
+        {
+            if (pCommandExecutionProperties)
+            {
+                PROPVARIANT var;
+                pCommandExecutionProperties->GetValue(UI_PKEY_LabelDescription, &var);
+                std::wstring path = var.bstrVal;
+                PropVariantClear(&var);
+                std::vector<std::wstring> files;
+                files.push_back(path);
+                OpenFiles(files);
+            }
+        }
+    }
+
     DoCommand(nCmdID);
-    return S_OK;
+    return hr;
 }
 
 bool CMainWindow::RegisterAndCreateWindow()
@@ -493,6 +563,7 @@ bool CMainWindow::OpenFiles( const std::vector<std::wstring>& files )
         CDocument doc = m_DocManager.LoadFile(*this, file, encoding);
         if (doc.m_document)
         {
+            CMRU::Instance().AddPath(file);
             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
             m_DocManager.AddDocumentAtEnd(doc);
             std::wstring sFileName = file.substr(file.find_last_of('\\')+1);
