@@ -334,8 +334,23 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         int tab = m_TabBar.GetCurrentTabIndex();
                         if (tab < m_DocManager.GetCount())
                         {
-                            Document oldDoc = m_scintilla.Call(SCI_GETDOCPOINTER);
-                            m_scintilla.Call(SCI_SETDOCPOINTER, 0, m_DocManager.GetScintillaDocument(tab));
+                            CDocument doc = m_DocManager.GetDocument(tab);
+                            m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+                            m_scintilla.RestoreCurrentPos(doc.m_position);
+                            SetFocus(m_scintilla);
+                            m_scintilla.Call(SCI_GRABFOCUS);
+                        }
+                    }
+                    break;
+                case TCN_SELCHANGING:
+                    {
+                        // document is about to be deactivated
+                        int tab = m_TabBar.GetCurrentTabIndex();
+                        if (tab < m_DocManager.GetCount())
+                        {
+                            CDocument doc = m_DocManager.GetDocument(tab);
+                            m_scintilla.SaveCurrentPos(&doc.m_position);
+                            m_DocManager.SetDocument(tab, doc);
                         }
                     }
                     break;

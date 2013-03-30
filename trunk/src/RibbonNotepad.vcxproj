@@ -210,6 +210,7 @@
     <ClInclude Include="..\ext\sktoolslib\StringUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
+    <ClInclude Include="Document.h" />
     <ClInclude Include="DocumentManager.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MRU.h" />

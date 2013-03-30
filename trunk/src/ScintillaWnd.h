@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseWindow.h"
 #include "Scintilla.h"
+#include "Document.h"
 
 class CScintillaWnd : public CWindow
 {
@@ -21,6 +22,8 @@ public :
     }
 
     void UpdateLineNumberWidth();
+    void SaveCurrentPos(CPosData * pPos);
+    void RestoreCurrentPos(CPosData pos);
 protected:
     virtual LRESULT CALLBACK WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 private:
