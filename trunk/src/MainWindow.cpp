@@ -321,7 +321,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             if ((pNMHDR->idFrom == (UINT_PTR)&m_TabBar) ||
                 (pNMHDR->hwndFrom == m_TabBar))
             {
-                //TBHDR * pnmhdr = reinterpret_cast<TBHDR*>(lParam);
+                TBHDR * ptbhdr = reinterpret_cast<TBHDR*>(lParam);
 
                 switch (((LPNMHDR)lParam)->code)
                 {
@@ -335,7 +335,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         if (tab < m_DocManager.GetCount())
                         {
                             Document oldDoc = m_scintilla.Call(SCI_GETDOCPOINTER);
-                            m_scintilla.Call(SCI_ADDREFDOCUMENT, 0, oldDoc);
                             m_scintilla.Call(SCI_SETDOCPOINTER, 0, m_DocManager.GetScintillaDocument(tab));
                         }
                     }
@@ -345,6 +344,18 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         int src = m_TabBar.GetSrcTab();
                         int dst = m_TabBar.GetDstTab();
                         m_DocManager.ExchangeDocs(src, dst);
+                    }
+                    break;
+                case TCN_TABDELETE:
+                    {
+                        int tab = m_TabBar.GetCurrentTabIndex();
+                        if (tab == ptbhdr->tabOrigin)
+                        {
+                            if (tab > 0)
+                                m_TabBar.ActivateAt(tab-1);
+                        }
+                        m_DocManager.RemoveDocument(ptbhdr->tabOrigin);
+                        m_TabBar.DeletItemAt(ptbhdr->tabOrigin);
                     }
                     break;
                 }

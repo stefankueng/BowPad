@@ -509,3 +509,10 @@ size_t CDocumentManager::GetIndexForPath( const std::wstring& path ) const
     }
     return (size_t)-1;
 }
+
+void CDocumentManager::RemoveDocument( int index )
+{
+    CDocument doc = GetDocument(index);
+    m_scratchScintilla.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
+    m_documents.erase(m_documents.begin() + index);
+}
