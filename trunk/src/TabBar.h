@@ -20,7 +20,7 @@ struct TBHDR
 
 struct CloseButtonZone
 {
-    CloseButtonZone(): m_width(11), m_height(11), m_fromTop(5), m_fromRight(3){};
+    CloseButtonZone(): m_width(11), m_height(11), m_fromTop(3), m_fromRight(3){};
     bool IsHit(int x, int y, const RECT & testZone) const;
     RECT GetButtonRectFrom(const RECT & tabItemRect) const;
 
@@ -85,14 +85,15 @@ protected:
 
     static void                 SetColour(COLORREF colour2Set, tabColourIndex i);
 
-    static LRESULT CALLBACK     TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
-    {
-        return (((CTabBar *)(::GetWindowLongPtr(hwnd, GWLP_USERDATA)))->RunProc(hwnd, Message, wParam, lParam));
-    };
+    static LRESULT CALLBACK     TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
     void                        ExchangeItemData(POINT point);
     LRESULT                     RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
-    void                        DrawItem(DRAWITEMSTRUCT *pDrawItemStruct);
+    COLORREF                    GetTabColor(bool bSelected);
+    void                        DrawMainBorder(LPDRAWITEMSTRUCT lpDrawItemStruct);
+    void                        DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
+    void                        DrawItemBorder(LPDRAWITEMSTRUCT lpDrawItemStruct);
+
     void                        DraggingCursor(POINT screenPoint);
 
     int                         GetTabIndexAt(const POINT & p) const { return GetTabIndexAt(p.x, p.y); }
@@ -100,7 +101,6 @@ protected:
     int                         GetTabIndexAt(int x, int y) const;
 
     bool                        IsPointInParentZone(POINT screenPoint) const;
-
 private:
     int                         m_nItems;
     bool                        m_bHasImgList;
