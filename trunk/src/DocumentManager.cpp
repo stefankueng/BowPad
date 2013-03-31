@@ -126,7 +126,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
             encoding = GetCodepageFromBuf(data, lenFile, doc.m_bHasBOM);
         }
         doc.m_encoding = encoding;
-        if (encoding == CP_UTF8)
+        if ((encoding == CP_UTF8) || (encoding == -1))
         {
             // Nothing to convert, just pass it to Scintilla
             if (bFirst && doc.m_bHasBOM)
