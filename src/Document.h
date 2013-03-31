@@ -33,6 +33,8 @@ public:
         , m_format(UNKNOWN_FORMAT)
         , m_bHasBOM(false)
         , m_encoding(-1)
+        , m_bIsDirty(false)
+        , m_bIsReadonly(false)
     {
     }
 
@@ -43,6 +45,8 @@ public:
     int                     m_encoding;
     std::wstring            m_path;
     CPosData                m_position;
+    bool                    m_bIsDirty;
+    bool                    m_bIsReadonly;
 };
 
 

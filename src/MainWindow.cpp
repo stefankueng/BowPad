@@ -386,6 +386,25 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         m_scintilla.UpdateLineNumberWidth();
                     }
                     break;
+                case SCN_SAVEPOINTREACHED:
+                case SCN_SAVEPOINTLEFT:
+                    {
+                        int tab = m_TabBar.GetCurrentTabIndex();
+                        if (tab < m_DocManager.GetCount())
+                        {
+                            CDocument doc = m_DocManager.GetDocument(tab);
+                            doc.m_bIsDirty = pScn->nmhdr.code == SCN_SAVEPOINTLEFT;
+                            m_DocManager.SetDocument(tab, doc);
+                            TCITEM tie;
+                            tie.lParam = -1;
+                            tie.mask = TCIF_IMAGE;
+                            tie.iImage = doc.m_bIsDirty?UNSAVED_IMG_INDEX:SAVED_IMG_INDEX;
+                            if (doc.m_bIsReadonly)
+                                tie.iImage = REDONLY_IMG_INDEX;
+                            ::SendMessage(m_TabBar, TCM_SETITEM, tab, reinterpret_cast<LPARAM>(&tie));
+                        }
+                    }
+                    break;
                 }
 
             }
