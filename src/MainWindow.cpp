@@ -156,13 +156,12 @@ STDMETHODIMP CMainWindow::UpdateProperty(
     PROPVARIANT* ppropvarNewValue)
 {
     UNREFERENCED_PARAMETER(ppropvarCurrentValue);
-    UNREFERENCED_PARAMETER(ppropvarNewValue);
 
     HRESULT hr = E_NOTIMPL;
-    //if(UI_PKEY_Enabled == key)
-    //{
-    //    return UIInitPropertyFromBoolean(UI_PKEY_Enabled, GetStatus(nCmdID), newValue);
-    //}
+    if(UI_PKEY_Enabled == key)
+    {
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, GetStatus(nCmdID), ppropvarNewValue);
+    }
 
     switch(nCmdID)
     {
@@ -364,6 +363,52 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case TCN_TABDELETE:
                     {
                         int tab = m_TabBar.GetCurrentTabIndex();
+                        CDocument doc = m_DocManager.GetDocument(ptbhdr->tabOrigin);
+                        if (doc.m_bIsDirty)
+                        {
+                            m_TabBar.ActivateAt(ptbhdr->tabOrigin);
+                            ResString rTitle(hInst, IDS_HASMODIFICATIONS);
+                            ResString rQuestion(hInst, IDS_DOYOUWANTOSAVE);
+                            ResString rSave(hInst, IDS_SAVE);
+                            ResString rDontSave(hInst, IDS_DONTSAVE);
+                            wchar_t buf[100] = {0};
+                            m_TabBar.GetCurrentTitle(buf, _countof(buf));
+                            std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
+
+                            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+                            TASKDIALOG_BUTTON aCustomButtons[2];
+                            aCustomButtons[0].nButtonID = 100;
+                            aCustomButtons[0].pszButtonText = rSave;
+                            aCustomButtons[1].nButtonID = 101;
+                            aCustomButtons[1].pszButtonText = rDontSave;
+
+                            tdc.hwndParent = *this;
+                            tdc.hInstance = hInst;
+                            tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+                            tdc.pButtons = aCustomButtons;
+                            tdc.cButtons = _countof(aCustomButtons);
+                            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+                            tdc.pszMainIcon = TD_INFORMATION_ICON;
+                            tdc.pszMainInstruction = rTitle;
+                            tdc.pszContent = sQuestion.c_str();
+                            tdc.nDefaultButton = 100;
+                            int nClickedBtn = 0;
+                            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
+
+                            if (SUCCEEDED(hr))
+                            {
+                                if (nClickedBtn == 100)
+                                    SaveCurrentTab();
+                                else if (nClickedBtn != 101)
+                                {
+                                    m_TabBar.ActivateAt(tab);
+                                    break;  // don't close!
+                                }
+                            }
+
+                            m_TabBar.ActivateAt(tab);
+                        }
+
                         if (tab == ptbhdr->tabOrigin)
                         {
                             if (tab > 0)
@@ -403,6 +448,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                 tie.iImage = REDONLY_IMG_INDEX;
                             ::SendMessage(m_TabBar, TCM_SETITEM, tab, reinterpret_cast<LPARAM>(&tie));
                         }
+                        g_pFramework->InvalidateUICommand(cmdSave, UI_INVALIDATIONS_STATE, NULL);
+                        g_pFramework->InvalidateUICommand(cmdSaveAll, UI_INVALIDATIONS_STATE, NULL);
                     }
                     break;
                 }
@@ -494,50 +541,22 @@ LRESULT CMainWindow::DoCommand(int id)
         }
         break;
     case cmdSave:
+        SaveCurrentTab();
+        g_pFramework->InvalidateUICommand(cmdSave, UI_INVALIDATIONS_STATE, NULL);
+        g_pFramework->InvalidateUICommand(cmdSaveAll, UI_INVALIDATIONS_STATE, NULL);
+        break;
+    case cmdSaveAll:
         {
-            int tab = m_TabBar.GetCurrentTabIndex();
-            if (tab < m_DocManager.GetCount())
+            for (int i = 0; i < (int)m_DocManager.GetCount(); ++i)
             {
-                CDocument doc = m_DocManager.GetDocument(tab);
-                if (doc.m_path.empty())
+                if (m_DocManager.GetDocument(i).m_bIsDirty)
                 {
-                    CComPtr<IFileSaveDialog> pfd = NULL;
-
-                    HRESULT hr = pfd.CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_INPROC_SERVER);
-                    if (SUCCEEDED(hr))
-                    {
-                        // Set the dialog options
-                        DWORD dwOptions;
-                        if (SUCCEEDED(hr = pfd->GetOptions(&dwOptions)))
-                        {
-                            hr = pfd->SetOptions(dwOptions | FOS_FORCEFILESYSTEM | FOS_OVERWRITEPROMPT);
-                        }
-
-                        // Set a title
-                        if (SUCCEEDED(hr))
-                        {
-                            pfd->SetTitle(L"RibbonNotepad");
-                        }
-
-                        // Show the save/open file dialog
-                        if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(*this)))
-                        {
-                            CComPtr<IShellItem> psiResult = NULL;
-                            hr = pfd->GetResult(&psiResult);
-                            if (SUCCEEDED(hr))
-                            {
-                                PWSTR pszPath = NULL;
-                                hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
-                                if (SUCCEEDED(hr))
-                                {
-                                    doc.m_path = pszPath;
-                                }
-                            }
-                        }
-                    }
+                    m_TabBar.ActivateAt(i);
+                    SaveCurrentTab();
                 }
-                m_DocManager.SaveFile(*this, doc);
             }
+            g_pFramework->InvalidateUICommand(cmdSave, UI_INVALIDATIONS_STATE, NULL);
+            g_pFramework->InvalidateUICommand(cmdSaveAll, UI_INVALIDATIONS_STATE, NULL);
         }
         break;
     default:
@@ -631,6 +650,95 @@ bool CMainWindow::OpenFiles( const std::vector<std::wstring>& files )
                 bRet = false;
             }
         }
+    }
+    return bRet;
+}
+
+BOOL CMainWindow::GetStatus( int cmdId )
+{
+    switch (cmdId)
+    {
+    case cmdSave:
+        {
+            int tab = m_TabBar.GetCurrentTabIndex();
+            if (tab < m_DocManager.GetCount())
+            {
+                CDocument doc = m_DocManager.GetDocument(tab);
+                return doc.m_bIsDirty;
+            }
+        }
+        break;
+    case cmdSaveAll:
+        {
+            int dirtycount = 0;
+            for (size_t i = 0; i < m_DocManager.GetCount(); ++i)
+            {
+                CDocument doc = m_DocManager.GetDocument((int)i);
+                if (doc.m_bIsDirty)
+                    dirtycount++;
+            }
+            return dirtycount > 1;
+        }
+        break;
+    default:
+        return TRUE;
+    }
+    return TRUE;
+}
+
+bool CMainWindow::SaveCurrentTab()
+{
+    bool bRet = false;
+    int tab = m_TabBar.GetCurrentTabIndex();
+    if (tab < m_DocManager.GetCount())
+    {
+        CDocument doc = m_DocManager.GetDocument(tab);
+        if (doc.m_path.empty())
+        {
+            CComPtr<IFileSaveDialog> pfd = NULL;
+
+            HRESULT hr = pfd.CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_INPROC_SERVER);
+            if (SUCCEEDED(hr))
+            {
+                // Set the dialog options
+                DWORD dwOptions;
+                if (SUCCEEDED(hr = pfd->GetOptions(&dwOptions)))
+                {
+                    hr = pfd->SetOptions(dwOptions | FOS_FORCEFILESYSTEM | FOS_OVERWRITEPROMPT);
+                }
+
+                // Set a title
+                if (SUCCEEDED(hr))
+                {
+                    ResString sTitle(hInst, IDS_APP_TITLE);
+                    std::wstring s = (const wchar_t*)sTitle;
+                    s += L" - ";
+                    wchar_t buf[100] = {0};
+                    m_TabBar.GetCurrentTitle(buf, _countof(buf));
+                    s += buf;
+                    pfd->SetTitle(s.c_str());
+                }
+
+                // Show the save/open file dialog
+                if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(*this)))
+                {
+                    CComPtr<IShellItem> psiResult = NULL;
+                    hr = pfd->GetResult(&psiResult);
+                    if (SUCCEEDED(hr))
+                    {
+                        PWSTR pszPath = NULL;
+                        hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
+                        if (SUCCEEDED(hr))
+                        {
+                            doc.m_path = pszPath;
+                            CMRU::Instance().AddPath(doc.m_path);
+                        }
+                    }
+                }
+            }
+        }
+        if (!doc.m_path.empty())
+            bRet = m_DocManager.SaveFile(*this, doc);
     }
     return bRet;
 }

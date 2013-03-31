@@ -59,10 +59,12 @@ protected:
     LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
     LRESULT             DoCommand(int id);
+    BOOL                GetStatus(int cmdId);
 
 private:
     void                ResizeChildWindows();
     bool                OpenFiles(const std::vector<std::wstring>& files);
+    bool                SaveCurrentTab();
 private:
     LONG                m_cRef;
     IUIRibbon *         m_pRibbon;
