@@ -572,12 +572,14 @@ void CMainWindow::ResizeChildWindows()
 {
     RECT rect;
     GetClientRect(*this, &rect);
-    MoveWindow(m_StatusBar, rect.left, rect.bottom-m_StatusBar.GetHeight(), rect.right-rect.left, m_StatusBar.GetHeight(), true);
-    MoveWindow(m_TabBar, rect.left, rect.top+m_RibbonHeight, rect.right-rect.left, rect.bottom-rect.top, true);
+    HDWP hDwp = BeginDeferWindowPos(3);
+    DeferWindowPos(hDwp, m_StatusBar, NULL, rect.left, rect.bottom-m_StatusBar.GetHeight(), rect.right-rect.left, m_StatusBar.GetHeight(), SWP_NOACTIVATE|SWP_NOOWNERZORDER|SWP_NOZORDER|SWP_SHOWWINDOW);
+    DeferWindowPos(hDwp, m_TabBar, NULL, rect.left, rect.top+m_RibbonHeight, rect.right-rect.left, rect.bottom-rect.top, SWP_NOACTIVATE|SWP_NOOWNERZORDER|SWP_NOZORDER|SWP_SHOWWINDOW);
     RECT tabrc;
     TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
     MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
-    MoveWindow(m_scintilla, rect.left, tabrc.bottom, rect.right-rect.left+5, rect.bottom-rect.top-tabrc.bottom-m_StatusBar.GetHeight(), true);
+    DeferWindowPos(hDwp, m_scintilla, NULL, rect.left, tabrc.bottom, rect.right-rect.left, rect.bottom-rect.top-tabrc.bottom-m_StatusBar.GetHeight(), SWP_NOACTIVATE|SWP_NOOWNERZORDER|SWP_NOZORDER|SWP_SHOWWINDOW);
+    EndDeferWindowPos(hDwp);
 }
 
 bool CMainWindow::OpenFiles( const std::vector<std::wstring>& files )
