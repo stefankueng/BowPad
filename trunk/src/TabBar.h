@@ -11,6 +11,9 @@
 #define TCN_REFRESH                     (WM_USER + 6)
 #define TCN_GETCOLOR                    (WM_USER + 7)
 
+const int SAVED_IMG_INDEX = 0;
+const int UNSAVED_IMG_INDEX = 1;
+const int REDONLY_IMG_INDEX = 2;
 
 struct TBHDR
 {
