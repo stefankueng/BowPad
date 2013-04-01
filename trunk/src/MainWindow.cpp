@@ -452,6 +452,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         g_pFramework->InvalidateUICommand(cmdSaveAll, UI_INVALIDATIONS_STATE, NULL);
                     }
                     break;
+                case SCN_MARGINCLICK:
+                    {
+                        m_scintilla.MarginClick(pScn);
+                    }
+                    break;
                 }
 
             }
