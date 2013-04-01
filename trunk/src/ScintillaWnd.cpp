@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ScintillaWnd.h"
 #include "XPMIcons.h"
+#include "UnicodeUtils.h"
 
 const int SC_MARGE_LINENUMBER = 0;
 const int SC_MARGE_SYBOLE = 1;
@@ -137,4 +138,75 @@ void CScintillaWnd::RestoreCurrentPos(CPosData pos)
 
     size_t lineToShow = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
     Call(SCI_LINESCROLL, 0, lineToShow);
+}
+
+void CScintillaWnd::SetupLexerForExt( const std::wstring& ext )
+{
+    auto lexerdata = CLexStyles::Instance().GetLexerDataForExt(CUnicodeUtils::StdGetUTF8(ext));
+    auto langdata = CLexStyles::Instance().GetKeywordsForExt(CUnicodeUtils::StdGetUTF8(ext));
+    SetupLexer(lexerdata, langdata);
+}
+
+void CScintillaWnd::SetupLexerForLang( const std::wstring& lang )
+{
+    auto lexerdata = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(lang));
+    auto langdata = CLexStyles::Instance().GetKeywordsForLang(CUnicodeUtils::StdGetUTF8(lang));
+    SetupLexer(lexerdata, langdata);
+}
+
+void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, std::string>& langdata )
+{
+    SetupDefaultStyles();
+    Call(SCI_STYLECLEARALL);
+
+    Call(SCI_SETLEXER, lexerdata.ID);
+
+    for (auto it: lexerdata.Properties)
+    {
+        Call(SCI_SETPROPERTY, (WPARAM)it.first.c_str(), (LPARAM)it.second.c_str());
+    }
+    for (auto it: lexerdata.Styles)
+    {
+        Call(SCI_STYLESETFORE, it.first, it.second.ForegroundColor);
+        Call(SCI_STYLESETBACK, it.first, it.second.BackgroundColor);
+        if (!it.second.FontName.empty())
+            Call(SCI_STYLESETFONT, it.first, (LPARAM)it.second.FontName.c_str());
+        switch (it.second.FontStyle)
+        {
+        case FONTSTYLE_NORMAL:
+            break;  // do nothing
+        case FONTSTYLE_BOLD:
+            Call(SCI_STYLESETBOLD, it.first, 1);
+            break;
+        case FONTSTYLE_ITALIC:
+            Call(SCI_STYLESETITALIC, it.first, 1);
+            break;
+        case FONTSTYLE_UNDERLINED:
+            Call(SCI_STYLESETUNDERLINE, it.first, 1);
+            break;
+        }
+        if (it.second.FontSize)
+            Call(SCI_STYLESETSIZE, it.first, it.second.FontSize);
+    }
+    for (auto it: langdata)
+    {
+        Call(SCI_SETKEYWORDS, it.first, (LPARAM)it.second.c_str());
+    }
+}
+
+void CScintillaWnd::SetupDefaultStyles()
+{
+    Call(SCI_STYLERESETDEFAULT);
+    // if possible, use the Consolas font
+    // to determine whether Consolas is available, try to create
+    // a font with it.
+    HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
+    if (hFont)
+    {
+        Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Consolas");
+        DeleteObject(hFont);
+    }
+    else
+        Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Courier New");
+    Call(SCI_STYLESETSIZE, STYLE_DEFAULT, 10);
 }

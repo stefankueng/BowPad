@@ -212,6 +212,7 @@
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
     <ClInclude Include="Document.h" />
     <ClInclude Include="DocumentManager.h" />
+    <ClInclude Include="LexStyles.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MRU.h" />
     <ClInclude Include="PropertySet.h" />
@@ -239,6 +240,7 @@
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
     <ClCompile Include="DocumentManager.cpp" />
+    <ClCompile Include="LexStyles.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MRU.cpp" />
     <ClCompile Include="PropertySet.cpp" />
@@ -288,6 +290,7 @@
     <None Include="res\drag_interdit.cur" />
     <None Include="res\drag_out.cur" />
     <None Include="res\drag_plus.cur" />
+    <None Include="res\Properties.ini" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ext\scintilla\Scintilla.vcxproj">

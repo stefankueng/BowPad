@@ -1,0 +1,195 @@
+#include "stdafx.h"
+#include "LexStyles.h"
+#include "SimpleIni.h"
+#include "StringUtils.h"
+#include "UnicodeUtils.h"
+#include "RibbonNotepad.h"
+
+#include <vector>
+
+CLexStyles::CLexStyles(void)
+    : m_bLoaded(false)
+{
+}
+
+
+CLexStyles::~CLexStyles(void)
+{
+}
+
+CLexStyles& CLexStyles::Instance()
+{
+    static CLexStyles instance;
+    if (!instance.m_bLoaded)
+        instance.Load();
+    return instance;
+}
+
+void CLexStyles::Load()
+{
+    HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(IDR_LEXSTYLES), L"config");
+    if (hRes)
+    {
+        HGLOBAL hResourceLoaded = LoadResource(NULL, hRes);
+        if (hResourceLoaded)
+        {
+            char * lpResLock = (char *) LockResource(hResourceLoaded);
+            DWORD dwSizeRes = SizeofResource(NULL, hRes);
+            if (lpResLock)
+            {
+                CSimpleIni ini;
+                ini.LoadFile(lpResLock, dwSizeRes);
+
+                std::map<std::wstring, int> lexers;
+                CSimpleIni::TNamesDepend lexkeys;
+                ini.GetAllKeys(L"lexers", lexkeys);
+                for (auto l : lexkeys)
+                {
+                    std::wstring v = ini.GetValue(L"lexers", l);
+                    std::vector<std::wstring> langs;
+                    stringtok(langs, v, true, L";");
+                    int lex = _wtoi(ini.GetValue(l, L"Lexer", L""));
+                    for (auto x : langs)
+                    {
+                        lexers[x] = lex;
+                    }
+
+                    // now parse all the data for this lexer
+                    LexerData lexerdata;
+                    lexerdata.ID = lex;
+                    CSimpleIni::TNamesDepend lexdatakeys;
+                    ini.GetAllKeys(l, lexdatakeys);
+                    for (auto it : lexdatakeys)
+                    {
+                        if (_wcsnicmp(L"Style", it, 5) == 0)
+                        {
+                            StyleData style;
+                            std::wstring v = ini.GetValue(l, it);
+                            std::vector<std::wstring> vec;
+                            stringtok(vec, v, false, L";");
+                            int i = 0;
+                            wchar_t * endptr;
+                            unsigned long hexval;
+                            for (auto s : vec)
+                            {
+                                switch (i)
+                                {
+                                case 0: // Name
+                                    style.Name = s;
+                                    break;
+                                case 1: // Foreground color
+                                    hexval = wcstol(s.c_str(), &endptr, 16);
+                                    style.ForegroundColor = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
+                                    break;
+                                case 2: // Background color
+                                    hexval = wcstol(s.c_str(), &endptr, 16);
+                                    style.BackgroundColor = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
+                                    break;
+                                case 3: // Font name
+                                    style.FontName = s;
+                                    break;
+                                case 4: // Font style
+                                    style.FontStyle = (FontStyle)_wtoi(s.c_str());
+                                    break;
+                                case 5: // Font size
+                                    style.FontSize = _wtoi(s.c_str());
+                                    break;
+                                }
+                                ++i;
+                            }
+
+                            lexerdata.Styles[_wtoi(it+5)] = style;
+                        }
+                        if (_wcsnicmp(L"Prop_", it, 5) == 0)
+                        {
+                            lexerdata.Properties[CUnicodeUtils::StdGetUTF8(it+5)] = CUnicodeUtils::StdGetUTF8(ini.GetValue(l, it, L""));
+                        }
+                    }
+                    m_lexerdata[lexerdata.ID] = lexerdata;
+                }
+
+                CSimpleIni::TNamesDepend langkeys;
+                ini.GetAllKeys(L"language", langkeys);
+                for (auto k : langkeys)
+                {
+                    std::wstring v = ini.GetValue(L"language", k);
+                    std::vector<std::wstring> exts;
+                    stringtok(exts, v, true, L";");
+                    for (auto e : exts)
+                    {
+                        m_extLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
+                    }
+
+                    std::wstring langsect = L"lang_";
+                    langsect += k;
+                    CSimpleIni::TNamesDepend specLangKeys;
+                    ini.GetAllKeys(langsect.c_str(), specLangKeys);
+                    LanguageData ld;
+                    ld.lexer = lexers[k];
+                    for (auto sk : specLangKeys)
+                    {
+                        if (_wcsnicmp(L"keywords", sk, 8) == 0)
+                        {
+                            ld.keywordlist[_wtol(sk+8)] = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
+                        }
+                    }
+                    m_Langdata[CUnicodeUtils::StdGetUTF8(k)] = ld;
+                }
+            }
+        }
+    }
+
+    m_bLoaded = true;
+}
+
+std::map<int, std::string> CLexStyles::GetKeywordsForExt( const std::string& ext ) const
+{
+    auto it = m_extLang.find(ext);
+    if (it != m_extLang.end())
+    {
+        auto lt = m_Langdata.find(it->second);
+        if (lt != m_Langdata.end())
+            return lt->second.keywordlist;
+    }
+    std::map<int, std::string> empty;
+    return empty;
+}
+
+std::map<int, std::string> CLexStyles::GetKeywordsForLang( const std::string& lang ) const
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+        return lt->second.keywordlist;
+
+    std::map<int, std::string> empty;
+    return empty;
+}
+
+LexerData CLexStyles::GetLexerDataForExt( const std::string& ext ) const
+{
+    auto it = m_extLang.find(ext);
+    if (it != m_extLang.end())
+    {
+        auto lt = m_Langdata.find(it->second);
+        if (lt != m_Langdata.end())
+        {
+            auto ld = m_lexerdata.find(lt->second.lexer);
+            if (ld != m_lexerdata.end())
+                return ld->second;
+        }
+    }
+    return LexerData();
+}
+
+LexerData CLexStyles::GetLexerDataForLang( const std::string& lang ) const
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+    {
+        auto ld = m_lexerdata.find(lt->second.lexer);
+        if (ld != m_lexerdata.end())
+            return ld->second;
+    }
+    return LexerData();
+}
+

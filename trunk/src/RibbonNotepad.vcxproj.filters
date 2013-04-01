@@ -114,6 +114,9 @@
     <ClInclude Include="Document.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LexStyles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -182,6 +185,9 @@
     <ClCompile Include="PropertySet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LexStyles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RibbonNotepad.rc">
@@ -233,5 +239,6 @@
     <None Include="res\drag_plus.cur">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\Properties.ini" />
   </ItemGroup>
 </Project>

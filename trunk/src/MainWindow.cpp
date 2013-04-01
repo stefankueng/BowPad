@@ -639,6 +639,7 @@ bool CMainWindow::OpenFiles( const std::vector<std::wstring>& files )
             {
                 CMRU::Instance().AddPath(file);
                 m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+                m_scintilla.SetupLexerForExt(file.substr(file.find_last_of('.')+1));
                 m_DocManager.AddDocumentAtEnd(doc);
                 std::wstring sFileName = file.substr(file.find_last_of('\\')+1);
                 int index = m_TabBar.InsertAtEnd(sFileName.c_str());

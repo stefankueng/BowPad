@@ -91,6 +91,8 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     m_scratchScintilla.Call(SCI_CLEARALL);
     //m_scratchScintilla.Call(SCI_SETLEXER, ScintillaEditView::langNames[language].lexerID);
     m_scratchScintilla.Call(SCI_SETCODEPAGE, CP_UTF8);
+    std::wstring ext = path.substr(path.find_last_of('.')+1);
+    m_scratchScintilla.SetupLexerForExt(ext);
 
     bool success = true;
     const int blockSize = 128 * 1024;   //128 kB
