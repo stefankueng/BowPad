@@ -44,6 +44,33 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETSCROLLWIDTHTRACKING, true);
     Call(SCI_SETSCROLLWIDTH, 1); // default empty document: override default width
 
+    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDEROPEN, SC_MARK_BOXMINUS);
+    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDER, SC_MARK_BOXPLUS);
+    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDERSUB, SC_MARK_VLINE);
+    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDERTAIL, SC_MARK_LCORNER);
+    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDEREND, SC_MARK_BOXPLUSCONNECTED);
+    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDEROPENMID, SC_MARK_BOXMINUSCONNECTED);
+    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_TCORNER);
+    Call(SCI_MARKERENABLEHIGHLIGHT, 0);
+
+    const unsigned long foldmarkfore = RGB(250,250,250);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDER, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERSUB, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERTAIL, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEREND, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, foldmarkfore);
+
+    const unsigned long foldmarkback = RGB(50,50,50);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDER, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERSUB, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERTAIL, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEREND, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, foldmarkback);
+
     Call(SCI_SETWRAPVISUALFLAGS, SC_WRAPVISUALFLAG_MARGIN);
     Call(SCI_SETWRAPMODE, SC_WRAP_WORD);
 
@@ -209,4 +236,119 @@ void CScintillaWnd::SetupDefaultStyles()
     else
         Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Courier New");
     Call(SCI_STYLESETSIZE, STYLE_DEFAULT, 10);
+}
+
+void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
+{
+    int lineClick = int(Call(SCI_LINEFROMPOSITION, pNotification->position, 0));
+    int levelClick = int(Call(SCI_GETFOLDLEVEL, lineClick, 0));
+    if (levelClick & SC_FOLDLEVELHEADERFLAG)
+    {
+        if (pNotification->modifiers & SCMOD_SHIFT)
+        {
+            // Ensure all children visible
+            Call(SCI_SETFOLDEXPANDED, lineClick, 1);
+            Expand(lineClick, true, true, 100, levelClick);
+        }
+        else if (pNotification->modifiers & SCMOD_CTRL)
+        {
+            if (Call(SCI_GETFOLDEXPANDED, lineClick, 0))
+            {
+                // Contract this line and all children
+                Call(SCI_SETFOLDEXPANDED, lineClick, 0);
+                Expand(lineClick, false, true, 0, levelClick);
+            }
+            else
+            {
+                // Expand this line and all children
+                Call(SCI_SETFOLDEXPANDED, lineClick, 1);
+                Expand(lineClick, true, true, 100, levelClick);
+            }
+        }
+        else
+        {
+            // Toggle this line
+            bool mode = Call(SCI_GETFOLDEXPANDED, lineClick) != 0;
+            Fold(lineClick, !mode);
+        }
+    }
+}
+
+void CScintillaWnd::Expand(int &line, bool doExpand, bool force, int visLevels, int level)
+{
+    int lineMaxSubord = int(Call(SCI_GETLASTCHILD, line, level & SC_FOLDLEVELNUMBERMASK));
+    line++;
+    while (line <= lineMaxSubord)
+    {
+        if (force)
+        {
+            if (visLevels > 0)
+                Call(SCI_SHOWLINES, line, line);
+            else
+                Call(SCI_HIDELINES, line, line);
+        }
+        else
+        {
+            if (doExpand)
+                Call(SCI_SHOWLINES, line, line);
+        }
+        int levelLine = level;
+        if (levelLine == -1)
+            levelLine = int(Call(SCI_GETFOLDLEVEL, line, 0));
+        if (levelLine & SC_FOLDLEVELHEADERFLAG)
+        {
+            if (force)
+            {
+                if (visLevels > 1)
+                    Call(SCI_SETFOLDEXPANDED, line, 1);
+                else
+                    Call(SCI_SETFOLDEXPANDED, line, 0);
+                Expand(line, doExpand, force, visLevels - 1);
+            }
+            else
+            {
+                if (doExpand)
+                {
+                    if (!Call(SCI_GETFOLDEXPANDED, line, 0))
+                        Call(SCI_SETFOLDEXPANDED, line, 1);
+
+                    Expand(line, true, force, visLevels - 1);
+                }
+                else
+                {
+                    Expand(line, false, force, visLevels - 1);
+                }
+            }
+        }
+        else
+        {
+            line++;
+        }
+    }
+}
+
+void CScintillaWnd::Fold(int line, bool mode)
+{
+    int endStyled = (int)Call(SCI_GETENDSTYLED);
+    int len = (int)Call(SCI_GETTEXTLENGTH);
+
+    if (endStyled < len)
+        Call(SCI_COLOURISE, 0, -1);
+
+    int headerLine;
+    int level = (int)Call(SCI_GETFOLDLEVEL, line);
+
+    if (level & SC_FOLDLEVELHEADERFLAG)
+        headerLine = line;
+    else
+    {
+        headerLine = (int)Call(SCI_GETFOLDPARENT, line);
+        if (headerLine == -1)
+            return;
+    }
+
+    if (Call(SCI_GETFOLDEXPANDED, headerLine) != mode)
+    {
+        Call(SCI_TOGGLEFOLD, headerLine);
+    }
 }

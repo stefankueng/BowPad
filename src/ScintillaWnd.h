@@ -27,13 +27,15 @@ public :
     void RestoreCurrentPos(CPosData pos);
     void SetupLexerForExt(const std::wstring& ext);
     void SetupLexerForLang(const std::wstring& lang);
+    void MarginClick(Scintilla::SCNotification * pNotification);
 
 protected:
     virtual LRESULT CALLBACK WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
     void SetupLexer(const LexerData& lexerdata, const std::map<int, std::string>& langdata);
     void SetupDefaultStyles();
-
+    void Expand(int &line, bool doExpand, bool force = false, int visLevels = 0, int level = -1);
+    void Fold(int line, bool mode);
 private:
     SciFnDirect                 m_pSciMsg;
     sptr_t                      m_pSciWndData;
