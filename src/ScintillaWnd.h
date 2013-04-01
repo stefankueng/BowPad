@@ -2,6 +2,7 @@
 #include "BaseWindow.h"
 #include "Scintilla.h"
 #include "Document.h"
+#include "LexStyles.h"
 
 class CScintillaWnd : public CWindow
 {
@@ -24,8 +25,15 @@ public :
     void UpdateLineNumberWidth();
     void SaveCurrentPos(CPosData * pPos);
     void RestoreCurrentPos(CPosData pos);
+    void SetupLexerForExt(const std::wstring& ext);
+    void SetupLexerForLang(const std::wstring& lang);
+
 protected:
     virtual LRESULT CALLBACK WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+
+    void SetupLexer(const LexerData& lexerdata, const std::map<int, std::string>& langdata);
+    void SetupDefaultStyles();
+
 private:
     SciFnDirect                 m_pSciMsg;
     sptr_t                      m_pSciWndData;
