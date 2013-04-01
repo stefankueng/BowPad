@@ -409,6 +409,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             m_TabBar.ActivateAt(tab);
                         }
 
+                        if ((m_TabBar.GetItemCount() == 1)&&(m_scintilla.Call(SCI_GETTEXTLENGTH)==0)&&(m_scintilla.Call(SCI_GETMODIFY)==0)&&doc.m_path.empty())
+                            break;  // leave the empty, new document as is
+
                         if (tab == ptbhdr->tabOrigin)
                         {
                             if (tab > 0)
@@ -416,6 +419,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         }
                         m_DocManager.RemoveDocument(ptbhdr->tabOrigin);
                         m_TabBar.DeletItemAt(ptbhdr->tabOrigin);
+                        if (m_TabBar.GetItemCount() == 0)
+                            DoCommand(cmdNew);
                     }
                     break;
                 }
@@ -607,6 +612,8 @@ bool CMainWindow::Initialize()
     {
         return false;
     }
+
+    DoCommand(cmdNew);
 
     return true;
 }
