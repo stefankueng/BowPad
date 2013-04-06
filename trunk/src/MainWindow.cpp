@@ -500,6 +500,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case SCN_UPDATEUI:
                     {
                         m_scintilla.MarkSelectedWord();
+                        g_pFramework->InvalidateUICommand(cmdCut, UI_INVALIDATIONS_STATE, NULL);
+                        g_pFramework->InvalidateUICommand(cmdPaste, UI_INVALIDATIONS_STATE, NULL);
                     }
                     break;
                 }
@@ -610,7 +612,7 @@ LRESULT CMainWindow::DoCommand(int id)
         }
         break;
     case cmdCopy:
-        m_scintilla.Call(SCI_COPY);
+        m_scintilla.Call(SCI_COPYALLOWLINE);
         break;
     case cmdCut:
         m_scintilla.Call(SCI_CUT);
@@ -739,6 +741,12 @@ BOOL CMainWindow::GetStatus( int cmdId )
             }
             return dirtycount > 1;
         }
+        break;
+    case cmdCut:
+            return (m_scintilla.Call(SCI_GETSELTEXT)>1);
+        break;
+    case cmdPaste:
+            return (m_scintilla.Call(SCI_CANPASTE) != 0);
         break;
     default:
         return TRUE;
