@@ -23,7 +23,7 @@
 #include <atlbase.h>
 #include <atlstr.h>
 
-#define DEBUGOUTPUTREGPATH L"Software\\RibbonNotepad\\DebugOutputString"
+#define DEBUGOUTPUTREGPATH L"Software\\BowPad\\DebugOutputString"
 #include "DebugOutput.h"
 
 #include "Language.h"

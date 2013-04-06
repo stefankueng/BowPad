@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F767677D-B0FE-4C4F-B886-09E501C543B2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>RibbonNotepad</RootNamespace>
+    <RootNamespace>BowPad</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -217,7 +217,7 @@
     <ClInclude Include="MRU.h" />
     <ClInclude Include="PropertySet.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="RibbonNotepad.h" />
+    <ClInclude Include="BowPad.h" />
     <ClInclude Include="ScintillaWnd.h" />
     <ClInclude Include="StatusBar.h" />
     <ClInclude Include="stdafx.h" />
@@ -244,7 +244,7 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MRU.cpp" />
     <ClCompile Include="PropertySet.cpp" />
-    <ClCompile Include="RibbonNotepad.cpp" />
+    <ClCompile Include="BowPad.cpp" />
     <ClCompile Include="ScintillaWnd.cpp" />
     <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -256,7 +256,7 @@
     <ClCompile Include="TabBar.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="RibbonNotepad.rc" />
+    <ResourceCompile Include="BowPad.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\closeTabButton.bmp" />
@@ -266,22 +266,22 @@
     <Image Include="res\readonly.ico" />
     <Image Include="res\saved.ico" />
     <Image Include="res\unsaved.ico" />
-    <Image Include="RibbonNotepad.ico" />
+    <Image Include="BowPad.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="res\RibbonNotepad.xml">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">uicc.exe res\RibbonNotepad.xml $(IntDir)RibbonNotepad.bml /header:$(IntDir)RibbonNotepadUI.h /res:$(IntDir)RibbonNotepadUI.rc /name:RibbonNotepad</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building RibbonNotepad.xml</Message>
+    <CustomBuild Include="res\BowPad.xml">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building BowPad.xml</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">uicc.exe res\RibbonNotepad.xml $(IntDir)RibbonNotepad.bml /header:$(IntDir)RibbonNotepadUI.h /res:$(IntDir)RibbonNotepadUI.rc /name:RibbonNotepad</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building RibbonNotepad.xml</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building BowPad.xml</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">uicc.exe res\RibbonNotepad.xml $(IntDir)RibbonNotepad.bml /header:$(IntDir)RibbonNotepadUI.h /res:$(IntDir)RibbonNotepadUI.rc /name:RibbonNotepad</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building RibbonNotepad.xml</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building BowPad.xml</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">uicc.exe res\RibbonNotepad.xml $(IntDir)RibbonNotepad.bml /header:$(IntDir)RibbonNotepadUI.h /res:$(IntDir)RibbonNotepadUI.rc /name:RibbonNotepad</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building RibbonNotepad.xml</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building BowPad.xml</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
     </CustomBuild>
   </ItemGroup>

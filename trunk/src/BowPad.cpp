@@ -1,8 +1,8 @@
-// RibbonNotepad.cpp : Defines the entry point for the application.
+// BowPad.cpp : Defines the entry point for the application.
 //
 
 #include "stdafx.h"
-#include "RibbonNotepad.h"
+#include "BowPad.h"
 #include "MainWindow.h"
 #include "CmdLineParser.h"
 
@@ -41,7 +41,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         }
         mainWindow.EnsureAtLeastOneTab();
         // Main message loop:
-        HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_RIBBONNOTEPAD));
+        HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_BOWPAD));
         while (GetMessage(&msg, NULL, 0, 0))
         {
             if (!TranslateAccelerator(mainWindow, hAccelTable, &msg))

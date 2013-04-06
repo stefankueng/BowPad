@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MainWindow.h"
-#include "RibbonNotepad.h"
-#include "RibbonNotepadUI.h"
+#include "BowPad.h"
+#include "BowPadUI.h"
 #include "StringUtils.h"
 #include "MRU.h"
 
@@ -259,7 +259,7 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.cbWndExtra = 0;
     wcx.hInstance = hResource;
     wcx.hCursor = NULL;
-    ResString clsName(hResource, IDC_RIBBONNOTEPAD);
+    ResString clsName(hResource, IDC_BOWPAD);
     wcx.lpszClassName = clsName;
     wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_SMALL));
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
@@ -524,7 +524,7 @@ LRESULT CMainWindow::DoCommand(int id)
                 // Set a title
                 if (SUCCEEDED(hr))
                 {
-                    pfd->SetTitle(L"RibbonNotepad");
+                    pfd->SetTitle(L"BowPad");
                 }
 
                 // Show the save/open file dialog
@@ -611,7 +611,7 @@ bool CMainWindow::Initialize()
     // Finally, we load the binary markup.  This will initiate callbacks to the IUIApplication object 
     // that was provided to the framework earlier, allowing command handlers to be bound to individual
     // commands.
-    hr = g_pFramework->LoadUI(GetModuleHandle(NULL), L"RIBBONNOTEPAD_RIBBON");
+    hr = g_pFramework->LoadUI(GetModuleHandle(NULL), L"BOWPAD_RIBBON");
     if (FAILED(hr))
     {
         return false;

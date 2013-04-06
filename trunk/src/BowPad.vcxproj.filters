@@ -27,7 +27,7 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RibbonNotepad.h">
+    <ClInclude Include="BowPad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MainWindow.h">
@@ -122,7 +122,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RibbonNotepad.cpp">
+    <ClCompile Include="BowPad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MainWindow.cpp">
@@ -190,7 +190,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="RibbonNotepad.rc">
+    <ResourceCompile Include="BowPad.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -198,7 +198,7 @@
     <Image Include="small.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="RibbonNotepad.ico">
+    <Image Include="BowPad.ico">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\closeTabButton.bmp">
@@ -224,7 +224,7 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="res\RibbonNotepad.xml" />
+    <CustomBuild Include="res\BowPad.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\drag.cur">
