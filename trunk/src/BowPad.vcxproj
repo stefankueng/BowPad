@@ -215,7 +215,6 @@
     <ClInclude Include="LexStyles.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MRU.h" />
-    <ClInclude Include="PropertySet.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="BowPad.h" />
     <ClInclude Include="ScintillaWnd.h" />
@@ -243,7 +242,6 @@
     <ClCompile Include="LexStyles.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MRU.cpp" />
-    <ClCompile Include="PropertySet.cpp" />
     <ClCompile Include="BowPad.cpp" />
     <ClCompile Include="ScintillaWnd.cpp" />
     <ClCompile Include="StatusBar.cpp" />
