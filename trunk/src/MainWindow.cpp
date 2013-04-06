@@ -682,6 +682,33 @@ bool CMainWindow::Initialize()
         return false;
     }
 
+
+    // Tell UAC that lower integrity processes are allowed to send WM_COPYDATA messages to this process (or window)
+    HMODULE hDll = GetModuleHandle(TEXT("user32.dll"));
+    if (hDll)
+    {
+        // first try ChangeWindowMessageFilterEx, if it's not available (i.e., running on Vista), then
+        // try ChangeWindowMessageFilter.
+        typedef BOOL (WINAPI *MESSAGEFILTERFUNCEX)(HWND hWnd,UINT message,DWORD action,VOID* pChangeFilterStruct);
+        MESSAGEFILTERFUNCEX func = (MESSAGEFILTERFUNCEX)::GetProcAddress( hDll, "ChangeWindowMessageFilterEx" );
+
+        if (func)
+        {
+            func(*this,       WM_COPYDATA, MSGFLT_ALLOW, NULL );
+            func(m_scintilla, WM_COPYDATA, MSGFLT_ALLOW, NULL );
+            func(m_TabBar,    WM_COPYDATA, MSGFLT_ALLOW, NULL );
+            func(m_StatusBar, WM_COPYDATA, MSGFLT_ALLOW, NULL );
+        }
+        else
+        {
+            typedef BOOL (WINAPI *MESSAGEFILTERFUNC)(UINT message,DWORD dwFlag);
+            MESSAGEFILTERFUNC func = (MESSAGEFILTERFUNC)::GetProcAddress( hDll, "ChangeWindowMessageFilter" );
+
+            if (func)
+                func(WM_COPYDATA, MSGFLT_ADD);
+        }
+    }
+
     return true;
 }
 
