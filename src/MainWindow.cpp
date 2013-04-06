@@ -331,7 +331,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     {
                         // document got activated
                         int tab = m_TabBar.GetCurrentTabIndex();
-                        if (tab < m_DocManager.GetCount())
+                        if ((tab >= 0) && (tab < m_DocManager.GetCount()))
                         {
                             CDocument doc = m_DocManager.GetDocument(tab);
                             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
@@ -345,7 +345,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     {
                         // document is about to be deactivated
                         int tab = m_TabBar.GetCurrentTabIndex();
-                        if (tab < m_DocManager.GetCount())
+                        if ((tab >= 0) && (tab < m_DocManager.GetCount()))
                         {
                             CDocument doc = m_DocManager.GetDocument(tab);
                             m_scintilla.SaveCurrentPos(&doc.m_position);
@@ -439,7 +439,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case SCN_SAVEPOINTLEFT:
                     {
                         int tab = m_TabBar.GetCurrentTabIndex();
-                        if (tab < m_DocManager.GetCount())
+                        if ((tab >= 0) && (tab < m_DocManager.GetCount()))
                         {
                             CDocument doc = m_DocManager.GetDocument(tab);
                             doc.m_bIsDirty = pScn->nmhdr.code == SCN_SAVEPOINTLEFT;
@@ -676,7 +676,7 @@ BOOL CMainWindow::GetStatus( int cmdId )
     case cmdSave:
         {
             int tab = m_TabBar.GetCurrentTabIndex();
-            if (tab < m_DocManager.GetCount())
+            if ((tab >= 0) && (tab < m_DocManager.GetCount()))
             {
                 CDocument doc = m_DocManager.GetDocument(tab);
                 return doc.m_bIsDirty;
@@ -686,9 +686,9 @@ BOOL CMainWindow::GetStatus( int cmdId )
     case cmdSaveAll:
         {
             int dirtycount = 0;
-            for (size_t i = 0; i < m_DocManager.GetCount(); ++i)
+            for (int i = 0; i < m_DocManager.GetCount(); ++i)
             {
-                CDocument doc = m_DocManager.GetDocument((int)i);
+                CDocument doc = m_DocManager.GetDocument(i);
                 if (doc.m_bIsDirty)
                     dirtycount++;
             }
@@ -705,7 +705,7 @@ bool CMainWindow::SaveCurrentTab()
 {
     bool bRet = false;
     int tab = m_TabBar.GetCurrentTabIndex();
-    if (tab < m_DocManager.GetCount())
+    if ((tab >= 0) && (tab < m_DocManager.GetCount()))
     {
         CDocument doc = m_DocManager.GetDocument(tab);
         if (doc.m_path.empty())

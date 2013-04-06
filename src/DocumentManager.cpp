@@ -48,9 +48,9 @@ void CDocumentManager::AddDocumentAtEnd( CDocument doc )
 
 void CDocumentManager::ExchangeDocs( int src, int dst )
 {
-    if (src >= m_documents.size())
+    if (src >= (int)m_documents.size())
         return;
-    if (dst >= m_documents.size())
+    if (dst >= (int)m_documents.size())
         return;
 
     CDocument srcDoc = m_documents[src];
@@ -502,14 +502,14 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
     return true;
 }
 
-size_t CDocumentManager::GetIndexForPath( const std::wstring& path ) const
+int CDocumentManager::GetIndexForPath( const std::wstring& path ) const
 {
     for (size_t i = 0; i < m_documents.size(); ++i)
     {
         if (m_documents[i].m_path.compare(path)==0)
-            return i;
+            return (int)i;
     }
-    return (size_t)-1;
+    return (int)-1;
 }
 
 void CDocumentManager::RemoveDocument( int index )
