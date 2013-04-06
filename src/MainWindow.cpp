@@ -278,10 +278,10 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.hCursor = NULL;
     ResString clsName(hResource, IDC_BOWPAD);
     wcx.lpszClassName = clsName;
-    wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_SMALL));
+    wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_BOWPAD));
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
     wcx.lpszMenuName = NULL;
-    wcx.hIconSm = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    wcx.hIconSm = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_BOWPAD));
     if (RegisterWindow(&wcx))
     {
         if (CreateEx(WS_EX_ACCEPTFILES, WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN, NULL))
@@ -504,6 +504,12 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         g_pFramework->InvalidateUICommand(cmdPaste, UI_INVALIDATIONS_STATE, NULL);
                     }
                     break;
+                case SCN_MODIFIED:
+                    {
+                        g_pFramework->InvalidateUICommand(cmdUndo, UI_INVALIDATIONS_STATE, NULL);
+                        g_pFramework->InvalidateUICommand(cmdRedo, UI_INVALIDATIONS_STATE, NULL);
+                    }
+                    break;
                 }
 
             }
@@ -619,6 +625,12 @@ LRESULT CMainWindow::DoCommand(int id)
         break;
     case cmdPaste:
         m_scintilla.Call(SCI_PASTE);
+        break;
+    case cmdUndo:
+        m_scintilla.Call(SCI_UNDO);
+        break;
+    case cmdRedo:
+        m_scintilla.Call(SCI_REDO);
         break;
     default:
         break;
@@ -743,10 +755,16 @@ BOOL CMainWindow::GetStatus( int cmdId )
         }
         break;
     case cmdCut:
-            return (m_scintilla.Call(SCI_GETSELTEXT)>1);
+        return (m_scintilla.Call(SCI_GETSELTEXT)>1);
         break;
     case cmdPaste:
-            return (m_scintilla.Call(SCI_CANPASTE) != 0);
+        return (m_scintilla.Call(SCI_CANPASTE) != 0);
+        break;
+    case cmdUndo:
+        return (m_scintilla.Call(SCI_CANUNDO) != 0);
+        break;
+    case cmdRedo:
+        return (m_scintilla.Call(SCI_CANREDO) != 0);
         break;
     default:
         return TRUE;
