@@ -361,7 +361,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 switch (((LPNMHDR)lParam)->code)
                 {
                 case TCN_GETCOLOR:
-                        return RGB(0, 255, 0);
+                    if ((ptbhdr->tabOrigin >= 0) && (ptbhdr->tabOrigin < m_DocManager.GetCount()))
+                    {
+                        return m_DocManager.GetColorForDocument(ptbhdr->tabOrigin);
+                    }
                     break;
                 case TCN_SELCHANGE:
                     {

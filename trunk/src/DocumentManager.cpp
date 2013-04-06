@@ -20,6 +20,20 @@
 #include "SmartHandle.h"
 #include "UnicodeUtils.h"
 
+COLORREF foldercolors[] = {
+    RGB(177,199,253),
+    RGB(221,253,177),
+    RGB(253,177,243),
+    RGB(177,253,240),
+    RGB(253,218,177),
+    RGB(196,177,253),
+    RGB(180,253,177),
+    RGB(253,177,202),
+    RGB(177,225,253),
+    RGB(247,253,177),
+};
+
+#define MAX_FOLDERCOLORS (_countof(foldercolors))
 
 wchar_t inline WideCharSwap(wchar_t nValue)
 {
@@ -48,6 +62,7 @@ UINT64 inline DwordSwapBytes(UINT64 nValue)
 
 CDocumentManager::CDocumentManager(void)
     : m_scratchScintilla(hInst)
+    , m_lastfoldercolorindex(0)
 {
     m_scratchScintilla.InitScratch(hInst);
 }
@@ -533,4 +548,17 @@ void CDocumentManager::RemoveDocument( int index )
     CDocument doc = GetDocument(index);
     m_scratchScintilla.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
     m_documents.erase(m_documents.begin() + index);
+}
+
+COLORREF CDocumentManager::GetColorForDocument( int index )
+{
+    CDocument doc = GetDocument(index);
+    std::wstring folderpath = doc.m_path.substr(0, doc.m_path.find_last_of('\\')+1);
+    auto foundIt = m_foldercolorindexes.find(folderpath);
+    if (foundIt != m_foldercolorindexes.end())
+    {
+        return foldercolors[foundIt->second % MAX_FOLDERCOLORS];
+    }
+    m_foldercolorindexes[folderpath] = m_lastfoldercolorindex;
+    return foldercolors[m_lastfoldercolorindex++ % MAX_FOLDERCOLORS];
 }
