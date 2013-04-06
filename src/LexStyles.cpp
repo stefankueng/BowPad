@@ -3,7 +3,7 @@
 #include "SimpleIni.h"
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
-#include "RibbonNotepad.h"
+#include "BowPad.h"
 
 #include <vector>
 

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "RibbonNotepad.h"
+#include "BowPad.h"
 #include "DocumentManager.h"
 #include "SmartHandle.h"
 #include "UnicodeUtils.h"
@@ -66,14 +66,14 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     if (!hFile.IsValid())
     {
         CFormatMessageWrapper errMsg;
-        MessageBox(hWnd, errMsg, L"RibbonNotepad", MB_ICONERROR);
+        MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
         return doc;
     }
     BY_HANDLE_FILE_INFORMATION fi = {0};
     if (!GetFileInformationByHandle(hFile, &fi))
     {
         CFormatMessageWrapper errMsg;
-        MessageBox(hWnd, errMsg, L"RibbonNotepad", MB_ICONERROR);
+        MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
         return doc;
     }
     doc.m_path = path;
@@ -107,7 +107,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     m_scratchScintilla.Call(SCI_ALLOCATE, WPARAM(bufferSizeRequested));
     if (m_scratchScintilla.Call(SCI_GETSTATUS) != SC_STATUS_OK)
     {
-        MessageBox(hWnd, CLanguage::Instance().GetTranslatedString(ResString(hInst, IDS_ERR_FILETOOBIG)).c_str(), L"RibbonNotepad", MB_ICONERROR);
+        MessageBox(hWnd, CLanguage::Instance().GetTranslatedString(ResString(hInst, IDS_ERR_FILETOOBIG)).c_str(), L"BowPad", MB_ICONERROR);
         return doc;
     }
     DWORD lenFile = 0;
@@ -282,7 +282,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
             doc.m_format = GetEOLFormatForm(data);
         if (m_scratchScintilla.Call(SCI_GETSTATUS) != SC_STATUS_OK)
         {
-            MessageBox(hWnd, CLanguage::Instance().GetTranslatedString(ResString(hInst, IDS_ERR_FILETOOBIG)).c_str(), L"RibbonNotepad", MB_ICONERROR);
+            MessageBox(hWnd, CLanguage::Instance().GetTranslatedString(ResString(hInst, IDS_ERR_FILETOOBIG)).c_str(), L"BowPad", MB_ICONERROR);
             success = false;
             break;
         }
@@ -340,7 +340,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
     if (!hFile.IsValid())
     {
         CFormatMessageWrapper errMsg;
-        MessageBox(hWnd, errMsg, L"RibbonNotepad", MB_ICONERROR);
+        MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
         return false;
     }
 
@@ -387,7 +387,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
                 if ((!WriteFile(hFile, widebuf.get(), widelen*2, &bytesWritten, NULL) || (widelen != int(bytesWritten/2))))
                 {
                     CFormatMessageWrapper errMsg;
-                    MessageBox(hWnd, errMsg, L"RibbonNotepad", MB_ICONERROR);
+                    MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
                     return false;
                 }
                 writeBuf += charStart;
@@ -452,7 +452,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
                 if ((!WriteFile(hFile, wide32buf.get(), widelen*4, &bytesWritten, NULL) || (widelen != int(bytesWritten/4))))
                 {
                     CFormatMessageWrapper errMsg;
-                    MessageBox(hWnd, errMsg, L"RibbonNotepad", MB_ICONERROR);
+                    MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
                     return false;
                 }
                 writeBuf += charStart;
@@ -470,7 +470,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
             if (!WriteFile(hFile, buf, writeLen, &bytesWritten, NULL))
             {
                 CFormatMessageWrapper errMsg;
-                MessageBox(hWnd, errMsg, L"RibbonNotepad", MB_ICONERROR);
+                MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
                 return false;
             }
             lengthDoc -= writeLen;
@@ -488,7 +488,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
                 if ((!WriteFile(hFile, charbuf.get(), charlen, &bytesWritten, NULL) || (charlen != int(bytesWritten))))
                 {
                     CFormatMessageWrapper errMsg;
-                    MessageBox(hWnd, errMsg, L"RibbonNotepad", MB_ICONERROR);
+                    MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
                     return false;
                 }
                 writeBuf += charStart;
