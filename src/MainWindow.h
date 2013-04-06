@@ -21,6 +21,9 @@ public:
     bool                RegisterAndCreateWindow();
 
     bool                Initialize();
+    bool                OpenFiles(const std::vector<std::wstring>& files);
+    void                EnsureAtLeastOneTab();
+    void                GoToLine( size_t line );
 
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
@@ -63,7 +66,6 @@ protected:
 
 private:
     void                ResizeChildWindows();
-    bool                OpenFiles(const std::vector<std::wstring>& files);
     bool                SaveCurrentTab();
 private:
     LONG                m_cRef;
