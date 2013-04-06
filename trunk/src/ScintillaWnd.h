@@ -4,6 +4,9 @@
 #include "Document.h"
 #include "LexStyles.h"
 
+#define STYLE_SELECTION_MARK        (STYLE_DEFAULT-1)
+
+
 class CScintillaWnd : public CWindow
 {
 public :
@@ -28,6 +31,7 @@ public :
     void SetupLexerForExt(const std::wstring& ext);
     void SetupLexerForLang(const std::wstring& lang);
     void MarginClick(Scintilla::SCNotification * pNotification);
+    void MarkSelectedWord();
 
 protected:
     virtual LRESULT CALLBACK WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );

@@ -462,6 +462,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         m_scintilla.MarginClick(pScn);
                     }
                     break;
+                case SCN_UPDATEUI:
+                    {
+                        m_scintilla.MarkSelectedWord();
+                    }
+                    break;
                 }
 
             }
