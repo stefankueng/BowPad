@@ -609,6 +609,15 @@ LRESULT CMainWindow::DoCommand(int id)
             g_pFramework->InvalidateUICommand(cmdSaveAll, UI_INVALIDATIONS_STATE, NULL);
         }
         break;
+    case cmdCopy:
+        m_scintilla.Call(SCI_COPY);
+        break;
+    case cmdCut:
+        m_scintilla.Call(SCI_CUT);
+        break;
+    case cmdPaste:
+        m_scintilla.Call(SCI_PASTE);
+        break;
     default:
         break;
     }

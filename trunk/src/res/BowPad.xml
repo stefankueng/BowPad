@@ -31,6 +31,11 @@
         <Image>res/SaveAllL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdGroupClipboard" LabelTitle="Clipboard">
+      <Command.LargeImages>
+        <Image>res/Paste.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdQat"/>
     <Command Name="cmdFileMenu"/>
     <Command Name="cmdMRUList">
@@ -63,6 +68,21 @@
         <Image>res/SaveAllL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdCopy" LabelTitle="Copy" TooltipTitle="Clipboard" TooltipDescription="Copy the current selection to the clipboard">
+      <Command.SmallImages>
+        <Image>res/Copy.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdCut" LabelTitle="Cut" TooltipTitle="Clipboard" TooltipDescription="Cut the current selection to the clipboard">
+      <Command.SmallImages>
+        <Image>res/Cut.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdPaste" LabelTitle="Paste" TooltipTitle="Clipboard" TooltipDescription="Inserts the content of the clipboard at the cursor position">
+      <Command.LargeImages>
+        <Image>res/Paste.bmp</Image>
+      </Command.LargeImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -89,16 +109,23 @@
               <ScalingPolicy.IdealSizes>
                 <!-- This describes the maximum size of each group in the tab. -->
                 <Scale Group="cmdGroupFile" Size="Large" />
+                <Scale Group="cmdGroupClipboard" Size="Medium" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
               resized. -->
               <Scale Group="cmdGroupFile" Size="Medium" />
+              <Scale Group="cmdGroupClipboard" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupFile" SizeDefinition="ThreeButtons">
             <Button CommandName="cmdNew" />
             <Button CommandName="cmdSave" />
             <Button CommandName="cmdSaveAll" />
+          </Group>
+          <Group CommandName="cmdGroupClipboard" SizeDefinition="ThreeButtons-OneBigAndTwoSmall">
+            <Button CommandName="cmdPaste" />
+            <Button CommandName="cmdCopy" />
+            <Button CommandName="cmdCut" />
           </Group>
         </Tab>
       </Ribbon.Tabs>
