@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <Shobjidl.h>
+#include <Shellapi.h>
 
 IUIFramework *g_pFramework = NULL;  // Reference to the Ribbon framework.
 
@@ -283,7 +284,7 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.hIconSm = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_SMALL));
     if (RegisterWindow(&wcx))
     {
-        if (Create(WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN, NULL))
+        if (CreateEx(WS_EX_ACCEPTFILES, WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN, NULL))
         {
             ShowWindow(*this, SW_SHOW);
             UpdateWindow(*this);
@@ -327,6 +328,25 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             if (dis->CtlType == ODT_TAB)
             {
                 return ::SendMessage(dis->hwndItem, WM_DRAWITEM, wParam, lParam);
+            }
+        }
+        break;
+    case WM_DROPFILES:
+        {
+            HDROP hDrop = reinterpret_cast<HDROP>(wParam);
+            if (hDrop)
+            {
+                int filesDropped = DragQueryFile(hDrop, 0xffffffff, NULL, 0);
+                std::vector<std::wstring> files;
+                for (int i = 0 ; i < filesDropped ; ++i)
+                {
+                    UINT len = DragQueryFile(hDrop, i, NULL, 0);
+                    std::unique_ptr<wchar_t[]> pathBuf(new wchar_t[len+1]);
+                    DragQueryFile(hDrop, i, pathBuf.get(), len+1);
+                    files.push_back(pathBuf.get());
+                }
+                DragFinish(hDrop);
+                OpenFiles(files);
             }
         }
         break;
