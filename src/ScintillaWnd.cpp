@@ -82,6 +82,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETFONTQUALITY, SC_EFF_QUALITY_LCD_OPTIMIZED);
 
     Call(SCI_STYLESETVISIBLE, STYLE_CONTROLCHAR, TRUE);
+
     return true;
 }
 
@@ -236,6 +237,11 @@ void CScintillaWnd::SetupDefaultStyles()
     else
         Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Courier New");
     Call(SCI_STYLESETSIZE, STYLE_DEFAULT, 10);
+
+    Call(SCI_INDICSETSTYLE, STYLE_SELECTION_MARK, INDIC_ROUNDBOX);
+    Call(SCI_INDICSETALPHA, STYLE_SELECTION_MARK, 100);
+    Call(SCI_INDICSETUNDER, STYLE_SELECTION_MARK, true);
+    Call(SCI_INDICSETFORE, STYLE_SELECTION_MARK, RGB(0,255,0));
 }
 
 void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
@@ -347,8 +353,51 @@ void CScintillaWnd::Fold(int line, bool mode)
             return;
     }
 
-    if (Call(SCI_GETFOLDEXPANDED, headerLine) != mode)
+    if ((Call(SCI_GETFOLDEXPANDED, headerLine) != 0) != mode)
     {
         Call(SCI_TOGGLEFOLD, headerLine);
+    }
+}
+
+void CScintillaWnd::MarkSelectedWord()
+{
+    LRESULT firstline = Call(SCI_GETFIRSTVISIBLELINE);
+    LRESULT lastline = firstline + Call(SCI_LINESONSCREEN);
+    long startstylepos = (long)Call(SCI_POSITIONFROMLINE, firstline);
+    long endstylepos = (long)Call(SCI_POSITIONFROMLINE, lastline) + (long)Call(SCI_LINELENGTH, lastline);
+    if (endstylepos < 0)
+        endstylepos = (long)Call(SCI_GETLENGTH)-startstylepos;
+
+    int len = endstylepos - startstylepos + 1;
+    // reset indicators
+    Call(SCI_SETINDICATORCURRENT, STYLE_SELECTION_MARK);
+    Call(SCI_INDICATORCLEARRANGE, startstylepos, len);
+
+    int selTextLen = (int)Call(SCI_GETSELTEXT);
+    if (selTextLen == 0)
+        return;
+
+    size_t selStartLine = Call(SCI_LINEFROMPOSITION, Call(SCI_GETSELECTIONSTART), 0);
+    size_t selEndLine   = Call(SCI_LINEFROMPOSITION, Call(SCI_GETSELECTIONEND), 0);
+    if (selStartLine != selEndLine)
+        return;
+
+    std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
+    Call(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
+    if (seltextbuffer[0] == 0)
+        return;
+
+    std::unique_ptr<char[]> textbuffer(new char[len + 1]);
+    Scintilla::Sci_TextRange textrange;
+    textrange.lpstrText = textbuffer.get();
+    textrange.chrg.cpMin = startstylepos;
+    textrange.chrg.cpMax = endstylepos;
+    Call(SCI_GETTEXTRANGE, 0, (LPARAM)&textrange);
+
+    char * startPos = strstr(textbuffer.get(), seltextbuffer.get());
+    while (startPos)
+    {
+        Call(SCI_INDICATORFILLRANGE, startstylepos + ((char*)startPos - (char*)textbuffer.get()), selTextLen-1);
+        startPos = strstr(startPos+1, seltextbuffer.get());
     }
 }
