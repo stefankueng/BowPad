@@ -59,6 +59,7 @@ protected:
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
     LRESULT             DoCommand(int id);
     BOOL                GetStatus(int cmdId);
+    BOOL                GetState(int cmdId);
 
 private:
     void                ResizeChildWindows();
