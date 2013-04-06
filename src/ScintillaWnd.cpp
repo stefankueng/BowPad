@@ -104,6 +104,9 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETCARETLINEBACK, ::GetSysColor(COLOR_WINDOWTEXT));
     Call(SCI_SETCARETLINEBACKALPHA, 20);
 
+    // For Ctrl+C, use SCI_COPYALLOWLINE instead of SCI_COPY
+    Call(SCI_ASSIGNCMDKEY, 'C'+(SCMOD_CTRL<<16), SCI_COPYALLOWLINE);
+
     return true;
 }
 
