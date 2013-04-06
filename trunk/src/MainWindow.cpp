@@ -419,8 +419,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         }
                         m_DocManager.RemoveDocument(ptbhdr->tabOrigin);
                         m_TabBar.DeletItemAt(ptbhdr->tabOrigin);
-                        if (m_TabBar.GetItemCount() == 0)
-                            DoCommand(cmdNew);
+                        EnsureAtLeastOneTab();
                     }
                     break;
                 }
@@ -618,8 +617,6 @@ bool CMainWindow::Initialize()
         return false;
     }
 
-    DoCommand(cmdNew);
-
     return true;
 }
 
@@ -759,5 +756,16 @@ bool CMainWindow::SaveCurrentTab()
             bRet = m_DocManager.SaveFile(*this, doc);
     }
     return bRet;
+}
+
+void CMainWindow::EnsureAtLeastOneTab()
+{
+    if (m_TabBar.GetItemCount() == 0)
+        DoCommand(cmdNew);
+}
+
+void CMainWindow::GoToLine( size_t line )
+{
+    m_scintilla.Call(SCI_GOTOLINE, line);
 }
 
