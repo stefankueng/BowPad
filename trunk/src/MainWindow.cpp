@@ -6,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #include "stdafx.h"
@@ -38,7 +38,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
 
 CMainWindow::~CMainWindow(void)
 {
-    
+
 }
 
 // IUnknown method implementations.
@@ -72,7 +72,7 @@ STDMETHODIMP CMainWindow::QueryInterface(REFIID iid, void** ppv)
     {
         *ppv = static_cast<IUICommandHandler*>(this);
     }
-    else 
+    else
     {
         *ppv = NULL;
         return E_NOINTERFACE;
@@ -124,7 +124,7 @@ STDMETHODIMP CMainWindow::OnViewChanged(
     if (UI_VIEWTYPE_RIBBON == typeId)
     {
         switch (verb)
-        {           
+        {
             // The view was newly created.
         case UI_VIEWVERB_CREATE:
             hr = pView->QueryInterface(IID_PPV_ARGS(&m_pRibbon));
@@ -362,7 +362,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 {
                 case TCN_GETCOLOR:
                         return RGB(0, 255, 0);
-                    break; 
+                    break;
                 case TCN_SELCHANGE:
                     {
                         // document got activated
@@ -636,7 +636,7 @@ bool CMainWindow::Initialize()
     if (FAILED(hr))
     {
         return false;
-    }   
+    }
 
     hr = g_pFramework->Initialize(*this, this);
     if (FAILED(hr))
@@ -644,7 +644,7 @@ bool CMainWindow::Initialize()
         return false;
     }
 
-    // Finally, we load the binary markup.  This will initiate callbacks to the IUIApplication object 
+    // Finally, we load the binary markup.  This will initiate callbacks to the IUIApplication object
     // that was provided to the framework earlier, allowing command handlers to be bound to individual
     // commands.
     hr = g_pFramework->LoadUI(GetModuleHandle(NULL), L"BOWPAD_RIBBON");

@@ -6,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #pragma once
@@ -23,7 +23,7 @@ enum FormatType { UNKNOWN_FORMAT, WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT };
 class CPosData
 {
 public:
-    CPosData() 
+    CPosData()
         : m_nFirstVisibleLine(0)
         , m_nStartPos(0)
         , m_nEndPos(0)

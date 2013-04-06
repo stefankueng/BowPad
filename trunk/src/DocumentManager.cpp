@@ -6,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #include "stdafx.h"
@@ -419,7 +419,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
             else
                 WriteFile(hFile, "\0\0\xFE\xFF", 4, &bytesWritten, NULL);
             char * writeBuf = buf;
-            do 
+            do
             {
                 int charStart = UTF8Helper::characterStart(writeBuf, (int)min(blockSize, lengthDoc));
                 int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), widebufSize);
@@ -480,7 +480,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
         // UTF8: save the buffer as it is
         if (doc.m_bHasBOM)
             WriteFile(hFile, "\xEF\xBB\xBF", 3, &bytesWritten, NULL);
-        do 
+        do
         {
             DWORD writeLen = (DWORD)min(blockSize, lengthDoc);
             if (!WriteFile(hFile, buf, writeLen, &bytesWritten, NULL))
@@ -496,7 +496,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
         {
             // first convert to wide char, then to the requested codepage
             char * writeBuf = buf;
-            do 
+            do
             {
                 int charStart = UTF8Helper::characterStart(writeBuf, (int)min(blockSize, lengthDoc));
                 int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), widebufSize);

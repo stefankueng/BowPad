@@ -6,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #pragma once
@@ -45,33 +45,13 @@ public:
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
     IFACEMETHODIMP_(ULONG) AddRef();
     IFACEMETHODIMP_(ULONG) Release();
-
     // IUIApplication methods
-    STDMETHOD(OnCreateUICommand)(UINT nCmdID,
-        UI_COMMANDTYPE typeID,
-        IUICommandHandler** ppCommandHandler);
-
-    STDMETHOD(OnViewChanged)(UINT viewId,
-        UI_VIEWTYPE typeId,
-        IUnknown* pView,
-        UI_VIEWVERB verb,
-        INT uReasonCode);
-
-    STDMETHOD(OnDestroyUICommand)(UINT32 commandId, 
-        UI_COMMANDTYPE typeID,
-        IUICommandHandler* commandHandler);
-
+    STDMETHOD(OnCreateUICommand)(UINT nCmdID, UI_COMMANDTYPE typeID, IUICommandHandler** ppCommandHandler);
+    STDMETHOD(OnViewChanged)(UINT viewId, UI_VIEWTYPE typeId, IUnknown* pView, UI_VIEWVERB verb, INT uReasonCode);
+    STDMETHOD(OnDestroyUICommand)(UINT32 commandId, UI_COMMANDTYPE typeID, IUICommandHandler* commandHandler);
     // IUICommandHandler methods
-    STDMETHOD(UpdateProperty)(UINT nCmdID,
-        REFPROPERTYKEY key,
-        const PROPVARIANT* ppropvarCurrentValue,
-        PROPVARIANT* ppropvarNewValue);
-
-    STDMETHOD(Execute)(UINT nCmdID,
-        UI_EXECUTIONVERB verb, 
-        const PROPERTYKEY* key,
-        const PROPVARIANT* ppropvarValue,
-        IUISimplePropertySet* pCommandExecutionProperties);
+    STDMETHOD(UpdateProperty)(UINT nCmdID, REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue);
+    STDMETHOD(Execute)(UINT nCmdID, UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties);
 
 protected:
     /// the message handler for this window
