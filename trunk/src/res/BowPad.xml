@@ -1,4 +1,5 @@
- <!--
+<?xml version='1.0' encoding='utf-8'?>
+<!--
  This file is part of BowPad.
 
  Copyright (C) 2013 - Stefan Kueng
@@ -15,8 +16,6 @@
  
  See <http://www.gnu.org/licenses/> for a copy of the full license text
  -->
-
-<?xml version='1.0' encoding='utf-8'?>
 
 <Application xmlns='http://schemas.microsoft.com/windows/2009/Ribbon'>
   <!-- Commands section -->
