@@ -108,7 +108,7 @@ protected:
     void                        ExchangeItemData(POINT point);
     LRESULT                     RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
-    COLORREF                    GetTabColor(bool bSelected);
+    COLORREF                    GetTabColor(bool bSelected, UINT item);
     void                        DrawMainBorder(LPDRAWITEMSTRUCT lpDrawItemStruct);
     void                        DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
     void                        DrawItemBorder(LPDRAWITEMSTRUCT lpDrawItemStruct);

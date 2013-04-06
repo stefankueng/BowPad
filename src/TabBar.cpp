@@ -585,13 +585,25 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
     return ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
 }
 
-COLORREF CTabBar::GetTabColor(bool bSelected)
+COLORREF CTabBar::GetTabColor(bool bSelected, UINT item)
 {
+    TBHDR nmhdr;
+    nmhdr.hdr.hwndFrom = *this;
+    nmhdr.hdr.code = TCN_GETCOLOR;
+    nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
+    nmhdr.tabOrigin = item;
+    COLORREF clr = (COLORREF)::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+    float lighterfactor = 1.1f;
+    if (clr == 0)
+    {
+        clr = GetSysColor(COLOR_3DFACE);
+        lighterfactor = 1.4f;
+    }
     if (bSelected)
     {
-        return Lighter(::GetSysColor(COLOR_3DFACE), 1.4f);
+        return Lighter(clr, lighterfactor);
     }
-    return Darker(::GetSysColor(COLOR_3DFACE), 0.9f);
+    return Darker(clr, 0.9f);
 }
 
 void CTabBar::DrawItemBorder(LPDRAWITEMSTRUCT lpdis)
@@ -600,7 +612,7 @@ void CTabBar::DrawItemBorder(LPDRAWITEMSTRUCT lpdis)
 
     RECT rItem(lpdis->rcItem);
 
-    COLORREF crTab = GetTabColor(bSelected);
+    COLORREF crTab = GetTabColor(bSelected, lpdis->itemID);
     COLORREF crHighlight = Lighter(crTab, 1.5f);
     COLORREF crShadow = Darker(crTab, 0.75f);
 
@@ -617,7 +629,7 @@ void CTabBar::DrawMainBorder(LPDRAWITEMSTRUCT lpdis)
 {
     RECT rBorder(lpdis->rcItem);
 
-    COLORREF crTab = GetTabColor(false);
+    COLORREF crTab = GetTabColor(false, lpdis->itemID);
     COLORREF crHighlight = Lighter(crTab, 1.5f);
     COLORREF crShadow = Darker(crTab, 0.75f);
 
@@ -648,7 +660,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
 
     // tab
     // blend from back color to COLOR_3DFACE if 16 bit mode or better
-    COLORREF crFrom = GetTabColor(bSelected);
+    COLORREF crFrom = GetTabColor(bSelected, pDrawItemStruct->itemID);
 
     COLORREF crTo = bSelected ? ::GetSysColor(COLOR_3DFACE) : Darker(::GetSysColor(COLOR_3DFACE), 0.7f);
 
@@ -718,7 +730,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
     UINT uFlags = DT_CALCRECT | DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS;
     ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, uFlags);
 
-    SetTextColor(pDrawItemStruct->hDC, bSelected ? ::GetSysColor(COLOR_WINDOWTEXT) : Darker(::GetSysColor(COLOR_3DFACE), 0.5f));
+    SetTextColor(pDrawItemStruct->hDC, bSelected ? ::GetSysColor(COLOR_WINDOWTEXT) : Darker(::GetSysColor(COLOR_3DFACE), 0.3f));
     DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, DT_NOPREFIX | DT_CENTER);
 }
 
