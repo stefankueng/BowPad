@@ -36,6 +36,11 @@
         <Image>res/Paste.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdGroupUndo" LabelTitle="Undo">
+      <Command.LargeImages>
+        <Image>res/UndoL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdQat"/>
     <Command Name="cmdFileMenu"/>
     <Command Name="cmdMRUList">
@@ -83,6 +88,22 @@
         <Image>res/Paste.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdUndo" LabelTitle="Undo" TooltipTitle="Undo" TooltipDescription="Undo the last change">
+      <Command.LargeImages>
+        <Image>res/UndoL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/Undo.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdRedo" LabelTitle="Redo" TooltipTitle="Redo" TooltipDescription="Redo what was undone before">
+      <Command.LargeImages>
+        <Image>res/RedoL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/Redo.bmp</Image>
+      </Command.SmallImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -110,11 +131,13 @@
                 <!-- This describes the maximum size of each group in the tab. -->
                 <Scale Group="cmdGroupFile" Size="Large" />
                 <Scale Group="cmdGroupClipboard" Size="Medium" />
+                <Scale Group="cmdGroupUndo" Size="Large" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
               resized. -->
               <Scale Group="cmdGroupFile" Size="Medium" />
               <Scale Group="cmdGroupClipboard" Size="Small" />
+              <Scale Group="cmdGroupUndo" Size="Medium" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupFile" SizeDefinition="ThreeButtons">
@@ -126,6 +149,10 @@
             <Button CommandName="cmdPaste" />
             <Button CommandName="cmdCopy" />
             <Button CommandName="cmdCut" />
+          </Group>
+          <Group CommandName="cmdGroupUndo" SizeDefinition="TwoButtons">
+            <Button CommandName="cmdUndo" />
+            <Button CommandName="cmdRedo" />
           </Group>
         </Tab>
       </Ribbon.Tabs>
