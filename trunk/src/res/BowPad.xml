@@ -41,6 +41,11 @@
         <Image>res/UndoL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdGroupView" LabelTitle="View">
+      <Command.LargeImages>
+        <Image>res/LineWrapL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdQat"/>
     <Command Name="cmdFileMenu"/>
     <Command Name="cmdMRUList">
@@ -104,6 +109,14 @@
         <Image>res/Redo.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdLineWrap" LabelTitle="Wrap Lines" TooltipTitle="Wrap Lines" TooltipDescription="Wrap lines at the end of the window">
+      <Command.LargeImages>
+        <Image>res/LineWrapL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/LineWrap.bmp</Image>
+      </Command.SmallImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -132,12 +145,14 @@
                 <Scale Group="cmdGroupFile" Size="Large" />
                 <Scale Group="cmdGroupClipboard" Size="Medium" />
                 <Scale Group="cmdGroupUndo" Size="Large" />
+                <Scale Group="cmdGroupView" Size="Large" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
               resized. -->
               <Scale Group="cmdGroupFile" Size="Medium" />
               <Scale Group="cmdGroupClipboard" Size="Small" />
               <Scale Group="cmdGroupUndo" Size="Medium" />
+              <!--<Scale Group="cmdGroupView" Size="Medium" />-->
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupFile" SizeDefinition="ThreeButtons">
@@ -153,6 +168,9 @@
           <Group CommandName="cmdGroupUndo" SizeDefinition="TwoButtons">
             <Button CommandName="cmdUndo" />
             <Button CommandName="cmdRedo" />
+          </Group>
+          <Group CommandName="cmdGroupView" SizeDefinition="OneButton">
+            <ToggleButton CommandName="cmdLineWrap" />
           </Group>
         </Tab>
       </Ribbon.Tabs>

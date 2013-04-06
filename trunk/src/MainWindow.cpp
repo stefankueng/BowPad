@@ -179,6 +179,10 @@ STDMETHODIMP CMainWindow::UpdateProperty(
     {
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, GetStatus(nCmdID), ppropvarNewValue);
     }
+    if (UI_PKEY_BooleanValue == key)
+    {
+        hr = UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, GetState(nCmdID), ppropvarNewValue);
+    }
 
     switch(nCmdID)
     {
@@ -189,10 +193,6 @@ STDMETHODIMP CMainWindow::UpdateProperty(
         }
         break;
     default:
-        //if (UI_PKEY_BooleanValue == key)
-        //{
-        //    hr = UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, GetStatus(nCmdID) & OLECMDF_LATCHED, newValue);
-        //}
         break;
     }
     return hr;
@@ -631,6 +631,9 @@ LRESULT CMainWindow::DoCommand(int id)
         break;
     case cmdRedo:
         m_scintilla.Call(SCI_REDO);
+    case cmdLineWrap:
+        m_scintilla.Call(SCI_SETWRAPMODE, m_scintilla.Call(SCI_GETWRAPMODE) ? 0 : SC_WRAP_WORD);
+        g_pFramework->InvalidateUICommand(cmdLineWrap, UI_INVALIDATIONS_STATE, NULL);
         break;
     default:
         break;
@@ -766,8 +769,17 @@ BOOL CMainWindow::GetStatus( int cmdId )
     case cmdRedo:
         return (m_scintilla.Call(SCI_CANREDO) != 0);
         break;
-    default:
-        return TRUE;
+    }
+    return TRUE;
+}
+
+BOOL CMainWindow::GetState( int cmdId )
+{
+    switch (cmdId)
+    {
+    case cmdLineWrap:
+        return (m_scintilla.Call(SCI_GETWRAPMODE) > 0);
+        break;
     }
     return TRUE;
 }
