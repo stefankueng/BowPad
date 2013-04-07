@@ -787,7 +787,7 @@ static LRESULT PostMouseNotify0(HWND hwnd, UINT msg, UINT nBar, RECT *prect, UIN
 static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdc, const RECT *rect, UINT uDrawFlags)
 {
     SCROLLINFO *si;
-    RECT ctrl, thumb;
+    RECT ctrl, thumb, fullpage;
     RECT sbm;
     int butwidth     = GetScrollMetric(sb, SM_SCROLL_LENGTH);
     int scrollwidth  = rect->right-rect->left;
@@ -860,6 +860,12 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdc, const RECT *r
     //
     if(scrollwidth > butwidth*2)
     {
+        //FULL PAGE
+        SetRect(&fullpage, rect->left+butwidth, rect->top, rect->right-butwidth, rect->bottom);
+        RotateRect0(sb, &fullpage);
+        if(fCustomDraw)
+            PostCustomDrawNotify(hwnd, hdc, sb->nBarType, &fullpage, HTSCROLL_PAGEFULL, fMouseDownL, 0, 0);
+
         //LEFT ARROW
         SetRect(&ctrl, rect->left, rect->top, rect->left + butwidth, rect->bottom);
 
@@ -1015,6 +1021,11 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdc, const RECT *r
     else
     {
         butwidth = scrollwidth / 2;
+        //FULL PAGE
+        SetRect(&fullpage, rect->left+butwidth, rect->top, rect->right-butwidth, rect->bottom);
+        RotateRect0(sb, &fullpage);
+        if(fCustomDraw)
+            PostCustomDrawNotify(hwnd, hdc, sb->nBarType, &fullpage, HTSCROLL_PAGEFULL, fMouseDownL, 0, 0);
 
         //LEFT ARROW
         SetRect(&ctrl, rect->left, rect->top, rect->left + butwidth, rect->bottom);
@@ -1926,6 +1937,9 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
     SCROLLBAR *sb;
     SCROLLBUT *sbut = 0;
     POINT pt;
+    int pos = 0;
+    int siMaxMin = 0;
+    int butwidth = 0;
 
     pt.x = GET_X_LPARAM(lParam);
     pt.y = GET_Y_LPARAM(lParam);
@@ -2062,15 +2076,42 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
         //any inserted buttons
         GetRealScrollRect(sb, &rect);
 
-        SendScrollMessage(hwnd, uScrollTimerMsg, uCurrentScrollPortion, 0);
+        if (sb->fFlatScrollbar & CSBS_MAPMODE)
+        {
+            siMaxMin = sb->scrollInfo.nMax - sb->scrollInfo.nMin;
+            butwidth = GetScrollMetric(sb, SM_SCROLL_LENGTH);
 
-        // Check what area the mouse is now over :
-        // If the scroll thumb has moved under the mouse in response to
-        // a call to SetScrollPos etc, then we don't hilight the scrollbar margin
-        if(uCurrentScrollbar == SB_HORZ)
-            uScrollTimerPortion = GetHorzScrollPortion(sb, hwnd, &rect, pt.x, pt.y);
+            if(uCurrentScrollbar == SB_HORZ)
+            {
+                if(siMaxMin > 0)
+                    pos = MulDiv(pt.x-rect.left-butwidth, siMaxMin, rect.right-rect.left-2*butwidth);
+                else
+                    pos = pt.x - rect.left;
+            }
+            else
+            {
+                if(siMaxMin > 0)
+                    pos = MulDiv(pt.y-rect.top-butwidth, siMaxMin, rect.bottom-rect.top-2*butwidth);
+                else
+                    pos = pt.y - rect.top;
+            }
+
+            sb->scrollInfo.nTrackPos = pos;
+            SendScrollMessage(hwnd, uScrollTimerMsg, SB_THUMBTRACK, pos);
+        }
         else
-            uScrollTimerPortion = GetVertScrollPortion(sb, hwnd, &rect, pt.x, pt.y);
+        {
+
+            SendScrollMessage(hwnd, uScrollTimerMsg, uCurrentScrollPortion, 0);
+
+            // Check what area the mouse is now over :
+            // If the scroll thumb has moved under the mouse in response to
+            // a call to SetScrollPos etc, then we don't highlight the scrollbar margin
+            if(uCurrentScrollbar == SB_HORZ)
+                uScrollTimerPortion = GetHorzScrollPortion(sb, hwnd, &rect, pt.x, pt.y);
+            else
+                uScrollTimerPortion = GetVertScrollPortion(sb, hwnd, &rect, pt.x, pt.y);
+        }
 
         GetWindowRect(hwnd, &winrect);
         OffsetRect(&rect, -winrect.left, -winrect.top);
@@ -2090,7 +2131,7 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
 
         //set a timer going on the first click.
         //if this one expires, then we can start off a more regular timer
-        //to generate the auto-scroll behaviour
+        //to generate the auto-scroll behavior
         uScrollTimerId = SetTimer(hwnd, COOLSB_TIMERID1, COOLSB_TIMERINTERVAL1, 0);
         break;
     default:
@@ -2245,7 +2286,7 @@ static LRESULT LButtonUp(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lParam)
 static LRESULT ThumbTrackHorz(SCROLLBAR *sbar, HWND hwnd, int x, int y)
 {
     POINT pt;
-    RECT rc, winrect, rc2;
+    RECT rc, winrect, rc2, fullpage;
     COLORREF crCheck1 = GetSBForeColor();
     COLORREF crCheck2 = GetSBBackColor();
     HDC hdc;
@@ -2299,6 +2340,14 @@ static LRESULT ThumbTrackHorz(SCROLLBAR *sbar, HWND hwnd, int x, int y)
 #endif
 
     OffsetRect(&rc, -winrect.left, -winrect.top);
+    //FULL PAGE
+    SetRect(&fullpage, rc.left, rc.top, rc.right, rc.bottom);
+    RotateRect0(sbar, &fullpage);
+    if(fCustomDraw)
+        PostCustomDrawNotify(hwnd, hdc, sbar->nBarType, &fullpage, HTSCROLL_PAGEFULL, 0, 0, 0);
+
+
+
     thumbpos -= winrect.left;
 
     //draw the margin before the thumb

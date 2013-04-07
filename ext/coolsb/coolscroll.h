@@ -31,6 +31,7 @@ extern "C"{
 #define CSBS_NORMAL         0
 #define CSBS_FLAT           1
 #define CSBS_HOTTRACKED     2
+#define CSBS_MAPMODE        0x80
 
 //
 //  Button mask flags for indicating which members of SCROLLBUT
@@ -107,6 +108,7 @@ extern "C"{
 #define HTSCROLL_PAGEGDOWN  (SB_PAGEDOWN)
 #define HTSCROLL_PAGELEFT   (SB_PAGELEFT)
 #define HTSCROLL_PAGERIGHT  (SB_PAGERIGHT)
+#define HTSCROLL_PAGEFULL   (10)
 
 #define HTSCROLL_NONE       (-1)
 #define HTSCROLL_NORMAL     (-1)
