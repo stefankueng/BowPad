@@ -27,6 +27,14 @@
 
 IUIFramework *g_pFramework = NULL;  // Reference to the Ribbon framework.
 
+#define STATUSBAR_DOC_TYPE 0
+#define STATUSBAR_DOC_SIZE 1
+#define STATUSBAR_CUR_POS 2
+#define STATUSBAR_EOF_FORMAT 3
+#define STATUSBAR_UNICODE_TYPE 4
+#define STATUSBAR_TYPING_MODE 5
+
+
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
@@ -377,6 +385,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             m_scintilla.RestoreCurrentPos(doc.m_position);
                             SetFocus(m_scintilla);
                             m_scintilla.Call(SCI_GRABFOCUS);
+                            m_StatusBar.SetText(doc.m_language.c_str(), STATUSBAR_DOC_TYPE);
+                            m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), STATUSBAR_EOF_FORMAT);
+                            m_StatusBar.SetText(doc.GetEncodingString().c_str(), STATUSBAR_UNICODE_TYPE);
+
                         }
                     }
                     break;
@@ -503,6 +515,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case SCN_UPDATEUI:
                     {
                         m_scintilla.MarkSelectedWord();
+                        UpdateStatusBar();
                         g_pFramework->InvalidateUICommand(cmdCut, UI_INVALIDATIONS_STATE, NULL);
                         g_pFramework->InvalidateUICommand(cmdPaste, UI_INVALIDATIONS_STATE, NULL);
                     }
@@ -745,6 +758,7 @@ bool CMainWindow::OpenFiles( const std::vector<std::wstring>& files )
             {
                 CMRU::Instance().AddPath(file);
                 m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+                doc.m_language = CLexStyles::Instance().GetLanguageForExt(file.substr(file.find_last_of('.')+1));
                 m_scintilla.SetupLexerForExt(file.substr(file.find_last_of('.')+1));
                 m_DocManager.AddDocumentAtEnd(doc);
                 std::wstring sFileName = file.substr(file.find_last_of('\\')+1);
@@ -882,3 +896,27 @@ void CMainWindow::GoToLine( size_t line )
     m_scintilla.Call(SCI_GOTOLINE, line);
 }
 
+void CMainWindow::UpdateStatusBar()
+{
+    TCHAR strLnCol[128] = {0};
+    TCHAR strSel[64] = {0};
+    size_t selByte = 0;
+    size_t selLine = 0;
+
+    if (m_scintilla.GetSelectedCount(selByte, selLine))
+        wsprintf(strSel, L"Sel : %d | %d", selByte, selLine);
+    else
+        wsprintf(strSel, L"Sel : %s", L"N/A");
+
+    wsprintf(strLnCol, L"Ln : %d    Col : %d    %s",
+                       (m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1),
+                       (m_scintilla.Call(SCI_GETCOLUMN, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1),
+                       strSel);
+
+    m_StatusBar.SetText(strLnCol, STATUSBAR_CUR_POS);
+
+    TCHAR strDocLen[256];
+    wsprintf(strDocLen, L"length : %d    lines : %d", m_scintilla.Call(SCI_GETLENGTH), m_scintilla.Call(SCI_GETLINECOUNT));
+    m_StatusBar.SetText(strDocLen, STATUSBAR_DOC_SIZE);
+    m_StatusBar.SetText(m_scintilla.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", STATUSBAR_TYPING_MODE);
+}

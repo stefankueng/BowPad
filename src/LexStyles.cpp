@@ -209,3 +209,14 @@ LexerData CLexStyles::GetLexerDataForLang( const std::string& lang ) const
     return LexerData();
 }
 
+std::wstring CLexStyles::GetLanguageForExt( const std::wstring& ext ) const
+{
+    std::string e = CUnicodeUtils::StdGetUTF8(ext);
+    auto it = m_extLang.find(e);
+    if (it != m_extLang.end())
+    {
+        return CUnicodeUtils::StdGetUnicode(it->second);
+    }
+    return L"";
+}
+

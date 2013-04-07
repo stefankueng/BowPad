@@ -64,6 +64,7 @@ protected:
 private:
     void                ResizeChildWindows();
     bool                SaveCurrentTab();
+    void                UpdateStatusBar();
 private:
     LONG                m_cRef;
     IUIRibbon *         m_pRibbon;

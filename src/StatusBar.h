@@ -16,6 +16,7 @@
 //
 #pragma once
 #include "BaseWindow.h"
+#include <Commctrl.h>
 
 class CStatusBar : public CWindow
 {
@@ -25,6 +26,11 @@ public :
 
     bool Init(HINSTANCE hInst, HWND hParent, int nbParts);
     int GetHeight() const { return m_height; }
+    bool SetText(const TCHAR *str, int whichPart) const
+    {
+        return (::SendMessage(*this, SB_SETTEXT, whichPart, (LPARAM)str) == TRUE);
+    };
+
 
     virtual LRESULT CALLBACK WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
