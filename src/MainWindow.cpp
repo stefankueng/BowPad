@@ -27,12 +27,13 @@
 
 IUIFramework *g_pFramework = NULL;  // Reference to the Ribbon framework.
 
-#define STATUSBAR_DOC_TYPE 0
-#define STATUSBAR_DOC_SIZE 1
-#define STATUSBAR_CUR_POS 2
-#define STATUSBAR_EOF_FORMAT 3
-#define STATUSBAR_UNICODE_TYPE 4
-#define STATUSBAR_TYPING_MODE 5
+#define STATUSBAR_DOC_TYPE      0
+#define STATUSBAR_DOC_SIZE      1
+#define STATUSBAR_CUR_POS       2
+#define STATUSBAR_EOF_FORMAT    3
+#define STATUSBAR_UNICODE_TYPE  4
+#define STATUSBAR_TYPING_MODE   5
+#define STATUSBAR_CAPS          6
 
 
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
@@ -660,8 +661,8 @@ LRESULT CMainWindow::DoCommand(int id)
 bool CMainWindow::Initialize()
 {
     m_scintilla.Init(hResource, *this);
-    int barParts[5] = {100, 250, 500, 600, 700};
-    m_StatusBar.Init(hResource, *this, 5, barParts);
+    int barParts[7] = {100, 250, 500, 600, 700, 730, 770};
+    m_StatusBar.Init(hResource, *this, _countof(barParts), barParts);
     m_TabBar.Init(hResource, *this);
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
     HICON hIcon = ::LoadIcon(hResource, MAKEINTRESOURCE(IDI_SAVED_ICON));
@@ -920,4 +921,6 @@ void CMainWindow::UpdateStatusBar()
     wsprintf(strDocLen, L"length : %d    lines : %d", m_scintilla.Call(SCI_GETLENGTH), m_scintilla.Call(SCI_GETLINECOUNT));
     m_StatusBar.SetText(strDocLen, STATUSBAR_DOC_SIZE);
     m_StatusBar.SetText(m_scintilla.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", STATUSBAR_TYPING_MODE);
+    bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
+    m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", STATUSBAR_CAPS);
 }
