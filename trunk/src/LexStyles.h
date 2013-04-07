@@ -68,6 +68,8 @@ class CLexStyles
 public:
     static CLexStyles&          Instance();
 
+    std::wstring                GetLanguageForExt(const std::wstring& ext) const;
+
     std::map<int, std::string>  GetKeywordsForExt(const std::string& ext) const;
     std::map<int, std::string>  GetKeywordsForLang(const std::string& lang) const;
 

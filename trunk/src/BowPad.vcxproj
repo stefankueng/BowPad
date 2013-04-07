@@ -238,6 +238,7 @@
     <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
+    <ClCompile Include="Document.cpp" />
     <ClCompile Include="DocumentManager.cpp" />
     <ClCompile Include="LexStyles.cpp" />
     <ClCompile Include="MainWindow.cpp" />

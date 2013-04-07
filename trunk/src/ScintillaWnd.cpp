@@ -425,3 +425,21 @@ void CScintillaWnd::MarkSelectedWord()
         startPos = strstr(startPos+1, seltextbuffer.get());
     }
 }
+
+bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
+{
+    // return false if it's multi-selection or rectangle selection
+    if ((Call(SCI_GETSELECTIONS) > 1) || Call(SCI_SELECTIONISRECTANGLE))
+        return false;
+    size_t start = Call(SCI_GETSELECTIONSTART);
+    size_t end = Call(SCI_GETSELECTIONEND);
+    selByte = (start < end)?end-start:start-end;
+
+    start = Call(SCI_LINEFROMPOSITION, start);
+    end = Call(SCI_LINEFROMPOSITION, end);
+    selLine = (start < end)?end-start:start-end;
+    if (selLine)
+        ++selLine;
+
+    return true;
+};

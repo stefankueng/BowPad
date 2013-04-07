@@ -48,6 +48,7 @@ public :
     void SetupLexerForLang(const std::wstring& lang);
     void MarginClick(Scintilla::SCNotification * pNotification);
     void MarkSelectedWord();
+    bool GetSelectedCount(size_t& selByte, size_t& selLine);
 
 protected:
     virtual LRESULT CALLBACK WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );

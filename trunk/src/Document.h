@@ -15,10 +15,13 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #pragma once
+#include "Scintilla.h"
 
 typedef uptr_t Document;
 
 enum FormatType { UNKNOWN_FORMAT, WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT };
+
+std::wstring FormatTypeToString(FormatType ft);
 
 class CPosData
 {
@@ -54,12 +57,14 @@ public:
     {
     }
 
+    std::wstring GetEncodingString();
 
     Document                m_document;
     FormatType              m_format;
     bool                    m_bHasBOM;
     int                     m_encoding;
     std::wstring            m_path;
+    std::wstring            m_language;
     CPosData                m_position;
     bool                    m_bIsDirty;
     bool                    m_bIsReadonly;
