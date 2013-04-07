@@ -479,6 +479,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             else if ((pNMHDR->idFrom == (UINT_PTR)&m_scintilla) ||
                 (pNMHDR->hwndFrom == m_scintilla))
             {
+                if(pNMHDR->code == NM_COOLSB_CUSTOMDRAW)
+                {
+                    return m_scintilla.HandleScrollbarCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
+                }
+
                 Scintilla::SCNotification * pScn = reinterpret_cast<Scintilla::SCNotification *>(lParam);
                 switch (pScn->nmhdr.code)
                 {

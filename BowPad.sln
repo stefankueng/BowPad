@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BowPad", "src\BowPad.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scintilla", "ext\scintilla\Scintilla.vcxproj", "{5877B917-512B-49F5-B514-1B4159E7A9CA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "coolsb", "ext\coolsb\coolsb.vcxproj", "{22B28D94-8FB7-484F-AD33-B3F2BD25351F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -29,6 +31,14 @@ Global
 		{5877B917-512B-49F5-B514-1B4159E7A9CA}.Release|Win32.Build.0 = Release|Win32
 		{5877B917-512B-49F5-B514-1B4159E7A9CA}.Release|x64.ActiveCfg = Release|x64
 		{5877B917-512B-49F5-B514-1B4159E7A9CA}.Release|x64.Build.0 = Release|x64
+		{22B28D94-8FB7-484F-AD33-B3F2BD25351F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{22B28D94-8FB7-484F-AD33-B3F2BD25351F}.Debug|Win32.Build.0 = Debug|Win32
+		{22B28D94-8FB7-484F-AD33-B3F2BD25351F}.Debug|x64.ActiveCfg = Debug|x64
+		{22B28D94-8FB7-484F-AD33-B3F2BD25351F}.Debug|x64.Build.0 = Debug|x64
+		{22B28D94-8FB7-484F-AD33-B3F2BD25351F}.Release|Win32.ActiveCfg = Release|Win32
+		{22B28D94-8FB7-484F-AD33-B3F2BD25351F}.Release|Win32.Build.0 = Release|Win32
+		{22B28D94-8FB7-484F-AD33-B3F2BD25351F}.Release|x64.ActiveCfg = Release|x64
+		{22B28D94-8FB7-484F-AD33-B3F2BD25351F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

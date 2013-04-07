@@ -19,6 +19,7 @@
 #include "Scintilla.h"
 #include "Document.h"
 #include "LexStyles.h"
+#include "DocScroll.h"
 
 #define STYLE_SELECTION_MARK        (STYLE_DEFAULT-1)
 
@@ -49,6 +50,7 @@ public :
     void MarginClick(Scintilla::SCNotification * pNotification);
     void MarkSelectedWord();
     bool GetSelectedCount(size_t& selByte, size_t& selLine);
+    LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
 
 protected:
     virtual LRESULT CALLBACK WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
@@ -60,5 +62,6 @@ protected:
 private:
     SciFnDirect                 m_pSciMsg;
     sptr_t                      m_pSciWndData;
+    CDocScroll                  m_docScroll;
 };
 
