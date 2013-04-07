@@ -114,6 +114,9 @@
     <ClInclude Include="LexStyles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DocScroll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -183,6 +186,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Document.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DocScroll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

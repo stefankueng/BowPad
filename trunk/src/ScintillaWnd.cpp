@@ -44,6 +44,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     if (m_pSciMsg==nullptr || m_pSciWndData==0)
         return false;
 
+    m_docScroll.InitScintilla(*this);
+
     Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
     Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, 14);
 
@@ -133,6 +135,18 @@ bool CScintillaWnd::InitScratch( HINSTANCE hInst )
 
 LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+    NMHDR *hdr = (NMHDR *)lParam;
+    switch (uMsg)
+    {
+    case WM_NOTIFY:
+        if(hdr->code == NM_COOLSB_CUSTOMDRAW)
+        {
+            return m_docScroll.HandleCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
+        }
+        break;
+    default:
+        break;
+    }
     if (prevWndProc)
         return CallWindowProc(prevWndProc, hwnd, uMsg, wParam, lParam);
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -443,3 +457,10 @@ bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
 
     return true;
 };
+
+LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw )
+{
+    m_docScroll.SetCurLine(Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS)));
+    m_docScroll.SetTotalLines(Call(SCI_GETLINECOUNT));
+    return m_docScroll.HandleCustomDraw(wParam, pCustDraw);
+}
