@@ -21,17 +21,20 @@
 class CStatusBar : public CWindow
 {
 public :
-    CStatusBar(HINSTANCE hInst) : CWindow(hInst) {};
+    CStatusBar(HINSTANCE hInst)
+        : CWindow(hInst)
+        , m_height(0){};
     virtual ~CStatusBar(){}
 
-    bool Init(HINSTANCE hInst, HWND hParent, int nbParts);
+    bool Init(HINSTANCE hInst, HWND hParent, int nbParts, int * nsParts);
+
     int GetHeight() const { return m_height; }
     bool SetText(const TCHAR *str, int whichPart) const
     {
         return (::SendMessage(*this, SB_SETTEXT, whichPart, (LPARAM)str) == TRUE);
     };
 
-
+protected:
     virtual LRESULT CALLBACK WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 private:
