@@ -663,6 +663,10 @@ LRESULT CMainWindow::DoCommand(int id)
         m_scintilla.Call(SCI_SETWRAPMODE, m_scintilla.Call(SCI_GETWRAPMODE) ? 0 : SC_WRAP_WORD);
         g_pFramework->InvalidateUICommand(cmdLineWrap, UI_INVALIDATIONS_STATE, NULL);
         break;
+    case cmdWhiteSpace:
+        m_scintilla.Call(SCI_SETVIEWWS, m_scintilla.Call(SCI_GETVIEWWS) ? 0 : 1);
+        g_pFramework->InvalidateUICommand(cmdWhiteSpace, UI_INVALIDATIONS_STATE, NULL);
+        break;
     default:
         break;
     }
@@ -836,6 +840,9 @@ BOOL CMainWindow::GetState( int cmdId )
     {
     case cmdLineWrap:
         return (m_scintilla.Call(SCI_GETWRAPMODE) > 0);
+        break;
+    case cmdWhiteSpace:
+        return (m_scintilla.Call(SCI_GETVIEWWS) > 0);
         break;
     }
     return TRUE;
