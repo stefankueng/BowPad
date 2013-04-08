@@ -117,6 +117,14 @@
         <Image>res/LineWrap.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdWhiteSpace" LabelTitle="Whitespace" TooltipTitle="Show Whitespaces" TooltipDescription="Turns showing whitespaces on/off">
+      <Command.LargeImages>
+        <Image>res/wspaceL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/wspaceS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -169,8 +177,9 @@
             <Button CommandName="cmdUndo" />
             <Button CommandName="cmdRedo" />
           </Group>
-          <Group CommandName="cmdGroupView" SizeDefinition="OneButton">
+          <Group CommandName="cmdGroupView" SizeDefinition="TwoButtons">
             <ToggleButton CommandName="cmdLineWrap" />
+            <ToggleButton CommandName="cmdWhiteSpace" />
           </Group>
         </Tab>
       </Ribbon.Tabs>
