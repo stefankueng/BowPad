@@ -537,6 +537,12 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             }
         }
         break;
+    case WM_SETFOCUS:
+    case WM_ACTIVATE:
+    case WM_ACTIVATEAPP:
+        SetFocus(m_scintilla);
+        m_scintilla.Call(SCI_SETFOCUS, true);
+        break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
