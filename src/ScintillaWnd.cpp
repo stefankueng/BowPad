@@ -109,6 +109,9 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     // For Ctrl+C, use SCI_COPYALLOWLINE instead of SCI_COPY
     Call(SCI_ASSIGNCMDKEY, 'C'+(SCMOD_CTRL<<16), SCI_COPYALLOWLINE);
 
+    Call(SCI_SETBUFFEREDDRAW, true);
+    Call(SCI_SETCARETSTYLE, 1);
+
     return true;
 }
 
