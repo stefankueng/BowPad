@@ -49,6 +49,7 @@ void CDocScroll::InitScintilla( HWND hWnd )
     CoolSB_SetStyle(hWnd, SB_HORZ, CSBS_HOTTRACKED);
     CoolSB_SetStyle(hWnd, SB_VERT, CSBS_HOTTRACKED|CSBS_MAPMODE);
     CoolSB_SetThumbAlways(hWnd, SB_VERT, TRUE);
+    CoolSB_SetMinThumbSize(hWnd, SB_BOTH, 10);
 }
 
 LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRAW * pCustDraw )
