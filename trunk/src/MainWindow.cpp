@@ -676,7 +676,7 @@ LRESULT CMainWindow::DoCommand(int id)
 bool CMainWindow::Initialize()
 {
     m_scintilla.Init(hResource, *this);
-    int barParts[7] = {100, 250, 500, 600, 700, 730, 770};
+    int barParts[7] = {100, 300, 550, 650, 750, 780, 820};
     m_StatusBar.Init(hResource, *this, _countof(barParts), barParts);
     m_TabBar.Init(hResource, *this);
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
