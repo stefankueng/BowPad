@@ -661,11 +661,11 @@ LRESULT CMainWindow::DoCommand(int id)
         m_scintilla.Call(SCI_REDO);
     case cmdLineWrap:
         m_scintilla.Call(SCI_SETWRAPMODE, m_scintilla.Call(SCI_GETWRAPMODE) ? 0 : SC_WRAP_WORD);
-        g_pFramework->InvalidateUICommand(cmdLineWrap, UI_INVALIDATIONS_STATE, NULL);
+        g_pFramework->InvalidateUICommand(cmdLineWrap, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         break;
     case cmdWhiteSpace:
         m_scintilla.Call(SCI_SETVIEWWS, m_scintilla.Call(SCI_GETVIEWWS) ? 0 : 1);
-        g_pFramework->InvalidateUICommand(cmdWhiteSpace, UI_INVALIDATIONS_STATE, NULL);
+        g_pFramework->InvalidateUICommand(cmdWhiteSpace, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         break;
     default:
         break;
