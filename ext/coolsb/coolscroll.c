@@ -2072,7 +2072,7 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
         if(!IsScrollbarActive(sb))
             break;
 
-        //ajust the horizontal rectangle to NOT include
+        //adjust the horizontal rectangle to NOT include
         //any inserted buttons
         GetRealScrollRect(sb, &rect);
 
@@ -2080,18 +2080,22 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
         {
             siMaxMin = sb->scrollInfo.nMax - sb->scrollInfo.nMin;
             butwidth = GetScrollMetric(sb, SM_SCROLL_LENGTH);
+            GetRealScrollRect(sb, &rect);
+            RotateRect0(sb, &rect);
+            CalcThumbSize(sb, &rect, &nThumbSize, &nThumbPos);
+            RotateRect0(sb, &rect);
 
             if(uCurrentScrollbar == SB_HORZ)
             {
                 if(siMaxMin > 0)
-                    pos = MulDiv(pt.x-rect.left-butwidth, siMaxMin, rect.right-rect.left-2*butwidth);
+                    pos = MulDiv(pt.x-rect.left-butwidth-nThumbSize/2, siMaxMin, rect.right-rect.left-2*butwidth);
                 else
                     pos = pt.x - rect.left;
             }
             else
             {
                 if(siMaxMin > 0)
-                    pos = MulDiv(pt.y-rect.top-butwidth, siMaxMin, rect.bottom-rect.top-2*butwidth);
+                    pos = MulDiv(pt.y-rect.top-butwidth-nThumbSize/2, siMaxMin, rect.bottom-rect.top-2*butwidth);
                 else
                     pos = pt.y - rect.top;
             }
