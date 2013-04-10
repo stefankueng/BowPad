@@ -415,63 +415,14 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case TCN_TABDELETE:
                     {
                         int tab = m_TabBar.GetCurrentTabIndex();
-                        CDocument doc = m_DocManager.GetDocument(ptbhdr->tabOrigin);
-                        if (doc.m_bIsDirty)
+                        if (CloseTab(ptbhdr->tabOrigin))
                         {
-                            m_TabBar.ActivateAt(ptbhdr->tabOrigin);
-                            ResString rTitle(hInst, IDS_HASMODIFICATIONS);
-                            ResString rQuestion(hInst, IDS_DOYOUWANTOSAVE);
-                            ResString rSave(hInst, IDS_SAVE);
-                            ResString rDontSave(hInst, IDS_DONTSAVE);
-                            wchar_t buf[100] = {0};
-                            m_TabBar.GetCurrentTitle(buf, _countof(buf));
-                            std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
-
-                            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-                            TASKDIALOG_BUTTON aCustomButtons[2];
-                            aCustomButtons[0].nButtonID = 100;
-                            aCustomButtons[0].pszButtonText = rSave;
-                            aCustomButtons[1].nButtonID = 101;
-                            aCustomButtons[1].pszButtonText = rDontSave;
-
-                            tdc.hwndParent = *this;
-                            tdc.hInstance = hInst;
-                            tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
-                            tdc.pButtons = aCustomButtons;
-                            tdc.cButtons = _countof(aCustomButtons);
-                            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-                            tdc.pszMainIcon = TD_INFORMATION_ICON;
-                            tdc.pszMainInstruction = rTitle;
-                            tdc.pszContent = sQuestion.c_str();
-                            tdc.nDefaultButton = 100;
-                            int nClickedBtn = 0;
-                            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
-
-                            if (SUCCEEDED(hr))
+                            if (tab == ptbhdr->tabOrigin)
                             {
-                                if (nClickedBtn == 100)
-                                    SaveCurrentTab();
-                                else if (nClickedBtn != 101)
-                                {
-                                    m_TabBar.ActivateAt(tab);
-                                    break;  // don't close!
-                                }
+                                if (tab > 0)
+                                    m_TabBar.ActivateAt(tab-1);
                             }
-
-                            m_TabBar.ActivateAt(tab);
                         }
-
-                        if ((m_TabBar.GetItemCount() == 1)&&(m_scintilla.Call(SCI_GETTEXTLENGTH)==0)&&(m_scintilla.Call(SCI_GETMODIFY)==0)&&doc.m_path.empty())
-                            break;  // leave the empty, new document as is
-
-                        if (tab == ptbhdr->tabOrigin)
-                        {
-                            if (tab > 0)
-                                m_TabBar.ActivateAt(tab-1);
-                        }
-                        m_DocManager.RemoveDocument(ptbhdr->tabOrigin);
-                        m_TabBar.DeletItemAt(ptbhdr->tabOrigin);
-                        EnsureAtLeastOneTab();
                     }
                     break;
                 }
@@ -547,7 +498,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         PostQuitMessage(0);
         break;
     case WM_CLOSE:
-        ::DestroyWindow(m_hwnd);
+        if (CloseAllTabs())
+            ::DestroyWindow(m_hwnd);
         break;
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -562,7 +514,8 @@ LRESULT CMainWindow::DoCommand(int id)
     {
     case cmdExit:
         {
-            ::PostQuitMessage(0);
+            if (CloseAllTabs())
+                ::PostQuitMessage(0);
         }
         break;
     case cmdNew:
@@ -941,4 +894,73 @@ void CMainWindow::UpdateStatusBar()
     m_StatusBar.SetText(m_scintilla.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", STATUSBAR_CAPS);
+}
+
+bool CMainWindow::CloseTab( int tab )
+{
+    CDocument doc = m_DocManager.GetDocument(tab);
+    if (doc.m_bIsDirty)
+    {
+        m_TabBar.ActivateAt(tab);
+        ResString rTitle(hInst, IDS_HASMODIFICATIONS);
+        ResString rQuestion(hInst, IDS_DOYOUWANTOSAVE);
+        ResString rSave(hInst, IDS_SAVE);
+        ResString rDontSave(hInst, IDS_DONTSAVE);
+        wchar_t buf[100] = {0};
+        m_TabBar.GetCurrentTitle(buf, _countof(buf));
+        std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
+
+        TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+        TASKDIALOG_BUTTON aCustomButtons[2];
+        aCustomButtons[0].nButtonID = 100;
+        aCustomButtons[0].pszButtonText = rSave;
+        aCustomButtons[1].nButtonID = 101;
+        aCustomButtons[1].pszButtonText = rDontSave;
+
+        tdc.hwndParent = *this;
+        tdc.hInstance = hInst;
+        tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+        tdc.pButtons = aCustomButtons;
+        tdc.cButtons = _countof(aCustomButtons);
+        tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+        tdc.pszMainIcon = TD_INFORMATION_ICON;
+        tdc.pszMainInstruction = rTitle;
+        tdc.pszContent = sQuestion.c_str();
+        tdc.nDefaultButton = 100;
+        int nClickedBtn = 0;
+        HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
+
+        if (SUCCEEDED(hr))
+        {
+            if (nClickedBtn == 100)
+                SaveCurrentTab();
+            else if (nClickedBtn != 101)
+            {
+                m_TabBar.ActivateAt(tab);
+                return false;  // don't close!
+            }
+        }
+
+        m_TabBar.ActivateAt(tab);
+    }
+
+    if ((m_TabBar.GetItemCount() == 1)&&(m_scintilla.Call(SCI_GETTEXTLENGTH)==0)&&(m_scintilla.Call(SCI_GETMODIFY)==0)&&doc.m_path.empty())
+        return true;  // leave the empty, new document as is
+
+    m_DocManager.RemoveDocument(tab);
+    m_TabBar.DeletItemAt(tab);
+    EnsureAtLeastOneTab();
+    return true;
+}
+
+bool CMainWindow::CloseAllTabs()
+{
+    do 
+    {
+        if (CloseTab(m_TabBar.GetItemCount()-1) == false)
+            return false;
+        if ((m_TabBar.GetItemCount() == 1)&&(m_scintilla.Call(SCI_GETTEXTLENGTH)==0)&&(m_scintilla.Call(SCI_GETMODIFY)==0)&&m_DocManager.GetDocument(0).m_path.empty())
+            return true;
+    } while (m_TabBar.GetItemCount() > 0);
+    return true;
 }
