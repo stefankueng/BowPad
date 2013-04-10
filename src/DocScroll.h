@@ -16,6 +16,9 @@
 //
 #pragma once
 #include "coolscroll.h"
+#include <deque>
+
+class CScintillaWnd;
 
 class CDocScroll
 {
@@ -23,11 +26,20 @@ public:
     CDocScroll();
     ~CDocScroll();
 
-    void                InitScintilla(HWND hWnd);
-    LRESULT CALLBACK    HandleCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
-    void                SetCurLine(size_t line) { m_line = line; }
-    void                SetTotalLines(size_t lines) { m_lines = lines; }
+    void                        InitScintilla(CScintillaWnd * pScintilla);
+    LRESULT CALLBACK            HandleCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
+    void                        SetTotalLines(size_t lines);
+    void                        Clear() { m_lineColors.clear(); m_visibleLineColors.clear(); }
+    void                        AddLineColor(size_t line, COLORREF clr);
+    void                        VisibleLinesChanged() { m_bDirty = true; }
 private:
-    size_t              m_line;
-    size_t              m_lines;
+    void                        CalcLines();
+
+
+    std::map<size_t, COLORREF>  m_visibleLineColors;
+    std::map<size_t, COLORREF>  m_lineColors;
+    size_t                      m_visibleLines;
+    size_t                      m_lines;
+    CScintillaWnd *             m_pScintilla;
+    bool                        m_bDirty;
 };
