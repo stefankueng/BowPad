@@ -40,6 +40,8 @@ public:
     bool                OpenFiles(const std::vector<std::wstring>& files);
     void                EnsureAtLeastOneTab();
     void                GoToLine( size_t line );
+    bool                CloseTab(int tab);
+    bool                CloseAllTabs();
 
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
