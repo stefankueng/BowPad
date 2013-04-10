@@ -16,6 +16,7 @@
 //
 #include "stdafx.h"
 #include "DocScroll.h"
+#include "ScintillaWnd.h"
 
 #include <Commctrl.h>
 
@@ -37,19 +38,21 @@ CDocScroll::~CDocScroll()
 }
 
 CDocScroll::CDocScroll()
-    : m_line(0)
+    : m_pScintilla(nullptr)
     , m_lines(0)
+    , m_bDirty(false)
 {
 
 }
 
-void CDocScroll::InitScintilla( HWND hWnd )
+void CDocScroll::InitScintilla( CScintillaWnd * pScintilla )
 {
-    InitializeCoolSB(hWnd);
-    CoolSB_SetStyle(hWnd, SB_HORZ, CSBS_HOTTRACKED);
-    CoolSB_SetStyle(hWnd, SB_VERT, CSBS_HOTTRACKED|CSBS_MAPMODE);
-    CoolSB_SetThumbAlways(hWnd, SB_VERT, TRUE);
-    CoolSB_SetMinThumbSize(hWnd, SB_BOTH, 10);
+    m_pScintilla = pScintilla;
+    InitializeCoolSB(*m_pScintilla);
+    CoolSB_SetStyle(*m_pScintilla, SB_HORZ, CSBS_HOTTRACKED);
+    CoolSB_SetStyle(*m_pScintilla, SB_VERT, CSBS_HOTTRACKED|CSBS_MAPMODE);
+    CoolSB_SetThumbAlways(*m_pScintilla, SB_VERT, TRUE);
+    CoolSB_SetMinThumbSize(*m_pScintilla, SB_BOTH, 10);
 }
 
 LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRAW * pCustDraw )
@@ -197,8 +200,14 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
         case HTSCROLL_PAGEFULL:
             {
                 FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, scroll);
-                LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*m_line/m_lines);
-                FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, linepos, pCustDraw->rect.right, linepos+2, RGB(0,200,0));
+                if (m_bDirty)
+                    CalcLines();
+
+                for (auto line : m_visibleLineColors)
+                {
+                    LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*line.first/m_lines);
+                    FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, linepos, pCustDraw->rect.right, linepos+2, line.second);
+                }
             }
             break;
         }
@@ -211,4 +220,35 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
     }
 
     return CDRF_SKIPDEFAULT;
+}
+
+void CDocScroll::CalcLines()
+{
+    if (m_bDirty)
+    {
+        m_visibleLineColors.clear();
+        for (auto it : m_lineColors)
+        {
+            m_visibleLineColors[m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, it.first)] = it.second;
+        }
+        m_visibleLines = m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, m_lines);
+    }
+    m_bDirty = false;
+}
+
+void CDocScroll::AddLineColor( size_t line, COLORREF clr )
+{
+    auto foundIt = m_lineColors.find(line);
+    if (foundIt == m_lineColors.end())
+    {
+        m_lineColors[line] = clr;
+        m_bDirty = true;
+    }
+}
+
+void CDocScroll::SetTotalLines( size_t lines )
+{
+    if (m_lines != lines)
+        m_bDirty = true;
+    m_lines = lines;
 }

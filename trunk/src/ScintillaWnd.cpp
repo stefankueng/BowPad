@@ -27,6 +27,8 @@ const int MARK_BOOKMARK = 24;
 const int MARK_HIDELINESBEGIN = 23;
 const int MARK_HIDELINESEND = 22;
 
+
+
 bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 {
     Scintilla_RegisterClasses(hInst);
@@ -44,7 +46,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     if (m_pSciMsg==nullptr || m_pSciWndData==0)
         return false;
 
-    m_docScroll.InitScintilla(*this);
+    m_docScroll.InitScintilla(this);
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
     Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, 14);
@@ -112,6 +114,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_ASSIGNCMDKEY, 'C'+(SCMOD_CTRL<<16), SCI_COPYALLOWLINE);
 
     Call(SCI_SETBUFFEREDDRAW, true);
+    Call(SCI_SETTWOPHASEDRAW, true);
     Call(SCI_SETCARETSTYLE, 1);
 
     return true;
@@ -374,6 +377,7 @@ void CScintillaWnd::Expand(int &line, bool doExpand, bool force, int visLevels, 
             line++;
         }
     }
+    m_docScroll.VisibleLinesChanged();
 }
 
 void CScintillaWnd::Fold(int line, bool mode)
@@ -400,10 +404,12 @@ void CScintillaWnd::Fold(int line, bool mode)
     {
         Call(SCI_TOGGLEFOLD, headerLine);
     }
+    m_docScroll.VisibleLinesChanged();
 }
 
 void CScintillaWnd::MarkSelectedWord()
 {
+    static std::string lastSelText;
     LRESULT firstline = Call(SCI_GETFIRSTVISIBLELINE);
     LRESULT lastline = firstline + Call(SCI_LINESONSCREEN);
     long startstylepos = (long)Call(SCI_POSITIONFROMLINE, firstline);
@@ -443,6 +449,23 @@ void CScintillaWnd::MarkSelectedWord()
         Call(SCI_INDICATORFILLRANGE, startstylepos + ((char*)startPos - (char*)textbuffer.get()), selTextLen-1);
         startPos = strstr(startPos+1, seltextbuffer.get());
     }
+
+    if (lastSelText.compare(seltextbuffer.get()))
+    {
+        m_docScroll.Clear();
+        Scintilla::Sci_TextToFind findText;
+        findText.chrg.cpMin = 0;
+        findText.chrg.cpMax = Call(SCI_GETLENGTH);
+        findText.lpstrText = seltextbuffer.get();
+        while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&findText) >= 0)
+        {
+            size_t line = Call(SCI_LINEFROMPOSITION, findText.chrgText.cpMin);
+            m_docScroll.AddLineColor(line, RGB(0,255,0));
+            findText.chrg.cpMin = findText.chrgText.cpMax;
+        }
+        SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
+    }
+    lastSelText = seltextbuffer.get();
 }
 
 bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
@@ -465,7 +488,7 @@ bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
 
 LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw )
 {
-    m_docScroll.SetCurLine(Call(SCI_VISIBLEFROMDOCLINE, Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS))));
+    m_docScroll.AddLineColor(Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS)), RGB(40,40,40));
     m_docScroll.SetTotalLines(Call(SCI_VISIBLEFROMDOCLINE, (Call(SCI_GETLINECOUNT))));
     return m_docScroll.HandleCustomDraw(wParam, pCustDraw);
 }
