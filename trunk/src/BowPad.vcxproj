@@ -213,6 +213,7 @@
     <ClInclude Include="DocScroll.h" />
     <ClInclude Include="Document.h" />
     <ClInclude Include="DocumentManager.h" />
+    <ClInclude Include="KeyboardShortcutHandler.h" />
     <ClInclude Include="LexStyles.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MRU.h" />
@@ -242,6 +243,7 @@
     <ClCompile Include="DocScroll.cpp" />
     <ClCompile Include="Document.cpp" />
     <ClCompile Include="DocumentManager.cpp" />
+    <ClCompile Include="KeyboardShortcutHandler.cpp" />
     <ClCompile Include="LexStyles.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MRU.cpp" />
@@ -292,6 +294,7 @@
     <None Include="res\drag_out.cur" />
     <None Include="res\drag_plus.cur" />
     <None Include="res\Properties.ini" />
+    <None Include="res\Shortcuts.ini" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ext\coolsb\coolsb.vcxproj">

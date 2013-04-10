@@ -18,6 +18,7 @@
 #include "BowPad.h"
 #include "MainWindow.h"
 #include "CmdLineParser.h"
+#include "KeyboardShortcutHandler.h"
 
 HINSTANCE hInst;
 
@@ -54,10 +55,9 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         }
         mainWindow.EnsureAtLeastOneTab();
         // Main message loop:
-        HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_BOWPAD));
         while (GetMessage(&msg, NULL, 0, 0))
         {
-            if (!TranslateAccelerator(mainWindow, hAccelTable, &msg))
+            if (!CKeyboardShortcutHandler::Instance().TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam))
             {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
