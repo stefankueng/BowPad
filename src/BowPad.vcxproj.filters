@@ -117,6 +117,9 @@
     <ClInclude Include="DocScroll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="KeyboardShortcutHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -191,6 +194,9 @@
     <ClCompile Include="DocScroll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="KeyboardShortcutHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc">
@@ -243,5 +249,6 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\Properties.ini" />
+    <None Include="res\Shortcuts.ini" />
   </ItemGroup>
 </Project>
