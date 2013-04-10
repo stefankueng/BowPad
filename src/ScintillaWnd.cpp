@@ -455,7 +455,7 @@ void CScintillaWnd::MarkSelectedWord()
         m_docScroll.Clear();
         Scintilla::Sci_TextToFind findText;
         findText.chrg.cpMin = 0;
-        findText.chrg.cpMax = Call(SCI_GETLENGTH);
+        findText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
         findText.lpstrText = seltextbuffer.get();
         while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&findText) >= 0)
         {
