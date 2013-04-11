@@ -160,7 +160,10 @@ void CLexStyles::Load()
 
 std::map<int, std::string> CLexStyles::GetKeywordsForExt( const std::string& ext ) const
 {
-    auto it = m_extLang.find(ext);
+    std::string v = ext;
+    std::transform(v.begin(), v.end(), v.begin(), ::tolower);
+
+    auto it = m_extLang.find(v);
     if (it != m_extLang.end())
     {
         auto lt = m_Langdata.find(it->second);
@@ -183,7 +186,9 @@ std::map<int, std::string> CLexStyles::GetKeywordsForLang( const std::string& la
 
 LexerData CLexStyles::GetLexerDataForExt( const std::string& ext ) const
 {
-    auto it = m_extLang.find(ext);
+    std::string v = ext;
+    std::transform(v.begin(), v.end(), v.begin(), ::tolower);
+    auto it = m_extLang.find(v);
     if (it != m_extLang.end())
     {
         auto lt = m_Langdata.find(it->second);
@@ -212,6 +217,7 @@ LexerData CLexStyles::GetLexerDataForLang( const std::string& lang ) const
 std::wstring CLexStyles::GetLanguageForExt( const std::wstring& ext ) const
 {
     std::string e = CUnicodeUtils::StdGetUTF8(ext);
+    std::transform(e.begin(), e.end(), e.begin(), ::towlower);
     auto it = m_extLang.find(e);
     if (it != m_extLang.end())
     {
