@@ -131,6 +131,7 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
 {
     switch (uMsg)
     {
+    case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
         {
             WORD ctrlkeys = (GetKeyState(VK_CONTROL)&0x8000) ? 0x08 : 0;
