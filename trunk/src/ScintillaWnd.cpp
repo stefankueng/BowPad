@@ -264,7 +264,7 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
     }
     for (auto it: langdata)
     {
-        Call(SCI_SETKEYWORDS, it.first, (LPARAM)it.second.c_str());
+        Call(SCI_SETKEYWORDS, it.first-1, (LPARAM)it.second.c_str());
     }
 }
 
