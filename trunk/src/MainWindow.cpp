@@ -598,6 +598,12 @@ LRESULT CMainWindow::DoCommand(int id)
             g_pFramework->InvalidateUICommand(cmdSaveAll, UI_INVALIDATIONS_STATE, NULL);
         }
         break;
+    case cmdClose:
+        CloseTab(m_TabBar.GetCurrentTabIndex());
+        break;
+    case cmdCloseAll:
+        CloseAllTabs();
+        break;
     case cmdCopy:
         m_scintilla.Call(SCI_COPYALLOWLINE);
         break;
@@ -898,6 +904,8 @@ void CMainWindow::UpdateStatusBar()
 
 bool CMainWindow::CloseTab( int tab )
 {
+    if ((tab < 0) || (tab >= m_DocManager.GetCount()))
+        return false;
     CDocument doc = m_DocManager.GetDocument(tab);
     if (doc.m_bIsDirty)
     {
@@ -950,6 +958,7 @@ bool CMainWindow::CloseTab( int tab )
     m_DocManager.RemoveDocument(tab);
     m_TabBar.DeletItemAt(tab);
     EnsureAtLeastOneTab();
+    m_TabBar.ActivateAt(tab < m_TabBar.GetItemCount() ? tab : m_TabBar.GetItemCount()-1);
     return true;
 }
 

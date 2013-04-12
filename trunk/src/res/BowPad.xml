@@ -78,6 +78,16 @@
         <Image>res/SaveAllL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdClose" LabelTitle="Close Tab" TooltipTitle="Close Tab" TooltipDescription="Close the current tab">
+      <Command.LargeImages>
+        <Image>res/CloseL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdCloseAll" LabelTitle="Close all" TooltipTitle="Close All Tabs" TooltipDescription="Closes all open files">
+      <Command.LargeImages>
+        <Image>res/CloseAllL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdCopy" LabelTitle="Copy" TooltipTitle="Clipboard" TooltipDescription="Copy the current selection to the clipboard">
       <Command.SmallImages>
         <Image>res/Copy.bmp</Image>
@@ -138,6 +148,8 @@
             <Button CommandName="cmdOpen" />
             <Button CommandName="cmdSave" />
             <Button CommandName="cmdSaveAll" />
+            <Button CommandName="cmdClose" />
+            <Button CommandName="cmdCloseAll" />
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="cmdExit" />
