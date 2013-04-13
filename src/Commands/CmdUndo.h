@@ -46,7 +46,7 @@ public:
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue ) 
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue ) 
     {
         if (UI_PKEY_Enabled == key)
         {
@@ -84,7 +84,7 @@ public:
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue ) 
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue ) 
     {
         if (UI_PKEY_Enabled == key)
         {
