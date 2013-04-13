@@ -103,6 +103,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     Call(SCI_STYLESETVISIBLE, STYLE_CONTROLCHAR, TRUE);
 
+    Call(SCI_SETCARETSTYLE, 1);
     Call(SCI_SETCARETLINEVISIBLE, true);
     Call(SCI_SETCARETLINEVISIBLEALWAYS, true);
     Call(SCI_SETCARETLINEBACK, ::GetSysColor(COLOR_WINDOWTEXT));
@@ -110,12 +111,17 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETWHITESPACEFORE, true, RGB(255, 181, 106));
     Call(SCI_SETWHITESPACESIZE, 2);
 
+    Call(SCI_SETTABWIDTH, 4);
+    Call(SCI_SETINDENTATIONGUIDES, SC_IV_LOOKBOTH);
+    Call(SCI_SETINDENT, 2);
+
     // For Ctrl+C, use SCI_COPYALLOWLINE instead of SCI_COPY
     Call(SCI_ASSIGNCMDKEY, 'C'+(SCMOD_CTRL<<16), SCI_COPYALLOWLINE);
 
     Call(SCI_SETBUFFEREDDRAW, true);
     Call(SCI_SETTWOPHASEDRAW, true);
-    Call(SCI_SETCARETSTYLE, 1);
+
+    SetupDefaultStyles();
 
     return true;
 }
@@ -230,8 +236,8 @@ void CScintillaWnd::SetupLexerForLang( const std::wstring& lang )
 
 void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, std::string>& langdata )
 {
-    SetupDefaultStyles();
     Call(SCI_STYLECLEARALL);
+    SetupDefaultStyles();
 
     Call(SCI_SETLEXER, lexerdata.ID);
 
@@ -277,8 +283,8 @@ void CScintillaWnd::SetupDefaultStyles()
     HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
     if (hFont)
     {
-        Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Consolas");
         DeleteObject(hFont);
+        Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Consolas");
     }
     else
         Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Courier New");
@@ -288,6 +294,13 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETALPHA, STYLE_SELECTION_MARK, 100);
     Call(SCI_INDICSETUNDER, STYLE_SELECTION_MARK, true);
     Call(SCI_INDICSETFORE, STYLE_SELECTION_MARK, RGB(0,255,0));
+
+    Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, RGB(0,150,0));
+    Call(SCI_STYLESETBOLD, STYLE_BRACELIGHT, 1);
+    Call(SCI_STYLESETFORE, STYLE_BRACEBAD, RGB(255,0,0));
+    Call(SCI_STYLESETBOLD, STYLE_BRACEBAD, 1);
+
+    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, RGB(150,150,150));
 }
 
 void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
@@ -468,6 +481,58 @@ void CScintillaWnd::MarkSelectedWord()
     lastSelText = seltextbuffer.get();
 }
 
+void CScintillaWnd::MatchBraces()
+{
+    int braceAtCaret = -1;
+    int braceOpposite = -1;
+
+    // find matching brace position
+    int caretPos = int(Call(SCI_GETCURRENTPOS));
+    WCHAR charBefore = '\0';
+
+    int lengthDoc = int(Call(SCI_GETLENGTH));
+
+    if ((lengthDoc > 0) && (caretPos > 0))
+    {
+        charBefore = WCHAR(Call(SCI_GETCHARAT, caretPos - 1, 0));
+    }
+    // Priority goes to character before the caret
+    if (charBefore && wcschr(L"[](){}", charBefore))
+    {
+        braceAtCaret = caretPos - 1;
+    }
+
+    if (lengthDoc > 0  && (braceAtCaret < 0))
+    {
+        // No brace found so check other side
+        WCHAR charAfter = WCHAR(Call(SCI_GETCHARAT, caretPos, 0));
+        if (charAfter && wcschr(L"[](){}", charAfter))
+        {
+            braceAtCaret = caretPos;
+        }
+    }
+    if (braceAtCaret >= 0)
+        braceOpposite = int(Call(SCI_BRACEMATCH, braceAtCaret, 0));
+
+
+    if ((braceAtCaret != -1) && (braceOpposite == -1))
+    {
+        Call(SCI_BRACEBADLIGHT, braceAtCaret);
+        Call(SCI_SETHIGHLIGHTGUIDE, 0);
+    }
+    else
+    {
+        Call(SCI_BRACEHIGHLIGHT, braceAtCaret, braceOpposite);
+
+        if (Call(SCI_GETINDENTATIONGUIDES) != 0)
+        {
+            int columnAtCaret = int(Call(SCI_GETCOLUMN, braceAtCaret));
+            int columnOpposite = int(Call(SCI_GETCOLUMN, braceOpposite));
+            Call(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite)?columnAtCaret:columnOpposite);
+        }
+    }
+}
+
 bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
 {
     // return false if it's multi-selection or rectangle selection
@@ -492,3 +557,4 @@ LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw( WPARAM wParam, NMCSBC
     m_docScroll.SetTotalLines(Call(SCI_VISIBLEFROMDOCLINE, (Call(SCI_GETLINECOUNT))));
     return m_docScroll.HandleCustomDraw(wParam, pCustDraw);
 }
+
