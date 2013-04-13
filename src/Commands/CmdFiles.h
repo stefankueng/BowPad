@@ -78,3 +78,16 @@ public:
     virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue );
 
 };
+
+class CCmdSaveAs : public ICommand
+{
+public:
+    CCmdSaveAs(void * obj) : ICommand(obj)
+    {
+    }
+    ~CCmdSaveAs(){}
+
+
+    virtual bool Execute();
+    virtual UINT GetCmdId() { return cmdSaveAs; }
+};

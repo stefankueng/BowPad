@@ -39,7 +39,7 @@ public:
 
     bool                Initialize();
     bool                OpenFile(const std::wstring& file);
-    bool                SaveCurrentTab();
+    bool                SaveCurrentTab(bool bSaveAs = false);
     void                EnsureAtLeastOneTab();
     void                GoToLine( size_t line );
     bool                CloseTab(int tab);
