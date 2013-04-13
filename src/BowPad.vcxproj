@@ -97,7 +97,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;SCI_NAMESPACE;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;Commands;$(ProjectDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
@@ -120,7 +120,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;SCI_NAMESPACE;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;Commands;$(ProjectDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
@@ -145,7 +145,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;SCI_NAMESPACE;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;Commands;$(ProjectDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
@@ -172,7 +172,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;SCI_NAMESPACE;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;Commands;$(ProjectDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
@@ -210,6 +210,14 @@
     <ClInclude Include="..\ext\sktoolslib\StringUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
+    <ClInclude Include="Commands\CmdClipboard.h" />
+    <ClInclude Include="Commands\CmdFiles.h" />
+    <ClInclude Include="Commands\CmdLineWrap.h" />
+    <ClInclude Include="Commands\CmdMRU.h" />
+    <ClInclude Include="Commands\CmdUndo.h" />
+    <ClInclude Include="Commands\CmdWhiteSpace.h" />
+    <ClInclude Include="Commands\CommandHandler.h" />
+    <ClInclude Include="Commands\ICommand.h" />
     <ClInclude Include="DocScroll.h" />
     <ClInclude Include="Document.h" />
     <ClInclude Include="DocumentManager.h" />
@@ -240,6 +248,9 @@
     <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
+    <ClCompile Include="Commands\CmdFiles.cpp" />
+    <ClCompile Include="Commands\CommandHandler.cpp" />
+    <ClCompile Include="Commands\ICommand.cpp" />
     <ClCompile Include="DocScroll.cpp" />
     <ClCompile Include="Document.cpp" />
     <ClCompile Include="DocumentManager.cpp" />

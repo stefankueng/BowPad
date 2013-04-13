@@ -27,6 +27,7 @@
 
 class CMainWindow : public CWindow, public IUIApplication, public IUICommandHandler
 {
+    friend class ICommand;
 public:
     CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL);
     ~CMainWindow(void);
@@ -37,7 +38,8 @@ public:
     bool                RegisterAndCreateWindow();
 
     bool                Initialize();
-    bool                OpenFiles(const std::vector<std::wstring>& files);
+    bool                OpenFile(const std::wstring& file);
+    bool                SaveCurrentTab();
     void                EnsureAtLeastOneTab();
     void                GoToLine( size_t line );
     bool                CloseTab(int tab);
@@ -60,13 +62,12 @@ protected:
     LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
     LRESULT             DoCommand(int id);
-    BOOL                GetStatus(int cmdId);
-    BOOL                GetState(int cmdId);
 
 private:
     void                ResizeChildWindows();
-    bool                SaveCurrentTab();
     void                UpdateStatusBar();
+    void                InitCommands();
+
 private:
     LONG                m_cRef;
     IUIRibbon *         m_pRibbon;

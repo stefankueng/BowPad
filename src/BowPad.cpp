@@ -45,9 +45,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         CCmdLineParser parser(lpCmdLine);
         if (parser.HasVal(L"path"))
         {
-            std::vector<std::wstring> files;
-            files.push_back(parser.GetVal(L"path"));
-            mainWindow.OpenFiles(files);
+            mainWindow.OpenFile(parser.GetVal(L"path"));
             if (parser.HasVal(L"line"))
             {
                 mainWindow.GoToLine(parser.GetLongVal(L"line")-1);
