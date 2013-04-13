@@ -19,6 +19,7 @@
 #include "BowPad.h"
 #include "BowPadUI.h"
 #include "StringUtils.h"
+#include "CommandHandler.h"
 #include "MRU.h"
 
 #include <memory>
@@ -91,15 +92,10 @@ STDMETHODIMP CMainWindow::QueryInterface(REFIID iid, void** ppv)
     return S_OK;
 }
 
-//
 //  FUNCTION: OnCreateUICommand(UINT, UI_COMMANDTYPE, IUICommandHandler)
 //
 //  PURPOSE: Called by the Ribbon framework for each command specified in markup, to allow
 //           the host application to bind a command handler to that command.
-//
-//    To view the OnCreateUICommand callbacks, uncomment the _cwprintf call.
-//
-//
 STDMETHODIMP CMainWindow::OnCreateUICommand(
     UINT nCmdID,
     UI_COMMANDTYPE typeID,
@@ -111,12 +107,9 @@ STDMETHODIMP CMainWindow::OnCreateUICommand(
     return QueryInterface(IID_PPV_ARGS(ppCommandHandler));
 }
 
-//
 //  FUNCTION: OnViewChanged(UINT, UI_VIEWTYPE, IUnknown*, UI_VIEWVERB, INT)
 //
 //  PURPOSE: Called when the state of a View (Ribbon is a view) changes, for example, created, destroyed, or resized.
-//
-//
 STDMETHODIMP CMainWindow::OnViewChanged(
     UINT viewId,
     UI_VIEWTYPE typeId,
@@ -184,26 +177,10 @@ STDMETHODIMP CMainWindow::UpdateProperty(
     UNREFERENCED_PARAMETER(ppropvarCurrentValue);
 
     HRESULT hr = E_NOTIMPL;
-    if(UI_PKEY_Enabled == key)
-    {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, GetStatus(nCmdID), ppropvarNewValue);
-    }
-    if (UI_PKEY_BooleanValue == key)
-    {
-        hr = UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, GetState(nCmdID), ppropvarNewValue);
-    }
+    ICommand * pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
+    if (pCmd)
+        hr = pCmd->IUICommandHandlerUpdateProperty(key, ppropvarCurrentValue, ppropvarNewValue);
 
-    switch(nCmdID)
-    {
-    case cmdMRUList:
-        if (UI_PKEY_RecentItems == key)
-        {
-            hr = CMRU::Instance().PopulateRibbonRecentItems(ppropvarNewValue);
-        }
-        break;
-    default:
-        break;
-    }
     return hr;
 }
 
@@ -220,56 +197,19 @@ STDMETHODIMP CMainWindow::Execute(
     UNREFERENCED_PARAMETER(verb);
 
     HRESULT hr = S_OK;
-    if (nCmdID == cmdMRUList)
+
+    ICommand * pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
+    if (pCmd)
     {
-        if (*key == UI_PKEY_RecentItems)
+        hr = pCmd->IUICommandHandlerExecute(verb, key, ppropvarValue, pCommandExecutionProperties);
+        if (hr == E_NOTIMPL)
         {
-            if (ppropvarValue)
-            {
-                SAFEARRAY * psa = V_ARRAY(ppropvarValue);
-                LONG lstart, lend;
-                hr = SafeArrayGetLBound( psa, 1, &lstart );
-                if (FAILED(hr))
-                    return hr;
-                hr = SafeArrayGetUBound( psa, 1, &lend );
-                if (FAILED(hr))
-                    return hr;
-                IUISimplePropertySet ** data;
-                hr = SafeArrayAccessData(psa,(void **)&data);
-                for (LONG idx = lstart; idx <= lend; ++idx)
-                {
-                    IUISimplePropertySet * ppset = (IUISimplePropertySet *)data[idx];
-                    if (ppset)
-                    {
-                        PROPVARIANT var;
-                        ppset->GetValue(UI_PKEY_LabelDescription, &var);
-                        std::wstring path = var.bstrVal;
-                        PropVariantClear(&var);
-                        ppset->GetValue(UI_PKEY_Pinned, &var);
-                        bool bPinned = VARIANT_TRUE==var.boolVal;
-                        PropVariantClear(&var);
-                        CMRU::Instance().PinPath(path, bPinned);
-                    }
-                }
-                hr = SafeArrayUnaccessData(psa);
-            }
-        }
-        if (*key == UI_PKEY_SelectedItem)
-        {
-            if (pCommandExecutionProperties)
-            {
-                PROPVARIANT var;
-                pCommandExecutionProperties->GetValue(UI_PKEY_LabelDescription, &var);
-                std::wstring path = var.bstrVal;
-                PropVariantClear(&var);
-                std::vector<std::wstring> files;
-                files.push_back(path);
-                OpenFiles(files);
-            }
+            hr = S_OK;
+            DoCommand(nCmdID);
         }
     }
-
-    DoCommand(nCmdID);
+    else
+        DoCommand(nCmdID);
     return hr;
 }
 
@@ -355,7 +295,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     files.push_back(pathBuf.get());
                 }
                 DragFinish(hDrop);
-                OpenFiles(files);
+                for (auto it:files)
+                    OpenFile(it);
             }
         }
         break;
@@ -430,12 +371,14 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             else if ((pNMHDR->idFrom == (UINT_PTR)&m_scintilla) ||
                 (pNMHDR->hwndFrom == m_scintilla))
             {
-                if(pNMHDR->code == NM_COOLSB_CUSTOMDRAW)
+                if (pNMHDR->code == NM_COOLSB_CUSTOMDRAW)
                 {
                     return m_scintilla.HandleScrollbarCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
                 }
 
                 Scintilla::SCNotification * pScn = reinterpret_cast<Scintilla::SCNotification *>(lParam);
+                CCommandHandler::Instance().ScintillaNotify(pScn);
+
                 switch (pScn->nmhdr.code)
                 {
                 case SCN_PAINTED:
@@ -460,8 +403,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                 tie.iImage = REDONLY_IMG_INDEX;
                             ::SendMessage(m_TabBar, TCM_SETITEM, tab, reinterpret_cast<LPARAM>(&tie));
                         }
-                        g_pFramework->InvalidateUICommand(cmdSave, UI_INVALIDATIONS_STATE, NULL);
-                        g_pFramework->InvalidateUICommand(cmdSaveAll, UI_INVALIDATIONS_STATE, NULL);
                     }
                     break;
                 case SCN_MARGINCLICK:
@@ -473,14 +414,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     {
                         m_scintilla.MarkSelectedWord();
                         UpdateStatusBar();
-                        g_pFramework->InvalidateUICommand(cmdCut, UI_INVALIDATIONS_STATE, NULL);
-                        g_pFramework->InvalidateUICommand(cmdPaste, UI_INVALIDATIONS_STATE, NULL);
-                    }
-                    break;
-                case SCN_MODIFIED:
-                    {
-                        g_pFramework->InvalidateUICommand(cmdUndo, UI_INVALIDATIONS_STATE, NULL);
-                        g_pFramework->InvalidateUICommand(cmdRedo, UI_INVALIDATIONS_STATE, NULL);
                     }
                     break;
                 }
@@ -531,102 +464,18 @@ LRESULT CMainWindow::DoCommand(int id)
             m_TabBar.ActivateAt(index);
         }
         break;
-    case cmdOpen:
-        {
-            std::vector<std::wstring> paths;
-            CComPtr<IFileOpenDialog> pfd = NULL;
-
-            HRESULT hr = pfd.CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER);
-            if (SUCCEEDED(hr))
-            {
-                // Set the dialog options
-                DWORD dwOptions;
-                if (SUCCEEDED(hr = pfd->GetOptions(&dwOptions)))
-                {
-                    hr = pfd->SetOptions(dwOptions | FOS_FILEMUSTEXIST | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_ALLOWMULTISELECT);
-                }
-
-                // Set a title
-                if (SUCCEEDED(hr))
-                {
-                    pfd->SetTitle(L"BowPad");
-                }
-
-                // Show the save/open file dialog
-                if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(*this)))
-                {
-                    CComPtr<IShellItemArray> psiaResults;
-                    hr = pfd->GetResults(&psiaResults);
-                    if (SUCCEEDED(hr))
-                    {
-                        DWORD count = 0;
-                        hr = psiaResults->GetCount(&count);
-                        for (DWORD i = 0; i < count; ++i)
-                        {
-                            CComPtr<IShellItem> psiResult = NULL;
-                            hr = psiaResults->GetItemAt(i, &psiResult);
-                            PWSTR pszPath = NULL;
-                            hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
-                            if (SUCCEEDED(hr))
-                            {
-                                paths.push_back(pszPath);
-                            }
-                        }
-                    }
-                }
-            }
-            if (SUCCEEDED(hr))
-                OpenFiles(paths);
-        }
-        break;
-    case cmdSave:
-        SaveCurrentTab();
-        g_pFramework->InvalidateUICommand(cmdSave, UI_INVALIDATIONS_STATE, NULL);
-        g_pFramework->InvalidateUICommand(cmdSaveAll, UI_INVALIDATIONS_STATE, NULL);
-        break;
-    case cmdSaveAll:
-        {
-            for (int i = 0; i < (int)m_DocManager.GetCount(); ++i)
-            {
-                if (m_DocManager.GetDocument(i).m_bIsDirty)
-                {
-                    m_TabBar.ActivateAt(i);
-                    SaveCurrentTab();
-                }
-            }
-            g_pFramework->InvalidateUICommand(cmdSave, UI_INVALIDATIONS_STATE, NULL);
-            g_pFramework->InvalidateUICommand(cmdSaveAll, UI_INVALIDATIONS_STATE, NULL);
-        }
-        break;
     case cmdClose:
         CloseTab(m_TabBar.GetCurrentTabIndex());
         break;
     case cmdCloseAll:
         CloseAllTabs();
         break;
-    case cmdCopy:
-        m_scintilla.Call(SCI_COPYALLOWLINE);
-        break;
-    case cmdCut:
-        m_scintilla.Call(SCI_CUT);
-        break;
-    case cmdPaste:
-        m_scintilla.Call(SCI_PASTE);
-        break;
-    case cmdUndo:
-        m_scintilla.Call(SCI_UNDO);
-        break;
-    case cmdRedo:
-        m_scintilla.Call(SCI_REDO);
-    case cmdLineWrap:
-        m_scintilla.Call(SCI_SETWRAPMODE, m_scintilla.Call(SCI_GETWRAPMODE) ? 0 : SC_WRAP_WORD);
-        g_pFramework->InvalidateUICommand(cmdLineWrap, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        break;
-    case cmdWhiteSpace:
-        m_scintilla.Call(SCI_SETVIEWWS, m_scintilla.Call(SCI_GETVIEWWS) ? 0 : 1);
-        g_pFramework->InvalidateUICommand(cmdWhiteSpace, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        break;
     default:
+        {
+            ICommand * pCmd = CCommandHandler::Instance().GetCommand(id);
+            if (pCmd)
+                pCmd->Execute();
+        }
         break;
     }
     return 1;
@@ -698,6 +547,8 @@ bool CMainWindow::Initialize()
         }
     }
 
+    CCommandHandler::Instance().Init(this);
+
     return true;
 }
 
@@ -713,98 +564,6 @@ void CMainWindow::ResizeChildWindows()
     MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
     DeferWindowPos(hDwp, m_scintilla, NULL, rect.left, rect.top+m_RibbonHeight+tabrc.bottom-tabrc.top, rect.right-rect.left, rect.bottom-(rect.top-rect.top+m_RibbonHeight+tabrc.bottom-tabrc.top)-m_StatusBar.GetHeight(), SWP_NOACTIVATE|SWP_NOOWNERZORDER|SWP_NOZORDER|SWP_SHOWWINDOW|SWP_NOCOPYBITS);
     EndDeferWindowPos(hDwp);
-}
-
-bool CMainWindow::OpenFiles( const std::vector<std::wstring>& files )
-{
-    bool bRet = true;
-    for (auto file: files)
-    {
-        int encoding = -1;
-        size_t index = m_DocManager.GetIndexForPath(file);
-        if (index != -1)
-        {
-            // document already open
-            m_TabBar.ActivateAt((int)index);
-        }
-        else
-        {
-            CDocument doc = m_DocManager.LoadFile(*this, file, encoding);
-            if (doc.m_document)
-            {
-                CMRU::Instance().AddPath(file);
-                m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-                doc.m_language = CLexStyles::Instance().GetLanguageForExt(file.substr(file.find_last_of('.')+1));
-                m_scintilla.SetupLexerForExt(file.substr(file.find_last_of('.')+1));
-                m_DocManager.AddDocumentAtEnd(doc);
-                std::wstring sFileName = file.substr(file.find_last_of('\\')+1);
-                int index = m_TabBar.InsertAtEnd(sFileName.c_str());
-                m_TabBar.ActivateAt(index);
-            }
-            else
-            {
-                CMRU::Instance().RemovePath(file, false);
-                bRet = false;
-            }
-        }
-    }
-    return bRet;
-}
-
-BOOL CMainWindow::GetStatus( int cmdId )
-{
-    switch (cmdId)
-    {
-    case cmdSave:
-        {
-            int tab = m_TabBar.GetCurrentTabIndex();
-            if ((tab >= 0) && (tab < m_DocManager.GetCount()))
-            {
-                CDocument doc = m_DocManager.GetDocument(tab);
-                return doc.m_bIsDirty;
-            }
-        }
-        break;
-    case cmdSaveAll:
-        {
-            int dirtycount = 0;
-            for (int i = 0; i < m_DocManager.GetCount(); ++i)
-            {
-                CDocument doc = m_DocManager.GetDocument(i);
-                if (doc.m_bIsDirty)
-                    dirtycount++;
-            }
-            return dirtycount > 1;
-        }
-        break;
-    case cmdCut:
-        return (m_scintilla.Call(SCI_GETSELTEXT)>1);
-        break;
-    case cmdPaste:
-        return (m_scintilla.Call(SCI_CANPASTE) != 0);
-        break;
-    case cmdUndo:
-        return (m_scintilla.Call(SCI_CANUNDO) != 0);
-        break;
-    case cmdRedo:
-        return (m_scintilla.Call(SCI_CANREDO) != 0);
-        break;
-    }
-    return TRUE;
-}
-
-BOOL CMainWindow::GetState( int cmdId )
-{
-    switch (cmdId)
-    {
-    case cmdLineWrap:
-        return (m_scintilla.Call(SCI_GETWRAPMODE) > 0);
-        break;
-    case cmdWhiteSpace:
-        return (m_scintilla.Call(SCI_GETVIEWWS) > 0);
-        break;
-    }
-    return TRUE;
 }
 
 bool CMainWindow::SaveCurrentTab()
@@ -972,4 +731,37 @@ bool CMainWindow::CloseAllTabs()
             return true;
     } while (m_TabBar.GetItemCount() > 0);
     return true;
+}
+
+bool CMainWindow::OpenFile( const std::wstring& file )
+{
+    bool bRet = true;
+    int encoding = -1;
+    int index = m_DocManager.GetIndexForPath(file.c_str());
+    if (index != -1)
+    {
+        // document already open
+        m_TabBar.ActivateAt(index);
+    }
+    else
+    {
+        CDocument doc = m_DocManager.LoadFile(*this, file.c_str(), encoding);
+        if (doc.m_document)
+        {
+            CMRU::Instance().AddPath(file);
+            m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+            doc.m_language = CLexStyles::Instance().GetLanguageForExt(file.substr(file.find_last_of('.')+1));
+            m_scintilla.SetupLexerForExt(file.substr(file.find_last_of('.')+1).c_str());
+            m_DocManager.AddDocumentAtEnd(doc);
+            std::wstring sFileName = file.substr(file.find_last_of('\\')+1);
+            int index = m_TabBar.InsertAtEnd(sFileName.c_str());
+            m_TabBar.ActivateAt(index);
+        }
+        else
+        {
+            CMRU::Instance().RemovePath(file, false);
+            bRet = false;
+        }
+    }
+    return bRet;
 }

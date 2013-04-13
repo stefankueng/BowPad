@@ -16,6 +16,9 @@
     <Filter Include="sktoolslib">
       <UniqueIdentifier>{c1a339fd-6b6d-475f-8108-4cfcc20b9520}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Commands">
+      <UniqueIdentifier>{fe5ddb2d-59a6-4810-aa77-a50f53983490}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -120,6 +123,30 @@
     <ClInclude Include="KeyboardShortcutHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CommandHandler.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands\ICommand.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands\CmdMRU.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands\CmdFiles.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands\CmdUndo.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands\CmdClipboard.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands\CmdLineWrap.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands\CmdWhiteSpace.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -196,6 +223,15 @@
     </ClCompile>
     <ClCompile Include="KeyboardShortcutHandler.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\ICommand.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CommandHandler.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdFiles.cpp">
+      <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
