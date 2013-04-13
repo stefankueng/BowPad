@@ -62,6 +62,8 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdSaveAll(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdSaveAs(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdUndo(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdRedo(obj);

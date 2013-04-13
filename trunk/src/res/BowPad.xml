@@ -78,6 +78,11 @@
         <Image>res/SaveAllL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdSaveAs" LabelTitle="Save as" TooltipTitle="Save as" TooltipDescription="Asks where to save the current tab">
+      <Command.LargeImages>
+        <Image>res/SaveAsL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdClose" LabelTitle="Close Tab" TooltipTitle="Close Tab" TooltipDescription="Close the current tab">
       <Command.LargeImages>
         <Image>res/CloseL.bmp</Image>
@@ -148,6 +153,7 @@
             <Button CommandName="cmdOpen" />
             <Button CommandName="cmdSave" />
             <Button CommandName="cmdSaveAll" />
+            <Button CommandName="cmdSaveAs" />
             <Button CommandName="cmdClose" />
             <Button CommandName="cmdCloseAll" />
           </MenuGroup>

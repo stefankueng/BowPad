@@ -566,14 +566,14 @@ void CMainWindow::ResizeChildWindows()
     EndDeferWindowPos(hDwp);
 }
 
-bool CMainWindow::SaveCurrentTab()
+bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
 {
     bool bRet = false;
     int tab = m_TabBar.GetCurrentTabIndex();
     if ((tab >= 0) && (tab < m_DocManager.GetCount()))
     {
         CDocument doc = m_DocManager.GetDocument(tab);
-        if (doc.m_path.empty())
+        if (doc.m_path.empty() || bSaveAs)
         {
             CComPtr<IFileSaveDialog> pfd = NULL;
 

@@ -46,7 +46,7 @@ protected:
     sptr_t              ScintillaCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0);
     HWND                GetHwnd();
     bool                OpenFile(LPCWSTR file);
-    bool                SaveCurrentTab();
+    bool                SaveCurrentTab(bool bSaveAs = false);
     HRESULT             InvalidateUICommand(UI_INVALIDATIONS flags, const PROPERTYKEY *key);
 private:
     void *              m_Obj;

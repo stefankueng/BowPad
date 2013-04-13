@@ -148,3 +148,8 @@ HRESULT CCmdSaveAll::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
     return E_NOTIMPL;
 }
 
+
+bool CCmdSaveAs::Execute()
+{
+    return SaveCurrentTab(true);
+}
