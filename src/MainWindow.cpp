@@ -414,6 +414,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     {
                         m_scintilla.MarkSelectedWord();
                         m_scintilla.MatchBraces();
+                        m_scintilla.MatchTags();
                         UpdateStatusBar();
                     }
                     break;

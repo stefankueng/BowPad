@@ -18,6 +18,7 @@
 #include "ScintillaWnd.h"
 #include "XPMIcons.h"
 #include "UnicodeUtils.h"
+#include "SciLexer.h"
 
 const int SC_MARGE_LINENUMBER = 0;
 const int SC_MARGE_SYBOLE = 1;
@@ -237,7 +238,6 @@ void CScintillaWnd::SetupLexerForLang( const std::wstring& lang )
 void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, std::string>& langdata )
 {
     Call(SCI_STYLECLEARALL);
-    SetupDefaultStyles();
 
     Call(SCI_SETLEXER, lexerdata.ID);
 
@@ -272,10 +272,13 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
     {
         Call(SCI_SETKEYWORDS, it.first-1, (LPARAM)it.second.c_str());
     }
+
+    SetupDefaultStyles();
 }
 
 void CScintillaWnd::SetupDefaultStyles()
 {
+    Call(SCI_SETSTYLEBITS, 8);
     Call(SCI_STYLERESETDEFAULT);
     // if possible, use the Consolas font
     // to determine whether Consolas is available, try to create
@@ -290,10 +293,10 @@ void CScintillaWnd::SetupDefaultStyles()
         Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Courier New");
     Call(SCI_STYLESETSIZE, STYLE_DEFAULT, 10);
 
-    Call(SCI_INDICSETSTYLE, STYLE_SELECTION_MARK, INDIC_ROUNDBOX);
-    Call(SCI_INDICSETALPHA, STYLE_SELECTION_MARK, 100);
-    Call(SCI_INDICSETUNDER, STYLE_SELECTION_MARK, true);
-    Call(SCI_INDICSETFORE, STYLE_SELECTION_MARK, RGB(0,255,0));
+    Call(SCI_INDICSETSTYLE, INDIC_SELECTION_MARK, INDIC_ROUNDBOX);
+    Call(SCI_INDICSETALPHA, INDIC_SELECTION_MARK, 100);
+    Call(SCI_INDICSETUNDER, INDIC_SELECTION_MARK, true);
+    Call(SCI_INDICSETFORE, INDIC_SELECTION_MARK, RGB(0,255,0));
 
     Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, RGB(0,150,0));
     Call(SCI_STYLESETBOLD, STYLE_BRACELIGHT, 1);
@@ -301,6 +304,15 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_STYLESETBOLD, STYLE_BRACEBAD, 1);
 
     Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, RGB(150,150,150));
+
+    Call(SCI_INDICSETFORE, INDIC_TAGMATCH, RGB(0x80, 0x00, 0xFF));
+    Call(SCI_INDICSETFORE, INDIC_TAGATTR, RGB(0xFF, 0xFF, 0x00));
+    Call(SCI_INDICSETSTYLE, INDIC_TAGMATCH, INDIC_ROUNDBOX);
+    Call(SCI_INDICSETSTYLE, INDIC_TAGATTR, INDIC_ROUNDBOX);
+    Call(SCI_INDICSETALPHA, INDIC_TAGMATCH, 100);
+    Call(SCI_INDICSETALPHA, INDIC_TAGATTR, 100);
+    Call(SCI_INDICSETUNDER, INDIC_TAGMATCH, true);
+    Call(SCI_INDICSETUNDER, INDIC_TAGATTR, true);
 }
 
 void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
@@ -432,7 +444,7 @@ void CScintillaWnd::MarkSelectedWord()
 
     int len = endstylepos - startstylepos + 1;
     // reset indicators
-    Call(SCI_SETINDICATORCURRENT, STYLE_SELECTION_MARK);
+    Call(SCI_SETINDICATORCURRENT, INDIC_SELECTION_MARK);
     Call(SCI_INDICATORCLEARRANGE, startstylepos, len);
 
     int selTextLen = (int)Call(SCI_GETSELTEXT);
@@ -466,15 +478,15 @@ void CScintillaWnd::MarkSelectedWord()
     if (lastSelText.compare(seltextbuffer.get()))
     {
         m_docScroll.Clear();
-        Scintilla::Sci_TextToFind findText;
-        findText.chrg.cpMin = 0;
-        findText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
-        findText.lpstrText = seltextbuffer.get();
-        while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&findText) >= 0)
+        Scintilla::Sci_TextToFind FindText;
+        FindText.chrg.cpMin = 0;
+        FindText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
+        FindText.lpstrText = seltextbuffer.get();
+        while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&FindText) >= 0)
         {
-            size_t line = Call(SCI_LINEFROMPOSITION, findText.chrgText.cpMin);
+            size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
             m_docScroll.AddLineColor(line, RGB(0,255,0));
-            findText.chrg.cpMin = findText.chrgText.cpMax;
+            FindText.chrg.cpMin = FindText.chrgText.cpMax;
         }
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
     }
@@ -533,6 +545,82 @@ void CScintillaWnd::MatchBraces()
     }
 }
 
+void CScintillaWnd::MatchTags()
+{
+    // basically the same as MatchBraces(), but much more complicated since
+    // finding xml tags is harder than just finding braces...
+
+    size_t docStart = 0;
+    size_t docEnd = Call(SCI_GETLENGTH);
+    Call(SCI_SETINDICATORCURRENT, INDIC_TAGMATCH);
+    Call(SCI_INDICATORCLEARRANGE, docStart, docEnd-docStart);
+    Call(SCI_SETINDICATORCURRENT, INDIC_TAGATTR);
+    Call(SCI_INDICATORCLEARRANGE, docStart, docEnd-docStart);
+
+    int lexer = (int)Call(SCI_GETLEXER);
+    if ((lexer != SCLEX_HTML) &&
+        (lexer != SCLEX_XML) &&
+        (lexer != SCLEX_PHPSCRIPT))
+        return;
+
+    // Get the original targets and search options to restore after tag matching operation
+    size_t originalStartPos = Call(SCI_GETTARGETSTART);
+    size_t originalEndPos = Call(SCI_GETTARGETEND);
+    size_t originalSearchFlags = Call(SCI_GETSEARCHFLAGS);
+
+    XmlMatchedTagsPos xmlTags = {0};
+
+    // Detect if it's a xml/html tag
+    if (GetXmlMatchedTagsPos(xmlTags))
+    {
+        Call(SCI_SETINDICATORCURRENT, INDIC_TAGMATCH);
+        int openTagTailLen = 2;
+
+        // Coloring the close tag first
+        if ((xmlTags.tagCloseStart != -1) && (xmlTags.tagCloseEnd != -1))
+        {
+            Call(SCI_INDICATORFILLRANGE,  xmlTags.tagCloseStart, xmlTags.tagCloseEnd - xmlTags.tagCloseStart);
+            // tag close is present, so it's not single tag
+            openTagTailLen = 1;
+        }
+
+        // Coloring the open tag
+        Call(SCI_INDICATORFILLRANGE,  xmlTags.tagOpenStart, xmlTags.tagNameEnd - xmlTags.tagOpenStart);
+        Call(SCI_INDICATORFILLRANGE,  xmlTags.tagOpenEnd - openTagTailLen, openTagTailLen);
+
+
+        // Coloring its attributes
+        std::vector<std::pair<size_t, size_t>> attributes = GetAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
+        Call(SCI_SETINDICATORCURRENT,  INDIC_TAGATTR);
+        for (size_t i = 0 ; i < attributes.size() ; i++)
+        {
+            Call(SCI_INDICATORFILLRANGE,  attributes[i].first, attributes[i].second - attributes[i].first);
+        }
+
+        // Coloring indent guide line position
+        if (Call(SCI_GETINDENTATIONGUIDES) != 0)
+        {
+            size_t columnAtCaret  = Call(SCI_GETCOLUMN, xmlTags.tagOpenStart);
+            size_t columnOpposite = Call(SCI_GETCOLUMN, xmlTags.tagCloseStart);
+
+            size_t lineAtCaret  = Call(SCI_LINEFROMPOSITION, xmlTags.tagOpenStart);
+            size_t lineOpposite = Call(SCI_LINEFROMPOSITION, xmlTags.tagCloseStart);
+
+            if (xmlTags.tagCloseStart != -1 && lineAtCaret != lineOpposite)
+            {
+                Call(SCI_BRACEHIGHLIGHT, xmlTags.tagOpenStart, xmlTags.tagCloseEnd-1);
+                Call(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite)?columnAtCaret:columnOpposite);
+            }
+        }
+    }
+
+    // restore the original targets and search options to avoid the conflict with search/replace function
+    Call(SCI_SETTARGETSTART, originalStartPos);
+    Call(SCI_SETTARGETEND, originalEndPos);
+    Call(SCI_SETSEARCHFLAGS, originalSearchFlags);
+
+}
+
 bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
 {
     // return false if it's multi-selection or rectangle selection
@@ -558,3 +646,547 @@ LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw( WPARAM wParam, NMCSBC
     return m_docScroll.HandleCustomDraw(wParam, pCustDraw);
 }
 
+bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
+{
+    bool tagFound = false;
+    size_t caret = Call(SCI_GETCURRENTPOS);
+    size_t searchStartPoint = caret;
+    size_t styleAt;
+    FindResult openFound;
+
+    // Search back for the previous open angle bracket.
+    // Keep looking whilst the angle bracket found is inside an XML attribute
+    do
+    {
+        openFound = FindText("<", searchStartPoint, 0, 0);
+        styleAt = Call(SCI_GETSTYLEAT, openFound.start);
+        searchStartPoint = openFound.start - 1;
+    } while (openFound.success && (styleAt == SCE_H_DOUBLESTRING || styleAt == SCE_H_SINGLESTRING) && (int)searchStartPoint > 0);
+
+    if (openFound.success && styleAt != SCE_H_CDATA)
+    {
+        // Found the "<" before the caret, now check there isn't a > between that position and the caret.
+        FindResult closeFound;
+        searchStartPoint = openFound.start;
+        do
+        {
+            closeFound = FindText(">", searchStartPoint, caret, 0);
+            styleAt = (int)Call(SCI_GETSTYLEAT, closeFound.start);
+            searchStartPoint = closeFound.end;
+        } while (closeFound.success && (styleAt == SCE_H_DOUBLESTRING || styleAt == SCE_H_SINGLESTRING) && (int)searchStartPoint <= caret);
+
+        if (!closeFound.success)
+        {
+            // We're in a tag (either a start tag or an end tag)
+            int nextChar = (int)Call(SCI_GETCHARAT, openFound.start + 1);
+
+
+            /////////////////////////////////////////////////////////////////////////
+            // CURSOR IN CLOSE TAG
+            /////////////////////////////////////////////////////////////////////////
+            if ('/' == nextChar)
+            {
+                xmlTags.tagCloseStart = openFound.start;
+                size_t docLength = Call(SCI_GETLENGTH);
+                FindResult endCloseTag = FindText(">", caret, docLength, 0);
+                if (endCloseTag.success)
+                {
+                    xmlTags.tagCloseEnd = endCloseTag.end;
+                }
+                // Now find the tagName
+                size_t position = openFound.start + 2;
+
+                // UTF-8 or ASCII tag name
+                std::string tagName;
+                nextChar = (int)Call(SCI_GETCHARAT, position);
+                // Checking for " or ' is actually wrong here, but it means it works better with invalid XML
+                while(position < docLength && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
+                {
+                    tagName.push_back((char)nextChar);
+                    ++position;
+                    nextChar = (int)Call(SCI_GETCHARAT, position);
+                }
+
+                // Now we know where the end of the tag is, and we know what the tag is called
+                if (tagName.size() != 0)
+                {
+                    /* Now we need to find the open tag.  The logic here is that we search for "<TAGNAME",
+                     * then check the next character - if it's one of '>', ' ', '\"' then we know we've found
+                     * a relevant tag.
+                     * We then need to check if either
+                     *    a) this tag is a self-closed tag - e.g. <TAGNAME attrib="value" />
+                     * or b) this tag has another closing tag after it and before our closing tag
+                     *       e.g.  <TAGNAME attrib="value">some text</TAGNAME></TAGNA|ME>
+                     *             (cursor represented by |)
+                     * If it's either of the above, then we continue searching, but only up to the
+                     * the point of the last find. (So in the (b) example above, we'd only search backwards
+                     * from the first "<TAGNAME...", as we know there's a close tag for the opened tag.
+
+                     * NOTE::  NEED TO CHECK THE ROTTEN CASE: ***********************************************************
+                     * <TAGNAME attrib="value"><TAGNAME>something</TAGNAME></TAGNAME></TAGNA|ME>
+                     * Maybe count all closing tags between start point and start of our end tag.???
+                     */
+                    size_t currentEndPoint = xmlTags.tagCloseStart;
+                    size_t openTagsRemaining = 1;
+                    FindResult nextOpenTag;
+                    do
+                    {
+                        nextOpenTag = FindOpenTag(tagName, currentEndPoint, 0);
+                        if (nextOpenTag.success)
+                        {
+                            --openTagsRemaining;
+                            // Open tag found
+                            // Now we need to check how many close tags there are between the open tag we just found,
+                            // and our close tag
+                            // eg. (Cursor == | )
+                            // <TAGNAME attrib="value"><TAGNAME>something</TAGNAME></TAGNAME></TAGNA|ME>
+                            //                         ^^^^^^^^ we've found this guy
+                            //                                           ^^^^^^^^^^ ^^^^^^^^ Now we need to count these fellas
+                            FindResult inbetweenCloseTag;
+                            size_t currentStartPosition = nextOpenTag.end;
+                            size_t closeTagsFound = 0;
+                            bool forwardSearch = (currentStartPosition < currentEndPoint);
+
+                            do
+                            {
+                                inbetweenCloseTag = FindCloseTag(tagName, currentStartPosition, currentEndPoint);
+
+                                if (inbetweenCloseTag.success)
+                                {
+                                    ++closeTagsFound;
+                                    if (forwardSearch)
+                                    {
+                                        currentStartPosition = inbetweenCloseTag.end;
+                                    }
+                                    else
+                                    {
+                                        currentStartPosition = inbetweenCloseTag.start - 1;
+                                    }
+                                }
+
+                            } while(inbetweenCloseTag.success);
+
+                            // If we didn't find any close tags between the open and our close,
+                            // and there's no open tags remaining to find
+                            // then the open we found was the right one, and we can return it
+                            if (0 == closeTagsFound && 0 == openTagsRemaining)
+                            {
+                                xmlTags.tagOpenStart = nextOpenTag.start;
+                                xmlTags.tagOpenEnd = nextOpenTag.end + 1;
+                                xmlTags.tagNameEnd = nextOpenTag.start + (int)tagName.size() + 1;  /* + 1 to account for '<' */
+                                tagFound = true;
+                            }
+                            else
+                            {
+
+                                // Need to find the same number of opening tags, without closing tags etc.
+                                openTagsRemaining += closeTagsFound;
+                                currentEndPoint = nextOpenTag.start;
+                            }
+                        }
+                    } while (!tagFound && openTagsRemaining > 0 && nextOpenTag.success);
+                }
+            }
+            else
+            {
+            /////////////////////////////////////////////////////////////////////////
+            // CURSOR IN OPEN TAG
+            /////////////////////////////////////////////////////////////////////////
+                size_t position = openFound.start + 1;
+                size_t docLength = (int)Call(SCI_GETLENGTH);
+
+                xmlTags.tagOpenStart = openFound.start;
+
+                std::string tagName;
+                nextChar = (int)Call(SCI_GETCHARAT, position);
+                // Checking for " or ' is actually wrong here, but it means it works better with invalid XML
+                while(position < docLength && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
+                {
+                    tagName.push_back((char)nextChar);
+                    ++position;
+                    nextChar = (int)Call(SCI_GETCHARAT, position);
+                }
+
+                // Now we know where the end of the tag is, and we know what the tag is called
+                if (tagName.size() != 0)
+                {
+                    // First we need to check if this is a self-closing tag.
+                    // If it is, then we can just return this tag to highlight itself.
+                    xmlTags.tagNameEnd = openFound.start + tagName.size() + 1;
+                    size_t closeAnglePosition = FindCloseAngle(position, docLength);
+                    if (-1 != closeAnglePosition)
+                    {
+                        xmlTags.tagOpenEnd = closeAnglePosition + 1;
+                        // If it's a self closing tag
+                        if (Call(SCI_GETCHARAT, closeAnglePosition - 1) == '/')
+                        {
+                            // Set it as found, and mark that there's no close tag
+                            xmlTags.tagCloseEnd = (size_t)-1;
+                            xmlTags.tagCloseStart = (size_t)-1;
+                            tagFound = true;
+                        }
+                        else
+                        {
+                            // It's a normal open tag
+
+
+
+                            /* Now we need to find the close tag.  The logic here is that we search for "</TAGNAME",
+                             * then check the next character - if it's '>' or whitespace followed by '>' then we've
+                             * found a relevant tag.
+                             * We then need to check if
+                             * our tag has another opening tag after it and before the closing tag we've found
+                             *       e.g.  <TA|GNAME><TAGNAME attrib="value">some text</TAGNAME></TAGNAME>
+                             *             (cursor represented by |)
+                             */
+                            size_t currentStartPosition = xmlTags.tagOpenEnd;
+                            size_t closeTagsRemaining = 1;
+                            FindResult nextCloseTag;
+                            do
+                            {
+                                nextCloseTag = FindCloseTag(tagName, currentStartPosition, docLength);
+                                if (nextCloseTag.success)
+                                {
+                                    --closeTagsRemaining;
+                                    // Open tag found
+                                    // Now we need to check how many close tags there are between the open tag we just found,
+                                    // and our close tag
+                                    // eg. (Cursor == | )
+                                    // <TAGNAM|E attrib="value"><TAGNAME>something</TAGNAME></TAGNAME></TAGNAME>
+                                    //                                            ^^^^^^^^ we've found this guy
+                                    //                         ^^^^^^^^^ Now we need to find this fella
+                                    FindResult inbetweenOpenTag;
+                                    size_t currentEndPosition = nextCloseTag.start;
+                                    size_t openTagsFound = 0;
+
+                                    do
+                                    {
+                                        inbetweenOpenTag = FindOpenTag(tagName, currentStartPosition, currentEndPosition);
+
+                                        if (inbetweenOpenTag.success)
+                                        {
+                                            ++openTagsFound;
+                                            currentStartPosition = inbetweenOpenTag.end;
+                                        }
+
+                                    } while(inbetweenOpenTag.success);
+
+                                    // If we didn't find any open tags between our open and the close,
+                                    // and there's no close tags remaining to find
+                                    // then the close we found was the right one, and we can return it
+                                    if (0 == openTagsFound && 0 == closeTagsRemaining)
+                                    {
+                                        xmlTags.tagCloseStart = nextCloseTag.start;
+                                        xmlTags.tagCloseEnd = nextCloseTag.end + 1;
+                                        tagFound = true;
+                                    }
+                                    else
+                                    {
+
+                                        // Need to find the same number of closing tags, without opening tags etc.
+                                        closeTagsRemaining += openTagsFound;
+                                        currentStartPosition = nextCloseTag.end;
+                                    }
+                                }
+                            } while (!tagFound && closeTagsRemaining > 0 && nextCloseTag.success);
+                        } // end if (selfclosingtag)... else {
+                    } // end if (-1 != closeAngle)  {
+
+                } // end if tagName.size() != 0
+            } // end open tag test
+        }
+    }
+    return tagFound;
+}
+
+FindResult CScintillaWnd::FindText( const char *text, size_t start, size_t end, int flags )
+{
+    FindResult returnValue;
+
+    Scintilla::Sci_TextToFind search;
+    search.lpstrText = const_cast<char *>(text);
+    search.chrg.cpMin = (long)start;
+    search.chrg.cpMax = (long)end;
+    size_t result = Call(SCI_FINDTEXT, flags, reinterpret_cast<LPARAM>(&search));
+    if (-1 == result)
+    {
+        returnValue.success = false;
+    }
+    else
+    {
+        returnValue.success = true;
+        returnValue.start = search.chrgText.cpMin;
+        returnValue.end = search.chrgText.cpMax;
+    }
+    return returnValue;
+}
+
+FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, size_t end)
+{
+    std::string search("<");
+    search.append(tagName);
+    FindResult openTagFound;
+    openTagFound.success = false;
+    FindResult result;
+    int nextChar = 0;
+    size_t styleAt;
+    size_t searchStart = start;
+    size_t searchEnd = end;
+    bool forwardSearch = (start < end);
+    do
+    {
+
+        result = FindText(search.c_str(), searchStart, searchEnd, 0);
+        if (result.success)
+        {
+            nextChar = (int)Call(SCI_GETCHARAT, result.end);
+            styleAt = Call(SCI_GETSTYLEAT, result.start);
+            if (styleAt != SCE_H_CDATA && styleAt != SCE_H_DOUBLESTRING && styleAt != SCE_H_SINGLESTRING)
+            {
+                // We've got an open tag for this tag name (i.e. nextChar was space or '>')
+                // Now we need to find the end of the start tag.
+
+                // Common case, the tag is an empty tag with no whitespace. e.g. <TAGNAME>
+                if (nextChar == '>')
+                {
+                    openTagFound.end = result.end;
+                    openTagFound.success = true;
+                }
+                else if (IsXMLWhitespace(nextChar))
+                {
+                    size_t closeAnglePosition = FindCloseAngle(result.end, forwardSearch ? end : start);
+                    if (-1 != closeAnglePosition && '/' != Call(SCI_GETCHARAT, closeAnglePosition - 1))
+                    {
+                        openTagFound.end = closeAnglePosition;
+                        openTagFound.success = true;
+                    }
+                }
+            }
+
+        }
+
+        if (forwardSearch)
+        {
+            searchStart = result.end + 1;
+        }
+        else
+        {
+            searchStart = result.start - 1;
+        }
+
+        // Loop while we've found a <TAGNAME, but it's either in a CDATA section,
+        // or it's got more none whitespace characters after it. e.g. <TAGNAME2
+    } while (result.success && !openTagFound.success);
+
+    openTagFound.start = result.start;
+
+
+    return openTagFound;
+
+}
+
+
+size_t CScintillaWnd::FindCloseAngle(size_t startPosition, size_t endPosition)
+{
+    // We'll search for the next '>', and check it's not in an attribute using the style
+    FindResult closeAngle;
+
+    bool isValidClose;
+    size_t returnPosition = (size_t)-1;
+
+    // Only search forwards
+    if (startPosition > endPosition)
+    {
+        size_t temp = endPosition;
+        endPosition = startPosition;
+        startPosition = temp;
+    }
+
+    do
+    {
+        isValidClose = false;
+
+        closeAngle = FindText(">", startPosition, endPosition, 0);
+        if (closeAngle.success)
+        {
+            int style = (int)Call(SCI_GETSTYLEAT, closeAngle.start);
+            // As long as we're not in an attribute (  <TAGNAME attrib="val>ue"> is VALID XML. )
+            if (style != SCE_H_DOUBLESTRING && style != SCE_H_SINGLESTRING)
+            {
+                returnPosition = closeAngle.start;
+                isValidClose = true;
+            }
+            else
+            {
+                startPosition = closeAngle.end;
+            }
+        }
+
+    } while (closeAngle.success && isValidClose == false);
+
+    return returnPosition;
+}
+
+
+FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, size_t start, size_t end)
+{
+    std::string search("</");
+    search.append(tagName);
+    FindResult closeTagFound;
+    closeTagFound.success = false;
+    FindResult result;
+    int nextChar;
+    size_t styleAt;
+    size_t searchStart = start;
+    size_t searchEnd = end;
+    bool forwardSearch = (start < end);
+    bool validCloseTag;
+    do
+    {
+        validCloseTag = false;
+        result = FindText(search.c_str(), searchStart, searchEnd, 0);
+        if (result.success)
+        {
+            nextChar = (int)Call(SCI_GETCHARAT, result.end);
+            styleAt = Call(SCI_GETSTYLEAT, result.start);
+
+            // Setup the parameters for the next search, if there is one.
+            if (forwardSearch)
+            {
+                searchStart = result.end + 1;
+            }
+            else
+            {
+                searchStart = result.start - 1;
+            }
+
+            if (styleAt != SCE_H_CDATA && styleAt != SCE_H_SINGLESTRING && styleAt != SCE_H_DOUBLESTRING) // If what we found was in CDATA section, it's not a valid tag.
+            {
+                // Common case - '>' follows the tag name directly
+                if (nextChar == '>')
+                {
+                    validCloseTag = true;
+                    closeTagFound.start = result.start;
+                    closeTagFound.end = result.end;
+                    closeTagFound.success = true;
+                }
+                else if (IsXMLWhitespace(nextChar))  // Otherwise, if it's whitespace, then allow whitespace until a '>' - any other character is invalid.
+                {
+                    size_t whitespacePoint = result.end;
+                    do
+                    {
+                        ++whitespacePoint;
+                        nextChar = (int)Call(SCI_GETCHARAT, whitespacePoint);
+
+                    } while(IsXMLWhitespace(nextChar));
+
+                    if (nextChar == '>')
+                    {
+                        validCloseTag = true;
+                        closeTagFound.start = result.start;
+                        closeTagFound.end = whitespacePoint;
+                        closeTagFound.success = true;
+                    }
+                }
+            }
+        }
+
+    } while (result.success && !validCloseTag);
+
+    return closeTagFound;
+
+}
+
+std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t start, size_t end)
+{
+    std::vector<std::pair<size_t, size_t>> attributes;
+
+    size_t bufLen = end - start + 1;
+    std::unique_ptr<char[]> buf(new char[bufLen+1]);
+    Scintilla::TextRange tr;
+    tr.chrg.cpMin = (long)start;
+    tr.chrg.cpMax = (long)end;
+    tr.lpstrText = buf.get();
+    Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
+
+    enum
+    {
+        attr_invalid,
+        attr_key,
+        attr_pre_assign,
+        attr_assign,
+        attr_string,
+        attr_value,
+        attr_valid
+    } state = attr_invalid;
+
+    size_t startPos = (size_t)-1;
+    int oneMoreChar = 1;
+    size_t i = 0;
+    for (; i < bufLen ; i++)
+    {
+        switch (buf[i])
+        {
+        case ' ':
+        case '\t':
+        case '\n':
+        case '\r':
+            {
+                if (state == attr_key)
+                    state = attr_pre_assign;
+                else if (state == attr_value)
+                {
+                    state = attr_valid;
+                    oneMoreChar = 0;
+                }
+            }
+            break;
+
+        case '=':
+            {
+                if (state == attr_key || state == attr_pre_assign)
+                    state = attr_assign;
+                else if (state == attr_assign || state == attr_value)
+                    state = attr_invalid;
+            }
+            break;
+
+        case '"':
+            {
+                if (state == attr_string)
+                {
+                    state = attr_valid;
+                    oneMoreChar = 1;
+                }
+                else if (state == attr_key || state == attr_pre_assign || state == attr_value)
+                    state = attr_invalid;
+                else if (state == attr_assign)
+                    state = attr_string;
+            }
+            break;
+
+        default:
+            {
+                if (state == attr_invalid)
+                {
+                    state = attr_key;
+                    startPos = i;
+                }
+                else if (state == attr_pre_assign)
+                    state = attr_invalid;
+                else if (state == attr_assign)
+                    state = attr_value;
+            }
+        }
+
+        if (state == attr_valid)
+        {
+            attributes.push_back(std::pair<size_t, size_t>(start+startPos, start+i+oneMoreChar));
+            state = attr_invalid;
+        }
+    }
+    if (state == attr_value)
+        attributes.push_back(std::pair<size_t, size_t>(start+startPos, start+i-1));
+
+    return attributes;
+}
