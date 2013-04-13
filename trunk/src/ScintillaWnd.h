@@ -49,6 +49,7 @@ public :
     void SetupLexerForLang(const std::wstring& lang);
     void MarginClick(Scintilla::SCNotification * pNotification);
     void MarkSelectedWord();
+    void MatchBraces();
     bool GetSelectedCount(size_t& selByte, size_t& selLine);
     LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
 

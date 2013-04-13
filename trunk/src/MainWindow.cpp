@@ -413,6 +413,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case SCN_UPDATEUI:
                     {
                         m_scintilla.MarkSelectedWord();
+                        m_scintilla.MatchBraces();
                         UpdateStatusBar();
                     }
                     break;
