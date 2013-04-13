@@ -21,8 +21,28 @@
 #include "LexStyles.h"
 #include "DocScroll.h"
 
-#define STYLE_SELECTION_MARK        (STYLE_DEFAULT-1)
+#include <vector>
 
+#define INDIC_SELECTION_MARK        (INDIC_CONTAINER+1)
+#define INDIC_TAGMATCH              (INDIC_CONTAINER+2)
+#define INDIC_TAGATTR               (INDIC_CONTAINER+3)
+
+struct XmlMatchedTagsPos
+{
+    size_t tagOpenStart;
+    size_t tagNameEnd;
+    size_t tagOpenEnd;
+
+    size_t tagCloseStart;
+    size_t tagCloseEnd;
+};
+
+struct FindResult
+{
+    size_t start;
+    size_t end;
+    bool success;
+};
 
 class CScintillaWnd : public CWindow
 {
@@ -50,6 +70,7 @@ public :
     void MarginClick(Scintilla::SCNotification * pNotification);
     void MarkSelectedWord();
     void MatchBraces();
+    void MatchTags();
     bool GetSelectedCount(size_t& selByte, size_t& selLine);
     LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
 
@@ -60,6 +81,14 @@ protected:
     void SetupDefaultStyles();
     void Expand(int &line, bool doExpand, bool force = false, int visLevels = 0, int level = -1);
     void Fold(int line, bool mode);
+    bool GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags );
+    FindResult FindText(const char *text, size_t start, size_t end, int flags);
+    FindResult FindOpenTag(const std::string& tagName, size_t start, size_t end);
+    size_t FindCloseAngle(size_t startPosition, size_t endPosition);
+    FindResult FindCloseTag(const std::string& tagName, size_t start, size_t end);
+    std::vector<std::pair<size_t, size_t>> GetAttributesPos(size_t start, size_t end);
+    bool IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
+
 private:
     SciFnDirect                 m_pSciMsg;
     sptr_t                      m_pSciWndData;
