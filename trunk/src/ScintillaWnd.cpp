@@ -641,7 +641,7 @@ bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
 
 LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw )
 {
-    m_docScroll.AddLineColor(Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS)), RGB(40,40,40));
+    m_docScroll.SetCurrentPos(Call(SCI_VISIBLEFROMDOCLINE, Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS))), RGB(40,40,40));
     m_docScroll.SetTotalLines(Call(SCI_VISIBLEFROMDOCLINE, (Call(SCI_GETLINECOUNT))));
     return m_docScroll.HandleCustomDraw(wParam, pCustDraw);
 }
