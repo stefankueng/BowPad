@@ -31,6 +31,7 @@ public:
     void                        SetTotalLines(size_t lines);
     void                        Clear() { m_lineColors.clear(); m_visibleLineColors.clear(); }
     void                        AddLineColor(size_t line, COLORREF clr);
+    void                        SetCurrentPos(size_t visibleline, COLORREF clr) { m_curPosVisLine = visibleline; m_curPosColor = clr; }
     void                        VisibleLinesChanged() { m_bDirty = true; }
 private:
     void                        CalcLines();
@@ -40,6 +41,8 @@ private:
     std::map<size_t, COLORREF>  m_lineColors;
     size_t                      m_visibleLines;
     size_t                      m_lines;
+    size_t                      m_curPosVisLine;
+    COLORREF                    m_curPosColor;
     CScintillaWnd *             m_pScintilla;
     bool                        m_bDirty;
 };

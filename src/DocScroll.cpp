@@ -208,6 +208,8 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
                     LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*line.first/m_lines);
                     FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, linepos, pCustDraw->rect.right, linepos+2, line.second);
                 }
+                LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*m_curPosVisLine/m_lines);
+                FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, linepos, pCustDraw->rect.right, linepos+2, m_curPosColor);
             }
             break;
         }
