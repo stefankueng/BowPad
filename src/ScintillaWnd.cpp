@@ -112,10 +112,6 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETWHITESPACEFORE, true, RGB(255, 181, 106));
     Call(SCI_SETWHITESPACESIZE, 2);
 
-    Call(SCI_SETTABWIDTH, 4);
-    Call(SCI_SETINDENTATIONGUIDES, SC_IV_LOOKBOTH);
-    Call(SCI_SETINDENT, 2);
-
     // For Ctrl+C, use SCI_COPYALLOWLINE instead of SCI_COPY
     Call(SCI_ASSIGNCMDKEY, 'C'+(SCMOD_CTRL<<16), SCI_COPYALLOWLINE);
 
@@ -313,6 +309,9 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETALPHA, INDIC_TAGATTR, 100);
     Call(SCI_INDICSETUNDER, INDIC_TAGMATCH, true);
     Call(SCI_INDICSETUNDER, INDIC_TAGATTR, true);
+
+    Call(SCI_SETTABWIDTH, 4);
+    Call(SCI_SETINDENTATIONGUIDES, SC_IV_LOOKBOTH);
 }
 
 void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
