@@ -16,6 +16,7 @@
 //
 #pragma once
 #include "Scintilla.h"
+#include "TabBar.h"
 #include "Document.h"
 
 #include <UIRibbon.h>
@@ -32,6 +33,7 @@ public:
     virtual UINT        GetCmdId() = 0;
 
     virtual void        ScintillaNotify(Scintilla::SCNotification * pScn);
+    virtual void        TabNotify(TBHDR * ptbhdr);
     virtual HRESULT     IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue);
     virtual HRESULT     IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties);
 
