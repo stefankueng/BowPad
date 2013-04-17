@@ -88,3 +88,11 @@ void CCommandHandler::ScintillaNotify( Scintilla::SCNotification * pScn )
     }
 }
 
+void CCommandHandler::TabNotify( TBHDR * ptbhdr )
+{
+    for (auto cmd:m_commands)
+    {
+        cmd.second->TabNotify(ptbhdr);
+    }
+}
+

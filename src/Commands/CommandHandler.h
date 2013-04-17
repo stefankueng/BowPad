@@ -31,7 +31,8 @@ public:
 
     void                            Init(void * obj);
     ICommand *                      GetCommand(UINT cmdId);
-    void ScintillaNotify( Scintilla::SCNotification * pScn );
+    void                            ScintillaNotify( Scintilla::SCNotification * pScn );
+    void                            TabNotify( TBHDR * ptbhdr );
 private:
     std::map<UINT, ICommand*>       m_commands;
 };
