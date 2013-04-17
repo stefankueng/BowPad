@@ -147,6 +147,12 @@
     <ClInclude Include="Commands\CmdWhiteSpace.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdLoadEncoding.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertySet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -233,6 +239,12 @@
     <ClCompile Include="Commands\CmdFiles.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
+    <ClCompile Include="Commands\CmdLoadEncoding.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertySet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc">
@@ -265,6 +277,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\unsaved.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\empty.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

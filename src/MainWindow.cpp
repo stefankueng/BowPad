@@ -307,6 +307,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 (pNMHDR->hwndFrom == m_TabBar))
             {
                 TBHDR * ptbhdr = reinterpret_cast<TBHDR*>(lParam);
+                CCommandHandler::Instance().TabNotify(ptbhdr);
 
                 switch (((LPNMHDR)lParam)->code)
                 {
@@ -330,7 +331,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             m_StatusBar.SetText(doc.m_language.c_str(), STATUSBAR_DOC_TYPE);
                             m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), STATUSBAR_EOF_FORMAT);
                             m_StatusBar.SetText(doc.GetEncodingString().c_str(), STATUSBAR_UNICODE_TYPE);
-
                         }
                     }
                     break;
@@ -361,7 +361,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             if (tab == ptbhdr->tabOrigin)
                             {
                                 if (tab > 0)
+                                {
                                     m_TabBar.ActivateAt(tab-1);
+                                }
                             }
                         }
                     }
@@ -766,4 +768,76 @@ bool CMainWindow::OpenFile( const std::wstring& file )
         }
     }
     return bRet;
+}
+
+bool CMainWindow::ReloadTab( int tab, int encoding )
+{
+    if ((tab < m_TabBar.GetItemCount())&&(tab < m_DocManager.GetCount()))
+    {
+        // close the document
+        CDocument doc = m_DocManager.GetDocument(tab);
+        if (doc.m_bIsDirty)
+        {
+            m_TabBar.ActivateAt(tab);
+            ResString rTitle(hInst, IDS_HASMODIFICATIONS);
+            ResString rQuestion(hInst, IDS_DOYOUWANTOSAVE);
+            ResString rSave(hInst, IDS_SAVE);
+            ResString rDontSave(hInst, IDS_DONTSAVE);
+            wchar_t buf[100] = {0};
+            m_TabBar.GetCurrentTitle(buf, _countof(buf));
+            std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
+
+            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+            TASKDIALOG_BUTTON aCustomButtons[2];
+            aCustomButtons[0].nButtonID = 100;
+            aCustomButtons[0].pszButtonText = rSave;
+            aCustomButtons[1].nButtonID = 101;
+            aCustomButtons[1].pszButtonText = rDontSave;
+
+            tdc.hwndParent = *this;
+            tdc.hInstance = hInst;
+            tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+            tdc.pButtons = aCustomButtons;
+            tdc.cButtons = _countof(aCustomButtons);
+            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+            tdc.pszMainIcon = TD_INFORMATION_ICON;
+            tdc.pszMainInstruction = rTitle;
+            tdc.pszContent = sQuestion.c_str();
+            tdc.nDefaultButton = 100;
+            int nClickedBtn = 0;
+            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
+
+            if (SUCCEEDED(hr))
+            {
+                if (nClickedBtn == 100)
+                    SaveCurrentTab();
+                else if (nClickedBtn != 101)
+                {
+                    m_TabBar.ActivateAt(tab);
+                    return false;  // don't close!
+                }
+            }
+
+            m_TabBar.ActivateAt(tab);
+        }
+
+        CDocument docreload = m_DocManager.LoadFile(*this, doc.m_path.c_str(), encoding);
+        if (docreload.m_document)
+        {
+            if (tab == m_TabBar.GetCurrentTabIndex())
+                m_scintilla.SaveCurrentPos(&doc.m_position);
+
+            m_scintilla.Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
+            docreload.m_language = doc.m_language;
+            docreload.m_position = doc.m_position;
+            m_DocManager.SetDocument(tab, docreload);
+            if (tab == m_TabBar.GetCurrentTabIndex())
+            {
+                m_scintilla.SetupLexerForLang(docreload.m_language);
+                m_scintilla.RestoreCurrentPos(docreload.m_position);
+            }
+            return true;
+        }
+    }
+    return false;
 }

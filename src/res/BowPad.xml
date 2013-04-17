@@ -140,6 +140,19 @@
         <Image>res/wspaceS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdGroupEncoding" LabelTitle="Encoding">
+      <Command.LargeImages>
+        <Image>res/KeyL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLoadAsEncoding" LabelTitle="Load as" TooltipTitle="Load as" TooltipDescription="Allows to load a file with a specific encoding">
+      <Command.LargeImages>
+        <Image>res/keyL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/keyS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -172,6 +185,7 @@
                 <Scale Group="cmdGroupClipboard" Size="Medium" />
                 <Scale Group="cmdGroupUndo" Size="Large" />
                 <Scale Group="cmdGroupView" Size="Large" />
+                <Scale Group="cmdGroupEncoding" Size="Large" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
               resized. -->
@@ -179,6 +193,7 @@
               <Scale Group="cmdGroupClipboard" Size="Small" />
               <Scale Group="cmdGroupUndo" Size="Medium" />
               <!--<Scale Group="cmdGroupView" Size="Medium" />-->
+              <!--<Scale Group="cmdGroupEncoding" Size="Large" />-->
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupFile" SizeDefinition="ThreeButtons">
@@ -198,6 +213,13 @@
           <Group CommandName="cmdGroupView" SizeDefinition="TwoButtons">
             <ToggleButton CommandName="cmdLineWrap" />
             <ToggleButton CommandName="cmdWhiteSpace" />
+          </Group>
+          <Group CommandName="cmdGroupEncoding" SizeDefinition="OneButton">
+            <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
           </Group>
         </Tab>
       </Ribbon.Tabs>

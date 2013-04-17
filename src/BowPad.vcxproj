@@ -104,7 +104,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Imm32.lib;Propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
@@ -127,7 +127,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Imm32.lib;Propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
@@ -154,7 +154,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Imm32.lib;Propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
@@ -181,7 +181,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Imm32.lib;Propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
@@ -213,6 +213,7 @@
     <ClInclude Include="Commands\CmdClipboard.h" />
     <ClInclude Include="Commands\CmdFiles.h" />
     <ClInclude Include="Commands\CmdLineWrap.h" />
+    <ClInclude Include="Commands\CmdLoadEncoding.h" />
     <ClInclude Include="Commands\CmdMRU.h" />
     <ClInclude Include="Commands\CmdUndo.h" />
     <ClInclude Include="Commands\CmdWhiteSpace.h" />
@@ -225,6 +226,7 @@
     <ClInclude Include="LexStyles.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MRU.h" />
+    <ClInclude Include="PropertySet.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="BowPad.h" />
     <ClInclude Include="ScintillaWnd.h" />
@@ -249,6 +251,7 @@
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
     <ClCompile Include="Commands\CmdFiles.cpp" />
+    <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
     <ClCompile Include="Commands\CommandHandler.cpp" />
     <ClCompile Include="Commands\ICommand.cpp" />
     <ClCompile Include="DocScroll.cpp" />
@@ -259,6 +262,7 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MRU.cpp" />
     <ClCompile Include="BowPad.cpp" />
+    <ClCompile Include="PropertySet.cpp" />
     <ClCompile Include="ScintillaWnd.cpp" />
     <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -277,6 +281,7 @@
     <Image Include="res\closeTabButton_hover.bmp" />
     <Image Include="res\closeTabButton_inact.bmp" />
     <Image Include="res\closeTabButton_push.bmp" />
+    <Image Include="res\empty.bmp" />
     <Image Include="res\readonly.ico" />
     <Image Include="res\saved.ico" />
     <Image Include="res\unsaved.ico" />
