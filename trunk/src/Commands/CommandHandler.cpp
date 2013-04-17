@@ -23,6 +23,7 @@
 #include "CmdClipboard.h"
 #include "CmdLineWrap.h"
 #include "CmdWhiteSpace.h"
+#include "CmdLoadEncoding.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -77,6 +78,8 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdLineWrap(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdWhiteSpace(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdLoadAsEncoded(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 }
 

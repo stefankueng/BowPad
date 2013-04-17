@@ -83,6 +83,12 @@ bool ICommand::OpenFile( LPCWSTR file )
     return pMainWnd->OpenFile(file);
 }
 
+bool ICommand::ReloadTab( int tab, int encoding )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->ReloadTab(tab, encoding);
+}
+
 HRESULT ICommand::InvalidateUICommand( UI_INVALIDATIONS flags, const PROPERTYKEY *key )
 {
     return g_pFramework->InvalidateUICommand(GetCmdId(), flags, key);
