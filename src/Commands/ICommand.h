@@ -47,6 +47,9 @@ protected:
     void                SetDocument(int index, CDocument doc);
 
     sptr_t              ScintillaCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0);
+    LRESULT             SendMessageToMainWnd(UINT msg, WPARAM wParam, LPARAM lParam);
+    void                UpdateStatusBar();
+
     HWND                GetHwnd();
     bool                OpenFile(LPCWSTR file);
     bool                ReloadTab(int tab, int encoding);
