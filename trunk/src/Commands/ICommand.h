@@ -48,7 +48,7 @@ protected:
 
     sptr_t              ScintillaCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0);
     LRESULT             SendMessageToMainWnd(UINT msg, WPARAM wParam, LPARAM lParam);
-    void                UpdateStatusBar();
+    void UpdateStatusBar(bool bEverything);
 
     HWND                GetHwnd();
     bool                OpenFile(LPCWSTR file);

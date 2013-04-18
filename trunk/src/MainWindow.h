@@ -66,7 +66,7 @@ protected:
 
 private:
     void                ResizeChildWindows();
-    void                UpdateStatusBar();
+    void UpdateStatusBar(bool bEverything);
     void                InitCommands();
 
 private:
