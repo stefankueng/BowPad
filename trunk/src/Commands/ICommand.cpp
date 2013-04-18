@@ -118,3 +118,15 @@ void ICommand::SetDocument( int index, CDocument doc )
     return pMainWnd->m_DocManager.SetDocument(index, doc);
 }
 
+LRESULT ICommand::SendMessageToMainWnd( UINT msg, WPARAM wParam, LPARAM lParam )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return ::SendMessage(*pMainWnd, msg, wParam, lParam);
+}
+
+void ICommand::UpdateStatusBar()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    pMainWnd->UpdateStatusBar();
+}
+
