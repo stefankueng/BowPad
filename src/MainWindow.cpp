@@ -328,9 +328,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             m_scintilla.RestoreCurrentPos(doc.m_position);
                             SetFocus(m_scintilla);
                             m_scintilla.Call(SCI_GRABFOCUS);
-                            m_StatusBar.SetText(doc.m_language.c_str(), STATUSBAR_DOC_TYPE);
-                            m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), STATUSBAR_EOF_FORMAT);
-                            m_StatusBar.SetText(doc.GetEncodingString().c_str(), STATUSBAR_UNICODE_TYPE);
+                            UpdateStatusBar(true);
                         }
                     }
                     break;
@@ -417,7 +415,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         m_scintilla.MarkSelectedWord();
                         m_scintilla.MatchBraces();
                         m_scintilla.MatchTags();
-                        UpdateStatusBar();
+                        UpdateStatusBar(false);
                     }
                     break;
                 }
@@ -629,7 +627,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
                 doc.m_bIsDirty = false;
                 doc.m_bNeedsSaving = false;
                 m_DocManager.SetDocument(tab, doc);
-                UpdateStatusBar();
+                UpdateStatusBar(true);
                 m_scintilla.Call(SCI_SETSAVEPOINT);
             }
         }
@@ -648,7 +646,7 @@ void CMainWindow::GoToLine( size_t line )
     m_scintilla.Call(SCI_GOTOLINE, line);
 }
 
-void CMainWindow::UpdateStatusBar()
+void CMainWindow::UpdateStatusBar( bool bEverything )
 {
     TCHAR strLnCol[128] = {0};
     TCHAR strSel[64] = {0};
@@ -673,6 +671,13 @@ void CMainWindow::UpdateStatusBar()
     m_StatusBar.SetText(m_scintilla.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", STATUSBAR_CAPS);
+    if (bEverything)
+    {
+        CDocument doc = m_DocManager.GetDocument(m_TabBar.GetCurrentTabIndex());
+        m_StatusBar.SetText(doc.m_language.c_str(), STATUSBAR_DOC_TYPE);
+        m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), STATUSBAR_EOF_FORMAT);
+        m_StatusBar.SetText(doc.GetEncodingString().c_str(), STATUSBAR_UNICODE_TYPE);
+    }
 }
 
 bool CMainWindow::CloseTab( int tab )

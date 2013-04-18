@@ -124,9 +124,9 @@ LRESULT ICommand::SendMessageToMainWnd( UINT msg, WPARAM wParam, LPARAM lParam )
     return ::SendMessage(*pMainWnd, msg, wParam, lParam);
 }
 
-void ICommand::UpdateStatusBar()
+void ICommand::UpdateStatusBar( bool bEverything )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    pMainWnd->UpdateStatusBar();
+    pMainWnd->UpdateStatusBar(bEverything);
 }
 

@@ -282,7 +282,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, co
             doc.m_bIsDirty = true;
             doc.m_bNeedsSaving = true;
             SetDocument(GetCurrentTabIndex(), doc);
-            UpdateStatusBar();
+            UpdateStatusBar(true);
             hr = S_OK;
         }
     }
