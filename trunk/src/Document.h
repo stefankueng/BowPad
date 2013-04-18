@@ -53,6 +53,7 @@ public:
         , m_bHasBOM(false)
         , m_encoding(-1)
         , m_bIsDirty(false)
+        , m_bNeedsSaving(false)
         , m_bIsReadonly(false)
     {
     }
@@ -67,6 +68,7 @@ public:
     std::wstring            m_language;
     CPosData                m_position;
     bool                    m_bIsDirty;
+    bool                    m_bNeedsSaving;
     bool                    m_bIsReadonly;
 };
 

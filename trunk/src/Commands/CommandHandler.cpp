@@ -81,6 +81,8 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdLoadAsEncoded(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdConvertEncoding(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
 }
 
 void CCommandHandler::ScintillaNotify( Scintilla::SCNotification * pScn )
