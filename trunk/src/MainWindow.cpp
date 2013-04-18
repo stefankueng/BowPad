@@ -400,7 +400,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             TCITEM tie;
                             tie.lParam = -1;
                             tie.mask = TCIF_IMAGE;
-                            tie.iImage = doc.m_bIsDirty?UNSAVED_IMG_INDEX:SAVED_IMG_INDEX;
+                            tie.iImage = doc.m_bIsDirty||doc.m_bNeedsSaving?UNSAVED_IMG_INDEX:SAVED_IMG_INDEX;
                             if (doc.m_bIsReadonly)
                                 tie.iImage = REDONLY_IMG_INDEX;
                             ::SendMessage(m_TabBar, TCM_SETITEM, tab, reinterpret_cast<LPARAM>(&tie));
@@ -622,7 +622,17 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
             }
         }
         if (!doc.m_path.empty())
+        {
             bRet = m_DocManager.SaveFile(*this, doc);
+            if (bRet)
+            {
+                doc.m_bIsDirty = false;
+                doc.m_bNeedsSaving = false;
+                m_DocManager.SetDocument(tab, doc);
+                UpdateStatusBar();
+                m_scintilla.Call(SCI_SETSAVEPOINT);
+            }
+        }
     }
     return bRet;
 }
@@ -670,7 +680,7 @@ bool CMainWindow::CloseTab( int tab )
     if ((tab < 0) || (tab >= m_DocManager.GetCount()))
         return false;
     CDocument doc = m_DocManager.GetDocument(tab);
-    if (doc.m_bIsDirty)
+    if (doc.m_bIsDirty||doc.m_bNeedsSaving)
     {
         m_TabBar.ActivateAt(tab);
         ResString rTitle(hInst, IDS_HASMODIFICATIONS);
@@ -776,7 +786,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding )
     {
         // close the document
         CDocument doc = m_DocManager.GetDocument(tab);
-        if (doc.m_bIsDirty)
+        if (doc.m_bIsDirty||doc.m_bNeedsSaving)
         {
             m_TabBar.ActivateAt(tab);
             ResString rTitle(hInst, IDS_HASMODIFICATIONS);
