@@ -112,3 +112,9 @@ CDocument ICommand::GetDocument( int index )
     return pMainWnd->m_DocManager.GetDocument(index);
 }
 
+void ICommand::SetDocument( int index, CDocument doc )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_DocManager.SetDocument(index, doc);
+}
+

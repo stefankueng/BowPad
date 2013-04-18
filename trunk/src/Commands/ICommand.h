@@ -44,6 +44,7 @@ protected:
 
     int                 GetDocumentCount();
     CDocument           GetDocument(int index);
+    void                SetDocument(int index, CDocument doc);
 
     sptr_t              ScintillaCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0);
     HWND                GetHwnd();
