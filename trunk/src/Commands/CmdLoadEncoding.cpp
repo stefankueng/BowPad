@@ -135,9 +135,9 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         hr = S_FALSE;
         for (size_t i = 0; i < codepages.size(); ++i)
         {
-            if (std::get<0>(codepages[i]) == doc.m_encoding)
+            if ((int)std::get<0>(codepages[i]) == doc.m_encoding)
             {
-                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, i, ppropvarNewValue);
+                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
                 break;
             }
         }
@@ -146,7 +146,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
     return hr;
 }
 
-HRESULT CCmdLoadAsEncoded::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties )
+HRESULT CCmdLoadAsEncoded::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ )
 {
     HRESULT hr = E_FAIL;
 
@@ -255,9 +255,9 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
         hr = S_FALSE;
         for (size_t i = 0; i < codepages.size(); ++i)
         {
-            if (std::get<0>(codepages[i]) == doc.m_encoding)
+            if ((int)std::get<0>(codepages[i]) == doc.m_encoding)
             {
-                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, i, ppropvarNewValue);
+                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
                 break;
             }
         }
@@ -266,7 +266,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
     return hr;
 }
 
-HRESULT CCmdConvertEncoding::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties )
+HRESULT CCmdConvertEncoding::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ )
 {
     HRESULT hr = E_FAIL;
 
