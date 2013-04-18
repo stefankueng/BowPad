@@ -153,6 +153,14 @@
         <Image>res/keyS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdConvertEncoding" LabelTitle="Convert to" TooltipTitle="Convert to" TooltipDescription="Converts the file to the specified encoding">
+      <Command.LargeImages>
+        <Image>res/keyL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/keyS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -185,7 +193,7 @@
                 <Scale Group="cmdGroupClipboard" Size="Medium" />
                 <Scale Group="cmdGroupUndo" Size="Large" />
                 <Scale Group="cmdGroupView" Size="Large" />
-                <Scale Group="cmdGroupEncoding" Size="Large" />
+                <Scale Group="cmdGroupEncoding" Size="Medium" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
               resized. -->
@@ -214,8 +222,13 @@
             <ToggleButton CommandName="cmdLineWrap" />
             <ToggleButton CommandName="cmdWhiteSpace" />
           </Group>
-          <Group CommandName="cmdGroupEncoding" SizeDefinition="OneButton">
+          <Group CommandName="cmdGroupEncoding" SizeDefinition="TwoButtons">
             <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <DropDownGallery CommandName="cmdConvertEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>

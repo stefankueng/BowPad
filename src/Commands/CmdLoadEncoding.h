@@ -46,3 +46,27 @@ public:
     virtual void TabNotify( TBHDR * ptbhdr );
 
 };
+
+class CCmdConvertEncoding : public ICommand
+{
+public:
+
+    CCmdConvertEncoding(void * obj) : ICommand(obj)
+    {
+    }
+
+    ~CCmdConvertEncoding(void)
+    {
+    }
+
+    virtual bool Execute() { return false; }
+    virtual UINT GetCmdId() { return cmdConvertEncoding; }
+
+
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue );
+
+    virtual HRESULT IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties );
+
+    virtual void TabNotify( TBHDR * ptbhdr );
+
+};
