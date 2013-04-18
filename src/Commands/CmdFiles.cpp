@@ -99,7 +99,7 @@ HRESULT CCmdSave::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PRO
         if ((tab >= 0) && (tab < GetDocumentCount()))
         {
             CDocument doc = GetDocument(tab);
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, doc.m_bIsDirty, ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, doc.m_bIsDirty||doc.m_bNeedsSaving, ppropvarNewValue);
         }
     }
     return E_NOTIMPL;
@@ -139,7 +139,7 @@ HRESULT CCmdSaveAll::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
         for (int i = 0; i < GetDocumentCount(); ++i)
         {
             CDocument doc = GetDocument(i);
-            if (doc.m_bIsDirty)
+            if (doc.m_bIsDirty||doc.m_bNeedsSaving)
                 dirtycount++;
         }
 
