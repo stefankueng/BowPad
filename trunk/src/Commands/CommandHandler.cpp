@@ -25,6 +25,7 @@
 #include "CmdWhiteSpace.h"
 #include "CmdLoadEncoding.h"
 #include "CmdCodeStyle.h"
+#include "CmdEOL.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -85,6 +86,13 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdConvertEncoding(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdCodeStyle(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
+    pCmd = new CCmdEOLWin(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdEOLUnix(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdEOLMac(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 }
 

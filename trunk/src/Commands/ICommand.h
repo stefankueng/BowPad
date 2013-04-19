@@ -56,6 +56,7 @@ protected:
     bool                ReloadTab(int tab, int encoding);
     bool                SaveCurrentTab(bool bSaveAs = false);
     HRESULT             InvalidateUICommand(UI_INVALIDATIONS flags, const PROPERTYKEY *key);
+    HRESULT             InvalidateUICommand(UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY *key);
 private:
     void *              m_Obj;
 };

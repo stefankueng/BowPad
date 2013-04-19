@@ -169,6 +169,26 @@
         <Image>res/CodeStyleS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdEOLGroup" LabelTitle="Line Endings">
+      <Command.SmallImages>
+        <Image>res/crlfS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdEOLWin" LabelTitle="Windows (CRLF)">
+      <Command.SmallImages>
+        <Image>res/crlfS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdEOLUnix" LabelTitle="Unix (LF)">
+      <Command.SmallImages>
+        <Image>res/lfS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdEOLMac" LabelTitle="MAC (CR)">
+      <Command.SmallImages>
+        <Image>res/crS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -209,7 +229,7 @@
               <Scale Group="cmdGroupClipboard" Size="Small" />
               <Scale Group="cmdGroupUndo" Size="Medium" />
               <!--<Scale Group="cmdGroupView" Size="Medium" />-->
-              <!--<Scale Group="cmdGroupEncoding" Size="Large" />-->
+              <Scale Group="cmdGroupEncoding" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupFile" SizeDefinition="ThreeButtons">
@@ -230,7 +250,7 @@
             <ToggleButton CommandName="cmdLineWrap" />
             <ToggleButton CommandName="cmdWhiteSpace" />
           </Group>
-          <Group CommandName="cmdGroupEncoding" SizeDefinition="ThreeButtons">
+          <Group CommandName="cmdGroupEncoding" SizeDefinition="FourButtons">
             <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout />
@@ -246,6 +266,13 @@
                 <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
+            <DropDownButton CommandName="cmdEOLGroup">
+              <MenuGroup>
+                <ToggleButton CommandName="cmdEOLWin"/>
+                <ToggleButton CommandName="cmdEOLUnix"/>
+                <ToggleButton CommandName="cmdEOLMac"/>
+              </MenuGroup>
+            </DropDownButton>
           </Group>
         </Tab>
       </Ribbon.Tabs>
