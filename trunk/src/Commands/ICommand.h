@@ -48,7 +48,8 @@ protected:
 
     sptr_t              ScintillaCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0);
     LRESULT             SendMessageToMainWnd(UINT msg, WPARAM wParam, LPARAM lParam);
-    void UpdateStatusBar(bool bEverything);
+    void                UpdateStatusBar(bool bEverything);
+    void                SetupLexerForLang(const std::wstring& lang);
 
     HWND                GetHwnd();
     bool                OpenFile(LPCWSTR file);

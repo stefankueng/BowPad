@@ -18,6 +18,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 class LanguageData
 {
@@ -68,6 +69,7 @@ class CLexStyles
 public:
     static CLexStyles&          Instance();
 
+    std::vector<std::wstring>   GetLanguages() const;
     std::wstring                GetLanguageForExt(const std::wstring& ext) const;
 
     std::map<int, std::string>  GetKeywordsForExt(const std::string& ext) const;

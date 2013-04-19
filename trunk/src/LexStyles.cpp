@@ -226,3 +226,13 @@ std::wstring CLexStyles::GetLanguageForExt( const std::wstring& ext ) const
     return L"";
 }
 
+std::vector<std::wstring> CLexStyles::GetLanguages() const
+{
+    std::vector<std::wstring> langs;
+    for (const auto& it : m_Langdata)
+    {
+        langs.push_back(CUnicodeUtils::StdGetUnicode(it.first));
+    }
+    return langs;
+}
+
