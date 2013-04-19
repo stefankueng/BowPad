@@ -19,29 +19,54 @@
 #include "PropertySet.h"
 #include "BowPad.h"
 #include "StringUtils.h"
+#include "ResString.h"
 
 #include <vector>
 #include <tuple>
 
-std::vector<std::tuple<UINT, std::wstring>>  codepages;
+//                    codepage name        category
+std::vector<std::tuple<UINT, std::wstring, int>>  codepages;
 
 BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
 {
-    UINT codepage = _wtoi(lpCodePageString);
-    CPINFOEX cpex = {0};
-    GetCPInfoEx(codepage, 0, &cpex);
-    if (cpex.CodePageName[0])
+    if (codepages.empty())
     {
-        std::wstring name = cpex.CodePageName;
-        name = name.substr(name.find_first_of(' '));
-        size_t pos = name.find_first_of('(');
-        if (pos != std::wstring::npos)
-            name.erase(pos, 1);
-        pos = name.find_last_of(')');
-        if (pos != std::wstring::npos)
-            name.erase(pos, 1);
-        CStringUtils::trim(name);
-        codepages.push_back(std::make_tuple(codepage, name));
+        // insert the main encodings
+        codepages.push_back(std::make_tuple(GetACP(), L"ANSI", 0));
+        codepages.push_back(std::make_tuple(CP_UTF8, L"UTF-8", 0));
+        codepages.push_back(std::make_tuple(1200, L"UTF-16 Little Endian", 0));
+        codepages.push_back(std::make_tuple(1201, L"UTF-16 Big Endian", 0));
+        codepages.push_back(std::make_tuple(12000, L"UTF-32 Little Endian", 0));
+        codepages.push_back(std::make_tuple(1200, L"UTF-32 Big Endian", 0));
+    }
+    UINT codepage = _wtoi(lpCodePageString);
+    switch (codepage)
+    {
+    case 1200:
+    case 1201:
+    case 12000:
+    case 12001:
+    case CP_UTF8:
+        break;
+    default:
+        {
+            CPINFOEX cpex = {0};
+            GetCPInfoEx(codepage, 0, &cpex);
+            if (cpex.CodePageName[0])
+            {
+                std::wstring name = cpex.CodePageName;
+                name = name.substr(name.find_first_of(' '));
+                size_t pos = name.find_first_of('(');
+                if (pos != std::wstring::npos)
+                    name.erase(pos, 1);
+                pos = name.find_last_of(')');
+                if (pos != std::wstring::npos)
+                    name.erase(pos, 1);
+                CStringUtils::trim(name);
+                codepages.push_back(std::make_tuple(codepage, name, 1));
+            }
+        }
+        break;
     }
     return TRUE;
 }
@@ -53,9 +78,48 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
 
     if(key == UI_PKEY_Categories)
     {
-        // A return value of S_FALSE or E_NOTIMPL will result in a gallery with no categories.
-        // If you return any error other than E_NOTIMPL, the contents of the gallery will not display.
-        hr = S_FALSE;
+        IUICollection* pCollection;
+        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+        if (FAILED(hr))
+        {
+            return hr;
+        }
+
+        // Create a property set for the main category.
+        CPropertySet *pMain;
+        hr = CPropertySet::CreateInstance(&pMain);
+        if (FAILED(hr))
+        {
+            pCollection->Release();
+            return hr;
+        }
+
+        // Load the label for the main category from the resource file.
+        ResString sMain(hInst, IDS_ENCODING_MAIN);
+        // Initialize the property set with the label that was just loaded and a category id of 0.
+        pMain->InitializeCategoryProperties(sMain, 0);
+        pCollection->Add(pMain);
+        pMain->Release();
+
+
+        // Create a property set for the codepages category.
+        CPropertySet *pCodepages;
+        hr = CPropertySet::CreateInstance(&pCodepages);
+        if (FAILED(hr))
+        {
+            pCollection->Release();
+            return hr;
+        }
+
+        ResString sCP(hInst, IDS_ENCODING_CODEPAGES);
+        // Initialize the property set with the label that was just loaded and a category id of 0.
+        pCodepages->InitializeCategoryProperties(sCP, 1);
+        pCollection->Add(pCodepages);
+        pCodepages->Release();
+
+        pCollection->Release();
+
+        hr = S_OK;
     }
     else if (key == UI_PKEY_ItemsSource)
     {
@@ -112,7 +176,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
                 return hr;
             }
 
-            pItem->InitializeItemProperties(pImg, std::get<1>(it).c_str(), UI_COLLECTION_INVALIDINDEX);
+            pItem->InitializeItemProperties(pImg, std::get<1>(it).c_str(), std::get<2>(it));
 
             // Add the newly-created property set to the collection supplied by the framework.
             pCollection->Add(pItem);
@@ -133,15 +197,23 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
     {
         CDocument doc = GetDocument(GetCurrentTabIndex());
         hr = S_FALSE;
-        for (size_t i = 0; i < codepages.size(); ++i)
+        if (doc.m_encoding == -1)
         {
-            if ((int)std::get<0>(codepages[i]) == doc.m_encoding)
+            hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
+            hr = S_OK;
+        }
+        else
+        {
+            for (size_t i = 0; i < codepages.size(); ++i)
             {
-                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
-                break;
+                if ((int)std::get<0>(codepages[i]) == doc.m_encoding)
+                {
+                    hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
+                    hr = S_OK;
+                    break;
+                }
             }
         }
-        hr = S_FALSE;
     }
     return hr;
 }
@@ -179,9 +251,48 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
 
     if(key == UI_PKEY_Categories)
     {
-        // A return value of S_FALSE or E_NOTIMPL will result in a gallery with no categories.
-        // If you return any error other than E_NOTIMPL, the contents of the gallery will not display.
-        hr = S_FALSE;
+        IUICollection* pCollection;
+        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+        if (FAILED(hr))
+        {
+            return hr;
+        }
+
+        // Create a property set for the main category.
+        CPropertySet *pMain;
+        hr = CPropertySet::CreateInstance(&pMain);
+        if (FAILED(hr))
+        {
+            pCollection->Release();
+            return hr;
+        }
+
+        // Load the label for the main category from the resource file.
+        ResString sMain(hInst, IDS_ENCODING_MAIN);
+        // Initialize the property set with the label that was just loaded and a category id of 0.
+        pMain->InitializeCategoryProperties(sMain, 0);
+        pCollection->Add(pMain);
+        pMain->Release();
+
+
+        // Create a property set for the codepages category.
+        CPropertySet *pCodepages;
+        hr = CPropertySet::CreateInstance(&pCodepages);
+        if (FAILED(hr))
+        {
+            pCollection->Release();
+            return hr;
+        }
+
+        ResString sCP(hInst, IDS_ENCODING_CODEPAGES);
+        // Initialize the property set with the label that was just loaded and a category id of 0.
+        pCodepages->InitializeCategoryProperties(sCP, 1);
+        pCollection->Add(pCodepages);
+        pCodepages->Release();
+
+        pCollection->Release();
+
+        hr = S_OK;
     }
     else if (key == UI_PKEY_ItemsSource)
     {
@@ -238,7 +349,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
                 return hr;
             }
 
-            pItem->InitializeItemProperties(pImg, std::get<1>(it).c_str(), UI_COLLECTION_INVALIDINDEX);
+            pItem->InitializeItemProperties(pImg, std::get<1>(it).c_str(), std::get<2>(it));
 
             // Add the newly-created property set to the collection supplied by the framework.
             pCollection->Add(pItem);
@@ -253,15 +364,23 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
     {
         CDocument doc = GetDocument(GetCurrentTabIndex());
         hr = S_FALSE;
-        for (size_t i = 0; i < codepages.size(); ++i)
+        if (doc.m_encoding == -1)
         {
-            if ((int)std::get<0>(codepages[i]) == doc.m_encoding)
+            hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
+            hr = S_OK;
+        }
+        else
+        {
+            for (size_t i = 0; i < codepages.size(); ++i)
             {
-                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
-                break;
+                if ((int)std::get<0>(codepages[i]) == doc.m_encoding)
+                {
+                    hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
+                    hr = S_OK;
+                    break;
+                }
             }
         }
-        hr = S_FALSE;
     }
     return hr;
 }
