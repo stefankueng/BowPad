@@ -161,6 +161,14 @@
         <Image>res/keyS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdCodeStyle" LabelTitle="Language" TooltipTitle="Language" TooltipDescription="Set the coloring according to the code language">
+      <Command.LargeImages>
+        <Image>res/CodeStyleL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/CodeStyleS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -222,13 +230,18 @@
             <ToggleButton CommandName="cmdLineWrap" />
             <ToggleButton CommandName="cmdWhiteSpace" />
           </Group>
-          <Group CommandName="cmdGroupEncoding" SizeDefinition="TwoButtons">
+          <Group CommandName="cmdGroupEncoding" SizeDefinition="ThreeButtons">
             <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
             <DropDownGallery CommandName="cmdConvertEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <DropDownGallery CommandName="cmdCodeStyle" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>

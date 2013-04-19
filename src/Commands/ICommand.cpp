@@ -130,3 +130,9 @@ void ICommand::UpdateStatusBar( bool bEverything )
     pMainWnd->UpdateStatusBar(bEverything);
 }
 
+void ICommand::SetupLexerForLang( const std::wstring& lang )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_scintilla.SetupLexerForLang(lang);
+}
+

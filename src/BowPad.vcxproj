@@ -211,6 +211,7 @@
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
     <ClInclude Include="Commands\CmdClipboard.h" />
+    <ClInclude Include="Commands\CmdCodeStyle.h" />
     <ClInclude Include="Commands\CmdFiles.h" />
     <ClInclude Include="Commands\CmdLineWrap.h" />
     <ClInclude Include="Commands\CmdLoadEncoding.h" />
@@ -250,6 +251,7 @@
     <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
+    <ClCompile Include="Commands\CmdCodeStyle.cpp" />
     <ClCompile Include="Commands\CmdFiles.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
     <ClCompile Include="Commands\CommandHandler.cpp" />
@@ -302,6 +304,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building BowPad.xml</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
+      <SubType>Designer</SubType>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
