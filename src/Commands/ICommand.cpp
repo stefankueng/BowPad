@@ -94,6 +94,11 @@ HRESULT ICommand::InvalidateUICommand( UI_INVALIDATIONS flags, const PROPERTYKEY
     return g_pFramework->InvalidateUICommand(GetCmdId(), flags, key);
 }
 
+HRESULT ICommand::InvalidateUICommand( UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY *key )
+{
+    return g_pFramework->InvalidateUICommand(cmdId, flags, key);
+}
+
 bool ICommand::SaveCurrentTab(bool bSaveAs /* = false */)
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);

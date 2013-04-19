@@ -329,6 +329,20 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
 
     if (doc.m_format == UNKNOWN_FORMAT)
         doc.m_format = WIN_FORMAT;
+    switch (doc.m_format)
+    {
+    case WIN_FORMAT:
+        m_scratchScintilla.Call(SCI_SETEOLMODE, SC_EOL_CRLF);
+        break;
+    case UNIX_FORMAT:
+        m_scratchScintilla.Call(SCI_SETEOLMODE, SC_EOL_LF);
+        break;
+    case MAC_FORMAT:
+        m_scratchScintilla.Call(SCI_SETEOLMODE, SC_EOL_CR);
+        break;
+    default:
+        break;
+    }
     m_scratchScintilla.Call(SCI_EMPTYUNDOBUFFER);
     m_scratchScintilla.Call(SCI_SETSAVEPOINT);
     if (ro)
