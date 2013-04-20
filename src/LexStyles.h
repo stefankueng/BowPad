@@ -83,6 +83,7 @@ private:
     ~CLexStyles(void);
 
     void                Load();
+    void                ReplaceVariables(std::wstring& s, const std::map<std::wstring, std::wstring>& vars);
 private:
     bool                m_bLoaded;
 

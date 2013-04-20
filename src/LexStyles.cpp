@@ -56,12 +56,25 @@ void CLexStyles::Load()
                 CSimpleIni ini;
                 ini.LoadFile(lpResLock, dwSizeRes);
 
+                std::map<std::wstring, std::wstring> variables;
+                CSimpleIni::TNamesDepend lexvars;
+                ini.GetAllKeys(L"variables", lexvars);
+                for (auto l : lexvars)
+                {
+                    std::wstring v = ini.GetValue(L"variables", l);
+                    std::wstring key = l;
+                    key = L"$(" + key + L")";
+                    variables[key] = v;
+                }
+
+
                 std::map<std::wstring, int> lexers;
                 CSimpleIni::TNamesDepend lexkeys;
                 ini.GetAllKeys(L"lexers", lexkeys);
                 for (auto l : lexkeys)
                 {
                     std::wstring v = ini.GetValue(L"lexers", l);
+                    ReplaceVariables(v, variables);
                     std::vector<std::wstring> langs;
                     stringtok(langs, v, true, L";");
                     int lex = _wtoi(ini.GetValue(l, L"Lexer", L""));
@@ -81,6 +94,7 @@ void CLexStyles::Load()
                         {
                             StyleData style;
                             std::wstring v = ini.GetValue(l, it);
+                            ReplaceVariables(v, variables);
                             std::vector<std::wstring> vec;
                             stringtok(vec, v, false, L";");
                             int i = 0;
@@ -110,6 +124,10 @@ void CLexStyles::Load()
                                 case 5: // Font size
                                     style.FontSize = _wtoi(s.c_str());
                                     break;
+                                case 6: // Override default background color in case the style was set with a variable
+                                    hexval = wcstol(s.c_str(), &endptr, 16);
+                                    style.BackgroundColor = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
+                                    break;
                                 }
                                 ++i;
                             }
@@ -129,6 +147,7 @@ void CLexStyles::Load()
                 for (auto k : langkeys)
                 {
                     std::wstring v = ini.GetValue(L"language", k);
+                    ReplaceVariables(v, variables);
                     std::vector<std::wstring> exts;
                     stringtok(exts, v, true, L";");
                     for (auto e : exts)
@@ -234,5 +253,24 @@ std::vector<std::wstring> CLexStyles::GetLanguages() const
         langs.push_back(CUnicodeUtils::StdGetUnicode(it.first));
     }
     return langs;
+}
+
+void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring, std::wstring>& vars )
+{
+    size_t pos = s.find(L"$(");
+    while (pos != std::wstring::npos)
+    {
+        std::wstring varname = s.substr(pos, s.find(L")", pos)-pos+1);
+        auto foundIt = vars.find(varname);
+        if (foundIt != vars.end())
+        {
+            SearchReplace(s, varname, foundIt->second);
+        }
+        else
+        {
+            DebugBreak();
+        }
+        pos = s.find(L"$(", pos);
+    }
 }
 
