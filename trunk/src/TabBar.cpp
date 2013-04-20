@@ -172,7 +172,7 @@ void CTabBar::GetCurrentTitle(TCHAR *title, int titleLen)
     ::SendMessage(*this, TCM_GETITEM, GetCurrentTabIndex(), reinterpret_cast<LPARAM>(&tci));
 }
 
-void CTabBar::SetFont(TCHAR *fontName, size_t fontSize)
+void CTabBar::SetFont( TCHAR *fontName, int fontSize )
 {
     if (m_hFont)
         ::DeleteObject(m_hFont);
@@ -203,7 +203,7 @@ void CTabBar::ActivateAt(int index) const
     ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
 }
 
-void CTabBar::DeletItemAt(size_t index)
+void CTabBar::DeletItemAt( int index )
 {
     if ((index == m_nItems-1))
     {
