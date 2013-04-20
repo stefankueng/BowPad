@@ -88,7 +88,7 @@ public :
     void                        ActivateAt(int index) const;
     void                        GetCurrentTitle(TCHAR *title, int titleLen);
     int                         GetCurrentTabIndex() const;
-    void                        DeletItemAt(size_t index);
+    void                        DeletItemAt(int index);
 
     void                        DeletAllItems();
 
@@ -96,7 +96,7 @@ public :
 
     int                         GetItemCount() const { return (int)m_nItems; }
 
-    void                        SetFont(TCHAR *fontName, size_t fontSize);
+    void                        SetFont(TCHAR *fontName, int fontSize);
     int                         GetSrcTab() const { return m_nSrcTab; }
     int                         GetDstTab() const { return m_nTabDragged; }
 protected:
