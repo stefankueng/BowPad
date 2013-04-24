@@ -59,6 +59,18 @@ int ICommand::GetCurrentTabIndex()
     return pMainWnd->m_TabBar.GetCurrentTabIndex();
 }
 
+int ICommand::GetSrcTab()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_TabBar.GetSrcTab();
+}
+
+int ICommand::GetDstTab()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_TabBar.GetDstTab();
+}
+
 int ICommand::GetTabCount()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
