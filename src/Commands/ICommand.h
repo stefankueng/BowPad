@@ -41,6 +41,8 @@ protected:
     void                TabActivateAt(int index);
     int                 GetCurrentTabIndex();
     int                 GetTabCount();
+    int                 GetSrcTab();
+    int                 GetDstTab();
 
     int                 GetDocumentCount();
     CDocument           GetDocument(int index);

@@ -217,6 +217,7 @@
     <ClInclude Include="Commands\CmdLineWrap.h" />
     <ClInclude Include="Commands\CmdLoadEncoding.h" />
     <ClInclude Include="Commands\CmdMRU.h" />
+    <ClInclude Include="Commands\CmdPrevNext.h" />
     <ClInclude Include="Commands\CmdUndo.h" />
     <ClInclude Include="Commands\CmdWhiteSpace.h" />
     <ClInclude Include="Commands\CommandHandler.h" />
@@ -255,6 +256,7 @@
     <ClCompile Include="Commands\CmdCodeStyle.cpp" />
     <ClCompile Include="Commands\CmdFiles.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
+    <ClCompile Include="Commands\CmdPrevNext.cpp" />
     <ClCompile Include="Commands\CommandHandler.cpp" />
     <ClCompile Include="Commands\ICommand.cpp" />
     <ClCompile Include="DocScroll.cpp" />

@@ -26,6 +26,7 @@
 #include "CmdLoadEncoding.h"
 #include "CmdCodeStyle.h"
 #include "CmdEOL.h"
+#include "CmdPrevNext.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -93,6 +94,13 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdEOLUnix(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdEOLMac(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
+    pCmd = new CCmdPrevNext(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdPrevious(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdNext(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 }
 

@@ -189,6 +189,23 @@
         <Image>res/crS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdPrevNext" />  <!-- dummy command, does nothing -->
+    <Command Name="cmdPrevious" LabelTitle="Previous" TooltipTitle="Previous" TooltipDescription="go to the previous cursor position">
+      <Command.LargeImages>
+        <Image>res/PrevL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/PrevS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdNext" LabelTitle="Next" TooltipTitle="Next" TooltipDescription="go to the next cursor position">
+      <Command.LargeImages>
+        <Image>res/NextL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/NextS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -242,9 +259,11 @@
             <Button CommandName="cmdCopy" />
             <Button CommandName="cmdCut" />
           </Group>
-          <Group CommandName="cmdGroupUndo" SizeDefinition="TwoButtons">
+          <Group CommandName="cmdGroupUndo" SizeDefinition="FourButtons">
             <Button CommandName="cmdUndo" />
             <Button CommandName="cmdRedo" />
+            <Button CommandName="cmdPrevious" />
+            <Button CommandName="cmdNext" />
           </Group>
           <Group CommandName="cmdGroupView" SizeDefinition="TwoButtons">
             <ToggleButton CommandName="cmdLineWrap" />
