@@ -214,6 +214,7 @@
     <ClInclude Include="Commands\CmdCodeStyle.h" />
     <ClInclude Include="Commands\CmdEOL.h" />
     <ClInclude Include="Commands\CmdFiles.h" />
+    <ClInclude Include="Commands\CmdFindReplace.h" />
     <ClInclude Include="Commands\CmdLineWrap.h" />
     <ClInclude Include="Commands\CmdLoadEncoding.h" />
     <ClInclude Include="Commands\CmdMRU.h" />
@@ -255,6 +256,7 @@
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
     <ClCompile Include="Commands\CmdCodeStyle.cpp" />
     <ClCompile Include="Commands\CmdFiles.cpp" />
+    <ClCompile Include="Commands\CmdFindReplace.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
     <ClCompile Include="Commands\CmdPrevNext.cpp" />
     <ClCompile Include="Commands\CommandHandler.cpp" />

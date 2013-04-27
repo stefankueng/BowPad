@@ -162,6 +162,9 @@
     <ClInclude Include="Commands\CmdPrevNext.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdFindReplace.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -258,6 +261,9 @@
       <Filter>Commands</Filter>
     </ClCompile>
     <ClCompile Include="Commands\CmdPrevNext.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdFindReplace.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
