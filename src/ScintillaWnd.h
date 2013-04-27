@@ -26,6 +26,7 @@
 #define INDIC_SELECTION_MARK        (INDIC_CONTAINER+1)
 #define INDIC_TAGMATCH              (INDIC_CONTAINER+2)
 #define INDIC_TAGATTR               (INDIC_CONTAINER+3)
+#define INDIC_FINDTEXT_MARK         (INDIC_CONTAINER+4)
 
 struct XmlMatchedTagsPos
 {
@@ -72,6 +73,10 @@ public :
     void MatchBraces();
     void MatchTags();
     bool GetSelectedCount(size_t& selByte, size_t& selLine);
+    void DocScrollClear(int type) { m_docScroll.Clear(type); }
+    void DocScrollAddLineColor(int type, size_t line, COLORREF clr) { m_docScroll.AddLineColor(type, line, clr); }
+    void Center(long posStart, long posEnd);
+
     LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
 
 protected:
@@ -88,7 +93,6 @@ protected:
     FindResult FindCloseTag(const std::string& tagName, size_t start, size_t end);
     std::vector<std::pair<size_t, size_t>> GetAttributesPos(size_t start, size_t end);
     bool IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
-
 private:
     SciFnDirect                 m_pSciMsg;
     sptr_t                      m_pSciWndData;

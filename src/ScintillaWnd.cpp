@@ -292,7 +292,12 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETSTYLE, INDIC_SELECTION_MARK, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_SELECTION_MARK, 100);
     Call(SCI_INDICSETUNDER, INDIC_SELECTION_MARK, true);
-    Call(SCI_INDICSETFORE, INDIC_SELECTION_MARK, RGB(0,255,0));
+    Call(SCI_INDICSETFORE,  INDIC_SELECTION_MARK, RGB(0,255,0));
+
+    Call(SCI_INDICSETSTYLE, INDIC_FINDTEXT_MARK, INDIC_ROUNDBOX);
+    Call(SCI_INDICSETALPHA, INDIC_FINDTEXT_MARK, 100);
+    Call(SCI_INDICSETUNDER, INDIC_FINDTEXT_MARK, true);
+    Call(SCI_INDICSETFORE,  INDIC_FINDTEXT_MARK, RGB(255,255,0));
 
     Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, RGB(0,150,0));
     Call(SCI_STYLESETBOLD, STYLE_BRACELIGHT, 1);
@@ -312,6 +317,43 @@ void CScintillaWnd::SetupDefaultStyles()
 
     Call(SCI_SETTABWIDTH, 4);
     Call(SCI_SETINDENTATIONGUIDES, SC_IV_LOOKBOTH);
+}
+
+void CScintillaWnd::Center(long posStart, long posEnd)
+{
+    // to make sure the found result is visible
+    // When searching up, the beginning of the (possible multiline) result is important, when scrolling down the end
+    long testPos = (posStart > posEnd) ? posEnd : posStart;
+    Call(SCI_SETCURRENTPOS, testPos);
+    long currentlineNumberDoc = (long)Call(SCI_LINEFROMPOSITION, testPos);
+    long currentlineNumberVis = (long)Call(SCI_VISIBLEFROMDOCLINE, currentlineNumberDoc);
+    Call(SCI_ENSUREVISIBLE, currentlineNumberDoc);    // make sure target line is unfolded
+
+    long firstVisibleLineVis =   (long)Call(SCI_GETFIRSTVISIBLELINE);
+    long linesVisible =          (long)Call(SCI_LINESONSCREEN) - 1; //-1 for the scrollbar
+    long lastVisibleLineVis =    (long)linesVisible + firstVisibleLineVis;
+
+    // if out of view vertically, scroll line into (center of) view
+    int linesToScroll = 0;
+    if (currentlineNumberVis < firstVisibleLineVis)
+    {
+        linesToScroll = currentlineNumberVis - firstVisibleLineVis;
+        // use center
+        linesToScroll -= linesVisible/2;
+    }
+    else if (currentlineNumberVis > lastVisibleLineVis)
+    {
+        linesToScroll = currentlineNumberVis - lastVisibleLineVis;
+        // use center
+        linesToScroll += linesVisible/2;
+    }
+    Call(SCI_LINESCROLL, 0, linesToScroll);
+
+    // Make sure the caret is visible, scroll horizontally
+    Call(SCI_GOTOPOS, posStart);
+    Call(SCI_GOTOPOS, posEnd);
+
+    Call(SCI_SETANCHOR, posStart);
 }
 
 void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
@@ -476,7 +518,7 @@ void CScintillaWnd::MarkSelectedWord()
 
     if (lastSelText.compare(seltextbuffer.get()))
     {
-        m_docScroll.Clear();
+        m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
         Scintilla::Sci_TextToFind FindText;
         FindText.chrg.cpMin = 0;
         FindText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
@@ -484,7 +526,7 @@ void CScintillaWnd::MarkSelectedWord()
         while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&FindText) >= 0)
         {
             size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
-            m_docScroll.AddLineColor(line, RGB(0,255,0));
+            m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, RGB(0,255,0));
             FindText.chrg.cpMin = FindText.chrgText.cpMax;
         }
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);

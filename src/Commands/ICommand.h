@@ -52,6 +52,9 @@ protected:
     LRESULT             SendMessageToMainWnd(UINT msg, WPARAM wParam, LPARAM lParam);
     void                UpdateStatusBar(bool bEverything);
     void                SetupLexerForLang(const std::wstring& lang);
+    void                DocScrollClear(int type);
+    void                DocScrollAddLineColor(int type, size_t line, COLORREF clr);
+    void                Center(long startPos, long endPos);
 
     HWND                GetHwnd();
     bool                OpenFile(LPCWSTR file);
@@ -59,7 +62,8 @@ protected:
     bool                SaveCurrentTab(bool bSaveAs = false);
     HRESULT             InvalidateUICommand(UI_INVALIDATIONS flags, const PROPERTYKEY *key);
     HRESULT             InvalidateUICommand(UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY *key);
-private:
+
+protected:
     void *              m_Obj;
 };
 

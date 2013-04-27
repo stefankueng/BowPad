@@ -153,3 +153,21 @@ void ICommand::SetupLexerForLang( const std::wstring& lang )
     return pMainWnd->m_scintilla.SetupLexerForLang(lang);
 }
 
+void ICommand::DocScrollClear( int type )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    pMainWnd->m_scintilla.DocScrollClear(type);
+}
+
+void ICommand::DocScrollAddLineColor( int type, size_t line, COLORREF clr )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    pMainWnd->m_scintilla.DocScrollAddLineColor(type, line, clr);
+}
+
+void ICommand::Center( long startPos, long endPos )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    pMainWnd->m_scintilla.Center(startPos, endPos);
+}
+
