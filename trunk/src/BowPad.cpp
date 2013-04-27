@@ -19,6 +19,7 @@
 #include "MainWindow.h"
 #include "CmdLineParser.h"
 #include "KeyboardShortcutHandler.h"
+#include "BaseDialog.h"
 
 HINSTANCE hInst;
 
@@ -55,7 +56,9 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         // Main message loop:
         while (GetMessage(&msg, NULL, 0, 0))
         {
-            if (!CKeyboardShortcutHandler::Instance().TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam))
+            if (!CKeyboardShortcutHandler::Instance().TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam) &&
+                !CDialog::IsDialogMessage(&msg)
+                )
             {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);

@@ -27,6 +27,7 @@
 #include "CmdCodeStyle.h"
 #include "CmdEOL.h"
 #include "CmdPrevNext.h"
+#include "CmdFindReplace.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -101,6 +102,17 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdPrevious(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdNext(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
+    pCmd = new CCmdFindReplace(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdFindNext(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdFindPrev(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdFindSelectedNext(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdFindSelectedPrev(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 }
 

@@ -206,6 +206,18 @@
         <Image>res/NextS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdFindReplace" LabelTitle="Find/Replace" TooltipTitle="Find &amp; Replace" TooltipDescription="Search and/or replace text in documents/tabs">
+      <Command.LargeImages>
+        <Image>res/FindReplaceL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/FindReplaceS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdFindNext" />
+    <Command Name="cmdFindPrev" />
+    <Command Name="cmdFindSelectedNext" />
+    <Command Name="cmdFindSelectedPrev" />
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -259,11 +271,12 @@
             <Button CommandName="cmdCopy" />
             <Button CommandName="cmdCut" />
           </Group>
-          <Group CommandName="cmdGroupUndo" SizeDefinition="FourButtons">
+          <Group CommandName="cmdGroupUndo" SizeDefinition="FiveButtons">
             <Button CommandName="cmdUndo" />
             <Button CommandName="cmdRedo" />
             <Button CommandName="cmdPrevious" />
             <Button CommandName="cmdNext" />
+            <Button CommandName="cmdFindReplace" />
           </Group>
           <Group CommandName="cmdGroupView" SizeDefinition="TwoButtons">
             <ToggleButton CommandName="cmdLineWrap" />

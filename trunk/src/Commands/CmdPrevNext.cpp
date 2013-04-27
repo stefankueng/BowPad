@@ -212,7 +212,7 @@ bool CCmdPrevious::Execute()
     return false;
 }
 
-HRESULT CCmdPrevious::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdPrevious::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
 {
     // enabled if there's something to go back to
     if (UI_PKEY_Enabled == key)
@@ -260,7 +260,7 @@ bool CCmdNext::Execute()
     return false;
 }
 
-HRESULT CCmdNext::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdNext::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
 {
     // enabled if there's something to go forward to
     if (UI_PKEY_Enabled == key)
