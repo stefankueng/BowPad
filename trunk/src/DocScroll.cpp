@@ -231,19 +231,20 @@ void CDocScroll::CalcLines()
         m_visibleLineColors.clear();
         for (auto it : m_lineColors)
         {
-            m_visibleLineColors[m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, it.first)] = it.second;
+            m_visibleLineColors[m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, std::get<1>(it.first))] = it.second;
         }
         m_visibleLines = m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, m_lines);
     }
     m_bDirty = false;
 }
 
-void CDocScroll::AddLineColor( size_t line, COLORREF clr )
+void CDocScroll::AddLineColor( int type, size_t line, COLORREF clr )
 {
-    auto foundIt = m_lineColors.find(line);
+    auto t = std::make_tuple(type,line);
+    auto foundIt = m_lineColors.find(t);
     if (foundIt == m_lineColors.end())
     {
-        m_lineColors[line] = clr;
+        m_lineColors[t] = clr;
         m_bDirty = true;
     }
 }
@@ -253,4 +254,23 @@ void CDocScroll::SetTotalLines( size_t lines )
     if (m_lines != lines)
         m_bDirty = true;
     m_lines = lines;
+}
+
+void CDocScroll::Clear( int type )
+{
+    if (type == 0)
+        m_lineColors.clear();
+    else
+    {
+        auto it = m_lineColors.begin();
+        for (; it != m_lineColors.end(); )
+        {
+            if (std::get<0>(it->first) == type)
+                it = m_lineColors.erase(it);
+            else
+                ++it;
+        }
+    }
+    m_visibleLineColors.clear();
+    m_bDirty = true;
 }
