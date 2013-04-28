@@ -136,7 +136,7 @@ STDMETHODIMP CPropertySet::QueryInterface(REFIID iid, void** ppv)
     {
         *ppv = static_cast<IUISimplePropertySet*>(this);
     }
-    else 
+    else
     {
         *ppv = NULL;
         return E_NOINTERFACE;

@@ -31,7 +31,7 @@ public:
     {
     }
 
-    virtual bool Execute() 
+    virtual bool Execute()
     {
         ScintillaCall(SCI_SETVIEWWS, ScintillaCall(SCI_GETVIEWWS) ? 0 : 1);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
@@ -40,7 +40,7 @@ public:
 
     virtual UINT GetCmdId() { return cmdWhiteSpace; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue ) 
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
     {
         if (UI_PKEY_BooleanValue == key)
         {

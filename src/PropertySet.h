@@ -19,8 +19,8 @@
 #define MAX_RESOURCE_LENGTH     256
 #include <uiribbon.h>
 
-// The implementation of IUISimplePropertySet. This handles all of the properties used for the 
-// ItemsSource and Categories PKEYs and provides functions to set only the properties required 
+// The implementation of IUISimplePropertySet. This handles all of the properties used for the
+// ItemsSource and Categories PKEYs and provides functions to set only the properties required
 // for each type of gallery contents.
 class CPropertySet : public IUISimplePropertySet
 {

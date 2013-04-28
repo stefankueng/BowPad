@@ -134,7 +134,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
             sptr_t findRet = -1;
             int replaceCount = 0;
             ScintillaCall(SCI_BEGINUNDOACTION);
-            do 
+            do
             {
                 findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
                 if ((findRet == -1) && (id==IDC_REPLACEBTN))
