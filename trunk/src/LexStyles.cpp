@@ -28,7 +28,6 @@ CLexStyles::CLexStyles(void)
 {
 }
 
-
 CLexStyles::~CLexStyles(void)
 {
 }
@@ -273,4 +272,3 @@ void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring,
         pos = s.find(L"$(", pos);
     }
 }
-

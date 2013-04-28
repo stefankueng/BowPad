@@ -42,7 +42,6 @@ CDocScroll::CDocScroll()
     , m_lines(0)
     , m_bDirty(false)
 {
-
 }
 
 void CDocScroll::InitScintilla( CScintillaWnd * pScintilla )

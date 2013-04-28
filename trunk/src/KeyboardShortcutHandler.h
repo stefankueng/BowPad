@@ -58,4 +58,3 @@ private:
     std::map<std::wstring, UINT>            m_virtkeys;
     WORD                                    m_lastKey;
 };
-

@@ -28,7 +28,6 @@ CKeyboardShortcutHandler::CKeyboardShortcutHandler(void)
 {
 }
 
-
 CKeyboardShortcutHandler::~CKeyboardShortcutHandler(void)
 {
 }

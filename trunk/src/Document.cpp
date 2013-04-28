@@ -20,7 +20,6 @@
 
 
 
-
 std::wstring FormatTypeToString( FormatType ft )
 {
     std::wstring sFt;

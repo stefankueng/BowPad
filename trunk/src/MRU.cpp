@@ -52,7 +52,7 @@ public:
         if (pProperties != NULL)
         {
             hr = ::StringCchCopyW(pProperties->m_wszFullPath, MAX_PATH, wszFullPath);
-            SHFILEINFOW sfi;
+            SHFILEINFOW sfi = {0};
 
             DWORD_PTR dwPtr = NULL;
             if (SUCCEEDED(hr))
@@ -149,7 +149,6 @@ CMRU::CMRU(void)
     : m_bLoaded(false)
 {
 }
-
 
 CMRU::~CMRU(void)
 {

@@ -71,5 +71,3 @@ public:
     bool                    m_bNeedsSaving;
     bool                    m_bIsReadonly;
 };
-
-

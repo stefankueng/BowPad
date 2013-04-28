@@ -98,4 +98,3 @@ private:
     sptr_t                      m_pSciWndData;
     CDocScroll                  m_docScroll;
 };
-

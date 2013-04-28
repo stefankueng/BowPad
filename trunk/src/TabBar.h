@@ -156,4 +156,3 @@ private:
     ULONG_PTR                   gdiplusToken;
 
 };
-

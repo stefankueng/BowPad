@@ -48,7 +48,6 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
 
 CMainWindow::~CMainWindow(void)
 {
-
 }
 
 // IUnknown method implementations.

@@ -48,4 +48,3 @@ private:
     int                         m_lastfoldercolorindex;
     CScintillaWnd               m_scratchScintilla;
 };
-

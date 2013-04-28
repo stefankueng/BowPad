@@ -91,4 +91,3 @@ private:
     std::map<std::string, LanguageData> m_Langdata;
     std::map<int, LexerData>            m_lexerdata;
 };
-

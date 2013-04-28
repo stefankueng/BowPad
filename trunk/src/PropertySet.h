@@ -69,4 +69,3 @@ private:
 
     LONG            m_cRef;
 };
-
