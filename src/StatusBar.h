@@ -40,4 +40,3 @@ protected:
 private:
     int     m_height;
 };
-

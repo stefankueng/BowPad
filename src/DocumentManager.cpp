@@ -360,7 +360,7 @@ FormatType CDocumentManager::GetEOLFormatForm( const char *data ) const
     {
         if (data[i] == '\r')
         {
-            if (i+1 < len &&  data[i+1] == '\n')
+            if (i+1 < len && data[i+1] == '\n')
             {
                 return WIN_FORMAT;
             }

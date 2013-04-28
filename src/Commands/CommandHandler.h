@@ -36,4 +36,3 @@ public:
 private:
     std::map<UINT, ICommand*>       m_commands;
 };
-

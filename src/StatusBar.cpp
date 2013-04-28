@@ -44,5 +44,3 @@ LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam,
         return prevWndProc(hwnd, uMsg, wParam, lParam);
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
-
-

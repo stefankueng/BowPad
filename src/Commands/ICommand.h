@@ -66,5 +66,3 @@ protected:
 protected:
     void *              m_Obj;
 };
-
-

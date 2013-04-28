@@ -24,7 +24,6 @@ extern IUIFramework *g_pFramework;
 ICommand::ICommand(void * obj)
     : m_Obj(obj)
 {
-
 }
 
 HRESULT ICommand::IUICommandHandlerUpdateProperty( REFPROPERTYKEY /*key*/, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* /*ppropvarNewValue*/ )
@@ -39,12 +38,10 @@ HRESULT ICommand::IUICommandHandlerExecute( UI_EXECUTIONVERB /*verb*/, const PRO
 
 void ICommand::ScintillaNotify( Scintilla::SCNotification * /*pScn*/ )
 {
-
 }
 
 void ICommand::TabNotify( TBHDR * /*ptbhdr*/ )
 {
-
 }
 
 void ICommand::TabActivateAt( int index )

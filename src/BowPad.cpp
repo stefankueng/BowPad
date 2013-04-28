@@ -24,9 +24,9 @@
 HINSTANCE hInst;
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPTSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+                       _In_opt_ HINSTANCE hPrevInstance,
+                       _In_ LPTSTR  lpCmdLine,
+                       _In_ int     nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
@@ -57,8 +57,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         while (GetMessage(&msg, NULL, 0, 0))
         {
             if (!CKeyboardShortcutHandler::Instance().TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam) &&
-                !CDialog::IsDialogMessage(&msg)
-                )
+                !CDialog::IsDialogMessage(&msg))
             {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
@@ -68,9 +67,5 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
     CoUninitialize();
 
-    return (int) msg.wParam;
+    return (int)msg.wParam;
 }
-
-
-
-

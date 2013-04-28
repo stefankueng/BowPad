@@ -131,4 +131,3 @@ void CCommandHandler::TabNotify( TBHDR * ptbhdr )
         cmd.second->TabNotify(ptbhdr);
     }
 }
-

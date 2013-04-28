@@ -41,4 +41,3 @@ private:
     bool                            m_bLoaded;
     std::vector<std::tuple<std::wstring, bool>>     m_mruVec;
 };
-
