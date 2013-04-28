@@ -743,7 +743,7 @@ bool CMainWindow::CloseTab( int tab )
 
 bool CMainWindow::CloseAllTabs()
 {
-    do 
+    do
     {
         if (CloseTab(m_TabBar.GetItemCount()-1) == false)
             return false;

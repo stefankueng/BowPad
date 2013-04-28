@@ -32,17 +32,17 @@ public:
     {
     }
 
-    virtual bool Execute() 
+    virtual bool Execute()
     {
         return true;
     }
 
-    virtual UINT GetCmdId() 
+    virtual UINT GetCmdId()
     {
         return cmdMRUList;
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue ) 
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
     {
         if (UI_PKEY_RecentItems == key)
         {
@@ -51,7 +51,7 @@ public:
         return E_NOTIMPL;
     }
 
-    virtual HRESULT IUICommandHandlerExecute( UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties ) 
+    virtual HRESULT IUICommandHandlerExecute( UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties )
     {
         HRESULT hr = E_NOTIMPL;
         if (*key == UI_PKEY_RecentItems)

@@ -32,7 +32,7 @@ public:
     {
     }
 
-    virtual bool Execute() 
+    virtual bool Execute()
     {
         ScintillaCall(SCI_SETEOLMODE, SC_EOL_CRLF);
         ScintillaCall(SCI_CONVERTEOLS, SC_EOL_CRLF);
@@ -47,7 +47,7 @@ public:
 
     virtual UINT GetCmdId() { return cmdEOLWin; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue ) 
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
     {
         if (UI_PKEY_BooleanValue == key)
         {
@@ -78,7 +78,7 @@ public:
     {
     }
 
-    virtual bool Execute() 
+    virtual bool Execute()
     {
         ScintillaCall(SCI_SETEOLMODE, SC_EOL_LF);
         ScintillaCall(SCI_CONVERTEOLS, SC_EOL_LF);
@@ -93,7 +93,7 @@ public:
 
     virtual UINT GetCmdId() { return cmdEOLUnix; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue ) 
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
     {
         if (UI_PKEY_BooleanValue == key)
         {
@@ -124,7 +124,7 @@ public:
     {
     }
 
-    virtual bool Execute() 
+    virtual bool Execute()
     {
         ScintillaCall(SCI_SETEOLMODE, SC_EOL_CR);
         ScintillaCall(SCI_CONVERTEOLS, SC_EOL_CR);
@@ -139,7 +139,7 @@ public:
 
     virtual UINT GetCmdId() { return cmdEOLMac; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue ) 
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
     {
         if (UI_PKEY_BooleanValue == key)
         {

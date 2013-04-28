@@ -32,7 +32,7 @@ public:
     {
     }
 
-    virtual bool Execute() 
+    virtual bool Execute()
     {
         ScintillaCall(SCI_UNDO);
         return true;
@@ -40,13 +40,13 @@ public:
 
     virtual UINT GetCmdId() { return cmdUndo; }
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn ) 
+    virtual void ScintillaNotify( Scintilla::SCNotification * pScn )
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue ) 
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
     {
         if (UI_PKEY_Enabled == key)
         {
@@ -70,7 +70,7 @@ public:
     {
     }
 
-    virtual bool Execute() 
+    virtual bool Execute()
     {
         ScintillaCall(SCI_REDO);
         return true;
@@ -78,13 +78,13 @@ public:
 
     virtual UINT GetCmdId() { return cmdRedo; }
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn ) 
+    virtual void ScintillaNotify( Scintilla::SCNotification * pScn )
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue ) 
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
     {
         if (UI_PKEY_Enabled == key)
         {
