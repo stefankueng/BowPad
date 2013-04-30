@@ -168,6 +168,9 @@
     <ClInclude Include="..\ext\sktoolslib\IniSettings.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="AppUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -271,6 +274,9 @@
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\IniSettings.cpp">
       <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="AppUtils.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

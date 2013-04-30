@@ -215,6 +215,7 @@
     <ClInclude Include="..\ext\sktoolslib\StringUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
+    <ClInclude Include="AppUtils.h" />
     <ClInclude Include="Commands\CmdClipboard.h" />
     <ClInclude Include="Commands\CmdCodeStyle.h" />
     <ClInclude Include="Commands\CmdEOL.h" />
@@ -260,6 +261,7 @@
     <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
+    <ClCompile Include="AppUtils.cpp" />
     <ClCompile Include="BowPad.cpp" />
     <ClCompile Include="Commands\CmdCodeStyle.cpp" />
     <ClCompile Include="Commands\CmdFiles.cpp" />

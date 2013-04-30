@@ -20,6 +20,7 @@
 #include "CmdLineParser.h"
 #include "KeyboardShortcutHandler.h"
 #include "BaseDialog.h"
+#include "AppUtils.h"
 
 HINSTANCE hInst;
 
@@ -37,7 +38,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
-    CIniSettings::Instance().SetIniPath(L"");
+    CIniSettings::Instance().SetIniPath(CAppUtils::GetDataPath() + L"\\settings");
     hInst = hInstance;
 
     MSG msg = {0};

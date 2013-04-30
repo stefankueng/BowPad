@@ -35,7 +35,6 @@ public:
 private:
     void                            Load();
     void                            Save();
-    std::wstring                    GetPath();
 
 private:
     bool                            m_bLoaded;
