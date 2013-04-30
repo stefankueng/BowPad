@@ -165,6 +165,9 @@
     <ClInclude Include="Commands\CmdFindReplace.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\IniSettings.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -265,6 +268,9 @@
     </ClCompile>
     <ClCompile Include="Commands\CmdFindReplace.cpp">
       <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\IniSettings.cpp">
+      <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
