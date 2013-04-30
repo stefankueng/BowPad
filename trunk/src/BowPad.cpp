@@ -37,6 +37,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
+    CIniSettings::Instance().SetIniPath(L"");
     hInst = hInstance;
 
     MSG msg = {0};

@@ -250,6 +250,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             m_hwnd = hwnd;
             Initialize();
+            CIniSettings::Instance().RestoreWindowPos(L"MainWindow", hwnd, SW_RESTORE);
         }
         break;
     case WM_COMMAND:
@@ -433,6 +434,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         PostQuitMessage(0);
         break;
     case WM_CLOSE:
+        CIniSettings::Instance().SaveWindowPos(L"MainWindow", *this);
         if (CloseAllTabs())
             ::DestroyWindow(m_hwnd);
         break;

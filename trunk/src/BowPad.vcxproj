@@ -207,6 +207,7 @@
     <ClInclude Include="..\ext\sktoolslib\DlgResizer.h" />
     <ClInclude Include="..\ext\sktoolslib\FormatMessageWrapper.h" />
     <ClInclude Include="..\ext\sktoolslib\hyperlink.h" />
+    <ClInclude Include="..\ext\sktoolslib\IniSettings.h" />
     <ClInclude Include="..\ext\sktoolslib\Language.h" />
     <ClInclude Include="..\ext\sktoolslib\ResString.h" />
     <ClInclude Include="..\ext\sktoolslib\SimpleIni.h" />
@@ -254,6 +255,7 @@
     <ClCompile Include="..\ext\sktoolslib\DebugOutput.cpp" />
     <ClCompile Include="..\ext\sktoolslib\DlgResizer.cpp" />
     <ClCompile Include="..\ext\sktoolslib\hyperlink.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\IniSettings.cpp" />
     <ClCompile Include="..\ext\sktoolslib\Language.cpp" />
     <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
