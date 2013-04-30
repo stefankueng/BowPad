@@ -16,6 +16,7 @@
 //
 #include "stdafx.h"
 #include "MRU.h"
+#include "AppUtils.h"
 
 #include <iostream>
 #include <fstream>
@@ -254,7 +255,7 @@ void CMRU::RemovePath( const std::wstring& path, bool removeEvenIfPinned )
 void CMRU::Load()
 {
     m_bLoaded = true;
-    std::wstring path = GetPath();
+    std::wstring path = CAppUtils::GetDataPath() + L"\\mru";
 
     std::wifstream File;
     File.imbue(std::locale(std::locale(), new utf8_conversion()));
@@ -285,7 +286,7 @@ void CMRU::Load()
 
 void CMRU::Save()
 {
-    std::wstring path = GetPath();
+    std::wstring path = CAppUtils::GetDataPath() + L"\\mru";
 
     std::wofstream File;
     File.imbue(std::locale(std::locale(), new utf8_conversion()));
@@ -298,17 +299,6 @@ void CMRU::Save()
         File << (std::get<1>(t) ? L"1" : L"0") << L"*" << std::get<0>(t) << std::endl;
     }
     File.close();
-}
-
-std::wstring CMRU::GetPath()
-{
-    wchar_t buf[MAX_PATH] = {0};
-    GetModuleFileName(NULL, buf, _countof(buf));
-    std::wstring path = buf;
-    path = path.substr(0, path.find_last_of('\\'));
-    path += L"\\mru";
-    // TODO: maybe check if we're installed somewhere with no write access and then use another path
-    return path;
 }
 
 void CMRU::PinPath( const std::wstring& path, bool bPin )
