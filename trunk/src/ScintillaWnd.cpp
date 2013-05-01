@@ -16,9 +16,14 @@
 //
 #include "stdafx.h"
 #include "ScintillaWnd.h"
+#include "BowPad.h"
+#include "BowPadUI.h"
 #include "XPMIcons.h"
 #include "UnicodeUtils.h"
 #include "SciLexer.h"
+
+#include <UIRibbon.h>
+#include <UIRibbonPropertyHelpers.h>
 
 const int SC_MARGE_LINENUMBER = 0;
 const int SC_MARGE_SYBOLE = 1;
@@ -29,6 +34,7 @@ const int MARK_HIDELINESBEGIN = 23;
 const int MARK_HIDELINESEND = 22;
 
 
+extern IUIFramework * g_pFramework;
 
 bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 {
@@ -118,6 +124,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETBUFFEREDDRAW, true);
     Call(SCI_SETTWOPHASEDRAW, true);
 
+    Call(SCI_USEPOPUP, 0);
+
     SetupDefaultStyles();
 
     return true;
@@ -153,6 +161,50 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         if(hdr->code == NM_COOLSB_CUSTOMDRAW)
         {
             return m_docScroll.HandleCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
+        }
+        break;
+    case WM_CONTEXTMENU:
+        {
+            POINT pt;
+            POINTSTOPOINT(pt, lParam);
+
+            if (pt.x == -1 && pt.y == -1)
+            {
+                HRESULT hr = E_FAIL;
+
+                // Display the menu in the upper-left corner of the client area, below the ribbon.
+                IUIRibbon * pRibbon;
+                hr = g_pFramework->GetView(0, IID_PPV_ARGS(&pRibbon));
+                if (SUCCEEDED(hr))
+                {
+                    UINT32 uRibbonHeight = 0;
+                    hr = pRibbon->GetHeight(&uRibbonHeight);
+                    if (SUCCEEDED(hr))
+                    {
+                        pt.x = 0;
+                        pt.y = uRibbonHeight;
+                        ClientToScreen(hwnd, &pt);
+                    }
+                    pRibbon->Release();
+                }
+                if (FAILED(hr))
+                {
+                    // Default to just the upper-right corner of the entire screen.
+                    pt.x = 0;
+                    pt.y = 0;
+                }
+            }
+
+            HRESULT hr = E_FAIL;
+
+            // The basic pattern of how to show Contextual UI in a specified location.
+            IUIContextualUI * pContextualUI = NULL;
+            if (SUCCEEDED(g_pFramework->GetView(cmdContextMap, IID_PPV_ARGS(&pContextualUI))))
+            {
+                hr = pContextualUI->ShowAtLocation(pt.x, pt.y);
+                pContextualUI->Release();
+            }
+
         }
         break;
     default:
