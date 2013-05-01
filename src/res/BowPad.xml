@@ -218,6 +218,18 @@
     <Command Name="cmdFindPrev" />
     <Command Name="cmdFindSelectedNext" />
     <Command Name="cmdFindSelectedPrev" />
+    <Command Name="cmdDelete" LabelTitle="Delete">
+      <Command.SmallImages>
+        <Image>res/DeleteS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdSelectAll" LabelTitle="Select all">
+      <Command.SmallImages>
+        <Image>res/SelectAllS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+
+    <Command Name="cmdContextMap" />
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -312,5 +324,31 @@
         <QuickAccessToolbar CommandName="cmdQat" />
       </Ribbon.QuickAccessToolbar>
     </Ribbon>
+    <ContextPopup>
+      <ContextPopup.MiniToolbars>
+        <MiniToolbar Name="CopyPasteToolbar">
+          <MenuGroup>
+            <Button CommandName="cmdCut" />
+            <Button CommandName="cmdCopy" />
+            <Button CommandName="cmdPaste" />
+          </MenuGroup>
+        </MiniToolbar>
+      </ContextPopup.MiniToolbars>
+      <ContextPopup.ContextMenus>
+        <ContextMenu Name="ContextMenu">
+          <MenuGroup>
+            <Button CommandName="cmdUndo" />
+            <Button CommandName="cmdRedo" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdSelectAll" />
+            <Button CommandName="cmdDelete" />
+          </MenuGroup>
+        </ContextMenu>
+      </ContextPopup.ContextMenus>
+      <ContextPopup.ContextMaps>
+        <ContextMap CommandName="cmdContextMap" ContextMenu="ContextMenu" MiniToolbar="CopyPasteToolbar"/>
+      </ContextPopup.ContextMaps>
+    </ContextPopup>
   </Application.Views>
 </Application>

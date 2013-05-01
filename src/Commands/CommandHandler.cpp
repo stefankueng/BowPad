@@ -28,6 +28,7 @@
 #include "CmdEOL.h"
 #include "CmdPrevNext.h"
 #include "CmdFindReplace.h"
+#include "CmdMisc.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -78,6 +79,10 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdCopy(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdPaste(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdDelete(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdSelectAll(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdLineWrap(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
