@@ -21,6 +21,7 @@
 #include "StringUtils.h"
 #include "CommandHandler.h"
 #include "MRU.h"
+#include "KeyboardShortcutHandler.h"
 
 #include <memory>
 #include <Shobjidl.h>
@@ -180,6 +181,14 @@ STDMETHODIMP CMainWindow::UpdateProperty(
     if (pCmd)
         hr = pCmd->IUICommandHandlerUpdateProperty(key, ppropvarCurrentValue, ppropvarNewValue);
 
+    if (key == UI_PKEY_TooltipTitle)
+    {
+        std::wstring shortkey = CKeyboardShortcutHandler::Instance().GetShortCutStringForCommand((WORD)nCmdID);
+        if (!shortkey.empty())
+        {
+            hr = UIInitPropertyFromString(UI_PKEY_TooltipTitle, shortkey.c_str(), ppropvarNewValue);
+        }
+    }
     return hr;
 }
 
