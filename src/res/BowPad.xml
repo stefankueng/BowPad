@@ -206,7 +206,7 @@
         <Image>res/NextS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdFindReplace" LabelTitle="Find/Replace" TooltipTitle="Find &amp; Replace" TooltipDescription="Search and/or replace text in documents/tabs">
+    <Command Name="cmdFindReplace" LabelTitle="Find/Replace" TooltipTitle="Find &amp;&amp; Replace" TooltipDescription="Search and/or replace text in documents/tabs">
       <Command.LargeImages>
         <Image>res/FindReplaceL.bmp</Image>
       </Command.LargeImages>
