@@ -32,12 +32,13 @@ public:
     {}
     ~KSH_Accel() {}
 
-    BYTE        fVirt;      // 0x10 = ALT, 0x08 = Ctrl, 0x04 = Shift
-    BOOL        fVirt1;     // true if key1 is a virtual key, false if it's a character code
-    WORD        key1;
-    BOOL        fVirt2;
-    WORD        key2;
-    WORD        cmd;        // the command
+    BYTE            fVirt;      // 0x10 = ALT, 0x08 = Ctrl, 0x04 = Shift
+    BOOL            fVirt1;     // true if key1 is a virtual key, false if it's a character code
+    WORD            key1;
+    BOOL            fVirt2;
+    WORD            key2;
+    WORD            cmd;        // the command
+    std::wstring    name;
 };
 
 class CKeyboardShortcutHandler
@@ -45,7 +46,7 @@ class CKeyboardShortcutHandler
 public:
     static CKeyboardShortcutHandler&        Instance();
     LRESULT CALLBACK                        TranslateAccelerator(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
+    std::wstring                            GetShortCutStringForCommand(WORD cmd);
 private:
     CKeyboardShortcutHandler(void);
     ~CKeyboardShortcutHandler(void);

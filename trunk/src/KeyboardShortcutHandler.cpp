@@ -20,7 +20,12 @@
 #include "StringUtils.h"
 #include "BowPad.h"
 
+#include <UIRibbon.h>
+#include <UIRibbonPropertyHelpers.h>
+
 #include <vector>
+
+extern IUIFramework *g_pFramework;
 
 CKeyboardShortcutHandler::CKeyboardShortcutHandler(void)
     : m_bLoaded(false)
@@ -71,15 +76,17 @@ void CKeyboardShortcutHandler::Load()
                 for (auto l : shortkeys)
                 {
                     std::wstring v = ini.GetValue(L"shortcuts", l);
-                    std::transform(v.begin(), v.end(), v.begin(), ::tolower);
                     std::vector<std::wstring> tokens;
                     stringtok(tokens, v, false, L";");
                     if (tokens.size() < 3)
                         continue;
+                    std::transform(tokens[0].begin(), tokens[0].end(), tokens[0].begin(), ::tolower);
+                    std::transform(tokens[2].begin(), tokens[2].end(), tokens[2].begin(), ::tolower);
                     std::wstring keys = tokens[2];
                     std::vector<std::wstring> keyvec;
                     stringtok(keyvec, keys, false, L",");
                     KSH_Accel accel;
+                    accel.name = tokens[1];
                     accel.cmd = (WORD)_wtoi(tokens[0].c_str());
                     for (size_t i = 0; i < keyvec.size(); ++i)
                     {
@@ -118,6 +125,7 @@ void CKeyboardShortcutHandler::Load()
                         }
                     }
                     m_accelerators.push_back(accel);
+                    g_pFramework->InvalidateUICommand(accel.cmd, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
                 }
             }
         }
@@ -179,4 +187,96 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
         break;
     }
     return FALSE;
+}
+
+std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd )
+{
+    for (const auto& accel : m_accelerators)
+    {
+        if (accel.cmd == cmd)
+        {
+            std::wstring s;
+            wchar_t buf[MAX_PATH] = {0};
+            if (accel.fVirt & 0x08)
+            {
+                LONG sc = MapVirtualKey(VK_CONTROL, MAPVK_VK_TO_VSC);
+                sc <<= 16;
+                GetKeyNameText(sc, buf, _countof(buf));
+                if (!s.empty())
+                    s += L"+";
+                s += buf;
+            }
+            if (accel.fVirt & 0x10)
+            {
+                LONG sc = MapVirtualKey(VK_MENU, MAPVK_VK_TO_VSC);
+                sc <<= 16;
+                GetKeyNameText(sc, buf, _countof(buf));
+                if (!s.empty())
+                    s += L"+";
+                s += buf;
+            }
+            if (accel.fVirt & 0x04)
+            {
+                LONG sc = MapVirtualKey(VK_SHIFT, MAPVK_VK_TO_VSC);
+                sc <<= 16;
+                GetKeyNameText(sc, buf, _countof(buf));
+                if (!s.empty())
+                    s += L"+";
+                s += buf;
+            }
+            if (accel.key1)
+            {
+                LONG nScanCode = MapVirtualKey(accel.key1, MAPVK_VK_TO_VSC);
+                switch(accel.key1)
+                {
+                    // Keys which are "extended" (except for Return which is Numeric Enter as extended)
+                case VK_INSERT:
+                case VK_DELETE:
+                case VK_HOME:
+                case VK_END:
+                case VK_NEXT:  // Page down
+                case VK_PRIOR: // Page up
+                case VK_LEFT:
+                case VK_RIGHT:
+                case VK_UP:
+                case VK_DOWN:
+                case VK_SNAPSHOT:
+                    nScanCode |= 0x0100; // Add extended bit
+                }
+                nScanCode <<= 16;
+                GetKeyNameText(nScanCode, buf, _countof(buf));
+                if (!s.empty())
+                    s += L"+";
+                s += buf;
+            }
+
+            if (accel.key2)
+            {
+                LONG nScanCode = MapVirtualKey(accel.key2, MAPVK_VK_TO_VSC);
+                switch(accel.key2)
+                {
+                    // Keys which are "extended" (except for Return which is Numeric Enter as extended)
+                case VK_INSERT:
+                case VK_DELETE:
+                case VK_HOME:
+                case VK_END:
+                case VK_NEXT:  // Page down
+                case VK_PRIOR: // Page up
+                case VK_LEFT:
+                case VK_RIGHT:
+                case VK_UP:
+                case VK_DOWN:
+                case VK_SNAPSHOT:
+                    nScanCode |= 0x0100; // Add extended bit
+                }
+                nScanCode <<= 16;
+                GetKeyNameText(nScanCode, buf, _countof(buf));
+                if (!s.empty())
+                    s += L",";
+                s += buf;
+            }
+            return accel.name + L" (" + s + L")";
+        }
+    }
+    return L"";
 }
