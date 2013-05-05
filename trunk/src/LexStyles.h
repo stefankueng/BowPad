@@ -67,23 +67,23 @@ public:
 class CLexStyles
 {
 public:
-    static CLexStyles&          Instance();
+    static CLexStyles&                  Instance();
 
-    std::vector<std::wstring>   GetLanguages() const;
-    std::wstring                GetLanguageForExt(const std::wstring& ext) const;
+    std::vector<std::wstring>           GetLanguages() const;
+    std::wstring                        GetLanguageForExt(const std::wstring& ext) const;
 
-    std::map<int, std::string>  GetKeywordsForExt(const std::string& ext) const;
-    std::map<int, std::string>  GetKeywordsForLang(const std::string& lang) const;
+    const std::map<int, std::string>&   GetKeywordsForExt(const std::string& ext) const;
+    const std::map<int, std::string>&   GetKeywordsForLang(const std::string& lang) const;
 
-    LexerData                   GetLexerDataForExt(const std::string& ext) const;
-    LexerData                   GetLexerDataForLang(const std::string& lang) const;
+    const LexerData&                    GetLexerDataForExt(const std::string& ext) const;
+    const LexerData&                    GetLexerDataForLang(const std::string& lang) const;
 
 private:
     CLexStyles(void);
     ~CLexStyles(void);
 
-    void                Load();
-    void                ReplaceVariables(std::wstring& s, const std::map<std::wstring, std::wstring>& vars);
+    void                                Load();
+    void                                ReplaceVariables(std::wstring& s, const std::map<std::wstring, std::wstring>& vars);
 private:
     bool                m_bLoaded;
 
