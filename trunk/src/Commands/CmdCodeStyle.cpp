@@ -32,9 +32,34 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
 
     if(key == UI_PKEY_Categories)
     {
-        // A return value of S_FALSE or E_NOTIMPL will result in a gallery with no categories.
-        // If you return any error other than E_NOTIMPL, the contents of the gallery will not display.
-        hr = S_FALSE;
+        IUICollection* pCollection;
+        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+        if (FAILED(hr))
+        {
+            return hr;
+        }
+
+        if (langs.empty())
+            langs = CLexStyles::Instance().GetLanguages();
+
+        for (wchar_t i = 'A'; i <= 'Z'; ++i)
+        {
+            // Create a property set for the category.
+            CPropertySet *pCat;
+            hr = CPropertySet::CreateInstance(&pCat);
+            if (FAILED(hr))
+            {
+                pCollection->Release();
+                return hr;
+            }
+
+            wchar_t sName[2] = {0};
+            sName[0] = i;
+            // Initialize the property set with the label that was just loaded and a category id of 0.
+            pCat->InitializeCategoryProperties(sName, i-'A');
+            pCollection->Add(pCat);
+            pCat->Release();
+        }
     }
     else if (key == UI_PKEY_ItemsSource)
     {
@@ -88,7 +113,8 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
                 return hr;
             }
 
-            pItem->InitializeItemProperties(pImg, it.c_str(), UI_COLLECTION_INVALIDINDEX);
+            int catId = it.c_str()[0] - 'A';
+            pItem->InitializeItemProperties(pImg, it.c_str(), catId);
 
             // Add the newly-created property set to the collection supplied by the framework.
             pCollection->Add(pItem);
@@ -111,7 +137,6 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
                 break;
             }
         }
-        hr = S_FALSE;
     }
     return hr;
 }

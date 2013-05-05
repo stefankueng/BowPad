@@ -307,7 +307,7 @@
             </DropDownGallery>
             <DropDownGallery CommandName="cmdCodeStyle" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
-                <VerticalMenuLayout />
+                <FlowMenuLayout Columns="4"/>
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
             <DropDownButton CommandName="cmdEOLGroup">
