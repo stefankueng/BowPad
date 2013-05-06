@@ -29,10 +29,10 @@ public:
 
 enum FontStyle
 {
-    FONTSTYLE_NORMAL,
-    FONTSTYLE_BOLD,
-    FONTSTYLE_ITALIC,
-    FONTSTYLE_UNDERLINED
+    FONTSTYLE_NORMAL            = 0,
+    FONTSTYLE_BOLD              = 1,
+    FONTSTYLE_ITALIC            = 2,
+    FONTSTYLE_UNDERLINED        = 4
 };
 
 class StyleData
@@ -78,6 +78,13 @@ public:
     const LexerData&                    GetLexerDataForExt(const std::string& ext) const;
     const LexerData&                    GetLexerDataForLang(const std::string& lang) const;
 
+    void                                SetUserForeground(int ID, int style, COLORREF clr);
+    void                                SetUserBackground(int ID, int style, COLORREF clr);
+    void                                SetUserFont(int ID, int style, const std::wstring font);
+    void                                SetUserFontSize(int ID, int style, int size);
+    void                                SetUserFontStyle(int ID, int style, FontStyle fontstyle);
+    void                                ResetUserData();
+    void                                SaveUserData();
 private:
     CLexStyles(void);
     ~CLexStyles(void);
@@ -85,9 +92,12 @@ private:
     void                                Load();
     void                                ReplaceVariables(std::wstring& s, const std::map<std::wstring, std::wstring>& vars);
 private:
-    bool                m_bLoaded;
+    bool                                m_bLoaded;
 
     std::map<std::string, std::string>  m_extLang;
     std::map<std::string, LanguageData> m_Langdata;
     std::map<int, LexerData>            m_lexerdata;
+    std::map<int, std::wstring>         m_lexerSection;
+
+    std::map<int, LexerData>            m_userlexerdata;
 };
