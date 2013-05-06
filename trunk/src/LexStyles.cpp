@@ -89,27 +89,37 @@ void CLexStyles::Load()
                     ini[iniind].GetAllKeys(L"lexers", lexkeys);
                     for (auto l : lexkeys)
                     {
-                        std::wstring v = ini[iniind].GetValue(L"lexers", l);
-                        ReplaceVariables(v, variables);
-                        std::vector<std::wstring> langs;
-                        stringtok(langs, v, true, L";");
                         int lex = _wtoi(ini[iniind].GetValue(l, L"Lexer", L""));
-                        for (auto x : langs)
+                        m_lexerSection[lex] = l;
+                    }
+                    for (auto l : m_lexerSection)
+                    {
+                        std::wstring v = ini[iniind].GetValue(L"lexers", l.second.c_str(), L"");
+                        int lex = _wtoi(ini[iniind].GetValue(l.second.c_str(), L"Lexer", L""));
+                        if (!v.empty())
                         {
-                            lexers[x] = lex;
+                            ReplaceVariables(v, variables);
+                            std::vector<std::wstring> langs;
+                            stringtok(langs, v, true, L";");
+                            for (auto x : langs)
+                            {
+                                lexers[x] = lex;
+                            }
                         }
 
                         // now parse all the data for this lexer
                         LexerData lexerdata = m_lexerdata[lex];
+                        LexerData userlexerdata;
                         lexerdata.ID = lex;
+                        userlexerdata.ID = lex;
                         CSimpleIni::TNamesDepend lexdatakeys;
-                        ini[iniind].GetAllKeys(l, lexdatakeys);
+                        ini[iniind].GetAllKeys(l.second.c_str(), lexdatakeys);
                         for (auto it : lexdatakeys)
                         {
                             if (_wcsnicmp(L"Style", it, 5) == 0)
                             {
                                 StyleData style;
-                                std::wstring v = ini[iniind].GetValue(l, it);
+                                std::wstring v = ini[iniind].GetValue(l.second.c_str(), it);
                                 ReplaceVariables(v, variables);
                                 std::vector<std::wstring> vec;
                                 stringtok(vec, v, false, L";");
@@ -149,13 +159,17 @@ void CLexStyles::Load()
                                 }
 
                                 lexerdata.Styles[_wtoi(it+5)] = style;
+                                userlexerdata.Styles[_wtoi(it+5)] = style;
                             }
                             if (_wcsnicmp(L"Prop_", it, 5) == 0)
                             {
-                                lexerdata.Properties[CUnicodeUtils::StdGetUTF8(it+5)] = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(l, it, L""));
+                                lexerdata.Properties[CUnicodeUtils::StdGetUTF8(it+5)] = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(l.second.c_str(), it, L""));
+                                userlexerdata.Properties[CUnicodeUtils::StdGetUTF8(it+5)] = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(l.second.c_str(), it, L""));
                             }
                         }
                         m_lexerdata[lexerdata.ID] = lexerdata;
+                        if (iniind == 1)
+                            m_userlexerdata[lexerdata.ID] = userlexerdata;
                     }
                 }
 
@@ -290,4 +304,101 @@ void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring,
         }
         pos = s.find(L"$(", pos);
     }
+}
+
+void CLexStyles::SetUserForeground( int ID, int style, COLORREF clr )
+{
+    LexerData ld = m_userlexerdata[ID];
+    StyleData sd = ld.Styles[style];
+    sd.ForegroundColor = clr;
+    ld.Styles[style] = sd;
+    m_userlexerdata[ID] = ld;
+}
+
+void CLexStyles::SetUserBackground( int ID, int style, COLORREF clr )
+{
+    LexerData ld = m_userlexerdata[ID];
+    StyleData sd = ld.Styles[style];
+    sd.BackgroundColor = clr;
+    ld.Styles[style] = sd;
+    m_userlexerdata[ID] = ld;
+}
+
+void CLexStyles::SetUserFont( int ID, int style, const std::wstring font )
+{
+    LexerData ld = m_userlexerdata[ID];
+    StyleData sd = ld.Styles[style];
+    sd.FontName = font;
+    ld.Styles[style] = sd;
+    m_userlexerdata[ID] = ld;
+}
+
+void CLexStyles::SetUserFontSize( int ID, int style, int size )
+{
+    LexerData ld = m_userlexerdata[ID];
+    StyleData sd = ld.Styles[style];
+    sd.FontSize = size;
+    ld.Styles[style] = sd;
+    m_userlexerdata[ID] = ld;
+}
+
+void CLexStyles::SetUserFontStyle( int ID, int style, FontStyle fontstyle )
+{
+    LexerData ld = m_userlexerdata[ID];
+    StyleData sd = ld.Styles[style];
+    sd.FontStyle = fontstyle;
+    ld.Styles[style] = sd;
+    m_userlexerdata[ID] = ld;
+}
+
+void CLexStyles::ResetUserData()
+{
+    m_userlexerdata.clear();
+    m_extLang.clear();
+    m_Langdata.clear();
+    m_lexerdata.clear();
+    Load();
+}
+
+void CLexStyles::SaveUserData()
+{
+    CSimpleIni ini;
+    std::wstring userStyleFile = CAppUtils::GetDataPath() + L"\\userconfig";
+
+    if (PathFileExists(userStyleFile.c_str()))
+    {
+        ini.LoadFile(userStyleFile.c_str());
+    }
+
+    for (const auto& it:m_userlexerdata)
+    {
+        if (it.first == 0)
+            continue;
+        // find the lexer section name
+        std::wstring section = m_lexerSection[it.first];
+        std::wstring v = CStringUtils::Format(L"%d", it.first);
+        ini.SetValue(section.c_str(), L"Lexer", v.c_str());
+        for (const auto& s:it.second.Styles)
+        {
+            std::wstring style = CStringUtils::Format(L"Style%d", s.first);
+            std::wstring sSize = CStringUtils::Format(L"%d", s.second.FontSize);
+            if (s.second.FontSize == 0)
+                sSize.clear();
+            std::wstring name = s.second.Name;
+            if (name.empty())
+                name = m_lexerdata[it.first].Styles[s.first].Name;
+            int fore = GetRValue(s.second.ForegroundColor)<<16 | GetGValue(s.second.ForegroundColor)<<8 | GetBValue(s.second.ForegroundColor);
+            int back = GetRValue(s.second.BackgroundColor)<<16 | GetGValue(s.second.BackgroundColor)<<8 | GetBValue(s.second.BackgroundColor);
+            // styleNR=name;foreground;background;fontname;fontstyle;fontsize
+            v = CStringUtils::Format(L"%s;%06X;%06X;%s;%d;%s", name.c_str(), fore, back, s.second.FontName.c_str(), s.second.FontStyle, sSize.c_str());
+            ini.SetValue(section.c_str(), style.c_str(), v.c_str());
+        }
+    }
+
+    FILE * pFile = NULL;
+    _tfopen_s(&pFile, userStyleFile.c_str(), _T("wb"));
+    ini.SaveFile(pFile);
+    fclose(pFile);
+
+    ResetUserData();
 }
