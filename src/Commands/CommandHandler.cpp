@@ -29,6 +29,7 @@
 #include "CmdPrevNext.h"
 #include "CmdFindReplace.h"
 #include "CmdMisc.h"
+#include "CmdStyleConfigurator.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -93,6 +94,8 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdConvertEncoding(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdCodeStyle(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdStyleConfigurator(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdEOLWin(obj);

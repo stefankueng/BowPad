@@ -216,6 +216,7 @@
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
     <ClInclude Include="AppUtils.h" />
+    <ClInclude Include="ColorButton.h" />
     <ClInclude Include="Commands\CmdClipboard.h" />
     <ClInclude Include="Commands\CmdCodeStyle.h" />
     <ClInclude Include="Commands\CmdEOL.h" />
@@ -226,6 +227,7 @@
     <ClInclude Include="Commands\CmdMisc.h" />
     <ClInclude Include="Commands\CmdMRU.h" />
     <ClInclude Include="Commands\CmdPrevNext.h" />
+    <ClInclude Include="Commands\CmdStyleConfigurator.h" />
     <ClInclude Include="Commands\CmdUndo.h" />
     <ClInclude Include="Commands\CmdWhiteSpace.h" />
     <ClInclude Include="Commands\CommandHandler.h" />
@@ -264,11 +266,13 @@
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
     <ClCompile Include="AppUtils.cpp" />
     <ClCompile Include="BowPad.cpp" />
+    <ClCompile Include="ColorButton.cpp" />
     <ClCompile Include="Commands\CmdCodeStyle.cpp" />
     <ClCompile Include="Commands\CmdFiles.cpp" />
     <ClCompile Include="Commands\CmdFindReplace.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
     <ClCompile Include="Commands\CmdPrevNext.cpp" />
+    <ClCompile Include="Commands\CmdStyleConfigurator.cpp" />
     <ClCompile Include="Commands\CommandHandler.cpp" />
     <ClCompile Include="Commands\ICommand.cpp" />
     <ClCompile Include="DocScroll.cpp" />
