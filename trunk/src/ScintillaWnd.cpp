@@ -299,20 +299,14 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
         Call(SCI_STYLESETBACK, it.first, it.second.BackgroundColor);
         if (!it.second.FontName.empty())
             Call(SCI_STYLESETFONT, it.first, (LPARAM)it.second.FontName.c_str());
-        switch (it.second.FontStyle)
-        {
-        case FONTSTYLE_NORMAL:
-            break;  // do nothing
-        case FONTSTYLE_BOLD:
+
+        if (it.second.FontStyle & FONTSTYLE_BOLD)
             Call(SCI_STYLESETBOLD, it.first, 1);
-            break;
-        case FONTSTYLE_ITALIC:
+        if (it.second.FontStyle & FONTSTYLE_ITALIC)
             Call(SCI_STYLESETITALIC, it.first, 1);
-            break;
-        case FONTSTYLE_UNDERLINED:
+        if (it.second.FontStyle & FONTSTYLE_UNDERLINED)
             Call(SCI_STYLESETUNDERLINE, it.first, 1);
-            break;
-        }
+
         if (it.second.FontSize)
             Call(SCI_STYLESETSIZE, it.first, it.second.FontSize);
     }

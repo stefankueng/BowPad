@@ -228,6 +228,14 @@
         <Image>res/SelectAllS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdStyleConfigurator" LabelTitle="Configure Styles" TooltipTitle="Configure Styles" TooltipDescription="Configure colors, fonts, styles and sizes">
+      <Command.LargeImages>
+        <Image>res/StyleConfigL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/StyleConfigS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
 
     <Command Name="cmdContextMap" />
   </Application.Commands>
@@ -294,7 +302,7 @@
             <ToggleButton CommandName="cmdLineWrap" />
             <ToggleButton CommandName="cmdWhiteSpace" />
           </Group>
-          <Group CommandName="cmdGroupEncoding" SizeDefinition="FourButtons">
+          <Group CommandName="cmdGroupEncoding" SizeDefinition="FiveButtons">
             <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout />
@@ -317,6 +325,7 @@
                 <ToggleButton CommandName="cmdEOLMac"/>
               </MenuGroup>
             </DropDownButton>
+            <Button CommandName="cmdStyleConfigurator" />
           </Group>
         </Tab>
       </Ribbon.Tabs>
