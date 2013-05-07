@@ -62,6 +62,8 @@ protected:
     bool                SaveCurrentTab(bool bSaveAs = false);
     HRESULT             InvalidateUICommand(UI_INVALIDATIONS flags, const PROPERTYKEY *key);
     HRESULT             InvalidateUICommand(UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY *key);
+    HRESULT             SetUICommandProperty(UINT32 commandId, REFPROPERTYKEY key, PROPVARIANT value);
+    HRESULT             SetUICommandProperty(REFPROPERTYKEY key, PROPVARIANT value);
 
 protected:
     void *              m_Obj;

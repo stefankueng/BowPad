@@ -108,6 +108,16 @@ HRESULT ICommand::InvalidateUICommand( UINT32 cmdId, UI_INVALIDATIONS flags, con
     return g_pFramework->InvalidateUICommand(cmdId, flags, key);
 }
 
+HRESULT ICommand::SetUICommandProperty( UINT32 commandId, REFPROPERTYKEY key, PROPVARIANT value )
+{
+    return g_pFramework->SetUICommandProperty(commandId, key, value);
+}
+
+HRESULT ICommand::SetUICommandProperty( REFPROPERTYKEY key, PROPVARIANT value )
+{
+    return g_pFramework->SetUICommandProperty(GetCmdId(), key, value);
+}
+
 bool ICommand::SaveCurrentTab(bool bSaveAs /* = false */)
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
@@ -167,4 +177,5 @@ void ICommand::Center( long startPos, long endPos )
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     pMainWnd->m_scintilla.Center(startPos, endPos);
 }
+
 
