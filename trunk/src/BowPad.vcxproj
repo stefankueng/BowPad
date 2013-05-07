@@ -229,6 +229,7 @@
     <ClInclude Include="Commands\CmdPrevNext.h" />
     <ClInclude Include="Commands\CmdStyleConfigurator.h" />
     <ClInclude Include="Commands\CmdUndo.h" />
+    <ClInclude Include="Commands\CmdVerticalEdge.h" />
     <ClInclude Include="Commands\CmdWhiteSpace.h" />
     <ClInclude Include="Commands\CommandHandler.h" />
     <ClInclude Include="Commands\ICommand.h" />
