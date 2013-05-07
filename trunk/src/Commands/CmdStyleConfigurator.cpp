@@ -154,13 +154,22 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                 auto languages = CLexStyles::Instance().GetLanguages();
                 if ((index > 0) && (index <= languages.size()))
                 {
-                    auto lexData = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(languages[index-1]));
+                    std::wstring currentLang = languages[index-1];
+                    auto lexData = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(currentLang));
                     SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_RESETCONTENT, 0, 0);
                     for (auto style:lexData.Styles)
                     {
                         index = (int)SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_ADDSTRING, 0, (LPARAM)style.second.Name.c_str());
                         SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_SETITEMDATA, index, style.first);
                     }
+                    std::wstring exts = CLexStyles::Instance().GetUserExtensionsForLanguage(currentLang);
+                    SetDlgItemText(*this, IDC_EXTENSIONS, exts.c_str());
+                    DialogEnableWindow(IDC_EXTENSIONS, true);
+                }
+                else
+                {
+                    SetDlgItemText(*this, IDC_EXTENSIONS, L"");
+                    DialogEnableWindow(IDC_EXTENSIONS, false);
                 }
             }
         }
@@ -204,6 +213,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
     case IDC_BOLDCHECK:
     case IDC_ITALICCHECK:
     case IDC_UNDERLINECHECK:
+    case IDC_EXTENSIONS:
         {
             int index = (int)SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_GETCURSEL, 0, 0);
             auto languages = CLexStyles::Instance().GetLanguages();
@@ -298,9 +308,16 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         }
                     }
                     break;
-
+                case IDC_EXTENSIONS:
+                    {
+                        if (msg == EN_KILLFOCUS)
+                        {
+                            auto extText = GetDlgItemText(IDC_EXTENSIONS);
+                            CLexStyles::Instance().SetUserExt(extText.get(), currentLang);
+                        }
+                    }
+                    break;
                 }
-
             }
         }
         break;

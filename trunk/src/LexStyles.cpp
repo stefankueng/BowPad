@@ -186,6 +186,8 @@ void CLexStyles::Load()
                         for (auto e : exts)
                         {
                             m_extLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
+                            if (iniind==1)
+                                m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
                         }
 
                         std::wstring langsect = L"lang_";
@@ -277,6 +279,22 @@ std::wstring CLexStyles::GetLanguageForExt( const std::wstring& ext ) const
     return L"";
 }
 
+std::wstring CLexStyles::GetUserExtensionsForLanguage( const std::wstring& lang ) const
+{
+    std::wstring exts;
+    std::string l = CUnicodeUtils::StdGetUTF8(lang);
+    for (const auto& e:m_userextLang)
+    {
+        if (e.second.compare(l) == 0)
+        {
+            if (!exts.empty())
+                exts += L";";
+            exts += CUnicodeUtils::StdGetUnicode(e.first);
+        }
+    }
+    return exts;
+}
+
 std::vector<std::wstring> CLexStyles::GetLanguages() const
 {
     std::vector<std::wstring> langs;
@@ -354,6 +372,7 @@ void CLexStyles::SetUserFontStyle( int ID, int style, FontStyle fontstyle )
 void CLexStyles::ResetUserData()
 {
     m_userlexerdata.clear();
+    m_userextLang.clear();
     m_extLang.clear();
     m_Langdata.clear();
     m_lexerdata.clear();
@@ -394,6 +413,14 @@ void CLexStyles::SaveUserData()
             ini.SetValue(section.c_str(), style.c_str(), v.c_str());
         }
     }
+    for (const auto& it:m_userextLang)
+    {
+        std::wstring v = ini.GetValue(L"language", CUnicodeUtils::StdGetUnicode(it.second).c_str(), L"");
+        if (!v.empty())
+            v += L";";
+        v += CUnicodeUtils::StdGetUnicode(it.first);
+        ini.SetValue(L"language", CUnicodeUtils::StdGetUnicode(it.second).c_str(), v.c_str());
+    }
 
     FILE * pFile = NULL;
     _tfopen_s(&pFile, userStyleFile.c_str(), _T("wb"));
@@ -402,3 +429,14 @@ void CLexStyles::SaveUserData()
 
     ResetUserData();
 }
+
+void CLexStyles::SetUserExt( const std::wstring& ext, const std::wstring& lang )
+{
+    std::vector<std::wstring> exts;
+    stringtok(exts, ext, true, L";");
+    for (auto e : exts)
+    {
+        m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(lang);
+    }
+}
+
