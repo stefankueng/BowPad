@@ -68,6 +68,8 @@ public:
 
     virtual void ScintillaNotify( Scintilla::SCNotification * pScn );
 
+    virtual void TabNotify( TBHDR * ptbhdr );
+
 private:
     CStyleConfiguratorDlg *           m_pStyleConfiguratorDlg;
 };

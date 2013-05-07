@@ -26,6 +26,7 @@ static std::string sFindString;
 static int         nSearchFlags;
 
 #define WM_CURRENTSTYLECHANGED (WM_APP + 1)
+#define WM_CURRENTDOCCHANGED   (WM_APP + 2)
 
 int CALLBACK CStyleConfiguratorDlg::EnumFontFamExProc(const LOGFONT *lpelfe, const TEXTMETRIC * /*lpntme*/, DWORD /*FontType*/, LPARAM lParam)
 {
@@ -60,7 +61,6 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
     case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
-            SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_ADDSTRING, 0, (LPARAM)L"Global");
             auto languages = CLexStyles::Instance().GetLanguages();
             for (auto l:languages)
                 SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_ADDSTRING, 0, (LPARAM)l.c_str());
@@ -108,9 +108,9 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
         {
             int index = (int)SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_GETCURSEL, 0, 0);
             auto languages = CLexStyles::Instance().GetLanguages();
-            if ((index > 0) && (index <= languages.size()))
+            if ((index >= 0) && (index < languages.size()))
             {
-                std::wstring currentLang = languages[index-1];
+                std::wstring currentLang = languages[index];
                 CDocument doc = GetDocument(GetCurrentTabIndex());
                 if (doc.m_language.compare(currentLang) == 0)
                 {
@@ -118,6 +118,17 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
                     DoCommand(IDC_STYLECOMBO, CBN_SELCHANGE);
                 }
             }
+        }
+        break;
+    case WM_CURRENTDOCCHANGED:
+        {
+            CDocument doc = GetDocument(GetCurrentTabIndex());
+            SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_SELECTSTRING, (WPARAM)-1, (LPARAM)doc.m_language.c_str());
+            DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
+
+            int style = (int)ScintillaCall(SCI_GETSTYLEAT, ScintillaCall(SCI_GETCURRENTPOS));
+            SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_SETCURSEL, style, 0);
+            DoCommand(IDC_STYLECOMBO, CBN_SELCHANGE);
         }
         break;
     default:
@@ -152,9 +163,9 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
             {
                 int index = (int)SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_GETCURSEL, 0, 0);
                 auto languages = CLexStyles::Instance().GetLanguages();
-                if ((index > 0) && (index <= languages.size()))
+                if ((index >= 0) && (index < languages.size()))
                 {
-                    std::wstring currentLang = languages[index-1];
+                    std::wstring currentLang = languages[index];
                     auto lexData = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(currentLang));
                     SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_RESETCONTENT, 0, 0);
                     for (auto style:lexData.Styles)
@@ -180,9 +191,9 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
             {
                 int index = (int)SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_GETCURSEL, 0, 0);
                 auto languages = CLexStyles::Instance().GetLanguages();
-                if ((index > 0) && (index <= languages.size()))
+                if ((index >= 0) && (index < languages.size()))
                 {
-                    auto lexData = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(languages[index-1]));
+                    auto lexData = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(languages[index]));
                     index = (int)SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_GETCURSEL, 0, 0);
                     int styleIndex = (int)SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_GETITEMDATA, index, 0);
 
@@ -217,9 +228,9 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
         {
             int index = (int)SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_GETCURSEL, 0, 0);
             auto languages = CLexStyles::Instance().GetLanguages();
-            if ((index > 0) && (index <= languages.size()))
+            if ((index >= 0) && (index < languages.size()))
             {
-                std::wstring currentLang = languages[index-1];
+                std::wstring currentLang = languages[index];
                 auto lexData = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(currentLang));
                 index = (int)SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_GETCURSEL, 0, 0);
                 int styleIndex = (int)SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_GETITEMDATA, index, 0);
@@ -352,6 +363,14 @@ void CCmdStyleConfigurator::ScintillaNotify( Scintilla::SCNotification * pScn )
                 }
             }
         }
+    }
+}
+
+void CCmdStyleConfigurator::TabNotify( TBHDR * ptbhdr )
+{
+    if ((m_pStyleConfiguratorDlg) && (ptbhdr->hdr.code == TCN_SELCHANGE))
+    {
+        SendMessage(*m_pStyleConfiguratorDlg, WM_CURRENTDOCCHANGED, 0, 0);
     }
 }
 
