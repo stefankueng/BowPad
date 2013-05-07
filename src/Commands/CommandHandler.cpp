@@ -30,6 +30,7 @@
 #include "CmdFindReplace.h"
 #include "CmdMisc.h"
 #include "CmdStyleConfigurator.h"
+#include "CmdVerticalEdge.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -121,6 +122,9 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdFindSelectedNext(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdFindSelectedPrev(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
+    pCmd = new CCmdVerticalEdge(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 }
 

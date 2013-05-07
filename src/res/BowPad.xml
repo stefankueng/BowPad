@@ -24,6 +24,9 @@
     <Command Name="cmdMainTab" Symbol="IDC_CMD_MAINTAB">
       <Command.LabelTitle>Main</Command.LabelTitle>
     </Command>
+    <Command Name="cmdViewTab" Symbol="IDC_CMD_VIEWTAB">
+      <Command.LabelTitle>View</Command.LabelTitle>
+    </Command>
     <Command Name="cmdGroupFile" LabelTitle="File">
       <!-- This image is used for when the group shrinks into a "pop-up".  The other groups
       in the markup don't display as pop-ups, so we don't specify an image for them.  -->
@@ -44,6 +47,11 @@
     <Command Name="cmdGroupView" LabelTitle="View">
       <Command.LargeImages>
         <Image>res/LineWrapL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupVEdge" LabelTitle="Vertical Edge">
+      <Command.LargeImages>
+        <Image>res/VEdgeL.bmp</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdQat"/>
@@ -236,7 +244,16 @@
         <Image>res/StyleConfigS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdVerticalEdge" LabelTitle="Edge Column" TooltipTitle="Egde Column" TooltipDescription="Sets the column at which the vertical edge is shown. Set to 0 to hide it.">
+      <Command.LargeImages>
+        <Image>res/VEdgeL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/VEdgeS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
 
+    
     <Command Name="cmdContextMap" />
   </Application.Commands>
   <Application.Views>
@@ -326,6 +343,19 @@
               </MenuGroup>
             </DropDownButton>
             <Button CommandName="cmdStyleConfigurator" />
+          </Group>
+        </Tab>
+        <Tab CommandName="cmdViewTab">
+          <Tab.ScalingPolicy>
+            <ScalingPolicy>
+              <ScalingPolicy.IdealSizes>
+                <!--<Scale Group="cmdGroupVEdge" Size="Large" />-->
+              </ScalingPolicy.IdealSizes>
+              <!--<Scale Group="cmdGroupVEdge" Size="Medium" />-->
+            </ScalingPolicy>
+          </Tab.ScalingPolicy>
+          <Group CommandName="cmdGroupVEdge">
+            <Spinner CommandName="cmdVerticalEdge" />
           </Group>
         </Tab>
       </Ribbon.Tabs>
