@@ -71,6 +71,7 @@ public:
 
     std::vector<std::wstring>           GetLanguages() const;
     std::wstring                        GetLanguageForExt(const std::wstring& ext) const;
+    std::wstring                        GetUserExtensionsForLanguage(const std::wstring& lang) const;
 
     const std::map<int, std::string>&   GetKeywordsForExt(const std::string& ext) const;
     const std::map<int, std::string>&   GetKeywordsForLang(const std::string& lang) const;
@@ -83,6 +84,7 @@ public:
     void                                SetUserFont(int ID, int style, const std::wstring font);
     void                                SetUserFontSize(int ID, int style, int size);
     void                                SetUserFontStyle(int ID, int style, FontStyle fontstyle);
+    void                                SetUserExt(const std::wstring& ext, const std::wstring& lang);
     void                                ResetUserData();
     void                                SaveUserData();
 private:
@@ -100,4 +102,5 @@ private:
     std::map<int, std::wstring>         m_lexerSection;
 
     std::map<int, LexerData>            m_userlexerdata;
+    std::map<std::string, std::string>  m_userextLang;
 };
