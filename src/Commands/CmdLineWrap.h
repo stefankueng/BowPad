@@ -25,6 +25,9 @@ public:
 
     CCmdLineWrap(void * obj) : ICommand(obj)
     {
+        int wrapmode = (int)CIniSettings::Instance().GetInt64(L"View", L"wrapmode", 0);
+        ScintillaCall(SCI_SETWRAPMODE, wrapmode);
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
     ~CCmdLineWrap(void)
@@ -34,6 +37,7 @@ public:
     virtual bool Execute()
     {
         ScintillaCall(SCI_SETWRAPMODE, ScintillaCall(SCI_GETWRAPMODE) ? 0 : SC_WRAP_WORD);
+        CIniSettings::Instance().SetInt64(L"View", L"wrapmode", ScintillaCall(SCI_GETWRAPMODE));
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         return true;
     }
