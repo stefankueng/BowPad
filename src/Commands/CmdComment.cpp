@@ -112,14 +112,12 @@ bool CCmdUnComment::Execute()
     size_t selEnd           = 0;
     size_t lineStartStart   = 0;
     size_t lineEndEnd       = 0;
-    bool bForceStream       = false;
 
     CDocument doc = GetDocument(GetCurrentTabIndex());
     std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
     std::string commentline = CLexStyles::Instance().GetCommentLineForLang(lang);
     std::string commentstreamstart = CLexStyles::Instance().GetCommentStreamStartForLang(lang);
     std::string commentstreamend = CLexStyles::Instance().GetCommentStreamEndForLang(lang);
-    bool commentlineatstart = CLexStyles::Instance().GetCommentLineAtStartForLang(lang);
 
     if (!bSelEmpty)
     {
