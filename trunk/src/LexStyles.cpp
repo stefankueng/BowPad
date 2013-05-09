@@ -359,7 +359,7 @@ void CLexStyles::SetUserBackground( int ID, int style, COLORREF clr )
     m_userlexerdata[ID] = ld;
 }
 
-void CLexStyles::SetUserFont( int ID, int style, const std::wstring font )
+void CLexStyles::SetUserFont( int ID, int style, const std::wstring& font )
 {
     LexerData ld = m_userlexerdata[ID];
     StyleData sd = ld.Styles[style];
