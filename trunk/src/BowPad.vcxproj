@@ -329,6 +329,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\BowPad.rc2" />
     <None Include="res\drag.cur" />
     <None Include="res\drag_interdit.cur" />
     <None Include="res\drag_out.cur" />

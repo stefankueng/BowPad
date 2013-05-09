@@ -358,5 +358,8 @@
     </None>
     <None Include="res\Properties.ini" />
     <None Include="res\Shortcuts.ini" />
+    <None Include="res\BowPad.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
