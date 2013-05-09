@@ -309,7 +309,6 @@
                 <Scale Group="cmdGroupFile" Size="Large" />
                 <Scale Group="cmdGroupClipboard" Size="Medium" />
                 <Scale Group="cmdGroupUndo" Size="Large" />
-                <Scale Group="cmdGroupView" Size="Large" />
                 <Scale Group="cmdGroupEncoding" Size="Medium" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
@@ -317,7 +316,6 @@
               <Scale Group="cmdGroupFile" Size="Medium" />
               <Scale Group="cmdGroupClipboard" Size="Small" />
               <Scale Group="cmdGroupUndo" Size="Medium" />
-              <!--<Scale Group="cmdGroupView" Size="Medium" />-->
               <Scale Group="cmdGroupEncoding" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
@@ -337,10 +335,6 @@
             <Button CommandName="cmdPrevious" />
             <Button CommandName="cmdNext" />
             <Button CommandName="cmdFindReplace" />
-          </Group>
-          <Group CommandName="cmdGroupView" SizeDefinition="TwoButtons">
-            <ToggleButton CommandName="cmdLineWrap" />
-            <ToggleButton CommandName="cmdWhiteSpace" />
           </Group>
           <Group CommandName="cmdGroupEncoding" SizeDefinition="FiveButtons">
             <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
@@ -373,12 +367,18 @@
             <ScalingPolicy>
               <ScalingPolicy.IdealSizes>
                 <!--<Scale Group="cmdGroupVEdge" Size="Large" />-->
+                <Scale Group="cmdGroupView" Size="Large" />
               </ScalingPolicy.IdealSizes>
               <!--<Scale Group="cmdGroupVEdge" Size="Medium" />-->
+              <!--<Scale Group="cmdGroupView" Size="Medium" />-->
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupVEdge">
             <Spinner CommandName="cmdVerticalEdge" />
+          </Group>
+          <Group CommandName="cmdGroupView" SizeDefinition="TwoButtons">
+            <ToggleButton CommandName="cmdLineWrap" />
+            <ToggleButton CommandName="cmdWhiteSpace" />
           </Group>
         </Tab>
         <Tab CommandName="cmdEditTab">
