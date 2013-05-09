@@ -27,6 +27,9 @@
     <Command Name="cmdViewTab" Symbol="IDC_CMD_VIEWTAB">
       <Command.LabelTitle>View</Command.LabelTitle>
     </Command>
+    <Command Name="cmdEditTab" Symbol="IDC_CMD_EDITTAB">
+      <Command.LabelTitle>Edit</Command.LabelTitle>
+    </Command>
     <Command Name="cmdGroupFile" LabelTitle="File">
       <!-- This image is used for when the group shrinks into a "pop-up".  The other groups
       in the markup don't display as pop-ups, so we don't specify an image for them.  -->
@@ -52,6 +55,11 @@
     <Command Name="cmdGroupVEdge" LabelTitle="Vertical Edge">
       <Command.LargeImages>
         <Image>res/VEdgeL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupComment" LabelTitle="Comment">
+      <Command.LargeImages>
+        <Image>res/CommentL.bmp</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdQat"/>
@@ -252,8 +260,23 @@
         <Image>res/VEdgeS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdComment" LabelTitle="Comment" TooltipTitle="Comment" TooltipDescription="Comments the selected text">
+      <Command.LargeImages>
+        <Image>res/CommentL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/CommentS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdUnComment" LabelTitle="Uncomment" TooltipTitle="Uncomment" TooltipDescription="Uncomments the selected text">
+      <Command.LargeImages>
+        <Image>res/UnCommentL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/UnCommentS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
 
-    
     <Command Name="cmdContextMap" />
   </Application.Commands>
   <Application.Views>
@@ -356,6 +379,20 @@
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupVEdge">
             <Spinner CommandName="cmdVerticalEdge" />
+          </Group>
+        </Tab>
+        <Tab CommandName="cmdEditTab">
+          <Tab.ScalingPolicy>
+            <ScalingPolicy>
+              <ScalingPolicy.IdealSizes>
+                <Scale Group="cmdGroupComment" Size="Large" />
+              </ScalingPolicy.IdealSizes>
+              <Scale Group="cmdGroupComment" Size="Medium" />
+            </ScalingPolicy>
+          </Tab.ScalingPolicy>
+          <Group CommandName="cmdGroupComment" SizeDefinition="TwoButtons">
+            <Button CommandName="cmdComment" />
+            <Button CommandName="cmdUnComment" />
           </Group>
         </Tab>
       </Ribbon.Tabs>

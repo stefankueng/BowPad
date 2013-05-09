@@ -26,6 +26,7 @@
 
 LexerData emptyLexData;
 std::map<int, std::string> emptyIntStrVec;
+std::string emptyString;
 
 CLexStyles::CLexStyles(void)
     : m_bLoaded(false)
@@ -201,6 +202,22 @@ void CLexStyles::Load()
                             if (_wcsnicmp(L"keywords", sk, 8) == 0)
                             {
                                 ld.keywordlist[_wtol(sk+8)] = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(langsect.c_str(), sk));
+                            }
+                            if (_wcsicmp(L"CommentLine", sk) == 0)
+                            {
+                                ld.commentline = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(langsect.c_str(), sk));
+                            }
+                            if (_wcsicmp(L"CommentStreamStart", sk) == 0)
+                            {
+                                ld.commentstreamstart = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(langsect.c_str(), sk));
+                            }
+                            if (_wcsicmp(L"CommentStreamEnd", sk) == 0)
+                            {
+                                ld.commentstreamend = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(langsect.c_str(), sk));
+                            }
+                            if (_wcsicmp(L"CommentLineAtStart", sk) == 0)
+                            {
+                                ld.commentstreamend = _wtoi(ini[iniind].GetValue(langsect.c_str(), sk)) != 0;
                             }
                         }
                         m_Langdata[CUnicodeUtils::StdGetUTF8(k)] = ld;
@@ -438,5 +455,37 @@ void CLexStyles::SetUserExt( const std::wstring& ext, const std::wstring& lang )
     {
         m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(lang);
     }
+}
+
+const std::string& CLexStyles::GetCommentLineForLang( const std::string& lang ) const
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+        return lt->second.commentline;
+    return emptyString;
+}
+
+const std::string& CLexStyles::GetCommentStreamStartForLang( const std::string& lang ) const
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+        return lt->second.commentstreamstart;
+    return emptyString;
+}
+
+const std::string& CLexStyles::GetCommentStreamEndForLang( const std::string& lang ) const
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+        return lt->second.commentstreamend;
+    return emptyString;
+}
+
+bool CLexStyles::GetCommentLineAtStartForLang( const std::string& lang ) const
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+        return lt->second.commentlineatstart;
+    return false;
 }
 
