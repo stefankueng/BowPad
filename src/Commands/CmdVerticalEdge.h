@@ -82,7 +82,7 @@ public:
         return hr;
     }
 
-    virtual HRESULT IUICommandHandlerExecute( UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ ) 
+    virtual HRESULT IUICommandHandlerExecute( UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ )
     {
         ScintillaCall(SCI_SETEDGECOLUMN, ppropvarValue->intVal);
         ScintillaCall(SCI_SETEDGEMODE, ppropvarValue->intVal ? EDGE_LINE : EDGE_NONE);

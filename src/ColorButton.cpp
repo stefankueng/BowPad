@@ -61,8 +61,8 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
             GetClientRect(hwnd, &rc);
             SetBkColor(hdc, pColorButton->m_color);
             ExtTextOut(hdc, rc.left, rc.top, ETO_CLIPPED | ETO_OPAQUE, &rc, L"", 0, NULL);
-            EndPaint(hwnd, &ps); 
-            return 0L; 
+            EndPaint(hwnd, &ps);
+            return 0L;
         }
         break;
     case WM_ERASEBKGND:
@@ -85,7 +85,7 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
             cc.lpCustColors = (LPDWORD) acrCustClr;
             cc.Flags = CC_ANYCOLOR | CC_RGBINIT;
 
-            if (ChooseColor(&cc)==TRUE) 
+            if (ChooseColor(&cc)==TRUE)
             {
                 pColorButton->m_color = cc.rgbResult;
                 InvalidateRect(hwnd, NULL, FALSE);

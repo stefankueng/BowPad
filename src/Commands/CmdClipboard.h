@@ -69,7 +69,7 @@ protected:
             }
 
             int p = selStart;
-            do 
+            do
             {
                 int s = (int)ScintillaCall(SCI_GETSTYLEAT, p);
                 if (s != style)
