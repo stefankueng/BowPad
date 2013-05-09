@@ -31,6 +31,7 @@
 #include "CmdMisc.h"
 #include "CmdStyleConfigurator.h"
 #include "CmdVerticalEdge.h"
+#include "CmdComment.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -125,6 +126,11 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdVerticalEdge(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
+    pCmd = new CCmdComment(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdUnComment(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 }
 

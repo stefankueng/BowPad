@@ -183,6 +183,9 @@
     <ClInclude Include="Commands\CmdVerticalEdge.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdComment.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -295,6 +298,9 @@
     </ClCompile>
     <ClCompile Include="ColorButton.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdComment.cpp">
+      <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

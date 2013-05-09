@@ -23,8 +23,17 @@
 class LanguageData
 {
 public:
+    LanguageData()
+        : commentlineatstart(false)
+    {
+    }
+
     int                         lexer;
     std::map<int, std::string>  keywordlist;
+    std::string                 commentline;
+    bool                        commentlineatstart;
+    std::string                 commentstreamstart;
+    std::string                 commentstreamend;
 };
 
 enum FontStyle
@@ -75,6 +84,10 @@ public:
 
     const std::map<int, std::string>&   GetKeywordsForExt(const std::string& ext) const;
     const std::map<int, std::string>&   GetKeywordsForLang(const std::string& lang) const;
+    const std::string&                  GetCommentLineForLang(const std::string& lang) const;
+    const std::string&                  GetCommentStreamStartForLang(const std::string& lang) const;
+    const std::string&                  GetCommentStreamEndForLang(const std::string& lang) const;
+    bool                                GetCommentLineAtStartForLang(const std::string& lang) const;
 
     const LexerData&                    GetLexerDataForExt(const std::string& ext) const;
     const LexerData&                    GetLexerDataForLang(const std::string& lang) const;
