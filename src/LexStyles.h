@@ -94,7 +94,7 @@ public:
 
     void                                SetUserForeground(int ID, int style, COLORREF clr);
     void                                SetUserBackground(int ID, int style, COLORREF clr);
-    void                                SetUserFont(int ID, int style, const std::wstring font);
+    void                                SetUserFont(int ID, int style, const std::wstring& font);
     void                                SetUserFontSize(int ID, int style, int size);
     void                                SetUserFontStyle(int ID, int style, FontStyle fontstyle);
     void                                SetUserExt(const std::wstring& ext, const std::wstring& lang);
