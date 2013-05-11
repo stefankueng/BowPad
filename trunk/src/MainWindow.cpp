@@ -428,8 +428,64 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         UpdateStatusBar(false);
                     }
                     break;
-                }
+                case SCN_CHARADDED:
+                    {
+                        int eolMode = int(m_scintilla.Call(SCI_GETEOLMODE));
+                        size_t curLine = m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS));
+                        size_t lastLine = curLine - 1;
+                        int indentAmount = 0;
 
+                        if (((eolMode == SC_EOL_CRLF || eolMode == SC_EOL_LF) && pScn->ch == '\n') ||
+                            (eolMode == SC_EOL_CR && pScn->ch == '\r'))
+                        {
+                            // use the same indentation as the last line
+                            while (lastLine >= 0 && (m_scintilla.Call(SCI_GETLINEENDPOSITION, lastLine) - m_scintilla.Call(SCI_POSITIONFROMLINE, lastLine)) == 0)
+                                lastLine--;
+
+                            if (lastLine >= 0)
+                                indentAmount = (int)m_scintilla.Call(SCI_GETLINEINDENTATION, lastLine);
+
+                            if (indentAmount > 0)
+                            {
+                                Scintilla::CharacterRange crange;
+                                crange.cpMin = long(m_scintilla.Call(SCI_GETSELECTIONSTART));
+                                crange.cpMax = long(m_scintilla.Call(SCI_GETSELECTIONEND));
+                                int posBefore = (int)m_scintilla.Call(SCI_GETLINEINDENTPOSITION, curLine);
+                                m_scintilla.Call(SCI_SETLINEINDENTATION, curLine, indentAmount);
+                                int posAfter = (int)m_scintilla.Call(SCI_GETLINEINDENTPOSITION, curLine);
+                                int posDifference = posAfter - posBefore;
+                                if (posAfter > posBefore)
+                                {
+                                    // Move selection on
+                                    if (crange.cpMin >= posBefore)
+                                        crange.cpMin += posDifference;
+                                    if (crange.cpMax >= posBefore)
+                                        crange.cpMax += posDifference;
+                                }
+                                else if (posAfter < posBefore)
+                                {
+                                    // Move selection back
+                                    if (crange.cpMin >= posAfter)
+                                    {
+                                        if (crange.cpMin >= posBefore)
+                                            crange.cpMin += posDifference;
+                                        else
+                                            crange.cpMin = posAfter;
+                                    }
+                                    if (crange.cpMax >= posAfter)
+                                    {
+                                        if (crange.cpMax >= posBefore)
+                                            crange.cpMax += posDifference;
+                                        else
+                                            crange.cpMax = posAfter;
+                                    }
+                                }
+                                m_scintilla.Call(SCI_SETSEL, crange.cpMin, crange.cpMax);
+                            }
+                        }
+                    }
+                    break;
+                }
             }
         }
         break;
