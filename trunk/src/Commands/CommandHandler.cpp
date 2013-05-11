@@ -92,6 +92,10 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdWhiteSpace(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdUseTabs(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdTabSize(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdLoadAsEncoded(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdConvertEncoding(obj);
