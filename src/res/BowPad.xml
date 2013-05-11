@@ -288,6 +288,13 @@
         <Image>res/LowerCaseS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdTabSize" LabelTitle="tab size" TooltipTitle="tab size" TooltipDescription="Set the number of columns for one tabulator.">
+    </Command>
+    <Command Name="cmdUseTabs" LabelTitle="Use Tabs" TooltipTitle="Use Tabs" TooltipDescription="Determines whether a tab is inserted or spaces when the tab key is pressed.">
+      <Command.SmallImages>
+        <Image>res/LowerCaseS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
 
     <Command Name="cmdContextMap" />
   </Application.Commands>
@@ -388,9 +395,54 @@
           <Group CommandName="cmdGroupVEdge">
             <Spinner CommandName="cmdVerticalEdge" />
           </Group>
-          <Group CommandName="cmdGroupView" SizeDefinition="TwoButtons">
+          <Group CommandName="cmdGroupView">
+            <SizeDefinition>
+              <ControlNameMap>
+                <ControlNameDefinition Name="button1"/>
+                <ControlNameDefinition Name="button2"/>
+                <ControlNameDefinition Name="button3"/>
+                <ControlNameDefinition Name="button4"/>
+              </ControlNameMap>
+              <GroupSizeDefinition Size="Large">
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Large" IsLabelVisible="true" />
+                  <ControlSizeDefinition ControlName="button2" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
+                <ColumnBreak ShowSeparator="true"/>
+                <Row>
+                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
+                  </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+              </GroupSizeDefinition>
+              <GroupSizeDefinition Size="Medium">
+                <Row>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="true" />
+                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+              </GroupSizeDefinition>
+              <GroupSizeDefinition Size="Small">
+                <Row>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="true" />
+                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="false" IsImageVisible="false" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="false" />
+                </Row>
+              </GroupSizeDefinition>
+            </SizeDefinition>
             <ToggleButton CommandName="cmdLineWrap" />
             <ToggleButton CommandName="cmdWhiteSpace" />
+            <Spinner CommandName="cmdTabSize" />
+            <ToggleButton CommandName="cmdUseTabs" />
           </Group>
         </Tab>
         <Tab CommandName="cmdEditTab">
