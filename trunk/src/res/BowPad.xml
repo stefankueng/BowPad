@@ -205,7 +205,8 @@
         <Image>res/crS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdPrevNext" />  <!-- dummy command, does nothing -->
+    <Command Name="cmdPrevNext" />
+    <!-- dummy command, does nothing -->
     <Command Name="cmdPrevious" LabelTitle="Previous" TooltipTitle="Previous" TooltipDescription="go to the previous cursor position">
       <Command.LargeImages>
         <Image>res/PrevL.bmp</Image>
@@ -274,6 +275,17 @@
       </Command.LargeImages>
       <Command.SmallImages>
         <Image>res/UnCommentS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdGroupCase" LabelTitle="UPPER/lower"/>
+    <Command Name="cmdUppercase" LabelTitle="Uppercase" TooltipTitle="Uppercase" TooltipDescription="Converts the selection to UPPERcase">
+      <Command.SmallImages>
+        <Image>res/UpperCaseS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLowercase" LabelTitle="Lowercase" TooltipTitle="Lowercase" TooltipDescription="Converts the selection to lowercase">
+      <Command.SmallImages>
+        <Image>res/LowerCaseS.bmp</Image>
       </Command.SmallImages>
     </Command>
 
@@ -386,13 +398,19 @@
             <ScalingPolicy>
               <ScalingPolicy.IdealSizes>
                 <Scale Group="cmdGroupComment" Size="Large" />
+                <Scale Group="cmdGroupCase" Size="Medium" />
               </ScalingPolicy.IdealSizes>
               <Scale Group="cmdGroupComment" Size="Medium" />
+              <!--<Scale Group="cmdGroupCase" Size="Small" />-->
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupComment" SizeDefinition="TwoButtons">
             <Button CommandName="cmdComment" />
             <Button CommandName="cmdUnComment" />
+          </Group>
+          <Group CommandName="cmdGroupCase" SizeDefinition="TwoButtons">
+            <Button CommandName="cmdUppercase" />
+            <Button CommandName="cmdLowercase" />
           </Group>
         </Tab>
       </Ribbon.Tabs>

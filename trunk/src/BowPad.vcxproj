@@ -220,6 +220,7 @@
     <ClInclude Include="Commands\CmdClipboard.h" />
     <ClInclude Include="Commands\CmdCodeStyle.h" />
     <ClInclude Include="Commands\CmdComment.h" />
+    <ClInclude Include="Commands\CmdConvertCase.h" />
     <ClInclude Include="Commands\CmdEOL.h" />
     <ClInclude Include="Commands\CmdFiles.h" />
     <ClInclude Include="Commands\CmdFindReplace.h" />
@@ -271,6 +272,7 @@
     <ClCompile Include="ColorButton.cpp" />
     <ClCompile Include="Commands\CmdCodeStyle.cpp" />
     <ClCompile Include="Commands\CmdComment.cpp" />
+    <ClCompile Include="Commands\CmdConvertCase.cpp" />
     <ClCompile Include="Commands\CmdFiles.cpp" />
     <ClCompile Include="Commands\CmdFindReplace.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
