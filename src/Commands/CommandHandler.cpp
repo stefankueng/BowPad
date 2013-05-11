@@ -32,6 +32,7 @@
 #include "CmdStyleConfigurator.h"
 #include "CmdVerticalEdge.h"
 #include "CmdComment.h"
+#include "CmdConvertCase.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -131,6 +132,10 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdComment(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdUnComment(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdConvertUppercase(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdConvertLowercase(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 }
 
