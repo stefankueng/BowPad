@@ -296,6 +296,49 @@
       </Command.SmallImages>
     </Command>
 
+    <Command Name="cmdGroupLines" LabelTitle="Lines"/>
+    <Command Name="cmdLineDuplicate" LabelTitle="Duplicate Line" TooltipTitle="Duplicate Line" TooltipDescription="Duplicates the current line">
+      <Command.LargeImages>
+        <Image>res/LineDupL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/LineDupS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLineSplit" LabelTitle="Split Lines" TooltipTitle="Split Lines" TooltipDescription="Split long lines at the right window border">
+      <Command.LargeImages>
+        <Image>res/LineSplitL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/LineSplitS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLineJoin" LabelTitle="Join Lines" TooltipTitle="Join Lines" TooltipDescription="Join selected lines to one long line">
+      <Command.LargeImages>
+        <Image>res/LineJoinL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/LineJoinS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLineUp" LabelTitle="Move up" TooltipTitle="Move line up" TooltipDescription="Moves the selected lines upwards">
+      <Command.LargeImages>
+        <Image>res/LineUpL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/LineUpS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLineDown" LabelTitle="Move down" TooltipTitle="Move line down" TooltipDescription="Moves the selected lines downwards">
+      <Command.LargeImages>
+        <Image>res/LineDownL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/LineDownS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+
+
     <Command Name="cmdContextMap" />
   </Application.Commands>
   <Application.Views>
@@ -411,7 +454,7 @@
                 <ColumnBreak ShowSeparator="true"/>
                 <Row>
                   <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
-                  </Row>
+                </Row>
                 <Row>
                   <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
@@ -451,9 +494,11 @@
               <ScalingPolicy.IdealSizes>
                 <Scale Group="cmdGroupComment" Size="Large" />
                 <Scale Group="cmdGroupCase" Size="Medium" />
+                <Scale Group="cmdGroupLines" Size="Medium" />
               </ScalingPolicy.IdealSizes>
               <Scale Group="cmdGroupComment" Size="Medium" />
               <!--<Scale Group="cmdGroupCase" Size="Small" />-->
+              <Scale Group="cmdGroupLines" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupComment" SizeDefinition="TwoButtons">
@@ -463,6 +508,13 @@
           <Group CommandName="cmdGroupCase" SizeDefinition="TwoButtons">
             <Button CommandName="cmdUppercase" />
             <Button CommandName="cmdLowercase" />
+          </Group>
+          <Group CommandName="cmdGroupLines" SizeDefinition="FiveButtons">
+            <Button CommandName="cmdLineDuplicate" />
+            <Button CommandName="cmdLineSplit" />
+            <Button CommandName="cmdLineJoin" />
+            <Button CommandName="cmdLineUp" />
+            <Button CommandName="cmdLineDown" />
           </Group>
         </Tab>
       </Ribbon.Tabs>
