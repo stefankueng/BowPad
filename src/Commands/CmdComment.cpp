@@ -76,7 +76,7 @@ bool CCmdComment::Execute()
         size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
         size_t lineend   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
         // first find the leftmost indent of all lines
-        sptr_t indent = INT64_MAX;
+        sptr_t indent = INTPTR_MAX;
         for (size_t line = linestart; line <= lineend; ++line)
         {
             indent = min(ScintillaCall(SCI_GETLINEINDENTATION, line), indent);
