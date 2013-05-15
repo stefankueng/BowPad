@@ -20,7 +20,6 @@
 
 #include <Commctrl.h>
 
-
 static void FillSolidRect(HDC hDC, int left, int top, int right, int bottom, COLORREF clr)
 {
     ::SetBkColor(hDC, clr);
@@ -35,6 +34,7 @@ static void FillSolidRect(HDC hDC, int left, int top, int right, int bottom, COL
 
 CDocScroll::~CDocScroll()
 {
+    Gdiplus::GdiplusShutdown(m_gdiplusToken);
 }
 
 CDocScroll::CDocScroll()
@@ -42,6 +42,8 @@ CDocScroll::CDocScroll()
     , m_lines(0)
     , m_bDirty(false)
 {
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 }
 
 void CDocScroll::InitScintilla( CScintillaWnd * pScintilla )
@@ -89,42 +91,46 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
         {
         case HTSCROLL_LEFT:
             {
-                FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, scroll);
-                HGDIOBJ brush = CreateSolidBrush(thumb);
-                HGDIOBJ oldbrush = SelectObject(pCustDraw->hdc, brush);
-                HGDIOBJ oldpen = SelectObject(pCustDraw->hdc, GetStockObject(NULL_PEN));
-                POINT triangle[3];
-                triangle[0].x = pCustDraw->rect.left + margin;
-                triangle[0].y = pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)/2;
-                triangle[1].x = pCustDraw->rect.right - margin;
-                triangle[1].y = pCustDraw->rect.top + margin;
-                triangle[2].x = triangle[1].x;
-                triangle[2].y = pCustDraw->rect.bottom - margin;
-                Polygon(pCustDraw->hdc, triangle, 3);
-                //RoundRect(pCustDraw->hdc, pCustDraw->rect.left+2, pCustDraw->rect.top+2, pCustDraw->rect.right-2, pCustDraw->rect.bottom-2, 5, 5);
-                SelectObject(pCustDraw->hdc, oldpen);
-                SelectObject(pCustDraw->hdc, oldbrush);
-                DeleteObject(brush);
+                Gdiplus::Graphics graphics(pCustDraw->hdc);
+                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+                Gdiplus::Color c1;
+                c1.SetFromCOLORREF(scroll);
+                Gdiplus::SolidBrush brush(c1);
+                graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
+
+                Gdiplus::Point trianglepts[3];
+                trianglepts[0].X = pCustDraw->rect.left + margin;
+                trianglepts[0].Y = pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)/2;
+                trianglepts[1].X = pCustDraw->rect.right - margin;
+                trianglepts[1].Y = pCustDraw->rect.top + margin;
+                trianglepts[2].X = trianglepts[1].X;
+                trianglepts[2].Y = pCustDraw->rect.bottom - margin;
+                Gdiplus::Color c2;
+                c2.SetFromCOLORREF(thumb);
+                Gdiplus::SolidBrush tribrush(c2);
+                graphics.FillPolygon(&tribrush, trianglepts, 3);
             }
             break;
         case HTSCROLL_RIGHT:
             {
-                FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, scroll);
-                HGDIOBJ brush = CreateSolidBrush(thumb);
-                HGDIOBJ oldbrush = SelectObject(pCustDraw->hdc, brush);
-                HGDIOBJ oldpen = SelectObject(pCustDraw->hdc, GetStockObject(NULL_PEN));
-                POINT triangle[3];
-                triangle[0].x = pCustDraw->rect.right - margin;
-                triangle[0].y = pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)/2;
-                triangle[1].x = pCustDraw->rect.left + margin;
-                triangle[1].y = pCustDraw->rect.top + margin;
-                triangle[2].x = triangle[1].x;
-                triangle[2].y = pCustDraw->rect.bottom - margin;
-                Polygon(pCustDraw->hdc, triangle, 3);
-                //RoundRect(pCustDraw->hdc, pCustDraw->rect.left+2, pCustDraw->rect.top+2, pCustDraw->rect.right-2, pCustDraw->rect.bottom-2, 5, 5);
-                SelectObject(pCustDraw->hdc, oldpen);
-                SelectObject(pCustDraw->hdc, oldbrush);
-                DeleteObject(brush);
+                Gdiplus::Graphics graphics(pCustDraw->hdc);
+                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+                Gdiplus::Color c1;
+                c1.SetFromCOLORREF(scroll);
+                Gdiplus::SolidBrush brush(c1);
+                graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
+
+                Gdiplus::Point trianglepts[3];
+                trianglepts[0].X = pCustDraw->rect.right - margin;
+                trianglepts[0].Y = pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)/2;
+                trianglepts[1].X = pCustDraw->rect.left + margin;
+                trianglepts[1].Y = pCustDraw->rect.top + margin;
+                trianglepts[2].X = trianglepts[1].X;
+                trianglepts[2].Y = pCustDraw->rect.bottom - margin;
+                Gdiplus::Color c2;
+                c2.SetFromCOLORREF(thumb);
+                Gdiplus::SolidBrush tribrush(c2);
+                graphics.FillPolygon(&tribrush, trianglepts, 3);
             }
             break;
         case HTSCROLL_THUMB:
@@ -147,68 +153,96 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
         {
         case HTSCROLL_DOWN:
             {
-                FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, scroll);
-                HGDIOBJ brush = CreateSolidBrush(thumb);
-                HGDIOBJ oldbrush = SelectObject(pCustDraw->hdc, brush);
-                HGDIOBJ oldpen = SelectObject(pCustDraw->hdc, GetStockObject(NULL_PEN));
-                POINT triangle[3];
-                triangle[0].x = pCustDraw->rect.left + (pCustDraw->rect.right-pCustDraw->rect.left)/2;
-                triangle[0].y = pCustDraw->rect.bottom - margin;
-                triangle[1].x = pCustDraw->rect.left + margin;
-                triangle[1].y = pCustDraw->rect.top + margin;
-                triangle[2].x = pCustDraw->rect.right - margin;
-                triangle[2].y = pCustDraw->rect.top + margin;
-                Polygon(pCustDraw->hdc, triangle, 3);
-                //RoundRect(pCustDraw->hdc, pCustDraw->rect.left+2, pCustDraw->rect.top+2, pCustDraw->rect.right-2, pCustDraw->rect.bottom-2, 5, 5);
-                SelectObject(pCustDraw->hdc, oldpen);
-                SelectObject(pCustDraw->hdc, oldbrush);
-                DeleteObject(brush);
+                Gdiplus::Graphics graphics(pCustDraw->hdc);
+                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+                Gdiplus::Color c1;
+                c1.SetFromCOLORREF(scroll);
+                Gdiplus::SolidBrush brush(c1);
+                graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
+
+                Gdiplus::Point trianglepts[3];
+                trianglepts[0].X = pCustDraw->rect.left + (pCustDraw->rect.right-pCustDraw->rect.left)/2;
+                trianglepts[0].Y = pCustDraw->rect.bottom - margin;
+                trianglepts[1].X = pCustDraw->rect.left + margin;
+                trianglepts[1].Y = pCustDraw->rect.top + margin;
+                trianglepts[2].X = pCustDraw->rect.right - margin;
+                trianglepts[2].Y = pCustDraw->rect.top + margin;
+                Gdiplus::Color c2;
+                c2.SetFromCOLORREF(thumb);
+                Gdiplus::SolidBrush tribrush(c2);
+                graphics.FillPolygon(&tribrush, trianglepts, 3);
             }
             break;
         case HTSCROLL_UP:
             {
-                FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, scroll);
-                HGDIOBJ brush = CreateSolidBrush(thumb);
-                HGDIOBJ oldbrush = SelectObject(pCustDraw->hdc, brush);
-                HGDIOBJ oldpen = SelectObject(pCustDraw->hdc, GetStockObject(NULL_PEN));
-                POINT triangle[3];
-                triangle[0].x = pCustDraw->rect.left + (pCustDraw->rect.right-pCustDraw->rect.left)/2;
-                triangle[0].y = pCustDraw->rect.top + margin;
-                triangle[1].x = pCustDraw->rect.left + margin;
-                triangle[1].y = pCustDraw->rect.bottom - margin;
-                triangle[2].x = pCustDraw->rect.right - margin;
-                triangle[2].y = pCustDraw->rect.bottom - margin;
-                Polygon(pCustDraw->hdc, triangle, 3);
-                //RoundRect(pCustDraw->hdc, pCustDraw->rect.left+2, pCustDraw->rect.top+2, pCustDraw->rect.right-2, pCustDraw->rect.bottom-2, 5, 5);
-                SelectObject(pCustDraw->hdc, oldpen);
-                SelectObject(pCustDraw->hdc, oldbrush);
-                DeleteObject(brush);
+                Gdiplus::Graphics graphics(pCustDraw->hdc);
+                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+                Gdiplus::Color c1;
+                c1.SetFromCOLORREF(scroll);
+                Gdiplus::SolidBrush brush(c1);
+                graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
+
+                Gdiplus::Point trianglepts[3];
+                trianglepts[0].X = pCustDraw->rect.left + (pCustDraw->rect.right-pCustDraw->rect.left)/2;
+                trianglepts[0].Y = pCustDraw->rect.top + margin;
+                trianglepts[1].X = pCustDraw->rect.left + margin;
+                trianglepts[1].Y = pCustDraw->rect.bottom - margin;
+                trianglepts[2].X = pCustDraw->rect.right - margin;
+                trianglepts[2].Y = pCustDraw->rect.bottom - margin;
+                Gdiplus::Color c2;
+                c2.SetFromCOLORREF(thumb);
+                Gdiplus::SolidBrush tribrush(c2);
+                graphics.FillPolygon(&tribrush, trianglepts, 3);
             }
             break;
         case HTSCROLL_THUMB:
             {
-                HGDIOBJ pen = CreatePen(PS_SOLID, 2, thumb);
-                HGDIOBJ oldbrush = SelectObject(pCustDraw->hdc, GetStockObject(NULL_BRUSH));
-                HGDIOBJ oldpen = SelectObject(pCustDraw->hdc, pen);
-                RoundRect(pCustDraw->hdc, pCustDraw->rect.left+2, pCustDraw->rect.top+2, pCustDraw->rect.right-2, pCustDraw->rect.bottom-2, 5, 5);
-                SelectObject(pCustDraw->hdc, oldpen);
-                SelectObject(pCustDraw->hdc, oldbrush);
-                DeleteObject(pen);
+                Gdiplus::Graphics graphics(pCustDraw->hdc);
+                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+                Gdiplus::Color c1;
+                c1.SetFromCOLORREF(thumb);
+                Gdiplus::Pen p1(c1);
+
+                Gdiplus::GraphicsPath path;
+                // top left
+                path.AddArc(pCustDraw->rect.left, pCustDraw->rect.top, 4, 4, 180, 90);
+                // top right
+                path.AddArc(pCustDraw->rect.right-4-1, pCustDraw->rect.top, 4, 4, 270, 90);
+                // bottom right
+                path.AddArc(pCustDraw->rect.right-4-1, pCustDraw->rect.bottom-4-1, 4, 4, 0, 90);
+                // bottom left
+                path.AddArc(pCustDraw->rect.left, pCustDraw->rect.bottom-4-1, 4, 4, 90, 90);
+                path.CloseFigure();
+                graphics.DrawPath(&p1, &path);
             }
             break;
         case HTSCROLL_PAGEFULL:
             {
-                FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, scroll);
+                Gdiplus::Graphics graphics(pCustDraw->hdc);
+                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+                Gdiplus::Color c1;
+                c1.SetFromCOLORREF(scroll);
+                Gdiplus::SolidBrush brush(c1);
+                graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
+
                 if (m_bDirty)
                     CalcLines();
 
                 for (auto line : m_visibleLineColors)
                 {
                     LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*line.first/m_lines);
-                    FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, linepos, pCustDraw->rect.right, linepos+2, line.second);
+
+                    Gdiplus::Color c2;
+                    c1.SetFromCOLORREF(line.second);
+                    Gdiplus::SolidBrush brushline(c2);
+                    graphics.FillRectangle(&brushline, pCustDraw->rect.left, linepos, pCustDraw->rect.right-pCustDraw->rect.left, 2);
                 }
                 LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*m_curPosVisLine/m_lines);
-                FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, linepos, pCustDraw->rect.right, linepos+2, m_curPosColor);
+
+                Gdiplus::Color c3;
+                c1.SetFromCOLORREF(m_curPosColor);
+                Gdiplus::SolidBrush brushcurline(c3);
+                graphics.FillRectangle(&brushcurline, pCustDraw->rect.left, linepos, pCustDraw->rect.right-pCustDraw->rect.left, 2);
             }
             break;
         }
