@@ -18,6 +18,7 @@
 #include "coolscroll.h"
 #include <deque>
 #include <tuple>
+#include <gdiplus.h>
 
 #define DOCSCROLLTYPE_SELTEXT           1
 #define DOCSCROLLTYPE_SEARCHTEXT        2
@@ -49,4 +50,5 @@ private:
     COLORREF                                    m_curPosColor;
     CScintillaWnd *                             m_pScintilla;
     bool                                        m_bDirty;
+    ULONG_PTR                                   m_gdiplusToken;
 };
