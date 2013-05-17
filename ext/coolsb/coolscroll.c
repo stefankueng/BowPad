@@ -2076,7 +2076,8 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
         //any inserted buttons
         GetRealScrollRect(sb, &rect);
 
-        if (sb->fFlatScrollbar & CSBS_MAPMODE)
+        if ((sb->fFlatScrollbar & CSBS_MAPMODE) &&
+            ((uCurrentScrollPortion == HTSCROLL_PAGELEFT)||(uCurrentScrollPortion == HTSCROLL_PAGERIGHT)))
         {
             siMaxMin = sb->scrollInfo.nMax - sb->scrollInfo.nMin;
             butwidth = GetScrollMetric(sb, SM_SCROLL_LENGTH);
