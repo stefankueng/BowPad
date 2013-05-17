@@ -202,6 +202,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
                 Gdiplus::Color c1;
                 c1.SetFromCOLORREF(thumb);
                 Gdiplus::Pen p1(c1);
+                p1.SetWidth(2.0);
 
                 Gdiplus::GraphicsPath path;
                 // top left
