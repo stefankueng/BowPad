@@ -538,17 +538,29 @@ void CScintillaWnd::MarkSelectedWord()
 
     int selTextLen = (int)Call(SCI_GETSELTEXT);
     if (selTextLen == 0)
+    {
+        m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+        SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
+    }
 
     size_t selStartLine = Call(SCI_LINEFROMPOSITION, Call(SCI_GETSELECTIONSTART), 0);
     size_t selEndLine   = Call(SCI_LINEFROMPOSITION, Call(SCI_GETSELECTIONEND), 0);
     if (selStartLine != selEndLine)
+    {
+        m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+        SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
+    }
 
     std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
     Call(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
     if (seltextbuffer[0] == 0)
+    {
+        m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+        SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
+    }
 
     std::unique_ptr<char[]> textbuffer(new char[len + 1]);
     Scintilla::Sci_TextRange textrange;
