@@ -220,7 +220,6 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
         case HTSCROLL_PAGEFULL:
             {
                 Gdiplus::Graphics graphics(pCustDraw->hdc);
-                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
                 Gdiplus::Color c1;
                 c1.SetFromCOLORREF(scroll);
                 Gdiplus::SolidBrush brush(c1);
