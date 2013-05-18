@@ -228,14 +228,20 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
                 if (m_bDirty)
                     CalcLines();
 
+                LONG lastLinePos = -1;
+                COLORREF lastColor = -1;
                 for (auto line : m_visibleLineColors)
                 {
                     LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*line.first/m_lines);
-
-                    Gdiplus::Color c2;
-                    c1.SetFromCOLORREF(line.second);
-                    Gdiplus::SolidBrush brushline(c2);
-                    graphics.FillRectangle(&brushline, pCustDraw->rect.left, linepos, pCustDraw->rect.right-pCustDraw->rect.left, 2);
+                    if ((linepos > (lastLinePos+1)) || (lastColor != line.second))
+                    {
+                        Gdiplus::Color c2(150, GetRValue(line.second), GetGValue(line.second), GetBValue(line.second));
+                        c2.SetFromCOLORREF(line.second);
+                        Gdiplus::SolidBrush brushline(c2);
+                        graphics.FillRectangle(&brushline, pCustDraw->rect.left, linepos, pCustDraw->rect.right-pCustDraw->rect.left, 2);
+                        lastLinePos = linepos;
+                        lastColor = line.second;
+                    }
                 }
                 LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*m_curPosVisLine/m_lines);
 
