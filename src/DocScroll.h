@@ -38,6 +38,7 @@ public:
     void                        AddLineColor(int type, size_t line, COLORREF clr);
     void                        SetCurrentPos(size_t visibleline, COLORREF clr) { m_curPosVisLine = visibleline; m_curPosColor = clr; }
     void                        VisibleLinesChanged() { m_bDirty = true; }
+    bool                        IsDirty() const { return m_bDirty; }
 private:
     void                        CalcLines();
 
