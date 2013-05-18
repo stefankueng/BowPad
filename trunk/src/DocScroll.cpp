@@ -292,18 +292,25 @@ void CDocScroll::SetTotalLines( size_t lines )
 void CDocScroll::Clear( int type )
 {
     if (type == 0)
+    {
+        if (!m_lineColors.empty())
+            m_bDirty = true;
         m_lineColors.clear();
+    }
     else
     {
         auto it = m_lineColors.begin();
         for (; it != m_lineColors.end(); )
         {
             if (std::get<0>(it->first) == type)
+            {
                 it = m_lineColors.erase(it);
+                m_bDirty = true;
+            }
             else
                 ++it;
         }
     }
-    m_visibleLineColors.clear();
-    m_bDirty = true;
+    if (m_bDirty)
+        m_visibleLineColors.clear();
 }
