@@ -337,6 +337,21 @@
         <Image>res/LineDownS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdPrintNow" LabelTitle="Print" TooltipTitle="Print" TooltipDescription="Sends the document to the default printer">
+      <Command.LargeImages>
+        <Image>res/PrintNowL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdPrint" LabelTitle="Print..." TooltipTitle="Print" TooltipDescription="Sends the document to a printer">
+      <Command.LargeImages>
+        <Image>res/PrintL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdPageSetup" LabelTitle="Page Setup" TooltipTitle="Print Page Setup" TooltipDescription="Set up print margins, page size, page orientation">
+      <Command.LargeImages>
+        <Image>res/PageSetupL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
 
 
     <Command Name="cmdContextMap" />
@@ -351,9 +366,13 @@
           <MenuGroup Class="MajorItems">
             <Button CommandName="cmdNew" />
             <Button CommandName="cmdOpen" />
+          </MenuGroup>
+          <MenuGroup>
             <Button CommandName="cmdSave" />
             <Button CommandName="cmdSaveAll" />
             <Button CommandName="cmdSaveAs" />
+          </MenuGroup>
+          <MenuGroup>
             <Button CommandName="cmdClose" />
             <Button CommandName="cmdCloseAll" />
           </MenuGroup>
@@ -381,7 +400,14 @@
               <Scale Group="cmdGroupEncoding" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
-          <Group CommandName="cmdGroupFile" SizeDefinition="ThreeButtons">
+          <Group CommandName="cmdGroupFile" SizeDefinition="FourButtons">
+            <SplitButton>
+              <SplitButton.ButtonItem>
+                <Button CommandName="cmdPrintNow"/>
+              </SplitButton.ButtonItem>
+              <Button CommandName="cmdPrint" />
+              <Button CommandName="cmdPageSetup" />
+            </SplitButton>
             <Button CommandName="cmdNew" />
             <Button CommandName="cmdSave" />
             <Button CommandName="cmdSaveAll" />

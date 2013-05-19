@@ -230,6 +230,7 @@
     <ClInclude Include="Commands\CmdMisc.h" />
     <ClInclude Include="Commands\CmdMRU.h" />
     <ClInclude Include="Commands\CmdPrevNext.h" />
+    <ClInclude Include="Commands\CmdPrint.h" />
     <ClInclude Include="Commands\CmdStyleConfigurator.h" />
     <ClInclude Include="Commands\CmdUndo.h" />
     <ClInclude Include="Commands\CmdVerticalEdge.h" />
@@ -278,6 +279,7 @@
     <ClCompile Include="Commands\CmdFindReplace.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
     <ClCompile Include="Commands\CmdPrevNext.cpp" />
+    <ClCompile Include="Commands\CmdPrint.cpp" />
     <ClCompile Include="Commands\CmdStyleConfigurator.cpp" />
     <ClCompile Include="Commands\CommandHandler.cpp" />
     <ClCompile Include="Commands\ICommand.cpp" />
