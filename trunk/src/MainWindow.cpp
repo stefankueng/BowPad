@@ -22,6 +22,7 @@
 #include "CommandHandler.h"
 #include "MRU.h"
 #include "KeyboardShortcutHandler.h"
+#include "AppUtils.h"
 
 #include <memory>
 #include <Shobjidl.h>
@@ -129,9 +130,16 @@ STDMETHODIMP CMainWindow::OnViewChanged(
         {
             // The view was newly created.
         case UI_VIEWVERB_CREATE:
-            hr = pView->QueryInterface(IID_PPV_ARGS(&m_pRibbon));
-            break;
+            {
+                hr = pView->QueryInterface(IID_PPV_ARGS(&m_pRibbon));
+                CComPtr<IStream> pStrm;
+                std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
+                hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_READ, 0, FALSE, NULL, &pStrm);
 
+                if (SUCCEEDED(hr))
+                    m_pRibbon->LoadSettingsFromStream(pStrm);
+            }
+            break;
             // The view has been resized.  For the Ribbon view, the application should
             // call GetHeight to determine the height of the ribbon.
         case UI_VIEWVERB_SIZE:
@@ -146,9 +154,27 @@ STDMETHODIMP CMainWindow::OnViewChanged(
             break;
             // The view was destroyed.
         case UI_VIEWVERB_DESTROY:
-            hr = S_OK;
-            m_pRibbon->Release();
-            m_pRibbon = NULL;
+            {
+                hr = S_OK;
+                CComPtr<IStream> pStrm;
+                std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
+                hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_WRITE|STGM_CREATE, FILE_ATTRIBUTE_NORMAL, TRUE, NULL, &pStrm);
+                if (SUCCEEDED(hr))
+                {
+                    LARGE_INTEGER liPos;
+                    ULARGE_INTEGER uliSize;
+
+                    liPos.QuadPart = 0;
+                    uliSize.QuadPart = 0;
+
+                    pStrm->Seek(liPos, STREAM_SEEK_SET, NULL);
+                    pStrm->SetSize(uliSize);
+
+                    m_pRibbon->SaveSettingsToStream(pStrm);
+                }
+                m_pRibbon->Release();
+                m_pRibbon = NULL;
+            }
             break;
         }
     }
@@ -499,6 +525,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         m_scintilla.Call(SCI_SETFOCUS, true);
         break;
     case WM_DESTROY:
+        g_pFramework->Destroy();
         PostQuitMessage(0);
         break;
     case WM_CLOSE:
