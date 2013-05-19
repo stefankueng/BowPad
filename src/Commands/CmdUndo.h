@@ -26,6 +26,7 @@ public:
 
     CCmdUndo(void * obj) : ICommand(obj)
     {
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
     ~CCmdUndo(void)
@@ -64,6 +65,7 @@ public:
 
     CCmdRedo(void * obj) : ICommand(obj)
     {
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
     ~CCmdRedo(void)
