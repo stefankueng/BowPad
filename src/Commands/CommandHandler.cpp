@@ -34,6 +34,7 @@
 #include "CmdComment.h"
 #include "CmdConvertCase.h"
 #include "CmdLines.h"
+#include "CmdPrint.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -74,6 +75,12 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdSaveAll(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdSaveAs(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdPrint(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdPrintNow(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdPageSetup(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdUndo(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;

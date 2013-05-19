@@ -192,6 +192,9 @@
     <ClInclude Include="Commands\CmdLines.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdPrint.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -309,6 +312,9 @@
       <Filter>Commands</Filter>
     </ClCompile>
     <ClCompile Include="Commands\CmdConvertCase.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdPrint.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
