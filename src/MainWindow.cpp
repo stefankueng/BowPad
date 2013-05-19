@@ -19,6 +19,7 @@
 #include "BowPad.h"
 #include "BowPadUI.h"
 #include "StringUtils.h"
+#include "UnicodeUtils.h"
 #include "CommandHandler.h"
 #include "MRU.h"
 #include "KeyboardShortcutHandler.h"
@@ -37,6 +38,8 @@ IUIFramework *g_pFramework = NULL;  // Reference to the Ribbon framework.
 #define STATUSBAR_UNICODE_TYPE  4
 #define STATUSBAR_TYPING_MODE   5
 #define STATUSBAR_CAPS          6
+
+#define URL_REG_EXPR "[A-Za-z]+://[A-Za-z0-9_\\-\\+~.:?&@=/%#,;\\{\\}\\(\\)\\[\\]\\|\\*\\!\\\\]+"
 
 
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
@@ -454,6 +457,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 
                         m_scintilla.MatchBraces();
                         m_scintilla.MatchTags();
+                        AddHotSpots();
                         UpdateStatusBar(false);
                     }
                     break;
@@ -511,6 +515,70 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                 }
                                 m_scintilla.Call(SCI_SETSEL, crange.cpMin, crange.cpMax);
                             }
+                        }
+                    }
+                    break;
+                case SCN_HOTSPOTCLICK:
+                    {
+                        if (pScn->modifiers & SCMOD_CTRL)
+                        {
+                            m_scintilla.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:?&@=/%#()");
+
+                            long pos = (long)m_scintilla.Call(SCI_GETCURRENTPOS);
+                            long startPos = static_cast<long>(m_scintilla.Call(SCI_WORDSTARTPOSITION, pos, false));
+                            long endPos = static_cast<long>(m_scintilla.Call(SCI_WORDENDPOSITION, pos, false));
+
+                            m_scintilla.Call(SCI_SETTARGETSTART, startPos);
+                            m_scintilla.Call(SCI_SETTARGETEND, endPos);
+
+                            long posFound = (long)m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
+                            if (posFound != -1)
+                            {
+                                startPos = int(m_scintilla.Call(SCI_GETTARGETSTART));
+                                endPos = int(m_scintilla.Call(SCI_GETTARGETEND));
+                            }
+
+                            std::unique_ptr<char[]> urltext(new char[endPos - startPos + 2]);
+                            Scintilla::TextRange tr;
+                            tr.chrg.cpMin = startPos;
+                            tr.chrg.cpMax = endPos;
+                            tr.lpstrText = urltext.get();
+                            m_scintilla.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
+
+
+                            // This treatment would fail on some valid URLs where there's actually supposed to be a comma or parenthesis at the end.
+                            size_t lastCharIndex = strlen(urltext.get())-1;
+                            while (lastCharIndex >= 0 && (urltext[lastCharIndex] == ',' || urltext[lastCharIndex] == ')' || urltext[lastCharIndex] == '('))
+                            {
+                                urltext[lastCharIndex] = '\0';
+                                --lastCharIndex;
+                            }
+
+                            std::wstring url = CUnicodeUtils::StdGetUnicode(urltext.get());
+                            ::ShellExecute(*this, L"open", url.c_str(), NULL, NULL, SW_SHOW);
+                            m_scintilla.Call(SCI_SETCHARSDEFAULT);
+                        }
+                    }
+                    break;
+                case SCN_DWELLSTART:
+                    {
+                        int style = (int)m_scintilla.Call(SCI_GETSTYLEAT, pScn->position);
+                        if (style & INDIC1_MASK)
+                        {
+                            // an url hotspot
+                            ResString str(hInst, IDS_CTRLCLICKTOOPEN);
+                            std::string strA = CUnicodeUtils::StdGetUTF8((LPCWSTR)str);
+                            m_scintilla.Call(SCI_CALLTIPSHOW, pScn->position, (sptr_t)strA.c_str());
+                        }
+                    }
+                    break;
+                case SCN_DWELLEND:
+                    {
+                        int style = (int)m_scintilla.Call(SCI_GETSTYLEAT, pScn->position);
+                        if (style & INDIC1_MASK)
+                        {
+                            // an url hotspot
+                            m_scintilla.Call(SCI_CALLTIPCANCEL);
                         }
                     }
                     break;
@@ -952,4 +1020,99 @@ bool CMainWindow::ReloadTab( int tab, int encoding )
         }
     }
     return false;
+}
+
+void CMainWindow::AddHotSpots()
+{
+    long startPos = 0;
+    long endPos = -1;
+    long endStyle = (long)m_scintilla.Call(SCI_GETENDSTYLED);
+
+
+    long firstVisibleLine = (long)m_scintilla.Call(SCI_GETFIRSTVISIBLELINE);
+    startPos = (long)m_scintilla.Call(SCI_POSITIONFROMLINE, m_scintilla.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine));
+    long linesOnScreen = (long)m_scintilla.Call(SCI_LINESONSCREEN);
+    long lineCount = (long)m_scintilla.Call(SCI_GETLINECOUNT);
+    endPos = (long)m_scintilla.Call(SCI_POSITIONFROMLINE, m_scintilla.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine + min(linesOnScreen, lineCount)));
+
+
+    m_scintilla.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
+
+    m_scintilla.Call(SCI_SETTARGETSTART, startPos);
+    m_scintilla.Call(SCI_SETTARGETEND, endPos);
+
+    std::vector<unsigned char> hotspotPairs;
+
+    unsigned char style_hotspot = 0;
+    unsigned char mask = INDIC1_MASK;
+
+    LRESULT posFound = m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
+
+    while (posFound != -1)
+    {
+        long start = long(m_scintilla.Call(SCI_GETTARGETSTART));
+        long end = long(m_scintilla.Call(SCI_GETTARGETEND));
+        long foundTextLen = end - start;
+        unsigned char idStyle = static_cast<unsigned char>(m_scintilla.Call(SCI_GETSTYLEAT, posFound));
+
+        // Search the style
+        long fs = -1;
+        for (size_t i = 0 ; i < hotspotPairs.size() ; i++)
+        {
+            // make sure to ignore "hotspot bit" when comparing document style with archived hotspot style
+            if ((hotspotPairs[i] & ~mask) == (idStyle & ~mask))
+            {
+                fs = hotspotPairs[i];
+                m_scintilla.Call(SCI_STYLEGETFORE, fs);
+                break;
+            }
+        }
+
+        // if we found it then use it to colorize
+        if (fs != -1)
+        {
+            m_scintilla.Call(SCI_STARTSTYLING, start, 0xFF);
+            m_scintilla.Call(SCI_SETSTYLING, foundTextLen, fs);
+        }
+        else // generate a new style and add it into a array
+        {
+            style_hotspot = idStyle | mask; // set "hotspot bit"
+            hotspotPairs.push_back(style_hotspot);
+            int activeFG = 0xFF0000;
+            unsigned char idStyleMSBunset = idStyle & ~mask;
+            char fontNameA[128];
+
+            // copy the style data
+            m_scintilla.Call(SCI_STYLEGETFONT, idStyleMSBunset, (LPARAM)fontNameA);
+            m_scintilla.Call(SCI_STYLESETFONT, style_hotspot, (LPARAM)fontNameA);
+
+            m_scintilla.Call(SCI_STYLESETSIZE, style_hotspot, m_scintilla.Call(SCI_STYLEGETSIZE, idStyleMSBunset));
+            m_scintilla.Call(SCI_STYLESETBOLD, style_hotspot, m_scintilla.Call(SCI_STYLEGETBOLD, idStyleMSBunset));
+            m_scintilla.Call(SCI_STYLESETWEIGHT, style_hotspot, m_scintilla.Call(SCI_STYLEGETWEIGHT, idStyleMSBunset));
+            m_scintilla.Call(SCI_STYLESETITALIC, style_hotspot, m_scintilla.Call(SCI_STYLEGETITALIC, idStyleMSBunset));
+            m_scintilla.Call(SCI_STYLESETUNDERLINE, style_hotspot, m_scintilla.Call(SCI_STYLEGETUNDERLINE, idStyleMSBunset));
+            m_scintilla.Call(SCI_STYLESETFORE, style_hotspot, m_scintilla.Call(SCI_STYLEGETFORE, idStyleMSBunset));
+            m_scintilla.Call(SCI_STYLESETBACK, style_hotspot, m_scintilla.Call(SCI_STYLEGETBACK, idStyleMSBunset));
+            m_scintilla.Call(SCI_STYLESETEOLFILLED, style_hotspot, m_scintilla.Call(SCI_STYLEGETEOLFILLED, idStyleMSBunset));
+            m_scintilla.Call(SCI_STYLESETCASE, style_hotspot, m_scintilla.Call(SCI_STYLEGETCASE, idStyleMSBunset));
+
+
+            m_scintilla.Call(SCI_STYLESETHOTSPOT, style_hotspot, TRUE);
+            m_scintilla.Call(SCI_SETHOTSPOTACTIVEUNDERLINE, style_hotspot, TRUE);
+            m_scintilla.Call(SCI_SETHOTSPOTACTIVEFORE, TRUE, activeFG);
+            m_scintilla.Call(SCI_SETHOTSPOTSINGLELINE, style_hotspot, 0);
+
+            // colorize it!
+            m_scintilla.Call(SCI_STARTSTYLING, start, 0xFF);
+            m_scintilla.Call(SCI_SETSTYLING, foundTextLen, style_hotspot);
+        }
+
+        m_scintilla.Call(SCI_SETTARGETSTART, posFound + foundTextLen);
+        m_scintilla.Call(SCI_SETTARGETEND, endPos);
+
+        posFound = (int)m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
+    }
+
+    m_scintilla.Call(SCI_STARTSTYLING, endStyle, 0xFF);
+    m_scintilla.Call(SCI_SETSTYLING, 0, 0);
 }

@@ -126,7 +126,10 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETBUFFEREDDRAW, true);
     Call(SCI_SETTWOPHASEDRAW, true);
 
-    Call(SCI_USEPOPUP, 0);
+    Call(SCI_USEPOPUP, 0);  // no default context menu
+
+    Call(SCI_SETMOUSEDWELLTIME, GetDoubleClickTime());
+    Call(SCI_CALLTIPSETPOSITION, 1);
 
     SetupDefaultStyles();
 

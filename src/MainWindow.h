@@ -66,8 +66,9 @@ protected:
 
 private:
     void                ResizeChildWindows();
-    void UpdateStatusBar(bool bEverything);
+    void                UpdateStatusBar(bool bEverything);
     void                InitCommands();
+    void                AddHotSpots();
 
 private:
     LONG                m_cRef;
