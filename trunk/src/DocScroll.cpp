@@ -231,7 +231,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
                     CalcLines();
 
                 LONG lastLinePos = -1;
-                COLORREF lastColor = -1;
+                COLORREF lastColor = (COLORREF)-1;
                 for (auto line : m_visibleLineColors)
                 {
                     LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*line.first/m_lines);
