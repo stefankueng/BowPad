@@ -41,6 +41,7 @@ protected:
     void                TabActivateAt(int index);
     int                 GetCurrentTabIndex();
     int                 GetTabCount();
+    std::wstring        GetCurrentTitle();
     int                 GetSrcTab();
     int                 GetDstTab();
 
