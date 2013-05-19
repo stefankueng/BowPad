@@ -337,6 +337,7 @@
         <Image>res/LineDownS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdGroupPrint" LabelTitle="Print" />
     <Command Name="cmdPrintNow" LabelTitle="Print" TooltipTitle="Print" TooltipDescription="Sends the document to the default printer">
       <Command.LargeImages>
         <Image>res/PrintNowL.bmp</Image>
@@ -401,7 +402,7 @@
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupFile" SizeDefinition="FourButtons">
-            <SplitButton>
+            <SplitButton CommandName="cmdGroupPrint">
               <SplitButton.ButtonItem>
                 <Button CommandName="cmdPrintNow"/>
               </SplitButton.ButtonItem>
