@@ -204,15 +204,17 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
                 Gdiplus::Pen p1(c1);
                 p1.SetWidth(2.0);
 
+                RECT rc = pCustDraw->rect;
+                InflateRect(&rc, -2, -2);
                 Gdiplus::GraphicsPath path;
                 // top left
-                path.AddArc(pCustDraw->rect.left, pCustDraw->rect.top, 4, 4, 180, 90);
+                path.AddArc(rc.left, rc.top, 4, 4, 180, 90);
                 // top right
-                path.AddArc(pCustDraw->rect.right-4-1, pCustDraw->rect.top, 4, 4, 270, 90);
+                path.AddArc(rc.right-4-1, rc.top, 4, 4, 270, 90);
                 // bottom right
-                path.AddArc(pCustDraw->rect.right-4-1, pCustDraw->rect.bottom-4-1, 4, 4, 0, 90);
+                path.AddArc(rc.right-4-1, rc.bottom-4-1, 4, 4, 0, 90);
                 // bottom left
-                path.AddArc(pCustDraw->rect.left, pCustDraw->rect.bottom-4-1, 4, 4, 90, 90);
+                path.AddArc(rc.left, rc.bottom-4-1, 4, 4, 90, 90);
                 path.CloseFigure();
                 graphics.DrawPath(&p1, &path);
             }
