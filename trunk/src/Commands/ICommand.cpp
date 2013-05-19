@@ -56,6 +56,14 @@ int ICommand::GetCurrentTabIndex()
     return pMainWnd->m_TabBar.GetCurrentTabIndex();
 }
 
+std::wstring ICommand::GetCurrentTitle()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    wchar_t buf[100] = {0};
+    pMainWnd->m_TabBar.GetCurrentTitle(buf, _countof(buf));
+    return buf;
+}
+
 int ICommand::GetSrcTab()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
