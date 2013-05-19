@@ -158,8 +158,7 @@ void CCmdPrint::Print( bool bShowDlg )
 
 
     DOCINFO di = {sizeof(DOCINFO), 0, 0, 0, 0};
-    CDocument doc = GetDocument(GetCurrentTabIndex());
-    std::wstring docname = doc.m_path.substr(doc.m_path.find_last_of('\\'));
+    std::wstring docname = GetCurrentTitle();
     di.lpszDocName = docname.c_str();
     di.lpszOutput = 0;
     di.lpszDatatype = 0;
