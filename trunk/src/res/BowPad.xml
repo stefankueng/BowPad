@@ -353,6 +353,14 @@
         <Image>res/PageSetupL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdGotoLine" LabelTitle="Go to line" TooltipTitle="Go to line" TooltipDescription="Moves the cursor to the specified line">
+      <Command.LargeImages>
+        <Image>res/GotoLineL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/GotoLineS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
 
 
     <Command Name="cmdContextMap" />
@@ -418,12 +426,13 @@
             <Button CommandName="cmdCopy" />
             <Button CommandName="cmdCut" />
           </Group>
-          <Group CommandName="cmdGroupUndo" SizeDefinition="FiveButtons">
+          <Group CommandName="cmdGroupUndo" SizeDefinition="SixButtons">
             <Button CommandName="cmdUndo" />
             <Button CommandName="cmdRedo" />
             <Button CommandName="cmdPrevious" />
             <Button CommandName="cmdNext" />
             <Button CommandName="cmdFindReplace" />
+            <Button CommandName="cmdGotoLine" />
           </Group>
           <Group CommandName="cmdGroupEncoding" SizeDefinition="FiveButtons">
             <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
