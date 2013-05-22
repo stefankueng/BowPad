@@ -364,6 +364,7 @@
 
 
     <Command Name="cmdContextMap" />
+    <Command Name="cmdSelectTab" Id="10000" />
   </Application.Commands>
   <Application.Views>
     <Ribbon>
