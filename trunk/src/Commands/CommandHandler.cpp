@@ -36,6 +36,7 @@
 #include "CmdLines.h"
 #include "CmdPrint.h"
 #include "CmdGotoLine.h"
+#include "CmdSelectTab.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -162,6 +163,9 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdLineUp(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdLineDown(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
+    pCmd = new CCmdSelectTab(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 }
 
