@@ -41,7 +41,7 @@ public:
 
         for (int key = 1; key < 9; ++key)
         {
-            if (GetKeyState(key+'0')&0x8000)
+            if ((GetKeyState(key+'0')&0x8000) || (GetKeyState(key + VK_NUMPAD0)&0x8000))
             {
                 if (GetTabCount() >= key)
                 {
@@ -51,7 +51,7 @@ public:
             }
         }
 
-        if (GetKeyState('9')&0x8000)
+        if ((GetKeyState('9')&0x8000) || (GetKeyState(VK_NUMPAD9)&0x8000))
         {
             TabActivateAt(GetTabCount()-1);
             return true;
