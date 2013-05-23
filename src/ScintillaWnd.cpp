@@ -57,6 +57,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
     Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, 14);
+    Call(SCI_SETAUTOMATICFOLD, SC_AUTOMATICFOLD_SHOW|SC_AUTOMATICFOLD_CLICK|SC_AUTOMATICFOLD_CHANGE);
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_SYBOLE, (1<<MARK_BOOKMARK) | (1<<MARK_HIDELINESBEGIN) | (1<<MARK_HIDELINESEND));
     Call(SCI_MARKERSETALPHA, MARK_BOOKMARK, 70);
@@ -409,120 +410,10 @@ void CScintillaWnd::Center(long posStart, long posEnd)
 
 void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
 {
-    int lineClick = int(Call(SCI_LINEFROMPOSITION, pNotification->position, 0));
-    int levelClick = int(Call(SCI_GETFOLDLEVEL, lineClick, 0));
-    if (levelClick & SC_FOLDLEVELHEADERFLAG)
-    {
-        if (pNotification->modifiers & SCMOD_SHIFT)
-        {
-            // Ensure all children visible
-            Call(SCI_SETFOLDEXPANDED, lineClick, 1);
-            Expand(lineClick, true, true, 100, levelClick);
-        }
-        else if (pNotification->modifiers & SCMOD_CTRL)
-        {
-            if (Call(SCI_GETFOLDEXPANDED, lineClick, 0))
-            {
-                // Contract this line and all children
-                Call(SCI_SETFOLDEXPANDED, lineClick, 0);
-                Expand(lineClick, false, true, 0, levelClick);
-            }
-            else
-            {
-                // Expand this line and all children
-                Call(SCI_SETFOLDEXPANDED, lineClick, 1);
-                Expand(lineClick, true, true, 100, levelClick);
-            }
-        }
-        else
-        {
-            // Toggle this line
-            bool mode = Call(SCI_GETFOLDEXPANDED, lineClick) != 0;
-            Fold(lineClick, !mode);
-        }
-    }
+    //int lineClick = int(Call(SCI_LINEFROMPOSITION, pNotification->position, 0));
+    //int levelClick = int(Call(SCI_GETFOLDLEVEL, lineClick, 0));
 }
 
-void CScintillaWnd::Expand(int &line, bool doExpand, bool force, int visLevels, int level)
-{
-    int lineMaxSubord = int(Call(SCI_GETLASTCHILD, line, level & SC_FOLDLEVELNUMBERMASK));
-    line++;
-    while (line <= lineMaxSubord)
-    {
-        if (force)
-        {
-            if (visLevels > 0)
-                Call(SCI_SHOWLINES, line, line);
-            else
-                Call(SCI_HIDELINES, line, line);
-        }
-        else
-        {
-            if (doExpand)
-                Call(SCI_SHOWLINES, line, line);
-        }
-        int levelLine = level;
-        if (levelLine == -1)
-            levelLine = int(Call(SCI_GETFOLDLEVEL, line, 0));
-        if (levelLine & SC_FOLDLEVELHEADERFLAG)
-        {
-            if (force)
-            {
-                if (visLevels > 1)
-                    Call(SCI_SETFOLDEXPANDED, line, 1);
-                else
-                    Call(SCI_SETFOLDEXPANDED, line, 0);
-                Expand(line, doExpand, force, visLevels - 1);
-            }
-            else
-            {
-                if (doExpand)
-                {
-                    if (!Call(SCI_GETFOLDEXPANDED, line, 0))
-                        Call(SCI_SETFOLDEXPANDED, line, 1);
-
-                    Expand(line, true, force, visLevels - 1);
-                }
-                else
-                {
-                    Expand(line, false, force, visLevels - 1);
-                }
-            }
-        }
-        else
-        {
-            line++;
-        }
-    }
-    m_docScroll.VisibleLinesChanged();
-}
-
-void CScintillaWnd::Fold(int line, bool mode)
-{
-    int endStyled = (int)Call(SCI_GETENDSTYLED);
-    int len = (int)Call(SCI_GETTEXTLENGTH);
-
-    if (endStyled < len)
-        Call(SCI_COLOURISE, 0, -1);
-
-    int headerLine;
-    int level = (int)Call(SCI_GETFOLDLEVEL, line);
-
-    if (level & SC_FOLDLEVELHEADERFLAG)
-        headerLine = line;
-    else
-    {
-        headerLine = (int)Call(SCI_GETFOLDPARENT, line);
-        if (headerLine == -1)
-            return;
-    }
-
-    if ((Call(SCI_GETFOLDEXPANDED, headerLine) != 0) != mode)
-    {
-        Call(SCI_TOGGLEFOLD, headerLine);
-    }
-    m_docScroll.VisibleLinesChanged();
-}
 
 void CScintillaWnd::MarkSelectedWord()
 {
