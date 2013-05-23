@@ -47,12 +47,7 @@ enum FontStyle
 class StyleData
 {
 public:
-    StyleData()
-        : ForegroundColor(::GetSysColor(COLOR_WINDOWTEXT))
-        , BackgroundColor(::GetSysColor(COLOR_WINDOW))
-        , FontStyle(FONTSTYLE_NORMAL)
-        , FontSize(0)
-    {}
+    StyleData();
 
     std::wstring        Name;
     COLORREF            ForegroundColor;
