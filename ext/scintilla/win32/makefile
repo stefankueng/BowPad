@@ -34,7 +34,10 @@ endif
 ALL:	$(COMPONENT) $(LEXCOMPONENT) $(LEXLIB) ScintillaWinS.o
 
 clean:
-	$(DEL) *.exe *.o *.obj *.dll *.res *.map
+	$(DEL) *.exe *.o *.obj *.dll *.res *.map *.plist
+
+analyze:
+	clang --analyze -D DISABLE_D2D $(CXXFLAGS) *.cxx ../src/*.cxx ../lexlib/*.cxx ../lexers/*.cxx
 
 deps:
 	$(CC) -MM $(CXXFLAGS) *.cxx ../src/*.cxx ../lexlib/*.cxx ../lexers/*.cxx >deps.mak

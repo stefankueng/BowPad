@@ -330,7 +330,8 @@ def RegenerateAll():
             lexerProperties[k] = 1
         documents = FindPropertyDocumentation(lexFile)
         for k in documents.keys():
-            propertyDocuments[k] = documents[k]
+            if k not in propertyDocuments:
+                propertyDocuments[k] = documents[k]
     sortListInsensitive(lexerModules)
     lexerProperties = list(lexerProperties.keys())
     sortListInsensitive(lexerProperties)
@@ -355,7 +356,6 @@ def RegenerateAll():
 
     Regenerate(root + "scintilla/src/Catalogue.cxx", "//", NATIVE, lexerModules)
     Regenerate(root + "scintilla/win32/scintilla.mak", "#", NATIVE, lexFiles)
-    Regenerate(root + "scintilla/win32/scintilla_vc6.mak", "#", NATIVE, lexFiles)
     if os.path.exists(root + "scite"):
         Regenerate(root + "scite/win32/makefile", "#", NATIVE, propFiles)
         Regenerate(root + "scite/win32/scite.mak", "#", NATIVE, propFiles)
