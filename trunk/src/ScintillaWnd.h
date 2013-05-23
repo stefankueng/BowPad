@@ -84,8 +84,6 @@ protected:
 
     void SetupLexer(const LexerData& lexerdata, const std::map<int, std::string>& langdata);
     void SetupDefaultStyles();
-    void Expand(int &line, bool doExpand, bool force = false, int visLevels = 0, int level = -1);
-    void Fold(int line, bool mode);
     bool GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags );
     FindResult FindText(const char *text, size_t start, size_t end, int flags);
     FindResult FindOpenTag(const std::string& tagName, size_t start, size_t end);
