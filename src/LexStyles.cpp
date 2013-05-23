@@ -28,6 +28,18 @@ LexerData emptyLexData;
 std::map<int, std::string> emptyIntStrVec;
 std::string emptyString;
 
+static COLORREF fgColor = ::GetSysColor(COLOR_WINDOWTEXT);
+static COLORREF bgColor = ::GetSysColor(COLOR_WINDOW);
+
+StyleData::StyleData()
+    : ForegroundColor(fgColor)
+    , BackgroundColor(bgColor)
+    , FontStyle(FONTSTYLE_NORMAL)
+    , FontSize(0)
+{
+
+}
+
 CLexStyles::CLexStyles(void)
     : m_bLoaded(false)
 {
@@ -73,7 +85,7 @@ void CLexStyles::Load()
                 {
                     CSimpleIni::TNamesDepend lexvars;
                     ini[iniind].GetAllKeys(L"variables", lexvars);
-                    for (auto l : lexvars)
+                    for (const auto& l : lexvars)
                     {
                         std::wstring v = ini[iniind].GetValue(L"variables", l);
                         std::wstring key = l;
@@ -82,18 +94,17 @@ void CLexStyles::Load()
                     }
                 }
 
-
                 std::map<std::wstring, int> lexers;
                 for (int iniind = 0; iniind < _countof(ini); ++iniind)
                 {
                     CSimpleIni::TNamesDepend lexkeys;
                     ini[iniind].GetAllKeys(L"lexers", lexkeys);
-                    for (auto l : lexkeys)
+                    for (const auto& l : lexkeys)
                     {
                         int lex = _wtoi(ini[iniind].GetValue(l, L"Lexer", L""));
                         m_lexerSection[lex] = l;
                     }
-                    for (auto l : m_lexerSection)
+                    for (const auto& l : m_lexerSection)
                     {
                         std::wstring v = ini[iniind].GetValue(L"lexers", l.second.c_str(), L"");
                         int lex = _wtoi(ini[iniind].GetValue(l.second.c_str(), L"Lexer", L""));
@@ -102,7 +113,7 @@ void CLexStyles::Load()
                             ReplaceVariables(v, variables);
                             std::vector<std::wstring> langs;
                             stringtok(langs, v, true, L";");
-                            for (auto x : langs)
+                            for (const auto& x : langs)
                             {
                                 lexers[x] = lex;
                             }
@@ -115,7 +126,7 @@ void CLexStyles::Load()
                         userlexerdata.ID = lex;
                         CSimpleIni::TNamesDepend lexdatakeys;
                         ini[iniind].GetAllKeys(l.second.c_str(), lexdatakeys);
-                        for (auto it : lexdatakeys)
+                        for (const auto& it : lexdatakeys)
                         {
                             if (_wcsnicmp(L"Style", it, 5) == 0)
                             {
@@ -127,7 +138,7 @@ void CLexStyles::Load()
                                 int i = 0;
                                 wchar_t * endptr;
                                 unsigned long hexval;
-                                for (auto s : vec)
+                                for (const auto& s : vec)
                                 {
                                     switch (i)
                                     {
@@ -164,13 +175,15 @@ void CLexStyles::Load()
                             }
                             if (_wcsnicmp(L"Prop_", it, 5) == 0)
                             {
-                                lexerdata.Properties[CUnicodeUtils::StdGetUTF8(it+5)] = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(l.second.c_str(), it, L""));
-                                userlexerdata.Properties[CUnicodeUtils::StdGetUTF8(it+5)] = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(l.second.c_str(), it, L""));
+                                std::string n = CUnicodeUtils::StdGetUTF8(it+5);
+                                std::string v = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(l.second.c_str(), it, L""));
+                                lexerdata.Properties[n] = v;
+                                userlexerdata.Properties[n] = v;
                             }
                         }
-                        m_lexerdata[lexerdata.ID] = lexerdata;
+                        m_lexerdata[lexerdata.ID] = std::move(lexerdata);
                         if (iniind == 1)
-                            m_userlexerdata[lexerdata.ID] = userlexerdata;
+                            m_userlexerdata[lexerdata.ID] = std::move(userlexerdata);
                     }
                 }
 
@@ -178,13 +191,13 @@ void CLexStyles::Load()
                 {
                     CSimpleIni::TNamesDepend langkeys;
                     ini[iniind].GetAllKeys(L"language", langkeys);
-                    for (auto k : langkeys)
+                    for (const auto& k : langkeys)
                     {
                         std::wstring v = ini[iniind].GetValue(L"language", k);
                         ReplaceVariables(v, variables);
                         std::vector<std::wstring> exts;
                         stringtok(exts, v, true, L";");
-                        for (auto e : exts)
+                        for (const auto& e : exts)
                         {
                             m_extLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
                             if (iniind==1)
@@ -197,7 +210,7 @@ void CLexStyles::Load()
                         ini[iniind].GetAllKeys(langsect.c_str(), specLangKeys);
                         LanguageData ld;
                         ld.lexer = lexers[k];
-                        for (auto sk : specLangKeys)
+                        for (const auto& sk : specLangKeys)
                         {
                             if (_wcsnicmp(L"keywords", sk, 8) == 0)
                             {
@@ -327,7 +340,8 @@ void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring,
     size_t pos = s.find(L"$(");
     while (pos != std::wstring::npos)
     {
-        std::wstring varname = s.substr(pos, s.find(L")", pos)-pos+1);
+        size_t pos2 = s.find(L")", pos);
+        std::wstring varname = s.substr(pos, pos2-pos+1);
         auto foundIt = vars.find(varname);
         if (foundIt != vars.end())
         {
@@ -337,7 +351,7 @@ void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring,
         {
             DebugBreak();
         }
-        pos = s.find(L"$(", pos);
+        pos = s.find(L"$(", pos2);
     }
 }
 
