@@ -24,30 +24,21 @@ bool CCmdComment::Execute()
 {
     // Get Selection
     bool bSelEmpty = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
-    size_t selStart         = 0;
-    size_t selEnd           = 0;
     size_t lineStartStart   = 0;
     size_t lineEndEnd       = 0;
     bool bForceStream       = false;
+    size_t selStart         = ScintillaCall(SCI_GETSELECTIONSTART);
+    size_t selEnd           = ScintillaCall(SCI_GETSELECTIONEND);
+    size_t linestart        = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+    size_t lineend          = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
     if (!bSelEmpty)
     {
-        selStart        = ScintillaCall(SCI_GETSELECTIONSTART);
-        selEnd          = ScintillaCall(SCI_GETSELECTIONEND);
-        // go back if selEnd is on an EOL char
-        switch (ScintillaCall(SCI_GETCHARAT, selEnd))
+        if (ScintillaCall(SCI_POSITIONFROMLINE, lineend) == (sptr_t)selEnd)
         {
-        case '\r':
-        case '\n':
-            --selEnd;
-            break;
+            --lineend;
+            selEnd = ScintillaCall(SCI_GETLINEENDPOSITION, lineend);
         }
-        switch (ScintillaCall(SCI_GETCHARAT, selEnd))
-        {
-        case '\r':
-        case '\n':
-            --selEnd;
-            break;
-        }
+
         lineStartStart  = ScintillaCall(SCI_POSITIONFROMLINE, ScintillaCall(SCI_LINEFROMPOSITION, selStart));
         lineEndEnd      = ScintillaCall(SCI_GETLINEENDPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, selEnd));
         bForceStream    = (lineStartStart != selStart) || (lineEndEnd != selEnd);
@@ -73,8 +64,6 @@ bool CCmdComment::Execute()
     if (!bForceStream)
     {
         // insert a block comment, i.e. a comment marker at the beginning of each line
-        size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-        size_t lineend   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
         // first find the leftmost indent of all lines
         sptr_t indent = INTPTR_MAX;
         for (size_t line = linestart; line <= lineend; ++line)
