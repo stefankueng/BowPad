@@ -338,7 +338,7 @@
       </Command.SmallImages>
     </Command>
     <Command Name="cmdGroupPrint" LabelTitle="Print" />
-    <Command Name="cmdPrintNow" LabelTitle="Print" TooltipTitle="Print" TooltipDescription="Sends the document to the default printer">
+    <Command Name="cmdPrintNow" LabelTitle="Print" TooltipTitle="Print now" TooltipDescription="Sends the document to the default printer">
       <Command.LargeImages>
         <Image>res/PrintNowL.bmp</Image>
       </Command.LargeImages>
@@ -415,6 +415,7 @@
               <SplitButton.ButtonItem>
                 <Button CommandName="cmdPrintNow"/>
               </SplitButton.ButtonItem>
+              <Button CommandName="cmdPrintNow"/>
               <Button CommandName="cmdPrint" />
               <Button CommandName="cmdPageSetup" />
             </SplitButton>
@@ -473,6 +474,26 @@
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupVEdge">
+            <SizeDefinition>
+              <ControlNameMap>
+                <ControlNameDefinition Name="button1"/>
+              </ControlNameMap>
+              <GroupSizeDefinition Size="Large">
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
+              </GroupSizeDefinition>
+              <GroupSizeDefinition Size="Medium">
+                <Row>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+              </GroupSizeDefinition>
+              <GroupSizeDefinition Size="Small">
+                <Row>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+              </GroupSizeDefinition>
+            </SizeDefinition>
             <Spinner CommandName="cmdVerticalEdge" />
           </Group>
           <Group CommandName="cmdGroupView">
