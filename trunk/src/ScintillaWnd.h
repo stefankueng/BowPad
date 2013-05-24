@@ -91,6 +91,7 @@ protected:
     FindResult FindCloseTag(const std::string& tagName, size_t start, size_t end);
     std::vector<std::pair<size_t, size_t>> GetAttributesPos(size_t start, size_t end);
     bool IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
+    bool AutoBraces( WPARAM wParam );
 private:
     SciFnDirect                 m_pSciMsg;
     sptr_t                      m_pSciWndData;

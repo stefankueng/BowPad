@@ -213,6 +213,12 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
 
         }
         break;
+    case WM_CHAR:
+        {
+            if (AutoBraces(wParam))
+                return 0;
+        }
+        break;
     default:
         break;
     }
@@ -1184,4 +1190,90 @@ std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t st
         attributes.push_back(std::pair<size_t, size_t>(start+startPos, start+i-1));
 
     return attributes;
+}
+
+bool CScintillaWnd::AutoBraces( WPARAM wParam )
+{
+    if ((wParam == '(') ||
+        (wParam == '{') ||
+        (wParam == '[') )
+    {
+        // Get Selection
+        bool bSelEmpty          = !!Call(SCI_GETSELECTIONEMPTY);
+        size_t lineStartStart   = 0;
+        size_t lineEndEnd       = 0;
+        if (!bSelEmpty)
+        {
+            char braceBuf[2] = {0};
+            braceBuf[0] = (char)wParam;
+            char braceCloseBuf[2] = {0};
+            switch (wParam)
+            {
+            case '(':
+                braceCloseBuf[0] = ')';
+                break;
+            case '{':
+                braceCloseBuf[0] = '}';
+                break;
+            case '[':
+                braceCloseBuf[0] = ']';
+                break;
+            }
+
+            size_t selStart  = Call(SCI_GETSELECTIONSTART);
+            size_t selEnd    = Call(SCI_GETSELECTIONEND);
+            size_t lineStart = Call(SCI_LINEFROMPOSITION, selStart);
+            size_t lineEnd   = Call(SCI_LINEFROMPOSITION, selEnd);
+            if (Call(SCI_POSITIONFROMLINE, lineEnd) == (sptr_t)selEnd)
+            {
+                --lineEnd;
+                selEnd = Call(SCI_GETLINEENDPOSITION, lineEnd);
+            }
+            lineStartStart  = Call(SCI_POSITIONFROMLINE, lineStart);
+            lineEndEnd      = Call(SCI_GETLINEENDPOSITION, lineEnd);
+            if ((lineStartStart != selStart) || (lineEndEnd != selEnd))
+            {
+                // insert the brace before the selection and the closing brace after the selection
+                Call(SCI_SETSEL, (uptr_t)-1, selStart);
+                Call(SCI_BEGINUNDOACTION);
+                Call(SCI_INSERTTEXT, selStart, (sptr_t)braceBuf);
+                Call(SCI_INSERTTEXT, selEnd+1, (sptr_t)braceCloseBuf);
+                Call(SCI_SETSEL, selStart+1, selStart+1);
+                Call(SCI_ENDUNDOACTION);
+                return true;
+            }
+            else
+            {
+                // get info
+                size_t tabIndent = Call(SCI_GETTABWIDTH);
+                int indentAmount = (int)Call(SCI_GETLINEINDENTATION, lineStart);
+
+                Call(SCI_BEGINUNDOACTION);
+
+                // insert a new line at the end of the selected lines
+                Call(SCI_SETSEL, lineEndEnd, lineEndEnd);
+                Call(SCI_NEWLINE);
+                // now insert the end-brace and indent it
+                Call(SCI_INSERTTEXT, (uptr_t)-1, (sptr_t)braceCloseBuf);
+                Call(SCI_SETLINEINDENTATION, lineEnd+1, indentAmount);
+
+                Call(SCI_SETSEL, lineStartStart, lineStartStart);
+                // now insert the start-brace and a newline after it
+                Call(SCI_INSERTTEXT, (uptr_t)-1, (sptr_t)braceBuf);
+                Call(SCI_SETSEL, lineStartStart+1, lineStartStart+1);
+                Call(SCI_NEWLINE);
+                // now indent the line with the start brace
+                Call(SCI_SETLINEINDENTATION, lineStart, indentAmount);
+
+                // increase the indentation of all selected lines
+                for (size_t line = lineStart+1; line <= lineEnd+1; ++line)
+                {
+                    Call(SCI_SETLINEINDENTATION, line, Call(SCI_GETLINEINDENTATION, line)+tabIndent);
+                }
+                Call(SCI_ENDUNDOACTION);
+                return true;
+            }
+        }
+    }
+    return false;
 }
