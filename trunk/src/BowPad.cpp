@@ -21,6 +21,7 @@
 #include "KeyboardShortcutHandler.h"
 #include "BaseDialog.h"
 #include "AppUtils.h"
+#include "SmartHandle.h"
 
 HINSTANCE hInst;
 
@@ -36,6 +37,18 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     if (FAILED(hr))
     {
         return FALSE;
+    }
+
+    // set the AppID
+    typedef HRESULT STDAPICALLTYPE SetCurrentProcessExplicitAppUserModelIDFN(PCWSTR AppID);
+    CAutoLibrary hShell = AtlLoadSystemLibraryUsingFullPath(_T("shell32.dll"));
+    if (hShell)
+    {
+        SetCurrentProcessExplicitAppUserModelIDFN *pfnSetCurrentProcessExplicitAppUserModelID = (SetCurrentProcessExplicitAppUserModelIDFN*)GetProcAddress(hShell, "SetCurrentProcessExplicitAppUserModelID");
+        if (pfnSetCurrentProcessExplicitAppUserModelID)
+        {
+            pfnSetCurrentProcessExplicitAppUserModelID(APP_ID);
+        }
     }
 
     CIniSettings::Instance().SetIniPath(CAppUtils::GetDataPath() + L"\\settings");
