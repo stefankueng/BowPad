@@ -28,6 +28,7 @@
 #include <memory>
 #include <Shobjidl.h>
 #include <Shellapi.h>
+#include <Shlobj.h>
 
 IUIFramework *g_pFramework = NULL;  // Reference to the Ribbon framework.
 
@@ -890,6 +891,7 @@ bool CMainWindow::OpenFile( const std::wstring& file )
             std::wstring sFileName = file.substr(file.find_last_of('\\')+1);
             int index = m_TabBar.InsertAtEnd(sFileName.c_str());
             m_TabBar.ActivateAt(index);
+            SHAddToRecentDocs(SHARD_PATHW, file.c_str());
         }
         else
         {
