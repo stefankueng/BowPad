@@ -107,6 +107,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
         return doc;
     }
+    doc.m_lastWriteTime = fi.ftLastWriteTime;
     doc.m_path = path;
     unsigned __int64 fileSize = static_cast<__int64>(fi.nFileSizeHigh) << 32 | fi.nFileSizeLow;
     // add more room for Scintilla (usually 1/6 more for editing)
@@ -545,6 +546,47 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
     m_scratchScintilla.Call(SCI_SETSAVEPOINT);
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
     return true;
+}
+
+bool CDocumentManager::UpdateFileTime( CDocument& doc )
+{
+    if (doc.m_path.empty())
+        return false;
+    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (!hFile.IsValid())
+    {
+        return false;
+    }
+    BY_HANDLE_FILE_INFORMATION fi = {0};
+    if (!GetFileInformationByHandle(hFile, &fi))
+    {
+        return false;
+    }
+    doc.m_lastWriteTime = fi.ftLastWriteTime;
+    return true;
+}
+
+bool CDocumentManager::HasFileChanged( int index )
+{
+    CDocument doc = GetDocument(index);
+    if (doc.m_path.empty())
+        return false;
+
+    // get the last write time of the base doc file
+    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (!hFile.IsValid())
+    {
+        return false;
+    }
+    BY_HANDLE_FILE_INFORMATION fi = {0};
+    if (!GetFileInformationByHandle(hFile, &fi))
+    {
+        return false;
+    }
+    if (CompareFileTime(&doc.m_lastWriteTime, &fi.ftLastWriteTime))
+        return true;
+
+    return false;
 }
 
 int CDocumentManager::GetIndexForPath( const std::wstring& path ) const

@@ -366,6 +366,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
                             m_scintilla.RestoreCurrentPos(doc.m_position);
                             m_scintilla.SetTabSettings();
+                            HandleOutsideModifications(tab);
                             SetFocus(m_scintilla);
                             m_scintilla.Call(SCI_GRABFOCUS);
                             UpdateStatusBar(true);
@@ -539,6 +540,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     case WM_SETFOCUS:
     case WM_ACTIVATE:
     case WM_ACTIVATEAPP:
+        HandleOutsideModifications();
         SetFocus(m_scintilla);
         m_scintilla.Call(SCI_SETFOCUS, true);
         break;
@@ -742,6 +744,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
             {
                 doc.m_bIsDirty = false;
                 doc.m_bNeedsSaving = false;
+                m_DocManager.UpdateFileTime(doc);
                 m_DocManager.SetDocument(tab, doc);
                 UpdateStatusBar(true);
                 m_scintilla.Call(SCI_SETSAVEPOINT);
@@ -906,10 +909,14 @@ bool CMainWindow::ReloadTab( int tab, int encoding )
 {
     if ((tab < m_TabBar.GetItemCount())&&(tab < m_DocManager.GetCount()))
     {
-        // close the document
+        // first check if the document is modified and needs saving
         CDocument doc = m_DocManager.GetDocument(tab);
         if (doc.m_bIsDirty||doc.m_bNeedsSaving)
         {
+            // doc has modifications, ask the user what to do:
+            // * reload without saving
+            // * save first, then reload
+            // * cancel
             m_TabBar.ActivateAt(tab);
             ResString rTitle(hInst, IDS_HASMODIFICATIONS);
             ResString rQuestion(hInst, IDS_DOYOUWANTOSAVE);
@@ -1124,4 +1131,104 @@ void CMainWindow::AutoIndent( Scintilla::SCNotification * pScn )
             m_scintilla.Call(SCI_SETSEL, crange.cpMin, crange.cpMax);
         }
     }
+}
+
+bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
+{
+    static bool bInHandleOutsideModifications = false;
+    // recurse protection
+    if (bInHandleOutsideModifications)
+        return false;
+
+    bInHandleOutsideModifications = true;
+    bool bRet = true;
+    for (int i = 0; i < m_DocManager.GetCount(); ++i)
+    {
+        if (index != -1)
+            i = index;
+
+        if (m_DocManager.HasFileChanged(i))
+        {
+            CDocument doc = m_DocManager.GetDocument(i);
+            m_TabBar.ActivateAt(i);
+            ResString rTitle(hInst, IDS_OUTSIDEMODIFICATIONS);
+            ResString rQuestion(hInst, doc.m_bNeedsSaving || doc.m_bIsDirty ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
+            ResString rSave(hInst, IDS_SAVELOSTOUTSIDEMODS);
+            ResString rReload(hInst, doc.m_bNeedsSaving || doc.m_bIsDirty ? IDS_RELOADLOSTMODS : IDS_RELOAD);
+            ResString rCancel(hInst, IDS_NORELOAD);
+            wchar_t buf[100] = {0};
+            m_TabBar.GetCurrentTitle(buf, _countof(buf));
+            std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
+
+            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+            TASKDIALOG_BUTTON aCustomButtons[3];
+            int bi = 0;
+            aCustomButtons[bi].nButtonID = bi+100;
+            aCustomButtons[bi++].pszButtonText = rReload;
+            if (doc.m_bNeedsSaving || doc.m_bIsDirty)
+            {
+                aCustomButtons[bi].nButtonID = bi+100;
+                aCustomButtons[bi++].pszButtonText = rSave;
+            }
+            aCustomButtons[bi].nButtonID = bi+100;
+            aCustomButtons[bi].pszButtonText = rCancel;
+
+            tdc.hwndParent = *this;
+            tdc.hInstance = hInst;
+            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+            tdc.pButtons = aCustomButtons;
+            tdc.cButtons = doc.m_bNeedsSaving || doc.m_bIsDirty ? 3 : 2;
+            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+            tdc.pszMainIcon = doc.m_bNeedsSaving || doc.m_bIsDirty ? TD_WARNING_ICON : TD_INFORMATION_ICON;
+            tdc.pszMainInstruction = rTitle;
+            tdc.pszContent = sQuestion.c_str();
+            tdc.nDefaultButton = 100;
+            int nClickedBtn = 0;
+            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
+
+            if (SUCCEEDED(hr))
+            {
+                if (nClickedBtn == 100)
+                {
+                    // reload the document
+                    CDocument docreload = m_DocManager.LoadFile(*this, doc.m_path.c_str(), doc.m_encoding);
+                    if (docreload.m_document)
+                    {
+                        m_scintilla.SaveCurrentPos(&doc.m_position);
+
+                        m_scintilla.Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
+                        docreload.m_language = doc.m_language;
+                        docreload.m_position = doc.m_position;
+                        m_DocManager.SetDocument(i, docreload);
+                        m_scintilla.SetupLexerForLang(docreload.m_language);
+                        m_scintilla.RestoreCurrentPos(docreload.m_position);
+                    }
+                }
+                else if ((nClickedBtn == 101) && (doc.m_bNeedsSaving || doc.m_bIsDirty))
+                {
+                    // save the document
+                    SaveCurrentTab();
+                    bRet = false;
+                }
+                else
+                {
+                    // update the filetime of the document to avoid this warning
+                    m_DocManager.UpdateFileTime(doc);
+                    m_DocManager.SetDocument(i, doc);
+                    bRet = false;
+                }
+            }
+            else
+            {
+                // update the filetime of the document to avoid this warning
+                m_DocManager.UpdateFileTime(doc);
+                m_DocManager.SetDocument(i, doc);
+            }
+        }
+
+        if (index != -1)
+            break;
+    }
+    bInHandleOutsideModifications = false;
+    return bRet;
 }
