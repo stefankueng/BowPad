@@ -521,16 +521,34 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             std::string strA = CUnicodeUtils::StdGetUTF8((LPCWSTR)str);
                             m_scintilla.Call(SCI_CALLTIPSHOW, pScn->position, (sptr_t)strA.c_str());
                         }
+                        else
+                        {
+                            Scintilla::Sci_TextRange tr = {0};
+                            tr.chrg.cpMin = static_cast<long>(m_scintilla.Call(SCI_WORDSTARTPOSITION, pScn->position, false));
+                            tr.chrg.cpMax = static_cast<long>(m_scintilla.Call(SCI_WORDENDPOSITION, pScn->position, false));
+                            std::unique_ptr<char[]> word(new char[tr.chrg.cpMax - tr.chrg.cpMin + 2]);
+                            tr.lpstrText = word.get();
+
+                            m_scintilla.Call(SCI_GETTEXTRANGE, 0, (sptr_t)&tr);
+
+                            std::string sWord = tr.lpstrText;
+                            if (!sWord.empty())
+                            {
+                                char * endptr = nullptr;
+                                long number = strtol(sWord.c_str(), &endptr, 0);
+                                if (number && (endptr != &sWord[sWord.size()-1]))
+                                {
+                                    // show number calltip
+                                    std::string sCallTip = CStringUtils::Format("Dec: %ld - Hex: %#lX - Oct:%#lo", number, number, number);
+                                    m_scintilla.Call(SCI_CALLTIPSHOW, pScn->position, (sptr_t)sCallTip.c_str());
+                                }
+                            }
+                        }
                     }
                     break;
                 case SCN_DWELLEND:
                     {
-                        int style = (int)m_scintilla.Call(SCI_GETSTYLEAT, pScn->position);
-                        if (style & INDIC1_MASK)
-                        {
-                            // an url hotspot
-                            m_scintilla.Call(SCI_CALLTIPCANCEL);
-                        }
+                        m_scintilla.Call(SCI_CALLTIPCANCEL);
                     }
                     break;
                 }
