@@ -374,6 +374,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETUNDER, INDIC_TAGATTR, true);
 
     Call(SCI_SETTABWIDTH, CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
+    Call(SCI_SETUSETABS, CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1));
     Call(SCI_SETINDENTATIONGUIDES, SC_IV_LOOKBOTH);
 }
 
