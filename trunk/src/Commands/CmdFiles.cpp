@@ -153,3 +153,25 @@ bool CCmdSaveAs::Execute()
 {
     return SaveCurrentTab(true);
 }
+
+HRESULT CCmdReload::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
+{
+    if (UI_PKEY_Enabled == key)
+    {
+        int tab = GetCurrentTabIndex();
+        if ((tab >= 0) && (tab < GetDocumentCount()))
+        {
+            CDocument doc = GetDocument(tab);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
+        }
+    }
+    return E_NOTIMPL;
+}
+
+void CCmdReload::TabNotify( TBHDR * ptbhdr )
+{
+    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+    }
+}

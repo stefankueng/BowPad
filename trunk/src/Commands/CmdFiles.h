@@ -93,3 +93,25 @@ public:
     virtual bool Execute();
     virtual UINT GetCmdId() { return cmdSaveAs; }
 };
+
+class CCmdReload : public ICommand
+{
+public:
+    CCmdReload(void * obj) : ICommand(obj)
+    {
+    }
+    ~CCmdReload(){}
+
+
+    virtual bool Execute()
+    {
+        CDocument doc = GetDocument(GetCurrentTabIndex());
+        ReloadTab(GetCurrentTabIndex(), doc.m_encoding);
+        return true;
+    }
+    virtual UINT GetCmdId() { return cmdReload; }
+
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue );
+
+    virtual void TabNotify( TBHDR * ptbhdr );
+};

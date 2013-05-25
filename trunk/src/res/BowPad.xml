@@ -382,6 +382,14 @@
       </Command.LargeImages>
     </Command>
 
+    <Command Name="cmdReload" LabelTitle="Reload" TooltipTitle="Reload (F5)" TooltipDescription="Reload the file from disk">
+      <Command.LargeImages>
+        <Image>res/RefreshL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/RefreshS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
 
     <Command Name="cmdContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />
@@ -398,6 +406,7 @@
             <Button CommandName="cmdOpen" />
           </MenuGroup>
           <MenuGroup>
+            <Button CommandName="cmdReload" />
             <Button CommandName="cmdSave" />
             <Button CommandName="cmdSaveAll" />
             <Button CommandName="cmdSaveAs" />
