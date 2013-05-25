@@ -76,6 +76,7 @@ public :
     void DocScrollClear(int type) { m_docScroll.Clear(type); }
     void DocScrollAddLineColor(int type, size_t line, COLORREF clr) { m_docScroll.AddLineColor(type, line, clr); }
     void Center(long posStart, long posEnd);
+    void SetTabSettings();
 
     LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
 
@@ -84,6 +85,7 @@ protected:
 
     void SetupLexer(const LexerData& lexerdata, const std::map<int, std::string>& langdata);
     void SetupDefaultStyles();
+
     bool GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags );
     FindResult FindText(const char *text, size_t start, size_t end, int flags);
     FindResult FindOpenTag(const std::string& tagName, size_t start, size_t end);

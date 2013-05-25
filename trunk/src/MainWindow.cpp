@@ -364,8 +364,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             CDocument doc = m_DocManager.GetDocument(tab);
                             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
                             m_scintilla.RestoreCurrentPos(doc.m_position);
-                            m_scintilla.Call(SCI_SETTABWIDTH, CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
-                            m_scintilla.Call(SCI_SETUSETABS, CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1));
+                            m_scintilla.SetTabSettings();
                             SetFocus(m_scintilla);
                             m_scintilla.Call(SCI_GRABFOCUS);
                             UpdateStatusBar(true);
