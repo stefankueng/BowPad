@@ -373,8 +373,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETUNDER, INDIC_TAGMATCH, true);
     Call(SCI_INDICSETUNDER, INDIC_TAGATTR, true);
 
-    Call(SCI_SETTABWIDTH, CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
-    Call(SCI_SETUSETABS, CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1));
+    SetTabSettings();
     Call(SCI_SETINDENTATIONGUIDES, SC_IV_LOOKBOTH);
 }
 
@@ -1277,4 +1276,12 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
         }
     }
     return false;
+}
+
+void CScintillaWnd::SetTabSettings()
+{
+    Call(SCI_SETTABWIDTH, CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
+    Call(SCI_SETUSETABS, CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1));
+    Call(SCI_SETBACKSPACEUNINDENTS, 1);
+    Call(SCI_SETTABINDENTS, 1);
 }
