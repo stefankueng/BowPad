@@ -56,6 +56,8 @@ public:
         , m_bNeedsSaving(false)
         , m_bIsReadonly(false)
     {
+        m_lastWriteTime.dwHighDateTime = 0;
+        m_lastWriteTime.dwLowDateTime  = 0;
     }
 
     std::wstring GetEncodingString();
@@ -65,6 +67,7 @@ public:
     bool                    m_bHasBOM;
     int                     m_encoding;
     std::wstring            m_path;
+    FILETIME                m_lastWriteTime;
     std::wstring            m_language;
     CPosData                m_position;
     bool                    m_bIsDirty;
