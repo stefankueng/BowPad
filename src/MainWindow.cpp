@@ -475,7 +475,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         {
                             m_scintilla.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:?&@=/%#()");
 
-                            long pos = (long)m_scintilla.Call(SCI_GETCURRENTPOS);
+                            long pos = pScn->position;
                             long startPos = static_cast<long>(m_scintilla.Call(SCI_WORDSTARTPOSITION, pos, false));
                             long endPos = static_cast<long>(m_scintilla.Call(SCI_WORDENDPOSITION, pos, false));
 
