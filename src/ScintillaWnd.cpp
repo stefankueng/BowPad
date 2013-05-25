@@ -132,6 +132,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETMOUSEDWELLTIME, GetDoubleClickTime());
     Call(SCI_CALLTIPSETPOSITION, 1);
 
+    Call(SCI_SETPASTECONVERTENDINGS, 1);
+
     SetupDefaultStyles();
 
     return true;
