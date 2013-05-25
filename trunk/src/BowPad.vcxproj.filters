@@ -201,6 +201,9 @@
     <ClInclude Include="Commands\CmdSelectTab.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdBlanks.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -324,6 +327,9 @@
       <Filter>Commands</Filter>
     </ClCompile>
     <ClCompile Include="Commands\CmdGotoLine.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdBlanks.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>

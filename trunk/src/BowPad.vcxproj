@@ -217,6 +217,7 @@
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
     <ClInclude Include="AppUtils.h" />
     <ClInclude Include="ColorButton.h" />
+    <ClInclude Include="Commands\CmdBlanks.h" />
     <ClInclude Include="Commands\CmdClipboard.h" />
     <ClInclude Include="Commands\CmdCodeStyle.h" />
     <ClInclude Include="Commands\CmdComment.h" />
@@ -274,6 +275,7 @@
     <ClCompile Include="AppUtils.cpp" />
     <ClCompile Include="BowPad.cpp" />
     <ClCompile Include="ColorButton.cpp" />
+    <ClCompile Include="Commands\CmdBlanks.cpp" />
     <ClCompile Include="Commands\CmdCodeStyle.cpp" />
     <ClCompile Include="Commands\CmdComment.cpp" />
     <ClCompile Include="Commands\CmdConvertCase.cpp" />

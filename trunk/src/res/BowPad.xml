@@ -362,6 +362,26 @@
       </Command.SmallImages>
     </Command>
 
+    <Command Name="cmdGroupBlanks" LabelTitle="Blank operations"/>
+    <Command Name="cmdTrim" LabelTitle="Trim Whitespaces" TooltipTitle="Trim Whitespaces" TooltipDescription="Removes whitespaces at the end of lines">
+      <Command.LargeImages>
+        <Image>res/TrimL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/TrimS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdTabs2Spaces" LabelTitle="Tabs to Spaces" TooltipTitle="Tabs to Sapaces" TooltipDescription="Converts all tabs in the document to spaces">
+      <Command.LargeImages>
+        <Image>res/Tab2SpaceL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpaces2Tabs" LabelTitle="Spaces to Tabs" TooltipTitle="Spaces to Tabs" TooltipDescription="Converts all spaces in the document to tabs">
+      <Command.LargeImages>
+        <Image>res/Space2TabL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
 
     <Command Name="cmdContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />
@@ -573,6 +593,11 @@
             <Button CommandName="cmdLineJoin" />
             <Button CommandName="cmdLineUp" />
             <Button CommandName="cmdLineDown" />
+          </Group>
+          <Group CommandName="cmdGroupBlanks" SizeDefinition="ThreeButtons">
+            <Button CommandName="cmdTrim" />
+            <Button CommandName="cmdTabs2Spaces" />
+            <Button CommandName="cmdSpaces2Tabs" />
           </Group>
         </Tab>
       </Ribbon.Tabs>
