@@ -364,6 +364,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             CDocument doc = m_DocManager.GetDocument(tab);
                             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
                             m_scintilla.RestoreCurrentPos(doc.m_position);
+                            m_scintilla.Call(SCI_SETTABWIDTH, CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
+                            m_scintilla.Call(SCI_SETUSETABS, CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1));
                             SetFocus(m_scintilla);
                             m_scintilla.Call(SCI_GRABFOCUS);
                             UpdateStatusBar(true);
@@ -577,6 +579,7 @@ LRESULT CMainWindow::DoCommand(int id)
             std::wstring s = CStringUtils::Format(newRes, newCount);
             int index = m_TabBar.InsertAtEnd(s.c_str());
             m_TabBar.ActivateAt(index);
+            m_scintilla.SetupLexerForLang(L"Text");
         }
         break;
     case cmdClose:
