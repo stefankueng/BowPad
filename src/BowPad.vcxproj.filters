@@ -204,6 +204,9 @@
     <ClInclude Include="Commands\CmdBlanks.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\PathUtils.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -331,6 +334,9 @@
     </ClCompile>
     <ClCompile Include="Commands\CmdBlanks.cpp">
       <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\PathUtils.cpp">
+      <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
