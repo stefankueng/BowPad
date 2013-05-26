@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "AppUtils.h"
 
+#include <memory>
 
 CAppUtils::CAppUtils(void)
 {
