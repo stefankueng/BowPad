@@ -22,6 +22,9 @@
 #include "BaseDialog.h"
 #include "AppUtils.h"
 #include "SmartHandle.h"
+#include "PathUtils.h"
+
+#include <Shellapi.h>
 
 HINSTANCE hInst;
 
@@ -65,6 +68,25 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             if (parser.HasVal(L"line"))
             {
                 mainWindow.GoToLine(parser.GetLongVal(L"line")-1);
+            }
+        }
+        else
+        {
+            // find out if there are paths specified without the key/value pair syntax
+            int nArgs;
+            int i;
+
+            LPWSTR * szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+            if( szArglist )
+            {
+                for( i=1; i<nArgs; i++)
+                {
+                    std::wstring path = CPathUtils::GetLongPathname(szArglist[i]);
+                    mainWindow.OpenFile(path);
+                }
+
+                // Free memory allocated for CommandLineToArgvW arguments.
+                LocalFree(szArglist);
             }
         }
         mainWindow.EnsureAtLeastOneTab();
