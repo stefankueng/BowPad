@@ -16,6 +16,7 @@
 //
 
 #pragma once
+#include <string>
 class CAppUtils
 {
 public:
