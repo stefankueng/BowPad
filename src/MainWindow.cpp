@@ -364,6 +364,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         {
                             CDocument doc = m_DocManager.GetDocument(tab);
                             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+                            m_scintilla.SetupLexerForLang(doc.m_language);
                             m_scintilla.RestoreCurrentPos(doc.m_position);
                             m_scintilla.SetTabSettings();
                             HandleOutsideModifications(tab);
