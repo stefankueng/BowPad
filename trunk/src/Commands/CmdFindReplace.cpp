@@ -173,7 +173,15 @@ bool CCmdFindReplace::Execute()
     if (m_pFindReplaceDlg == nullptr)
         m_pFindReplaceDlg = new CFindReplaceDlg(m_Obj);
 
+    int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
+    std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
+    ScintillaCall(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
+    std::string sSelText = seltextbuffer.get();
+
     m_pFindReplaceDlg->ShowModeless(hInst, IDD_FINDREPLACEDLG, GetHwnd());
+    if (!sSelText.empty())
+        SetDlgItemText(*m_pFindReplaceDlg, IDC_SEARCHCOMBO, CUnicodeUtils::StdGetUnicode(sSelText).c_str());
+
 
     return true;
 }
