@@ -38,6 +38,7 @@
 #include "CmdGotoLine.h"
 #include "CmdSelectTab.h"
 #include "CmdBlanks.h"
+#include "CmdZoom.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -176,6 +177,12 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdSelectTab(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdZoom100(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdZoomIn(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdZoomOut(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 }
 

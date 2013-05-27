@@ -569,7 +569,7 @@ bool CDocumentManager::UpdateFileTime( CDocument& doc )
 bool CDocumentManager::HasFileChanged( int index )
 {
     CDocument doc = GetDocument(index);
-    if (doc.m_path.empty())
+    if (doc.m_path.empty() || ((doc.m_lastWriteTime.dwLowDateTime==0)&&(doc.m_lastWriteTime.dwHighDateTime==0)))
         return false;
 
     // get the last write time of the base doc file
