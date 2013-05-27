@@ -433,7 +433,7 @@ void CScintillaWnd::MarkSelectedWord()
     if (endstylepos < 0)
         endstylepos = (long)Call(SCI_GETLENGTH)-startstylepos;
 
-    int len = endstylepos - startstylepos + 1;
+    int len = endstylepos - startstylepos;
     // reset indicators
     Call(SCI_SETINDICATORCURRENT, INDIC_SELECTION_MARK);
     Call(SCI_INDICATORCLEARRANGE, startstylepos, len);
