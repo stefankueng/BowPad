@@ -154,7 +154,7 @@ bool CCmdSaveAs::Execute()
     return SaveCurrentTab(true);
 }
 
-HRESULT CCmdReload::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdReload::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
 {
     if (UI_PKEY_Enabled == key)
     {
