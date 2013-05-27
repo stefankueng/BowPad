@@ -239,6 +239,7 @@
     <ClInclude Include="Commands\CmdUndo.h" />
     <ClInclude Include="Commands\CmdVerticalEdge.h" />
     <ClInclude Include="Commands\CmdWhiteSpace.h" />
+    <ClInclude Include="Commands\CmdZoom.h" />
     <ClInclude Include="Commands\CommandHandler.h" />
     <ClInclude Include="Commands\ICommand.h" />
     <ClInclude Include="DocScroll.h" />
