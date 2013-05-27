@@ -95,8 +95,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
             DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
 
             int style = (int)ScintillaCall(SCI_GETSTYLEAT, ScintillaCall(SCI_GETCURRENTPOS));
-            SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_SETCURSEL, style, 0);
-            DoCommand(IDC_STYLECOMBO, CBN_SELCHANGE);
+            SelectStyle(style);
         }
         return FALSE;
     case WM_ACTIVATE:
@@ -114,8 +113,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
                 CDocument doc = GetDocument(GetCurrentTabIndex());
                 if (doc.m_language.compare(currentLang) == 0)
                 {
-                    SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_SETCURSEL, wParam, 0);
-                    DoCommand(IDC_STYLECOMBO, CBN_SELCHANGE);
+                    SelectStyle((int)wParam);
                 }
             }
         }
@@ -127,8 +125,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
             DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
 
             int style = (int)ScintillaCall(SCI_GETSTYLEAT, ScintillaCall(SCI_GETCURRENTPOS));
-            SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_SETCURSEL, style, 0);
-            DoCommand(IDC_STYLECOMBO, CBN_SELCHANGE);
+            SelectStyle(style);
         }
         break;
     default:
@@ -334,6 +331,20 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
         break;
     }
     return 1;
+}
+
+void CStyleConfiguratorDlg::SelectStyle( int style )
+{
+    int styleCount = (int)SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_GETCOUNT, 0, 0);
+    for (int i = 0; i < styleCount; ++i)
+    {
+        int stylec = (int)SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_GETITEMDATA, i, 0);
+        if (style == stylec)
+        {
+            SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_SETCURSEL, i, 0);
+            DoCommand(IDC_STYLECOMBO, CBN_SELCHANGE);
+        }
+    }
 }
 
 bool CCmdStyleConfigurator::Execute()
