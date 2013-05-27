@@ -38,7 +38,7 @@ protected:
     virtual UINT            GetCmdId() { return 0; }
 
     static int CALLBACK     EnumFontFamExProc(const LOGFONT *lpelfe, const TEXTMETRIC *lpntme, DWORD FontType, LPARAM lParam);
-
+    void                    SelectStyle( int style );
 private:
     std::vector<std::wstring>   m_fonts;
     std::set<std::wstring>      m_tempFonts;
