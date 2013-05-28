@@ -40,6 +40,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
     {
     case WM_INITDIALOG:
         {
+            InitDialog(hwndDlg, IDI_BOWPAD);
             m_resizer.Init(hwndDlg);
             m_resizer.AddControl(hwndDlg, IDC_LABEL1, RESIZER_TOPLEFT);
             m_resizer.AddControl(hwndDlg, IDC_LABEL2, RESIZER_TOPLEFT);
@@ -53,8 +54,6 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             m_resizer.AddControl(hwndDlg, IDC_REPLACEALLBTN, RESIZER_TOPRIGHT);
             m_resizer.AddControl(hwndDlg, IDCANCEL, RESIZER_TOPRIGHT);
 
-            InitDialog(hwndDlg, IDI_BOWPAD);
-
             SetFocus(GetDlgItem(*this, IDC_SEARCHCOMBO));
         }
         return FALSE;
@@ -67,8 +66,8 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
     case WM_GETMINMAXINFO:
         {
             MINMAXINFO * mmi = (MINMAXINFO*)lParam;
-            mmi->ptMinTrackSize.x = m_resizer.GetDlgRect()->right;
-            mmi->ptMinTrackSize.y = m_resizer.GetDlgRect()->bottom;
+            mmi->ptMinTrackSize.x = m_resizer.GetDlgRectScreen()->right;
+            mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
             return 0;
         }
         break;
