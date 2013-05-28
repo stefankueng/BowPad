@@ -24,20 +24,21 @@
 #include <vector>
 #include <tuple>
 
-//                    codepage name        category
-std::vector<std::tuple<UINT, std::wstring, int>>  codepages;
+//                 codepage  BOM   name          category
+std::vector<std::tuple<UINT, bool, std::wstring, int>>  codepages;
 
 BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
 {
     if (codepages.empty())
     {
         // insert the main encodings
-        codepages.push_back(std::make_tuple(GetACP(), L"ANSI", 0));
-        codepages.push_back(std::make_tuple(CP_UTF8, L"UTF-8", 0));
-        codepages.push_back(std::make_tuple(1200, L"UTF-16 Little Endian", 0));
-        codepages.push_back(std::make_tuple(1201, L"UTF-16 Big Endian", 0));
-        codepages.push_back(std::make_tuple(12000, L"UTF-32 Little Endian", 0));
-        codepages.push_back(std::make_tuple(1200, L"UTF-32 Big Endian", 0));
+        codepages.push_back(std::make_tuple(GetACP(), false, L"ANSI", 0));
+        codepages.push_back(std::make_tuple(CP_UTF8, false, L"UTF-8", 0));
+        codepages.push_back(std::make_tuple(CP_UTF8, true, L"UTF-8 BOM", 0));
+        codepages.push_back(std::make_tuple(1200, true, L"UTF-16 Little Endian", 0));
+        codepages.push_back(std::make_tuple(1201, true, L"UTF-16 Big Endian", 0));
+        codepages.push_back(std::make_tuple(12000, true, L"UTF-32 Little Endian", 0));
+        codepages.push_back(std::make_tuple(1200, true, L"UTF-32 Big Endian", 0));
     }
     UINT codepage = _wtoi(lpCodePageString);
     switch (codepage)
@@ -63,7 +64,7 @@ BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
                 if (pos != std::wstring::npos)
                     name.erase(pos, 1);
                 CStringUtils::trim(name);
-                codepages.push_back(std::make_tuple(codepage, name, 1));
+                codepages.push_back(std::make_tuple(codepage, false, name, 1));
             }
         }
         break;
@@ -167,6 +168,8 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         // populate the dropdown with the code pages
         for (auto it:codepages)
         {
+            if ((std::get<1>(it)) && (std::get<2>(it).compare(L"UTF-8 BOM")==0))
+                continue;
             // Create a new property set for each item.
             CPropertySet* pItem;
             hr = CPropertySet::CreateInstance(&pItem);
@@ -176,7 +179,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
                 return hr;
             }
 
-            pItem->InitializeItemProperties(pImg, std::get<1>(it).c_str(), std::get<2>(it));
+            pItem->InitializeItemProperties(pImg, std::get<2>(it).c_str(), std::get<3>(it));
 
             // Add the newly-created property set to the collection supplied by the framework.
             pCollection->Add(pItem);
@@ -197,7 +200,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
     {
         CDocument doc = GetDocument(GetCurrentTabIndex());
         hr = S_FALSE;
-        if (doc.m_encoding == -1)
+        if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
         {
             hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
             hr = S_OK;
@@ -349,7 +352,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
                 return hr;
             }
 
-            pItem->InitializeItemProperties(pImg, std::get<1>(it).c_str(), std::get<2>(it));
+            pItem->InitializeItemProperties(pImg, std::get<2>(it).c_str(), std::get<3>(it));
 
             // Add the newly-created property set to the collection supplied by the framework.
             pCollection->Add(pItem);
@@ -364,7 +367,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
     {
         CDocument doc = GetDocument(GetCurrentTabIndex());
         hr = S_FALSE;
-        if (doc.m_encoding == -1)
+        if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
         {
             hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
             hr = S_OK;
@@ -373,7 +376,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
         {
             for (size_t i = 0; i < codepages.size(); ++i)
             {
-                if ((int)std::get<0>(codepages[i]) == doc.m_encoding)
+                if (((int)std::get<0>(codepages[i]) == doc.m_encoding)&&(std::get<1>(codepages[i]) == doc.m_bHasBOM))
                 {
                     hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
                     hr = S_OK;
@@ -398,9 +401,13 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, co
             UINT codepage = std::get<0>(codepages[selected]);
             CDocument doc = GetDocument(GetCurrentTabIndex());
             doc.m_encoding = codepage;
+            doc.m_bHasBOM = std::get<1>(codepages[selected]);
             doc.m_bIsDirty = true;
             doc.m_bNeedsSaving = true;
             SetDocument(GetCurrentTabIndex(), doc);
+            // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
+            ScintillaCall(SCI_ADDUNDOACTION, 0,0);
+            ScintillaCall(SCI_UNDO);
             UpdateStatusBar(true);
             hr = S_OK;
         }
