@@ -524,6 +524,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         }
                         else
                         {
+                            m_scintilla.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#");
                             Scintilla::Sci_TextRange tr = {0};
                             tr.chrg.cpMin = static_cast<long>(m_scintilla.Call(SCI_WORDSTARTPOSITION, pScn->position, false));
                             tr.chrg.cpMax = static_cast<long>(m_scintilla.Call(SCI_WORDENDPOSITION, pScn->position, false));
@@ -535,15 +536,56 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             std::string sWord = tr.lpstrText;
                             if (!sWord.empty())
                             {
-                                char * endptr = nullptr;
-                                long number = strtol(sWord.c_str(), &endptr, 0);
-                                if (number && (endptr != &sWord[sWord.size()-1]))
+                                if ((sWord[0] == '#') &&
+                                    ((sWord.size() == 4) || (sWord.size() == 7)))
                                 {
-                                    // show number calltip
-                                    std::string sCallTip = CStringUtils::Format("Dec: %ld - Hex: %#lX - Oct:%#lo", number, number, number);
+                                    // html color
+                                    COLORREF color = 0;
+                                    DWORD hexval = 0;
+                                    if (sWord.size() == 4)
+                                    {
+                                        // shorthand form
+                                        char * endptr = nullptr;
+                                        char dig[2] = {0};
+                                        dig[0] = sWord[1];
+                                        int red = strtol(dig, &endptr, 16);
+                                        red = red * 16 + red;
+                                        dig[0] = sWord[2];
+                                        int green = strtol(dig, &endptr, 16);
+                                        green = green * 16 + green;
+                                        dig[0] = sWord[3];
+                                        int blue = strtol(dig, &endptr, 16);
+                                        blue = blue * 16 + blue;
+                                        color = RGB(red, green, blue);
+                                        hexval = (RGB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF)) | (color & 0xFF000000);
+                                    }
+                                    else if (sWord.size() == 7)
+                                    {
+                                        // normal/long form
+                                        char * endptr = nullptr;
+                                        hexval = strtol(&sWord[1], &endptr, 16);
+                                        color = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
+                                    }
+                                    std::string sCallTip = CStringUtils::Format("RGB(%d,%d,%d)\nHex: #%06lX\n####################\n####################\n####################", GetRValue(color), GetGValue(color), GetBValue(color), hexval);
+                                    m_scintilla.Call(SCI_CALLTIPSETFOREHLT, color);
                                     m_scintilla.Call(SCI_CALLTIPSHOW, pScn->position, (sptr_t)sCallTip.c_str());
+                                    size_t pos = sCallTip.find_first_of('\n');
+                                    pos = sCallTip.find_first_of('\n', pos+1);
+                                    m_scintilla.Call(SCI_CALLTIPSETHLT, pos, pos+63);
+                                }
+                                else
+                                {
+                                    char * endptr = nullptr;
+                                    long number = strtol(sWord.c_str(), &endptr, 0);
+                                    if (number && (endptr != &sWord[sWord.size()-1]))
+                                    {
+                                        // show number calltip
+                                        std::string sCallTip = CStringUtils::Format("Dec: %ld - Hex: %#lX - Oct:%#lo", number, number, number);
+                                        m_scintilla.Call(SCI_CALLTIPSHOW, pScn->position, (sptr_t)sCallTip.c_str());
+                                    }
                                 }
                             }
+                            m_scintilla.Call(SCI_SETCHARSDEFAULT);
                         }
                     }
                     break;
