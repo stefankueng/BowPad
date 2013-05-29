@@ -423,7 +423,7 @@ void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
 }
 
 
-void CScintillaWnd::MarkSelectedWord()
+void CScintillaWnd::MarkSelectedWord( bool clear )
 {
     static std::string lastSelText;
     LRESULT firstline = Call(SCI_GETFIRSTVISIBLELINE);
@@ -439,8 +439,9 @@ void CScintillaWnd::MarkSelectedWord()
     Call(SCI_INDICATORCLEARRANGE, startstylepos, len);
 
     int selTextLen = (int)Call(SCI_GETSELTEXT);
-    if (selTextLen == 0)
+    if ((selTextLen == 0)||(clear))
     {
+        lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
@@ -450,6 +451,7 @@ void CScintillaWnd::MarkSelectedWord()
     size_t selEndLine   = Call(SCI_LINEFROMPOSITION, Call(SCI_GETSELECTIONEND), 0);
     if (selStartLine != selEndLine)
     {
+        lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
@@ -459,6 +461,7 @@ void CScintillaWnd::MarkSelectedWord()
     Call(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
     if (seltextbuffer[0] == 0)
     {
+        lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
