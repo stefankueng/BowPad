@@ -20,6 +20,13 @@
 #include <vector>
 #include "Document.h"
 
+enum DocModifiedState
+{
+    DM_Unmodified,
+    DM_Modified,
+    DM_Removed,
+    DM_Unknown
+};
 
 class CDocumentManager
 {
@@ -40,7 +47,7 @@ public:
     CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding);
     bool                        SaveFile(HWND hWnd, const CDocument& doc);
     bool                        UpdateFileTime(CDocument& doc);
-    bool                        HasFileChanged(int index);
+    DocModifiedState            HasFileChanged(int index);
 private:
     FormatType                  GetEOLFormatForm(const char *data) const;
 

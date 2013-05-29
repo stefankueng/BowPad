@@ -555,6 +555,11 @@ bool CDocumentManager::UpdateFileTime( CDocument& doc )
     CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (!hFile.IsValid())
     {
+        if (GetLastError() == ERROR_FILE_NOT_FOUND)
+        {
+            doc.m_lastWriteTime.dwLowDateTime  = 0;
+            doc.m_lastWriteTime.dwHighDateTime = 0;
+        }
         return false;
     }
     BY_HANDLE_FILE_INFORMATION fi = {0};
@@ -566,27 +571,29 @@ bool CDocumentManager::UpdateFileTime( CDocument& doc )
     return true;
 }
 
-bool CDocumentManager::HasFileChanged( int index )
+DocModifiedState CDocumentManager::HasFileChanged( int index )
 {
     CDocument doc = GetDocument(index);
     if (doc.m_path.empty() || ((doc.m_lastWriteTime.dwLowDateTime==0)&&(doc.m_lastWriteTime.dwHighDateTime==0)))
-        return false;
+        return DM_Unmodified;
 
     // get the last write time of the base doc file
     CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (!hFile.IsValid())
     {
-        return false;
+        if (GetLastError() == ERROR_FILE_NOT_FOUND)
+            return DM_Removed;
+        return DM_Unknown;
     }
     BY_HANDLE_FILE_INFORMATION fi = {0};
     if (!GetFileInformationByHandle(hFile, &fi))
     {
-        return false;
+        return DM_Unknown;
     }
     if (CompareFileTime(&doc.m_lastWriteTime, &fi.ftLastWriteTime))
-        return true;
+        return DM_Modified;
 
-    return false;
+    return DM_Unmodified;
 }
 
 int CDocumentManager::GetIndexForPath( const std::wstring& path ) const
