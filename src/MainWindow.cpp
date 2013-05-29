@@ -1209,7 +1209,8 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
         if (index != -1)
             i = index;
 
-        if (m_DocManager.HasFileChanged(i))
+        auto ds = m_DocManager.HasFileChanged(i);
+        if (ds == DM_Modified)
         {
             CDocument doc = m_DocManager.GetDocument(i);
             m_TabBar.ActivateAt(i);
@@ -1285,6 +1286,62 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
                 // update the filetime of the document to avoid this warning
                 m_DocManager.UpdateFileTime(doc);
                 m_DocManager.SetDocument(i, doc);
+            }
+        }
+        else if (ds == DM_Removed)
+        {
+            // file was removed. Options are:
+            // * keep the file open
+            // * close the file
+            CDocument doc = m_DocManager.GetDocument(i);
+            m_TabBar.ActivateAt(i);
+            ResString rTitle(hInst, IDS_OUTSIDEREMOVEDHEAD);
+            ResString rQuestion(hInst, IDS_OUTSIDEREMOVED);
+            ResString rKeep(hInst, IDS_OUTSIDEREMOVEDKEEP);
+            ResString rClose(hInst, IDS_OUTSIDEREMOVEDCLOSE);
+            wchar_t buf[100] = {0};
+            m_TabBar.GetCurrentTitle(buf, _countof(buf));
+            std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
+
+            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+            TASKDIALOG_BUTTON aCustomButtons[2];
+            int bi = 0;
+            aCustomButtons[bi].nButtonID = bi+100;
+            aCustomButtons[bi++].pszButtonText = rKeep;
+            aCustomButtons[bi].nButtonID = bi+100;
+            aCustomButtons[bi].pszButtonText = rClose;
+
+            tdc.hwndParent = *this;
+            tdc.hInstance = hInst;
+            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+            tdc.pButtons = aCustomButtons;
+            tdc.cButtons = _countof(aCustomButtons);
+            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+            tdc.pszMainIcon = TD_INFORMATION_ICON;
+            tdc.pszMainInstruction = rTitle;
+            tdc.pszContent = sQuestion.c_str();
+            tdc.nDefaultButton = 100;
+            int nClickedBtn = 0;
+            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
+
+            if (SUCCEEDED(hr) && (nClickedBtn == 101))
+            {
+                // close the tab
+                CloseTab(i);
+                if (index == -1)
+                    --i;    // the tab was removed, so continue with the next one
+            }
+            else
+            {
+                // keep the file: mark the file as modified
+                doc.m_bNeedsSaving = true;
+                // update the filetime of the document to avoid this warning
+                m_DocManager.UpdateFileTime(doc);
+                m_DocManager.SetDocument(i, doc);
+                // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
+                m_scintilla.Call(SCI_ADDUNDOACTION, 0, 0);
+                m_scintilla.Call(SCI_UNDO);
+                bRet = false;
             }
         }
 
