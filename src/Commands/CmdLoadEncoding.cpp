@@ -56,7 +56,7 @@ BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
             if (cpex.CodePageName[0])
             {
                 std::wstring name = cpex.CodePageName;
-                name = name.substr(name.find_first_of(' '));
+                name = name.substr(name.find_first_of(' ')+1);
                 size_t pos = name.find_first_of('(');
                 if (pos != std::wstring::npos)
                     name.erase(pos, 1);
@@ -64,7 +64,7 @@ BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
                 if (pos != std::wstring::npos)
                     name.erase(pos, 1);
                 CStringUtils::trim(name);
-                codepages.push_back(std::make_tuple(codepage, false, name, 1));
+                codepages.push_back(std::make_tuple(codepage, false, std::move(name), 1));
             }
         }
         break;
