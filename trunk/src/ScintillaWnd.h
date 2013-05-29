@@ -69,7 +69,7 @@ public :
     void SetupLexerForExt(const std::wstring& ext);
     void SetupLexerForLang(const std::wstring& lang);
     void MarginClick(Scintilla::SCNotification * pNotification);
-    void MarkSelectedWord();
+    void MarkSelectedWord(bool clear);
     void MatchBraces();
     void MatchTags();
     bool GetSelectedCount(size_t& selByte, size_t& selLine);

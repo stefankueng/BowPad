@@ -367,6 +367,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             m_scintilla.SetupLexerForLang(doc.m_language);
                             m_scintilla.RestoreCurrentPos(doc.m_position);
                             m_scintilla.SetTabSettings();
+                            m_scintilla.MarkSelectedWord(true);
                             HandleOutsideModifications(tab);
                             SetFocus(m_scintilla);
                             m_scintilla.Call(SCI_GRABFOCUS);
@@ -457,7 +458,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         if ((pScn->updated & SC_UPDATE_SELECTION) ||
                             (pScn->updated & SC_UPDATE_H_SCROLL)  ||
                             (pScn->updated & SC_UPDATE_V_SCROLL))
-                            m_scintilla.MarkSelectedWord();
+                            m_scintilla.MarkSelectedWord(false);
 
                         m_scintilla.MatchBraces();
                         m_scintilla.MatchTags();
