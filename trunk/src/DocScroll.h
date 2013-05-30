@@ -22,6 +22,7 @@
 
 #define DOCSCROLLTYPE_SELTEXT           1
 #define DOCSCROLLTYPE_SEARCHTEXT        2
+#define DOCSCROLLTYPE_BOOKMARK          3
 
 class CScintillaWnd;
 
