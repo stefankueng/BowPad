@@ -24,6 +24,7 @@
 #include "MRU.h"
 #include "KeyboardShortcutHandler.h"
 #include "AppUtils.h"
+#include "PreserveChdir.h"
 
 #include <memory>
 #include <Shobjidl.h>
@@ -757,6 +758,8 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         CDocument doc = m_DocManager.GetDocument(tab);
         if (doc.m_path.empty() || bSaveAs)
         {
+            PreserveChdir keepCWD;
+
             CComPtr<IFileSaveDialog> pfd = NULL;
 
             HRESULT hr = pfd.CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_INPROC_SERVER);
