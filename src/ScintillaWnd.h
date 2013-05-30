@@ -75,6 +75,7 @@ public :
     bool GetSelectedCount(size_t& selByte, size_t& selLine);
     void DocScrollClear(int type) { m_docScroll.Clear(type); }
     void DocScrollAddLineColor(int type, size_t line, COLORREF clr) { m_docScroll.AddLineColor(type, line, clr); }
+    void MarkBookmarksInScrollbar();
     void Center(long posStart, long posEnd);
     void SetTabSettings();
 
@@ -94,6 +95,12 @@ protected:
     std::vector<std::pair<size_t, size_t>> GetAttributesPos(size_t start, size_t end);
     bool IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
     bool AutoBraces( WPARAM wParam );
+
+    void BookmarkAdd(long lineno);
+    void BookmarkDelete(int lineno);
+    bool IsBookmarkPresent(int lineno);
+    void BookmarkToggle(int lineno);
+
 private:
     SciFnDirect                 m_pSciMsg;
     sptr_t                      m_pSciWndData;

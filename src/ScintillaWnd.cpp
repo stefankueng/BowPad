@@ -30,8 +30,6 @@ const int SC_MARGE_SYBOLE = 1;
 const int SC_MARGE_FOLDER = 2;
 
 const int MARK_BOOKMARK = 24;
-const int MARK_HIDELINESBEGIN = 23;
-const int MARK_HIDELINESEND = 22;
 
 
 extern IUIFramework * g_pFramework;
@@ -57,13 +55,14 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
     Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, 14);
+    Call(SCI_SETMARGINCURSORN, SC_MARGE_FOLDER, SC_CURSORARROW);
     Call(SCI_SETAUTOMATICFOLD, SC_AUTOMATICFOLD_SHOW|SC_AUTOMATICFOLD_CLICK|SC_AUTOMATICFOLD_CHANGE);
 
-    Call(SCI_SETMARGINMASKN, SC_MARGE_SYBOLE, (1<<MARK_BOOKMARK) | (1<<MARK_HIDELINESBEGIN) | (1<<MARK_HIDELINESEND));
+    Call(SCI_SETMARGINMASKN, SC_MARGE_SYBOLE, (1<<MARK_BOOKMARK));
+    Call(SCI_SETMARGINWIDTHN, SC_MARGE_SYBOLE, 14);
+    Call(SCI_SETMARGINCURSORN, SC_MARGE_SYBOLE, SC_CURSORARROW);
     Call(SCI_MARKERSETALPHA, MARK_BOOKMARK, 70);
-    Call(SCI_MARKERDEFINEPIXMAP, MARK_BOOKMARK, (LPARAM)bookmark_xpm);
-    Call(SCI_MARKERDEFINEPIXMAP, MARK_HIDELINESBEGIN, (LPARAM)acTop_xpm);
-    Call(SCI_MARKERDEFINEPIXMAP, MARK_HIDELINESEND, (LPARAM)acBottom_xpm);
+    Call(SCI_MARKERDEFINEPIXMAP, MARK_BOOKMARK, (LPARAM)bullet_red);
 
     Call(SCI_SETMARGINSENSITIVEN, SC_MARGE_FOLDER, true);
     Call(SCI_SETMARGINSENSITIVEN, SC_MARGE_SYBOLE, true);
@@ -418,8 +417,8 @@ void CScintillaWnd::Center(long posStart, long posEnd)
 
 void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
 {
-    //int lineClick = int(Call(SCI_LINEFROMPOSITION, pNotification->position, 0));
-    //int levelClick = int(Call(SCI_GETFOLDLEVEL, lineClick, 0));
+    if ((pNotification->margin == SC_MARGE_SYBOLE) && !pNotification->modifiers)
+        BookmarkToggle(Call(SCI_LINEFROMPOSITION, pNotification->position));
 }
 
 
@@ -1289,4 +1288,56 @@ void CScintillaWnd::SetTabSettings()
     Call(SCI_SETUSETABS, CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1));
     Call(SCI_SETBACKSPACEUNINDENTS, 1);
     Call(SCI_SETTABINDENTS, 1);
+}
+
+void CScintillaWnd::BookmarkAdd( long lineno )
+{
+    if (lineno == -1)
+        lineno = long(Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS)));
+    if (!IsBookmarkPresent(lineno))
+    {
+        Call(SCI_MARKERADD, lineno, MARK_BOOKMARK);
+        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, lineno, RGB(255,0,0));
+    }
+}
+
+void CScintillaWnd::BookmarkDelete( int lineno )
+{
+    if (lineno == -1)
+        lineno = long(Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS)));
+    if ( IsBookmarkPresent(lineno))
+    {
+        Call(SCI_MARKERDELETE, lineno, MARK_BOOKMARK);
+        m_docScroll.RemoveLine(DOCSCROLLTYPE_BOOKMARK, lineno);
+    }
+}
+
+bool CScintillaWnd::IsBookmarkPresent( int lineno )
+{
+    if (lineno == -1)
+        lineno = long(Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS)));
+    LRESULT state = Call(SCI_MARKERGET, lineno);
+    return ((state & (1 << MARK_BOOKMARK)) != 0);
+}
+
+void CScintillaWnd::BookmarkToggle( int lineno )
+{
+    if (lineno == -1)
+        lineno = long(Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS)));
+
+    if (IsBookmarkPresent(lineno))
+        BookmarkDelete(lineno);
+    else
+        BookmarkAdd(lineno);
+}
+
+void CScintillaWnd::MarkBookmarksInScrollbar()
+{
+    m_docScroll.Clear(DOCSCROLLTYPE_BOOKMARK);
+    long line = (long)Call(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
+    while (line >= 0)
+    {
+        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, line, RGB(255,0,0));
+        line = (long)Call(SCI_MARKERNEXT, line+1, (1 << MARK_BOOKMARK));
+    }
 }

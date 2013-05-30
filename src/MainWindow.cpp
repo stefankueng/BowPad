@@ -369,6 +369,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             m_scintilla.RestoreCurrentPos(doc.m_position);
                             m_scintilla.SetTabSettings();
                             m_scintilla.MarkSelectedWord(true);
+                            m_scintilla.MarkBookmarksInScrollbar();
                             HandleOutsideModifications(tab);
                             SetFocus(m_scintilla);
                             m_scintilla.Call(SCI_GRABFOCUS);
