@@ -18,9 +18,12 @@
 #include "CmdFiles.h"
 #include "MRU.h"
 #include "LexStyles.h"
+#include "PreserveChdir.h"
 
 bool CCmdOpen::Execute()
 {
+    PreserveChdir keepCWD;
+
     std::vector<std::wstring> paths;
     CComPtr<IFileOpenDialog> pfd = NULL;
 
