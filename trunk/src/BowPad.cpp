@@ -74,12 +74,11 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         {
             // find out if there are paths specified without the key/value pair syntax
             int nArgs;
-            int i;
 
             LPWSTR * szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
             if( szArglist )
             {
-                for( i=1; i<nArgs; i++)
+                for( int i=1; i<nArgs; i++)
                 {
                     std::wstring path = CPathUtils::GetLongPathname(szArglist[i]);
                     mainWindow.OpenFile(path);

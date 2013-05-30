@@ -34,7 +34,7 @@ public:
 
     virtual bool Execute()
     {
-        CCmdPrint::Print(true);
+        Print(true);
         return true;
     }
 

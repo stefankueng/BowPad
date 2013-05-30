@@ -1,4 +1,3 @@
-LIBRARY	"BowPadShellExtension"
 EXPORTS
     DllGetClassObject   PRIVATE
     DllCanUnloadNow     PRIVATE
