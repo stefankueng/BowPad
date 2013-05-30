@@ -193,6 +193,12 @@ void CTabBar::ActivateAt(int index) const
     InvalidateRect(*this, NULL, TRUE);
     if (GetCurrentTabIndex() != index)
     {
+        TBHDR nmhdr;
+        nmhdr.hdr.hwndFrom = *this;
+        nmhdr.hdr.code = TCN_SELCHANGING;
+        nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
+        nmhdr.tabOrigin = GetCurrentTabIndex();
+        ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
         ::SendMessage(*this, TCM_SETCURSEL, index, 0);
     }
     TBHDR nmhdr;
