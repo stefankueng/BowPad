@@ -89,6 +89,13 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                 LocalFree(szArglist);
             }
         }
+
+        // force CWD to the install path to avoid the CWD being locked:
+        // if BowPad is started from another path (e.g. via double click on a text file in
+        // explorer), the CWD is the directory of that file. As long as BowPad runs with the CWD
+        // set to that dir, that dir can't be removed or renamed due to the lock.
+        ::SetCurrentDirectory(CPathUtils::GetModuleDir().c_str());
+
         mainWindow.EnsureAtLeastOneTab();
         // Main message loop:
         while (GetMessage(&msg, NULL, 0, 0))
