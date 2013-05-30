@@ -36,6 +36,7 @@ public:
     void                        SetTotalLines(size_t lines);
     void                        Clear(int type);
     void                        AddLineColor(int type, size_t line, COLORREF clr);
+    void                        RemoveLine(int type, size_t line);
     void                        SetCurrentPos(size_t visibleline, COLORREF clr) { m_curPosVisLine = visibleline; m_curPosColor = clr; }
     void                        VisibleLinesChanged() { m_bDirty = true; }
     bool                        IsDirty() const { return m_bDirty; }

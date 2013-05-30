@@ -290,6 +290,17 @@ void CDocScroll::AddLineColor( int type, size_t line, COLORREF clr )
     }
 }
 
+void CDocScroll::RemoveLine( int type, size_t line )
+{
+    auto t = std::make_tuple(type,line);
+    auto foundIt = m_lineColors.find(t);
+    if (foundIt != m_lineColors.end())
+    {
+        m_lineColors.erase(foundIt);
+        m_bDirty = true;
+    }
+}
+
 void CDocScroll::SetTotalLines( size_t lines )
 {
     if (m_lines != lines)
