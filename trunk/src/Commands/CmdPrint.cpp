@@ -187,8 +187,6 @@ void CCmdPrint::Print( bool bShowDlg )
             lengthDoc = endPos;
         }
 
-        if (lengthPrinted < 0)
-            lengthPrinted = 0;
         if (lengthDoc > lengthDocMax)
             lengthDoc = lengthDocMax;
     }
