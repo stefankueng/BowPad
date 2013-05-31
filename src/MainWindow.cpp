@@ -503,7 +503,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 
                             // This treatment would fail on some valid URLs where there's actually supposed to be a comma or parenthesis at the end.
                             size_t lastCharIndex = strlen(urltext.get())-1;
-                            while (lastCharIndex >= 0 && (urltext[lastCharIndex] == ',' || urltext[lastCharIndex] == ')' || urltext[lastCharIndex] == '('))
+                            while (lastCharIndex > 0 && (urltext[lastCharIndex] == ',' || urltext[lastCharIndex] == ')' || urltext[lastCharIndex] == '('))
                             {
                                 urltext[lastCharIndex] = '\0';
                                 --lastCharIndex;
@@ -1153,11 +1153,10 @@ void CMainWindow::AutoIndent( Scintilla::SCNotification * pScn )
         (eolMode == SC_EOL_CR && pScn->ch == '\r'))
     {
         // use the same indentation as the last line
-        while (lastLine >= 0 && (m_scintilla.Call(SCI_GETLINEENDPOSITION, lastLine) - m_scintilla.Call(SCI_POSITIONFROMLINE, lastLine)) == 0)
+        while (lastLine > 0 && (m_scintilla.Call(SCI_GETLINEENDPOSITION, lastLine) - m_scintilla.Call(SCI_POSITIONFROMLINE, lastLine)) == 0)
             lastLine--;
 
-        if (lastLine >= 0)
-            indentAmount = (int)m_scintilla.Call(SCI_GETLINEINDENTATION, lastLine);
+        indentAmount = (int)m_scintilla.Call(SCI_GETLINEINDENTATION, lastLine);
 
         if (indentAmount > 0)
         {
