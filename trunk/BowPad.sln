@@ -9,6 +9,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "coolsb", "ext\coolsb\coolsb
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BowPadShellExtension", "src\ShellExtension\BowPadShellExtension.vcxproj", "{03213C0C-290A-468F-BC06-C46D31B7A4F8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{3B89F19A-74E2-4A5D-B1E4-8C7E56E0BA89}"
+	ProjectSection(SolutionItems) = preProject
+		src\Setup\setup.build = src\Setup\setup.build
+		src\Setup\Setup.wxs = src\Setup\Setup.wxs
+		src\Setup\Setup64.wxs = src\Setup\Setup64.wxs
+		src\Setup\VersionNumberInclude.in.wxi = src\Setup\VersionNumberInclude.in.wxi
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{FA983034-B76F-4BDF-BAB0-569312EA0949}"
+	ProjectSection(SolutionItems) = preProject
+		default.build = default.build
+		default.build.user.tmpl = default.build.user.tmpl
+		version.build.in = version.build.in
+		versioninfo.build = versioninfo.build
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32

@@ -406,5 +406,8 @@
     <None Include="res\BowPad.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="version.in">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

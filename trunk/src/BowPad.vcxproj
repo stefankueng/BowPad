@@ -351,6 +351,7 @@
     <None Include="res\drag_plus.cur" />
     <None Include="res\Properties.ini" />
     <None Include="res\Shortcuts.ini" />
+    <None Include="version.in" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ext\coolsb\coolsb.vcxproj">
