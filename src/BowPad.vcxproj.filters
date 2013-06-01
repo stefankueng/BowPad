@@ -213,6 +213,9 @@
     <ClInclude Include="..\ext\sktoolslib\PreserveChdir.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdBookmarks.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

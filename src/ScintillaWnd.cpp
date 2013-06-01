@@ -25,12 +25,6 @@
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 
-const int SC_MARGE_LINENUMBER = 0;
-const int SC_MARGE_SYBOLE = 1;
-const int SC_MARGE_FOLDER = 2;
-
-const int MARK_BOOKMARK = 24;
-
 
 extern IUIFramework * g_pFramework;
 
@@ -418,7 +412,7 @@ void CScintillaWnd::Center(long posStart, long posEnd)
 void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
 {
     if ((pNotification->margin == SC_MARGE_SYBOLE) && !pNotification->modifiers)
-        BookmarkToggle(Call(SCI_LINEFROMPOSITION, pNotification->position));
+        BookmarkToggle((int)Call(SCI_LINEFROMPOSITION, pNotification->position));
 }
 
 

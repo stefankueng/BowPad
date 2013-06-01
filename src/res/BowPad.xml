@@ -391,6 +391,29 @@
       </Command.SmallImages>
     </Command>
 
+    <Command Name="cmdGroupGoto" LabelTitle="Goto" />
+    <Command Name="cmdBookmarkToggle" LabelTitle="Bookmark" TooltipTitle="Toggle Bookmark" TooltipDescription="Toggle a bookmark on the current line">
+      <Command.LargeImages>
+        <Image>res/BookmarkL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdBookmarkClearAll" LabelTitle="Clear Bookmarks" TooltipTitle="Clear Bookmarks" TooltipDescription="Removes all bookmarks from the current file">
+      <Command.LargeImages>
+        <Image>res/BookmarkClearL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdBookmarkNext" LabelTitle="Next Bookmarks" TooltipTitle="Next Bookmarks" TooltipDescription="Move the caret to the next bookmark">
+      <Command.LargeImages>
+        <Image>res/BookmarkNextL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdBookmarkPrev" LabelTitle="Previous Bookmarks" TooltipTitle="Previous Bookmarks" TooltipDescription="Move the caret to the previous bookmark">
+      <Command.LargeImages>
+        <Image>res/BookmarkPrevL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
+
     <Command Name="cmdContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />
     <Command Name="cmdZoom100" Id="10001" />
@@ -429,17 +452,23 @@
             <ScalingPolicy>
               <ScalingPolicy.IdealSizes>
                 <!-- This describes the maximum size of each group in the tab. -->
-                <Scale Group="cmdGroupFile" Size="Large" />
+                <Scale Group="cmdGroupFile" Size="Medium" />
                 <Scale Group="cmdGroupClipboard" Size="Medium" />
                 <Scale Group="cmdGroupUndo" Size="Large" />
-                <Scale Group="cmdGroupEncoding" Size="Medium" />
+                <Scale Group="cmdGroupGoto" Size="Large" />
+                <Scale Group="cmdGroupComment" Size="Large" />
+                <Scale Group="cmdGroupCase" Size="Medium" />
+                <Scale Group="cmdGroupLines" Size="Medium" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
               resized. -->
-              <Scale Group="cmdGroupFile" Size="Medium" />
+              <Scale Group="cmdGroupFile" Size="Small" />
               <Scale Group="cmdGroupClipboard" Size="Small" />
-              <Scale Group="cmdGroupUndo" Size="Medium" />
-              <Scale Group="cmdGroupEncoding" Size="Small" />
+              <!--<Scale Group="cmdGroupUndo" Size="Small" />-->
+              <Scale Group="cmdGroupGoto" Size="Small" />
+              <Scale Group="cmdGroupComment" Size="Medium" />
+              <!--<Scale Group="cmdGroupCase" Size="Medium" />-->
+              <Scale Group="cmdGroupLines" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupFile" SizeDefinition="FourButtons">
@@ -447,9 +476,9 @@
               <SplitButton.ButtonItem>
                 <Button CommandName="cmdPrintNow"/>
               </SplitButton.ButtonItem>
+              <Button CommandName="cmdPageSetup" />
               <Button CommandName="cmdPrintNow"/>
               <Button CommandName="cmdPrint" />
-              <Button CommandName="cmdPageSetup" />
             </SplitButton>
             <Button CommandName="cmdNew" />
             <Button CommandName="cmdSave" />
@@ -460,30 +489,40 @@
             <Button CommandName="cmdCopy" />
             <Button CommandName="cmdCut" />
           </Group>
-          <Group CommandName="cmdGroupUndo" SizeDefinition="SixButtons">
+          <Group CommandName="cmdGroupUndo" SizeDefinition="TwoButtons">
             <Button CommandName="cmdUndo" />
             <Button CommandName="cmdRedo" />
+          </Group>
+          <Group CommandName="cmdGroupGoto" SizeDefinition="EightButtons">
             <Button CommandName="cmdPrevious" />
             <Button CommandName="cmdNext" />
             <Button CommandName="cmdFindReplace" />
             <Button CommandName="cmdGotoLine" />
+
+            <Button CommandName="cmdBookmarkToggle" />
+            <Button CommandName="cmdBookmarkNext" />
+            <Button CommandName="cmdBookmarkPrev" />
+            <Button CommandName="cmdBookmarkClearAll" />
           </Group>
-          <Group CommandName="cmdGroupEncoding" SizeDefinition="FiveButtons">
-            <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
-              <DropDownGallery.MenuLayout>
-                <VerticalMenuLayout />
-              </DropDownGallery.MenuLayout>
-            </DropDownGallery>
-            <DropDownGallery CommandName="cmdConvertEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
-              <DropDownGallery.MenuLayout>
-                <VerticalMenuLayout />
-              </DropDownGallery.MenuLayout>
-            </DropDownGallery>
-            <DropDownGallery CommandName="cmdCodeStyle" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
-              <DropDownGallery.MenuLayout>
-                <FlowMenuLayout Columns="4"/>
-              </DropDownGallery.MenuLayout>
-            </DropDownGallery>
+          <Group CommandName="cmdGroupComment" SizeDefinition="TwoButtons">
+            <Button CommandName="cmdComment" />
+            <Button CommandName="cmdUnComment" />
+          </Group>
+          <Group CommandName="cmdGroupCase" SizeDefinition="TwoButtons">
+            <Button CommandName="cmdUppercase" />
+            <Button CommandName="cmdLowercase" />
+          </Group>
+          <Group CommandName="cmdGroupLines" SizeDefinition="FiveButtons">
+            <Button CommandName="cmdLineDuplicate" />
+            <Button CommandName="cmdLineSplit" />
+            <Button CommandName="cmdLineJoin" />
+            <Button CommandName="cmdLineUp" />
+            <Button CommandName="cmdLineDown" />
+          </Group>
+          <Group CommandName="cmdGroupBlanks" SizeDefinition="FourButtons">
+            <Button CommandName="cmdTrim" />
+            <Button CommandName="cmdTabs2Spaces" />
+            <Button CommandName="cmdSpaces2Tabs" />
             <DropDownButton CommandName="cmdEOLGroup">
               <MenuGroup>
                 <ToggleButton CommandName="cmdEOLWin"/>
@@ -491,7 +530,6 @@
                 <ToggleButton CommandName="cmdEOLMac"/>
               </MenuGroup>
             </DropDownButton>
-            <Button CommandName="cmdStyleConfigurator" />
           </Group>
         </Tab>
         <Tab CommandName="cmdViewTab">
@@ -500,9 +538,11 @@
               <ScalingPolicy.IdealSizes>
                 <!--<Scale Group="cmdGroupVEdge" Size="Large" />-->
                 <Scale Group="cmdGroupView" Size="Large" />
+                <Scale Group="cmdGroupEncoding" Size="Medium" />
               </ScalingPolicy.IdealSizes>
               <!--<Scale Group="cmdGroupVEdge" Size="Medium" />-->
               <!--<Scale Group="cmdGroupView" Size="Medium" />-->
+              <Scale Group="cmdGroupEncoding" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupVEdge">
@@ -577,39 +617,23 @@
             <Spinner CommandName="cmdTabSize" />
             <ToggleButton CommandName="cmdUseTabs" />
           </Group>
-        </Tab>
-        <Tab CommandName="cmdEditTab">
-          <Tab.ScalingPolicy>
-            <ScalingPolicy>
-              <ScalingPolicy.IdealSizes>
-                <Scale Group="cmdGroupComment" Size="Large" />
-                <Scale Group="cmdGroupCase" Size="Medium" />
-                <Scale Group="cmdGroupLines" Size="Medium" />
-              </ScalingPolicy.IdealSizes>
-              <Scale Group="cmdGroupComment" Size="Medium" />
-              <!--<Scale Group="cmdGroupCase" Size="Small" />-->
-              <Scale Group="cmdGroupLines" Size="Small" />
-            </ScalingPolicy>
-          </Tab.ScalingPolicy>
-          <Group CommandName="cmdGroupComment" SizeDefinition="TwoButtons">
-            <Button CommandName="cmdComment" />
-            <Button CommandName="cmdUnComment" />
-          </Group>
-          <Group CommandName="cmdGroupCase" SizeDefinition="TwoButtons">
-            <Button CommandName="cmdUppercase" />
-            <Button CommandName="cmdLowercase" />
-          </Group>
-          <Group CommandName="cmdGroupLines" SizeDefinition="FiveButtons">
-            <Button CommandName="cmdLineDuplicate" />
-            <Button CommandName="cmdLineSplit" />
-            <Button CommandName="cmdLineJoin" />
-            <Button CommandName="cmdLineUp" />
-            <Button CommandName="cmdLineDown" />
-          </Group>
-          <Group CommandName="cmdGroupBlanks" SizeDefinition="ThreeButtons">
-            <Button CommandName="cmdTrim" />
-            <Button CommandName="cmdTabs2Spaces" />
-            <Button CommandName="cmdSpaces2Tabs" />
+          <Group CommandName="cmdGroupEncoding" SizeDefinition="FourButtons">
+            <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <DropDownGallery CommandName="cmdConvertEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <DropDownGallery CommandName="cmdCodeStyle" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="4"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <Button CommandName="cmdStyleConfigurator" />
           </Group>
         </Tab>
       </Ribbon.Tabs>
