@@ -16,6 +16,8 @@
 //
 #include "stdafx.h"
 #include "AppUtils.h"
+#include "StringUtils.h"
+#include "SmartHandle.h"
 
 #include <memory>
 
@@ -43,3 +45,24 @@ std::wstring CAppUtils::GetDataPath(HMODULE hMod)
     sPath = sPath.substr(0, sPath.find_last_of('\\'));
     return sPath;
 }
+
+std::wstring CAppUtils::GetSessionID()
+{
+    std::wstring t;
+    CAutoGeneralHandle token;
+    BOOL result = OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, token.GetPointer());
+    if(result)
+    {
+        DWORD len = 0;
+        GetTokenInformation(token, TokenStatistics, NULL, 0, &len);
+        if (len >= sizeof (TOKEN_STATISTICS))
+        {
+            std::unique_ptr<BYTE[]> data (new BYTE[len]);
+            GetTokenInformation(token, TokenStatistics, data.get(), len, &len);
+            LUID uid = ((PTOKEN_STATISTICS)data.get())->AuthenticationId;
+            t = CStringUtils::Format(L"-%08x%08x", uid.HighPart, uid.LowPart);
+        }
+    }
+    return t;
+}
+
