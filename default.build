@@ -83,8 +83,6 @@
       <foreach item="File" property="filename">
         <in>
           <items>
-            <include name="bin\${configuration}\bin\*.dll" />
-            <include name="bin\${configuration}64\bin\*.dll" />
             <include name="bin\${configuration}\bin\*.exe" />
             <include name="bin\${configuration}64\bin\*.exe" />
           </items>
