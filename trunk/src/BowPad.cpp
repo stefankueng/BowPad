@@ -23,10 +23,13 @@
 #include "AppUtils.h"
 #include "SmartHandle.h"
 #include "PathUtils.h"
+#include "StringUtils.h"
 
 #include <Shellapi.h>
 
 HINSTANCE hInst;
+
+
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                        _In_opt_ HINSTANCE hPrevInstance,
@@ -41,6 +44,88 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     if (FAILED(hr))
     {
         return FALSE;
+    }
+
+    bool bAlreadyRunning = false;
+    ::SetLastError(NO_ERROR);
+    std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
+    ::CreateMutex(NULL, false, sID.c_str());
+    if ((GetLastError() == ERROR_ALREADY_EXISTS) ||
+        (GetLastError() == ERROR_ACCESS_DENIED))
+        bAlreadyRunning = true;
+
+    CCmdLineParser parser(lpCmdLine);
+
+    if (bAlreadyRunning && !parser.HasKey(L"multiple"))
+    {
+        // don't start another instance: reuse the existing one
+        
+        // find the window of the existing instance
+        ResString clsResName(hInst, IDC_BOWPAD);
+        std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
+
+        HWND hBowPadWnd = ::FindWindow(clsName.c_str(), NULL);
+        // if we don't have a window yet, wait a little while
+        // to give the other process time to create the window
+        for (int i = 0; !hBowPadWnd && i < 5; i++)
+        {
+            Sleep(100);
+            hBowPadWnd = ::FindWindow(clsName.c_str(), NULL);
+        }
+
+        if (hBowPadWnd)
+        {
+            int nCmdShow = 0;
+
+            if (::IsZoomed(hBowPadWnd))
+                nCmdShow = SW_MAXIMIZE;
+            else if (::IsIconic(hBowPadWnd))
+                nCmdShow = SW_RESTORE;
+            else
+                nCmdShow = SW_SHOW;
+
+            ::ShowWindow(hBowPadWnd, nCmdShow);
+
+            ::SetForegroundWindow(hBowPadWnd);
+
+            size_t cmdLineLen = wcslen(lpCmdLine);
+            if (cmdLineLen)
+            {
+                COPYDATASTRUCT cds;
+                cds.dwData = CD_COMMAND_LINE;
+                if (!parser.HasVal(L"path"))
+                {
+                    // create our own command line with all paths converted to long/full paths
+                    // since the CWD of the other instance is most likely different
+                    int nArgs;
+                    std::wstring sCmdLine;
+                    LPWSTR * szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+                    if( szArglist )
+                    {
+                        for( int i=0; i<nArgs; i++)
+                        {
+                            std::wstring path = CPathUtils::GetLongPathname(szArglist[i]);
+                            sCmdLine += L"\"" + path + L"\" ";
+                        }
+
+                        // Free memory allocated for CommandLineToArgvW arguments.
+                        LocalFree(szArglist);
+                    }
+                    std::unique_ptr<wchar_t[]> ownCmdLine(new wchar_t[sCmdLine.size() + 2]);
+                    wcscpy_s(ownCmdLine.get(), sCmdLine.size()+2, sCmdLine.c_str());
+                    cds.cbData = (DWORD)((sCmdLine.size()+1)*sizeof(wchar_t));
+                    cds.lpData = ownCmdLine.get();
+                    SendMessage(hBowPadWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&cds);
+                }
+                else
+                {
+                    cds.cbData = (DWORD)((cmdLineLen + 1)*sizeof(wchar_t));
+                    cds.lpData = lpCmdLine;
+                    SendMessage(hBowPadWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&cds);
+                }
+            }
+            return 0;
+        }
     }
 
     // set the AppID
@@ -62,7 +147,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     CMainWindow mainWindow(hInstance);
     if (mainWindow.RegisterAndCreateWindow())
     {
-        CCmdLineParser parser(lpCmdLine);
         if (parser.HasVal(L"path"))
         {
             mainWindow.OpenFile(parser.GetVal(L"path"));
@@ -83,6 +167,10 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                 {
                     std::wstring path = CPathUtils::GetLongPathname(szArglist[i]);
                     mainWindow.OpenFile(path);
+                }
+                if (parser.HasVal(L"line"))
+                {
+                    mainWindow.GoToLine(parser.GetLongVal(L"line")-1);
                 }
 
                 // Free memory allocated for CommandLineToArgvW arguments.

@@ -25,6 +25,7 @@
 #include "KeyboardShortcutHandler.h"
 #include "AppUtils.h"
 #include "PreserveChdir.h"
+#include "CmdLineParser.h"
 
 #include <memory>
 #include <Shobjidl.h>
@@ -264,8 +265,9 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.cbWndExtra = 0;
     wcx.hInstance = hResource;
     wcx.hCursor = NULL;
-    ResString clsName(hResource, IDC_BOWPAD);
-    wcx.lpszClassName = clsName;
+    ResString clsResName(hResource, IDC_BOWPAD);
+    std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
+    wcx.lpszClassName = clsName.c_str();
     wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_BOWPAD));
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
     wcx.lpszMenuName = NULL;
@@ -337,6 +339,45 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 DragFinish(hDrop);
                 for (auto it:files)
                     OpenFile(it);
+            }
+        }
+        break;
+    case WM_COPYDATA:
+        {
+            COPYDATASTRUCT *cds;
+            cds = (COPYDATASTRUCT *) lParam;
+            if (cds->dwData == CD_COMMAND_LINE)
+            {
+                CCmdLineParser parser((LPCWSTR)cds->lpData);
+                if (parser.HasVal(L"path"))
+                {
+                    OpenFile(parser.GetVal(L"path"));
+                    if (parser.HasVal(L"line"))
+                    {
+                        GoToLine(parser.GetLongVal(L"line")-1);
+                    }
+                }
+                else
+                {
+                    // find out if there are paths specified without the key/value pair syntax
+                    int nArgs;
+
+                    LPWSTR * szArglist = CommandLineToArgvW((LPCWSTR)cds->lpData, &nArgs);
+                    if( szArglist )
+                    {
+                        for( int i=1; i<nArgs; i++)
+                        {
+                            OpenFile(szArglist[i]);
+                        }
+                        if (parser.HasVal(L"line"))
+                        {
+                            GoToLine(parser.GetLongVal(L"line")-1);
+                        }
+
+                        // Free memory allocated for CommandLineToArgvW arguments.
+                        LocalFree(szArglist);
+                    }
+                }
             }
         }
         break;
