@@ -1284,8 +1284,8 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
 
 void CScintillaWnd::SetTabSettings()
 {
-    Call(SCI_SETTABWIDTH, CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
-    Call(SCI_SETUSETABS, CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1));
+    Call(SCI_SETTABWIDTH, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
+    Call(SCI_SETUSETABS, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1));
     Call(SCI_SETBACKSPACEUNINDENTS, 1);
     Call(SCI_SETTABINDENTS, 1);
 }

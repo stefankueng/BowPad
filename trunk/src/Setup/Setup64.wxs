@@ -34,7 +34,7 @@
     <Condition Message="This application requires an 64-bit OS">VersionNT64</Condition>
 
     <Property Id="INSTALLDIR">
-      <RegistrySearch Id="PreviousInstallLocationRegistrySearch" Root="HKLM" Key="Software\BowPad" Name="installDir" Type="raw" Win64="yes" />
+      <RegistrySearch Id="PreviousInstallLocationRegistrySearchMachine" Root="HKLM" Key="Software\BowPad" Name="installDir" Type="raw" Win64="yes" />
     </Property>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
@@ -44,11 +44,11 @@
           <Component Id="BowPad.exe" Guid="666BFAE6-68D2-4F4E-A579-32CDDDA0BA74" Win64="yes">
             <File Id="BowPad.EXE" Name="BowPad.exe" DiskId="1" Source="../../bin/release64/bin/BowPad.exe" Vital="yes" />
           </Component>
-          <Component Id="ShellExt" Guid="8DE7F16A-1AD2-484C-8BD5-B63749680BFC" Win64="yes">
-            <File Id="BowPadShellExtension.dll" KeyPath="yes" Source="../../bin/release64/bin/BowPadShellExtension.dll">
-              <Class Id="{E32BBD98-E7AC-4744-858A-833555B7B582}" Context="InprocServer32" Description="BowPadShellExt.FileContextMenuExt Class" ThreadingModel="apartment" />
-            </File>
-            <RegistryValue Root="HKCR" Key="*\shellex\ContextMenuHandlers\{E32BBD98-E7AC-4744-858A-833555B7B582}" Value="BowPadShellExt.FileContextMenuExt" Type="string" Action="write" />
+          <Component Id="BowPadShellMenu" Guid="43123CE3-4D2C-4200-BB10-C128EFC6F486" Win64="yes">
+            <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad" Value='Edit in BowPad' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad" Name="Icon" Value='[INSTALLDIR]BowPad.exe,-107' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad\command" Value='[INSTALLDIR]BowPad.exe /path:"%1"' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\BowPad" Name="installDir" Value='[INSTALLDIR]' Type="string" />
           </Component>
 
         </Directory>
@@ -72,7 +72,7 @@
           Display="expand" Level="1" ConfigurableDirectory="INSTALLDIR">
       <Feature Id="MainEXE" Title="Program" Description="The main executable." Level="1">
         <ComponentRef Id="BowPad.exe" />
-        <ComponentRef Id="ShellExt" />
+        <ComponentRef Id="BowPadShellMenu" />
         <ComponentRef Id="StartMenuShortCut" />
       </Feature>
     </Feature>
