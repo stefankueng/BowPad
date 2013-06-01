@@ -24,5 +24,6 @@ public:
     ~CAppUtils(void);
 
     static std::wstring             GetDataPath(HMODULE hMod = NULL);
+    static std::wstring             GetSessionID();
 };
 
