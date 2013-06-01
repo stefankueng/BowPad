@@ -36,6 +36,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
 
+    SetDllDirectory(L"");
     HRESULT hr = CoInitialize(NULL);
     if (FAILED(hr))
     {
