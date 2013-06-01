@@ -218,7 +218,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
             FindText.lpstrText = const_cast<char*>(sFindString.c_str());
             while (ScintillaCall(SCI_FINDTEXT, nSearchFlags, (LPARAM)&FindText) >= 0)
             {
-                ScintillaCall(SCI_INDICATORFILLRANGE, FindText.chrgText.cpMin, FindText.chrgText.cpMax-FindText.chrgText.cpMin-1);
+                ScintillaCall(SCI_INDICATORFILLRANGE, FindText.chrgText.cpMin, FindText.chrgText.cpMax-FindText.chrgText.cpMin);
                 FindText.chrg.cpMin = FindText.chrgText.cpMax;
             }
 
@@ -232,7 +232,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
                 while (ScintillaCall(SCI_FINDTEXT, nSearchFlags, (LPARAM)&FindText) >= 0)
                 {
                     size_t line = ScintillaCall(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
-                    DocScrollAddLineColor(DOCSCROLLTYPE_SEARCHTEXT, line, RGB(255,255,0));
+                    DocScrollAddLineColor(DOCSCROLLTYPE_SEARCHTEXT, line, RGB(200,200,0));
                     FindText.chrg.cpMin = FindText.chrgText.cpMax;
                 }
             }
