@@ -39,6 +39,7 @@
 #include "CmdSelectTab.h"
 #include "CmdBlanks.h"
 #include "CmdZoom.h"
+#include "CmdBookmarks.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -144,6 +145,15 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdFindSelectedPrev(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdGotoLine(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
+    pCmd = new CCmdBookmarkToggle(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdBookmarkClearAll(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdBookmarkNext(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdBookmarkPrev(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdVerticalEdge(obj);

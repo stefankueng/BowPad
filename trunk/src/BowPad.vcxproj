@@ -231,6 +231,7 @@
     <ClInclude Include="AppUtils.h" />
     <ClInclude Include="ColorButton.h" />
     <ClInclude Include="Commands\CmdBlanks.h" />
+    <ClInclude Include="Commands\CmdBookmarks.h" />
     <ClInclude Include="Commands\CmdClipboard.h" />
     <ClInclude Include="Commands\CmdCodeStyle.h" />
     <ClInclude Include="Commands\CmdComment.h" />

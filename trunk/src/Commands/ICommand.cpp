@@ -180,6 +180,12 @@ void ICommand::DocScrollAddLineColor( int type, size_t line, COLORREF clr )
     pMainWnd->m_scintilla.DocScrollAddLineColor(type, line, clr);
 }
 
+void ICommand::DocScrollRemoveLine( int type, size_t line )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    pMainWnd->m_scintilla.DocScrollRemoveLine(type, line);
+}
+
 void ICommand::Center( long startPos, long endPos )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);

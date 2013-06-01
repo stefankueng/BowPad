@@ -28,6 +28,12 @@
 #define INDIC_TAGATTR               (INDIC_CONTAINER+3)
 #define INDIC_FINDTEXT_MARK         (INDIC_CONTAINER+4)
 
+const int SC_MARGE_LINENUMBER = 0;
+const int SC_MARGE_SYBOLE = 1;
+const int SC_MARGE_FOLDER = 2;
+
+const int MARK_BOOKMARK = 24;
+
 struct XmlMatchedTagsPos
 {
     size_t tagOpenStart;
@@ -75,6 +81,7 @@ public :
     bool GetSelectedCount(size_t& selByte, size_t& selLine);
     void DocScrollClear(int type) { m_docScroll.Clear(type); }
     void DocScrollAddLineColor(int type, size_t line, COLORREF clr) { m_docScroll.AddLineColor(type, line, clr); }
+    void DocScrollRemoveLine(int type, size_t line) { m_docScroll.RemoveLine(type, line); }
     void MarkBookmarksInScrollbar();
     void Center(long posStart, long posEnd);
     void SetTabSettings();

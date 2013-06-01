@@ -55,6 +55,7 @@ protected:
     void                SetupLexerForLang(const std::wstring& lang);
     void                DocScrollClear(int type);
     void                DocScrollAddLineColor(int type, size_t line, COLORREF clr);
+    void                DocScrollRemoveLine(int type, size_t line);
     void                Center(long startPos, long endPos);
 
     HWND                GetHwnd();
