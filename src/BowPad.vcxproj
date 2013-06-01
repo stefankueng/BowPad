@@ -164,6 +164,11 @@
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
     </Manifest>
+    <CustomBuildStep />
+    <PostBuildEvent>
+      <Command>$(ProjectDir)..\tools\ResText.exe extract $(TargetPath) $(ProjectDir)..\Languages\BowPad.po</Command>
+      <Message>Extracting resources, creating pot file</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -193,6 +198,12 @@
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
     </Manifest>
+    <CustomBuildStep />
+    <CustomBuildStep />
+    <PostBuildEvent>
+      <Command>$(ProjectDir)..\tools\ResText.exe extract $(TargetPath) $(ProjectDir)..\Languages\BowPad.po</Command>
+      <Message>Extracting resources, creating pot file</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\ext\sktoolslib\AeroControls.h" />
