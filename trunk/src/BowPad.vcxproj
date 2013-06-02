@@ -164,7 +164,6 @@
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
     </Manifest>
-    <CustomBuildStep />
     <PostBuildEvent>
       <Command>$(ProjectDir)..\tools\ResText.exe extract $(TargetPath) $(ProjectDir)..\Languages\BowPad.po</Command>
       <Message>Extracting resources, creating pot file</Message>
@@ -198,8 +197,6 @@
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
     </Manifest>
-    <CustomBuildStep />
-    <CustomBuildStep />
     <PostBuildEvent>
       <Command>$(ProjectDir)..\tools\ResText.exe extract $(TargetPath) $(ProjectDir)..\Languages\BowPad.po</Command>
       <Message>Extracting resources, creating pot file</Message>
