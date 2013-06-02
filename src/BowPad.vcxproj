@@ -219,12 +219,14 @@
     <ClInclude Include="..\ext\sktoolslib\Language.h" />
     <ClInclude Include="..\ext\sktoolslib\PathUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\PreserveChdir.h" />
+    <ClInclude Include="..\ext\sktoolslib\ProgressDlg.h" />
     <ClInclude Include="..\ext\sktoolslib\ResString.h" />
     <ClInclude Include="..\ext\sktoolslib\SimpleIni.h" />
     <ClInclude Include="..\ext\sktoolslib\SmartHandle.h" />
     <ClInclude Include="..\ext\sktoolslib\StringUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
+    <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppUtils.h" />
     <ClInclude Include="ColorButton.h" />
     <ClInclude Include="Commands\CmdBlanks.h" />
@@ -283,9 +285,11 @@
     <ClCompile Include="..\ext\sktoolslib\Language.cpp" />
     <ClCompile Include="..\ext\sktoolslib\PathUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\PreserveChdir.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\ProgressDlg.cpp" />
     <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
+    <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AppUtils.cpp" />
     <ClCompile Include="BowPad.cpp" />
     <ClCompile Include="ColorButton.cpp" />

@@ -14,24 +14,26 @@
 //
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
-
 #pragma once
-#include <string>
-class CAppUtils
+#include "BaseDialog.h"
+#include "hyperlink.h"
+
+/**
+ * about dialog.
+ */
+class CAboutDlg : public CDialog
 {
 public:
-    CAppUtils(void);
-    ~CAppUtils(void);
+    CAboutDlg(HWND hParent);
+    ~CAboutDlg(void);
 
-    static std::wstring             GetDataPath(HMODULE hMod = NULL);
-    static std::wstring             GetSessionID();
-    static bool                     CheckForUpdate(bool force);
-    static bool                     DownloadUpdate(HWND hWnd, bool bInstall);
-    static bool                     ShowUpdateAvailableDialog(HWND hWnd);
-    static HRESULT CALLBACK         TDLinkClickCallback(HWND hwnd, UINT uNotification, WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData);
+    void                    SetHiddenWnd(HWND hWnd) {m_hHiddenWnd = hWnd;}
+protected:
+    LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT                 DoCommand(int id);
 
 private:
-    static std::wstring             updatefilename;
-    static std::wstring             updateurl;
+    HWND                    m_hParent;
+    HWND                    m_hHiddenWnd;
+    CHyperLink              m_link;
 };
-

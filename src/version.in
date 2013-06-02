@@ -3,8 +3,8 @@
 #define STRFILEVER      "$MajorVersion$.$MinorVersion$.$MicroVersion$.$WCREV$\0"
 #define STRPRODUCTVER   "$MajorVersion$.$MinorVersion$.$MicroVersion$.$WCREV$\0"
 
-#define CS_VERMAJOR     $MajorVersion$
-#define CS_VERMINOR     $MinorVersion$
-#define CS_VERMICRO     $MicroVersion$
-#define CS_VERBUILD     $WCREV$
-#define CS_VERDATE      "$WCDATE$"
+#define BP_VERMAJOR     $MajorVersion$
+#define BP_VERMINOR     $MinorVersion$
+#define BP_VERMICRO     $MicroVersion$
+#define BP_VERBUILD     $WCREV$
+#define BP_VERDATE      "$WCDATE$"

@@ -18,6 +18,7 @@
 #include "MainWindow.h"
 #include "BowPad.h"
 #include "BowPadUI.h"
+#include "AboutDlg.h"
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
 #include "CommandHandler.h"
@@ -28,6 +29,7 @@
 #include "CmdLineParser.h"
 
 #include <memory>
+#include <future>
 #include <Shobjidl.h>
 #include <Shellapi.h>
 #include <Shlobj.h>
@@ -293,6 +295,14 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             m_hwnd = hwnd;
             Initialize();
             CIniSettings::Instance().RestoreWindowPos(L"MainWindow", hwnd, SW_RESTORE);
+
+            // TODO: skip check for portable version
+            std::async([=]
+            {
+                bool bNewer = CAppUtils::CheckForUpdate(false);
+                if (bNewer)
+                    PostMessage(m_hwnd, WM_UPDATEAVAILABLE, 0, 0);
+            });
         }
         break;
     case WM_COMMAND:
@@ -380,6 +390,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 }
             }
         }
+        break;
+    case WM_UPDATEAVAILABLE:
+            CAppUtils::ShowUpdateAvailableDialog(*this);
         break;
     case WM_NOTIFY:
         {
@@ -694,6 +707,12 @@ LRESULT CMainWindow::DoCommand(int id)
         break;
     case cmdCloseAll:
         CloseAllTabs();
+        break;
+    case cmdAbout:
+        {
+            CAboutDlg dlg(*this);
+            dlg.DoModal(hInst, IDD_ABOUTBOX, *this);
+        }
         break;
     default:
         {
