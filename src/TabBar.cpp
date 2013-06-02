@@ -172,6 +172,14 @@ void CTabBar::GetCurrentTitle(TCHAR *title, int titleLen)
     ::SendMessage(*this, TCM_GETITEM, GetCurrentTabIndex(), reinterpret_cast<LPARAM>(&tci));
 }
 
+void CTabBar::SetCurrentTitle(LPCTSTR title)
+{
+    TCITEM tci;
+    tci.mask = TCIF_TEXT;
+    tci.pszText = const_cast<TCHAR*>(title);
+    ::SendMessage(*this, TCM_SETITEM, GetCurrentTabIndex(), reinterpret_cast<LPARAM>(&tci));
+}
+
 void CTabBar::SetFont( TCHAR *fontName, int fontSize )
 {
     if (m_hFont)
