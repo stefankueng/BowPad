@@ -209,6 +209,7 @@
     <ClCompile Include="lexers\LexSpecman.cxx" />
     <ClCompile Include="lexers\LexSpice.cxx" />
     <ClCompile Include="lexers\LexSQL.cxx" />
+    <ClCompile Include="lexers\LexSTTXT.cxx" />
     <ClCompile Include="lexers\LexTACL.cxx" />
     <ClCompile Include="lexers\LexTADS3.cxx" />
     <ClCompile Include="lexers\LexTAL.cxx" />
