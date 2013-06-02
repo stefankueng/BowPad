@@ -21,6 +21,8 @@ import string
 import sys
 import os
 import glob
+import codecs
+import datetime
 
 # EOL constants
 CR = "\r"
@@ -251,11 +253,13 @@ def sortListInsensitive(l):
 
 def UpdateLineInFile(path, linePrefix, lineReplace):
     lines = []
-    with open(path, "r") as f:
+    updated = False
+    with codecs.open(path, "r", "utf-8") as f:
         for l in f.readlines():
             l = l.rstrip()
-            if l.startswith(linePrefix):
+            if not updated and l.startswith(linePrefix):
                 lines.append(lineReplace)
+                updated = True
             else:
                 lines.append(l)
     contents = NATIVE.join(lines) + NATIVE
@@ -283,35 +287,70 @@ def UpdateVersionNumbers(root):
         version = f.read()
     versionDotted = version[0] + '.' + version[1] + '.' + version[2]
     versionCommad = version[0] + ', ' + version[1] + ', ' + version[2] + ', 0'
+    with open(root + "scintilla/doc/index.html") as f:
+        dateModified = [l for l in f.readlines() if "Date.Modified" in l][0].split('\"')[3]
+        # 20130602
+        # index.html, SciTE.html
+        dtModified = datetime.datetime.strptime(dateModified, "%Y%m%d")
+        yearModified = dateModified[0:4]
+        monthModified = dtModified.strftime("%B")
+        dayModified = "%d" % dtModified.day
+        mdyModified = monthModified + " " + dayModified + " " + yearModified
+        # May 22 2013
+        # index.html, SciTE.html
+        dmyModified = dayModified + " " + monthModified + " " + yearModified
+        # 22 May 2013
+        # ScintillaHistory.html -- only first should change
+        myModified = monthModified + " " + yearModified
+        # scite/src/SciTE.h
+        #define COPYRIGHT_DATES "December 1998-May 2013"
+        #define COPYRIGHT_YEARS "1998-2013"
+        dateLine = f.readlines()
 
     UpdateLineInFile(root + "scintilla/win32/ScintRes.rc", "#define VERSION_SCINTILLA",
         "#define VERSION_SCINTILLA \"" + versionDotted + "\"")
-    UpdateLineInFile(root + "scintilla/win32/ScintRes.rc", "#define VERSION_WORDS", 
+    UpdateLineInFile(root + "scintilla/win32/ScintRes.rc", "#define VERSION_WORDS",
         "#define VERSION_WORDS " + versionCommad)
     UpdateLineInFile(root + "scintilla/qt/ScintillaEditBase/ScintillaEditBase.pro",
-        "VERSION =", 
+        "VERSION =",
         "VERSION = " + versionDotted)
     UpdateLineInFile(root + "scintilla/qt/ScintillaEdit/ScintillaEdit.pro",
-        "VERSION =", 
+        "VERSION =",
         "VERSION = " + versionDotted)
-    UpdateLineInFile(root + "scintilla/doc/ScintillaDownload.html", "       Release", 
+    UpdateLineInFile(root + "scintilla/doc/ScintillaDownload.html", "       Release",
         "       Release " + versionDotted)
     UpdateDownloadLinks(root + "scintilla/doc/ScintillaDownload.html", version)
     UpdateLineInFile(root + "scintilla/doc/index.html",
-        '          <font color="#FFCC99" size="3"> Release version', 
-        '          <font color="#FFCC99" size="3"> Release version ' + versionDotted + '<br />') 
+        '          <font color="#FFCC99" size="3"> Release version',
+        '          <font color="#FFCC99" size="3"> Release version ' + versionDotted + '<br />')
+    UpdateLineInFile(root + "scintilla/doc/index.html",
+        '           Site last modified',
+        '           Site last modified ' + mdyModified + '</font>')
+    UpdateLineInFile(root + "scintilla/doc/ScintillaHistory.html",
+        '	Released ',
+        '	Released ' + dmyModified + '.')
 
     if os.path.exists(root + "scite"):
-        UpdateLineInFile(root + "scite/src/SciTE.h", "#define VERSION_SCITE", 
+        UpdateLineInFile(root + "scite/src/SciTE.h", "#define VERSION_SCITE",
             "#define VERSION_SCITE \"" + versionDotted + "\"")
-        UpdateLineInFile(root + "scite/src/SciTE.h", "#define VERSION_WORDS", 
+        UpdateLineInFile(root + "scite/src/SciTE.h", "#define VERSION_WORDS",
             "#define VERSION_WORDS " + versionCommad)
-        UpdateLineInFile(root + "scite/doc/SciTEDownload.html", "       Release", 
+        UpdateLineInFile(root + "scite/src/SciTE.h", "#define COPYRIGHT_DATES",
+            '#define COPYRIGHT_DATES "December 1998-' + myModified + '"')
+        UpdateLineInFile(root + "scite/src/SciTE.h", "#define COPYRIGHT_YEARS",
+            '#define COPYRIGHT_YEARS "1998-' + yearModified + '"')
+        UpdateLineInFile(root + "scite/doc/SciTEDownload.html", "       Release",
             "       Release " + versionDotted)
         UpdateDownloadLinks(root + "scite/doc/SciTEDownload.html", version)
         UpdateLineInFile(root + "scite/doc/SciTE.html",
-            '          <font color="#FFCC99" size="3"> Release version', 
-            '          <font color="#FFCC99" size="3"> Release version ' + versionDotted + '<br />') 
+            '          <font color="#FFCC99" size="3"> Release version',
+            '          <font color="#FFCC99" size="3"> Release version ' + versionDotted + '<br />')
+        UpdateLineInFile(root + "scite/doc/SciTE.html",
+            '           Site last modified',
+            '           Site last modified ' + mdyModified + '</font>')
+        UpdateLineInFile(root + "scite/doc/SciTE.html",
+            '    <meta name="Date.Modified"',
+            '    <meta name="Date.Modified" content="' + dateModified + '" />')
 
 def RegenerateAll():
     root="../../"
