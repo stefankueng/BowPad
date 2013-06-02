@@ -800,6 +800,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         CDocument doc = m_DocManager.GetDocument(tab);
         if (doc.m_path.empty() || bSaveAs)
         {
+            bSaveAs = true;
             PreserveChdir keepCWD;
 
             CComPtr<IFileSaveDialog> pfd = NULL;
@@ -852,6 +853,13 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
                 doc.m_bIsDirty = false;
                 doc.m_bNeedsSaving = false;
                 m_DocManager.UpdateFileTime(doc);
+                if (bSaveAs)
+                {
+                    doc.m_language = CLexStyles::Instance().GetLanguageForExt(doc.m_path.substr(doc.m_path.find_last_of('.')+1));
+                    m_scintilla.SetupLexerForExt(doc.m_path.substr(doc.m_path.find_last_of('.')+1).c_str());
+                }
+                std::wstring sFileName = doc.m_path.substr(doc.m_path.find_last_of('\\')+1);
+                m_TabBar.SetCurrentTitle(sFileName.c_str());
                 m_DocManager.SetDocument(tab, doc);
                 UpdateStatusBar(true);
                 m_scintilla.Call(SCI_SETSAVEPOINT);
