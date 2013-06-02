@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{FA983034
 		versioninfo.build = versioninfo.build
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ResourceDll", "src\ResourceDll.vcxproj", "{26DD7834-6269-413C-960A-AA7CCB72243C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -55,6 +57,12 @@ Global
 		{22B28D94-8FB7-484F-AD33-B3F2BD25351F}.Release|Win32.Build.0 = Release|Win32
 		{22B28D94-8FB7-484F-AD33-B3F2BD25351F}.Release|x64.ActiveCfg = Release|x64
 		{22B28D94-8FB7-484F-AD33-B3F2BD25351F}.Release|x64.Build.0 = Release|x64
+		{26DD7834-6269-413C-960A-AA7CCB72243C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{26DD7834-6269-413C-960A-AA7CCB72243C}.Debug|Win32.Build.0 = Debug|Win32
+		{26DD7834-6269-413C-960A-AA7CCB72243C}.Debug|x64.ActiveCfg = Debug|x64
+		{26DD7834-6269-413C-960A-AA7CCB72243C}.Release|Win32.ActiveCfg = Release|Win32
+		{26DD7834-6269-413C-960A-AA7CCB72243C}.Release|Win32.Build.0 = Release|Win32
+		{26DD7834-6269-413C-960A-AA7CCB72243C}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
