@@ -419,9 +419,13 @@
     <Command Name="cmdZoom100" Id="10001" />
     <Command Name="cmdZoomIn" Id="10002" />
     <Command Name="cmdZoomOut" Id="10003" />
+    <Command Name="cmdAbout" Id="10004" />
   </Application.Commands>
   <Application.Views>
     <Ribbon>
+      <Ribbon.HelpButton>
+        <HelpButton CommandName="cmdAbout" />
+      </Ribbon.HelpButton>
       <Ribbon.ApplicationMenu>
         <ApplicationMenu CommandName="cmdFileMenu">
           <ApplicationMenu.RecentItems>

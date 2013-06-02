@@ -48,3 +48,6 @@
 #define APP_ID L"TortoiseSVN.Tools.BowPad.1"
 // custon id for the WM_COPYDATA message
 #define CD_COMMAND_LINE 101
+
+#define WM_UPDATEAVAILABLE (WM_APP + 10)
+
