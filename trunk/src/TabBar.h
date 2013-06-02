@@ -87,6 +87,7 @@ public :
     int                         InsertAtEnd(const TCHAR *subTabName);
     void                        ActivateAt(int index) const;
     void                        GetCurrentTitle(TCHAR *title, int titleLen);
+    void                        SetCurrentTitle(LPCTSTR title);
     int                         GetCurrentTabIndex() const;
     void                        DeletItemAt(int index);
 
