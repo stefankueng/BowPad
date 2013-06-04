@@ -345,7 +345,7 @@ void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring,
         auto foundIt = vars.find(varname);
         if (foundIt != vars.end())
         {
-            SearchReplace(s, varname, foundIt->second);
+            s = s.substr(0, pos) + foundIt->second + s.substr(pos2+1);
         }
         else
         {
