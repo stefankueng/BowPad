@@ -179,8 +179,10 @@ bool CCmdFindReplace::Execute()
 
     m_pFindReplaceDlg->ShowModeless(hInst, IDD_FINDREPLACEDLG, GetHwnd());
     if (!sSelText.empty())
+    {
         SetDlgItemText(*m_pFindReplaceDlg, IDC_SEARCHCOMBO, CUnicodeUtils::StdGetUnicode(sSelText).c_str());
-
+        SetFocus(GetDlgItem(*m_pFindReplaceDlg, IDC_SEARCHCOMBO));
+    }
 
     return true;
 }
