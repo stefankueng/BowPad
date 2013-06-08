@@ -192,4 +192,10 @@ void ICommand::Center( long startPos, long endPos )
     pMainWnd->m_scintilla.Center(startPos, endPos);
 }
 
+void ICommand::GotoBrace()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    pMainWnd->m_scintilla.GotoBrace();
+}
+
 

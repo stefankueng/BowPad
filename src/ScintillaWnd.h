@@ -77,6 +77,7 @@ public :
     void MarginClick(Scintilla::SCNotification * pNotification);
     void MarkSelectedWord(bool clear);
     void MatchBraces();
+    void GotoBrace();
     void MatchTags();
     bool GetSelectedCount(size_t& selByte, size_t& selLine);
     void DocScrollClear(int type) { m_docScroll.Clear(type); }
