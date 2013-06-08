@@ -57,6 +57,7 @@ protected:
     void                DocScrollAddLineColor(int type, size_t line, COLORREF clr);
     void                DocScrollRemoveLine(int type, size_t line);
     void                Center(long startPos, long endPos);
+    void                GotoBrace();
 
     HWND                GetHwnd();
     bool                OpenFile(LPCWSTR file);

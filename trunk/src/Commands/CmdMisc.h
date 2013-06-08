@@ -62,3 +62,23 @@ public:
     virtual UINT GetCmdId() { return cmdSelectAll; }
 };
 
+class CCmdGotoBrace : public ICommand
+{
+public:
+
+    CCmdGotoBrace(void * obj) : ICommand(obj)
+    {
+    }
+
+    ~CCmdGotoBrace(void)
+    {
+    }
+
+    virtual bool Execute()
+    {
+        GotoBrace();
+        return true;
+    }
+
+    virtual UINT GetCmdId() { return cmdGotoBrace; }
+};

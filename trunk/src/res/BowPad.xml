@@ -420,6 +420,7 @@
     <Command Name="cmdZoomIn" Id="10002" />
     <Command Name="cmdZoomOut" Id="10003" />
     <Command Name="cmdAbout" Id="10004" />
+    <Command Name="cmdGotoBrace" Id="10005" />
   </Application.Commands>
   <Application.Views>
     <Ribbon>
