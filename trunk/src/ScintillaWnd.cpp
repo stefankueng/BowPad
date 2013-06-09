@@ -21,6 +21,7 @@
 #include "XPMIcons.h"
 #include "UnicodeUtils.h"
 #include "SciLexer.h"
+#include "AppUtils.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -46,6 +47,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
         return false;
 
     m_docScroll.InitScintilla(this);
+
+    
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
     Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, 14);
@@ -74,32 +77,9 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_TCORNER);
     Call(SCI_MARKERENABLEHIGHLIGHT, 0);
 
-    const unsigned long foldmarkfore = RGB(250,250,250);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDER, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERSUB, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERTAIL, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEREND, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, foldmarkfore);
-
-    const unsigned long foldmarkback = RGB(50,50,50);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDER, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERSUB, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERTAIL, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEREND, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, foldmarkback);
-
     Call(SCI_SETWRAPVISUALFLAGS, SC_WRAPVISUALFLAG_NONE);
     Call(SCI_SETWRAPMODE, SC_WRAP_NONE);
 
-    Call(SCI_STYLESETFORE, STYLE_DEFAULT, ::GetSysColor(COLOR_WINDOWTEXT));
-    Call(SCI_STYLESETBACK, STYLE_DEFAULT, ::GetSysColor(COLOR_WINDOW));
-    Call(SCI_SETSELFORE, TRUE, ::GetSysColor(COLOR_HIGHLIGHTTEXT));
-    Call(SCI_SETSELBACK, TRUE, ::GetSysColor(COLOR_HIGHLIGHT));
-    Call(SCI_SETCARETFORE, ::GetSysColor(COLOR_WINDOWTEXT));
     Call(SCI_SETFONTQUALITY, SC_EFF_QUALITY_LCD_OPTIMIZED);
 
     Call(SCI_STYLESETVISIBLE, STYLE_CONTROLCHAR, TRUE);
@@ -107,9 +87,6 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETCARETSTYLE, 1);
     Call(SCI_SETCARETLINEVISIBLE, true);
     Call(SCI_SETCARETLINEVISIBLEALWAYS, true);
-    Call(SCI_SETCARETLINEBACK, ::GetSysColor(COLOR_WINDOWTEXT));
-    Call(SCI_SETCARETLINEBACKALPHA, 20);
-    Call(SCI_SETWHITESPACEFORE, true, RGB(255, 181, 106));
     Call(SCI_SETWHITESPACESIZE, 2);
     Call(SCI_SETMULTIPLESELECTION, 1);
     Call(SCI_SETMULTIPASTE, SC_MULTIPASTE_EACH);
@@ -302,8 +279,8 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
     }
     for (auto it: lexerdata.Styles)
     {
-        Call(SCI_STYLESETFORE, it.first, it.second.ForegroundColor);
-        Call(SCI_STYLESETBACK, it.first, it.second.BackgroundColor);
+        Call(SCI_STYLESETFORE, it.first, CAppUtils::GetThemeColor(it.second.ForegroundColor));
+        Call(SCI_STYLESETBACK, it.first, CAppUtils::GetThemeColor(it.second.BackgroundColor));
         if (!it.second.FontName.empty())
             Call(SCI_STYLESETFONT, it.first, (LPARAM)it.second.FontName.c_str());
 
@@ -341,26 +318,31 @@ void CScintillaWnd::SetupDefaultStyles()
     else
         Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Courier New");
     Call(SCI_STYLESETSIZE, STYLE_DEFAULT, 10);
+    Call(SCI_STYLESETFORE, STYLE_DEFAULT, CAppUtils::GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
+    Call(SCI_STYLESETBACK, STYLE_DEFAULT, CAppUtils::GetThemeColor(::GetSysColor(COLOR_WINDOW)));
+
+    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CAppUtils::GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
+    Call(SCI_STYLESETBACK, STYLE_LINENUMBER, CAppUtils::GetThemeColor(::GetSysColor(COLOR_3DFACE)));
 
     Call(SCI_INDICSETSTYLE, INDIC_SELECTION_MARK, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_SELECTION_MARK, 100);
     Call(SCI_INDICSETUNDER, INDIC_SELECTION_MARK, true);
-    Call(SCI_INDICSETFORE,  INDIC_SELECTION_MARK, RGB(0,255,0));
+    Call(SCI_INDICSETFORE,  INDIC_SELECTION_MARK, CAppUtils::GetThemeColor(RGB(0,255,0)));
 
     Call(SCI_INDICSETSTYLE, INDIC_FINDTEXT_MARK, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_FINDTEXT_MARK, 100);
     Call(SCI_INDICSETUNDER, INDIC_FINDTEXT_MARK, true);
-    Call(SCI_INDICSETFORE,  INDIC_FINDTEXT_MARK, RGB(255,255,0));
+    Call(SCI_INDICSETFORE,  INDIC_FINDTEXT_MARK, CAppUtils::GetThemeColor(RGB(255,255,0)));
 
-    Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, RGB(0,150,0));
+    Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, CAppUtils::GetThemeColor(RGB(0,150,0)));
     Call(SCI_STYLESETBOLD, STYLE_BRACELIGHT, 1);
-    Call(SCI_STYLESETFORE, STYLE_BRACEBAD, RGB(255,0,0));
+    Call(SCI_STYLESETFORE, STYLE_BRACEBAD, CAppUtils::GetThemeColor(RGB(255,0,0)));
     Call(SCI_STYLESETBOLD, STYLE_BRACEBAD, 1);
 
-    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, RGB(150,150,150));
+    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, CAppUtils::GetThemeColor(RGB(150,150,150)));
 
-    Call(SCI_INDICSETFORE, INDIC_TAGMATCH, RGB(0x80, 0x00, 0xFF));
-    Call(SCI_INDICSETFORE, INDIC_TAGATTR, RGB(0xFF, 0xFF, 0x00));
+    Call(SCI_INDICSETFORE, INDIC_TAGMATCH, CAppUtils::GetThemeColor(RGB(0x80, 0x00, 0xFF)));
+    Call(SCI_INDICSETFORE, INDIC_TAGATTR, CAppUtils::GetThemeColor(RGB(0xFF, 0xFF, 0x00)));
     Call(SCI_INDICSETSTYLE, INDIC_TAGMATCH, INDIC_ROUNDBOX);
     Call(SCI_INDICSETSTYLE, INDIC_TAGATTR, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_TAGMATCH, 100);
@@ -368,8 +350,39 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETUNDER, INDIC_TAGMATCH, true);
     Call(SCI_INDICSETUNDER, INDIC_TAGATTR, true);
 
+    Call(SCI_SETFOLDMARGINCOLOUR, true, CAppUtils::GetThemeColor(::GetSysColor(COLOR_3DFACE)));
+    Call(SCI_SETFOLDMARGINHICOLOUR, true, CAppUtils::GetThemeColor(::GetSysColor(COLOR_3DHIGHLIGHT)));
+
     SetTabSettings();
     Call(SCI_SETINDENTATIONGUIDES, SC_IV_LOOKBOTH);
+
+    const unsigned long foldmarkfore = CAppUtils::GetThemeColor(RGB(250,250,250));
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDER, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERSUB, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERTAIL, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEREND, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, foldmarkfore);
+
+    const unsigned long foldmarkback = CAppUtils::GetThemeColor(RGB(50,50,50));
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDER, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERSUB, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERTAIL, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEREND, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, foldmarkback);
+
+    Call(SCI_STYLESETFORE, STYLE_DEFAULT, CAppUtils::GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
+    Call(SCI_STYLESETBACK, STYLE_DEFAULT, CAppUtils::GetThemeColor(::GetSysColor(COLOR_WINDOW)));
+    Call(SCI_SETSELFORE, TRUE, CAppUtils::GetThemeColor(::GetSysColor(COLOR_HIGHLIGHTTEXT)));
+    Call(SCI_SETSELBACK, TRUE, CAppUtils::GetThemeColor(::GetSysColor(COLOR_HIGHLIGHT)));
+    Call(SCI_SETCARETFORE, CAppUtils::GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
+
+    Call(SCI_SETCARETLINEBACK, CAppUtils::GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
+    Call(SCI_SETCARETLINEBACKALPHA, 20);
+    Call(SCI_SETWHITESPACEFORE, true, CAppUtils::GetThemeColor(RGB(255, 181, 106)));
 }
 
 void CScintillaWnd::Center(long posStart, long posEnd)
@@ -484,7 +497,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&FindText) >= 0)
         {
             size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
-            m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, RGB(0,255,0));
+            m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, CAppUtils::GetThemeColor(RGB(0,255,0)));
             FindText.chrg.cpMin = FindText.chrgText.cpMax;
         }
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
@@ -679,7 +692,7 @@ bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
 
 LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw )
 {
-    m_docScroll.SetCurrentPos(Call(SCI_VISIBLEFROMDOCLINE, Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS))), RGB(40,40,40));
+    m_docScroll.SetCurrentPos(Call(SCI_VISIBLEFROMDOCLINE, Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS))), CAppUtils::GetThemeColor(RGB(40,40,40)));
     m_docScroll.SetTotalLines(Call(SCI_VISIBLEFROMDOCLINE, (Call(SCI_GETLINECOUNT))));
     return m_docScroll.HandleCustomDraw(wParam, pCustDraw);
 }
@@ -1330,7 +1343,7 @@ void CScintillaWnd::BookmarkAdd( long lineno )
     if (!IsBookmarkPresent(lineno))
     {
         Call(SCI_MARKERADD, lineno, MARK_BOOKMARK);
-        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, lineno, RGB(255,0,0));
+        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, lineno, CAppUtils::GetThemeColor(RGB(255,0,0)));
     }
 }
 
@@ -1370,7 +1383,7 @@ void CScintillaWnd::MarkBookmarksInScrollbar()
     long line = (long)Call(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
     while (line >= 0)
     {
-        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, line, RGB(255,0,0));
+        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, line, CAppUtils::GetThemeColor(RGB(255,0,0)));
         line = (long)Call(SCI_MARKERNEXT, line+1, (1 << MARK_BOOKMARK));
     }
 }

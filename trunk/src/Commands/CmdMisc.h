@@ -18,6 +18,7 @@
 #pragma once
 #include "ICommand.h"
 #include "BowPadUI.h"
+#include "AppUtils.h"
 
 class CCmdDelete : public ICommand
 {
@@ -81,4 +82,56 @@ public:
     }
 
     virtual UINT GetCmdId() { return cmdGotoBrace; }
+};
+
+class CCmdToggleTheme : public ICommand
+{
+public:
+
+    CCmdToggleTheme(void * obj) : ICommand(obj)
+    {
+        CAppUtils::GetRibbonColors(text, back, high);
+        int dark = (int)CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0);
+        if (dark)
+        {
+            CAppUtils::SetDarkTheme(!CAppUtils::IsDarkTheme());
+            CAppUtils::SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(50,50,50));
+        }
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    }
+
+    ~CCmdToggleTheme(void)
+    {
+    }
+
+    virtual bool Execute()
+    {
+        CAppUtils::SetDarkTheme(!CAppUtils::IsDarkTheme());
+        CDocument doc = GetDocument(GetCurrentTabIndex());
+        SetupLexerForLang(doc.m_language);
+        if (CAppUtils::IsDarkTheme())
+            CAppUtils::SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(50,50,50));
+        else
+            CAppUtils::SetRibbonColorsHSB(text, back, high);
+
+        CIniSettings::Instance().SetInt64(L"View", L"darktheme", CAppUtils::IsDarkTheme() ? 1 : 0);
+
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+        return true;
+    }
+
+    virtual UINT GetCmdId() { return cmdToggleTheme; }
+
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    {
+        if (UI_PKEY_BooleanValue == key)
+        {
+            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CAppUtils::IsDarkTheme(), ppropvarNewValue);
+        }
+        return E_NOTIMPL;
+    }
+private:
+    UI_HSBCOLOR text;
+    UI_HSBCOLOR back;
+    UI_HSBCOLOR high;
 };
