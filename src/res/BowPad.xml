@@ -413,6 +413,9 @@
       </Command.LargeImages>
     </Command>
 
+    <Command Name="cmdToggleTheme" LabelTitle="Dark Theme" TooltipTitle="Dark Theme" TooltipDescription="Toggles between the normal and the dark theme">
+    </Command>
+
 
     <Command Name="cmdContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />
@@ -580,6 +583,7 @@
                 <ControlNameDefinition Name="button2"/>
                 <ControlNameDefinition Name="button3"/>
                 <ControlNameDefinition Name="button4"/>
+                <ControlNameDefinition Name="button5"/>
               </ControlNameMap>
               <GroupSizeDefinition Size="Large">
                 <ControlGroup>
@@ -593,6 +597,9 @@
                 <Row>
                   <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Medium">
                 <Row>
@@ -605,6 +612,9 @@
                 <Row>
                   <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Small">
                 <Row>
@@ -615,12 +625,16 @@
                   <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
                   <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="false" />
                 </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
               </GroupSizeDefinition>
             </SizeDefinition>
             <ToggleButton CommandName="cmdLineWrap" />
             <ToggleButton CommandName="cmdWhiteSpace" />
             <Spinner CommandName="cmdTabSize" />
             <ToggleButton CommandName="cmdUseTabs" />
+            <ToggleButton CommandName="cmdToggleTheme" />
           </Group>
           <Group CommandName="cmdGroupEncoding" SizeDefinition="FourButtons">
             <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">

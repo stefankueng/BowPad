@@ -111,6 +111,8 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdUseTabs(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdToggleTheme(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdTabSize(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdLoadAsEncoded(obj);
