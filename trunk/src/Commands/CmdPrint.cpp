@@ -97,11 +97,15 @@ void CCmdPrint::Print( bool bShowDlg )
         - GetDeviceCaps(hdc, VERTRES)                       // printable height
         - rectPhysMargins.top;                              // right unprintable margin
 
+    TCHAR localeInfo[3];
+    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, 3);
+    // Metric system. '1' is US System
+    int defaultMargin = localeInfo[0] == '0' ? 2540 : 1000;
     RECT pagesetupMargin;
-    pagesetupMargin.left   = (long)CIniSettings::Instance().GetInt64(L"print", L"pagesetupmarginleft", 2540);
-    pagesetupMargin.top    = (long)CIniSettings::Instance().GetInt64(L"print", L"pagesetupmargintop", 2540);
-    pagesetupMargin.right  = (long)CIniSettings::Instance().GetInt64(L"print", L"pagesetupmarginright", 2540);
-    pagesetupMargin.bottom = (long)CIniSettings::Instance().GetInt64(L"print", L"pagesetupmarginbottom", 2540);
+    pagesetupMargin.left   = (long)CIniSettings::Instance().GetInt64(L"print", L"pagesetupmarginleft", defaultMargin);
+    pagesetupMargin.top    = (long)CIniSettings::Instance().GetInt64(L"print", L"pagesetupmargintop", defaultMargin);
+    pagesetupMargin.right  = (long)CIniSettings::Instance().GetInt64(L"print", L"pagesetupmarginright", defaultMargin);
+    pagesetupMargin.bottom = (long)CIniSettings::Instance().GetInt64(L"print", L"pagesetupmarginbottom", defaultMargin);
 
     if (pagesetupMargin.left != 0 || pagesetupMargin.right != 0 ||
         pagesetupMargin.top != 0 || pagesetupMargin.bottom != 0)
@@ -112,9 +116,6 @@ void CCmdPrint::Print( bool bShowDlg )
             // thousandths of inches (HiEnglish) margin values
             // from the Page Setup dialog to device units.
             // (There are 2540 hundredths of a mm in an inch.)
-
-            TCHAR localeInfo[3];
-            GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, 3);
 
             if (localeInfo[0] == '0')
             {
