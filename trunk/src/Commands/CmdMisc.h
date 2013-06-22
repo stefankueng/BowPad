@@ -19,6 +19,7 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 #include "AppUtils.h"
+#include "Theme.h"
 
 class CCmdDelete : public ICommand
 {
@@ -90,12 +91,12 @@ public:
 
     CCmdToggleTheme(void * obj) : ICommand(obj)
     {
-        CAppUtils::GetRibbonColors(text, back, high);
+        CTheme::Instance().GetRibbonColors(text, back, high);
         int dark = (int)CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0);
         if (dark)
         {
-            CAppUtils::SetDarkTheme(!CAppUtils::IsDarkTheme());
-            CAppUtils::SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(50,50,50));
+            CTheme::Instance().SetDarkTheme(!CTheme::Instance().IsDarkTheme());
+            CTheme::Instance().SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(50,50,50));
         }
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
@@ -106,15 +107,19 @@ public:
 
     virtual bool Execute()
     {
-        CAppUtils::SetDarkTheme(!CAppUtils::IsDarkTheme());
+        CTheme::Instance().SetDarkTheme(!CTheme::Instance().IsDarkTheme());
         CDocument doc = GetDocument(GetCurrentTabIndex());
         SetupLexerForLang(doc.m_language);
-        if (CAppUtils::IsDarkTheme())
-            CAppUtils::SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(50,50,50));
+        if (CTheme::Instance().IsDarkTheme())
+            CTheme::Instance().SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(50,50,50));
         else
-            CAppUtils::SetRibbonColorsHSB(text, back, high);
+            CTheme::Instance().SetRibbonColorsHSB(text, back, high);
 
-        CIniSettings::Instance().SetInt64(L"View", L"darktheme", CAppUtils::IsDarkTheme() ? 1 : 0);
+        CIniSettings::Instance().SetInt64(L"View", L"darktheme", CTheme::Instance().IsDarkTheme() ? 1 : 0);
+
+        ScintillaCall(SCI_CLEARDOCUMENTSTYLE);
+        ScintillaCall(SCI_COLOURISE, 0, -1);
+        TabActivateAt(GetCurrentTabIndex());
 
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         return true;
@@ -126,7 +131,7 @@ public:
     {
         if (UI_PKEY_BooleanValue == key)
         {
-            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CAppUtils::IsDarkTheme(), ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CTheme::Instance().IsDarkTheme(), ppropvarNewValue);
         }
         return E_NOTIMPL;
     }

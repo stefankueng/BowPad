@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "StatusBar.h"
 #include "AppUtils.h"
+#include "Theme.h"
 
 #include <Commctrl.h>
 
@@ -29,7 +30,7 @@ void DrawSizeGrip(HDC hdc, LPRECT lpRect)
     pt.x = lpRect->right - 1;
     pt.y = lpRect->bottom - 1;
 
-    hPenFace = CreatePen( PS_SOLID, 1, CAppUtils::GetThemeColor(GetSysColor(COLOR_3DFACE)));
+    hPenFace = CreatePen( PS_SOLID, 1, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
     hOldPen = (HPEN)SelectObject( hdc, hPenFace );
     MoveToEx (hdc, pt.x - 12, pt.y, NULL);
     LineTo (hdc, pt.x, pt.y);
@@ -38,7 +39,7 @@ void DrawSizeGrip(HDC hdc, LPRECT lpRect)
     pt.x--;
     pt.y--;
 
-    hPenShadow = CreatePen( PS_SOLID, 1, CAppUtils::GetThemeColor(GetSysColor(COLOR_3DSHADOW)));
+    hPenShadow = CreatePen( PS_SOLID, 1, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DSHADOW)));
     SelectObject( hdc, hPenShadow );
     for (i = 1; i < 11; i += 4)
     {
@@ -49,7 +50,7 @@ void DrawSizeGrip(HDC hdc, LPRECT lpRect)
         LineTo (hdc, pt.x + 1, pt.y - i - 2);
     }
 
-    hPenHighlight = CreatePen( PS_SOLID, 1, CAppUtils::GetThemeColor(GetSysColor(COLOR_3DHIGHLIGHT)));
+    hPenHighlight = CreatePen( PS_SOLID, 1, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DHIGHLIGHT)));
     SelectObject( hdc, hPenHighlight );
     for (i = 3; i < 13; i += 4)
     {
@@ -85,8 +86,8 @@ void DrawPart (HWND hWnd, HDC hdc, int itemID)
     int textlen = (int)SendMessage(hWnd, SB_GETTEXTLENGTH, itemID, 0);
     std::unique_ptr<wchar_t[]> textbuf(new wchar_t[textlen + 1]);
     SendMessage(hWnd, SB_GETTEXT, itemID, (LPARAM)textbuf.get());
-    SetTextColor(hdc, CAppUtils::GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)));
-    SetBkColor(hdc, CAppUtils::GetThemeColor(GetSysColor(COLOR_3DFACE)));
+    SetTextColor(hdc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)));
+    SetBkColor(hdc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
     InflateRect(&rcPart, -2, 0);
     DrawText(hdc, textbuf.get(), -1, &rcPart, DT_LEFT|DT_SINGLELINE|DT_VCENTER);
 }
@@ -102,7 +103,7 @@ void RefreshPart (HWND hWnd, HDC hdc, int itemID)
     if (!RectVisible(hdc, &rcPart))
         return;
 
-    hbrBk = CreateSolidBrush(CAppUtils::GetThemeColor(GetSysColor(COLOR_3DFACE)));
+    hbrBk = CreateSolidBrush(CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
     FillRect(hdc, &rcPart, hbrBk);
     DeleteObject (hbrBk);
 
@@ -120,7 +121,7 @@ LRESULT Refresh (HWND hWnd, HDC hdc)
 
     GetClientRect (hWnd, &rect);
 
-    hbrBk = CreateSolidBrush(CAppUtils::GetThemeColor(GetSysColor(COLOR_3DFACE)));
+    hbrBk = CreateSolidBrush(CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
     FillRect(hdc, &rect, hbrBk);
     DeleteObject (hbrBk);
 
@@ -162,7 +163,7 @@ bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, int * nsPa
 
 LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-    if (CAppUtils::IsDarkTheme())
+    if (CTheme::Instance().IsDarkTheme())
     {
         // only do custom drawing when in dark theme
         switch (uMsg)

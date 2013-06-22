@@ -25,6 +25,7 @@
 #include "MRU.h"
 #include "KeyboardShortcutHandler.h"
 #include "AppUtils.h"
+#include "Theme.h"
 #include "PreserveChdir.h"
 #include "CmdLineParser.h"
 
@@ -408,7 +409,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case TCN_GETCOLOR:
                     if ((ptbhdr->tabOrigin >= 0) && (ptbhdr->tabOrigin < m_DocManager.GetCount()))
                     {
-                        return CAppUtils::GetThemeColor(m_DocManager.GetColorForDocument(ptbhdr->tabOrigin));
+                        return CTheme::Instance().GetThemeColor(m_DocManager.GetColorForDocument(ptbhdr->tabOrigin));
                     }
                     break;
                 case TCN_SELCHANGE:

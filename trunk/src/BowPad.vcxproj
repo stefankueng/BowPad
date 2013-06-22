@@ -269,6 +269,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TabBar.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Theme.h" />
     <ClInclude Include="XPMIcons.h" />
   </ItemGroup>
   <ItemGroup>
@@ -323,6 +324,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TabBar.cpp" />
+    <ClCompile Include="Theme.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc" />
@@ -358,6 +360,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\BowPad.rc2" />
+    <None Include="res\darktheme.ini" />
     <None Include="res\drag.cur" />
     <None Include="res\drag_interdit.cur" />
     <None Include="res\drag_out.cur" />

@@ -18,6 +18,7 @@
 #include "TabBar.h"
 #include "resource.h"
 #include "AppUtils.h"
+#include "Theme.h"
 
 #include <Uxtheme.h>
 #include <vsstyle.h>
@@ -79,11 +80,11 @@ void FillSolidRect(HDC hDC, int left, int top, int right, int bottom, COLORREF c
 }
 
 
-COLORREF CTabBar::m_activeTextColour = CAppUtils::GetThemeColor(::GetSysColor(COLOR_BTNTEXT));
-COLORREF CTabBar::m_activeTopBarFocusedColour = CAppUtils::GetThemeColor(RGB(250, 170, 60));
-COLORREF CTabBar::m_activeTopBarUnfocusedColour = CAppUtils::GetThemeColor(RGB(250, 210, 150));
-COLORREF CTabBar::m_inactiveTextColour = CAppUtils::GetThemeColor(RGB(128, 128, 128));
-COLORREF CTabBar::m_inactiveBgColour = CAppUtils::GetThemeColor(RGB(192, 192, 192));
+COLORREF CTabBar::m_activeTextColour = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNTEXT));
+COLORREF CTabBar::m_activeTopBarFocusedColour = CTheme::Instance().GetThemeColor(RGB(250, 170, 60));
+COLORREF CTabBar::m_activeTopBarUnfocusedColour = CTheme::Instance().GetThemeColor(RGB(250, 210, 150));
+COLORREF CTabBar::m_inactiveTextColour = CTheme::Instance().GetThemeColor(RGB(128, 128, 128));
+COLORREF CTabBar::m_inactiveBgColour = CTheme::Instance().GetThemeColor(RGB(192, 192, 192));
 
 HWND CTabBar::m_hwndArray[nbCtrlMax] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 int CTabBar::m_nControls = 0;
@@ -336,7 +337,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             // color - in some places the background color shows thru' the pages!!
             // so we must only paint the background color where we need to, which is that
             // portion of the tab area not excluded by the tabs themselves
-            crBack = CAppUtils::GetThemeColor(::GetSysColor(COLOR_3DFACE));
+            crBack = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
 
             // full width of tab ctrl above top of tabs
             rBkgnd = rClient;
@@ -611,7 +612,7 @@ COLORREF CTabBar::GetTabColor(bool bSelected, UINT item)
     float lighterfactor = 1.1f;
     if (clr == 0)
     {
-        clr = CAppUtils::GetThemeColor(GetSysColor(COLOR_3DFACE));
+        clr = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
         lighterfactor = 1.4f;
     }
     if (bSelected)
@@ -678,7 +679,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
     COLORREF crFrom = GetTabColor(bSelected, pDrawItemStruct->itemID);
 
     COLORREF crTo = bSelected ? ::GetSysColor(COLOR_3DFACE) : Darker(::GetSysColor(COLOR_3DFACE), 0.7f);
-    crTo = CAppUtils::GetThemeColor(crTo);
+    crTo = CTheme::Instance().GetThemeColor(crTo);
 
     int nROrg = GetRValue(crFrom);
     int nGOrg = GetGValue(crFrom);
@@ -746,7 +747,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
     UINT uFlags = DT_CALCRECT | DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS;
     ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, uFlags);
 
-    SetTextColor(pDrawItemStruct->hDC, bSelected ? CAppUtils::GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)) : CAppUtils::GetThemeColor(Darker(::GetSysColor(COLOR_3DFACE), 0.3f)));
+    SetTextColor(pDrawItemStruct->hDC, bSelected ? CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)) : CTheme::Instance().GetThemeColor(Darker(::GetSysColor(COLOR_3DFACE), 0.3f)));
     DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, DT_NOPREFIX | DT_CENTER);
 }
 

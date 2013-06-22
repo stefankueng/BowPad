@@ -17,8 +17,6 @@
 
 #pragma once
 #include <string>
-#include <UIRibbon.h>
-#include <UIRibbonPropertyHelpers.h>
 
 class CAppUtils
 {
@@ -27,25 +25,14 @@ public:
     ~CAppUtils(void);
 
     static std::wstring             GetDataPath(HMODULE hMod = NULL);
-    static COLORREF                 GetThemeColor(COLORREF clr);
     static std::wstring             GetSessionID();
     static bool                     CheckForUpdate(bool force);
     static bool                     DownloadUpdate(HWND hWnd, bool bInstall);
     static bool                     ShowUpdateAvailableDialog(HWND hWnd);
     static HRESULT CALLBACK         TDLinkClickCallback(HWND hwnd, UINT uNotification, WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData);
-    static void                     SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight);
-    static void                     SetRibbonColorsHSB(UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight);
-    static void                     GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight);
 
-    static void                     RGBToHSB(COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightness);
-    static void                     RGBtoHSL(COLORREF color, unsigned int& h, unsigned int& s, unsigned int& l);
-    static COLORREF                 HSLtoRGB(const unsigned int& h, const unsigned int& s, const unsigned int& l);
-
-    static void                     SetDarkTheme(bool b = true) { dark = b; }
-    static bool                     IsDarkTheme() { return dark; }
 private:
     static std::wstring             updatefilename;
     static std::wstring             updateurl;
-    static bool                     dark;
 };
 
