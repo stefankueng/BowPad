@@ -424,6 +424,7 @@
     <Command Name="cmdZoomOut" Id="10003" />
     <Command Name="cmdAbout" Id="10004" />
     <Command Name="cmdGotoBrace" Id="10005" />
+    <Command Name="cmdRandom" Id="10006" />
   </Application.Commands>
   <Application.Views>
     <Ribbon>

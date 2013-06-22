@@ -40,6 +40,7 @@
 #include "CmdBlanks.h"
 #include "CmdZoom.h"
 #include "CmdBookmarks.h"
+#include "CmdRandom.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -197,6 +198,9 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdZoomIn(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdZoomOut(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
+    pCmd = new CCmdRandom(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 }
 

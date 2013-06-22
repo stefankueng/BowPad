@@ -44,6 +44,7 @@ protected:
     std::wstring        GetCurrentTitle();
     int                 GetSrcTab();
     int                 GetDstTab();
+    void                CloseTab(int index);
 
     int                 GetDocumentCount();
     CDocument           GetDocument(int index);
