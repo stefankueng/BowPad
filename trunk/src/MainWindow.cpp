@@ -424,6 +424,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             m_scintilla.SetTabSettings();
                             m_scintilla.MarkSelectedWord(true);
                             m_scintilla.MarkBookmarksInScrollbar();
+                            wchar_t sTabTitle[100] = {0};
+                            m_TabBar.GetCurrentTitle(sTabTitle, _countof(sTabTitle));
+                            std::wstring sWindowTitle = CStringUtils::Format(L"%s - BowPad", doc.m_path.empty() ? sTabTitle : doc.m_path.c_str());
+                            SetWindowText(*this, sWindowTitle.c_str());
                             HandleOutsideModifications(tab);
                             SetFocus(m_scintilla);
                             m_scintilla.Call(SCI_GRABFOCUS);
