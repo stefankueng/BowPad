@@ -230,7 +230,7 @@ void CLexStyles::Load()
                             }
                             if (_wcsicmp(L"CommentLineAtStart", sk) == 0)
                             {
-                                ld.commentstreamend = _wtoi(ini[iniind].GetValue(langsect.c_str(), sk)) != 0;
+                                ld.commentlineatstart = _wtoi(ini[iniind].GetValue(langsect.c_str(), sk)) != 0;
                             }
                         }
                         m_Langdata[CUnicodeUtils::StdGetUTF8(k)] = ld;
