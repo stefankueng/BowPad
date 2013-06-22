@@ -1025,6 +1025,16 @@ bool CMainWindow::OpenFile( const std::wstring& file )
         CDocument doc = m_DocManager.LoadFile(*this, file.c_str(), encoding);
         if (doc.m_document)
         {
+            if (m_TabBar.GetItemCount() == 1)
+            {
+                // check if the only tab is empty and if it is, remove it
+                CDocument existDoc = m_DocManager.GetDocument(0);
+                if (existDoc.m_path.empty() && (m_scintilla.Call(SCI_GETLENGTH)==0) && (m_scintilla.Call(SCI_CANUNDO)==0))
+                {
+                    m_DocManager.RemoveDocument(0);
+                    m_TabBar.DeletItemAt(0);
+                }
+            }
             CMRU::Instance().AddPath(file);
             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
             doc.m_language = CLexStyles::Instance().GetLanguageForExt(file.substr(file.find_last_of('.')+1));
