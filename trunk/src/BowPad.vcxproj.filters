@@ -225,6 +225,12 @@
     <ClInclude Include="Theme.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdRandom.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\DirFileEnum.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -367,6 +373,9 @@
     </ClCompile>
     <ClCompile Include="Theme.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\DirFileEnum.cpp">
+      <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
