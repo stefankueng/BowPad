@@ -209,6 +209,10 @@ void CLexStyles::Load()
                         CSimpleIni::TNamesDepend specLangKeys;
                         ini[iniind].GetAllKeys(langsect.c_str(), specLangKeys);
                         LanguageData ld;
+                        if (iniind > 0)
+                        {
+                            ld = m_Langdata[CUnicodeUtils::StdGetUTF8(k)];
+                        }
                         ld.lexer = lexers[k];
                         for (const auto& sk : specLangKeys)
                         {
