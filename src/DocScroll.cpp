@@ -18,6 +18,7 @@
 #include "DocScroll.h"
 #include "ScintillaWnd.h"
 #include "AppUtils.h"
+#include "Theme.h"
 
 #include <Commctrl.h>
 
@@ -79,14 +80,14 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
     if (pCustDraw->nBar == SB_BOTH)
     {
         // the sizing gripper in the bottom-right corner
-        FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, CAppUtils::GetThemeColor(::GetSysColor(COLOR_SCROLLBAR)));
+        FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_SCROLLBAR)));
     }
     else if (pCustDraw->nBar == SB_HORZ)
     {
-        COLORREF scroll = CAppUtils::GetThemeColor(::GetSysColor(COLOR_3DFACE));
-        COLORREF thumb = CAppUtils::GetThemeColor(::GetSysColor(COLOR_SCROLLBAR));
+        COLORREF scroll = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
+        COLORREF thumb = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DSHADOW));
         if (pCustDraw->uState == CDIS_HOT)
-            thumb = CAppUtils::GetThemeColor(RGB(200,200,255));
+            thumb = CTheme::Instance().GetThemeColor(RGB(200,200,255));
 
         switch (pCustDraw->uItem)
         {
@@ -145,10 +146,10 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
     }
     else if (pCustDraw->nBar == SB_VERT)
     {
-        COLORREF scroll = CAppUtils::GetThemeColor(::GetSysColor(COLOR_3DFACE));
-        COLORREF thumb = CAppUtils::GetThemeColor(::GetSysColor(COLOR_SCROLLBAR));
+        COLORREF scroll = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
+        COLORREF thumb = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DSHADOW));
         if (pCustDraw->uState == CDIS_HOT)
-            thumb = CAppUtils::GetThemeColor(RGB(200,200,255));
+            thumb = CTheme::Instance().GetThemeColor(RGB(200,200,255));
 
         switch (pCustDraw->uItem)
         {
