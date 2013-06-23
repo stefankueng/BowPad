@@ -54,7 +54,35 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             m_resizer.AddControl(hwndDlg, IDC_REPLACEALLBTN, RESIZER_TOPRIGHT);
             m_resizer.AddControl(hwndDlg, IDCANCEL, RESIZER_TOPRIGHT);
 
-            SetFocus(GetDlgItem(*this, IDC_SEARCHCOMBO));
+            HWND hSearchCombo = GetDlgItem(*this, IDC_SEARCHCOMBO);
+            int maxSearch = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearch", 20);
+            m_searchStrings.clear();
+            for (int i = 0; i < maxSearch; ++i)
+            {
+                std::wstring sKey = CStringUtils::Format(L"search%d", i);
+                std::wstring sSearchWord = CIniSettings::Instance().GetString(L"searchreplace", sKey.c_str(), L"");
+                if (!sSearchWord.empty())
+                {
+                    m_searchStrings.push_back(sSearchWord);
+                    SendMessage(hSearchCombo, CB_INSERTSTRING, (WPARAM)-1, (LPARAM)sSearchWord.c_str());
+                }
+            }
+
+            HWND hReplaceCombo = GetDlgItem(*this, IDC_REPLACECOMBO);
+            int maxReplace = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxReplace", 20);
+            m_replaceStrings.clear();
+            for (int i = 0; i < maxReplace; ++i)
+            {
+                std::wstring sKey = CStringUtils::Format(L"replace%d", i);
+                std::wstring sReplaceWord = CIniSettings::Instance().GetString(L"searchreplace", sKey.c_str(), L"");
+                if (!sReplaceWord.empty())
+                {
+                    m_replaceStrings.push_back(sReplaceWord);
+                    SendMessage(hReplaceCombo, CB_INSERTSTRING, (WPARAM)-1, (LPARAM)sReplaceWord.c_str());
+                }
+            }
+
+            SetFocus(hSearchCombo);
         }
         return FALSE;
     case WM_ACTIVATE:
@@ -111,6 +139,24 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
             {
                 Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
             }
+
+            int maxSearch = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearch", 20);
+            std::wstring sFindStringW = CUnicodeUtils::StdGetUnicode(sFindString);
+            auto foundIt = std::find(m_searchStrings.begin(), m_searchStrings.end(), sFindStringW);
+            if (foundIt != m_searchStrings.end())
+                m_searchStrings.erase(foundIt);
+            else
+                SendDlgItemMessage(*this, IDC_SEARCHCOMBO, CB_INSERTSTRING, 0, (LPARAM)CUnicodeUtils::StdGetUnicode(sFindString).c_str());
+            m_searchStrings.push_front(sFindStringW);
+            while (m_searchStrings.size() >= maxSearch)
+                m_searchStrings.pop_back();
+
+            int i = 0;
+            for (const auto& it : m_searchStrings)
+            {
+                std::wstring sKey = CStringUtils::Format(L"search%d", i++);
+                CIniSettings::Instance().SetString(L"searchreplace", sKey.c_str(), it.c_str());
+            }
         }
         break;
     case IDC_REPLACEALLBTN:
@@ -160,6 +206,43 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
                 // TODO: maybe use a better way to inform the user than an interrupting dialog box
                 std::wstring sInfo = CStringUtils::Format(L"%d occurrences were replaced", replaceCount);
                 ::MessageBox(*this, sInfo.c_str(), L"BowPad", MB_ICONINFORMATION);
+            }
+
+            int maxSearch = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearch", 20);
+            std::wstring sFindStringW = CUnicodeUtils::StdGetUnicode(sFindString);
+            auto foundIt = std::find(m_searchStrings.begin(), m_searchStrings.end(), sFindStringW);
+            if (foundIt != m_searchStrings.end())
+                m_searchStrings.erase(foundIt);
+            else
+                SendDlgItemMessage(*this, IDC_SEARCHCOMBO, CB_INSERTSTRING, 0, (LPARAM)sFindStringW.c_str());
+            m_searchStrings.push_front(sFindStringW);
+            while (m_searchStrings.size() >= maxSearch)
+                m_searchStrings.pop_back();
+
+            int i = 0;
+            for (const auto& it : m_searchStrings)
+            {
+                std::wstring sKey = CStringUtils::Format(L"search%d", i++);
+                CIniSettings::Instance().SetString(L"searchreplace", sKey.c_str(), it.c_str());
+            }
+
+
+            int maxReplace = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxreplace", 20);
+            std::wstring sReplaceStringW = CUnicodeUtils::StdGetUnicode(sReplaceString);
+            foundIt = std::find(m_replaceStrings.begin(), m_replaceStrings.end(), sFindStringW);
+            if (foundIt != m_replaceStrings.end())
+                m_replaceStrings.erase(foundIt);
+            else
+                SendDlgItemMessage(*this, IDC_REPLACECOMBO, CB_INSERTSTRING, 0, (LPARAM)sReplaceStringW.c_str());
+            m_replaceStrings.push_front(sReplaceStringW);
+            while (m_replaceStrings.size() >= maxReplace)
+                m_replaceStrings.pop_back();
+
+            i = 0;
+            for (const auto& it : m_replaceStrings)
+            {
+                std::wstring sKey = CStringUtils::Format(L"replace%d", i++);
+                CIniSettings::Instance().SetString(L"searchreplace", sKey.c_str(), it.c_str());
             }
         }
         break;
