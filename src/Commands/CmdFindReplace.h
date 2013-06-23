@@ -36,6 +36,8 @@ protected:
 
 private:
     CDlgResizer             m_resizer;
+    std::list<std::wstring> m_searchStrings;
+    std::list<std::wstring> m_replaceStrings;
 };
 
 
