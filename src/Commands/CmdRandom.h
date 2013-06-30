@@ -149,6 +149,9 @@ public:
     size_t GetShownCount() { return m_arShownFileList.size(); }
     void Save()
     {
+        if (m_arShownFileList.empty() && m_arUnShownFileList.empty())
+            return;
+
         std::wstring path = m_sPath + L"\\_shownfilelist";
         HANDLE hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN, NULL);
         if (hFile != INVALID_HANDLE_VALUE)
