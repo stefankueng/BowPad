@@ -66,7 +66,7 @@
     <Command Name="cmdFileMenu"/>
     <Command Name="cmdMRUList">
       <Command.LabelTitle>
-        <String Id ="280">MRU List</String>
+        <String>MRU List</String>
       </Command.LabelTitle>
     </Command>
     <Command Name="cmdExit" LabelTitle="Exit">
@@ -74,22 +74,22 @@
         <Image>res/ExitL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdNew" LabelTitle="New" TooltipTitle="New Document" TooltipDescription="Creates a new tab with an empty document">
+    <Command Name="cmdNew" LabelTitle="New" TooltipTitle="New Document (Ctrl+N)" TooltipDescription="Creates a new tab with an empty document">
       <Command.LargeImages>
         <Image>res/NewL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdOpen" LabelTitle="Open" TooltipTitle="Open Files" TooltipDescription="Opens one or more files">
+    <Command Name="cmdOpen" LabelTitle="Open" TooltipTitle="Open Files (Ctrl+O)" TooltipDescription="Opens one or more files">
       <Command.LargeImages>
         <Image>res/OpenL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdSave" LabelTitle="Save" TooltipTitle="Save File" TooltipDescription="Saves the current tab">
+    <Command Name="cmdSave" LabelTitle="Save" TooltipTitle="Save File (Ctrl+S)" TooltipDescription="Saves the current tab">
       <Command.LargeImages>
         <Image>res/SaveL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdSaveAll" LabelTitle="Save all" TooltipTitle="Save Files" TooltipDescription="Saves all open files">
+    <Command Name="cmdSaveAll" LabelTitle="Save all" TooltipTitle="Save Files (Ctrl+Shift+S)" TooltipDescription="Saves all open files">
       <Command.LargeImages>
         <Image>res/SaveAllL.bmp</Image>
       </Command.LargeImages>
@@ -99,7 +99,7 @@
         <Image>res/SaveAsL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdClose" LabelTitle="Close Tab" TooltipTitle="Close Tab" TooltipDescription="Close the current tab">
+    <Command Name="cmdClose" LabelTitle="Close Tab" TooltipTitle="Close Tab (Ctrl+W)" TooltipDescription="Close the current tab">
       <Command.LargeImages>
         <Image>res/CloseL.bmp</Image>
       </Command.LargeImages>
@@ -109,22 +109,22 @@
         <Image>res/CloseAllL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdCopy" LabelTitle="Copy" TooltipTitle="Clipboard" TooltipDescription="Copy the current selection to the clipboard">
+    <Command Name="cmdCopy" LabelTitle="Copy" TooltipTitle="Clipboard (Ctrl+C)" TooltipDescription="Copy the current selection to the clipboard">
       <Command.SmallImages>
         <Image>res/Copy.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdCut" LabelTitle="Cut" TooltipTitle="Clipboard" TooltipDescription="Cut the current selection to the clipboard">
+    <Command Name="cmdCut" LabelTitle="Cut" TooltipTitle="Clipboard (Ctrl+X)" TooltipDescription="Cut the current selection to the clipboard">
       <Command.SmallImages>
         <Image>res/Cut.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdPaste" LabelTitle="Paste" TooltipTitle="Clipboard" TooltipDescription="Inserts the content of the clipboard at the cursor position">
+    <Command Name="cmdPaste" LabelTitle="Paste" TooltipTitle="Clipboard (Ctrl+V)" TooltipDescription="Inserts the content of the clipboard at the cursor position">
       <Command.LargeImages>
         <Image>res/Paste.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdUndo" LabelTitle="Undo" TooltipTitle="Undo" TooltipDescription="Undo the last change">
+    <Command Name="cmdUndo" LabelTitle="Undo" TooltipTitle="Undo (Ctrl+Z)" TooltipDescription="Undo the last change">
       <Command.LargeImages>
         <Image>res/UndoL.bmp</Image>
       </Command.LargeImages>
@@ -132,7 +132,7 @@
         <Image>res/Undo.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdRedo" LabelTitle="Redo" TooltipTitle="Redo" TooltipDescription="Redo what was undone before">
+    <Command Name="cmdRedo" LabelTitle="Redo" TooltipTitle="Redo (Ctrl+Y)" TooltipDescription="Redo what was undone before">
       <Command.LargeImages>
         <Image>res/RedoL.bmp</Image>
       </Command.LargeImages>
@@ -140,7 +140,7 @@
         <Image>res/Redo.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdLineWrap" LabelTitle="Wrap Lines" TooltipTitle="Wrap Lines" TooltipDescription="Wrap lines at the end of the window">
+    <Command Name="cmdLineWrap" LabelTitle="Wrap Lines" TooltipTitle="Wrap Lines (Ctrl+E,W)" TooltipDescription="Wrap lines at the end of the window">
       <Command.LargeImages>
         <Image>res/LineWrapL.bmp</Image>
       </Command.LargeImages>
@@ -148,7 +148,7 @@
         <Image>res/LineWrap.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdWhiteSpace" LabelTitle="Whitespace" TooltipTitle="Show Whitespaces" TooltipDescription="Turns showing whitespaces on/off">
+    <Command Name="cmdWhiteSpace" LabelTitle="Whitespace" TooltipTitle="Show Whitespaces (Ctrl+R,W)" TooltipDescription="Turns showing whitespaces on/off">
       <Command.LargeImages>
         <Image>res/wspaceL.bmp</Image>
       </Command.LargeImages>
@@ -223,7 +223,7 @@
         <Image>res/NextS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdFindReplace" LabelTitle="Find/Replace" TooltipTitle="Find &amp;&amp; Replace" TooltipDescription="Search and/or replace text in documents/tabs">
+    <Command Name="cmdFindReplace" LabelTitle="Find/Replace" TooltipTitle="Find &amp;&amp; Replace (Ctrl+F)" TooltipDescription="Search and/or replace text in documents/tabs">
       <Command.LargeImages>
         <Image>res/FindReplaceL.bmp</Image>
       </Command.LargeImages>
@@ -261,7 +261,7 @@
         <Image>res/VEdgeS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdComment" LabelTitle="Comment" TooltipTitle="Comment" TooltipDescription="Comments the selected text">
+    <Command Name="cmdComment" LabelTitle="Comment" TooltipTitle="Comment (Ctrl+K,C)" TooltipDescription="Comments the selected text">
       <Command.LargeImages>
         <Image>res/CommentL.bmp</Image>
       </Command.LargeImages>
@@ -269,7 +269,7 @@
         <Image>res/CommentS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdUnComment" LabelTitle="Uncomment" TooltipTitle="Uncomment" TooltipDescription="Uncomments the selected text">
+    <Command Name="cmdUnComment" LabelTitle="Uncomment" TooltipTitle="Uncomment (Ctrl+K,U)" TooltipDescription="Uncomments the selected text">
       <Command.LargeImages>
         <Image>res/UnCommentL.bmp</Image>
       </Command.LargeImages>
@@ -278,12 +278,12 @@
       </Command.SmallImages>
     </Command>
     <Command Name="cmdGroupCase" LabelTitle="UPPER/lower"/>
-    <Command Name="cmdUppercase" LabelTitle="Uppercase" TooltipTitle="Uppercase" TooltipDescription="Converts the selection to UPPERcase">
+    <Command Name="cmdUppercase" LabelTitle="Uppercase" TooltipTitle="Uppercase (Ctrl+Shift+U)" TooltipDescription="Converts the selection to UPPERcase">
       <Command.SmallImages>
         <Image>res/UpperCaseS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdLowercase" LabelTitle="Lowercase" TooltipTitle="Lowercase" TooltipDescription="Converts the selection to lowercase">
+    <Command Name="cmdLowercase" LabelTitle="Lowercase" TooltipTitle="Lowercase (Ctrl+U)" TooltipDescription="Converts the selection to lowercase">
       <Command.SmallImages>
         <Image>res/LowerCaseS.bmp</Image>
       </Command.SmallImages>
@@ -353,7 +353,7 @@
         <Image>res/PageSetupL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdGotoLine" LabelTitle="Go to line" TooltipTitle="Go to line" TooltipDescription="Moves the cursor to the specified line">
+    <Command Name="cmdGotoLine" LabelTitle="Go to line" TooltipTitle="Go to line (Ctrl+G)" TooltipDescription="Moves the cursor to the specified line">
       <Command.LargeImages>
         <Image>res/GotoLineL.bmp</Image>
       </Command.LargeImages>
