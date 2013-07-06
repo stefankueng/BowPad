@@ -41,7 +41,7 @@ public:
 
     virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
     {
-        HRESULT hr = S_OK;
+        HRESULT hr = E_FAIL;
         // Set the minimum value
         if (IsEqualPropertyKey(key, UI_PKEY_MinValue))
         {
@@ -78,6 +78,7 @@ public:
             ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
             ppropvarNewValue->vt = VT_DECIMAL;
             VarDecFromR8(ve, &ppropvarNewValue->decVal);
+            hr = S_OK;
         }
         return hr;
     }
