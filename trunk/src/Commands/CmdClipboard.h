@@ -117,7 +117,7 @@ protected:
         sHtmlFragment += "</span></pre>";
 
         std::string header = "Version:0.9\r\nStartHTML:<<<<<<<1\r\nEndHTML:<<<<<<<2\r\nStartFragment:<<<<<<<3\r\nEndFragment:<<<<<<<4\r\nStartSelection:<<<<<<<3\r\nEndSelection:<<<<<<<3\r\n";
-        std::string pre = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\r\n<HTML><HEAD><TITLE>BowPad</TITLE></HEAD>\r\n<BODY>\r\n<!--StartFragment-->";
+        std::string pre = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\r\n<HTML><HEAD></HEAD>\r\n<BODY>\r\n<!--StartFragment-->";
         std::string post = "<!--EndFragment--></BODY></HTML>";
 
         std::string sHtml = header;
