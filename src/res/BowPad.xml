@@ -545,11 +545,11 @@
           <Tab.ScalingPolicy>
             <ScalingPolicy>
               <ScalingPolicy.IdealSizes>
-                <!--<Scale Group="cmdGroupVEdge" Size="Large" />-->
+                <Scale Group="cmdGroupVEdge" Size="Large" />
                 <Scale Group="cmdGroupView" Size="Large" />
                 <Scale Group="cmdGroupEncoding" Size="Medium" />
               </ScalingPolicy.IdealSizes>
-              <!--<Scale Group="cmdGroupVEdge" Size="Medium" />-->
+              <Scale Group="cmdGroupVEdge" Size="Medium" />
               <!--<Scale Group="cmdGroupView" Size="Medium" />-->
               <Scale Group="cmdGroupEncoding" Size="Small" />
             </ScalingPolicy>
@@ -560,9 +560,9 @@
                 <ControlNameDefinition Name="button1"/>
               </ControlNameMap>
               <GroupSizeDefinition Size="Large">
-                <ControlGroup>
-                  <ControlSizeDefinition ControlName="button1" ImageSize="Large" IsLabelVisible="true" />
-                </ControlGroup>
+                <Row>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Medium">
                 <Row>
