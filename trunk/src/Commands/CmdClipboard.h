@@ -20,7 +20,8 @@
 #include "BowPadUI.h"
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
-
+#include "Theme.h"
+#include "LexStyles.h"
 
 class ClipboardBase : public ICommand
 {
@@ -36,6 +37,9 @@ public:
 protected:
     std::string GetHtmlSelection()
     {
+        CDocument doc = GetDocument(GetCurrentTabIndex());
+        auto lexerdata = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(doc.m_language));
+
         std::string sHtmlFragment;
         int style = 0;
 
@@ -47,6 +51,11 @@ protected:
         bool underlined = !!ScintillaCall(SCI_STYLEGETUNDERLINE, 0);
         COLORREF fore = (COLORREF)ScintillaCall(SCI_STYLEGETFORE, 0);
         COLORREF back = (COLORREF)ScintillaCall(SCI_STYLEGETBACK, 0);
+        if (CTheme::Instance().IsDarkTheme())
+        {
+            fore = lexerdata.Styles[0].ForegroundColor;
+            back = lexerdata.Styles[0].BackgroundColor;
+        }
         std::string stylehtml = CStringUtils::Format("<pre style=\"font-family:%s;font-size:%dpt;font-weight:%s;font-style:%s;text-decoration:%s;color:#%06x;background:#%06x;\">",
             fontbuf, fontSize, bold ? "bold" : "normal", italic ? "italic" : "normal", underlined ? "underline" : "none",
             GetRValue(fore)<<16 | GetGValue(fore)<<8 | GetBValue(fore),
@@ -83,6 +92,11 @@ protected:
                     underlined = !!ScintillaCall(SCI_STYLEGETUNDERLINE, s);
                     fore = (COLORREF)ScintillaCall(SCI_STYLEGETFORE, s);
                     back = (COLORREF)ScintillaCall(SCI_STYLEGETBACK, s);
+                    if (CTheme::Instance().IsDarkTheme())
+                    {
+                        fore = lexerdata.Styles[s].ForegroundColor;
+                        back = lexerdata.Styles[s].BackgroundColor;
+                    }
                     stylehtml = CStringUtils::Format("<span style=\"font-family:%s;font-size:%dpt;font-weight:%s;font-style:%s;text-decoration:%s;color:#%06x;background:#%06x;\">",
                         fontbuf, fontSize, bold ? "bold" : "normal", italic ? "italic" : "normal", underlined ? "underline" : "none",
                         GetRValue(fore)<<16 | GetGValue(fore)<<8 | GetBValue(fore),
