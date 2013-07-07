@@ -146,7 +146,7 @@ bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, int * nsPa
 {
     InitCommonControls();
 
-    CreateEx(0, WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, hParent, 0, STATUSCLASSNAME);
+    CreateEx(WS_EX_COMPOSITED, WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, hParent, 0, STATUSCLASSNAME);
 
     if (!*this)
     {

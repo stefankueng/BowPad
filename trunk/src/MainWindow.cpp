@@ -269,7 +269,7 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.hIconSm = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_BOWPAD));
     if (RegisterWindow(&wcx))
     {
-        if (CreateEx(WS_EX_ACCEPTFILES|WS_EX_COMPOSITED, WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN, NULL))
+        if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, NULL))
         {
             ShowWindow(*this, SW_SHOW);
             UpdateWindow(*this);
