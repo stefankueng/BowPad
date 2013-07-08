@@ -18,6 +18,7 @@
 #include "BowPad.h"
 #include "AboutDlg.h"
 #include "AppUtils.h"
+// compiler error? Run the NAnt build script first or create version.h from version.in
 #include "version.h"
 #include <string>
 #include <Commdlg.h>
