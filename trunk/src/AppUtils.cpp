@@ -22,6 +22,7 @@
 #include "UnicodeUtils.h"
 #include "SmartHandle.h"
 #include "ProgressDlg.h"
+// compiler error? Run the NAnt build script first or create version.h from version.in
 #include "version.h"
 
 #include <memory>
