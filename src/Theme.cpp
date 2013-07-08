@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "Theme.h"
 #include "BowPad.h"
+#include "SysInfo.h"
 
 extern IUIFramework *g_pFramework;  // Reference to the Ribbon framework.
 
@@ -291,6 +292,8 @@ COLORREF CTheme::GetThemeColor( COLORREF clr )
 
 void CTheme::SetRibbonColors( COLORREF text, COLORREF background, COLORREF highlight )
 {
+    if (SysInfo::Instance().IsWin8OrLater())
+        return;
     CComPtr<IPropertyStore> spPropertyStore;
 
     // g_pFramework is a pointer to the IUIFramework interface that is assigned 
