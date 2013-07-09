@@ -20,6 +20,7 @@
 #include "BowPadUI.h"
 #include "AppUtils.h"
 #include "Theme.h"
+#include "SysInfo.h"
 
 class CCmdDelete : public ICommand
 {
@@ -96,7 +97,10 @@ public:
         if (dark)
         {
             CTheme::Instance().SetDarkTheme(!CTheme::Instance().IsDarkTheme());
-            CTheme::Instance().SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(50,50,50));
+            if (SysInfo::Instance().IsWin8OrLater())
+                CTheme::Instance().SetRibbonColorsHSB(UI_HSB(255,255,0), UI_HSB(160,44,0), UI_HSB(160,44,0));
+            else
+                CTheme::Instance().SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(50,50,50));
         }
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
@@ -111,7 +115,12 @@ public:
         CDocument doc = GetDocument(GetCurrentTabIndex());
         SetupLexerForLang(doc.m_language);
         if (CTheme::Instance().IsDarkTheme())
-            CTheme::Instance().SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(50,50,50));
+        {
+            if (SysInfo::Instance().IsWin8OrLater())
+                CTheme::Instance().SetRibbonColorsHSB(UI_HSB(255,255,0), UI_HSB(160,44,0), UI_HSB(160,44,0));
+            else
+                CTheme::Instance().SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(50,50,50));
+        }
         else
             CTheme::Instance().SetRibbonColorsHSB(text, back, high);
 
