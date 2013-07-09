@@ -21,7 +21,7 @@
 
 /* Include tooltip support for inserted buttons. Without this, no
    tooltip requests (TTN_GETDISPINFO's) will be sent to the window */
-#define COOLSB_TOOLTIPS
+//#define COOLSB_TOOLTIPS
 
 /* Define this to include the custom-draw support */
 #define CUSTOM_DRAW
