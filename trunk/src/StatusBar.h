@@ -23,11 +23,14 @@ class CStatusBar : public CWindow
 public :
     CStatusBar(HINSTANCE hInst)
         : CWindow(hInst)
-        , m_height(0){};
+        , m_height(0)
+        , m_bHasOnlyFixedWidth(false)
+        , m_nParts(0)
+    {};
     virtual ~CStatusBar(){}
 
     bool Init(HINSTANCE hInst, HWND hParent, int nbParts, int * nsParts);
-
+    void Resize();
     int GetHeight() const { return m_height; }
     bool SetText(const TCHAR *str, int whichPart) const
     {
@@ -38,5 +41,8 @@ protected:
     virtual LRESULT CALLBACK WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 private:
-    int     m_height;
+    int                     m_height;
+    bool                    m_bHasOnlyFixedWidth;
+    int                     m_nParts;
+    std::unique_ptr<int[]>  m_Parts;
 };

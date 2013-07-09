@@ -154,6 +154,15 @@ bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, int * nsPa
     }
 
     SendMessage(*this, SB_SETPARTS, (WPARAM) nbParts, (LPARAM)nsParts);
+    m_nParts = nbParts;
+    m_Parts = std::unique_ptr<int[]>(new int[nbParts]);
+    m_bHasOnlyFixedWidth = true;
+    for (int i = 0; i < nbParts; ++i)
+    {
+        m_Parts[i] = nsParts[i];
+        if (nsParts[i] == -1)
+            m_bHasOnlyFixedWidth = false;
+    }
 
     RECT rcClient;
     GetClientRect(*this, &rcClient);
@@ -184,4 +193,21 @@ LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam,
     if (prevWndProc)
         return prevWndProc(hwnd, uMsg, wParam, lParam);
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
+void CStatusBar::Resize()
+{
+    if (m_bHasOnlyFixedWidth)
+    {
+        std::unique_ptr<int[]> sbParts(new int[m_nParts]);
+        RECT rc;
+        GetClientRect(*this, &rc);
+        int width = rc.right-rc.left;
+        int lastx = m_Parts[m_nParts-1];
+        for (int i = 0; i < m_nParts; ++i)
+        {
+            sbParts[i] = m_Parts[i] * width / lastx;
+        }
+        SendMessage(*this, SB_SETPARTS, (WPARAM) m_nParts, (LPARAM)sbParts.get());
+    }
 }
