@@ -352,7 +352,7 @@ bool CCmdStyleConfigurator::Execute()
     if (m_pStyleConfiguratorDlg == nullptr)
         m_pStyleConfiguratorDlg = new CStyleConfiguratorDlg(m_Obj);
 
-    m_pStyleConfiguratorDlg->ShowModeless(hInst, IDD_STYLECONFIGURATOR, GetHwnd());
+    m_pStyleConfiguratorDlg->ShowModeless(hRes, IDD_STYLECONFIGURATOR, GetHwnd());
 
     return true;
 }

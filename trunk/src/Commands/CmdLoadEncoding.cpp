@@ -96,7 +96,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         }
 
         // Load the label for the main category from the resource file.
-        ResString sMain(hInst, IDS_ENCODING_MAIN);
+        ResString sMain(hRes, IDS_ENCODING_MAIN);
         // Initialize the property set with the label that was just loaded and a category id of 0.
         pMain->InitializeCategoryProperties(sMain, 0);
         pCollection->Add(pMain);
@@ -112,7 +112,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
             return hr;
         }
 
-        ResString sCP(hInst, IDS_ENCODING_CODEPAGES);
+        ResString sCP(hRes, IDS_ENCODING_CODEPAGES);
         // Initialize the property set with the label that was just loaded and a category id of 0.
         pCodepages->InitializeCategoryProperties(sCP, 1);
         pCollection->Add(pCodepages);
@@ -271,7 +271,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
         }
 
         // Load the label for the main category from the resource file.
-        ResString sMain(hInst, IDS_ENCODING_MAIN);
+        ResString sMain(hRes, IDS_ENCODING_MAIN);
         // Initialize the property set with the label that was just loaded and a category id of 0.
         pMain->InitializeCategoryProperties(sMain, 0);
         pCollection->Add(pMain);
@@ -287,7 +287,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
             return hr;
         }
 
-        ResString sCP(hInst, IDS_ENCODING_CODEPAGES);
+        ResString sCP(hRes, IDS_ENCODING_CODEPAGES);
         // Initialize the property set with the label that was just loaded and a category id of 0.
         pCodepages->InitializeCategoryProperties(sCP, 1);
         pCollection->Add(pCodepages);

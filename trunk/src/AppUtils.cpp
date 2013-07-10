@@ -334,7 +334,7 @@ bool CAppUtils::ShowUpdateAvailableDialog( HWND hWnd )
     };
 
     tdc.hwndParent = hWnd;
-    tdc.hInstance = hInst;
+    tdc.hInstance = hRes;
     tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
     tdc.pButtons = aCustomButtons;
     tdc.cButtons = _countof(aCustomButtons);

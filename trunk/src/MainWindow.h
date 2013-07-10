@@ -29,7 +29,7 @@ class CMainWindow : public CWindow, public IUIApplication, public IUICommandHand
 {
     friend class ICommand;
 public:
-    CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL);
+    CMainWindow(HINSTANCE hRes, const WNDCLASSEX* wcx = NULL);
     ~CMainWindow(void);
 
     /**
