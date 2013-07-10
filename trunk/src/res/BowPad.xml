@@ -422,6 +422,12 @@
       </Command.SmallImages>
     </Command>
     <Command Name="cmdToggleTheme" LabelTitle="Dark Theme" TooltipTitle="Dark Theme" TooltipDescription="Toggles between the normal and the dark theme">
+      <Command.LargeImages>
+        <Image>res/DarkThemeL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/DarkThemeS.bmp</Image>
+      </Command.SmallImages>
     </Command>
     <Command Name="cmdLanguage" LabelTitle="Language" TooltipTitle="Select Language" TooltipDescription="Select the language for BowPad">
       <Command.LargeImages>
