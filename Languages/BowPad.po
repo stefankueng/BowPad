@@ -314,10 +314,6 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#. Resource IDs: (3759)
-msgid "Egde Column"
-msgstr ""
-
 #. Resource IDs: (3755)
 msgid "Encoding"
 msgstr ""
@@ -693,10 +689,6 @@ msgstr ""
 
 #. Resource IDs: (65535)
 msgid "Styles"
-msgstr ""
-
-#. Resource IDs: (3764)
-msgid "Tabs to Sapaces"
 msgstr ""
 
 #. Resource IDs: (3764)
