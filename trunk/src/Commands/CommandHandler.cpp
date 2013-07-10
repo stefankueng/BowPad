@@ -41,6 +41,7 @@
 #include "CmdZoom.h"
 #include "CmdBookmarks.h"
 #include "CmdRandom.h"
+#include "CmdLanguage.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -113,6 +114,8 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdUseTabs(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdToggleTheme(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdLanguage(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdTabSize(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;

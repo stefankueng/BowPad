@@ -253,7 +253,7 @@
         <Image>res/StyleConfigS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdVerticalEdge" LabelTitle="Edge Column" TooltipTitle="Egde Column" TooltipDescription="Sets the column at which the vertical edge is shown. Set to 0 to hide it.">
+    <Command Name="cmdVerticalEdge" LabelTitle="Edge Column" TooltipTitle="Edge Column" TooltipDescription="Sets the column at which the vertical edge is shown. Set to 0 to hide it.">
       <Command.LargeImages>
         <Image>res/VEdgeL.bmp</Image>
       </Command.LargeImages>
@@ -371,7 +371,7 @@
         <Image>res/TrimS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdTabs2Spaces" LabelTitle="Tabs to Spaces" TooltipTitle="Tabs to Sapaces" TooltipDescription="Converts all tabs in the document to spaces">
+    <Command Name="cmdTabs2Spaces" LabelTitle="Tabs to Spaces" TooltipTitle="Tabs to Spaces" TooltipDescription="Converts all tabs in the document to spaces">
       <Command.LargeImages>
         <Image>res/Tab2SpaceL.bmp</Image>
       </Command.LargeImages>
@@ -413,7 +413,23 @@
       </Command.LargeImages>
     </Command>
 
+    <Command Name="cmdGroupMisc" LabelTitle="Misc">
+      <Command.LargeImages>
+        <Image>res/LangL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/LangS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
     <Command Name="cmdToggleTheme" LabelTitle="Dark Theme" TooltipTitle="Dark Theme" TooltipDescription="Toggles between the normal and the dark theme">
+    </Command>
+    <Command Name="cmdLanguage" LabelTitle="Language" TooltipTitle="Select Language" TooltipDescription="Select the language for BowPad">
+      <Command.LargeImages>
+        <Image>res/LangL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/LangS.bmp</Image>
+      </Command.SmallImages>
     </Command>
 
 
@@ -584,7 +600,6 @@
                 <ControlNameDefinition Name="button2"/>
                 <ControlNameDefinition Name="button3"/>
                 <ControlNameDefinition Name="button4"/>
-                <ControlNameDefinition Name="button5"/>
               </ControlNameMap>
               <GroupSizeDefinition Size="Large">
                 <ControlGroup>
@@ -598,9 +613,6 @@
                 <Row>
                   <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
-                <Row>
-                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
-                </Row>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Medium">
                 <Row>
@@ -613,9 +625,6 @@
                 <Row>
                   <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
-                <Row>
-                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
-                </Row>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Small">
                 <Row>
@@ -626,16 +635,20 @@
                   <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
                   <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="false" />
                 </Row>
-                <Row>
-                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
-                </Row>
               </GroupSizeDefinition>
             </SizeDefinition>
             <ToggleButton CommandName="cmdLineWrap" />
             <ToggleButton CommandName="cmdWhiteSpace" />
             <Spinner CommandName="cmdTabSize" />
             <ToggleButton CommandName="cmdUseTabs" />
+          </Group>
+          <Group CommandName="cmdGroupMisc" SizeDefinition="TwoButtons">
             <ToggleButton CommandName="cmdToggleTheme" />
+            <DropDownGallery CommandName="cmdLanguage" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
           </Group>
           <Group CommandName="cmdGroupEncoding" SizeDefinition="FourButtons">
             <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
