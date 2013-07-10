@@ -73,6 +73,10 @@ msgstr ""
 msgid "&Search for:"
 msgstr ""
 
+#. Resource IDs: (9)
+msgid "<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Full details about this update</a>"
+msgstr ""
+
 #. Resource IDs: (103)
 msgid "About BowPad"
 msgstr ""
@@ -81,8 +85,16 @@ msgstr ""
 msgid "Allows to load a file with a specific encoding"
 msgstr ""
 
+#. Resource IDs: (9)
+msgid "An update for BowPad is available"
+msgstr ""
+
 #. Resource IDs: (3753)
 msgid "Asks where to save the current tab"
+msgstr ""
+
+#. Resource IDs: (65535)
+msgid "Author: Stefan Küng"
 msgstr ""
 
 #. Resource IDs: (7)
@@ -97,12 +109,16 @@ msgstr ""
 msgid "Bold"
 msgstr ""
 
+#. Resource IDs: (3764)
+msgid "Bookmark"
+msgstr ""
+
 #. Resource IDs: (7)
 msgid "BowPad"
 msgstr ""
 
-#. Resource IDs: (65535)
-msgid "BowPad, Version 1.0"
+#. Resource IDs: (9)
+msgid "BowPad Text Editor"
 msgstr ""
 
 #. Resource IDs: (2)
@@ -113,8 +129,28 @@ msgstr ""
 msgid "Cancel\nThe file is not loaded again."
 msgstr ""
 
+#. Resource IDs: (1027)
+msgid "Check for Updates"
+msgstr ""
+
+#. Resource IDs: (3765)
+msgid "Clear Bookmarks"
+msgstr ""
+
 #. Resource IDs: (3751, 3753, 3754)
 msgid "Clipboard"
+msgstr ""
+
+#. Resource IDs: (3754)
+msgid "Clipboard (Ctrl+C)"
+msgstr ""
+
+#. Resource IDs: (3754)
+msgid "Clipboard (Ctrl+V)"
+msgstr ""
+
+#. Resource IDs: (3754)
+msgid "Clipboard (Ctrl+X)"
 msgstr ""
 
 #. Resource IDs: (3753)
@@ -123,6 +159,10 @@ msgstr ""
 
 #. Resource IDs: (3753)
 msgid "Close Tab"
+msgstr ""
+
+#. Resource IDs: (3753)
+msgid "Close Tab (Ctrl+W)"
 msgstr ""
 
 #. Resource IDs: (3753)
@@ -151,6 +191,10 @@ msgstr ""
 
 #. Resource IDs: (3751, 3759)
 msgid "Comment"
+msgstr ""
+
+#. Resource IDs: (3759)
+msgid "Comment (Ctrl+K,C)"
 msgstr ""
 
 #. Resource IDs: (3759)
@@ -197,10 +241,6 @@ msgstr ""
 msgid "Copy the current selection to the clipboard"
 msgstr ""
 
-#. Resource IDs: (65535)
-msgid "Copyright (C) 2013"
-msgstr ""
-
 #. Resource IDs: (3752)
 msgid "Creates a new tab with an empty document"
 msgstr ""
@@ -217,12 +257,20 @@ msgstr ""
 msgid "Cut the current selection to the clipboard"
 msgstr ""
 
+#. Resource IDs: (3765, 3766)
+msgid "Dark Theme"
+msgstr ""
+
 #. Resource IDs: (3758)
 msgid "Delete"
 msgstr ""
 
 #. Resource IDs: (3760)
 msgid "Determines whether a tab is inserted or spaces when the tab key is pressed."
+msgstr ""
+
+#. Resource IDs: (9)
+msgid "Do &not download the update\nYou will be reminded again about the update in a week."
 msgstr ""
 
 #. Resource IDs: (7)
@@ -236,6 +284,14 @@ msgstr ""
 
 #. Resource IDs: (8)
 msgid "Document removed"
+msgstr ""
+
+#. Resource IDs: (8)
+msgid "Download and install the update\nUpdates BowPad to the latest version."
+msgstr ""
+
+#. Resource IDs: (9)
+msgid "Download the update\nYou have to install the update manually."
 msgstr ""
 
 #. Resource IDs: (3760, 3761)
@@ -283,7 +339,7 @@ msgid "File is too big to be opened by BowPad"
 msgstr ""
 
 #. Resource IDs: (3758)
-msgid "Find && Replace"
+msgid "Find && Replace (Ctrl+F)"
 msgstr ""
 
 #. Resource IDs: (143)
@@ -300,6 +356,14 @@ msgstr ""
 
 #. Resource IDs: (145, 3763)
 msgid "Go to line"
+msgstr ""
+
+#. Resource IDs: (3763)
+msgid "Go to line (Ctrl+G)"
+msgstr ""
+
+#. Resource IDs: (3764)
+msgid "Goto"
 msgstr ""
 
 #. Resource IDs: (3754)
@@ -350,6 +414,10 @@ msgstr ""
 msgid "Lowercase"
 msgstr ""
 
+#. Resource IDs: (3760)
+msgid "Lowercase (Ctrl+U)"
+msgstr ""
+
 #. Resource IDs: (3757)
 msgid "MAC (CR)"
 msgstr ""
@@ -386,6 +454,14 @@ msgstr ""
 msgid "Move line up"
 msgstr ""
 
+#. Resource IDs: (3765)
+msgid "Move the caret to the next bookmark"
+msgstr ""
+
+#. Resource IDs: (3765)
+msgid "Move the caret to the previous bookmark"
+msgstr ""
+
 #. Resource IDs: (3761)
 msgid "Move up"
 msgstr ""
@@ -412,11 +488,19 @@ msgid "New %d"
 msgstr ""
 
 #. Resource IDs: (3752)
-msgid "New Document"
+msgid "New Document (Ctrl+N)"
 msgstr ""
 
 #. Resource IDs: (3757)
 msgid "Next"
+msgstr ""
+
+#. Resource IDs: (3765)
+msgid "Next Bookmarks"
+msgstr ""
+
+#. Resource IDs: (9)
+msgid "No updates available.\nYou already have the current version."
 msgstr ""
 
 #. Resource IDs: (1)
@@ -428,7 +512,7 @@ msgid "Open"
 msgstr ""
 
 #. Resource IDs: (3752)
-msgid "Open Files"
+msgid "Open Files (Ctrl+O)"
 msgstr ""
 
 #. Resource IDs: (3752)
@@ -445,6 +529,10 @@ msgstr ""
 
 #. Resource IDs: (3757)
 msgid "Previous"
+msgstr ""
+
+#. Resource IDs: (3765)
+msgid "Previous Bookmarks"
 msgstr ""
 
 #. Resource IDs: (3762)
@@ -472,6 +560,10 @@ msgid "Redo"
 msgstr ""
 
 #. Resource IDs: (3755)
+msgid "Redo (Ctrl+Y)"
+msgstr ""
+
+#. Resource IDs: (3755)
 msgid "Redo what was undone before"
 msgstr ""
 
@@ -495,6 +587,10 @@ msgstr ""
 msgid "Reload the file from disk"
 msgstr ""
 
+#. Resource IDs: (3765)
+msgid "Removes all bookmarks from the current file"
+msgstr ""
+
 #. Resource IDs: (3763)
 msgid "Removes whitespaces at the end of lines"
 msgstr ""
@@ -508,11 +604,11 @@ msgid "Save"
 msgstr ""
 
 #. Resource IDs: (3752)
-msgid "Save File"
+msgid "Save File (Ctrl+S)"
 msgstr ""
 
-#. Resource IDs: (3752)
-msgid "Save Files"
+#. Resource IDs: (3753)
+msgid "Save Files (Ctrl+Shift+S)"
 msgstr ""
 
 #. Resource IDs: (3752)
@@ -572,7 +668,7 @@ msgid "Sets the column at which the vertical edge is shown. Set to 0 to hide it.
 msgstr ""
 
 #. Resource IDs: (3755)
-msgid "Show Whitespaces"
+msgid "Show Whitespaces (Ctrl+R,W)"
 msgstr ""
 
 #. Resource IDs: (3764)
@@ -622,8 +718,24 @@ msgstr ""
 msgid "The document '%s' was removed outside of BowPad."
 msgstr ""
 
+#. Resource IDs: (3765)
+msgid "Toggle Bookmark"
+msgstr ""
+
+#. Resource IDs: (3765)
+msgid "Toggle a bookmark on the current line"
+msgstr ""
+
+#. Resource IDs: (3766)
+msgid "Toggles between the normal and the dark theme"
+msgstr ""
+
 #. Resource IDs: (3763)
 msgid "Trim Whitespaces"
+msgstr ""
+
+#. Resource IDs: (9)
+msgid "Turn off automatic update checks"
 msgstr ""
 
 #. Resource IDs: (3755)
@@ -639,6 +751,10 @@ msgid "Uncomment"
 msgstr ""
 
 #. Resource IDs: (3759)
+msgid "Uncomment (Ctrl+K,U)"
+msgstr ""
+
+#. Resource IDs: (3759)
 msgid "Uncomments the selected text"
 msgstr ""
 
@@ -648,6 +764,10 @@ msgstr ""
 
 #. Resource IDs: (3751, 3754)
 msgid "Undo"
+msgstr ""
+
+#. Resource IDs: (3754)
+msgid "Undo (Ctrl+Z)"
 msgstr ""
 
 #. Resource IDs: (3754)
@@ -667,6 +787,10 @@ msgid "Uppercase"
 msgstr ""
 
 #. Resource IDs: (3760)
+msgid "Uppercase (Ctrl+Shift+U)"
+msgstr ""
+
+#. Resource IDs: (3760)
 msgid "Use Tabs"
 msgstr ""
 
@@ -676,6 +800,10 @@ msgstr ""
 
 #. Resource IDs: (3751)
 msgid "View"
+msgstr ""
+
+#. Resource IDs: (1026)
+msgid "Visit our Website"
 msgstr ""
 
 #. Resource IDs: (3755)
@@ -688,6 +816,10 @@ msgstr ""
 
 #. Resource IDs: (3755)
 msgid "Wrap Lines"
+msgstr ""
+
+#. Resource IDs: (3755)
+msgid "Wrap Lines (Ctrl+E,W)"
 msgstr ""
 
 #. Resource IDs: (3755)
