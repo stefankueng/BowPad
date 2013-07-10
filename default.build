@@ -121,13 +121,13 @@
   </target>
 
   <target name="lang">
+    <delete file="Languages\Languages.txt" />
     <foreach item="File" property="filename">
       <in>
         <items>
           <include name="Languages\BowPad_*" />
         </items>
       </in>
-      <delete file="Languages\Languages.txt" />
       <do>
         <property name="fname" value="${path::get-file-name(filename)}" />
         <exec program="tools\restext.exe">
