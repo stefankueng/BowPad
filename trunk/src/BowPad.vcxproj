@@ -273,6 +273,7 @@
     <ClInclude Include="TabBar.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Theme.h" />
+    <ClInclude Include="version.h" />
     <ClInclude Include="XPMIcons.h" />
   </ItemGroup>
   <ItemGroup>

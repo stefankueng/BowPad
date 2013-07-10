@@ -30,6 +30,7 @@ public:
     static bool                     DownloadUpdate(HWND hWnd, bool bInstall);
     static bool                     ShowUpdateAvailableDialog(HWND hWnd);
     static HRESULT CALLBACK         TDLinkClickCallback(HWND hwnd, UINT uNotification, WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData);
+    static bool                     HasSameMajorVersion(const std::wstring& path);
 
 private:
     static std::wstring             updatefilename;

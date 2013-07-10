@@ -24,8 +24,6 @@
 #include "SmartHandle.h"
 #include "PathUtils.h"
 #include "StringUtils.h"
-// compiler error? Run the NAnt build script first or create version.h from version.in
-#include "version.h"
 
 #include <Shellapi.h>
 
@@ -154,8 +152,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         langdllpath += L"\\BowPad_";
         langdllpath += lang;
         langdllpath += L".lang";
-        std::wstring sVerDll = CPathUtils::GetVersionFromFile(langdllpath);
-        if (sVerDll.compare(_T(STRFILEVER)) == 0)
+        if (CAppUtils::HasSameMajorVersion(langdllpath))
         {
             hRes = LoadLibraryEx(langdllpath.c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES|LOAD_LIBRARY_AS_IMAGE_RESOURCE);
             if (hRes == NULL)
