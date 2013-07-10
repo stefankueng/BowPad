@@ -142,8 +142,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         {
             if (_wcsicmp(CPathUtils::GetFileExtension(respath).c_str(), L"lang")==0)
             {
-                std::wstring sVerDll = CPathUtils::GetVersionFromFile(respath);
-                if (sVerDll.compare(_T(STRFILEVER)) == 0)
+                if (CAppUtils::HasSameMajorVersion(respath))
                 {
                     std::wstring sLocale = respath.substr(respath.find_last_of('_')+1);
                     sLocale = sLocale.substr(0, sLocale.find_last_of('.'));
@@ -285,8 +284,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
                 langfile += L"\\BowPad_";
                 langfile += gLanguages[selected];
                 langfile += L".lang";
-                std::wstring sVerDll = CPathUtils::GetVersionFromFile(langfile);
-                if (sVerDll.compare(_T(STRFILEVER)) != 0)
+                if (!CAppUtils::HasSameMajorVersion(langfile))
                 {
                     DeleteFile(langfile.c_str());
 #ifdef _WIN64

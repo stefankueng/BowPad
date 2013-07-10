@@ -361,3 +361,12 @@ bool CAppUtils::ShowUpdateAvailableDialog( HWND hWnd )
     return false;
 }
 
+bool CAppUtils::HasSameMajorVersion( const std::wstring& path )
+{
+    std::wstring sVer = CPathUtils::GetVersionFromFile(path);
+    // cut off the build version
+    sVer = sVer.substr(0, sVer.find_last_of('.'));
+    std::wstring sAppVer = _T(STRPRODUCTVER);
+    sAppVer = sAppVer.substr(0, sAppVer.find_last_of('.'));
+    return (_wcsicmp(sVer.c_str(), sAppVer.c_str()) == 0);
+}
