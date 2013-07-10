@@ -260,7 +260,7 @@ bool CCmdFindReplace::Execute()
     ScintillaCall(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
     std::string sSelText = seltextbuffer.get();
 
-    m_pFindReplaceDlg->ShowModeless(hInst, IDD_FINDREPLACEDLG, GetHwnd());
+    m_pFindReplaceDlg->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
     if (!sSelText.empty())
     {
         SetDlgItemText(*m_pFindReplaceDlg, IDC_SEARCHCOMBO, CUnicodeUtils::StdGetUnicode(sSelText).c_str());

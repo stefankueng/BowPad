@@ -61,10 +61,10 @@ UINT64 inline DwordSwapBytes(UINT64 nValue)
 
 
 CDocumentManager::CDocumentManager(void)
-    : m_scratchScintilla(hInst)
+    : m_scratchScintilla(hRes)
     , m_lastfoldercolorindex(0)
 {
-    m_scratchScintilla.InitScratch(hInst);
+    m_scratchScintilla.InitScratch(hRes);
 }
 
 
@@ -139,7 +139,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     m_scratchScintilla.Call(SCI_ALLOCATE, WPARAM(bufferSizeRequested));
     if (m_scratchScintilla.Call(SCI_GETSTATUS) != SC_STATUS_OK)
     {
-        MessageBox(hWnd, CLanguage::Instance().GetTranslatedString(ResString(hInst, IDS_ERR_FILETOOBIG)).c_str(), L"BowPad", MB_ICONERROR);
+        MessageBox(hWnd, CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str(), L"BowPad", MB_ICONERROR);
         return doc;
     }
     DWORD lenFile = 0;
@@ -314,7 +314,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
             doc.m_format = GetEOLFormatForm(data);
         if (m_scratchScintilla.Call(SCI_GETSTATUS) != SC_STATUS_OK)
         {
-            MessageBox(hWnd, CLanguage::Instance().GetTranslatedString(ResString(hInst, IDS_ERR_FILETOOBIG)).c_str(), L"BowPad", MB_ICONERROR);
+            MessageBox(hWnd, CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str(), L"BowPad", MB_ICONERROR);
             success = false;
             break;
         }

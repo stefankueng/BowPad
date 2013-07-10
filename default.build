@@ -120,4 +120,34 @@
     </nant>
   </target>
 
+  <target name="lang">
+    <foreach item="File" property="filename">
+      <in>
+        <items>
+          <include name="Languages\BowPad_*" />
+        </items>
+      </in>
+      <delete file="Languages\Languages.txt" />
+      <do>
+        <property name="fname" value="${path::get-file-name(filename)}" />
+        <exec program="tools\restext.exe">
+          <arg value="apply" />
+          <arg line="bin\Release\bin\Resource.dll" />
+          <arg line="bin\Release\bin\${path::get-file-name-without-extension(filename)}.lang" />
+          <arg line="${filename}" />
+        </exec>
+        <copy file="bin\Release\bin\${path::get-file-name-without-extension(filename)}.lang" tofile="Languages\x86\${path::get-file-name-without-extension(filename)}.lang" overwrite="true" />
+        <exec program="tools\restext.exe">
+          <arg value="apply" />
+          <arg line="bin\Release64\bin\Resource.dll" />
+          <arg line="bin\Release64\bin\${path::get-file-name-without-extension(filename)}.lang" />
+          <arg line="${filename}" />
+        </exec>
+        <copy file="bin\Release64\bin\${path::get-file-name-without-extension(filename)}.lang" tofile="Languages\x64\${path::get-file-name-without-extension(filename)}.lang" overwrite="true" />
+        <echo message="${string::substring(path::get-file-name-without-extension(filename), 7, string::get-length(path::get-file-name-without-extension(filename))-7)}
+" append="true" file="Languages\Languages.txt"/>
+      </do>
+    </foreach>
+  </target>
+
 </project>

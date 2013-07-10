@@ -18,4 +18,4 @@
 
 #include "resource.h"
 
-extern HINSTANCE hInst;
+extern HINSTANCE hRes;

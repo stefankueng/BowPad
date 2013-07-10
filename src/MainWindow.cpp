@@ -572,7 +572,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         if (style & INDIC1_MASK)
                         {
                             // an url hotspot
-                            ResString str(hInst, IDS_CTRLCLICKTOOPEN);
+                            ResString str(hRes, IDS_CTRLCLICKTOOPEN);
                             std::string strA = CUnicodeUtils::StdGetUTF8((LPCWSTR)str);
                             m_scintilla.Call(SCI_CALLTIPSHOW, pScn->position, (sptr_t)strA.c_str());
                         }
@@ -692,7 +692,7 @@ LRESULT CMainWindow::DoCommand(int id)
             CDocument doc;
             doc.m_document = m_scintilla.Call(SCI_CREATEDOCUMENT);
             m_DocManager.AddDocumentAtEnd(doc);
-            ResString newRes(hInst, IDS_NEW_TABTITLE);
+            ResString newRes(hRes, IDS_NEW_TABTITLE);
             std::wstring s = CStringUtils::Format(newRes, newCount);
             int index = m_TabBar.InsertAtEnd(s.c_str());
             m_TabBar.ActivateAt(index);
@@ -708,7 +708,7 @@ LRESULT CMainWindow::DoCommand(int id)
     case cmdAbout:
         {
             CAboutDlg dlg(*this);
-            dlg.DoModal(hInst, IDD_ABOUTBOX, *this);
+            dlg.DoModal(hRes, IDD_ABOUTBOX, *this);
         }
         break;
     default:
@@ -755,7 +755,7 @@ bool CMainWindow::Initialize()
     // Finally, we load the binary markup.  This will initiate callbacks to the IUIApplication object
     // that was provided to the framework earlier, allowing command handlers to be bound to individual
     // commands.
-    hr = g_pFramework->LoadUI(GetModuleHandle(NULL), L"BOWPAD_RIBBON");
+    hr = g_pFramework->LoadUI(hRes, L"BOWPAD_RIBBON");
     if (FAILED(hr))
     {
         return false;
@@ -835,7 +835,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
                 // Set a title
                 if (SUCCEEDED(hr))
                 {
-                    ResString sTitle(hInst, IDS_APP_TITLE);
+                    ResString sTitle(hRes, IDS_APP_TITLE);
                     std::wstring s = (const wchar_t*)sTitle;
                     s += L" - ";
                     wchar_t buf[100] = {0};
@@ -939,10 +939,10 @@ bool CMainWindow::CloseTab( int tab )
     if (doc.m_bIsDirty||doc.m_bNeedsSaving)
     {
         m_TabBar.ActivateAt(tab);
-        ResString rTitle(hInst, IDS_HASMODIFICATIONS);
-        ResString rQuestion(hInst, IDS_DOYOUWANTOSAVE);
-        ResString rSave(hInst, IDS_SAVE);
-        ResString rDontSave(hInst, IDS_DONTSAVE);
+        ResString rTitle(hRes, IDS_HASMODIFICATIONS);
+        ResString rQuestion(hRes, IDS_DOYOUWANTOSAVE);
+        ResString rSave(hRes, IDS_SAVE);
+        ResString rDontSave(hRes, IDS_DONTSAVE);
         wchar_t buf[100] = {0};
         m_TabBar.GetCurrentTitle(buf, _countof(buf));
         std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
@@ -955,7 +955,7 @@ bool CMainWindow::CloseTab( int tab )
         aCustomButtons[1].pszButtonText = rDontSave;
 
         tdc.hwndParent = *this;
-        tdc.hInstance = hInst;
+        tdc.hInstance = hRes;
         tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
         tdc.pButtons = aCustomButtons;
         tdc.cButtons = _countof(aCustomButtons);
@@ -1060,10 +1060,10 @@ bool CMainWindow::ReloadTab( int tab, int encoding )
             // * save first, then reload
             // * cancel
             m_TabBar.ActivateAt(tab);
-            ResString rTitle(hInst, IDS_HASMODIFICATIONS);
-            ResString rQuestion(hInst, IDS_DOYOUWANTOSAVE);
-            ResString rSave(hInst, IDS_SAVE);
-            ResString rDontSave(hInst, IDS_DONTSAVE);
+            ResString rTitle(hRes, IDS_HASMODIFICATIONS);
+            ResString rQuestion(hRes, IDS_DOYOUWANTOSAVE);
+            ResString rSave(hRes, IDS_SAVE);
+            ResString rDontSave(hRes, IDS_DONTSAVE);
             wchar_t buf[100] = {0};
             m_TabBar.GetCurrentTitle(buf, _countof(buf));
             std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
@@ -1076,7 +1076,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding )
             aCustomButtons[1].pszButtonText = rDontSave;
 
             tdc.hwndParent = *this;
-            tdc.hInstance = hInst;
+            tdc.hInstance = hRes;
             tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
             tdc.pButtons = aCustomButtons;
             tdc.cButtons = _countof(aCustomButtons);
@@ -1293,11 +1293,11 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
         {
             CDocument doc = m_DocManager.GetDocument(i);
             m_TabBar.ActivateAt(i);
-            ResString rTitle(hInst, IDS_OUTSIDEMODIFICATIONS);
-            ResString rQuestion(hInst, doc.m_bNeedsSaving || doc.m_bIsDirty ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
-            ResString rSave(hInst, IDS_SAVELOSTOUTSIDEMODS);
-            ResString rReload(hInst, doc.m_bNeedsSaving || doc.m_bIsDirty ? IDS_RELOADLOSTMODS : IDS_RELOAD);
-            ResString rCancel(hInst, IDS_NORELOAD);
+            ResString rTitle(hRes, IDS_OUTSIDEMODIFICATIONS);
+            ResString rQuestion(hRes, doc.m_bNeedsSaving || doc.m_bIsDirty ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
+            ResString rSave(hRes, IDS_SAVELOSTOUTSIDEMODS);
+            ResString rReload(hRes, doc.m_bNeedsSaving || doc.m_bIsDirty ? IDS_RELOADLOSTMODS : IDS_RELOAD);
+            ResString rCancel(hRes, IDS_NORELOAD);
             wchar_t buf[100] = {0};
             m_TabBar.GetCurrentTitle(buf, _countof(buf));
             std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
@@ -1316,7 +1316,7 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
             aCustomButtons[bi].pszButtonText = rCancel;
 
             tdc.hwndParent = *this;
-            tdc.hInstance = hInst;
+            tdc.hInstance = hRes;
             tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
             tdc.pButtons = aCustomButtons;
             tdc.cButtons = doc.m_bNeedsSaving || doc.m_bIsDirty ? 3 : 2;
@@ -1374,10 +1374,10 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
             // * close the file
             CDocument doc = m_DocManager.GetDocument(i);
             m_TabBar.ActivateAt(i);
-            ResString rTitle(hInst, IDS_OUTSIDEREMOVEDHEAD);
-            ResString rQuestion(hInst, IDS_OUTSIDEREMOVED);
-            ResString rKeep(hInst, IDS_OUTSIDEREMOVEDKEEP);
-            ResString rClose(hInst, IDS_OUTSIDEREMOVEDCLOSE);
+            ResString rTitle(hRes, IDS_OUTSIDEREMOVEDHEAD);
+            ResString rQuestion(hRes, IDS_OUTSIDEREMOVED);
+            ResString rKeep(hRes, IDS_OUTSIDEREMOVEDKEEP);
+            ResString rClose(hRes, IDS_OUTSIDEREMOVEDCLOSE);
             wchar_t buf[100] = {0};
             m_TabBar.GetCurrentTitle(buf, _countof(buf));
             std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
@@ -1391,7 +1391,7 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
             aCustomButtons[bi].pszButtonText = rClose;
 
             tdc.hwndParent = *this;
-            tdc.hInstance = hInst;
+            tdc.hInstance = hRes;
             tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
             tdc.pButtons = aCustomButtons;
             tdc.cButtons = _countof(aCustomButtons);
