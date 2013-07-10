@@ -90,7 +90,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         {
             return hr;
         }
-
+        pCollection->Clear();
         // Create an IUIImage from a resource id.
         IUIImage * pImg = nullptr;
         IUIImageFromBitmap * pifbFactory = nullptr;
@@ -271,6 +271,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
                     }
                     ResString sLangLoadOk(hRes, IDS_LANGUAGE_DOWNLOADOK);
                     MessageBox(GetHwnd(), sLangLoadOk, L"BowPad", MB_ICONINFORMATION);
+                    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
                 }
                 else
                 {
@@ -293,7 +294,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
 #else
 #define LANGPLAT L"x86"
 #endif
-                    std::wstring sLangURL = CStringUtils::Format(L"https://bowpad.googlecode.com/svn/branches/%d.%d.%d/Languages/%s/BowPad_%s.lang", LANGPLAT, BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, gLanguages[selected].c_str());
+                    std::wstring sLangURL = CStringUtils::Format(L"https://bowpad.googlecode.com/svn/branches/%d.%d.%d/Languages/%s/BowPad_%s.lang", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, LANGPLAT, gLanguages[selected].c_str());
                     HRESULT res = URLDownloadToFile(NULL, sLangURL.c_str(), langfile.c_str(), 0, NULL);
                     if (FAILED(res))
                     {
