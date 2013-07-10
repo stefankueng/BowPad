@@ -231,6 +231,9 @@
     <ClInclude Include="..\ext\sktoolslib\DirFileEnum.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdLanguage.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -376,6 +379,9 @@
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\DirFileEnum.cpp">
       <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdLanguage.cpp">
+      <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

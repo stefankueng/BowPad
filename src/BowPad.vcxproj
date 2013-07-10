@@ -240,6 +240,7 @@
     <ClInclude Include="Commands\CmdFiles.h" />
     <ClInclude Include="Commands\CmdFindReplace.h" />
     <ClInclude Include="Commands\CmdGotoLine.h" />
+    <ClInclude Include="Commands\CmdLanguage.h" />
     <ClInclude Include="Commands\CmdLines.h" />
     <ClInclude Include="Commands\CmdLineWrap.h" />
     <ClInclude Include="Commands\CmdLoadEncoding.h" />
@@ -304,6 +305,7 @@
     <ClCompile Include="Commands\CmdFiles.cpp" />
     <ClCompile Include="Commands\CmdFindReplace.cpp" />
     <ClCompile Include="Commands\CmdGotoLine.cpp" />
+    <ClCompile Include="Commands\CmdLanguage.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
     <ClCompile Include="Commands\CmdPrevNext.cpp" />
     <ClCompile Include="Commands\CmdPrint.cpp" />
