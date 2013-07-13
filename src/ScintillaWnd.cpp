@@ -1251,28 +1251,28 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
         (wParam == '{') ||
         (wParam == '[') )
     {
+        char braceBuf[2] = {0};
+        braceBuf[0] = (char)wParam;
+        char braceCloseBuf[2] = {0};
+        switch (wParam)
+        {
+        case '(':
+            braceCloseBuf[0] = ')';
+            break;
+        case '{':
+            braceCloseBuf[0] = '}';
+            break;
+        case '[':
+            braceCloseBuf[0] = ']';
+            break;
+        }
+
         // Get Selection
         bool bSelEmpty          = !!Call(SCI_GETSELECTIONEMPTY);
         size_t lineStartStart   = 0;
         size_t lineEndEnd       = 0;
         if (!bSelEmpty)
         {
-            char braceBuf[2] = {0};
-            braceBuf[0] = (char)wParam;
-            char braceCloseBuf[2] = {0};
-            switch (wParam)
-            {
-            case '(':
-                braceCloseBuf[0] = ')';
-                break;
-            case '{':
-                braceCloseBuf[0] = '}';
-                break;
-            case '[':
-                braceCloseBuf[0] = ']';
-                break;
-            }
-
             size_t selStart  = Call(SCI_GETSELECTIONSTART);
             size_t selEnd    = Call(SCI_GETSELECTIONEND);
             size_t lineStart = Call(SCI_LINEFROMPOSITION, selStart);
@@ -1323,6 +1323,51 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 {
                     Call(SCI_SETLINEINDENTATION, line, Call(SCI_GETLINEINDENTATION, line)+tabIndent);
                 }
+                Call(SCI_ENDUNDOACTION);
+                return true;
+            }
+        }
+        else
+        {
+            // Auto-add the closing brace on a new line and indent the middle
+            size_t line = Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS));
+
+            // check if the line is empty (not counting whitespaces)
+            size_t linesize = Call(SCI_GETLINE, line, 0);
+            std::unique_ptr<char[]> pLine(new char[linesize+1]);
+            Call(SCI_GETLINE, line, (sptr_t)pLine.get());
+            pLine[linesize] = 0;
+            bool bLineHasOnlyWhitespaces = true;
+            for (size_t i = 0; (i < linesize) && bLineHasOnlyWhitespaces; ++i)
+            {
+                switch (pLine[i])
+                {
+                case ' ':
+                case '\t':
+                case '\r':
+                case '\n':
+                    break;
+                default:
+                    bLineHasOnlyWhitespaces = false;
+                    break;
+                }
+            }
+            if (bLineHasOnlyWhitespaces)
+            {
+                // insert the opening brace first
+                Call(SCI_ADDTEXT, 1, (sptr_t)braceBuf);
+
+                Call(SCI_BEGINUNDOACTION);
+                // now insert a newline
+                Call(SCI_NEWLINE);
+                // insert another newline
+                Call(SCI_NEWLINE);
+                // insert the closing brace
+                Call(SCI_ADDTEXT, 1, (sptr_t)braceCloseBuf);
+                // go back one line
+                Call(SCI_LINEUP);
+                // indent the empty line
+                Call(SCI_TAB);
                 Call(SCI_ENDUNDOACTION);
                 return true;
             }
