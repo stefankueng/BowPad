@@ -97,7 +97,11 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdCut(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdCutPlain(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdCopy(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdCopyPlain(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdPaste(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
