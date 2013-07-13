@@ -447,6 +447,8 @@
     <Command Name="cmdAbout" Id="10004" />
     <Command Name="cmdGotoBrace" Id="10005" />
     <Command Name="cmdRandom" Id="10006" />
+    <Command Name="cmdCutPlain" Id="10007" />
+    <Command Name="cmdCopyPlain" Id="10008" />
   </Application.Commands>
   <Application.Views>
     <Ribbon>

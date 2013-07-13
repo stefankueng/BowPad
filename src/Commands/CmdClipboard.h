@@ -217,6 +217,43 @@ public:
 
 };
 
+class CCmdCutPlain : public ClipboardBase
+{
+public:
+
+    CCmdCutPlain(void * obj) : ClipboardBase(obj)
+    {
+    }
+
+    ~CCmdCutPlain(void)
+    {
+    }
+
+    virtual bool Execute()
+    {
+        ScintillaCall(SCI_CUT);
+        return true;
+    }
+
+    virtual UINT GetCmdId() { return cmdCutPlain; }
+
+    virtual void ScintillaNotify( Scintilla::SCNotification * pScn )
+    {
+        if (pScn->nmhdr.code == SCN_UPDATEUI)
+            InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+    }
+
+    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    {
+        if (UI_PKEY_Enabled == key)
+        {
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_GETSELTEXT) > 1), ppropvarNewValue);
+        }
+        return E_NOTIMPL;
+    }
+
+};
+
 
 class CCmdCopy : public ClipboardBase
 {
@@ -239,6 +276,27 @@ public:
     }
 
     virtual UINT GetCmdId() { return cmdCopy; }
+};
+
+class CCmdCopyPlain : public ClipboardBase
+{
+public:
+
+    CCmdCopyPlain(void * obj) : ClipboardBase(obj)
+    {
+    }
+
+    ~CCmdCopyPlain(void)
+    {
+    }
+
+    virtual bool Execute()
+    {
+        ScintillaCall(SCI_COPYALLOWLINE);
+        return true;
+    }
+
+    virtual UINT GetCmdId() { return cmdCopyPlain; }
 };
 
 class CCmdPaste : public ICommand
