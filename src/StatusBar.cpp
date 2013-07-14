@@ -180,7 +180,7 @@ LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam,
         case WM_PAINT:
             {
                 PAINTSTRUCT ps;
-                HDC hdc = BeginPaint(hwnd, &ps); 
+                HDC hdc = BeginPaint(hwnd, &ps);
                 Refresh(hwnd, hdc);
                 EndPaint(hwnd, &ps);
                 return 0;

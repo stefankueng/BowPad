@@ -119,7 +119,7 @@ public:
         }
         DWORD ticks = GetTickCount() * rand();
         INT_PTR index = 0;
-        if (m_arUnShownFileList.size())
+        if (!m_arUnShownFileList.empty())
             index = ticks % (m_arUnShownFileList.size());
         std::set<std::wstring>::iterator it = m_arUnShownFileList.begin();
         for (int i = 0; i < index; ++i)

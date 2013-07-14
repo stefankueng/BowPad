@@ -42,7 +42,7 @@ std::wstring CAppUtils::updatefilename;
 std::wstring CAppUtils::updateurl;
 
 
-class CCallback : public IBindStatusCallback  
+class CCallback : public IBindStatusCallback
 {
 public:
     CCallback() : m_pDlg(nullptr) {}
