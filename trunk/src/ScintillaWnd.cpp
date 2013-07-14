@@ -49,7 +49,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     m_docScroll.InitScintilla(this);
 
-    
+
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
     Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, 14);

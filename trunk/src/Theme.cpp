@@ -294,7 +294,7 @@ void CTheme::SetRibbonColors( COLORREF text, COLORREF background, COLORREF highl
 {
     CComPtr<IPropertyStore> spPropertyStore;
 
-    // g_pFramework is a pointer to the IUIFramework interface that is assigned 
+    // g_pFramework is a pointer to the IUIFramework interface that is assigned
     // when the Ribbon is initialized.
     if (SUCCEEDED(g_pFramework->QueryInterface(&spPropertyStore)))
     {
@@ -302,7 +302,7 @@ void CTheme::SetRibbonColors( COLORREF text, COLORREF background, COLORREF highl
         PROPVARIANT propvarHighlight;
         PROPVARIANT propvarText;
 
-        // UI_HSBCOLOR is a type defined in UIRibbon.h that is composed of 
+        // UI_HSBCOLOR is a type defined in UIRibbon.h that is composed of
         // three component values: hue, saturation and brightness, respectively.
         BYTE h, s, b;
         RGBToHSB(text, h, s, b);
@@ -328,7 +328,7 @@ void CTheme::SetRibbonColorsHSB( UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HS
 {
     CComPtr<IPropertyStore> spPropertyStore;
 
-    // g_pFramework is a pointer to the IUIFramework interface that is assigned 
+    // g_pFramework is a pointer to the IUIFramework interface that is assigned
     // when the Ribbon is initialized.
     if (SUCCEEDED(g_pFramework->QueryInterface(&spPropertyStore)))
     {
@@ -352,7 +352,7 @@ void CTheme::GetRibbonColors( UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSB
 {
     CComPtr<IPropertyStore> spPropertyStore;
 
-    // g_pFramework is a pointer to the IUIFramework interface that is assigned 
+    // g_pFramework is a pointer to the IUIFramework interface that is assigned
     // when the Ribbon is initialized.
     if (SUCCEEDED(g_pFramework->QueryInterface(&spPropertyStore)))
     {

@@ -59,7 +59,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     if (bAlreadyRunning && !parser.HasKey(L"multiple"))
     {
         // don't start another instance: reuse the existing one
-        
+
         // find the window of the existing instance
         ResString clsResName(hInst, IDC_BOWPAD);
         std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
