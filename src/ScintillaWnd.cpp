@@ -765,21 +765,21 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                 if (tagName.size() != 0)
                 {
                     /* Now we need to find the open tag.  The logic here is that we search for "<TAGNAME",
-                     * then check the next character - if it's one of '>', ' ', '\"' then we know we've found
-                     * a relevant tag.
-                     * We then need to check if either
-                     *    a) this tag is a self-closed tag - e.g. <TAGNAME attrib="value" />
-                     * or b) this tag has another closing tag after it and before our closing tag
-                     *       e.g.  <TAGNAME attrib="value">some text</TAGNAME></TAGNA|ME>
-                     *             (cursor represented by |)
-                     * If it's either of the above, then we continue searching, but only up to the
-                     * the point of the last find. (So in the (b) example above, we'd only search backwards
-                     * from the first "<TAGNAME...", as we know there's a close tag for the opened tag.
+                    * then check the next character - if it's one of '>', ' ', '\"' then we know we've found
+                    * a relevant tag.
+                    * We then need to check if either
+                    *    a) this tag is a self-closed tag - e.g. <TAGNAME attrib="value" />
+                    * or b) this tag has another closing tag after it and before our closing tag
+                    *       e.g.  <TAGNAME attrib="value">some text</TAGNAME></TAGNA|ME>
+                    *             (cursor represented by |)
+                    * If it's either of the above, then we continue searching, but only up to the
+                    * the point of the last find. (So in the (b) example above, we'd only search backwards
+                    * from the first "<TAGNAME...", as we know there's a close tag for the opened tag.
 
-                     * NOTE::  NEED TO CHECK THE ROTTEN CASE: ***********************************************************
-                     * <TAGNAME attrib="value"><TAGNAME>something</TAGNAME></TAGNAME></TAGNA|ME>
-                     * Maybe count all closing tags between start point and start of our end tag.???
-                     */
+                    * NOTE::  NEED TO CHECK THE ROTTEN CASE: ***********************************************************
+                    * <TAGNAME attrib="value"><TAGNAME>something</TAGNAME></TAGNAME></TAGNA|ME>
+                    * Maybe count all closing tags between start point and start of our end tag.???
+                    */
                     size_t currentEndPoint = xmlTags.tagCloseStart;
                     size_t openTagsRemaining = 1;
                     FindResult nextOpenTag;
@@ -843,9 +843,9 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
             }
             else
             {
-            /////////////////////////////////////////////////////////////////////////
-            // CURSOR IN OPEN TAG
-            /////////////////////////////////////////////////////////////////////////
+                /////////////////////////////////////////////////////////////////////////
+                // CURSOR IN OPEN TAG
+                /////////////////////////////////////////////////////////////////////////
                 size_t position = openFound.start + 1;
                 size_t docLength = (int)Call(SCI_GETLENGTH);
 
@@ -886,13 +886,13 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
 
 
                             /* Now we need to find the close tag.  The logic here is that we search for "</TAGNAME",
-                             * then check the next character - if it's '>' or whitespace followed by '>' then we've
-                             * found a relevant tag.
-                             * We then need to check if
-                             * our tag has another opening tag after it and before the closing tag we've found
-                             *       e.g.  <TA|GNAME><TAGNAME attrib="value">some text</TAGNAME></TAGNAME>
-                             *             (cursor represented by |)
-                             */
+                            * then check the next character - if it's '>' or whitespace followed by '>' then we've
+                            * found a relevant tag.
+                            * We then need to check if
+                            * our tag has another opening tag after it and before the closing tag we've found
+                            *       e.g.  <TA|GNAME><TAGNAME attrib="value">some text</TAGNAME></TAGNAME>
+                            *             (cursor represented by |)
+                            */
                             size_t currentStartPosition = xmlTags.tagOpenEnd;
                             size_t closeTagsRemaining = 1;
                             FindResult nextCloseTag;
@@ -1375,6 +1375,47 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 }
             }
         }
+    }
+    else if (wParam == '>')
+    {
+        // check if there's a '/' char before the opening '<' (searching backwards)
+        FindResult result1, result2;
+        size_t currentpos = Call(SCI_GETCURRENTPOS);
+        result1 = FindText("/", currentpos, 0, 0);
+        result2 = FindText("<", currentpos, 0, 0);
+        if (result2.success)
+        {
+            if (!result1.success || (result2.start > result1.start))
+            {
+                // seems like an opening xml tag
+
+                // insert the closing tag now
+                Call(SCI_ADDTEXT, 1, (sptr_t)">");
+                size_t cursorPos = Call(SCI_GETCURRENTPOS);
+                // find the tag id
+                std::string tagName;
+                size_t position = result2.start + 1;
+                int nextChar = (int)Call(SCI_GETCHARAT, position);
+                while(position < currentpos && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
+                {
+                    tagName.push_back((char)nextChar);
+                    ++position;
+                    nextChar = (int)Call(SCI_GETCHARAT, position);
+                }
+                if (!tagName.empty())
+                {
+                    Call(SCI_BEGINUNDOACTION);
+                    // we found the tag id, now insert the closing xml tag
+                    Call(SCI_ADDTEXT, 2, (sptr_t)"</");
+                    Call(SCI_ADDTEXT, tagName.size(), (sptr_t)tagName.c_str());
+                    Call(SCI_ADDTEXT, 1, (sptr_t)">");
+                    Call(SCI_GOTOPOS, cursorPos);
+                    Call(SCI_ENDUNDOACTION);
+                }
+                return true;
+            }
+        }
+
     }
     return false;
 }
