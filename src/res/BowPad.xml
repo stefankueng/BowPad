@@ -292,7 +292,7 @@
     </Command>
     <Command Name="cmdUseTabs" LabelTitle="Use Tabs" TooltipTitle="Use Tabs" TooltipDescription="Determines whether a tab is inserted or spaces when the tab key is pressed.">
       <Command.SmallImages>
-        <Image>res/LowerCaseS.bmp</Image>
+        <Image>res/Space2TabL.bmp</Image>
       </Command.SmallImages>
     </Command>
 
@@ -490,18 +490,22 @@
                 <Scale Group="cmdGroupUndo" Size="Large" />
                 <Scale Group="cmdGroupGoto" Size="Large" />
                 <Scale Group="cmdGroupComment" Size="Large" />
-                <Scale Group="cmdGroupCase" Size="Medium" />
-                <Scale Group="cmdGroupLines" Size="Medium" />
+                <Scale Group="cmdGroupCase" Size="Large" />
+                <Scale Group="cmdGroupLines" Size="Large" />
+                <Scale Group="cmdGroupBlanks" Size="Large" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
               resized. -->
               <Scale Group="cmdGroupFile" Size="Small" />
               <Scale Group="cmdGroupClipboard" Size="Small" />
-              <!--<Scale Group="cmdGroupUndo" Size="Small" />-->
+              <Scale Group="cmdGroupUndo" Size="Medium" />
               <Scale Group="cmdGroupGoto" Size="Small" />
               <Scale Group="cmdGroupComment" Size="Medium" />
-              <!--<Scale Group="cmdGroupCase" Size="Medium" />-->
+              <Scale Group="cmdGroupCase" Size="Medium" />
+              <Scale Group="cmdGroupLines" Size="Medium" />
               <Scale Group="cmdGroupLines" Size="Small" />
+              <Scale Group="cmdGroupBlanks" Size="Medium" />
+              <Scale Group="cmdGroupBlanks" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupFile" SizeDefinition="FourButtons">
@@ -522,7 +526,7 @@
             <Button CommandName="cmdCopy" />
             <Button CommandName="cmdCut" />
           </Group>
-          <Group CommandName="cmdGroupUndo" SizeDefinition="TwoButtons">
+          <Group CommandName="cmdGroupUndo" SizeDefinition="TwoButtonsWithSmall">
             <Button CommandName="cmdUndo" />
             <Button CommandName="cmdRedo" />
           </Group>
@@ -537,11 +541,11 @@
             <Button CommandName="cmdBookmarkPrev" />
             <Button CommandName="cmdBookmarkClearAll" />
           </Group>
-          <Group CommandName="cmdGroupComment" SizeDefinition="TwoButtons">
+          <Group CommandName="cmdGroupComment" SizeDefinition="TwoButtonsWithSmall">
             <Button CommandName="cmdComment" />
             <Button CommandName="cmdUnComment" />
           </Group>
-          <Group CommandName="cmdGroupCase" SizeDefinition="TwoButtons">
+          <Group CommandName="cmdGroupCase" SizeDefinition="TwoButtonsWithSmall">
             <Button CommandName="cmdUppercase" />
             <Button CommandName="cmdLowercase" />
           </Group>
@@ -650,7 +654,7 @@
             <Spinner CommandName="cmdTabSize" />
             <ToggleButton CommandName="cmdUseTabs" />
           </Group>
-          <Group CommandName="cmdGroupMisc" SizeDefinition="TwoButtons">
+          <Group CommandName="cmdGroupMisc" SizeDefinition="TwoButtonsWithSmall">
             <ToggleButton CommandName="cmdToggleTheme" />
             <DropDownGallery CommandName="cmdLanguage" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
@@ -681,6 +685,23 @@
       <Ribbon.QuickAccessToolbar>
         <QuickAccessToolbar CommandName="cmdQat" />
       </Ribbon.QuickAccessToolbar>
+
+      <Ribbon.SizeDefinitions>
+        <SizeDefinition Name="TwoButtonsWithSmall">
+          <GroupSizeDefinition Size="Large">
+            <ControlSizeDefinition ImageSize="Large" IsLabelVisible="true" />
+            <ControlSizeDefinition ImageSize="Large" IsLabelVisible="true" />
+          </GroupSizeDefinition>
+          <GroupSizeDefinition Size="Medium">
+            <ControlSizeDefinition ImageSize="Small" IsLabelVisible="false" />
+            <ControlSizeDefinition ImageSize="Small" IsLabelVisible="false" />
+          </GroupSizeDefinition>
+          <GroupSizeDefinition Size="Small">
+            <ControlSizeDefinition ImageSize="Small" IsLabelVisible="false" />
+            <ControlSizeDefinition ImageSize="Small" IsLabelVisible="false" />
+          </GroupSizeDefinition>
+        </SizeDefinition>
+      </Ribbon.SizeDefinitions>
     </Ribbon>
     <ContextPopup>
       <ContextPopup.MiniToolbars>
