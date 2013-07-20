@@ -595,7 +595,7 @@ void CScintillaWnd::GotoBrace()
 
     if (braceOpposite >= 0)
     {
-        Call(SCI_GOTOPOS, braceOpposite);
+        Call(SCI_SETSEL, (GetKeyState(VK_SHIFT)&0x8000) ? braceAtCaret : braceOpposite, braceOpposite);
     }
 }
 
