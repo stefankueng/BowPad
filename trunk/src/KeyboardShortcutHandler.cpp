@@ -25,8 +25,6 @@
 
 #include <vector>
 
-extern IUIFramework *g_pFramework;
-
 CKeyboardShortcutHandler::CKeyboardShortcutHandler(void)
     : m_bLoaded(false)
     , m_lastKey(0)
@@ -125,7 +123,6 @@ void CKeyboardShortcutHandler::Load()
                         }
                     }
                     m_accelerators.push_back(accel);
-                    g_pFramework->InvalidateUICommand(accel.cmd, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
                 }
             }
         }
