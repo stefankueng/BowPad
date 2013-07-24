@@ -406,10 +406,13 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
     case 1200: // UTF16_LE
     case 1201: // UTF16_BE
         {
-            if (doc.m_encoding == 1200)
-                WriteFile(hFile, "\xFF\xFE", 2, &bytesWritten, NULL);
-            else
-                WriteFile(hFile, "\xFE\xFF", 2, &bytesWritten, NULL);
+            if (doc.m_bHasBOM)
+            {
+                if (doc.m_encoding == 1200)
+                    WriteFile(hFile, "\xFF\xFE", 2, &bytesWritten, NULL);
+                else
+                    WriteFile(hFile, "\xFE\xFF", 2, &bytesWritten, NULL);
+            }
             char * writeBuf = buf;
             do
             {
