@@ -24,6 +24,11 @@
   <ItemGroup>
     <None Include="res\BowPad.rc2" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="BowPad.vcxproj">
+      <Project>{f767677d-b0fe-4c4f-b886-09e501c543b2}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{26DD7834-6269-413C-960A-AA7CCB72243C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -46,14 +51,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -97,79 +102,49 @@
     <TargetName>Resource</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;RESOURCEDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <NoEntryPoint>true</NoEntryPoint>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ProgramDatabaseFile />
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>..\obj\BowPad\Debug</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\obj\BowPad\$(Configuration);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;RESOURCEDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <NoEntryPoint>true</NoEntryPoint>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ProgramDatabaseFile />
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>..\obj\BowPad\Debug64</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\obj\BowPad\$(Configuration)64;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;RESOURCEDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <NoEntryPoint>true</NoEntryPoint>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ProgramDatabaseFile />
+      <SetChecksum>true</SetChecksum>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>..\obj\BowPad\Release</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\obj\BowPad\$(Configuration);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;RESOURCEDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <NoEntryPoint>true</NoEntryPoint>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ProgramDatabaseFile />
+      <SetChecksum>true</SetChecksum>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>..\obj\BowPad\Release64</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\obj\BowPad\$(Configuration)64;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
