@@ -390,6 +390,15 @@
     <ClCompile Include="lexers\LexSTTXT.cxx">
       <Filter>lexers</Filter>
     </ClCompile>
+    <ClCompile Include="lexlib\CharacterCategory.cxx">
+      <Filter>lexlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CaseFolder.cxx">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CaseConvert.cxx">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ILexer.h">
@@ -520,6 +529,18 @@
     </ClInclude>
     <ClInclude Include="win32\PlatWin.h">
       <Filter>win32</Filter>
+    </ClInclude>
+    <ClInclude Include="lexlib\CharacterCategory.h">
+      <Filter>lexlib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CaseConvert.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CaseFolder.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UnicodeFromUTF8.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
