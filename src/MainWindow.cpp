@@ -569,7 +569,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case SCN_DWELLSTART:
                     {
                         int style = (int)m_scintilla.Call(SCI_GETSTYLEAT, pScn->position);
-                        if (style & INDIC1_MASK)
+                        if (style & INDIC2_MASK)
                         {
                             // an url hotspot
                             ResString str(hRes, IDS_CTRLCLICKTOOPEN);
@@ -1145,7 +1145,7 @@ void CMainWindow::AddHotSpots()
     std::vector<unsigned char> hotspotPairs;
 
     unsigned char style_hotspot = 0;
-    unsigned char mask = INDIC1_MASK;
+    unsigned char mask = INDIC2_MASK;
 
     LRESULT posFound = m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
 
