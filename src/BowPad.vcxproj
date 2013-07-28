@@ -273,6 +273,7 @@
     <ClInclude Include="TabBar.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Theme.h" />
+    <ClInclude Include="UTF8DocumentIterator.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="XPMIcons.h" />
   </ItemGroup>
@@ -329,8 +330,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="StdRegexSearch.cpp" />
     <ClCompile Include="TabBar.cpp" />
     <ClCompile Include="Theme.cpp" />
+    <ClCompile Include="UTF8DocumentIterator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc" />
