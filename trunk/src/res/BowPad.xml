@@ -207,7 +207,7 @@
     </Command>
     <Command Name="cmdPrevNext" />
     <!-- dummy command, does nothing -->
-    <Command Name="cmdPrevious" LabelTitle="Previous" TooltipTitle="Previous" TooltipDescription="go to the previous cursor position">
+    <Command Name="cmdPrevious" LabelTitle="Previous" TooltipTitle="Previous (Alt+Left)" TooltipDescription="go to the previous cursor position">
       <Command.LargeImages>
         <Image>res/PrevL.bmp</Image>
       </Command.LargeImages>
@@ -215,7 +215,7 @@
         <Image>res/PrevS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdNext" LabelTitle="Next" TooltipTitle="Next" TooltipDescription="go to the next cursor position">
+    <Command Name="cmdNext" LabelTitle="Next" TooltipTitle="Next (Alt+Right)" TooltipDescription="go to the next cursor position">
       <Command.LargeImages>
         <Image>res/NextL.bmp</Image>
       </Command.LargeImages>
@@ -297,7 +297,7 @@
     </Command>
 
     <Command Name="cmdGroupLines" LabelTitle="Lines"/>
-    <Command Name="cmdLineDuplicate" LabelTitle="Duplicate Line" TooltipTitle="Duplicate Line" TooltipDescription="Duplicates the current line">
+    <Command Name="cmdLineDuplicate" LabelTitle="Duplicate Line" TooltipTitle="Duplicate Line (Ctrl+D)" TooltipDescription="Duplicates the current line">
       <Command.LargeImages>
         <Image>res/LineDupL.bmp</Image>
       </Command.LargeImages>
@@ -343,7 +343,7 @@
         <Image>res/PrintNowL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdPrint" LabelTitle="Print..." TooltipTitle="Print" TooltipDescription="Sends the document to a printer">
+    <Command Name="cmdPrint" LabelTitle="Print..." TooltipTitle="Print (Ctrl+P)" TooltipDescription="Sends the document to a printer">
       <Command.LargeImages>
         <Image>res/PrintL.bmp</Image>
       </Command.LargeImages>
@@ -392,7 +392,7 @@
     </Command>
 
     <Command Name="cmdGroupGoto" LabelTitle="Goto" />
-    <Command Name="cmdBookmarkToggle" LabelTitle="Bookmark" TooltipTitle="Toggle Bookmark" TooltipDescription="Toggle a bookmark on the current line">
+    <Command Name="cmdBookmarkToggle" LabelTitle="Bookmark" TooltipTitle="Toggle Bookmark (Ctrl+K,K)" TooltipDescription="Toggle a bookmark on the current line">
       <Command.LargeImages>
         <Image>res/BookmarkL.bmp</Image>
       </Command.LargeImages>
@@ -402,12 +402,12 @@
         <Image>res/BookmarkClearL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdBookmarkNext" LabelTitle="Next Bookmarks" TooltipTitle="Next Bookmarks" TooltipDescription="Move the caret to the next bookmark">
+    <Command Name="cmdBookmarkNext" LabelTitle="Next Bookmarks" TooltipTitle="Next Bookmarks (F2)" TooltipDescription="Move the caret to the next bookmark">
       <Command.LargeImages>
         <Image>res/BookmarkNextL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdBookmarkPrev" LabelTitle="Previous Bookmarks" TooltipTitle="Previous Bookmarks" TooltipDescription="Move the caret to the previous bookmark">
+    <Command Name="cmdBookmarkPrev" LabelTitle="Previous Bookmarks" TooltipTitle="Previous Bookmarks (Shift+F2)" TooltipDescription="Move the caret to the previous bookmark">
       <Command.LargeImages>
         <Image>res/BookmarkPrevL.bmp</Image>
       </Command.LargeImages>
