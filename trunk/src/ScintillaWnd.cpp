@@ -29,6 +29,7 @@
 
 
 extern IUIFramework * g_pFramework;
+extern std::string    sFindString;  // from CmdFindReplace
 
 bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 {
@@ -333,7 +334,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETFORE,  INDIC_SELECTION_MARK, CTheme::Instance().GetThemeColor(RGB(0,255,0)));
 
     Call(SCI_INDICSETSTYLE, INDIC_FINDTEXT_MARK, INDIC_ROUNDBOX);
-    Call(SCI_INDICSETALPHA, INDIC_FINDTEXT_MARK, 100);
+    Call(SCI_INDICSETALPHA, INDIC_FINDTEXT_MARK, 255);
     Call(SCI_INDICSETUNDER, INDIC_FINDTEXT_MARK, true);
     Call(SCI_INDICSETFORE,  INDIC_FINDTEXT_MARK, CTheme::Instance().GetThemeColor(RGB(255,255,0)));
 
@@ -466,6 +467,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         return;
     }
 
+    size_t selStartPos = Call(SCI_GETSELECTIONSTART);
     std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
     Call(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
     if (seltextbuffer[0] == 0)
@@ -475,6 +477,10 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
     }
+
+    // don't mark the text again if it's already marked by the search feature
+    if (_stricmp(sFindString.c_str(), seltextbuffer.get()) == 0)
+        return;
 
     std::unique_ptr<char[]> textbuffer(new char[len + 1]);
     Scintilla::Sci_TextRange textrange;
@@ -486,7 +492,9 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     char * startPos = strstr(textbuffer.get(), seltextbuffer.get());
     while (startPos)
     {
-        Call(SCI_INDICATORFILLRANGE, startstylepos + ((char*)startPos - (char*)textbuffer.get()), selTextLen-1);
+        // don't style the selected text itself
+        if (selStartPos != (startstylepos + ((char*)startPos - (char*)textbuffer.get())))
+            Call(SCI_INDICATORFILLRANGE, startstylepos + ((char*)startPos - (char*)textbuffer.get()), selTextLen-1);
         startPos = strstr(startPos+1, seltextbuffer.get());
     }
 
