@@ -250,7 +250,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
                 LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*m_curPosVisLine/m_lines);
 
                 Gdiplus::Color c3;
-                c1.SetFromCOLORREF(m_curPosColor);
+                c3.SetFromCOLORREF(m_curPosColor);
                 Gdiplus::SolidBrush brushcurline(c3);
                 graphics.FillRectangle(&brushcurline, pCustDraw->rect.left, linepos, pCustDraw->rect.right-pCustDraw->rect.left, 2);
             }
