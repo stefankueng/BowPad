@@ -21,8 +21,8 @@
 #include "UnicodeUtils.h"
 #include "StringUtils.h"
 
-static std::string sFindString;
-static int         nSearchFlags;
+std::string         sFindString;
+static int          nSearchFlags;
 
 CFindReplaceDlg::CFindReplaceDlg(void * obj)
     : ICommand(obj)
