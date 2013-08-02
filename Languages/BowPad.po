@@ -311,6 +311,10 @@ msgid "Duplicate Line"
 msgstr ""
 
 #. Resource IDs: (3761)
+msgid "Duplicate Line (Ctrl+D)"
+msgstr ""
+
+#. Resource IDs: (3761)
 msgid "Duplicates the current line"
 msgstr ""
 
@@ -519,8 +523,16 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
+#. Resource IDs: (3757)
+msgid "Next (Alt+Right)"
+msgstr ""
+
 #. Resource IDs: (3765)
 msgid "Next Bookmarks"
+msgstr ""
+
+#. Resource IDs: (3765)
+msgid "Next Bookmarks (F2)"
 msgstr ""
 
 #. Resource IDs: (9)
@@ -559,12 +571,24 @@ msgstr ""
 msgid "Previous"
 msgstr ""
 
+#. Resource IDs: (3757)
+msgid "Previous (Alt+Left)"
+msgstr ""
+
 #. Resource IDs: (3765)
 msgid "Previous Bookmarks"
 msgstr ""
 
+#. Resource IDs: (3765)
+msgid "Previous Bookmarks (Shift+F2)"
+msgstr ""
+
 #. Resource IDs: (3762)
 msgid "Print"
+msgstr ""
+
+#. Resource IDs: (3762)
+msgid "Print (Ctrl+P)"
 msgstr ""
 
 #. Resource IDs: (3763)
@@ -751,7 +775,7 @@ msgid "The document '%s' was removed outside of BowPad."
 msgstr ""
 
 #. Resource IDs: (3765)
-msgid "Toggle Bookmark"
+msgid "Toggle Bookmark (Ctrl+K,K)"
 msgstr ""
 
 #. Resource IDs: (3765)
