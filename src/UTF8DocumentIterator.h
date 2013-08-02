@@ -32,16 +32,13 @@
 #include "../ext/scintilla/src/RESearch.h"
 #include "../ext/scintilla/src/Document.h"
 
-class UTF8DocumentIterator : public std::iterator<std::bidirectional_iterator_tag, wchar_t>
+class UTF8DocumentIterator : public std::iterator<std::bidirectional_iterator_tag, char>
 {
 public:
     UTF8DocumentIterator()
         : m_doc(0)
         , m_pos(0)
         , m_end(0)
-        , m_characterIndex(0)
-        , m_utf8Length(0)
-        , m_utf16Length(0)
     {
     }
 
@@ -49,26 +46,18 @@ public:
         : m_doc(doc)
         , m_pos(pos)
         , m_end(end)
-        , m_characterIndex(0)
     {
         if (m_pos > m_end)
         {
             m_pos = m_end;
         }
-        readCharacter();
     }
 
     UTF8DocumentIterator(const UTF8DocumentIterator& copy)
         : m_doc(copy.m_doc)
         , m_pos(copy.m_pos)
         , m_end(copy.m_end)
-        , m_characterIndex(copy.m_characterIndex)
-        , m_utf8Length(copy.m_utf8Length)
-        , m_utf16Length(copy.m_utf16Length)
     {
-        m_character[0] = copy.m_character[0];
-        m_character[1] = copy.m_character[1];
-
         if (m_pos > m_end)
         {
             m_pos = m_end;
@@ -85,9 +74,9 @@ public:
         return !(*this == other);
     }
 
-    wchar_t operator * () const
+    char operator * () const
     {
-        return m_character[m_characterIndex];
+        return m_doc->CharAt(m_pos);
     }
 
     UTF8DocumentIterator& operator = (int other)
@@ -98,20 +87,11 @@ public:
 
     UTF8DocumentIterator& operator ++ ()
     {
-        if (2 == m_utf16Length && 0 == m_characterIndex)
-        {
-            m_characterIndex = 1;
-        }
-        else
-        {
-            m_pos += m_utf8Length;
+        m_pos++;
 
-            if (m_pos > m_end)
-            {
-                m_pos = m_end;
-            }
-            m_characterIndex = 0;
-            readCharacter();
+        if (m_pos > m_end)
+        {
+            m_pos = m_end;
         }
         return *this;
     }
@@ -125,23 +105,7 @@ public:
 
     UTF8DocumentIterator& operator -- ()
     {
-        if (m_utf16Length == 2 && m_characterIndex == 1)
-        {
-            m_characterIndex = 0;
-        }
-        else
-        {
-            --m_pos;
-            // Skip past the UTF-8 extension bytes
-            while (0x80 == (m_doc->CharAt(m_pos) & 0xC0) && m_pos > 0)
-                --m_pos;
-
-            readCharacter();
-            if (m_utf16Length == 2)
-            {
-                m_characterIndex = 1;
-            }
-        }
+        --m_pos;
         return *this;
     }
 
@@ -151,8 +115,6 @@ public:
     }
 
 private:
-    void readCharacter();
-
 
     bool ended() const
     {
@@ -160,12 +122,7 @@ private:
     }
 
     int m_pos;
-    wchar_t m_character[2];
-    int m_characterIndex;
     int m_end;
-    int m_utf8Length;
-    int m_utf16Length;
     Scintilla::Document* m_doc;
-    static const unsigned char m_firstByteMask[];
 };
 

@@ -132,30 +132,20 @@ private:
 
     class CharTPtr
     {
-        // Automatically translatable from utf8 to wchar_t*, if required, with allocation and deallocation on destruction; char* is not deallocated.
     public:
         CharTPtr(const char* ptr)
             : _charPtr(ptr)
-            , _wcharPtr(NULL)
         {
         }
         ~CharTPtr()
         {
-            delete[] _wcharPtr;
         }
         operator const char*()
         {
             return _charPtr;
         }
-        operator const wchar_t*()
-        {
-            if (_wcharPtr == NULL)
-                _wcharPtr = utf8ToWchar(_charPtr);
-            return _wcharPtr;
-        }
     private:
         const char* _charPtr;
-        wchar_t* _wcharPtr;
     };
 
     template <class CharT, class CharacterIterator>
@@ -200,12 +190,9 @@ private:
         int _direction;
     };
 
-    static wchar_t *utf8ToWchar(const char *utf8);
-    static char    *wcharToUtf8(const wchar_t *w);
     static char    *stringToCharPtr(const std::string& str);
-    static char    *stringToCharPtr(const std::wstring& str);
 
-    EncodingDependent<wchar_t, UTF8DocumentIterator> _utf8;
+    EncodingDependent<char, UTF8DocumentIterator> _utf8;
 
     char *_substituted;
 
@@ -315,7 +302,6 @@ StdRegexSearch::Match StdRegexSearch::EncodingDependent<CharT, CharacterIterator
     if (found)
     {
         const int  position = _match[0].first.pos();
-        //const int  length   = _match[0].second.pos() - position;
         next_search_from_position = search.nextCharacter(position);
     }
 
@@ -389,46 +375,25 @@ bool StdRegexSearch::SearchParameters::isLineEnd(int position)
         || _document->CharAt(position) == '\n' && (position == 0 || _document->CharAt(position-1) != '\n');
 }
 
-const char *StdRegexSearch::SubstituteByPosition(Document* /*doc*/, const char *text, int *length) {
+const char *StdRegexSearch::SubstituteByPosition(Document* /*doc*/, const char *text, int *length)
+{
     delete[] _substituted;
     _substituted = _utf8.SubstituteByPosition(text, length);
     return _substituted;
 }
 
 template <class CharT, class CharacterIterator>
-char *StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::SubstituteByPosition(const char *text, int *length) {
+char *StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::SubstituteByPosition(const char *text, int *length)
+{
     char *substituted = stringToCharPtr(_match.format((const CharT*)CharTPtr(text), std::regex_constants::format_default));
     *length = (int)strlen(substituted);
     return substituted;
 }
 
-wchar_t *StdRegexSearch::utf8ToWchar(const char *utf8)
-{
-    int utf8Size = (int)strlen(utf8);
-    int wcharSize = UTF16Length(utf8, utf8Size);
-    wchar_t *w = new wchar_t[wcharSize + 1];
-    UTF16FromUTF8(utf8, utf8Size, w, wcharSize + 1);
-    w[wcharSize] = 0;
-    return w;
-}
-
-char *StdRegexSearch::wcharToUtf8(const wchar_t *w)
-{
-    int wcharSize = (int)wcslen(w);
-    int charSize = UTF8Length(w, wcharSize);
-    char *c = new char[charSize + 1];
-    UTF8FromUTF16(w, wcharSize, c, charSize);
-    c[charSize] = 0;
-    return c;
-}
 
 char *StdRegexSearch::stringToCharPtr(const std::string& str)
 {
     char *charPtr = new char[str.length() + 1];
     strcpy_s(charPtr, str.length() + 1, str.c_str());
     return charPtr;
-}
-char *StdRegexSearch::stringToCharPtr(const std::wstring& str)
-{
-    return wcharToUtf8(str.c_str());
 }
