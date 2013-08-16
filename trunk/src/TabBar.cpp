@@ -354,7 +354,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             // to right of tabs
             rBkgnd = rClient;
-            rBkgnd.left += (rTotalTab.right-rTotalTab.left) - 2;
+            rBkgnd.left += (rTotalTab.right-(max(rTotalTab.left, 0))) - 2;
             rBkgnd.bottom = rBkgnd.top + (nTabHeight + 2);
             ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, NULL);
 
