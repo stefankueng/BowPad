@@ -523,6 +523,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
                 return false;
             }
             lengthDoc -= writeLen;
+            buf += writeLen;
         } while (lengthDoc > 0);
         break;
     default:
