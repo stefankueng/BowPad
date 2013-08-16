@@ -59,6 +59,7 @@ public :
         , m_nItems(0)
         , m_bHasImgList(false)
         , m_hFont(NULL)
+        , m_hBoldFont(NULL)
         , m_ctrlID(-1)
         , m_bIsDragging(false)
         , m_bIsDraggingInside(false)
@@ -125,6 +126,7 @@ private:
     int                         m_nItems;
     bool                        m_bHasImgList;
     HFONT                       m_hFont;
+    HFONT                       m_hBoldFont;
 
 
     int                         m_ctrlID;
