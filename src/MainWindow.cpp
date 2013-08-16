@@ -44,6 +44,7 @@ IUIFramework *g_pFramework = NULL;  // Reference to the Ribbon framework.
 #define STATUSBAR_UNICODE_TYPE  4
 #define STATUSBAR_TYPING_MODE   5
 #define STATUSBAR_CAPS          6
+#define STATUSBAR_TABS          7
 
 #define URL_REG_EXPR "[A-Za-z]+://[A-Za-z0-9_\\-\\+~.:?&@=/%#,;\\{\\}\\(\\)\\[\\]\\|\\*\\!\\\\]+"
 
@@ -725,7 +726,7 @@ LRESULT CMainWindow::DoCommand(int id)
 bool CMainWindow::Initialize()
 {
     m_scintilla.Init(hResource, *this);
-    int barParts[7] = {100, 300, 550, 650, 750, 780, 820};
+    int barParts[8] = {100, 300, 550, 650, 750, 780, 820, 880};
     m_StatusBar.Init(hResource, *this, _countof(barParts), barParts);
     m_TabBar.Init(hResource, *this);
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
@@ -928,6 +929,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
         m_StatusBar.SetText(doc.m_language.c_str(), STATUSBAR_DOC_TYPE);
         m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), STATUSBAR_EOF_FORMAT);
         m_StatusBar.SetText(doc.GetEncodingString().c_str(), STATUSBAR_UNICODE_TYPE);
+        m_StatusBar.SetText(CStringUtils::Format(L"tabs: %d", m_TabBar.GetItemCount()).c_str(), STATUSBAR_TABS);
     }
 }
 
