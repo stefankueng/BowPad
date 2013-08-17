@@ -762,7 +762,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
     UINT uFlags = DT_CALCRECT | DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS;
     ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, uFlags);
 
-    SetTextColor(pDrawItemStruct->hDC, bSelected ? CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)) : CTheme::Instance().GetThemeColor(Darker(::GetSysColor(COLOR_3DFACE), 0.3f)));
+    SetTextColor(pDrawItemStruct->hDC, bSelected ? CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)) : CTheme::Instance().GetThemeColor(Darker(::GetSysColor(COLOR_3DFACE), 0.5f)));
     DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, DT_NOPREFIX | DT_CENTER);
 }
 
