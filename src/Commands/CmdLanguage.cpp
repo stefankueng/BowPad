@@ -23,7 +23,6 @@
 #include "DirFileEnum.h"
 #include "AppUtils.h"
 #include "PathUtils.h"
-// compiler error? Run the NAnt build script first or create version.h from version.in
 #include "version.h"
 
 #include <vector>
