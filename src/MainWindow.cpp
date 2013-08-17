@@ -410,6 +410,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             wcscpy_s(m_tooltipbuffer.get(), doc.m_path.size()+1, doc.m_path.c_str());
                             lpnmtdi->lpszText = m_tooltipbuffer.get();
                             lpnmtdi->hinst = NULL;
+                            return 0;
                         }
                     }
                 }
