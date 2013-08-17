@@ -34,7 +34,6 @@ public:
     CRandomFileList(void){}
     ~CRandomFileList(void)
     {
-        Save();
     }
 
 public:
