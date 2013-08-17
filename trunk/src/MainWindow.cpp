@@ -1166,82 +1166,101 @@ void CMainWindow::AddHotSpots()
     long lineCount = (long)m_scintilla.Call(SCI_GETLINECOUNT);
     endPos = (long)m_scintilla.Call(SCI_POSITIONFROMLINE, m_scintilla.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine + min(linesOnScreen, lineCount)));
 
-
-    m_scintilla.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
-
-    m_scintilla.Call(SCI_SETTARGETSTART, startPos);
-    m_scintilla.Call(SCI_SETTARGETEND, endPos);
-
     std::vector<unsigned char> hotspotPairs;
 
     unsigned char style_hotspot = 0;
     unsigned char mask = INDIC2_MASK;
 
-    LRESULT posFound = m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
-
-    while (posFound != -1)
+    // to speed up the search, first search for "://" without using the regex engine
+    long fStartPos = startPos;
+    long fEndPos = endPos;
+    m_scintilla.Call(SCI_SETSEARCHFLAGS, 0);
+    m_scintilla.Call(SCI_SETTARGETSTART, fStartPos);
+    m_scintilla.Call(SCI_SETTARGETEND, fEndPos);
+    LRESULT posFoundColonSlash = m_scintilla.Call(SCI_SEARCHINTARGET, 3, (LPARAM)"://");
+    while (posFoundColonSlash != -1)
     {
-        long start = long(m_scintilla.Call(SCI_GETTARGETSTART));
-        long end = long(m_scintilla.Call(SCI_GETTARGETEND));
-        long foundTextLen = end - start;
-        unsigned char idStyle = static_cast<unsigned char>(m_scintilla.Call(SCI_GETSTYLEAT, posFound));
+        // found a "://"
+        long lineFoundcolonSlash = m_scintilla.Call(SCI_LINEFROMPOSITION, posFoundColonSlash);
+        startPos = (long)m_scintilla.Call(SCI_POSITIONFROMLINE, lineFoundcolonSlash);
+        endPos = (long)m_scintilla.Call(SCI_GETLINEENDPOSITION, lineFoundcolonSlash);
+        fStartPos = posFoundColonSlash + 1;
 
-        // Search the style
-        long fs = -1;
-        for (size_t i = 0 ; i < hotspotPairs.size() ; i++)
-        {
-            // make sure to ignore "hotspot bit" when comparing document style with archived hotspot style
-            if ((hotspotPairs[i] & ~mask) == (idStyle & ~mask))
-            {
-                fs = hotspotPairs[i];
-                m_scintilla.Call(SCI_STYLEGETFORE, fs);
-                break;
-            }
-        }
+        m_scintilla.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
 
-        // if we found it then use it to colorize
-        if (fs != -1)
-        {
-            m_scintilla.Call(SCI_STARTSTYLING, start, 0xFF);
-            m_scintilla.Call(SCI_SETSTYLING, foundTextLen, fs);
-        }
-        else // generate a new style and add it into a array
-        {
-            style_hotspot = idStyle | mask; // set "hotspot bit"
-            hotspotPairs.push_back(style_hotspot);
-            int activeFG = 0xFF0000;
-            unsigned char idStyleMSBunset = idStyle & ~mask;
-            char fontNameA[128];
-
-            // copy the style data
-            m_scintilla.Call(SCI_STYLEGETFONT, idStyleMSBunset, (LPARAM)fontNameA);
-            m_scintilla.Call(SCI_STYLESETFONT, style_hotspot, (LPARAM)fontNameA);
-
-            m_scintilla.Call(SCI_STYLESETSIZE, style_hotspot, m_scintilla.Call(SCI_STYLEGETSIZE, idStyleMSBunset));
-            m_scintilla.Call(SCI_STYLESETBOLD, style_hotspot, m_scintilla.Call(SCI_STYLEGETBOLD, idStyleMSBunset));
-            m_scintilla.Call(SCI_STYLESETWEIGHT, style_hotspot, m_scintilla.Call(SCI_STYLEGETWEIGHT, idStyleMSBunset));
-            m_scintilla.Call(SCI_STYLESETITALIC, style_hotspot, m_scintilla.Call(SCI_STYLEGETITALIC, idStyleMSBunset));
-            m_scintilla.Call(SCI_STYLESETUNDERLINE, style_hotspot, m_scintilla.Call(SCI_STYLEGETUNDERLINE, idStyleMSBunset));
-            m_scintilla.Call(SCI_STYLESETFORE, style_hotspot, m_scintilla.Call(SCI_STYLEGETFORE, idStyleMSBunset));
-            m_scintilla.Call(SCI_STYLESETBACK, style_hotspot, m_scintilla.Call(SCI_STYLEGETBACK, idStyleMSBunset));
-            m_scintilla.Call(SCI_STYLESETEOLFILLED, style_hotspot, m_scintilla.Call(SCI_STYLEGETEOLFILLED, idStyleMSBunset));
-            m_scintilla.Call(SCI_STYLESETCASE, style_hotspot, m_scintilla.Call(SCI_STYLEGETCASE, idStyleMSBunset));
-
-
-            m_scintilla.Call(SCI_STYLESETHOTSPOT, style_hotspot, TRUE);
-            m_scintilla.Call(SCI_SETHOTSPOTACTIVEUNDERLINE, style_hotspot, TRUE);
-            m_scintilla.Call(SCI_SETHOTSPOTACTIVEFORE, TRUE, activeFG);
-            m_scintilla.Call(SCI_SETHOTSPOTSINGLELINE, style_hotspot, 0);
-
-            // colorize it!
-            m_scintilla.Call(SCI_STARTSTYLING, start, 0xFF);
-            m_scintilla.Call(SCI_SETSTYLING, foundTextLen, style_hotspot);
-        }
-
-        m_scintilla.Call(SCI_SETTARGETSTART, posFound + foundTextLen);
+        m_scintilla.Call(SCI_SETTARGETSTART, startPos);
         m_scintilla.Call(SCI_SETTARGETEND, endPos);
 
-        posFound = (int)m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
+        LRESULT posFound = m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
+
+        while (posFound != -1)
+        {
+            long start = long(m_scintilla.Call(SCI_GETTARGETSTART));
+            long end = long(m_scintilla.Call(SCI_GETTARGETEND));
+            long foundTextLen = end - start;
+            unsigned char idStyle = static_cast<unsigned char>(m_scintilla.Call(SCI_GETSTYLEAT, posFound));
+
+            // Search the style
+            long fs = -1;
+            for (size_t i = 0 ; i < hotspotPairs.size() ; i++)
+            {
+                // make sure to ignore "hotspot bit" when comparing document style with archived hotspot style
+                if ((hotspotPairs[i] & ~mask) == (idStyle & ~mask))
+                {
+                    fs = hotspotPairs[i];
+                    m_scintilla.Call(SCI_STYLEGETFORE, fs);
+                    break;
+                }
+            }
+
+            // if we found it then use it to colorize
+            if (fs != -1)
+            {
+                m_scintilla.Call(SCI_STARTSTYLING, start, 0xFF);
+                m_scintilla.Call(SCI_SETSTYLING, foundTextLen, fs);
+            }
+            else // generate a new style and add it into a array
+            {
+                style_hotspot = idStyle | mask; // set "hotspot bit"
+                hotspotPairs.push_back(style_hotspot);
+                int activeFG = 0xFF0000;
+                unsigned char idStyleMSBunset = idStyle & ~mask;
+                char fontNameA[128];
+
+                // copy the style data
+                m_scintilla.Call(SCI_STYLEGETFONT, idStyleMSBunset, (LPARAM)fontNameA);
+                m_scintilla.Call(SCI_STYLESETFONT, style_hotspot, (LPARAM)fontNameA);
+
+                m_scintilla.Call(SCI_STYLESETSIZE, style_hotspot, m_scintilla.Call(SCI_STYLEGETSIZE, idStyleMSBunset));
+                m_scintilla.Call(SCI_STYLESETBOLD, style_hotspot, m_scintilla.Call(SCI_STYLEGETBOLD, idStyleMSBunset));
+                m_scintilla.Call(SCI_STYLESETWEIGHT, style_hotspot, m_scintilla.Call(SCI_STYLEGETWEIGHT, idStyleMSBunset));
+                m_scintilla.Call(SCI_STYLESETITALIC, style_hotspot, m_scintilla.Call(SCI_STYLEGETITALIC, idStyleMSBunset));
+                m_scintilla.Call(SCI_STYLESETUNDERLINE, style_hotspot, m_scintilla.Call(SCI_STYLEGETUNDERLINE, idStyleMSBunset));
+                m_scintilla.Call(SCI_STYLESETFORE, style_hotspot, m_scintilla.Call(SCI_STYLEGETFORE, idStyleMSBunset));
+                m_scintilla.Call(SCI_STYLESETBACK, style_hotspot, m_scintilla.Call(SCI_STYLEGETBACK, idStyleMSBunset));
+                m_scintilla.Call(SCI_STYLESETEOLFILLED, style_hotspot, m_scintilla.Call(SCI_STYLEGETEOLFILLED, idStyleMSBunset));
+                m_scintilla.Call(SCI_STYLESETCASE, style_hotspot, m_scintilla.Call(SCI_STYLEGETCASE, idStyleMSBunset));
+
+
+                m_scintilla.Call(SCI_STYLESETHOTSPOT, style_hotspot, TRUE);
+                m_scintilla.Call(SCI_SETHOTSPOTACTIVEUNDERLINE, style_hotspot, TRUE);
+                m_scintilla.Call(SCI_SETHOTSPOTACTIVEFORE, TRUE, activeFG);
+                m_scintilla.Call(SCI_SETHOTSPOTSINGLELINE, style_hotspot, 0);
+
+                // colorize it!
+                m_scintilla.Call(SCI_STARTSTYLING, start, 0xFF);
+                m_scintilla.Call(SCI_SETSTYLING, foundTextLen, style_hotspot);
+            }
+
+            m_scintilla.Call(SCI_SETTARGETSTART, posFound + foundTextLen);
+            m_scintilla.Call(SCI_SETTARGETEND, endPos);
+
+            posFound = (int)m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
+        }
+        m_scintilla.Call(SCI_SETTARGETSTART, fStartPos);
+        m_scintilla.Call(SCI_SETTARGETEND, fEndPos);
+        m_scintilla.Call(SCI_SETSEARCHFLAGS, 0);
+        posFoundColonSlash = (int)m_scintilla.Call(SCI_SEARCHINTARGET, 3, (LPARAM)"://");
     }
 
     m_scintilla.Call(SCI_STARTSTYLING, endStyle, 0xFF);
