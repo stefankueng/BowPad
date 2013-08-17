@@ -391,13 +391,40 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     case WM_NOTIFY:
         {
             LPNMHDR pNMHDR = reinterpret_cast<LPNMHDR>(lParam);
+
+            switch (pNMHDR->code)
+            {
+            case TTN_GETDISPINFO:
+                {
+                    POINT p;
+                    ::GetCursorPos(&p);
+                    ::ScreenToClient(*this, &p);
+                    HWND hWin = ::RealChildWindowFromPoint(*this, p);
+                    if (hWin == m_TabBar)
+                    {
+                        LPNMTTDISPINFO lpnmtdi = (LPNMTTDISPINFO)lParam;
+                        if ((pNMHDR->idFrom >= 0) && (pNMHDR->idFrom < m_DocManager.GetCount()))
+                        {
+                            CDocument doc = m_DocManager.GetDocument(pNMHDR->idFrom);
+                            m_tooltipbuffer = std::unique_ptr<wchar_t[]>(new wchar_t[doc.m_path.size()+1]);
+                            wcscpy_s(m_tooltipbuffer.get(), doc.m_path.size()+1, doc.m_path.c_str());
+                            lpnmtdi->lpszText = m_tooltipbuffer.get();
+                            lpnmtdi->hinst = NULL;
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+            }
+
             if ((pNMHDR->idFrom == (UINT_PTR)&m_TabBar) ||
                 (pNMHDR->hwndFrom == m_TabBar))
             {
                 TBHDR * ptbhdr = reinterpret_cast<TBHDR*>(lParam);
                 CCommandHandler::Instance().TabNotify(ptbhdr);
 
-                switch (((LPNMHDR)lParam)->code)
+                switch (pNMHDR->code)
                 {
                 case TCN_GETCOLOR:
                     if ((ptbhdr->tabOrigin >= 0) && (ptbhdr->tabOrigin < m_DocManager.GetCount()))

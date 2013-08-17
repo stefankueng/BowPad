@@ -61,26 +61,27 @@ public:
 
 protected:
     /// the message handler for this window
-    LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK            WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    void AutoIndent( Scintilla::SCNotification * pScn );
+    void                        AutoIndent( Scintilla::SCNotification * pScn );
 
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
-    LRESULT             DoCommand(int id);
+    LRESULT                     DoCommand(int id);
 
 private:
-    void                ResizeChildWindows();
-    void                UpdateStatusBar(bool bEverything);
-    void                InitCommands();
-    void                AddHotSpots();
+    void                        ResizeChildWindows();
+    void                        UpdateStatusBar(bool bEverything);
+    void                        InitCommands();
+    void                        AddHotSpots();
 
 private:
-    LONG                m_cRef;
-    IUIRibbon *         m_pRibbon;
-    UINT                m_RibbonHeight;
+    LONG                        m_cRef;
+    IUIRibbon *                 m_pRibbon;
+    UINT                        m_RibbonHeight;
 
-    CStatusBar          m_StatusBar;
-    CTabBar             m_TabBar;
-    CScintillaWnd       m_scintilla;
-    CDocumentManager    m_DocManager;
+    CStatusBar                  m_StatusBar;
+    CTabBar                     m_TabBar;
+    CScintillaWnd               m_scintilla;
+    CDocumentManager            m_DocManager;
+    std::unique_ptr<wchar_t[]>  m_tooltipbuffer;
 };
