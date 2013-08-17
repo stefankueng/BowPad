@@ -493,7 +493,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     while (startPos)
     {
         // don't style the selected text itself
-        if (selStartPos != (startstylepos + ((char*)startPos - (char*)textbuffer.get())))
+        if (selStartPos != size_t(startstylepos + ((char*)startPos - (char*)textbuffer.get())))
             Call(SCI_INDICATORFILLRANGE, startstylepos + ((char*)startPos - (char*)textbuffer.get()), selTextLen-1);
         startPos = strstr(startPos+1, seltextbuffer.get());
     }

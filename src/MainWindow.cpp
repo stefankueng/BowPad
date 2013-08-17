@@ -405,7 +405,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         LPNMTTDISPINFO lpnmtdi = (LPNMTTDISPINFO)lParam;
                         if ((pNMHDR->idFrom >= 0) && (pNMHDR->idFrom < m_DocManager.GetCount()))
                         {
-                            CDocument doc = m_DocManager.GetDocument(pNMHDR->idFrom);
+                            CDocument doc = m_DocManager.GetDocument((int)pNMHDR->idFrom);
                             m_tooltipbuffer = std::unique_ptr<wchar_t[]>(new wchar_t[doc.m_path.size()+1]);
                             wcscpy_s(m_tooltipbuffer.get(), doc.m_path.size()+1, doc.m_path.c_str());
                             lpnmtdi->lpszText = m_tooltipbuffer.get();
