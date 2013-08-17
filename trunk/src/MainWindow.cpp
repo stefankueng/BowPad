@@ -46,7 +46,7 @@ IUIFramework *g_pFramework = NULL;  // Reference to the Ribbon framework.
 #define STATUSBAR_CAPS          6
 #define STATUSBAR_TABS          7
 
-#define URL_REG_EXPR "[A-Za-z]+://[A-Za-z0-9_\\-\\+~.:?&@=/%#,;\\{\\}\\(\\)\\[\\]\\|\\*\\!\\\\]+"
+#define URL_REG_EXPR "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b"
 
 
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
