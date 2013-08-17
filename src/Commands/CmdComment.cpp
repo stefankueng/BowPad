@@ -112,12 +112,14 @@ bool CCmdUnComment::Execute()
     {
         selStart        = ScintillaCall(SCI_GETSELECTIONSTART);
         selEnd          = ScintillaCall(SCI_GETSELECTIONEND);
+        size_t selEndCorr = 0;
         // go back if selEnd is on an EOL char
         switch (ScintillaCall(SCI_GETCHARAT, selEnd))
         {
         case '\r':
         case '\n':
             --selEnd;
+            ++selEndCorr;
             break;
         }
         switch (ScintillaCall(SCI_GETCHARAT, selEnd))
@@ -125,6 +127,7 @@ bool CCmdUnComment::Execute()
         case '\r':
         case '\n':
             --selEnd;
+            ++selEndCorr;
             break;
         }
 
@@ -160,7 +163,7 @@ bool CCmdUnComment::Execute()
         {
             lineStartStart  = ScintillaCall(SCI_POSITIONFROMLINE, ScintillaCall(SCI_LINEFROMPOSITION, selStart));
             lineEndEnd      = ScintillaCall(SCI_GETLINEENDPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, selEnd));
-            if ((lineStartStart == selStart) && (lineEndEnd == selEnd))
+            if ((lineStartStart == selStart) && ((lineEndEnd == selEnd) || ((lineEndEnd - selEndCorr) == selEnd)))
             {
                 // remove block comments for each selected line
                 size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
