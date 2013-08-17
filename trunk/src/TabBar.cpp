@@ -94,8 +94,6 @@ CTabBar::~CTabBar()
 {
     if (m_hFont)
         DeleteObject(m_hFont);
-    if (m_hBoldFont)
-        DeleteObject(m_hBoldFont);
     Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
@@ -142,11 +140,6 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
 
     if (m_hFont == NULL)
         m_hFont = (HFONT)::GetStockObject(DEFAULT_GUI_FONT);
-
-    LOGFONT lf = {0};
-    GetObject(m_hFont, sizeof(LOGFONT), &lf);
-    lf.lfWeight = FW_BOLD;
-    m_hBoldFont = CreateFontIndirect(&lf);
 
     DoOwnerDrawTab();
     return true;
@@ -203,11 +196,6 @@ void CTabBar::SetFont( TCHAR *fontName, int fontSize )
         fontName);
     if (m_hFont)
         ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
-
-    LOGFONT lf = {0};
-    GetObject(m_hFont, sizeof(LOGFONT), &lf);
-    lf.lfWeight = FW_BOLD;
-    m_hBoldFont = CreateFontIndirect(&lf);
 }
 
 void CTabBar::ActivateAt(int index) const
@@ -423,8 +411,6 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 }
             }
 
-            SelectObject(hDC, hOldFont);
-            hOldFont = SelectObject(hDC, m_hBoldFont);
             // now selected tab
             dis.itemID = nSel;
             dis.itemState = ODS_SELECTED;
