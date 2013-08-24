@@ -104,8 +104,16 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                     {
                         for( int i=0; i<nArgs; i++)
                         {
-                            std::wstring path = CPathUtils::GetLongPathname(szArglist[i]);
-                            sCmdLine += L"\"" + path + L"\" ";
+                            if (szArglist[i][0] != '/')
+                            {
+                                std::wstring path = CPathUtils::GetLongPathname(szArglist[i]);
+                                sCmdLine += L"\"" + path + L"\" ";
+                            }
+                            else
+                            {
+                                sCmdLine += szArglist[i];
+                                sCmdLine += L" ";
+                            }
                         }
 
                         // Free memory allocated for CommandLineToArgvW arguments.
@@ -182,8 +190,11 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             {
                 for( int i=1; i<nArgs; i++)
                 {
+                    if (szArglist[i][0] != '/')
+{
                     std::wstring path = CPathUtils::GetLongPathname(szArglist[i]);
                     mainWindow.OpenFile(path);
+}
                 }
                 if (parser.HasVal(L"line"))
                 {
