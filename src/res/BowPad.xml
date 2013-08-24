@@ -449,6 +449,7 @@
     <Command Name="cmdRandom" Id="10006" />
     <Command Name="cmdCutPlain" Id="10007" />
     <Command Name="cmdCopyPlain" Id="10008" />
+    <Command Name="cmdHeaderSource" Id="10009" />
   </Application.Commands>
   <Application.Views>
     <Ribbon>
