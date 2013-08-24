@@ -404,7 +404,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     if (hWin == m_TabBar)
                     {
                         LPNMTTDISPINFO lpnmtdi = (LPNMTTDISPINFO)lParam;
-                        if ((pNMHDR->idFrom >= 0) && (pNMHDR->idFrom < m_DocManager.GetCount()))
+                        if (pNMHDR->idFrom < m_DocManager.GetCount())
                         {
                             CDocument doc = m_DocManager.GetDocument((int)pNMHDR->idFrom);
                             m_tooltipbuffer = std::unique_ptr<wchar_t[]>(new wchar_t[doc.m_path.size()+1]);
@@ -935,11 +935,11 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     size_t selLine = 0;
 
     if (m_scintilla.GetSelectedCount(selByte, selLine))
-        wsprintf(strSel, L"Sel : %d | %d", selByte, selLine);
+        wsprintf(strSel, L"Sel : %lld | %lld", selByte, selLine);
     else
         wsprintf(strSel, L"Sel : %s", L"N/A");
 
-    wsprintf(strLnCol, L"Ln : %d    Col : %d    %s",
+    wsprintf(strLnCol, L"Ln : %ld    Col : %ld    %s",
                        (m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1),
                        (m_scintilla.Call(SCI_GETCOLUMN, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1),
                        strSel);
@@ -1182,10 +1182,10 @@ void CMainWindow::AddHotSpots()
     while (posFoundColonSlash != -1)
     {
         // found a "://"
-        long lineFoundcolonSlash = m_scintilla.Call(SCI_LINEFROMPOSITION, posFoundColonSlash);
+        long lineFoundcolonSlash = (long)m_scintilla.Call(SCI_LINEFROMPOSITION, posFoundColonSlash);
         startPos = (long)m_scintilla.Call(SCI_POSITIONFROMLINE, lineFoundcolonSlash);
         endPos = (long)m_scintilla.Call(SCI_GETLINEENDPOSITION, lineFoundcolonSlash);
-        fStartPos = posFoundColonSlash + 1;
+        fStartPos = (long)posFoundColonSlash + 1;
 
         m_scintilla.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
 
