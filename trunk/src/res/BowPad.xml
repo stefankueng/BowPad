@@ -321,7 +321,7 @@
         <Image>res/LineJoinS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdLineUp" LabelTitle="Move up" TooltipTitle="Move line up" TooltipDescription="Moves the selected lines upwards">
+    <Command Name="cmdLineUp" LabelTitle="Move up" TooltipTitle="Move line up (Alt+Cursor Up)" TooltipDescription="Moves the selected lines upwards">
       <Command.LargeImages>
         <Image>res/LineUpL.bmp</Image>
       </Command.LargeImages>
@@ -329,7 +329,7 @@
         <Image>res/LineUpS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdLineDown" LabelTitle="Move down" TooltipTitle="Move line down" TooltipDescription="Moves the selected lines downwards">
+    <Command Name="cmdLineDown" LabelTitle="Move down" TooltipTitle="Move line down (Alt+Cursor Down)" TooltipDescription="Moves the selected lines downwards">
       <Command.LargeImages>
         <Image>res/LineDownL.bmp</Image>
       </Command.LargeImages>
