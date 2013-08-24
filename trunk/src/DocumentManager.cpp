@@ -20,6 +20,8 @@
 #include "SmartHandle.h"
 #include "UnicodeUtils.h"
 
+#include <algorithm>
+
 COLORREF foldercolors[] = {
     RGB(177,199,253),
     RGB(221,253,177),
@@ -621,6 +623,7 @@ COLORREF CDocumentManager::GetColorForDocument( int index )
 {
     CDocument doc = GetDocument(index);
     std::wstring folderpath = doc.m_path.substr(0, doc.m_path.find_last_of('\\')+1);
+    std::transform(folderpath.begin(), folderpath.end(), folderpath.begin(), ::tolower);
     auto foundIt = m_foldercolorindexes.find(folderpath);
     if (foundIt != m_foldercolorindexes.end())
     {
