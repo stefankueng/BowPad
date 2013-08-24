@@ -229,6 +229,7 @@
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppUtils.h" />
+    <ClInclude Include="ChoseDlg.h" />
     <ClInclude Include="ColorButton.h" />
     <ClInclude Include="Commands\CmdBlanks.h" />
     <ClInclude Include="Commands\CmdBookmarks.h" />
@@ -240,6 +241,7 @@
     <ClInclude Include="Commands\CmdFiles.h" />
     <ClInclude Include="Commands\CmdFindReplace.h" />
     <ClInclude Include="Commands\CmdGotoLine.h" />
+    <ClInclude Include="Commands\CmdHeaderSource.h" />
     <ClInclude Include="Commands\CmdLanguage.h" />
     <ClInclude Include="Commands\CmdLines.h" />
     <ClInclude Include="Commands\CmdLineWrap.h" />
@@ -299,6 +301,7 @@
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AppUtils.cpp" />
     <ClCompile Include="BowPad.cpp" />
+    <ClCompile Include="ChoseDlg.cpp" />
     <ClCompile Include="ColorButton.cpp" />
     <ClCompile Include="Commands\CmdBlanks.cpp" />
     <ClCompile Include="Commands\CmdCodeStyle.cpp" />
@@ -354,16 +357,16 @@
     <CustomBuild Include="res\BowPad.xml">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building BowPad.xml</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)BowPad.bml;$(IntDir)BowPadUI.h;$(IntDir)BowPadUI.rc</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building BowPad.xml</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)BowPad.bml;$(IntDir)BowPadUI.h;$(IntDir)BowPadUI.rc</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building BowPad.xml</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)BowPad.bml;$(IntDir)BowPadUI.h;$(IntDir)BowPadUI.rc</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building BowPad.xml</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(InputName).bml;$(InputName)ids.h;$(InputName).rc</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)BowPad.bml;$(IntDir)BowPadUI.h;$(IntDir)BowPadUI.rc</Outputs>
       <SubType>Designer</SubType>
     </CustomBuild>
   </ItemGroup>

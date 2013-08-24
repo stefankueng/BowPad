@@ -240,6 +240,12 @@
     <ClInclude Include="UTF8DocumentIterator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdHeaderSource.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="ChoseDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -393,6 +399,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StdRegexSearch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChoseDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
