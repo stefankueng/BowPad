@@ -191,8 +191,32 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         break;
     case WM_CHAR:
         {
+            if (((wParam == VK_RETURN) || (wParam == '\n')) &&
+                ((GetKeyState(VK_CONTROL)&0x8000) || (GetKeyState(VK_SHIFT)&0x8000)))
+            {
+                return 0;
+            }
             if (AutoBraces(wParam))
                 return 0;
+        }
+        break;
+    case WM_KEYDOWN:
+        {
+            if (((wParam == VK_RETURN) || (wParam == '\n')) &&
+                ((GetKeyState(VK_CONTROL)&0x8000) || (GetKeyState(VK_SHIFT)&0x8000)))
+            {
+                Call(SCI_BEGINUNDOACTION);
+                if (GetKeyState(VK_CONTROL)&0x8000)
+                {
+                    // Ctrl+Return: insert a line above the current line
+                    // Cursor-Up, End, Return
+                    Call(SCI_LINEUP);
+                }
+                Call(SCI_LINEEND);
+                Call(SCI_NEWLINE);
+                Call(SCI_ENDUNDOACTION);
+                return 0;
+            }
         }
         break;
     default:
