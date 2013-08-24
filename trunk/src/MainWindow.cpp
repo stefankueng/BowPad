@@ -371,7 +371,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     {
                         for( int i=1; i<nArgs; i++)
                         {
-                            OpenFile(szArglist[i]);
+                            if (szArglist[i][0] != '/')
+                                OpenFile(szArglist[i]);
                         }
                         if (parser.HasVal(L"line"))
                         {
