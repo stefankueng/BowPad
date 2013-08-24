@@ -25,6 +25,7 @@
 #include "MRU.h"
 #include "KeyboardShortcutHandler.h"
 #include "AppUtils.h"
+#include "PathUtils.h"
 #include "Theme.h"
 #include "PreserveChdir.h"
 #include "CmdLineParser.h"
@@ -1038,7 +1039,8 @@ bool CMainWindow::OpenFile( const std::wstring& file )
 {
     bool bRet = true;
     int encoding = -1;
-    int index = m_DocManager.GetIndexForPath(file.c_str());
+    std::wstring filepath = CPathUtils::GetLongPathname(file);
+    int index = m_DocManager.GetIndexForPath(filepath.c_str());
     if (index != -1)
     {
         // document already open
@@ -1046,7 +1048,7 @@ bool CMainWindow::OpenFile( const std::wstring& file )
     }
     else
     {
-        CDocument doc = m_DocManager.LoadFile(*this, file.c_str(), encoding);
+        CDocument doc = m_DocManager.LoadFile(*this, filepath.c_str(), encoding);
         if (doc.m_document)
         {
             if (m_TabBar.GetItemCount() == 1)
@@ -1059,19 +1061,19 @@ bool CMainWindow::OpenFile( const std::wstring& file )
                     m_TabBar.DeletItemAt(0);
                 }
             }
-            CMRU::Instance().AddPath(file);
+            CMRU::Instance().AddPath(filepath);
             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-            doc.m_language = CLexStyles::Instance().GetLanguageForExt(file.substr(file.find_last_of('.')+1));
-            m_scintilla.SetupLexerForExt(file.substr(file.find_last_of('.')+1).c_str());
+            doc.m_language = CLexStyles::Instance().GetLanguageForExt(filepath.substr(filepath.find_last_of('.')+1));
+            m_scintilla.SetupLexerForExt(filepath.substr(filepath.find_last_of('.')+1).c_str());
             m_DocManager.AddDocumentAtEnd(doc);
-            std::wstring sFileName = file.substr(file.find_last_of('\\')+1);
+            std::wstring sFileName = filepath.substr(filepath.find_last_of('\\')+1);
             int index = m_TabBar.InsertAtEnd(sFileName.c_str());
             m_TabBar.ActivateAt(index);
-            SHAddToRecentDocs(SHARD_PATHW, file.c_str());
+            SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
         }
         else
         {
-            CMRU::Instance().RemovePath(file, false);
+            CMRU::Instance().RemovePath(filepath, false);
             bRet = false;
         }
     }
