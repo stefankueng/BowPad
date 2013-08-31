@@ -936,11 +936,11 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     size_t selLine = 0;
 
     if (m_scintilla.GetSelectedCount(selByte, selLine))
-        wsprintf(strSel, L"Sel : %lld | %lld", selByte, selLine);
+        swprintf_s(strSel, L"Sel : %lld | %lld", selByte, selLine);
     else
-        wsprintf(strSel, L"Sel : %s", L"N/A");
+        swprintf_s(strSel, L"Sel : %s", L"N/A");
 
-    wsprintf(strLnCol, L"Ln : %ld    Col : %ld    %s",
+    swprintf_s(strLnCol, L"Ln : %ld    Col : %ld    %s",
                        (m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1),
                        (m_scintilla.Call(SCI_GETCOLUMN, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1),
                        strSel);
@@ -948,7 +948,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     m_StatusBar.SetText(strLnCol, STATUSBAR_CUR_POS);
 
     TCHAR strDocLen[256];
-    wsprintf(strDocLen, L"length : %d    lines : %d", m_scintilla.Call(SCI_GETLENGTH), m_scintilla.Call(SCI_GETLINECOUNT));
+    swprintf_s(strDocLen, L"length : %d    lines : %d", m_scintilla.Call(SCI_GETLENGTH), m_scintilla.Call(SCI_GETLINECOUNT));
     m_StatusBar.SetText(strDocLen, STATUSBAR_DOC_SIZE);
     m_StatusBar.SetText(m_scintilla.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
