@@ -150,9 +150,12 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
                         if (accel.key2 == 0)
                         {
                             // execute the command
-                            SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(accel.cmd, 1), 0);
-                            m_lastKey = 0;
-                            return TRUE;
+                            if (GetForegroundWindow() == hwnd)
+                            {
+                                SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(accel.cmd, 1), 0);
+                                m_lastKey = 0;
+                                return TRUE;
+                            }
                         }
                         else
                         {
@@ -163,9 +166,12 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
                     else if ((m_lastKey == accel.key1) && (accel.key2 == wParam))
                     {
                         // execute the command
-                        SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(accel.cmd, 1), 0);
-                        m_lastKey = 0;
-                        return TRUE;
+                        if (GetForegroundWindow() == hwnd)
+                        {
+                            SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(accel.cmd, 1), 0);
+                            m_lastKey = 0;
+                            return TRUE;
+                        }
                     }
                 }
             }
