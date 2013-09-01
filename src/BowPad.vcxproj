@@ -214,6 +214,7 @@
     <ClInclude Include="..\ext\sktoolslib\DebugOutput.h" />
     <ClInclude Include="..\ext\sktoolslib\DirFileEnum.h" />
     <ClInclude Include="..\ext\sktoolslib\DlgResizer.h" />
+    <ClInclude Include="..\ext\sktoolslib\EscapeUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\FormatMessageWrapper.h" />
     <ClInclude Include="..\ext\sktoolslib\hyperlink.h" />
     <ClInclude Include="..\ext\sktoolslib\IniSettings.h" />
@@ -243,6 +244,7 @@
     <ClInclude Include="Commands\CmdGotoLine.h" />
     <ClInclude Include="Commands\CmdHeaderSource.h" />
     <ClInclude Include="Commands\CmdLanguage.h" />
+    <ClInclude Include="Commands\CmdLaunch.h" />
     <ClInclude Include="Commands\CmdLines.h" />
     <ClInclude Include="Commands\CmdLineWrap.h" />
     <ClInclude Include="Commands\CmdLoadEncoding.h" />
@@ -289,6 +291,7 @@
     <ClCompile Include="..\ext\sktoolslib\DebugOutput.cpp" />
     <ClCompile Include="..\ext\sktoolslib\DirFileEnum.cpp" />
     <ClCompile Include="..\ext\sktoolslib\DlgResizer.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\EscapeUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\hyperlink.cpp" />
     <ClCompile Include="..\ext\sktoolslib\IniSettings.cpp" />
     <ClCompile Include="..\ext\sktoolslib\Language.cpp" />
@@ -311,6 +314,7 @@
     <ClCompile Include="Commands\CmdFindReplace.cpp" />
     <ClCompile Include="Commands\CmdGotoLine.cpp" />
     <ClCompile Include="Commands\CmdLanguage.cpp" />
+    <ClCompile Include="Commands\CmdLaunch.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
     <ClCompile Include="Commands\CmdPrevNext.cpp" />
     <ClCompile Include="Commands\CmdPrint.cpp" />

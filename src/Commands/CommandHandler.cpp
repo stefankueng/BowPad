@@ -43,6 +43,7 @@
 #include "CmdRandom.h"
 #include "CmdLanguage.h"
 #include "CmdHeaderSource.h"
+#include "CmdLaunch.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -209,6 +210,33 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdHeaderSource(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
+    pCmd = new CCmdLaunchIE(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdLaunchFirefox(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdLaunchChrome(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdLaunchSafari(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdLaunchOpera(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdLaunchSearch(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdLaunchWikipedia(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdLaunchConsole(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdLaunchExplorer(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        pCmd = new CCmdLaunchCustom(i, obj);
+        m_commands[pCmd->GetCmdId()] = pCmd;
+    }
+    pCmd = new CCmdCustomCommands(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdRandom(obj);

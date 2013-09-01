@@ -450,6 +450,117 @@
       </Command.SmallImages>
     </Command>
 
+    <Command Name="cmdGroupLaunch" LabelTitle="Launch/Open">
+      <Command.LargeImages>
+        <Image>res/PlayL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchGroup" LabelTitle="Open">
+      <Command.LargeImages>
+        <Image>res/PlayL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchIE" LabelTitle="Launch in IE" TooltipTitle="Launch in Internet Explorer (Ctrl+L,I)" TooltipDescription="Opens the current file in Microsoft Internet Explorer">
+      <Command.LargeImages>
+        <Image>res/IEL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchFirefox" LabelTitle="Launch in Firefox" TooltipTitle="Launch in Firefox (Ctrl+L,F)" TooltipDescription="Opens the current file in the Firefox browser">
+      <Command.LargeImages>
+        <Image>res/FirefoxL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchChrome" LabelTitle="Launch in Chrome" TooltipTitle="Launch in Google Chrome (Ctrl+L,C)" TooltipDescription="Opens the current file in the Google Chrome browser">
+      <Command.LargeImages>
+        <Image>res/ChromeL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchSafari" LabelTitle="Launch in Safari" TooltipTitle="Launch in Safari (Ctrl+L,S)" TooltipDescription="Opens the current file in the Safari browser">
+      <Command.LargeImages>
+        <Image>res/SafariL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchOpera" LabelTitle="Launch in Opera" TooltipTitle="Launch in Opera (Ctrl+L,O)" TooltipDescription="Opens the current file in the Opera browser">
+      <Command.LargeImages>
+        <Image>res/OperaL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchExplorer" LabelTitle="Open Explorer" TooltipTitle="Open Explorer (Ctrl+L,E)" TooltipDescription="Opens the Windows Explorer at the current file location">
+      <Command.SmallImages>
+        <Image>res/ExplorerS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLaunchConsole" LabelTitle="Open Console" TooltipTitle="Open Console (Ctrl+L,M)" TooltipDescription="Opens the Console at the current file location">
+      <Command.SmallImages>
+        <Image>res/ConsoleL.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLaunchSearch" LabelTitle="Search Web" TooltipTitle="Search Web (Ctrl+L,W)" TooltipDescription="Opens the default browser to search for the selected text">
+      <Command.LargeImages>
+        <Image>res/WorldL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchWikipedia" LabelTitle="Search Wikipedia" TooltipTitle="Search Wikipedia (Ctrl+L,P)" TooltipDescription="Opens the default browser to search Wikipedia for the selected text">
+      <Command.LargeImages>
+        <Image>res/WikipediaL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom0" LabelTitle="Custom Command 0" TooltipTitle="Custom Command 0 (Ctrl+L,0)" TooltipDescription="runs the custom command 0">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom1" LabelTitle="Custom Command 1" TooltipTitle="Custom Command 1 (Ctrl+L,1)" TooltipDescription="runs the custom command 1">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom2" LabelTitle="Custom Command 2" TooltipTitle="Custom Command 2 (Ctrl+L,2)" TooltipDescription="runs the custom command 2">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom3" LabelTitle="Custom Command 3" TooltipTitle="Custom Command 3 (Ctrl+L,3)" TooltipDescription="runs the custom command 3">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom4" LabelTitle="Custom Command 4" TooltipTitle="Custom Command 4 (Ctrl+L,4)" TooltipDescription="runs the custom command 4">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom5" LabelTitle="Custom Command 5" TooltipTitle="Custom Command 5 (Ctrl+L,5)" TooltipDescription="runs the custom command 5">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom6" LabelTitle="Custom Command 6" TooltipTitle="Custom Command 6 (Ctrl+L,6)" TooltipDescription="runs the custom command 6">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom7" LabelTitle="Custom Command 7" TooltipTitle="Custom Command 7 (Ctrl+L,7)" TooltipDescription="runs the custom command 7">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom8" LabelTitle="Custom Command 8" TooltipTitle="Custom Command 8 (Ctrl+L,8)" TooltipDescription="runs the custom command 8">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom9" LabelTitle="Custom Command 9" TooltipTitle="Custom Command 9 (Ctrl+L,9)" TooltipDescription="runs the custom command 9">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdCustomCommands" LabelTitle="Configure custom commands" TooltipTitle="Configure custom commands" TooltipDescription="Shows a dialog to configure custom commands">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
 
     <Command Name="cmdGroupFind" LabelTitle="Find" />
 
@@ -464,6 +575,8 @@
     <Command Name="cmdCutPlain" Id="10007" />
     <Command Name="cmdCopyPlain" Id="10008" />
     <Command Name="cmdHeaderSource" Id="10009" />
+
+    <Command Name="cmdTesting" Id="20000" />
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -503,7 +616,7 @@
                 <Scale Group="cmdGroupFile" Size="Medium" />
                 <Scale Group="cmdGroupClipboard" Size="Medium" />
                 <Scale Group="cmdGroupUndo" Size="Large" />
-                <Scale Group="cmdGroupFind" Size="Medium" />
+                <Scale Group="cmdGroupFind" Size="Large" />
                 <Scale Group="cmdGroupGoto" Size="Large" />
                 <Scale Group="cmdGroupComment" Size="Large" />
                 <Scale Group="cmdGroupCase" Size="Large" />
@@ -515,7 +628,9 @@
               <Scale Group="cmdGroupFile" Size="Small" />
               <Scale Group="cmdGroupClipboard" Size="Small" />
               <Scale Group="cmdGroupUndo" Size="Medium" />
-                <Scale Group="cmdGroupFind" Size="Small" />
+              <Scale Group="cmdGroupFind" Size="Medium" />
+              <Scale Group="cmdGroupFind" Size="Small" />
+              <Scale Group="cmdGroupGoto" Size="Medium" />
               <Scale Group="cmdGroupGoto" Size="Small" />
               <Scale Group="cmdGroupComment" Size="Medium" />
               <Scale Group="cmdGroupCase" Size="Medium" />
@@ -562,6 +677,40 @@
             <Button CommandName="cmdBookmarkNext" />
             <Button CommandName="cmdBookmarkPrev" />
             <Button CommandName="cmdBookmarkClearAll" />
+          </Group>
+          <Group CommandName="cmdGroupLaunch" SizeDefinition="OneButton">
+            <DropDownButton CommandName="cmdLaunchGroup">
+              <MenuGroup>
+                <Button CommandName="cmdLaunchIE"/>
+                <Button CommandName="cmdLaunchFirefox"/>
+                <Button CommandName="cmdLaunchChrome"/>
+                <Button CommandName="cmdLaunchSafari"/>
+                <Button CommandName="cmdLaunchOpera"/>
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdLaunchSearch"/>
+                <Button CommandName="cmdLaunchWikipedia"/>
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdLaunchExplorer"/>
+                <Button CommandName="cmdLaunchConsole"/>
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdLaunchCustom0"/>
+                <Button CommandName="cmdLaunchCustom1"/>
+                <Button CommandName="cmdLaunchCustom2"/>
+                <Button CommandName="cmdLaunchCustom3"/>
+                <Button CommandName="cmdLaunchCustom4"/>
+                <Button CommandName="cmdLaunchCustom5"/>
+                <Button CommandName="cmdLaunchCustom6"/>
+                <Button CommandName="cmdLaunchCustom7"/>
+                <Button CommandName="cmdLaunchCustom8"/>
+                <Button CommandName="cmdLaunchCustom9"/>
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdCustomCommands"/>
+              </MenuGroup>
+            </DropDownButton>
           </Group>
           <Group CommandName="cmdGroupComment" SizeDefinition="TwoButtonsWithSmall">
             <Button CommandName="cmdComment" />
