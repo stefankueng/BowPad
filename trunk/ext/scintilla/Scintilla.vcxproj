@@ -170,6 +170,7 @@
     <ClCompile Include="lexers\LexHTML.cxx" />
     <ClCompile Include="lexers\LexInno.cxx" />
     <ClCompile Include="lexers\LexKix.cxx" />
+    <ClCompile Include="lexers\LexKVIrc.cxx" />
     <ClCompile Include="lexers\LexLaTeX.cxx" />
     <ClCompile Include="lexers\LexLisp.cxx" />
     <ClCompile Include="lexers\LexLout.cxx" />
