@@ -107,8 +107,8 @@
     <ClCompile>
       <AdditionalIncludeDirectories>include;lexlib;src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <OmitFramePointers>true</OmitFramePointers>
       <Optimization>MaxSpeed</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>SCI_NAMESPACE;SCI_OWNREGEX;EnableScrollBar=CoolSB_EnableScrollBar;GetScrollInfo=CoolSB_GetScrollInfo;GetScrollPos=CoolSB_GetScrollPos;GetScrollRange=CoolSB_GetScrollRange;SetScrollInfo=CoolSB_SetScrollInfo;SetScrollPos=CoolSB_SetScrollPos;SetScrollRange=CoolSB_SetScrollRange;ShowScrollBar=CoolSB_ShowScrollBar;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;STATIC_BUILD;SCI_LEXER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -277,6 +277,7 @@
     <ClInclude Include="lexlib\PropSetSimple.h" />
     <ClInclude Include="lexlib\SparseState.h" />
     <ClInclude Include="lexlib\StyleContext.h" />
+    <ClInclude Include="lexlib\SubStyles.h" />
     <ClInclude Include="lexlib\WordList.h" />
     <ClInclude Include="src\AutoComplete.h" />
     <ClInclude Include="src\CallTip.h" />
