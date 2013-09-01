@@ -894,6 +894,10 @@
             <Button CommandName="cmdSelectAll" />
             <Button CommandName="cmdDelete" />
           </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdLaunchSearch"/>
+                <Button CommandName="cmdLaunchWikipedia"/>
+              </MenuGroup>
         </ContextMenu>
       </ContextPopup.ContextMenus>
       <ContextPopup.ContextMaps>
