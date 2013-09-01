@@ -246,6 +246,12 @@
     <ClInclude Include="ChoseDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdLaunch.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\EscapeUtils.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -403,6 +409,12 @@
     </ClCompile>
     <ClCompile Include="ChoseDlg.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\EscapeUtils.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdLaunch.cpp">
+      <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
