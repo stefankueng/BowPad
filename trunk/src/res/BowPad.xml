@@ -727,10 +727,10 @@
           </Group>
           <Group CommandName="cmdGroupLines" SizeDefinition="FiveButtons">
             <Button CommandName="cmdLineDuplicate" />
-            <Button CommandName="cmdLineSplit" />
-            <Button CommandName="cmdLineJoin" />
             <Button CommandName="cmdLineUp" />
             <Button CommandName="cmdLineDown" />
+            <Button CommandName="cmdLineSplit" />
+            <Button CommandName="cmdLineJoin" />
           </Group>
           <Group CommandName="cmdGroupBlanks" SizeDefinition="FourButtons">
             <Button CommandName="cmdTrim" />
