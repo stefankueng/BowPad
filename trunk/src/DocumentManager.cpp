@@ -606,7 +606,7 @@ int CDocumentManager::GetIndexForPath( const std::wstring& path ) const
 {
     for (size_t i = 0; i < m_documents.size(); ++i)
     {
-        if (m_documents[i].m_path.compare(path)==0)
+        if (_wcsicmp(m_documents[i].m_path.c_str(), path.c_str()) == 0)
             return (int)i;
     }
     return (int)-1;
