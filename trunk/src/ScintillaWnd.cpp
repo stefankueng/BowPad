@@ -1325,7 +1325,7 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
             }
             lineStartStart  = Call(SCI_POSITIONFROMLINE, lineStart);
             lineEndEnd      = Call(SCI_GETLINEENDPOSITION, lineEnd);
-            if ((lineStartStart != selStart) || (lineEndEnd != selEnd))
+            if ((lineStartStart != selStart) || (lineEndEnd != selEnd) || (wParam == '(') || (wParam == '['))
             {
                 // insert the brace before the selection and the closing brace after the selection
                 Call(SCI_SETSEL, (uptr_t)-1, selStart);
