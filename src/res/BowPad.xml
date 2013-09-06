@@ -574,7 +574,11 @@
     <Command Name="cmdRandom" Id="10006" />
     <Command Name="cmdCutPlain" Id="10007" />
     <Command Name="cmdCopyPlain" Id="10008" />
-    <Command Name="cmdHeaderSource" Id="10009" />
+    <Command Name="cmdHeaderSource" Id="10009" LabelTitle="Corresponding File" TooltipTitle="Open corresponding File (Ctrl+K,O)" TooltipDescription="Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)">
+      <Command.LargeImages>
+        <Image>res/HeaderSourceL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
 
     <Command Name="cmdTesting" Id="20000" />
   </Application.Commands>
@@ -712,9 +716,10 @@
               </MenuGroup>
             </DropDownButton>
           </Group>
-          <Group CommandName="cmdGroupComment" SizeDefinition="TwoButtonsWithSmall">
+          <Group CommandName="cmdGroupComment" SizeDefinition="ThreeButtons">
             <Button CommandName="cmdComment" />
             <Button CommandName="cmdUnComment" />
+            <Button CommandName="cmdHeaderSource" />
           </Group>
           <Group CommandName="cmdGroupCase" SizeDefinition="TwoButtonsWithSmall">
             <Button CommandName="cmdUppercase" />
@@ -894,10 +899,10 @@
             <Button CommandName="cmdSelectAll" />
             <Button CommandName="cmdDelete" />
           </MenuGroup>
-              <MenuGroup>
-                <Button CommandName="cmdLaunchSearch"/>
-                <Button CommandName="cmdLaunchWikipedia"/>
-              </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdLaunchSearch"/>
+            <Button CommandName="cmdLaunchWikipedia"/>
+          </MenuGroup>
         </ContextMenu>
       </ContextPopup.ContextMenus>
       <ContextPopup.ContextMaps>
