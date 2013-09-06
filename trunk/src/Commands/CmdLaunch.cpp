@@ -29,6 +29,8 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     std::wstring tabpath = doc.m_path;
     SearchReplace(cmd, L"$(TAB_PATH)", tabpath);
     SearchReplace(cmd, L"$(TAB_DIR)", CPathUtils::GetParentDirectory(tabpath));
+    SearchReplace(cmd, L"$(LINE)", CStringUtils::Format(L"%lld", ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS))));
+    SearchReplace(cmd, L"$(POS)", CStringUtils::Format(L"%lld", ScintillaCall(SCI_GETCURRENTPOS)));
     // find selected text or current word
     std::string sSelText;
     int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
@@ -137,6 +139,9 @@ LRESULT CALLBACK CCustomCommandsDlg::DlgFunc( HWND hwndDlg, UINT uMsg, WPARAM wP
     case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
+            ResString sInfo(hRes, IDS_CUSTOMCOMMANDSINFO);
+            SetDlgItemText(hwndDlg, IDC_INFO, sInfo);
+
             m_resizer.Init(hwndDlg);
             m_resizer.AddControl(hwndDlg, IDC_STATICWEB, RESIZER_TOPLEFT);
             m_resizer.AddControl(hwndDlg, IDC_WEBSEARCHCMD, RESIZER_TOPLEFTRIGHT);
@@ -174,9 +179,10 @@ LRESULT CALLBACK CCustomCommandsDlg::DlgFunc( HWND hwndDlg, UINT uMsg, WPARAM wP
             m_resizer.AddControl(hwndDlg, IDC_STATIC9,      RESIZER_TOPLEFT);
             m_resizer.AddControl(hwndDlg, IDC_CUSTNAME9,    RESIZER_TOPLEFT);
             m_resizer.AddControl(hwndDlg, IDC_CUSTCMD9,     RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_INFO,         RESIZER_TOPLEFTBOTTOMRIGHT);
 
-            m_resizer.AddControl(hwndDlg, IDOK, RESIZER_TOPRIGHT);
-            m_resizer.AddControl(hwndDlg, IDCANCEL, RESIZER_TOPRIGHT);
+            m_resizer.AddControl(hwndDlg, IDOK, RESIZER_BOTTOMRIGHT);
+            m_resizer.AddControl(hwndDlg, IDCANCEL, RESIZER_BOTTOMRIGHT);
 
             std::wstring sWebSearch = CIniSettings::Instance().GetString(L"CustomLaunch", L"websearch", L"http://www.google.com/search?q=$(SEL_TEXT_ESCAPED)");
             if (sWebSearch.empty())
