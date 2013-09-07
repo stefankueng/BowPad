@@ -234,17 +234,24 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
 
                 LONG lastLinePos = -1;
                 COLORREF lastColor = (COLORREF)-1;
-                for (auto line : m_visibleLineColors)
+                size_t colcount = DOCSCROLLTYPE_END;
+                int width = pCustDraw->rect.right-pCustDraw->rect.left;
+                int colwidth = width / (colcount-1);
+                for (int c = 1; c < colcount; ++c)
                 {
-                    LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*line.first/m_lines);
-                    if ((linepos > (lastLinePos+1)) || (lastColor != line.second))
+                    int drawx = pCustDraw->rect.left + (c-1)*colwidth;
+                    for (auto line : m_visibleLineColors[c])
                     {
-                        Gdiplus::Color c2(150, GetRValue(line.second), GetGValue(line.second), GetBValue(line.second));
-                        c2.SetFromCOLORREF(line.second);
-                        Gdiplus::SolidBrush brushline(c2);
-                        graphics.FillRectangle(&brushline, pCustDraw->rect.left, linepos, pCustDraw->rect.right-pCustDraw->rect.left, 2);
-                        lastLinePos = linepos;
-                        lastColor = line.second;
+                        LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*line.first/m_lines);
+                        if ((linepos > (lastLinePos+1)) || (lastColor != line.second))
+                        {
+                            Gdiplus::Color c2(150, GetRValue(line.second), GetGValue(line.second), GetBValue(line.second));
+                            c2.SetFromCOLORREF(line.second);
+                            Gdiplus::SolidBrush brushline(c2);
+                            graphics.FillRectangle(&brushline, drawx, linepos, colwidth, 2);
+                            lastLinePos = linepos;
+                            lastColor = line.second;
+                        }
                     }
                 }
                 LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*m_curPosVisLine/m_lines);
@@ -271,10 +278,11 @@ void CDocScroll::CalcLines()
 {
     if (m_bDirty)
     {
-        m_visibleLineColors.clear();
+        for (int i=0; i<DOCSCROLLTYPE_END; ++i)
+            m_visibleLineColors[i].clear();
         for (auto it : m_lineColors)
         {
-            m_visibleLineColors[m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, std::get<1>(it.first))] = it.second;
+            m_visibleLineColors[std::get<0>(it.first)][m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, std::get<1>(it.first))] = it.second;
         }
         m_visibleLines = m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, m_lines);
     }
@@ -333,5 +341,8 @@ void CDocScroll::Clear( int type )
         }
     }
     if (m_bDirty)
-        m_visibleLineColors.clear();
+    {
+        for (int i=0; i<DOCSCROLLTYPE_END; ++i)
+            m_visibleLineColors[i].clear();
+    }
 }

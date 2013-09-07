@@ -21,8 +21,9 @@
 #include <gdiplus.h>
 
 #define DOCSCROLLTYPE_SELTEXT           1
-#define DOCSCROLLTYPE_SEARCHTEXT        2
-#define DOCSCROLLTYPE_BOOKMARK          3
+#define DOCSCROLLTYPE_BOOKMARK          2
+#define DOCSCROLLTYPE_SEARCHTEXT        3
+#define DOCSCROLLTYPE_END               4
 
 class CScintillaWnd;
 
@@ -45,7 +46,7 @@ private:
     void                        CalcLines();
 
 
-    std::map<size_t, COLORREF>                  m_visibleLineColors;
+    std::map<size_t, COLORREF>                  m_visibleLineColors[DOCSCROLLTYPE_END];
     std::map<std::tuple<int,size_t>,COLORREF>   m_lineColors;
     size_t                                      m_visibleLines;
     size_t                                      m_lines;
