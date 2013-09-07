@@ -1340,8 +1340,10 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
             {
                 // get info
                 size_t tabIndent = Call(SCI_GETTABWIDTH);
-                int indentAmount = (int)Call(SCI_GETLINEINDENTATION, lineStart);
-
+                int indentAmount = (int)Call(SCI_GETLINEINDENTATION, lineStart > 0 ? lineStart-1 : lineStart);
+                int indentAmountfirst = (int)Call(SCI_GETLINEINDENTATION, lineStart);
+                if (indentAmount == 0)
+                    indentAmount = indentAmountfirst;
                 Call(SCI_BEGINUNDOACTION);
 
                 // insert a new line at the end of the selected lines
@@ -1360,9 +1362,12 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 Call(SCI_SETLINEINDENTATION, lineStart, indentAmount);
 
                 // increase the indentation of all selected lines
-                for (size_t line = lineStart+1; line <= lineEnd+1; ++line)
+                if (indentAmount == indentAmountfirst)
                 {
-                    Call(SCI_SETLINEINDENTATION, line, Call(SCI_GETLINEINDENTATION, line)+tabIndent);
+                    for (size_t line = lineStart+1; line <= lineEnd+1; ++line)
+                    {
+                        Call(SCI_SETLINEINDENTATION, line, Call(SCI_GETLINEINDENTATION, line)+tabIndent);
+                    }
                 }
                 Call(SCI_ENDUNDOACTION);
                 return true;
