@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2013-09-07 11:28+0100\n"
+"PO-Revision-Date: 2013-09-07 14:15+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: German\n"
@@ -106,10 +106,6 @@ msgstr "Vorhandene Sprachen"
 msgid "BOWPAD"
 msgstr "BOWPAD"
 
-#. Resource IDs: (3763)
-msgid "Blank operations"
-msgstr "Leerzeichen"
-
 #. Resource IDs: (1020)
 msgid "Bold"
 msgstr "Fett"
@@ -137,6 +133,10 @@ msgid ""
 msgstr ""
 "Abbrechen\n"
 "Die Datei wird nicht neu geladen"
+
+#. Resource IDs: (3764)
+msgid "Char operations"
+msgstr "Zeichenoperationen"
 
 #. Resource IDs: (1027)
 msgid "Check for Updates"
@@ -193,6 +193,10 @@ msgstr ""
 #. Resource IDs: (3753)
 msgid "Closes all open files"
 msgstr "Schliesse alle offenen Dateien"
+
+#. Resource IDs: (3767)
+msgid "Cmd"
+msgstr "Cmd"
 
 #. Resource IDs: (8)
 msgid "Codepages/Character sets"
@@ -621,10 +625,6 @@ msgstr "Öffne mit Safari"
 #. Resource IDs: (3768)
 msgid "Launch in Safari (Ctrl+L,S)"
 msgstr "Öffne mit Safari (Ctrl+L,S)"
-
-#. Resource IDs: (3767)
-msgid "Launch/Open"
-msgstr "Ausführen"
 
 #. Resource IDs: (3756)
 msgid "Line Endings"
@@ -1295,3 +1295,6 @@ msgstr "Führt den Benutzerbefehl 9 aus"
 #. Resource IDs: (3760)
 msgid "tab size"
 msgstr "Tabulatorgrösse"
+
+#~ msgid "Launch/Open"
+#~ msgstr "Ausführen"
