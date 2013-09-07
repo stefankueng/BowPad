@@ -574,7 +574,8 @@
     <Command Name="cmdRandom" Id="10006" />
     <Command Name="cmdCutPlain" Id="10007" />
     <Command Name="cmdCopyPlain" Id="10008" />
-    <Command Name="cmdHeaderSource" Id="10009" LabelTitle="Corresponding File" TooltipTitle="Open corresponding File (Ctrl+K,O)" TooltipDescription="Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)">
+    <Command Name="cmdHeaderSource" Id="10009" LabelTitle="Corresponding File" TooltipTitle="Open corresponding File (Ctrl+K,O)" TooltipDescription="Opens the corresponding file to the file in the current tab.
+(h/cpp, aspx/cs/vb)">
       <Command.LargeImages>
         <Image>res/HeaderSourceL.bmp</Image>
       </Command.LargeImages>
