@@ -374,7 +374,7 @@
       </Command.SmallImages>
     </Command>
 
-    <Command Name="cmdGroupBlanks" LabelTitle="Blank operations"/>
+    <Command Name="cmdGroupBlanks" LabelTitle="Char operations"/>
     <Command Name="cmdTrim" LabelTitle="Trim Whitespaces" TooltipTitle="Trim Whitespaces" TooltipDescription="Removes whitespaces at the end of lines">
       <Command.LargeImages>
         <Image>res/TrimL.bmp</Image>
@@ -450,7 +450,7 @@
       </Command.SmallImages>
     </Command>
 
-    <Command Name="cmdGroupLaunch" LabelTitle="Launch/Open">
+    <Command Name="cmdGroupLaunch" LabelTitle="Cmd">
       <Command.LargeImages>
         <Image>res/PlayL.bmp</Image>
       </Command.LargeImages>
@@ -624,9 +624,8 @@
                 <Scale Group="cmdGroupFind" Size="Large" />
                 <Scale Group="cmdGroupGoto" Size="Large" />
                 <Scale Group="cmdGroupComment" Size="Large" />
-                <Scale Group="cmdGroupCase" Size="Large" />
                 <Scale Group="cmdGroupLines" Size="Large" />
-                <Scale Group="cmdGroupBlanks" Size="Large" />
+                <Scale Group="cmdGroupBlanks" Size="Medium" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
               resized. -->
@@ -638,10 +637,8 @@
               <Scale Group="cmdGroupGoto" Size="Medium" />
               <Scale Group="cmdGroupGoto" Size="Small" />
               <Scale Group="cmdGroupComment" Size="Medium" />
-              <Scale Group="cmdGroupCase" Size="Medium" />
               <Scale Group="cmdGroupLines" Size="Medium" />
               <Scale Group="cmdGroupLines" Size="Small" />
-              <Scale Group="cmdGroupBlanks" Size="Medium" />
               <Scale Group="cmdGroupBlanks" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
@@ -722,10 +719,6 @@
             <Button CommandName="cmdUnComment" />
             <Button CommandName="cmdHeaderSource" />
           </Group>
-          <Group CommandName="cmdGroupCase" SizeDefinition="TwoButtonsWithSmall">
-            <Button CommandName="cmdUppercase" />
-            <Button CommandName="cmdLowercase" />
-          </Group>
           <Group CommandName="cmdGroupLines" SizeDefinition="FiveButtons">
             <Button CommandName="cmdLineDuplicate" />
             <Button CommandName="cmdLineUp" />
@@ -733,7 +726,7 @@
             <Button CommandName="cmdLineSplit" />
             <Button CommandName="cmdLineJoin" />
           </Group>
-          <Group CommandName="cmdGroupBlanks" SizeDefinition="FourButtons">
+          <Group CommandName="cmdGroupBlanks" SizeDefinition="SixButtons">
             <Button CommandName="cmdTrim" />
             <Button CommandName="cmdTabs2Spaces" />
             <Button CommandName="cmdSpaces2Tabs" />
@@ -744,44 +737,20 @@
                 <ToggleButton CommandName="cmdEOLMac"/>
               </MenuGroup>
             </DropDownButton>
+            <Button CommandName="cmdUppercase" />
+            <Button CommandName="cmdLowercase" />
           </Group>
         </Tab>
         <Tab CommandName="cmdViewTab">
           <Tab.ScalingPolicy>
             <ScalingPolicy>
               <ScalingPolicy.IdealSizes>
-                <Scale Group="cmdGroupVEdge" Size="Large" />
                 <Scale Group="cmdGroupView" Size="Large" />
                 <Scale Group="cmdGroupEncoding" Size="Medium" />
               </ScalingPolicy.IdealSizes>
-              <Scale Group="cmdGroupVEdge" Size="Medium" />
-              <!--<Scale Group="cmdGroupView" Size="Medium" />-->
               <Scale Group="cmdGroupEncoding" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
-          <Group CommandName="cmdGroupVEdge">
-            <SizeDefinition>
-              <ControlNameMap>
-                <ControlNameDefinition Name="button1"/>
-              </ControlNameMap>
-              <GroupSizeDefinition Size="Large">
-                <Row>
-                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="true" />
-                </Row>
-              </GroupSizeDefinition>
-              <GroupSizeDefinition Size="Medium">
-                <Row>
-                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="true" />
-                </Row>
-              </GroupSizeDefinition>
-              <GroupSizeDefinition Size="Small">
-                <Row>
-                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="true" />
-                </Row>
-              </GroupSizeDefinition>
-            </SizeDefinition>
-            <Spinner CommandName="cmdVerticalEdge" />
-          </Group>
           <Group CommandName="cmdGroupView">
             <SizeDefinition>
               <ControlNameMap>
@@ -789,6 +758,7 @@
                 <ControlNameDefinition Name="button2"/>
                 <ControlNameDefinition Name="button3"/>
                 <ControlNameDefinition Name="button4"/>
+                <ControlNameDefinition Name="button5"/>
               </ControlNameMap>
               <GroupSizeDefinition Size="Large">
                 <ControlGroup>
@@ -802,6 +772,9 @@
                 <Row>
                   <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Medium">
                 <Row>
@@ -814,6 +787,9 @@
                 <Row>
                   <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Small">
                 <Row>
@@ -823,6 +799,7 @@
                 <Row>
                   <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
                   <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="false" />
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
               </GroupSizeDefinition>
             </SizeDefinition>
@@ -830,14 +807,7 @@
             <ToggleButton CommandName="cmdWhiteSpace" />
             <Spinner CommandName="cmdTabSize" />
             <ToggleButton CommandName="cmdUseTabs" />
-          </Group>
-          <Group CommandName="cmdGroupMisc" SizeDefinition="TwoButtonsWithSmall">
-            <ToggleButton CommandName="cmdToggleTheme" />
-            <DropDownGallery CommandName="cmdLanguage" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
-              <DropDownGallery.MenuLayout>
-                <VerticalMenuLayout />
-              </DropDownGallery.MenuLayout>
-            </DropDownGallery>
+            <Spinner CommandName="cmdVerticalEdge" />
           </Group>
           <Group CommandName="cmdGroupEncoding" SizeDefinition="FourButtons">
             <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
@@ -856,6 +826,14 @@
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
             <Button CommandName="cmdStyleConfigurator" />
+          </Group>
+          <Group CommandName="cmdGroupMisc" SizeDefinition="TwoButtonsWithSmall">
+            <ToggleButton CommandName="cmdToggleTheme" />
+            <DropDownGallery CommandName="cmdLanguage" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
           </Group>
         </Tab>
       </Ribbon.Tabs>
