@@ -234,7 +234,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
 
                 LONG lastLinePos = -1;
                 COLORREF lastColor = (COLORREF)-1;
-                size_t colcount = DOCSCROLLTYPE_END;
+                int colcount = DOCSCROLLTYPE_END;
                 int width = pCustDraw->rect.right-pCustDraw->rect.left;
                 int colwidth = width / (colcount-1);
                 for (int c = 1; c < colcount; ++c)
