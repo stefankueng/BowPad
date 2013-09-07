@@ -283,7 +283,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
                 langfile += L"\\BowPad_";
                 langfile += gLanguages[selected];
                 langfile += L".lang";
-                if (!CAppUtils::HasSameMajorVersion(langfile))
+                if (!gLanguages[selected].empty() && !CAppUtils::HasSameMajorVersion(langfile))
                 {
                     DeleteFile(langfile.c_str());
 #ifdef _WIN64
