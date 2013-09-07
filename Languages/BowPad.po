@@ -105,10 +105,6 @@ msgstr ""
 msgid "BOWPAD"
 msgstr ""
 
-#. Resource IDs: (3763)
-msgid "Blank operations"
-msgstr ""
-
 #. Resource IDs: (1020)
 msgid "Bold"
 msgstr ""
@@ -131,6 +127,10 @@ msgstr ""
 
 #. Resource IDs: (8)
 msgid "Cancel\nThe file is not loaded again."
+msgstr ""
+
+#. Resource IDs: (3764)
+msgid "Char operations"
 msgstr ""
 
 #. Resource IDs: (1027)
@@ -183,6 +183,10 @@ msgstr ""
 
 #. Resource IDs: (3753)
 msgid "Closes all open files"
+msgstr ""
+
+#. Resource IDs: (3767)
+msgid "Cmd"
 msgstr ""
 
 #. Resource IDs: (8)
@@ -584,10 +588,6 @@ msgstr ""
 
 #. Resource IDs: (3768)
 msgid "Launch in Safari (Ctrl+L,S)"
-msgstr ""
-
-#. Resource IDs: (3767)
-msgid "Launch/Open"
 msgstr ""
 
 #. Resource IDs: (3756)
