@@ -21,6 +21,7 @@
 #include "UnicodeUtils.h"
 #include "StringUtils.h"
 #include "LexStyles.h"
+#include "Theme.h"
 
 static std::string sFindString;
 static int         nSearchFlags;
@@ -352,6 +353,10 @@ bool CCmdStyleConfigurator::Execute()
     if (m_pStyleConfiguratorDlg == nullptr)
         m_pStyleConfiguratorDlg = new CStyleConfiguratorDlg(m_Obj);
 
+    if (CTheme::Instance().IsDarkTheme())
+    {
+        SendMessage(GetHwnd(), WM_COMMAND, MAKEWPARAM(cmdToggleTheme, 1), 0);
+    }
     m_pStyleConfiguratorDlg->ShowModeless(hRes, IDD_STYLECONFIGURATOR, GetHwnd());
 
     return true;
