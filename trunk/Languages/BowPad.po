@@ -193,6 +193,14 @@ msgstr ""
 msgid "Color"
 msgstr ""
 
+#. Resource IDs: (1061)
+msgid "Command Line:"
+msgstr ""
+
+#. Resource IDs: (1060)
+msgid "Command Name:"
+msgstr ""
+
 #. Resource IDs: (3751, 3759)
 msgid "Comment"
 msgstr ""
@@ -211,6 +219,10 @@ msgstr ""
 
 #. Resource IDs: (3758)
 msgid "Configure colors, fonts, styles and sizes"
+msgstr ""
+
+#. Resource IDs: (3772)
+msgid "Configure custom commands"
 msgstr ""
 
 #. Resource IDs: (3756)
@@ -245,6 +257,10 @@ msgstr ""
 msgid "Copy the current selection to the clipboard"
 msgstr ""
 
+#. Resource IDs: (3772)
+msgid "Corresponding File"
+msgstr ""
+
 #. Resource IDs: (9)
 msgid "Could not download the language file!"
 msgstr ""
@@ -255,6 +271,90 @@ msgstr ""
 
 #. Resource IDs: (8)
 msgid "Ctrl+Click to open the link in the default browser"
+msgstr ""
+
+#. Resource IDs: (1049, 3770)
+msgid "Custom Command 0"
+msgstr ""
+
+#. Resource IDs: (3770)
+msgid "Custom Command 0 (Ctrl+L,0)"
+msgstr ""
+
+#. Resource IDs: (1050, 3770)
+msgid "Custom Command 1"
+msgstr ""
+
+#. Resource IDs: (3770)
+msgid "Custom Command 1 (Ctrl+L,1)"
+msgstr ""
+
+#. Resource IDs: (1051, 3770)
+msgid "Custom Command 2"
+msgstr ""
+
+#. Resource IDs: (3770)
+msgid "Custom Command 2 (Ctrl+L,2)"
+msgstr ""
+
+#. Resource IDs: (1052, 3770)
+msgid "Custom Command 3"
+msgstr ""
+
+#. Resource IDs: (3770)
+msgid "Custom Command 3 (Ctrl+L,3)"
+msgstr ""
+
+#. Resource IDs: (1053, 3771)
+msgid "Custom Command 4"
+msgstr ""
+
+#. Resource IDs: (3771)
+msgid "Custom Command 4 (Ctrl+L,4)"
+msgstr ""
+
+#. Resource IDs: (1054, 3771)
+msgid "Custom Command 5"
+msgstr ""
+
+#. Resource IDs: (3771)
+msgid "Custom Command 5 (Ctrl+L,5)"
+msgstr ""
+
+#. Resource IDs: (1055, 3771)
+msgid "Custom Command 6"
+msgstr ""
+
+#. Resource IDs: (3771)
+msgid "Custom Command 6 (Ctrl+L,6)"
+msgstr ""
+
+#. Resource IDs: (1056, 3771)
+msgid "Custom Command 7"
+msgstr ""
+
+#. Resource IDs: (3771)
+msgid "Custom Command 7 (Ctrl+L,7)"
+msgstr ""
+
+#. Resource IDs: (1057, 3772)
+msgid "Custom Command 8"
+msgstr ""
+
+#. Resource IDs: (3772)
+msgid "Custom Command 8 (Ctrl+L,8)"
+msgstr ""
+
+#. Resource IDs: (1058, 3772)
+msgid "Custom Command 9"
+msgstr ""
+
+#. Resource IDs: (3772)
+msgid "Custom Command 9 (Ctrl+L,9)"
+msgstr ""
+
+#. Resource IDs: (149)
+msgid "Custom Commands"
 msgstr ""
 
 #. Resource IDs: (3754)
@@ -358,8 +458,36 @@ msgstr ""
 msgid "File is too big to be opened by BowPad"
 msgstr ""
 
+#. Resource IDs: (3772)
+msgid "Find"
+msgstr ""
+
 #. Resource IDs: (3758)
 msgid "Find && Replace (Ctrl+F)"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "Find Next"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "Find Next (F3)"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "Find Next Selected"
+msgstr ""
+
+#. Resource IDs: (3759)
+msgid "Find Next Selected (Ctrl+F3)"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "Find Previous"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "Find Previous (Shift+F3)"
 msgstr ""
 
 #. Resource IDs: (143)
@@ -418,6 +546,50 @@ msgstr ""
 msgid "Language:"
 msgstr ""
 
+#. Resource IDs: (3768)
+msgid "Launch in Chrome"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Launch in Firefox"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Launch in Firefox (Ctrl+L,F)"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Launch in Google Chrome (Ctrl+L,C)"
+msgstr ""
+
+#. Resource IDs: (3767)
+msgid "Launch in IE"
+msgstr ""
+
+#. Resource IDs: (3767)
+msgid "Launch in Internet Explorer (Ctrl+L,I)"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Launch in Opera"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Launch in Opera (Ctrl+L,O)"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Launch in Safari"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Launch in Safari (Ctrl+L,S)"
+msgstr ""
+
+#. Resource IDs: (3767)
+msgid "Launch/Open"
+msgstr ""
+
 #. Resource IDs: (3756)
 msgid "Line Endings"
 msgstr ""
@@ -474,12 +646,12 @@ msgstr ""
 msgid "Move down"
 msgstr ""
 
-#. Resource IDs: (3762)
-msgid "Move line down"
+#. Resource IDs: (3763)
+msgid "Move line down (Alt+Cursor Down)"
 msgstr ""
 
-#. Resource IDs: (3761)
-msgid "Move line up"
+#. Resource IDs: (3762)
+msgid "Move line up (Alt+Cursor Up)"
 msgstr ""
 
 #. Resource IDs: (3765)
@@ -504,6 +676,14 @@ msgstr ""
 
 #. Resource IDs: (3762)
 msgid "Moves the selected lines upwards"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "Moves to the next match of the last search"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "Moves to the previous match of the last search"
 msgstr ""
 
 #. Resource IDs: (3752)
@@ -551,12 +731,72 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
+#. Resource IDs: (3769)
+msgid "Open Console"
+msgstr ""
+
+#. Resource IDs: (3769)
+msgid "Open Console (Ctrl+L,M)"
+msgstr ""
+
+#. Resource IDs: (3769)
+msgid "Open Explorer"
+msgstr ""
+
+#. Resource IDs: (3769)
+msgid "Open Explorer (Ctrl+L,E)"
+msgstr ""
+
 #. Resource IDs: (3752)
 msgid "Open Files (Ctrl+O)"
 msgstr ""
 
+#. Resource IDs: (3772)
+msgid "Open corresponding File (Ctrl+K,O)"
+msgstr ""
+
 #. Resource IDs: (3752)
 msgid "Opens one or more files"
+msgstr ""
+
+#. Resource IDs: (3769)
+msgid "Opens the Console at the current file location"
+msgstr ""
+
+#. Resource IDs: (3769)
+msgid "Opens the Windows Explorer at the current file location"
+msgstr ""
+
+#. Resource IDs: (3772)
+msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
+msgstr ""
+
+#. Resource IDs: (3767)
+msgid "Opens the current file in Microsoft Internet Explorer"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Firefox browser"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Google Chrome browser"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Opera browser"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Safari browser"
+msgstr ""
+
+#. Resource IDs: (3769)
+msgid "Opens the default browser to search Wikipedia for the selected text"
+msgstr ""
+
+#. Resource IDs: (3769)
+msgid "Opens the default browser to search for the selected text"
 msgstr ""
 
 #. Resource IDs: (3763)
@@ -687,8 +927,28 @@ msgstr ""
 msgid "Search Regex mode"
 msgstr ""
 
+#. Resource IDs: (3769)
+msgid "Search Web"
+msgstr ""
+
+#. Resource IDs: (3769)
+msgid "Search Web (Ctrl+L,W)"
+msgstr ""
+
+#. Resource IDs: (3769)
+msgid "Search Wikipedia"
+msgstr ""
+
+#. Resource IDs: (3769)
+msgid "Search Wikipedia (Ctrl+L,P)"
+msgstr ""
+
 #. Resource IDs: (3758)
 msgid "Search and/or replace text in documents/tabs"
+msgstr ""
+
+#. Resource IDs: (3759)
+msgid "Searches for the next match of the selected text"
 msgstr ""
 
 #. Resource IDs: (3766)
@@ -729,6 +989,10 @@ msgstr ""
 
 #. Resource IDs: (3755)
 msgid "Show Whitespaces (Ctrl+R,W)"
+msgstr ""
+
+#. Resource IDs: (3772)
+msgid "Shows a dialog to configure custom commands"
 msgstr ""
 
 #. Resource IDs: (3764)
@@ -862,6 +1126,10 @@ msgstr ""
 msgid "Visit our Website"
 msgstr ""
 
+#. Resource IDs: (1059)
+msgid "Web Search:"
+msgstr ""
+
 #. Resource IDs: (3755)
 msgid "Whitespace"
 msgstr ""
@@ -880,6 +1148,10 @@ msgstr ""
 
 #. Resource IDs: (3755)
 msgid "Wrap lines at the end of the window"
+msgstr ""
+
+#. Resource IDs: (9)
+msgid "You can use the following strings in the command line:\r\n$(LINE)\t\t\tThe line where the cursor is\r\n$(POS)\t\t\tthe position where the cursor is\r\n$(TAB_PATH)\t\tthe path to the file of the active tab\r\n$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
 msgstr ""
 
 #. Resource IDs: (65535)
@@ -901,6 +1173,46 @@ msgstr ""
 
 #. Resource IDs: (3757)
 msgid "go to the previous cursor position"
+msgstr ""
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 0"
+msgstr ""
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 1"
+msgstr ""
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 2"
+msgstr ""
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 3"
+msgstr ""
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 4"
+msgstr ""
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 5"
+msgstr ""
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 6"
+msgstr ""
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 7"
+msgstr ""
+
+#. Resource IDs: (3772)
+msgid "runs the custom command 8"
+msgstr ""
+
+#. Resource IDs: (3772)
+msgid "runs the custom command 9"
 msgstr ""
 
 #. Resource IDs: (3760)
