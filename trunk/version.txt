@@ -1,5 +1,5 @@
-1.0.0.0
-http://grepwin.googlecode.com/files/grepWin-1.6.1-64.msi
-grepWin-1.6.1-64.msi
-http://grepwin.googlecode.com/files/grepWin-1.6.1.msi
-grepWin-1.6.1.msi
+1.0.1.362
+https://downloads.sourceforge.net/project/stefanstools/BowPad/BowPad64-1.0.1.msi?r=&ts=1378666715&use_mirror=master
+BowPad64-1.0.1.msi
+https://downloads.sourceforge.net/project/stefanstools/BowPad/BowPad-1.0.1.msi?r=&ts=1378666666&use_mirror=master
+BowPad-1.0.1.msi
