@@ -179,6 +179,7 @@ std::wstring CAppUtils::GetDataPath(HMODULE hMod)
                 datapath = outpath;
                 datapath += L"\\BowPad";
                 datapath = CPathUtils::GetLongPathname(datapath);
+                CreateDirectory(datapath.c_str(), NULL);
                 CoTaskMemFree(outpath);
             }
         }
