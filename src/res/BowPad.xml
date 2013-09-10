@@ -265,7 +265,7 @@
         <Image>res/StyleConfigS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdVerticalEdge" LabelTitle="Edge Column" TooltipTitle="Edge Column" TooltipDescription="Sets the column at which the vertical edge is shown. Set to 0 to hide it.">
+    <Command Name="cmdVerticalEdge" LabelTitle="Right margin" TooltipTitle="Right margin" TooltipDescription="Sets the column at which the vertical edge is shown, indicating the right margin. Set to 0 to hide it.">
       <Command.LargeImages>
         <Image>res/VEdgeL.bmp</Image>
       </Command.LargeImages>
