@@ -57,7 +57,7 @@
         <Image>res/VEdgeL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdGroupComment" LabelTitle="Comment">
+    <Command Name="cmdGroupComment" LabelTitle="Code">
       <Command.LargeImages>
         <Image>res/CommentL.bmp</Image>
       </Command.LargeImages>
