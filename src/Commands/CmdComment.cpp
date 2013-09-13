@@ -199,7 +199,7 @@ bool CCmdUnComment::Execute()
         range.chrg.cpMax = long(pos + commentline.length());
         range.lpstrText = strbuf.get();
         ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&range);
-        if (_stricmp(commentline.c_str(), strbuf.get())==0)
+        if (!commentline.empty() && (_stricmp(commentline.c_str(), strbuf.get())==0))
         {
             ScintillaCall(SCI_SETSEL, range.chrg.cpMin, range.chrg.cpMax);
             ScintillaCall(SCI_REPLACESEL, 0, (sptr_t)"");
