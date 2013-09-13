@@ -31,6 +31,7 @@ bool CCmdComment::Execute()
     size_t selEnd           = ScintillaCall(SCI_GETSELECTIONEND);
     size_t linestart        = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
     size_t lineend          = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    size_t curPos           = ScintillaCall(SCI_GETCURRENTPOS);
     if (!bSelEmpty)
     {
         if (ScintillaCall(SCI_POSITIONFROMLINE, lineend) == (sptr_t)selEnd)
@@ -45,7 +46,6 @@ bool CCmdComment::Execute()
     }
     else
     {
-        size_t curPos   = ScintillaCall(SCI_GETCURRENTPOS);
         selStart        = ScintillaCall(SCI_GETLINEINDENTPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
         selEnd          = ScintillaCall(SCI_GETLINEENDPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
         lineStartStart  = ScintillaCall(SCI_GETLINEINDENTPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
@@ -72,14 +72,20 @@ bool CCmdComment::Execute()
         }
         // now insert the comment marker at the leftmost indentation on every line
         ScintillaCall(SCI_BEGINUNDOACTION);
+        size_t insertedchars = 0;
         for (size_t line = linestart; line <= lineend; ++line)
         {
             size_t pos = ScintillaCall(SCI_POSITIONFROMLINE, line);
             if (!commentlineatstart)
                 pos += indent;
             ScintillaCall(SCI_INSERTTEXT, pos, (sptr_t)commentline.c_str());
+            insertedchars += commentline.length();
         }
         ScintillaCall(SCI_ENDUNDOACTION);
+        if (!bSelEmpty)
+            ScintillaCall(SCI_SETSEL, selStart, selEnd+insertedchars);
+        else
+            ScintillaCall(SCI_SETSEL, curPos+insertedchars, curPos+insertedchars);
     }
     else if (!commentstreamstart.empty())
     {
@@ -88,6 +94,10 @@ bool CCmdComment::Execute()
         ScintillaCall(SCI_INSERTTEXT, selStart, (sptr_t)commentstreamstart.c_str());
         ScintillaCall(SCI_INSERTTEXT, selEnd + commentstreamstart.length(), (sptr_t)commentstreamend.c_str());
         ScintillaCall(SCI_ENDUNDOACTION);
+        if (!bSelEmpty)
+            ScintillaCall(SCI_SETSEL, selStart + commentstreamstart.length(), selEnd + commentstreamstart.length());
+        else
+            ScintillaCall(SCI_SETSEL, curPos + commentstreamstart.length(), curPos + commentstreamstart.length());
     }
 
     return true;
@@ -156,6 +166,7 @@ bool CCmdUnComment::Execute()
                 ScintillaCall(SCI_SETSEL, rangeend.chrg.cpMin - commentstreamstart.length(), rangeend.chrg.cpMax - commentstreamstart.length());
                 ScintillaCall(SCI_REPLACESEL, 0, (sptr_t)"");
                 ScintillaCall(SCI_ENDUNDOACTION);
+                ScintillaCall(SCI_SETSEL, selStart - commentstreamstart.length(), selEnd - commentstreamstart.length() + selEndCorr);
                 bRemovedStream = true;
             }
         }
@@ -169,6 +180,7 @@ bool CCmdUnComment::Execute()
                 size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
                 size_t lineend   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
                 ScintillaCall(SCI_BEGINUNDOACTION);
+                size_t removedchars = 0;
                 for (size_t line = linestart; line <= lineend; ++line)
                 {
                     size_t pos = ScintillaCall(SCI_GETLINEINDENTPOSITION, line);
@@ -181,9 +193,11 @@ bool CCmdUnComment::Execute()
                     {
                         ScintillaCall(SCI_SETSEL, range.chrg.cpMin, range.chrg.cpMax);
                         ScintillaCall(SCI_REPLACESEL, 0, (sptr_t)"");
+                        removedchars += commentline.length();
                     }
                 }
                 ScintillaCall(SCI_ENDUNDOACTION);
+                ScintillaCall(SCI_SETSEL, selStart, selEnd-removedchars+selEndCorr);
             }
         }
     }
@@ -203,6 +217,7 @@ bool CCmdUnComment::Execute()
         {
             ScintillaCall(SCI_SETSEL, range.chrg.cpMin, range.chrg.cpMax);
             ScintillaCall(SCI_REPLACESEL, 0, (sptr_t)"");
+            ScintillaCall(SCI_SETSEL, curPos-commentline.length(), curPos-commentline.length());
         }
         else if (!commentstreamstart.empty() && !commentstreamend.empty())
         {
@@ -233,6 +248,7 @@ bool CCmdUnComment::Execute()
                         ScintillaCall(SCI_REPLACESEL, 0, (sptr_t)"");
                         ScintillaCall(SCI_SETSEL, findRet, findRet + commentstreamstart.length());
                         ScintillaCall(SCI_REPLACESEL, 0, (sptr_t)"");
+                        ScintillaCall(SCI_SETSEL, curPos-commentstreamstart.length(), curPos-commentstreamstart.length());
                     }
                 }
             }
