@@ -703,6 +703,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         PostQuitMessage(0);
         break;
     case WM_CLOSE:
+        CCommandHandler::Instance().OnClose();
         CIniSettings::Instance().SaveWindowPos(L"MainWindow", *this);
         if (CloseAllTabs())
             ::DestroyWindow(m_hwnd);

@@ -33,6 +33,7 @@ public:
     ICommand *                      GetCommand(UINT cmdId);
     void                            ScintillaNotify( Scintilla::SCNotification * pScn );
     void                            TabNotify( TBHDR * ptbhdr );
+    void                            OnClose();
 private:
     std::map<UINT, ICommand*>       m_commands;
 };

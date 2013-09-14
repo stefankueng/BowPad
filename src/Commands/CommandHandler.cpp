@@ -258,3 +258,11 @@ void CCommandHandler::TabNotify( TBHDR * ptbhdr )
         cmd.second->TabNotify(ptbhdr);
     }
 }
+
+void CCommandHandler::OnClose()
+{
+    for (auto cmd:m_commands)
+    {
+        cmd.second->OnClose();
+    }
+}
