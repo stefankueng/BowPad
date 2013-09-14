@@ -252,6 +252,9 @@
     <ClInclude Include="..\ext\sktoolslib\EscapeUtils.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdSession.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

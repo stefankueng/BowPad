@@ -258,6 +258,7 @@
     <ClInclude Include="Commands\CmdPrint.h" />
     <ClInclude Include="Commands\CmdRandom.h" />
     <ClInclude Include="Commands\CmdSelectTab.h" />
+    <ClInclude Include="Commands\CmdSession.h" />
     <ClInclude Include="Commands\CmdStyleConfigurator.h" />
     <ClInclude Include="Commands\CmdUndo.h" />
     <ClInclude Include="Commands\CmdVerticalEdge.h" />
