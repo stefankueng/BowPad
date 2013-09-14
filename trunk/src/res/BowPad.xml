@@ -394,7 +394,7 @@
       </Command.LargeImages>
     </Command>
 
-    <Command Name="cmdReload" LabelTitle="Reload" TooltipTitle="Reload (F5)" TooltipDescription="Reload the file from disk">
+    <Command Name="cmdReload" LabelTitle="RestoreSavedSession" TooltipTitle="RestoreSavedSession (F5)" TooltipDescription="RestoreSavedSession the file from disk">
       <Command.LargeImages>
         <Image>res/RefreshL.bmp</Image>
       </Command.LargeImages>
@@ -561,6 +561,23 @@
       </Command.LargeImages>
     </Command>
 
+    <Command Name="cmdSessionLoad" LabelTitle="Load session" TooltipTitle="Load last session" TooltipDescription="Loads all files that were open the last time BowPad got closed">
+      <Command.LargeImages>
+        <Image>res/SessionLoadL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/SessionLoadS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdSessionAutoLoad" LabelTitle="Load session on start" TooltipTitle="Load last session on start" TooltipDescription="Loads all files automatically that were open the last time BowPad got closed">
+      <Command.LargeImages>
+        <Image>res/SessionAutoL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/SessionAutoS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+
 
     <Command Name="cmdGroupFind" LabelTitle="Find" />
 
@@ -580,6 +597,7 @@
         <Image>res/HeaderSourceL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdSessionLast" Id="10010" />
 
     <Command Name="cmdTesting" Id="20000" />
   </Application.Commands>
@@ -642,7 +660,7 @@
               <Scale Group="cmdGroupBlanks" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
-          <Group CommandName="cmdGroupFile" SizeDefinition="FiveButtons">
+          <Group CommandName="cmdGroupFile" SizeDefinition="SevenButtons">
             <SplitButton CommandName="cmdGroupPrint">
               <SplitButton.ButtonItem>
                 <Button CommandName="cmdPrintNow"/>
@@ -655,6 +673,8 @@
             <Button CommandName="cmdNew" />
             <Button CommandName="cmdSave" />
             <Button CommandName="cmdSaveAll" />
+            <Button CommandName="cmdSessionLoad" />
+            <ToggleButton CommandName="cmdSessionAutoLoad" />
           </Group>
           <Group CommandName="cmdGroupClipboard" SizeDefinition="ThreeButtons-OneBigAndTwoSmall">
             <Button CommandName="cmdPaste" />

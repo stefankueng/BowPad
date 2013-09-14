@@ -44,6 +44,7 @@
 #include "CmdLanguage.h"
 #include "CmdHeaderSource.h"
 #include "CmdLaunch.h"
+#include "CmdSession.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -77,6 +78,9 @@ void CCommandHandler::Init( void * obj )
 {
     ICommand * pCmd = new CCmdMRU(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdToggleTheme(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
     pCmd = new CCmdOpen(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdSave(obj);
@@ -92,6 +96,12 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdPrintNow(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdPageSetup(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdSessionLoad(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdSessionAutoLoad(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdSessionRestoreLast(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdUndo(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
@@ -118,8 +128,6 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdWhiteSpace(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdUseTabs(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdToggleTheme(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdLanguage(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
