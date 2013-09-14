@@ -642,7 +642,7 @@
               <Scale Group="cmdGroupBlanks" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
-          <Group CommandName="cmdGroupFile" SizeDefinition="FourButtons">
+          <Group CommandName="cmdGroupFile" SizeDefinition="FiveButtons">
             <SplitButton CommandName="cmdGroupPrint">
               <SplitButton.ButtonItem>
                 <Button CommandName="cmdPrintNow"/>
@@ -651,6 +651,7 @@
               <Button CommandName="cmdPrintNow"/>
               <Button CommandName="cmdPrint" />
             </SplitButton>
+            <Button CommandName="cmdOpen" />
             <Button CommandName="cmdNew" />
             <Button CommandName="cmdSave" />
             <Button CommandName="cmdSaveAll" />
