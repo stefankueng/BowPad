@@ -298,6 +298,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 if (bNewer)
                     PostMessage(m_hwnd, WM_UPDATEAVAILABLE, 0, 0);
             });
+            PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
         }
         break;
     case WM_COMMAND:
@@ -388,7 +389,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         }
         break;
     case WM_UPDATEAVAILABLE:
-            CAppUtils::ShowUpdateAvailableDialog(*this);
+        CAppUtils::ShowUpdateAvailableDialog(*this);
+        break;
+    case WM_AFTERINIT:
+        CCommandHandler::Instance().AfterInit();
         break;
     case WM_NOTIFY:
         {

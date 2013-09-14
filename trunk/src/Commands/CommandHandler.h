@@ -35,6 +35,7 @@ public:
     void                            TabNotify( TBHDR * ptbhdr );
     void                            OnClose();
     void                            OnDocumentClose(int index);
+    void                            AfterInit();
 private:
     std::map<UINT, ICommand*>       m_commands;
 };
