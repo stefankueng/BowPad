@@ -35,6 +35,7 @@ public:
     virtual void        ScintillaNotify(Scintilla::SCNotification * pScn);
     virtual void        TabNotify(TBHDR * ptbhdr);
     virtual void        OnClose();
+    virtual void        OnDocumentClose(int index);
     virtual HRESULT     IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue);
     virtual HRESULT     IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties);
 
