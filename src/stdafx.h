@@ -50,4 +50,5 @@
 #define CD_COMMAND_LINE 101
 
 #define WM_UPDATEAVAILABLE (WM_APP + 10)
+#define WM_AFTERINIT       (WM_APP + 11)
 

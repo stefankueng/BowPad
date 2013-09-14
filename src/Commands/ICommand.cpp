@@ -48,6 +48,10 @@ void ICommand::OnClose()
 {
 }
 
+void ICommand::AfterInit()
+{
+}
+
 void ICommand::OnDocumentClose( int /*index*/ )
 {
 }
