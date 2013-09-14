@@ -619,6 +619,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             m_scintilla.Call(SCI_GETTEXTRANGE, 0, (sptr_t)&tr);
 
                             std::string sWord = tr.lpstrText;
+                            m_scintilla.Call(SCI_SETCHARSDEFAULT);
                             if (!sWord.empty())
                             {
                                 if ((sWord[0] == '#') &&
@@ -634,12 +635,18 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                         char dig[2] = {0};
                                         dig[0] = sWord[1];
                                         int red = strtol(dig, &endptr, 16);
+                                        if (endptr != &dig[1])
+                                            break;
                                         red = red * 16 + red;
                                         dig[0] = sWord[2];
                                         int green = strtol(dig, &endptr, 16);
+                                        if (endptr != &dig[1])
+                                            break;
                                         green = green * 16 + green;
                                         dig[0] = sWord[3];
                                         int blue = strtol(dig, &endptr, 16);
+                                        if (endptr != &dig[1])
+                                            break;
                                         blue = blue * 16 + blue;
                                         color = RGB(red, green, blue);
                                         hexval = (RGB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF)) | (color & 0xFF000000);
@@ -649,6 +656,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                         // normal/long form
                                         char * endptr = nullptr;
                                         hexval = strtol(&sWord[1], &endptr, 16);
+                                        if (endptr != &sWord[6])
+                                            break;
                                         color = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
                                     }
                                     std::string sCallTip = CStringUtils::Format("RGB(%d,%d,%d)\nHex: #%06lX\n####################\n####################\n####################", GetRValue(color), GetGValue(color), GetBValue(color), hexval);
@@ -670,7 +679,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                     }
                                 }
                             }
-                            m_scintilla.Call(SCI_SETCHARSDEFAULT);
                         }
                     }
                     break;
