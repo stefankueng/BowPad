@@ -44,6 +44,10 @@ void ICommand::TabNotify( TBHDR * /*ptbhdr*/ )
 {
 }
 
+void ICommand::OnClose()
+{
+}
+
 void ICommand::TabActivateAt( int index )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
