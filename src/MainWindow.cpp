@@ -1024,6 +1024,8 @@ bool CMainWindow::CloseTab( int tab )
     if ((m_TabBar.GetItemCount() == 1)&&(m_scintilla.Call(SCI_GETTEXTLENGTH)==0)&&(m_scintilla.Call(SCI_GETMODIFY)==0)&&doc.m_path.empty())
         return true;  // leave the empty, new document as is
 
+    CCommandHandler::Instance().OnDocumentClose(tab);
+
     m_DocManager.RemoveDocument(tab);
     m_TabBar.DeletItemAt(tab);
     EnsureAtLeastOneTab();

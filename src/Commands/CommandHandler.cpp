@@ -266,3 +266,11 @@ void CCommandHandler::OnClose()
         cmd.second->OnClose();
     }
 }
+
+void CCommandHandler::OnDocumentClose(int index)
+{
+    for (auto cmd:m_commands)
+    {
+        cmd.second->OnDocumentClose(index);
+    }
+}

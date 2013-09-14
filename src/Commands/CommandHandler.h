@@ -34,6 +34,7 @@ public:
     void                            ScintillaNotify( Scintilla::SCNotification * pScn );
     void                            TabNotify( TBHDR * ptbhdr );
     void                            OnClose();
+    void                            OnDocumentClose(int index);
 private:
     std::map<UINT, ICommand*>       m_commands;
 };
