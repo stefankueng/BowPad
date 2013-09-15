@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2013-09-07 14:15+0100\n"
+"PO-Revision-Date: 2013-09-15 13:28+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: German\n"
@@ -197,6 +197,10 @@ msgstr "Schliesse alle offenen Dateien"
 #. Resource IDs: (3767)
 msgid "Cmd"
 msgstr "Cmd"
+
+#. Resource IDs: (3751)
+msgid "Code"
+msgstr "Code"
 
 #. Resource IDs: (8)
 msgid "Codepages/Character sets"
@@ -454,10 +458,6 @@ msgstr "Dupliziert die aktuelle Zeile"
 msgid "E&xit"
 msgstr "Be&enden"
 
-#. Resource IDs: (3758)
-msgid "Edge Column"
-msgstr "Markierung Spalte"
-
 #. Resource IDs: (3751)
 msgid "Edit"
 msgstr "Verändern"
@@ -641,6 +641,33 @@ msgstr "Zeilen"
 #. Resource IDs: (3756)
 msgid "Load as"
 msgstr "Lade als"
+
+#. Resource IDs: (3772)
+msgid "Load last session"
+msgstr "Lade letzte Sitzung"
+
+#. Resource IDs: (3773)
+msgid "Load last session on start"
+msgstr "Lade letzte Sitzung beim Start"
+
+#. Resource IDs: (3772)
+msgid "Load session"
+msgstr "Lade Sitzung"
+
+#. Resource IDs: (3773)
+msgid "Load session on start"
+msgstr "Lade Sitzung bei Start"
+
+#. Resource IDs: (3773)
+msgid ""
+"Loads all files automatically that were open the last time BowPad got closed"
+msgstr ""
+"Lade alle Dateien automatisch beim Start von BowPad welche offen waren als "
+"BowPad das letzte Mal beendet wurde"
+
+#. Resource IDs: (3772)
+msgid "Loads all files that were open the last time BowPad got closed"
+msgstr "Lade alle Dateien welche beim letzten Beenden von BowPad offen waren"
 
 #. Resource IDs: (3760)
 msgid "Lowercase"
@@ -903,11 +930,11 @@ msgstr "Wiederholen (Ctrl+Y)"
 msgid "Redo what was undone before"
 msgstr "Wiederholen was Rückgängig gemacht wurde"
 
-#. Resource IDs: (3764)
+#. Resource IDs: (3765)
 msgid "Reload"
 msgstr "Neu laden"
 
-#. Resource IDs: (3764)
+#. Resource IDs: (3765)
 msgid "Reload (F5)"
 msgstr "Neu laden (F5)"
 
@@ -927,7 +954,7 @@ msgstr ""
 "Dokument neu laden\n"
 "Nicht gespeicherte Änderungen gehen verloren."
 
-#. Resource IDs: (3764)
+#. Resource IDs: (3765)
 msgid "Reload the file from disk"
 msgstr "Datei von Medium neu laden"
 
@@ -942,6 +969,10 @@ msgstr "Entfernt Leerzeichen am Ende von Zeilen"
 #. Resource IDs: (1004)
 msgid "Replace &All"
 msgstr "&Alle ersetzen"
+
+#. Resource IDs: (3759)
+msgid "Right margin"
+msgstr "Rechter Rand"
 
 #. Resource IDs: (3752)
 msgid "Save"
@@ -1041,10 +1072,11 @@ msgstr "Bestimmt die Druckränder, Seitengrösse und Orientierung"
 
 #. Resource IDs: (3759)
 msgid ""
-"Sets the column at which the vertical edge is shown. Set to 0 to hide it."
+"Sets the column at which the vertical edge is shown, indicating the right "
+"margin. Set to 0 to hide it."
 msgstr ""
-"Bestimmt die Spalte an welcher eine Vertikale Linie angezeigt wird. Zum "
-"nicht-Anzeigen der Linie auf 0 setzen."
+"Bestimmt die Spalte an welcher eine Vertikale Linie als rechter Rand "
+"angezeigt wird. Zum nicht-Anzeigen der Linie auf 0 setzen."
 
 #. Resource IDs: (3755)
 msgid "Show Whitespaces (Ctrl+R,W)"
@@ -1295,6 +1327,9 @@ msgstr "Führt den Benutzerbefehl 9 aus"
 #. Resource IDs: (3760)
 msgid "tab size"
 msgstr "Tabulatorgrösse"
+
+#~ msgid "Edge Column"
+#~ msgstr "Markierung Spalte"
 
 #~ msgid "Launch/Open"
 #~ msgstr "Ausführen"

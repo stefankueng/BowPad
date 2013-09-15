@@ -189,6 +189,10 @@ msgstr ""
 msgid "Cmd"
 msgstr ""
 
+#. Resource IDs: (3751)
+msgid "Code"
+msgstr ""
+
 #. Resource IDs: (8)
 msgid "Codepages/Character sets"
 msgstr ""
@@ -426,10 +430,6 @@ msgstr ""
 msgid "E&xit"
 msgstr ""
 
-#. Resource IDs: (3758)
-msgid "Edge Column"
-msgstr ""
-
 #. Resource IDs: (3751)
 msgid "Edit"
 msgstr ""
@@ -604,6 +604,30 @@ msgstr ""
 
 #. Resource IDs: (3756)
 msgid "Load as"
+msgstr ""
+
+#. Resource IDs: (3772)
+msgid "Load last session"
+msgstr ""
+
+#. Resource IDs: (3773)
+msgid "Load last session on start"
+msgstr ""
+
+#. Resource IDs: (3772)
+msgid "Load session"
+msgstr ""
+
+#. Resource IDs: (3773)
+msgid "Load session on start"
+msgstr ""
+
+#. Resource IDs: (3773)
+msgid "Loads all files automatically that were open the last time BowPad got closed"
+msgstr ""
+
+#. Resource IDs: (3772)
+msgid "Loads all files that were open the last time BowPad got closed"
 msgstr ""
 
 #. Resource IDs: (3760)
@@ -859,11 +883,11 @@ msgstr ""
 msgid "Redo what was undone before"
 msgstr ""
 
-#. Resource IDs: (3764)
+#. Resource IDs: (3765)
 msgid "Reload"
 msgstr ""
 
-#. Resource IDs: (3764)
+#. Resource IDs: (3765)
 msgid "Reload (F5)"
 msgstr ""
 
@@ -875,7 +899,7 @@ msgstr ""
 msgid "Reload document\nThe unsaved modifications are lost."
 msgstr ""
 
-#. Resource IDs: (3764)
+#. Resource IDs: (3765)
 msgid "Reload the file from disk"
 msgstr ""
 
@@ -889,6 +913,10 @@ msgstr ""
 
 #. Resource IDs: (1004)
 msgid "Replace &All"
+msgstr ""
+
+#. Resource IDs: (3759)
+msgid "Right margin"
 msgstr ""
 
 #. Resource IDs: (3752)
@@ -984,7 +1012,7 @@ msgid "Set up print margins, page size, page orientation"
 msgstr ""
 
 #. Resource IDs: (3759)
-msgid "Sets the column at which the vertical edge is shown. Set to 0 to hide it."
+msgid "Sets the column at which the vertical edge is shown, indicating the right margin. Set to 0 to hide it."
 msgstr ""
 
 #. Resource IDs: (3755)
