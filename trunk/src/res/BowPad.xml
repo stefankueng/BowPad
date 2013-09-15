@@ -394,7 +394,7 @@
       </Command.LargeImages>
     </Command>
 
-    <Command Name="cmdReload" LabelTitle="RestoreSavedSession" TooltipTitle="RestoreSavedSession (F5)" TooltipDescription="RestoreSavedSession the file from disk">
+    <Command Name="cmdReload" LabelTitle="Reload" TooltipTitle="Reload (F5)" TooltipDescription="Reload the file from disk">
       <Command.LargeImages>
         <Image>res/RefreshL.bmp</Image>
       </Command.LargeImages>
