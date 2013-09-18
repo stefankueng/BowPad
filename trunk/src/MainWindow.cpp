@@ -660,7 +660,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                         // normal/long form
                                         char * endptr = nullptr;
                                         hexval = strtol(&sWord[1], &endptr, 16);
-                                        if (endptr != &sWord[6])
+                                        if (endptr != &sWord[7])
                                             break;
                                         color = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
                                     }
