@@ -31,6 +31,8 @@ protected:
     LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT                 DoCommand(int id, int msg);
 
+    void                    SetInfoText(UINT resid);
+
     virtual bool Execute() { return true; }
     virtual UINT GetCmdId() { return 0; }
 
