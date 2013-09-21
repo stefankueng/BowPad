@@ -108,7 +108,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
         {
             int index = (int)SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_GETCURSEL, 0, 0);
             auto languages = CLexStyles::Instance().GetLanguages();
-            if ((index >= 0) && (index < languages.size()))
+            if ((index >= 0) && (index < (int)languages.size()))
             {
                 std::wstring currentLang = languages[index];
                 CDocument doc = GetDocument(GetCurrentTabIndex());
@@ -161,7 +161,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
             {
                 int index = (int)SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_GETCURSEL, 0, 0);
                 auto languages = CLexStyles::Instance().GetLanguages();
-                if ((index >= 0) && (index < languages.size()))
+                if ((index >= 0) && (index < (int)languages.size()))
                 {
                     std::wstring currentLang = languages[index];
                     auto lexData = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(currentLang));
@@ -189,7 +189,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
             {
                 int index = (int)SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_GETCURSEL, 0, 0);
                 auto languages = CLexStyles::Instance().GetLanguages();
-                if ((index >= 0) && (index < languages.size()))
+                if ((index >= 0) && (index < (int)languages.size()))
                 {
                     auto lexData = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(languages[index]));
                     index = (int)SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_GETCURSEL, 0, 0);
@@ -226,7 +226,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
         {
             int index = (int)SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_GETCURSEL, 0, 0);
             auto languages = CLexStyles::Instance().GetLanguages();
-            if ((index >= 0) && (index < languages.size()))
+            if ((index >= 0) && (index < (int)languages.size()))
             {
                 std::wstring currentLang = languages[index];
                 auto lexData = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(currentLang));
@@ -253,7 +253,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         if (msg == CBN_SELCHANGE)
                         {
                             int selInd = (int)SendDlgItemMessage(*this, IDC_FONTCOMBO, CB_GETCURSEL, 0, 0);
-                            if ((selInd >= 0) && (selInd < m_fonts.size()))
+                            if ((selInd >= 0) && (selInd < (int)m_fonts.size()))
                             {
                                 std::wstring font = m_fonts[selInd];
                                 CLexStyles::Instance().SetUserFont(lexData.ID, styleIndex, font);

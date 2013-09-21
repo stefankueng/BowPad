@@ -206,7 +206,7 @@ bool CCmdSpaces2Tabs::Execute()
         if ((*pBuf == ' ') || (*pBuf == '\t'))
         {
             spacecount++;
-            if ((spacecount == tabsize) || ((*pBuf == '\t') && (spacecount > 1)))
+            if ((spacecount == (size_t)tabsize) || ((*pBuf == '\t') && (spacecount > 1)))
             {
                 spacegrouppositions.push_back(pos - spacecount + 1);
                 count += (spacecount - 1);
@@ -236,13 +236,13 @@ bool CCmdSpaces2Tabs::Execute()
             {
                 *pBuf++ = '\t';
                 spacecount = 0;
-                while ((spacecount < tabsize) && (*pOldBuf == ' '))
+                while ((spacecount < (size_t)tabsize) && (*pOldBuf == ' '))
                 {
                     i++;
                     spacecount++;
                     pOldBuf++;
                 }
-                if ((spacecount < tabsize) && (*pOldBuf == '\t'))
+                if ((spacecount < (size_t)tabsize) && (*pOldBuf == '\t'))
                     pBuf--;
                 --i;
                 ++it;
