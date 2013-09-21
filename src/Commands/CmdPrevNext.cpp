@@ -56,7 +56,7 @@ void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification * pScn )
         {
             if (ignore)
                 return;
-            if (offsetBeforeEnd >= positions.size())
+            if (offsetBeforeEnd >= (int)positions.size())
                 offsetBeforeEnd = 0;
             size_t line = ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
             if ((currentDocIndex < 0) || (currentline == -1))
@@ -182,7 +182,7 @@ bool CCmdPrevious::Execute()
     PositionData data;
     for (auto it = positions.crbegin(); it != positions.crend(); ++it)
     {
-        if (i == offsetBeforeEnd)
+        if (i == (size_t)offsetBeforeEnd)
         {
             data = *it;
             break;
@@ -217,7 +217,7 @@ HRESULT CCmdPrevious::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
     // enabled if there's something to go back to
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, positions.size() > offsetBeforeEnd, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, positions.size() > (size_t)offsetBeforeEnd, ppropvarNewValue);
     }
     return E_NOTIMPL;
 }
@@ -231,7 +231,7 @@ bool CCmdNext::Execute()
     --offsetBeforeEnd;
     for (auto it = positions.crbegin(); it != positions.crend(); ++it)
     {
-        if (i == offsetBeforeEnd)
+        if (i == (size_t)offsetBeforeEnd)
         {
             data = *it;
             break;

@@ -104,12 +104,12 @@ protected:
             if (OpenFile(path.c_str()))
             {
                 CDocument doc = GetDocument(GetCurrentTabIndex());
-                doc.m_position.m_nSelMode           = CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"selmode%d", i).c_str(), 0);
-                doc.m_position.m_nStartPos          = CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"startpos%d", i).c_str(), 0);
-                doc.m_position.m_nEndPos            = CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"endpos%d", i).c_str(), 0);
-                doc.m_position.m_nScrollWidth       = CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"scrollwidth%d", i).c_str(), 0);
-                doc.m_position.m_xOffset            = CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"xoffset%d", i).c_str(), 0);
-                doc.m_position.m_nFirstVisibleLine  = CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"firstvisible%d", i).c_str(), 0);
+                doc.m_position.m_nSelMode           = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"selmode%d", i).c_str(), 0);
+                doc.m_position.m_nStartPos          = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"startpos%d", i).c_str(), 0);
+                doc.m_position.m_nEndPos            = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"endpos%d", i).c_str(), 0);
+                doc.m_position.m_nScrollWidth       = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"scrollwidth%d", i).c_str(), 0);
+                doc.m_position.m_xOffset            = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"xoffset%d", i).c_str(), 0);
+                doc.m_position.m_nFirstVisibleLine  = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"firstvisible%d", i).c_str(), 0);
                 SetDocument(GetCurrentTabIndex(), doc);
 
                 ScintillaCall(SCI_GOTOPOS, 0);

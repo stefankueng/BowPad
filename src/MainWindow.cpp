@@ -409,7 +409,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     if (hWin == m_TabBar)
                     {
                         LPNMTTDISPINFO lpnmtdi = (LPNMTTDISPINFO)lParam;
-                        if (pNMHDR->idFrom < m_DocManager.GetCount())
+                        if (pNMHDR->idFrom < (UINT_PTR)m_DocManager.GetCount())
                         {
                             CDocument doc = m_DocManager.GetDocument((int)pNMHDR->idFrom);
                             m_tooltipbuffer = std::unique_ptr<wchar_t[]>(new wchar_t[doc.m_path.size()+1]);

@@ -168,7 +168,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
             else
                 SendDlgItemMessage(*this, IDC_SEARCHCOMBO, CB_INSERTSTRING, 0, (LPARAM)CUnicodeUtils::StdGetUnicode(sFindString).c_str());
             m_searchStrings.push_front(sFindStringW);
-            while (m_searchStrings.size() >= maxSearch)
+            while (m_searchStrings.size() >= (size_t)maxSearch)
                 m_searchStrings.pop_back();
 
             int i = 0;
@@ -238,7 +238,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
             else
                 SendDlgItemMessage(*this, IDC_SEARCHCOMBO, CB_INSERTSTRING, 0, (LPARAM)sFindStringW.c_str());
             m_searchStrings.push_front(sFindStringW);
-            while (m_searchStrings.size() >= maxSearch)
+            while (m_searchStrings.size() >= (size_t)maxSearch)
                 m_searchStrings.pop_back();
 
             int i = 0;
@@ -257,7 +257,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
             else
                 SendDlgItemMessage(*this, IDC_REPLACECOMBO, CB_INSERTSTRING, 0, (LPARAM)sReplaceStringW.c_str());
             m_replaceStrings.push_front(sReplaceStringW);
-            while (m_replaceStrings.size() >= maxReplace)
+            while (m_replaceStrings.size() >= (size_t)maxReplace)
                 m_replaceStrings.pop_back();
 
             i = 0;
