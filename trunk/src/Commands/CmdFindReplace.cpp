@@ -24,6 +24,8 @@
 std::string         sFindString;
 static int          nSearchFlags;
 
+#define TIMER_INFOSTRING    100
+
 CFindReplaceDlg::CFindReplaceDlg(void * obj)
     : ICommand(obj)
 {
@@ -52,6 +54,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             m_resizer.AddControl(hwndDlg, IDC_FINDBTN, RESIZER_TOPRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_REPLACEBTN, RESIZER_TOPRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_REPLACEALLBTN, RESIZER_TOPRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_SEARCHINFO, RESIZER_TOPLEFTRIGHT);
             m_resizer.AddControl(hwndDlg, IDCANCEL, RESIZER_TOPRIGHT);
 
             HWND hSearchCombo = GetDlgItem(*this, IDC_SEARCHCOMBO);
@@ -101,6 +104,13 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
         break;
     case WM_COMMAND:
         return DoCommand(LOWORD(wParam), HIWORD(wParam));
+    case WM_TIMER:
+        {
+            if (wParam == TIMER_INFOSTRING)
+                SetDlgItemText(*this, IDC_SEARCHINFO, L"");
+            KillTimer(*this, TIMER_INFOSTRING);
+        }
+        break;
     default:
         return FALSE;
     }
@@ -116,6 +126,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
         break;
     case IDC_FINDBTN:
         {
+            SetDlgItemText(*this, IDC_SEARCHINFO, L"");
             Scintilla::Sci_TextToFind ttf = {0};
             ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
             ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
@@ -130,14 +141,23 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
             sptr_t findRet = ScintillaCall(SCI_FINDTEXT, nSearchFlags, (sptr_t)&ttf);
             if (findRet == -1)
             {
+                SetInfoText(IDS_FINDRETRYWRAP);
                 // retry from the start of the doc
                 ttf.chrg.cpMax = ttf.chrg.cpMin;
                 ttf.chrg.cpMin = 0;
                 findRet = ScintillaCall(SCI_FINDTEXT, nSearchFlags, (sptr_t)&ttf);
             }
             if (findRet >= 0)
-            {
                 Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
+            else
+            {
+                SetInfoText(IDS_FINDNOTFOUND);
+                FLASHWINFO fi = {sizeof(FLASHWINFO)};
+                fi.hwnd = *this;
+                fi.dwFlags = FLASHW_CAPTION;
+                fi.uCount = 3;
+                fi.dwTimeout = 20;
+                FlashWindowEx(&fi);
             }
 
             int maxSearch = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearch", 20);
@@ -162,6 +182,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
     case IDC_REPLACEALLBTN:
     case IDC_REPLACEBTN:
         {
+            SetDlgItemText(*this, IDC_SEARCHINFO, L"");
             ScintillaCall(SCI_SETTARGETSTART, id==IDC_REPLACEBTN ? ScintillaCall(SCI_GETCURRENTPOS): 0);
             ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
 
@@ -184,6 +205,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
                 findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
                 if ((findRet == -1) && (id==IDC_REPLACEBTN))
                 {
+                    SetInfoText(IDS_FINDRETRYWRAP);
                     // retry from the start of the doc
                     ScintillaCall(SCI_SETTARGETSTART, 0);
                     ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETCURRENTPOS));
@@ -248,6 +270,13 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
         break;
     }
     return 1;
+}
+
+void CFindReplaceDlg::SetInfoText( UINT resid )
+{
+    ResString str(hRes, resid);
+    SetDlgItemText(*this, IDC_SEARCHINFO, str);
+    SetTimer(*this, TIMER_INFOSTRING, 5000, NULL);
 }
 
 bool CCmdFindReplace::Execute()
@@ -345,8 +374,15 @@ bool CCmdFindNext::Execute()
         findRet = ScintillaCall(SCI_FINDTEXT, nSearchFlags, (sptr_t)&ttf);
     }
     if (findRet >= 0)
-    {
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
+    else
+    {
+        FLASHWINFO fi = {sizeof(FLASHWINFO)};
+        fi.hwnd = GetHwnd();
+        fi.dwFlags = FLASHW_CAPTION;
+        fi.uCount = 3;
+        fi.dwTimeout = 20;
+        FlashWindowEx(&fi);
     }
     return true;
 }
@@ -368,8 +404,15 @@ bool CCmdFindPrev::Execute()
         findRet = ScintillaCall(SCI_FINDTEXT, nSearchFlags, (sptr_t)&ttf);
     }
     if (findRet >= 0)
-    {
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
+    else
+    {
+        FLASHWINFO fi = {sizeof(FLASHWINFO)};
+        fi.hwnd = GetHwnd();
+        fi.dwFlags = FLASHW_CAPTION;
+        fi.uCount = 3;
+        fi.dwTimeout = 20;
+        FlashWindowEx(&fi);
     }
     return true;
 }
@@ -398,8 +441,15 @@ bool CCmdFindSelectedNext::Execute()
         findRet = ScintillaCall(SCI_FINDTEXT, nSearchFlags, (sptr_t)&ttf);
     }
     if (findRet >= 0)
-    {
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
+    else
+    {
+        FLASHWINFO fi = {sizeof(FLASHWINFO)};
+        fi.hwnd = GetHwnd();
+        fi.dwFlags = FLASHW_CAPTION;
+        fi.uCount = 3;
+        fi.dwTimeout = 20;
+        FlashWindowEx(&fi);
     }
     return true;
 }
@@ -430,8 +480,15 @@ bool CCmdFindSelectedPrev::Execute()
         findRet = ScintillaCall(SCI_FINDTEXT, nSearchFlags, (sptr_t)&ttf);
     }
     if (findRet >= 0)
-    {
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
+    else
+    {
+        FLASHWINFO fi = {sizeof(FLASHWINFO)};
+        fi.hwnd = GetHwnd();
+        fi.dwFlags = FLASHW_CAPTION;
+        fi.uCount = 3;
+        fi.dwTimeout = 20;
+        FlashWindowEx(&fi);
     }
     return true;
 }
