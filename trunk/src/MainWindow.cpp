@@ -29,6 +29,7 @@
 #include "Theme.h"
 #include "PreserveChdir.h"
 #include "CmdLineParser.h"
+#include "SysInfo.h"
 
 #include <memory>
 #include <future>
@@ -299,6 +300,14 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     PostMessage(m_hwnd, WM_UPDATEAVAILABLE, 0, 0);
             });
             PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
+
+            if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
+            {
+                // in case we're running elevated, use a BowPad icon with a shield
+                HICON hIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_BOWPAD_ELEVATED), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE|LR_SHARED);
+                ::SendMessage(m_hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+                ::SendMessage(m_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+            }
         }
         break;
     case WM_COMMAND:
@@ -972,6 +981,14 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
         m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), STATUSBAR_EOF_FORMAT);
         m_StatusBar.SetText(doc.GetEncodingString().c_str(), STATUSBAR_UNICODE_TYPE);
         m_StatusBar.SetText(CStringUtils::Format(L"tabs: %d", m_TabBar.GetItemCount()).c_str(), STATUSBAR_TABS);
+
+        if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
+        {
+            // in case we're running elevated, use a BowPad icon with a shield
+            HICON hIcon = (HICON)::LoadImage(NULL, MAKEINTRESOURCE(IDI_SHIELD), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE|LR_SHARED);
+            SendMessage(m_StatusBar, SB_SETICON, 0, (LPARAM)hIcon);
+        }
+
     }
 }
 
