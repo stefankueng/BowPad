@@ -360,6 +360,7 @@
     <Image Include="res\empty.bmp" />
     <Image Include="res\readonly.ico" />
     <Image Include="res\saved.ico" />
+    <Image Include="res\Shield.ico" />
     <Image Include="res\unsaved.ico" />
     <Image Include="BowPad.ico" />
     <Image Include="small.ico" />

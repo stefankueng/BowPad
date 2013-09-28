@@ -84,4 +84,5 @@ private:
     CScintillaWnd               m_scintilla;
     CDocumentManager            m_DocManager;
     std::unique_ptr<wchar_t[]>  m_tooltipbuffer;
+    HICON                       m_hShieldIcon;
 };

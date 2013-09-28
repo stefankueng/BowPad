@@ -57,11 +57,14 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_TabBar(hInst)
     , m_scintilla(hInst)
     , m_cRef(1)
+    , m_hShieldIcon(NULL)
 {
+    m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 }
 
 CMainWindow::~CMainWindow(void)
 {
+    DestroyIcon(m_hShieldIcon);
 }
 
 // IUnknown method implementations.
@@ -985,10 +988,8 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
         if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
         {
             // in case we're running elevated, use a BowPad icon with a shield
-            HICON hIcon = (HICON)::LoadImage(NULL, MAKEINTRESOURCE(IDI_SHIELD), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE|LR_SHARED);
-            SendMessage(m_StatusBar, SB_SETICON, 0, (LPARAM)hIcon);
+            SendMessage(m_StatusBar, SB_SETICON, 0, (LPARAM)m_hShieldIcon);
         }
-
     }
 }
 
