@@ -948,7 +948,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     size_t selLine = 0;
 
     if (m_scintilla.GetSelectedCount(selByte, selLine))
-        swprintf_s(strSel, L"Sel : %lld | %lld", selByte, selLine);
+        swprintf_s(strSel, L"Sel : %u | %u", selByte, selLine);
     else
         swprintf_s(strSel, L"Sel : %s", L"N/A");
 
