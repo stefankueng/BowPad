@@ -78,7 +78,7 @@ void DrawPart (HWND hWnd, HDC hdc, int itemID)
     if (hIcon)
     {
         INT cy = rcPart.bottom - rcPart.top;
-        DrawIconEx (hdc, rcPart.left + 2, rcPart.top, hIcon, cy, cy, 0, 0, DI_NORMAL);
+        DrawIconEx (hdc, rcPart.left + 2, rcPart.top, hIcon, 0, 0, 0, 0, DI_NORMAL);
         x = 2 + cy;
     }
 
