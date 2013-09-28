@@ -50,6 +50,7 @@ public:
     DocModifiedState            HasFileChanged(int index);
 private:
     FormatType                  GetEOLFormatForm(const char *data) const;
+    bool                        SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc);
 
 private:
     std::vector<CDocument>      m_documents;

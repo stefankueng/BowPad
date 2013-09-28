@@ -179,6 +179,10 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             {
                 mainWindow.GoToLine(parser.GetLongVal(L"line")-1);
             }
+            if (parser.HasKey(L"elevate") && parser.HasKey(L"savepath"))
+            {
+                mainWindow.ElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"));
+            }
         }
         else
         {

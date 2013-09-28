@@ -19,8 +19,14 @@
 #include "DocumentManager.h"
 #include "SmartHandle.h"
 #include "UnicodeUtils.h"
+#include "SysInfo.h"
+#include "StringUtils.h"
+#include "PathUtils.h"
 
 #include <algorithm>
+#include <Shobjidl.h>
+#include <Shellapi.h>
+#include <Shlobj.h>
 
 COLORREF foldercolors[] = {
     RGB(177,199,253),
@@ -98,7 +104,63 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     CAutoFile hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (!hFile.IsValid())
     {
-        CFormatMessageWrapper errMsg;
+        DWORD err = GetLastError();
+        CFormatMessageWrapper errMsg(err);
+        if (((err == ERROR_ACCESS_DENIED)||(err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
+        {
+            // access to the file is denied, and we're not running with elevated privileges
+            // offer to start BowPad with elevated privileges and open the file in that instance
+            ResString rTitle(hRes, IDS_ACCESS_ELEVATE);
+            ResString rQuestion(hRes, IDS_ACCESS_ASK_ELEVATE);
+            ResString rElevate(hRes, IDS_ELEVATEOPEN);
+            ResString rDontElevate(hRes, IDS_DONTELEVATEOPEN);
+            std::wstring filename = path.substr(path.find_last_of('\\')+1);
+            std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str());
+
+            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+            TASKDIALOG_BUTTON aCustomButtons[2];
+            aCustomButtons[0].nButtonID = 100;
+            aCustomButtons[0].pszButtonText = rElevate;
+            aCustomButtons[1].nButtonID = 101;
+            aCustomButtons[1].pszButtonText = rDontElevate;
+
+            tdc.hwndParent = hWnd;
+            tdc.hInstance = hRes;
+            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+            tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+            tdc.pButtons = aCustomButtons;
+            tdc.cButtons = _countof(aCustomButtons);
+            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+            tdc.pszMainIcon = TD_SHIELD_ICON;
+            tdc.pszMainInstruction = rTitle;
+            tdc.pszContent = sQuestion.c_str();
+            tdc.nDefaultButton = 100;
+            int nClickedBtn = 0;
+            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
+
+            if (SUCCEEDED(hr))
+            {
+                if (nClickedBtn == 100)
+                {
+                    std::wstring modpath = CPathUtils::GetModulePath();
+                    SHELLEXECUTEINFO shExecInfo;
+                    shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+
+                    shExecInfo.fMask = NULL;
+                    shExecInfo.hwnd = hWnd;
+                    shExecInfo.lpVerb = L"runas";
+                    shExecInfo.lpFile = modpath.c_str();
+                    shExecInfo.lpParameters = path.c_str();
+                    shExecInfo.lpDirectory = NULL;
+                    shExecInfo.nShow = SW_NORMAL;
+                    shExecInfo.hInstApp = NULL;
+
+                    ShellExecuteEx(&shExecInfo);
+                    return doc;
+                }
+            }
+
+        }
         MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
         return doc;
     }
@@ -380,11 +442,11 @@ FormatType CDocumentManager::GetEOLFormatForm( const char *data ) const
     return UNKNOWN_FORMAT;
 }
 
-bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
+bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocument& doc )
 {
-    if (doc.m_path.empty())
+    if (path.empty())
         return false;
-    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    CAutoFile hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (!hFile.IsValid())
     {
         CFormatMessageWrapper errMsg;
@@ -549,8 +611,89 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
         }
         break;
     }
-    m_scratchScintilla.Call(SCI_SETSAVEPOINT);
-    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
+    return true;
+}
+
+bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
+{
+    if (doc.m_path.empty())
+        return false;
+    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (!hFile.IsValid())
+    {
+        DWORD err = GetLastError();
+        CFormatMessageWrapper errMsg(err);
+        if (((err == ERROR_ACCESS_DENIED)||(err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
+        {
+            // access to the file is denied, and we're not running with elevated privileges
+            // offer to start BowPad with elevated privileges and open the file in that instance
+            ResString rTitle(hRes, IDS_ACCESS_ELEVATE);
+            ResString rQuestion(hRes, IDS_ACCESS_ASK_ELEVATE);
+            ResString rElevate(hRes, IDS_ELEVATESAVE);
+            ResString rDontElevate(hRes, IDS_DONTELEVATESAVE);
+            std::wstring filename = doc.m_path.substr(doc.m_path.find_last_of('\\')+1);
+            std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str());
+
+            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+            TASKDIALOG_BUTTON aCustomButtons[2];
+            aCustomButtons[0].nButtonID = 100;
+            aCustomButtons[0].pszButtonText = rElevate;
+            aCustomButtons[1].nButtonID = 101;
+            aCustomButtons[1].pszButtonText = rDontElevate;
+
+            tdc.hwndParent = hWnd;
+            tdc.hInstance = hRes;
+            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+            tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+            tdc.pButtons = aCustomButtons;
+            tdc.cButtons = _countof(aCustomButtons);
+            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+            tdc.pszMainIcon = TD_SHIELD_ICON;
+            tdc.pszMainInstruction = rTitle;
+            tdc.pszContent = sQuestion.c_str();
+            tdc.nDefaultButton = 100;
+            int nClickedBtn = 0;
+            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
+
+            if (SUCCEEDED(hr))
+            {
+                if (nClickedBtn == 100)
+                {
+                    std::wstring temppath = CPathUtils::GetTempFilePath();
+                    CDocument tempdoc;
+
+                    if (SaveDoc(hWnd, temppath, doc))
+                    {
+                        std::wstring modpath = CPathUtils::GetModulePath();
+                        std::wstring cmdline = CStringUtils::Format(L"/elevate /savepath:\"%s\" /path:\"%s\"", doc.m_path.c_str(), temppath.c_str());
+                        SHELLEXECUTEINFO shExecInfo;
+                        shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+
+                        shExecInfo.fMask = NULL;
+                        shExecInfo.hwnd = hWnd;
+                        shExecInfo.lpVerb = L"runas";
+                        shExecInfo.lpFile = modpath.c_str();
+                        shExecInfo.lpParameters = cmdline.c_str();
+                        shExecInfo.lpDirectory = NULL;
+                        shExecInfo.nShow = SW_NORMAL;
+                        shExecInfo.hInstApp = NULL;
+
+                        ShellExecuteEx(&shExecInfo);
+                        return false;
+                    }
+                }
+            }
+
+        }
+        MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
+        return false;
+    }
+
+    if (SaveDoc(hWnd, doc.m_path, doc))
+    {
+        m_scratchScintilla.Call(SCI_SETSAVEPOINT);
+        m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
+    }
     return true;
 }
 

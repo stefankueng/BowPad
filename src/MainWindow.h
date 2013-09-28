@@ -46,6 +46,7 @@ public:
     bool                CloseTab(int tab);
     bool                CloseAllTabs();
     bool                HandleOutsideModifications(int index = -1);
+    void                ElevatedSave( const std::wstring& path, const std::wstring& savepath );
 
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
@@ -73,7 +74,6 @@ private:
     void                        UpdateStatusBar(bool bEverything);
     void                        InitCommands();
     void                        AddHotSpots();
-
 private:
     LONG                        m_cRef;
     IUIRibbon *                 m_pRibbon;
