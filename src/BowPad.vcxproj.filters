@@ -462,6 +462,9 @@
     <Image Include="res\BowPad.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\Shield.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="res\BowPad.xml" />
