@@ -1516,7 +1516,6 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
 
 void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& savepath )
 {
-    MessageBox(*this, L"", L"", 0);
     std::wstring filepath = CPathUtils::GetLongPathname(path);
     int index = m_DocManager.GetIndexForPath(filepath.c_str());
     if (index != -1)
