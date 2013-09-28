@@ -50,6 +50,7 @@ IUIFramework *g_pFramework = NULL;  // Reference to the Ribbon framework.
 
 #define URL_REG_EXPR "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b"
 
+static bool bWindowRestored = false;
 
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
@@ -293,7 +294,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             m_hwnd = hwnd;
             Initialize();
-            CIniSettings::Instance().RestoreWindowPos(L"MainWindow", hwnd, SW_RESTORE);
 
             // TODO: skip check for portable version
             std::async([=]
@@ -707,9 +707,15 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             }
         }
         break;
+    case WM_ACTIVATEAPP:
+        if (!bWindowRestored)
+        {
+            CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
+            bWindowRestored = true;
+        }
+        // intentional fall through!
     case WM_SETFOCUS:
     case WM_ACTIVATE:
-    case WM_ACTIVATEAPP:
         HandleOutsideModifications();
         SetFocus(m_scintilla);
         m_scintilla.Call(SCI_SETFOCUS, true);
