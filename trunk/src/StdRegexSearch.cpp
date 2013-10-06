@@ -252,11 +252,7 @@ long StdRegexSearch::FindText(Document* doc, int startPosition, int endPosition,
             | (caseSensitive ? 0 : std::regex_constants::icase);
         search._regexString = regexString;
 
-        const bool starts_at_line_start = search.isLineStart(search._startPosition);
-        const bool ends_at_line_end     = search.isLineEnd(search._endPosition);
-        search.regexFlags = std::regex_constants::match_not_null | std::regex_constants::format_first_only |
-              (starts_at_line_start ? std::regex_constants::match_default : std::regex_constants::match_not_bol)
-            | (ends_at_line_end     ? std::regex_constants::match_default : std::regex_constants::match_not_eol);
+        search.regexFlags = std::regex_constants::match_not_null | std::regex_constants::format_first_only;
 
         Match match = _utf8.FindText(search);
 
@@ -294,9 +290,7 @@ StdRegexSearch::Match StdRegexSearch::EncodingDependent<CharT, CharacterIterator
     CharacterIterator endIterator(search._document, search._endPosition, search._endPosition);
     int next_search_from_position = search._startPosition;
     bool found = false;
-    search.regexFlags = search.isLineStart(next_search_from_position)
-        ? search.regexFlags & ~std::regex_constants::match_not_bol
-        : search.regexFlags |  std::regex_constants::match_not_bol;
+
     const bool end_reached = next_search_from_position > search._endPosition;
     found = !end_reached && std::regex_search(CharacterIterator(search._document, next_search_from_position, search._endPosition), endIterator, _match, _regex, search.regexFlags);
     if (found)
