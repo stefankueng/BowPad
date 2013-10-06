@@ -45,6 +45,7 @@
 #include "CmdHeaderSource.h"
 #include "CmdLaunch.h"
 #include "CmdSession.h"
+#include "CmdFunctions.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -167,6 +168,8 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdFindSelectedPrev(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdGotoLine(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdFunctions(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdBookmarkToggle(obj);

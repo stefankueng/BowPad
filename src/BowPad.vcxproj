@@ -245,6 +245,7 @@
     <ClInclude Include="Commands\CmdEOL.h" />
     <ClInclude Include="Commands\CmdFiles.h" />
     <ClInclude Include="Commands\CmdFindReplace.h" />
+    <ClInclude Include="Commands\CmdFunctions.h" />
     <ClInclude Include="Commands\CmdGotoLine.h" />
     <ClInclude Include="Commands\CmdHeaderSource.h" />
     <ClInclude Include="Commands\CmdLanguage.h" />
@@ -317,6 +318,7 @@
     <ClCompile Include="Commands\CmdConvertCase.cpp" />
     <ClCompile Include="Commands\CmdFiles.cpp" />
     <ClCompile Include="Commands\CmdFindReplace.cpp" />
+    <ClCompile Include="Commands\CmdFunctions.cpp" />
     <ClCompile Include="Commands\CmdGotoLine.cpp" />
     <ClCompile Include="Commands\CmdLanguage.cpp" />
     <ClCompile Include="Commands\CmdLaunch.cpp" />

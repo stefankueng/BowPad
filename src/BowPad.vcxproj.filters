@@ -255,6 +255,9 @@
     <ClInclude Include="Commands\CmdSession.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdFunctions.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -417,6 +420,9 @@
       <Filter>sktoolslib</Filter>
     </ClCompile>
     <ClCompile Include="Commands\CmdLaunch.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdFunctions.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
