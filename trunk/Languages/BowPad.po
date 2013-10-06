@@ -81,6 +81,15 @@ msgstr ""
 msgid "About BowPad"
 msgstr ""
 
+#. Resource IDs: (10)
+msgid "Access denied!"
+msgstr ""
+
+#. Resource IDs: (10)
+#, c-format
+msgid "Access to the file '%s' was denied. Do you want to try again with elevated privileges?"
+msgstr ""
+
 #. Resource IDs: (3756)
 msgid "Allows to load a file with a specific encoding"
 msgstr ""
@@ -402,6 +411,14 @@ msgstr ""
 msgid "Document removed"
 msgstr ""
 
+#. Resource IDs: (10)
+msgid "Don't Save\nThe file is not saved."
+msgstr ""
+
+#. Resource IDs: (10)
+msgid "Don't open\nThe file is not opened."
+msgstr ""
+
 #. Resource IDs: (8)
 msgid "Download and install the update\nUpdates BowPad to the latest version."
 msgstr ""
@@ -504,6 +521,10 @@ msgstr ""
 
 #. Resource IDs: (65535)
 msgid "Font"
+msgstr ""
+
+#. Resource IDs: (3773)
+msgid "Functions"
 msgstr ""
 
 #. Resource IDs: (145, 3763)
@@ -739,6 +760,10 @@ msgstr ""
 msgid "Next Bookmarks (F2)"
 msgstr ""
 
+#. Resource IDs: (10)
+msgid "No functions found!"
+msgstr ""
+
 #. Resource IDs: (9)
 msgid "No updates available.\nYou already have the current version."
 msgstr ""
@@ -777,6 +802,10 @@ msgstr ""
 
 #. Resource IDs: (3772)
 msgid "Open corresponding File (Ctrl+K,O)"
+msgstr ""
+
+#. Resource IDs: (10)
+msgid "Open elevated\nBowPad is started again with elevated privileges."
 msgstr ""
 
 #. Resource IDs: (3752)
@@ -939,6 +968,10 @@ msgstr ""
 msgid "Save as"
 msgstr ""
 
+#. Resource IDs: (10)
+msgid "Save elevated\nBowPad is started again with elevated privileges."
+msgstr ""
+
 #. Resource IDs: (8)
 msgid "Save modifications\nThe modifications that were made outside BowPad are overwritten."
 msgstr ""
@@ -973,6 +1006,10 @@ msgstr ""
 
 #. Resource IDs: (3758)
 msgid "Search and/or replace text in documents/tabs"
+msgstr ""
+
+#. Resource IDs: (10)
+msgid "Search text not found!"
 msgstr ""
 
 #. Resource IDs: (3759)
@@ -1021,6 +1058,10 @@ msgstr ""
 
 #. Resource IDs: (3772)
 msgid "Shows a dialog to configure custom commands"
+msgstr ""
+
+#. Resource IDs: (3773)
+msgid "Shows a list of functions/methods in the file to jump to"
 msgstr ""
 
 #. Resource IDs: (3764)
@@ -1172,6 +1213,10 @@ msgstr ""
 
 #. Resource IDs: (3755)
 msgid "Wrap Lines (Ctrl+E,W)"
+msgstr ""
+
+#. Resource IDs: (9)
+msgid "Wrap around"
 msgstr ""
 
 #. Resource IDs: (3755)
