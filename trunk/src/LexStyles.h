@@ -25,6 +25,7 @@ class LanguageData
 public:
     LanguageData()
         : commentlineatstart(false)
+        , functionregexsort(0)
     {
     }
 
@@ -34,6 +35,8 @@ public:
     bool                        commentlineatstart;
     std::string                 commentstreamstart;
     std::string                 commentstreamend;
+    std::string                 functionregex;
+    int                         functionregexsort;
 };
 
 enum FontStyle
@@ -83,6 +86,8 @@ public:
     const std::string&                  GetCommentStreamStartForLang(const std::string& lang) const;
     const std::string&                  GetCommentStreamEndForLang(const std::string& lang) const;
     bool                                GetCommentLineAtStartForLang(const std::string& lang) const;
+    const std::string&                  GetFunctionRegexForLang(const std::string& lang) const;
+    int                                 GetFunctionRegexSortForLang(const std::string& lang) const;
 
     const LexerData&                    GetLexerDataForExt(const std::string& ext) const;
     const LexerData&                    GetLexerDataForLang(const std::string& lang) const;

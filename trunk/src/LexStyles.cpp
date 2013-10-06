@@ -236,6 +236,14 @@ void CLexStyles::Load()
                             {
                                 ld.commentlineatstart = _wtoi(ini[iniind].GetValue(langsect.c_str(), sk)) != 0;
                             }
+                            if (_wcsicmp(L"FunctionRegex", sk) == 0)
+                            {
+                                ld.functionregex = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(langsect.c_str(), sk));
+                            }
+                            if (_wcsicmp(L"FunctionRegexSort", sk) == 0)
+                            {
+                                ld.functionregexsort = _wtoi(ini[iniind].GetValue(langsect.c_str(), sk));
+                            }
                         }
                         m_Langdata[CUnicodeUtils::StdGetUTF8(k)] = ld;
                     }
@@ -505,5 +513,21 @@ bool CLexStyles::GetCommentLineAtStartForLang( const std::string& lang ) const
     if (lt != m_Langdata.end())
         return lt->second.commentlineatstart;
     return false;
+}
+
+const std::string& CLexStyles::GetFunctionRegexForLang( const std::string& lang ) const
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+        return lt->second.functionregex;
+    return emptyString;
+}
+
+int CLexStyles::GetFunctionRegexSortForLang( const std::string& lang ) const
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+        return lt->second.functionregexsort;
+    return 0;
 }
 

@@ -578,6 +578,15 @@
       </Command.SmallImages>
     </Command>
 
+    <Command Name="cmdFunctions" LabelTitle="Functions" TooltipTitle="Functions" TooltipDescription="Shows a list of functions/methods in the file to jump to">
+      <Command.LargeImages>
+        <Image>res/func32.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/func16.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+
 
     <Command Name="cmdGroupFind" LabelTitle="Find" />
 
@@ -691,8 +700,13 @@
             <Button CommandName="cmdFindPrev" />
             <Button CommandName="cmdFindSelectedNext" />
           </Group>
-          <Group CommandName="cmdGroupGoto" SizeDefinition="SevenButtons">
+          <Group CommandName="cmdGroupGoto" SizeDefinition="EightButtons">
             <Button CommandName="cmdGotoLine" />
+            <DropDownGallery CommandName="cmdFunctions" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="1"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
             <Button CommandName="cmdPrevious" />
             <Button CommandName="cmdNext" />
 
