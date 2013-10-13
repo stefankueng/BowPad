@@ -531,22 +531,32 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         startPos = strstr(startPos+1, seltextbuffer.get());
     }
 
-    if (lastSelText.compare(seltextbuffer.get()))
+    int lineCount = (int)Call(SCI_GETLINECOUNT);
+    if ((selTextLen > 2) || (lineCount < 100000))
     {
-        m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
-        Scintilla::Sci_TextToFind FindText;
-        FindText.chrg.cpMin = 0;
-        FindText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
-        FindText.lpstrText = seltextbuffer.get();
-        while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&FindText) >= 0)
+        ULONGLONG startTicks = GetTickCount64();
+        if (lastSelText.compare(seltextbuffer.get()))
         {
-            size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
-            m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, CTheme::Instance().GetThemeColor(RGB(0,255,0)));
-            FindText.chrg.cpMin = FindText.chrgText.cpMax;
+            m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+            Scintilla::Sci_TextToFind FindText;
+            FindText.chrg.cpMin = 0;
+            FindText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
+            FindText.lpstrText = seltextbuffer.get();
+            while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&FindText) >= 0)
+            {
+                size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
+                m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, CTheme::Instance().GetThemeColor(RGB(0,255,0)));
+                FindText.chrg.cpMin = FindText.chrgText.cpMax;
+                if ((GetTickCount64() - startTicks) > 2000)
+                {
+                    m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+                    break;
+                }
+            }
+            SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         }
-        SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
+        lastSelText = seltextbuffer.get();
     }
-    lastSelText = seltextbuffer.get();
 }
 
 void CScintillaWnd::MatchBraces()
