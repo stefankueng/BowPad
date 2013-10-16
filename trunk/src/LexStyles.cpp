@@ -27,6 +27,7 @@
 LexerData emptyLexData;
 std::map<int, std::string> emptyIntStrVec;
 std::string emptyString;
+std::vector<std::string> emptyStringVector;
 
 static COLORREF fgColor = ::GetSysColor(COLOR_WINDOWTEXT);
 static COLORREF bgColor = ::GetSysColor(COLOR_WINDOW);
@@ -223,14 +224,17 @@ void CLexStyles::Load()
                             if (_wcsicmp(L"CommentLine", sk) == 0)
                             {
                                 ld.commentline = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(langsect.c_str(), sk));
+                                ld.commentline.erase(ld.commentline.find_last_not_of("~")+1); // Erase '~'
                             }
                             if (_wcsicmp(L"CommentStreamStart", sk) == 0)
                             {
                                 ld.commentstreamstart = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(langsect.c_str(), sk));
+                                ld.commentstreamstart.erase(ld.commentstreamstart.find_last_not_of("~")+1); // Erase '~'
                             }
                             if (_wcsicmp(L"CommentStreamEnd", sk) == 0)
                             {
                                 ld.commentstreamend = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(langsect.c_str(), sk));
+                                ld.commentstreamend.erase(ld.commentstreamend.find_last_not_of("~")+1); // Erase '~'
                             }
                             if (_wcsicmp(L"CommentLineAtStart", sk) == 0)
                             {
@@ -239,10 +243,17 @@ void CLexStyles::Load()
                             if (_wcsicmp(L"FunctionRegex", sk) == 0)
                             {
                                 ld.functionregex = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(langsect.c_str(), sk));
+                                ld.functionregex.erase(ld.functionregex.find_last_not_of("~")+1); // Erase '~'
                             }
                             if (_wcsicmp(L"FunctionRegexSort", sk) == 0)
                             {
                                 ld.functionregexsort = _wtoi(ini[iniind].GetValue(langsect.c_str(), sk));
+                            }
+                            if (_wcsicmp(L"FunctionRegexTrim", sk) == 0)
+                            {
+                                std::string s = CUnicodeUtils::StdGetUTF8(ini[iniind].GetValue(langsect.c_str(), sk));
+                                s.erase(s.find_last_not_of("~")+1); // Erase '~'
+                                stringtok(ld.functionregextrim, s, true, ",");
                             }
                         }
                         m_Langdata[CUnicodeUtils::StdGetUTF8(k)] = ld;
@@ -529,5 +540,13 @@ int CLexStyles::GetFunctionRegexSortForLang( const std::string& lang ) const
     if (lt != m_Langdata.end())
         return lt->second.functionregexsort;
     return 0;
+}
+
+const std::vector<std::string>& CLexStyles::GetFunctionRegexTrimForLang( const std::string& lang ) const
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+        return lt->second.functionregextrim;
+    return emptyStringVector;
 }
 

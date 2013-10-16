@@ -51,6 +51,7 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
         std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
         std::string funcregex = CLexStyles::Instance().GetFunctionRegexForLang(lang);
         int sortmethod = CLexStyles::Instance().GetFunctionRegexSortForLang(lang);
+        auto trimtokens = CLexStyles::Instance().GetFunctionRegexTrimForLang(lang);
         if (!funcregex.empty())
         {
             sptr_t findRet = -1;
@@ -59,7 +60,7 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
             ttf.chrg.cpMin = 0;
             ttf.chrg.cpMax = length;
             ttf.lpstrText = const_cast<char*>(funcregex.c_str());
-            do 
+            do
             {
                 ttf.chrgText.cpMin = 0;
                 ttf.chrgText.cpMax = 0;
@@ -78,6 +79,11 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
                     SearchReplace(sf, L"\n", L"");
                     SearchReplace(sf, L"{", L"");
                     SearchReplace(sf, L"\t", L" ");
+                    if (!trimtokens.empty())
+                    {
+                        for (const auto& token : trimtokens)
+                            SearchReplace(sf, CUnicodeUtils::StdGetUnicode(token), L"");
+                    }
                     // remove comments
                     size_t pos = sf.find(L"/*");
                     while (pos != std::wstring::npos)
@@ -120,8 +126,12 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
                         size_t pb = sb.find_last_of('(');
                         if (pb > 2)
                             pb -= 2;
-                        sa = sa.substr(sa.find_last_of(' ', pa));
-                        sb = sb.substr(sb.find_last_of(' ', pb));
+                        size_t flosa = sa.find_last_of(' ', pa);
+                        size_t flosb = sb.find_last_of(' ', pb);
+                        if (flosa != std::wstring::npos)
+                            sa = sa.substr(flosa);
+                        if (flosb != std::wstring::npos)
+                            sb = sb.substr(flosb);
 
                         if (!sa.empty() && (sa[0] == '*'))
                             sa = sa.substr(1);
