@@ -206,6 +206,7 @@
     <ClCompile Include="lexers\LexR.cxx" />
     <ClCompile Include="lexers\LexRebol.cxx" />
     <ClCompile Include="lexers\LexRuby.cxx" />
+    <ClCompile Include="lexers\LexRust.cxx" />
     <ClCompile Include="lexers\LexScriptol.cxx" />
     <ClCompile Include="lexers\LexSmalltalk.cxx" />
     <ClCompile Include="lexers\LexSML.cxx" />
