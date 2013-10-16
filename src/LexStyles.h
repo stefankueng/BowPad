@@ -36,6 +36,7 @@ public:
     std::string                 commentstreamstart;
     std::string                 commentstreamend;
     std::string                 functionregex;
+    std::vector<std::string>    functionregextrim;
     int                         functionregexsort;
 };
 
@@ -88,6 +89,7 @@ public:
     bool                                GetCommentLineAtStartForLang(const std::string& lang) const;
     const std::string&                  GetFunctionRegexForLang(const std::string& lang) const;
     int                                 GetFunctionRegexSortForLang(const std::string& lang) const;
+    const std::vector<std::string>&     GetFunctionRegexTrimForLang(const std::string& lang) const;
 
     const LexerData&                    GetLexerDataForExt(const std::string& ext) const;
     const LexerData&                    GetLexerDataForLang(const std::string& lang) const;
