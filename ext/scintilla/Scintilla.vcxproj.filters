@@ -548,5 +548,8 @@
     <ClCompile Include="lexers\LexKVIrc.cxx">
       <Filter>lexers</Filter>
     </ClCompile>
+    <ClCompile Include="lexers\LexRust.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
