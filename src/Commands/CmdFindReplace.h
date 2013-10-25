@@ -32,6 +32,8 @@ protected:
     LRESULT                 DoCommand(int id, int msg);
 
     void                    SetInfoText(UINT resid);
+    void                    DoSearch();
+    void                    DoReplace(int id);
 
     virtual bool Execute() { return true; }
     virtual UINT GetCmdId() { return 0; }

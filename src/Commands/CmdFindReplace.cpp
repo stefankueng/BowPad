@@ -126,146 +126,13 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
         break;
     case IDC_FINDBTN:
         {
-            SetDlgItemText(*this, IDC_SEARCHINFO, L"");
-            Scintilla::Sci_TextToFind ttf = {0};
-            ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
-            ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
-            auto findText = GetDlgItemText(IDC_SEARCHCOMBO);
-            sFindString = CUnicodeUtils::StdGetUTF8(findText.get());
-            ttf.lpstrText = const_cast<char*>(sFindString.c_str());
-            nSearchFlags = 0;
-            nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHCASE)  ? SCFIND_MATCHCASE : 0;
-            nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHWORD)  ? SCFIND_WHOLEWORD : 0;
-            nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHREGEX) ? SCFIND_REGEXP    : 0;
-
-            sptr_t findRet = ScintillaCall(SCI_FINDTEXT, nSearchFlags, (sptr_t)&ttf);
-            if (findRet == -1)
-            {
-                SetInfoText(IDS_FINDRETRYWRAP);
-                // retry from the start of the doc
-                ttf.chrg.cpMax = ttf.chrg.cpMin;
-                ttf.chrg.cpMin = 0;
-                findRet = ScintillaCall(SCI_FINDTEXT, nSearchFlags, (sptr_t)&ttf);
-            }
-            if (findRet >= 0)
-                Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
-            else
-            {
-                SetInfoText(IDS_FINDNOTFOUND);
-                FLASHWINFO fi = {sizeof(FLASHWINFO)};
-                fi.hwnd = *this;
-                fi.dwFlags = FLASHW_CAPTION;
-                fi.uCount = 3;
-                fi.dwTimeout = 20;
-                FlashWindowEx(&fi);
-            }
-
-            int maxSearch = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearch", 20);
-            std::wstring sFindStringW = CUnicodeUtils::StdGetUnicode(sFindString);
-            auto foundIt = std::find(m_searchStrings.begin(), m_searchStrings.end(), sFindStringW);
-            if (foundIt != m_searchStrings.end())
-                m_searchStrings.erase(foundIt);
-            else
-                SendDlgItemMessage(*this, IDC_SEARCHCOMBO, CB_INSERTSTRING, 0, (LPARAM)CUnicodeUtils::StdGetUnicode(sFindString).c_str());
-            m_searchStrings.push_front(sFindStringW);
-            while (m_searchStrings.size() >= (size_t)maxSearch)
-                m_searchStrings.pop_back();
-
-            int i = 0;
-            for (const auto& it : m_searchStrings)
-            {
-                std::wstring sKey = CStringUtils::Format(L"search%d", i++);
-                CIniSettings::Instance().SetString(L"searchreplace", sKey.c_str(), it.c_str());
-            }
+            DoSearch();
         }
         break;
     case IDC_REPLACEALLBTN:
     case IDC_REPLACEBTN:
         {
-            SetDlgItemText(*this, IDC_SEARCHINFO, L"");
-            ScintillaCall(SCI_SETTARGETSTART, id==IDC_REPLACEBTN ? ScintillaCall(SCI_GETCURRENTPOS): 0);
-            ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
-
-            auto findText = GetDlgItemText(IDC_SEARCHCOMBO);
-            sFindString = CUnicodeUtils::StdGetUTF8(findText.get());
-            auto replaceText = GetDlgItemText(IDC_REPLACECOMBO);
-            std::string sReplaceString = CUnicodeUtils::StdGetUTF8(replaceText.get());
-
-            nSearchFlags = 0;
-            nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHCASE)  ? SCFIND_MATCHCASE : 0;
-            nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHWORD)  ? SCFIND_WHOLEWORD : 0;
-            nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHREGEX) ? SCFIND_REGEXP    : 0;
-
-            ScintillaCall(SCI_SETSEARCHFLAGS, nSearchFlags);
-            sptr_t findRet = -1;
-            int replaceCount = 0;
-            ScintillaCall(SCI_BEGINUNDOACTION);
-            do
-            {
-                findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
-                if ((findRet == -1) && (id==IDC_REPLACEBTN))
-                {
-                    SetInfoText(IDS_FINDRETRYWRAP);
-                    // retry from the start of the doc
-                    ScintillaCall(SCI_SETTARGETSTART, 0);
-                    ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETCURRENTPOS));
-                    findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
-                }
-                if (findRet >= 0)
-                {
-                    ScintillaCall((nSearchFlags & SCFIND_REGEXP)!=0 ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, sReplaceString.length(), (sptr_t)sReplaceString.c_str());
-                    ++replaceCount;
-                    if (id==IDC_REPLACEBTN)
-                        Center((long)ScintillaCall(SCI_GETTARGETSTART), (long)ScintillaCall(SCI_GETTARGETEND));
-
-                    ScintillaCall(SCI_SETTARGETSTART, ScintillaCall(SCI_GETTARGETEND));
-                    ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
-                }
-            } while ((id==IDC_REPLACEALLBTN) && (findRet != -1));
-            ScintillaCall(SCI_ENDUNDOACTION);
-            if (id==IDC_REPLACEALLBTN)
-            {
-                // TODO: maybe use a better way to inform the user than an interrupting dialog box
-                std::wstring sInfo = CStringUtils::Format(L"%d occurrences were replaced", replaceCount);
-                ::MessageBox(*this, sInfo.c_str(), L"BowPad", MB_ICONINFORMATION);
-            }
-
-            int maxSearch = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearch", 20);
-            std::wstring sFindStringW = CUnicodeUtils::StdGetUnicode(sFindString);
-            auto foundIt = std::find(m_searchStrings.begin(), m_searchStrings.end(), sFindStringW);
-            if (foundIt != m_searchStrings.end())
-                m_searchStrings.erase(foundIt);
-            else
-                SendDlgItemMessage(*this, IDC_SEARCHCOMBO, CB_INSERTSTRING, 0, (LPARAM)sFindStringW.c_str());
-            m_searchStrings.push_front(sFindStringW);
-            while (m_searchStrings.size() >= (size_t)maxSearch)
-                m_searchStrings.pop_back();
-
-            int i = 0;
-            for (const auto& it : m_searchStrings)
-            {
-                std::wstring sKey = CStringUtils::Format(L"search%d", i++);
-                CIniSettings::Instance().SetString(L"searchreplace", sKey.c_str(), it.c_str());
-            }
-
-
-            int maxReplace = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxreplace", 20);
-            std::wstring sReplaceStringW = CUnicodeUtils::StdGetUnicode(sReplaceString);
-            foundIt = std::find(m_replaceStrings.begin(), m_replaceStrings.end(), sFindStringW);
-            if (foundIt != m_replaceStrings.end())
-                m_replaceStrings.erase(foundIt);
-            else
-                SendDlgItemMessage(*this, IDC_REPLACECOMBO, CB_INSERTSTRING, 0, (LPARAM)sReplaceStringW.c_str());
-            m_replaceStrings.push_front(sReplaceStringW);
-            while (m_replaceStrings.size() >= (size_t)maxReplace)
-                m_replaceStrings.pop_back();
-
-            i = 0;
-            for (const auto& it : m_replaceStrings)
-            {
-                std::wstring sKey = CStringUtils::Format(L"replace%d", i++);
-                CIniSettings::Instance().SetString(L"searchreplace", sKey.c_str(), it.c_str());
-            }
+            DoReplace(id);
         }
         break;
     }
@@ -277,6 +144,151 @@ void CFindReplaceDlg::SetInfoText( UINT resid )
     ResString str(hRes, resid);
     SetDlgItemText(*this, IDC_SEARCHINFO, str);
     SetTimer(*this, TIMER_INFOSTRING, 5000, NULL);
+}
+
+void CFindReplaceDlg::DoReplace( int id )
+{
+    SetDlgItemText(*this, IDC_SEARCHINFO, L"");
+    ScintillaCall(SCI_SETTARGETSTART, id==IDC_REPLACEBTN ? ScintillaCall(SCI_GETSELECTIONSTART): 0);
+    ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
+
+    auto findText = GetDlgItemText(IDC_SEARCHCOMBO);
+    sFindString = CUnicodeUtils::StdGetUTF8(findText.get());
+    auto replaceText = GetDlgItemText(IDC_REPLACECOMBO);
+    std::string sReplaceString = CUnicodeUtils::StdGetUTF8(replaceText.get());
+
+    nSearchFlags = 0;
+    nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHCASE)  ? SCFIND_MATCHCASE : 0;
+    nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHWORD)  ? SCFIND_WHOLEWORD : 0;
+    nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHREGEX) ? SCFIND_REGEXP    : 0;
+
+    ScintillaCall(SCI_SETSEARCHFLAGS, nSearchFlags);
+    sptr_t findRet = -1;
+    int replaceCount = 0;
+    ScintillaCall(SCI_BEGINUNDOACTION);
+    do
+    {
+        findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
+        if ((findRet == -1) && (id==IDC_REPLACEBTN))
+        {
+            SetInfoText(IDS_FINDRETRYWRAP);
+            // retry from the start of the doc
+            ScintillaCall(SCI_SETTARGETSTART, 0);
+            ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETCURRENTPOS));
+            findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
+        }
+        if (findRet >= 0)
+        {
+            ScintillaCall((nSearchFlags & SCFIND_REGEXP)!=0 ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, sReplaceString.length(), (sptr_t)sReplaceString.c_str());
+            ++replaceCount;
+            if (id==IDC_REPLACEBTN)
+                Center((long)ScintillaCall(SCI_GETTARGETSTART), (long)ScintillaCall(SCI_GETTARGETEND));
+
+            ScintillaCall(SCI_SETTARGETSTART, ScintillaCall(SCI_GETTARGETEND));
+            ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
+        }
+    } while ((id==IDC_REPLACEALLBTN) && (findRet != -1));
+    ScintillaCall(SCI_ENDUNDOACTION);
+    if (id==IDC_REPLACEALLBTN)
+    {
+        // TODO: maybe use a better way to inform the user than an interrupting dialog box
+        std::wstring sInfo = CStringUtils::Format(L"%d occurrences were replaced", replaceCount);
+        ::MessageBox(*this, sInfo.c_str(), L"BowPad", MB_ICONINFORMATION);
+    }
+    else
+        DoSearch();
+
+    int maxSearch = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearch", 20);
+    std::wstring sFindStringW = CUnicodeUtils::StdGetUnicode(sFindString);
+    auto foundIt = std::find(m_searchStrings.begin(), m_searchStrings.end(), sFindStringW);
+    if (foundIt != m_searchStrings.end())
+        m_searchStrings.erase(foundIt);
+    else
+        SendDlgItemMessage(*this, IDC_SEARCHCOMBO, CB_INSERTSTRING, 0, (LPARAM)sFindStringW.c_str());
+    m_searchStrings.push_front(sFindStringW);
+    while (m_searchStrings.size() >= (size_t)maxSearch)
+        m_searchStrings.pop_back();
+
+    int i = 0;
+    for (const auto& it : m_searchStrings)
+    {
+        std::wstring sKey = CStringUtils::Format(L"search%d", i++);
+        CIniSettings::Instance().SetString(L"searchreplace", sKey.c_str(), it.c_str());
+    }
+
+
+    int maxReplace = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxreplace", 20);
+    std::wstring sReplaceStringW = CUnicodeUtils::StdGetUnicode(sReplaceString);
+    foundIt = std::find(m_replaceStrings.begin(), m_replaceStrings.end(), sReplaceStringW);
+    if (foundIt != m_replaceStrings.end())
+        m_replaceStrings.erase(foundIt);
+    else
+        SendDlgItemMessage(*this, IDC_REPLACECOMBO, CB_INSERTSTRING, 0, (LPARAM)sReplaceStringW.c_str());
+    m_replaceStrings.push_front(sReplaceStringW);
+    while (m_replaceStrings.size() >= (size_t)maxReplace)
+        m_replaceStrings.pop_back();
+
+    i = 0;
+    for (const auto& it : m_replaceStrings)
+    {
+        std::wstring sKey = CStringUtils::Format(L"replace%d", i++);
+        CIniSettings::Instance().SetString(L"searchreplace", sKey.c_str(), it.c_str());
+    }
+}
+
+void CFindReplaceDlg::DoSearch()
+{
+    SetDlgItemText(*this, IDC_SEARCHINFO, L"");
+    Scintilla::Sci_TextToFind ttf = {0};
+    ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
+    ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
+    auto findText = GetDlgItemText(IDC_SEARCHCOMBO);
+    sFindString = CUnicodeUtils::StdGetUTF8(findText.get());
+    ttf.lpstrText = const_cast<char*>(sFindString.c_str());
+    nSearchFlags = 0;
+    nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHCASE)  ? SCFIND_MATCHCASE : 0;
+    nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHWORD)  ? SCFIND_WHOLEWORD : 0;
+    nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHREGEX) ? SCFIND_REGEXP    : 0;
+
+    sptr_t findRet = ScintillaCall(SCI_FINDTEXT, nSearchFlags, (sptr_t)&ttf);
+    if (findRet == -1)
+    {
+        SetInfoText(IDS_FINDRETRYWRAP);
+        // retry from the start of the doc
+        ttf.chrg.cpMax = ttf.chrg.cpMin;
+        ttf.chrg.cpMin = 0;
+        findRet = ScintillaCall(SCI_FINDTEXT, nSearchFlags, (sptr_t)&ttf);
+    }
+    if (findRet >= 0)
+        Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
+    else
+    {
+        SetInfoText(IDS_FINDNOTFOUND);
+        FLASHWINFO fi = {sizeof(FLASHWINFO)};
+        fi.hwnd = *this;
+        fi.dwFlags = FLASHW_CAPTION;
+        fi.uCount = 3;
+        fi.dwTimeout = 20;
+        FlashWindowEx(&fi);
+    }
+
+    int maxSearch = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearch", 20);
+    std::wstring sFindStringW = CUnicodeUtils::StdGetUnicode(sFindString);
+    auto foundIt = std::find(m_searchStrings.begin(), m_searchStrings.end(), sFindStringW);
+    if (foundIt != m_searchStrings.end())
+        m_searchStrings.erase(foundIt);
+    else
+        SendDlgItemMessage(*this, IDC_SEARCHCOMBO, CB_INSERTSTRING, 0, (LPARAM)CUnicodeUtils::StdGetUnicode(sFindString).c_str());
+    m_searchStrings.push_front(sFindStringW);
+    while (m_searchStrings.size() >= (size_t)maxSearch)
+        m_searchStrings.pop_back();
+
+    int i = 0;
+    for (const auto& it : m_searchStrings)
+    {
+        std::wstring sKey = CStringUtils::Format(L"search%d", i++);
+        CIniSettings::Instance().SetString(L"searchreplace", sKey.c_str(), it.c_str());
+    }
 }
 
 bool CCmdFindReplace::Execute()
