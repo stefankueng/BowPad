@@ -107,6 +107,8 @@ void CKeyboardShortcutHandler::Load()
                             else
                             {
                                 accel.key1 = (WORD)::towupper(keyvec[i][0]);
+                                if ((keyvec[i].size() > 2) && (keyvec[i][0]=='0') && (keyvec[i][1]=='x'))
+                                    accel.key1 = (WORD)wcstol(keyvec[i].c_str(), NULL, 0);
                             }
                             break;
                         case 2:
@@ -118,6 +120,8 @@ void CKeyboardShortcutHandler::Load()
                             else
                             {
                                 accel.key2 = (WORD)::towupper(keyvec[i][0]);
+                                if ((keyvec[i].size() > 2) && (keyvec[i][0]=='0') && (keyvec[i][1]=='x'))
+                                    accel.key2 = (WORD)wcstol(keyvec[i].c_str(), NULL, 0);
                             }
                             break;
                         }
