@@ -21,11 +21,11 @@
 
 bool LaunchBase::Launch( const std::wstring& cmdline )
 {
-    if (cmdline.empty())
+    if (cmdline.empty() || !HasActiveDocument())
         return false;
     std::wstring cmd = cmdline;
     // replace the macros in the command line
-    CDocument doc = GetDocument(GetCurrentTabIndex());
+    CDocument doc = GetActiveDocument();
     std::wstring tabpath = doc.m_path;
     SearchReplace(cmd, L"$(TAB_PATH)", tabpath);
     SearchReplace(cmd, L"$(TAB_DIR)", CPathUtils::GetParentDirectory(tabpath));

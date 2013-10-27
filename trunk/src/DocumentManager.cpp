@@ -80,22 +80,9 @@ CDocumentManager::~CDocumentManager(void)
 {
 }
 
-void CDocumentManager::AddDocumentAtEnd( CDocument doc )
+void CDocumentManager::AddDocumentAtEnd( CDocument doc, int id )
 {
-    m_documents.push_back(doc);
-}
-
-void CDocumentManager::ExchangeDocs( int src, int dst )
-{
-    if (src >= (int)m_documents.size())
-        return;
-    if (dst >= (int)m_documents.size())
-        return;
-
-    CDocument srcDoc = m_documents[src];
-    CDocument dstDoc = m_documents[dst];
-    m_documents[src] = dstDoc;
-    m_documents[dst] = srcDoc;
+    m_documents[id] = doc;
 }
 
 CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int encoding)
@@ -720,9 +707,9 @@ bool CDocumentManager::UpdateFileTime( CDocument& doc )
     return true;
 }
 
-DocModifiedState CDocumentManager::HasFileChanged( int index )
+DocModifiedState CDocumentManager::HasFileChanged( int id )
 {
-    CDocument doc = GetDocument(index);
+    CDocument doc = GetDocumentFromID(id);
     if (doc.m_path.empty() || ((doc.m_lastWriteTime.dwLowDateTime==0)&&(doc.m_lastWriteTime.dwHighDateTime==0)))
         return DM_Unmodified;
 
@@ -745,26 +732,26 @@ DocModifiedState CDocumentManager::HasFileChanged( int index )
     return DM_Unmodified;
 }
 
-int CDocumentManager::GetIndexForPath( const std::wstring& path ) const
+int CDocumentManager::GetIdForPath( const std::wstring& path ) const
 {
-    for (size_t i = 0; i < m_documents.size(); ++i)
+    for (const auto& d : m_documents)
     {
-        if (_wcsicmp(m_documents[i].m_path.c_str(), path.c_str()) == 0)
-            return (int)i;
+        if (_wcsicmp(d.second.m_path.c_str(), path.c_str()) == 0)
+            return d.first;
     }
     return (int)-1;
 }
 
-void CDocumentManager::RemoveDocument( int index )
+void CDocumentManager::RemoveDocument( int id )
 {
-    CDocument doc = GetDocument(index);
+    CDocument doc = GetDocumentFromID(id);
     m_scratchScintilla.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
-    m_documents.erase(m_documents.begin() + index);
+    m_documents.erase(id);
 }
 
-COLORREF CDocumentManager::GetColorForDocument( int index )
+COLORREF CDocumentManager::GetColorForDocument( int id )
 {
-    CDocument doc = GetDocument(index);
+    CDocument doc = GetDocumentFromID(id);
     std::wstring folderpath = doc.m_path.substr(0, doc.m_path.find_last_of('\\')+1);
     std::transform(folderpath.begin(), folderpath.end(), folderpath.begin(), ::tolower);
     auto foundIt = m_foldercolorindexes.find(folderpath);

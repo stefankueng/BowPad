@@ -127,14 +127,17 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
     }
     else if (key == UI_PKEY_SelectedItem)
     {
-        CDocument doc = GetDocument(GetCurrentTabIndex());
-        hr = S_FALSE;
-        for (size_t i = 0; i < langs.size(); ++i)
+        if (HasActiveDocument())
         {
-            if (langs[i] == doc.m_language)
+            CDocument doc = GetActiveDocument();
+            hr = S_FALSE;
+            for (size_t i = 0; i < langs.size(); ++i)
             {
-                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
-                break;
+                if (langs[i] == doc.m_language)
+                {
+                    hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
+                    break;
+                }
             }
         }
     }
@@ -151,11 +154,14 @@ HRESULT CCmdCodeStyle::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PR
         {
             UINT selected;
             hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
-            CDocument doc = GetDocument(GetCurrentTabIndex());
-            doc.m_language = langs[selected];
-            SetDocument(GetCurrentTabIndex(), doc);
-            SetupLexerForLang(doc.m_language);
-            UpdateStatusBar(true);
+            if (HasActiveDocument())
+            {
+                CDocument doc = GetActiveDocument();
+                doc.m_language = langs[selected];
+                SetDocument(GetCurrentTabId(), doc);
+                SetupLexerForLang(doc.m_language);
+                UpdateStatusBar(true);
+            }
             hr = S_OK;
         }
     }

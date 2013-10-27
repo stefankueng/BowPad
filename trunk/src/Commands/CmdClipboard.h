@@ -37,7 +37,9 @@ public:
 protected:
     std::string GetHtmlSelection()
     {
-        CDocument doc = GetDocument(GetCurrentTabIndex());
+        if (!HasActiveDocument())
+            return "";
+        CDocument doc = GetActiveDocument();
         auto lexerdata = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(doc.m_language));
 
         std::string sHtmlFragment;

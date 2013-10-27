@@ -193,27 +193,33 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
     else if (key == UI_PKEY_Enabled)
     {
         // only enabled if the current doc has a path!
-        CDocument doc = GetDocument(GetCurrentTabIndex());
-        hr = UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
+        if (HasActiveDocument())
+        {
+            CDocument doc = GetActiveDocument();
+            hr = UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
+        }
     }
     else if (key == UI_PKEY_SelectedItem)
     {
-        CDocument doc = GetDocument(GetCurrentTabIndex());
         hr = S_FALSE;
-        if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
+        if (HasActiveDocument())
         {
-            hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
-            hr = S_OK;
-        }
-        else
-        {
-            for (size_t i = 0; i < codepages.size(); ++i)
+            CDocument doc = GetActiveDocument();
+            if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
             {
-                if ((int)std::get<0>(codepages[i]) == doc.m_encoding)
+                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
+                hr = S_OK;
+            }
+            else
+            {
+                for (size_t i = 0; i < codepages.size(); ++i)
                 {
-                    hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
-                    hr = S_OK;
-                    break;
+                    if ((int)std::get<0>(codepages[i]) == doc.m_encoding)
+                    {
+                        hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
+                        hr = S_OK;
+                        break;
+                    }
                 }
             }
         }
@@ -232,7 +238,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, cons
             UINT selected;
             hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
             UINT codepage = std::get<0>(codepages[selected]);
-            ReloadTab(GetCurrentTabIndex(), codepage);
+            ReloadTab(GetActiveTabIndex(), codepage);
             hr = S_OK;
         }
     }
@@ -365,22 +371,25 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
     }
     else if (key == UI_PKEY_SelectedItem)
     {
-        CDocument doc = GetDocument(GetCurrentTabIndex());
         hr = S_FALSE;
-        if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
+        if (HasActiveDocument())
         {
-            hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
-            hr = S_OK;
-        }
-        else
-        {
-            for (size_t i = 0; i < codepages.size(); ++i)
+            CDocument doc = GetActiveDocument();
+            if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
             {
-                if (((int)std::get<0>(codepages[i]) == doc.m_encoding)&&(std::get<1>(codepages[i]) == doc.m_bHasBOM))
+                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
+                hr = S_OK;
+            }
+            else
+            {
+                for (size_t i = 0; i < codepages.size(); ++i)
                 {
-                    hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
-                    hr = S_OK;
-                    break;
+                    if (((int)std::get<0>(codepages[i]) == doc.m_encoding)&&(std::get<1>(codepages[i]) == doc.m_bHasBOM))
+                    {
+                        hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
+                        hr = S_OK;
+                        break;
+                    }
                 }
             }
         }
@@ -399,16 +408,19 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, co
             UINT selected;
             hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
             UINT codepage = std::get<0>(codepages[selected]);
-            CDocument doc = GetDocument(GetCurrentTabIndex());
-            doc.m_encoding = codepage;
-            doc.m_bHasBOM = std::get<1>(codepages[selected]);
-            doc.m_bIsDirty = true;
-            doc.m_bNeedsSaving = true;
-            SetDocument(GetCurrentTabIndex(), doc);
-            // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
-            ScintillaCall(SCI_ADDUNDOACTION, 0,0);
-            ScintillaCall(SCI_UNDO);
-            UpdateStatusBar(true);
+            if (HasActiveDocument())
+            {
+                CDocument doc = GetActiveDocument();
+                doc.m_encoding = codepage;
+                doc.m_bHasBOM = std::get<1>(codepages[selected]);
+                doc.m_bIsDirty = true;
+                doc.m_bNeedsSaving = true;
+                SetDocument(GetCurrentTabId(), doc);
+                // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
+                ScintillaCall(SCI_ADDUNDOACTION, 0,0);
+                ScintillaCall(SCI_UNDO);
+                UpdateStatusBar(true);
+            }
             hr = S_OK;
         }
     }

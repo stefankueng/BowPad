@@ -105,8 +105,11 @@ public:
 
     virtual bool Execute()
     {
-        CDocument doc = GetDocument(GetCurrentTabIndex());
-        ReloadTab(GetCurrentTabIndex(), doc.m_encoding);
+        if (HasActiveDocument())
+        {
+            CDocument doc = GetActiveDocument();
+            ReloadTab(GetActiveTabIndex(), doc.m_encoding);
+        }
         return true;
     }
     virtual UINT GetCmdId() { return cmdReload; }

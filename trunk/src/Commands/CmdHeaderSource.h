@@ -39,8 +39,10 @@ public:
 
     virtual bool Execute()
     {
+        if (!HasActiveDocument())
+            return false;
         // get the current path and filename
-        CDocument doc = GetDocument(GetCurrentTabIndex());
+        CDocument doc = GetActiveDocument();
         std::wstring path = doc.m_path;
         std::transform(path.begin(), path.end(), path.begin(), ::tolower);
 

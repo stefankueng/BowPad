@@ -155,13 +155,14 @@ LRESULT CALLBACK CTabBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LP
 int CTabBar::InsertAtEnd(const TCHAR *subTabName)
 {
     TCITEM tie;
-    tie.mask = TCIF_TEXT | TCIF_IMAGE;
+    tie.mask = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
     int index = -1;
 
     if (m_bHasImgList)
         index = 0;
     tie.iImage = index;
     tie.pszText = (TCHAR *)subTabName;
+    tie.lParam = m_tabID++;
     return int(::SendMessage(*this, TCM_INSERTITEM, m_nItems++, reinterpret_cast<LPARAM>(&tie)));
 }
 
@@ -209,7 +210,8 @@ void CTabBar::ActivateAt(int index) const
         nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
         nmhdr.tabOrigin = GetCurrentTabIndex();
         ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
-        ::SendMessage(*this, TCM_SETCURSEL, index, 0);
+        if (index >= 0)
+            ::SendMessage(*this, TCM_SETCURSEL, index, 0);
     }
     TBHDR nmhdr;
     nmhdr.hdr.hwndFrom = *this;
@@ -247,6 +249,21 @@ void CTabBar::DeletItemAt( int index )
 int CTabBar::GetCurrentTabIndex() const
 {
     return (int)::SendMessage(*this, TCM_GETCURSEL, 0, 0);
+}
+
+int CTabBar::GetCurrentTabId() const
+{
+    int index = (int)::SendMessage(*this, TCM_GETCURSEL, 0, 0);
+    if (index < 0)
+    {
+        index = (int)::SendMessage(*this, TCM_GETCURFOCUS, 0, 0);
+        if (index < 0)
+            return -1;
+    }
+    TCITEM tci;
+    tci.mask = TCIF_PARAM;
+    ::SendMessage(*this, TCM_GETITEM, index, reinterpret_cast<LPARAM>(&tci));
+    return (int)tci.lParam;
 }
 
 void CTabBar::DeletAllItems()
@@ -862,6 +879,27 @@ bool CTabBar::IsPointInParentZone( POINT screenPoint ) const
 LRESULT CALLBACK CTabBar::TabBar_Proc( HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam )
 {
     return (((CTabBar *)(::GetWindowLongPtr(hwnd, GWLP_USERDATA)))->RunProc(hwnd, Message, wParam, lParam));
+}
+
+int CTabBar::GetIDFromIndex( int index )
+{
+    TCITEM tci;
+    tci.mask = TCIF_PARAM;
+    ::SendMessage(*this, TCM_GETITEM, index, reinterpret_cast<LPARAM>(&tci));
+    return (int)tci.lParam;
+}
+
+int CTabBar::GetIndexFromID( int id )
+{
+    for (int i = 0; i < m_nItems; ++i)
+    {
+        TCITEM tci;
+        tci.mask = TCIF_PARAM;
+        ::SendMessage(*this, TCM_GETITEM, i, reinterpret_cast<LPARAM>(&tci));
+        if (id == tci.lParam)
+            return i;
+    }
+    return (-1);
 }
 
 bool CloseButtonZone::IsHit(int x, int y, const RECT & testZone) const

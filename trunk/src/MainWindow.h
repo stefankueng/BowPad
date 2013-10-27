@@ -45,7 +45,7 @@ public:
     void                GoToLine( size_t line );
     bool                CloseTab(int tab);
     bool                CloseAllTabs();
-    bool                HandleOutsideModifications(int index = -1);
+    bool                HandleOutsideModifications(int id = -1);
     void                ElevatedSave( const std::wstring& path, const std::wstring& savepath );
 
     // IUnknown

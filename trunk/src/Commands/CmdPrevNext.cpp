@@ -23,27 +23,27 @@ class PositionData
 {
 public:
     PositionData()
-        : index(-1)
+        : id(-1)
         , line((size_t)-1)
         , column((size_t)-1)
     {
     }
     PositionData(int i, size_t l, size_t c)
-        : index(i)
+        : id(i)
         , line(l)
         , column(c)
     {
     }
     ~PositionData(){}
 
-    int             index;
+    int             id;
     size_t          line;
     size_t          column;
 };
 
 
 std::deque<PositionData>    positions;
-int                         currentDocIndex = -1;
+int                         currentDocId = -1;
 int                         offsetBeforeEnd = 0;
 size_t                      currentline = (size_t)-1;
 bool                        ignore = false;
@@ -59,18 +59,18 @@ void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification * pScn )
             if (offsetBeforeEnd >= (int)positions.size())
                 offsetBeforeEnd = 0;
             size_t line = ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
-            if ((currentDocIndex < 0) || (currentline == -1))
+            if ((currentDocId < 0) || (currentline == -1))
             {
                 if (offsetBeforeEnd)
                 {
                     positions.resize(positions.size()-offsetBeforeEnd+1);
                     offsetBeforeEnd = 0;
                 }
-                currentDocIndex = GetCurrentTabIndex();
-                if (currentDocIndex >= 0)
+                currentDocId = GetCurrentTabId();
+                if (currentDocId >= 0)
                 {
                     size_t col  = ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
-                    PositionData data(currentDocIndex, line, col);
+                    PositionData data(currentDocId, line, col);
                     positions.push_back(data);
                     currentline = line;
                     InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
@@ -91,7 +91,7 @@ void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification * pScn )
                             offsetBeforeEnd = 0;
                         }
                         size_t col  = ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
-                        PositionData data(currentDocIndex, line, col);
+                        PositionData data(currentDocId, line, col);
                         positions.push_back(data);
                         InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
                         InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, NULL);
@@ -108,7 +108,7 @@ void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification * pScn )
                             offsetBeforeEnd = 0;
                         }
                         size_t col  = ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
-                        PositionData data(currentDocIndex, line, col);
+                        PositionData data(currentDocId, line, col);
                         positions.push_back(data);
                         InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
                         InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, NULL);
@@ -131,41 +131,24 @@ void CCmdPrevNext::TabNotify( TBHDR * ptbhdr )
     case TCN_SELCHANGE:
         {
             // document got activated
-            currentDocIndex = GetCurrentTabIndex();
+            currentDocId = GetCurrentTabId();
         }
         break;
-    case TCN_TABDROPPED:
-        {
-            // adjust the indexes
-            int src = GetSrcTab();
-            int dst = GetDstTab();
-            for (auto it : positions)
-            {
-                if (it.index == src)
-                    it.index = dst;
-                else if (it.index == dst)
-                    it.index = src;
-            }
-        }
         break;
     case TCN_TABDELETE:
         {
             // remove all positions in that tab
             auto it = positions.begin();
-            size_t i = 0;
             for (; it != positions.end();)
             {
-                if (it->index == ptbhdr->tabOrigin)
+                if (it->id == GetDocIDFromTabIndex(ptbhdr->tabOrigin))
                 {
                     it = positions.erase(it);
                 }
                 else
                 {
-                    if (it->index > ptbhdr->tabOrigin)
-                        it->index--;
                     ++it;
                 }
-                ++i;
             }
             offsetBeforeEnd = 0;
             InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
@@ -190,11 +173,11 @@ bool CCmdPrevious::Execute()
         ++i;
     }
 
-    if (data.index >= 0)
+    if (data.id >= 0)
     {
         ignore = true;
-        if (GetCurrentTabIndex() != data.index)
-            TabActivateAt(data.index);
+        if (GetCurrentTabId() != data.id)
+            TabActivateAt(GetTabIndexFromDocID(data.id));
 
         size_t pos = ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
         ScintillaCall(SCI_SETANCHOR, pos);
@@ -239,11 +222,11 @@ bool CCmdNext::Execute()
         ++i;
     }
 
-    if (data.index >= 0)
+    if (data.id >= 0)
     {
         ignore = true;
-        if (GetCurrentTabIndex() != data.index)
-            TabActivateAt(data.index);
+        if (GetCurrentTabId() != data.id)
+            TabActivateAt(GetTabIndexFromDocID(data.id));
 
         size_t pos = ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
         ScintillaCall(SCI_SETANCHOR, pos);
