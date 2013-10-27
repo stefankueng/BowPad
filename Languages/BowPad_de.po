@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2013-09-15 13:28+0100\n"
+"PO-Revision-Date: 2013-10-27 19:48+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: German\n"
@@ -81,6 +81,19 @@ msgstr ""
 #. Resource IDs: (103)
 msgid "About BowPad"
 msgstr "Über BowPad"
+
+#. Resource IDs: (10)
+msgid "Access denied!"
+msgstr "Zugriff verweigert!"
+
+#. Resource IDs: (10)
+#, c-format
+msgid ""
+"Access to the file '%s' was denied. Do you want to try again with elevated "
+"privileges?"
+msgstr ""
+"Zugriff auf die Datei '%s' wurde verweigert. Möchten Sie mit erhöhten "
+"Rechten erneut versuchen?"
 
 #. Resource IDs: (3756)
 msgid "Allows to load a file with a specific encoding"
@@ -418,6 +431,22 @@ msgstr "Dokument verändert"
 msgid "Document removed"
 msgstr "Dokument gelöscht"
 
+#. Resource IDs: (10)
+msgid ""
+"Don't Save\n"
+"The file is not saved."
+msgstr ""
+"Nicht speichern\n"
+"Die Datei wird nicht gespeichert."
+
+#. Resource IDs: (10)
+msgid ""
+"Don't open\n"
+"The file is not opened."
+msgstr ""
+"Nicht öffnen\n"
+"Die Datei wird nicht geöffnet."
+
 #. Resource IDs: (8)
 msgid ""
 "Download and install the update\n"
@@ -533,6 +562,10 @@ msgstr "Suchen/Ersetzen"
 #. Resource IDs: (65535)
 msgid "Font"
 msgstr "Schriftart"
+
+#. Resource IDs: (3773)
+msgid "Functions"
+msgstr "Funktionen"
 
 #. Resource IDs: (145, 3763)
 msgid "Go to line"
@@ -778,6 +811,10 @@ msgstr "Nächstes Lesezeichen"
 msgid "Next Bookmarks (F2)"
 msgstr "Nächstes Lesezeichen (F2)"
 
+#. Resource IDs: (10)
+msgid "No functions found!"
+msgstr "Keine Funktionen gefunden"
+
 #. Resource IDs: (9)
 msgid ""
 "No updates available.\n"
@@ -821,6 +858,14 @@ msgstr "Öffne Dateien (Ctrl+O)"
 #. Resource IDs: (3772)
 msgid "Open corresponding File (Ctrl+K,O)"
 msgstr "Öffne zugehörige Datei (Ctrl+K,O)"
+
+#. Resource IDs: (10)
+msgid ""
+"Open elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"Öffne Elevated\n"
+"BowPad wird erneut mit erhöhten Rechten gestartet."
 
 #. Resource IDs: (3752)
 msgid "Opens one or more files"
@@ -994,6 +1039,14 @@ msgstr "Alle speichern"
 msgid "Save as"
 msgstr "Speichern unter"
 
+#. Resource IDs: (10)
+msgid ""
+"Save elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"Speichere elevated\n"
+"BowPad wird erneut mit erhöhten Rechten gestartet."
+
 #. Resource IDs: (8)
 msgid ""
 "Save modifications\n"
@@ -1033,6 +1086,10 @@ msgstr "Suche in Wikipedia (Ctrl+L,P)"
 #. Resource IDs: (3758)
 msgid "Search and/or replace text in documents/tabs"
 msgstr "Suche und/oder ersetze Text in Dokumenten/Tabs"
+
+#. Resource IDs: (10)
+msgid "Search text not found!"
+msgstr "Suchtext nicht gefunden!"
 
 #. Resource IDs: (3759)
 msgid "Searches for the next match of the selected text"
@@ -1085,6 +1142,10 @@ msgstr "Zeige Leerzeichen (Ctrl+R,W)"
 #. Resource IDs: (3772)
 msgid "Shows a dialog to configure custom commands"
 msgstr "Zeigt den Konfigurationsdialog für Benutzerbefehle"
+
+#. Resource IDs: (3773)
+msgid "Shows a list of functions/methods in the file to jump to"
+msgstr "Zeigt eine Liste von Funktionen/Methoden an in der aktuellen Datei"
 
 #. Resource IDs: (3764)
 msgid "Spaces to Tabs"
@@ -1240,6 +1301,10 @@ msgstr "Zeilenumbruch"
 #. Resource IDs: (3755)
 msgid "Wrap Lines (Ctrl+E,W)"
 msgstr "Zeilenumbruch (Ctrl+E,W)"
+
+#. Resource IDs: (9)
+msgid "Wrap around"
+msgstr "Weiter von Beginn"
 
 #. Resource IDs: (3755)
 msgid "Wrap lines at the end of the window"
