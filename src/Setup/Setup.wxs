@@ -22,7 +22,7 @@
     </Upgrade>
 
     <Media Id="1" Cabinet="BowPad.cab" EmbedCab="yes" CompressionLevel="high" />
-    <Icon Id="BowPadIcon" SourceFile="..\BowPad.ico" />
+    <Icon Id="BowPadIcon" SourceFile="..\res\BowPad.ico" />
     <Property Id="ARPPRODUCTICON">BowPadIcon</Property>
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <Property Id="RIBBONFRAMEWORK">
