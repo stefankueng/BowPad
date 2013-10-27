@@ -51,11 +51,11 @@ public:
         CIniSettings::Instance().SetInt64(L"TabSession", L"autoload", bAutoLoad);
         // now go through all tabs and save their state
         int tabcount = GetTabCount();
-        int activetab = GetCurrentTabIndex();
+        int activetab = GetActiveTabIndex();
         int saveindex = 0;
         for (int i = 0; i < tabcount; ++i)
         {
-            CDocument doc = GetDocument(i);
+            CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(i));
             if (!doc.m_path.empty())
             {
                 if (i == activetab)
@@ -103,29 +103,32 @@ protected:
                 break;
             if (OpenFile(path.c_str()))
             {
-                CDocument doc = GetDocument(GetCurrentTabIndex());
-                doc.m_position.m_nSelMode           = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"selmode%d", i).c_str(), 0);
-                doc.m_position.m_nStartPos          = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"startpos%d", i).c_str(), 0);
-                doc.m_position.m_nEndPos            = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"endpos%d", i).c_str(), 0);
-                doc.m_position.m_nScrollWidth       = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"scrollwidth%d", i).c_str(), 0);
-                doc.m_position.m_xOffset            = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"xoffset%d", i).c_str(), 0);
-                doc.m_position.m_nFirstVisibleLine  = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"firstvisible%d", i).c_str(), 0);
-                SetDocument(GetCurrentTabIndex(), doc);
-
-                ScintillaCall(SCI_GOTOPOS, 0);
-                ScintillaCall(SCI_SETSELECTIONMODE, doc.m_position.m_nSelMode);
-                ScintillaCall(SCI_SETANCHOR, doc.m_position.m_nStartPos);
-                ScintillaCall(SCI_SETCURRENTPOS, doc.m_position.m_nEndPos);
-                ScintillaCall(SCI_CANCEL);
-                if (ScintillaCall(SCI_GETWRAPMODE) != SC_WRAP_WORD)
+                if (HasActiveDocument())
                 {
-                    // only offset if not wrapping, otherwise the offset isn't needed at all
-                    ScintillaCall(SCI_SETSCROLLWIDTH, doc.m_position.m_nScrollWidth);
-                    ScintillaCall(SCI_SETXOFFSET, doc.m_position.m_xOffset);
+                    CDocument doc = GetActiveDocument();
+                    doc.m_position.m_nSelMode           = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"selmode%d", i).c_str(), 0);
+                    doc.m_position.m_nStartPos          = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"startpos%d", i).c_str(), 0);
+                    doc.m_position.m_nEndPos            = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"endpos%d", i).c_str(), 0);
+                    doc.m_position.m_nScrollWidth       = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"scrollwidth%d", i).c_str(), 0);
+                    doc.m_position.m_xOffset            = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"xoffset%d", i).c_str(), 0);
+                    doc.m_position.m_nFirstVisibleLine  = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"firstvisible%d", i).c_str(), 0);
+                    SetDocument(GetCurrentTabId(), doc);
+
+                    ScintillaCall(SCI_GOTOPOS, 0);
+                    ScintillaCall(SCI_SETSELECTIONMODE, doc.m_position.m_nSelMode);
+                    ScintillaCall(SCI_SETANCHOR, doc.m_position.m_nStartPos);
+                    ScintillaCall(SCI_SETCURRENTPOS, doc.m_position.m_nEndPos);
+                    ScintillaCall(SCI_CANCEL);
+                    if (ScintillaCall(SCI_GETWRAPMODE) != SC_WRAP_WORD)
+                    {
+                        // only offset if not wrapping, otherwise the offset isn't needed at all
+                        ScintillaCall(SCI_SETSCROLLWIDTH, doc.m_position.m_nScrollWidth);
+                        ScintillaCall(SCI_SETXOFFSET, doc.m_position.m_xOffset);
+                    }
+                    ScintillaCall(SCI_CHOOSECARETX);
+                    size_t lineToShow = ScintillaCall(SCI_VISIBLEFROMDOCLINE,doc.m_position.m_nFirstVisibleLine);
+                    ScintillaCall(SCI_LINESCROLL, 0, lineToShow);
                 }
-                ScintillaCall(SCI_CHOOSECARETX);
-                size_t lineToShow = ScintillaCall(SCI_VISIBLEFROMDOCLINE,doc.m_position.m_nFirstVisibleLine);
-                ScintillaCall(SCI_LINESCROLL, 0, lineToShow);
             }
         }
     }
@@ -221,11 +224,11 @@ public:
 
     virtual void OnDocumentClose( int index )
     {
-        CDocument doc = GetDocument(index);
+        CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(index));
         if (doc.m_path.empty())
             return;
 
-        if (index == GetCurrentTabIndex())
+        if (index == GetActiveTabIndex())
         {
             CPosData pos;
             pos.m_nFirstVisibleLine   = ScintillaCall(SCI_GETFIRSTVISIBLELINE);

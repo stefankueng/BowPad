@@ -34,26 +34,26 @@ public:
     CDocumentManager(void);
     ~CDocumentManager(void);
 
-    void                        AddDocumentAtEnd(CDocument doc);
-    void                        RemoveDocument(int index);
-    void                        SetDocument(int index, CDocument doc) { m_documents[index] = doc; }
+    void                        AddDocumentAtEnd(CDocument doc, int id);
+    void                        RemoveDocument(int id);
+    void                        SetDocument(int id, CDocument doc) { m_documents.find(id)->second = doc; }
     int                         GetCount() const { return (int)m_documents.size(); }
-    int                         GetIndexForPath(const std::wstring& path) const;
-    CDocument                   GetDocument(int index) const { return m_documents.at(index); }
-    Document                    GetScintillaDocument(int index) const { return m_documents.at(index).m_document; }
-    void                        ExchangeDocs(int src, int dst);
-    COLORREF                    GetColorForDocument(int index);
+    int                         GetIdForPath(const std::wstring& path) const;
+    bool                        HasDocumentID(int id) const { return m_documents.find(id) != m_documents.end(); }
+    CDocument                   GetDocumentFromID(int id) const { return m_documents.find(id)->second; }
+    Document                    GetScintillaDocument(int id) const { return m_documents.find(id)->second.m_document; }
+    COLORREF                    GetColorForDocument(int id);
 
     CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding);
     bool                        SaveFile(HWND hWnd, const CDocument& doc);
     bool                        UpdateFileTime(CDocument& doc);
-    DocModifiedState            HasFileChanged(int index);
+    DocModifiedState            HasFileChanged(int id);
 private:
     FormatType                  GetEOLFormatForm(const char *data) const;
     bool                        SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc);
 
 private:
-    std::vector<CDocument>      m_documents;
+    std::map<int,CDocument>     m_documents;
     std::map<std::wstring, int> m_foldercolorindexes;
     int                         m_lastfoldercolorindex;
     CScintillaWnd               m_scratchScintilla;

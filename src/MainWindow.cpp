@@ -421,14 +421,18 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     if (hWin == m_TabBar)
                     {
                         LPNMTTDISPINFO lpnmtdi = (LPNMTTDISPINFO)lParam;
-                        if (pNMHDR->idFrom < (UINT_PTR)m_DocManager.GetCount())
+                        int id = m_TabBar.GetIDFromIndex((int)pNMHDR->idFrom);
+                        if (id >= 0)
                         {
-                            CDocument doc = m_DocManager.GetDocument((int)pNMHDR->idFrom);
-                            m_tooltipbuffer = std::unique_ptr<wchar_t[]>(new wchar_t[doc.m_path.size()+1]);
-                            wcscpy_s(m_tooltipbuffer.get(), doc.m_path.size()+1, doc.m_path.c_str());
-                            lpnmtdi->lpszText = m_tooltipbuffer.get();
-                            lpnmtdi->hinst = NULL;
-                            return 0;
+                            if (m_DocManager.HasDocumentID(id))
+                            {
+                                CDocument doc = m_DocManager.GetDocumentFromID(id);
+                                m_tooltipbuffer = std::unique_ptr<wchar_t[]>(new wchar_t[doc.m_path.size()+1]);
+                                wcscpy_s(m_tooltipbuffer.get(), doc.m_path.size()+1, doc.m_path.c_str());
+                                lpnmtdi->lpszText = m_tooltipbuffer.get();
+                                lpnmtdi->hinst = NULL;
+                                return 0;
+                            }
                         }
                     }
                 }
@@ -448,16 +452,16 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case TCN_GETCOLOR:
                     if ((ptbhdr->tabOrigin >= 0) && (ptbhdr->tabOrigin < m_DocManager.GetCount()))
                     {
-                        return CTheme::Instance().GetThemeColor(m_DocManager.GetColorForDocument(ptbhdr->tabOrigin));
+                        return CTheme::Instance().GetThemeColor(m_DocManager.GetColorForDocument(m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin)));
                     }
                     break;
                 case TCN_SELCHANGE:
                     {
                         // document got activated
-                        int tab = m_TabBar.GetCurrentTabIndex();
-                        if ((tab >= 0) && (tab < m_DocManager.GetCount()))
+                        int id = m_TabBar.GetCurrentTabId();
+                        if ((id >= 0) && m_DocManager.HasDocumentID(id))
                         {
-                            CDocument doc = m_DocManager.GetDocument(tab);
+                            CDocument doc = m_DocManager.GetDocumentFromID(id);
                             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
                             m_scintilla.SetupLexerForLang(doc.m_language);
                             m_scintilla.RestoreCurrentPos(doc.m_position);
@@ -468,7 +472,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             m_TabBar.GetCurrentTitle(sTabTitle, _countof(sTabTitle));
                             std::wstring sWindowTitle = CStringUtils::Format(L"%s - BowPad", doc.m_path.empty() ? sTabTitle : doc.m_path.c_str());
                             SetWindowText(*this, sWindowTitle.c_str());
-                            HandleOutsideModifications(tab);
+                            HandleOutsideModifications(id);
                             SetFocus(m_scintilla);
                             m_scintilla.Call(SCI_GRABFOCUS);
                             UpdateStatusBar(true);
@@ -478,32 +482,25 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case TCN_SELCHANGING:
                     {
                         // document is about to be deactivated
-                        int tab = m_TabBar.GetCurrentTabIndex();
-                        if ((tab >= 0) && (tab < m_DocManager.GetCount()))
+                        int id = m_TabBar.GetCurrentTabId();
+                        if ((id >= 0) && m_DocManager.HasDocumentID(id))
                         {
-                            CDocument doc = m_DocManager.GetDocument(tab);
+                            CDocument doc = m_DocManager.GetDocumentFromID(id);
                             m_scintilla.SaveCurrentPos(&doc.m_position);
-                            m_DocManager.SetDocument(tab, doc);
+                            m_DocManager.SetDocument(id, doc);
                         }
-                    }
-                    break;
-                case TCN_TABDROPPED:
-                    {
-                        int src = m_TabBar.GetSrcTab();
-                        int dst = m_TabBar.GetDstTab();
-                        m_DocManager.ExchangeDocs(src, dst);
                     }
                     break;
                 case TCN_TABDELETE:
                     {
-                        int tab = m_TabBar.GetCurrentTabIndex();
+                        int id = m_TabBar.GetCurrentTabId();
                         if (CloseTab(ptbhdr->tabOrigin))
                         {
-                            if (tab == ptbhdr->tabOrigin)
+                            if (id == m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin))
                             {
-                                if (tab > 0)
+                                if (ptbhdr->tabOrigin > 0)
                                 {
-                                    m_TabBar.ActivateAt(tab-1);
+                                    m_TabBar.ActivateAt(ptbhdr->tabOrigin-1);
                                 }
                             }
                         }
@@ -532,19 +529,19 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case SCN_SAVEPOINTREACHED:
                 case SCN_SAVEPOINTLEFT:
                     {
-                        int tab = m_TabBar.GetCurrentTabIndex();
-                        if ((tab >= 0) && (tab < m_DocManager.GetCount()))
+                        int id = m_TabBar.GetCurrentTabId();
+                        if ((id >= 0) && m_DocManager.HasDocumentID(id))
                         {
-                            CDocument doc = m_DocManager.GetDocument(tab);
+                            CDocument doc = m_DocManager.GetDocumentFromID(id);
                             doc.m_bIsDirty = pScn->nmhdr.code == SCN_SAVEPOINTLEFT;
-                            m_DocManager.SetDocument(tab, doc);
+                            m_DocManager.SetDocument(id, doc);
                             TCITEM tie;
                             tie.lParam = -1;
                             tie.mask = TCIF_IMAGE;
                             tie.iImage = doc.m_bIsDirty||doc.m_bNeedsSaving?UNSAVED_IMG_INDEX:SAVED_IMG_INDEX;
                             if (doc.m_bIsReadonly)
                                 tie.iImage = REDONLY_IMG_INDEX;
-                            ::SendMessage(m_TabBar, TCM_SETITEM, tab, reinterpret_cast<LPARAM>(&tie));
+                            ::SendMessage(m_TabBar, TCM_SETITEM, m_TabBar.GetIndexFromID(id), reinterpret_cast<LPARAM>(&tie));
                         }
                     }
                     break;
@@ -753,10 +750,11 @@ LRESULT CMainWindow::DoCommand(int id)
             newCount++;
             CDocument doc;
             doc.m_document = m_scintilla.Call(SCI_CREATEDOCUMENT);
-            m_DocManager.AddDocumentAtEnd(doc);
             ResString newRes(hRes, IDS_NEW_TABTITLE);
             std::wstring s = CStringUtils::Format(newRes, newCount);
             int index = m_TabBar.InsertAtEnd(s.c_str());
+            int id = m_TabBar.GetIDFromIndex(index);
+            m_DocManager.AddDocumentAtEnd(doc, id);
             m_TabBar.ActivateAt(index);
             m_scintilla.SetupLexerForLang(L"Text");
         }
@@ -872,10 +870,10 @@ void CMainWindow::ResizeChildWindows()
 bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
 {
     bool bRet = false;
-    int tab = m_TabBar.GetCurrentTabIndex();
-    if ((tab >= 0) && (tab < m_DocManager.GetCount()))
+    int id = m_TabBar.GetCurrentTabId();
+    if ((id >= 0) && m_DocManager.HasDocumentID(id))
     {
-        CDocument doc = m_DocManager.GetDocument(tab);
+        CDocument doc = m_DocManager.GetDocumentFromID(id);
         if (doc.m_path.empty() || bSaveAs)
         {
             bSaveAs = true;
@@ -938,7 +936,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
                 }
                 std::wstring sFileName = doc.m_path.substr(doc.m_path.find_last_of('\\')+1);
                 m_TabBar.SetCurrentTitle(sFileName.c_str());
-                m_DocManager.SetDocument(tab, doc);
+                m_DocManager.SetDocument(id, doc);
                 UpdateStatusBar(true);
                 m_scintilla.Call(SCI_SETSAVEPOINT);
             }
@@ -985,7 +983,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", STATUSBAR_CAPS);
     if (bEverything)
     {
-        CDocument doc = m_DocManager.GetDocument(m_TabBar.GetCurrentTabIndex());
+        CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
         m_StatusBar.SetText(doc.m_language.c_str(), STATUSBAR_DOC_TYPE);
         m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), STATUSBAR_EOF_FORMAT);
         m_StatusBar.SetText(doc.GetEncodingString().c_str(), STATUSBAR_UNICODE_TYPE);
@@ -1003,7 +1001,7 @@ bool CMainWindow::CloseTab( int tab )
 {
     if ((tab < 0) || (tab >= m_DocManager.GetCount()))
         return false;
-    CDocument doc = m_DocManager.GetDocument(tab);
+    CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
     if (doc.m_bIsDirty||doc.m_bNeedsSaving)
     {
         m_TabBar.ActivateAt(tab);
@@ -1054,7 +1052,7 @@ bool CMainWindow::CloseTab( int tab )
 
     CCommandHandler::Instance().OnDocumentClose(tab);
 
-    m_DocManager.RemoveDocument(tab);
+    m_DocManager.RemoveDocument(m_TabBar.GetIDFromIndex(tab));
     m_TabBar.DeletItemAt(tab);
     EnsureAtLeastOneTab();
     m_TabBar.ActivateAt(tab < m_TabBar.GetItemCount() ? tab : m_TabBar.GetItemCount()-1);
@@ -1067,7 +1065,7 @@ bool CMainWindow::CloseAllTabs()
     {
         if (CloseTab(m_TabBar.GetItemCount()-1) == false)
             return false;
-        if ((m_TabBar.GetItemCount() == 1)&&(m_scintilla.Call(SCI_GETTEXTLENGTH)==0)&&(m_scintilla.Call(SCI_GETMODIFY)==0)&&m_DocManager.GetDocument(0).m_path.empty())
+        if ((m_TabBar.GetItemCount() == 1)&&(m_scintilla.Call(SCI_GETTEXTLENGTH)==0)&&(m_scintilla.Call(SCI_GETMODIFY)==0)&&m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0)).m_path.empty())
             return true;
     } while (m_TabBar.GetItemCount() > 0);
     return true;
@@ -1078,11 +1076,11 @@ bool CMainWindow::OpenFile( const std::wstring& file )
     bool bRet = true;
     int encoding = -1;
     std::wstring filepath = CPathUtils::GetLongPathname(file);
-    int index = m_DocManager.GetIndexForPath(filepath.c_str());
-    if (index != -1)
+    int id = m_DocManager.GetIdForPath(filepath.c_str());
+    if (id != -1)
     {
         // document already open
-        m_TabBar.ActivateAt(index);
+        m_TabBar.ActivateAt(m_TabBar.GetIndexFromID(id));
     }
     else
     {
@@ -1092,10 +1090,10 @@ bool CMainWindow::OpenFile( const std::wstring& file )
             if (m_TabBar.GetItemCount() == 1)
             {
                 // check if the only tab is empty and if it is, remove it
-                CDocument existDoc = m_DocManager.GetDocument(0);
+                CDocument existDoc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0));
                 if (existDoc.m_path.empty() && (m_scintilla.Call(SCI_GETLENGTH)==0) && (m_scintilla.Call(SCI_CANUNDO)==0))
                 {
-                    m_DocManager.RemoveDocument(0);
+                    m_DocManager.RemoveDocument(m_TabBar.GetIDFromIndex(0));
                     m_TabBar.DeletItemAt(0);
                 }
             }
@@ -1103,9 +1101,10 @@ bool CMainWindow::OpenFile( const std::wstring& file )
             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
             doc.m_language = CLexStyles::Instance().GetLanguageForExt(filepath.substr(filepath.find_last_of('.')+1));
             m_scintilla.SetupLexerForExt(filepath.substr(filepath.find_last_of('.')+1).c_str());
-            m_DocManager.AddDocumentAtEnd(doc);
             std::wstring sFileName = filepath.substr(filepath.find_last_of('\\')+1);
             int index = m_TabBar.InsertAtEnd(sFileName.c_str());
+            int id = m_TabBar.GetIDFromIndex(index);
+            m_DocManager.AddDocumentAtEnd(doc, id);
             m_TabBar.ActivateAt(index);
             SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
         }
@@ -1123,7 +1122,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding )
     if ((tab < m_TabBar.GetItemCount())&&(tab < m_DocManager.GetCount()))
     {
         // first check if the document is modified and needs saving
-        CDocument doc = m_DocManager.GetDocument(tab);
+        CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
         if (doc.m_bIsDirty||doc.m_bNeedsSaving)
         {
             // doc has modifications, ask the user what to do:
@@ -1364,7 +1363,7 @@ void CMainWindow::AutoIndent( Scintilla::SCNotification * pScn )
     }
 }
 
-bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
+bool CMainWindow::HandleOutsideModifications( int id /*= -1*/ )
 {
     static bool bInHandleOutsideModifications = false;
     // recurse protection
@@ -1373,15 +1372,13 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
 
     bInHandleOutsideModifications = true;
     bool bRet = true;
-    for (int i = 0; i < m_DocManager.GetCount(); ++i)
+    for (int i = 0; i < m_TabBar.GetItemCount(); ++i)
     {
-        if (index != -1)
-            i = index;
-
-        auto ds = m_DocManager.HasFileChanged(i);
+        int docID = id == -1 ? m_TabBar.GetIDFromIndex(i) : id;
+        auto ds = m_DocManager.HasFileChanged(docID);
         if (ds == DM_Modified)
         {
-            CDocument doc = m_DocManager.GetDocument(i);
+            CDocument doc = m_DocManager.GetDocumentFromID(docID);
             m_TabBar.ActivateAt(i);
             ResString rTitle(hRes, IDS_OUTSIDEMODIFICATIONS);
             ResString rQuestion(hRes, doc.m_bNeedsSaving || doc.m_bIsDirty ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
@@ -1462,7 +1459,7 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
             // file was removed. Options are:
             // * keep the file open
             // * close the file
-            CDocument doc = m_DocManager.GetDocument(i);
+            CDocument doc = m_DocManager.GetDocumentFromID(docID);
             m_TabBar.ActivateAt(i);
             ResString rTitle(hRes, IDS_OUTSIDEREMOVEDHEAD);
             ResString rQuestion(hRes, IDS_OUTSIDEREMOVED);
@@ -1497,7 +1494,7 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
             {
                 // close the tab
                 CloseTab(i);
-                if (index == -1)
+                if (id == -1)
                     --i;    // the tab was removed, so continue with the next one
             }
             else
@@ -1514,7 +1511,7 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
             }
         }
 
-        if (index != -1)
+        if (id != -1)
             break;
     }
     bInHandleOutsideModifications = false;
@@ -1524,13 +1521,13 @@ bool CMainWindow::HandleOutsideModifications( int index /*= -1*/ )
 void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& savepath )
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
-    int index = m_DocManager.GetIndexForPath(filepath.c_str());
-    if (index != -1)
+    int id = m_DocManager.GetIdForPath(filepath.c_str());
+    if (id != -1)
     {
-        m_TabBar.ActivateAt(index);
-        CDocument doc = m_DocManager.GetDocument(index);
+        m_TabBar.ActivateAt(m_TabBar.GetIndexFromID(id));
+        CDocument doc = m_DocManager.GetDocumentFromID(id);
         doc.m_path = CPathUtils::GetLongPathname(savepath);
-        m_DocManager.SetDocument(index, doc);
+        m_DocManager.SetDocument(id, doc);
         SaveCurrentTab();
         wchar_t sTabTitle[100] = {0};
         m_TabBar.GetCurrentTitle(sTabTitle, _countof(sTabTitle));

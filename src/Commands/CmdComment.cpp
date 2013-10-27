@@ -51,7 +51,9 @@ bool CCmdComment::Execute()
         lineStartStart  = ScintillaCall(SCI_GETLINEINDENTPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
         lineEndEnd      = ScintillaCall(SCI_GETLINEENDPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
     }
-    CDocument doc = GetDocument(GetCurrentTabIndex());
+    if (!HasActiveDocument())
+        return false;
+    CDocument doc = GetActiveDocument();
     std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
     std::string commentline = CLexStyles::Instance().GetCommentLineForLang(lang);
     std::string commentstreamstart = CLexStyles::Instance().GetCommentStreamStartForLang(lang);
@@ -112,7 +114,9 @@ bool CCmdUnComment::Execute()
     size_t lineStartStart   = 0;
     size_t lineEndEnd       = 0;
 
-    CDocument doc = GetDocument(GetCurrentTabIndex());
+    if (!HasActiveDocument())
+        return false;
+    CDocument doc = GetActiveDocument();
     std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
     std::string commentline = CLexStyles::Instance().GetCommentLineForLang(lang);
     std::string commentstreamstart = CLexStyles::Instance().GetCommentStreamStartForLang(lang);

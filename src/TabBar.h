@@ -69,6 +69,7 @@ public :
         , m_bIsCloseHover(false)
         , m_whichCloseClickDown(-1)
         , m_lmbdHit(false)
+        , m_tabID(0)
     {
         Gdiplus::GdiplusStartupInput gdiplusStartupInput;
         Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
@@ -89,7 +90,10 @@ public :
     void                        GetCurrentTitle(TCHAR *title, int titleLen);
     void                        SetCurrentTitle(LPCTSTR title);
     int                         GetCurrentTabIndex() const;
+    int                         GetCurrentTabId() const;
     void                        DeletItemAt(int index);
+    int                         GetIDFromIndex(int index);
+    int                         GetIndexFromID(int id);
 
     void                        DeletAllItems();
 
@@ -125,6 +129,7 @@ private:
     int                         m_nItems;
     bool                        m_bHasImgList;
     HFONT                       m_hFont;
+    int                         m_tabID;
 
 
     int                         m_ctrlID;

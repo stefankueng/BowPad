@@ -98,10 +98,9 @@ HRESULT CCmdSave::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PRO
 {
     if (UI_PKEY_Enabled == key)
     {
-        int tab = GetCurrentTabIndex();
-        if ((tab >= 0) && (tab < GetDocumentCount()))
+        if (HasActiveDocument())
         {
-            CDocument doc = GetDocument(tab);
+            CDocument doc = GetActiveDocument();
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, doc.m_bIsDirty||doc.m_bNeedsSaving, ppropvarNewValue);
         }
     }
@@ -112,7 +111,7 @@ bool CCmdSaveAll::Execute()
 {
     for (int i = 0; i < (int)GetDocumentCount(); ++i)
     {
-        if (GetDocument(i).m_bIsDirty)
+        if (GetDocumentFromID(GetDocIDFromTabIndex(i)).m_bIsDirty)
         {
             TabActivateAt(i);
             SaveCurrentTab();
@@ -141,7 +140,7 @@ HRESULT CCmdSaveAll::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
         int dirtycount = 0;
         for (int i = 0; i < GetDocumentCount(); ++i)
         {
-            CDocument doc = GetDocument(i);
+            CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(i));
             if (doc.m_bIsDirty||doc.m_bNeedsSaving)
                 dirtycount++;
         }
@@ -161,10 +160,9 @@ HRESULT CCmdReload::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const P
 {
     if (UI_PKEY_Enabled == key)
     {
-        int tab = GetCurrentTabIndex();
-        if ((tab >= 0) && (tab < GetDocumentCount()))
+        if (HasActiveDocument())
         {
-            CDocument doc = GetDocument(tab);
+            CDocument doc = GetActiveDocument();
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
         }
     }

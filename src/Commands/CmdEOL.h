@@ -36,9 +36,12 @@ public:
     {
         ScintillaCall(SCI_SETEOLMODE, SC_EOL_CRLF);
         ScintillaCall(SCI_CONVERTEOLS, SC_EOL_CRLF);
-        CDocument doc = GetDocument(GetCurrentTabIndex());
-        doc.m_format = WIN_FORMAT;
-        SetDocument(GetCurrentTabIndex(), doc);
+        if (HasActiveDocument())
+        {
+            CDocument doc = GetActiveDocument();
+            doc.m_format = WIN_FORMAT;
+            SetDocument(GetCurrentTabId(), doc);
+        }
         InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         InvalidateUICommand(cmdEOLUnix, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         InvalidateUICommand(cmdEOLMac,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
@@ -82,9 +85,12 @@ public:
     {
         ScintillaCall(SCI_SETEOLMODE, SC_EOL_LF);
         ScintillaCall(SCI_CONVERTEOLS, SC_EOL_LF);
-        CDocument doc = GetDocument(GetCurrentTabIndex());
-        doc.m_format = WIN_FORMAT;
-        SetDocument(GetCurrentTabIndex(), doc);
+        if (HasActiveDocument())
+        {
+            CDocument doc = GetActiveDocument();
+            doc.m_format = WIN_FORMAT;
+            SetDocument(GetCurrentTabId(), doc);
+        }
         InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         InvalidateUICommand(cmdEOLUnix, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         InvalidateUICommand(cmdEOLMac,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
@@ -128,9 +134,12 @@ public:
     {
         ScintillaCall(SCI_SETEOLMODE, SC_EOL_CR);
         ScintillaCall(SCI_CONVERTEOLS, SC_EOL_CR);
-        CDocument doc = GetDocument(GetCurrentTabIndex());
-        doc.m_format = WIN_FORMAT;
-        SetDocument(GetCurrentTabIndex(), doc);
+        if (HasActiveDocument())
+        {
+            CDocument doc = GetActiveDocument();
+            doc.m_format = WIN_FORMAT;
+            SetDocument(GetCurrentTabId(), doc);
+        }
         InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         InvalidateUICommand(cmdEOLUnix, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         InvalidateUICommand(cmdEOLMac,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);

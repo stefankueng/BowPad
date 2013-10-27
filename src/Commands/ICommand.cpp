@@ -62,10 +62,16 @@ void ICommand::TabActivateAt( int index )
     pMainWnd->m_TabBar.ActivateAt(index);
 }
 
-int ICommand::GetCurrentTabIndex()
+int ICommand::GetActiveTabIndex()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     return pMainWnd->m_TabBar.GetCurrentTabIndex();
+}
+
+int ICommand::GetCurrentTabId()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_TabBar.GetCurrentTabId();
 }
 
 std::wstring ICommand::GetCurrentTitle()
@@ -156,10 +162,23 @@ int ICommand::GetDocumentCount()
     return pMainWnd->m_DocManager.GetCount();
 }
 
-CDocument ICommand::GetDocument( int index )
+bool ICommand::HasActiveDocument()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    return pMainWnd->m_DocManager.GetDocument(index);
+    int id = pMainWnd->m_TabBar.GetCurrentTabId();
+    return pMainWnd->m_DocManager.HasDocumentID(id);
+}
+
+CDocument ICommand::GetActiveDocument()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_DocManager.GetDocumentFromID(pMainWnd->m_TabBar.GetCurrentTabId());
+}
+
+CDocument ICommand::GetDocumentFromID( int id )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_DocManager.GetDocumentFromID(id);
 }
 
 void ICommand::SetDocument( int index, CDocument doc )
@@ -214,6 +233,18 @@ void ICommand::GotoBrace()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     pMainWnd->m_scintilla.GotoBrace();
+}
+
+int ICommand::GetDocIDFromTabIndex( int tab )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_TabBar.GetIDFromIndex(tab);
+}
+
+int ICommand::GetTabIndexFromDocID( int docID )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_TabBar.GetIndexFromID(docID);
 }
 
 

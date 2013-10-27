@@ -42,15 +42,20 @@ public:
 
 protected:
     void                TabActivateAt(int index);
-    int                 GetCurrentTabIndex();
+    int                 GetCurrentTabId();
+    int                 GetActiveTabIndex();
     int                 GetTabCount();
     std::wstring        GetCurrentTitle();
     int                 GetSrcTab();
     int                 GetDstTab();
     void                CloseTab(int index);
+    int                 GetDocIDFromTabIndex(int tab);
+    int                 GetTabIndexFromDocID(int docID);
 
     int                 GetDocumentCount();
-    CDocument           GetDocument(int index);
+    bool                HasActiveDocument();
+    CDocument           GetActiveDocument();
+    CDocument           GetDocumentFromID(int id);
     void                SetDocument(int index, CDocument doc);
 
     sptr_t              ScintillaCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0);

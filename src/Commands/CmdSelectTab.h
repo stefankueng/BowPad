@@ -58,7 +58,7 @@ public:
         }
         if (GetKeyState(VK_TAB)&0x8000)
         {
-            int tab = GetCurrentTabIndex();
+            int tab = GetActiveTabIndex();
             if (GetKeyState(VK_SHIFT)&0x8000)
             {
                 // previous tab

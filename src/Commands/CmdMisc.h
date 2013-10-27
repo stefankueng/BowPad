@@ -111,8 +111,10 @@ public:
 
     virtual bool Execute()
     {
+        if (!HasActiveDocument())
+            return false;
         CTheme::Instance().SetDarkTheme(!CTheme::Instance().IsDarkTheme());
-        CDocument doc = GetDocument(GetCurrentTabIndex());
+        CDocument doc = GetActiveDocument();
         SetupLexerForLang(doc.m_language);
         if (CTheme::Instance().IsDarkTheme())
         {
@@ -128,7 +130,7 @@ public:
 
         ScintillaCall(SCI_CLEARDOCUMENTSTYLE);
         ScintillaCall(SCI_COLOURISE, 0, -1);
-        TabActivateAt(GetCurrentTabIndex());
+        TabActivateAt(GetActiveTabIndex());
 
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         return true;

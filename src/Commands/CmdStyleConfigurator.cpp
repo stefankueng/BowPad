@@ -91,8 +91,11 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
             m_bkColor.ConvertToColorButton(hwndDlg, IDC_BK_BTN);
 
             // select the current language
-            CDocument doc = GetDocument(GetCurrentTabIndex());
-            SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_SELECTSTRING, (WPARAM)-1, (LPARAM)doc.m_language.c_str());
+            if (HasActiveDocument())
+            {
+                CDocument doc = GetActiveDocument();
+                SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_SELECTSTRING, (WPARAM)-1, (LPARAM)doc.m_language.c_str());
+            }
             DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
 
             int style = (int)ScintillaCall(SCI_GETSTYLEAT, ScintillaCall(SCI_GETCURRENTPOS));
@@ -111,18 +114,24 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
             if ((index >= 0) && (index < (int)languages.size()))
             {
                 std::wstring currentLang = languages[index];
-                CDocument doc = GetDocument(GetCurrentTabIndex());
-                if (doc.m_language.compare(currentLang) == 0)
+                if (HasActiveDocument())
                 {
-                    SelectStyle((int)wParam);
+                    CDocument doc = GetActiveDocument();
+                    if (doc.m_language.compare(currentLang) == 0)
+                    {
+                        SelectStyle((int)wParam);
+                    }
                 }
             }
         }
         break;
     case WM_CURRENTDOCCHANGED:
         {
-            CDocument doc = GetDocument(GetCurrentTabIndex());
-            SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_SELECTSTRING, (WPARAM)-1, (LPARAM)doc.m_language.c_str());
+            if (HasActiveDocument())
+            {
+                CDocument doc = GetActiveDocument();
+                SendDlgItemMessage(*this, IDC_LANGCOMBO, CB_SELECTSTRING, (WPARAM)-1, (LPARAM)doc.m_language.c_str());
+            }
             DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
 
             int style = (int)ScintillaCall(SCI_GETSTYLEAT, ScintillaCall(SCI_GETCURRENTPOS));
@@ -142,16 +151,22 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
     case IDOK:
         {
             CLexStyles::Instance().SaveUserData();
-            CDocument doc = GetDocument(GetCurrentTabIndex());
-            SetupLexerForLang(doc.m_language);
+            if (HasActiveDocument())
+            {
+                CDocument doc = GetActiveDocument();
+                SetupLexerForLang(doc.m_language);
+            }
             ShowWindow(*this, SW_HIDE);
         }
         break;
     case IDCANCEL:
         {
             CLexStyles::Instance().ResetUserData();
-            CDocument doc = GetDocument(GetCurrentTabIndex());
-            SetupLexerForLang(doc.m_language);
+            if (HasActiveDocument())
+            {
+                CDocument doc = GetActiveDocument();
+                SetupLexerForLang(doc.m_language);
+            }
             ShowWindow(*this, SW_HIDE);
         }
         break;
@@ -233,9 +248,12 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                 index = (int)SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_GETCURSEL, 0, 0);
                 int styleIndex = (int)SendDlgItemMessage(*this, IDC_STYLECOMBO, CB_GETITEMDATA, index, 0);
                 bool updateView = false;
-                CDocument doc = GetDocument(GetCurrentTabIndex());
-                if (doc.m_language.compare(currentLang) == 0)
-                    updateView = true;
+                if (HasActiveDocument())
+                {
+                    CDocument doc = GetActiveDocument();
+                    if (doc.m_language.compare(currentLang) == 0)
+                        updateView = true;
+                }
                 switch (id)
                 {
                 case IDC_FG_BTN:
