@@ -18,12 +18,16 @@
 #include "KeyboardShortcutHandler.h"
 #include "SimpleIni.h"
 #include "StringUtils.h"
+#include "UnicodeUtils.h"
 #include "BowPad.h"
+#include "ResString.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 
 #include <vector>
+
+extern IUIFramework *g_pFramework;
 
 CKeyboardShortcutHandler::CKeyboardShortcutHandler(void)
     : m_bLoaded(false)
@@ -40,7 +44,10 @@ CKeyboardShortcutHandler& CKeyboardShortcutHandler::Instance()
 {
     static CKeyboardShortcutHandler instance;
     if (!instance.m_bLoaded)
+    {
+        instance.LoadUIHeader();
         instance.Load();
+    }
     return instance;
 }
 
@@ -78,7 +85,6 @@ void CKeyboardShortcutHandler::Load()
                     stringtok(tokens, v, false, L";");
                     if (tokens.size() < 3)
                         continue;
-                    std::transform(tokens[0].begin(), tokens[0].end(), tokens[0].begin(), ::tolower);
                     std::transform(tokens[2].begin(), tokens[2].end(), tokens[2].begin(), ::tolower);
                     std::wstring keys = tokens[2];
                     std::vector<std::wstring> keyvec;
@@ -86,6 +92,16 @@ void CKeyboardShortcutHandler::Load()
                     KSH_Accel accel;
                     accel.name = tokens[1];
                     accel.cmd = (WORD)_wtoi(tokens[0].c_str());
+                    if (accel.cmd == 0)
+                    {
+                        auto it = m_resourceData.find(tokens[0]);
+                        if (it != m_resourceData.end())
+                            accel.cmd = (WORD)it->second;
+#ifdef _DEBUG
+                        else
+                            DebugBreak();
+#endif
+                    }
                     for (size_t i = 0; i < keyvec.size(); ++i)
                     {
                         switch (i)
@@ -282,8 +298,114 @@ std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd )
                     s += L",";
                 s += buf;
             }
-            return accel.name + L" (" + s + L")";
+            return L"(" + s + L")";
         }
     }
     return L"";
+}
+
+void CKeyboardShortcutHandler::LoadUIHeader()
+{
+    m_resourceData.clear();
+    HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(IDR_BOWPADUIH), L"config");
+    if (hRes)
+    {
+        HGLOBAL hResourceLoaded = LoadResource(NULL, hRes);
+        if (hResourceLoaded)
+        {
+            char * lpResLock = (char *) LockResource(hResourceLoaded);
+            DWORD dwSizeRes = SizeofResource(NULL, hRes);
+            if (lpResLock)
+            {
+                // parse the header file
+                DWORD lastLineStart = 0;
+                for (DWORD ind = 0; ind < dwSizeRes; ++ind)
+                {
+                    if (*((char*)(lpResLock + ind)) == '\n')
+                    {
+                        std::string sLine(lpResLock + lastLineStart, ind-lastLineStart);
+                        lastLineStart = ind + 1;
+                        // cut off '#define'
+                        if (sLine.empty())
+                            continue;
+                        if (sLine[0] == '/')
+                            continue;
+                        auto spacepos = sLine.find(' ');
+                        if (spacepos != std::string::npos)
+                        {
+                            auto spacepos2 = sLine.find(' ', spacepos+1);
+                            if (spacepos2 != std::string::npos)
+                            {
+                                std::string sIDString = sLine.substr(spacepos+1, spacepos2-spacepos-1);
+                                int ID = atoi(sLine.substr(spacepos2).c_str());
+                                std::wstring s = CUnicodeUtils::StdGetUnicode(sIDString);
+                                m_resourceData[s] = ID;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void CKeyboardShortcutHandler::UpdateTooltips(bool bAll)
+{
+    if (bAll)
+    {
+        m_tooltiptitlestoupdate.clear();
+        for (const auto& rsc : m_resourceData)
+        {
+            std::wstring sAcc = GetShortCutStringForCommand((WORD)rsc.second);
+            if (!sAcc.empty())
+            {
+                g_pFramework->InvalidateUICommand(rsc.second, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
+                m_tooltiptitlestoupdate.insert((WORD)rsc.second);
+            }
+        }
+    }
+    else
+    {
+        for (const auto& w : m_tooltiptitlestoupdate)
+        {
+            std::wstring sAcc = GetShortCutStringForCommand(w);
+            if (!sAcc.empty())
+            {
+                g_pFramework->InvalidateUICommand(w, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
+            }
+        }
+    }
+}
+
+std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand( WORD cmd )
+{
+    std::wstring sAcc = GetShortCutStringForCommand((WORD)cmd);
+    if (!sAcc.empty())
+    {
+        std::wstring sID;
+        for (const auto& sc : m_resourceData)
+        {
+            if (sc.second == cmd)
+            {
+                sID = sc.first;
+                break;
+            }
+        }
+        sID += L"_TooltipTitle_RESID";
+        auto ttIDit = m_resourceData.find(sID);
+        if (ttIDit != m_resourceData.end())
+        {
+            ResString rs(hRes, ttIDit->second);
+            std::wstring sRes = (LPCWSTR)rs;
+            sRes += L" ";
+            sRes += sAcc;
+            return sRes;
+        }
+    }
+    return L"";
+}
+
+void CKeyboardShortcutHandler::ToolTipUpdated( WORD cmd )
+{
+    m_tooltiptitlestoupdate.erase(cmd);
 }

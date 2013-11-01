@@ -223,6 +223,21 @@ STDMETHODIMP CMainWindow::UpdateProperty(
     if (pCmd)
         hr = pCmd->IUICommandHandlerUpdateProperty(key, ppropvarCurrentValue, ppropvarNewValue);
 
+    if (key == UI_PKEY_TooltipTitle)
+    {
+        std::wstring shortkey = CKeyboardShortcutHandler::Instance().GetTooltipTitleForCommand((WORD)nCmdID);
+        if (!shortkey.empty())
+        {
+            hr = UIInitPropertyFromString(UI_PKEY_TooltipTitle, shortkey.c_str(), ppropvarNewValue);
+            CKeyboardShortcutHandler::Instance().ToolTipUpdated(nCmdID);
+        }
+    }
+    // the ribbon UI is really buggy: Invalidating a lot of properties at once
+    // won't update all the properties but only the first few.
+    // Since there's no way to invalidate everything that's necessary at once,
+    // we do invalidate all the remaining tooltip properties here until all
+    // of them have been updated (see the call to TooltipUpdated() above).
+    CKeyboardShortcutHandler::Instance().UpdateTooltips(false);
     return hr;
 }
 
@@ -920,6 +935,7 @@ bool CMainWindow::Initialize()
     }
 
     CCommandHandler::Instance().Init(this);
+    CKeyboardShortcutHandler::Instance().UpdateTooltips(true);
 
     return true;
 }
