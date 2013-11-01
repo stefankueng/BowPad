@@ -127,7 +127,7 @@ public:
     CCmdLaunchExplorer(void * obj) : LaunchBase(obj){}
     ~CCmdLaunchExplorer(void){}
 
-    virtual bool Execute() { return Launch(L"explorer $(TAB_DIR"); }
+    virtual bool Execute() { return Launch(L"explorer $(TAB_DIR)"); }
     virtual UINT GetCmdId() { return cmdLaunchExplorer; }
 };
 
