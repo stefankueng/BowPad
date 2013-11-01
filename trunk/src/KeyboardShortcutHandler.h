@@ -18,6 +18,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <set>
 
 class KSH_Accel
 {
@@ -47,10 +48,15 @@ public:
     static CKeyboardShortcutHandler&        Instance();
     LRESULT CALLBACK                        TranslateAccelerator(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     std::wstring                            GetShortCutStringForCommand(WORD cmd);
+    std::wstring                            GetTooltipTitleForCommand(WORD cmd);
+    void                                    UpdateTooltips(bool bAll);
+    void                                    ToolTipUpdated(WORD cmd);
+
 private:
     CKeyboardShortcutHandler(void);
     ~CKeyboardShortcutHandler(void);
 
+    void                                    LoadUIHeader();
     void                                    Load();
 
 private:
@@ -58,4 +64,6 @@ private:
     std::vector<KSH_Accel>                  m_accelerators;
     std::map<std::wstring, UINT>            m_virtkeys;
     WORD                                    m_lastKey;
+    std::map<std::wstring, int>             m_resourceData;
+    std::set<WORD>                          m_tooltiptitlestoupdate;
 };
