@@ -134,7 +134,6 @@ void CCmdPrevNext::TabNotify( TBHDR * ptbhdr )
             currentDocId = GetCurrentTabId();
         }
         break;
-        break;
     case TCN_TABDELETE:
         {
             // remove all positions in that tab
