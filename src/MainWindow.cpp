@@ -765,6 +765,78 @@ LRESULT CMainWindow::DoCommand(int id)
     case cmdCloseAll:
         CloseAllTabs();
         break;
+    case cmdCloseAllButThis:
+        {
+            int count = m_TabBar.GetItemCount();
+            int current = m_TabBar.GetCurrentTabIndex();
+            for (int i = count-1; i >= 0; --i)
+            {
+                if (i != current)
+                    CloseTab(i);
+            }
+        }
+        break;
+    case cmdCopyPath:
+        {
+            int id = m_TabBar.GetCurrentTabId();
+            if ((id >= 0) && m_DocManager.HasDocumentID(id))
+            {
+                CDocument doc = m_DocManager.GetDocumentFromID(id);
+                WriteAsciiStringToClipboard(doc.m_path.c_str(), *this);
+            }
+        }
+        break;
+    case cmdCopyName:
+        {
+            int id = m_TabBar.GetCurrentTabId();
+            if ((id >= 0) && m_DocManager.HasDocumentID(id))
+            {
+                CDocument doc = m_DocManager.GetDocumentFromID(id);
+                WriteAsciiStringToClipboard(doc.m_path.substr(doc.m_path.find_last_of(L"\\/")+1).c_str(), *this);
+            }
+        }
+        break;
+    case cmdCopyDir:
+        {
+            int id = m_TabBar.GetCurrentTabId();
+            if ((id >= 0) && m_DocManager.HasDocumentID(id))
+            {
+                CDocument doc = m_DocManager.GetDocumentFromID(id);
+                WriteAsciiStringToClipboard(doc.m_path.substr(0, doc.m_path.find_last_of(L"\\/")).c_str(), *this);
+            }
+        }
+        break;
+    case cmdExplore:
+        {
+            int id = m_TabBar.GetCurrentTabId();
+            if ((id >= 0) && m_DocManager.HasDocumentID(id))
+            {
+                CDocument doc = m_DocManager.GetDocumentFromID(id);
+                PCIDLIST_ABSOLUTE __unaligned pidl = ILCreateFromPath(doc.m_path.c_str());
+                if (pidl)
+                {
+                    SHOpenFolderAndSelectItems(pidl,0,0,0);
+                    CoTaskMemFree((LPVOID)pidl);
+                }
+            }
+        }
+        break;
+    case cmdExploreProperties:
+        {
+            int id = m_TabBar.GetCurrentTabId();
+            if ((id >= 0) && m_DocManager.HasDocumentID(id))
+            {
+                CDocument doc = m_DocManager.GetDocumentFromID(id);
+                SHELLEXECUTEINFO info = {sizeof(SHELLEXECUTEINFO)};
+                info.lpVerb = L"properties";
+                info.lpFile = doc.m_path.c_str();
+                info.nShow = SW_SHOW;
+                info.fMask = SEE_MASK_INVOKEIDLIST;
+                info.hwnd = *this;
+                ShellExecuteEx(&info);
+            }
+        }
+        break;
     case cmdAbout:
         {
             CAboutDlg dlg(*this);
