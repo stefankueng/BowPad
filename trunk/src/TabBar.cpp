@@ -19,13 +19,18 @@
 #include "resource.h"
 #include "AppUtils.h"
 #include "Theme.h"
+#include "BowPad.h"
+#include "BowPadUI.h"
 
 #include <Uxtheme.h>
 #include <vsstyle.h>
+#include <UIRibbon.h>
+#include <UIRibbonPropertyHelpers.h>
 
 
 #pragma comment(lib, "UxTheme.lib")
 
+extern IUIFramework * g_pFramework;
 
 COLORREF Darker(COLORREF crBase, float fFactor)
 {
@@ -486,14 +491,15 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             nmhdr.tabOrigin = currentTabOn;
 
             ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
-
             return TRUE;
         }
+        break;
     case WM_RBUTTONDOWN :   //rightclick selects tab aswell
         {
             ::CallWindowProc(m_TabBarDefaultProc, hwnd, WM_LBUTTONDOWN, wParam, lParam);
             return TRUE;
         }
+        break;
     case WM_MOUSEMOVE :
         {
             if (m_bIsDragging)
@@ -535,9 +541,8 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                     InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
                 }
             }
-            break;
         }
-
+        break;
     case WM_LBUTTONUP :
         {
             int xPos = LOWORD(lParam);
@@ -574,10 +579,8 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 return TRUE;
             }
             m_whichCloseClickDown = -1;
-
-            break;
         }
-
+        break;
     case WM_CAPTURECHANGED :
         {
             if (m_bIsDragging)
@@ -585,22 +588,21 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 m_bIsDragging = false;
                 return TRUE;
             }
-            break;
         }
-
+        break;
     case WM_DRAWITEM :
         {
             DrawItem((DRAWITEMSTRUCT *)lParam);
             return TRUE;
         }
-
+        break;
     case WM_KEYDOWN :
         {
             if (wParam == VK_LCONTROL)
                 ::SetCursor(::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_PLUS_TAB)));
             return TRUE;
         }
-
+        break;
     case WM_MBUTTONUP:
         {
             int xPos = LOWORD(lParam);
@@ -615,6 +617,50 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             return TRUE;
         }
+        break;
+    case WM_CONTEXTMENU:
+        {
+            POINT pt;
+            POINTSTOPOINT(pt, lParam);
+
+            if (pt.x == -1 && pt.y == -1)
+            {
+                HRESULT hr = E_FAIL;
+
+                // Display the menu in the upper-left corner of the client area, below the ribbon.
+                IUIRibbon * pRibbon;
+                hr = g_pFramework->GetView(0, IID_PPV_ARGS(&pRibbon));
+                if (SUCCEEDED(hr))
+                {
+                    UINT32 uRibbonHeight = 0;
+                    hr = pRibbon->GetHeight(&uRibbonHeight);
+                    if (SUCCEEDED(hr))
+                    {
+                        pt.x = 0;
+                        pt.y = uRibbonHeight;
+                        ClientToScreen(hwnd, &pt);
+                    }
+                    pRibbon->Release();
+                }
+                if (FAILED(hr))
+                {
+                    // Default to just the upper-right corner of the entire screen.
+                    pt.x = 0;
+                    pt.y = 0;
+                }
+            }
+
+            HRESULT hr = E_FAIL;
+
+            // The basic pattern of how to show Contextual UI in a specified location.
+            IUIContextualUI * pContextualUI = NULL;
+            if (SUCCEEDED(g_pFramework->GetView(cmdTabContextMap, IID_PPV_ARGS(&pContextualUI))))
+            {
+                hr = pContextualUI->ShowAtLocation(pt.x, pt.y);
+                pContextualUI->Release();
+            }
+        }
+        break;
     }
     return ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
 }

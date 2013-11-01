@@ -587,10 +587,41 @@
       </Command.SmallImages>
     </Command>
 
+    <Command Name="cmdCloseAllButThis" LabelTitle="Close all but this" TooltipTitle="Close All Tabs Except This One" TooltipDescription="Closes all open files except the current one">
+      <Command.LargeImages>
+        <Image>res/CloseAllL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdCopyPath" LabelTitle="Copy Path" TooltipTitle="Copy Path" TooltipDescription="Copies the path of the current file to the clipboard">
+      <Command.LargeImages>
+        <Image>res/Copy.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdCopyName" LabelTitle="Copy Name" TooltipTitle="Copy Name" TooltipDescription="Copies the name of the current file to the clipboard">
+      <Command.LargeImages>
+        <Image>res/Copy.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdCopyDir" LabelTitle="Copy Directory" TooltipTitle="Copy Directory" TooltipDescription="Copies the path of the directory of the current file to the clipboard">
+      <Command.LargeImages>
+        <Image>res/Copy.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdExplore" LabelTitle="Open Explorer" TooltipTitle="Open Explorer" TooltipDescription="Opens the Windows Explorer at the current file path">
+      <Command.LargeImages>
+        <Image>res/ExplorerS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdExploreProperties" LabelTitle="Show Properties" TooltipTitle="Show Properties" TooltipDescription="Shows the Windows Explorer file properties dialog for the current file">
+      <Command.LargeImages>
+        <Image>res/ExplorerS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
 
     <Command Name="cmdGroupFind" LabelTitle="Find" />
 
     <Command Name="cmdContextMap" />
+    <Command Name="cmdTabContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />
     <Command Name="cmdZoom100" Id="10001" />
     <Command Name="cmdZoomIn" Id="10002" />
@@ -918,9 +949,31 @@
             <Button CommandName="cmdLaunchWikipedia"/>
           </MenuGroup>
         </ContextMenu>
+        <ContextMenu Name="TabContextMenu">
+          <MenuGroup>
+            <Button CommandName="cmdClose" />
+            <Button CommandName="cmdCloseAll" />
+            <Button CommandName="cmdCloseAllButThis" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdSave" />
+            <Button CommandName="cmdSaveAs" />
+            <Button CommandName="cmdReload" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdCopyPath" />
+            <Button CommandName="cmdCopyName" />
+            <Button CommandName="cmdCopyDir" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdExplore" />
+            <Button CommandName="cmdExploreProperties" />
+          </MenuGroup>
+        </ContextMenu>
       </ContextPopup.ContextMenus>
       <ContextPopup.ContextMaps>
         <ContextMap CommandName="cmdContextMap" ContextMenu="ContextMenu" MiniToolbar="CopyPasteToolbar"/>
+        <ContextMap CommandName="cmdTabContextMap" ContextMenu="TabContextMenu" />
       </ContextPopup.ContextMaps>
     </ContextPopup>
   </Application.Views>
