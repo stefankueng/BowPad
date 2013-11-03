@@ -219,6 +219,18 @@ bool CAppUtils::CheckForUpdate(bool force)
         double days = std::difftime(now, last) / (60 * 60 * 24);
         if ((days >= 7.0) || force)
         {
+            // check for portable version
+            HKEY subKey = nullptr;
+            LONG result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Software\\BowPad", 0, KEY_READ, &subKey);
+            if (result != ERROR_SUCCESS)
+            {
+                // BowPad was not installed: portable version.
+                RegCloseKey(subKey);
+                // No auto update check for portable versions
+                if (!force)
+                    return false;
+            }
+
             std::wstring tempfile = CPathUtils::GetTempFilePath();
 
             std::wstring sCheckURL = L"https://bowpad.googlecode.com/svn/trunk/version.txt";
