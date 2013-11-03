@@ -229,7 +229,7 @@ STDMETHODIMP CMainWindow::UpdateProperty(
         if (!shortkey.empty())
         {
             hr = UIInitPropertyFromString(UI_PKEY_TooltipTitle, shortkey.c_str(), ppropvarNewValue);
-            CKeyboardShortcutHandler::Instance().ToolTipUpdated(nCmdID);
+            CKeyboardShortcutHandler::Instance().ToolTipUpdated((WORD)nCmdID);
         }
     }
     // the ribbon UI is really buggy: Invalidating a lot of properties at once
@@ -310,7 +310,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             m_hwnd = hwnd;
             Initialize();
 
-            // TODO: skip check for portable version
             std::async([=]
             {
                 bool bNewer = CAppUtils::CheckForUpdate(false);
