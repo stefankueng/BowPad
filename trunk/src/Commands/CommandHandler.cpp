@@ -46,6 +46,7 @@
 #include "CmdLaunch.h"
 #include "CmdSession.h"
 #include "CmdFunctions.h"
+#include "CmdFont.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -184,6 +185,8 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdVerticalEdge(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdFont(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdComment(obj);

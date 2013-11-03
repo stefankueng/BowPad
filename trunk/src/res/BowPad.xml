@@ -623,8 +623,10 @@
       </Command.LargeImages>
     </Command>
 
+    <Command Name="cmdFontOnlyGroup" LabelTitle="Font" />
+    <Command Name="cmdFontOnly" />
+    
     <Command Name="cmdGroupFind" LabelTitle="Find" />
-
     <Command Name="cmdContextMap" />
     <Command Name="cmdTabContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />
@@ -825,6 +827,18 @@
               <Scale Group="cmdGroupEncoding" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
+          <Group CommandName="cmdFontOnlyGroup" SizeDefinition="OneFontControl">
+            <FontControl CommandName="cmdFontOnly"
+                         FontType="FontOnly"
+                         IsUnderlineButtonVisible="false"
+                         IsStrikethroughButtonVisible="false"
+                         IsHighlightButtonVisible="false"
+                         IsGrowShrinkButtonGroupVisible="false"
+                         ShowTrueTypeOnly="true"
+                         ShowVerticalFonts="false"
+                         MinimumFontSize="6"
+                         MaximumFontSize="50" />
+          </Group>
           <Group CommandName="cmdGroupView">
             <SizeDefinition>
               <ControlNameMap>

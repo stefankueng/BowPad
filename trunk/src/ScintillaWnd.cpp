@@ -344,9 +344,17 @@ void CScintillaWnd::SetupDefaultStyles()
         DeleteObject(hFont);
         Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Consolas");
     }
-    else
-        Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Courier New");
-    Call(SCI_STYLESETSIZE, STYLE_DEFAULT, 10);
+
+    std::string sFontName = CUnicodeUtils::StdGetUTF8(CIniSettings::Instance().GetString(L"View", L"FontName", L"Consolas"));
+    Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)sFontName.c_str());
+
+    bool bBold = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
+    bool bItalic = !!CIniSettings::Instance().GetInt64(L"View", L"FontItalic", false);
+    int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 10);
+
+    Call(SCI_STYLESETBOLD, STYLE_DEFAULT, bBold);
+    Call(SCI_STYLESETITALIC, STYLE_DEFAULT, bItalic);
+    Call(SCI_STYLESETSIZE, STYLE_DEFAULT, fontsize);
     Call(SCI_STYLESETFORE, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
     Call(SCI_STYLESETBACK, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOW)));
 
