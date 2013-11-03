@@ -617,6 +617,11 @@
         <Image>res/ExplorerS.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdConfigShortcuts" LabelTitle="Configure Shortcuts" TooltipTitle="Configure Keyboard Shortcuts" TooltipDescription="Opens the config file to configure keyboard shortcuts for any command in BowPad">
+      <Command.LargeImages>
+        <Image>res/KeyShortCutsL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
 
     <Command Name="cmdGroupFind" LabelTitle="Find" />
 
@@ -664,6 +669,9 @@
           <MenuGroup>
             <Button CommandName="cmdClose" />
             <Button CommandName="cmdCloseAll" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdConfigShortcuts" />
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="cmdExit" />
