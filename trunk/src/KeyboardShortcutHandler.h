@@ -39,7 +39,6 @@ public:
     BOOL            fVirt2;
     WORD            key2;
     WORD            cmd;        // the command
-    std::wstring    name;
 };
 
 class CKeyboardShortcutHandler
@@ -49,8 +48,12 @@ public:
     LRESULT CALLBACK                        TranslateAccelerator(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     std::wstring                            GetShortCutStringForCommand(WORD cmd);
     std::wstring                            GetTooltipTitleForCommand(WORD cmd);
+    void                                    Reload();
     void                                    UpdateTooltips(bool bAll);
     void                                    ToolTipUpdated(WORD cmd);
+    const std::map<std::wstring, int>&      GetResourceData() const { return m_resourceData; }
+    const std::map<std::wstring, UINT>&     GetVirtKeys() const { return m_virtkeys; }
+    const std::vector<KSH_Accel>&           GetAccelerators() const { return m_accelerators; }
 
 private:
     CKeyboardShortcutHandler(void);
@@ -58,6 +61,7 @@ private:
 
     void                                    LoadUIHeader();
     void                                    Load();
+    void                                    Load(CSimpleIni& ini);
 
 private:
     bool                                    m_bLoaded;
