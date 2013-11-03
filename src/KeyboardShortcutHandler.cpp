@@ -21,6 +21,7 @@
 #include "UnicodeUtils.h"
 #include "BowPad.h"
 #include "ResString.h"
+#include "AppUtils.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -64,91 +65,102 @@ void CKeyboardShortcutHandler::Load()
             if (lpResLock)
             {
                 CSimpleIni ini;
+                ini.SetMultiKey(true);
                 ini.LoadFile(lpResLock, dwSizeRes);
-
-                CSimpleIni::TNamesDepend virtkeys;
-                ini.GetAllKeys(L"virtkeys", virtkeys);
-                for (auto l : virtkeys)
-                {
-                    wchar_t * endptr;
-                    std::wstring v = l;
-                    std::transform(v.begin(), v.end(), v.begin(), ::tolower);
-                    m_virtkeys[v] = wcstol(ini.GetValue(L"virtkeys", l), &endptr, 16);
-                }
-
-                CSimpleIni::TNamesDepend shortkeys;
-                ini.GetAllKeys(L"shortcuts", shortkeys);
-                for (auto l : shortkeys)
-                {
-                    std::wstring v = ini.GetValue(L"shortcuts", l);
-                    std::vector<std::wstring> tokens;
-                    stringtok(tokens, v, false, L";");
-                    if (tokens.size() < 3)
-                        continue;
-                    std::transform(tokens[2].begin(), tokens[2].end(), tokens[2].begin(), ::tolower);
-                    std::wstring keys = tokens[2];
-                    std::vector<std::wstring> keyvec;
-                    stringtok(keyvec, keys, false, L",");
-                    KSH_Accel accel;
-                    accel.name = tokens[1];
-                    accel.cmd = (WORD)_wtoi(tokens[0].c_str());
-                    if (accel.cmd == 0)
-                    {
-                        auto it = m_resourceData.find(tokens[0]);
-                        if (it != m_resourceData.end())
-                            accel.cmd = (WORD)it->second;
-#ifdef _DEBUG
-                        else
-                            DebugBreak();
-#endif
-                    }
-                    for (size_t i = 0; i < keyvec.size(); ++i)
-                    {
-                        switch (i)
-                        {
-                        case 0:
-                            if (keyvec[i].find(L"alt") != std::wstring::npos)
-                                accel.fVirt |= 0x10;
-                            if (keyvec[i].find(L"ctrl") != std::wstring::npos)
-                                accel.fVirt |= 0x08;
-                            if (keyvec[i].find(L"shift") != std::wstring::npos)
-                                accel.fVirt |= 0x04;
-                            break;
-                        case 1:
-                            if (m_virtkeys.find(keyvec[i]) != m_virtkeys.end())
-                            {
-                                accel.fVirt1 = TRUE;
-                                accel.key1 = (WORD)m_virtkeys[keyvec[i]];
-                            }
-                            else
-                            {
-                                accel.key1 = (WORD)::towupper(keyvec[i][0]);
-                                if ((keyvec[i].size() > 2) && (keyvec[i][0]=='0') && (keyvec[i][1]=='x'))
-                                    accel.key1 = (WORD)wcstol(keyvec[i].c_str(), NULL, 0);
-                            }
-                            break;
-                        case 2:
-                            if (m_virtkeys.find(keyvec[i]) != m_virtkeys.end())
-                            {
-                                accel.fVirt2 = TRUE;
-                                accel.key2 = (WORD)m_virtkeys[keyvec[i]];
-                            }
-                            else
-                            {
-                                accel.key2 = (WORD)::towupper(keyvec[i][0]);
-                                if ((keyvec[i].size() > 2) && (keyvec[i][0]=='0') && (keyvec[i][1]=='x'))
-                                    accel.key2 = (WORD)wcstol(keyvec[i].c_str(), NULL, 0);
-                            }
-                            break;
-                        }
-                    }
-                    m_accelerators.push_back(accel);
-                }
+                Load(ini);
             }
         }
     }
 
+    std::wstring userFile = CAppUtils::GetDataPath() + L"\\shortcuts.ini";
+    CSimpleIni userIni;
+    userIni.SetMultiKey(true);
+    userIni.LoadFile(userFile.c_str());
+    Load(userIni);
+
     m_bLoaded = true;
+}
+
+void CKeyboardShortcutHandler::Load( CSimpleIni& ini )
+{
+    CSimpleIni::TNamesDepend virtkeys;
+    ini.GetAllKeys(L"virtkeys", virtkeys);
+    for (auto l : virtkeys)
+    {
+        wchar_t * endptr;
+        std::wstring v = l;
+        std::transform(v.begin(), v.end(), v.begin(), ::tolower);
+        m_virtkeys[v] = wcstol(ini.GetValue(L"virtkeys", l), &endptr, 16);
+    }
+
+    CSimpleIni::TNamesDepend shortkeys;
+    ini.GetAllKeys(L"shortcuts", shortkeys);
+
+    for (auto l : shortkeys)
+    {
+        CSimpleIni::TNamesDepend values;
+        ini.GetAllValues(L"shortcuts", l, values);
+        for (auto vv : values)
+        {
+            std::wstring v = vv;
+            std::transform(v.begin(), v.end(), v.begin(), ::tolower);
+            std::vector<std::wstring> keyvec;
+            stringtok(keyvec, v, false, L",");
+            KSH_Accel accel;
+            accel.cmd = (WORD)_wtoi(l);
+            if (accel.cmd == 0)
+            {
+                auto it = m_resourceData.find(l);
+                if (it != m_resourceData.end())
+                    accel.cmd = (WORD)it->second;
+#ifdef _DEBUG
+                else
+                    DebugBreak();
+#endif
+            }
+            for (size_t i = 0; i < keyvec.size(); ++i)
+            {
+                switch (i)
+                {
+                case 0:
+                    if (keyvec[i].find(L"alt") != std::wstring::npos)
+                        accel.fVirt |= 0x10;
+                    if (keyvec[i].find(L"ctrl") != std::wstring::npos)
+                        accel.fVirt |= 0x08;
+                    if (keyvec[i].find(L"shift") != std::wstring::npos)
+                        accel.fVirt |= 0x04;
+                    break;
+                case 1:
+                    if (m_virtkeys.find(keyvec[i]) != m_virtkeys.end())
+                    {
+                        accel.fVirt1 = TRUE;
+                        accel.key1 = (WORD)m_virtkeys[keyvec[i]];
+                    }
+                    else
+                    {
+                        accel.key1 = (WORD)::towupper(keyvec[i][0]);
+                        if ((keyvec[i].size() > 2) && (keyvec[i][0]=='0') && (keyvec[i][1]=='x'))
+                            accel.key1 = (WORD)wcstol(keyvec[i].c_str(), NULL, 0);
+                    }
+                    break;
+                case 2:
+                    if (m_virtkeys.find(keyvec[i]) != m_virtkeys.end())
+                    {
+                        accel.fVirt2 = TRUE;
+                        accel.key2 = (WORD)m_virtkeys[keyvec[i]];
+                    }
+                    else
+                    {
+                        accel.key2 = (WORD)::towupper(keyvec[i][0]);
+                        if ((keyvec[i].size() > 2) && (keyvec[i][0]=='0') && (keyvec[i][1]=='x'))
+                            accel.key2 = (WORD)wcstol(keyvec[i].c_str(), NULL, 0);
+                    }
+                    break;
+                }
+            }
+            m_accelerators.push_back(accel);
+        }
+    }
 }
 
 LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM /*lParam*/ )
@@ -408,4 +420,9 @@ std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand( WORD cmd )
 void CKeyboardShortcutHandler::ToolTipUpdated( WORD cmd )
 {
     m_tooltiptitlestoupdate.erase(cmd);
+}
+
+void CKeyboardShortcutHandler::Reload()
+{
+    Load();
 }
