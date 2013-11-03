@@ -17,6 +17,7 @@
 
 #pragma once
 #include "ICommand.h"
+#include "BowPad.h"
 #include "BowPadUI.h"
 #include "AppUtils.h"
 #include "Theme.h"
@@ -151,3 +152,55 @@ private:
     UI_HSBCOLOR back;
     UI_HSBCOLOR high;
 };
+
+class CCmdConfigShortcuts : public ICommand
+{
+public:
+
+    CCmdConfigShortcuts(void * obj) : ICommand(obj)
+    {
+    }
+
+    ~CCmdConfigShortcuts(void)
+    {
+    }
+
+    virtual bool Execute()
+    {
+        std::wstring userFile = CAppUtils::GetDataPath() + L"\\shortcuts.ini";
+        if (!PathFileExists(userFile.c_str()))
+        {
+            HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(IDR_SHORTCUTS), L"config");
+            if (hRes)
+            {
+                HGLOBAL hResourceLoaded = LoadResource(NULL, hRes);
+                if (hResourceLoaded)
+                {
+                    char * lpResLock = (char *) LockResource(hResourceLoaded);
+                    if (lpResLock)
+                    {
+                        char * lpStart = strstr(lpResLock, "#--");
+                        if (lpStart)
+                        {
+                            char * lpEnd = strstr(lpStart + 3, "#--");
+                            if (lpEnd)
+                            {
+                                HANDLE hFile = CreateFile(userFile.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+                                if (hFile != INVALID_HANDLE_VALUE)
+                                {
+                                    DWORD dwWritten = 0;
+                                    WriteFile(hFile, lpStart, (DWORD)(lpEnd-lpStart), &dwWritten, NULL);
+                                    CloseHandle(hFile);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return OpenFile(userFile.c_str());
+    }
+
+    virtual UINT GetCmdId() { return cmdConfigShortcuts; }
+};
+
