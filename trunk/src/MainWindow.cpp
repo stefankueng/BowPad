@@ -1268,7 +1268,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding )
             m_scintilla.Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
             docreload.m_language = doc.m_language;
             docreload.m_position = doc.m_position;
-            m_DocManager.SetDocument(tab, docreload);
+            m_DocManager.SetDocument(m_TabBar.GetIDFromIndex(tab), docreload);
             if (tab == m_TabBar.GetCurrentTabIndex())
             {
                 m_scintilla.SetupLexerForLang(docreload.m_language);
