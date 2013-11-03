@@ -247,6 +247,7 @@
     <ClInclude Include="Commands\CmdEOL.h" />
     <ClInclude Include="Commands\CmdFiles.h" />
     <ClInclude Include="Commands\CmdFindReplace.h" />
+    <ClInclude Include="Commands\CmdFont.h" />
     <ClInclude Include="Commands\CmdFunctions.h" />
     <ClInclude Include="Commands\CmdGotoLine.h" />
     <ClInclude Include="Commands\CmdHeaderSource.h" />
