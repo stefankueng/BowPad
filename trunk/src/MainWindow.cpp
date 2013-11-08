@@ -1515,7 +1515,7 @@ bool CMainWindow::HandleOutsideModifications( int id /*= -1*/ )
                         m_scintilla.Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
                         docreload.m_language = doc.m_language;
                         docreload.m_position = doc.m_position;
-                        m_DocManager.SetDocument(i, docreload);
+                        m_DocManager.SetDocument(docID, docreload);
                         m_scintilla.SetupLexerForLang(docreload.m_language);
                         m_scintilla.RestoreCurrentPos(docreload.m_position);
                     }
@@ -1530,7 +1530,7 @@ bool CMainWindow::HandleOutsideModifications( int id /*= -1*/ )
                 {
                     // update the filetime of the document to avoid this warning
                     m_DocManager.UpdateFileTime(doc);
-                    m_DocManager.SetDocument(i, doc);
+                    m_DocManager.SetDocument(docID, doc);
                     bRet = false;
                 }
             }
@@ -1538,7 +1538,7 @@ bool CMainWindow::HandleOutsideModifications( int id /*= -1*/ )
             {
                 // update the filetime of the document to avoid this warning
                 m_DocManager.UpdateFileTime(doc);
-                m_DocManager.SetDocument(i, doc);
+                m_DocManager.SetDocument(docID, doc);
             }
         }
         else if (ds == DM_Removed)
@@ -1590,7 +1590,7 @@ bool CMainWindow::HandleOutsideModifications( int id /*= -1*/ )
                 doc.m_bNeedsSaving = true;
                 // update the filetime of the document to avoid this warning
                 m_DocManager.UpdateFileTime(doc);
-                m_DocManager.SetDocument(i, doc);
+                m_DocManager.SetDocument(docID, doc);
                 // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
                 m_scintilla.Call(SCI_ADDUNDOACTION, 0, 0);
                 m_scintilla.Call(SCI_UNDO);
