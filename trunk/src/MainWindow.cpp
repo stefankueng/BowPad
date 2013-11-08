@@ -727,9 +727,20 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         // intentional fall through!
     case WM_SETFOCUS:
     case WM_ACTIVATE:
-        HandleOutsideModifications();
-        SetFocus(m_scintilla);
-        m_scintilla.Call(SCI_SETFOCUS, true);
+        {
+            if ((wParam == WA_ACTIVE)||(wParam == WA_CLICKACTIVE))
+            {
+                HWND hFocus = GetFocus();
+                if (hFocus)
+                {
+                    hFocus = GetAncestor(hFocus, GA_ROOT);
+                    if (hFocus == *this)
+                        HandleOutsideModifications();
+                }
+                SetFocus(m_scintilla);
+                m_scintilla.Call(SCI_SETFOCUS, true);
+            }
+        }
         break;
     case WM_DESTROY:
         g_pFramework->Destroy();
