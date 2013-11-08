@@ -20,6 +20,8 @@
 #include "BowPadUI.h"
 #include "MRU.h"
 
+#include <algorithm>
+
 class CCmdMRU : public ICommand
 {
 public:
@@ -94,7 +96,7 @@ public:
                 pCommandExecutionProperties->GetValue(UI_PKEY_LabelDescription, &var);
                 std::wstring path = var.bstrVal;
                 PropVariantClear(&var);
-
+                std::replace(path.begin(), path.end(), '/', '\\');
                 OpenFile(path.c_str());
             }
         }
