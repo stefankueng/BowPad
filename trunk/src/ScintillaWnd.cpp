@@ -485,6 +485,9 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         endstylepos = (long)Call(SCI_GETLENGTH)-startstylepos;
 
     int len = endstylepos - startstylepos;
+    if (len <= 0)
+        return;
+
     // reset indicators
     Call(SCI_SETINDICATORCURRENT, INDIC_SELECTION_MARK);
     Call(SCI_INDICATORCLEARRANGE, startstylepos, len);
@@ -554,6 +557,8 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
             {
                 size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
                 m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, CTheme::Instance().GetThemeColor(RGB(0,255,0)));
+                if (FindText.chrg.cpMin >= FindText.chrgText.cpMax)
+                    break;
                 FindText.chrg.cpMin = FindText.chrgText.cpMax;
                 if ((GetTickCount64() - startTicks) > 2000)
                 {
