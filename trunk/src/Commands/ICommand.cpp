@@ -247,4 +247,10 @@ int ICommand::GetTabIndexFromDocID( int docID )
     return pMainWnd->m_TabBar.GetIndexFromID(docID);
 }
 
+int ICommand::GetDocIDFromPath( LPCTSTR path )
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_DocManager.GetIdForPath(path);
+}
+
 
