@@ -107,6 +107,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                             if (szArglist[i][0] != '/')
                             {
                                 std::wstring path = CPathUtils::GetLongPathname(szArglist[i]);
+                                std::replace(path.begin(), path.end(), '/', '\\');
                                 sCmdLine += L"\"" + path + L"\" ";
                             }
                             else
@@ -195,10 +196,11 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                 for( int i=1; i<nArgs; i++)
                 {
                     if (szArglist[i][0] != '/')
-{
-                    std::wstring path = CPathUtils::GetLongPathname(szArglist[i]);
-                    mainWindow.OpenFile(path);
-}
+                    {
+                        std::wstring path = CPathUtils::GetLongPathname(szArglist[i]);
+                        std::replace(path.begin(), path.end(), '/', '\\');
+                        mainWindow.OpenFile(path);
+                    }
                 }
                 if (parser.HasVal(L"line"))
                 {
