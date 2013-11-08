@@ -50,6 +50,7 @@ protected:
     int                 GetDstTab();
     void                CloseTab(int index);
     int                 GetDocIDFromTabIndex(int tab);
+    int                 GetDocIDFromPath(LPCTSTR path);
     int                 GetTabIndexFromDocID(int docID);
 
     int                 GetDocumentCount();
