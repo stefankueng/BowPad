@@ -1196,14 +1196,14 @@ bool CMainWindow::OpenFile( const std::wstring& file )
                 }
             }
             CMRU::Instance().AddPath(filepath);
-            m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-            doc.m_language = CLexStyles::Instance().GetLanguageForExt(filepath.substr(filepath.find_last_of('.')+1));
-            m_scintilla.SetupLexerForExt(filepath.substr(filepath.find_last_of('.')+1).c_str());
             std::wstring sFileName = filepath.substr(filepath.find_last_of('\\')+1);
             int index = m_TabBar.InsertAtEnd(sFileName.c_str());
             int id = m_TabBar.GetIDFromIndex(index);
             m_DocManager.AddDocumentAtEnd(doc, id);
             m_TabBar.ActivateAt(index);
+            m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+            doc.m_language = CLexStyles::Instance().GetLanguageForExt(filepath.substr(filepath.find_last_of('.')+1));
+            m_scintilla.SetupLexerForExt(filepath.substr(filepath.find_last_of('.')+1).c_str());
             SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
         }
         else
