@@ -91,7 +91,7 @@ public:
         return hr;
     }
 
-    virtual HRESULT IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties )
+    virtual HRESULT IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* /*ppropvarValue*/, IUISimplePropertySet* pCommandExecutionProperties )
     {
         HRESULT hr = E_NOTIMPL;
         if ((key) && (*key == UI_PKEY_FontProperties))
