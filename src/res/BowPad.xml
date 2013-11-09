@@ -645,8 +645,10 @@
       </Command.LargeImages>
     </Command>
     <Command Name="cmdSessionLast" Id="10010" />
+    <Command Name="cmdPasteHistory" Id="10011" />
 
     <Command Name="cmdTesting" Id="20000" />
+  
   </Application.Commands>
   <Application.Views>
     <Ribbon>

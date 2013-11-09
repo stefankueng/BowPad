@@ -30,6 +30,7 @@
 #include "PreserveChdir.h"
 #include "CmdLineParser.h"
 #include "SysInfo.h"
+#include "ClipboardHelper.h"
 
 #include <memory>
 #include <future>
@@ -742,6 +743,45 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             }
         }
         break;
+    case WM_CLIPBOARDUPDATE:
+        {
+            CClipboardHelper clipboard;
+            if (clipboard.Open(*this))
+            {
+                HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+                if (hData)
+                {
+                    LPCWSTR lptstr = (LPCWSTR)GlobalLock(hData); 
+                    if (lptstr != NULL) 
+                    {
+                        std::wstring s = lptstr;
+                        if (!s.empty())
+                        {
+                            std::wstring sTrimmed = s;
+                            CStringUtils::trim(sTrimmed);
+                            if (!sTrimmed.empty())
+                            {
+                                for (auto it = m_ClipboardHistory.cbegin(); it != m_ClipboardHistory.cend(); ++it)
+                                {
+                                    if (it->compare(s)==0)
+                                    {
+                                        m_ClipboardHistory.erase(it);
+                                        break;
+                                    }
+                                }
+                                m_ClipboardHistory.push_front(s);
+                            }
+                        }
+                        GlobalUnlock(hData);
+
+                        size_t maxsize = CIniSettings::Instance().GetInt64(L"clipboard", L"maxhistory", 20);
+                        if (m_ClipboardHistory.size() > maxsize)
+                            m_ClipboardHistory.pop_back();
+                    }
+                }
+            }
+        }
+        break;
     case WM_DESTROY:
         g_pFramework->Destroy();
         PostQuitMessage(0);
@@ -862,6 +902,58 @@ LRESULT CMainWindow::DoCommand(int id)
             }
         }
         break;
+    case cmdPasteHistory:
+        {
+            if (!m_ClipboardHistory.empty())
+            {
+                // create a context menu with all the items in the clipboard history
+                HMENU hMenu = CreatePopupMenu();
+                if (hMenu)
+                {
+                    size_t pos = m_scintilla.Call(SCI_GETCURRENTPOS);
+                    POINT pt;
+                    pt.x = (LONG)m_scintilla.Call(SCI_POINTXFROMPOSITION, 0, pos);
+                    pt.y = (LONG)m_scintilla.Call(SCI_POINTYFROMPOSITION, 0, pos);
+                    ClientToScreen(m_scintilla, &pt);
+                    int index = 1;
+                    size_t maxsize = CIniSettings::Instance().GetInt64(L"clipboard", L"maxuilength", 40);
+                    for (const auto& s : m_ClipboardHistory)
+                    {
+                        std::wstring sf = s;
+                        SearchReplace(sf, L"\t", L" ");
+                        SearchReplace(sf, L"\n", L" ");
+                        SearchReplace(sf, L"\r", L" ");
+                        CStringUtils::trim(sf);
+                        // remove unnecessary whitespace inside the string
+                        std::wstring::iterator new_end = std::unique(sf.begin(), sf.end(), [&] (wchar_t lhs, wchar_t rhs) -> bool
+                        {
+                            return (lhs == rhs) && (lhs == ' ');
+                        });
+                        sf.erase(new_end, sf.end());
+
+                        AppendMenu(hMenu, MF_ENABLED, index, sf.substr(0, maxsize).c_str());
+                        ++index;
+                    }
+                    int selIndex = TrackPopupMenu(hMenu, TPM_LEFTALIGN|TPM_RETURNCMD, pt.x, pt.y, 0, m_scintilla, NULL);
+                    DestroyMenu (hMenu);
+                    if (selIndex > 0)
+                    {
+                        index = 1;
+                        for (const auto& s : m_ClipboardHistory)
+                        {
+                            if (index == selIndex)
+                            {
+                                WriteAsciiStringToClipboard(s.c_str(), *this);
+                                m_scintilla.Call(SCI_PASTE);
+                                break;
+                            }
+                            ++index;
+                        }
+                    }
+                }
+            }
+        }
+        break;
     case cmdAbout:
         {
             CAboutDlg dlg(*this);
@@ -946,7 +1038,7 @@ bool CMainWindow::Initialize()
 
     CCommandHandler::Instance().Init(this);
     CKeyboardShortcutHandler::Instance().UpdateTooltips(true);
-
+    AddClipboardFormatListener(*this);
     return true;
 }
 
