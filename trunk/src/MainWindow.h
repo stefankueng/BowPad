@@ -24,6 +24,7 @@
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
+#include <list>
 
 class CMainWindow : public CWindow, public IUIApplication, public IUICommandHandler
 {
@@ -85,4 +86,5 @@ private:
     CDocumentManager            m_DocManager;
     std::unique_ptr<wchar_t[]>  m_tooltipbuffer;
     HICON                       m_hShieldIcon;
+    std::list<std::wstring>     m_ClipboardHistory;
 };
