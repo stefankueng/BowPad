@@ -266,6 +266,12 @@ public:
 
     virtual UINT GetCmdId() { return cmdRandom; }
 
+    virtual void OnClose()
+    {
+        if (!m_scannedDir.empty())
+            m_fileList.Save();
+    }
+
 private:
     std::wstring                m_scannedDir;
     CRandomFileList             m_fileList;
