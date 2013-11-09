@@ -22,6 +22,7 @@
 #include "UnicodeUtils.h"
 #include "Theme.h"
 #include "LexStyles.h"
+#include "ClipboardHelper.h"
 
 class ClipboardBase : public ICommand
 {
@@ -315,7 +316,38 @@ public:
 
     virtual bool Execute()
     {
-        ScintillaCall(SCI_PASTE);
+        // test first if there's a file on the clipboard
+        bool bFilesOpened = false;
+        {
+            CClipboardHelper clipboard;
+            if (clipboard.Open(GetHwnd()))
+            {
+                HANDLE hData = GetClipboardData(CF_HDROP);
+                if (hData)
+                {
+                    HDROP hDrop = reinterpret_cast<HDROP>(hData);
+                    if (hDrop)
+                    {
+                        int filesDropped = DragQueryFile(hDrop, 0xffffffff, NULL, 0);
+                        std::vector<std::wstring> files;
+                        for (int i = 0 ; i < filesDropped ; ++i)
+                        {
+                            UINT len = DragQueryFile(hDrop, i, NULL, 0);
+                            std::unique_ptr<wchar_t[]> pathBuf(new wchar_t[len+1]);
+                            DragQueryFile(hDrop, i, pathBuf.get(), len+1);
+                            files.push_back(pathBuf.get());
+                        }
+                        DragFinish(hDrop);
+                        for (auto it:files)
+                            OpenFile(it.c_str());
+                        bFilesOpened = true;
+                    }
+
+                }
+            }
+        }
+        if (!bFilesOpened)
+            ScintillaCall(SCI_PASTE);
         return true;
     }
 
