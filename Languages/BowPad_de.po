@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2013-10-27 19:48+0100\n"
+"PO-Revision-Date: 2013-11-10 13:48+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: German\n"
@@ -163,33 +163,25 @@ msgstr "Lösche Lesezeichen"
 msgid "Clipboard"
 msgstr "Zwischenablage"
 
-#. Resource IDs: (3754)
-msgid "Clipboard (Ctrl+C)"
-msgstr "Zwischenablage (Ctrl+C)"
-
-#. Resource IDs: (3754)
-msgid "Clipboard (Ctrl+V)"
-msgstr "Zwischenablage (Ctrl+V)"
-
-#. Resource IDs: (3754)
-msgid "Clipboard (Ctrl+X)"
-msgstr "Zwischenablage (Ctrl+X)"
-
 #. Resource IDs: (3753)
 msgid "Close All Tabs"
 msgstr "Schliesse alle Tabs"
+
+#. Resource IDs: (3773)
+msgid "Close All Tabs Except This One"
+msgstr "Schliesse alle Tabs ausser diesen"
 
 #. Resource IDs: (3753)
 msgid "Close Tab"
 msgstr "Schliesse Tab"
 
 #. Resource IDs: (3753)
-msgid "Close Tab (Ctrl+W)"
-msgstr "Schliesse Tab (Ctrl+W)"
-
-#. Resource IDs: (3753)
 msgid "Close all"
 msgstr "Schliesse alle"
+
+#. Resource IDs: (3773)
+msgid "Close all but this"
+msgstr "Schliesse alle ausser diesen"
 
 #. Resource IDs: (3753)
 msgid "Close the current tab"
@@ -206,6 +198,10 @@ msgstr ""
 #. Resource IDs: (3753)
 msgid "Closes all open files"
 msgstr "Schliesse alle offenen Dateien"
+
+#. Resource IDs: (3773)
+msgid "Closes all open files except the current one"
+msgstr "Schliesse alle offenen Dateien ausser der aktuellen"
 
 #. Resource IDs: (3767)
 msgid "Cmd"
@@ -236,12 +232,16 @@ msgid "Comment"
 msgstr "Kommentieren"
 
 #. Resource IDs: (3759)
-msgid "Comment (Ctrl+K,C)"
-msgstr "Kommentieren (Ctrl+K,C)"
-
-#. Resource IDs: (3759)
 msgid "Comments the selected text"
 msgstr "Kommentiert den ausgewählten Text"
+
+#. Resource IDs: (3775)
+msgid "Configure Keyboard Shortcuts"
+msgstr "Tastenkürzel konfigurieren"
+
+#. Resource IDs: (3775)
+msgid "Configure Shortcuts"
+msgstr "Tastaturkürzel Konfigurieren"
 
 #. Resource IDs: (3758)
 msgid "Configure Styles"
@@ -279,9 +279,33 @@ msgstr "Konvertiert die Auswahl zu GROSSbuchstaben"
 msgid "Converts the selection to lowercase"
 msgstr "Konvertiert die Auswahl zu kleinbuchstaben"
 
+#. Resource IDs: (3774)
+msgid "Copies the name of the current file to the clipboard"
+msgstr "Kopiert den aktuellen Dateinamen in die Zwischenablage"
+
+#. Resource IDs: (3774)
+msgid "Copies the path of the current file to the clipboard"
+msgstr "Kopiert den aktuellen Dateipfad in die Zwischenablage"
+
+#. Resource IDs: (3774)
+msgid "Copies the path of the directory of the current file to the clipboard"
+msgstr "Kopiert den aktuellen Dateiordnerpfad in die Zwischenablage"
+
 #. Resource IDs: (3753)
 msgid "Copy"
 msgstr "Kopieren"
+
+#. Resource IDs: (3774)
+msgid "Copy Directory"
+msgstr "Ordner kopieren"
+
+#. Resource IDs: (3774)
+msgid "Copy Name"
+msgstr "Kopiere Name"
+
+#. Resource IDs: (3773, 3774)
+msgid "Copy Path"
+msgstr "Kopiere Pfad"
 
 #. Resource IDs: (3754)
 msgid "Copy the current selection to the clipboard"
@@ -307,81 +331,41 @@ msgstr "Ctrl+Klick um den Link im Standardbrowser zu öffnen"
 msgid "Custom Command 0"
 msgstr "Benutzerbefehl 0"
 
-#. Resource IDs: (3770)
-msgid "Custom Command 0 (Ctrl+L,0)"
-msgstr "Benutzerbefehl 0 (Ctrl+L,0)"
-
 #. Resource IDs: (1050, 3770)
 msgid "Custom Command 1"
 msgstr "Benutzerbefehl 1"
-
-#. Resource IDs: (3770)
-msgid "Custom Command 1 (Ctrl+L,1)"
-msgstr "Benutzerbefehl 1 (Ctrl+L,1)"
 
 #. Resource IDs: (1051, 3770)
 msgid "Custom Command 2"
 msgstr "Benutzerbefehl 2"
 
-#. Resource IDs: (3770)
-msgid "Custom Command 2 (Ctrl+L,2)"
-msgstr "Benutzerbefehl 2 (Ctrl+L,2)"
-
 #. Resource IDs: (1052, 3770)
 msgid "Custom Command 3"
 msgstr "Benutzerbefehl 3"
-
-#. Resource IDs: (3770)
-msgid "Custom Command 3 (Ctrl+L,3)"
-msgstr "Benutzerbefehl 3 (Ctrl+L,3)"
 
 #. Resource IDs: (1053, 3771)
 msgid "Custom Command 4"
 msgstr "Benutzerbefehl 4"
 
-#. Resource IDs: (3771)
-msgid "Custom Command 4 (Ctrl+L,4)"
-msgstr "Benutzerbefehl 4 (Ctrl+L,4)"
-
 #. Resource IDs: (1054, 3771)
 msgid "Custom Command 5"
 msgstr "Benutzerbefehl 5"
-
-#. Resource IDs: (3771)
-msgid "Custom Command 5 (Ctrl+L,5)"
-msgstr "Benutzerbefehl 5 (Ctrl+L,5)"
 
 #. Resource IDs: (1055, 3771)
 msgid "Custom Command 6"
 msgstr "Benutzerbefehl 6"
 
-#. Resource IDs: (3771)
-msgid "Custom Command 6 (Ctrl+L,6)"
-msgstr "Benutzerbefehl 6 (Ctrl+L,6)"
-
 #. Resource IDs: (1056, 3771)
 msgid "Custom Command 7"
 msgstr "Benutzerbefehl 7"
-
-#. Resource IDs: (3771)
-msgid "Custom Command 7 (Ctrl+L,7)"
-msgstr "Benutzerbefehl 7 (Ctrl+L,7)"
 
 #. Resource IDs: (1057, 3772)
 msgid "Custom Command 8"
 msgstr "Benutzerbefehl 8"
 
-#. Resource IDs: (3772)
-msgid "Custom Command 8 (Ctrl+L,8)"
-msgstr "Benutzerbefehl 8 (Ctrl+L,8)"
-
 #. Resource IDs: (1058, 3772)
 msgid "Custom Command 9"
 msgstr "Benutzerbefehl 9"
-
-#. Resource IDs: (3772)
-msgid "Custom Command 9 (Ctrl+L,9)"
-msgstr "Benutzerbefehl 9 (Ctrl+L,9)"
 
 #. Resource IDs: (149)
 msgid "Custom Commands"
@@ -476,10 +460,6 @@ msgid "Duplicate Line"
 msgstr "Zeile duplizieren"
 
 #. Resource IDs: (3761)
-msgid "Duplicate Line (Ctrl+D)"
-msgstr "Zeile duplizieren (Ctrl+D)"
-
-#. Resource IDs: (3761)
 msgid "Duplicates the current line"
 msgstr "Dupliziert die aktuelle Zeile"
 
@@ -524,32 +504,20 @@ msgid "Find"
 msgstr "Suchen"
 
 #. Resource IDs: (3758)
-msgid "Find && Replace (Ctrl+F)"
-msgstr "Suche && Ersetze (Ctrl+F)"
+msgid "Find && Replace"
+msgstr "Suche && Ersetze"
 
 #. Resource IDs: (3758)
 msgid "Find Next"
 msgstr "Finde nächstes"
 
 #. Resource IDs: (3758)
-msgid "Find Next (F3)"
-msgstr "Finde nächstes (F3)"
-
-#. Resource IDs: (3758)
 msgid "Find Next Selected"
 msgstr "Finde nächstes markiert"
-
-#. Resource IDs: (3759)
-msgid "Find Next Selected (Ctrl+F3)"
-msgstr "Finde nächstes markiert (Ctrl+F3)"
 
 #. Resource IDs: (3758)
 msgid "Find Previous"
 msgstr "Finde vorheriges"
-
-#. Resource IDs: (3758)
-msgid "Find Previous (Shift+F3)"
-msgstr "Suche rückwärts (Shift+F3)"
 
 #. Resource IDs: (143)
 msgid "Find and replace"
@@ -570,10 +538,6 @@ msgstr "Funktionen"
 #. Resource IDs: (145, 3763)
 msgid "Go to line"
 msgstr "Gehe zu Zeile"
-
-#. Resource IDs: (3763)
-msgid "Go to line (Ctrl+G)"
-msgstr "Gehe zu Zeile (Ctrl+G)"
 
 #. Resource IDs: (3764)
 msgid "Goto"
@@ -628,36 +592,24 @@ msgid "Launch in Firefox"
 msgstr "Öffne mit Firefox"
 
 #. Resource IDs: (3768)
-msgid "Launch in Firefox (Ctrl+L,F)"
-msgstr "Öffne mit Firefox (Ctrl+L,F)"
-
-#. Resource IDs: (3768)
-msgid "Launch in Google Chrome (Ctrl+L,C)"
-msgstr "Öffne mit Google Chrome (Ctrl+L,C)"
+msgid "Launch in Google Chrome"
+msgstr "Öffne mit Google Chrome"
 
 #. Resource IDs: (3767)
 msgid "Launch in IE"
 msgstr "Öffne mit IE"
 
 #. Resource IDs: (3767)
-msgid "Launch in Internet Explorer (Ctrl+L,I)"
-msgstr "Öffne mit Internet Explorer (Ctrl+L,I)"
+msgid "Launch in Internet Explorer"
+msgstr "Öffne mit Internet Explorer"
 
 #. Resource IDs: (3768)
 msgid "Launch in Opera"
 msgstr "Öffne mit Opera"
 
 #. Resource IDs: (3768)
-msgid "Launch in Opera (Ctrl+L,O)"
-msgstr "Öffne mit Opera (Ctrl+L,O)"
-
-#. Resource IDs: (3768)
 msgid "Launch in Safari"
 msgstr "Öffne mit Safari"
-
-#. Resource IDs: (3768)
-msgid "Launch in Safari (Ctrl+L,S)"
-msgstr "Öffne mit Safari (Ctrl+L,S)"
 
 #. Resource IDs: (3756)
 msgid "Line Endings"
@@ -706,10 +658,6 @@ msgstr "Lade alle Dateien welche beim letzten Beenden von BowPad offen waren"
 msgid "Lowercase"
 msgstr "Kleinschreibung"
 
-#. Resource IDs: (3760)
-msgid "Lowercase (Ctrl+U)"
-msgstr "Kleinschreibung (Ctrl+U)"
-
 #. Resource IDs: (3757)
 msgid "MAC (CR)"
 msgstr "MAC (CR)"
@@ -743,12 +691,12 @@ msgid "Move down"
 msgstr "Nach unten"
 
 #. Resource IDs: (3763)
-msgid "Move line down (Alt+Cursor Down)"
-msgstr "Zeilen nach unten schieben (Alt+Cursor nach unten)"
+msgid "Move line down"
+msgstr "Zeilen nach unten schieben"
 
 #. Resource IDs: (3762)
-msgid "Move line up (Alt+Cursor Up)"
-msgstr "Zeile nach oben schieben (Alt+Cursor nach oben)"
+msgid "Move line up"
+msgstr "Zeile nach oben schieben"
 
 #. Resource IDs: (3765)
 msgid "Move the caret to the next bookmark"
@@ -792,24 +740,16 @@ msgid "New %d"
 msgstr "Neu %d"
 
 #. Resource IDs: (3752)
-msgid "New Document (Ctrl+N)"
-msgstr "Neues Dokument (Ctrl+N)"
+msgid "New Document"
+msgstr "Neues Dokument"
 
 #. Resource IDs: (3757)
 msgid "Next"
 msgstr "Nächste"
 
-#. Resource IDs: (3757)
-msgid "Next (Alt+Right)"
-msgstr "Nächste (Alt+Rechts)"
-
 #. Resource IDs: (3765)
 msgid "Next Bookmarks"
 msgstr "Nächstes Lesezeichen"
-
-#. Resource IDs: (3765)
-msgid "Next Bookmarks (F2)"
-msgstr "Nächstes Lesezeichen (F2)"
 
 #. Resource IDs: (10)
 msgid "No functions found!"
@@ -840,24 +780,16 @@ msgid "Open Console"
 msgstr "Öffne Konsole"
 
 #. Resource IDs: (3769)
-msgid "Open Console (Ctrl+L,M)"
-msgstr "Öffne Konsole (Ctrl+L,M)"
-
-#. Resource IDs: (3769)
 msgid "Open Explorer"
 msgstr "Öffne Explorer"
 
-#. Resource IDs: (3769)
-msgid "Open Explorer (Ctrl+L,E)"
-msgstr "Öffne Explorer (Ctrl+L,E)"
-
 #. Resource IDs: (3752)
-msgid "Open Files (Ctrl+O)"
-msgstr "Öffne Dateien (Ctrl+O)"
+msgid "Open Files"
+msgstr "Öffne Dateien"
 
-#. Resource IDs: (3772)
-msgid "Open corresponding File (Ctrl+K,O)"
-msgstr "Öffne zugehörige Datei (Ctrl+K,O)"
+#. Resource IDs: (3775)
+msgid "Open corresponding File"
+msgstr "Öffne zugehörige Datei"
 
 #. Resource IDs: (10)
 msgid ""
@@ -878,6 +810,17 @@ msgstr "Öffnet die Konsole im aktuellen Verzeichnis"
 #. Resource IDs: (3769)
 msgid "Opens the Windows Explorer at the current file location"
 msgstr "Öffnet den Windows Explorer im aktuellen Verzeichnis"
+
+#. Resource IDs: (3774)
+msgid "Opens the Windows Explorer at the current file path"
+msgstr "Öffnet den Windows Explorer im aktuellen Dateipfad"
+
+#. Resource IDs: (3775)
+msgid ""
+"Opens the config file to configure keyboard shortcuts for any command in "
+"BowPad"
+msgstr ""
+"Öffnet die Konfigurationsdatei zum konfigurieren der Tastaturkürzel in BowPad"
 
 #. Resource IDs: (3772)
 msgid ""
@@ -927,25 +870,13 @@ msgstr "Einfügen"
 msgid "Previous"
 msgstr "Vorherige"
 
-#. Resource IDs: (3757)
-msgid "Previous (Alt+Left)"
-msgstr "Vorherige (Alt+Links)"
-
 #. Resource IDs: (3765)
 msgid "Previous Bookmarks"
 msgstr "Vorheriges Lesezeichen"
 
-#. Resource IDs: (3765)
-msgid "Previous Bookmarks (Shift+F2)"
-msgstr "Vorheriges Lesezeichen (Shift+F2)"
-
 #. Resource IDs: (3762)
 msgid "Print"
 msgstr "Drucken"
-
-#. Resource IDs: (3762)
-msgid "Print (Ctrl+P)"
-msgstr "Drucken (Ctrl+P)"
 
 #. Resource IDs: (3763)
 msgid "Print Page Setup"
@@ -968,20 +899,12 @@ msgid "Redo"
 msgstr "Wiederholen"
 
 #. Resource IDs: (3755)
-msgid "Redo (Ctrl+Y)"
-msgstr "Wiederholen (Ctrl+Y)"
-
-#. Resource IDs: (3755)
 msgid "Redo what was undone before"
 msgstr "Wiederholen was Rückgängig gemacht wurde"
 
 #. Resource IDs: (3765)
 msgid "Reload"
 msgstr "Neu laden"
-
-#. Resource IDs: (3765)
-msgid "Reload (F5)"
-msgstr "Neu laden (F5)"
 
 #. Resource IDs: (8)
 msgid ""
@@ -1024,12 +947,12 @@ msgid "Save"
 msgstr "Speichern"
 
 #. Resource IDs: (3752)
-msgid "Save File (Ctrl+S)"
-msgstr "Datei speichern (Ctrl+S)"
+msgid "Save File"
+msgstr "Datei speichern"
 
 #. Resource IDs: (3753)
-msgid "Save Files (Ctrl+Shift+S)"
-msgstr "Dateien speichern (Ctrl+Shift+S)"
+msgid "Save Files"
+msgstr "Dateien speichern"
 
 #. Resource IDs: (3752)
 msgid "Save all"
@@ -1072,16 +995,8 @@ msgid "Search Web"
 msgstr "Websuche"
 
 #. Resource IDs: (3769)
-msgid "Search Web (Ctrl+L,W)"
-msgstr "Websuche (Ctrl+L,W)"
-
-#. Resource IDs: (3769)
 msgid "Search Wikipedia"
 msgstr "Suche in Wikipedia"
-
-#. Resource IDs: (3769)
-msgid "Search Wikipedia (Ctrl+L,P)"
-msgstr "Suche in Wikipedia (Ctrl+L,P)"
 
 #. Resource IDs: (3758)
 msgid "Search and/or replace text in documents/tabs"
@@ -1135,9 +1050,13 @@ msgstr ""
 "Bestimmt die Spalte an welcher eine Vertikale Linie als rechter Rand "
 "angezeigt wird. Zum nicht-Anzeigen der Linie auf 0 setzen."
 
+#. Resource IDs: (3774, 3775)
+msgid "Show Properties"
+msgstr "Zeige Eigenschaften"
+
 #. Resource IDs: (3755)
-msgid "Show Whitespaces (Ctrl+R,W)"
-msgstr "Zeige Leerzeichen (Ctrl+R,W)"
+msgid "Show Whitespaces"
+msgstr "Zeige Leerzeichen"
 
 #. Resource IDs: (3772)
 msgid "Shows a dialog to configure custom commands"
@@ -1146,6 +1065,10 @@ msgstr "Zeigt den Konfigurationsdialog für Benutzerbefehle"
 #. Resource IDs: (3773)
 msgid "Shows a list of functions/methods in the file to jump to"
 msgstr "Zeigt eine Liste von Funktionen/Methoden an in der aktuellen Datei"
+
+#. Resource IDs: (3775)
+msgid "Shows the Windows Explorer file properties dialog for the current file"
+msgstr "Öffnet den Windows Explorer Eigenschaftsdialog für die aktuelle Datei"
 
 #. Resource IDs: (3764)
 msgid "Spaces to Tabs"
@@ -1195,8 +1118,8 @@ msgid "The document '%s' was removed outside of BowPad."
 msgstr "Das Dokument '%s' wurde ausserhalb von BowPad gelöscht."
 
 #. Resource IDs: (3765)
-msgid "Toggle Bookmark (Ctrl+K,K)"
-msgstr "Lesezeichen ein/aus (Ctrl+K,K)"
+msgid "Toggle Bookmark"
+msgstr "Lesezeichen ein/aus"
 
 #. Resource IDs: (3765)
 msgid "Toggle a bookmark on the current line"
@@ -1227,10 +1150,6 @@ msgid "Uncomment"
 msgstr "Kommentar entfernen"
 
 #. Resource IDs: (3759)
-msgid "Uncomment (Ctrl+K,U)"
-msgstr "Kommentar entfernen (Ctrl+K,U)"
-
-#. Resource IDs: (3759)
 msgid "Uncomments the selected text"
 msgstr "Entfernt den Kommentar der aktuellen Zeile"
 
@@ -1241,10 +1160,6 @@ msgstr "Unterstrichen"
 #. Resource IDs: (3751, 3754)
 msgid "Undo"
 msgstr "Rückgängig"
-
-#. Resource IDs: (3754)
-msgid "Undo (Ctrl+Z)"
-msgstr "Rückgängig (Ctrl-Z)"
 
 #. Resource IDs: (3754)
 msgid "Undo the last change"
@@ -1261,10 +1176,6 @@ msgstr "nicht gespeicherte Änderungen"
 #. Resource IDs: (3759, 3760)
 msgid "Uppercase"
 msgstr "Grossschreibung"
-
-#. Resource IDs: (3760)
-msgid "Uppercase (Ctrl+Shift+U)"
-msgstr "Grossschreibung (Ctrl+Shift+U)"
 
 #. Resource IDs: (3760)
 msgid "Use Tabs"
@@ -1297,10 +1208,6 @@ msgstr "Windows (CRLF)"
 #. Resource IDs: (3755)
 msgid "Wrap Lines"
 msgstr "Zeilenumbruch"
-
-#. Resource IDs: (3755)
-msgid "Wrap Lines (Ctrl+E,W)"
-msgstr "Zeilenumbruch (Ctrl+E,W)"
 
 #. Resource IDs: (9)
 msgid "Wrap around"
@@ -1392,9 +1299,3 @@ msgstr "Führt den Benutzerbefehl 9 aus"
 #. Resource IDs: (3760)
 msgid "tab size"
 msgstr "Tabulatorgrösse"
-
-#~ msgid "Edge Column"
-#~ msgstr "Markierung Spalte"
-
-#~ msgid "Launch/Open"
-#~ msgstr "Ausführen"

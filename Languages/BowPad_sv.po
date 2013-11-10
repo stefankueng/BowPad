@@ -1,5 +1,5 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Mikael Hiort af Ornäs <mikael.hafo@hotmail.com>, 2013.
 msgid ""
@@ -156,18 +156,6 @@ msgstr "Rensa bokmärken"
 msgid "Clipboard"
 msgstr "Urklipp"
 
-#. Resource IDs: (3754)
-msgid "Clipboard (Ctrl+C)"
-msgstr "Urklipp (Ctrl+C)"
-
-#. Resource IDs: (3754)
-msgid "Clipboard (Ctrl+V)"
-msgstr "Urklipp (Ctrl+V)"
-
-#. Resource IDs: (3754)
-msgid "Clipboard (Ctrl+X)"
-msgstr "Urklipp (Ctrl+X)"
-
 #. Resource IDs: (3753)
 msgid "Close All Tabs"
 msgstr "Stäng alla flikar"
@@ -175,10 +163,6 @@ msgstr "Stäng alla flikar"
 #. Resource IDs: (3753)
 msgid "Close Tab"
 msgstr "Stäng flik"
-
-#. Resource IDs: (3753)
-msgid "Close Tab (Ctrl+W)"
-msgstr "Stäng flik (Ctrl+W)"
 
 #. Resource IDs: (3753)
 msgid "Close all"
@@ -225,10 +209,6 @@ msgstr "Kommandots namn:"
 #. Resource IDs: (3751, 3759)
 msgid "Comment"
 msgstr "Kommentera"
-
-#. Resource IDs: (3759)
-msgid "Comment (Ctrl+K,C)"
-msgstr "Kommentera (Ctrl+K,C)"
 
 #. Resource IDs: (3759)
 msgid "Comments the selected text"
@@ -298,81 +278,41 @@ msgstr "Ctrl+Klick öppnar länken i standardwebbläsaren"
 msgid "Custom Command 0"
 msgstr "Eget kommando 0"
 
-#. Resource IDs: (3770)
-msgid "Custom Command 0 (Ctrl+L,0)"
-msgstr "Eget kommando 0 (Ctrl+L,0)"
-
 #. Resource IDs: (1050, 3770)
 msgid "Custom Command 1"
 msgstr "Eget kommando 1"
-
-#. Resource IDs: (3770)
-msgid "Custom Command 1 (Ctrl+L,1)"
-msgstr "Eget kommando 1 (Ctrl+L,1)"
 
 #. Resource IDs: (1051, 3770)
 msgid "Custom Command 2"
 msgstr "Eget kommando 2"
 
-#. Resource IDs: (3770)
-msgid "Custom Command 2 (Ctrl+L,2)"
-msgstr "Eget kommando 2 (Ctrl+L,2)"
-
 #. Resource IDs: (1052, 3770)
 msgid "Custom Command 3"
 msgstr "Eget kommando 3"
-
-#. Resource IDs: (3770)
-msgid "Custom Command 3 (Ctrl+L,3)"
-msgstr "Eget kommando 3 (Ctrl+L,3)"
 
 #. Resource IDs: (1053, 3771)
 msgid "Custom Command 4"
 msgstr "Eget kommando 4"
 
-#. Resource IDs: (3771)
-msgid "Custom Command 4 (Ctrl+L,4)"
-msgstr "Eget kommando 4 (Ctrl+L,4)"
-
 #. Resource IDs: (1054, 3771)
 msgid "Custom Command 5"
 msgstr "Eget kommando 5"
-
-#. Resource IDs: (3771)
-msgid "Custom Command 5 (Ctrl+L,5)"
-msgstr "Eget kommando 5 (Ctrl+L,5)"
 
 #. Resource IDs: (1055, 3771)
 msgid "Custom Command 6"
 msgstr "Eget kommando 6"
 
-#. Resource IDs: (3771)
-msgid "Custom Command 6 (Ctrl+L,6)"
-msgstr "Eget kommando 6 (Ctrl+L,6)"
-
 #. Resource IDs: (1056, 3771)
 msgid "Custom Command 7"
 msgstr "Eget kommando 7"
-
-#. Resource IDs: (3771)
-msgid "Custom Command 7 (Ctrl+L,7)"
-msgstr "Eget kommando 7 (Ctrl+L,7)"
 
 #. Resource IDs: (1057, 3772)
 msgid "Custom Command 8"
 msgstr "Eget kommando 8"
 
-#. Resource IDs: (3772)
-msgid "Custom Command 8 (Ctrl+L,8)"
-msgstr "Eget kommando 8 (Ctrl+L,8)"
-
 #. Resource IDs: (1058, 3772)
 msgid "Custom Command 9"
 msgstr "Eget kommando 9"
-
-#. Resource IDs: (3772)
-msgid "Custom Command 9 (Ctrl+L,9)"
-msgstr "Eget kommando 9 (Ctrl+L,9)"
 
 #. Resource IDs: (149)
 msgid "Custom Commands"
@@ -453,10 +393,6 @@ msgid "Duplicate Line"
 msgstr "Duplicera rad"
 
 #. Resource IDs: (3761)
-msgid "Duplicate Line (Ctrl+D)"
-msgstr "Duplicera rad (Ctrl+D)"
-
-#. Resource IDs: (3761)
 msgid "Duplicates the current line"
 msgstr "Duplicerar den aktuella raden"
 
@@ -501,32 +437,20 @@ msgid "Find"
 msgstr "Sök"
 
 #. Resource IDs: (3758)
-msgid "Find && Replace (Ctrl+F)"
-msgstr "Sök && ersätt (Ctrl+F)"
+msgid "Find && Replace"
+msgstr "Sök && ersätt"
 
 #. Resource IDs: (3758)
 msgid "Find Next"
 msgstr "Sök nästa"
 
 #. Resource IDs: (3758)
-msgid "Find Next (F3)"
-msgstr "Sök nästa (F3)"
-
-#. Resource IDs: (3758)
 msgid "Find Next Selected"
 msgstr "Sök nästa markerade"
-
-#. Resource IDs: (3759)
-msgid "Find Next Selected (Ctrl+F3)"
-msgstr "Sök nästa markerade (Ctrl+F3)"
 
 #. Resource IDs: (3758)
 msgid "Find Previous"
 msgstr "Sök föregående"
-
-#. Resource IDs: (3758)
-msgid "Find Previous (Shift+F3)"
-msgstr "Sök föregående (Skift+F3)"
 
 #. Resource IDs: (143)
 msgid "Find and replace"
@@ -547,10 +471,6 @@ msgstr "Funktioner"
 #. Resource IDs: (145, 3763)
 msgid "Go to line"
 msgstr "Gå till rad"
-
-#. Resource IDs: (3763)
-msgid "Go to line (Ctrl+G)"
-msgstr "Gå till rad (Ctrl+G)"
 
 #. Resource IDs: (3764)
 msgid "Goto"
@@ -601,36 +521,24 @@ msgid "Launch in Firefox"
 msgstr "Kör i Firefox"
 
 #. Resource IDs: (3768)
-msgid "Launch in Firefox (Ctrl+L,F)"
-msgstr "Kör i Firefox (Ctrl+L,F)"
-
-#. Resource IDs: (3768)
-msgid "Launch in Google Chrome (Ctrl+L,C)"
-msgstr "Kör i Google Chrome (Ctrl+L,C)"
+msgid "Launch in Google Chrome"
+msgstr "Kör i Google Chrome"
 
 #. Resource IDs: (3767)
 msgid "Launch in IE"
 msgstr "Kör i Internet Explorer"
 
 #. Resource IDs: (3767)
-msgid "Launch in Internet Explorer (Ctrl+L,I)"
-msgstr "Kör i Internet Explorer (Ctrl+L,I)"
+msgid "Launch in Internet Explorer"
+msgstr "Kör i Internet Explorer"
 
 #. Resource IDs: (3768)
 msgid "Launch in Opera"
 msgstr "Kör i Opera"
 
 #. Resource IDs: (3768)
-msgid "Launch in Opera (Ctrl+L,O)"
-msgstr "Kör i Opera (Ctrl+L,O)"
-
-#. Resource IDs: (3768)
 msgid "Launch in Safari"
 msgstr "Kör i Safari"
-
-#. Resource IDs: (3768)
-msgid "Launch in Safari (Ctrl+L,S)"
-msgstr "Kör i Safari (Ctrl+L,S)"
 
 #. Resource IDs: (3756)
 msgid "Line Endings"
@@ -678,10 +586,6 @@ msgstr "Läser in alla filer som var öppna senaste gången BowPad avslutades"
 msgid "Lowercase"
 msgstr "Gemener"
 
-#. Resource IDs: (3760)
-msgid "Lowercase (Ctrl+U)"
-msgstr "Gemener (Ctrl+U)"
-
 #. Resource IDs: (3757)
 msgid "MAC (CR)"
 msgstr "Mac (CR)"
@@ -715,12 +619,12 @@ msgid "Move down"
 msgstr "Flytta nedåt"
 
 #. Resource IDs: (3763)
-msgid "Move line down (Alt+Cursor Down)"
-msgstr "Flytta rad nedåt (Alt+Nedåtpil)"
+msgid "Move line down"
+msgstr "Flytta rad nedåt"
 
 #. Resource IDs: (3762)
-msgid "Move line up (Alt+Cursor Up)"
-msgstr "Flytta rad uppåt (Alt+Uppåtpil)"
+msgid "Move line up"
+msgstr "Flytta rad uppåt"
 
 #. Resource IDs: (3765)
 msgid "Move the caret to the next bookmark"
@@ -764,24 +668,16 @@ msgid "New %d"
 msgstr "Nytt %d"
 
 #. Resource IDs: (3752)
-msgid "New Document (Ctrl+N)"
-msgstr "Nytt dokument (Ctrl+N)"
+msgid "New Document"
+msgstr "Nytt dokument"
 
 #. Resource IDs: (3757)
 msgid "Next"
 msgstr "Nästa"
 
-#. Resource IDs: (3757)
-msgid "Next (Alt+Right)"
-msgstr "Nästa (Alt+Högerpil)"
-
 #. Resource IDs: (3765)
 msgid "Next Bookmarks"
 msgstr "Nästa bokmärke"
-
-#. Resource IDs: (3765)
-msgid "Next Bookmarks (F2)"
-msgstr "Nästa bokmärke (F2)"
 
 #. Resource IDs: (10)
 msgid "No functions found!"
@@ -810,24 +706,16 @@ msgid "Open Console"
 msgstr "Öppna kommandotolken"
 
 #. Resource IDs: (3769)
-msgid "Open Console (Ctrl+L,M)"
-msgstr "Öppna kommandotolken (Ctrl+L,M)"
-
-#. Resource IDs: (3769)
 msgid "Open Explorer"
 msgstr "Öppna Utforskaren"
 
-#. Resource IDs: (3769)
-msgid "Open Explorer (Ctrl+L,E)"
-msgstr "Öppna Utforskaren (Ctrl+L,E)"
-
 #. Resource IDs: (3752)
-msgid "Open Files (Ctrl+O)"
-msgstr "Öppna fil (Ctrl+O)"
+msgid "Open Files"
+msgstr "Öppna fil"
 
 #. Resource IDs: (3772)
-msgid "Open corresponding File (Ctrl+K,O)"
-msgstr "Öppna kopplad fil (Ctrl+K,O)"
+msgid "Open corresponding File"
+msgstr "Öppna kopplad fil"
 
 #. Resource IDs: (10)
 msgid "Open elevated\nBowPad is started again with elevated privileges."
@@ -895,25 +783,13 @@ msgstr "Klistra in"
 msgid "Previous"
 msgstr "Föregående"
 
-#. Resource IDs: (3757)
-msgid "Previous (Alt+Left)"
-msgstr "Föregående (Alt+Vänsterpil)"
-
 #. Resource IDs: (3765)
 msgid "Previous Bookmarks"
 msgstr "Föregående bokmärke"
 
-#. Resource IDs: (3765)
-msgid "Previous Bookmarks (Shift+F2)"
-msgstr "Föregående bokmärke (Skift+F2)"
-
 #. Resource IDs: (3762)
 msgid "Print"
 msgstr "Skriv ut"
-
-#. Resource IDs: (3762)
-msgid "Print (Ctrl+P)"
-msgstr "Skriv ut (Ctrl+P)"
 
 #. Resource IDs: (3763)
 msgid "Print Page Setup"
@@ -936,20 +812,12 @@ msgid "Redo"
 msgstr "Gör om"
 
 #. Resource IDs: (3755)
-msgid "Redo (Ctrl+Y)"
-msgstr "Gör om (Ctrl+Y)"
-
-#. Resource IDs: (3755)
 msgid "Redo what was undone before"
 msgstr "Gör om tidigare ångrade åtgärder"
 
 #. Resource IDs: (3765)
 msgid "Reload"
 msgstr "Uppdatera"
-
-#. Resource IDs: (3765)
-msgid "Reload (F5)"
-msgstr "Uppdatera (F5)"
 
 #. Resource IDs: (8)
 msgid "Reload document\nThe document is refreshed from disk."
@@ -988,12 +856,12 @@ msgid "Save"
 msgstr "Spara"
 
 #. Resource IDs: (3752)
-msgid "Save File (Ctrl+S)"
-msgstr "Spara fil (Ctrl+S)"
+msgid "Save File"
+msgstr "Spara fil"
 
 #. Resource IDs: (3753)
-msgid "Save Files (Ctrl+Shift+S)"
-msgstr "Spara filer (Ctrl+Skift+S)"
+msgid "Save Files"
+msgstr "Spara filer"
 
 #. Resource IDs: (3752)
 msgid "Save all"
@@ -1032,16 +900,8 @@ msgid "Search Web"
 msgstr "Sök på webben"
 
 #. Resource IDs: (3769)
-msgid "Search Web (Ctrl+L,W)"
-msgstr "Sök på webben (Ctrl+L,W)"
-
-#. Resource IDs: (3769)
 msgid "Search Wikipedia"
 msgstr "Sök på Wikipedia"
-
-#. Resource IDs: (3769)
-msgid "Search Wikipedia (Ctrl+L,P)"
-msgstr "Sök på Wikipedia (Ctrl+L,P)"
 
 #. Resource IDs: (3758)
 msgid "Search and/or replace text in documents/tabs"
@@ -1094,8 +954,8 @@ msgstr ""
 "högermarginalen. Ange till 0 för att dölja den."
 
 #. Resource IDs: (3755)
-msgid "Show Whitespaces (Ctrl+R,W)"
-msgstr "Visa blanksteg (Ctrl+R,W)"
+msgid "Show Whitespaces"
+msgstr "Visa blanksteg"
 
 #. Resource IDs: (3772)
 msgid "Shows a dialog to configure custom commands"
@@ -1151,8 +1011,8 @@ msgid "The document '%s' was removed outside of BowPad."
 msgstr "Dokumentet \"%s\" har tagits bort utanför BowPad."
 
 #. Resource IDs: (3765)
-msgid "Toggle Bookmark (Ctrl+K,K)"
-msgstr "Växla bokmärke (Ctrl+K,K)"
+msgid "Toggle Bookmark"
+msgstr "Växla bokmärke"
 
 #. Resource IDs: (3765)
 msgid "Toggle a bookmark on the current line"
@@ -1183,10 +1043,6 @@ msgid "Uncomment"
 msgstr "Avkommentera"
 
 #. Resource IDs: (3759)
-msgid "Uncomment (Ctrl+K,U)"
-msgstr "Avkommentera (Ctrl+K,U)"
-
-#. Resource IDs: (3759)
 msgid "Uncomments the selected text"
 msgstr "Avkommenterar den markerade texten"
 
@@ -1197,10 +1053,6 @@ msgstr "Understruken"
 #. Resource IDs: (3751, 3754)
 msgid "Undo"
 msgstr "Ångra"
-
-#. Resource IDs: (3754)
-msgid "Undo (Ctrl+Z)"
-msgstr "Ångra (Ctrl+Z)"
 
 #. Resource IDs: (3754)
 msgid "Undo the last change"
@@ -1217,10 +1069,6 @@ msgstr "Osparade ändringar"
 #. Resource IDs: (3759, 3760)
 msgid "Uppercase"
 msgstr "Versaler"
-
-#. Resource IDs: (3760)
-msgid "Uppercase (Ctrl+Shift+U)"
-msgstr "Versaler (Ctrl+Skift+U)"
 
 #. Resource IDs: (3760)
 msgid "Use Tabs"
@@ -1253,10 +1101,6 @@ msgstr "Windows (CR+LF)"
 #. Resource IDs: (3755)
 msgid "Wrap Lines"
 msgstr "Bryt rader"
-
-#. Resource IDs: (3755)
-msgid "Wrap Lines (Ctrl+E,W)"
-msgstr "Bryt rader (Ctrl+E,W)"
 
 #. Resource IDs: (9)
 msgid "Wrap around"

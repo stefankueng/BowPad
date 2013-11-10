@@ -161,18 +161,6 @@ msgstr "清空书签"
 msgid "Clipboard"
 msgstr "剪贴板"
 
-#. Resource IDs: (3754)
-msgid "Clipboard (Ctrl+C)"
-msgstr "剪贴板 (Ctrl+C)"
-
-#. Resource IDs: (3754)
-msgid "Clipboard (Ctrl+V)"
-msgstr "剪贴板 (Ctrl+V)"
-
-#. Resource IDs: (3754)
-msgid "Clipboard (Ctrl+X)"
-msgstr "剪贴板 (Ctrl+X)"
-
 #. Resource IDs: (3753)
 msgid "Close All Tabs"
 msgstr "关闭所有标签页"
@@ -180,10 +168,6 @@ msgstr "关闭所有标签页"
 #. Resource IDs: (3753)
 msgid "Close Tab"
 msgstr "关闭标签页"
-
-#. Resource IDs: (3753)
-msgid "Close Tab (Ctrl+W)"
-msgstr "关闭标签页 (Ctrl+W)"
 
 #. Resource IDs: (3753)
 msgid "Close all"
@@ -232,10 +216,6 @@ msgstr "命令名称："
 #. Resource IDs: (3751, 3759)
 msgid "Comment"
 msgstr "注释"
-
-#. Resource IDs: (3759)
-msgid "Comment (Ctrl+K,C)"
-msgstr "注释 (Ctrl+K,C)"
 
 #. Resource IDs: (3759)
 msgid "Comments the selected text"
@@ -305,81 +285,41 @@ msgstr "Ctrl+点击 在默认浏览器中打开链接"
 msgid "Custom Command 0"
 msgstr "自定义命令 0"
 
-#. Resource IDs: (3770)
-msgid "Custom Command 0 (Ctrl+L,0)"
-msgstr "自定义命令 0 (Ctrl+L,0)"
-
 #. Resource IDs: (1050, 3770)
 msgid "Custom Command 1"
 msgstr "自定义命令 1"
-
-#. Resource IDs: (3770)
-msgid "Custom Command 1 (Ctrl+L,1)"
-msgstr "自定义命令 1 (Ctrl+L,1)"
 
 #. Resource IDs: (1051, 3770)
 msgid "Custom Command 2"
 msgstr "自定义命令 2"
 
-#. Resource IDs: (3770)
-msgid "Custom Command 2 (Ctrl+L,2)"
-msgstr "自定义命令 2 (Ctrl+L,2)"
-
 #. Resource IDs: (1052, 3770)
 msgid "Custom Command 3"
 msgstr "自定义命令 3"
-
-#. Resource IDs: (3770)
-msgid "Custom Command 3 (Ctrl+L,3)"
-msgstr "自定义命令 3 (Ctrl+L,3)"
 
 #. Resource IDs: (1053, 3771)
 msgid "Custom Command 4"
 msgstr "自定义命令 4"
 
-#. Resource IDs: (3771)
-msgid "Custom Command 4 (Ctrl+L,4)"
-msgstr "自定义命令 4 (Ctrl+L,4)"
-
 #. Resource IDs: (1054, 3771)
 msgid "Custom Command 5"
 msgstr "自定义命令 5"
-
-#. Resource IDs: (3771)
-msgid "Custom Command 5 (Ctrl+L,5)"
-msgstr "自定义命令 5 (Ctrl+L,5)"
 
 #. Resource IDs: (1055, 3771)
 msgid "Custom Command 6"
 msgstr "自定义命令 6"
 
-#. Resource IDs: (3771)
-msgid "Custom Command 6 (Ctrl+L,6)"
-msgstr "自定义命令 6 (Ctrl+L,6)"
-
 #. Resource IDs: (1056, 3771)
 msgid "Custom Command 7"
 msgstr "自定义命令 7"
-
-#. Resource IDs: (3771)
-msgid "Custom Command 7 (Ctrl+L,7)"
-msgstr "自定义命令 7 (Ctrl+L,7)"
 
 #. Resource IDs: (1057, 3772)
 msgid "Custom Command 8"
 msgstr "自定义命令 8"
 
-#. Resource IDs: (3772)
-msgid "Custom Command 8 (Ctrl+L,8)"
-msgstr "自定义命令 8 (Ctrl+L,8)"
-
 #. Resource IDs: (1058, 3772)
 msgid "Custom Command 9"
 msgstr "自定义命令 9"
-
-#. Resource IDs: (3772)
-msgid "Custom Command 9 (Ctrl+L,9)"
-msgstr "自定义命令 9 (Ctrl+L,9)"
 
 #. Resource IDs: (149)
 msgid "Custom Commands"
@@ -470,16 +410,12 @@ msgid "Duplicate Line"
 msgstr "重复行"
 
 #. Resource IDs: (3761)
-msgid "Duplicate Line (Ctrl+D)"
-msgstr "重复行 (Ctrl+D)"
-
-#. Resource IDs: (3761)
 msgid "Duplicates the current line"
 msgstr "当前行重复内容"
 
 #. Resource IDs: (105)
 msgid "E&amp;xit"
-msgstr "退出 (&amp;X)"
+msgstr "退出"
 
 #. Resource IDs: (3751)
 msgid "Edit"
@@ -518,32 +454,20 @@ msgid "Find"
 msgstr "查找"
 
 #. Resource IDs: (3758)
-msgid "Find &amp;&amp; Replace (Ctrl+F)"
-msgstr "查找 &amp; 替换 (Ctrl+F)"
+msgid "Find &amp;&amp; Replace"
+msgstr "查找 &amp; 替换"
 
 #. Resource IDs: (3758)
 msgid "Find Next"
 msgstr "查找下一个"
 
 #. Resource IDs: (3758)
-msgid "Find Next (F3)"
-msgstr "查找下一个 (F3)"
-
-#. Resource IDs: (3758)
 msgid "Find Next Selected"
 msgstr "查找下一个选择的"
-
-#. Resource IDs: (3759)
-msgid "Find Next Selected (Ctrl+F3)"
-msgstr "查找选择的下一个 (Ctrl+F3)"
 
 #. Resource IDs: (3758)
 msgid "Find Previous"
 msgstr "查找上一个"
-
-#. Resource IDs: (3758)
-msgid "Find Previous (Shift+F3)"
-msgstr "查找上一个 (Shift+F3)"
 
 #. Resource IDs: (143)
 msgid "Find and replace"
@@ -564,10 +488,6 @@ msgstr "函数"
 #. Resource IDs: (145, 3763)
 msgid "Go to line"
 msgstr "转到行"
-
-#. Resource IDs: (3763)
-msgid "Go to line (Ctrl+G)"
-msgstr "转到行 (Ctrl+G)"
 
 #. Resource IDs: (3764)
 msgid "Goto"
@@ -622,36 +542,24 @@ msgid "Launch in Firefox"
 msgstr "用 Firefox 打开"
 
 #. Resource IDs: (3768)
-msgid "Launch in Firefox (Ctrl+L,F)"
-msgstr "用 Firefox 打开 (Ctrl+L,F)"
-
-#. Resource IDs: (3768)
-msgid "Launch in Google Chrome (Ctrl+L,C)"
-msgstr "用 Google Chrome 打开 (Ctrl+L,C)"
+msgid "Launch in Google Chrome"
+msgstr "用 Google Chrome 打开"
 
 #. Resource IDs: (3767)
 msgid "Launch in IE"
 msgstr "用 IE 打开"
 
 #. Resource IDs: (3767)
-msgid "Launch in Internet Explorer (Ctrl+L,I)"
-msgstr "用 Internet Explorer 打开 (Ctrl+L,I)"
+msgid "Launch in Internet Explorer"
+msgstr "用 Internet Explorer 打开"
 
 #. Resource IDs: (3768)
 msgid "Launch in Opera"
 msgstr "用 Opera 打开"
 
 #. Resource IDs: (3768)
-msgid "Launch in Opera (Ctrl+L,O)"
-msgstr "用 Opera 打开 (Ctrl+L,O)"
-
-#. Resource IDs: (3768)
 msgid "Launch in Safari"
 msgstr "用 Safari 打开"
-
-#. Resource IDs: (3768)
-msgid "Launch in Safari (Ctrl+L,S)"
-msgstr "用 Safari 打开 (Ctrl+L,S)"
 
 #. Resource IDs: (3756)
 msgid "Line Endings"
@@ -698,10 +606,6 @@ msgstr "载入 BowPad 上次关闭时打开的文件"
 msgid "Lowercase"
 msgstr "小写"
 
-#. Resource IDs: (3760)
-msgid "Lowercase (Ctrl+U)"
-msgstr "小写 (Ctrl+U)"
-
 #. Resource IDs: (3757)
 msgid "MAC (CR)"
 msgstr "MAC (CR)"
@@ -735,12 +639,12 @@ msgid "Move down"
 msgstr "下移"
 
 #. Resource IDs: (3763)
-msgid "Move line down (Alt+Cursor Down)"
-msgstr "下移一行 (Alt+下)"
+msgid "Move line down"
+msgstr "下移一行"
 
 #. Resource IDs: (3762)
-msgid "Move line up (Alt+Cursor Up)"
-msgstr "上移一行 (Alt+上)"
+msgid "Move line up"
+msgstr "上移一行"
 
 #. Resource IDs: (3765)
 msgid "Move the caret to the next bookmark"
@@ -784,24 +688,16 @@ msgid "New %d"
 msgstr "新建 %d"
 
 #. Resource IDs: (3752)
-msgid "New Document (Ctrl+N)"
-msgstr "新文档 (Ctrl+N)"
+msgid "New Document"
+msgstr "新文档"
 
 #. Resource IDs: (3757)
 msgid "Next"
 msgstr "下一个"
 
-#. Resource IDs: (3757)
-msgid "Next (Alt+Right)"
-msgstr "下一个 (Alt+Right)"
-
 #. Resource IDs: (3765)
 msgid "Next Bookmarks"
 msgstr "下一个书签"
-
-#. Resource IDs: (3765)
-msgid "Next Bookmarks (F2)"
-msgstr "下一个书签 (F2)"
 
 #. Resource IDs: (10)
 msgid "No functions found!"
@@ -832,24 +728,16 @@ msgid "Open Console"
 msgstr "打开控制台"
 
 #. Resource IDs: (3769)
-msgid "Open Console (Ctrl+L,M)"
-msgstr "打开控制台 (Ctrl+L,M)"
-
-#. Resource IDs: (3769)
 msgid "Open Explorer"
 msgstr "打开浏览器"
 
-#. Resource IDs: (3769)
-msgid "Open Explorer (Ctrl+L,E)"
-msgstr "打开浏览器 (Ctrl+L,E)"
-
 #. Resource IDs: (3752)
-msgid "Open Files (Ctrl+O)"
-msgstr "已打开的文件 (Ctrl+O)"
+msgid "Open Files"
+msgstr "已打开的文件"
 
 #. Resource IDs: (3772)
-msgid "Open corresponding File (Ctrl+K,O)"
-msgstr "打开相应的文件 (Ctrl+K,O)"
+msgid "Open corresponding File"
+msgstr "打开相应的文件"
 
 #. Resource IDs: (10)
 msgid ""
@@ -919,25 +807,13 @@ msgstr "粘贴"
 msgid "Previous"
 msgstr "上一个"
 
-#. Resource IDs: (3757)
-msgid "Previous (Alt+Left)"
-msgstr "上一个 (Alt+Left)"
-
 #. Resource IDs: (3765)
 msgid "Previous Bookmarks"
 msgstr "上一个书签"
 
-#. Resource IDs: (3765)
-msgid "Previous Bookmarks (Shift+F2)"
-msgstr "上一个书签 (Shift+F2)"
-
 #. Resource IDs: (3762)
 msgid "Print"
 msgstr "打印"
-
-#. Resource IDs: (3762)
-msgid "Print (Ctrl+P)"
-msgstr "打印 (Ctrl+P)"
 
 #. Resource IDs: (3763)
 msgid "Print Page Setup"
@@ -960,20 +836,12 @@ msgid "Redo"
 msgstr "重做"
 
 #. Resource IDs: (3755)
-msgid "Redo (Ctrl+Y)"
-msgstr "重做 (Ctrl+Y)"
-
-#. Resource IDs: (3755)
 msgid "Redo what was undone before"
 msgstr "重做上次撤消的操作"
 
 #. Resource IDs: (3765)
 msgid "Reload"
 msgstr "重新载入"
-
-#. Resource IDs: (3765)
-msgid "Reload (F5)"
-msgstr "重新载入 (F5)"
 
 #. Resource IDs: (8)
 msgid ""
@@ -1016,12 +884,12 @@ msgid "Save"
 msgstr "保存"
 
 #. Resource IDs: (3752)
-msgid "Save File (Ctrl+S)"
-msgstr "保存文件 (Ctrl+S)"
+msgid "Save File"
+msgstr "保存文件"
 
 #. Resource IDs: (3753)
-msgid "Save Files (Ctrl+Shift+S)"
-msgstr "保存文件 (Ctrl+Shift+S)"
+msgid "Save Files"
+msgstr "保存文件"
 
 #. Resource IDs: (3752)
 msgid "Save all"
@@ -1064,16 +932,8 @@ msgid "Search Web"
 msgstr "搜索网页"
 
 #. Resource IDs: (3769)
-msgid "Search Web (Ctrl+L,W)"
-msgstr "搜索网页 (Ctrl+L,W)"
-
-#. Resource IDs: (3769)
 msgid "Search Wikipedia"
 msgstr "搜索维基百科"
-
-#. Resource IDs: (3769)
-msgid "Search Wikipedia (Ctrl+L,P)"
-msgstr "搜索维基百科 (Ctrl+L,P)"
 
 #. Resource IDs: (3758)
 msgid "Search and/or replace text in documents/tabs"
@@ -1126,8 +986,8 @@ msgid ""
 msgstr "设置垂直边距，包括右边距。0 表示隐藏边距。"
 
 #. Resource IDs: (3755)
-msgid "Show Whitespaces (Ctrl+R,W)"
-msgstr "显示空格 (Ctrl+R,W)"
+msgid "Show Whitespaces"
+msgstr "显示空格"
 
 #. Resource IDs: (3772)
 msgid "Shows a dialog to configure custom commands"
@@ -1183,8 +1043,8 @@ msgid "The document '%s' was removed outside of BowPad."
 msgstr "文档 '%s' 在 BowPad 外被删除。"
 
 #. Resource IDs: (3765)
-msgid "Toggle Bookmark (Ctrl+K,K)"
-msgstr "切换书签 (Ctrl+K,K)"
+msgid "Toggle Bookmark"
+msgstr "切换书签"
 
 #. Resource IDs: (3765)
 msgid "Toggle a bookmark on the current line"
@@ -1215,10 +1075,6 @@ msgid "Uncomment"
 msgstr "取消注释"
 
 #. Resource IDs: (3759)
-msgid "Uncomment (Ctrl+K,U)"
-msgstr "取消注释 (Ctrl+K,U)"
-
-#. Resource IDs: (3759)
 msgid "Uncomments the selected text"
 msgstr "取消注释选择的文本"
 
@@ -1229,10 +1085,6 @@ msgstr "下划线"
 #. Resource IDs: (3751, 3754)
 msgid "Undo"
 msgstr "撤消"
-
-#. Resource IDs: (3754)
-msgid "Undo (Ctrl+Z)"
-msgstr "撤消 (Ctrl+Z)"
 
 #. Resource IDs: (3754)
 msgid "Undo the last change"
@@ -1249,10 +1101,6 @@ msgstr "不安全的修改"
 #. Resource IDs: (3759, 3760)
 msgid "Uppercase"
 msgstr "大写"
-
-#. Resource IDs: (3760)
-msgid "Uppercase (Ctrl+Shift+U)"
-msgstr "大写 (Ctrl+Shift+U)"
 
 #. Resource IDs: (3760)
 msgid "Use Tabs"
@@ -1285,10 +1133,6 @@ msgstr "Windows (CRLF)"
 #. Resource IDs: (3755)
 msgid "Wrap Lines"
 msgstr "自动换行"
-
-#. Resource IDs: (3755)
-msgid "Wrap Lines (Ctrl+E,W)"
-msgstr "自动换行 (Ctrl+E,W)"
 
 #. Resource IDs: (9)
 msgid "Wrap around"
