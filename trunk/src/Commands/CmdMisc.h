@@ -99,7 +99,7 @@ public:
         {
             CTheme::Instance().SetDarkTheme(!CTheme::Instance().IsDarkTheme());
             if (SysInfo::Instance().IsWin8OrLater())
-                CTheme::Instance().SetRibbonColorsHSB(UI_HSB(255,255,0), UI_HSB(160,44,0), UI_HSB(160,44,0));
+                CTheme::Instance().SetRibbonColorsHSB(UI_HSB(0,0,255), UI_HSB(160,0,0), UI_HSB(160,44,0));
             else
                 CTheme::Instance().SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(153,76,0));
         }
