@@ -78,7 +78,7 @@ public:
                     // Font size value is available so get the font size.
                     VarDecFromR8((DOUBLE)fontsize, &decSize);
                     // Set UI_PKEY_FontProperties_Size value in property store.
-                    UIInitPropertyFromDecimal(UI_PKEY_FontProperties_Size, decSize, &propvar); 
+                    UIInitPropertyFromDecimal(UI_PKEY_FontProperties_Size, decSize, &propvar);
                     pValues->SetValue(UI_PKEY_FontProperties_Size, propvar);
                     PropVariantClear(&propvar);
 
@@ -141,7 +141,7 @@ public:
                         PWSTR pszFamily;
                         UIPropertyToStringAlloc(UI_PKEY_FontProperties_Family, propvar, &pszFamily);
                         // Blank string is used as "Not Available" value.
-                        if (lstrcmp(pszFamily, L"")) 
+                        if (lstrcmp(pszFamily, L""))
                         {
                             if (verb == UI_EXECUTIONVERB_EXECUTE)
                                 CIniSettings::Instance().SetString(L"View", L"FontName", pszFamily);

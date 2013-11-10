@@ -751,8 +751,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 HANDLE hData = GetClipboardData(CF_UNICODETEXT);
                 if (hData)
                 {
-                    LPCWSTR lptstr = (LPCWSTR)GlobalLock(hData); 
-                    if (lptstr != NULL) 
+                    LPCWSTR lptstr = (LPCWSTR)GlobalLock(hData);
+                    if (lptstr != NULL)
                     {
                         std::wstring s = lptstr;
                         if (!s.empty())
