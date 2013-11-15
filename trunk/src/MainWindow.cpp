@@ -420,6 +420,18 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_AFTERINIT:
         CCommandHandler::Instance().AfterInit();
+        for (const auto& path : m_pathsToOpen)
+        {
+            OpenFile(path.first);
+            if (path.second != (size_t)-1)
+                GoToLine(path.second);
+        }
+        if (!m_elevatepath.empty())
+        {
+            ElevatedSave(m_elevatepath, m_elevatesavepath);
+            m_elevatepath.clear();
+            m_elevatesavepath.clear();
+        }
         break;
     case WM_NOTIFY:
         {

@@ -100,9 +100,9 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                     int nArgs;
                     std::wstring sCmdLine;
                     LPWSTR * szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
-                    if( szArglist )
+                    if (szArglist)
                     {
-                        for( int i=0; i<nArgs; i++)
+                        for (int i = 0; i < nArgs; i++)
                         {
                             if (szArglist[i][0] != '/')
                             {
@@ -121,8 +121,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                         LocalFree(szArglist);
                     }
                     std::unique_ptr<wchar_t[]> ownCmdLine(new wchar_t[sCmdLine.size() + 2]);
-                    wcscpy_s(ownCmdLine.get(), sCmdLine.size()+2, sCmdLine.c_str());
-                    cds.cbData = (DWORD)((sCmdLine.size()+1)*sizeof(wchar_t));
+                    wcscpy_s(ownCmdLine.get(), sCmdLine.size() + 2, sCmdLine.c_str());
+                    cds.cbData = (DWORD)((sCmdLine.size() + 1)*sizeof(wchar_t));
                     cds.lpData = ownCmdLine.get();
                     SendMessage(hBowPadWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&cds);
                 }
@@ -163,26 +163,27 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         langdllpath += L".lang";
         if (CAppUtils::HasSameMajorVersion(langdllpath))
         {
-            hRes = LoadLibraryEx(langdllpath.c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES|LOAD_LIBRARY_AS_IMAGE_RESOURCE);
+            hRes = LoadLibraryEx(langdllpath.c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
             if (hRes == NULL)
                 hRes = hInst;
         }
     }
 
-    MSG msg = {0};
+    MSG msg = { 0 };
     CMainWindow mainWindow(hRes);
     if (mainWindow.RegisterAndCreateWindow())
     {
         if (parser.HasVal(L"path"))
         {
-            mainWindow.OpenFile(parser.GetVal(L"path"));
+            size_t line = (size_t)-1;
             if (parser.HasVal(L"line"))
             {
-                mainWindow.GoToLine(parser.GetLongVal(L"line")-1);
+                line = parser.GetLongVal(L"line") - 1;
             }
+            mainWindow.SetFileToOpen(parser.GetVal(L"path"), line);
             if (parser.HasKey(L"elevate") && parser.HasKey(L"savepath"))
             {
-                mainWindow.ElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"));
+                mainWindow.SetElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"));
             }
         }
         else
@@ -191,20 +192,21 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             int nArgs;
 
             LPWSTR * szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
-            if( szArglist )
+            if (szArglist)
             {
-                for( int i=1; i<nArgs; i++)
+                size_t line = (size_t)-1;
+                if (parser.HasVal(L"line"))
+                {
+                    line = parser.GetLongVal(L"line") - 1;
+                }
+                for (int i = 1; i < nArgs; i++)
                 {
                     if (szArglist[i][0] != '/')
                     {
                         std::wstring path = CPathUtils::GetLongPathname(szArglist[i]);
                         std::replace(path.begin(), path.end(), '/', '\\');
-                        mainWindow.OpenFile(path);
+                        mainWindow.SetFileToOpen(path, line);
                     }
-                }
-                if (parser.HasVal(L"line"))
-                {
-                    mainWindow.GoToLine(parser.GetLongVal(L"line")-1);
                 }
 
                 // Free memory allocated for CommandLineToArgvW arguments.

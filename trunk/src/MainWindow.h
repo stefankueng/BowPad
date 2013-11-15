@@ -43,11 +43,13 @@ public:
     bool                ReloadTab(int tab, int encoding);
     bool                SaveCurrentTab(bool bSaveAs = false);
     void                EnsureAtLeastOneTab();
-    void                GoToLine( size_t line );
+    void                GoToLine(size_t line);
     bool                CloseTab(int tab);
     bool                CloseAllTabs();
     bool                HandleOutsideModifications(int id = -1);
-    void                ElevatedSave( const std::wstring& path, const std::wstring& savepath );
+    void                SetFileToOpen(const std::wstring& path, size_t line = (size_t)-1) { m_pathsToOpen[path] = line; }
+    void                SetElevatedSave(const std::wstring& path, const std::wstring& savepath) { m_elevatepath = path; m_elevatesavepath = savepath; }
+    void                ElevatedSave(const std::wstring& path, const std::wstring& savepath);
 
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
@@ -65,7 +67,7 @@ protected:
     /// the message handler for this window
     LRESULT CALLBACK            WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    void                        AutoIndent( Scintilla::SCNotification * pScn );
+    void                        AutoIndent(Scintilla::SCNotification * pScn);
 
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
     LRESULT                     DoCommand(int id);
@@ -87,4 +89,7 @@ private:
     std::unique_ptr<wchar_t[]>  m_tooltipbuffer;
     HICON                       m_hShieldIcon;
     std::list<std::wstring>     m_ClipboardHistory;
+    std::map<std::wstring, size_t> m_pathsToOpen;
+    std::wstring                m_elevatepath;
+    std::wstring                m_elevatesavepath;
 };
