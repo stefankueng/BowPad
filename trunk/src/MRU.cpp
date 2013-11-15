@@ -171,7 +171,7 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
     LONG i = 0;
     for (auto countPathPair = m_mruVec.crbegin(); countPathPair != m_mruVec.crend(); ++countPathPair)
     {
-        CRecentFileProperties* pPropertiesObj;
+        CRecentFileProperties* pPropertiesObj = nullptr;
         hr = CRecentFileProperties::CreateInstance(std::get<0>(*countPathPair).c_str(), std::get<1>(*countPathPair), &pPropertiesObj);
 
         if (SUCCEEDED(hr))

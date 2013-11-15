@@ -786,7 +786,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         }
                         GlobalUnlock(hData);
 
-                        size_t maxsize = CIniSettings::Instance().GetInt64(L"clipboard", L"maxhistory", 20);
+                        size_t maxsize = (size_t)CIniSettings::Instance().GetInt64(L"clipboard", L"maxhistory", 20);
                         if (m_ClipboardHistory.size() > maxsize)
                             m_ClipboardHistory.pop_back();
                     }
@@ -928,7 +928,7 @@ LRESULT CMainWindow::DoCommand(int id)
                     pt.y = (LONG)m_scintilla.Call(SCI_POINTYFROMPOSITION, 0, pos);
                     ClientToScreen(m_scintilla, &pt);
                     int index = 1;
-                    size_t maxsize = CIniSettings::Instance().GetInt64(L"clipboard", L"maxuilength", 40);
+                    size_t maxsize = (size_t)CIniSettings::Instance().GetInt64(L"clipboard", L"maxuilength", 40);
                     for (const auto& s : m_ClipboardHistory)
                     {
                         std::wstring sf = s;
