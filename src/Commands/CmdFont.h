@@ -138,7 +138,7 @@ public:
                     if (SUCCEEDED(pChanges->GetValue(UI_PKEY_FontProperties_Family, &propvar)))
                     {
                         // Get the string for the font family.
-                        PWSTR pszFamily;
+                        PWSTR pszFamily = nullptr;
                         UIPropertyToStringAlloc(UI_PKEY_FontProperties_Family, propvar, &pszFamily);
                         // Blank string is used as "Not Available" value.
                         if (lstrcmp(pszFamily, L""))
