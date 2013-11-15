@@ -97,7 +97,7 @@
     <InstallExecuteSequence>
       <AppSearch Sequence="1"></AppSearch>
       <LaunchConditions After="AppSearch" />
-      <RemoveExistingProducts After="InstallValidate"><![CDATA[PREVIOUSVERSIONSINSTALLED]]></RemoveExistingProducts>
+      <RemoveExistingProducts After="InstallFinalize"><![CDATA[PREVIOUSVERSIONSINSTALLED]]></RemoveExistingProducts>
     </InstallExecuteSequence>
 
   </Product>
