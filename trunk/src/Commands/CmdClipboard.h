@@ -317,6 +317,7 @@ public:
     virtual bool Execute()
     {
         // test first if there's a file on the clipboard
+        std::vector<std::wstring> files;
         bool bFilesOpened = false;
         {
             CClipboardHelper clipboard;
@@ -329,7 +330,6 @@ public:
                     if (hDrop)
                     {
                         int filesDropped = DragQueryFile(hDrop, 0xffffffff, NULL, 0);
-                        std::vector<std::wstring> files;
                         for (int i = 0 ; i < filesDropped ; ++i)
                         {
                             UINT len = DragQueryFile(hDrop, i, NULL, 0);
@@ -337,14 +337,14 @@ public:
                             DragQueryFile(hDrop, i, pathBuf.get(), len+1);
                             files.push_back(pathBuf.get());
                         }
-                        DragFinish(hDrop);
-                        for (auto it:files)
-                            OpenFile(it.c_str());
-                        bFilesOpened = true;
                     }
-
                 }
             }
+        }
+        for (auto it : files)
+        {
+            OpenFile(it.c_str());
+            bFilesOpened = true;
         }
         if (!bFilesOpened)
             ScintillaCall(SCI_PASTE);
