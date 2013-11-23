@@ -235,7 +235,6 @@
     <ClInclude Include="..\obj\BowPad\Debug\BowPadUI.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppUtils.h" />
-    <ClInclude Include="BowPadUI.h" />
     <ClInclude Include="ChoseDlg.h" />
     <ClInclude Include="ColorButton.h" />
     <ClInclude Include="Commands\CmdBlanks.h" />
@@ -367,8 +366,6 @@
     <Image Include="res\saved.ico" />
     <Image Include="res\Shield.ico" />
     <Image Include="res\unsaved.ico" />
-    <Image Include="BowPad.ico" />
-    <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="res\BowPad.xml">
