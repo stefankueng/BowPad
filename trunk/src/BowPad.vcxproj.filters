@@ -261,9 +261,6 @@
     <ClInclude Include="..\obj\BowPad\Debug\BowPadUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BowPadUI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Commands\CmdFont.h">
       <Filter>Commands</Filter>
     </ClInclude>
@@ -441,12 +438,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="small.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="BowPad.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="res\closeTabButton.bmp">
       <Filter>Resource Files</Filter>
     </Image>
