@@ -20,6 +20,28 @@
 #include "BowPadUI.h"
 #include "BaseDialog.h"
 #include "DlgResizer.h"
+#include "ScintillaWnd.h"
+
+class CSearchResult
+{
+public:
+    CSearchResult()
+        : docID(-1)
+        , pos(0)
+        , line(0)
+        , posInLineStart(0)
+        , posInLineEnd(0)
+    {}
+    ~CSearchResult() {}
+
+    int             docID;
+    std::wstring    lineText;
+    size_t          pos;
+    size_t          line;
+    size_t          posInLineStart;
+    size_t          posInLineEnd;
+};
+
 
 class CFindReplaceDlg : public CDialog,  public ICommand
 {
@@ -33,15 +55,26 @@ protected:
 
     void                    SetInfoText(UINT resid);
     void                    DoSearch();
+    void                    DoSearchAll(int id);
     void                    DoReplace(int id);
+    void                    SearchDocument(int docID, const CDocument& doc, const std::string& searchfor, int searchflags);
+
+    void                    ShowResults(bool bShow);
+    void                    InitResultList();
+    LRESULT                 DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
+    LRESULT                 DrawListItemWithMatches(NMLVCUSTOMDRAW * pLVCD);
+    RECT                    DrawListColumnBackground(NMLVCUSTOMDRAW * pLVCD);
 
     virtual bool Execute() { return true; }
     virtual UINT GetCmdId() { return 0; }
 
 private:
-    CDlgResizer             m_resizer;
-    std::list<std::wstring> m_searchStrings;
-    std::list<std::wstring> m_replaceStrings;
+    CDlgResizer                 m_resizer;
+    std::list<std::wstring>     m_searchStrings;
+    std::list<std::wstring>     m_replaceStrings;
+    bool                        m_freeresize;
+    CScintillaWnd               m_searchWnd;
+    std::deque<CSearchResult>   m_searchResults;
 };
 
 

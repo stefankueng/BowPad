@@ -264,6 +264,9 @@
     <ClInclude Include="Commands\CmdFont.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="BowPadUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
