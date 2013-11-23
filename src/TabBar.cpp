@@ -171,6 +171,15 @@ int CTabBar::InsertAtEnd(const TCHAR *subTabName)
     return int(::SendMessage(*this, TCM_INSERTITEM, m_nItems++, reinterpret_cast<LPARAM>(&tie)));
 }
 
+void CTabBar::GetTitle(int index, TCHAR *title, int titleLen)
+{
+    TCITEM tci;
+    tci.mask = TCIF_TEXT;
+    tci.pszText = title;
+    tci.cchTextMax = titleLen - 1;
+    ::SendMessage(*this, TCM_GETITEM, index, reinterpret_cast<LPARAM>(&tci));
+}
+
 void CTabBar::GetCurrentTitle(TCHAR *title, int titleLen)
 {
     TCITEM tci;

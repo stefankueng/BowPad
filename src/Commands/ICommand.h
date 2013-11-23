@@ -46,6 +46,8 @@ protected:
     int                 GetActiveTabIndex();
     int                 GetTabCount();
     std::wstring        GetCurrentTitle();
+    std::wstring        GetTitleForTabIndex(int index);
+    std::wstring        GetTitleForDocID(int id);
     int                 GetSrcTab();
     int                 GetDstTab();
     void                CloseTab(int index);

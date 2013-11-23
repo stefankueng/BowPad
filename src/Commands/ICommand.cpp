@@ -82,6 +82,19 @@ std::wstring ICommand::GetCurrentTitle()
     return buf;
 }
 
+std::wstring ICommand::GetTitleForTabIndex(int index)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    wchar_t buf[100] = { 0 };
+    pMainWnd->m_TabBar.GetTitle(index, buf, _countof(buf));
+    return buf;
+}
+
+std::wstring ICommand::GetTitleForDocID(int id)
+{
+    return GetTitleForTabIndex(GetTabIndexFromDocID(id));
+}
+
 int ICommand::GetSrcTab()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
