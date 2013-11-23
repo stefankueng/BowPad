@@ -235,6 +235,7 @@
     <ClInclude Include="..\obj\BowPad\Debug\BowPadUI.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppUtils.h" />
+    <ClInclude Include="BowPadUI.h" />
     <ClInclude Include="ChoseDlg.h" />
     <ClInclude Include="ColorButton.h" />
     <ClInclude Include="Commands\CmdBlanks.h" />
