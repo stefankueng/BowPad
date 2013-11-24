@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2013-11-10 13:48+0100\n"
+"PO-Revision-Date: 2013-11-24 15:01+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: German\n"
@@ -37,10 +37,6 @@ msgstr "Ü&ber ..."
 #. Resource IDs: (7)
 msgid "&Cancel"
 msgstr "&Abbrechen"
-
-#. Resource IDs: (2)
-msgid "&Close"
-msgstr "&Schliessen"
 
 #. Resource IDs: (7)
 msgid "&Don't save"
@@ -154,6 +150,10 @@ msgstr "Zeichenoperationen"
 #. Resource IDs: (1027)
 msgid "Check for Updates"
 msgstr "Auf Updates überprüfen"
+
+#. Resource IDs: (2)
+msgid "Cl&ose"
+msgstr "&Schliessen"
 
 #. Resource IDs: (3765)
 msgid "Clear Bookmarks"
@@ -507,6 +507,14 @@ msgstr "Suchen"
 msgid "Find && Replace"
 msgstr "Suche && Ersetze"
 
+#. Resource IDs: (1065)
+msgid "Find &All"
+msgstr "Suchen &Alle"
+
+#. Resource IDs: (1066)
+msgid "Find All In All Open &Tabs"
+msgstr "Finde Alle in allen &Tabs"
+
 #. Resource IDs: (3758)
 msgid "Find Next"
 msgstr "Finde nächstes"
@@ -611,9 +619,17 @@ msgstr "Öffne mit Opera"
 msgid "Launch in Safari"
 msgstr "Öffne mit Safari"
 
+#. Resource IDs: (10)
+msgid "Line"
+msgstr "Zeile"
+
 #. Resource IDs: (3756)
 msgid "Line Endings"
 msgstr "Zeilenenden"
+
+#. Resource IDs: (10)
+msgid "Line Text"
+msgstr "Zeilentext"
 
 #. Resource IDs: (65535)
 msgid "Line:"
@@ -935,8 +951,8 @@ msgid "Removes whitespaces at the end of lines"
 msgstr "Entfernt Leerzeichen am Ende von Zeilen"
 
 #. Resource IDs: (1004)
-msgid "Replace &All"
-msgstr "&Alle ersetzen"
+msgid "Replace A&ll"
+msgstr "A&lle ersetzen"
 
 #. Resource IDs: (3759)
 msgid "Right margin"
@@ -1299,3 +1315,6 @@ msgstr "Führt den Benutzerbefehl 9 aus"
 #. Resource IDs: (3760)
 msgid "tab size"
 msgstr "Tabulatorgrösse"
+
+#~ msgid "&Close"
+#~ msgstr "&Schliessen"
