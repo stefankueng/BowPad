@@ -41,10 +41,6 @@ msgstr ""
 msgid "&Cancel"
 msgstr ""
 
-#. Resource IDs: (2)
-msgid "&Close"
-msgstr ""
-
 #. Resource IDs: (7)
 msgid "&Don't save"
 msgstr ""
@@ -144,6 +140,10 @@ msgstr ""
 
 #. Resource IDs: (1027)
 msgid "Check for Updates"
+msgstr ""
+
+#. Resource IDs: (2)
+msgid "Cl&ose"
 msgstr ""
 
 #. Resource IDs: (3765)
@@ -467,6 +467,14 @@ msgstr ""
 msgid "Find && Replace"
 msgstr ""
 
+#. Resource IDs: (1065)
+msgid "Find &All"
+msgstr ""
+
+#. Resource IDs: (1066)
+msgid "Find All In All Open &Tabs"
+msgstr ""
+
 #. Resource IDs: (3758)
 msgid "Find Next"
 msgstr ""
@@ -563,8 +571,16 @@ msgstr ""
 msgid "Launch in Safari"
 msgstr ""
 
+#. Resource IDs: (10)
+msgid "Line"
+msgstr ""
+
 #. Resource IDs: (3756)
 msgid "Line Endings"
+msgstr ""
+
+#. Resource IDs: (10)
+msgid "Line Text"
 msgstr ""
 
 #. Resource IDs: (65535)
@@ -861,7 +877,7 @@ msgid "Removes whitespaces at the end of lines"
 msgstr ""
 
 #. Resource IDs: (1004)
-msgid "Replace &All"
+msgid "Replace A&ll"
 msgstr ""
 
 #. Resource IDs: (3759)
