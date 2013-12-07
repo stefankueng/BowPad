@@ -794,6 +794,9 @@ void CFindReplaceDlg::SearchDocument(int docID, const CDocument& doc, const std:
             ttf.chrg.cpMin = ttf.chrgText.cpMax;
         }
     } while (findRet >= 0);
+    m_searchWnd.Call(SCI_SETREADONLY, false);
+    m_searchWnd.Call(SCI_SETSAVEPOINT);
+    m_searchWnd.Call(SCI_SETDOCPOINTER, 0, 0);
 }
 
 void CFindReplaceDlg::InitResultList()
