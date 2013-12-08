@@ -539,6 +539,20 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
             DoReplace(id);
         }
         break;
+    case IDC_MATCHREGEX:
+        {
+            ResString sInfo(hRes, IDS_REGEXTOOLTIP);
+            bool bChecked = !!IsDlgButtonChecked(*this, IDC_MATCHREGEX);
+            // get the edit control of the replace combo
+            COMBOBOXINFO cinfo = { 0 };
+            cinfo.cbSize = sizeof(COMBOBOXINFO);
+            GetComboBoxInfo(GetDlgItem(*this, IDC_REPLACECOMBO), &cinfo);
+            AddToolTip(cinfo.hwndCombo, bChecked ? (LPCWSTR)sInfo : L"");
+            AddToolTip(cinfo.hwndItem, bChecked ? (LPCWSTR)sInfo : L"");
+            AddToolTip(cinfo.hwndList, bChecked ? (LPCWSTR)sInfo : L"");
+            AddToolTip(IDC_LABEL2, bChecked ? (LPCWSTR)sInfo : L"");
+        }
+        break;
     }
     return 1;
 }
