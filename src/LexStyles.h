@@ -18,6 +18,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 #include <vector>
 
 class LanguageData
@@ -26,6 +27,7 @@ public:
     LanguageData()
         : commentlineatstart(false)
         , functionregexsort(0)
+        , userfunctions(0)
     {
     }
 
@@ -38,6 +40,8 @@ public:
     std::string                 functionregex;
     std::vector<std::string>    functionregextrim;
     int                         functionregexsort;
+    int                         userfunctions;
+    std::set<std::string>       userkeywords;
 };
 
 enum FontStyle
@@ -81,8 +85,8 @@ public:
     std::wstring                        GetLanguageForExt(const std::wstring& ext) const;
     std::wstring                        GetUserExtensionsForLanguage(const std::wstring& lang) const;
 
-    const std::map<int, std::string>&   GetKeywordsForExt(const std::string& ext) const;
-    const std::map<int, std::string>&   GetKeywordsForLang(const std::string& lang) const;
+    const std::map<int, std::string>&   GetKeywordsForExt(const std::string& ext);
+    const std::map<int, std::string>&   GetKeywordsForLang(const std::string& lang);
     const std::string&                  GetCommentLineForLang(const std::string& lang) const;
     const std::string&                  GetCommentStreamStartForLang(const std::string& lang) const;
     const std::string&                  GetCommentStreamEndForLang(const std::string& lang) const;
@@ -102,12 +106,14 @@ public:
     void                                SetUserExt(const std::wstring& ext, const std::wstring& lang);
     void                                ResetUserData();
     void                                SaveUserData();
+    size_t                              AddUserFunctionForLang(const std::string& lang, const std::string& fnc);
 private:
     CLexStyles(void);
     ~CLexStyles(void);
 
     void                                Load();
     void                                ReplaceVariables(std::wstring& s, const std::map<std::wstring, std::wstring>& vars);
+    void                                GenerateUserKeywords(LanguageData& ld);
 private:
     bool                                m_bLoaded;
 
