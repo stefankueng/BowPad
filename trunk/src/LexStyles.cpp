@@ -255,6 +255,10 @@ void CLexStyles::Load()
                                 s.erase(s.find_last_not_of("~")+1); // Erase '~'
                                 stringtok(ld.functionregextrim, s, true, ",");
                             }
+                            if (_wcsicmp(L"UserFunctions", sk) == 0)
+                            {
+                                ld.userfunctions = _wtoi(ini[iniind].GetValue(langsect.c_str(), sk));
+                            }
                         }
                         m_Langdata[CUnicodeUtils::StdGetUTF8(k)] = ld;
                     }
@@ -266,7 +270,7 @@ void CLexStyles::Load()
     m_bLoaded = true;
 }
 
-const std::map<int, std::string>& CLexStyles::GetKeywordsForExt( const std::string& ext ) const
+const std::map<int, std::string>& CLexStyles::GetKeywordsForExt( const std::string& ext )
 {
     std::string v = ext;
     std::transform(v.begin(), v.end(), v.begin(), ::tolower);
@@ -276,18 +280,51 @@ const std::map<int, std::string>& CLexStyles::GetKeywordsForExt( const std::stri
     {
         auto lt = m_Langdata.find(it->second);
         if (lt != m_Langdata.end())
+        {
+            GenerateUserKeywords(lt->second);
             return lt->second.keywordlist;
+        }
     }
     return emptyIntStrVec;
 }
 
-const std::map<int, std::string>& CLexStyles::GetKeywordsForLang( const std::string& lang ) const
+const std::map<int, std::string>& CLexStyles::GetKeywordsForLang( const std::string& lang )
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
+    {
+        GenerateUserKeywords(lt->second);
         return lt->second.keywordlist;
+    }
 
     return emptyIntStrVec;
+}
+
+size_t CLexStyles::AddUserFunctionForLang(const std::string& lang, const std::string& fnc)
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+    {
+        if (lt->second.userfunctions)
+        {
+            lt->second.userkeywords.insert(fnc);
+            return lt->second.userkeywords.size();
+        }
+    }
+}
+
+void CLexStyles::GenerateUserKeywords(LanguageData& ld)
+{
+    if (ld.userfunctions && !ld.userkeywords.empty())
+    {
+        std::string keywords;
+        for (const auto& w : ld.userkeywords)
+        {
+            keywords += w;
+            keywords += " ";
+        }
+        ld.keywordlist[ld.userfunctions] = keywords;
+    }
 }
 
 const LexerData& CLexStyles::GetLexerDataForExt( const std::string& ext ) const
