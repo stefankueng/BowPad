@@ -311,6 +311,7 @@ size_t CLexStyles::AddUserFunctionForLang(const std::string& lang, const std::st
             return lt->second.userkeywords.size();
         }
     }
+    return 0;
 }
 
 void CLexStyles::GenerateUserKeywords(LanguageData& ld)
