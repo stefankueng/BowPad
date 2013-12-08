@@ -18,6 +18,8 @@
 #pragma once
 #include "ICommand.h"
 #include "BowPadUI.h"
+#include "BowPad.h"
+#include "ScintillaWnd.h"
 
 #include <string>
 #include <vector>
@@ -27,8 +29,12 @@ class CCmdFunctions : public ICommand
 {
 public:
 
-    CCmdFunctions(void * obj) : ICommand(obj)
+    CCmdFunctions(void * obj)
+        : ICommand(obj)
+        , m_ScratchScintilla(hRes)
     {
+        m_timerID = GetTimerID();
+        m_ScratchScintilla.InitScratch(hRes);
     }
 
     ~CCmdFunctions(void)
@@ -47,5 +53,15 @@ public:
 
     virtual void ScintillaNotify( Scintilla::SCNotification * pScn );
 
+    virtual void OnTimer(UINT id);
+
+    virtual void OnDocumentOpen(int id);
+
+private:
+    void            FindFunctions(int docID, bool bBackground);
+
+    UINT            m_timerID;
+    std::set<int>   m_docIDs;
+    CScintillaWnd   m_ScratchScintilla;
 };
 
