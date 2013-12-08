@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2013-11-24 15:01+0100\n"
+"PO-Revision-Date: 2013-12-08 20:20+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: German\n"
@@ -918,6 +918,14 @@ msgstr "Wiederholen"
 msgid "Redo what was undone before"
 msgstr "Wiederholen was Rückgängig gemacht wurde"
 
+#. Resource IDs: (10)
+msgid "Regex expression is invalid!"
+msgstr "Regulärer Ausdruck ist ungültig!"
+
+#. Resource IDs: (10)
+msgid "Regex expression is valid"
+msgstr "Regulärer Ausdruck ist gültig"
+
 #. Resource IDs: (3765)
 msgid "Reload"
 msgstr "Neu laden"
@@ -1192,6 +1200,10 @@ msgstr "nicht gespeicherte Änderungen"
 #. Resource IDs: (3759, 3760)
 msgid "Uppercase"
 msgstr "Grossschreibung"
+
+#. Resource IDs: (10)
+msgid "Use $0 for the whole match, and $1..$99 for group matches."
+msgstr "Verwende $0 für den ganzen Match, und $1..$99 für Gruppenmatches."
 
 #. Resource IDs: (3760)
 msgid "Use Tabs"
