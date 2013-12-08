@@ -504,7 +504,12 @@ void CLexStyles::SaveUserData()
             ini.SetValue(section.c_str(), style.c_str(), v.c_str());
         }
     }
-    for (const auto& it:m_userextLang)
+
+    // first clear all user extensions, then add them again to the ini file
+    for (const auto& it : m_userextLang)
+        ini.SetValue(L"language", CUnicodeUtils::StdGetUnicode(it.second).c_str(), L"");
+
+    for (const auto& it : m_userextLang)
     {
         std::wstring v = ini.GetValue(L"language", CUnicodeUtils::StdGetUnicode(it.second).c_str(), L"");
         if (!v.empty())
@@ -523,11 +528,21 @@ void CLexStyles::SaveUserData()
 
 void CLexStyles::SetUserExt( const std::wstring& ext, const std::wstring& lang )
 {
+    std::string alang = CUnicodeUtils::StdGetUTF8(lang);
+    auto iter = m_userextLang.begin();
+    auto endIter = m_userextLang.end();
+    for (; iter != endIter;)
+    {
+        if (iter->second.compare(alang) == 0)
+            m_userextLang.erase(iter++);
+        else
+            ++iter;
+    }
     std::vector<std::wstring> exts;
-    stringtok(exts, ext, true, L";");
+    stringtok(exts, ext, true, L"; ,");
     for (auto e : exts)
     {
-        m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(lang);
+        m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = alang;
     }
 }
 
