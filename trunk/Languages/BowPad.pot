@@ -852,6 +852,14 @@ msgstr ""
 msgid "Redo what was undone before"
 msgstr ""
 
+#. Resource IDs: (10)
+msgid "Regex expression is invalid!"
+msgstr ""
+
+#. Resource IDs: (10)
+msgid "Regex expression is valid"
+msgstr ""
+
 #. Resource IDs: (3765)
 msgid "Reload"
 msgstr ""
@@ -1101,6 +1109,10 @@ msgstr ""
 
 #. Resource IDs: (3759, 3760)
 msgid "Uppercase"
+msgstr ""
+
+#. Resource IDs: (10)
+msgid "Use $0 for the whole match, and $1..$99 for group matches."
 msgstr ""
 
 #. Resource IDs: (3760)
