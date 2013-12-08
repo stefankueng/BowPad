@@ -21,6 +21,8 @@
 #include "UnicodeUtils.h"
 #include "StringUtils.h"
 
+#include <regex>
+
 std::string         sFindString;
 static int          nSearchFlags;
 
@@ -515,7 +517,7 @@ void CFindReplaceDlg::ShowResults(bool bShow)
     }
 }
 
-LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
+LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
 {
     switch (id)
     {
@@ -551,6 +553,12 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int /*msg*/)
             AddToolTip(cinfo.hwndItem, bChecked ? (LPCWSTR)sInfo : L"");
             AddToolTip(cinfo.hwndList, bChecked ? (LPCWSTR)sInfo : L"");
             AddToolTip(IDC_LABEL2, bChecked ? (LPCWSTR)sInfo : L"");
+        }
+        break;
+    case IDC_SEARCHCOMBO:
+        {
+            if ((msg == CBN_EDITCHANGE) && (IsDlgButtonChecked(*this, IDC_MATCHREGEX)))
+                CheckRegex();
         }
         break;
     }
@@ -848,6 +856,20 @@ void CFindReplaceDlg::InitResultList()
     ListView_SetColumnWidth(hListControl, 0, 100);
     ListView_SetColumnWidth(hListControl, 1, 40);
     ListView_SetColumnWidth(hListControl, 2, LVSCW_AUTOSIZE_USEHEADER);
+}
+
+void CFindReplaceDlg::CheckRegex()
+{
+    try
+    {
+        auto findText = GetDlgItemText(IDC_SEARCHCOMBO);
+        const std::wregex ignex(findText.get(), std::regex_constants::icase | std::regex_constants::ECMAScript);
+        SetInfoText(IDS_REGEX_OK);
+    }
+    catch (std::exception)
+    {
+        SetInfoText(IDS_REGEX_NOTOK);
+    }
 }
 
 bool CCmdFindReplace::Execute()
