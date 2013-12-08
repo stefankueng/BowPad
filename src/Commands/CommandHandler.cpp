@@ -291,10 +291,26 @@ void CCommandHandler::OnDocumentClose(int index)
     }
 }
 
+void CCommandHandler::OnDocumentOpen(int index)
+{
+    for (auto cmd : m_commands)
+    {
+        cmd.second->OnDocumentOpen(index);
+    }
+}
+
 void CCommandHandler::AfterInit()
 {
     for (auto cmd:m_commands)
     {
         cmd.second->AfterInit();
+    }
+}
+
+void CCommandHandler::OnTimer(UINT id)
+{
+    for (auto cmd : m_commands)
+    {
+        cmd.second->OnTimer(id);
     }
 }

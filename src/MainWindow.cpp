@@ -794,6 +794,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             }
         }
         break;
+    case WM_TIMER:
+        CCommandHandler::Instance().OnTimer((UINT)wParam);
+        break;
     case WM_DESTROY:
         g_pFramework->Destroy();
         PostQuitMessage(0);
@@ -1310,6 +1313,7 @@ bool CMainWindow::OpenFile( const std::wstring& file )
             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
             m_scintilla.SetupLexerForExt(sExt.c_str());
             SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
+            CCommandHandler::Instance().OnDocumentOpen(index);
         }
         else
         {
