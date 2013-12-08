@@ -23,6 +23,7 @@ extern IUIFramework *g_pFramework;
 
 ICommand::ICommand(void * obj)
     : m_Obj(obj)
+    , m_nextTimerID(1000)
 {
 }
 
@@ -53,6 +54,13 @@ void ICommand::AfterInit()
 }
 
 void ICommand::OnDocumentClose( int /*index*/ )
+{
+}
+
+void ICommand::OnDocumentOpen(int /*index*/)
+{}
+
+void ICommand::OnTimer(UINT /*id*/)
 {
 }
 
@@ -186,6 +194,12 @@ CDocument ICommand::GetActiveDocument()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     return pMainWnd->m_DocManager.GetDocumentFromID(pMainWnd->m_TabBar.GetCurrentTabId());
+}
+
+bool ICommand::HasDocumentID(int id)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_DocManager.HasDocumentID(id);
 }
 
 CDocument ICommand::GetDocumentFromID( int id )

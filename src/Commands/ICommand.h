@@ -37,8 +37,10 @@ public:
     virtual void        OnClose();
     virtual void        AfterInit();
     virtual void        OnDocumentClose(int index);
+    virtual void        OnDocumentOpen(int index);
     virtual HRESULT     IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue);
     virtual HRESULT     IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties);
+    virtual void        OnTimer(UINT id);
 
 protected:
     void                TabActivateAt(int index);
@@ -58,6 +60,7 @@ protected:
     int                 GetDocumentCount();
     bool                HasActiveDocument();
     CDocument           GetActiveDocument();
+    bool                HasDocumentID(int id);
     CDocument           GetDocumentFromID(int id);
     void                SetDocument(int index, CDocument doc);
 
@@ -72,6 +75,7 @@ protected:
     void                GotoBrace();
 
     HWND                GetHwnd();
+    UINT                GetTimerID() { return m_nextTimerID++; }
     bool                OpenFile(LPCWSTR file);
     bool                ReloadTab(int tab, int encoding);
     bool                SaveCurrentTab(bool bSaveAs = false);
@@ -82,4 +86,5 @@ protected:
 
 protected:
     void *              m_Obj;
+    UINT                m_nextTimerID;
 };
