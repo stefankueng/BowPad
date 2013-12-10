@@ -757,41 +757,45 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_CLIPBOARDUPDATE:
         {
-            CClipboardHelper clipboard;
-            if (clipboard.Open(*this))
+            std::wstring s;
+            if (IsClipboardFormatAvailable(CF_UNICODETEXT))
             {
-                HANDLE hData = GetClipboardData(CF_UNICODETEXT);
-                if (hData)
+                CClipboardHelper clipboard;
+                if (clipboard.Open(*this))
                 {
-                    LPCWSTR lptstr = (LPCWSTR)GlobalLock(hData);
-                    if (lptstr != NULL)
+                    HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+                    if (hData)
                     {
-                        std::wstring s = lptstr;
-                        if (!s.empty())
+                        LPCWSTR lptstr = (LPCWSTR)GlobalLock(hData);
+                        if (lptstr != NULL)
                         {
-                            std::wstring sTrimmed = s;
-                            CStringUtils::trim(sTrimmed);
-                            if (!sTrimmed.empty())
-                            {
-                                for (auto it = m_ClipboardHistory.cbegin(); it != m_ClipboardHistory.cend(); ++it)
-                                {
-                                    if (it->compare(s)==0)
-                                    {
-                                        m_ClipboardHistory.erase(it);
-                                        break;
-                                    }
-                                }
-                                m_ClipboardHistory.push_front(s);
-                            }
+                            s = lptstr;
+                            GlobalUnlock(hData);
                         }
-                        GlobalUnlock(hData);
-
-                        size_t maxsize = (size_t)CIniSettings::Instance().GetInt64(L"clipboard", L"maxhistory", 20);
-                        if (m_ClipboardHistory.size() > maxsize)
-                            m_ClipboardHistory.pop_back();
                     }
                 }
             }
+            if (!s.empty())
+            {
+                std::wstring sTrimmed = s;
+                CStringUtils::trim(sTrimmed);
+                if (!sTrimmed.empty())
+                {
+                    for (auto it = m_ClipboardHistory.cbegin(); it != m_ClipboardHistory.cend(); ++it)
+                    {
+                        if (it->compare(s) == 0)
+                        {
+                            m_ClipboardHistory.erase(it);
+                            break;
+                        }
+                    }
+                    m_ClipboardHistory.push_front(s);
+                }
+            }
+
+            size_t maxsize = (size_t)CIniSettings::Instance().GetInt64(L"clipboard", L"maxhistory", 20);
+            if (m_ClipboardHistory.size() > maxsize)
+                m_ClipboardHistory.pop_back();
         }
         break;
     case WM_TIMER:
