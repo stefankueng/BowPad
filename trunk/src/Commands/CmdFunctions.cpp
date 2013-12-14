@@ -233,13 +233,23 @@ void CCmdFunctions::OnTimer(UINT id)
 {
     if (id == m_timerID)
     {
-        for (auto id : m_docIDs)
+        if (CIniSettings::Instance().GetInt64(L"functions", L"autoscan", 0))
         {
-            FindFunctions(id, true);
-            m_docIDs.erase(id);
-            if (!m_docIDs.empty())
-                SetTimer(GetHwnd(), m_timerID, 100, NULL);
-            break;
+            for (auto id : m_docIDs)
+            {
+                FindFunctions(id, true);
+                m_docIDs.erase(id);
+                if (!m_docIDs.empty())
+                    SetTimer(GetHwnd(), m_timerID, 100, NULL);
+                break;
+            }
+            if (m_docIDs.empty())
+                KillTimer(GetHwnd(), m_timerID);
+        }
+        else
+        {
+            m_docIDs.clear();
+            KillTimer(GetHwnd(), m_timerID);
         }
     }
 }
