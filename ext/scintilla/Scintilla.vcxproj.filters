@@ -551,5 +551,8 @@
     <ClCompile Include="lexers\LexRust.cxx">
       <Filter>lexers</Filter>
     </ClCompile>
+    <ClCompile Include="lexers\LexDMAP.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
