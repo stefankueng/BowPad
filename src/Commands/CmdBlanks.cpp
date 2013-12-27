@@ -34,7 +34,7 @@ bool CCmdTrim::Execute()
     ScintillaCall(SCI_SETSEARCHFLAGS, SCFIND_REGEXP);
     sptr_t findRet = -1;
     ScintillaCall(SCI_BEGINUNDOACTION);
-    std::string sFindString = "[ \t]+$";
+    std::string sFindString = "([ \\t]+$)|([ \\t]+\\r)||([ \\t]+\\n)";
     do
     {
         findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
@@ -44,7 +44,7 @@ bool CCmdTrim::Execute()
 
             if (ScintillaCall(SCI_GETSELECTIONEMPTY))
             {
-                ScintillaCall(SCI_SETTARGETSTART, 0);
+                ScintillaCall(SCI_SETTARGETSTART, findRet);
                 ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
             }
             else
@@ -54,7 +54,7 @@ bool CCmdTrim::Execute()
         }
     } while (findRet != -1);
     ScintillaCall(SCI_ENDUNDOACTION);
-
+    ScintillaCall(SCI_SETVIEWEOL, true);
     return true;
 }
 
