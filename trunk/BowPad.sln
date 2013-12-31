@@ -1,5 +1,5 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 13.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BowPad", "src\BowPad.vcxproj", "{F767677D-B0FE-4C4F-B886-09E501C543B2}"
 EndProject
