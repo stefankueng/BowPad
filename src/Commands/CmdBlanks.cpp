@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,11 +40,19 @@ bool CCmdTrim::Execute()
         findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
         if (findRet >= 0)
         {
+            sptr_t endpos = ScintillaCall(SCI_GETTARGETEND);
+            char c = 0;
+            do
+            {
+                --endpos;
+                c = (char)ScintillaCall(SCI_GETCHARAT, endpos);
+            } while ((c == '\n') || (c == '\r'));
+            ScintillaCall(SCI_SETTARGETEND, endpos+1);
             ScintillaCall(SCI_REPLACETARGETRE, (uptr_t)-1, (sptr_t)"");
 
             if (ScintillaCall(SCI_GETSELECTIONEMPTY))
             {
-                ScintillaCall(SCI_SETTARGETSTART, findRet);
+                ScintillaCall(SCI_SETTARGETSTART, findRet+1);
                 ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
             }
             else
@@ -54,7 +62,6 @@ bool CCmdTrim::Execute()
         }
     } while (findRet != -1);
     ScintillaCall(SCI_ENDUNDOACTION);
-    ScintillaCall(SCI_SETVIEWEOL, true);
     return true;
 }
 
