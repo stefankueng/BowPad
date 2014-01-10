@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1447,6 +1447,16 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
     }
     else if (wParam == '>')
     {
+        int lexer = (int)Call(SCI_GETLEXER);
+        switch (lexer)
+        {
+            // add the closing tag only for xml and html lexers
+            case SCLEX_XML:
+            case SCLEX_HTML:
+                break;
+            default:
+                return false;
+        }
         // check if there's a '/' char before the opening '<' (searching backwards)
         FindResult result1, result2;
         size_t currentpos = Call(SCI_GETCURRENTPOS);
