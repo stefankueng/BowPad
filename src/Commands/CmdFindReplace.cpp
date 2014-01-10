@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include <regex>
 
 std::string         sFindString;
+std::string         sHighlightString;
 static int          nSearchFlags;
 
 #define TIMER_INFOSTRING    100
@@ -524,6 +525,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
     case IDCANCEL:
         ShowResults(false);
         ShowWindow(*this, SW_HIDE);
+        sHighlightString.clear();
         break;
     case IDC_FINDBTN:
         {
@@ -580,6 +582,7 @@ void CFindReplaceDlg::DoReplace( int id )
 
     auto findText = GetDlgItemText(IDC_SEARCHCOMBO);
     sFindString = CUnicodeUtils::StdGetUTF8(findText.get());
+    sHighlightString = sFindString;
     auto replaceText = GetDlgItemText(IDC_REPLACECOMBO);
     std::string sReplaceString = CUnicodeUtils::StdGetUTF8(replaceText.get());
 
@@ -670,6 +673,7 @@ void CFindReplaceDlg::DoSearch()
     ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
     auto findText = GetDlgItemText(IDC_SEARCHCOMBO);
     sFindString = CUnicodeUtils::StdGetUTF8(findText.get());
+    sHighlightString = sFindString;
     ttf.lpstrText = const_cast<char*>(sFindString.c_str());
     nSearchFlags = 0;
     nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHCASE)  ? SCFIND_MATCHCASE : 0;
@@ -913,7 +917,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
             ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_FINDTEXT_MARK);
             ScintillaCall(SCI_INDICATORCLEARRANGE, startstylepos, len);
 
-            if (sFindString.empty())
+            if (sHighlightString.empty())
             {
                 DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
                 return;
@@ -922,7 +926,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
             Scintilla::Sci_TextToFind FindText;
             FindText.chrg.cpMin = startstylepos;
             FindText.chrg.cpMax = endstylepos;
-            FindText.lpstrText = const_cast<char*>(sFindString.c_str());
+            FindText.lpstrText = const_cast<char*>(sHighlightString.c_str());
             while (ScintillaCall(SCI_FINDTEXT, nSearchFlags, (LPARAM)&FindText) >= 0)
             {
                 ScintillaCall(SCI_INDICATORFILLRANGE, FindText.chrgText.cpMin, FindText.chrgText.cpMax-FindText.chrgText.cpMin);
@@ -931,13 +935,13 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
                 FindText.chrg.cpMin = FindText.chrgText.cpMax;
             }
 
-            if (lastSelText.compare(sFindString) || (nSearchFlags != lastSearchFlags))
+            if (lastSelText.compare(sHighlightString) || (nSearchFlags != lastSearchFlags))
             {
                 DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
                 Scintilla::Sci_TextToFind FindText;
                 FindText.chrg.cpMin = 0;
                 FindText.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
-                FindText.lpstrText = const_cast<char*>(sFindString.c_str());
+                FindText.lpstrText = const_cast<char*>(sHighlightString.c_str());
                 while (ScintillaCall(SCI_FINDTEXT, nSearchFlags, (LPARAM)&FindText) >= 0)
                 {
                     size_t line = ScintillaCall(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
@@ -947,7 +951,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
                     FindText.chrg.cpMin = FindText.chrgText.cpMax;
                 }
             }
-            lastSelText = sFindString.c_str();
+            lastSelText = sHighlightString.c_str();
             lastSearchFlags = nSearchFlags;
         }
         break;
@@ -1016,6 +1020,7 @@ bool CCmdFindPrev::Execute()
 
 bool CCmdFindSelectedNext::Execute()
 {
+    sHighlightString.clear();
     int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
     if (selTextLen == 0)
         return false;
@@ -1024,6 +1029,7 @@ bool CCmdFindSelectedNext::Execute()
     if (seltextbuffer[0] == 0)
         return false;
     sFindString = seltextbuffer.get();
+    sHighlightString = sFindString;
 
     Scintilla::Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
@@ -1053,6 +1059,7 @@ bool CCmdFindSelectedNext::Execute()
 
 bool CCmdFindSelectedPrev::Execute()
 {
+    sHighlightString.clear();
     int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
     if (selTextLen == 0)
         return false;
@@ -1061,6 +1068,7 @@ bool CCmdFindSelectedPrev::Execute()
     if (seltextbuffer[0] == 0)
         return false;
     sFindString = seltextbuffer.get();
+    sHighlightString = sFindString;
 
     Scintilla::Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
