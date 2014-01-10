@@ -99,6 +99,15 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     // For Ctrl+C, use SCI_COPYALLOWLINE instead of SCI_COPY
     Call(SCI_ASSIGNCMDKEY, 'C'+(SCMOD_CTRL<<16), SCI_COPYALLOWLINE);
 
+    // change the home and end key to honour wrapped lines
+    // but allow the line-home and line-end to be used with the ALT key
+    Call(SCI_ASSIGNCMDKEY, SCK_HOME, SCI_VCHOMEWRAP);
+    Call(SCI_ASSIGNCMDKEY, SCK_END, SCI_LINEENDWRAP);
+    Call(SCI_ASSIGNCMDKEY, SCK_HOME + (SCMOD_ALT << 16), SCI_VCHOME);
+    Call(SCI_ASSIGNCMDKEY, SCK_END + (SCMOD_ALT << 16), SCI_LINEEND);
+    // line cut for Ctrl+L
+    Call(SCI_ASSIGNCMDKEY, 'L' + (SCMOD_CTRL << 16), SCI_LINECUT);
+
     Call(SCI_SETBUFFEREDDRAW, true);
     Call(SCI_SETTWOPHASEDRAW, true);
 
