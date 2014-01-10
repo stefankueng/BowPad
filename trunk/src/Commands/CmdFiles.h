@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ public:
     virtual UINT GetCmdId() { return cmdSave; }
 
     virtual void ScintillaNotify( Scintilla::SCNotification * pScn );
+    virtual void TabNotify(TBHDR * ptbhdr);
 
     virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue );
 
@@ -76,6 +77,7 @@ public:
     virtual UINT GetCmdId() { return cmdSaveAll; }
 
     virtual void ScintillaNotify( Scintilla::SCNotification * pScn );
+    virtual void TabNotify(TBHDR * ptbhdr);
 
     virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue );
 
