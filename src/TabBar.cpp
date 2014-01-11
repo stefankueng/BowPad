@@ -771,6 +771,12 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
 
         FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top + nLine, rItem.right, rItem.top + nLine + 2, RGB(nRed, nGreen, nBlue));
     }
+    if (bSelected)
+    {
+        COLORREF cLine = RGB(255 - GetRValue(crFrom), 255 - GetGValue(crFrom), 255 - GetBValue(crFrom));
+        FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - 5, rItem.right, rItem.bottom, cLine);
+    }
+    FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - 5, rItem.right, rItem.bottom, CTheme::Instance().GetThemeColor(RGB(200, 0, 0)));
     const int PADDING = 2;
     // text & icon
     rItem.left += PADDING;
