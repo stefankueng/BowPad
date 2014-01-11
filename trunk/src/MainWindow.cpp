@@ -1443,14 +1443,21 @@ bool CMainWindow::OpenFile( const std::wstring& file )
             }
             CMRU::Instance().AddPath(filepath);
             std::wstring sFileName = filepath.substr(filepath.find_last_of('\\')+1);
-            std::wstring sExt = filepath.substr(filepath.find_last_of('.')+1);
+            auto dotpos = filepath.find_last_of('.');
+            std::wstring sExt = filepath.substr(dotpos + 1);
             int index = m_TabBar.InsertAtEnd(sFileName.c_str());
             int id = m_TabBar.GetIDFromIndex(index);
-            doc.m_language = CLexStyles::Instance().GetLanguageForExt(sExt);
+            if (dotpos == std::wstring::npos)
+                doc.m_language = CLexStyles::Instance().GetLanguageForPath(filepath);
+            else
+                doc.m_language = CLexStyles::Instance().GetLanguageForExt(sExt);
             m_DocManager.AddDocumentAtEnd(doc, id);
             m_TabBar.ActivateAt(index);
             m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-            m_scintilla.SetupLexerForExt(sExt.c_str());
+            if (dotpos == std::wstring::npos)
+                m_scintilla.SetupLexerForLang(doc.m_language);
+            else
+                m_scintilla.SetupLexerForExt(sExt.c_str());
             SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
             CCommandHandler::Instance().OnDocumentOpen(index);
         }

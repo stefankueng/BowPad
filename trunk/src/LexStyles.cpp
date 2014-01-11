@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -190,6 +190,36 @@ void CLexStyles::Load()
 
                 for (int iniind = 0; iniind < _countof(ini); ++iniind)
                 {
+                    CSimpleIni::TNamesDepend autolangkeys;
+                    ini[iniind].GetAllKeys(L"autolanguage", autolangkeys);
+                    for (const auto& k : autolangkeys)
+                    {
+                        std::wstring v = ini[iniind].GetValue(L"autolanguage", k);
+                        ReplaceVariables(v, variables);
+                        std::vector<std::wstring> exts;
+                        stringtok(exts, v, true, L";");
+                        for (const auto& e : exts)
+                        {
+                            m_extLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
+                            if (iniind == 1)
+                                m_autoextLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
+                        }
+                    }
+                    if (iniind == 1)
+                    {
+                        CSimpleIni::TNamesDepend autopathkeys;
+                        ini[iniind].GetAllKeys(L"pathlanguage", autopathkeys);
+                        for (const auto& k : autopathkeys)
+                        {
+                            std::wstring v = ini[iniind].GetValue(L"pathlanguage", k);
+                            auto f = v.find(L"*");
+                            std::wstring p = v.substr(0, f);
+                            std::string l = CUnicodeUtils::StdGetUTF8(v.substr(f + 1));
+                            m_pathsLang[p] = l;
+                            m_pathsForLang.push_back(p);
+                        }
+                    }
+
                     CSimpleIni::TNamesDepend langkeys;
                     ini[iniind].GetAllKeys(L"language", langkeys);
                     for (const auto& k : langkeys)
@@ -361,10 +391,32 @@ const LexerData& CLexStyles::GetLexerDataForLang( const std::string& lang ) cons
 std::wstring CLexStyles::GetLanguageForExt( const std::wstring& ext ) const
 {
     std::string e = CUnicodeUtils::StdGetUTF8(ext);
-    std::transform(e.begin(), e.end(), e.begin(), ::towlower);
+    std::transform(e.begin(), e.end(), e.begin(), ::tolower);
     auto it = m_extLang.find(e);
     if (it != m_extLang.end())
     {
+        return CUnicodeUtils::StdGetUnicode(it->second);
+    }
+    return L"";
+}
+
+std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
+{
+    std::wstring p = path;
+    std::transform(p.begin(), p.end(), p.begin(), ::towlower);
+    auto it = m_pathsLang.find(p);
+    if (it != m_pathsLang.end())
+    {
+        // move the path to the top of the list
+        for (auto li = m_pathsForLang.begin(); li != m_pathsForLang.end(); ++li)
+        {
+            if (it->first.compare(*li) == 0)
+            {
+                m_pathsForLang.erase(li);
+                m_pathsForLang.push_front(it->first);
+                break;
+            }
+        }
         return CUnicodeUtils::StdGetUnicode(it->second);
     }
     return L"";
@@ -519,6 +571,28 @@ void CLexStyles::SaveUserData()
         ini.SetValue(L"language", CUnicodeUtils::StdGetUnicode(it.second).c_str(), v.c_str());
     }
 
+    // first clear all auto extensions, then add them again to the ini file
+    for (const auto& it : m_autoextLang)
+        ini.SetValue(L"autolanguage", CUnicodeUtils::StdGetUnicode(it.second).c_str(), L"");
+
+    for (const auto& it : m_autoextLang)
+    {
+        std::wstring v = ini.GetValue(L"autolanguage", CUnicodeUtils::StdGetUnicode(it.second).c_str(), L"");
+        if (!v.empty())
+            v += L";";
+        v += CUnicodeUtils::StdGetUnicode(it.first);
+        ini.SetValue(L"autolanguage", CUnicodeUtils::StdGetUnicode(it.second).c_str(), v.c_str());
+    }
+
+    int pcount = 0;
+    for (const auto& it : m_pathsLang)
+    {
+        std::wstring key = CStringUtils::Format(L"%03d", pcount);
+        std::wstring val = it.first + L"*" + CUnicodeUtils::StdGetUnicode(it.second);
+        ini.SetValue(L"pathlanguage", key.c_str(), val.c_str());
+        ++pcount;
+    }
+
     FILE * pFile = NULL;
     _tfopen_s(&pFile, userStyleFile.c_str(), _T("wb"));
     ini.SaveFile(pFile);
@@ -601,5 +675,39 @@ const std::vector<std::string>& CLexStyles::GetFunctionRegexTrimForLang( const s
     if (lt != m_Langdata.end())
         return lt->second.functionregextrim;
     return emptyStringVector;
+}
+
+void CLexStyles::SetLangForPath(const std::wstring& path, const std::wstring& language)
+{
+    auto dotpos = path.find_last_of('.');
+    std::wstring sExt = path.substr(dotpos + 1);
+    std::string e = CUnicodeUtils::StdGetUTF8(sExt);
+    if (dotpos == std::wstring::npos)
+    {
+        // store the full path and the language
+        std::wstring p = path;
+        std::transform(p.begin(), p.end(), p.begin(), ::towlower);
+        m_pathsLang[p] = CUnicodeUtils::StdGetUTF8(language);
+        m_pathsForLang.push_front(p);
+        while (m_pathsForLang.size() > 100)
+            m_pathsForLang.pop_back();
+        SaveUserData();
+    }
+    else
+    {
+        std::wstring lang = GetLanguageForExt(sExt);
+        if (!lang.empty())
+        {
+            // extension already has a language set
+            // only add this if the extension is set in m_autoextLang
+            std::transform(e.begin(), e.end(), e.begin(), ::tolower);
+            auto it = m_autoextLang.find(e);
+            if (it == m_autoextLang.end())
+                return;
+        }
+        m_autoextLang[e] = CUnicodeUtils::StdGetUTF8(language);
+        m_extLang[e] = CUnicodeUtils::StdGetUTF8(language);
+        SaveUserData();
+    }
 }
 
