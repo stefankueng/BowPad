@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -44,12 +44,14 @@ public:
     bool                SaveCurrentTab(bool bSaveAs = false);
     void                EnsureAtLeastOneTab();
     void                GoToLine(size_t line);
-    bool                CloseTab(int tab);
+    bool                CloseTab(int tab, bool force = false);
     bool                CloseAllTabs();
     bool                HandleOutsideModifications(int id = -1);
     void                SetFileToOpen(const std::wstring& path, size_t line = (size_t)-1) { m_pathsToOpen[path] = line; }
-    void                SetElevatedSave(const std::wstring& path, const std::wstring& savepath) { m_elevatepath = path; m_elevatesavepath = savepath; }
-    void                ElevatedSave(const std::wstring& path, const std::wstring& savepath);
+    void                SetElevatedSave(const std::wstring& path, const std::wstring& savepath, long line) { m_elevatepath = path; m_elevatesavepath = savepath; m_initLine = line; }
+    void                ElevatedSave(const std::wstring& path, const std::wstring& savepath, long line);
+    void                TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line);
+    void                SetTabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line) { m_tabmovepath = path; m_tabmovesavepath = savepath; m_tabmovemod = bMod; m_initLine = line; }
 
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
@@ -92,4 +94,8 @@ private:
     std::map<std::wstring, size_t> m_pathsToOpen;
     std::wstring                m_elevatepath;
     std::wstring                m_elevatesavepath;
+    std::wstring                m_tabmovepath;
+    std::wstring                m_tabmovesavepath;
+    bool                        m_tabmovemod;
+    long                        m_initLine;
 };

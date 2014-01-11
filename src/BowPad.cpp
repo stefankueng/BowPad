@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -183,7 +183,11 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             mainWindow.SetFileToOpen(parser.GetVal(L"path"), line);
             if (parser.HasKey(L"elevate") && parser.HasKey(L"savepath"))
             {
-                mainWindow.SetElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"));
+                mainWindow.SetElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"), (long)line);
+            }
+            if (parser.HasKey(L"tabmove") && parser.HasKey(L"savepath"))
+            {
+                mainWindow.SetTabMove(parser.GetVal(L"path"), parser.GetVal(L"savepath"), !!parser.HasKey(L"modified"), (long)line);
             }
         }
         else
