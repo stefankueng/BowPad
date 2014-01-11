@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -60,6 +60,8 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_scintilla(hInst)
     , m_cRef(1)
     , m_hShieldIcon(NULL)
+    , m_tabmovemod(false)
+    , m_initLine(0)
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 }
@@ -379,39 +381,92 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             COPYDATASTRUCT *cds;
             cds = (COPYDATASTRUCT *) lParam;
-            if (cds->dwData == CD_COMMAND_LINE)
+            switch (cds->dwData)
             {
-                CCmdLineParser parser((LPCWSTR)cds->lpData);
-                if (parser.HasVal(L"path"))
+                case CD_COMMAND_LINE:
                 {
-                    OpenFile(parser.GetVal(L"path"));
-                    if (parser.HasVal(L"line"))
+                    CCmdLineParser parser((LPCWSTR)cds->lpData);
+                    if (parser.HasVal(L"path"))
                     {
-                        GoToLine(parser.GetLongVal(L"line")-1);
-                    }
-                }
-                else
-                {
-                    // find out if there are paths specified without the key/value pair syntax
-                    int nArgs;
-
-                    LPWSTR * szArglist = CommandLineToArgvW((LPCWSTR)cds->lpData, &nArgs);
-                    if( szArglist )
-                    {
-                        for( int i=1; i<nArgs; i++)
-                        {
-                            if (szArglist[i][0] != '/')
-                                OpenFile(szArglist[i]);
-                        }
+                        OpenFile(parser.GetVal(L"path"));
                         if (parser.HasVal(L"line"))
                         {
-                            GoToLine(parser.GetLongVal(L"line")-1);
+                            GoToLine(parser.GetLongVal(L"line") - 1);
                         }
+                    }
+                    else
+                    {
+                        // find out if there are paths specified without the key/value pair syntax
+                        int nArgs;
 
-                        // Free memory allocated for CommandLineToArgvW arguments.
-                        LocalFree(szArglist);
+                        LPWSTR * szArglist = CommandLineToArgvW((LPCWSTR)cds->lpData, &nArgs);
+                        if (szArglist)
+                        {
+                            for (int i = 1; i < nArgs; i++)
+                            {
+                                if (szArglist[i][0] != '/')
+                                    OpenFile(szArglist[i]);
+                            }
+                            if (parser.HasVal(L"line"))
+                            {
+                                GoToLine(parser.GetLongVal(L"line") - 1);
+                            }
+
+                            // Free memory allocated for CommandLineToArgvW arguments.
+                            LocalFree(szArglist);
+                        }
                     }
                 }
+                    break;
+                case CD_COMMAND_MOVETAB:
+                {
+                    std::wstring paths = std::wstring((wchar_t*)cds->lpData, cds->cbData / sizeof(wchar_t));
+                    std::vector<std::wstring> datavec;
+                    stringtok(datavec, paths, false, L"*");
+                    std::wstring realpath = datavec[0];
+                    std::wstring temppath = datavec[1];
+                    bool bMod = _wtoi(datavec[2].c_str()) != 0;
+                    int line = _wtoi(datavec[3].c_str());
+
+                    int id = m_DocManager.GetIdForPath(realpath.c_str());
+                    if (id != -1)
+                    {
+                        m_TabBar.ActivateAt(m_TabBar.GetIndexFromID(id));
+                    }
+                    else
+                    {
+                        OpenFile(temppath);
+                        id = m_DocManager.GetIdForPath(temppath);
+                        m_TabBar.ActivateAt(m_TabBar.GetIndexFromID(id));
+                        CDocument doc = m_DocManager.GetDocumentFromID(id);
+                        doc.m_path = CPathUtils::GetLongPathname(realpath);
+                        doc.m_bIsDirty = bMod;
+                        doc.m_bNeedsSaving = bMod;
+                        m_DocManager.UpdateFileTime(doc);
+                        doc.m_language = CLexStyles::Instance().GetLanguageForExt(doc.m_path.substr(doc.m_path.find_last_of('.') + 1));
+                        m_DocManager.SetDocument(id, doc);
+                        m_scintilla.SetupLexerForExt(doc.m_path.substr(doc.m_path.find_last_of('.') + 1).c_str());
+                        std::wstring sFileName = doc.m_path.substr(doc.m_path.find_last_of('\\') + 1);
+                        m_TabBar.SetCurrentTitle(sFileName.c_str());
+                        wchar_t sTabTitle[100] = { 0 };
+                        m_TabBar.GetCurrentTitle(sTabTitle, _countof(sTabTitle));
+                        std::wstring sWindowTitle = CStringUtils::Format(L"%s - BowPad", doc.m_path.empty() ? sTabTitle : doc.m_path.c_str());
+                        SetWindowText(*this, sWindowTitle.c_str());
+                        UpdateStatusBar(true);
+                        TCITEM tie;
+                        tie.lParam = -1;
+                        tie.mask = TCIF_IMAGE;
+                        tie.iImage = doc.m_bIsDirty || doc.m_bNeedsSaving ? UNSAVED_IMG_INDEX : SAVED_IMG_INDEX;
+                        if (doc.m_bIsReadonly)
+                            tie.iImage = REDONLY_IMG_INDEX;
+                        ::SendMessage(m_TabBar, TCM_SETITEM, m_TabBar.GetIndexFromID(id), reinterpret_cast<LPARAM>(&tie));
+
+                        GoToLine(line);
+                    }
+                    // delete the temp file
+                    DeleteFile(temppath.c_str());
+                }
+                break;
             }
         }
         break;
@@ -428,9 +483,15 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         }
         if (!m_elevatepath.empty())
         {
-            ElevatedSave(m_elevatepath, m_elevatesavepath);
+            ElevatedSave(m_elevatepath, m_elevatesavepath, m_initLine);
             m_elevatepath.clear();
             m_elevatesavepath.clear();
+        }
+        if (!m_tabmovepath.empty())
+        {
+            TabMove(m_tabmovepath, m_tabmovesavepath, m_tabmovemod, m_initLine);
+            m_tabmovepath.clear();
+            m_tabmovesavepath.clear();
         }
         break;
     case WM_NOTIFY:
@@ -530,6 +591,80 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                     m_TabBar.ActivateAt(ptbhdr->tabOrigin-1);
                                 }
                             }
+                        }
+                    }
+                    break;
+                case TCN_TABDROPPEDOUTSIDE:
+                    {
+                        // start a new instance of BowPad with this dropped tab, or add this tab to
+                        // the BowPad window the drop was done on. Then close this tab.
+
+                        // first save the file to a temp location to ensure all unsaved mods are saved
+                        std::wstring temppath = CPathUtils::GetTempFilePath();
+                        CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin));
+                        CDocument tempdoc = doc;
+                        tempdoc.m_path = temppath;
+                        m_DocManager.SaveFile(*this, tempdoc);
+                        DWORD pos = GetMessagePos();
+                        POINT pt;
+                        pt.x = GET_X_LPARAM(pos);
+                        pt.y = GET_Y_LPARAM(pos);
+                        HWND hDroppedWnd = WindowFromPoint(pt);
+                        if (hDroppedWnd)
+                        {
+                            ResString clsResName(hRes, IDC_BOWPAD);
+                            std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
+                            while (hDroppedWnd)
+                            {
+                                wchar_t classname[MAX_PATH] = { 0 };
+                                GetClassName(hDroppedWnd, classname, _countof(classname));
+                                if (clsName.compare(classname) == 0)
+                                    break;
+                                hDroppedWnd = GetParent(hDroppedWnd);
+                            }
+                            // dropping on our own window shall create an new BowPad instance
+                            if (hDroppedWnd == *this)
+                                hDroppedWnd = NULL;
+                            if (hDroppedWnd)
+                            {
+                                // dropped on another BowPad Window, 'move' this tab to that BowPad Window
+                                COPYDATASTRUCT cpd = { 0 };
+                                cpd.dwData = CD_COMMAND_MOVETAB;
+                                std::wstring cpdata = doc.m_path + L"*" + temppath + L"*";
+                                cpdata += (doc.m_bIsDirty || doc.m_bNeedsSaving) ? L"1*" : L"0*";
+                                cpdata += CStringUtils::Format(L"%ld", (long)(m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1));
+                                cpd.lpData = (PVOID)cpdata.c_str();
+                                cpd.cbData = DWORD(cpdata.size()*sizeof(wchar_t));
+                                SendMessage(hDroppedWnd, WM_COPYDATA, (WPARAM)m_hwnd, (LPARAM)&cpd);
+                                // remove the tab
+                                CloseTab(ptbhdr->tabOrigin, true);
+                                break;
+                            }
+                        }
+                        // no BowPad Window at the drop location: start a new instance and open the tab there
+
+                        std::wstring modpath = CPathUtils::GetModulePath();
+                        std::wstring cmdline = CStringUtils::Format(L"/multiple /tabmove /savepath:\"%s\" /path:\"%s\" /line:%ld",
+                                                                    doc.m_path.c_str(), temppath.c_str(),
+                                                                    (long)(m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1));
+                        if (doc.m_bIsDirty || doc.m_bNeedsSaving)
+                            cmdline += L" /modified";
+                        SHELLEXECUTEINFO shExecInfo;
+                        shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+
+                        shExecInfo.fMask = NULL;
+                        shExecInfo.hwnd = *this;
+                        shExecInfo.lpVerb = L"open";
+                        shExecInfo.lpFile = modpath.c_str();
+                        shExecInfo.lpParameters = cmdline.c_str();
+                        shExecInfo.lpDirectory = NULL;
+                        shExecInfo.nShow = SW_NORMAL;
+                        shExecInfo.hInstApp = NULL;
+
+                        if (ShellExecuteEx(&shExecInfo))
+                        {
+                            // remove the tab
+                            CloseTab(ptbhdr->tabOrigin, true);
                         }
                     }
                     break;
@@ -1206,12 +1341,12 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     }
 }
 
-bool CMainWindow::CloseTab( int tab )
+bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
 {
     if ((tab < 0) || (tab >= m_DocManager.GetCount()))
         return false;
     CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
-    if (doc.m_bIsDirty||doc.m_bNeedsSaving)
+    if (!force && (doc.m_bIsDirty||doc.m_bNeedsSaving))
     {
         m_TabBar.ActivateAt(tab);
         ResString rTitle(hRes, IDS_HASMODIFICATIONS);
@@ -1729,7 +1864,7 @@ bool CMainWindow::HandleOutsideModifications( int id /*= -1*/ )
     return bRet;
 }
 
-void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& savepath )
+void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& savepath, long line )
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
     int id = m_DocManager.GetIdForPath(filepath.c_str());
@@ -1745,8 +1880,49 @@ void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& sa
         std::wstring sWindowTitle = CStringUtils::Format(L"%s - BowPad", doc.m_path.empty() ? sTabTitle : doc.m_path.c_str());
         SetWindowText(*this, sWindowTitle.c_str());
         UpdateStatusBar(true);
+        GoToLine(line);
 
         // delete the temp file used for the elevated save
+        DeleteFile(path.c_str());
+    }
+}
+
+void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line)
+{
+    std::wstring filepath = CPathUtils::GetLongPathname(path);
+    int id = m_DocManager.GetIdForPath(filepath.c_str());
+    if (id != -1)
+    {
+        m_TabBar.ActivateAt(m_TabBar.GetIndexFromID(id));
+        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        doc.m_path = CPathUtils::GetLongPathname(savepath);
+        doc.m_bIsDirty = bMod;
+        doc.m_bNeedsSaving = bMod;
+        m_DocManager.UpdateFileTime(doc);
+        doc.m_language = CLexStyles::Instance().GetLanguageForExt(doc.m_path.substr(doc.m_path.find_last_of('.') + 1));
+        m_DocManager.SetDocument(id, doc);
+
+        m_scintilla.SetupLexerForExt(doc.m_path.substr(doc.m_path.find_last_of('.') + 1).c_str());
+        std::wstring sFileName = doc.m_path.substr(doc.m_path.find_last_of('\\') + 1);
+        m_TabBar.SetCurrentTitle(sFileName.c_str());
+
+        wchar_t sTabTitle[100] = { 0 };
+        m_TabBar.GetCurrentTitle(sTabTitle, _countof(sTabTitle));
+        std::wstring sWindowTitle = CStringUtils::Format(L"%s - BowPad", doc.m_path.empty() ? sTabTitle : doc.m_path.c_str());
+        SetWindowText(*this, sWindowTitle.c_str());
+        UpdateStatusBar(true);
+
+        TCITEM tie;
+        tie.lParam = -1;
+        tie.mask = TCIF_IMAGE;
+        tie.iImage = doc.m_bIsDirty || doc.m_bNeedsSaving ? UNSAVED_IMG_INDEX : SAVED_IMG_INDEX;
+        if (doc.m_bIsReadonly)
+            tie.iImage = REDONLY_IMG_INDEX;
+        ::SendMessage(m_TabBar, TCM_SETITEM, m_TabBar.GetIndexFromID(id), reinterpret_cast<LPARAM>(&tie));
+
+        GoToLine(line);
+
+        // delete the temp file
         DeleteFile(path.c_str());
     }
 }

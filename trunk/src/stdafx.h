@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@
 #define APP_ID L"TortoiseSVN.Tools.BowPad.1"
 // custon id for the WM_COPYDATA message
 #define CD_COMMAND_LINE 101
+#define CD_COMMAND_MOVETAB 102
 
 #define WM_UPDATEAVAILABLE (WM_APP + 10)
 #define WM_AFTERINIT       (WM_APP + 11)
