@@ -489,6 +489,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     LRESULT firstline = Call(SCI_GETFIRSTVISIBLELINE);
     LRESULT lastline = firstline + Call(SCI_LINESONSCREEN);
     long startstylepos = (long)Call(SCI_POSITIONFROMLINE, firstline);
+    startstylepos = max(startstylepos, 0);
     long endstylepos = (long)Call(SCI_POSITIONFROMLINE, lastline) + (long)Call(SCI_LINELENGTH, lastline);
     if (endstylepos < 0)
         endstylepos = (long)Call(SCI_GETLENGTH)-startstylepos;
