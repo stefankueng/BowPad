@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -83,6 +83,7 @@ public:
 
     std::vector<std::wstring>           GetLanguages() const;
     std::wstring                        GetLanguageForExt(const std::wstring& ext) const;
+    std::wstring                        GetLanguageForPath(const std::wstring& path);
     std::wstring                        GetUserExtensionsForLanguage(const std::wstring& lang) const;
 
     const std::map<int, std::string>&   GetKeywordsForExt(const std::string& ext);
@@ -97,6 +98,8 @@ public:
 
     const LexerData&                    GetLexerDataForExt(const std::string& ext) const;
     const LexerData&                    GetLexerDataForLang(const std::string& lang) const;
+
+    void                                SetLangForPath(const std::wstring& path, const std::wstring& language);
 
     void                                SetUserForeground(int ID, int style, COLORREF clr);
     void                                SetUserBackground(int ID, int style, COLORREF clr);
@@ -124,4 +127,7 @@ private:
 
     std::map<int, LexerData>            m_userlexerdata;
     std::map<std::string, std::string>  m_userextLang;
+    std::map<std::string, std::string>  m_autoextLang;
+    std::map<std::wstring, std::string> m_pathsLang;
+    std::list<std::wstring>             m_pathsForLang;
 };
