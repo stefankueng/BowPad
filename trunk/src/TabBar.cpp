@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -570,7 +570,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 nmhdr.hdr.hwndFrom = *this;
                 nmhdr.hdr.code = m_bIsDraggingInside?TCN_TABDROPPED:TCN_TABDROPPEDOUTSIDE;
                 nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
-                nmhdr.tabOrigin = currentTabOn;
+                nmhdr.tabOrigin = m_nTabDragged;
                 ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
                 return TRUE;
             }
