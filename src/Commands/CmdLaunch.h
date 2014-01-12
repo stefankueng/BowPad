@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ public:
     CCmdLaunchConsole(void * obj) : LaunchBase(obj){}
     ~CCmdLaunchConsole(void){}
 
-    virtual bool Execute() { return Launch(L"cmd /K cd /d $(TAB_DIR)"); }
+    virtual bool Execute() { return Launch(L"cmd /K cd /d \"$(TAB_DIR)\""); }
     virtual UINT GetCmdId() { return cmdLaunchConsole; }
 };
 
@@ -127,7 +127,7 @@ public:
     CCmdLaunchExplorer(void * obj) : LaunchBase(obj){}
     ~CCmdLaunchExplorer(void){}
 
-    virtual bool Execute() { return Launch(L"explorer $(TAB_DIR)"); }
+    virtual bool Execute() { return Launch(L"explorer \"$(TAB_DIR)\""); }
     virtual UINT GetCmdId() { return cmdLaunchExplorer; }
 };
 

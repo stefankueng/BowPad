@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,8 +27,16 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     // replace the macros in the command line
     CDocument doc = GetActiveDocument();
     std::wstring tabpath = doc.m_path;
-    SearchReplace(cmd, L"$(TAB_PATH)", tabpath);
-    SearchReplace(cmd, L"$(TAB_DIR)", CPathUtils::GetParentDirectory(tabpath));
+    if (PathFileExists(tabpath.c_str()))
+        SearchReplace(cmd, L"$(TAB_PATH)", tabpath);
+    else
+        SearchReplace(cmd, L"$(TAB_PATH)", L"");
+    tabpath = CPathUtils::GetParentDirectory(tabpath);
+    if (PathFileExists(tabpath.c_str()))
+        SearchReplace(cmd, L"$(TAB_DIR)", tabpath);
+    else
+        SearchReplace(cmd, L"$(TAB_DIR)", L"");
+
     SearchReplace(cmd, L"$(LINE)", CStringUtils::Format(L"%lld", ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS))));
     SearchReplace(cmd, L"$(POS)", CStringUtils::Format(L"%lld", ScintillaCall(SCI_GETCURRENTPOS)));
     // find selected text or current word
