@@ -1,0 +1,5 @@
+1.0.7.498
+http://switch.dl.sourceforge.net/project/stefanstools/BowPad/BowPad64-1.0.7.msi
+BowPad64-1.0.7.msi
+http://switch.dl.sourceforge.net/project/stefanstools/BowPad/BowPad-1.0.7.msi
+BowPad-1.0.7.msi
