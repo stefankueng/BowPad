@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2013-12-08 20:20+0100\n"
+"PO-Revision-Date: 2014-01-12 15:16+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
-"Language: German\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.5.7\n"
+"X-Generator: Poedit 1.6.3\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -38,6 +38,10 @@ msgstr "Ü&ber ..."
 msgid "&Cancel"
 msgstr "&Abbrechen"
 
+#. Resource IDs: (3754)
+msgid "&Close Tab"
+msgstr "&Schliesse Tab"
+
 #. Resource IDs: (7)
 msgid "&Don't save"
 msgstr "&Nicht speichern"
@@ -53,6 +57,18 @@ msgstr "&Finde nächstes"
 #. Resource IDs: (65535)
 msgid "&Help"
 msgstr "&Hilfe"
+
+#. Resource IDs: (3753)
+msgid "&New"
+msgstr "&Neu"
+
+#. Resource IDs: (3753)
+msgid "&Open"
+msgstr "Ö&ffnen"
+
+#. Resource IDs: (3769)
+msgid "&Reload"
+msgstr "Neu &laden"
 
 #. Resource IDs: (1003)
 msgid "&Replace"
@@ -73,6 +89,14 @@ msgid ""
 msgstr ""
 "<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Mehr "
 "Info über diese Update</a>"
+
+#. Resource IDs: (3754)
+msgid "A"
+msgstr "A"
+
+#. Resource IDs: (3754)
+msgid "AS"
+msgstr "AS"
 
 #. Resource IDs: (103)
 msgid "About BowPad"
@@ -111,9 +135,25 @@ msgstr "Autor: Stefan Küng"
 msgid "Available Languages"
 msgstr "Vorhandene Sprachen"
 
+#. Resource IDs: (3770)
+msgid "BC"
+msgstr "BC"
+
+#. Resource IDs: (3770)
+msgid "BN"
+msgstr "BN"
+
 #. Resource IDs: (7)
 msgid "BOWPAD"
 msgstr "BOWPAD"
+
+#. Resource IDs: (3770)
+msgid "BP"
+msgstr "BP"
+
+#. Resource IDs: (3769)
+msgid "BT"
+msgstr "BT"
 
 #. Resource IDs: (1020)
 msgid "Bold"
@@ -130,6 +170,34 @@ msgstr "BowPad"
 #. Resource IDs: (9)
 msgid "BowPad Text Editor"
 msgstr "BowPad Text Editor"
+
+#. Resource IDs: (3751, 3754, 3755)
+msgid "C"
+msgstr "C"
+
+#. Resource IDs: (3754)
+msgid "CA"
+msgstr "CA"
+
+#. Resource IDs: (3762)
+msgid "CC"
+msgstr "CC"
+
+#. Resource IDs: (3752)
+msgid "CO"
+msgstr "CO"
+
+#. Resource IDs: (3759)
+msgid "CR"
+msgstr "CR"
+
+#. Resource IDs: (3758)
+msgid "CT"
+msgstr "CT"
+
+#. Resource IDs: (3763)
+msgid "CU"
+msgstr "CU"
 
 #. Resource IDs: (2)
 msgid "Cancel"
@@ -379,6 +447,14 @@ msgstr "Ausschneiden"
 msgid "Cut the current selection to the clipboard"
 msgstr "Den selektierten Text in die Zwischenablage ausschneiden"
 
+#. Resource IDs: (3765)
+msgid "DD"
+msgstr "DD"
+
+#. Resource IDs: (3761)
+msgid "DEL"
+msgstr "DEL"
+
 #. Resource IDs: (3765, 3766)
 msgid "Dark Theme"
 msgstr "Dunkler Stil"
@@ -463,9 +539,21 @@ msgstr "Zeile duplizieren"
 msgid "Duplicates the current line"
 msgstr "Dupliziert die aktuelle Zeile"
 
+#. Resource IDs: (3751)
+msgid "E"
+msgstr "E"
+
 #. Resource IDs: (105)
 msgid "E&xit"
 msgstr "Be&enden"
+
+#. Resource IDs: (3757)
+msgid "ENC"
+msgstr "ENC"
+
+#. Resource IDs: (3759)
+msgid "EOL"
+msgstr "EOL"
 
 #. Resource IDs: (3751)
 msgid "Edit"
@@ -475,13 +563,25 @@ msgstr "Verändern"
 msgid "Encoding"
 msgstr "Kodierung"
 
-#. Resource IDs: (3752)
-msgid "Exit"
-msgstr "Beenden"
-
 #. Resource IDs: (65535)
 msgid "Extension"
 msgstr "Erweiterung"
+
+#. Resource IDs: (3751, 3752, 3760)
+msgid "F"
+msgstr "F"
+
+#. Resource IDs: (3760, 3777)
+msgid "FN"
+msgstr "FN"
+
+#. Resource IDs: (3761)
+msgid "FP"
+msgstr "FP"
+
+#. Resource IDs: (3761)
+msgid "FSN"
+msgstr "FSN"
 
 #. Resource IDs: (9)
 msgid "Failed to download the list of available languages."
@@ -543,6 +643,10 @@ msgstr "Schriftart"
 msgid "Functions"
 msgstr "Funktionen"
 
+#. Resource IDs: (3767)
+msgid "GL"
+msgstr "GL"
+
 #. Resource IDs: (145, 3763)
 msgid "Go to line"
 msgstr "Gehe zu Zeile"
@@ -551,6 +655,10 @@ msgstr "Gehe zu Zeile"
 msgid "Goto"
 msgstr "Gehe zu"
 
+#. Resource IDs: (3752)
+msgid "H"
+msgstr "H"
+
 #. Resource IDs: (3754)
 msgid "Inserts the content of the clipboard at the cursor position"
 msgstr "Fügt den Inhalt der Zwischenablage an der Cursorposition ein"
@@ -558,6 +666,10 @@ msgstr "Fügt den Inhalt der Zwischenablage an der Cursorposition ein"
 #. Resource IDs: (1021)
 msgid "Italic"
 msgstr "Kursiv"
+
+#. Resource IDs: (3765)
+msgid "JL"
+msgstr "JL"
 
 #. Resource IDs: (3761)
 msgid "Join Lines"
@@ -574,6 +686,30 @@ msgid ""
 msgstr ""
 "Behalte das Dokument\n"
 "Das Dokument wird offen gelassen."
+
+#. Resource IDs: (3757)
+msgid "LA"
+msgstr "LA"
+
+#. Resource IDs: (3758)
+msgid "LANG"
+msgstr "LANG"
+
+#. Resource IDs: (3766)
+msgid "LD"
+msgstr "LD"
+
+#. Resource IDs: (3759)
+msgid "LF"
+msgstr "LF"
+
+#. Resource IDs: (3765, 3771, 3777)
+msgid "LS"
+msgstr "LS"
+
+#. Resource IDs: (3766)
+msgid "LU"
+msgstr "LU"
 
 #. Resource IDs: (3756)
 msgid "Language"
@@ -674,13 +810,29 @@ msgstr "Lade alle Dateien welche beim letzten Beenden von BowPad offen waren"
 msgid "Lowercase"
 msgstr "Kleinschreibung"
 
+#. Resource IDs: (3751, 3752)
+msgid "M"
+msgstr "M"
+
+#. Resource IDs: (3759)
+msgid "MAC"
+msgstr "MAC"
+
 #. Resource IDs: (3757)
 msgid "MAC (CR)"
 msgstr "MAC (CR)"
 
+#. Resource IDs: (3764)
+msgid "ML"
+msgstr "ML"
+
 #. Resource IDs: (18)
 msgid "MRU List"
 msgstr "MRU Liste"
+
+#. Resource IDs: (3763)
+msgid "MU"
+msgstr "MU"
 
 #. Resource IDs: (3751)
 msgid "Main"
@@ -746,9 +898,13 @@ msgstr "Geht zum nächsten Treffer der letzten Suche"
 msgid "Moves to the previous match of the last search"
 msgstr "Geht zum vorherigen Treffer der letzten Suche"
 
-#. Resource IDs: (3752)
-msgid "New"
-msgstr "Neu"
+#. Resource IDs: (3753)
+msgid "N"
+msgstr "N"
+
+#. Resource IDs: (3760)
+msgid "NEXT"
+msgstr "NEXT"
 
 #. Resource IDs: (7)
 #, c-format
@@ -778,6 +934,10 @@ msgid ""
 msgstr ""
 "Keine Updates erhältlich\n"
 "Sie haben bereits die neueste Version."
+
+#. Resource IDs: (3753)
+msgid "O"
+msgstr "O"
 
 #. Resource IDs: (1)
 msgid "OK"
@@ -874,6 +1034,22 @@ msgstr "Sucht nach dem markierten Text in Wikipedia"
 msgid "Opens the default browser to search for the selected text"
 msgstr "Sucht mit dem Standardbrowser nach dem markierten Text"
 
+#. Resource IDs: (3766)
+msgid "P"
+msgstr "P"
+
+#. Resource IDs: (3767)
+msgid "PP"
+msgstr "PP"
+
+#. Resource IDs: (3759)
+msgid "PREV"
+msgstr "PREV"
+
+#. Resource IDs: (3767)
+msgid "PS"
+msgstr "PS"
+
 #. Resource IDs: (3763)
 msgid "Page Setup"
 msgstr "Seitenkonfiguration"
@@ -909,6 +1085,10 @@ msgstr "Drucken..."
 #. Resource IDs: (1006)
 msgid "R&eplace with:"
 msgstr "E&rsetzen mit:"
+
+#. Resource IDs: (3769)
+msgid "RELOAD"
+msgstr "RELOAD"
 
 #. Resource IDs: (3754, 3755)
 msgid "Redo"
@@ -966,9 +1146,29 @@ msgstr "A&lle ersetzen"
 msgid "Right margin"
 msgstr "Rechter Rand"
 
-#. Resource IDs: (3752)
-msgid "Save"
-msgstr "Speichern"
+#. Resource IDs: (3753)
+msgid "S"
+msgstr "S"
+
+#. Resource IDs: (3762)
+msgid "SA"
+msgstr "SA"
+
+#. Resource IDs: (3777)
+msgid "SAL"
+msgstr "SAL"
+
+#. Resource IDs: (3762, 3769)
+msgid "ST"
+msgstr "ST"
+
+#. Resource IDs: (3754)
+msgid "Sa&ve as"
+msgstr "Speichern &unter"
+
+#. Resource IDs: (3753)
+msgid "Save &all"
+msgstr "&Alle speichern"
 
 #. Resource IDs: (3752)
 msgid "Save File"
@@ -977,10 +1177,6 @@ msgstr "Datei speichern"
 #. Resource IDs: (3753)
 msgid "Save Files"
 msgstr "Dateien speichern"
-
-#. Resource IDs: (3752)
-msgid "Save all"
-msgstr "Alle speichern"
 
 #. Resource IDs: (3753)
 msgid "Save as"
@@ -1118,6 +1314,18 @@ msgstr "Stil:"
 msgid "Styles"
 msgstr "Stile:"
 
+#. Resource IDs: (3768)
+msgid "T"
+msgstr "T"
+
+#. Resource IDs: (3764, 3768)
+msgid "TS"
+msgstr "TS"
+
+#. Resource IDs: (3771)
+msgid "TT"
+msgstr "TT"
+
 #. Resource IDs: (3764)
 msgid "Tabs to Spaces"
 msgstr "Tabulatoren zu Leerzeichen"
@@ -1165,9 +1373,17 @@ msgstr "Automatische Überprüfungen auf Updates ausschalten"
 msgid "Turns showing whitespaces on/off"
 msgstr "Schaltet die Anzeige von Leerzeichen ein/aus"
 
+#. Resource IDs: (3751)
+msgid "U"
+msgstr "U"
+
 #. Resource IDs: (3759)
 msgid "UPPER/lower"
 msgstr "GROSS/klein"
+
+#. Resource IDs: (3764)
+msgid "UT"
+msgstr "UT"
 
 #. Resource IDs: (3759)
 msgid "Uncomment"
@@ -1209,6 +1425,14 @@ msgstr "Verwende $0 für den ganzen Match, und $1..$99 für Gruppenmatches."
 msgid "Use Tabs"
 msgstr "Tabulatoren"
 
+#. Resource IDs: (3751, 3752, 3755)
+msgid "V"
+msgstr "V"
+
+#. Resource IDs: (3752, 3762)
+msgid "VE"
+msgstr "VE"
+
 #. Resource IDs: (3751)
 msgid "Vertical Edge"
 msgstr "Vertikale Linie"
@@ -1220,6 +1444,14 @@ msgstr "Anzeige"
 #. Resource IDs: (1026)
 msgid "Visit our Website"
 msgstr "Besuchen Sie unsere Webseite"
+
+#. Resource IDs: (3756)
+msgid "W"
+msgstr "W"
+
+#. Resource IDs: (3757)
+msgid "WS"
+msgstr "WS"
 
 #. Resource IDs: (1059)
 msgid "Web Search:"
@@ -1245,6 +1477,14 @@ msgstr "Weiter von Beginn"
 msgid "Wrap lines at the end of the window"
 msgstr "Bricht Zeilen am rechten Fensterrand um"
 
+#. Resource IDs: (3752, 3755)
+msgid "X"
+msgstr "X"
+
+#. Resource IDs: (3756)
+msgid "Y"
+msgstr "Y"
+
 #. Resource IDs: (9)
 msgid ""
 "You can use the following strings in the command line:\r\n"
@@ -1262,6 +1502,10 @@ msgstr ""
 "$(TAB_DIR)\t\tOrdnerpfad der Datei im aktuellen Tab\r\n"
 "$(SEL_TEXT)\t\tMarkierter Text oder Wort an der aktuellen Cursorposition\r\n"
 "$(SEL_TEXT_ESCAPED)\twie $(SEL_TEXT) aber Escaped, nützlich für URLs"
+
+#. Resource IDs: (3756)
+msgid "Z"
+msgstr "Z"
 
 #. Resource IDs: (65535)
 msgid "background:"
@@ -1327,6 +1571,15 @@ msgstr "Führt den Benutzerbefehl 9 aus"
 #. Resource IDs: (3760)
 msgid "tab size"
 msgstr "Tabulatorgrösse"
+
+#~ msgid "Exit"
+#~ msgstr "Beenden"
+
+#~ msgid "New"
+#~ msgstr "Neu"
+
+#~ msgid "Save"
+#~ msgstr "Speichern"
 
 #~ msgid "&Close"
 #~ msgstr "&Schliessen"
