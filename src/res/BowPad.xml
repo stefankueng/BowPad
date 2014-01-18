@@ -625,7 +625,7 @@
 
     <Command Name="cmdFontOnlyGroup" LabelTitle="Font" />
     <Command Name="cmdFontOnly" />
-    
+
     <Command Name="cmdGroupFind" LabelTitle="Find" />
     <Command Name="cmdContextMap" />
     <Command Name="cmdTabContextMap" />
@@ -648,7 +648,7 @@
     <Command Name="cmdPasteHistory" Id="10011" />
 
     <Command Name="cmdTesting" Id="20000" />
-  
+
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -927,7 +927,14 @@
         </Tab>
       </Ribbon.Tabs>
       <Ribbon.QuickAccessToolbar>
-        <QuickAccessToolbar CommandName="cmdQat" />
+        <QuickAccessToolbar CommandName="cmdQat">
+          <QuickAccessToolbar.ApplicationDefaults>
+          <Button CommandName="cmdSave" ApplicationDefaults.IsChecked="true"/>
+          <Button CommandName="cmdClose" ApplicationDefaults.IsChecked="true"/>
+          <Button CommandName="cmdOpen" ApplicationDefaults.IsChecked="true"/>
+          <Button CommandName="cmdNew" ApplicationDefaults.IsChecked="true"/>
+          </QuickAccessToolbar.ApplicationDefaults>
+        </QuickAccessToolbar>
       </Ribbon.QuickAccessToolbar>
 
       <Ribbon.SizeDefinitions>
