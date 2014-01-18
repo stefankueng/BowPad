@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "BowPadUI.h"
 #include "StringUtils.h"
 #include "IniSettings.h"
+#include "CmdLineParser.h"
 
 class CCmdSessionLoad : public ICommand
 {
@@ -170,10 +171,12 @@ public:
         return E_NOTIMPL;
     }
 
-    virtual void AfterInit()
+    virtual void AfterInit() override
     {
+        CCmdLineParser parser(GetCommandLine());
+
         bool bAutoLoad = CIniSettings::Instance().GetInt64(L"TabSession", L"autoload", 0) != 0;
-        if (bAutoLoad)
+        if (bAutoLoad && !parser.HasKey(L"multiple"))
             RestoreSavedSession();
     }
 
