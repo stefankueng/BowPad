@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_SETWRAPMODE, ScintillaCall(SCI_GETWRAPMODE) ? 0 : SC_WRAP_WORD);
         CIniSettings::Instance().SetInt64(L"View", L"wrapmode", ScintillaCall(SCI_GETWRAPMODE));
@@ -42,9 +42,9 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdLineWrap; }
+    virtual UINT GetCmdId() override { return cmdLineWrap; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_BooleanValue == key)
         {

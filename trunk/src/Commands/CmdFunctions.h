@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,21 +41,21 @@ public:
     {
     }
 
-    virtual bool Execute() { return false; }
-    virtual UINT GetCmdId() { return cmdFunctions; }
+    virtual bool Execute() override { return false; }
+    virtual UINT GetCmdId() override { return cmdFunctions; }
 
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue );
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual HRESULT IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties );
+    virtual HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    virtual void TabNotify( TBHDR * ptbhdr );
+    virtual void TabNotify(TBHDR * ptbhdr) override;
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn );
+    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
-    virtual void OnTimer(UINT id);
+    virtual void OnTimer(UINT id) override;
 
-    virtual void OnDocumentOpen(int id);
+    virtual void OnDocumentOpen(int id) override;
 
 private:
     void            FindFunctions(int docID, bool bBackground);

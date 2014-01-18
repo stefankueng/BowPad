@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,21 +33,21 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_UNDO);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdUndo; }
+    virtual UINT GetCmdId() override { return cmdUndo; }
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn )
+    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_Enabled == key)
         {
@@ -72,21 +72,21 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_REDO);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdRedo; }
+    virtual UINT GetCmdId() override { return cmdRedo; }
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn )
+    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_Enabled == key)
         {

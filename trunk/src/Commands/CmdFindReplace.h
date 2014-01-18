@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -66,8 +66,8 @@ protected:
     LRESULT                 DrawListItemWithMatches(NMLVCUSTOMDRAW * pLVCD);
     RECT                    DrawListColumnBackground(NMLVCUSTOMDRAW * pLVCD);
 
-    virtual bool Execute() { return true; }
-    virtual UINT GetCmdId() { return 0; }
+    virtual bool Execute() override { return true; }
+    virtual UINT GetCmdId() override { return 0; }
 
 private:
     CDlgResizer                 m_resizer;
@@ -94,11 +94,11 @@ public:
         delete m_pFindReplaceDlg;
     }
 
-    virtual bool Execute();
+    virtual bool Execute() override;
 
-    virtual UINT GetCmdId() { return cmdFindReplace; }
+    virtual UINT GetCmdId() override { return cmdFindReplace; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_BooleanValue == key)
         {
@@ -107,7 +107,7 @@ public:
         return E_NOTIMPL;
     }
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn );
+    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
 private:
     CFindReplaceDlg *           m_pFindReplaceDlg;
@@ -126,9 +126,9 @@ public:
     {
     }
 
-    virtual bool Execute();
+    virtual bool Execute() override;
 
-    virtual UINT GetCmdId() { return cmdFindNext; }
+    virtual UINT GetCmdId() override { return cmdFindNext; }
 };
 
 class CCmdFindPrev : public ICommand
@@ -144,9 +144,9 @@ public:
     {
     }
 
-    virtual bool Execute();
+    virtual bool Execute() override;
 
-    virtual UINT GetCmdId() { return cmdFindPrev; }
+    virtual UINT GetCmdId() override { return cmdFindPrev; }
 };
 
 class CCmdFindSelectedNext : public ICommand
@@ -162,9 +162,9 @@ public:
     {
     }
 
-    virtual bool Execute();
+    virtual bool Execute() override;
 
-    virtual UINT GetCmdId() { return cmdFindSelectedNext; }
+    virtual UINT GetCmdId() override { return cmdFindSelectedNext; }
 };
 
 class CCmdFindSelectedPrev : public ICommand
@@ -180,7 +180,7 @@ public:
     {
     }
 
-    virtual bool Execute();
+    virtual bool Execute() override;
 
-    virtual UINT GetCmdId() { return cmdFindSelectedPrev; }
+    virtual UINT GetCmdId() override { return cmdFindSelectedPrev; }
 };

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -193,7 +193,7 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         std::string sHtml = GetHtmlSelection();
         ScintillaCall(SCI_CUT);
@@ -201,15 +201,15 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdCut; }
+    virtual UINT GetCmdId() override { return cmdCut; }
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn )
+    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override
     {
         if (pScn->nmhdr.code == SCN_UPDATEUI)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_Enabled == key)
         {
@@ -232,21 +232,21 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_CUT);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdCutPlain; }
+    virtual UINT GetCmdId() override { return cmdCutPlain; }
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn )
+    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override
     {
         if (pScn->nmhdr.code == SCN_UPDATEUI)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_Enabled == key)
         {
@@ -270,7 +270,7 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         std::string sHtml = GetHtmlSelection();
         ScintillaCall(SCI_COPYALLOWLINE);
@@ -278,7 +278,7 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdCopy; }
+    virtual UINT GetCmdId() override { return cmdCopy; }
 };
 
 class CCmdCopyPlain : public ClipboardBase
@@ -293,13 +293,13 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_COPYALLOWLINE);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdCopyPlain; }
+    virtual UINT GetCmdId() override { return cmdCopyPlain; }
 };
 
 class CCmdPaste : public ICommand
@@ -314,7 +314,7 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         // test first if there's a file on the clipboard
         std::vector<std::wstring> files;
@@ -351,15 +351,15 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdPaste; }
+    virtual UINT GetCmdId() override { return cmdPaste; }
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn )
+    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_Enabled == key)
         {

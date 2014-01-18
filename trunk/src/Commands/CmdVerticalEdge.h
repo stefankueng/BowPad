@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,11 +35,11 @@ public:
     {
     }
 
-    virtual bool Execute() { return true; }
+    virtual bool Execute() override { return true; }
 
-    virtual UINT GetCmdId() { return cmdVerticalEdge; }
+    virtual UINT GetCmdId() override { return cmdVerticalEdge; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         HRESULT hr = E_FAIL;
         // Set the minimum value
@@ -83,7 +83,7 @@ public:
         return hr;
     }
 
-    virtual HRESULT IUICommandHandlerExecute( UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ )
+    virtual HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/) override
     {
         ScintillaCall(SCI_SETEDGECOLUMN, ppropvarValue->intVal);
         ScintillaCall(SCI_SETEDGEMODE, ppropvarValue->intVal ? EDGE_LINE : EDGE_NONE);

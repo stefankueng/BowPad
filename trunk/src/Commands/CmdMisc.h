@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,13 +35,13 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_CLEAR);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdDelete; }
+    virtual UINT GetCmdId() override { return cmdDelete; }
 };
 
 
@@ -57,13 +57,13 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_SELECTALL);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdSelectAll; }
+    virtual UINT GetCmdId() override { return cmdSelectAll; }
 };
 
 class CCmdGotoBrace : public ICommand
@@ -78,13 +78,13 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         GotoBrace();
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdGotoBrace; }
+    virtual UINT GetCmdId() override { return cmdGotoBrace; }
 };
 
 class CCmdToggleTheme : public ICommand
@@ -110,7 +110,7 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         if (!HasActiveDocument())
             return false;
@@ -137,9 +137,9 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdToggleTheme; }
+    virtual UINT GetCmdId() override { return cmdToggleTheme; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_BooleanValue == key)
         {
@@ -165,7 +165,7 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         std::wstring userFile = CAppUtils::GetDataPath() + L"\\shortcuts.ini";
         if (!PathFileExists(userFile.c_str()))
@@ -201,6 +201,6 @@ public:
         return OpenFile(userFile.c_str());
     }
 
-    virtual UINT GetCmdId() { return cmdConfigShortcuts; }
+    virtual UINT GetCmdId() override { return cmdConfigShortcuts; }
 };
 
