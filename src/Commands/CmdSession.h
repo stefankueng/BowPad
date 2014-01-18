@@ -34,15 +34,15 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         RestoreSavedSession();
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdSessionLoad; }
+    virtual UINT GetCmdId() override { return cmdSessionLoad; }
 
-    virtual void OnClose()
+    virtual void OnClose() override
     {
         // BowPad is closing, save the current session
 
@@ -148,7 +148,7 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         bool bAutoLoad = CIniSettings::Instance().GetInt64(L"TabSession", L"autoload", 0) != 0;
         bAutoLoad = !bAutoLoad;
@@ -157,11 +157,11 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdSessionAutoLoad; }
+    virtual UINT GetCmdId() override { return cmdSessionAutoLoad; }
 
-    virtual void OnClose() {}
+    virtual void OnClose() override {}
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_BooleanValue == key)
         {
@@ -194,7 +194,7 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         if (m_docstates.empty())
             return false;
@@ -223,9 +223,9 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdSessionLast; }
+    virtual UINT GetCmdId() override { return cmdSessionLast; }
 
-    virtual void OnDocumentClose( int index )
+    virtual void OnDocumentClose(int index) override
     {
         CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(index));
         if (doc.m_path.empty())

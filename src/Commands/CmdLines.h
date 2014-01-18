@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,13 +31,13 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_LINEDUPLICATE);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdLineDuplicate; }
+    virtual UINT GetCmdId() override { return cmdLineDuplicate; }
 };
 
 class CCmdLineSplit : public ICommand
@@ -52,14 +52,14 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_TARGETFROMSELECTION);
         ScintillaCall(SCI_LINESSPLIT);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdLineSplit; }
+    virtual UINT GetCmdId() override { return cmdLineSplit; }
 };
 
 class CCmdLineJoin : public ICommand
@@ -74,14 +74,14 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_TARGETFROMSELECTION);
         ScintillaCall(SCI_LINESJOIN);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdLineJoin; }
+    virtual UINT GetCmdId() override { return cmdLineJoin; }
 };
 
 class CCmdLineUp : public ICommand
@@ -96,13 +96,13 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_MOVESELECTEDLINESUP);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdLineUp; }
+    virtual UINT GetCmdId() override { return cmdLineUp; }
 };
 
 class CCmdLineDown : public ICommand
@@ -117,11 +117,11 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_MOVESELECTEDLINESDOWN);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdLineDown; }
+    virtual UINT GetCmdId() override { return cmdLineDown; }
 };

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         long line = long(ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS)));
 
@@ -55,7 +55,7 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdBookmarkToggle; }
+    virtual UINT GetCmdId() override { return cmdBookmarkToggle; }
 };
 
 class CCmdBookmarkClearAll : public ICommand
@@ -70,14 +70,14 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_MARKERDELETEALL, MARK_BOOKMARK);
         DocScrollClear(DOCSCROLLTYPE_BOOKMARK);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdBookmarkClearAll; }
+    virtual UINT GetCmdId() override { return cmdBookmarkClearAll; }
 };
 
 class CCmdBookmarkNext : public ICommand
@@ -93,7 +93,7 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         long line = (long)ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
         line = (long)ScintillaCall(SCI_MARKERNEXT, line+1, (1 << MARK_BOOKMARK));
@@ -109,9 +109,9 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdBookmarkNext; }
+    virtual UINT GetCmdId() override { return cmdBookmarkNext; }
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn )
+    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
@@ -119,7 +119,7 @@ public:
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_Enabled == key)
         {
@@ -144,7 +144,7 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         long line = (long)ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
         line = (long)ScintillaCall(SCI_MARKERPREVIOUS, line-1, (1 << MARK_BOOKMARK));
@@ -160,9 +160,9 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdBookmarkPrev; }
+    virtual UINT GetCmdId() override { return cmdBookmarkPrev; }
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn )
+    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
@@ -170,7 +170,7 @@ public:
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_Enabled == key)
         {

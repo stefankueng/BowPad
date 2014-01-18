@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,9 +32,9 @@ public:
     {
     }
 
-    virtual bool Execute();
+    virtual bool Execute() override;
 
-    virtual UINT GetCmdId() { return cmdUppercase; }
+    virtual UINT GetCmdId() override { return cmdUppercase; }
 };
 
 class CCmdConvertLowercase : public ICommand
@@ -50,8 +50,8 @@ public:
     {
     }
 
-    virtual bool Execute();
+    virtual bool Execute() override;
 
-    virtual UINT GetCmdId() { return cmdLowercase; }
+    virtual UINT GetCmdId() override { return cmdLowercase; }
 };
 

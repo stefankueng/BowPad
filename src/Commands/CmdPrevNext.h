@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,12 +39,12 @@ public:
     {
     }
 
-    virtual bool Execute() { return false; }
-    virtual UINT GetCmdId() { return cmdPrevNext; }
+    virtual bool Execute() override { return false; }
+    virtual UINT GetCmdId() override { return cmdPrevNext; }
 
-    virtual void ScintillaNotify( Scintilla::SCNotification * pScn );
+    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
-    virtual void TabNotify( TBHDR * ptbhdr );
+    virtual void TabNotify(TBHDR * ptbhdr) override;
 };
 
 
@@ -60,10 +60,10 @@ public:
     {
     }
 
-    virtual bool Execute();
-    virtual UINT GetCmdId() { return cmdPrevious; }
+    virtual bool Execute() override;
+    virtual UINT GetCmdId() override { return cmdPrevious; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue );
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
 };
 
@@ -79,9 +79,9 @@ public:
     {
     }
 
-    virtual bool Execute();
-    virtual UINT GetCmdId() { return cmdNext; }
+    virtual bool Execute() override;
+    virtual UINT GetCmdId() override { return cmdNext; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue );
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
 };

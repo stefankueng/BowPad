@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,9 +35,9 @@ public:
     {
     }
 
-    virtual bool Execute();
+    virtual bool Execute() override;
 
-    virtual UINT GetCmdId() { return cmdTrim; }
+    virtual UINT GetCmdId() override { return cmdTrim; }
 
 };
 
@@ -54,9 +54,9 @@ public:
     {
     }
 
-    virtual bool Execute();
+    virtual bool Execute() override;
 
-    virtual UINT GetCmdId() { return cmdTabs2Spaces; }
+    virtual UINT GetCmdId() override { return cmdTabs2Spaces; }
 
 };
 
@@ -74,8 +74,8 @@ public:
     {
     }
 
-    virtual bool Execute();
+    virtual bool Execute() override;
 
-    virtual UINT GetCmdId() { return cmdSpaces2Tabs; }
+    virtual UINT GetCmdId() override { return cmdSpaces2Tabs; }
 
 };

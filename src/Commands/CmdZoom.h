@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,13 +31,13 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_SETZOOM, 0);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdZoom100; }
+    virtual UINT GetCmdId() override { return cmdZoom100; }
 };
 
 class CCmdZoomIn : public ICommand
@@ -52,13 +52,13 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_ZOOMIN);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdZoomIn; }
+    virtual UINT GetCmdId() override { return cmdZoomIn; }
 };
 
 class CCmdZoomOut : public ICommand
@@ -73,11 +73,11 @@ public:
     {
     }
 
-    virtual bool Execute()
+    virtual bool Execute() override
     {
         ScintillaCall(SCI_ZOOMOUT);
         return true;
     }
 
-    virtual UINT GetCmdId() { return cmdZoomOut; }
+    virtual UINT GetCmdId() override { return cmdZoomOut; }
 };
