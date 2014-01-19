@@ -1325,7 +1325,9 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
         (wParam == '{') ||
         (wParam == '[') )
     {
-        char braceBuf[2] = {0};
+        if (CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1) == 0)
+            return false;
+        char braceBuf[2] = { 0 };
         braceBuf[0] = (char)wParam;
         char braceCloseBuf[2] = {0};
         switch (wParam)

@@ -204,3 +204,33 @@ public:
     virtual UINT GetCmdId() override { return cmdConfigShortcuts; }
 };
 
+class CCmdAutoBraces : public ICommand
+{
+public:
+
+    CCmdAutoBraces(void * obj) : ICommand(obj)
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    }
+
+    ~CCmdAutoBraces(void)
+    {}
+
+    virtual bool Execute() override
+    {
+        CIniSettings::Instance().SetInt64(L"View", L"autobrace", CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1) ? 0 : 1);
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+        return true;
+    }
+
+    virtual UINT GetCmdId() override { return cmdAutoBraces; }
+
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
+    {
+        if (UI_PKEY_BooleanValue == key)
+        {
+            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, (BOOL)CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1), ppropvarNewValue);
+        }
+        return E_NOTIMPL;
+    }
+};
