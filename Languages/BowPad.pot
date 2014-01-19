@@ -93,6 +93,10 @@ msgstr ""
 msgid "A"
 msgstr ""
 
+#. Resource IDs: (3780)
+msgid "AB"
+msgstr ""
+
 #. Resource IDs: (3754)
 msgid "AS"
 msgstr ""
@@ -124,6 +128,10 @@ msgstr ""
 
 #. Resource IDs: (65535)
 msgid "Author: Stefan Küng"
+msgstr ""
+
+#. Resource IDs: (3780)
+msgid "Auto Braces"
 msgstr ""
 
 #. Resource IDs: (9)
@@ -517,6 +525,10 @@ msgstr ""
 
 #. Resource IDs: (3751)
 msgid "Edit"
+msgstr ""
+
+#. Resource IDs: (3780)
+msgid "Enable to automatically add a closing brace when an opening brace is entered"
 msgstr ""
 
 #. Resource IDs: (3755)
