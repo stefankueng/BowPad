@@ -626,6 +626,13 @@
     <Command Name="cmdFontOnlyGroup" LabelTitle="Font" />
     <Command Name="cmdFontOnly" />
 
+    <Command Name="cmdAutoBraces" LabelTitle="Auto Braces" TooltipTitle="Auto Braces" TooltipDescription="Enable to automatically add a closing brace when an opening brace is entered" Keytip="AB">
+      <Command.SmallImages>
+        <Image>res/AutoBraces.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+
+
     <Command Name="cmdGroupFind" LabelTitle="Find" />
     <Command Name="cmdContextMap" />
     <Command Name="cmdTabContextMap" />
@@ -830,6 +837,7 @@
               <ScalingPolicy.IdealSizes>
                 <Scale Group="cmdGroupView" Size="Large" />
                 <Scale Group="cmdGroupEncoding" Size="Medium" />
+                <Scale Group="cmdGroupMisc" Size="Medium" />
               </ScalingPolicy.IdealSizes>
             </ScalingPolicy>
           </Tab.ScalingPolicy>
@@ -916,7 +924,8 @@
             </DropDownGallery>
             <Button CommandName="cmdStyleConfigurator" />
           </Group>
-          <Group CommandName="cmdGroupMisc" SizeDefinition="TwoButtonsWithSmall">
+          <Group CommandName="cmdGroupMisc" SizeDefinition="ThreeButtons">
+            <ToggleButton CommandName="cmdAutoBraces" />
             <ToggleButton CommandName="cmdToggleTheme" />
             <DropDownGallery CommandName="cmdLanguage" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
@@ -929,10 +938,10 @@
       <Ribbon.QuickAccessToolbar>
         <QuickAccessToolbar CommandName="cmdQat">
           <QuickAccessToolbar.ApplicationDefaults>
-          <Button CommandName="cmdSave" ApplicationDefaults.IsChecked="true"/>
-          <Button CommandName="cmdClose" ApplicationDefaults.IsChecked="true"/>
-          <Button CommandName="cmdOpen" ApplicationDefaults.IsChecked="true"/>
-          <Button CommandName="cmdNew" ApplicationDefaults.IsChecked="true"/>
+            <Button CommandName="cmdSave" ApplicationDefaults.IsChecked="true"/>
+            <Button CommandName="cmdClose" ApplicationDefaults.IsChecked="true"/>
+            <Button CommandName="cmdOpen" ApplicationDefaults.IsChecked="true"/>
+            <Button CommandName="cmdNew" ApplicationDefaults.IsChecked="true"/>
           </QuickAccessToolbar.ApplicationDefaults>
         </QuickAccessToolbar>
       </Ribbon.QuickAccessToolbar>
