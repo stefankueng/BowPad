@@ -1,0 +1,5 @@
+1.0.8.522
+http://netcologne.dl.sourceforge.net/project/stefanstools/BowPad/BowPad64-1.0.8.msi
+BowPad64-1.0.8.msi
+http://netcologn.dl.sourceforge.net/project/stefanstools/BowPad/BowPad-1.0.8.msi
+BowPad-1.0.8.msi
