@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-01-12 15:16+0100\n"
+"PO-Revision-Date: 2014-01-19 17:51+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -94,6 +94,10 @@ msgstr ""
 msgid "A"
 msgstr "A"
 
+#. Resource IDs: (3780)
+msgid "AB"
+msgstr "AB"
+
 #. Resource IDs: (3754)
 msgid "AS"
 msgstr "AS"
@@ -130,6 +134,10 @@ msgstr "Fragt nach wo der aktuelle Tab gespeichert werden soll"
 #. Resource IDs: (65535)
 msgid "Author: Stefan Küng"
 msgstr "Autor: Stefan Küng"
+
+#. Resource IDs: (3780)
+msgid "Auto Braces"
+msgstr "Auto-Klammern"
 
 #. Resource IDs: (9)
 msgid "Available Languages"
@@ -558,6 +566,13 @@ msgstr "EOL"
 #. Resource IDs: (3751)
 msgid "Edit"
 msgstr "Verändern"
+
+#. Resource IDs: (3780)
+msgid ""
+"Enable to automatically add a closing brace when an opening brace is entered"
+msgstr ""
+"Aktivieren um automatisch eine schliessende Klammer einzufügen sobald eine "
+"öffnende Klammer eingegeben wird"
 
 #. Resource IDs: (3755)
 msgid "Encoding"
