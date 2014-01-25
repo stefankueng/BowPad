@@ -24,6 +24,9 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     if (cmdline.empty() || !HasActiveDocument())
         return false;
     std::wstring cmd = cmdline;
+    // remove eols
+    SearchReplace(cmd, L"\n", L"");
+    SearchReplace(cmd, L"\r", L" ");
     // replace the macros in the command line
     CDocument doc = GetActiveDocument();
     std::wstring tabpath = doc.m_path;
