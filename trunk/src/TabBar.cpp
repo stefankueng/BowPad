@@ -771,22 +771,27 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
 
         FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top + nLine, rItem.right, rItem.top + nLine + 2, RGB(nRed, nGreen, nBlue));
     }
+    wchar_t buf[100] = { 0 };
+    tci.mask = TCIF_TEXT | TCIF_IMAGE;
+    tci.pszText = buf;
+    tci.cchTextMax = 99;
+    ::SendMessage(*this, TCM_GETITEM, pDrawItemStruct->itemID, reinterpret_cast<LPARAM>(&tci));
     if (bSelected)
     {
-        FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - 5, rItem.right, rItem.bottom, CTheme::Instance().GetThemeColor(RGB(200, 0, 0)));
+        // draw a line at the bottom indicating the active tab:
+        // green if the tab is not modified, red if it is modified and needs saving
+        FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - 5, rItem.right, rItem.bottom,
+                      CTheme::Instance().GetThemeColor(tci.iImage == UNSAVED_IMG_INDEX ? RGB(200, 0, 0) : RGB(0, 200, 0)));
     }
+    if (tci.iImage == UNSAVED_IMG_INDEX)
+        wcscat_s(buf, L"*");
+
     const int PADDING = 2;
     // text & icon
     rItem.left += PADDING;
     rItem.top += PADDING + (bSelected ? 1 : 0);
 
     SetBkMode(pDrawItemStruct->hDC, TRANSPARENT);
-
-    wchar_t buf[100] = {0};
-    tci.mask        = TCIF_TEXT | TCIF_IMAGE;
-    tci.pszText     = buf;
-    tci.cchTextMax  = 99;
-    ::SendMessage(*this, TCM_GETITEM, pDrawItemStruct->itemID, reinterpret_cast<LPARAM>(&tci));
 
     // draw close button
     RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(pDrawItemStruct->rcItem);
