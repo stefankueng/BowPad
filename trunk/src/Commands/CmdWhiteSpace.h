@@ -36,8 +36,13 @@ public:
 
     virtual bool Execute() override
     {
-        ScintillaCall(SCI_SETVIEWWS, ScintillaCall(SCI_GETVIEWWS) ? 0 : 1);
+        bool bShown = ScintillaCall(SCI_GETVIEWWS) != 0;
+        ScintillaCall(SCI_SETVIEWWS, bShown ? 0 : 1);
         CIniSettings::Instance().SetInt64(L"View", L"whitespace", ScintillaCall(SCI_GETVIEWWS));
+        if (bShown || ((GetKeyState(VK_SHIFT) & 0x8000)==0))
+            ScintillaCall(SCI_SETVIEWEOL, false);
+        else
+            ScintillaCall(SCI_SETVIEWEOL, true);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         return true;
     }
