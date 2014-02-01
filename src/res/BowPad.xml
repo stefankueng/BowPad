@@ -148,7 +148,8 @@
         <Image>res/LineWrap.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdWhiteSpace" LabelTitle="Whitespace" TooltipTitle="Show Whitespaces" TooltipDescription="Turns showing whitespaces on/off" Keytip="WS">
+    <Command Name="cmdWhiteSpace" LabelTitle="Whitespace" TooltipTitle="Show Whitespaces" TooltipDescription="Turns showing whitespaces on/off.
+Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Command.LargeImages>
         <Image>res/wspaceL.bmp</Image>
       </Command.LargeImages>
