@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-01-19 17:51+0100\n"
+"PO-Revision-Date: 2014-02-01 13:53+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -41,10 +41,6 @@ msgstr "&Abbrechen"
 #. Resource IDs: (3754)
 msgid "&Close Tab"
 msgstr "&Schliesse Tab"
-
-#. Resource IDs: (7)
-msgid "&Don't save"
-msgstr "&Nicht speichern"
 
 #. Resource IDs: (65535)
 msgid "&File"
@@ -490,6 +486,10 @@ msgstr ""
 #, c-format
 msgid "Do you want to save changes to \"%s\""
 msgstr "Möchten Sie die Änderungen speichern nach \"%s\""
+
+#. Resource IDs: (7)
+msgid "Do&n't save"
+msgstr "&Nicht speichern"
 
 #. Resource IDs: (8)
 msgid "Document modified"
@@ -1384,9 +1384,13 @@ msgstr "Entferne Leerzeichen"
 msgid "Turn off automatic update checks"
 msgstr "Automatische Überprüfungen auf Updates ausschalten"
 
-#. Resource IDs: (3755)
-msgid "Turns showing whitespaces on/off"
-msgstr "Schaltet die Anzeige von Leerzeichen ein/aus"
+#. Resource IDs: (3757)
+msgid ""
+"Turns showing whitespaces on/off.\n"
+"Hold down the Shift key to show EOLs as well."
+msgstr ""
+"Schaltet die Anzeige von Leerzeichen ein/aus.\n"
+"Drücke die Umschalt-Taste um auch die Zeilenenden anzuzeigen."
 
 #. Resource IDs: (3751)
 msgid "U"
@@ -1586,6 +1590,9 @@ msgstr "Führt den Benutzerbefehl 9 aus"
 #. Resource IDs: (3760)
 msgid "tab size"
 msgstr "Tabulatorgrösse"
+
+#~ msgid "Turns showing whitespaces on/off"
+#~ msgstr "Schaltet die Anzeige von Leerzeichen ein/aus"
 
 #~ msgid "Exit"
 #~ msgstr "Beenden"
