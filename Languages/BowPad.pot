@@ -45,10 +45,6 @@ msgstr ""
 msgid "&Close Tab"
 msgstr ""
 
-#. Resource IDs: (7)
-msgid "&Don't save"
-msgstr ""
-
 #. Resource IDs: (65535)
 msgid "&File"
 msgstr ""
@@ -469,6 +465,10 @@ msgstr ""
 #. Resource IDs: (7)
 #, c-format
 msgid "Do you want to save changes to \"%s\""
+msgstr ""
+
+#. Resource IDs: (7)
+msgid "Do&n't save"
 msgstr ""
 
 #. Resource IDs: (8)
@@ -1291,8 +1291,8 @@ msgstr ""
 msgid "Turn off automatic update checks"
 msgstr ""
 
-#. Resource IDs: (3755)
-msgid "Turns showing whitespaces on/off"
+#. Resource IDs: (3757)
+msgid "Turns showing whitespaces on/off.\nHold down the Shift key to show EOLs as well."
 msgstr ""
 
 #. Resource IDs: (3751)
