@@ -256,7 +256,7 @@ public:
                 --count;
             }
             // now load that file in the same tab
-            if (OpenFile(showpath.c_str()))
+            if (OpenFile(showpath.c_str(), false))
             {
                 CloseTab(tabIndex);
             }

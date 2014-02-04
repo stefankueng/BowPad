@@ -87,7 +87,7 @@ public:
         if (matchingfiles.size() == 1)
         {
             // only one match found: open it directly
-            OpenFile(matchingfiles[0].c_str());
+            OpenFile(matchingfiles[0].c_str(), true);
         }
         else
         {
@@ -97,7 +97,7 @@ public:
             int ret = (int)dlg.DoModal(hRes, IDD_CHOSE, GetHwnd());
             if (ret >= 0)
             {
-                OpenFile(matchingfiles[ret].c_str());
+                OpenFile(matchingfiles[ret].c_str(), true);
             }
         }
 

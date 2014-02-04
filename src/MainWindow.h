@@ -39,7 +39,7 @@ public:
     bool                RegisterAndCreateWindow();
 
     bool                Initialize();
-    bool                OpenFile(const std::wstring& file);
+    bool                OpenFile(const std::wstring& file, bool bAddToMRU);
     bool                ReloadTab(int tab, int encoding);
     bool                SaveCurrentTab(bool bSaveAs = false);
     void                EnsureAtLeastOneTab();

@@ -102,7 +102,7 @@ protected:
             std::wstring path = CIniSettings::Instance().GetString(L"TabSession", key.c_str(), L"");
             if (path.empty())
                 break;
-            if (OpenFile(path.c_str()))
+            if (OpenFile(path.c_str(), false))
             {
                 if (HasActiveDocument())
                 {
@@ -200,7 +200,7 @@ public:
             return false;
         // restore the tab that was closed last
         auto pt = m_docstates.back();
-        if (OpenFile(std::get<0>(pt).c_str()))
+        if (OpenFile(std::get<0>(pt).c_str(), true))
         {
             ScintillaCall(SCI_GOTOPOS, 0);
 
