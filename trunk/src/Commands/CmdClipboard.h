@@ -343,7 +343,7 @@ public:
         }
         for (auto it : files)
         {
-            OpenFile(it.c_str());
+            OpenFile(it.c_str(), true);
             bFilesOpened = true;
         }
         if (!bFilesOpened)

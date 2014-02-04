@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -139,10 +139,10 @@ HWND ICommand::GetHwnd()
     return *pMainWnd;
 }
 
-bool ICommand::OpenFile( LPCWSTR file )
+bool ICommand::OpenFile(LPCWSTR file, bool bAddToMRU)
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    return pMainWnd->OpenFile(file);
+    return pMainWnd->OpenFile(file, bAddToMRU);
 }
 
 bool ICommand::ReloadTab( int tab, int encoding )

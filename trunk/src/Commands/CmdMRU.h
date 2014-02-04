@@ -97,7 +97,7 @@ public:
                 std::wstring path = var.bstrVal;
                 PropVariantClear(&var);
                 std::replace(path.begin(), path.end(), '/', '\\');
-                OpenFile(path.c_str());
+                OpenFile(path.c_str(), true);
             }
         }
         return hr;

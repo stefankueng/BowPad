@@ -373,7 +373,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 }
                 DragFinish(hDrop);
                 for (auto it:files)
-                    OpenFile(it);
+                    OpenFile(it, true);
             }
         }
         break;
@@ -388,7 +388,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     CCmdLineParser parser((LPCWSTR)cds->lpData);
                     if (parser.HasVal(L"path"))
                     {
-                        OpenFile(parser.GetVal(L"path"));
+                        OpenFile(parser.GetVal(L"path"), true);
                         if (parser.HasVal(L"line"))
                         {
                             GoToLine(parser.GetLongVal(L"line") - 1);
@@ -405,7 +405,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             for (int i = 1; i < nArgs; i++)
                             {
                                 if (szArglist[i][0] != '/')
-                                    OpenFile(szArglist[i]);
+                                    OpenFile(szArglist[i], true);
                             }
                             if (parser.HasVal(L"line"))
                             {
@@ -435,7 +435,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     }
                     else
                     {
-                        OpenFile(temppath);
+                        OpenFile(temppath, false);
                         id = m_DocManager.GetIdForPath(temppath);
                         m_TabBar.ActivateAt(m_TabBar.GetIndexFromID(id));
                         CDocument doc = m_DocManager.GetDocumentFromID(id);
@@ -477,7 +477,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         CCommandHandler::Instance().AfterInit();
         for (const auto& path : m_pathsToOpen)
         {
-            OpenFile(path.first);
+            OpenFile(path.first, false);
             if (path.second != (size_t)-1)
                 GoToLine(path.second);
         }
@@ -1415,7 +1415,7 @@ bool CMainWindow::CloseAllTabs()
     return true;
 }
 
-bool CMainWindow::OpenFile( const std::wstring& file )
+bool CMainWindow::OpenFile(const std::wstring& file, bool bAddToMRU)
 {
     bool bRet = true;
     int encoding = -1;
@@ -1441,7 +1441,8 @@ bool CMainWindow::OpenFile( const std::wstring& file )
                     m_TabBar.DeletItemAt(0);
                 }
             }
-            CMRU::Instance().AddPath(filepath);
+            if (bAddToMRU)
+                CMRU::Instance().AddPath(filepath);
             std::wstring sFileName = filepath.substr(filepath.find_last_of('\\')+1);
             auto dotpos = filepath.find_last_of('.');
             std::wstring sExt = filepath.substr(dotpos + 1);

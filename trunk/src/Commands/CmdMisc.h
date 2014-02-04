@@ -198,7 +198,7 @@ public:
                 }
             }
         }
-        return OpenFile(userFile.c_str());
+        return OpenFile(userFile.c_str(), false);
     }
 
     virtual UINT GetCmdId() override { return cmdConfigShortcuts; }

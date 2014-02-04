@@ -69,7 +69,7 @@ bool CCmdOpen::Execute()
     if (SUCCEEDED(hr))
     {
         for (auto it : paths)
-            OpenFile(it.c_str());
+            OpenFile(it.c_str(), true);
     }
     return true;
 }
