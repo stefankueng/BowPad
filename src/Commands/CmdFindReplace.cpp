@@ -919,7 +919,9 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
 
             if (sHighlightString.empty())
             {
+                lastSelText.clear();
                 DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
+                DocScrollUpdate();
                 return;
             }
 
@@ -935,7 +937,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
                 FindText.chrg.cpMin = FindText.chrgText.cpMax;
             }
 
-            if (lastSelText.compare(sHighlightString) || (nSearchFlags != lastSearchFlags))
+            if (lastSelText.empty() || lastSelText.compare(sHighlightString) || (nSearchFlags != lastSearchFlags))
             {
                 DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
                 Scintilla::Sci_TextToFind FindText;
@@ -950,6 +952,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
                         break;
                     FindText.chrg.cpMin = FindText.chrgText.cpMax;
                 }
+                DocScrollUpdate();
             }
             lastSelText = sHighlightString.c_str();
             lastSearchFlags = nSearchFlags;
@@ -1023,11 +1026,17 @@ bool CCmdFindSelectedNext::Execute()
     sHighlightString.clear();
     int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
     if (selTextLen == 0)
+    {
+        DocScrollUpdate();
         return false;
+    }
     std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
     ScintillaCall(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
     if (seltextbuffer[0] == 0)
+    {
+        DocScrollUpdate();
         return false;
+    }
     sFindString = seltextbuffer.get();
     sHighlightString = sFindString;
 
@@ -1054,6 +1063,7 @@ bool CCmdFindSelectedNext::Execute()
         fi.dwTimeout = 20;
         FlashWindowEx(&fi);
     }
+    DocScrollUpdate();
     return true;
 }
 
@@ -1062,11 +1072,17 @@ bool CCmdFindSelectedPrev::Execute()
     sHighlightString.clear();
     int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
     if (selTextLen == 0)
+    {
+        DocScrollUpdate();
         return false;
+    }
     std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
     ScintillaCall(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
     if (seltextbuffer[0] == 0)
+    {
+        DocScrollUpdate();
         return false;
+    }
     sFindString = seltextbuffer.get();
     sHighlightString = sFindString;
 
@@ -1095,5 +1111,6 @@ bool CCmdFindSelectedPrev::Execute()
         fi.dwTimeout = 20;
         FlashWindowEx(&fi);
     }
+    DocScrollUpdate();
     return true;
 }

@@ -250,6 +250,12 @@ void ICommand::DocScrollRemoveLine( int type, size_t line )
     pMainWnd->m_scintilla.DocScrollRemoveLine(type, line);
 }
 
+void ICommand::DocScrollUpdate()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    pMainWnd->m_scintilla.DocScrollUpdate();
+}
+
 void ICommand::Center( long startPos, long endPos )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
