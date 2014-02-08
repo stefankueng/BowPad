@@ -82,6 +82,7 @@ public :
     bool GetSelectedCount(size_t& selByte, size_t& selLine);
     void DocScrollClear(int type) { m_docScroll.Clear(type); }
     void DocScrollAddLineColor(int type, size_t line, COLORREF clr) { m_docScroll.AddLineColor(type, line, clr); }
+    void DocScrollUpdate();
     void DocScrollRemoveLine(int type, size_t line) { m_docScroll.RemoveLine(type, line); }
     void MarkBookmarksInScrollbar();
     void Center(long posStart, long posEnd);

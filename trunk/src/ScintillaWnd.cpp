@@ -1570,3 +1570,8 @@ void CScintillaWnd::MarkBookmarksInScrollbar()
         line = (long)Call(SCI_MARKERNEXT, line+1, (1 << MARK_BOOKMARK));
     }
 }
+
+void CScintillaWnd::DocScrollUpdate()
+{
+    InvalidateRect(*this, NULL, FALSE);
+}
