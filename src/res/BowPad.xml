@@ -654,8 +654,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
     <Command Name="cmdSessionLast" Id="10010" />
     <Command Name="cmdPasteHistory" Id="10011" />
-
-    <Command Name="cmdTesting" Id="20000" />
+    
+    <!-- dummy command, does nothing. Used to disable hotkeys -->
+    <Command Name="cmdNothing" Id="30000" />
 
   </Application.Commands>
   <Application.Views>
