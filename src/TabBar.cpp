@@ -32,6 +32,8 @@
 
 extern IUIFramework * g_pFramework;
 
+#define TABBAR_SHOWDISKICON 0
+
 COLORREF Darker(COLORREF crBase, float fFactor)
 {
     ASSERT (fFactor < 1.0f && fFactor > 0.0f);
@@ -165,7 +167,7 @@ int CTabBar::InsertAtEnd(const TCHAR *subTabName)
 
     if (m_bHasImgList)
         index = 0;
-    tie.iImage = index;
+    tie.iImage = TABBAR_SHOWDISKICON ? index : 0;
     tie.pszText = (TCHAR *)subTabName;
     tie.lParam = m_tabID++;
     return int(::SendMessage(*this, TCM_INSERTITEM, m_nItems++, reinterpret_cast<LPARAM>(&tie)));
@@ -769,7 +771,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
     wchar_t buf[100] = { 0 };
     tci.mask = TCIF_TEXT | TCIF_IMAGE;
     tci.pszText = buf;
-    tci.cchTextMax = 99;
+    tci.cchTextMax = _countof(buf)-1;
     ::SendMessage(*this, TCM_GETITEM, pDrawItemStruct->itemID, reinterpret_cast<LPARAM>(&tci));
     if (bSelected)
     {
@@ -813,19 +815,21 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
     ::DeleteObject(hBmp);
 
     // icon
-    if (hilTabs)
+    if (TABBAR_SHOWDISKICON && hilTabs)
     {
         ImageList_Draw(hilTabs, tci.iImage, pDrawItemStruct->hDC, rItem.left, rItem.top, ILD_TRANSPARENT);
         rItem.left += 16 + PADDING;
     }
+    else
+        rItem.left += PADDING;
 
     // text
     rItem.right -= PADDING;
-    UINT uFlags = DT_CALCRECT | DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS;
+    UINT uFlags = DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER;
     ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, uFlags);
 
     SetTextColor(pDrawItemStruct->hDC, bSelected ? CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)) : CTheme::Instance().GetThemeColor(Darker(::GetSysColor(COLOR_3DFACE), 0.5f)));
-    DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, DT_NOPREFIX | DT_CENTER);
+    DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER);
 }
 
 
