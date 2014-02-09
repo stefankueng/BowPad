@@ -301,6 +301,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/LowerCaseS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdTitlecase" LabelTitle="Titlecase" TooltipTitle="Titlecase" TooltipDescription="Converts the selection to Title Case" Keytip="ML">
+      <Command.SmallImages>
+        <Image>res/TitleCaseS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
     <Command Name="cmdTabSize" LabelTitle="tab size" TooltipTitle="tab size" TooltipDescription="Set the number of columns for one tabulator." Keytip="TS">
     </Command>
     <Command Name="cmdUseTabs" LabelTitle="Use Tabs" TooltipTitle="Use Tabs" TooltipDescription="Determines whether a tab is inserted or spaces when the tab key is pressed." Keytip="UT">
@@ -654,7 +659,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
     <Command Name="cmdSessionLast" Id="10010" />
     <Command Name="cmdPasteHistory" Id="10011" />
-    
+
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />
 
@@ -818,7 +823,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdLineSplit" />
             <Button CommandName="cmdLineJoin" />
           </Group>
-          <Group CommandName="cmdGroupBlanks" SizeDefinition="SixButtons">
+          <Group CommandName="cmdGroupBlanks" SizeDefinition="SevenButtons">
             <Button CommandName="cmdTrim" />
             <Button CommandName="cmdTabs2Spaces" />
             <Button CommandName="cmdSpaces2Tabs" />
@@ -831,6 +836,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             </DropDownButton>
             <Button CommandName="cmdUppercase" />
             <Button CommandName="cmdLowercase" />
+            <Button CommandName="cmdTitlecase" />
           </Group>
         </Tab>
         <Tab CommandName="cmdViewTab">
@@ -988,6 +994,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           <MenuGroup>
             <Button CommandName="cmdLaunchSearch"/>
             <Button CommandName="cmdLaunchWikipedia"/>
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdUppercase" />
+            <Button CommandName="cmdLowercase" />
+            <Button CommandName="cmdTitlecase" />
           </MenuGroup>
         </ContextMenu>
         <ContextMenu Name="TabContextMenu">

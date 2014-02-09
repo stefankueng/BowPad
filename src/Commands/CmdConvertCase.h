@@ -55,3 +55,19 @@ public:
     virtual UINT GetCmdId() override { return cmdLowercase; }
 };
 
+class CCmdConvertTitlecase : public ICommand
+{
+public:
+
+    CCmdConvertTitlecase(void * obj) : ICommand(obj)
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    }
+
+    ~CCmdConvertTitlecase(void)
+    {}
+
+    virtual bool Execute() override;
+
+    virtual UINT GetCmdId() override { return cmdTitlecase; }
+};
