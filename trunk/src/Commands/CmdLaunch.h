@@ -93,9 +93,9 @@ public:
 
     virtual bool Execute() override
     {
-        std::wstring sLaunch = CIniSettings::Instance().GetString(L"CustomLaunch", L"websearch", L"http://www.google.com/search?q=$(SEL_TEXT_ESCAPED)");
+        std::wstring sLaunch = CIniSettings::Instance().GetString(L"CustomLaunch", L"websearch", L"http://www.bing.com/search?q=$(SEL_TEXT_ESCAPED)");
         if (sLaunch.empty())
-            sLaunch = L"http://www.google.com/search?q=$(SEL_TEXT_ESCAPED)";
+            sLaunch = L"http://www.bing.com/search?q=$(SEL_TEXT_ESCAPED)";
         return Launch(sLaunch);
     }
     virtual UINT GetCmdId() override { return cmdLaunchSearch; }
