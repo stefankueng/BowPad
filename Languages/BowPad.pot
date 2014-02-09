@@ -330,6 +330,10 @@ msgstr ""
 msgid "Converts the file to the specified encoding"
 msgstr ""
 
+#. Resource IDs: (3764)
+msgid "Converts the selection to Title Case"
+msgstr ""
+
 #. Resource IDs: (3760)
 msgid "Converts the selection to UPPERcase"
 msgstr ""
@@ -1269,6 +1273,10 @@ msgstr ""
 #. Resource IDs: (8)
 #, c-format
 msgid "The document '%s' was removed outside of BowPad."
+msgstr ""
+
+#. Resource IDs: (3764)
+msgid "Titlecase"
 msgstr ""
 
 #. Resource IDs: (3765)
