@@ -199,6 +199,8 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdConvertLowercase(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdConvertTitlecase(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdLineDuplicate(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
