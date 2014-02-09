@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-02-01 13:53+0100\n"
+"PO-Revision-Date: 2014-02-09 19:32+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.3\n"
+"X-Generator: Poedit 1.6.4\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -342,6 +342,12 @@ msgstr "Konvertiert alle Tabulatoren zu Leerzeichen"
 #. Resource IDs: (3756)
 msgid "Converts the file to the specified encoding"
 msgstr "Konvertiert die Datei zur angegebenen Kodierung"
+
+#. Resource IDs: (3764)
+msgid "Converts the selection to Title Case"
+msgstr ""
+"Konvertiert die Auswahl zu Titlecase, d.h. alle Wörter beginnen mit "
+"Grossbuchstaben"
 
 #. Resource IDs: (3760)
 msgid "Converts the selection to UPPERcase"
@@ -1363,6 +1369,10 @@ msgstr "Das Dokument '%s' wurde ausserhalb von BowPad verändert."
 #, c-format
 msgid "The document '%s' was removed outside of BowPad."
 msgstr "Das Dokument '%s' wurde ausserhalb von BowPad gelöscht."
+
+#. Resource IDs: (3764)
+msgid "Titlecase"
+msgstr "Titlecase"
 
 #. Resource IDs: (3765)
 msgid "Toggle Bookmark"
