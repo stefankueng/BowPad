@@ -34,8 +34,7 @@ public:
     }
 
     ~CCmdHeaderSource(void)
-    {
-    }
+    {}
 
     virtual bool Execute() override
     {
@@ -47,7 +46,7 @@ public:
         std::transform(path.begin(), path.end(), path.begin(), ::tolower);
 
         std::wstring dirpath = path.substr(0, path.find_last_of('\\'));
-        std::wstring filename = path.substr(path.find_last_of('\\')+1);
+        std::wstring filename = path.substr(path.find_last_of('\\') + 1);
         auto dotpos = filename.find_first_of('.');
         if (dotpos == std::wstring::npos)
             return false;
@@ -58,12 +57,19 @@ public:
         bool bIsDir = false;
         std::vector<std::wstring> matchingfiles;
         std::vector<std::wstring> matchingfilenames;
+
+        std::vector<std::wstring> ignoredExts;
+        stringtok(ignoredExts, CIniSettings::Instance().GetString(L"HeaderSource", L"IgnoredExts", L"exe*obj*dll*ilk*lib*ncb*ipch*bml*pch*res*pdb*aps"), true, L"*");
         while (enumerator.NextFile(respath, &bIsDir, false))
         {
             if (bIsDir)
                 continue;
 
-            std::wstring resname = respath.substr(respath.find_last_of('\\')+1);
+            std::wstring resname = respath.substr(respath.find_last_of('\\') + 1);
+            std::wstring ext;
+            size_t dotpos = resname.find_last_of('.');
+            if ((dotpos != std::wstring::npos) && ((dotpos + 1) < resname.size()))
+                ext = resname.substr(dotpos + 1);
             std::transform(respath.begin(), respath.end(), respath.begin(), ::tolower);
             std::wstring lowerresname = resname;
             std::transform(lowerresname.begin(), lowerresname.end(), lowerresname.begin(), ::tolower);
@@ -75,8 +81,23 @@ public:
             {
                 if ((lowerresname.size() > plainname.size()) && (lowerresname[plainname.size()] == '.'))
                 {
-                    matchingfiles.push_back(respath);
-                    matchingfilenames.push_back(resname);
+                    bool useIt = true;
+                    if (!ext.empty())
+                    {
+                        for (const auto& e : ignoredExts)
+                        {
+                            if (e.compare(ext) == 0)
+                            {
+                                useIt = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (useIt)
+                    {
+                        matchingfiles.push_back(respath);
+                        matchingfilenames.push_back(resname);
+                    }
                 }
             }
         }
