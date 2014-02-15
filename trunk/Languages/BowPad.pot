@@ -50,7 +50,7 @@ msgid "&File"
 msgstr ""
 
 #. Resource IDs: (1001)
-msgid "&Find Next"
+msgid "&Find"
 msgstr ""
 
 #. Resource IDs: (65535)
@@ -587,8 +587,8 @@ msgstr ""
 msgid "Find &All"
 msgstr ""
 
-#. Resource IDs: (1066)
-msgid "Find All In All Open &Tabs"
+#. Resource IDs: (10)
+msgid "Find All In All &Tabs"
 msgstr ""
 
 #. Resource IDs: (3758)
@@ -1080,8 +1080,8 @@ msgstr ""
 msgid "Removes whitespaces at the end of lines"
 msgstr ""
 
-#. Resource IDs: (1004)
-msgid "Replace A&ll"
+#. Resource IDs: (11)
+msgid "Replace &All"
 msgstr ""
 
 #. Resource IDs: (3759)

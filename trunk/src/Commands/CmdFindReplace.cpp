@@ -48,6 +48,9 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
     case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
+            AdjustControlSize(IDC_MATCHWORD);
+            AdjustControlSize(IDC_MATCHCASE);
+            AdjustControlSize(IDC_MATCHREGEX);
             m_resizer.Init(hwndDlg);
             m_resizer.AddControl(hwndDlg, IDC_LABEL1, RESIZER_TOPLEFT);
             m_resizer.AddControl(hwndDlg, IDC_LABEL2, RESIZER_TOPLEFT);
@@ -57,10 +60,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             m_resizer.AddControl(hwndDlg, IDC_MATCHCASE, RESIZER_TOPLEFT);
             m_resizer.AddControl(hwndDlg, IDC_MATCHREGEX, RESIZER_TOPLEFT);
             m_resizer.AddControl(hwndDlg, IDC_FINDBTN, RESIZER_TOPRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_FINDALL, RESIZER_TOPRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_FINDALLINTABS, RESIZER_TOPRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_REPLACEBTN, RESIZER_TOPRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_REPLACEALLBTN, RESIZER_TOPRIGHT);
             m_resizer.AddControl(hwndDlg, IDCANCEL, RESIZER_TOPRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_FINDRESULTS, RESIZER_TOPLEFTBOTTOMRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_SEARCHINFO, RESIZER_TOPLEFTRIGHT);
@@ -128,9 +128,44 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
         }
         break;
     case WM_NOTIFY:
-        if (wParam == IDC_FINDRESULTS)
+        switch (wParam)
         {
-            return DoListNotify((LPNMITEMACTIVATE)lParam);
+            case IDC_FINDRESULTS:
+                return DoListNotify((LPNMITEMACTIVATE)lParam);
+            case IDC_FINDBTN:
+            case IDC_REPLACEBTN:
+                switch (((LPNMHDR)lParam)->code)
+                {
+                    case BCN_DROPDOWN:
+                    {
+                        NMBCDROPDOWN* pDropDown = (NMBCDROPDOWN*)lParam;
+                        // Get screen coordinates of the button.
+                        POINT pt;
+                        pt.x = pDropDown->rcButton.left;
+                        pt.y = pDropDown->rcButton.bottom;
+                        ClientToScreen(pDropDown->hdr.hwndFrom, &pt);
+
+                        // Create a menu and add items.
+                        HMENU hSplitMenu = CreatePopupMenu();
+                        if (pDropDown->hdr.hwndFrom == GetDlgItem(*this, IDC_FINDBTN))
+                        {
+                            ResString sFindAll(hRes, IDS_FINDALL);
+                            ResString sFindAllInTabs(hRes, IDS_FINDALLINTABS);
+                            AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_FINDALL, sFindAll);
+                            AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_FINDALLINTABS, sFindAllInTabs);
+                        }
+                        else if (pDropDown->hdr.hwndFrom == GetDlgItem(*this, IDC_REPLACEBTN))
+                        {
+                            ResString sReplaceAll(hRes, IDS_REPLACEALL);
+                            AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_FINDALL, sReplaceAll);
+                        }
+                        // Display the menu.
+                        TrackPopupMenu(hSplitMenu, TPM_LEFTALIGN | TPM_TOPALIGN, pt.x, pt.y, 0, *this, NULL);
+                        return TRUE;
+                    }
+                        break;
+                }
+                break;
         }
         break;
     default:
@@ -515,7 +550,6 @@ void CFindReplaceDlg::ShowResults(bool bShow)
     {
         MoveWindow(*this, windowRect.left, windowRect.top, windowRect.right - windowRect.left, height + 15, TRUE);
         ShowWindow(GetDlgItem(*this, IDC_FINDRESULTS), SW_HIDE);
-        DocScrollUpdate();
     }
 }
 
@@ -773,7 +807,22 @@ void CFindReplaceDlg::DoSearchAll(int id)
         std::wstring sKey = CStringUtils::Format(L"search%d", i++);
         CIniSettings::Instance().SetString(L"searchreplace", sKey.c_str(), it.c_str());
     }
-
+    // go to the first search result
+    if (!m_searchResults.empty())
+    {
+        int tab = GetActiveTabIndex();
+        int docID = GetDocIDFromTabIndex(tab);
+        if (docID != m_searchResults[0].docID)
+        {
+            int tabtoopen = GetTabIndexFromDocID(m_searchResults[0].docID);
+            if (tabtoopen >= 0)
+                TabActivateAt(tabtoopen);
+            else
+                return;
+        }
+        ScintillaCall(SCI_GOTOLINE, m_searchResults[0].line);
+        Center((long)m_searchResults[0].pos, (long)m_searchResults[0].pos);
+    }
 }
 
 void CFindReplaceDlg::SearchDocument(int docID, const CDocument& doc, const std::string& searchfor, int searchflags)
