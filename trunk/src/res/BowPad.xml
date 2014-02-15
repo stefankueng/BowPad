@@ -206,6 +206,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/crS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdGroupFind" LabelTitle="Find">
+      <Command.SmallImages>
+        <Image>res/FindReplaceS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
     <Command Name="cmdPrevNext" />
     <!-- dummy command, does nothing -->
     <Command Name="cmdPrevious" LabelTitle="Previous" TooltipTitle="Previous" TooltipDescription="go to the previous cursor position" Keytip="PREV">
@@ -290,7 +295,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/UnCommentS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdGroupCase" LabelTitle="UPPER/lower"/>
+    <Command Name="cmdGroupCase" LabelTitle="UPPER/lower">
+      <Command.SmallImages>
+        <Image>res/UpperCaseS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
     <Command Name="cmdUppercase" LabelTitle="Uppercase" TooltipTitle="Uppercase" TooltipDescription="Converts the selection to UPPERcase" Keytip="MU">
       <Command.SmallImages>
         <Image>res/UpperCaseS.bmp</Image>
@@ -314,7 +323,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.SmallImages>
     </Command>
 
-    <Command Name="cmdGroupLines" LabelTitle="Lines"/>
+    <Command Name="cmdGroupLines" LabelTitle="Lines">
+      <Command.SmallImages>
+        <Image>res/LineDupS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
     <Command Name="cmdLineDuplicate" LabelTitle="Duplicate Line" TooltipTitle="Duplicate Line" TooltipDescription="Duplicates the current line" Keytip="DD">
       <Command.LargeImages>
         <Image>res/LineDupL.bmp</Image>
@@ -355,7 +368,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/LineDownS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdGroupPrint" LabelTitle="Print"  Keytip="P"/>
+    <Command Name="cmdGroupPrint" LabelTitle="Print"  Keytip="P">
+      <Command.LargeImages>
+        <Image>res/PrintL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdPrintNow" LabelTitle="Print" TooltipTitle="Print now" TooltipDescription="Sends the document to the default printer">
       <Command.LargeImages>
         <Image>res/PrintNowL.bmp</Image>
@@ -380,7 +397,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.SmallImages>
     </Command>
 
-    <Command Name="cmdGroupBlanks" LabelTitle="Char operations"/>
+    <Command Name="cmdGroupBlanks" LabelTitle="Char operations">
+      <Command.SmallImages>
+        <Image>res/TrimS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
     <Command Name="cmdTrim" LabelTitle="Trim Whitespaces" TooltipTitle="Trim Whitespaces" TooltipDescription="Removes whitespaces at the end of lines" Keytip="T">
       <Command.LargeImages>
         <Image>res/TrimL.bmp</Image>
@@ -409,7 +430,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.SmallImages>
     </Command>
 
-    <Command Name="cmdGroupGoto" LabelTitle="Goto" />
+    <Command Name="cmdGroupGoto" LabelTitle="Goto">
+      <Command.LargeImages>
+        <Image>res/BookmarkL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdBookmarkToggle" LabelTitle="Bookmark" TooltipTitle="Toggle Bookmark" TooltipDescription="Toggle a bookmark on the current line" Keytip="BT">
       <Command.LargeImages>
         <Image>res/BookmarkL.bmp</Image>
@@ -639,7 +664,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
 
 
-    <Command Name="cmdGroupFind" LabelTitle="Find" />
     <Command Name="cmdContextMap" />
     <Command Name="cmdTabContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />
