@@ -184,10 +184,12 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             if (parser.HasKey(L"elevate") && parser.HasKey(L"savepath"))
             {
                 mainWindow.SetElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"), (long)line);
+                mainWindow.SetFileOpenMRU(false);
             }
             if (parser.HasKey(L"tabmove") && parser.HasKey(L"savepath"))
             {
                 mainWindow.SetTabMove(parser.GetVal(L"path"), parser.GetVal(L"savepath"), !!parser.HasKey(L"modified"), (long)line);
+                mainWindow.SetFileOpenMRU(false);
             }
         }
         else

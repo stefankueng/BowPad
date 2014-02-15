@@ -62,6 +62,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_hShieldIcon(NULL)
     , m_tabmovemod(false)
     , m_initLine(0)
+    , m_bPathsToOpenMRU(true)
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 }
@@ -477,10 +478,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         CCommandHandler::Instance().AfterInit();
         for (const auto& path : m_pathsToOpen)
         {
-            OpenFile(path.first, false);
+            OpenFile(path.first, m_bPathsToOpenMRU);
             if (path.second != (size_t)-1)
                 GoToLine(path.second);
         }
+        m_bPathsToOpenMRU = true;
         if (!m_elevatepath.empty())
         {
             ElevatedSave(m_elevatepath, m_elevatesavepath, m_initLine);
