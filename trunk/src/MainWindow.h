@@ -48,6 +48,7 @@ public:
     bool                CloseAllTabs();
     bool                HandleOutsideModifications(int id = -1);
     void                SetFileToOpen(const std::wstring& path, size_t line = (size_t)-1) { m_pathsToOpen[path] = line; }
+    void                SetFileOpenMRU(bool bUseMRU) { m_bPathsToOpenMRU = bUseMRU; }
     void                SetElevatedSave(const std::wstring& path, const std::wstring& savepath, long line) { m_elevatepath = path; m_elevatesavepath = savepath; m_initLine = line; }
     void                ElevatedSave(const std::wstring& path, const std::wstring& savepath, long line);
     void                TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line);
@@ -92,6 +93,7 @@ private:
     HICON                       m_hShieldIcon;
     std::list<std::wstring>     m_ClipboardHistory;
     std::map<std::wstring, size_t> m_pathsToOpen;
+    bool                        m_bPathsToOpenMRU;
     std::wstring                m_elevatepath;
     std::wstring                m_elevatesavepath;
     std::wstring                m_tabmovepath;
