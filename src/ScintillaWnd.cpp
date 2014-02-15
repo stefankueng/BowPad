@@ -1576,5 +1576,13 @@ void CScintillaWnd::MarkBookmarksInScrollbar()
 
 void CScintillaWnd::DocScrollUpdate()
 {
+    InvalidateRect(*this, NULL, TRUE);
+    Scintilla::SCNotification Scn = { 0 };
+    Scn.message = SCN_UPDATEUI;
+    Scn.updated = SC_UPDATE_CONTENT;
+    Scn.nmhdr.code = SCN_UPDATEUI;
+    Scn.nmhdr.hwndFrom = *this;
+    Scn.nmhdr.idFrom = (uptr_t)this;
+    SendMessage(GetParent(*this), WM_NOTIFY, (WPARAM)(this), (LPARAM)&Scn);
     InvalidateRect(*this, NULL, FALSE);
 }
