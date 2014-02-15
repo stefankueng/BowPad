@@ -515,6 +515,7 @@ void CFindReplaceDlg::ShowResults(bool bShow)
     {
         MoveWindow(*this, windowRect.left, windowRect.top, windowRect.right - windowRect.left, height + 15, TRUE);
         ShowWindow(GetDlgItem(*this, IDC_FINDRESULTS), SW_HIDE);
+        DocScrollUpdate();
     }
 }
 
@@ -526,6 +527,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
         ShowResults(false);
         ShowWindow(*this, SW_HIDE);
         sHighlightString.clear();
+        DocScrollUpdate();
         break;
     case IDC_FINDBTN:
         {
@@ -916,12 +918,12 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
             // reset indicators
             ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_FINDTEXT_MARK);
             ScintillaCall(SCI_INDICATORCLEARRANGE, startstylepos, len);
+            ScintillaCall(SCI_INDICATORCLEARRANGE, startstylepos, len - 1);
 
             if (sHighlightString.empty())
             {
                 lastSelText.clear();
                 DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
-                DocScrollUpdate();
                 return;
             }
 
