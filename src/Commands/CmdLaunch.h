@@ -28,8 +28,8 @@
 class LaunchBase : public ICommand
 {
 public:
-    LaunchBase(void * obj) : ICommand(obj){}
-    virtual ~LaunchBase(void){}
+    LaunchBase(void * obj) : ICommand(obj) {}
+    virtual ~LaunchBase(void) {}
 
 protected:
     bool Launch(const std::wstring& cmdline);
@@ -38,8 +38,8 @@ protected:
 class CCmdLaunchIE : public LaunchBase
 {
 public:
-    CCmdLaunchIE(void * obj) : LaunchBase(obj){}
-    ~CCmdLaunchIE(void){}
+    CCmdLaunchIE(void * obj) : LaunchBase(obj) {}
+    ~CCmdLaunchIE(void) {}
 
     virtual bool Execute() override { return Launch(L"iexplore \"$(TAB_PATH)\""); }
     virtual UINT GetCmdId() override { return cmdLaunchIE; }
@@ -48,8 +48,8 @@ public:
 class CCmdLaunchFirefox : public LaunchBase
 {
 public:
-    CCmdLaunchFirefox(void * obj) : LaunchBase(obj){}
-    ~CCmdLaunchFirefox(void){}
+    CCmdLaunchFirefox(void * obj) : LaunchBase(obj) {}
+    ~CCmdLaunchFirefox(void) {}
 
     virtual bool Execute() override { return Launch(L"firefox \"$(TAB_PATH)\""); }
     virtual UINT GetCmdId() override { return cmdLaunchFirefox; }
@@ -58,8 +58,8 @@ public:
 class CCmdLaunchChrome : public LaunchBase
 {
 public:
-    CCmdLaunchChrome(void * obj) : LaunchBase(obj){}
-    ~CCmdLaunchChrome(void){}
+    CCmdLaunchChrome(void * obj) : LaunchBase(obj) {}
+    ~CCmdLaunchChrome(void) {}
 
     virtual bool Execute() override { return Launch(L"chrome \"$(TAB_PATH)\""); }
     virtual UINT GetCmdId() override { return cmdLaunchChrome; }
@@ -68,8 +68,8 @@ public:
 class CCmdLaunchSafari : public LaunchBase
 {
 public:
-    CCmdLaunchSafari(void * obj) : LaunchBase(obj){}
-    ~CCmdLaunchSafari(void){}
+    CCmdLaunchSafari(void * obj) : LaunchBase(obj) {}
+    ~CCmdLaunchSafari(void) {}
 
     virtual bool Execute() override { return Launch(L"safari \"$(TAB_PATH)\""); }
     virtual UINT GetCmdId() override { return cmdLaunchSafari; }
@@ -78,8 +78,8 @@ public:
 class CCmdLaunchOpera : public LaunchBase
 {
 public:
-    CCmdLaunchOpera(void * obj) : LaunchBase(obj){}
-    ~CCmdLaunchOpera(void){}
+    CCmdLaunchOpera(void * obj) : LaunchBase(obj) {}
+    ~CCmdLaunchOpera(void) {}
 
     virtual bool Execute() override { return Launch(L"opera \"$(TAB_PATH)\""); }
     virtual UINT GetCmdId() override { return cmdLaunchOpera; }
@@ -88,8 +88,8 @@ public:
 class CCmdLaunchSearch : public LaunchBase
 {
 public:
-    CCmdLaunchSearch(void * obj) : LaunchBase(obj){}
-    ~CCmdLaunchSearch(void){}
+    CCmdLaunchSearch(void * obj) : LaunchBase(obj) {}
+    ~CCmdLaunchSearch(void) {}
 
     virtual bool Execute() override
     {
@@ -104,8 +104,8 @@ public:
 class CCmdLaunchWikipedia : public LaunchBase
 {
 public:
-    CCmdLaunchWikipedia(void * obj) : LaunchBase(obj){}
-    ~CCmdLaunchWikipedia(void){}
+    CCmdLaunchWikipedia(void * obj) : LaunchBase(obj) {}
+    ~CCmdLaunchWikipedia(void) {}
 
     virtual bool Execute() override { return Launch(L"http://en.wikipedia.org/wiki/Special:Search?search=$(SEL_TEXT_ESCAPED)"); }
     virtual UINT GetCmdId() override { return cmdLaunchWikipedia; }
@@ -114,18 +114,24 @@ public:
 class CCmdLaunchConsole : public LaunchBase
 {
 public:
-    CCmdLaunchConsole(void * obj) : LaunchBase(obj){}
-    ~CCmdLaunchConsole(void){}
+    CCmdLaunchConsole(void * obj) : LaunchBase(obj) {}
+    ~CCmdLaunchConsole(void) {}
 
-    virtual bool Execute() override { return Launch(L"cmd /K cd /d \"$(TAB_DIR)\""); }
+    virtual bool Execute() override
+    {
+        if (HasActiveDocument() && !GetActiveDocument().m_path.empty())
+            return Launch(L"cmd /K cd /d \"$(TAB_DIR)\"");
+        else
+            return Launch(L"cmd /K");
+    }
     virtual UINT GetCmdId() override { return cmdLaunchConsole; }
 };
 
 class CCmdLaunchExplorer : public LaunchBase
 {
 public:
-    CCmdLaunchExplorer(void * obj) : LaunchBase(obj){}
-    ~CCmdLaunchExplorer(void){}
+    CCmdLaunchExplorer(void * obj) : LaunchBase(obj) {}
+    ~CCmdLaunchExplorer(void) {}
 
     virtual bool Execute() override { return Launch(L"explorer \"$(TAB_DIR)\""); }
     virtual UINT GetCmdId() override { return cmdLaunchExplorer; }
@@ -141,7 +147,7 @@ public:
         InvalidateUICommand(m_customCmdId, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
         InvalidateUICommand(m_customCmdId, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
     }
-    ~CCmdLaunchCustom(void){}
+    ~CCmdLaunchCustom(void) {}
 
     virtual bool Execute() override { return Launch(CIniSettings::Instance().GetString(L"CustomLaunch", m_settingsID.c_str(), L"")); }
     virtual UINT GetCmdId() override { return m_customCmdId; }
@@ -172,7 +178,7 @@ class CCmdCustomCommands : public ICommand
 {
 public:
     CCmdCustomCommands(void * obj) : ICommand(obj) {}
-    ~CCmdCustomCommands(void){}
+    ~CCmdCustomCommands(void) {}
 
     virtual bool Execute() override;
     virtual UINT GetCmdId() override { return cmdCustomCommands; }
