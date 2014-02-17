@@ -732,7 +732,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Scale Group="cmdGroupFind" Size="Large" />
                 <Scale Group="cmdGroupGoto" Size="Large" />
                 <Scale Group="cmdGroupComment" Size="Medium" />
-                <Scale Group="cmdGroupLines" Size="Large" />
                 <Scale Group="cmdGroupBlanks" Size="Medium" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
@@ -745,8 +744,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Scale Group="cmdGroupGoto" Size="Medium" />
               <Scale Group="cmdGroupGoto" Size="Small" />
               <Scale Group="cmdGroupComment" Size="Small" />
-              <Scale Group="cmdGroupLines" Size="Medium" />
-              <Scale Group="cmdGroupLines" Size="Small" />
               <Scale Group="cmdGroupBlanks" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
@@ -840,14 +837,14 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
           </Group>
-          <Group CommandName="cmdGroupLines" SizeDefinition="FiveButtons">
-            <Button CommandName="cmdLineDuplicate" />
-            <Button CommandName="cmdLineUp" />
-            <Button CommandName="cmdLineDown" />
-            <Button CommandName="cmdLineSplit" />
-            <Button CommandName="cmdLineJoin" />
-          </Group>
-          <Group CommandName="cmdGroupBlanks" SizeDefinition="SevenButtons">
+          <Group CommandName="cmdGroupBlanks" SizeDefinition="EightButtons">
+            <SplitButton CommandName="cmdGroupLines">
+              <Button CommandName="cmdLineDuplicate" />
+              <Button CommandName="cmdLineUp" />
+              <Button CommandName="cmdLineDown" />
+              <Button CommandName="cmdLineSplit" />
+              <Button CommandName="cmdLineJoin" />
+            </SplitButton>
             <Button CommandName="cmdTrim" />
             <Button CommandName="cmdTabs2Spaces" />
             <Button CommandName="cmdSpaces2Tabs" />
