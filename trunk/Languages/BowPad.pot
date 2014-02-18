@@ -202,6 +202,10 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#. Resource IDs: (11)
+msgid "Cancel\nThe file is not created."
+msgstr ""
+
 #. Resource IDs: (8)
 msgid "Cancel\nThe file is not loaded again."
 msgstr ""
@@ -380,6 +384,10 @@ msgstr ""
 
 #. Resource IDs: (9)
 msgid "Could not download the language file!"
+msgstr ""
+
+#. Resource IDs: (11)
+msgid "Create\nAn empty file is created."
 msgstr ""
 
 #. Resource IDs: (3752)
@@ -569,6 +577,10 @@ msgstr ""
 
 #. Resource IDs: (3751)
 msgid "File"
+msgstr ""
+
+#. Resource IDs: (11)
+msgid "File does not exist"
 msgstr ""
 
 #. Resource IDs: (7)
@@ -908,10 +920,6 @@ msgstr ""
 msgid "Online Languages"
 msgstr ""
 
-#. Resource IDs: (3752)
-msgid "Open"
-msgstr ""
-
 #. Resource IDs: (3769)
 msgid "Open Console"
 msgstr ""
@@ -1086,6 +1094,10 @@ msgstr ""
 
 #. Resource IDs: (3759)
 msgid "Right margin"
+msgstr ""
+
+#. Resource IDs: (3772)
+msgid "Run"
 msgstr ""
 
 #. Resource IDs: (3753)
@@ -1273,6 +1285,11 @@ msgstr ""
 #. Resource IDs: (8)
 #, c-format
 msgid "The document '%s' was removed outside of BowPad."
+msgstr ""
+
+#. Resource IDs: (11)
+#, c-format
+msgid "The file '%s' does not exist. Do you want to create it?"
 msgstr ""
 
 #. Resource IDs: (3764)
