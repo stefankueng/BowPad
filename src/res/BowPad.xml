@@ -486,7 +486,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/PlayL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchGroup" LabelTitle="Open">
+    <Command Name="cmdLaunchGroup" LabelTitle="Run">
       <Command.LargeImages>
         <Image>res/PlayL.bmp</Image>
       </Command.LargeImages>
