@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-02-09 19:32+0100\n"
+"PO-Revision-Date: 2014-02-18 20:50+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -47,8 +47,8 @@ msgid "&File"
 msgstr "&Datei"
 
 #. Resource IDs: (1001)
-msgid "&Find Next"
-msgstr "&Finde nächstes"
+msgid "&Find"
+msgstr "&Suchen"
 
 #. Resource IDs: (65535)
 msgid "&Help"
@@ -206,6 +206,14 @@ msgstr "CU"
 #. Resource IDs: (2)
 msgid "Cancel"
 msgstr "Abbrechen"
+
+#. Resource IDs: (11)
+msgid ""
+"Cancel\n"
+"The file is not created."
+msgstr ""
+"Abbrechen\n"
+"Die Datei wird nicht erstellt."
 
 #. Resource IDs: (8)
 msgid ""
@@ -396,6 +404,14 @@ msgstr "Entsprechende Datei"
 #. Resource IDs: (9)
 msgid "Could not download the language file!"
 msgstr "Konnte die Sprachdatei nicht downloaden!"
+
+#. Resource IDs: (11)
+msgid ""
+"Create\n"
+"An empty file is created."
+msgstr ""
+"Erstellen\n"
+"Eine leere Datei wird erstellt."
 
 #. Resource IDs: (3752)
 msgid "Creates a new tab with an empty document"
@@ -616,6 +632,10 @@ msgstr "Hole Sprachliste von Server..."
 msgid "File"
 msgstr "Datei"
 
+#. Resource IDs: (11)
+msgid "File does not exist"
+msgstr "Datei nicht gefunden"
+
 #. Resource IDs: (7)
 msgid "File is too big to be opened by BowPad"
 msgstr "Datei ist zu gross um mit BowPad geöffnet zu werden"
@@ -632,8 +652,8 @@ msgstr "Suche && Ersetze"
 msgid "Find &All"
 msgstr "Suchen &Alle"
 
-#. Resource IDs: (1066)
-msgid "Find All In All Open &Tabs"
+#. Resource IDs: (10)
+msgid "Find All In All &Tabs"
 msgstr "Finde Alle in allen &Tabs"
 
 #. Resource IDs: (3758)
@@ -968,10 +988,6 @@ msgstr "OK"
 msgid "Online Languages"
 msgstr "Online Sprachen"
 
-#. Resource IDs: (3752)
-msgid "Open"
-msgstr "Öffnen"
-
 #. Resource IDs: (3769)
 msgid "Open Console"
 msgstr "Öffne Konsole"
@@ -1159,13 +1175,17 @@ msgstr "Entfernt alle Lesezeichen aus dem aktuellen Dokument"
 msgid "Removes whitespaces at the end of lines"
 msgstr "Entfernt Leerzeichen am Ende von Zeilen"
 
-#. Resource IDs: (1004)
-msgid "Replace A&ll"
-msgstr "A&lle ersetzen"
+#. Resource IDs: (11)
+msgid "Replace &All"
+msgstr "Alle E&rsetzen"
 
 #. Resource IDs: (3759)
 msgid "Right margin"
 msgstr "Rechter Rand"
+
+#. Resource IDs: (3772)
+msgid "Run"
+msgstr "Ausführen"
 
 #. Resource IDs: (3753)
 msgid "S"
@@ -1369,6 +1389,11 @@ msgstr "Das Dokument '%s' wurde ausserhalb von BowPad verändert."
 #, c-format
 msgid "The document '%s' was removed outside of BowPad."
 msgstr "Das Dokument '%s' wurde ausserhalb von BowPad gelöscht."
+
+#. Resource IDs: (11)
+#, c-format
+msgid "The file '%s' does not exist. Do you want to create it?"
+msgstr "Die Datei '%s' existiert nicht. Möchten Sie die Datei jetzt erstellen?"
 
 #. Resource IDs: (3764)
 msgid "Titlecase"
@@ -1600,6 +1625,12 @@ msgstr "Führt den Benutzerbefehl 9 aus"
 #. Resource IDs: (3760)
 msgid "tab size"
 msgstr "Tabulatorgrösse"
+
+#~ msgid "&Find Next"
+#~ msgstr "&Finde nächstes"
+
+#~ msgid "Open"
+#~ msgstr "Öffnen"
 
 #~ msgid "Turns showing whitespaces on/off"
 #~ msgstr "Schaltet die Anzeige von Leerzeichen ein/aus"
