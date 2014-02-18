@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -173,34 +173,34 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
             WORD ctrlkeys = (GetKeyState(VK_CONTROL)&0x8000) ? 0x08 : 0;
             ctrlkeys |= (GetKeyState(VK_SHIFT)&0x8000) ? 0x04 : 0;
             ctrlkeys |= (GetKeyState(VK_MENU)&0x8000) ? 0x10 : 0;
-            for (auto accel : m_accelerators)
+            for (auto accel = m_accelerators.crbegin(); accel != m_accelerators.crend(); ++accel)
             {
-                if (accel.fVirt == ctrlkeys)
+                if (accel->fVirt == ctrlkeys)
                 {
-                    if ((m_lastKey == 0) && (accel.key1 == wParam))
+                    if ((m_lastKey == 0) && (accel->key1 == wParam))
                     {
-                        if (accel.key2 == 0)
+                        if (accel->key2 == 0)
                         {
                             // execute the command
                             if (GetForegroundWindow() == hwnd)
                             {
-                                SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(accel.cmd, 1), 0);
+                                SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(accel->cmd, 1), 0);
                                 m_lastKey = 0;
                                 return TRUE;
                             }
                         }
                         else
                         {
-                            m_lastKey = accel.key1;
+                            m_lastKey = accel->key1;
                             return TRUE;
                         }
                     }
-                    else if ((m_lastKey == accel.key1) && (accel.key2 == wParam))
+                    else if ((m_lastKey == accel->key1) && (accel->key2 == wParam))
                     {
                         // execute the command
                         if (GetForegroundWindow() == hwnd)
                         {
-                            SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(accel.cmd, 1), 0);
+                            SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(accel->cmd, 1), 0);
                             m_lastKey = 0;
                             return TRUE;
                         }
