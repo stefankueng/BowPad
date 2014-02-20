@@ -828,9 +828,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             </DropDownButton>
           </Group>
           <Group CommandName="cmdGroupComment" SizeDefinition="FourButtons">
+            <Button CommandName="cmdHeaderSource" />
             <Button CommandName="cmdComment" />
             <Button CommandName="cmdUnComment" />
-            <Button CommandName="cmdHeaderSource" />
             <DropDownGallery CommandName="cmdCodeStyle" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <FlowMenuLayout Columns="4"/>
