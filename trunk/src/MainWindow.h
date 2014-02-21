@@ -71,6 +71,7 @@ protected:
     LRESULT CALLBACK            WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     void                        AutoIndent(Scintilla::SCNotification * pScn);
+    bool                        AskToCreateNonExistingFile(const std::wstring& path);
 
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
     LRESULT                     DoCommand(int id);

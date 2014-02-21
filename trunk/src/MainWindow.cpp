@@ -389,10 +389,13 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     CCmdLineParser parser((LPCWSTR)cds->lpData);
                     if (parser.HasVal(L"path"))
                     {
-                        OpenFile(parser.GetVal(L"path"), true);
-                        if (parser.HasVal(L"line"))
+                        if (AskToCreateNonExistingFile(parser.GetVal(L"path")))
                         {
-                            GoToLine(parser.GetLongVal(L"line") - 1);
+                            OpenFile(parser.GetVal(L"path"), true);
+                            if (parser.HasVal(L"line"))
+                            {
+                                GoToLine(parser.GetLongVal(L"line") - 1);
+                            }
                         }
                     }
                     else
@@ -406,7 +409,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             for (int i = 1; i < nArgs; i++)
                             {
                                 if (szArglist[i][0] != '/')
+                                {
+                                    if (!AskToCreateNonExistingFile(szArglist[i]))
+                                        continue;
                                     OpenFile(szArglist[i], true);
+                                }
                             }
                             if (parser.HasVal(L"line"))
                             {
@@ -478,46 +485,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         CCommandHandler::Instance().AfterInit();
         for (const auto& path : m_pathsToOpen)
         {
-            if (!PathFileExists(path.first.c_str()))
-            {
-                ResString rTitle(hRes, IDS_FILE_DOESNT_EXIST);
-                ResString rQuestion(hRes, IDS_FILE_ASK_TO_CREATE);
-                ResString rCreate(hRes, IDS_FILE_CREATE);
-                ResString rCancel(hRes, IDS_FILE_CREATE_CANCEL);
-                std::wstring sQuestion = CStringUtils::Format(rQuestion, path.first.substr(path.first.find_last_of('\\') + 1).c_str());
-
-                TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-                TASKDIALOG_BUTTON aCustomButtons[2];
-                int bi = 0;
-                aCustomButtons[bi].nButtonID = bi + 100;
-                aCustomButtons[bi++].pszButtonText = rCreate;
-                aCustomButtons[bi].nButtonID = bi + 100;
-                aCustomButtons[bi++].pszButtonText = rCancel;
-
-                tdc.hwndParent = *this;
-                tdc.hInstance = hRes;
-                tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-                tdc.pButtons = aCustomButtons;
-                tdc.cButtons = _countof(aCustomButtons);
-                tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-                tdc.pszMainIcon = TD_INFORMATION_ICON;
-                tdc.pszMainInstruction = rTitle;
-                tdc.pszContent = sQuestion.c_str();
-                tdc.nDefaultButton = 100;
-                int nClickedBtn = 0;
-                HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
-
-                if (SUCCEEDED(hr) && (nClickedBtn == 100))
-                {
-                    HANDLE hFile = CreateFile(path.first.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-                    if (hFile != INVALID_HANDLE_VALUE)
-                    {
-                        CloseHandle(hFile);
-                    }
-                }
-                else
-                    continue;
-            }
+            if (!AskToCreateNonExistingFile(path.first))
+                continue;
             OpenFile(path.first, m_bPathsToOpenMRU);
             if (path.second != (size_t)-1)
                 GoToLine(path.second);
@@ -1810,7 +1779,7 @@ bool CMainWindow::HandleOutsideModifications( int id /*= -1*/ )
             tdc.pszMainIcon = doc.m_bNeedsSaving || doc.m_bIsDirty ? TD_WARNING_ICON : TD_INFORMATION_ICON;
             tdc.pszMainInstruction = rTitle;
             tdc.pszContent = sQuestion.c_str();
-            tdc.nDefaultButton = 100;
+            tdc.nDefaultButton = doc.m_bNeedsSaving || doc.m_bIsDirty ? 102 : 100;  // default to "Cancel" in case the file is modified
             int nClickedBtn = 0;
             HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
 
@@ -1978,4 +1947,49 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
         // delete the temp file
         DeleteFile(path.c_str());
     }
+}
+
+bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path)
+{
+    if (!PathFileExists(path.c_str()))
+    {
+        ResString rTitle(hRes, IDS_FILE_DOESNT_EXIST);
+        ResString rQuestion(hRes, IDS_FILE_ASK_TO_CREATE);
+        ResString rCreate(hRes, IDS_FILE_CREATE);
+        ResString rCancel(hRes, IDS_FILE_CREATE_CANCEL);
+        std::wstring sQuestion = CStringUtils::Format(rQuestion, path.substr(path.find_last_of('\\') + 1).c_str());
+
+        TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+        TASKDIALOG_BUTTON aCustomButtons[2];
+        int bi = 0;
+        aCustomButtons[bi].nButtonID = bi + 100;
+        aCustomButtons[bi++].pszButtonText = rCreate;
+        aCustomButtons[bi].nButtonID = bi + 100;
+        aCustomButtons[bi++].pszButtonText = rCancel;
+
+        tdc.hwndParent = *this;
+        tdc.hInstance = hRes;
+        tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+        tdc.pButtons = aCustomButtons;
+        tdc.cButtons = _countof(aCustomButtons);
+        tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+        tdc.pszMainIcon = TD_INFORMATION_ICON;
+        tdc.pszMainInstruction = rTitle;
+        tdc.pszContent = sQuestion.c_str();
+        tdc.nDefaultButton = 100;
+        int nClickedBtn = 0;
+        HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
+
+        if (SUCCEEDED(hr) && (nClickedBtn == 100))
+        {
+            HANDLE hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (hFile != INVALID_HANDLE_VALUE)
+            {
+                CloseHandle(hFile);
+            }
+        }
+        else
+            return false;
+    }
+    return true;
 }
