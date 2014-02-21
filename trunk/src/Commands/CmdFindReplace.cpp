@@ -157,19 +157,19 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
                         else if (pDropDown->hdr.hwndFrom == GetDlgItem(*this, IDC_REPLACEBTN))
                         {
                             ResString sReplaceAll(hRes, IDS_REPLACEALL);
-                            AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_FINDALL, sReplaceAll);
+                            AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_REPLACEALLBTN, sReplaceAll);
                         }
                         // Display the menu.
                         TrackPopupMenu(hSplitMenu, TPM_LEFTALIGN | TPM_TOPALIGN, pt.x, pt.y, 0, *this, NULL);
                         return TRUE;
                     }
-                        break;
+                    break;
                 }
                 break;
-        }
-        break;
-    default:
-        return FALSE;
+            }
+            break;
+        default:
+            return FALSE;
     }
     return FALSE;
 }
@@ -565,6 +565,25 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
         break;
     case IDC_FINDBTN:
         {
+            if (GetFocus() == GetDlgItem(*this, IDC_FINDRESULTS))
+            {
+                int selIndex = ListView_GetSelectionMark(GetDlgItem(*this, IDC_FINDRESULTS));
+                if (!m_searchResults.empty() && (selIndex >= 0) && (selIndex < m_searchResults.size()))
+                {
+                    int tab = GetActiveTabIndex();
+                    int docID = GetDocIDFromTabIndex(tab);
+                    if (docID != m_searchResults[selIndex].docID)
+                    {
+                        int tabtoopen = GetTabIndexFromDocID(m_searchResults[selIndex].docID);
+                        if (tabtoopen >= 0)
+                            TabActivateAt(tabtoopen);
+                        else
+                            break;
+                    }
+                    ScintillaCall(SCI_GOTOLINE, m_searchResults[selIndex].line);
+                    Center((long)m_searchResults[selIndex].pos, (long)m_searchResults[selIndex].pos);
+                }
+            }
             DoSearch();
         }
         break;
@@ -823,6 +842,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
         ScintillaCall(SCI_GOTOLINE, m_searchResults[0].line);
         Center((long)m_searchResults[0].pos, (long)m_searchResults[0].pos);
     }
+    SendMessage(*this, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(*this, IDC_FINDRESULTS), TRUE);
 }
 
 void CFindReplaceDlg::SearchDocument(int docID, const CDocument& doc, const std::string& searchfor, int searchflags)
