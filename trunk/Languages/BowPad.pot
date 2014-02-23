@@ -118,6 +118,10 @@ msgstr ""
 msgid "An update for BowPad is available"
 msgstr ""
 
+#. Resource IDs: (11)
+msgid "Are you sure you want to reload?"
+msgstr ""
+
 #. Resource IDs: (3753)
 msgid "Asks where to save the current tab"
 msgstr ""
@@ -210,16 +214,16 @@ msgstr ""
 msgid "Cancel\nThe file is not loaded again."
 msgstr ""
 
+#. Resource IDs: (11)
+msgid "Cancel\nThe unsaved modifications are kept."
+msgstr ""
+
 #. Resource IDs: (3764)
 msgid "Char operations"
 msgstr ""
 
 #. Resource IDs: (1027)
 msgid "Check for Updates"
-msgstr ""
-
-#. Resource IDs: (2)
-msgid "Cl&ose"
 msgstr ""
 
 #. Resource IDs: (3765)
@@ -928,6 +932,14 @@ msgstr ""
 msgid "Open Explorer"
 msgstr ""
 
+#. Resource IDs: (3781)
+msgid "Open File"
+msgstr ""
+
+#. Resource IDs: (3781)
+msgid "Open File under cursor"
+msgstr ""
+
 #. Resource IDs: (3752)
 msgid "Open Files"
 msgstr ""
@@ -990,6 +1002,10 @@ msgstr ""
 
 #. Resource IDs: (3769)
 msgid "Opens the default browser to search for the selected text"
+msgstr ""
+
+#. Resource IDs: (3781)
+msgid "Opens the file/path that's at the cursor position"
 msgstr ""
 
 #. Resource IDs: (3766)
@@ -1078,6 +1094,10 @@ msgstr ""
 
 #. Resource IDs: (3765)
 msgid "Reload the file from disk"
+msgstr ""
+
+#. Resource IDs: (11)
+msgid "Reload\nThe unsaved modifications are lost!"
 msgstr ""
 
 #. Resource IDs: (3765)
