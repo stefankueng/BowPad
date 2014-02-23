@@ -61,7 +61,6 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             m_resizer.AddControl(hwndDlg, IDC_MATCHREGEX, RESIZER_TOPLEFT);
             m_resizer.AddControl(hwndDlg, IDC_FINDBTN, RESIZER_TOPRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_REPLACEBTN, RESIZER_TOPRIGHT);
-            m_resizer.AddControl(hwndDlg, IDCANCEL, RESIZER_TOPRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_FINDRESULTS, RESIZER_TOPLEFTBOTTOMRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_SEARCHINFO, RESIZER_TOPLEFTRIGHT);
             m_freeresize = true;
@@ -537,10 +536,10 @@ RECT CFindReplaceDlg::DrawListColumnBackground(NMLVCUSTOMDRAW * pLVCD)
 
 void CFindReplaceDlg::ShowResults(bool bShow)
 {
-    RECT windowRect, cancelRect;
+    RECT windowRect, infoRect;
     GetWindowRect(*this, &windowRect);
-    GetWindowRect(GetDlgItem(*this, IDCANCEL), &cancelRect);
-    int height = cancelRect.bottom - windowRect.top;
+    GetWindowRect(GetDlgItem(*this, IDC_SEARCHINFO), &infoRect);
+    int height = infoRect.bottom - windowRect.top;
     if (bShow)
     {
         MoveWindow(*this, windowRect.left, windowRect.top, windowRect.right - windowRect.left, height + 300, TRUE);
