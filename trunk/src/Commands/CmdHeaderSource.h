@@ -70,11 +70,12 @@ public:
             size_t dotpos = resname.find_last_of('.');
             if ((dotpos != std::wstring::npos) && ((dotpos + 1) < resname.size()))
                 ext = resname.substr(dotpos + 1);
-            std::transform(respath.begin(), respath.end(), respath.begin(), ::tolower);
+            std::wstring lowerrespath = respath;
+            std::transform(lowerrespath.begin(), lowerrespath.end(), lowerrespath.begin(), ::tolower);
             std::wstring lowerresname = resname;
             std::transform(lowerresname.begin(), lowerresname.end(), lowerresname.begin(), ::tolower);
 
-            if (respath.compare(path) == 0)
+            if (lowerrespath.compare(path) == 0)
                 continue;
             std::wstring sub = lowerresname.substr(0, plainname.size());
             if (plainname.compare(sub) == 0)
