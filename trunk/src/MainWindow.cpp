@@ -1496,9 +1496,9 @@ bool CMainWindow::ReloadTab( int tab, int encoding )
             // * cancel
             m_TabBar.ActivateAt(tab);
             ResString rTitle(hRes, IDS_HASMODIFICATIONS);
-            ResString rQuestion(hRes, IDS_DOYOUWANTOSAVE);
-            ResString rSave(hRes, IDS_SAVE);
-            ResString rDontSave(hRes, IDS_DONTSAVE);
+            ResString rQuestion(hRes, IDS_RELOADREALLY);
+            ResString rReload(hRes, IDS_DORELOAD);
+            ResString rCancel(hRes, IDS_DONTRELOAD);
             wchar_t buf[100] = {0};
             m_TabBar.GetCurrentTitle(buf, _countof(buf));
             std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
@@ -1506,32 +1506,27 @@ bool CMainWindow::ReloadTab( int tab, int encoding )
             TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
             TASKDIALOG_BUTTON aCustomButtons[2];
             aCustomButtons[0].nButtonID = 100;
-            aCustomButtons[0].pszButtonText = rSave;
+            aCustomButtons[0].pszButtonText = rReload;
             aCustomButtons[1].nButtonID = 101;
-            aCustomButtons[1].pszButtonText = rDontSave;
+            aCustomButtons[1].pszButtonText = rCancel;
 
             tdc.hwndParent = *this;
             tdc.hInstance = hRes;
-            tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
             tdc.pButtons = aCustomButtons;
             tdc.cButtons = _countof(aCustomButtons);
             tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
             tdc.pszMainIcon = TD_INFORMATION_ICON;
             tdc.pszMainInstruction = rTitle;
             tdc.pszContent = sQuestion.c_str();
-            tdc.nDefaultButton = 100;
+            tdc.nDefaultButton = 101;
             int nClickedBtn = 0;
             HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
 
-            if (SUCCEEDED(hr))
+            if (SUCCEEDED(hr) && (nClickedBtn != 100))
             {
-                if (nClickedBtn == 100)
-                    SaveCurrentTab();
-                else if (nClickedBtn != 101)
-                {
-                    m_TabBar.ActivateAt(tab);
-                    return false;  // don't close!
-                }
+                m_TabBar.ActivateAt(tab);
+                return false;  // don't close!
             }
 
             m_TabBar.ActivateAt(tab);
