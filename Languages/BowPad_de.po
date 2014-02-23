@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-02-18 20:50+0100\n"
+"PO-Revision-Date: 2014-02-23 16:26+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -123,6 +123,10 @@ msgstr "Erlaubt das Laden einer Datei mit einer bestimmten Kodierung"
 msgid "An update for BowPad is available"
 msgstr "Ein Update für BowPad ist erhältlich"
 
+#. Resource IDs: (11)
+msgid "Are you sure you want to reload?"
+msgstr "Möchten Sie die Datei wirklich neu laden?"
+
 #. Resource IDs: (3753)
 msgid "Asks where to save the current tab"
 msgstr "Fragt nach wo der aktuelle Tab gespeichert werden soll"
@@ -223,6 +227,14 @@ msgstr ""
 "Abbrechen\n"
 "Die Datei wird nicht neu geladen"
 
+#. Resource IDs: (11)
+msgid ""
+"Cancel\n"
+"The unsaved modifications are kept."
+msgstr ""
+"Abbrechen\n"
+"Nicht gespeicherte Änderungen bleiben vorhanden."
+
 #. Resource IDs: (3764)
 msgid "Char operations"
 msgstr "Zeichenoperationen"
@@ -230,10 +242,6 @@ msgstr "Zeichenoperationen"
 #. Resource IDs: (1027)
 msgid "Check for Updates"
 msgstr "Auf Updates überprüfen"
-
-#. Resource IDs: (2)
-msgid "Cl&ose"
-msgstr "&Schliessen"
 
 #. Resource IDs: (3765)
 msgid "Clear Bookmarks"
@@ -996,6 +1004,14 @@ msgstr "Öffne Konsole"
 msgid "Open Explorer"
 msgstr "Öffne Explorer"
 
+#. Resource IDs: (3781)
+msgid "Open File"
+msgstr "Öffne Datei"
+
+#. Resource IDs: (3781)
+msgid "Open File under cursor"
+msgstr "Öffne Datei an Cursorposition"
+
 #. Resource IDs: (3752)
 msgid "Open Files"
 msgstr "Öffne Dateien"
@@ -1070,6 +1086,10 @@ msgstr "Sucht nach dem markierten Text in Wikipedia"
 #. Resource IDs: (3769)
 msgid "Opens the default browser to search for the selected text"
 msgstr "Sucht mit dem Standardbrowser nach dem markierten Text"
+
+#. Resource IDs: (3781)
+msgid "Opens the file/path that's at the cursor position"
+msgstr "Öffnet die Datei/Pfad welche an der Cursorposition steht"
 
 #. Resource IDs: (3766)
 msgid "P"
@@ -1166,6 +1186,14 @@ msgstr ""
 #. Resource IDs: (3765)
 msgid "Reload the file from disk"
 msgstr "Datei von Medium neu laden"
+
+#. Resource IDs: (11)
+msgid ""
+"Reload\n"
+"The unsaved modifications are lost!"
+msgstr ""
+"Dokument neu laden\n"
+"Nicht gespeicherte Änderungen gehen verloren."
 
 #. Resource IDs: (3765)
 msgid "Removes all bookmarks from the current file"
@@ -1625,6 +1653,9 @@ msgstr "Führt den Benutzerbefehl 9 aus"
 #. Resource IDs: (3760)
 msgid "tab size"
 msgstr "Tabulatorgrösse"
+
+#~ msgid "Cl&ose"
+#~ msgstr "&Schliessen"
 
 #~ msgid "&Find Next"
 #~ msgstr "&Finde nächstes"
