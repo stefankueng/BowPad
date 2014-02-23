@@ -662,6 +662,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/AutoBraces.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdOpenSelection" LabelTitle="Open File" TooltipTitle="Open File under cursor" TooltipDescription="Opens the file/path that's at the cursor position">
+      <Command.SmallImages>
+        <Image>res/OpenL.bmp</Image>
+      </Command.SmallImages>
+    </Command>
 
 
     <Command Name="cmdContextMap" />
@@ -1020,6 +1025,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdUppercase" />
             <Button CommandName="cmdLowercase" />
             <Button CommandName="cmdTitlecase" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdOpenSelection" />
           </MenuGroup>
         </ContextMenu>
         <ContextMenu Name="TabContextMenu">

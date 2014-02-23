@@ -47,6 +47,7 @@
 #include "CmdSession.h"
 #include "CmdFunctions.h"
 #include "CmdFont.h"
+#include "CmdOpenSelection.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -230,6 +231,8 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdHeaderSource(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdOpenSelection(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdLaunchIE(obj);
