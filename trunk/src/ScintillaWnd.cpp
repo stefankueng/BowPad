@@ -370,7 +370,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_STYLESETFORE, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
     Call(SCI_STYLESETBACK, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOW)));
 
-    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
+    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_GRAYTEXT)));
     Call(SCI_STYLESETBACK, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
 
     Call(SCI_INDICSETSTYLE, INDIC_SELECTION_MARK, INDIC_ROUNDBOX);
