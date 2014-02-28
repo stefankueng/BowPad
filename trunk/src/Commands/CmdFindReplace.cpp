@@ -48,6 +48,13 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
     case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
+
+            // position the find dialog in the top right corner
+            RECT rcScintilla, rcDlg;
+            GetWindowRect(GetScintillaWnd(), &rcScintilla);
+            GetWindowRect(hwndDlg, &rcDlg);
+            SetWindowPos(hwndDlg, HWND_TOP, rcScintilla.right - (rcDlg.right - rcDlg.left), rcScintilla.top, 0, 0, SWP_NOSIZE | SWP_SHOWWINDOW);
+
             AdjustControlSize(IDC_MATCHWORD);
             AdjustControlSize(IDC_MATCHCASE);
             AdjustControlSize(IDC_MATCHREGEX);
