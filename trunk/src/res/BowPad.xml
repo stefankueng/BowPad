@@ -398,8 +398,16 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
 
     <Command Name="cmdGroupBlanks" LabelTitle="Char operations">
+      <Command.LargeImages>
+        <Image>res/TrimL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdWhitespacecombo" LabelTitle="Whitespaces" Keytip="W">
+      <Command.LargeImages>
+        <Image>res/WhitespaceL.bmp</Image>
+      </Command.LargeImages>
       <Command.SmallImages>
-        <Image>res/TrimS.bmp</Image>
+        <Image>res/WhitespaceS.bmp</Image>
       </Command.SmallImages>
     </Command>
     <Command Name="cmdTrim" LabelTitle="Trim Whitespaces" TooltipTitle="Trim Whitespaces" TooltipDescription="Removes whitespaces at the end of lines" Keytip="T">
@@ -737,7 +745,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Scale Group="cmdGroupFind" Size="Large" />
                 <Scale Group="cmdGroupGoto" Size="Large" />
                 <Scale Group="cmdGroupComment" Size="Medium" />
-                <Scale Group="cmdGroupBlanks" Size="Medium" />
+                <Scale Group="cmdGroupBlanks" Size="Large" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
               resized. -->
@@ -749,6 +757,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Scale Group="cmdGroupGoto" Size="Medium" />
               <Scale Group="cmdGroupGoto" Size="Small" />
               <Scale Group="cmdGroupComment" Size="Small" />
+              <Scale Group="cmdGroupBlanks" Size="Medium" />
               <Scale Group="cmdGroupBlanks" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
@@ -842,7 +851,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
           </Group>
-          <Group CommandName="cmdGroupBlanks" SizeDefinition="EightButtons">
+          <Group CommandName="cmdGroupBlanks" SizeDefinition="FiveOrSixButtons">
             <SplitButton CommandName="cmdGroupLines">
               <Button CommandName="cmdLineDuplicate" />
               <Button CommandName="cmdLineUp" />
@@ -850,9 +859,16 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Button CommandName="cmdLineSplit" />
               <Button CommandName="cmdLineJoin" />
             </SplitButton>
-            <Button CommandName="cmdTrim" />
-            <Button CommandName="cmdTabs2Spaces" />
-            <Button CommandName="cmdSpaces2Tabs" />
+            <DropDownButton CommandName="cmdWhitespacecombo">
+              <MenuGroup>
+                <Button CommandName="cmdTrim" />
+                <Button CommandName="cmdTabs2Spaces" />
+                <Button CommandName="cmdSpaces2Tabs" />
+              </MenuGroup>
+              <MenuGroup>
+                <ToggleButton CommandName="cmdWhiteSpace" />
+              </MenuGroup>
+            </DropDownButton>
             <DropDownButton CommandName="cmdEOLGroup">
               <MenuGroup>
                 <ToggleButton CommandName="cmdEOLWin"/>
