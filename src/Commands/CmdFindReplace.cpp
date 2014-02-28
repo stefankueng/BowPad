@@ -162,8 +162,14 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
                         }
                         else if (pDropDown->hdr.hwndFrom == GetDlgItem(*this, IDC_REPLACEBTN))
                         {
+                            size_t selStart = ScintillaCall(SCI_GETSELECTIONSTART);
+                            size_t selEnd = ScintillaCall(SCI_GETSELECTIONEND);
+                            size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+                            size_t lineend = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+
                             ResString sReplaceAll(hRes, IDS_REPLACEALL);
-                            AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_REPLACEALLBTN, sReplaceAll);
+                            ResString sReplaceAllInSelection(hRes, IDS_REPLACEALLINSELECTION);
+                            AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_REPLACEALLBTN, linestart != lineend ? sReplaceAllInSelection : sReplaceAll);
                         }
                         // Display the menu.
                         TrackPopupMenu(hSplitMenu, TPM_LEFTALIGN | TPM_TOPALIGN, pt.x, pt.y, 0, *this, NULL);
