@@ -76,6 +76,7 @@ protected:
     void                GotoBrace();
 
     HWND                GetHwnd();
+    HWND                GetScintillaWnd();
     UINT                GetTimerID() { return m_nextTimerID++; }
     bool                OpenFile(LPCWSTR file, bool bAddToMRU);
     bool                ReloadTab(int tab, int encoding);

@@ -139,6 +139,12 @@ HWND ICommand::GetHwnd()
     return *pMainWnd;
 }
 
+HWND ICommand::GetScintillaWnd()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_scintilla;
+}
+
 bool ICommand::OpenFile(LPCWSTR file, bool bAddToMRU)
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
