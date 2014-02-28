@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -210,9 +210,14 @@ void CMRU::AddPath( const std::wstring& path )
         Load();
 
     bool pinned = false;
+    std::wstring lpath = path;
+    std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::tolower);
+
     for (auto it = m_mruVec.begin(); it != m_mruVec.end(); ++it)
     {
-        if (path.compare(std::get<0>(*it))==0)
+        std::wstring lp = std::get<0>(*it);
+        std::transform(lp.begin(), lp.end(), lp.begin(), ::tolower);
+        if (lpath.compare(lp) == 0)
         {
             pinned = std::get<1>(*it);
             m_mruVec.erase(it);
@@ -240,9 +245,13 @@ void CMRU::RemovePath( const std::wstring& path, bool removeEvenIfPinned )
     if (!m_bLoaded)
         Load();
 
+    std::wstring lpath = path;
+    std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::tolower);
     for (auto it = m_mruVec.begin(); it != m_mruVec.end(); ++it)
     {
-        if (path.compare(std::get<0>(*it))==0)
+        std::wstring lp = std::get<0>(*it);
+        std::transform(lp.begin(), lp.end(), lp.begin(), ::tolower);
+        if (lpath.compare(lp) == 0)
         {
             if (removeEvenIfPinned || !std::get<1>(*it))
                 m_mruVec.erase(it);
