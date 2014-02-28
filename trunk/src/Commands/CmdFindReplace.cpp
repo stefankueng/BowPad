@@ -638,8 +638,23 @@ void CFindReplaceDlg::SetInfoText( UINT resid )
 void CFindReplaceDlg::DoReplace( int id )
 {
     SetDlgItemText(*this, IDC_SEARCHINFO, L"");
-    ScintillaCall(SCI_SETTARGETSTART, id==IDC_REPLACEBTN ? ScintillaCall(SCI_GETSELECTIONSTART): 0);
-    ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
+
+    size_t selStart = ScintillaCall(SCI_GETSELECTIONSTART);
+    size_t selEnd = ScintillaCall(SCI_GETSELECTIONEND);
+    size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+    size_t lineend = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    bool bReplaceOnlyInSelection = (linestart != lineend) && (id == IDC_REPLACEALLBTN);
+
+    if (bReplaceOnlyInSelection)
+    {
+        ScintillaCall(SCI_SETTARGETSTART, selStart);
+        ScintillaCall(SCI_SETTARGETEND, selEnd);
+    }
+    else
+    {
+        ScintillaCall(SCI_SETTARGETSTART, id == IDC_REPLACEBTN ? selStart : 0);
+        ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
+    }
 
     auto findText = GetDlgItemText(IDC_SEARCHCOMBO);
     sFindString = CUnicodeUtils::StdGetUTF8(findText.get());
@@ -675,7 +690,10 @@ void CFindReplaceDlg::DoReplace( int id )
                 Center((long)ScintillaCall(SCI_GETTARGETSTART), (long)ScintillaCall(SCI_GETTARGETEND));
 
             ScintillaCall(SCI_SETTARGETSTART, ScintillaCall(SCI_GETTARGETEND));
-            ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
+            if (bReplaceOnlyInSelection)
+                ScintillaCall(SCI_SETTARGETEND, selEnd);
+            else
+                ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
         }
     } while ((id==IDC_REPLACEALLBTN) && (findRet != -1));
     ScintillaCall(SCI_ENDUNDOACTION);
