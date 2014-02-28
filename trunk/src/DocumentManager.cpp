@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -88,6 +88,7 @@ void CDocumentManager::AddDocumentAtEnd( CDocument doc, int id )
 CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int encoding)
 {
     CDocument doc;
+    std::wstring sFileName = CPathUtils::GetFileName(path);
     CAutoFile hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (!hFile.IsValid())
     {
@@ -148,14 +149,16 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
             }
 
         }
-        MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
+        ResString sLoadErr(hRes, IDS_FAILEDTOLOADFILE);
+        MessageBox(hWnd, CStringUtils::Format(sLoadErr, sFileName.c_str(), (LPCTSTR)errMsg).c_str(), L"BowPad", MB_ICONERROR);
         return doc;
     }
     BY_HANDLE_FILE_INFORMATION fi = {0};
     if (!GetFileInformationByHandle(hFile, &fi))
     {
         CFormatMessageWrapper errMsg;
-        MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
+        ResString sLoadErr(hRes, IDS_FAILEDTOLOADFILE);
+        MessageBox(hWnd, CStringUtils::Format(sLoadErr, sFileName.c_str(), (LPCTSTR)errMsg).c_str(), L"BowPad", MB_ICONERROR);
         return doc;
     }
     doc.m_lastWriteTime = fi.ftLastWriteTime;
