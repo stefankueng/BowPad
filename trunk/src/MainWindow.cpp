@@ -973,7 +973,10 @@ LRESULT CMainWindow::DoCommand(int id)
             CCommandHandler::Instance().OnClose();
             CIniSettings::Instance().SaveWindowPos(L"MainWindow", *this);
             if (CloseAllTabs())
+            {
+                g_pFramework->Destroy();
                 ::PostQuitMessage(0);
+            }
         }
         break;
     case cmdNew:
