@@ -31,6 +31,7 @@
 #include "CmdLineParser.h"
 #include "SysInfo.h"
 #include "ClipboardHelper.h"
+#include "EditorConfigHandler.h"
 
 #include <memory>
 #include <future>
@@ -567,6 +568,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             m_scintilla.SetupLexerForLang(doc.m_language);
                             m_scintilla.RestoreCurrentPos(doc.m_position);
                             m_scintilla.SetTabSettings();
+                            CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_scintilla, doc);
+                            m_DocManager.SetDocument(id, doc);
                             m_scintilla.MarkSelectedWord(true);
                             m_scintilla.MarkBookmarksInScrollbar();
                             wchar_t sTabTitle[100] = {0};

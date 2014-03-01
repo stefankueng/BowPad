@@ -258,17 +258,14 @@
     <ClInclude Include="Commands\CmdFunctions.h">
       <Filter>Commands</Filter>
     </ClInclude>
-    <ClInclude Include="..\obj\BowPad\Debug\BowPadUI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Commands\CmdFont.h">
       <Filter>Commands</Filter>
     </ClInclude>
-    <ClInclude Include="BowPadUI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Commands\CmdOpenSelection.h">
       <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorConfigHandler.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -436,6 +433,9 @@
     </ClCompile>
     <ClCompile Include="Commands\CmdFunctions.cpp">
       <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorConfigHandler.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -97,7 +97,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;SCI_NAMESPACE;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -122,7 +122,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;SCI_NAMESPACE;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -149,7 +149,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;SCI_NAMESPACE;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -182,7 +182,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;SCI_NAMESPACE;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -232,10 +232,8 @@
     <ClInclude Include="..\ext\sktoolslib\StringUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
-    <ClInclude Include="..\obj\BowPad\Debug\BowPadUI.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppUtils.h" />
-    <ClInclude Include="BowPadUI.h" />
     <ClInclude Include="ChoseDlg.h" />
     <ClInclude Include="ColorButton.h" />
     <ClInclude Include="Commands\CmdBlanks.h" />
@@ -274,6 +272,7 @@
     <ClInclude Include="DocScroll.h" />
     <ClInclude Include="Document.h" />
     <ClInclude Include="DocumentManager.h" />
+    <ClInclude Include="EditorConfigHandler.h" />
     <ClInclude Include="KeyboardShortcutHandler.h" />
     <ClInclude Include="LexStyles.h" />
     <ClInclude Include="MainWindow.h" />
@@ -335,6 +334,7 @@
     <ClCompile Include="DocScroll.cpp" />
     <ClCompile Include="Document.cpp" />
     <ClCompile Include="DocumentManager.cpp" />
+    <ClCompile Include="EditorConfigHandler.cpp" />
     <ClCompile Include="KeyboardShortcutHandler.cpp" />
     <ClCompile Include="LexStyles.cpp" />
     <ClCompile Include="MainWindow.cpp" />
@@ -400,6 +400,9 @@
   <ItemGroup>
     <ProjectReference Include="..\ext\coolsb\coolsb.vcxproj">
       <Project>{22b28d94-8fb7-484f-ad33-b3f2bd25351f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ext\editorconfig-core\editorconfig.vcxproj">
+      <Project>{ddecdf19-8125-4efe-bf88-72a61af8ff4b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ext\scintilla\Scintilla.vcxproj">
       <Project>{5877b917-512b-49f5-b514-1b4159e7a9ca}</Project>
