@@ -28,11 +28,8 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
-
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
-
-#include <atlbase.h>
-#include <atlstr.h>
+#include <comip.h>
+#include <comdef.h>
 
 #define DEBUGOUTPUTREGPATH L"Software\\BowPad\\DebugOutputString"
 #include "DebugOutput.h"

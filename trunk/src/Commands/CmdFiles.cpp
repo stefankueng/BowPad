@@ -25,9 +25,10 @@ bool CCmdOpen::Execute()
     PreserveChdir keepCWD;
 
     std::vector<std::wstring> paths;
-    CComPtr<IFileOpenDialog> pfd = NULL;
+    _COM_SMARTPTR_TYPEDEF(IFileOpenDialog, __uuidof(IFileOpenDialog));
+    IFileOpenDialogPtr pfd = NULL;
 
-    HRESULT hr = pfd.CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT hr = pfd.CreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER);
     if (SUCCEEDED(hr))
     {
         // Set the dialog options
@@ -46,7 +47,8 @@ bool CCmdOpen::Execute()
         // Show the save/open file dialog
         if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(GetHwnd())))
         {
-            CComPtr<IShellItemArray> psiaResults;
+            _COM_SMARTPTR_TYPEDEF(IShellItemArray, __uuidof(IShellItemArray));
+            IShellItemArrayPtr psiaResults;
             hr = pfd->GetResults(&psiaResults);
             if (SUCCEEDED(hr))
             {
@@ -54,7 +56,8 @@ bool CCmdOpen::Execute()
                 hr = psiaResults->GetCount(&count);
                 for (DWORD i = 0; i < count; ++i)
                 {
-                    CComPtr<IShellItem> psiResult = NULL;
+                    _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
+                    IShellItemPtr psiResult = NULL;
                     hr = psiaResults->GetItemAt(i, &psiResult);
                     PWSTR pszPath = NULL;
                     hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);

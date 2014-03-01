@@ -139,7 +139,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
     // set the AppID
     typedef HRESULT STDAPICALLTYPE SetCurrentProcessExplicitAppUserModelIDFN(PCWSTR AppID);
-    CAutoLibrary hShell = AtlLoadSystemLibraryUsingFullPath(_T("shell32.dll"));
+    CAutoLibrary hShell = LoadLibraryExW(L"Shell32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
     if (hShell)
     {
         SetCurrentProcessExplicitAppUserModelIDFN *pfnSetCurrentProcessExplicitAppUserModelID = (SetCurrentProcessExplicitAppUserModelIDFN*)GetProcAddress(hShell, "SetCurrentProcessExplicitAppUserModelID");
