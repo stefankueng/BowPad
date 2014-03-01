@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BowPad", "src\BowPad.vcxproj", "{F767677D-B0FE-4C4F-B886-09E501C543B2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scintilla", "ext\scintilla\Scintilla.vcxproj", "{5877B917-512B-49F5-B514-1B4159E7A9CA}"
@@ -24,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{FA983034
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ResourceDll", "src\ResourceDll.vcxproj", "{26DD7834-6269-413C-960A-AA7CCB72243C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "editorconfig", "ext\editorconfig-core\editorconfig.vcxproj", "{DDECDF19-8125-4EFE-BF88-72A61AF8FF4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +68,14 @@ Global
 		{26DD7834-6269-413C-960A-AA7CCB72243C}.Release|Win32.Build.0 = Release|Win32
 		{26DD7834-6269-413C-960A-AA7CCB72243C}.Release|x64.ActiveCfg = Release|x64
 		{26DD7834-6269-413C-960A-AA7CCB72243C}.Release|x64.Build.0 = Release|x64
+		{DDECDF19-8125-4EFE-BF88-72A61AF8FF4B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DDECDF19-8125-4EFE-BF88-72A61AF8FF4B}.Debug|Win32.Build.0 = Debug|Win32
+		{DDECDF19-8125-4EFE-BF88-72A61AF8FF4B}.Debug|x64.ActiveCfg = Debug|x64
+		{DDECDF19-8125-4EFE-BF88-72A61AF8FF4B}.Debug|x64.Build.0 = Debug|x64
+		{DDECDF19-8125-4EFE-BF88-72A61AF8FF4B}.Release|Win32.ActiveCfg = Release|Win32
+		{DDECDF19-8125-4EFE-BF88-72A61AF8FF4B}.Release|Win32.Build.0 = Release|Win32
+		{DDECDF19-8125-4EFE-BF88-72A61AF8FF4B}.Release|x64.ActiveCfg = Release|x64
+		{DDECDF19-8125-4EFE-BF88-72A61AF8FF4B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
