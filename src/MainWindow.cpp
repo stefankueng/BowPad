@@ -152,7 +152,8 @@ STDMETHODIMP CMainWindow::OnViewChanged(
         case UI_VIEWVERB_CREATE:
             {
                 hr = pView->QueryInterface(IID_PPV_ARGS(&m_pRibbon));
-                CComPtr<IStream> pStrm;
+                _COM_SMARTPTR_TYPEDEF(IStream, __uuidof(IStream));
+                IStreamPtr pStrm;
                 std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
                 hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_READ, 0, FALSE, NULL, &pStrm);
 
@@ -176,7 +177,8 @@ STDMETHODIMP CMainWindow::OnViewChanged(
         case UI_VIEWVERB_DESTROY:
             {
                 hr = S_OK;
-                CComPtr<IStream> pStrm;
+                _COM_SMARTPTR_TYPEDEF(IStream, __uuidof(IStream));
+                IStreamPtr pStrm;
                 std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
                 hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_WRITE|STGM_CREATE, FILE_ATTRIBUTE_NORMAL, TRUE, NULL, &pStrm);
                 if (SUCCEEDED(hr))
@@ -1239,9 +1241,10 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
             bSaveAs = true;
             PreserveChdir keepCWD;
 
-            CComPtr<IFileSaveDialog> pfd = NULL;
+            _COM_SMARTPTR_TYPEDEF(IFileSaveDialog, __uuidof(IFileSaveDialog));
+            IFileSaveDialogPtr pfd = NULL;
 
-            HRESULT hr = pfd.CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_INPROC_SERVER);
+            HRESULT hr = pfd.CreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_INPROC_SERVER);
             if (SUCCEEDED(hr))
             {
                 // Set the dialog options
@@ -1266,7 +1269,8 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
                 // Show the save/open file dialog
                 if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(*this)))
                 {
-                    CComPtr<IShellItem> psiResult = NULL;
+                    _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
+                    IShellItemPtr psiResult = NULL;
                     hr = pfd->GetResult(&psiResult);
                     if (SUCCEEDED(hr))
                     {

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -292,7 +292,8 @@ COLORREF CTheme::GetThemeColor( COLORREF clr )
 
 void CTheme::SetRibbonColors( COLORREF text, COLORREF background, COLORREF highlight )
 {
-    CComPtr<IPropertyStore> spPropertyStore;
+    _COM_SMARTPTR_TYPEDEF(IPropertyStore, __uuidof(IPropertyStore));
+    IPropertyStorePtr spPropertyStore;
 
     // g_pFramework is a pointer to the IUIFramework interface that is assigned
     // when the Ribbon is initialized.
@@ -326,7 +327,8 @@ void CTheme::SetRibbonColors( COLORREF text, COLORREF background, COLORREF highl
 
 void CTheme::SetRibbonColorsHSB( UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight )
 {
-    CComPtr<IPropertyStore> spPropertyStore;
+    _COM_SMARTPTR_TYPEDEF(IPropertyStore, __uuidof(IPropertyStore));
+    IPropertyStorePtr spPropertyStore;
 
     // g_pFramework is a pointer to the IUIFramework interface that is assigned
     // when the Ribbon is initialized.
@@ -350,7 +352,8 @@ void CTheme::SetRibbonColorsHSB( UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HS
 
 void CTheme::GetRibbonColors( UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight )
 {
-    CComPtr<IPropertyStore> spPropertyStore;
+    _COM_SMARTPTR_TYPEDEF(IPropertyStore, __uuidof(IPropertyStore));
+    IPropertyStorePtr spPropertyStore;
 
     // g_pFramework is a pointer to the IUIFramework interface that is assigned
     // when the Ribbon is initialized.

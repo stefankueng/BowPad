@@ -24,7 +24,6 @@
 
 #include <Shobjidl.h>
 #include <Shellapi.h>
-#include <atlbase.h>
 
 
 class CCmdOpen : public ICommand
