@@ -65,10 +65,11 @@ protected:
     LRESULT                 DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
     LRESULT                 DrawListItemWithMatches(NMLVCUSTOMDRAW * pLVCD);
     RECT                    DrawListColumnBackground(NMLVCUSTOMDRAW * pLVCD);
+    std::string             UnEscape(const std::string& str);
+    bool                    ReadBase(const char * str, int * value, int base, int size);
 
     virtual bool Execute() override { return true; }
     virtual UINT GetCmdId() override { return 0; }
-
 private:
     CDlgResizer                 m_resizer;
     std::list<std::wstring>     m_searchStrings;
