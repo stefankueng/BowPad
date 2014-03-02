@@ -575,6 +575,11 @@ msgstr ""
 msgid "Failed to download the list of available languages."
 msgstr ""
 
+#. Resource IDs: (11)
+#, c-format
+msgid "Failed to load the file '%s'.\r\n\r\nThe error message is:\r\n%s"
+msgstr ""
+
 #. Resource IDs: (9)
 msgid "Fetch remote languages..."
 msgstr ""
@@ -1112,6 +1117,10 @@ msgstr ""
 msgid "Replace &All"
 msgstr ""
 
+#. Resource IDs: (11)
+msgid "Replace &all in selection"
+msgstr ""
+
 #. Resource IDs: (3759)
 msgid "Right margin"
 msgstr ""
@@ -1426,6 +1435,10 @@ msgstr ""
 
 #. Resource IDs: (3755)
 msgid "Whitespace"
+msgstr ""
+
+#. Resource IDs: (3768)
+msgid "Whitespaces"
 msgstr ""
 
 #. Resource IDs: (3757)
