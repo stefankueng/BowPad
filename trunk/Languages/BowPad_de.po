@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-02-23 16:26+0100\n"
+"PO-Revision-Date: 2014-03-02 14:53+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -632,6 +632,19 @@ msgstr "FSN"
 msgid "Failed to download the list of available languages."
 msgstr "Konnte die Liste mit Sprachdateien nicht downloaden."
 
+#. Resource IDs: (11)
+#, c-format
+msgid ""
+"Failed to load the file '%s'.\r\n"
+"\r\n"
+"The error message is:\r\n"
+"%s"
+msgstr ""
+"Konnte die Datei '%s' nicht öffnen.\r\n"
+"\r\n"
+"Die Fehlermeldung ist:\r\n"
+"%s"
+
 #. Resource IDs: (9)
 msgid "Fetch remote languages..."
 msgstr "Hole Sprachliste von Server..."
@@ -1207,6 +1220,10 @@ msgstr "Entfernt Leerzeichen am Ende von Zeilen"
 msgid "Replace &All"
 msgstr "Alle E&rsetzen"
 
+#. Resource IDs: (11)
+msgid "Replace &all in selection"
+msgstr "Alle in Auswahl e&rsetzen"
+
 #. Resource IDs: (3759)
 msgid "Right margin"
 msgstr "Rechter Rand"
@@ -1541,6 +1558,10 @@ msgstr "Websuche:"
 
 #. Resource IDs: (3755)
 msgid "Whitespace"
+msgstr "Leerzeichen"
+
+#. Resource IDs: (3768)
+msgid "Whitespaces"
 msgstr "Leerzeichen"
 
 #. Resource IDs: (3757)
