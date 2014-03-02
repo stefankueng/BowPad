@@ -673,6 +673,11 @@ void CFindReplaceDlg::DoReplace( int id )
     nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHWORD)  ? SCFIND_WHOLEWORD : 0;
     nSearchFlags |= IsDlgButtonChecked(*this, IDC_MATCHREGEX) ? SCFIND_REGEXP    : 0;
 
+    if (nSearchFlags & SCFIND_REGEXP)
+    {
+        sReplaceString = UnEscape(sReplaceString);
+    }
+
     ScintillaCall(SCI_SETSEARCHFLAGS, nSearchFlags);
     sptr_t findRet = -1;
     int replaceCount = 0;
@@ -695,7 +700,7 @@ void CFindReplaceDlg::DoReplace( int id )
             if (id==IDC_REPLACEBTN)
                 Center((long)ScintillaCall(SCI_GETTARGETSTART), (long)ScintillaCall(SCI_GETTARGETEND));
 
-            ScintillaCall(SCI_SETTARGETSTART, ScintillaCall(SCI_GETTARGETEND));
+            ScintillaCall(SCI_SETTARGETSTART, ScintillaCall(SCI_GETTARGETEND)+1);
             if (bReplaceOnlyInSelection)
                 ScintillaCall(SCI_SETTARGETEND, selEnd);
             else
@@ -918,7 +923,7 @@ void CFindReplaceDlg::SearchDocument(int docID, const CDocument& doc, const std:
 
             if (ttf.chrg.cpMin >= ttf.chrgText.cpMax)
                 break;
-            ttf.chrg.cpMin = ttf.chrgText.cpMax;
+            ttf.chrg.cpMin = ttf.chrgText.cpMax + 1;
         }
     } while (findRet >= 0);
     m_searchWnd.Call(SCI_SETREADONLY, false);
@@ -976,6 +981,139 @@ void CFindReplaceDlg::CheckRegex()
         SetInfoText(IDS_REGEX_NOTOK);
     }
 }
+
+std::string CFindReplaceDlg::UnEscape(const std::string& str)
+{
+    int i = 0, j = 0;
+    int charLeft = (int)str.length();
+    bool isGood = true;
+    char current;
+    std::unique_ptr<char[]> result(new char[str.length() + 1]);
+    while (i < (int)str.length())
+    {
+        current = str[i];
+        --charLeft;
+        if (current == '\\' && charLeft)
+        {
+            // possible escape sequence
+            ++i;
+            --charLeft;
+            current = str[i];
+            switch (current)
+            {
+                case 'r':
+                    result[j] = '\r';
+                    break;
+                case 'n':
+                    result[j] = '\n';
+                    break;
+                case '0':
+                    result[j] = '\0';
+                    break;
+                case 't':
+                    result[j] = '\t';
+                    break;
+                case '\\':
+                    result[j] = '\\';
+                    break;
+                case 'b':
+                case 'd':
+                case 'o':
+                case 'x':
+                case 'u':
+                {
+                    int size = 0, base = 0;
+                    if (current == 'b')
+                    {
+                        // 11111111
+                        size = 8, base = 2;
+                    }
+                    else if (current == 'o')
+                    {
+                        // 377
+                        size = 3, base = 8;
+                    }
+                    else if (current == 'd')
+                    {
+                        // 255
+                        size = 3, base = 10;
+                    }
+                    else if (current == 'x')
+                    {
+                        // 0xFF
+                        size = 2, base = 16;
+                    }
+                    else if (current == 'u')
+                    {
+                        // 0xCDCD
+                        size = 4, base = 16;
+                    }
+                    if (charLeft >= size)
+                    {
+                        int res = 0;
+                        if (ReadBase(str.c_str() + (i + 1), &res, base, size))
+                        {
+                            result[j] = (char)res;
+                            i += size;
+                            break;
+                        }
+                    }
+                    // not enough chars to make parameter, use default method as fallback
+                }
+                default:
+                {
+                    // unknown sequence, treat as regular text
+                    result[j] = '\\';
+                    ++j;
+                    result[j] = current;
+                    isGood = false;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            result[j] = str[i];
+        }
+        ++i;
+        ++j;
+    }
+    result[j] = 0;
+    return result.get();
+}
+
+bool CFindReplaceDlg::ReadBase(const char * str, int * value, int base, int size)
+{
+    int i = 0, temp = 0;
+    *value = 0;
+    char max = '0' + (char)base - 1;
+    char current;
+    while (i < size)
+    {
+        current = str[i];
+        if (current >= 'A')
+        {
+            current &= 0xdf;
+            current -= ('A' - '0' - 10);
+        }
+        else if (current > '9')
+            return false;
+
+        if (current >= '0' && current <= max)
+        {
+            temp *= base;
+            temp += (current - '0');
+        }
+        else
+        {
+            return false;
+        }
+        ++i;
+    }
+    *value = temp;
+    return true;
+}
+
 
 bool CCmdFindReplace::Execute()
 {
