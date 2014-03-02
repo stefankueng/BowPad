@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -252,7 +252,7 @@ long StdRegexSearch::FindText(Document* doc, int startPosition, int endPosition,
             | (caseSensitive ? 0 : std::regex_constants::icase);
         search._regexString = regexString;
 
-        search.regexFlags = std::regex_constants::match_not_null | std::regex_constants::format_first_only;
+        search.regexFlags = std::regex_constants::format_first_only;
 
         Match match = _utf8.FindText(search);
 

@@ -1667,7 +1667,7 @@ void CMainWindow::AddHotSpots()
                 m_scintilla.Call(SCI_SETSTYLING, foundTextLen, style_hotspot);
             }
 
-            m_scintilla.Call(SCI_SETTARGETSTART, posFound + foundTextLen);
+            m_scintilla.Call(SCI_SETTARGETSTART, posFound + max(1, foundTextLen));
             m_scintilla.Call(SCI_SETTARGETEND, endPos);
 
             posFound = (int)m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
