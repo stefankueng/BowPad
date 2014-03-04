@@ -979,8 +979,7 @@ LRESULT CMainWindow::DoCommand(int id)
             CIniSettings::Instance().SaveWindowPos(L"MainWindow", *this);
             if (CloseAllTabs())
             {
-                g_pFramework->Destroy();
-                ::PostQuitMessage(0);
+                PostMessage(m_hwnd, WM_CLOSE, 0, 0);
             }
         }
         break;
