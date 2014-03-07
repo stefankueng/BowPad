@@ -1271,7 +1271,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
                     pfd->SetTitle(s.c_str());
                 }
 
-                // Show the save/open file dialog
+                // Show the save file dialog
                 if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(*this)))
                 {
                     _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
@@ -1286,8 +1286,14 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
                             doc.m_path = pszPath;
                             CMRU::Instance().AddPath(doc.m_path);
                         }
+                        else
+                            return bRet;
                     }
+                    else
+                        return bRet;
                 }
+                else
+                    return bRet;
             }
         }
         if (!doc.m_path.empty())
