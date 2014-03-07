@@ -1271,6 +1271,20 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
                     pfd->SetTitle(s.c_str());
                 }
 
+                // set the default folder to the folder of the current tab
+                if (!doc.m_path.empty())
+                {
+                    std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
+                    _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
+                    IShellItemPtr psiDefFolder = NULL;
+                    hr = SHCreateItemFromParsingName(folder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
+
+                    if (SUCCEEDED(hr))
+                    {
+                        pfd->SetFolder(psiDefFolder);
+                    }
+                }
+
                 // Show the save file dialog
                 if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(*this)))
                 {
