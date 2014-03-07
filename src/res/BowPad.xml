@@ -397,7 +397,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.SmallImages>
     </Command>
 
-    <Command Name="cmdGroupBlanks" LabelTitle="Char operations">
+    <Command Name="cmdGroupBlanks" LabelTitle="Other operations">
       <Command.LargeImages>
         <Image>res/TrimL.bmp</Image>
       </Command.LargeImages>
@@ -448,6 +448,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/BookmarkL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdGroupBookmarksBtn" LabelTitle="Bookmarks">
+      <Command.LargeImages>
+        <Image>res/BookmarkL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdBookmarkToggle" LabelTitle="Bookmark" TooltipTitle="Toggle Bookmark" TooltipDescription="Toggle a bookmark on the current line" Keytip="BT">
       <Command.LargeImages>
         <Image>res/BookmarkL.bmp</Image>
@@ -458,12 +463,12 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/BookmarkClearL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdBookmarkNext" LabelTitle="Next Bookmarks" TooltipTitle="Next Bookmarks" TooltipDescription="Move the caret to the next bookmark" Keytip="BN">
+    <Command Name="cmdBookmarkNext" LabelTitle="Next" TooltipTitle="Next Bookmark" TooltipDescription="Move the caret to the next bookmark" Keytip="BN">
       <Command.LargeImages>
         <Image>res/BookmarkNextL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdBookmarkPrev" LabelTitle="Previous Bookmarks" TooltipTitle="Previous Bookmarks" TooltipDescription="Move the caret to the previous bookmark" Keytip="BP">
+    <Command Name="cmdBookmarkPrev" LabelTitle="Previous" TooltipTitle="Previous Bookmark" TooltipDescription="Move the caret to the previous bookmark" Keytip="BP">
       <Command.LargeImages>
         <Image>res/BookmarkPrevL.bmp</Image>
       </Command.LargeImages>
@@ -757,7 +762,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Scale Group="cmdGroupUndo" Size="Large" />
                 <Scale Group="cmdGroupFind" Size="Large" />
                 <Scale Group="cmdGroupGoto" Size="Large" />
-                <Scale Group="cmdGroupBookmarks" Size="Medium" />
+                <Scale Group="cmdGroupBookmarks" Size="Large" />
                 <Scale Group="cmdGroupComment" Size="Medium" />
                 <Scale Group="cmdGroupBlanks" Size="Medium" />
               </ScalingPolicy.IdealSizes>
@@ -769,7 +774,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Scale Group="cmdGroupFind" Size="Medium" />
               <Scale Group="cmdGroupFind" Size="Small" />
               <Scale Group="cmdGroupGoto" Size="Medium" />
-              <Scale Group="cmdGroupBookmarks" Size="Small" />
+              <Scale Group="cmdGroupBookmarks" Size="Medium" />
               <Scale Group="cmdGroupComment" Size="Small" />
               <Scale Group="cmdGroupBlanks" Size="Small" />
             </ScalingPolicy>
@@ -810,11 +815,15 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdPrevious" />
             <Button CommandName="cmdNext" />
           </Group>
-          <Group CommandName="cmdGroupBookmarks" SizeDefinition="FourButtons">
-            <Button CommandName="cmdBookmarkToggle" />
-            <Button CommandName="cmdBookmarkNext" />
+          <Group CommandName="cmdGroupBookmarks" SizeDefinition="ThreeButtons">
+            <SplitButton CommandName="cmdGroupBookmarksBtn">
+              <SplitButton.ButtonItem>
+                <Button CommandName="cmdBookmarkToggle" />
+              </SplitButton.ButtonItem>
+              <Button CommandName="cmdBookmarkClearAll" />
+            </SplitButton>
             <Button CommandName="cmdBookmarkPrev" />
-            <Button CommandName="cmdBookmarkClearAll" />
+            <Button CommandName="cmdBookmarkNext" />
           </Group>
           <Group CommandName="cmdGroupLaunch" SizeDefinition="OneButton">
             <DropDownButton CommandName="cmdLaunchGroup">
