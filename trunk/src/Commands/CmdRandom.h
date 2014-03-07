@@ -258,7 +258,7 @@ public:
             // now load that file in the same tab
             if (OpenFile(showpath.c_str(), false))
             {
-                CloseTab(tabIndex);
+                CloseTab(tabIndex, false);
             }
         }
         return true;

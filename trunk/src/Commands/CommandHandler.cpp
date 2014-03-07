@@ -94,6 +94,8 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdReload(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdFileDelete(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdPrint(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdPrintNow(obj);

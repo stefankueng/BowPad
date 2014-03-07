@@ -121,10 +121,10 @@ int ICommand::GetTabCount()
     return pMainWnd->m_TabBar.GetItemCount();
 }
 
-void ICommand::CloseTab( int index )
+bool ICommand::CloseTab( int index, bool bForce )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    pMainWnd->CloseTab(index);
+    return pMainWnd->CloseTab(index, bForce);
 }
 
 sptr_t ICommand::ScintillaCall( unsigned int iMessage, uptr_t wParam /*= 0*/, sptr_t lParam /*= 0*/ )

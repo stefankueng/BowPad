@@ -31,12 +31,10 @@ class CCmdOpen : public ICommand
 public:
 
     CCmdOpen(void * obj) : ICommand(obj)
-    {
-    }
+    {}
 
     ~CCmdOpen(void)
-    {
-    }
+    {}
 
     virtual bool Execute() override;
     virtual UINT GetCmdId() override { return cmdOpen; }
@@ -49,7 +47,7 @@ public:
     {
         InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
-    ~CCmdSave(){}
+    ~CCmdSave() {}
 
 
     virtual bool Execute() override;
@@ -69,7 +67,7 @@ public:
     {
         InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
-    ~CCmdSaveAll(){}
+    ~CCmdSaveAll() {}
 
 
     virtual bool Execute() override;
@@ -86,9 +84,8 @@ class CCmdSaveAs : public ICommand
 {
 public:
     CCmdSaveAs(void * obj) : ICommand(obj)
-    {
-    }
-    ~CCmdSaveAs(){}
+    {}
+    ~CCmdSaveAs() {}
 
 
     virtual bool Execute() override;
@@ -99,9 +96,8 @@ class CCmdReload : public ICommand
 {
 public:
     CCmdReload(void * obj) : ICommand(obj)
-    {
-    }
-    ~CCmdReload(){}
+    {}
+    ~CCmdReload() {}
 
 
     virtual bool Execute() override
@@ -114,6 +110,23 @@ public:
         return true;
     }
     virtual UINT GetCmdId() override { return cmdReload; }
+
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+
+    virtual void TabNotify(TBHDR * ptbhdr) override;
+};
+
+class CCmdFileDelete : public ICommand
+{
+public:
+    CCmdFileDelete(void * obj) : ICommand(obj)
+    {}
+    ~CCmdFileDelete() {}
+
+
+    virtual bool Execute() override;
+
+    virtual UINT GetCmdId() override { return cmdFileDelete; }
 
     virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
