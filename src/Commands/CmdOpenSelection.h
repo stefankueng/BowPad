@@ -60,8 +60,6 @@ public:
             {
                 path = path.substr(slashpos+1);
             }
-            else
-                path.clear();
 
             ResString label(hRes, cmdOpenSelection_LabelTitle_RESID);
             if (!path.empty())
@@ -102,20 +100,20 @@ private:
                 if (slashpos != std::wstring::npos)
                 {
                     std::wstring path = doc.m_path.substr(0, slashpos) + L"\\" + sWord;
-                    if (PathFileExists(path.c_str()))
+                    if (PathFileExists(path.c_str()) && !PathIsDirectory(path.c_str()))
                         return path;
                     path = doc.m_path.substr(0, slashpos);
                     slashpos = path.find_last_of('\\');
                     if (slashpos != std::wstring::npos)
                     {
-                        path = doc.m_path.substr(0, slashpos);
-                        if (PathFileExists(path.c_str()))
+                        path = doc.m_path.substr(0, slashpos) + L"\\" + sWord;
+                        if (PathFileExists(path.c_str()) && !PathIsDirectory(path.c_str()))
                             return path;
                     }
                 }
             }
         }
-        if (PathFileExists(sWord.c_str()))
+        if (PathFileExists(sWord.c_str()) && !PathIsDirectory(sWord.c_str()))
         {
             return sWord;
         }
