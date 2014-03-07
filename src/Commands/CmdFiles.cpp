@@ -19,6 +19,7 @@
 #include "MRU.h"
 #include "LexStyles.h"
 #include "PreserveChdir.h"
+#include "PathUtils.h"
 
 bool CCmdOpen::Execute()
 {
@@ -39,12 +40,27 @@ bool CCmdOpen::Execute()
         }
 
         // Set a title
-        if (SUCCEEDED(hr))
+        pfd->SetTitle(L"BowPad");
+
+        // set the default folder to the folder of the current tab
+        if (HasActiveDocument())
         {
-            pfd->SetTitle(L"BowPad");
+            CDocument doc = GetActiveDocument();
+            if (!doc.m_path.empty())
+            {
+                std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
+                _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
+                IShellItemPtr psiDefFolder = NULL;
+                hr = SHCreateItemFromParsingName(folder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
+
+                if (SUCCEEDED(hr))
+                {
+                    pfd->SetFolder(psiDefFolder);
+                }
+            }
         }
 
-        // Show the save/open file dialog
+        // Show the open file dialog
         if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(GetHwnd())))
         {
             _COM_SMARTPTR_TYPEDEF(IShellItemArray, __uuidof(IShellItemArray));
