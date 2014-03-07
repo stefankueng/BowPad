@@ -681,6 +681,14 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.SmallImages>
     </Command>
 
+    <Command Name="cmdFileDelete" LabelTitle="Delete File" TooltipTitle="Delete File" TooltipDescription="Deletes the file of the current tab" >
+      <Command.SmallImages>
+        <Image>res/FileDeleteS.bmp</Image>
+      </Command.SmallImages>
+      <Command.LargeImages>
+        <Image>res/FileDeleteL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
 
     <Command Name="cmdContextMap" />
     <Command Name="cmdTabContextMap" />
@@ -1069,6 +1077,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdSave" />
             <Button CommandName="cmdSaveAs" />
             <Button CommandName="cmdReload" />
+            <Button CommandName="cmdFileDelete" />
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="cmdCopyPath" />

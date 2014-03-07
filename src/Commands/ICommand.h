@@ -52,7 +52,7 @@ protected:
     std::wstring        GetTitleForDocID(int id);
     int                 GetSrcTab();
     int                 GetDstTab();
-    void                CloseTab(int index);
+    bool                CloseTab(int index, bool bForce);
     int                 GetDocIDFromTabIndex(int tab);
     int                 GetDocIDFromPath(LPCTSTR path);
     int                 GetTabIndexFromDocID(int docID);

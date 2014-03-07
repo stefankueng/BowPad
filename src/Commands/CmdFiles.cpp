@@ -114,6 +114,7 @@ HRESULT CCmdSave::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PRO
             CDocument doc = GetActiveDocument();
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, doc.m_bIsDirty||doc.m_bNeedsSaving, ppropvarNewValue);
         }
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
     }
     return E_NOTIMPL;
 }
@@ -175,7 +176,7 @@ bool CCmdSaveAs::Execute()
     return SaveCurrentTab(true);
 }
 
-HRESULT CCmdReload::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdReload::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
@@ -184,14 +185,86 @@ HRESULT CCmdReload::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const P
             CDocument doc = GetActiveDocument();
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
         }
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
     }
     return E_NOTIMPL;
 }
 
-void CCmdReload::TabNotify( TBHDR * ptbhdr )
+void CCmdReload::TabNotify(TBHDR * ptbhdr)
 {
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
         InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
+}
+
+HRESULT CCmdFileDelete::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+{
+    if (UI_PKEY_Enabled == key)
+    {
+        if (HasActiveDocument())
+        {
+            CDocument doc = GetActiveDocument();
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
+        }
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
+    }
+    return E_NOTIMPL;
+}
+
+void CCmdFileDelete::TabNotify(TBHDR * ptbhdr)
+{
+    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+    }
+}
+
+bool CCmdFileDelete::Execute()
+{
+    if (HasActiveDocument())
+    {
+        CDocument doc = GetActiveDocument();
+        if (!doc.m_path.empty())
+        {
+            // Close the tab
+            if (!CloseTab(GetTabIndexFromDocID(GetCurrentTabId()), false))
+                return false;
+
+            _COM_SMARTPTR_TYPEDEF(IFileOperation, __uuidof(IFileOperation));
+            IFileOperationPtr pfo = NULL;
+            HRESULT hr = pfo.CreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL);
+
+            if (SUCCEEDED(hr))
+            {
+                // Set parameters for current operation
+                hr = pfo->SetOperationFlags(FOF_ALLOWUNDO | FOF_NO_CONNECTED_ELEMENTS | FOFX_ADDUNDORECORD);
+
+                if (SUCCEEDED(hr))
+                {
+                    // Create IShellItem instance associated to file to delete
+                    _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
+                    IShellItemPtr psiFileToDelete = NULL;
+                    hr = SHCreateItemFromParsingName(doc.m_path.c_str(), NULL, IID_PPV_ARGS(&psiFileToDelete));
+
+                    if (SUCCEEDED(hr))
+                    {
+                        // Declare this shell item (file) to be deleted
+                        hr = pfo->DeleteItem(psiFileToDelete, NULL);
+                    }
+                }
+                pfo->SetOwnerWindow(GetHwnd());
+                if (SUCCEEDED(hr))
+                {
+                    // Perform the deleting operation
+                    hr = pfo->PerformOperations();
+                    if (SUCCEEDED(hr))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }
