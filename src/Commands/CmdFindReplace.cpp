@@ -1120,17 +1120,41 @@ bool CCmdFindReplace::Execute()
     if (m_pFindReplaceDlg == nullptr)
         m_pFindReplaceDlg = new CFindReplaceDlg(m_Obj);
 
-    int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
-    std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
-    ScintillaCall(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
-    std::string sSelText = seltextbuffer.get();
+    size_t selStart = ScintillaCall(SCI_GETSELECTIONSTART);
+    size_t selEnd = ScintillaCall(SCI_GETSELECTIONEND);
+    size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+    size_t lineend = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
 
-    m_pFindReplaceDlg->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
-    if (!sSelText.empty())
+    if (linestart == lineend)
     {
-        SetDlgItemText(*m_pFindReplaceDlg, IDC_SEARCHCOMBO, CUnicodeUtils::StdGetUnicode(sSelText).c_str());
-        SetFocus(GetDlgItem(*m_pFindReplaceDlg, IDC_SEARCHCOMBO));
+        int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
+        std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
+        ScintillaCall(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
+        std::string sSelText = seltextbuffer.get();
+
+        if (sSelText.empty())
+        {
+            // get the current word instead
+            long currentPos = (long)ScintillaCall(SCI_GETCURRENTPOS);
+            long startPos = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos);
+            long endPos = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos);
+            std::unique_ptr<char[]> textbuf(new char[endPos - startPos + 1]);
+            Scintilla::Sci_TextRange range;
+            range.chrg.cpMin = startPos;
+            range.chrg.cpMax = endPos;
+            range.lpstrText = textbuf.get();
+            ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&range);
+            sSelText = textbuf.get();
+        }
+        m_pFindReplaceDlg->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
+        if (!sSelText.empty())
+        {
+            SetDlgItemText(*m_pFindReplaceDlg, IDC_SEARCHCOMBO, CUnicodeUtils::StdGetUnicode(sSelText).c_str());
+            SetFocus(GetDlgItem(*m_pFindReplaceDlg, IDC_SEARCHCOMBO));
+        }
     }
+    else
+        m_pFindReplaceDlg->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
 
     return true;
 }
