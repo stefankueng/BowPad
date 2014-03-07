@@ -658,6 +658,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             }
                         }
                         // no BowPad Window at the drop location: start a new instance and open the tab there
+                        // but only if there are more than one tab in the current window
+                        if (m_TabBar.GetItemCount() < 2)
+                            break;
 
                         std::wstring modpath = CPathUtils::GetModulePath();
                         std::wstring cmdline = CStringUtils::Format(L"/multiple /tabmove /savepath:\"%s\" /path:\"%s\" /line:%ld",
