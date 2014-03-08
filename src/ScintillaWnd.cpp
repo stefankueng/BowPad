@@ -62,6 +62,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETMARGINCURSORN, SC_MARGE_SYBOLE, SC_CURSORARROW);
     Call(SCI_MARKERSETALPHA, MARK_BOOKMARK, 70);
     Call(SCI_MARKERDEFINEPIXMAP, MARK_BOOKMARK, (LPARAM)bullet_red);
+    // Scintilla has a marker for bookmarks, but I think our own looks better
+    //Call(SCI_MARKERDEFINE, MARK_BOOKMARK, SC_MARK_BOOKMARK);
 
     Call(SCI_SETMARGINSENSITIVEN, SC_MARGE_FOLDER, true);
     Call(SCI_SETMARGINSENSITIVEN, SC_MARGE_SYBOLE, true);
