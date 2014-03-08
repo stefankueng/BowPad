@@ -1241,7 +1241,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
     if ((id >= 0) && m_DocManager.HasDocumentID(id))
     {
         CDocument doc = m_DocManager.GetDocumentFromID(id);
-        if (doc.m_path.empty() || bSaveAs)
+        if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
         {
             bSaveAs = true;
             PreserveChdir keepCWD;
@@ -1312,6 +1312,8 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         }
         if (!doc.m_path.empty())
         {
+            doc.m_bDoSaveAs = false;
+
             if (doc.m_bTrimBeforeSave)
             {
                 auto cmd = CCommandHandler::Instance().GetCommand(cmdTrim);

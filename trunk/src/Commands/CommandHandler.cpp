@@ -48,6 +48,7 @@
 #include "CmdFunctions.h"
 #include "CmdFont.h"
 #include "CmdOpenSelection.h"
+#include "CmdNewCopy.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -230,6 +231,9 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdZoomIn(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdZoomOut(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+
+    pCmd = new CCmdNewCopy(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdHeaderSource(obj);
