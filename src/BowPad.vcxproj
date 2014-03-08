@@ -234,7 +234,12 @@
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppUtils.h" />
-    <ClInclude Include="BowPadUI.h" />
+    <ClInclude Include="BowPadUI.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="ChoseDlg.h" />
     <ClInclude Include="ColorButton.h" />
     <ClInclude Include="Commands\CmdBlanks.h" />
