@@ -1312,6 +1312,32 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         }
         if (!doc.m_path.empty())
         {
+            if (doc.m_bTrimBeforeSave)
+            {
+                auto cmd = CCommandHandler::Instance().GetCommand(cmdTrim);
+                cmd->Execute();
+            }
+            if (doc.m_bEnsureNewlineAtEnd)
+            {
+                size_t endpos = m_scintilla.Call(SCI_GETLENGTH);
+                char c = (char)m_scintilla.Call(SCI_GETCHARAT, endpos - 1);
+                if ((c != '\r') && (c != '\n'))
+                {
+                    switch (doc.m_format)
+                    {
+                        case WIN_FORMAT:
+                            m_scintilla.Call(SCI_APPENDTEXT, 2, (sptr_t)"\r\n");
+                            break;
+                        case MAC_FORMAT:
+                            m_scintilla.Call(SCI_APPENDTEXT, 1, (sptr_t)"\r");
+                            break;
+                        case UNIX_FORMAT:
+                        default:
+                            m_scintilla.Call(SCI_APPENDTEXT, 1, (sptr_t)"\n");
+                            break;
+                    }
+                }
+            }
             bRet = m_DocManager.SaveFile(*this, doc);
             if (bRet)
             {
