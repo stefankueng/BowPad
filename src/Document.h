@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,6 +51,8 @@ public:
         : m_document(NULL)
         , m_format(UNKNOWN_FORMAT)
         , m_bHasBOM(false)
+        , m_bTrimBeforeSave(false)
+        , m_bEnsureNewlineAtEnd(false)
         , m_encoding(-1)
         , m_bIsDirty(false)
         , m_bNeedsSaving(false)
@@ -65,6 +67,8 @@ public:
     Document                m_document;
     FormatType              m_format;
     bool                    m_bHasBOM;
+    bool                    m_bTrimBeforeSave;
+    bool                    m_bEnsureNewlineAtEnd;
     int                     m_encoding;
     std::wstring            m_path;
     FILETIME                m_lastWriteTime;

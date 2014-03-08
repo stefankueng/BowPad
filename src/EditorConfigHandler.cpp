@@ -120,10 +120,12 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
             if (strcmp(name, "trim_trailing_whitespace") == 0)
             {
                 // true / false
+                doc.m_bTrimBeforeSave = strcmp(value, "true") == 0;
             }
             if (strcmp(name, "insert_final_newline") == 0)
             {
                 // true / false
+                doc.m_bEnsureNewlineAtEnd = strcmp(value, "true") == 0;
             }
         }
     }
