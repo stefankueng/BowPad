@@ -41,6 +41,7 @@ public:
             CDocument doc = GetActiveDocument();
             doc.m_format = WIN_FORMAT;
             SetDocument(GetCurrentTabId(), doc);
+            UpdateStatusBar(true);
         }
         InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         InvalidateUICommand(cmdEOLUnix, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
@@ -88,8 +89,9 @@ public:
         if (HasActiveDocument())
         {
             CDocument doc = GetActiveDocument();
-            doc.m_format = WIN_FORMAT;
+            doc.m_format = UNIX_FORMAT;
             SetDocument(GetCurrentTabId(), doc);
+            UpdateStatusBar(true);
         }
         InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         InvalidateUICommand(cmdEOLUnix, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
@@ -137,8 +139,9 @@ public:
         if (HasActiveDocument())
         {
             CDocument doc = GetActiveDocument();
-            doc.m_format = WIN_FORMAT;
+            doc.m_format = MAC_FORMAT;
             SetDocument(GetCurrentTabId(), doc);
+            UpdateStatusBar(true);
         }
         InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         InvalidateUICommand(cmdEOLUnix, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
