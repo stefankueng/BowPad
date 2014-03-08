@@ -87,6 +87,7 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
         }
     }
 
+    std::wstring directory = CPathUtils::GetParentDirectory(tabpath);
     SHELLEXECUTEINFO shi = {0};
     shi.cbSize = sizeof(SHELLEXECUTEINFO);
     shi.fMask = SEE_MASK_DOENVSUBST|SEE_MASK_UNICODE;
@@ -94,7 +95,7 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     shi.lpVerb = L"open";
     shi.lpFile = cmd.c_str();
     shi.lpParameters = params.empty() ? NULL : params.c_str();
-    shi.lpDirectory = CPathUtils::GetParentDirectory(tabpath).c_str();
+    shi.lpDirectory = directory.c_str();
     shi.nShow = SW_SHOW;
 
     return !!ShellExecuteEx(&shi);
