@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "ICommand.h"
 #include "MainWindow.h"
+#include "StringUtils.h"
 
 extern IUIFramework *g_pFramework;
 
@@ -101,6 +102,14 @@ std::wstring ICommand::GetTitleForTabIndex(int index)
 std::wstring ICommand::GetTitleForDocID(int id)
 {
     return GetTitleForTabIndex(GetTabIndexFromDocID(id));
+}
+
+void ICommand::SetCurrentTitle(LPCWSTR title)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    pMainWnd->m_TabBar.SetCurrentTitle(title);
+    std::wstring sWindowTitle = CStringUtils::Format(L"%s - BowPad", title);
+    SetWindowText(*pMainWnd, sWindowTitle.c_str());
 }
 
 int ICommand::GetSrcTab()
@@ -218,6 +227,18 @@ void ICommand::SetDocument( int index, CDocument doc )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     return pMainWnd->m_DocManager.SetDocument(index, doc);
+}
+
+void ICommand::RestoreCurrentPos(CPosData pos)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_scintilla.RestoreCurrentPos(pos);
+}
+
+void ICommand::SaveCurrentPos(CPosData * pos)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_scintilla.SaveCurrentPos(pos);
 }
 
 LRESULT ICommand::SendMessageToMainWnd( UINT msg, WPARAM wParam, LPARAM lParam )
