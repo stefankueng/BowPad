@@ -50,6 +50,7 @@ protected:
     std::wstring        GetCurrentTitle();
     std::wstring        GetTitleForTabIndex(int index);
     std::wstring        GetTitleForDocID(int id);
+    void                SetCurrentTitle(LPCWSTR title);
     int                 GetSrcTab();
     int                 GetDstTab();
     bool                CloseTab(int index, bool bForce);
@@ -63,6 +64,8 @@ protected:
     bool                HasDocumentID(int id);
     CDocument           GetDocumentFromID(int id);
     void                SetDocument(int index, CDocument doc);
+    void                RestoreCurrentPos(CPosData pos);
+    void                SaveCurrentPos(CPosData * pos);
 
     sptr_t              ScintillaCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0);
     LRESULT             SendMessageToMainWnd(UINT msg, WPARAM wParam, LPARAM lParam);
