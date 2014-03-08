@@ -57,6 +57,7 @@ public:
         , m_bIsDirty(false)
         , m_bNeedsSaving(false)
         , m_bIsReadonly(false)
+        , m_bDoSaveAs(false)
     {
         m_lastWriteTime.dwHighDateTime = 0;
         m_lastWriteTime.dwLowDateTime  = 0;
@@ -77,4 +78,5 @@ public:
     bool                    m_bIsDirty;
     bool                    m_bNeedsSaving;
     bool                    m_bIsReadonly;
+    bool                    m_bDoSaveAs;        ///< even if m_path is set, always ask where to save
 };

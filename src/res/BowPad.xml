@@ -694,6 +694,14 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/FileDeleteL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdNewCopy" LabelTitle="New Copy" TooltipTitle="New Copy" TooltipDescription="Creates a copy of the current tab" >
+      <Command.SmallImages>
+        <Image>res/FileNewCopyS.bmp</Image>
+      </Command.SmallImages>
+      <Command.LargeImages>
+        <Image>res/FileNewCopyL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
 
     <Command Name="cmdContextMap" />
     <Command Name="cmdTabContextMap" />
@@ -1085,6 +1093,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdSaveAs" />
             <Button CommandName="cmdReload" />
             <Button CommandName="cmdFileDelete" />
+            <Button CommandName="cmdNewCopy" />
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="cmdCopyPath" />
