@@ -439,7 +439,7 @@ void CScintillaWnd::SetupDefaultStyles()
     else
     {
         Call(SCI_SETCARETLINEBACK, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
-        Call(SCI_SETCARETLINEBACKALPHA, 20);
+        Call(SCI_SETCARETLINEBACKALPHA, 15);
     }
     Call(SCI_SETWHITESPACEFORE, true, CTheme::Instance().GetThemeColor(RGB(255, 181, 106)));
 }
