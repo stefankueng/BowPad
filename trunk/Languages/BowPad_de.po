@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-03-02 14:53+0100\n"
+"PO-Revision-Date: 2014-03-09 14:02+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -16,6 +16,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.6.4\n"
+
+# msgid/msgstr fields for Accelerator keys
+# Format is: "ID:xxxxxx:VACS+X" where:
+#    ID:xxxxx = the menu ID corresponding to the accelerator
+#    V = Virtual key (or blank if not used) - nearly always set!
+#    A = Alt key     (or blank if not used)
+#    C = Ctrl key    (or blank if not used)
+#    S = Shift key   (or blank if not used)
+#    X = upper case character
+# e.g. "V CS+Q" == Ctrl + Shift + 'Q'
+# ONLY Accelerator Keys with corresponding alphanumeric characters can be
+# updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
+# ONLY change the msgstr field. Do NOT change any other.
+# If you do not want to change an Accelerator Key, copy msgid to msgstr
+#. Resource IDs: (11)
+#, c-format
+msgid "%s (copy).%s"
+msgstr "%s (Kopie).%s"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -171,6 +189,10 @@ msgstr "Fett"
 msgid "Bookmark"
 msgstr "Lesezeichen"
 
+#. Resource IDs: (3770)
+msgid "Bookmarks"
+msgstr "Lesezeichen"
+
 #. Resource IDs: (7)
 msgid "BowPad"
 msgstr "BowPad"
@@ -230,14 +252,14 @@ msgstr ""
 #. Resource IDs: (11)
 msgid ""
 "Cancel\n"
-"The unsaved modifications are kept."
+"The unsaved modifications will be kept."
 msgstr ""
 "Abbrechen\n"
 "Nicht gespeicherte Änderungen bleiben vorhanden."
 
-#. Resource IDs: (3764)
-msgid "Char operations"
-msgstr "Zeichenoperationen"
+#. Resource IDs: (3763)
+msgid "Change Case"
+msgstr "Gross/Kleinschreibung"
 
 #. Resource IDs: (1027)
 msgid "Check for Updates"
@@ -421,6 +443,10 @@ msgstr ""
 "Erstellen\n"
 "Eine leere Datei wird erstellt."
 
+#. Resource IDs: (3782)
+msgid "Creates a copy of the current tab"
+msgstr "Erstellt eine Kopie des aktuellen Tabs"
+
 #. Resource IDs: (3752)
 msgid "Creates a new tab with an empty document"
 msgstr "Erstellt einen neuen Tab mit einem leeren Dokument"
@@ -496,6 +522,14 @@ msgstr "Dunkler Stil"
 #. Resource IDs: (3758)
 msgid "Delete"
 msgstr "Löschen"
+
+#. Resource IDs: (3781)
+msgid "Delete File"
+msgstr "Datei löschen"
+
+#. Resource IDs: (3782)
+msgid "Deletes the file of the current tab"
+msgstr "Löscht die Datei des aktuellen Tabs"
 
 #. Resource IDs: (3760)
 msgid ""
@@ -973,6 +1007,10 @@ msgstr "NEXT"
 msgid "New %d"
 msgstr "Neu %d"
 
+#. Resource IDs: (3782)
+msgid "New Copy"
+msgstr "Neue Kopie"
+
 #. Resource IDs: (3752)
 msgid "New Document"
 msgstr "Neues Dokument"
@@ -981,8 +1019,8 @@ msgstr "Neues Dokument"
 msgid "Next"
 msgstr "Nächste"
 
-#. Resource IDs: (3765)
-msgid "Next Bookmarks"
+#. Resource IDs: (3771)
+msgid "Next Bookmark"
 msgstr "Nächstes Lesezeichen"
 
 #. Resource IDs: (10)
@@ -1104,6 +1142,10 @@ msgstr "Sucht mit dem Standardbrowser nach dem markierten Text"
 msgid "Opens the file/path that's at the cursor position"
 msgstr "Öffnet die Datei/Pfad welche an der Cursorposition steht"
 
+#. Resource IDs: (3768)
+msgid "Other operations"
+msgstr "Andere Funktionen"
+
 #. Resource IDs: (3766)
 msgid "P"
 msgstr "P"
@@ -1132,8 +1174,8 @@ msgstr "Einfügen"
 msgid "Previous"
 msgstr "Vorherige"
 
-#. Resource IDs: (3765)
-msgid "Previous Bookmarks"
+#. Resource IDs: (3772)
+msgid "Previous Bookmark"
 msgstr "Vorheriges Lesezeichen"
 
 #. Resource IDs: (3762)
@@ -1203,7 +1245,7 @@ msgstr "Datei von Medium neu laden"
 #. Resource IDs: (11)
 msgid ""
 "Reload\n"
-"The unsaved modifications are lost!"
+"The unsaved modifications will be lost!"
 msgstr ""
 "Dokument neu laden\n"
 "Nicht gespeicherte Änderungen gehen verloren."
@@ -1476,10 +1518,6 @@ msgstr ""
 msgid "U"
 msgstr "U"
 
-#. Resource IDs: (3759)
-msgid "UPPER/lower"
-msgstr "GROSS/klein"
-
 #. Resource IDs: (3764)
 msgid "UT"
 msgstr "UT"
@@ -1509,8 +1547,8 @@ msgid "Unix (LF)"
 msgstr "Unix (LF)"
 
 #. Resource IDs: (7)
-msgid "Unsafed modifications"
-msgstr "nicht gespeicherte Änderungen"
+msgid "Unsaved modifications"
+msgstr "Nicht gespeicherte Änderungen"
 
 #. Resource IDs: (3759, 3760)
 msgid "Uppercase"
@@ -1674,6 +1712,9 @@ msgstr "Führt den Benutzerbefehl 9 aus"
 #. Resource IDs: (3760)
 msgid "tab size"
 msgstr "Tabulatorgrösse"
+
+#~ msgid "UPPER/lower"
+#~ msgstr "GROSS/klein"
 
 #~ msgid "Cl&ose"
 #~ msgstr "&Schliessen"
