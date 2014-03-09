@@ -540,13 +540,31 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 ::SendMessage(*this, TCM_GETITEMRECT, oldIndex, (LPARAM)&oldRect);
                 m_currentHoverTabItem = index;
                 m_bIsCloseHover = m_closeButtonZone.IsHit(xPos, yPos, m_currentHoverTabRect);
-
+                if (m_bIsCloseHover)
+                {
+                    TRACKMOUSEEVENT tme = { 0 };
+                    tme.cbSize = sizeof(TRACKMOUSEEVENT);
+                    tme.dwFlags = TME_LEAVE;
+                    tme.hwndTrack = *this;
+                    TrackMouseEvent(&tme);
+                }
                 if (oldVal != m_bIsCloseHover)
                 {
                     InvalidateRect(hwnd, &oldRect, FALSE);
                     InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
                 }
             }
+        }
+            break;
+        case WM_MOUSELEAVE:
+        {
+            TRACKMOUSEEVENT tme = { 0 };
+            tme.cbSize = sizeof(TRACKMOUSEEVENT);
+            tme.dwFlags = TME_LEAVE | TME_CANCEL;
+            tme.hwndTrack = *this;
+            TrackMouseEvent(&tme);
+            m_bIsCloseHover = false;
+            InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
         }
             break;
         case WM_LBUTTONUP:
