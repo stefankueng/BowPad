@@ -867,7 +867,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               </MenuGroup>
             </DropDownButton>
           </Group>
-          <Group CommandName="cmdGroupComment" SizeDefinition="FiveOrSixButtons">
+          <Group CommandName="cmdGroupComment" SizeDefinition="FiveButtons">
             <DropDownGallery CommandName="cmdFunctions" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <FlowMenuLayout Columns="1"/>
