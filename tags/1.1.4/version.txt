@@ -1,0 +1,5 @@
+1.1.3.628
+http://netcologne.dl.sourceforge.net/project/stefanstools/BowPad/1.1.3/BowPad64-1.1.3.msi
+BowPad64-1.1.3.msi
+http://netcologne.dl.sourceforge.net/project/stefanstools/BowPad/1.1.3/BowPad-1.1.3.msi
+BowPad-1.1.3.msi
