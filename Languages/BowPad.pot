@@ -33,6 +33,11 @@ msgstr ""
 # ONLY change the msgstr field. Do NOT change any other.
 # If you do not want to change an Accelerator Key, copy msgid to msgstr
 
+#. Resource IDs: (11)
+#, c-format
+msgid "%s (copy).%s"
+msgstr ""
+
 #. Resource IDs: (104)
 msgid "&About ..."
 msgstr ""
@@ -166,6 +171,10 @@ msgstr ""
 msgid "Bookmark"
 msgstr ""
 
+#. Resource IDs: (3770)
+msgid "Bookmarks"
+msgstr ""
+
 #. Resource IDs: (7)
 msgid "BowPad"
 msgstr ""
@@ -215,11 +224,11 @@ msgid "Cancel\nThe file is not loaded again."
 msgstr ""
 
 #. Resource IDs: (11)
-msgid "Cancel\nThe unsaved modifications are kept."
+msgid "Cancel\nThe unsaved modifications will be kept."
 msgstr ""
 
-#. Resource IDs: (3764)
-msgid "Char operations"
+#. Resource IDs: (3763)
+msgid "Change Case"
 msgstr ""
 
 #. Resource IDs: (1027)
@@ -394,6 +403,10 @@ msgstr ""
 msgid "Create\nAn empty file is created."
 msgstr ""
 
+#. Resource IDs: (3782)
+msgid "Creates a copy of the current tab"
+msgstr ""
+
 #. Resource IDs: (3752)
 msgid "Creates a new tab with an empty document"
 msgstr ""
@@ -468,6 +481,14 @@ msgstr ""
 
 #. Resource IDs: (3758)
 msgid "Delete"
+msgstr ""
+
+#. Resource IDs: (3781)
+msgid "Delete File"
+msgstr ""
+
+#. Resource IDs: (3782)
+msgid "Deletes the file of the current tab"
 msgstr ""
 
 #. Resource IDs: (3760)
@@ -897,6 +918,10 @@ msgstr ""
 msgid "New %d"
 msgstr ""
 
+#. Resource IDs: (3782)
+msgid "New Copy"
+msgstr ""
+
 #. Resource IDs: (3752)
 msgid "New Document"
 msgstr ""
@@ -905,8 +930,8 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#. Resource IDs: (3765)
-msgid "Next Bookmarks"
+#. Resource IDs: (3771)
+msgid "Next Bookmark"
 msgstr ""
 
 #. Resource IDs: (10)
@@ -1013,6 +1038,10 @@ msgstr ""
 msgid "Opens the file/path that's at the cursor position"
 msgstr ""
 
+#. Resource IDs: (3768)
+msgid "Other operations"
+msgstr ""
+
 #. Resource IDs: (3766)
 msgid "P"
 msgstr ""
@@ -1041,8 +1070,8 @@ msgstr ""
 msgid "Previous"
 msgstr ""
 
-#. Resource IDs: (3765)
-msgid "Previous Bookmarks"
+#. Resource IDs: (3772)
+msgid "Previous Bookmark"
 msgstr ""
 
 #. Resource IDs: (3762)
@@ -1102,7 +1131,7 @@ msgid "Reload the file from disk"
 msgstr ""
 
 #. Resource IDs: (11)
-msgid "Reload\nThe unsaved modifications are lost!"
+msgid "Reload\nThe unsaved modifications will be lost!"
 msgstr ""
 
 #. Resource IDs: (3765)
@@ -1353,10 +1382,6 @@ msgstr ""
 msgid "U"
 msgstr ""
 
-#. Resource IDs: (3759)
-msgid "UPPER/lower"
-msgstr ""
-
 #. Resource IDs: (3764)
 msgid "UT"
 msgstr ""
@@ -1386,7 +1411,7 @@ msgid "Unix (LF)"
 msgstr ""
 
 #. Resource IDs: (7)
-msgid "Unsafed modifications"
+msgid "Unsaved modifications"
 msgstr ""
 
 #. Resource IDs: (3759, 3760)
