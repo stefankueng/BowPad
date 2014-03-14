@@ -15,11 +15,13 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #include "stdafx.h"
+#include "BowPad.h"
 #include "CmdFiles.h"
 #include "MRU.h"
 #include "LexStyles.h"
 #include "PreserveChdir.h"
 #include "PathUtils.h"
+#include "StringUtils.h"
 
 bool CCmdOpen::Execute()
 {
@@ -243,40 +245,75 @@ bool CCmdFileDelete::Execute()
         CDocument doc = GetActiveDocument();
         if (!doc.m_path.empty())
         {
-            // Close the tab
-            if (!CloseTab(GetTabIndexFromDocID(GetCurrentTabId()), false))
-                return false;
+            // ask first
+            ResString rTitle(hRes, IDS_FILEDELETE_TITLE);
+            ResString rQuestion(hRes, IDS_FILEDELETE_ASK);
+            ResString rDelete(hRes, IDS_FILEDELETE_DEL);
+            ResString rCancel(hRes, IDS_FILEDELETE_CANCEL);
+            std::wstring filename = CPathUtils::GetFileName(doc.m_path);
+            std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str());
 
-            _COM_SMARTPTR_TYPEDEF(IFileOperation, __uuidof(IFileOperation));
-            IFileOperationPtr pfo = NULL;
-            HRESULT hr = pfo.CreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL);
+            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+            TASKDIALOG_BUTTON aCustomButtons[2];
+            aCustomButtons[0].nButtonID = 100;
+            aCustomButtons[0].pszButtonText = rDelete;
+            aCustomButtons[1].nButtonID = 101;
+            aCustomButtons[1].pszButtonText = rCancel;
+
+            tdc.hwndParent = GetHwnd();
+            tdc.hInstance = hRes;
+            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+            tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+            tdc.pButtons = aCustomButtons;
+            tdc.cButtons = _countof(aCustomButtons);
+            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+            tdc.pszMainIcon = TD_WARNING_ICON;
+            tdc.pszMainInstruction = rTitle;
+            tdc.pszContent = sQuestion.c_str();
+            tdc.nDefaultButton = 101;
+            int nClickedBtn = 0;
+            HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
 
             if (SUCCEEDED(hr))
             {
-                // Set parameters for current operation
-                hr = pfo->SetOperationFlags(FOF_ALLOWUNDO | FOF_NO_CONNECTED_ELEMENTS | FOFX_ADDUNDORECORD);
-
-                if (SUCCEEDED(hr))
+                if (nClickedBtn == 100)
                 {
-                    // Create IShellItem instance associated to file to delete
-                    _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
-                    IShellItemPtr psiFileToDelete = NULL;
-                    hr = SHCreateItemFromParsingName(doc.m_path.c_str(), NULL, IID_PPV_ARGS(&psiFileToDelete));
+                    // Close the tab
+                    if (!CloseTab(GetTabIndexFromDocID(GetCurrentTabId()), false))
+                        return false;
+
+                    _COM_SMARTPTR_TYPEDEF(IFileOperation, __uuidof(IFileOperation));
+                    IFileOperationPtr pfo = NULL;
+                    HRESULT hr = pfo.CreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL);
 
                     if (SUCCEEDED(hr))
                     {
-                        // Declare this shell item (file) to be deleted
-                        hr = pfo->DeleteItem(psiFileToDelete, NULL);
-                    }
-                }
-                pfo->SetOwnerWindow(GetHwnd());
-                if (SUCCEEDED(hr))
-                {
-                    // Perform the deleting operation
-                    hr = pfo->PerformOperations();
-                    if (SUCCEEDED(hr))
-                    {
-                        return true;
+                        // Set parameters for current operation
+                        hr = pfo->SetOperationFlags(FOF_ALLOWUNDO | FOF_NO_CONNECTED_ELEMENTS | FOFX_ADDUNDORECORD | FOF_NOCONFIRMATION | FOF_NORECURSION | FOF_SILENT | FOFX_SHOWELEVATIONPROMPT | FOFX_RECYCLEONDELETE);
+
+                        if (SUCCEEDED(hr))
+                        {
+                            // Create IShellItem instance associated to file to delete
+                            _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
+                            IShellItemPtr psiFileToDelete = NULL;
+                            hr = SHCreateItemFromParsingName(doc.m_path.c_str(), NULL, IID_PPV_ARGS(&psiFileToDelete));
+
+                            if (SUCCEEDED(hr))
+                            {
+                                // Declare this shell item (file) to be deleted
+                                hr = pfo->DeleteItem(psiFileToDelete, NULL);
+                            }
+                        }
+                        pfo->SetOwnerWindow(GetHwnd());
+                        if (SUCCEEDED(hr))
+                        {
+                            // Perform the deleting operation
+                            hr = pfo->PerformOperations();
+                            if (SUCCEEDED(hr))
+                            {
+                                return true;
+                            }
+                        }
                     }
                 }
             }
