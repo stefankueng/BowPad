@@ -53,7 +53,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             RECT rcScintilla, rcDlg;
             GetWindowRect(GetScintillaWnd(), &rcScintilla);
             GetWindowRect(hwndDlg, &rcDlg);
-            SetWindowPos(hwndDlg, HWND_TOP, rcScintilla.right - (rcDlg.right - rcDlg.left), rcScintilla.top, 0, 0, SWP_NOSIZE | SWP_SHOWWINDOW);
+            SetWindowPos(hwndDlg, HWND_TOP, rcScintilla.right - (rcDlg.right - rcDlg.left), rcScintilla.top, 0, 0, SWP_NOSIZE);
 
             AdjustControlSize(IDC_MATCHWORD);
             AdjustControlSize(IDC_MATCHCASE);
@@ -104,6 +104,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             }
 
             m_searchWnd.Init(hRes, *this);
+            ShowWindow(*this, SW_SHOW);
             SetFocus(hSearchCombo);
         }
         return FALSE;
