@@ -443,6 +443,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/GotoLineL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdBookmarks" />
     <Command Name="cmdGroupBookmarks" LabelTitle="Bookmarks">
       <Command.LargeImages>
         <Image>res/BookmarkL.bmp</Image>

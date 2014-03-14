@@ -181,6 +181,8 @@ void CCommandHandler::Init( void * obj )
     pCmd = new CCmdFunctions(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 
+    pCmd = new CCmdBookmarks(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdBookmarkToggle(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
     pCmd = new CCmdBookmarkClearAll(obj);
