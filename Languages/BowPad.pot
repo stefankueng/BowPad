@@ -124,6 +124,11 @@ msgid "An update for BowPad is available"
 msgstr ""
 
 #. Resource IDs: (11)
+#, c-format
+msgid "Are you sure you want to delete the file '%s'?"
+msgstr ""
+
+#. Resource IDs: (11)
 msgid "Are you sure you want to reload?"
 msgstr ""
 
@@ -213,6 +218,10 @@ msgstr ""
 
 #. Resource IDs: (2)
 msgid "Cancel"
+msgstr ""
+
+#. Resource IDs: (11)
+msgid "Cancel\nDo not delete the file."
 msgstr ""
 
 #. Resource IDs: (11)
@@ -485,6 +494,14 @@ msgstr ""
 
 #. Resource IDs: (3781)
 msgid "Delete File"
+msgstr ""
+
+#. Resource IDs: (11)
+msgid "Delete file"
+msgstr ""
+
+#. Resource IDs: (11)
+msgid "Delete\nThe file will be removed."
 msgstr ""
 
 #. Resource IDs: (3782)
