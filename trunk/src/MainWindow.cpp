@@ -977,14 +977,7 @@ LRESULT CMainWindow::DoCommand(int id)
     switch (id)
     {
     case cmdExit:
-        {
-            CCommandHandler::Instance().OnClose();
-            CIniSettings::Instance().SaveWindowPos(L"MainWindow", *this);
-            if (CloseAllTabs())
-            {
-                PostMessage(m_hwnd, WM_CLOSE, 0, 0);
-            }
-        }
+        PostMessage(m_hwnd, WM_CLOSE, 0, 0);
         break;
     case cmdNew:
         {
