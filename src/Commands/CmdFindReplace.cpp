@@ -1137,8 +1137,8 @@ bool CCmdFindReplace::Execute()
         {
             // get the current word instead
             long currentPos = (long)ScintillaCall(SCI_GETCURRENTPOS);
-            long startPos = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos);
-            long endPos = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos);
+            long startPos = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
+            long endPos = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
             std::unique_ptr<char[]> textbuf(new char[endPos - startPos + 1]);
             Scintilla::Sci_TextRange range;
             range.chrg.cpMin = startPos;
