@@ -300,7 +300,6 @@ bool CMainWindow::RegisterAndCreateWindow()
     {
         if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, NULL))
         {
-            ShowWindow(*this, SW_SHOW);
             UpdateWindow(*this);
             return true;
         }
