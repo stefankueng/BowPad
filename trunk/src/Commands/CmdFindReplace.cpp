@@ -168,9 +168,14 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
                             size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
                             size_t lineend = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
 
+                            int wrapcount = 1;
+                            if (linestart == lineend)
+                                wrapcount = (int)ScintillaCall(SCI_WRAPCOUNT, linestart);
+                            bool bReplaceOnlyInSelection = (linestart != lineend) || ((wrapcount > 1) && (selEnd - selStart > 20));
+
                             ResString sReplaceAll(hRes, IDS_REPLACEALL);
                             ResString sReplaceAllInSelection(hRes, IDS_REPLACEALLINSELECTION);
-                            AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_REPLACEALLBTN, linestart != lineend ? sReplaceAllInSelection : sReplaceAll);
+                            AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_REPLACEALLBTN, bReplaceOnlyInSelection ? sReplaceAllInSelection : sReplaceAll);
 
                             ResString sReplaceAllInTabs(hRes, IDS_REPLACEALLINTABS);
                             AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_REPLACEALLINTABSBTN, sReplaceAllInTabs);
@@ -654,7 +659,10 @@ void CFindReplaceDlg::DoReplace( int id )
     size_t selEnd = ScintillaCall(SCI_GETSELECTIONEND);
     size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
     size_t lineend = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
-    bool bReplaceOnlyInSelection = (linestart != lineend) && (id == IDC_REPLACEALLBTN);
+    int wrapcount = 1;
+    if (linestart == lineend)
+        wrapcount = (int)ScintillaCall(SCI_WRAPCOUNT, linestart);
+    bool bReplaceOnlyInSelection = ((linestart != lineend) || ((wrapcount > 1) && (selEnd - selStart > 20))) && (id == IDC_REPLACEALLBTN);
 
     if (bReplaceOnlyInSelection)
     {
@@ -1204,7 +1212,7 @@ bool CCmdFindReplace::Execute()
             sSelText = textbuf.get();
         }
         m_pFindReplaceDlg->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
-        if (!sSelText.empty())
+        if (!sSelText.empty() && (sSelText.size() > 50))
         {
             SetDlgItemText(*m_pFindReplaceDlg, IDC_SEARCHCOMBO, CUnicodeUtils::StdGetUnicode(sSelText).c_str());
             SetFocus(GetDlgItem(*m_pFindReplaceDlg, IDC_SEARCHCOMBO));
