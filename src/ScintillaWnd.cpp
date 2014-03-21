@@ -20,6 +20,7 @@
 #include "BowPadUI.h"
 #include "XPMIcons.h"
 #include "UnicodeUtils.h"
+#include "StringUtils.h"
 #include "SciLexer.h"
 #include "AppUtils.h"
 #include "Theme.h"
@@ -376,12 +377,12 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_STYLESETBACK, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
 
     Call(SCI_INDICSETSTYLE, INDIC_SELECTION_MARK, INDIC_ROUNDBOX);
-    Call(SCI_INDICSETALPHA, INDIC_SELECTION_MARK, 100);
+    Call(SCI_INDICSETALPHA, INDIC_SELECTION_MARK, 50);
     Call(SCI_INDICSETUNDER, INDIC_SELECTION_MARK, true);
     Call(SCI_INDICSETFORE,  INDIC_SELECTION_MARK, CTheme::Instance().GetThemeColor(RGB(0,255,0)));
 
     Call(SCI_INDICSETSTYLE, INDIC_FINDTEXT_MARK, INDIC_ROUNDBOX);
-    Call(SCI_INDICSETALPHA, INDIC_FINDTEXT_MARK, 200);
+    Call(SCI_INDICSETALPHA, INDIC_FINDTEXT_MARK, CTheme::Instance().IsDarkTheme() ? 100 : 200);
     Call(SCI_INDICSETUNDER, INDIC_FINDTEXT_MARK, true);
     Call(SCI_INDICSETFORE,  INDIC_FINDTEXT_MARK, CTheme::Instance().GetThemeColor(RGB(255,255,0)));
 
@@ -536,7 +537,15 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
     }
-
+    std::string sSelText = seltextbuffer.get();
+    sSelText = CStringUtils::trim(sSelText);
+    if (sSelText.empty())
+    {
+        lastSelText.clear();
+        m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+        SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
+        return;
+    }
     // don't mark the text again if it's already marked by the search feature
     if (_stricmp(sFindString.c_str(), seltextbuffer.get()) == 0)
         return;
