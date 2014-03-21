@@ -24,8 +24,8 @@
     <Command Name="cmdMainTab" Symbol="IDC_CMD_MAINTAB" Keytip="M">
       <Command.LabelTitle>Main</Command.LabelTitle>
     </Command>
-    <Command Name="cmdViewTab" Symbol="IDC_CMD_VIEWTAB" Keytip="V">
-      <Command.LabelTitle>View</Command.LabelTitle>
+    <Command Name="cmdOtherTab" Symbol="IDC_CMD_VIEWTAB" Keytip="V">
+      <Command.LabelTitle>Other</Command.LabelTitle>
     </Command>
     <Command Name="cmdEditTab" Symbol="IDC_CMD_EDITTAB" Keytip="E">
       <Command.LabelTitle>Edit</Command.LabelTitle>
@@ -373,12 +373,22 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/PrintL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdGroupPrint2" LabelTitle="Print"  Keytip="P">
+      <Command.LargeImages>
+        <Image>res/PrintL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupPrint3" LabelTitle="Print"  Keytip="P">
+      <Command.LargeImages>
+        <Image>res/PrintL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdPrintNow" LabelTitle="Print" TooltipTitle="Print now" TooltipDescription="Sends the document to the default printer">
       <Command.LargeImages>
         <Image>res/PrintNowL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdPrint" LabelTitle="Print..." TooltipTitle="Print" TooltipDescription="Sends the document to a printer" Keytip="PP">
+    <Command Name="cmdPrint" LabelTitle="Print setup" TooltipTitle="Print setup" TooltipDescription="Opens the printer setup dialog" Keytip="PP">
       <Command.LargeImages>
         <Image>res/PrintL.bmp</Image>
       </Command.LargeImages>
@@ -743,6 +753,13 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdOpen" />
           </MenuGroup>
           <MenuGroup>
+            <DropDownButton CommandName="cmdGroupPrint">
+              <Button CommandName="cmdPrintNow"/>
+              <Button CommandName="cmdPageSetup" />
+              <Button CommandName="cmdPrint" />
+            </DropDownButton>
+          </MenuGroup>
+          <MenuGroup>
             <Button CommandName="cmdReload" />
             <Button CommandName="cmdSave" />
             <Button CommandName="cmdSaveAll" />
@@ -788,15 +805,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Scale Group="cmdGroupUndo" Size="Medium" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
-          <Group CommandName="cmdGroupFile" SizeDefinition="SevenButtons">
-            <SplitButton CommandName="cmdGroupPrint">
-              <SplitButton.ButtonItem>
-                <Button CommandName="cmdPrintNow"/>
-              </SplitButton.ButtonItem>
-              <Button CommandName="cmdPageSetup" />
-              <Button CommandName="cmdPrintNow"/>
-              <Button CommandName="cmdPrint" />
-            </SplitButton>
+          <Group CommandName="cmdGroupFile" SizeDefinition="FiveOrSixButtons">
             <Button CommandName="cmdOpen" />
             <Button CommandName="cmdNew" />
             <Button CommandName="cmdSave" />
@@ -918,7 +927,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <ToggleButton CommandName="cmdLineWrap"/>
           </Group>
         </Tab>
-        <Tab CommandName="cmdViewTab">
+        <Tab CommandName="cmdOtherTab">
           <Tab.ScalingPolicy>
             <ScalingPolicy>
               <ScalingPolicy.IdealSizes>
@@ -939,6 +948,16 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                          ShowVerticalFonts="false"
                          MinimumFontSize="6"
                          MaximumFontSize="50" />
+          </Group>
+          <Group CommandName="cmdGroupPrint2" SizeDefinition="OneButton">
+            <SplitButton CommandName="cmdGroupPrint3">
+              <SplitButton.ButtonItem>
+                <Button CommandName="cmdPrintNow"/>
+              </SplitButton.ButtonItem>
+              <Button CommandName="cmdPageSetup" />
+              <Button CommandName="cmdPrintNow"/>
+              <Button CommandName="cmdPrint" />
+            </SplitButton>
           </Group>
           <Group CommandName="cmdGroupView">
             <SizeDefinition>
