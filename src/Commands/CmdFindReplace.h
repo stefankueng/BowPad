@@ -58,6 +58,7 @@ protected:
     void                    DoSearchAll(int id);
     void                    DoReplace(int id);
     void                    SearchDocument(int docID, const CDocument& doc, const std::string& searchfor, int searchflags);
+    int                     ReplaceDocument(CDocument& doc, const std::string& sFindString, const std::string& sReplaceString, int searchflags);
     void                    CheckRegex();
 
     void                    ShowResults(bool bShow);
