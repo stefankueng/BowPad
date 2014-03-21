@@ -171,6 +171,9 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
                             ResString sReplaceAll(hRes, IDS_REPLACEALL);
                             ResString sReplaceAllInSelection(hRes, IDS_REPLACEALLINSELECTION);
                             AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_REPLACEALLBTN, linestart != lineend ? sReplaceAllInSelection : sReplaceAll);
+
+                            ResString sReplaceAllInTabs(hRes, IDS_REPLACEALLINTABS);
+                            AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_REPLACEALLINTABSBTN, sReplaceAllInTabs);
                         }
                         // Display the menu.
                         TrackPopupMenu(hSplitMenu, TPM_LEFTALIGN | TPM_TOPALIGN, pt.x, pt.y, 0, *this, NULL);
@@ -607,7 +610,8 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
         break;
     case IDC_REPLACEALLBTN:
     case IDC_REPLACEBTN:
-        {
+    case IDC_REPLACEALLINTABSBTN:
+    {
             DoReplace(id);
         }
         break;
@@ -679,37 +683,56 @@ void CFindReplaceDlg::DoReplace( int id )
         sReplaceString = UnEscape(sReplaceString);
     }
 
-    ScintillaCall(SCI_SETSEARCHFLAGS, nSearchFlags);
-    sptr_t findRet = -1;
     int replaceCount = 0;
-    ScintillaCall(SCI_BEGINUNDOACTION);
-    do
+    if (id == IDC_REPLACEALLINTABSBTN)
     {
-        findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
-        if ((findRet == -1) && (id==IDC_REPLACEBTN))
+        int tabcount = GetTabCount();
+        for (int i = 0; i < tabcount; ++i)
         {
-            SetInfoText(IDS_FINDRETRYWRAP);
-            // retry from the start of the doc
-            ScintillaCall(SCI_SETTARGETSTART, 0);
-            ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETCURRENTPOS));
+            int docID = GetDocIDFromTabIndex(i);
+            CDocument doc = GetDocumentFromID(docID);
+            int rcount = ReplaceDocument(doc, sFindString, sReplaceString, nSearchFlags);
+            if (rcount)
+            {
+                replaceCount += rcount;
+                SetDocument(docID, doc);
+                UpdateTab(i);
+            }
+        }
+    }
+    else
+    {
+        ScintillaCall(SCI_SETSEARCHFLAGS, nSearchFlags);
+        sptr_t findRet = -1;
+        ScintillaCall(SCI_BEGINUNDOACTION);
+        do
+        {
             findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
-        }
-        if (findRet >= 0)
-        {
-            ScintillaCall((nSearchFlags & SCFIND_REGEXP)!=0 ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, sReplaceString.length(), (sptr_t)sReplaceString.c_str());
-            ++replaceCount;
-            if (id==IDC_REPLACEBTN)
-                Center((long)ScintillaCall(SCI_GETTARGETSTART), (long)ScintillaCall(SCI_GETTARGETEND));
+            if ((findRet == -1) && (id == IDC_REPLACEBTN))
+            {
+                SetInfoText(IDS_FINDRETRYWRAP);
+                // retry from the start of the doc
+                ScintillaCall(SCI_SETTARGETSTART, 0);
+                ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETCURRENTPOS));
+                findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
+            }
+            if (findRet >= 0)
+            {
+                ScintillaCall((nSearchFlags & SCFIND_REGEXP) != 0 ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, sReplaceString.length(), (sptr_t)sReplaceString.c_str());
+                ++replaceCount;
+                if (id == IDC_REPLACEBTN)
+                    Center((long)ScintillaCall(SCI_GETTARGETSTART), (long)ScintillaCall(SCI_GETTARGETEND));
 
-            ScintillaCall(SCI_SETTARGETSTART, ScintillaCall(SCI_GETTARGETEND)+1);
-            if (bReplaceOnlyInSelection)
-                ScintillaCall(SCI_SETTARGETEND, selEnd);
-            else
-                ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
-        }
-    } while ((id==IDC_REPLACEALLBTN) && (findRet != -1));
-    ScintillaCall(SCI_ENDUNDOACTION);
-    if (id==IDC_REPLACEALLBTN)
+                ScintillaCall(SCI_SETTARGETSTART, ScintillaCall(SCI_GETTARGETEND) + 1);
+                if (bReplaceOnlyInSelection)
+                    ScintillaCall(SCI_SETTARGETEND, selEnd);
+                else
+                    ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
+            }
+        } while ((id == IDC_REPLACEALLBTN) && (findRet != -1));
+        ScintillaCall(SCI_ENDUNDOACTION);
+    }
+    if ((id == IDC_REPLACEALLBTN) || (id == IDC_REPLACEALLINTABSBTN))
     {
         // TODO: maybe use a better way to inform the user than an interrupting dialog box
         std::wstring sInfo = CStringUtils::Format(L"%d occurrences were replaced", replaceCount);
@@ -930,6 +953,39 @@ void CFindReplaceDlg::SearchDocument(int docID, const CDocument& doc, const std:
     m_searchWnd.Call(SCI_SETREADONLY, false);
     m_searchWnd.Call(SCI_SETSAVEPOINT);
     m_searchWnd.Call(SCI_SETDOCPOINTER, 0, 0);
+}
+
+int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindString, const std::string& sReplaceString, int searchflags)
+{
+    m_searchWnd.Call(SCI_SETSTATUS, SC_STATUS_OK);   // reset error status
+    m_searchWnd.Call(SCI_CLEARALL);
+    m_searchWnd.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+    m_searchWnd.Call(SCI_SETCODEPAGE, CP_UTF8);
+
+    m_searchWnd.Call(SCI_SETTARGETSTART, 0);
+    m_searchWnd.Call(SCI_SETTARGETEND, m_searchWnd.Call(SCI_GETLENGTH));
+
+    m_searchWnd.Call(SCI_SETSEARCHFLAGS, searchflags);
+    sptr_t findRet = -1;
+    int replaceCount = 0;
+    m_searchWnd.Call(SCI_BEGINUNDOACTION);
+    do
+    {
+        findRet = m_searchWnd.Call(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
+        if (findRet >= 0)
+        {
+            m_searchWnd.Call((searchflags & SCFIND_REGEXP) != 0 ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, sReplaceString.length(), (sptr_t)sReplaceString.c_str());
+            ++replaceCount;
+
+            m_searchWnd.Call(SCI_SETTARGETSTART, m_searchWnd.Call(SCI_GETTARGETEND) + 1);
+            m_searchWnd.Call(SCI_SETTARGETEND, m_searchWnd.Call(SCI_GETLENGTH));
+            doc.m_bIsDirty = true;
+        }
+    } while (findRet != -1);
+    m_searchWnd.Call(SCI_ENDUNDOACTION);
+
+    m_searchWnd.Call(SCI_SETDOCPOINTER, 0, 0);
+    return replaceCount;
 }
 
 void CFindReplaceDlg::InitResultList()
