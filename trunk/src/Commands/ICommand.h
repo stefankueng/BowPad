@@ -44,6 +44,7 @@ public:
 
 protected:
     void                TabActivateAt(int index);
+    void                UpdateTab(int index);
     int                 GetCurrentTabId();
     int                 GetActiveTabIndex();
     int                 GetTabCount();
@@ -63,7 +64,7 @@ protected:
     CDocument           GetActiveDocument();
     bool                HasDocumentID(int id);
     CDocument           GetDocumentFromID(int id);
-    void                SetDocument(int index, CDocument doc);
+    void                SetDocument(int id, CDocument doc);
     void                RestoreCurrentPos(CPosData pos);
     void                SaveCurrentPos(CPosData * pos);
 

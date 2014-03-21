@@ -71,6 +71,19 @@ void ICommand::TabActivateAt( int index )
     pMainWnd->m_TabBar.ActivateAt(index);
 }
 
+void ICommand::UpdateTab(int index)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(index));
+    TCITEM tie;
+    tie.lParam = -1;
+    tie.mask = TCIF_IMAGE;
+    tie.iImage = doc.m_bIsDirty || doc.m_bNeedsSaving ? UNSAVED_IMG_INDEX : SAVED_IMG_INDEX;
+    if (doc.m_bIsReadonly)
+        tie.iImage = REDONLY_IMG_INDEX;
+    ::SendMessage(pMainWnd->m_TabBar, TCM_SETITEM, index, reinterpret_cast<LPARAM>(&tie));
+}
+
 int ICommand::GetActiveTabIndex()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
@@ -223,10 +236,10 @@ CDocument ICommand::GetDocumentFromID( int id )
     return pMainWnd->m_DocManager.GetDocumentFromID(id);
 }
 
-void ICommand::SetDocument( int index, CDocument doc )
+void ICommand::SetDocument( int id, CDocument doc )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    return pMainWnd->m_DocManager.SetDocument(index, doc);
+    return pMainWnd->m_DocManager.SetDocument(id, doc);
 }
 
 void ICommand::RestoreCurrentPos(CPosData pos)
