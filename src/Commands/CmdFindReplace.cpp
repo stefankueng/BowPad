@@ -728,10 +728,14 @@ void CFindReplaceDlg::DoReplace( int id )
             {
                 ScintillaCall((nSearchFlags & SCFIND_REGEXP) != 0 ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, sReplaceString.length(), (sptr_t)sReplaceString.c_str());
                 ++replaceCount;
+                long tstart = (long)ScintillaCall(SCI_GETTARGETSTART);
+                long tend = (long)ScintillaCall(SCI_GETTARGETEND);
                 if (id == IDC_REPLACEBTN)
-                    Center((long)ScintillaCall(SCI_GETTARGETSTART), (long)ScintillaCall(SCI_GETTARGETEND));
-
-                ScintillaCall(SCI_SETTARGETSTART, ScintillaCall(SCI_GETTARGETEND) + 1);
+                    Center(tstart, tend);
+                if ((tend > tstart) || (sReplaceString.empty()))
+                    ScintillaCall(SCI_SETTARGETSTART, tend);
+                else
+                    ScintillaCall(SCI_SETTARGETSTART, tend + 1);
                 if (bReplaceOnlyInSelection)
                     ScintillaCall(SCI_SETTARGETEND, selEnd);
                 else
@@ -984,8 +988,13 @@ int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindStr
         {
             m_searchWnd.Call((searchflags & SCFIND_REGEXP) != 0 ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, sReplaceString.length(), (sptr_t)sReplaceString.c_str());
             ++replaceCount;
+            long tstart = (long)m_searchWnd.Call(SCI_GETTARGETSTART);
+            long tend = (long)m_searchWnd.Call(SCI_GETTARGETEND);
+            if ((tend > tstart) || (sReplaceString.empty()))
+                m_searchWnd.Call(SCI_SETTARGETSTART, tend);
+            else
+                m_searchWnd.Call(SCI_SETTARGETSTART, tend + 1);
 
-            m_searchWnd.Call(SCI_SETTARGETSTART, m_searchWnd.Call(SCI_GETTARGETEND) + 1);
             m_searchWnd.Call(SCI_SETTARGETEND, m_searchWnd.Call(SCI_GETLENGTH));
             doc.m_bIsDirty = true;
         }
