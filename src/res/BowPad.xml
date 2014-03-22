@@ -315,7 +315,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/TitleCaseS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdTabSize" LabelTitle="tab size" TooltipTitle="tab size" TooltipDescription="Set the number of columns for one tabulator." Keytip="TS">
+    <Command Name="cmdTabSize" LabelTitle="Tab Size" TooltipTitle="Tab Size" TooltipDescription="Set the number of columns for one tabulator." Keytip="TS">
     </Command>
     <Command Name="cmdUseTabs" LabelTitle="Use Tabs" TooltipTitle="Use Tabs" TooltipDescription="Determines whether a tab is inserted or spaces when the tab key is pressed." Keytip="UT">
       <Command.SmallImages>
