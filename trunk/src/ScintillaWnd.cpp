@@ -342,6 +342,7 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
     {
         Call(SCI_SETKEYWORDS, it.first-1, (LPARAM)it.second.c_str());
     }
+    Call(SCI_SETLINEENDTYPESALLOWED, Call(SCI_GETLINEENDTYPESSUPPORTED));
 
     SetupDefaultStyles();
 }
