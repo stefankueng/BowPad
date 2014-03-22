@@ -86,6 +86,10 @@ msgstr ""
 msgid "&Search for:"
 msgstr ""
 
+#. Resource IDs: (1007)
+msgid "&whole word"
+msgstr ""
+
 #. Resource IDs: (9)
 msgid "<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Full details about this update</a>"
 msgstr ""
@@ -870,10 +874,6 @@ msgstr ""
 msgid "Match &case"
 msgstr ""
 
-#. Resource IDs: (1007)
-msgid "Match &whole word only"
-msgstr ""
-
 #. Resource IDs: (3765)
 msgid "Misc"
 msgstr ""
@@ -1056,6 +1056,14 @@ msgid "Opens the file/path that's at the cursor position"
 msgstr ""
 
 #. Resource IDs: (3768)
+msgid "Opens the printer setup dialog"
+msgstr ""
+
+#. Resource IDs: (3751)
+msgid "Other"
+msgstr ""
+
+#. Resource IDs: (3768)
 msgid "Other operations"
 msgstr ""
 
@@ -1103,8 +1111,8 @@ msgstr ""
 msgid "Print now"
 msgstr ""
 
-#. Resource IDs: (3762)
-msgid "Print..."
+#. Resource IDs: (3768)
+msgid "Print setup"
 msgstr ""
 
 #. Resource IDs: (1006)
@@ -1129,6 +1137,10 @@ msgstr ""
 
 #. Resource IDs: (10)
 msgid "Regex expression is valid"
+msgstr ""
+
+#. Resource IDs: (1009)
+msgid "Regex mode"
 msgstr ""
 
 #. Resource IDs: (3765)
@@ -1165,6 +1177,10 @@ msgstr ""
 
 #. Resource IDs: (11)
 msgid "Replace &all in selection"
+msgstr ""
+
+#. Resource IDs: (11)
+msgid "Replace All In All &Tabs"
 msgstr ""
 
 #. Resource IDs: (3759)
@@ -1227,10 +1243,6 @@ msgstr ""
 msgid "Saves the current tab"
 msgstr ""
 
-#. Resource IDs: (1009)
-msgid "Search Regex mode"
-msgstr ""
-
 #. Resource IDs: (3769)
 msgid "Search Web"
 msgstr ""
@@ -1261,10 +1273,6 @@ msgstr ""
 
 #. Resource IDs: (3766)
 msgid "Select the language for BowPad"
-msgstr ""
-
-#. Resource IDs: (3762)
-msgid "Sends the document to a printer"
 msgstr ""
 
 #. Resource IDs: (3762)
