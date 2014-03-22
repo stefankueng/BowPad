@@ -36,7 +36,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 {
     Scintilla_RegisterClasses(hInst);
 
-    CreateEx(WS_EX_COMPOSITED, WS_CHILD | WS_VISIBLE, hParent, 0, L"Scintilla");
+    CreateEx(0, WS_CHILD | WS_VISIBLE, hParent, 0, L"Scintilla");
 
     if (!*this)
     {
@@ -51,7 +51,12 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     m_docScroll.InitScintilla(this);
 
-
+#ifdef _DEBUG
+    bool bUseD2D = CIniSettings::Instance().GetInt64(L"View", L"d2d", 1) != 0;
+#else
+    bool bUseD2D = CIniSettings::Instance().GetInt64(L"View", L"d2d", 0) != 0;
+#endif
+    Call(SCI_SETTECHNOLOGY, bUseD2D ? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT);
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
     Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, 14);
@@ -102,7 +107,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     // For Ctrl+C, use SCI_COPYALLOWLINE instead of SCI_COPY
     Call(SCI_ASSIGNCMDKEY, 'C'+(SCMOD_CTRL<<16), SCI_COPYALLOWLINE);
 
-    // change the home and end key to honour wrapped lines
+    // change the home and end key to honor wrapped lines
     // but allow the line-home and line-end to be used with the ALT key
     Call(SCI_ASSIGNCMDKEY, SCK_HOME, SCI_VCHOMEWRAP);
     Call(SCI_ASSIGNCMDKEY, SCK_END, SCI_LINEENDWRAP);
@@ -114,7 +119,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     // line cut for Ctrl+L
     Call(SCI_ASSIGNCMDKEY, 'L' + (SCMOD_CTRL << 16), SCI_LINECUT);
 
-    Call(SCI_SETBUFFEREDDRAW, true);
+    Call(SCI_SETBUFFEREDDRAW, bUseD2D ? false : true);
     Call(SCI_SETTWOPHASEDRAW, true);
 
     Call(SCI_USEPOPUP, 0);  // no default context menu
