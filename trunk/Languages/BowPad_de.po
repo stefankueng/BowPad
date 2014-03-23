@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-03-09 14:02+0100\n"
+"PO-Revision-Date: 2014-03-23 13:49+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -96,6 +96,10 @@ msgstr "&Speichern"
 msgid "&Search for:"
 msgstr "&Suche nach:"
 
+#. Resource IDs: (1007)
+msgid "&whole word"
+msgstr "&ganze Wörter"
+
 #. Resource IDs: (9)
 msgid ""
 "<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Full "
@@ -140,6 +144,11 @@ msgstr "Erlaubt das Laden einer Datei mit einer bestimmten Kodierung"
 #. Resource IDs: (9)
 msgid "An update for BowPad is available"
 msgstr "Ein Update für BowPad ist erhältlich"
+
+#. Resource IDs: (11)
+#, c-format
+msgid "Are you sure you want to delete the file '%s'?"
+msgstr "Möchten Sie die Datei '%s' wirklich löschen?"
 
 #. Resource IDs: (11)
 msgid "Are you sure you want to reload?"
@@ -232,6 +241,14 @@ msgstr "CU"
 #. Resource IDs: (2)
 msgid "Cancel"
 msgstr "Abbrechen"
+
+#. Resource IDs: (11)
+msgid ""
+"Cancel\n"
+"Do not delete the file."
+msgstr ""
+"Abbrechen\n"
+"Datei nicht löschen"
 
 #. Resource IDs: (11)
 msgid ""
@@ -526,6 +543,18 @@ msgstr "Löschen"
 #. Resource IDs: (3781)
 msgid "Delete File"
 msgstr "Datei löschen"
+
+#. Resource IDs: (11)
+msgid "Delete file"
+msgstr "Datei löschen"
+
+#. Resource IDs: (11)
+msgid ""
+"Delete\n"
+"The file will be removed."
+msgstr ""
+"Löschen\n"
+"Die Datei wird gelöscht."
 
 #. Resource IDs: (3782)
 msgid "Deletes the file of the current tab"
@@ -942,10 +971,6 @@ msgstr "Haupt-Kodierungen"
 msgid "Match &case"
 msgstr "Gross/Kleinschreibung"
 
-#. Resource IDs: (1007)
-msgid "Match &whole word only"
-msgstr "Nur &ganze Wörter"
-
 #. Resource IDs: (3765)
 msgid "Misc"
 msgstr "Verschiedenes"
@@ -1143,6 +1168,14 @@ msgid "Opens the file/path that's at the cursor position"
 msgstr "Öffnet die Datei/Pfad welche an der Cursorposition steht"
 
 #. Resource IDs: (3768)
+msgid "Opens the printer setup dialog"
+msgstr "Öffnet den Drucker Setup Dialog"
+
+#. Resource IDs: (3751)
+msgid "Other"
+msgstr "Anderes"
+
+#. Resource IDs: (3768)
 msgid "Other operations"
 msgstr "Andere Funktionen"
 
@@ -1190,9 +1223,9 @@ msgstr "Druckseitenkonfiguration"
 msgid "Print now"
 msgstr "Drucke jetzt"
 
-#. Resource IDs: (3762)
-msgid "Print..."
-msgstr "Drucken..."
+#. Resource IDs: (3768)
+msgid "Print setup"
+msgstr "Drucker Setup"
 
 #. Resource IDs: (1006)
 msgid "R&eplace with:"
@@ -1217,6 +1250,10 @@ msgstr "Regulärer Ausdruck ist ungültig!"
 #. Resource IDs: (10)
 msgid "Regex expression is valid"
 msgstr "Regulärer Ausdruck ist gültig"
+
+#. Resource IDs: (1009)
+msgid "Regex mode"
+msgstr "Regex Modus"
 
 #. Resource IDs: (3765)
 msgid "Reload"
@@ -1265,6 +1302,10 @@ msgstr "Alle E&rsetzen"
 #. Resource IDs: (11)
 msgid "Replace &all in selection"
 msgstr "Alle in Auswahl e&rsetzen"
+
+#. Resource IDs: (11)
+msgid "Replace All In All &Tabs"
+msgstr "Alle E&rsetzen in allen Tabs"
 
 #. Resource IDs: (3759)
 msgid "Right margin"
@@ -1334,10 +1375,6 @@ msgstr "Speichert alle geöffneten Dateien"
 msgid "Saves the current tab"
 msgstr "Speichert den aktuellen Tab"
 
-#. Resource IDs: (1009)
-msgid "Search Regex mode"
-msgstr "Suche im Regex Modus"
-
 #. Resource IDs: (3769)
 msgid "Search Web"
 msgstr "Websuche"
@@ -1369,10 +1406,6 @@ msgstr "Alles auswählen"
 #. Resource IDs: (3766)
 msgid "Select the language for BowPad"
 msgstr "Wähle die Sprache für BowPad"
-
-#. Resource IDs: (3762)
-msgid "Sends the document to a printer"
-msgstr "Sendet das Dokument an einen Drucker"
 
 #. Resource IDs: (3762)
 msgid "Sends the document to the default printer"
@@ -1453,6 +1486,10 @@ msgstr "TS"
 #. Resource IDs: (3771)
 msgid "TT"
 msgstr "TT"
+
+#. Resource IDs: (3764)
+msgid "Tab Size"
+msgstr "Tabulatorgrösse"
 
 #. Resource IDs: (3764)
 msgid "Tabs to Spaces"
@@ -1709,9 +1746,14 @@ msgstr "Führt den Benutzerbefehl 8 aus"
 msgid "runs the custom command 9"
 msgstr "Führt den Benutzerbefehl 9 aus"
 
-#. Resource IDs: (3760)
-msgid "tab size"
-msgstr "Tabulatorgrösse"
+#~ msgid "Print..."
+#~ msgstr "Drucken..."
+
+#~ msgid "Sends the document to a printer"
+#~ msgstr "Sendet das Dokument an einen Drucker"
+
+#~ msgid "tab size"
+#~ msgstr "Tabulatorgrösse"
 
 #~ msgid "UPPER/lower"
 #~ msgstr "GROSS/klein"
