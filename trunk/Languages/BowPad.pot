@@ -1352,6 +1352,10 @@ msgid "TT"
 msgstr ""
 
 #. Resource IDs: (3764)
+msgid "Tab Size"
+msgstr ""
+
+#. Resource IDs: (3764)
 msgid "Tabs to Spaces"
 msgstr ""
 
@@ -1582,9 +1586,5 @@ msgstr ""
 
 #. Resource IDs: (3772)
 msgid "runs the custom command 9"
-msgstr ""
-
-#. Resource IDs: (3760)
-msgid "tab size"
 msgstr ""
 
