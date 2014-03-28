@@ -78,6 +78,7 @@ public:
                     CIniSettings::Instance().SetInt64 (L"TabSession", CStringUtils::Format(L"scrollwidth%d", saveindex).c_str(), pos.m_nScrollWidth);
                     CIniSettings::Instance().SetInt64 (L"TabSession", CStringUtils::Format(L"xoffset%d", saveindex).c_str(), pos.m_xOffset);
                     CIniSettings::Instance().SetInt64 (L"TabSession", CStringUtils::Format(L"firstvisible%d", saveindex).c_str(), pos.m_nFirstVisibleLine);
+                    CIniSettings::Instance().SetInt64 (L"TabSession", CStringUtils::Format(L"activetab%d", saveindex).c_str(), 1);
                 }
                 else
                 {
@@ -88,6 +89,7 @@ public:
                     CIniSettings::Instance().SetInt64 (L"TabSession", CStringUtils::Format(L"scrollwidth%d", saveindex).c_str(), doc.m_position.m_nScrollWidth);
                     CIniSettings::Instance().SetInt64 (L"TabSession", CStringUtils::Format(L"xoffset%d", saveindex).c_str(), doc.m_position.m_xOffset);
                     CIniSettings::Instance().SetInt64 (L"TabSession", CStringUtils::Format(L"firstvisible%d", saveindex).c_str(), doc.m_position.m_nFirstVisibleLine);
+                    CIniSettings::Instance().SetInt64 (L"TabSession", CStringUtils::Format(L"activetab%d", saveindex).c_str(), 0);
                 }
             }
             ++saveindex;
@@ -96,6 +98,7 @@ public:
 protected:
     void    RestoreSavedSession()
     {
+        int activetab = -1;
         for (int i = 0; i < 100; ++i)
         {
             std::wstring key = CStringUtils::Format(L"path%d", i);
@@ -129,9 +132,13 @@ protected:
                     ScintillaCall(SCI_CHOOSECARETX);
                     size_t lineToShow = ScintillaCall(SCI_VISIBLEFROMDOCLINE,doc.m_position.m_nFirstVisibleLine);
                     ScintillaCall(SCI_LINESCROLL, 0, lineToShow);
+                    if ((int)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"activetab%d", i).c_str(), 0))
+                        activetab = GetActiveTabIndex();
                 }
             }
         }
+        if (activetab >= 0)
+            TabActivateAt(activetab);
     }
 };
 
