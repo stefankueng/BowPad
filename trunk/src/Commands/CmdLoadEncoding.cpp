@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
         codepages.push_back(std::make_tuple(1200, true, L"UTF-16 Little Endian", 0));
         codepages.push_back(std::make_tuple(1201, true, L"UTF-16 Big Endian", 0));
         codepages.push_back(std::make_tuple(12000, true, L"UTF-32 Little Endian", 0));
-        codepages.push_back(std::make_tuple(1200, true, L"UTF-32 Big Endian", 0));
+        codepages.push_back(std::make_tuple(12001, true, L"UTF-32 Big Endian", 0));
     }
     UINT codepage = _wtoi(lpCodePageString);
     switch (codepage)
