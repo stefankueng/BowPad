@@ -23,18 +23,91 @@
 #include "LexStyles.h"
 
 #include <vector>
-#include <map>
-#include <set>
-#include <tuple>
 #include <algorithm>
 
-std::vector<std::tuple<size_t,std::wstring>> functions;
+namespace
+{
+    struct func_info
+    {
+        inline func_info(size_t line, std::wstring&& sort_name, std::wstring&& display_name)
+            : line(line), sort_name(sort_name), display_name(display_name)
+        {}
+        size_t line;
+        std::wstring sort_name;
+        std::wstring display_name;
+    };
+};
 
-HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
+static std::vector<func_info> functions;
+// Using the same timer delay in all situations to avoid repeating it.
+static const int timer_delay = 3000;
+
+static void strip_comments(std::wstring& f)
+{
+    // remove comments
+    auto pos = f.find(L"/*");
+    while (pos != std::wstring::npos)
+    {
+        size_t posend = f.find(L"*/", pos);
+        if (posend != std::string::npos)
+        {
+            f.erase(pos, posend);
+        }
+        pos = f.find(L"/*");
+    }
+}
+
+static void normalize(std::wstring& f)
+{
+    auto e = std::remove_if(f.begin(), f.end(), [](wchar_t c)
+    {
+        return c == L'\r' || c == L'{';
+    });
+    f.erase(e, f.end());
+    std::replace_if(f.begin(), f.end(), [](wchar_t c)
+    {
+        return c == L'\n' || c == L'\t';
+    }, L' ');
+    // remove unnecessary whitespace inside the string
+    // bool BothAreSpaces(char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); }
+    auto new_end = std::unique(f.begin(), f.end(), [](wchar_t lhs, wchar_t rhs) -> bool
+    {
+        return (lhs == rhs) && (lhs == L' ');
+    });
+    f.erase(new_end, f.end());
+}
+
+static bool parse_signature(const std::wstring& sig, std::wstring& name, std::wstring& name_and_args)
+{
+    // Find the name of the function
+    name.clear();
+    name_and_args.clear();
+    bool parsed = false;
+
+    auto bracepos = sig.find(L'(');
+    if (bracepos != std::wstring::npos)
+    {
+        auto wpos = sig.find_last_of(L"\t :,.", bracepos - 1, 5);
+        size_t spos = (wpos == std::wstring::npos) ? 0 : wpos + 1;
+
+        // Functions returning pointer or reference will feature these symbols
+        // before the name. Ignore them.
+        // This whole logic may need to be language specific.
+        while (spos < bracepos && (sig[spos] == L'*' || sig[spos] == L'&' || sig[spos] == L'^'))
+            ++spos;
+        name = sig.substr(spos, bracepos - spos);
+        name_and_args = sig.substr(spos);
+        CStringUtils::trim(name);
+        parsed = !name.empty();
+    }
+    return parsed;
+}
+
+HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
 {
     HRESULT hr = E_FAIL;
 
-    if(key == UI_PKEY_Categories)
+    if (key == UI_PKEY_Categories)
     {
         hr = S_FALSE;
     }
@@ -50,7 +123,12 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
         pCollection->Clear();
         functions.clear();
         if (!HasActiveDocument())
+        {
+            pCollection->Release();
             return hr;
+        }
+        // Note: docID is < 0 if the document does not exist,
+        // then FindFunctions() will return no functions
         int docID = GetDocIDFromTabIndex(GetActiveTabIndex());
         FindFunctions(docID, false);
         if (!functions.empty())
@@ -58,37 +136,19 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
             CDocument doc = GetActiveDocument();
             std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
             int sortmethod = CLexStyles::Instance().GetFunctionRegexSortForLang(lang);
+
             if (sortmethod)
             {
-                std::sort(functions.begin(), functions.end(), [&](std::tuple<size_t, std::wstring> a, std::tuple<size_t, std::wstring> b)
+                std::sort(functions.begin(), functions.end(),
+                          [](const func_info& a, const func_info& b)
                 {
-                    std::wstring sa = std::get<1>(a);
-                    std::wstring sb = std::get<1>(b);
-                    if (sortmethod == 2)
-                    {
-                        size_t pa = sa.find_last_of('(');
-                        if (pa > 2)
-                            pa -= 2;
-                        size_t pb = sb.find_last_of('(');
-                        if (pb > 2)
-                            pb -= 2;
-                        size_t flosa = sa.find_last_of(' ', pa);
-                        size_t flosb = sb.find_last_of(' ', pb);
-                        if (flosa != std::wstring::npos)
-                            sa = sa.substr(flosa);
-                        if (flosb != std::wstring::npos)
-                            sb = sb.substr(flosb);
-
-                        if (!sa.empty() && (sa[0] == '*'))
-                            sa = sa.substr(1);
-                        if (!sb.empty() && (sb[0] == '*'))
-                            sb = sb.substr(1);
-                    }
-
-                    return sa < sb;
+                    // sorting the list case insensitively makes
+                    // finding things easier for many people.
+                    // Could be an additional setting to sort by case or not.
+                    return _wcsicmp(a.sort_name.c_str(), b.sort_name.c_str()) < 0;
                 });
             }
-            // populate the dropdown with the code pages
+            // Populate the dropdown with the function details.
             for (const auto& func : functions)
             {
                 // Create a new property set for each item.
@@ -99,8 +159,10 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
                     pCollection->Release();
                     return hr;
                 }
-                std::wstring sf = std::get<1>(func);
-                pItem->InitializeItemProperties(NULL, sf.c_str(), UI_COLLECTION_INVALIDINDEX);
+
+                pItem->InitializeItemProperties(NULL,
+                                                func.display_name.c_str(),
+                                                UI_COLLECTION_INVALIDINDEX);
 
                 // Add the newly-created property set to the collection supplied by the framework.
                 hr = pCollection->Add(pItem);
@@ -147,19 +209,19 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
     return hr;
 }
 
-HRESULT CCmdFunctions::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ )
+HRESULT CCmdFunctions::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
     HRESULT hr = E_FAIL;
 
     if (verb == UI_EXECUTIONVERB_EXECUTE)
     {
-        if ( key && (*key == UI_PKEY_SelectedItem) && !functions.empty())
+        if (key && (*key == UI_PKEY_SelectedItem) && !functions.empty())
         {
             UINT selected;
             hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
             if (SUCCEEDED(hr))
             {
-                size_t line = std::get<0>(functions[selected]);
+                size_t line = functions[selected].line;
                 size_t linepos = ScintillaCall(SCI_POSITIONFROMLINE, line);
 
                 // to make sure the found result is visible
@@ -179,13 +241,13 @@ HRESULT CCmdFunctions::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PR
                 {
                     linesToScroll = currentlineNumberVis - firstVisibleLineVis;
                     // use center
-                    linesToScroll -= linesVisible/2;
+                    linesToScroll -= linesVisible / 2;
                 }
                 else if (currentlineNumberVis > lastVisibleLineVis)
                 {
                     linesToScroll = currentlineNumberVis - lastVisibleLineVis;
                     // use center
-                    linesToScroll += linesVisible/2;
+                    linesToScroll += linesVisible / 2;
                 }
                 ScintillaCall(SCI_LINESCROLL, 0, linesToScroll);
 
@@ -201,7 +263,7 @@ HRESULT CCmdFunctions::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PR
     return hr;
 }
 
-void CCmdFunctions::TabNotify( TBHDR * ptbhdr )
+void CCmdFunctions::TabNotify(TBHDR * ptbhdr)
 {
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
@@ -210,22 +272,22 @@ void CCmdFunctions::TabNotify( TBHDR * ptbhdr )
     }
 }
 
-void CCmdFunctions::ScintillaNotify( Scintilla::SCNotification * pScn )
+void CCmdFunctions::ScintillaNotify(Scintilla::SCNotification * pScn)
 {
     switch (pScn->nmhdr.code)
     {
-    case SCN_MODIFIED:
-        switch (pScn->modificationType)
-        {
-            case SC_MOD_INSERTTEXT:
-            case SC_MOD_DELETETEXT:
-            case SC_PERFORMED_USER:
-                InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
-                m_docIDs.insert(GetDocIDFromTabIndex(GetActiveTabIndex()));
-                break;
-        }
-        SetTimer(GetHwnd(), m_timerID, 3000, NULL);
-        break;
+        case SCN_MODIFIED:
+            switch (pScn->modificationType)
+            {
+                case SC_MOD_INSERTTEXT:
+                case SC_MOD_DELETETEXT:
+                case SC_PERFORMED_USER:
+                    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
+                    m_docIDs.insert(GetDocIDFromTabIndex(GetActiveTabIndex()));
+                    break;
+            }
+            SetTimer(GetHwnd(), m_timerID, timer_delay, NULL);
+            break;
     }
 }
 
@@ -260,7 +322,7 @@ void CCmdFunctions::OnDocumentOpen(int id)
     if (docID >= 0)
     {
         m_docIDs.insert(docID);
-        SetTimer(GetHwnd(), m_timerID, 3000, NULL);
+        SetTimer(GetHwnd(), m_timerID, timer_delay, NULL);
     }
 }
 
@@ -282,6 +344,9 @@ void CCmdFunctions::FindFunctions(int docID, bool bBackground)
         std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
         std::string funcregex = CLexStyles::Instance().GetFunctionRegexForLang(lang);
         auto trimtokens = CLexStyles::Instance().GetFunctionRegexTrimForLang(lang);
+        std::vector<std::wstring> wtrimtokens;
+        for (const auto& token : trimtokens)
+            wtrimtokens.push_back(CUnicodeUtils::StdGetUnicode(token));
         if (!funcregex.empty())
         {
             m_ScratchScintilla.Call(SCI_SETSTATUS, SC_STATUS_OK);   // reset error status
@@ -300,79 +365,82 @@ void CCmdFunctions::FindFunctions(int docID, bool bBackground)
             ttf.chrg.cpMin = 0;
             ttf.chrg.cpMax = length;
             ttf.lpstrText = const_cast<char*>(funcregex.c_str());
-            size_t numKeywords = 0;
             bool bUpdateLexer = false;
-            do
+
+            int func_display_mode = static_cast<int>(
+                CIniSettings::Instance().GetInt64(L"functions", L"function_display_mode",
+                0));
+
+            for (;;)
             {
                 ttf.chrgText.cpMin = 0;
                 ttf.chrgText.cpMax = 0;
                 findRet = m_ScratchScintilla.Call(SCI_FINDTEXT, SCFIND_REGEXP, (sptr_t)&ttf);
-                if (findRet >= 0)
+                if (findRet < 0)
+                    break;
+
+                size_t len = ttf.chrgText.cpMax - ttf.chrgText.cpMin;
+                std::string raw;
+                raw.resize(len + 1);
+                Scintilla::Sci_TextRange funcrange;
+                funcrange.chrg.cpMin = ttf.chrgText.cpMin;
+                funcrange.chrg.cpMax = ttf.chrgText.cpMax;
+                funcrange.lpstrText = &raw[0];
+                m_ScratchScintilla.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&funcrange));
+                raw.resize(len);
+                size_t line = m_ScratchScintilla.Call(SCI_LINEFROMPOSITION, funcrange.chrg.cpMin);
+
+                std::wstring sig = CUnicodeUtils::StdGetUnicode(raw);
+                strip_comments(sig);
+                normalize(sig);
+                for (const auto& token : wtrimtokens)
+                    SearchReplace(sig, token, L"");
+                CStringUtils::trim(sig);
+                ttf.chrg.cpMin = ttf.chrgText.cpMax + 1;
+                ttf.chrg.cpMax = length;
+
+                std::wstring name;
+                std::wstring name_and_args;
+
+                // Note: regexp identifies functions incorrectly so not
+                // everything is a function that comes through here.
+                // e.g. a switch looking a lot like a function can appear. e.g.:
+                // "case ISD::SHL: switch (VT.SimpleTy)"
+                // but we have to deal with it unless we want to write compilers
+                // for each supported language
+                if (parse_signature(sig, name, name_and_args))
                 {
-                    std::unique_ptr<char[]> strbuf(new char[ttf.chrgText.cpMax - ttf.chrgText.cpMin + 1]);
-                    Scintilla::Sci_TextRange funcrange;
-                    funcrange.chrg.cpMin = ttf.chrgText.cpMin;
-                    funcrange.chrg.cpMax = ttf.chrgText.cpMax;
-                    funcrange.lpstrText = strbuf.get();
-                    m_ScratchScintilla.Call(SCI_GETTEXTRANGE, 0, (sptr_t)&funcrange);
-                    size_t line = m_ScratchScintilla.Call(SCI_LINEFROMPOSITION, funcrange.chrg.cpMin);
-                    std::wstring sf = CUnicodeUtils::StdGetUnicode(strbuf.get());
-                    SearchReplace(sf, L"\r", L"");
-                    SearchReplace(sf, L"\n", L" ");
-                    SearchReplace(sf, L"{", L"");
-                    SearchReplace(sf, L"\t", L" ");
-                    if (!trimtokens.empty())
-                    {
-                        for (const auto& token : trimtokens)
-                            SearchReplace(sf, CUnicodeUtils::StdGetUnicode(token), L"");
-                    }
-                    // remove comments
-                    size_t pos = sf.find(L"/*");
-                    while (pos != std::wstring::npos)
-                    {
-                        size_t posend = sf.find(L"*/", pos);
-                        if (posend != std::wstring::npos)
-                        {
-                            sf.erase(pos, posend);
-                        }
-                        pos = sf.find(L"/*");
-                    }
-                    CStringUtils::trim(sf);
-
-                    // remove unnecessary whitespace inside the string
-                    // bool BothAreSpaces(char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); }
-                    std::wstring::iterator new_end = std::unique(sf.begin(), sf.end(), [&](wchar_t lhs, wchar_t rhs) -> bool
-                    {
-                        return (lhs == rhs) && (lhs == ' ');
-                    });
-                    sf.erase(new_end, sf.end());
-
-
-                    functions.push_back(std::make_tuple(line, sf));
-                    ttf.chrg.cpMin = ttf.chrgText.cpMax + 1;
-                    ttf.chrg.cpMax = length;
-
-                    // find the name of the function
-                    auto bracepos = sf.find('(');
-                    if (bracepos != std::wstring::npos)
-                    {
-                        sf = sf.substr(0, bracepos);
-                        auto wpos = sf.find_last_of(L" \t:,.");
-                        if (wpos != std::wstring::npos)
-                        {
-                            sf = sf.substr(wpos + 1);
-                        }
-                    }
-                    CStringUtils::trim(sf);
-                    size_t actKeywords = CLexStyles::Instance().AddUserFunctionForLang(lang, CUnicodeUtils::StdGetUTF8(sf));
-                    if (numKeywords == 0)
-                        numKeywords = actKeywords;
-                    else if (numKeywords != actKeywords)
+                    size_t actKeywords = CLexStyles::Instance().AddUserFunctionForLang(lang, CUnicodeUtils::StdGetUTF8(name));
+                    if (actKeywords)
                         bUpdateLexer = true;
+
+                    switch (func_display_mode)
+                    {
+                        case 0: // display name and signature
+                            functions.push_back(func_info(line, std::move(name), std::move(name_and_args)));
+                            break;
+                        case 1: // name only
+                        {
+                            std::wstring temp = name;
+                            functions.push_back(func_info(line, std::move(name), std::move(temp)));
+                        }
+                            break;
+                        case 2: // display whole thing type name inc.
+                            functions.push_back(func_info(line, std::move(name), std::move(sig)));
+                            break;
+                    }
+                }
+                else
+                {
+                    // Some kind of line we don't understand. It's probably not
+                    // a function, but put it in the list so it can be seen, then
+                    // someone can file bug reports on why we don't recognize it.
+                    name = sig;
+                    functions.push_back(func_info(line, std::move(sig), std::move(name)));
                 }
                 if (bBackground && (GetTickCount64() - start > 500))
                     break;
-            } while (findRet >= 0);
+            }
             m_ScratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
 
             if (bBackground && bUpdateLexer)
