@@ -984,6 +984,8 @@ LRESULT CMainWindow::DoCommand(int id)
             newCount++;
             CDocument doc;
             doc.m_document = m_scintilla.Call(SCI_CREATEDOCUMENT);
+            doc.m_bHasBOM = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
+            doc.m_encoding = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
             ResString newRes(hRes, IDS_NEW_TABTITLE);
             std::wstring s = CStringUtils::Format(newRes, newCount);
             int index = m_TabBar.InsertAtEnd(s.c_str());
