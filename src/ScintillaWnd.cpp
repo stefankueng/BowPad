@@ -30,7 +30,7 @@
 
 
 extern IUIFramework * g_pFramework;
-extern std::string    sFindString;  // from CmdFindReplace
+extern std::string    sHighlightString;  // from CmdFindReplace
 
 bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 {
@@ -555,7 +555,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         return;
     }
     // don't mark the text again if it's already marked by the search feature
-    if (_stricmp(sFindString.c_str(), seltextbuffer.get()) == 0)
+    if (_stricmp(sHighlightString.c_str(), seltextbuffer.get()) == 0)
         return;
 
     std::unique_ptr<char[]> textbuffer(new char[len + 1]);
