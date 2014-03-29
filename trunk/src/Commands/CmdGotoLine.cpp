@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,9 +20,6 @@
 #include "ScintillaWnd.h"
 #include "UnicodeUtils.h"
 #include "StringUtils.h"
-
-static std::string sFindString;
-static int         nSearchFlags;
 
 CGotoLineDlg::CGotoLineDlg()
 {
