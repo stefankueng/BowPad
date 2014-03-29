@@ -79,6 +79,14 @@
         <Image>res/NewL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdNewDefault" LabelTitle="Set Encoding" TooltipTitle="Set default encoding" TooltipDescription="Set the default encoding for new files, e.g. ANSI, UTF-8, ..." >
+      <Command.LargeImages>
+        <Image>res/keyL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/keyS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
     <Command Name="cmdOpen" LabelTitle="&amp;Open" TooltipTitle="Open Files" TooltipDescription="Opens one or more files" Keytip="O">
       <Command.LargeImages>
         <Image>res/OpenL.bmp</Image>
@@ -733,7 +741,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
     <Command Name="cmdSessionLast" Id="10010" />
     <Command Name="cmdPasteHistory" Id="10011" />
-
+    <Command Name="cmdGroupNewBtn" Id="10012" />
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />
 
@@ -807,7 +815,12 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupFile" SizeDefinition="FiveOrSixButtons">
             <Button CommandName="cmdOpen" />
-            <Button CommandName="cmdNew" />
+            <SplitButton CommandName="cmdGroupNewBtn">
+              <SplitButton.ButtonItem>
+                <Button CommandName="cmdNew" />
+              </SplitButton.ButtonItem>
+              <Button CommandName="cmdNewDefault" />
+            </SplitButton>
             <Button CommandName="cmdSave" />
             <Button CommandName="cmdSaveAll" />
             <Button CommandName="cmdSessionLoad" />

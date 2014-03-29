@@ -49,6 +49,7 @@
 #include "CmdFont.h"
 #include "CmdOpenSelection.h"
 #include "CmdNewCopy.h"
+#include "CmdDefaultEncoding.h"
 
 CCommandHandler::CCommandHandler(void)
 {
@@ -236,6 +237,8 @@ void CCommandHandler::Init( void * obj )
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdNewCopy(obj);
+    m_commands[pCmd->GetCmdId()] = pCmd;
+    pCmd = new CCmdDefaultEncoding(obj);
     m_commands[pCmd->GetCmdId()] = pCmd;
 
     pCmd = new CCmdHeaderSource(obj);
