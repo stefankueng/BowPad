@@ -449,6 +449,8 @@ void CScintillaWnd::SetupDefaultStyles()
         Call(SCI_SETCARETLINEBACKALPHA, 15);
     }
     Call(SCI_SETWHITESPACEFORE, true, CTheme::Instance().GetThemeColor(RGB(255, 181, 106)));
+    Call(SCI_SETCODEPAGE, CP_UTF8);
+
 }
 
 void CScintillaWnd::Center(long posStart, long posEnd)
