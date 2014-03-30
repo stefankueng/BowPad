@@ -326,6 +326,18 @@ void CCmdFunctions::OnDocumentOpen(int id)
     }
 }
 
+void CCmdFunctions::OnDocumentSave(int index, bool bSaveAs)
+{
+    if (bSaveAs)
+    {
+        int docID = GetDocIDFromTabIndex(index);
+        if (docID >= 0)
+        {
+            m_docIDs.insert(docID);
+            SetTimer(GetHwnd(), m_timerID, timer_delay, NULL);
+        }
+    }
+}
 
 void CCmdFunctions::FindFunctions(int docID, bool bBackground)
 {

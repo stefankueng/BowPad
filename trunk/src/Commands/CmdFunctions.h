@@ -57,6 +57,8 @@ public:
 
     virtual void OnDocumentOpen(int id) override;
 
+    virtual void OnDocumentSave(int index, bool bSaveAs) override;
+
 private:
     void            FindFunctions(int docID, bool bBackground);
 
