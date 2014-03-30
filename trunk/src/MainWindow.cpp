@@ -1353,6 +1353,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
                 m_DocManager.SetDocument(id, doc);
                 UpdateStatusBar(true);
                 m_scintilla.Call(SCI_SETSAVEPOINT);
+                CCommandHandler::Instance().OnDocumentSave(m_TabBar.GetCurrentTabIndex(), bSaveAs);
             }
         }
     }
