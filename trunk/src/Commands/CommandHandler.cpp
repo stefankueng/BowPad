@@ -317,6 +317,14 @@ void CCommandHandler::OnDocumentOpen(int index)
     }
 }
 
+void CCommandHandler::OnDocumentSave(int index, bool bSaveAs)
+{
+    for (auto cmd : m_commands)
+    {
+        cmd.second->OnDocumentSave(index, bSaveAs);
+    }
+}
+
 void CCommandHandler::AfterInit()
 {
     for (auto cmd:m_commands)

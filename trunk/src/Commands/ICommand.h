@@ -38,6 +38,7 @@ public:
     virtual void        AfterInit();
     virtual void        OnDocumentClose(int index);
     virtual void        OnDocumentOpen(int index);
+    virtual void        OnDocumentSave(int index, bool bSaveAs);
     virtual HRESULT     IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue);
     virtual HRESULT     IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties);
     virtual void        OnTimer(UINT id);
