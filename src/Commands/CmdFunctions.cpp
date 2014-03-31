@@ -169,23 +169,23 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
 
                 pItem->Release();
             }
-            if (functions.empty())
+        }
+        if (functions.empty())
+        {
+            CPropertySet* pItem;
+            hr = CPropertySet::CreateInstance(&pItem);
+            if (FAILED(hr))
             {
-                CPropertySet* pItem;
-                hr = CPropertySet::CreateInstance(&pItem);
-                if (FAILED(hr))
-                {
-                    pCollection->Release();
-                    return hr;
-                }
-                ResString rs(hRes, IDS_NOFUNCTIONSFOUND);
-                pItem->InitializeItemProperties(NULL, rs, UI_COLLECTION_INVALIDINDEX);
-
-                // Add the newly-created property set to the collection supplied by the framework.
-                hr = pCollection->Add(pItem);
-
-                pItem->Release();
+                pCollection->Release();
+                return hr;
             }
+            ResString rs(hRes, IDS_NOFUNCTIONSFOUND);
+            pItem->InitializeItemProperties(NULL, rs, UI_COLLECTION_INVALIDINDEX);
+
+            // Add the newly-created property set to the collection supplied by the framework.
+            hr = pCollection->Add(pItem);
+
+            pItem->Release();
         }
 
         pCollection->Release();
@@ -429,7 +429,15 @@ void CCmdFunctions::FindFunctions(int docID, bool bBackground)
                     switch (func_display_mode)
                     {
                         case 0: // display name and signature
+                        {
+                            // Put a space between the function name and the args to enhance readability.
+                            auto bracepos = name_and_args.find(L'(');
+                            if (bracepos != std::wstring::npos)
+                            {
+                                name_and_args.insert(bracepos, L" ");
+                            }
                             functions.push_back(func_info(line, std::move(name), std::move(name_and_args)));
+                        }
                             break;
                         case 1: // name only
                         {
@@ -438,7 +446,15 @@ void CCmdFunctions::FindFunctions(int docID, bool bBackground)
                         }
                             break;
                         case 2: // display whole thing type name inc.
+                        {
+                            // Put a space between the function name and the args to enhance readability.
+                            auto bracepos = sig.find(L'(');
+                            if (bracepos != std::wstring::npos)
+                            {
+                                sig.insert(bracepos, L" ");
+                            }
                             functions.push_back(func_info(line, std::move(name), std::move(sig)));
+                        }
                             break;
                     }
                 }
