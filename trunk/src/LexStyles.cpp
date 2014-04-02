@@ -330,18 +330,21 @@ const std::map<int, std::string>& CLexStyles::GetKeywordsForLang( const std::str
     return emptyIntStrVec;
 }
 
-size_t CLexStyles::AddUserFunctionForLang(const std::string& lang, const std::string& fnc)
+bool CLexStyles::AddUserFunctionForLang(const std::string& lang, const std::string& fnc)
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
     {
         if (lt->second.userfunctions)
         {
-            lt->second.userkeywords.insert(fnc);
-            return lt->second.userkeywords.size();
+            if (lt->second.userkeywords.find(fnc) == lt->second.userkeywords.end())
+            {
+                lt->second.userkeywords.insert(fnc);
+                return true;
+            }
         }
     }
-    return 0;
+    return false;
 }
 
 void CLexStyles::GenerateUserKeywords(LanguageData& ld)

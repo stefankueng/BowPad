@@ -109,7 +109,7 @@ public:
     void                                SetUserExt(const std::wstring& ext, const std::wstring& lang);
     void                                ResetUserData();
     void                                SaveUserData();
-    size_t                              AddUserFunctionForLang(const std::string& lang, const std::string& fnc);
+    bool                                AddUserFunctionForLang(const std::string& lang, const std::string& fnc);
 private:
     CLexStyles(void);
     ~CLexStyles(void);

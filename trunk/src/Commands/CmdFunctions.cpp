@@ -422,8 +422,7 @@ void CCmdFunctions::FindFunctions(int docID, bool bBackground)
                 // for each supported language
                 if (parse_signature(sig, name, name_and_args))
                 {
-                    size_t actKeywords = CLexStyles::Instance().AddUserFunctionForLang(lang, CUnicodeUtils::StdGetUTF8(name));
-                    if (actKeywords)
+                    if (CLexStyles::Instance().AddUserFunctionForLang(lang, CUnicodeUtils::StdGetUTF8(name)))
                         bUpdateLexer = true;
 
                     switch (func_display_mode)
