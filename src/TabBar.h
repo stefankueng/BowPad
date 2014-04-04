@@ -42,6 +42,7 @@ struct CloseButtonZone
     CloseButtonZone(): m_width(11), m_height(11), m_fromTop(3), m_fromRight(3){};
     bool IsHit(int x, int y, const RECT & testZone) const;
     RECT GetButtonRectFrom(const RECT & tabItemRect) const;
+    void SetDPIScale(float scale) { m_width = int(m_width * scale); m_height = int(m_height * scale); m_fromRight = int(m_fromRight * scale); m_fromTop = int (m_fromTop * scale); }
 
     int m_width;
     int m_height;
@@ -106,9 +107,9 @@ public :
     int                         GetSrcTab() const { return m_nSrcTab; }
     int                         GetDstTab() const { return m_nTabDragged; }
 protected:
-    static void                 DoOwnerDrawTab();
+    void                        DoOwnerDrawTab();
 
-    static void                 SetColour(COLORREF colour2Set, tabColourIndex i);
+    void                        SetColour(COLORREF colour2Set, tabColourIndex i);
 
     static LRESULT CALLBACK     TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
     void                        ExchangeItemData(POINT point);
