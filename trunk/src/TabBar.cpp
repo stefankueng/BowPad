@@ -151,7 +151,8 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
         ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
     }
 
-    TabCtrl_SetMinTabWidth(*this, GetSystemMetrics(SM_CXSMICON)*4);
+    TabCtrl_SetMinTabWidth(*this, LPARAM(GetSystemMetrics(SM_CXSMICON) * m_dpiScale * 4.0));
+    m_closeButtonZone.SetDPIScale(m_dpiScale);
 
     DoOwnerDrawTab();
     return true;
@@ -296,8 +297,8 @@ void CTabBar::SetImageList(HIMAGELIST himl)
 
 void CTabBar::DoOwnerDrawTab()
 {
-    int pad = GetSystemMetrics(SM_CXSMICON) / 2;
-    int pady = GetSystemMetrics(SM_CYSMICON) / 4;
+    int pad = int(GetSystemMetrics(SM_CXSMICON) / 2 * m_dpiScale);
+    int pady = int(3.0 * m_dpiScale);
     ::SendMessage(m_hwndArray[0], TCM_SETPADDING, 0, MAKELPARAM(pad, pady));
     for (int i = 0; i < m_nControls; i++)
     {
@@ -829,7 +830,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
         idCloseImg = bSelected ? IDR_CLOSETAB : IDR_CLOSETAB_INACT;
     HDC hdcMemory;
     hdcMemory = ::CreateCompatibleDC(pDrawItemStruct->hDC);
-    HBITMAP hBmp = ::LoadBitmap(hResource, MAKEINTRESOURCE(idCloseImg));
+    HBITMAP hBmp = (HBITMAP)::LoadImage(hResource, MAKEINTRESOURCE(idCloseImg), IMAGE_BITMAP, int(11 * m_dpiScale), int(11 * m_dpiScale), 0);
     BITMAP bmp;
     ::GetObject(hBmp, sizeof(bmp), &bmp);
     rItem.right = closeButtonRect.left;
