@@ -146,7 +146,12 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
     m_hFont = (HFONT)::SendMessage(*this, WM_GETFONT, 0, 0);
 
     if (m_hFont == NULL)
+    {
         m_hFont = (HFONT)::GetStockObject(DEFAULT_GUI_FONT);
+        ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
+    }
+
+    TabCtrl_SetMinTabWidth(*this, GetSystemMetrics(SM_CXSMICON)*4);
 
     DoOwnerDrawTab();
     return true;
@@ -292,13 +297,14 @@ void CTabBar::SetImageList(HIMAGELIST himl)
 void CTabBar::DoOwnerDrawTab()
 {
     int pad = GetSystemMetrics(SM_CXSMICON) / 2;
-    ::SendMessage(m_hwndArray[0], TCM_SETPADDING, 0, MAKELPARAM(pad, 0));
+    int pady = GetSystemMetrics(SM_CYSMICON) / 4;
+    ::SendMessage(m_hwndArray[0], TCM_SETPADDING, 0, MAKELPARAM(pad, pady));
     for (int i = 0; i < m_nControls; i++)
     {
         if (m_hwndArray[i])
         {
             ::InvalidateRect(m_hwndArray[i], NULL, TRUE);
-            ::SendMessage(m_hwndArray[i], TCM_SETPADDING, 0, MAKELPARAM(pad, 0));
+            ::SendMessage(m_hwndArray[i], TCM_SETPADDING, 0, MAKELPARAM(pad, pady));
         }
     }
 }
