@@ -470,47 +470,37 @@ void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring,
 
 void CLexStyles::SetUserForeground( int ID, int style, COLORREF clr )
 {
-    LexerData ld = m_userlexerdata[ID];
-    StyleData sd = ld.Styles[style];
+    LexerData& ld = m_userlexerdata[ID];
+    StyleData& sd = ld.Styles[style];
     sd.ForegroundColor = clr;
-    ld.Styles[style] = sd;
-    m_userlexerdata[ID] = ld;
 }
 
 void CLexStyles::SetUserBackground( int ID, int style, COLORREF clr )
 {
-    LexerData ld = m_userlexerdata[ID];
-    StyleData sd = ld.Styles[style];
+    LexerData& ld = m_userlexerdata[ID];
+    StyleData& sd = ld.Styles[style];
     sd.BackgroundColor = clr;
-    ld.Styles[style] = sd;
-    m_userlexerdata[ID] = ld;
 }
 
 void CLexStyles::SetUserFont( int ID, int style, const std::wstring& font )
 {
-    LexerData ld = m_userlexerdata[ID];
-    StyleData sd = ld.Styles[style];
+    LexerData& ld = m_userlexerdata[ID];
+    StyleData& sd = ld.Styles[style];
     sd.FontName = font;
-    ld.Styles[style] = sd;
-    m_userlexerdata[ID] = ld;
 }
 
 void CLexStyles::SetUserFontSize( int ID, int style, int size )
 {
-    LexerData ld = m_userlexerdata[ID];
-    StyleData sd = ld.Styles[style];
+    LexerData& ld = m_userlexerdata[ID];
+    StyleData& sd = ld.Styles[style];
     sd.FontSize = size;
-    ld.Styles[style] = sd;
-    m_userlexerdata[ID] = ld;
 }
 
 void CLexStyles::SetUserFontStyle( int ID, int style, FontStyle fontstyle )
 {
-    LexerData ld = m_userlexerdata[ID];
-    StyleData sd = ld.Styles[style];
+    LexerData& ld = m_userlexerdata[ID];
+    StyleData& sd = ld.Styles[style];
     sd.FontStyle = fontstyle;
-    ld.Styles[style] = sd;
-    m_userlexerdata[ID] = ld;
 }
 
 void CLexStyles::ResetUserData()
