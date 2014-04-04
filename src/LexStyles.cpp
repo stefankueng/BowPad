@@ -337,11 +337,8 @@ bool CLexStyles::AddUserFunctionForLang(const std::string& lang, const std::stri
     {
         if (lt->second.userfunctions)
         {
-            if (lt->second.userkeywords.find(fnc) == lt->second.userkeywords.end())
-            {
-                lt->second.userkeywords.insert(fnc);
-                return true;
-            }
+            auto result = lt->second.userkeywords.insert(fnc);
+            return result.second;
         }
     }
     return false;
