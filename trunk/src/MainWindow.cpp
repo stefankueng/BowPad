@@ -1306,7 +1306,6 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         if (!doc.m_path.empty())
         {
             doc.m_bDoSaveAs = false;
-
             if (doc.m_bTrimBeforeSave)
             {
                 auto cmd = CCommandHandler::Instance().GetCommand(cmdTrim);
@@ -1336,6 +1335,11 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
             bRet = m_DocManager.SaveFile(*this, doc);
             if (bRet)
             {
+                if (_wcsicmp(CIniSettings::Instance().GetIniPath().c_str(), doc.m_path.c_str()) == 0)
+                {
+                    CIniSettings::Instance().Reload();
+                }
+
                 doc.m_bIsDirty = false;
                 doc.m_bNeedsSaving = false;
                 m_DocManager.UpdateFileTime(doc);
@@ -1487,6 +1491,10 @@ bool CMainWindow::OpenFile(const std::wstring& file, bool bAddToMRU)
     bool bRet = true;
     int encoding = -1;
     std::wstring filepath = CPathUtils::GetLongPathname(file);
+    if (_wcsicmp(CIniSettings::Instance().GetIniPath().c_str(), filepath.c_str()) == 0)
+    {
+        CIniSettings::Instance().Save();
+    }
     int id = m_DocManager.GetIdForPath(filepath.c_str());
     if (id != -1)
     {
