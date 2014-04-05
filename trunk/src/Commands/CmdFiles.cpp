@@ -28,7 +28,6 @@ bool CCmdOpen::Execute()
     PreserveChdir keepCWD;
 
     std::vector<std::wstring> paths;
-    _COM_SMARTPTR_TYPEDEF(IFileOpenDialog, __uuidof(IFileOpenDialog));
     IFileOpenDialogPtr pfd = NULL;
 
     HRESULT hr = pfd.CreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER);
@@ -51,7 +50,6 @@ bool CCmdOpen::Execute()
             if (!doc.m_path.empty())
             {
                 std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
-                _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
                 IShellItemPtr psiDefFolder = NULL;
                 hr = SHCreateItemFromParsingName(folder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
 
@@ -65,7 +63,6 @@ bool CCmdOpen::Execute()
         // Show the open file dialog
         if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(GetHwnd())))
         {
-            _COM_SMARTPTR_TYPEDEF(IShellItemArray, __uuidof(IShellItemArray));
             IShellItemArrayPtr psiaResults;
             hr = pfd->GetResults(&psiaResults);
             if (SUCCEEDED(hr))
@@ -74,7 +71,6 @@ bool CCmdOpen::Execute()
                 hr = psiaResults->GetCount(&count);
                 for (DWORD i = 0; i < count; ++i)
                 {
-                    _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
                     IShellItemPtr psiResult = NULL;
                     hr = psiaResults->GetItemAt(i, &psiResult);
                     PWSTR pszPath = NULL;
@@ -282,7 +278,6 @@ bool CCmdFileDelete::Execute()
                     if (!CloseTab(GetTabIndexFromDocID(GetCurrentTabId()), false))
                         return false;
 
-                    _COM_SMARTPTR_TYPEDEF(IFileOperation, __uuidof(IFileOperation));
                     IFileOperationPtr pfo = NULL;
                     HRESULT hr = pfo.CreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL);
 
@@ -294,7 +289,6 @@ bool CCmdFileDelete::Execute()
                         if (SUCCEEDED(hr))
                         {
                             // Create IShellItem instance associated to file to delete
-                            _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
                             IShellItemPtr psiFileToDelete = NULL;
                             hr = SHCreateItemFromParsingName(doc.m_path.c_str(), NULL, IID_PPV_ARGS(&psiFileToDelete));
 

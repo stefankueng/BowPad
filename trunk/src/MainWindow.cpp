@@ -153,7 +153,6 @@ STDMETHODIMP CMainWindow::OnViewChanged(
         case UI_VIEWVERB_CREATE:
             {
                 hr = pView->QueryInterface(IID_PPV_ARGS(&m_pRibbon));
-                _COM_SMARTPTR_TYPEDEF(IStream, __uuidof(IStream));
                 IStreamPtr pStrm;
                 std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
                 hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_READ, 0, FALSE, NULL, &pStrm);
@@ -1243,7 +1242,6 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
             bSaveAs = true;
             PreserveChdir keepCWD;
 
-            _COM_SMARTPTR_TYPEDEF(IFileSaveDialog, __uuidof(IFileSaveDialog));
             IFileSaveDialogPtr pfd = NULL;
 
             HRESULT hr = pfd.CreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_INPROC_SERVER);
@@ -1272,7 +1270,6 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
                 if (!doc.m_path.empty())
                 {
                     std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
-                    _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
                     IShellItemPtr psiDefFolder = NULL;
                     hr = SHCreateItemFromParsingName(folder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
 
@@ -1285,7 +1282,6 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
                 // Show the save file dialog
                 if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(*this)))
                 {
-                    _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
                     IShellItemPtr psiResult = NULL;
                     hr = pfd->GetResult(&psiResult);
                     if (SUCCEEDED(hr))

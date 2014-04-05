@@ -105,7 +105,6 @@ static bool parse_signature(const std::wstring& sig, std::wstring& name, std::ws
 
 HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
 {
-    _COM_SMARTPTR_TYPEDEF(IUICollection, __uuidof(IUICollection));
     HRESULT hr = E_FAIL;
 
     if (key == UI_PKEY_Categories)
