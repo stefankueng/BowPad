@@ -105,6 +105,7 @@ static bool parse_signature(const std::wstring& sig, std::wstring& name, std::ws
 
 HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
 {
+    _COM_SMARTPTR_TYPEDEF(IUICollection, __uuidof(IUICollection));
     HRESULT hr = E_FAIL;
 
     if (key == UI_PKEY_Categories)
@@ -113,20 +114,15 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
     }
     else if (key == UI_PKEY_ItemsSource)
     {
-        IUICollection* pCollection;
+        IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (FAILED(hr))
-        {
             return hr;
-        }
 
         pCollection->Clear();
         functions.clear();
         if (!HasActiveDocument())
-        {
-            pCollection->Release();
             return hr;
-        }
         // Note: docID is < 0 if the document does not exist,
         // then FindFunctions() will return no functions
         int docID = GetDocIDFromTabIndex(GetActiveTabIndex());
@@ -155,10 +151,7 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
                 CPropertySet* pItem;
                 hr = CPropertySet::CreateInstance(&pItem);
                 if (FAILED(hr))
-                {
-                    pCollection->Release();
                     return hr;
-                }
 
                 pItem->InitializeItemProperties(NULL,
                                                 func.display_name.c_str(),
@@ -166,19 +159,17 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
 
                 // Add the newly-created property set to the collection supplied by the framework.
                 hr = pCollection->Add(pItem);
-
                 pItem->Release();
+                if (FAILED(hr))
+                    return hr;
             }
         }
-        if (functions.empty())
+        else // No functions
         {
             CPropertySet* pItem;
             hr = CPropertySet::CreateInstance(&pItem);
             if (FAILED(hr))
-            {
-                pCollection->Release();
                 return hr;
-            }
             ResString rs(hRes, IDS_NOFUNCTIONSFOUND);
             pItem->InitializeItemProperties(NULL, rs, UI_COLLECTION_INVALIDINDEX);
 
@@ -188,7 +179,6 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
             pItem->Release();
         }
 
-        pCollection->Release();
         hr = S_OK;
     }
     else if (key == UI_PKEY_SelectedItem)
