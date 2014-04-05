@@ -267,14 +267,14 @@
     <ClInclude Include="EditorConfigHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BowPadUI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Commands\CmdNewCopy.h">
       <Filter>Commands</Filter>
     </ClInclude>
     <ClInclude Include="Commands\CmdDefaultEncoding.h">
       <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="COMPtrs.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
