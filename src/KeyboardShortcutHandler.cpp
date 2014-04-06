@@ -173,11 +173,14 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
             WORD ctrlkeys = (GetKeyState(VK_CONTROL)&0x8000) ? 0x08 : 0;
             ctrlkeys |= (GetKeyState(VK_SHIFT)&0x8000) ? 0x04 : 0;
             ctrlkeys |= (GetKeyState(VK_MENU)&0x8000) ? 0x10 : 0;
+            int nonvirt = MapVirtualKey((UINT)wParam, MAPVK_VK_TO_CHAR);
             for (auto accel = m_accelerators.crbegin(); accel != m_accelerators.crend(); ++accel)
             {
                 if (accel->fVirt == ctrlkeys)
                 {
-                    if ((m_lastKey == 0) && (accel->key1 == wParam))
+                    if ((m_lastKey == 0) && 
+                        (((accel->key1 == wParam) && accel->fVirt1) || (nonvirt && (accel->key1 == nonvirt) && !accel->fVirt1))
+                        )
                     {
                         if (accel->key2 == 0)
                         {
@@ -195,7 +198,9 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
                             return TRUE;
                         }
                     }
-                    else if ((m_lastKey == accel->key1) && (accel->key2 == wParam))
+                    else if ((m_lastKey == accel->key1) &&
+                             (((accel->key2 == wParam) && accel->fVirt2) || (nonvirt && (accel->key2 == nonvirt) && !accel->fVirt2))
+                        )
                     {
                         // execute the command
                         if (GetForegroundWindow() == hwnd)
