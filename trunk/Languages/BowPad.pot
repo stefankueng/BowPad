@@ -102,6 +102,10 @@ msgstr ""
 msgid "AB"
 msgstr ""
 
+#. Resource IDs: (1070)
+msgid "ANSI / Local encoding"
+msgstr ""
+
 #. Resource IDs: (3754)
 msgid "AS"
 msgstr ""
@@ -246,6 +250,10 @@ msgstr ""
 
 #. Resource IDs: (1027)
 msgid "Check for Updates"
+msgstr ""
+
+#. Resource IDs: (65535)
+msgid "Chose the encoding of new files:"
 msgstr ""
 
 #. Resource IDs: (3765)
@@ -492,6 +500,10 @@ msgstr ""
 msgid "Dark Theme"
 msgstr ""
 
+#. Resource IDs: (153)
+msgid "Default Encoding"
+msgstr ""
+
 #. Resource IDs: (3758)
 msgid "Delete"
 msgstr ""
@@ -698,6 +710,10 @@ msgstr ""
 msgid "H"
 msgstr ""
 
+#. Resource IDs: (12)
+msgid "Insert"
+msgstr ""
+
 #. Resource IDs: (3754)
 msgid "Inserts the content of the clipboard at the cursor position"
 msgstr ""
@@ -786,8 +802,18 @@ msgstr ""
 msgid "Launch in Safari"
 msgstr ""
 
+#. Resource IDs: (12)
+#, c-format
+msgid "Length in bytes: %ld\r\nLines: %ld"
+msgstr ""
+
 #. Resource IDs: (10)
 msgid "Line"
+msgstr ""
+
+#. Resource IDs: (12)
+#, c-format
+msgid "Line : %ld\r\nColumn : %ld\r\nSelection : %Iu | %Iu"
 msgstr ""
 
 #. Resource IDs: (3756)
@@ -796,6 +822,11 @@ msgstr ""
 
 #. Resource IDs: (10)
 msgid "Line Text"
+msgstr ""
+
+#. Resource IDs: (12)
+#, c-format
+msgid "Line endings: %s"
 msgstr ""
 
 #. Resource IDs: (65535)
@@ -999,6 +1030,11 @@ msgstr ""
 msgid "Open elevated\nBowPad is started again with elevated privileges."
 msgstr ""
 
+#. Resource IDs: (12)
+#, c-format
+msgid "Open files: %d"
+msgstr ""
+
 #. Resource IDs: (3752)
 msgid "Opens one or more files"
 msgstr ""
@@ -1065,6 +1101,10 @@ msgstr ""
 
 #. Resource IDs: (3768)
 msgid "Other operations"
+msgstr ""
+
+#. Resource IDs: (12)
+msgid "Overtype"
 msgstr ""
 
 #. Resource IDs: (3766)
@@ -1279,8 +1319,20 @@ msgstr ""
 msgid "Sends the document to the default printer"
 msgstr ""
 
+#. Resource IDs: (3753)
+msgid "Set Encoding"
+msgstr ""
+
+#. Resource IDs: (3753)
+msgid "Set default encoding"
+msgstr ""
+
 #. Resource IDs: (3756)
 msgid "Set the coloring according to the code language"
+msgstr ""
+
+#. Resource IDs: (3753)
+msgid "Set the default encoding for new files, e.g. ANSI, UTF-8, ..."
 msgstr ""
 
 #. Resource IDs: (3760)
@@ -1407,12 +1459,41 @@ msgstr ""
 msgid "Turns showing whitespaces on/off.\nHold down the Shift key to show EOLs as well."
 msgstr ""
 
+#. Resource IDs: (12)
+#, c-format
+msgid "Typing mode: %s"
+msgstr ""
+
 #. Resource IDs: (3751)
 msgid "U"
 msgstr ""
 
 #. Resource IDs: (3764)
 msgid "UT"
+msgstr ""
+
+#. Resource IDs: (1074)
+msgid "UTF-16 Big Endian"
+msgstr ""
+
+#. Resource IDs: (1073)
+msgid "UTF-16 Little Endian"
+msgstr ""
+
+#. Resource IDs: (1076)
+msgid "UTF-32 Big Endian"
+msgstr ""
+
+#. Resource IDs: (1075)
+msgid "UTF-32 Little Endian"
+msgstr ""
+
+#. Resource IDs: (1071)
+msgid "UTF-8"
+msgstr ""
+
+#. Resource IDs: (1072)
+msgid "UTF-8 with BOM"
 msgstr ""
 
 #. Resource IDs: (3759)
