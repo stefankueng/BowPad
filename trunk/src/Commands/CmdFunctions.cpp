@@ -324,6 +324,7 @@ void CCmdFunctions::OnDocumentSave(int index, bool bSaveAs)
         {
             m_docIDs.insert(docID);
             SetTimer(GetHwnd(), m_timerID, timer_delay, NULL);
+            InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
         }
     }
 }
