@@ -277,6 +277,7 @@
     <ClInclude Include="Commands\CmdZoom.h" />
     <ClInclude Include="Commands\CommandHandler.h" />
     <ClInclude Include="Commands\ICommand.h" />
+    <ClInclude Include="COMPtrs.h" />
     <ClInclude Include="DocScroll.h" />
     <ClInclude Include="Document.h" />
     <ClInclude Include="DocumentManager.h" />
