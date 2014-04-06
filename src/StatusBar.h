@@ -32,8 +32,12 @@ public :
     bool Init(HINSTANCE hInst, HWND hParent, int nbParts, int * nsParts);
     void Resize();
     int GetHeight() const { return m_height; }
-    bool SetText(const TCHAR *str, int whichPart) const
+    bool SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart) const
     {
+        if (tooltip)
+            m_PartsTooltips[whichPart] = tooltip;
+        else
+            m_PartsTooltips[whichPart] = str;
         return (::SendMessage(*this, SB_SETTEXT, whichPart, (LPARAM)str) == TRUE);
     };
 
@@ -45,4 +49,5 @@ private:
     bool                    m_bHasOnlyFixedWidth;
     int                     m_nParts;
     std::unique_ptr<int[]>  m_Parts;
+    std::unique_ptr<std::wstring[]>  m_PartsTooltips;
 };
