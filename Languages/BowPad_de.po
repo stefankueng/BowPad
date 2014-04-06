@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-03-23 13:49+0100\n"
+"PO-Revision-Date: 2014-04-06 14:41+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -115,6 +115,10 @@ msgstr "A"
 #. Resource IDs: (3780)
 msgid "AB"
 msgstr "AB"
+
+#. Resource IDs: (1070)
+msgid "ANSI / Local encoding"
+msgstr "ANSI / Lokale Codepage"
 
 #. Resource IDs: (3754)
 msgid "AS"
@@ -281,6 +285,10 @@ msgstr "Gross/Kleinschreibung"
 #. Resource IDs: (1027)
 msgid "Check for Updates"
 msgstr "Auf Updates überprüfen"
+
+#. Resource IDs: (65535)
+msgid "Chose the encoding of new files:"
+msgstr "Wähle die Kodierung von neuen Dateien:"
 
 #. Resource IDs: (3765)
 msgid "Clear Bookmarks"
@@ -536,6 +544,10 @@ msgstr "DEL"
 msgid "Dark Theme"
 msgstr "Dunkler Stil"
 
+#. Resource IDs: (153)
+msgid "Default Encoding"
+msgstr "Default Kodierung"
+
 #. Resource IDs: (3758)
 msgid "Delete"
 msgstr "Löschen"
@@ -784,6 +796,10 @@ msgstr "Gehe zu"
 msgid "H"
 msgstr "H"
 
+#. Resource IDs: (12)
+msgid "Insert"
+msgstr "Einfügen"
+
 #. Resource IDs: (3754)
 msgid "Inserts the content of the clipboard at the cursor position"
 msgstr "Fügt den Inhalt der Zwischenablage an der Cursorposition ein"
@@ -880,9 +896,29 @@ msgstr "Öffne mit Opera"
 msgid "Launch in Safari"
 msgstr "Öffne mit Safari"
 
+#. Resource IDs: (12)
+#, c-format
+msgid ""
+"Length in bytes: %ld\r\n"
+"Lines: %ld"
+msgstr ""
+"Länge in Bytes: %ld\r\n"
+"Zeilen: %ld"
+
 #. Resource IDs: (10)
 msgid "Line"
 msgstr "Zeile"
+
+#. Resource IDs: (12)
+#, c-format
+msgid ""
+"Line : %ld\r\n"
+"Column : %ld\r\n"
+"Selection : %Iu | %Iu"
+msgstr ""
+"Zeile: %ld\r\n"
+"Spalte: %ld\r\n"
+"Selektion: %lu | %lu"
 
 #. Resource IDs: (3756)
 msgid "Line Endings"
@@ -891,6 +927,11 @@ msgstr "Zeilenenden"
 #. Resource IDs: (10)
 msgid "Line Text"
 msgstr "Zeilentext"
+
+#. Resource IDs: (12)
+#, c-format
+msgid "Line endings: %s"
+msgstr "Zeilenenden: %s"
 
 #. Resource IDs: (65535)
 msgid "Line:"
@@ -1104,6 +1145,11 @@ msgstr ""
 "Öffne Elevated\n"
 "BowPad wird erneut mit erhöhten Rechten gestartet."
 
+#. Resource IDs: (12)
+#, c-format
+msgid "Open files: %d"
+msgstr "Offene Dateien: %d"
+
 #. Resource IDs: (3752)
 msgid "Opens one or more files"
 msgstr "Öffnet eine oder mehrere Dateien"
@@ -1178,6 +1224,10 @@ msgstr "Anderes"
 #. Resource IDs: (3768)
 msgid "Other operations"
 msgstr "Andere Funktionen"
+
+#. Resource IDs: (12)
+msgid "Overtype"
+msgstr "Überschreiben"
 
 #. Resource IDs: (3766)
 msgid "P"
@@ -1411,9 +1461,21 @@ msgstr "Wähle die Sprache für BowPad"
 msgid "Sends the document to the default printer"
 msgstr "Sendet das Dokument an den Standarddrucker"
 
+#. Resource IDs: (3753)
+msgid "Set Encoding"
+msgstr "Setze Kodierung"
+
+#. Resource IDs: (3753)
+msgid "Set default encoding"
+msgstr "Setze Default-Kodierung"
+
 #. Resource IDs: (3756)
 msgid "Set the coloring according to the code language"
 msgstr "Bestimmt die Farben anhand der Codesprache"
+
+#. Resource IDs: (3753)
+msgid "Set the default encoding for new files, e.g. ANSI, UTF-8, ..."
+msgstr "Setzt die Default-Kodierung für neue Dateien, z.B. ANSI, UTF-8, ..."
 
 #. Resource IDs: (3760)
 msgid "Set the number of columns for one tabulator."
@@ -1551,6 +1613,11 @@ msgstr ""
 "Schaltet die Anzeige von Leerzeichen ein/aus.\n"
 "Drücke die Umschalt-Taste um auch die Zeilenenden anzuzeigen."
 
+#. Resource IDs: (12)
+#, c-format
+msgid "Typing mode: %s"
+msgstr "Eingabemodus: %s"
+
 #. Resource IDs: (3751)
 msgid "U"
 msgstr "U"
@@ -1558,6 +1625,30 @@ msgstr "U"
 #. Resource IDs: (3764)
 msgid "UT"
 msgstr "UT"
+
+#. Resource IDs: (1074)
+msgid "UTF-16 Big Endian"
+msgstr "UTF-16 Big Endian"
+
+#. Resource IDs: (1073)
+msgid "UTF-16 Little Endian"
+msgstr "UTF-16 Little Endian"
+
+#. Resource IDs: (1076)
+msgid "UTF-32 Big Endian"
+msgstr "UTF-32 Big Endian"
+
+#. Resource IDs: (1075)
+msgid "UTF-32 Little Endian"
+msgstr "UTF-32 Little Endian"
+
+#. Resource IDs: (1071)
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#. Resource IDs: (1072)
+msgid "UTF-8 with BOM"
+msgstr "UTF-8 mit BOM"
 
 #. Resource IDs: (3759)
 msgid "Uncomment"
