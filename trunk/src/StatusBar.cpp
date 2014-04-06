@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -146,7 +146,7 @@ bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, int * nsPa
 {
     InitCommonControls();
 
-    CreateEx(WS_EX_COMPOSITED, WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, hParent, 0, STATUSCLASSNAME);
+    CreateEx(WS_EX_COMPOSITED, WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP | SBARS_TOOLTIPS, hParent, 0, STATUSCLASSNAME);
 
     if (!*this)
     {
@@ -156,6 +156,7 @@ bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, int * nsPa
     SendMessage(*this, SB_SETPARTS, (WPARAM) nbParts, (LPARAM)nsParts);
     m_nParts = nbParts;
     m_Parts = std::unique_ptr<int[]>(new int[nbParts]);
+    m_PartsTooltips = std::unique_ptr<std::wstring[]>(new std::wstring[nbParts]);
     m_bHasOnlyFixedWidth = true;
     for (int i = 0; i < nbParts; ++i)
     {
@@ -167,11 +168,35 @@ bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, int * nsPa
     RECT rcClient;
     GetClientRect(*this, &rcClient);
     m_height = rcClient.bottom-rcClient.top;
+
     return true;
 }
 
 LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+    if (uMsg == WM_NOTIFY)
+    {
+        LPNMTTDISPINFO lpnmtdi = (LPNMTTDISPINFO)lParam;
+        if (lpnmtdi->hdr.code == TTN_GETDISPINFO)
+        {
+            DWORD mpos = GetMessagePos();
+            POINT pt;
+            pt.x = GET_X_LPARAM(mpos);
+            pt.y = GET_Y_LPARAM(mpos);
+            ScreenToClient(*this, &pt);
+            for (int i = 0; i < m_nParts; ++i)
+            {
+                RECT rc;
+                SendMessage(*this, SB_GETRECT, (WPARAM)i, (LPARAM)&rc);
+                if (PtInRect(&rc, pt))
+                {
+                    lpnmtdi->lpszText = const_cast<LPWSTR>(m_PartsTooltips[i].c_str());
+                    SendMessage(lpnmtdi->hdr.hwndFrom, TTM_SETMAXTIPWIDTH, 0, 600);
+                    break;
+                }
+            }
+        }
+    }
     if (CTheme::Instance().IsDarkTheme())
     {
         // only do custom drawing when in dark theme

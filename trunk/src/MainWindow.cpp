@@ -1373,7 +1373,15 @@ void CMainWindow::GoToLine( size_t line )
 
 void CMainWindow::UpdateStatusBar( bool bEverything )
 {
-    TCHAR strLnCol[128] = {0};
+    static ResString rsStatusTTDocSize(hRes, IDS_STATUSTTDOCSIZE);
+    static ResString rsStatusTTCurPos(hRes, IDS_STATUSTTCURPOS);
+    static ResString rsStatusTTEOF(hRes, IDS_STATUSTTEOF);
+    static ResString rsStatusTTTyping(hRes, IDS_STATUSTTTYPING);
+    static ResString rsStatusTTTypingOvl(hRes, IDS_STATUSTTTYPINGOVL);
+    static ResString rsStatusTTTypingIns(hRes, IDS_STATUSTTTYPINGINS);
+    static ResString rsStatusTTTabs(hRes, IDS_STATUSTTTABS);
+
+    TCHAR strLnCol[128] = { 0 };
     TCHAR strSel[64] = {0};
     size_t selByte = 0;
     size_t selLine = 0;
@@ -1382,27 +1390,33 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
         swprintf_s(strSel, L"Sel : %Iu | %Iu", selByte, selLine);
     else
         swprintf_s(strSel, L"Sel : %s", L"N/A");
-
+    long line = (long)m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1;
+    long column = (long)m_scintilla.Call(SCI_GETCOLUMN, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1;
     swprintf_s(strLnCol, L"Ln : %ld    Col : %ld    %s",
-                       (m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1),
-                       (m_scintilla.Call(SCI_GETCOLUMN, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1),
+                       line, column,
                        strSel);
-
-    m_StatusBar.SetText(strLnCol, STATUSBAR_CUR_POS);
+    std::wstring ttcurpos = CStringUtils::Format(rsStatusTTCurPos, line, column, selByte, selLine);
+    m_StatusBar.SetText(strLnCol, ttcurpos.c_str(), STATUSBAR_CUR_POS);
 
     TCHAR strDocLen[256];
     swprintf_s(strDocLen, L"length : %d    lines : %d", m_scintilla.Call(SCI_GETLENGTH), m_scintilla.Call(SCI_GETLINECOUNT));
-    m_StatusBar.SetText(strDocLen, STATUSBAR_DOC_SIZE);
-    m_StatusBar.SetText(m_scintilla.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", STATUSBAR_TYPING_MODE);
+    std::wstring ttdocsize = CStringUtils::Format(rsStatusTTDocSize, m_scintilla.Call(SCI_GETLENGTH), m_scintilla.Call(SCI_GETLINECOUNT));
+    m_StatusBar.SetText(strDocLen, ttdocsize.c_str(), STATUSBAR_DOC_SIZE);
+
+    std::wstring tttyping = CStringUtils::Format(rsStatusTTTyping, m_scintilla.Call(SCI_GETOVERTYPE) ? (LPCWSTR)rsStatusTTTypingOvl : (LPCWSTR)rsStatusTTTypingIns);
+    m_StatusBar.SetText(m_scintilla.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
-    m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", STATUSBAR_CAPS);
+    m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", NULL, STATUSBAR_CAPS);
     if (bEverything)
     {
         CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
-        m_StatusBar.SetText(doc.m_language.c_str(), STATUSBAR_DOC_TYPE);
-        m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), STATUSBAR_EOF_FORMAT);
-        m_StatusBar.SetText(doc.GetEncodingString().c_str(), STATUSBAR_UNICODE_TYPE);
-        m_StatusBar.SetText(CStringUtils::Format(L"tabs: %d", m_TabBar.GetItemCount()).c_str(), STATUSBAR_TABS);
+        m_StatusBar.SetText(doc.m_language.c_str(), NULL, STATUSBAR_DOC_TYPE);
+        std::wstring tteof = CStringUtils::Format(rsStatusTTEOF, FormatTypeToString(doc.m_format).c_str());
+        m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), tteof.c_str(), STATUSBAR_EOF_FORMAT);
+        m_StatusBar.SetText(doc.GetEncodingString().c_str(), NULL, STATUSBAR_UNICODE_TYPE);
+
+        std::wstring tttabs = CStringUtils::Format(rsStatusTTTabs, m_TabBar.GetItemCount());
+        m_StatusBar.SetText(CStringUtils::Format(L"tabs: %d", m_TabBar.GetItemCount()).c_str(), tttabs.c_str(), STATUSBAR_TABS);
 
         if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
         {
