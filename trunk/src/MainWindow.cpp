@@ -254,11 +254,6 @@ STDMETHODIMP CMainWindow::Execute(
     const PROPVARIANT* ppropvarValue,
     IUISimplePropertySet* pCommandExecutionProperties)
 {
-    UNREFERENCED_PARAMETER(pCommandExecutionProperties);
-    UNREFERENCED_PARAMETER(ppropvarValue);
-    UNREFERENCED_PARAMETER(key);
-    UNREFERENCED_PARAMETER(verb);
-
     HRESULT hr = S_OK;
 
     ICommand * pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
@@ -784,6 +779,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             }
 
                             std::wstring url = CUnicodeUtils::StdGetUnicode(urltext.get());
+                            while ((*url.begin() == '(') || (*url.begin() == ')') || (*url.begin() == ','))
+                                url.erase(url.begin());
+
                             ::ShellExecute(*this, L"open", url.c_str(), NULL, NULL, SW_SHOW);
                             m_scintilla.Call(SCI_SETCHARSDEFAULT);
                         }
