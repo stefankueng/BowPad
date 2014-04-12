@@ -331,7 +331,7 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
         Call(SCI_STYLESETFORE, it.first, CTheme::Instance().GetThemeColor(it.second.ForegroundColor));
         Call(SCI_STYLESETBACK, it.first, CTheme::Instance().GetThemeColor(it.second.BackgroundColor));
         if (!it.second.FontName.empty())
-            Call(SCI_STYLESETFONT, it.first, (LPARAM)it.second.FontName.c_str());
+            Call(SCI_STYLESETFONT, it.first, (sptr_t)CUnicodeUtils::StdGetUTF8(it.second.FontName).c_str());
 
         if (it.second.FontStyle & FONTSTYLE_BOLD)
             Call(SCI_STYLESETBOLD, it.first, 1);
@@ -364,6 +364,12 @@ void CScintillaWnd::SetupDefaultStyles()
     {
         DeleteObject(hFont);
         Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Consolas");
+        Call(SCI_STYLESETFONT, STYLE_LINENUMBER, (LPARAM)"Consolas");
+    }
+    else
+    {
+        Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Courier New");
+        Call(SCI_STYLESETFONT, STYLE_LINENUMBER, (LPARAM)"Courier New");
     }
 
     std::string sFontName = CUnicodeUtils::StdGetUTF8(CIniSettings::Instance().GetString(L"View", L"FontName", L"Consolas"));
