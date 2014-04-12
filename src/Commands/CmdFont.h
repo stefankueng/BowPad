@@ -98,6 +98,8 @@ public:
         {
             // Font properties have changed.
             PROPVARIANT varChanges;
+            if (pCommandExecutionProperties == nullptr)
+                return E_INVALIDARG;
             hr = pCommandExecutionProperties->GetValue(UI_PKEY_FontProperties_ChangedProperties, &varChanges);
             if (SUCCEEDED(hr))
             {
