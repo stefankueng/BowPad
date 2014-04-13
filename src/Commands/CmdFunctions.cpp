@@ -266,16 +266,12 @@ void CCmdFunctions::ScintillaNotify(Scintilla::SCNotification * pScn)
     switch (pScn->nmhdr.code)
     {
         case SCN_MODIFIED:
-            switch (pScn->modificationType)
+            if (pScn->modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_USER))
             {
-                case SC_MOD_INSERTTEXT:
-                case SC_MOD_DELETETEXT:
-                case SC_PERFORMED_USER:
-                    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
-                    m_docIDs.insert(GetDocIDFromTabIndex(GetActiveTabIndex()));
-                    break;
+                InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
+                m_docIDs.insert(GetDocIDFromTabIndex(GetActiveTabIndex()));
+                SetTimer(GetHwnd(), m_timerID, timer_delay, NULL);
             }
-            SetTimer(GetHwnd(), m_timerID, timer_delay, NULL);
             break;
     }
 }
