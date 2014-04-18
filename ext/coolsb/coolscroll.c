@@ -1941,6 +1941,8 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
     int siMaxMin = 0;
     int butwidth = 0;
 
+    int mapMode = 0;
+
     pt.x = GET_X_LPARAM(lParam);
     pt.y = GET_Y_LPARAM(lParam);
 
@@ -2075,8 +2077,11 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
         //adjust the horizontal rectangle to NOT include
         //any inserted buttons
         GetRealScrollRect(sb, &rect);
+        mapMode = (sb->fFlatScrollbar & CSBS_MAPMODE) != 0;
+        if (GetKeyState(VK_SHIFT) & 0x8000)
+            mapMode = !mapMode;
 
-        if ((sb->fFlatScrollbar & CSBS_MAPMODE) &&
+        if (mapMode &&
             ((uCurrentScrollPortion == HTSCROLL_PAGELEFT)||(uCurrentScrollPortion == HTSCROLL_PAGERIGHT)))
         {
             siMaxMin = sb->scrollInfo.nMax - sb->scrollInfo.nMin;
