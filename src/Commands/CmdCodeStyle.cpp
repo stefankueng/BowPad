@@ -156,6 +156,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PR
             hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
             if (HasActiveDocument())
             {
+                InvalidateUICommand(cmdFunctions, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
                 CDocument doc = GetActiveDocument();
                 doc.m_language = langs[selected];
                 SetDocument(GetCurrentTabId(), doc);
