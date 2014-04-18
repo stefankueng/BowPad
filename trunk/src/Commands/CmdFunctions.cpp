@@ -355,11 +355,6 @@ void CCmdFunctions::FindFunctions(int docID, bool bBackground)
             sptr_t findRet = -1;
             Scintilla::Sci_TextToFind ttf = { 0 };
             long length = (long)m_ScratchScintilla.Call(SCI_GETLENGTH);
-            if (bBackground && (length > 1000 * 1024))
-            {
-                m_ScratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
-                return;
-            }
             ttf.chrg.cpMin = 0;
             ttf.chrg.cpMax = length;
             ttf.lpstrText = const_cast<char*>(funcregex.c_str());
