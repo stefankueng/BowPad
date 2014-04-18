@@ -25,7 +25,6 @@ public:
 
     CCmdComment(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
     ~CCmdComment(void)
@@ -43,7 +42,6 @@ public:
 
     CCmdUnComment(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
     ~CCmdUnComment(void)
