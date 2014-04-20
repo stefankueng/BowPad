@@ -53,7 +53,7 @@ public:
     void                ElevatedSave(const std::wstring& path, const std::wstring& savepath, long line);
     void                TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line);
     void                SetTabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line) { m_tabmovepath = path; m_tabmovesavepath = savepath; m_tabmovemod = bMod; m_initLine = line; }
-
+    void                SetInsertionIndex(int index) { m_insertionIndex = index; }
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
     IFACEMETHODIMP_(ULONG) AddRef();
@@ -101,4 +101,5 @@ private:
     std::wstring                m_tabmovesavepath;
     bool                        m_tabmovemod;
     long                        m_initLine;
+    int                         m_insertionIndex;
 };
