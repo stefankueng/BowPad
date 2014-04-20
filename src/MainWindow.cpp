@@ -64,6 +64,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_tabmovemod(false)
     , m_initLine(0)
     , m_bPathsToOpenMRU(true)
+    , m_insertionIndex(-1)
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 }
@@ -547,7 +548,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case TCN_GETCOLOR:
                     if ((ptbhdr->tabOrigin >= 0) && (ptbhdr->tabOrigin < m_DocManager.GetCount()))
                     {
-                        return CTheme::Instance().GetThemeColor(m_DocManager.GetColorForDocument(m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin)));
+                        int id = m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin);
+                        if (m_DocManager.HasDocumentID(id))
+                            return CTheme::Instance().GetThemeColor(m_DocManager.GetColorForDocument(id));
                     }
                     break;
                 case TCN_SELCHANGE:
@@ -985,11 +988,16 @@ LRESULT CMainWindow::DoCommand(int id)
             doc.m_encoding = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
             ResString newRes(hRes, IDS_NEW_TABTITLE);
             std::wstring s = CStringUtils::Format(newRes, newCount);
-            int index = m_TabBar.InsertAtEnd(s.c_str());
+            int index = -1;
+            if (m_insertionIndex >= 0)
+                index = m_TabBar.InsertAfter(m_insertionIndex, s.c_str());
+            else
+                index = m_TabBar.InsertAtEnd(s.c_str());
             int id = m_TabBar.GetIDFromIndex(index);
             m_DocManager.AddDocumentAtEnd(doc, id);
             m_TabBar.ActivateAt(index);
             m_scintilla.SetupLexerForLang(L"Text");
+            m_insertionIndex = -1;
         }
         break;
     case cmdClose:
@@ -1533,7 +1541,11 @@ bool CMainWindow::OpenFile(const std::wstring& file, bool bAddToMRU)
             std::wstring sFileName = filepath.substr(filepath.find_last_of('\\')+1);
             auto dotpos = filepath.find_last_of('.');
             std::wstring sExt = filepath.substr(dotpos + 1);
-            int index = m_TabBar.InsertAtEnd(sFileName.c_str());
+            int index = -1;
+            if (m_insertionIndex >= 0)
+                index = m_TabBar.InsertAfter(m_insertionIndex, sFileName.c_str());
+            else
+                index = m_TabBar.InsertAtEnd(sFileName.c_str());
             int id = m_TabBar.GetIDFromIndex(index);
             if (dotpos == std::wstring::npos)
                 doc.m_language = CLexStyles::Instance().GetLanguageForPath(filepath);
@@ -1555,6 +1567,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, bool bAddToMRU)
             bRet = false;
         }
     }
+    m_insertionIndex = -1;
     return bRet;
 }
 

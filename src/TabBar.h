@@ -87,6 +87,7 @@ public :
     virtual LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
     int                         InsertAtEnd(const TCHAR *subTabName);
+    int                         InsertAfter(int index, const TCHAR *subTabName);
     void                        ActivateAt(int index) const;
     void                        GetTitle(int index, TCHAR *title, int titleLen);
     void                        GetCurrentTitle(TCHAR *title, int titleLen);

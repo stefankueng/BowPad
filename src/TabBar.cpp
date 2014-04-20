@@ -179,6 +179,24 @@ int CTabBar::InsertAtEnd(const TCHAR *subTabName)
     return int(::SendMessage(*this, TCM_INSERTITEM, m_nItems++, reinterpret_cast<LPARAM>(&tie)));
 }
 
+int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
+{
+    TCITEM tie;
+    tie.mask = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
+    int imgindex = -1;
+
+    if (m_bHasImgList)
+        imgindex = 0;
+    tie.iImage = TABBAR_SHOWDISKICON ? imgindex : 0;
+    tie.pszText = (TCHAR *)subTabName;
+    tie.lParam = m_tabID++;
+    if ((index + 1) >= m_nItems)
+        index = m_nItems - 1;
+    int ret = int(::SendMessage(*this, TCM_INSERTITEM, index + 1, reinterpret_cast<LPARAM>(&tie)));
+    ++m_nItems;
+    return ret;
+}
+
 void CTabBar::GetTitle(int index, TCHAR *title, int titleLen)
 {
     TCITEM tci;

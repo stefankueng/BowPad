@@ -329,4 +329,10 @@ int ICommand::GetDocIDFromPath( LPCTSTR path )
     return pMainWnd->m_DocManager.GetIdForPath(path);
 }
 
+void ICommand::SetInsertionIndex(int index)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->SetInsertionIndex(index);
+}
+
 

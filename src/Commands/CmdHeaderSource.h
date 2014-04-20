@@ -109,6 +109,7 @@ public:
         if (matchingfiles.size() == 1)
         {
             // only one match found: open it directly
+            SetInsertionIndex(GetActiveTabIndex());
             OpenFile(matchingfiles[0].c_str(), true);
         }
         else
@@ -119,6 +120,7 @@ public:
             int ret = (int)dlg.DoModal(hRes, IDD_CHOSE, GetHwnd());
             if (ret >= 0)
             {
+                SetInsertionIndex(GetActiveTabIndex());
                 OpenFile(matchingfiles[ret].c_str(), true);
             }
         }

@@ -44,6 +44,7 @@ public:
     virtual void        OnTimer(UINT id);
 
 protected:
+    void                SetInsertionIndex(int index);
     void                TabActivateAt(int index);
     void                UpdateTab(int index);
     int                 GetCurrentTabId();
