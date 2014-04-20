@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -52,8 +52,10 @@ void CDocScroll::InitScintilla( CScintillaWnd * pScintilla )
 {
     m_pScintilla = pScintilla;
     InitializeCoolSB(*m_pScintilla);
-    CoolSB_SetStyle(*m_pScintilla, SB_HORZ, CSBS_HOTTRACKED);
-    CoolSB_SetStyle(*m_pScintilla, SB_VERT, CSBS_HOTTRACKED|CSBS_MAPMODE);
+    UINT style = CSBS_HOTTRACKED;
+    CoolSB_SetStyle(*m_pScintilla, SB_HORZ, style);
+    style |= CIniSettings::Instance().GetInt64(L"View", L"scrollstyle", 1) > 0 ? CSBS_MAPMODE : 0;
+    CoolSB_SetStyle(*m_pScintilla, SB_VERT, style);
     CoolSB_SetThumbAlways(*m_pScintilla, SB_VERT, TRUE);
     CoolSB_SetMinThumbSize(*m_pScintilla, SB_BOTH, 10);
 }
