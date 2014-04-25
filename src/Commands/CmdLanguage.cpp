@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
 
     if(key == UI_PKEY_Categories)
     {
-        IUICollection* pCollection;
+        IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (FAILED(hr))
         {
@@ -50,7 +50,6 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         hr = CPropertySet::CreateInstance(&pMain);
         if (FAILED(hr))
         {
-            pCollection->Release();
             return hr;
         }
 
@@ -67,7 +66,6 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         hr = CPropertySet::CreateInstance(&pRemotes);
         if (FAILED(hr))
         {
-            pCollection->Release();
             return hr;
         }
 
@@ -77,13 +75,11 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         pCollection->Add(pRemotes);
         pRemotes->Release();
 
-        pCollection->Release();
-
         hr = S_OK;
     }
     else if (key == UI_PKEY_ItemsSource)
     {
-        IUICollection* pCollection;
+        IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (FAILED(hr))
         {
@@ -91,8 +87,8 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         }
         pCollection->Clear();
         // Create an IUIImage from a resource id.
-        IUIImage * pImg = nullptr;
-        IUIImageFromBitmap * pifbFactory = nullptr;
+        IUIImagePtr pImg;
+        IUIImageFromBitmapPtr pifbFactory;
         hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
         if (FAILED(hr))
         {
@@ -110,28 +106,17 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
                 DeleteObject(hbm);
             }
         }
-        pifbFactory->Release();
 
         if (FAILED(hr))
         {
-            pCollection->Release();
             return hr;
         }
 
         gLanguages.clear();
 
         // English as the first language, always installed
-        CPropertySet* pItem;
-        hr = CPropertySet::CreateInstance(&pItem);
-        if (FAILED(hr))
-        {
-            pCollection->Release();
-            return hr;
-        }
-        pItem->InitializeItemProperties(pImg, L"English", 0);
-        pCollection->Add(pItem);
+        CAppUtils::AddStringItem(pCollection, L"English", 0, pImg);
         gLanguages.push_back(L"");
-        pItem->Release();
 
         std::wstring path = CAppUtils::GetDataPath();
         CDirFileEnum enumerator(path);
@@ -151,17 +136,8 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
                         std::unique_ptr<wchar_t[]> langbuf(new wchar_t[len]);
                         if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langbuf.get(), len))
                         {
-                            CPropertySet* pItem;
-                            hr = CPropertySet::CreateInstance(&pItem);
-                            if (FAILED(hr))
-                            {
-                                pCollection->Release();
-                                return hr;
-                            }
-                            pItem->InitializeItemProperties(pImg, langbuf.get(), 0);
-                            pCollection->Add(pItem);
+                            CAppUtils::AddStringItem(pCollection, langbuf.get(), 0, pImg);
                             gLanguages.push_back(sLocale);
-                            pItem->Release();
                         }
                     }
                 }
@@ -171,18 +147,8 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         if (gRemotes.empty())
         {
             // Dummy entry for fetching the remote language list
-            CPropertySet* pItem;
-            hr = CPropertySet::CreateInstance(&pItem);
-            if (FAILED(hr))
-            {
-                pCollection->Release();
-                return hr;
-            }
-            ResString sFetch(hRes, IDS_LANGUAGE_FETCH);
-            pItem->InitializeItemProperties(pImg, sFetch, 1);
-            pCollection->Add(pItem);
+            CAppUtils::AddResStringItem(pCollection, IDS_LANGUAGE_FETCH, 1, pImg);
             gLanguages.push_back(L"*");
-            pItem->Release();
         }
         else
         {
@@ -195,24 +161,13 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
                     std::unique_ptr<wchar_t[]> langbuf(new wchar_t[len]);
                     if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langbuf.get(), len))
                     {
-                        CPropertySet* pItem;
-                        hr = CPropertySet::CreateInstance(&pItem);
-                        if (FAILED(hr))
-                        {
-                            pCollection->Release();
-                            return hr;
-                        }
-                        pItem->InitializeItemProperties(pImg, langbuf.get(), 0);
-                        pCollection->Add(pItem);
+                        CAppUtils::AddStringItem(pCollection, langbuf.get(), 0, pImg);
                         gLanguages.push_back(sLocale);
-                        pItem->Release();
                     }
                 }
             }
         }
 
-        pImg->Release();
-        pCollection->Release();
         hr = S_OK;
     }
     else if (key == UI_PKEY_SelectedItem)

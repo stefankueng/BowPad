@@ -19,6 +19,7 @@
 #include "PropertySet.h"
 #include "BowPad.h"
 #include "StringUtils.h"
+#include "AppUtils.h"
 #include "ResString.h"
 
 #include <vector>
@@ -79,7 +80,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
 
     if(key == UI_PKEY_Categories)
     {
-        IUICollection* pCollection;
+        IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (FAILED(hr))
         {
@@ -91,7 +92,6 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         hr = CPropertySet::CreateInstance(&pMain);
         if (FAILED(hr))
         {
-            pCollection->Release();
             return hr;
         }
 
@@ -108,7 +108,6 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         hr = CPropertySet::CreateInstance(&pCodepages);
         if (FAILED(hr))
         {
-            pCollection->Release();
             return hr;
         }
 
@@ -118,13 +117,11 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         pCollection->Add(pCodepages);
         pCodepages->Release();
 
-        pCollection->Release();
-
         hr = S_OK;
     }
     else if (key == UI_PKEY_ItemsSource)
     {
-        IUICollection* pCollection;
+        IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (FAILED(hr))
         {
@@ -136,8 +133,8 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
 
 
         // Create an IUIImage from a resource id.
-        IUIImage * pImg = nullptr;
-        IUIImageFromBitmap * pifbFactory = nullptr;
+        IUIImagePtr pImg;
+        IUIImageFromBitmapPtr pifbFactory;
         hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
         if (FAILED(hr))
         {
@@ -155,11 +152,9 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
                 DeleteObject(hbm);
             }
         }
-        pifbFactory->Release();
 
         if (FAILED(hr))
         {
-            pCollection->Release();
             return hr;
         }
 
@@ -170,24 +165,9 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         {
             if ((std::get<1>(it)) && (std::get<2>(it).compare(L"UTF-8 BOM")==0))
                 continue;
-            // Create a new property set for each item.
-            CPropertySet* pItem;
-            hr = CPropertySet::CreateInstance(&pItem);
-            if (FAILED(hr))
-            {
-                pCollection->Release();
-                return hr;
-            }
 
-            pItem->InitializeItemProperties(pImg, std::get<2>(it).c_str(), std::get<3>(it));
-
-            // Add the newly-created property set to the collection supplied by the framework.
-            pCollection->Add(pItem);
-
-            pItem->Release();
+            CAppUtils::AddStringItem(pCollection, std::get<2>(it).c_str(), std::get<3>(it), pImg);
         }
-        pImg->Release();
-        pCollection->Release();
         hr = S_OK;
     }
     else if (key == UI_PKEY_Enabled)
@@ -260,7 +240,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
 
     if(key == UI_PKEY_Categories)
     {
-        IUICollection* pCollection;
+        IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (FAILED(hr))
         {
@@ -272,7 +252,6 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
         hr = CPropertySet::CreateInstance(&pMain);
         if (FAILED(hr))
         {
-            pCollection->Release();
             return hr;
         }
 
@@ -289,7 +268,6 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
         hr = CPropertySet::CreateInstance(&pCodepages);
         if (FAILED(hr))
         {
-            pCollection->Release();
             return hr;
         }
 
@@ -299,13 +277,11 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
         pCollection->Add(pCodepages);
         pCodepages->Release();
 
-        pCollection->Release();
-
         hr = S_OK;
     }
     else if (key == UI_PKEY_ItemsSource)
     {
-        IUICollection* pCollection;
+        IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (FAILED(hr))
         {
@@ -317,8 +293,8 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
 
 
         // Create an IUIImage from a resource id.
-        IUIImage * pImg = nullptr;
-        IUIImageFromBitmap * pifbFactory = nullptr;
+        IUIImagePtr pImg;
+        IUIImageFromBitmapPtr pifbFactory;
         hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
         if (FAILED(hr))
         {
@@ -336,37 +312,17 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
                 DeleteObject(hbm);
             }
         }
-        pifbFactory->Release();
 
         if (FAILED(hr))
         {
-            pCollection->Release();
             return hr;
         }
-
-
 
         // populate the dropdown with the code pages
         for (auto it:codepages)
         {
-            // Create a new property set for each item.
-            CPropertySet* pItem;
-            hr = CPropertySet::CreateInstance(&pItem);
-            if (FAILED(hr))
-            {
-                pCollection->Release();
-                return hr;
-            }
-
-            pItem->InitializeItemProperties(pImg, std::get<2>(it).c_str(), std::get<3>(it));
-
-            // Add the newly-created property set to the collection supplied by the framework.
-            pCollection->Add(pItem);
-
-            pItem->Release();
+            CAppUtils::AddStringItem(pCollection, std::get<2>(it).c_str(), std::get<3>(it), pImg);
         }
-        pImg->Release();
-        pCollection->Release();
         hr = S_OK;
     }
     else if (key == UI_PKEY_SelectedItem)

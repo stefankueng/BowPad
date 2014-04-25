@@ -22,6 +22,8 @@
 #include <ShlObj.h>
 
 _COM_SMARTPTR_TYPEDEF(IUICollection, __uuidof(IUICollection));
+_COM_SMARTPTR_TYPEDEF(IUIImage, __uuidof(IUIImage));
+_COM_SMARTPTR_TYPEDEF(IUIImageFromBitmap, __uuidof(IUIImageFromBitmap));
 _COM_SMARTPTR_TYPEDEF(IFileOpenDialog, __uuidof(IFileOpenDialog));
 _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
 _COM_SMARTPTR_TYPEDEF(IShellItemArray, __uuidof(IShellItemArray));
