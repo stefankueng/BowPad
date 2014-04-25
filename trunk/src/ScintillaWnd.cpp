@@ -460,6 +460,12 @@ void CScintillaWnd::SetupDefaultStyles()
 
 }
 
+void CScintillaWnd::GotoLine(long line)
+{
+    long linepos = (long)Call(SCI_POSITIONFROMLINE, line);
+    Center(linepos, linepos);
+}
+
 void CScintillaWnd::Center(long posStart, long posEnd)
 {
     // to make sure the found result is visible

@@ -299,6 +299,12 @@ void ICommand::DocScrollUpdate()
     pMainWnd->m_scintilla.DocScrollUpdate();
 }
 
+void ICommand::GotoLine(long line)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    pMainWnd->m_scintilla.GotoLine(line);
+}
+
 void ICommand::Center( long startPos, long endPos )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);

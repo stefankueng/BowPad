@@ -85,6 +85,7 @@ public :
     void DocScrollUpdate();
     void DocScrollRemoveLine(int type, size_t line) { m_docScroll.RemoveLine(type, line); }
     void MarkBookmarksInScrollbar();
+    void GotoLine(long line);
     void Center(long posStart, long posEnd);
     void SetTabSettings();
 
@@ -109,7 +110,6 @@ protected:
     void BookmarkDelete(int lineno);
     bool IsBookmarkPresent(int lineno);
     void BookmarkToggle(int lineno);
-
 private:
     SciFnDirect                 m_pSciMsg;
     sptr_t                      m_pSciWndData;
