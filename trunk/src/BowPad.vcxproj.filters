@@ -276,6 +276,12 @@
     <ClInclude Include="COMPtrs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BowPadUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\Registry.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -448,6 +454,9 @@
     </ClCompile>
     <ClCompile Include="Commands\CmdDefaultEncoding.cpp">
       <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\Registry.cpp">
+      <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

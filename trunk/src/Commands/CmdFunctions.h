@@ -24,26 +24,58 @@
 #include <string>
 #include <vector>
 
+// Enable to test function scanning performance. If set to 1 a
+// a dialog box is shown showing how long each document took to scan
+// and how any many pieces it was scanned in.
+#define TIMED_FUNCTIONS 0
+#include <chrono>
+
+enum class FindFunctionsStatus
+{
+    NotStarted,
+    InProgress,
+    Finished,
+    Failed
+};
+
+enum class FunctionDisplayMode
+{
+    NameAndArgs,
+    Name,
+    Signature
+};
+
+struct FunctionInfo
+{
+    inline FunctionInfo(size_t line, std::wstring&& sort_name, std::wstring&& display_name)
+        : line(std::move(line)), sort_name(std::move(sort_name)), display_name(std::move(display_name))
+    {}
+    size_t line;
+    std::wstring sort_name;
+    std::wstring display_name;
+};
+
+enum class FunctionUpdateReason
+{
+    Unknown,
+    TabChange,
+    DocOpen,
+    DocModified,
+    DocSave,
+    DocProgress,
+    DocNext
+};
 
 class CCmdFunctions : public ICommand
 {
 public:
-
-    CCmdFunctions(void * obj)
-        : ICommand(obj)
-        , m_ScratchScintilla(hRes)
-    {
-        m_timerID = GetTimerID();
-        m_ScratchScintilla.InitScratch(hRes);
-    }
+    CCmdFunctions(void * obj);
 
     ~CCmdFunctions(void)
-    {
-    }
+    {}
 
     virtual bool Execute() override { return false; }
     virtual UINT GetCmdId() override { return cmdFunctions; }
-
 
     virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
@@ -60,10 +92,37 @@ public:
     virtual void OnDocumentSave(int index, bool bSaveAs) override;
 
 private:
-    void            FindFunctions(int docID, bool bBackground);
 
-    UINT            m_timerID;
-    std::set<int>   m_docIDs;
-    CScintillaWnd   m_ScratchScintilla;
+    void FindFunctions(int docID);
+    void SaveFunctionForActiveDocument(FunctionDisplayMode fdm, size_t line_no,
+                                       bool parsed, std::wstring&& sig, std::wstring&& name, std::wstring&& name_and_args);
+    void InvalidateFunctionsEnabled();
+    void InvalidateFunctionsSource();
+    HRESULT PopulateFunctions(IUICollectionPtr& collection);
+    void ScheduleFunctionUpdate(int docId, FunctionUpdateReason reason);
+    void UpdateFunctions();
+    void RemoveNonExistantDocuments();
+    void AddDocumentToScan(int docId);
+    void FunctionScanningComplet(int docId);
+    void DocumentScanFinished(int docId);
+    void DocumentScanInterrupted(int docId, int interruptingDocId);
+    void DocumentScanProgressing(int docId);
+    int TopDocumentId() const;
+
+private:
+    UINT m_timerID;
+    std::vector<int> m_docIDs;
+    CScintillaWnd m_edit;
+    std::vector<FunctionInfo> m_functions;
+    std::string m_funcRegex;
+    Scintilla::Sci_TextToFind m_ttf;
+    FindFunctionsStatus m_searchStatus;
+    FindFunctionsStatus m_functionsStatus;
+    bool m_autoscan;
+    FunctionDisplayMode m_functionDisplayMode;
+
+    int m_timedParts;
+    std::chrono::steady_clock::time_point m_startTime;
+    std::chrono::steady_clock::time_point m_endTime;
 };
 
