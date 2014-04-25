@@ -1405,7 +1405,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     m_StatusBar.SetText(strLnCol, ttcurpos.c_str(), STATUSBAR_CUR_POS);
 
     TCHAR strDocLen[256];
-    swprintf_s(strDocLen, L"length : %d    lines : %d", m_scintilla.Call(SCI_GETLENGTH), m_scintilla.Call(SCI_GETLINECOUNT));
+    swprintf_s(strDocLen, L"length : %d    lines : %d", (int)m_scintilla.Call(SCI_GETLENGTH), (int)m_scintilla.Call(SCI_GETLINECOUNT));
     std::wstring ttdocsize = CStringUtils::Format(rsStatusTTDocSize, m_scintilla.Call(SCI_GETLENGTH), m_scintilla.Call(SCI_GETLINECOUNT));
     m_StatusBar.SetText(strDocLen, ttdocsize.c_str(), STATUSBAR_DOC_SIZE);
 
