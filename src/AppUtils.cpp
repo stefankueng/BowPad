@@ -22,6 +22,8 @@
 #include "UnicodeUtils.h"
 #include "SmartHandle.h"
 #include "ProgressDlg.h"
+#include "PropertySet.h"
+#include "ResString.h"
 #include "version.h"
 
 #include <memory>
@@ -410,4 +412,46 @@ bool CAppUtils::HasSameMajorVersion( const std::wstring& path )
     std::wstring sAppVer = _T(STRPRODUCTVER);
     sAppVer = sAppVer.substr(0, sAppVer.find_last_of('.'));
     return (_wcsicmp(sVer.c_str(), sAppVer.c_str()) == 0);
+}
+
+bool CAppUtils::FailedShowMessage(HRESULT hr)
+{
+    if (FAILED(hr))
+    {
+        _com_error err(hr);
+        if (CIniSettings::Instance().GetInt64(L"Debug", L"usemessagebox", 0))
+        {
+            MessageBox(NULL, L"BowPad", err.ErrorMessage(), MB_ICONERROR);
+        }
+        else
+        {
+            CTraceToOutputDebugString::Instance()(L"BowPad : ");
+            CTraceToOutputDebugString::Instance()(err.ErrorMessage());
+            CTraceToOutputDebugString::Instance()(L"\n");
+        }
+        return true;
+    }
+    return false;
+}
+
+HRESULT CAppUtils::AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int cat)
+{
+    HRESULT hr;
+    CPropertySet* pItem;
+    hr = CPropertySet::CreateInstance(&pItem);
+    if (FailedShowMessage(hr))
+        return hr;
+    pItem->InitializeItemProperties(NULL, text, cat);
+
+    // Add the newly-created property set to the collection supplied by the framework.
+    hr = collection->Add(pItem);
+    FailedShowMessage(hr);
+    pItem->Release();
+    return hr;
+}
+
+HRESULT CAppUtils::AddResStringItem(IUICollectionPtr& collection, int resId, int cat)
+{
+    ResString rs(hRes, resId);
+    return AddStringItem(collection, rs, cat);
 }
