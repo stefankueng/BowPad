@@ -19,6 +19,7 @@
 #include "PropertySet.h"
 #include "BowPad.h"
 #include "StringUtils.h"
+#include "AppUtils.h"
 #include "LexStyles.h"
 
 #include <vector>
@@ -32,7 +33,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
 
     if(key == UI_PKEY_Categories)
     {
-        IUICollection* pCollection;
+        IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (FAILED(hr))
         {
@@ -49,7 +50,6 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
             hr = CPropertySet::CreateInstance(&pCat);
             if (FAILED(hr))
             {
-                pCollection->Release();
                 return hr;
             }
 
@@ -63,7 +63,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
     }
     else if (key == UI_PKEY_ItemsSource)
     {
-        IUICollection* pCollection;
+        IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (FAILED(hr))
         {
@@ -74,8 +74,8 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
             langs = CLexStyles::Instance().GetLanguages();
 
         // Create an IUIImage from a resource id.
-        IUIImage * pImg = nullptr;
-        IUIImageFromBitmap * pifbFactory = nullptr;
+        IUIImagePtr pImg;
+        IUIImageFromBitmapPtr pifbFactory;
         hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
         if (FAILED(hr))
         {
@@ -93,36 +93,18 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
                 DeleteObject(hbm);
             }
         }
-        pifbFactory->Release();
 
         if (FAILED(hr))
         {
-            pCollection->Release();
             return hr;
         }
 
         // populate the dropdown with the code pages
         for (auto it:langs)
         {
-            // Create a new property set for each item.
-            CPropertySet* pItem;
-            hr = CPropertySet::CreateInstance(&pItem);
-            if (FAILED(hr))
-            {
-                pCollection->Release();
-                return hr;
-            }
-
             int catId = it.c_str()[0] - 'A';
-            pItem->InitializeItemProperties(pImg, it.c_str(), catId);
-
-            // Add the newly-created property set to the collection supplied by the framework.
-            pCollection->Add(pItem);
-
-            pItem->Release();
+            CAppUtils::AddStringItem(pCollection, it.c_str(), catId, pImg);
         }
-        pImg->Release();
-        pCollection->Release();
         hr = S_OK;
     }
     else if (key == UI_PKEY_SelectedItem)

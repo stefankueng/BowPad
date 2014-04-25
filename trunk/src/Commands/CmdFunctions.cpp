@@ -338,7 +338,7 @@ HRESULT CCmdFunctions::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PRO
                 // If we reach here, our internal list and menu may be out of
                 // sync. It shouldn't happen but don't crash if it does.
                 hr = E_FAIL;
-                APPVERIFY(false, "internal list and menu might be out of sync");
+                APPVERIFYM(false, "internal list and menu might be out of sync");
             }
         }
     }
