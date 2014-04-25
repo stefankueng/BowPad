@@ -19,6 +19,8 @@
 
 #include <string>
 #include <map>
+#include <memory>
+#include <vector>
 
 class CCommandHandler
 {
@@ -40,5 +42,17 @@ public:
     void                            AfterInit();
     void                            OnTimer(UINT id);
 private:
-    std::map<UINT, ICommand*>       m_commands;
+    template<typename T, typename ... ARGS> T* Add(ARGS ... args)
+    {
+        // Construct the type we want. We need to get the id out of it.
+        // Move it into the map, then return the pointer we got
+        // out. We know it must be the type we want because we just created it.
+        // We could use shared_ptr here but we control the life time so
+        // no point paying the price as if we didn't.
+        auto pCmd = std::make_unique<T>(args...);
+        auto cmdId = pCmd->GetCmdId();
+        auto at = m_commands.insert({cmdId,std::move(pCmd)});
+        return static_cast<T*>(at.first->second.get());
+    }
+    std::map<UINT, std::unique_ptr<ICommand>>       m_commands;
 };

@@ -58,10 +58,6 @@ CCommandHandler::CCommandHandler(void)
 
 CCommandHandler::~CCommandHandler(void)
 {
-    for (auto c:m_commands)
-    {
-        delete c.second;
-    }
 }
 
 CCommandHandler& CCommandHandler::Instance()
@@ -74,220 +70,131 @@ ICommand * CCommandHandler::GetCommand( UINT cmdId )
 {
     auto c = m_commands.find(cmdId);
     if (c != m_commands.end())
-        return c->second;
+        return c->second.get();
 
     return nullptr;
 }
 
 void CCommandHandler::Init( void * obj )
 {
-    ICommand * pCmd = new CCmdMRU(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdToggleTheme(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdMRU>(obj);
+    Add<CCmdToggleTheme>(obj);
+    Add<CCmdOpen>(obj);
+    Add<CCmdSave>(obj);
+    Add<CCmdSaveAll>(obj);
+    Add<CCmdSaveAs>(obj);
+    Add<CCmdReload>(obj);
+    Add<CCmdFileDelete>(obj);
+    Add<CCmdPrint>(obj);
+    Add<CCmdPrintNow>(obj);
+    Add<CCmdPageSetup>(obj);
+    Add<CCmdSessionLoad>(obj);
+    Add<CCmdSessionAutoLoad>(obj);
+    Add<CCmdSessionRestoreLast>(obj);
+    Add<CCmdUndo>(obj);
+    Add<CCmdRedo>(obj);
+    Add<CCmdCut>(obj);
+    Add<CCmdCutPlain>(obj);
+    Add<CCmdCopy>(obj);
+    Add<CCmdCopyPlain>(obj);
+    Add<CCmdPaste>(obj);
+    Add<CCmdDelete>(obj);
+    Add<CCmdSelectAll>(obj);
+    Add<CCmdGotoBrace>(obj);
+    Add<CCmdConfigShortcuts>(obj);
+    Add<CCmdLineWrap>(obj);
+    Add<CCmdWhiteSpace>(obj);
+    Add<CCmdUseTabs>(obj);
+    Add<CCmdAutoBraces>(obj);
+    Add<CCmdLanguage>(obj);
+    Add<CCmdTabSize>(obj);
+    Add<CCmdLoadAsEncoded>(obj);
+    Add<CCmdConvertEncoding>(obj);
+    Add<CCmdCodeStyle>(obj);
+    Add<CCmdStyleConfigurator>(obj);
 
-    pCmd = new CCmdOpen(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdSave(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdSaveAll(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdSaveAs(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdReload(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdFileDelete(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdPrint(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdPrintNow(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdPageSetup(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdSessionLoad(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdSessionAutoLoad(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdSessionRestoreLast(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdUndo(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdRedo(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdCut(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdCutPlain(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdCopy(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdCopyPlain(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdPaste(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdDelete(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdSelectAll(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdGotoBrace(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdConfigShortcuts(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLineWrap(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdWhiteSpace(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdUseTabs(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdAutoBraces(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLanguage(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdTabSize(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLoadAsEncoded(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdConvertEncoding(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdCodeStyle(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdStyleConfigurator(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdEOLWin>(obj);
+    Add<CCmdEOLUnix>(obj);
+    Add<CCmdEOLMac>(obj);
 
-    pCmd = new CCmdEOLWin(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdEOLUnix(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdEOLMac(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdPrevNext>(obj);
+    Add<CCmdPrevious>(obj);
+    Add<CCmdNext>(obj);
 
-    pCmd = new CCmdPrevNext(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdPrevious(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdNext(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdFindReplace>(obj);
+    Add<CCmdFindNext>(obj);
+    Add<CCmdFindPrev>(obj);
+    Add<CCmdFindSelectedNext>(obj);
+    Add<CCmdFindSelectedPrev>(obj);
+    Add<CCmdGotoLine>(obj);
+    Add<CCmdFunctions>(obj);
 
-    pCmd = new CCmdFindReplace(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdFindNext(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdFindPrev(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdFindSelectedNext(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdFindSelectedPrev(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdGotoLine(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdFunctions(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdBookmarks>(obj);
+    Add<CCmdBookmarkToggle>(obj);
+    Add<CCmdBookmarkClearAll>(obj);
+    Add<CCmdBookmarkNext>(obj);
+    Add<CCmdBookmarkPrev>(obj);
 
-    pCmd = new CCmdBookmarks(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdBookmarkToggle(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdBookmarkClearAll(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdBookmarkNext(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdBookmarkPrev(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdVerticalEdge>(obj);
+    Add<CCmdFont>(obj);
 
-    pCmd = new CCmdVerticalEdge(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdFont(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdComment>(obj);
+    Add<CCmdUnComment>(obj);
+    Add<CCmdConvertUppercase>(obj);
+    Add<CCmdConvertLowercase>(obj);
+    Add<CCmdConvertTitlecase>(obj);
 
-    pCmd = new CCmdComment(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdUnComment(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdConvertUppercase(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdConvertLowercase(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdConvertTitlecase(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdLineDuplicate>(obj);
+    Add<CCmdLineSplit>(obj);
+    Add<CCmdLineJoin>(obj);
+    Add<CCmdLineUp>(obj);
+    Add<CCmdLineDown>(obj);
 
-    pCmd = new CCmdLineDuplicate(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLineSplit(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLineJoin(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLineUp(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLineDown(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdTrim>(obj);
+    Add<CCmdTabs2Spaces>(obj);
+    Add<CCmdSpaces2Tabs>(obj);
 
-    pCmd = new CCmdTrim(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdTabs2Spaces(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdSpaces2Tabs(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdSelectTab>(obj);
+    Add<CCmdZoom100>(obj);
+    Add<CCmdZoomIn>(obj);
+    Add<CCmdZoomOut>(obj);
 
-    pCmd = new CCmdSelectTab(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdZoom100(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdZoomIn(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdZoomOut(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdNewCopy>(obj);
+    Add<CCmdDefaultEncoding>(obj);
 
-    pCmd = new CCmdNewCopy(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdDefaultEncoding(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdHeaderSource>(obj);
+    Add<CCmdOpenSelection>(obj);
 
-    pCmd = new CCmdHeaderSource(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdOpenSelection(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-
-    pCmd = new CCmdLaunchIE(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLaunchFirefox(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLaunchChrome(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLaunchSafari(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLaunchOpera(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLaunchSearch(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLaunchWikipedia(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLaunchConsole(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
-    pCmd = new CCmdLaunchExplorer(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdLaunchIE>(obj);
+    Add<CCmdLaunchFirefox>(obj);
+    Add<CCmdLaunchChrome>(obj);
+    Add<CCmdLaunchSafari>(obj);
+    Add<CCmdLaunchOpera>(obj);
+    Add<CCmdLaunchSearch>(obj);
+    Add<CCmdLaunchWikipedia>(obj);
+    Add<CCmdLaunchConsole>(obj);
+    Add<CCmdLaunchExplorer>(obj);
 
     for (int i = 0; i < 10; ++i)
     {
-        pCmd = new CCmdLaunchCustom(i, obj);
-        m_commands[pCmd->GetCmdId()] = pCmd;
+        Add<CCmdLaunchCustom>(i, obj);
     }
-    pCmd = new CCmdCustomCommands(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdCustomCommands>(obj);
 
-    pCmd = new CCmdRandom(obj);
-    m_commands[pCmd->GetCmdId()] = pCmd;
+    Add<CCmdRandom>(obj);
 }
 
 void CCommandHandler::ScintillaNotify( Scintilla::SCNotification * pScn )
 {
-    for (auto cmd:m_commands)
+    for (auto& cmd:m_commands)
     {
-        cmd.second->ScintillaNotify(pScn);
+        cmd.second.get()->ScintillaNotify(pScn);
     }
 }
 
 void CCommandHandler::TabNotify( TBHDR * ptbhdr )
 {
-    for (auto cmd:m_commands)
+    for (auto& cmd:m_commands)
     {
         cmd.second->TabNotify(ptbhdr);
     }
@@ -295,7 +202,7 @@ void CCommandHandler::TabNotify( TBHDR * ptbhdr )
 
 void CCommandHandler::OnClose()
 {
-    for (auto cmd:m_commands)
+    for (auto& cmd:m_commands)
     {
         cmd.second->OnClose();
     }
@@ -303,7 +210,7 @@ void CCommandHandler::OnClose()
 
 void CCommandHandler::OnDocumentClose(int index)
 {
-    for (auto cmd:m_commands)
+    for (auto& cmd:m_commands)
     {
         cmd.second->OnDocumentClose(index);
     }
@@ -311,7 +218,7 @@ void CCommandHandler::OnDocumentClose(int index)
 
 void CCommandHandler::OnDocumentOpen(int index)
 {
-    for (auto cmd : m_commands)
+    for (auto& cmd : m_commands)
     {
         cmd.second->OnDocumentOpen(index);
     }
@@ -319,7 +226,7 @@ void CCommandHandler::OnDocumentOpen(int index)
 
 void CCommandHandler::OnDocumentSave(int index, bool bSaveAs)
 {
-    for (auto cmd : m_commands)
+    for (auto& cmd : m_commands)
     {
         cmd.second->OnDocumentSave(index, bSaveAs);
     }
@@ -327,7 +234,7 @@ void CCommandHandler::OnDocumentSave(int index, bool bSaveAs)
 
 void CCommandHandler::AfterInit()
 {
-    for (auto cmd:m_commands)
+    for (auto& cmd:m_commands)
     {
         cmd.second->AfterInit();
     }
@@ -335,7 +242,7 @@ void CCommandHandler::AfterInit()
 
 void CCommandHandler::OnTimer(UINT id)
 {
-    for (auto cmd : m_commands)
+    for (auto& cmd:m_commands)
     {
         cmd.second->OnTimer(id);
     }
