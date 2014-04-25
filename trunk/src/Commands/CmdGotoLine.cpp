@@ -79,7 +79,7 @@ bool CCmdGotoLine::Execute()
     dlg.lineinfo = CStringUtils::Format(lineformat, first, last);
     if (dlg.DoModal(hRes, IDD_GOTOLINE, GetHwnd())==IDOK)
     {
-        ScintillaCall(SCI_GOTOLINE, dlg.line-1);
+        GotoLine(dlg.line - 1);
     }
 
     return true;
