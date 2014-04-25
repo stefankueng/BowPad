@@ -31,8 +31,8 @@ public:
     static bool                     ShowUpdateAvailableDialog(HWND hWnd);
     static HRESULT CALLBACK         TDLinkClickCallback(HWND hwnd, UINT uNotification, WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData);
     static bool                     HasSameMajorVersion(const std::wstring& path);
-    static HRESULT                  AddResStringItem(IUICollectionPtr& collection, int resId, int cat = UI_COLLECTION_INVALIDINDEX);
-    static HRESULT                  AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int cat = UI_COLLECTION_INVALIDINDEX);
+    static HRESULT                  AddResStringItem(IUICollectionPtr& collection, int resId, int cat = UI_COLLECTION_INVALIDINDEX, IUIImage * pImg = nullptr);
+    static HRESULT                  AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int cat = UI_COLLECTION_INVALIDINDEX, IUIImage * pImg = nullptr);
     static bool                     FailedShowMessage(HRESULT hr);
 
 private:

@@ -434,14 +434,14 @@ bool CAppUtils::FailedShowMessage(HRESULT hr)
     return false;
 }
 
-HRESULT CAppUtils::AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int cat)
+HRESULT CAppUtils::AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int cat, IUIImage * pImg)
 {
     HRESULT hr;
     CPropertySet* pItem;
     hr = CPropertySet::CreateInstance(&pItem);
     if (FailedShowMessage(hr))
         return hr;
-    pItem->InitializeItemProperties(NULL, text, cat);
+    pItem->InitializeItemProperties(pImg, text, cat);
 
     // Add the newly-created property set to the collection supplied by the framework.
     hr = collection->Add(pItem);
@@ -450,8 +450,8 @@ HRESULT CAppUtils::AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int
     return hr;
 }
 
-HRESULT CAppUtils::AddResStringItem(IUICollectionPtr& collection, int resId, int cat)
+HRESULT CAppUtils::AddResStringItem(IUICollectionPtr& collection, int resId, int cat, IUIImage * pImg)
 {
     ResString rs(hRes, resId);
-    return AddStringItem(collection, rs, cat);
+    return AddStringItem(collection, rs, cat, pImg);
 }
