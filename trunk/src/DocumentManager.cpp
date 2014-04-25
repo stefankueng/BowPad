@@ -609,11 +609,39 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
     if (doc.m_path.empty())
         return false;
     CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    DWORD attributes = INVALID_FILE_ATTRIBUTES;
+    if (!hFile.IsValid())
+    {
+        DWORD err = GetLastError();
+        if (err == ERROR_ACCESS_DENIED)
+        {
+            // check if the file attributes are the reason we can not
+            // open the file for writing
+            attributes = GetFileAttributes(doc.m_path.c_str());
+            if (attributes != INVALID_FILE_ATTRIBUTES)
+            {
+                if ((attributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)) != 0)
+                {
+                    // clear the file attributes that prevent us from opening the file in write mode
+                    // then open the file again
+                    // Note: this is the easiest way to deal with this, but maybe not the best:
+                    // the readonly flag is sometimes used to tell the user that the file should
+                    // not be edited. And we don't inform the user about this here!
+                    // But since every user can remove that flag easily from explorer,
+                    // it won't stop the user from saving anyway, so here we just do this automatically.
+                    SetFileAttributes(doc.m_path.c_str(), attributes & (~(FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)));
+                    hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+                }
+                else
+                    attributes = INVALID_FILE_ATTRIBUTES;
+            }
+        }
+    }
     if (!hFile.IsValid())
     {
         DWORD err = GetLastError();
         CFormatMessageWrapper errMsg(err);
-        if (((err == ERROR_ACCESS_DENIED)||(err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
+        if (((err == ERROR_ACCESS_DENIED) || (err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
         {
             // access to the file is denied, and we're not running with elevated privileges
             // offer to start BowPad with elevated privileges and open the file in that instance
@@ -683,6 +711,11 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
     {
         m_scratchScintilla.Call(SCI_SETSAVEPOINT);
         m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
+    }
+    if (attributes != INVALID_FILE_ATTRIBUTES)
+    {
+        // reset the file attributes after saving
+        SetFileAttributes(doc.m_path.c_str(), attributes);
     }
     return true;
 }
