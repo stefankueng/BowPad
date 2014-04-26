@@ -50,6 +50,10 @@ msgstr ""
 msgid "&Close Tab"
 msgstr ""
 
+#. Resource IDs: (12)
+msgid "&Edit"
+msgstr ""
+
 #. Resource IDs: (65535)
 msgid "&File"
 msgstr ""
@@ -1429,6 +1433,14 @@ msgstr ""
 #. Resource IDs: (11)
 #, c-format
 msgid "The file '%s' does not exist. Do you want to create it?"
+msgstr ""
+
+#. Resource IDs: (12)
+msgid "The file is marked as read only. Are you sure you want to edit this file?"
+msgstr ""
+
+#. Resource IDs: (12)
+msgid "The file is write protected"
 msgstr ""
 
 #. Resource IDs: (3764)
