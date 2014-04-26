@@ -745,6 +745,51 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         AutoIndent(pScn);
                     }
                     break;
+                case SCN_MODIFYATTEMPTRO:
+                    {
+                        // user tried to edit a readonly file: ask whether
+                        // to make the file writeable
+                        int id = m_TabBar.GetCurrentTabId();
+                        if ((id >= 0) && m_DocManager.HasDocumentID(id))
+                        {
+                            CDocument doc = m_DocManager.GetDocumentFromID(id);
+                            if (doc.m_bIsReadonly)
+                            {
+                                ResString rTitle(hRes, IDS_FILEISREADONLY);
+                                ResString rQuestion(hRes, IDS_FILEMAKEWRITABLEASK);
+                                ResString rEditFile(hRes, IDS_EDITFILE);
+                                ResString rCancel(hRes, IDS_CANCEL);
+
+                                TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+                                TASKDIALOG_BUTTON aCustomButtons[2];
+                                aCustomButtons[0].nButtonID = 100;
+                                aCustomButtons[0].pszButtonText = rEditFile;
+                                aCustomButtons[1].nButtonID = 101;
+                                aCustomButtons[1].pszButtonText = rCancel;
+
+                                tdc.hwndParent = *this;
+                                tdc.hInstance = hRes;
+                                tdc.dwFlags = /*TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | */TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+                                tdc.pButtons = aCustomButtons;
+                                tdc.cButtons = _countof(aCustomButtons);
+                                tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+                                tdc.pszMainIcon = TD_WARNING_ICON;
+                                tdc.pszMainInstruction = rTitle;
+                                tdc.pszContent = rQuestion;
+                                tdc.nDefaultButton = 101;
+                                int nClickedBtn = 0;
+                                HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
+
+                                if (SUCCEEDED(hr) && (nClickedBtn == 100))
+                                {
+                                    doc.m_bIsReadonly = false;
+                                    m_scintilla.Call(SCI_SETREADONLY, false);
+                                    m_scintilla.Call(SCI_SETSAVEPOINT);
+                                }
+                            }
+                        }
+                    }
+                    break;
                 case SCN_HOTSPOTCLICK:
                     {
                         if (pScn->modifiers & SCMOD_CTRL)

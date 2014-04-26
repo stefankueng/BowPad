@@ -161,6 +161,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         MessageBox(hWnd, CStringUtils::Format(sLoadErr, sFileName.c_str(), (LPCTSTR)errMsg).c_str(), L"BowPad", MB_ICONERROR);
         return doc;
     }
+    doc.m_bIsReadonly = (fi.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)) != 0;
     doc.m_lastWriteTime = fi.ftLastWriteTime;
     doc.m_path = path;
     unsigned __int64 fileSize = static_cast<__int64>(fi.nFileSizeHigh) << 32 | fi.nFileSizeLow;
@@ -400,7 +401,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     }
     m_scratchScintilla.Call(SCI_EMPTYUNDOBUFFER);
     m_scratchScintilla.Call(SCI_SETSAVEPOINT);
-    if (ro)
+    if (ro || doc.m_bIsReadonly)
         m_scratchScintilla.Call(SCI_SETREADONLY, true);
     doc.m_document = m_scratchScintilla.Call(SCI_GETDOCPOINTER);
     m_scratchScintilla.Call(SCI_ADDREFDOCUMENT, 0, doc.m_document);
