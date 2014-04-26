@@ -1042,6 +1042,7 @@ LRESULT CMainWindow::DoCommand(int id)
             m_DocManager.AddDocumentAtEnd(doc, id);
             m_TabBar.ActivateAt(index);
             m_scintilla.SetupLexerForLang(L"Text");
+            m_scintilla.GotoLine(0);
             m_insertionIndex = -1;
         }
         break;
