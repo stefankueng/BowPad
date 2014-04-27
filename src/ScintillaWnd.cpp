@@ -1616,5 +1616,10 @@ void CScintillaWnd::DocScrollUpdate()
     Scn.nmhdr.hwndFrom = *this;
     Scn.nmhdr.idFrom = (uptr_t)this;
     SendMessage(GetParent(*this), WM_NOTIFY, (WPARAM)(this), (LPARAM)&Scn);
-    InvalidateRect(*this, NULL, FALSE);
+    // force the scrollbar to redraw
+    SCROLLINFO si;
+    si.cbSize = sizeof(SCROLLINFO);
+    //si.fMask = SIF_RANGE;
+    //GetScrollInfo(*this, SB_VERT, &si);
+    SetScrollInfo(*this, SB_VERT, &si, TRUE);
 }
