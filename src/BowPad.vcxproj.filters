@@ -282,6 +282,9 @@
     <ClInclude Include="..\ext\sktoolslib\Registry.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\DownloadFile.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -456,6 +459,9 @@
       <Filter>Commands</Filter>
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\Registry.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\DownloadFile.cpp">
       <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>

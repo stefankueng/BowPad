@@ -218,6 +218,7 @@
     <ClInclude Include="..\ext\sktoolslib\DebugOutput.h" />
     <ClInclude Include="..\ext\sktoolslib\DirFileEnum.h" />
     <ClInclude Include="..\ext\sktoolslib\DlgResizer.h" />
+    <ClInclude Include="..\ext\sktoolslib\DownloadFile.h" />
     <ClInclude Include="..\ext\sktoolslib\EscapeUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\FormatMessageWrapper.h" />
     <ClInclude Include="..\ext\sktoolslib\hyperlink.h" />
@@ -310,6 +311,7 @@
     <ClCompile Include="..\ext\sktoolslib\DebugOutput.cpp" />
     <ClCompile Include="..\ext\sktoolslib\DirFileEnum.cpp" />
     <ClCompile Include="..\ext\sktoolslib\DlgResizer.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\DownloadFile.cpp" />
     <ClCompile Include="..\ext\sktoolslib\EscapeUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\hyperlink.cpp" />
     <ClCompile Include="..\ext\sktoolslib\IniSettings.cpp" />
