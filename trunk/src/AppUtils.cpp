@@ -24,6 +24,7 @@
 #include "ProgressDlg.h"
 #include "PropertySet.h"
 #include "ResString.h"
+#include "DownloadFile.h"
 #include "version.h"
 
 #include <memory>
@@ -41,97 +42,6 @@
 
 std::wstring CAppUtils::updatefilename;
 std::wstring CAppUtils::updateurl;
-
-
-class CCallback : public IBindStatusCallback
-{
-public:
-    CCallback() : m_pDlg(nullptr) {}
-    ~CCallback() {}
-
-    // Pointer to the download progress dialog.
-    CProgressDlg* m_pDlg;
-
-    // IBindStatusCallback methods.  Note that the only method called by IE
-    // is OnProgress(), so the others just return E_NOTIMPL.
-
-    STDMETHOD(OnStartBinding)(
-        /* [in] */ DWORD /*dwReserved*/,
-        /* [in] */ IBinding __RPC_FAR * /*pib*/)
-    { return E_NOTIMPL; }
-
-    STDMETHOD(GetPriority)(
-        /* [out] */ LONG __RPC_FAR * /*pnPriority*/)
-    { return E_NOTIMPL; }
-
-    STDMETHOD(OnLowResource)(
-        /* [in] */ DWORD /*reserved*/)
-    { return E_NOTIMPL; }
-
-    STDMETHOD(OnProgress)(
-        /* [in] */ ULONG ulProgress,
-        /* [in] */ ULONG ulProgressMax,
-        /* [in] */ ULONG /*ulStatusCode*/,
-        /* [in] */ LPCWSTR /*wszStatusText*/)
-    {
-        if (m_pDlg->HasUserCancelled())
-            return E_ABORT;
-
-        static TCHAR   szAmtDownloaded[256], szTotalSize[256];
-
-        StrFormatByteSize(ulProgress, szAmtDownloaded, 256);
-        StrFormatByteSize(ulProgressMax, szTotalSize, 256);
-
-        std::wstring sLine;
-        if (ulProgressMax)
-        {
-            m_pDlg->SetProgress(ulProgress, ulProgressMax);
-            sLine = CStringUtils::Format(L"%s of %s downloaded", szAmtDownloaded, szTotalSize);
-        }
-        else
-            sLine = CStringUtils::Format(L"%s downloaded", szAmtDownloaded);
-        m_pDlg->SetLine(1, sLine.c_str());
-
-        return S_OK;
-    }
-
-    STDMETHOD(OnStopBinding)(
-        /* [in] */ HRESULT /*hresult*/,
-        /* [unique][in] */ LPCWSTR /*szError*/)
-    { return E_NOTIMPL; }
-
-    STDMETHOD(GetBindInfo)(
-        /* [out] */ DWORD __RPC_FAR * /*grfBINDF*/,
-        /* [unique][out][in] */ BINDINFO __RPC_FAR * /*pbindinfo*/)
-    { return E_NOTIMPL; }
-
-    STDMETHOD(OnDataAvailable)(
-        /* [in] */ DWORD /*grfBSCF*/,
-        /* [in] */ DWORD /*dwSize*/,
-        /* [in] */ FORMATETC __RPC_FAR * /*pformatetc*/,
-        /* [in] */ STGMEDIUM __RPC_FAR * /*pstgmed*/)
-    { return E_NOTIMPL; }
-
-    STDMETHOD(OnObjectAvailable)(
-        /* [in] */ REFIID /*riid*/,
-        /* [iid_is][in] */ IUnknown __RPC_FAR * /*punk*/)
-    { return E_NOTIMPL; }
-
-    // IUnknown methods.  Note that IE never calls any of these methods, since
-    // the caller owns the IBindStatusCallback interface, so the methods all
-    // return zero/E_NOTIMPL.
-
-    STDMETHOD_(ULONG,AddRef)()
-    { return 0; }
-
-    STDMETHOD_(ULONG,Release)()
-    { return 0; }
-
-    STDMETHOD(QueryInterface)(
-        /* [in] */ REFIID /*riid*/,
-        /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR * /*ppvObject*/)
-    { return E_NOTIMPL; }
-};
 
 
 
@@ -317,6 +227,8 @@ HRESULT CALLBACK CAppUtils::TDLinkClickCallback(HWND hwnd, UINT uNotification, W
 
 bool CAppUtils::DownloadUpdate(HWND hWnd, bool bInstall)
 {
+    updatefilename = L"test.msi";
+    updateurl = L"http://sourceforge.net/projects/stefanstools/files/BowPad/1.1.7/BowPad64-1.1.7.msi/download";
     if (updatefilename.empty() || updateurl.empty())
         return false;
 
@@ -329,17 +241,16 @@ bool CAppUtils::DownloadUpdate(HWND hWnd, bool bInstall)
         sDownloadFile += L"\\";
         sDownloadFile += updatefilename;
 
-        CCallback callback;
         CProgressDlg progDlg;
         progDlg.SetTitle(L"BowPad Update");
         progDlg.SetLine(1, L"Downloading BowPad Update...");
         progDlg.ResetTimer();
         progDlg.SetTime();
         progDlg.ShowModal(hWnd);
-        callback.m_pDlg = &progDlg;
 
-        hr = URLDownloadToFile(NULL, updateurl.c_str(), sDownloadFile.c_str(), 0, &callback);
-        if (SUCCEEDED(hr))
+        CDownloadFile filedownloader(L"BowPad", &progDlg);
+
+        if (filedownloader.DownloadFile(updateurl, sDownloadFile))
         {
             if (bInstall)
             {
