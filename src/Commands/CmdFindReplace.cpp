@@ -1239,7 +1239,6 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
     {
     case SCN_UPDATEUI:
         {
-            static std::string lastSelText;
             static int         lastSearchFlags;
 
             LRESULT firstline = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
@@ -1257,7 +1256,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
 
             if (sHighlightString.empty())
             {
-                lastSelText.clear();
+                m_lastSelText.clear();
                 DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
                 return;
             }
@@ -1274,7 +1273,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
                 FindText.chrg.cpMin = FindText.chrgText.cpMax;
             }
 
-            if (lastSelText.empty() || lastSelText.compare(sHighlightString) || (nSearchFlags != lastSearchFlags))
+            if (m_lastSelText.empty() || m_lastSelText.compare(sHighlightString) || (nSearchFlags != lastSearchFlags))
             {
                 DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
                 Scintilla::Sci_TextToFind FindText;
@@ -1291,12 +1290,20 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
                 }
                 DocScrollUpdate();
             }
-            lastSelText = sHighlightString.c_str();
+            m_lastSelText = sHighlightString.c_str();
             lastSearchFlags = nSearchFlags;
         }
         break;
     default:
         break;
+    }
+}
+
+void CCmdFindReplace::TabNotify(TBHDR * ptbhdr)
+{
+    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    {
+        m_lastSelText.clear();
     }
 }
 
