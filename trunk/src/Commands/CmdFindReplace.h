@@ -111,8 +111,11 @@ public:
 
     virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
+    virtual void TabNotify(TBHDR * ptbhdr) override;
+
 private:
     CFindReplaceDlg *           m_pFindReplaceDlg;
+    std::string                 m_lastSelText;
 };
 
 class CCmdFindNext : public ICommand
