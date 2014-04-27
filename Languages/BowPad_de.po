@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-04-06 14:41+0100\n"
+"PO-Revision-Date: 2014-04-27 13:56+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -59,6 +59,10 @@ msgstr "&Abbrechen"
 #. Resource IDs: (3754)
 msgid "&Close Tab"
 msgstr "&Schliesse Tab"
+
+#. Resource IDs: (12)
+msgid "&Edit"
+msgstr "&Bearbeiten"
 
 #. Resource IDs: (65535)
 msgid "&File"
@@ -1580,6 +1584,17 @@ msgstr "Das Dokument '%s' wurde ausserhalb von BowPad gelöscht."
 #, c-format
 msgid "The file '%s' does not exist. Do you want to create it?"
 msgstr "Die Datei '%s' existiert nicht. Möchten Sie die Datei jetzt erstellen?"
+
+#. Resource IDs: (12)
+msgid ""
+"The file is marked as read only. Are you sure you want to edit this file?"
+msgstr ""
+"Die Datei ist als nur lesbar markiert. Möchten Sie die Datei wirklich "
+"bearbeiten?"
+
+#. Resource IDs: (12)
+msgid "The file is write protected"
+msgstr "Die Datei ist schreibgeschützt"
 
 #. Resource IDs: (3764)
 msgid "Titlecase"
