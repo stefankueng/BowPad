@@ -227,8 +227,6 @@ HRESULT CALLBACK CAppUtils::TDLinkClickCallback(HWND hwnd, UINT uNotification, W
 
 bool CAppUtils::DownloadUpdate(HWND hWnd, bool bInstall)
 {
-    updatefilename = L"test.msi";
-    updateurl = L"http://sourceforge.net/projects/stefanstools/files/BowPad/1.1.7/BowPad64-1.1.7.msi/download";
     if (updatefilename.empty() || updateurl.empty())
         return false;
 
