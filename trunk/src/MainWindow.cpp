@@ -794,7 +794,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     {
                         if (pScn->modifiers & SCMOD_CTRL)
                         {
-                            m_scintilla.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:?&@=/%#()");
+                            m_scintilla.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:;?&@=/%#()");
 
                             long pos = pScn->position;
                             long startPos = static_cast<long>(m_scintilla.Call(SCI_WORDSTARTPOSITION, pos, false));
@@ -829,6 +829,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             std::wstring url = CUnicodeUtils::StdGetUnicode(urltext.get());
                             while ((*url.begin() == '(') || (*url.begin() == ')') || (*url.begin() == ','))
                                 url.erase(url.begin());
+
+                            SearchReplace(url, L"&amp;", L"&");
 
                             ::ShellExecute(*this, L"open", url.c_str(), NULL, NULL, SW_SHOW);
                             m_scintilla.Call(SCI_SETCHARSDEFAULT);
