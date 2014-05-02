@@ -271,7 +271,7 @@ bool CCmdFileDelete::Execute()
             int nClickedBtn = 0;
             HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
 
-            if (SUCCEEDED(hr))
+            if (!CAppUtils::FailedShowMessage(hr))
             {
                 if (nClickedBtn == 100)
                 {
@@ -282,29 +282,29 @@ bool CCmdFileDelete::Execute()
                     IFileOperationPtr pfo = NULL;
                     HRESULT hr = pfo.CreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL);
 
-                    if (CAppUtils::FailedShowMessage(hr))
+                    if (!CAppUtils::FailedShowMessage(hr))
                     {
                         // Set parameters for current operation
                         hr = pfo->SetOperationFlags(FOF_ALLOWUNDO | FOF_NO_CONNECTED_ELEMENTS | FOFX_ADDUNDORECORD | FOF_NOCONFIRMATION | FOF_NORECURSION | FOF_SILENT | FOFX_SHOWELEVATIONPROMPT | FOFX_RECYCLEONDELETE);
 
-                        if (SUCCEEDED(hr))
+                        if (!CAppUtils::FailedShowMessage(hr))
                         {
                             // Create IShellItem instance associated to file to delete
                             IShellItemPtr psiFileToDelete = NULL;
                             hr = SHCreateItemFromParsingName(doc.m_path.c_str(), NULL, IID_PPV_ARGS(&psiFileToDelete));
 
-                            if (SUCCEEDED(hr))
+                            if (!CAppUtils::FailedShowMessage(hr))
                             {
                                 // Declare this shell item (file) to be deleted
                                 hr = pfo->DeleteItem(psiFileToDelete, NULL);
                             }
                         }
                         pfo->SetOwnerWindow(GetHwnd());
-                        if (CAppUtils::FailedShowMessage(hr))
+                        if (!CAppUtils::FailedShowMessage(hr))
                         {
                             // Perform the deleting operation
                             hr = pfo->PerformOperations();
-                            if (SUCCEEDED(hr))
+                            if (!CAppUtils::FailedShowMessage(hr))
                             {
                                 return true;
                             }
