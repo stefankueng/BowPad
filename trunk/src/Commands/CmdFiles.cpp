@@ -22,6 +22,7 @@
 #include "PreserveChdir.h"
 #include "PathUtils.h"
 #include "StringUtils.h"
+#include "AppUtils.h"
 
 bool CCmdOpen::Execute()
 {
@@ -281,7 +282,7 @@ bool CCmdFileDelete::Execute()
                     IFileOperationPtr pfo = NULL;
                     HRESULT hr = pfo.CreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL);
 
-                    if (SUCCEEDED(hr))
+                    if (CAppUtils::FailedShowMessage(hr))
                     {
                         // Set parameters for current operation
                         hr = pfo->SetOperationFlags(FOF_ALLOWUNDO | FOF_NO_CONNECTED_ELEMENTS | FOFX_ADDUNDORECORD | FOF_NOCONFIRMATION | FOF_NORECURSION | FOF_SILENT | FOFX_SHOWELEVATIONPROMPT | FOFX_RECYCLEONDELETE);
@@ -299,7 +300,7 @@ bool CCmdFileDelete::Execute()
                             }
                         }
                         pfo->SetOwnerWindow(GetHwnd());
-                        if (SUCCEEDED(hr))
+                        if (CAppUtils::FailedShowMessage(hr))
                         {
                             // Perform the deleting operation
                             hr = pfo->PerformOperations();
