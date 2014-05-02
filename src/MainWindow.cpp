@@ -1733,7 +1733,7 @@ void CMainWindow::AddHotSpots()
 
         LRESULT posFound = m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
 
-        while (posFound != -1)
+        if (posFound != -1)
         {
             long start = long(m_scintilla.Call(SCI_GETTARGETSTART));
             long end = long(m_scintilla.Call(SCI_GETTARGETEND));
@@ -1791,11 +1791,6 @@ void CMainWindow::AddHotSpots()
                 m_scintilla.Call(SCI_STARTSTYLING, start, 0xFF);
                 m_scintilla.Call(SCI_SETSTYLING, foundTextLen, style_hotspot);
             }
-
-            m_scintilla.Call(SCI_SETTARGETSTART, posFound + max(1, foundTextLen));
-            m_scintilla.Call(SCI_SETTARGETEND, endPos);
-
-            posFound = (int)m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
         }
         m_scintilla.Call(SCI_SETTARGETSTART, fStartPos);
         m_scintilla.Call(SCI_SETTARGETEND, fEndPos);
