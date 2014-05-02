@@ -23,6 +23,7 @@
 #include "PathUtils.h"
 #include "StringUtils.h"
 #include "AppUtils.h"
+#include <VersionHelpers.h>
 
 bool CCmdOpen::Execute()
 {
@@ -285,7 +286,10 @@ bool CCmdFileDelete::Execute()
                     if (!CAppUtils::FailedShowMessage(hr))
                     {
                         // Set parameters for current operation
-                        hr = pfo->SetOperationFlags(FOF_ALLOWUNDO | FOF_NO_CONNECTED_ELEMENTS | FOFX_ADDUNDORECORD | FOF_NOCONFIRMATION | FOF_NORECURSION | FOF_SILENT | FOFX_SHOWELEVATIONPROMPT | FOFX_RECYCLEONDELETE);
+                        DWORD opFlags = FOF_ALLOWUNDO | FOF_NO_CONNECTED_ELEMENTS | FOF_NOCONFIRMATION | FOF_NORECURSION | FOF_SILENT | FOFX_SHOWELEVATIONPROMPT;
+                        if (IsWindows8OrGreater())
+                            opFlags |= FOFX_RECYCLEONDELETE | FOFX_ADDUNDORECORD;
+                        hr = pfo->SetOperationFlags(opFlags);
 
                         if (!CAppUtils::FailedShowMessage(hr))
                         {
