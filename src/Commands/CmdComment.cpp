@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -79,7 +79,18 @@ bool CCmdComment::Execute()
         {
             size_t pos = ScintillaCall(SCI_POSITIONFROMLINE, line);
             if (!commentlineatstart)
-                pos += indent;
+            {
+                int tabsize = (int)ScintillaCall(SCI_GETTABWIDTH);
+                for (int i = 0; i < indent; )
+                {
+                    char c = (char)ScintillaCall(SCI_GETCHARAT, pos);
+                    if (c == '\t')
+                        i += tabsize;
+                    else
+                        i += 1;
+                    pos += 1;
+                }
+            }
             ScintillaCall(SCI_INSERTTEXT, pos, (sptr_t)commentline.c_str());
             insertedchars += commentline.length();
         }
