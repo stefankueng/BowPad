@@ -1472,6 +1472,8 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 }
                 if (bLineHasOnlyWhitespaces)
                 {
+                    // BSD or GNU style
+
                     // insert the opening brace first
                     Call(SCI_ADDTEXT, 1, (sptr_t)braceBuf);
 
@@ -1488,6 +1490,38 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                     Call(SCI_TAB);
                     Call(SCI_ENDUNDOACTION);
                     return true;
+                }
+                else
+                {
+                    // K&R indent style
+                    auto lexer = Call(SCI_GETLEXER);
+                    switch (lexer)
+                    {
+                        case SCLEX_CONTAINER:
+                        case SCLEX_NULL:
+                        case SCLEX_PROPERTIES:
+                        case SCLEX_ERRORLIST:
+                        case SCLEX_MARKDOWN:
+                        case SCLEX_TXT2TAGS:
+                            break;
+                        default:
+                            // insert the opening brace first
+                            Call(SCI_ADDTEXT, 1, (sptr_t)braceBuf);
+
+                            Call(SCI_BEGINUNDOACTION);
+                            // now insert a newline
+                            Call(SCI_NEWLINE);
+                            // insert another newline
+                            Call(SCI_NEWLINE);
+                            // insert the closing brace
+                            Call(SCI_ADDTEXT, 1, (sptr_t)braceCloseBuf);
+                            // go back one line
+                            Call(SCI_LINEUP);
+                            // indent the empty line
+                            Call(SCI_TAB);
+                            Call(SCI_ENDUNDOACTION);
+                            return true;
+                    }
                 }
             }
         }
