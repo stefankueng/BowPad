@@ -746,12 +746,12 @@ msgstr ""
 msgid "LA"
 msgstr ""
 
-#. Resource IDs: (3758)
-msgid "LANG"
-msgstr ""
-
 #. Resource IDs: (3766)
 msgid "LD"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "LEX"
 msgstr ""
 
 #. Resource IDs: (3759)
@@ -768,6 +768,10 @@ msgstr ""
 
 #. Resource IDs: (3756)
 msgid "Language"
+msgstr ""
+
+#. Resource IDs: (3759)
+msgid "Language Lexer"
 msgstr ""
 
 #. Resource IDs: (9)
@@ -809,6 +813,10 @@ msgstr ""
 #. Resource IDs: (12)
 #, c-format
 msgid "Length in bytes: %ld\r\nLines: %ld"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "Lexer"
 msgstr ""
 
 #. Resource IDs: (10)
