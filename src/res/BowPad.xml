@@ -186,7 +186,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/keyS.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdCodeStyle" LabelTitle="Language" TooltipTitle="Language" TooltipDescription="Set the coloring according to the code language" Keytip="LANG">
+    <Command Name="cmdCodeStyle" LabelTitle="Lexer" TooltipTitle="Language Lexer" TooltipDescription="Set the coloring according to the code language" Keytip="LEX">
       <Command.LargeImages>
         <Image>res/CodeStyleL.bmp</Image>
       </Command.LargeImages>
