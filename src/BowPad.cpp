@@ -24,6 +24,9 @@
 #include "SmartHandle.h"
 #include "PathUtils.h"
 #include "StringUtils.h"
+#include "ProgressDlg.h"
+#include "DownloadFile.h"
+#include "version.h"
 
 #include <Shellapi.h>
 
@@ -161,6 +164,31 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         langdllpath += L"\\BowPad_";
         langdllpath += lang;
         langdllpath += L".lang";
+        if (!CAppUtils::HasSameMajorVersion(langdllpath))
+        {
+            // the language dll does not exist or does not match:
+            // try downloading the new language dll right now
+            // so the user gets the selected language immediately after
+            // updating BowPad
+            std::wstring sLangURL = CStringUtils::Format(L"https://bowpad.googlecode.com/svn/branches/%d.%d.%d/Languages/%s/BowPad_%s.lang", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, LANGPLAT, lang.c_str());
+ 
+            // note: text below is in English and not translatable because
+            // we try to download the translation file here, so there's no
+            // point in having this translated...
+            CProgressDlg progDlg;
+            progDlg.SetTitle(L"BowPad Update");
+            progDlg.SetLine(1, L"Downloading BowPad Language file...");
+            progDlg.ResetTimer();
+            progDlg.SetTime();
+            progDlg.ShowModal(NULL);
+
+            CDownloadFile filedownloader(L"BowPad", &progDlg);
+
+            if (!filedownloader.DownloadFile(sLangURL, langdllpath))
+            {
+                DeleteFile(langdllpath.c_str());
+            }
+        }
         if (CAppUtils::HasSameMajorVersion(langdllpath))
         {
             hRes = LoadLibraryEx(langdllpath.c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE);

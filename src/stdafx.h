@@ -45,6 +45,13 @@
 #pragma comment(linker, "\"/manifestdependency:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #define APP_ID L"TortoiseSVN.Tools.BowPad.1"
+
+#ifdef _WIN64
+#define LANGPLAT L"x64"
+#else
+#define LANGPLAT L"x86"
+#endif
+
 // custom id for the WM_COPYDATA message
 #define CD_COMMAND_LINE 101
 #define CD_COMMAND_MOVETAB 102

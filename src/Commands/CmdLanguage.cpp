@@ -241,11 +241,6 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
                 if (!gLanguages[selected].empty() && !CAppUtils::HasSameMajorVersion(langfile))
                 {
                     DeleteFile(langfile.c_str());
-#ifdef _WIN64
-#define LANGPLAT L"x64"
-#else
-#define LANGPLAT L"x86"
-#endif
                     std::wstring sLangURL = CStringUtils::Format(L"https://bowpad.googlecode.com/svn/branches/%d.%d.%d/Languages/%s/BowPad_%s.lang", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, LANGPLAT, gLanguages[selected].c_str());
                     HRESULT res = URLDownloadToFile(NULL, sLangURL.c_str(), langfile.c_str(), 0, NULL);
                     if (FAILED(res))
