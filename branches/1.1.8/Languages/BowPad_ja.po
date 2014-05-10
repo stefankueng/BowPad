@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-05-07 13:48+0900\n"
+"PO-Revision-Date: 2014-05-09 11:29+0900\n"
 "Last-Translator: Hiroshi Kuno <hkuno9000@gmail.com>\n"
 "Language-Team: LANGUAGE <hkuno9000+bowpad@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,7 @@ msgstr "ヘルプ(&H)"
 
 #. Resource IDs: (3753)
 msgid "&New"
-msgstr "新規作成(&N)"
+msgstr "新規(&N)"
 
 #. Resource IDs: (3753)
 msgid "&Open"
@@ -317,8 +317,8 @@ msgid ""
 "Close the document\n"
 "The document tab is closed."
 msgstr ""
-"この文書を閉じる\n"
-"この文書タブを閉じます。"
+"文書を閉じる\n"
+"文書タブを閉じます。"
 
 #. Resource IDs: (3753)
 msgid "Closes all open files"
@@ -354,7 +354,7 @@ msgstr "コマンド名:"
 
 #. Resource IDs: (3751, 3759)
 msgid "Comment"
-msgstr "コメント"
+msgstr "コメント化"
 
 #. Resource IDs: (3759)
 msgid "Comments the selected text"
@@ -370,7 +370,7 @@ msgstr "ショートカット設定"
 
 #. Resource IDs: (3758)
 msgid "Configure Styles"
-msgstr "スタイル設定"
+msgstr "構文スタイル設定"
 
 #. Resource IDs: (3758)
 msgid "Configure colors, fonts, styles and sizes"
@@ -386,11 +386,11 @@ msgstr "変換"
 
 #. Resource IDs: (3764)
 msgid "Converts all spaces in the document to tabs"
-msgstr "文書中のタブをスペースに変換する"
+msgstr "文書中の全てのタブ文字をスペース文字に変換する"
 
 #. Resource IDs: (3764)
 msgid "Converts all tabs in the document to spaces"
-msgstr "文書中のスペースをタブに変換する"
+msgstr "文書中の全てのスペース文字をタブ文字に変換する"
 
 #. Resource IDs: (3756)
 msgid "Converts the file to the specified encoding"
@@ -453,7 +453,7 @@ msgid ""
 "Create\n"
 "An empty file is created."
 msgstr ""
-"新規作成\n"
+"作成\n"
 "空のファイルを作成します。"
 
 #. Resource IDs: (3782)
@@ -462,7 +462,7 @@ msgstr "現在タブのコピーを作成する"
 
 #. Resource IDs: (3752)
 msgid "Creates a new tab with an empty document"
-msgstr "空のタブを新規作成する"
+msgstr "空の文書タブを新規作成する"
 
 #. Resource IDs: (8)
 msgid "Ctrl+Click to open the link in the default browser"
@@ -611,7 +611,7 @@ msgid ""
 "Download and install the update\n"
 "Updates BowPad to the latest version."
 msgstr ""
-"アップデートをダウンロードしてインストールします\n"
+"アップデートをダウンロードしてインストールする\n"
 "BowPad を最新版にアップデートします。"
 
 #. Resource IDs: (9)
@@ -627,11 +627,11 @@ msgid ""
 "You have to install the update manually."
 msgstr ""
 "アップデートをダウンロードする\n"
-"アップデートのインストールは手動で実施してください。"
+"アップデートのインストールは手動で実施する必要があります。"
 
 #. Resource IDs: (3760, 3761)
 msgid "Duplicate Line"
-msgstr "行を複製する"
+msgstr "行を複製"
 
 #. Resource IDs: (3761)
 msgid "Duplicates the current line"
@@ -735,7 +735,7 @@ msgstr "全検索する(&A)"
 
 #. Resource IDs: (10)
 msgid "Find All In All &Tabs"
-msgstr "全部のタブを全検索する(&T)"
+msgstr "全タブ内を全検索する(&T)"
 
 #. Resource IDs: (3758)
 msgid "Find Next"
@@ -799,11 +799,11 @@ msgstr "JL"
 
 #. Resource IDs: (3761)
 msgid "Join Lines"
-msgstr "行結合"
+msgstr "行を結合"
 
 #. Resource IDs: (3761)
 msgid "Join selected lines to one long line"
-msgstr "選択行をつなげて一行にします"
+msgstr "選択行を結合して一行にします"
 
 #. Resource IDs: (8)
 msgid ""
@@ -811,7 +811,7 @@ msgid ""
 "The document is kept open."
 msgstr ""
 "文書を保持する\n"
-"文章を開いたままにします。"
+"文書を開いたままにします。"
 
 #. Resource IDs: (3757)
 msgid "LA"
@@ -911,7 +911,7 @@ msgstr "行末記号"
 
 #. Resource IDs: (10)
 msgid "Line Text"
-msgstr "Line Text"
+msgstr "行のテキスト"
 
 #. Resource IDs: (12)
 #, c-format
@@ -991,9 +991,10 @@ msgstr "Main"
 msgid "Main Encodings"
 msgstr "主なエンコーディング"
 
+# Keep short translation text to avoid clipout in the find-replace dialog.
 #. Resource IDs: (1008)
 msgid "Match &case"
-msgstr "大文字小文字を区別しない(&c)"
+msgstr "大文字小文字を同一視(&c)"
 
 #. Resource IDs: (3765)
 msgid "Misc"
@@ -1054,7 +1055,7 @@ msgstr "NEXT"
 #. Resource IDs: (7)
 #, c-format
 msgid "New %d"
-msgstr "新規作成 %d"
+msgstr "新規 %d"
 
 #. Resource IDs: (3782)
 msgid "New Copy"
@@ -1062,7 +1063,7 @@ msgstr "新規コピー"
 
 #. Resource IDs: (3752)
 msgid "New Document"
-msgstr "新規文書作成"
+msgstr "新規文書"
 
 #. Resource IDs: (3757)
 msgid "Next"
@@ -1081,8 +1082,8 @@ msgid ""
 "No updates available.\n"
 "You already have the current version."
 msgstr ""
-"アップデートがありません\n"
-"これは最新版です。"
+"アップデートはありません。\n"
+"これが最新版です。"
 
 #. Resource IDs: (3753)
 msgid "O"
@@ -1108,6 +1109,7 @@ msgstr "エクスプローラを開く"
 msgid "Open File"
 msgstr "ファイルを開く"
 
+# What is mean? where to use? --> context menu over a string that's a path, e.g. "C:\file.txt"
 #. Resource IDs: (3781)
 #, fuzzy
 msgid "Open File under cursor"
@@ -1444,7 +1446,7 @@ msgstr "BowPadの翻訳言語を選択します"
 
 #. Resource IDs: (3762)
 msgid "Sends the document to the default printer"
-msgstr "デフォルトプリンタで印刷します"
+msgstr "既定のプリンタで印刷します"
 
 #. Resource IDs: (3753)
 msgid "Set Encoding"
@@ -1554,12 +1556,12 @@ msgstr "文書'%s'には未保存の変更がありますが、BowPad外部で�
 #. Resource IDs: (8)
 #, c-format
 msgid "The document '%s' was modified outside of BowPad."
-msgstr "文章'%s'はBowPad外部で修正されています。"
+msgstr "文書'%s'はBowPad外部で修正されています。"
 
 #. Resource IDs: (8)
 #, c-format
 msgid "The document '%s' was removed outside of BowPad."
-msgstr "文章'%s'はBowPad外部で削除されています。"
+msgstr "文書'%s'はBowPad外部で削除されています。"
 
 #. Resource IDs: (11)
 #, c-format
@@ -1582,11 +1584,11 @@ msgstr "タイトルケース化"
 
 #. Resource IDs: (3765)
 msgid "Toggle Bookmark"
-msgstr "ブックマークの付け外し"
+msgstr "ブックマーク有無"
 
 #. Resource IDs: (3765)
 msgid "Toggle a bookmark on the current line"
-msgstr "現在行のブックマークを付け外します"
+msgstr "現在行のブックマーク有無を交互に切り替えます"
 
 #. Resource IDs: (3766)
 msgid "Toggles between the normal and the dark theme"
@@ -1647,7 +1649,7 @@ msgstr "UTF-8 with BOM"
 
 #. Resource IDs: (3759)
 msgid "Uncomment"
-msgstr "コメントアウト解除"
+msgstr "コメント解除"
 
 #. Resource IDs: (3759)
 msgid "Uncomments the selected text"
@@ -1733,8 +1735,8 @@ msgstr "Windows (CRLF)"
 msgid "Wrap Lines"
 msgstr "行折り返し"
 
+# This is used in the find-replace dialog. This means that find next to file top
 #. Resource IDs: (9)
-#, fuzzy
 msgid "Wrap around"
 msgstr "折り返し"
 
@@ -1787,11 +1789,11 @@ msgstr "%ld から %ld まで"
 
 #. Resource IDs: (3757)
 msgid "go to the next cursor position"
-msgstr "次のカーソル位置へ移動"
+msgstr "次のカーソル位置へ移動します"
 
 #. Resource IDs: (3757)
 msgid "go to the previous cursor position"
-msgstr "前のカーソル位置へ移動"
+msgstr "前のカーソル位置へ移動します"
 
 #. Resource IDs: (3770)
 msgid "runs the custom command 0"
