@@ -93,18 +93,18 @@ public:
 
 private:
 
-    void FindFunctions(int docID);
+    void FindFunctions(int docID, bool bForce);
     void SaveFunctionForActiveDocument(FunctionDisplayMode fdm, size_t line_no,
                                        bool parsed, std::wstring&& sig, std::wstring&& name, std::wstring&& name_and_args);
     void InvalidateFunctionsEnabled();
     void InvalidateFunctionsSource();
     HRESULT PopulateFunctions(IUICollectionPtr& collection);
     void ScheduleFunctionUpdate(int docId, FunctionUpdateReason reason);
-    void UpdateFunctions();
+    void UpdateFunctions(bool bForce);
     void RemoveNonExistantDocuments();
     void AddDocumentToScan(int docId);
     void FunctionScanningComplet(int docId);
-    void DocumentScanFinished(int docId);
+    void DocumentScanFinished(int docId, bool bForce);
     void DocumentScanInterrupted(int docId, int interruptingDocId);
     void DocumentScanProgressing(int docId);
     int TopDocumentId() const;

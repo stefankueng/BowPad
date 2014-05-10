@@ -273,11 +273,7 @@ HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     // it transpires we arrive here and we're not ready, indicate that.
     if (m_functionsStatus != FindFunctionsStatus::Finished)
     {
-        // Could use a "not ready" message. But button shouldn't be enabled
-        // so this shouldn't be possible in the current design anyway.
-        HRESULT hrMissingHint = CAppUtils::AddStringItem(collection, L"...");
-        CAppUtils::FailedShowMessage(hrMissingHint);
-        return hrMissingHint;
+        UpdateFunctions(true);
     }
     // If the data is ready, but there isn't any, indicate that.
     if (m_functions.empty())
@@ -388,7 +384,7 @@ void CCmdFunctions::OnTimer(UINT id)
         // we wanted that the period would likely be different anyway.
         KillTimer(GetHwnd(), id);
         if (m_autoscan)
-            UpdateFunctions();
+            UpdateFunctions(false);
         else
             m_docIDs.clear();
     }
@@ -405,18 +401,19 @@ void CCmdFunctions::OnDocumentSave(int index, bool bSaveAs)
         ScheduleFunctionUpdate(GetDocIDFromTabIndex(index), FunctionUpdateReason::DocSave);
 }
 
-void CCmdFunctions::UpdateFunctions()
+void CCmdFunctions::UpdateFunctions( bool bForce )
 {
     // First remove any invalid documents that might exist. Perhaps
     // documents some closed before we got to them.
     RemoveNonExistantDocuments();
     // No documents, then nothing to do.
-    if ( m_docIDs.empty() )
+    if ( !bForce && m_docIDs.empty() )
         return;
     // Process documents on a last in first out basis,
     // roughly hoping to process the most recently changed first.
-    int docId = TopDocumentId();
-    FindFunctions(docId);
+    int docId = bForce ? GetCurrentTabId() : TopDocumentId();
+
+    FindFunctions(docId, bForce);
     // The processing of the active document makes the functions list
     // presented to the user available.
     if (docId == GetCurrentTabId())
@@ -425,7 +422,7 @@ void CCmdFunctions::UpdateFunctions()
         ScheduleFunctionUpdate(docId,FunctionUpdateReason::DocProgress);
     else
     {
-        DocumentScanFinished(docId);
+        DocumentScanFinished(docId, bForce);
         if (! m_docIDs.empty())
         {
             int nextDocId = TopDocumentId();
@@ -434,7 +431,7 @@ void CCmdFunctions::UpdateFunctions()
     }
 }
 
-void CCmdFunctions::FindFunctions(int docId)
+void CCmdFunctions::FindFunctions(int docID, bool bForce)
 {
     if (m_searchStatus != FindFunctionsStatus::InProgress)
     {
@@ -443,7 +440,7 @@ void CCmdFunctions::FindFunctions(int docId)
     }
     else
         ++m_timedParts;
-    if (docId < 0) // Need a a valid document to scan.
+    if (docID < 0) // Need a a valid document to scan.
     {
         m_searchStatus = FindFunctionsStatus::Failed;
         return;
@@ -457,15 +454,15 @@ void CCmdFunctions::FindFunctions(int docId)
     }
 
     // Detect if the scanned document is the active document.
-    auto forActiveDoc = (docId == activeDocId); 
+    auto forActiveDoc = (docID == activeDocId); 
 
-    if (forActiveDoc && m_searchStatus != FindFunctionsStatus::InProgress)
+    if ((forActiveDoc && m_searchStatus != FindFunctionsStatus::InProgress) || bForce)
     {
         m_functions.clear();
         m_functionsStatus = FindFunctionsStatus::NotStarted;
     }
 
-    CDocument doc = GetDocumentFromID(docId);
+    CDocument doc = GetDocumentFromID(docID);
     auto docLang = CUnicodeUtils::StdGetUTF8(doc.m_language);
     // Can't find functions in a document that has no language.
     if (docLang.empty())
@@ -479,7 +476,7 @@ void CCmdFunctions::FindFunctions(int docId)
 
     // If starting the search, as opposed to continuing it,
     // reset everything to point to the start of the document.
-    if (m_searchStatus != FindFunctionsStatus::InProgress)
+    if ((m_searchStatus != FindFunctionsStatus::InProgress) || bForce)
     {
         m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
         m_edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
@@ -551,7 +548,7 @@ void CCmdFunctions::FindFunctions(int docId)
         {
             auto end_time_point = GetTickCount64();
             auto ellapsed_time = end_time_point - start_time_point;
-            if (ellapsed_time > incremental_search_time)
+            if (!bForce && (ellapsed_time > incremental_search_time))
             {
                 timeUp = true;
                 break;
@@ -682,17 +679,17 @@ void CCmdFunctions::DocumentScanProgressing(int docId)
     APPVERIFY(docId == TopDocumentId());
 }
 
-void CCmdFunctions::DocumentScanFinished(int docId)
+void CCmdFunctions::DocumentScanFinished(int docId, bool bForce)
 {
-    APPVERIFY(docId == TopDocumentId());
+    APPVERIFY(bForce || (docId == TopDocumentId()));
     // After finishing, remove the document processed then signal
     // a new one, but ensure things start a-new.
     auto whereFound = std::find(std::begin(m_docIDs),std::end(m_docIDs), docId);
     if (whereFound != std::end(m_docIDs))
         m_docIDs.erase(whereFound);
     else
-        assert(false);
-    if (docId == GetCurrentTabId())
+        assert(bForce);
+    if (!bForce && (docId == GetCurrentTabId()))
     {
         InvalidateFunctionsSource();
         InvalidateFunctionsEnabled();
@@ -717,7 +714,10 @@ void CCmdFunctions::ScheduleFunctionUpdate(int docId, FunctionUpdateReason reaso
     // Turning autoscan off disables function scanning
     // so don't set any timers or anything just do nothing.
     if (!m_autoscan)
+    {
+        m_functionsStatus = FindFunctionsStatus::NotStarted;
         return;
+    }
 
     // -1 means don't set timer. 0 means trigger soon as possible.
     int updateWhen = -1;
