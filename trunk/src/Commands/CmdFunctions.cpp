@@ -716,6 +716,7 @@ void CCmdFunctions::ScheduleFunctionUpdate(int docId, FunctionUpdateReason reaso
     if (!m_autoscan)
     {
         m_functionsStatus = FindFunctionsStatus::NotStarted;
+        InvalidateFunctionsSource();
         return;
     }
 
