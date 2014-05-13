@@ -417,17 +417,14 @@ static void ShowFileLoadError(HWND hWnd, const std::wstring& fileName, LPCWSTR m
 {
     ResString rTitle(hRes, IDS_APP_TITLE);
     ResString rLoadErr(hRes, IDS_FAILEDTOLOADFILE);
-    MessageBox(hWnd, CStringUtils::Format(rLoadErr, fileName.c_str(), msg).c_str(), rTitle, MB_ICONERROR);
+    MessageBox(hWnd, CStringUtils::Format(rLoadErr, fileName.c_str(), msg).c_str(), (LPCWSTR)rTitle, MB_ICONERROR);
 }
 
 static void ShowFileSaveError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg )
 {
     ResString rTitle(hRes, IDS_APP_TITLE);
-    //ResString rSaveErr(hRes, IDS_FAILEDTOSAVEFILE);
-    std::wstring sSaveErr = L"Failed to save the file '%s'.\r\n\r\nThe error message is:\r\n%s";
-    // FIXME! Add IDS_FAILEDTOSAVEFILE and uncomment rSaveErr above
-    // then delete sSaveErr and use rSaveErr below.
-    MessageBox(hWnd, CStringUtils::Format(sSaveErr.c_str(), fileName.c_str(), msg).c_str(), rTitle, MB_ICONERROR);
+    ResString rSaveErr(hRes, IDS_FAILEDTOSAVEFILE);
+    MessageBox(hWnd, CStringUtils::Format(rSaveErr, fileName.c_str(), msg).c_str(), (LPCWSTR)rTitle, MB_ICONERROR);
 }
 
 static void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
