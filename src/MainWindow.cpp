@@ -63,34 +63,6 @@ const int STATUSBAR_TABS          = 7;
 
 static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
 
-// FIXME! Move to useful utility include even if just for BP so it's not here.
-// Will treat any signed type given as unsigned.
-// Need to decide if make unsigned part should be part of this function
-// or just make the caller do it. TBD
-template<typename T> std::string to_bit_string(T number, bool trim_significant_clear_bits)
-{
-    // Unsigned version of type given.
-    typedef typename std::make_unsigned<T>::type UT;
-    UT one = 1;
-    UT zero = 0;
-    UT unumber;
-    unumber = UT(number);
-    const int nbits = std::numeric_limits<UT>::digits;
-    std:: string bs;
-    bool seen_set_bit = false;
-    for ( int bn = nbits - 1; bn >= 0; --bn)
-    {
-        UT mask = one << bn;
-        bool is_set = (unumber & mask) != zero;
-        if (trim_significant_clear_bits && ! seen_set_bit && ! is_set)
-            continue;
-        bs += is_set ? '1' : '0';
-        if (is_set)
-            seen_set_bit = true;
-    }
-    return bs;
-}
-
 // Simple class that deletes given the filename on destruction
 // unless detached beforehand.
 class CTempFileDeleter
