@@ -30,6 +30,7 @@
 #include "AboutDlg.h"
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
+#include "TempFile.h"
 #include "CommandHandler.h"
 #include "MRU.h"
 #include "KeyboardShortcutHandler.h"
@@ -63,37 +64,6 @@ const int STATUSBAR_TABS          = 7;
 
 static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
 
-// Simple class that deletes given the filename on destruction
-// unless detached beforehand.
-class CTempFileDeleter
-{
-public:
-    CTempFileDeleter(const std::wstring& filename) :
-        m_filename(filename)
-    {
-    }
-    void Detach()
-    {
-        m_filename.clear();
-    }
-    bool Delete()
-    {
-        if (m_filename.empty())
-            return true;
-        if (::DeleteFile(m_filename.c_str()))
-        {
-            Detach();
-            return true;
-        }
-        return false;
-    }
-    ~CTempFileDeleter()
-    {
-        Delete();
-    }
-public:
-    std::wstring m_filename;
-};
 
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
@@ -2299,7 +2269,7 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
     // Start a new instance of BowPad with this dropped tab, or add this tab to
     // the BowPad window the drop was done on. Then close this tab.
     // First save the file to a temp location to ensure all unsaved mods are saved.
-    std::wstring temppath = CPathUtils::GetTempFilePath();
+    std::wstring temppath = CTempFiles::Instance().GetTempFilePath(true);
     CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
     CDocument tempdoc = doc;
     tempdoc.m_path = temppath;
@@ -2346,9 +2316,6 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
                 // with no error, so probably some minimal message might be useful.
                 ::MessageBox(*this, L"Failed to move Tab.", GetAppName().c_str(), MB_OK | MB_ICONERROR);
             }
-            // The receiver should have deleted this file but we'll do it too in
-            // case they failed.
-            ::DeleteFile(temppath.c_str());
             return;
         }
     }
@@ -2377,13 +2344,6 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
         // remove the tab
         CloseTab(tab, true);
     }
-    else
-    {
-        // If can't start the other instance, delete the temp file
-        // we prepared for it.
-        ::DeleteFile(temppath.c_str());
-        return;
-   }
 }
 
 bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
@@ -2540,7 +2500,7 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
 
-    CTempFileDeleter td(filepath);
+    CTempFiles::Instance().AddFileToRemove(filepath);
     int docID = m_DocManager.GetIdForPath(filepath.c_str());
     if (docID < 0)
         return;
