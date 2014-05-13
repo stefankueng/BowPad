@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 #pragma once
 #include "ScintillaWnd.h"
 
-#include <vector>
 #include "Document.h"
 
 enum DocModifiedState
@@ -34,20 +33,23 @@ public:
     CDocumentManager(void);
     ~CDocumentManager(void);
 
-    void                        AddDocumentAtEnd(CDocument doc, int id);
+    void                        AddDocumentAtEnd(const CDocument& doc, int id);
     void                        RemoveDocument(int id);
-    void                        SetDocument(int id, CDocument doc) { m_documents.find(id)->second = doc; }
+    void                        SetDocument(int id, const CDocument& doc);
     int                         GetCount() const { return (int)m_documents.size(); }
     int                         GetIdForPath(const std::wstring& path) const;
-    bool                        HasDocumentID(int id) const { return m_documents.find(id) != m_documents.end(); }
-    CDocument                   GetDocumentFromID(int id) const { return m_documents.find(id)->second; }
-    Document                    GetScintillaDocument(int id) const { return m_documents.find(id)->second.m_document; }
+    bool                        HasDocumentID(int id) const;
+    CDocument                   GetDocumentFromID(int id) const;
+    Document                    GetScintillaDocument(int id) const
+    {
+        return GetDocumentFromID(id).m_document;
+    }
     COLORREF                    GetColorForDocument(int id);
 
-    CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding);
+    CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
     bool                        SaveFile(HWND hWnd, const CDocument& doc);
     bool                        UpdateFileTime(CDocument& doc);
-    DocModifiedState            HasFileChanged(int id);
+    DocModifiedState            HasFileChanged(int id) const;
 private:
     FormatType                  GetEOLFormatForm(const char *data) const;
     bool                        SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc);

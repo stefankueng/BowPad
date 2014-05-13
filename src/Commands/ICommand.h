@@ -86,7 +86,7 @@ protected:
     HWND                GetScintillaWnd();
     UINT                GetTimerID() { return m_nextTimerID++; }
     bool                OpenFile(LPCWSTR file, bool bAddToMRU);
-    bool                ReloadTab(int tab, int encoding);
+    bool                ReloadTab(int tab, int encoding = -1); // By default reload encoding
     bool                SaveCurrentTab(bool bSaveAs = false);
     HRESULT             InvalidateUICommand(UI_INVALIDATIONS flags, const PROPERTYKEY *key);
     HRESULT             InvalidateUICommand(UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY *key);

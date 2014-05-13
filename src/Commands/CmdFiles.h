@@ -104,8 +104,7 @@ public:
     {
         if (HasActiveDocument())
         {
-            CDocument doc = GetActiveDocument();
-            ReloadTab(GetActiveTabIndex(), doc.m_encoding);
+            ReloadTab(GetActiveTabIndex());
         }
         return true;
     }

@@ -141,7 +141,8 @@ msgid "Are you sure you want to delete the file '%s'?"
 msgstr ""
 
 #. Resource IDs: (11)
-msgid "Are you sure you want to reload?"
+#, c-format
+msgid "Are you sure you want to reload '%s'?"
 msgstr ""
 
 #. Resource IDs: (3753)

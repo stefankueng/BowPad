@@ -77,14 +77,7 @@ void ICommand::TabActivateAt( int index )
 void ICommand::UpdateTab(int index)
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(index));
-    TCITEM tie;
-    tie.lParam = -1;
-    tie.mask = TCIF_IMAGE;
-    tie.iImage = doc.m_bIsDirty || doc.m_bNeedsSaving ? UNSAVED_IMG_INDEX : SAVED_IMG_INDEX;
-    if (doc.m_bIsReadonly)
-        tie.iImage = REDONLY_IMG_INDEX;
-    ::SendMessage(pMainWnd->m_TabBar, TCM_SETITEM, index, reinterpret_cast<LPARAM>(&tie));
+    pMainWnd->UpdateTab(GetDocIDFromTabIndex(index));
 }
 
 int ICommand::GetActiveTabIndex()
@@ -93,6 +86,7 @@ int ICommand::GetActiveTabIndex()
     return pMainWnd->m_TabBar.GetCurrentTabIndex();
 }
 
+// TODO: Rename to GetDocIdOfCurrentTab()
 int ICommand::GetCurrentTabId()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
@@ -102,17 +96,13 @@ int ICommand::GetCurrentTabId()
 std::wstring ICommand::GetCurrentTitle()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    wchar_t buf[100] = {0};
-    pMainWnd->m_TabBar.GetCurrentTitle(buf, _countof(buf));
-    return buf;
+    return pMainWnd->m_TabBar.GetCurrentTitle();
 }
 
 std::wstring ICommand::GetTitleForTabIndex(int index)
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    wchar_t buf[100] = { 0 };
-    pMainWnd->m_TabBar.GetTitle(index, buf, _countof(buf));
-    return buf;
+    return pMainWnd->m_TabBar.GetTitle(index);
 }
 
 std::wstring ICommand::GetTitleForDocID(int id)
@@ -155,7 +145,7 @@ bool ICommand::CloseTab( int index, bool bForce )
 sptr_t ICommand::ScintillaCall( unsigned int iMessage, uptr_t wParam /*= 0*/, sptr_t lParam /*= 0*/ )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    return pMainWnd->m_scintilla.Call(iMessage, wParam, lParam);
+    return pMainWnd->m_editor.Call(iMessage, wParam, lParam);
 }
 
 HWND ICommand::GetHwnd()
@@ -167,7 +157,7 @@ HWND ICommand::GetHwnd()
 HWND ICommand::GetScintillaWnd()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    return pMainWnd->m_scintilla;
+    return pMainWnd->m_editor;
 }
 
 bool ICommand::OpenFile(LPCWSTR file, bool bAddToMRU)
@@ -248,13 +238,13 @@ void ICommand::SetDocument( int id, CDocument doc )
 void ICommand::RestoreCurrentPos(CPosData pos)
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    return pMainWnd->m_scintilla.RestoreCurrentPos(pos);
+    return pMainWnd->m_editor.RestoreCurrentPos(pos);
 }
 
 void ICommand::SaveCurrentPos(CPosData * pos)
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    return pMainWnd->m_scintilla.SaveCurrentPos(pos);
+    return pMainWnd->m_editor.SaveCurrentPos(pos);
 }
 
 LRESULT ICommand::SendMessageToMainWnd( UINT msg, WPARAM wParam, LPARAM lParam )
@@ -272,49 +262,49 @@ void ICommand::UpdateStatusBar( bool bEverything )
 void ICommand::SetupLexerForLang( const std::wstring& lang )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    return pMainWnd->m_scintilla.SetupLexerForLang(lang);
+    return pMainWnd->m_editor.SetupLexerForLang(lang);
 }
 
 void ICommand::DocScrollClear( int type )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    pMainWnd->m_scintilla.DocScrollClear(type);
+    pMainWnd->m_editor.DocScrollClear(type);
 }
 
 void ICommand::DocScrollAddLineColor( int type, size_t line, COLORREF clr )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    pMainWnd->m_scintilla.DocScrollAddLineColor(type, line, clr);
+    pMainWnd->m_editor.DocScrollAddLineColor(type, line, clr);
 }
 
 void ICommand::DocScrollRemoveLine( int type, size_t line )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    pMainWnd->m_scintilla.DocScrollRemoveLine(type, line);
+    pMainWnd->m_editor.DocScrollRemoveLine(type, line);
 }
 
 void ICommand::DocScrollUpdate()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    pMainWnd->m_scintilla.DocScrollUpdate();
+    pMainWnd->m_editor.DocScrollUpdate();
 }
 
 void ICommand::GotoLine(long line)
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    pMainWnd->m_scintilla.GotoLine(line);
+    pMainWnd->m_editor.GotoLine(line);
 }
 
 void ICommand::Center( long startPos, long endPos )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    pMainWnd->m_scintilla.Center(startPos, endPos);
+    pMainWnd->m_editor.Center(startPos, endPos);
 }
 
 void ICommand::GotoBrace()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    pMainWnd->m_scintilla.GotoBrace();
+    pMainWnd->m_editor.GotoBrace();
 }
 
 int ICommand::GetDocIDFromTabIndex( int tab )

@@ -14,6 +14,20 @@
 //
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
+
+// TODO: Currently, we use exceptions and asserts to detect some pretty serious
+// issues that may happen at runtime.
+// The idea eventually is to move to a model where we can catch these in
+// the message loop and ask the user to save their work and close the app.
+// For now just diagnose these problems with asserts and exceptions that will
+// abort as that's better than leaving the app in a wildly unknown state.
+// This allow also allows us to find these problems in testing and users
+// can report issues because they will be aware of them too and not just
+// continue with silent corruption problems.
+// Will envolve this further later but this is an improvement for now.
+//
+// Some button handling need work cleaning up.
+
 #include "stdafx.h"
 #include "BowPad.h"
 #include "DocumentManager.h"
@@ -22,13 +36,15 @@
 #include "SysInfo.h"
 #include "StringUtils.h"
 #include "PathUtils.h"
+#include "AppUtils.h"
 
 #include <algorithm>
+#include <stdexcept>
 #include <Shobjidl.h>
 #include <Shellapi.h>
 #include <Shlobj.h>
 
-COLORREF foldercolors[] = {
+static const COLORREF foldercolors[] = {
     RGB(177,199,253),
     RGB(221,253,177),
     RGB(253,177,243),
@@ -41,26 +57,26 @@ COLORREF foldercolors[] = {
     RGB(247,253,177),
 };
 
-#define MAX_FOLDERCOLORS (_countof(foldercolors))
+static const int MAX_FOLDERCOLORS = (_countof(foldercolors));
 
-wchar_t inline WideCharSwap(wchar_t nValue)
+static wchar_t inline WideCharSwap(wchar_t nValue)
 {
     return (((nValue>> 8)) | (nValue << 8));
 }
 
-UINT64 inline WordSwapBytes(UINT64 nValue)
+static UINT64 inline WordSwapBytes(UINT64 nValue)
 {
     return ((nValue&0xff00ff00ff00ff)<<8) | ((nValue>>8)&0xff00ff00ff00ff); // swap BYTESs in WORDs
 }
 
-UINT32 inline DwordSwapBytes(UINT32 nValue)
+static UINT32 inline DwordSwapBytes(UINT32 nValue)
 {
     UINT32 nRet = (nValue<<16) | (nValue>>16); // swap WORDs
     nRet = ((nRet&0xff00ff)<<8) | ((nRet>>8)&0xff00ff); // swap BYTESs in WORDs
     return nRet;
 }
 
-UINT64 inline DwordSwapBytes(UINT64 nValue)
+static UINT64 inline DwordSwapBytes(UINT64 nValue)
 {
     UINT64 nRet = ((nValue&0xffff0000ffffL)<<16) | ((nValue>>16)&0xffff0000ffffL); // swap WORDs in DWORDs
     nRet = ((nRet&0xff00ff00ff00ff)<<8) | ((nRet>>8)&0xff00ff00ff00ff); // swap BYTESs in WORDs
@@ -75,90 +91,395 @@ CDocumentManager::CDocumentManager(void)
     m_scratchScintilla.InitScratch(hRes);
 }
 
-
 CDocumentManager::~CDocumentManager(void)
 {
 }
 
-void CDocumentManager::AddDocumentAtEnd( CDocument doc, int id )
+bool CDocumentManager::HasDocumentID(int id) const
 {
+    // Allow searches of things with an invalid id, to simplify things for the caller.
+    auto where = m_documents.find(id);
+    if ( where == m_documents.end())
+    {
+        return false;
+    }
+    // Paranoid check.
+    // If we find something with an invalid id, something is very wrong.
+    if (id <0)
+    {
+        assert(false);
+        throw std::invalid_argument("HasDocumentID called with an invalid document id but found a document.");
+    }
+    return true;
+}
+
+// Must exist or it's a bug.
+CDocument CDocumentManager::GetDocumentFromID(int id) const
+{
+    if (id<0)
+    {
+        assert(false); // It's a bug to even try to use a null id here.
+        throw std::invalid_argument("GetDocumentFromID called with an invalid document id");
+    }
+    auto pos = m_documents.find(id);
+    // Pretty catastrophic if this ever fails.
+    // Use HasDocumentID to check first if you're not sure.
+    if (pos == std::end(m_documents))
+        throw std::invalid_argument("GetDocumentFromID called but not document exists with the given id");
+    return pos->second;
+}
+
+
+void CDocumentManager::SetDocument(int id, const CDocument& doc)
+{
+    auto where = m_documents.find(id);
+    // SetDocument/Find does not create a position if it doesn't exist.
+    // Use Operator [] for that or really AddDocumentAtEnd etc. to add.
+    if (where == std::end(m_documents))
+        throw std::invalid_argument("SetDocument can only update an existing document.");
+    where->second = doc;
+}
+
+void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, int id )
+{
+    // Catch attempts to id's that serve as null type values.
+    if (id<0)
+        throw std::invalid_argument("Attempt to add a document with invalid id");
     m_documents[id] = doc;
 }
 
-CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int encoding)
+static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, bool& bFirst, DWORD& lenFile, 
+    int& incompleteMultibyteChar, char* data, char* charbuf, int charbufSize, wchar_t* widebuf )
+
+{
+    char* pData = data;
+    int wideLen = 0;
+    switch (encoding)
+    {
+        case -1:
+        case CP_UTF8:
+        {
+            // Nothing to convert, just pass it to Scintilla
+            if (bFirst && doc.m_bHasBOM)
+            {
+                pData += 3;
+                lenFile -= 3;
+            }
+            edit.Call(SCI_APPENDTEXT, lenFile, (LPARAM)pData);
+            if (bFirst && doc.m_bHasBOM)
+                lenFile += 3;
+        }
+        break;
+    case 1200: // UTF16_LE
+        {
+            if (bFirst && doc.m_bHasBOM)
+            {
+                pData += 2;
+                lenFile -= 2;
+            }
+            memcpy(widebuf, pData, lenFile);
+            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, NULL);
+            edit.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf);
+            if (bFirst && doc.m_bHasBOM)
+                lenFile += 2;
+        }
+        break;
+    case 1201: // UTF16_BE
+        {
+            if (bFirst && doc.m_bHasBOM)
+            {
+                pData += 2;
+                lenFile -= 2;
+            }
+            memcpy(widebuf, pData, lenFile);
+            // make in place WORD BYTEs swap
+            UINT64 * p_qw = (UINT64 *)(void *)widebuf;
+            int nQwords = lenFile/8;
+            for (int nQword = 0; nQword<nQwords; nQword++)
+            {
+                p_qw[nQword] = WordSwapBytes(p_qw[nQword]);
+            }
+            wchar_t * p_w = (wchar_t *)p_qw;
+            int nWords = lenFile/2;
+            for (int nWord = nQwords*4; nWord<nWords; nWord++)
+            {
+                p_w[nWord] = WideCharSwap(p_w[nWord]);
+            }
+            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, NULL);
+            edit.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf);
+            if (bFirst && doc.m_bHasBOM)
+                lenFile += 2;
+        }
+        break;
+    case 12001: // UTF32_BE
+        {
+            UINT64 * p64 = (UINT64 *)(void *)data;
+            int nQwords = lenFile/8;
+            for (int nQword = 0; nQword<nQwords; nQword++)
+            {
+                p64[nQword] = DwordSwapBytes(p64[nQword]);
+            }
+
+            UINT32 * p32 = (UINT32 *)p64;
+            int nDwords = lenFile/4;
+            for (int nDword = nQwords*2; nDword<nDwords; nDword++)
+            {
+                p32[nDword] = DwordSwapBytes(p32[nDword]);
+            }
+        }
+        // intentional fall-through
+    case 12000: // UTF32_LE
+        {
+            if (bFirst && doc.m_bHasBOM)
+            {
+                pData += 4;
+                lenFile -= 4;
+            }
+            // UTF32 have four bytes per char
+            int nReadChars = lenFile/4;
+            UINT32 * p32 = (UINT32 *)(void *)pData;
+
+            // fill buffer
+            wchar_t * pOut = (wchar_t *)widebuf;
+            for (int i = 0; i<nReadChars; ++i, ++pOut)
+            {
+                UINT32 zChar = p32[i];
+                if (zChar>=0x110000)
+                {
+                    *pOut=0xfffd; // ? mark
+                }
+                else if (zChar>=0x10000)
+                {
+                    zChar-=0x10000;
+                    pOut[0] = ((zChar>>10)&0x3ff) | 0xd800; // lead surrogate
+                    pOut[1] = (zChar&0x7ff) | 0xdc00; // trail surrogate
+                    pOut++;
+                }
+                else
+                {
+                    *pOut = (wchar_t)zChar;
+                }
+            }
+            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, nReadChars, charbuf, charbufSize, 0, NULL);
+            edit.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf);
+            if (bFirst && doc.m_bHasBOM)
+                lenFile += 4;
+        }
+        break;
+    default:
+        {
+            // For other encodings, ask system if there are any invalid characters; note that it will
+            // not correctly know if the last character is cut when there are invalid characters inside the text
+            wideLen = MultiByteToWideChar(encoding, (lenFile == -1) ? 0 : MB_ERR_INVALID_CHARS, data, lenFile, NULL, 0);
+            if (wideLen == 0 && GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
+            {
+                // Test without last byte
+                if (lenFile > 1)
+                    wideLen = MultiByteToWideChar(encoding, MB_ERR_INVALID_CHARS, data, lenFile-1, NULL, 0);
+                if (wideLen == 0)
+                {
+                    // don't have to check that the error is still ERROR_NO_UNICODE_TRANSLATION,
+                    // since only the length parameter changed
+
+                    // TODO: should warn user about incorrect loading due to invalid characters
+                    // We still load the file, but the system will either strip or replace invalid characters
+                    // (including the last character, if cut in half)
+                    wideLen = MultiByteToWideChar(encoding, 0, data, lenFile, NULL, 0);
+                }
+                else
+                {
+                    // We found a valid text by removing one byte.
+                    incompleteMultibyteChar = 1;
+                }
+            }
+        }
+        break;
+    }
+    if (wideLen > 0)
+    {
+        MultiByteToWideChar(encoding, 0, data, lenFile-incompleteMultibyteChar, widebuf, wideLen);
+        int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, wideLen, charbuf, charbufSize, 0, NULL);
+        edit.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf);
+    }
+}
+
+static int AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
+{
+    // access to the file is denied, and we're not running with elevated privileges
+    // offer to start BowPad with elevated privileges and open the file in that instance
+    ResString rTitle(hRes, IDS_ACCESS_ELEVATE);
+    ResString rQuestion(hRes, IDS_ACCESS_ASK_ELEVATE);
+    ResString rElevate(hRes, IDS_ELEVATEOPEN);
+    ResString rDontElevate(hRes, IDS_DONTELEVATEOPEN);
+    std::wstring filename = CPathUtils::GetFileName(path);
+    std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
+
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    TASKDIALOG_BUTTON aCustomButtons[2];
+    aCustomButtons[0].nButtonID = 101;
+    aCustomButtons[0].pszButtonText = rElevate;
+    aCustomButtons[1].nButtonID = 100;
+    aCustomButtons[1].pszButtonText = rDontElevate;
+    tdc.pButtons = aCustomButtons;
+    tdc.cButtons = _countof(aCustomButtons);
+    tdc.nDefaultButton = 101;
+
+    tdc.hwndParent = hWnd;
+    tdc.hInstance = hRes;
+    tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+    tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+
+    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+    tdc.pszMainIcon = TD_SHIELD_ICON;
+    tdc.pszMainInstruction = rTitle;
+    tdc.pszContent = sQuestion.c_str();
+    int nClickedBtn = 0;
+    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, NULL, NULL );
+    if (CAppUtils::FailedShowMessage(hr))
+        return 0;
+    return nClickedBtn == IDCANCEL ? 100 : nClickedBtn;
+}
+
+static int AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
+{
+    // access to the file is denied, and we're not running with elevated privileges
+    // offer to start BowPad with elevated privileges and open the file in that instance
+    ResString rTitle(hRes, IDS_ACCESS_ELEVATE);
+    ResString rQuestion(hRes, IDS_ACCESS_ASK_ELEVATE);
+    ResString rElevate(hRes, IDS_ELEVATESAVE);
+    ResString rDontElevate(hRes, IDS_DONTELEVATESAVE);
+    std::wstring filename = CPathUtils::GetFileExtension(path);
+    std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str());
+
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    TASKDIALOG_BUTTON aCustomButtons[2];
+    aCustomButtons[0].nButtonID = 101;
+    aCustomButtons[0].pszButtonText = rElevate;
+    aCustomButtons[1].nButtonID = 100;
+    aCustomButtons[1].pszButtonText = rDontElevate;
+    tdc.pButtons = aCustomButtons;
+    tdc.cButtons = _countof(aCustomButtons);
+    tdc.nDefaultButton = 101;
+
+    tdc.hwndParent = hWnd;
+    tdc.hInstance = hRes;
+    tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+    tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+
+    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+    tdc.pszMainIcon = TD_SHIELD_ICON;
+    tdc.pszMainInstruction = rTitle;
+    tdc.pszContent = sQuestion.c_str();
+    int nClickedBtn = 0;
+    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, NULL, NULL );
+    if (CAppUtils::FailedShowMessage(hr))
+        return 0;
+    // We've used TDCBF_CANCEL_BUTTON so IDCANCEL can be returned,
+    // map that to don't elevate.
+    return nClickedBtn == IDCANCEL ? 100 : nClickedBtn;
+}
+
+static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params)
+{
+    std::wstring modpath = CPathUtils::GetModulePath();
+    SHELLEXECUTEINFO shExecInfo = { };
+    shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+
+    shExecInfo.hwnd = hWnd;
+    shExecInfo.lpVerb = L"runas";
+    shExecInfo.lpFile = modpath.c_str();
+    shExecInfo.lpParameters = params.c_str();
+    shExecInfo.nShow = SW_NORMAL;
+
+    if (! ShellExecuteEx(&shExecInfo))
+    {
+        return ::GetLastError();
+    }
+    return 0;
+}
+
+static void ShowFileLoadError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg )
+{
+    ResString rTitle(hRes, IDS_APP_TITLE);
+    ResString rLoadErr(hRes, IDS_FAILEDTOLOADFILE);
+    MessageBox(hWnd, CStringUtils::Format(rLoadErr, fileName.c_str(), msg).c_str(), rTitle, MB_ICONERROR);
+}
+
+static void ShowFileSaveError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg )
+{
+    ResString rTitle(hRes, IDS_APP_TITLE);
+    //ResString rSaveErr(hRes, IDS_FAILEDTOSAVEFILE);
+    std::wstring sSaveErr = L"Failed to save the file '%s'.\r\n\r\nThe error message is:\r\n%s";
+    // FIXME! Add IDS_FAILEDTOSAVEFILE and uncomment rSaveErr above
+    // then delete sSaveErr and use rSaveErr below.
+    MessageBox(hWnd, CStringUtils::Format(sSaveErr.c_str(), fileName.c_str(), msg).c_str(), rTitle, MB_ICONERROR);
+}
+
+static void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
+{
+    switch (doc.m_format)
+    {
+    case WIN_FORMAT:
+        edit.Call(SCI_SETEOLMODE, SC_EOL_CRLF);
+        break;
+    case UNIX_FORMAT:
+        edit.Call(SCI_SETEOLMODE, SC_EOL_LF);
+        break;
+    case MAC_FORMAT:
+        edit.Call(SCI_SETEOLMODE, SC_EOL_CR);
+        break;
+    default:
+        break;
+    }
+}
+
+CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing)
 {
     CDocument doc;
     std::wstring sFileName = CPathUtils::GetFileName(path);
-    CAutoFile hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    CAutoFile hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, createIfMissing ? CREATE_NEW : OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (!hFile.IsValid())
     {
+        // Capture the access denied error, while it's valid.
         DWORD err = GetLastError();
         CFormatMessageWrapper errMsg(err);
         if (((err == ERROR_ACCESS_DENIED)||(err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
         {
-            // access to the file is denied, and we're not running with elevated privileges
-            // offer to start BowPad with elevated privileges and open the file in that instance
-            ResString rTitle(hRes, IDS_ACCESS_ELEVATE);
-            ResString rQuestion(hRes, IDS_ACCESS_ASK_ELEVATE);
-            ResString rElevate(hRes, IDS_ELEVATEOPEN);
-            ResString rDontElevate(hRes, IDS_DONTELEVATEOPEN);
-            std::wstring filename = path.substr(path.find_last_of('\\')+1);
-            std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str());
-
-            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-            TASKDIALOG_BUTTON aCustomButtons[2];
-            aCustomButtons[0].nButtonID = 100;
-            aCustomButtons[0].pszButtonText = rElevate;
-            aCustomButtons[1].nButtonID = 101;
-            aCustomButtons[1].pszButtonText = rDontElevate;
-
-            tdc.hwndParent = hWnd;
-            tdc.hInstance = hRes;
-            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-            tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
-            tdc.pButtons = aCustomButtons;
-            tdc.cButtons = _countof(aCustomButtons);
-            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-            tdc.pszMainIcon = TD_SHIELD_ICON;
-            tdc.pszMainInstruction = rTitle;
-            tdc.pszContent = sQuestion.c_str();
-            tdc.nDefaultButton = 100;
-            int nClickedBtn = 0;
-            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
-
-            if (SUCCEEDED(hr))
+            int nClickedBtn = AskToElevatePrivilegeForOpening(hWnd,path);
+            // nClickBtn can Elvate, no, Cancel
+            if (nClickedBtn == 101) // Elevate
             {
-                if (nClickedBtn == 100)
-                {
-                    std::wstring modpath = CPathUtils::GetModulePath();
-                    SHELLEXECUTEINFO shExecInfo;
-                    shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-
-                    shExecInfo.fMask = NULL;
-                    shExecInfo.hwnd = hWnd;
-                    shExecInfo.lpVerb = L"runas";
-                    shExecInfo.lpFile = modpath.c_str();
-                    shExecInfo.lpParameters = path.c_str();
-                    shExecInfo.lpDirectory = NULL;
-                    shExecInfo.nShow = SW_NORMAL;
-                    shExecInfo.hInstApp = NULL;
-
-                    ShellExecuteEx(&shExecInfo);
+                // 1223 - operation canceled by user.
+                DWORD elevationError = RunSelfElevated(hWnd,path);
+                // If we get no error attempting to running another instance elevated,
+                // assume any further errors that might occur completing the operation
+                // will be issued by that instance, so return now.
+                if (elevationError == 0)
                     return doc;
+                // If the user hasn't chanceld explain why we
+                // couldn't elevate.If they did cancel, they no that so no need
+                // to tell them that!
+                if (elevationError != ERROR_CANCELLED)
+                {
+                    CFormatMessageWrapper errMsg(elevationError);
+                    ShowFileLoadError(hWnd, path, errMsg);
                 }
+                // Exahusted all operations to work around the problem,
+                // fall through to inform that what the final outcome is
+                // which is the origal error thy got.
             }
-
+            // else if cancelled elevation via various means or got an error even asking.
+            // just fall through and issue the error that failed.
         }
-        ResString sLoadErr(hRes, IDS_FAILEDTOLOADFILE);
-        MessageBox(hWnd, CStringUtils::Format(sLoadErr, sFileName.c_str(), (LPCTSTR)errMsg).c_str(), L"BowPad", MB_ICONERROR);
+        ShowFileLoadError(hWnd,sFileName,errMsg);
         return doc;
     }
     BY_HANDLE_FILE_INFORMATION fi = {0};
     if (!GetFileInformationByHandle(hFile, &fi))
     {
-        CFormatMessageWrapper errMsg;
-        ResString sLoadErr(hRes, IDS_FAILEDTOLOADFILE);
-        MessageBox(hWnd, CStringUtils::Format(sLoadErr, sFileName.c_str(), (LPCTSTR)errMsg).c_str(), L"BowPad", MB_ICONERROR);
+        CFormatMessageWrapper errMsg; // Calls GetLastError itself.
+        ShowFileLoadError(hWnd,sFileName,errMsg);
         return doc;
     }
     doc.m_bIsReadonly = (fi.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)) != 0;
@@ -178,13 +499,12 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     m_scratchScintilla.Call(SCI_CLEARALL);
     //m_scratchScintilla.Call(SCI_SETLEXER, ScintillaEditView::langNames[language].lexerID);
     m_scratchScintilla.Call(SCI_SETCODEPAGE, CP_UTF8);
-    std::wstring ext = path.substr(path.find_last_of('.')+1);
+    std::wstring ext = CPathUtils::GetFileExtension(path);
     m_scratchScintilla.SetupLexerForExt(ext);
 
     bool success = true;
     const int blockSize = 128 * 1024;   //128 kB
     char data[blockSize+8];
-    char * pData = data;
     const int widebufSize = blockSize * 2;
     std::unique_ptr<wchar_t[]> widebuf(new wchar_t[widebufSize]);
     const int charbufSize = widebufSize * 2;
@@ -193,8 +513,9 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     // First allocate enough memory for the whole file (this will reduce memory copy during loading)
     m_scratchScintilla.Call(SCI_ALLOCATE, WPARAM(bufferSizeRequested));
     if (m_scratchScintilla.Call(SCI_GETSTATUS) != SC_STATUS_OK)
-    {
-        MessageBox(hWnd, CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str(), L"BowPad", MB_ICONERROR);
+    {        
+        ShowFileLoadError(hWnd,sFileName,
+            CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str());
         return doc;
     }
     DWORD lenFile = 0;
@@ -215,161 +536,15 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
             encoding = GetCodepageFromBuf(data, lenFile, doc.m_bHasBOM);
         }
         doc.m_encoding = encoding;
-        if ((encoding == CP_UTF8) || (encoding == -1))
-        {
-            // Nothing to convert, just pass it to Scintilla
-            if (bFirst && doc.m_bHasBOM)
-            {
-                pData += 3;
-                lenFile -= 3;
-            }
-            m_scratchScintilla.Call(SCI_APPENDTEXT, lenFile, (LPARAM)pData);
-            if (bFirst && doc.m_bHasBOM)
-                lenFile += 3;
-        }
-        else
-        {
-            int wideLen = 0;
-            switch (encoding)
-            {
-            case 1200: // UTF16_LE
-                {
-                    if (bFirst && doc.m_bHasBOM)
-                    {
-                        pData += 2;
-                        lenFile -= 2;
-                    }
-                    memcpy(widebuf.get(), pData, lenFile);
-                    int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf.get(), lenFile/2, charbuf.get(), charbufSize, 0, NULL);
-                    m_scratchScintilla.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf.get());
-                    if (bFirst && doc.m_bHasBOM)
-                        lenFile += 2;
-                }
-                break;
-            case 1201: // UTF16_BE
-                {
-                    if (bFirst && doc.m_bHasBOM)
-                    {
-                        pData += 2;
-                        lenFile -= 2;
-                    }
-                    memcpy(widebuf.get(), pData, lenFile);
-                    // make in place WORD BYTEs swap
-                    UINT64 * p_qw = (UINT64 *)(void *)widebuf.get();
-                    int nQwords = lenFile/8;
-                    for (int nQword = 0; nQword<nQwords; nQword++)
-                    {
-                        p_qw[nQword] = WordSwapBytes(p_qw[nQword]);
-                    }
-                    wchar_t * p_w = (wchar_t *)p_qw;
-                    int nWords = lenFile/2;
-                    for (int nWord = nQwords*4; nWord<nWords; nWord++)
-                    {
-                        p_w[nWord] = WideCharSwap(p_w[nWord]);
-                    }
-                    int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf.get(), lenFile/2, charbuf.get(), charbufSize, 0, NULL);
-                    m_scratchScintilla.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf.get());
-                    if (bFirst && doc.m_bHasBOM)
-                        lenFile += 2;
-                }
-                break;
-            case 12001: // UTF32_BE
-                {
-                    UINT64 * p64 = (UINT64 *)(void *)data;
-                    int nQwords = lenFile/8;
-                    for (int nQword = 0; nQword<nQwords; nQword++)
-                    {
-                        p64[nQword] = DwordSwapBytes(p64[nQword]);
-                    }
-
-                    UINT32 * p32 = (UINT32 *)p64;
-                    int nDwords = lenFile/4;
-                    for (int nDword = nQwords*2; nDword<nDwords; nDword++)
-                    {
-                        p32[nDword] = DwordSwapBytes(p32[nDword]);
-                    }
-                }
-                // intentional fall-through
-            case 12000: // UTF32_LE
-                {
-                    if (bFirst && doc.m_bHasBOM)
-                    {
-                        pData += 4;
-                        lenFile -= 4;
-                    }
-                    // UTF32 have four bytes per char
-                    int nReadChars = lenFile/4;
-                    UINT32 * p32 = (UINT32 *)(void *)pData;
-
-                    // fill buffer
-                    wchar_t * pOut = (wchar_t *)widebuf.get();
-                    for (int i = 0; i<nReadChars; ++i, ++pOut)
-                    {
-                        UINT32 zChar = p32[i];
-                        if (zChar>=0x110000)
-                        {
-                            *pOut=0xfffd; // ? mark
-                        }
-                        else if (zChar>=0x10000)
-                        {
-                            zChar-=0x10000;
-                            pOut[0] = ((zChar>>10)&0x3ff) | 0xd800; // lead surrogate
-                            pOut[1] = (zChar&0x7ff) | 0xdc00; // trail surrogate
-                            pOut++;
-                        }
-                        else
-                        {
-                            *pOut = (wchar_t)zChar;
-                        }
-                    }
-                    int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf.get(), nReadChars, charbuf.get(), charbufSize, 0, NULL);
-                    m_scratchScintilla.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf.get());
-                    if (bFirst && doc.m_bHasBOM)
-                        lenFile += 4;
-                }
-                break;
-            default:
-                {
-                    // For other encodings, ask system if there are any invalid characters; note that it will
-                    // not correctly know if the last character is cut when there are invalid characters inside the text
-                    wideLen = MultiByteToWideChar(encoding, (lenFile == -1) ? 0 : MB_ERR_INVALID_CHARS, data, lenFile, NULL, 0);
-                    if (wideLen == 0 && GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
-                    {
-                        // Test without last byte
-                        if (lenFile > 1)
-                            wideLen = MultiByteToWideChar(encoding, MB_ERR_INVALID_CHARS, data, lenFile-1, NULL, 0);
-                        if (wideLen == 0)
-                        {
-                            // don't have to check that the error is still ERROR_NO_UNICODE_TRANSLATION,
-                            // since only the length parameter changed
-
-                            // TODO: should warn user about incorrect loading due to invalid characters
-                            // We still load the file, but the system will either strip or replace invalid characters
-                            // (including the last character, if cut in half)
-                            wideLen = MultiByteToWideChar(encoding, 0, data, lenFile, NULL, 0);
-                        }
-                        else
-                        {
-                            // We found a valid text by removing one byte.
-                            incompleteMultibyteChar = 1;
-                        }
-                    }
-                }
-                break;
-            }
-            if (wideLen > 0)
-            {
-                MultiByteToWideChar(encoding, 0, data, lenFile-incompleteMultibyteChar, widebuf.get(), wideLen);
-                int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf.get(), wideLen, charbuf.get(), charbufSize, 0, NULL);
-                m_scratchScintilla.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf.get());
-            }
-        }
+        LoadSome(encoding, m_scratchScintilla, doc, bFirst, lenFile, incompleteMultibyteChar, 
+                  data, charbuf.get(), charbufSize, widebuf.get() );
 
         if (doc.m_format == UNKNOWN_FORMAT)
             doc.m_format = GetEOLFormatForm(data);
         if (m_scratchScintilla.Call(SCI_GETSTATUS) != SC_STATUS_OK)
         {
-            MessageBox(hWnd, CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str(), L"BowPad", MB_ICONERROR);
+            ShowFileLoadError(hWnd,sFileName,
+                CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str());
             success = false;
             break;
         }
@@ -380,25 +555,13 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
             memcpy(data, data + blockSize - incompleteMultibyteChar, incompleteMultibyteChar);
         }
         bFirst = false;
-        pData = data;
     } while (lenFile == blockSize);
 
     if (doc.m_format == UNKNOWN_FORMAT)
         doc.m_format = WIN_FORMAT;
-    switch (doc.m_format)
-    {
-    case WIN_FORMAT:
-        m_scratchScintilla.Call(SCI_SETEOLMODE, SC_EOL_CRLF);
-        break;
-    case UNIX_FORMAT:
-        m_scratchScintilla.Call(SCI_SETEOLMODE, SC_EOL_LF);
-        break;
-    case MAC_FORMAT:
-        m_scratchScintilla.Call(SCI_SETEOLMODE, SC_EOL_CR);
-        break;
-    default:
-        break;
-    }
+
+    SetEOLType(m_scratchScintilla, doc);
+
     m_scratchScintilla.Call(SCI_EMPTYUNDOBUFFER);
     m_scratchScintilla.Call(SCI_SETSAVEPOINT);
     if (ro || doc.m_bIsReadonly)
@@ -441,7 +604,7 @@ bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocu
     if (!hFile.IsValid())
     {
         CFormatMessageWrapper errMsg;
-        MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
+        ShowFileSaveError(hWnd,path,errMsg);
         return false;
     }
 
@@ -491,7 +654,7 @@ bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocu
                 if ((!WriteFile(hFile, widebuf.get(), widelen*2, &bytesWritten, NULL) || (widelen != int(bytesWritten/2))))
                 {
                     CFormatMessageWrapper errMsg;
-                    MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
+                    ShowFileSaveError(hWnd,path,errMsg);
                     return false;
                 }
                 writeBuf += charStart;
@@ -556,7 +719,7 @@ bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocu
                 if ((!WriteFile(hFile, wide32buf.get(), widelen*4, &bytesWritten, NULL) || (widelen != int(bytesWritten/4))))
                 {
                     CFormatMessageWrapper errMsg;
-                    MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
+                    ShowFileSaveError(hWnd,path,errMsg);
                     return false;
                 }
                 writeBuf += charStart;
@@ -574,7 +737,7 @@ bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocu
             if (!WriteFile(hFile, buf, writeLen, &bytesWritten, NULL))
             {
                 CFormatMessageWrapper errMsg;
-                MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
+                ShowFileSaveError(hWnd,path,errMsg);
                 return false;
             }
             lengthDoc -= writeLen;
@@ -593,7 +756,7 @@ bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocu
                 if ((!WriteFile(hFile, charbuf.get(), charlen, &bytesWritten, NULL) || (charlen != int(bytesWritten))))
                 {
                     CFormatMessageWrapper errMsg;
-                    MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
+                    ShowFileSaveError(hWnd,path,errMsg);
                     return false;
                 }
                 writeBuf += charStart;
@@ -609,102 +772,60 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
 {
     if (doc.m_path.empty())
         return false;
-    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     DWORD attributes = INVALID_FILE_ATTRIBUTES;
+    DWORD err = 0;
+    // FIXME! Why so much sharing?
+    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (!hFile.IsValid())
+        err = GetLastError();
+    // If the file can't be created, check if the file attributes are the reason we can't open
+    // the file for writing. If so, remove the offending ones, we'll re-apply them later.
+    // If we can't get the attributes or they aren't the ones we thought were causing the
+    // problem or we can't remove them; fall through and go with our original error.
+    if (!hFile.IsValid() && err == ERROR_ACCESS_DENIED)
     {
-        DWORD err = GetLastError();
-        if (err == ERROR_ACCESS_DENIED)
+        DWORD undesiredAttributes = FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM;
+        attributes = GetFileAttributes(doc.m_path.c_str());
+        if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & undesiredAttributes) != 0)
         {
-            // check if the file attributes are the reason we can not
-            // open the file for writing
-            attributes = GetFileAttributes(doc.m_path.c_str());
-            if (attributes != INVALID_FILE_ATTRIBUTES)
+            DWORD desiredAttributes = attributes & ~undesiredAttributes;
+            if (SetFileAttributes(doc.m_path.c_str(), desiredAttributes))
             {
-                if ((attributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)) != 0)
-                {
-                    // clear the file attributes that prevent us from opening the file in write mode
-                    // then open the file again
-                    // Note: this is the easiest way to deal with this, but maybe not the best:
-                    // the readonly flag is sometimes used to tell the user that the file should
-                    // not be edited. And we don't inform the user about this here!
-                    // But since every user can remove that flag easily from explorer,
-                    // it won't stop the user from saving anyway, so here we just do this automatically.
-                    SetFileAttributes(doc.m_path.c_str(), attributes & (~(FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)));
-                    hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-                }
-                else
-                    attributes = INVALID_FILE_ATTRIBUTES;
+                hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
             }
         }
     }
     if (!hFile.IsValid())
     {
-        DWORD err = GetLastError();
         CFormatMessageWrapper errMsg(err);
         if (((err == ERROR_ACCESS_DENIED) || (err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
         {
-            // access to the file is denied, and we're not running with elevated privileges
-            // offer to start BowPad with elevated privileges and open the file in that instance
-            ResString rTitle(hRes, IDS_ACCESS_ELEVATE);
-            ResString rQuestion(hRes, IDS_ACCESS_ASK_ELEVATE);
-            ResString rElevate(hRes, IDS_ELEVATESAVE);
-            ResString rDontElevate(hRes, IDS_DONTELEVATESAVE);
-            std::wstring filename = doc.m_path.substr(doc.m_path.find_last_of('\\')+1);
-            std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str());
-
-            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-            TASKDIALOG_BUTTON aCustomButtons[2];
-            aCustomButtons[0].nButtonID = 100;
-            aCustomButtons[0].pszButtonText = rElevate;
-            aCustomButtons[1].nButtonID = 101;
-            aCustomButtons[1].pszButtonText = rDontElevate;
-
-            tdc.hwndParent = hWnd;
-            tdc.hInstance = hRes;
-            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-            tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
-            tdc.pButtons = aCustomButtons;
-            tdc.cButtons = _countof(aCustomButtons);
-            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-            tdc.pszMainIcon = TD_SHIELD_ICON;
-            tdc.pszMainInstruction = rTitle;
-            tdc.pszContent = sQuestion.c_str();
-            tdc.nDefaultButton = 100;
-            int nClickedBtn = 0;
-            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
-
-            if (SUCCEEDED(hr))
+            auto nClickedBtn = AskToElevatePrivilegeForSaving(hWnd,doc.m_path);
+            if (nClickedBtn == 101) // Elevate
             {
-                if (nClickedBtn == 100)
+                std::wstring temppath = CPathUtils::GetTempFilePath();
+
+                if (SaveDoc(hWnd, temppath, doc))
                 {
-                    std::wstring temppath = CPathUtils::GetTempFilePath();
-                    CDocument tempdoc;
-
-                    if (SaveDoc(hWnd, temppath, doc))
+                    std::wstring cmdline = CStringUtils::Format(L"/elevate /savepath:\"%s\" /path:\"%s\"", doc.m_path.c_str(), temppath.c_str());
+                    DWORD elevationError = RunSelfElevated(hWnd, cmdline);
+                    // TODO: Review. We don't know if saving worked or not.
+                    // So return true or false or some other. Need to check how
+                    // various callers will interpret this.
+                    if (elevationError == 0)
+                        return false; // Temp path "belongs" to other instance.
+                    if (elevationError != ERROR_CANCELLED)
                     {
-                        std::wstring modpath = CPathUtils::GetModulePath();
-                        std::wstring cmdline = CStringUtils::Format(L"/elevate /savepath:\"%s\" /path:\"%s\"", doc.m_path.c_str(), temppath.c_str());
-                        SHELLEXECUTEINFO shExecInfo;
-                        shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-
-                        shExecInfo.fMask = NULL;
-                        shExecInfo.hwnd = hWnd;
-                        shExecInfo.lpVerb = L"runas";
-                        shExecInfo.lpFile = modpath.c_str();
-                        shExecInfo.lpParameters = cmdline.c_str();
-                        shExecInfo.lpDirectory = NULL;
-                        shExecInfo.nShow = SW_NORMAL;
-                        shExecInfo.hInstApp = NULL;
-
-                        ShellExecuteEx(&shExecInfo);
-                        return false;
+                        // Can't elevate. Explain the error,
+                        // don't refer to the temp path, that would be confusing.
+                        CFormatMessageWrapper errMsg(elevationError);
+                        ShowFileSaveError(hWnd, doc.m_path, errMsg);
                     }
                 }
-            }
-
+                ::DeleteFile(temppath.c_str());
+             }
         }
-        MessageBox(hWnd, errMsg, L"BowPad", MB_ICONERROR);
+        ShowFileSaveError(hWnd,doc.m_path,errMsg);
         return false;
     }
 
@@ -744,7 +865,7 @@ bool CDocumentManager::UpdateFileTime( CDocument& doc )
     return true;
 }
 
-DocModifiedState CDocumentManager::HasFileChanged( int id )
+DocModifiedState CDocumentManager::HasFileChanged( int id ) const
 {
     CDocument doc = GetDocumentFromID(id);
     if (doc.m_path.empty() || ((doc.m_lastWriteTime.dwLowDateTime==0)&&(doc.m_lastWriteTime.dwHighDateTime==0)) || doc.m_bDoSaveAs)
@@ -776,7 +897,7 @@ int CDocumentManager::GetIdForPath( const std::wstring& path ) const
         if (_wcsicmp(d.second.m_path.c_str(), path.c_str()) == 0)
             return d.first;
     }
-    return (int)-1;
+    return -1;
 }
 
 void CDocumentManager::RemoveDocument( int id )
