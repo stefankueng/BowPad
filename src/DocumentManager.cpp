@@ -459,7 +459,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         if (((err == ERROR_ACCESS_DENIED)||(err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
         {
             int nClickedBtn = AskToElevatePrivilegeForOpening(hWnd,path);
-            // nClickBtn can Elvate, no, Cancel
+            // nClickBtn can Elevate, no, Cancel
             if (nClickedBtn == 101) // Elevate
             {
                 // 1223 - operation canceled by user.
@@ -469,7 +469,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
                 // will be issued by that instance, so return now.
                 if (elevationError == 0)
                     return doc;
-                // If the user hasn't chanceld explain why we
+                // If the user hasn't canceled explain why we
                 // couldn't elevate. If they did cancel, they no that so no need
                 // to tell them that!
                 if (elevationError != ERROR_CANCELLED)
@@ -477,11 +477,11 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
                     CFormatMessageWrapper errMsg(elevationError);
                     ShowFileLoadError(hWnd, path, errMsg);
                 }
-                // Exahusted all operations to work around the problem,
+                // Exhausted all operations to work around the problem,
                 // fall through to inform that what the final outcome is
-                // which is the origal error thy got.
+                // which is the original error thy got.
             }
-            // else if cancelled elevation via various means or got an error even asking.
+            // else if canceled elevation via various means or got an error even asking.
             // just fall through and issue the error that failed.
         }
         ShowFileLoadError(hWnd,sFileName,errMsg);
