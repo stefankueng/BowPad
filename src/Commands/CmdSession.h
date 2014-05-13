@@ -116,7 +116,7 @@ protected:
                     doc.m_position.m_nScrollWidth       = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"scrollwidth%d", i).c_str(), 0);
                     doc.m_position.m_xOffset            = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"xoffset%d", i).c_str(), 0);
                     doc.m_position.m_nFirstVisibleLine  = (size_t)CIniSettings::Instance().GetInt64(L"TabSession", CStringUtils::Format(L"firstvisible%d", i).c_str(), 0);
-                    SetDocument(GetCurrentTabId(), doc);
+                    SetDocument(GetDocIdOfCurrentTab(), doc);
 
                     ScintillaCall(SCI_GOTOPOS, 0);
                     ScintillaCall(SCI_SETSELECTIONMODE, doc.m_position.m_nSelMode);

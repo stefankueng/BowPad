@@ -371,7 +371,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, co
                 doc.m_bHasBOM = std::get<1>(codepages[selected]);
                 doc.m_bIsDirty = true;
                 doc.m_bNeedsSaving = true;
-                SetDocument(GetCurrentTabId(), doc);
+                SetDocument(GetDocIdOfCurrentTab(), doc);
                 // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
                 ScintillaCall(SCI_ADDUNDOACTION, 0,0);
                 ScintillaCall(SCI_UNDO);
