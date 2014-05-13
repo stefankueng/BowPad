@@ -17,7 +17,6 @@
 #pragma once
 #include "BaseWindow.h"
 #include <Commctrl.h>
-#include <gdiplus.h>
 
 #define TCN_TABDROPPED                  (WM_USER + 1)
 #define TCN_TABDROPPEDOUTSIDE           (WM_USER + 2)
@@ -55,26 +54,7 @@ const int nbCtrlMax = 10;
 class CTabBar : public CWindow
 {
 public :
-    CTabBar(HINSTANCE hInst)
-        : CWindow(hInst)
-        , m_nItems(0)
-        , m_bHasImgList(false)
-        , m_hFont(NULL)
-        , m_ctrlID(-1)
-        , m_bIsDragging(false)
-        , m_bIsDraggingInside(false)
-        , m_nSrcTab(-1)
-        , m_nTabDragged(-1)
-        , m_TabBarDefaultProc(NULL)
-        , m_currentHoverTabItem(-1)
-        , m_bIsCloseHover(false)
-        , m_whichCloseClickDown(-1)
-        , m_lmbdHit(false)
-        , m_tabID(0)
-    {
-        Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-        Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-    };
+    CTabBar(HINSTANCE hInst);
     virtual ~CTabBar();
 
     enum tabColourIndex
@@ -89,14 +69,16 @@ public :
     int                         InsertAtEnd(const TCHAR *subTabName);
     int                         InsertAfter(int index, const TCHAR *subTabName);
     void                        ActivateAt(int index) const;
-    void                        GetTitle(int index, TCHAR *title, int titleLen);
-    void                        GetCurrentTitle(TCHAR *title, int titleLen);
+    void                        GetTitle(int index, TCHAR *title, int titleLen) const;
+    std::wstring                GetTitle(int index) const;
+    void                        GetCurrentTitle(TCHAR *title, int titleLen) const;
+    std::wstring                GetCurrentTitle() const;
     void                        SetCurrentTitle(LPCTSTR title);
     int                         GetCurrentTabIndex() const;
     int                         GetCurrentTabId() const;
     void                        DeletItemAt(int index);
-    int                         GetIDFromIndex(int index);
-    int                         GetIndexFromID(int id);
+    int                         GetIDFromIndex(int index) const;
+    int                         GetIndexFromID(int id) const;
 
     void                        DeletAllItems();
 
@@ -159,6 +141,8 @@ private:
     static COLORREF             m_inactiveTextColour;
     static COLORREF             m_inactiveBgColour;
 
+    // FIXME, these shouldn't be static.
+    // Logically there is more than one tab control
     static int                  m_nControls;
     static HWND                 m_hwndArray[nbCtrlMax];
 

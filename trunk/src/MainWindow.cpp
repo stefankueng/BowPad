@@ -14,6 +14,15 @@
 //
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
+
+//
+// TODO: create named constants or enumerations for button id's.
+// e..g. 101 == RELOAD etc.
+// Cancel is currently always 100 where possible to be consistent.
+//
+// TODO: Need to check the encoding logic on reload has been put back
+// together properly after merging somewhat duplicate open/reload code paths.
+
 #include "stdafx.h"
 #include "MainWindow.h"
 #include "BowPad.h"
@@ -34,6 +43,8 @@
 #include "EditorConfigHandler.h"
 
 #include <memory>
+#include <cassert>
+#include <type_traits>
 #include <future>
 #include <Shobjidl.h>
 #include <Shellapi.h>
@@ -41,30 +52,91 @@
 
 IUIFramework *g_pFramework = NULL;  // Reference to the Ribbon framework.
 
-#define STATUSBAR_DOC_TYPE      0
-#define STATUSBAR_DOC_SIZE      1
-#define STATUSBAR_CUR_POS       2
-#define STATUSBAR_EOF_FORMAT    3
-#define STATUSBAR_UNICODE_TYPE  4
-#define STATUSBAR_TYPING_MODE   5
-#define STATUSBAR_CAPS          6
-#define STATUSBAR_TABS          7
+const int STATUSBAR_DOC_TYPE      = 0;
+const int STATUSBAR_DOC_SIZE      = 1;
+const int STATUSBAR_CUR_POS       = 2;
+const int STATUSBAR_EOF_FORMAT    = 3;
+const int STATUSBAR_UNICODE_TYPE  = 4;
+const int STATUSBAR_TYPING_MODE   = 5;
+const int STATUSBAR_CAPS          = 6;
+const int STATUSBAR_TABS          = 7;
 
-#define URL_REG_EXPR "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b"
+static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
 
-static bool bWindowRestored = false;
+// FIXME! Move to useful utility include even if just for BP so it's not here.
+// Will treat any signed type given as unsigned.
+// Need to decide if make unsigned part should be part of this function
+// or just make the caller do it. TBD
+template<typename T> std::string to_bit_string(T number, bool trim_significant_clear_bits)
+{
+    // Unsigned version of type given.
+    typedef typename std::make_unsigned<T>::type UT;
+    UT one = 1;
+    UT zero = 0;
+    UT unumber;
+    unumber = UT(number);
+    const int nbits = std::numeric_limits<UT>::digits;
+    std:: string bs;
+    bool seen_set_bit = false;
+    for ( int bn = nbits - 1; bn >= 0; --bn)
+    {
+        UT mask = one << bn;
+        bool is_set = (unumber & mask) != zero;
+        if (trim_significant_clear_bits && ! seen_set_bit && ! is_set)
+            continue;
+        bs += is_set ? '1' : '0';
+        if (is_set)
+            seen_set_bit = true;
+    }
+    return bs;
+}
+
+// Simple class that deletes given the filename on destruction
+// unless detached beforehand.
+class CTempFileDeleter
+{
+public:
+    CTempFileDeleter(const std::wstring& filename) :
+        m_filename(filename)
+    {
+    }
+    void Detach()
+    {
+        m_filename.clear();
+    }
+    bool Delete()
+    {
+        if (m_filename.empty())
+            return true;
+        if (::DeleteFile(m_filename.c_str()))
+        {
+            Detach();
+            return true;
+        }
+        return false;
+    }
+    ~CTempFileDeleter()
+    {
+        Delete();
+    }
+public:
+    std::wstring m_filename;
+};
 
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
     , m_TabBar(hInst)
-    , m_scintilla(hInst)
+    , m_editor(hInst)
+    , m_newCount(0)
     , m_cRef(1)
     , m_hShieldIcon(NULL)
     , m_tabmovemod(false)
     , m_initLine(0)
     , m_bPathsToOpenMRU(true)
     , m_insertionIndex(-1)
+    , m_windowRestored(false)
+    , m_handlingOutsideChanges(false)
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 }
@@ -154,12 +226,18 @@ STDMETHODIMP CMainWindow::OnViewChanged(
         case UI_VIEWVERB_CREATE:
             {
                 hr = pView->QueryInterface(IID_PPV_ARGS(&m_pRibbon));
-                IStreamPtr pStrm;
-                std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
-                hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_READ, 0, FALSE, NULL, &pStrm);
+                if (!CAppUtils::FailedShowMessage(hr))
+                {
+                    IStreamPtr pStrm;
+                    std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
+                    hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_READ, 0, FALSE, NULL, &pStrm);
 
-                if (SUCCEEDED(hr))
-                    m_pRibbon->LoadSettingsFromStream(pStrm);
+                    if (!CAppUtils::FailedShowMessage(hr))
+                    {
+                        hr = m_pRibbon->LoadSettingsFromStream(pStrm);
+                        CAppUtils::FailedShowMessage(hr);
+                    }
+                }
             }
             break;
             // The view has been resized.  For the Ribbon view, the application should
@@ -170,7 +248,8 @@ STDMETHODIMP CMainWindow::OnViewChanged(
                 {
                     // Call to the framework to determine the desired height of the Ribbon.
                     hr = m_pRibbon->GetHeight(&m_RibbonHeight);
-                    ResizeChildWindows();
+                    if (!CAppUtils::FailedShowMessage((hr)))
+                        ResizeChildWindows();
                 }
             }
             break;
@@ -178,7 +257,6 @@ STDMETHODIMP CMainWindow::OnViewChanged(
         case UI_VIEWVERB_DESTROY:
             {
                 hr = S_OK;
-                _COM_SMARTPTR_TYPEDEF(IStream, __uuidof(IStream));
                 IStreamPtr pStrm;
                 std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
                 hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_WRITE|STGM_CREATE, FILE_ATTRIBUTE_NORMAL, TRUE, NULL, &pStrm);
@@ -272,20 +350,63 @@ STDMETHODIMP CMainWindow::Execute(
     return hr;
 }
 
+void CMainWindow::About() const
+{
+    CAboutDlg dlg(*this);
+    dlg.DoModal(hRes, IDD_ABOUTBOX, *this);
+}
+
+std::wstring CMainWindow::GetAppName() const
+{
+   ResString sTitle(hRes, IDS_APP_TITLE);
+   return (LPCWSTR)sTitle;
+}
+
+std::wstring CMainWindow::GetWindowClassName() const
+{
+    ResString clsResName(hResource, IDC_BOWPAD);
+    std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
+    return clsName;
+}
+
+std::wstring CMainWindow::GetNewTabName()
+{
+    // Tab's start at 1, m_mewCount left at value of last ticket used.
+    int newCount = ++m_newCount;
+    ResString newRes(hRes, IDS_NEW_TABTITLE);
+    std::wstring tabName = CStringUtils::Format(newRes, newCount);
+    return tabName;
+}
+
+HWND CMainWindow::FindAppMainWindow(HWND hStartWnd, bool* isThisInstance) const
+{
+    std::wstring clsName = GetWindowClassName();
+    while (hStartWnd)
+    {
+        wchar_t classname[MAX_PATH];
+        GetClassName(hStartWnd, classname, _countof(classname));
+        if (clsName.compare(classname) == 0)
+            break;
+        hStartWnd = GetParent(hStartWnd);
+    }
+    if (isThisInstance)
+        *isThisInstance = hStartWnd != NULL && hStartWnd == *this;
+    return hStartWnd;
+}
+
 bool CMainWindow::RegisterAndCreateWindow()
 {
-    WNDCLASSEX wcx;
+    WNDCLASSEX wcx = { }; // Zero out.
 
     // Fill in the window class structure with default parameters
     wcx.cbSize = sizeof(WNDCLASSEX);
-    wcx.style = 0; // Don't use CS_HREDRAW or CS_VREDRAW with a Ribbon
+    //wcx.style = 0; // Don't use CS_HREDRAW or CS_VREDRAW with a Ribbon
     wcx.lpfnWndProc = CWindow::stWinMsgHandler;
-    wcx.cbClsExtra = 0;
-    wcx.cbWndExtra = 0;
+    //wcx.cbClsExtra = 0;
+    //wcx.cbWndExtra = 0;
     wcx.hInstance = hResource;
     wcx.hCursor = NULL;
-    ResString clsResName(hResource, IDC_BOWPAD);
-    std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
+    std::wstring clsName = GetWindowClassName();
     wcx.lpszClassName = clsName.c_str();
     wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_BOWPAD));
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
@@ -307,36 +428,13 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     switch (uMsg)
     {
     case WM_CREATE:
-        {
-            m_hwnd = hwnd;
-            Initialize();
-
-            std::async([=]
-            {
-                bool bNewer = CAppUtils::CheckForUpdate(false);
-                if (bNewer)
-                    PostMessage(m_hwnd, WM_UPDATEAVAILABLE, 0, 0);
-            });
-            PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
-
-            if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
-            {
-                // in case we're running elevated, use a BowPad icon with a shield
-                HICON hIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_BOWPAD_ELEVATED), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE|LR_SHARED);
-                ::SendMessage(m_hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-                ::SendMessage(m_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-            }
-        }
+        HandleCreate(hwnd);
         break;
     case WM_COMMAND:
-        {
-            return DoCommand(LOWORD(wParam));
-        }
+        return DoCommand(LOWORD(wParam));
         break;
     case WM_SIZE:
-        {
-            ResizeChildWindows();
-        }
+        ResizeChildWindows();
         break;
     case WM_GETMINMAXINFO:
         {
@@ -346,7 +444,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             return 0;
         }
         break;
-    case WM_DRAWITEM :
+    case WM_DRAWITEM:
         {
             DRAWITEMSTRUCT *dis = (DRAWITEMSTRUCT *)lParam;
             if (dis->CtlType == ODT_TAB)
@@ -359,119 +457,22 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             HDROP hDrop = reinterpret_cast<HDROP>(wParam);
             if (hDrop)
-            {
-                int filesDropped = DragQueryFile(hDrop, 0xffffffff, NULL, 0);
-                std::vector<std::wstring> files;
-                for (int i = 0 ; i < filesDropped ; ++i)
-                {
-                    UINT len = DragQueryFile(hDrop, i, NULL, 0);
-                    std::unique_ptr<wchar_t[]> pathBuf(new wchar_t[len+1]);
-                    DragQueryFile(hDrop, i, pathBuf.get(), len+1);
-                    files.push_back(pathBuf.get());
-                }
-                DragFinish(hDrop);
-                for (auto it:files)
-                    OpenFile(it, true);
-            }
+                HandleDropFiles(hDrop);
         }
         break;
     case WM_COPYDATA:
         {
-            COPYDATASTRUCT *cds;
-            cds = (COPYDATASTRUCT *) lParam;
-            switch (cds->dwData)
+            if (lParam == 0)
+                return 0;
+            const COPYDATASTRUCT& cds = *reinterpret_cast<const COPYDATASTRUCT *>(lParam);
+            switch (cds.dwData)
             {
                 case CD_COMMAND_LINE:
-                {
-                    CCmdLineParser parser((LPCWSTR)cds->lpData);
-                    if (parser.HasVal(L"path"))
-                    {
-                        if (AskToCreateNonExistingFile(parser.GetVal(L"path")))
-                        {
-                            OpenFile(parser.GetVal(L"path"), true);
-                            if (parser.HasVal(L"line"))
-                            {
-                                GoToLine(parser.GetLongVal(L"line") - 1);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // find out if there are paths specified without the key/value pair syntax
-                        int nArgs;
-
-                        LPWSTR * szArglist = CommandLineToArgvW((LPCWSTR)cds->lpData, &nArgs);
-                        if (szArglist)
-                        {
-                            for (int i = 1; i < nArgs; i++)
-                            {
-                                if (szArglist[i][0] != '/')
-                                {
-                                    if (!AskToCreateNonExistingFile(szArglist[i]))
-                                        continue;
-                                    OpenFile(szArglist[i], true);
-                                }
-                            }
-                            if (parser.HasVal(L"line"))
-                            {
-                                GoToLine(parser.GetLongVal(L"line") - 1);
-                            }
-
-                            // Free memory allocated for CommandLineToArgvW arguments.
-                            LocalFree(szArglist);
-                        }
-                    }
-                }
+                    HandleCopyDataCommandLine(cds);
                     break;
                 case CD_COMMAND_MOVETAB:
-                {
-                    std::wstring paths = std::wstring((wchar_t*)cds->lpData, cds->cbData / sizeof(wchar_t));
-                    std::vector<std::wstring> datavec;
-                    stringtok(datavec, paths, false, L"*");
-                    std::wstring realpath = datavec[0];
-                    std::wstring temppath = datavec[1];
-                    bool bMod = _wtoi(datavec[2].c_str()) != 0;
-                    int line = _wtoi(datavec[3].c_str());
-
-                    int id = m_DocManager.GetIdForPath(realpath.c_str());
-                    if (id != -1)
-                    {
-                        m_TabBar.ActivateAt(m_TabBar.GetIndexFromID(id));
-                    }
-                    else
-                    {
-                        OpenFile(temppath, false);
-                        id = m_DocManager.GetIdForPath(temppath);
-                        m_TabBar.ActivateAt(m_TabBar.GetIndexFromID(id));
-                        CDocument doc = m_DocManager.GetDocumentFromID(id);
-                        doc.m_path = CPathUtils::GetLongPathname(realpath);
-                        doc.m_bIsDirty = bMod;
-                        doc.m_bNeedsSaving = bMod;
-                        m_DocManager.UpdateFileTime(doc);
-                        doc.m_language = CLexStyles::Instance().GetLanguageForExt(doc.m_path.substr(doc.m_path.find_last_of('.') + 1));
-                        m_DocManager.SetDocument(id, doc);
-                        m_scintilla.SetupLexerForExt(doc.m_path.substr(doc.m_path.find_last_of('.') + 1).c_str());
-                        std::wstring sFileName = doc.m_path.substr(doc.m_path.find_last_of('\\') + 1);
-                        m_TabBar.SetCurrentTitle(sFileName.c_str());
-                        wchar_t sTabTitle[100] = { 0 };
-                        m_TabBar.GetCurrentTitle(sTabTitle, _countof(sTabTitle));
-                        std::wstring sWindowTitle = CStringUtils::Format(L"%s - BowPad", doc.m_path.empty() ? sTabTitle : doc.m_path.c_str());
-                        SetWindowText(*this, sWindowTitle.c_str());
-                        UpdateStatusBar(true);
-                        TCITEM tie;
-                        tie.lParam = -1;
-                        tie.mask = TCIF_IMAGE;
-                        tie.iImage = doc.m_bIsDirty || doc.m_bNeedsSaving ? UNSAVED_IMG_INDEX : SAVED_IMG_INDEX;
-                        if (doc.m_bIsReadonly)
-                            tie.iImage = REDONLY_IMG_INDEX;
-                        ::SendMessage(m_TabBar, TCM_SETITEM, m_TabBar.GetIndexFromID(id), reinterpret_cast<LPARAM>(&tie));
-
-                        GoToLine(line);
-                    }
-                    // delete the temp file
-                    DeleteFile(temppath.c_str());
-                }
-                break;
+                    return (LRESULT) HandleCopyDataMoveTab(cds);
+                    break;
             }
         }
         break;
@@ -479,28 +480,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         CAppUtils::ShowUpdateAvailableDialog(*this);
         break;
     case WM_AFTERINIT:
-        CCommandHandler::Instance().AfterInit();
-        for (const auto& path : m_pathsToOpen)
-        {
-            if (!AskToCreateNonExistingFile(path.first))
-                continue;
-            OpenFile(path.first, m_bPathsToOpenMRU);
-            if (path.second != (size_t)-1)
-                GoToLine(path.second);
-        }
-        m_bPathsToOpenMRU = true;
-        if (!m_elevatepath.empty())
-        {
-            ElevatedSave(m_elevatepath, m_elevatesavepath, m_initLine);
-            m_elevatepath.clear();
-            m_elevatesavepath.clear();
-        }
-        if (!m_tabmovepath.empty())
-        {
-            TabMove(m_tabmovepath, m_tabmovesavepath, m_tabmovemod, m_initLine);
-            m_tabmovepath.clear();
-            m_tabmovesavepath.clear();
-        }
+        HandleAfterInit();
         break;
     case WM_NOTIFY:
         {
@@ -510,27 +490,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             {
             case TTN_GETDISPINFO:
                 {
-                    POINT p;
-                    ::GetCursorPos(&p);
-                    ::ScreenToClient(*this, &p);
-                    HWND hWin = ::RealChildWindowFromPoint(*this, p);
-                    if (hWin == m_TabBar)
-                    {
-                        LPNMTTDISPINFO lpnmtdi = (LPNMTTDISPINFO)lParam;
-                        int id = m_TabBar.GetIDFromIndex((int)pNMHDR->idFrom);
-                        if (id >= 0)
-                        {
-                            if (m_DocManager.HasDocumentID(id))
-                            {
-                                CDocument doc = m_DocManager.GetDocumentFromID(id);
-                                m_tooltipbuffer = std::unique_ptr<wchar_t[]>(new wchar_t[doc.m_path.size()+1]);
-                                wcscpy_s(m_tooltipbuffer.get(), doc.m_path.size()+1, doc.m_path.c_str());
-                                lpnmtdi->lpszText = m_tooltipbuffer.get();
-                                lpnmtdi->hinst = NULL;
-                                return 0;
-                            }
-                        }
-                    }
+                LPNMTTDISPINFO lpnmtdi = reinterpret_cast<LPNMTTDISPINFO>(lParam);
+                HandleGetDispInfo((int)pNMHDR->idFrom, lpnmtdi);
                 }
                 break;
             default:
@@ -540,8 +501,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             if ((pNMHDR->idFrom == (UINT_PTR)&m_TabBar) ||
                 (pNMHDR->hwndFrom == m_TabBar))
             {
-                TBHDR * ptbhdr = reinterpret_cast<TBHDR*>(lParam);
+                TBHDR* ptbhdr = reinterpret_cast<TBHDR*>(lParam);
                 CCommandHandler::Instance().TabNotify(ptbhdr);
+
+                assert(ptbhdr->hdr.code == pNMHDR->code);
 
                 switch (pNMHDR->code)
                 {
@@ -554,449 +517,159 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     }
                     break;
                 case TCN_SELCHANGE:
-                    {
-                        // document got activated
-                        int id = m_TabBar.GetCurrentTabId();
-                        if ((id >= 0) && m_DocManager.HasDocumentID(id))
-                        {
-                            CDocument doc = m_DocManager.GetDocumentFromID(id);
-                            m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-                            m_scintilla.SetupLexerForLang(doc.m_language);
-                            m_scintilla.RestoreCurrentPos(doc.m_position);
-                            m_scintilla.SetTabSettings();
-                            CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_scintilla, doc);
-                            m_DocManager.SetDocument(id, doc);
-                            m_scintilla.MarkSelectedWord(true);
-                            m_scintilla.MarkBookmarksInScrollbar();
-                            wchar_t sTabTitle[100] = {0};
-                            m_TabBar.GetCurrentTitle(sTabTitle, _countof(sTabTitle));
-                            std::wstring sWindowTitle = CStringUtils::Format(L"%s - BowPad", doc.m_path.empty() ? sTabTitle : doc.m_path.c_str());
-                            SetWindowText(*this, sWindowTitle.c_str());
-                            HandleOutsideModifications(id);
-                            SetFocus(m_scintilla);
-                            m_scintilla.Call(SCI_GRABFOCUS);
-                            UpdateStatusBar(true);
-                        }
-                    }
+                    HandleTabChange(*ptbhdr);
                     break;
                 case TCN_SELCHANGING:
-                    {
-                        // document is about to be deactivated
-                        int id = m_TabBar.GetCurrentTabId();
-                        if ((id >= 0) && m_DocManager.HasDocumentID(id))
-                        {
-                            CDocument doc = m_DocManager.GetDocumentFromID(id);
-                            m_scintilla.SaveCurrentPos(&doc.m_position);
-                            m_DocManager.SetDocument(id, doc);
-                        }
-                    }
+                    HandleTabChanging(*ptbhdr);
                     break;
                 case TCN_TABDELETE:
-                    {
-                        int id = m_TabBar.GetCurrentTabId();
-                        if (CloseTab(ptbhdr->tabOrigin))
-                        {
-                            if (id == m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin))
-                            {
-                                if (ptbhdr->tabOrigin > 0)
-                                {
-                                    m_TabBar.ActivateAt(ptbhdr->tabOrigin-1);
-                                }
-                            }
-                        }
-                    }
+                    HandleTabDelete(*ptbhdr);
                     break;
                 case TCN_TABDROPPEDOUTSIDE:
                     {
-                        // start a new instance of BowPad with this dropped tab, or add this tab to
-                        // the BowPad window the drop was done on. Then close this tab.
-
-                        // first save the file to a temp location to ensure all unsaved mods are saved
-                        std::wstring temppath = CPathUtils::GetTempFilePath();
-                        CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin));
-                        CDocument tempdoc = doc;
-                        tempdoc.m_path = temppath;
-                        m_DocManager.SaveFile(*this, tempdoc);
                         DWORD pos = GetMessagePos();
                         POINT pt;
                         pt.x = GET_X_LPARAM(pos);
                         pt.y = GET_Y_LPARAM(pos);
-                        HWND hDroppedWnd = WindowFromPoint(pt);
-                        if (hDroppedWnd)
-                        {
-                            ResString clsResName(hRes, IDC_BOWPAD);
-                            std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
-                            while (hDroppedWnd)
-                            {
-                                wchar_t classname[MAX_PATH] = { 0 };
-                                GetClassName(hDroppedWnd, classname, _countof(classname));
-                                if (clsName.compare(classname) == 0)
-                                    break;
-                                hDroppedWnd = GetParent(hDroppedWnd);
-                            }
-                            // dropping on our own window shall create an new BowPad instance
-                            if (hDroppedWnd == *this)
-                                hDroppedWnd = NULL;
-                            if (hDroppedWnd)
-                            {
-                                // dropped on another BowPad Window, 'move' this tab to that BowPad Window
-                                COPYDATASTRUCT cpd = { 0 };
-                                cpd.dwData = CD_COMMAND_MOVETAB;
-                                std::wstring cpdata = doc.m_path + L"*" + temppath + L"*";
-                                cpdata += (doc.m_bIsDirty || doc.m_bNeedsSaving) ? L"1*" : L"0*";
-                                cpdata += CStringUtils::Format(L"%ld", (long)(m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1));
-                                cpd.lpData = (PVOID)cpdata.c_str();
-                                cpd.cbData = DWORD(cpdata.size()*sizeof(wchar_t));
-                                SendMessage(hDroppedWnd, WM_COPYDATA, (WPARAM)m_hwnd, (LPARAM)&cpd);
-                                // remove the tab
-                                CloseTab(ptbhdr->tabOrigin, true);
-                                break;
-                            }
-                        }
-                        // no BowPad Window at the drop location: start a new instance and open the tab there
-                        // but only if there are more than one tab in the current window
-                        if (m_TabBar.GetItemCount() < 2)
-                            break;
-
-                        std::wstring modpath = CPathUtils::GetModulePath();
-                        std::wstring cmdline = CStringUtils::Format(L"/multiple /tabmove /savepath:\"%s\" /path:\"%s\" /line:%ld",
-                                                                    doc.m_path.c_str(), temppath.c_str(),
-                                                                    (long)(m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1));
-                        if (doc.m_bIsDirty || doc.m_bNeedsSaving)
-                            cmdline += L" /modified";
-                        SHELLEXECUTEINFO shExecInfo;
-                        shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-
-                        shExecInfo.fMask = NULL;
-                        shExecInfo.hwnd = *this;
-                        shExecInfo.lpVerb = L"open";
-                        shExecInfo.lpFile = modpath.c_str();
-                        shExecInfo.lpParameters = cmdline.c_str();
-                        shExecInfo.lpDirectory = NULL;
-                        shExecInfo.nShow = SW_NORMAL;
-                        shExecInfo.hInstApp = NULL;
-
-                        if (ShellExecuteEx(&shExecInfo))
-                        {
-                            // remove the tab
-                            CloseTab(ptbhdr->tabOrigin, true);
-                        }
+                        HandleTabDroppedOutside(ptbhdr->tabOrigin, pt);
                     }
                     break;
                 }
             }
-            else if ((pNMHDR->idFrom == (UINT_PTR)&m_scintilla) ||
-                (pNMHDR->hwndFrom == m_scintilla))
+            else if ((pNMHDR->idFrom == (UINT_PTR)&m_editor) ||
+                (pNMHDR->hwndFrom == m_editor))
             {
                 if (pNMHDR->code == NM_COOLSB_CUSTOMDRAW)
                 {
-                    return m_scintilla.HandleScrollbarCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
+                    return m_editor.HandleScrollbarCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
                 }
 
-                Scintilla::SCNotification * pScn = reinterpret_cast<Scintilla::SCNotification *>(lParam);
-                CCommandHandler::Instance().ScintillaNotify(pScn);
+                Scintilla::SCNotification* pScn = reinterpret_cast<Scintilla::SCNotification *>(lParam);
+                APPVERIFY(pScn != nullptr );
+                const Scintilla::SCNotification& scn = *reinterpret_cast<const Scintilla::SCNotification *>(lParam);
 
+                CCommandHandler::Instance().ScintillaNotify(pScn);
                 switch (pScn->nmhdr.code)
                 {
                 case SCN_PAINTED:
-                    {
-                        m_scintilla.UpdateLineNumberWidth();
-                    }
+                    m_editor.UpdateLineNumberWidth();
                     break;
                 case SCN_SAVEPOINTREACHED:
                 case SCN_SAVEPOINTLEFT:
-                    {
-                        int id = m_TabBar.GetCurrentTabId();
-                        if ((id >= 0) && m_DocManager.HasDocumentID(id))
-                        {
-                            CDocument doc = m_DocManager.GetDocumentFromID(id);
-                            doc.m_bIsDirty = pScn->nmhdr.code == SCN_SAVEPOINTLEFT;
-                            m_DocManager.SetDocument(id, doc);
-                            TCITEM tie;
-                            tie.lParam = -1;
-                            tie.mask = TCIF_IMAGE;
-                            tie.iImage = doc.m_bIsDirty||doc.m_bNeedsSaving?UNSAVED_IMG_INDEX:SAVED_IMG_INDEX;
-                            if (doc.m_bIsReadonly)
-                                tie.iImage = REDONLY_IMG_INDEX;
-                            ::SendMessage(m_TabBar, TCM_SETITEM, m_TabBar.GetIndexFromID(id), reinterpret_cast<LPARAM>(&tie));
-                        }
-                    }
+                    HandleSavePoint(scn);
                     break;
                 case SCN_MARGINCLICK:
-                    {
-                        m_scintilla.MarginClick(pScn);
-                    }
+                    m_editor.MarginClick(pScn);
                     break;
                 case SCN_UPDATEUI:
-                    {
-                        if ((pScn->updated & SC_UPDATE_SELECTION) ||
-                            (pScn->updated & SC_UPDATE_H_SCROLL)  ||
-                            (pScn->updated & SC_UPDATE_V_SCROLL))
-                            m_scintilla.MarkSelectedWord(false);
-
-                        m_scintilla.MatchBraces();
-                        m_scintilla.MatchTags();
-                        AddHotSpots();
-                        UpdateStatusBar(false);
-                    }
+                    HandleUpdateUI(scn);
                     break;
                 case SCN_CHARADDED:
-                    {
-                        AutoIndent(pScn);
-                    }
+                    HandleAutoIndent(scn);
                     break;
                 case SCN_MODIFYATTEMPTRO:
-                    {
-                        // user tried to edit a readonly file: ask whether
-                        // to make the file writeable
-                        int id = m_TabBar.GetCurrentTabId();
-                        if ((id >= 0) && m_DocManager.HasDocumentID(id))
-                        {
-                            CDocument doc = m_DocManager.GetDocumentFromID(id);
-                            if (doc.m_bIsReadonly)
-                            {
-                                ResString rTitle(hRes, IDS_FILEISREADONLY);
-                                ResString rQuestion(hRes, IDS_FILEMAKEWRITABLEASK);
-                                ResString rEditFile(hRes, IDS_EDITFILE);
-                                ResString rCancel(hRes, IDS_CANCEL);
-
-                                TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-                                TASKDIALOG_BUTTON aCustomButtons[2];
-                                aCustomButtons[0].nButtonID = 100;
-                                aCustomButtons[0].pszButtonText = rEditFile;
-                                aCustomButtons[1].nButtonID = 101;
-                                aCustomButtons[1].pszButtonText = rCancel;
-
-                                tdc.hwndParent = *this;
-                                tdc.hInstance = hRes;
-                                tdc.dwFlags = /*TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | */TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-                                tdc.pButtons = aCustomButtons;
-                                tdc.cButtons = _countof(aCustomButtons);
-                                tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-                                tdc.pszMainIcon = TD_WARNING_ICON;
-                                tdc.pszMainInstruction = rTitle;
-                                tdc.pszContent = rQuestion;
-                                tdc.nDefaultButton = 101;
-                                int nClickedBtn = 0;
-                                HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
-
-                                if (SUCCEEDED(hr) && (nClickedBtn == 100))
-                                {
-                                    doc.m_bIsReadonly = false;
-                                    m_scintilla.Call(SCI_SETREADONLY, false);
-                                    m_scintilla.Call(SCI_SETSAVEPOINT);
-                                }
-                            }
-                        }
-                    }
+                    HandleWriteProtectedEdit();
                     break;
                 case SCN_HOTSPOTCLICK:
-                    {
-                        if (pScn->modifiers & SCMOD_CTRL)
-                        {
-                            m_scintilla.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:;?&@=/%#()");
-
-                            long pos = pScn->position;
-                            long startPos = static_cast<long>(m_scintilla.Call(SCI_WORDSTARTPOSITION, pos, false));
-                            long endPos = static_cast<long>(m_scintilla.Call(SCI_WORDENDPOSITION, pos, false));
-
-                            m_scintilla.Call(SCI_SETTARGETSTART, startPos);
-                            m_scintilla.Call(SCI_SETTARGETEND, endPos);
-
-                            long posFound = (long)m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
-                            if (posFound != -1)
-                            {
-                                startPos = int(m_scintilla.Call(SCI_GETTARGETSTART));
-                                endPos = int(m_scintilla.Call(SCI_GETTARGETEND));
-                            }
-
-                            std::unique_ptr<char[]> urltext(new char[endPos - startPos + 2]);
-                            Scintilla::TextRange tr;
-                            tr.chrg.cpMin = startPos;
-                            tr.chrg.cpMax = endPos;
-                            tr.lpstrText = urltext.get();
-                            m_scintilla.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
-
-
-                            // This treatment would fail on some valid URLs where there's actually supposed to be a comma or parenthesis at the end.
-                            size_t lastCharIndex = strlen(urltext.get())-1;
-                            while (lastCharIndex > 0 && (urltext[lastCharIndex] == ',' || urltext[lastCharIndex] == ')' || urltext[lastCharIndex] == '('))
-                            {
-                                urltext[lastCharIndex] = '\0';
-                                --lastCharIndex;
-                            }
-
-                            std::wstring url = CUnicodeUtils::StdGetUnicode(urltext.get());
-                            while ((*url.begin() == '(') || (*url.begin() == ')') || (*url.begin() == ','))
-                                url.erase(url.begin());
-
-                            SearchReplace(url, L"&amp;", L"&");
-
-                            ::ShellExecute(*this, L"open", url.c_str(), NULL, NULL, SW_SHOW);
-                            m_scintilla.Call(SCI_SETCHARSDEFAULT);
-                        }
-                    }
+                    HandleHotSpotClick(scn);
                     break;
                 case SCN_DWELLSTART:
-                    {
-                        int style = (int)m_scintilla.Call(SCI_GETSTYLEAT, pScn->position);
-                        if (style & INDIC2_MASK)
-                        {
-                            // an url hotspot
-                            ResString str(hRes, IDS_CTRLCLICKTOOPEN);
-                            std::string strA = CUnicodeUtils::StdGetUTF8((LPCWSTR)str);
-                            m_scintilla.Call(SCI_CALLTIPSHOW, pScn->position, (sptr_t)strA.c_str());
-                        }
-                        else
-                        {
-                            m_scintilla.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#");
-                            Scintilla::Sci_TextRange tr = {0};
-                            tr.chrg.cpMin = static_cast<long>(m_scintilla.Call(SCI_WORDSTARTPOSITION, pScn->position, false));
-                            tr.chrg.cpMax = static_cast<long>(m_scintilla.Call(SCI_WORDENDPOSITION, pScn->position, false));
-                            std::unique_ptr<char[]> word(new char[tr.chrg.cpMax - tr.chrg.cpMin + 2]);
-                            tr.lpstrText = word.get();
-
-                            m_scintilla.Call(SCI_GETTEXTRANGE, 0, (sptr_t)&tr);
-
-                            std::string sWord = tr.lpstrText;
-                            m_scintilla.Call(SCI_SETCHARSDEFAULT);
-                            if (!sWord.empty())
-                            {
-                                if ((sWord[0] == '#') &&
-                                    ((sWord.size() == 4) || (sWord.size() == 7)))
-                                {
-                                    // html color
-                                    COLORREF color = 0;
-                                    DWORD hexval = 0;
-                                    if (sWord.size() == 4)
-                                    {
-                                        // shorthand form
-                                        char * endptr = nullptr;
-                                        char dig[2] = {0};
-                                        dig[0] = sWord[1];
-                                        int red = strtol(dig, &endptr, 16);
-                                        if (endptr != &dig[1])
-                                            break;
-                                        red = red * 16 + red;
-                                        dig[0] = sWord[2];
-                                        int green = strtol(dig, &endptr, 16);
-                                        if (endptr != &dig[1])
-                                            break;
-                                        green = green * 16 + green;
-                                        dig[0] = sWord[3];
-                                        int blue = strtol(dig, &endptr, 16);
-                                        if (endptr != &dig[1])
-                                            break;
-                                        blue = blue * 16 + blue;
-                                        color = RGB(red, green, blue);
-                                        hexval = (RGB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF)) | (color & 0xFF000000);
-                                    }
-                                    else if (sWord.size() == 7)
-                                    {
-                                        // normal/long form
-                                        char * endptr = nullptr;
-                                        hexval = strtol(&sWord[1], &endptr, 16);
-                                        if (endptr != &sWord[7])
-                                            break;
-                                        color = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
-                                    }
-                                    std::string sCallTip = CStringUtils::Format("RGB(%d,%d,%d)\nHex: #%06lX\n####################\n####################\n####################", GetRValue(color), GetGValue(color), GetBValue(color), hexval);
-                                    m_scintilla.Call(SCI_CALLTIPSETFOREHLT, color);
-                                    m_scintilla.Call(SCI_CALLTIPSHOW, pScn->position, (sptr_t)sCallTip.c_str());
-                                    size_t pos = sCallTip.find_first_of('\n');
-                                    pos = sCallTip.find_first_of('\n', pos+1);
-                                    m_scintilla.Call(SCI_CALLTIPSETHLT, pos, pos+63);
-                                }
-                                else
-                                {
-                                    char * endptr = nullptr;
-                                    long number = strtol(sWord.c_str(), &endptr, 0);
-                                    if (number && (endptr != &sWord[sWord.size()-1]))
-                                    {
-                                        // show number calltip
-                                        std::string sCallTip = CStringUtils::Format("Dec: %ld - Hex: %#lX - Oct:%#lo", number, number, number);
-                                        m_scintilla.Call(SCI_CALLTIPSHOW, pScn->position, (sptr_t)sCallTip.c_str());
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    HandleDwellStart(scn);
                     break;
                 case SCN_DWELLEND:
-                    {
-                        m_scintilla.Call(SCI_CALLTIPCANCEL);
-                    }
+                    m_editor.Call(SCI_CALLTIPCANCEL);
                     break;
                 }
             }
         }
         break;
+
+    case WM_MOUSEACTIVATE:
+        // OutputDebugStringA("WM_MOUSEACTIVATE\n");
+        // If outside changes have been made, then we will later
+        // likely popup a dialog to respond to those changes like
+        // ask to reload the current document. If this
+        // happens, any click will be meaningless or dangerous
+        // in the context of the document that's been reloaded.
+        // So eat the click in that case.
+        // If no outside changes have been made pass it on for
+        // business as usual as otherwise we'll fail to
+        // recognize clicks, like to tab headers or whatever.
+
+        if (HasOutsideChangesOccurred())
+            return MA_ACTIVATEANDEAT;
+        else
+            return DefWindowProc(hwnd,uMsg,wParam,lParam);
+        break;
+
     case WM_ACTIVATEAPP:
-        if (!bWindowRestored)
+    {
+        //bool activating = (wParam != 0);
+// Handy for debugging until we're sure problems related here are definitely fixed.
+#if 0
+        DWORD threadIdOfWindowOwner = reinterpret_cast<DWORD>(lpParam);
+        OutputDebugStringA("WM_ACTIVATEAPP ");
+        OutputDebugStringA(activating ? "activating\n" : "deactivating\n");
+#endif   
+        // Only restore the window position on activation as that's when we'll
+        // be showing any window and needing to use it.
+        if (!m_windowRestored)
         {
             CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
-            bWindowRestored = true;
+            m_windowRestored = true;
         }
-        // intentional fall through!
-    case WM_SETFOCUS:
+    }
+        break;
     case WM_ACTIVATE:
+    {
+// Handy for debugging until we're sure problems related here are definitely fixed.
+#if 0
+        // Useful debugging details.
+        // Note WA_ activation codes are packed in the wParam parameter and not raw.
+        WORD activationType = LOWORD(wParam);
+        bool minimized = HIWORD(wParam) != 0;
+        HWND windowChangingActivation = reinterpret_cast<HWND>(lParam);
+        OutputDebugStringA("WM_ACTIVATE ");
+        switch (activationType)
         {
-            if ((wParam == WA_ACTIVE)||(wParam == WA_CLICKACTIVE))
-            {
-                HWND hFocus = GetFocus();
-                if (hFocus)
-                {
-                    hFocus = GetAncestor(hFocus, GA_ROOT);
-                    if (hFocus == *this)
-                        HandleOutsideModifications();
-                }
-                SetFocus(m_scintilla);
-                m_scintilla.Call(SCI_SETFOCUS, true);
-            }
+        case WA_CLICKACTIVE:
+            OutputDebugStringA("WA_CLICKACTIVE ");
+            break;
+        case WA_ACTIVE:
+            OutputDebugStringA("WA_ACTIVE ");
+            break;
+        case WA_INACTIVE:
+            OutputDebugStringA("WA_INACTIVE ");
+            break;
+        default:
+            break;
         }
+        OutputDebugStringA(minimized? "minimized\n" : "\n");
+#endif
+        // Ensure proper focus handling occurs such as
+        // making sure WM_SETFOCUS is generated in all situations.
+        return DefWindowProc(hwnd,uMsg,wParam,lParam);
+    }
+        break;
+    case WM_SETFOCUS: // lParam HWND that is losing focus.
+    {        
+        //OutputDebugStringA("WM_SETFOCUS\n");
+        SetFocus(m_editor);
+        m_editor.Call(SCI_SETFOCUS, true);
+        // Dialog Box's popup as part of handling outside changes,
+        // when they close, focus returns here
+        if (!m_handlingOutsideChanges)
+        {
+            m_handlingOutsideChanges = true;
+            //OutputDebugStringA("CheckForOutsideChanges()\n");
+            CheckForOutsideChanges();
+            m_handlingOutsideChanges = false;
+        }
+        //OutputDebugStringA("CheckForOutsideChanges() compelete\n");
+    }
         break;
     case WM_CLIPBOARDUPDATE:
-        {
-            std::wstring s;
-            if (IsClipboardFormatAvailable(CF_UNICODETEXT))
-            {
-                CClipboardHelper clipboard;
-                if (clipboard.Open(*this))
-                {
-                    HANDLE hData = GetClipboardData(CF_UNICODETEXT);
-                    if (hData)
-                    {
-                        LPCWSTR lptstr = (LPCWSTR)GlobalLock(hData);
-                        if (lptstr != NULL)
-                        {
-                            s = lptstr;
-                            GlobalUnlock(hData);
-                        }
-                    }
-                }
-            }
-            if (!s.empty())
-            {
-                std::wstring sTrimmed = s;
-                CStringUtils::trim(sTrimmed);
-                if (!sTrimmed.empty())
-                {
-                    for (auto it = m_ClipboardHistory.cbegin(); it != m_ClipboardHistory.cend(); ++it)
-                    {
-                        if (it->compare(s) == 0)
-                        {
-                            m_ClipboardHistory.erase(it);
-                            break;
-                        }
-                    }
-                    m_ClipboardHistory.push_front(s);
-                }
-            }
-
-            size_t maxsize = (size_t)CIniSettings::Instance().GetInt64(L"clipboard", L"maxhistory", 20);
-            if (m_ClipboardHistory.size() > maxsize)
-                m_ClipboardHistory.pop_back();
-        }
+        HandleClipboardUpdate();
         break;
     case WM_TIMER:
         CCommandHandler::Instance().OnTimer((UINT)wParam);
@@ -1007,16 +680,18 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_CLOSE:
         CCommandHandler::Instance().OnClose();
-        CIniSettings::Instance().SaveWindowPos(L"MainWindow", *this);
         if (CloseAllTabs())
+        {
+            CIniSettings::Instance().SaveWindowPos(L"MainWindow", *this);
             ::DestroyWindow(m_hwnd);
+        }
         break;
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
 
     return 0;
-};
+}
 
 LRESULT CMainWindow::DoCommand(int id)
 {
@@ -1026,27 +701,7 @@ LRESULT CMainWindow::DoCommand(int id)
         PostMessage(m_hwnd, WM_CLOSE, 0, 0);
         break;
     case cmdNew:
-        {
-            static int newCount = 0;
-            newCount++;
-            CDocument doc;
-            doc.m_document = m_scintilla.Call(SCI_CREATEDOCUMENT);
-            doc.m_bHasBOM = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
-            doc.m_encoding = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
-            ResString newRes(hRes, IDS_NEW_TABTITLE);
-            std::wstring s = CStringUtils::Format(newRes, newCount);
-            int index = -1;
-            if (m_insertionIndex >= 0)
-                index = m_TabBar.InsertAfter(m_insertionIndex, s.c_str());
-            else
-                index = m_TabBar.InsertAtEnd(s.c_str());
-            int id = m_TabBar.GetIDFromIndex(index);
-            m_DocManager.AddDocumentAtEnd(doc, id);
-            m_TabBar.ActivateAt(index);
-            m_scintilla.SetupLexerForLang(L"Text");
-            m_scintilla.GotoLine(0);
-            m_insertionIndex = -1;
-        }
+        OpenNewTab();
         break;
     case cmdClose:
         CloseTab(m_TabBar.GetCurrentTabIndex());
@@ -1055,134 +710,28 @@ LRESULT CMainWindow::DoCommand(int id)
         CloseAllTabs();
         break;
     case cmdCloseAllButThis:
-        {
-            int count = m_TabBar.GetItemCount();
-            int current = m_TabBar.GetCurrentTabIndex();
-            for (int i = count-1; i >= 0; --i)
-            {
-                if (i != current)
-                    CloseTab(i);
-            }
-        }
+        CloseAllButCurrentTab();
         break;
     case cmdCopyPath:
-        {
-            int id = m_TabBar.GetCurrentTabId();
-            if ((id >= 0) && m_DocManager.HasDocumentID(id))
-            {
-                CDocument doc = m_DocManager.GetDocumentFromID(id);
-                WriteAsciiStringToClipboard(doc.m_path.c_str(), *this);
-            }
-        }
+        CopyCurDocPathToClipboard();
         break;
     case cmdCopyName:
-        {
-            int id = m_TabBar.GetCurrentTabId();
-            if ((id >= 0) && m_DocManager.HasDocumentID(id))
-            {
-                CDocument doc = m_DocManager.GetDocumentFromID(id);
-                WriteAsciiStringToClipboard(doc.m_path.substr(doc.m_path.find_last_of(L"\\/")+1).c_str(), *this);
-            }
-        }
+        CopyCurDocNameToClipboard();
         break;
     case cmdCopyDir:
-        {
-            int id = m_TabBar.GetCurrentTabId();
-            if ((id >= 0) && m_DocManager.HasDocumentID(id))
-            {
-                CDocument doc = m_DocManager.GetDocumentFromID(id);
-                WriteAsciiStringToClipboard(doc.m_path.substr(0, doc.m_path.find_last_of(L"\\/")).c_str(), *this);
-            }
-        }
+        CopyCurDocDirToClipboard();
         break;
     case cmdExplore:
-        {
-            int id = m_TabBar.GetCurrentTabId();
-            if ((id >= 0) && m_DocManager.HasDocumentID(id))
-            {
-                CDocument doc = m_DocManager.GetDocumentFromID(id);
-                PCIDLIST_ABSOLUTE __unaligned pidl = ILCreateFromPath(doc.m_path.c_str());
-                if (pidl)
-                {
-                    SHOpenFolderAndSelectItems(pidl,0,0,0);
-                    CoTaskMemFree((LPVOID)pidl);
-                }
-            }
-        }
+        ShowCurDocInExplorer();
         break;
     case cmdExploreProperties:
-        {
-            int id = m_TabBar.GetCurrentTabId();
-            if ((id >= 0) && m_DocManager.HasDocumentID(id))
-            {
-                CDocument doc = m_DocManager.GetDocumentFromID(id);
-                SHELLEXECUTEINFO info = {sizeof(SHELLEXECUTEINFO)};
-                info.lpVerb = L"properties";
-                info.lpFile = doc.m_path.c_str();
-                info.nShow = SW_SHOW;
-                info.fMask = SEE_MASK_INVOKEIDLIST;
-                info.hwnd = *this;
-                ShellExecuteEx(&info);
-            }
-        }
+        ShowCurDocExplorerProperties();
         break;
     case cmdPasteHistory:
-        {
-            if (!m_ClipboardHistory.empty())
-            {
-                // create a context menu with all the items in the clipboard history
-                HMENU hMenu = CreatePopupMenu();
-                if (hMenu)
-                {
-                    size_t pos = m_scintilla.Call(SCI_GETCURRENTPOS);
-                    POINT pt;
-                    pt.x = (LONG)m_scintilla.Call(SCI_POINTXFROMPOSITION, 0, pos);
-                    pt.y = (LONG)m_scintilla.Call(SCI_POINTYFROMPOSITION, 0, pos);
-                    ClientToScreen(m_scintilla, &pt);
-                    int index = 1;
-                    size_t maxsize = (size_t)CIniSettings::Instance().GetInt64(L"clipboard", L"maxuilength", 40);
-                    for (const auto& s : m_ClipboardHistory)
-                    {
-                        std::wstring sf = s;
-                        SearchReplace(sf, L"\t", L" ");
-                        SearchReplace(sf, L"\n", L" ");
-                        SearchReplace(sf, L"\r", L" ");
-                        CStringUtils::trim(sf);
-                        // remove unnecessary whitespace inside the string
-                        std::wstring::iterator new_end = std::unique(sf.begin(), sf.end(), [&] (wchar_t lhs, wchar_t rhs) -> bool
-                        {
-                            return (lhs == rhs) && (lhs == ' ');
-                        });
-                        sf.erase(new_end, sf.end());
-
-                        AppendMenu(hMenu, MF_ENABLED, index, sf.substr(0, maxsize).c_str());
-                        ++index;
-                    }
-                    int selIndex = TrackPopupMenu(hMenu, TPM_LEFTALIGN|TPM_RETURNCMD, pt.x, pt.y, 0, m_scintilla, NULL);
-                    DestroyMenu (hMenu);
-                    if (selIndex > 0)
-                    {
-                        index = 1;
-                        for (const auto& s : m_ClipboardHistory)
-                        {
-                            if (index == selIndex)
-                            {
-                                WriteAsciiStringToClipboard(s.c_str(), *this);
-                                m_scintilla.Call(SCI_PASTE);
-                                break;
-                            }
-                            ++index;
-                        }
-                    }
-                }
-            }
-        }
+        PasteHistory();
         break;
     case cmdAbout:
-        {
-            CAboutDlg dlg(*this);
-            dlg.DoModal(hRes, IDD_ABOUTBOX, *this);
-        }
+        About();
         break;
     default:
         {
@@ -1209,7 +758,7 @@ bool CMainWindow::Initialize()
         if (func)
         {
             func(*this,       WM_COPYDATA, MSGFLT_ALLOW, NULL );
-            func(m_scintilla, WM_COPYDATA, MSGFLT_ALLOW, NULL );
+            func(m_editor, WM_COPYDATA, MSGFLT_ALLOW, NULL );
             func(m_TabBar,    WM_COPYDATA, MSGFLT_ALLOW, NULL );
             func(m_StatusBar, WM_COPYDATA, MSGFLT_ALLOW, NULL );
         }
@@ -1223,7 +772,7 @@ bool CMainWindow::Initialize()
         }
     }
 
-    m_scintilla.Init(hResource, *this);
+    m_editor.Init(hResource, *this);
     int barParts[8] = {100, 300, 550, 650, 750, 780, 820, 880};
     m_StatusBar.Init(hResource, *this, _countof(barParts), barParts);
     m_TabBar.Init(hResource, *this);
@@ -1238,32 +787,84 @@ bool CMainWindow::Initialize()
     ImageList_AddIcon(hImgList, hIcon);
     ::DestroyIcon(hIcon);
     m_TabBar.SetImageList(hImgList);
-    // Here we instantiate the Ribbon framework object.
-    HRESULT hr = CoCreateInstance(CLSID_UIRibbonFramework, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&g_pFramework));
-    if (FAILED(hr))
-    {
-        return false;
-    }
 
-    hr = g_pFramework->Initialize(*this, this);
-    if (FAILED(hr))
-    {
+    if (!CreateRibbon())
         return false;
-    }
-
-    // Finally, we load the binary markup.  This will initiate callbacks to the IUIApplication object
-    // that was provided to the framework earlier, allowing command handlers to be bound to individual
-    // commands.
-    hr = g_pFramework->LoadUI(hRes, L"BOWPAD_RIBBON");
-    if (FAILED(hr))
-    {
-        return false;
-    }
 
     CCommandHandler::Instance().Init(this);
     CKeyboardShortcutHandler::Instance().UpdateTooltips(true);
     AddClipboardFormatListener(*this);
     return true;
+}
+
+bool CMainWindow::CreateRibbon()
+{
+    assert(!g_pFramework); // Not supporting re-initializing.
+    // Here we instantiate the Ribbon framework object.
+    HRESULT hr = CoCreateInstance(CLSID_UIRibbonFramework, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&g_pFramework));
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+
+    hr = g_pFramework->Initialize(*this, this);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+
+    // Finally, we load the binary markup.  This will initiate callbacks to the IUIApplication object
+    // that was provided to the framework earlier, allowing command handlers to be bound to individual
+    // commands.
+    hr = g_pFramework->LoadUI(hRes, L"BOWPAD_RIBBON");
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+    return true;
+}
+
+void CMainWindow::HandleCreate(HWND hwnd)
+{
+    m_hwnd = hwnd;
+    Initialize();
+
+    std::async([=]
+    {
+        bool bNewer = CAppUtils::CheckForUpdate(false);
+        if (bNewer)
+            PostMessage(m_hwnd, WM_UPDATEAVAILABLE, 0, 0);
+    });
+    PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
+
+    if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
+    {
+        // in case we're running elevated, use a BowPad icon with a shield
+        HICON hIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_BOWPAD_ELEVATED), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE|LR_SHARED);
+        ::SendMessage(m_hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+        ::SendMessage(m_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+    }
+}
+
+void CMainWindow::HandleAfterInit()
+{
+    CCommandHandler::Instance().AfterInit();
+    for (const auto& path : m_pathsToOpen)
+    {
+        unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
+        if (m_bPathsToOpenMRU)
+            openFlags |= OpenFlags::AddToMRU;
+        OpenFileEx(path.first, openFlags);
+        if (path.second != (size_t)-1)
+            GoToLine(path.second);
+    }
+    m_bPathsToOpenMRU = true;
+    if (!m_elevatepath.empty())
+    {
+        ElevatedSave(m_elevatepath, m_elevatesavepath, m_initLine);
+        m_elevatepath.clear();
+        m_elevatesavepath.clear();
+    }
+    if (!m_tabmovepath.empty())
+    {
+        TabMove(m_tabmovepath, m_tabmovesavepath, m_tabmovemod, m_initLine);
+        m_tabmovepath.clear();
+        m_tabmovesavepath.clear();
+    }
 }
 
 void CMainWindow::ResizeChildWindows()
@@ -1272,146 +873,167 @@ void CMainWindow::ResizeChildWindows()
     GetClientRect(*this, &rect);
     if (!IsRectEmpty(&rect))
     {
+        const UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
         HDWP hDwp = BeginDeferWindowPos(3);
-        DeferWindowPos(hDwp, m_StatusBar, NULL, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS);
-        DeferWindowPos(hDwp, m_TabBar, NULL, rect.left, rect.top + m_RibbonHeight, rect.right - rect.left, rect.bottom - rect.top, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS);
+        DeferWindowPos(hDwp, m_StatusBar, NULL, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), flags);
+        DeferWindowPos(hDwp, m_TabBar, NULL, rect.left, rect.top + m_RibbonHeight, rect.right - rect.left, rect.bottom - rect.top, flags);
         RECT tabrc;
         TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
         MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
-        DeferWindowPos(hDwp, m_scintilla, NULL, rect.left, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, rect.right - rect.left, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS);
+        DeferWindowPos(hDwp, m_editor, NULL, rect.left, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, rect.right - rect.left, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), flags);
         EndDeferWindowPos(hDwp);
         m_StatusBar.Resize();
     }
 }
 
-bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
+void CMainWindow::EnsureNewLineAtEnd(const CDocument& doc)
 {
-    bool bRet = false;
-    int id = m_TabBar.GetCurrentTabId();
-    if ((id >= 0) && m_DocManager.HasDocumentID(id))
+    size_t endpos = m_editor.Call(SCI_GETLENGTH);
+    char c = (char)m_editor.Call(SCI_GETCHARAT, endpos - 1);
+    if ((c != '\r') && (c != '\n'))
     {
-        CDocument doc = m_DocManager.GetDocumentFromID(id);
-        if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
+        switch (doc.m_format)
         {
-            bSaveAs = true;
-            PreserveChdir keepCWD;
-
-            IFileSaveDialogPtr pfd = NULL;
-
-            HRESULT hr = pfd.CreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_INPROC_SERVER);
-            if (SUCCEEDED(hr))
-            {
-                // Set the dialog options
-                DWORD dwOptions;
-                if (SUCCEEDED(hr = pfd->GetOptions(&dwOptions)))
-                {
-                    hr = pfd->SetOptions(dwOptions | FOS_FORCEFILESYSTEM | FOS_OVERWRITEPROMPT);
-                }
-
-                // Set a title
-                if (SUCCEEDED(hr))
-                {
-                    ResString sTitle(hRes, IDS_APP_TITLE);
-                    std::wstring s = (const wchar_t*)sTitle;
-                    s += L" - ";
-                    wchar_t buf[100] = {0};
-                    m_TabBar.GetCurrentTitle(buf, _countof(buf));
-                    s += buf;
-                    pfd->SetTitle(s.c_str());
-                }
-
-                // set the default folder to the folder of the current tab
-                if (!doc.m_path.empty())
-                {
-                    std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
-                    IShellItemPtr psiDefFolder = NULL;
-                    hr = SHCreateItemFromParsingName(folder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
-
-                    if (SUCCEEDED(hr))
-                    {
-                        pfd->SetFolder(psiDefFolder);
-                    }
-                }
-
-                // Show the save file dialog
-                if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(*this)))
-                {
-                    IShellItemPtr psiResult = NULL;
-                    hr = pfd->GetResult(&psiResult);
-                    if (SUCCEEDED(hr))
-                    {
-                        PWSTR pszPath = NULL;
-                        hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
-                        if (SUCCEEDED(hr))
-                        {
-                            doc.m_path = pszPath;
-                            CMRU::Instance().AddPath(doc.m_path);
-                        }
-                        else
-                            return bRet;
-                    }
-                    else
-                        return bRet;
-                }
-                else
-                    return bRet;
-            }
-        }
-        if (!doc.m_path.empty())
-        {
-            doc.m_bDoSaveAs = false;
-            if (doc.m_bTrimBeforeSave)
-            {
-                auto cmd = CCommandHandler::Instance().GetCommand(cmdTrim);
-                cmd->Execute();
-            }
-            if (doc.m_bEnsureNewlineAtEnd)
-            {
-                size_t endpos = m_scintilla.Call(SCI_GETLENGTH);
-                char c = (char)m_scintilla.Call(SCI_GETCHARAT, endpos - 1);
-                if ((c != '\r') && (c != '\n'))
-                {
-                    switch (doc.m_format)
-                    {
-                        case WIN_FORMAT:
-                            m_scintilla.Call(SCI_APPENDTEXT, 2, (sptr_t)"\r\n");
-                            break;
-                        case MAC_FORMAT:
-                            m_scintilla.Call(SCI_APPENDTEXT, 1, (sptr_t)"\r");
-                            break;
-                        case UNIX_FORMAT:
-                        default:
-                            m_scintilla.Call(SCI_APPENDTEXT, 1, (sptr_t)"\n");
-                            break;
-                    }
-                }
-            }
-            bRet = m_DocManager.SaveFile(*this, doc);
-            if (bRet)
-            {
-                if (_wcsicmp(CIniSettings::Instance().GetIniPath().c_str(), doc.m_path.c_str()) == 0)
-                {
-                    CIniSettings::Instance().Reload();
-                }
-
-                doc.m_bIsDirty = false;
-                doc.m_bNeedsSaving = false;
-                m_DocManager.UpdateFileTime(doc);
-                if (bSaveAs)
-                {
-                    doc.m_language = CLexStyles::Instance().GetLanguageForExt(doc.m_path.substr(doc.m_path.find_last_of('.')+1));
-                    m_scintilla.SetupLexerForExt(doc.m_path.substr(doc.m_path.find_last_of('.')+1).c_str());
-                }
-                std::wstring sFileName = doc.m_path.substr(doc.m_path.find_last_of('\\')+1);
-                m_TabBar.SetCurrentTitle(sFileName.c_str());
-                m_DocManager.SetDocument(id, doc);
-                UpdateStatusBar(true);
-                m_scintilla.Call(SCI_SETSAVEPOINT);
-                CCommandHandler::Instance().OnDocumentSave(m_TabBar.GetCurrentTabIndex(), bSaveAs);
-            }
+            case WIN_FORMAT:
+                m_editor.Call(SCI_APPENDTEXT, 2, (sptr_t)"\r\n");
+                break;
+            case MAC_FORMAT:
+                m_editor.Call(SCI_APPENDTEXT, 1, (sptr_t)"\r");
+                break;
+            case UNIX_FORMAT:
+            default:
+                m_editor.Call(SCI_APPENDTEXT, 1, (sptr_t)"\n");
+                break;
         }
     }
-    return bRet;
+}
+
+bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
+{
+    int docID = m_TabBar.GetCurrentTabId();
+    if (docID < 0)
+        return false;
+    if (!m_DocManager.HasDocumentID(docID))
+        return false;
+
+    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
+    {
+        bSaveAs = true;
+        PreserveChdir keepCWD;
+
+        IFileSaveDialogPtr pfd = NULL;
+
+        HRESULT hr = pfd.CreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_INPROC_SERVER);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+
+        // Set the dialog options
+        DWORD dwOptions;
+        hr = pfd->GetOptions(&dwOptions);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+        hr = pfd->SetOptions(dwOptions | FOS_FORCEFILESYSTEM | FOS_OVERWRITEPROMPT);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+
+        std::wstring s = GetAppName();
+        s += L" - ";
+        s += m_TabBar.GetCurrentTitle();
+        hr = pfd->SetTitle(s.c_str());
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+
+        // set the default folder to the folder of the current tab
+        if (!doc.m_path.empty())
+        {
+            std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
+            IShellItemPtr psiDefFolder = NULL;
+            hr = SHCreateItemFromParsingName(folder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
+            if (CAppUtils::FailedShowMessage(hr))
+                return false;
+            hr = pfd->SetFolder(psiDefFolder);
+            if (CAppUtils::FailedShowMessage(hr))
+                return false;
+        }
+
+        // Show the save file dialog
+        hr = pfd->Show(*this);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+        IShellItemPtr psiResult = NULL;
+        hr = pfd->GetResult(&psiResult);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+        PWSTR pszPath = NULL;
+        hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+        doc.m_path = pszPath;
+        CMRU::Instance().AddPath(doc.m_path);
+    }
+    if (!doc.m_path.empty())
+    {
+        doc.m_bDoSaveAs = false;
+        if (doc.m_bTrimBeforeSave)
+        {
+            auto cmd = CCommandHandler::Instance().GetCommand(cmdTrim);
+            cmd->Execute();
+        }
+        if (doc.m_bEnsureNewlineAtEnd)
+        {
+            EnsureNewLineAtEnd(doc);
+        }
+        if (!m_DocManager.SaveFile(*this, doc))
+            return false;
+
+        if (_wcsicmp(CIniSettings::Instance().GetIniPath().c_str(), doc.m_path.c_str()) == 0)
+        {
+            CIniSettings::Instance().Reload();
+        }
+
+        doc.m_bIsDirty = false;
+        doc.m_bNeedsSaving = false;
+        m_DocManager.UpdateFileTime(doc);
+        if (bSaveAs)
+        {
+            std::wstring ext = CPathUtils::GetFileExtension(doc.m_path);
+            doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
+            m_editor.SetupLexerForExt(ext);
+        }
+        std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
+        m_TabBar.SetCurrentTitle(sFileName.c_str());
+        m_DocManager.SetDocument(docID, doc);
+        // TOOD Review! UpdateTab added here - yet to figure out what bug it fixes.
+        // But think it does!
+        UpdateTab(docID);
+        UpdateCaptionBar();
+        UpdateStatusBar(true);
+        m_editor.Call(SCI_SETSAVEPOINT);
+        CCommandHandler::Instance().OnDocumentSave(m_TabBar.GetCurrentTabIndex(), bSaveAs);
+    }
+    return true;
+}
+
+void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& savepath, long line )
+{
+    std::wstring filepath = CPathUtils::GetLongPathname(path);
+    int docID = m_DocManager.GetIdForPath(filepath.c_str());
+    if (docID != -1)
+    {
+        int tab = m_TabBar.GetIndexFromID(docID);
+        m_TabBar.ActivateAt(tab);
+        CDocument doc = m_DocManager.GetDocumentFromID(docID);
+        doc.m_path = CPathUtils::GetLongPathname(savepath);
+        m_DocManager.SetDocument(docID, doc);
+        SaveCurrentTab();
+        UpdateCaptionBar();
+        UpdateStatusBar(true);
+        GoToLine(line);
+
+        // delete the temp file used for the elevated save
+        DeleteFile(path.c_str());
+    }
 }
 
 void CMainWindow::EnsureAtLeastOneTab()
@@ -1422,7 +1044,7 @@ void CMainWindow::EnsureAtLeastOneTab()
 
 void CMainWindow::GoToLine( size_t line )
 {
-    m_scintilla.Call(SCI_GOTOLINE, line);
+    m_editor.Call(SCI_GOTOLINE, line);
 }
 
 void CMainWindow::UpdateStatusBar( bool bEverything )
@@ -1440,12 +1062,12 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     size_t selByte = 0;
     size_t selLine = 0;
 
-    if (m_scintilla.GetSelectedCount(selByte, selLine))
+    if (m_editor.GetSelectedCount(selByte, selLine))
         swprintf_s(strSel, L"Sel : %Iu | %Iu", selByte, selLine);
     else
         swprintf_s(strSel, L"Sel : %s", L"N/A");
-    long line = (long)m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1;
-    long column = (long)m_scintilla.Call(SCI_GETCOLUMN, m_scintilla.Call(SCI_GETCURRENTPOS)) + 1;
+    long line = (long)m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS)) + 1;
+    long column = (long)m_editor.Call(SCI_GETCOLUMN, m_editor.Call(SCI_GETCURRENTPOS)) + 1;
     swprintf_s(strLnCol, L"Ln : %ld    Col : %ld    %s",
                        line, column,
                        strSel);
@@ -1453,12 +1075,12 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     m_StatusBar.SetText(strLnCol, ttcurpos.c_str(), STATUSBAR_CUR_POS);
 
     TCHAR strDocLen[256];
-    swprintf_s(strDocLen, L"length : %d    lines : %d", (int)m_scintilla.Call(SCI_GETLENGTH), (int)m_scintilla.Call(SCI_GETLINECOUNT));
-    std::wstring ttdocsize = CStringUtils::Format(rsStatusTTDocSize, m_scintilla.Call(SCI_GETLENGTH), m_scintilla.Call(SCI_GETLINECOUNT));
+    swprintf_s(strDocLen, L"length : %d    lines : %d", (int)m_editor.Call(SCI_GETLENGTH), (int)m_editor.Call(SCI_GETLINECOUNT));
+    std::wstring ttdocsize = CStringUtils::Format(rsStatusTTDocSize, m_editor.Call(SCI_GETLENGTH), m_editor.Call(SCI_GETLINECOUNT));
     m_StatusBar.SetText(strDocLen, ttdocsize.c_str(), STATUSBAR_DOC_SIZE);
 
-    std::wstring tttyping = CStringUtils::Format(rsStatusTTTyping, m_scintilla.Call(SCI_GETOVERTYPE) ? (LPCWSTR)rsStatusTTTypingOvl : (LPCWSTR)rsStatusTTTypingIns);
-    m_StatusBar.SetText(m_scintilla.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
+    std::wstring tttyping = CStringUtils::Format(rsStatusTTTyping, m_editor.Call(SCI_GETOVERTYPE) ? (LPCWSTR)rsStatusTTTypingOvl : (LPCWSTR)rsStatusTTTypingIns);
+    m_StatusBar.SetText(m_editor.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", NULL, STATUSBAR_CAPS);
     if (bEverything)
@@ -1488,49 +1110,22 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
     if (!force && (doc.m_bIsDirty||doc.m_bNeedsSaving))
     {
         m_TabBar.ActivateAt(tab);
-        ResString rTitle(hRes, IDS_HASMODIFICATIONS);
-        ResString rQuestion(hRes, IDS_DOYOUWANTOSAVE);
-        ResString rSave(hRes, IDS_SAVE);
-        ResString rDontSave(hRes, IDS_DONTSAVE);
-        wchar_t buf[100] = {0};
-        m_TabBar.GetCurrentTitle(buf, _countof(buf));
-        std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
-
-        TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-        TASKDIALOG_BUTTON aCustomButtons[2];
-        aCustomButtons[0].nButtonID = 100;
-        aCustomButtons[0].pszButtonText = rSave;
-        aCustomButtons[1].nButtonID = 101;
-        aCustomButtons[1].pszButtonText = rDontSave;
-
-        tdc.hwndParent = *this;
-        tdc.hInstance = hRes;
-        tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
-        tdc.pButtons = aCustomButtons;
-        tdc.cButtons = _countof(aCustomButtons);
-        tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-        tdc.pszMainIcon = TD_INFORMATION_ICON;
-        tdc.pszMainInstruction = rTitle;
-        tdc.pszContent = sQuestion.c_str();
-        tdc.nDefaultButton = 100;
-        int nClickedBtn = 0;
-        HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
-
-        if (SUCCEEDED(hr))
+        auto nClickedBtn = AskToCloseTab();
+        // Options:
+        // Save and Close OR
+        // Don't Save and Close OR
+        // Cancel and Stay Open
+        if (nClickedBtn == 100) // Save And (fallthroug to) Close
+            SaveCurrentTab();
+        else if (nClickedBtn != 101) // Cancel And Stay Open
         {
-            if (nClickedBtn == 100)
-                SaveCurrentTab();
-            else if (nClickedBtn != 101)
-            {
-                m_TabBar.ActivateAt(tab);
-                return false;  // don't close!
-            }
+            m_TabBar.ActivateAt(tab);
+            return false;
         }
-
-        m_TabBar.ActivateAt(tab);
+        // Will Close
     }
 
-    if ((m_TabBar.GetItemCount() == 1)&&(m_scintilla.Call(SCI_GETTEXTLENGTH)==0)&&(m_scintilla.Call(SCI_GETMODIFY)==0)&&doc.m_path.empty())
+    if ((m_TabBar.GetItemCount() == 1)&&(m_editor.Call(SCI_GETTEXTLENGTH)==0)&&(m_editor.Call(SCI_GETMODIFY)==0)&&doc.m_path.empty())
         return true;  // leave the empty, new document as is
 
     CCommandHandler::Instance().OnDocumentClose(tab);
@@ -1548,163 +1143,665 @@ bool CMainWindow::CloseAllTabs()
     {
         if (CloseTab(m_TabBar.GetItemCount()-1) == false)
             return false;
-        if ((m_TabBar.GetItemCount() == 1)&&(m_scintilla.Call(SCI_GETTEXTLENGTH)==0)&&(m_scintilla.Call(SCI_GETMODIFY)==0)&&m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0)).m_path.empty())
+        if ((m_TabBar.GetItemCount() == 1)&&(m_editor.Call(SCI_GETTEXTLENGTH)==0)&&(m_editor.Call(SCI_GETMODIFY)==0)&&m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0)).m_path.empty())
             return true;
     } while (m_TabBar.GetItemCount() > 0);
     return true;
 }
 
-bool CMainWindow::OpenFile(const std::wstring& file, bool bAddToMRU)
+void CMainWindow::CloseAllButCurrentTab()
 {
-    bool bRet = true;
-    int encoding = -1;
-    std::wstring filepath = CPathUtils::GetLongPathname(file);
-    if (_wcsicmp(CIniSettings::Instance().GetIniPath().c_str(), filepath.c_str()) == 0)
+    int count = m_TabBar.GetItemCount();
+    int current = m_TabBar.GetCurrentTabIndex();
+    for (int i = count-1; i >= 0; --i)
     {
-        CIniSettings::Instance().Save();
+        if (i != current)
+            CloseTab(i);
     }
-    int id = m_DocManager.GetIdForPath(filepath.c_str());
-    if (id != -1)
+}
+
+void CMainWindow::UpdateCaptionBar()
+{
+    int docID = m_TabBar.GetCurrentTabId();
+    std::wstring appName = GetAppName();
+    if (m_DocManager.HasDocumentID(docID))
     {
-        // document already open
-        m_TabBar.ActivateAt(m_TabBar.GetIndexFromID(id));
+        CDocument doc = m_DocManager.GetDocumentFromID(docID);
+
+        std::wstring sWindowTitle = doc.m_path.empty() ? m_TabBar.GetCurrentTitle() : doc.m_path;
+        sWindowTitle += L" - ";
+        sWindowTitle += appName;
+        SetWindowText(*this, sWindowTitle.c_str());
+    }
+    else
+        SetWindowText(*this, appName.c_str());
+}
+
+void CMainWindow::UpdateTab(int docID)
+{
+    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    TCITEM tie;
+    tie.lParam = -1;
+    tie.mask = TCIF_IMAGE;
+    if (doc.m_bIsReadonly)
+        tie.iImage = REDONLY_IMG_INDEX;
+    else
+        tie.iImage = doc.m_bIsDirty || doc.m_bNeedsSaving ? UNSAVED_IMG_INDEX : SAVED_IMG_INDEX;
+    TabCtrl_SetItem(m_TabBar, m_TabBar.GetIndexFromID(docID), &tie);
+}
+
+int CMainWindow::AskToCloseTab() const
+{
+    ResString rTitle(hRes, IDS_HASMODIFICATIONS);
+    ResString rQuestion(hRes, IDS_DOYOUWANTOSAVE);
+    ResString rSave(hRes, IDS_SAVE);
+    ResString rDontSave(hRes, IDS_DONTSAVE);
+    std::wstring sQuestion = CStringUtils::Format(rQuestion, m_TabBar.GetCurrentTitle().c_str());
+
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    TASKDIALOG_BUTTON aCustomButtons[2];
+    aCustomButtons[0].nButtonID = 100;
+    aCustomButtons[0].pszButtonText = rSave;
+    aCustomButtons[1].nButtonID = 101;
+    aCustomButtons[1].pszButtonText = rDontSave;
+    tdc.pButtons = aCustomButtons;
+    tdc.cButtons = _countof(aCustomButtons);
+    assert(tdc.cButtons <= _countof(aCustomButtons));
+    tdc.nDefaultButton = 100;
+
+    tdc.hwndParent = *this;
+    tdc.hInstance = hRes;
+    tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+    tdc.pszMainIcon = TD_INFORMATION_ICON;
+    tdc.pszMainInstruction = rTitle;
+    tdc.pszContent = sQuestion.c_str();
+    int nClickedBtn = 0;
+    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, NULL, NULL );
+    if (CAppUtils::FailedShowMessage(hr))
+        return 0;
+    return nClickedBtn;
+}
+
+int CMainWindow::AskToReloadOutsideModifiedFile(const CDocument& doc) const
+{
+    bool changed = doc.m_bNeedsSaving || doc.m_bIsDirty;
+    ResString rTitle(hRes, IDS_OUTSIDEMODIFICATIONS);
+    ResString rQuestion(hRes, changed ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
+    ResString rSave(hRes, IDS_SAVELOSTOUTSIDEMODS);
+    ResString rReload(hRes, changed ? IDS_RELOADLOSTMODS : IDS_RELOAD);
+    ResString rCancel(hRes, IDS_NORELOAD);
+    // Be specific about what they are re-loading.
+    std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
+
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    TASKDIALOG_BUTTON aCustomButtons[3];
+    int bi = 0;
+    aCustomButtons[bi].nButtonID = 101;
+    aCustomButtons[bi++].pszButtonText = rReload;
+    if (changed)
+    {
+        aCustomButtons[bi].nButtonID = 102;
+        aCustomButtons[bi++].pszButtonText = rSave;
+    }
+    aCustomButtons[bi].nButtonID = 100;
+    aCustomButtons[bi++].pszButtonText = rCancel;
+    tdc.pButtons = aCustomButtons;
+    tdc.cButtons = bi;
+    assert(tdc.cButtons <= _countof(aCustomButtons));
+    tdc.nDefaultButton = 100;  // default to "Cancel" in case the file is modified
+
+    tdc.hwndParent = *this;
+    tdc.hInstance = hRes;
+    tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+    tdc.pszMainIcon = changed ? TD_WARNING_ICON : TD_INFORMATION_ICON;
+    tdc.pszMainInstruction = rTitle;
+    tdc.pszContent = sQuestion.c_str();
+    int nClickedBtn = 0;
+    HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
+    if (CAppUtils::FailedShowMessage(hr))
+        return 0;
+    return nClickedBtn;
+}
+
+int CMainWindow::AskToReload(const CDocument& doc) const
+{
+    ResString rTitle(hRes, IDS_HASMODIFICATIONS);
+    ResString rQuestion(hRes, IDS_RELOADREALLY);
+    ResString rReload(hRes, IDS_DORELOAD);
+    ResString rCancel(hRes, IDS_DONTRELOAD);
+    // Be specific about what they are re-loading.
+    std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
+
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    TASKDIALOG_BUTTON aCustomButtons[2];
+    aCustomButtons[0].nButtonID = 101;
+    aCustomButtons[0].pszButtonText = rReload;
+    aCustomButtons[1].nButtonID = 100;
+    aCustomButtons[1].pszButtonText = rCancel;
+    tdc.pButtons = aCustomButtons;
+    tdc.cButtons = _countof(aCustomButtons);
+    assert(tdc.cButtons <= _countof(aCustomButtons));
+    tdc.nDefaultButton = 100; // Default to cancel
+
+    tdc.hwndParent = *this;
+    tdc.hInstance = hRes;
+    tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+    tdc.pszMainIcon = TD_WARNING_ICON; // Warn because we are going to throw away the document.
+    tdc.pszMainInstruction = rTitle;
+    tdc.pszContent = sQuestion.c_str();
+    int nClickedBtn = 0;
+    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, NULL, NULL );
+    if (CAppUtils::FailedShowMessage(hr))
+        return 0;
+    return nClickedBtn;
+}
+
+int CMainWindow::AskToRemoveFile(const CDocument& doc) const
+{
+    ResString rTitle(hRes, IDS_OUTSIDEREMOVEDHEAD);
+    ResString rQuestion(hRes, IDS_OUTSIDEREMOVED);
+    ResString rKeep(hRes, IDS_OUTSIDEREMOVEDKEEP);
+    ResString rClose(hRes, IDS_OUTSIDEREMOVEDCLOSE);
+    // Be specific about what they are removing.
+    std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
+
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    TASKDIALOG_BUTTON aCustomButtons[2];
+    int bi = 0;
+    aCustomButtons[bi].nButtonID = 100;
+    aCustomButtons[bi++].pszButtonText = rKeep;
+    aCustomButtons[bi].nButtonID = 101;
+    aCustomButtons[bi].pszButtonText = rClose;
+    tdc.pButtons = aCustomButtons;
+    tdc.cButtons = _countof(aCustomButtons);
+    tdc.nDefaultButton = 100;
+
+    tdc.hwndParent = *this;
+    tdc.hInstance = hRes;
+    tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+    tdc.pszMainIcon = TD_INFORMATION_ICON;
+    tdc.pszMainInstruction = rTitle;
+    tdc.pszContent = sQuestion.c_str();
+    int nClickedBtn = 0;
+    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, NULL, NULL );
+    if (CAppUtils::FailedShowMessage(hr))
+        return 0;
+    return nClickedBtn;
+}
+
+int CMainWindow::AskToRemoveReadOnlyAttribute() const
+{
+    ResString rTitle(hRes, IDS_FILEISREADONLY);
+    ResString rQuestion(hRes, IDS_FILEMAKEWRITABLEASK);
+    ResString rEditFile(hRes, IDS_EDITFILE);
+    ResString rCancel(hRes, IDS_CANCEL);
+
+    // TODO! remove the short cut accelerator &e &c
+    // options from these buttons because this dialog is auomatically
+    // triggered by typing and it's too easy to accidentally
+    // acknowledge the button by type say hello int o the editor
+    // and getting interrupted by the dialog and matching the 
+    // the edit button with the e of hello.
+    // Need mew resource entries for this.
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    TASKDIALOG_BUTTON aCustomButtons[2];
+    aCustomButtons[0].nButtonID = 101;
+    aCustomButtons[0].pszButtonText = rEditFile;
+    aCustomButtons[1].nButtonID = 100;
+    aCustomButtons[1].pszButtonText = rCancel;
+    tdc.pButtons = aCustomButtons;
+    tdc.cButtons = _countof(aCustomButtons);
+    assert(tdc.cButtons <= _countof(aCustomButtons));
+    tdc.nDefaultButton = 100; // Default to cancel
+
+    tdc.hwndParent = *this;
+    tdc.hInstance = hRes;
+    tdc.dwFlags = TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+    tdc.pszMainIcon = TD_WARNING_ICON;
+    tdc.pszMainInstruction = rTitle;
+    tdc.pszContent = rQuestion;
+    int nClickedBtn = 0;
+    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
+    if (CAppUtils::FailedShowMessage(hr))
+        return 0;
+    return nClickedBtn;
+}
+
+// Returns true if file exists or was created.
+int CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
+{
+    ResString rTitle(hRes, IDS_FILE_DOESNT_EXIST);
+    ResString rQuestion(hRes, IDS_FILE_ASK_TO_CREATE);
+    ResString rCreate(hRes, IDS_FILE_CREATE);
+    ResString rCancel(hRes, IDS_FILE_CREATE_CANCEL);
+    // Show exactly what we are creating.
+    std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
+
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    TASKDIALOG_BUTTON aCustomButtons[2];
+    int bi = 0;
+    aCustomButtons[bi].nButtonID = 101;
+    aCustomButtons[bi++].pszButtonText = rCreate;
+    aCustomButtons[bi].nButtonID = 100;
+    aCustomButtons[bi++].pszButtonText = rCancel;
+    tdc.pButtons = aCustomButtons;
+    tdc.cButtons = bi;
+    assert(tdc.cButtons <= _countof(aCustomButtons));
+    tdc.nDefaultButton = 101; // Default to cancel as to easy to create by mistake.
+
+    tdc.hwndParent = *this;
+    tdc.hInstance = hRes;
+    tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+    tdc.pszMainIcon = TD_INFORMATION_ICON;
+    tdc.pszMainInstruction = rTitle;
+    tdc.pszContent = sQuestion.c_str();
+    int nClickedBtn = 0;
+    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
+    return CAppUtils::FailedShowMessage(hr) ? 0 : nClickedBtn;
+}
+
+void CMainWindow::CopyCurDocPathToClipboard() const
+{
+    int id = m_TabBar.GetCurrentTabId();
+    if (m_DocManager.HasDocumentID(id))
+    {
+        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        WriteAsciiStringToClipboard(doc.m_path.c_str(), *this);
+    }
+}
+
+void CMainWindow::CopyCurDocNameToClipboard() const
+{
+    int id = m_TabBar.GetCurrentTabId();
+    if (m_DocManager.HasDocumentID(id))
+    {
+        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        WriteAsciiStringToClipboard(CPathUtils::GetFileName(doc.m_path).c_str(), *this);
+    }
+}
+
+void CMainWindow::CopyCurDocDirToClipboard() const
+{
+    int id = m_TabBar.GetCurrentTabId();
+    if (m_DocManager.HasDocumentID(id))
+    {
+        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        // FIXME TODO! Create/use an appropriate CPathUtils function for this.
+        WriteAsciiStringToClipboard(doc.m_path.substr(0, doc.m_path.find_last_of(L"\\/")).c_str(), *this);
+    }
+}
+
+void CMainWindow::ShowCurDocInExplorer() const
+{
+    int id = m_TabBar.GetCurrentTabId();
+    if (m_DocManager.HasDocumentID(id))
+    {
+        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        PCIDLIST_ABSOLUTE __unaligned pidl = ILCreateFromPath(doc.m_path.c_str());
+        if (pidl)
+        {
+            SHOpenFolderAndSelectItems(pidl,0,0,0);
+            CoTaskMemFree((LPVOID)pidl);
+        }
+    }
+}
+
+void CMainWindow::ShowCurDocExplorerProperties() const
+{
+    int id = m_TabBar.GetCurrentTabId();
+    if (m_DocManager.HasDocumentID(id))
+    {
+        // This creates an ugly exception dialog on my machine in debug mode
+        // but it seems to work anyway.
+        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        SHELLEXECUTEINFO info = {sizeof(SHELLEXECUTEINFO)};
+        info.lpVerb = L"properties";
+        info.lpFile = doc.m_path.c_str();
+        info.nShow = SW_NORMAL;
+        info.fMask = SEE_MASK_INVOKEIDLIST;
+        info.hwnd = *this;
+        ShellExecuteEx(&info);
+    }
+}
+
+void CMainWindow::HandleClipboardUpdate()
+{
+    std::wstring s;
+    if (IsClipboardFormatAvailable(CF_UNICODETEXT))
+    {
+        CClipboardHelper clipboard;
+        if (clipboard.Open(*this))
+        {
+            HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+            if (hData)
+            {
+                LPCWSTR lptstr = (LPCWSTR)GlobalLock(hData);
+                if (lptstr != NULL)
+                {
+                    s = lptstr;
+                    GlobalUnlock(hData);
+                }
+            }
+        }
+    }
+    if (!s.empty())
+    {
+        std::wstring sTrimmed = s;
+        CStringUtils::trim(sTrimmed);
+        if (!sTrimmed.empty())
+        {
+            for (auto it = m_ClipboardHistory.cbegin(); it != m_ClipboardHistory.cend(); ++it)
+            {
+                if (it->compare(s) == 0)
+                {
+                    m_ClipboardHistory.erase(it);
+                    break;
+                }
+            }
+            m_ClipboardHistory.push_front(s);
+        }
+    }
+
+    size_t maxsize = (size_t)CIniSettings::Instance().GetInt64(L"clipboard", L"maxhistory", 20);
+    if (m_ClipboardHistory.size() > maxsize)
+        m_ClipboardHistory.pop_back();
+}
+
+void CMainWindow::PasteHistory()
+{
+    if (!m_ClipboardHistory.empty())
+    {
+        // create a context menu with all the items in the clipboard history
+        HMENU hMenu = CreatePopupMenu();
+        if (hMenu)
+        {
+            size_t pos = m_editor.Call(SCI_GETCURRENTPOS);
+            POINT pt;
+            pt.x = (LONG)m_editor.Call(SCI_POINTXFROMPOSITION, 0, pos);
+            pt.y = (LONG)m_editor.Call(SCI_POINTYFROMPOSITION, 0, pos);
+            ClientToScreen(m_editor, &pt);
+            int index = 1;
+            size_t maxsize = (size_t)CIniSettings::Instance().GetInt64(L"clipboard", L"maxuilength", 40);
+            for (const auto& s : m_ClipboardHistory)
+            {
+                std::wstring sf = s;
+                SearchReplace(sf, L"\t", L" ");
+                SearchReplace(sf, L"\n", L" ");
+                SearchReplace(sf, L"\r", L" ");
+                CStringUtils::trim(sf);
+                // remove unnecessary whitespace inside the string
+                std::wstring::iterator new_end = std::unique(sf.begin(), sf.end(), [&] (wchar_t lhs, wchar_t rhs) -> bool
+                {
+                    return (lhs == rhs) && (lhs == ' ');
+                });
+                sf.erase(new_end, sf.end());
+
+                AppendMenu(hMenu, MF_ENABLED, index, sf.substr(0, maxsize).c_str());
+                ++index;
+            }
+            int selIndex = TrackPopupMenu(hMenu, TPM_LEFTALIGN|TPM_RETURNCMD, pt.x, pt.y, 0, m_editor, NULL);
+            DestroyMenu (hMenu);
+            if (selIndex > 0)
+            {
+                index = 1;
+                for (const auto& s : m_ClipboardHistory)
+                {
+                    if (index == selIndex)
+                    {
+                        WriteAsciiStringToClipboard(s.c_str(), *this);
+                        m_editor.Call(SCI_PASTE);
+                        break;
+                    }
+                    ++index;
+                }
+            }
+        }
+    }
+}
+
+// Show Tool Tips and colors for colors and numbers and their
+// conversions to hex octal etc.
+// e.g. 0xF0F hex == 3855 decimal == 07417 octal.
+void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
+{
+    int style = (int)m_editor.Call(SCI_GETSTYLEAT, scn.position);
+    // Note style will be zero if no style or past end of the document.
+    if (style & INDIC2_MASK)
+    {
+        // an url hotspot
+        ResString str(hRes, IDS_CTRLCLICKTOOPEN);
+        std::string strA = CUnicodeUtils::StdGetUTF8((LPCWSTR)str);
+        m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)strA.c_str());
+        return;
+    }
+    m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#");
+    Scintilla::Sci_TextRange tr = {0};
+    tr.chrg.cpMin = static_cast<long>(m_editor.Call(SCI_WORDSTARTPOSITION, scn.position, false));
+    tr.chrg.cpMax = static_cast<long>(m_editor.Call(SCI_WORDENDPOSITION, scn.position, false));
+    auto len = tr.chrg.cpMax - tr.chrg.cpMin;
+    std::unique_ptr<char[]> word(new char[len + 2]);
+    tr.lpstrText = word.get();
+
+    m_editor.Call(SCI_GETTEXTRANGE, 0, (sptr_t)&tr);
+
+    std::string sWord = tr.lpstrText;
+    m_editor.Call(SCI_SETCHARSDEFAULT);
+    if (sWord.empty())
+        return;
+
+    // TODO: Extract parsing to utility/functions for clarity.
+    // Short form or long form html color e.g. #F0F or #FF00FF
+    if (sWord[0] == '#' && (sWord.size() == 4 || sWord.size() == 7))
+    {
+        bool failed = true;
+        COLORREF color = 0;
+        DWORD hexval = 0;
+
+        // Note: could use std::stoi family of functions but they throw
+        // range exceptions etc. and VC reports those in the debugger output
+        // window. That's distracting and gives the impression something
+        // is drastically wrong when it isn't, so we don't use those.
+
+        std::string strNum = sWord.substr(1); // Drop #
+        if (strNum.size() == 3) // short form .e.g. F0F
+        {
+            BYTE rgb[3]; // [0]=red, [1]=green, [2]=blue
+            failed = false;
+            char dig[2];
+            dig[1] = '\0';
+            for (int i = 0; i < 3; ++i)
+            {
+                dig[0] = strNum[i];
+                BYTE& v = rgb[i];
+                char* ep = nullptr;
+                errno = 0;
+                // Must convert all digits of string.
+                v = (BYTE) strtoul(dig, &ep, 16);
+                if (errno == 0 && ep == &dig[1])
+                    v = v * 16 + v;
+                else
+                {
+                    v = 0;
+                    failed = true;
+                }
+            }
+            if (!failed)
+            {
+                color = RGB(rgb[0], rgb[1], rgb[2]);
+                hexval = (RGB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF)) | (color & 0xFF000000);
+            }
+        }
+        else if (strNum.size() == 6) // normal/long form, e.g. FF00FF
+        {                    
+            char* ep = nullptr;
+            failed = false;
+            errno = 0;
+            hexval = strtoul(strNum.c_str(), &ep, 16);
+            // Must convert all digits of string.
+            if (errno == 0 && ep == &strNum[6] )
+                color = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
+            else
+                failed = true;
+        }
+        if (!failed)
+        {
+            std::string sCallTip = CStringUtils::Format("RGB(%d,%d,%d)\nHex: #%06lX\n####################\n####################\n####################", GetRValue(color), GetGValue(color), GetBValue(color), hexval);
+            m_editor.Call(SCI_CALLTIPSETFOREHLT, color);
+            m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)sCallTip.c_str());
+            size_t pos = sCallTip.find_first_of('\n');
+            pos = sCallTip.find_first_of('\n', pos+1);
+            m_editor.Call(SCI_CALLTIPSETHLT, pos, pos+63); // FIXME! What is 63?
+        }
     }
     else
     {
-        CDocument doc = m_DocManager.LoadFile(*this, filepath.c_str(), encoding);
-        if (doc.m_document)
+        // Assume a number format determined by the string itself
+        // and as recognized as a valid format according to strtoll:
+        // e.g. 0xF0F hex == 3855 decimal == 07417 octal.
+        // Use long long to yield more conversion range than say just long.
+        long long number = 0;
+        char* ep = nullptr;
+        // 0 base means determine base from any format in the string.
+        errno = 0;
+        number = strtoll(sWord.c_str(), &ep, 0);
+        // Be forgiving if given 100xyz, show 100, but 
+        // don't accept xyz100, show nothing.
+        // BTW: errno seems to be 0 even if nothing is converted.
+        // Must convert some digits of string.
+
+        if (errno == 0 && ep != &sWord[0])
         {
-            if (m_TabBar.GetItemCount() == 1)
-            {
-                // check if the only tab is empty and if it is, remove it
-                CDocument existDoc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0));
-                if (existDoc.m_path.empty() && (m_scintilla.Call(SCI_GETLENGTH)==0) && (m_scintilla.Call(SCI_CANUNDO)==0))
-                {
-                    m_DocManager.RemoveDocument(m_TabBar.GetIDFromIndex(0));
-                    m_TabBar.DeletItemAt(0);
-                }
-            }
-            if (bAddToMRU)
-                CMRU::Instance().AddPath(filepath);
-            std::wstring sFileName = filepath.substr(filepath.find_last_of('\\')+1);
-            auto dotpos = filepath.find_last_of('.');
-            std::wstring sExt = filepath.substr(dotpos + 1);
-            int index = -1;
-            if (m_insertionIndex >= 0)
-                index = m_TabBar.InsertAfter(m_insertionIndex, sFileName.c_str());
-            else
-                index = m_TabBar.InsertAtEnd(sFileName.c_str());
-            int id = m_TabBar.GetIDFromIndex(index);
-            if (dotpos == std::wstring::npos)
-                doc.m_language = CLexStyles::Instance().GetLanguageForPath(filepath);
-            else
-                doc.m_language = CLexStyles::Instance().GetLanguageForExt(sExt);
-            m_DocManager.AddDocumentAtEnd(doc, id);
-            m_TabBar.ActivateAt(index);
-            m_scintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-            if (dotpos == std::wstring::npos)
-                m_scintilla.SetupLexerForLang(doc.m_language);
-            else
-                m_scintilla.SetupLexerForExt(sExt.c_str());
-            SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
-            CCommandHandler::Instance().OnDocumentOpen(index);
-        }
-        else
-        {
-            CMRU::Instance().RemovePath(filepath, false);
-            bRet = false;
+            std::string bs = to_bit_string(number,true);
+            std::string sCallTip = CStringUtils::Format("Dec: %lld - Hex: %#llX - Oct: %#llo\nBin: %s (%d digits)",
+                number, number, number, bs.c_str(), (int)bs.size());
+            m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)sCallTip.c_str());
         }
     }
-    m_insertionIndex = -1;
-    return bRet;
 }
 
-bool CMainWindow::ReloadTab( int tab, int encoding )
+void CMainWindow::HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi)
 {
-    if ((tab < m_TabBar.GetItemCount())&&(tab < m_DocManager.GetCount()))
+    POINT p;
+    ::GetCursorPos(&p);
+    ::ScreenToClient(*this, &p);
+    HWND hWin = ::RealChildWindowFromPoint(*this, p);
+    if (hWin == m_TabBar)
     {
-        // first check if the document is modified and needs saving
-        CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
-        if (doc.m_bIsDirty||doc.m_bNeedsSaving)
+        int id = m_TabBar.GetIDFromIndex(tab);
+        if (id >= 0)
         {
-            // doc has modifications, ask the user what to do:
-            // * reload without saving
-            // * save first, then reload
-            // * cancel
-            m_TabBar.ActivateAt(tab);
-            ResString rTitle(hRes, IDS_HASMODIFICATIONS);
-            ResString rQuestion(hRes, IDS_RELOADREALLY);
-            ResString rReload(hRes, IDS_DORELOAD);
-            ResString rCancel(hRes, IDS_DONTRELOAD);
-            wchar_t buf[100] = {0};
-            m_TabBar.GetCurrentTitle(buf, _countof(buf));
-            std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
-
-            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-            TASKDIALOG_BUTTON aCustomButtons[2];
-            aCustomButtons[0].nButtonID = 100;
-            aCustomButtons[0].pszButtonText = rReload;
-            aCustomButtons[1].nButtonID = 101;
-            aCustomButtons[1].pszButtonText = rCancel;
-
-            tdc.hwndParent = *this;
-            tdc.hInstance = hRes;
-            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-            tdc.pButtons = aCustomButtons;
-            tdc.cButtons = _countof(aCustomButtons);
-            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-            tdc.pszMainIcon = TD_INFORMATION_ICON;
-            tdc.pszMainInstruction = rTitle;
-            tdc.pszContent = sQuestion.c_str();
-            tdc.nDefaultButton = 101;
-            int nClickedBtn = 0;
-            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
-
-            if (SUCCEEDED(hr) && (nClickedBtn != 100))
+            if (m_DocManager.HasDocumentID(id))
             {
-                m_TabBar.ActivateAt(tab);
-                return false;  // don't close!
+                CDocument doc = m_DocManager.GetDocumentFromID(id);
+                m_tooltipbuffer = std::unique_ptr<wchar_t[]>(new wchar_t[doc.m_path.size()+1]);
+                wcscpy_s(m_tooltipbuffer.get(), doc.m_path.size()+1, doc.m_path.c_str());
+                lpnmtdi->lpszText = m_tooltipbuffer.get();
+                lpnmtdi->hinst = NULL;
             }
-
-            m_TabBar.ActivateAt(tab);
-        }
-
-        CDocument docreload = m_DocManager.LoadFile(*this, doc.m_path.c_str(), encoding);
-        if (docreload.m_document)
-        {
-            if (tab == m_TabBar.GetCurrentTabIndex())
-                m_scintilla.SaveCurrentPos(&doc.m_position);
-
-            m_scintilla.Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
-            docreload.m_language = doc.m_language;
-            docreload.m_position = doc.m_position;
-            std::wstring sFileName = doc.m_path.substr(doc.m_path.find_last_of('\\') + 1);
-            m_DocManager.SetDocument(m_TabBar.GetIDFromIndex(tab), docreload);
-            if (tab == m_TabBar.GetCurrentTabIndex())
-            {
-                m_scintilla.SetupLexerForLang(docreload.m_language);
-                m_scintilla.RestoreCurrentPos(docreload.m_position);
-            }
-            UpdateStatusBar(true);
-            m_scintilla.Call(SCI_SETSAVEPOINT);
-            return true;
         }
     }
-    return false;
+}
+
+void CMainWindow::HandleHotSpotClick(const Scintilla::SCNotification& scn)
+{
+   if (!(scn.modifiers & SCMOD_CTRL))
+       return;
+
+    m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:;?&@=/%#()");
+
+    long pos = scn.position;
+    long startPos = static_cast<long>(m_editor.Call(SCI_WORDSTARTPOSITION, pos, false));
+    long endPos = static_cast<long>(m_editor.Call(SCI_WORDENDPOSITION, pos, false));
+
+    m_editor.Call(SCI_SETTARGETSTART, startPos);
+    m_editor.Call(SCI_SETTARGETEND, endPos);
+
+    long posFound = (long)m_editor.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
+    if (posFound != -1)
+    {
+        startPos = int(m_editor.Call(SCI_GETTARGETSTART));
+        endPos = int(m_editor.Call(SCI_GETTARGETEND));
+    }
+
+    std::unique_ptr<char[]> urltext(new char[endPos - startPos + 2]);
+    Scintilla::TextRange tr;
+    tr.chrg.cpMin = startPos;
+    tr.chrg.cpMax = endPos;
+    tr.lpstrText = urltext.get();
+    m_editor.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
+
+
+    // This treatment would fail on some valid URLs where there's actually supposed to be a comma or parenthesis at the end.
+    size_t lastCharIndex = strlen(urltext.get())-1;
+    while (lastCharIndex > 0 && (urltext[lastCharIndex] == ',' || urltext[lastCharIndex] == ')' || urltext[lastCharIndex] == '('))
+    {
+        urltext[lastCharIndex] = '\0';
+        --lastCharIndex;
+    }
+
+    std::wstring url = CUnicodeUtils::StdGetUnicode(urltext.get());
+    while ((*url.begin() == '(') || (*url.begin() == ')') || (*url.begin() == ','))
+        url.erase(url.begin());
+
+    SearchReplace(url, L"&amp;", L"&");
+
+    ::ShellExecute(*this, L"open", url.c_str(), NULL, NULL, SW_SHOW);
+    m_editor.Call(SCI_SETCHARSDEFAULT);
+}
+
+void CMainWindow::HandleSavePoint(const Scintilla::SCNotification& scn)
+{
+    int docID = m_TabBar.GetCurrentTabId();
+    if (m_DocManager.HasDocumentID(docID))
+    {
+        CDocument doc = m_DocManager.GetDocumentFromID(docID);
+        doc.m_bIsDirty = scn.nmhdr.code == SCN_SAVEPOINTLEFT;
+        m_DocManager.SetDocument(docID, doc);
+        UpdateTab(docID);
+    }
+}
+
+void CMainWindow::HandleWriteProtectedEdit()
+{
+    // user tried to edit a readonly file: ask whether
+    // to make the file writeable
+    int docID = m_TabBar.GetCurrentTabId();
+    if (m_DocManager.HasDocumentID(docID))
+    {
+        CDocument doc = m_DocManager.GetDocumentFromID(docID);
+        if (doc.m_bIsReadonly)
+        {
+            auto nClickedBtn = AskToRemoveReadOnlyAttribute();
+            if (nClickedBtn == 101) // Edit
+            {
+                // User wants to remove read only attribute.
+                doc.m_bIsReadonly = false;
+                m_DocManager.SetDocument(docID, doc);
+                UpdateTab(docID);
+                m_editor.Call(SCI_SETREADONLY, false);
+                m_editor.Call(SCI_SETSAVEPOINT);
+            }
+        }
+    }
 }
 
 void CMainWindow::AddHotSpots()
 {
     long startPos = 0;
     long endPos = -1;
-    long endStyle = (long)m_scintilla.Call(SCI_GETENDSTYLED);
+    long endStyle = (long)m_editor.Call(SCI_GETENDSTYLED);
 
-
-    long firstVisibleLine = (long)m_scintilla.Call(SCI_GETFIRSTVISIBLELINE);
-    startPos = (long)m_scintilla.Call(SCI_POSITIONFROMLINE, m_scintilla.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine));
-    long linesOnScreen = (long)m_scintilla.Call(SCI_LINESONSCREEN);
-    long lineCount = (long)m_scintilla.Call(SCI_GETLINECOUNT);
-    endPos = (long)m_scintilla.Call(SCI_POSITIONFROMLINE, m_scintilla.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine + min(linesOnScreen, lineCount)));
+    long firstVisibleLine = (long)m_editor.Call(SCI_GETFIRSTVISIBLELINE);
+    startPos = (long)m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine));
+    long linesOnScreen = (long)m_editor.Call(SCI_LINESONSCREEN);
+    long lineCount = (long)m_editor.Call(SCI_GETLINECOUNT);
+    endPos = (long)m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine + min(linesOnScreen, lineCount)));
 
     std::vector<unsigned char> hotspotPairs;
 
@@ -1714,31 +1811,31 @@ void CMainWindow::AddHotSpots()
     // to speed up the search, first search for "://" without using the regex engine
     long fStartPos = startPos;
     long fEndPos = endPos;
-    m_scintilla.Call(SCI_SETSEARCHFLAGS, 0);
-    m_scintilla.Call(SCI_SETTARGETSTART, fStartPos);
-    m_scintilla.Call(SCI_SETTARGETEND, fEndPos);
-    LRESULT posFoundColonSlash = m_scintilla.Call(SCI_SEARCHINTARGET, 3, (LPARAM)"://");
+    m_editor.Call(SCI_SETSEARCHFLAGS, 0);
+    m_editor.Call(SCI_SETTARGETSTART, fStartPos);
+    m_editor.Call(SCI_SETTARGETEND, fEndPos);
+    LRESULT posFoundColonSlash = m_editor.Call(SCI_SEARCHINTARGET, 3, (LPARAM)"://");
     while (posFoundColonSlash != -1)
     {
         // found a "://"
-        long lineFoundcolonSlash = (long)m_scintilla.Call(SCI_LINEFROMPOSITION, posFoundColonSlash);
-        startPos = (long)m_scintilla.Call(SCI_POSITIONFROMLINE, lineFoundcolonSlash);
-        endPos = (long)m_scintilla.Call(SCI_GETLINEENDPOSITION, lineFoundcolonSlash);
+        long lineFoundcolonSlash = (long)m_editor.Call(SCI_LINEFROMPOSITION, posFoundColonSlash);
+        startPos = (long)m_editor.Call(SCI_POSITIONFROMLINE, lineFoundcolonSlash);
+        endPos = (long)m_editor.Call(SCI_GETLINEENDPOSITION, lineFoundcolonSlash);
         fStartPos = (long)posFoundColonSlash + 1;
 
-        m_scintilla.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
+        m_editor.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
 
-        m_scintilla.Call(SCI_SETTARGETSTART, startPos);
-        m_scintilla.Call(SCI_SETTARGETEND, endPos);
+        m_editor.Call(SCI_SETTARGETSTART, startPos);
+        m_editor.Call(SCI_SETTARGETEND, endPos);
 
-        LRESULT posFound = m_scintilla.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
+        LRESULT posFound = m_editor.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
 
         if (posFound != -1)
         {
-            long start = long(m_scintilla.Call(SCI_GETTARGETSTART));
-            long end = long(m_scintilla.Call(SCI_GETTARGETEND));
+            long start = long(m_editor.Call(SCI_GETTARGETSTART));
+            long end = long(m_editor.Call(SCI_GETTARGETEND));
             long foundTextLen = end - start;
-            unsigned char idStyle = static_cast<unsigned char>(m_scintilla.Call(SCI_GETSTYLEAT, posFound));
+            unsigned char idStyle = static_cast<unsigned char>(m_editor.Call(SCI_GETSTYLEAT, posFound));
 
             // Search the style
             long fs = -1;
@@ -1748,7 +1845,7 @@ void CMainWindow::AddHotSpots()
                 if ((hotspotPairs[i] & ~mask) == (idStyle & ~mask))
                 {
                     fs = hotspotPairs[i];
-                    m_scintilla.Call(SCI_STYLEGETFORE, fs);
+                    m_editor.Call(SCI_STYLEGETFORE, fs);
                     break;
                 }
             }
@@ -1756,8 +1853,8 @@ void CMainWindow::AddHotSpots()
             // if we found it then use it to colorize
             if (fs != -1)
             {
-                m_scintilla.Call(SCI_STARTSTYLING, start, 0xFF);
-                m_scintilla.Call(SCI_SETSTYLING, foundTextLen, fs);
+                m_editor.Call(SCI_STARTSTYLING, start, 0xFF);
+                m_editor.Call(SCI_SETSTYLING, foundTextLen, fs);
             }
             else // generate a new style and add it into a array
             {
@@ -1768,64 +1865,77 @@ void CMainWindow::AddHotSpots()
                 char fontNameA[128];
 
                 // copy the style data
-                m_scintilla.Call(SCI_STYLEGETFONT, idStyleMSBunset, (LPARAM)fontNameA);
-                m_scintilla.Call(SCI_STYLESETFONT, style_hotspot, (LPARAM)fontNameA);
+                m_editor.Call(SCI_STYLEGETFONT, idStyleMSBunset, (LPARAM)fontNameA);
+                m_editor.Call(SCI_STYLESETFONT, style_hotspot, (LPARAM)fontNameA);
 
-                m_scintilla.Call(SCI_STYLESETSIZE, style_hotspot, m_scintilla.Call(SCI_STYLEGETSIZE, idStyleMSBunset));
-                m_scintilla.Call(SCI_STYLESETBOLD, style_hotspot, m_scintilla.Call(SCI_STYLEGETBOLD, idStyleMSBunset));
-                m_scintilla.Call(SCI_STYLESETWEIGHT, style_hotspot, m_scintilla.Call(SCI_STYLEGETWEIGHT, idStyleMSBunset));
-                m_scintilla.Call(SCI_STYLESETITALIC, style_hotspot, m_scintilla.Call(SCI_STYLEGETITALIC, idStyleMSBunset));
-                m_scintilla.Call(SCI_STYLESETUNDERLINE, style_hotspot, m_scintilla.Call(SCI_STYLEGETUNDERLINE, idStyleMSBunset));
-                m_scintilla.Call(SCI_STYLESETFORE, style_hotspot, m_scintilla.Call(SCI_STYLEGETFORE, idStyleMSBunset));
-                m_scintilla.Call(SCI_STYLESETBACK, style_hotspot, m_scintilla.Call(SCI_STYLEGETBACK, idStyleMSBunset));
-                m_scintilla.Call(SCI_STYLESETEOLFILLED, style_hotspot, m_scintilla.Call(SCI_STYLEGETEOLFILLED, idStyleMSBunset));
-                m_scintilla.Call(SCI_STYLESETCASE, style_hotspot, m_scintilla.Call(SCI_STYLEGETCASE, idStyleMSBunset));
+                m_editor.Call(SCI_STYLESETSIZE, style_hotspot, m_editor.Call(SCI_STYLEGETSIZE, idStyleMSBunset));
+                m_editor.Call(SCI_STYLESETBOLD, style_hotspot, m_editor.Call(SCI_STYLEGETBOLD, idStyleMSBunset));
+                m_editor.Call(SCI_STYLESETWEIGHT, style_hotspot, m_editor.Call(SCI_STYLEGETWEIGHT, idStyleMSBunset));
+                m_editor.Call(SCI_STYLESETITALIC, style_hotspot, m_editor.Call(SCI_STYLEGETITALIC, idStyleMSBunset));
+                m_editor.Call(SCI_STYLESETUNDERLINE, style_hotspot, m_editor.Call(SCI_STYLEGETUNDERLINE, idStyleMSBunset));
+                m_editor.Call(SCI_STYLESETFORE, style_hotspot, m_editor.Call(SCI_STYLEGETFORE, idStyleMSBunset));
+                m_editor.Call(SCI_STYLESETBACK, style_hotspot, m_editor.Call(SCI_STYLEGETBACK, idStyleMSBunset));
+                m_editor.Call(SCI_STYLESETEOLFILLED, style_hotspot, m_editor.Call(SCI_STYLEGETEOLFILLED, idStyleMSBunset));
+                m_editor.Call(SCI_STYLESETCASE, style_hotspot, m_editor.Call(SCI_STYLEGETCASE, idStyleMSBunset));
 
 
-                m_scintilla.Call(SCI_STYLESETHOTSPOT, style_hotspot, TRUE);
-                m_scintilla.Call(SCI_SETHOTSPOTACTIVEUNDERLINE, style_hotspot, TRUE);
-                m_scintilla.Call(SCI_SETHOTSPOTACTIVEFORE, TRUE, activeFG);
-                m_scintilla.Call(SCI_SETHOTSPOTSINGLELINE, style_hotspot, 0);
+                m_editor.Call(SCI_STYLESETHOTSPOT, style_hotspot, TRUE);
+                m_editor.Call(SCI_SETHOTSPOTACTIVEUNDERLINE, style_hotspot, TRUE);
+                m_editor.Call(SCI_SETHOTSPOTACTIVEFORE, TRUE, activeFG);
+                m_editor.Call(SCI_SETHOTSPOTSINGLELINE, style_hotspot, 0);
 
                 // colorize it!
-                m_scintilla.Call(SCI_STARTSTYLING, start, 0xFF);
-                m_scintilla.Call(SCI_SETSTYLING, foundTextLen, style_hotspot);
+                m_editor.Call(SCI_STARTSTYLING, start, 0xFF);
+                m_editor.Call(SCI_SETSTYLING, foundTextLen, style_hotspot);
             }
         }
-        m_scintilla.Call(SCI_SETTARGETSTART, fStartPos);
-        m_scintilla.Call(SCI_SETTARGETEND, fEndPos);
-        m_scintilla.Call(SCI_SETSEARCHFLAGS, 0);
-        posFoundColonSlash = (int)m_scintilla.Call(SCI_SEARCHINTARGET, 3, (LPARAM)"://");
+        m_editor.Call(SCI_SETTARGETSTART, fStartPos);
+        m_editor.Call(SCI_SETTARGETEND, fEndPos);
+        m_editor.Call(SCI_SETSEARCHFLAGS, 0);
+        posFoundColonSlash = (int)m_editor.Call(SCI_SEARCHINTARGET, 3, (LPARAM)"://");
     }
 
-    m_scintilla.Call(SCI_STARTSTYLING, endStyle, 0xFF);
-    m_scintilla.Call(SCI_SETSTYLING, 0, 0);
+    m_editor.Call(SCI_STARTSTYLING, endStyle, 0xFF);
+    m_editor.Call(SCI_SETSTYLING, 0, 0);
 }
 
-void CMainWindow::AutoIndent( Scintilla::SCNotification * pScn )
+void CMainWindow::HandleUpdateUI(const Scintilla::SCNotification& scn)
 {
-    int eolMode = int(m_scintilla.Call(SCI_GETEOLMODE));
-    size_t curLine = m_scintilla.Call(SCI_LINEFROMPOSITION, m_scintilla.Call(SCI_GETCURRENTPOS));
+    const unsigned int uiflags = SC_UPDATE_SELECTION |
+        SC_UPDATE_H_SCROLL | SC_UPDATE_V_SCROLL;
+    if ((scn.updated & uiflags) != 0)
+        m_editor.MarkSelectedWord(false);
+
+    m_editor.MatchBraces();
+    m_editor.MatchTags();
+    AddHotSpots();
+    UpdateStatusBar(false);
+}
+
+void CMainWindow::HandleAutoIndent( const Scintilla::SCNotification& scn )
+{
+    int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
+    size_t curLine = m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS));
     size_t lastLine = curLine - 1;
     int indentAmount = 0;
 
-    if (((eolMode == SC_EOL_CRLF || eolMode == SC_EOL_LF) && pScn->ch == '\n') ||
-        (eolMode == SC_EOL_CR && pScn->ch == '\r'))
+    if (((eolMode == SC_EOL_CRLF || eolMode == SC_EOL_LF) && scn.ch == '\n') ||
+        (eolMode == SC_EOL_CR && scn.ch == '\r'))
     {
         // use the same indentation as the last line
-        while (lastLine > 0 && (m_scintilla.Call(SCI_GETLINEENDPOSITION, lastLine) - m_scintilla.Call(SCI_POSITIONFROMLINE, lastLine)) == 0)
+        while (lastLine > 0 && (m_editor.Call(SCI_GETLINEENDPOSITION, lastLine) - m_editor.Call(SCI_POSITIONFROMLINE, lastLine)) == 0)
             lastLine--;
 
-        indentAmount = (int)m_scintilla.Call(SCI_GETLINEINDENTATION, lastLine);
+        indentAmount = (int)m_editor.Call(SCI_GETLINEINDENTATION, lastLine);
 
         if (indentAmount > 0)
         {
             Scintilla::CharacterRange crange;
-            crange.cpMin = long(m_scintilla.Call(SCI_GETSELECTIONSTART));
-            crange.cpMax = long(m_scintilla.Call(SCI_GETSELECTIONEND));
-            int posBefore = (int)m_scintilla.Call(SCI_GETLINEINDENTPOSITION, curLine);
-            m_scintilla.Call(SCI_SETLINEINDENTATION, curLine, indentAmount);
-            int posAfter = (int)m_scintilla.Call(SCI_GETLINEINDENTPOSITION, curLine);
+            crange.cpMin = long(m_editor.Call(SCI_GETSELECTIONSTART));
+            crange.cpMax = long(m_editor.Call(SCI_GETSELECTIONEND));
+            int posBefore = (int)m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);
+            m_editor.Call(SCI_SETLINEINDENTATION, curLine, indentAmount);
+            int posAfter = (int)m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);
             int posDifference = posAfter - posBefore;
             if (posAfter > posBefore)
             {
@@ -1853,270 +1963,634 @@ void CMainWindow::AutoIndent( Scintilla::SCNotification * pScn )
                         crange.cpMax = posAfter;
                 }
             }
-            m_scintilla.Call(SCI_SETSEL, crange.cpMin, crange.cpMax);
+            m_editor.Call(SCI_SETSEL, crange.cpMin, crange.cpMax);
         }
     }
 }
 
-bool CMainWindow::HandleOutsideModifications( int id /*= -1*/ )
+void CMainWindow::OpenNewTab()
 {
-    static bool bInHandleOutsideModifications = false;
-    // recurse protection
-    if (bInHandleOutsideModifications)
-        return false;
+    CDocument doc;
+    doc.m_document = m_editor.Call(SCI_CREATEDOCUMENT);
+    doc.m_bHasBOM = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
+    doc.m_encoding = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
+    std::wstring tabName = GetNewTabName();
+    int index = -1;
+    if (m_insertionIndex >= 0)
+        index = m_TabBar.InsertAfter(m_insertionIndex, tabName.c_str());
+    else
+        index = m_TabBar.InsertAtEnd(tabName.c_str());
+    int docID = m_TabBar.GetIDFromIndex(index);
+    m_DocManager.AddDocumentAtEnd(doc, docID);
+    m_TabBar.ActivateAt(index);
+    m_editor.SetupLexerForLang(L"Text");
+    m_editor.GotoLine(0);
+    m_insertionIndex = -1;
+}
 
-    bInHandleOutsideModifications = true;
-    bool bRet = true;
-    for (int i = 0; i < m_TabBar.GetItemCount(); ++i)
+void CMainWindow::HandleTabChanging(const TBHDR& /*tbhdr*/)
+{
+    // document is about to be deactivated
+    int docID = m_TabBar.GetCurrentTabId();
+    if (m_DocManager.HasDocumentID(docID))
     {
-        int docID = id == -1 ? m_TabBar.GetIDFromIndex(i) : id;
-        auto ds = m_DocManager.HasFileChanged(docID);
-        if (ds == DM_Modified)
-        {
-            CDocument doc = m_DocManager.GetDocumentFromID(docID);
-            m_TabBar.ActivateAt(i);
-            ResString rTitle(hRes, IDS_OUTSIDEMODIFICATIONS);
-            ResString rQuestion(hRes, doc.m_bNeedsSaving || doc.m_bIsDirty ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
-            ResString rSave(hRes, IDS_SAVELOSTOUTSIDEMODS);
-            ResString rReload(hRes, doc.m_bNeedsSaving || doc.m_bIsDirty ? IDS_RELOADLOSTMODS : IDS_RELOAD);
-            ResString rCancel(hRes, IDS_NORELOAD);
-            wchar_t buf[100] = {0};
-            m_TabBar.GetCurrentTitle(buf, _countof(buf));
-            std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
-
-            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-            TASKDIALOG_BUTTON aCustomButtons[3];
-            int bi = 0;
-            aCustomButtons[bi].nButtonID = bi+100;
-            aCustomButtons[bi++].pszButtonText = rReload;
-            if (doc.m_bNeedsSaving || doc.m_bIsDirty)
-            {
-                aCustomButtons[bi].nButtonID = bi+100;
-                aCustomButtons[bi++].pszButtonText = rSave;
-            }
-            aCustomButtons[bi].nButtonID = bi+100;
-            aCustomButtons[bi].pszButtonText = rCancel;
-
-            tdc.hwndParent = *this;
-            tdc.hInstance = hRes;
-            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-            tdc.pButtons = aCustomButtons;
-            tdc.cButtons = doc.m_bNeedsSaving || doc.m_bIsDirty ? 3 : 2;
-            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-            tdc.pszMainIcon = doc.m_bNeedsSaving || doc.m_bIsDirty ? TD_WARNING_ICON : TD_INFORMATION_ICON;
-            tdc.pszMainInstruction = rTitle;
-            tdc.pszContent = sQuestion.c_str();
-            tdc.nDefaultButton = doc.m_bNeedsSaving || doc.m_bIsDirty ? 102 : 100;  // default to "Cancel" in case the file is modified
-            int nClickedBtn = 0;
-            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
-
-            if (SUCCEEDED(hr))
-            {
-                if (nClickedBtn == 100)
-                {
-                    // reload the document
-                    CDocument docreload = m_DocManager.LoadFile(*this, doc.m_path.c_str(), doc.m_encoding);
-                    if (docreload.m_document)
-                    {
-                        m_scintilla.SaveCurrentPos(&doc.m_position);
-
-                        m_scintilla.Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
-                        docreload.m_language = doc.m_language;
-                        docreload.m_position = doc.m_position;
-                        m_DocManager.SetDocument(docID, docreload);
-                        m_scintilla.SetupLexerForLang(docreload.m_language);
-                        m_scintilla.RestoreCurrentPos(docreload.m_position);
-                    }
-                }
-                else if ((nClickedBtn == 101) && (doc.m_bNeedsSaving || doc.m_bIsDirty))
-                {
-                    // save the document
-                    SaveCurrentTab();
-                    bRet = false;
-                }
-                else
-                {
-                    // update the filetime of the document to avoid this warning
-                    m_DocManager.UpdateFileTime(doc);
-                    m_DocManager.SetDocument(docID, doc);
-                    bRet = false;
-                }
-            }
-            else
-            {
-                // update the filetime of the document to avoid this warning
-                m_DocManager.UpdateFileTime(doc);
-                m_DocManager.SetDocument(docID, doc);
-            }
-        }
-        else if (ds == DM_Removed)
-        {
-            // file was removed. Options are:
-            // * keep the file open
-            // * close the file
-            CDocument doc = m_DocManager.GetDocumentFromID(docID);
-            m_TabBar.ActivateAt(i);
-            ResString rTitle(hRes, IDS_OUTSIDEREMOVEDHEAD);
-            ResString rQuestion(hRes, IDS_OUTSIDEREMOVED);
-            ResString rKeep(hRes, IDS_OUTSIDEREMOVEDKEEP);
-            ResString rClose(hRes, IDS_OUTSIDEREMOVEDCLOSE);
-            wchar_t buf[100] = {0};
-            m_TabBar.GetCurrentTitle(buf, _countof(buf));
-            std::wstring sQuestion = CStringUtils::Format(rQuestion, buf);
-
-            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-            TASKDIALOG_BUTTON aCustomButtons[2];
-            int bi = 0;
-            aCustomButtons[bi].nButtonID = bi+100;
-            aCustomButtons[bi++].pszButtonText = rKeep;
-            aCustomButtons[bi].nButtonID = bi+100;
-            aCustomButtons[bi].pszButtonText = rClose;
-
-            tdc.hwndParent = *this;
-            tdc.hInstance = hRes;
-            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-            tdc.pButtons = aCustomButtons;
-            tdc.cButtons = _countof(aCustomButtons);
-            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-            tdc.pszMainIcon = TD_INFORMATION_ICON;
-            tdc.pszMainInstruction = rTitle;
-            tdc.pszContent = sQuestion.c_str();
-            tdc.nDefaultButton = 100;
-            int nClickedBtn = 0;
-            HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
-
-            if (SUCCEEDED(hr) && (nClickedBtn == 101))
-            {
-                // close the tab
-                CloseTab(i);
-                if (id == -1)
-                    --i;    // the tab was removed, so continue with the next one
-            }
-            else
-            {
-                // keep the file: mark the file as modified
-                doc.m_bNeedsSaving = true;
-                // update the filetime of the document to avoid this warning
-                m_DocManager.UpdateFileTime(doc);
-                m_DocManager.SetDocument(docID, doc);
-                // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
-                m_scintilla.Call(SCI_ADDUNDOACTION, 0, 0);
-                m_scintilla.Call(SCI_UNDO);
-                bRet = false;
-            }
-        }
-
-        if (id != -1)
-            break;
+        CDocument doc = m_DocManager.GetDocumentFromID(docID);
+        m_editor.SaveCurrentPos(&doc.m_position);
+        m_DocManager.SetDocument(docID, doc);
     }
-    bInHandleOutsideModifications = false;
-    return bRet;
 }
 
-void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& savepath, long line )
+void CMainWindow::HandleTabChange(const TBHDR& ptbhdr)
 {
-    std::wstring filepath = CPathUtils::GetLongPathname(path);
+    int curTab = m_TabBar.GetCurrentTabIndex();
+    APPVERIFY(ptbhdr.tabOrigin == curTab);
+    // document got activated
+    int docID = m_TabBar.GetCurrentTabId();
+    // Can't do much if no document for this tab.
+    if (!m_DocManager.HasDocumentID(docID))
+        return;
+
+    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+    m_editor.SetupLexerForLang(doc.m_language);
+    m_editor.RestoreCurrentPos(doc.m_position);
+    m_editor.SetTabSettings();
+    CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc);
+    m_DocManager.SetDocument(docID, doc);
+    m_editor.MarkSelectedWord(true);
+    m_editor.MarkBookmarksInScrollbar();
+    UpdateCaptionBar();
+    SetFocus(m_editor);
+    m_editor.Call(SCI_GRABFOCUS);
+    UpdateStatusBar(true);
+    auto ds = m_DocManager.HasFileChanged(docID);
+    if (ds == DM_Modified)
+    {
+        ReloadTab(curTab,-1,true);
+        // Shouldn't be modified after we've handled it.
+        auto ds = m_DocManager.HasFileChanged(docID);
+        APPVERIFY(ds != DM_Modified);
+    }
+    else if (ds == DM_Removed)
+    {
+        HandleOutsideDeletedFile(curTab);
+    }
+    CheckForOutsideChanges();
+}
+
+void CMainWindow::HandleTabDelete(const TBHDR& tbhdr)
+{
+    int tabToDelete = tbhdr.tabOrigin;
+    // Close tab will take care of activating any next tab.
+    CloseTab(tabToDelete);
+}
+
+bool CMainWindow::OpenFileEx(const std::wstring& file, unsigned int openFlags)
+{
+    bool bRet = true;
+    bool bAddToMRU = (openFlags & OpenFlags::AddToMRU) != 0;
+    bool bAskToCreateIfMissing = (openFlags & OpenFlags::AskToCreateIfMissing) != 0;
+
+    int encoding = -1;
+    std::wstring filepath = CPathUtils::GetLongPathname(file);
+    if (_wcsicmp(CIniSettings::Instance().GetIniPath().c_str(), filepath.c_str()) == 0)
+    {
+        CIniSettings::Instance().Save();
+    }
     int id = m_DocManager.GetIdForPath(filepath.c_str());
     if (id != -1)
     {
+        // document already open
         m_TabBar.ActivateAt(m_TabBar.GetIndexFromID(id));
-        CDocument doc = m_DocManager.GetDocumentFromID(id);
-        doc.m_path = CPathUtils::GetLongPathname(savepath);
-        m_DocManager.SetDocument(id, doc);
-        SaveCurrentTab();
-        wchar_t sTabTitle[100] = {0};
-        m_TabBar.GetCurrentTitle(sTabTitle, _countof(sTabTitle));
-        std::wstring sWindowTitle = CStringUtils::Format(L"%s - BowPad", doc.m_path.empty() ? sTabTitle : doc.m_path.c_str());
-        SetWindowText(*this, sWindowTitle.c_str());
-        UpdateStatusBar(true);
-        GoToLine(line);
+    }
+    else
+    {
+        // Note, a folder will return true also.
+        bool createIfMissing = false;
+        if (!PathFileExists(file.c_str()))
+        {
+            if (bAskToCreateIfMissing)
+            {
+                int nClickedBtn = AskToCreateNonExistingFile(file);
+                if (nClickedBtn==101)
+                {
+                    createIfMissing = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
 
-        // delete the temp file used for the elevated save
-        DeleteFile(path.c_str());
+        CDocument doc = m_DocManager.LoadFile(*this, filepath, encoding, createIfMissing);
+        if (doc.m_document)
+        {
+            if (m_TabBar.GetItemCount() == 1)
+            {
+                // check if the only tab is empty and if it is, remove it
+                auto docID = m_TabBar.GetIDFromIndex(0);
+                CDocument existDoc = m_DocManager.GetDocumentFromID(docID);
+                if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH)==0) && (m_editor.Call(SCI_CANUNDO)==0))
+                {
+                    m_DocManager.RemoveDocument(docID);
+                    m_TabBar.DeletItemAt(0);
+                }
+            }
+            if (bAddToMRU)
+                CMRU::Instance().AddPath(filepath);
+            std::wstring sFileName = CPathUtils::GetFileName(filepath);
+            std::wstring ext = CPathUtils::GetFileExtension(filepath);
+            int index = -1;
+            if (m_insertionIndex >= 0)
+                index = m_TabBar.InsertAfter(m_insertionIndex, sFileName.c_str());
+            else
+                index = m_TabBar.InsertAtEnd(sFileName.c_str());
+            int id = m_TabBar.GetIDFromIndex(index);
+            if (ext.empty())
+                doc.m_language = CLexStyles::Instance().GetLanguageForPath(filepath);
+            else
+                doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
+            m_DocManager.AddDocumentAtEnd(doc, id);
+            //TODO! Review. Might be better to set doc pointer then activate?
+            m_TabBar.ActivateAt(index);
+            m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+            if (ext.empty())
+                m_editor.SetupLexerForLang(doc.m_language);
+            else
+                m_editor.SetupLexerForExt(ext);
+            SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
+            CCommandHandler::Instance().OnDocumentOpen(index);
+        }
+        else
+        {
+            CMRU::Instance().RemovePath(filepath, false);
+            bRet = false;
+        }
+    }
+    m_insertionIndex = -1;
+    return bRet;
+}
+
+// TODO: consider continuing merging process,
+// how to merge with OpenFileAs with OpenFile
+// TODO! Need to report and fix bReadOnly support
+// Moving a read only tab to another instance
+// makes the read only status lost
+bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& realpath, bool bModified )
+{
+    // If we can't open it, not much we can do.
+    if (!OpenFile(temppath, 0))
+    {
+        DeleteFile(temppath.c_str());
+        return false;
+    }
+
+    // Get the id for the document we just loaded,
+    // it'll currently have a temporary name.
+    int docID = m_DocManager.GetIdForPath(temppath);
+    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    doc.m_path = CPathUtils::GetLongPathname(realpath);
+    doc.m_bIsDirty = bModified;
+    doc.m_bNeedsSaving = bModified;
+    m_DocManager.UpdateFileTime(doc);
+    std::wstring ext = CPathUtils::GetFileExtension(doc.m_path);
+    std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
+    doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
+    m_DocManager.SetDocument(docID, doc);
+    m_editor.SetupLexerForExt(ext);
+    UpdateTab(docID);
+    m_TabBar.SetCurrentTitle(sFileName.c_str());
+    UpdateCaptionBar();
+    UpdateStatusBar(true);
+    DeleteFile(temppath.c_str());
+
+    return true;
+}
+
+// TODO:
+// CmdClipboard.h's CmdPaste::execute() method should probably use this.
+
+void CMainWindow::HandleDropFiles(HDROP hDrop)
+{
+    int filesDropped = DragQueryFile(hDrop, 0xffffffff, NULL, 0);
+    std::vector<std::wstring> files;
+    for (int i = 0 ; i < filesDropped ; ++i)
+    {
+        UINT len = DragQueryFile(hDrop, i, NULL, 0);
+        std::unique_ptr<wchar_t[]> pathBuf(new wchar_t[len+1]);
+        DragQueryFile(hDrop, i, pathBuf.get(), len+1);
+        files.push_back(pathBuf.get());
+    }
+    DragFinish(hDrop);
+    for (const auto& filename:files)
+    {
+        OpenFileEx(filename, OpenFlags::AddToMRU);
     }
 }
+
+void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
+{
+    CCmdLineParser parser((LPCWSTR)cds.lpData);
+    LPCTSTR path = parser.GetVal(L"path");
+    if (path)
+    {
+        if (OpenFileEx(path, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
+        {
+            if (parser.HasVal(L"line"))
+            {
+                GoToLine(parser.GetLongVal(L"line") - 1);
+            }
+        }
+    }
+    else
+    {
+        // find out if there are paths specified without the key/value pair syntax
+        int nArgs;
+
+        LPWSTR * szArglist = CommandLineToArgvW((LPCWSTR)cds.lpData, &nArgs);
+        if (!szArglist)
+            return;
+        for (int i = 1; i < nArgs; i++)
+        {
+            if (szArglist[i][0] != '/')
+            {
+                OpenFileEx(szArglist[i], OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing);
+            }
+        }
+
+        // Free memory allocated for CommandLineToArgvW arguments.
+        LocalFree(szArglist);
+
+        //FIXME: This seems wrong/misplaced. Not sure how one line
+        // can be associated with multiple files (see above).
+        if (parser.HasVal(L"line"))
+        {
+            GoToLine(parser.GetLongVal(L"line") - 1);
+        }
+    }
+}
+
+// FIXME/TODO:
+// If both instances have the same document loaded,
+// things get tricky:
+//
+// Currently, if one instance instructs another instance to
+// load a document the first instance already has open,
+// the receiver will switch to it's own tab and copy of the document
+// and silently throw the senders document away.
+//
+// This may cause the sender to lose work if their document was modified
+// or more recent.
+// This is what happens currently but is arguably wrong.
+//
+// If the receiver refuses to load the document, the sender might not actually
+// have it open themselves and was just instructing the reciever to load it;
+// if the receiver refuses, nothing will happen and that would be also wrong.
+//
+// The receiver could load the senders document but the receiver might have
+// modified their version, in which case we don't know if it's
+// safe to replace it and if we silently do they may lose something.
+//
+// Even if the receivers document isn't modified, there is no
+// guarantee that the senders document is newer.
+//
+// The design probably needs to change so that the reciever asks
+// the user what to do if they try to move a document to another
+// when it's open in two places.
+//
+// The sender might also need to indicate to the receiver if it's ok
+// for the receiver to switch to an already loaded instance.
+//
+// For now, continue to do what we've always have, which is to
+// just switch to any existing document of the same name and
+// throw the senders copy away if there is a clash.
+//
+// Will revisit this later.
+
+// Returns true of the tab was moved in, else false.
+// Callers using SendMessage can check if the reciever
+// loaded the tab they sent before they close their tab
+// it was sent from.
+
+// TODO!: Moving a tab to another instance means losing
+// undo history.
+// Consider warning about that or if the undo history
+// could be saved and restored.
+
+// Called when a Tab is dropped over another instance of BowPad.
+bool CMainWindow::HandleCopyDataMoveTab(const COPYDATASTRUCT& cds)
+{
+    std::wstring paths = std::wstring((const wchar_t*)cds.lpData, cds.cbData / sizeof(wchar_t));
+    std::vector<std::wstring> datavec;
+    stringtok(datavec, paths, false, L"*");
+    // Be a little untrusting of the clipboard data and if it's
+    // a mistake by the caller let them know so they
+    // don't throw away something we can't open.
+    if (datavec.size() != 4)
+    {
+        APPVERIFY(false); // Assume a bug if testing.
+        return false;
+    }
+    std::wstring realpath = datavec[0];
+    std::wstring temppath = datavec[1];
+    bool bMod = _wtoi(datavec[2].c_str()) != 0;
+    int line = _wtoi(datavec[3].c_str());
+
+    // Unsaved files / New tabs have an empty real path.
+
+    if (!realpath.empty()) // If this is a saved file
+    {
+        int docID = m_DocManager.GetIdForPath(realpath.c_str());
+        if (docID != -1) // If it already exists switch to it.
+        {
+            // TODO: we can lose work here, see notes above.
+            // The document we switch to may be the same.
+            // better to reject the move and return false or something.
+
+            int tab = m_TabBar.GetIndexFromID(docID);
+            m_TabBar.ActivateAt(tab);
+            DeleteFile(temppath.c_str());
+
+            return true;
+        }
+        // If it doesn't exist, fall through to load it.
+    }
+    bool opened = OpenFileAs(temppath, realpath, bMod);
+    if (opened)
+        GoToLine(line);
+    return opened;
+}
+
+void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
+{
+    // Start a new instance of BowPad with this dropped tab, or add this tab to
+    // the BowPad window the drop was done on. Then close this tab.
+    // First save the file to a temp location to ensure all unsaved mods are saved.
+    std::wstring temppath = CPathUtils::GetTempFilePath();
+    CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
+    CDocument tempdoc = doc;
+    tempdoc.m_path = temppath;
+    m_DocManager.SaveFile(*this, tempdoc);
+    HWND hDroppedWnd = WindowFromPoint(pt);
+    if (hDroppedWnd)
+    {
+        // If the drop target identifies a specific instance of BowPad found
+        // move the tab to that instance OR
+        // if not, create a new instance of BowPad and move the tab to that.
+
+        bool isThisInstance;
+        HWND hMainWnd = FindAppMainWindow(hDroppedWnd, &isThisInstance);
+        // Dropping on our own window shall create an new BowPad instance
+        // because the user doesn't want to be moving a tab around within
+        // the same instance of BowPad this way.
+        if (hMainWnd && ! isThisInstance)
+        {
+            // dropped on another BowPad Window, 'move' this tab to that BowPad Window
+            COPYDATASTRUCT cpd = { 0 };
+            cpd.dwData = CD_COMMAND_MOVETAB;
+            std::wstring cpdata = doc.m_path + L"*" + temppath + L"*";
+            cpdata += (doc.m_bIsDirty || doc.m_bNeedsSaving) ? L"1*" : L"0*";
+            cpdata += CStringUtils::Format(L"%ld", (long)(m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS)) + 1));
+            cpd.lpData = (PVOID)cpdata.c_str();
+            cpd.cbData = DWORD(cpdata.size()*sizeof(wchar_t));
+
+            // It's an important concept that the receiver can reject/be unable
+            // to load / handle the file/tab we are trying to move to them.
+            // We don't want the user to lose their work if that happens.
+            // So only close this tab if the move was successful.
+            bool moved = SendMessage(hMainWnd, WM_COPYDATA, (WPARAM)m_hwnd, (LPARAM)&cpd) ? true : false;
+            if (moved)
+            {
+                // remove the tab
+                CloseTab(tab, true);
+            }
+            else
+            {
+                // TODO. Work in progress.
+                // On error, in theory the sender or receiver or both can display an error.
+                // Until it's clear what set of errors and handling is required just throw
+                // up a simple dialog box this side. In theory the receiver may even crash
+                // with no error, so probably some minimal message might be useful.
+                ::MessageBox(*this, L"Failed to move Tab.", GetAppName().c_str(), MB_OK | MB_ICONERROR);
+            }
+            // The receiver should have deleted this file but we'll do it too in
+            // case they failed.
+            ::DeleteFile(temppath.c_str());
+            return;
+        }
+    }
+
+    // Start a new instance and open the tab there.
+    std::wstring modpath = CPathUtils::GetModulePath();
+    std::wstring cmdline = CStringUtils::Format(L"/multiple /tabmove /savepath:\"%s\" /path:\"%s\" /line:%ld",
+                                                doc.m_path.c_str(), temppath.c_str(),
+                                                (long)(m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS)) + 1));
+    if (doc.m_bIsDirty || doc.m_bNeedsSaving)
+        cmdline += L" /modified";
+    SHELLEXECUTEINFO shExecInfo;
+    shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+
+    shExecInfo.fMask = NULL;
+    shExecInfo.hwnd = *this;
+    shExecInfo.lpVerb = L"open";
+    shExecInfo.lpFile = modpath.c_str();
+    shExecInfo.lpParameters = cmdline.c_str();
+    shExecInfo.lpDirectory = NULL;
+    shExecInfo.nShow = SW_NORMAL;
+    shExecInfo.hInstApp = NULL;
+
+    if (ShellExecuteEx(&shExecInfo))
+    {
+        // remove the tab
+        CloseTab(tab, true);
+    }
+    else
+    {
+        // If can't start the other instance, delete the temp file
+        // we prepared for it.
+        ::DeleteFile(temppath.c_str());
+        return;
+   }
+}
+
+bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
+{
+    APPVERIFY(tab == m_TabBar.GetCurrentTabIndex());
+    int docID = m_TabBar.GetIDFromIndex(tab);
+    if (docID < 0) // No such tab.
+        return false;
+    if (!m_DocManager.HasDocumentID(docID)) // No such document
+        return false;
+    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+
+    if (dueToOutsideChanges)
+    {
+        auto nClickedBtn = AskToReloadOutsideModifiedFile(doc);
+        // Responses: Cancel, Save and Reload, Reload
+
+        if (nClickedBtn == 101) // Reload
+        {
+            // Fall through to reload
+        }
+        // Save if asked to. Assume we won't have asked them to save if
+        // the file isn't dirty or it wasn't appropriate to save.
+        else if (nClickedBtn == 102) // Save
+        {
+            SaveCurrentTab();
+        }
+        else // Cancel or failedto ask
+        {
+            // update the filetime of the document to avoid this warning
+            m_DocManager.UpdateFileTime(doc);
+            m_DocManager.SetDocument(docID, doc);
+            return false;
+        }
+    }
+    else if (doc.m_bIsDirty || doc.m_bNeedsSaving)
+    {
+        int nClickedBtn = AskToReload(doc);
+        // Responses:
+        // Error, failed to ask the question or never obtained an answer.
+        // Reload, unsaved modifications will be lost!
+        // Cancel, unsaved modifications will be kept.
+
+        // If the user doesn't want to reload or we failed to find out,
+        // return and don't reload.
+        if (nClickedBtn != 101)
+            return false;
+    }
+
+    // TODO! Review: I merged two similar reload functions with slightly
+    // different enconding handling. One seemed to try to keep the encoding,
+    // another seemed to want to reload it to revert it.
+    // Check I changed the handling and what should happen.
+    // I think it should revert or you should be asked.
+
+    CDocument docreload = m_DocManager.LoadFile(*this, doc.m_path.c_str(), encoding, false);
+    if (! docreload.m_document)
+        return false;
+
+    if (tab == m_TabBar.GetCurrentTabIndex())
+        m_editor.SaveCurrentPos(&doc.m_position);
+
+    // TODO: Review use of SCI_RELEASEDOCUMENT, seems required to avoid memory leak.
+    m_editor.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
+    // Apply the new one.
+    m_editor.Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
+
+    docreload.m_language = doc.m_language;
+    docreload.m_position = doc.m_position;
+    m_DocManager.SetDocument(docID, docreload);
+    if (tab == m_TabBar.GetCurrentTabIndex())
+    {
+        m_editor.SetupLexerForLang(docreload.m_language);
+        m_editor.RestoreCurrentPos(docreload.m_position);
+    }
+    UpdateStatusBar(true);
+    UpdateTab(docID);
+    // TODO: Review. I merged two reload paths, SETSAVEPOINT was
+    // called for regular reloads but not outside modified file reloads.
+    // Decide if this is needed in both paths or not.
+    // I think it should be the same for both paths, called or not called.
+    // I've decided to call it in both cases.
+    // To restore the old functionality (hopefully), add if (!outsideModified)
+    m_editor.Call(SCI_SETSAVEPOINT);
+    return true;
+}
+
+// Return true if requested to removed document.
+bool CMainWindow::HandleOutsideDeletedFile(int tab)
+{
+    assert(tab == m_TabBar.GetCurrentTabIndex());
+    int docID = m_TabBar.GetIDFromIndex(tab);
+    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    // file was removed. Options are:
+    // * keep the file open
+    // * close the file
+    auto nClickedBtn = AskToRemoveFile(doc);
+    if (nClickedBtn == 101) // User wishes to remove the document
+    {
+        CloseTab(tab);
+        return true;
+    }
+
+    // keep the file: mark the file as modified
+    doc.m_bNeedsSaving = true;
+    // update the filetime of the document to avoid this warning
+    m_DocManager.UpdateFileTime(doc);
+    m_DocManager.SetDocument(docID, doc);
+    // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
+    m_editor.Call(SCI_ADDUNDOACTION, 0, 0);
+    m_editor.Call(SCI_UNDO);
+    return false;;
+}
+
+bool CMainWindow::HasOutsideChangesOccurred() const
+{
+    int tabCount = m_TabBar.GetItemCount();
+    for (int i = 0; i < tabCount; ++i)
+    {
+        auto docID = m_TabBar.GetIDFromIndex(i);
+        auto ds = m_DocManager.HasFileChanged(docID);
+        if (ds == DM_Modified || ds == DM_Removed)
+            return true;
+    }
+    return false;
+}
+
+void CMainWindow::CheckForOutsideChanges()
+{
+    // TODO! This logic is a bit restrictured from before but
+    // has the same design and flaw. We shouldn't activate each
+    // tab forcing the user to make reload choices for each one.
+    // just the first. Then let the user find the others when they
+    // change tabs. We could draw their attention to it by 
+    // marking the tab header "stale" via a colour change for example.
+
+    // See if any doc has been changed externally.
+    for (int i = 0; i < m_TabBar.GetItemCount(); ++i)
+    {
+        int docID = m_TabBar.GetIDFromIndex(i);
+        auto ds = m_DocManager.HasFileChanged(docID);
+        if (ds == DM_Modified || ds == DM_Removed)
+        {
+            m_TabBar.ActivateAt(i);
+            break;
+        }
+    }
+    // TODO! Test if All tabs might get removed here?
+}
+
+// TODO! Get rid of TabMove, make callers use OpenFileAs
 
 void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line)
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
-    int id = m_DocManager.GetIdForPath(filepath.c_str());
-    if (id != -1)
-    {
-        m_TabBar.ActivateAt(m_TabBar.GetIndexFromID(id));
-        CDocument doc = m_DocManager.GetDocumentFromID(id);
-        doc.m_path = CPathUtils::GetLongPathname(savepath);
-        doc.m_bIsDirty = bMod;
-        doc.m_bNeedsSaving = bMod;
-        m_DocManager.UpdateFileTime(doc);
-        doc.m_language = CLexStyles::Instance().GetLanguageForExt(doc.m_path.substr(doc.m_path.find_last_of('.') + 1));
-        m_DocManager.SetDocument(id, doc);
 
-        m_scintilla.SetupLexerForExt(doc.m_path.substr(doc.m_path.find_last_of('.') + 1).c_str());
-        std::wstring sFileName = doc.m_path.substr(doc.m_path.find_last_of('\\') + 1);
-        m_TabBar.SetCurrentTitle(sFileName.c_str());
+    CTempFileDeleter td(filepath);
+    int docID = m_DocManager.GetIdForPath(filepath.c_str());
+    if (docID < 0)
+        return;
 
-        wchar_t sTabTitle[100] = { 0 };
-        m_TabBar.GetCurrentTitle(sTabTitle, _countof(sTabTitle));
-        std::wstring sWindowTitle = CStringUtils::Format(L"%s - BowPad", doc.m_path.empty() ? sTabTitle : doc.m_path.c_str());
-        SetWindowText(*this, sWindowTitle.c_str());
-        UpdateStatusBar(true);
+    int tab = m_TabBar.GetIndexFromID(docID);
+    m_TabBar.ActivateAt(tab);
+    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    doc.m_path = CPathUtils::GetLongPathname(savepath);
+    doc.m_bIsDirty = bMod;
+    doc.m_bNeedsSaving = bMod;
+    m_DocManager.UpdateFileTime(doc);
+    std::wstring ext = CPathUtils::GetFileExtension(doc.m_path);
+    std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
+    doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
+    m_DocManager.SetDocument(docID, doc);
 
-        TCITEM tie;
-        tie.lParam = -1;
-        tie.mask = TCIF_IMAGE;
-        tie.iImage = doc.m_bIsDirty || doc.m_bNeedsSaving ? UNSAVED_IMG_INDEX : SAVED_IMG_INDEX;
-        if (doc.m_bIsReadonly)
-            tie.iImage = REDONLY_IMG_INDEX;
-        ::SendMessage(m_TabBar, TCM_SETITEM, m_TabBar.GetIndexFromID(id), reinterpret_cast<LPARAM>(&tie));
+    m_editor.SetupLexerForExt(ext);
+    m_TabBar.SetCurrentTitle(sFileName.c_str());
 
-        GoToLine(line);
+    UpdateTab(docID);
+    UpdateCaptionBar();
+    UpdateStatusBar(true);
 
-        // delete the temp file
-        DeleteFile(path.c_str());
-    }
-}
-
-bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path)
-{
-    if (!PathFileExists(path.c_str()))
-    {
-        ResString rTitle(hRes, IDS_FILE_DOESNT_EXIST);
-        ResString rQuestion(hRes, IDS_FILE_ASK_TO_CREATE);
-        ResString rCreate(hRes, IDS_FILE_CREATE);
-        ResString rCancel(hRes, IDS_FILE_CREATE_CANCEL);
-        std::wstring sQuestion = CStringUtils::Format(rQuestion, path.substr(path.find_last_of('\\') + 1).c_str());
-
-        TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-        TASKDIALOG_BUTTON aCustomButtons[2];
-        int bi = 0;
-        aCustomButtons[bi].nButtonID = bi + 100;
-        aCustomButtons[bi++].pszButtonText = rCreate;
-        aCustomButtons[bi].nButtonID = bi + 100;
-        aCustomButtons[bi++].pszButtonText = rCancel;
-
-        tdc.hwndParent = *this;
-        tdc.hInstance = hRes;
-        tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-        tdc.pButtons = aCustomButtons;
-        tdc.cButtons = _countof(aCustomButtons);
-        tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-        tdc.pszMainIcon = TD_INFORMATION_ICON;
-        tdc.pszMainInstruction = rTitle;
-        tdc.pszContent = sQuestion.c_str();
-        tdc.nDefaultButton = 100;
-        int nClickedBtn = 0;
-        HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
-
-        if (SUCCEEDED(hr) && (nClickedBtn == 100))
-        {
-            HANDLE hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-            if (hFile != INVALID_HANDLE_VALUE)
-            {
-                CloseHandle(hFile);
-            }
-        }
-        else
-            return false;
-    }
-    return true;
+    GoToLine(line);
 }

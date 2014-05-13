@@ -459,10 +459,10 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW * pLVCD)
             rc = rect;
             if (it->cpMin - drawPos)
             {
-                DrawText(pLVCD->nmcd.hdc, text.substr(drawPos).c_str(), it->cpMin - drawPos, &rc,
+                DrawText(pLVCD->nmcd.hdc, &text[drawPos], it->cpMin - drawPos, &rc,
                          DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
-                DrawText(pLVCD->nmcd.hdc, text.substr(drawPos).c_str(), it->cpMin - drawPos, &rc,
-                         DT_CALCRECT | DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
+                DrawText(pLVCD->nmcd.hdc, &text[drawPos], it->cpMin - drawPos, &rc,
+                         DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS | DT_CALCRECT );
                 rect.left = rc.right;
             }
             rc = rect;
@@ -470,10 +470,10 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW * pLVCD)
             if (it->cpMax - drawPos)
             {
                 SetTextColor(pLVCD->nmcd.hdc, RGB(255,0,0));
-                DrawText(pLVCD->nmcd.hdc, text.substr(drawPos).c_str(), it->cpMax - drawPos, &rc,
+                DrawText(pLVCD->nmcd.hdc, &text[drawPos], it->cpMax - drawPos, &rc,
                          DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
-                DrawText(pLVCD->nmcd.hdc, text.substr(drawPos).c_str(), it->cpMax - drawPos, &rc,
-                         DT_CALCRECT | DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
+                DrawText(pLVCD->nmcd.hdc, &text[drawPos], it->cpMax - drawPos, &rc,
+                         DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS | DT_CALCRECT );
                 rect.left = rc.right;
                 SetTextColor(pLVCD->nmcd.hdc, textColor);
             }

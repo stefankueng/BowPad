@@ -25,6 +25,13 @@
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 #include <list>
+#include <shellapi.h> // TODO Put in stdafx.h and remove from all headers.
+
+namespace OpenFlags
+{
+    const unsigned int AddToMRU = 1;
+    const unsigned int AskToCreateIfMissing = 2;
+};
 
 class CMainWindow : public CWindow, public IUIApplication, public IUICommandHandler
 {
@@ -39,14 +46,23 @@ public:
     bool                RegisterAndCreateWindow();
 
     bool                Initialize();
-    bool                OpenFile(const std::wstring& file, bool bAddToMRU);
-    bool                ReloadTab(int tab, int encoding);
+    bool                CreateRibbon();
+
+    // Load/Reload functions
+    // TODO: merge more.
+    bool                OpenFileEx(const std::wstring& file, unsigned int openFlags);
+    bool                OpenFile(const std::wstring& file, bool bAddToMRU)
+    {
+        return OpenFileEx(file, bAddToMRU ? OpenFlags::AddToMRU : 0);
+    }
+    bool                OpenFileAs( const std::wstring& temppath, const std::wstring& realpath, bool bModified );
+    bool                ReloadTab(int tab, int encoding, bool dueToOutsideChanges = false);
+
     bool                SaveCurrentTab(bool bSaveAs = false);
     void                EnsureAtLeastOneTab();
     void                GoToLine(size_t line);
     bool                CloseTab(int tab, bool force = false);
     bool                CloseAllTabs();
-    bool                HandleOutsideModifications(int id = -1);
     void                SetFileToOpen(const std::wstring& path, size_t line = (size_t)-1) { m_pathsToOpen[path] = line; }
     void                SetFileOpenMRU(bool bUseMRU) { m_bPathsToOpenMRU = bUseMRU; }
     void                SetElevatedSave(const std::wstring& path, const std::wstring& savepath, long line) { m_elevatepath = path; m_elevatesavepath = savepath; m_initLine = line; }
@@ -54,6 +70,7 @@ public:
     void                TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line);
     void                SetTabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line) { m_tabmovepath = path; m_tabmovesavepath = savepath; m_tabmovemod = bMod; m_initLine = line; }
     void                SetInsertionIndex(int index) { m_insertionIndex = index; }
+    std::wstring        GetNewTabName();
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
     IFACEMETHODIMP_(ULONG) AddRef();
@@ -70,25 +87,69 @@ protected:
     /// the message handler for this window
     LRESULT CALLBACK            WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    void                        AutoIndent(Scintilla::SCNotification * pScn);
-    bool                        AskToCreateNonExistingFile(const std::wstring& path);
-
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
     LRESULT                     DoCommand(int id);
 
 private:
+    std::wstring                GetWindowClassName() const;
+    std::wstring                GetAppName() const;
+    HWND                        FindAppMainWindow(HWND hStartWnd, bool* isThisInstance = nullptr) const;
     void                        ResizeChildWindows();
     void                        UpdateStatusBar(bool bEverything);
     void                        InitCommands();
     void                        AddHotSpots();
+
+    int                         AskToCreateNonExistingFile(const std::wstring& path) const;
+    int                         AskToReload(const CDocument& doc) const;
+    int                         AskToReloadOutsideModifiedFile(const CDocument& doc) const;
+    int                         AskToRemoveFile(const CDocument& doc) const;
+    int                         AskToRemoveReadOnlyAttribute() const;
+    int                         AskToCloseTab() const;
+    void                        UpdateTab(int docID);
+    void                        CloseAllButCurrentTab();
+    void                        EnsureNewLineAtEnd(const CDocument& doc);
+    void                        OpenNewTab();
+    void                        CopyCurDocPathToClipboard() const;
+    void                        CopyCurDocNameToClipboard() const;
+    void                        CopyCurDocDirToClipboard() const;
+    void                        ShowCurDocInExplorer() const;
+    void                        ShowCurDocExplorerProperties() const;
+    void                        PasteHistory();
+    void                        About() const;
+    bool                        HasOutsideChangesOccurred() const;
+    void                        CheckForOutsideChanges();
+    void                        UpdateCaptionBar();
+    void                        HandleOutsideModifiedFile(int docID);
+    bool                        HandleOutsideDeletedFile(int docID);
+    void                        HandleCreate(HWND hwnd);
+    void                        HandleAfterInit();
+    void                        HandleDropFiles(HDROP hDrop);
+    void                        HandleTabDroppedOutside(int tab, POINT pt);
+    void                        HandleTabChange(const TBHDR& tbhdr);
+    void                        HandleTabChanging(const TBHDR& tbhdr);
+    void                        HandleTabDelete(const TBHDR& tbhdr);
+    void                        HandleClipboardUpdate();
+    void                        HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi);
+    // Scintilla events.
+    void                        HandleDwellStart(const Scintilla::SCNotification& scn);
+    void                        HandleHotSpotClick(const Scintilla::SCNotification& scn);
+    void                        HandleCopyDataCommandLine(const COPYDATASTRUCT& cds);
+    bool                        HandleCopyDataMoveTab(const COPYDATASTRUCT& cds);
+    void                        HandleWriteProtectedEdit();
+    void                        HandleSavePoint(const Scintilla::SCNotification& scn);
+    void                        HandleUpdateUI(const Scintilla::SCNotification& scn);
+    void                        HandleAutoIndent(const Scintilla::SCNotification &scn);
+    void                        DocumentChanged();
+
 private:
     LONG                        m_cRef;
+    int                         m_newCount;
     IUIRibbon *                 m_pRibbon;
     UINT                        m_RibbonHeight;
 
     CStatusBar                  m_StatusBar;
     CTabBar                     m_TabBar;
-    CScintillaWnd               m_scintilla;
+    CScintillaWnd               m_editor;
     CDocumentManager            m_DocManager;
     std::unique_ptr<wchar_t[]>  m_tooltipbuffer;
     HICON                       m_hShieldIcon;
@@ -102,4 +163,6 @@ private:
     bool                        m_tabmovemod;
     long                        m_initLine;
     int                         m_insertionIndex;
+    bool                        m_handlingOutsideChanges;
+    bool                        m_windowRestored;
 };
