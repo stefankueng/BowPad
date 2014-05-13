@@ -2153,20 +2153,21 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
         LPWSTR * szArglist = CommandLineToArgvW((LPCWSTR)cds.lpData, &nArgs);
         if (!szArglist)
             return;
+
+        int filesOpened = 0;
         for (int i = 1; i < nArgs; i++)
         {
             if (szArglist[i][0] != '/')
             {
-                OpenFileEx(szArglist[i], OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing);
+                if (OpenFileEx(szArglist[i], OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
+                    ++filesOpened;
             }
         }
 
         // Free memory allocated for CommandLineToArgvW arguments.
         LocalFree(szArglist);
 
-        //FIXME: This seems wrong/misplaced. Not sure how one line
-        // can be associated with multiple files (see above).
-        if (parser.HasVal(L"line"))
+        if ((filesOpened == 1) && parser.HasVal(L"line"))
         {
             GoToLine(parser.GetLongVal(L"line") - 1);
         }
