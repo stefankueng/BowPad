@@ -86,8 +86,7 @@ int ICommand::GetActiveTabIndex()
     return pMainWnd->m_TabBar.GetCurrentTabIndex();
 }
 
-// TODO: Rename to GetDocIdOfCurrentTab()
-int ICommand::GetCurrentTabId()
+int ICommand::GetDocIdOfCurrentTab()
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     return pMainWnd->m_TabBar.GetCurrentTabId();

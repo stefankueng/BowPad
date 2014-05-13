@@ -349,7 +349,7 @@ void CCmdFunctions::TabNotify(TBHDR * ptbhdr)
         // FIXME! GetDocIDFromTabIndex should work here but
         // tabOrigin seems usually wrong?
         //int docId = GetDocIDFromTabIndex(ptbhdr->tabOrigin);
-        int docId = GetCurrentTabId();
+        int docId = GetDocIdOfCurrentTab();
         ScheduleFunctionUpdate(docId, FunctionUpdateReason::TabChange);
     }
 }
@@ -361,7 +361,7 @@ void CCmdFunctions::ScintillaNotify(Scintilla::SCNotification * pScn)
         case SCN_MODIFIED:
             if (pScn->modificationType & (SC_MOD_INSERTTEXT|SC_MOD_DELETETEXT))
             {
-                int docId = GetCurrentTabId();
+                int docId = GetDocIdOfCurrentTab();
                 if (docId < 0)
                     return;
                 const CDocument& doc = this->GetDocumentFromID(docId);
@@ -411,12 +411,12 @@ void CCmdFunctions::UpdateFunctions( bool bForce )
         return;
     // Process documents on a last in first out basis,
     // roughly hoping to process the most recently changed first.
-    int docId = bForce ? GetCurrentTabId() : TopDocumentId();
+    int docId = bForce ? GetDocIdOfCurrentTab() : TopDocumentId();
 
     FindFunctions(docId, bForce);
     // The processing of the active document makes the functions list
     // presented to the user available.
-    if (docId == GetCurrentTabId())
+    if (docId == GetDocIdOfCurrentTab())
         m_functionsStatus = m_searchStatus;
     if (m_searchStatus == FindFunctionsStatus::InProgress)
         ScheduleFunctionUpdate(docId,FunctionUpdateReason::DocProgress);
@@ -446,7 +446,7 @@ void CCmdFunctions::FindFunctions(int docID, bool bForce)
         return;
     }
 
-    int activeDocId = GetCurrentTabId();
+    int activeDocId = GetDocIdOfCurrentTab();
     if (activeDocId < 0) // Need to know what the active document is.
     {
         m_searchStatus = FindFunctionsStatus::Failed;
@@ -689,7 +689,7 @@ void CCmdFunctions::DocumentScanFinished(int docId, bool bForce)
         m_docIDs.erase(whereFound);
     else
         assert(bForce);
-    if (!bForce && (docId == GetCurrentTabId()))
+    if (!bForce && (docId == GetDocIdOfCurrentTab()))
     {
         InvalidateFunctionsSource();
         InvalidateFunctionsEnabled();
@@ -722,7 +722,7 @@ void CCmdFunctions::ScheduleFunctionUpdate(int docId, FunctionUpdateReason reaso
 
     // -1 means don't set timer. 0 means trigger soon as possible.
     int updateWhen = -1;
-    int activeDocId = GetCurrentTabId();
+    int activeDocId = GetDocIdOfCurrentTab();
 
     // If we were expecting progress but didn't receive it because
     // we received some other non progress event or 

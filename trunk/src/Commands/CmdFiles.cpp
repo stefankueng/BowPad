@@ -277,7 +277,7 @@ bool CCmdFileDelete::Execute()
                 if (nClickedBtn == 100)
                 {
                     // Close the tab
-                    if (!CloseTab(GetTabIndexFromDocID(GetCurrentTabId()), false))
+                    if (!CloseTab(GetTabIndexFromDocID(GetDocIdOfCurrentTab()), false))
                         return false;
 
                     IFileOperationPtr pfo = NULL;

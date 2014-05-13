@@ -141,7 +141,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PR
                 InvalidateUICommand(cmdFunctions, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
                 CDocument doc = GetActiveDocument();
                 doc.m_language = langs[selected];
-                SetDocument(GetCurrentTabId(), doc);
+                SetDocument(GetDocIdOfCurrentTab(), doc);
                 SetupLexerForLang(doc.m_language);
                 CLexStyles::Instance().SetLangForPath(doc.m_path, doc.m_language);
                 UpdateStatusBar(true);

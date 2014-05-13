@@ -47,7 +47,7 @@ protected:
     void                SetInsertionIndex(int index);
     void                TabActivateAt(int index);
     void                UpdateTab(int index);
-    int                 GetCurrentTabId();
+    int                 GetDocIdOfCurrentTab();
     int                 GetActiveTabIndex();
     int                 GetTabCount();
     std::wstring        GetCurrentTitle();

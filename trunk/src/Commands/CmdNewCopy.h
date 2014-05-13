@@ -56,7 +56,7 @@ public:
 
             SetupLexerForLang(docnew.m_language);
             ScintillaCall(SCI_APPENDTEXT, len, (sptr_t)textbuf.get());
-            SetDocument(GetCurrentTabId(), docnew);
+            SetDocument(GetDocIdOfCurrentTab(), docnew);
             RestoreCurrentPos(docnew.m_position);
             ScintillaCall(SCI_SETSAVEPOINT);
             std::wstring sTitle = CPathUtils::GetFileName(docnew.m_path);
