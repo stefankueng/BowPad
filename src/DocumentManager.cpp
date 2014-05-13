@@ -786,7 +786,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
         return false;
     DWORD attributes = INVALID_FILE_ATTRIBUTES;
     DWORD err = 0;
-    // FIXME! Why so much sharing?
+    // when opening files, always 'share' as much as possible to reduce problems with virus scanners
     CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (!hFile.IsValid())
         err = GetLastError();
