@@ -104,29 +104,39 @@ bool CDocumentManager::HasDocumentID(int id) const
     {
         return false;
     }
+#ifdef _DEBUG
     // Paranoid check.
     // If we find something with an invalid id, something is very wrong.
-    if (id <0)
+    if (id < 0)
     {
         assert(false);
         throw std::invalid_argument("HasDocumentID called with an invalid document id but found a document.");
     }
+#endif
+
     return true;
 }
 
 // Must exist or it's a bug.
 CDocument CDocumentManager::GetDocumentFromID(int id) const
 {
-    if (id<0)
+#ifdef _DEBUG
+    if (id < 0)
     {
         assert(false); // It's a bug to even try to use a null id here.
         throw std::invalid_argument("GetDocumentFromID called with an invalid document id");
     }
+#endif
     auto pos = m_documents.find(id);
     // Pretty catastrophic if this ever fails.
     // Use HasDocumentID to check first if you're not sure.
     if (pos == std::end(m_documents))
+    {
+#ifdef _DEBUG
         throw std::invalid_argument("GetDocumentFromID called but not document exists with the given id");
+#endif
+        return CDocument();
+    }
     return pos->second;
 }
 
@@ -136,16 +146,20 @@ void CDocumentManager::SetDocument(int id, const CDocument& doc)
     auto where = m_documents.find(id);
     // SetDocument/Find does not create a position if it doesn't exist.
     // Use Operator [] for that or really AddDocumentAtEnd etc. to add.
+#ifdef _DEBUG
     if (where == std::end(m_documents))
         throw std::invalid_argument("SetDocument can only update an existing document.");
+#endif
     where->second = doc;
 }
 
 void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, int id )
 {
+#ifdef _DEBUG
     // Catch attempts to id's that serve as null type values.
     if (id<0)
         throw std::invalid_argument("Attempt to add a document with invalid id");
+#endif
     m_documents[id] = doc;
 }
 
@@ -459,7 +473,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
                 if (elevationError == 0)
                     return doc;
                 // If the user hasn't chanceld explain why we
-                // couldn't elevate.If they did cancel, they no that so no need
+                // couldn't elevate. If they did cancel, they no that so no need
                 // to tell them that!
                 if (elevationError != ERROR_CANCELLED)
                 {
@@ -868,7 +882,7 @@ bool CDocumentManager::UpdateFileTime( CDocument& doc )
 DocModifiedState CDocumentManager::HasFileChanged( int id ) const
 {
     CDocument doc = GetDocumentFromID(id);
-    if (doc.m_path.empty() || ((doc.m_lastWriteTime.dwLowDateTime==0)&&(doc.m_lastWriteTime.dwHighDateTime==0)) || doc.m_bDoSaveAs)
+    if (doc.m_path.empty() || ((doc.m_lastWriteTime.dwLowDateTime == 0) && (doc.m_lastWriteTime.dwHighDateTime == 0)) || doc.m_bDoSaveAs)
         return DM_Unmodified;
 
     // get the last write time of the base doc file
