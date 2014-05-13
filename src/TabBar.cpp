@@ -118,7 +118,7 @@ CTabBar::CTabBar(HINSTANCE hInst)
         , m_tabID(0)
 {
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-        Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 };
 
  CTabBar::~CTabBar()
@@ -329,7 +329,6 @@ int CTabBar::GetCurrentTabIndex() const
     return TabCtrl_GetCurSel(*this);
 }
 
-// TODO: Rename to GetDocIdOfCurrentTab() or something better.
 int CTabBar::GetCurrentTabId() const
 {
     int index = TabCtrl_GetCurSel(*this);
