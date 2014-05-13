@@ -221,7 +221,6 @@ int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
     return ret;
 }
 
-// FIXME! Use TabCtrl_GetItem etc. instead.
 void CTabBar::GetTitle(int index, TCHAR *title, int titleLen) const
 {
     TCITEM tci;
