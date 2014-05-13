@@ -36,6 +36,7 @@
 #include "SysInfo.h"
 #include "StringUtils.h"
 #include "PathUtils.h"
+#include "TempFile.h"
 #include "AppUtils.h"
 
 #include <algorithm>
@@ -803,7 +804,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
             auto nClickedBtn = AskToElevatePrivilegeForSaving(hWnd,doc.m_path);
             if (nClickedBtn == 101) // Elevate
             {
-                std::wstring temppath = CPathUtils::GetTempFilePath();
+                std::wstring temppath = CTempFiles::Instance().GetTempFilePath(true);
 
                 if (SaveDoc(hWnd, temppath, doc))
                 {
@@ -822,7 +823,6 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
                         ShowFileSaveError(hWnd, doc.m_path, errMsg);
                     }
                 }
-                ::DeleteFile(temppath.c_str());
              }
         }
         ShowFileSaveError(hWnd,doc.m_path,errMsg);

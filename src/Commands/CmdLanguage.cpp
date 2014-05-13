@@ -23,6 +23,7 @@
 #include "DirFileEnum.h"
 #include "AppUtils.h"
 #include "PathUtils.h"
+#include "TempFile.h"
 #include "version.h"
 
 #include <vector>
@@ -205,7 +206,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
             {
                 gRemotes.clear();
                 // fetch list of remotely available languages
-                std::wstring tempfile = CPathUtils::GetTempFilePath();
+                std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
 
                 std::wstring sLangURL = CStringUtils::Format(L"https://bowpad.googlecode.com/svn/branches/%d.%d.%d/Languages/Languages.txt", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO);
                 HRESULT res = URLDownloadToFile(NULL, sLangURL.c_str(), tempfile.c_str(), 0, NULL);

@@ -19,6 +19,7 @@
 #include "BowPad.h"
 #include "StringUtils.h"
 #include "PathUtils.h"
+#include "TempFile.h"
 #include "UnicodeUtils.h"
 #include "SmartHandle.h"
 #include "ProgressDlg.h"
@@ -143,7 +144,7 @@ bool CAppUtils::CheckForUpdate(bool force)
                     return false;
             }
 
-            std::wstring tempfile = CPathUtils::GetTempFilePath();
+            std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
 
             std::wstring sCheckURL = L"https://bowpad.googlecode.com/svn/trunk/version.txt";
             HRESULT res = URLDownloadToFile(NULL, sCheckURL.c_str(), tempfile.c_str(), 0, NULL);
@@ -207,7 +208,6 @@ bool CAppUtils::CheckForUpdate(bool force)
                 }
                 File.close();
             }
-            DeleteFile(tempfile.c_str());
         }
     }
     return bNewerAvailable;
