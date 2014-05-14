@@ -142,7 +142,7 @@ LRESULT Refresh (HWND hWnd, HDC hdc)
     return 0;
 }
 
-bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, int * nsParts)
+bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, const int nsParts[])
 {
     InitCommonControls();
 

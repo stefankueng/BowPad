@@ -34,15 +34,15 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         RestoreSavedSession();
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdSessionLoad; }
+    UINT GetCmdId() override { return cmdSessionLoad; }
 
-    virtual void OnClose() override
+    void OnClose() override
     {
         // BowPad is closing, save the current session
 
@@ -155,7 +155,7 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         bool bAutoLoad = CIniSettings::Instance().GetInt64(L"TabSession", L"autoload", 0) != 0;
         bAutoLoad = !bAutoLoad;
@@ -164,11 +164,11 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdSessionAutoLoad; }
+    UINT GetCmdId() override { return cmdSessionAutoLoad; }
 
-    virtual void OnClose() override {}
+    void OnClose() override {}
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_BooleanValue == key)
         {
@@ -178,7 +178,7 @@ public:
         return E_NOTIMPL;
     }
 
-    virtual void AfterInit() override
+    void AfterInit() override
     {
         CCmdLineParser parser(GetCommandLine());
 
@@ -201,7 +201,7 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         if (m_docstates.empty())
             return false;
@@ -230,9 +230,9 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdSessionLast; }
+    UINT GetCmdId() override { return cmdSessionLast; }
 
-    virtual void OnDocumentClose(int index) override
+    void OnDocumentClose(int index) override
     {
         CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(index));
         if (doc.m_path.empty())

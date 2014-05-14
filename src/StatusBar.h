@@ -29,7 +29,7 @@ public :
     {};
     virtual ~CStatusBar(){}
 
-    bool Init(HINSTANCE hInst, HWND hParent, int nbParts, int * nsParts);
+    bool Init(HINSTANCE hInst, HWND hParent, int nbParts, const int nsParts[]);
     void Resize();
     int GetHeight() const { return m_height; }
     bool SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart) const
