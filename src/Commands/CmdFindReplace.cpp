@@ -617,8 +617,8 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
     case IDC_REPLACEBTN:
     case IDC_REPLACEALLINTABSBTN:
     {
-            DoReplace(id);
-        }
+        DoReplace(id);
+    }
         break;
     case IDC_MATCHREGEX:
         {
@@ -654,6 +654,10 @@ void CFindReplaceDlg::SetInfoText( UINT resid )
 void CFindReplaceDlg::DoReplace( int id )
 {
     SetDlgItemText(*this, IDC_SEARCHINFO, L"");
+
+    size_t len = ScintillaCall(SCI_GETLENGTH);
+    if ((len == 0) && (sFindString.empty()))
+        return; // empty document and empty search string, nothing to replace
 
     size_t selStart = ScintillaCall(SCI_GETSELECTIONSTART);
     size_t selEnd = ScintillaCall(SCI_GETSELECTIONEND);
