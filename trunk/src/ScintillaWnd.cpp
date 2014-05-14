@@ -1618,3 +1618,13 @@ void CScintillaWnd::DocScrollUpdate()
     //GetScrollInfo(*this, SB_VERT, &si);
     SetScrollInfo(*this, SB_VERT, &si, TRUE);
 }
+
+void CScintillaWnd::SetEOLType(int eolType)
+{
+    Call(SCI_SETEOLMODE, eolType);
+}
+
+void CScintillaWnd::AppendText(int len, const char* buf)
+{
+    Call(SCI_APPENDTEXT, len, reinterpret_cast<LPARAM>(buf));
+}
