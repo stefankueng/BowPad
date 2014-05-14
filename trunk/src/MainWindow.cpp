@@ -51,7 +51,7 @@
 #include <Shellapi.h>
 #include <Shlobj.h>
 
-IUIFramework *g_pFramework = NULL;  // Reference to the Ribbon framework.
+IUIFramework *g_pFramework = nullptr;  // Reference to the Ribbon framework.
 
 const int STATUSBAR_DOC_TYPE      = 0;
 const int STATUSBAR_DOC_SIZE      = 1;
@@ -72,7 +72,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_editor(hInst)
     , m_newCount(0)
     , m_cRef(1)
-    , m_hShieldIcon(NULL)
+    , m_hShieldIcon(nullptr)
     , m_tabmovemod(false)
     , m_initLine(0)
     , m_bPathsToOpenMRU(true)
@@ -121,7 +121,7 @@ STDMETHODIMP CMainWindow::QueryInterface(REFIID iid, void** ppv)
     }
     else
     {
-        *ppv = NULL;
+        *ppv = nullptr;
         return E_NOINTERFACE;
     }
 
@@ -172,8 +172,7 @@ STDMETHODIMP CMainWindow::OnViewChanged(
                 {
                     IStreamPtr pStrm;
                     std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
-                    hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_READ, 0, FALSE, NULL, &pStrm);
-
+                    hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_READ, 0, FALSE, nullptr, &pStrm);
                     if (!CAppUtils::FailedShowMessage(hr))
                     {
                         hr = m_pRibbon->LoadSettingsFromStream(pStrm);
@@ -201,8 +200,8 @@ STDMETHODIMP CMainWindow::OnViewChanged(
                 hr = S_OK;
                 IStreamPtr pStrm;
                 std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
-                hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_WRITE|STGM_CREATE, FILE_ATTRIBUTE_NORMAL, TRUE, NULL, &pStrm);
-                if (SUCCEEDED(hr))
+                hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_WRITE|STGM_CREATE, FILE_ATTRIBUTE_NORMAL, TRUE, nullptr, &pStrm);
+                if (!CAppUtils::FailedShowMessage(hr))
                 {
                     LARGE_INTEGER liPos;
                     ULARGE_INTEGER uliSize;
@@ -210,13 +209,13 @@ STDMETHODIMP CMainWindow::OnViewChanged(
                     liPos.QuadPart = 0;
                     uliSize.QuadPart = 0;
 
-                    pStrm->Seek(liPos, STREAM_SEEK_SET, NULL);
+                    pStrm->Seek(liPos, STREAM_SEEK_SET, nullptr);
                     pStrm->SetSize(uliSize);
 
                     m_pRibbon->SaveSettingsToStream(pStrm);
                 }
                 m_pRibbon->Release();
-                m_pRibbon = NULL;
+                m_pRibbon = nullptr;
             }
             break;
         }
@@ -332,7 +331,7 @@ HWND CMainWindow::FindAppMainWindow(HWND hStartWnd, bool* isThisInstance) const
         hStartWnd = GetParent(hStartWnd);
     }
     if (isThisInstance)
-        *isThisInstance = hStartWnd != NULL && hStartWnd == *this;
+        *isThisInstance = hStartWnd != nullptr && hStartWnd == *this;
     return hStartWnd;
 }
 
@@ -347,16 +346,16 @@ bool CMainWindow::RegisterAndCreateWindow()
     //wcx.cbClsExtra = 0;
     //wcx.cbWndExtra = 0;
     wcx.hInstance = hResource;
-    wcx.hCursor = NULL;
+    //wcx.hCursor = NULL;
     std::wstring clsName = GetWindowClassName();
     wcx.lpszClassName = clsName.c_str();
     wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_BOWPAD));
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
-    wcx.lpszMenuName = NULL;
+    //wcx.lpszMenuName = NULL;
     wcx.hIconSm = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_BOWPAD));
     if (RegisterWindow(&wcx))
     {
-        if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, NULL))
+        if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, nullptr))
         {
             UpdateWindow(*this);
             return true;
@@ -380,18 +379,18 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_GETMINMAXINFO:
         {
-            MINMAXINFO * mmi = (MINMAXINFO*)lParam;
-            mmi->ptMinTrackSize.x = 400;
-            mmi->ptMinTrackSize.y = 100;
+            MINMAXINFO& mmi = *(MINMAXINFO*)lParam;
+            mmi.ptMinTrackSize.x = 400;
+            mmi.ptMinTrackSize.y = 100;
             return 0;
         }
         break;
     case WM_DRAWITEM:
         {
-            DRAWITEMSTRUCT *dis = (DRAWITEMSTRUCT *)lParam;
-            if (dis->CtlType == ODT_TAB)
+            const DRAWITEMSTRUCT& dis = *(DRAWITEMSTRUCT *)lParam;
+            if (dis.CtlType == ODT_TAB)
             {
-                return ::SendMessage(dis->hwndItem, WM_DRAWITEM, wParam, lParam);
+                return ::SendMessage(dis.hwndItem, WM_DRAWITEM, wParam, lParam);
             }
         }
         break;
@@ -426,46 +425,51 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_NOTIFY:
         {
-            LPNMHDR pNMHDR = reinterpret_cast<LPNMHDR>(lParam);
+            LPNMHDR pnmhdr = reinterpret_cast<LPNMHDR>(lParam);
+            APPVERIFY(pnmhdr != nullptr);
+            if (pnmhdr == nullptr)
+                return 0;
+            const NMHDR& nmhdr = *pnmhdr;
 
-            switch (pNMHDR->code)
+            switch (nmhdr.code)
             {
             case TTN_GETDISPINFO:
                 {
                 LPNMTTDISPINFO lpnmtdi = reinterpret_cast<LPNMTTDISPINFO>(lParam);
-                HandleGetDispInfo((int)pNMHDR->idFrom, lpnmtdi);
+                HandleGetDispInfo((int)nmhdr.idFrom, lpnmtdi);
                 }
                 break;
             default:
                 break;
             }
 
-            if ((pNMHDR->idFrom == (UINT_PTR)&m_TabBar) ||
-                (pNMHDR->hwndFrom == m_TabBar))
+            if ((nmhdr.idFrom == (UINT_PTR)&m_TabBar) ||
+                (nmhdr.hwndFrom == m_TabBar))
             {
                 TBHDR* ptbhdr = reinterpret_cast<TBHDR*>(lParam);
+                const TBHDR& tbhdr = *ptbhdr;
+                assert(tbhdr.hdr.code == nmhdr.code);
+
                 CCommandHandler::Instance().TabNotify(ptbhdr);
 
-                assert(ptbhdr->hdr.code == pNMHDR->code);
-
-                switch (pNMHDR->code)
+                switch (nmhdr.code)
                 {
                 case TCN_GETCOLOR:
-                    if ((ptbhdr->tabOrigin >= 0) && (ptbhdr->tabOrigin < m_DocManager.GetCount()))
+                    if ((tbhdr.tabOrigin >= 0) && (tbhdr.tabOrigin < m_DocManager.GetCount()))
                     {
-                        int id = m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin);
+                        int id = m_TabBar.GetIDFromIndex(tbhdr.tabOrigin);
                         if (m_DocManager.HasDocumentID(id))
                             return CTheme::Instance().GetThemeColor(m_DocManager.GetColorForDocument(id));
                     }
                     break;
                 case TCN_SELCHANGE:
-                    HandleTabChange(*ptbhdr);
+                    HandleTabChange(tbhdr);
                     break;
                 case TCN_SELCHANGING:
-                    HandleTabChanging(*ptbhdr);
+                    HandleTabChanging(tbhdr);
                     break;
                 case TCN_TABDELETE:
-                    HandleTabDelete(*ptbhdr);
+                    HandleTabDelete(tbhdr);
                     break;
                 case TCN_TABDROPPEDOUTSIDE:
                     {
@@ -478,20 +482,19 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     break;
                 }
             }
-            else if ((pNMHDR->idFrom == (UINT_PTR)&m_editor) ||
-                (pNMHDR->hwndFrom == m_editor))
+            else if ((nmhdr.idFrom == (UINT_PTR)&m_editor) ||
+                (nmhdr.hwndFrom == m_editor))
             {
-                if (pNMHDR->code == NM_COOLSB_CUSTOMDRAW)
+                if (nmhdr.code == NM_COOLSB_CUSTOMDRAW)
                 {
                     return m_editor.HandleScrollbarCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
                 }
 
                 Scintilla::SCNotification* pScn = reinterpret_cast<Scintilla::SCNotification *>(lParam);
-                APPVERIFY(pScn != nullptr );
-                const Scintilla::SCNotification& scn = *reinterpret_cast<const Scintilla::SCNotification *>(lParam);
+                const Scintilla::SCNotification& scn = *pScn;
 
                 CCommandHandler::Instance().ScintillaNotify(pScn);
-                switch (pScn->nmhdr.code)
+                switch (scn.nmhdr.code)
                 {
                 case SCN_PAINTED:
                     m_editor.UpdateLineNumberWidth();
@@ -699,10 +702,10 @@ bool CMainWindow::Initialize()
 
         if (func)
         {
-            func(*this,       WM_COPYDATA, MSGFLT_ALLOW, NULL );
-            func(m_editor, WM_COPYDATA, MSGFLT_ALLOW, NULL );
-            func(m_TabBar,    WM_COPYDATA, MSGFLT_ALLOW, NULL );
-            func(m_StatusBar, WM_COPYDATA, MSGFLT_ALLOW, NULL );
+            func(*this,       WM_COPYDATA, MSGFLT_ALLOW, nullptr );
+            func(m_editor, WM_COPYDATA, MSGFLT_ALLOW, nullptr );
+            func(m_TabBar,    WM_COPYDATA, MSGFLT_ALLOW, nullptr );
+            func(m_StatusBar, WM_COPYDATA, MSGFLT_ALLOW, nullptr );
         }
         else
         {
@@ -715,7 +718,7 @@ bool CMainWindow::Initialize()
     }
 
     m_editor.Init(hResource, *this);
-    int barParts[8] = {100, 300, 550, 650, 750, 780, 820, 880};
+    const int barParts[8] = {100, 300, 550, 650, 750, 780, 820, 880};
     m_StatusBar.Init(hResource, *this, _countof(barParts), barParts);
     m_TabBar.Init(hResource, *this);
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
@@ -743,7 +746,7 @@ bool CMainWindow::CreateRibbon()
 {
     assert(!g_pFramework); // Not supporting re-initializing.
     // Here we instantiate the Ribbon framework object.
-    HRESULT hr = CoCreateInstance(CLSID_UIRibbonFramework, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&g_pFramework));
+    HRESULT hr = CoCreateInstance(CLSID_UIRibbonFramework, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&g_pFramework));
     if (CAppUtils::FailedShowMessage(hr))
         return false;
 
@@ -817,12 +820,12 @@ void CMainWindow::ResizeChildWindows()
     {
         const UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
         HDWP hDwp = BeginDeferWindowPos(3);
-        DeferWindowPos(hDwp, m_StatusBar, NULL, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_TabBar, NULL, rect.left, rect.top + m_RibbonHeight, rect.right - rect.left, rect.bottom - rect.top, flags);
+        DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), flags);
+        DeferWindowPos(hDwp, m_TabBar, nullptr, rect.left, rect.top + m_RibbonHeight, rect.right - rect.left, rect.bottom - rect.top, flags);
         RECT tabrc;
         TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
         MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
-        DeferWindowPos(hDwp, m_editor, NULL, rect.left, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, rect.right - rect.left, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), flags);
+        DeferWindowPos(hDwp, m_editor, nullptr, rect.left, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, rect.right - rect.left, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), flags);
         EndDeferWindowPos(hDwp);
         m_StatusBar.Resize();
     }
@@ -864,9 +867,9 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         bSaveAs = true;
         PreserveChdir keepCWD;
 
-        IFileSaveDialogPtr pfd = NULL;
+        IFileSaveDialogPtr pfd;
 
-        HRESULT hr = pfd.CreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_INPROC_SERVER);
+        HRESULT hr = pfd.CreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER);
         if (CAppUtils::FailedShowMessage(hr))
             return false;
 
@@ -890,8 +893,8 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         if (!doc.m_path.empty())
         {
             std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
-            IShellItemPtr psiDefFolder = NULL;
-            hr = SHCreateItemFromParsingName(folder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
+            IShellItemPtr psiDefFolder = nullptr;
+            hr = SHCreateItemFromParsingName(folder.c_str(), nullptr, IID_PPV_ARGS(&psiDefFolder));
             if (CAppUtils::FailedShowMessage(hr))
                 return false;
             hr = pfd->SetFolder(psiDefFolder);
@@ -903,11 +906,11 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         hr = pfd->Show(*this);
         if (CAppUtils::FailedShowMessage(hr))
             return false;
-        IShellItemPtr psiResult = NULL;
+        IShellItemPtr psiResult = nullptr;
         hr = pfd->GetResult(&psiResult);
         if (CAppUtils::FailedShowMessage(hr))
             return false;
-        PWSTR pszPath = NULL;
+        PWSTR pszPath = nullptr;
         hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
         if (CAppUtils::FailedShowMessage(hr))
             return false;
@@ -1024,14 +1027,14 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     std::wstring tttyping = CStringUtils::Format(rsStatusTTTyping, m_editor.Call(SCI_GETOVERTYPE) ? (LPCWSTR)rsStatusTTTypingOvl : (LPCWSTR)rsStatusTTTypingIns);
     m_StatusBar.SetText(m_editor.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
-    m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", NULL, STATUSBAR_CAPS);
+    m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", nullptr, STATUSBAR_CAPS);
     if (bEverything)
     {
         CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
-        m_StatusBar.SetText(doc.m_language.c_str(), NULL, STATUSBAR_DOC_TYPE);
+        m_StatusBar.SetText(doc.m_language.c_str(), nullptr, STATUSBAR_DOC_TYPE);
         std::wstring tteof = CStringUtils::Format(rsStatusTTEOF, FormatTypeToString(doc.m_format).c_str());
         m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), tteof.c_str(), STATUSBAR_EOF_FORMAT);
-        m_StatusBar.SetText(doc.GetEncodingString().c_str(), NULL, STATUSBAR_UNICODE_TYPE);
+        m_StatusBar.SetText(doc.GetEncodingString().c_str(), nullptr, STATUSBAR_UNICODE_TYPE);
 
         std::wstring tttabs = CStringUtils::Format(rsStatusTTTabs, m_TabBar.GetItemCount());
         m_StatusBar.SetText(CStringUtils::Format(L"tabs: %d", m_TabBar.GetItemCount()).c_str(), tttabs.c_str(), STATUSBAR_TABS);
@@ -1159,7 +1162,7 @@ int CMainWindow::AskToCloseTab() const
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent = sQuestion.c_str();
     int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, NULL, NULL );
+    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, nullptr, nullptr );
     if (CAppUtils::FailedShowMessage(hr))
         return 0;
     return nClickedBtn;
@@ -1201,7 +1204,7 @@ int CMainWindow::AskToReloadOutsideModifiedFile(const CDocument& doc) const
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent = sQuestion.c_str();
     int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, NULL, NULL );
+    HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, nullptr, nullptr );
     if (CAppUtils::FailedShowMessage(hr))
         return 0;
     return nClickedBtn;
@@ -1235,7 +1238,7 @@ int CMainWindow::AskToReload(const CDocument& doc) const
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent = sQuestion.c_str();
     int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, NULL, NULL );
+    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, nullptr, nullptr );
     if (CAppUtils::FailedShowMessage(hr))
         return 0;
     return nClickedBtn;
@@ -1269,7 +1272,7 @@ int CMainWindow::AskToRemoveFile(const CDocument& doc) const
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent = sQuestion.c_str();
     int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, NULL, NULL );
+    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, nullptr, nullptr );
     if (CAppUtils::FailedShowMessage(hr))
         return 0;
     return nClickedBtn;
@@ -1308,7 +1311,7 @@ int CMainWindow::AskToRemoveReadOnlyAttribute() const
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent = rQuestion;
     int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
+    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
     if (CAppUtils::FailedShowMessage(hr))
         return 0;
     return nClickedBtn;
@@ -1344,7 +1347,7 @@ int CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent = sQuestion.c_str();
     int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
+    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
     return CAppUtils::FailedShowMessage(hr) ? 0 : nClickedBtn;
 }
 
@@ -1424,7 +1427,7 @@ void CMainWindow::HandleClipboardUpdate()
             if (hData)
             {
                 LPCWSTR lptstr = (LPCWSTR)GlobalLock(hData);
-                if (lptstr != NULL)
+                if (lptstr != nullptr)
                 {
                     s = lptstr;
                     GlobalUnlock(hData);
@@ -1487,7 +1490,7 @@ void CMainWindow::PasteHistory()
                 AppendMenu(hMenu, MF_ENABLED, index, sf.substr(0, maxsize).c_str());
                 ++index;
             }
-            int selIndex = TrackPopupMenu(hMenu, TPM_LEFTALIGN|TPM_RETURNCMD, pt.x, pt.y, 0, m_editor, NULL);
+            int selIndex = TrackPopupMenu(hMenu, TPM_LEFTALIGN|TPM_RETURNCMD, pt.x, pt.y, 0, m_editor, nullptr);
             DestroyMenu (hMenu);
             if (selIndex > 0)
             {
@@ -1644,7 +1647,7 @@ void CMainWindow::HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi)
                 m_tooltipbuffer = std::unique_ptr<wchar_t[]>(new wchar_t[doc.m_path.size()+1]);
                 wcscpy_s(m_tooltipbuffer.get(), doc.m_path.size()+1, doc.m_path.c_str());
                 lpnmtdi->lpszText = m_tooltipbuffer.get();
-                lpnmtdi->hinst = NULL;
+                lpnmtdi->hinst = nullptr;
             }
         }
     }
@@ -1693,7 +1696,7 @@ void CMainWindow::HandleHotSpotClick(const Scintilla::SCNotification& scn)
 
     SearchReplace(url, L"&amp;", L"&");
 
-    ::ShellExecute(*this, L"open", url.c_str(), NULL, NULL, SW_SHOW);
+    ::ShellExecute(*this, L"open", url.c_str(), nullptr, nullptr, SW_SHOW);
     m_editor.Call(SCI_SETCHARSDEFAULT);
 }
 
@@ -2115,11 +2118,11 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
 
 void CMainWindow::HandleDropFiles(HDROP hDrop)
 {
-    int filesDropped = DragQueryFile(hDrop, 0xffffffff, NULL, 0);
+    int filesDropped = DragQueryFile(hDrop, 0xffffffff, nullptr, 0);
     std::vector<std::wstring> files;
     for (int i = 0 ; i < filesDropped ; ++i)
     {
-        UINT len = DragQueryFile(hDrop, i, NULL, 0);
+        UINT len = DragQueryFile(hDrop, i, nullptr, 0);
         std::unique_ptr<wchar_t[]> pathBuf(new wchar_t[len+1]);
         DragQueryFile(hDrop, i, pathBuf.get(), len+1);
         files.push_back(pathBuf.get());
@@ -2328,17 +2331,17 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
                                                 (long)(m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS)) + 1));
     if (doc.m_bIsDirty || doc.m_bNeedsSaving)
         cmdline += L" /modified";
-    SHELLEXECUTEINFO shExecInfo;
+    SHELLEXECUTEINFO shExecInfo = { };
     shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 
-    shExecInfo.fMask = NULL;
+    //shExecInfo.fMask = NULL;
     shExecInfo.hwnd = *this;
     shExecInfo.lpVerb = L"open";
     shExecInfo.lpFile = modpath.c_str();
     shExecInfo.lpParameters = cmdline.c_str();
-    shExecInfo.lpDirectory = NULL;
+    //shExecInfo.lpDirectory = NULL;
     shExecInfo.nShow = SW_NORMAL;
-    shExecInfo.hInstApp = NULL;
+    //shExecInfo.hInstApp = NULL;
 
     if (ShellExecuteEx(&shExecInfo))
     {
