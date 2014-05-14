@@ -327,7 +327,6 @@ static int AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
     ResString rQuestion(hRes, IDS_ACCESS_ASK_ELEVATE);
     ResString rElevate(hRes, IDS_ELEVATEOPEN);
     ResString rDontElevate(hRes, IDS_DONTELEVATEOPEN);
-    std::wstring filename = CPathUtils::GetFileName(path);
     std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
 
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
@@ -353,6 +352,8 @@ static int AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
     HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, NULL, NULL );
     if (CAppUtils::FailedShowMessage(hr))
         return 0;
+    // We've used TDCBF_CANCEL_BUTTON so IDCANCEL can be returned,
+    // map that to don't elevate.
     return nClickedBtn == IDCANCEL ? 100 : nClickedBtn;
 }
 
@@ -364,8 +365,7 @@ static int AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
     ResString rQuestion(hRes, IDS_ACCESS_ASK_ELEVATE);
     ResString rElevate(hRes, IDS_ELEVATESAVE);
     ResString rDontElevate(hRes, IDS_DONTELEVATESAVE);
-    std::wstring filename = CPathUtils::GetFileExtension(path);
-    std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str());
+    std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
 
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
     TASKDIALOG_BUTTON aCustomButtons[2];
