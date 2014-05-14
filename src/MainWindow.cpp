@@ -837,14 +837,14 @@ void CMainWindow::EnsureNewLineAtEnd(const CDocument& doc)
         switch (doc.m_format)
         {
             case WIN_FORMAT:
-                m_editor.Call(SCI_APPENDTEXT, 2, (sptr_t)"\r\n");
+                m_editor.AppendText(2, "\r\n");
                 break;
             case MAC_FORMAT:
-                m_editor.Call(SCI_APPENDTEXT, 1, (sptr_t)"\r");
+                m_editor.AppendText(1, "\r");
                 break;
             case UNIX_FORMAT:
             default:
-                m_editor.Call(SCI_APPENDTEXT, 1, (sptr_t)"\n");
+                m_editor.AppendText(1, "\n");
                 break;
         }
     }

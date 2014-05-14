@@ -180,7 +180,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
                 pData += 3;
                 lenFile -= 3;
             }
-            edit.Call(SCI_APPENDTEXT, lenFile, (LPARAM)pData);
+            edit.AppendText(lenFile, pData);
             if (bFirst && doc.m_bHasBOM)
                 lenFile += 3;
         }
@@ -194,7 +194,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
             }
             memcpy(widebuf, pData, lenFile);
             int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, NULL);
-            edit.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf);
+            edit.AppendText(charlen, charbuf);
             if (bFirst && doc.m_bHasBOM)
                 lenFile += 2;
         }
@@ -221,13 +221,14 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
                 p_w[nWord] = WideCharSwap(p_w[nWord]);
             }
             int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, NULL);
-            edit.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf);
+            edit.AppendText(charlen, charbuf);
             if (bFirst && doc.m_bHasBOM)
                 lenFile += 2;
         }
         break;
     case 12001: // UTF32_BE
         {
+            // REVIEW: Is two casts neccessary?
             UINT64 * p64 = (UINT64 *)(void *)data;
             int nQwords = lenFile/8;
             for (int nQword = 0; nQword<nQwords; nQword++)
@@ -276,7 +277,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
                 }
             }
             int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, nReadChars, charbuf, charbufSize, 0, NULL);
-            edit.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf);
+            edit.AppendText(charlen, charbuf);
             if (bFirst && doc.m_bHasBOM)
                 lenFile += 4;
         }
@@ -314,7 +315,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
     {
         MultiByteToWideChar(encoding, 0, data, lenFile-incompleteMultibyteChar, widebuf, wideLen);
         int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, wideLen, charbuf, charbufSize, 0, NULL);
-        edit.Call(SCI_APPENDTEXT, charlen, (LPARAM)charbuf);
+        edit.AppendText(charlen, charbuf);
     }
 }
 
@@ -432,13 +433,13 @@ static void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
     switch (doc.m_format)
     {
     case WIN_FORMAT:
-        edit.Call(SCI_SETEOLMODE, SC_EOL_CRLF);
+        edit.SetEOLType(SC_EOL_CRLF);
         break;
     case UNIX_FORMAT:
-        edit.Call(SCI_SETEOLMODE, SC_EOL_LF);
+        edit.SetEOLType(SC_EOL_LF);
         break;
     case MAC_FORMAT:
-        edit.Call(SCI_SETEOLMODE, SC_EOL_CR);
+        edit.SetEOLType(SC_EOL_CR);
         break;
     default:
         break;

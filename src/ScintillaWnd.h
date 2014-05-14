@@ -88,6 +88,8 @@ public :
     void GotoLine(long line);
     void Center(long posStart, long posEnd);
     void SetTabSettings();
+    void SetEOLType(int eolType);
+    void AppendText(int len, const char* buf);
 
     LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
 
