@@ -464,7 +464,10 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
             if (nClickedBtn == 101) // Elevate
             {
                 // 1223 - operation canceled by user.
-                DWORD elevationError = RunSelfElevated(hWnd,path);
+                std::wstring params = L"\"";
+                params += path;
+                params += L"\"";
+                DWORD elevationError = RunSelfElevated(hWnd, params);
                 // If we get no error attempting to running another instance elevated,
                 // assume any further errors that might occur completing the operation
                 // will be issued by that instance, so return now.
