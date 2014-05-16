@@ -1124,17 +1124,29 @@ void CMainWindow::UpdateCaptionBar()
 {
     int docID = m_TabBar.GetCurrentTabId();
     std::wstring appName = GetAppName();
+    std::wstring elev;
+    ResString rElev(hRes, IDS_ELEVATED);
+    if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
+        elev = (LPCWSTR)rElev;
+
     if (m_DocManager.HasDocumentID(docID))
     {
         CDocument doc = m_DocManager.GetDocumentFromID(docID);
 
-        std::wstring sWindowTitle = doc.m_path.empty() ? m_TabBar.GetCurrentTitle() : doc.m_path;
+        std::wstring sWindowTitle = elev;
+        if (!elev.empty())
+            sWindowTitle += L" : ";
+        sWindowTitle += doc.m_path.empty() ? m_TabBar.GetCurrentTitle() : doc.m_path;
         sWindowTitle += L" - ";
         sWindowTitle += appName;
         SetWindowText(*this, sWindowTitle.c_str());
     }
     else
+    {
+        if (!elev.empty())
+            appName += L" : " + elev;
         SetWindowText(*this, appName.c_str());
+    }
 }
 
 void CMainWindow::UpdateTab(int docID)
