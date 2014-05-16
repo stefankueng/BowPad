@@ -929,8 +929,13 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         {
             EnsureNewLineAtEnd(doc);
         }
-        if (!m_DocManager.SaveFile(*this, doc))
+        bool bTabMoved = false;
+        if (!m_DocManager.SaveFile(*this, doc, bTabMoved))
+        {
+            if (bTabMoved)
+                CloseTab(m_TabBar.GetCurrentTabIndex(), true);
             return false;
+        }
 
         if (_wcsicmp(CIniSettings::Instance().GetIniPath().c_str(), doc.m_path.c_str()) == 0)
         {
@@ -2276,7 +2281,8 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
     CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
     CDocument tempdoc = doc;
     tempdoc.m_path = temppath;
-    m_DocManager.SaveFile(*this, tempdoc);
+    bool bDummy = false;
+    m_DocManager.SaveFile(*this, tempdoc, bDummy);
     HWND hDroppedWnd = WindowFromPoint(pt);
     if (hDroppedWnd)
     {
@@ -2503,10 +2509,11 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
 
-    CTempFiles::Instance().AddFileToRemove(filepath);
     int docID = m_DocManager.GetIdForPath(filepath.c_str());
     if (docID < 0)
         return;
+
+    DeleteFile(filepath.c_str());
 
     int tab = m_TabBar.GetIndexFromID(docID);
     m_TabBar.ActivateAt(tab);
