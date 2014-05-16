@@ -602,6 +602,10 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
+#. Resource IDs: (12)
+msgid "Elevated"
+msgstr ""
+
 #. Resource IDs: (3780)
 msgid "Enable to automatically add a closing brace when an opening brace is entered"
 msgstr ""
@@ -637,6 +641,11 @@ msgstr ""
 #. Resource IDs: (11)
 #, c-format
 msgid "Failed to load the file '%s'.\r\n\r\nThe error message is:\r\n%s"
+msgstr ""
+
+#. Resource IDs: (12)
+#, c-format
+msgid "Failed to save the file '%s'.\r\n\r\nThe error message is:\r\n%s"
 msgstr ""
 
 #. Resource IDs: (9)
