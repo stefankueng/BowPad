@@ -48,7 +48,7 @@ public:
 
     CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
     bool                        SaveFile(HWND hWnd, const CDocument& doc);
-    bool                        UpdateFileTime(CDocument& doc);
+    bool                        UpdateFileTime(CDocument& doc, bool bIncludeReadonly);
     DocModifiedState            HasFileChanged(int id) const;
 private:
     FormatType                  GetEOLFormatForm(const char *data) const;

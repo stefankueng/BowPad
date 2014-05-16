@@ -939,7 +939,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
 
         doc.m_bIsDirty = false;
         doc.m_bNeedsSaving = false;
-        m_DocManager.UpdateFileTime(doc);
+        m_DocManager.UpdateFileTime(doc, false);
         if (bSaveAs)
         {
             std::wstring ext = CPathUtils::GetFileExtension(doc.m_path);
@@ -2079,9 +2079,6 @@ bool CMainWindow::OpenFileEx(const std::wstring& file, unsigned int openFlags)
 
 // TODO: consider continuing merging process,
 // how to merge with OpenFileAs with OpenFile
-// TODO! Need to report and fix bReadOnly support
-// Moving a read only tab to another instance
-// makes the read only status lost
 bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& realpath, bool bModified )
 {
     // If we can't open it, not much we can do.
@@ -2098,11 +2095,13 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
     doc.m_path = CPathUtils::GetLongPathname(realpath);
     doc.m_bIsDirty = bModified;
     doc.m_bNeedsSaving = bModified;
-    m_DocManager.UpdateFileTime(doc);
+    m_DocManager.UpdateFileTime(doc, true);
     std::wstring ext = CPathUtils::GetFileExtension(doc.m_path);
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
     doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
     m_DocManager.SetDocument(docID, doc);
+    if (doc.m_bIsReadonly)
+        m_editor.Call(SCI_SETREADONLY, true);
     m_editor.SetupLexerForExt(ext);
     UpdateTab(docID);
     m_TabBar.SetCurrentTitle(sFileName.c_str());
@@ -2378,7 +2377,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
         else // Cancel or failedto ask
         {
             // update the filetime of the document to avoid this warning
-            m_DocManager.UpdateFileTime(doc);
+            m_DocManager.UpdateFileTime(doc, false);
             m_DocManager.SetDocument(docID, doc);
             return false;
         }
@@ -2454,7 +2453,7 @@ bool CMainWindow::HandleOutsideDeletedFile(int tab)
     // keep the file: mark the file as modified
     doc.m_bNeedsSaving = true;
     // update the filetime of the document to avoid this warning
-    m_DocManager.UpdateFileTime(doc);
+    m_DocManager.UpdateFileTime(doc, false);
     m_DocManager.SetDocument(docID, doc);
     // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
     m_editor.Call(SCI_ADDUNDOACTION, 0, 0);
@@ -2515,7 +2514,10 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
     doc.m_path = CPathUtils::GetLongPathname(savepath);
     doc.m_bIsDirty = bMod;
     doc.m_bNeedsSaving = bMod;
-    m_DocManager.UpdateFileTime(doc);
+    m_DocManager.UpdateFileTime(doc, true);
+    if (doc.m_bIsReadonly)
+        m_editor.Call(SCI_SETREADONLY, true);
+
     std::wstring ext = CPathUtils::GetFileExtension(doc.m_path);
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
     doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
