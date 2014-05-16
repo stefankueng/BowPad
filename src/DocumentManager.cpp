@@ -857,7 +857,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
     return true;
 }
 
-bool CDocumentManager::UpdateFileTime( CDocument& doc )
+bool CDocumentManager::UpdateFileTime(CDocument& doc, bool bIncludeReadonly)
 {
     if (doc.m_path.empty())
         return false;
@@ -877,6 +877,8 @@ bool CDocumentManager::UpdateFileTime( CDocument& doc )
         return false;
     }
     doc.m_lastWriteTime = fi.ftLastWriteTime;
+    if (bIncludeReadonly)
+        doc.m_bIsReadonly = (fi.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)) != 0;
     return true;
 }
 
