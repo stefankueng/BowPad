@@ -47,7 +47,7 @@ public:
     COLORREF                    GetColorForDocument(int id);
 
     CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
-    bool                        SaveFile(HWND hWnd, const CDocument& doc);
+    bool                        SaveFile(HWND hWnd, const CDocument& doc, bool & bTabMoved);
     bool                        UpdateFileTime(CDocument& doc, bool bIncludeReadonly);
     DocModifiedState            HasFileChanged(int id) const;
 private:

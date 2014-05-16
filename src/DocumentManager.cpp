@@ -784,8 +784,9 @@ bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocu
     return true;
 }
 
-bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
+bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc, bool & bTabMoved )
 {
+    bTabMoved = false;
     if (doc.m_path.empty())
         return false;
     DWORD attributes = INVALID_FILE_ATTRIBUTES;
@@ -829,7 +830,18 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc )
                     // So return true or false or some other. Need to check how
                     // various callers will interpret this.
                     if (elevationError == 0)
+                    {
+                        for (int i = 0; i < 20; ++i)
+                        {
+                            Sleep(100);
+                            if (!PathFileExists(temppath.c_str()))
+                            {
+                                bTabMoved = true;
+                                return false;
+                            }
+                        }
                         return false; // Temp path "belongs" to other instance.
+                    }
                     if (elevationError != ERROR_CANCELLED)
                     {
                         // Can't elevate. Explain the error,
