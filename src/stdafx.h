@@ -45,6 +45,7 @@
 #pragma comment(linker, "\"/manifestdependency:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #define APP_ID L"TortoiseSVN.Tools.BowPad.1"
+#define APP_ID_ELEVATED L"TortoiseSVN.Tools.BowPad_elevated.1"
 
 #ifdef _WIN64
 #define LANGPLAT L"x64"

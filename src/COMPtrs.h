@@ -20,6 +20,7 @@
 
 #include <UIRibbon.h>
 #include <ShlObj.h>
+#include <Shobjidl.h>
 
 _COM_SMARTPTR_TYPEDEF(IUICollection, __uuidof(IUICollection));
 _COM_SMARTPTR_TYPEDEF(IUIImage, __uuidof(IUIImage));
@@ -33,3 +34,5 @@ _COM_SMARTPTR_TYPEDEF(IFileSaveDialog, __uuidof(IFileSaveDialog));
 _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
 _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
 _COM_SMARTPTR_TYPEDEF(IPropertyStore, __uuidof(IPropertyStore));
+_COM_SMARTPTR_TYPEDEF(ITaskbarList3, __uuidof(ITaskbarList3));
+_COM_SMARTPTR_TYPEDEF(ITaskbarList4, __uuidof(ITaskbarList4));
