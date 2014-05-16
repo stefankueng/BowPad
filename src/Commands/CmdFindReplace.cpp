@@ -68,6 +68,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             m_resizer.AddControl(hwndDlg, IDC_MATCHREGEX, RESIZER_TOPLEFT);
             m_resizer.AddControl(hwndDlg, IDC_FINDBTN, RESIZER_TOPRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_REPLACEBTN, RESIZER_TOPRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_REPLACEALLBTN, RESIZER_TOPRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_FINDRESULTS, RESIZER_TOPLEFTBOTTOMRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_SEARCHINFO, RESIZER_TOPLEFTRIGHT);
             m_freeresize = true;
@@ -140,7 +141,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             case IDC_FINDRESULTS:
                 return DoListNotify((LPNMITEMACTIVATE)lParam);
             case IDC_FINDBTN:
-            case IDC_REPLACEBTN:
+            case IDC_REPLACEALLBTN:
                 switch (((LPNMHDR)lParam)->code)
                 {
                     case BCN_DROPDOWN:
@@ -161,7 +162,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
                             AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_FINDALL, sFindAll);
                             AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_FINDALLINTABS, sFindAllInTabs);
                         }
-                        else if (pDropDown->hdr.hwndFrom == GetDlgItem(*this, IDC_REPLACEBTN))
+                        else if (pDropDown->hdr.hwndFrom == GetDlgItem(*this, IDC_REPLACEALLBTN))
                         {
                             size_t selStart = ScintillaCall(SCI_GETSELECTIONSTART);
                             size_t selEnd = ScintillaCall(SCI_GETSELECTIONEND);
