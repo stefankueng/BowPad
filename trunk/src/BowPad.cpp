@@ -26,6 +26,7 @@
 #include "StringUtils.h"
 #include "ProgressDlg.h"
 #include "DownloadFile.h"
+#include "SysInfo.h"
 #include "version.h"
 
 #include <Shellapi.h>
@@ -148,7 +149,10 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         SetCurrentProcessExplicitAppUserModelIDFN *pfnSetCurrentProcessExplicitAppUserModelID = (SetCurrentProcessExplicitAppUserModelIDFN*)GetProcAddress(hShell, "SetCurrentProcessExplicitAppUserModelID");
         if (pfnSetCurrentProcessExplicitAppUserModelID)
         {
-            pfnSetCurrentProcessExplicitAppUserModelID(APP_ID);
+            if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
+                pfnSetCurrentProcessExplicitAppUserModelID(APP_ID_ELEVATED);
+            else
+                pfnSetCurrentProcessExplicitAppUserModelID(APP_ID);
         }
     }
 

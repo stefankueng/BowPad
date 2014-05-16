@@ -783,6 +783,16 @@ void CMainWindow::HandleCreate(HWND hwnd)
         ::SendMessage(m_hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
         ::SendMessage(m_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
     }
+
+    if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
+    {
+        ITaskbarList3Ptr pTaskbarInterface;
+        HRESULT hr = CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pTaskbarInterface));
+        if (SUCCEEDED(hr))
+        {
+            pTaskbarInterface->SetOverlayIcon(m_hwnd, m_hShieldIcon, L"elevated");
+        }
+    }
 }
 
 void CMainWindow::HandleAfterInit()
