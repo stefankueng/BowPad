@@ -899,7 +899,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                          IsUnderlineButtonVisible="false"
                          IsStrikethroughButtonVisible="false"
                          IsHighlightButtonVisible="false"
-                         IsGrowShrinkButtonGroupVisible="false"
                          ShowTrueTypeOnly="true"
                          ShowVerticalFonts="false"
                          MinimumFontSize="6"
