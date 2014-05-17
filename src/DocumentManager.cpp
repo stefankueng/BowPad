@@ -208,7 +208,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
             }
             memcpy(widebuf, pData, lenFile);
             // make in place WORD BYTEs swap
-            UINT64 * p_qw = (UINT64 *)(void *)widebuf;
+            UINT64 * p_qw = (UINT64 *)widebuf;
             int nQwords = lenFile/8;
             for (int nQword = 0; nQword<nQwords; nQword++)
             {
@@ -228,8 +228,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
         break;
     case 12001: // UTF32_BE
         {
-            // REVIEW: Is two casts neccessary?
-            UINT64 * p64 = (UINT64 *)(void *)data;
+            UINT64 * p64 = (UINT64 *)data;
             int nQwords = lenFile/8;
             for (int nQword = 0; nQword<nQwords; nQword++)
             {
@@ -253,7 +252,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
             }
             // UTF32 have four bytes per char
             int nReadChars = lenFile/4;
-            UINT32 * p32 = (UINT32 *)(void *)pData;
+            UINT32 * p32 = (UINT32 *)pData;
 
             // fill buffer
             wchar_t * pOut = (wchar_t *)widebuf;
