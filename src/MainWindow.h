@@ -33,6 +33,26 @@ namespace OpenFlags
     const unsigned int AskToCreateIfMissing = 2;
 };
 
+enum class ResponseToOutsideModifiedFile
+{
+    Cancel,
+    Reload,
+    KeepOurChanges
+};
+
+enum class ResponseToCloseTab
+{
+    Cancel, // aka StayOpen
+    SaveAndClose,
+    CloseWithoutSaving
+};
+
+enum class ResponseToOutsideDeletedFile
+{
+    Close,
+    StayOpen
+};
+
 class CMainWindow : public CWindow, public IUIApplication, public IUICommandHandler
 {
     friend class ICommand;
@@ -99,12 +119,13 @@ private:
     void                        InitCommands();
     void                        AddHotSpots();
 
-    int                         AskToCreateNonExistingFile(const std::wstring& path) const;
-    int                         AskToReload(const CDocument& doc) const;
-    int                         AskToReloadOutsideModifiedFile(const CDocument& doc) const;
-    int                         AskToRemoveFile(const CDocument& doc) const;
-    int                         AskToRemoveReadOnlyAttribute() const;
-    int                         AskToCloseTab() const;
+    bool                        AskToCreateNonExistingFile(const std::wstring& path) const;
+    bool                        AskToReload(const CDocument& doc) const;
+    ResponseToOutsideModifiedFile
+                                AskToReloadOutsideModifiedFile(const CDocument& doc) const;
+    bool                        AskAboutOutsideDeletedFile(const CDocument& doc) const;
+    bool                        AskToRemoveReadOnlyAttribute() const;
+    ResponseToCloseTab          AskToCloseTab() const;
     void                        UpdateTab(int docID);
     void                        CloseAllButCurrentTab();
     void                        EnsureNewLineAtEnd(const CDocument& doc);

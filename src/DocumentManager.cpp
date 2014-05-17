@@ -319,7 +319,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
     }
 }
 
-static int AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
+static bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
 {
     // access to the file is denied, and we're not running with elevated privileges
     // offer to start BowPad with elevated privileges and open the file in that instance
@@ -354,10 +354,11 @@ static int AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
         return 0;
     // We've used TDCBF_CANCEL_BUTTON so IDCANCEL can be returned,
     // map that to don't elevate.
-    return nClickedBtn == IDCANCEL ? 100 : nClickedBtn;
+    bool bElevate = (nClickedBtn == 101);
+    return bElevate;
 }
 
-static int AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
+static bool AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
 {
     // access to the file is denied, and we're not running with elevated privileges
     // offer to start BowPad with elevated privileges and open the file in that instance
@@ -392,7 +393,8 @@ static int AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
         return 0;
     // We've used TDCBF_CANCEL_BUTTON so IDCANCEL can be returned,
     // map that to don't elevate.
-    return nClickedBtn == IDCANCEL ? 100 : nClickedBtn;
+    bool bElevate = (nClickedBtn == 101);
+    return bElevate;
 }
 
 static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params)
@@ -459,9 +461,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         CFormatMessageWrapper errMsg(err);
         if (((err == ERROR_ACCESS_DENIED)||(err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
         {
-            int nClickedBtn = AskToElevatePrivilegeForOpening(hWnd,path);
-            // nClickBtn can Elevate, no, Cancel
-            if (nClickedBtn == 101) // Elevate
+            if (AskToElevatePrivilegeForOpening(hWnd,path))
             {
                 // 1223 - operation canceled by user.
                 std::wstring params = L"\"";
@@ -817,8 +817,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc, bool & bTabMov
         CFormatMessageWrapper errMsg(err);
         if (((err == ERROR_ACCESS_DENIED) || (err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
         {
-            auto nClickedBtn = AskToElevatePrivilegeForSaving(hWnd,doc.m_path);
-            if (nClickedBtn == 101) // Elevate
+            if (AskToElevatePrivilegeForSaving(hWnd,doc.m_path))
             {
                 std::wstring temppath = CTempFiles::Instance().GetTempFilePath(true);
 
