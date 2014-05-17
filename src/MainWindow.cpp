@@ -2548,8 +2548,6 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
     if (docID < 0)
         return;
 
-    DeleteFile(filepath.c_str());
-
     int tab = m_TabBar.GetIndexFromID(docID);
     m_TabBar.ActivateAt(tab);
     CDocument doc = m_DocManager.GetDocumentFromID(docID);
@@ -2573,4 +2571,6 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
     UpdateStatusBar(true);
 
     GoToLine(line);
+
+    DeleteFile(filepath.c_str());
 }
