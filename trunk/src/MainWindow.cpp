@@ -2158,7 +2158,10 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
         m_editor.Call(SCI_SETREADONLY, true);
     m_editor.SetupLexerForExt(ext);
     UpdateTab(docID);
-    m_TabBar.SetCurrentTitle(sFileName.c_str());
+    if (sFileName.empty())
+        m_TabBar.SetCurrentTitle(GetNewTabName().c_str());
+    else
+        m_TabBar.SetCurrentTitle(sFileName.c_str());
     UpdateCaptionBar();
     UpdateStatusBar(true);
     DeleteFile(temppath.c_str());
