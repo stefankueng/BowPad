@@ -91,7 +91,7 @@ msgid "&Search for:"
 msgstr ""
 
 #. Resource IDs: (1007)
-msgid "&whole word"
+msgid "&Whole word"
 msgstr ""
 
 #. Resource IDs: (9)
@@ -539,7 +539,7 @@ msgstr ""
 
 #. Resource IDs: (7)
 #, c-format
-msgid "Do you want to save changes to \"%s\""
+msgid "Do you want to save changes to \"%s\"?"
 msgstr ""
 
 #. Resource IDs: (7)

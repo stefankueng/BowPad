@@ -1070,16 +1070,19 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
     if (!force && (doc.m_bIsDirty||doc.m_bNeedsSaving))
     {
         m_TabBar.ActivateAt(tab);
-        auto nClickedBtn = AskToCloseTab();
-        // Options:
-        // Save and Close OR
-        // Don't Save and Close OR
-        // Cancel and Stay Open
-        if (nClickedBtn == 100) // Save And (fallthroug to) Close
-            SaveCurrentTab();
-        else if (nClickedBtn != 101) // Cancel And Stay Open
+        ResponseToCloseTab response = AskToCloseTab();
+        if (response == ResponseToCloseTab::SaveAndClose)
+            SaveCurrentTab(); // Save And (fallthrough to) Close
+
+        else if (response == ResponseToCloseTab::CloseWithoutSaving)
+            ;
+        // If you don't want to save and close and
+        // you don't want to close without saving, you must want to stay open.
+        else
         {
-            m_TabBar.ActivateAt(tab);
+            // Cancel And Stay Open
+            m_TabBar.ActivateAt(tab); 
+            // REVIEW: Why activate again, we are open?
             return false;
         }
         // Will Close
@@ -1162,7 +1165,7 @@ void CMainWindow::UpdateTab(int docID)
     TabCtrl_SetItem(m_TabBar, m_TabBar.GetIndexFromID(docID), &tie);
 }
 
-int CMainWindow::AskToCloseTab() const
+ResponseToCloseTab CMainWindow::AskToCloseTab() const
 {
     ResString rTitle(hRes, IDS_HASMODIFICATIONS);
     ResString rQuestion(hRes, IDS_DOYOUWANTOSAVE);
@@ -1191,11 +1194,21 @@ int CMainWindow::AskToCloseTab() const
     int nClickedBtn = 0;
     HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, nullptr, nullptr );
     if (CAppUtils::FailedShowMessage(hr))
-        return 0;
-    return nClickedBtn;
+        nClickedBtn = 0;
+    ResponseToCloseTab response = ResponseToCloseTab::Cancel;
+    switch (nClickedBtn)
+    {
+    case 100:
+        response = ResponseToCloseTab::SaveAndClose;
+        break;
+    case 101:
+        response = ResponseToCloseTab::CloseWithoutSaving;
+        break;
+    }
+    return response;
 }
 
-int CMainWindow::AskToReloadOutsideModifiedFile(const CDocument& doc) const
+ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const CDocument& doc) const
 {
     bool changed = doc.m_bNeedsSaving || doc.m_bIsDirty;
     ResString rTitle(hRes, IDS_OUTSIDEMODIFICATIONS);
@@ -1233,11 +1246,21 @@ int CMainWindow::AskToReloadOutsideModifiedFile(const CDocument& doc) const
     int nClickedBtn = 0;
     HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, nullptr, nullptr );
     if (CAppUtils::FailedShowMessage(hr))
-        return 0;
-    return nClickedBtn;
+        nClickedBtn = 0;
+    ResponseToOutsideModifiedFile response = ResponseToOutsideModifiedFile::Cancel;
+    switch (nClickedBtn)
+    {
+    case 101:
+        response = ResponseToOutsideModifiedFile::Reload;
+        break;
+    case 102:
+        response = ResponseToOutsideModifiedFile::KeepOurChanges;
+        break;
+    }
+    return response;
 }
 
-int CMainWindow::AskToReload(const CDocument& doc) const
+bool CMainWindow::AskToReload(const CDocument& doc) const
 {
     ResString rTitle(hRes, IDS_HASMODIFICATIONS);
     ResString rQuestion(hRes, IDS_RELOADREALLY);
@@ -1267,11 +1290,12 @@ int CMainWindow::AskToReload(const CDocument& doc) const
     int nClickedBtn = 0;
     HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, nullptr, nullptr );
     if (CAppUtils::FailedShowMessage(hr))
-        return 0;
-    return nClickedBtn;
+        nClickedBtn = 0;
+    bool reload = (nClickedBtn == 101);
+    return reload;
 }
 
-int CMainWindow::AskToRemoveFile(const CDocument& doc) const
+bool CMainWindow::AskAboutOutsideDeletedFile(const CDocument& doc) const
 {
     ResString rTitle(hRes, IDS_OUTSIDEREMOVEDHEAD);
     ResString rQuestion(hRes, IDS_OUTSIDEREMOVED);
@@ -1301,11 +1325,14 @@ int CMainWindow::AskToRemoveFile(const CDocument& doc) const
     int nClickedBtn = 0;
     HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, nullptr, nullptr );
     if (CAppUtils::FailedShowMessage(hr))
-        return 0;
-    return nClickedBtn;
+        nClickedBtn = 0;
+    bool bKeep = true;
+    if (nClickedBtn == 101)
+        bKeep = false;
+    return bKeep;
 }
 
-int CMainWindow::AskToRemoveReadOnlyAttribute() const
+bool CMainWindow::AskToRemoveReadOnlyAttribute() const
 {
     ResString rTitle(hRes, IDS_FILEISREADONLY);
     ResString rQuestion(hRes, IDS_FILEMAKEWRITABLEASK);
@@ -1340,12 +1367,13 @@ int CMainWindow::AskToRemoveReadOnlyAttribute() const
     int nClickedBtn = 0;
     HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
     if (CAppUtils::FailedShowMessage(hr))
-        return 0;
-    return nClickedBtn;
+        nClickedBtn = 0;
+    bool bRemoveReadOnlyAttribute = (nClickedBtn == 101);
+    return bRemoveReadOnlyAttribute;
 }
 
 // Returns true if file exists or was created.
-int CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
+bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
 {
     ResString rTitle(hRes, IDS_FILE_DOESNT_EXIST);
     ResString rQuestion(hRes, IDS_FILE_ASK_TO_CREATE);
@@ -1364,7 +1392,7 @@ int CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
     tdc.pButtons = aCustomButtons;
     tdc.cButtons = bi;
     assert(tdc.cButtons <= _countof(aCustomButtons));
-    tdc.nDefaultButton = 101; // Default to cancel as to easy to create by mistake.
+    tdc.nDefaultButton = 101;
 
     tdc.hwndParent = *this;
     tdc.hInstance = hRes;
@@ -1375,7 +1403,10 @@ int CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
     tdc.pszContent = sQuestion.c_str();
     int nClickedBtn = 0;
     HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
-    return CAppUtils::FailedShowMessage(hr) ? 0 : nClickedBtn;
+    if (CAppUtils::FailedShowMessage(hr))
+        nClickedBtn = 0;
+    bool bCreate = (nClickedBtn == 101);
+    return bCreate;
 }
 
 void CMainWindow::CopyCurDocPathToClipboard() const
@@ -1749,10 +1780,9 @@ void CMainWindow::HandleWriteProtectedEdit()
         CDocument doc = m_DocManager.GetDocumentFromID(docID);
         if (doc.m_bIsReadonly)
         {
-            auto nClickedBtn = AskToRemoveReadOnlyAttribute();
-            if (nClickedBtn == 101) // Edit
+             // If the user really wants to edit despite it being read only, let them.
+            if (AskToRemoveReadOnlyAttribute())
             {
-                // User wants to remove read only attribute.
                 doc.m_bIsReadonly = false;
                 m_DocManager.SetDocument(docID, doc);
                 UpdateTab(docID);
@@ -2389,20 +2419,21 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
 
     if (dueToOutsideChanges)
     {
-        auto nClickedBtn = AskToReloadOutsideModifiedFile(doc);
+        ResponseToOutsideModifiedFile response = AskToReloadOutsideModifiedFile(doc);
+
         // Responses: Cancel, Save and Reload, Reload
 
-        if (nClickedBtn == 101) // Reload
+        if (response == ResponseToOutsideModifiedFile::Reload) // Reload
         {
             // Fall through to reload
         }
         // Save if asked to. Assume we won't have asked them to save if
         // the file isn't dirty or it wasn't appropriate to save.
-        else if (nClickedBtn == 102) // Save
+        else if (response == ResponseToOutsideModifiedFile::KeepOurChanges) // Save
         {
             SaveCurrentTab();
         }
-        else // Cancel or failedto ask
+        else // Cancel or failed to ask
         {
             // update the filetime of the document to avoid this warning
             m_DocManager.UpdateFileTime(doc, false);
@@ -2412,15 +2443,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     }
     else if (doc.m_bIsDirty || doc.m_bNeedsSaving)
     {
-        int nClickedBtn = AskToReload(doc);
-        // Responses:
-        // Error, failed to ask the question or never obtained an answer.
-        // Reload, unsaved modifications will be lost!
-        // Cancel, unsaved modifications will be kept.
-
-        // If the user doesn't want to reload or we failed to find out,
-        // return and don't reload.
-        if (nClickedBtn != 101)
+        if (!AskToReload(doc)) // User doesn't want to reload.
             return false;
     }
 
@@ -2437,7 +2460,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     if (tab == m_TabBar.GetCurrentTabIndex())
         m_editor.SaveCurrentPos(&doc.m_position);
 
-    // TODO: Review use of SCI_RELEASEDOCUMENT, seems required to avoid memory leak.
+    // REVIEW: SCI_RELEASEDOCUMENT seems to resolve a memory leak. The right solution?
     m_editor.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
     // Apply the new one.
     m_editor.Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
@@ -2470,9 +2493,8 @@ bool CMainWindow::HandleOutsideDeletedFile(int tab)
     CDocument doc = m_DocManager.GetDocumentFromID(docID);
     // file was removed. Options are:
     // * keep the file open
-    // * close the file
-    auto nClickedBtn = AskToRemoveFile(doc);
-    if (nClickedBtn == 101) // User wishes to remove the document
+    // * close the tab
+    if (AskAboutOutsideDeletedFile(doc)) // User wishes to close the tab.
     {
         CloseTab(tab);
         return true;
