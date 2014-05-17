@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-04-27 13:56+0100\n"
+"PO-Revision-Date: 2014-05-17 10:30+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.4\n"
+"X-Generator: Poedit 1.6.5\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -101,8 +101,8 @@ msgid "&Search for:"
 msgstr "&Suche nach:"
 
 #. Resource IDs: (1007)
-msgid "&whole word"
-msgstr "&ganze Wörter"
+msgid "&Whole word"
+msgstr "&Ganze Wörter"
 
 #. Resource IDs: (9)
 msgid ""
@@ -159,8 +159,9 @@ msgid "Are you sure you want to delete the file '%s'?"
 msgstr "Möchten Sie die Datei '%s' wirklich löschen?"
 
 #. Resource IDs: (11)
-msgid "Are you sure you want to reload?"
-msgstr "Möchten Sie die Datei wirklich neu laden?"
+#, c-format
+msgid "Are you sure you want to reload '%s'?"
+msgstr "Möchten Sie die Datei '%s' wirklich neu laden?"
 
 #. Resource IDs: (3753)
 msgid "Asks where to save the current tab"
@@ -593,8 +594,8 @@ msgstr ""
 
 #. Resource IDs: (7)
 #, c-format
-msgid "Do you want to save changes to \"%s\""
-msgstr "Möchten Sie die Änderungen speichern nach \"%s\""
+msgid "Do you want to save changes to \"%s\"?"
+msgstr "Möchten Sie die Änderungen speichern nach \"%s\"?"
 
 #. Resource IDs: (7)
 msgid "Do&n't save"
@@ -676,6 +677,10 @@ msgstr "EOL"
 msgid "Edit"
 msgstr "Verändern"
 
+#. Resource IDs: (12)
+msgid "Elevated"
+msgstr "Elevated"
+
 #. Resource IDs: (3780)
 msgid ""
 "Enable to automatically add a closing brace when an opening brace is entered"
@@ -720,6 +725,19 @@ msgid ""
 "%s"
 msgstr ""
 "Konnte die Datei '%s' nicht öffnen.\r\n"
+"\r\n"
+"Die Fehlermeldung ist:\r\n"
+"%s"
+
+#. Resource IDs: (12)
+#, c-format
+msgid ""
+"Failed to save the file '%s'.\r\n"
+"\r\n"
+"The error message is:\r\n"
+"%s"
+msgstr ""
+"Konnte die Datei '%s' nicht speichern.\r\n"
 "\r\n"
 "Die Fehlermeldung ist:\r\n"
 "%s"
@@ -836,13 +854,13 @@ msgstr ""
 msgid "LA"
 msgstr "LA"
 
-#. Resource IDs: (3758)
-msgid "LANG"
-msgstr "LANG"
-
 #. Resource IDs: (3766)
 msgid "LD"
 msgstr "LD"
+
+#. Resource IDs: (3758)
+msgid "LEX"
+msgstr "LEX"
 
 #. Resource IDs: (3759)
 msgid "LF"
@@ -859,6 +877,10 @@ msgstr "LU"
 #. Resource IDs: (3756)
 msgid "Language"
 msgstr "Sprache"
+
+#. Resource IDs: (3759)
+msgid "Language Lexer"
+msgstr "Sprachlexer"
 
 #. Resource IDs: (9)
 msgid ""
@@ -908,6 +930,10 @@ msgid ""
 msgstr ""
 "Länge in Bytes: %ld\r\n"
 "Zeilen: %ld"
+
+#. Resource IDs: (3758)
+msgid "Lexer"
+msgstr "Lexer"
 
 #. Resource IDs: (10)
 msgid "Line"
@@ -1851,6 +1877,9 @@ msgstr "Führt den Benutzerbefehl 8 aus"
 #. Resource IDs: (3772)
 msgid "runs the custom command 9"
 msgstr "Führt den Benutzerbefehl 9 aus"
+
+#~ msgid "LANG"
+#~ msgstr "LANG"
 
 #~ msgid "Print..."
 #~ msgstr "Drucken..."
