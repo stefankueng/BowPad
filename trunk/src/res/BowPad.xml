@@ -190,9 +190,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Command.LargeImages>
         <Image>res/CodeStyleL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/CodeStyleS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdEOLGroup" LabelTitle="Line Endings" Keytip="EOL">
       <Command.SmallImages>
@@ -215,9 +212,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.SmallImages>
     </Command>
     <Command Name="cmdGroupFind" LabelTitle="Find">
-      <Command.SmallImages>
-        <Image>res/FindReplaceS.bmp</Image>
-      </Command.SmallImages>
+      <Command.LargeImages>
+        <Image>res/FindReplaceL.bmp</Image>
+      </Command.LargeImages>
     </Command>
     <Command Name="cmdPrevNext" />
     <!-- dummy command, does nothing -->
@@ -225,25 +222,16 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Command.LargeImages>
         <Image>res/PrevL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/PrevS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdNext" LabelTitle="Next" TooltipTitle="Next" TooltipDescription="go to the next cursor position" Keytip="NEXT">
       <Command.LargeImages>
         <Image>res/NextL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/NextS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdFindReplace" LabelTitle="Find/Replace" TooltipTitle="Find &amp;&amp; Replace" TooltipDescription="Search and/or replace text in documents/tabs" Keytip="F">
       <Command.LargeImages>
         <Image>res/FindReplaceL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/FindReplaceS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdFindNext" LabelTitle="Find Next" TooltipTitle="Find Next" TooltipDescription="Moves to the next match of the last search" Keytip="FN">
       <Command.LargeImages>
@@ -275,17 +263,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Command.LargeImages>
         <Image>res/StyleConfigL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/StyleConfigS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdVerticalEdge" LabelTitle="Right margin" TooltipTitle="Right margin" TooltipDescription="Sets the column at which the vertical edge is shown, indicating the right margin. Set to 0 to hide it." Keytip="VE">
       <Command.LargeImages>
         <Image>res/VEdgeL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/VEdgeS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdComment" LabelTitle="Comment" TooltipTitle="Comment" TooltipDescription="Comments the selected text" Keytip="CC">
       <Command.LargeImages>
@@ -332,17 +314,14 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
 
     <Command Name="cmdGroupLines" LabelTitle="Lines">
-      <Command.SmallImages>
-        <Image>res/LineDupS.bmp</Image>
-      </Command.SmallImages>
+      <Command.LargeImages>
+        <Image>res/LineDupL.bmp</Image>
+      </Command.LargeImages>
     </Command>
     <Command Name="cmdLineDuplicate" LabelTitle="Duplicate Line" TooltipTitle="Duplicate Line" TooltipDescription="Duplicates the current line" Keytip="DD">
       <Command.LargeImages>
         <Image>res/LineDupL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/LineDupS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdLineSplit" LabelTitle="Split Lines" TooltipTitle="Split Lines" TooltipDescription="Split long lines at the right window border" Keytip="LS">
       <Command.LargeImages>
@@ -364,17 +343,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Command.LargeImages>
         <Image>res/LineUpL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/LineUpS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdLineDown" LabelTitle="Move down" TooltipTitle="Move line down" TooltipDescription="Moves the selected lines downwards" Keytip="LD">
       <Command.LargeImages>
         <Image>res/LineDownL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/LineDownS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdGroupPrint" LabelTitle="Print"  Keytip="P">
       <Command.LargeImages>
@@ -410,9 +383,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Command.LargeImages>
         <Image>res/GotoLineL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/GotoLineS.bmp</Image>
-      </Command.SmallImages>
     </Command>
 
     <Command Name="cmdGroupBlanks" LabelTitle="Other operations">
@@ -424,9 +394,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Command.LargeImages>
         <Image>res/WhitespaceL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/WhitespaceS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdTrim" LabelTitle="Trim Whitespaces" TooltipTitle="Trim Whitespaces" TooltipDescription="Removes whitespaces at the end of lines" Keytip="T">
       <Command.LargeImages>
@@ -451,9 +418,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Command.LargeImages>
         <Image>res/RefreshL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/RefreshS.bmp</Image>
-      </Command.SmallImages>
     </Command>
 
     <Command Name="cmdGroupGoto" LabelTitle="Goto">
@@ -497,25 +461,16 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Command.LargeImages>
         <Image>res/LangL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/LangS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdToggleTheme" LabelTitle="Dark Theme" TooltipTitle="Dark Theme" TooltipDescription="Toggles between the normal and the dark theme" Keytip="TT">
       <Command.LargeImages>
         <Image>res/DarkThemeL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/DarkThemeS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdLanguage" LabelTitle="Language" TooltipTitle="Select Language" TooltipDescription="Select the language for BowPad" Keytip="LS">
       <Command.LargeImages>
         <Image>res/LangL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/LangS.bmp</Image>
-      </Command.SmallImages>
     </Command>
 
     <Command Name="cmdGroupLaunch" LabelTitle="Cmd">
@@ -633,17 +588,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Command.LargeImages>
         <Image>res/SessionLoadL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/SessionLoadS.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdSessionAutoLoad" LabelTitle="Load session on start" TooltipTitle="Load last session on start" TooltipDescription="Loads all files automatically that were open the last time BowPad got closed" Keytip="SAL">
       <Command.LargeImages>
         <Image>res/SessionAutoL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/SessionAutoS.bmp</Image>
-      </Command.SmallImages>
     </Command>
 
     <Command Name="cmdFunctions" LabelTitle="Functions" TooltipTitle="Functions" TooltipDescription="Shows a list of functions/methods in the file to jump to" Keytip="FN">
@@ -706,17 +655,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
 
     <Command Name="cmdFileDelete" LabelTitle="Delete File" TooltipTitle="Delete File" TooltipDescription="Deletes the file of the current tab" >
-      <Command.SmallImages>
-        <Image>res/FileDeleteS.bmp</Image>
-      </Command.SmallImages>
       <Command.LargeImages>
         <Image>res/FileDeleteL.bmp</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdNewCopy" LabelTitle="New Copy" TooltipTitle="New Copy" TooltipDescription="Creates a copy of the current tab" >
-      <Command.SmallImages>
-        <Image>res/FileNewCopyS.bmp</Image>
-      </Command.SmallImages>
       <Command.LargeImages>
         <Image>res/FileNewCopyL.bmp</Image>
       </Command.LargeImages>
