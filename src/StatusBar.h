@@ -16,7 +16,6 @@
 //
 #pragma once
 #include "BaseWindow.h"
-#include <Commctrl.h>
 
 class CStatusBar : public CWindow
 {

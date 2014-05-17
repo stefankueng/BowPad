@@ -377,7 +377,6 @@ void CTabBar::DoOwnerDrawTab()
 
 void CTabBar::SetColour(COLORREF colour2Set, tabColourIndex i)
 {
-    // TODO! Review for thread safety sharing issues.
     switch (i)
     {
         case activeText:
@@ -956,7 +955,6 @@ void CTabBar::DraggingCursor(POINT screenPoint)
 
 void CTabBar::ExchangeItemData(POINT point)
 {
-    // TODO: review this again just to double check it's right.
     // Find the destination tab...
     int nTab = GetTabIndexAt(point);
 

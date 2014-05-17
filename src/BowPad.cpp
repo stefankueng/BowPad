@@ -29,8 +29,6 @@
 #include "SysInfo.h"
 #include "version.h"
 
-#include <Shellapi.h>
-
 HINSTANCE hInst;
 HINSTANCE hRes;
 

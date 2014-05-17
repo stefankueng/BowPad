@@ -25,7 +25,6 @@
 #include <cctype>
 #include <memory>
 #include <functional>
-#include <shellapi.h>
 #include <strsafe.h>
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>

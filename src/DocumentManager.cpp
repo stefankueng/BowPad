@@ -42,8 +42,6 @@
 #include <algorithm>
 #include <stdexcept>
 #include <Shobjidl.h>
-#include <Shellapi.h>
-#include <Shlobj.h>
 
 static const COLORREF foldercolors[] = {
     RGB(177,199,253),
@@ -824,9 +822,8 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc, bool & bTabMov
                 {
                     std::wstring cmdline = CStringUtils::Format(L"/elevate /savepath:\"%s\" /path:\"%s\"", doc.m_path.c_str(), temppath.c_str());
                     DWORD elevationError = RunSelfElevated(hWnd, cmdline);
-                    // TODO: Review. We don't know if saving worked or not.
-                    // So return true or false or some other. Need to check how
-                    // various callers will interpret this.
+                    // We don't know if saving worked or not.
+                    // So return false since this instance didn't do the saving.
                     if (elevationError == 0)
                     {
                         for (int i = 0; i < 20; ++i)

@@ -48,8 +48,6 @@
 #include <type_traits>
 #include <future>
 #include <Shobjidl.h>
-#include <Shellapi.h>
-#include <Shlobj.h>
 
 IUIFramework *g_pFramework = nullptr;  // Reference to the Ribbon framework.
 
@@ -964,8 +962,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
         m_TabBar.SetCurrentTitle(sFileName.c_str());
         m_DocManager.SetDocument(docID, doc);
-        // TOOD Review! UpdateTab added here - yet to figure out what bug it fixes.
-        // But think it does!
+        // Update tab so the various states are updated (readonly, modified, ...)
         UpdateTab(docID);
         UpdateCaptionBar();
         UpdateStatusBar(true);
@@ -1072,7 +1069,7 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
         m_TabBar.ActivateAt(tab);
         ResponseToCloseTab response = AskToCloseTab();
         if (response == ResponseToCloseTab::SaveAndClose)
-            SaveCurrentTab(); // Save And (fallthrough to) Close
+            SaveCurrentTab(); // Save And (fall through to) Close
 
         else if (response == ResponseToCloseTab::CloseWithoutSaving)
             ;
@@ -1081,8 +1078,9 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
         else
         {
             // Cancel And Stay Open
-            m_TabBar.ActivateAt(tab); 
-            // REVIEW: Why activate again, we are open?
+            // activate the tab: user might have clicked another than
+            // the active tab to close: user clicked on that tab so activate that tab now
+            m_TabBar.ActivateAt(tab);
             return false;
         }
         // Will Close
@@ -2114,9 +2112,8 @@ bool CMainWindow::OpenFileEx(const std::wstring& file, unsigned int openFlags)
             else
                 doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
             m_DocManager.AddDocumentAtEnd(doc, id);
-            //TODO! Review. Might be better to set doc pointer then activate?
-            m_TabBar.ActivateAt(index);
             m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+            m_TabBar.ActivateAt(index);
             if (ext.empty())
                 m_editor.SetupLexerForLang(doc.m_language);
             else
@@ -2453,6 +2450,8 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     // Check I changed the handling and what should happen.
     // I think it should revert or you should be asked.
 
+    // LoadFile increases the reference count, so decrease it here first
+    m_editor.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
     CDocument docreload = m_DocManager.LoadFile(*this, doc.m_path.c_str(), encoding, false);
     if (! docreload.m_document)
         return false;
@@ -2460,8 +2459,6 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     if (tab == m_TabBar.GetCurrentTabIndex())
         m_editor.SaveCurrentPos(&doc.m_position);
 
-    // REVIEW: SCI_RELEASEDOCUMENT seems to resolve a memory leak. The right solution?
-    m_editor.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
     // Apply the new one.
     m_editor.Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
 
@@ -2475,12 +2472,6 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     }
     UpdateStatusBar(true);
     UpdateTab(docID);
-    // TODO: Review. I merged two reload paths, SETSAVEPOINT was
-    // called for regular reloads but not outside modified file reloads.
-    // Decide if this is needed in both paths or not.
-    // I think it should be the same for both paths, called or not called.
-    // I've decided to call it in both cases.
-    // To restore the old functionality (hopefully), add if (!outsideModified)
     m_editor.Call(SCI_SETSAVEPOINT);
     return true;
 }

@@ -39,6 +39,10 @@
 #include "Language.h"
 #include "IniSettings.h"
 
+#include <shellapi.h>
+#include <Commctrl.h>
+#include <Shlobj.h>
+
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "shlwapi.lib")
 

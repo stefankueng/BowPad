@@ -20,7 +20,6 @@
 #include "AppUtils.h"
 #include "Theme.h"
 
-#include <Commctrl.h>
 #include <gdiplus.h>
 
 static void FillSolidRect(HDC hDC, int left, int top, int right, int bottom, COLORREF clr)

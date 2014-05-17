@@ -19,8 +19,6 @@
 #include "AppUtils.h"
 #include "Theme.h"
 
-#include <Commctrl.h>
-
 void DrawSizeGrip(HDC hdc, LPRECT lpRect)
 {
     HPEN hPenFace, hPenShadow, hPenHighlight, hOldPen;

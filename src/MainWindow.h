@@ -25,7 +25,6 @@
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 #include <list>
-#include <shellapi.h> // TODO Put in stdafx.h and remove from all headers.
 
 namespace OpenFlags
 {
