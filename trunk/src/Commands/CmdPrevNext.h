@@ -23,7 +23,6 @@
 #include <vector>
 
 #include <Shobjidl.h>
-#include <Shellapi.h>
 
 
 class CCmdPrevNext : public ICommand

@@ -17,7 +17,6 @@
 #include "stdafx.h"
 #include "CmdLaunch.h"
 #include "BowPad.h"
-#include <Shellapi.h>
 
 bool LaunchBase::Launch( const std::wstring& cmdline )
 {

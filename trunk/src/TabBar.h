@@ -16,7 +16,6 @@
 //
 #pragma once
 #include "BaseWindow.h"
-#include <Commctrl.h>
 
 #define TCN_TABDROPPED                  (WM_USER + 1)
 #define TCN_TABDROPPEDOUTSIDE           (WM_USER + 2)

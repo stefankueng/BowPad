@@ -33,8 +33,6 @@
 #include <ctime>
 #include <fstream>
 
-#include <Commctrl.h>
-#include <Shellapi.h>
 
 #pragma comment(lib, "Urlmon.lib")
 #pragma comment(lib, "Shell32.lib")
