@@ -33,63 +33,81 @@ bool CCmdOpen::Execute()
     IFileOpenDialogPtr pfd = NULL;
 
     HRESULT hr = pfd.CreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER);
-    if (SUCCEEDED(hr))
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+
+    // Set the dialog options, if it fails don't continue as we don't
+    // know what options we're blending. Shouldn't ever fail anyway.
+    DWORD dwOptions;
+    hr = pfd->GetOptions(&dwOptions);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+    // If we can't set our options, we have no idea what's happening
+    // so don't continue.
+    hr = pfd->SetOptions(dwOptions | FOS_FILEMUSTEXIST | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_ALLOWMULTISELECT);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+
+    // Set the standard title.
+    ResString rTitle(hRes, IDS_APP_TITLE);
+    pfd->SetTitle(rTitle);
+
+    // Set the default folder to the folder of the current tab.
+    if (HasActiveDocument())
     {
-        // Set the dialog options
-        DWORD dwOptions;
-        if (SUCCEEDED(hr = pfd->GetOptions(&dwOptions)))
+        CDocument doc = GetActiveDocument();
+        if (!doc.m_path.empty())
         {
-            hr = pfd->SetOptions(dwOptions | FOS_FILEMUSTEXIST | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_ALLOWMULTISELECT);
-        }
-
-        // Set a title
-        pfd->SetTitle(L"BowPad");
-
-        // set the default folder to the folder of the current tab
-        if (HasActiveDocument())
-        {
-            CDocument doc = GetActiveDocument();
-            if (!doc.m_path.empty())
+            std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
+            IShellItemPtr psiDefFolder = NULL;
+            hr = SHCreateItemFromParsingName(folder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
+            if (!CAppUtils::FailedShowMessage(hr))
             {
-                std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
-                IShellItemPtr psiDefFolder = NULL;
-                hr = SHCreateItemFromParsingName(folder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
-
-                if (SUCCEEDED(hr))
-                {
-                    pfd->SetFolder(psiDefFolder);
-                }
-            }
-        }
-
-        // Show the open file dialog
-        if (SUCCEEDED(hr) && SUCCEEDED(hr = pfd->Show(GetHwnd())))
-        {
-            IShellItemArrayPtr psiaResults;
-            hr = pfd->GetResults(&psiaResults);
-            if (SUCCEEDED(hr))
-            {
-                DWORD count = 0;
-                hr = psiaResults->GetCount(&count);
-                for (DWORD i = 0; i < count; ++i)
-                {
-                    IShellItemPtr psiResult = NULL;
-                    hr = psiaResults->GetItemAt(i, &psiResult);
-                    PWSTR pszPath = NULL;
-                    hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
-                    if (SUCCEEDED(hr))
-                    {
-                        paths.push_back(pszPath);
-                    }
-                }
+                // Assume if we can't set the folder we can at least continue
+                // and the user might be able to set another folder or something.
+                hr = pfd->SetFolder(psiDefFolder);
+                CAppUtils::FailedShowMessage(hr);
             }
         }
     }
-    if (SUCCEEDED(hr))
+
+    // Show the open file dialog, not much we can do if that doesn't work.
+    hr = pfd->Show(GetHwnd());
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+
+    IShellItemArrayPtr psiaResults;
+    hr = pfd->GetResults(&psiaResults);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+
+    // Fetch the (possibly multiple) results. Some may possibly fail
+    // but get as many as we can. We don't report partial failure.
+    // We could make it an all or nothing deal but we have chosen not to. 
+
+    DWORD count = 0;
+    hr = psiaResults->GetCount(&count);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+    for (DWORD i = 0; i < count; ++i)
     {
-        for (auto it : paths)
-            OpenFile(it.c_str(), true);
+        IShellItemPtr psiResult = NULL;
+        hr = psiaResults->GetItemAt(i, &psiResult);
+        if (!CAppUtils::FailedShowMessage(hr))
+        {
+            PWSTR pszPath = NULL;
+            hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
+            if (!CAppUtils::FailedShowMessage(hr))
+            {
+                paths.push_back(pszPath);
+            }
+        }
     }
+
+    // Open all that was selected or at least returned.
+    for (const auto& file : paths)
+        OpenFile(file.c_str(), true);
+
     return true;
 }
 
