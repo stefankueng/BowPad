@@ -2065,21 +2065,16 @@ bool CMainWindow::OpenFileEx(const std::wstring& file, unsigned int openFlags)
     }
     else
     {
-        // Note, a folder will return true also.
         bool createIfMissing = false;
+        // Note PathFileExists returns true for existing folders,
+        // not just files.
         if (!PathFileExists(file.c_str()))
         {
             if (bAskToCreateIfMissing)
             {
-                int nClickedBtn = AskToCreateNonExistingFile(file);
-                if (nClickedBtn==101)
-                {
-                    createIfMissing = true;
-                }
-                else
-                {
+                if (!AskToCreateNonExistingFile(file))
                     return false;
-                }
+                createIfMissing = true;
             }
         }
 
