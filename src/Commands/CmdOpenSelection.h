@@ -79,13 +79,8 @@ private:
     {
         ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
         size_t pos = ScintillaCall(SCI_GETCURRENTPOS);
-        Scintilla::Sci_TextRange tr = { 0 };
-        tr.chrg.cpMin = static_cast<long>(ScintillaCall(SCI_WORDSTARTPOSITION, pos, false));
-        tr.chrg.cpMax = static_cast<long>(ScintillaCall(SCI_WORDENDPOSITION, pos, false));
-        std::unique_ptr<char[]> word(new char[tr.chrg.cpMax - tr.chrg.cpMin + 2]);
-        tr.lpstrText = word.get();
-        ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&tr);
-        std::wstring sWord = CUnicodeUtils::StdGetUnicode(tr.lpstrText);
+        std::string sWordA = GetTextRange(static_cast<long>(ScintillaCall(SCI_WORDSTARTPOSITION, pos, false)), static_cast<long>(ScintillaCall(SCI_WORDENDPOSITION, pos, false)));
+        std::wstring sWord = CUnicodeUtils::StdGetUnicode(sWordA);
         ScintillaCall(SCI_SETCHARSDEFAULT);
 
         InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);

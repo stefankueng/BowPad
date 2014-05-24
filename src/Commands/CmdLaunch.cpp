@@ -42,11 +42,7 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     SearchReplace(cmd, L"$(LINE)", CStringUtils::Format(L"%lld", ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS))));
     SearchReplace(cmd, L"$(POS)", CStringUtils::Format(L"%lld", ScintillaCall(SCI_GETCURRENTPOS)));
     // find selected text or current word
-    std::string sSelText;
-    int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
-    std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
-    ScintillaCall(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
-    sSelText = seltextbuffer.get();
+    std::string sSelText = GetSelectedText();
     if (sSelText.empty())
     {
         // get the current word instead

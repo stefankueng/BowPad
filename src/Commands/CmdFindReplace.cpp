@@ -1206,10 +1206,7 @@ bool CCmdFindReplace::Execute()
 
     if (linestart == lineend)
     {
-        int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
-        std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
-        ScintillaCall(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
-        std::string sSelText = seltextbuffer.get();
+        std::string sSelText = GetSelectedText();
 
         if (sSelText.empty())
         {
@@ -1379,14 +1376,13 @@ bool CCmdFindSelectedNext::Execute()
         DocScrollUpdate();
         return false;
     }
-    std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
-    ScintillaCall(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
-    if (seltextbuffer[0] == 0)
+    std::string seltext = GetSelectedText();
+    if (seltext.empty())
     {
         DocScrollUpdate();
         return false;
     }
-    sFindString = seltextbuffer.get();
+    sFindString = seltext;
     sHighlightString = sFindString;
 
     Scintilla::Sci_TextToFind ttf = {0};
@@ -1425,14 +1421,14 @@ bool CCmdFindSelectedPrev::Execute()
         DocScrollUpdate();
         return false;
     }
-    std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
-    ScintillaCall(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
-    if (seltextbuffer[0] == 0)
+
+    std::string seltext = GetSelectedText();
+    if (seltext.empty())
     {
         DocScrollUpdate();
         return false;
     }
-    sFindString = seltextbuffer.get();
+    sFindString = seltext;
     sHighlightString = sFindString;
 
     Scintilla::Sci_TextToFind ttf = {0};

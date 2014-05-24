@@ -1084,6 +1084,15 @@ FindResult CScintillaWnd::FindText( const char *text, size_t start, size_t end, 
     return returnValue;
 }
 
+size_t CScintillaWnd::FindText(const std::string& tofind, long startpos, long endpos)
+{
+    Scintilla::Sci_TextToFind ttf = { 0 };
+    ttf.chrg.cpMin = startpos;
+    ttf.chrg.cpMax = endpos;
+    ttf.lpstrText = const_cast<char*>(tofind.c_str());
+    return Call(SCI_FINDTEXT, 0, (sptr_t)&ttf);
+}
+
 FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, size_t end)
 {
     std::string search("<");
@@ -1628,3 +1637,59 @@ void CScintillaWnd::AppendText(int len, const char* buf)
 {
     Call(SCI_APPENDTEXT, len, reinterpret_cast<LPARAM>(buf));
 }
+
+std::string CScintillaWnd::GetLine(long line)
+{
+    size_t linesize = Call(SCI_GETLINE, line, 0);
+    std::unique_ptr<char[]> pLine(new char[linesize + 1]);
+    Call(SCI_GETLINE, line, (sptr_t)pLine.get());
+    pLine[linesize] = 0;
+    return pLine.get();
+}
+
+std::string CScintillaWnd::GetTextRange(long startpos, long endpos)
+{
+    assert(endpos - startpos >= 0);
+    if (endpos < startpos)
+        return "";
+    std::unique_ptr<char[]> strbuf(new char[endpos - startpos + 5]);
+    Scintilla::Sci_TextRange rangestart;
+    rangestart.chrg.cpMin = startpos;
+    rangestart.chrg.cpMax = endpos;
+    rangestart.lpstrText = strbuf.get();
+    Call(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
+    return rangestart.lpstrText;
+}
+
+std::string CScintillaWnd::GetSelectedText()
+{
+    int selTextLen = (int)Call(SCI_GETSELTEXT);
+    std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
+    Call(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
+    return seltextbuffer.get();
+}
+
+std::string CScintillaWnd::GetCurrentLine()
+{
+    int LineLen = (int)Call(SCI_GETCURLINE);
+    std::unique_ptr<char[]> linebuffer(new char[LineLen + 1]);
+    Call(SCI_GETCURLINE, LineLen + 1, (LPARAM)(char*)linebuffer.get());
+    return linebuffer.get();
+}
+
+std::string CScintillaWnd::GetWordChars()
+{
+    int len = (int)Call(SCI_GETWORDCHARS);
+    std::unique_ptr<char[]> linebuffer(new char[len + 1]);
+    Call(SCI_GETWORDCHARS, 0, (LPARAM)(char*)linebuffer.get());
+    return linebuffer.get();
+}
+
+std::string CScintillaWnd::GetWhitespaceChars()
+{
+    int len = (int)Call(SCI_GETWHITESPACECHARS);
+    std::unique_ptr<char[]> linebuffer(new char[len + 1]);
+    Call(SCI_GETWHITESPACECHARS, 0, (LPARAM)(char*)linebuffer.get());
+    return linebuffer.get();
+}
+
