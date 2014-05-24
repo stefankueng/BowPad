@@ -81,6 +81,12 @@ protected:
     void                GotoLine(long line);
     void                Center(long startPos, long endPos);
     void                GotoBrace();
+    std::string         GetLine(long line);
+    std::string         GetTextRange(long startpos, long endpos);
+    size_t              FindText(const std::string& tofind, long startpos, long endpos);
+    std::string         GetSelectedText();
+    std::string         GetCurrentLine();
+
 
     HWND                GetHwnd();
     HWND                GetScintillaWnd();

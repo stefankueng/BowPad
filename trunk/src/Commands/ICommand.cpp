@@ -330,4 +330,34 @@ void ICommand::SetInsertionIndex(int index)
     return pMainWnd->SetInsertionIndex(index);
 }
 
+std::string ICommand::GetLine(long line)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_editor.GetLine(line);
+}
+
+std::string ICommand::GetTextRange(long startpos, long endpos)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_editor.GetTextRange(startpos, endpos);
+}
+
+size_t ICommand::FindText(const std::string& tofind, long startpos, long endpos)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_editor.FindText(tofind, startpos, endpos);
+}
+
+std::string ICommand::GetSelectedText()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_editor.GetSelectedText();
+}
+
+std::string ICommand::GetCurrentLine()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->m_editor.GetCurrentLine();
+}
+
 

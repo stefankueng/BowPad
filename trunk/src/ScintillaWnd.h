@@ -90,6 +90,13 @@ public :
     void SetTabSettings();
     void SetEOLType(int eolType);
     void AppendText(int len, const char* buf);
+    std::string GetLine(long line);
+    std::string GetTextRange(long startpos, long endpos);
+    size_t FindText(const std::string& tofind, long startpos, long endpos);
+    std::string GetSelectedText();
+    std::string GetCurrentLine();
+    std::string GetWordChars();
+    std::string GetWhitespaceChars();
 
     LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
 

@@ -1582,16 +1582,8 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
         return;
     }
     m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#");
-    Scintilla::Sci_TextRange tr = {0};
-    tr.chrg.cpMin = static_cast<long>(m_editor.Call(SCI_WORDSTARTPOSITION, scn.position, false));
-    tr.chrg.cpMax = static_cast<long>(m_editor.Call(SCI_WORDENDPOSITION, scn.position, false));
-    auto len = tr.chrg.cpMax - tr.chrg.cpMin;
-    std::unique_ptr<char[]> word(new char[len + 2]);
-    tr.lpstrText = word.get();
+    std::string sWord = m_editor.GetTextRange(static_cast<long>(m_editor.Call(SCI_WORDSTARTPOSITION, scn.position, false)), static_cast<long>(m_editor.Call(SCI_WORDENDPOSITION, scn.position, false)));
 
-    m_editor.Call(SCI_GETTEXTRANGE, 0, (sptr_t)&tr);
-
-    std::string sWord = tr.lpstrText;
     m_editor.Call(SCI_SETCHARSDEFAULT);
     if (sWord.empty())
         return;
@@ -1730,23 +1722,17 @@ void CMainWindow::HandleHotSpotClick(const Scintilla::SCNotification& scn)
         endPos = int(m_editor.Call(SCI_GETTARGETEND));
     }
 
-    std::unique_ptr<char[]> urltext(new char[endPos - startPos + 2]);
-    Scintilla::TextRange tr;
-    tr.chrg.cpMin = startPos;
-    tr.chrg.cpMax = endPos;
-    tr.lpstrText = urltext.get();
-    m_editor.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
-
+    std::string urltext = m_editor.GetTextRange(startPos, endPos);
 
     // This treatment would fail on some valid URLs where there's actually supposed to be a comma or parenthesis at the end.
-    size_t lastCharIndex = strlen(urltext.get())-1;
+    size_t lastCharIndex = urltext.size() - 1;
     while (lastCharIndex > 0 && (urltext[lastCharIndex] == ',' || urltext[lastCharIndex] == ')' || urltext[lastCharIndex] == '('))
     {
         urltext[lastCharIndex] = '\0';
         --lastCharIndex;
     }
 
-    std::wstring url = CUnicodeUtils::StdGetUnicode(urltext.get());
+    std::wstring url = CUnicodeUtils::StdGetUnicode(urltext);
     while ((*url.begin() == '(') || (*url.begin() == ')') || (*url.begin() == ','))
         url.erase(url.begin());
 
