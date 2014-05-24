@@ -51,8 +51,13 @@ private:
         // no point paying the price as if we didn't.
         auto pCmd = std::make_unique<T>(args...);
         auto cmdId = pCmd->GetCmdId();
+        m_highestCmdId = max(m_highestCmdId, cmdId);
         auto at = m_commands.insert({cmdId,std::move(pCmd)});
         return static_cast<T*>(at.first->second.get());
     }
+
+    void                            InsertPlugins(void * obj);
+
     std::map<UINT, std::unique_ptr<ICommand>>       m_commands;
+    UINT                                            m_highestCmdId;
 };

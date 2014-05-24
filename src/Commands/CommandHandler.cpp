@@ -16,6 +16,7 @@
 //
 #include "stdafx.h"
 #include "CommandHandler.h"
+#include "DirFileEnum.h"
 
 #include "CmdMRU.h"
 #include "CmdFiles.h"
@@ -50,8 +51,10 @@
 #include "CmdOpenSelection.h"
 #include "CmdNewCopy.h"
 #include "CmdDefaultEncoding.h"
+#include "CmdScripts.h"
 
 CCommandHandler::CCommandHandler(void)
+    : m_highestCmdId(0)
 {
 }
 
@@ -182,6 +185,8 @@ void CCommandHandler::Init( void * obj )
     Add<CCmdCustomCommands>(obj);
 
     Add<CCmdRandom>(obj);
+
+    InsertPlugins(obj);
 }
 
 void CCommandHandler::ScintillaNotify( Scintilla::SCNotification * pScn )
@@ -245,5 +250,42 @@ void CCommandHandler::OnTimer(UINT id)
     for (auto& cmd:m_commands)
     {
         cmd.second->OnTimer(id);
+    }
+}
+
+void CCommandHandler::InsertPlugins(void * obj)
+{
+    // scan the paths, find all plugin files, create a plugin object
+    // for every found file and store the plugin for later use
+    std::wstring sPluginDir = CAppUtils::GetDataPath();
+    sPluginDir += L"\\plugins";
+    CDirFileEnum filefinder(sPluginDir);
+    bool bIsDirectory;
+    std::wstring filename;
+    while (filefinder.NextFile(filename, &bIsDirectory, true))
+    {
+        if (!bIsDirectory)
+        {
+            try
+            {
+                auto pScript = std::make_unique<CCmdScript>(obj);
+                if (pScript->Create(filename))
+                    m_commands.insert({ ++m_highestCmdId, std::move(pScript) });
+            }
+            catch (std::exception& e)
+            {
+                // TODO: create a method in CAppUtils that shows the exception
+                if (CIniSettings::Instance().GetInt64(L"Debug", L"usemessagebox", 0))
+                {
+                    MessageBox(NULL, L"BowPad", CUnicodeUtils::StdGetUnicode(e.what()).c_str(), MB_ICONERROR);
+                }
+                else
+                {
+                    CTraceToOutputDebugString::Instance()(L"BowPad : ");
+                    CTraceToOutputDebugString::Instance()(e.what());
+                    CTraceToOutputDebugString::Instance()(L"\n");
+                }
+            }
+        }
     }
 }
