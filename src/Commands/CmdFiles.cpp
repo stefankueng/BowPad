@@ -73,8 +73,13 @@ bool CCmdOpen::Execute()
 
     // Show the open file dialog, not much we can do if that doesn't work.
     hr = pfd->Show(GetHwnd());
-    if (CAppUtils::FailedShowMessage(hr))
+    if(hr == HRESULT_FROM_WIN32(ERROR_CANCELLED)) // Expected error
         return false;
+    else
+    {
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+    }
 
     IShellItemArrayPtr psiaResults;
     hr = pfd->GetResults(&psiaResults);
