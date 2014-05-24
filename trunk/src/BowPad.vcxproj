@@ -271,6 +271,7 @@
     <ClInclude Include="Commands\CmdPrevNext.h" />
     <ClInclude Include="Commands\CmdPrint.h" />
     <ClInclude Include="Commands\CmdRandom.h" />
+    <ClInclude Include="Commands\CmdScripts.h" />
     <ClInclude Include="Commands\CmdSelectTab.h" />
     <ClInclude Include="Commands\CmdSession.h" />
     <ClInclude Include="Commands\CmdStyleConfigurator.h" />
@@ -293,6 +294,8 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="BowPad.h" />
     <ClInclude Include="ScintillaWnd.h" />
+    <ClInclude Include="scripting\BasicScriptHost.h" />
+    <ClInclude Include="scripting\BasicScriptObject.h" />
     <ClInclude Include="StatusBar.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TabBar.h" />
@@ -344,6 +347,7 @@
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
     <ClCompile Include="Commands\CmdPrevNext.cpp" />
     <ClCompile Include="Commands\CmdPrint.cpp" />
+    <ClCompile Include="Commands\CmdScripts.cpp" />
     <ClCompile Include="Commands\CmdStyleConfigurator.cpp" />
     <ClCompile Include="Commands\CommandHandler.cpp" />
     <ClCompile Include="Commands\ICommand.cpp" />
@@ -357,6 +361,8 @@
     <ClCompile Include="MRU.cpp" />
     <ClCompile Include="PropertySet.cpp" />
     <ClCompile Include="ScintillaWnd.cpp" />
+    <ClCompile Include="scripting\BasicScriptHost.cpp" />
+    <ClCompile Include="scripting\BasicScriptObject.cpp" />
     <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
