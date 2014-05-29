@@ -67,6 +67,7 @@ bool CCmdScript::Create(const std::wstring& path)
         if (CAppUtils::FailedShowMessage(hr))
             return false;
         m_host->m_path = path;
+        m_host->m_hWnd = GetHwnd();
         std::wstring source;  // stores file contents
         FILE * f = NULL;
         _wfopen_s(&f, path.c_str(), L"rtS, ccs=UTF-8");

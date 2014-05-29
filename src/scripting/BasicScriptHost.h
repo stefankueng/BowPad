@@ -63,6 +63,7 @@ public:
     virtual _variant_t CallFunction(const std::wstring& strFunc, DISPPARAMS& params);
 
     std::wstring            m_path;
+    HWND                    m_hWnd;
 private:
 
     ULONG                   m_refCount;
