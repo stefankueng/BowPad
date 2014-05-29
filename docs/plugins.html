@@ -1,0 +1,205 @@
+@@include("_includes/header.html", {"title": "BowPad JavaScript Plugins"})
+<div class="wrapper">
+<article>
+    <h1>Javascript Plugins</h1>
+    @@include("_includes/adsense_top.html")
+    <p>
+        BowPad can use plugins and scripts written in javascript (jscript) or
+        VBScript.
+    </p>
+    <p>
+        To be used as a plugin in BowPad, the script must implement a few callback
+        functions. The callbacks are optional to implement, but depending on what
+        the plugin should accomplish you will have to implement at least some of
+        them.
+    </p>
+    <p>
+        To access BowPad and its data, an object named &quot;BowPad&quot; is available
+        and provides a lot of functions a plugin can call.
+    </p>
+    <h2>Callback functions</h2>
+    <p>
+        <pre>
+// this is the main function that gets executed when the command is run, i.e.
+// the button is clicked
+function Execute()
+{
+    // execute whatever the plugin should do here,
+    // return true if the command was successful or false if it didn't run
+    // successfully
+    return true;
+}
+// return true if the plugin command is enabled (used for the button)
+function IsEnabled() { return true; }
+// return true if the plugin button should appear as checked
+function IsChecked() { return true; }
+
+// called just before BowPad exits
+function OnClose() { return; }
+// called after BowPad has fully initialized
+function AfterInit() { return; }
+// called just before a document is closed
+function OnDocumentClose(index) { return; }
+// called after a document was opened
+function OnDocumentOpen(index) { return; }
+// called after a document was saved
+function OnDocumentSave(index) { return; }
+// called on a timer event
+function OnTimer(id) { return; }
+// notification from the Scintilla control
+function ScintillaNotify(code, position, ch, modifiers, modificationType, text, length, linesAdded, message, wParam, lParam, line, foldLevelNow, foldLevelPrev, margin, listType, x, y, token, annotationLinesAdded, updated)
+{
+    // for a description of the parameters, see the Scintilla
+    // documentation here:
+    // http://www.scintilla.org/ScintillaDoc.html#Notifications
+    return;
+}
+// notification about tabs
+function TabNotify(code, tabOrigin)
+{
+    return;
+}
+        </pre>
+    </p>
+    <h2>BowPad functions</h2>
+    <p>
+        To access BowPad and its data, an object named &quot;BowPad&quot; is available
+        and provides a lot of functions a plugin can call.
+    </p>
+    <p>
+        First a list of functions and properties for the main component of BowPad:
+    </p>
+    <pre>
+    // shows a message box with the specified message text
+    BowPad.alert("message");
+    // outputs the specified text to the debug output of an attached debugger
+    // or tools like dbgView (http://technet.microsoft.com/en-us/sysinternals/bb896647.aspx)
+    BowPad.debugprint("message");
+    // Sets the tab index at which the next new tab/document is inserted
+    BowPad.SetInsertionIndex(int);
+    // activates the tab at the specified index
+    BowPad.TabActivateAt(int);
+    // updates the tab at the specified index, ensuring the tab name and state are drawn correctly
+    BowPad.UpdateTab(int);
+    // returns the document ID of the specified tab index
+    var docID = BowPad.GetDocIdOfCurrentTab(int);
+    // returns the document ID of the specified tab index
+    var docID = BowPad.GetDocIDFromTabIndex(index);
+    // returns the document ID for the specified path
+    var docID = BowPad.GetDocIDFromPath("C:/file.txt");
+    // returns the tab index for the specified document ID
+    var tabIndex = BowPad.GetTabIndexFromDocID(id);
+    // returns the index of the currently active/shown tab
+    var activeTab = BowPad.GetActiveTabIndex(int);
+    // returns the number of open tabs/documents
+    var tabcount = BowPad.GetTabCount();
+    // returns the current title string
+    var title = BowPad.GetCurrentTitle();
+    // returns the title string of the specified tab
+    var title = BowPad.GetTitleForTabIndex(int);
+    // returns the title string of the specified document
+    var title = BowPad.GetTitleForDocID(int);
+    // sets the title of the current tab
+    BowPad.SetCurrentTitle("new title");
+    // closes the specified tab. If force is true, the tab is closed without
+    // asking to save it first even if it's modified
+    BowPad.CloseTab(tabindex, false);
+    // Property that contains the number of open documents
+    var count = BowPad.DocumentCount;
+    // Property that indicates whether there's a document active
+    // In some callbacks it's possible that there is no tab active, this is
+    // to check for that
+    var bActive = BowPad.HasActiveDocument;
+    // Property that indicates whether the active tab has a document ID assigned to it.
+    // In some callbacks it's possible that even if there's a tab active, no document
+    // is assigned to it yet.
+    var bHasID = BowPad.HasDocumentID;
+    // forces an update of the status bar. If true is passed, the whole status bar
+    // info is read and updated. If false is passed, only the line and doc info is updated.
+    BowPad.UpdateStatusBar(bEverything);
+    // sets up the configured lexer for the specified language
+    BowPad.SetupLexerForLang("html");
+    // clears the info for the doc scrollbar: all coloring is cleared
+    BowPad.DocScrollClear();
+    // adds a color to the doc scrollbar
+    // type specifies the information type: 1 = selected text, 2 = bookmark, 3 = search matches
+    // line is the line number the info is for
+    // color is an RGB value
+    BowPad.DocScrollAddLineColor(type, line, color);
+    // redraws the doc scrollbar to show the set information
+    BowPad.DocScrollUpdate();
+    // removes color info from the doc scrollbar for the specified type and line
+    BowPad.DocScrollRemoveLine(type, line);
+    // moves the cursor to the specified line
+    BowPad.GotoLine(line);
+    // centers the text between the minPos and maxPos in the window
+    BowPad.Center(minPos, maxPos);
+    // moves the cursor to the corresponding brace
+    BowPad.GotoBrace();
+    // returns a timer ID to be used in the SetTimer() function
+    var timerID = BowPad.GetTimerID();
+    // sets a timer. The OnTimer() callback is called whenever the timer elapses
+    BowPad.SetTimer(timerID, milliseconds);
+    // opens the specified file, if mru is true, the file is added to the MRU list
+    BowPad.OpenFile("C:/file.ext", true);
+    // reloads the specified tab with the specified encoding. If the encoding is -1
+    // then the encoding is determined from the file content.
+    BowPad.ReloadTab(tab, 65001);   // reload tab with UTF8 encoding
+    // saves the currently active tab
+    // if saveas is true, the save-as dialog is shown unconditionally. If saveas
+    // is false, the save-as dialog is only shown if the tab was never saved before
+    // and has no file path specified.
+    BowPad.SaveCurrentTab(saveas);
+    // Invalidates the state of the plugin button. Call this if the look of
+    // the button needs changing.
+    BowPad.InvalidateState();
+    </pre>
+    <p>
+        BowPad uses the Scintilla editor component. A plugin can access that
+        component via special functions provided by the &quot;BowPad&quot; object.
+        Please refer to the Scintilla documentation for detailed information
+        about the available commands and parameters:
+        http://www.scintilla.org/ScintillaDoc.html
+    </p>
+    <p>
+        The &quot;BowPad&quot; component provides most of the Scintilla functions.
+        The naming of the functions is a modified version of the <pre>SCI_</pre> functions
+        of the Scintilla component.
+    </p>
+    <p>
+        For example, the Scintilla function <pre>SCI_SETSELECTIONSTART(int position)</pre>
+        is named <pre>SciSetSelectionStart(int)</pre> in the BowPad object.
+        Basically the function names are the names of the original Scintilla functions
+        without the <pre>_</pre> in the name. The parameters are either interger, bools or strings
+        and the same as in the Scintilla documentation.
+    </p>
+    <p>
+        Parameters in the Scintilla docs that are shown as <pre>&lt;unused&gt;</pre>
+        are omitted in the BowPad object function.
+        Also &quot;Get&quot; functions that have a <pre>char * text</pre> parameter
+        are treated differently: the strings are returned directly by the BowPad object function
+        as the return value, so the pointer param must be omitted. For example:
+        <pre>SCI_GETSELTEXT(&lt;unused&gt;, char *text)</pre> becomes
+        <pre>var selText = SciGetSelText()</pre>.
+    </p>
+    <p>
+        Some Scintilla functions take structs as parameters or return values
+        in structs. These are converted differently to &quot;BowPad&quot; functions
+        and listed here:
+    </p>
+    <pre>
+    // returns the specified range of text, between the minPos position and the 
+    // maxPos position
+    var sText = BowPad.SciGetTextRange(minPos, maxPos);
+    // returns the char at the specified position
+    // Note: BowPad sets the Scintilla control to UTF8 encoding, so it's
+    // possible that a char isn't complete because only the first byte
+    // is returned, and utf8 chars can use multiple bytes.
+    // use SciGetTextRange() instead if you're dealing with non-ASCII text
+    var sChar = BowPad.SciGetCharAt(position);
+    // finds the text
+    var foundPos = BowPad.SciFindText(flags, minPos, maxPos, "text to search for");
+    </pre>
+</article>
+</div>
+@@include("_includes/footer.html")
