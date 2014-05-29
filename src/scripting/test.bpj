@@ -14,9 +14,17 @@ function ScintillaNotify(code, position, ch, modifiers, modificationType, text, 
 // notification about tabs
 function TabNotify(code, tabOrigin)
 {
-    var id = BowPad.GetDocIdOfCurrentTab();
-    BowPad.debugprint("TabNotify: docid of current tab: " + id);
-    BowPad.debugprint("TabNotify: number of documents: " + BowPad.DocumentCount);
+    //var id = BowPad.GetDocIdOfCurrentTab();
+    //BowPad.debugprint("TabNotify: docid of current tab: " + id);
+    //BowPad.debugprint("TabNotify: number of documents: " + BowPad.DocumentCount);
+    var findret = BowPad.SciFindText(0, 0, 100, "find");
+    // jscript does not understand the returned array directly,
+    // we have to convert it to a real jscript array first
+    var findret2 = new VBArray(findret);
+    var findresult = findret2.toArray();
+    BowPad.debugprint("TabNotify: SciCanUndo: " + BowPad.SciCanUndo + "  " + BowPad.SciCanUndo());
+    BowPad.debugprint("TabNotify: FindText: " + findresult.length);
+    BowPad.debugprint("TabNotify: FindText: found start: " + findresult[0] + ", end:" + findresult[1]);
     return;
 }
 

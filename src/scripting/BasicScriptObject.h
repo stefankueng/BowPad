@@ -19,6 +19,17 @@
 #include "ICommand.h"
 #include <string>
 #include <comdef.h>
+#include <vector>
+
+struct ScintillaCmd
+{
+    std::wstring    functionname;
+    UINT            cmd;
+    UINT            cmdget;
+    VARTYPE         retval;
+    VARTYPE         p1;
+    VARTYPE         p2;
+};
 
 class BasicScriptObject : public IDispatch, ICommand
 {
@@ -43,10 +54,10 @@ public:
     virtual bool Execute() { return true; }
     virtual UINT GetCmdId() { return 0; }
 
-
 private:
-
-    static const std::wstring functionName;
+    bool ScintillaCommandsDispId(wchar_t * name, DISPID& id);
+    HRESULT ScintillaCommandInvoke(DISPID id, WORD flags, DISPPARAMS* args, VARIANT* ret);
+    std::vector<ScintillaCmd>   m_ScintillaCmds;
     ICommand *                  m_Obj;
 
     ULONG                       m_refCount;
