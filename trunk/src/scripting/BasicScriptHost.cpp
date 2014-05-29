@@ -22,6 +22,7 @@
 
 BasicScriptHost::BasicScriptHost(const GUID& languageId, const std::wstring& objectName, IDispatchPtr object)
     : m_refCount(1)
+    , m_hWnd(nullptr)
 {
     IActiveScriptPtr engine;
 
@@ -256,7 +257,7 @@ HRESULT BasicScriptHost::OnScriptError(IActiveScriptError *err)
     err->GetSourcePosition(&cookie, &line, &charpos);
     std::wstring sMsg = CStringUtils::Format(L"Script error in file '%s':\nline %lu, pos %ld\n%s\nscode = %xld\nwcode = %xd", m_path.c_str(), line, charpos, (e.bstrDescription == nullptr ? L"unknown" : e.bstrDescription), e.scode, e.wCode);
 
-    MessageBox(NULL, sMsg.c_str(), L"BowPad Script error", MB_ICONERROR);
+    MessageBox(m_hWnd, sMsg.c_str(), L"BowPad Script error", MB_ICONERROR);
 
     return S_OK;
 }

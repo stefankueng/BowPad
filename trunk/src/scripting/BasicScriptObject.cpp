@@ -943,7 +943,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
                 return DISP_E_BADPARAMCOUNT;
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
                 return DISP_E_TYPEMISMATCH;
-            MessageBox(NULL, p1.bstrVal, L"Script Alert", MB_OK);
+            MessageBox(GetHwnd(), p1.bstrVal, L"Script Alert", MB_OK);
             break;
         case 2: // debugprint
             if (args->cArgs != 1)
