@@ -268,6 +268,7 @@
     <ClInclude Include="Commands\CmdMRU.h" />
     <ClInclude Include="Commands\CmdNewCopy.h" />
     <ClInclude Include="Commands\CmdOpenSelection.h" />
+    <ClInclude Include="Commands\CmdPlugins.h" />
     <ClInclude Include="Commands\CmdPrevNext.h" />
     <ClInclude Include="Commands\CmdPrint.h" />
     <ClInclude Include="Commands\CmdRandom.h" />
@@ -345,6 +346,7 @@
     <ClCompile Include="Commands\CmdLanguage.cpp" />
     <ClCompile Include="Commands\CmdLaunch.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
+    <ClCompile Include="Commands\CmdPlugins.cpp" />
     <ClCompile Include="Commands\CmdPrevNext.cpp" />
     <ClCompile Include="Commands\CmdPrint.cpp" />
     <ClCompile Include="Commands\CmdScripts.cpp" />

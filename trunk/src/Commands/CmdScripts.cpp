@@ -90,11 +90,6 @@ bool CCmdScript::Create(const std::wstring& path)
             fclose(f);
         }
 
-        //wchar_t* source =
-        //    L"function ProcessData(msg) { window.alert(msg); }"
-        //    L"window.alert('cplusplus.com SUCKS!');"
-        //    ;
-
         hr = m_host->Parse(source);
         if (CAppUtils::FailedShowMessage(hr))
             return false;
@@ -102,19 +97,12 @@ bool CCmdScript::Create(const std::wstring& path)
         hr = m_host->Run();
         if (CAppUtils::FailedShowMessage(hr))
             return false;
-
-        //if (SUCCEEDED(hr))
-        //{
-        //    std::vector<std::wstring> args;
-        //    args.push_back(L"use cppreference.com instead!");
-        //    m_host->CallFunction(L"ProcessData", args);
-        //}
     }
     catch (std::exception& e)
     {
         if (CIniSettings::Instance().GetInt64(L"Debug", L"usemessagebox", 0))
         {
-            MessageBox(NULL, L"BowPad", CUnicodeUtils::StdGetUnicode(e.what()).c_str(), MB_ICONERROR);
+            MessageBox(GetHwnd(), L"BowPad", CUnicodeUtils::StdGetUnicode(e.what()).c_str(), MB_ICONERROR);
         }
         else
         {

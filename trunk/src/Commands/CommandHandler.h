@@ -41,6 +41,8 @@ public:
     void                            OnDocumentSave(int index, bool bSaveAs);
     void                            AfterInit();
     void                            OnTimer(UINT id);
+    const std::map<UINT, std::wstring>& GetPluginMap() { return m_plugins; }
+
 private:
     template<typename T, typename ... ARGS> T* Add(ARGS ... args)
     {
@@ -59,5 +61,6 @@ private:
     void                            InsertPlugins(void * obj);
 
     std::map<UINT, std::unique_ptr<ICommand>>       m_commands;
+    std::map<UINT, std::wstring>                    m_plugins;
     UINT                                            m_highestCmdId;
 };
