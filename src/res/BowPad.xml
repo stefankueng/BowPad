@@ -665,6 +665,22 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.LargeImages>
     </Command>
 
+    <Command Name="cmdGroupPlugins" LabelTitle="Plugins">
+      <Command.LargeImages>
+        <Image>res/PluginsL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdPluginConfig" LabelTitle="Configure" TooltipTitle="Configure plugins" TooltipDescription="Shows a dialog to configure the installed plugins and install new plugins">
+      <Command.LargeImages>
+        <Image>res/PluginsConfigL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdPlugins" LabelTitle="Plugins" TooltipTitle="Plugin commands" TooltipDescription="All plugin commands are listed here">
+      <Command.LargeImages>
+        <Image>res/PluginsL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
     <Command Name="cmdContextMap" />
     <Command Name="cmdTabContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />
@@ -989,6 +1005,14 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <ToggleButton CommandName="cmdAutoBraces" />
             <ToggleButton CommandName="cmdToggleTheme" />
             <DropDownGallery CommandName="cmdLanguage" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+          </Group>
+          <Group CommandName="cmdGroupPlugins" SizeDefinition="TwoButtons">
+            <Button CommandName="cmdPluginConfig" />
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>

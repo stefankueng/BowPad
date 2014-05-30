@@ -52,6 +52,7 @@
 #include "CmdNewCopy.h"
 #include "CmdDefaultEncoding.h"
 #include "CmdScripts.h"
+#include "CmdPlugins.h"
 
 CCommandHandler::CCommandHandler(void)
     : m_highestCmdId(0)
@@ -177,6 +178,7 @@ void CCommandHandler::Init( void * obj )
     Add<CCmdLaunchWikipedia>(obj);
     Add<CCmdLaunchConsole>(obj);
     Add<CCmdLaunchExplorer>(obj);
+    Add<CCmdPlugins>(obj);
 
     for (int i = 0; i < 10; ++i)
     {
@@ -262,6 +264,7 @@ void CCommandHandler::InsertPlugins(void * obj)
     CDirFileEnum filefinder(sPluginDir);
     bool bIsDirectory;
     std::wstring filename;
+    UINT pluginCmd = m_highestCmdId + 1000;
     while (filefinder.NextFile(filename, &bIsDirectory, true))
     {
         if (!bIsDirectory)
@@ -270,7 +273,12 @@ void CCommandHandler::InsertPlugins(void * obj)
             {
                 auto pScript = std::make_unique<CCmdScript>(obj);
                 if (pScript->Create(filename))
-                    m_commands.insert({ ++m_highestCmdId, std::move(pScript) });
+                {
+                    m_commands.insert({ ++pluginCmd, std::move(pScript) });
+                    std::wstring sName = CPathUtils::GetFileName(filename);
+                    sName = sName.substr(0, sName.size() - 4);
+                    m_plugins.insert({ pluginCmd, sName });
+                }
             }
             catch (std::exception& e)
             {
