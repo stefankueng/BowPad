@@ -28,6 +28,8 @@
 
 #include <future>
 #include <fstream>
+#include <locale>
+#include <codecvt>
 #include <VersionHelpers.h>
 
 
@@ -66,6 +68,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
                 std::map<std::wstring, PluginInfo> plugins;
 
                 std::wifstream fin(tempfile);
+                fin.imbue(std::locale(fin.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
                 if (fin.is_open())
                 {
                     std::wstring line;
@@ -82,7 +85,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
                                 if (std::getline(fin, line))
                                 {
                                     info.description = line;
-                                    SearchReplace(info.description, L"\\n", L"\n");
+                                    SearchReplace(info.description, L"\\n", L"\r\n");
 
                                     info.installedversion = CCommandHandler::Instance().GetPluginVersion(info.name);
 
