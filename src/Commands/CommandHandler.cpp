@@ -276,8 +276,8 @@ void CCommandHandler::InsertPlugins(void * obj)
                 auto pScript = std::make_unique<CCmdScript>(obj);
                 if (pScript->Create(filename))
                 {
-                    std::wstring sName = CPathUtils::GetFileName(filename);
-                    sName = sName.substr(0, sName.size() - 4);
+                    std::wstring sName = CPathUtils::GetParentDirectory(filename);
+                    sName = CPathUtils::GetFileName(sName);
                     m_pluginversion.insert({ sName, pScript->m_version });
                     m_commands.insert({ ++pluginCmd, std::move(pScript) });
                     m_plugins.insert({ pluginCmd, sName });
