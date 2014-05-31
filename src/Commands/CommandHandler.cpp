@@ -53,6 +53,7 @@
 #include "CmdDefaultEncoding.h"
 #include "CmdScripts.h"
 #include "CmdPlugins.h"
+#include "CmdPluginsConfig.h"
 
 CCommandHandler::CCommandHandler(void)
     : m_highestCmdId(0)
@@ -179,6 +180,7 @@ void CCommandHandler::Init( void * obj )
     Add<CCmdLaunchConsole>(obj);
     Add<CCmdLaunchExplorer>(obj);
     Add<CCmdPlugins>(obj);
+    Add<CCmdPluginsConfig>(obj);
 
     for (int i = 0; i < 10; ++i)
     {
@@ -274,9 +276,10 @@ void CCommandHandler::InsertPlugins(void * obj)
                 auto pScript = std::make_unique<CCmdScript>(obj);
                 if (pScript->Create(filename))
                 {
-                    m_commands.insert({ ++pluginCmd, std::move(pScript) });
                     std::wstring sName = CPathUtils::GetFileName(filename);
                     sName = sName.substr(0, sName.size() - 4);
+                    m_pluginversion.insert({ sName, pScript->m_version });
+                    m_commands.insert({ ++pluginCmd, std::move(pScript) });
                     m_plugins.insert({ pluginCmd, sName });
                 }
             }
@@ -296,4 +299,12 @@ void CCommandHandler::InsertPlugins(void * obj)
             }
         }
     }
+}
+
+int CCommandHandler::GetPluginVersion(const std::wstring& name)
+{
+    auto it = m_pluginversion.find(name);
+    if (it != m_pluginversion.end())
+        return it->second;
+    return 0;
 }
