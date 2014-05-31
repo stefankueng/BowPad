@@ -33,8 +33,8 @@ public:
 
     void                            Init(void * obj);
     ICommand *                      GetCommand(UINT cmdId);
-    void                            ScintillaNotify( Scintilla::SCNotification * pScn );
-    void                            TabNotify( TBHDR * ptbhdr );
+    void                            ScintillaNotify(Scintilla::SCNotification * pScn);
+    void                            TabNotify(TBHDR * ptbhdr);
     void                            OnClose();
     void                            OnDocumentClose(int index);
     void                            OnDocumentOpen(int index);
@@ -42,7 +42,7 @@ public:
     void                            AfterInit();
     void                            OnTimer(UINT id);
     const std::map<UINT, std::wstring>& GetPluginMap() { return m_plugins; }
-
+    int                             GetPluginVersion(const std::wstring& name);
 private:
     template<typename T, typename ... ARGS> T* Add(ARGS ... args)
     {
@@ -54,7 +54,7 @@ private:
         auto pCmd = std::make_unique<T>(args...);
         auto cmdId = pCmd->GetCmdId();
         m_highestCmdId = max(m_highestCmdId, cmdId);
-        auto at = m_commands.insert({cmdId,std::move(pCmd)});
+        auto at = m_commands.insert({ cmdId, std::move(pCmd) });
         return static_cast<T*>(at.first->second.get());
     }
 
@@ -62,5 +62,6 @@ private:
 
     std::map<UINT, std::unique_ptr<ICommand>>       m_commands;
     std::map<UINT, std::wstring>                    m_plugins;
+    std::map<std::wstring, int>                     m_pluginversion;
     UINT                                            m_highestCmdId;
 };

@@ -303,6 +303,9 @@
     <ClInclude Include="Commands\CmdPlugins.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdPluginsConfig.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -495,6 +498,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Commands\CmdPlugins.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdPluginsConfig.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>

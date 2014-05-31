@@ -53,6 +53,8 @@ public:
 
     virtual void OnTimer(UINT id) override;
 
+    int m_version;
+
 private:
     BasicScriptObject * m_appObject;
     BasicScriptHost *   m_host;

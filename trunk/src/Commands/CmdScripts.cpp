@@ -25,6 +25,7 @@ CCmdScript::CCmdScript(void * obj)
     , m_appObject(new BasicScriptObject(obj))
     , m_host(nullptr)
     , m_cmdID(0)
+    , m_version(0)
 {
 
 }
@@ -50,6 +51,8 @@ bool CCmdScript::Create(const std::wstring& path)
             sEngine = L"JavaScript";
         else if (_wcsicmp(CPathUtils::GetFileExtension(path).c_str(), L"bpv") == 0)
             sEngine = L"VBScript";
+        else
+            return false;
 
         HRESULT hr = CLSIDFromProgID(sEngine.c_str(), &engineID);
         if (CAppUtils::FailedShowMessage(hr))
@@ -97,6 +100,16 @@ bool CCmdScript::Create(const std::wstring& path)
         hr = m_host->Run();
         if (CAppUtils::FailedShowMessage(hr))
             return false;
+        // get the version
+        DISPPARAMS dispparams = { 0 };
+        try 
+        { 
+            auto ret = m_host->CallFunction(L"Version", dispparams); 
+            if (SUCCEEDED(VariantChangeType(&ret, &ret, VARIANT_ALPHABOOL, VT_INT)))
+                m_version = ret.intVal;
+        }
+        catch (std::exception&) {}
+
     }
     catch (std::exception& e)
     {
