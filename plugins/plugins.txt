@@ -1,4 +1,4 @@
 SortLines
 0100
 0200
-A script to sort the selected lines.\nAuthor: Stefan KÃ¼ng\nWebsite: http://stefanstools.sourceforge.net
+A script to sort the selected lines.\nAuthor: Stefan Küng\nWebsite: http://stefanstools.sourceforge.net
