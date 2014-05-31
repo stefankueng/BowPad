@@ -255,7 +255,7 @@ HRESULT BasicScriptHost::OnScriptError(IActiveScriptError *err)
     ULONG line;
     LONG charpos;
     err->GetSourcePosition(&cookie, &line, &charpos);
-    std::wstring sMsg = CStringUtils::Format(L"Script error in file '%s':\nline %lu, pos %ld\n%s\nscode = %xld\nwcode = %xd", m_path.c_str(), line, charpos, (e.bstrDescription == nullptr ? L"unknown" : e.bstrDescription), e.scode, e.wCode);
+    std::wstring sMsg = CStringUtils::Format(L"Script error in file '%s':\nline %lu, pos %ld\n%s\nscode = %xld\nwcode = %xd", m_path.c_str(), line + 1, charpos + 1, (e.bstrDescription == nullptr ? L"unknown" : e.bstrDescription), e.scode, e.wCode);
 
     MessageBox(m_hWnd, sMsg.c_str(), L"BowPad Script error", MB_ICONERROR);
 
