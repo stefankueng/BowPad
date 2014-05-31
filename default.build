@@ -161,4 +161,26 @@
     </foreach>
   </target>
 
+  <target name="plugins">
+    <delete file="plugins\plugins.txt" />
+    <foreach item="Folder" in="plugins" property="foldername">
+      <loadfile file="${foldername}\${path::get-file-name(foldername)}.desc" property="desc" />
+      <echo message="${path::get-file-name(foldername)}${environment::newline()}" append="true" file="plugins\plugins.txt"/>
+      <property name="pver" value="${string::substring(desc, 0, string::index-of(desc, environment::newline()))}" />
+      <property name="desc" value="${string::trim-start(string::substring(desc, string::index-of(desc, environment::newline()), string::get-length(desc)-string::index-of(desc, environment::newline())))}" />
+      <property name="minver" value="${string::substring(desc, 0, string::index-of(desc, environment::newline()))}" />
+      <property name="desc" value="${string::trim-start(string::substring(desc, string::index-of(desc, environment::newline()), string::get-length(desc)-string::index-of(desc, environment::newline())))}" />
+      <property name="desc" value="${string::replace(desc, environment::newline(), '\n')}" />
+      <echo message="${pver}${environment::newline()}" append="true" file="plugins\plugins.txt"/>
+      <echo message="${minver}${environment::newline()}" append="true" file="plugins\plugins.txt"/>
+      <echo message="${desc}${environment::newline()}" append="true" file="plugins\plugins.txt"/>
+
+      <zip zipfile="plugins\${path::get-file-name(foldername)}.zip">
+        <fileset basedir="plugins">
+          <include name="${foldername}\**" />
+        </fileset>
+      </zip>
+
+    </foreach>
+  </target>
 </project>
