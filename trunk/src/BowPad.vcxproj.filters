@@ -494,13 +494,13 @@
     <ClCompile Include="scripting\BasicScriptObject.cpp">
       <Filter>Scripting</Filter>
     </ClCompile>
-    <ClCompile Include="Commands\CmdScripts.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Commands\CmdPlugins.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
     <ClCompile Include="Commands\CmdPluginsConfig.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdScripts.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
