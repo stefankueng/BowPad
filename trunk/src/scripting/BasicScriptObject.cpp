@@ -1293,20 +1293,39 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
 
         const auto& cmd = m_ScintillaCmds[vectIndex];
         // cmd(p1, p2);
-        if (cmd.p2 != VT_NULL)
+        if ((cmd.p2 != VT_NULL) || (cmd.retval == VT_BSTR))
         {
 
-            if (args->cArgs != 2)
+            if ((args->cArgs != 2) && (cmd.retval != VT_BSTR))
                 return DISP_E_BADPARAMCOUNT;
-            if (FAILED(VariantChangeType(&p1, &args->rgvarg[1], VARIANT_ALPHABOOL, cmd.p1)))
-                return DISP_E_TYPEMISMATCH;
-            if (FAILED(VariantChangeType(&p2, &args->rgvarg[0], VARIANT_ALPHABOOL, cmd.p2)))
-                return DISP_E_TYPEMISMATCH;
+            if (cmd.p2 != VT_NULL)
+            {
+                if (FAILED(VariantChangeType(&p1, &args->rgvarg[1], VARIANT_ALPHABOOL, cmd.p1)))
+                    return DISP_E_TYPEMISMATCH;
+                if (FAILED(VariantChangeType(&p2, &args->rgvarg[0], VARIANT_ALPHABOOL, cmd.p2)))
+                    return DISP_E_TYPEMISMATCH;
+            }
+            else
+            {
+                if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, cmd.p1)))
+                    return DISP_E_TYPEMISMATCH;
+            }
             if (cmd.p2 == VT_BSTR)
             {
                 ret->vt = VT_INT;
                 ret->intVal = (int)ScintillaCall(cmd.cmd, p1.intVal, (sptr_t)CUnicodeUtils::StdGetUTF8(p2.bstrVal).c_str());
                 VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retval);
+                return S_OK;
+            }
+            else if ((cmd.p2 == VT_NULL) && (cmd.retval == VT_BSTR))
+            {
+                // return value is a string
+                auto len = ScintillaCall(cmd.cmd, p1.intVal);
+                std::unique_ptr<char[]> buf(new char[len + 1]);
+                ScintillaCall(cmd.cmd, p1.intVal, (sptr_t)buf.get());
+                buf[len] = 0;
+                ret->vt = VT_BSTR;
+                ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(buf.get()).c_str()).Detach();
                 return S_OK;
             }
             else
@@ -1351,6 +1370,7 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
                 auto len = ScintillaCall(cmd.cmd);
                 std::unique_ptr<char[]> buf(new char[len + 1]);
                 ScintillaCall(cmd.cmd, len, (sptr_t)buf.get());
+                buf[len] = 0;
                 ret->vt = VT_BSTR;
                 ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(buf.get()).c_str()).Detach();
                 return S_OK;
