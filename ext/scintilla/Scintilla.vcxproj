@@ -161,6 +161,7 @@
     <ClCompile Include="lexers\LexCSS.cxx" />
     <ClCompile Include="lexers\LexD.cxx" />
     <ClCompile Include="lexers\LexDMAP.cxx" />
+    <ClCompile Include="lexers\LexDMIS.cxx" />
     <ClCompile Include="lexers\LexECL.cxx" />
     <ClCompile Include="lexers\LexEiffel.cxx" />
     <ClCompile Include="lexers\LexErlang.cxx" />
