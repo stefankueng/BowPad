@@ -88,8 +88,8 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
                                     SearchReplace(info.description, L"\\n", L"\r\n");
 
                                     info.installedversion = CCommandHandler::Instance().GetPluginVersion(info.name);
-
-                                    plugins[info.name] = info;
+                                    if (info.minversion <= (BP_VERMAJOR * 100 + BP_VERMINOR))
+                                        plugins[info.name] = info;
                                 }
                             }
                         }
