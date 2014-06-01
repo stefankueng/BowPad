@@ -1,5 +1,5 @@
-1.1.8.766
-http://cznic.dl.sourceforge.net/project/stefanstools/BowPad/1.1.8/BowPad64-1.1.8.msi
-BowPad64-1.1.8.msi
-http://cznic.dl.sourceforge.net/project/stefanstools/BowPad/1.1.8/BowPad-1.1.8.msi
-BowPad-1.1.8.msi
+2.0.0.856
+http://cznic.dl.sourceforge.net/project/stefanstools/BowPad/2.0.0/BowPad64-2.0.0.msi
+BowPad64-2.0.0.msi
+http://cznic.dl.sourceforge.net/project/stefanstools/BowPad/2.0.0/BowPad-2.0.0.msi
+BowPad-2.0.0.msi
