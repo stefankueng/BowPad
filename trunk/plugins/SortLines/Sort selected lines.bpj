@@ -11,7 +11,7 @@ function Execute()
     // find the start and end position of the selected lines
     // these might be different if the selection is not over whole lines
     var startpos = BowPad.SciPositionFromLine(startline);
-    var endpos = BowPad.SciGetLineEndPosition(endline);
+    var endpos = BowPad.SciPositionFromLine(endline);
     var lines = [];
     // get the lines and put them into an array
     for (var i = startline; i < endline; ++i)
