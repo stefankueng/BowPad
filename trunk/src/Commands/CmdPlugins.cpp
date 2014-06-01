@@ -111,6 +111,7 @@ HRESULT CCmdPlugins::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROP
                 if (count == selected)
                 {
                     SendMessage(GetHwnd(), WM_COMMAND, MAKEWPARAM(p.first, 1), 0);
+                    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
                     break;
                 }
                 ++count;
