@@ -38,10 +38,6 @@ msgstr ""
 msgid "%s (copy).%s"
 msgstr ""
 
-#. Resource IDs: (104)
-msgid "&About ..."
-msgstr ""
-
 #. Resource IDs: (7)
 msgid "&Cancel"
 msgstr ""
@@ -54,16 +50,8 @@ msgstr ""
 msgid "&Edit"
 msgstr ""
 
-#. Resource IDs: (65535)
-msgid "&File"
-msgstr ""
-
 #. Resource IDs: (1001)
 msgid "&Find"
-msgstr ""
-
-#. Resource IDs: (65535)
-msgid "&Help"
 msgstr ""
 
 #. Resource IDs: (3753)
@@ -127,6 +115,10 @@ msgstr ""
 msgid "Access to the file '%s' was denied. Do you want to try again with elevated privileges?"
 msgstr ""
 
+#. Resource IDs: (3782)
+msgid "All plugin commands are listed here"
+msgstr ""
+
 #. Resource IDs: (3756)
 msgid "Allows to load a file with a specific encoding"
 msgstr ""
@@ -159,6 +151,10 @@ msgstr ""
 
 #. Resource IDs: (9)
 msgid "Available Languages"
+msgstr ""
+
+#. Resource IDs: (1075)
+msgid "Available plugins"
 msgstr ""
 
 #. Resource IDs: (3770)
@@ -253,6 +249,10 @@ msgstr ""
 msgid "Change Case"
 msgstr ""
 
+#. Resource IDs: (1062)
+msgid "Check a plugin to install it, uncheck it to deinstall it."
+msgstr ""
+
 #. Resource IDs: (1027)
 msgid "Check for Updates"
 msgstr ""
@@ -337,8 +337,16 @@ msgstr ""
 msgid "Comments the selected text"
 msgstr ""
 
+#. Resource IDs: (3782)
+msgid "Configure"
+msgstr ""
+
 #. Resource IDs: (3775)
 msgid "Configure Keyboard Shortcuts"
+msgstr ""
+
+#. Resource IDs: (154)
+msgid "Configure Plugins"
 msgstr ""
 
 #. Resource IDs: (3775)
@@ -355,6 +363,10 @@ msgstr ""
 
 #. Resource IDs: (3772)
 msgid "Configure custom commands"
+msgstr ""
+
+#. Resource IDs: (3782)
+msgid "Configure plugins"
 msgstr ""
 
 #. Resource IDs: (3756)
@@ -732,6 +744,15 @@ msgstr ""
 msgid "Inserts the content of the clipboard at the cursor position"
 msgstr ""
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Installation of plugin \"%s\" failed!"
+msgstr ""
+
+#. Resource IDs: (12)
+msgid "Installed Version"
+msgstr ""
+
 #. Resource IDs: (1021)
 msgid "Italic"
 msgstr ""
@@ -1008,6 +1029,10 @@ msgstr ""
 msgid "No functions found!"
 msgstr ""
 
+#. Resource IDs: (12)
+msgid "No plugins loaded"
+msgstr ""
+
 #. Resource IDs: (9)
 msgid "No updates available.\nYou already have the current version."
 msgstr ""
@@ -1151,6 +1176,18 @@ msgstr ""
 
 #. Resource IDs: (3754)
 msgid "Paste"
+msgstr ""
+
+#. Resource IDs: (12)
+msgid "Plugin Name"
+msgstr ""
+
+#. Resource IDs: (3782)
+msgid "Plugin commands"
+msgstr ""
+
+#. Resource IDs: (3782)
+msgid "Plugins"
 msgstr ""
 
 #. Resource IDs: (3757)
@@ -1381,6 +1418,10 @@ msgstr ""
 msgid "Shows a dialog to configure custom commands"
 msgstr ""
 
+#. Resource IDs: (3782)
+msgid "Shows a dialog to configure the installed plugins and install new plugins"
+msgstr ""
+
 #. Resource IDs: (3773)
 msgid "Shows a list of functions/methods in the file to jump to"
 msgstr ""
@@ -1574,6 +1615,10 @@ msgstr ""
 msgid "VE"
 msgstr ""
 
+#. Resource IDs: (12)
+msgid "Version"
+msgstr ""
+
 #. Resource IDs: (3751)
 msgid "Vertical Edge"
 msgstr ""
@@ -1632,6 +1677,10 @@ msgstr ""
 
 #. Resource IDs: (9)
 msgid "You can use the following strings in the command line:\r\n$(LINE)\t\t\tThe line where the cursor is\r\n$(POS)\t\t\tthe position where the cursor is\r\n$(TAB_PATH)\t\tthe path to the file of the active tab\r\n$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
+msgstr ""
+
+#. Resource IDs: (13)
+msgid "You have to restart BowPad for the plugin changes to take effect."
 msgstr ""
 
 #. Resource IDs: (3756)
