@@ -365,10 +365,6 @@ msgstr ""
 msgid "Configure custom commands"
 msgstr ""
 
-#. Resource IDs: (3782)
-msgid "Configure plugins"
-msgstr ""
-
 #. Resource IDs: (3756)
 msgid "Convert to"
 msgstr ""

@@ -670,7 +670,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/PluginsL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdPluginConfig" LabelTitle="Configure" TooltipTitle="Configure plugins" TooltipDescription="Shows a dialog to configure the installed plugins and install new plugins">
+    <Command Name="cmdPluginConfig" LabelTitle="Configure" TooltipTitle="Configure Plugins" TooltipDescription="Shows a dialog to configure the installed plugins and install new plugins">
       <Command.LargeImages>
         <Image>res/PluginsConfigL.bmp</Image>
       </Command.LargeImages>
