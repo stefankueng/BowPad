@@ -1080,6 +1080,13 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           <MenuGroup>
             <Button CommandName="cmdOpenSelection" />
           </MenuGroup>
+          <MenuGroup>
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+          </MenuGroup>
         </ContextMenu>
         <ContextMenu Name="TabContextMenu">
           <MenuGroup>
