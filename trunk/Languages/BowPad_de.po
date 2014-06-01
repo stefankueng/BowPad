@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-05-17 10:30+0100\n"
+"PO-Revision-Date: 2014-06-01 16:01+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -35,23 +35,6 @@ msgstr ""
 msgid "%s (copy).%s"
 msgstr "%s (Kopie).%s"
 
-# msgid/msgstr fields for Accelerator keys
-# Format is: "ID:xxxxxx:VACS+X" where:
-#    ID:xxxxx = the menu ID corresponding to the accelerator
-#    V = Virtual key (or blank if not used) - nearly always set!
-#    A = Alt key     (or blank if not used)
-#    C = Ctrl key    (or blank if not used)
-#    S = Shift key   (or blank if not used)
-#    X = upper case character
-# e.g. "V CS+Q" == Ctrl + Shift + 'Q'
-# ONLY Accelerator Keys with corresponding alphanumeric characters can be
-# updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
-# ONLY change the msgstr field. Do NOT change any other.
-# If you do not want to change an Accelerator Key, copy msgid to msgstr
-#. Resource IDs: (104)
-msgid "&About ..."
-msgstr "Ü&ber ..."
-
 #. Resource IDs: (7)
 msgid "&Cancel"
 msgstr "&Abbrechen"
@@ -64,17 +47,9 @@ msgstr "&Schliesse Tab"
 msgid "&Edit"
 msgstr "&Bearbeiten"
 
-#. Resource IDs: (65535)
-msgid "&File"
-msgstr "&Datei"
-
 #. Resource IDs: (1001)
 msgid "&Find"
 msgstr "&Suchen"
-
-#. Resource IDs: (65535)
-msgid "&Help"
-msgstr "&Hilfe"
 
 #. Resource IDs: (3753)
 msgid "&New"
@@ -145,6 +120,10 @@ msgstr ""
 "Zugriff auf die Datei '%s' wurde verweigert. Möchten Sie mit erhöhten "
 "Rechten erneut versuchen?"
 
+#. Resource IDs: (3782)
+msgid "All plugin commands are listed here"
+msgstr "Alle Plugin-Befehle werden hier aufgelistet"
+
 #. Resource IDs: (3756)
 msgid "Allows to load a file with a specific encoding"
 msgstr "Erlaubt das Laden einer Datei mit einer bestimmten Kodierung"
@@ -178,6 +157,10 @@ msgstr "Auto-Klammern"
 #. Resource IDs: (9)
 msgid "Available Languages"
 msgstr "Vorhandene Sprachen"
+
+#. Resource IDs: (1075)
+msgid "Available plugins"
+msgstr "Vorhandene Plugins"
 
 #. Resource IDs: (3770)
 msgid "BC"
@@ -287,6 +270,11 @@ msgstr ""
 msgid "Change Case"
 msgstr "Gross/Kleinschreibung"
 
+#. Resource IDs: (1062)
+msgid "Check a plugin to install it, uncheck it to deinstall it."
+msgstr ""
+"Markieren um ein Plugin zu installieren, unmarkieren um es zu deinstallieren."
+
 #. Resource IDs: (1027)
 msgid "Check for Updates"
 msgstr "Auf Updates überprüfen"
@@ -375,9 +363,17 @@ msgstr "Kommentieren"
 msgid "Comments the selected text"
 msgstr "Kommentiert den ausgewählten Text"
 
+#. Resource IDs: (3782)
+msgid "Configure"
+msgstr "Konfigurieren"
+
 #. Resource IDs: (3775)
 msgid "Configure Keyboard Shortcuts"
 msgstr "Tastenkürzel konfigurieren"
+
+#. Resource IDs: (154)
+msgid "Configure Plugins"
+msgstr "Plugins konfigurieren"
 
 #. Resource IDs: (3775)
 msgid "Configure Shortcuts"
@@ -826,6 +822,15 @@ msgstr "Einfügen"
 msgid "Inserts the content of the clipboard at the cursor position"
 msgstr "Fügt den Inhalt der Zwischenablage an der Cursorposition ein"
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Installation of plugin \"%s\" failed!"
+msgstr "Installation des Plugins \"%s\" fehlgeschlagen!"
+
+#. Resource IDs: (12)
+msgid "Installed Version"
+msgstr "Installierte Version"
+
 #. Resource IDs: (1021)
 msgid "Italic"
 msgstr "Kursiv"
@@ -1123,6 +1128,10 @@ msgstr "Nächstes Lesezeichen"
 msgid "No functions found!"
 msgstr "Keine Funktionen gefunden"
 
+#. Resource IDs: (12)
+msgid "No plugins loaded"
+msgstr "Keine Plugins geladen"
+
 #. Resource IDs: (9)
 msgid ""
 "No updates available.\n"
@@ -1282,6 +1291,18 @@ msgstr "Seitenkonfiguration"
 #. Resource IDs: (3754)
 msgid "Paste"
 msgstr "Einfügen"
+
+#. Resource IDs: (12)
+msgid "Plugin Name"
+msgstr "Plugin Name:"
+
+#. Resource IDs: (3782)
+msgid "Plugin commands"
+msgstr "Plugin Befehle"
+
+#. Resource IDs: (3782)
+msgid "Plugins"
+msgstr "Plugins"
 
 #. Resource IDs: (3757)
 msgid "Previous"
@@ -1535,6 +1556,11 @@ msgstr "Zeige Leerzeichen"
 msgid "Shows a dialog to configure custom commands"
 msgstr "Zeigt den Konfigurationsdialog für Benutzerbefehle"
 
+#. Resource IDs: (3782)
+msgid ""
+"Shows a dialog to configure the installed plugins and install new plugins"
+msgstr "Zeigt einen Dialog an um Plugins zu installieren und konfigurieren"
+
 #. Resource IDs: (3773)
 msgid "Shows a list of functions/methods in the file to jump to"
 msgstr "Zeigt eine Liste von Funktionen/Methoden an in der aktuellen Datei"
@@ -1739,6 +1765,10 @@ msgstr "V"
 msgid "VE"
 msgstr "VE"
 
+#. Resource IDs: (12)
+msgid "Version"
+msgstr "Version"
+
 #. Resource IDs: (3751)
 msgid "Vertical Edge"
 msgstr "Vertikale Linie"
@@ -1813,6 +1843,11 @@ msgstr ""
 "$(SEL_TEXT)\t\tMarkierter Text oder Wort an der aktuellen Cursorposition\r\n"
 "$(SEL_TEXT_ESCAPED)\twie $(SEL_TEXT) aber Escaped, nützlich für URLs"
 
+#. Resource IDs: (13)
+msgid "You have to restart BowPad for the plugin changes to take effect."
+msgstr ""
+"Sie müssen BowPad neu starten damit die Änderungen an Plugins wirksam werden."
+
 #. Resource IDs: (3756)
 msgid "Z"
 msgstr "Z"
@@ -1878,41 +1913,5 @@ msgstr "Führt den Benutzerbefehl 8 aus"
 msgid "runs the custom command 9"
 msgstr "Führt den Benutzerbefehl 9 aus"
 
-#~ msgid "LANG"
-#~ msgstr "LANG"
-
-#~ msgid "Print..."
-#~ msgstr "Drucken..."
-
-#~ msgid "Sends the document to a printer"
-#~ msgstr "Sendet das Dokument an einen Drucker"
-
-#~ msgid "tab size"
-#~ msgstr "Tabulatorgrösse"
-
-#~ msgid "UPPER/lower"
-#~ msgstr "GROSS/klein"
-
-#~ msgid "Cl&ose"
-#~ msgstr "&Schliessen"
-
-#~ msgid "&Find Next"
-#~ msgstr "&Finde nächstes"
-
-#~ msgid "Open"
-#~ msgstr "Öffnen"
-
-#~ msgid "Turns showing whitespaces on/off"
-#~ msgstr "Schaltet die Anzeige von Leerzeichen ein/aus"
-
-#~ msgid "Exit"
-#~ msgstr "Beenden"
-
-#~ msgid "New"
-#~ msgstr "Neu"
-
-#~ msgid "Save"
-#~ msgstr "Speichern"
-
-#~ msgid "&Close"
-#~ msgstr "&Schliessen"
+#~ msgid "Configure plugins"
+#~ msgstr "Plugins konfigurieren"
