@@ -164,7 +164,7 @@
   <target name="plugins">
     <delete file="plugins\plugins.txt" />
     <foreach item="Folder" in="plugins" property="foldername">
-      <loadfile file="${foldername}\${path::get-file-name(foldername)}.desc" property="desc" />
+      <loadfile file="${foldername}\${path::get-file-name(foldername)}.desc" property="desc" encoding="utf-8"/>
       <echo message="${path::get-file-name(foldername)}${environment::newline()}" append="true" file="plugins\plugins.txt"/>
       <property name="pver" value="${string::substring(desc, 0, string::index-of(desc, environment::newline()))}" />
       <property name="desc" value="${string::trim-start(string::substring(desc, string::index-of(desc, environment::newline()), string::get-length(desc)-string::index-of(desc, environment::newline())))}" />
