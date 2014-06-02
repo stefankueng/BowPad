@@ -149,8 +149,9 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                             //pluginlocal += info.name;
                             //pluginlocal += L".zip";
                             //CopyFile(pluginlocal.c_str(), tempfile.c_str(), FALSE);
-
+                            CreateDirectory(CAppUtils::GetDataPath().c_str(), NULL);
                             std::wstring pluginsdir = CAppUtils::GetDataPath() + L"\\plugins";
+                            CreateDirectory(pluginsdir.c_str(), NULL);
                             if (!CPathUtils::Unzip2Folder(tempfile.c_str(), pluginsdir.c_str()))
                             {
                                 // failed to unzip/install the plugin
