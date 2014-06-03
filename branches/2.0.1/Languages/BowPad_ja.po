@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-05-20 15:25+0900\n"
+"PO-Revision-Date: 2014-06-03 09:31+0900\n"
 "Last-Translator: Hiroshi Kuno <hkuno9000@gmail.com>\n"
 "Language-Team: LANGUAGE <hkuno9000@gmail.com>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.6.5\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Language: ja\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 # msgid/msgstr fields for Accelerator keys
@@ -37,10 +37,6 @@ msgstr ""
 msgid "%s (copy).%s"
 msgstr "%s (コピー).%s"
 
-#. Resource IDs: (104)
-msgid "&About ..."
-msgstr "バージョン情報(&A) ..."
-
 #. Resource IDs: (7)
 msgid "&Cancel"
 msgstr "キャンセル(&C)"
@@ -53,17 +49,9 @@ msgstr "タブを閉じる(&C)"
 msgid "&Edit"
 msgstr "編集(&E)"
 
-#. Resource IDs: (65535)
-msgid "&File"
-msgstr "ファイル(&F)"
-
 #. Resource IDs: (1001)
 msgid "&Find"
 msgstr "検索(&F)"
-
-#. Resource IDs: (65535)
-msgid "&Help"
-msgstr "ヘルプ(&H)"
 
 #. Resource IDs: (3753)
 msgid "&New"
@@ -132,6 +120,10 @@ msgid ""
 "privileges?"
 msgstr "ファイル'%s'のアクセスが拒否されました。管理者権限でリトライしますか?"
 
+#. Resource IDs: (3782)
+msgid "All plugin commands are listed here"
+msgstr "全プラグインコマンドが一覧表示されます"
+
 #. Resource IDs: (3756)
 msgid "Allows to load a file with a specific encoding"
 msgstr "指定したエンコーディングでファイル読み込みを許可する"
@@ -165,6 +157,10 @@ msgstr "自動波括弧"
 #. Resource IDs: (9)
 msgid "Available Languages"
 msgstr "取り込み済みの翻訳言語"
+
+#. Resource IDs: (1075)
+msgid "Available plugins"
+msgstr "存在するプラグインの一覧"
 
 #. Resource IDs: (3770)
 msgid "BC"
@@ -274,6 +270,10 @@ msgstr ""
 msgid "Change Case"
 msgstr "大小文字変換"
 
+#. Resource IDs: (1062)
+msgid "Check a plugin to install it, uncheck it to deinstall it."
+msgstr "チェックオンでインストール、チェックオフでアンインストールします。"
+
 #. Resource IDs: (1027)
 msgid "Check for Updates"
 msgstr "アップデートを確認する"
@@ -362,9 +362,17 @@ msgstr "コメント化"
 msgid "Comments the selected text"
 msgstr "選択テキストをコメントアウトする"
 
+#. Resource IDs: (3782)
+msgid "Configure"
+msgstr "設定"
+
 #. Resource IDs: (3775)
 msgid "Configure Keyboard Shortcuts"
 msgstr "キーボードショートカット設定"
+
+#. Resource IDs: (154)
+msgid "Configure Plugins"
+msgstr "プラグイン設定"
 
 #. Resource IDs: (3775)
 msgid "Configure Shortcuts"
@@ -809,6 +817,15 @@ msgstr "挿入"
 msgid "Inserts the content of the clipboard at the cursor position"
 msgstr "カーソル位置へクリップボードの内容を挿入する"
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Installation of plugin \"%s\" failed!"
+msgstr "プラグイン \"%s\" のインストールに失敗!"
+
+#. Resource IDs: (12)
+msgid "Installed Version"
+msgstr "インストール済みバージョン"
+
 #. Resource IDs: (1021)
 msgid "Italic"
 msgstr "斜体"
@@ -1105,6 +1122,10 @@ msgstr "次のブックマーク"
 msgid "No functions found!"
 msgstr "関数が見つかりません!"
 
+#. Resource IDs: (12)
+msgid "No plugins loaded"
+msgstr "ロード済みのプラグインはありません"
+
 #. Resource IDs: (9)
 msgid ""
 "No updates available.\n"
@@ -1265,6 +1286,18 @@ msgstr "ページ設定"
 #. Resource IDs: (3754)
 msgid "Paste"
 msgstr "貼り付け"
+
+#. Resource IDs: (12)
+msgid "Plugin Name"
+msgstr "プラグイン名"
+
+#. Resource IDs: (3782)
+msgid "Plugin commands"
+msgstr "プラグインコマンド"
+
+#. Resource IDs: (3782)
+msgid "Plugins"
+msgstr "プラグイン"
 
 #. Resource IDs: (3757)
 msgid "Previous"
@@ -1519,6 +1552,13 @@ msgstr "空白文字を表示"
 msgid "Shows a dialog to configure custom commands"
 msgstr "カスタムコマンドの設定ダイアログを表示します"
 
+#. Resource IDs: (3782)
+msgid ""
+"Shows a dialog to configure the installed plugins and install new plugins"
+msgstr ""
+"インストール済みプラグインの設定と、新プラグインのインストールを行うダイアロ"
+"グを開きます"
+
 #. Resource IDs: (3773)
 msgid "Shows a list of functions/methods in the file to jump to"
 msgstr "ファイル内ジャンプの関数/メソッドリストを表示します"
@@ -1721,6 +1761,10 @@ msgstr "V"
 msgid "VE"
 msgstr "VE"
 
+#. Resource IDs: (12)
+msgid "Version"
+msgstr "バージョン"
+
 #. Resource IDs: (3751)
 msgid "Vertical Edge"
 msgstr "垂直線"
@@ -1796,6 +1840,10 @@ msgstr ""
 "$(SEL_TEXT)\t\t選択テキストまたはカーソル位置の単語\r\n"
 "$(SEL_TEXT_ESCAPED)\tURL用に$(SEL_TEXT)をエスケープしたもの"
 
+#. Resource IDs: (13)
+msgid "You have to restart BowPad for the plugin changes to take effect."
+msgstr "プラグイン変更結果を反映するため、BowPad を再起動してください。"
+
 #. Resource IDs: (3756)
 msgid "Z"
 msgstr "Z"
@@ -1860,3 +1908,12 @@ msgstr "カスタムコマンド 8 を実行"
 #. Resource IDs: (3772)
 msgid "runs the custom command 9"
 msgstr "カスタムコマンド 9 を実行"
+
+#~ msgid "&About ..."
+#~ msgstr "バージョン情報(&A) ..."
+
+#~ msgid "&File"
+#~ msgstr "ファイル(&F)"
+
+#~ msgid "&Help"
+#~ msgstr "ヘルプ(&H)"
