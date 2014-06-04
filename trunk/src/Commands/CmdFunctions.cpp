@@ -181,8 +181,17 @@ bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf,
     auto findRet = edit.Call(SCI_FINDTEXT, SCFIND_REGEXP, (sptr_t)&ttf);
     if (findRet < 0)
         return false;
-    found_text = edit.GetTextRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
-    *line_no = edit.Call(SCI_LINEFROMPOSITION, ttf.chrgText.cpMin);
+    // skip newlines, whitespaces and possible leftover closing braces from
+    // the start of the matched function text
+    char c = (char)edit.Call(SCI_GETCHARAT, ttf.chrgText.cpMin);
+    long cpmin = ttf.chrgText.cpMin;
+    while ((cpmin < ttf.chrgText.cpMax) && ((c == '\r') || (c == '\n') || (c == ';') || (c == '}') || (c == ' ') || (c == '\t')))
+    {
+        ++cpmin;
+        c = (char)edit.Call(SCI_GETCHARAT, cpmin);
+    }
+    found_text = edit.GetTextRange(cpmin, ttf.chrgText.cpMax);
+    *line_no = edit.Call(SCI_LINEFROMPOSITION, cpmin);
     return true;
 }
 
