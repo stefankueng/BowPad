@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-06-03 09:31+0900\n"
+"PO-Revision-Date: 2014-06-04 14:10+0900\n"
 "Last-Translator: Hiroshi Kuno <hkuno9000@gmail.com>\n"
 "Language-Team: LANGUAGE <hkuno9000@gmail.com>\n"
 "Language: ja\n"
@@ -1036,10 +1036,10 @@ msgstr "Main"
 msgid "Main Encodings"
 msgstr "主なエンコーディング"
 
-# Keep short translation text to avoid clipout in the find-replace dialog.
+# that means not-ignore-case.
 #. Resource IDs: (1008)
 msgid "Match &case"
-msgstr "大文字小文字を同一視(&c)"
+msgstr "大文字小文字を区別する(&C)"
 
 #. Resource IDs: (3765)
 msgid "Misc"
