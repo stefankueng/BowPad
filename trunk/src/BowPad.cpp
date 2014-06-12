@@ -48,6 +48,14 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
+    CCmdLineParser parser(lpCmdLine);
+    if (parser.HasKey(L"?") || parser.HasKey(L"help"))
+    {
+        std::wstring sMessage = CStringUtils::Format(L"BowPad version %d.%d.%d.%d\nusage: BowPad.exe /path:\"PATH\" [/line:number] [/multiple]\nor: BowPad.exe PATH [/line:number] [/multiple]\nwith /multiple forcing BowPad to open a new instance even if there's already an instance running."
+                                                     , BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
+        MessageBox(NULL, sMessage.c_str(), L"BowPad", MB_ICONINFORMATION);
+        return FALSE;
+    }
     bool bAlreadyRunning = false;
     ::SetLastError(NO_ERROR);
     std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
@@ -55,8 +63,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     if ((GetLastError() == ERROR_ALREADY_EXISTS) ||
         (GetLastError() == ERROR_ACCESS_DENIED))
         bAlreadyRunning = true;
-
-    CCmdLineParser parser(lpCmdLine);
 
     if (bAlreadyRunning && !parser.HasKey(L"multiple"))
     {
