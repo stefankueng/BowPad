@@ -4,6 +4,12 @@ setlocal
 pushd %~dp0
 
 rem you can set the COVDIR variable to your coverity path
+if exist ..\..\cov-analysis-win64-7.0.2 (
+  set "COVDIR=..\..\cov-analysis-win64-7.0.2"
+)
+if not defined COVDIR if exist ..\..\cov-analysis-win32-7.0.2 (
+  set "COVDIR=..\..\cov-analysis-win32-7.0.2"
+)
 if not defined COVDIR set "COVDIR=C:\cov-analysis-win32-7.0.2"
 if defined COVDIR if not exist "%COVDIR%" (
   echo.
@@ -43,6 +49,9 @@ set PATH=C:\MSYS\bin;%PATH%
 tar --version 1>&2 2>nul || (echo. & echo ERROR: tar not found & goto SevenZip)
 title Creating "BowPad.lzma"...
 tar caf "BowPad.lzma" "cov-int"
+if exist cov-upload.tmpl (
+  SubWCRev .. cov-upload.tmpl cov-upload.bat
+)
 goto End
 
 
