@@ -208,7 +208,7 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
             {
                 if (pDispInfo->item.pszText == nullptr)
                     return 0;
-                pDispInfo->item.pszText[0] = 0;;
+                pDispInfo->item.pszText[0] = 0;
                 if (pDispInfo->item.iItem >= m_searchResults.size())
                     return 0;
                 switch (pDispInfo->item.iSubItem)
