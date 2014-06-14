@@ -2483,7 +2483,7 @@ bool CMainWindow::HandleOutsideDeletedFile(int tab)
     // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
     m_editor.Call(SCI_ADDUNDOACTION, 0, 0);
     m_editor.Call(SCI_UNDO);
-    return false;;
+    return false;
 }
 
 bool CMainWindow::HasOutsideChangesOccurred() const
