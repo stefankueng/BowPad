@@ -52,6 +52,7 @@ BasicScriptHost::BasicScriptHost(const GUID& languageId, const std::wstring& obj
 
 BasicScriptHost::BasicScriptHost(const GUID& languageId)
     : m_refCount(1)
+    , m_hWnd(nullptr)
 {
     IActiveScriptPtr engine;
 

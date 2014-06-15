@@ -77,6 +77,8 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_insertionIndex(-1)
     , m_windowRestored(false)
     , m_handlingOutsideChanges(false)
+    , m_pRibbon(nullptr)
+    , m_RibbonHeight(0)
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 }

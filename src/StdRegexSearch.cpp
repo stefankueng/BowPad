@@ -39,7 +39,9 @@ using namespace Scintilla;
 class StdRegexSearch : public RegexSearchBase
 {
 public:
-    StdRegexSearch() : _substituted(NULL)
+    StdRegexSearch()
+        : _substituted(NULL)
+        , _lastDirection(0)
     {
     }
 

@@ -119,6 +119,8 @@ CTabBar::CTabBar(HINSTANCE hInst)
 {
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+    m_draggingPoint = {};
+    m_currentHoverTabRect = {};
 };
 
  CTabBar::~CTabBar()

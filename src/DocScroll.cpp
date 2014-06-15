@@ -43,6 +43,9 @@ CDocScroll::CDocScroll()
     : m_pScintilla(nullptr)
     , m_lines(0)
     , m_bDirty(false)
+    , m_visibleLines(0)
+    , m_curPosVisLine(0)
+    , m_curPosColor(0)
 {
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);

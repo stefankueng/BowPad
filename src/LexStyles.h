@@ -28,6 +28,7 @@ public:
         : commentlineatstart(false)
         , functionregexsort(0)
         , userfunctions(0)
+        , lexer(0)
     {
     }
 
