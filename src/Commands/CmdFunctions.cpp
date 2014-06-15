@@ -212,6 +212,7 @@ CCmdFunctions::CCmdFunctions(void * obj)
     m_functionDisplayMode = static_cast<FunctionDisplayMode>(
         CIniSettings::Instance().GetInt64(L"functions", L"function_display_mode",
         (int) FunctionDisplayMode::NameAndArgs));
+    m_ttf = {};
 }
 
 int CCmdFunctions::TopDocumentId() const
@@ -756,6 +757,7 @@ void CCmdFunctions::ScheduleFunctionUpdate(int docId, FunctionUpdateReason reaso
         }
         AddDocumentToScan(docId);
         updateWhen = 200;
+        break;
     case FunctionUpdateReason::DocNext:
         updateWhen = 50;
         break;

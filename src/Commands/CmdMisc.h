@@ -91,7 +91,11 @@ class CCmdToggleTheme : public ICommand
 {
 public:
 
-    CCmdToggleTheme(void * obj) : ICommand(obj)
+    CCmdToggleTheme(void * obj)
+        : ICommand(obj)
+        , text(0)
+        , back(0)
+        , high(0)
     {
         CTheme::Instance().GetRibbonColors(text, back, high);
         int dark = (int)CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0);
