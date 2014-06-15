@@ -22,6 +22,7 @@
 #include "StringUtils.h"
 
 CGotoLineDlg::CGotoLineDlg()
+    : line(0)
 {
 }
 

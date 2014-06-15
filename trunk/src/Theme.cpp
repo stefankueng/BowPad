@@ -23,6 +23,7 @@ extern IUIFramework *g_pFramework;  // Reference to the Ribbon framework.
 
 CTheme::CTheme(void)
     : m_bLoaded(false)
+    , dark(false)
 {
 }
 
