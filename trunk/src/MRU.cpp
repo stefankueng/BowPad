@@ -305,7 +305,15 @@ void CMRU::Save()
 
     std::wofstream File;
     File.imbue(std::locale(std::locale(), new utf8_conversion()));
-    File.open(path);
+
+    try
+    {
+        File.open(path);
+    }
+    catch (std::ios_base::failure e)
+    {
+        return;
+    }
     if (!File.good())
         return;
 
