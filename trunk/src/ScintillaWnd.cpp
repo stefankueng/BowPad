@@ -1064,7 +1064,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
 
 FindResult CScintillaWnd::FindText( const char *text, size_t start, size_t end, int flags )
 {
-    FindResult returnValue;
+    FindResult returnValue = { 0 };
 
     Scintilla::Sci_TextToFind search;
     search.lpstrText = const_cast<char *>(text);
@@ -1097,7 +1097,7 @@ FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, 
 {
     std::string search("<");
     search.append(tagName);
-    FindResult openTagFound;
+    FindResult openTagFound = { 0 };
     openTagFound.success = false;
     FindResult result;
     int nextChar = 0;
@@ -1204,7 +1204,7 @@ FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, size_t start,
 {
     std::string search("</");
     search.append(tagName);
-    FindResult closeTagFound;
+    FindResult closeTagFound = { 0 };
     closeTagFound.success = false;
     FindResult result;
     int nextChar;

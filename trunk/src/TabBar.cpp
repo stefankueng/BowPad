@@ -469,7 +469,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             // prepare dc
             HGDIOBJ hOldFont = SelectObject(hDC, m_hFont);
 
-            DRAWITEMSTRUCT dis;
+            DRAWITEMSTRUCT dis = { 0 };
             dis.CtlType = ODT_TAB;
             dis.CtlID = 0;
             dis.hwndItem = *this;
