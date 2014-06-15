@@ -65,6 +65,9 @@ if exist "%SEVENZIP%" (
   "%SEVENZIP%" a -ttar "BowPad.tar" "cov-int"
   "%SEVENZIP%" a -tgzip "BowPad.tgz" "BowPad.tar"
   if exist "BowPad.tar" del "BowPad.tar"
+  if exist cov-upload.tmpl (
+    SubWCRev .. cov-upload.tmpl cov-upload.bat
+  )
   goto End
 )
 
