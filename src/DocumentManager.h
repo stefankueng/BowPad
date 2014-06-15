@@ -51,7 +51,7 @@ public:
     bool                        UpdateFileTime(CDocument& doc, bool bIncludeReadonly);
     DocModifiedState            HasFileChanged(int id) const;
 private:
-    FormatType                  GetEOLFormatForm(const char *data) const;
+    FormatType                  GetEOLFormatForm(const char *data, DWORD len) const;
     bool                        SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc);
 
 private:
