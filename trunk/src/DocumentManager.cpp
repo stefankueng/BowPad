@@ -553,7 +553,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
                   data, charbuf.get(), charbufSize, widebuf.get() );
 
         if (doc.m_format == UNKNOWN_FORMAT)
-            doc.m_format = GetEOLFormatForm(data);
+            doc.m_format = GetEOLFormatForm(data, lenFile);
         if (m_scratchScintilla.Call(SCI_GETSTATUS) != SC_STATUS_OK)
         {
             ShowFileLoadError(hWnd,sFileName,
@@ -585,9 +585,8 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     return doc;
 }
 
-FormatType CDocumentManager::GetEOLFormatForm( const char *data ) const
+FormatType CDocumentManager::GetEOLFormatForm( const char *data, DWORD len ) const
 {
-    size_t len = strlen(data);
     for (size_t i = 0 ; i < len ; i++)
     {
         if (data[i] == '\r')
