@@ -271,7 +271,7 @@ void CMRU::Load()
     {
         File.open(path);
     }
-    catch (std::ios_base::failure e)
+    catch (std::ios_base::failure &)
     {
         return;
     }
@@ -310,7 +310,7 @@ void CMRU::Save()
     {
         File.open(path);
     }
-    catch (std::ios_base::failure e)
+    catch (std::ios_base::failure &)
     {
         return;
     }
