@@ -27,8 +27,6 @@ public:
     CDefaultEncodingDlg();
     ~CDefaultEncodingDlg(void);
 
-    long                    line;
-    std::wstring            lineinfo;
 protected:
     LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT                 DoCommand(int id, int msg);

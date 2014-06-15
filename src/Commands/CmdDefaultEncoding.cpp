@@ -22,7 +22,6 @@
 #include "StringUtils.h"
 
 static std::string sFindString;
-static int         nSearchFlags;
 
 CDefaultEncodingDlg::CDefaultEncodingDlg()
 {}
