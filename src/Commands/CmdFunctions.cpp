@@ -202,6 +202,7 @@ CCmdFunctions::CCmdFunctions(void * obj)
         , m_edit(hRes)
         , m_searchStatus(FindFunctionsStatus::NotStarted)
         , m_functionsStatus(FindFunctionsStatus::NotStarted)
+        , m_timedParts(0)
 {
     m_timerID = GetTimerID();
     m_edit.InitScratch(hRes);
@@ -213,6 +214,7 @@ CCmdFunctions::CCmdFunctions(void * obj)
         CIniSettings::Instance().GetInt64(L"functions", L"function_display_mode",
         (int) FunctionDisplayMode::NameAndArgs));
     m_ttf = {};
+    m_startTime = m_endTime = std::chrono::steady_clock::now();
 }
 
 int CCmdFunctions::TopDocumentId() const
