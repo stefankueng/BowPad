@@ -2471,8 +2471,9 @@ bool CMainWindow::HandleOutsideDeletedFile(int tab)
     // file was removed. Options are:
     // * keep the file open
     // * close the tab
-    if (AskAboutOutsideDeletedFile(doc)) // User wishes to close the tab.
+    if (!AskAboutOutsideDeletedFile(doc))
     {
+        // User wishes to close the tab.
         CloseTab(tab);
         return true;
     }
