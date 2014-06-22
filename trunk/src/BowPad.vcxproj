@@ -384,6 +384,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\BowPad.ico" />
+    <Image Include="res\BowPadDoc.ico" />
     <Image Include="res\BowPad_elevated.ico" />
     <Image Include="res\closeTabButton.bmp" />
     <Image Include="res\closeTabButton_hover.bmp" />
