@@ -204,7 +204,30 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                 hRes = hInst;
         }
     }
-
+    {
+        HKEY hKey = 0;
+        if (RegOpenKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe", &hKey) == ERROR_SUCCESS)
+        {
+            // registry key exists, which means at least one file type was associated with BowPad by the user
+            RegCloseKey(hKey);
+            if (RegOpenKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe\\DefaultIcon", &hKey) != ERROR_SUCCESS)
+            {
+                // but the default icon hasn't been set yet: set the default icon now
+                if (RegCreateKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe\\DefaultIcon", &hKey) == ERROR_SUCCESS)
+                {
+                    std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str(), IDI_BOWPAD_DOC);
+                    if (RegSetValue(hKey, NULL, REG_SZ, sIconPath.c_str(), 0) == ERROR_SUCCESS)
+                    {
+                        // now tell the shell about the changed icon
+                        SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+                    }
+                    RegCloseKey(hKey);
+                }
+            }
+            else
+                RegCloseKey(hKey);
+        }
+    }
     MSG msg = { 0 };
     CMainWindow mainWindow(hRes);
     if (mainWindow.RegisterAndCreateWindow())
