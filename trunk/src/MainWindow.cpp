@@ -15,11 +15,6 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 
-//
-// TODO: create named constants or enumerations for button id's.
-// e..g. 101 == RELOAD etc.
-// Cancel is currently always 100 where possible to be consistent.
-//
 // TODO: Need to check the encoding logic on reload has been put back
 // together properly after merging somewhat duplicate open/reload code paths.
 
@@ -337,21 +332,16 @@ HWND CMainWindow::FindAppMainWindow(HWND hStartWnd, bool* isThisInstance) const
 
 bool CMainWindow::RegisterAndCreateWindow()
 {
-    WNDCLASSEX wcx = { }; // Zero out.
+    WNDCLASSEX wcx = { sizeof(WNDCLASSEX) }; // Set size and zero out rest.
 
     // Fill in the window class structure with default parameters
-    wcx.cbSize = sizeof(WNDCLASSEX);
     //wcx.style = 0; // Don't use CS_HREDRAW or CS_VREDRAW with a Ribbon
     wcx.lpfnWndProc = CWindow::stWinMsgHandler;
-    //wcx.cbClsExtra = 0;
-    //wcx.cbWndExtra = 0;
     wcx.hInstance = hResource;
-    //wcx.hCursor = NULL;
     std::wstring clsName = GetWindowClassName();
     wcx.lpszClassName = clsName.c_str();
     wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_BOWPAD));
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
-    //wcx.lpszMenuName = NULL;
     wcx.hIconSm = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_BOWPAD));
     if (RegisterWindow(&wcx))
     {
