@@ -17,117 +17,80 @@
 
 #pragma once
 #include "ICommand.h"
-#include "BowPad.h"
-#include "BowPadUI.h"
-#include "DirFileEnum.h"
-#include "ChoseDlg.h"
 
+#include <string>
 #include <vector>
+
+#include "ScintillaWnd.h"
+#include "BowPadUI.h"
+
+enum class IncludeType
+{
+    Unknown,
+    User,
+    System
+};
+
+struct IncludeInfo
+{
+    size_t line; // line number where the include was found.
+    std::wstring filename; // filename parsed from raw line. e.g. <x> or "y"
+    IncludeType includeType; // type of include i.e. <x> or "x"
+
+    IncludeInfo::IncludeInfo(size_t line, std::wstring&& filename, IncludeType includeType);
+    bool IncludeInfo::operator == (const IncludeInfo& other) const;
+};
+
+struct IncludeMenuItemInfo
+{
+    IncludeMenuItemInfo(IncludeInfo&& definition, std::wstring&& filename)
+        : definition(std::move(definition)), filename(std::move(filename))
+    {
+    }
+    IncludeInfo definition;
+    std::wstring filename;
+};
 
 class CCmdHeaderSource : public ICommand
 {
 public:
-
-    CCmdHeaderSource(void * obj) : ICommand(obj)
-    {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    }
-
+    CCmdHeaderSource(void * obj);
     ~CCmdHeaderSource(void)
-    {}
-
-    virtual bool Execute() override
     {
-        if (!HasActiveDocument())
-            return false;
-        // get the current path and filename
-        CDocument doc = GetActiveDocument();
-        std::wstring path = doc.m_path;
-        std::transform(path.begin(), path.end(), path.begin(), ::tolower);
-
-        std::wstring dirpath = path.substr(0, path.find_last_of('\\'));
-        std::wstring filename = path.substr(path.find_last_of('\\') + 1);
-        auto dotpos = filename.find_first_of('.');
-        if (dotpos == std::wstring::npos)
-            return false;
-
-        std::wstring plainname = filename.substr(0, dotpos);
-        CDirFileEnum enumerator(dirpath);
-        std::wstring respath;
-        bool bIsDir = false;
-        std::vector<std::wstring> matchingfiles;
-        std::vector<std::wstring> matchingfilenames;
-
-        std::vector<std::wstring> ignoredExts;
-        stringtok(ignoredExts, CIniSettings::Instance().GetString(L"HeaderSource", L"IgnoredExts", L"exe*obj*dll*ilk*lib*ncb*ipch*bml*pch*res*pdb*aps"), true, L"*");
-        while (enumerator.NextFile(respath, &bIsDir, false))
-        {
-            if (bIsDir)
-                continue;
-
-            std::wstring resname = respath.substr(respath.find_last_of('\\') + 1);
-            std::wstring ext;
-            size_t dotpos = resname.find_last_of('.');
-            if ((dotpos != std::wstring::npos) && ((dotpos + 1) < resname.size()))
-                ext = resname.substr(dotpos + 1);
-            std::wstring lowerrespath = respath;
-            std::transform(lowerrespath.begin(), lowerrespath.end(), lowerrespath.begin(), ::tolower);
-            std::wstring lowerresname = resname;
-            std::transform(lowerresname.begin(), lowerresname.end(), lowerresname.begin(), ::tolower);
-
-            if (lowerrespath.compare(path) == 0)
-                continue;
-            std::wstring sub = lowerresname.substr(0, plainname.size());
-            if (plainname.compare(sub) == 0)
-            {
-                if ((lowerresname.size() > plainname.size()) && (lowerresname[plainname.size()] == '.'))
-                {
-                    bool useIt = true;
-                    if (!ext.empty())
-                    {
-                        for (const auto& e : ignoredExts)
-                        {
-                            if (e.compare(ext) == 0)
-                            {
-                                useIt = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (useIt)
-                    {
-                        matchingfiles.push_back(respath);
-                        matchingfilenames.push_back(resname);
-                    }
-                }
-            }
-        }
-
-        if (matchingfiles.empty())
-            return false;
-
-        if (matchingfiles.size() == 1)
-        {
-            // only one match found: open it directly
-            SetInsertionIndex(GetActiveTabIndex());
-            OpenFile(matchingfiles[0].c_str(), true);
-        }
-        else
-        {
-            // more than one match found: show a chose dialog
-            CChoseDlg dlg(GetHwnd());
-            dlg.SetList(matchingfilenames);
-            int ret = (int)dlg.DoModal(hRes, IDD_CHOSE, GetHwnd());
-            if (ret >= 0)
-            {
-                SetInsertionIndex(GetActiveTabIndex());
-                OpenFile(matchingfiles[ret].c_str(), true);
-            }
-        }
-
-        return true;
     }
 
+    virtual bool Execute() override { return false; }
     virtual UINT GetCmdId() override { return cmdHeaderSource; }
 
+    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+
+    virtual HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
+
+    virtual void TabNotify(TBHDR * ptbhdr) override;
+
+    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+
+    virtual void OnDocumentOpen(int id) override;
+
+    virtual void OnDocumentSave(int index, bool bSaveAs) override;
+
+private:
+
+    bool PopulateMenu(const CDocument& doc, IUICollectionPtr& collection);
+    void InvalidateIncludes();
+    void InvalidateIncludesSource();
+    void InvalidateIncludesEnabled();
+    bool HandleSelectedMenuItem(size_t selected);
+    bool IsValidMenuItem(size_t item);
+    bool UserFindFile( HWND hwndParent, 
+        const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename);
+    bool IsServiceAvailable();
+
+private:
+    std::vector<IncludeMenuItemInfo> m_menuInfo;
+    std::string m_includeRegEx;
+    bool m_bStale;
+    // TODO! Find out what requires this to be a memeber variable.
+    // It crashes if on the stack etc. Might reveal bugs.
+    CScintillaWnd m_edit;
 };

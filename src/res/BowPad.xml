@@ -855,7 +855,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <FlowMenuLayout Columns="1"/>
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
-            <Button CommandName="cmdHeaderSource" />
+            <DropDownGallery CommandName="cmdHeaderSource" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="1"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
             <Button CommandName="cmdComment" />
             <Button CommandName="cmdUnComment" />
             <DropDownGallery CommandName="cmdCodeStyle" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
