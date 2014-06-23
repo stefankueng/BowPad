@@ -178,7 +178,7 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
             {
                 if (accel->fVirt == ctrlkeys)
                 {
-                    if ((m_lastKey == 0) && 
+                    if ((m_lastKey == 0) &&
                         (((accel->key1 == wParam) && accel->fVirt1) || (nonvirt && (accel->key1 == nonvirt) && !accel->fVirt1))
                         )
                     {

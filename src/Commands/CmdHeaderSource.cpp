@@ -147,9 +147,9 @@ HRESULT AddCategory(const IUICollectionPtr& coll, int catId, int catNameResId)
 
 bool ShowFileSelectionDialog(
     HWND hWndParent,
-    const std::wstring& defaultFilename, 
-    const std::wstring& defaultFolder, 
-    std::vector<std::wstring>& filesChosen, 
+    const std::wstring& defaultFilename,
+    const std::wstring& defaultFolder,
+    std::vector<std::wstring>& filesChosen,
     bool multiple)
 {
     PreserveChdir keepCWD;
@@ -213,7 +213,7 @@ bool ShowFileSelectionDialog(
 
     // Fetch the (possibly multiple) results. Some may possibly fail
     // but get as many as we can. We don't report partial failure.
-    // We could make it an all or nothing deal but we have chosen not to. 
+    // We could make it an all or nothing deal but we have chosen not to.
 
     DWORD count = 0;
     hr = psiaResults->GetCount(&count);
@@ -239,7 +239,7 @@ bool ShowFileSelectionDialog(
 
 bool ShowSingleFileSelectionDialog(
     HWND hWndParent,
-    const std::wstring& defaultFilename, 
+    const std::wstring& defaultFilename,
     const std::wstring& defaultFolder,
     std::wstring& fileChosen)
 {
@@ -257,7 +257,7 @@ bool ShowSingleFileSelectionDialog(
 bool ShowMultipleFileSelectionDialog(
     HWND hWndParent,
     const std::wstring& defaultFilename,
-    const std::wstring& defaultFolder, 
+    const std::wstring& defaultFolder,
     std::vector<std::wstring>& filesChosen)
 {
     return ShowFileSelectionDialog(hWndParent, defaultFilename, defaultFolder, filesChosen, true);
@@ -388,7 +388,7 @@ bool ParseInclude(const std::wstring& raw, std::wstring& filename, IncludeType& 
         }
     }
     else
-    {   
+    {
         // Looking for a filename in angle brackets, hopefully after an include.
         first = raw.find(L'<');
         if (first != std::wstring::npos)
@@ -528,7 +528,7 @@ CCmdHeaderSource::CCmdHeaderSource(void * obj)
     : ICommand(obj)
     , m_edit(hRes)
     , m_bStale(true)
-       
+
 {
     m_edit.InitScratch(hRes);
     // Because we don't know if this file type supports includes.
@@ -722,7 +722,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
         int includeCategory = (inc.includeType == IncludeType::System)
                 ? SYSTEM_INCLUDE_CATEGORY
                 : USER_INCLUDE_CATEGORY;
- 
+
         bool found = false;
         if (hasCppToolChain)
             found = FindFile(inc.filename, searchPath, foundFile);
@@ -740,7 +740,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
             return false;
         }
     }
- 
+
     return true;
 }
 
@@ -914,7 +914,7 @@ void CCmdHeaderSource::OnDocumentOpen(int /*index*/)
 {
     // All new links to find.
     InvalidateIncludes();
-} 
+}
 
 void CCmdHeaderSource::OnDocumentSave(int /*index*/, bool /*bSaveAs*/)
 {

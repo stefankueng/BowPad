@@ -172,7 +172,7 @@ bool ParseSignature(const std::wstring& sig, std::wstring& name, std::wstring& n
     return parsed;
 }
 
-bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf, 
+bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf,
     std::string& found_text, size_t* line_no)
 {
     found_text.clear();
@@ -332,9 +332,9 @@ HRESULT CCmdFunctions::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PRO
                 hr = S_OK;
             }
             // A "..." indicator may be present, assume it's that.
-            else if (selected == m_functions.size()) 
+            else if (selected == m_functions.size())
                 return S_OK;
-            else 
+            else
             {
                 // If we reach here, our internal list and menu may be out of
                 // sync. It shouldn't happen but don't crash if it does.
@@ -398,7 +398,7 @@ void CCmdFunctions::OnTimer(UINT id)
 void CCmdFunctions::OnDocumentOpen(int index)
 {
     ScheduleFunctionUpdate(GetDocIDFromTabIndex(index), FunctionUpdateReason::DocOpen);
-} 
+}
 
 void CCmdFunctions::OnDocumentSave(int index, bool bSaveAs)
 {
@@ -459,7 +459,7 @@ void CCmdFunctions::FindFunctions(int docID, bool bForce)
     }
 
     // Detect if the scanned document is the active document.
-    auto forActiveDoc = (docID == activeDocId); 
+    auto forActiveDoc = (docID == activeDocId);
 
     if ((forActiveDoc && m_searchStatus != FindFunctionsStatus::InProgress) || bForce)
     {
@@ -590,7 +590,7 @@ void CCmdFunctions::FindFunctions(int docID, bool bForce)
 }
 
 void CCmdFunctions::SaveFunctionForActiveDocument(
-    FunctionDisplayMode fdm, size_t line_no, bool parsed, 
+    FunctionDisplayMode fdm, size_t line_no, bool parsed,
     std::wstring&& sig, std::wstring&& name, std::wstring&& name_and_args)
 {
     if (parsed)
@@ -730,7 +730,7 @@ void CCmdFunctions::ScheduleFunctionUpdate(int docId, FunctionUpdateReason reaso
     int activeDocId = GetDocIdOfCurrentTab();
 
     // If we were expecting progress but didn't receive it because
-    // we received some other non progress event or 
+    // we received some other non progress event or
     // an event from some id other than the last event which
     // should be the id we wanted, then we must have been interrupted
     // before we could finish that document.
