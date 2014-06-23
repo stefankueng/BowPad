@@ -287,7 +287,6 @@ void GetFilesWithSameName(
     std::wstring targetFileName = CPathUtils::GetFileName(targetPath);
     std::wstring targetFileNameWithoutExt = CPathUtils::GetFileNameWithoutExtension(targetPath);
     std::wstring matchingPath;
-    std::wstring matchingFileName;
     std::wstring matchingFileNameWithoutExt;
     std::wstring matchingExt;
 
@@ -460,8 +459,6 @@ bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeI
 
     std::string text_found;
     size_t line_no;
-    std::wstring name;
-
     for (;;)
     {
         ttf.chrgText.cpMin = 0;
