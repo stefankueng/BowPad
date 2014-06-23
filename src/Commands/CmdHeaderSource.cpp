@@ -32,14 +32,14 @@ Clicking on a relative filename causes BP to open whatever physical file BP thin
 corresponds to it.
 
 Since BP has no project system, BP may not be able to find a corresponding file at all
-or it might not be the right one. Usually the user will realise when this happens though.
+or it might not be the right one. Usually the user will realize when this happens though.
 
 BP resolves user includes files by searching for them in the folder of the active document.
 
-BP searches for system include files by following a search path definded in
+BP searches for system include files by following a search path defined in
 it's settings file %appdata%\bowpad\settings.
 
-The confguration for this is shown below, but is optional:
+The configuration for this is shown below, but is optional:
 
 [cpp]
 toolchain=msvc
@@ -57,12 +57,12 @@ If it is empty no toolchain is used and system files must be found manually.
 
 If BP does not resolve a file to an existing file name on the disk ... is shown next to the file.
 This gives the user an indication that file cannot be found. Clicking on an item shown as
-... results in a File Open Dialog being shown to the user so they can find it themslves.
+... results in a File Open Dialog being shown to the user so they can find it themselves.
 
 Since BP can fill in the filename for the user and assume the file type opened in this manner
 is a C/C++ file, this is the prime service this mechanism has over the regular file open method
 from the File Menu that the user would otherwise have to use. This mechanism also means the user
-doesn't have to go to the top of the file to find the list of possibile includes they might want.
+doesn't have to go to the top of the file to find the list of possible includes they might want.
 
 Landing in later patches:
 
@@ -71,12 +71,12 @@ Introduce the ability to "switch between header and .cpp file" in one key/click.
 
 TOOD! Fix the override mechanism. Shift doesn't get detected well (at least on my keyboard).
 
-TODO! Restructure the menu inf oobject to be a bit more generic / flexible.
+TODO! Restructure the menu inf object to be a bit more generic / flexible.
 
 TODO: Add a file file find dialog that remember previous folders and helps more with finding files etc.
 
 TODO: Fix outstanding bug:
-1. Press Ctrn-N to create an empty document.
+1. Press Ctrl-N to create an empty document.
 2. Type #include <cstdio>
 3. Notice include button is disabled - as it should be.
 4. From the Lexer ribbon menu, change the language to C++.
@@ -117,7 +117,7 @@ The feature could be expanded on more for other languages / file types.
 namespace {
 
 // Maximum number of lines to scan for include statements.
-// NOTE: This could be a configuration item but have decided that's not neccessary.
+// NOTE: This could be a configuration item but have decided that's not necessary.
 const int MAX_INCLUDE_SEARCH_LINES = 100;
 
 const int CORRESPONDING_FILES_CATEGORY = 1;
@@ -364,7 +364,7 @@ bool ParseInclude(const std::wstring& raw, std::wstring& filename, IncludeType& 
         return false;
 
     // The regex is supposed to do the heavy lifting, matching wise,
-    // this is more about filename extractionand trying
+    // this is more about filename extraction and trying
     // not to cash given something vaguely sensible than matching/validation.
 
     // Match the '#' of include. Basic sanity check.
@@ -444,7 +444,7 @@ bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeI
     if (lang != "C/C++")
         return false;
 
-    // It's compromise of speed vs accurracy. Only scan the first N lines
+    // It's compromise of speed vs accuracy. Only scan the first N lines
     // for #include statements. They usually only exist at the start of the file.
     // We could get more creative and improve on this but this seems fine for now.
     long length = (long) edit.Call(SCI_GETLINEENDPOSITION, WPARAM(MAX_INCLUDE_SEARCH_LINES-1)); // 0 based.
@@ -453,7 +453,7 @@ bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeI
 
     Scintilla::Sci_TextToFind ttf{}; // Zero initialize.
     ttf.chrg.cpMax = length;
-    // NOTE: Intentionaly hard coded for now. See overview for reasons.
+    // NOTE: Intentionally hard coded for now. See overview for reasons.
     // Match an include statement: #include <x> or #include "x" at start of line.
     ttf.lpstrText = const_cast<char*>("^\\#include\\s+((\\\"[^\\\"]+\\\")|(<[^>]+>))");
 
@@ -467,7 +467,7 @@ bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeI
         // Note:
         // RegEx searches currently take a long time in debug mode.
         // SCI_GETLINE(int line, char *text) and SCI_GETLINELENGTH is an
-        // untried alternative that might be faster it ever becomes neccessary.
+        // untried alternative that might be faster it ever becomes necessary.
 
         // Use match case because the include keyword is case sensitive and the
         // rest of the regular expression is symbols.
@@ -485,7 +485,7 @@ bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeI
             includes.push_back(IncludeInfo(line_no, std::move(filename), includeType));
         }
     }
-    // Sort the list putting user includes before system includes. Remove duplcicates.
+    // Sort the list putting user includes before system includes. Remove duplicates.
     // A duplicate is an include with the same name and type as another in the list.
     std::sort(includes.begin(), includes.end(), [](const IncludeInfo& a, const IncludeInfo& b) -> bool
     {
