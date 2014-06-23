@@ -503,6 +503,9 @@
     <ClCompile Include="Commands\CmdScripts.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
+    <ClCompile Include="Commands\CmdHeaderSource.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc">
