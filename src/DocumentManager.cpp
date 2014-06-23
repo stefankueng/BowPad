@@ -397,8 +397,7 @@ static bool AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
 static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params)
 {
     std::wstring modpath = CPathUtils::GetModulePath();
-    SHELLEXECUTEINFO shExecInfo = { };
-    shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+    SHELLEXECUTEINFO shExecInfo = { sizeof(SHELLEXECUTEINFO) };
 
     shExecInfo.hwnd = hWnd;
     shExecInfo.lpVerb = L"runas";
