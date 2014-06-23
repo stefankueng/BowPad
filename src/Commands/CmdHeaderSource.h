@@ -37,8 +37,8 @@ struct IncludeInfo
     std::wstring filename; // filename parsed from raw line. e.g. <x> or "y"
     IncludeType includeType; // type of include i.e. <x> or "x"
 
-    IncludeInfo::IncludeInfo(size_t line, std::wstring&& filename, IncludeType includeType);
-    bool IncludeInfo::operator == (const IncludeInfo& other) const;
+    IncludeInfo(size_t line, std::wstring&& filename, IncludeType includeType);
+    bool operator == (const IncludeInfo& other) const;
 };
 
 struct IncludeMenuItemInfo
