@@ -102,9 +102,9 @@ bool CCmdScript::Create(const std::wstring& path)
             return false;
         // get the version
         DISPPARAMS dispparams = { 0 };
-        try 
-        { 
-            auto ret = m_host->CallFunction(L"Version", dispparams); 
+        try
+        {
+            auto ret = m_host->CallFunction(L"Version", dispparams);
             if (SUCCEEDED(VariantChangeType(&ret, &ret, VARIANT_ALPHABOOL, VT_INT)))
                 m_version = ret.intVal;
         }
@@ -267,7 +267,7 @@ HRESULT CCmdScript::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PR
     if (UI_PKEY_Enabled == key)
     {
         DISPPARAMS dispparams = { 0 };
-        try 
+        try
         {
             _variant_t ret = m_host->CallFunction(L"IsEnabled", dispparams);
             if (ret.vt == VT_BOOL)
