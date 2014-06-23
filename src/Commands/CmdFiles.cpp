@@ -88,7 +88,7 @@ bool CCmdOpen::Execute()
 
     // Fetch the (possibly multiple) results. Some may possibly fail
     // but get as many as we can. We don't report partial failure.
-    // We could make it an all or nothing deal but we have chosen not to. 
+    // We could make it an all or nothing deal but we have chosen not to.
 
     DWORD count = 0;
     hr = psiaResults->GetCount(&count);

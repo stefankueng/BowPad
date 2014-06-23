@@ -545,7 +545,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         DWORD threadIdOfWindowOwner = reinterpret_cast<DWORD>(lpParam);
         OutputDebugStringA("WM_ACTIVATEAPP ");
         OutputDebugStringA(activating ? "activating\n" : "deactivating\n");
-#endif   
+#endif
         // Only restore the window position on activation as that's when we'll
         // be showing any window and needing to use it.
         if (!m_windowRestored)
@@ -587,7 +587,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     }
         break;
     case WM_SETFOCUS: // lParam HWND that is losing focus.
-    {        
+    {
         //OutputDebugStringA("WM_SETFOCUS\n");
         SetFocus(m_editor);
         m_editor.Call(SCI_SETFOCUS, true);
@@ -1333,7 +1333,7 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
     // options from these buttons because this dialog is auomatically
     // triggered by typing and it's too easy to accidentally
     // acknowledge the button by type say hello int o the editor
-    // and getting interrupted by the dialog and matching the 
+    // and getting interrupted by the dialog and matching the
     // the edit button with the e of hello.
     // Need mew resource entries for this.
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
@@ -1623,7 +1623,7 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
             }
         }
         else if (strNum.size() == 6) // normal/long form, e.g. FF00FF
-        {                    
+        {
             char* ep = nullptr;
             failed = false;
             errno = 0;
@@ -1655,7 +1655,7 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
         // 0 base means determine base from any format in the string.
         errno = 0;
         number = strtoll(sWord.c_str(), &ep, 0);
-        // Be forgiving if given 100xyz, show 100, but 
+        // Be forgiving if given 100xyz, show 100, but
         // don't accept xyz100, show nothing.
         // BTW: errno seems to be 0 even if nothing is converted.
         // Must convert some digits of string.
@@ -2498,7 +2498,7 @@ void CMainWindow::CheckForOutsideChanges()
     // has the same design and flaw. We shouldn't activate each
     // tab forcing the user to make reload choices for each one.
     // just the first. Then let the user find the others when they
-    // change tabs. We could draw their attention to it by 
+    // change tabs. We could draw their attention to it by
     // marking the tab header "stale" via a colour change for example.
 
     // See if any doc has been changed externally.

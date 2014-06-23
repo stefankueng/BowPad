@@ -179,7 +179,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             // so the user gets the selected language immediately after
             // updating BowPad
             std::wstring sLangURL = CStringUtils::Format(L"https://bowpad.googlecode.com/svn/branches/%d.%d.%d/Languages/%s/BowPad_%s.lang", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, LANGPLAT, lang.c_str());
- 
+
             // note: text below is in English and not translatable because
             // we try to download the translation file here, so there's no
             // point in having this translated...

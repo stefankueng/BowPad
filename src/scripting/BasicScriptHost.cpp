@@ -267,7 +267,7 @@ HRESULT BasicScriptHost::OnScriptError(IActiveScriptError *err)
 _variant_t BasicScriptHost::CallFunction(const std::wstring& strFunc,
                                          const std::vector<std::wstring>& paramArray)
 {
-    // Putting parameters  
+    // Putting parameters
     DISPPARAMS dispparams = { 0 };
     const int arraySize = (int)paramArray.size();
 

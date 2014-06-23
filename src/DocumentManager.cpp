@@ -161,7 +161,7 @@ void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, int id )
     m_documents[id] = doc;
 }
 
-static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, bool& bFirst, DWORD& lenFile, 
+static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, bool& bFirst, DWORD& lenFile,
     int& incompleteMultibyteChar, char* data, char* charbuf, int charbufSize, wchar_t* widebuf )
 
 {
@@ -525,7 +525,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     // First allocate enough memory for the whole file (this will reduce memory copy during loading)
     m_scratchScintilla.Call(SCI_ALLOCATE, WPARAM(bufferSizeRequested));
     if (m_scratchScintilla.Call(SCI_GETSTATUS) != SC_STATUS_OK)
-    {        
+    {
         ShowFileLoadError(hWnd,sFileName,
             CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str());
         return doc;
@@ -548,7 +548,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
             encoding = GetCodepageFromBuf(data, lenFile, doc.m_bHasBOM);
         }
         doc.m_encoding = encoding;
-        LoadSome(encoding, m_scratchScintilla, doc, bFirst, lenFile, incompleteMultibyteChar, 
+        LoadSome(encoding, m_scratchScintilla, doc, bFirst, lenFile, incompleteMultibyteChar,
                   data, charbuf.get(), charbufSize, widebuf.get() );
 
         if (doc.m_format == UNKNOWN_FORMAT)
