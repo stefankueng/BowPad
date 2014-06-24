@@ -209,7 +209,7 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
                 if (pDispInfo->item.pszText == nullptr)
                     return 0;
                 pDispInfo->item.pszText[0] = 0;
-                if (pDispInfo->item.iItem >= m_searchResults.size())
+                if (pDispInfo->item.iItem >= (int)m_searchResults.size())
                     return 0;
                 switch (pDispInfo->item.iSubItem)
                 {
@@ -235,7 +235,7 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
             break;
         case NM_DBLCLK:
         {
-            if (lpNMItemActivate->iItem >= m_searchResults.size())
+            if (lpNMItemActivate->iItem >= (int)m_searchResults.size())
                 return 0;
             int tab = GetActiveTabIndex();
             int docID = GetDocIDFromTabIndex(tab);
@@ -481,7 +481,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW * pLVCD)
             rc = rect;
             drawPos = it->cpMax;
         }
-        if (text.size() > drawPos)
+        if ((int)text.size() > drawPos)
             DrawText(pLVCD->nmcd.hdc, text.substr(drawPos).c_str(), -1, &rc,
                      DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
         CloseThemeData(hTheme);
@@ -590,7 +590,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
             if (GetFocus() == GetDlgItem(*this, IDC_FINDRESULTS))
             {
                 int selIndex = ListView_GetSelectionMark(GetDlgItem(*this, IDC_FINDRESULTS));
-                if (!m_searchResults.empty() && (selIndex >= 0) && (selIndex < m_searchResults.size()))
+                if (!m_searchResults.empty() && (selIndex >= 0) && (selIndex < (int)m_searchResults.size()))
                 {
                     int tab = GetActiveTabIndex();
                     int docID = GetDocIDFromTabIndex(tab);
