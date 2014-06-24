@@ -22,24 +22,45 @@ First basic implementation. WIP.
 OVERVIEW
 
 When the user clicks on the Corresponding File button, BP responds by displaying
-a menu list of (usually relative) filenames.
+a menu list of (usually non-absolute) filenames.
 
-The list displayed comes from any #include statements in the current document.
-The include statements have the form #include "x" or #include <x>.
-The former are deemed "user" include files; the later are "system" include files.
+The list displayed is derived from filenames parsed from any C++ #include statements
+that exist in the current document. The language must be set to C/C++ for this to happen.
 
-Clicking on a relative filename causes BP to open whatever physical file BP thinks
-corresponds to it.
+If no #include statements are present, just the Open C++ File... option is present. This
+protects the drop down list from ever being empty, which is something that looks very
+strange and disconcerting to the user if an empty drop down list were allowed.
 
-Since BP has no project system, BP may not be able to find a corresponding file at all
-or it might not be the right one. Usually the user will realize when this happens though.
+Include statements have the form #include "x" or #include <x>.
+The former type are deemed "User" include files; the later are termed "System" include files.
 
-BP resolves user includes files by searching for them in the folder of the active document.
+Clicking on a filename in the list causes BP to open, if it can, whatever physical file BP
+"thinks" corresponds to the filename the user clicked on.
 
-BP searches for system include files by following a search path defined in
-it's settings file %appdata%\bowpad\settings.
+As BP has no project system it may not always find a physical file match for every include file
+it presents in the menu; and sometimes it can find the wrong file.
 
-The configuration for this is shown below, but is optional:
+When BP cannot find a physical match for a referenced file, it signals this fact to the user
+by showing the referenced filename followed by an ellipses "...".
+
+If a wrong file is found, there is no way to know other than be realising when they open it.
+So the user should be mindful that this can happen and why, so they are not caught out.
+
+User includes files are found by searching for them in the folder of the active document.
+If the document is New (unsaved), that folder will be that of whatever
+document the user had active when they created the New document/tab. If that's none,
+the final fallback is the current working directory.
+
+When they save the New document, the active folder may change. This is something to be
+aware of to avoid surprises but should cause little problem in practice.
+
+System include files are found by following a search path in BP's settings file
+"%appdata%\bowpad\settings".
+
+If no such configuration is defined BP will fallback to providing a basic functionality set.
+Providing a full configuration will enable most functionality and features but none is required.
+
+An example configuration for this is shown below.
 
 [cpp]
 toolchain=msvc
@@ -50,24 +71,56 @@ systemincludepath=c:\libcxx\include
 [mingw]
 systemincludepath=c:\mingw\x86_64-w64-mingw32\include\c++
 
-The configuration structure allows multiple "toolchains" to be defined in BP though only
-one or none is active at any time.
-The "toolchain" variable determines what the active toolchain is and accordingly then which search path is used.
-If it is empty no toolchain is used and system files must be found manually.
+The configuration structure design and the one shown above allows for multiple "toolchains"
+to be defined in BP. Only one or none is ever "active" at any time though.
 
-If BP does not resolve a file to an existing file name on the disk ... is shown next to the file.
-This gives the user an indication that file cannot be found. Clicking on an item shown as
-... results in a File Open Dialog being shown to the user so they can find it themselves.
+The "toolchain" variable determines which toolchain is the active one and accordingly which
+search paths will be used.
 
-Since BP can fill in the filename for the user and assume the file type opened in this manner
-is a C/C++ file, this is the prime service this mechanism has over the regular file open method
-from the File Menu that the user would otherwise have to use. This mechanism also means the user
-doesn't have to go to the top of the file to find the list of possible includes they might want.
+If the toolchain value is blank or missing, no toolchain will be used and the system will behave as if
+no configuration at all was present. This allows the default/unconfigured/fallback feature set to
+be tested without having to completely remove the configuration information first.
 
-Landing in later patches:
+The basic (unconfigured) feature set means system files must be found manually.
+User file finding will still occur for the active folder.
 
-TODO: Tighten the corresponding file list. Sort etc.
-Introduce the ability to "switch between header and .cpp file" in one key/click. This will come soon.
+A design choice could be made to not show missing files in the Corresponding File menu.
+But showing them allows BP to populate the filename component of the File Open Dialog,
+saving the user from having to type it.
+
+BP cannot always deduce the language/lexer desired for a file from the file's extension.
+Some files like System include files do not have extenions. Other file types are too generic
+to be assumed to contain C/C++ thhough they often do (e.g. .inc or .inl files).
+
+The regular File Menu / Ctrl-O menu cannot make assumptions about the language type for these
+types of file extensions, but the "Open C++ File..." menu otion on the Corresponding File menu
+can and does make this assumption.
+
+Showing a full list that includes missing files serves as a discoverability tool to determine exactly
+what names are referenced from a file without forcing the user to go to the top of the file (and often scroll)
+to find out. It gives an instant and consistant overview of the include file "findability" state as it
+relates to the current document in one click.
+
+These features are the primary utility of this service over the regular File Open/Ctrl-O method.
+
+Knowing the filename in advance also extends the possibility of future extensions described below.
+
+One example is the possibility of an extended file open dialog (see below).
+
+END OVERVIEW.
+
+TODO: Expand the corresponding file list matching, so .cpp yields not just test.h but also
+perhaps other file names like test.cpp.html, that might match "code behind" scenarious.
+Suggestions needed. May benefit from custom sort rules.
+
+TOOD: Introduce the ability to "switch between header and .cpp file" in one key/click.
+This is a feature that worked often by one click, but by accident more than guarantee.
+Recent changes make this guaranteed realistically never possible since their will almost
+always be more than one corresponding file now.
+
+However the solution is to restore the ability of one click include/cpp file switching but
+assign that function to a dedicated command/key, one that does gurantee to work even in the
+presence of other files. Once this has been implemented, that and this feature will be better for it.
 
 TOOD! Fix the override mechanism. Shift doesn't get detected well (at least on my keyboard).
 
@@ -363,9 +416,9 @@ bool ParseInclude(const std::wstring& raw, std::wstring& filename, IncludeType& 
     if (len <= 0)
         return false;
 
-    // The regex is supposed to do the heavy lifting, matching wise,
-    // this is more about filename extraction and trying
-    // not to cash given something vaguely sensible than matching/validation.
+    // The regex is supposed to do the heavy lifting, matching wise.
+    // The code here is more about filename extraction and trying
+    // not to crash given something vaguely sensible than matching/validation.
 
     // Match the '#' of include. Basic sanity check.
     if (raw[0] != L'#')
@@ -647,7 +700,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     IncludeInfo inc(0, std::wstring(), IncludeType::Unknown);
     IncludeMenuItemInfo item(std::move(inc), std::wstring());
     m_menuInfo.push_back(std::move(item));
-    HRESULT hr = CAppUtils::AddResStringItem(collection, IDS_OPEN_OTHER_INCLUDE, CORRESPONDING_FILES_CATEGORY);
+    HRESULT hr = CAppUtils::AddResStringItem(collection, IDS_OPEN_CPP_FILE, CORRESPONDING_FILES_CATEGORY);
     CAppUtils::FailedShowMessage(hr);
 
     std::vector<std::wstring> matchingFiles;
@@ -759,62 +812,73 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
         return false;
     }
 
-    std::wstring targetFile;
-
-    bool choose = false;
     const IncludeMenuItemInfo& info = m_menuInfo[selected];
-    // Assume user chose Open Other Include...
-    if (info.filename.empty() && info.definition.filename.empty())
-        choose = true;
+    std::wstring fileToOpen;
+    std::wstring defaultFolder;
+    bool asCpp = true;
 
-    // If the system didn't manage to automatically associate the include with a
-    // file, use the filename from the include and let the user find it.
-    else if (info.filename.empty())
-    {
-        // If the system didn't find a file, the user has to choose.
-        targetFile = CPathUtils::GetFileName(info.definition.filename);
-        choose = true;
-    }
+    CDocument doc = GetActiveDocument();
+    if (!doc.m_path.empty())
+        defaultFolder = CPathUtils::GetParentDirectory(doc.m_path);
     else
-    {
-        // The system found a file. This will be the file to open unless
-        // the user wants to override that by pressing the shift key down.
-        targetFile = info.filename;
+        defaultFolder = CPathUtils::GetCWD();
 
-        // TODO! Tighten the key logic so we don't act if other keys are down, like control.
-        // This also doesn't seem to yield accurate detection. Need to investigate.
-        auto keyState = GetKeyState(VK_SHIFT);
-        if (keyState == -127)
-            choose = true;
-    }
+    // TODO! This is all a temporary hack. Will replace with a proper and simpler
+    // design soon that will remove all the if else tests.
 
-    if (choose)
+    // If the user chose Open C++ File... from the menu.
+    if (info.filename.empty() && info.definition.filename.empty())
     {
-        std::wstring defaultFolder;
-        std::wstring selectedFile;
-        // Set the default folder to the folder of the current tab.
-        CDocument doc = GetActiveDocument();
-        if (!doc.m_path.empty())
-            defaultFolder = CPathUtils::GetParentDirectory(doc.m_path);
-        if (!UserFindFile(GetHwnd(), targetFile, defaultFolder, selectedFile))
+        if (!UserFindFile(GetHwnd(), info.filename, defaultFolder, fileToOpen))
             return false;
-        targetFile = selectedFile;
+
+        SetInsertionIndex(GetActiveTabIndex());
+        if (!OpenFile(fileToOpen.c_str(), true))
+            return false;
+    }
+    // If the user chose a Corresponding File / matching file from the menu.
+    else if (! info.filename.empty() && info.definition.includeType == IncludeType::Unknown)
+    {
+        asCpp = false;
+        SetInsertionIndex(GetActiveTabIndex());
+        if (!OpenFile(info.filename.c_str(), true))
+            return false;
+    }
+    else // User wants to open an include file, either an existing or non existing one.
+    {
+        bool pickInclude = (info.filename.empty());
+        // If the user chose an include file from the menu that exists open it
+        // unless they have the shift key down, in which case they want
+        // to search for it even though it exists.
+        if (!info.filename.empty())
+        {
+            // TODO! Tighten the key logic so we don't act if other keys are down, like control.
+            // This also doesn't seem to yield accurate detection. Need to investigate.
+            auto keyState = GetKeyState(VK_SHIFT);
+            if (keyState == -127)
+                pickInclude = false;
+
+            if (! pickInclude)
+            {
+                SetInsertionIndex(GetActiveTabIndex());
+                if (!OpenFile(info.filename.c_str(), true))
+                    return false;
+            }
+        }
+        if (pickInclude)
+        {
+            // If the User chose an include file name from the menu that didn't exist. They wants to find it.
+            std::wstring targetFile = CPathUtils::GetFileName(info.definition.filename);
+            if (!UserFindFile(GetHwnd(), targetFile, defaultFolder, fileToOpen))
+                return false;
+
+            SetInsertionIndex(GetActiveTabIndex());
+            if (!OpenFile(fileToOpen.c_str(), true))
+                return false;
+        }
     }
 
-    SetInsertionIndex(GetActiveTabIndex());
-    if (!OpenFile(targetFile.c_str(), true))
-        return false;
-
-    // Assume not an include.
-    if (info.definition.includeType == IncludeType::Unknown)
-        return true;
-
-    // If the include file has no extension, we're pretty safe to assume
-    // it's a system header like <cstdio> so set the language to C/C++
-    // as the system won't do it. This is one of the benefits of using this
-    // include facility in the first place over straight File Open.
-    std::wstring fileExt = CPathUtils::GetFileExtension(targetFile);
-    if (fileExt.empty())
+    if (asCpp)
     {
         // REVIEW: It would be more efficient to have an OpenFile overload where
         // we could specify the language at it's opened.
