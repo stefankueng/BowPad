@@ -33,6 +33,7 @@ public:
     static bool                     HasSameMajorVersion(const std::wstring& path);
     static HRESULT                  AddResStringItem(IUICollectionPtr& collection, int resId, int cat = UI_COLLECTION_INVALIDINDEX, IUIImage * pImg = nullptr);
     static HRESULT                  AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int cat = UI_COLLECTION_INVALIDINDEX, IUIImage * pImg = nullptr);
+    static HRESULT                  AddCategory(IUICollectionPtr& coll, int catId, int catNameResId);
     static bool                     FailedShowMessage(HRESULT hr);
 
 private:
