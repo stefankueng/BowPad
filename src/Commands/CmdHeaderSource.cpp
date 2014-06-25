@@ -149,6 +149,9 @@ it should be rebuilt.
 
 TODO! The include feature is quite a C++ specific for now.
 The feature could be expanded on more for other languages / file types.
+
+TODO: Display the file's full path as a tooltip when the cursor is over a drop down item.
+
 */
 
 #include "stdafx.h"
@@ -170,29 +173,12 @@ The feature could be expanded on more for other languages / file types.
 namespace {
 
 // Maximum number of lines to scan for include statements.
-// NOTE: This could be a configuration item but have decided that's not necessary.
+// NOTE: This could be a configuration item but that doesn't seem necessary for now.
 const int MAX_INCLUDE_SEARCH_LINES = 100;
 
 const int CORRESPONDING_FILES_CATEGORY = 1;
 const int USER_INCLUDE_CATEGORY = 2;
 const int SYSTEM_INCLUDE_CATEGORY = 3;
-
-// TODO! Candidate for CAppUtils::
-HRESULT AddCategory(const IUICollectionPtr& coll, int catId, int catNameResId)
-{
-    // TOOD! Use a RAII type to manage life time of the category objects.
-    // Note Categories appear in the list in the order of their creation.
-    CPropertySet* cat;
-    HRESULT hr = CPropertySet::CreateInstance(&cat);
-    if (CAppUtils::FailedShowMessage(hr))
-        return hr;
-
-    ResString catName(hRes, catNameResId);
-    cat->InitializeCategoryProperties(catName, catId);
-    coll->Add(cat);
-    cat->Release();
-    return S_OK;
-}
 
 // File Selection API. Should be utility and shared with other code.
 // Will leave unshared right now while this include/corresponding file
@@ -566,7 +552,7 @@ bool IncludeInfo::operator == (const IncludeInfo& other) const
 }
 
 bool CCmdHeaderSource::UserFindFile(
-    HWND hwndParent, const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename)
+    HWND hwndParent, const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename) const
 {
     std::wstring name = CPathUtils::GetFileName(filename);
     if (!ShowSingleFileSelectionDialog(hwndParent, name, defaultFolder, selectedFilename))
@@ -622,13 +608,13 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
         if (FAILED(hr))
             return hr;
 
-        hr = AddCategory(coll, CORRESPONDING_FILES_CATEGORY, IDS_CORRESPONDING_FILES);
+        hr = CAppUtils::AddCategory(coll, CORRESPONDING_FILES_CATEGORY, IDS_CORRESPONDING_FILES);
         if (FAILED(hr))
             return hr;
-        AddCategory(coll, USER_INCLUDE_CATEGORY, IDS_USER_INCLUDES);
+        CAppUtils::AddCategory(coll, USER_INCLUDE_CATEGORY, IDS_USER_INCLUDES);
         if (FAILED(hr))
             return hr;
-        AddCategory(coll, SYSTEM_INCLUDE_CATEGORY, IDS_SYSTEM_INCLUDES);
+        CAppUtils::AddCategory(coll, SYSTEM_INCLUDE_CATEGORY, IDS_SYSTEM_INCLUDES);
         if (FAILED(hr))
             return hr;
 
@@ -678,6 +664,14 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, enabled, ppropvarNewValue);
     }
 
+#if 0
+    if (key == UI_PKEY_TooltipTitle)
+    {
+        HRESULT hr;        
+        hr = UIInitPropertyntFromString(UI_PKEY_TooltipTitle, L"My TT Title2", ppropvarNewValue);
+        return hr;
+    }
+#endif
     return E_NOTIMPL;
 }
 
@@ -794,7 +788,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     return true;
 }
 
-bool CCmdHeaderSource::IsValidMenuItem(size_t item)
+bool CCmdHeaderSource::IsValidMenuItem(size_t item) const
 {
     return item >= 0 && item < m_menuInfo.size();
 }
@@ -893,13 +887,13 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
     return true;
 }
 
-HRESULT CCmdHeaderSource::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
+HRESULT CCmdHeaderSource::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties)
 {
     HRESULT hr;
 
     if (verb == UI_EXECUTIONVERB_EXECUTE)
     {
-        if (key && (*key == UI_PKEY_SelectedItem))
+        if (key && *key == UI_PKEY_SelectedItem)
         {
             // Happens when a highlighted item is selected from the drop down
             // and clicked.
@@ -919,30 +913,6 @@ HRESULT CCmdHeaderSource::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const 
             return HandleSelectedMenuItem(selected) ? S_OK : E_FAIL;
         }
     }
-#if 0
-        // TODO: Display the file's full path in preview mode.
-    if (verb == UI_EXECUTIONVERB_CANCELPREVIEW)
-    {
-        return S_OK;
-    }
-    if (verb == UI_EXECUTIONVERB_PREVIEW)
-    {
-        if ( key && *key == UI_PKEY_SelectedItem)
-        {
-            UINT selected;
-            HRESULT hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
-            const IncludeMenuItemInfo& info = m_menuInfo[selected];
-            // Assume user chose Open Other File....
-            //if (!(info.filename.empty() && info.definition.filename.empty()))
-
-            ///InitPropVariantFromString(L"hello",ppropvarNewValue
-            UIPrUI_PKEY_TooltipDescriptio
-            pCommandExecutionProperties->
-            //return UIInitPropertyFromString(UI_PKEY_SelectedItem, selected, ppropvarNewValue);
-        }
-        return S_OK;
-    }
-#endif
     return E_NOTIMPL;
 }
 

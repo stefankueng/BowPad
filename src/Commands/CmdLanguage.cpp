@@ -29,9 +29,13 @@
 #include <vector>
 #include <fstream>
 
+
+namespace
+{
+// Global but not externally accessable.
 std::vector<std::wstring> gLanguages;
 std::vector<std::wstring> gRemotes;
-
+};
 
 HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
 {
@@ -46,37 +50,13 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
             return hr;
         }
 
-        // Create a property set for the main category.
-        CPropertySet *pMain;
-        hr = CPropertySet::CreateInstance(&pMain);
+        CAppUtils::AddCategory(pCollection, 0, IDS_LANGUAGE_AVAILABLE);
         if (FAILED(hr))
-        {
             return hr;
-        }
-
-        // Load the label for the main category from the resource file.
-        ResString sMain(hRes, IDS_LANGUAGE_AVAILABLE);
-        // Initialize the property set with the label that was just loaded and a category id of 0.
-        pMain->InitializeCategoryProperties(sMain, 0);
-        pCollection->Add(pMain);
-        pMain->Release();
-
-
-        // Create a property set for the remote category.
-        CPropertySet *pRemotes;
-        hr = CPropertySet::CreateInstance(&pRemotes);
+        CAppUtils::AddCategory(pCollection, 1, IDS_LANGUAGE_REMOTE);
         if (FAILED(hr))
-        {
             return hr;
-        }
-
-        ResString sRem(hRes, IDS_LANGUAGE_REMOTE);
-        // Initialize the property set with the label that was just loaded and a category id of 1.
-        pRemotes->InitializeCategoryProperties(sRem, 1);
-        pCollection->Add(pRemotes);
-        pRemotes->Release();
-
-        hr = S_OK;
+        return S_OK;
     }
     else if (key == UI_PKEY_ItemsSource)
     {
@@ -91,10 +71,8 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         IUIImagePtr pImg;
         IUIImageFromBitmapPtr pifbFactory;
         hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
-        if (FAILED(hr))
-        {
+        if (CAppUtils::FailedShowMessage(hr))
             return hr;
-        }
 
         // Load the bitmap from the resource file.
         HBITMAP hbm = (HBITMAP) LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_EMPTY), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
@@ -129,6 +107,8 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
             {
                 if (CAppUtils::HasSameMajorVersion(respath))
                 {
+                    // TODO! Review: Is this supposed to be searching the path or the file name
+                    // for _ and .? LIkely a bug. Use CPath::GetFileName(resPath) and search that.
                     std::wstring sLocale = respath.substr(respath.find_last_of('_')+1);
                     sLocale = sLocale.substr(0, sLocale.find_last_of('.'));
                     int len = GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, 0, 0);
@@ -153,9 +133,8 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         }
         else
         {
-            for (auto it : gRemotes)
+            for (const auto& sLocale : gRemotes)
             {
-                std::wstring sLocale = it;
                 int len = GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, 0, 0);
                 if (len)
                 {
