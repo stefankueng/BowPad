@@ -81,9 +81,9 @@ private:
     void InvalidateIncludesSource();
     void InvalidateIncludesEnabled();
     bool HandleSelectedMenuItem(size_t selected);
-    bool IsValidMenuItem(size_t item);
+    bool IsValidMenuItem(size_t item) const;
     bool UserFindFile( HWND hwndParent,
-        const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename);
+        const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename) const;
     bool IsServiceAvailable();
 
 private:
