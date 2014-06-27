@@ -72,20 +72,6 @@ private:
     CScintillaWnd m_edit;
 };
 
-#if 0 // No longer used. Pondering it's fate.
-class OpenFileItem
-{
-public:
-    using OpenFileItemOwner = std::function<void(OpenFileItem&)>;
-    OpenFileItemOwner owner;
-    OpenFileItem(OpenFileItemOwner& owner) : owner(owner) { }
-    void operator()()
-    {
-        owner(*this);
-    }
-};
-#endif
-
 enum class IncludeType
 {
     Unknown,
