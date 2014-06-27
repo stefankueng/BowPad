@@ -185,405 +185,402 @@ this from working. Need to investigate as I'm far from certain that's the reason
 #include "DirFileEnum.h"
 #include "Resource.h"
 
-namespace {
-
-// We may want to use this elsewhere in the future so draw attention to it, but
-// but for now it's only needed in this module.
-static const char CPP_INCLUDE_STATEMENT_REGEX[] = { "^\\#include\\s+((\\\"[^\\\"]+\\\")|(<[^>]+>))" };
-
-// Maximum number of lines to scan for include statements.
-// NOTE: This could be a configuration item but that doesn't seem necessary for now.
-const int MAX_INCLUDE_SEARCH_LINES = 100;
-
-const int CORRESPONDING_FILES_CATEGORY = 1;
-const int USER_INCLUDE_CATEGORY = 2;
-const int SYSTEM_INCLUDE_CATEGORY = 3;
-
-// File Selection API. Should be utility and shared with other code.
-// Will leave unshared right now while this include/corresponding file
-// feature functionality is settles down.
-
-// TODO! Move appropriate functions to utilities.
-bool ShowFileSelectionDialog(
-    HWND hWndParent,
-    const std::wstring& defaultFilename,
-    const std::wstring& defaultFolder,
-    std::vector<std::wstring>& filesChosen,
-    bool multiple)
+namespace
 {
-    PreserveChdir keepCWD;
-    filesChosen.clear();
 
-    IFileOpenDialogPtr pfd = NULL;
+    // We may want to use this elsewhere in the future so draw attention to it, but
+    // but for now it's only needed in this module.
+    static const char CPP_INCLUDE_STATEMENT_REGEX[] = { "^\\#include\\s+((\\\"[^\\\"]+\\\")|(<[^>]+>))" };
 
-    HRESULT hr = pfd.CreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER);
-    if (CAppUtils::FailedShowMessage(hr))
-        return false;
+    // Maximum number of lines to scan for include statements.
+    // NOTE: This could be a configuration item but that doesn't seem necessary for now.
+    const int MAX_INCLUDE_SEARCH_LINES = 100;
 
-    // Set the dialog options, if it fails don't continue as we don't
-    // know what options we're blending. Shouldn't ever fail anyway.
-    DWORD dwOptions;
-    hr = pfd->GetOptions(&dwOptions);
-    if (CAppUtils::FailedShowMessage(hr))
-        return false;
-    // If we can't set our options, we have no idea what's happening
-    // so don't continue.
-    dwOptions |= FOS_FILEMUSTEXIST | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST;
-    if (multiple)
-        dwOptions |= FOS_ALLOWMULTISELECT;
-    hr = pfd->SetOptions(dwOptions);
-    if (CAppUtils::FailedShowMessage(hr))
-        return false;
+    const int CORRESPONDING_FILES_CATEGORY = 1;
+    const int USER_INCLUDE_CATEGORY = 2;
+    const int SYSTEM_INCLUDE_CATEGORY = 3;
 
-    if (!defaultFilename.empty())
+    // File Selection API. Should be utility and shared with other code.
+    // Will leave unshared right now while this include/corresponding file
+    // feature functionality is settles down.
+
+    // TODO! Move appropriate functions to utilities.
+    bool ShowFileSelectionDialog(
+        HWND hWndParent,
+        const std::wstring& defaultFilename,
+        const std::wstring& defaultFolder,
+        std::vector<std::wstring>& filesChosen,
+        bool multiple)
     {
-        pfd->SetFileName(defaultFilename.c_str());
-        // set a filter for this as well
-        COMDLG_FILTERSPEC filters[2];
-        filters[0].pszName = defaultFilename.c_str();
-        filters[0].pszSpec = defaultFilename.c_str();
-        filters[1].pszName = L"All files";
-        filters[1].pszSpec = L"*.*";
-        pfd->SetFileTypes(2, filters);
-        pfd->SetFileTypeIndex(1);
-    }
+        PreserveChdir keepCWD;
+        filesChosen.clear();
 
-    // Set the standard title.
-    ResString rTitle(hRes, IDS_APP_TITLE);
-    pfd->SetTitle(rTitle);
+        IFileOpenDialogPtr pfd = NULL;
 
-    if (!defaultFolder.empty())
-    {
-        IShellItemPtr psiDefFolder = NULL;
-        hr = SHCreateItemFromParsingName(defaultFolder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
-        if (!CAppUtils::FailedShowMessage(hr))
-        {
-            // Assume if we can't set the folder we can at least continue
-            // and the user might be able to set another folder or something.
-            hr = pfd->SetFolder(psiDefFolder);
-            CAppUtils::FailedShowMessage(hr);
-        }
-    }
-
-    // Show the open file dialog, not much we can do if that doesn't work.
-    hr = pfd->Show(hWndParent);
-    if (hr == HRESULT_FROM_WIN32(ERROR_CANCELLED)) // Expected error
-        return false;
-    else
-    {
+        HRESULT hr = pfd.CreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER);
         if (CAppUtils::FailedShowMessage(hr))
             return false;
-    }
 
-    IShellItemArrayPtr psiaResults;
-    hr = pfd->GetResults(&psiaResults);
-    if (CAppUtils::FailedShowMessage(hr))
-        return false;
-
-    // Fetch the (possibly multiple) results. Some may possibly fail
-    // but get as many as we can. We don't report partial failure.
-    // We could make it an all or nothing deal but we have chosen not to.
-
-    DWORD count = 0;
-    hr = psiaResults->GetCount(&count);
-    if (CAppUtils::FailedShowMessage(hr))
-        return false;
-    for (DWORD i = 0; i < count; ++i)
-    {
-        IShellItemPtr psiResult = NULL;
-        hr = psiaResults->GetItemAt(i, &psiResult);
-        if (!CAppUtils::FailedShowMessage(hr))
-        {
-            PWSTR pszPath = NULL;
-            hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
-            if (!CAppUtils::FailedShowMessage(hr))
-                filesChosen.push_back(pszPath);
-        }
+        // Set the dialog options, if it fails don't continue as we don't
+        // know what options we're blending. Shouldn't ever fail anyway.
+        DWORD dwOptions;
+        hr = pfd->GetOptions(&dwOptions);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+        // If we can't set our options, we have no idea what's happening
+        // so don't continue.
+        dwOptions |= FOS_FILEMUSTEXIST | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST;
         if (multiple)
-            break;
-    }
+            dwOptions |= FOS_ALLOWMULTISELECT;
+        hr = pfd->SetOptions(dwOptions);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
 
-    return true;
-}
+        if (!defaultFilename.empty())
+        {
+            pfd->SetFileName(defaultFilename.c_str());
+            // set a filter for this as well
+            COMDLG_FILTERSPEC filters[2];
+            filters[0].pszName = defaultFilename.c_str();
+            filters[0].pszSpec = defaultFilename.c_str();
+            filters[1].pszName = L"All files";
+            filters[1].pszSpec = L"*.*";
+            pfd->SetFileTypes(2, filters);
+            pfd->SetFileTypeIndex(1);
+        }
 
-bool ShowSingleFileSelectionDialog(
-    HWND hWndParent,
-    const std::wstring& defaultFilename,
-    const std::wstring& defaultFolder,
-    std::wstring& fileChosen)
-{
-    fileChosen.clear();
-    std::vector<std::wstring> filesChosen;
-    if (ShowFileSelectionDialog(hWndParent, defaultFilename, defaultFolder, filesChosen, false))
-    {
-        fileChosen = filesChosen[0];
+        // Set the standard title.
+        ResString rTitle(hRes, IDS_APP_TITLE);
+        pfd->SetTitle(rTitle);
+
+        if (!defaultFolder.empty())
+        {
+            IShellItemPtr psiDefFolder = NULL;
+            hr = SHCreateItemFromParsingName(defaultFolder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
+            if (!CAppUtils::FailedShowMessage(hr))
+            {
+                // Assume if we can't set the folder we can at least continue
+                // and the user might be able to set another folder or something.
+                hr = pfd->SetFolder(psiDefFolder);
+                CAppUtils::FailedShowMessage(hr);
+            }
+        }
+
+        // Show the open file dialog, not much we can do if that doesn't work.
+        hr = pfd->Show(hWndParent);
+        if (hr == HRESULT_FROM_WIN32(ERROR_CANCELLED)) // Expected error
+            return false;
+        else
+        {
+            if (CAppUtils::FailedShowMessage(hr))
+                return false;
+        }
+
+        IShellItemArrayPtr psiaResults;
+        hr = pfd->GetResults(&psiaResults);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+
+        // Fetch the (possibly multiple) results. Some may possibly fail
+        // but get as many as we can. We don't report partial failure.
+        // We could make it an all or nothing deal but we have chosen not to.
+
+        DWORD count = 0;
+        hr = psiaResults->GetCount(&count);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+        for (DWORD i = 0; i < count; ++i)
+        {
+            IShellItemPtr psiResult = NULL;
+            hr = psiaResults->GetItemAt(i, &psiResult);
+            if (!CAppUtils::FailedShowMessage(hr))
+            {
+                PWSTR pszPath = NULL;
+                hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
+                if (!CAppUtils::FailedShowMessage(hr))
+                    filesChosen.push_back(pszPath);
+            }
+            if (multiple)
+                break;
+        }
+
         return true;
     }
-    return false;
-}
 
-
-// Find all derivatives of a file (the current document) in it's folder.
-// i.e. match files that share the same filename, but not extension.
-// Directory names are not included.
-// Ignore any files that have certain extensions.
-// e.g. Given a name like c:\test\test.cpp,
-// return {c:\test\test.h and test.h} but ignore c:\test\test.exe.
-// Filenames that have no extension are not considered (for not particular reason).
-void GetFilesWithSameName(
-    const std::wstring& targetPath,
-    std::vector<std::wstring>& matchingfiles
-)
-{
-    std::wstring targetExt = CPathUtils::GetFileExtension(targetPath);
-    if (targetExt.empty())
-        return;
-
-    std::vector<std::wstring> ignoredExts;
-    stringtok(ignoredExts, CIniSettings::Instance().GetString(L"HeaderSource", L"IgnoredExts", L"exe*obj*dll*ilk*lib*ncb*ipch*bml*pch*res*pdb*aps"), true, L"*");
-
-    std::wstring targetFolder = CPathUtils::GetParentDirectory(targetPath);
-    std::wstring targetFileName = CPathUtils::GetFileName(targetPath);
-    std::wstring targetFileNameWithoutExt = CPathUtils::GetFileNameWithoutExtension(targetPath);
-    std::wstring matchingPath;
-    std::wstring matchingFileNameWithoutExt;
-    std::wstring matchingExt;
-
-    CDirFileEnum enumerator(targetFolder);
-    bool bIsDir = false;
-    while (enumerator.NextFile(matchingPath, &bIsDir, false))
+    bool ShowSingleFileSelectionDialog(HWND hWndParent,
+                                       const std::wstring& defaultFilename,
+                                       const std::wstring& defaultFolder,
+                                       std::wstring& fileChosen)
     {
-        if (bIsDir)
-            continue;
-        // Don't match ourself.
-        if (CPathUtils::PathCompare(matchingPath, targetPath) == 0)
-            continue;
-        // Don't match files without extensions. REVIEW: Why not?
-        matchingExt = CPathUtils::GetFileExtension(matchingPath);
-        if (matchingExt.empty())
-            continue;
-        // TODO! Consider if corresponding file should be based on the first "." in the
-        // the name rather than last "." etc.
-        // So test.cs can be linked with test.cs.html or whatever.
-        matchingFileNameWithoutExt = CPathUtils::GetFileNameWithoutExtension(matchingPath);
-        if (CPathUtils::PathCompare(targetFileNameWithoutExt, matchingFileNameWithoutExt) == 0)
+        fileChosen.clear();
+        std::vector<std::wstring> filesChosen;
+        if (ShowFileSelectionDialog(hWndParent, defaultFilename, defaultFolder, filesChosen, false))
         {
-            bool useIt = true;
-            for (const auto& ignoredExt : ignoredExts)
+            fileChosen = filesChosen[0];
+            return true;
+        }
+        return false;
+    }
+
+
+    // Find all derivatives of a file (the current document) in it's folder.
+    // i.e. match files that share the same filename, but not extension.
+    // Directory names are not included.
+    // Ignore any files that have certain extensions.
+    // e.g. Given a name like c:\test\test.cpp,
+    // return {c:\test\test.h and test.h} but ignore c:\test\test.exe.
+    // Filenames that have no extension are not considered (for not particular reason).
+    void GetFilesWithSameName(const std::wstring& targetPath,
+                              std::vector<std::wstring>& matchingfiles)
+    {
+        std::wstring targetExt = CPathUtils::GetFileExtension(targetPath);
+        if (targetExt.empty())
+            return;
+
+        std::vector<std::wstring> ignoredExts;
+        stringtok(ignoredExts, CIniSettings::Instance().GetString(L"HeaderSource", L"IgnoredExts", L"exe*obj*dll*ilk*lib*ncb*ipch*bml*pch*res*pdb*aps"), true, L"*");
+
+        std::wstring targetFolder = CPathUtils::GetParentDirectory(targetPath);
+        std::wstring targetFileName = CPathUtils::GetFileName(targetPath);
+        std::wstring targetFileNameWithoutExt = CPathUtils::GetFileNameWithoutExtension(targetPath);
+        std::wstring matchingPath;
+        std::wstring matchingFileNameWithoutExt;
+        std::wstring matchingExt;
+
+        CDirFileEnum enumerator(targetFolder);
+        bool bIsDir = false;
+        while (enumerator.NextFile(matchingPath, &bIsDir, false))
+        {
+            if (bIsDir)
+                continue;
+            // Don't match ourself.
+            if (CPathUtils::PathCompare(matchingPath, targetPath) == 0)
+                continue;
+            // Don't match files without extensions. REVIEW: Why not?
+            matchingExt = CPathUtils::GetFileExtension(matchingPath);
+            if (matchingExt.empty())
+                continue;
+            // TODO! Consider if corresponding file should be based on the first "." in the
+            // the name rather than last "." etc.
+            // So test.cs can be linked with test.cs.html or whatever.
+            matchingFileNameWithoutExt = CPathUtils::GetFileNameWithoutExtension(matchingPath);
+            if (CPathUtils::PathCompare(targetFileNameWithoutExt, matchingFileNameWithoutExt) == 0)
             {
-                if (CPathUtils::PathCompare(matchingExt, ignoredExt) == 0)
+                bool useIt = true;
+                for (const auto& ignoredExt : ignoredExts)
                 {
-                    useIt = false;
-                    break;
+                    if (CPathUtils::PathCompare(matchingExt, ignoredExt) == 0)
+                    {
+                        useIt = false;
+                        break;
+                    }
                 }
+                if (useIt)
+                    matchingfiles.push_back(matchingPath);
             }
-            if (useIt)
-                matchingfiles.push_back(matchingPath);
         }
     }
-}
 
-bool FindFile( const std::wstring& fileToFind, const std::vector<std::wstring>& foldersToSearch, std::wstring& foundPath )
-{
-    foundPath.clear();
-    if (::PathIsRelative(fileToFind.c_str()))
+    bool FindFile(const std::wstring& fileToFind, const std::vector<std::wstring>& foldersToSearch, std::wstring& foundPath)
     {
-        std::wstring possiblePath;
-        for (const auto& folderToSearch : foldersToSearch)
+        foundPath.clear();
+        if (::PathIsRelative(fileToFind.c_str()))
         {
-            possiblePath = CPathUtils::Append(folderToSearch, fileToFind);
-            if (_waccess(possiblePath.c_str(), 0) == 0)
+            std::wstring possiblePath;
+            for (const auto& folderToSearch : foldersToSearch)
             {
-                foundPath = possiblePath;
+                possiblePath = CPathUtils::Append(folderToSearch, fileToFind);
+                if (_waccess(possiblePath.c_str(), 0) == 0)
+                {
+                    foundPath = possiblePath;
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            if (_waccess(fileToFind.c_str(), 0) == 0)
+            {
+                foundPath = fileToFind;
                 return true;
             }
         }
-    }
-    else
-    {
-        if (_waccess(fileToFind.c_str(), 0) == 0)
-        {
-            foundPath = fileToFind;
-            return true;
-        }
-    }
-    return false;
-}
-
-// Extract the filename from the #include <x> or #include "y" elements.
-bool ParseInclude(const std::wstring& raw, std::wstring& filename, IncludeType& incType)
-{
-    filename.clear();
-    incType = IncludeType::Unknown;
-
-    size_t len = raw.length();
-    size_t first, last;
-
-    if (len <= 0)
-        return false;
-
-    // The regex is supposed to do the heavy lifting, matching wise.
-    // The code here is more about filename extraction and trying
-    // not to crash given something vaguely sensible than
-    // precise matching/validation.
-
-    // Match the '#' of include. Basic sanity check.
-    if (raw[0] != L'#')
-    {
-        APPVERIFY(false);
         return false;
     }
-    // Look for the filename which hopefully follows after the literal #include.
-    // Look for the quote enclosed filename first, then the angle bracket kind.
-    first = raw.find(L'\"');
-    if (first != std::wstring::npos)
+
+    // Extract the filename from the #include <x> or #include "y" elements.
+    bool ParseInclude(const std::wstring& raw, std::wstring& filename, IncludeType& incType)
     {
-        last = raw.find_last_of(L'\"');
-        if (last != first)
+        filename.clear();
+        incType = IncludeType::Unknown;
+
+        size_t len = raw.length();
+        size_t first, last;
+
+        if (len <= 0)
+            return false;
+
+        // The regex is supposed to do the heavy lifting, matching wise.
+        // The code here is more about filename extraction and trying
+        // not to crash given something vaguely sensible than
+        // precise matching/validation.
+
+        // Match the '#' of include. Basic sanity check.
+        if (raw[0] != L'#')
         {
-            incType = IncludeType::User;
-            len = last - (first + 1);
-            filename = raw.substr(first+1,len);
-            return (len> 0);
+            APPVERIFY(false);
+            return false;
         }
-    }
-    else
-    {
-        // Looking for a filename in angle brackets, hopefully after an include.
-        first = raw.find(L'<');
+        // Look for the filename which hopefully follows after the literal #include.
+        // Look for the quote enclosed filename first, then the angle bracket kind.
+        first = raw.find(L'\"');
         if (first != std::wstring::npos)
         {
-            incType = IncludeType::System;
-            last = raw.find_last_of(L'>');
+            last = raw.find_last_of(L'\"');
             if (last != first)
             {
+                incType = IncludeType::User;
                 len = last - (first + 1);
-                filename = raw.substr(first+1,len);
+                filename = raw.substr(first + 1, len);
                 return (len > 0);
             }
         }
-    }
-
-    return false;
-}
-
-bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf, int flags,
-    std::string& found_text, size_t* line_no)
-{
-    found_text.clear();
-    *line_no = 0;
-
-    auto findRet = edit.Call(SCI_FINDTEXT, flags, (sptr_t)&ttf);
-    if (findRet < 0)
-        return false;
-    size_t len = ttf.chrgText.cpMax - ttf.chrgText.cpMin;
-    found_text.resize(len+1);
-    Scintilla::Sci_TextRange r{};
-    r.chrg.cpMin = ttf.chrgText.cpMin;
-    r.chrg.cpMax = ttf.chrgText.cpMax;
-    r.lpstrText = &found_text[0];
-    edit.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&r));
-    found_text.resize(len);
-    *line_no = edit.Call(SCI_LINEFROMPOSITION, r.chrg.cpMin);
-    return true;
-}
-
-void AttachDocument(CScintillaWnd& edit, CDocument& doc)
-{
-    edit.Call(SCI_SETDOCPOINTER, 0, 0);
-    edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
-    edit.Call(SCI_CLEARALL);
-    edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-    edit.Call(SCI_SETCODEPAGE, CP_UTF8);
-}
-
-bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeInfo>& includes)
-{
-    includes.clear();
-
-    std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
-    if (lang != "C/C++")
-        return false;
-
-    // It is a compromise of speed vs accuracy to only scan the first N lines
-    // for #include statements. They mostly exist at the start of the file
-    // but can appear anywhere. But searching the whole file using regex is slow
-    // especially in debug mode. So this isn't a good idea especially when this isn't
-    // the only activity that might be occuring whichi eating CPU time like Function scanning.
-    // As we don't want to compete with that, for now just scan the first N lines.
-    // We could get more creative by not using regex and just fetching and parsing
-    // each line ourself but that is unproven and this seems fine for now.
-    long length = (long) edit.Call(SCI_GETLINEENDPOSITION, WPARAM(MAX_INCLUDE_SEARCH_LINES-1)); // 0 based.
-    // NOTE: If we want whole file scanned use:
-    // long length = (long) edit.Call(SCI_GETLENGTH);
-
-    Scintilla::Sci_TextToFind ttf{}; // Zero initialize.
-    ttf.chrg.cpMax = length;
-    // NOTE: Intentionally hard coded for now. See overview for reasons.
-    // Match an include statement: #include <x> or #include "x" at start of line.
-    ttf.lpstrText = const_cast<char*>(CPP_INCLUDE_STATEMENT_REGEX);
-
-    std::string text_found;
-    size_t line_no;
-
-    std::wstring raw;
-    std::wstring filename;
-    IncludeType includeType;
-
-    for (;;)
-    {
-        ttf.chrgText.cpMin = 0;
-        ttf.chrgText.cpMax = 0;
-
-        // Note:
-        // RegEx searches currently take a long time in debug mode.
-        // SCI_GETLINE(int line, char *text) and SCI_GETLINELENGTH is an
-        // untried alternative that might be faster it ever becomes necessary.
-
-        // Use match case because the include keyword is case sensitive and the
-        // rest of the regular expression is symbols.
-        if (!FindNext(edit, ttf, SCFIND_REGEXP | SCFIND_MATCHCASE, text_found, &line_no))
-            break;
-        ttf.chrg.cpMin = ttf.chrgText.cpMax + 1;
-
-        raw = CUnicodeUtils::StdGetUnicode(text_found);
-        bool parsed = ParseInclude(raw, filename, includeType);
-        if (parsed)
+        else
         {
-            CPathUtils::NormalizeFolderSeparators(filename);
-            includes.push_back(IncludeInfo(line_no, filename, includeType));
+            // Looking for a filename in angle brackets, hopefully after an include.
+            first = raw.find(L'<');
+            if (first != std::wstring::npos)
+            {
+                incType = IncludeType::System;
+                last = raw.find_last_of(L'>');
+                if (last != first)
+                {
+                    len = last - (first + 1);
+                    filename = raw.substr(first + 1, len);
+                    return (len > 0);
+                }
+            }
         }
-    }
-    // Sort the list putting user includes before system includes. Remove duplicates.
-    // A duplicate is an include with the same name and type as another in the list.
-    std::sort(includes.begin(), includes.end(), [](const IncludeInfo& a, const IncludeInfo& b) -> bool
-    {
-        // Put user before system includes.
-        if (a.includeType == IncludeType::System && b.includeType == IncludeType::User)
-            return false;
-        // Within the same type, sort by name.
-        return CPathUtils::PathCompare(a.filename, b.filename) < 0;
-    });
 
-    // Remove any includes that have the same path and include type, they
-    // have to result in the same path found.
-    auto newEnd = std::unique(includes.begin(), includes.end(),
-        [](const IncludeInfo& a, const IncludeInfo& b) {
-            return (a.includeType == b.includeType &&
-                CPathUtils::PathCompare(a.filename, b.filename) == 0);
+        return false;
+    }
+
+    bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf, int flags,
+                  std::string& found_text, size_t* line_no)
+    {
+        found_text.clear();
+        *line_no = 0;
+
+        auto findRet = edit.Call(SCI_FINDTEXT, flags, (sptr_t)&ttf);
+        if (findRet < 0)
+            return false;
+        size_t len = ttf.chrgText.cpMax - ttf.chrgText.cpMin;
+        found_text.resize(len + 1);
+        Scintilla::Sci_TextRange r{};
+        r.chrg.cpMin = ttf.chrgText.cpMin;
+        r.chrg.cpMax = ttf.chrgText.cpMax;
+        r.lpstrText = &found_text[0];
+        edit.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&r));
+        found_text.resize(len);
+        *line_no = edit.Call(SCI_LINEFROMPOSITION, r.chrg.cpMin);
+        return true;
+    }
+
+    void AttachDocument(CScintillaWnd& edit, CDocument& doc)
+    {
+        edit.Call(SCI_SETDOCPOINTER, 0, 0);
+        edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
+        edit.Call(SCI_CLEARALL);
+        edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+        edit.Call(SCI_SETCODEPAGE, CP_UTF8);
+    }
+
+    bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeInfo>& includes)
+    {
+        includes.clear();
+
+        std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
+        if (lang != "C/C++")
+            return false;
+
+        // It is a compromise of speed vs accuracy to only scan the first N lines
+        // for #include statements. They mostly exist at the start of the file
+        // but can appear anywhere. But searching the whole file using regex is slow
+        // especially in debug mode. So this isn't a good idea especially when this isn't
+        // the only activity that might be occurring which is eating CPU time like Function scanning.
+        // As we don't want to compete with that, for now just scan the first N lines.
+        // We could get more creative by not using regex and just fetching and parsing
+        // each line ourself but that is unproven and this seems fine for now.
+        long length = (long)edit.Call(SCI_GETLINEENDPOSITION, WPARAM(MAX_INCLUDE_SEARCH_LINES - 1)); // 0 based.
+        // NOTE: If we want whole file scanned use:
+        // long length = (long) edit.Call(SCI_GETLENGTH);
+
+        Scintilla::Sci_TextToFind ttf{}; // Zero initialize.
+        ttf.chrg.cpMax = length;
+        // NOTE: Intentionally hard coded for now. See overview for reasons.
+        // Match an include statement: #include <x> or #include "x" at start of line.
+        ttf.lpstrText = const_cast<char*>(CPP_INCLUDE_STATEMENT_REGEX);
+
+        std::string text_found;
+        size_t line_no;
+
+        std::wstring raw;
+        std::wstring filename;
+        IncludeType includeType;
+
+        for (;;)
+        {
+            ttf.chrgText.cpMin = 0;
+            ttf.chrgText.cpMax = 0;
+
+            // Note:
+            // RegEx searches currently take a long time in debug mode.
+            // SCI_GETLINE(int line, char *text) and SCI_GETLINELENGTH is an
+            // untried alternative that might be faster it ever becomes necessary.
+
+            // Use match case because the include keyword is case sensitive and the
+            // rest of the regular expression is symbols.
+            if (!FindNext(edit, ttf, SCFIND_REGEXP | SCFIND_MATCHCASE, text_found, &line_no))
+                break;
+            ttf.chrg.cpMin = ttf.chrgText.cpMax + 1;
+
+            raw = CUnicodeUtils::StdGetUnicode(text_found);
+            bool parsed = ParseInclude(raw, filename, includeType);
+            if (parsed)
+            {
+                CPathUtils::NormalizeFolderSeparators(filename);
+                includes.push_back(IncludeInfo(line_no, filename, includeType));
+            }
         }
-    );
-    // Really remove them.
-    includes.erase(newEnd, includes.end() );
-    return true;
-}
+        // Sort the list putting user includes before system includes. Remove duplicates.
+        // A duplicate is an include with the same name and type as another in the list.
+        std::sort(includes.begin(), includes.end(), [](const IncludeInfo& a, const IncludeInfo& b) -> bool
+        {
+            // Put user before system includes.
+            if (a.includeType == IncludeType::System && b.includeType == IncludeType::User)
+                return false;
+            // Within the same type, sort by name.
+            return CPathUtils::PathCompare(a.filename, b.filename) < 0;
+        });
+
+        // Remove any includes that have the same path and include type, they
+        // have to result in the same path found.
+        auto newEnd = std::unique(includes.begin(), includes.end(),
+                                  [](const IncludeInfo& a, const IncludeInfo& b)
+        {
+            return (a.includeType == b.includeType &&
+                    CPathUtils::PathCompare(a.filename, b.filename) == 0);
+        }
+        );
+        // Really remove them.
+        includes.erase(newEnd, includes.end());
+        return true;
+    }
 
 }; // anon namespace
 
-bool CCmdHeaderSource::UserFindFile(
-    HWND hwndParent, const std::wstring& filename,
-    const std::wstring& defaultFolder, std::wstring& selectedFilename) const
-
+bool CCmdHeaderSource::UserFindFile(HWND hwndParent, const std::wstring& filename,
+                                    const std::wstring& defaultFolder, std::wstring& selectedFilename) const
 {
     std::wstring defFolder;
     if (defaultFolder.empty())
@@ -628,7 +625,7 @@ void CCmdHeaderSource::InvalidateIncludesEnabled()
 {
     // Note SetUICommandProperty(UI_PKEY_Enabled,en) can be useful but probably
     // isn't what we want; and it fails when the ribbon is hidden anyway.
-    HRESULT hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY,&UI_PKEY_Enabled);
+    HRESULT hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
     CAppUtils::FailedShowMessage(hr);
 }
 
@@ -644,7 +641,7 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
 {
     HRESULT hr;
 
-    if(key == UI_PKEY_Categories)
+    if (key == UI_PKEY_Categories)
     {
         IUICollectionPtr coll;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&coll));
@@ -681,7 +678,7 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
         // We will rebuild this information so clear it.
         m_menuInfo.clear();
 
-         // We need to know have an active document to continue.
+        // We need to know have an active document to continue.
         int docId = GetDocIdOfCurrentTab();
         if (docId < 0)
             return E_FAIL;
@@ -737,12 +734,13 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     GetFilesWithSameName(targetPath, matchingFiles);
 
     std::sort(matchingFiles.begin(), matchingFiles.end(),
-        [](const std::wstring& a, const std::wstring& b) -> bool
+              [](const std::wstring& a, const std::wstring& b) -> bool
     {
         return CPathUtils::PathCompare(a, b) < 0;
     });
 
-    std::function<void(CorrespondingFileItem&)> matchf = [this](CorrespondingFileItem& item)->void {
+    std::function<void(CorrespondingFileItem&)> matchf = [this](CorrespondingFileItem& item)->void
+    {
         this->HandleCorrespondingFileMenuItem(item);
     };
     std::wstring matchingFileName;
@@ -786,7 +784,8 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
 
     bool hasCppToolChain = !cpptoolchain.empty();
 
-    std::function<void(IncludeFileItem&)> incf = [this](IncludeFileItem& item)->void {
+    std::function<void(IncludeFileItem&)> incf = [this](IncludeFileItem& item)->void
+    {
         this->HandleIncludeFileMenuItem(item);
     };
 
@@ -804,12 +803,12 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
             stringtok(systemFoldersToSearch, systemIncludePath, true, L";");
         }
 
-        for ( const auto& inc : includes )
+        for (const auto& inc : includes)
         {
             if (inc.includeType == IncludeType::System)
             {
                 found = FindFile(inc.filename, systemFoldersToSearch, foundFile);
-                m_menuInfo.push_back(IncludeFileItem(incf, inc, found ? foundFile : L"" ));
+                m_menuInfo.push_back(IncludeFileItem(incf, inc, found ? foundFile : L""));
 
                 menuText = inc.filename;
                 if (!found)
@@ -831,12 +830,12 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     std::vector<std::wstring> regularFoldersToSearch;
     regularFoldersToSearch.push_back(mainFolder);
 
-    for ( const auto& inc : includes )
+    for (const auto& inc : includes)
     {
         if (inc.includeType == IncludeType::User)
         {
             found = FindFile(inc.filename, regularFoldersToSearch, foundFile);
-            m_menuInfo.push_back(IncludeFileItem(incf, inc, found ? foundFile : L"" ));
+            m_menuInfo.push_back(IncludeFileItem(incf, inc, found ? foundFile : L""));
 
             menuText = inc.filename;
             if (!found)
@@ -854,7 +853,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     // indicator in, but it's also useful.
     if (m_menuInfo.size() == 0)
     {
-        m_menuInfo.push_back([](){}); // No action. Love C++...
+        m_menuInfo.push_back([]() {}); // No action. Love C++...
         // Using CORRESPONDING_FILES_CATEGORY, but might possibly prefer no category,
         // but that doesn't appear to be possible it seems.
         HRESULT hr = CAppUtils::AddResStringItem(collection, IDS_NO_FILES_FOUND, CORRESPONDING_FILES_CATEGORY);
@@ -991,7 +990,7 @@ void CCmdHeaderSource::TabNotify(TBHDR * ptbhdr)
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
         // Switching to this document.
-        APPVERIFY( GetDocIdOfCurrentTab() == GetDocIDFromTabIndex(ptbhdr->tabOrigin) );
+        APPVERIFY(GetDocIdOfCurrentTab() == GetDocIDFromTabIndex(ptbhdr->tabOrigin));
         // Include list will be stale now.
         InvalidateIncludes();
     }
@@ -1004,7 +1003,7 @@ void CCmdHeaderSource::ScintillaNotify(Scintilla::SCNotification * pScn)
     switch (pScn->nmhdr.code)
     {
         case SCN_MODIFIED:
-            if (pScn->modificationType & (SC_MOD_INSERTTEXT|SC_MOD_DELETETEXT))
+            if (pScn->modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT))
             {
                 // Links may have changed.
                 InvalidateIncludes();
