@@ -67,7 +67,7 @@ private:
 private:
     std::vector<std::function<void()>> m_menuInfo;
     bool m_bStale;
-    // TODO! Find out what requires this to be a memeber variable.
+    // TODO! Find out what requires this to be a member variable.
     // It crashes if on the stack etc. Might reveal bugs.
     CScintillaWnd m_edit;
 };
