@@ -210,7 +210,7 @@ bool ICommand::HasActiveDocument()
     return pMainWnd->m_DocManager.HasDocumentID(id);
 }
 
-CDocument ICommand::GetActiveDocument()
+CDocument ICommand::GetActiveDocument() const
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     return pMainWnd->m_DocManager.GetDocumentFromID(pMainWnd->m_TabBar.GetCurrentTabId());

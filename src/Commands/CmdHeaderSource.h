@@ -20,9 +20,71 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 #include "ScintillaWnd.h"
 #include "BowPadUI.h"
+
+class OpenFileItem; class IncludeFileItem; class CorrespondingFileItem;
+
+class CCmdHeaderSource : public ICommand
+{
+public:
+    CCmdHeaderSource(void * obj);
+    ~CCmdHeaderSource(void) { }
+
+    // Overrides
+    bool Execute() override { return false; }
+    UINT GetCmdId() override { return cmdHeaderSource; }
+
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
+
+    void TabNotify(TBHDR * ptbhdr) override;
+
+    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+
+    void OnDocumentOpen(int id) override;
+
+    void OnDocumentSave(int index, bool bSaveAs) override;
+
+private:
+    void HandleIncludeFileMenuItem(IncludeFileItem& item);
+    void HandleCorrespondingFileMenuItem(CorrespondingFileItem & item);
+    void HandleOpenFileMenuItem(OpenFileItem& item);
+    bool PopulateMenu(const CDocument& doc, IUICollectionPtr& collection);
+    void InvalidateIncludes();
+    void InvalidateIncludesSource();
+    void InvalidateIncludesEnabled();
+    bool HandleSelectedMenuItem(size_t selected);
+    bool IsValidMenuItem(size_t item) const;
+    bool UserFindFile( HWND hwndParent,
+        const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename) const;
+    bool IsServiceAvailable();
+    bool OpenFileAsLanguage(const std::wstring& filename);
+
+private:
+    std::vector<std::function<void()>> m_menuInfo;
+    bool m_bStale;
+    // TODO! Find out what requires this to be a memeber variable.
+    // It crashes if on the stack etc. Might reveal bugs.
+    CScintillaWnd m_edit;
+};
+
+#if 0 // No longer used. Pondering it's fate.
+class OpenFileItem
+{
+public:
+    using OpenFileItemOwner = std::function<void(OpenFileItem&)>;
+    OpenFileItemOwner owner;
+    OpenFileItem(OpenFileItemOwner& owner) : owner(owner) { }
+    void operator()()
+    {
+        owner(*this);
+    }
+};
+#endif
 
 enum class IncludeType
 {
@@ -33,64 +95,41 @@ enum class IncludeType
 
 struct IncludeInfo
 {
-    size_t line; // line number where the include was found.
-    std::wstring filename; // filename parsed from raw line. e.g. <x> or "y"
-    IncludeType includeType; // type of include i.e. <x> or "x"
+    size_t line;             // Line number where the include was found.
+    std::wstring filename;   // Filename parsed from raw line. e.g. <x> or "y"
+    IncludeType includeType; // Type of include i.e. <x> or "x" or unknown (e.g. parse error)
 
-    IncludeInfo(size_t line, std::wstring&& filename, IncludeType includeType);
-    bool operator == (const IncludeInfo& other) const;
+    inline IncludeInfo::IncludeInfo(size_t line, std::wstring& filename, IncludeType includeType)
+        : line(line), filename(filename), includeType(includeType) { }
 };
 
-struct IncludeMenuItemInfo
-{
-    IncludeMenuItemInfo(IncludeInfo&& definition, std::wstring&& filename)
-        : definition(std::move(definition)), filename(std::move(filename))
-    {
-    }
-    IncludeInfo definition;
-    std::wstring filename;
-};
-
-class CCmdHeaderSource : public ICommand
+class CorrespondingFileItem
 {
 public:
-    CCmdHeaderSource(void * obj);
-    ~CCmdHeaderSource(void)
+    using CorrespondingFileItemOwner = std::function<void(CorrespondingFileItem&)>;
+    CorrespondingFileItemOwner owner;
+    std::wstring filename;
+    CorrespondingFileItem(CorrespondingFileItemOwner& owner, const std::wstring& filename)
+        : owner(owner), filename(filename) { }
+    void operator()()
     {
+        owner(*this);
     }
-
-    virtual bool Execute() override { return false; }
-    virtual UINT GetCmdId() override { return cmdHeaderSource; }
-
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
-
-    virtual HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
-
-    virtual void TabNotify(TBHDR * ptbhdr) override;
-
-    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
-
-    virtual void OnDocumentOpen(int id) override;
-
-    virtual void OnDocumentSave(int index, bool bSaveAs) override;
-
-private:
-
-    bool PopulateMenu(const CDocument& doc, IUICollectionPtr& collection);
-    void InvalidateIncludes();
-    void InvalidateIncludesSource();
-    void InvalidateIncludesEnabled();
-    bool HandleSelectedMenuItem(size_t selected);
-    bool IsValidMenuItem(size_t item) const;
-    bool UserFindFile( HWND hwndParent,
-        const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename) const;
-    bool IsServiceAvailable();
-
-private:
-    std::vector<IncludeMenuItemInfo> m_menuInfo;
-    std::string m_includeRegEx;
-    bool m_bStale;
-    // TODO! Find out what requires this to be a memeber variable.
-    // It crashes if on the stack etc. Might reveal bugs.
-    CScintillaWnd m_edit;
 };
+
+class IncludeFileItem
+{
+public:
+    IncludeInfo inc;
+    std::wstring realFile;
+    using IncludeFileItemOwner = std::function<void(IncludeFileItem&)>;
+    IncludeFileItemOwner owner;
+    IncludeFileItem( IncludeFileItemOwner& owner,
+        const IncludeInfo& inc, const std::wstring& realFile) 
+        : owner(owner), inc(inc), realFile(realFile) { }
+    void operator()()
+    {
+        owner(*this);
+    }
+};
+
