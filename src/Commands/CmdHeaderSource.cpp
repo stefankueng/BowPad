@@ -114,7 +114,8 @@ perhaps other file names like test.cpp.html, that might match "code behind" scen
 Suggestions needed. May benefit from custom sort rules.
 
 TOOD: Introduce the ability to "switch between header and .cpp file" in one key/click.
-This is a feature that worked often by one click, but by accident more than guarantee.
+This is a feature that worked often on this button by one click,
+but by accident more than guarantee.
 Recent changes make this guaranteed realistically never possible since their will almost
 always be more than one corresponding file now.
 
@@ -124,11 +125,21 @@ presence of other files. Once this has been implemented, that and this feature w
 
 TOOD! Fix the override mechanism. Shift doesn't get detected well (at least on my keyboard).
 
-TODO! Restructure the menu inf object to be a bit more generic / flexible.
+TODO! Decide if to support a search path tor user include files.
+The user will need to change it all the time though for each project they work on.
+We could look for a include.ini file up from the current working directory,
+but this starts getting more involved.
+We could also/instead just rember the include directory we have have opened user include files in the
+past and just search along those; these would be lost on exit.
+Any solution needs to be simple as it will never be 100% effective without a project system etc.
+Will wait for suggestion of improvement for now.
 
-TODO: Add a file file find dialog that remember previous folders and helps more with finding files etc.
+TODO: Add a file file find dialog that remembers previous folders and helps more with finding files etc.
 
-TODO: Fix outstanding bug:
+TODO: Fix outstanding bug: /
+TODO! Change the logic so the menu rebuilds each time the button is clicked, rather than detecting when
+it should be rebuilt.
+
 1. Press Ctrl-N to create an empty document.
 2. Type #include <cstdio>
 3. Notice include button is disabled - as it should be.
@@ -136,21 +147,26 @@ TODO: Fix outstanding bug:
 5. Notice the include button is still disabled - it shouldn't be.
 6. Type something. Notice include is still disabled.
 7. Press enter. Notice include is no longer disabled.
+I think the solution is either:
+
+A) (preferable) Make it so the drop down list is always populated each time it's
+clicked. I can't make that work yet.
+OR:
+B) Need a "language changed event" to listen for in which we can invalidate the
+the drop down list when the lexer language changes.
 
 TODO: Convert a few hard coded strings to resource file entries.
-
-TODO: Remember why ComboBox_ShowDropDown might be useful somewhere and test if it is.
 
 TODO! Remember paths where include files have been opened previously.
 This could be under the search button as a split, the combo list may not be viable for this purpose.
 
-TODO! Change the logic so the menu rebuilds each time the button is clicked, rather than detecting when
-it should be rebuilt.
+TODO! The include feature is quite C++ specific for now.
+The feature could be expanded for other languages / file types.
+Will wait for suggestions before doing more work here for now.
 
-TODO! The include feature is quite a C++ specific for now.
-The feature could be expanded on more for other languages / file types.
-
-TODO: Display the file's full path as a tooltip when the cursor is over a drop down item.
+TODO: Display the files full path as a tooltip when the cursor is over a drop down item.
+I think code in main window might be preventing any code I've tried to use to do
+this from working. Need to investigate as I'm far from certain that's the reason.
 
 */
 
@@ -166,11 +182,14 @@ TODO: Display the file's full path as a tooltip when the cursor is over a drop d
 #include "PathUtils.h"
 #include "StringUtils.h"
 #include "PreserveChdir.h"
-#include "Resource.h"
 #include "DirFileEnum.h"
+#include "Resource.h"
 
-// TODO! Move appropriate functions to utilities.
 namespace {
+
+// We may want to use this elsewhere in the future so draw attention to it, but
+// but for now it's only needed in this module.
+static const char CPP_INCLUDE_STATEMENT_REGEX[] = { "^\\#include\\s+((\\\"[^\\\"]+\\\")|(<[^>]+>))" };
 
 // Maximum number of lines to scan for include statements.
 // NOTE: This could be a configuration item but that doesn't seem necessary for now.
@@ -184,6 +203,7 @@ const int SYSTEM_INCLUDE_CATEGORY = 3;
 // Will leave unshared right now while this include/corresponding file
 // feature functionality is settles down.
 
+// TODO! Move appropriate functions to utilities.
 bool ShowFileSelectionDialog(
     HWND hWndParent,
     const std::wstring& defaultFilename,
@@ -237,7 +257,7 @@ bool ShowFileSelectionDialog(
 
     // Show the open file dialog, not much we can do if that doesn't work.
     hr = pfd->Show(hWndParent);
-    if(hr == HRESULT_FROM_WIN32(ERROR_CANCELLED)) // Expected error
+    if (hr == HRESULT_FROM_WIN32(ERROR_CANCELLED)) // Expected error
         return false;
     else
     {
@@ -404,7 +424,8 @@ bool ParseInclude(const std::wstring& raw, std::wstring& filename, IncludeType& 
 
     // The regex is supposed to do the heavy lifting, matching wise.
     // The code here is more about filename extraction and trying
-    // not to crash given something vaguely sensible than matching/validation.
+    // not to crash given something vaguely sensible than
+    // precise matching/validation.
 
     // Match the '#' of include. Basic sanity check.
     if (raw[0] != L'#')
@@ -412,7 +433,8 @@ bool ParseInclude(const std::wstring& raw, std::wstring& filename, IncludeType& 
         APPVERIFY(false);
         return false;
     }
-    // Looking for a filename in quotes, hopefully follows after #include.
+    // Look for the filename which hopefully follows after the literal #include.
+    // Look for the quote enclosed filename first, then the angle bracket kind.
     first = raw.find(L'\"');
     if (first != std::wstring::npos)
     {
@@ -483,9 +505,14 @@ bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeI
     if (lang != "C/C++")
         return false;
 
-    // It's compromise of speed vs accuracy. Only scan the first N lines
-    // for #include statements. They usually only exist at the start of the file.
-    // We could get more creative and improve on this but this seems fine for now.
+    // It is a compromise of speed vs accuracy to only scan the first N lines
+    // for #include statements. They mostly exist at the start of the file
+    // but can appear anywhere. But searching the whole file using regex is slow
+    // especially in debug mode. So this isn't a good idea especially when this isn't
+    // the only activity that might be occuring whichi eating CPU time like Function scanning.
+    // As we don't want to compete with that, for now just scan the first N lines.
+    // We could get more creative by not using regex and just fetching and parsing
+    // each line ourself but that is unproven and this seems fine for now.
     long length = (long) edit.Call(SCI_GETLINEENDPOSITION, WPARAM(MAX_INCLUDE_SEARCH_LINES-1)); // 0 based.
     // NOTE: If we want whole file scanned use:
     // long length = (long) edit.Call(SCI_GETLENGTH);
@@ -494,10 +521,15 @@ bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeI
     ttf.chrg.cpMax = length;
     // NOTE: Intentionally hard coded for now. See overview for reasons.
     // Match an include statement: #include <x> or #include "x" at start of line.
-    ttf.lpstrText = const_cast<char*>("^\\#include\\s+((\\\"[^\\\"]+\\\")|(<[^>]+>))");
+    ttf.lpstrText = const_cast<char*>(CPP_INCLUDE_STATEMENT_REGEX);
 
     std::string text_found;
     size_t line_no;
+
+    std::wstring raw;
+    std::wstring filename;
+    IncludeType includeType;
+
     for (;;)
     {
         ttf.chrgText.cpMin = 0;
@@ -514,14 +546,12 @@ bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeI
             break;
         ttf.chrg.cpMin = ttf.chrgText.cpMax + 1;
 
-        std::wstring raw = CUnicodeUtils::StdGetUnicode(text_found);
-        std::wstring filename;
-        IncludeType includeType;
+        raw = CUnicodeUtils::StdGetUnicode(text_found);
         bool parsed = ParseInclude(raw, filename, includeType);
         if (parsed)
         {
             CPathUtils::NormalizeFolderSeparators(filename);
-            includes.push_back(IncludeInfo(line_no, std::move(filename), includeType));
+            includes.push_back(IncludeInfo(line_no, filename, includeType));
         }
     }
     // Sort the list putting user includes before system includes. Remove duplicates.
@@ -534,28 +564,41 @@ bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeI
         // Within the same type, sort by name.
         return CPathUtils::PathCompare(a.filename, b.filename) < 0;
     });
-    includes.erase( std::unique( includes.begin(), includes.end() ), includes.end() );
+
+    // Remove any includes that have the same path and include type, they
+    // have to result in the same path found.
+    auto newEnd = std::unique(includes.begin(), includes.end(),
+        [](const IncludeInfo& a, const IncludeInfo& b) {
+            return (a.includeType == b.includeType &&
+                CPathUtils::PathCompare(a.filename, b.filename) == 0);
+        }
+    );
+    // Really remove them.
+    includes.erase(newEnd, includes.end() );
     return true;
 }
 
 }; // anon namespace
 
-IncludeInfo::IncludeInfo(size_t line, std::wstring&& filename, IncludeType includeType)
-    : line(line), filename(std::move(filename)), includeType(includeType)
-{
-}
-
-bool IncludeInfo::operator == (const IncludeInfo& other) const
-{
-    return other.includeType == this->includeType &&
-        CPathUtils::PathCompare(other.filename.c_str(), this->filename.c_str()) == 0;
-}
-
 bool CCmdHeaderSource::UserFindFile(
-    HWND hwndParent, const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename) const
+    HWND hwndParent, const std::wstring& filename,
+    const std::wstring& defaultFolder, std::wstring& selectedFilename) const
+
 {
+    std::wstring defFolder;
+    if (defaultFolder.empty())
+    {
+        CDocument doc = GetActiveDocument();
+        if (!doc.m_path.empty())
+            defFolder = CPathUtils::GetParentDirectory(doc.m_path);
+        else
+            defFolder = CPathUtils::GetCWD();
+    }
+    else
+        defFolder = defaultFolder;
+
     std::wstring name = CPathUtils::GetFileName(filename);
-    if (!ShowSingleFileSelectionDialog(hwndParent, name, defaultFolder, selectedFilename))
+    if (!ShowSingleFileSelectionDialog(hwndParent, name, defFolder, selectedFilename))
         return false;
     return true;
 }
@@ -664,14 +707,6 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, enabled, ppropvarNewValue);
     }
 
-#if 0
-    if (key == UI_PKEY_TooltipTitle)
-    {
-        HRESULT hr;        
-        hr = UIInitPropertyntFromString(UI_PKEY_TooltipTitle, L"My TT Title2", ppropvarNewValue);
-        return hr;
-    }
-#endif
     return E_NOTIMPL;
 }
 
@@ -683,20 +718,19 @@ bool CCmdHeaderSource::IsServiceAvailable()
     return available;
 }
 
-// Populate the dropdown with the details.
+// Populate the dropdown with the details. Returns false if
+// any options couldn't be added but for some reason.
+// Not a good enough reason not to show the menu though.
 bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& collection)
 {
+    // Open File Option
+
     // If the user can't find the file they want, offer a shortcut to find it themselves
     // and open it. Using this mechanism has two advantages over regular file open:
     // 1. The user doesn't have to move the cursor off to the file open menu to find the file.
     // 2. The file opened can be assumed to be an include file if it has no file extension.
 
-    IncludeInfo inc(0, std::wstring(), IncludeType::Unknown);
-    IncludeMenuItemInfo item(std::move(inc), std::wstring());
-    m_menuInfo.push_back(std::move(item));
-    HRESULT hr = CAppUtils::AddResStringItem(collection, IDS_OPEN_CPP_FILE, CORRESPONDING_FILES_CATEGORY);
-    CAppUtils::FailedShowMessage(hr);
-
+    // Corresponding File Options
     std::vector<std::wstring> matchingFiles;
 
     std::wstring targetPath = doc.m_path;
@@ -708,20 +742,23 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
         return CPathUtils::PathCompare(a, b) < 0;
     });
 
+    std::function<void(CorrespondingFileItem&)> matchf = [this](CorrespondingFileItem& item)->void {
+        this->HandleCorrespondingFileMenuItem(item);
+    };
     std::wstring matchingFileName;
-    for (size_t m = 0; m < matchingFiles.size(); ++m)
+    for (const auto& matchingFile : matchingFiles)
     {
-        matchingFileName = CPathUtils::GetFileName(matchingFiles[m]);
-        IncludeInfo inc(0, std::wstring(), IncludeType::Unknown);
-        IncludeMenuItemInfo item(std::move(inc), std::move(matchingFiles[m]));
-        m_menuInfo.push_back(std::move(item));
+        matchingFileName = CPathUtils::GetFileName(matchingFile);
+        m_menuInfo.push_back(CorrespondingFileItem(matchf, matchingFile));
         HRESULT hr = CAppUtils::AddStringItem(collection, matchingFileName.c_str(), CORRESPONDING_FILES_CATEGORY);
-        if (CAppUtils::FailedShowMessage(hr))
+        if (!SUCCEEDED(hr))
         {
             m_menuInfo.pop_back();
             return false;
         }
     }
+
+    // Include Files
 
     std::vector<IncludeInfo> includes;
     GetIncludes(doc, m_edit, includes);
@@ -735,54 +772,93 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     std::vector<std::wstring> systemFoldersToSearch;
 
     std::wstring cpptoolchain;
-    std::wstring systemIncludePath;
     LPCWSTR configItem;
     configItem = CIniSettings::Instance().GetString(
         L"cpp", L"toolchain", 0);
     if (configItem != nullptr && *configItem != L'\0')
     {
         cpptoolchain = configItem;
+    }
+
+    std::wstring foundFile;
+    std::wstring menuText;
+    bool found;
+
+    bool hasCppToolChain = !cpptoolchain.empty();
+
+    std::function<void(IncludeFileItem&)> incf = [this](IncludeFileItem& item)->void {
+        this->HandleIncludeFileMenuItem(item);
+    };
+
+    // Handle System Include Files
+
+    // Only look for system include files if there's a tool chain defined that
+    // says where they can be found.
+    if (hasCppToolChain)
+    {
         configItem = CIniSettings::Instance().GetString(
             cpptoolchain.c_str(), L"systemincludepath", 0);
         if (configItem != nullptr)
         {
-            systemIncludePath = configItem;
+            std::wstring systemIncludePath = configItem;
             stringtok(systemFoldersToSearch, systemIncludePath, true, L";");
+        }
+
+        for ( const auto& inc : includes )
+        {
+            if (inc.includeType == IncludeType::System)
+            {
+                found = FindFile(inc.filename, systemFoldersToSearch, foundFile);
+                m_menuInfo.push_back(IncludeFileItem(incf, inc, found ? foundFile : L"" ));
+
+                menuText = inc.filename;
+                if (!found)
+                    menuText += L" ...";
+                HRESULT hr = CAppUtils::AddStringItem(collection, menuText.c_str(), SYSTEM_INCLUDE_CATEGORY);
+                if (!SUCCEEDED(hr))
+                {
+                    m_menuInfo.pop_back();
+                    return false;
+                }
+            }
         }
     }
 
+    // Handle User Includes Files
+
+    // Look for user files in the directory of the current document no matter
+    // if there is no tool chain.
     std::vector<std::wstring> regularFoldersToSearch;
     regularFoldersToSearch.push_back(mainFolder);
 
-    std::wstring foundFile;
-    bool hasCppToolChain = !cpptoolchain.empty();
-    for ( auto& inc : includes )
+    for ( const auto& inc : includes )
     {
-        HRESULT hr;
-        std::vector<std::wstring>& searchPath =
-            (inc.includeType == IncludeType::System)
-                ? systemFoldersToSearch
-                : regularFoldersToSearch;
-        int includeCategory = (inc.includeType == IncludeType::System)
-                ? SYSTEM_INCLUDE_CATEGORY
-                : USER_INCLUDE_CATEGORY;
-
-        bool found = false;
-        if (hasCppToolChain)
-            found = FindFile(inc.filename, searchPath, foundFile);
-
-        std::wstring menuText = inc.filename;
-        if (!found)
-            menuText += L" ...";
-        IncludeMenuItemInfo m(std::move(inc), std::move(foundFile));
-
-        m_menuInfo.push_back(std::move(m));
-        hr = CAppUtils::AddStringItem(collection, menuText.c_str(), includeCategory);
-        if (CAppUtils::FailedShowMessage(hr))
+        if (inc.includeType == IncludeType::User)
         {
-            m_menuInfo.pop_back();
-            return false;
+            found = FindFile(inc.filename, regularFoldersToSearch, foundFile);
+            m_menuInfo.push_back(IncludeFileItem(incf, inc, found ? foundFile : L"" ));
+
+            menuText = inc.filename;
+            if (!found)
+                menuText += L" ...";
+            HRESULT hr = CAppUtils::AddStringItem(collection, menuText.c_str(), USER_INCLUDE_CATEGORY);
+            if (SUCCEEDED(hr))
+            {
+                m_menuInfo.pop_back();
+                return false;
+            }
         }
+    }
+
+    // Stop the drop down list from ever being blank by putting a no files found
+    // indicator in, but it's also useful.
+    if (m_menuInfo.size() == 0)
+    {
+        m_menuInfo.push_back([](){}); // No action. Love C++...
+        // Using CORRESPONDING_FILES_CATEGORY, but might possibly prefer no category,
+        // but that doesn't appear to be possible it seems.
+        HRESULT hr = CAppUtils::AddResStringItem(collection, IDS_NO_FILES_FOUND, CORRESPONDING_FILES_CATEGORY);
+        CAppUtils::FailedShowMessage(hr);
     }
 
     return true;
@@ -791,6 +867,76 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
 bool CCmdHeaderSource::IsValidMenuItem(size_t item) const
 {
     return item >= 0 && item < m_menuInfo.size();
+}
+
+bool CCmdHeaderSource::OpenFileAsLanguage(const std::wstring& filename)
+{
+    SetInsertionIndex(GetActiveTabIndex());
+    if (!OpenFile(filename.c_str(), true))
+        return false;
+    // REVIEW: It might be more efficient to have an OpenFile overload where
+    // we could specify the language at it's opened.
+    const std::wstring desiredLang = L"C/C++";
+    if (HasActiveDocument())
+    {
+        CDocument doc = GetActiveDocument();
+        if (doc.m_language != desiredLang)
+        {
+            doc.m_language = desiredLang;
+            SetDocument(GetDocIdOfCurrentTab(), doc);
+            SetupLexerForLang(doc.m_language);
+            CLexStyles::Instance().SetLangForPath(doc.m_path, doc.m_language);
+            UpdateStatusBar(true);
+        }
+    }
+    return true;
+}
+
+void CCmdHeaderSource::HandleIncludeFileMenuItem(IncludeFileItem& item)
+{
+    std::wstring defaultFolder;
+    std::wstring fileToOpen;
+
+    // If the system has found a file, the filename will be non blank.
+    // In that case, proceed to try and open the file but
+    // let the user override that file choice first which they do by
+    // holding the shift key down.
+    // If they didn't chose to override, open the file and be done
+    // no matter if we succeed in opening or not.
+    // If the user chose to override, fall through and let them try to find it.
+    // Which is what happens if the System couldn't find the file to begin with
+    // and it was blank.
+    if (!item.realFile.empty())
+    {
+        auto keyState = GetKeyState(VK_SHIFT);
+        if (keyState != -127)
+        {
+            OpenFileAsLanguage(item.realFile.c_str());
+            return;
+        }
+    }
+    if (!UserFindFile(GetHwnd(), CPathUtils::GetFileName(item.inc.filename), defaultFolder, fileToOpen))
+        return;
+    if (!OpenFileAsLanguage(fileToOpen.c_str()))
+        return;
+}
+
+void CCmdHeaderSource::HandleCorrespondingFileMenuItem(CorrespondingFileItem & item)
+{
+    SetInsertionIndex(GetActiveTabIndex());
+    OpenFile(item.filename.c_str(), true);
+}
+
+void CCmdHeaderSource::HandleOpenFileMenuItem(OpenFileItem&/* item*/)
+{
+    std::wstring defaultFolder;
+
+    std::wstring fileToOpen;
+    if (!UserFindFile(GetHwnd(), L"", defaultFolder, fileToOpen))
+        return;
+
+    if (!OpenFileAsLanguage(fileToOpen.c_str()))
+        return;
 }
 
 bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
@@ -806,88 +952,12 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
         return false;
     }
 
-    const IncludeMenuItemInfo& info = m_menuInfo[selected];
-    std::wstring fileToOpen;
-    std::wstring defaultFolder;
-    bool asCpp = true;
-
-    CDocument doc = GetActiveDocument();
-    if (!doc.m_path.empty())
-        defaultFolder = CPathUtils::GetParentDirectory(doc.m_path);
-    else
-        defaultFolder = CPathUtils::GetCWD();
-
-    // TODO! This is all a temporary hack. Will replace with a proper and simpler
-    // design soon that will remove all the if else tests.
-
-    // If the user chose Open C++ File... from the menu.
-    if (info.filename.empty() && info.definition.filename.empty())
-    {
-        if (!UserFindFile(GetHwnd(), info.filename, defaultFolder, fileToOpen))
-            return false;
-
-        SetInsertionIndex(GetActiveTabIndex());
-        if (!OpenFile(fileToOpen.c_str(), true))
-            return false;
-    }
-    // If the user chose a Corresponding File / matching file from the menu.
-    else if (! info.filename.empty() && info.definition.includeType == IncludeType::Unknown)
-    {
-        asCpp = false;
-        SetInsertionIndex(GetActiveTabIndex());
-        if (!OpenFile(info.filename.c_str(), true))
-            return false;
-    }
-    else // User wants to open an include file, either an existing or non existing one.
-    {
-        bool pickInclude = (info.filename.empty());
-        // If the user chose an include file from the menu that exists open it
-        // unless they have the shift key down, in which case they want
-        // to search for it even though it exists.
-        if (!info.filename.empty())
-        {
-            // TODO! Tighten the key logic so we don't act if other keys are down, like control.
-            // This also doesn't seem to yield accurate detection. Need to investigate.
-            auto keyState = GetKeyState(VK_SHIFT);
-            if (keyState == -127)
-                pickInclude = false;
-
-            if (! pickInclude)
-            {
-                SetInsertionIndex(GetActiveTabIndex());
-                if (!OpenFile(info.filename.c_str(), true))
-                    return false;
-            }
-        }
-        if (pickInclude)
-        {
-            // If the User chose an include file name from the menu that didn't exist. They wants to find it.
-            std::wstring targetFile = CPathUtils::GetFileName(info.definition.filename);
-            if (!UserFindFile(GetHwnd(), targetFile, defaultFolder, fileToOpen))
-                return false;
-
-            SetInsertionIndex(GetActiveTabIndex());
-            if (!OpenFile(fileToOpen.c_str(), true))
-                return false;
-        }
-    }
-
-    if (asCpp)
-    {
-        // REVIEW: It would be more efficient to have an OpenFile overload where
-        // we could specify the language at it's opened.
-        CDocument doc = GetActiveDocument();
-        doc.m_language = L"C/C++";
-        SetDocument(GetDocIdOfCurrentTab(), doc);
-        SetupLexerForLang(doc.m_language);
-        CLexStyles::Instance().SetLangForPath(doc.m_path, doc.m_language);
-        UpdateStatusBar(true);
-    }
+    m_menuInfo[selected]();
 
     return true;
 }
 
-HRESULT CCmdHeaderSource::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties)
+HRESULT CCmdHeaderSource::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
     HRESULT hr;
 
@@ -929,6 +999,8 @@ void CCmdHeaderSource::TabNotify(TBHDR * ptbhdr)
 
 void CCmdHeaderSource::ScintillaNotify(Scintilla::SCNotification * pScn)
 {
+    // TODO! Need to trap the language change too.
+    // We get style needed events but that's not the same.
     switch (pScn->nmhdr.code)
     {
         case SCN_MODIFIED:
