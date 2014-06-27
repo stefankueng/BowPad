@@ -926,7 +926,7 @@ void CCmdHeaderSource::HandleCorrespondingFileMenuItem(CorrespondingFileItem & i
     OpenFile(item.filename.c_str(), true);
 }
 
-void CCmdHeaderSource::HandleOpenFileMenuItem(OpenFileItem&/* item*/)
+void CCmdHeaderSource::HandleOpenFileMenuItem()
 {
     std::wstring defaultFolder;
 
