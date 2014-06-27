@@ -855,11 +855,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <FlowMenuLayout Columns="1"/>
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
-            <DropDownGallery CommandName="cmdHeaderSource" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
-              <DropDownGallery.MenuLayout>
+            <SplitButtonGallery CommandName="cmdHeaderSource" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <SplitButtonGallery.MenuLayout>
                 <FlowMenuLayout Columns="1"/>
-              </DropDownGallery.MenuLayout>
-            </DropDownGallery>
+              </SplitButtonGallery.MenuLayout>
+            </SplitButtonGallery>
             <Button CommandName="cmdComment" />
             <Button CommandName="cmdUnComment" />
             <DropDownGallery CommandName="cmdCodeStyle" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">

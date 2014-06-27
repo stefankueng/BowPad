@@ -89,16 +89,16 @@ But showing them allows BP to populate the filename component of the File Open D
 saving the user from having to type it.
 
 BP cannot always deduce the language/lexer desired for a file from the file's extension.
-Some files like System include files do not have extenions. Other file types are too generic
-to be assumed to contain C/C++ thhough they often do (e.g. .inc or .inl files).
+Some files like System include files do not have extensions. Other file types are too generic
+to be assumed to contain C/C++ though they often do (e.g. .inc or .inl files).
 
 The regular File Menu / Ctrl-O menu cannot make assumptions about the language type for these
-types of file extensions, but the "Open C++ File..." menu otion on the Corresponding File menu
+types of file extensions, but the "Open C++ File..." menu option on the Corresponding File menu
 can and does make this assumption.
 
 Showing a full list that includes missing files serves as a discoverability tool to determine exactly
 what names are referenced from a file without forcing the user to go to the top of the file (and often scroll)
-to find out. It gives an instant and consistant overview of the include file "findability" state as it
+to find out. It gives an instant and consistent overview of the include file "findability" state as it
 relates to the current document in one click.
 
 These features are the primary utility of this service over the regular File Open/Ctrl-O method.
@@ -110,7 +110,7 @@ One example is the possibility of an extended file open dialog (see below).
 END OVERVIEW.
 
 TODO: Expand the corresponding file list matching, so .cpp yields not just test.h but also
-perhaps other file names like test.cpp.html, that might match "code behind" scenarious.
+perhaps other file names like test.cpp.html, that might match "code behind" scenarios.
 Suggestions needed. May benefit from custom sort rules.
 
 TOOD: Introduce the ability to "switch between header and .cpp file" in one key/click.
@@ -575,7 +575,7 @@ namespace
         return true;
     }
 
-}; // anon namespace
+}; // unnamed namespace
 
 bool CCmdHeaderSource::UserFindFile(HWND hwndParent, const std::wstring& filename,
                                     const std::wstring& defaultFolder, std::wstring& selectedFilename) const
@@ -969,7 +969,7 @@ HRESULT CCmdHeaderSource::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const 
                 return hr;
             size_t selected = static_cast<size_t>(uSelected);
 
-            // The user selected a function to goto, we don't want that function
+            // The user selected a file to open, we don't want that file
             // to remain selected because the user is supposed to
             // reselect a new one each time,so clear the selection status.
             hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
@@ -1019,4 +1019,30 @@ void CCmdHeaderSource::OnDocumentSave(int /*index*/, bool /*bSaveAs*/)
 {
     // Language might have changed.
     InvalidateIncludes();
+}
+
+bool CCmdHeaderSource::Execute()
+{
+    // this is executed when the user clicks the default button or
+    // through the hotkey:
+    // find the corresponding file and open it if there's only one
+    // if there are more than one, do nothing.
+    // 
+
+    if (HasActiveDocument())
+    {
+        CDocument doc = GetActiveDocument();
+        std::vector<std::wstring> matchingFiles;
+        GetFilesWithSameName(doc.m_path, matchingFiles);
+        if (matchingFiles.size() == 1)
+        {
+            SetInsertionIndex(GetActiveTabIndex());
+            return OpenFile(matchingFiles[0].c_str(), true);
+        }
+        // if I ever find a way to show the
+        // drop down gallery, then do that here in case there are
+        // more than one corresponding file found
+    }
+
+    return false;
 }

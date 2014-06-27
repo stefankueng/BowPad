@@ -34,7 +34,7 @@ public:
     ~CCmdHeaderSource(void) { }
 
     // Overrides
-    bool Execute() override { return false; }
+    bool Execute() override;
     UINT GetCmdId() override { return cmdHeaderSource; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
