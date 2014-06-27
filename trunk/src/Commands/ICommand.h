@@ -63,7 +63,7 @@ protected:
 
     int                 GetDocumentCount();
     bool                HasActiveDocument();
-    CDocument           GetActiveDocument();
+    CDocument           GetActiveDocument() const;
     bool                HasDocumentID(int id);
     CDocument           GetDocumentFromID(int id);
     void                SetDocument(int id, CDocument doc);
