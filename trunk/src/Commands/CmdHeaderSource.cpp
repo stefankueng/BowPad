@@ -236,7 +236,17 @@ bool ShowFileSelectionDialog(
         return false;
 
     if (!defaultFilename.empty())
+    {
         pfd->SetFileName(defaultFilename.c_str());
+        // set a filter for this as well
+        COMDLG_FILTERSPEC filters[2];
+        filters[0].pszName = defaultFilename.c_str();
+        filters[0].pszSpec = defaultFilename.c_str();
+        filters[1].pszName = L"All files";
+        filters[1].pszSpec = L"*.*";
+        pfd->SetFileTypes(2, filters);
+        pfd->SetFileTypeIndex(1);
+    }
 
     // Set the standard title.
     ResString rTitle(hRes, IDS_APP_TITLE);
