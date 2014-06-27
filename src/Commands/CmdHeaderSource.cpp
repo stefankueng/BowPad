@@ -322,16 +322,6 @@ bool ShowSingleFileSelectionDialog(
     return false;
 }
 
-#if 0 // TOOD. Open Other File can use this overload. Not used just yet.
-bool ShowMultipleFileSelectionDialog(
-    HWND hWndParent,
-    const std::wstring& defaultFilename,
-    const std::wstring& defaultFolder,
-    std::vector<std::wstring>& filesChosen)
-{
-    return ShowFileSelectionDialog(hWndParent, defaultFilename, defaultFolder, filesChosen, true);
-}
-#endif
 
 // Find all derivatives of a file (the current document) in it's folder.
 // i.e. match files that share the same filename, but not extension.
