@@ -905,8 +905,7 @@ void CCmdHeaderSource::HandleIncludeFileMenuItem(IncludeFileItem& item)
     // and it was blank.
     if (!item.realFile.empty())
     {
-        auto keyState = GetKeyState(VK_SHIFT);
-        if (keyState != -127)
+        if ((GetKeyState(VK_SHIFT) & 0x8000) == 0)
         {
             OpenFileAsLanguage(item.realFile.c_str());
             return;
