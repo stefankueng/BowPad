@@ -120,7 +120,7 @@ Recent changes make this guaranteed realistically never possible since their wil
 always be more than one corresponding file now.
 
 However the solution is to restore the ability of one click include/cpp file switching but
-assign that function to a dedicated command/key, one that does gurantee to work even in the
+assign that function to a dedicated command/key, one that does guarantee to work even in the
 presence of other files. Once this has been implemented, that and this feature will be better for it.
 
 TOOD! Fix the override mechanism. Shift doesn't get detected well (at least on my keyboard).
@@ -129,7 +129,7 @@ TODO! Decide if to support a search path tor user include files.
 The user will need to change it all the time though for each project they work on.
 We could look for a include.ini file up from the current working directory,
 but this starts getting more involved.
-We could also/instead just rember the include directory we have have opened user include files in the
+We could also/instead just remember the include directory we have have opened user include files in the
 past and just search along those; these would be lost on exit.
 Any solution needs to be simple as it will never be 100% effective without a project system etc.
 Will wait for suggestion of improvement for now.
