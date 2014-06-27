@@ -749,7 +749,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
         matchingFileName = CPathUtils::GetFileName(matchingFile);
         m_menuInfo.push_back(CorrespondingFileItem(matchf, matchingFile));
         HRESULT hr = CAppUtils::AddStringItem(collection, matchingFileName.c_str(), CORRESPONDING_FILES_CATEGORY);
-        if (!SUCCEEDED(hr))
+        if (FAILED(hr))
         {
             m_menuInfo.pop_back();
             return false;
@@ -814,7 +814,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
                 if (!found)
                     menuText += L" ...";
                 HRESULT hr = CAppUtils::AddStringItem(collection, menuText.c_str(), SYSTEM_INCLUDE_CATEGORY);
-                if (!SUCCEEDED(hr))
+                if (FAILED(hr))
                 {
                     m_menuInfo.pop_back();
                     return false;
@@ -841,7 +841,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
             if (!found)
                 menuText += L" ...";
             HRESULT hr = CAppUtils::AddStringItem(collection, menuText.c_str(), USER_INCLUDE_CATEGORY);
-            if (SUCCEEDED(hr))
+            if (FAILED(hr))
             {
                 m_menuInfo.pop_back();
                 return false;
