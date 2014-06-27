@@ -187,7 +187,6 @@ this from working. Need to investigate as I'm far from certain that's the reason
 
 namespace
 {
-
     // We may want to use this elsewhere in the future so draw attention to it, but
     // but for now it's only needed in this module.
     static const char CPP_INCLUDE_STATEMENT_REGEX[] = { "^\\#include\\s+((\\\"[^\\\"]+\\\")|(<[^>]+>))" };
@@ -205,12 +204,11 @@ namespace
     // feature functionality is settles down.
 
     // TODO! Move appropriate functions to utilities.
-    bool ShowFileSelectionDialog(
-        HWND hWndParent,
-        const std::wstring& defaultFilename,
-        const std::wstring& defaultFolder,
-        std::vector<std::wstring>& filesChosen,
-        bool multiple)
+    bool ShowFileSelectionDialog(HWND hWndParent,
+                                 const std::wstring& defaultFilename,
+                                 const std::wstring& defaultFolder,
+                                 std::vector<std::wstring>& filesChosen,
+                                 bool multiple)
     {
         PreserveChdir keepCWD;
         filesChosen.clear();
