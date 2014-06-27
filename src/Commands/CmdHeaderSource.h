@@ -25,7 +25,7 @@
 #include "ScintillaWnd.h"
 #include "BowPadUI.h"
 
-class OpenFileItem; class IncludeFileItem; class CorrespondingFileItem;
+class IncludeFileItem; class CorrespondingFileItem;
 
 class CCmdHeaderSource : public ICommand
 {
@@ -52,7 +52,7 @@ public:
 private:
     void HandleIncludeFileMenuItem(IncludeFileItem& item);
     void HandleCorrespondingFileMenuItem(CorrespondingFileItem & item);
-    void HandleOpenFileMenuItem(OpenFileItem& item);
+    void HandleOpenFileMenuItem();
     bool PopulateMenu(const CDocument& doc, IUICollectionPtr& collection);
     void InvalidateIncludes();
     void InvalidateIncludesSource();
