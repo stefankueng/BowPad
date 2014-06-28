@@ -670,6 +670,9 @@ const std::vector<std::string>& CLexStyles::GetFunctionRegexTrimForLang( const s
 void CLexStyles::SetLangForPath(const std::wstring& path, const std::wstring& language)
 {
     auto dotpos = path.find_last_of('.');
+    auto slashpos = path.find_last_of(L"\\/");
+    if (slashpos > dotpos)
+        dotpos = std::wstring::npos;
     std::wstring sExt = path.substr(dotpos + 1);
     std::string e = CUnicodeUtils::StdGetUTF8(sExt);
     if (dotpos == std::wstring::npos)
