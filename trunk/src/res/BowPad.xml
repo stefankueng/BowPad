@@ -855,9 +855,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <FlowMenuLayout Columns="1"/>
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
-            <SplitButtonGallery CommandName="cmdHeaderSource" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+            <SplitButtonGallery CommandName="cmdHeaderSource" TextPosition="Right" Type="Items" >
               <SplitButtonGallery.MenuLayout>
-                <FlowMenuLayout Columns="1"/>
+                <VerticalMenuLayout Gripper="None"/>
               </SplitButtonGallery.MenuLayout>
             </SplitButtonGallery>
             <Button CommandName="cmdComment" />
