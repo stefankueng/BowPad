@@ -25,7 +25,28 @@
 #include "ScintillaWnd.h"
 #include "BowPadUI.h"
 
-class IncludeFileItem; class CorrespondingFileItem;
+enum class RelatedType
+{
+    Unknown,
+    Corresponding,
+    UserInclude,
+    SystemInclude
+};
+
+class RelatedFileItem
+{
+public:
+    RelatedFileItem() : Type(RelatedType::Unknown) {};
+    RelatedFileItem(const std::wstring& path, RelatedType type)
+        : Path(path)
+        , Type(type)
+    {}
+    ~RelatedFileItem() {};
+
+    std::wstring    Path;
+    RelatedType     Type;
+};
+
 
 class CCmdHeaderSource : public ICommand
 {
@@ -50,8 +71,8 @@ public:
     void OnDocumentSave(int index, bool bSaveAs) override;
 
 private:
-    void HandleIncludeFileMenuItem(IncludeFileItem& item);
-    void HandleCorrespondingFileMenuItem(CorrespondingFileItem & item);
+    void HandleIncludeFileMenuItem(const RelatedFileItem& item);
+    void HandleCorrespondingFileMenuItem(const RelatedFileItem& item);
     void HandleOpenFileMenuItem();
     bool PopulateMenu(const CDocument& doc, IUICollectionPtr& collection);
     void InvalidateIncludes();
@@ -59,63 +80,16 @@ private:
     void InvalidateIncludesEnabled();
     bool HandleSelectedMenuItem(size_t selected);
     bool IsValidMenuItem(size_t item) const;
-    bool UserFindFile( HWND hwndParent,
-        const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename) const;
+    bool UserFindFile(HWND hwndParent, const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename) const;
     bool IsServiceAvailable();
     bool OpenFileAsLanguage(const std::wstring& filename);
 
 private:
-    std::vector<std::function<void()>> m_menuInfo;
+    std::vector<RelatedFileItem> m_menuInfo;
     bool m_bStale;
     // TODO! Find out what requires this to be a member variable.
     // It crashes if on the stack etc. Might reveal bugs.
     CScintillaWnd m_edit;
 };
 
-enum class IncludeType
-{
-    Unknown,
-    User,
-    System
-};
-
-struct IncludeInfo
-{
-    size_t line;             // Line number where the include was found.
-    std::wstring filename;   // Filename parsed from raw line. e.g. <x> or "y"
-    IncludeType includeType; // Type of include i.e. <x> or "x" or unknown (e.g. parse error)
-
-    inline IncludeInfo::IncludeInfo(size_t line, std::wstring& filename, IncludeType includeType)
-        : line(line), filename(filename), includeType(includeType) { }
-};
-
-class CorrespondingFileItem
-{
-public:
-    using CorrespondingFileItemOwner = std::function<void(CorrespondingFileItem&)>;
-    CorrespondingFileItemOwner owner;
-    std::wstring filename;
-    CorrespondingFileItem(CorrespondingFileItemOwner& owner, const std::wstring& filename)
-        : owner(owner), filename(filename) { }
-    void operator()()
-    {
-        owner(*this);
-    }
-};
-
-class IncludeFileItem
-{
-public:
-    IncludeInfo inc;
-    std::wstring realFile;
-    using IncludeFileItemOwner = std::function<void(IncludeFileItem&)>;
-    IncludeFileItemOwner owner;
-    IncludeFileItem( IncludeFileItemOwner& owner,
-        const IncludeInfo& inc, const std::wstring& realFile) 
-        : owner(owner), inc(inc), realFile(realFile) { }
-    void operator()()
-    {
-        owner(*this);
-    }
-};
 
