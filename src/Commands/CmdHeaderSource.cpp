@@ -331,7 +331,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     std::sort(matchingFiles.begin(), matchingFiles.end(),
               [](const std::wstring& a, const std::wstring& b) -> bool
     {
-        return CPathUtils::PathCompare(a, b) < 0;
+        return StrCmpLogicalW(a.c_str(), b.c_str()) < 0;
     });
 
     std::wstring matchingFileName;
@@ -1009,7 +1009,7 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
         if (a.Type == RelatedType::SystemInclude && b.Type == RelatedType::UserInclude)
             return false;
         // Within the same type, sort by name.
-        return CPathUtils::PathCompare(a.Path, b.Path) < 0;
+        return StrCmpLogicalW(a.Path.c_str(), b.Path.c_str()) < 0;
     });
 
     // Remove any includes that have the same path and include type, they
