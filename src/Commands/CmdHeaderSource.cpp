@@ -109,10 +109,6 @@ One example is the possibility of an extended file open dialog (see below).
 
 END OVERVIEW.
 
-TODO: Expand the corresponding file list matching, so .cpp yields not just test.h but also
-perhaps other file names like test.cpp.html, that might match "code behind" scenarios.
-Suggestions needed. May benefit from custom sort rules.
-
 
 TODO: Decide if to support a search path for user include files.
 The user will need to change it all the time though for each project they work on.
@@ -141,8 +137,6 @@ clicked. I can't make that work yet.
 OR:
 B) Need a "language changed event" to listen for in which we can invalidate the
 the drop down list when the lexer language changes.
-
-TODO: Convert a few hard coded strings to resource file entries.
 
 TODO! Remember paths where include files have been opened previously.
 This could be under the search button as a split, the combo list may not be viable for this purpose.
@@ -326,7 +320,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     std::vector<std::wstring> matchingFiles;
 
     std::wstring targetPath = doc.m_path;
-    GetFilesWithSameName(targetPath, matchingFiles);
+    GetFilesWithSameName(targetPath, false, matchingFiles);
 
     std::sort(matchingFiles.begin(), matchingFiles.end(),
               [](const std::wstring& a, const std::wstring& b) -> bool
@@ -668,7 +662,9 @@ bool CCmdHeaderSource::Execute()
     {
         CDocument doc = GetActiveDocument();
         std::vector<std::wstring> matchingFiles;
-        GetFilesWithSameName(doc.m_path, matchingFiles);
+        GetFilesWithSameName(doc.m_path, true, matchingFiles);
+        if (matchingFiles.empty())
+            GetFilesWithSameName(doc.m_path, false, matchingFiles);
         if (matchingFiles.size() == 1)
         {
             SetInsertionIndex(GetActiveTabIndex());
@@ -780,12 +776,9 @@ bool CCmdHeaderSource::ShowSingleFileSelectionDialog(HWND hWndParent, const std:
 // Ignore any files that have certain extensions.
 // e.g. Given a name like c:\test\test.cpp,
 // return {c:\test\test.h and test.h} but ignore c:\test\test.exe.
-// Filenames that have no extension are not considered (for not particular reason).
-void CCmdHeaderSource::GetFilesWithSameName(const std::wstring& targetPath, std::vector<std::wstring>& matchingfiles) const
+void CCmdHeaderSource::GetFilesWithSameName(const std::wstring& targetPath, bool exact, std::vector<std::wstring>& matchingfiles) const
 {
     std::wstring targetExt = CPathUtils::GetFileExtension(targetPath);
-    if (targetExt.empty())
-        return;
 
     std::vector<std::wstring> ignoredExts;
     stringtok(ignoredExts, CIniSettings::Instance().GetString(L"HeaderSource", L"IgnoredExts", L"exe*obj*dll*ilk*lib*ncb*ipch*bml*pch*res*pdb*aps"), true, L"*");
@@ -797,6 +790,17 @@ void CCmdHeaderSource::GetFilesWithSameName(const std::wstring& targetPath, std:
     std::wstring matchingFileNameWithoutExt;
     std::wstring matchingExt;
 
+    // remove all extensions in case the filename has multiple ones, e.g.
+    // test.Designer.cs
+    if (!exact)
+    {
+        while (!targetExt.empty())
+        {
+            targetExt = CPathUtils::GetFileExtension(targetFileNameWithoutExt);
+            targetFileNameWithoutExt = CPathUtils::GetFileNameWithoutExtension(targetFileNameWithoutExt);
+        }
+    }
+
     CDirFileEnum enumerator(targetFolder);
     bool bIsDir = false;
     while (enumerator.NextFile(matchingPath, &bIsDir, false))
@@ -806,17 +810,22 @@ void CCmdHeaderSource::GetFilesWithSameName(const std::wstring& targetPath, std:
         // Don't match ourself.
         if (CPathUtils::PathCompare(matchingPath, targetPath) == 0)
             continue;
-        // Don't match files without extensions. REVIEW: Why not?
+
         matchingExt = CPathUtils::GetFileExtension(matchingPath);
-        if (matchingExt.empty())
-            continue;
-        // TODO! Consider if corresponding file should be based on the first "." in the
-        // the name rather than last "." etc.
-        // So test.cs can be linked with test.cs.html or whatever.
         matchingFileNameWithoutExt = CPathUtils::GetFileNameWithoutExtension(matchingPath);
+        if (!exact)
+        {
+            while (!matchingExt.empty())
+            {
+                matchingExt = CPathUtils::GetFileExtension(matchingFileNameWithoutExt);
+                matchingFileNameWithoutExt = CPathUtils::GetFileNameWithoutExtension(matchingFileNameWithoutExt);
+            }
+        }
+
         if (CPathUtils::PathCompare(targetFileNameWithoutExt, matchingFileNameWithoutExt) == 0)
         {
             bool useIt = true;
+            matchingExt = CPathUtils::GetFileExtension(matchingPath);
             for (const auto& ignoredExt : ignoredExts)
             {
                 if (CPathUtils::PathCompare(matchingExt, ignoredExt) == 0)
