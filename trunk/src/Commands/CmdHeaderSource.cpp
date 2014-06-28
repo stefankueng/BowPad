@@ -407,10 +407,10 @@ namespace
     }
 
     // Extract the filename from the #include <x> or #include "y" elements.
-    bool ParseInclude(const std::wstring& raw, std::wstring& filename, IncludeType& incType)
+    bool ParseInclude(const std::wstring& raw, std::wstring& filename, RelatedType& incType)
     {
         filename.clear();
-        incType = IncludeType::Unknown;
+        incType = RelatedType::Unknown;
 
         size_t len = raw.length();
         size_t first, last;
@@ -437,7 +437,7 @@ namespace
             last = raw.find_last_of(L'\"');
             if (last != first)
             {
-                incType = IncludeType::User;
+                incType = RelatedType::UserInclude;
                 len = last - (first + 1);
                 filename = raw.substr(first + 1, len);
                 return (len > 0);
@@ -449,7 +449,7 @@ namespace
             first = raw.find(L'<');
             if (first != std::wstring::npos)
             {
-                incType = IncludeType::System;
+                incType = RelatedType::SystemInclude;
                 last = raw.find_last_of(L'>');
                 if (last != first)
                 {
@@ -493,7 +493,7 @@ namespace
         edit.Call(SCI_SETCODEPAGE, CP_UTF8);
     }
 
-    bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<IncludeInfo>& includes)
+    bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<RelatedFileItem>& includes)
     {
         includes.clear();
 
@@ -524,7 +524,7 @@ namespace
 
         std::wstring raw;
         std::wstring filename;
-        IncludeType includeType;
+        RelatedType includeType;
 
         for (;;)
         {
@@ -547,27 +547,27 @@ namespace
             if (parsed)
             {
                 CPathUtils::NormalizeFolderSeparators(filename);
-                includes.push_back(IncludeInfo(line_no, filename, includeType));
+                includes.push_back(RelatedFileItem(filename, includeType));
             }
         }
         // Sort the list putting user includes before system includes. Remove duplicates.
         // A duplicate is an include with the same name and type as another in the list.
-        std::sort(includes.begin(), includes.end(), [](const IncludeInfo& a, const IncludeInfo& b) -> bool
+        std::sort(includes.begin(), includes.end(), [](const RelatedFileItem& a, const RelatedFileItem& b) -> bool
         {
             // Put user before system includes.
-            if (a.includeType == IncludeType::System && b.includeType == IncludeType::User)
+            if (a.Type == RelatedType::SystemInclude && b.Type == RelatedType::UserInclude)
                 return false;
             // Within the same type, sort by name.
-            return CPathUtils::PathCompare(a.filename, b.filename) < 0;
+            return CPathUtils::PathCompare(a.Path, b.Path) < 0;
         });
 
         // Remove any includes that have the same path and include type, they
         // have to result in the same path found.
         auto newEnd = std::unique(includes.begin(), includes.end(),
-                                  [](const IncludeInfo& a, const IncludeInfo& b)
+                                  [](const RelatedFileItem& a, const RelatedFileItem& b)
         {
-            return (a.includeType == b.includeType &&
-                    CPathUtils::PathCompare(a.filename, b.filename) == 0);
+            return (a.Type == b.Type &&
+                    CPathUtils::PathCompare(a.Path, b.Path) == 0);
         }
         );
         // Really remove them.
@@ -737,15 +737,11 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
         return CPathUtils::PathCompare(a, b) < 0;
     });
 
-    std::function<void(CorrespondingFileItem&)> matchf = [this](CorrespondingFileItem& item)->void
-    {
-        this->HandleCorrespondingFileMenuItem(item);
-    };
     std::wstring matchingFileName;
     for (const auto& matchingFile : matchingFiles)
     {
         matchingFileName = CPathUtils::GetFileName(matchingFile);
-        m_menuInfo.push_back(CorrespondingFileItem(matchf, matchingFile));
+        m_menuInfo.push_back(RelatedFileItem(matchingFile, RelatedType::Corresponding));
         HRESULT hr = CAppUtils::AddStringItem(collection, matchingFileName.c_str(), CORRESPONDING_FILES_CATEGORY);
         if (FAILED(hr))
         {
@@ -756,7 +752,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
 
     // Include Files
 
-    std::vector<IncludeInfo> includes;
+    std::vector<RelatedFileItem> includes;
     GetIncludes(doc, m_edit, includes);
 
     std::wstring mainFolder;
@@ -769,8 +765,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
 
     std::wstring cpptoolchain;
     LPCWSTR configItem;
-    configItem = CIniSettings::Instance().GetString(
-        L"cpp", L"toolchain", 0);
+    configItem = CIniSettings::Instance().GetString(L"cpp", L"toolchain", 0);
     if (configItem != nullptr && *configItem != L'\0')
     {
         cpptoolchain = configItem;
@@ -781,11 +776,6 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     bool found;
 
     bool hasCppToolChain = !cpptoolchain.empty();
-
-    std::function<void(IncludeFileItem&)> incf = [this](IncludeFileItem& item)->void
-    {
-        this->HandleIncludeFileMenuItem(item);
-    };
 
     // Handle System Include Files
 
@@ -803,12 +793,12 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
 
         for (const auto& inc : includes)
         {
-            if (inc.includeType == IncludeType::System)
+            if (inc.Type == RelatedType::SystemInclude)
             {
-                found = FindFile(inc.filename, systemFoldersToSearch, foundFile);
-                m_menuInfo.push_back(IncludeFileItem(incf, inc, found ? foundFile : L""));
+                found = FindFile(inc.Path, systemFoldersToSearch, foundFile);
+                m_menuInfo.push_back(RelatedFileItem(found ? foundFile : inc.Path, inc.Type));
 
-                menuText = inc.filename;
+                menuText = inc.Path;
                 if (!found)
                     menuText += L" ...";
                 HRESULT hr = CAppUtils::AddStringItem(collection, menuText.c_str(), SYSTEM_INCLUDE_CATEGORY);
@@ -830,12 +820,12 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
 
     for (const auto& inc : includes)
     {
-        if (inc.includeType == IncludeType::User)
+        if (inc.Type == RelatedType::UserInclude)
         {
-            found = FindFile(inc.filename, regularFoldersToSearch, foundFile);
-            m_menuInfo.push_back(IncludeFileItem(incf, inc, found ? foundFile : L""));
+            found = FindFile(inc.Path, regularFoldersToSearch, foundFile);
+            m_menuInfo.push_back(RelatedFileItem(found ? foundFile : inc.Path, inc.Type));
 
-            menuText = inc.filename;
+            menuText = inc.Path;
             if (!found)
                 menuText += L" ...";
             HRESULT hr = CAppUtils::AddStringItem(collection, menuText.c_str(), USER_INCLUDE_CATEGORY);
@@ -851,7 +841,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     // indicator in, but it's also useful.
     if (m_menuInfo.size() == 0)
     {
-        m_menuInfo.push_back([]() {}); // No action. Love C++...
+        m_menuInfo.push_back(RelatedFileItem()); // No action.
         // Using CORRESPONDING_FILES_CATEGORY, but might possibly prefer no category,
         // but that doesn't appear to be possible it seems.
         HRESULT hr = CAppUtils::AddResStringItem(collection, IDS_NO_FILES_FOUND, CORRESPONDING_FILES_CATEGORY);
@@ -889,7 +879,7 @@ bool CCmdHeaderSource::OpenFileAsLanguage(const std::wstring& filename)
     return true;
 }
 
-void CCmdHeaderSource::HandleIncludeFileMenuItem(IncludeFileItem& item)
+void CCmdHeaderSource::HandleIncludeFileMenuItem(const RelatedFileItem& item)
 {
     std::wstring defaultFolder;
     std::wstring fileToOpen;
@@ -903,24 +893,24 @@ void CCmdHeaderSource::HandleIncludeFileMenuItem(IncludeFileItem& item)
     // If the user chose to override, fall through and let them try to find it.
     // Which is what happens if the System couldn't find the file to begin with
     // and it was blank.
-    if (!item.realFile.empty())
+    if (!item.Path.empty() && PathFileExists(item.Path.c_str()))
     {
         if ((GetKeyState(VK_SHIFT) & 0x8000) == 0)
         {
-            OpenFileAsLanguage(item.realFile.c_str());
+            OpenFileAsLanguage(item.Path.c_str());
             return;
         }
     }
-    if (!UserFindFile(GetHwnd(), CPathUtils::GetFileName(item.inc.filename), defaultFolder, fileToOpen))
+    if (!UserFindFile(GetHwnd(), CPathUtils::GetFileName(item.Path), defaultFolder, fileToOpen))
         return;
     if (!OpenFileAsLanguage(fileToOpen.c_str()))
         return;
 }
 
-void CCmdHeaderSource::HandleCorrespondingFileMenuItem(CorrespondingFileItem & item)
+void CCmdHeaderSource::HandleCorrespondingFileMenuItem(const RelatedFileItem& item)
 {
     SetInsertionIndex(GetActiveTabIndex());
-    OpenFile(item.filename.c_str(), true);
+    OpenFile(item.Path.c_str(), true);
 }
 
 void CCmdHeaderSource::HandleOpenFileMenuItem()
@@ -931,7 +921,7 @@ void CCmdHeaderSource::HandleOpenFileMenuItem()
     if (!UserFindFile(GetHwnd(), L"", defaultFolder, fileToOpen))
         return;
 
-    if (!OpenFileAsLanguage(fileToOpen.c_str()))
+    if (!OpenFileAsLanguage(fileToOpen))
         return;
 }
 
@@ -948,7 +938,17 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
         return false;
     }
 
-    m_menuInfo[selected]();
+    auto item = m_menuInfo[selected];
+    switch (item.Type)
+    {
+        case RelatedType::Corresponding:
+            HandleCorrespondingFileMenuItem(item);
+            break;
+        case RelatedType::SystemInclude:
+        case RelatedType::UserInclude:
+            HandleIncludeFileMenuItem(item);
+            break;
+    }
 
     return true;
 }
