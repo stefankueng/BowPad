@@ -278,7 +278,8 @@ STDMETHODIMP CMainWindow::Execute(
         if (hr == E_NOTIMPL)
         {
             hr = S_OK;
-            DoCommand(nCmdID);
+            if (verb == UI_EXECUTIONVERB_EXECUTE)
+                DoCommand(nCmdID);
         }
     }
     else
