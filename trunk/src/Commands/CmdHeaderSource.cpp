@@ -144,11 +144,6 @@ This could be under the search button as a split, the combo list may not be viab
 TODO! The include feature is quite C++ specific for now.
 The feature could be expanded for other languages / file types.
 Will wait for suggestions before doing more work here for now.
-
-TODO: Display the files full path as a tooltip when the cursor is over a drop down item.
-I think code in main window might be preventing any code I've tried to use to do
-this from working. Need to investigate as I'm far from certain that's the reason.
-
 */
 
 #include "stdafx.h"
@@ -677,7 +672,6 @@ bool CCmdHeaderSource::Execute()
     // through the hotkey:
     // find the corresponding file and open it if there's only one
     // if there are more than one, do nothing.
-    // 
 
     if (HasActiveDocument())
     {
@@ -691,9 +685,49 @@ bool CCmdHeaderSource::Execute()
             SetInsertionIndex(GetActiveTabIndex());
             return OpenFile(matchingFiles[0].c_str(), true);
         }
-        // if I ever find a way to show the
-        // drop down gallery, then do that here in case there are
-        // more than one corresponding file found
+        if (matchingFiles.size() > 1)
+        {
+            // open the dropdown gallery using windows automation
+            IUIAutomationPtr pAutomation;
+            if (CAppUtils::FailedShowMessage(CoCreateInstance(__uuidof(CUIAutomation), NULL, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), (void **)&pAutomation)))
+                return false;
+            // get the top element of this app window
+            IUIAutomationElementPtr pParent;
+            if (CAppUtils::FailedShowMessage(pAutomation->ElementFromHandle(GetHwnd(), &pParent)))
+                return false;
+            // set up conditions to find the control
+            // first condition is the name "Corresponding File"
+            // second condition is the accessibility role id, which is 0x38 for a dropdown control
+            // the second condition is required since there's also a normal button with the same name: the default button of the dropdown gallery
+            IUIAutomationConditionPtr pCondition;
+            ResString ctrlName(hRes, cmdHeaderSource_LabelTitle_RESID);
+            VARIANT varProp;
+            varProp.vt = VT_BSTR;
+            varProp.bstrVal = SysAllocString(ctrlName);
+            if (CAppUtils::FailedShowMessage(pAutomation->CreatePropertyCondition(UIA_NamePropertyId, varProp, &pCondition)))
+                return false;
+            varProp.vt = VT_INT;
+            varProp.intVal = 0x38;
+            IUIAutomationConditionPtr pCondition2;
+            if (CAppUtils::FailedShowMessage(pAutomation->CreatePropertyCondition(UIA_LegacyIAccessibleRolePropertyId, varProp, &pCondition2)))
+                return false;
+            // both conditions must be true
+            IUIAutomationConditionPtr pCondition3;
+            if (CAppUtils::FailedShowMessage(pAutomation->CreateAndCondition(pCondition, pCondition2, &pCondition3)))
+                return false;
+            // now try to find the control
+            IUIAutomationElementPtr pFound;
+            if (CAppUtils::FailedShowMessage(pParent->FindFirst(TreeScope_Descendants, pCondition3, &pFound)))
+                return false;
+
+            // the the invoke pattern of the control so we can invoke it
+            IUIAutomationInvokePatternPtr pInvoke;
+            if (CAppUtils::FailedShowMessage(pFound->GetCurrentPatternAs(UIA_InvokePatternId, __uuidof(IUIAutomationInvokePattern), (void **)&pInvoke)))
+                return false;
+            // finally, invoke the command which drops down the gallery
+            pInvoke->Invoke();
+            pFound->SetFocus();
+        }
     }
 
     return false;
