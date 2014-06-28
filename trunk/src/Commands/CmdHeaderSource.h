@@ -94,6 +94,8 @@ private:
 private:
     std::vector<RelatedFileItem>    m_menuInfo;
     CScintillaWnd                   m_edit;
+    std::wstring                    m_systemIncludePaths;
+    bool                            m_bSearchedIncludePaths;
 };
 
 

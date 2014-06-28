@@ -209,7 +209,7 @@ bool CCmdHeaderSource::UserFindFile(HWND hwndParent, const std::wstring& filenam
 CCmdHeaderSource::CCmdHeaderSource(void * obj)
     : ICommand(obj)
     , m_edit(hRes)
-
+    , m_bSearchedIncludePaths(false)
 {
     m_edit.InitScratch(hRes);
     // Because we don't know if this file type supports includes.
@@ -372,16 +372,55 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     std::wstring menuText;
     bool found;
 
-    bool hasCppToolChain = !cpptoolchain.empty();
-
     // Handle System Include Files
 
     // Only look for system include files if there's a tool chain defined that
     // says where they can be found.
-    if (hasCppToolChain)
     {
-        configItem = CIniSettings::Instance().GetString(
-            cpptoolchain.c_str(), L"systemincludepath", 0);
+        configItem = nullptr;
+        if (!cpptoolchain.empty())
+            configItem = CIniSettings::Instance().GetString(cpptoolchain.c_str(), L"systemincludepath", 0);
+        if (configItem == nullptr)
+        {
+            if (!m_bSearchedIncludePaths)
+            {
+                // try to find sensible default paths
+                PWSTR programfiles = 0;
+                SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &programfiles);
+                // first the windows sdks
+                std::vector<std::wstring> sdkvers = { L"v8.1A", L"v8.1", L"v8.0A", L"v8.0", L"v7.1A", L"v7.1", L"v7.0A", L"v7.0" };
+                for (const auto& ver : sdkvers)
+                {
+                    std::wstring sTestPath = CStringUtils::Format(L"%s\\Microsoft SDKs\\Windows\\%s\\Include", programfiles, ver.c_str());
+                    if (PathFileExists(sTestPath.c_str()))
+                    {
+                        m_systemIncludePaths += sTestPath;
+                        m_systemIncludePaths += L";";
+                    }
+                }
+
+                // now go through the visual studio paths
+                std::vector<std::wstring> vsvers = { L"Microsoft Visual Studio 13.0", L"Microsoft Visual Studio 12.0", L"Microsoft Visual Studio 11.0", L"Microsoft Visual Studio 10.0" };
+                for (const auto& ver : vsvers)
+                {
+                    std::wstring sTestPath = CStringUtils::Format(L"%s\\%s\\VC\\include", programfiles, ver.c_str());
+                    if (PathFileExists(sTestPath.c_str()))
+                    {
+                        m_systemIncludePaths += sTestPath;
+                        m_systemIncludePaths += L";";
+                        sTestPath = CStringUtils::Format(L"%s\\%s\\VC\\atlmfc\\include", programfiles, ver.c_str());
+                        if (PathFileExists(sTestPath.c_str()))
+                        {
+                            m_systemIncludePaths += sTestPath;
+                            m_systemIncludePaths += L";";
+                        }
+                    }
+                }
+                m_bSearchedIncludePaths = true;
+            }
+            if (!m_systemIncludePaths.empty())
+                configItem = m_systemIncludePaths.c_str();
+        }
         if (configItem != nullptr)
         {
             std::wstring systemIncludePath = configItem;
