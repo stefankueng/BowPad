@@ -114,7 +114,7 @@ perhaps other file names like test.cpp.html, that might match "code behind" scen
 Suggestions needed. May benefit from custom sort rules.
 
 
-TODO! Decide if to support a search path tor user include files.
+TODO: Decide if to support a search path for user include files.
 The user will need to change it all the time though for each project they work on.
 We could look for a include.ini file up from the current working directory,
 but this starts getting more involved.
@@ -126,8 +126,6 @@ Will wait for suggestion of improvement for now.
 TODO: Add a file file find dialog that remembers previous folders and helps more with finding files etc.
 
 TODO: Fix outstanding bug: /
-TODO! Change the logic so the menu rebuilds each time the button is clicked, rather than detecting when
-it should be rebuilt.
 
 1. Press Ctrl-N to create an empty document.
 2. Type #include <cstdio>
@@ -216,10 +214,6 @@ CCmdHeaderSource::CCmdHeaderSource(void * obj)
     m_edit.InitScratch(hRes);
     // Because we don't know if this file type supports includes.
     InvalidateIncludes();
-
-    //TODO! Review if this is required.
-    HRESULT hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    CAppUtils::FailedShowMessage(hr);
 }
 
 void CCmdHeaderSource::InvalidateIncludesSource()
@@ -464,8 +458,7 @@ bool CCmdHeaderSource::OpenFileAsLanguage(const std::wstring& filename)
     SetInsertionIndex(GetActiveTabIndex());
     if (!OpenFile(filename.c_str(), true))
         return false;
-    // REVIEW: It might be more efficient to have an OpenFile overload where
-    // we could specify the language at it's opened.
+
     const std::wstring desiredLang = L"C/C++";
     if (HasActiveDocument())
     {
