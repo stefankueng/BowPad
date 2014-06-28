@@ -22,6 +22,7 @@
 #include <ShlObj.h>
 #include <Shobjidl.h>
 #include <activscp.h>
+#include <UIAutomation.h>
 
 _COM_SMARTPTR_TYPEDEF(IUICollection, __uuidof(IUICollection));
 _COM_SMARTPTR_TYPEDEF(IUIImage, __uuidof(IUIImage));
@@ -41,4 +42,9 @@ _COM_SMARTPTR_TYPEDEF(IDispatch, __uuidof(IDispatch));
 _COM_SMARTPTR_TYPEDEF(IActiveScript, __uuidof(IActiveScript));
 _COM_SMARTPTR_TYPEDEF(IActiveScriptParse, __uuidof(IActiveScriptParse));
 
+// UIAutomation
+_COM_SMARTPTR_TYPEDEF(IUIAutomation, __uuidof(IUIAutomation));
+_COM_SMARTPTR_TYPEDEF(IUIAutomationElement, __uuidof(IUIAutomationElement));
+_COM_SMARTPTR_TYPEDEF(IUIAutomationCondition, __uuidof(IUIAutomationCondition));
+_COM_SMARTPTR_TYPEDEF(IUIAutomationInvokePattern, __uuidof(IUIAutomationInvokePattern));
 
