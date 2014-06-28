@@ -211,7 +211,6 @@ bool CCmdHeaderSource::UserFindFile(HWND hwndParent, const std::wstring& filenam
 CCmdHeaderSource::CCmdHeaderSource(void * obj)
     : ICommand(obj)
     , m_edit(hRes)
-    , m_bStale(true)
 
 {
     m_edit.InitScratch(hRes);
@@ -239,7 +238,6 @@ void CCmdHeaderSource::InvalidateIncludesEnabled()
 
 void CCmdHeaderSource::InvalidateIncludes()
 {
-    m_bStale = true;
     m_menuInfo.clear();
     InvalidateIncludesSource();
     InvalidateIncludesEnabled();
@@ -271,11 +269,6 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
 
     if (key == UI_PKEY_ItemsSource)
     {
-        // We should have detected all the re-/population points and marked
-        // the data stale. If the data isn't marked stale by here it suggests
-        // we've missed a point where we should have invalidated the data.
-        ASSERT(m_bStale);
-
         IUICollectionPtr collection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&collection));
         if (CAppUtils::FailedShowMessage(hr))

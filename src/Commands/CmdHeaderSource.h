@@ -92,11 +92,8 @@ private:
     bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<RelatedFileItem>& includes) const;
 
 private:
-    std::vector<RelatedFileItem> m_menuInfo;
-    bool m_bStale;
-    // TODO! Find out what requires this to be a member variable.
-    // It crashes if on the stack etc. Might reveal bugs.
-    CScintillaWnd m_edit;
+    std::vector<RelatedFileItem>    m_menuInfo;
+    CScintillaWnd                   m_edit;
 };
 
 
