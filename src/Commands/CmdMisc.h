@@ -102,10 +102,7 @@ public:
         if (dark)
         {
             CTheme::Instance().SetDarkTheme(!CTheme::Instance().IsDarkTheme());
-            if (IsWindows8OrGreater())
-                CTheme::Instance().SetRibbonColorsHSB(UI_HSB(0,0,255), UI_HSB(160,0,0), UI_HSB(160,44,0));
-            else
-                CTheme::Instance().SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(153,76,0));
+            CTheme::Instance().SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
         }
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
@@ -123,10 +120,7 @@ public:
         SetupLexerForLang(doc.m_language);
         if (CTheme::Instance().IsDarkTheme())
         {
-            if (IsWindows8OrGreater())
-                CTheme::Instance().SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
-            else
-                CTheme::Instance().SetRibbonColors(RGB(255,255,255), RGB(20,20,20), RGB(153,76,0));
+            CTheme::Instance().SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
         }
         else
             CTheme::Instance().SetRibbonColorsHSB(text, back, high);
