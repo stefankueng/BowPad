@@ -429,6 +429,10 @@ msgstr ""
 msgid "Corresponding File"
 msgstr ""
 
+#. Resource IDs: (13)
+msgid "Corresponding Files"
+msgstr ""
+
 #. Resource IDs: (9)
 msgid "Could not download the language file!"
 msgstr ""
@@ -1021,6 +1025,10 @@ msgstr ""
 msgid "Next Bookmark"
 msgstr ""
 
+#. Resource IDs: (13)
+msgid "No files found"
+msgstr ""
+
 #. Resource IDs: (10)
 msgid "No functions found!"
 msgstr ""
@@ -1450,6 +1458,10 @@ msgstr ""
 msgid "Styles"
 msgstr ""
 
+#. Resource IDs: (13)
+msgid "System Includes"
+msgstr ""
+
 #. Resource IDs: (3768)
 msgid "T"
 msgstr ""
@@ -1601,6 +1613,10 @@ msgstr ""
 
 #. Resource IDs: (3760)
 msgid "Use Tabs"
+msgstr ""
+
+#. Resource IDs: (13)
+msgid "User Includes"
 msgstr ""
 
 #. Resource IDs: (3751, 3752, 3755)
