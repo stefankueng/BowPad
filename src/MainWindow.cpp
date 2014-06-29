@@ -2087,11 +2087,18 @@ bool CMainWindow::OpenFileEx(const std::wstring& file, unsigned int openFlags)
                 doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
             m_DocManager.AddDocumentAtEnd(doc, id);
             m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-            m_TabBar.ActivateAt(index);
-            if (ext.empty())
-                m_editor.SetupLexerForLang(doc.m_language);
-            else
-                m_editor.SetupLexerForExt(ext);
+            if (IsWindowEnabled(*this))
+            {
+                // only activate the new doc tab if the main window is enabled:
+                // if it's disabled, a modal dialog is shown
+                // (e.g., the handle-outside-modifications confirmation dialog)
+                // and we then must not change the active tab.
+                m_TabBar.ActivateAt(index);
+                if (ext.empty())
+                    m_editor.SetupLexerForLang(doc.m_language);
+                else
+                    m_editor.SetupLexerForExt(ext);
+            }
             SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
             CCommandHandler::Instance().OnDocumentOpen(index);
         }
@@ -2495,13 +2502,6 @@ bool CMainWindow::HasOutsideChangesOccurred() const
 
 void CMainWindow::CheckForOutsideChanges()
 {
-    // TODO! This logic is a bit restrictured from before but
-    // has the same design and flaw. We shouldn't activate each
-    // tab forcing the user to make reload choices for each one.
-    // just the first. Then let the user find the others when they
-    // change tabs. We could draw their attention to it by
-    // marking the tab header "stale" via a colour change for example.
-
     // See if any doc has been changed externally.
     for (int i = 0; i < m_TabBar.GetItemCount(); ++i)
     {
