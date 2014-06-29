@@ -50,10 +50,10 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
             return hr;
         }
 
-        CAppUtils::AddCategory(pCollection, 0, IDS_LANGUAGE_AVAILABLE);
+        hr = CAppUtils::AddCategory(pCollection, 0, IDS_LANGUAGE_AVAILABLE);
         if (FAILED(hr))
             return hr;
-        CAppUtils::AddCategory(pCollection, 1, IDS_LANGUAGE_REMOTE);
+        hr = CAppUtils::AddCategory(pCollection, 1, IDS_LANGUAGE_REMOTE);
         if (FAILED(hr))
             return hr;
         return S_OK;

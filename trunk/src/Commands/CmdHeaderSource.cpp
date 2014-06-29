@@ -240,10 +240,10 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
         hr = CAppUtils::AddCategory(coll, CORRESPONDING_FILES_CATEGORY, IDS_CORRESPONDING_FILES);
         if (FAILED(hr))
             return hr;
-        CAppUtils::AddCategory(coll, USER_INCLUDE_CATEGORY, IDS_USER_INCLUDES);
+        hr = CAppUtils::AddCategory(coll, USER_INCLUDE_CATEGORY, IDS_USER_INCLUDES);
         if (FAILED(hr))
             return hr;
-        CAppUtils::AddCategory(coll, SYSTEM_INCLUDE_CATEGORY, IDS_SYSTEM_INCLUDES);
+        hr = CAppUtils::AddCategory(coll, SYSTEM_INCLUDE_CATEGORY, IDS_SYSTEM_INCLUDES);
         if (FAILED(hr))
             return hr;
 
@@ -499,7 +499,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
 
 bool CCmdHeaderSource::IsValidMenuItem(size_t item) const
 {
-    return item >= 0 && item < m_menuInfo.size();
+    return item < m_menuInfo.size();
 }
 
 bool CCmdHeaderSource::OpenFileAsLanguage(const std::wstring& filename)
