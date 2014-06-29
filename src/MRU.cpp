@@ -270,31 +270,31 @@ void CMRU::Load()
     try
     {
         File.open(path);
+        if (!File.good())
+            return;
+
+        const int maxlinelength = 65535;
+
+        std::unique_ptr<wchar_t[]> line(new wchar_t[maxlinelength]);
+        do
+        {
+            File.getline(line.get(), maxlinelength);
+
+            std::wstring sLine = line.get();
+            size_t pos = sLine.find('*');
+            if (pos != std::wstring::npos)
+            {
+                std::wstring sPinned = sLine.substr(0, pos);
+                std::wstring sPath = sLine.substr(pos + 1);
+                m_mruVec.push_back(std::make_tuple(sPath, sPinned.compare(L"1") == 0));
+            }
+        } while (File.gcount() > 0);
+        File.close();
     }
     catch (std::ios_base::failure &)
     {
         return;
     }
-    if (!File.good())
-        return;
-
-    const int maxlinelength = 65535;
-
-    std::unique_ptr<wchar_t[]> line(new wchar_t[maxlinelength]);
-    do
-    {
-        File.getline(line.get(), maxlinelength);
-
-        std::wstring sLine = line.get();
-        size_t pos = sLine.find('*');
-        if (pos != std::wstring::npos)
-        {
-            std::wstring sPinned = sLine.substr(0, pos);
-            std::wstring sPath  = sLine.substr(pos+1);
-            m_mruVec.push_back(std::make_tuple(sPath, sPinned.compare(L"1")==0));
-        }
-    } while (File.gcount() > 0);
-    File.close();
 
     m_bLoaded = true;
 }
@@ -309,19 +309,19 @@ void CMRU::Save()
     try
     {
         File.open(path);
+        if (!File.good())
+            return;
+
+        for (auto t : m_mruVec)
+        {
+            File << (std::get<1>(t) ? L"1" : L"0") << L"*" << std::get<0>(t) << std::endl;
+        }
+        File.close();
     }
     catch (std::ios_base::failure &)
     {
         return;
     }
-    if (!File.good())
-        return;
-
-    for (auto t : m_mruVec)
-    {
-        File << (std::get<1>(t) ? L"1" : L"0") << L"*" << std::get<0>(t) << std::endl;
-    }
-    File.close();
 }
 
 void CMRU::PinPath( const std::wstring& path, bool bPin )
