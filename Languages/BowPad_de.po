@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-06-01 16:01+0100\n"
+"PO-Revision-Date: 2014-06-29 19:17+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -456,6 +456,10 @@ msgstr "Kopiert die Auswahl in die Zwischenablage"
 #. Resource IDs: (3772)
 msgid "Corresponding File"
 msgstr "Entsprechende Datei"
+
+#. Resource IDs: (13)
+msgid "Corresponding Files"
+msgstr "Entsprechende Dateien"
 
 #. Resource IDs: (9)
 msgid "Could not download the language file!"
@@ -1124,6 +1128,10 @@ msgstr "Nächste"
 msgid "Next Bookmark"
 msgstr "Nächstes Lesezeichen"
 
+#. Resource IDs: (13)
+msgid "No files found"
+msgstr "Keine Dateien gefunden"
+
 #. Resource IDs: (10)
 msgid "No functions found!"
 msgstr "Keine Funktionen gefunden"
@@ -1593,6 +1601,10 @@ msgstr "Stil:"
 msgid "Styles"
 msgstr "Stile:"
 
+#. Resource IDs: (13)
+msgid "System Includes"
+msgstr "System Includes"
+
 #. Resource IDs: (3768)
 msgid "T"
 msgstr "T"
@@ -1756,6 +1768,10 @@ msgstr "Verwende $0 für den ganzen Match, und $1..$99 für Gruppenmatches."
 #. Resource IDs: (3760)
 msgid "Use Tabs"
 msgstr "Tabulatoren"
+
+#. Resource IDs: (13)
+msgid "User Includes"
+msgstr "User Includes"
 
 #. Resource IDs: (3751, 3752, 3755)
 msgid "V"
