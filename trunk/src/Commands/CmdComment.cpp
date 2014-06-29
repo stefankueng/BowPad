@@ -232,7 +232,8 @@ bool CCmdUnComment::Execute()
         {
             ScintillaCall(SCI_SETSEL, range.chrg.cpMin, range.chrg.cpMax);
             ScintillaCall(SCI_REPLACESEL, 0, (sptr_t)"");
-            ScintillaCall(SCI_SETSEL, curPos-commentline.length(), curPos-commentline.length());
+            size_t newcurpos = curPos > commentline.length() ? curPos - commentline.length() : 0;
+            ScintillaCall(SCI_SETSEL, newcurpos, newcurpos);
         }
         else if (!commentstreamstart.empty() && !commentstreamend.empty())
         {
@@ -240,7 +241,7 @@ bool CCmdUnComment::Execute()
 
             Scintilla::Sci_TextToFind ttf = {0};
             ttf.chrg.cpMin = (long)curPos;
-            if (ttf.chrg.cpMin > 0)
+            if (ttf.chrg.cpMin > commentstreamstart.length())
                 ttf.chrg.cpMin--;
             ttf.chrg.cpMax = 0;
             ttf.lpstrText = const_cast<char*>(commentstreamstart.c_str());
