@@ -506,8 +506,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case SCN_MODIFYATTEMPTRO:
                     HandleWriteProtectedEdit();
                     break;
-                case SCN_HOTSPOTCLICK:
-                    HandleHotSpotClick(scn);
+                case SCN_DOUBLECLICK:
+                    return HandleDoubleClick(scn);
                     break;
                 case SCN_DWELLSTART:
                     HandleDwellStart(scn);
@@ -1564,12 +1564,11 @@ void CMainWindow::PasteHistory()
 // e.g. 0xF0F hex == 3855 decimal == 07417 octal.
 void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
 {
-    int style = (int)m_editor.Call(SCI_GETSTYLEAT, scn.position);
     // Note style will be zero if no style or past end of the document.
-    if (style & INDIC2_MASK)
+    if ((scn.position >= 0) && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position))
     {
         // an url hotspot
-        ResString str(hRes, IDS_CTRLCLICKTOOPEN);
+        ResString str(hRes, IDS_HOWTOOPENURL);
         std::string strA = CUnicodeUtils::StdGetUTF8((LPCWSTR)str);
         m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)strA.c_str());
         return;
@@ -1694,10 +1693,10 @@ void CMainWindow::HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi)
     }
 }
 
-void CMainWindow::HandleHotSpotClick(const Scintilla::SCNotification& scn)
+bool CMainWindow::HandleDoubleClick(const Scintilla::SCNotification& scn)
 {
    if (!(scn.modifiers & SCMOD_CTRL))
-       return;
+       return false;
 
     m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:;?&@=/%#()");
 
@@ -1733,6 +1732,8 @@ void CMainWindow::HandleHotSpotClick(const Scintilla::SCNotification& scn)
 
     ::ShellExecute(*this, L"open", url.c_str(), nullptr, nullptr, SW_SHOW);
     m_editor.Call(SCI_SETCHARSDEFAULT);
+
+    return true;
 }
 
 void CMainWindow::HandleSavePoint(const Scintilla::SCNotification& scn)
@@ -1774,7 +1775,6 @@ void CMainWindow::AddHotSpots()
 {
     long startPos = 0;
     long endPos = -1;
-    long endStyle = (long)m_editor.Call(SCI_GETENDSTYLED);
 
     long firstVisibleLine = (long)m_editor.Call(SCI_GETFIRSTVISIBLELINE);
     startPos = (long)m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine));
@@ -1782,10 +1782,6 @@ void CMainWindow::AddHotSpots()
     long lineCount = (long)m_editor.Call(SCI_GETLINECOUNT);
     endPos = (long)m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine + min(linesOnScreen, lineCount)));
 
-    std::vector<unsigned char> hotspotPairs;
-
-    unsigned char style_hotspot = 0;
-    unsigned char mask = INDIC2_MASK;
 
     // to speed up the search, first search for "://" without using the regex engine
     long fStartPos = startPos;
@@ -1814,68 +1810,20 @@ void CMainWindow::AddHotSpots()
             long start = long(m_editor.Call(SCI_GETTARGETSTART));
             long end = long(m_editor.Call(SCI_GETTARGETEND));
             long foundTextLen = end - start;
-            unsigned char idStyle = static_cast<unsigned char>(m_editor.Call(SCI_GETSTYLEAT, posFound));
-
-            // Search the style
-            long fs = -1;
-            for (size_t i = 0 ; i < hotspotPairs.size() ; i++)
-            {
-                // make sure to ignore "hotspot bit" when comparing document style with archived hotspot style
-                if ((hotspotPairs[i] & ~mask) == (idStyle & ~mask))
-                {
-                    fs = hotspotPairs[i];
-                    m_editor.Call(SCI_STYLEGETFORE, fs);
-                    break;
-                }
-            }
-
-            // if we found it then use it to colorize
-            if (fs != -1)
-            {
-                m_editor.Call(SCI_STARTSTYLING, start, 0xFF);
-                m_editor.Call(SCI_SETSTYLING, foundTextLen, fs);
-            }
-            else // generate a new style and add it into a array
-            {
-                style_hotspot = idStyle | mask; // set "hotspot bit"
-                hotspotPairs.push_back(style_hotspot);
-                int activeFG = 0xFF0000;
-                unsigned char idStyleMSBunset = idStyle & ~mask;
-                char fontNameA[128];
-
-                // copy the style data
-                m_editor.Call(SCI_STYLEGETFONT, idStyleMSBunset, (LPARAM)fontNameA);
-                m_editor.Call(SCI_STYLESETFONT, style_hotspot, (LPARAM)fontNameA);
-
-                m_editor.Call(SCI_STYLESETSIZE, style_hotspot, m_editor.Call(SCI_STYLEGETSIZE, idStyleMSBunset));
-                m_editor.Call(SCI_STYLESETBOLD, style_hotspot, m_editor.Call(SCI_STYLEGETBOLD, idStyleMSBunset));
-                m_editor.Call(SCI_STYLESETWEIGHT, style_hotspot, m_editor.Call(SCI_STYLEGETWEIGHT, idStyleMSBunset));
-                m_editor.Call(SCI_STYLESETITALIC, style_hotspot, m_editor.Call(SCI_STYLEGETITALIC, idStyleMSBunset));
-                m_editor.Call(SCI_STYLESETUNDERLINE, style_hotspot, m_editor.Call(SCI_STYLEGETUNDERLINE, idStyleMSBunset));
-                m_editor.Call(SCI_STYLESETFORE, style_hotspot, m_editor.Call(SCI_STYLEGETFORE, idStyleMSBunset));
-                m_editor.Call(SCI_STYLESETBACK, style_hotspot, m_editor.Call(SCI_STYLEGETBACK, idStyleMSBunset));
-                m_editor.Call(SCI_STYLESETEOLFILLED, style_hotspot, m_editor.Call(SCI_STYLEGETEOLFILLED, idStyleMSBunset));
-                m_editor.Call(SCI_STYLESETCASE, style_hotspot, m_editor.Call(SCI_STYLEGETCASE, idStyleMSBunset));
 
 
-                m_editor.Call(SCI_STYLESETHOTSPOT, style_hotspot, TRUE);
-                m_editor.Call(SCI_SETHOTSPOTACTIVEUNDERLINE, style_hotspot, TRUE);
-                m_editor.Call(SCI_SETHOTSPOTACTIVEFORE, TRUE, activeFG);
-                m_editor.Call(SCI_SETHOTSPOTSINGLELINE, style_hotspot, 0);
+            // reset indicators
+            m_editor.Call(SCI_SETINDICATORCURRENT, INDIC_URLHOTSPOT);
+            m_editor.Call(SCI_INDICATORCLEARRANGE, start, foundTextLen);
+            m_editor.Call(SCI_INDICATORCLEARRANGE, start, foundTextLen - 1);
 
-                // colorize it!
-                m_editor.Call(SCI_STARTSTYLING, start, 0xFF);
-                m_editor.Call(SCI_SETSTYLING, foundTextLen, style_hotspot);
-            }
+            m_editor.Call(SCI_INDICATORFILLRANGE, start, foundTextLen);
         }
         m_editor.Call(SCI_SETTARGETSTART, fStartPos);
         m_editor.Call(SCI_SETTARGETEND, fEndPos);
         m_editor.Call(SCI_SETSEARCHFLAGS, 0);
         posFoundColonSlash = (int)m_editor.Call(SCI_SEARCHINTARGET, 3, (LPARAM)"://");
     }
-
-    m_editor.Call(SCI_STARTSTYLING, endStyle, 0xFF);
-    m_editor.Call(SCI_SETSTYLING, 0, 0);
 }
 
 void CMainWindow::HandleUpdateUI(const Scintilla::SCNotification& scn)
