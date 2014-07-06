@@ -280,7 +280,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                     return TRUE;
                 }
             }
-            Call(SCI_SETCURSOR, (uptr_t)SC_CURSORNORMAL);
+            if (Call(SCI_GETCURSOR) == 8)
+                Call(SCI_SETCURSOR, (uptr_t)SC_CURSORNORMAL);
             if (activeset)
             {
                 Call(SCI_SETINDICATORCURRENT, INDIC_URLHOTSPOTACTIVE);
