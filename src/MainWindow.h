@@ -152,7 +152,7 @@ private:
     void                        HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi);
     // Scintilla events.
     void                        HandleDwellStart(const Scintilla::SCNotification& scn);
-    void                        HandleHotSpotClick(const Scintilla::SCNotification& scn);
+    bool                        HandleDoubleClick(const Scintilla::SCNotification& scn);
     void                        HandleCopyDataCommandLine(const COPYDATASTRUCT& cds);
     bool                        HandleCopyDataMoveTab(const COPYDATASTRUCT& cds);
     void                        HandleWriteProtectedEdit();
