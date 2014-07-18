@@ -434,44 +434,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 break;
             }
 
-            // TCN_SELCHANGE/ING events are received here from both commctrl and tabbar.cpp.
-            // commctrl sends these events with a data value of type NMHDR,
-            // which has no tabOrigin field.
-            // tabbar was sending the same TCN_SELCHANG/ING events (same numbers) here, but as
-            // a TBHDR type, and populating the tabOrigin field which is part of TBHDR.
-            // The problem of using the same message with two different data types is
-            // that it is confusing. Acordingly, code here was forwarding both of these events
-            // and values to TabNotify as TBHDR's using a cast, even though one of
-            // the events was NMHDR.
-            // In TabNotify this made it look like tabOrigin was always present but sometimes
-            // inexplicably invalid.
-            // That was becasue tabOrigin wasn't there if commctrl was sending
-            // the message as NMHDR; but was there if tabbar sent the message as TBHDR.
-            // Most code was tripped up by this duality of using the same event with
-            // two different data types, masked as one, implying tabOrigin was always populated
-            // when it wasn't. Eventually code realised tabOrigin wasn't reliable so
-            // worked around it by querying the data directly and not using tabOrigin at all
-            // in the end. So no code relies on tabOrigin because of that nor can
-            // because it can't always be present because commctrl doesn't send it.
-            // The only code that did reference tabOrigin was ASSERT code I put in previously
-            // to ASSERT if tabOrigin was valid or not, to find out what was going on.
-            // Now I know know what's going I've now removed the asserts on tabOrigin.
-            // But as notbody uses tabOrigin nor can because it's not reliable, tabbar might
-            // as well stop sending tabOrigin; and stop using TBHDR then too, to stop encouraging
-            // use of the field in an event that can't always guarantee the fields validity.
-            // So I've changed tabbar to use NMHDR for TCN_SELCHANGE/ING events, which
-            // makes tabbar consistent with the commctrl and clearing up this confusion.
-
-            // Because ICommand types expects events to be of a unified type of TBHDR,
-            // NMHDR types are packaged as real TBHDR types for them.
-            // This avoids having to change their interface for now.
-            // But also allows tabOrigin to be present incase it's referenced,
-            // but as an obviously invalid value to prevent it's use.
-            // The code and this comment makes this all clear now so it shouldn't get used.
-            // TabNotify might be better if it were broken out into individual event types
-            // as that might improve the abstraction between tabbar and ICommand
-            // and would makes the simple packaging redundant too but I've left the
-            // inteface the same while the value of that can be considered later.
             
             if (nmhdr.idFrom == (UINT_PTR)&m_TabBar || nmhdr.hwndFrom == m_TabBar)
             {
@@ -494,7 +456,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case TCN_GETCOLOR:
                 {
                     // TODO: There was a bug here and elsewhere that was making this check
-                    // neccessary. I've now fixed them both, so this test is not needed,
+                    // necessary. I've now fixed them both, so this test is not needed,
                     // but I've left this fixed test in for now while testing continues.
                     // But it can be removed once testing satisfies it really is fixed.
                     if (tbhdr.tabOrigin >= 0 && tbhdr.tabOrigin < m_TabBar.GetItemCount())
