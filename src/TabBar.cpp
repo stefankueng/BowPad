@@ -285,44 +285,63 @@ void CTabBar::SetFont(TCHAR *fontName, int fontSize)
 
 void CTabBar::ActivateAt(int index) const
 {
+    // We are about to send TCN_SELCHANGING and TCN_SELCHANGE events.
+    // commtrl sends the same events to a TabBar's owner as we do
+    // It sends them with NMHDR data, not TABHDR data.
+    // We should use NMHDR too because the receiver can't easily distinguish
+    // our message from commtrl ones and even if it could, commctrl doesn't
+    // populate the extra fields we are sending so the receiver has to
+    // have code to re-fetch these values directly so it might as well do that
+    // in our case too. That free's us to use NMHDR instead of TBHDR
+    // making our events nearly the same which is easier on the receiver.
+    
     InvalidateRect(*this, NULL, TRUE);
-    TBHDR nmhdr;
-    nmhdr.hdr.hwndFrom = *this;
-    nmhdr.hdr.code = TCN_SELCHANGING;
-    nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
-    nmhdr.tabOrigin = GetCurrentTabIndex();
+    NMHDR nmhdr;
+    nmhdr.hwndFrom = *this;
+    nmhdr.code = TCN_SELCHANGING;
     ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
     if (index >= 0)
         TabCtrl_SetCurSel(*this, index);
 
-    nmhdr.hdr.code = TCN_SELCHANGE;
-    nmhdr.tabOrigin = index;
+    nmhdr.code = TCN_SELCHANGE;
     ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
 }
 
-void CTabBar::DeletItemAt(int index)
+void CTabBar::DeleteItemAt(int index)
 {
-    if ((index == m_nItems - 1))
+    if (index == m_nItems - 1)
     {
         // prevent invisible tabs. If last visible tab is removed, other tabs are put in view but not redrawn
         // Therefore, scroll one tab to the left if only one tab visible
         if (m_nItems > 1)
         {
             RECT itemRect;
-            TabCtrl_GetItemRect(*this, index, &itemRect);
-            if (itemRect.left < 5) // if last visible tab, scroll left once (no more than 5px away should be safe, usually 2px depending on the drawing)
+            bool got = TabCtrl_GetItemRect(*this, index, &itemRect) != FALSE;
+            APPVERIFY(got);
+            if (got)
             {
-                // To scroll the tab control to the left, use the WM_HSCROLL notification
-                int wParam = MAKEWPARAM(SB_THUMBPOSITION, index - 1);
-                ::SendMessage(*this, WM_HSCROLL, wParam, 0);
+                if (itemRect.left < 5) // if last visible tab, scroll left once (no more than 5px away should be safe, usually 2px depending on the drawing)
+                {
+                    // To scroll the tab control to the left, use the WM_HSCROLL notification
+                    int wParam = MAKEWPARAM(SB_THUMBPOSITION, index - 1);
+                    ::SendMessage(*this, WM_HSCROLL, wParam, 0);
 
-                wParam = MAKEWPARAM(SB_ENDSCROLL, index - 1);
-                ::SendMessage(*this, WM_HSCROLL, wParam, 0);
+                    wParam = MAKEWPARAM(SB_ENDSCROLL, index - 1);
+                    ::SendMessage(*this, WM_HSCROLL, wParam, 0);
+                }
             }
         }
     }
-    TabCtrl_DeleteItem(*this, index);
+    // Decrement the item count before calling delete as this delete
+    // seems to initiate events (like paint) that will assume the extra
+    // item is present if it's not already accounted as gone before then,
+    // even though it is gone, but the delete itself is initiating the actions.
+    // Failure to decrement the count first will show up as assertion
+    // failures in calls to GetItemRect arond line 320 & 530 in the
+    // paint logic.
     m_nItems--;
+    bool deleted = TabCtrl_DeleteItem(*this, index) != FALSE;
+    APPVERIFY(deleted);
 }
 
 int CTabBar::GetCurrentTabIndex() const
@@ -488,8 +507,9 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             DrawMainBorder(&dis);
 
             // paint the tabs first and then the borders
-            int nTab = GetItemCount();
-            int nSel = TabCtrl_GetCurSel(*this);
+            int count = GetItemCount();
+            APPVERIFY(count>=0);
+            int nTab = count;
 
             if (!nTab) // no pages added
             {
@@ -498,31 +518,47 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 return 0;
             }
 
-            while (nTab--)
+            int nSel = TabCtrl_GetCurSel(*this);
+
+            do
             {
+                --nTab;
                 if (nTab != nSel)
                 {
+                    APPVERIFY(nTab>=0 && nTab<count);
                     dis.itemID = nTab;
                     dis.itemState = 0;
 
-                    TabCtrl_GetItemRect(*this, nTab, &dis.rcItem);
+                    // Curiously we may not be able to get this always at
+                    // any time.
+                    bool got = TabCtrl_GetItemRect(*this, nTab, &dis.rcItem) != FALSE;
+                    APPVERIFY(got);
+                    if (got)
+                    {
+                        dis.rcItem.bottom -= 2;
+                        DrawItem(&dis);
+                        DrawItemBorder(&dis);
+                    }
+                }
+            } while (nTab > 0);
 
-                    dis.rcItem.bottom -= 2;
+            if (nSel != -1)
+            {
+                APPVERIFY(nSel>=0 && nSel<count);
+                // now selected tab
+                dis.itemID = nSel;
+                dis.itemState = ODS_SELECTED;
+
+                bool got = TabCtrl_GetItemRect(*this, nSel, &dis.rcItem) != FALSE;
+                APPVERIFY(got);
+                if (got)
+                {
+                    dis.rcItem.bottom += 2;
+                    dis.rcItem.top -= 2;
                     DrawItem(&dis);
                     DrawItemBorder(&dis);
                 }
             }
-
-            // now selected tab
-            dis.itemID = nSel;
-            dis.itemState = ODS_SELECTED;
-
-            TabCtrl_GetItemRect(*this, nSel, &dis.rcItem);
-
-            dis.rcItem.bottom += 2;
-            dis.rcItem.top -= 2;
-            DrawItem(&dis);
-            DrawItemBorder(&dis);
 
             SelectObject(hDC, hOldFont);
             EndPaint(*this, &ps);
@@ -546,10 +582,9 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             }
 
             ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
-            int currentTabOn = TabCtrl_GetCurSel(*this);
-
             if (wParam == 2)
                 return TRUE;
+            int currentTabOn = TabCtrl_GetCurSel(*this);
 
             m_nSrcTab = m_nTabDragged = currentTabOn;
 
@@ -1048,7 +1083,11 @@ int CTabBar::GetIDFromIndex(int index) const
     TCITEM tci;
     tci.mask = TCIF_PARAM;
     auto result = TabCtrl_GetItem(*this, index, &tci);
-    return result ? (int)tci.lParam : -1;
+    // Easier to set a break point on failed results.
+    if (result)
+        return (int)tci.lParam;
+    else
+        return -1;
 }
 
 int CTabBar::GetIndexFromID(int id) const
