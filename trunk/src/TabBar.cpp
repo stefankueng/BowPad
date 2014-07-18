@@ -575,7 +575,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 TBHDR nmhdr;
                 nmhdr.hdr.hwndFrom = *this;
                 nmhdr.hdr.code = TCN_REFRESH;
-                nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
+                nmhdr.hdr.idFrom = reinterpret_cast<UINT_PTR>(this);
                 nmhdr.tabOrigin = 0;
                 ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
                 return TRUE;
@@ -602,7 +602,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             TBHDR nmhdr;
             nmhdr.hdr.hwndFrom = *this;
             nmhdr.hdr.code = NM_CLICK;
-            nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
+            nmhdr.hdr.idFrom = reinterpret_cast<UINT_PTR>(this);
             nmhdr.tabOrigin = currentTabOn;
 
             ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
@@ -692,7 +692,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 TBHDR nmhdr;
                 nmhdr.hdr.hwndFrom = *this;
                 nmhdr.hdr.code = m_bIsDraggingInside ? TCN_TABDROPPED : TCN_TABDROPPEDOUTSIDE;
-                nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
+                nmhdr.hdr.idFrom = reinterpret_cast<UINT_PTR>(this);
                 nmhdr.tabOrigin = m_nTabDragged;
                 ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
                 return TRUE;
@@ -703,7 +703,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 TBHDR nmhdr;
                 nmhdr.hdr.hwndFrom = *this;
                 nmhdr.hdr.code = TCN_TABDELETE;
-                nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
+                nmhdr.hdr.idFrom = reinterpret_cast<UINT_PTR>(this);
                 nmhdr.tabOrigin = currentTabOn;
                 ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
 
@@ -743,7 +743,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             TBHDR nmhdr;
             nmhdr.hdr.hwndFrom = *this;
             nmhdr.hdr.code = TCN_TABDELETE;
-            nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
+            nmhdr.hdr.idFrom = reinterpret_cast<UINT_PTR>(this);
             nmhdr.tabOrigin = currentTabOn;
             ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
 
@@ -806,7 +806,7 @@ COLORREF CTabBar::GetTabColor(bool bSelected, UINT item)
     TBHDR nmhdr;
     nmhdr.hdr.hwndFrom = *this;
     nmhdr.hdr.code = TCN_GETCOLOR;
-    nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
+    nmhdr.hdr.idFrom = reinterpret_cast<UINT_PTR>(this);
     nmhdr.tabOrigin = item;
     COLORREF clr = (COLORREF)::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
     float lighterfactor = 1.1f;
@@ -1045,7 +1045,7 @@ void CTabBar::ExchangeItemData(POINT point)
             TBHDR nmhdr;
             nmhdr.hdr.hwndFrom = *this;
             nmhdr.hdr.code = TCN_ORDERCHANGED;
-            nmhdr.hdr.idFrom = reinterpret_cast<unsigned int>(this);
+            nmhdr.hdr.idFrom = reinterpret_cast<UINT_PTR>(this);
             nmhdr.tabOrigin = nTab;
             ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
         }
