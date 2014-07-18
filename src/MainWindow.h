@@ -145,8 +145,8 @@ private:
     void                        HandleAfterInit();
     void                        HandleDropFiles(HDROP hDrop);
     void                        HandleTabDroppedOutside(int tab, POINT pt);
-    void                        HandleTabChange(const TBHDR& tbhdr);
-    void                        HandleTabChanging(const TBHDR& tbhdr);
+    void                        HandleTabChange(const NMHDR& tbhdr);
+    void                        HandleTabChanging(const NMHDR& tbhdr);
     void                        HandleTabDelete(const TBHDR& tbhdr);
     void                        HandleClipboardUpdate();
     void                        HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi);
