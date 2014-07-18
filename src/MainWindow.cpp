@@ -455,10 +455,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 {
                 case TCN_GETCOLOR:
                 {
-                    // TODO: There was a bug here and elsewhere that was making this check
-                    // necessary. I've now fixed them both, so this test is not needed,
-                    // but I've left this fixed test in for now while testing continues.
-                    // But it can be removed once testing satisfies it really is fixed.
                     if (tbhdr.tabOrigin >= 0 && tbhdr.tabOrigin < m_TabBar.GetItemCount())
                     {
                         int docId = m_TabBar.GetIDFromIndex(tbhdr.tabOrigin);
