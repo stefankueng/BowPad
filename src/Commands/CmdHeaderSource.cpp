@@ -22,10 +22,10 @@ OVERVIEW
 Clicking the list part of the Corresponding File button causes BP to display
 a menu of filenames.
 
-The list contains "Corressponding" files and (if the language is set to C/C++) 
+The list contains "Corresponding" files and (if the language is set to C/C++)
 C++ User Include files and C++ System Include files. Filenames may be absolute or relative.
 
-The "Corresponding Files" list contains files that match the 
+The "Corresponding Files" list contains files that match the
 filename of the current document up to but excluding the first ".".
 The name after the first "." is termed the "long" extension.
 So given test.aspx.cs, "aspx.cs" is the long extension. "test" is the filename
@@ -41,7 +41,7 @@ Clicking a filename in the list causes BP to open the physical file it represent
 As BP has no project system, BP might not always find a physical file match for
 every include file it presents and for the same reason it might find the wrong file.
 BP signals files that can't be found by showing ellipses "..." after their name.
-When a wrong file is found, there is know way to know unless the user realises,
+When a wrong file is found, there is know way to know unless the user realizes,
 so it's important the user be mindful that this can happen and why, to not get caught out.
 
 User includes files are found by searching for them in the folder of the active document.
@@ -89,7 +89,7 @@ b) BP can pre-populate the file name for the File Open Dialog if the user clicks
 which wouldn't be done otherwise if it wasn't listed.
 c) allows BP to assume the language will be C/C++ so the user never has to set it
 manually. This is useful as some file types which aren't safe to assume language type
-from (e.g. .inc or .inl files) and where there is no type extension 
+from (e.g. .inc or .inl files) and where there is no type extension
 like C++ system include files.
 
 A full list serves as a one click discoverability tool to determine exactly what
@@ -108,7 +108,7 @@ as the current file but with the right extension.
 Multiple files can be listed on the right side. BP will search for each file
 in order until it finds a match.
 The table below is actually the defaults but the user can override the
-defaults by defining the table below with just what they want to addtionally define.
+defaults by defining the table below with just what they want to additionally define.
 
 [corresponding_files_ext_map]
 cpp=hpp;h
@@ -119,7 +119,7 @@ aspx=aspx.cs;aspx.vb
 aspx.cs=aspx
 
 Provision of such a mapping for C++ ensures that a one click action is possible and
-prevents presenting listing of alternative files for a file type when that anternative
+prevents presenting listing of alternative files for a file type when that alternative
 list is never desirable.
 e.g. If you are editing test.cpp, you would never want test.db, it's a database file.
 If you are editing test.hpp, you'd likely never want test.c, only test.cpp
@@ -182,162 +182,6 @@ const int CORRESPONDING_FILES_CATEGORY = 1;
 const int USER_INCLUDE_CATEGORY = 2;
 const int SYSTEM_INCLUDE_CATEGORY = 3;
 
-
-static bool GetDefaultCorrespondingFileExtMappings(
-    const std::wstring& from,
-    std::wstring& to
-)
-{
-    to.clear();
-
-    // Find an entry on the left that matches the given name
-    // and return the list on the right.
-    const struct {
-        LPCWSTR from;
-        LPCWSTR to;
-    } default_ext_map[] = {
-        // Order is important. Multiple matches expected.
-        // Caller will try files in order of generated results.
-        { L"cpp",     L"hpp;h" },
-        { L"cxx",     L"hpp;h" },
-        { L"h",       L"c;cpp" },
-        { L"hpp",     L"cpp;cxx" },
-        { L"aspx.cs", L"aspx" },
-        { L"aspx",    L"aspx.cs;aspx.vb" }
-    };
-
-    for (const auto& me : default_ext_map)
-    {
-        if (CPathUtils::PathCompare(from, me.from) ==0)
-        {
-            to = me.to;
-            return true;
-        }
-    }
-    return false;
-}
-
-static void GetCorrespondingFileMappings(
-    const std::wstring& input_filename,
-    std::vector<std::wstring>& corresponding_filenames
-)
-{
-    // Let the user override our defaults for an extension.
-    std::wstring from_ext = CPathUtils::GetLongFileExtension(input_filename);
-    std::wstring to_list;
-    LPCWSTR item = CIniSettings::Instance().GetString(
-        L"corresponding_files_extension_map", from_ext.c_str());
-    if (item != nullptr)
-        to_list = item;
-    else
-        GetDefaultCorrespondingFileExtMappings(from_ext, to_list);
-
-    std::vector<std::wstring> to_exts;
-    stringtok(to_exts, to_list, false, L";");
-    std::wstring base_filename = CPathUtils::RemoveLongExtension(input_filename);
-    for (const std::wstring& to_ext : to_exts)
-    {
-        std::wstring corresponding_file;
-        corresponding_file = base_filename;
-        corresponding_file += L".";
-        corresponding_file += to_ext;
-        corresponding_filenames.push_back(std::move(corresponding_file));
-    }
-}
-
-// TODO! I'm reusable. Put me somewhere useful.
-static bool ShowDropDownList(HWND hWnd, LPCWSTR ctrlName)
-{
-    // open the dropdown gallery using windows automation
-    IUIAutomationPtr pAutomation;
-    if (CAppUtils::FailedShowMessage(CoCreateInstance(__uuidof(CUIAutomation), NULL, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), (void **)&pAutomation)))
-        return false;
-    // get the top element of this app window
-    IUIAutomationElementPtr pParent;
-    if (CAppUtils::FailedShowMessage(pAutomation->ElementFromHandle(hWnd, &pParent)))
-        return false;
-    // set up conditions to find the control
-    // first condition is the name 
-    // second condition is the accessibility role id, which is 0x38 for a dropdown control
-    // the second condition is required since there's also a normal button with the same name:
-    // the default button of the dropdown gallery
-    IUIAutomationConditionPtr pCondition;
-    VARIANT varProp;
-    varProp.vt = VT_BSTR;
-    varProp.bstrVal = SysAllocString(ctrlName);
-    if (CAppUtils::FailedShowMessage(pAutomation->CreatePropertyCondition(UIA_NamePropertyId, varProp, &pCondition)))
-        return false;
-    varProp.vt = VT_INT;
-    varProp.intVal = 0x38;
-    IUIAutomationConditionPtr pCondition2;
-    if (CAppUtils::FailedShowMessage(pAutomation->CreatePropertyCondition(UIA_LegacyIAccessibleRolePropertyId, varProp, &pCondition2)))
-        return false;
-    // both conditions must be true
-    IUIAutomationConditionPtr pCondition3;
-    if (CAppUtils::FailedShowMessage(pAutomation->CreateAndCondition(pCondition, pCondition2, &pCondition3)))
-        return false;
-    // now try to find the control
-    IUIAutomationElementPtr pFound;
-    if (CAppUtils::FailedShowMessage(pParent->FindFirst(TreeScope_Descendants, pCondition3, &pFound)))
-        return false;
-
-    // the the invoke pattern of the control so we can invoke it
-    IUIAutomationInvokePatternPtr pInvoke;
-    if (CAppUtils::FailedShowMessage(pFound->GetCurrentPatternAs(UIA_InvokePatternId, __uuidof(IUIAutomationInvokePattern), (void **)&pInvoke)))
-        return false;
-    // finally, invoke the command which drops down the gallery
-    pInvoke->Invoke();
-    pFound->SetFocus();
-    return true;
-}
-
-static bool GetCPPIncludePathsForMS(std::wstring& systemIncludePaths)
-{
-    systemIncludePaths.clear();
-    // try to find sensible default paths
-    PWSTR programfiles = 0;
-    HRESULT hr = SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &programfiles);
-    if (CAppUtils::FailedShowMessage(hr))
-        return false;
-    // first the windows sdks
-    std::vector<std::wstring> sdkvers = { 
-        L"v8.1A", L"v8.1", L"v8.0A", L"v8.0", 
-        L"v7.1A", L"v7.1", L"v7.0A", L"v7.0" };
-    for (const auto& ver : sdkvers)
-    {
-        std::wstring sTestPath = CStringUtils::Format(L"%s\\Microsoft SDKs\\Windows\\%s\\Include", programfiles, ver);
-        if (PathFileExists(sTestPath.c_str()))
-        {
-            systemIncludePaths += sTestPath;
-            systemIncludePaths += L";";
-            // The user shouldn't be mixing sdks, paths shouldn't be accumulative.
-            break;
-        }
-    }
-
-    // now go through the visual studio paths
-    std::vector<std::wstring> vsvers = {
-        L"Microsoft Visual Studio 13.0", L"Microsoft Visual Studio 12.0", 
-        L"Microsoft Visual Studio 11.0", L"Microsoft Visual Studio 10.0" };
-    for (const auto& ver : vsvers)
-    {
-        std::wstring sTestPath = CStringUtils::Format(L"%s\\%s\\VC\\include", programfiles, ver.c_str());
-        if (PathFileExists(sTestPath.c_str()))
-        {
-            systemIncludePaths += sTestPath;
-            systemIncludePaths += L";";
-            sTestPath = CStringUtils::Format(L"%s\\%s\\VC\\atlmfc\\include", programfiles, ver.c_str());
-            if (PathFileExists(sTestPath.c_str()))
-            {
-                systemIncludePaths += sTestPath;
-                systemIncludePaths += L";";
-            }
-            // The user shouldn't be mixing VC versions, path shouldn't be accumulative.
-            break;
-        }
-    }
-    return true;
-}
 
 bool CCmdHeaderSource::UserFindFile(HWND hwndParent, const std::wstring& filename,
                                     const std::wstring& defaultFolder,
@@ -765,7 +609,7 @@ void CCmdHeaderSource::TabNotify(TBHDR * ptbhdr)
 {
     // Include list will be stale now.        
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
-        InvalidateIncludes(); 
+        InvalidateIncludes();
 }
 
 void CCmdHeaderSource::ScintillaNotify(Scintilla::SCNotification * pScn)
@@ -820,7 +664,7 @@ bool CCmdHeaderSource::Execute()
         for (const std::wstring& filename : correspondingFiles)
         {
             correspondingFile = CPathUtils::Append(basePath, filename);
-            if (_waccess(correspondingFile.c_str(), 0)==0)
+            if (_waccess(correspondingFile.c_str(), 0) == 0)
             {
                 SetInsertionIndex(GetActiveTabIndex());
                 return OpenFile(correspondingFile.c_str(), true);
@@ -829,37 +673,25 @@ bool CCmdHeaderSource::Execute()
 
         // Automatically loading a file just because it is the only file
         // there and it happens to have a similar filename to the file
-        // currently being edited, is a dubious thing to do.
-        // It basically can be seen to be equivalent to opening any random
-        // file just because it's there. We don't know the user want that file,
-        // and they may not even be sure what file is there and even if a file
-        // is there, it isn't guaranteed to be something they want anyway.
-        // It may even harm the session if it's some massive temp or db file.
+        // currently being edited can be bad.
         // For example, if you're editing test.cpp and there is a test.db
         // you don't want to load a database ever.
+        //
         // You can filter files out but you might not want to, for example:
         // If you are editing test.cpp, you are unlikely to
         // want test.aspx.cs just because it's the only other file there
         // and you definitely don't want to filter that file out.
         // You want to see it and and switch to it you are editing test.aspx.
         // For all these reasons, autoload should be switched off by default,
-        // If the user wants to load files, they should add a file mapping
-        // because that actually then works better than autoload because
-        // then that file will autoload even in the presence of other
-        // less desirable files instead of getting a menu which is better
-        // than just force autoload-ing any file that happens to be there.
-        // If the user really wants to autoload files to avoid proper configuration,
-        // then autoload can be set on, but then they can be prepared
-        // for seeing what might be random files appearing.
-
+        // If the user wants to load files, they should add a file mapping.
+        //
         // Explicit mappings help reduce that problems of file clashings and provide
         // priorities where otherwise there might be a conflict or a wrong choice;
         // and it keep things to one click that should be one click even in the presence
         // of similar files. (see OVERVIEW)
         // The user needs a way of preventing/allowing files to be automatically opened
         // though.
-        bool autoload = CIniSettings::Instance().GetInt64(
-            L"corresponding_files", L"autoload", 0) != 0; // See comment above why default is 0.
+        bool autoload = CIniSettings::Instance().GetInt64(L"corresponding_files", L"autoload", 0) != 0; // See comment above why default is 0.
         // Don't try to autoload files that have mappings, if the file
         // wasn't there, it doesn't mean we want just any old file instead.
         if (correspondingFile.size() > 0)
@@ -874,7 +706,7 @@ bool CCmdHeaderSource::Execute()
         // Note the menu is always shown if all other paths have been exhausted so
         // that the user doesn't think the button didn't work.
         ResString ctrlName(hRes, cmdHeaderSource_LabelTitle_RESID);
-        return ShowDropDownList(GetHwnd(), ctrlName);
+        return CAppUtils::ShowDropDownList(GetHwnd(), ctrlName);
     }
 
     return false;
@@ -978,10 +810,7 @@ bool CCmdHeaderSource::ShowSingleFileSelectionDialog(HWND hWndParent, const std:
 // Ignore any files that have certain extensions.
 // e.g. Given a name like c:\test\test.cpp,
 // return {c:\test\test.h and test.h} but ignore c:\test\test.exe.
-// Doesn't need to be /benefit from being a member function.
-void CCmdHeaderSource::GetFilesWithSameName(
-    const std::wstring& targetPath,
-    std::vector<std::wstring>& matchingfiles) const
+void CCmdHeaderSource::GetFilesWithSameName(const std::wstring& targetPath, std::vector<std::wstring>& matchingfiles) const
 {
     std::wstring targetExt = CPathUtils::GetFileExtension(targetPath);
 
@@ -1220,3 +1049,108 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
     includes.erase(newEnd, includes.end());
     return true;
 }
+
+bool CCmdHeaderSource::GetDefaultCorrespondingFileExtMappings(const std::wstring& from, std::wstring& to)
+{
+    to.clear();
+
+    // Find an entry on the left that matches the given name
+    // and return the list on the right.
+    const struct
+    {
+        LPCWSTR from;
+        LPCWSTR to;
+    } default_ext_map[] = {
+        // Order is important. Multiple matches expected.
+        // Caller will try files in order of generated results.
+            { L"cpp", L"hpp;h" },
+            { L"cxx", L"hpp;h" },
+            { L"h", L"c;cpp" },
+            { L"hpp", L"cpp;cxx" },
+            { L"aspx.cs", L"aspx" },
+            { L"aspx", L"aspx.cs;aspx.vb" }
+    };
+
+    for (const auto& me : default_ext_map)
+    {
+        if (CPathUtils::PathCompare(from, me.from) == 0)
+        {
+            to = me.to;
+            return true;
+        }
+    }
+    return false;
+}
+
+void CCmdHeaderSource::GetCorrespondingFileMappings(const std::wstring& input_filename, std::vector<std::wstring>& corresponding_filenames)
+{
+    // Let the user override our defaults for an extension.
+    std::wstring from_ext = CPathUtils::GetLongFileExtension(input_filename);
+    std::wstring to_list;
+    LPCWSTR item = CIniSettings::Instance().GetString(L"corresponding_files_extension_map", from_ext.c_str());
+    if (item != nullptr)
+        to_list = item;
+    else
+        GetDefaultCorrespondingFileExtMappings(from_ext, to_list);
+
+    std::vector<std::wstring> to_exts;
+    stringtok(to_exts, to_list, false, L";");
+    std::wstring base_filename = CPathUtils::RemoveLongExtension(input_filename);
+    for (const std::wstring& to_ext : to_exts)
+    {
+        std::wstring corresponding_file;
+        corresponding_file = base_filename;
+        corresponding_file += L".";
+        corresponding_file += to_ext;
+        corresponding_filenames.push_back(std::move(corresponding_file));
+    }
+}
+
+bool CCmdHeaderSource::GetCPPIncludePathsForMS(std::wstring& systemIncludePaths)
+{
+    systemIncludePaths.clear();
+    // try to find sensible default paths
+    PWSTR programfiles = 0;
+    HRESULT hr = SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &programfiles);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+    // first the windows sdks
+    std::vector<std::wstring> sdkvers = {
+        L"v8.1A", L"v8.1", L"v8.0A", L"v8.0",
+        L"v7.1A", L"v7.1", L"v7.0A", L"v7.0" };
+    for (const auto& ver : sdkvers)
+    {
+        std::wstring sTestPath = CStringUtils::Format(L"%s\\Microsoft SDKs\\Windows\\%s\\Include", programfiles, ver);
+        if (PathFileExists(sTestPath.c_str()))
+        {
+            systemIncludePaths += sTestPath;
+            systemIncludePaths += L";";
+            // The user shouldn't be mixing sdks, paths shouldn't be accumulative.
+            break;
+        }
+    }
+
+    // now go through the visual studio paths
+    std::vector<std::wstring> vsvers = {
+        L"Microsoft Visual Studio 13.0", L"Microsoft Visual Studio 12.0",
+        L"Microsoft Visual Studio 11.0", L"Microsoft Visual Studio 10.0" };
+    for (const auto& ver : vsvers)
+    {
+        std::wstring sTestPath = CStringUtils::Format(L"%s\\%s\\VC\\include", programfiles, ver.c_str());
+        if (PathFileExists(sTestPath.c_str()))
+        {
+            systemIncludePaths += sTestPath;
+            systemIncludePaths += L";";
+            sTestPath = CStringUtils::Format(L"%s\\%s\\VC\\atlmfc\\include", programfiles, ver.c_str());
+            if (PathFileExists(sTestPath.c_str()))
+            {
+                systemIncludePaths += sTestPath;
+                systemIncludePaths += L";";
+            }
+            // The user shouldn't be mixing VC versions, path shouldn't be accumulative.
+            break;
+        }
+    }
+    return true;
+}
+

@@ -359,10 +359,53 @@ HRESULT CAppUtils::AddCategory(IUICollectionPtr& coll, int catId, int catNameRes
     return hr;
 }
 
-
-
 HRESULT CAppUtils::AddResStringItem(IUICollectionPtr& collection, int resId, int cat, IUIImage * pImg)
 {
     ResString rs(hRes, resId);
     return AddStringItem(collection, rs, cat, pImg);
+}
+
+bool CAppUtils::ShowDropDownList(HWND hWnd, LPCWSTR ctrlName)
+{
+    // open the dropdown gallery using windows automation
+    IUIAutomationPtr pAutomation;
+    if (CAppUtils::FailedShowMessage(CoCreateInstance(__uuidof(CUIAutomation), NULL, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), (void **)&pAutomation)))
+        return false;
+    // get the top element of this app window
+    IUIAutomationElementPtr pParent;
+    if (CAppUtils::FailedShowMessage(pAutomation->ElementFromHandle(hWnd, &pParent)))
+        return false;
+    // set up conditions to find the control
+    // first condition is the name 
+    // second condition is the accessibility role id, which is 0x38 for a dropdown control
+    // the second condition is required since there's also a normal button with the same name:
+    // the default button of the dropdown gallery
+    IUIAutomationConditionPtr pCondition;
+    VARIANT varProp;
+    varProp.vt = VT_BSTR;
+    varProp.bstrVal = SysAllocString(ctrlName);
+    if (CAppUtils::FailedShowMessage(pAutomation->CreatePropertyCondition(UIA_NamePropertyId, varProp, &pCondition)))
+        return false;
+    varProp.vt = VT_INT;
+    varProp.intVal = 0x38;
+    IUIAutomationConditionPtr pCondition2;
+    if (CAppUtils::FailedShowMessage(pAutomation->CreatePropertyCondition(UIA_LegacyIAccessibleRolePropertyId, varProp, &pCondition2)))
+        return false;
+    // both conditions must be true
+    IUIAutomationConditionPtr pCondition3;
+    if (CAppUtils::FailedShowMessage(pAutomation->CreateAndCondition(pCondition, pCondition2, &pCondition3)))
+        return false;
+    // now try to find the control
+    IUIAutomationElementPtr pFound;
+    if (CAppUtils::FailedShowMessage(pParent->FindFirst(TreeScope_Descendants, pCondition3, &pFound)))
+        return false;
+
+    // the the invoke pattern of the control so we can invoke it
+    IUIAutomationInvokePatternPtr pInvoke;
+    if (CAppUtils::FailedShowMessage(pFound->GetCurrentPatternAs(UIA_InvokePatternId, __uuidof(IUIAutomationInvokePattern), (void **)&pInvoke)))
+        return false;
+    // finally, invoke the command which drops down the gallery
+    pInvoke->Invoke();
+    pFound->SetFocus();
+    return true;
 }
