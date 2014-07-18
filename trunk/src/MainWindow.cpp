@@ -434,9 +434,55 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 break;
             }
 
-            if ((nmhdr.idFrom == (UINT_PTR)&m_TabBar) ||
-                (nmhdr.hwndFrom == m_TabBar))
+            // TCN_SELCHANGE/ING events are received here from both commctrl and tabbar.cpp.
+            // commctrl sends these events with a data value of type NMHDR,
+            // which has no tabOrigin field.
+            // tabbar was sending the same TCN_SELCHANG/ING events (same numbers) here, but as
+            // a TBHDR type, and populating the tabOrigin field which is part of TBHDR.
+            // The problem of using the same message with two different data types is
+            // that it is confusing. Acordingly, code here was forwarding both of these events
+            // and values to TabNotify as TBHDR's using a cast, even though one of
+            // the events was NMHDR.
+            // In TabNotify this made it look like tabOrigin was always present but sometimes
+            // inexplicably invalid.
+            // That was becasue tabOrigin wasn't there if commctrl was sending
+            // the message as NMHDR; but was there if tabbar sent the message as TBHDR.
+            // Most code was tripped up by this duality of using the same event with
+            // two different data types, masked as one, implying tabOrigin was always populated
+            // when it wasn't. Eventually code realised tabOrigin wasn't reliable so
+            // worked around it by querying the data directly and not using tabOrigin at all
+            // in the end. So no code relies on tabOrigin because of that nor can
+            // because it can't always be present because commctrl doesn't send it.
+            // The only code that did reference tabOrigin was ASSERT code I put in previously
+            // to ASSERT if tabOrigin was valid or not, to find out what was going on.
+            // Now I know know what's going I've now removed the asserts on tabOrigin.
+            // But as notbody uses tabOrigin nor can because it's not reliable, tabbar might
+            // as well stop sending tabOrigin; and stop using TBHDR then too, to stop encouraging
+            // use of the field in an event that can't always guarantee the fields validity.
+            // So I've changed tabbar to use NMHDR for TCN_SELCHANGE/ING events, which
+            // makes tabbar consistent with the commctrl and clearing up this confusion.
+
+            // Because ICommand types expects events to be of a unified type of TBHDR,
+            // NMHDR types are packaged as real TBHDR types for them.
+            // This avoids having to change their interface for now.
+            // But also allows tabOrigin to be present incase it's referenced,
+            // but as an obviously invalid value to prevent it's use.
+            // The code and this comment makes this all clear now so it shouldn't get used.
+            // TabNotify might be better if it were broken out into individual event types
+            // as that might improve the abstraction between tabbar and ICommand
+            // and would makes the simple packaging redundant too but I've left the
+            // inteface the same while the value of that can be considered later.
+            
+            if (nmhdr.idFrom == (UINT_PTR)&m_TabBar || nmhdr.hwndFrom == m_TabBar)
             {
+                TBHDR tbh;
+                if (nmhdr.idFrom != (UINT_PTR)&m_TabBar)
+                {                    
+                    tbh.hdr = nmhdr; // See comment above.
+                    tbh.tabOrigin = ~0; // Obviously bogus value.
+                    lParam = (LPARAM) &tbh;
+                }
+
                 TBHDR* ptbhdr = reinterpret_cast<TBHDR*>(lParam);
                 const TBHDR& tbhdr = *ptbhdr;
                 assert(tbhdr.hdr.code == nmhdr.code);
@@ -446,18 +492,30 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 switch (nmhdr.code)
                 {
                 case TCN_GETCOLOR:
-                    if ((tbhdr.tabOrigin >= 0) && (tbhdr.tabOrigin < m_DocManager.GetCount()))
+                {
+                    // TODO: There was a bug here and elsewhere that was making this check
+                    // neccessary. I've now fixed them both, so this test is not needed,
+                    // but I've left this fixed test in for now while testing continues.
+                    // But it can be removed once testing satisfies it really is fixed.
+                    if (tbhdr.tabOrigin >= 0 && tbhdr.tabOrigin < m_TabBar.GetItemCount())
                     {
-                        int id = m_TabBar.GetIDFromIndex(tbhdr.tabOrigin);
-                        if (m_DocManager.HasDocumentID(id))
-                            return CTheme::Instance().GetThemeColor(m_DocManager.GetColorForDocument(id));
+                        int docId = m_TabBar.GetIDFromIndex(tbhdr.tabOrigin);
+                        APPVERIFY(docId >= 0);
+                        if (m_DocManager.HasDocumentID(docId))
+                        {
+                            auto clr = m_DocManager.GetColorForDocument(docId);
+                            return CTheme::Instance().GetThemeColor(clr);
+                        }
                     }
+                    else
+                        APPVERIFY(false);
                     break;
+                }
                 case TCN_SELCHANGE:
-                    HandleTabChange(tbhdr);
+                    HandleTabChange(nmhdr);
                     break;
                 case TCN_SELCHANGING:
-                    HandleTabChanging(tbhdr);
+                    HandleTabChanging(nmhdr);
                     break;
                 case TCN_TABDELETE:
                     HandleTabDelete(tbhdr);
@@ -1084,8 +1142,11 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
 
     CCommandHandler::Instance().OnDocumentClose(tab);
 
-    m_DocManager.RemoveDocument(m_TabBar.GetIDFromIndex(tab));
-    m_TabBar.DeletItemAt(tab);
+    // Prefer to remove the document after the tab has gone as it supports it
+    // and deletion causes events that may expect it to be there.
+    int docId = m_TabBar.GetIDFromIndex(tab);
+    m_TabBar.DeleteItemAt(tab);
+    m_DocManager.RemoveDocument(docId);
     EnsureAtLeastOneTab();
     m_TabBar.ActivateAt(tab < m_TabBar.GetItemCount() ? tab : m_TabBar.GetItemCount()-1);
     return true;
@@ -1678,13 +1739,13 @@ void CMainWindow::HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi)
     HWND hWin = ::RealChildWindowFromPoint(*this, p);
     if (hWin == m_TabBar)
     {
-        int id = m_TabBar.GetIDFromIndex(tab);
-        if (id >= 0)
+        int docId = m_TabBar.GetIDFromIndex(tab);
+        if (docId >= 0)
         {
-            if (m_DocManager.HasDocumentID(id))
+            if (m_DocManager.HasDocumentID(docId))
             {
-                CDocument doc = m_DocManager.GetDocumentFromID(id);
-                m_tooltipbuffer = std::unique_ptr<wchar_t[]>(new wchar_t[doc.m_path.size()+1]);
+                CDocument doc = m_DocManager.GetDocumentFromID(docId);
+                m_tooltipbuffer = std::make_unique<wchar_t[]>(doc.m_path.size()+1);
                 wcscpy_s(m_tooltipbuffer.get(), doc.m_path.size()+1, doc.m_path.c_str());
                 lpnmtdi->lpszText = m_tooltipbuffer.get();
                 lpnmtdi->hinst = nullptr;
@@ -1915,7 +1976,7 @@ void CMainWindow::OpenNewTab()
     m_insertionIndex = -1;
 }
 
-void CMainWindow::HandleTabChanging(const TBHDR& /*tbhdr*/)
+void CMainWindow::HandleTabChanging(const NMHDR& /*nmhdr*/)
 {
     // document is about to be deactivated
     int docID = m_TabBar.GetCurrentTabId();
@@ -1927,10 +1988,9 @@ void CMainWindow::HandleTabChanging(const TBHDR& /*tbhdr*/)
     }
 }
 
-void CMainWindow::HandleTabChange(const TBHDR& ptbhdr)
+void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
 {
     int curTab = m_TabBar.GetCurrentTabIndex();
-    APPVERIFY(ptbhdr.tabOrigin == curTab);
     // document got activated
     int docID = m_TabBar.GetCurrentTabId();
     // Can't do much if no document for this tab.
@@ -2015,8 +2075,10 @@ bool CMainWindow::OpenFileEx(const std::wstring& file, unsigned int openFlags)
                 CDocument existDoc = m_DocManager.GetDocumentFromID(docID);
                 if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH)==0) && (m_editor.Call(SCI_CANUNDO)==0))
                 {
+                    m_TabBar.DeleteItemAt(0);
+                    // Prefer to remove the document after the tab has gone as it supports it
+                    // and deletion causes events that may expect it to be there.
                     m_DocManager.RemoveDocument(docID);
-                    m_TabBar.DeletItemAt(0);
                 }
             }
             if (bAddToMRU)
@@ -2108,7 +2170,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
     for (int i = 0 ; i < filesDropped ; ++i)
     {
         UINT len = DragQueryFile(hDrop, i, nullptr, 0);
-        std::unique_ptr<wchar_t[]> pathBuf(new wchar_t[len+1]);
+        auto pathBuf = std::make_unique<wchar_t[]>(len+1);
         DragQueryFile(hDrop, i, pathBuf.get(), len+1);
         files.push_back(pathBuf.get());
     }
@@ -2299,7 +2361,7 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
             }
             else
             {
-                // TODO. Work in progress.
+                // TODO.
                 // On error, in theory the sender or receiver or both can display an error.
                 // Until it's clear what set of errors and handling is required just throw
                 // up a simple dialog box this side. In theory the receiver may even crash
@@ -2320,20 +2382,14 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
     SHELLEXECUTEINFO shExecInfo = { };
     shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 
-    //shExecInfo.fMask = NULL;
     shExecInfo.hwnd = *this;
     shExecInfo.lpVerb = L"open";
     shExecInfo.lpFile = modpath.c_str();
     shExecInfo.lpParameters = cmdline.c_str();
-    //shExecInfo.lpDirectory = NULL;
     shExecInfo.nShow = SW_NORMAL;
-    //shExecInfo.hInstApp = NULL;
 
     if (ShellExecuteEx(&shExecInfo))
-    {
-        // remove the tab
         CloseTab(tab, true);
-    }
 }
 
 bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
