@@ -440,7 +440,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 TBHDR tbh;
                 if (nmhdr.idFrom != (UINT_PTR)&m_TabBar)
                 {                    
-                    tbh.hdr = nmhdr; // See comment above.
+                    tbh.hdr = nmhdr;
                     tbh.tabOrigin = ~0; // Obviously bogus value.
                     lParam = (LPARAM) &tbh;
                 }
