@@ -84,14 +84,15 @@ private:
     bool IsServiceAvailable();
     bool OpenFileAsLanguage(const std::wstring& filename);
     bool ShowSingleFileSelectionDialog(HWND hWndParent, const std::wstring& defaultFilename, const std::wstring& defaultFolder, std::wstring& fileChosen) const;
-    void GetFilesWithSameName(const std::wstring& targetPath,
-        std::vector<std::wstring>& matchingfiles) const;
+    void GetFilesWithSameName(const std::wstring& targetPath, std::vector<std::wstring>& matchingfiles) const;
     bool FindFile(const std::wstring& fileToFind, const std::vector<std::wstring>& foldersToSearch, std::wstring& foundPath) const;
     bool ParseInclude(const std::wstring& raw, std::wstring& filename, RelatedType& incType) const;
     bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf, int flags, std::string& found_text, size_t* line_no) const;
     void AttachDocument(CScintillaWnd& edit, CDocument& doc);
     bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<RelatedFileItem>& includes) const;
-
+    bool GetDefaultCorrespondingFileExtMappings(const std::wstring& from, std::wstring& to);
+    void GetCorrespondingFileMappings(const std::wstring& input_filename, std::vector<std::wstring>& corresponding_filenames);
+    bool GetCPPIncludePathsForMS(std::wstring& systemIncludePaths);
 private:
     std::vector<RelatedFileItem>    m_menuInfo;
     CScintillaWnd                   m_edit;
