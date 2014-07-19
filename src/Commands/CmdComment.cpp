@@ -241,7 +241,7 @@ bool CCmdUnComment::Execute()
 
             Scintilla::Sci_TextToFind ttf = {0};
             ttf.chrg.cpMin = (long)curPos;
-            if (ttf.chrg.cpMin > commentstreamstart.length())
+            if (ttf.chrg.cpMin > (long)commentstreamstart.length())
                 ttf.chrg.cpMin--;
             ttf.chrg.cpMax = 0;
             ttf.lpstrText = const_cast<char*>(commentstreamstart.c_str());
