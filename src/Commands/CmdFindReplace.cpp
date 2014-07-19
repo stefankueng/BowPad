@@ -1065,7 +1065,6 @@ std::string CFindReplaceDlg::UnEscape(const std::string& str)
 {
     int i = 0, j = 0;
     int charLeft = (int)str.length();
-    bool isGood = true;
     char current;
     std::unique_ptr<char[]> result(new char[str.length() + 1]);
     while (i < (int)str.length())
@@ -1145,7 +1144,6 @@ std::string CFindReplaceDlg::UnEscape(const std::string& str)
                     result[j] = '\\';
                     ++j;
                     result[j] = current;
-                    isGood = false;
                     break;
                 }
             }

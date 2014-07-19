@@ -514,7 +514,6 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     std::wstring ext = CPathUtils::GetFileExtension(path);
     m_scratchScintilla.SetupLexerForExt(ext);
 
-    bool success = true;
     const int blockSize = 128 * 1024;   //128 kB
     char data[blockSize+8];
     const int widebufSize = blockSize * 2;
@@ -537,7 +536,6 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     {
         if (!ReadFile(hFile, data + incompleteMultibyteChar, blockSize - incompleteMultibyteChar, &lenFile, NULL))
         {
-            success = false;
             lenFile = 0;
         }
         else
@@ -557,7 +555,6 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         {
             ShowFileLoadError(hWnd,sFileName,
                 CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str());
-            success = false;
             break;
         }
 
