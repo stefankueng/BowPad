@@ -520,13 +520,13 @@ void CCmdHeaderSource::HandleIncludeFileMenuItem(const RelatedFileItem& item)
     {
         if ((GetKeyState(VK_SHIFT) & 0x8000) == 0)
         {
-            OpenFileAsLanguage(item.Path.c_str());
+            OpenFileAsLanguage(item.Path);
             return;
         }
     }
     if (!UserFindFile(GetHwnd(), CPathUtils::GetFileName(item.Path), defaultFolder, fileToOpen))
         return;
-    if (!OpenFileAsLanguage(fileToOpen.c_str()))
+    if (!OpenFileAsLanguage(fileToOpen))
         return;
 }
 
