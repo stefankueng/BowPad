@@ -925,7 +925,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                 }
 
                 // Now we know where the end of the tag is, and we know what the tag is called
-                if (tagName.size() != 0)
+                if (!tagName.empty())
                 {
                     /* Now we need to find the open tag.  The logic here is that we search for "<TAGNAME",
                     * then check the next character - if it's one of '>', ' ', '\"' then we know we've found
@@ -1025,7 +1025,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                 }
 
                 // Now we know where the end of the tag is, and we know what the tag is called
-                if (tagName.size() != 0)
+                if (!tagName.empty())
                 {
                     // First we need to check if this is a self-closing tag.
                     // If it is, then we can just return this tag to highlight itself.
@@ -1109,7 +1109,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                         } // end if (selfclosingtag)... else {
                     } // end if (-1 != closeAngle)  {
 
-                } // end if tagName.size() != 0
+                } // end if !tagName.empty()
             } // end open tag test
         }
     }

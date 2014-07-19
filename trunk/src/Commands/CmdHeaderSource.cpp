@@ -463,7 +463,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
 
     // Stop the drop down list from ever being blank by putting a no files found
     // indicator in, but it's also useful.
-    if (m_menuInfo.size() == 0)
+    if (m_menuInfo.empty())
     {
         m_menuInfo.push_back(RelatedFileItem()); // No action.
         // Using CORRESPONDING_FILES_CATEGORY, but might possibly prefer no category,
