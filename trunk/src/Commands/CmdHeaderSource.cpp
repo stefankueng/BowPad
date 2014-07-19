@@ -812,8 +812,6 @@ bool CCmdHeaderSource::ShowSingleFileSelectionDialog(HWND hWndParent, const std:
 // return {c:\test\test.h and test.h} but ignore c:\test\test.exe.
 void CCmdHeaderSource::GetFilesWithSameName(const std::wstring& targetPath, std::vector<std::wstring>& matchingfiles) const
 {
-    std::wstring targetExt = CPathUtils::GetFileExtension(targetPath);
-
     std::vector<std::wstring> ignoredExts;
     stringtok(ignoredExts, CIniSettings::Instance().GetString(L"HeaderSource", L"IgnoredExts", L"exe*obj*dll*ilk*lib*ncb*ipch*bml*pch*res*pdb*aps"), true, L"*");
 
