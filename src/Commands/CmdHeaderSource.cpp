@@ -887,7 +887,7 @@ bool CCmdHeaderSource::ParseInclude(const std::wstring& raw, std::wstring& filen
     size_t len = raw.length();
     size_t first, last;
 
-    if (len <= 0)
+    if (len == 0)
         return false;
 
     // The regex is supposed to do the heavy lifting, matching wise.
