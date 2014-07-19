@@ -192,7 +192,6 @@ STDMETHODIMP CMainWindow::OnViewChanged(
             // The view was destroyed.
         case UI_VIEWVERB_DESTROY:
             {
-                hr = S_OK;
                 IStreamPtr pStrm;
                 std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
                 hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_WRITE|STGM_CREATE, FILE_ATTRIBUTE_NORMAL, TRUE, nullptr, &pStrm);
@@ -1793,7 +1792,7 @@ void CMainWindow::HandleWriteProtectedEdit()
 void CMainWindow::AddHotSpots()
 {
     long startPos = 0;
-    long endPos = -1;
+    long endPos;
 
     long firstVisibleLine = (long)m_editor.Call(SCI_GETFIRSTVISIBLELINE);
     startPos = (long)m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine));
