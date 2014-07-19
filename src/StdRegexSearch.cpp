@@ -291,7 +291,7 @@ StdRegexSearch::Match StdRegexSearch::EncodingDependent<CharT, CharacterIterator
 {
     CharacterIterator endIterator(search._document, search._endPosition, search._endPosition);
     int next_search_from_position = search._startPosition;
-    bool found = false;
+    bool found;
 
     const bool end_reached = next_search_from_position > search._endPosition;
     found = !end_reached && std::regex_search(CharacterIterator(search._document, next_search_from_position, search._endPosition), endIterator, _match, _regex, search.regexFlags);

@@ -761,7 +761,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             if (pt.x == -1 && pt.y == -1)
             {
-                HRESULT hr = E_FAIL;
+                HRESULT hr;
 
                 // Display the menu in the upper-left corner of the client area, below the ribbon.
                 IUIRibbon * pRibbon;
@@ -786,13 +786,11 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 }
             }
 
-            HRESULT hr = E_FAIL;
-
             // The basic pattern of how to show Contextual UI in a specified location.
             IUIContextualUI * pContextualUI = NULL;
             if (SUCCEEDED(g_pFramework->GetView(cmdTabContextMap, IID_PPV_ARGS(&pContextualUI))))
             {
-                hr = pContextualUI->ShowAtLocation(pt.x, pt.y);
+                pContextualUI->ShowAtLocation(pt.x, pt.y);
                 pContextualUI->Release();
             }
         }
