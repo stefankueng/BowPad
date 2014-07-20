@@ -53,7 +53,7 @@ void CTheme::Load()
         HGLOBAL hResourceLoaded = LoadResource(NULL, hRes);
         if (hResourceLoaded)
         {
-            char * lpResLock = (char *) LockResource(hResourceLoaded);
+            const char * lpResLock = (const char *) LockResource(hResourceLoaded);
             DWORD dwSizeRes = SizeofResource(NULL, hRes);
             if (lpResLock)
             {

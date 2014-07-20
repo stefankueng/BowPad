@@ -17,7 +17,7 @@
 #include "stdafx.h"
 #include "EditorConfigHandler.h"
 #include "UnicodeUtils.h"
-
+#include "Document.h"
 
 
 CEditorConfigHandler::CEditorConfigHandler(void)
