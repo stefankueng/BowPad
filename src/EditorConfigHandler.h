@@ -20,6 +20,8 @@
 #include "ScintillaWnd.h"
 #include "editorconfig/editorconfig.h"
 
+class CDocument;
+
 class CEditorConfigHandler
 {
 private:

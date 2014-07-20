@@ -85,7 +85,7 @@ public :
 
     int                         GetItemCount() const { return (int)m_nItems; }
 
-    void                        SetFont(TCHAR *fontName, int fontSize);
+    void                        SetFont(const TCHAR *fontName, int fontSize);
     int                         GetSrcTab() const { return m_nSrcTab; }
     int                         GetDstTab() const { return m_nTabDragged; }
 protected:

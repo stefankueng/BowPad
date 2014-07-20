@@ -517,9 +517,9 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     const int blockSize = 128 * 1024;   //128 kB
     char data[blockSize+8];
     const int widebufSize = blockSize * 2;
-    std::unique_ptr<wchar_t[]> widebuf(new wchar_t[widebufSize]);
+    auto widebuf = std::make_unique<wchar_t[]>(widebufSize);
     const int charbufSize = widebufSize * 2;
-    std::unique_ptr<char[]> charbuf(new char[charbufSize]);
+    auto charbuf = std::make_unique<char[]>(charbufSize);
 
     // First allocate enough memory for the whole file (this will reduce memory copy during loading)
     m_scratchScintilla.Call(SCI_ALLOCATE, WPARAM(bufferSizeRequested));
@@ -618,10 +618,10 @@ bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocu
 
     const int blockSize = 128 * 1024;   //128 kB
     const int widebufSize = blockSize * 2;
-    std::unique_ptr<wchar_t[]> widebuf(new wchar_t[widebufSize]);
-    std::unique_ptr<wchar_t[]> wide32buf(new wchar_t[widebufSize*2]);
+    auto widebuf = std::make_unique<wchar_t[]>(widebufSize);
+    auto wide32buf = std::make_unique<wchar_t[]>(widebufSize*2);
     const int charbufSize = widebufSize * 2;
-    std::unique_ptr<char[]> charbuf(new char[charbufSize]);
+    auto charbuf = std::make_unique<char[]>(charbufSize);
 
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
     size_t lengthDoc = m_scratchScintilla.Call(SCI_GETLENGTH);

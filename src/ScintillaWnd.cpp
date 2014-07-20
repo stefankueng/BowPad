@@ -24,6 +24,7 @@
 #include "SciLexer.h"
 #include "AppUtils.h"
 #include "Theme.h"
+#include "Document.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -330,7 +331,7 @@ void CScintillaWnd::SaveCurrentPos(CPosData * pPos)
     pPos->m_nScrollWidth        = Call(SCI_GETSCROLLWIDTH);
 }
 
-void CScintillaWnd::RestoreCurrentPos(CPosData pos)
+void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
 {
     Call(SCI_GOTOPOS, 0);
 
@@ -1690,58 +1691,58 @@ void CScintillaWnd::AppendText(int len, const char* buf)
     Call(SCI_APPENDTEXT, len, reinterpret_cast<LPARAM>(buf));
 }
 
-std::string CScintillaWnd::GetLine(long line)
+std::string CScintillaWnd::GetLine(long line) const
 {
-    size_t linesize = Call(SCI_GETLINE, line, 0);
-    std::unique_ptr<char[]> pLine(new char[linesize + 1]);
-    Call(SCI_GETLINE, line, (sptr_t)pLine.get());
+    size_t linesize = ConstCall(SCI_GETLINE, line, 0);
+    auto pLine = std::make_unique<char[]>(linesize + 1);
+    ConstCall(SCI_GETLINE, line, (sptr_t)pLine.get());
     pLine[linesize] = 0;
     return pLine.get();
 }
 
-std::string CScintillaWnd::GetTextRange(long startpos, long endpos)
+std::string CScintillaWnd::GetTextRange(long startpos, long endpos) const
 {
     assert(endpos - startpos >= 0);
     if (endpos < startpos)
         return "";
-    std::unique_ptr<char[]> strbuf(new char[endpos - startpos + 5]);
+    auto strbuf = std::make_unique<char[]>(endpos - startpos + 5);
     Scintilla::Sci_TextRange rangestart;
     rangestart.chrg.cpMin = startpos;
     rangestart.chrg.cpMax = endpos;
     rangestart.lpstrText = strbuf.get();
-    Call(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
+    ConstCall(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
     return rangestart.lpstrText;
 }
 
-std::string CScintillaWnd::GetSelectedText()
+std::string CScintillaWnd::GetSelectedText() const
 {
-    int selTextLen = (int)Call(SCI_GETSELTEXT);
-    std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
-    Call(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
+    int selTextLen = (int)ConstCall(SCI_GETSELTEXT);
+    auto seltextbuffer = std::make_unique<char[]>(selTextLen + 1);
+    ConstCall(SCI_GETSELTEXT, 0, (LPARAM)seltextbuffer.get());
     return seltextbuffer.get();
 }
 
-std::string CScintillaWnd::GetCurrentLine()
+std::string CScintillaWnd::GetCurrentLine() const
 {
-    int LineLen = (int)Call(SCI_GETCURLINE);
-    std::unique_ptr<char[]> linebuffer(new char[LineLen + 1]);
-    Call(SCI_GETCURLINE, LineLen + 1, (LPARAM)(char*)linebuffer.get());
+    int LineLen = (int)ConstCall(SCI_GETCURLINE);
+    auto linebuffer = std::make_unique<char[]>(LineLen + 1);
+    ConstCall(SCI_GETCURLINE, LineLen + 1, (LPARAM)linebuffer.get());
     return linebuffer.get();
 }
 
-std::string CScintillaWnd::GetWordChars()
+std::string CScintillaWnd::GetWordChars() const
 {
-    int len = (int)Call(SCI_GETWORDCHARS);
-    std::unique_ptr<char[]> linebuffer(new char[len + 1]);
-    Call(SCI_GETWORDCHARS, 0, (LPARAM)(char*)linebuffer.get());
+    int len = (int)ConstCall(SCI_GETWORDCHARS);
+    auto linebuffer = std::make_unique<char[]>(len + 1);
+    ConstCall(SCI_GETWORDCHARS, 0, (LPARAM)linebuffer.get());
     return linebuffer.get();
 }
 
-std::string CScintillaWnd::GetWhitespaceChars()
+std::string CScintillaWnd::GetWhitespaceChars() const
 {
-    int len = (int)Call(SCI_GETWHITESPACECHARS);
-    std::unique_ptr<char[]> linebuffer(new char[len + 1]);
-    Call(SCI_GETWHITESPACECHARS, 0, (LPARAM)(char*)linebuffer.get());
+    int len = (int)ConstCall(SCI_GETWHITESPACECHARS);
+    auto linebuffer = std::make_unique<char[]>(len + 1);
+    ConstCall(SCI_GETWHITESPACECHARS, 0, (LPARAM)linebuffer.get());
     return linebuffer.get();
 }
 
