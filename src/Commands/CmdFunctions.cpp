@@ -351,9 +351,6 @@ void CCmdFunctions::TabNotify(TBHDR * ptbhdr)
     // Switching to this document.
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
-        // FIXME! GetDocIDFromTabIndex should work here but
-        // tabOrigin seems usually wrong?
-        //int docId = GetDocIDFromTabIndex(ptbhdr->tabOrigin);
         int docId = GetDocIdOfCurrentTab();
         ScheduleFunctionUpdate(docId, FunctionUpdateReason::TabChange);
     }

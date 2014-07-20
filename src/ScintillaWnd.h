@@ -17,11 +17,12 @@
 #pragma once
 #include "BaseWindow.h"
 #include "Scintilla.h"
-#include "Document.h"
 #include "LexStyles.h"
 #include "DocScroll.h"
 
 #include <vector>
+
+class CPosData;
 
 #define INDIC_SELECTION_MARK        (INDIC_CONTAINER+1)
 #define INDIC_TAGMATCH              (INDIC_CONTAINER+2)
@@ -70,10 +71,14 @@ public :
     {
         return m_pSciMsg(m_pSciWndData, iMessage, wParam, lParam);
     }
+    sptr_t ConstCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0) const
+    {
+        return m_pSciMsg(m_pSciWndData, iMessage, wParam, lParam);
+    }
 
     void UpdateLineNumberWidth();
     void SaveCurrentPos(CPosData * pPos);
-    void RestoreCurrentPos(CPosData pos);
+    void RestoreCurrentPos(const CPosData& pos);
     void SetupLexerForExt(const std::wstring& ext);
     void SetupLexerForLang(const std::wstring& lang);
     void MarginClick(Scintilla::SCNotification * pNotification);
@@ -92,13 +97,13 @@ public :
     void SetTabSettings();
     void SetEOLType(int eolType);
     void AppendText(int len, const char* buf);
-    std::string GetLine(long line);
-    std::string GetTextRange(long startpos, long endpos);
+    std::string GetLine(long line) const;
+    std::string GetTextRange(long startpos, long endpos) const;
     size_t FindText(const std::string& tofind, long startpos, long endpos);
-    std::string GetSelectedText();
-    std::string GetCurrentLine();
-    std::string GetWordChars();
-    std::string GetWhitespaceChars();
+    std::string GetSelectedText() const;
+    std::string GetCurrentLine() const;
+    std::string GetWordChars() const;
+    std::string GetWhitespaceChars() const;
 
     LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
 

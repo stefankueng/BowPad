@@ -267,7 +267,7 @@ void CTabBar::SetCurrentTitle(LPCTSTR title)
     TabCtrl_SetItem(*this, GetCurrentTabIndex(), &tci);
 }
 
-void CTabBar::SetFont(TCHAR *fontName, int fontSize)
+void CTabBar::SetFont(const TCHAR *fontName, int fontSize)
 {
     if (m_hFont)
         ::DeleteObject(m_hFont);
@@ -440,8 +440,9 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             nTab = GetItemCount();
             SetRectEmpty(&rTotalTab);
 
-            while (nTab--)
+            while (nTab > 0)
             {
+                --nTab;
                 TabCtrl_GetItemRect(*this, nTab, &rTab);
                 UnionRect(&rTotalTab, &rTab, &rTotalTab);
             }
