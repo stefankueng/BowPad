@@ -57,7 +57,6 @@ const int STATUSBAR_TABS          = 7;
 
 static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
 
-
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
@@ -803,6 +802,9 @@ void CMainWindow::HandleCreate(HWND hwnd)
 
 void CMainWindow::HandleAfterInit()
 {
+    // Makes painting look a little cleaner, especially when loading a lot
+    // of files for a session.
+    UpdateWindow(*this);
     CCommandHandler::Instance().AfterInit();
     for (const auto& path : m_pathsToOpen)
     {
