@@ -197,13 +197,13 @@ bool ICommand::SaveCurrentTab(bool bSaveAs /* = false */)
     return pMainWnd->SaveCurrentTab(bSaveAs);
 }
 
-int ICommand::GetDocumentCount()
+int ICommand::GetDocumentCount() const
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     return pMainWnd->m_DocManager.GetCount();
 }
 
-bool ICommand::HasActiveDocument()
+bool ICommand::HasActiveDocument() const
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     int id = pMainWnd->m_TabBar.GetCurrentTabId();
@@ -234,10 +234,10 @@ void ICommand::SetDocument( int id, CDocument doc )
     return pMainWnd->m_DocManager.SetDocument(id, doc);
 }
 
-void ICommand::RestoreCurrentPos(CPosData pos)
+void ICommand::RestoreCurrentPos(const CPosData& pos)
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    return pMainWnd->m_editor.RestoreCurrentPos(pos);
+    pMainWnd->m_editor.RestoreCurrentPos(pos);
 }
 
 void ICommand::SaveCurrentPos(CPosData * pos)

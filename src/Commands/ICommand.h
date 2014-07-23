@@ -61,13 +61,13 @@ protected:
     int                 GetDocIDFromPath(LPCTSTR path);
     int                 GetTabIndexFromDocID(int docID);
 
-    int                 GetDocumentCount();
-    bool                HasActiveDocument();
+    int                 GetDocumentCount() const;
+    bool                HasActiveDocument() const;
     CDocument           GetActiveDocument() const;
     bool                HasDocumentID(int id);
     CDocument           GetDocumentFromID(int id);
     void                SetDocument(int id, CDocument doc);
-    void                RestoreCurrentPos(CPosData pos);
+    void                RestoreCurrentPos(const CPosData& pos);
     void                SaveCurrentPos(CPosData * pos);
 
     sptr_t              ScintillaCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0);
