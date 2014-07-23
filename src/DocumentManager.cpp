@@ -98,19 +98,12 @@ bool CDocumentManager::HasDocumentID(int id) const
 {
     // Allow searches of things with an invalid id, to simplify things for the caller.
     auto where = m_documents.find(id);
-    if ( where == m_documents.end())
-    {
+    if (where == m_documents.end())
         return false;
-    }
-#ifdef _DEBUG
-    // Paranoid check.
+
     // If we find something with an invalid id, something is very wrong.
     if (id < 0)
-    {
-        assert(false);
-        throw std::invalid_argument("HasDocumentID called with an invalid document id but found a document.");
-    }
-#endif
+        APPVERIFY(false);
 
     return true;
 }
@@ -118,21 +111,14 @@ bool CDocumentManager::HasDocumentID(int id) const
 // Must exist or it's a bug.
 CDocument CDocumentManager::GetDocumentFromID(int id) const
 {
-#ifdef _DEBUG
-    if (id < 0)
-    {
-        assert(false); // It's a bug to even try to use a null id here.
-        throw std::invalid_argument("GetDocumentFromID called with an invalid document id");
-    }
-#endif
-    auto pos = m_documents.find(id);
     // Pretty catastrophic if this ever fails.
     // Use HasDocumentID to check first if you're not sure.
+    if (id < 0)
+        APPVERIFY(false);
+    auto pos = m_documents.find(id);
     if (pos == std::end(m_documents))
     {
-#ifdef _DEBUG
-        throw std::invalid_argument("GetDocumentFromID called but not document exists with the given id");
-#endif
+        APPVERIFY(false);
         return CDocument();
     }
     return pos->second;
@@ -144,20 +130,23 @@ void CDocumentManager::SetDocument(int id, const CDocument& doc)
     auto where = m_documents.find(id);
     // SetDocument/Find does not create a position if it doesn't exist.
     // Use Operator [] for that or really AddDocumentAtEnd etc. to add.
-#ifdef _DEBUG
     if (where == std::end(m_documents))
-        throw std::invalid_argument("SetDocument can only update an existing document.");
-#endif
+    {
+        // Should never happen but if it does, it's a serious bug
+        // because we are throwing data away.
+        // Ideally we want to notify the user about this but their
+        // is no consensus to do that.
+        APPVERIFY(false);
+        return; // Return now to avoid overwriting memory.
+    }
     where->second = doc;
 }
 
 void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, int id )
 {
-#ifdef _DEBUG
     // Catch attempts to id's that serve as null type values.
     if (id<0)
-        throw std::invalid_argument("Attempt to add a document with invalid id");
-#endif
+        APPVERIFY(false); // Serious bug.
     m_documents[id] = doc;
 }
 
@@ -913,7 +902,7 @@ int CDocumentManager::GetIdForPath( const std::wstring& path ) const
 {
     for (const auto& d : m_documents)
     {
-        if (_wcsicmp(d.second.m_path.c_str(), path.c_str()) == 0)
+        if (CPathUtils::PathCompare(d.second.m_path, path) == 0)
             return d.first;
     }
     return -1;
@@ -929,13 +918,13 @@ void CDocumentManager::RemoveDocument( int id )
 COLORREF CDocumentManager::GetColorForDocument( int id )
 {
     CDocument doc = GetDocumentFromID(id);
-    std::wstring folderpath = doc.m_path.substr(0, doc.m_path.find_last_of('\\')+1);
-    std::transform(folderpath.begin(), folderpath.end(), folderpath.begin(), ::tolower);
+    std::wstring folderpath = CPathUtils::GetParentDirectory(doc.m_path);
+    CStringUtils::emplace_to_lower(folderpath);
+
     auto foundIt = m_foldercolorindexes.find(folderpath);
     if (foundIt != m_foldercolorindexes.end())
-    {
         return foldercolors[foundIt->second % MAX_FOLDERCOLORS];
-    }
+
     m_foldercolorindexes[folderpath] = m_lastfoldercolorindex;
     return foldercolors[m_lastfoldercolorindex++ % MAX_FOLDERCOLORS];
 }
