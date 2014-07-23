@@ -277,6 +277,7 @@
     <ClInclude Include="Commands\CmdSelectTab.h" />
     <ClInclude Include="Commands\CmdSession.h" />
     <ClInclude Include="Commands\CmdStyleConfigurator.h" />
+    <ClInclude Include="Commands\cmdTabList.h" />
     <ClInclude Include="Commands\CmdUndo.h" />
     <ClInclude Include="Commands\CmdVerticalEdge.h" />
     <ClInclude Include="Commands\CmdWhiteSpace.h" />
@@ -354,6 +355,7 @@
     <ClCompile Include="Commands\CmdPrint.cpp" />
     <ClCompile Include="Commands\CmdScripts.cpp" />
     <ClCompile Include="Commands\CmdStyleConfigurator.cpp" />
+    <ClCompile Include="Commands\cmdTabList.cpp" />
     <ClCompile Include="Commands\CommandHandler.cpp" />
     <ClCompile Include="Commands\ICommand.cpp" />
     <ClCompile Include="DocScroll.cpp" />
