@@ -316,23 +316,9 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
 {
     // Create an IUIImage from a resource id.
     IUIImagePtr pImg = nullptr;
-    IUIImageFromBitmapPtr pifbFactory;
-    HRESULT hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
-    if (SUCCEEDED(hr))
-    {
-        // Load the bitmap from the resource file.
-        HBITMAP hbm = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_EMPTY), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-        if (hbm)
-        {
-            // Use the factory implemented by the framework to produce an IUIImage.
-            hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_TRANSFER, &pImg);
-            if (FAILED(hr))
-            {
-                DeleteObject(hbm);
-                pImg = nullptr;
-            }
-        }
-    }
+    HRESULT hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
+    // Not a concern if it fails, just show the list without images.
+    CAppUtils::FailedShowMessage(hr);
 
     // Open File Option
 
@@ -561,7 +547,7 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
         return false;
     }
 
-    auto item = m_menuInfo[selected];
+    const auto& item = m_menuInfo[selected];
     switch (item.Type)
     {
         case RelatedType::Corresponding:
