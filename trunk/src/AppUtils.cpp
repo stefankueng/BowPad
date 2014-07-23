@@ -367,13 +367,16 @@ HRESULT CAppUtils::AddResStringItem(IUICollectionPtr& collection, int resId, int
 
 bool CAppUtils::ShowDropDownList(HWND hWnd, LPCWSTR ctrlName)
 {
+    HRESULT hr;
     // open the dropdown gallery using windows automation
     IUIAutomationPtr pAutomation;
-    if (CAppUtils::FailedShowMessage(CoCreateInstance(__uuidof(CUIAutomation), NULL, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), (void **)&pAutomation)))
+    hr = CoCreateInstance(__uuidof(CUIAutomation), NULL, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), (void **)&pAutomation);
+    if (CAppUtils::FailedShowMessage(hr))
         return false;
     // get the top element of this app window
     IUIAutomationElementPtr pParent;
-    if (CAppUtils::FailedShowMessage(pAutomation->ElementFromHandle(hWnd, &pParent)))
+    hr = pAutomation->ElementFromHandle(hWnd, &pParent);
+    if (CAppUtils::FailedShowMessage(hr))
         return false;
     // set up conditions to find the control
     // first condition is the name 
@@ -384,28 +387,66 @@ bool CAppUtils::ShowDropDownList(HWND hWnd, LPCWSTR ctrlName)
     VARIANT varProp;
     varProp.vt = VT_BSTR;
     varProp.bstrVal = SysAllocString(ctrlName);
-    if (CAppUtils::FailedShowMessage(pAutomation->CreatePropertyCondition(UIA_NamePropertyId, varProp, &pCondition)))
+    hr = pAutomation->CreatePropertyCondition(UIA_NamePropertyId, varProp, &pCondition);
+    if (CAppUtils::FailedShowMessage(hr))
         return false;
     varProp.vt = VT_INT;
     varProp.intVal = 0x38;
     IUIAutomationConditionPtr pCondition2;
-    if (CAppUtils::FailedShowMessage(pAutomation->CreatePropertyCondition(UIA_LegacyIAccessibleRolePropertyId, varProp, &pCondition2)))
+    hr = pAutomation->CreatePropertyCondition(UIA_LegacyIAccessibleRolePropertyId, varProp, &pCondition2);
+    if (CAppUtils::FailedShowMessage(hr))
         return false;
     // both conditions must be true
     IUIAutomationConditionPtr pCondition3;
-    if (CAppUtils::FailedShowMessage(pAutomation->CreateAndCondition(pCondition, pCondition2, &pCondition3)))
+    hr = pAutomation->CreateAndCondition(pCondition, pCondition2, &pCondition3);
+    if (CAppUtils::FailedShowMessage(hr))
         return false;
     // now try to find the control
     IUIAutomationElementPtr pFound;
-    if (CAppUtils::FailedShowMessage(pParent->FindFirst(TreeScope_Descendants, pCondition3, &pFound)))
+    hr = pParent->FindFirst(TreeScope_Descendants, pCondition3, &pFound);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+    if (!pFound)
         return false;
 
     // the the invoke pattern of the control so we can invoke it
     IUIAutomationInvokePatternPtr pInvoke;
-    if (CAppUtils::FailedShowMessage(pFound->GetCurrentPatternAs(UIA_InvokePatternId, __uuidof(IUIAutomationInvokePattern), (void **)&pInvoke)))
+    hr = pFound->GetCurrentPatternAs(UIA_InvokePatternId, __uuidof(IUIAutomationInvokePattern),
+        (void **)&pInvoke);
+    if (CAppUtils::FailedShowMessage(hr))
         return false;
     // finally, invoke the command which drops down the gallery
     pInvoke->Invoke();
     pFound->SetFocus();
     return true;
 }
+
+HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg )
+{
+    pOutImg = nullptr;
+    // Create an IUIImage from a resource id.
+    IUIImagePtr pImg;
+    IUIImageFromBitmapPtr pifbFactory;
+    HRESULT hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
+    if (SUCCEEDED(hr))
+    {
+        // Load the bitmap from the resource file.
+        HBITMAP hbm = (HBITMAP)LoadImage(GetModuleHandle(NULL), resName, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+        if (hbm)
+        {
+            // Use the factory implemented by the framework to produce an IUIImage.
+            hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_TRANSFER, &pImg);
+            if (FAILED(hr))
+            {
+                DeleteObject(hbm);
+                pImg = nullptr;
+            }
+            else
+            {
+                pOutImg = pImg;
+            }
+        }
+    }
+    return hr;
+}
+

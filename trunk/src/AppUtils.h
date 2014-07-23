@@ -36,6 +36,7 @@ public:
     static HRESULT                  AddCategory(IUICollectionPtr& coll, int catId, int catNameResId);
     static bool                     FailedShowMessage(HRESULT hr);
     static bool                     ShowDropDownList(HWND hWnd, LPCWSTR ctrlName);
+    static HRESULT                  CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg );
 private:
     static std::wstring             updatefilename;
     static std::wstring             updateurl;
