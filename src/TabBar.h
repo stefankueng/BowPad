@@ -109,6 +109,7 @@ protected:
     int                         GetTabIndexAt(int x, int y) const;
 
     bool                        IsPointInParentZone(POINT screenPoint) const;
+    void                        NotifyTabDelete(int tab);
 private:
     int                         m_nItems;
     bool                        m_bHasImgList;
