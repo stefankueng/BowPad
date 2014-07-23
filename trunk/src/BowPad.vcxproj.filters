@@ -306,6 +306,9 @@
     <ClInclude Include="Commands\CmdPluginsConfig.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\cmdTabList.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -504,6 +507,9 @@
       <Filter>Commands</Filter>
     </ClCompile>
     <ClCompile Include="Commands\CmdHeaderSource.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\cmdTabList.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>

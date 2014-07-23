@@ -701,6 +701,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdSessionLast" Id="10010" />
     <Command Name="cmdPasteHistory" Id="10011" />
     <Command Name="cmdGroupNewBtn" Id="10012" />
+    <Command Name="cmdTabList" Id="10013" LabelTitle="Tabs" TooltipTitle="Tab List" TooltipDescription="Shows a list of tabs.">
+      <Command.LargeImages>
+        <Image>res/TabListL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />
 
@@ -754,7 +759,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Scale Group="cmdGroupClipboard" Size="Medium" />
                 <Scale Group="cmdGroupUndo" Size="Large" />
                 <Scale Group="cmdGroupFind" Size="Large" />
-                <Scale Group="cmdGroupGoto" Size="Large" />
                 <Scale Group="cmdGroupBookmarks" Size="Large" />
                 <Scale Group="cmdGroupComment" Size="Medium" />
                 <Scale Group="cmdGroupBlanks" Size="Medium" />
@@ -800,7 +804,12 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdFindPrev" />
             <Button CommandName="cmdFindSelectedNext" />
           </Group>
-          <Group CommandName="cmdGroupGoto" SizeDefinition="ThreeButtons">
+          <Group CommandName="cmdGroupGoto" SizeDefinition="FourButtons">
+            <DropDownGallery CommandName="cmdTabList"  Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout Gripper="None"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
             <Button CommandName="cmdGotoLine" />
             <Button CommandName="cmdPrevious" />
             <Button CommandName="cmdNext" />
