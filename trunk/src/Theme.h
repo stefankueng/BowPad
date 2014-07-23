@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,16 +30,16 @@ public:
     static CTheme& Instance();
 
     void                            SetDarkTheme(bool b = true) { dark = b; }
-    bool                            IsDarkTheme() { return dark; }
-    COLORREF                        GetThemeColor(COLORREF clr);
+    bool                            IsDarkTheme() const { return dark; }
+    COLORREF                        GetThemeColor(COLORREF clr) const;
 
     void                            SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight);
     void                            SetRibbonColorsHSB(UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight);
     void                            GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight);
 
-    void                            RGBToHSB(COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightness);
-    void                            RGBtoHSL(COLORREF color, unsigned int& h, unsigned int& s, unsigned int& l);
-    COLORREF                        HSLtoRGB(const unsigned int& h, const unsigned int& s, const unsigned int& l);
+    static void                     RGBToHSB(COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightness);
+    static void                     RGBtoHSL(COLORREF color, float& h, float& s, float& l);
+    static COLORREF                 HSLtoRGB(float h, float s, float l);
 
 private:
     void                            Load();
