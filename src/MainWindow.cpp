@@ -431,13 +431,19 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             default:
                 break;
             }
-
             
             if (nmhdr.idFrom == (UINT_PTR)&m_TabBar || nmhdr.hwndFrom == m_TabBar)
             {
-                TBHDR tbh;
+                TBHDR tbh = { };
                 if (nmhdr.idFrom != (UINT_PTR)&m_TabBar)
-                {                    
+                {
+                    // Events that are not from CTabBar might be 
+                    // lower level and of type HMHDR, not TBHDR
+                    // and therefore missing tabOrigin.
+                    // In case they are NMHDR, map them to TBHDR and set
+                    // an obviously bogus value for tabOrigin so it isn't
+                    // used by mistake.
+                    // We need a TBHDR type to notify commands with.
                     tbh.hdr = nmhdr;
                     tbh.tabOrigin = ~0; // Obviously bogus value.
                     lParam = (LPARAM) &tbh;
@@ -802,8 +808,6 @@ void CMainWindow::HandleCreate(HWND hwnd)
 
 void CMainWindow::HandleAfterInit()
 {
-    // Makes painting look a little cleaner, especially when loading a lot
-    // of files for a session.
     UpdateWindow(*this);
     CCommandHandler::Instance().AfterInit();
     for (const auto& path : m_pathsToOpen)
@@ -943,10 +947,10 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
             auto cmd = CCommandHandler::Instance().GetCommand(cmdTrim);
             cmd->Execute();
         }
+
         if (doc.m_bEnsureNewlineAtEnd)
-        {
             EnsureNewLineAtEnd(doc);
-        }
+
         bool bTabMoved = false;
         if (!m_DocManager.SaveFile(*this, doc, bTabMoved))
         {
@@ -1071,7 +1075,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
 
 bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
 {
-    if ((tab < 0) || (tab >= m_DocManager.GetCount()))
+    if ((tab < 0) || (tab >= m_TabBar.GetItemCount()))
         return false;
     CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
     if (!force && (doc.m_bIsDirty||doc.m_bNeedsSaving))
@@ -1107,7 +1111,8 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
     m_TabBar.DeleteItemAt(tab);
     m_DocManager.RemoveDocument(docId);
     EnsureAtLeastOneTab();
-    m_TabBar.ActivateAt(tab < m_TabBar.GetItemCount() ? tab : m_TabBar.GetItemCount()-1);
+    int nextTab = (tab < m_TabBar.GetItemCount()) ? tab : m_TabBar.GetItemCount() - 1;
+    m_TabBar.ActivateAt(nextTab);
     return true;
 }
 
@@ -1933,6 +1938,7 @@ void CMainWindow::OpenNewTab()
     m_editor.SetupLexerForLang(L"Text");
     m_editor.GotoLine(0);
     m_insertionIndex = -1;
+    CCommandHandler::Instance().OnDocumentOpen(index);
 }
 
 void CMainWindow::HandleTabChanging(const NMHDR& /*nmhdr*/)
@@ -2134,7 +2140,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         files.push_back(pathBuf.get());
     }
     DragFinish(hDrop);
-    for (const auto& filename:files)
+    for (const auto& filename : files)
     {
         OpenFileEx(filename, OpenFlags::AddToMRU);
     }
