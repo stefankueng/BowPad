@@ -296,7 +296,7 @@ void CTabBar::ActivateAt(int index) const
     // making our events nearly the same which is easier on the receiver.
     
     InvalidateRect(*this, NULL, TRUE);
-    NMHDR nmhdr;
+    NMHDR nmhdr = {};
     nmhdr.hwndFrom = *this;
     nmhdr.code = TCN_SELCHANGING;
     ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
@@ -701,12 +701,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             if ((m_whichCloseClickDown == currentTabOn) && m_closeButtonZone.IsHit(xPos, yPos, m_currentHoverTabRect))
             {
-                TBHDR nmhdr;
-                nmhdr.hdr.hwndFrom = *this;
-                nmhdr.hdr.code = TCN_TABDELETE;
-                nmhdr.hdr.idFrom = reinterpret_cast<UINT_PTR>(this);
-                nmhdr.tabOrigin = currentTabOn;
-                ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+                NotifyTabDelete(currentTabOn);
 
                 m_whichCloseClickDown = -1;
                 return TRUE;
@@ -741,12 +736,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             int xPos = GET_X_LPARAM(lParam);
             int yPos = GET_Y_LPARAM(lParam);
             int currentTabOn = GetTabIndexAt(xPos, yPos);
-            TBHDR nmhdr;
-            nmhdr.hdr.hwndFrom = *this;
-            nmhdr.hdr.code = TCN_TABDELETE;
-            nmhdr.hdr.idFrom = reinterpret_cast<UINT_PTR>(this);
-            nmhdr.tabOrigin = currentTabOn;
-            ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+            NotifyTabDelete(currentTabOn);
 
             return TRUE;
         }
@@ -823,7 +813,8 @@ COLORREF CTabBar::GetTabColor(bool bSelected, UINT item)
 
 void CTabBar::DrawItemBorder(LPDRAWITEMSTRUCT lpdis)
 {
-    bool bSelected = (lpdis->itemID == (UINT)TabCtrl_GetCurSel(*this));
+    int curSel = TabCtrl_GetCurSel(*this);
+    bool bSelected = (lpdis->itemID == (UINT)curSel);
 
     RECT rItem(lpdis->rcItem);
 
@@ -864,7 +855,8 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
     TC_ITEM tci;
     HIMAGELIST hilTabs = (HIMAGELIST)TabCtrl_GetImageList(*this);
 
-    bool bSelected = (pDrawItemStruct->itemID == (UINT)TabCtrl_GetCurSel(*this));
+    int curSel = TabCtrl_GetCurSel(*this);
+    bool bSelected = (pDrawItemStruct->itemID == (UINT)curSel);
 
     RECT rItem(pDrawItemStruct->rcItem);
 
@@ -1100,6 +1092,16 @@ int CTabBar::GetIndexFromID(int id) const
         }
     }
     return -1;
+}
+
+void CTabBar::NotifyTabDelete(int tab)
+{
+    TBHDR nmhdr;
+    nmhdr.hdr.hwndFrom = *this;
+    nmhdr.hdr.code = TCN_TABDELETE;
+    nmhdr.hdr.idFrom = reinterpret_cast<UINT_PTR>(this);
+    nmhdr.tabOrigin = tab;
+    ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
 }
 
 bool CloseButtonZone::IsHit(int x, int y, const RECT & testZone) const
