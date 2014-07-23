@@ -37,6 +37,7 @@ public:
     static bool                     FailedShowMessage(HRESULT hr);
     static bool                     ShowDropDownList(HWND hWnd, LPCWSTR ctrlName);
     static HRESULT                  CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg );
+    static bool                     HexStringToCOLORREF(const wchar_t* s, COLORREF* clr);
 private:
     static std::wstring             updatefilename;
     static std::wstring             updateurl;
