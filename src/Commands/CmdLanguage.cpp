@@ -26,7 +26,6 @@
 #include "TempFile.h"
 #include "version.h"
 
-#include <vector>
 #include <fstream>
 
 
@@ -35,25 +34,26 @@ namespace
 // Global but not externally accessable.
 std::vector<std::wstring> gLanguages;
 std::vector<std::wstring> gRemotes;
+
+const int CAT_LANGS_AVAILABLE = 0;
+const int CAT_LANGS_REMOTE = 1;
 };
 
 HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
 {
     HRESULT hr = E_FAIL;
 
-    if(key == UI_PKEY_Categories)
+    if (key == UI_PKEY_Categories)
     {
         IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (FAILED(hr))
-        {
+        if (CAppUtils::FailedShowMessage(hr))
             return hr;
-        }
 
-        hr = CAppUtils::AddCategory(pCollection, 0, IDS_LANGUAGE_AVAILABLE);
+        hr = CAppUtils::AddCategory(pCollection, CAT_LANGS_AVAILABLE, IDS_LANGUAGE_AVAILABLE);
         if (FAILED(hr))
             return hr;
-        hr = CAppUtils::AddCategory(pCollection, 1, IDS_LANGUAGE_REMOTE);
+        hr = CAppUtils::AddCategory(pCollection, CAT_LANGS_REMOTE, IDS_LANGUAGE_REMOTE);
         if (FAILED(hr))
             return hr;
         return S_OK;
@@ -62,73 +62,78 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
     {
         IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (FAILED(hr))
-        {
-            return hr;
-        }
-        pCollection->Clear();
-        // Create an IUIImage from a resource id.
-        IUIImagePtr pImg;
-        IUIImageFromBitmapPtr pifbFactory;
-        hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
+        pCollection->Clear();
 
-        // Load the bitmap from the resource file.
-        HBITMAP hbm = (HBITMAP) LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_EMPTY), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-        if (hbm)
-        {
-            // Use the factory implemented by the framework to produce an IUIImage.
-            hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_TRANSFER, &pImg);
-            if (FAILED(hr))
-            {
-                DeleteObject(hbm);
-            }
-        }
-
-        if (FAILED(hr))
-        {
-            return hr;
-        }
+        IUIImagePtr pImg;
+        hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY),pImg);
+        // Don't worry if it failed. Show list without images.
+        CAppUtils::FailedShowMessage(hr);
 
         gLanguages.clear();
 
         // English as the first language, always installed
-        CAppUtils::AddStringItem(pCollection, L"English", 0, pImg);
+        CAppUtils::AddStringItem(pCollection, L"English", CAT_LANGS_AVAILABLE, pImg);
         gLanguages.push_back(L"");
 
         std::wstring path = CAppUtils::GetDataPath();
+        // REVIEW: CSimpleFileFind might be better here?
         CDirFileEnum enumerator(path);
         std::wstring respath;
         bool bIsDir = false;
         while (enumerator.NextFile(respath, &bIsDir, false))
         {
-            if (_wcsicmp(CPathUtils::GetFileExtension(respath).c_str(), L"lang")==0)
+            if (bIsDir) // Only interested in files.
+                continue; // Continue on to the next, save indentation.
+
+            // Only interested in files htat match BowPad*_*.lang, to extract the
+            // DE part as a locale name. If no "_" is present, the file is either
+            // incorrectly named or is an  unrelated file that just happens to
+            // have a .lang extension. Either way, if it happens we can't process it.
+            if (CPathUtils::PathCompare(CPathUtils::GetFileExtension(respath).c_str(), L"lang") != 0)
+                continue; // Name of no interest.
+
+            // Make sure the file matches our naming convention of BowPad*_Local.
+            // If notm, alert attention to any problems if in testing or diagnostic
+            // mode but otherwise we'll just ignore the files.
+            std::wstring filename = CPathUtils::GetFileNameWithoutExtension(respath);
+            auto pos = filename.find_last_of(L'_');
+            if (pos == std::wstring::npos) // No "_"
             {
-                if (CAppUtils::HasSameMajorVersion(respath))
-                {
-                    // TODO! Review: Is this supposed to be searching the path or the file name
-                    // for _ and .? LIkely a bug. Use CPath::GetFileName(resPath) and search that.
-                    std::wstring sLocale = respath.substr(respath.find_last_of('_')+1);
-                    sLocale = sLocale.substr(0, sLocale.find_last_of('.'));
-                    int len = GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, 0, 0);
-                    if (len)
-                    {
-                        std::unique_ptr<wchar_t[]> langbuf(new wchar_t[len]);
-                        if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langbuf.get(), len))
-                        {
-                            CAppUtils::AddStringItem(pCollection, langbuf.get(), 0, pImg);
-                            gLanguages.push_back(sLocale);
-                        }
-                    }
-                }
+                APPVERIFY(false);
+                continue;
+            }
+            // Extract the locale name, note the extension is already removed.
+            std::wstring sLocale = filename.substr(pos+1);
+            if (sLocale.empty()) // Just BowPad_, no language name.
+            {
+                APPVERIFY(false);
+                continue;
+            }
+            // Now that we're sure the file obeys all the name conventions to
+            // be expected to be a file we want, check the version.
+            if (!CAppUtils::HasSameMajorVersion(respath))
+                continue; // Assume old/unversioned, so ignore it.
+
+            // REVIEW! If there's an error from the OS about the locale we could
+            // perhaps show these as present but flag them as not supported by the
+            // OS or whatever at the appropriate time rahther than just ignore them.
+            int len = GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, 0, 0);
+            if (len <= 0) // Assume unrecognized language.
+                continue;
+            auto langbuf = std::make_unique<wchar_t[]>(len);
+            if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langbuf.get(), len))
+            {
+                CAppUtils::AddStringItem(pCollection, langbuf.get(), CAT_LANGS_AVAILABLE, pImg);
+                gLanguages.push_back(sLocale);
             }
         }
 
         if (gRemotes.empty())
         {
             // Dummy entry for fetching the remote language list
-            CAppUtils::AddResStringItem(pCollection, IDS_LANGUAGE_FETCH, 1, pImg);
+            CAppUtils::AddResStringItem(pCollection, IDS_LANGUAGE_FETCH, CAT_LANGS_REMOTE, pImg);
             gLanguages.push_back(L"*");
         }
         else
@@ -136,19 +141,19 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
             for (const auto& sLocale : gRemotes)
             {
                 int len = GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, 0, 0);
-                if (len)
+                // Can't process this, continue to the next, save indentation.
+                if (len <= 0)
+                    continue;
+                auto langbuf = std::make_unique<wchar_t[]>(len);
+                if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langbuf.get(), len))
                 {
-                    std::unique_ptr<wchar_t[]> langbuf(new wchar_t[len]);
-                    if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langbuf.get(), len))
-                    {
-                        CAppUtils::AddStringItem(pCollection, langbuf.get(), 0, pImg);
-                        gLanguages.push_back(sLocale);
-                    }
+                    CAppUtils::AddStringItem(pCollection, langbuf.get(), CAT_LANGS_AVAILABLE, pImg);
+                    gLanguages.push_back(sLocale);
                 }
             }
         }
 
-        hr = S_OK;
+        return S_OK;
     }
     else if (key == UI_PKEY_SelectedItem)
     {
@@ -166,9 +171,14 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
                 }
             }
         }
-        hr = S_OK;
+        return S_OK;
     }
-    return hr;
+    else // Event not handled.
+    {
+        return E_NOTIMPL;
+    }
+    assert(false); // Fallthrough not expected.
+    return E_NOTIMPL;
 }
 
 HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ )
