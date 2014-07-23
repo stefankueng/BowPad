@@ -450,3 +450,21 @@ HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg )
     return hr;
 }
 
+bool CAppUtils::HexStringToCOLORREF(const wchar_t* s, COLORREF* clr)
+{
+    errno = 0;
+    wchar_t* ep = nullptr;
+    unsigned long v;
+    v = wcstoul(s, &ep, 16);
+    if (errno == 0 && ep == &s[6])
+    {
+        BYTE r = (v >> 16) & 0xFF;
+        BYTE g = (v >> 8) & 0xFF;
+        BYTE b = v & 0xFF;
+        *clr = RGB(r, g, b) | (v & 0xFF000000);
+        return true;
+    }
+    *clr = RGB(0,0,0);
+    return false;
+}
+
