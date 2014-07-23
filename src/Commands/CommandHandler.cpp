@@ -54,6 +54,7 @@
 #include "CmdScripts.h"
 #include "CmdPlugins.h"
 #include "CmdPluginsConfig.h"
+#include "cmdTabList.h"
 
 CCommandHandler::CCommandHandler(void)
     : m_highestCmdId(0)
@@ -125,6 +126,7 @@ void CCommandHandler::Init( void * obj )
     Add<CCmdPrevNext>(obj);
     Add<CCmdPrevious>(obj);
     Add<CCmdNext>(obj);
+    Add<CCmdTabList>(obj);
 
     Add<CCmdFindReplace>(obj);
     Add<CCmdFindNext>(obj);
