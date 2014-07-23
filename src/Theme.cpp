@@ -18,6 +18,7 @@
 #include "Theme.h"
 #include "BowPad.h"
 #include "SysInfo.h"
+#include "AppUtils.h"
 
 extern IUIFramework *g_pFramework;  // Reference to the Ribbon framework.
 
@@ -39,7 +40,6 @@ CTheme& CTheme::Instance()
 
     return instance;
 }
-
 
 void CTheme::Load()
 {
@@ -66,18 +66,20 @@ void CTheme::Load()
     CSimpleIni::TNamesDepend colors;
     themeIni.GetAllKeys(L"SubstColors", colors);
 
-    wchar_t * endptr;
-    unsigned long hexval;
+    std::wstring s;
+    bool ok;
     for (const auto& it : colors)
     {
-        hexval = wcstol(it, &endptr, 16);
-        COLORREF col1 = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
+        COLORREF clr1;
+        ok = CAppUtils::HexStringToCOLORREF(it, &clr1);
+        APPVERIFY(ok);
 
-        std::wstring s = themeIni.GetValue(L"SubstColors", it);
-        hexval = wcstol(s.c_str(), &endptr, 16);
-        COLORREF col2 = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
+        COLORREF clr2;
+        s = themeIni.GetValue(L"SubstColors", it);
+        ok = CAppUtils::HexStringToCOLORREF(s.c_str(), &clr2);
+        APPVERIFY(ok);
 
-        m_colorMap[col1] = col2;
+        m_colorMap[clr1] = clr2;
     }
 
     m_bLoaded = true;
@@ -85,26 +87,26 @@ void CTheme::Load()
 
 void CTheme::RGBToHSB( COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightness )
 {
-    double minRGB = min(min(GetRValue(rgb), GetGValue(rgb)), GetBValue(rgb));
-    double maxRGB = max(max(GetRValue(rgb), GetGValue(rgb)), GetBValue(rgb));
-    double delta = maxRGB - minRGB;
-    double b = maxRGB;
+    BYTE r = GetRValue(rgb);
+    BYTE g = GetGValue(rgb);
+    BYTE b = GetBValue(rgb);
+    BYTE minRGB = min(min(r, g), b);
+    BYTE maxRGB = max(max(r, g), b);
+    BYTE delta = maxRGB - minRGB;
+    double l = double(maxRGB);
     double s = 0.0;
     double h = 0.0;
     if (maxRGB)
-        s = 255 * delta / maxRGB;
+        s = (255.0 * delta) / maxRGB;
 
     if (s != 0.0)
     {
-        if (GetRValue(rgb) == maxRGB)
-            h = (double(GetGValue(rgb)) - double(GetBValue(rgb))) / delta;
-        else
-        {
-            if (GetGValue(rgb) == maxRGB)
-                h = 2.0 + (double(GetBValue(rgb)) - double(GetRValue(rgb))) / delta;
-            else if (GetBValue(rgb) == maxRGB)
-                h = 4.0 + (double(GetRValue(rgb)) - double(GetGValue(rgb))) / delta;
-        }
+        if (r == maxRGB)
+            h = double(g - b) / delta;
+        else if (g == maxRGB)
+            h = 2.0 + double(b - r) / delta;
+        else if (b == maxRGB)
+            h = 4.0 + double(r - g) / delta;
     }
     else
         h = -1.0;
@@ -114,165 +116,110 @@ void CTheme::RGBToHSB( COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightne
 
     hue         = BYTE(h);
     saturation  = BYTE(s * 100.0 / 255.0);
-    brightness  = BYTE(b * 100.0 / 255.0);
+    brightness  = BYTE(l * 100.0 / 255.0);
 }
 
-void CTheme::RGBtoHSL(COLORREF color, unsigned int& h, unsigned int& s, unsigned int& l)
+void CTheme::RGBtoHSL(COLORREF color, float& h, float& s, float& l)
 {
-    UINT r = GetRValue(color);
-    UINT g = GetGValue(color);
-    UINT b = GetBValue(color);
-
-    float r_percent = ((float)r)/255;
-    float g_percent = ((float)g)/255;
-    float b_percent = ((float)b)/255;
+    float r_percent = float(GetRValue(color)) / 255;
+    float g_percent = float(GetGValue(color)) / 255;
+    float b_percent = float(GetBValue(color)) / 255;
 
     float max_color = 0;
-    if((r_percent >= g_percent) && (r_percent >= b_percent))
-    {
+    if ((r_percent >= g_percent) && (r_percent >= b_percent))
         max_color = r_percent;
-    }
-    if((g_percent >= r_percent) && (g_percent >= b_percent))
+    else if ((g_percent >= r_percent) && (g_percent >= b_percent))
         max_color = g_percent;
-    if((b_percent >= r_percent) && (b_percent >= g_percent))
+    else if ((b_percent >= r_percent) && (b_percent >= g_percent))
         max_color = b_percent;
 
     float min_color = 0;
-    if((r_percent <= g_percent) && (r_percent <= b_percent))
+    if ((r_percent <= g_percent) && (r_percent <= b_percent))
         min_color = r_percent;
-    if((g_percent <= r_percent) && (g_percent <= b_percent))
+    else if ((g_percent <= r_percent) && (g_percent <= b_percent))
         min_color = g_percent;
-    if((b_percent <= r_percent) && (b_percent <= g_percent))
+    else if ((b_percent <= r_percent) && (b_percent <= g_percent))
         min_color = b_percent;
 
-    float L = 0;
-    float S = 0;
-    float H = 0;
+    float L = 0, S = 0, H = 0;
 
     L = (max_color + min_color)/2;
 
-    if(max_color == min_color)
+    if (max_color == min_color)
     {
         S = 0;
         H = 0;
     }
     else
     {
-        if(L < .50)
-        {
-            S = (max_color - min_color)/(max_color + min_color);
-        }
+        auto d = max_color - min_color;
+        if (L < .50)
+            S = d / (max_color + min_color);
         else
-        {
-            S = (max_color - min_color)/(2 - max_color - min_color);
-        }
-        if(max_color == r_percent)
-        {
-            H = (g_percent - b_percent)/(max_color - min_color);
-        }
-        if(max_color == g_percent)
-        {
-            H = 2 + (b_percent - r_percent)/(max_color - min_color);
-        }
-        if(max_color == b_percent)
-        {
-            H = 4 + (r_percent - g_percent)/(max_color - min_color);
-        }
+            S = d / ((2.0f - max_color) - min_color);
+
+        if (max_color == r_percent)
+            H = (g_percent - b_percent) / d;
+
+        else if (max_color == g_percent)
+            H = 2.0f + (b_percent - r_percent) / d;
+
+        else if (max_color == b_percent)
+            H = 4.0f + (r_percent - g_percent) / d;
     }
-    s = (unsigned int)(S*100);
-    l = (unsigned int)(L*100);
     H = H*60;
-    if(H < 0)
+    if (H < 0)
         H += 360;
-    h = (unsigned int)H;
+    s = S*100;
+    l = L*100;
+    h = H;
 }
 
-static void HSLtoRGB_Subfunction(unsigned int& c, const float& temp1, const float& temp2, const float& temp3)
+static void HSLtoRGB_Subfunction(float& pc, float temp1, float temp2, float temp3)
 {
-    if((temp3 * 6) < 1)
-        c = (unsigned int)((temp2 + (temp1 - temp2)*6*temp3)*100);
+    if ((temp3 * 6) < 1)
+        pc = (temp2 + (temp1 - temp2)*6*temp3)*100;
+    else if ((temp3 * 2) < 1)
+        pc = temp1*100;
+    else if ((temp3 * 3) < 2)
+        pc = (temp2 + (temp1 - temp2)*(.66666f - temp3)*6)*100;
     else
-        if((temp3 * 2) < 1)
-            c = (unsigned int)(temp1*100);
-        else
-            if((temp3 * 3) < 2)
-                c = (unsigned int)((temp2 + (temp1 - temp2)*(.66666 - temp3)*6)*100);
-            else
-                c = (unsigned int)(temp2*100);
+        pc = temp2*100;
     return;
 }
 
-COLORREF CTheme::HSLtoRGB(const unsigned int& h, const unsigned int& s, const unsigned int& l)
+COLORREF CTheme::HSLtoRGB(float h, float s, float l)
 {
-    unsigned int r = 0;
-    unsigned int g = 0;
-    unsigned int b = 0;
+    float pcr, pcg, pcb;
 
-    float L = ((float)l)/100;
-    float S = ((float)s)/100;
-    float H = ((float)h)/360;
-
-    if(s == 0)
+    if (s == 0)
     {
-        r = l;
-        g = l;
-        b = l;
+        BYTE t = BYTE(l/100*255);
+        return RGB(t,t,t);
     }
-    else
-    {
-        float temp1 = 0;
-        if(L < .50)
-        {
-            temp1 = L*(1 + S);
-        }
-        else
-        {
-            temp1 = L + S - (L*S);
-        }
-
-        float temp2 = 2*L - temp1;
-
-        float temp3 = 0;
-        for(int i = 0 ; i < 3 ; i++)
-        {
-            switch(i)
-            {
-            case 0: // red
-                {
-                    temp3 = H + .33333f;
-                    if(temp3 > 1)
-                        temp3 -= 1;
-                    HSLtoRGB_Subfunction(r,temp1,temp2,temp3);
-                    break;
-                }
-            case 1: // green
-                {
-                    temp3 = H;
-                    HSLtoRGB_Subfunction(g,temp1,temp2,temp3);
-                    break;
-                }
-            case 2: // blue
-                {
-                    temp3 = H - .33333f;
-                    if(temp3 < 0)
-                        temp3 += 1;
-                    HSLtoRGB_Subfunction(b,temp1,temp2,temp3);
-                    break;
-                }
-            default:
-                {
-
-                }
-            }
-        }
-    }
-    r = (unsigned int)((((float)r)/100)*255);
-    g = (unsigned int)((((float)g)/100)*255);
-    b = (unsigned int)((((float)b)/100)*255);
+    float L = l/100;
+    float S = s/100;
+    float H = h/360;
+    float temp1 = (L < .50) ? L*(1 + S) : L + S - (L*S);
+    float temp2 = 2*L - temp1;
+    float temp3 = 0;
+    temp3 = H + .33333f;
+    if (temp3 > 1)
+        temp3 -= 1;
+    HSLtoRGB_Subfunction(pcr,temp1,temp2,temp3);
+    temp3 = H;
+    HSLtoRGB_Subfunction(pcg,temp1,temp2,temp3);
+    temp3 = H - .33333f;
+    if (temp3 < 0)
+        temp3 += 1;
+    HSLtoRGB_Subfunction(pcb,temp1,temp2,temp3);
+    BYTE r = BYTE(pcr/100*255);
+    BYTE g = BYTE(pcg/100*255);
+    BYTE b = BYTE(pcb/100*255);
     return RGB(r,g,b);
 }
 
-COLORREF CTheme::GetThemeColor( COLORREF clr )
+COLORREF CTheme::GetThemeColor( COLORREF clr ) const
 {
     if (dark)
     {
@@ -280,9 +227,7 @@ COLORREF CTheme::GetThemeColor( COLORREF clr )
         if (cIt != m_colorMap.end())
             return cIt->second;
 
-        unsigned int h;
-        unsigned int s;
-        unsigned int l;
+        float h, s, l;
         RGBtoHSL(clr, h, s, l);
         l = 100 - l;
         return HSLtoRGB(h, s, l);
@@ -329,9 +274,11 @@ void CTheme::SetRibbonColorsHSB( UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HS
 {
     IPropertyStorePtr spPropertyStore;
 
+    APPVERIFY(g_pFramework != nullptr);
     // g_pFramework is a pointer to the IUIFramework interface that is assigned
     // when the Ribbon is initialized.
-    if (SUCCEEDED(g_pFramework->QueryInterface(&spPropertyStore)))
+    HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
+    if (SUCCEEDED(hr))
     {
         PROPVARIANT propvarBackground;
         PROPVARIANT propvarHighlight;
@@ -355,7 +302,8 @@ void CTheme::GetRibbonColors( UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSB
 
     // g_pFramework is a pointer to the IUIFramework interface that is assigned
     // when the Ribbon is initialized.
-    if (SUCCEEDED(g_pFramework->QueryInterface(&spPropertyStore)))
+    HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
+    if (SUCCEEDED(hr))
     {
         PROPVARIANT propvarBackground;
         PROPVARIANT propvarHighlight;
