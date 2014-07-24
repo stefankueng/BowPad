@@ -123,6 +123,61 @@ STDMETHODIMP CMainWindow::QueryInterface(REFIID iid, void** ppv)
     return S_OK;
 }
 
+HRESULT CMainWindow::LoadRibbonSettings(IUnknown* pView)
+{
+    HRESULT hr = pView->QueryInterface(IID_PPV_ARGS(&m_pRibbon));
+    if (!CAppUtils::FailedShowMessage(hr))
+    {
+        IStreamPtr pStrm;
+        std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
+        hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_READ, 0, FALSE, nullptr, &pStrm);
+        if (!CAppUtils::FailedShowMessage(hr))
+        {
+            hr = m_pRibbon->LoadSettingsFromStream(pStrm);
+            CAppUtils::FailedShowMessage(hr);
+        }
+    }
+    return hr;
+}
+
+HRESULT CMainWindow::SaveRibbonSettings()
+{
+    IStreamPtr pStrm;
+    std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
+    HRESULT hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(),
+        STGM_WRITE|STGM_CREATE, FILE_ATTRIBUTE_NORMAL, TRUE, nullptr, &pStrm);
+    if (!CAppUtils::FailedShowMessage(hr))
+    {
+        LARGE_INTEGER liPos;
+        ULARGE_INTEGER uliSize;
+
+        liPos.QuadPart = 0;
+        uliSize.QuadPart = 0;
+
+        pStrm->Seek(liPos, STREAM_SEEK_SET, nullptr);
+        pStrm->SetSize(uliSize);
+
+        hr = m_pRibbon->SaveSettingsToStream(pStrm);
+        CAppUtils::FailedShowMessage(hr);
+    }
+    m_pRibbon->Release();
+    m_pRibbon = nullptr;
+    return hr;
+}
+
+HRESULT CMainWindow::ResizeToRibbon()
+{
+    HRESULT hr = E_FAIL;
+    if (m_pRibbon)
+    {
+        // Call to the framework to determine the desired height of the Ribbon.
+        HRESULT hr = m_pRibbon->GetHeight(&m_RibbonHeight);
+        if (!CAppUtils::FailedShowMessage((hr)))
+            ResizeChildWindows();
+    }
+    return hr;
+}
+
 //  FUNCTION: OnCreateUICommand(UINT, UI_COMMANDTYPE, IUICommandHandler)
 //
 //  PURPOSE: Called by the Ribbon framework for each command specified in markup, to allow
@@ -160,56 +215,16 @@ STDMETHODIMP CMainWindow::OnViewChanged(
         {
             // The view was newly created.
         case UI_VIEWVERB_CREATE:
-            {
-                hr = pView->QueryInterface(IID_PPV_ARGS(&m_pRibbon));
-                if (!CAppUtils::FailedShowMessage(hr))
-                {
-                    IStreamPtr pStrm;
-                    std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
-                    hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_READ, 0, FALSE, nullptr, &pStrm);
-                    if (!CAppUtils::FailedShowMessage(hr))
-                    {
-                        hr = m_pRibbon->LoadSettingsFromStream(pStrm);
-                        CAppUtils::FailedShowMessage(hr);
-                    }
-                }
-            }
+            hr = LoadRibbonSettings(pView);
             break;
             // The view has been resized.  For the Ribbon view, the application should
             // call GetHeight to determine the height of the ribbon.
         case UI_VIEWVERB_SIZE:
-            {
-                if (m_pRibbon)
-                {
-                    // Call to the framework to determine the desired height of the Ribbon.
-                    hr = m_pRibbon->GetHeight(&m_RibbonHeight);
-                    if (!CAppUtils::FailedShowMessage((hr)))
-                        ResizeChildWindows();
-                }
-            }
+            hr = ResizeToRibbon();
             break;
             // The view was destroyed.
         case UI_VIEWVERB_DESTROY:
-            {
-                IStreamPtr pStrm;
-                std::wstring ribbonsettingspath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
-                hr = SHCreateStreamOnFileEx(ribbonsettingspath.c_str(), STGM_WRITE|STGM_CREATE, FILE_ATTRIBUTE_NORMAL, TRUE, nullptr, &pStrm);
-                if (!CAppUtils::FailedShowMessage(hr))
-                {
-                    LARGE_INTEGER liPos;
-                    ULARGE_INTEGER uliSize;
-
-                    liPos.QuadPart = 0;
-                    uliSize.QuadPart = 0;
-
-                    pStrm->Seek(liPos, STREAM_SEEK_SET, nullptr);
-                    pStrm->SetSize(uliSize);
-
-                    m_pRibbon->SaveSettingsToStream(pStrm);
-                }
-                m_pRibbon->Release();
-                m_pRibbon = nullptr;
-            }
+            hr = SaveRibbonSettings();
             break;
         }
     }
@@ -660,6 +675,24 @@ LRESULT CMainWindow::DoCommand(int id)
         OpenNewTab();
         break;
     case cmdClose:
+        // TODO:
+        // Clicking a tab header's X generates an TCN_TABDELETE event,
+        // that is forwarded to the commands through TabNotify,
+        // and results eventually in CloseTab being called.
+        // But closing this way (Ctrl-F4) and just call CloseTab,
+        // No TCN_TABDELETE message is sent to the children.
+        // If we want that we could call
+        // m_TabBar.NotifyTabDelete(m_TabBar.GetCurrentTabIndex());
+        // instead which would do that. But I'm leaving things
+        // as they are for now as nothing (now) uses TCN_TABDELETE
+        // and it still isn't generated in every circumstance
+        // anyway even if we catch this instance and do it here.
+        // But I want to record this fact as this area needs some
+        // attention, but later. I don't want to risk breaking
+        // anything yet until the topic gets more thought / discussion.
+        // But ultimate TCN_TABDELETE probably wants to be generated
+        // here as a "Hey command, I'm thinking about closing,
+        // are you cool with that", kind of thing.
         CloseTab(m_TabBar.GetCurrentTabIndex());
         break;
     case cmdCloseAll:
