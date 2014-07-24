@@ -31,9 +31,9 @@ public:
     {
     }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdComment; }
+    UINT GetCmdId() override { return cmdComment; }
 };
 
 class CCmdUnComment : public ICommand
@@ -48,8 +48,8 @@ public:
     {
     }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdUnComment; }
+    UINT GetCmdId() override { return cmdUnComment; }
 };
 

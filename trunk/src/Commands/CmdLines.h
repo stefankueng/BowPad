@@ -31,13 +31,13 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         ScintillaCall(SCI_LINEDUPLICATE);
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdLineDuplicate; }
+    UINT GetCmdId() override { return cmdLineDuplicate; }
 };
 
 class CCmdLineSplit : public ICommand
@@ -52,14 +52,14 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         ScintillaCall(SCI_TARGETFROMSELECTION);
         ScintillaCall(SCI_LINESSPLIT);
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdLineSplit; }
+     UINT GetCmdId() override { return cmdLineSplit; }
 };
 
 class CCmdLineJoin : public ICommand
@@ -74,14 +74,14 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         ScintillaCall(SCI_TARGETFROMSELECTION);
         ScintillaCall(SCI_LINESJOIN);
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdLineJoin; }
+    UINT GetCmdId() override { return cmdLineJoin; }
 };
 
 class CCmdLineUp : public ICommand
@@ -96,13 +96,13 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         ScintillaCall(SCI_MOVESELECTEDLINESUP);
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdLineUp; }
+    UINT GetCmdId() override { return cmdLineUp; }
 };
 
 class CCmdLineDown : public ICommand
@@ -117,11 +117,11 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         ScintillaCall(SCI_MOVESELECTEDLINESDOWN);
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdLineDown; }
+    UINT GetCmdId() override { return cmdLineDown; }
 };
