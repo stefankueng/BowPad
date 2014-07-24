@@ -268,7 +268,7 @@ void CCmdTabList::OnDocumentClose(int /*tab*/)
     InvalidateTabList();
 }
 
-void CCmdTabList::TabNotify(TBHDR * ptbhdr)
+void CCmdTabList::TabNotify(TBHDR * /*ptbhdr*/)
 {
     // Don't think we need to handle anything here yet.
     // But maybe eventually, see OVERVIEW.
