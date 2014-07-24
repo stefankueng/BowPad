@@ -20,11 +20,8 @@
 #include "BowPad.h"
 #include "StringUtils.h"
 #include "ResString.h"
-#include "DirFileEnum.h"
 #include "AppUtils.h"
 #include "PathUtils.h"
-#include "TempFile.h"
-#include "version.h"
 
 /*
 
