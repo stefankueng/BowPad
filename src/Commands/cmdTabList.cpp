@@ -30,10 +30,10 @@ OVERVIEW
 Clicking the tab list button causes BP to display a menu of tabs.
 
 Ideally the tab list would be built on demand to ensure it remains
-in synch. But we don't know how to make the ribbon query for a new list
+in sync. But we don't know how to make the ribbon query for a new list
 each time the menu is clicked, it prefers to cache it.
 That means we have to build the tab list when the ribbon asks for it
-and track events which indicate the tab list is out of synch and
+and track events which indicate the tab list is out of sync and
 then invalidate the tab list then so BP re-queries for a new list.
 So ideally we'd just build it on demand and trash it when the user
 dismisses/cancels the list without making a selection.
@@ -49,7 +49,7 @@ reliable and leaves the user looking at an empty menu sometimes
 so that approach hasn't been taken.
 
 When a future solution becomes available it is likely
-we want to call InvalidateTabList on the approprate event type.
+we want to call InvalidateTabList on the appropriate event type.
 
 A better solution as described above may be possible, at least in the
 future, but the current solution of tracking events and maintaining the list
@@ -109,7 +109,7 @@ HRESULT CCmdTabList::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
         return E_NOTIMPL;
     }
 
-    assert(false); // No fallthrough expected.
+    assert(false); // No fall through expected.
     return E_NOTIMPL;
 }
 
@@ -128,7 +128,7 @@ bool CCmdTabList::PopulateMenu(const CDocument& /*doc*/, IUICollectionPtr& colle
 {
     IUIImagePtr pImg;
     HRESULT hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
-    // If image creation fails we can't do much abou it other than report it.
+    // If image creation fails we can't do much about it other than report it.
     // Images aren't essential, so try to continue without them if we need to.
     CAppUtils::FailedShowMessage(hr);
 
@@ -218,12 +218,12 @@ bool CCmdTabList::HandleSelectedMenuItem(size_t selected)
     // when the menu is opened but then canceled without the user making
     // a selection. There is no InvalidateOnCancel type ribbon event that
     // I am aware of.
-    // Not being built on demand means our tab list could get out of synch
+    // Not being built on demand means our tab list could get out of sync
     // with the real tab list, though we don't know how yet.
     // It might happen if we failed to trap a close event somehow for example.
-    // If we reach here the likely reason is our list is out of synch however
+    // If we reach here the likely reason is our list is out of sync however
     // it happened so call IvalidTabList here.
-    // Note reaching here may or meay not mean a bug in this module, it could
+    // Note reaching here may or may not mean a bug in this module, it could
     // be a bug elsewhere failing to notify us of events. I have fixed one
     // two problems like this so there may be more.
     // This assert is just to draw attention to the fact that a problem exists,
@@ -244,8 +244,8 @@ void CCmdTabList::InvalidateTabList()
 
 void CCmdTabList::ScintillaNotify(Scintilla::SCNotification* /*pScn*/)
 {
-    // ideally we want to invalidate this lis when the user cancels
-    // the drop down list without making a selectiont, but there isn't an
+    // ideally we want to invalidate this list when the user cancels
+    // the drop down list without making a selection, but there isn't an
     // appropriate fool proof way of doing it that yet, see OVERVIEW.
     // When a solution appears for that problem we likely want some
     // code here to invalidate the tab list on the appropriate event.
