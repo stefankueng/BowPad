@@ -294,7 +294,7 @@ void CTabBar::ActivateAt(int index) const
     // have code to re-fetch these values directly so it might as well do that
     // in our case too. That free's us to use NMHDR instead of TBHDR
     // making our events nearly the same which is easier on the receiver.
-    
+
     InvalidateRect(*this, NULL, TRUE);
     NMHDR nmhdr = {};
     nmhdr.hwndFrom = *this;

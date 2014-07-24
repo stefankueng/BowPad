@@ -51,7 +51,7 @@ begins working in the editor again, but this isn't totally
 reliable and leaves the user looking at an empty menu sometimes
 so that approach hasn't been taken.
 
-When a future solution becomes available it is likely 
+When a future solution becomes available it is likely
 we want to call InvalidateTabList on the approprate event type.
 
 A better solution as described above may be possible, at least in the
