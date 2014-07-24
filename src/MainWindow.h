@@ -52,7 +52,9 @@ enum class ResponseToOutsideDeletedFile
     StayOpen
 };
 
+
 class CMainWindow : public CWindow, public IUIApplication, public IUICommandHandler
+
 {
     friend class ICommand;
 public:
@@ -160,6 +162,9 @@ private:
     void                        HandleUpdateUI(const Scintilla::SCNotification& scn);
     void                        HandleAutoIndent(const Scintilla::SCNotification &scn);
     void                        DocumentChanged();
+    HRESULT                     LoadRibbonSettings(IUnknown* pView);
+    HRESULT                     SaveRibbonSettings();
+    HRESULT                     ResizeToRibbon();
 
 private:
     LONG                        m_cRef;
