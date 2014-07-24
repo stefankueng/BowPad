@@ -15,8 +15,6 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #include "stdafx.h"
-#include "CommandHandler.h"
-#include "DirFileEnum.h"
 
 #include "CmdMRU.h"
 #include "CmdFiles.h"
@@ -56,11 +54,16 @@
 #include "CmdPluginsConfig.h"
 #include "cmdTabList.h"
 
+#include "CommandHandler.h"
+#include "DirFileEnum.h"
+#include "AppUtils.h"
+#include "PathUtils.h"
+#include "UnicodeUtils.h"
+
 CCommandHandler::CCommandHandler(void)
     : m_highestCmdId(0)
 {
 }
-
 
 CCommandHandler::~CCommandHandler(void)
 {
