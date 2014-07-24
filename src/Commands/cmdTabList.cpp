@@ -96,7 +96,17 @@ HRESULT CCmdTabList::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
     }
     else if (key == UI_PKEY_SelectedItem)
     {
-        return UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)UI_COLLECTION_INVALIDINDEX, ppropvarNewValue);
+        int docId = GetDocIdOfCurrentTab();
+
+        UINT index = UI_COLLECTION_INVALIDINDEX;
+        for (const auto& d : m_menuInfo)
+        {
+            ++index;
+            if (d.docId == docId)
+                break;
+        }
+
+        return UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)index, ppropvarNewValue);
     }
     else if (key == UI_PKEY_Enabled)
     {
@@ -135,7 +145,8 @@ bool CCmdTabList::PopulateMenu(const CDocument& /*doc*/, IUICollectionPtr& colle
     int tabCount = GetTabCount();
     for ( int i  = 0; i < tabCount; ++i)
     {
-        // TODO: consider storing tab id's.
+        // don't store tab ids since they won't match after
+        // a tab drag anymore
         int docId = this->GetDocIDFromTabIndex(i);
 
         std::wstring tabTitle = GetTitleForTabIndex(i);
@@ -267,10 +278,7 @@ void CCmdTabList::OnDocumentClose(int /*tab*/)
 
 void CCmdTabList::TabNotify(TBHDR * /*ptbhdr*/)
 {
-    // Don't think we need to handle anything here yet.
-    // But maybe eventually, see OVERVIEW.
-    //if (ptbhdr->hdr.code == TCN_TABDELETE)
-        //InvalidateTabList();
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
 }
 
 
