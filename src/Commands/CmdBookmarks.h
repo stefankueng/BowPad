@@ -24,7 +24,7 @@
 
 namespace Scintilla
 {
-	struct SCNotification;
+    struct SCNotification;
 };
 
 class CCmdBookmarks : public ICommand
@@ -48,7 +48,7 @@ public:
     void OnDocumentOpen(int index) override;
 
 private:
-	// REVIEW: A case insensitive string map to vector<lomg>
+    // REVIEW: A case insensitive string map to vector<lomg>
     // is a lot less code, way more readable and gets rid of tuple too!
     std::list<std::tuple<std::wstring, std::vector<long>>> m_bookmarks;
 };
@@ -101,7 +101,7 @@ public:
     void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(
-		REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+        REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };
 
 class CCmdBookmarkPrev : public ICommand
@@ -122,5 +122,5 @@ public:
     void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(
-		REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+        REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };
