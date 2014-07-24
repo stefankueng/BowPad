@@ -22,9 +22,6 @@
 #include <string>
 #include <vector>
 
-#include <Shobjidl.h>
-
-
 class CCmdPrevNext : public ICommand
 {
 public:
@@ -37,12 +34,13 @@ public:
     {
     }
 
-    virtual bool Execute() override { return false; }
-    virtual UINT GetCmdId() override { return cmdPrevNext; }
+    bool Execute() override { return false; }
+    UINT GetCmdId() override { return cmdPrevNext; }
 
-    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
-    virtual void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR * ptbhdr) override;
+    void OnDocumentClose(int tab) override;
 };
 
 
@@ -58,10 +56,11 @@ public:
     {
     }
 
-    virtual bool Execute() override;
-    virtual UINT GetCmdId() override { return cmdPrevious; }
+    bool Execute() override;
+    UINT GetCmdId() override { return cmdPrevious; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(
+        REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
 };
 
@@ -77,9 +76,10 @@ public:
     {
     }
 
-    virtual bool Execute() override;
-    virtual UINT GetCmdId() override { return cmdNext; }
+    bool Execute() override;
+    UINT GetCmdId() override { return cmdNext; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(
+        REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
 };
