@@ -337,6 +337,7 @@
     <ClCompile Include="ChoseDlg.cpp" />
     <ClCompile Include="ColorButton.cpp" />
     <ClCompile Include="Commands\CmdBlanks.cpp" />
+    <ClCompile Include="Commands\CmdBookmarks.cpp" />
     <ClCompile Include="Commands\CmdCodeStyle.cpp" />
     <ClCompile Include="Commands\CmdComment.cpp" />
     <ClCompile Include="Commands\CmdConvertCase.cpp" />
