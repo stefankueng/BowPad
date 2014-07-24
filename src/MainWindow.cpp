@@ -431,13 +431,13 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             default:
                 break;
             }
-            
+
             if (nmhdr.idFrom == (UINT_PTR)&m_TabBar || nmhdr.hwndFrom == m_TabBar)
             {
                 TBHDR tbh = { };
                 if (nmhdr.idFrom != (UINT_PTR)&m_TabBar)
                 {
-                    // Events that are not from CTabBar might be 
+                    // Events that are not from CTabBar might be
                     // lower level and of type HMHDR, not TBHDR
                     // and therefore missing tabOrigin.
                     // In case they are NMHDR, map them to TBHDR and set

@@ -379,7 +379,7 @@ bool CAppUtils::ShowDropDownList(HWND hWnd, LPCWSTR ctrlName)
     if (CAppUtils::FailedShowMessage(hr))
         return false;
     // set up conditions to find the control
-    // first condition is the name 
+    // first condition is the name
     // second condition is the accessibility role id, which is 0x38 for a dropdown control
     // the second condition is required since there's also a normal button with the same name:
     // the default button of the dropdown gallery

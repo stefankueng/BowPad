@@ -593,7 +593,7 @@ HRESULT CCmdHeaderSource::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const 
 
 void CCmdHeaderSource::TabNotify(TBHDR * ptbhdr)
 {
-    // Include list will be stale now.        
+    // Include list will be stale now.
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
         InvalidateIncludes();
 }
