@@ -17,6 +17,10 @@
 #include "stdafx.h"
 #include "CmdLaunch.h"
 #include "BowPad.h"
+#include "StringUtils.h"
+#include "PathUtils.h"
+#include "UnicodeUtils.h"
+#include "EscapeUtils.h"
 
 bool LaunchBase::Launch( const std::wstring& cmdline )
 {
@@ -94,6 +98,22 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     shi.nShow = SW_SHOW;
 
     return !!ShellExecuteEx(&shi);
+}
+
+bool CCmdLaunchSearch::Execute()
+{
+    std::wstring sLaunch = CIniSettings::Instance().GetString(L"CustomLaunch", L"websearch", L"http://www.bing.com/search?q=$(SEL_TEXT_ESCAPED)");
+    if (sLaunch.empty())
+        sLaunch = L"http://www.bing.com/search?q=$(SEL_TEXT_ESCAPED)";
+    return Launch(sLaunch);
+}
+
+CCmdLaunchCustom::CCmdLaunchCustom(UINT customId, void * obj) : m_customId(customId), LaunchBase(obj)
+{
+    m_customCmdId = cmdLaunchCustom0 + customId;
+    m_settingsID = CStringUtils::Format(L"Command%d", customId);
+    InvalidateUICommand(m_customCmdId, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
+    InvalidateUICommand(m_customCmdId, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
 }
 
 HRESULT CCmdLaunchCustom::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
