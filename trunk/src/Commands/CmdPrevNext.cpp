@@ -41,12 +41,18 @@ public:
     size_t          column;
 };
 
-
+// Don't share unless we need to.
+namespace
+{
 std::deque<PositionData>    positions;
 int                         currentDocId = -1;
 int                         offsetBeforeEnd = 0;
 size_t                      currentline = (size_t)-1;
 bool                        ignore = false;
+const size_t                MAX_PREV_NEXT_POSITIONS = 500;
+// Only store a new position if it's more than N lines from the old one.
+const size_t                POSITION_SAVE_GRANULARITY = 10;
+};
 
 void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification * pScn )
 {
@@ -83,7 +89,7 @@ void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification * pScn )
                 // store a new position if it's more than 10 lines from the old one
                 if (currentline > line)
                 {
-                    if ((currentline - line) > 10)
+                    if ((currentline - line) > POSITION_SAVE_GRANULARITY)
                     {
                         if (offsetBeforeEnd)
                         {
@@ -100,7 +106,7 @@ void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification * pScn )
                 }
                 else if (currentline < line)
                 {
-                    if ((line - currentline) > 10)
+                    if ((line - currentline) > POSITION_SAVE_GRANULARITY)
                     {
                         if (offsetBeforeEnd)
                         {
@@ -117,7 +123,7 @@ void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification * pScn )
                 }
             }
             // don't store too many positions, drop the oldest ones
-            if (positions.size() > 500)
+            if (positions.size() > MAX_PREV_NEXT_POSITIONS)
                 positions.pop_front();
         }
         break;
@@ -134,29 +140,26 @@ void CCmdPrevNext::TabNotify( TBHDR * ptbhdr )
             currentDocId = GetDocIdOfCurrentTab();
         }
         break;
-    case TCN_TABDELETE:
-        {
-            // remove all positions in that tab
-            auto it = positions.begin();
-            for (; it != positions.end();)
-            {
-                if (it->id == GetDocIDFromTabIndex(ptbhdr->tabOrigin))
-                {
-                    it = positions.erase(it);
-                }
-                else
-                {
-                    ++it;
-                }
-            }
-            offsetBeforeEnd = 0;
-            InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
-            InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, NULL);
-        }
-        break;
+    // Not definite event of closure. User may cancel so don't erase saved
+    // positions here. Do it on OnDocumentClose.
+    // case TCN_TABDELETE:
     }
 }
 
+void CCmdPrevNext::OnDocumentClose(int tab)
+{
+    // remove all positions in that tab
+    for (auto it = positions.begin(); it != positions.end();)
+    {
+        if (it->id == tab)
+            it = positions.erase(it);
+        else
+            ++it;
+    }
+    offsetBeforeEnd = 0;
+    InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
+    InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, NULL);
+}
 
 bool CCmdPrevious::Execute()
 {
