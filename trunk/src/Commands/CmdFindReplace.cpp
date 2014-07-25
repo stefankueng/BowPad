@@ -49,11 +49,25 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
         {
             InitDialog(hwndDlg, IDI_BOWPAD, false);
 
-            // position the find dialog in the top right corner
+            // Position the find dialog in the top right corner.
+            // Make sure we don't obsecure the scroll bar though.
             RECT rcScintilla, rcDlg;
             GetWindowRect(GetScintillaWnd(), &rcScintilla);
             GetWindowRect(hwndDlg, &rcDlg);
-            SetWindowPos(hwndDlg, HWND_TOP, rcScintilla.right - (rcDlg.right - rcDlg.left), rcScintilla.top, 0, 0, SWP_NOSIZE);
+
+            int sbVertWidth = GetSystemMetrics(SM_CXVSCROLL);
+            // Make a small gap between the dialog and the SB, or edge if
+            // there isn't an sb. The gap needs to be a little bit
+            // big to account for the shadow dialogs sometimes get.
+            // We don't want the shadow obscuring the sb either.
+            LONG adjustX = 15;
+            if (sbVertWidth >= 0)
+                adjustX += sbVertWidth;
+            LONG x = rcScintilla.right - ((rcDlg.right - rcDlg.left) + adjustX);
+            // Try (unscientifically) to not get to close to the tab bar either.
+            LONG y = rcScintilla.top + 15;
+
+            SetWindowPos(hwndDlg, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
 
             AdjustControlSize(IDC_MATCHWORD);
             AdjustControlSize(IDC_MATCHCASE);
@@ -447,6 +461,8 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW * pLVCD)
             //        textColor = GetSysColor(COLOR_HIGHLIGHTTEXT);
             //}
         }
+        // REVIEW: There is only one range here.
+        // Why the vector or the loop!?
         std::vector<Scintilla::Sci_CharacterRange> ranges;
         Scintilla::Sci_CharacterRange r;
         r.cpMin = (long)start;
@@ -951,7 +967,7 @@ void CFindReplaceDlg::SearchDocument(int docID, const CDocument& doc, const std:
             result.docID = docID;
 
             size_t linesize = m_searchWnd.Call(SCI_GETLINE, result.line, 0);
-            std::unique_ptr<char[]> pLine(new char[linesize + 1]);
+            auto pLine = std::make_unique<char[]>(linesize + 1);
             m_searchWnd.Call(SCI_GETLINE, result.line, (sptr_t)pLine.get());
             pLine[linesize] = 0;
             // remove EOLs
@@ -1066,7 +1082,7 @@ std::string CFindReplaceDlg::UnEscape(const std::string& str)
     int i = 0, j = 0;
     int charLeft = (int)str.length();
     char current;
-    std::unique_ptr<char[]> result(new char[str.length() + 1]);
+    auto result = std::make_unique<char[]>(str.length() + 1);
     while (i < (int)str.length())
     {
         current = str[i];
@@ -1212,7 +1228,7 @@ bool CCmdFindReplace::Execute()
             long currentPos = (long)ScintillaCall(SCI_GETCURRENTPOS);
             long startPos = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
             long endPos = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
-            std::unique_ptr<char[]> textbuf(new char[endPos - startPos + 1]);
+            auto textbuf = std::make_unique<char[]>(endPos - startPos + 1);
             Scintilla::Sci_TextRange range;
             range.chrg.cpMin = startPos;
             range.chrg.cpMax = endPos;
@@ -1239,6 +1255,8 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
     {
     case SCN_UPDATEUI:
         {
+            // REVIEW: might want to make this a module global to draw attention
+            // to such global state.
             static int         lastSearchFlags;
 
             LRESULT firstline = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
