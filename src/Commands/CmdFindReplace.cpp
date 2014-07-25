@@ -934,6 +934,11 @@ void CFindReplaceDlg::DoSearchAll(int id)
         ScintillaCall(SCI_GOTOLINE, m_searchResults[0].line);
         Center((long)m_searchResults[0].pos, (long)m_searchResults[0].pos);
     }
+
+    ResString rInfo(hRes, IDS_FINDRESULT_COUNT);
+    std::wstring sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size());
+    SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
+
     SendMessage(*this, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(*this, IDC_FINDRESULTS), TRUE);
 }
 
