@@ -1391,9 +1391,10 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
     // TODO! remove the short cut accelerator &e &c
     // options from these buttons because this dialog is auomatically
     // triggered by typing and it's too easy to accidentally
-    // acknowledge the button by type say hello int o the editor
-    // and getting interrupted by the dialog and matching the
-    // the edit button with the e of hello.
+    // acknowledge the button by typing hello into the editor
+    // and getting interrupted by the dialog popping up
+    // and matching the e of hello with the e of the edit button
+    // and effectively accidentally clicking it.
     // Need mew resource entries for this.
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
     TASKDIALOG_BUTTON aCustomButtons[2];
