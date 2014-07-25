@@ -355,6 +355,7 @@
     <ClCompile Include="Commands\CmdPrevNext.cpp" />
     <ClCompile Include="Commands\CmdPrint.cpp" />
     <ClCompile Include="Commands\CmdScripts.cpp" />
+    <ClCompile Include="Commands\CmdSession.cpp" />
     <ClCompile Include="Commands\CmdStyleConfigurator.cpp" />
     <ClCompile Include="Commands\cmdTabList.cpp" />
     <ClCompile Include="Commands\CommandHandler.cpp" />
