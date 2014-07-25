@@ -805,7 +805,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdFindSelectedNext" />
           </Group>
           <Group CommandName="cmdGroupGoto" SizeDefinition="FourButtons">
-            <DropDownGallery CommandName="cmdTabList"  Type="Items" ItemHeight="16" ItemWidth="16">
+            <DropDownGallery CommandName="cmdTabList" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout Gripper="None"/>
               </DropDownGallery.MenuLayout>
