@@ -288,3 +288,9 @@ void CCmdTabList::OnDocumentSave(int /*tab*/, bool /*bSaveAs*/)
     InvalidateTabList();
 }
 
+bool CCmdTabList::Execute()
+{
+    ResString ctrlName(hRes, cmdTabList_LabelTitle_RESID);
+    return CAppUtils::ShowDropDownList(GetHwnd(), ctrlName);
+}
+
