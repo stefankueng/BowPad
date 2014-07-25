@@ -530,8 +530,6 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                     dis.itemID = nTab;
                     dis.itemState = 0;
 
-                    // Curiously we may not be able to get this always at
-                    // any time.
                     bool got = TabCtrl_GetItemRect(*this, nTab, &dis.rcItem) != FALSE;
                     APPVERIFY(got);
                     if (got)
@@ -703,7 +701,13 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             {
                 NotifyTabDelete(currentTabOn);
 
+                // Don't remember the close button location, it will change if the user
+                // responds to the notification by deleting the tab and if they
+                // don't delete the tab, it'll get calculated again when they move
+                // the mouse.
+                ::SetRectEmpty(&m_currentHoverTabRect);
                 m_whichCloseClickDown = -1;
+
                 return TRUE;
             }
             m_whichCloseClickDown = -1;
@@ -921,7 +925,12 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
     if (m_bIsCloseHover && (m_currentHoverTabItem == (int)pDrawItemStruct->itemID) && (m_whichCloseClickDown == -1)) // hover
         idCloseImg = IDR_CLOSETAB_HOVER;
     else if (m_bIsCloseHover && (m_currentHoverTabItem == (int)pDrawItemStruct->itemID) && (m_whichCloseClickDown == m_currentHoverTabItem)) // pushed
-        idCloseImg = IDR_CLOSETAB_PUSH;
+    {
+        // The pushed state doesn't work and this line related to it creates painting glitches.
+        // So just disable the line until someone cares about the pushed state enough
+        // to make it work properly.
+        // idCloseImg = IDR_CLOSETAB_PUSH;
+    }
     else
         idCloseImg = bSelected ? IDR_CLOSETAB : IDR_CLOSETAB_INACT;
     HDC hdcMemory;
