@@ -680,6 +680,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/PluginsL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdTabList" LabelTitle="Tabs" TooltipTitle="Tab List" TooltipDescription="Shows the list of all opened tabs.">
+      <Command.LargeImages>
+        <Image>res/TabListL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
 
     <Command Name="cmdContextMap" />
     <Command Name="cmdTabContextMap" />
@@ -701,11 +706,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdSessionLast" Id="10010" />
     <Command Name="cmdPasteHistory" Id="10011" />
     <Command Name="cmdGroupNewBtn" Id="10012" />
-    <Command Name="cmdTabList" Id="10013" LabelTitle="Tabs" TooltipTitle="Tab List" TooltipDescription="Shows a list of tabs.">
-      <Command.LargeImages>
-        <Image>res/TabListL.bmp</Image>
-      </Command.LargeImages>
-    </Command>
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />
 
