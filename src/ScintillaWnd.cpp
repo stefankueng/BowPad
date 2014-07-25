@@ -1673,12 +1673,35 @@ void CScintillaWnd::DocScrollUpdate()
     Scn.nmhdr.hwndFrom = *this;
     Scn.nmhdr.idFrom = (uptr_t)this;
     SendMessage(GetParent(*this), WM_NOTIFY, (WPARAM)(this), (LPARAM)&Scn);
+
     // force the scrollbar to redraw
-    SCROLLINFO si;
-    si.cbSize = sizeof(SCROLLINFO);
-    //si.fMask = SIF_RANGE;
-    //GetScrollInfo(*this, SB_VERT, &si);
-    SetScrollInfo(*this, SB_VERT, &si, TRUE);
+
+    // REVIEW:
+    // We were previously constructing an uninitialized object
+    // with random values in except for the size and passing
+    // that to SetScrollInfo.
+    // The documentation isn't clear what that should do, but
+    // that has to be wrong. It wasn't working well if at all
+    // as verification of that.
+
+    // Something like this below would seem more accurate
+    // to persue what I assume was the previous path to get
+    // the current state in order to not change it and pass that
+    // to SetScrollInfo and cause a paint with the TRUE flag.
+    // SCROLLINFO si{sizeof(SCROLLINFO)};
+    // si.fMask = SIF_ALL;
+    // GetScrollInfo(*this, SB_VERT, &si);
+    // SetScrollInfo(*this, SB_VERT, &si, TRUE);
+    // But I'm not sure that works because the data returned doesn't
+    // appear useful at this point.
+
+    // This works better.
+    bool ok = SetWindowPos(*this, NULL, 0, 0, 0, 0, 
+        SWP_FRAMECHANGED | // NO to everything else
+        SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOOWNERZORDER |
+        SWP_NOACTIVATE | SWP_NOSENDCHANGING
+        ) != FALSE;
+    APPVERIFY(ok);
 }
 
 void CScintillaWnd::SetEOLType(int eolType)
