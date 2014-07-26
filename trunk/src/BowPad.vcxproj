@@ -350,10 +350,12 @@
     <ClCompile Include="Commands\CmdLanguage.cpp" />
     <ClCompile Include="Commands\CmdLaunch.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
+    <ClCompile Include="Commands\CmdNewCopy.cpp" />
     <ClCompile Include="Commands\CmdPlugins.cpp" />
     <ClCompile Include="Commands\CmdPluginsConfig.cpp" />
     <ClCompile Include="Commands\CmdPrevNext.cpp" />
     <ClCompile Include="Commands\CmdPrint.cpp" />
+    <ClCompile Include="Commands\CmdRandom.cpp" />
     <ClCompile Include="Commands\CmdScripts.cpp" />
     <ClCompile Include="Commands\CmdSession.cpp" />
     <ClCompile Include="Commands\CmdStyleConfigurator.cpp" />
