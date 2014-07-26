@@ -535,13 +535,13 @@ void CScintillaWnd::Center(long posStart, long posEnd)
 
     // if out of view vertically, scroll line into (center of) view
     int linesToScroll = 0;
-    if (currentlineNumberVis < firstVisibleLineVis)
+    if (currentlineNumberVis < (firstVisibleLineVis+(linesVisible/4)))
     {
         linesToScroll = currentlineNumberVis - firstVisibleLineVis;
         // use center
         linesToScroll -= linesVisible/2;
     }
-    else if (currentlineNumberVis > lastVisibleLineVis)
+    else if (currentlineNumberVis > (lastVisibleLineVis - (linesVisible / 4)))
     {
         linesToScroll = currentlineNumberVis - lastVisibleLineVis;
         // use center
