@@ -444,59 +444,36 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW * pLVCD)
             }
         }
         COLORREF textColor = pLVCD->clrText;
-        if ((item.state & LVIS_SELECTED) && (::GetFocus() == hListControl))
-        {
-            // the theme API really is ridiculous. Instead of returning
-            // what was asked for, in most cases we get an "unsupported" error
-            // and have to fall back ourselves to the plain windows API to get
-            // whatever we want (colors, metrics, ...)
-            // What the API should do is to do the fallback automatically and
-            // return that value - Windows knows best to what it falls back
-            // if something isn't defined in the .msstyles file!
-            //if (SysInfo::Instance().IsXP())
-            //{
-            //    // we only do that on XP, because on Vista/Win7, the COLOR_HIGHLIGHTTEXT
-            //    // is *not* used but some other color I don't know where to get from
-            //    if (FAILED(GetThemeColor(hTheme, LVP_LISTITEM, 0, TMT_HIGHLIGHTTEXT, &textColor)))
-            //        textColor = GetSysColor(COLOR_HIGHLIGHTTEXT);
-            //}
-        }
-        // REVIEW: There is only one range here.
-        // Why the vector or the loop!?
-        std::vector<Scintilla::Sci_CharacterRange> ranges;
+
         Scintilla::Sci_CharacterRange r;
         r.cpMin = (long)start;
         r.cpMax = (long)min(end, text.size());  // regex search can match over several lines, but here we only draw one line
-        ranges.push_back(r);
 
         SetTextColor(pLVCD->nmcd.hdc, textColor);
         SetBkMode(pLVCD->nmcd.hdc, TRANSPARENT);
-        for (auto it = ranges.begin(); it != ranges.end(); ++it)
+        rc = rect;
+        if (r.cpMin - drawPos)
         {
-            rc = rect;
-            if (it->cpMin - drawPos)
-            {
-                DrawText(pLVCD->nmcd.hdc, &text[drawPos], it->cpMin - drawPos, &rc,
-                         DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
-                DrawText(pLVCD->nmcd.hdc, &text[drawPos], it->cpMin - drawPos, &rc,
-                         DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS | DT_CALCRECT );
-                rect.left = rc.right;
-            }
-            rc = rect;
-            drawPos = it->cpMin;
-            if (it->cpMax - drawPos)
-            {
-                SetTextColor(pLVCD->nmcd.hdc, RGB(255,0,0));
-                DrawText(pLVCD->nmcd.hdc, &text[drawPos], it->cpMax - drawPos, &rc,
-                         DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
-                DrawText(pLVCD->nmcd.hdc, &text[drawPos], it->cpMax - drawPos, &rc,
-                         DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS | DT_CALCRECT );
-                rect.left = rc.right;
-                SetTextColor(pLVCD->nmcd.hdc, textColor);
-            }
-            rc = rect;
-            drawPos = it->cpMax;
+            DrawText(pLVCD->nmcd.hdc, &text[drawPos], r.cpMin - drawPos, &rc,
+                     DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
+            DrawText(pLVCD->nmcd.hdc, &text[drawPos], r.cpMin - drawPos, &rc,
+                     DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS | DT_CALCRECT);
+            rect.left = rc.right;
         }
+        rc = rect;
+        drawPos = r.cpMin;
+        if (r.cpMax - drawPos)
+        {
+            SetTextColor(pLVCD->nmcd.hdc, RGB(255, 0, 0));
+            DrawText(pLVCD->nmcd.hdc, &text[drawPos], r.cpMax - drawPos, &rc,
+                     DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
+            DrawText(pLVCD->nmcd.hdc, &text[drawPos], r.cpMax - drawPos, &rc,
+                     DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS | DT_CALCRECT);
+            rect.left = rc.right;
+            SetTextColor(pLVCD->nmcd.hdc, textColor);
+        }
+        rc = rect;
+        drawPos = r.cpMax;
         if ((int)text.size() > drawPos)
             DrawText(pLVCD->nmcd.hdc, text.substr(drawPos).c_str(), -1, &rc,
                      DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
