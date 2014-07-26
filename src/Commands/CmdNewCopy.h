@@ -19,9 +19,6 @@
 #include "ICommand.h"
 #include "BowPad.h"
 #include "BowPadUI.h"
-#include "StringUtils.h"
-#include "UnicodeUtils.h"
-#include "PathUtils.h"
 
 
 class CCmdNewCopy : public ICommand
@@ -34,46 +31,8 @@ public:
     ~CCmdNewCopy(void)
     {}
 
-    virtual bool Execute() override
-    {
-        if (HasActiveDocument())
-        {
-            // create a copy of the active document
-            size_t len = ScintillaCall(SCI_GETLENGTH);
-            std::unique_ptr<char[]> textbuf(new char[len + 1]);
-            ScintillaCall(SCI_GETTEXT, len + 1, (sptr_t)textbuf.get());
+    bool Execute() override;
 
-            CDocument doc = GetActiveDocument();
-            SaveCurrentPos(&doc.m_position);
-            SendMessage(GetHwnd(), WM_COMMAND, MAKEWPARAM(cmdNew, 1), 0);
-            CDocument docnew = GetActiveDocument();
-            auto d = docnew.m_document;
-            docnew = doc;
-            docnew.m_document = d;
-            docnew.m_bDoSaveAs = true;
-            docnew.m_bIsDirty = true;
-            docnew.m_bNeedsSaving = true;
-
-            SetupLexerForLang(docnew.m_language);
-            ScintillaCall(SCI_APPENDTEXT, len, (sptr_t)textbuf.get());
-            SetDocument(GetDocIdOfCurrentTab(), docnew);
-            RestoreCurrentPos(docnew.m_position);
-            ScintillaCall(SCI_SETSAVEPOINT);
-            std::wstring sTitle = CPathUtils::GetFileName(docnew.m_path);
-            if (sTitle.empty())
-                sTitle = GetCurrentTitle();
-            std::wstring sExt = CPathUtils::GetFileExtension(docnew.m_path);
-            ResString sTitleFormat(hRes, IDS_COPYTITLE);
-            if (sExt.empty())
-                sTitle = CStringUtils::Format(sTitleFormat, sTitle.c_str(), sExt.c_str());
-            else
-                sTitle = CStringUtils::Format(sTitleFormat, sTitle.substr(0, sTitle.size() - sExt.size() - 1).c_str(), sExt.c_str());
-            SetCurrentTitle(sTitle.c_str());
-            UpdateStatusBar(true);
-        }
-        return true;
-    }
-
-    virtual UINT GetCmdId() override { return cmdNewCopy; }
+    UINT GetCmdId() override { return cmdNewCopy; }
 };
 
