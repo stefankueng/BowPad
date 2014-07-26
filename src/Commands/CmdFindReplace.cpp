@@ -1245,8 +1245,6 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
     {
     case SCN_UPDATEUI:
         {
-            // REVIEW: might want to make this a module global to draw attention
-            // to such global state.
             static int         lastSearchFlags;
 
             LRESULT firstline = ScintillaCall(SCI_GETFIRSTVISIBLELINE);

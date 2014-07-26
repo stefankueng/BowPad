@@ -1015,8 +1015,9 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
         if (a.Type == RelatedType::SystemInclude && b.Type == RelatedType::UserInclude)
             return false;
         // Within the same type, sort by name.
-        // REVIEW: Consider if PathCompare should be used here and/or
-        // if PathCompare should use StrCmpLogicalW.
+        // don't use PathCompare since we're sorting to show in an UI
+        // and PathCompare should not use StrCmpLogicalW because it's not
+        // necessary and stricmp is faster.
         return StrCmpLogicalW(a.Path.c_str(), b.Path.c_str()) < 0;
     });
 

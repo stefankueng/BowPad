@@ -78,7 +78,6 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         gLanguages.push_back(L"");
 
         std::wstring path = CAppUtils::GetDataPath();
-        // REVIEW: CSimpleFileFind might be better here?
         CDirFileEnum enumerator(path);
         std::wstring respath;
         bool bIsDir = false;
@@ -116,9 +115,10 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
             if (!CAppUtils::HasSameMajorVersion(respath))
                 continue; // Assume old/unversioned, so ignore it.
 
-            // REVIEW! If there's an error from the OS about the locale we could
+            // TODO: If there's an error from the OS about the locale we could
             // perhaps show these as present but flag them as not supported by the
-            // OS or whatever at the appropriate time rahther than just ignore them.
+            // OS or whatever at the appropriate time rather than just ignore them.
+            // Not a high priority issue though...
             int len = GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, 0, 0);
             if (len <= 0) // Assume unrecognized language.
                 continue;
