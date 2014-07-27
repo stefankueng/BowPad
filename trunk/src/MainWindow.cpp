@@ -37,6 +37,7 @@
 #include "SysInfo.h"
 #include "ClipboardHelper.h"
 #include "EditorConfigHandler.h"
+#include "DirFileEnum.h"
 
 #include <memory>
 #include <cassert>
@@ -2177,7 +2178,25 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
     DragFinish(hDrop);
     for (const auto& filename : files)
     {
-        OpenFile(filename, OpenFlags::AddToMRU);
+        if (PathIsDirectory(filename.c_str()))
+        {
+            std::vector<std::wstring> recursefiles;
+            CDirFileEnum enumerator(filename);
+            bool bIsDir = false;
+            std::wstring path;
+            while (enumerator.NextFile(path, &bIsDir, false))
+            {
+                if (!bIsDir)
+                    recursefiles.push_back(path);
+            }
+            if (recursefiles.size() < 100)
+            {
+                for (const auto& f : recursefiles)
+                    OpenFile(f, 0);
+            }
+        }
+        else
+            OpenFile(filename, OpenFlags::AddToMRU);
     }
 }
 
