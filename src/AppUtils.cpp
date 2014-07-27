@@ -464,6 +464,7 @@ bool CAppUtils::HexStringToCOLORREF(const wchar_t* s, COLORREF* clr)
         *clr = RGB(r, g, b) | (v & 0xFF000000);
         return true;
     }
+    APPVERIFY(s[0] == 0);
     *clr = RGB(0,0,0);
     return false;
 }
