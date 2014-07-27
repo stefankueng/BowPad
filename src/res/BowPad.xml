@@ -478,7 +478,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/PlayL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchGroup" LabelTitle="Run">
+    <Command Name="cmdLaunchGroup" LabelTitle="Run" TooltipTitle="Runs various commands">
       <Command.LargeImages>
         <Image>res/PlayL.bmp</Image>
       </Command.LargeImages>
