@@ -149,10 +149,14 @@ void CLexStyles::Load()
                                     case 1: // Foreground color
                                         if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
                                             style.ForegroundColor = clr;
+                                        else
+                                            APPVERIFY(s.empty());
                                         break;
                                     case 2: // Background color
                                         if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
                                             style.BackgroundColor = clr;
+                                        else
+                                            APPVERIFY(s.empty());
                                         break;
                                     case 3: // Font name
                                         style.FontName = s;
@@ -166,6 +170,8 @@ void CLexStyles::Load()
                                     case 6: // Override default background color in case the style was set with a variable
                                         if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
                                             style.BackgroundColor = clr;
+                                        else
+                                            APPVERIFY(s.empty());
                                         break;
                                     }
                                     ++i;
