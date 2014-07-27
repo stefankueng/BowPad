@@ -192,11 +192,18 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
             }
             else
             {
+                int offset = 0;
                 for (size_t i = 0; i < codepages.size(); ++i)
                 {
+                    if ((std::get<1>(codepages[i])) && (std::get<2>(codepages[i]).compare(L"UTF-8 BOM") == 0))
+                    {
+                        offset = 1;
+                        continue;
+                    }
+
                     if ((int)std::get<0>(codepages[i]) == doc.m_encoding)
                     {
-                        hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
+                        hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)(i - offset), ppropvarNewValue);
                         hr = S_OK;
                         break;
                     }
@@ -217,6 +224,8 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, cons
         {
             UINT selected;
             hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
+            if (selected > 1)
+                ++selected; // offset for missing "utf-8 BOM"
             UINT codepage = std::get<0>(codepages[selected]);
             ReloadTab(GetActiveTabIndex(), codepage);
             hr = S_OK;
