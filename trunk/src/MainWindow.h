@@ -26,12 +26,6 @@
 #include <UIRibbonPropertyHelpers.h>
 #include <list>
 
-namespace OpenFlags
-{
-    const unsigned int AddToMRU = 1;
-    const unsigned int AskToCreateIfMissing = 2;
-};
-
 enum class ResponseToOutsideModifiedFile
 {
     Cancel,
@@ -70,12 +64,7 @@ public:
     bool                CreateRibbon();
 
     // Load/Reload functions
-    // TODO: merge more.
-    bool                OpenFileEx(const std::wstring& file, unsigned int openFlags);
-    bool                OpenFile(const std::wstring& file, bool bAddToMRU)
-    {
-        return OpenFileEx(file, bAddToMRU ? OpenFlags::AddToMRU : 0);
-    }
+    bool                OpenFile(const std::wstring& file, unsigned int openFlags);
     bool                OpenFileAs( const std::wstring& temppath, const std::wstring& realpath, bool bModified );
     bool                ReloadTab(int tab, int encoding, bool dueToOutsideChanges = false);
 

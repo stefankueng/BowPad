@@ -228,7 +228,7 @@ bool CCmdRandom::Execute()
             --count;
         }
         // now load that file in the same tab
-        if (OpenFile(showpath.c_str(), false))
+        if (OpenFile(showpath.c_str(), 0))
         {
             CloseTab(tabIndex, false);
         }

@@ -97,7 +97,7 @@ public:
                 std::wstring path = var.bstrVal;
                 PropVariantClear(&var);
                 std::replace(path.begin(), path.end(), '/', '\\');
-                OpenFile(path.c_str(), true);
+                OpenFile(path.c_str(), OpenFlags::AddToMRU);
             }
         }
         return hr;
