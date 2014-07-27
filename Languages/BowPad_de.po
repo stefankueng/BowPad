@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-06-29 19:17+0100\n"
+"PO-Revision-Date: 2014-07-27 19:19+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.5\n"
+"X-Generator: Poedit 1.6.7\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -465,6 +465,15 @@ msgstr "Entsprechende Dateien"
 msgid "Could not download the language file!"
 msgstr "Konnte die Sprachdatei nicht downloaden!"
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Create '%s'"
+msgstr "Erstelle '%s'"
+
+#. Resource IDs: (13)
+msgid "Create Corresponding File"
+msgstr "Erstelle entsprechende Datei"
+
 #. Resource IDs: (11)
 msgid ""
 "Create\n"
@@ -482,8 +491,8 @@ msgid "Creates a new tab with an empty document"
 msgstr "Erstellt einen neuen Tab mit einem leeren Dokument"
 
 #. Resource IDs: (8)
-msgid "Ctrl+Click to open the link in the default browser"
-msgstr "Ctrl+Klick um den Link im Standardbrowser zu öffnen"
+msgid "Ctrl+Doubleclick to open the link in the default browser"
+msgstr "Ctrl+Doppelklick um den Link im Standardbrowser zu öffnen"
 
 #. Resource IDs: (1049, 3770)
 msgid "Custom Command 0"
@@ -798,6 +807,16 @@ msgstr "Suchen/Ersetzen"
 msgid "Font"
 msgstr "Schriftart"
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Found: %d matches"
+msgstr "Gefunden: %d Markierungen"
+
+#. Resource IDs: (13)
+#, c-format
+msgid "Found: %d matches in %d tabs"
+msgstr "Gefunden: %d in %d Tabs"
+
 #. Resource IDs: (3773)
 msgid "Functions"
 msgstr "Funktionen"
@@ -953,11 +972,12 @@ msgstr "Zeile"
 msgid ""
 "Line : %ld\r\n"
 "Column : %ld\r\n"
-"Selection : %Iu | %Iu"
+"Selection : %Iu | %Iu\r\n"
+"Matches: %ld"
 msgstr ""
 "Zeile: %ld\r\n"
 "Spalte: %ld\r\n"
-"Selektion: %lu | %lu"
+"Selektion: %lu | %luMarkierungen: %ld"
 
 #. Resource IDs: (3756)
 msgid "Line Endings"
@@ -1424,6 +1444,10 @@ msgstr "Rechter Rand"
 msgid "Run"
 msgstr "Ausführen"
 
+#. Resource IDs: (3773)
+msgid "Runs various commands"
+msgstr "Führt verschiedene Befehle aus"
+
 #. Resource IDs: (3753)
 msgid "S"
 msgstr "S"
@@ -1504,6 +1528,11 @@ msgstr "Suchtext nicht gefunden!"
 msgid "Searches for the next match of the selected text"
 msgstr "Sucht nach dem nächsten Treffer des markierten Texts"
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Sel : %Iu chars | %Iu lines | %ld matches"
+msgstr "Sel: %lu Zeichen | %lu Zeilen | %ld Markierungen"
+
 #. Resource IDs: (3766)
 msgid "Select Language"
 msgstr "Wähle Sprache"
@@ -1577,6 +1606,10 @@ msgstr "Zeigt eine Liste von Funktionen/Methoden an in der aktuellen Datei"
 msgid "Shows the Windows Explorer file properties dialog for the current file"
 msgstr "Öffnet den Windows Explorer Eigenschaftsdialog für die aktuelle Datei"
 
+#. Resource IDs: (3782)
+msgid "Shows the list of all opened tabs."
+msgstr "Zeigt eine Liste mit offenen Tabs"
+
 #. Resource IDs: (3764)
 msgid "Spaces to Tabs"
 msgstr "Leerzeichen zu Tabulatoren"
@@ -1617,9 +1650,17 @@ msgstr "TS"
 msgid "TT"
 msgstr "TT"
 
+#. Resource IDs: (3782)
+msgid "Tab List"
+msgstr "Tabs Liste"
+
 #. Resource IDs: (3764)
 msgid "Tab Size"
 msgstr "Tabulatorgrösse"
+
+#. Resource IDs: (3782)
+msgid "Tabs"
+msgstr "Tabs"
 
 #. Resource IDs: (3764)
 msgid "Tabs to Spaces"
