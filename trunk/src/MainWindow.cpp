@@ -1048,7 +1048,7 @@ void CMainWindow::EnsureAtLeastOneTab()
 
 void CMainWindow::GoToLine( size_t line )
 {
-    m_editor.Call(SCI_GOTOLINE, line);
+    m_editor.GotoLine((long)line);
 }
 
 void CMainWindow::UpdateStatusBar( bool bEverything )
