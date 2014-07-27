@@ -446,7 +446,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         CFormatMessageWrapper errMsg(err);
         if (((err == ERROR_ACCESS_DENIED)||(err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
         {
-            if (AskToElevatePrivilegeForOpening(hWnd,path))
+            if (!PathIsDirectory(path.c_str()) && AskToElevatePrivilegeForOpening(hWnd, path))
             {
                 // 1223 - operation canceled by user.
                 std::wstring params = L"\"";
