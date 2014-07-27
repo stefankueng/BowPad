@@ -159,10 +159,10 @@ HWND ICommand::GetScintillaWnd()
     return pMainWnd->m_editor;
 }
 
-bool ICommand::OpenFile(LPCWSTR file, bool bAddToMRU)
+bool ICommand::OpenFile(LPCWSTR file, unsigned int openFlags)
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
-    return pMainWnd->OpenFile(file, bAddToMRU);
+    return pMainWnd->OpenFile(file, openFlags);
 }
 
 bool ICommand::ReloadTab( int tab, int encoding )

@@ -157,6 +157,7 @@ drop down list when the lexer language changes. Other utilities need this too.
 
 #include "stdafx.h"
 #include "CmdHeaderSource.h"
+
 #include "PropertySet.h"
 #include "BowPad.h"
 #include "StringUtils.h"
@@ -170,6 +171,8 @@ drop down list when the lexer language changes. Other utilities need this too.
 #include "DirFileEnum.h"
 #include "Resource.h"
 
+namespace
+{
 // We may want to use this elsewhere in the future so draw attention to it, but
 // but for now it's only needed in this module.
 static const char CPP_INCLUDE_STATEMENT_REGEX[] = { "^\\#include\\s+((\\\"[^\\\"]+\\\")|(<[^>]+>))" };
@@ -178,10 +181,11 @@ static const char CPP_INCLUDE_STATEMENT_REGEX[] = { "^\\#include\\s+((\\\"[^\\\"
 // NOTE: This could be a configuration item but that doesn't seem necessary for now.
 const int MAX_INCLUDE_SEARCH_LINES = 100;
 
-const int CORRESPONDING_FILES_CATEGORY = 1;
-const int USER_INCLUDE_CATEGORY = 2;
-const int SYSTEM_INCLUDE_CATEGORY = 3;
-
+const int CREATE_CORRESPONDING_FILE_CATEGORY = 1;
+const int CORRESPONDING_FILES_CATEGORY = 2;
+const int USER_INCLUDE_CATEGORY = 3;
+const int SYSTEM_INCLUDE_CATEGORY = 4;
+};
 
 bool CCmdHeaderSource::UserFindFile(HWND hwndParent, const std::wstring& filename,
                                     const std::wstring& defaultFolder,
@@ -212,16 +216,10 @@ CCmdHeaderSource::CCmdHeaderSource(void * obj)
 {
     m_edit.InitScratch(hRes);
     // Because we don't know if this file type supports includes.
-    InvalidateIncludes();
+    InvalidateMenu();
 }
 
-void CCmdHeaderSource::InvalidateIncludesSource()
-{
-    HRESULT hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
-    CAppUtils::FailedShowMessage(hr);
-}
-
-void CCmdHeaderSource::InvalidateIncludesEnabled()
+void CCmdHeaderSource::InvalidateMenuEnabled()
 {
     // Note SetUICommandProperty(UI_PKEY_Enabled,en) can be useful but probably
     // isn't what we want; and it fails when the ribbon is hidden anyway.
@@ -229,11 +227,12 @@ void CCmdHeaderSource::InvalidateIncludesEnabled()
     CAppUtils::FailedShowMessage(hr);
 }
 
-void CCmdHeaderSource::InvalidateIncludes()
+void CCmdHeaderSource::InvalidateMenu()
 {
     m_menuInfo.clear();
-    InvalidateIncludesSource();
-    InvalidateIncludesEnabled();
+    HRESULT hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
+    CAppUtils::FailedShowMessage(hr);
+    InvalidateMenuEnabled();
 }
 
 HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
@@ -244,6 +243,11 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
     {
         IUICollectionPtr coll;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&coll));
+        if (FAILED(hr))
+            return hr;
+
+        hr = CAppUtils::AddCategory(coll, CREATE_CORRESPONDING_FILE_CATEGORY,
+            IDS_CREATE_CORRESPONDING_FILE_CATEGORY);
         if (FAILED(hr))
             return hr;
 
@@ -319,6 +323,63 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     HRESULT hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
     // Not a concern if it fails, just show the list without images.
     CAppUtils::FailedShowMessage(hr);
+
+    std::vector<std::wstring> correspondingFiles;
+    GetCorrespondingFileMappings(CPathUtils::GetFileName(doc.m_path), correspondingFiles);
+
+    std::wstring basePath = CPathUtils::GetParentDirectory(doc.m_path);
+    std::wstring correspondingFile;
+
+    bool showCreate = true;
+
+#if 0
+    // Need to think more on this. For now offer all creation
+    // options though it is a little clutered.
+
+    // If a corresponding file exists, don't show create options.
+    // otherwise do. Note there isn't a one to one mapping of potential
+    // corresponding files, just a one to one of actual.
+    // e.g.
+    // if editing test.aspx, potential corresponding files might be
+    // be teas.apsx.cs or test.aspx.vb so create options would want
+    // to be shown for either file if neither file existed.
+    // But once one exists, e.g. if test.aspx.vb is created, 
+    // creation options for both test.aspx.cs and test.aspx.vb are not
+    // offered again.
+
+    std::wstring menuText;
+    for (const std::wstring& filename : correspondingFiles)
+    {
+        correspondingFile = CPathUtils::Append(basePath, filename);
+        if (_waccess(correspondingFile.c_str(), 0) == 0)
+        {
+            showCreate = false;
+            break;
+        }
+    }
+#endif
+    if (showCreate)
+    {
+        for (const std::wstring& filename : correspondingFiles)
+        {
+            correspondingFile = CPathUtils::Append(basePath, filename);
+            if (_waccess(correspondingFile.c_str(), 0) != 0)
+            {
+                m_menuInfo.push_back(RelatedFileItem(correspondingFile,
+                    RelatedType::CreateCorrespondingFile));
+
+                ResString createMenuItem(hRes, IDS_CREATE_CORRESPONDING_FILE);
+                std::wstring menuText = CStringUtils::Format(createMenuItem, filename.c_str());
+
+                HRESULT hr = CAppUtils::AddStringItem(collection, menuText.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, pImg);
+                if (FAILED(hr))
+                {
+                    m_menuInfo.pop_back();
+                    return false;
+                }
+            }
+        }
+    }
 
     // Open File Option
 
@@ -469,7 +530,7 @@ bool CCmdHeaderSource::IsValidMenuItem(size_t item) const
 bool CCmdHeaderSource::OpenFileAsLanguage(const std::wstring& filename)
 {
     SetInsertionIndex(GetActiveTabIndex());
-    if (!OpenFile(filename.c_str(), true))
+    if (!OpenFile(filename.c_str(), OpenFlags::AddToMRU))
         return false;
 
     const std::wstring desiredLang = L"C/C++";
@@ -519,7 +580,7 @@ void CCmdHeaderSource::HandleIncludeFileMenuItem(const RelatedFileItem& item)
 void CCmdHeaderSource::HandleCorrespondingFileMenuItem(const RelatedFileItem& item)
 {
     SetInsertionIndex(GetActiveTabIndex());
-    OpenFile(item.Path.c_str(), true);
+    OpenFile(item.Path.c_str(), OpenFlags::AddToMRU);
 }
 
 void CCmdHeaderSource::HandleOpenFileMenuItem()
@@ -556,6 +617,9 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
         case RelatedType::SystemInclude:
         case RelatedType::UserInclude:
             HandleIncludeFileMenuItem(item);
+            break;
+        case RelatedType::CreateCorrespondingFile:
+            return OpenFile(item.Path.c_str(), OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing);
             break;
     }
 
@@ -595,7 +659,7 @@ void CCmdHeaderSource::TabNotify(TBHDR * ptbhdr)
 {
     // Include list will be stale now.
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
-        InvalidateIncludes();
+        InvalidateMenu();
 }
 
 void CCmdHeaderSource::ScintillaNotify(Scintilla::SCNotification * pScn)
@@ -608,7 +672,7 @@ void CCmdHeaderSource::ScintillaNotify(Scintilla::SCNotification * pScn)
             if (pScn->modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT))
             {
                 // Links may have changed.
-                InvalidateIncludes();
+                InvalidateMenu();
             }
             break;
     }
@@ -617,13 +681,13 @@ void CCmdHeaderSource::ScintillaNotify(Scintilla::SCNotification * pScn)
 void CCmdHeaderSource::OnDocumentOpen(int /*index*/)
 {
     // All new links to find.
-    InvalidateIncludes();
+    InvalidateMenu();
 }
 
 void CCmdHeaderSource::OnDocumentSave(int /*index*/, bool /*bSaveAs*/)
 {
     // Language might have changed.
-    InvalidateIncludes();
+    InvalidateMenu();
 }
 
 bool CCmdHeaderSource::Execute()
@@ -653,7 +717,7 @@ bool CCmdHeaderSource::Execute()
             if (_waccess(correspondingFile.c_str(), 0) == 0)
             {
                 SetInsertionIndex(GetActiveTabIndex());
-                return OpenFile(correspondingFile.c_str(), true);
+                return OpenFile(correspondingFile.c_str(), OpenFlags::AddToMRU);
             }
         }
 
@@ -686,7 +750,7 @@ bool CCmdHeaderSource::Execute()
         if (matchingFiles.size() == 1 && autoload)
         {
             SetInsertionIndex(GetActiveTabIndex());
-            return OpenFile(matchingFiles[0].c_str(), true);
+            return OpenFile(matchingFiles[0].c_str(), OpenFlags::AddToMRU);
         }
 
         // Note the menu is always shown if all other paths have been exhausted so
@@ -1050,6 +1114,7 @@ bool CCmdHeaderSource::GetDefaultCorrespondingFileExtMappings(const std::wstring
         // Caller will try files in order of generated results.
             { L"cpp", L"hpp;h" },
             { L"cxx", L"hpp;h" },
+            { L"c",   L"h"     },
             { L"h", L"c;cpp" },
             { L"hpp", L"cpp;cxx" },
             { L"aspx.cs", L"aspx" },

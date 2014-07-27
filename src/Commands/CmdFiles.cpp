@@ -111,7 +111,7 @@ bool CCmdOpen::Execute()
 
     // Open all that was selected or at least returned.
     for (const auto& file : paths)
-        OpenFile(file.c_str(), true);
+        OpenFile(file.c_str(), OpenFlags::AddToMRU);
 
     return true;
 }

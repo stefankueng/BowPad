@@ -20,7 +20,6 @@
 
 #include <string>
 #include <vector>
-#include <functional>
 
 #include "ScintillaWnd.h"
 #include "BowPadUI.h"
@@ -30,7 +29,8 @@ enum class RelatedType
     Unknown,
     Corresponding,
     UserInclude,
-    SystemInclude
+    SystemInclude,
+    CreateCorrespondingFile
 };
 
 class RelatedFileItem
@@ -75,9 +75,8 @@ private:
     void HandleCorrespondingFileMenuItem(const RelatedFileItem& item);
     void HandleOpenFileMenuItem();
     bool PopulateMenu(const CDocument& doc, IUICollectionPtr& collection);
-    void InvalidateIncludes();
-    void InvalidateIncludesSource();
-    void InvalidateIncludesEnabled();
+    void InvalidateMenu();
+    void InvalidateMenuEnabled();
     bool HandleSelectedMenuItem(size_t selected);
     bool IsValidMenuItem(size_t item) const;
     bool UserFindFile(HWND hwndParent, const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename) const;
@@ -98,6 +97,7 @@ private:
     CScintillaWnd                   m_edit;
     std::wstring                    m_systemIncludePaths;
     bool                            m_bSearchedIncludePaths;
+    bool                            m_defaultExecuteFired = false;
 };
 
 

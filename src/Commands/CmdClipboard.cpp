@@ -258,7 +258,7 @@ bool CCmdPaste::Execute()
     }
     for (const auto& file : files)
     {
-        OpenFile(file.c_str(), true);
+        OpenFile(file.c_str(), OpenFlags::AddToMRU);
         bFilesOpened = true;
     }
     if (!bFilesOpened)
