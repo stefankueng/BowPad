@@ -29,7 +29,7 @@ bool CCmdOpenSelection::Execute()
     std::wstring path = GetPathUnderCursor();
     if (!path.empty())
     {
-        return OpenFile(path.c_str(), true);
+        return OpenFile(path.c_str(), OpenFlags::AddToMRU);
     }
     return false;
 }

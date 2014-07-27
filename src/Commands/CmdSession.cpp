@@ -94,7 +94,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         std::wstring path = CIniSettings::Instance().GetString(L"TabSession", key.c_str(), L"");
         if (path.empty())
             break;
-        if (OpenFile(path.c_str(), false))
+        if (OpenFile(path.c_str(), 0))
         {
             if (HasActiveDocument())
             {
@@ -173,7 +173,7 @@ bool CCmdSessionRestoreLast::Execute()
         return false;
     // restore the tab that was closed last
     auto pt = m_docstates.back();
-    if (OpenFile(std::get<0>(pt).c_str(), true))
+    if (OpenFile(std::get<0>(pt).c_str(), OpenFlags::AddToMRU))
     {
         ScintillaCall(SCI_GOTOPOS, 0);
 

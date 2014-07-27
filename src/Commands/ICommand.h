@@ -22,6 +22,12 @@
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 
+namespace OpenFlags
+{
+    const unsigned int AddToMRU = 1;
+    const unsigned int AskToCreateIfMissing = 2;
+};
+
 class ICommand
 {
 public:
@@ -91,7 +97,7 @@ protected:
     HWND                GetHwnd();
     HWND                GetScintillaWnd();
     UINT                GetTimerID() { return m_nextTimerID++; }
-    bool                OpenFile(LPCWSTR file, bool bAddToMRU);
+    bool                OpenFile(LPCWSTR file, unsigned int openFlags);
     bool                ReloadTab(int tab, int encoding = -1); // By default reload encoding
     bool                SaveCurrentTab(bool bSaveAs = false);
     HRESULT             InvalidateUICommand(UI_INVALIDATIONS flags, const PROPERTYKEY *key);

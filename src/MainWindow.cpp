@@ -848,7 +848,7 @@ void CMainWindow::HandleAfterInit()
         unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
         if (m_bPathsToOpenMRU)
             openFlags |= OpenFlags::AddToMRU;
-        OpenFileEx(path.first, openFlags);
+        OpenFile(path.first, openFlags);
         if (path.second != (size_t)-1)
             GoToLine(path.second);
     }
@@ -2032,7 +2032,7 @@ void CMainWindow::HandleTabDelete(const TBHDR& tbhdr)
     CloseTab(tabToDelete);
 }
 
-bool CMainWindow::OpenFileEx(const std::wstring& file, unsigned int openFlags)
+bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
 {
     bool bRet = true;
     bool bAddToMRU = (openFlags & OpenFlags::AddToMRU) != 0;
@@ -2177,7 +2177,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
     DragFinish(hDrop);
     for (const auto& filename : files)
     {
-        OpenFileEx(filename, OpenFlags::AddToMRU);
+        OpenFile(filename, OpenFlags::AddToMRU);
     }
 }
 
@@ -2187,7 +2187,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
     LPCTSTR path = parser.GetVal(L"path");
     if (path)
     {
-        if (OpenFileEx(path, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
+        if (OpenFile(path, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
         {
             if (parser.HasVal(L"line"))
             {
@@ -2209,7 +2209,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
         {
             if (szArglist[i][0] != '/')
             {
-                if (OpenFileEx(szArglist[i], OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
+                if (OpenFile(szArglist[i], OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
                     ++filesOpened;
             }
         }
