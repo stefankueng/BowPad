@@ -587,6 +587,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     {
         lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+        m_selTextMarkerCount = 0;
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
     }
@@ -597,6 +598,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     {
         lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+        m_selTextMarkerCount = 0;
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
     }
@@ -608,6 +610,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     {
         lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+        m_selTextMarkerCount = 0;
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
     }
@@ -617,6 +620,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     {
         lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+        m_selTextMarkerCount = 0;
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
     }
@@ -647,6 +651,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         if (lastSelText.compare(seltextbuffer.get()))
         {
             m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+            m_selTextMarkerCount = 0;
             Scintilla::Sci_TextToFind FindText;
             FindText.chrg.cpMin = 0;
             FindText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
@@ -655,12 +660,14 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
             {
                 size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
                 m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, CTheme::Instance().GetThemeColor(RGB(0,255,0)));
+                ++m_selTextMarkerCount;
                 if (FindText.chrg.cpMin >= FindText.chrgText.cpMax)
                     break;
                 FindText.chrg.cpMin = FindText.chrgText.cpMax;
                 if ((GetTickCount64() - startTicks) > 2000)
                 {
                     m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+                    m_selTextMarkerCount = 0;
                     break;
                 }
             }

@@ -61,6 +61,7 @@ public :
         : CWindow(hInst)
         , m_pSciMsg(nullptr)
         , m_pSciWndData(0)
+        , m_selTextMarkerCount(0)
     {};
     virtual ~CScintillaWnd(){}
 
@@ -104,6 +105,7 @@ public :
     std::string GetCurrentLine() const;
     std::string GetWordChars() const;
     std::string GetWhitespaceChars() const;
+    long GetSelTextMarkerCount() const { return m_selTextMarkerCount; }
 
     LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
 
@@ -130,4 +132,5 @@ private:
     SciFnDirect                 m_pSciMsg;
     sptr_t                      m_pSciWndData;
     CDocScroll                  m_docScroll;
+    long                        m_selTextMarkerCount;
 };
