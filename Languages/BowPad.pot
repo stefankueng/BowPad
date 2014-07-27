@@ -450,7 +450,7 @@ msgid "Creates a new tab with an empty document"
 msgstr ""
 
 #. Resource IDs: (8)
-msgid "Ctrl+Click to open the link in the default browser"
+msgid "Ctrl+Doubleclick to open the link in the default browser"
 msgstr ""
 
 #. Resource IDs: (1049, 3770)
@@ -716,6 +716,16 @@ msgstr ""
 msgid "Font"
 msgstr ""
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Found: %d matches"
+msgstr ""
+
+#. Resource IDs: (13)
+#, c-format
+msgid "Found: %d matches in %d tabs"
+msgstr ""
+
 #. Resource IDs: (3773)
 msgid "Functions"
 msgstr ""
@@ -856,7 +866,7 @@ msgstr ""
 
 #. Resource IDs: (12)
 #, c-format
-msgid "Line : %ld\r\nColumn : %ld\r\nSelection : %Iu | %Iu"
+msgid "Line : %ld\r\nColumn : %ld\r\nSelection : %Iu | %Iu\r\nMatches: %ld"
 msgstr ""
 
 #. Resource IDs: (3756)
@@ -1366,6 +1376,11 @@ msgstr ""
 msgid "Searches for the next match of the selected text"
 msgstr ""
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Sel : %Iu chars | %Iu lines | %ld matches"
+msgstr ""
+
 #. Resource IDs: (3766)
 msgid "Select Language"
 msgstr ""
@@ -1434,6 +1449,10 @@ msgstr ""
 msgid "Shows the Windows Explorer file properties dialog for the current file"
 msgstr ""
 
+#. Resource IDs: (3782)
+msgid "Shows the list of all opened tabs."
+msgstr ""
+
 #. Resource IDs: (3764)
 msgid "Spaces to Tabs"
 msgstr ""
@@ -1474,8 +1493,16 @@ msgstr ""
 msgid "TT"
 msgstr ""
 
+#. Resource IDs: (3782)
+msgid "Tab List"
+msgstr ""
+
 #. Resource IDs: (3764)
 msgid "Tab Size"
+msgstr ""
+
+#. Resource IDs: (3782)
+msgid "Tabs"
 msgstr ""
 
 #. Resource IDs: (3764)
