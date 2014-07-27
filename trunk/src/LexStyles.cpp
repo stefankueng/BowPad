@@ -22,8 +22,8 @@
 #include "BowPad.h"
 #include "AppUtils.h"
 
-#include <vector>
-
+namespace
+{
 LexerData emptyLexData;
 std::map<int, std::string> emptyIntStrVec;
 std::string emptyString;
@@ -31,6 +31,7 @@ std::vector<std::string> emptyStringVector;
 
 static COLORREF fgColor = ::GetSysColor(COLOR_WINDOWTEXT);
 static COLORREF bgColor = ::GetSysColor(COLOR_WINDOW);
+};
 
 StyleData::StyleData()
     : ForegroundColor(fgColor)
@@ -137,8 +138,7 @@ void CLexStyles::Load()
                                 std::vector<std::wstring> vec;
                                 stringtok(vec, v, false, L";");
                                 int i = 0;
-                                wchar_t * endptr;
-                                unsigned long hexval;
+                                COLORREF clr;
                                 for (const auto& s : vec)
                                 {
                                     switch (i)
@@ -147,12 +147,14 @@ void CLexStyles::Load()
                                         style.Name = s;
                                         break;
                                     case 1: // Foreground color
-                                        hexval = wcstol(s.c_str(), &endptr, 16);
-                                        style.ForegroundColor = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
+                                        if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
+                                            style.ForegroundColor = clr;
+                                        //else APPVERIFY(false); // TODO
                                         break;
                                     case 2: // Background color
-                                        hexval = wcstol(s.c_str(), &endptr, 16);
-                                        style.BackgroundColor = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
+                                        if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
+                                            style.BackgroundColor = clr;
+                                        //else APPVERIFY(false);
                                         break;
                                     case 3: // Font name
                                         style.FontName = s;
@@ -164,15 +166,17 @@ void CLexStyles::Load()
                                         style.FontSize = _wtoi(s.c_str());
                                         break;
                                     case 6: // Override default background color in case the style was set with a variable
-                                        hexval = wcstol(s.c_str(), &endptr, 16);
-                                        style.BackgroundColor = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
+                                        if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
+                                            style.BackgroundColor = clr;
+                                        //else APPVERIFY(false);
                                         break;
                                     }
                                     ++i;
                                 }
 
-                                lexerdata.Styles[_wtoi(it+5)] = style;
-                                userlexerdata.Styles[_wtoi(it+5)] = style;
+                                int pos = _wtoi(it+5);
+                                lexerdata.Styles[pos] = style;
+                                userlexerdata.Styles[pos] = style;
                             }
                             if (_wcsnicmp(L"Prop_", it, 5) == 0)
                             {
