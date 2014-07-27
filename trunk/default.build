@@ -108,6 +108,7 @@
       </buildfiles>
     </nant>
     <property name="verstring" value="${environment::get-variable('MajorVersion')}.${environment::get-variable('MinorVersion')}.${environment::get-variable('MicroVersion')}" />
+    <property name="verstringfull" value="${verstring}.${environment::get-variable('WCREV')}" />
     <zip zipfile="bin\BowPad-${verstring}-portable.zip" ziplevel="9">
       <fileset basedir="bin\${configuration}\bin">
         <include name="BowPad.exe" />
@@ -118,6 +119,42 @@
         <include name="BowPad.exe" />
       </fileset>
     </zip>
+    <!-- now write the version.txt file -->
+    <echo file="version.txt">${verstringfull}
+http://sourceforge.net/projects/stefanstools/files/BowPad/${verstring}/BowPad64-${verstring}.msi/download
+BowPad64-${verstring}.msi
+http://sourceforge.net/projects/stefanstools/files/BowPad/${verstring}/BowPad-${verstring}.msi/download
+BowPad-${verstring}.msi</echo>
+    <loadfile file="ext\choco\bowpad.nuspec" property="nuspecfile">
+      <filterchain>
+        <replacetokens begintoken="$" endtoken="$">
+          <token key="MajorVersion" value="${environment::get-variable('MajorVersion')}" />
+          <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
+          <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
+          <token key="WCREV" value="${environment::get-variable('WCREV')}" />
+          <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
+        </replacetokens>
+      </filterchain>
+    </loadfile>
+    <echo file="ext\choco\package\bowpad.nuspec" message="${nuspecfile}" />
+    <loadfile file="ext\choco\chocolateyInstall.ps1" property="cinstfile">
+      <filterchain>
+        <replacetokens begintoken="$" endtoken="$">
+          <token key="MajorVersion" value="${environment::get-variable('MajorVersion')}" />
+          <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
+          <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
+          <token key="WCREV" value="${environment::get-variable('WCREV')}" />
+          <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
+        </replacetokens>
+      </filterchain>
+    </loadfile>
+    <echo file="ext\choco\package\tools\chocolateyInstall.ps1" message="${cinstfile}" />
+    <echo>
+      now start an admin console in ext\choco\package and then run
+      choco pack
+      to upload the package, run
+      cpush BowPad-x.x.x.nupkg
+    </echo>
   </target>
 
   <target name="msi" depends="VersionInfo">
