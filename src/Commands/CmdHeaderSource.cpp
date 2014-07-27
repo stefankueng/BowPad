@@ -1099,7 +1099,7 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
     return true;
 }
 
-bool CCmdHeaderSource::GetDefaultCorrespondingFileExtMappings(const std::wstring& from, std::wstring& to)
+bool CCmdHeaderSource::GetDefaultCorrespondingFileExtMappings(const std::wstring& from, std::wstring& to) const
 {
     to.clear();
 
@@ -1132,7 +1132,7 @@ bool CCmdHeaderSource::GetDefaultCorrespondingFileExtMappings(const std::wstring
     return false;
 }
 
-void CCmdHeaderSource::GetCorrespondingFileMappings(const std::wstring& input_filename, std::vector<std::wstring>& corresponding_filenames)
+void CCmdHeaderSource::GetCorrespondingFileMappings(const std::wstring& input_filename, std::vector<std::wstring>& corresponding_filenames) const
 {
     // Let the user override our defaults for an extension.
     std::wstring from_ext = CPathUtils::GetLongFileExtension(input_filename);
