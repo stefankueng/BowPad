@@ -437,6 +437,15 @@ msgstr ""
 msgid "Could not download the language file!"
 msgstr ""
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Create '%s'"
+msgstr ""
+
+#. Resource IDs: (13)
+msgid "Create Corresponding File"
+msgstr ""
+
 #. Resource IDs: (11)
 msgid "Create\nAn empty file is created."
 msgstr ""
@@ -1302,6 +1311,10 @@ msgstr ""
 
 #. Resource IDs: (3772)
 msgid "Run"
+msgstr ""
+
+#. Resource IDs: (3773)
+msgid "Runs various commands"
 msgstr ""
 
 #. Resource IDs: (3753)
