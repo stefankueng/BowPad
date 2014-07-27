@@ -352,6 +352,7 @@
     <ClCompile Include="Commands\CmdLaunch.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
     <ClCompile Include="Commands\CmdNewCopy.cpp" />
+    <ClCompile Include="Commands\CmdOpenSelection.cpp" />
     <ClCompile Include="Commands\CmdPlugins.cpp" />
     <ClCompile Include="Commands\CmdPluginsConfig.cpp" />
     <ClCompile Include="Commands\CmdPrevNext.cpp" />

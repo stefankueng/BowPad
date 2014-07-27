@@ -17,9 +17,7 @@
 
 #pragma once
 #include "ICommand.h"
-#include "BowPad.h"
 #include "BowPadUI.h"
-#include "UnicodeUtils.h"
 
 class CCmdOpenSelection : public ICommand
 {
@@ -33,85 +31,12 @@ public:
     {
     }
 
-    virtual bool Execute() override
-    {
-        std::wstring path = GetPathUnderCursor();
-        if (!path.empty())
-        {
-            return OpenFile(path.c_str(), true);
-        }
-        return false;
-    }
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdOpenSelection; }
+    UINT GetCmdId() override { return cmdOpenSelection; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
-    {
-        if (UI_PKEY_Enabled == key)
-        {
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !GetPathUnderCursor().empty(), ppropvarNewValue);
-        }
-        if (UI_PKEY_Label == key)
-        {
-            // add the filename to the command label
-            std::wstring path = GetPathUnderCursor();
-            auto slashpos = path.find_last_of('\\');
-            if (slashpos != std::wstring::npos)
-            {
-                path = path.substr(slashpos+1);
-            }
-
-            ResString label(hRes, cmdOpenSelection_LabelTitle_RESID);
-            if (!path.empty())
-            {
-                return UIInitPropertyFromString(UI_PKEY_Label, CStringUtils::Format(L"%s \"%s\"", (LPCWSTR)label, path.c_str()).c_str(), ppropvarNewValue);
-            }
-            else
-            {
-                return UIInitPropertyFromString(UI_PKEY_Label, label, ppropvarNewValue);
-            }
-        }
-        return E_NOTIMPL;
-    }
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
 private:
-    std::wstring GetPathUnderCursor()
-    {
-        ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
-        size_t pos = ScintillaCall(SCI_GETCURRENTPOS);
-        std::string sWordA = GetTextRange(static_cast<long>(ScintillaCall(SCI_WORDSTARTPOSITION, pos, false)), static_cast<long>(ScintillaCall(SCI_WORDENDPOSITION, pos, false)));
-        std::wstring sWord = CUnicodeUtils::StdGetUnicode(sWordA);
-        ScintillaCall(SCI_SETCHARSDEFAULT);
-
-        InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
-        InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
-
-        if (PathIsRelative(sWord.c_str()))
-        {
-            CDocument doc = GetActiveDocument();
-            if (!doc.m_path.empty())
-            {
-                auto slashpos = doc.m_path.find_last_of('\\');
-                if (slashpos != std::wstring::npos)
-                {
-                    std::wstring path = doc.m_path.substr(0, slashpos) + L"\\" + sWord;
-                    if (PathFileExists(path.c_str()) && !PathIsDirectory(path.c_str()))
-                        return path;
-                    path = doc.m_path.substr(0, slashpos);
-                    slashpos = path.find_last_of('\\');
-                    if (slashpos != std::wstring::npos)
-                    {
-                        path = doc.m_path.substr(0, slashpos) + L"\\" + sWord;
-                        if (PathFileExists(path.c_str()) && !PathIsDirectory(path.c_str()))
-                            return path;
-                    }
-                }
-            }
-        }
-        if (PathFileExists(sWord.c_str()) && !PathIsDirectory(sWord.c_str()))
-        {
-            return sWord;
-        }
-        return L"";
-    }
+    std::wstring GetPathUnderCursor();
 };
