@@ -1060,22 +1060,23 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     static ResString rsStatusTTTypingOvl(hRes, IDS_STATUSTTTYPINGOVL);
     static ResString rsStatusTTTypingIns(hRes, IDS_STATUSTTTYPINGINS);
     static ResString rsStatusTTTabs(hRes, IDS_STATUSTTTABS);
+    static ResString rsStatusSelection(hRes, IDS_STATUSSELECTION);
 
     TCHAR strLnCol[128] = { 0 };
     TCHAR strSel[64] = {0};
     size_t selByte = 0;
     size_t selLine = 0;
-
-    if (m_editor.GetSelectedCount(selByte, selLine))
-        swprintf_s(strSel, L"Sel : %Iu | %Iu", selByte, selLine);
+    long selTextMarkerCount = m_editor.GetSelTextMarkerCount();
+    if (m_editor.GetSelectedCount(selByte, selLine) && selByte)
+        swprintf_s(strSel, rsStatusSelection, selByte, selLine, selTextMarkerCount);
     else
         swprintf_s(strSel, L"Sel : %s", L"N/A");
     long line = (long)m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS)) + 1;
     long column = (long)m_editor.Call(SCI_GETCOLUMN, m_editor.Call(SCI_GETCURRENTPOS)) + 1;
     swprintf_s(strLnCol, L"Ln : %ld    Col : %ld    %s",
-                       line, column,
-                       strSel);
-    std::wstring ttcurpos = CStringUtils::Format(rsStatusTTCurPos, line, column, selByte, selLine);
+               line, column,
+               strSel);
+    std::wstring ttcurpos = CStringUtils::Format(rsStatusTTCurPos, line, column, selByte, selLine, selTextMarkerCount);
     m_StatusBar.SetText(strLnCol, ttcurpos.c_str(), STATUSBAR_CUR_POS);
 
     TCHAR strDocLen[256];
