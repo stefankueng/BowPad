@@ -17,19 +17,17 @@
 #include "stdafx.h"
 #include "MRU.h"
 #include "AppUtils.h"
+#include "PathUtils.h"
+#include "codecvt.h"
 
 #include <iostream>
 #include <fstream>
-#include "codecvt.h"
 #include <algorithm>
 #include <cctype>
 #include <memory>
-#include <functional>
 #include <strsafe.h>
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
-
-const int PinnedMask = 0x8000;
 
 // Implement the properties that describe a Recent Item to the Windows Ribbon
 class CRecentFileProperties
@@ -170,8 +168,11 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
     LONG i = 0;
     for (auto countPathPair = m_mruVec.crbegin(); countPathPair != m_mruVec.crend(); ++countPathPair)
     {
+        const MRUItem& mru = *countPathPair;
+
+        // TODO! Use Com smart ptr type RAII here.
         CRecentFileProperties* pPropertiesObj = nullptr;
-        hr = CRecentFileProperties::CreateInstance(std::get<0>(*countPathPair).c_str(), std::get<1>(*countPathPair), &pPropertiesObj);
+        hr = CRecentFileProperties::CreateInstance(mru.path.c_str(), mru.pinned, &pPropertiesObj);
 
         if (SUCCEEDED(hr))
         {
@@ -192,8 +193,9 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
         if (FAILED(hr))
             break;
 
-        i ++;
+        i++;
     }
+    // TODO! Set/check hr here.
     // We will only populate items up to before the first failed item, and discard the rest.
     SAFEARRAYBOUND sab = {i,0};
     SafeArrayRedim(psa, &sab);
@@ -209,33 +211,33 @@ void CMRU::AddPath( const std::wstring& path )
         Load();
 
     bool pinned = false;
-    std::wstring lpath = path;
-    std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::tolower);
 
+    // Erase the first MRU item that might already exist
+    // with the same path (case insensitive)
+    // Remember if it was pinned if it was found.
     for (auto it = m_mruVec.begin(); it != m_mruVec.end(); ++it)
     {
-        std::wstring lp = std::get<0>(*it);
-        std::transform(lp.begin(), lp.end(), lp.begin(), ::tolower);
-        if (lpath.compare(lp) == 0)
+        if (CPathUtils::PathCompare(path, it->path) == 0)
         {
-            pinned = std::get<1>(*it);
+            pinned = it->pinned;
             m_mruVec.erase(it);
             break;
         }
     }
     if (m_mruVec.size() >= 20)
     {
-        // clear out old entries if they're not pinned
+        // Clear out an old entry if it's not pinned
         for (auto it = m_mruVec.begin(); it != m_mruVec.end(); ++it)
         {
-            if (std::get<1>(*it))
-                continue;
-            m_mruVec.erase(it);
-            break;
+            if (!it->pinned)
+            {
+                m_mruVec.erase(it);
+                break;
+            }
         }
     }
 
-    m_mruVec.push_back(std::make_tuple(path, pinned));
+    m_mruVec.push_back(MRUItem(path, pinned));
     Save();
 }
 
@@ -244,15 +246,11 @@ void CMRU::RemovePath( const std::wstring& path, bool removeEvenIfPinned )
     if (!m_bLoaded)
         Load();
 
-    std::wstring lpath = path;
-    std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::tolower);
     for (auto it = m_mruVec.begin(); it != m_mruVec.end(); ++it)
     {
-        std::wstring lp = std::get<0>(*it);
-        std::transform(lp.begin(), lp.end(), lp.begin(), ::tolower);
-        if (lpath.compare(lp) == 0)
+        if (CPathUtils::PathCompare(path, it->path) == 0)
         {
-            if (removeEvenIfPinned || !std::get<1>(*it))
+            if (removeEvenIfPinned || !it->pinned)
                 m_mruVec.erase(it);
             break;
         }
@@ -260,10 +258,19 @@ void CMRU::RemovePath( const std::wstring& path, bool removeEvenIfPinned )
     Save();
 }
 
+std::wstring CMRU::GetMRUFilename() const
+{
+    std::wstring path = CAppUtils::GetDataPath();
+    path = CPathUtils::Append(path, L"mru");
+    return path;
+}
+
+
 void CMRU::Load()
 {
     m_bLoaded = true;
-    std::wstring path = CAppUtils::GetDataPath() + L"\\mru";
+
+    std::wstring path = GetMRUFilename();
 
     std::wifstream File;
     File.imbue(std::locale(std::locale(), new utf8_conversion()));
@@ -275,18 +282,19 @@ void CMRU::Load()
 
         const int maxlinelength = 65535;
 
-        std::unique_ptr<wchar_t[]> line(new wchar_t[maxlinelength]);
+        auto line = std::make_unique<wchar_t[]>(maxlinelength);
         do
         {
             File.getline(line.get(), maxlinelength);
 
             std::wstring sLine = line.get();
-            size_t pos = sLine.find('*');
+            size_t pos = sLine.find(L'*');
             if (pos != std::wstring::npos)
             {
                 std::wstring sPinned = sLine.substr(0, pos);
                 std::wstring sPath = sLine.substr(pos + 1);
-                m_mruVec.push_back(std::make_tuple(sPath, sPinned.compare(L"1") == 0));
+                bool pinned = (sPinned == L"1");
+                m_mruVec.push_back(MRUItem(sPath, pinned));
             }
         } while (File.gcount() > 0);
         File.close();
@@ -301,7 +309,7 @@ void CMRU::Load()
 
 void CMRU::Save()
 {
-    std::wstring path = CAppUtils::GetDataPath() + L"\\mru";
+    std::wstring path = GetMRUFilename();
 
     std::wofstream File;
     File.imbue(std::locale(std::locale(), new utf8_conversion()));
@@ -312,10 +320,9 @@ void CMRU::Save()
         if (!File.good())
             return;
 
-        for (auto t : m_mruVec)
-        {
-            File << (std::get<1>(t) ? L"1" : L"0") << L"*" << std::get<0>(t) << std::endl;
-        }
+        for (const auto& mru : m_mruVec)
+            File << (mru.pinned ? L"1" : L"0") << L"*" << mru.path << std::endl;
+
         File.close();
     }
     catch (std::ios_base::failure &)
@@ -328,18 +335,20 @@ void CMRU::PinPath( const std::wstring& path, bool bPin )
 {
     if (!m_bLoaded)
         Load();
-    bool bPinned = false;
-    size_t i = 0;
-    for (auto it : m_mruVec)
+
+    for (auto& mru : m_mruVec) // Intentionally mutable.
     {
-        if (std::get<0>(it).compare(path)==0)
+        if (CPathUtils::PathCompare(mru.path, path)==0)
         {
-            bPinned = std::get<1>(it);
-            m_mruVec[i] = std::make_tuple(path, bPin);
-            if (bPinned != bPin)
+            // Technically paths are case insensitive on the file system
+            // so updating the path might is kind of updating it to itself but
+            // do it anyway so it reflects the actual case used even
+            // if it refers to the same file.
+            bool wasPinned = mru.pinned;
+            mru = MRUItem(path, bPin); // Container update.
+            if (wasPinned != bPin)
                 Save();
-            break;
+            break; // Assume there is only one path with the same name here.
         }
-        ++i;
     }
 }
