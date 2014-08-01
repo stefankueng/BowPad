@@ -72,7 +72,7 @@ protected:
     CDocument           GetActiveDocument() const;
     bool                HasDocumentID(int id);
     CDocument           GetDocumentFromID(int id);
-    void                SetDocument(int id, CDocument doc);
+    void                SetDocument(int id, const CDocument& doc);
     void                RestoreCurrentPos(const CPosData& pos);
     void                SaveCurrentPos(CPosData * pos);
 
