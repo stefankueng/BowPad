@@ -19,6 +19,8 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 
+#include <vector>
+
 class CCmdSessionLoad : public ICommand
 {
 public:
@@ -63,6 +65,14 @@ public:
 
 };
 
+struct SessionItem
+{
+    SessionItem(std::wstring& path , CPosData& posData)
+        : path(path), posData(posData) {}
+    std::wstring path;
+    CPosData posData;
+};
+
 class CCmdSessionRestoreLast : public ICommand
 {
 public:
@@ -82,5 +92,5 @@ public:
     void OnDocumentClose(int index) override;
 
 private:
-    std::list<std::tuple<std::wstring,CPosData>> m_docstates;
+    std::vector<SessionItem> m_docstates;
 };
