@@ -2119,7 +2119,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             // the TCN_CHANGE event will then install the new document as
             // active for the second time, possibly creating excess references.
 
-            // LLetting ActivateAt manage the setting of the new document,
+            // Letting ActivateAt manage the setting of the new document,
             // at least for now but probably for ever, avoids these issues.
             // Calling m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document) ourselves
             // before ActivateAt causes the issues.
@@ -2132,7 +2132,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             // I've added an else path to keep the code the same as before in this case
             // so things are no worse than before, but I think this still incorrect.
             // Another issue is that the IsWindowEnabled is probably not enough of a
-            // test either, and possibly isn't applied rigurously enough in any case
+            // test either, and possibly isn't applied rigorously enough in any case
             // (see above comment at top of function).
 
             // All in all this all indicates some further thought and restructuring is
