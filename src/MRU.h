@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013 - 2014 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,6 +18,14 @@
 #include <string>
 #include <vector>
 
+struct MRUItem
+{
+    MRUItem(const std::wstring& path, bool pinned)
+        : path(path), pinned(pinned) { }
+    std::wstring path;
+    bool pinned;
+};
+
 class CMRU
 {
 private:
@@ -33,10 +41,11 @@ public:
     void                            PinPath(const std::wstring& path, bool bPin);
 
 private:
+    std::wstring                    GetMRUFilename() const;
     void                            Load();
     void                            Save();
 
 private:
     bool                            m_bLoaded;
-    std::vector<std::tuple<std::wstring, bool>>     m_mruVec;
+    std::vector<MRUItem>            m_mruVec;
 };
