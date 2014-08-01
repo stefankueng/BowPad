@@ -228,7 +228,7 @@ CDocument ICommand::GetDocumentFromID( int id )
     return pMainWnd->m_DocManager.GetDocumentFromID(id);
 }
 
-void ICommand::SetDocument( int id, CDocument doc )
+void ICommand::SetDocument( int id, const CDocument& doc )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     return pMainWnd->m_DocManager.SetDocument(id, doc);
