@@ -473,10 +473,12 @@ bool CAppUtils::TryParse(const wchar_t* s, int& result, bool emptyOk, int def)
     // info for exceptions that are handled so aren't of interest.
     // However, for the uses intended so far exceptions shouldn't be thrown
     // so hopefully this will not be a problem.
-    if (!*s && emptyOk)
+    if (!*s)
     {
+        // Don't even try to convert empty strings.
+        // Success or failure is determined by the caller.
         result = def;
-        return true;
+        return emptyOk;
     }
     try
     {
