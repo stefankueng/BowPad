@@ -33,15 +33,11 @@
 #include <ctime>
 #include <fstream>
 
-
 #pragma comment(lib, "Urlmon.lib")
 #pragma comment(lib, "Shell32.lib")
 
-
 std::wstring CAppUtils::updatefilename;
 std::wstring CAppUtils::updateurl;
-
-
 
 CAppUtils::CAppUtils(void)
 {
@@ -466,5 +462,31 @@ bool CAppUtils::HexStringToCOLORREF(const wchar_t* s, COLORREF* clr)
     }
     *clr = RGB(0,0,0);
     return false;
+}
+
+bool CAppUtils::TryParse(const wchar_t* s, int& result, bool emptyOk, int def)
+{
+    // At the time of writing _wtoi doesn't appear to set errno at all,
+    // despite what the documentation suggests.
+    // Using std::stoi isn't ideal as exceptions aren't really wanted here,
+    // and they cloud the output window in VS with often unwanted exception
+    // info for exceptions that are handled so aren't of interest.
+    // However, for the uses intended so far exceptions shouldn't be thrown
+    // so hopefully this will not be a problem.
+    if (!*s && emptyOk)
+    {
+        result = def;
+        return true;
+    }
+    try
+    {
+        result  = std::stoi(s);
+    }
+    catch (std::invalid_argument& /*ex*/)
+    {
+        result = def;
+        return false;
+    }
+    return true;
 }
 

@@ -38,6 +38,7 @@ public:
     static bool                     ShowDropDownList(HWND hWnd, LPCWSTR ctrlName);
     static HRESULT                  CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg );
     static bool                     HexStringToCOLORREF(const wchar_t* s, COLORREF* clr);
+    static bool                     TryParse(const wchar_t* s, int& result, bool emptyOk = false, int def = 0);
 private:
     static std::wstring             updatefilename;
     static std::wstring             updateurl;
