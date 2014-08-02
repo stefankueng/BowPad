@@ -19,10 +19,6 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 
-#include <string>
-#include <vector>
-
-
 class CCmdLoadAsEncoded : public ICommand
 {
 public:

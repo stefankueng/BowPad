@@ -23,23 +23,40 @@
 #include "ResString.h"
 
 #include <vector>
-#include <tuple>
+#include <string>
 
-//                 codepage  BOM   name          category
-std::vector<std::tuple<UINT, bool, std::wstring, int>>  codepages;
+struct CodePageItem
+{
+    CodePageItem(UINT codepage, bool bom, const std::wstring& name, int category) 
+        : codepage(codepage), bom(bom), name(name), category(category) { }
+
+    UINT codepage;
+    bool bom;
+    std::wstring name;
+    int category;
+};
+
+namespace
+{
+// Don't change value, file data depends on them.
+const int CP_CATEGORY_MAIN = 0;
+const int CP_CATEGORY_CODEPAGES = 1;
+
+std::vector<CodePageItem>  codepages;
+};
 
 BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
 {
     if (codepages.empty())
     {
         // insert the main encodings
-        codepages.push_back(std::make_tuple(GetACP(), false, L"ANSI", 0));
-        codepages.push_back(std::make_tuple(CP_UTF8, false, L"UTF-8", 0));
-        codepages.push_back(std::make_tuple(CP_UTF8, true, L"UTF-8 BOM", 0));
-        codepages.push_back(std::make_tuple(1200, true, L"UTF-16 Little Endian", 0));
-        codepages.push_back(std::make_tuple(1201, true, L"UTF-16 Big Endian", 0));
-        codepages.push_back(std::make_tuple(12000, true, L"UTF-32 Little Endian", 0));
-        codepages.push_back(std::make_tuple(12001, true, L"UTF-32 Big Endian", 0));
+        codepages.push_back(CodePageItem(GetACP(), false, L"ANSI", 0));
+        codepages.push_back(CodePageItem(CP_UTF8, false, L"UTF-8", 0));
+        codepages.push_back(CodePageItem(CP_UTF8, true, L"UTF-8 BOM", 0));
+        codepages.push_back(CodePageItem(1200, true, L"UTF-16 Little Endian", 0));
+        codepages.push_back(CodePageItem(1201, true, L"UTF-16 Big Endian", 0));
+        codepages.push_back(CodePageItem(12000, true, L"UTF-32 Little Endian", 0));
+        codepages.push_back(CodePageItem(12001, true, L"UTF-32 Big Endian", 0));
     }
     UINT codepage = _wtoi(lpCodePageString);
     switch (codepage)
@@ -65,7 +82,7 @@ BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
                 if (pos != std::wstring::npos)
                     name.erase(pos, 1);
                 CStringUtils::trim(name);
-                codepages.push_back(std::make_tuple(codepage, false, std::move(name), 1));
+                codepages.push_back(CodePageItem(codepage, false, name, 1));
             }
         }
         break;
@@ -78,160 +95,106 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
 {
     HRESULT hr = E_FAIL;
 
-    if(key == UI_PKEY_Categories)
+    if (key == UI_PKEY_Categories)
     {
         IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (FAILED(hr))
-        {
+        if (CAppUtils::FailedShowMessage(hr))
             return hr;
-        }
 
-        // Create a property set for the main category.
-        CPropertySet *pMain;
-        hr = CPropertySet::CreateInstance(&pMain);
+        hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MAIN, IDS_ENCODING_MAIN);
         if (FAILED(hr))
-        {
             return hr;
-        }
-
-        // Load the label for the main category from the resource file.
-        ResString sMain(hRes, IDS_ENCODING_MAIN);
-        // Initialize the property set with the label that was just loaded and a category id of 0.
-        pMain->InitializeCategoryProperties(sMain, 0);
-        pCollection->Add(pMain);
-        pMain->Release();
-
-
-        // Create a property set for the codepages category.
-        CPropertySet *pCodepages;
-        hr = CPropertySet::CreateInstance(&pCodepages);
+        hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_CODEPAGES, IDS_ENCODING_CODEPAGES);
         if (FAILED(hr))
-        {
             return hr;
-        }
 
-        ResString sCP(hRes, IDS_ENCODING_CODEPAGES);
-        // Initialize the property set with the label that was just loaded and a category id of 0.
-        pCodepages->InitializeCategoryProperties(sCP, 1);
-        pCollection->Add(pCodepages);
-        pCodepages->Release();
-
-        hr = S_OK;
+        return S_OK;
     }
     else if (key == UI_PKEY_ItemsSource)
     {
         IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (FAILED(hr))
-        {
+        if (CAppUtils::FailedShowMessage(hr))
             return hr;
-        }
 
         if (codepages.empty())
             EnumSystemCodePages(CodePageEnumerator, CP_INSTALLED);
 
-
-        // Create an IUIImage from a resource id.
         IUIImagePtr pImg;
-        IUIImageFromBitmapPtr pifbFactory;
-        hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
-        if (FAILED(hr))
-        {
-            return hr;
-        }
-
-        // Load the bitmap from the resource file.
-        HBITMAP hbm = (HBITMAP) LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_EMPTY), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-        if (hbm)
-        {
-            // Use the factory implemented by the framework to produce an IUIImage.
-            hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_TRANSFER, &pImg);
-            if (FAILED(hr))
-            {
-                DeleteObject(hbm);
-            }
-        }
-
-        if (FAILED(hr))
-        {
-            return hr;
-        }
-
-
+        hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY),pImg);
+        CAppUtils::FailedShowMessage(hr); // Report any problem, don't let it stop us.
 
         // populate the dropdown with the code pages
-        for (auto it:codepages)
+        for (const auto& cp : codepages)
         {
-            if ((std::get<1>(it)) && (std::get<2>(it).compare(L"UTF-8 BOM")==0))
+            if (cp.bom && cp.name.compare(L"UTF-8 BOM")==0)
                 continue;
 
-            CAppUtils::AddStringItem(pCollection, std::get<2>(it).c_str(), std::get<3>(it), pImg);
+            CAppUtils::AddStringItem(pCollection, cp.name.c_str(), cp.category, pImg);
         }
-        hr = S_OK;
+        return S_OK;
     }
     else if (key == UI_PKEY_Enabled)
     {
+        HRESULT hr;
         // only enabled if the current doc has a path!
-        if (HasActiveDocument())
-        {
-            CDocument doc = GetActiveDocument();
-            hr = UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
-        }
+        if (!HasActiveDocument())
+            return E_FAIL;
+        CDocument doc = GetActiveDocument();
+        hr = UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
+        return hr;
     }
     else if (key == UI_PKEY_SelectedItem)
     {
-        hr = S_FALSE;
-        if (HasActiveDocument())
+        HRESULT hr = S_FALSE;
+        if (!HasActiveDocument())
+            return S_FALSE;
+        CDocument doc = GetActiveDocument();
+        if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
+            hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
+            // Return value unused, just set for debugging.
+        else
         {
-            CDocument doc = GetActiveDocument();
-            if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
+            int offset = 0;
+            for (size_t i = 0; i < codepages.size(); ++i)
             {
-                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
-                hr = S_OK;
-            }
-            else
-            {
-                int offset = 0;
-                for (size_t i = 0; i < codepages.size(); ++i)
+                if (codepages[i].bom && codepages[i].name.compare(L"UTF-8 BOM") == 0)
                 {
-                    if ((std::get<1>(codepages[i])) && (std::get<2>(codepages[i]).compare(L"UTF-8 BOM") == 0))
-                    {
-                        offset = 1;
-                        continue;
-                    }
+                    offset = 1;
+                    continue;
+                }
 
-                    if ((int)std::get<0>(codepages[i]) == doc.m_encoding)
-                    {
-                        hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)(i - offset), ppropvarNewValue);
-                        hr = S_OK;
-                        break;
-                    }
+                if ((int)codepages[i].codepage == doc.m_encoding)
+                {
+                    hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)(i - offset), ppropvarNewValue);
+                    // Return value unused, just set for debugging.
+                    break;
                 }
             }
         }
+        return S_OK;
     }
-    return hr;
+
+    return E_FAIL;
 }
 
 HRESULT CCmdLoadAsEncoded::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ )
 {
-    HRESULT hr = E_FAIL;
-
     if (verb == UI_EXECUTIONVERB_EXECUTE)
     {
-        if ( key && *key == UI_PKEY_SelectedItem)
+        if (key && *key == UI_PKEY_SelectedItem)
         {
             UINT selected;
-            hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
+            HRESULT hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
             if (selected > 1)
                 ++selected; // offset for missing "utf-8 BOM"
-            UINT codepage = std::get<0>(codepages[selected]);
+            UINT codepage = codepages[selected].codepage;
             ReloadTab(GetActiveTabIndex(), codepage);
-            hr = S_OK;
+            return hr;
         }
     }
-    return hr;
+    return E_FAIL;
 }
 
 void CCmdLoadAsEncoded::TabNotify( TBHDR * ptbhdr )
@@ -247,92 +210,41 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
 {
     HRESULT hr = E_FAIL;
 
-    if(key == UI_PKEY_Categories)
+    if (key == UI_PKEY_Categories)
     {
         IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (FAILED(hr))
-        {
+        if (CAppUtils::FailedShowMessage(hr))
             return hr;
-        }
 
-        // Create a property set for the main category.
-        CPropertySet *pMain;
-        hr = CPropertySet::CreateInstance(&pMain);
+        hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MAIN, IDS_ENCODING_MAIN);
         if (FAILED(hr))
-        {
             return hr;
-        }
-
-        // Load the label for the main category from the resource file.
-        ResString sMain(hRes, IDS_ENCODING_MAIN);
-        // Initialize the property set with the label that was just loaded and a category id of 0.
-        pMain->InitializeCategoryProperties(sMain, 0);
-        pCollection->Add(pMain);
-        pMain->Release();
-
-
-        // Create a property set for the codepages category.
-        CPropertySet *pCodepages;
-        hr = CPropertySet::CreateInstance(&pCodepages);
+        hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_CODEPAGES, IDS_ENCODING_CODEPAGES);
         if (FAILED(hr))
-        {
             return hr;
-        }
 
-        ResString sCP(hRes, IDS_ENCODING_CODEPAGES);
-        // Initialize the property set with the label that was just loaded and a category id of 0.
-        pCodepages->InitializeCategoryProperties(sCP, 1);
-        pCollection->Add(pCodepages);
-        pCodepages->Release();
-
-        hr = S_OK;
+        return S_OK;
     }
     else if (key == UI_PKEY_ItemsSource)
     {
         IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (FAILED(hr))
-        {
+        if (CAppUtils::FailedShowMessage(hr))
             return hr;
-        }
 
         if (codepages.empty())
             EnumSystemCodePages(CodePageEnumerator, CP_INSTALLED);
 
-
-        // Create an IUIImage from a resource id.
         IUIImagePtr pImg;
-        IUIImageFromBitmapPtr pifbFactory;
-        hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
-        if (FAILED(hr))
-        {
-            return hr;
-        }
-
-        // Load the bitmap from the resource file.
-        HBITMAP hbm = (HBITMAP) LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_EMPTY), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-        if (hbm)
-        {
-            // Use the factory implemented by the framework to produce an IUIImage.
-            hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_TRANSFER, &pImg);
-            if (FAILED(hr))
-            {
-                DeleteObject(hbm);
-            }
-        }
-
-        if (FAILED(hr))
-        {
-            return hr;
-        }
+        hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
+        CAppUtils::FailedShowMessage(hr); // Report any errors, but don't let it stop us.
 
         // populate the dropdown with the code pages
-        for (auto it:codepages)
-        {
-            CAppUtils::AddStringItem(pCollection, std::get<2>(it).c_str(), std::get<3>(it), pImg);
-        }
-        hr = S_OK;
+        for (const auto& cp : codepages)
+            CAppUtils::AddStringItem(pCollection, cp.name.c_str(), cp.category, pImg);
+
+        return S_OK;
     }
     else if (key == UI_PKEY_SelectedItem)
     {
@@ -349,7 +261,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
             {
                 for (size_t i = 0; i < codepages.size(); ++i)
                 {
-                    if (((int)std::get<0>(codepages[i]) == doc.m_encoding)&&(std::get<1>(codepages[i]) == doc.m_bHasBOM))
+                    if (((int)codepages[i].codepage == doc.m_encoding)&&(codepages[i].bom == doc.m_bHasBOM))
                     {
                         hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
                         hr = S_OK;
@@ -358,8 +270,10 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
                 }
             }
         }
+        return hr;
     }
-    return hr;
+
+    return E_FAIL;
 }
 
 HRESULT CCmdConvertEncoding::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ )
@@ -368,16 +282,16 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, co
 
     if (verb == UI_EXECUTIONVERB_EXECUTE)
     {
-        if ( key && *key == UI_PKEY_SelectedItem)
+        if (key && *key == UI_PKEY_SelectedItem)
         {
             UINT selected;
             hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
-            UINT codepage = std::get<0>(codepages[selected]);
+            UINT codepage = codepages[selected].codepage;
             if (HasActiveDocument())
             {
                 CDocument doc = GetActiveDocument();
                 doc.m_encoding = codepage;
-                doc.m_bHasBOM = std::get<1>(codepages[selected]);
+                doc.m_bHasBOM = codepages[selected].bom;
                 doc.m_bIsDirty = true;
                 doc.m_bNeedsSaving = true;
                 SetDocument(GetDocIdOfCurrentTab(), doc);
