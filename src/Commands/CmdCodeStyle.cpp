@@ -100,10 +100,10 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
         }
 
         // populate the dropdown with the code pages
-        for (auto it:langs)
+        for (const auto& lang : langs)
         {
-            int catId = it.c_str()[0] - 'A';
-            CAppUtils::AddStringItem(pCollection, it.c_str(), catId, pImg);
+            int catId = lang.c_str()[0] - 'A';
+            CAppUtils::AddStringItem(pCollection, lang.c_str(), catId, pImg);
         }
         hr = S_OK;
     }
