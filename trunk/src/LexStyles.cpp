@@ -19,6 +19,7 @@
 #include "SimpleIni.h"
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
+#include "PathUtils.h"
 #include "BowPad.h"
 #include "AppUtils.h"
 
@@ -59,6 +60,65 @@ CLexStyles& CLexStyles::Instance()
     return instance;
 }
 
+void CLexStyles::ParseStyle(
+    LPCWSTR styleName,
+    LPCWSTR styleString,
+    std::map<std::wstring, std::wstring>& variables,
+    StyleData& style
+    ) const
+{
+    std::wstring v = styleString;
+    ReplaceVariables(v, variables);
+    std::vector<std::wstring> vec;
+    stringtok(vec, v, false, L";");
+    int i = 0;
+    COLORREF clr;
+    for (const auto& s : vec)
+    {
+        switch (i)
+        {
+        case 0: // Name
+            style.Name = s;
+            break;
+        case 1: // Foreground color
+            if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
+                style.ForegroundColor = clr;
+            else
+                APPVERIFYM(s.empty(), styleName);
+            break;
+        case 2: // Background color
+            if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
+                style.BackgroundColor = clr;
+            else
+                APPVERIFYM(s.empty(), styleName);
+            break;
+        case 3: // Font name
+            style.FontName = s;
+            break;
+        case 4: // Font style
+        {
+            int fs;
+            if (!CAppUtils::TryParse(s.c_str(), fs, true))
+                APPVERIFYM(false, styleName);
+            style.FontStyle = (FontStyle)fs;
+        }
+            break;
+        case 5: // Font size
+            if (!CAppUtils::TryParse(s.c_str(), style.FontSize, true))
+                APPVERIFYM(false, styleName);
+            break;
+        case 6: // Override default background color in case the style was set with a variable
+            if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
+                style.BackgroundColor = clr;
+            else
+                APPVERIFYM(s.empty(), styleName);
+            break;
+        }
+        ++i;
+    }
+
+}
+
 void CLexStyles::Load()
 {
     CSimpleIni inis[2];
@@ -68,6 +128,7 @@ void CLexStyles::Load()
     {
         inis[1].LoadFile(userStyleFile.c_str());
     }
+    // TODO! Use some early returns here to reduce intentation.
     HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(IDR_LEXSTYLES), L"config");
     if (hRes)
     {
@@ -92,7 +153,7 @@ void CLexStyles::Load()
                         key = L"$(";
                         key += l;
                         key += L")";
-                        variables[key] = v;
+                        variables[key] = std::move(v);
                     }
                 }
 
@@ -110,19 +171,17 @@ void CLexStyles::Load()
                     }
                     for (const auto& l : m_lexerSection)
                     {
-                        std::wstring v = ini.GetValue(L"lexers", l.second.c_str(), L"");
                         int lex;
                         if (! CAppUtils::TryParse(ini.GetValue(l.second.c_str(), L"Lexer", L""), lex, true))
                             APPVERIFY(false);
+                        std::wstring v = ini.GetValue(L"lexers", l.second.c_str(), L"");
                         if (!v.empty())
                         {
                             ReplaceVariables(v, variables);
                             std::vector<std::wstring> langs;
                             stringtok(langs, v, true, L";");
                             for (const auto& x : langs)
-                            {
                                 lexers[x] = lex;
-                            }
                         }
 
                         // now parse all the data for this lexer
@@ -137,68 +196,19 @@ void CLexStyles::Load()
                             if (_wcsnicmp(L"Style", it, 5) == 0)
                             {
                                 StyleData style;
-                                std::wstring v = ini.GetValue(l.second.c_str(), it);
-                                ReplaceVariables(v, variables);
-                                std::vector<std::wstring> vec;
-                                stringtok(vec, v, false, L";");
-                                int i = 0;
-                                COLORREF clr;
-                                for (const auto& s : vec)
-                                {
-                                    switch (i)
-                                    {
-                                    case 0: // Name
-                                        style.Name = s;
-                                        break;
-                                    case 1: // Foreground color
-                                        if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
-                                            style.ForegroundColor = clr;
-                                        else
-                                            APPVERIFY(s.empty());
-                                        break;
-                                    case 2: // Background color
-                                        if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
-                                            style.BackgroundColor = clr;
-                                        else
-                                            APPVERIFY(s.empty());
-                                        break;
-                                    case 3: // Font name
-                                        style.FontName = s;
-                                        break;
-                                    case 4: // Font style
-                                    {
-                                        int fs;
-                                        if (!CAppUtils::TryParse(s.c_str(), fs, true))
-                                            APPVERIFYM(false,it);
-                                        style.FontStyle = (FontStyle)fs;
-                                    }
-                                        break;
-                                    case 5: // Font size
-                                        if (!CAppUtils::TryParse(s.c_str(), style.FontSize, true))
-                                            APPVERIFYM(false,it);
-                                        break;
-                                    case 6: // Override default background color in case the style was set with a variable
-                                        if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
-                                            style.BackgroundColor = clr;
-                                        else
-                                            APPVERIFY(s.empty());
-                                        break;
-                                    }
-                                    ++i;
-                                }
-
+                                ParseStyle(it, ini.GetValue(l.second.c_str(), it), variables, style);
                                 int pos;
                                 if (!CAppUtils::TryParse(it+5, pos, false))
                                     APPVERIFY(false);
                                 lexerdata.Styles[pos] = style;
-                                userlexerdata.Styles[pos] = style;
+                                userlexerdata.Styles[pos] = std::move(style);
                             }
                             else if (_wcsnicmp(L"Prop_", it, 5) == 0)
                             {
                                 std::string n = CUnicodeUtils::StdGetUTF8(it+5);
                                 std::string v = CUnicodeUtils::StdGetUTF8(ini.GetValue(l.second.c_str(), it, L""));
                                 lexerdata.Properties[n] = v;
-                                userlexerdata.Properties[n] = v;
+                                userlexerdata.Properties[n] = std::move(v);
                             }
                         }
                         m_lexerdata[lexerdata.ID] = std::move(lexerdata);
@@ -233,9 +243,8 @@ void CLexStyles::Load()
                             std::wstring v = ini.GetValue(L"pathlanguage", k);
                             auto f = v.find(L"*");
                             std::wstring p = v.substr(0, f);
-                            std::string l = CUnicodeUtils::StdGetUTF8(v.substr(f + 1));
-                            m_pathsLang[p] = l;
-                            m_pathsForLang.push_back(p);
+                            m_pathsLang[p] = CUnicodeUtils::StdGetUTF8(v.substr(f + 1));
+                            m_pathsForLang.push_back(std::move(p));
                         }
                     }
 
@@ -323,7 +332,7 @@ void CLexStyles::Load()
                                     APPVERIFY(false);
                             }
                         }
-                        m_Langdata[CUnicodeUtils::StdGetUTF8(k)] = ld;
+                        m_Langdata[CUnicodeUtils::StdGetUTF8(k)] = std::move(ld);
                     }
                 }
             }
@@ -435,8 +444,7 @@ std::wstring CLexStyles::GetLanguageForExt( const std::wstring& ext ) const
 
 std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
 {
-    std::wstring p = path;
-    std::transform(p.begin(), p.end(), p.begin(), ::towlower);
+    std::wstring p = CStringUtils::to_lower(path);
     auto it = m_pathsLang.find(p);
     if (it != m_pathsLang.end())
     {
@@ -481,7 +489,7 @@ std::vector<std::wstring> CLexStyles::GetLanguages() const
     return langs;
 }
 
-void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring, std::wstring>& vars )
+void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring, std::wstring>& vars ) const
 {
     size_t pos = s.find(L"$(");
     while (pos != std::wstring::npos)
@@ -616,7 +624,7 @@ void CLexStyles::SaveUserData()
         ++pcount;
     }
 
-    FILE * pFile = NULL;
+    FILE* pFile = NULL;
     _tfopen_s(&pFile, userStyleFile.c_str(), _T("wb"));
     ini.SaveFile(pFile);
     fclose(pFile);
@@ -638,7 +646,7 @@ void CLexStyles::SetUserExt( const std::wstring& ext, const std::wstring& lang )
     }
     std::vector<std::wstring> exts;
     stringtok(exts, ext, true, L"; ,");
-    for (auto e : exts)
+    for (const auto& e : exts)
     {
         m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = alang;
     }
@@ -702,19 +710,14 @@ const std::vector<std::string>& CLexStyles::GetFunctionRegexTrimForLang( const s
 
 void CLexStyles::SetLangForPath(const std::wstring& path, const std::wstring& language)
 {
-    auto dotpos = path.find_last_of('.');
-    auto slashpos = path.find_last_of(L"\\/");
-    if (slashpos > dotpos)
-        dotpos = std::wstring::npos;
-    std::wstring sExt = path.substr(dotpos + 1);
+    std::wstring sExt = CPathUtils::GetFileExtension(path);
     std::string e = CUnicodeUtils::StdGetUTF8(sExt);
-    if (dotpos == std::wstring::npos)
+    if (sExt.empty())
     {
         // store the full path and the language
-        std::wstring p = path;
-        std::transform(p.begin(), p.end(), p.begin(), ::towlower);
-        m_pathsLang[p] = CUnicodeUtils::StdGetUTF8(language);
-        m_pathsForLang.push_front(p);
+        std::wstring lpath = CStringUtils::to_lower(path);
+        m_pathsLang[lpath] = CUnicodeUtils::StdGetUTF8(language);
+        m_pathsForLang.push_front(std::move(lpath));
         while (m_pathsForLang.size() > 100)
             m_pathsForLang.pop_back();
         SaveUserData();
