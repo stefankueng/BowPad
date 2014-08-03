@@ -142,19 +142,19 @@ void CLexStyles::Load()
                 inis[0].LoadFile(lpResLock, dwSizeRes);
 
                 std::map<std::wstring, std::wstring> variables;
+                std::wstring key;
                 for (auto& ini : inis)
                 {
                     CSimpleIni::TNamesDepend lexvars;
                     ini.GetAllKeys(L"variables", lexvars);
                     for (const auto& l : lexvars)
                     {
-                        std::wstring v = ini.GetValue(L"variables", l);
-                        //key = L"$(";
-                        //key += l;
-                        //key += L")";
-                        //variables[key] = std::move(v);
                         APPVERIFY(*l != L'\0');
-                        variables[l] = std::move(v);
+                        std::wstring v = ini.GetValue(L"variables", l);
+                        key = L"$(";
+                        key += l;
+                        key += L")";
+                        variables[key] = std::move(v);
                     }
                 }
 
@@ -171,16 +171,16 @@ void CLexStyles::Load()
                             APPVERIFY(false);
                         m_lexerSection[lex] = l;
                     }
+                    std::wstring slex;
                     for (const auto& l : m_lexerSection)
-                    {
+                    {                       
+                        slex = ini.GetValue(l.second.c_str(), L"Lexer", L"");
+                        if (slex.empty())
+                            continue;
                         int lex;
-                        // REIVEW: Is always empty on ini[1]
-                        /*
-                        if (! CAppUtils::TryParse(ini.GetValue(l.second.c_str(), L"Lexer", L""), lex, false))
+                        if (! CAppUtils::TryParse(slex.c_str(), lex, false))
                             APPVERIFY(false);
-                            */
-                        // Do you mean this?
-                        lex = l.first;
+                        
                         std::wstring v = ini.GetValue(L"lexers", l.second.c_str(), L"");
                         if (!v.empty())
                         {
@@ -502,7 +502,7 @@ void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring,
     while (pos != std::wstring::npos)
     {
         size_t pos2 = s.find(L")", pos);
-        std::wstring varname = s.substr(pos+2, pos2-(pos+2));
+        std::wstring varname = s.substr(pos, pos2-pos+1);
         auto foundIt = vars.find(varname);
         if (foundIt != vars.end())
         {
