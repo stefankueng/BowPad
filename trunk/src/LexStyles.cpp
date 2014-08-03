@@ -129,14 +129,14 @@ void CLexStyles::Load()
         inis[1].LoadFile(userStyleFile.c_str());
     }
     // TODO! Use some early returns here to reduce intentation.
-    HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(IDR_LEXSTYLES), L"config");
+    HRSRC hRes = FindResource(nullptr, MAKEINTRESOURCE(IDR_LEXSTYLES), L"config");
     if (hRes)
     {
-        HGLOBAL hResourceLoaded = LoadResource(NULL, hRes);
+        HGLOBAL hResourceLoaded = LoadResource(nullptr, hRes);
         if (hResourceLoaded)
         {
             const char * lpResLock = (const char *) LockResource(hResourceLoaded);
-            DWORD dwSizeRes = SizeofResource(NULL, hRes);
+            DWORD dwSizeRes = SizeofResource(nullptr, hRes);
             if (lpResLock)
             {
                 inis[0].LoadFile(lpResLock, dwSizeRes);
@@ -146,14 +146,15 @@ void CLexStyles::Load()
                 {
                     CSimpleIni::TNamesDepend lexvars;
                     ini.GetAllKeys(L"variables", lexvars);
-                    std::wstring key;
                     for (const auto& l : lexvars)
                     {
                         std::wstring v = ini.GetValue(L"variables", l);
-                        key = L"$(";
-                        key += l;
-                        key += L")";
-                        variables[key] = std::move(v);
+                        //key = L"$(";
+                        //key += l;
+                        //key += L")";
+                        //variables[key] = std::move(v);
+                        APPVERIFY(*l != L'\0');
+                        variables[l] = std::move(v);
                     }
                 }
 
@@ -164,16 +165,22 @@ void CLexStyles::Load()
                     ini.GetAllKeys(L"lexers", lexkeys);
                     for (const auto& l : lexkeys)
                     {
+                        APPVERIFY(*l != L'\0');
                         int lex;
-                        if (! CAppUtils::TryParse(ini.GetValue(l, L"Lexer", L""), lex, true))
+                        if (! CAppUtils::TryParse(ini.GetValue(l, L"Lexer", L""), lex, false))
                             APPVERIFY(false);
                         m_lexerSection[lex] = l;
                     }
                     for (const auto& l : m_lexerSection)
                     {
                         int lex;
-                        if (! CAppUtils::TryParse(ini.GetValue(l.second.c_str(), L"Lexer", L""), lex, true))
+                        // REIVEW: Is always empty on ini[1]
+                        /*
+                        if (! CAppUtils::TryParse(ini.GetValue(l.second.c_str(), L"Lexer", L""), lex, false))
                             APPVERIFY(false);
+                            */
+                        // Do you mean this?
+                        lex = l.first;
                         std::wstring v = ini.GetValue(L"lexers", l.second.c_str(), L"");
                         if (!v.empty())
                         {
@@ -495,7 +502,7 @@ void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring,
     while (pos != std::wstring::npos)
     {
         size_t pos2 = s.find(L")", pos);
-        std::wstring varname = s.substr(pos, pos2-pos+1);
+        std::wstring varname = s.substr(pos+2, pos2-(pos+2));
         auto foundIt = vars.find(varname);
         if (foundIt != vars.end())
         {
@@ -624,7 +631,7 @@ void CLexStyles::SaveUserData()
         ++pcount;
     }
 
-    FILE* pFile = NULL;
+    FILE* pFile = nullptr;
     _tfopen_s(&pFile, userStyleFile.c_str(), _T("wb"));
     ini.SaveFile(pFile);
     fclose(pFile);
