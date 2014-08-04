@@ -342,6 +342,8 @@ void CTabBar::DeleteItemAt(int index)
     m_nItems--;
     bool deleted = TabCtrl_DeleteItem(*this, index) != FALSE;
     APPVERIFY(deleted);
+    if (m_currentHoverTabItem == index)
+        m_currentHoverTabItem = -1;
 }
 
 int CTabBar::GetCurrentTabIndex() const
@@ -443,7 +445,8 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             while (nTab > 0)
             {
                 --nTab;
-                TabCtrl_GetItemRect(*this, nTab, &rTab);
+                bool ok = TabCtrl_GetItemRect(*this, nTab, &rTab) != FALSE;
+                APPVERIFY(ok);
                 UnionRect(&rTotalTab, &rTab, &rTotalTab);
             }
 
@@ -485,7 +488,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             break;
         case WM_PAINT:
         {
-            PAINTSTRUCT ps = { 0 };
+            PAINTSTRUCT ps; // ps is a totally out parameter, no init needed.
             HDC hDC = BeginPaint(*this, &ps);
 
             // prepare dc
@@ -639,12 +642,18 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             {
                 // Reduce flicker by only redrawing needed tabs
 
-                bool oldVal = m_bIsCloseHover;
+                bool wasCloseHover = m_bIsCloseHover;
                 int oldIndex = m_currentHoverTabItem;
                 RECT oldRect;
 
-                TabCtrl_GetItemRect(*this, index, &m_currentHoverTabRect);
-                TabCtrl_GetItemRect(*this, oldIndex, &oldRect);
+                bool ok;
+                ok = TabCtrl_GetItemRect(*this, index, &m_currentHoverTabRect) != FALSE;
+                APPVERIFY(ok);
+                if (oldIndex != -1)
+                {
+                    ok = TabCtrl_GetItemRect(*this, oldIndex, &oldRect) != FALSE;
+                    APPVERIFY(ok);
+                }
                 m_currentHoverTabItem = index;
                 m_bIsCloseHover = m_closeButtonZone.IsHit(xPos, yPos, m_currentHoverTabRect);
                 if (m_bIsCloseHover)
@@ -655,9 +664,10 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                     tme.hwndTrack = *this;
                     TrackMouseEvent(&tme);
                 }
-                if (oldVal != m_bIsCloseHover)
+                if (wasCloseHover != m_bIsCloseHover)
                 {
-                    InvalidateRect(hwnd, &oldRect, FALSE);
+                    if (oldIndex != -1)
+                        InvalidateRect(hwnd, &oldRect, FALSE);
                     InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
                 }
             }
@@ -1019,25 +1029,32 @@ void CTabBar::ExchangeItemData(POINT point)
             itemData_shift.pszText = str2;
             itemData_shift.cchTextMax = (stringSize);
 
-            TabCtrl_GetItem(*this, m_nTabDragged, &itemData_nDraggedTab);
+            bool ok;
+            ok = TabCtrl_GetItem(*this, m_nTabDragged, &itemData_nDraggedTab) != FALSE;
+            APPVERIFY(ok);
 
             if (m_nTabDragged > nTab)
             {
                 for (int i = m_nTabDragged; i > nTab; i--)
                 {
-                    TabCtrl_GetItem(*this, i - 1, &itemData_shift);
-                    TabCtrl_SetItem(*this, i, &itemData_shift);
+                    ok = TabCtrl_GetItem(*this, i - 1, &itemData_shift) != FALSE;
+                    APPVERIFY(ok);
+                    ok = TabCtrl_SetItem(*this, i, &itemData_shift) != FALSE;
+                    APPVERIFY(ok);
                 }
             }
             else
             {
                 for (int i = m_nTabDragged; i < nTab; i++)
                 {
-                    TabCtrl_GetItem(*this, i + 1, &itemData_shift);
-                    TabCtrl_SetItem(*this, i, &itemData_shift);
+                    ok = TabCtrl_GetItem(*this, i + 1, &itemData_shift) != FALSE;
+                    APPVERIFY(ok);
+                    ok = TabCtrl_SetItem(*this, i, &itemData_shift) != FALSE;
+                    APPVERIFY(ok);
                 }
             }
-            TabCtrl_SetItem(*this, nTab, &itemData_nDraggedTab);
+            ok = TabCtrl_SetItem(*this, nTab, &itemData_nDraggedTab) != FALSE;
+            APPVERIFY(ok);
 
             //3. update the current index
             m_nTabDragged = nTab;
