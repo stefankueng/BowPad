@@ -21,10 +21,12 @@
 #include "XPMIcons.h"
 #include "UnicodeUtils.h"
 #include "StringUtils.h"
-#include "SciLexer.h"
 #include "AppUtils.h"
 #include "Theme.h"
+#include "SciLexer.h"
 #include "Document.h"
+#include "LexStyles.h"
+#include "DocScroll.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -371,11 +373,11 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
 
     Call(SCI_SETLEXER, lexerdata.ID);
 
-    for (auto it: lexerdata.Properties)
+    for (const auto& it: lexerdata.Properties)
     {
         Call(SCI_SETPROPERTY, (WPARAM)it.first.c_str(), (LPARAM)it.second.c_str());
     }
-    for (auto it: lexerdata.Styles)
+    for (const auto& it: lexerdata.Styles)
     {
         Call(SCI_STYLESETFORE, it.first, CTheme::Instance().GetThemeColor(it.second.ForegroundColor));
         Call(SCI_STYLESETBACK, it.first, CTheme::Instance().GetThemeColor(it.second.BackgroundColor));
@@ -392,7 +394,7 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
         if (it.second.FontSize)
             Call(SCI_STYLESETSIZE, it.first, it.second.FontSize);
     }
-    for (auto it: langdata)
+    for (const auto& it: langdata)
     {
         Call(SCI_SETKEYWORDS, it.first-1, (LPARAM)it.second.c_str());
     }
@@ -604,7 +606,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     }
 
     size_t selStartPos = Call(SCI_GETSELECTIONSTART);
-    std::unique_ptr<char[]> seltextbuffer(new char[selTextLen + 1]);
+    auto seltextbuffer = std::make_unique<char[]>(selTextLen + 1);
     Call(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
     if (seltextbuffer[0] == 0)
     {
@@ -628,19 +630,19 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     if (_stricmp(sHighlightString.c_str(), seltextbuffer.get()) == 0)
         return;
 
-    std::unique_ptr<char[]> textbuffer(new char[len + 1]);
+    auto textbuffer = std::make_unique<char[]>(len + 1);
     Scintilla::Sci_TextRange textrange;
     textrange.lpstrText = textbuffer.get();
     textrange.chrg.cpMin = startstylepos;
     textrange.chrg.cpMax = endstylepos;
     Call(SCI_GETTEXTRANGE, 0, (LPARAM)&textrange);
 
-    char * startPos = strstr(textbuffer.get(), seltextbuffer.get());
+    const char* startPos = strstr(textbuffer.get(), seltextbuffer.get());
     while (startPos)
     {
         // don't style the selected text itself
-        if (selStartPos != size_t(startstylepos + ((char*)startPos - (char*)textbuffer.get())))
-            Call(SCI_INDICATORFILLRANGE, startstylepos + ((char*)startPos - (char*)textbuffer.get()), selTextLen-1);
+        if (selStartPos != size_t(startstylepos + (startPos - textbuffer.get())))
+            Call(SCI_INDICATORFILLRANGE, startstylepos + (startPos - textbuffer.get()), selTextLen-1);
         startPos = strstr(startPos+1, seltextbuffer.get());
     }
 
@@ -815,9 +817,9 @@ void CScintillaWnd::MatchTags()
         // Coloring its attributes
         std::vector<std::pair<size_t, size_t>> attributes = GetAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
         Call(SCI_SETINDICATORCURRENT,  INDIC_TAGATTR);
-        for (size_t i = 0 ; i < attributes.size() ; i++)
+        for (const auto& attr : attributes)
         {
-            Call(SCI_INDICATORFILLRANGE,  attributes[i].first, attributes[i].second - attributes[i].first);
+            Call(SCI_INDICATORFILLRANGE, attr.first, attr.second - attr.first);
         }
 
         // Coloring indent guide line position
@@ -1334,7 +1336,7 @@ std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t st
     std::vector<std::pair<size_t, size_t>> attributes;
 
     size_t bufLen = end - start + 1;
-    std::unique_ptr<char[]> buf(new char[bufLen+1]);
+    auto buf = std::make_unique<char[]>(bufLen+1);
     Scintilla::TextRange tr;
     tr.chrg.cpMin = (long)start;
     tr.chrg.cpMax = (long)end;
@@ -1534,7 +1536,7 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
 
                 // check if the line is empty (not counting whitespaces)
                 size_t linesize = Call(SCI_GETLINE, line, 0);
-                std::unique_ptr<char[]> pLine(new char[linesize+1]);
+                auto pLine = std::make_unique<char[]>(linesize+1);
                 Call(SCI_GETLINE, line, (sptr_t)pLine.get());
                 pLine[linesize] = 0;
                 // insert the opening brace first
