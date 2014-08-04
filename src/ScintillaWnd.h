@@ -17,7 +17,6 @@
 #pragma once
 #include "BaseWindow.h"
 #include "Scintilla.h"
-#include "LexStyles.h"
 #include "DocScroll.h"
 
 #include <vector>
@@ -53,6 +52,8 @@ struct FindResult
     size_t end;
     bool success;
 };
+
+class LexerData;
 
 class CScintillaWnd : public CWindow
 {
