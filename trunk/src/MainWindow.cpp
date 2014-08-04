@@ -38,6 +38,7 @@
 #include "ClipboardHelper.h"
 #include "EditorConfigHandler.h"
 #include "DirFileEnum.h"
+#include "LexStyles.h"
 
 #include <memory>
 #include <cassert>

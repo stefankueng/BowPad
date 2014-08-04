@@ -22,6 +22,9 @@
 #include "DlgResizer.h"
 #include "ScintillaWnd.h"
 
+#include <deque>
+#include <list>
+
 class CSearchResult
 {
 public:

@@ -16,7 +16,8 @@
 //
 #pragma once
 #include "coolscroll.h"
-#include <deque>
+
+#include <map>
 #include <tuple>
 
 #define DOCSCROLLTYPE_SELTEXT           1

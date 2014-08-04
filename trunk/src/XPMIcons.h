@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013 - 2014 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,7 +21,9 @@
 
 
 /* XPM */
-static char * bullet_red[] = {
+// REVIEW: This should probably be defined in ScintillaWnd.cpp,
+// or anywhere else but in a header.
+static const char *const bullet_red[] = {
     /* columns rows colors chars-per-pixel */
     "16 16 26 1",
     "  c #B4442F",
