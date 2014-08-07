@@ -18,9 +18,6 @@
 #pragma once
 #include "ICommand.h"
 #include "BowPadUI.h"
-#include "MRU.h"
-
-#include <algorithm>
 
 class CCmdMRU : public ICommand
 {
@@ -34,72 +31,17 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         return true;
     }
 
-    virtual UINT GetCmdId() override
+    UINT GetCmdId() override
     {
         return cmdMRUList;
     }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
-    {
-        if (UI_PKEY_RecentItems == key)
-        {
-            return CMRU::Instance().PopulateRibbonRecentItems(ppropvarNewValue);
-        }
-        return E_NOTIMPL;
-    }
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override
-    {
-        HRESULT hr = E_NOTIMPL;
-        if (*key == UI_PKEY_RecentItems)
-        {
-            if (ppropvarValue)
-            {
-                SAFEARRAY * psa = V_ARRAY(ppropvarValue);
-                LONG lstart, lend;
-                hr = SafeArrayGetLBound( psa, 1, &lstart );
-                if (FAILED(hr))
-                    return hr;
-                hr = SafeArrayGetUBound( psa, 1, &lend );
-                if (FAILED(hr))
-                    return hr;
-                IUISimplePropertySet ** data;
-                hr = SafeArrayAccessData(psa,(void **)&data);
-                for (LONG idx = lstart; idx <= lend; ++idx)
-                {
-                    IUISimplePropertySet * ppset = (IUISimplePropertySet *)data[idx];
-                    if (ppset)
-                    {
-                        PROPVARIANT var;
-                        ppset->GetValue(UI_PKEY_LabelDescription, &var);
-                        std::wstring path = var.bstrVal;
-                        PropVariantClear(&var);
-                        ppset->GetValue(UI_PKEY_Pinned, &var);
-                        bool bPinned = VARIANT_TRUE==var.boolVal;
-                        PropVariantClear(&var);
-                        CMRU::Instance().PinPath(path, bPinned);
-                    }
-                }
-                hr = SafeArrayUnaccessData(psa);
-            }
-        }
-        if (*key == UI_PKEY_SelectedItem)
-        {
-            if (pCommandExecutionProperties)
-            {
-                PROPVARIANT var;
-                pCommandExecutionProperties->GetValue(UI_PKEY_LabelDescription, &var);
-                std::wstring path = var.bstrVal;
-                PropVariantClear(&var);
-                std::replace(path.begin(), path.end(), '/', '\\');
-                OpenFile(path.c_str(), OpenFlags::AddToMRU);
-            }
-        }
-        return hr;
-    }
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 };

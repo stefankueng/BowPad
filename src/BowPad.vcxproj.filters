@@ -530,6 +530,9 @@
     <ClCompile Include="Commands\CmdOpenSelection.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
+    <ClCompile Include="Commands\CmdMRU.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc">
