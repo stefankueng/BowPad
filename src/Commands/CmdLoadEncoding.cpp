@@ -27,7 +27,7 @@
 
 struct CodePageItem
 {
-    CodePageItem(UINT codepage, bool bom, const std::wstring& name, int category) 
+    CodePageItem(UINT codepage, bool bom, const std::wstring& name, int category)
         : codepage(codepage), bom(bom), name(name), category(category) { }
 
     UINT codepage;
