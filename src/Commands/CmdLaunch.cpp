@@ -108,7 +108,9 @@ bool CCmdLaunchSearch::Execute()
     return Launch(sLaunch);
 }
 
-CCmdLaunchCustom::CCmdLaunchCustom(UINT customId, void * obj) : m_customId(customId), LaunchBase(obj)
+CCmdLaunchCustom::CCmdLaunchCustom(UINT customId, void * obj)
+    : m_customId(customId)
+    , LaunchBase(obj)
 {
     m_customCmdId = cmdLaunchCustom0 + customId;
     m_settingsID = CStringUtils::Format(L"Command%d", customId);
@@ -150,12 +152,10 @@ HRESULT CCmdLaunchCustom::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, c
 
 CCustomCommandsDlg::CCustomCommandsDlg()
 {
-
 }
 
 CCustomCommandsDlg::~CCustomCommandsDlg( void )
 {
-
 }
 
 LRESULT CALLBACK CCustomCommandsDlg::DlgFunc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )

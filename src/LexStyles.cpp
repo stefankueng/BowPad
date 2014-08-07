@@ -40,7 +40,6 @@ StyleData::StyleData()
     , FontStyle(FONTSTYLE_NORMAL)
     , FontSize(0)
 {
-
 }
 
 CLexStyles::CLexStyles(void)
@@ -173,14 +172,14 @@ void CLexStyles::Load()
                     }
                     std::wstring slex;
                     for (const auto& l : m_lexerSection)
-                    {                       
+                    {
                         slex = ini.GetValue(l.second.c_str(), L"Lexer", L"");
                         if (slex.empty())
                             continue;
                         int lex;
                         if (! CAppUtils::TryParse(slex.c_str(), lex, false))
                             APPVERIFY(false);
-                        
+
                         std::wstring v = ini.GetValue(L"lexers", l.second.c_str(), L"");
                         if (!v.empty())
                         {
