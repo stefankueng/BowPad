@@ -18,7 +18,6 @@
 #pragma once
 #include "ICommand.h"
 #include "BowPadUI.h"
-#include "MRU.h"
 
 class CCmdUndo : public ICommand
 {
