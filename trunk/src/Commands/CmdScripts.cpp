@@ -27,7 +27,6 @@ CCmdScript::CCmdScript(void * obj)
     , m_cmdID(0)
     , m_version(0)
 {
-
 }
 
 CCmdScript::~CCmdScript()

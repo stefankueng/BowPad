@@ -100,7 +100,7 @@ HRESULT CCmdPlugins::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROP
 
     if (verb == UI_EXECUTIONVERB_EXECUTE)
     {
-        if ( key && *key == UI_PKEY_SelectedItem)
+        if (key && *key == UI_PKEY_SelectedItem)
         {
             UINT selected;
             hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
