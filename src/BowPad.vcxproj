@@ -276,6 +276,7 @@
     <ClInclude Include="Commands\CmdScripts.h" />
     <ClInclude Include="Commands\CmdSelectTab.h" />
     <ClInclude Include="Commands\CmdSession.h" />
+    <ClInclude Include="Commands\CmdSort.h" />
     <ClInclude Include="Commands\CmdStyleConfigurator.h" />
     <ClInclude Include="Commands\cmdTabList.h" />
     <ClInclude Include="Commands\CmdUndo.h" />
@@ -361,6 +362,7 @@
     <ClCompile Include="Commands\CmdRandom.cpp" />
     <ClCompile Include="Commands\CmdScripts.cpp" />
     <ClCompile Include="Commands\CmdSession.cpp" />
+    <ClCompile Include="Commands\CmdSort.cpp" />
     <ClCompile Include="Commands\CmdStyleConfigurator.cpp" />
     <ClCompile Include="Commands\cmdTabList.cpp" />
     <ClCompile Include="Commands\CommandHandler.cpp" />

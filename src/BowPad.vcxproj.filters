@@ -309,6 +309,9 @@
     <ClInclude Include="Commands\cmdTabList.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdSort.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -531,6 +534,9 @@
       <Filter>Commands</Filter>
     </ClCompile>
     <ClCompile Include="Commands\CmdMRU.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdSort.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>

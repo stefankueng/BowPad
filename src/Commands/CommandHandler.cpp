@@ -16,6 +16,8 @@
 //
 #include "stdafx.h"
 
+#include "CommandHandler.h"
+
 #include "CmdMRU.h"
 #include "CmdFiles.h"
 #include "CmdUndo.h"
@@ -52,9 +54,9 @@
 #include "CmdScripts.h"
 #include "CmdPlugins.h"
 #include "CmdPluginsConfig.h"
-#include "cmdTabList.h"
+#include "CmdTabList.h"
+#include "CmdSort.h"
 
-#include "CommandHandler.h"
 #include "DirFileEnum.h"
 #include "AppUtils.h"
 #include "PathUtils.h"
@@ -159,6 +161,7 @@ void CCommandHandler::Init( void * obj )
     Add<CCmdLineJoin>(obj);
     Add<CCmdLineUp>(obj);
     Add<CCmdLineDown>(obj);
+    Add<CCmdSort>(obj);
 
     Add<CCmdTrim>(obj);
     Add<CCmdTabs2Spaces>(obj);
