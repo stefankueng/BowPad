@@ -22,9 +22,6 @@
 #include <string>
 #include <vector>
 
-#include <Shobjidl.h>
-
-
 class CCmdOpen : public ICommand
 {
 public:
