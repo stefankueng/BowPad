@@ -349,6 +349,14 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/LineDownL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdSort" LabelTitle="Sort Lines" TooltipTitle="Sort Lines" TooltipDescription="Sorts the current selection (normal or rectangular)." Keytip="SL">
+      <Command.LargeImages>
+        <Image>res/SortL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/Sort.bmp</Image>
+      </Command.SmallImages>
+    </Command>
     <Command Name="cmdGroupPrint" LabelTitle="Print"  Keytip="P">
       <Command.LargeImages>
         <Image>res/PrintL.bmp</Image>
@@ -884,6 +892,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Button CommandName="cmdLineDown" />
               <Button CommandName="cmdLineSplit" />
               <Button CommandName="cmdLineJoin" />
+              <Button CommandName="cmdSort" />
             </DropDownButton>
             <DropDownButton CommandName="cmdGroupCase">
               <MenuGroup>
