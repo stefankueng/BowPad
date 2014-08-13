@@ -94,8 +94,8 @@ protected:
     std::string         GetCurrentLine();
 
 
-    HWND                GetHwnd();
-    HWND                GetScintillaWnd();
+    HWND                GetHwnd() const;
+    HWND                GetScintillaWnd() const;
     UINT                GetTimerID() { return m_nextTimerID++; }
     bool                OpenFile(LPCWSTR file, unsigned int openFlags);
     bool                ReloadTab(int tab, int encoding = -1); // By default reload encoding

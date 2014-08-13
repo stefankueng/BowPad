@@ -64,8 +64,14 @@ struct SortOptions
         sortDigits(sortDigits)
     {
     }
-    SortOptions() // Default constructor sets default options but not sort.
-        : sortAction(SortAction::None)
+    // Default constructor sets sensible default options
+    // for sorting, but defaults to not actually sorting.
+    // Set sort action explicitly to Sort invoke any sorting.
+    SortOptions() :
+        sortAction(SortAction::None),
+        sortOrder(SortOrder::Ascending),
+        sortCase(SortCase::Sensitive),
+        sortDigits(SortDigits::AsDigits)
     {
     }
     SortAction sortAction;
@@ -112,13 +118,12 @@ LRESULT CSortDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
-            auto list = GetDlgItem(*this,IDC_SORTDLG_ORDER);
+            auto sortOrderList = GetDlgItem(*this,IDC_SORTDLG_ORDER);
             ResString ascending(hRes, IDS_ASCENDING );
             ResString descending(hRes, IDS_DESCENDING );
-            int defSel = ListBox_AddString(list, static_cast<LPCTSTR>(ascending));
-            ListBox_AddString(list, static_cast<LPCTSTR>(descending));
-            ListBox_SetCurSel(list, defSel);
- 
+            int defSel = ListBox_AddString(sortOrderList, static_cast<LPCTSTR>(ascending));
+            ListBox_AddString(sortOrderList, static_cast<LPCTSTR>(descending));
+            ListBox_SetCurSel(sortOrderList, defSel); 
         }
         return FALSE;
     case WM_COMMAND:
@@ -242,14 +247,14 @@ bool CCmdSort::Execute()
         std::vector<std::string> lines;
         stringtok(lines, selText, false, "\n");
 
-        // The all important sort bit.
+        // The all important sort bit. Doesn't effect the document yet.
         Sort(lines);
 
         selText.clear();
         for (size_t lineNum = 0; lineNum < lines.size(); ++lineNum)
         {
             selText += lines[lineNum];
-            if (lineNum != lines.size() - 1) // No new line on the last line.
+            if (lineNum < lines.size() - 1) // No new line on the last line.
                 selText += eol;
         }
         ScintillaCall(SCI_REPLACESEL, 0, sptr_t(selText.c_str()));
@@ -266,7 +271,7 @@ SortOptions CCmdSort::GetSortOptions() const
 {
     CSortDlg sortDlg;
 
-    auto result = sortDlg.DoModal(hRes, IDD_SORTDLG, const_cast<CCmdSort*>(this)->GetHwnd());
+    auto result = sortDlg.DoModal(hRes, IDD_SORTDLG, GetHwnd() );
 
     if (result == IDOK)
         return SortOptions(SortAction::Sort,
@@ -289,7 +294,7 @@ void CCmdSort::Sort(std::vector<std::string>& lines) const
     if (so.sortCase == SortCase::Insensitive)
         cmpFlags |= LINGUISTIC_IGNORECASE;
     if (so.sortDigits == SortDigits::AsNumbers)
-        cmpFlags = SORT_DIGITSASNUMBERS;
+        cmpFlags |= SORT_DIGITSASNUMBERS;
 
     if (so.sortOrder == SortOrder::Ascending)
     {
