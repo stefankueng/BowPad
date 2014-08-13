@@ -29,7 +29,7 @@ struct SortOptions;
 class CCmdSort : public ICommand
 {
 public:
-    CCmdSort(void * obj) : ICommand(obj)
+    CCmdSort(void* obj) : ICommand(obj)
     {
     }
     ~CCmdSort(void)

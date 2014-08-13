@@ -147,13 +147,13 @@ sptr_t ICommand::ScintillaCall( unsigned int iMessage, uptr_t wParam /*= 0*/, sp
     return pMainWnd->m_editor.Call(iMessage, wParam, lParam);
 }
 
-HWND ICommand::GetHwnd()
+HWND ICommand::GetHwnd() const
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     return *pMainWnd;
 }
 
-HWND ICommand::GetScintillaWnd()
+HWND ICommand::GetScintillaWnd() const
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
     return pMainWnd->m_editor;
