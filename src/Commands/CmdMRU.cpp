@@ -17,8 +17,6 @@
 
 #include "stdafx.h"
 #include "CmdMRU.h"
-#include "ICommand.h"
-#include "BowPadUI.h"
 #include "MRU.h"
 #include "PathUtils.h"
 #include "AppUtils.h"
