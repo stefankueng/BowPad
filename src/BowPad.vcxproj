@@ -344,6 +344,7 @@
     <ClCompile Include="Commands\CmdComment.cpp" />
     <ClCompile Include="Commands\CmdConvertCase.cpp" />
     <ClCompile Include="Commands\CmdDefaultEncoding.cpp" />
+    <ClCompile Include="Commands\CmdEOL.cpp" />
     <ClCompile Include="Commands\CmdFiles.cpp" />
     <ClCompile Include="Commands\CmdFindReplace.cpp" />
     <ClCompile Include="Commands\CmdFunctions.cpp" />
