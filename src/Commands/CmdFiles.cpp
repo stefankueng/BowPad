@@ -23,6 +23,7 @@
 #include "PathUtils.h"
 #include "StringUtils.h"
 #include "AppUtils.h"
+#include "ResString.h"
 
 #include <VersionHelpers.h>
 #include <Shobjidl.h>
