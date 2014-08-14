@@ -20,6 +20,7 @@
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
 #include "PathUtils.h"
+#include "ResString.h"
 
 bool CCmdNewCopy::Execute()
 {
