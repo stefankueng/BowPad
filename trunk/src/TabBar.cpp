@@ -28,10 +28,6 @@
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 
-// TODO
-// Continuing to use macros like TabCtrl_XXXX instead of SendMessage throughout this file.
-// It'd be nice if they made them inline functions one day...
-
 #pragma comment(lib, "UxTheme.lib")
 
 extern IUIFramework * g_pFramework;
@@ -87,7 +83,7 @@ static void FillSolidRect(HDC hDC, int left, int top, int right, int bottom, COL
     rect.top = top;
     rect.right = right;
     rect.bottom = bottom;
-    ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rect, NULL, 0, NULL);
+    ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rect, nullptr, 0, nullptr);
 }
 
 COLORREF CTabBar::m_activeTextColour = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNTEXT));
@@ -96,7 +92,7 @@ COLORREF CTabBar::m_activeTopBarUnfocusedColour = CTheme::Instance().GetThemeCol
 COLORREF CTabBar::m_inactiveTextColour = CTheme::Instance().GetThemeColor(RGB(128, 128, 128));
 COLORREF CTabBar::m_inactiveBgColour = CTheme::Instance().GetThemeColor(RGB(192, 192, 192));
 
-HWND CTabBar::m_hwndArray[nbCtrlMax] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+HWND CTabBar::m_hwndArray[nbCtrlMax] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 int CTabBar::m_nControls = 0;
 
 
@@ -104,13 +100,13 @@ CTabBar::CTabBar(HINSTANCE hInst)
         : CWindow(hInst)
         , m_nItems(0)
         , m_bHasImgList(false)
-        , m_hFont(NULL)
+        , m_hFont(nullptr)
         , m_ctrlID(-1)
         , m_bIsDragging(false)
         , m_bIsDraggingInside(false)
         , m_nSrcTab(-1)
         , m_nTabDragged(-1)
-        , m_TabBarDefaultProc(NULL)
+        , m_TabBarDefaultProc(nullptr)
         , m_currentHoverTabItem(-1)
         , m_bIsCloseHover(false)
         , m_whichCloseClickDown(-1)
@@ -118,7 +114,7 @@ CTabBar::CTabBar(HINSTANCE hInst)
         , m_tabID(0)
 {
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
     m_draggingPoint = {};
     m_currentHoverTabRect = {};
 };
@@ -171,7 +167,7 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
 
     m_hFont = (HFONT)::SendMessage(*this, WM_GETFONT, 0, 0);
 
-    if (m_hFont == NULL)
+    if (m_hFont == nullptr)
     {
         m_hFont = (HFONT)::GetStockObject(DEFAULT_GUI_FONT);
         ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
@@ -295,7 +291,7 @@ void CTabBar::ActivateAt(int index) const
     // in our case too. That free's us to use NMHDR instead of TBHDR
     // making our events nearly the same which is easier on the receiver.
 
-    InvalidateRect(*this, NULL, TRUE);
+    InvalidateRect(*this, nullptr, TRUE);
     NMHDR nmhdr = {};
     nmhdr.hwndFrom = *this;
     nmhdr.code = TCN_SELCHANGING;
@@ -392,7 +388,7 @@ void CTabBar::DoOwnerDrawTab()
     {
         if (m_hwndArray[i])
         {
-            ::InvalidateRect(m_hwndArray[i], NULL, TRUE);
+            ::InvalidateRect(m_hwndArray[i], nullptr, TRUE);
             TabCtrl_SetPadding(m_hwndArray[i], padx, pady);
         }
     }
@@ -469,19 +465,19 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             rBkgnd = rClient;
             rBkgnd.bottom = rTotalTab.top + 3;
             SetBkColor(hDC, crBack);
-            ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, NULL);
+            ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, nullptr);
 
             // width of tab ctrl visible bkgnd including bottom pixel of tabs to left of tabs
             rBkgnd = rClient;
             rBkgnd.right = 2;
             rBkgnd.bottom = rBkgnd.top + (nTabHeight + 2);
-            ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, NULL);
+            ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, nullptr);
 
             // to right of tabs
             rBkgnd = rClient;
             rBkgnd.left += (rTotalTab.right - (max(rTotalTab.left, 0))) - 2;
             rBkgnd.bottom = rBkgnd.top + (nTabHeight + 2);
-            ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, NULL);
+            ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, nullptr);
 
             return TRUE;
         }
@@ -792,7 +788,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             }
 
             // The basic pattern of how to show Contextual UI in a specified location.
-            IUIContextualUI * pContextualUI = NULL;
+            IUIContextualUI * pContextualUI = nullptr;
             if (SUCCEEDED(g_pFramework->GetView(cmdTabContextMap, IID_PPV_ARGS(&pContextualUI))))
             {
                 pContextualUI->ShowAtLocation(pt.x, pt.y);
@@ -981,7 +977,7 @@ void CTabBar::DraggingCursor(POINT screenPoint)
 {
     HWND hWin = ::WindowFromPoint(screenPoint);
     if (*this == hWin)
-        ::SetCursor(::LoadCursor(NULL, IDC_ARROW));
+        ::SetCursor(::LoadCursor(nullptr, IDC_ARROW));
     else
     {
         TCHAR className[256];
