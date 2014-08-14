@@ -119,7 +119,6 @@ private:
 
     int                         m_ctrlID;
 
-    static bool                 m_bDoDragNDrop;
     bool                        m_bIsDragging;
     bool                        m_bIsDraggingInside;
     int                         m_nSrcTab;
