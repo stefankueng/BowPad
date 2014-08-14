@@ -353,6 +353,7 @@
     <ClCompile Include="Commands\CmdLanguage.cpp" />
     <ClCompile Include="Commands\CmdLaunch.cpp" />
     <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
+    <ClCompile Include="Commands\CmdMisc.cpp" />
     <ClCompile Include="Commands\CmdMRU.cpp" />
     <ClCompile Include="Commands\CmdNewCopy.cpp" />
     <ClCompile Include="Commands\CmdOpenSelection.cpp" />
