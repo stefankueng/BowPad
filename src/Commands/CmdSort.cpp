@@ -121,8 +121,8 @@ LRESULT CSortDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             auto sortOrderList = GetDlgItem(*this,IDC_SORTDLG_ORDER);
             ResString ascending(hRes, IDS_ASCENDING );
             ResString descending(hRes, IDS_DESCENDING );
-            int defSel = ListBox_AddString(sortOrderList, static_cast<LPCTSTR>(ascending));
-            ListBox_AddString(sortOrderList, static_cast<LPCTSTR>(descending));
+            int defSel = ListBox_AddString(sortOrderList, ascending);
+            ListBox_AddString(sortOrderList, descending);
             ListBox_SetCurSel(sortOrderList, defSel); 
         }
         return FALSE;
