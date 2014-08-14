@@ -23,148 +23,49 @@ class CCmdEOLWin : public ICommand
 {
 public:
 
-    CCmdEOLWin(void * obj) : ICommand(obj)
-    {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    }
+    CCmdEOLWin(void * obj);
 
-    ~CCmdEOLWin(void)
-    {
-    }
+    ~CCmdEOLWin(void);
 
-    virtual bool Execute() override
-    {
-        ScintillaCall(SCI_SETEOLMODE, SC_EOL_CRLF);
-        ScintillaCall(SCI_CONVERTEOLS, SC_EOL_CRLF);
-        if (HasActiveDocument())
-        {
-            CDocument doc = GetActiveDocument();
-            doc.m_format = WIN_FORMAT;
-            SetDocument(GetDocIdOfCurrentTab(), doc);
-            UpdateStatusBar(true);
-        }
-        InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        InvalidateUICommand(cmdEOLUnix, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        InvalidateUICommand(cmdEOLMac,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        return true;
-    }
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdEOLWin; }
+    UINT GetCmdId() override { return cmdEOLWin; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
-    {
-        if (UI_PKEY_BooleanValue == key)
-        {
-            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETEOLMODE)==SC_EOL_CRLF, ppropvarNewValue);
-        }
-        return E_NOTIMPL;
-    }
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual void TabNotify(TBHDR * ptbhdr) override
-    {
-        if (ptbhdr->hdr.code == TCN_SELCHANGE)
-        {
-            InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        }
-    }
+    void TabNotify(TBHDR * ptbhdr) override;
 };
 
 class CCmdEOLUnix : public ICommand
 {
 public:
 
-    CCmdEOLUnix(void * obj) : ICommand(obj)
-    {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    }
+    CCmdEOLUnix(void * obj);
 
-    ~CCmdEOLUnix(void)
-    {
-    }
+    ~CCmdEOLUnix(void);
 
-    virtual bool Execute() override
-    {
-        ScintillaCall(SCI_SETEOLMODE, SC_EOL_LF);
-        ScintillaCall(SCI_CONVERTEOLS, SC_EOL_LF);
-        if (HasActiveDocument())
-        {
-            CDocument doc = GetActiveDocument();
-            doc.m_format = UNIX_FORMAT;
-            SetDocument(GetDocIdOfCurrentTab(), doc);
-            UpdateStatusBar(true);
-        }
-        InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        InvalidateUICommand(cmdEOLUnix, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        InvalidateUICommand(cmdEOLMac,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        return true;
-    }
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdEOLUnix; }
+    UINT GetCmdId() override { return cmdEOLUnix; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
-    {
-        if (UI_PKEY_BooleanValue == key)
-        {
-            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETEOLMODE)==SC_EOL_LF, ppropvarNewValue);
-        }
-        return E_NOTIMPL;
-    }
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual void TabNotify(TBHDR * ptbhdr) override
-    {
-        if (ptbhdr->hdr.code == TCN_SELCHANGE)
-        {
-            InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        }
-    }
+    void TabNotify(TBHDR* ptbhdr) override;
 };
 
 class CCmdEOLMac : public ICommand
 {
 public:
 
-    CCmdEOLMac(void * obj) : ICommand(obj)
-    {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    }
+    CCmdEOLMac(void * obj);
 
-    ~CCmdEOLMac(void)
-    {
-    }
+    ~CCmdEOLMac(void);
 
-    virtual bool Execute() override
-    {
-        ScintillaCall(SCI_SETEOLMODE, SC_EOL_CR);
-        ScintillaCall(SCI_CONVERTEOLS, SC_EOL_CR);
-        if (HasActiveDocument())
-        {
-            CDocument doc = GetActiveDocument();
-            doc.m_format = MAC_FORMAT;
-            SetDocument(GetDocIdOfCurrentTab(), doc);
-            UpdateStatusBar(true);
-        }
-        InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        InvalidateUICommand(cmdEOLUnix, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        InvalidateUICommand(cmdEOLMac,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        return true;
-    }
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdEOLMac; }
+    UINT GetCmdId() override { return cmdEOLMac; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
-    {
-        if (UI_PKEY_BooleanValue == key)
-        {
-            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETEOLMODE)==SC_EOL_CR, ppropvarNewValue);
-        }
-        return E_NOTIMPL;
-    }
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual void TabNotify(TBHDR * ptbhdr) override
-    {
-        if (ptbhdr->hdr.code == TCN_SELCHANGE)
-        {
-            InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        }
-    }
+    void TabNotify(TBHDR * ptbhdr) override;
 };
