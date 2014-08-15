@@ -490,13 +490,14 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     // add more room for Scintilla (usually 1/6 more for editing)
     unsigned __int64 bufferSizeRequested = fileSize + min(1<<20,fileSize/6);
 
-
+    auto start = GetTickCount64();
     // Setup our scratch scintilla control to load the data
     m_scratchScintilla.Call(SCI_SETSTATUS, SC_STATUS_OK);   // reset error status
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
     bool ro = m_scratchScintilla.Call(SCI_GETREADONLY) != 0;
     if (ro)
         m_scratchScintilla.Call(SCI_SETREADONLY, false);    // we need write access
+    m_scratchScintilla.Call(SCI_SETUNDOCOLLECTION, 0);
     m_scratchScintilla.Call(SCI_CLEARALL);
     //m_scratchScintilla.Call(SCI_SETLEXER, ScintillaEditView::langNames[language].lexerID);
     m_scratchScintilla.Call(SCI_SETCODEPAGE, CP_UTF8);
@@ -567,6 +568,9 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     doc.m_document = m_scratchScintilla.Call(SCI_GETDOCPOINTER);
     m_scratchScintilla.Call(SCI_ADDREFDOCUMENT, 0, doc.m_document);
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
+
+    auto end = GetTickCount64();
+    CTraceToOutputDebugString::Instance()(L"time: %ld ms\n", end - start);
     return doc;
 }
 
