@@ -900,16 +900,11 @@ void CFindReplaceDlg::DoSearchAll(int id)
     {
         int tab = GetActiveTabIndex();
         int docID = GetDocIDFromTabIndex(tab);
-        if (docID != m_searchResults[0].docID)
+        if (docID = m_searchResults[0].docID)
         {
-            int tabtoopen = GetTabIndexFromDocID(m_searchResults[0].docID);
-            if (tabtoopen >= 0)
-                TabActivateAt(tabtoopen);
-            else
-                return;
+            ScintillaCall(SCI_GOTOLINE, m_searchResults[0].line);
+            Center((long)m_searchResults[0].pos, (long)m_searchResults[0].pos);
         }
-        ScintillaCall(SCI_GOTOLINE, m_searchResults[0].line);
-        Center((long)m_searchResults[0].pos, (long)m_searchResults[0].pos);
     }
     std::wstring sInfo;
     if (id == IDC_FINDALLINTABS)
