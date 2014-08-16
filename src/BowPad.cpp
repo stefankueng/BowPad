@@ -14,6 +14,7 @@
 //
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
+
 #include "stdafx.h"
 #include "BowPad.h"
 #include "MainWindow.h"
@@ -31,6 +32,7 @@
 
 HINSTANCE hInst;
 HINSTANCE hRes;
+static HANDLE hAppMutex = nullptr;
 
 #pragma pack(push)  // push current alignment to stack
 #pragma pack(1)     // set alignment to 1 byte boundary
@@ -241,7 +243,7 @@ static bool CheckIfAlreadyRunning()
     bool bAlreadyRunning = false;
     ::SetLastError(NO_ERROR);
     std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
-    ::CreateMutex(NULL, false, sID.c_str());
+    hAppMutex = ::CreateMutex(NULL, false, sID.c_str());
     if ((GetLastError() == ERROR_ALREADY_EXISTS) ||
         (GetLastError() == ERROR_ACCESS_DENIED))
         bAlreadyRunning = true;
@@ -357,6 +359,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
     SetAppID();
 
+    // TODO/REVIEW: May want to set ini file and load language earlier
+    // to avoid issues or future ones?
     CIniSettings::Instance().SetIniPath(CAppUtils::GetDataPath() + L"\\settings");
     hInst = hInstance;
     hRes = hInstance;
@@ -390,6 +394,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     }
 
     CoUninitialize();
+
+    CloseHandle(hAppMutex);
 
     return (int)msg.wParam;
 }
