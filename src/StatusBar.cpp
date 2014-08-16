@@ -82,7 +82,7 @@ void DrawPart (HWND hWnd, HDC hdc, int itemID)
 
     rcPart.left += x;
     int textlen = (int)SendMessage(hWnd, SB_GETTEXTLENGTH, itemID, 0);
-    auto textbuf = std::make_unique<wchar_t[]>(textlen + 1);
+    std::unique_ptr<wchar_t[]> textbuf(new wchar_t[textlen + 1]);
     SendMessage(hWnd, SB_GETTEXT, itemID, (LPARAM)textbuf.get());
     SetTextColor(hdc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)));
     SetBkColor(hdc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
@@ -153,8 +153,8 @@ bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, const int 
 
     SendMessage(*this, SB_SETPARTS, (WPARAM) nbParts, (LPARAM)nsParts);
     m_nParts = nbParts;
-    m_Parts = std::make_unique<int[]>(nbParts);
-    m_PartsTooltips = std::make_unique<std::wstring[]>(nbParts);
+    m_Parts = std::unique_ptr<int[]>(new int[nbParts]);
+    m_PartsTooltips = std::unique_ptr<std::wstring[]>(new std::wstring[nbParts]);
     m_bHasOnlyFixedWidth = true;
     for (int i = 0; i < nbParts; ++i)
     {
@@ -222,7 +222,7 @@ void CStatusBar::Resize()
 {
     if (m_bHasOnlyFixedWidth)
     {
-        auto sbParts = std::make_unique<int[]>(m_nParts);
+        std::unique_ptr<int[]> sbParts(new int[m_nParts]);
         RECT rc;
         GetClientRect(*this, &rc);
         int width = rc.right-rc.left;
