@@ -38,6 +38,7 @@
 #include "PathUtils.h"
 #include "TempFile.h"
 #include "AppUtils.h"
+#include "ILexer.h"
 
 #include <algorithm>
 #include <stdexcept>
@@ -150,7 +151,7 @@ void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, int id )
     m_documents[id] = doc;
 }
 
-static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, bool& bFirst, DWORD& lenFile,
+static void LoadSome( int encoding, Scintilla::ILoader * edit, const CDocument& doc, bool& bFirst, DWORD& lenFile,
     int& incompleteMultibyteChar, char* data, char* charbuf, int charbufSize, wchar_t* widebuf )
 
 {
@@ -167,7 +168,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
                 pData += 3;
                 lenFile -= 3;
             }
-            edit.AppendText(lenFile, pData);
+            edit->AddData(pData, lenFile);
             if (bFirst && doc.m_bHasBOM)
                 lenFile += 3;
         }
@@ -181,7 +182,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
             }
             memcpy(widebuf, pData, lenFile);
             int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, NULL);
-            edit.AppendText(charlen, charbuf);
+            edit->AddData(charbuf, charlen);
             if (bFirst && doc.m_bHasBOM)
                 lenFile += 2;
         }
@@ -208,7 +209,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
                 p_w[nWord] = WideCharSwap(p_w[nWord]);
             }
             int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, NULL);
-            edit.AppendText(charlen, charbuf);
+            edit->AddData(charbuf, charlen);
             if (bFirst && doc.m_bHasBOM)
                 lenFile += 2;
         }
@@ -263,7 +264,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
                 }
             }
             int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, nReadChars, charbuf, charbufSize, 0, NULL);
-            edit.AppendText(charlen, charbuf);
+            edit->AddData(charbuf, charlen);
             if (bFirst && doc.m_bHasBOM)
                 lenFile += 4;
         }
@@ -301,7 +302,7 @@ static void LoadSome( int encoding, CScintillaWnd& edit, const CDocument& doc, b
     {
         MultiByteToWideChar(encoding, 0, data, lenFile-incompleteMultibyteChar, widebuf, wideLen);
         int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, wideLen, charbuf, charbufSize, 0, NULL);
-        edit.AppendText(charlen, charbuf);
+        edit->AddData(charbuf, charlen);
     }
 }
 
@@ -491,6 +492,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     unsigned __int64 bufferSizeRequested = fileSize + min(1<<20,fileSize/6);
 
     auto start = GetTickCount64();
+
     // Setup our scratch scintilla control to load the data
     m_scratchScintilla.Call(SCI_SETSTATUS, SC_STATUS_OK);   // reset error status
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
@@ -499,10 +501,15 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         m_scratchScintilla.Call(SCI_SETREADONLY, false);    // we need write access
     m_scratchScintilla.Call(SCI_SETUNDOCOLLECTION, 0);
     m_scratchScintilla.Call(SCI_CLEARALL);
-    //m_scratchScintilla.Call(SCI_SETLEXER, ScintillaEditView::langNames[language].lexerID);
     m_scratchScintilla.Call(SCI_SETCODEPAGE, CP_UTF8);
-    std::wstring ext = CPathUtils::GetFileExtension(path);
-    m_scratchScintilla.SetupLexerForExt(ext);
+
+    Scintilla::ILoader * pdocLoad = reinterpret_cast<Scintilla::ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, bufferSizeRequested));
+    if (pdocLoad == nullptr)
+    {
+        ShowFileLoadError(hWnd, sFileName,
+                          CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str());
+        return doc;
+    }
 
     const int blockSize = 128 * 1024;   //128 kB
     char data[blockSize+8];
@@ -511,14 +518,6 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     const int charbufSize = widebufSize * 2;
     auto charbuf = std::make_unique<char[]>(charbufSize);
 
-    // First allocate enough memory for the whole file (this will reduce memory copy during loading)
-    m_scratchScintilla.Call(SCI_ALLOCATE, WPARAM(bufferSizeRequested));
-    if (m_scratchScintilla.Call(SCI_GETSTATUS) != SC_STATUS_OK)
-    {
-        ShowFileLoadError(hWnd,sFileName,
-            CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str());
-        return doc;
-    }
     DWORD lenFile = 0;
     int incompleteMultibyteChar = 0;
     bool bFirst = true;
@@ -536,17 +535,11 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
             encoding = GetCodepageFromBuf(data, lenFile, doc.m_bHasBOM);
         }
         doc.m_encoding = encoding;
-        LoadSome(encoding, m_scratchScintilla, doc, bFirst, lenFile, incompleteMultibyteChar,
+        LoadSome(encoding, pdocLoad, doc, bFirst, lenFile, incompleteMultibyteChar,
                   data, charbuf.get(), charbufSize, widebuf.get() );
 
         if (doc.m_format == UNKNOWN_FORMAT)
             doc.m_format = GetEOLFormatForm(data, lenFile);
-        if (m_scratchScintilla.Call(SCI_GETSTATUS) != SC_STATUS_OK)
-        {
-            ShowFileLoadError(hWnd,sFileName,
-                CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str());
-            break;
-        }
 
         if (incompleteMultibyteChar != 0)
         {
@@ -561,6 +554,8 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
 
     SetEOLType(m_scratchScintilla, doc);
 
+    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, (sptr_t)pdocLoad->ConvertToDocument());
+    m_scratchScintilla.Call(SCI_SETUNDOCOLLECTION, 1);
     m_scratchScintilla.Call(SCI_EMPTYUNDOBUFFER);
     m_scratchScintilla.Call(SCI_SETSAVEPOINT);
     if (ro || doc.m_bIsReadonly)
