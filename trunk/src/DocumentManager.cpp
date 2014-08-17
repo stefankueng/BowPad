@@ -57,7 +57,12 @@ static const COLORREF foldercolors[] = {
     RGB(247,253,177),
 };
 
-static const int MAX_FOLDERCOLORS = (_countof(foldercolors));
+namespace
+{
+const int ReadBlockSize = 128 * 1024;   //128 kB
+const int WriteBlockSize = 128 * 1024;   //128 kB
+const int MAX_FOLDERCOLORS = (_countof(foldercolors));
+};
 
 static wchar_t inline WideCharSwap(wchar_t nValue)
 {
@@ -82,7 +87,6 @@ static UINT64 inline DwordSwapBytes(UINT64 nValue)
     nRet = ((nRet&0xff00ff00ff00ff)<<8) | ((nRet>>8)&0xff00ff00ff00ff); // swap BYTESs in WORDs
     return nRet;
 }
-
 
 CDocumentManager::CDocumentManager(void)
     : m_scratchScintilla(hRes)
@@ -124,7 +128,6 @@ CDocument CDocumentManager::GetDocumentFromID(int id) const
     }
     return pos->second;
 }
-
 
 void CDocumentManager::SetDocument(int id, const CDocument& doc)
 {
@@ -181,7 +184,7 @@ static void LoadSome( int encoding, Scintilla::ILoader * edit, const CDocument& 
                 lenFile -= 2;
             }
             memcpy(widebuf, pData, lenFile);
-            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, NULL);
+            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, nullptr);
             edit->AddData(charbuf, charlen);
             if (bFirst && doc.m_bHasBOM)
                 lenFile += 2;
@@ -199,16 +202,14 @@ static void LoadSome( int encoding, Scintilla::ILoader * edit, const CDocument& 
             UINT64 * p_qw = (UINT64 *)widebuf;
             int nQwords = lenFile/8;
             for (int nQword = 0; nQword<nQwords; nQword++)
-            {
                 p_qw[nQword] = WordSwapBytes(p_qw[nQword]);
-            }
+
             wchar_t * p_w = (wchar_t *)p_qw;
             int nWords = lenFile/2;
             for (int nWord = nQwords*4; nWord<nWords; nWord++)
-            {
                 p_w[nWord] = WideCharSwap(p_w[nWord]);
-            }
-            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, NULL);
+
+            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, nullptr);
             edit->AddData(charbuf, charlen);
             if (bFirst && doc.m_bHasBOM)
                 lenFile += 2;
@@ -219,16 +220,12 @@ static void LoadSome( int encoding, Scintilla::ILoader * edit, const CDocument& 
             UINT64 * p64 = (UINT64 *)data;
             int nQwords = lenFile/8;
             for (int nQword = 0; nQword<nQwords; nQword++)
-            {
                 p64[nQword] = DwordSwapBytes(p64[nQword]);
-            }
 
             UINT32 * p32 = (UINT32 *)p64;
             int nDwords = lenFile/4;
             for (int nDword = nQwords*2; nDword<nDwords; nDword++)
-            {
                 p32[nDword] = DwordSwapBytes(p32[nDword]);
-            }
         }
         // intentional fall-through
     case 12000: // UTF32_LE
@@ -263,7 +260,7 @@ static void LoadSome( int encoding, Scintilla::ILoader * edit, const CDocument& 
                     *pOut = (wchar_t)zChar;
                 }
             }
-            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, nReadChars, charbuf, charbufSize, 0, NULL);
+            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, nReadChars, charbuf, charbufSize, 0, nullptr);
             edit->AddData(charbuf, charlen);
             if (bFirst && doc.m_bHasBOM)
                 lenFile += 4;
@@ -273,12 +270,12 @@ static void LoadSome( int encoding, Scintilla::ILoader * edit, const CDocument& 
         {
             // For other encodings, ask system if there are any invalid characters; note that it will
             // not correctly know if the last character is cut when there are invalid characters inside the text
-            wideLen = MultiByteToWideChar(encoding, (lenFile == -1) ? 0 : MB_ERR_INVALID_CHARS, data, lenFile, NULL, 0);
+            wideLen = MultiByteToWideChar(encoding, (lenFile == -1) ? 0 : MB_ERR_INVALID_CHARS, data, lenFile, nullptr, 0);
             if (wideLen == 0 && GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
             {
                 // Test without last byte
                 if (lenFile > 1)
-                    wideLen = MultiByteToWideChar(encoding, MB_ERR_INVALID_CHARS, data, lenFile-1, NULL, 0);
+                    wideLen = MultiByteToWideChar(encoding, MB_ERR_INVALID_CHARS, data, lenFile-1, nullptr, 0);
                 if (wideLen == 0)
                 {
                     // don't have to check that the error is still ERROR_NO_UNICODE_TRANSLATION,
@@ -287,7 +284,7 @@ static void LoadSome( int encoding, Scintilla::ILoader * edit, const CDocument& 
                     // TODO: should warn user about incorrect loading due to invalid characters
                     // We still load the file, but the system will either strip or replace invalid characters
                     // (including the last character, if cut in half)
-                    wideLen = MultiByteToWideChar(encoding, 0, data, lenFile, NULL, 0);
+                    wideLen = MultiByteToWideChar(encoding, 0, data, lenFile, nullptr, 0);
                 }
                 else
                 {
@@ -301,7 +298,7 @@ static void LoadSome( int encoding, Scintilla::ILoader * edit, const CDocument& 
     if (wideLen > 0)
     {
         MultiByteToWideChar(encoding, 0, data, lenFile-incompleteMultibyteChar, widebuf, wideLen);
-        int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, wideLen, charbuf, charbufSize, 0, NULL);
+        int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, wideLen, charbuf, charbufSize, 0, nullptr);
         edit->AddData(charbuf, charlen);
     }
 }
@@ -336,7 +333,7 @@ static bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent = sQuestion.c_str();
     int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, NULL, NULL );
+    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, nullptr, nullptr );
     if (CAppUtils::FailedShowMessage(hr))
         return 0;
     // We've used TDCBF_CANCEL_BUTTON so IDCANCEL can be returned,
@@ -375,7 +372,7 @@ static bool AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent = sQuestion.c_str();
     int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, NULL, NULL );
+    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, nullptr, nullptr );
     if (CAppUtils::FailedShowMessage(hr))
         return 0;
     // We've used TDCBF_CANCEL_BUTTON so IDCANCEL can be returned,
@@ -396,9 +393,8 @@ static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params)
     shExecInfo.nShow = SW_NORMAL;
 
     if (! ShellExecuteEx(&shExecInfo))
-    {
         return ::GetLastError();
-    }
+
     return 0;
 }
 
@@ -439,7 +435,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     CDocument doc;
     std::wstring sFileName = CPathUtils::GetFileName(path);
 
-    CAutoFile hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, createIfMissing ? CREATE_NEW : OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    CAutoFile hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, nullptr, createIfMissing ? CREATE_NEW : OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (!hFile.IsValid())
     {
         // Capture the access denied error, while it's valid.
@@ -511,9 +507,8 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         return doc;
     }
 
-    const int blockSize = 128 * 1024;   //128 kB
-    char data[blockSize+8];
-    const int widebufSize = blockSize * 2;
+    char data[ReadBlockSize+8];
+    const int widebufSize = ReadBlockSize * 2;
     auto widebuf = std::make_unique<wchar_t[]>(widebufSize);
     const int charbufSize = widebufSize * 2;
     auto charbuf = std::make_unique<char[]>(charbufSize);
@@ -523,17 +518,14 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     bool bFirst = true;
     do
     {
-        if (!ReadFile(hFile, data + incompleteMultibyteChar, blockSize - incompleteMultibyteChar, &lenFile, NULL))
-        {
+        if (!ReadFile(hFile, data + incompleteMultibyteChar, ReadBlockSize - incompleteMultibyteChar, &lenFile, nullptr))
             lenFile = 0;
-        }
         else
             lenFile += incompleteMultibyteChar;
 
         if (encoding == -1)
-        {
             encoding = GetCodepageFromBuf(data, lenFile, doc.m_bHasBOM);
-        }
+
         doc.m_encoding = encoding;
         LoadSome(encoding, pdocLoad, doc, bFirst, lenFile, incompleteMultibyteChar,
                   data, charbuf.get(), charbufSize, widebuf.get() );
@@ -541,13 +533,11 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         if (doc.m_format == UNKNOWN_FORMAT)
             doc.m_format = GetEOLFormatForm(data, lenFile);
 
-        if (incompleteMultibyteChar != 0)
-        {
-            // copy bytes to next buffer
-            memcpy(data, data + blockSize - incompleteMultibyteChar, incompleteMultibyteChar);
-        }
+        if (incompleteMultibyteChar != 0) // copy bytes to next buffer
+            memcpy(data, data + ReadBlockSize - incompleteMultibyteChar, incompleteMultibyteChar);
+
         bFirst = false;
-    } while (lenFile == blockSize);
+    } while (lenFile == ReadBlockSize);
 
     if (doc.m_format == UNKNOWN_FORMAT)
         doc.m_format = WIN_FORMAT;
@@ -565,7 +555,9 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
 
     auto end = GetTickCount64();
-    CTraceToOutputDebugString::Instance()(L"time: %ld ms\n", end - start);
+    CTraceToOutputDebugString::Instance()(L"Load time: %ld ms\n", end - start);
+
+    pdocLoad->Release();
     return doc;
 }
 
@@ -576,27 +568,189 @@ FormatType CDocumentManager::GetEOLFormatForm( const char *data, DWORD len ) con
         if (data[i] == '\r')
         {
             if (i+1 < len && data[i+1] == '\n')
-            {
                 return WIN_FORMAT;
-            }
             else
-            {
                 return MAC_FORMAT;
-            }
         }
         if (data[i] == '\n')
-        {
             return UNIX_FORMAT;
-        }
     }
     return UNKNOWN_FORMAT;
+}
+
+static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
+{
+    const int writeWidebufSize = WriteBlockSize * 2;
+    auto widebuf = std::make_unique<wchar_t[]>(writeWidebufSize);
+    auto wide32buf = std::make_unique<wchar_t[]>(writeWidebufSize*2);
+    err.clear();
+    DWORD bytesWritten = 0;
+    if (doc.m_bHasBOM)
+    {
+        BOOL result;
+        if (doc.m_encoding == 1200)
+            result = WriteFile(hFile, "\xFF\xFE", 2, &bytesWritten, nullptr);
+        else
+            result = WriteFile(hFile, "\xFE\xFF", 2, &bytesWritten, nullptr);
+        if (!result || bytesWritten != 2)
+        {
+            CFormatMessageWrapper errMsg;
+            err = (wchar_t) errMsg;
+            return false;
+        }
+    }
+    char * writeBuf = buf;
+    do
+    {
+        int charStart = UTF8Helper::characterStart(writeBuf, (int)min(WriteBlockSize, lengthDoc));
+        int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), writeWidebufSize);
+        if (doc.m_encoding == 1201)
+        {
+            UINT64 * p_qw = reinterpret_cast<UINT64 *>(widebuf.get());
+            int nQwords = widelen/4;
+            for (int nQword = 0; nQword<nQwords; nQword++)
+                p_qw[nQword] = WordSwapBytes(p_qw[nQword]);
+            wchar_t * p_w = (wchar_t *)p_qw;
+            int nWords = widelen;
+            for (int nWord = nQwords*4; nWord<nWords; nWord++)
+                p_w[nWord] = WideCharSwap(p_w[nWord]);
+        }
+        if (!WriteFile(hFile, widebuf.get(), widelen*2, &bytesWritten, nullptr) || widelen != int(bytesWritten/2))
+        {
+            CFormatMessageWrapper errMsg;
+            err = (wchar_t) errMsg;
+            return false;
+        }
+        writeBuf += charStart;
+        lengthDoc -= charStart;
+    } while (lengthDoc > 0);
+    return true;
+}
+
+static bool SaveAsUtf32(const CDocument& doc, char*buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
+{
+    const int writeWidebufSize = WriteBlockSize * 2;
+    auto writeWidebuf = std::make_unique<wchar_t[]>(writeWidebufSize);
+    auto writeWide32buf = std::make_unique<wchar_t[]>(writeWidebufSize*2);
+    DWORD bytesWritten = 0;
+    BOOL result;
+    if (doc.m_encoding == 12000)
+        result = WriteFile(hFile, "\xFF\xFE\0\0", 4, &bytesWritten, nullptr);
+    else
+        result= WriteFile(hFile, "\0\0\xFE\xFF", 4, &bytesWritten, nullptr);
+    if (!result || bytesWritten != 4)
+    {
+        CFormatMessageWrapper errMsg;
+        err = (wchar_t) errMsg;
+        return false;
+    }
+    char * writeBuf = buf;
+    do
+    {
+        int charStart = UTF8Helper::characterStart(writeBuf, (int)min(WriteBlockSize, lengthDoc));
+        int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, writeWidebuf.get(), writeWidebufSize);
+
+        LPCWSTR p_In = (LPCWSTR)writeWidebuf.get();
+        UINT32 * p_Out = (UINT32 *)writeWide32buf.get();
+        int nOutDword = 0;
+        for (int nInWord = 0; nInWord<widelen; nInWord++, nOutDword++)
+        {
+            UINT32 zChar = p_In[nInWord];
+            if ((zChar&0xfc00) == 0xd800) // lead surrogate
+            {
+                if (nInWord+1<widelen && (p_In[nInWord+1]&0xfc00) == 0xdc00) // trail surrogate follows
+                    zChar = 0x10000 + ((zChar&0x3ff)<<10) + (p_In[++nInWord]&0x3ff);
+                else
+                    zChar = 0xfffd; // ? mark
+            }
+            else if ((zChar&0xfc00) == 0xdc00) // trail surrogate without lead
+                zChar = 0xfffd; // ? mark
+            p_Out[nOutDword] = zChar;
+        }
+
+        if (doc.m_encoding == 12001)
+        {
+            UINT64 * p64 = reinterpret_cast<UINT64 *>(writeWide32buf.get());
+            int nQwords = widelen/2;
+            for (int nQword = 0; nQword<nQwords; nQword++)
+                p64[nQword] = DwordSwapBytes(p64[nQword]);
+
+            UINT32 * p32 = (UINT32 *)p64;
+            int nDwords = widelen;
+            for (int nDword = nQwords*2; nDword<nDwords; nDword++)
+                p32[nDword] = DwordSwapBytes(p32[nDword]);
+        }
+        if (!WriteFile(hFile, writeWide32buf.get(), widelen*4, &bytesWritten, nullptr) || widelen != int(bytesWritten/4))
+        {
+            CFormatMessageWrapper errMsg;
+            err = (wchar_t) errMsg;
+            return false;
+        }
+        writeBuf += charStart;
+        lengthDoc -= charStart;
+    } while (lengthDoc > 0);
+    return true;
+}
+
+static bool SaveAsUtf8(const CDocument& doc, char* buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
+{
+    // UTF8: save the buffer as it is
+    DWORD bytesWritten = 0;
+    if (doc.m_bHasBOM)
+    {
+        if (!WriteFile(hFile, "\xEF\xBB\xBF", 3, &bytesWritten, nullptr) || bytesWritten != 3)
+        {
+            CFormatMessageWrapper errMsg;
+            err = (wchar_t) errMsg;
+            return false;
+        }
+    }
+    do
+    {
+        DWORD writeLen = (DWORD)min(WriteBlockSize, lengthDoc);
+        if (!WriteFile(hFile, buf, writeLen, &bytesWritten, nullptr))
+        {
+            CFormatMessageWrapper errMsg;
+            err = (wchar_t) errMsg;
+            return false;
+        }
+        lengthDoc -= writeLen;
+        buf += writeLen;
+    } while (lengthDoc > 0);
+    return true;
+}
+
+static bool SaveAsOther(const CDocument& doc, char* buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
+{
+    const int widebufSize = WriteBlockSize * 2;
+    auto widebuf = std::make_unique<wchar_t[]>(widebufSize);
+    const int charbufSize = widebufSize * 2;
+    auto charbuf = std::make_unique<char[]>(charbufSize);
+    // first convert to wide char, then to the requested codepage
+    DWORD bytesWritten = 0;
+    char * writeBuf = buf;
+    do
+    {
+        int charStart = UTF8Helper::characterStart(writeBuf, (int)min(WriteBlockSize, lengthDoc));
+        int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), widebufSize);
+        int charlen = WideCharToMultiByte(doc.m_encoding < 0 ? CP_ACP : doc.m_encoding, 0, widebuf.get(), widelen, charbuf.get(), charbufSize, 0, nullptr);
+        if (!WriteFile(hFile, charbuf.get(), charlen, &bytesWritten, nullptr) || charlen != int(bytesWritten))
+        {
+            CFormatMessageWrapper errMsg;
+            err = (wchar_t) errMsg;
+            return false;
+        }
+        writeBuf += charStart;
+        lengthDoc -= charStart;
+    } while (lengthDoc > 0);
+    return true;
 }
 
 bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocument& doc )
 {
     if (path.empty())
         return false;
-    CAutoFile hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    CAutoFile hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (!hFile.IsValid())
     {
         CFormatMessageWrapper errMsg;
@@ -604,163 +758,31 @@ bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocu
         return false;
     }
 
-    const int blockSize = 128 * 1024;   //128 kB
-    const int widebufSize = blockSize * 2;
-    auto widebuf = std::make_unique<wchar_t[]>(widebufSize);
-    auto wide32buf = std::make_unique<wchar_t[]>(widebufSize*2);
-    const int charbufSize = widebufSize * 2;
-    auto charbuf = std::make_unique<char[]>(charbufSize);
-
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
     size_t lengthDoc = m_scratchScintilla.Call(SCI_GETLENGTH);
-    char* buf = (char*)m_scratchScintilla.Call(SCI_GETCHARACTERPOINTER);    // get characters directly from Scintilla buffer
-    DWORD bytesWritten = 0;
+    // get characters directly from Scintilla buffer
+    char* buf = (char*)m_scratchScintilla.Call(SCI_GETCHARACTERPOINTER);
+    bool ok = false;
+    std::wstring err;
     switch (doc.m_encoding)
     {
+    case CP_UTF8:
+        ok = SaveAsUtf8(doc, buf, lengthDoc, hFile, err);
+        break;
     case 1200: // UTF16_LE
     case 1201: // UTF16_BE
-        {
-            if (doc.m_bHasBOM)
-            {
-                if (doc.m_encoding == 1200)
-                    WriteFile(hFile, "\xFF\xFE", 2, &bytesWritten, NULL);
-                else
-                    WriteFile(hFile, "\xFE\xFF", 2, &bytesWritten, NULL);
-            }
-            char * writeBuf = buf;
-            do
-            {
-                int charStart = UTF8Helper::characterStart(writeBuf, (int)min(blockSize, lengthDoc));
-                int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), widebufSize);
-                if (doc.m_encoding == 1201)
-                {
-                    UINT64 * p_qw = (UINT64 *)(void *)widebuf.get();
-                    int nQwords = widelen/4;
-                    for (int nQword = 0; nQword<nQwords; nQword++)
-                    {
-                        p_qw[nQword] = WordSwapBytes(p_qw[nQword]);
-                    }
-                    wchar_t * p_w = (wchar_t *)p_qw;
-                    int nWords = widelen;
-                    for (int nWord = nQwords*4; nWord<nWords; nWord++)
-                    {
-                        p_w[nWord] = WideCharSwap(p_w[nWord]);
-                    }
-                }
-                if ((!WriteFile(hFile, widebuf.get(), widelen*2, &bytesWritten, NULL) || (widelen != int(bytesWritten/2))))
-                {
-                    CFormatMessageWrapper errMsg;
-                    ShowFileSaveError(hWnd,path,errMsg);
-                    return false;
-                }
-                writeBuf += charStart;
-                lengthDoc -= charStart;
-            } while (lengthDoc > 0);
-        }
+        ok = SaveAsUtf16(doc, buf, lengthDoc, hFile, err);
         break;
     case 12000: // UTF32_LE
     case 12001: // UTF32_BE
-        {
-            if (doc.m_encoding == 12000)
-                WriteFile(hFile, "\xFF\xFE\0\0", 4, &bytesWritten, NULL);
-            else
-                WriteFile(hFile, "\0\0\xFE\xFF", 4, &bytesWritten, NULL);
-            char * writeBuf = buf;
-            do
-            {
-                int charStart = UTF8Helper::characterStart(writeBuf, (int)min(blockSize, lengthDoc));
-                int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), widebufSize);
-
-                LPCWSTR p_In = (LPCWSTR)widebuf.get();
-                UINT32 * p_Out = (UINT32 *)(void *)wide32buf.get();
-                int nOutDword = 0;
-                for (int nInWord = 0; nInWord<widelen; nInWord++, nOutDword++)
-                {
-                    UINT32 zChar = p_In[nInWord];
-                    if ((zChar&0xfc00) == 0xd800) // lead surrogate
-                    {
-                        if (nInWord+1<widelen && (p_In[nInWord+1]&0xfc00) == 0xdc00) // trail surrogate follows
-                        {
-                            zChar = 0x10000 + ((zChar&0x3ff)<<10) + (p_In[++nInWord]&0x3ff);
-                        }
-                        else
-                        {
-                            zChar = 0xfffd; // ? mark
-                        }
-                    }
-                    else if ((zChar&0xfc00) == 0xdc00) // trail surrogate without lead
-                    {
-                        zChar = 0xfffd; // ? mark
-                    }
-                    p_Out[nOutDword] = zChar;
-                }
-
-
-                if (doc.m_encoding == 12001)
-                {
-                    UINT64 * p64 = (UINT64 *)(void *)wide32buf.get();
-                    int nQwords = widelen/2;
-                    for (int nQword = 0; nQword<nQwords; nQword++)
-                    {
-                        p64[nQword] = DwordSwapBytes(p64[nQword]);
-                    }
-
-                    UINT32 * p32 = (UINT32 *)p64;
-                    int nDwords = widelen;
-                    for (int nDword = nQwords*2; nDword<nDwords; nDword++)
-                    {
-                        p32[nDword] = DwordSwapBytes(p32[nDword]);
-                    }
-                }
-                if ((!WriteFile(hFile, wide32buf.get(), widelen*4, &bytesWritten, NULL) || (widelen != int(bytesWritten/4))))
-                {
-                    CFormatMessageWrapper errMsg;
-                    ShowFileSaveError(hWnd,path,errMsg);
-                    return false;
-                }
-                writeBuf += charStart;
-                lengthDoc -= charStart;
-            } while (lengthDoc > 0);
-        }
-        break;
-    case CP_UTF8:
-        // UTF8: save the buffer as it is
-        if (doc.m_bHasBOM)
-            WriteFile(hFile, "\xEF\xBB\xBF", 3, &bytesWritten, NULL);
-        do
-        {
-            DWORD writeLen = (DWORD)min(blockSize, lengthDoc);
-            if (!WriteFile(hFile, buf, writeLen, &bytesWritten, NULL))
-            {
-                CFormatMessageWrapper errMsg;
-                ShowFileSaveError(hWnd,path,errMsg);
-                return false;
-            }
-            lengthDoc -= writeLen;
-            buf += writeLen;
-        } while (lengthDoc > 0);
+        ok = SaveAsUtf32(doc, buf, lengthDoc, hFile, err);
         break;
     default:
-        {
-            // first convert to wide char, then to the requested codepage
-            char * writeBuf = buf;
-            do
-            {
-                int charStart = UTF8Helper::characterStart(writeBuf, (int)min(blockSize, lengthDoc));
-                int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), widebufSize);
-                int charlen = WideCharToMultiByte(doc.m_encoding < 0 ? CP_ACP : doc.m_encoding, 0, widebuf.get(), widelen, charbuf.get(), charbufSize, 0, NULL);
-                if ((!WriteFile(hFile, charbuf.get(), charlen, &bytesWritten, NULL) || (charlen != int(bytesWritten))))
-                {
-                    CFormatMessageWrapper errMsg;
-                    ShowFileSaveError(hWnd,path,errMsg);
-                    return false;
-                }
-                writeBuf += charStart;
-                lengthDoc -= charStart;
-            } while (lengthDoc > 0);
-        }
+        ok = SaveAsOther(doc, buf, lengthDoc, hFile, err);
         break;
     }
+    if (!ok)
+        ShowFileSaveError(hWnd, path, err.c_str());
     return true;
 }
 
@@ -772,7 +794,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc, bool & bTabMov
     DWORD attributes = INVALID_FILE_ATTRIBUTES;
     DWORD err = 0;
     // when opening files, always 'share' as much as possible to reduce problems with virus scanners
-    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (!hFile.IsValid())
         err = GetLastError();
     // If the file can't be created, check if the file attributes are the reason we can't open
@@ -788,7 +810,7 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc, bool & bTabMov
             DWORD desiredAttributes = attributes & ~undesiredAttributes;
             if (SetFileAttributes(doc.m_path.c_str(), desiredAttributes))
             {
-                hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+                hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
             }
         }
     }
@@ -851,7 +873,7 @@ bool CDocumentManager::UpdateFileTime(CDocument& doc, bool bIncludeReadonly)
 {
     if (doc.m_path.empty())
         return false;
-    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (!hFile.IsValid())
     {
         if (GetLastError() == ERROR_FILE_NOT_FOUND)
@@ -863,9 +885,8 @@ bool CDocumentManager::UpdateFileTime(CDocument& doc, bool bIncludeReadonly)
     }
     BY_HANDLE_FILE_INFORMATION fi = {0};
     if (!GetFileInformationByHandle(hFile, &fi))
-    {
         return false;
-    }
+
     doc.m_lastWriteTime = fi.ftLastWriteTime;
     if (bIncludeReadonly)
         doc.m_bIsReadonly = (fi.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)) != 0;
@@ -879,7 +900,7 @@ DocModifiedState CDocumentManager::HasFileChanged( int id ) const
         return DM_Unmodified;
 
     // get the last write time of the base doc file
-    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (!hFile.IsValid())
     {
         if (GetLastError() == ERROR_FILE_NOT_FOUND)
@@ -888,9 +909,8 @@ DocModifiedState CDocumentManager::HasFileChanged( int id ) const
     }
     BY_HANDLE_FILE_INFORMATION fi = {0};
     if (!GetFileInformationByHandle(hFile, &fi))
-    {
         return DM_Unknown;
-    }
+
     if (CompareFileTime(&doc.m_lastWriteTime, &fi.ftLastWriteTime))
         return DM_Modified;
 
