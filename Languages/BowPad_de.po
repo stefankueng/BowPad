@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-07-27 19:19+0100\n"
+"PO-Revision-Date: 2014-08-17 18:27+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -74,6 +74,10 @@ msgstr "&Speichern"
 #. Resource IDs: (1005)
 msgid "&Search for:"
 msgstr "&Suche nach:"
+
+#. Resource IDs: (1005)
+msgid "&Sort Order:"
+msgstr "&Sortierreihenfolge:"
 
 #. Resource IDs: (1007)
 msgid "&Whole word"
@@ -141,6 +145,10 @@ msgstr "Möchten Sie die Datei '%s' wirklich löschen?"
 #, c-format
 msgid "Are you sure you want to reload '%s'?"
 msgstr "Möchten Sie die Datei '%s' wirklich neu laden?"
+
+#. Resource IDs: (13)
+msgid "Ascending (A-Z)"
+msgstr "Aufsteigend (A-Z)"
 
 #. Resource IDs: (3753)
 msgid "Asks where to save the current tab"
@@ -586,6 +594,10 @@ msgstr ""
 msgid "Deletes the file of the current tab"
 msgstr "Löscht die Datei des aktuellen Tabs"
 
+#. Resource IDs: (13)
+msgid "Descending (Z-A)"
+msgstr "Absteigend (Z-A)"
+
 #. Resource IDs: (3760)
 msgid ""
 "Determines whether a tab is inserted or spaces when the tab key is pressed."
@@ -836,6 +848,10 @@ msgstr "Gehe zu"
 #. Resource IDs: (3752)
 msgid "H"
 msgstr "H"
+
+#. Resource IDs: (1079)
+msgid "Ignore &case."
+msgstr "Gross/Kleinschreibung ignorieren"
 
 #. Resource IDs: (12)
 msgid "Insert"
@@ -1460,6 +1476,10 @@ msgstr "SA"
 msgid "SAL"
 msgstr "SAL"
 
+#. Resource IDs: (3767)
+msgid "SL"
+msgstr "SL"
+
 #. Resource IDs: (3762, 3769)
 msgid "ST"
 msgstr "ST"
@@ -1610,6 +1630,18 @@ msgstr "Öffnet den Windows Explorer Eigenschaftsdialog für die aktuelle Datei"
 msgid "Shows the list of all opened tabs."
 msgstr "Zeigt eine Liste mit offenen Tabs"
 
+#. Resource IDs: (3767)
+msgid "Sort Lines"
+msgstr "Zeilen sortieren"
+
+#. Resource IDs: (203)
+msgid "Sort Lines - Options"
+msgstr "Zeilen sortieren - Einstellungen"
+
+#. Resource IDs: (3767)
+msgid "Sorts the current selection (normal or rectangular)."
+msgstr "Sortiert die aktuelle Auswahl (Normale Auswahl oder Rechteckauswahl)"
+
 #. Resource IDs: (3764)
 msgid "Spaces to Tabs"
 msgstr "Leerzeichen zu Tabulatoren"
@@ -1716,6 +1748,10 @@ msgstr "Setzt/entfernt ein Lesezeichen an der aktuellen Zeile"
 #. Resource IDs: (3766)
 msgid "Toggles between the normal and the dark theme"
 msgstr "Schaltet um zwischen normalem und dunklem Stil"
+
+#. Resource IDs: (1078)
+msgid "Treat digits as &numbers."
+msgstr "&Nummern als Zahlen behandeln:"
 
 #. Resource IDs: (3763)
 msgid "Trim Whitespaces"
