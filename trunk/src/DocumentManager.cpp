@@ -549,7 +549,6 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     if (ro || doc.m_bIsReadonly)
         m_scratchScintilla.Call(SCI_SETREADONLY, true);
     doc.m_document = m_scratchScintilla.Call(SCI_GETDOCPOINTER);
-    m_scratchScintilla.Call(SCI_ADDREFDOCUMENT, 0, doc.m_document);
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
 
     auto end = GetTickCount64();
