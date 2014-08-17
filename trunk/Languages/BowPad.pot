@@ -78,6 +78,10 @@ msgstr ""
 msgid "&Search for:"
 msgstr ""
 
+#. Resource IDs: (1005)
+msgid "&Sort Order:"
+msgstr ""
+
 #. Resource IDs: (1007)
 msgid "&Whole word"
 msgstr ""
@@ -135,6 +139,10 @@ msgstr ""
 #. Resource IDs: (11)
 #, c-format
 msgid "Are you sure you want to reload '%s'?"
+msgstr ""
+
+#. Resource IDs: (13)
+msgid "Ascending (A-Z)"
 msgstr ""
 
 #. Resource IDs: (3753)
@@ -550,6 +558,10 @@ msgstr ""
 msgid "Deletes the file of the current tab"
 msgstr ""
 
+#. Resource IDs: (13)
+msgid "Descending (Z-A)"
+msgstr ""
+
 #. Resource IDs: (3760)
 msgid "Determines whether a tab is inserted or spaces when the tab key is pressed."
 msgstr ""
@@ -753,6 +765,10 @@ msgstr ""
 
 #. Resource IDs: (3752)
 msgid "H"
+msgstr ""
+
+#. Resource IDs: (1079)
+msgid "Ignore &case."
 msgstr ""
 
 #. Resource IDs: (12)
@@ -1329,6 +1345,10 @@ msgstr ""
 msgid "SAL"
 msgstr ""
 
+#. Resource IDs: (3767)
+msgid "SL"
+msgstr ""
+
 #. Resource IDs: (3762, 3769)
 msgid "ST"
 msgstr ""
@@ -1466,6 +1486,18 @@ msgstr ""
 msgid "Shows the list of all opened tabs."
 msgstr ""
 
+#. Resource IDs: (3767)
+msgid "Sort Lines"
+msgstr ""
+
+#. Resource IDs: (203)
+msgid "Sort Lines - Options"
+msgstr ""
+
+#. Resource IDs: (3767)
+msgid "Sorts the current selection (normal or rectangular)."
+msgstr ""
+
 #. Resource IDs: (3764)
 msgid "Spaces to Tabs"
 msgstr ""
@@ -1564,6 +1596,10 @@ msgstr ""
 
 #. Resource IDs: (3766)
 msgid "Toggles between the normal and the dark theme"
+msgstr ""
+
+#. Resource IDs: (1078)
+msgid "Treat digits as &numbers."
 msgstr ""
 
 #. Resource IDs: (3763)
