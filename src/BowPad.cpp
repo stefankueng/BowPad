@@ -340,7 +340,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     if ((GetLastError() == ERROR_ALREADY_EXISTS) ||
         (GetLastError() == ERROR_ACCESS_DENIED))
         bAlreadyRunning = true;
-    return bAlreadyRunning;
 
     if (bAlreadyRunning && !parser.HasKey(L"multiple"))
     {
