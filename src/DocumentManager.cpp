@@ -557,7 +557,6 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     auto end = GetTickCount64();
     CTraceToOutputDebugString::Instance()(L"Load time: %ld ms\n", end - start);
 
-    pdocLoad->Release();
     return doc;
 }
 
