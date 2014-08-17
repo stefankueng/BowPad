@@ -480,11 +480,10 @@ void CCmdFunctions::FindFunctions(int docID, bool bForce)
     // reset everything to point to the start of the document.
     if ((m_searchStatus != FindFunctionsStatus::InProgress) || bForce)
     {
-        m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
         m_edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
         m_edit.Call(SCI_CLEARALL);
-        m_edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
         m_edit.Call(SCI_SETCODEPAGE, CP_UTF8);
+        m_edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
         // The length shouldn't change without us restarting the search.
         // If it does that's a bug.
         long length = (long) m_edit.Call(SCI_GETLENGTH);
@@ -496,10 +495,13 @@ void CCmdFunctions::FindFunctions(int docID, bool bForce)
         {
             // Nothing to do if this doc type doesn't support functions.
             m_searchStatus = FindFunctionsStatus::Finished;
+            m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
             return;
         }
         m_searchStatus = FindFunctionsStatus::InProgress;
     }
+    else
+        m_edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
 
     unsigned long long start_time_point = 0;
     if (incremental_search_time > 0)
@@ -584,6 +586,7 @@ void CCmdFunctions::FindFunctions(int docID, bool bForce)
             }
         }
     }
+    m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
 }
 
 void CCmdFunctions::SaveFunctionForActiveDocument(
