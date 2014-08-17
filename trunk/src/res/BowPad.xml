@@ -353,9 +353,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Command.LargeImages>
         <Image>res/SortL.bmp</Image>
       </Command.LargeImages>
-      <Command.SmallImages>
-        <Image>res/Sort.bmp</Image>
-      </Command.SmallImages>
     </Command>
     <Command Name="cmdGroupPrint" LabelTitle="Print"  Keytip="P">
       <Command.LargeImages>
