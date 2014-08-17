@@ -287,6 +287,9 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
 
         PopulateMenu(doc, collection);
 
+        // detach document
+        m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
+
         return S_OK;
     }
 
