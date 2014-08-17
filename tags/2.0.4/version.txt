@@ -1,0 +1,5 @@
+2.0.3.1019
+http://sourceforge.net/projects/stefanstools/files/BowPad/2.0.3/BowPad64-2.0.3.msi/download
+BowPad64-2.0.3.msi
+http://sourceforge.net/projects/stefanstools/files/BowPad/2.0.3/BowPad-2.0.3.msi/download
+BowPad-2.0.3.msi
