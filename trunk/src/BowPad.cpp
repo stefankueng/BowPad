@@ -354,8 +354,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
     SetAppID();
 
-    // TODO/REVIEW: May want to set ini file and load language earlier
-    // to avoid issues or future ones?
     CIniSettings::Instance().SetIniPath(CAppUtils::GetDataPath() + L"\\settings");
     hInst = hInstance;
     hRes = hInstance;
