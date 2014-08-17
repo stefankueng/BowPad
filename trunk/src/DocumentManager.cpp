@@ -57,12 +57,10 @@ static const COLORREF foldercolors[] = {
     RGB(247,253,177),
 };
 
-namespace
-{
 const int ReadBlockSize = 128 * 1024;   //128 kB
 const int WriteBlockSize = 128 * 1024;   //128 kB
 const int MAX_FOLDERCOLORS = (_countof(foldercolors));
-};
+
 
 static wchar_t inline WideCharSwap(wchar_t nValue)
 {
