@@ -581,7 +581,6 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
 {
     const int writeWidebufSize = WriteBlockSize * 2;
     auto widebuf = std::make_unique<wchar_t[]>(writeWidebufSize);
-    auto wide32buf = std::make_unique<wchar_t[]>(writeWidebufSize*2);
     err.clear();
     DWORD bytesWritten = 0;
     if (doc.m_bHasBOM)
