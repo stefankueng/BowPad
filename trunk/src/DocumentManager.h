@@ -40,10 +40,7 @@ public:
     int                         GetIdForPath(const std::wstring& path) const;
     bool                        HasDocumentID(int id) const;
     CDocument                   GetDocumentFromID(int id) const;
-    Document                    GetScintillaDocument(int id) const
-    {
-        return GetDocumentFromID(id).m_document;
-    }
+    Document                    GetScintillaDocument(int id) const { return GetDocumentFromID(id).m_document; }
     COLORREF                    GetColorForDocument(int id);
 
     CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
