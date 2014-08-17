@@ -542,14 +542,15 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
 
     SetEOLType(m_scratchScintilla, doc);
 
-    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, (sptr_t)pdocLoad->ConvertToDocument());
+    sptr_t loadeddoc = (sptr_t)pdocLoad->ConvertToDocument();   // loadeddoc has reference count 1
+    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, loadeddoc);   // doc in scratch has reference count 2 (loadeddoc 1, added one)
     m_scratchScintilla.Call(SCI_SETUNDOCOLLECTION, 1);
     m_scratchScintilla.Call(SCI_EMPTYUNDOBUFFER);
     m_scratchScintilla.Call(SCI_SETSAVEPOINT);
     if (ro || doc.m_bIsReadonly)
         m_scratchScintilla.Call(SCI_SETREADONLY, true);
-    doc.m_document = m_scratchScintilla.Call(SCI_GETDOCPOINTER);
-    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
+    doc.m_document = m_scratchScintilla.Call(SCI_GETDOCPOINTER);    // doc.m_document has reference count of 2
+    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);               // now doc.m_document has reference count of 1, and the scratch does not hold any doc anymore
 
     auto end = GetTickCount64();
     CTraceToOutputDebugString::Instance()(L"Load time: %ld ms\n", end - start);
