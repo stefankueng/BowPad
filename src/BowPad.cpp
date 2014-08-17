@@ -32,7 +32,6 @@
 
 HINSTANCE hInst;
 HINSTANCE hRes;
-static HANDLE hAppMutex = nullptr;
 
 #pragma pack(push)  // push current alignment to stack
 #pragma pack(1)     // set alignment to 1 byte boundary
@@ -238,18 +237,6 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLinePa
     }
 }
 
-static bool CheckIfAlreadyRunning()
-{
-    bool bAlreadyRunning = false;
-    ::SetLastError(NO_ERROR);
-    std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
-    hAppMutex = ::CreateMutex(NULL, false, sID.c_str());
-    if ((GetLastError() == ERROR_ALREADY_EXISTS) ||
-        (GetLastError() == ERROR_ACCESS_DENIED))
-        bAlreadyRunning = true;
-    return bAlreadyRunning;
-}
-
 static HWND FindAndWaitForBowPad()
 {
     // don't start another instance: reuse the existing one
@@ -346,7 +333,15 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
-    bool bAlreadyRunning = CheckIfAlreadyRunning();
+    bool bAlreadyRunning = false;
+    ::SetLastError(NO_ERROR);
+    std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
+    HANDLE hAppMutex = ::CreateMutex(NULL, false, sID.c_str());
+    if ((GetLastError() == ERROR_ALREADY_EXISTS) ||
+        (GetLastError() == ERROR_ACCESS_DENIED))
+        bAlreadyRunning = true;
+    return bAlreadyRunning;
+
     if (bAlreadyRunning && !parser.HasKey(L"multiple"))
     {
         HWND hBowPadWnd = FindAndWaitForBowPad();
