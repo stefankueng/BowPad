@@ -1118,7 +1118,7 @@ bool CCmdHeaderSource::GetDefaultCorrespondingFileExtMappings(const std::wstring
             { L"cpp", L"hpp;h" },
             { L"cxx", L"hpp;h" },
             { L"c",   L"h"     },
-            { L"h", L"c;cpp" },
+            { L"h", L"c;cpp;cxx" },
             { L"hpp", L"cpp;cxx" },
             { L"aspx.cs", L"aspx" },
             { L"aspx", L"aspx.cs;aspx.vb" }
