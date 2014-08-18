@@ -19,7 +19,7 @@
 #include "AppUtils.h"
 #include "Theme.h"
 
-void DrawSizeGrip(HDC hdc, LPRECT lpRect)
+static void DrawSizeGrip(HDC hdc, LPRECT lpRect)
 {
     HPEN hPenFace, hPenShadow, hPenHighlight, hOldPen;
     POINT pt;
@@ -62,7 +62,7 @@ void DrawSizeGrip(HDC hdc, LPRECT lpRect)
     DeleteObject( hPenHighlight );
 }
 
-void DrawPart (HWND hWnd, HDC hdc, int itemID)
+static void DrawPart(HWND hWnd, HDC hdc, int itemID)
 {
     RECT rcPart;
     SendMessage(hWnd, SB_GETRECT, itemID, (LPARAM)&rcPart);
@@ -82,7 +82,7 @@ void DrawPart (HWND hWnd, HDC hdc, int itemID)
 
     rcPart.left += x;
     int textlen = (int)SendMessage(hWnd, SB_GETTEXTLENGTH, itemID, 0);
-    std::unique_ptr<wchar_t[]> textbuf(new wchar_t[textlen + 1]);
+    auto textbuf = std::make_unique<wchar_t[]>(textlen + 1);
     SendMessage(hWnd, SB_GETTEXT, itemID, (LPARAM)textbuf.get());
     SetTextColor(hdc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)));
     SetBkColor(hdc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
@@ -90,7 +90,7 @@ void DrawPart (HWND hWnd, HDC hdc, int itemID)
     DrawText(hdc, textbuf.get(), -1, &rcPart, DT_LEFT|DT_SINGLELINE|DT_VCENTER);
 }
 
-void RefreshPart (HWND hWnd, HDC hdc, int itemID)
+static void RefreshPart(HWND hWnd, HDC hdc, int itemID)
 {
     HBRUSH hbrBk;
 
@@ -108,7 +108,7 @@ void RefreshPart (HWND hWnd, HDC hdc, int itemID)
     DrawPart (hWnd, hdc, itemID);
 }
 
-LRESULT Refresh (HWND hWnd, HDC hdc)
+static LRESULT Refresh(HWND hWnd, HDC hdc)
 {
     RECT   rect;
     HBRUSH hbrBk;
@@ -117,11 +117,11 @@ LRESULT Refresh (HWND hWnd, HDC hdc)
     if (!IsWindowVisible(hWnd))
         return 0;
 
-    GetClientRect (hWnd, &rect);
+    GetClientRect(hWnd, &rect);
 
     hbrBk = CreateSolidBrush(CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
     FillRect(hdc, &rect, hbrBk);
-    DeleteObject (hbrBk);
+    DeleteObject(hbrBk);
 
     HFONT hFont = (HFONT)SendMessage(hWnd, WM_GETFONT, 0, 0);
 
@@ -129,15 +129,24 @@ LRESULT Refresh (HWND hWnd, HDC hdc)
     int numparts = (int)SendMessage(hWnd, SB_GETPARTS, 0, 0);
     for (int i = 0; i < numparts; i++)
     {
-        RefreshPart (hWnd, hdc, i);
+        RefreshPart(hWnd, hdc, i);
     }
 
-    SelectObject (hdc, hOldFont);
+    SelectObject(hdc, hOldFont);
 
     if (GetWindowLongW (hWnd, GWL_STYLE) & SBARS_SIZEGRIP)
-        DrawSizeGrip (hdc, &rect);
+        DrawSizeGrip(hdc, &rect);
 
     return 0;
+}
+
+bool CStatusBar::SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart) const
+{
+    if (tooltip)
+        m_PartsTooltips[whichPart] = tooltip;
+    else
+        m_PartsTooltips[whichPart] = str;
+    return (::SendMessage(*this, SB_SETTEXT, whichPart, (LPARAM)str) == TRUE);
 }
 
 bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, const int nsParts[])
@@ -147,14 +156,12 @@ bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, const int 
     CreateEx(WS_EX_COMPOSITED, WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP | SBARS_TOOLTIPS, hParent, 0, STATUSCLASSNAME);
 
     if (!*this)
-    {
         return false;
-    }
 
     SendMessage(*this, SB_SETPARTS, (WPARAM) nbParts, (LPARAM)nsParts);
     m_nParts = nbParts;
-    m_Parts = std::unique_ptr<int[]>(new int[nbParts]);
-    m_PartsTooltips = std::unique_ptr<std::wstring[]>(new std::wstring[nbParts]);
+    m_Parts = std::make_unique<int[]>(nbParts);
+    m_PartsTooltips = std::make_unique<std::wstring[]>(nbParts);
     m_bHasOnlyFixedWidth = true;
     for (int i = 0; i < nbParts; ++i)
     {
@@ -222,7 +229,7 @@ void CStatusBar::Resize()
 {
     if (m_bHasOnlyFixedWidth)
     {
-        std::unique_ptr<int[]> sbParts(new int[m_nParts]);
+        auto sbParts = std::make_unique<int[]>(m_nParts);
         RECT rc;
         GetClientRect(*this, &rc);
         int width = rc.right-rc.left;
