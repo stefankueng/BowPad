@@ -31,14 +31,7 @@ public :
     bool Init(HINSTANCE hInst, HWND hParent, int nbParts, const int nsParts[]);
     void Resize();
     int GetHeight() const { return m_height; }
-    bool SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart) const
-    {
-        if (tooltip)
-            m_PartsTooltips[whichPart] = tooltip;
-        else
-            m_PartsTooltips[whichPart] = str;
-        return (::SendMessage(*this, SB_SETTEXT, whichPart, (LPARAM)str) == TRUE);
-    };
+    bool SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart) const;
 
 protected:
     virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
