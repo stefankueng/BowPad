@@ -14,12 +14,12 @@
 //
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
+
 #include "stdafx.h"
 #include "StatusBar.h"
-#include "AppUtils.h"
 #include "Theme.h"
 
-static void DrawSizeGrip(HDC hdc, LPRECT lpRect)
+static void DrawSizeGrip(HDC hdc, LPCRECT lpRect)
 {
     HPEN hPenFace, hPenShadow, hPenHighlight, hOldPen;
     POINT pt;
@@ -30,9 +30,9 @@ static void DrawSizeGrip(HDC hdc, LPRECT lpRect)
 
     hPenFace = CreatePen( PS_SOLID, 1, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
     hOldPen = (HPEN)SelectObject( hdc, hPenFace );
-    MoveToEx (hdc, pt.x - 12, pt.y, NULL);
-    LineTo (hdc, pt.x, pt.y);
-    LineTo (hdc, pt.x, pt.y - 13);
+    MoveToEx(hdc, pt.x - 12, pt.y, NULL);
+    LineTo(hdc, pt.x, pt.y);
+    LineTo(hdc, pt.x, pt.y - 13);
 
     pt.x--;
     pt.y--;
@@ -56,7 +56,7 @@ static void DrawSizeGrip(HDC hdc, LPRECT lpRect)
         LineTo (hdc, pt.x + 1, pt.y - i - 1);
     }
 
-    SelectObject (hdc, hOldPen);
+    SelectObject(hdc, hOldPen);
     DeleteObject( hPenFace );
     DeleteObject( hPenShadow );
     DeleteObject( hPenHighlight );
@@ -96,7 +96,8 @@ static void RefreshPart(HWND hWnd, HDC hdc, int itemID)
 
     RECT rcPart;
     SendMessage(hWnd, SB_GETRECT, itemID, (LPARAM)&rcPart);
-    if (rcPart.right < rcPart.left) return;
+    if (rcPart.right < rcPart.left)
+        return;
 
     if (!RectVisible(hdc, &rcPart))
         return;
@@ -125,22 +126,20 @@ static LRESULT Refresh(HWND hWnd, HDC hdc)
 
     HFONT hFont = (HFONT)SendMessage(hWnd, WM_GETFONT, 0, 0);
 
-    hOldFont = (HFONT)SelectObject (hdc, hFont);
+    hOldFont = (HFONT)SelectObject(hdc, hFont);
     int numparts = (int)SendMessage(hWnd, SB_GETPARTS, 0, 0);
     for (int i = 0; i < numparts; i++)
-    {
         RefreshPart(hWnd, hdc, i);
-    }
 
     SelectObject(hdc, hOldFont);
 
-    if (GetWindowLongW (hWnd, GWL_STYLE) & SBARS_SIZEGRIP)
+    if (GetWindowLongW(hWnd, GWL_STYLE) & SBARS_SIZEGRIP)
         DrawSizeGrip(hdc, &rect);
 
     return 0;
 }
 
-bool CStatusBar::SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart) const
+bool CStatusBar::SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart)
 {
     if (tooltip)
         m_PartsTooltips[whichPart] = tooltip;
@@ -149,30 +148,30 @@ bool CStatusBar::SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart) 
     return (::SendMessage(*this, SB_SETTEXT, whichPart, (LPARAM)str) == TRUE);
 }
 
-bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int nbParts, const int nsParts[])
+bool CStatusBar::Init(HINSTANCE hInst, HWND hParent, std::initializer_list<int> parts)
+{
+    return Init(hInst, hParent, (int)parts.size(), std::cbegin(parts));
+}
+
+bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int numParts, const int parts[])
 {
     InitCommonControls();
 
     CreateEx(WS_EX_COMPOSITED, WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP | SBARS_TOOLTIPS, hParent, 0, STATUSCLASSNAME);
-
     if (!*this)
         return false;
 
-    SendMessage(*this, SB_SETPARTS, (WPARAM) nbParts, (LPARAM)nsParts);
-    m_nParts = nbParts;
-    m_Parts = std::make_unique<int[]>(nbParts);
-    m_PartsTooltips = std::make_unique<std::wstring[]>(nbParts);
-    m_bHasOnlyFixedWidth = true;
-    for (int i = 0; i < nbParts; ++i)
-    {
-        m_Parts[i] = nsParts[i];
-        if (nsParts[i] == -1)
-            m_bHasOnlyFixedWidth = false;
-    }
+    assert(numParts > 0); // Must have 1 part even if -1.
+    SendMessage(*this, SB_SETPARTS, (LPARAM) numParts, (WPARAM) parts);
+
+    m_Parts = std::vector<int>(parts, parts + numParts);
+    m_PartsTooltips = std::vector<std::wstring>(m_Parts.size());
+    m_bHasOnlyFixedWidth = std::find(
+        std::begin(m_Parts), std::end(m_Parts), -1) == std::end(m_Parts);
 
     RECT rcClient;
     GetClientRect(*this, &rcClient);
-    m_height = rcClient.bottom-rcClient.top;
+    m_height = rcClient.bottom - rcClient.top;
 
     return true;
 }
@@ -189,7 +188,7 @@ LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam,
             pt.x = GET_X_LPARAM(mpos);
             pt.y = GET_Y_LPARAM(mpos);
             ScreenToClient(*this, &pt);
-            for (int i = 0; i < m_nParts; ++i)
+            for (int i = 0; i < m_Parts.size(); ++i)
             {
                 RECT rc;
                 SendMessage(*this, SB_GETRECT, (WPARAM)i, (LPARAM)&rc);
@@ -227,17 +226,22 @@ LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam,
 
 void CStatusBar::Resize()
 {
+    size_t nParts = m_Parts.size();
+    assert(nParts > 0); // Must have 1 part, set in Init.
     if (m_bHasOnlyFixedWidth)
     {
-        auto sbParts = std::make_unique<int[]>(m_nParts);
         RECT rc;
         GetClientRect(*this, &rc);
-        int width = rc.right-rc.left;
-        int lastx = m_Parts[m_nParts-1];
-        for (int i = 0; i < m_nParts; ++i)
-        {
-            sbParts[i] = m_Parts[i] * width / lastx;
-        }
-        SendMessage(*this, SB_SETPARTS, (WPARAM) m_nParts, (LPARAM)sbParts.get());
+        const int available_width = rc.right - rc.left;
+
+        // Calculate new edges to match the new size reality.
+        // Dynamic change does not alter our original design units in m_Parts.
+        std::vector<int> sbParts;
+        sbParts.reserve(nParts);
+        int lastx = m_Parts.back();
+        for (int right_edge : m_Parts)
+            sbParts.push_back(right_edge * available_width / lastx);
+        assert(sbParts.size() == m_Parts.size());
+        SendMessage(*this, SB_SETPARTS, (WPARAM) sbParts.size(), (LPARAM)&sbParts[0]);
     }
 }
