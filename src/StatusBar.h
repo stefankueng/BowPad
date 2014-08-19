@@ -17,6 +17,10 @@
 #pragma once
 #include "BaseWindow.h"
 
+#include <vector>
+#include <string>
+#include <initializer_list>
+
 class CStatusBar : public CWindow
 {
 public :
@@ -24,14 +28,14 @@ public :
         : CWindow(hInst)
         , m_height(0)
         , m_bHasOnlyFixedWidth(false)
-        , m_nParts(0)
     {};
     virtual ~CStatusBar(){}
 
-    bool Init(HINSTANCE hInst, HWND hParent, int nbParts, const int nsParts[]);
+    bool Init(HINSTANCE hInst, HWND hParent, std::initializer_list<int> parts);
+    bool Init(HINSTANCE hInst, HWND hParent, int numParts, const int parts[]);
     void Resize();
     int GetHeight() const { return m_height; }
-    bool SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart) const;
+    bool SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart);
 
 protected:
     virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -39,7 +43,6 @@ protected:
 private:
     int                     m_height;
     bool                    m_bHasOnlyFixedWidth;
-    int                     m_nParts;
-    std::unique_ptr<int[]>  m_Parts;
-    std::unique_ptr<std::wstring[]>  m_PartsTooltips;
+    std::vector<int>        m_Parts;
+    std::vector<std::wstring> m_PartsTooltips;
 };

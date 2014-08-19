@@ -764,8 +764,8 @@ bool CMainWindow::Initialize()
     }
 
     m_editor.Init(hResource, *this);
-    const int barParts[8] = {100, 300, 550, 650, 750, 780, 820, 880};
-    m_StatusBar.Init(hResource, *this, _countof(barParts), barParts);
+    // Each value is the right edge of each status bar element.
+    m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 750, 780, 820, 880});
     m_TabBar.Init(hResource, *this);
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
     HICON hIcon = ::LoadIcon(hResource, MAKEINTRESOURCE(IDI_SAVED_ICON));
