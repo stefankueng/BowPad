@@ -23,145 +23,45 @@ class CCmdWhiteSpace : public ICommand
 {
 public:
 
-    CCmdWhiteSpace(void * obj) : ICommand(obj)
-    {
-        int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"whitespace", 0);
-        ScintillaCall(SCI_SETVIEWWS, ws);
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    }
+    CCmdWhiteSpace(void * obj);
 
-    ~CCmdWhiteSpace(void)
-    {
-    }
+    ~CCmdWhiteSpace(void);
 
-    virtual bool Execute() override
-    {
-        bool bShown = ScintillaCall(SCI_GETVIEWWS) != 0;
-        ScintillaCall(SCI_SETVIEWWS, bShown ? 0 : 1);
-        CIniSettings::Instance().SetInt64(L"View", L"whitespace", ScintillaCall(SCI_GETVIEWWS));
-        if (bShown || ((GetKeyState(VK_SHIFT) & 0x8000)==0))
-            ScintillaCall(SCI_SETVIEWEOL, false);
-        else
-            ScintillaCall(SCI_SETVIEWEOL, true);
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        return true;
-    }
+    bool Execute() override;
 
     virtual UINT GetCmdId() override { return cmdWhiteSpace; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
-    {
-        if (UI_PKEY_BooleanValue == key)
-        {
-            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETVIEWWS) > 0, ppropvarNewValue);
-        }
-        return E_NOTIMPL;
-    }
-
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };
 
 class CCmdTabSize : public ICommand
 {
 public:
 
-    CCmdTabSize(void * obj) : ICommand(obj)
-    {
-        int ve = (int)CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4);
-        ScintillaCall(SCI_SETTABWIDTH, ve);
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
-    }
+    CCmdTabSize(void * obj);
 
-    ~CCmdTabSize(void)
-    {
-    }
+    ~CCmdTabSize(void);
 
-    virtual bool Execute() override { return true; }
+    bool Execute() override { return true; }
 
-    virtual UINT GetCmdId() override { return cmdTabSize; }
+    UINT GetCmdId() override { return cmdTabSize; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
-    {
-        HRESULT hr = S_OK;
-        // Set the minimum value
-        if (IsEqualPropertyKey(key, UI_PKEY_MinValue))
-        {
-            ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-            ppropvarNewValue->vt = VT_DECIMAL;
-            VarDecFromR8(1, &ppropvarNewValue->decVal);
-            hr = S_OK;
-        }
-        // Set the maximum value
-        else if (IsEqualPropertyKey(key, UI_PKEY_MaxValue))
-        {
-            ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-            ppropvarNewValue->vt = VT_DECIMAL;
-            VarDecFromR8(20, &ppropvarNewValue->decVal);
-            hr = S_OK;
-        }
-        // Set the increment
-        else if (IsEqualPropertyKey(key, UI_PKEY_Increment))
-        {
-            ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-            ppropvarNewValue->vt = VT_DECIMAL;
-            VarDecFromR8(1, &ppropvarNewValue->decVal);
-            hr = S_OK;
-        }
-        // Set the number of decimal places
-        else if (IsEqualPropertyKey(key, UI_PKEY_DecimalPlaces))
-        {
-            hr = InitPropVariantFromUInt32(0, ppropvarNewValue);
-        }
-        // Set the initial value
-        else if (IsEqualPropertyKey(key, UI_PKEY_DecimalValue))
-        {
-            int ve = (int)CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4);
-            ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-            ppropvarNewValue->vt = VT_DECIMAL;
-            VarDecFromR8(ve, &ppropvarNewValue->decVal);
-        }
-        return hr;
-    }
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/) override
-    {
-        ScintillaCall(SCI_SETTABWIDTH, ppropvarValue->intVal);
-        CIniSettings::Instance().SetInt64(L"View", L"tabsize", ppropvarValue->intVal);
-        return S_OK;
-    }
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/) override;
 };
 
 class CCmdUseTabs : public ICommand
 {
 public:
 
-    CCmdUseTabs(void * obj) : ICommand(obj)
-    {
-        int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1);
-        ScintillaCall(SCI_SETUSETABS, ws);
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    }
+    CCmdUseTabs(void * obj);
 
-    ~CCmdUseTabs(void)
-    {
-    }
+    ~CCmdUseTabs(void);
 
-    virtual bool Execute() override
-    {
-        ScintillaCall(SCI_SETUSETABS, ScintillaCall(SCI_GETUSETABS) ? 0 : 1);
-        CIniSettings::Instance().SetInt64(L"View", L"usetabs", ScintillaCall(SCI_GETUSETABS));
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        return true;
-    }
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdUseTabs; }
+    UINT GetCmdId() override { return cmdTabSize; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
-    {
-        if (UI_PKEY_BooleanValue == key)
-        {
-            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETUSETABS) > 0, ppropvarNewValue);
-        }
-        return E_NOTIMPL;
-    }
-
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override; 
 };
