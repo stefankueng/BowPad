@@ -367,6 +367,7 @@
     <ClCompile Include="Commands\CmdSort.cpp" />
     <ClCompile Include="Commands\CmdStyleConfigurator.cpp" />
     <ClCompile Include="Commands\cmdTabList.cpp" />
+    <ClCompile Include="Commands\CmdWhiteSpace.cpp" />
     <ClCompile Include="Commands\CommandHandler.cpp" />
     <ClCompile Include="Commands\ICommand.cpp" />
     <ClCompile Include="DocScroll.cpp" />

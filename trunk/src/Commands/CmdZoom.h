@@ -31,13 +31,13 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         ScintillaCall(SCI_SETZOOM, 0);
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdZoom100; }
+    UINT GetCmdId() override { return cmdZoom100; }
 };
 
 class CCmdZoomIn : public ICommand
@@ -52,13 +52,13 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         ScintillaCall(SCI_ZOOMIN);
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdZoomIn; }
+    UINT GetCmdId() override { return cmdZoomIn; }
 };
 
 class CCmdZoomOut : public ICommand
@@ -73,11 +73,11 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         ScintillaCall(SCI_ZOOMOUT);
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdZoomOut; }
+    UINT GetCmdId() override { return cmdZoomOut; }
 };
