@@ -25,9 +25,11 @@
 
 struct TabInfo
 {
-    TabInfo(int docId) : docId(docId)
+    TabInfo(int docId, const std::wstring& title)
+        : docId(docId), title(title)
     {
     }
+    std::wstring title;
     int docId;
 };
 

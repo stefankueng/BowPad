@@ -143,20 +143,30 @@ bool CCmdTabList::PopulateMenu(const CDocument& /*doc*/, IUICollectionPtr& colle
     CAppUtils::FailedShowMessage(hr);
 
     int tabCount = GetTabCount();
+    std::wstring tabTitle;
     for ( int i  = 0; i < tabCount; ++i)
     {
         // don't store tab ids since they won't match after
         // a tab drag anymore
         int docId = this->GetDocIDFromTabIndex(i);
 
-        std::wstring tabTitle = GetTitleForTabIndex(i);
-        m_menuInfo.push_back(TabInfo(docId));
-        HRESULT hr = CAppUtils::AddStringItem(collection, tabTitle.c_str(), -1, pImg);
+        tabTitle = GetTitleForTabIndex(i);
+        m_menuInfo.push_back(TabInfo(docId, tabTitle));
+    }
+
+    std::sort(std::begin(m_menuInfo), std::end(m_menuInfo),
+        [&](const TabInfo& lhs, const TabInfo& rhs)->bool
+    {
+        return _wcsicmp(lhs.title.c_str(), rhs.title.c_str()) < 0;
+    });
+
+    for (const auto& tabInfo : m_menuInfo)
+    {
+        HRESULT hr = CAppUtils::AddStringItem(collection, tabInfo.title.c_str(), -1, pImg);
+        // If we can't add one, assume we can't add any more so quit
+        // not to avoid spamming the user with a sequence of errors.
         if (FAILED(hr))
-        {
-            m_menuInfo.pop_back();
-            return false;
-        }
+            break;
     }
 
     // Technically if no tabs are found, we could populate the menu with
