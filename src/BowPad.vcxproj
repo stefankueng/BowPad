@@ -347,6 +347,7 @@
     <ClCompile Include="Commands\CmdEOL.cpp" />
     <ClCompile Include="Commands\CmdFiles.cpp" />
     <ClCompile Include="Commands\CmdFindReplace.cpp" />
+    <ClCompile Include="Commands\CmdFont.cpp" />
     <ClCompile Include="Commands\CmdFunctions.cpp" />
     <ClCompile Include="Commands\CmdGotoLine.cpp" />
     <ClCompile Include="Commands\CmdHeaderSource.cpp" />

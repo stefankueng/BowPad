@@ -548,6 +548,9 @@
     <ClCompile Include="Commands\CmdWhiteSpace.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
+    <ClCompile Include="Commands\CmdFont.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc">
