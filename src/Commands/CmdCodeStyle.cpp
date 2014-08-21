@@ -14,6 +14,7 @@
 //
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
+
 #include "stdafx.h"
 #include "CmdCodeStyle.h"
 #include "PropertySet.h"
@@ -22,10 +23,10 @@
 #include "AppUtils.h"
 #include "LexStyles.h"
 
-#include <vector>
-#include <tuple>
-
+namespace
+{
 std::vector<std::wstring> langs;
+}
 
 HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
 {
@@ -35,11 +36,9 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
     {
         IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (FAILED(hr))
-        {
+        if (CAppUtils::FailedShowMessage(hr))
             return hr;
-        }
-
+ 
         if (langs.empty())
             langs = CLexStyles::Instance().GetLanguages();
 
@@ -65,40 +64,16 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
     {
         IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (FAILED(hr))
-        {
+        if (CAppUtils::FailedShowMessage(hr))
             return hr;
-        }
 
         if (langs.empty())
             langs = CLexStyles::Instance().GetLanguages();
 
-        // Create an IUIImage from a resource id.
         IUIImagePtr pImg;
-        IUIImageFromBitmapPtr pifbFactory;
-        hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
-        if (FAILED(hr))
-        {
-            return hr;
-        }
-
-        // Load the bitmap from the resource file.
-        HBITMAP hbm = (HBITMAP) LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_EMPTY), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-        if (hbm)
-        {
-            // Use the factory implemented by the framework to produce an IUIImage.
-            hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_TRANSFER, &pImg);
-            if (FAILED(hr))
-            {
-                DeleteObject(hbm);
-            }
-        }
-
-        if (FAILED(hr))
-        {
-            return hr;
-        }
-
+        hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
+        // Not a concern if it fails, just show the list without images.
+        CAppUtils::FailedShowMessage(hr);
         // populate the dropdown with the code pages
         for (const auto& lang : langs)
         {
