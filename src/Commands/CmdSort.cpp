@@ -216,7 +216,7 @@ bool CCmdSort::Execute()
 
         ScintillaCall(SCI_BEGINUNDOACTION);
         size_t ln = 0;
-        for (size_t line = lineStart; line <= lineEnd; ++line, ++ln)
+        for (long line = lineStart; line <= lineEnd; ++line, ++ln)
         {
             const auto& lineText = lines[ln];
             ScintillaCall(SCI_DELETERANGE, positions[ln], lineText.length());
