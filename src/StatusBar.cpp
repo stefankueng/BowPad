@@ -188,7 +188,7 @@ LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam,
             pt.x = GET_X_LPARAM(mpos);
             pt.y = GET_Y_LPARAM(mpos);
             ScreenToClient(*this, &pt);
-            for (int i = 0; i < m_Parts.size(); ++i)
+            for (size_t i = 0; i < m_Parts.size(); ++i)
             {
                 RECT rc;
                 SendMessage(*this, SB_GETRECT, (WPARAM)i, (LPARAM)&rc);
