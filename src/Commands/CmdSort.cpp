@@ -34,11 +34,11 @@ extern HINSTANCE hRes;
 // May wish to handle multiple selections and custom delimiters as
 // future improvements.
 //
-// FIXME: Test/Support more intersting character encodings,
+// FIXME: Test/Support more interesting character encodings,
 // but basic functionality options and structure is inplace
 // for simple encodings. Use of string/wstring needs addressing.
 //
-// May wan't to consider user's language as set in BP etc
+// May want to consider user's language as set in BP etc
 // and/or provide further UI options.
 //
 
@@ -161,7 +161,7 @@ bool CCmdSort::Execute()
     if (bSelEmpty) // Need a non empty selection.
         return false;
 
-    // We only handle single selections or retangular ones.
+    // We only handle single selections or rectangular ones.
     bool isRectangular = ScintillaCall(SCI_SELECTIONISRECTANGLE) != 0;
     // Don't handle multiple selections unless it's rectangular.
     if (ScintillaCall(SCI_GETSELECTIONS) > 1 && ! isRectangular)
@@ -195,7 +195,7 @@ bool CCmdSort::Execute()
     if (lineCount <= 1)
         return true;
     
-    if (isRectangular) // Find and sort lines in retangular selections.
+    if (isRectangular) // Find and sort lines in rectangular selections.
     {
         std::vector<std::string> lines;
         std::vector<long> positions;
@@ -224,7 +224,7 @@ bool CCmdSort::Execute()
         }
         ScintillaCall(SCI_ENDUNDOACTION);
     }    
-    else // Find an sort lines for regular (non retangular selections).
+    else // Find an sort lines for regular (non rectangular selections).
     {
         // Avoid any trailing blank line in the users selection.
         if (ScintillaCall(SCI_POSITIONFROMLINE, lineEnd) == (sptr_t)selEnd)
@@ -238,9 +238,9 @@ bool CCmdSort::Execute()
         ScintillaCall(SCI_BEGINUNDOACTION);
         ScintillaCall(SCI_SETSEL, selStart, selEnd);
         std::string selText = GetSelectedText();
-        // Whatever the line breaks type is current, standardsize on "\n".
+        // Whatever the line breaks type is current, standardize on "\n".
         // When re-inserting the lines later we'll use whatever line
-        // break type is approprirate for the document.
+        // break type is appropriate for the document.
         // REVIEW: check this is reasonable behavior.
         SearchReplace(selText, "\r\n", "\n");
         SearchReplace(selText, "\r", "\n");
