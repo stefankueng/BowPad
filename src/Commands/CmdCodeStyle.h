@@ -35,15 +35,14 @@ public:
     {
     }
 
-    virtual bool Execute() override { return false; }
-    virtual UINT GetCmdId() override { return cmdCodeStyle; }
+    bool Execute() override { return false; }
+    UINT GetCmdId() override { return cmdCodeStyle; }
 
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    virtual HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
-
-    virtual void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR * ptbhdr) override;
 
 };
 

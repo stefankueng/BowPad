@@ -35,11 +35,11 @@ public:
     {
     }
 
-    virtual bool Execute() override { return true; }
+    bool Execute() override { return true; }
 
-    virtual UINT GetCmdId() override { return cmdVerticalEdge; }
+    UINT GetCmdId() override { return cmdVerticalEdge; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {
         HRESULT hr = E_FAIL;
         // Set the minimum value
@@ -83,7 +83,7 @@ public:
         return hr;
     }
 
-    virtual HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/) override
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/) override
     {
         ScintillaCall(SCI_SETEDGECOLUMN, ppropvarValue->intVal);
         ScintillaCall(SCI_SETEDGEMODE, ppropvarValue->intVal ? EDGE_LINE : EDGE_NONE);
