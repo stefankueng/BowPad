@@ -19,8 +19,8 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 
-#include "scripting/BasicScriptObject.h"
-#include "scripting/BasicScriptHost.h"
+class BasicScriptObject;
+class BasicScriptHost;
 
 class CCmdScript : public ICommand
 {

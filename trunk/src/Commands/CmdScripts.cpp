@@ -20,6 +20,9 @@
 #include "AppUtils.h"
 #include "UnicodeUtils.h"
 
+#include "scripting/BasicScriptObject.h"
+#include "scripting/BasicScriptHost.h"
+
 CCmdScript::CCmdScript(void * obj)
     : ICommand(obj)
     , m_appObject(new BasicScriptObject(obj))
