@@ -22,6 +22,9 @@
 #include "PathUtils.h"
 #include "DirFileEnum.h"
 
+#define _CRT_RAND_S
+#include <stdlib.h>
+#include <time.h>
 
 void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
 {

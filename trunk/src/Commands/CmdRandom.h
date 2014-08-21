@@ -21,10 +21,6 @@
 
 #include <vector>
 #include <set>
-#define _CRT_RAND_S
-#include <stdlib.h>
-#include <time.h>
-
 
 class CRandomFileList
 {
