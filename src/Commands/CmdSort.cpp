@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "CmdSort.h"
 #include "StringUtils.h"
+#include "UnicodeUtils.h"
 #include "Resource.h"
 #include "BaseDialog.h"
 
@@ -33,14 +34,6 @@ extern HINSTANCE hRes;
 // Does not handle multiple selections but support is possible.
 // May wish to handle multiple selections and custom delimiters as
 // future improvements.
-//
-// FIXME: Test/Support more interesting character encodings,
-// but basic functionality options and structure is inplace
-// for simple encodings. Use of string/wstring needs addressing.
-//
-// May want to consider user's language as set in BP etc
-// and/or provide further UI options.
-//
 
 // No need to expose these types. Internal only.
 namespace
@@ -168,20 +161,20 @@ bool CCmdSort::Execute()
         return false;
 
     // Determine the line endings used/to use.
-    std::string eol;
+    std::wstring eol;
     switch (ScintillaCall(SCI_GETEOLMODE))
     {
     case SC_EOL_CRLF:
-        eol = "\r\n";
+        eol = L"\r\n";
         break;
     case SC_EOL_LF:
-        eol = "\n";
+        eol = L"\n";
         break;
     case SC_EOL_CR:
-        eol ="\r";
+        eol = L"\r";
         break;
     default:
-        eol = "\r\n";
+        eol = L"\r\n";
         APPVERIFY(false); // Shouldn't happen.
     }
 
@@ -197,13 +190,13 @@ bool CCmdSort::Execute()
     
     if (isRectangular) // Find and sort lines in rectangular selections.
     {
-        std::vector<std::string> lines;
+        std::vector<std::wstring> lines;
         std::vector<long> positions;
         for (long lineNum = lineStart; lineNum <= lineEnd; ++lineNum)
         {
             long lineSelStart = (long)ScintillaCall(SCI_GETLINESELSTARTPOSITION, lineNum);
             long lineSelEnd = (long)ScintillaCall(SCI_GETLINESELENDPOSITION, lineNum);
-            std::string line = GetTextRange(lineSelStart, lineSelEnd);
+            std::wstring line = CUnicodeUtils::StdGetUnicode(GetTextRange(lineSelStart, lineSelEnd));
             lines.push_back(std::move(line));
             positions.push_back(lineSelStart);
         }
@@ -218,7 +211,7 @@ bool CCmdSort::Execute()
         size_t ln = 0;
         for (long line = lineStart; line <= lineEnd; ++line, ++ln)
         {
-            const auto& lineText = lines[ln];
+            const auto& lineText = CUnicodeUtils::StdGetUTF8(lines[ln]);
             ScintillaCall(SCI_DELETERANGE, positions[ln], lineText.length());
             ScintillaCall(SCI_INSERTTEXT, positions[ln], sptr_t(lineText.c_str()));
         }
@@ -237,15 +230,14 @@ bool CCmdSort::Execute()
 
         ScintillaCall(SCI_BEGINUNDOACTION);
         ScintillaCall(SCI_SETSEL, selStart, selEnd);
-        std::string selText = GetSelectedText();
+        std::wstring selText = CUnicodeUtils::StdGetUnicode(GetSelectedText());
         // Whatever the line breaks type is current, standardize on "\n".
         // When re-inserting the lines later we'll use whatever line
         // break type is appropriate for the document.
-        // REVIEW: check this is reasonable behavior.
-        SearchReplace(selText, "\r\n", "\n");
-        SearchReplace(selText, "\r", "\n");
-        std::vector<std::string> lines;
-        stringtok(lines, selText, false, "\n");
+        SearchReplace(selText, L"\r\n", L"\n");
+        SearchReplace(selText, L"\r", L"\n");
+        std::vector<std::wstring> lines;
+        stringtok(lines, selText, false, L"\n");
 
         // The all important sort bit. Doesn't effect the document yet.
         Sort(lines);
@@ -257,7 +249,8 @@ bool CCmdSort::Execute()
             if (lineNum < lines.size() - 1) // No new line on the last line.
                 selText += eol;
         }
-        ScintillaCall(SCI_REPLACESEL, 0, sptr_t(selText.c_str()));
+        std::string sSortedText = CUnicodeUtils::StdGetUTF8(selText);
+        ScintillaCall(SCI_REPLACESEL, 0, sptr_t(sSortedText.c_str()));
         // Put the selection back where it was so the user
         // can see still see what they sorted and possibly do more with it.
         ScintillaCall(SCI_SETSEL, selStart, selEndOriginal);
@@ -282,13 +275,11 @@ SortOptions CCmdSort::GetSortOptions() const
     return SortOptions(); // Means don't sort.
 }
 
-void CCmdSort::Sort(std::vector<std::string>& lines) const
+void CCmdSort::Sort(std::vector<std::wstring>& lines) const
 {
     SortOptions so = GetSortOptions();
     if (so.sortAction == SortAction::None)
         return;
-
-    // TOOD: REVIEW compare options used here. See OVERVIEW.
 
     DWORD cmpFlags = 0;
     if (so.sortCase == SortCase::Insensitive)
@@ -296,34 +287,14 @@ void CCmdSort::Sort(std::vector<std::string>& lines) const
     if (so.sortDigits == SortDigits::AsNumbers)
         cmpFlags |= SORT_DIGITSASNUMBERS;
 
-    if (so.sortOrder == SortOrder::Ascending)
+
+    std::sort(std::begin(lines), std::end(lines),
+              [&](const std::wstring& lhs, const std::wstring& rhs)->bool
     {
-        std::sort(std::begin(lines), std::end(lines),
-            [&](const std::string& lhs, const std::string& rhs)->bool
-            {
-                // TODO! This conversion is neither effecient nor
-                // accurate. See OVERVIEW.
-                auto wlhs = std::wstring(lhs.begin(), lhs.end());
-                auto wrhs = std::wstring(rhs.begin(), rhs.end());
-                auto res = CompareStringEx(nullptr, cmpFlags,
-                    wlhs.data(), (int) wlhs.length(),
-                    wrhs.data(), (int) wrhs.length(),
-                    nullptr, nullptr, 0);
-                return res == CSTR_LESS_THAN;
-            });
-    }
-    else
-    {
-        std::sort(std::begin(lines), std::end(lines),
-            [&](const std::string& lhs, const std::string& rhs)->bool
-            {
-                auto wlhs = std::wstring(lhs.begin(), lhs.end());
-                auto wrhs = std::wstring(rhs.begin(), rhs.end());
-                auto res = CompareStringEx(nullptr, cmpFlags,
-                    wlhs.data(), (int) wlhs.length(),
-                    wrhs.data(), (int) wrhs.length(),
-                    nullptr, nullptr, 0);
-                return res == CSTR_GREATER_THAN;
-            });
-    }
+        auto res = CompareStringEx(nullptr, cmpFlags,
+                                   lhs.data(), (int)lhs.length(),
+                                   rhs.data(), (int)rhs.length(),
+                                   nullptr, nullptr, 0);
+        return so.sortOrder == SortOrder::Ascending ? res == CSTR_LESS_THAN : res == CSTR_GREATER_THAN;
+    });
 }
