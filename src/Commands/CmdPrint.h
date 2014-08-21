@@ -32,13 +32,13 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         Print(true);
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdPrint; }
+    UINT GetCmdId() override { return cmdPrint; }
 
     void Print(bool bShowDlg);
 };
@@ -55,13 +55,13 @@ public:
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         Print(false);
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdPrintNow; }
+    UINT GetCmdId() override { return cmdPrintNow; }
 };
 
 class CCmdPageSetup : public ICommand
@@ -76,8 +76,8 @@ public:
     {
     }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdPageSetup; }
+    UINT GetCmdId() override { return cmdPageSetup; }
 };
 
