@@ -34,8 +34,8 @@ protected:
     LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT                 DoCommand(int id, int msg);
 
-    virtual bool            Execute() override { return true; }
-    virtual UINT            GetCmdId() override { return 0; }
+    bool            Execute() override { return true; }
+    UINT            GetCmdId() override { return 0; }
 
     static int CALLBACK     EnumFontFamExProc(const LOGFONT *lpelfe, const TEXTMETRIC *lpntme, DWORD FontType, LPARAM lParam);
     void                    SelectStyle( int style );
@@ -62,13 +62,13 @@ public:
         delete m_pStyleConfiguratorDlg;
     }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdStyleConfigurator; }
+    UINT GetCmdId() override { return cmdStyleConfigurator; }
 
-    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
-    virtual void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR * ptbhdr) override;
 
 private:
     CStyleConfiguratorDlg *           m_pStyleConfiguratorDlg;
