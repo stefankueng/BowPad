@@ -40,6 +40,6 @@ public:
     bool Execute() override;
 
 private:
-    void Sort(std::vector<std::string>& lines) const;
+    void Sort(std::vector<std::wstring>& lines) const;
     SortOptions GetSortOptions() const;
 };
