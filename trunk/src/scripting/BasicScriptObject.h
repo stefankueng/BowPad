@@ -15,7 +15,6 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #pragma once
-#include "stdafx.h"
 #include "ICommand.h"
 #include <string>
 #include <comdef.h>
@@ -31,7 +30,7 @@ struct ScintillaCmd
     VARTYPE         p2;
 };
 
-class BasicScriptObject : public IDispatch, ICommand
+class BasicScriptObject : public IDispatch, public ICommand
 {
 public:
 
@@ -51,8 +50,8 @@ public:
     HRESULT STDMETHODCALLTYPE Invoke(DISPID id, REFIID riid, LCID lcid, WORD flags, DISPPARAMS * args, VARIANT * ret, EXCEPINFO * excp, UINT * err);
 
     // ICommand implementation
-    virtual bool Execute() { return true; }
-    virtual UINT GetCmdId() { return 0; }
+    bool Execute() override { return true; }
+    UINT GetCmdId() override { return 0; }
 
 private:
     bool ScintillaCommandsDispId(wchar_t * name, DISPID& id);
