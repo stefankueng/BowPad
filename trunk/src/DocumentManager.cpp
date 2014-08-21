@@ -497,7 +497,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     m_scratchScintilla.Call(SCI_CLEARALL);
     m_scratchScintilla.Call(SCI_SETCODEPAGE, CP_UTF8);
 
-    Scintilla::ILoader * pdocLoad = reinterpret_cast<Scintilla::ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, bufferSizeRequested));
+    Scintilla::ILoader * pdocLoad = reinterpret_cast<Scintilla::ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, (int)bufferSizeRequested));
     if (pdocLoad == nullptr)
     {
         ShowFileLoadError(hWnd, sFileName,
