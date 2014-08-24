@@ -315,6 +315,9 @@
     <ClInclude Include="Commands\CmdSummary.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdLineNumbers.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
