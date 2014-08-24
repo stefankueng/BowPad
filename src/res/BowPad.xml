@@ -165,6 +165,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/wspaceS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdLinenumbers" LabelTitle="Line numbers" TooltipTitle="Show line numbers" TooltipDescription="Turns showing the line numbers on/off" Keytip="WL">
+      <Command.LargeImages>
+        <Image>res/LineNumbersL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdGroupEncoding" LabelTitle="Encoding" Keytip="ENC">
       <Command.LargeImages>
         <Image>res/KeyL.bmp</Image>
@@ -928,10 +933,15 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           <Tab.ScalingPolicy>
             <ScalingPolicy>
               <ScalingPolicy.IdealSizes>
+                <!-- This describes the maximum size of each group in the tab. -->
                 <Scale Group="cmdGroupView" Size="Large" />
                 <Scale Group="cmdGroupEncoding" Size="Medium" />
                 <Scale Group="cmdGroupMisc" Size="Medium" />
               </ScalingPolicy.IdealSizes>
+              <!-- This describes the order and how the groups shrink when the window is
+              resized. -->
+                <Scale Group="cmdGroupView" Size="Medium" />
+                <Scale Group="cmdGroupView" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdFontOnlyGroup" SizeDefinition="OneFontControl">
@@ -963,52 +973,71 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <ControlNameDefinition Name="button3"/>
                 <ControlNameDefinition Name="button4"/>
                 <ControlNameDefinition Name="button5"/>
+                <ControlNameDefinition Name="button6"/>
               </ControlNameMap>
               <GroupSizeDefinition Size="Large">
                 <ControlGroup>
                   <ControlSizeDefinition ControlName="button1" ImageSize="Large" IsLabelVisible="true" />
                   <ControlSizeDefinition ControlName="button2" ImageSize="Large" IsLabelVisible="true" />
+                  <ControlSizeDefinition ControlName="button3" ImageSize="Large" IsLabelVisible="true" />
                 </ControlGroup>
                 <ColumnBreak ShowSeparator="true"/>
                 <Row>
-                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
-                </Row>
-                <Row>
-                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
                 </Row>
                 <Row>
                   <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Medium">
                 <Row>
                   <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="true" />
-                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
                 </Row>
                 <Row>
                   <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
                 <Row>
-                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
+                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <ColumnBreak ShowSeparator="true"/>
+                <Row>
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
                 </Row>
                 <Row>
                   <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Small">
                 <Row>
-                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="true" />
-                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="false" IsImageVisible="false" />
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="false" />
                 </Row>
                 <Row>
-                  <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
-                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="false" />
+                  <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="false" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="false" />
+                </Row>
+                <ColumnBreak ShowSeparator="true"/>
+                <Row>
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
+                </Row>
+                <Row>
                   <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
               </GroupSizeDefinition>
             </SizeDefinition>
             <ToggleButton CommandName="cmdLineWrap" />
             <ToggleButton CommandName="cmdWhiteSpace" />
+            <ToggleButton CommandName="cmdLinenumbers" />
             <Spinner CommandName="cmdTabSize" />
             <ToggleButton CommandName="cmdUseTabs" />
             <Spinner CommandName="cmdVerticalEdge" />

@@ -261,6 +261,7 @@
     <ClInclude Include="Commands\CmdHeaderSource.h" />
     <ClInclude Include="Commands\CmdLanguage.h" />
     <ClInclude Include="Commands\CmdLaunch.h" />
+    <ClInclude Include="Commands\CmdLineNumbers.h" />
     <ClInclude Include="Commands\CmdLines.h" />
     <ClInclude Include="Commands\CmdLineWrap.h" />
     <ClInclude Include="Commands\CmdLoadEncoding.h" />

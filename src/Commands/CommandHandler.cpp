@@ -57,6 +57,7 @@
 #include "CmdTabList.h"
 #include "CmdSort.h"
 #include "CmdSummary.h"
+#include "CmdLineNumbers.h"
 
 #include "DirFileEnum.h"
 #include "AppUtils.h"
@@ -117,6 +118,7 @@ void CCommandHandler::Init( void * obj )
     Add<CCmdConfigShortcuts>(obj);
     Add<CCmdLineWrap>(obj);
     Add<CCmdWhiteSpace>(obj);
+    Add<CCmdLineNumbers>(obj);
     Add<CCmdUseTabs>(obj);
     Add<CCmdAutoBraces>(obj);
     Add<CCmdLanguage>(obj);
