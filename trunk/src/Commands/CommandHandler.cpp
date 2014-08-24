@@ -56,6 +56,7 @@
 #include "CmdPluginsConfig.h"
 #include "CmdTabList.h"
 #include "CmdSort.h"
+#include "CmdSummary.h"
 
 #include "DirFileEnum.h"
 #include "AppUtils.h"
@@ -95,6 +96,7 @@ void CCommandHandler::Init( void * obj )
     Add<CCmdSaveAll>(obj);
     Add<CCmdSaveAs>(obj);
     Add<CCmdReload>(obj);
+    Add<CCmdSummary>(obj);
     Add<CCmdFileDelete>(obj);
     Add<CCmdPrint>(obj);
     Add<CCmdPrintNow>(obj);
