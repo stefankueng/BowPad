@@ -360,4 +360,10 @@ std::string ICommand::GetCurrentLine()
     return pMainWnd->m_editor.GetCurrentLine();
 }
 
+void ICommand::OpenHDROP(HDROP hDrop)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->HandleDropFiles(hDrop);
+}
+
 
