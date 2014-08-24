@@ -1392,7 +1392,7 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
     ResString rCancel(hRes, IDS_CANCEL);
 
     // TODO! remove the short cut accelerator &e &c
-    // options from these buttons because this dialog is auomatically
+    // options from these buttons because this dialog is automatically
     // triggered by typing and it's too easy to accidentally
     // acknowledge the button by typing hello into the editor
     // and getting interrupted by the dialog popping up
