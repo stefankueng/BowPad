@@ -1488,8 +1488,7 @@ void CMainWindow::CopyCurDocDirToClipboard() const
     if (m_DocManager.HasDocumentID(id))
     {
         CDocument doc = m_DocManager.GetDocumentFromID(id);
-        // FIXME TODO! Create/use an appropriate CPathUtils function for this.
-        WriteAsciiStringToClipboard(doc.m_path.substr(0, doc.m_path.find_last_of(L"\\/")).c_str(), *this);
+        WriteAsciiStringToClipboard(CPathUtils::GetParentDirectory(doc.m_path).c_str(), *this);
     }
 }
 
