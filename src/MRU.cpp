@@ -195,7 +195,6 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
 
         i++;
     }
-    // TODO! Set/check hr here.
     // We will only populate items up to before the first failed item, and discard the rest.
     SAFEARRAYBOUND sab = {i,0};
     SafeArrayRedim(psa, &sab);
