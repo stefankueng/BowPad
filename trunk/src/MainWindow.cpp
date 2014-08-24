@@ -2218,9 +2218,6 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
     return true;
 }
 
-// TODO:
-// CmdClipboard.h's CmdPaste::execute() method should probably use this.
-
 void CMainWindow::HandleDropFiles(HDROP hDrop)
 {
     int filesDropped = DragQueryFile(hDrop, 0xffffffff, nullptr, 0);

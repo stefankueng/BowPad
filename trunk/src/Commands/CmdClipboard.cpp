@@ -233,7 +233,6 @@ bool CCmdPaste::Execute()
 {
     // test first if there's a file on the clipboard
     std::vector<std::wstring> files;
-    bool bFilesOpened = false;
     {
         CClipboardHelper clipboard;
         if (clipboard.Open(GetHwnd()))
@@ -244,25 +243,12 @@ bool CCmdPaste::Execute()
                 HDROP hDrop = reinterpret_cast<HDROP>(hData);
                 if (hDrop)
                 {
-                    int filesDropped = DragQueryFile(hDrop, 0xffffffff, NULL, 0);
-                    for (int i = 0 ; i < filesDropped ; ++i)
-                    {
-                        UINT len = DragQueryFile(hDrop, i, NULL, 0);
-                        std::unique_ptr<wchar_t[]> pathBuf(new wchar_t[len+1]);
-                        DragQueryFile(hDrop, i, pathBuf.get(), len+1);
-                        files.push_back(pathBuf.get());
-                    }
+                    OpenHDROP(hDrop);
                 }
             }
         }
     }
-    for (const auto& file : files)
-    {
-        OpenFile(file.c_str(), OpenFlags::AddToMRU);
-        bFilesOpened = true;
-    }
-    if (!bFilesOpened)
-        ScintillaCall(SCI_PASTE);
+    ScintillaCall(SCI_PASTE);
     return true;
 }
 
