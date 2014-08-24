@@ -127,7 +127,7 @@ void CLexStyles::Load()
     {
         inis[1].LoadFile(userStyleFile.c_str());
     }
-    // TODO! Use some early returns here to reduce intentation.
+
     HRSRC hRes = FindResource(nullptr, MAKEINTRESOURCE(IDR_LEXSTYLES), L"config");
     if (hRes)
     {
