@@ -301,6 +301,12 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
 
 void CScintillaWnd::UpdateLineNumberWidth()
 {
+    bool bShowLineNumbers = CIniSettings::Instance().GetInt64(L"View", L"linenumbers", 1) != 0;
+    if (!bShowLineNumbers)
+    {
+        Call(SCI_SETMARGINWIDTHN, SC_MARGE_LINENUMBER, 0);
+        return;
+    }
     int linesVisible = (int) Call(SCI_LINESONSCREEN);
     if (linesVisible)
     {
@@ -318,7 +324,6 @@ void CScintillaWnd::UpdateLineNumberWidth()
             Call(SCI_SETMARGINWIDTHN, SC_MARGE_LINENUMBER, pixelWidth);
         }
     }
-
 }
 
 void CScintillaWnd::SaveCurrentPos(CPosData * pPos)
