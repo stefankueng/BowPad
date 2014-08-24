@@ -98,6 +98,7 @@ protected:
     HWND                GetScintillaWnd() const;
     UINT                GetTimerID() { return m_nextTimerID++; }
     bool                OpenFile(LPCWSTR file, unsigned int openFlags);
+    void                OpenHDROP(HDROP hDrop);
     bool                ReloadTab(int tab, int encoding = -1); // By default reload encoding
     bool                SaveCurrentTab(bool bSaveAs = false);
     HRESULT             InvalidateUICommand(UI_INVALIDATIONS flags, const PROPERTYKEY *key);
