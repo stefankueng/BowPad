@@ -30,7 +30,11 @@ struct ScintillaCmd
     VARTYPE         p2;
 };
 
-class BasicScriptObject : public IDispatch, public ICommand
+// BasicScriptObject is not a command but inherits from ICommand only so
+// it gets access to all the scintilla and BP commands ICommand provides.
+// That's why the inheritance is private.
+
+class BasicScriptObject : public IDispatch, /* private */ ICommand
 {
 public:
 
