@@ -361,7 +361,7 @@ int CTabBar::GetCurrentTabId() const
     BOOL result = TabCtrl_GetItem(*this, index, &tci);
     if (!result)
     {
-        assert(false); // TODO! Remove after testing to see what this show sup.
+        assert(false);
         return -1;
     }
     return (int)tci.lParam;
