@@ -19,6 +19,7 @@
 #include "CmdFont.h"
 #include "IniSettings.h"
 #include "AppUtils.h"
+#include "UnicodeUtils.h"
 
 CCmdFont::CCmdFont(void * obj) : ICommand(obj)
 {
@@ -85,6 +86,25 @@ HRESULT CCmdFont::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROP
 HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* /*ppropvarValue*/, IUISimplePropertySet* pCommandExecutionProperties)
 {
     HRESULT hr = E_NOTIMPL;
+    if (verb == UI_EXECUTIONVERB_CANCELPREVIEW)
+    {
+        // restore from saved values
+        std::string sFontName = CUnicodeUtils::StdGetUTF8(CIniSettings::Instance().GetString(L"View", L"FontName", L"Consolas"));
+        ScintillaCall(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)sFontName.c_str());
+
+        bool bBold = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
+        bool bItalic = !!CIniSettings::Instance().GetInt64(L"View", L"FontItalic", false);
+        int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 10);
+
+        ScintillaCall(SCI_STYLESETBOLD, STYLE_DEFAULT, bBold);
+        ScintillaCall(SCI_STYLESETITALIC, STYLE_DEFAULT, bItalic);
+        ScintillaCall(SCI_STYLESETSIZE, STYLE_DEFAULT, fontsize);
+
+        // refresh lexer
+        CDocument doc = GetActiveDocument();
+        SetupLexerForLang(doc.m_language);
+        return S_OK;
+    }
     if (key && *key == UI_PKEY_FontProperties)
     {
         // Font properties have changed.
@@ -111,6 +131,8 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
                     {
                         if (verb == UI_EXECUTIONVERB_EXECUTE)
                             CIniSettings::Instance().SetInt64(L"View", L"FontBold", uValue == UI_FONTPROPERTIES_SET);
+                        if ((verb == UI_EXECUTIONVERB_EXECUTE) || (verb == UI_EXECUTIONVERB_PREVIEW))
+                            ScintillaCall(SCI_STYLESETBOLD, STYLE_DEFAULT, uValue == UI_FONTPROPERTIES_SET);
                     }
                 }
                 PropVariantClear(&propvar);
@@ -123,6 +145,8 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
                     {
                         if (verb == UI_EXECUTIONVERB_EXECUTE)
                             CIniSettings::Instance().SetInt64(L"View", L"FontItalic", uValue == UI_FONTPROPERTIES_SET);
+                        if ((verb == UI_EXECUTIONVERB_EXECUTE) || (verb == UI_EXECUTIONVERB_PREVIEW))
+                            ScintillaCall(SCI_STYLESETITALIC, STYLE_DEFAULT, uValue == UI_FONTPROPERTIES_SET);
                     }
                 }
                 PropVariantClear(&propvar);
@@ -138,6 +162,11 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
                     {
                         if (verb == UI_EXECUTIONVERB_EXECUTE)
                             CIniSettings::Instance().SetString(L"View", L"FontName", pszFamily);
+                        if ((verb == UI_EXECUTIONVERB_EXECUTE) || (verb == UI_EXECUTIONVERB_PREVIEW))
+                        {
+                            std::string sFontName = CUnicodeUtils::StdGetUTF8(pszFamily);
+                            ScintillaCall(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)sFontName.c_str());
+                        }
                     }
                     // Free the allocated string.
                     CoTaskMemFree(pszFamily);
@@ -157,6 +186,8 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
                     {
                         if (verb == UI_EXECUTIONVERB_EXECUTE)
                             CIniSettings::Instance().SetInt64(L"View", L"FontSize", (LONG)(dSize));
+                        if ((verb == UI_EXECUTIONVERB_EXECUTE) || (verb == UI_EXECUTIONVERB_PREVIEW))
+                            ScintillaCall(SCI_STYLESETSIZE, STYLE_DEFAULT, (LONG)(dSize));
                     }
                 }
                 PropVariantClear(&propvar);
@@ -164,13 +195,9 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
             }
             PropVariantClear(&varChanges);
         }
-        if (verb == UI_EXECUTIONVERB_EXECUTE)
+        if ((verb == UI_EXECUTIONVERB_EXECUTE) || (verb == UI_EXECUTIONVERB_PREVIEW))
         {
             CDocument doc = GetActiveDocument();
-            // TODO: Verify if this is still required on latest BP/Scintilla.
-            // set up font styles twice: once seems not to work properly,
-            // haven't found out why yet.
-            SetupLexerForLang(doc.m_language);
             SetupLexerForLang(doc.m_language);
         }
     }
