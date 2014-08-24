@@ -15,9 +15,6 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 
-// TODO: Need to check the encoding logic on reload has been put back
-// together properly after merging somewhat duplicate open/reload code paths.
-
 #include "stdafx.h"
 #include "MainWindow.h"
 #include "BowPad.h"
@@ -2049,10 +2046,16 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     if (id != -1)
     {
         // document already open.
-        // REVIEW: Consider if the same IsWindowEnabled concerns
-        // need to be applied here as is handled below.
-        int index = m_TabBar.GetIndexFromID(id);
-        m_TabBar.ActivateAt(index);
+        if (IsWindowEnabled(*this))
+        {
+            // only activate the new doc tab if the main window is enabled:
+            // if it's disabled, a modal dialog is shown
+            // (e.g., the handle-outside-modifications confirmation dialog)
+            // and we then must not change the active tab.
+
+            int index = m_TabBar.GetIndexFromID(id);
+            m_TabBar.ActivateAt(index);
+        }
     }
     else
     {
@@ -2504,12 +2507,6 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
         if (!AskToReload(doc)) // User doesn't want to reload.
             return false;
     }
-
-    // TODO! Review: I merged two similar reload functions with slightly
-    // different enconding handling. One seemed to try to keep the encoding,
-    // another seemed to want to reload it to revert it.
-    // Check I changed the handling and what should happen.
-    // I think it should revert or you should be asked.
 
     // LoadFile increases the reference count, so decrease it here first
     m_editor.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
