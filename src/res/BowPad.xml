@@ -690,6 +690,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/TabListL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdSummary" LabelTitle="Summary" TooltipTitle="Document Summary" TooltipDescription="Shows statistics about the current document">
+      <Command.LargeImages>
+        <Image>res/SummaryL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
 
     <Command Name="cmdContextMap" />
     <Command Name="cmdTabContextMap" />
@@ -735,6 +740,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Button CommandName="cmdPageSetup" />
               <Button CommandName="cmdPrint" />
             </DropDownButton>
+            <Button CommandName="cmdSummary" />
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="cmdReload" />
