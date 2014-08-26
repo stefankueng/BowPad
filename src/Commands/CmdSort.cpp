@@ -116,7 +116,7 @@ LRESULT CSortDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             ResString descending(hRes, IDS_DESCENDING );
             int defSel = ListBox_AddString(sortOrderList, ascending);
             ListBox_AddString(sortOrderList, descending);
-            ListBox_SetCurSel(sortOrderList, defSel); 
+            ListBox_SetCurSel(sortOrderList, defSel);
         }
         return FALSE;
     case WM_COMMAND:
@@ -138,7 +138,7 @@ LRESULT CSortDlg::DoCommand(int id, int /*msg*/)
         EndDialog(*this, id);
         break;
     case IDCANCEL:
-        EndDialog(*this, id); 
+        EndDialog(*this, id);
         break;
     }
     return 1;
@@ -149,7 +149,7 @@ bool CCmdSort::Execute()
     // Could provide error messages here but have chosen
     // not to bother.
     if (!HasActiveDocument())
-        return false; // Need a document.    
+        return false; // Need a document.
     bool bSelEmpty = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
     if (bSelEmpty) // Need a non empty selection.
         return false;
@@ -187,7 +187,7 @@ bool CCmdSort::Execute()
     long lineCount = lineEnd - lineStart;
     if (lineCount <= 1)
         return true;
-    
+
     if (isRectangular) // Find and sort lines in rectangular selections.
     {
         std::vector<std::wstring> lines;
@@ -216,7 +216,7 @@ bool CCmdSort::Execute()
             ScintillaCall(SCI_INSERTTEXT, positions[ln], sptr_t(lineText.c_str()));
         }
         ScintillaCall(SCI_ENDUNDOACTION);
-    }    
+    }
     else // Find an sort lines for regular (non rectangular selections).
     {
         // Avoid any trailing blank line in the users selection.
