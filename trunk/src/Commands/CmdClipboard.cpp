@@ -232,7 +232,6 @@ bool CCmdCopyPlain::Execute()
 bool CCmdPaste::Execute()
 {
     // test first if there's a file on the clipboard
-    std::vector<std::wstring> files;
     {
         CClipboardHelper clipboard;
         if (clipboard.Open(GetHwnd()))
