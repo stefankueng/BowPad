@@ -346,7 +346,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
     // if editing test.aspx, potential corresponding files might be
     // be teas.apsx.cs or test.aspx.vb so create options would want
     // to be shown for either file if neither file existed.
-    // But once one exists, e.g. if test.aspx.vb is created, 
+    // But once one exists, e.g. if test.aspx.vb is created,
     // creation options for both test.aspx.cs and test.aspx.vb are not
     // offered again.
 

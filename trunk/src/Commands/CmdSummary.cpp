@@ -185,8 +185,8 @@ bool CCmdSummary::Execute()
 
     ResString rSummary(hRes, IDS_SUMMARY);
     std::wstring sSummary = CStringUtils::Format(rSummary,
-                                                 doc.m_path.c_str(), 
-                                                 numWords, 
+                                                 doc.m_path.c_str(),
+                                                 numWords,
                                                  (long)ScintillaCall(SCI_GETLINECOUNT),
                                                  numEmptyLines,
                                                  numParagraphs);

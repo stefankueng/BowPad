@@ -16,9 +16,7 @@
 //
 
 #include "stdafx.h"
-
 #include "CmdOpenselection.h"
-
 #include "BowPad.h"
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
