@@ -78,8 +78,7 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
             std::wstring parent = CPathUtils::GetParentDirectory(doc.m_path);
             if (!parent.empty())
             {
-                std::wstring path = parent;
-                path = CPathUtils::Append(parent, sWord);
+                std::wstring path = CPathUtils::Append(parent, sWord);
                 if (PathFileExists(path.c_str()) && !PathIsDirectory(path.c_str()))
                     return path;
                 parent = CPathUtils::GetParentDirectory(parent);
