@@ -21,7 +21,7 @@
 
 CCmdWhiteSpace::CCmdWhiteSpace(void * obj) : ICommand(obj)
 {
-    
+
     int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"whitespace", 0);
     ScintillaCall(SCI_SETVIEWWS, ws);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
