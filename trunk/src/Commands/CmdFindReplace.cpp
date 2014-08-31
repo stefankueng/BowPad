@@ -263,7 +263,10 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
             {
                 int tabtoopen = GetTabIndexFromDocID(m_searchResults[lpNMItemActivate->iItem].docID);
                 if (tabtoopen >= 0)
+                {
                     TabActivateAt(tabtoopen);
+                    SetFocus(GetDlgItem(*this, IDC_FINDRESULTS));
+                }
                 else
                     return 0;
             }
