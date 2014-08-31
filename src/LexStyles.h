@@ -15,6 +15,8 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #pragma once
+#include "Document.h"
+#include "ScintillaWnd.h"
 
 #include <string>
 #include <map>
@@ -84,7 +86,7 @@ public:
 
     std::vector<std::wstring>           GetLanguages() const;
     std::wstring                        GetLanguageForExt(const std::wstring& ext) const;
-    std::wstring                        GetLanguageForPath(const std::wstring& path);
+    std::wstring                        GetLanguageForDocument(const CDocument& doc);
     std::wstring                        GetUserExtensionsForLanguage(const std::wstring& lang) const;
 
     const std::map<int, std::string>&   GetKeywordsForExt(const std::string& ext);
@@ -136,4 +138,5 @@ private:
     std::map<std::string, std::string>  m_autoextLang;
     std::map<std::wstring, std::string> m_pathsLang;
     std::list<std::wstring>             m_pathsForLang;
+    CScintillaWnd                       m_scratchWnd;
 };
