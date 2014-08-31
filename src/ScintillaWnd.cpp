@@ -39,7 +39,11 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 {
     Scintilla_RegisterClasses(hInst);
 
-    CreateEx(0, WS_CHILD | WS_VISIBLE, hParent, 0, L"Scintilla");
+    if (hParent)
+        CreateEx(0, WS_CHILD | WS_VISIBLE, hParent, 0, L"Scintilla");
+    else
+        CreateEx(0, 0, 0, 0, L"Scintilla");
+
 
     if (!*this)
     {
