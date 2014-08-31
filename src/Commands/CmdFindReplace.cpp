@@ -50,7 +50,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             InitDialog(hwndDlg, IDI_BOWPAD, false);
 
             // Position the find dialog in the top right corner.
-            // Make sure we don't obsecure the scroll bar though.
+            // Make sure we don't obscure the scroll bar though.
             RECT rcScintilla, rcDlg;
             GetWindowRect(GetScintillaWnd(), &rcScintilla);
             GetWindowRect(hwndDlg, &rcDlg);
