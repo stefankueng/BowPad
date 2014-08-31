@@ -247,6 +247,12 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
             }
         }
             break;
+        case LVN_ITEMCHANGED:
+            if (((GetKeyState(VK_SHIFT) & 0x8000) == 0) || ((GetKeyState(VK_CONTROL) & 0x8000) == 0))
+                break;
+            if ((LPNMLISTVIEW(lpNMItemActivate)->uNewState & LVIS_SELECTED)==0)
+                break;
+            // intentional fall through
         case NM_DBLCLK:
         {
             if (lpNMItemActivate->iItem >= (int)m_searchResults.size())
