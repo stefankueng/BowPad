@@ -44,6 +44,7 @@ StyleData::StyleData()
 
 CLexStyles::CLexStyles(void)
     : m_bLoaded(false)
+    , m_scratchWnd(hRes)
 {
 }
 
@@ -55,7 +56,10 @@ CLexStyles& CLexStyles::Instance()
 {
     static CLexStyles instance;
     if (!instance.m_bLoaded)
+    {
         instance.Load();
+        instance.m_scratchWnd.Init(hRes, NULL);
+    }
     return instance;
 }
 
@@ -448,9 +452,9 @@ std::wstring CLexStyles::GetLanguageForExt( const std::wstring& ext ) const
     return L"";
 }
 
-std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
+std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc)
 {
-    std::wstring p = CStringUtils::to_lower(path);
+    std::wstring p = CStringUtils::to_lower(doc.m_path);
     auto it = m_pathsLang.find(p);
     if (it != m_pathsLang.end())
     {
@@ -466,7 +470,23 @@ std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
         }
         return CUnicodeUtils::StdGetUnicode(it->second);
     }
-    return L"";
+    if (doc.m_path.empty())
+        return L"";
+
+    // no extension, and no previously set lexer for this path:
+    // try using the file content to determine a lexer.
+    // Since this needs to be fast, we don't do excessive checks but
+    // keep it very, very simple.
+    std::wstring ret;
+    m_scratchWnd.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+
+    // currently, we only check for OpenFOAM files
+    std::string line = m_scratchWnd.GetLine(0);
+    if (line.find("*- C++ -*") != std::string::npos)
+        ret = L"C/C++";
+    m_scratchWnd.Call(SCI_SETDOCPOINTER, 0, 0);
+
+    return ret;
 }
 
 std::wstring CLexStyles::GetUserExtensionsForLanguage( const std::wstring& lang ) const

@@ -2099,7 +2099,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 index = m_TabBar.InsertAtEnd(sFileName.c_str());
             int id = m_TabBar.GetIDFromIndex(index);
             if (ext.empty())
-                doc.m_language = CLexStyles::Instance().GetLanguageForPath(filepath);
+                doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
             else
                 doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
             m_DocManager.AddDocumentAtEnd(doc, id);
