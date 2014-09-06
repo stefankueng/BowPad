@@ -27,10 +27,25 @@
 #include "Document.h"
 #include "LexStyles.h"
 #include "DocScroll.h"
+#include "SmartHandle.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
+#include <uxtheme.h>
 
+typedef BOOL(WINAPI * GetGestureInfoFN)(HGESTUREINFO hGestureInfo, PGESTUREINFO pGestureInfo);
+GetGestureInfoFN GetGestureInfoFunc = nullptr;
+typedef BOOL(WINAPI * CloseGestureInfoHandleFN)(HGESTUREINFO hGestureInfo);
+CloseGestureInfoHandleFN CloseGestureInfoHandleFunc = nullptr;
+
+typedef BOOL(WINAPI * BeginPanningFeedbackFN)(HWND hwnd);
+BeginPanningFeedbackFN BeginPanningFeedbackFunc = nullptr;
+typedef BOOL(WINAPI * EndPanningFeedbackFN)(HWND hwnd, BOOL fAnimateBack);
+EndPanningFeedbackFN EndPanningFeedbackFunc = nullptr;
+typedef BOOL(WINAPI * UpdatePanningFeedbackFN)(HWND hwnd, LONG lTotalOverpanOffsetX, LONG lTotalOverpanOffsetY, BOOL fInInertia);
+UpdatePanningFeedbackFN UpdatePanningFeedbackFunc = nullptr;
+
+CAutoLibrary hUxThemeDll = LoadLibrary(L"uxtheme.dll");
 
 extern IUIFramework * g_pFramework;
 extern std::string    sHighlightString;  // from CmdFindReplace
@@ -138,6 +153,21 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETPASTECONVERTENDINGS, 1);
 
     SetupDefaultStyles();
+
+    // delay loaded functions, not available on Vista
+    HMODULE hDll = GetModuleHandle(TEXT("user32.dll"));
+    if (hDll)
+    {
+        GetGestureInfoFunc = (GetGestureInfoFN)::GetProcAddress(hDll, "GetGestureInfo");
+        CloseGestureInfoHandleFunc = (CloseGestureInfoHandleFN)::GetProcAddress(hDll, "CloseGestureInfoHandle");
+    }
+    if (hUxThemeDll)
+    {
+        BeginPanningFeedbackFunc = (BeginPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "BeginPanningFeedback");
+        EndPanningFeedbackFunc = (EndPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "EndPanningFeedback");
+        UpdatePanningFeedbackFunc = (UpdatePanningFeedbackFN)::GetProcAddress(hUxThemeDll, "UpdatePanningFeedback");
+    }
+
 
     return true;
 }
@@ -294,6 +324,121 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 activeset = false;
             }
         }
+        break;
+    case WM_GESTURENOTIFY:
+    {
+        DWORD panWant = GC_PAN | GC_PAN_WITH_INERTIA;
+        GESTURECONFIG gestureConfig[] =
+        {
+            { GID_PAN, panWant, GC_PAN_WITH_GUTTER },
+            { GID_ZOOM, GC_ZOOM, 0 },
+        };
+        SetGestureConfig(*this, 0, _countof(gestureConfig), gestureConfig, sizeof(GESTURECONFIG));
+        return 0;
+    }
+    case WM_GESTURE:
+    {
+        static int scale = 8;   // altering the scale value will change how fast the page scrolls
+        static int lastY = 0;   // used for panning calculations (initial / previous vertical position)
+        static int lastX = 0;   // used for panning calculations (initial / previous horizontal position)
+        static long xOverpan = 0;
+        static long yOverpan = 0;
+
+        if ((GetGestureInfoFunc == nullptr) || (CloseGestureInfoHandleFunc == nullptr) ||
+            (BeginPanningFeedbackFunc == nullptr) || (EndPanningFeedbackFunc == nullptr) || (UpdatePanningFeedbackFunc == nullptr))
+            break;
+
+        GESTUREINFO gi;
+        ZeroMemory(&gi, sizeof(GESTUREINFO));
+        gi.cbSize = sizeof(GESTUREINFO);
+        BOOL bResult = GetGestureInfoFunc((HGESTUREINFO)lParam, &gi);
+
+        if (bResult)
+        {
+            // now interpret the gesture            
+            switch (gi.dwID)
+            {
+                case GID_BEGIN:
+                    lastY = 0;
+                    lastX = 0;
+                    break;
+                case GID_PAN:
+                {
+                    if ((lastY == 0) && (lastX == 0))
+                    {
+                        lastY = gi.ptsLocation.y;
+                        lastX = gi.ptsLocation.x;
+                        break;
+                    }
+                    // Get all the vertical scroll bar information
+                    int scrollX = (gi.ptsLocation.x - lastX) / scale;;
+                    int scrollY = (gi.ptsLocation.y - lastY) / scale;;
+
+                    SCROLLINFO siv = { 0 };
+                    siv.cbSize = sizeof(siv);
+                    siv.fMask = SIF_ALL;
+                    CoolSB_GetScrollInfo(*this, SB_VERT, &siv);
+                    if (scrollY)
+                    {
+                        siv.nPos -= scrollY;
+                        siv.fMask = SIF_POS;
+                        CoolSB_SetScrollInfo(hwnd, SB_VERT, &siv, TRUE);
+                        SendMessage(hwnd, WM_VSCROLL, MAKEWPARAM(SB_THUMBPOSITION, siv.nPos), NULL);
+                        lastY = gi.ptsLocation.y;
+                    }
+
+                    SCROLLINFO sih = { 0 };
+                    sih.cbSize = sizeof(sih);
+                    sih.fMask = SIF_ALL;
+                    CoolSB_GetScrollInfo(*this, SB_HORZ, &sih);
+                    if (scrollX)
+                    {
+                        sih.nPos -= scrollX;
+                        sih.fMask = SIF_POS;
+                        CoolSB_SetScrollInfo(hwnd, SB_HORZ, &sih, TRUE);
+                        SendMessage(hwnd, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, sih.nPos), NULL);
+                        lastX = gi.ptsLocation.x;
+                    }
+
+                    yOverpan -= lastY - gi.ptsLocation.y;
+                    xOverpan -= lastX - gi.ptsLocation.x;
+
+                    if (gi.dwFlags & GF_BEGIN)
+                    {
+                        BeginPanningFeedbackFunc(hwnd);
+                        yOverpan = 0;
+                        xOverpan = 0;
+                    }
+                    else if (gi.dwFlags & GF_END)
+                    {
+                        EndPanningFeedbackFunc(hwnd, TRUE);
+                        yOverpan = 0;
+                        xOverpan = 0;
+                    }
+
+                    if ((siv.nPos == siv.nMin) || (siv.nPos >= (siv.nMax - int(siv.nPage))))
+                    {
+                        // we reached the bottom / top, pan
+                        UpdatePanningFeedbackFunc(hwnd, 0, yOverpan, gi.dwFlags & GF_INERTIA);
+                    }
+                    if ((sih.nPos == sih.nMin) || (sih.nPos >= (sih.nMax - int(sih.nPage))))
+                    {
+                        // we reached the bottom / top, pan
+                        UpdatePanningFeedbackFunc(hwnd, xOverpan, 0, gi.dwFlags & GF_INERTIA);
+                    }
+                    UpdateWindow(hwnd);
+                }
+                    break;
+                case GID_ZOOM:
+                    // Add Zoom handler 
+                    break;
+                default:
+                    // You have encountered an unknown gesture
+                    break;
+            }
+            CloseGestureInfoHandleFunc((HGESTUREINFO)lParam);
+        }
+    }
         break;
     default:
         break;
