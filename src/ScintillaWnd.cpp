@@ -327,11 +327,11 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         break;
     case WM_GESTURENOTIFY:
     {
-        DWORD panWant = GC_PAN | GC_PAN_WITH_INERTIA;
+        DWORD panWant = GC_PAN | GC_PAN_WITH_INERTIA | GC_PAN_WITH_SINGLE_FINGER_VERTICALLY;
         GESTURECONFIG gestureConfig[] =
         {
             { GID_PAN, panWant, GC_PAN_WITH_GUTTER },
-            { GID_ZOOM, GC_ZOOM, 0 },
+            { GID_TWOFINGERTAP, GC_TWOFINGERTAP, 0 },
         };
         SetGestureConfig(*this, 0, _countof(gestureConfig), gestureConfig, sizeof(GESTURECONFIG));
         return 0;
@@ -427,16 +427,17 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                         UpdatePanningFeedbackFunc(hwnd, xOverpan, 0, gi.dwFlags & GF_INERTIA);
                     }
                     UpdateWindow(hwnd);
+                    CloseGestureInfoHandleFunc((HGESTUREINFO)lParam);
+                    return 0;
                 }
                     break;
-                case GID_ZOOM:
-                    // Add Zoom handler 
+                case GID_TWOFINGERTAP:
+                    Call(SCI_SETZOOM, 0);
                     break;
                 default:
                     // You have encountered an unknown gesture
                     break;
             }
-            CloseGestureInfoHandleFunc((HGESTUREINFO)lParam);
         }
     }
         break;
