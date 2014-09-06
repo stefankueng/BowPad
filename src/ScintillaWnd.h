@@ -64,7 +64,7 @@ public :
         , m_pSciWndData(0)
         , m_selTextMarkerCount(0)
     {};
-    virtual ~CScintillaWnd(){}
+    virtual ~CScintillaWnd() {}
 
     bool Init(HINSTANCE hInst, HWND hParent);
     bool InitScratch(HINSTANCE hInst);
