@@ -422,6 +422,7 @@ int WINAPI CoolSB_SetScrollInfo (HWND hwnd, int fnBar, LPSCROLLINFO lpsi, BOOL f
     {
         mysi->nPos = max(lpsi->nPos, mysi->nMin);
         mysi->nPos = min((UINT)mysi->nPos, mysi->nMax - max(mysi->nPage - 1, 0));
+        mysi->nTrackPos = mysi->nPos;
     }
 
     sbar = GetScrollBarFromHwnd(hwnd, fnBar);
