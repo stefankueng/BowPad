@@ -42,6 +42,10 @@ msgstr ""
 msgid "&Cancel"
 msgstr ""
 
+#. Resource IDs: (1)
+msgid "&Close"
+msgstr ""
+
 #. Resource IDs: (3754)
 msgid "&Close Tab"
 msgstr ""
@@ -579,6 +583,10 @@ msgstr ""
 msgid "Do&n't save"
 msgstr ""
 
+#. Resource IDs: (3783)
+msgid "Document Summary"
+msgstr ""
+
 #. Resource IDs: (8)
 msgid "Document modified"
 msgstr ""
@@ -747,6 +755,11 @@ msgstr ""
 msgid "Found: %d matches in %d tabs"
 msgstr ""
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Full file path:\r\n%s\r\n\r\nWord count: %ld\r\nLines: %ld\r\nEmpty lines: %ld\r\nParagraphs: %ld\r\n"
+msgstr ""
+
 #. Resource IDs: (3773)
 msgid "Functions"
 msgstr ""
@@ -905,6 +918,10 @@ msgstr ""
 #. Resource IDs: (12)
 #, c-format
 msgid "Line endings: %s"
+msgstr ""
+
+#. Resource IDs: (3757)
+msgid "Line numbers"
 msgstr ""
 
 #. Resource IDs: (65535)
@@ -1466,6 +1483,10 @@ msgstr ""
 msgid "Show Whitespaces"
 msgstr ""
 
+#. Resource IDs: (3758)
+msgid "Show line numbers"
+msgstr ""
+
 #. Resource IDs: (3772)
 msgid "Shows a dialog to configure custom commands"
 msgstr ""
@@ -1476,6 +1497,10 @@ msgstr ""
 
 #. Resource IDs: (3773)
 msgid "Shows a list of functions/methods in the file to jump to"
+msgstr ""
+
+#. Resource IDs: (3783)
+msgid "Shows statistics about the current document"
 msgstr ""
 
 #. Resource IDs: (3775)
@@ -1520,6 +1545,10 @@ msgstr ""
 
 #. Resource IDs: (65535)
 msgid "Styles"
+msgstr ""
+
+#. Resource IDs: (156, 3783)
+msgid "Summary"
 msgstr ""
 
 #. Resource IDs: (13)
@@ -1608,6 +1637,10 @@ msgstr ""
 
 #. Resource IDs: (9)
 msgid "Turn off automatic update checks"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "Turns showing the line numbers on/off"
 msgstr ""
 
 #. Resource IDs: (3757)
@@ -1721,6 +1754,10 @@ msgstr ""
 
 #. Resource IDs: (3756)
 msgid "W"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "WL"
 msgstr ""
 
 #. Resource IDs: (3757)
