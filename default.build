@@ -34,6 +34,7 @@
       <arg value="/p:Configuration=${configuration}" />
       <arg value="/p:Platform=win32" />
       <arg value="/verbosity:quiet" />
+      <arg value="/maxcpucount" />
     </exec>
     <exec program="msbuild.exe" >
       <arg value="BowPad.sln" />
@@ -41,6 +42,7 @@
       <arg value="/p:Configuration=${configuration}" />
       <arg value="/p:Platform=x64" />
       <arg value="/verbosity:quiet" />
+      <arg value="/maxcpucount" />
     </exec>
   </target>
 
@@ -78,6 +80,7 @@
       <arg value="/p:Configuration=${configuration}" />
       <arg value="/p:Platform=win32" />
       <arg value="/verbosity:minimal" />
+      <arg value="/maxcpucount" />
     </exec>
     <exec program="msbuild.exe" >
       <arg value="BowPad.sln" />
@@ -85,6 +88,7 @@
       <arg value="/p:Configuration=${configuration}" />
       <arg value="/p:Platform=x64" />
       <arg value="/verbosity:minimal" />
+      <arg value="/maxcpucount" />
     </exec>
     <!-- sign all binaries -->
     <if test="${file::exists('signinfo.txt')}">
