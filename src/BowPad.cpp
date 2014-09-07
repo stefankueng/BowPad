@@ -374,6 +374,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         if (hBowPadWnd)
         {
             ForwardToOtherInstance(hBowPadWnd, lpCmdLine, parser);
+            CloseHandle(hAppMutex);
             return 0;
         }
     }
