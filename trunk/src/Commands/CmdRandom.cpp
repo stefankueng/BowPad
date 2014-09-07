@@ -94,7 +94,7 @@ std::wstring CRandomFileList::GetRandomFile()
     std::lock_guard<std::mutex> guard(m_mutex);
     if (m_shuffleIndex >= m_arShuffleList.size())
     {
-        if (m_arShownRepeatFileList.size())
+        if (!m_arShownRepeatFileList.empty())
         {
             m_arUnShownFileList = m_arShownRepeatFileList;
             m_arShownRepeatFileList.clear();
