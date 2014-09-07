@@ -355,7 +355,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
 
         if (bResult)
         {
-            // now interpret the gesture            
+            // now interpret the gesture
             switch (gi.dwID)
             {
                 case GID_BEGIN:
