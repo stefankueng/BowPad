@@ -26,7 +26,8 @@ class PluginInfo
 {
 public:
     PluginInfo()
-        : minversion(0200)
+        : version(0)
+        , minversion(0200)
         , installedversion(0)
     {}
 
