@@ -22,14 +22,16 @@
 #include "PathUtils.h"
 #include "DirFileEnum.h"
 
-#define _CRT_RAND_S
+#include <random>
 #include <stdlib.h>
 #include <time.h>
 
 void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
 {
+    std::lock_guard<std::mutex> guard(m_mutex);
     m_arUnShownFileList.clear();
     m_arShownFileList.clear();
+    m_arShuffleList.clear();
     m_sPath = path;
 
     CDirFileEnum filefinder(m_sPath);
@@ -80,14 +82,19 @@ void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
         if (findit != m_arUnShownFileList.end())
             m_arUnShownFileList.erase(findit);
     }
-    srand(GetTickCount());
+
+    for (const auto & file : m_arUnShownFileList)
+        m_arShuffleList.push_back(file);
+    auto gen = std::default_random_engine((unsigned int)time(0));
+    shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
 }
 
 std::wstring CRandomFileList::GetRandomFile()
 {
-    if (m_arUnShownFileList.empty())
+    std::lock_guard<std::mutex> guard(m_mutex);
+    if (m_shuffleIndex >= m_arShuffleList.size())
     {
-        if (!m_arShownRepeatFileList.empty())
+        if (m_arShownRepeatFileList.size())
         {
             m_arUnShownFileList = m_arShownRepeatFileList;
             m_arShownRepeatFileList.clear();
@@ -96,41 +103,53 @@ std::wstring CRandomFileList::GetRandomFile()
         {
             m_arUnShownFileList.clear();
             m_arShownFileList.clear();
-            CDirFileEnum filefinder(m_sPath);
             bool bIsDirectory;
             std::wstring filename;
-            while (filefinder.NextFile(filename, &bIsDirectory))
             {
-                m_arUnShownFileList.insert(m_arUnShownFileList.end(), filename);
+                CDirFileEnum filefinder(m_sPath);
+                while (filefinder.NextFile(filename, &bIsDirectory, !m_noSubs))
+                {
+                    if (!bIsDirectory)
+                        m_arUnShownFileList.insert(m_arUnShownFileList.end(), filename);
+                }
+            }
+            if (m_arUnShownFileList.size() < 5)
+            {
+                CDirFileEnum filefinder(m_sPath);
+                while (filefinder.NextFile(filename, &bIsDirectory, true))
+                {
+                    if (!bIsDirectory)
+                        m_arUnShownFileList.insert(m_arUnShownFileList.end(), filename);
+                }
             }
         }
+        m_arShuffleList.clear();
+        for (const auto & file : m_arUnShownFileList)
+            m_arShuffleList.push_back(file);
+        auto gen = std::default_random_engine((unsigned int)time(0));
+        shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
+        m_shuffleIndex = 0;
     }
-    DWORD ticks = GetTickCount() * rand();
-    INT_PTR index = 0;
-    if (!m_arUnShownFileList.empty())
-        index = ticks % (m_arUnShownFileList.size());
-    std::set<std::wstring>::iterator it = m_arUnShownFileList.begin();
-    for (int i = 0; i < index; ++i)
-        ++it;
-    std::wstring filename;
-    if (it != m_arUnShownFileList.end())
-    {
-        filename = *it;
-        m_arUnShownFileList.erase(it);
-        m_arShownFileList.insert(filename);
-        m_arSessionFiles.push_back(filename);
-    }
+    if (m_arShuffleList.size() <= m_shuffleIndex)
+        return L"";
+    std::wstring filename = m_arShuffleList[m_shuffleIndex];
+    ++m_shuffleIndex;
+    m_arShownFileList.insert(filename);
+
     return filename;
 }
 
 std::wstring CRandomFileList::GoBack()
 {
-    if (m_arSessionFiles.empty())
-        return GetRandomFile();
-    std::wstring filename = m_arSessionFiles.back();
-    m_arSessionFiles.pop_back();
-    m_arUnShownFileList.insert(filename);
-    return filename;
+    std::lock_guard<std::mutex> guard(m_mutex);
+    if (m_shuffleIndex >= 2)
+    {
+        std::wstring filename = m_arShuffleList[m_shuffleIndex - 2];
+        --m_shuffleIndex;
+        return filename;
+    }
+    m_shuffleIndex = int(m_arShuffleList.size() - 1);
+    return m_arShuffleList[m_shuffleIndex];
 }
 
 size_t CRandomFileList::GetCount()
@@ -144,6 +163,7 @@ size_t CRandomFileList::GetShownCount() {
 
 void CRandomFileList::Save()
 {
+    std::lock_guard<std::mutex> guard(m_mutex);
     if (m_arShownFileList.empty() && m_arUnShownFileList.empty())
         return;
 
@@ -181,12 +201,13 @@ void CRandomFileList::Save()
 
 void CRandomFileList::SetShown(std::wstring file)
 {
+    std::lock_guard<std::mutex> guard(m_mutex);
     m_arShownFileList.insert(file);
-    m_arSessionFiles.push_back(file);
 }
 
 void CRandomFileList::SetNotShown(std::wstring file)
 {
+    std::lock_guard<std::mutex> guard(m_mutex);
     std::set<std::wstring>::iterator it = m_arShownFileList.find(file);
     if (it != m_arShownFileList.end())
         m_arShownFileList.erase(it);
@@ -195,15 +216,26 @@ void CRandomFileList::SetNotShown(std::wstring file)
 
 void CRandomFileList::RemoveFromShown(std::wstring file)
 {
+    std::lock_guard<std::mutex> guard(m_mutex);
     m_arShownFileList.erase(file);
 }
 
 void CRandomFileList::RemoveFromNotShown(std::wstring file)
 {
+    std::lock_guard<std::mutex> guard(m_mutex);
     m_arUnShownFileList.erase(file);
     m_arShownRepeatFileList.erase(file);
 }
 
+void CRandomFileList::SetNewPath(const std::wstring& fileold, const std::wstring& filenew)
+{
+    std::lock_guard<std::mutex> guard(m_mutex);
+    auto foundIT = std::find(m_arShuffleList.begin(), m_arShuffleList.end(), fileold);
+    if (foundIT != m_arShuffleList.end())
+    {
+        (*foundIT) = filenew;
+    }
+}
 
 bool CCmdRandom::Execute()
 {
