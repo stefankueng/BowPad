@@ -21,13 +21,18 @@
 
 #include <vector>
 #include <set>
+#include <mutex>
 
 class CRandomFileList
 {
 public:
-    CRandomFileList(void){}
+    CRandomFileList(void)
+        : m_noSubs(false)
+        , m_shuffleIndex(0)
+    {}
     ~CRandomFileList(void)
     {
+        Save();
     }
 
 public:
@@ -42,21 +47,21 @@ public:
     size_t GetShownCount();
 
     void Save();
-
     void SetShown(std::wstring file);
-
     void SetNotShown(std::wstring file);
-
     void RemoveFromShown(std::wstring file);
-
     void RemoveFromNotShown(std::wstring file);
+    void SetNewPath(const std::wstring& fileold, const std::wstring& filenew);
 
 private:
-    std::wstring m_sPath;
-    std::set<std::wstring> m_arShownFileList;
-    std::set<std::wstring> m_arUnShownFileList;
-    std::set<std::wstring> m_arShownRepeatFileList;
-    std::vector<std::wstring> m_arSessionFiles;
+    std::wstring                m_sPath;
+    std::set<std::wstring>      m_arShownFileList;
+    std::set<std::wstring>      m_arUnShownFileList;
+    std::set<std::wstring>      m_arShownRepeatFileList;
+    std::vector<std::wstring>   m_arShuffleList;
+    int                         m_shuffleIndex;
+    bool                        m_noSubs;
+    std::mutex                  m_mutex;
 };
 
 
