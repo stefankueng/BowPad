@@ -272,9 +272,9 @@ void CMRU::Load()
     std::wstring path = GetMRUFilename();
 
     std::wifstream File;
-    File.imbue(std::locale(std::locale(), new utf8_conversion()));
     try
     {
+        File.imbue(std::locale(std::locale(), new utf8_conversion()));
         File.open(path);
         if (!File.good())
             return;
@@ -299,6 +299,10 @@ void CMRU::Load()
         File.close();
     }
     catch (std::ios_base::failure &)
+    {
+        return;
+    }
+    catch (std::exception&)
     {
         return;
     }
