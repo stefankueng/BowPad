@@ -2495,7 +2495,15 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
         {
             // update the filetime of the document to avoid this warning
             m_DocManager.UpdateFileTime(doc, false);
+            // the current content of the tab is possibly different
+            // than the content on disk: mark the content as dirty
+            // so the user knows he can save the changes.
+            doc.m_bIsDirty = true;
+            doc.m_bNeedsSaving = true;
             m_DocManager.SetDocument(docID, doc);
+            // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
+            m_editor.Call(SCI_ADDUNDOACTION, 0, 0);
+            m_editor.Call(SCI_UNDO);
             return false;
         }
     }
