@@ -318,6 +318,9 @@
     <ClInclude Include="Commands\CmdLineNumbers.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\DPIAware.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
