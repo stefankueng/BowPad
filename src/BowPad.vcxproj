@@ -219,6 +219,7 @@
     <ClInclude Include="..\ext\sktoolslib\DirFileEnum.h" />
     <ClInclude Include="..\ext\sktoolslib\DlgResizer.h" />
     <ClInclude Include="..\ext\sktoolslib\DownloadFile.h" />
+    <ClInclude Include="..\ext\sktoolslib\DPIAware.h" />
     <ClInclude Include="..\ext\sktoolslib\EscapeUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\FormatMessageWrapper.h" />
     <ClInclude Include="..\ext\sktoolslib\hyperlink.h" />

@@ -28,6 +28,7 @@
 #include "LexStyles.h"
 #include "DocScroll.h"
 #include "SmartHandle.h"
+#include "DPIAware.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -120,7 +121,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETCARETLINEVISIBLE, true);
     Call(SCI_SETCARETLINEVISIBLEALWAYS, true);
     Call(SCI_SETCARETWIDTH, bUseD2D ? 2 : 1);
-    Call(SCI_SETWHITESPACESIZE, 1);
+    Call(SCI_SETWHITESPACESIZE, CDPIAware::Instance().ScaleX(1));
     Call(SCI_SETMULTIPLESELECTION, 1);
     Call(SCI_SETMOUSESELECTIONRECTANGULARSWITCH, true);
     Call(SCI_SETADDITIONALSELECTIONTYPING, true);
