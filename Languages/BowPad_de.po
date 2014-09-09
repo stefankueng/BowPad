@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-08-17 18:27+0100\n"
+"PO-Revision-Date: 2014-09-09 14:19+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -38,6 +38,10 @@ msgstr "%s (Kopie).%s"
 #. Resource IDs: (7)
 msgid "&Cancel"
 msgstr "&Abbrechen"
+
+#. Resource IDs: (1)
+msgid "&Close"
+msgstr "S&chliessen"
 
 #. Resource IDs: (3754)
 msgid "&Close Tab"
@@ -622,6 +626,10 @@ msgstr "Möchten Sie die Änderungen speichern nach \"%s\"?"
 msgid "Do&n't save"
 msgstr "&Nicht speichern"
 
+#. Resource IDs: (3783)
+msgid "Document Summary"
+msgstr "Dokument Statistik"
+
 #. Resource IDs: (8)
 msgid "Document modified"
 msgstr "Dokument verändert"
@@ -829,6 +837,25 @@ msgstr "Gefunden: %d Markierungen"
 msgid "Found: %d matches in %d tabs"
 msgstr "Gefunden: %d in %d Tabs"
 
+#. Resource IDs: (13)
+#, c-format
+msgid ""
+"Full file path:\r\n"
+"%s\r\n"
+"\r\n"
+"Word count: %ld\r\n"
+"Lines: %ld\r\n"
+"Empty lines: %ld\r\n"
+"Paragraphs: %ld\r\n"
+msgstr ""
+"Dateipfad:\r\n"
+"%s\r\n"
+"\r\n"
+"Anzahl Wörter: %ld\r\n"
+"Zeilen: %ld\r\n"
+"Leere Zeilen: %ld\r\n"
+"Abschnitte: %ld\r\n"
+
 #. Resource IDs: (3773)
 msgid "Functions"
 msgstr "Funktionen"
@@ -1007,6 +1034,10 @@ msgstr "Zeilentext"
 #, c-format
 msgid "Line endings: %s"
 msgstr "Zeilenenden: %s"
+
+#. Resource IDs: (3757)
+msgid "Line numbers"
+msgstr "Zeilennummern"
 
 #. Resource IDs: (65535)
 msgid "Line:"
@@ -1609,6 +1640,10 @@ msgstr "Zeige Eigenschaften"
 msgid "Show Whitespaces"
 msgstr "Zeige Leerzeichen"
 
+#. Resource IDs: (3758)
+msgid "Show line numbers"
+msgstr "Zeige Zeilennummern"
+
 #. Resource IDs: (3772)
 msgid "Shows a dialog to configure custom commands"
 msgstr "Zeigt den Konfigurationsdialog für Benutzerbefehle"
@@ -1621,6 +1656,10 @@ msgstr "Zeigt einen Dialog an um Plugins zu installieren und konfigurieren"
 #. Resource IDs: (3773)
 msgid "Shows a list of functions/methods in the file to jump to"
 msgstr "Zeigt eine Liste von Funktionen/Methoden an in der aktuellen Datei"
+
+#. Resource IDs: (3783)
+msgid "Shows statistics about the current document"
+msgstr "Zeigt Statistiken über das aktuelle Dokument an"
 
 #. Resource IDs: (3775)
 msgid "Shows the Windows Explorer file properties dialog for the current file"
@@ -1665,6 +1704,10 @@ msgstr "Stil:"
 #. Resource IDs: (65535)
 msgid "Styles"
 msgstr "Stile:"
+
+#. Resource IDs: (156, 3783)
+msgid "Summary"
+msgstr "Statistik"
 
 #. Resource IDs: (13)
 msgid "System Includes"
@@ -1760,6 +1803,10 @@ msgstr "Entferne Leerzeichen"
 #. Resource IDs: (9)
 msgid "Turn off automatic update checks"
 msgstr "Automatische Überprüfungen auf Updates ausschalten"
+
+#. Resource IDs: (3758)
+msgid "Turns showing the line numbers on/off"
+msgstr "Schaltet die Zeilennummernanzeige ein oder aus"
 
 #. Resource IDs: (3757)
 msgid ""
@@ -1877,6 +1924,10 @@ msgstr "Besuchen Sie unsere Webseite"
 #. Resource IDs: (3756)
 msgid "W"
 msgstr "W"
+
+#. Resource IDs: (3758)
+msgid "WL"
+msgstr "WL"
 
 #. Resource IDs: (3757)
 msgid "WS"
