@@ -1,0 +1,5 @@
+2.0.4.1077
+http://sourceforge.net/projects/stefanstools/files/BowPad/2.0.4/BowPad64-2.0.4.msi/download
+BowPad64-2.0.4.msi
+http://sourceforge.net/projects/stefanstools/files/BowPad/2.0.4/BowPad-2.0.4.msi/download
+BowPad-2.0.4.msi
