@@ -82,6 +82,10 @@ void CLexStyles::ParseStyle(
         {
         case 0: // Name
             style.Name = s;
+#ifdef _DEBUG
+            if (s.find(',') != std::wstring::npos)
+                APPVERIFYM(false, s.c_str());
+#endif
             break;
         case 1: // Foreground color
             if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
