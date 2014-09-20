@@ -28,6 +28,7 @@
 #include "ProgressDlg.h"
 #include "DownloadFile.h"
 #include "SysInfo.h"
+#include "OnOutOfScope.h"
 #include "version.h"
 
 HINSTANCE hInst;
@@ -86,6 +87,7 @@ static void SetIcon()
         RegCloseKey(hKey);
         if (RegOpenKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe\\DefaultIcon", &hKey) != ERROR_SUCCESS)
         {
+            OnOutOfScope(RegCloseKey(hKey));
             // but the default icon hasn't been set yet: set the default icon now
             if (RegCreateKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe\\DefaultIcon", &hKey) == ERROR_SUCCESS)
             {
@@ -95,11 +97,8 @@ static void SetIcon()
                     // now tell the shell about the changed icon
                     SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
                 }
-                RegCloseKey(hKey);
             }
         }
-        else
-            RegCloseKey(hKey);
     }
 }
 
@@ -289,6 +288,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     HRESULT hr = CoInitialize(NULL);
     if (FAILED(hr))
         return FALSE;
+    OnOutOfScope(CoUninitialize());
 
     CCmdLineParser parser(lpCmdLine);
     if (parser.HasKey(L"?") || parser.HasKey(L"help"))
@@ -311,6 +311,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     ::SetLastError(NO_ERROR);
     std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
     HANDLE hAppMutex = ::CreateMutex(NULL, false, sID.c_str());
+    OnOutOfScope(CloseHandle(hAppMutex));
     if ((GetLastError() == ERROR_ALREADY_EXISTS) ||
         (GetLastError() == ERROR_ACCESS_DENIED))
         bAlreadyRunning = true;
@@ -321,7 +322,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         if (hBowPadWnd)
         {
             ForwardToOtherInstance(hBowPadWnd, lpCmdLine, parser);
-            CloseHandle(hAppMutex);
             return 0;
         }
     }
@@ -359,10 +359,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             }
         }
     }
-
-    CoUninitialize();
-
-    CloseHandle(hAppMutex);
 
     return (int)msg.wParam;
 }
