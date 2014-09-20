@@ -225,6 +225,7 @@
     <ClInclude Include="..\ext\sktoolslib\hyperlink.h" />
     <ClInclude Include="..\ext\sktoolslib\IniSettings.h" />
     <ClInclude Include="..\ext\sktoolslib\Language.h" />
+    <ClInclude Include="..\ext\sktoolslib\OnOutOfScope.h" />
     <ClInclude Include="..\ext\sktoolslib\PathUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\PreserveChdir.h" />
     <ClInclude Include="..\ext\sktoolslib\ProgressDlg.h" />
