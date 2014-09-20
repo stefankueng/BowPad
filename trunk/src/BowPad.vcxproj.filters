@@ -563,6 +563,9 @@
     <ClCompile Include="Commands\CmdSummary.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
+    <ClCompile Include="XPMIcons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc">
