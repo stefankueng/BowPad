@@ -398,6 +398,7 @@
     <ClCompile Include="TabBar.cpp" />
     <ClCompile Include="Theme.cpp" />
     <ClCompile Include="UTF8DocumentIterator.cpp" />
+    <ClCompile Include="XPMIcons.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc" />
