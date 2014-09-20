@@ -59,7 +59,7 @@ private:
     std::set<std::wstring>      m_arUnShownFileList;
     std::set<std::wstring>      m_arShownRepeatFileList;
     std::vector<std::wstring>   m_arShuffleList;
-    int                         m_shuffleIndex;
+    size_t                      m_shuffleIndex;
     bool                        m_noSubs;
     std::mutex                  m_mutex;
 };

@@ -148,7 +148,7 @@ std::wstring CRandomFileList::GoBack()
         --m_shuffleIndex;
         return filename;
     }
-    m_shuffleIndex = int(m_arShuffleList.size() - 1);
+    m_shuffleIndex = m_arShuffleList.size() - 1;
     return m_arShuffleList[m_shuffleIndex];
 }
 
