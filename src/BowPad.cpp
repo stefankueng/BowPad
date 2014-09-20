@@ -33,59 +33,6 @@
 HINSTANCE hInst;
 HINSTANCE hRes;
 
-#pragma pack(push)  // push current alignment to stack
-#pragma pack(1)     // set alignment to 1 byte boundary
-
-extern const char *const bullet_red[] = {
-    /* columns rows colors chars-per-pixel */
-    "16 16 26 1",
-    "  c #B4442F",
-    ". c #CB4831",
-    "X c #CA4A33",
-    "o c #CB4A33",
-    "O c #CC4932",
-    "+ c #CC4A33",
-    "@ c #CB4B34",
-    "# c #CB4B35",
-    "$ c #CD4C35",
-    "% c #D95A42",
-    "& c #DB5D44",
-    "* c #DB5D45",
-    "= c #FA6D4D",
-    "- c #FB6D4D",
-    "; c #F97355",
-    ": c #FA795A",
-    "> c #FD7B5F",
-    ", c #FF7C5F",
-    "< c #FF7C60",
-    "1 c #FF886D",
-    "2 c #FF886F",
-    "3 c #FF8C73",
-    "4 c #FDA590",
-    "5 c #FCA690",
-    "6 c #FFAC95",
-    "7 c None",
-    /* pixels */
-    "7777777777777777",
-    "7777777777777777",
-    "7777777777777777",
-    "7777777777777777",
-    "777777$O.O$77777",
-    "77777$*565&$7777",
-    "77777+4:;:4+7777",
-    "77777o1-=-1o7777",
-    "77777#,<><,#7777",
-    "77777 %232% 7777",
-    "777777 @X@ 77777",
-    "7777777777777777",
-    "7777777777777777",
-    "7777777777777777",
-    "7777777777777777",
-    "7777777777777777"
-};
-
-#pragma pack(pop)
-
 static void LoadLanguage(HINSTANCE hInstance)
 {
     // load the language dll if required
