@@ -1086,7 +1086,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     m_StatusBar.SetText(m_editor.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", nullptr, STATUSBAR_CAPS);
-    m_StatusBar.SetText(m_editor.Call(SCI_SETUSETABS) ? L"tabs" : L"spaces", (LPCWSTR)rsStatusTTTabSpaces, STATUSBAR_TABSPACE);
+    m_StatusBar.SetText(m_editor.Call(SCI_GETUSETABS) ? L"tabs" : L"spaces", (LPCWSTR)rsStatusTTTabSpaces, STATUSBAR_TABSPACE);
     if (bEverything)
     {
         CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
