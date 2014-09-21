@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013-2014 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,13 +28,13 @@ std::wstring FormatTypeToString( FormatType ft )
     case UNKNOWN_FORMAT:
         break;
     case WIN_FORMAT:
-        sFt = L"DOS\\Windows";
+        sFt = L"Windows (CRLF)";
         break;
     case MAC_FORMAT:
-        sFt = L"Macintosh";
+        sFt = L"Mac (CR)";
         break;
     case UNIX_FORMAT:
-        sFt = L"UNIX";
+        sFt = L"Unix (LF)";
         break;
     }
     return sFt;
