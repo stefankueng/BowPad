@@ -655,6 +655,11 @@ msgstr ""
 msgid "Encoding"
 msgstr ""
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Encoding: %s"
+msgstr ""
+
 #. Resource IDs: (65535)
 msgid "Extension"
 msgstr ""
@@ -786,6 +791,10 @@ msgstr ""
 
 #. Resource IDs: (12)
 msgid "Insert"
+msgstr ""
+
+#. Resource IDs: (13)
+msgid "Insert Tabs or Spaces"
 msgstr ""
 
 #. Resource IDs: (3754)
