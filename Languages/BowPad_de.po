@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-09-09 14:19+0100\n"
+"PO-Revision-Date: 2014-09-21 16:13+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -721,6 +721,11 @@ msgstr ""
 msgid "Encoding"
 msgstr "Kodierung"
 
+#. Resource IDs: (13)
+#, c-format
+msgid "Encoding: %s"
+msgstr "Kodierung: %s"
+
 #. Resource IDs: (65535)
 msgid "Extension"
 msgstr "Erweiterung"
@@ -883,6 +888,10 @@ msgstr "Gross/Kleinschreibung ignorieren"
 #. Resource IDs: (12)
 msgid "Insert"
 msgstr "Einfügen"
+
+#. Resource IDs: (13)
+msgid "Insert Tabs or Spaces"
+msgstr "Ob Tabulatoren oder Leerzeichen eingefügt werden"
 
 #. Resource IDs: (3754)
 msgid "Inserts the content of the clipboard at the cursor position"
