@@ -178,10 +178,35 @@ bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int numParts, const int
 
 LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-    if (uMsg == WM_NOTIFY)
+    switch (uMsg)
     {
-        LPNMTTDISPINFO lpnmtdi = (LPNMTTDISPINFO)lParam;
-        if (lpnmtdi->hdr.code == TTN_GETDISPINFO)
+        case WM_NOTIFY:
+        {
+            LPNMTTDISPINFO lpnmtdi = (LPNMTTDISPINFO)lParam;
+            if (lpnmtdi->hdr.code == TTN_GETDISPINFO)
+            {
+                DWORD mpos = GetMessagePos();
+                POINT pt;
+                pt.x = GET_X_LPARAM(mpos);
+                pt.y = GET_Y_LPARAM(mpos);
+                ScreenToClient(*this, &pt);
+                for (size_t i = 0; i < m_Parts.size(); ++i)
+                {
+                    RECT rc;
+                    SendMessage(*this, SB_GETRECT, (WPARAM)i, (LPARAM)&rc);
+                    if (PtInRect(&rc, pt))
+                    {
+                        lpnmtdi->lpszText = const_cast<LPWSTR>(m_PartsTooltips[i].c_str());
+                        SendMessage(lpnmtdi->hdr.hwndFrom, TTM_SETMAXTIPWIDTH, 0, 600);
+                        break;
+                    }
+                }
+            }
+        }
+            break;
+        case WM_LBUTTONDBLCLK:
+        case WM_LBUTTONUP:
+        case WM_LBUTTONDOWN:
         {
             DWORD mpos = GetMessagePos();
             POINT pt;
@@ -194,12 +219,12 @@ LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam,
                 SendMessage(*this, SB_GETRECT, (WPARAM)i, (LPARAM)&rc);
                 if (PtInRect(&rc, pt))
                 {
-                    lpnmtdi->lpszText = const_cast<LPWSTR>(m_PartsTooltips[i].c_str());
-                    SendMessage(lpnmtdi->hdr.hwndFrom, TTM_SETMAXTIPWIDTH, 0, 600);
+                    SendMessage(::GetParent(*this), WM_STATUSBAR_MSG, uMsg, i);
                     break;
                 }
             }
         }
+            break;
     }
     if (CTheme::Instance().IsDarkTheme())
     {

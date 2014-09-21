@@ -62,4 +62,4 @@
 
 #define WM_UPDATEAVAILABLE (WM_APP + 10)
 #define WM_AFTERINIT       (WM_APP + 11)
-
+#define WM_STATUSBAR_MSG   (WM_APP + 12)
