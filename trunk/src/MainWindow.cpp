@@ -657,6 +657,57 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             ::DestroyWindow(m_hwnd);
         }
         break;
+    case WM_STATUSBAR_MSG:
+    {
+        if (wParam == WM_LBUTTONDBLCLK)
+        {
+            switch (lParam)
+            {
+                case STATUSBAR_EOF_FORMAT:
+                {
+                    int eolmode = (int)m_editor.Call(SCI_GETEOLMODE);
+                    FormatType format = UNKNOWN_FORMAT;
+                    switch (eolmode)
+                    {
+                        case SC_EOL_CRLF:
+                            eolmode = SC_EOL_CR;
+                            format = MAC_FORMAT;
+                            break;
+                        case SC_EOL_CR:
+                            eolmode = SC_EOL_LF;
+                            format = UNIX_FORMAT;
+                            break;
+                        case SC_EOL_LF:
+                            eolmode = SC_EOL_CRLF;
+                            format = WIN_FORMAT;
+                            break;
+                        default:
+                            eolmode = SC_EOL_CRLF;
+                            format = WIN_FORMAT;
+                            break;
+                    }
+                    m_editor.Call(SCI_SETEOLMODE, eolmode);
+                    m_editor.Call(SCI_CONVERTEOLS, eolmode);
+                    int id = m_TabBar.GetCurrentTabId();
+                    if (m_DocManager.HasDocumentID(id))
+                    {
+                        CDocument doc = m_DocManager.GetDocumentFromID(id);
+                        doc.m_format = format;
+                        m_DocManager.SetDocument(id, doc);
+                    }
+                }
+                    break;
+                case STATUSBAR_TABSPACE:
+                    m_editor.Call(SCI_SETUSETABS, !m_editor.Call(SCI_GETUSETABS));
+                    break;
+                case STATUSBAR_TYPING_MODE:
+                    m_editor.Call(SCI_EDITTOGGLEOVERTYPE);
+                    break;
+            }
+            UpdateStatusBar(true);
+        }
+    }
+        break;
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
