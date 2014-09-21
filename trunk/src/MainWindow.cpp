@@ -1058,6 +1058,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     static ResString rsStatusTTTabs(hRes, IDS_STATUSTTTABS);
     static ResString rsStatusSelection(hRes, IDS_STATUSSELECTION);
     static ResString rsStatusTTTabSpaces(hRes, IDS_STATUSTTTABSPACES);
+    static ResString rsStatusTTEncoding(hRes, IDS_STATUSTTENCODING);
 
     TCHAR strLnCol[128] = { 0 };
     TCHAR strSel[64] = {0};
@@ -1092,7 +1093,8 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
         m_StatusBar.SetText(doc.m_language.c_str(), nullptr, STATUSBAR_DOC_TYPE);
         std::wstring tteof = CStringUtils::Format(rsStatusTTEOF, FormatTypeToString(doc.m_format).c_str());
         m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), tteof.c_str(), STATUSBAR_EOF_FORMAT);
-        m_StatusBar.SetText(doc.GetEncodingString().c_str(), nullptr, STATUSBAR_UNICODE_TYPE);
+        std::wstring ttencoding = CStringUtils::Format(rsStatusTTEncoding, doc.GetEncodingString().c_str());
+        m_StatusBar.SetText(doc.GetEncodingString().c_str(), ttencoding.c_str(), STATUSBAR_UNICODE_TYPE);
 
         std::wstring tttabs = CStringUtils::Format(rsStatusTTTabs, m_TabBar.GetItemCount());
         m_StatusBar.SetText(CStringUtils::Format(L"tabs: %d", m_TabBar.GetItemCount()).c_str(), tttabs.c_str(), STATUSBAR_TABS);
