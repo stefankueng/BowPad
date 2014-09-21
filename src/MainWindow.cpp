@@ -49,10 +49,11 @@ const int STATUSBAR_DOC_TYPE      = 0;
 const int STATUSBAR_DOC_SIZE      = 1;
 const int STATUSBAR_CUR_POS       = 2;
 const int STATUSBAR_EOF_FORMAT    = 3;
-const int STATUSBAR_UNICODE_TYPE  = 4;
-const int STATUSBAR_TYPING_MODE   = 5;
-const int STATUSBAR_CAPS          = 6;
-const int STATUSBAR_TABS          = 7;
+const int STATUSBAR_TABSPACE      = 4;
+const int STATUSBAR_UNICODE_TYPE  = 5;
+const int STATUSBAR_TYPING_MODE   = 6;
+const int STATUSBAR_CAPS          = 7;
+const int STATUSBAR_TABS          = 8;
 
 static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
 
@@ -758,7 +759,7 @@ bool CMainWindow::Initialize()
 
     m_editor.Init(hResource, *this);
     // Each value is the right edge of each status bar element.
-    m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 750, 780, 820, 880});
+    m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 870, 920});
     m_TabBar.Init(hResource, *this);
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
     HICON hIcon = ::LoadIcon(hResource, MAKEINTRESOURCE(IDI_SAVED_ICON));
@@ -1056,6 +1057,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     static ResString rsStatusTTTypingIns(hRes, IDS_STATUSTTTYPINGINS);
     static ResString rsStatusTTTabs(hRes, IDS_STATUSTTTABS);
     static ResString rsStatusSelection(hRes, IDS_STATUSSELECTION);
+    static ResString rsStatusTTTabSpaces(hRes, IDS_STATUSTTTABSPACES);
 
     TCHAR strLnCol[128] = { 0 };
     TCHAR strSel[64] = {0};
@@ -1083,6 +1085,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     m_StatusBar.SetText(m_editor.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", nullptr, STATUSBAR_CAPS);
+    m_StatusBar.SetText(m_editor.Call(SCI_SETUSETABS) ? L"tabs" : L"spaces", (LPCWSTR)rsStatusTTTabSpaces, STATUSBAR_TABSPACE);
     if (bEverything)
     {
         CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
