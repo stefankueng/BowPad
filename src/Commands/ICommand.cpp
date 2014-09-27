@@ -14,7 +14,6 @@
 //
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
-#pragma once
 #include "stdafx.h"
 #include "ICommand.h"
 #include "MainWindow.h"
