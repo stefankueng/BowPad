@@ -39,6 +39,7 @@ StyleData::StyleData()
     , BackgroundColor(bgColor)
     , FontStyle(FONTSTYLE_NORMAL)
     , FontSize(0)
+    , eolfilled(false)
 {
 }
 
@@ -120,6 +121,9 @@ void CLexStyles::ParseStyle(
             else
                 APPVERIFYM(s.empty(), styleName);
             break;
+        case 7: // eolstylefilled
+            if (!s.empty())
+                style.eolfilled = true;
         }
         ++i;
     }

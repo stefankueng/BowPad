@@ -66,6 +66,7 @@ public:
     std::wstring        FontName;
     FontStyle           FontStyle;
     int                 FontSize;
+    bool                eolfilled;
 };
 
 class LexerData

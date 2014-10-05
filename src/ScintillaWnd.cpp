@@ -549,6 +549,8 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
 
         if (it.second.FontSize)
             Call(SCI_STYLESETSIZE, it.first, it.second.FontSize);
+        if (it.second.eolfilled)
+            Call(SCI_STYLESETEOLFILLED, it.first, 1);
     }
     for (const auto& it: langdata)
     {
