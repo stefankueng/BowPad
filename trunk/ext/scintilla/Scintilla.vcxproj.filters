@@ -581,5 +581,8 @@
     <ClCompile Include="src\MarginView.cxx">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="lexers\LexBibTeX.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
