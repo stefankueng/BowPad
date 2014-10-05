@@ -148,6 +148,7 @@
     <ClCompile Include="lexers\LexBaan.cxx" />
     <ClCompile Include="lexers\LexBash.cxx" />
     <ClCompile Include="lexers\LexBasic.cxx" />
+    <ClCompile Include="lexers\LexBibTeX.cxx" />
     <ClCompile Include="lexers\LexBullant.cxx" />
     <ClCompile Include="lexers\LexCaml.cxx" />
     <ClCompile Include="lexers\LexCLW.cxx" />
