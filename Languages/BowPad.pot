@@ -1821,6 +1821,11 @@ msgstr ""
 msgid "Z"
 msgstr ""
 
+#. Resource IDs: (14)
+#, c-format
+msgid "Zoom: %d%%"
+msgstr ""
+
 #. Resource IDs: (65535)
 msgid "background:"
 msgstr ""
