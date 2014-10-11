@@ -483,6 +483,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                     break;
                 case GID_TWOFINGERTAP:
                     Call(SCI_SETZOOM, 0);
+                    //UpdateStatusBar(false);
                     break;
                 default:
                     // You have encountered an unknown gesture

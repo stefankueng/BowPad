@@ -54,6 +54,7 @@ const int STATUSBAR_UNICODE_TYPE  = 5;
 const int STATUSBAR_TYPING_MODE   = 6;
 const int STATUSBAR_CAPS          = 7;
 const int STATUSBAR_TABS          = 8;
+const int STATUSBAR_ZOOM          = 9;
 
 static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
 
@@ -550,6 +551,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case SCN_DWELLEND:
                     m_editor.Call(SCI_CALLTIPCANCEL);
                     break;
+                case SCN_ZOOM:
+                    UpdateStatusBar(false);
+                    break;
                 }
             }
         }
@@ -659,52 +663,93 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_STATUSBAR_MSG:
     {
-        if (wParam == WM_LBUTTONDBLCLK)
+        switch (wParam)
         {
-            switch (lParam)
+            case WM_LBUTTONDBLCLK:
             {
-                case STATUSBAR_EOF_FORMAT:
+                switch (lParam)
                 {
-                    int eolmode = (int)m_editor.Call(SCI_GETEOLMODE);
-                    FormatType format = UNKNOWN_FORMAT;
-                    switch (eolmode)
+                    case STATUSBAR_EOF_FORMAT:
                     {
-                        case SC_EOL_CRLF:
-                            eolmode = SC_EOL_CR;
-                            format = MAC_FORMAT;
-                            break;
-                        case SC_EOL_CR:
-                            eolmode = SC_EOL_LF;
-                            format = UNIX_FORMAT;
-                            break;
-                        case SC_EOL_LF:
-                            eolmode = SC_EOL_CRLF;
-                            format = WIN_FORMAT;
-                            break;
-                        default:
-                            eolmode = SC_EOL_CRLF;
-                            format = WIN_FORMAT;
-                            break;
+                        int eolmode = (int)m_editor.Call(SCI_GETEOLMODE);
+                        FormatType format = UNKNOWN_FORMAT;
+                        switch (eolmode)
+                        {
+                            case SC_EOL_CRLF:
+                                eolmode = SC_EOL_CR;
+                                format = MAC_FORMAT;
+                                break;
+                            case SC_EOL_CR:
+                                eolmode = SC_EOL_LF;
+                                format = UNIX_FORMAT;
+                                break;
+                            case SC_EOL_LF:
+                                eolmode = SC_EOL_CRLF;
+                                format = WIN_FORMAT;
+                                break;
+                            default:
+                                eolmode = SC_EOL_CRLF;
+                                format = WIN_FORMAT;
+                                break;
+                        }
+                        m_editor.Call(SCI_SETEOLMODE, eolmode);
+                        m_editor.Call(SCI_CONVERTEOLS, eolmode);
+                        int id = m_TabBar.GetCurrentTabId();
+                        if (m_DocManager.HasDocumentID(id))
+                        {
+                            CDocument doc = m_DocManager.GetDocumentFromID(id);
+                            doc.m_format = format;
+                            m_DocManager.SetDocument(id, doc);
+                        }
                     }
-                    m_editor.Call(SCI_SETEOLMODE, eolmode);
-                    m_editor.Call(SCI_CONVERTEOLS, eolmode);
-                    int id = m_TabBar.GetCurrentTabId();
-                    if (m_DocManager.HasDocumentID(id))
-                    {
-                        CDocument doc = m_DocManager.GetDocumentFromID(id);
-                        doc.m_format = format;
-                        m_DocManager.SetDocument(id, doc);
-                    }
+                        break;
+                    case STATUSBAR_TABSPACE:
+                        m_editor.Call(SCI_SETUSETABS, !m_editor.Call(SCI_GETUSETABS));
+                        break;
+                    case STATUSBAR_TYPING_MODE:
+                        m_editor.Call(SCI_EDITTOGGLEOVERTYPE);
+                        break;
+                    case STATUSBAR_ZOOM:
+                        m_editor.Call(SCI_SETZOOM, 0);
+                        break;
+
                 }
-                    break;
-                case STATUSBAR_TABSPACE:
-                    m_editor.Call(SCI_SETUSETABS, !m_editor.Call(SCI_GETUSETABS));
-                    break;
-                case STATUSBAR_TYPING_MODE:
-                    m_editor.Call(SCI_EDITTOGGLEOVERTYPE);
-                    break;
+                UpdateStatusBar(true);
             }
-            UpdateStatusBar(true);
+                break;
+            case WM_CONTEXTMENU:
+            {
+                switch (lParam)
+                {
+                    case STATUSBAR_ZOOM:
+                    {
+                        DWORD msgpos = GetMessagePos();
+                        int xPos = GET_X_LPARAM(msgpos);
+                        int yPos = GET_Y_LPARAM(msgpos);
+
+                        HMENU hPopup = CreatePopupMenu();
+                        AppendMenu(hPopup, MF_BYPOSITION,  20,  L"20%");
+                        AppendMenu(hPopup, MF_BYPOSITION,  50,  L"50%");
+                        AppendMenu(hPopup, MF_BYPOSITION,  70,  L"70%");
+                        AppendMenu(hPopup, MF_BYPOSITION, 100, L"100%");
+                        AppendMenu(hPopup, MF_BYPOSITION, 150, L"150%");
+                        AppendMenu(hPopup, MF_BYPOSITION, 200, L"200%");
+                        AppendMenu(hPopup, MF_BYPOSITION, 400, L"400%");
+                        auto cmd = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, NULL);
+                        if (cmd != 0)
+                        {
+                            int fontsize = (int)m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT);
+                            int zoom = (fontsize * cmd / 100) - fontsize;
+                            m_editor.Call(SCI_SETZOOM, zoom);
+                        }
+                    }
+                        break;
+
+                }
+            }
+                break;
+            default:
+                break;
         }
     }
         break;
@@ -810,7 +855,7 @@ bool CMainWindow::Initialize()
 
     m_editor.Init(hResource, *this);
     // Each value is the right edge of each status bar element.
-    m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 870, 920});
+    m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 870, 920, 1000});
     m_TabBar.Init(hResource, *this);
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
     HICON hIcon = ::LoadIcon(hResource, MAKEINTRESOURCE(IDI_SAVED_ICON));
@@ -1110,6 +1155,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     static ResString rsStatusSelection(hRes, IDS_STATUSSELECTION);
     static ResString rsStatusTTTabSpaces(hRes, IDS_STATUSTTTABSPACES);
     static ResString rsStatusTTEncoding(hRes, IDS_STATUSTTENCODING);
+    static ResString rsStatusZoom(hRes, IDS_STATUSZOOM);
 
     TCHAR strLnCol[128] = { 0 };
     TCHAR strSel[64] = {0};
@@ -1138,6 +1184,15 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", nullptr, STATUSBAR_CAPS);
     m_StatusBar.SetText(m_editor.Call(SCI_GETUSETABS) ? L"tabs" : L"spaces", (LPCWSTR)rsStatusTTTabSpaces, STATUSBAR_TABSPACE);
+
+    int fontsize = (int)m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT);
+    int zoom = (int)m_editor.Call(SCI_GETZOOM);
+    int zoomfactor = (fontsize + zoom) * 100 / fontsize;
+    if (zoomfactor == 0)
+        zoomfactor = 1;
+    std::wstring szoomfactor = CStringUtils::Format(rsStatusZoom, zoomfactor);
+    m_StatusBar.SetText(szoomfactor.c_str(), nullptr, STATUSBAR_ZOOM);
+
     if (bEverything)
     {
         CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
