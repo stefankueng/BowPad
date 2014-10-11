@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-09-21 16:13+0100\n"
+"PO-Revision-Date: 2014-10-11 15:02+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -2004,6 +2004,11 @@ msgstr ""
 #. Resource IDs: (3756)
 msgid "Z"
 msgstr "Z"
+
+#. Resource IDs: (14)
+#, c-format
+msgid "Zoom: %d%%"
+msgstr "Zoom: %d%%"
 
 #. Resource IDs: (65535)
 msgid "background:"
