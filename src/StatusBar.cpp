@@ -207,12 +207,13 @@ LRESULT CALLBACK CStatusBar::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam,
         case WM_LBUTTONDBLCLK:
         case WM_LBUTTONUP:
         case WM_LBUTTONDOWN:
+        case WM_CONTEXTMENU:
         {
-            DWORD mpos = GetMessagePos();
             POINT pt;
-            pt.x = GET_X_LPARAM(mpos);
-            pt.y = GET_Y_LPARAM(mpos);
-            ScreenToClient(*this, &pt);
+            pt.x = GET_X_LPARAM(lParam);
+            pt.y = GET_Y_LPARAM(lParam);
+            if (uMsg == WM_CONTEXTMENU)
+                ScreenToClient(*this, &pt);
             for (size_t i = 0; i < m_Parts.size(); ++i)
             {
                 RECT rc;
