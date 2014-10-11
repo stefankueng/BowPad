@@ -63,6 +63,7 @@ public :
         , m_pSciMsg(nullptr)
         , m_pSciWndData(0)
         , m_selTextMarkerCount(0)
+        , m_bCursorShown(true)
     {};
     virtual ~CScintillaWnd() {}
 
@@ -134,4 +135,5 @@ private:
     sptr_t                      m_pSciWndData;
     CDocScroll                  m_docScroll;
     long                        m_selTextMarkerCount;
+    bool                        m_bCursorShown;
 };

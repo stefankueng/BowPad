@@ -51,6 +51,9 @@ CAutoLibrary hUxThemeDll = LoadLibrary(L"uxtheme.dll");
 extern IUIFramework * g_pFramework;
 extern std::string    sHighlightString;  // from CmdFindReplace
 
+
+#define TIM_HIDECURSOR 101
+
 bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 {
     Scintilla_RegisterClasses(hInst);
@@ -277,6 +280,51 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
             }
         }
         break;
+    case WM_MOUSEMOVE:
+    case WM_LBUTTONDBLCLK:
+    case WM_LBUTTONDOWN:
+    case WM_RBUTTONDBLCLK:
+    case WM_RBUTTONDOWN:
+    {
+        // mouse cursor moved, ensure it's visible
+        // but set a timer to hide it after a while
+        UINT elapse = (UINT)CIniSettings::Instance().GetInt64(L"View", L"hidecursortimeout", 3000);
+        if (elapse != 0)
+            SetTimer(*this, TIM_HIDECURSOR, elapse, NULL);
+    }
+    // intentional fall through
+    case WM_MOUSELEAVE:
+        if (!m_bCursorShown)
+        {
+            ShowCursor(TRUE);
+            m_bCursorShown = true;
+        }
+        break;
+    case WM_TIMER:
+        if (wParam == TIM_HIDECURSOR)
+        {
+            // hide the mouse cursor so it does not get in the way
+            if (m_bCursorShown)
+            {
+                RECT rc;
+                GetWindowRect(*this, &rc);
+                DWORD pos = GetMessagePos();
+                POINT pt;
+                pt.x = GET_X_LPARAM(pos);
+                pt.y = GET_Y_LPARAM(pos);
+                if (PtInRect(&rc, pt))
+                {
+                    ShowCursor(FALSE);
+                    m_bCursorShown = false;
+                    TRACKMOUSEEVENT tme = { 0 };
+                    tme.cbSize = sizeof(TRACKMOUSEEVENT);
+                    tme.dwFlags = TME_LEAVE;
+                    tme.hwndTrack = *this;
+                    TrackMouseEvent(&tme);
+                }
+            }
+        }
+        break;
     case WM_SETCURSOR:
         {
             // Change the indic over urls if the cursor is over them,
@@ -316,7 +364,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                     return TRUE;
                 }
             }
-            if (Call(SCI_GETCURSOR) == 8)
+            auto cur = Call(SCI_GETCURSOR);
+            if ((cur == 8) || (cur == 0))
                 Call(SCI_SETCURSOR, (uptr_t)SC_CURSORNORMAL);
             if (activeset)
             {
