@@ -488,10 +488,12 @@ std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc)
     std::wstring ret;
     m_scratchWnd.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
 
-    // currently, we only check for OpenFOAM files
+    // currently, we only check for OpenFOAM and bash files
     std::string line = m_scratchWnd.GetLine(0);
     if (line.find("*- C++ -*") != std::string::npos)
         ret = L"C/C++";
+    if ((line.find("#! /bin/bash") != std::string::npos) || (line.find("#!/bin/bash") != std::string::npos))
+        ret = L"Bash";
     m_scratchWnd.Call(SCI_SETDOCPOINTER, 0, 0);
 
     return ret;
