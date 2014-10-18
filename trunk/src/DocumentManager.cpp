@@ -540,13 +540,12 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     if (doc.m_format == UNKNOWN_FORMAT)
         doc.m_format = WIN_FORMAT;
 
-    SetEOLType(m_scratchScintilla, doc);
-
     sptr_t loadeddoc = (sptr_t)pdocLoad->ConvertToDocument();   // loadeddoc has reference count 1
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, loadeddoc);   // doc in scratch has reference count 2 (loadeddoc 1, added one)
     m_scratchScintilla.Call(SCI_SETUNDOCOLLECTION, 1);
     m_scratchScintilla.Call(SCI_EMPTYUNDOBUFFER);
     m_scratchScintilla.Call(SCI_SETSAVEPOINT);
+    SetEOLType(m_scratchScintilla, doc);
     if (ro || doc.m_bIsReadonly)
         m_scratchScintilla.Call(SCI_SETREADONLY, true);
     doc.m_document = m_scratchScintilla.Call(SCI_GETDOCPOINTER);    // doc.m_document has reference count of 2
