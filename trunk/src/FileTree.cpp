@@ -28,6 +28,33 @@
 
 #pragma comment(lib, "Uxtheme.lib")
 
+#define SCRATCH_QCM_FIRST 1
+#define SCRATCH_QCM_LAST  0x6FFF
+
+IContextMenu2 *g_pcm2 = nullptr;
+IContextMenu3 *g_pcm3 = nullptr;
+
+HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void **ppv)
+{
+    *ppv = NULL;
+    HRESULT hr = E_FAIL;
+    LPITEMIDLIST pidl;
+    SFGAOF sfgao;
+    if (SUCCEEDED(hr = SHParseDisplayName(pszPath, NULL, &pidl, 0, &sfgao)))
+    {
+        IShellFolder *psf;
+        LPCITEMIDLIST pidlChild;
+        if (SUCCEEDED(hr = SHBindToParent(pidl, IID_IShellFolder,
+            (void**)&psf, &pidlChild)))
+        {
+            hr = psf->GetUIObjectOf(hwnd, 1, &pidlChild, riid, NULL, ppv);
+            psf->Release();
+        }
+        CoTaskMemFree(pidl);
+    }
+    return hr;
+}
+
 class FileTreeItem
 {
 public:
@@ -75,6 +102,22 @@ bool CFileTree::Init(HINSTANCE /*hInst*/, HWND hParent)
 
 LRESULT CALLBACK CFileTree::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+    if (g_pcm3)
+    {
+        LRESULT lres;
+        if (SUCCEEDED(g_pcm3->HandleMenuMsg2(uMsg, wParam, lParam, &lres)))
+        {
+            return lres;
+        }
+    }
+    else if (g_pcm2)
+    {
+        if (SUCCEEDED(g_pcm2->HandleMenuMsg(uMsg, wParam, lParam)))
+        {
+            return 0;
+        }
+    }
+
     switch (uMsg)
     {
         case WM_ERASEBKGND:
@@ -96,6 +139,94 @@ LRESULT CALLBACK CFileTree::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, 
             }
             else
                 TreeView_SetExtendedStyle(*this, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
+        }
+            break;
+        case WM_CONTEXTMENU:
+        {
+            HTREEITEM hSelItem = TreeView_GetSelection(*this);
+            POINT pt;
+            POINTSTOPOINT(pt, lParam);
+
+            if (pt.x == -1 && pt.y == -1)
+            {
+                hSelItem = TreeView_GetSelection(*this);
+                RECT rc;
+                TreeView_GetItemRect(*this, hSelItem, &rc, TRUE);
+                pt.x = rc.left;
+                pt.y = rc.top;
+                ClientToScreen(*this, &pt);
+            }
+            else
+            {
+                ScreenToClient(*this, &pt);
+
+                TV_HITTESTINFO tvhti;
+                tvhti.pt = pt;
+                HTREEITEM hItem = TreeView_HitTest(*this, &tvhti);
+                if ((tvhti.flags & TVHT_ONITEM) != 0)
+                {
+                    hSelItem = hItem;
+                }
+                ClientToScreen(*this, &pt);
+            }
+            if (hSelItem == 0)
+                break;
+            TVITEM item = { 0 };
+            item.mask = TVIF_PARAM;
+            item.hItem = hSelItem;
+            TreeView_GetItem(*this, &item);
+            FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
+
+            IContextMenu *pcm;
+            if (SUCCEEDED(GetUIObjectOfFile(hwnd, pTreeItem->path.c_str(),
+                IID_IContextMenu, (void**)&pcm)))
+            {
+                HMENU hmenu = CreatePopupMenu();
+                if (hmenu)
+                {
+                    if (SUCCEEDED(pcm->QueryContextMenu(hmenu, 1,
+                        SCRATCH_QCM_FIRST, SCRATCH_QCM_LAST,
+                        CMF_NORMAL)))
+                    {
+                        pcm->QueryInterface(IID_IContextMenu2, (void**)&g_pcm2);
+                        pcm->QueryInterface(IID_IContextMenu3, (void**)&g_pcm3);
+                        int iCmd = TrackPopupMenuEx(hmenu, TPM_RETURNCMD,
+                                                    pt.x, pt.y, hwnd, NULL);
+                        if (g_pcm2)
+                        {
+                            g_pcm2->Release();
+                            g_pcm2 = NULL;
+                        }
+                        if (g_pcm3)
+                        {
+                            g_pcm3->Release();
+                            g_pcm3 = NULL;
+                        }
+                        if (iCmd > 0)
+                        {
+                            CMINVOKECOMMANDINFOEX info = { 0 };
+                            info.cbSize = sizeof(info);
+                            info.fMask = CMIC_MASK_UNICODE | CMIC_MASK_PTINVOKE;
+                            if (GetKeyState(VK_CONTROL) < 0)
+                            {
+                                info.fMask |= CMIC_MASK_CONTROL_DOWN;
+                            }
+                            if (GetKeyState(VK_SHIFT) < 0)
+                            {
+                                info.fMask |= CMIC_MASK_SHIFT_DOWN;
+                            }
+                            info.hwnd = hwnd;
+                            info.lpVerb = MAKEINTRESOURCEA(iCmd - SCRATCH_QCM_FIRST);
+                            info.lpVerbW = MAKEINTRESOURCEW(iCmd - SCRATCH_QCM_FIRST);
+                            info.nShow = SW_SHOWNORMAL;
+                            info.ptInvoke = pt;
+                            pcm->InvokeCommand((LPCMINVOKECOMMANDINFO)&info);
+                        }
+                    }
+                    DestroyMenu(hmenu);
+                }
+                pcm->Release();
+            }
         }
             break;
         default:
@@ -128,7 +259,7 @@ HTREEITEM CFileTree::RecurseTree(HTREEITEM hItem, ItemHandler handler)
     return NULL;
 }
 
-int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lParamSort*/)
 {
     FileTreeItem * pTreeItem1 = reinterpret_cast<FileTreeItem*>(lParam1);
     FileTreeItem * pTreeItem2 = reinterpret_cast<FileTreeItem*>(lParam2);
