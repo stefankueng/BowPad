@@ -82,7 +82,7 @@ public:
     void                SetTabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line) { m_tabmovepath = path; m_tabmovesavepath = savepath; m_tabmovemod = bMod; m_initLine = line; }
     void                SetInsertionIndex(int index) { m_insertionIndex = index; }
     std::wstring        GetNewTabName();
-    void                ShowFileTree(bool bShow) { m_fileTreeVisible = bShow; ResizeChildWindows(); }
+    void                ShowFileTree(bool bShow);
     bool                IsFileTreeShown() const { return m_fileTreeVisible; }
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
