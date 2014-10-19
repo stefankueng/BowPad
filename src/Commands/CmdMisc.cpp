@@ -135,3 +135,26 @@ HRESULT CCmdAutoBraces::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, cons
     }
     return E_NOTIMPL;
 }
+
+CCmdViewFileTree::CCmdViewFileTree(void * obj) : ICommand(obj)
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+}
+
+CCmdViewFileTree::~CCmdViewFileTree(void)
+{}
+
+bool CCmdViewFileTree::Execute()
+{
+    ShowFileTree(!IsFileTreeShown());
+    return true;
+}
+
+HRESULT CCmdViewFileTree::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+{
+    if (UI_PKEY_BooleanValue == key)
+    {
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, IsFileTreeShown(), ppropvarNewValue);
+    }
+    return E_NOTIMPL;
+}

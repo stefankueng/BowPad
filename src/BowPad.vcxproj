@@ -234,6 +234,7 @@
     <ClInclude Include="..\ext\sktoolslib\SimpleIni.h" />
     <ClInclude Include="..\ext\sktoolslib\SmartHandle.h" />
     <ClInclude Include="..\ext\sktoolslib\StringUtils.h" />
+    <ClInclude Include="..\ext\sktoolslib\SysImageList.h" />
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
     <ClInclude Include="..\ext\sktoolslib\TempFile.h" />
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
@@ -294,6 +295,7 @@
     <ClInclude Include="Document.h" />
     <ClInclude Include="DocumentManager.h" />
     <ClInclude Include="EditorConfigHandler.h" />
+    <ClInclude Include="FileTree.h" />
     <ClInclude Include="KeyboardShortcutHandler.h" />
     <ClInclude Include="LexStyles.h" />
     <ClInclude Include="MainWindow.h" />
@@ -333,6 +335,7 @@
     <ClCompile Include="..\ext\sktoolslib\ProgressDlg.cpp" />
     <ClCompile Include="..\ext\sktoolslib\Registry.cpp" />
     <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\SysImageList.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
     <ClCompile Include="..\ext\sktoolslib\TempFile.cpp" />
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
@@ -380,6 +383,7 @@
     <ClCompile Include="Document.cpp" />
     <ClCompile Include="DocumentManager.cpp" />
     <ClCompile Include="EditorConfigHandler.cpp" />
+    <ClCompile Include="FileTree.cpp" />
     <ClCompile Include="KeyboardShortcutHandler.cpp" />
     <ClCompile Include="LexStyles.cpp" />
     <ClCompile Include="MainWindow.cpp" />
