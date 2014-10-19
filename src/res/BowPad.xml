@@ -170,6 +170,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/LineNumbersL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdFileTree" LabelTitle="File Tree" TooltipTitle="Show the file tree" TooltipDescription="Shows or hides the file tree" Keytip="FT">
+      <Command.LargeImages>
+        <Image>res/FileTreeL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdGroupEncoding" LabelTitle="Encoding" Keytip="ENC">
       <Command.LargeImages>
         <Image>res/KeyL.bmp</Image>
@@ -940,8 +945,8 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
               resized. -->
-                <Scale Group="cmdGroupView" Size="Medium" />
-                <Scale Group="cmdGroupView" Size="Small" />
+              <Scale Group="cmdGroupView" Size="Medium" />
+              <Scale Group="cmdGroupView" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdFontOnlyGroup" SizeDefinition="OneFontControl">
@@ -974,6 +979,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <ControlNameDefinition Name="button4"/>
                 <ControlNameDefinition Name="button5"/>
                 <ControlNameDefinition Name="button6"/>
+                <ControlNameDefinition Name="button7"/>
               </ControlNameMap>
               <GroupSizeDefinition Size="Large">
                 <ControlGroup>
@@ -991,6 +997,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button7" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Medium">
                 <Row>
@@ -1012,6 +1021,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button7" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Small">
                 <Row>
@@ -1033,6 +1045,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button7" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
               </GroupSizeDefinition>
             </SizeDefinition>
             <ToggleButton CommandName="cmdLineWrap" />
@@ -1041,6 +1056,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Spinner CommandName="cmdTabSize" />
             <ToggleButton CommandName="cmdUseTabs" />
             <Spinner CommandName="cmdVerticalEdge" />
+            <ToggleButton CommandName="cmdFileTree" />
           </Group>
           <Group CommandName="cmdGroupEncoding" SizeDefinition="ThreeButtons">
             <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">

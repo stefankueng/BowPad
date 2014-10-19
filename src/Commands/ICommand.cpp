@@ -365,4 +365,16 @@ void ICommand::OpenHDROP(HDROP hDrop)
     return pMainWnd->HandleDropFiles(hDrop);
 }
 
+void ICommand::ShowFileTree(bool bShow)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->ShowFileTree(bShow);
+}
+
+bool ICommand::IsFileTreeShown()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->IsFileTreeShown();
+}
+
 

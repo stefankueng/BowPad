@@ -21,6 +21,7 @@
 #include "TabBar.h"
 #include "DocumentManager.h"
 #include "ScintillaWnd.h"
+#include "FileTree.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -81,6 +82,8 @@ public:
     void                SetTabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line) { m_tabmovepath = path; m_tabmovesavepath = savepath; m_tabmovemod = bMod; m_initLine = line; }
     void                SetInsertionIndex(int index) { m_insertionIndex = index; }
     std::wstring        GetNewTabName();
+    void                ShowFileTree(bool bShow) { m_fileTreeVisible = bShow; ResizeChildWindows(); }
+    bool                IsFileTreeShown() const { return m_fileTreeVisible; }
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
     IFACEMETHODIMP_(ULONG) AddRef();
@@ -154,7 +157,10 @@ private:
     HRESULT                     LoadRibbonSettings(IUnknown* pView);
     HRESULT                     SaveRibbonSettings();
     HRESULT                     ResizeToRibbon();
-
+    bool                        OnLButtonDown(UINT nFlags, POINT point);
+    bool                        OnMouseMove(UINT nFlags, POINT point);
+    bool                        OnLButtonUp(UINT nFlags, POINT point);
+    void                        DrawXorBar(HDC hDC, LONG x1, LONG y1, LONG width, LONG height);
 private:
     LONG                        m_cRef;
     int                         m_newCount;
@@ -164,6 +170,11 @@ private:
     CStatusBar                  m_StatusBar;
     CTabBar                     m_TabBar;
     CScintillaWnd               m_editor;
+    CFileTree                   m_fileTree;
+    int                         m_treeWidth;
+    bool                        m_bDragging;
+    POINT                       m_oldPt;
+    bool                        m_fileTreeVisible;
     CDocumentManager            m_DocManager;
     std::unique_ptr<wchar_t[]>  m_tooltipbuffer;
     HICON                       m_hShieldIcon;

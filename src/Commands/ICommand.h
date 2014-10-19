@@ -92,6 +92,8 @@ protected:
     size_t              FindText(const std::string& tofind, long startpos, long endpos);
     std::string         GetSelectedText();
     std::string         GetCurrentLine();
+    void                ShowFileTree(bool bShow);
+    bool                IsFileTreeShown();
 
 
     HWND                GetHwnd() const;

@@ -121,6 +121,7 @@ void CCommandHandler::Init( void * obj )
     Add<CCmdLineNumbers>(obj);
     Add<CCmdUseTabs>(obj);
     Add<CCmdAutoBraces>(obj);
+    Add<CCmdViewFileTree>(obj);
     Add<CCmdLanguage>(obj);
     Add<CCmdTabSize>(obj);
     Add<CCmdLoadAsEncoded>(obj);
