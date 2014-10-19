@@ -595,6 +595,15 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         }
                     }
                         break;
+                    case NM_RCLICK:
+                    {
+                        // the tree control does not get the WM_CONTEXTMENU message.
+                        // see http://support.microsoft.com/kb/222905 for details about why
+                        // so we have to work around this and handle the NM_RCLICK instead
+                        // and send the WM_CONTEXTMENU message from here.
+                        SendMessage(m_fileTree, WM_CONTEXTMENU, (WPARAM)m_hwnd, GetMessagePos());
+                    }
+                        break;
                     case TVN_ITEMEXPANDING:
                     {
                         m_fileTree.Refresh(pnmtv->itemNew.hItem);
