@@ -844,20 +844,7 @@ void CTabBar::DrawItemBorder(LPDRAWITEMSTRUCT lpdis)
 void CTabBar::DrawMainBorder(LPDRAWITEMSTRUCT lpdis)
 {
     RECT rBorder(lpdis->rcItem);
-
-    COLORREF crTab = GetTabColor(false, lpdis->itemID);
-    COLORREF crHighlight = Lighter(crTab, 1.5f);
-    COLORREF crShadow = Darker(crTab, 0.75f);
-
-    LONG x = rBorder.left;
-    LONG y = rBorder.top;
-    LONG cx = rBorder.right - rBorder.left;
-    LONG cy = rBorder.bottom - rBorder.top;
-
-    FillSolidRect(lpdis->hDC, x, y, x + cx - 1, y + 1, crHighlight);
-    FillSolidRect(lpdis->hDC, x, y, x + 1, y + cy - 1, crHighlight);
-    FillSolidRect(lpdis->hDC, x + cx, y, x - 1, y + cy, crShadow);
-    FillSolidRect(lpdis->hDC, x, y + cy, x + cx, y - 1, crShadow);
+    FillSolidRect(lpdis->hDC, rBorder.left, rBorder.top, rBorder.right, rBorder.bottom, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
 }
 
 void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
