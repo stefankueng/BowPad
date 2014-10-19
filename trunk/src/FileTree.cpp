@@ -128,6 +128,21 @@ HTREEITEM CFileTree::RecurseTree(HTREEITEM hItem, ItemHandler handler)
     return NULL;
 }
 
+int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+    FileTreeItem * pTreeItem1 = reinterpret_cast<FileTreeItem*>(lParam1);
+    FileTreeItem * pTreeItem2 = reinterpret_cast<FileTreeItem*>(lParam2);
+
+    if (pTreeItem1->isDir != pTreeItem2->isDir)
+        return pTreeItem1->isDir ? -1 : 1;
+
+    auto res = CompareStringEx(nullptr, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS | SORT_STRINGSORT,
+                               pTreeItem1->path.c_str(), (int)pTreeItem1->path.length(),
+                               pTreeItem2->path.c_str(), (int)pTreeItem2->path.length(),
+                               nullptr, nullptr, 0);
+    return res - 2;
+}
+
 void CFileTree::Refresh(HTREEITEM refreshRoot)
 {
     SendMessage(*this, WM_SETREDRAW, FALSE, 0);
@@ -199,11 +214,16 @@ void CFileTree::Refresh(HTREEITEM refreshRoot)
 
         tvi.lParam = (LPARAM)fi;
         tvins.itemex = tvi;
-        tvins.hInsertAfter = TVI_SORT;
+        tvins.hInsertAfter = TVI_LAST;
         tvins.hParent = refreshRoot;
 
         TreeView_InsertItem(*this, &tvins);
     }
+    TVSORTCB sortcb = { 0 };
+    sortcb.hParent = refreshRoot;
+    sortcb.lParam = (LPARAM)this;
+    sortcb.lpfnCompare = TreeCompareFunc;
+    TreeView_SortChildrenCB(*this, &sortcb, false);
 }
 
 HTREEITEM CFileTree::GetHitItem()
