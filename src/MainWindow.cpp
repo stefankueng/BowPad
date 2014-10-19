@@ -81,6 +81,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_RibbonHeight(0)
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+    m_fileTreeVisible = CIniSettings::Instance().GetInt64(L"View", L"FileTree", 1) != 0;
 }
 
 CMainWindow::~CMainWindow(void)
@@ -2895,5 +2896,12 @@ bool CMainWindow::OnLButtonUp(UINT nFlags, POINT point)
     ResizeChildWindows();
 
     return true;
+}
+
+void CMainWindow::ShowFileTree(bool bShow)
+{
+    m_fileTreeVisible = bShow;
+    ResizeChildWindows();
+    CIniSettings::Instance().SetInt64(L"View", L"FileTree", m_fileTreeVisible ? 1 : 0);
 }
 
