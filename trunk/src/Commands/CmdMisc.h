@@ -132,3 +132,18 @@ public:
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };
+
+class CCmdViewFileTree : public ICommand
+{
+public:
+
+    CCmdViewFileTree(void * obj);
+
+    ~CCmdViewFileTree(void);
+
+    bool Execute() override;
+
+    UINT GetCmdId() override { return cmdFileTree; }
+
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+};

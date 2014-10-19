@@ -36,6 +36,7 @@
 #include "EditorConfigHandler.h"
 #include "DirFileEnum.h"
 #include "LexStyles.h"
+#include "OnOutOfScope.h"
 
 #include <memory>
 #include <cassert>
@@ -61,6 +62,10 @@ static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
+    , m_fileTree(hInst)
+    , m_treeWidth(0)
+    , m_bDragging(false)
+    , m_fileTreeVisible(true)
     , m_TabBar(hInst)
     , m_editor(hInst)
     , m_newCount(0)
@@ -358,6 +363,7 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_BOWPAD));
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
     wcx.hIconSm = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_BOWPAD));
+    wcx.hCursor = LoadCursor(NULL, (LPTSTR)IDC_SIZEWE);
     if (RegisterWindow(&wcx))
     {
         if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, nullptr))
@@ -398,6 +404,24 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 return ::SendMessage(dis.hwndItem, WM_DRAWITEM, wParam, lParam);
             }
         }
+        break;
+    case WM_MOUSEMOVE:
+    {
+        POINT pt = { LOWORD(lParam), HIWORD(lParam) };
+        return OnMouseMove((UINT)wParam, pt);
+    }
+        break;
+    case WM_LBUTTONDOWN:
+    {
+        POINT pt = { LOWORD(lParam), HIWORD(lParam) };
+        return OnLButtonDown((UINT)wParam, pt);
+    }
+        break;
+    case WM_LBUTTONUP:
+    {
+        POINT pt = { LOWORD(lParam), HIWORD(lParam) };
+        return OnLButtonUp((UINT)wParam, pt);
+    }
         break;
     case WM_DROPFILES:
         {
@@ -491,6 +515,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 }
                 case TCN_SELCHANGE:
                     HandleTabChange(nmhdr);
+                    InvalidateRect(m_fileTree, NULL, TRUE);
                     break;
                 case TCN_SELCHANGING:
                     HandleTabChanging(nmhdr);
@@ -554,6 +579,52 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 case SCN_ZOOM:
                     UpdateStatusBar(false);
                     break;
+                }
+            }
+            else if (nmhdr.idFrom == (UINT_PTR)&m_fileTree || nmhdr.hwndFrom == m_fileTree)
+            {
+                LPNMTREEVIEW pnmtv = (LPNMTREEVIEW)lParam;
+                switch (nmhdr.code)
+                {
+                    case NM_DBLCLK:
+                    {
+                        auto path = m_fileTree.GetFilePathForHitItem();
+                        if (!path.empty())
+                        {
+                            OpenFile(path.c_str(), OpenFlags::AddToMRU);
+                        }
+                    }
+                        break;
+                    case TVN_ITEMEXPANDING:
+                    {
+                        m_fileTree.Refresh(pnmtv->itemNew.hItem);
+                    }
+                        break;
+                    case NM_CUSTOMDRAW:
+                    {
+                        if (CTheme::Instance().IsDarkTheme())
+                        {
+                            LPNMTVCUSTOMDRAW lpNMCustomDraw = (LPNMTVCUSTOMDRAW)lParam;
+                            // only do custom drawing when in dark theme
+                            switch (lpNMCustomDraw->nmcd.dwDrawStage)
+                            {
+                                case CDDS_PREPAINT:
+                                    return CDRF_NOTIFYITEMDRAW;
+                                case CDDS_ITEMPREPAINT:
+                                {
+                                    lpNMCustomDraw->clrText = CTheme::Instance().GetThemeColor(RGB(0,0,0));
+                                    lpNMCustomDraw->clrTextBk = CTheme::Instance().GetThemeColor(RGB(255,255,255));
+
+                                    return CDRF_DODEFAULT;
+                                }
+                                    break;
+                            }
+                            return CDRF_DODEFAULT;
+                        }
+                    }
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -843,9 +914,10 @@ bool CMainWindow::Initialize()
         if (func)
         {
             func(*this,       WM_COPYDATA, MSGFLT_ALLOW, nullptr );
-            func(m_editor, WM_COPYDATA, MSGFLT_ALLOW, nullptr );
+            func(m_editor,    WM_COPYDATA, MSGFLT_ALLOW, nullptr );
             func(m_TabBar,    WM_COPYDATA, MSGFLT_ALLOW, nullptr );
             func(m_StatusBar, WM_COPYDATA, MSGFLT_ALLOW, nullptr );
+            func(m_fileTree,  WM_COPYDATA, MSGFLT_ALLOW, nullptr );
         }
         else
         {
@@ -853,6 +925,12 @@ bool CMainWindow::Initialize()
         }
     }
 
+    m_fileTree.Init(hResource, *this);
+    m_treeWidth = (int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200);
+    m_treeWidth = max(50, m_treeWidth);
+    RECT rc;
+    GetClientRect(*this, &rc);
+    m_treeWidth = min(m_treeWidth, rc.right - rc.left - 500);
     m_editor.Init(hResource, *this);
     // Each value is the right edge of each status bar element.
     m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 870, 920, 1000});
@@ -966,13 +1044,17 @@ void CMainWindow::ResizeChildWindows()
     if (!IsRectEmpty(&rect))
     {
         const UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
-        HDWP hDwp = BeginDeferWindowPos(3);
+        HDWP hDwp = BeginDeferWindowPos(4);
         DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), flags);
         DeferWindowPos(hDwp, m_TabBar, nullptr, rect.left, rect.top + m_RibbonHeight, rect.right - rect.left, rect.bottom - rect.top, flags);
         RECT tabrc;
         TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
         MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
-        DeferWindowPos(hDwp, m_editor, nullptr, rect.left, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, rect.right - rect.left, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), flags);
+        int treeWidth = 0;
+        if (m_fileTreeVisible && !m_fileTree.GetPath().empty())
+            treeWidth = m_treeWidth;
+        DeferWindowPos(hDwp, m_editor, nullptr, rect.left + treeWidth, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, rect.right - rect.left - treeWidth, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), flags);
+        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, treeWidth ? treeWidth - 5 : 0, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), flags);
         EndDeferWindowPos(hDwp);
         m_StatusBar.Resize();
     }
@@ -1063,6 +1145,11 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
             return false;
         doc.m_path = pszPath;
         CMRU::Instance().AddPath(doc.m_path);
+        if (m_fileTree.GetPath().empty())
+        {
+            m_fileTree.SetPath(CPathUtils::GetParentDirectory(doc.m_path));
+            ResizeChildWindows();
+        }
     }
     if (!doc.m_path.empty())
     {
@@ -2276,6 +2363,11 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
             SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
             CCommandHandler::Instance().OnDocumentOpen(index);
+            if (m_fileTree.GetPath().empty())
+            {
+                m_fileTree.SetPath(CPathUtils::GetParentDirectory(filepath));
+                ResizeChildWindows();
+            }
         }
         else
         {
@@ -2741,3 +2833,58 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
 
     DeleteFile(filepath.c_str());
 }
+
+bool CMainWindow::OnMouseMove(UINT nFlags, POINT point)
+{
+    if (m_bDragging)
+    {
+        if ((nFlags & MK_LBUTTON) && (point.x != m_oldPt.x))
+        {
+            m_treeWidth = point.x;
+            m_treeWidth = max(50, m_treeWidth);
+            RECT rc;
+            GetClientRect(*this, &rc);
+            m_treeWidth = min(m_treeWidth, rc.right - rc.left - 200);
+            ResizeChildWindows();
+        }
+    }
+
+    return true;
+}
+
+bool CMainWindow::OnLButtonDown(UINT nFlags, POINT /*point*/)
+{
+    UNREFERENCED_PARAMETER(nFlags);
+
+    if (!m_bDragging)
+    {
+        SetCapture(*this);
+        m_bDragging = true;
+    }
+
+    return true;
+}
+
+bool CMainWindow::OnLButtonUp(UINT nFlags, POINT point)
+{
+    UNREFERENCED_PARAMETER(nFlags);
+
+    if (!m_bDragging)
+        return false;
+
+    m_treeWidth = point.x;
+    m_treeWidth = max(50, m_treeWidth);
+    RECT rc;
+    GetClientRect(*this, &rc);
+    m_treeWidth = min(m_treeWidth, rc.right - rc.left - 200);
+
+    CIniSettings::Instance().SetInt64(L"View", L"FileTreeWidth", m_treeWidth);
+
+    ReleaseCapture();
+    m_bDragging = false;
+    
+    ResizeChildWindows();
+
+    return true;
+}
+
