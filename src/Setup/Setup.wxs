@@ -44,10 +44,13 @@
             <File Id="BowPad.EXE" Name="BowPad.exe" DiskId="1" Source="../../bin/release/bin/BowPad.exe" Vital="yes" />
           </Component>
           <Component Id="BowPadShellMenu" Guid="43123CE3-4D2C-4200-BB10-C128EFC6F486">
-            <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad" Value='Edit in BowPad' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad" Value='Edit with BowPad' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad" Name="Icon" Value='[INSTALLDIR]BowPad.exe,-107' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad" Name="MultiSelectModel" Value='Player' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad\command" Value='[INSTALLDIR]BowPad.exe /path:"%1"' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Classes\Directory\shell\BowPad" Value='Open Folder with BowPad' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Classes\Directory\shell\BowPad" Name="Icon" Value='[INSTALLDIR]BowPad.exe,-107' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Classes\Directory\shell\BowPad\command" Value='[INSTALLDIR]BowPad.exe /path:"%1"' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\BowPad" Name="installDir" Value='[INSTALLDIR]' Type="string" />
           </Component>
 
