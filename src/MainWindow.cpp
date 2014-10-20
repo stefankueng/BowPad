@@ -1028,9 +1028,17 @@ void CMainWindow::HandleAfterInit()
         unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
         if (m_bPathsToOpenMRU)
             openFlags |= OpenFlags::AddToMRU;
-        OpenFile(path.first, openFlags);
-        if (path.second != (size_t)-1)
-            GoToLine(path.second);
+        if ((m_pathsToOpen.size() == 1) && (PathIsDirectory(path.first.c_str())) && (m_fileTree.GetPath().empty()))
+        {
+            m_fileTree.SetPath(path.first);
+            ShowFileTree(true);
+        }
+        else
+        {
+            OpenFile(path.first, openFlags);
+            if (path.second != (size_t)-1)
+                GoToLine(path.second);
+        }
     }
     m_bPathsToOpenMRU = true;
     if (!m_elevatepath.empty())
