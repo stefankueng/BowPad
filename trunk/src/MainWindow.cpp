@@ -587,6 +587,16 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 LPNMTREEVIEW pnmtv = (LPNMTREEVIEW)lParam;
                 switch (nmhdr.code)
                 {
+                    case NM_RETURN:
+                    {
+                        auto path = m_fileTree.GetFilePathForSelItem();
+                        if (!path.empty())
+                        {
+                            OpenFile(path.c_str(), OpenFlags::AddToMRU);
+                            return TRUE;
+                        }
+                    }
+                        break;
                     case NM_DBLCLK:
                     {
                         auto path = m_fileTree.GetFilePathForHitItem();
