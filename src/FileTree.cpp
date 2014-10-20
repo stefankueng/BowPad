@@ -390,6 +390,24 @@ std::wstring CFileTree::GetFilePathForHitItem()
     return std::wstring();
 }
 
+std::wstring CFileTree::GetFilePathForSelItem()
+{
+    HTREEITEM hItem = TreeView_GetSelection(*this);
+    if (hItem)
+    {
+        TVITEM item = { 0 };
+        item.mask = TVIF_PARAM;
+        item.hItem = hItem;
+        TreeView_GetItem(*this, &item);
+        FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
+        if (pTreeItem && !pTreeItem->isDir)
+        {
+            return pTreeItem->path;
+        }
+    }
+    return std::wstring();
+}
+
 
 
 

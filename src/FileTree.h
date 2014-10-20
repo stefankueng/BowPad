@@ -35,6 +35,7 @@ public:
     HTREEITEM GetHitItem();
     void Refresh(HTREEITEM refreshRoot);
     std::wstring GetFilePathForHitItem();
+    std::wstring GetFilePathForSelItem();
 
 
 protected:
