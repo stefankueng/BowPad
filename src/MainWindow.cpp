@@ -593,6 +593,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         if (!path.empty())
                         {
                             OpenFile(path.c_str(), OpenFlags::AddToMRU);
+                            PostMessage(*this, WM_SETFOCUS, TRUE, 0);
                         }
                     }
                         break;
