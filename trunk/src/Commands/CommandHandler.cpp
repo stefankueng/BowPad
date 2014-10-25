@@ -270,6 +270,14 @@ void CCommandHandler::OnTimer(UINT id)
     }
 }
 
+void CCommandHandler::OnThemeChanged(bool bDark)
+{
+    for (auto& cmd : m_commands)
+    {
+        cmd.second->OnThemeChanged(bDark);
+    }
+}
+
 void CCommandHandler::InsertPlugins(void * obj)
 {
     // scan the paths, find all plugin files, create a plugin object
