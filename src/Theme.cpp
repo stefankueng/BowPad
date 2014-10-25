@@ -19,6 +19,7 @@
 #include "BowPad.h"
 #include "SysInfo.h"
 #include "AppUtils.h"
+#include "CommandHandler.h"
 
 extern IUIFramework *g_pFramework;  // Reference to the Ribbon framework.
 
@@ -319,3 +320,8 @@ void CTheme::GetRibbonColors( UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSB
     }
 }
 
+void CTheme::SetDarkTheme(bool b /*= true*/)
+{
+    dark = b;
+    CCommandHandler::Instance().OnThemeChanged(dark);
+}

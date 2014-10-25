@@ -67,6 +67,10 @@ void ICommand::OnTimer(UINT /*id*/)
 {
 }
 
+void ICommand::OnThemeChanged(bool /*bDark*/)
+{
+}
+
 void ICommand::TabActivateAt( int index )
 {
     CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);

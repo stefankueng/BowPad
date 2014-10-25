@@ -41,6 +41,7 @@ public:
     void                            OnDocumentSave(int index, bool bSaveAs);
     void                            AfterInit();
     void                            OnTimer(UINT id);
+    void                            OnThemeChanged(bool bDark);
     const std::map<UINT, std::wstring>& GetPluginMap() { return m_plugins; }
     int                             GetPluginVersion(const std::wstring& name);
 private:
