@@ -44,3 +44,5 @@ function IsEnabled() { return true; }
 function IsChecked() { return true; }
 // called on a timer event
 function OnTimer(id) { return; }
+// called when the theme has changed
+function OnThemeChanged(bDark) { return; }

@@ -53,6 +53,8 @@ public:
 
     virtual void OnTimer(UINT id) override;
 
+    virtual void OnThemeChanged(bool bDark) override;
+
     int m_version;
 
 private:

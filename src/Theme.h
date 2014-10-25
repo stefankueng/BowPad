@@ -29,7 +29,7 @@ private:
 public:
     static CTheme& Instance();
 
-    void                            SetDarkTheme(bool b = true) { dark = b; }
+    void                            SetDarkTheme(bool b = true);
     bool                            IsDarkTheme() const { return dark; }
     COLORREF                        GetThemeColor(COLORREF clr) const;
 

@@ -306,5 +306,17 @@ void CCmdScript::OnTimer(UINT id)
     catch (std::exception&) {}
 }
 
+void CCmdScript::OnThemeChanged(bool bDark)
+{
+    DISPPARAMS dispparams = { 0 };
+    dispparams.cArgs = 1;
+    VARIANT vI;
+    vI.boolVal = bDark;
+    vI.vt = VT_BOOL;
+    dispparams.rgvarg = &vI;
+    try { m_host->CallFunction(L"OnThemeChanged", dispparams); }
+    catch (std::exception&) {}
+}
+
 
 
