@@ -680,6 +680,10 @@ msgstr ""
 msgid "FSN"
 msgstr ""
 
+#. Resource IDs: (3758)
+msgid "FT"
+msgstr ""
+
 #. Resource IDs: (9)
 msgid "Failed to download the list of available languages."
 msgstr ""
@@ -700,6 +704,10 @@ msgstr ""
 
 #. Resource IDs: (3751)
 msgid "File"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "File Tree"
 msgstr ""
 
 #. Resource IDs: (11)
@@ -1496,6 +1504,10 @@ msgstr ""
 msgid "Show line numbers"
 msgstr ""
 
+#. Resource IDs: (3758)
+msgid "Show the file tree"
+msgstr ""
+
 #. Resource IDs: (3772)
 msgid "Shows a dialog to configure custom commands"
 msgstr ""
@@ -1506,6 +1518,10 @@ msgstr ""
 
 #. Resource IDs: (3773)
 msgid "Shows a list of functions/methods in the file to jump to"
+msgstr ""
+
+#. Resource IDs: (3758)
+msgid "Shows or hides the file tree"
 msgstr ""
 
 #. Resource IDs: (3783)
