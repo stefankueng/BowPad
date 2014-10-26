@@ -16,6 +16,7 @@
 //
 
 #include "stdafx.h"
+#include "BowPadUI.h"
 #include "FileTree.h"
 #include "Theme.h"
 #include "SysImageList.h"
@@ -425,6 +426,16 @@ void CFileTree::OnThemeChanged(bool bDark)
         TreeView_SetExtendedStyle(*this, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
         SetWindowTheme(*this, L"Explorer", NULL);
     }
+}
+
+bool CFileTree::Execute()
+{
+    return false;
+}
+
+UINT CFileTree::GetCmdId()
+{
+    return cmdFileTreeControl;
 }
 
 
