@@ -84,7 +84,9 @@ ICommand * CCommandHandler::GetCommand( UINT cmdId )
     auto c = m_commands.find(cmdId);
     if (c != m_commands.end())
         return c->second.get();
-
+    auto nc = m_nodeletecommands.find(cmdId);
+    if (nc != m_nodeletecommands.end())
+        return nc->second;
     return nullptr;
 }
 
@@ -208,9 +210,13 @@ void CCommandHandler::Init( void * obj )
 
 void CCommandHandler::ScintillaNotify( Scintilla::SCNotification * pScn )
 {
-    for (auto& cmd:m_commands)
+    for (auto& cmd : m_commands)
     {
-        cmd.second.get()->ScintillaNotify(pScn);
+        cmd.second->ScintillaNotify(pScn);
+    }
+    for (auto& cmd : m_nodeletecommands)
+    {
+        cmd.second->ScintillaNotify(pScn);
     }
 }
 
@@ -220,11 +226,19 @@ void CCommandHandler::TabNotify( TBHDR * ptbhdr )
     {
         cmd.second->TabNotify(ptbhdr);
     }
+    for (auto& cmd : m_nodeletecommands)
+    {
+        cmd.second->TabNotify(ptbhdr);
+    }
 }
 
 void CCommandHandler::OnClose()
 {
-    for (auto& cmd:m_commands)
+    for (auto& cmd : m_commands)
+    {
+        cmd.second->OnClose();
+    }
+    for (auto& cmd : m_nodeletecommands)
     {
         cmd.second->OnClose();
     }
@@ -232,7 +246,11 @@ void CCommandHandler::OnClose()
 
 void CCommandHandler::OnDocumentClose(int index)
 {
-    for (auto& cmd:m_commands)
+    for (auto& cmd : m_commands)
+    {
+        cmd.second->OnDocumentClose(index);
+    }
+    for (auto& cmd : m_nodeletecommands)
     {
         cmd.second->OnDocumentClose(index);
     }
@@ -244,6 +262,10 @@ void CCommandHandler::OnDocumentOpen(int index)
     {
         cmd.second->OnDocumentOpen(index);
     }
+    for (auto& cmd : m_nodeletecommands)
+    {
+        cmd.second->OnDocumentOpen(index);
+    }
 }
 
 void CCommandHandler::OnDocumentSave(int index, bool bSaveAs)
@@ -252,11 +274,19 @@ void CCommandHandler::OnDocumentSave(int index, bool bSaveAs)
     {
         cmd.second->OnDocumentSave(index, bSaveAs);
     }
+    for (auto& cmd : m_nodeletecommands)
+    {
+        cmd.second->OnDocumentSave(index, bSaveAs);
+    }
 }
 
 void CCommandHandler::AfterInit()
 {
-    for (auto& cmd:m_commands)
+    for (auto& cmd : m_commands)
+    {
+        cmd.second->AfterInit();
+    }
+    for (auto& cmd : m_nodeletecommands)
     {
         cmd.second->AfterInit();
     }
@@ -264,7 +294,11 @@ void CCommandHandler::AfterInit()
 
 void CCommandHandler::OnTimer(UINT id)
 {
-    for (auto& cmd:m_commands)
+    for (auto& cmd : m_commands)
+    {
+        cmd.second->OnTimer(id);
+    }
+    for (auto& cmd : m_nodeletecommands)
     {
         cmd.second->OnTimer(id);
     }
@@ -273,6 +307,10 @@ void CCommandHandler::OnTimer(UINT id)
 void CCommandHandler::OnThemeChanged(bool bDark)
 {
     for (auto& cmd : m_commands)
+    {
+        cmd.second->OnThemeChanged(bDark);
+    }
+    for (auto& cmd : m_nodeletecommands)
     {
         cmd.second->OnThemeChanged(bDark);
     }
@@ -328,4 +366,10 @@ int CCommandHandler::GetPluginVersion(const std::wstring& name)
     if (it != m_pluginversion.end())
         return it->second;
     return 0;
+}
+
+void CCommandHandler::AddCommand(ICommand * cmd)
+{
+    m_highestCmdId = max(m_highestCmdId, cmd->GetCmdId());
+    m_nodeletecommands.insert({ cmd->GetCmdId(), cmd });
 }

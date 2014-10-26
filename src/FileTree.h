@@ -16,15 +16,17 @@
 //
 #pragma once
 #include "BaseWindow.h"
+#include "ICommand.h"
 #include <functional>
 
 typedef std::function<bool(HTREEITEM)> ItemHandler;
 
-class CFileTree : public CWindow
+class CFileTree : public CWindow, public ICommand
 {
 public:
-    CFileTree(HINSTANCE hInst)
+    CFileTree(HINSTANCE hInst, void * obj)
         : CWindow(hInst)
+        , ICommand(obj)
     {};
     virtual ~CFileTree();
 
@@ -35,8 +37,10 @@ public:
     void Refresh(HTREEITEM refreshRoot);
     std::wstring GetFilePathForHitItem();
     std::wstring GetFilePathForSelItem();
-    void OnThemeChanged(bool bDark);
-
+    
+    virtual void OnThemeChanged(bool bDark) override;
+    virtual bool Execute() override;
+    virtual UINT GetCmdId() override;
 
 protected:
     virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;

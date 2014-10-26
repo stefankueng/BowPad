@@ -62,7 +62,7 @@ static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
-    , m_fileTree(hInst)
+    , m_fileTree(hInst, this)
     , m_treeWidth(0)
     , m_bDragging(false)
     , m_fileTreeVisible(true)
@@ -753,9 +753,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             ::DestroyWindow(m_hwnd);
         }
         break;
-    case WM_CUSTTHEMECHANGED:
-        m_fileTree.OnThemeChanged(wParam != 0);
-        break;
     case WM_STATUSBAR_MSG:
     {
         switch (wParam)
@@ -941,7 +938,7 @@ bool CMainWindow::Initialize()
             func(m_editor,    WM_COPYDATA, MSGFLT_ALLOW, nullptr );
             func(m_TabBar,    WM_COPYDATA, MSGFLT_ALLOW, nullptr );
             func(m_StatusBar, WM_COPYDATA, MSGFLT_ALLOW, nullptr );
-            func(m_fileTree,  WM_COPYDATA, MSGFLT_ALLOW, nullptr );
+            func(m_fileTree, WM_COPYDATA, MSGFLT_ALLOW, nullptr );
         }
         else
         {
@@ -949,8 +946,8 @@ bool CMainWindow::Initialize()
         }
     }
 
-    CTheme::Instance().Init(*this);
     m_fileTree.Init(hResource, *this);
+    CCommandHandler::Instance().AddCommand(&m_fileTree);
     m_treeWidth = (int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200);
     m_treeWidth = max(50, m_treeWidth);
     RECT rc;
