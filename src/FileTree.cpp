@@ -269,6 +269,19 @@ int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lParamSort
 
 void CFileTree::Refresh(HTREEITEM refreshRoot)
 {
+    std::wstring activepath;
+    if (HasActiveDocument())
+    {
+        auto doc = GetActiveDocument();
+        if (!doc.m_path.empty() && (m_path.size() < doc.m_path.size()))
+        {
+            if (CPathUtils::PathCompare(m_path, doc.m_path.substr(0, m_path.size())) == 0)
+            {
+                activepath = doc.m_path;
+            }
+        }
+    }
+
     SendMessage(*this, WM_SETREDRAW, FALSE, 0);
     OnOutOfScope(SendMessage(*this, WM_SETREDRAW, TRUE, 0));
 
@@ -335,7 +348,15 @@ void CFileTree::Refresh(HTREEITEM refreshRoot)
             tvi.iImage = CSysImageList::GetInstance().GetFileIconIndex(path);
             tvi.iSelectedImage = CSysImageList::GetInstance().GetFileIconIndex(path);
         }
-
+        if (!activepath.empty())
+        {
+            if (CPathUtils::PathCompare(path, activepath) == 0)
+            {
+                tvi.mask |= TVIF_STATE;
+                tvi.state = TVIS_BOLD;
+                tvi.stateMask = TVIS_BOLD;
+            }
+        }
         tvi.lParam = (LPARAM)fi;
         tvins.itemex = tvi;
         tvins.hInsertAfter = TVI_LAST;
@@ -438,6 +459,46 @@ UINT CFileTree::GetCmdId()
     return cmdFileTreeControl;
 }
 
-
+void CFileTree::TabNotify(TBHDR * ptbhdr)
+{
+    if ((ptbhdr->hdr.code == TCN_SELCHANGE))
+    {
+        // remove the bold status from all items
+        RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
+        {
+            TreeView_SetItemState(*this, hItem, 0, TVIS_BOLD);
+            return false;
+        });
+        if (HasActiveDocument())
+        {
+            auto doc = GetActiveDocument();
+            if (!doc.m_path.empty() && (m_path.size() < doc.m_path.size()))
+            {
+                if (CPathUtils::PathCompare(m_path, doc.m_path.substr(0, m_path.size())) == 0)
+                {
+                    // find the path
+                    RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
+                    {
+                        TVITEM item = { 0 };
+                        item.mask = TVIF_PARAM;
+                        item.hItem = hItem;
+                        TreeView_GetItem(*this, &item);
+                        FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
+                        if (pTreeItem && !pTreeItem->isDir)
+                        {
+                            if (CPathUtils::PathCompare(doc.m_path, pTreeItem->path) == 0)
+                            {
+                                TreeView_EnsureVisible(*this, hItem);
+                                TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+                }
+            }
+        }
+    }
+}
 
 
