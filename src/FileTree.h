@@ -34,7 +34,7 @@ public:
     void SetPath(const std::wstring& path) { m_path = path; Refresh(TVI_ROOT); }
     std::wstring GetPath()const { return m_path; }
     HTREEITEM GetHitItem();
-    void Refresh(HTREEITEM refreshRoot);
+    void Refresh(HTREEITEM refreshRoot, bool force = false);
     std::wstring GetFilePathForHitItem();
     std::wstring GetFilePathForSelItem();
     

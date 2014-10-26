@@ -947,6 +947,7 @@ bool CMainWindow::Initialize()
     }
 
     m_fileTree.Init(hResource, *this);
+    ShowWindow(m_fileTree, m_fileTreeVisible ? SW_SHOW : SW_HIDE);
     CCommandHandler::Instance().AddCommand(&m_fileTree);
     m_treeWidth = (int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200);
     m_treeWidth = max(50, m_treeWidth);
@@ -1074,6 +1075,7 @@ void CMainWindow::ResizeChildWindows()
     if (!IsRectEmpty(&rect))
     {
         const UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
+        const UINT noshowflags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOCOPYBITS;
         HDWP hDwp = BeginDeferWindowPos(4);
         DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), flags);
         DeferWindowPos(hDwp, m_TabBar, nullptr, rect.left, rect.top + m_RibbonHeight, rect.right - rect.left, rect.bottom - rect.top, flags);
@@ -1084,7 +1086,7 @@ void CMainWindow::ResizeChildWindows()
         if (m_fileTreeVisible && !m_fileTree.GetPath().empty())
             treeWidth = m_treeWidth;
         DeferWindowPos(hDwp, m_editor, nullptr, rect.left + treeWidth, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, rect.right - rect.left - treeWidth, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, treeWidth ? treeWidth - 5 : 0, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), flags);
+        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, treeWidth ? treeWidth - 5 : 0, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
         EndDeferWindowPos(hDwp);
         m_StatusBar.Resize();
     }
@@ -2921,6 +2923,7 @@ bool CMainWindow::OnLButtonUp(UINT nFlags, POINT point)
 void CMainWindow::ShowFileTree(bool bShow)
 {
     m_fileTreeVisible = bShow;
+    ShowWindow(m_fileTree, m_fileTreeVisible ? SW_SHOW : SW_HIDE);
     ResizeChildWindows();
     CIniSettings::Instance().SetInt64(L"View", L"FileTree", m_fileTreeVisible ? 1 : 0);
 }

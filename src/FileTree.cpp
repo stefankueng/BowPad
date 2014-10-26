@@ -121,6 +121,10 @@ LRESULT CALLBACK CFileTree::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, 
 
     switch (uMsg)
     {
+        case WM_SHOWWINDOW:
+            if (wParam)
+                Refresh(TVI_ROOT, true);
+            break;
         case WM_ERASEBKGND:
         {
             if (CTheme::Instance().IsDarkTheme())
@@ -267,8 +271,11 @@ int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lParamSort
     return res - 2;
 }
 
-void CFileTree::Refresh(HTREEITEM refreshRoot)
+void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
 {
+    if (!force && !IsWindowVisible(*this))
+        return;
+
     std::wstring activepath;
     if (HasActiveDocument())
     {
