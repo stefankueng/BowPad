@@ -29,7 +29,6 @@ private:
 public:
     static CTheme& Instance();
 
-    void                            Init(HWND hMain);
     void                            SetDarkTheme(bool b = true);
     bool                            IsDarkTheme() const { return dark; }
     COLORREF                        GetThemeColor(COLORREF clr) const;
@@ -49,5 +48,4 @@ private:
     bool                            m_bLoaded;
     std::map<COLORREF, COLORREF>    m_colorMap;
     bool                            dark;
-    HWND                            m_mainWnd;
 };

@@ -44,6 +44,7 @@ public:
     void                            OnThemeChanged(bool bDark);
     const std::map<UINT, std::wstring>& GetPluginMap() { return m_plugins; }
     int                             GetPluginVersion(const std::wstring& name);
+    void                            AddCommand(ICommand * cmd);
 private:
     template<typename T, typename ... ARGS> T* Add(ARGS ... args)
     {
@@ -62,6 +63,7 @@ private:
     void                            InsertPlugins(void * obj);
 
     std::map<UINT, std::unique_ptr<ICommand>>       m_commands;
+    std::map<UINT, ICommand*>                       m_nodeletecommands;
     std::map<UINT, std::wstring>                    m_plugins;
     std::map<std::wstring, int>                     m_pluginversion;
     UINT                                            m_highestCmdId;
