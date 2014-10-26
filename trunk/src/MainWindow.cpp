@@ -753,6 +753,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             ::DestroyWindow(m_hwnd);
         }
         break;
+    case WM_CUSTTHEMECHANGED:
+        m_fileTree.OnThemeChanged(wParam != 0);
+        break;
     case WM_STATUSBAR_MSG:
     {
         switch (wParam)
@@ -946,6 +949,7 @@ bool CMainWindow::Initialize()
         }
     }
 
+    CTheme::Instance().Init(*this);
     m_fileTree.Init(hResource, *this);
     m_treeWidth = (int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200);
     m_treeWidth = max(50, m_treeWidth);

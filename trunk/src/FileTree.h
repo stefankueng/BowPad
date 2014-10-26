@@ -16,7 +16,6 @@
 //
 #pragma once
 #include "BaseWindow.h"
-#include "ICommand.h"
 #include <functional>
 
 typedef std::function<bool(HTREEITEM)> ItemHandler;
@@ -36,12 +35,14 @@ public:
     void Refresh(HTREEITEM refreshRoot);
     std::wstring GetFilePathForHitItem();
     std::wstring GetFilePathForSelItem();
+    void OnThemeChanged(bool bDark);
 
 
 protected:
     virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
     HTREEITEM RecurseTree(HTREEITEM hItem, ItemHandler handler);
+
 private:
     std::wstring        m_path;
 };

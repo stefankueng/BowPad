@@ -26,6 +26,7 @@ extern IUIFramework *g_pFramework;  // Reference to the Ribbon framework.
 CTheme::CTheme(void)
     : m_bLoaded(false)
     , dark(false)
+    , m_mainWnd(NULL)
 {
 }
 
@@ -324,4 +325,12 @@ void CTheme::SetDarkTheme(bool b /*= true*/)
 {
     dark = b;
     CCommandHandler::Instance().OnThemeChanged(dark);
+    if (m_mainWnd)
+        SendMessage(m_mainWnd, WM_CUSTTHEMECHANGED, dark, 0);
 }
+
+void CTheme::Init(HWND hMain)
+{
+    m_mainWnd = hMain;
+}
+

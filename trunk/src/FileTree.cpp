@@ -22,8 +22,8 @@
 #include "DirFileEnum.h"
 #include "PathUtils.h"
 #include "OnOutOfScope.h"
-#include "coolscroll.h"
 
+#include <VersionHelpers.h>
 #include <Uxtheme.h>
 
 #pragma comment(lib, "Uxtheme.lib")
@@ -95,7 +95,7 @@ bool CFileTree::Init(HINSTANCE /*hInst*/, HWND hParent)
     TreeView_SetExtendedStyle(*this, TVS_EX_AUTOHSCROLL | TVS_EX_DOUBLEBUFFER, TVS_EX_AUTOHSCROLL | TVS_EX_DOUBLEBUFFER);
     TreeView_SetImageList(*this, CSysImageList::GetInstance(), TVSIL_NORMAL);
 
-    SetWindowTheme(*this, L"Explorer", NULL);
+    OnThemeChanged(CTheme::Instance().IsDarkTheme());
 
     return true;
 }
@@ -124,12 +124,6 @@ LRESULT CALLBACK CFileTree::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, 
         {
             if (CTheme::Instance().IsDarkTheme())
             {
-                // When in dark theme mode, we have to disable double buffering:
-                // if double buffering is enabled, the background of the tree
-                // control is always shown in white, even though we draw it black
-                // here. Haven't found a way to work around this
-                TreeView_SetExtendedStyle(*this, 0, TVS_EX_DOUBLEBUFFER);
-
                 HDC hDC = (HDC)wParam;
                 ::SetBkColor(hDC, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOW)));
                 RECT rect;
@@ -137,8 +131,6 @@ LRESULT CALLBACK CFileTree::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, 
                 ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rect, NULL, 0, NULL);
                 return TRUE;
             }
-            else
-                TreeView_SetExtendedStyle(*this, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
         }
             break;
         case WM_CONTEXTMENU:
@@ -406,6 +398,33 @@ std::wstring CFileTree::GetFilePathForSelItem()
         }
     }
     return std::wstring();
+}
+
+void CFileTree::OnThemeChanged(bool bDark)
+{
+    if (bDark)
+    {
+        // When in dark theme mode, we have to disable double buffering:
+        // if double buffering is enabled, the background of the tree
+        // control is always shown in white, even though we draw it black
+        // in the WM_ERASEBACKGROUND handler. Haven't found a way to work around this
+        TreeView_SetExtendedStyle(*this, 0, TVS_EX_DOUBLEBUFFER);
+        if (!IsWindows8OrGreater())
+        {
+            // disable the explorer theme in dark mode on Win7:
+            // the color of the selection is too bright and causes
+            // the text to be unreadable
+            // works much better on Win8 so we leave the explorer theme there
+            SetWindowTheme(*this, NULL, NULL);
+        }
+        else
+            SetWindowTheme(*this, L"Explorer", NULL);
+    }
+    else
+    {
+        TreeView_SetExtendedStyle(*this, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
+        SetWindowTheme(*this, L"Explorer", NULL);
+    }
 }
 
 
