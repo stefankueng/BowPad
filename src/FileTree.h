@@ -47,6 +47,8 @@ protected:
 
     HTREEITEM RecurseTree(HTREEITEM hItem, ItemHandler handler);
 
+    virtual void TabNotify(TBHDR * ptbhdr);
+
 private:
     std::wstring        m_path;
 };
