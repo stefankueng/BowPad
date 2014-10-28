@@ -3,19 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2014-10-27 19:19+0100\n"
+"Last-Translator: \n"
+"Language-Team: Non <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
+"Language: fr\n"
+"X-Generator: Poedit 1.6.10\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -26,13 +26,10 @@ msgstr ""
 #    S = Shift key   (or blank if not used)
 #    X = upper case character
 # e.g. "V CS+Q" == Ctrl + Shift + 'Q'
-
 # ONLY Accelerator Keys with corresponding alphanumeric characters can be
 # updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
-
 # ONLY change the msgstr field. Do NOT change any other.
 # If you do not want to change an Accelerator Key, copy msgid to msgstr
-
 #. Resource IDs: (104)
 msgid "&About ..."
 msgstr "&A propos"
@@ -320,11 +317,11 @@ msgstr "Convertir en"
 
 #. Resource IDs: (3764)
 msgid "Converts all spaces in the document to tabs"
-msgstr "Convertit tous les espaces du document en onglets"
+msgstr "Convertit tous les espaces du document en tabulations"
 
 #. Resource IDs: (3764)
 msgid "Converts all tabs in the document to spaces"
-msgstr "Convertit tous les onglets du document en espaces"
+msgstr "Convertit toutes les tabulations du document en espaces"
 
 #. Resource IDs: (3756)
 msgid "Converts the file to the specified encoding"
@@ -460,7 +457,7 @@ msgstr "Supprimer"
 
 #. Resource IDs: (3760)
 msgid "Determines whether a tab is inserted or spaces when the tab key is pressed."
-msgstr "Détermine si un onglet ou des espaces sont insérés lorsque la touche de tabulation est actionnée"
+msgstr "Détermine si une tabulation ou des espaces sont insérés lorsque la touche de tabulation est actionnée"
 
 #. Resource IDs: (9)
 msgid "Do &not download the update\nYou will be reminded again about the update in a week."
@@ -1222,7 +1219,7 @@ msgstr "Affiche la boîte de dialogue Propriétés du fichier pour le fichier ac
 
 #. Resource IDs: (3764)
 msgid "Spaces to Tabs"
-msgstr "Taille des onglets"
+msgstr "Convertir les espaces en tabulations"
 
 #. Resource IDs: (3761)
 msgid "Split Lines"
@@ -1258,7 +1255,7 @@ msgstr "TT"
 
 #. Resource IDs: (3764)
 msgid "Tabs to Spaces"
-msgstr "Onglets avec espace"
+msgstr "Convertir les tabulations en espaces"
 
 #. Resource IDs: (8)
 #, c-format
@@ -1281,7 +1278,7 @@ msgstr "Titre"
 
 #. Resource IDs: (3765)
 msgid "Toggle Bookmark"
-msgstr "Basculer le signet""
+msgstr "Basculer le signet"
 
 #. Resource IDs: (3765)
 msgid "Toggle a bookmark on the current line"
@@ -1353,7 +1350,7 @@ msgstr "Utilisez $0 pour l'ensemble des résultats, et $1..$99 pour les groupes"
 
 #. Resource IDs: (3760)
 msgid "Use Tabs"
-msgstr "Utilisez les onglets"
+msgstr "Utiliser des tabulations"
 
 #. Resource IDs: (3751, 3752, 3755)
 msgid "V"
@@ -1417,7 +1414,7 @@ msgstr "Y"
 
 #. Resource IDs: (9)
 msgid "You can use the following strings in the command line:\r\n$(LINE)\t\t\tThe line where the cursor is\r\n$(POS)\t\t\tthe position where the cursor is\r\n$(TAB_PATH)\t\tthe path to the file of the active tab\r\n$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
-msgstr "Vous pouvez utiliser les chaînes suivantes dans la ligne de commande :\r\n$(LINE)\t\t\La ligne où le curseur est\r\n$(POS)\t\t\tla position où le curseur est\r\n$(TAB_PATH)\t\tle chemin d'accès au fichier de l'onglet actif\r\n$(TAB_DIR)\t\tle répertoire du fichier de l'onglet actif\r\n$(SEL-TEXT)\t\tle texte sélectionné ou le mot à la position du curseur\r\n$(SEL_TEXT_ESCAPED)\tcomme $(SEL_TEXT) mais escaped, utilisé pour les URLs"
+msgstr "Vous pouvez utiliser les chaînes suivantes dans la ligne de commande :\r\n$(LINE)\t\t\tLa ligne où le curseur est\r\n$(POS)\t\t\tla position où le curseur est\r\n$(TAB_PATH)\t\tle chemin d'accès au fichier de l'onglet actif\r\n$(TAB_DIR)\t\tle répertoire du fichier de l'onglet actif\r\n$(SEL-TEXT)\t\tle texte sélectionné ou le mot à la position du curseur\r\n$(SEL_TEXT_ESCAPED)\tcomme $(SEL_TEXT) mais escaped, utilisé pour les URLs"
 
 #. Resource IDs: (3756)
 msgid "Z"
