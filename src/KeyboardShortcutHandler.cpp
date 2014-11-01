@@ -107,16 +107,13 @@ void CKeyboardShortcutHandler::Load( CSimpleIni& ini )
             std::vector<std::wstring> keyvec;
             stringtok(keyvec, v, false, L",");
             KSH_Accel accel;
+            accel.sCmd = l;
             accel.cmd = (WORD)_wtoi(l);
             if (accel.cmd == 0)
             {
                 auto it = m_resourceData.find(l);
                 if (it != m_resourceData.end())
                     accel.cmd = (WORD)it->second;
-#ifdef _DEBUG
-                else
-                    DebugBreak();
-#endif
             }
             for (size_t i = 0; i < keyvec.size(); ++i)
             {
@@ -430,4 +427,16 @@ void CKeyboardShortcutHandler::ToolTipUpdated( WORD cmd )
 void CKeyboardShortcutHandler::Reload()
 {
     Load();
+}
+
+void CKeyboardShortcutHandler::AddCommand(const std::wstring& name, int id)
+{
+    for (auto it = m_accelerators.begin(); it != m_accelerators.end(); ++it)
+    {
+        if (it->sCmd.compare(name) == 0)
+        {
+            it->cmd = id;
+            break;
+        }
+    }
 }

@@ -63,6 +63,7 @@
 #include "AppUtils.h"
 #include "PathUtils.h"
 #include "UnicodeUtils.h"
+#include "KeyboardShortcutHandler.h"
 
 CCommandHandler::CCommandHandler(void)
     : m_highestCmdId(0)
@@ -340,6 +341,7 @@ void CCommandHandler::InsertPlugins(void * obj)
                     m_pluginversion.insert({ sName, pScript->m_version });
                     m_commands.insert({ ++pluginCmd, std::move(pScript) });
                     m_plugins.insert({ pluginCmd, sName });
+                    CKeyboardShortcutHandler::Instance().AddCommand(sName, pluginCmd);
                 }
             }
             catch (std::exception& e)
