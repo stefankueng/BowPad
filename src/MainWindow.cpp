@@ -82,6 +82,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
     m_fileTreeVisible = CIniSettings::Instance().GetInt64(L"View", L"FileTree", 1) != 0;
+    m_oldPt.x = m_oldPt.y = 0;
 }
 
 CMainWindow::~CMainWindow(void)
