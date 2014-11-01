@@ -1161,6 +1161,9 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
             hr = pfd->SetFolder(psiDefFolder);
             if (CAppUtils::FailedShowMessage(hr))
                 return false;
+            hr = pfd->SetFileName(CPathUtils::GetFileName(doc.m_path).c_str());
+            if (CAppUtils::FailedShowMessage(hr))
+                return false;
         }
 
         // Show the save file dialog
