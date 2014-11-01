@@ -339,7 +339,7 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
 
         wcscpy_s(textbuf, CPathUtils::GetFileName(path).c_str());
         tvi.pszText = textbuf;
-        tvi.cchTextMax = sizeof(tvi.pszText) / sizeof(tvi.pszText[0]);
+        tvi.cchTextMax = _countof(textbuf);
         tvi.cChildren = 0;
 
         if (bIsDir)
