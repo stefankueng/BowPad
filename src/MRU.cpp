@@ -314,11 +314,10 @@ void CMRU::Save()
 {
     std::wstring path = GetMRUFilename();
 
-    std::wofstream File;
-    File.imbue(std::locale(std::locale(), new utf8_conversion()));
-
     try
     {
+        std::wofstream File;
+        File.imbue(std::locale(std::locale(), new utf8_conversion()));
         File.open(path);
         if (!File.good())
             return;
@@ -329,6 +328,10 @@ void CMRU::Save()
         File.close();
     }
     catch (std::ios_base::failure &)
+    {
+        return;
+    }
+    catch (std::runtime_error &)
     {
         return;
     }
