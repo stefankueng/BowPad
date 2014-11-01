@@ -435,7 +435,7 @@ void CKeyboardShortcutHandler::AddCommand(const std::wstring& name, int id)
     {
         if (it->sCmd.compare(name) == 0)
         {
-            it->cmd = id;
+            it->cmd = (WORD)id;
             break;
         }
     }
