@@ -38,6 +38,8 @@ typedef BOOL(WINAPI * GetGestureInfoFN)(HGESTUREINFO hGestureInfo, PGESTUREINFO 
 GetGestureInfoFN GetGestureInfoFunc = nullptr;
 typedef BOOL(WINAPI * CloseGestureInfoHandleFN)(HGESTUREINFO hGestureInfo);
 CloseGestureInfoHandleFN CloseGestureInfoHandleFunc = nullptr;
+typedef BOOL(WINAPI * SetGestureConfigFN)(HWND hwnd, DWORD dwReserved, UINT cIDs, PGESTURECONFIG pGestureConfig, UINT cbSize);
+SetGestureConfigFN SetGestureConfigFunc = nullptr;
 
 typedef BOOL(WINAPI * BeginPanningFeedbackFN)(HWND hwnd);
 BeginPanningFeedbackFN BeginPanningFeedbackFunc = nullptr;
@@ -164,6 +166,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     {
         GetGestureInfoFunc = (GetGestureInfoFN)::GetProcAddress(hDll, "GetGestureInfo");
         CloseGestureInfoHandleFunc = (CloseGestureInfoHandleFN)::GetProcAddress(hDll, "CloseGestureInfoHandle");
+        SetGestureConfigFunc = (SetGestureConfigFN)::GetProcAddress(hDll, "SetGestureConfig");
     }
     if (hUxThemeDll)
     {
@@ -377,13 +380,16 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         break;
     case WM_GESTURENOTIFY:
     {
-        DWORD panWant = GC_PAN | GC_PAN_WITH_INERTIA | GC_PAN_WITH_SINGLE_FINGER_VERTICALLY;
-        GESTURECONFIG gestureConfig[] =
+        if (SetGestureConfigFunc)
         {
-            { GID_PAN, panWant, GC_PAN_WITH_GUTTER },
-            { GID_TWOFINGERTAP, GC_TWOFINGERTAP, 0 },
-        };
-        SetGestureConfig(*this, 0, _countof(gestureConfig), gestureConfig, sizeof(GESTURECONFIG));
+            DWORD panWant = GC_PAN | GC_PAN_WITH_INERTIA | GC_PAN_WITH_SINGLE_FINGER_VERTICALLY;
+            GESTURECONFIG gestureConfig[] =
+            {
+                { GID_PAN, panWant, GC_PAN_WITH_GUTTER },
+                { GID_TWOFINGERTAP, GC_TWOFINGERTAP, 0 },
+            };
+            SetGestureConfigFunc(*this, 0, _countof(gestureConfig), gestureConfig, sizeof(GESTURECONFIG));
+        }
         return 0;
     }
     case WM_GESTURE:
