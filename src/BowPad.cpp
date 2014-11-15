@@ -106,16 +106,24 @@ static void RegisterContextMenu(bool bAdd)
 {
     if (bAdd)
     {
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", NULL, REG_SZ, L"Edit in BowPad", sizeof(L"Edit in BowPad") + 2);
         std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str(), IDI_BOWPAD);
+        std::wstring sExePath = CStringUtils::Format(L"%s /path:\"%%1\"", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str());
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", NULL, REG_SZ, L"Edit in BowPad", sizeof(L"Edit in BowPad") + 2);
         SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
         SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", L"MultiSelectModel", REG_SZ, L"Player", sizeof(L"MultiSelectModel") + 2);
-        std::wstring sExePath = CStringUtils::Format(L"%s /path:\"%%1\"", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str());
         SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad\\Command", NULL, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad", NULL, REG_SZ, L"Open Folder with BowPad", sizeof(L"Open Folder with BowPad") + 2);
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad\\Command", NULL, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad", NULL, REG_SZ, L"Open Folder with BowPad", sizeof(L"Open Folder with BowPad") + 2);
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad\\Command", NULL, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
     }
     else
     {
         SHDeleteKey(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad");
+        SHDeleteKey(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad");
+        SHDeleteKey(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad");
     }
 }
 
