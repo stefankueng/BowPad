@@ -1295,6 +1295,10 @@ msgstr ""
 msgid "RELOAD"
 msgstr ""
 
+#. Resource IDs: (14)
+msgid "Recently Used Encodings"
+msgstr ""
+
 #. Resource IDs: (3754, 3755)
 msgid "Redo"
 msgstr ""
