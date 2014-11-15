@@ -25,6 +25,8 @@
 #include <vector>
 #include <string>
 
+extern IUIFramework *g_pFramework;
+
 struct CodePageItem
 {
     CodePageItem(UINT codepage, bool bom, const std::wstring& name, int category)
@@ -40,23 +42,77 @@ namespace
 {
 // Don't change value, file data depends on them.
 const int CP_CATEGORY_MAIN = 0;
-const int CP_CATEGORY_CODEPAGES = 1;
+const int CP_CATEGORY_MRU = 1;
+const int CP_CATEGORY_CODEPAGES = 2;
 
 std::vector<CodePageItem>  codepages;
+std::vector<UINT>  mrucodepages;
 };
+
+void AddToMRU(const CodePageItem& cp)
+{
+    if (cp.category == CP_CATEGORY_MAIN)
+        return; // ignore items from the main category for the MRU list
+
+    // Erase the MRU item that might already exist
+    for (auto it = mrucodepages.begin(); it != mrucodepages.end(); ++it)
+    {
+        if (cp.codepage == (*it))
+        {
+            mrucodepages.erase(it);
+            break;
+        }
+    }
+    // keep the MRU small, clear out old entries
+    if (mrucodepages.size() >= 5)
+        mrucodepages.erase(mrucodepages.begin());
+
+    mrucodepages.push_back(cp.codepage);
+
+    // go throuch all codepages and adjust the category
+    for (auto& cpentry : codepages)
+    {
+        if (cpentry.category == CP_CATEGORY_MRU)
+            cpentry.category = CP_CATEGORY_CODEPAGES;
+    }
+    int mruindex = 1;
+    for (const auto& mru : mrucodepages)
+    {
+        auto sKey = CStringUtils::Format(L"%02d", mruindex++);
+        CIniSettings::Instance().SetInt64(L"codepagemru", sKey.c_str(), mru);
+        for (auto& cpentry : codepages)
+        {
+            if (cpentry.codepage == mru)
+                cpentry.category = CP_CATEGORY_MRU;
+        }
+    }
+    g_pFramework->InvalidateUICommand(cmdLoadAsEncoding, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Categories);
+    g_pFramework->InvalidateUICommand(cmdLoadAsEncoding, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
+    g_pFramework->InvalidateUICommand(cmdConvertEncoding, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Categories);
+    g_pFramework->InvalidateUICommand(cmdConvertEncoding, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
+}
 
 BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
 {
     if (codepages.empty())
     {
         // insert the main encodings
-        codepages.push_back(CodePageItem(GetACP(), false, L"ANSI", 0));
-        codepages.push_back(CodePageItem(CP_UTF8, false, L"UTF-8", 0));
-        codepages.push_back(CodePageItem(CP_UTF8, true, L"UTF-8 BOM", 0));
-        codepages.push_back(CodePageItem(1200, true, L"UTF-16 Little Endian", 0));
-        codepages.push_back(CodePageItem(1201, true, L"UTF-16 Big Endian", 0));
-        codepages.push_back(CodePageItem(12000, true, L"UTF-32 Little Endian", 0));
-        codepages.push_back(CodePageItem(12001, true, L"UTF-32 Big Endian", 0));
+        codepages.push_back(CodePageItem(GetACP(), false, L"ANSI", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(CP_UTF8, false, L"UTF-8", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(CP_UTF8, true, L"UTF-8 BOM", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(1200, true, L"UTF-16 Little Endian", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(1201, true, L"UTF-16 Big Endian", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(12000, true, L"UTF-32 Little Endian", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(12001, true, L"UTF-32 Big Endian", CP_CATEGORY_MAIN));
+        for (int i = 5; i >0 ; --i)
+        {
+            auto sKey = CStringUtils::Format(L"%02d", i);
+            UINT cp = (UINT)CIniSettings::Instance().GetInt64(L"codepagemru", sKey.c_str(), 0);
+            if (cp)
+            {
+                mrucodepages.push_back(cp);
+            }
+        }
     }
     UINT codepage = _wtoi(lpCodePageString);
     switch (codepage)
@@ -82,7 +138,7 @@ BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
                 if (pos != std::wstring::npos)
                     name.erase(pos, 1);
                 CStringUtils::trim(name);
-                codepages.push_back(CodePageItem(codepage, false, name, 1));
+                codepages.push_back(CodePageItem(codepage, false, name, CP_CATEGORY_CODEPAGES));
             }
         }
         break;
@@ -102,6 +158,14 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
 
+        pCollection->Clear();
+
+        if (!mrucodepages.empty())
+        {
+            hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MRU, IDS_ENCODING_MRU);
+            if (FAILED(hr))
+                return hr;
+        }
         hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MAIN, IDS_ENCODING_MAIN);
         if (FAILED(hr))
             return hr;
@@ -117,7 +181,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
-
+        pCollection->Clear();
         if (codepages.empty())
             EnumSystemCodePages(CodePageEnumerator, CP_INSTALLED);
 
@@ -190,6 +254,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, cons
             if (selected > 1)
                 ++selected; // offset for missing "utf-8 BOM"
             UINT codepage = codepages[selected].codepage;
+            AddToMRU(codepages[selected]);
             ReloadTab(GetActiveTabIndex(), codepage);
             return hr;
         }
@@ -217,6 +282,14 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
 
+        pCollection->Clear();
+
+        if (!mrucodepages.empty())
+        {
+            hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MRU, IDS_ENCODING_MRU);
+            if (FAILED(hr))
+                return hr;
+        }
         hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MAIN, IDS_ENCODING_MAIN);
         if (FAILED(hr))
             return hr;
@@ -232,6 +305,8 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
+
+        pCollection->Clear();
 
         if (codepages.empty())
             EnumSystemCodePages(CodePageEnumerator, CP_INSTALLED);
@@ -299,6 +374,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, co
                 ScintillaCall(SCI_ADDUNDOACTION, 0,0);
                 ScintillaCall(SCI_UNDO);
                 UpdateStatusBar(true);
+                AddToMRU(codepages[selected]);
             }
             hr = S_OK;
         }
