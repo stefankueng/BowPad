@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-10-11 15:02+0100\n"
+"PO-Revision-Date: 2014-11-16 12:56+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.7\n"
+"X-Generator: Poedit 1.6.10\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -746,6 +746,10 @@ msgstr "FP"
 msgid "FSN"
 msgstr "FSN"
 
+#. Resource IDs: (3758)
+msgid "FT"
+msgstr "FT"
+
 #. Resource IDs: (9)
 msgid "Failed to download the list of available languages."
 msgstr "Konnte die Liste mit Sprachdateien nicht downloaden."
@@ -783,6 +787,10 @@ msgstr "Hole Sprachliste von Server..."
 #. Resource IDs: (3751)
 msgid "File"
 msgstr "Datei"
+
+#. Resource IDs: (3758)
+msgid "File Tree"
+msgstr "Dateibaum"
 
 #. Resource IDs: (11)
 msgid "File does not exist"
@@ -1420,6 +1428,10 @@ msgstr "E&rsetzen mit:"
 msgid "RELOAD"
 msgstr "RELOAD"
 
+#. Resource IDs: (14)
+msgid "Recently Used Encodings"
+msgstr "Zuletzt benutzte Kodierung"
+
 #. Resource IDs: (3754, 3755)
 msgid "Redo"
 msgstr "Wiederholen"
@@ -1653,6 +1665,10 @@ msgstr "Zeige Leerzeichen"
 msgid "Show line numbers"
 msgstr "Zeige Zeilennummern"
 
+#. Resource IDs: (3758)
+msgid "Show the file tree"
+msgstr "Zeige Dateibaum"
+
 #. Resource IDs: (3772)
 msgid "Shows a dialog to configure custom commands"
 msgstr "Zeigt den Konfigurationsdialog für Benutzerbefehle"
@@ -1665,6 +1681,10 @@ msgstr "Zeigt einen Dialog an um Plugins zu installieren und konfigurieren"
 #. Resource IDs: (3773)
 msgid "Shows a list of functions/methods in the file to jump to"
 msgstr "Zeigt eine Liste von Funktionen/Methoden an in der aktuellen Datei"
+
+#. Resource IDs: (3758)
+msgid "Shows or hides the file tree"
+msgstr "Zeigt den Dateibaum an oder versteckt diesen"
 
 #. Resource IDs: (3783)
 msgid "Shows statistics about the current document"
