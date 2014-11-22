@@ -273,6 +273,9 @@ int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lParamSort
 
 void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
 {
+    InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
+    InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+
     if (!force && !IsWindowVisible(*this))
         return;
 
@@ -470,6 +473,8 @@ void CFileTree::TabNotify(TBHDR * ptbhdr)
 {
     if ((ptbhdr->hdr.code == TCN_SELCHANGE))
     {
+        InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
+        InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         // remove the bold status from all items
         RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
         {

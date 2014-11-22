@@ -84,6 +84,8 @@ public:
     std::wstring        GetNewTabName();
     void                ShowFileTree(bool bShow);
     bool                IsFileTreeShown() const { return m_fileTreeVisible; }
+    std::wstring        GetFileTreePath() const { return m_fileTree.GetPath(); }
+
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
     IFACEMETHODIMP_(ULONG) AddRef();

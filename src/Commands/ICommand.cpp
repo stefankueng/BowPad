@@ -381,4 +381,10 @@ bool ICommand::IsFileTreeShown()
     return pMainWnd->IsFileTreeShown();
 }
 
+std::wstring ICommand::GetFileTreePath()
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->GetFileTreePath();
+}
+
 
