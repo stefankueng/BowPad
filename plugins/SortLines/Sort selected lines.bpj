@@ -4,15 +4,15 @@ function Version() { return 100; }
 function Execute()
 {
     // find the start and end line of the current selection
-    var start = BowPad.SciGetSelectionStart();
-    var end   = BowPad.SciGetSelectionEnd();
+    var start     = BowPad.SciGetSelectionStart();
+    var end       = BowPad.SciGetSelectionEnd();
     var startline = BowPad.SciLineFromPosition(start);
     var endline   = BowPad.SciLineFromPosition(end);
     // find the start and end position of the selected lines
     // these might be different if the selection is not over whole lines
     var startpos = BowPad.SciPositionFromLine(startline);
-    var endpos = BowPad.SciPositionFromLine(endline);
-    var lines = [];
+    var endpos   = BowPad.SciPositionFromLine(endline);
+    var lines    = [];
     // get the lines and put them into an array
     for (var i = startline; i < endline; ++i)
     {
@@ -27,10 +27,10 @@ function Execute()
     BowPad.SciDeleteRange(startpos, endpos-startpos);
     // now insert the lines again but this time sorted
     var arrlength = lines.length;
-    for (var i = 0; i < arrlength; ++i)
+    for (var j = 0; j < arrlength; ++j)
     {
-        BowPad.SciInsertText(startpos, lines[i]);
-        startpos += lines[i].length;
+        BowPad.SciInsertText(startpos, lines[j]);
+        startpos += lines[j].length;
     }
     // now we're finished, and this marks the undo action
 	BowPad.SciEndUndoAction();
