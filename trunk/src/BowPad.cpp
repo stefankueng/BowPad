@@ -117,6 +117,8 @@ static void RegisterContextMenu(bool bAdd)
         SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad\\Command", NULL, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
         SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad", NULL, REG_SZ, L"Open Folder with BowPad", sizeof(L"Open Folder with BowPad") + 2);
         SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
+
+        sExePath = CStringUtils::Format(L"%s /path:\"%%V\"", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str());
         SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad\\Command", NULL, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
     }
     else
