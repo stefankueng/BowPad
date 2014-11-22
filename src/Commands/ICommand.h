@@ -95,6 +95,7 @@ protected:
     std::string         GetCurrentLine();
     void                ShowFileTree(bool bShow);
     bool                IsFileTreeShown();
+    std::wstring        GetFileTreePath();
 
 
     HWND                GetHwnd() const;
