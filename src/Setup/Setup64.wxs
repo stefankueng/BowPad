@@ -54,7 +54,7 @@
             <RegistryValue Root="HKLM" Key="Software\Classes\Directory\shell\BowPad\command" Value='[INSTALLDIR]BowPad.exe /path:"%1"' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\Directory\Background\shell\BowPad" Value='Open Folder with BowPad' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\Directory\Background\shell\BowPad" Name="Icon" Value='[INSTALLDIR]BowPad.exe,-107' Type="string" />
-            <RegistryValue Root="HKLM" Key="Software\Classes\Directory\Background\shell\BowPad\command" Value='[INSTALLDIR]BowPad.exe /path:"%1"' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Classes\Directory\Background\shell\BowPad\command" Value='[INSTALLDIR]BowPad.exe /path:"%V"' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\BowPad" Name="installDir" Value='[INSTALLDIR]' Type="string" />
           </Component>
 
