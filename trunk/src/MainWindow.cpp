@@ -2495,7 +2495,12 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
     LPCTSTR path = parser.GetVal(L"path");
     if (path)
     {
-        if (OpenFile(path, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
+        if (PathIsDirectory(path))
+        {
+            m_fileTree.SetPath(path);
+            ShowFileTree(true);
+        }
+        else if (OpenFile(path, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
         {
             if (parser.HasVal(L"line"))
             {
@@ -2517,7 +2522,12 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
         {
             if (szArglist[i][0] != '/')
             {
-                if (OpenFile(szArglist[i], OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
+                if (PathIsDirectory(szArglist[i]))
+                {
+                    m_fileTree.SetPath(szArglist[i]);
+                    ShowFileTree(true);
+                }
+                else if (OpenFile(szArglist[i], OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
                     ++filesOpened;
             }
         }
