@@ -668,6 +668,12 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETUNDER, INDIC_URLHOTSPOTACTIVE, true);
     Call(SCI_INDICSETFORE, INDIC_URLHOTSPOTACTIVE, CTheme::Instance().GetThemeColor(RGB(0, 0, 255)));
 
+    Call(SCI_INDICSETSTYLE, INDIC_BRACEMATCH, INDIC_ROUNDBOX);
+    Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, 30);
+    Call(SCI_INDICSETOUTLINEALPHA, INDIC_BRACEMATCH, 0);
+    Call(SCI_INDICSETUNDER, INDIC_BRACEMATCH, true);
+    Call(SCI_INDICSETFORE, INDIC_BRACEMATCH, CTheme::Instance().GetThemeColor(RGB(0, 150, 0)));
+
     Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, CTheme::Instance().GetThemeColor(RGB(0,150,0)));
     Call(SCI_STYLESETBOLD, STYLE_BRACELIGHT, 1);
     Call(SCI_STYLESETFORE, STYLE_BRACEBAD, CTheme::Instance().GetThemeColor(RGB(255,0,0)));
@@ -895,6 +901,9 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
 
 void CScintillaWnd::MatchBraces()
 {
+    static int lastIndicatorStart = 0;
+    static int lastIndicatorLength = 0;
+
     int braceAtCaret = -1;
     int braceOpposite = -1;
 
@@ -931,10 +940,31 @@ void CScintillaWnd::MatchBraces()
     {
         Call(SCI_BRACEBADLIGHT, braceAtCaret);
         Call(SCI_SETHIGHLIGHTGUIDE, 0);
+        if (CIniSettings::Instance().GetInt64(L"View", L"bracehighlighttext", 1))
+        {
+            Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
+            Call(SCI_INDICATORCLEARRANGE, lastIndicatorStart, lastIndicatorLength);
+        }
     }
     else
     {
         Call(SCI_BRACEHIGHLIGHT, braceAtCaret, braceOpposite);
+        if (CIniSettings::Instance().GetInt64(L"View", L"bracehighlighttext", 1))
+        {
+            Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
+            Call(SCI_INDICATORCLEARRANGE, lastIndicatorStart, lastIndicatorLength);
+            lastIndicatorStart = braceAtCaret < braceOpposite ? braceAtCaret : braceOpposite;
+            lastIndicatorLength = braceAtCaret < braceOpposite ? braceOpposite - braceAtCaret : braceAtCaret - braceOpposite;
+            ++lastIndicatorLength;
+            int startLine = int(Call(SCI_LINEFROMPOSITION, lastIndicatorStart));
+            int endLine = int(Call(SCI_LINEFROMPOSITION, lastIndicatorStart + lastIndicatorLength));
+            if (endLine != startLine)
+                Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, CTheme::Instance().IsDarkTheme() ? 15 : 25);
+            else
+                Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, 40);
+
+            Call(SCI_INDICATORFILLRANGE, lastIndicatorStart, lastIndicatorLength);
+        }
 
         if (Call(SCI_GETINDENTATIONGUIDES) != 0)
         {
