@@ -1117,8 +1117,9 @@ bool CCmdHeaderSource::GetDefaultCorrespondingFileExtMappings(const std::wstring
         // Caller will try files in order of generated results.
             { L"cpp", L"hpp;h" },
             { L"cxx", L"hpp;h" },
-            { L"c",   L"h"     },
-            { L"h", L"c;cpp;cxx" },
+            { L"c", L"h" },
+            { L"cc", L"hpp;h" },
+            { L"h", L"c;cpp;cxx;cc" },
             { L"hpp", L"cpp;cxx" },
             { L"aspx.cs", L"aspx" },
             { L"aspx", L"aspx.cs;aspx.vb" }
