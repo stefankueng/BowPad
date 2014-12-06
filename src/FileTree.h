@@ -27,6 +27,7 @@ public:
     CFileTree(HINSTANCE hInst, void * obj)
         : CWindow(hInst)
         , ICommand(obj)
+        , m_bBlockRefresh(false)
     {};
     virtual ~CFileTree();
 
@@ -42,6 +43,8 @@ public:
     virtual bool Execute() override;
     virtual UINT GetCmdId() override;
 
+    void BlockRefresh(bool bBlock);
+
 protected:
     virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
@@ -51,4 +54,5 @@ protected:
 
 private:
     std::wstring        m_path;
+    bool                m_bBlockRefresh;
 };

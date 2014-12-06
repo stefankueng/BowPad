@@ -96,6 +96,7 @@ protected:
     void                ShowFileTree(bool bShow);
     bool                IsFileTreeShown();
     std::wstring        GetFileTreePath();
+    void                FileTreeBlockRefresh(bool bBlock);
 
 
     HWND                GetHwnd() const;

@@ -24,6 +24,7 @@
 #include "StringUtils.h"
 #include "IniSettings.h"
 #include "CmdLineParser.h"
+#include "OnOutOfScope.h"
 
 namespace
 {
@@ -95,6 +96,8 @@ void CCmdSessionLoad::OnClose()
 void CCmdSessionLoad::RestoreSavedSession()
 {
     int activeDoc = -1;
+    FileTreeBlockRefresh(true);
+    OnOutOfScope(FileTreeBlockRefresh(false));
     for (int i = 0; i < BP_MAX_SESSION_SIZE; ++i)
     {
         std::wstring key = CStringUtils::Format(L"path%d", i);
