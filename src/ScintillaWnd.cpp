@@ -79,11 +79,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     m_docScroll.InitScintilla(this);
 
-#ifdef _DEBUG
     bool bUseD2D = CIniSettings::Instance().GetInt64(L"View", L"d2d", 1) != 0;
-#else
-    bool bUseD2D = CIniSettings::Instance().GetInt64(L"View", L"d2d", 0) != 0;
-#endif
     Call(SCI_SETTECHNOLOGY, bUseD2D ? SC_TECHNOLOGY_DIRECTWRITERETAIN : SC_TECHNOLOGY_DEFAULT);
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
