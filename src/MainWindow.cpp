@@ -2393,12 +2393,14 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 // if it's disabled, a modal dialog is shown
                 // (e.g., the handle-outside-modifications confirmation dialog)
                 // and we then must not change the active tab.
-
+                bool bResize = m_fileTree.GetPath().empty() && !doc.m_path.empty();
                 m_TabBar.ActivateAt(index);
                 if (ext.empty())
                     m_editor.SetupLexerForLang(doc.m_language);
                 else
                     m_editor.SetupLexerForExt(ext);
+                if (bResize)
+                    ResizeChildWindows();
             }
             else // See comment above.
                 m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
