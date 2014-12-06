@@ -85,6 +85,7 @@ public:
     void                ShowFileTree(bool bShow);
     bool                IsFileTreeShown() const { return m_fileTreeVisible; }
     std::wstring        GetFileTreePath() const { return m_fileTree.GetPath(); }
+    void                FileTreeBlockRefresh(bool bBlock) { m_fileTree.BlockRefresh(bBlock); }
 
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);

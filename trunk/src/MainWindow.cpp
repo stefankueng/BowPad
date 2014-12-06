@@ -1037,6 +1037,8 @@ void CMainWindow::HandleAfterInit()
 {
     UpdateWindow(*this);
     CCommandHandler::Instance().AfterInit();
+    FileTreeBlockRefresh(true);
+    OnOutOfScope(FileTreeBlockRefresh(false));
     for (const auto& path : m_pathsToOpen)
     {
         unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
@@ -2472,6 +2474,8 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         files.push_back(pathBuf.get());
     }
     DragFinish(hDrop);
+    FileTreeBlockRefresh(true);
+    OnOutOfScope(FileTreeBlockRefresh(false));
     for (const auto& filename : files)
     {
         if (PathIsDirectory(filename.c_str()))
@@ -2524,6 +2528,8 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
         if (!szArglist)
             return;
 
+        FileTreeBlockRefresh(true);
+        OnOutOfScope(FileTreeBlockRefresh(false));
         int filesOpened = 0;
         for (int i = 1; i < nArgs; i++)
         {

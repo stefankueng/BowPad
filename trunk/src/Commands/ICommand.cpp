@@ -387,4 +387,10 @@ std::wstring ICommand::GetFileTreePath()
     return pMainWnd->GetFileTreePath();
 }
 
+void ICommand::FileTreeBlockRefresh(bool bBlock)
+{
+    CMainWindow * pMainWnd = static_cast<CMainWindow*>(m_Obj);
+    return pMainWnd->FileTreeBlockRefresh(bBlock);
+}
+
 
