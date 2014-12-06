@@ -290,15 +290,10 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         UINT elapse = (UINT)CIniSettings::Instance().GetInt64(L"View", L"hidecursortimeout", 3000);
         if (elapse != 0)
             SetTimer(*this, TIM_HIDECURSOR, elapse, NULL);
+        Call(SCI_SETCURSOR, (uptr_t)-1);
+        m_bCursorShown = true;
     }
-    // intentional fall through
-    case WM_MOUSELEAVE:
-        if (!m_bCursorShown)
-        {
-            ShowCursor(TRUE);
-            m_bCursorShown = true;
-        }
-        break;
+    break;
     case WM_TIMER:
         if (wParam == TIM_HIDECURSOR)
         {
@@ -313,19 +308,22 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 pt.y = GET_Y_LPARAM(pos);
                 if (PtInRect(&rc, pt))
                 {
-                    ShowCursor(FALSE);
                     m_bCursorShown = false;
-                    TRACKMOUSEEVENT tme = { 0 };
-                    tme.cbSize = sizeof(TRACKMOUSEEVENT);
-                    tme.dwFlags = TME_LEAVE;
-                    tme.hwndTrack = *this;
-                    TrackMouseEvent(&tme);
+                    SetCursor(NULL);
+                    Call(SCI_SETCURSOR, (uptr_t)-2);
                 }
             }
         }
         break;
     case WM_SETCURSOR:
         {
+            if (!m_bCursorShown)
+            {
+                SetCursor(NULL);
+                Call(SCI_SETCURSOR, (uptr_t)-2);
+            }
+            else
+                Call(SCI_SETCURSOR, (uptr_t)-1);
             // Change the indic over urls if the cursor is over them,
             // and change the cursor to a hand if the ctrl key is pressed
             // over an url to indicate that a ctrl+doubleclick opens the url
