@@ -278,6 +278,8 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
 
     if (!force && !IsWindowVisible(*this))
         return;
+    if (m_bBlockRefresh)
+        return;
 
     std::wstring activepath;
     if (HasActiveDocument())
@@ -520,6 +522,16 @@ void CFileTree::TabNotify(TBHDR * ptbhdr)
             }
         }
     }
+}
+
+void CFileTree::BlockRefresh(bool bBlock)
+{
+    if (m_bBlockRefresh && !bBlock)
+    {
+        m_bBlockRefresh = bBlock;
+        Refresh(TVI_ROOT, false);
+    }
+    m_bBlockRefresh = bBlock;
 }
 
 
