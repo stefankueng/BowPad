@@ -2332,6 +2332,11 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
             else
                 doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
+            if ((CPathUtils::PathCompare(filepath, m_tabmovepath) == 0) && m_tabmovemod)
+            {
+                doc.m_path = m_tabmovesavepath;
+                filepath = m_tabmovesavepath;
+            }
             m_DocManager.AddDocumentAtEnd(doc, id);
 
             // We've loaded a new document, now we'd like to activate it.

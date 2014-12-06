@@ -326,6 +326,8 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
         else
             return;
     }
+    if (refreshPath.empty())
+        return;
     CDirFileEnum enumerator(refreshPath);
     bool bIsDir = false;
     std::wstring path;
