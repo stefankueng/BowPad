@@ -1383,6 +1383,8 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
 
 bool CMainWindow::CloseAllTabs()
 {
+    FileTreeBlockRefresh(true);
+    OnOutOfScope(FileTreeBlockRefresh(false));
     do
     {
         if (CloseTab(m_TabBar.GetItemCount()-1) == false)
@@ -1395,6 +1397,8 @@ bool CMainWindow::CloseAllTabs()
 
 void CMainWindow::CloseAllButCurrentTab()
 {
+    FileTreeBlockRefresh(true);
+    OnOutOfScope(FileTreeBlockRefresh(false));
     int count = m_TabBar.GetItemCount();
     int current = m_TabBar.GetCurrentTabIndex();
     for (int i = count-1; i >= 0; --i)
