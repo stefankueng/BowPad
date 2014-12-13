@@ -130,7 +130,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, 
             if (CTheme::Instance().IsDarkTheme())
             {
                 HDC hDC = (HDC)wParam;
-                ::SetBkColor(hDC, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOW)));
+                ::SetBkColor(hDC, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
                 RECT rect;
                 GetClientRect(*this, &rect);
                 ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rect, NULL, 0, NULL);

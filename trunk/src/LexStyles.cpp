@@ -30,8 +30,8 @@ std::map<int, std::string> emptyIntStrVec;
 std::string emptyString;
 std::vector<std::string> emptyStringVector;
 
-static COLORREF fgColor = ::GetSysColor(COLOR_WINDOWTEXT);
-static COLORREF bgColor = ::GetSysColor(COLOR_WINDOW);
+static COLORREF fgColor = RGB(0, 0, 0);
+static COLORREF bgColor = RGB(255, 255, 255);
 };
 
 StyleData::StyleData()
