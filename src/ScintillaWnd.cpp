@@ -290,8 +290,11 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         UINT elapse = (UINT)CIniSettings::Instance().GetInt64(L"View", L"hidecursortimeout", 3000);
         if (elapse != 0)
             SetTimer(*this, TIM_HIDECURSOR, elapse, NULL);
-        Call(SCI_SETCURSOR, (uptr_t)-1);
-        m_bCursorShown = true;
+        if (!m_bCursorShown)
+        {
+            Call(SCI_SETCURSOR, (uptr_t)-1);
+            m_bCursorShown = true;
+        }
     }
     break;
     case WM_TIMER:
@@ -322,8 +325,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 SetCursor(NULL);
                 Call(SCI_SETCURSOR, (uptr_t)-2);
             }
-            else
-                Call(SCI_SETCURSOR, (uptr_t)-1);
+
             // Change the indic over urls if the cursor is over them,
             // and change the cursor to a hand if the ctrl key is pressed
             // over an url to indicate that a ctrl+doubleclick opens the url
