@@ -54,7 +54,8 @@ extern IUIFramework * g_pFramework;
 extern std::string    sHighlightString;  // from CmdFindReplace
 
 
-#define TIM_HIDECURSOR 101
+#define TIM_HIDECURSOR              101
+#define TIM_BRACEHIGHLIGHTTEXT      102
 
 bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 {
@@ -298,24 +299,29 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
     }
     break;
     case WM_TIMER:
-        if (wParam == TIM_HIDECURSOR)
+        switch (wParam)
         {
-            // hide the mouse cursor so it does not get in the way
-            if (m_bCursorShown)
-            {
-                RECT rc;
-                GetWindowRect(*this, &rc);
-                DWORD pos = GetMessagePos();
-                POINT pt;
-                pt.x = GET_X_LPARAM(pos);
-                pt.y = GET_Y_LPARAM(pos);
-                if (PtInRect(&rc, pt))
+            case TIM_HIDECURSOR:
+                // hide the mouse cursor so it does not get in the way
+                if (m_bCursorShown)
                 {
-                    m_bCursorShown = false;
-                    SetCursor(NULL);
-                    Call(SCI_SETCURSOR, (uptr_t)-2);
+                    RECT rc;
+                    GetWindowRect(*this, &rc);
+                    DWORD pos = GetMessagePos();
+                    POINT pt;
+                    pt.x = GET_X_LPARAM(pos);
+                    pt.y = GET_Y_LPARAM(pos);
+                    if (PtInRect(&rc, pt))
+                    {
+                        m_bCursorShown = false;
+                        SetCursor(NULL);
+                        Call(SCI_SETCURSOR, (uptr_t)-2);
+                    }
                 }
-            }
+                break;
+            case TIM_BRACEHIGHLIGHTTEXT:
+                MatchBraces(true);
+                break;
         }
         break;
     case WM_SETCURSOR:
@@ -895,16 +901,25 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     }
 }
 
-void CScintillaWnd::MatchBraces()
+void CScintillaWnd::MatchBraces( bool delayed )
 {
     static int lastIndicatorStart = 0;
     static int lastIndicatorLength = 0;
+    static int lastCaretPos = 0;
 
     int braceAtCaret = -1;
     int braceOpposite = -1;
 
     // find matching brace position
     int caretPos = int(Call(SCI_GETCURRENTPOS));
+
+    // setting the highlighting style triggers an UI update notification,
+    // which in return calls MatchBraces(false). So to avoid an endless
+    // loop, we bail out if the caret position has not changed.
+    if (!delayed && (caretPos == lastCaretPos))
+        return;
+    lastCaretPos = caretPos;
+
     WCHAR charBefore = '\0';
 
     int lengthDoc = int(Call(SCI_GETLENGTH));
@@ -932,14 +947,16 @@ void CScintillaWnd::MatchBraces()
         braceOpposite = int(Call(SCI_BRACEMATCH, braceAtCaret, 0));
 
 
+    KillTimer(*this, TIM_BRACEHIGHLIGHTTEXT);
     if ((braceAtCaret != -1) && (braceOpposite == -1))
     {
         Call(SCI_BRACEBADLIGHT, braceAtCaret);
         Call(SCI_SETHIGHLIGHTGUIDE, 0);
-        if (CIniSettings::Instance().GetInt64(L"View", L"bracehighlighttext", 1))
+        if (lastIndicatorLength && CIniSettings::Instance().GetInt64(L"View", L"bracehighlighttext", 1))
         {
             Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
             Call(SCI_INDICATORCLEARRANGE, lastIndicatorStart, lastIndicatorLength);
+            lastIndicatorLength = 0;
         }
     }
     else
@@ -947,19 +964,28 @@ void CScintillaWnd::MatchBraces()
         Call(SCI_BRACEHIGHLIGHT, braceAtCaret, braceOpposite);
         if (CIniSettings::Instance().GetInt64(L"View", L"bracehighlighttext", 1))
         {
-            Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
-            Call(SCI_INDICATORCLEARRANGE, lastIndicatorStart, lastIndicatorLength);
-            lastIndicatorStart = braceAtCaret < braceOpposite ? braceAtCaret : braceOpposite;
-            lastIndicatorLength = braceAtCaret < braceOpposite ? braceOpposite - braceAtCaret : braceAtCaret - braceOpposite;
-            ++lastIndicatorLength;
-            int startLine = int(Call(SCI_LINEFROMPOSITION, lastIndicatorStart));
-            int endLine = int(Call(SCI_LINEFROMPOSITION, lastIndicatorStart + lastIndicatorLength));
-            if (endLine != startLine)
-                Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, CTheme::Instance().IsDarkTheme() ? 15 : 25);
-            else
-                Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, 40);
+            if (lastIndicatorLength)
+            {
+                Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
+                Call(SCI_INDICATORCLEARRANGE, lastIndicatorStart, lastIndicatorLength);
+            }
+            if (delayed)
+            {
+                Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
+                lastIndicatorStart = braceAtCaret < braceOpposite ? braceAtCaret : braceOpposite;
+                lastIndicatorLength = braceAtCaret < braceOpposite ? braceOpposite - braceAtCaret : braceAtCaret - braceOpposite;
+                ++lastIndicatorLength;
+                int startLine = int(Call(SCI_LINEFROMPOSITION, lastIndicatorStart));
+                int endLine = int(Call(SCI_LINEFROMPOSITION, lastIndicatorStart + lastIndicatorLength));
+                if (endLine != startLine)
+                    Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, CTheme::Instance().IsDarkTheme() ? 15 : 25);
+                else
+                    Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, 40);
 
-            Call(SCI_INDICATORFILLRANGE, lastIndicatorStart, lastIndicatorLength);
+                Call(SCI_INDICATORFILLRANGE, lastIndicatorStart, lastIndicatorLength);
+            }
+            else
+                SetTimer(*this, TIM_BRACEHIGHLIGHTTEXT, 1000, NULL);
         }
 
         if (Call(SCI_GETINDENTATIONGUIDES) != 0)
