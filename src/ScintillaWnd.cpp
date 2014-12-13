@@ -640,11 +640,11 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_STYLESETBOLD, STYLE_DEFAULT, bBold);
     Call(SCI_STYLESETITALIC, STYLE_DEFAULT, bItalic);
     Call(SCI_STYLESETSIZE, STYLE_DEFAULT, fontsize);
-    Call(SCI_STYLESETFORE, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
-    Call(SCI_STYLESETBACK, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOW)));
+    Call(SCI_STYLESETFORE, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
+    Call(SCI_STYLESETBACK, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
 
-    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_GRAYTEXT)));
-    Call(SCI_STYLESETBACK, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
+    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(109, 109, 109)));
+    Call(SCI_STYLESETBACK, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(240, 240, 240)));
 
     Call(SCI_INDICSETSTYLE, INDIC_SELECTION_MARK, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_SELECTION_MARK, 50);
@@ -684,8 +684,8 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETUNDER, INDIC_TAGMATCH, true);
     Call(SCI_INDICSETUNDER, INDIC_TAGATTR, true);
 
-    Call(SCI_SETFOLDMARGINCOLOUR, true, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
-    Call(SCI_SETFOLDMARGINHICOLOUR, true, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DHIGHLIGHT)));
+    Call(SCI_SETFOLDMARGINCOLOUR, true, CTheme::Instance().GetThemeColor(RGB(240, 240, 240)));
+    Call(SCI_SETFOLDMARGINHICOLOUR, true, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
 
     SetTabSettings();
     Call(SCI_SETINDENTATIONGUIDES, SC_IV_LOOKBOTH);
@@ -708,11 +708,11 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, foldmarkback);
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, foldmarkback);
 
-    Call(SCI_STYLESETFORE, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
-    Call(SCI_STYLESETBACK, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOW)));
-    Call(SCI_SETSELFORE, TRUE, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_HIGHLIGHTTEXT)));
-    Call(SCI_SETSELBACK, TRUE, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_HIGHLIGHT)));
-    Call(SCI_SETCARETFORE, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
+    Call(SCI_STYLESETFORE, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
+    Call(SCI_STYLESETBACK, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
+    Call(SCI_SETSELFORE, TRUE, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
+    Call(SCI_SETSELBACK, TRUE, CTheme::Instance().GetThemeColor(RGB(255, 153, 51)));
+    Call(SCI_SETCARETFORE, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
 
     if (CTheme::Instance().IsDarkTheme())
     {
@@ -721,7 +721,7 @@ void CScintillaWnd::SetupDefaultStyles()
     }
     else
     {
-        Call(SCI_SETCARETLINEBACK, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
+        Call(SCI_SETCARETLINEBACK, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
         Call(SCI_SETCARETLINEBACKALPHA, 15);
     }
     Call(SCI_SETWHITESPACEFORE, true, CTheme::Instance().GetThemeColor(RGB(255, 181, 106)));
