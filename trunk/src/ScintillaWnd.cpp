@@ -719,7 +719,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_STYLESETFORE, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
     Call(SCI_STYLESETBACK, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
     Call(SCI_SETSELFORE, TRUE, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
-    Call(SCI_SETSELBACK, TRUE, CTheme::Instance().GetThemeColor(RGB(255, 153, 51)));
+    Call(SCI_SETSELBACK, TRUE, CTheme::Instance().GetThemeColor(RGB(51, 153, 255)));
     Call(SCI_SETCARETFORE, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
 
     if (CTheme::Instance().IsDarkTheme())
