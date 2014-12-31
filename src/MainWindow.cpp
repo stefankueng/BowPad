@@ -2009,7 +2009,8 @@ bool CMainWindow::HandleDoubleClick(const Scintilla::SCNotification& scn)
     }
 
     std::string urltext = m_editor.GetTextRange(startPos, endPos);
-
+    if (urltext.empty())
+        return false;
     // This treatment would fail on some valid URLs where there's actually supposed to be a comma or parenthesis at the end.
     size_t lastCharIndex = urltext.size() - 1;
     while (lastCharIndex > 0 && (urltext[lastCharIndex] == ',' || urltext[lastCharIndex] == ')' || urltext[lastCharIndex] == '('))
