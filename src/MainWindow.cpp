@@ -2343,6 +2343,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             if ((CPathUtils::PathCompare(filepath, m_tabmovepath) == 0) && m_tabmovemod)
             {
                 doc.m_path = m_tabmovesavepath;
+                m_DocManager.UpdateFileTime(doc, true);
                 filepath = m_tabmovesavepath;
             }
             m_DocManager.AddDocumentAtEnd(doc, id);
