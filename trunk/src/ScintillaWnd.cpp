@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -429,8 +429,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                         break;
                     }
                     // Get all the vertical scroll bar information
-                    int scrollX = (gi.ptsLocation.x - lastX) / scale;;
-                    int scrollY = (gi.ptsLocation.y - lastY) / scale;;
+                    int scrollX = (gi.ptsLocation.x - lastX) / scale;
+                    int scrollY = (gi.ptsLocation.y - lastY) / scale;
 
                     SCROLLINFO siv = { 0 };
                     siv.cbSize = sizeof(siv);

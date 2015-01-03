@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -335,7 +335,7 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
     std::wstring path;
     while (enumerator.NextFile(path, &bIsDir, false))
     {
-        FileTreeItem * fi = new FileTreeItem();;
+        FileTreeItem * fi = new FileTreeItem();
         fi->path = path;
         fi->isDir = bIsDir;
 
