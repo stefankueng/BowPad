@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1251,7 +1251,8 @@ void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& sa
         UpdateCaptionBar();
         UpdateStatusBar(true);
         GoToLine(line);
-
+        m_fileTree.SetPath(CPathUtils::GetParentDirectory(savepath));
+        ResizeChildWindows();
         // delete the temp file used for the elevated save
         DeleteFile(path.c_str());
     }
@@ -2894,6 +2895,9 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
     UpdateStatusBar(true);
 
     GoToLine(line);
+
+    m_fileTree.SetPath(CPathUtils::GetParentDirectory(savepath));
+    ResizeChildWindows();
 
     DeleteFile(filepath.c_str());
 }
