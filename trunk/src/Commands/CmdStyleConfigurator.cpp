@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -216,9 +216,9 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                             fsize.clear();
                         SendDlgItemMessage(*this, IDC_FONTSIZECOMBO, CB_SELECTSTRING, (WPARAM)-1, (LPARAM)fsize.c_str());
 
-                        SendDlgItemMessage(*this, IDC_BOLDCHECK,      BM_SETCHECK, foundStyle->second.FontStyle & FONTSTYLE_BOLD       ? BST_CHECKED : BST_UNCHECKED, NULL);
-                        SendDlgItemMessage(*this, IDC_ITALICCHECK,    BM_SETCHECK, foundStyle->second.FontStyle & FONTSTYLE_ITALIC     ? BST_CHECKED : BST_UNCHECKED, NULL);
-                        SendDlgItemMessage(*this, IDC_UNDERLINECHECK, BM_SETCHECK, foundStyle->second.FontStyle & FONTSTYLE_UNDERLINED ? BST_CHECKED : BST_UNCHECKED, NULL);
+                        SendDlgItemMessage(*this, IDC_BOLDCHECK,      BM_SETCHECK, (foundStyle->second.FontStyle & FONTSTYLE_BOLD)       ? BST_CHECKED : BST_UNCHECKED, NULL);
+                        SendDlgItemMessage(*this, IDC_ITALICCHECK,    BM_SETCHECK, (foundStyle->second.FontStyle & FONTSTYLE_ITALIC)     ? BST_CHECKED : BST_UNCHECKED, NULL);
+                        SendDlgItemMessage(*this, IDC_UNDERLINECHECK, BM_SETCHECK, (foundStyle->second.FontStyle & FONTSTYLE_UNDERLINED) ? BST_CHECKED : BST_UNCHECKED, NULL);
 
                         m_fgColor.SetColor(foundStyle->second.ForegroundColor);
                         m_bkColor.SetColor(foundStyle->second.BackgroundColor);
@@ -326,9 +326,9 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         CLexStyles::Instance().SetUserFontStyle(lexData.ID, styleIndex, fstyle);
                         if (updateView)
                         {
-                            ScintillaCall(SCI_STYLESETBOLD, styleIndex, fstyle & FONTSTYLE_BOLD ? 1 : 0);
-                            ScintillaCall(SCI_STYLESETITALIC, styleIndex, fstyle & FONTSTYLE_ITALIC ? 1 : 0);
-                            ScintillaCall(SCI_STYLESETUNDERLINE, styleIndex, fstyle & FONTSTYLE_UNDERLINED ? 1 : 0);
+                            ScintillaCall(SCI_STYLESETBOLD, styleIndex, (fstyle & FONTSTYLE_BOLD) ? 1 : 0);
+                            ScintillaCall(SCI_STYLESETITALIC, styleIndex, (fstyle & FONTSTYLE_ITALIC) ? 1 : 0);
+                            ScintillaCall(SCI_STYLESETUNDERLINE, styleIndex, (fstyle & FONTSTYLE_UNDERLINED) ? 1 : 0);
                         }
                     }
                     break;
