@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -584,18 +584,6 @@ void CCmdHeaderSource::HandleCorrespondingFileMenuItem(const RelatedFileItem& it
 {
     SetInsertionIndex(GetActiveTabIndex());
     OpenFile(item.Path.c_str(), OpenFlags::AddToMRU);
-}
-
-void CCmdHeaderSource::HandleOpenFileMenuItem()
-{
-    std::wstring defaultFolder;
-
-    std::wstring fileToOpen;
-    if (!UserFindFile(GetHwnd(), L"", defaultFolder, fileToOpen))
-        return;
-
-    if (!OpenFileAsLanguage(fileToOpen))
-        return;
 }
 
 bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
