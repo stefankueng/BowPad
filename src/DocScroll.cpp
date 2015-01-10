@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -99,46 +99,53 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
         case HTSCROLL_LEFT:
             {
                 Gdiplus::Graphics graphics(pCustDraw->hdc);
-                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+                Gdiplus::Bitmap bitmap(pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top);
+                Gdiplus::Graphics graphicsd(&bitmap);
+                graphicsd.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+
                 Gdiplus::Color c1;
                 c1.SetFromCOLORREF(scroll);
                 Gdiplus::SolidBrush brush(c1);
-                graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
+                graphicsd.FillRectangle(&brush, 0, 0, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
 
                 Gdiplus::Point trianglepts[3];
-                trianglepts[0].X = pCustDraw->rect.left + margin;
-                trianglepts[0].Y = pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)/2;
-                trianglepts[1].X = pCustDraw->rect.right - margin;
-                trianglepts[1].Y = pCustDraw->rect.top + margin;
+                trianglepts[0].X = margin;
+                trianglepts[0].Y = (pCustDraw->rect.bottom-pCustDraw->rect.top)/2;
+                trianglepts[1].X = pCustDraw->rect.right - pCustDraw->rect.left - margin;
+                trianglepts[1].Y = margin;
                 trianglepts[2].X = trianglepts[1].X;
-                trianglepts[2].Y = pCustDraw->rect.bottom - margin;
+                trianglepts[2].Y = pCustDraw->rect.bottom - pCustDraw->rect.top - margin;
                 Gdiplus::Color c2;
                 c2.SetFromCOLORREF(thumb);
                 Gdiplus::SolidBrush tribrush(c2);
-                graphics.FillPolygon(&tribrush, trianglepts, 3);
-            }
+                graphicsd.FillPolygon(&tribrush, trianglepts, 3);
+                graphics.DrawImage(&bitmap, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top);
+        }
             break;
         case HTSCROLL_RIGHT:
             {
                 Gdiplus::Graphics graphics(pCustDraw->hdc);
-                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+                Gdiplus::Bitmap bitmap(pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top);
+                Gdiplus::Graphics graphicsd(&bitmap);
+                graphicsd.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
                 Gdiplus::Color c1;
                 c1.SetFromCOLORREF(scroll);
                 Gdiplus::SolidBrush brush(c1);
-                graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
+                graphicsd.FillRectangle(&brush, 0, 0, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
 
                 Gdiplus::Point trianglepts[3];
-                trianglepts[0].X = pCustDraw->rect.right - margin;
-                trianglepts[0].Y = pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)/2;
-                trianglepts[1].X = pCustDraw->rect.left + margin;
-                trianglepts[1].Y = pCustDraw->rect.top + margin;
+                trianglepts[0].X = pCustDraw->rect.right - pCustDraw->rect.left - margin;
+                trianglepts[0].Y = (pCustDraw->rect.bottom-pCustDraw->rect.top)/2;
+                trianglepts[1].X = margin;
+                trianglepts[1].Y = margin;
                 trianglepts[2].X = trianglepts[1].X;
-                trianglepts[2].Y = pCustDraw->rect.bottom - margin;
+                trianglepts[2].Y = pCustDraw->rect.bottom - pCustDraw->rect.top - margin;
                 Gdiplus::Color c2;
                 c2.SetFromCOLORREF(thumb);
                 Gdiplus::SolidBrush tribrush(c2);
-                graphics.FillPolygon(&tribrush, trianglepts, 3);
-            }
+                graphicsd.FillPolygon(&tribrush, trianglepts, 3);
+                graphics.DrawImage(&bitmap, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top);
+        }
             break;
         case HTSCROLL_THUMB:
             FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, thumb);
@@ -161,46 +168,52 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
         case HTSCROLL_DOWN:
             {
                 Gdiplus::Graphics graphics(pCustDraw->hdc);
-                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+                Gdiplus::Bitmap bitmap(pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top, &graphics);
+                Gdiplus::Graphics graphicsd(&bitmap);
+                graphicsd.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
                 Gdiplus::Color c1;
                 c1.SetFromCOLORREF(scroll);
                 Gdiplus::SolidBrush brush(c1);
-                graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
+                graphicsd.FillRectangle(&brush, 0, 0, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
 
                 Gdiplus::Point trianglepts[3];
-                trianglepts[0].X = pCustDraw->rect.left + (pCustDraw->rect.right-pCustDraw->rect.left)/2;
-                trianglepts[0].Y = pCustDraw->rect.bottom - margin;
-                trianglepts[1].X = pCustDraw->rect.left + margin;
-                trianglepts[1].Y = pCustDraw->rect.top + margin;
-                trianglepts[2].X = pCustDraw->rect.right - margin;
-                trianglepts[2].Y = pCustDraw->rect.top + margin;
+                trianglepts[0].X = (pCustDraw->rect.right-pCustDraw->rect.left)/2;
+                trianglepts[0].Y = pCustDraw->rect.bottom - pCustDraw->rect.top - margin;
+                trianglepts[1].X = margin;
+                trianglepts[1].Y = margin;
+                trianglepts[2].X = pCustDraw->rect.right - pCustDraw->rect.left - margin;
+                trianglepts[2].Y = margin;
                 Gdiplus::Color c2;
                 c2.SetFromCOLORREF(thumb);
                 Gdiplus::SolidBrush tribrush(c2);
-                graphics.FillPolygon(&tribrush, trianglepts, 3);
-            }
+                graphicsd.FillPolygon(&tribrush, trianglepts, 3);
+                graphics.DrawImage(&bitmap, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top);
+        }
             break;
         case HTSCROLL_UP:
             {
                 Gdiplus::Graphics graphics(pCustDraw->hdc);
-                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+                Gdiplus::Bitmap bitmap(pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top, &graphics);
+                Gdiplus::Graphics graphicsd(&bitmap);
+                graphicsd.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
                 Gdiplus::Color c1;
                 c1.SetFromCOLORREF(scroll);
                 Gdiplus::SolidBrush brush(c1);
-                graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
+                graphicsd.FillRectangle(&brush, 0, 0, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
 
                 Gdiplus::Point trianglepts[3];
-                trianglepts[0].X = pCustDraw->rect.left + (pCustDraw->rect.right-pCustDraw->rect.left)/2;
-                trianglepts[0].Y = pCustDraw->rect.top + margin;
-                trianglepts[1].X = pCustDraw->rect.left + margin;
-                trianglepts[1].Y = pCustDraw->rect.bottom - margin;
-                trianglepts[2].X = pCustDraw->rect.right - margin;
-                trianglepts[2].Y = pCustDraw->rect.bottom - margin;
+                trianglepts[0].X = (pCustDraw->rect.right-pCustDraw->rect.left)/2;
+                trianglepts[0].Y = margin;
+                trianglepts[1].X = margin;
+                trianglepts[1].Y = pCustDraw->rect.bottom - pCustDraw->rect.top - margin;
+                trianglepts[2].X = pCustDraw->rect.right - pCustDraw->rect.left - margin;
+                trianglepts[2].Y = pCustDraw->rect.bottom - pCustDraw->rect.top - margin;
                 Gdiplus::Color c2;
                 c2.SetFromCOLORREF(thumb);
                 Gdiplus::SolidBrush tribrush(c2);
-                graphics.FillPolygon(&tribrush, trianglepts, 3);
-            }
+                graphicsd.FillPolygon(&tribrush, trianglepts, 3);
+                graphics.DrawImage(&bitmap, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top);
+        }
             break;
         case HTSCROLL_THUMB:
             {
@@ -229,10 +242,12 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
         case HTSCROLL_PAGEFULL:
             {
                 Gdiplus::Graphics graphics(pCustDraw->hdc);
+                Gdiplus::Bitmap bitmap(pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top, &graphics);
+                Gdiplus::Graphics graphicsd(&bitmap);
                 Gdiplus::Color c1;
                 c1.SetFromCOLORREF(scroll);
                 Gdiplus::SolidBrush brush(c1);
-                graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
+                graphicsd.FillRectangle(&brush, 0, 0, pCustDraw->rect.right-pCustDraw->rect.left, pCustDraw->rect.bottom-pCustDraw->rect.top);
 
                 if (m_bDirty)
                     CalcLines();
@@ -244,28 +259,29 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw( WPARAM /*wParam*/, NMCSBCUSTOMDRA
                 int colwidth = width / (colcount-1);
                 for (int c = 1; c < colcount; ++c)
                 {
-                    int drawx = pCustDraw->rect.left + (c-1)*colwidth;
+                    int drawx = (c-1)*colwidth;
                     for (auto line : m_visibleLineColors[c])
                     {
-                        LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*line.first/m_lines);
+                        LONG linepos = LONG((pCustDraw->rect.bottom-pCustDraw->rect.top)*line.first/m_lines);
                         if ((linepos > (lastLinePos+1)) || (lastColor != line.second))
                         {
                             Gdiplus::Color c2(150, GetRValue(line.second), GetGValue(line.second), GetBValue(line.second));
                             c2.SetFromCOLORREF(line.second);
                             Gdiplus::SolidBrush brushline(c2);
-                            graphics.FillRectangle(&brushline, drawx, linepos, colwidth, 2);
+                            graphicsd.FillRectangle(&brushline, drawx, linepos, colwidth, 2);
                             lastLinePos = linepos;
                             lastColor = line.second;
                         }
                     }
                 }
-                LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom-pCustDraw->rect.top)*m_curPosVisLine/m_lines);
+                LONG linepos = LONG((pCustDraw->rect.bottom-pCustDraw->rect.top)*m_curPosVisLine/m_lines);
 
                 Gdiplus::Color c3;
                 c3.SetFromCOLORREF(m_curPosColor);
                 Gdiplus::SolidBrush brushcurline(c3);
-                graphics.FillRectangle(&brushcurline, pCustDraw->rect.left, linepos, pCustDraw->rect.right-pCustDraw->rect.left, 2);
-            }
+                graphicsd.FillRectangle(&brushcurline, 0, linepos, pCustDraw->rect.right-pCustDraw->rect.left, 2);
+                graphics.DrawImage(&bitmap, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top);
+        }
             break;
         }
         return CDRF_SKIPDEFAULT;
