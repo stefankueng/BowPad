@@ -784,7 +784,7 @@ static LRESULT PostMouseNotify0(HWND hwnd, UINT msg, UINT nBar, RECT *prect, UIN
 //  specified portion in an active state or not.
 //
 //
-static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdc, const RECT *rect, UINT uDrawFlags)
+static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const RECT *rect, UINT uDrawFlags)
 {
     SCROLLINFO *si;
     RECT ctrl, thumb, fullpage;
@@ -815,6 +815,14 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdc, const RECT *r
     if(scrollwidth <= 0)
         return 0;
 
+    RotateRect0(sb, rect);
+    HDC hdc = CreateCompatibleDC(hdcorig);
+    HBITMAP hBitmap = CreateCompatibleBitmap(hdcorig, rect->right - rect->left, rect->bottom - rect->top);
+    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hdc, hBitmap);
+    SetWindowOrgEx(hdc, rect->left, rect->top, NULL);
+    RotateRect0(sb, rect);
+
+
     si = &sb->scrollInfo;
     siMaxMin = si->nMax - si->nMin;
 
@@ -828,7 +836,7 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdc, const RECT *r
     if(sb->fScrollFlags & ESB_DISABLE_LEFT)     uLeftButFlags  |= DFCS_INACTIVE;
     if(sb->fScrollFlags & ESB_DISABLE_RIGHT)    uRightButFlags |= DFCS_INACTIVE;
 
-    //if we need to grey the arrows because there is no data to scroll
+    //if we need to gray the arrows because there is no data to scroll
     if(!IsScrollInfoActive(si) && !(sb->fScrollFlags & CSBS_THUMBALWAYS))
     {
         uLeftButFlags  |= DFCS_INACTIVE;
@@ -1068,6 +1076,15 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdc, const RECT *r
 #ifdef CUSTOM_DRAW
     PostCustomPrePostPaint(hwnd, hdc, sb, CDDS_POSTPAINT);
 #endif
+
+    RotateRect0(sb, rect);
+    BitBlt(hdcorig, rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top, hdc, rect->left, rect->top, SRCCOPY);
+    RotateRect0(sb, rect);
+
+    //Swap back the original bitmap.
+    SelectObject(hdc, hOldBitmap);
+    DeleteObject(hBitmap);
+    DeleteDC(hdc);
 
     return fCustomDraw;
 }
