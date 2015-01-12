@@ -652,24 +652,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         }
         break;
 
-    case WM_MOUSEACTIVATE:
-        // OutputDebugStringA("WM_MOUSEACTIVATE\n");
-        // If outside changes have been made, then we will later
-        // likely popup a dialog to respond to those changes like
-        // ask to reload the current document. If this
-        // happens, any click will be meaningless or dangerous
-        // in the context of the document that's been reloaded.
-        // So eat the click in that case.
-        // If no outside changes have been made pass it on for
-        // business as usual as otherwise we'll fail to
-        // recognize clicks, like to tab headers or whatever.
-
-        if (HasOutsideChangesOccurred())
-            return MA_ACTIVATEANDEAT;
-        else
-            return DefWindowProc(hwnd,uMsg,wParam,lParam);
-        break;
-
     case WM_ACTIVATEAPP:
     {
         //bool activating = (wParam != 0);
@@ -2250,9 +2232,6 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     if (ds == DM_Modified)
     {
         ReloadTab(curTab,-1,true);
-        // Shouldn't be modified after we've handled it.
-        auto ds = m_DocManager.HasFileChanged(docID);
-        APPVERIFY(ds != DM_Modified);
     }
     else if (ds == DM_Removed)
     {
