@@ -681,7 +681,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_STYLESETFORE, STYLE_BRACEBAD, CTheme::Instance().GetThemeColor(RGB(255,0,0)));
     Call(SCI_STYLESETBOLD, STYLE_BRACEBAD, 1);
 
-    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, CTheme::Instance().GetThemeColor(RGB(150,150,150)));
+    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, CTheme::Instance().GetThemeColor(RGB(200,200,200)));
 
     Call(SCI_INDICSETFORE, INDIC_TAGMATCH, CTheme::Instance().GetThemeColor(RGB(0x80, 0x00, 0xFF)));
     Call(SCI_INDICSETFORE, INDIC_TAGATTR, CTheme::Instance().GetThemeColor(RGB(0xFF, 0xFF, 0x00)));
