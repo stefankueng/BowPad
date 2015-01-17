@@ -59,6 +59,8 @@ const int STATUSBAR_ZOOM          = 9;
 
 static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
 
+#define TIMER_UPDATECHECK           101
+
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
@@ -76,7 +78,6 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_bPathsToOpenMRU(true)
     , m_insertionIndex(-1)
     , m_windowRestored(false)
-    , m_handlingOutsideChanges(false)
     , m_pRibbon(nullptr)
     , m_RibbonHeight(0)
 {
@@ -703,19 +704,16 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_SETFOCUS: // lParam HWND that is losing focus.
     {
-        //OutputDebugStringA("WM_SETFOCUS\n");
         SetFocus(m_editor);
         m_editor.Call(SCI_SETFOCUS, true);
-        // Dialog Box's popup as part of handling outside changes,
-        // when they close, focus returns here
-        if (!m_handlingOutsideChanges)
-        {
-            m_handlingOutsideChanges = true;
-            //OutputDebugStringA("CheckForOutsideChanges()\n");
-            CheckForOutsideChanges();
-            m_handlingOutsideChanges = false;
-        }
-        //OutputDebugStringA("CheckForOutsideChanges() compelete\n");
+        // the update check can show a dialog. Doing this in the
+        // WM_SETFOCUS handler causes problems due to the dialog
+        // having its own message queue.
+        // See issue #129 https://code.google.com/p/bowpad/issues/detail?id=129
+        // To avoid these problems, set a timer instead. The timer
+        // will fire after all messages related to the focus change have
+        // been handled, and then it is save to show a message box dialog.
+        SetTimer(*this, TIMER_UPDATECHECK, 200, NULL);
     }
         break;
     case WM_CLIPBOARDUPDATE:
@@ -723,6 +721,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_TIMER:
         CCommandHandler::Instance().OnTimer((UINT)wParam);
+        if (wParam == TIMER_UPDATECHECK)
+        {
+            KillTimer(*this, TIMER_UPDATECHECK);
+            CheckForOutsideChanges();
+        }
         break;
     case WM_DESTROY:
         g_pFramework->Destroy();

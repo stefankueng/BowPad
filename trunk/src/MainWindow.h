@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -191,6 +191,5 @@ private:
     bool                        m_tabmovemod;
     long                        m_initLine;
     int                         m_insertionIndex;
-    bool                        m_handlingOutsideChanges;
     bool                        m_windowRestored;
 };
