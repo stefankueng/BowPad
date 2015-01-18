@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013, 2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@
 #include <Commdlg.h>
 
 CColorButton::CColorButton(void)
-    : m_ctlId(0)
-    , m_pfnOrigCtlProc(nullptr)
+    : m_pfnOrigCtlProc(nullptr)
     , m_color(0)
     , m_hwnd(0)
+    , m_ctlId(0)
 {
 }
 

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ public:
         , m_nStartPos(0)
         , m_nEndPos(0)
         , m_xOffset(0)
-        , m_nScrollWidth(1)
         , m_nSelMode(0)
+        , m_nScrollWidth(1)
     {};
     ~CPosData(){}
 

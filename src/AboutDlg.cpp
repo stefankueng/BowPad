@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013, 2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@
 
 
 CAboutDlg::CAboutDlg(HWND hParent)
-    : m_hHiddenWnd(NULL)
-    , m_hParent(hParent)
+    : m_hParent(hParent)
+    , m_hHiddenWnd(NULL)
 {
 }
 
