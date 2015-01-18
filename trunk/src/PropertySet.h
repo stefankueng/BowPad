@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013, 2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -44,8 +44,8 @@ public:
 
 private:
     CPropertySet()
-        : m_pimgItem(NULL)
-        , m_categoryId(UI_COLLECTION_INVALIDINDEX)
+        : m_categoryId(UI_COLLECTION_INVALIDINDEX)
+        , m_pimgItem(NULL)
         , m_commandId(-1)
         , m_commandType(UI_COMMANDTYPE_UNKNOWN)
         , m_cRef(1)
