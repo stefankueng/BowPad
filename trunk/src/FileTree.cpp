@@ -24,6 +24,7 @@
 #include "PathUtils.h"
 #include "OnOutOfScope.h"
 
+#include <thread>
 #include <VersionHelpers.h>
 #include <Uxtheme.h>
 
@@ -61,9 +62,11 @@ class FileTreeItem
 public:
     FileTreeItem()
         : isDir(false)
+        , busy(false)
     {}
     std::wstring    path;
     bool            isDir;
+    bool            busy;
 };
 
 CFileTree::~CFileTree()
@@ -294,6 +297,46 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
         }
     }
 
+    TVITEMEX tvex = { 0 };
+    tvex.mask = TVIF_PARAM;
+    TreeView_GetItem(*this, &tvex);
+    FileTreeItem * fi = (FileTreeItem*)tvex.lParam;
+    if (fi)
+    {
+        if (fi->busy)
+            return;
+        fi->busy = true;
+    }
+    else
+    {
+        if (m_bBusyRoot)
+            return;
+        m_bBusyRoot = true;
+    }
+
+    TreeView_SetItemState(*this, refreshRoot, TVIS_CUT, TVIS_CUT);
+
+    InterlockedIncrement(&m_ThreadsRunning);
+
+    std::thread t(&CFileTree::RefreshThread, this, refreshRoot, activepath);
+    t.detach();
+
+}
+
+void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& activepath)
+{
+    OnOutOfScope(
+    {
+        TVITEMEX tvex = { 0 };
+        tvex.mask = TVIF_PARAM;
+        TreeView_GetItem(*this, &tvex);
+        FileTreeItem * fi = (FileTreeItem*)tvex.lParam;
+        if (fi)
+            fi->busy = false;
+        else
+            m_bBusyRoot = false;
+        InterlockedDecrement(&m_ThreadsRunning);
+    });
     SendMessage(*this, WM_SETREDRAW, FALSE, 0);
     OnOutOfScope(SendMessage(*this, WM_SETREDRAW, TRUE, 0));
 
@@ -333,7 +376,7 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
     CDirFileEnum enumerator(refreshPath);
     bool bIsDir = false;
     std::wstring path;
-    while (enumerator.NextFile(path, &bIsDir, false))
+    while (enumerator.NextFile(path, &bIsDir, false) && !m_bStop)
     {
         FileTreeItem * fi = new FileTreeItem();
         fi->path = path;
@@ -383,6 +426,8 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
     sortcb.lParam = (LPARAM)this;
     sortcb.lpfnCompare = TreeCompareFunc;
     TreeView_SortChildrenCB(*this, &sortcb, false);
+    TreeView_Expand(*this, refreshRoot, TVE_EXPAND);
+    TreeView_SetItemState(*this, refreshRoot, 0, TVIS_CUT);
 }
 
 HTREEITEM CFileTree::GetHitItem()
@@ -532,6 +577,11 @@ void CFileTree::BlockRefresh(bool bBlock)
         Refresh(TVI_ROOT, false);
     }
     m_bBlockRefresh = bBlock;
+}
+
+void CFileTree::OnClose()
+{
+    m_bStop = true;
 }
 
 
