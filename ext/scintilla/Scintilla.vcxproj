@@ -173,6 +173,7 @@
     <ClCompile Include="lexers\LexGAP.cxx" />
     <ClCompile Include="lexers\LexGui4Cli.cxx" />
     <ClCompile Include="lexers\LexHaskell.cxx" />
+    <ClCompile Include="lexers\LexHex.cxx" />
     <ClCompile Include="lexers\LexHTML.cxx" />
     <ClCompile Include="lexers\LexInno.cxx" />
     <ClCompile Include="lexers\LexKix.cxx" />
