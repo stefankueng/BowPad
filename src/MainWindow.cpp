@@ -620,7 +620,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         break;
                     case TVN_ITEMEXPANDING:
                     {
-                        m_fileTree.Refresh(pnmtv->itemNew.hItem);
+                        if (pnmtv->action & TVE_EXPAND)
+                            m_fileTree.Refresh(pnmtv->itemNew.hItem);
                     }
                         break;
                     case NM_CUSTOMDRAW:
