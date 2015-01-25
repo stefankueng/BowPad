@@ -696,7 +696,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_SETFOLDMARGINHICOLOUR, true, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
 
     SetTabSettings();
-    Call(SCI_SETINDENTATIONGUIDES, SC_IV_LOOKBOTH);
+    Call(SCI_SETINDENTATIONGUIDES, CIniSettings::Instance().GetInt64(L"View", L"indent", SC_IV_LOOKBOTH));
 
     const unsigned long foldmarkfore = CTheme::Instance().GetThemeColor(RGB(250,250,250));
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN, foldmarkfore);
