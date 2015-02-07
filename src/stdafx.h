@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -63,3 +63,4 @@
 #define WM_UPDATEAVAILABLE  (WM_APP + 10)
 #define WM_AFTERINIT        (WM_APP + 11)
 #define WM_STATUSBAR_MSG    (WM_APP + 12)
+#define WM_FILETREEREADY    (WM_APP + 13)

@@ -28,7 +28,6 @@ public:
         : CWindow(hInst)
         , ICommand(obj)
         , m_bBlockRefresh(false)
-        , m_bBusyRoot(false)
         , m_ThreadsRunning(0)
         , m_bStop(false)
     {};
@@ -52,7 +51,7 @@ protected:
     virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
     HTREEITEM RecurseTree(HTREEITEM hItem, ItemHandler handler);
-    void RefreshThread(HTREEITEM refreshRoot, const std::wstring& activepath);
+    void RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath);
 
     virtual void TabNotify(TBHDR * ptbhdr);
 
@@ -61,7 +60,6 @@ protected:
 private:
     std::wstring        m_path;
     bool                m_bBlockRefresh;
-    bool                m_bBusyRoot;
     volatile LONG       m_ThreadsRunning;
     bool                m_bStop;
 };
