@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,6 +36,13 @@ const int SC_MARGE_SYBOLE = 1;
 const int SC_MARGE_FOLDER = 2;
 
 const int MARK_BOOKMARK = 24;
+
+enum BraceMatch
+{
+    Braces,
+    Highlight,
+    Clear,
+};
 
 struct XmlMatchedTagsPos
 {
@@ -87,7 +94,7 @@ public :
     void SetupLexerForLang(const std::wstring& lang);
     void MarginClick(Scintilla::SCNotification * pNotification);
     void MarkSelectedWord(bool clear);
-    void MatchBraces(bool delayed);
+    void MatchBraces(BraceMatch what);
     void GotoBrace();
     void MatchTags();
     bool GetSelectedCount(size_t& selByte, size_t& selLine);

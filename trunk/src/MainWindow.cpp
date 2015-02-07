@@ -2115,7 +2115,7 @@ void CMainWindow::HandleUpdateUI(const Scintilla::SCNotification& scn)
     if ((scn.updated & uiflags) != 0)
         m_editor.MarkSelectedWord(false);
 
-    m_editor.MatchBraces(false);
+    m_editor.MatchBraces(Braces);
     m_editor.MatchTags();
     AddHotSpots();
     UpdateStatusBar(false);
