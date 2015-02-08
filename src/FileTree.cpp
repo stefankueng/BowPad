@@ -255,7 +255,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
             }
         }
         break;
-        case WM_FILETREEREADY:
+        case WM_THREADRESULTREADY:
         {
             if (m_bStop)
                 break;
@@ -489,7 +489,7 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
         delete data;
         return;
     }
-    PostMessage(*this, WM_FILETREEREADY, 0, (LPARAM)data);
+    PostMessage(*this, WM_THREADRESULTREADY, 0, (LPARAM)data);
 }
 
 HTREEITEM CFileTree::GetHitItem()
