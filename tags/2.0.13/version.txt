@@ -1,0 +1,5 @@
+2.0.12.1273
+http://sourceforge.net/projects/stefanstools/files/BowPad/2.0.12/BowPad64-2.0.12.msi/download
+BowPad64-2.0.12.msi
+http://sourceforge.net/projects/stefanstools/files/BowPad/2.0.12/BowPad-2.0.12.msi/download
+BowPad-2.0.12.msi
