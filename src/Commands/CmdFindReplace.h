@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ class CSearchResult
 public:
     CSearchResult()
         : docID(-1)
+        , pathIndex(0)
         , pos(0)
         , line(0)
         , posInLineStart(0)
@@ -39,6 +40,7 @@ public:
 
     int             docID;
     std::wstring    lineText;
+    size_t          pathIndex;
     size_t          pos;
     size_t          line;
     size_t          posInLineStart;
@@ -59,10 +61,12 @@ protected:
     void                    SetInfoText(UINT resid);
     void                    DoSearch();
     void                    DoSearchAll(int id);
+
     void                    DoReplace(int id);
     void                    SearchDocument(int docID, const CDocument& doc, const std::string& searchfor, int searchflags);
     int                     ReplaceDocument(CDocument& doc, const std::string& sFindString, const std::string& sReplaceString, int searchflags);
     void                    CheckRegex();
+    void                    SearchThread(const std::wstring& searchpath, const std::string& searchfor, int flags);
 
     void                    ShowResults(bool bShow);
     void                    InitResultList();
@@ -72,15 +76,25 @@ protected:
     std::string             UnEscape(const std::string& str);
     bool                    ReadBase(const char * str, int * value, int base, int size);
 
+    void                    EnableControls(bool bEnable);
+
     virtual bool Execute() override { return true; }
     virtual UINT GetCmdId() override { return 0; }
+
+    virtual void OnClose() override;
+
 private:
     CDlgResizer                 m_resizer;
     std::list<std::wstring>     m_searchStrings;
     std::list<std::wstring>     m_replaceStrings;
     bool                        m_freeresize;
     CScintillaWnd               m_searchWnd;
+    CScintillaWnd *             m_pSearchWnd;
     std::deque<CSearchResult>   m_searchResults;
+    std::vector<std::wstring>   m_foundPaths;
+
+    bool                        m_bStop;
+    volatile LONG               m_ThreadsRunning;
 };
 
 
