@@ -61,8 +61,12 @@ static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=
 
 #define TIMER_UPDATECHECK           101
 
-static ResponseToOutsideModifiedFile responsetooutsidemodifiedfile;
-static BOOL                          responsetooutsidemodifiedfiledoall;
+static ResponseToOutsideModifiedFile responsetooutsidemodifiedfile = ResponseToOutsideModifiedFile::Reload;
+static BOOL                          responsetooutsidemodifiedfiledoall = FALSE;
+
+static bool docloseall = false;
+static BOOL closealldoall = FALSE;
+static ResponseToCloseTab responsetoclosetab = ResponseToCloseTab::CloseWithoutSaving;
 
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
@@ -1336,11 +1340,13 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
     if (!force && (doc.m_bIsDirty||doc.m_bNeedsSaving))
     {
         m_TabBar.ActivateAt(tab);
-        ResponseToCloseTab response = AskToCloseTab();
-        if (response == ResponseToCloseTab::SaveAndClose)
+        if (!docloseall || !closealldoall)
+            responsetoclosetab = AskToCloseTab();
+
+        if (responsetoclosetab == ResponseToCloseTab::SaveAndClose)
             SaveCurrentTab(); // Save And (fall through to) Close
 
-        else if (response == ResponseToCloseTab::CloseWithoutSaving)
+        else if (responsetoclosetab == ResponseToCloseTab::CloseWithoutSaving)
             ;
         // If you don't want to save and close and
         // you don't want to close without saving, you must want to stay open.
@@ -1375,6 +1381,11 @@ bool CMainWindow::CloseAllTabs()
 {
     FileTreeBlockRefresh(true);
     OnOutOfScope(FileTreeBlockRefresh(false));
+
+    closealldoall = FALSE;
+    OnOutOfScope(closealldoall = FALSE;);
+    docloseall = true;
+    OnOutOfScope(docloseall = false;);
     do
     {
         if (CloseTab(m_TabBar.GetItemCount()-1) == false)
@@ -1391,7 +1402,12 @@ void CMainWindow::CloseAllButCurrentTab()
     OnOutOfScope(FileTreeBlockRefresh(false));
     int count = m_TabBar.GetItemCount();
     int current = m_TabBar.GetCurrentTabIndex();
-    for (int i = count-1; i >= 0; --i)
+
+    closealldoall = FALSE;
+    OnOutOfScope(closealldoall = FALSE;);
+    docloseall = true;
+    OnOutOfScope(docloseall = false;);
+    for (int i = count - 1; i >= 0; --i)
     {
         if (i != current)
             CloseTab(i);
@@ -1466,8 +1482,10 @@ ResponseToCloseTab CMainWindow::AskToCloseTab() const
     tdc.pszMainIcon = TD_INFORMATION_ICON;
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent = sQuestion.c_str();
+    if (docloseall)
+        tdc.pszVerificationText = MAKEINTRESOURCE(IDS_DOITFORALLFILES);
     int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, nullptr, nullptr );
+    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, &closealldoall);
     if (CAppUtils::FailedShowMessage(hr))
         nClickedBtn = 0;
     ResponseToCloseTab response = ResponseToCloseTab::Cancel;
