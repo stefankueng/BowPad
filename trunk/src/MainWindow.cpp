@@ -61,6 +61,9 @@ static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=
 
 #define TIMER_UPDATECHECK           101
 
+static ResponseToOutsideModifiedFile responsetooutsidemodifiedfile;
+static BOOL                          responsetooutsidemodifiedfiledoall;
+
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
@@ -1482,54 +1485,58 @@ ResponseToCloseTab CMainWindow::AskToCloseTab() const
 
 ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const CDocument& doc) const
 {
-    bool changed = doc.m_bNeedsSaving || doc.m_bIsDirty;
-    ResString rTitle(hRes, IDS_OUTSIDEMODIFICATIONS);
-    ResString rQuestion(hRes, changed ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
-    ResString rSave(hRes, IDS_SAVELOSTOUTSIDEMODS);
-    ResString rReload(hRes, changed ? IDS_RELOADLOSTMODS : IDS_RELOAD);
-    ResString rCancel(hRes, IDS_NORELOAD);
-    // Be specific about what they are re-loading.
-    std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
-
-    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-    TASKDIALOG_BUTTON aCustomButtons[3];
-    int bi = 0;
-    aCustomButtons[bi].nButtonID = 101;
-    aCustomButtons[bi++].pszButtonText = rReload;
-    if (changed)
+    if (!responsetooutsidemodifiedfiledoall)
     {
-        aCustomButtons[bi].nButtonID = 102;
-        aCustomButtons[bi++].pszButtonText = rSave;
-    }
-    aCustomButtons[bi].nButtonID = 100;
-    aCustomButtons[bi++].pszButtonText = rCancel;
-    tdc.pButtons = aCustomButtons;
-    tdc.cButtons = bi;
-    assert(tdc.cButtons <= _countof(aCustomButtons));
-    tdc.nDefaultButton = 100;  // default to "Cancel" in case the file is modified
+        bool changed = doc.m_bNeedsSaving || doc.m_bIsDirty;
+        ResString rTitle(hRes, IDS_OUTSIDEMODIFICATIONS);
+        ResString rQuestion(hRes, changed ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
+        ResString rSave(hRes, IDS_SAVELOSTOUTSIDEMODS);
+        ResString rReload(hRes, changed ? IDS_RELOADLOSTMODS : IDS_RELOAD);
+        ResString rCancel(hRes, IDS_NORELOAD);
+        // Be specific about what they are re-loading.
+        std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
 
-    tdc.hwndParent = *this;
-    tdc.hInstance = hRes;
-    tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-    tdc.pszMainIcon = changed ? TD_WARNING_ICON : TD_INFORMATION_ICON;
-    tdc.pszMainInstruction = rTitle;
-    tdc.pszContent = sQuestion.c_str();
-    int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect ( &tdc, &nClickedBtn, nullptr, nullptr );
-    if (CAppUtils::FailedShowMessage(hr))
-        nClickedBtn = 0;
-    ResponseToOutsideModifiedFile response = ResponseToOutsideModifiedFile::Cancel;
-    switch (nClickedBtn)
-    {
-    case 101:
-        response = ResponseToOutsideModifiedFile::Reload;
-        break;
-    case 102:
-        response = ResponseToOutsideModifiedFile::KeepOurChanges;
-        break;
+        TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+        TASKDIALOG_BUTTON aCustomButtons[3];
+        int bi = 0;
+        aCustomButtons[bi].nButtonID = 101;
+        aCustomButtons[bi++].pszButtonText = rReload;
+        if (changed)
+        {
+            aCustomButtons[bi].nButtonID = 102;
+            aCustomButtons[bi++].pszButtonText = rSave;
+        }
+        aCustomButtons[bi].nButtonID = 100;
+        aCustomButtons[bi++].pszButtonText = rCancel;
+        tdc.pButtons = aCustomButtons;
+        tdc.cButtons = bi;
+        assert(tdc.cButtons <= _countof(aCustomButtons));
+        tdc.nDefaultButton = 100;  // default to "Cancel" in case the file is modified
+
+        tdc.hwndParent = *this;
+        tdc.hInstance = hRes;
+        tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+        tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+        tdc.pszMainIcon = changed ? TD_WARNING_ICON : TD_INFORMATION_ICON;
+        tdc.pszMainInstruction = rTitle;
+        tdc.pszContent = sQuestion.c_str();
+        tdc.pszVerificationText = MAKEINTRESOURCE(IDS_DOITFORALLFILES);
+        int nClickedBtn = 0;
+        HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, &responsetooutsidemodifiedfiledoall);
+        if (CAppUtils::FailedShowMessage(hr))
+            nClickedBtn = 0;
+        responsetooutsidemodifiedfile = ResponseToOutsideModifiedFile::Cancel;
+        switch (nClickedBtn)
+        {
+            case 101:
+                responsetooutsidemodifiedfile = ResponseToOutsideModifiedFile::Reload;
+                break;
+            case 102:
+                responsetooutsidemodifiedfile = ResponseToOutsideModifiedFile::KeepOurChanges;
+                break;
+        }
     }
-    return response;
+    return responsetooutsidemodifiedfile;
 }
 
 bool CMainWindow::AskToReload(const CDocument& doc) const
@@ -2241,7 +2248,6 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     {
         HandleOutsideDeletedFile(curTab);
     }
-    CheckForOutsideChanges();
 }
 
 void CMainWindow::HandleTabDelete(const TBHDR& tbhdr)
@@ -2829,7 +2835,16 @@ bool CMainWindow::HasOutsideChangesOccurred() const
 
 void CMainWindow::CheckForOutsideChanges()
 {
+    static bool bInsideCheckForOutsideChanges = false;
     // See if any doc has been changed externally.
+    if (bInsideCheckForOutsideChanges)
+        return;
+
+    bInsideCheckForOutsideChanges = true;
+    OnOutOfScope(bInsideCheckForOutsideChanges = false;);
+    responsetooutsidemodifiedfiledoall = FALSE;
+    bool bChangedTab = false;
+    int activeTab = m_TabBar.GetCurrentTabIndex();
     for (int i = 0; i < m_TabBar.GetItemCount(); ++i)
     {
         int docID = m_TabBar.GetIDFromIndex(i);
@@ -2837,10 +2852,14 @@ void CMainWindow::CheckForOutsideChanges()
         if (ds == DM_Modified || ds == DM_Removed)
         {
             m_TabBar.ActivateAt(i);
-            break;
+            if (i != activeTab)
+                bChangedTab = true;
         }
     }
-    // TODO! Test if All tabs might get removed here?
+    responsetooutsidemodifiedfiledoall = FALSE;
+
+    if (bChangedTab)
+        m_TabBar.ActivateAt(activeTab);
 }
 
 // TODO! Get rid of TabMove, make callers use OpenFileAs
