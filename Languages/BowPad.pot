@@ -574,6 +574,10 @@ msgstr ""
 msgid "Do &not download the update\nYou will be reminded again about the update in a week."
 msgstr ""
 
+#. Resource IDs: (14)
+msgid "Do this for all files"
+msgstr ""
+
 #. Resource IDs: (7)
 #, c-format
 msgid "Do you want to save changes to \"%s\"?"
@@ -744,6 +748,10 @@ msgstr ""
 
 #. Resource IDs: (3758)
 msgid "Find Previous"
+msgstr ""
+
+#. Resource IDs: (14)
+msgid "Find all in &folder"
 msgstr ""
 
 #. Resource IDs: (143)
@@ -1445,6 +1453,11 @@ msgstr ""
 
 #. Resource IDs: (3759)
 msgid "Searches for the next match of the selected text"
+msgstr ""
+
+#. Resource IDs: (14)
+#, c-format
+msgid "Searching in file '%s'"
 msgstr ""
 
 #. Resource IDs: (13)
