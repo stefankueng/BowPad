@@ -346,7 +346,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                     if (fi)
                         fi->busy = false;
                     if (m_bRootBusy)
-                        m_bRootBusy = true;
+                        m_bRootBusy = false;
 
                     delete pData;
                 }
@@ -493,6 +493,7 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
         for (const auto& i : data->data)
             delete i;
         delete data;
+        m_bRootBusy = false;
         return;
     }
     PostMessage(*this, WM_THREADRESULTREADY, 0, (LPARAM)data);

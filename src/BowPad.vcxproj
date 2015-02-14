@@ -258,6 +258,7 @@
     <ClInclude Include="Commands\CmdEOL.h" />
     <ClInclude Include="Commands\CmdFiles.h" />
     <ClInclude Include="Commands\CmdFindReplace.h" />
+    <ClInclude Include="Commands\CmdFolding.h" />
     <ClInclude Include="Commands\CmdFont.h" />
     <ClInclude Include="Commands\CmdFunctions.h" />
     <ClInclude Include="Commands\CmdGotoLine.h" />
@@ -354,6 +355,7 @@
     <ClCompile Include="Commands\CmdEOL.cpp" />
     <ClCompile Include="Commands\CmdFiles.cpp" />
     <ClCompile Include="Commands\CmdFindReplace.cpp" />
+    <ClCompile Include="Commands\CmdFolding.cpp" />
     <ClCompile Include="Commands\CmdFont.cpp" />
     <ClCompile Include="Commands\CmdFunctions.cpp" />
     <ClCompile Include="Commands\CmdGotoLine.cpp" />

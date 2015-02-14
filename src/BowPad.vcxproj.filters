@@ -330,6 +330,9 @@
     <ClInclude Include="..\ext\sktoolslib\SysImageList.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdFolding.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -580,6 +583,9 @@
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\SysImageList.cpp">
       <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdFolding.cpp">
+      <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
