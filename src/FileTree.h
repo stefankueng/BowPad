@@ -30,6 +30,7 @@ public:
         , m_nBlockRefresh(0)
         , m_ThreadsRunning(0)
         , m_bStop(false)
+        , m_bRootBusy(false)
     {};
     virtual ~CFileTree();
 
@@ -62,4 +63,5 @@ private:
     int                 m_nBlockRefresh;
     volatile LONG       m_ThreadsRunning;
     bool                m_bStop;
+    bool                m_bRootBusy;
 };
