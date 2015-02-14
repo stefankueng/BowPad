@@ -399,7 +399,7 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
 
     if (!force && !IsWindowVisible(*this))
         return;
-    if (m_bBlockRefresh)
+    if (m_nBlockRefresh)
         return;
 
     FileTreeItem * fi = nullptr;
@@ -461,7 +461,6 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
 
     std::thread t(&CFileTree::RefreshThread, this, refreshRoot, refreshPath);
     t.detach();
-
 }
 
 void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath)
@@ -633,12 +632,20 @@ void CFileTree::TabNotify(TBHDR * ptbhdr)
 
 void CFileTree::BlockRefresh(bool bBlock)
 {
-    if (m_bBlockRefresh && !bBlock)
+    if (bBlock)
+        ++m_nBlockRefresh;
+    else
+        --m_nBlockRefresh;
+    if (m_nBlockRefresh < 0)
     {
-        m_bBlockRefresh = bBlock;
+        // this should not happen!
+        assert(false);
+        m_nBlockRefresh = 0;
+    }
+    if (m_nBlockRefresh == 0)
+    {
         Refresh(TVI_ROOT, false);
     }
-    m_bBlockRefresh = bBlock;
 }
 
 void CFileTree::OnClose()

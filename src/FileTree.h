@@ -27,7 +27,7 @@ public:
     CFileTree(HINSTANCE hInst, void * obj)
         : CWindow(hInst)
         , ICommand(obj)
-        , m_bBlockRefresh(false)
+        , m_nBlockRefresh(0)
         , m_ThreadsRunning(0)
         , m_bStop(false)
     {};
@@ -59,7 +59,7 @@ protected:
 
 private:
     std::wstring        m_path;
-    bool                m_bBlockRefresh;
+    int                 m_nBlockRefresh;
     volatile LONG       m_ThreadsRunning;
     bool                m_bStop;
 };
