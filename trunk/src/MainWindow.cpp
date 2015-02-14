@@ -2941,12 +2941,24 @@ bool CMainWindow::OnMouseMove(UINT nFlags, POINT point)
     return true;
 }
 
-bool CMainWindow::OnLButtonDown(UINT nFlags, POINT /*point*/)
+bool CMainWindow::OnLButtonDown(UINT nFlags, POINT point)
 {
     UNREFERENCED_PARAMETER(nFlags);
 
     if (!m_bDragging)
     {
+        RECT rctree;
+        GetWindowRect(m_fileTree, &rctree);
+        MapWindowPoints(NULL, *this, (LPPOINT)&rctree, 2);
+        if (point.y < rctree.top)
+            return true;
+        if (point.y > rctree.bottom)
+            return true;
+        if (point.x < rctree.right - 20)
+            return true;
+        if (point.x > rctree.right + 20)
+            return true;
+
         SetCapture(*this);
         m_bDragging = true;
     }
