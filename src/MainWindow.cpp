@@ -1029,9 +1029,9 @@ void CMainWindow::HandleCreate(HWND hwnd)
 void CMainWindow::HandleAfterInit()
 {
     UpdateWindow(*this);
-    CCommandHandler::Instance().AfterInit();
     FileTreeBlockRefresh(true);
     OnOutOfScope(FileTreeBlockRefresh(false));
+    CCommandHandler::Instance().AfterInit();
     for (const auto& path : m_pathsToOpen)
     {
         unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
