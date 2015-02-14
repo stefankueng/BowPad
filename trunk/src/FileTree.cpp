@@ -345,6 +345,8 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
 
                     if (fi)
                         fi->busy = false;
+                    if (m_bRootBusy)
+                        m_bRootBusy = true;
 
                     delete pData;
                 }
@@ -402,6 +404,9 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
     if (m_nBlockRefresh)
         return;
 
+    if (m_bRootBusy)
+        return;
+
     FileTreeItem * fi = nullptr;
     if (refreshRoot != TVI_ROOT)
     {
@@ -417,6 +422,8 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
             return;
         fi->busy = true;
     }
+    else
+        m_bRootBusy = true;
 
     TreeView_SetItemState(*this, refreshRoot, TVIS_CUT, TVIS_CUT);
 
