@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1308,7 +1308,12 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
             }
             else
             {
-                if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, cmd.p1)))
+                if (cmd.p1 == VT_NULL)
+                {
+                    p1.vt = VT_INT;
+                    p1.intVal = 0;
+                }
+                else if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, cmd.p1)))
                     return DISP_E_TYPEMISMATCH;
             }
             if (cmd.p2 == VT_BSTR)
