@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@
 #include "CmdSort.h"
 #include "CmdSummary.h"
 #include "CmdLineNumbers.h"
+#include "CmdFolding.h"
 
 #include "DirFileEnum.h"
 #include "AppUtils.h"
@@ -170,6 +171,12 @@ void CCommandHandler::Init( void * obj )
     Add<CCmdLineUp>(obj);
     Add<CCmdLineDown>(obj);
     Add<CCmdSort>(obj);
+    Add<CCmdFoldAll>(obj);
+
+    for (int i = 0; i < 10; ++i)
+    {
+        Add<CCmdFoldLevel>(i, obj);
+    }
 
     Add<CCmdTrim>(obj);
     Add<CCmdTabs2Spaces>(obj);
