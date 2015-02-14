@@ -706,6 +706,23 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.LargeImages>
     </Command>
 
+    <Command Name="cmdFoldGroup" LabelTitle="Folding">
+      <Command.LargeImages>
+        <Image>res/FoldL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdFoldAll" LabelTitle="Toggle folding all" TooltipTitle="Toggle folding all" TooltipDescription="toggles folding all levels in the whole document" />
+    <Command Name="cmdFoldLevel0" LabelTitle="Toggle level 0" TooltipTitle="Toggle level 0" TooltipDescription="toggles folding at level 0 in the whole document" />
+    <Command Name="cmdFoldLevel1" LabelTitle="Toggle level 1" TooltipTitle="Toggle level 1" TooltipDescription="toggles folding at level 1 in the whole document" />
+    <Command Name="cmdFoldLevel2" LabelTitle="Toggle level 2" TooltipTitle="Toggle level 2" TooltipDescription="toggles folding at level 2 in the whole document" />
+    <Command Name="cmdFoldLevel3" LabelTitle="Toggle level 3" TooltipTitle="Toggle level 3" TooltipDescription="toggles folding at level 3 in the whole document" />
+    <Command Name="cmdFoldLevel4" LabelTitle="Toggle level 4" TooltipTitle="Toggle level 4" TooltipDescription="toggles folding at level 4 in the whole document" />
+    <Command Name="cmdFoldLevel5" LabelTitle="Toggle level 5" TooltipTitle="Toggle level 5" TooltipDescription="toggles folding at level 5 in the whole document" />
+    <Command Name="cmdFoldLevel6" LabelTitle="Toggle level 6" TooltipTitle="Toggle level 6" TooltipDescription="toggles folding at level 6 in the whole document" />
+    <Command Name="cmdFoldLevel7" LabelTitle="Toggle level 7" TooltipTitle="Toggle level 7" TooltipDescription="toggles folding at level 7 in the whole document" />
+    <Command Name="cmdFoldLevel8" LabelTitle="Toggle level 8" TooltipTitle="Toggle level 8" TooltipDescription="toggles folding at level 8 in the whole document" />
+    <Command Name="cmdFoldLevel9" LabelTitle="Toggle level 9" TooltipTitle="Toggle level 9" TooltipDescription="toggles folding at level 9 in the whole document" />
+
     <Command Name="cmdContextMap" />
     <Command Name="cmdTabContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />
@@ -1150,6 +1167,25 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="cmdOpenSelection" />
+          </MenuGroup>
+          <MenuGroup>
+            <DropDownButton CommandName="cmdFoldGroup">
+              <MenuGroup>
+                <Button CommandName="cmdFoldAll" />
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdFoldLevel0" />
+                <Button CommandName="cmdFoldLevel1" />
+                <Button CommandName="cmdFoldLevel2" />
+                <Button CommandName="cmdFoldLevel3" />
+                <Button CommandName="cmdFoldLevel4" />
+                <Button CommandName="cmdFoldLevel5" />
+                <Button CommandName="cmdFoldLevel6" />
+                <Button CommandName="cmdFoldLevel7" />
+                <Button CommandName="cmdFoldLevel8" />
+                <Button CommandName="cmdFoldLevel9" />
+              </MenuGroup>
+            </DropDownButton>
           </MenuGroup>
           <MenuGroup>
             <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
