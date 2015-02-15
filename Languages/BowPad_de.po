@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2015-02-08 15:23+0100\n"
+"PO-Revision-Date: 2015-02-15 13:33+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -843,6 +843,10 @@ msgstr "Suche und ersetze"
 #. Resource IDs: (3758)
 msgid "Find/Replace"
 msgstr "Suchen/Ersetzen"
+
+#. Resource IDs: (3784)
+msgid "Folding"
+msgstr "Klappung"
 
 #. Resource IDs: (65535)
 msgid "Font"
@@ -1830,6 +1834,50 @@ msgstr "Lesezeichen ein/aus"
 msgid "Toggle a bookmark on the current line"
 msgstr "Setzt/entfernt ein Lesezeichen an der aktuellen Zeile"
 
+#. Resource IDs: (3784)
+msgid "Toggle folding all"
+msgstr "Wechsle Einklappung"
+
+#. Resource IDs: (3784)
+msgid "Toggle level 0"
+msgstr "Wechsle Einklappung Stufe 0"
+
+#. Resource IDs: (3784)
+msgid "Toggle level 1"
+msgstr "Wechsle Einklappung Stufe 1"
+
+#. Resource IDs: (3784)
+msgid "Toggle level 2"
+msgstr "Wechsle Einklappung Stufe 2"
+
+#. Resource IDs: (3785)
+msgid "Toggle level 3"
+msgstr "Wechsle Einklappung Stufe 3"
+
+#. Resource IDs: (3785)
+msgid "Toggle level 4"
+msgstr "Wechsle Einklappung Stufe 4"
+
+#. Resource IDs: (3785)
+msgid "Toggle level 5"
+msgstr "Wechsle Einklappung Stufe 5"
+
+#. Resource IDs: (3785)
+msgid "Toggle level 6"
+msgstr "Wechsle Einklappung Stufe 6"
+
+#. Resource IDs: (3785)
+msgid "Toggle level 7"
+msgstr "Wechsle Einklappung Stufe 7"
+
+#. Resource IDs: (3785, 3786)
+msgid "Toggle level 8"
+msgstr "Wechsle Einklappung Stufe 8"
+
+#. Resource IDs: (3786)
+msgid "Toggle level 9"
+msgstr "Wechsle Einklappung Stufe 9"
+
 #. Resource IDs: (3766)
 msgid "Toggles between the normal and the dark theme"
 msgstr "Schaltet um zwischen normalem und dunklem Stil"
@@ -2103,6 +2151,50 @@ msgstr "Führt den Benutzerbefehl 8 aus"
 #. Resource IDs: (3772)
 msgid "runs the custom command 9"
 msgstr "Führt den Benutzerbefehl 9 aus"
+
+#. Resource IDs: (3784)
+msgid "toggles folding all levels in the whole document"
+msgstr "Wechselt die Einklappung im ganzen Dokument"
+
+#. Resource IDs: (3784)
+msgid "toggles folding at level 0 in the whole document"
+msgstr "Wechselt die Einklappung in Stufe 0 im ganzen Dokument"
+
+#. Resource IDs: (3784)
+msgid "toggles folding at level 1 in the whole document"
+msgstr "Wechselt die Einklappung in Stufe 1 im ganzen Dokument"
+
+#. Resource IDs: (3784)
+msgid "toggles folding at level 2 in the whole document"
+msgstr "Wechselt die Einklappung in Stufe 2 im ganzen Dokument"
+
+#. Resource IDs: (3785)
+msgid "toggles folding at level 3 in the whole document"
+msgstr "Wechselt die Einklappung in Stufe 3 im ganzen Dokument"
+
+#. Resource IDs: (3785)
+msgid "toggles folding at level 4 in the whole document"
+msgstr "Wechselt die Einklappung in Stufe 4 im ganzen Dokument"
+
+#. Resource IDs: (3785)
+msgid "toggles folding at level 5 in the whole document"
+msgstr "Wechselt die Einklappung in Stufe 5 im ganzen Dokument"
+
+#. Resource IDs: (3785)
+msgid "toggles folding at level 6 in the whole document"
+msgstr "Wechselt die Einklappung in Stufe 6 im ganzen Dokument"
+
+#. Resource IDs: (3785)
+msgid "toggles folding at level 7 in the whole document"
+msgstr "Wechselt die Einklappung in Stufe 7 im ganzen Dokument"
+
+#. Resource IDs: (3786)
+msgid "toggles folding at level 8 in the whole document"
+msgstr "Wechselt die Einklappung in Stufe 8 im ganzen Dokument"
+
+#. Resource IDs: (3786)
+msgid "toggles folding at level 9 in the whole document"
+msgstr "Wechselt die Einklappung in Stufe 9 im ganzen Dokument"
 
 #~ msgid "Configure plugins"
 #~ msgstr "Plugins konfigurieren"
