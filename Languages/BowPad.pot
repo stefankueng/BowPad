@@ -762,6 +762,10 @@ msgstr ""
 msgid "Find/Replace"
 msgstr ""
 
+#. Resource IDs: (3784)
+msgid "Folding"
+msgstr ""
+
 #. Resource IDs: (65535)
 msgid "Font"
 msgstr ""
@@ -1665,6 +1669,50 @@ msgstr ""
 msgid "Toggle a bookmark on the current line"
 msgstr ""
 
+#. Resource IDs: (3784)
+msgid "Toggle folding all"
+msgstr ""
+
+#. Resource IDs: (3784)
+msgid "Toggle level 0"
+msgstr ""
+
+#. Resource IDs: (3784)
+msgid "Toggle level 1"
+msgstr ""
+
+#. Resource IDs: (3784)
+msgid "Toggle level 2"
+msgstr ""
+
+#. Resource IDs: (3785)
+msgid "Toggle level 3"
+msgstr ""
+
+#. Resource IDs: (3785)
+msgid "Toggle level 4"
+msgstr ""
+
+#. Resource IDs: (3785)
+msgid "Toggle level 5"
+msgstr ""
+
+#. Resource IDs: (3785)
+msgid "Toggle level 6"
+msgstr ""
+
+#. Resource IDs: (3785)
+msgid "Toggle level 7"
+msgstr ""
+
+#. Resource IDs: (3785, 3786)
+msgid "Toggle level 8"
+msgstr ""
+
+#. Resource IDs: (3786)
+msgid "Toggle level 9"
+msgstr ""
+
 #. Resource IDs: (3766)
 msgid "Toggles between the normal and the dark theme"
 msgstr ""
@@ -1918,5 +1966,49 @@ msgstr ""
 
 #. Resource IDs: (3772)
 msgid "runs the custom command 9"
+msgstr ""
+
+#. Resource IDs: (3784)
+msgid "toggles folding all levels in the whole document"
+msgstr ""
+
+#. Resource IDs: (3784)
+msgid "toggles folding at level 0 in the whole document"
+msgstr ""
+
+#. Resource IDs: (3784)
+msgid "toggles folding at level 1 in the whole document"
+msgstr ""
+
+#. Resource IDs: (3784)
+msgid "toggles folding at level 2 in the whole document"
+msgstr ""
+
+#. Resource IDs: (3785)
+msgid "toggles folding at level 3 in the whole document"
+msgstr ""
+
+#. Resource IDs: (3785)
+msgid "toggles folding at level 4 in the whole document"
+msgstr ""
+
+#. Resource IDs: (3785)
+msgid "toggles folding at level 5 in the whole document"
+msgstr ""
+
+#. Resource IDs: (3785)
+msgid "toggles folding at level 6 in the whole document"
+msgstr ""
+
+#. Resource IDs: (3785)
+msgid "toggles folding at level 7 in the whole document"
+msgstr ""
+
+#. Resource IDs: (3786)
+msgid "toggles folding at level 8 in the whole document"
+msgstr ""
+
+#. Resource IDs: (3786)
+msgid "toggles folding at level 9 in the whole document"
 msgstr ""
 
