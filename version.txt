@@ -1,5 +1,5 @@
-2.0.13.1285
-http://sourceforge.net/projects/stefanstools/files/BowPad/2.0.13/BowPad64-2.0.13.msi/download
-BowPad64-2.0.13.msi
-http://sourceforge.net/projects/stefanstools/files/BowPad/2.0.13/BowPad-2.0.13.msi/download
-BowPad-2.0.13.msi
+2.0.14.1302
+http://sourceforge.net/projects/stefanstools/files/BowPad/2.0.14/BowPad64-2.0.14.msi/download
+BowPad64-2.0.14.msi
+http://sourceforge.net/projects/stefanstools/files/BowPad/2.0.14/BowPad-2.0.14.msi/download
+BowPad-2.0.14.msi
