@@ -10,7 +10,7 @@ if exist ..\..\cov-analysis-win64-7.6.0 (
 if not defined COVDIR if exist ..\..\cov-analysis-win32-7.6.0 (
   set "COVDIR=..\..\cov-analysis-win32-7.6.0"
 )
-if not defined COVDIR set "COVDIR=C:\cov-analysis-win32"
+if not defined COVDIR set "COVDIR=C:\cov-analysis"
 if defined COVDIR if not exist "%COVDIR%" (
   echo.
   echo ERROR: Coverity not found in "%COVDIR%"
