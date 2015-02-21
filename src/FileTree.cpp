@@ -289,6 +289,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                     TreeView_GetItem(*this, &tvex);
                     fi = (FileTreeItem*)tvex.lParam;
                 }
+                bool activepathmarked = false;
                 if (((pData->refreshRoot == TVI_ROOT) && (pData->refreshpath.compare(m_path) == 0)) ||
                     (fi && (fi->path.compare(pData->refreshpath) == 0)))
                 {
@@ -325,6 +326,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                                 tvi.mask |= TVIF_STATE;
                                 tvi.state = TVIS_BOLD;
                                 tvi.stateMask = TVIS_BOLD;
+                                activepathmarked = true;
                             }
                         }
                         tvi.lParam = (LPARAM)item;
@@ -349,6 +351,20 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                         m_bRootBusy = false;
 
                     delete pData;
+
+                    if (!activepath.empty() && !activepathmarked && !m_path.empty())
+                    {
+                        // the current path does not appear to be visible, so
+                        // refresh all sub-paths down to the active path
+                        std::wstring expandpath = CPathUtils::GetParentDirectory(activepath);
+                        HTREEITEM hItem = GetItemForPath(expandpath);
+                        while ((hItem == NULL) && (expandpath.size() > m_path.size()))
+                        {
+                            expandpath = CPathUtils::GetParentDirectory(expandpath);
+                            hItem = GetItemForPath(expandpath);
+                        }
+                        Refresh(hItem);
+                    }
                 }
                 else
                 {
@@ -662,6 +678,29 @@ void CFileTree::OnClose()
     auto start = GetTickCount64();
     while (m_ThreadsRunning && (GetTickCount64() - start < 5000))
         Sleep(10);
+}
+
+HTREEITEM CFileTree::GetItemForPath(const std::wstring& expandpath)
+{
+    HTREEITEM hResult = NULL;
+    RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
+    {
+        TVITEM item = { 0 };
+        item.mask = TVIF_PARAM;
+        item.hItem = hItem;
+        TreeView_GetItem(*this, &item);
+        FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
+        if (pTreeItem)
+        {
+            if (pTreeItem->path.compare(expandpath) == 0)
+            {
+                hResult = hItem;
+                return true;
+            }
+        }
+        return false;
+    });
+    return hResult;
 }
 
 
