@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -345,4 +345,49 @@ bool CCmdFileDelete::Execute()
         }
     }
     return false;
+}
+
+bool CCmdSaveAuto::Execute()
+{
+    int autosave = (int)CIniSettings::Instance().GetInt64(L"View", L"autosave", 0);
+    CIniSettings::Instance().SetInt64(L"View", L"autosave", autosave ? 0 : 1);
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    return true;
+}
+
+HRESULT CCmdSaveAuto::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+{
+    if (UI_PKEY_BooleanValue == key)
+    {
+        int autosave = (int)CIniSettings::Instance().GetInt64(L"View", L"autosave", 0);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, autosave != 0, ppropvarNewValue);
+    }
+    return E_NOTIMPL;
+}
+
+void CCmdSaveAuto::TabNotify(TBHDR * ptbhdr)
+{
+    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    {
+        Save();
+    }
+}
+
+void CCmdSaveAuto::ScintillaNotify(Scintilla::SCNotification * pScn)
+{
+    if (pScn->nmhdr.code == SCN_FOCUSOUT)
+    {
+        Save();
+    }
+}
+
+void CCmdSaveAuto::Save()
+{
+    int autosave = (int)CIniSettings::Instance().GetInt64(L"View", L"autosave", 0);
+    if (autosave)
+    {
+        CDocument doc = GetActiveDocument();
+        if ((doc.m_bIsDirty || doc.m_bNeedsSaving) && !doc.m_path.empty())
+            SaveCurrentTab();
+    }
 }
