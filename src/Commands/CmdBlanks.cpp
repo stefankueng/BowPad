@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 #include "CmdBlanks.h"
 #include "BowPad.h"
 #include "ScintillaWnd.h"
+#include "SciLexer.h"
 
 bool CCmdTrim::Execute()
 {
@@ -71,6 +72,16 @@ bool CCmdTabs2Spaces::Execute()
     // convert the whole file, ignore the selection
     int tabsize = (int)ScintillaCall(SCI_GETTABWIDTH);
     size_t docLength = ScintillaCall(SCI_GETLENGTH) + 1;
+    size_t curpos = ScintillaCall(SCI_GETCURRENTPOS);
+    bool bIgnoreQuotes = false;
+    int lexer = (int)ScintillaCall(SCI_GETLEXER);
+    switch (lexer)
+    {
+        case SCLEX_XML:
+        case SCLEX_HTML:
+            bIgnoreQuotes = true;
+            break;
+    }
 
     std::unique_ptr<char[]> source(new char[docLength]);
     ScintillaCall(SCI_GETTEXT, docLength, (LPARAM)source.get());
@@ -94,9 +105,9 @@ bool CCmdTabs2Spaces::Execute()
         }
         if (*pBuf == '\\')
             escapeChar = true;
-        if (!inString && (*pBuf == '\''))
+        if (!bIgnoreQuotes && !inString && (*pBuf == '\''))
             inChar = !inChar;
-        if ((!inChar) && (*pBuf == '\"'))
+        if (!bIgnoreQuotes && !inChar && (*pBuf == '\"'))
             inString = !inString;
         if (inChar || inString)
             continue;
@@ -117,6 +128,7 @@ bool CCmdTabs2Spaces::Execute()
 
     if (spacestoinsert)
     {
+        size_t setpos = curpos;
         inlinepos = 0;
         size_t newfilelen = docLength + spacestoinsert;
         std::unique_ptr<char[]> destination(new char[newfilelen]);
@@ -137,9 +149,9 @@ bool CCmdTabs2Spaces::Execute()
             }
             if (*pOldBuf == '\\')
                 escapeChar = true;
-            if (!inString && (*pOldBuf == '\''))
+            if (!bIgnoreQuotes && !inString && (*pOldBuf == '\''))
                 inChar = !inChar;
-            if ((!inChar) && (*pOldBuf == '\"'))
+            if (!bIgnoreQuotes && !inChar && (*pOldBuf == '\"'))
                 inString = !inString;
             if (inChar || inString)
             {
@@ -158,6 +170,8 @@ bool CCmdTabs2Spaces::Execute()
                 for (size_t j = 0; j < inlinepostemp; ++j)
                 {
                     *pBuf++ = ' ';
+                    if (i < curpos)
+                        ++setpos;
                 }
                 pOldBuf++;
             }
@@ -167,6 +181,7 @@ bool CCmdTabs2Spaces::Execute()
         ScintillaCall(SCI_BEGINUNDOACTION);
         ScintillaCall(SCI_SETTEXT, 0, (LPARAM)destination.get());
         ScintillaCall(SCI_ENDUNDOACTION);
+        Center((long)setpos, (long)setpos);
         return true;
     }
     return false;
@@ -177,6 +192,16 @@ bool CCmdSpaces2Tabs::Execute()
     // convert the whole file, ignore the selection
     int tabsize = (int)ScintillaCall(SCI_GETTABWIDTH);
     size_t docLength = ScintillaCall(SCI_GETLENGTH) + 1;
+    size_t curpos = ScintillaCall(SCI_GETCURRENTPOS);
+    bool bIgnoreQuotes = false;
+    int lexer = (int)ScintillaCall(SCI_GETLEXER);
+    switch (lexer)
+    {
+        case SCLEX_XML:
+        case SCLEX_HTML:
+            bIgnoreQuotes = true;
+            break;
+    }
 
     std::unique_ptr<char[]> source(new char[docLength]);
     ScintillaCall(SCI_GETTEXT, docLength, (LPARAM)source.get());
@@ -200,9 +225,9 @@ bool CCmdSpaces2Tabs::Execute()
         }
         if (*pBuf == '\\')
             escapeChar = true;
-        if (!inString && (*pBuf == '\''))
+        if (!bIgnoreQuotes && !inString && (*pBuf == '\''))
             inChar = !inChar;
-        if ((!inChar) && (*pBuf == '\"'))
+        if (!bIgnoreQuotes && !inChar && (*pBuf == '\"'))
             inString = !inString;
         if (inChar || inString)
         {
@@ -230,6 +255,7 @@ bool CCmdSpaces2Tabs::Execute()
     // groups with tabs.
     if (count)
     {
+        size_t setpos = curpos;
         size_t newfilelen = docLength;
         newfilelen -= count;
         std::unique_ptr<char[]> destination(new char[newfilelen]);
@@ -248,6 +274,8 @@ bool CCmdSpaces2Tabs::Execute()
                     i++;
                     spacecount++;
                     pOldBuf++;
+                    if (i < curpos)
+                        --setpos;
                 }
                 if ((spacecount < (size_t)tabsize) && (*pOldBuf == '\t'))
                     pBuf--;
@@ -260,6 +288,7 @@ bool CCmdSpaces2Tabs::Execute()
         ScintillaCall(SCI_BEGINUNDOACTION);
         ScintillaCall(SCI_SETTEXT, 0, (LPARAM)destination.get());
         ScintillaCall(SCI_ENDUNDOACTION);
+        Center((long)setpos, (long)setpos);
         return true;
     }
     return false;
