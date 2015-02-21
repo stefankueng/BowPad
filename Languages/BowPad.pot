@@ -161,6 +161,10 @@ msgstr ""
 msgid "Auto Braces"
 msgstr ""
 
+#. Resource IDs: (3754)
+msgid "Auto save"
+msgstr ""
+
 #. Resource IDs: (9)
 msgid "Available Languages"
 msgstr ""
@@ -1433,6 +1437,10 @@ msgstr ""
 
 #. Resource IDs: (3753)
 msgid "Saves all open files"
+msgstr ""
+
+#. Resource IDs: (3754)
+msgid "Saves changes automatically when the tab is switched or closed"
 msgstr ""
 
 #. Resource IDs: (3752)
