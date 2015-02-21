@@ -102,6 +102,11 @@
         <Image>res/SaveAllL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdSaveAuto" LabelTitle="Auto save" TooltipTitle="Auto save" TooltipDescription="Saves changes automatically when the tab is switched or closed">
+      <Command.LargeImages>
+        <Image>res/SaveAutoL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdSaveAs" LabelTitle="Sa&amp;ve as" TooltipTitle="Save as" TooltipDescription="Asks where to save the current tab" Keytip="AS">
       <Command.LargeImages>
         <Image>res/SaveAsL.bmp</Image>
@@ -744,6 +749,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdPasteHistory" Id="10011" />
     <Command Name="cmdGroupNewBtn" Id="10012" />
     <Command Name="cmdFileTreeControl" Id="10013" />
+    <Command Name="cmdGroupSaveBtn" Id="10014" />
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />
 
@@ -824,7 +830,12 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Button CommandName="cmdNewDefault" />
             </SplitButton>
             <Button CommandName="cmdSave" />
-            <Button CommandName="cmdSaveAll" />
+            <SplitButton CommandName="cmdGroupSaveBtn">
+              <SplitButton.ButtonItem>
+                <Button CommandName="cmdSaveAll" />
+              </SplitButton.ButtonItem>
+              <ToggleButton CommandName="cmdSaveAuto" />
+            </SplitButton>
             <Button CommandName="cmdSessionLoad" />
             <ToggleButton CommandName="cmdSessionAutoLoad" />
           </Group>
