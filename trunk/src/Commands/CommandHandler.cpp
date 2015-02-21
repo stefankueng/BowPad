@@ -99,6 +99,7 @@ void CCommandHandler::Init( void * obj )
     Add<CCmdOpen>(obj);
     Add<CCmdSave>(obj);
     Add<CCmdSaveAll>(obj);
+    Add<CCmdSaveAuto>(obj);
     Add<CCmdSaveAs>(obj);
     Add<CCmdReload>(obj);
     Add<CCmdSummary>(obj);
