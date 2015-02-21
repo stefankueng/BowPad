@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2015-02-15 13:33+0100\n"
+"PO-Revision-Date: 2015-02-21 16:15+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -165,6 +165,10 @@ msgstr "Autor: Stefan Küng"
 #. Resource IDs: (3780)
 msgid "Auto Braces"
 msgstr "Auto-Klammern"
+
+#. Resource IDs: (3754)
+msgid "Auto save"
+msgstr "Auto-Speichern"
 
 #. Resource IDs: (9)
 msgid "Available Languages"
@@ -1587,6 +1591,12 @@ msgstr ""
 #. Resource IDs: (3753)
 msgid "Saves all open files"
 msgstr "Speichert alle geöffneten Dateien"
+
+#. Resource IDs: (3754)
+msgid "Saves changes automatically when the tab is switched or closed"
+msgstr ""
+"Speichert Änderungen automatisch wenn der aktive Tab gewechselt oder "
+"geschlossen wird"
 
 #. Resource IDs: (3752)
 msgid "Saves the current tab"
