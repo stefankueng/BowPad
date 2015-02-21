@@ -307,11 +307,12 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 if (m_bCursorShown)
                 {
                     RECT rc;
-                    GetWindowRect(*this, &rc);
+                    GetClientRect(*this, &rc);
                     DWORD pos = GetMessagePos();
                     POINT pt;
                     pt.x = GET_X_LPARAM(pos);
                     pt.y = GET_Y_LPARAM(pos);
+                    ScreenToClient(*this, &pt);
                     if (PtInRect(&rc, pt))
                     {
                         m_bCursorShown = false;
