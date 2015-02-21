@@ -2229,6 +2229,7 @@ void CMainWindow::HandleTabChanging(const NMHDR& /*nmhdr*/)
     int docID = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(docID))
     {
+        m_editor.MatchBraces(Clear);
         CDocument doc = m_DocManager.GetDocumentFromID(docID);
         m_editor.SaveCurrentPos(&doc.m_position);
         m_DocManager.SetDocument(docID, doc);
