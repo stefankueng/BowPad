@@ -1843,13 +1843,14 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 return false;
         }
         // check if there's a '/' char before the opening '<' (searching backwards)
-        FindResult result1, result2;
+        FindResult result1, result2, result3;
         size_t currentpos = Call(SCI_GETCURRENTPOS);
         result1 = FindText("/", currentpos, 0, 0);
         result2 = FindText("<", currentpos, 0, 0);
+        result3 = FindText("?", currentpos, 0, 0);
         if (result2.success)
         {
-            if (!result1.success || (result2.start > result1.start))
+            if (!(result1.success || result3.success) || ((result2.start > result1.start) && ((result3.start + 1) != currentpos)))
             {
                 // seems like an opening xml tag
 
