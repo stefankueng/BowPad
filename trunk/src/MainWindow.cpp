@@ -77,6 +77,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_fileTreeVisible(true)
     , m_TabBar(hInst)
     , m_editor(hInst)
+    , m_scratchEditor(hInst)
     , m_newCount(0)
     , m_cRef(1)
     , m_hShieldIcon(nullptr)
@@ -949,6 +950,7 @@ bool CMainWindow::Initialize()
     GetClientRect(*this, &rc);
     m_treeWidth = min(m_treeWidth, rc.right - rc.left - 500);
     m_editor.Init(hResource, *this);
+    m_scratchEditor.InitScratch(hResource);
     // Each value is the right edge of each status bar element.
     m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 870, 920, 1000});
     m_TabBar.Init(hResource, *this);
@@ -1506,6 +1508,8 @@ ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const 
     if (!responsetooutsidemodifiedfiledoall)
     {
         bool changed = doc.m_bNeedsSaving || doc.m_bIsDirty;
+        if (!changed && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
+            return ResponseToOutsideModifiedFile::Reload;
         ResString rTitle(hRes, IDS_OUTSIDEMODIFICATIONS);
         ResString rQuestion(hRes, changed ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
         ResString rSave(hRes, IDS_SAVELOSTOUTSIDEMODS);
@@ -2740,14 +2744,16 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
 
 bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
 {
-    APPVERIFY(tab == m_TabBar.GetCurrentTabIndex());
     int docID = m_TabBar.GetIDFromIndex(tab);
     if (docID < 0) // No such tab.
         return false;
     if (!m_DocManager.HasDocumentID(docID)) // No such document
         return false;
+    bool bReloadCurrentTab = (tab == m_TabBar.GetCurrentTabIndex());
     CDocument doc = m_DocManager.GetDocumentFromID(docID);
 
+    m_scratchEditor.Call(SCI_SETDOCPOINTER, 0, 0);
+    CScintillaWnd * editor = bReloadCurrentTab ? &m_editor : &m_scratchEditor;
     if (dueToOutsideChanges)
     {
         ResponseToOutsideModifiedFile response = AskToReloadOutsideModifiedFile(doc);
@@ -2775,8 +2781,8 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
             doc.m_bNeedsSaving = true;
             m_DocManager.SetDocument(docID, doc);
             // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
-            m_editor.Call(SCI_ADDUNDOACTION, 0, 0);
-            m_editor.Call(SCI_UNDO);
+            editor->Call(SCI_ADDUNDOACTION, 0, 0);
+            editor->Call(SCI_UNDO);
             return false;
         }
     }
@@ -2786,29 +2792,35 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
             return false;
     }
 
+    if (!bReloadCurrentTab)
+        editor->Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+
     // LoadFile increases the reference count, so decrease it here first
-    m_editor.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
+    editor->Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
     CDocument docreload = m_DocManager.LoadFile(*this, doc.m_path.c_str(), encoding, false);
     if (! docreload.m_document)
         return false;
 
-    if (tab == m_TabBar.GetCurrentTabIndex())
-        m_editor.SaveCurrentPos(&doc.m_position);
-
-    // Apply the new one.
-    m_editor.Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
+    if (bReloadCurrentTab)
+    {
+        editor->SaveCurrentPos(&doc.m_position);
+        // Apply the new one.
+        editor->Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
+    }
 
     docreload.m_language = doc.m_language;
     docreload.m_position = doc.m_position;
     m_DocManager.SetDocument(docID, docreload);
-    if (tab == m_TabBar.GetCurrentTabIndex())
-    {
-        m_editor.SetupLexerForLang(docreload.m_language);
-        m_editor.RestoreCurrentPos(docreload.m_position);
-    }
-    UpdateStatusBar(true);
+    editor->SetupLexerForLang(docreload.m_language);
+    editor->RestoreCurrentPos(docreload.m_position);
+    if (bReloadCurrentTab)
+        UpdateStatusBar(true);
     UpdateTab(docID);
-    m_editor.Call(SCI_SETSAVEPOINT);
+    if (bReloadCurrentTab)
+        editor->Call(SCI_SETSAVEPOINT);
+
+    m_scratchEditor.Call(SCI_SETDOCPOINTER, 0, 0);
+
     return true;
 }
 
@@ -2855,10 +2867,10 @@ bool CMainWindow::HasOutsideChangesOccurred() const
 void CMainWindow::CheckForOutsideChanges()
 {
     static bool bInsideCheckForOutsideChanges = false;
-    // See if any doc has been changed externally.
     if (bInsideCheckForOutsideChanges)
         return;
 
+    // See if any doc has been changed externally.
     bInsideCheckForOutsideChanges = true;
     OnOutOfScope(bInsideCheckForOutsideChanges = false;);
     responsetooutsidemodifiedfiledoall = FALSE;
@@ -2870,9 +2882,17 @@ void CMainWindow::CheckForOutsideChanges()
         auto ds = m_DocManager.HasFileChanged(docID);
         if (ds == DM_Modified || ds == DM_Removed)
         {
-            m_TabBar.ActivateAt(i);
-            if (i != activeTab)
-                bChangedTab = true;
+            CDocument doc = m_DocManager.GetDocumentFromID(docID);
+            if (!doc.m_bIsDirty && !doc.m_bNeedsSaving && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
+            {
+                ReloadTab(i, -1);
+            }
+            else
+            {
+                m_TabBar.ActivateAt(i);
+                if (i != activeTab)
+                    bChangedTab = true;
+            }
         }
     }
     responsetooutsidemodifiedfiledoall = FALSE;
