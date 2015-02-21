@@ -52,6 +52,7 @@ protected:
     virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
     HTREEITEM RecurseTree(HTREEITEM hItem, ItemHandler handler);
+    HTREEITEM GetItemForPath(const std::wstring& expandpath);
     void RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath);
 
     virtual void TabNotify(TBHDR * ptbhdr);
