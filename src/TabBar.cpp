@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -281,16 +281,6 @@ void CTabBar::SetFont(const TCHAR *fontName, int fontSize)
 
 void CTabBar::ActivateAt(int index) const
 {
-    // We are about to send TCN_SELCHANGING and TCN_SELCHANGE events.
-    // commtrl sends the same events to a TabBar's owner as we do
-    // It sends them with NMHDR data, not TABHDR data.
-    // We should use NMHDR too because the receiver can't easily distinguish
-    // our message from commtrl ones and even if it could, commctrl doesn't
-    // populate the extra fields we are sending so the receiver has to
-    // have code to re-fetch these values directly so it might as well do that
-    // in our case too. That free's us to use NMHDR instead of TBHDR
-    // making our events nearly the same which is easier on the receiver.
-
     InvalidateRect(*this, nullptr, TRUE);
     NMHDR nmhdr = {};
     nmhdr.hwndFrom = *this;
