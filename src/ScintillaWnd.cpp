@@ -954,10 +954,10 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
 
     KillTimer(*this, TIM_BRACEHIGHLIGHTTEXT);
     KillTimer(*this, TIM_BRACEHIGHLIGHTTEXTCLEAR);
+    Call(SCI_SETHIGHLIGHTGUIDE, 0);
     if ((braceAtCaret != -1) && (braceOpposite == -1))
     {
         Call(SCI_BRACEBADLIGHT, braceAtCaret);
-        Call(SCI_SETHIGHLIGHTGUIDE, 0);
         if (lastIndicatorLength && CIniSettings::Instance().GetInt64(L"View", L"bracehighlighttext", 1))
         {
             Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
@@ -995,11 +995,11 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
                 SetTimer(*this, TIM_BRACEHIGHLIGHTTEXT, 1000, NULL);
         }
 
-        if (Call(SCI_GETINDENTATIONGUIDES) != 0)
+        if ((what == Highlight) && (Call(SCI_GETINDENTATIONGUIDES) != 0))
         {
             int columnAtCaret = int(Call(SCI_GETCOLUMN, braceAtCaret));
             int columnOpposite = int(Call(SCI_GETCOLUMN, braceOpposite));
-            Call(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite)?columnAtCaret:columnOpposite);
+            Call(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite) ? columnAtCaret : columnOpposite);
         }
     }
 }
