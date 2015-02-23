@@ -347,8 +347,8 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
 
                     if (fi)
                         fi->busy = false;
-                    if (m_bRootBusy)
-                        m_bRootBusy = false;
+                    m_bRootBusy = false;
+
 
                     delete pData;
 
@@ -363,7 +363,8 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                             expandpath = CPathUtils::GetParentDirectory(expandpath);
                             hItem = GetItemForPath(expandpath);
                         }
-                        Refresh(hItem);
+                        if (hItem)
+                            Refresh(hItem);
                     }
                 }
                 else
@@ -637,13 +638,21 @@ void CFileTree::TabNotify(TBHDR * ptbhdr)
                         item.hItem = hItem;
                         TreeView_GetItem(*this, &item);
                         FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
-                        if (pTreeItem && !pTreeItem->isDir)
+                        if (pTreeItem)
                         {
-                            if (CPathUtils::PathCompare(doc.m_path, pTreeItem->path) == 0)
+                            if (!pTreeItem->isDir)
                             {
-                                TreeView_EnsureVisible(*this, hItem);
-                                TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
-                                return true;
+                                if (CPathUtils::PathCompare(doc.m_path, pTreeItem->path) == 0)
+                                {
+                                    TreeView_EnsureVisible(*this, hItem);
+                                    TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
+                                    return true;
+                                }
+                            }
+                            else
+                            {
+                                if (CPathUtils::PathIsChild(pTreeItem->path, doc.m_path))
+                                    TreeView_Expand(*this, hItem, TVE_EXPAND);
                             }
                         }
                         return false;
