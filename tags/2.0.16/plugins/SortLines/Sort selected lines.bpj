@@ -1,0 +1,61 @@
+// returns the version of the plugin
+function Version() { return 100; }
+// called when the plugin command is executed, i.e. the "button" is clicked
+function Execute()
+{
+    // find the start and end line of the current selection
+    var start     = BowPad.SciGetSelectionStart();
+    var end       = BowPad.SciGetSelectionEnd();
+    var startline = BowPad.SciLineFromPosition(start);
+    var endline   = BowPad.SciLineFromPosition(end);
+    // find the start and end position of the selected lines
+    // these might be different if the selection is not over whole lines
+    var startpos = BowPad.SciPositionFromLine(startline);
+    var endpos   = BowPad.SciPositionFromLine(endline);
+    var lines    = [];
+    // get the lines and put them into an array
+    for (var i = startline; i < endline; ++i)
+    {
+        var line = BowPad.SciGetLine(i);
+        lines.push(line);
+    }
+    // sort the array
+    lines.sort();
+    // the Undo command should undo this whole operation at once
+    BowPad.SciBeginUndoAction();
+    // delete the lines the selection spans over
+    BowPad.SciDeleteRange(startpos, endpos-startpos);
+    // now insert the lines again but this time sorted
+    var arrlength = lines.length;
+    for (var j = 0; j < arrlength; ++j)
+    {
+        BowPad.SciInsertText(startpos, lines[j]);
+        startpos += lines[j].length;
+    }
+    // now we're finished, and this marks the undo action
+	BowPad.SciEndUndoAction();
+    return true;
+}
+
+// notification from the Scintilla control
+function ScintillaNotify(code, position, ch, modifiers, modificationType, text, length, linesAdded, message, wParam, lParam, line, foldLevelNow, foldLevelPrev, margin, listType, x, y, token, annotationLinesAdded, updated) { return; }
+
+// notification about tabs
+function TabNotify(code, tabOrigin) { return; }
+
+// called just before BowPad exits
+function OnClose() { return; }
+// called after BowPad has fully initialized
+function AfterInit() { return; }
+// called just before a document is closed
+function OnDocumentClose(index) { return; }
+// called after a document was opened
+function OnDocumentOpen(index) { return; }
+// called after a document was saved
+function OnDocumentSave(index) { return; }
+// return true if the plugin command is enabled (used for the button)
+function IsEnabled() { return true; }
+// return true if the plugin button should appear as checked
+function IsChecked() { return true; }
+// called on a timer event
+function OnTimer(id) { return; }
