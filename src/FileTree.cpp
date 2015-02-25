@@ -258,7 +258,10 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
         case WM_THREADRESULTREADY:
         {
             if (m_bStop)
+            {
+                m_bRootBusy = false;
                 break;
+            }
 
             std::wstring activepath;
             if (HasActiveDocument())
@@ -369,6 +372,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 }
                 else
                 {
+                    m_bRootBusy = false;
                     // the refresh root is not valid anymore (e.g., the tab
                     // was changed while the thread was running), so delete
                     // the data the thread provided
@@ -475,10 +479,16 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
             refreshPath = pTreeItem->path;
         }
         else
+        {
+            m_bRootBusy = false;
             return;
+        }
     }
     if (refreshPath.empty())
+    {
+        m_bRootBusy = false;
         return;
+    }
 
 
     InterlockedIncrement(&m_ThreadsRunning);
