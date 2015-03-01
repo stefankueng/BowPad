@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -390,6 +390,20 @@ const std::map<int, std::string>& CLexStyles::GetKeywordsForLang( const std::str
     return emptyIntStrVec;
 }
 
+const std::map<int, std::string>& CLexStyles::GetKeywordsForLexer(int lexer)
+{
+    for (auto it = m_Langdata.begin(); it != m_Langdata.end(); ++it)
+    {
+        if (it->second.lexer == lexer)
+        {
+            GenerateUserKeywords(it->second);
+            return it->second.keywordlist;
+        }
+    }
+
+    return emptyIntStrVec;
+}
+
 bool CLexStyles::AddUserFunctionForLang(const std::string& lang, const std::string& fnc)
 {
     auto lt = m_Langdata.find(lang);
@@ -445,6 +459,14 @@ const LexerData& CLexStyles::GetLexerDataForLang( const std::string& lang ) cons
         if (ld != m_lexerdata.end())
             return ld->second;
     }
+    return emptyLexData;
+}
+
+const LexerData& CLexStyles::GetLexerDataForLexer(int lexer)
+{
+    auto ld = m_lexerdata.find(lexer);
+    if (ld != m_lexerdata.end())
+        return ld->second;
     return emptyLexData;
 }
 

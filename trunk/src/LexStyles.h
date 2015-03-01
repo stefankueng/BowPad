@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -92,6 +92,7 @@ public:
 
     const std::map<int, std::string>&   GetKeywordsForExt(const std::string& ext);
     const std::map<int, std::string>&   GetKeywordsForLang(const std::string& lang);
+    const std::map<int, std::string>&   GetKeywordsForLexer(int lexer);
     const std::string&                  GetCommentLineForLang(const std::string& lang) const;
     const std::string&                  GetCommentStreamStartForLang(const std::string& lang) const;
     const std::string&                  GetCommentStreamEndForLang(const std::string& lang) const;
@@ -102,6 +103,7 @@ public:
 
     const LexerData&                    GetLexerDataForExt(const std::string& ext) const;
     const LexerData&                    GetLexerDataForLang(const std::string& lang) const;
+    const LexerData&                    GetLexerDataForLexer(int lexer);
 
     void                                SetLangForPath(const std::wstring& path, const std::wstring& language);
 
