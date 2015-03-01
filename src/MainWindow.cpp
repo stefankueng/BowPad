@@ -2883,7 +2883,7 @@ void CMainWindow::CheckForOutsideChanges()
         if (ds == DM_Modified || ds == DM_Removed)
         {
             CDocument doc = m_DocManager.GetDocumentFromID(docID);
-            if (!doc.m_bIsDirty && !doc.m_bNeedsSaving && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
+            if ((ds != DM_Removed) && !doc.m_bIsDirty && !doc.m_bNeedsSaving && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
             {
                 ReloadTab(i, -1);
             }
