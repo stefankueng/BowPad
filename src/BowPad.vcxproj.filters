@@ -333,6 +333,9 @@
     <ClInclude Include="Commands\CmdFolding.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdSpellcheck.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -585,6 +588,9 @@
       <Filter>sktoolslib</Filter>
     </ClCompile>
     <ClCompile Include="Commands\CmdFolding.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdSpellcheck.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
