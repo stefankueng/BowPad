@@ -728,7 +728,40 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdFoldLevel8" LabelTitle="Toggle level 8" TooltipTitle="Toggle level 8" TooltipDescription="toggles folding at level 8 in the whole document" />
     <Command Name="cmdFoldLevel9" LabelTitle="Toggle level 9" TooltipTitle="Toggle level 9" TooltipDescription="toggles folding at level 9 in the whole document" />
 
+    <Command Name="cmdSpellCheckGroup" LabelTitle="Spell Check">
+      <Command.LargeImages>
+        <Image>res/FoldL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpellCheck" LabelTitle="Spell checker" TooltipTitle="Spell checker" TooltipDescription="Enables/Disables the spell checker">
+      <Command.LargeImages>
+        <Image>res/SpellCheckL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpellCheckLang" LabelTitle="Language" TooltipTitle="Spell checker language" TooltipDescription="Selects the language for the spell checker">
+      <Command.LargeImages>
+        <Image>res/LangL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpellCheckCorrect" LabelTitle="Spell checker" TooltipTitle="Spell checker" TooltipDescription="Correct spelling mistakes">
+      <Command.LargeImages>
+        <Image>res/SpellCheckL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpellCheckAll" LabelTitle="Only comments" TooltipTitle="Only comments" TooltipDescription="Check for errors only in comments, strings and text">
+      <Command.LargeImages>
+        <Image>res/CommentL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpellCheckUpper" LabelTitle="Include uppercase" TooltipTitle="Include uppercase" TooltipDescription="Include words that are all CAPS or have uppercase letters in the middle">
+      <Command.SmallImages>
+        <Image>res/TitleCaseS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+
+
     <Command Name="cmdContextMap" />
+    <Command Name="cmdContextSpellMap" />
     <Command Name="cmdTabContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />
     <Command Name="cmdZoom100" Id="10001" />
@@ -807,6 +840,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Scale Group="cmdGroupBookmarks" Size="Large" />
                 <Scale Group="cmdGroupComment" Size="Medium" />
                 <Scale Group="cmdGroupBlanks" Size="Medium" />
+                <Scale Group="cmdSpellCheckGroup" Size="Medium" />
               </ScalingPolicy.IdealSizes>
               <!-- This describes the order and how the groups shrink when the window is
               resized. -->
@@ -819,6 +853,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Scale Group="cmdGroupComment" Size="Small" />
               <Scale Group="cmdGroupBlanks" Size="Small" />
               <Scale Group="cmdGroupUndo" Size="Medium" />
+              <Scale Group="cmdSpellCheckGroup" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
           <Group CommandName="cmdGroupFile" SizeDefinition="FiveOrSixButtons">
@@ -961,6 +996,16 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               </MenuGroup>
             </DropDownButton>
             <ToggleButton CommandName="cmdLineWrap"/>
+          </Group>
+          <Group CommandName="cmdSpellCheckGroup" SizeDefinition="FourButtons" ApplicationModes='1'>
+            <ToggleButton CommandName="cmdSpellCheck" />
+            <DropDownGallery CommandName="cmdSpellCheckLang" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="4"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <ToggleButton CommandName="cmdSpellCheckAll" />
+            <ToggleButton CommandName="cmdSpellCheckUpper" />
           </Group>
         </Tab>
         <Tab CommandName="cmdOtherTab">
@@ -1206,6 +1251,61 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             </DropDownGallery>
           </MenuGroup>
         </ContextMenu>
+        <ContextMenu Name="ContextMenuSpell">
+          <MenuGroup>
+            <Button CommandName="cmdUndo" />
+            <Button CommandName="cmdRedo" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdSelectAll" />
+            <Button CommandName="cmdDelete" />
+          </MenuGroup>
+          <MenuGroup>
+            <DropDownGallery CommandName="cmdSpellCheckCorrect" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="1"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdLaunchSearch"/>
+            <Button CommandName="cmdLaunchWikipedia"/>
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdUppercase" />
+            <Button CommandName="cmdLowercase" />
+            <Button CommandName="cmdTitlecase" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdOpenSelection" />
+          </MenuGroup>
+          <MenuGroup>
+            <DropDownButton CommandName="cmdFoldGroup">
+              <MenuGroup>
+                <Button CommandName="cmdFoldAll" />
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdFoldLevel0" />
+                <Button CommandName="cmdFoldLevel1" />
+                <Button CommandName="cmdFoldLevel2" />
+                <Button CommandName="cmdFoldLevel3" />
+                <Button CommandName="cmdFoldLevel4" />
+                <Button CommandName="cmdFoldLevel5" />
+                <Button CommandName="cmdFoldLevel6" />
+                <Button CommandName="cmdFoldLevel7" />
+                <Button CommandName="cmdFoldLevel8" />
+                <Button CommandName="cmdFoldLevel9" />
+              </MenuGroup>
+            </DropDownButton>
+          </MenuGroup>
+          <MenuGroup>
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+          </MenuGroup>
+        </ContextMenu>
         <ContextMenu Name="TabContextMenu">
           <MenuGroup>
             <Button CommandName="cmdClose" />
@@ -1232,6 +1332,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </ContextPopup.ContextMenus>
       <ContextPopup.ContextMaps>
         <ContextMap CommandName="cmdContextMap" ContextMenu="ContextMenu" MiniToolbar="CopyPasteToolbar"/>
+        <ContextMap CommandName="cmdContextSpellMap" ContextMenu="ContextMenuSpell" MiniToolbar="CopyPasteToolbar"/>
         <ContextMap CommandName="cmdTabContextMap" ContextMenu="TabContextMenu" />
       </ContextPopup.ContextMaps>
     </ContextPopup>

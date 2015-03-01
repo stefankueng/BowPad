@@ -50,6 +50,8 @@ UpdatePanningFeedbackFN UpdatePanningFeedbackFunc = nullptr;
 
 CAutoLibrary hUxThemeDll = LoadLibrary(L"uxtheme.dll");
 
+UINT32 contextID = cmdContextMap;
+
 extern IUIFramework * g_pFramework;
 extern std::string    sHighlightString;  // from CmdFindReplace
 
@@ -243,7 +245,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
 
             // The basic pattern of how to show Contextual UI in a specified location.
             IUIContextualUI * pContextualUI = NULL;
-            if (SUCCEEDED(g_pFramework->GetView(cmdContextMap, IID_PPV_ARGS(&pContextualUI))))
+            if (SUCCEEDED(g_pFramework->GetView(contextID, IID_PPV_ARGS(&pContextualUI))))
             {
                 pContextualUI->ShowAtLocation(pt.x, pt.y);
                 pContextualUI->Release();
@@ -680,6 +682,10 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETOUTLINEALPHA, INDIC_BRACEMATCH, 0);
     Call(SCI_INDICSETUNDER, INDIC_BRACEMATCH, true);
     Call(SCI_INDICSETFORE, INDIC_BRACEMATCH, CTheme::Instance().GetThemeColor(RGB(0, 150, 0)));
+
+    Call(SCI_INDICSETSTYLE, INDIC_MISSPELLED, INDIC_SQUIGGLE);
+    Call(SCI_INDICSETFORE, INDIC_MISSPELLED, CTheme::Instance().GetThemeColor(RGB(255, 0, 0)));
+    Call(SCI_INDICSETUNDER, INDIC_MISSPELLED, true);
 
     Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, CTheme::Instance().GetThemeColor(RGB(0,150,0)));
     Call(SCI_STYLESETBOLD, STYLE_BRACELIGHT, 1);

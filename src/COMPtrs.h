@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,12 +17,14 @@
 
 #pragma once
 #include <comip.h>
+#include <comdefsp.h>
 
 #include <UIRibbon.h>
 #include <ShlObj.h>
 #include <Shobjidl.h>
 #include <activscp.h>
 #include <UIAutomation.h>
+#include <spellcheck.h>
 
 _COM_SMARTPTR_TYPEDEF(IUICollection, __uuidof(IUICollection));
 _COM_SMARTPTR_TYPEDEF(IUIImage, __uuidof(IUIImage));
@@ -47,4 +49,10 @@ _COM_SMARTPTR_TYPEDEF(IUIAutomation, __uuidof(IUIAutomation));
 _COM_SMARTPTR_TYPEDEF(IUIAutomationElement, __uuidof(IUIAutomationElement));
 _COM_SMARTPTR_TYPEDEF(IUIAutomationCondition, __uuidof(IUIAutomationCondition));
 _COM_SMARTPTR_TYPEDEF(IUIAutomationInvokePattern, __uuidof(IUIAutomationInvokePattern));
+
+// Spellchecker
+_COM_SMARTPTR_TYPEDEF(ISpellCheckerFactory, __uuidof(ISpellCheckerFactory));
+_COM_SMARTPTR_TYPEDEF(ISpellChecker, __uuidof(ISpellChecker));
+_COM_SMARTPTR_TYPEDEF(IEnumSpellingError, __uuidof(IEnumSpellingError));
+_COM_SMARTPTR_TYPEDEF(ISpellingError, __uuidof(ISpellingError));
 

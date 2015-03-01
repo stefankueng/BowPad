@@ -52,6 +52,7 @@
 #include "CmdNewCopy.h"
 #include "CmdDefaultEncoding.h"
 #include "CmdScripts.h"
+#include "CmdSpellcheck.h"
 #include "CmdPlugins.h"
 #include "CmdPluginsConfig.h"
 #include "CmdTabList.h"
@@ -193,6 +194,12 @@ void CCommandHandler::Init( void * obj )
 
     Add<CCmdHeaderSource>(obj);
     Add<CCmdOpenSelection>(obj);
+
+    Add<CCmdSpellcheck>(obj);
+    Add<CCmdSpellcheckLang>(obj);
+    Add<CCmdSpellcheckCorrect>(obj);
+    Add<CCmdSpellcheckAll>(obj);
+    Add<CCmdSpellcheckUpper>(obj);
 
     Add<CCmdLaunchIE>(obj);
     Add<CCmdLaunchFirefox>(obj);
