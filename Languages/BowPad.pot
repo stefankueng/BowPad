@@ -123,6 +123,10 @@ msgstr ""
 msgid "Access to the file '%s' was denied. Do you want to try again with elevated privileges?"
 msgstr ""
 
+#. Resource IDs: (14)
+msgid "Add word to dictionary"
+msgstr ""
+
 #. Resource IDs: (3782)
 msgid "All plugin commands are listed here"
 msgstr ""
@@ -271,6 +275,10 @@ msgstr ""
 
 #. Resource IDs: (1027)
 msgid "Check for Updates"
+msgstr ""
+
+#. Resource IDs: (3787)
+msgid "Check for errors only in comments, strings and text"
 msgstr ""
 
 #. Resource IDs: (65535)
@@ -439,6 +447,14 @@ msgstr ""
 
 #. Resource IDs: (3754)
 msgid "Copy the current selection to the clipboard"
+msgstr ""
+
+#. Resource IDs: (3787)
+msgid "Correct spelling mistakes"
+msgstr ""
+
+#. Resource IDs: (14)
+msgid "Corrections"
 msgstr ""
 
 #. Resource IDs: (3772)
@@ -659,6 +675,10 @@ msgstr ""
 msgid "Enable to automatically add a closing brace when an opening brace is entered"
 msgstr ""
 
+#. Resource IDs: (3786)
+msgid "Enables/Disables the spell checker"
+msgstr ""
+
 #. Resource IDs: (3755)
 msgid "Encoding"
 msgstr ""
@@ -809,8 +829,24 @@ msgstr ""
 msgid "H"
 msgstr ""
 
+#. Resource IDs: (14)
+msgid "Ignore"
+msgstr ""
+
 #. Resource IDs: (1079)
 msgid "Ignore &case."
+msgstr ""
+
+#. Resource IDs: (14)
+msgid "Ignore word for this session"
+msgstr ""
+
+#. Resource IDs: (3787)
+msgid "Include uppercase"
+msgstr ""
+
+#. Resource IDs: (3787)
+msgid "Include words that are all CAPS or have uppercase letters in the middle"
 msgstr ""
 
 #. Resource IDs: (12)
@@ -1110,6 +1146,10 @@ msgstr ""
 msgid "Next Bookmark"
 msgstr ""
 
+#. Resource IDs: (14)
+msgid "No corrections found!"
+msgstr ""
+
 #. Resource IDs: (13)
 msgid "No files found"
 msgstr ""
@@ -1136,6 +1176,10 @@ msgstr ""
 
 #. Resource IDs: (9)
 msgid "Online Languages"
+msgstr ""
+
+#. Resource IDs: (3787)
+msgid "Only comments"
 msgstr ""
 
 #. Resource IDs: (3769)
@@ -1489,6 +1533,10 @@ msgstr ""
 msgid "Select the language for BowPad"
 msgstr ""
 
+#. Resource IDs: (3787)
+msgid "Selects the language for the spell checker"
+msgstr ""
+
 #. Resource IDs: (3762)
 msgid "Sends the document to the default printer"
 msgstr ""
@@ -1579,6 +1627,18 @@ msgstr ""
 
 #. Resource IDs: (3764)
 msgid "Spaces to Tabs"
+msgstr ""
+
+#. Resource IDs: (3786)
+msgid "Spell Check"
+msgstr ""
+
+#. Resource IDs: (3786, 3787)
+msgid "Spell checker"
+msgstr ""
+
+#. Resource IDs: (3787)
+msgid "Spell checker language"
 msgstr ""
 
 #. Resource IDs: (3761)
