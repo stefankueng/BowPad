@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -485,7 +485,9 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     // add more room for Scintilla (usually 1/6 more for editing)
     unsigned __int64 bufferSizeRequested = fileSize + min(1<<20,fileSize/6);
 
-    auto start = GetTickCount64();
+#ifdef _DEBUG
+    ProfileTimer timer(L"LoadFile");
+#endif
 
     // Setup our scratch scintilla control to load the data
     m_scratchScintilla.Call(SCI_SETSTATUS, SC_STATUS_OK);   // reset error status
@@ -550,9 +552,6 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         m_scratchScintilla.Call(SCI_SETREADONLY, true);
     doc.m_document = m_scratchScintilla.Call(SCI_GETDOCPOINTER);    // doc.m_document has reference count of 2
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);               // now doc.m_document has reference count of 1, and the scratch does not hold any doc anymore
-
-    auto end = GetTickCount64();
-    CTraceToOutputDebugString::Instance()(L"Load time: %ld ms\n", end - start);
 
     return doc;
 }
