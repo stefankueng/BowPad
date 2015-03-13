@@ -61,7 +61,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
             {
                 CDownloadFile filedownloader(L"BowPad", NULL);
                 std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
-                filedownloader.DownloadFile(L"https://bowpad.googlecode.com/svn/trunk/plugins/plugins.txt", tempfile);
+                filedownloader.DownloadFile(L"https://svn.code.sf.net/p/bowpad-sk/code/trunk/plugins/plugins.txt", tempfile);
 
                 //CopyFile(L"D:\\Development\\BowPad\\BowPad\\plugins\\plugins.txt", tempfile.c_str(), FALSE);
                 // parse the file and fill in the m_plugins set
@@ -139,7 +139,7 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                         {
                             CDownloadFile filedownloader(L"BowPad", NULL);
                             std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true, L".zip");
-                            std::wstring pluginurl = L"https://bowpad.googlecode.com/svn/trunk/plugins/";
+                            std::wstring pluginurl = L"https://svn.code.sf.net/p/bowpad-sk/code/trunk/plugins/";
                             pluginurl += info.name;
                             pluginurl += L".zip";
                             filedownloader.DownloadFile(pluginurl, tempfile);
