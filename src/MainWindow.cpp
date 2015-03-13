@@ -718,7 +718,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         // the update check can show a dialog. Doing this in the
         // WM_SETFOCUS handler causes problems due to the dialog
         // having its own message queue.
-        // See issue #129 https://code.google.com/p/bowpad/issues/detail?id=129
+        // See issue #129 https://sourceforge.net/p/bowpad-sk/tickets/129/
         // To avoid these problems, set a timer instead. The timer
         // will fire after all messages related to the focus change have
         // been handled, and then it is save to show a message box dialog.
