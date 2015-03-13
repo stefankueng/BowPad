@@ -50,7 +50,7 @@ static void LoadLanguage(HINSTANCE hInstance)
             // try downloading the new language dll right now
             // so the user gets the selected language immediately after
             // updating BowPad
-            std::wstring sLangURL = CStringUtils::Format(L"https://bowpad.googlecode.com/svn/branches/%d.%d.%d/Languages/%s/BowPad_%s.lang", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, LANGPLAT, lang.c_str());
+            std::wstring sLangURL = CStringUtils::Format(L"https://svn.code.sf.net/p/bowpad-sk/code/branches/%d.%d.%d/Languages/%s/BowPad_%s.lang", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, LANGPLAT, lang.c_str());
 
             // note: text below is in English and not translatable because
             // we try to download the translation file here, so there's no

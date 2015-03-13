@@ -126,7 +126,7 @@ bool CAppUtils::CheckForUpdate(bool force)
 
             std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
 
-            std::wstring sCheckURL = L"https://bowpad.googlecode.com/svn/trunk/version.txt";
+            std::wstring sCheckURL = L"https://svn.code.sf.net/p/bowpad-sk/code/trunk/version.txt";
             HRESULT res = URLDownloadToFile(NULL, sCheckURL.c_str(), tempfile.c_str(), 0, NULL);
             if (res == S_OK)
             {
