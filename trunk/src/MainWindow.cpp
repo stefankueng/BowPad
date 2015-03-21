@@ -2821,6 +2821,9 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
 
     m_scratchEditor.Call(SCI_SETDOCPOINTER, 0, 0);
 
+    // refresh the file tree
+    m_fileTree.SetPath(m_fileTree.GetPath());
+
     return true;
 }
 
