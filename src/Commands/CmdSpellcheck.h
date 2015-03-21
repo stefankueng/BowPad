@@ -54,6 +54,7 @@ private:
     LexerData                   m_lexerData;
     std::unique_ptr<char[]>     m_textbuffer;
     int                         m_textbuflen;
+    LRESULT                     m_lastcheckedpos;
 };
 
 class CCmdSpellcheckLang : public ICommand
