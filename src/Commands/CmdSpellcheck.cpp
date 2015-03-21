@@ -148,8 +148,8 @@ void CCmdSpellcheck::Check()
             lastpos = textlength - textrange.chrg.cpMin;
         if (m_lastcheckedpos)
         {
-            textrange.chrg.cpMin = m_lastcheckedpos;
-            textrange.chrg.cpMax = m_lastcheckedpos;
+            textrange.chrg.cpMin = (LONG)m_lastcheckedpos;
+            textrange.chrg.cpMax = (LONG)m_lastcheckedpos;
         }
         auto start = GetTickCount64();
         while (textrange.chrg.cpMax < lastpos)
