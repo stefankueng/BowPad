@@ -2111,7 +2111,8 @@ void CMainWindow::AddHotSpots()
 
         m_editor.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
 
-        m_editor.Call(SCI_SETTARGETSTART, startPos);
+        // 20 chars for the url protocol should be enough
+        m_editor.Call(SCI_SETTARGETSTART, max(startPos, posFoundColonSlash-20));
         m_editor.Call(SCI_SETTARGETEND, endPos);
 
         LRESULT posFound = m_editor.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
@@ -2429,6 +2430,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             CCommandHandler::Instance().OnDocumentOpen(index);
             if (m_fileTree.GetPath().empty())
             {
+                ProfileTimer timer(L"Filetree SetPath");
                 m_fileTree.SetPath(CPathUtils::GetParentDirectory(filepath));
                 ResizeChildWindows();
             }
