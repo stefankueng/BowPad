@@ -630,7 +630,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
                 bool wasCloseHover = m_bIsCloseHover;
                 int oldIndex = m_currentHoverTabItem;
-                RECT oldRect;
+                RECT oldRect = { 0 };
 
                 bool ok;
                 ok = TabCtrl_GetItemRect(*this, index, &m_currentHoverTabRect) != FALSE;
