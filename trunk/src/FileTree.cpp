@@ -204,6 +204,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
             FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
 
             IContextMenu *pcm;
+            HTREEITEM hRefresh = NULL;
             if (SUCCEEDED(GetUIObjectOfFile(hwnd, pTreeItem->path.c_str(),
                 IID_IContextMenu, (void**)&pcm)))
             {
@@ -247,11 +248,16 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                             info.nShow = SW_SHOWNORMAL;
                             info.ptInvoke = pt;
                             pcm->InvokeCommand((LPCMINVOKECOMMANDINFO)&info);
+                            hRefresh = TreeView_GetParent(*this, hSelItem);
+                            if (hRefresh == NULL)
+                                hRefresh = TVI_ROOT;
                         }
                     }
                     DestroyMenu(hmenu);
                 }
                 pcm->Release();
+                if (hRefresh)
+                    Refresh(hRefresh);
             }
         }
         break;
