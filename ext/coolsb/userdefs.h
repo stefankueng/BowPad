@@ -62,7 +62,7 @@
    dragging the thumb, that is. #undeffing this results in the thumb
    never snapping back into position, no matter how far away you move
    the mouse */
-#define SNAP_THUMB_BACK
+//#define SNAP_THUMB_BACK
 
 /* distance (in pixels) the mouse must move away from the thumb
    during tracking to cause the thumb bar to snap back to its
