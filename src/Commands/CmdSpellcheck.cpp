@@ -43,6 +43,7 @@ CCmdSpellcheck::CCmdSpellcheck(void * obj)
     , m_enabled(true)
     , m_activeLexer(-1)
     , m_textbuflen(0)
+    , m_lastcheckedpos(0)
 {
     m_enabled = CIniSettings::Instance().GetInt64(L"spellcheck", L"enabled", 1) != 0;
     g_checktimer = GetTimerID();
@@ -97,12 +98,14 @@ void CCmdSpellcheck::ScintillaNotify(Scintilla::SCNotification * pScn)
         case SCN_UPDATEUI:
             if (pScn->updated & (SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL))
             {
+                m_lastcheckedpos = 0;
                 SetTimer(GetHwnd(), g_checktimer, 500, NULL);
             }
             break;
         case SCN_MODIFIED:
             if (pScn->modificationType & (SC_MOD_DELETETEXT | SC_MOD_INSERTTEXT))
             {
+                m_lastcheckedpos = 0;
                 SetTimer(GetHwnd(), g_checktimer, 500, NULL);
             }
             break;
@@ -111,6 +114,8 @@ void CCmdSpellcheck::ScintillaNotify(Scintilla::SCNotification * pScn)
 
 void CCmdSpellcheck::Check()
 {
+    static LRESULT s_lastpos = 0;
+
     if (m_enabled && g_SpellChecker)
     {
 #ifdef _DEBUG
@@ -128,6 +133,7 @@ void CCmdSpellcheck::Check()
             {
                 stringtokset(m_keywords, words.second, true, " ", true);
             }
+            m_lastcheckedpos = 0;
         }
 
         ScintillaCall(SCI_SETCHARSDEFAULT);
@@ -140,8 +146,21 @@ void CCmdSpellcheck::Check()
         auto textlength = ScintillaCall(SCI_GETLENGTH);
         if (lastpos < 0)
             lastpos = textlength - textrange.chrg.cpMin;
+        if (m_lastcheckedpos)
+        {
+            textrange.chrg.cpMin = m_lastcheckedpos;
+            textrange.chrg.cpMax = m_lastcheckedpos;
+        }
+        auto start = GetTickCount64();
         while (textrange.chrg.cpMax < lastpos)
         {
+            if (GetTickCount64() - start > 300)
+            {
+                m_lastcheckedpos = textrange.chrg.cpMax;
+                if (g_checktimer)
+                    SetTimer(GetHwnd(), g_checktimer, 10, NULL);
+                break;
+            }
             textrange.chrg.cpMin = (LONG)ScintillaCall(SCI_WORDSTARTPOSITION, textrange.chrg.cpMax + 1, TRUE);
             if (textrange.chrg.cpMin < textrange.chrg.cpMax)
                 break;
@@ -298,7 +317,10 @@ bool CCmdSpellcheck::Execute()
     CIniSettings::Instance().SetInt64(L"spellcheck", L"enabled", m_enabled);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     if (m_enabled)
+    {
+        m_lastcheckedpos = 0;
         Check();
+    }
     else
     {
         ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
