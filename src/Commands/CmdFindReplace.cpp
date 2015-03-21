@@ -1464,6 +1464,8 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
                         break;
                     FindText.chrg.cpMin = FindText.chrgText.cpMax;
                 }
+                m_lastSelText = sHighlightString.c_str();
+                lastSearchFlags = nSearchFlags;
                 DocScrollUpdate();
             }
             m_lastSelText = sHighlightString.c_str();
