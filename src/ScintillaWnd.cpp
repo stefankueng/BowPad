@@ -341,52 +341,9 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 Call(SCI_SETCURSOR, (uptr_t)-2);
             }
 
-            // Change the indic over urls if the cursor is over them,
-            // and change the cursor to a hand if the ctrl key is pressed
-            // over an url to indicate that a ctrl+doubleclick opens the url
-            static bool activeset = false;
-            static sptr_t laststart = 0;
-            static sptr_t lastend = 0;
-
-            auto msgpos = GetMessagePos();
-            POINT pt;
-            pt.x = GET_X_LPARAM(msgpos);
-            pt.y = GET_Y_LPARAM(msgpos);
-            ScreenToClient(*this, &pt);
-            auto pos = Call(SCI_POSITIONFROMPOINT, pt.x, pt.y);
-            if (pos >= 0)
-            {
-                if (Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, pos))
-                {
-                    if (GetKeyState(VK_CONTROL) & 0x8000)
-                        Call(SCI_SETCURSOR, 8);
-                    auto start = Call(SCI_INDICATORSTART, INDIC_URLHOTSPOT, pos);
-                    auto end = Call(SCI_INDICATOREND, INDIC_URLHOTSPOT, pos);
-                    if (start < end)
-                    {
-                        if ((start != laststart) || (end != lastend))
-                        {
-                            Call(SCI_SETINDICATORCURRENT, INDIC_URLHOTSPOTACTIVE);
-                            Call(SCI_INDICATORCLEARRANGE, 0, Call(SCI_GETLENGTH));
-                        }
-                        Call(SCI_SETINDICATORCURRENT, INDIC_URLHOTSPOTACTIVE);
-                        Call(SCI_INDICATORFILLRANGE, start, end - start);
-                        laststart = start;
-                        lastend = end;
-                        activeset = true;
-                    }
-                    return TRUE;
-                }
-            }
             auto cur = Call(SCI_GETCURSOR);
             if ((cur == 8) || (cur == 0))
                 Call(SCI_SETCURSOR, (uptr_t)SC_CURSORNORMAL);
-            if (activeset)
-            {
-                Call(SCI_SETINDICATORCURRENT, INDIC_URLHOTSPOTACTIVE);
-                Call(SCI_INDICATORCLEARRANGE, 0, Call(SCI_GETLENGTH));
-                activeset = false;
-            }
         }
         break;
     case WM_GESTURENOTIFY:
