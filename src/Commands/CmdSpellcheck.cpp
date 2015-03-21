@@ -177,8 +177,7 @@ void CCmdSpellcheck::Check()
                 }
                 continue;
             }
-            if (ScintillaCall(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, textrange.chrg.cpMin) || 
-                ScintillaCall(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOTACTIVE, textrange.chrg.cpMin))
+            if (ScintillaCall(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, textrange.chrg.cpMin))
                 continue;
 
             int style = (int)ScintillaCall(SCI_GETSTYLEAT, textrange.chrg.cpMin);
