@@ -2430,7 +2430,6 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             CCommandHandler::Instance().OnDocumentOpen(index);
             if (m_fileTree.GetPath().empty())
             {
-                ProfileTimer timer(L"Filetree SetPath");
                 m_fileTree.SetPath(CPathUtils::GetParentDirectory(filepath));
                 ResizeChildWindows();
             }
