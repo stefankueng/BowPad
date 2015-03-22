@@ -57,7 +57,10 @@ const int STATUSBAR_CAPS          = 7;
 const int STATUSBAR_TABS          = 8;
 const int STATUSBAR_ZOOM          = 9;
 
+// TODO:
+// change this to constexpr and constLength once VS2015 is out
 static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
+static const size_t URL_REG_EXPR_LENGTH = strlen(URL_REG_EXPR);
 
 #define TIMER_UPDATECHECK           101
 
@@ -2017,7 +2020,7 @@ bool CMainWindow::HandleDoubleClick(const Scintilla::SCNotification& scn)
     m_editor.Call(SCI_SETTARGETSTART, startPos);
     m_editor.Call(SCI_SETTARGETEND, endPos);
 
-    long posFound = (long)m_editor.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
+    long posFound = (long)m_editor.Call(SCI_SEARCHINTARGET, URL_REG_EXPR_LENGTH, (LPARAM)URL_REG_EXPR);
     if (posFound != -1)
     {
         startPos = int(m_editor.Call(SCI_GETTARGETSTART));
@@ -2113,9 +2116,10 @@ void CMainWindow::AddHotSpots()
 
         // 20 chars for the url protocol should be enough
         m_editor.Call(SCI_SETTARGETSTART, max(startPos, posFoundColonSlash-20));
-        m_editor.Call(SCI_SETTARGETEND, endPos);
+        // urls longer than 2048 are not handled by browsers
+        m_editor.Call(SCI_SETTARGETEND, min(endPos, posFoundColonSlash + 2048));
 
-        LRESULT posFound = m_editor.Call(SCI_SEARCHINTARGET, strlen(URL_REG_EXPR), (LPARAM)URL_REG_EXPR);
+        LRESULT posFound = m_editor.Call(SCI_SEARCHINTARGET, URL_REG_EXPR_LENGTH, (LPARAM)URL_REG_EXPR);
 
         if (posFound != -1)
         {
