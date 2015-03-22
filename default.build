@@ -133,9 +133,9 @@
     </zip>
     <!-- now write the version.txt file -->
     <echo file="version.txt">${verstringfull}
-http://sourceforge.net/projects/stefanstools/files/BowPad/${verstring}/BowPad64-${verstring}.msi/download
+https://sourceforge.net/projects/bowpad-sk/files/${verstring}/BowPad64-${verstring}.msi/download
 BowPad64-${verstring}.msi
-http://sourceforge.net/projects/stefanstools/files/BowPad/${verstring}/BowPad-${verstring}.msi/download
+https://sourceforge.net/projects/bowpad-sk/files/${verstring}/BowPad-${verstring}.msi/download
 BowPad-${verstring}.msi</echo>
     <loadfile file="ext\choco\bowpad.nuspec" property="nuspecfile">
       <filterchain>
