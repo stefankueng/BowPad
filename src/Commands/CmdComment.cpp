@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -189,7 +189,7 @@ bool CCmdUnComment::Execute()
         {
             lineStartStart  = ScintillaCall(SCI_POSITIONFROMLINE, ScintillaCall(SCI_LINEFROMPOSITION, selStart));
             lineEndEnd      = ScintillaCall(SCI_GETLINEENDPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, selEnd));
-            if ((lineStartStart == selStart) && ((lineEndEnd == selEnd) || ((lineEndEnd - selEndCorr) == selEnd)))
+            if (lineStartStart == selStart)
             {
                 // remove block comments for each selected line
                 size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
