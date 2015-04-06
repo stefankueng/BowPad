@@ -1397,14 +1397,21 @@ bool CCmdFindReplace::Execute()
             sSelText = textbuf.get();
         }
         m_pFindReplaceDlg->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
-        if (!sSelText.empty() && (sSelText.size() < 50))
+        if (!sSelText.empty() && (sSelText.find_first_of("\r\n") == std::string::npos))
         {
             SetDlgItemText(*m_pFindReplaceDlg, IDC_SEARCHCOMBO, CUnicodeUtils::StdGetUnicode(sSelText).c_str());
-            SetFocus(GetDlgItem(*m_pFindReplaceDlg, IDC_SEARCHCOMBO));
         }
+        else
+        {
+            SetDlgItemText(*m_pFindReplaceDlg, IDC_SEARCHCOMBO, L"");
+        }
+        SetFocus(GetDlgItem(*m_pFindReplaceDlg, IDC_SEARCHCOMBO));
     }
     else
+    {
+        SetDlgItemText(*m_pFindReplaceDlg, IDC_SEARCHCOMBO, L"");
         m_pFindReplaceDlg->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
+    }
 
     return true;
 }
