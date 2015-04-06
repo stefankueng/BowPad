@@ -367,13 +367,16 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                         // refresh all sub-paths down to the active path
                         std::wstring expandpath = CPathUtils::GetParentDirectory(activepath);
                         HTREEITEM hItem = GetItemForPath(expandpath);
-                        while ((hItem == NULL) && (expandpath.size() > m_path.size()))
+                        if (hItem == NULL)
                         {
-                            expandpath = CPathUtils::GetParentDirectory(expandpath);
-                            hItem = GetItemForPath(expandpath);
+                            while ((hItem == NULL) && (expandpath.size() > m_path.size()))
+                            {
+                                expandpath = CPathUtils::GetParentDirectory(expandpath);
+                                hItem = GetItemForPath(expandpath);
+                            }
+                            if (hItem)
+                                Refresh(hItem);
                         }
-                        if (hItem)
-                            Refresh(hItem);
                     }
                 }
                 else
