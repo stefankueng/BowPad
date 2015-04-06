@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -176,9 +176,15 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLinePa
             LPWSTR * szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
             if (szArglist)
             {
+                bool bOmitNext = false;
                 for (int i = 0; i < nArgs; i++)
                 {
-                    if (szArglist[i][0] != '/')
+                    if (bOmitNext)
+                    {
+                        bOmitNext = false;
+                        continue;
+                    }
+                    if ((szArglist[i][0] != '/') && (szArglist[i][0] != '-'))
                     {
                         std::wstring path = szArglist[i];
                         CPathUtils::NormalizeFolderSeparators(path);
@@ -187,6 +193,8 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLinePa
                     }
                     else
                     {
+                        if (wcscmp(&szArglist[i][1], L"z") == 0)
+                            bOmitNext = true;
                         sCmdLine += szArglist[i];
                         sCmdLine += L" ";
                     }
@@ -269,14 +277,26 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
             {
                 line = parser.GetLongVal(L"line") - 1;
             }
+
+            bool bOmitNext = false;
             for (int i = 1; i < nArgs; i++)
             {
-                if (szArglist[i][0] != '/')
+                if (bOmitNext)
+                {
+                    bOmitNext = false;
+                    continue;
+                }
+                if ((szArglist[i][0] != '/') && (szArglist[i][0] != '-'))
                 {
                     std::wstring path = szArglist[i];
                     CPathUtils::NormalizeFolderSeparators(path);
                     path = CPathUtils::GetLongPathname(path);
                     mainWindow.SetFileToOpen(path, line);
+                }
+                else
+                {
+                    if (wcscmp(&szArglist[i][1], L"z") == 0)
+                        bOmitNext = true;
                 }
             }
 
