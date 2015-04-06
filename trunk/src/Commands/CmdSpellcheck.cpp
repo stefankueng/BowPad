@@ -36,7 +36,7 @@ ISpellCheckerFactoryPtr     g_spellCheckerFactory = nullptr;
 ISpellCheckerPtr            g_SpellChecker = nullptr;
 std::vector<std::wstring>   g_languages;
 UINT                        g_checktimer = 0;
-
+std::string                 g_wordchars;
 
 CCmdSpellcheck::CCmdSpellcheck(void * obj)
     : ICommand(obj)
@@ -84,6 +84,14 @@ CCmdSpellcheck::CCmdSpellcheck(void * obj)
         }
         m_textbuflen = 1024;
         m_textbuffer = std::make_unique<char[]>(m_textbuflen);
+    }
+
+    // create a string with all the word chars
+    g_wordchars.clear();
+    for (int ch = 0; ch < 256; ++ch)
+    {
+        if (ch >= 0x80 || isalnum(ch) || ch == '_' || ch == '\'')
+            g_wordchars += (char)ch;
     }
 
     contextID = m_enabled && g_SpellChecker ? cmdContextSpellMap : cmdContextMap;
@@ -136,7 +144,7 @@ void CCmdSpellcheck::Check()
             m_lastcheckedpos = 0;
         }
 
-        ScintillaCall(SCI_SETCHARSDEFAULT);
+        ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)g_wordchars.c_str());
         TEXTRANGEA textrange;
         LRESULT firstline = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
         LRESULT lastline = firstline + ScintillaCall(SCI_LINESONSCREEN);
@@ -510,7 +518,7 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
         {
             std::wstring sWord;
 
-            ScintillaCall(SCI_SETCHARSDEFAULT);
+            ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)g_wordchars.c_str());
             long currentPos = (long)ScintillaCall(SCI_GETCURRENTPOS);
             long startPos = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
             long endPos = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
