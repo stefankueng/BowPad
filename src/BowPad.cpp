@@ -291,6 +291,23 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
                     std::wstring path = szArglist[i];
                     CPathUtils::NormalizeFolderSeparators(path);
                     path = CPathUtils::GetLongPathname(path);
+                    if (!PathFileExists(path.c_str()))
+                    {
+                        std::wstring tmp = GetCommandLineW();
+                        auto pathpos = tmp.find(szArglist[i]);
+                        if (pathpos != std::wstring::npos)
+                        {
+                            tmp = tmp.substr(pathpos);
+                            if (PathFileExists(tmp.c_str()))
+                            {
+                                path = tmp;
+                                CPathUtils::NormalizeFolderSeparators(path);
+                                path = CPathUtils::GetLongPathname(path);
+                                mainWindow.SetFileToOpen(path, line);
+                                break;
+                            }
+                        }
+                    }
                     mainWindow.SetFileToOpen(path, line);
                 }
                 else
