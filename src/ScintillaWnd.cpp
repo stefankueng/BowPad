@@ -1808,18 +1808,23 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
             default:
                 return false;
         }
+        if (CIniSettings::Instance().GetInt64(L"View", L"autobracexml", 1) == 0)
+            return false;
+
         // check if there's a '/' char before the opening '<' (searching backwards)
-        FindResult result1, result2, result3;
+        FindResult result1, result2;
         size_t currentpos = Call(SCI_GETCURRENTPOS);
         result1 = FindText("/", currentpos, 0, 0);
         result2 = FindText("<", currentpos, 0, 0);
-        result3 = FindText("?", currentpos, 0, 0);
         if (result2.success)
         {
-            if (!(result1.success || result3.success) || ((result2.start > result1.start) && ((result3.start + 1) != currentpos)))
+            if (!result1.success || (result2.start > result1.start))
             {
                 // seems like an opening xml tag
-
+                // prevent closing tags that are not full tags
+                auto c = Call(SCI_GETCHARAT, result2.start + 1, 0);
+                if ((c == '?') || (c == '%'))
+                    return false;
                 // insert the closing tag now
                 Call(SCI_ADDTEXT, 1, (sptr_t)">");
                 size_t cursorPos = Call(SCI_GETCURRENTPOS);
