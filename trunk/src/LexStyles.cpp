@@ -140,14 +140,14 @@ void CLexStyles::Load()
         inis[1].LoadFile(userStyleFile.c_str());
     }
 
-    HRSRC hRes = FindResource(nullptr, MAKEINTRESOURCE(IDR_LEXSTYLES), L"config");
-    if (hRes)
+    HRSRC hResource = FindResource(nullptr, MAKEINTRESOURCE(IDR_LEXSTYLES), L"config");
+    if (hResource)
     {
-        HGLOBAL hResourceLoaded = LoadResource(nullptr, hRes);
+        HGLOBAL hResourceLoaded = LoadResource(nullptr, hResource);
         if (hResourceLoaded)
         {
             const char * lpResLock = (const char *) LockResource(hResourceLoaded);
-            DWORD dwSizeRes = SizeofResource(nullptr, hRes);
+            DWORD dwSizeRes = SizeofResource(nullptr, hResource);
             if (lpResLock)
             {
                 inis[0].LoadFile(lpResLock, dwSizeRes);
@@ -224,9 +224,9 @@ void CLexStyles::Load()
                             else if (_wcsnicmp(L"Prop_", it, 5) == 0)
                             {
                                 std::string n = CUnicodeUtils::StdGetUTF8(it+5);
-                                std::string v = CUnicodeUtils::StdGetUTF8(ini.GetValue(l.second.c_str(), it, L""));
-                                lexerdata.Properties[n] = v;
-                                userlexerdata.Properties[n] = std::move(v);
+                                std::string vl = CUnicodeUtils::StdGetUTF8(ini.GetValue(l.second.c_str(), it, L""));
+                                lexerdata.Properties[n] = vl;
+                                userlexerdata.Properties[n] = std::move(vl);
                             }
                         }
                         m_lexerdata[lexerdata.ID] = std::move(lexerdata);
@@ -295,10 +295,10 @@ void CLexStyles::Load()
                         {
                             if (_wcsnicmp(L"keywords", sk, 8) == 0)
                             {
-                                int v;
-                                if (!CAppUtils::TryParse(sk+8,v,false))
+                                int vn;
+                                if (!CAppUtils::TryParse(sk+8,vn,false))
                                     APPVERIFY(false);
-                                ld.keywordlist[v] = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
+                                ld.keywordlist[vn] = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
                             }
                             else if (_wcsicmp(L"CommentLine", sk) == 0)
                             {
@@ -317,11 +317,11 @@ void CLexStyles::Load()
                             }
                             else if (_wcsicmp(L"CommentLineAtStart", sk) == 0)
                             {
-                                int v;
+                                int vn;
                                 if (!CAppUtils::TryParse(
-                                    ini.GetValue(langsect.c_str(), sk),v,false))
+                                    ini.GetValue(langsect.c_str(), sk),vn,false))
                                     APPVERIFY(false);
-                                ld.commentlineatstart = v != 0;
+                                ld.commentlineatstart = vn != 0;
                             }
                             else if (_wcsicmp(L"FunctionRegex", sk) == 0)
                             {

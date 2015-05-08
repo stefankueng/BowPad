@@ -307,7 +307,7 @@ bool CCmdFileDelete::Execute()
                         return false;
 
                     IFileOperationPtr pfo = NULL;
-                    HRESULT hr = pfo.CreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL);
+                    hr = pfo.CreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL);
 
                     if (!CAppUtils::FailedShowMessage(hr))
                     {

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -48,14 +48,14 @@ void CTheme::Load()
 
     CSimpleIni themeIni;
 
-    HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(IDR_DARKTHEME), L"config");
-    if (hRes)
+    HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_DARKTHEME), L"config");
+    if (hResource)
     {
-        HGLOBAL hResourceLoaded = LoadResource(NULL, hRes);
+        HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
         if (hResourceLoaded)
         {
             const char * lpResLock = (const char *) LockResource(hResourceLoaded);
-            DWORD dwSizeRes = SizeofResource(NULL, hRes);
+            DWORD dwSizeRes = SizeofResource(NULL, hResource);
             if (lpResLock)
             {
                 themeIni.LoadFile(lpResLock, dwSizeRes);

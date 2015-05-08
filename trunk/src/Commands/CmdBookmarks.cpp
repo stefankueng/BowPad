@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,14 +33,14 @@ CCmdBookmarks::CCmdBookmarks(void * obj) : ICommand(obj)
             stringtok(tokens, sBmData, true, L"*");
             std::vector<long> lines;
             std::wstring filepath;
-            int i = 0;
+            int j = 0;
             for (const auto& t : tokens)
             {
-                if (i == 0)
+                if (j == 0)
                     filepath = t;
                 else
                     lines.push_back(_wtol(t.c_str()));
-                ++i;
+                ++j;
             }
             if (!filepath.empty() && !lines.empty())
                 m_bookmarks.push_back(std::make_tuple(filepath, lines));
@@ -91,10 +91,10 @@ void CCmdBookmarks::OnDocumentClose(int index)
         {
             std::wstring sValue = std::get<0>(bm);
             const auto lines = std::get<1>(bm);
-            for (const auto& line : lines)
+            for (const auto& linenr : lines)
             {
                 sValue += L"*";
-                sValue += CStringUtils::Format(L"%ld", line);
+                sValue += CStringUtils::Format(L"%ld", linenr);
             }
             std::wstring sKey = CStringUtils::Format(L"file%d", i);
             CIniSettings::Instance().SetString(L"bookmarks", sKey.c_str(), sValue.c_str());

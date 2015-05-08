@@ -135,9 +135,9 @@ bool CCmdTabs2Spaces::Execute()
         char * pBufStart = destination.get();
         char * pOldBuf = (char*)source.get();
         pBuf = pBufStart;
-        bool inChar = false;
-        bool inString = false;
-        bool escapeChar = false;
+        inChar = false;
+        inString = false;
+        escapeChar = false;
         for (size_t i = 0; i < docLength; ++i)
         {
             ++inlinepos;

@@ -458,8 +458,8 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
                 // to tell them that!
                 if (elevationError != ERROR_CANCELLED)
                 {
-                    CFormatMessageWrapper errMsg(elevationError);
-                    ShowFileLoadError(hWnd, path, errMsg);
+                    CFormatMessageWrapper errMsgelev(elevationError);
+                    ShowFileLoadError(hWnd, path, errMsgelev);
                 }
                 // Exhausted all operations to work around the problem,
                 // fall through to inform that what the final outcome is
@@ -840,8 +840,8 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc, bool & bTabMov
                     {
                         // Can't elevate. Explain the error,
                         // don't refer to the temp path, that would be confusing.
-                        CFormatMessageWrapper errMsg(elevationError);
-                        ShowFileSaveError(hWnd, doc.m_path, errMsg);
+                        CFormatMessageWrapper errMsgelev(elevationError);
+                        ShowFileSaveError(hWnd, doc.m_path, errMsgelev);
                     }
                 }
              }

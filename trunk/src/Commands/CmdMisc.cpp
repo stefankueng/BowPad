@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -80,10 +80,10 @@ bool CCmdConfigShortcuts::Execute()
     std::wstring userFile = CAppUtils::GetDataPath() + L"\\shortcuts.ini";
     if (!PathFileExists(userFile.c_str()))
     {
-        HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(IDR_SHORTCUTS), L"config");
-        if (hRes)
+        HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_SHORTCUTS), L"config");
+        if (hResource)
         {
-            HGLOBAL hResourceLoaded = LoadResource(NULL, hRes);
+            HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
             if (hResourceLoaded)
             {
                 const char* lpResLock = (const char *) LockResource(hResourceLoaded);
