@@ -191,7 +191,7 @@ HRESULT CMainWindow::ResizeToRibbon()
     if (m_pRibbon)
     {
         // Call to the framework to determine the desired height of the Ribbon.
-        HRESULT hr = m_pRibbon->GetHeight(&m_RibbonHeight);
+        hr = m_pRibbon->GetHeight(&m_RibbonHeight);
         if (!CAppUtils::FailedShowMessage((hr)))
             ResizeChildWindows();
     }
@@ -1432,13 +1432,13 @@ void CMainWindow::UpdateCaptionBar()
     {
         CDocument doc = m_DocManager.GetDocumentFromID(docID);
 
-        std::wstring sWindowTitle = elev;
+        std::wstring sTitle = elev;
         if (!elev.empty())
-            sWindowTitle += L" : ";
-        sWindowTitle += doc.m_path.empty() ? m_TabBar.GetCurrentTitle() : doc.m_path;
-        sWindowTitle += L" - ";
-        sWindowTitle += appName;
-        SetWindowText(*this, sWindowTitle.c_str());
+            sTitle += L" : ";
+        sTitle += doc.m_path.empty() ? m_TabBar.GetCurrentTitle() : doc.m_path;
+        sTitle += L" - ";
+        sTitle += appName;
+        SetWindowText(*this, sTitle.c_str());
     }
     else
     {
@@ -2352,7 +2352,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 index = m_TabBar.InsertAfter(m_insertionIndex, sFileName.c_str());
             else
                 index = m_TabBar.InsertAtEnd(sFileName.c_str());
-            int id = m_TabBar.GetIDFromIndex(index);
+            id = m_TabBar.GetIDFromIndex(index);
             if (ext.empty())
                 doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
             else

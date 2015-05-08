@@ -54,7 +54,7 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
                     if (endStyled < len)
                         ScintillaCall(SCI_COLOURISE, 0, -1);
 
-                    auto level = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
+                    level = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
 
                     auto headerLine = 0;
                     if (level & SC_FOLDLEVELHEADERFLAG)

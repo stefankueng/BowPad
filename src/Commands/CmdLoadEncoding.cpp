@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -201,7 +201,6 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
     }
     else if (key == UI_PKEY_Enabled)
     {
-        HRESULT hr;
         // only enabled if the current doc has a path!
         if (!HasActiveDocument())
             return E_FAIL;
@@ -211,7 +210,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
     }
     else if (key == UI_PKEY_SelectedItem)
     {
-        HRESULT hr = S_FALSE;
+        hr = S_FALSE;
         if (!HasActiveDocument())
             return S_FALSE;
         CDocument doc = GetActiveDocument();

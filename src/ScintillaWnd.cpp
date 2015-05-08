@@ -1798,7 +1798,7 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
     }
     else if (wParam == '>')
     {
-        int lexer = (int)Call(SCI_GETLEXER);
+        lexer = Call(SCI_GETLEXER);
         switch (lexer)
         {
             // add the closing tag only for xml and html lexers
