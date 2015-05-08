@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,14 +54,14 @@ CKeyboardShortcutHandler& CKeyboardShortcutHandler::Instance()
 
 void CKeyboardShortcutHandler::Load()
 {
-    HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(IDR_SHORTCUTS), L"config");
-    if (hRes)
+    HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_SHORTCUTS), L"config");
+    if (hResource)
     {
-        HGLOBAL hResourceLoaded = LoadResource(NULL, hRes);
+        HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
         if (hResourceLoaded)
         {
             char * lpResLock = (char *) LockResource(hResourceLoaded);
-            DWORD dwSizeRes = SizeofResource(NULL, hRes);
+            DWORD dwSizeRes = SizeofResource(NULL, hResource);
             if (lpResLock)
             {
                 CSimpleIni ini;
@@ -321,14 +321,14 @@ std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd )
 void CKeyboardShortcutHandler::LoadUIHeader()
 {
     m_resourceData.clear();
-    HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(IDR_BOWPADUIH), L"config");
-    if (hRes)
+    HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_BOWPADUIH), L"config");
+    if (hResource)
     {
-        HGLOBAL hResourceLoaded = LoadResource(NULL, hRes);
+        HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
         if (hResourceLoaded)
         {
             char * lpResLock = (char *) LockResource(hResourceLoaded);
-            DWORD dwSizeRes = SizeofResource(NULL, hRes);
+            DWORD dwSizeRes = SizeofResource(NULL, hResource);
             if (lpResLock)
             {
                 // parse the header file

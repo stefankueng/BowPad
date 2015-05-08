@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
                 wchar_t * pPath = buffer.get();
                 while (pPath < (buffer.get()+fileinfo.nFileSizeLow))
                 {
-                    std::wstring temppath = pPath;
+                    temppath = pPath;
                     pPath += temppath.size()+1;
                     m_arShownFileList.insert(temppath);
                 }

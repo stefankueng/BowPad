@@ -374,7 +374,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
                 ResString createMenuItem(hRes, IDS_CREATE_CORRESPONDING_FILE);
                 std::wstring menuText = CStringUtils::Format(createMenuItem, filename.c_str());
 
-                HRESULT hr = CAppUtils::AddStringItem(collection, menuText.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, pImg);
+                hr = CAppUtils::AddStringItem(collection, menuText.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, pImg);
                 if (FAILED(hr))
                 {
                     m_menuInfo.pop_back();
@@ -411,7 +411,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
         {
             matchingFileName = CPathUtils::GetFileName(matchingFile);
             m_menuInfo.push_back(RelatedFileItem(matchingFile, RelatedType::Corresponding));
-            HRESULT hr = CAppUtils::AddStringItem(collection, matchingFileName.c_str(), CORRESPONDING_FILES_CATEGORY, pImg);
+            hr = CAppUtils::AddStringItem(collection, matchingFileName.c_str(), CORRESPONDING_FILES_CATEGORY, pImg);
             if (FAILED(hr))
             {
                 m_menuInfo.pop_back();
@@ -475,7 +475,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
                 menuText = inc.Path;
                 if (!found)
                     menuText += L" ...";
-                HRESULT hr = CAppUtils::AddStringItem(collection, menuText.c_str(), SYSTEM_INCLUDE_CATEGORY, pImg);
+                hr = CAppUtils::AddStringItem(collection, menuText.c_str(), SYSTEM_INCLUDE_CATEGORY, pImg);
                 if (FAILED(hr))
                 {
                     m_menuInfo.pop_back();
@@ -501,7 +501,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
                 menuText = inc.Path;
                 if (!found)
                     menuText += L" ...";
-                HRESULT hr = CAppUtils::AddStringItem(collection, menuText.c_str(), USER_INCLUDE_CATEGORY, pImg);
+                hr = CAppUtils::AddStringItem(collection, menuText.c_str(), USER_INCLUDE_CATEGORY, pImg);
                 if (FAILED(hr))
                 {
                     m_menuInfo.pop_back();
@@ -518,7 +518,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
         m_menuInfo.push_back(RelatedFileItem()); // No action.
         // Using CORRESPONDING_FILES_CATEGORY, but might possibly prefer no category,
         // but that doesn't appear to be possible it seems.
-        HRESULT hr = CAppUtils::AddResStringItem(collection, IDS_NO_FILES_FOUND, CORRESPONDING_FILES_CATEGORY, pImg);
+        hr = CAppUtils::AddResStringItem(collection, IDS_NO_FILES_FOUND, CORRESPONDING_FILES_CATEGORY, pImg);
         CAppUtils::FailedShowMessage(hr);
     }
 

@@ -1128,7 +1128,7 @@ void CFindReplaceDlg::SearchDocument(int docID, const CDocument& doc, const std:
     searchWnd->Call(SCI_SETDOCPOINTER, 0, 0);
 }
 
-int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindString, const std::string& sReplaceString, int searchflags)
+int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindstring, const std::string& sReplaceString, int searchflags)
 {
     m_searchWnd.Call(SCI_SETSTATUS, SC_STATUS_OK);   // reset error status
     m_searchWnd.Call(SCI_CLEARALL);
@@ -1144,7 +1144,7 @@ int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindStr
     m_searchWnd.Call(SCI_BEGINUNDOACTION);
     do
     {
-        findRet = m_searchWnd.Call(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());
+        findRet = m_searchWnd.Call(SCI_SEARCHINTARGET, sFindstring.length(), (sptr_t)sFindstring.c_str());
         if (findRet >= 0)
         {
             m_searchWnd.Call((searchflags & SCFIND_REGEXP) != 0 ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, sReplaceString.length(), (sptr_t)sReplaceString.c_str());
@@ -1459,7 +1459,6 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification * pScn )
             if (m_lastSelText.empty() || m_lastSelText.compare(sHighlightString) || (nSearchFlags != lastSearchFlags))
             {
                 DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
-                Scintilla::Sci_TextToFind FindText;
                 FindText.chrg.cpMin = 0;
                 FindText.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
                 FindText.lpstrText = const_cast<char*>(sHighlightString.c_str());

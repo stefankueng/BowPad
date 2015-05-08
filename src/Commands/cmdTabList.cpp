@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -162,7 +162,7 @@ bool CCmdTabList::PopulateMenu(const CDocument& /*doc*/, IUICollectionPtr& colle
 
     for (const auto& tabInfo : m_menuInfo)
     {
-        HRESULT hr = CAppUtils::AddStringItem(collection, tabInfo.title.c_str(), -1, pImg);
+        hr = CAppUtils::AddStringItem(collection, tabInfo.title.c_str(), -1, pImg);
         // If we can't add one, assume we can't add any more so quit
         // not to avoid spamming the user with a sequence of errors.
         if (FAILED(hr))
