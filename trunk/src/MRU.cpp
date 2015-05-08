@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -196,7 +196,7 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
         i++;
     }
     // We will only populate items up to before the first failed item, and discard the rest.
-    SAFEARRAYBOUND sab = {i,0};
+    SAFEARRAYBOUND sab = {ULONG(i),0};
     SafeArrayRedim(psa, &sab);
     hr = UIInitPropertyFromIUnknownArray(UI_PKEY_RecentItems, psa, pvarValue);
 
