@@ -1,5 +1,5 @@
-2.0.19.1374
-https://sourceforge.net/projects/bowpad-sk/files/2.0.19/BowPad64-2.0.19.msi/download
-BowPad64-2.0.19.msi
-https://sourceforge.net/projects/bowpad-sk/files/2.0.19/BowPad-2.0.19.msi/download
-BowPad-2.0.19.msi
+2.0.20.1385
+https://sourceforge.net/projects/bowpad-sk/files/2.0.20/BowPad64-2.0.20.msi/download
+BowPad64-2.0.20.msi
+https://sourceforge.net/projects/bowpad-sk/files/2.0.20/BowPad-2.0.20.msi/download
+BowPad-2.0.20.msi
