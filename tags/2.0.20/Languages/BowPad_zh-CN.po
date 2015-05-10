@@ -1,0 +1,1226 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR &lt;EMAIL@ADDRESS&gt;, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: BowPad\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Larry Li <larryli@qq.com>\n"
+"Language-Team: LANGUAGE &lt;LL@li.org&gt;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.7\n"
+"Language: zh_CN\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+# "Project-Id-Version: PACKAGE VERSION\n"
+# msgid/msgstr fields for Accelerator keys
+# Format is: "ID:xxxxxx:VACS+X" where:
+#    ID:xxxxx = the menu ID corresponding to the accelerator
+#    V = Virtual key (or blank if not used) - nearly always set!
+#    A = Alt key     (or blank if not used)
+#    C = Ctrl key    (or blank if not used)
+#    S = Shift key   (or blank if not used)
+#    X = upper case character
+# e.g. "V CS+Q" == Ctrl + Shift + 'Q'
+# ONLY Accelerator Keys with corresponding alphanumeric characters can be
+# updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
+# ONLY change the msgstr field. Do NOT change any other.
+# If you do not want to change an Accelerator Key, copy msgid to msgstr
+#. Resource IDs: (104)
+msgid "&amp;About ..."
+msgstr "关于...(&amp;A)"
+
+#. Resource IDs: (7)
+msgid "&amp;Cancel"
+msgstr "取消(&amp;C)"
+
+#. Resource IDs: (2)
+msgid "&amp;Close"
+msgstr "关闭(&amp;C)"
+
+#. Resource IDs: (7)
+msgid "&amp;Don't save"
+msgstr "不保存(&amp;D)"
+
+#. Resource IDs: (65535)
+msgid "&amp;File"
+msgstr "文件(&amp;F)"
+
+#. Resource IDs: (1001)
+msgid "&amp;Find Next"
+msgstr "查找下一个(&amp;F)"
+
+#. Resource IDs: (65535)
+msgid "&amp;Help"
+msgstr "帮助(&amp;H)"
+
+#. Resource IDs: (1003)
+msgid "&amp;Replace"
+msgstr "替换(&amp;R)"
+
+#. Resource IDs: (7)
+msgid "&amp;Save"
+msgstr "保存(&amp;S)"
+
+#. Resource IDs: (1005)
+msgid "&amp;Search for:"
+msgstr "搜索：(&amp;S)"
+
+#. Resource IDs: (9)
+msgid ""
+"&lt;a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\"&gt;"
+"Full details about this update&lt;/a&gt;"
+msgstr ""
+"&lt;a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\"&gt;更"
+"新详细内容&lt;/a&gt;"
+
+#. Resource IDs: (103)
+msgid "About BowPad"
+msgstr "关于 BowPad"
+
+#. Resource IDs: (10)
+msgid "Access denied!"
+msgstr "禁止访问！"
+
+#. Resource IDs: (10)
+#, c-format
+msgid ""
+"Access to the file '%s' was denied. Do you want to try again with elevated "
+"privileges?"
+msgstr "访问文件 '%s' 被禁止。您希望提升权限并重试么？"
+
+#. Resource IDs: (3756)
+msgid "Allows to load a file with a specific encoding"
+msgstr "允许使用指定编码载入文件"
+
+#. Resource IDs: (9)
+msgid "An update for BowPad is available"
+msgstr "BowPad 有可用更新"
+
+#. Resource IDs: (3753)
+msgid "Asks where to save the current tab"
+msgstr "保存当前标签页时询问"
+
+#. Resource IDs: (65535)
+msgid "Author: Stefan Küng"
+msgstr "作者：Stefan Küng"
+
+#. Resource IDs: (9)
+msgid "Available Languages"
+msgstr "可用的语言"
+
+#. Resource IDs: (7)
+msgid "BOWPAD"
+msgstr "BOWPAD"
+
+#. Resource IDs: (1020)
+msgid "Bold"
+msgstr "粗体"
+
+#. Resource IDs: (3764)
+msgid "Bookmark"
+msgstr "书签"
+
+#. Resource IDs: (7)
+msgid "BowPad"
+msgstr "BowPad"
+
+#. Resource IDs: (9)
+msgid "BowPad Text Editor"
+msgstr "BowPad 文本编辑器"
+
+#. Resource IDs: (2)
+msgid "Cancel"
+msgstr "取消"
+
+#. Resource IDs: (8)
+msgid ""
+"Cancel\n"
+"The file is not loaded again."
+msgstr ""
+"取消\n"
+"该文件再次无法载入。"
+
+#. Resource IDs: (3764)
+msgid "Char operations"
+msgstr "字符操作"
+
+#. Resource IDs: (1027)
+msgid "Check for Updates"
+msgstr "检查更新."
+
+#. Resource IDs: (3765)
+msgid "Clear Bookmarks"
+msgstr "清空书签"
+
+#. Resource IDs: (3751, 3753, 3754)
+msgid "Clipboard"
+msgstr "剪贴板"
+
+#. Resource IDs: (3753)
+msgid "Close All Tabs"
+msgstr "关闭所有标签页"
+
+#. Resource IDs: (3753)
+msgid "Close Tab"
+msgstr "关闭标签页"
+
+#. Resource IDs: (3753)
+msgid "Close all"
+msgstr "关闭所有"
+
+#. Resource IDs: (3753)
+msgid "Close the current tab"
+msgstr "关闭当前标签页"
+
+#. Resource IDs: (8)
+msgid ""
+"Close the document\n"
+"The document tab is closed."
+msgstr ""
+"关闭文档\n"
+"文档标签页已关闭。"
+
+#. Resource IDs: (3753)
+msgid "Closes all open files"
+msgstr "关闭所有打开的文件"
+
+#. Resource IDs: (3767)
+msgid "Cmd"
+msgstr "命令行"
+
+#. Resource IDs: (3751)
+msgid "Code"
+msgstr "代码"
+
+#. Resource IDs: (8)
+msgid "Codepages/Character sets"
+msgstr "代码页/字符集"
+
+#. Resource IDs: (65535)
+msgid "Color"
+msgstr "颜色"
+
+#. Resource IDs: (1061)
+msgid "Command Line:"
+msgstr "命令行："
+
+#. Resource IDs: (1060)
+msgid "Command Name:"
+msgstr "命令名称："
+
+#. Resource IDs: (3751, 3759)
+msgid "Comment"
+msgstr "注释"
+
+#. Resource IDs: (3759)
+msgid "Comments the selected text"
+msgstr "注释选择的文本"
+
+#. Resource IDs: (3758)
+msgid "Configure Styles"
+msgstr "配置样式"
+
+#. Resource IDs: (3758)
+msgid "Configure colors, fonts, styles and sizes"
+msgstr "配置颜色、字体、样式和大小"
+
+#. Resource IDs: (3772)
+msgid "Configure custom commands"
+msgstr "配置自定义命令"
+
+#. Resource IDs: (3756)
+msgid "Convert to"
+msgstr "转换到"
+
+#. Resource IDs: (3764)
+msgid "Converts all spaces in the document to tabs"
+msgstr "转换文档中所有空格为制表符"
+
+#. Resource IDs: (3764)
+msgid "Converts all tabs in the document to spaces"
+msgstr "转换文档中所有制表符为空格"
+
+#. Resource IDs: (3756)
+msgid "Converts the file to the specified encoding"
+msgstr "转换文件到指定编码"
+
+#. Resource IDs: (3760)
+msgid "Converts the selection to UPPERcase"
+msgstr "转换选择内容为大写"
+
+#. Resource IDs: (3760)
+msgid "Converts the selection to lowercase"
+msgstr "转换选择内容为小写"
+
+#. Resource IDs: (3753)
+msgid "Copy"
+msgstr "复制"
+
+#. Resource IDs: (3754)
+msgid "Copy the current selection to the clipboard"
+msgstr "复制当前选择到剪贴板。"
+
+#. Resource IDs: (3772)
+msgid "Corresponding File"
+msgstr "相应的文件"
+
+#. Resource IDs: (9)
+msgid "Could not download the language file!"
+msgstr "无法下载语言文件！"
+
+#. Resource IDs: (3752)
+msgid "Creates a new tab with an empty document"
+msgstr "使用空文档创建新标签页"
+
+#. Resource IDs: (8)
+msgid "Ctrl+Click to open the link in the default browser"
+msgstr "Ctrl+点击 在默认浏览器中打开链接"
+
+#. Resource IDs: (1049, 3770)
+msgid "Custom Command 0"
+msgstr "自定义命令 0"
+
+#. Resource IDs: (1050, 3770)
+msgid "Custom Command 1"
+msgstr "自定义命令 1"
+
+#. Resource IDs: (1051, 3770)
+msgid "Custom Command 2"
+msgstr "自定义命令 2"
+
+#. Resource IDs: (1052, 3770)
+msgid "Custom Command 3"
+msgstr "自定义命令 3"
+
+#. Resource IDs: (1053, 3771)
+msgid "Custom Command 4"
+msgstr "自定义命令 4"
+
+#. Resource IDs: (1054, 3771)
+msgid "Custom Command 5"
+msgstr "自定义命令 5"
+
+#. Resource IDs: (1055, 3771)
+msgid "Custom Command 6"
+msgstr "自定义命令 6"
+
+#. Resource IDs: (1056, 3771)
+msgid "Custom Command 7"
+msgstr "自定义命令 7"
+
+#. Resource IDs: (1057, 3772)
+msgid "Custom Command 8"
+msgstr "自定义命令 8"
+
+#. Resource IDs: (1058, 3772)
+msgid "Custom Command 9"
+msgstr "自定义命令 9"
+
+#. Resource IDs: (149)
+msgid "Custom Commands"
+msgstr "自定义命令"
+
+#. Resource IDs: (3754)
+msgid "Cut"
+msgstr "剪切"
+
+#. Resource IDs: (3754)
+msgid "Cut the current selection to the clipboard"
+msgstr "剪切当前选择到剪贴板。"
+
+#. Resource IDs: (3765, 3766)
+msgid "Dark Theme"
+msgstr "黑色主题"
+
+#. Resource IDs: (3758)
+msgid "Delete"
+msgstr "删除"
+
+#. Resource IDs: (3760)
+msgid ""
+"Determines whether a tab is inserted or spaces when the tab key is pressed."
+msgstr "Tab 制表符按下时是插入制表符还是空格"
+
+#. Resource IDs: (9)
+msgid ""
+"Do &amp;not download the update\n"
+"You will be reminded again about the update in a week."
+msgstr ""
+"不下载此次更新\n"
+"会在一周后再次提醒您。"
+
+#. Resource IDs: (7)
+#, c-format
+msgid "Do you want to save changes to \"%s\""
+msgstr "您想要保存更改到 \"%s\""
+
+#. Resource IDs: (8)
+msgid "Document modified"
+msgstr "文档已修改"
+
+#. Resource IDs: (8)
+msgid "Document removed"
+msgstr "文档已删除"
+
+#. Resource IDs: (10)
+msgid ""
+"Don't Save\n"
+"The file is not saved."
+msgstr ""
+"不保存\n"
+"文件未保存。"
+
+#. Resource IDs: (10)
+msgid ""
+"Don't open\n"
+"The file is not opened."
+msgstr ""
+"不打开\n"
+"文件未被打开。"
+
+#. Resource IDs: (8)
+msgid ""
+"Download and install the update\n"
+"Updates BowPad to the latest version."
+msgstr ""
+"下载并安装更新\n"
+"更新 BowPad 到最新版本。"
+
+#. Resource IDs: (9)
+msgid ""
+"Download of language list succeeded. Now you can select a language from that "
+"list."
+msgstr "下载语言列表成功。现在您可以从列表中选择语言。"
+
+#. Resource IDs: (9)
+msgid ""
+"Download the update\n"
+"You have to install the update manually."
+msgstr ""
+"下载更新\n"
+"您需要手工安装更新。"
+
+#. Resource IDs: (3760, 3761)
+msgid "Duplicate Line"
+msgstr "重复行"
+
+#. Resource IDs: (3761)
+msgid "Duplicates the current line"
+msgstr "当前行重复内容"
+
+#. Resource IDs: (105)
+msgid "E&amp;xit"
+msgstr "退出"
+
+#. Resource IDs: (3751)
+msgid "Edit"
+msgstr "编辑"
+
+#. Resource IDs: (3755)
+msgid "Encoding"
+msgstr "编码"
+
+#. Resource IDs: (3752)
+msgid "Exit"
+msgstr "退出"
+
+#. Resource IDs: (65535)
+msgid "Extension"
+msgstr "扩展名"
+
+#. Resource IDs: (9)
+msgid "Failed to download the list of available languages."
+msgstr "下载可用的语言列表出错。"
+
+#. Resource IDs: (9)
+msgid "Fetch remote languages..."
+msgstr "获取远程语言..."
+
+#. Resource IDs: (3751)
+msgid "File"
+msgstr "文件"
+
+#. Resource IDs: (7)
+msgid "File is too big to be opened by BowPad"
+msgstr "文件太大无法用 BowPad 打开"
+
+#. Resource IDs: (3772)
+msgid "Find"
+msgstr "查找"
+
+#. Resource IDs: (3758)
+msgid "Find &amp;&amp; Replace"
+msgstr "查找 &amp; 替换"
+
+#. Resource IDs: (3758)
+msgid "Find Next"
+msgstr "查找下一个"
+
+#. Resource IDs: (3758)
+msgid "Find Next Selected"
+msgstr "查找下一个选择的"
+
+#. Resource IDs: (3758)
+msgid "Find Previous"
+msgstr "查找上一个"
+
+#. Resource IDs: (143)
+msgid "Find and replace"
+msgstr "查找并替换"
+
+#. Resource IDs: (3758)
+msgid "Find/Replace"
+msgstr "查找/替换"
+
+#. Resource IDs: (65535)
+msgid "Font"
+msgstr "字体"
+
+#. Resource IDs: (3773)
+msgid "Functions"
+msgstr "函数"
+
+#. Resource IDs: (145, 3763)
+msgid "Go to line"
+msgstr "转到行"
+
+#. Resource IDs: (3764)
+msgid "Goto"
+msgstr "转到"
+
+#. Resource IDs: (3754)
+msgid "Inserts the content of the clipboard at the cursor position"
+msgstr "在光标位置插入剪贴板内容"
+
+#. Resource IDs: (1021)
+msgid "Italic"
+msgstr "斜体"
+
+#. Resource IDs: (3761)
+msgid "Join Lines"
+msgstr "连接行"
+
+#. Resource IDs: (3761)
+msgid "Join selected lines to one long line"
+msgstr "连接选择的行到一个长行"
+
+#. Resource IDs: (8)
+msgid ""
+"Keep the document\n"
+"The document is kept open."
+msgstr ""
+"保持文档\n"
+"文档保持打开。"
+
+#. Resource IDs: (3756)
+msgid "Language"
+msgstr "语言"
+
+#. Resource IDs: (9)
+msgid ""
+"Language selected.\n"
+"You need to restart BowPad for the changes to take effect."
+msgstr ""
+"语言已选择\n"
+"您需要重新启动 BowPad 生效选择。"
+
+#. Resource IDs: (65535)
+msgid "Language:"
+msgstr "语言："
+
+#. Resource IDs: (3768)
+msgid "Launch in Chrome"
+msgstr "用 Chrome 打开"
+
+#. Resource IDs: (3768)
+msgid "Launch in Firefox"
+msgstr "用 Firefox 打开"
+
+#. Resource IDs: (3768)
+msgid "Launch in Google Chrome"
+msgstr "用 Google Chrome 打开"
+
+#. Resource IDs: (3767)
+msgid "Launch in IE"
+msgstr "用 IE 打开"
+
+#. Resource IDs: (3767)
+msgid "Launch in Internet Explorer"
+msgstr "用 Internet Explorer 打开"
+
+#. Resource IDs: (3768)
+msgid "Launch in Opera"
+msgstr "用 Opera 打开"
+
+#. Resource IDs: (3768)
+msgid "Launch in Safari"
+msgstr "用 Safari 打开"
+
+#. Resource IDs: (3756)
+msgid "Line Endings"
+msgstr "行结束格式"
+
+#. Resource IDs: (65535)
+msgid "Line:"
+msgstr "行："
+
+#. Resource IDs: (3760)
+msgid "Lines"
+msgstr "行"
+
+#. Resource IDs: (3756)
+msgid "Load as"
+msgstr "载入为"
+
+#. Resource IDs: (3772)
+msgid "Load last session"
+msgstr "载入上次会话"
+
+#. Resource IDs: (3773)
+msgid "Load last session on start"
+msgstr "启动时载入上次会话"
+
+#. Resource IDs: (3772)
+msgid "Load session"
+msgstr "载入会话"
+
+#. Resource IDs: (3773)
+msgid "Load session on start"
+msgstr "启动时载入会话"
+
+#. Resource IDs: (3773)
+msgid ""
+"Loads all files automatically that were open the last time BowPad got closed"
+msgstr "自动载入 BowPad 上次关闭时打开的文件"
+
+#. Resource IDs: (3772)
+msgid "Loads all files that were open the last time BowPad got closed"
+msgstr "载入 BowPad 上次关闭时打开的文件"
+
+#. Resource IDs: (3760)
+msgid "Lowercase"
+msgstr "小写"
+
+#. Resource IDs: (3757)
+msgid "MAC (CR)"
+msgstr "MAC (CR)"
+
+#. Resource IDs: (18)
+msgid "MRU List"
+msgstr "最近打开文件列表"
+
+#. Resource IDs: (3751)
+msgid "Main"
+msgstr "主要"
+
+#. Resource IDs: (8)
+msgid "Main Encodings"
+msgstr "主要编码"
+
+#. Resource IDs: (1008)
+msgid "Match &amp;case"
+msgstr "匹配大小写(&amp;C)"
+
+#. Resource IDs: (1007)
+msgid "Match &amp;whole word only"
+msgstr "匹配整个单词(&amp;W)"
+
+#. Resource IDs: (3765)
+msgid "Misc"
+msgstr "杂项"
+
+#. Resource IDs: (3762)
+msgid "Move down"
+msgstr "下移"
+
+#. Resource IDs: (3763)
+msgid "Move line down"
+msgstr "下移一行"
+
+#. Resource IDs: (3762)
+msgid "Move line up"
+msgstr "上移一行"
+
+#. Resource IDs: (3765)
+msgid "Move the caret to the next bookmark"
+msgstr "移动光标到下一个书签"
+
+#. Resource IDs: (3765)
+msgid "Move the caret to the previous bookmark"
+msgstr "移动光标到上一个书签"
+
+#. Resource IDs: (3761)
+msgid "Move up"
+msgstr "上移"
+
+#. Resource IDs: (3763)
+msgid "Moves the cursor to the specified line"
+msgstr "光标转到指定行"
+
+#. Resource IDs: (3762)
+msgid "Moves the selected lines downwards"
+msgstr "选择行下移"
+
+#. Resource IDs: (3762)
+msgid "Moves the selected lines upwards"
+msgstr "选择行上移"
+
+#. Resource IDs: (3758)
+msgid "Moves to the next match of the last search"
+msgstr "转到上次搜索的下一个匹配项"
+
+#. Resource IDs: (3758)
+msgid "Moves to the previous match of the last search"
+msgstr "转到上次搜索的上一个匹配项"
+
+#. Resource IDs: (3752)
+msgid "New"
+msgstr "新建"
+
+#. Resource IDs: (7)
+#, c-format
+msgid "New %d"
+msgstr "新建 %d"
+
+#. Resource IDs: (3752)
+msgid "New Document"
+msgstr "新文档"
+
+#. Resource IDs: (3757)
+msgid "Next"
+msgstr "下一个"
+
+#. Resource IDs: (3765)
+msgid "Next Bookmarks"
+msgstr "下一个书签"
+
+#. Resource IDs: (10)
+msgid "No functions found!"
+msgstr "函数未找到！"
+
+#. Resource IDs: (9)
+msgid ""
+"No updates available.\n"
+"You already have the current version."
+msgstr ""
+"没有可用更新。\n"
+"您已使用最新的版本。"
+
+#. Resource IDs: (1)
+msgid "OK"
+msgstr "确定"
+
+#. Resource IDs: (9)
+msgid "Online Languages"
+msgstr "在线语言"
+
+#. Resource IDs: (3752)
+msgid "Open"
+msgstr "打开"
+
+#. Resource IDs: (3769)
+msgid "Open Console"
+msgstr "打开控制台"
+
+#. Resource IDs: (3769)
+msgid "Open Explorer"
+msgstr "打开浏览器"
+
+#. Resource IDs: (3752)
+msgid "Open Files"
+msgstr "已打开的文件"
+
+#. Resource IDs: (3772)
+msgid "Open corresponding File"
+msgstr "打开相应的文件"
+
+#. Resource IDs: (10)
+msgid ""
+"Open elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"打开权限\n"
+"BowPad 将提升权限再启动。"
+
+#. Resource IDs: (3752)
+msgid "Opens one or more files"
+msgstr "打开一个或多个文件"
+
+#. Resource IDs: (3769)
+msgid "Opens the Console at the current file location"
+msgstr "在当前文件位置打开控制台"
+
+#. Resource IDs: (3769)
+msgid "Opens the Windows Explorer at the current file location"
+msgstr "在当前文件位置打开 Windows 资源管理器"
+
+#. Resource IDs: (3772)
+msgid ""
+"Opens the corresponding file to the file in the current tab.\n"
+"(h/cpp, aspx/cs/vb)"
+msgstr ""
+"在当前标签页打开相关文件。\n"
+"(h/cpp, aspx/cs/vb)"
+
+#. Resource IDs: (3767)
+msgid "Opens the current file in Microsoft Internet Explorer"
+msgstr "在 IE 浏览器中打开当前文件"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Firefox browser"
+msgstr "在 Firefox 浏览器中打开当前文件"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Google Chrome browser"
+msgstr "在 Google Chrome 浏览器中打开当前文件"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Opera browser"
+msgstr "在 Opera 浏览器中打开当前文件"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Safari browser"
+msgstr "在 Safari 浏览器中打开当前文件"
+
+#. Resource IDs: (3769)
+msgid "Opens the default browser to search Wikipedia for the selected text"
+msgstr "打开默认浏览器使用维基百科搜索选中文本"
+
+#. Resource IDs: (3769)
+msgid "Opens the default browser to search for the selected text"
+msgstr "打开默认浏览器搜索选中文本"
+
+#. Resource IDs: (3763)
+msgid "Page Setup"
+msgstr "页面设置"
+
+#. Resource IDs: (3754)
+msgid "Paste"
+msgstr "粘贴"
+
+#. Resource IDs: (3757)
+msgid "Previous"
+msgstr "上一个"
+
+#. Resource IDs: (3765)
+msgid "Previous Bookmarks"
+msgstr "上一个书签"
+
+#. Resource IDs: (3762)
+msgid "Print"
+msgstr "打印"
+
+#. Resource IDs: (3763)
+msgid "Print Page Setup"
+msgstr "打印页设置"
+
+#. Resource IDs: (3762)
+msgid "Print now"
+msgstr "马上打印"
+
+#. Resource IDs: (3762)
+msgid "Print..."
+msgstr "打印..."
+
+#. Resource IDs: (1006)
+msgid "R&amp;eplace with:"
+msgstr "替换为：(&amp;E)"
+
+#. Resource IDs: (3754, 3755)
+msgid "Redo"
+msgstr "重做"
+
+#. Resource IDs: (3755)
+msgid "Redo what was undone before"
+msgstr "重做上次撤消的操作"
+
+#. Resource IDs: (3765)
+msgid "Reload"
+msgstr "重新载入"
+
+#. Resource IDs: (8)
+msgid ""
+"Reload document\n"
+"The document is refreshed from disk."
+msgstr ""
+"重载文档\n"
+"文档在磁盘上已刷新。"
+
+#. Resource IDs: (8)
+msgid ""
+"Reload document\n"
+"The unsaved modifications are lost."
+msgstr ""
+"重载文档\n"
+"不安全的修改已丢弃。"
+
+#. Resource IDs: (3765)
+msgid "Reload the file from disk"
+msgstr "从磁盘重新载入文件"
+
+#. Resource IDs: (3765)
+msgid "Removes all bookmarks from the current file"
+msgstr "删除当前文件的所有书签"
+
+#. Resource IDs: (3763)
+msgid "Removes whitespaces at the end of lines"
+msgstr "删除行尾空格"
+
+#. Resource IDs: (1004)
+msgid "Replace &amp;All"
+msgstr "替换全部(&A)"
+
+#. Resource IDs: (3759)
+msgid "Right margin"
+msgstr "右留空"
+
+#. Resource IDs: (3752)
+msgid "Save"
+msgstr "保存"
+
+#. Resource IDs: (3752)
+msgid "Save File"
+msgstr "保存文件"
+
+#. Resource IDs: (3753)
+msgid "Save Files"
+msgstr "保存文件"
+
+#. Resource IDs: (3752)
+msgid "Save all"
+msgstr "保存全部"
+
+#. Resource IDs: (3753)
+msgid "Save as"
+msgstr "另存为"
+
+#. Resource IDs: (10)
+msgid ""
+"Save elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"保存权限\n"
+"BowPad 将提升权限再启动。"
+
+#. Resource IDs: (8)
+msgid ""
+"Save modifications\n"
+"The modifications that were made outside BowPad are overwritten."
+msgstr ""
+"保存修改\n"
+"BowPad 以外的修改将被覆盖、"
+
+#. Resource IDs: (3753)
+msgid "Saves all open files"
+msgstr "保存所有打开的文件"
+
+#. Resource IDs: (3752)
+msgid "Saves the current tab"
+msgstr "保存当前标签页"
+
+#. Resource IDs: (1009)
+msgid "Search Regex mode"
+msgstr "搜索正则模式"
+
+#. Resource IDs: (3769)
+msgid "Search Web"
+msgstr "搜索网页"
+
+#. Resource IDs: (3769)
+msgid "Search Wikipedia"
+msgstr "搜索维基百科"
+
+#. Resource IDs: (3758)
+msgid "Search and/or replace text in documents/tabs"
+msgstr "在文档/标签页搜索和/或替换文本"
+
+#. Resource IDs: (10)
+msgid "Search text not found!"
+msgstr "找不到搜索的文本"
+
+#. Resource IDs: (3759)
+msgid "Searches for the next match of the selected text"
+msgstr "搜索选中文本的下一个匹配"
+
+#. Resource IDs: (3766)
+msgid "Select Language"
+msgstr "选择语言"
+
+#. Resource IDs: (3758)
+msgid "Select all"
+msgstr "全选"
+
+#. Resource IDs: (3766)
+msgid "Select the language for BowPad"
+msgstr "选择 BowPad 语言"
+
+#. Resource IDs: (3762)
+msgid "Sends the document to a printer"
+msgstr "发送文档到打印机"
+
+#. Resource IDs: (3762)
+msgid "Sends the document to the default printer"
+msgstr "发送文档到默认打印机"
+
+#. Resource IDs: (3756)
+msgid "Set the coloring according to the code language"
+msgstr "设置代码语言语法着色"
+
+#. Resource IDs: (3760)
+msgid "Set the number of columns for one tabulator."
+msgstr "设置制表符宽度"
+
+#. Resource IDs: (3763)
+msgid "Set up print margins, page size, page orientation"
+msgstr "设置打印机边距，页面大小，页面方向"
+
+#. Resource IDs: (3759)
+msgid ""
+"Sets the column at which the vertical edge is shown, indicating the right "
+"margin. Set to 0 to hide it."
+msgstr "设置垂直边距，包括右边距。0 表示隐藏边距。"
+
+#. Resource IDs: (3755)
+msgid "Show Whitespaces"
+msgstr "显示空格"
+
+#. Resource IDs: (3772)
+msgid "Shows a dialog to configure custom commands"
+msgstr "显示自定义命令配置对话框"
+
+#. Resource IDs: (3773)
+msgid "Shows a list of functions/methods in the file to jump to"
+msgstr "显示文件函数/方法跳转列表"
+
+#. Resource IDs: (3764)
+msgid "Spaces to Tabs"
+msgstr "空格转制表符"
+
+#. Resource IDs: (3761)
+msgid "Split Lines"
+msgstr "分割行"
+
+#. Resource IDs: (3761)
+msgid "Split long lines at the right window border"
+msgstr "在窗口右边分割很长的行"
+
+#. Resource IDs: (144)
+msgid "Style Configurator"
+msgstr "样式配置"
+
+#. Resource IDs: (65535)
+msgid "Style:"
+msgstr "样式："
+
+#. Resource IDs: (65535)
+msgid "Styles"
+msgstr "样式"
+
+#. Resource IDs: (3764)
+msgid "Tabs to Spaces"
+msgstr "制表符转空格"
+
+#. Resource IDs: (8)
+#, c-format
+msgid ""
+"The document '%s' was modified outside of BowPad, but there are unsaved "
+"changes in the document."
+msgstr "文档 '%s' 在 BowPad 外被修改，但文档有未保存的修改。"
+
+#. Resource IDs: (8)
+#, c-format
+msgid "The document '%s' was modified outside of BowPad."
+msgstr "文档 '%s' 在 BowPad 外被修改。"
+
+#. Resource IDs: (8)
+#, c-format
+msgid "The document '%s' was removed outside of BowPad."
+msgstr "文档 '%s' 在 BowPad 外被删除。"
+
+#. Resource IDs: (3765)
+msgid "Toggle Bookmark"
+msgstr "切换书签"
+
+#. Resource IDs: (3765)
+msgid "Toggle a bookmark on the current line"
+msgstr "切换当前行书签"
+
+#. Resource IDs: (3766)
+msgid "Toggles between the normal and the dark theme"
+msgstr "切换普通和黑色主题"
+
+#. Resource IDs: (3763)
+msgid "Trim Whitespaces"
+msgstr "去掉空格"
+
+#. Resource IDs: (9)
+msgid "Turn off automatic update checks"
+msgstr "关闭自动更新检查"
+
+#. Resource IDs: (3755)
+msgid "Turns showing whitespaces on/off"
+msgstr "开关空格显示"
+
+#. Resource IDs: (3759)
+msgid "UPPER/lower"
+msgstr "大/小写"
+
+#. Resource IDs: (3759)
+msgid "Uncomment"
+msgstr "取消注释"
+
+#. Resource IDs: (3759)
+msgid "Uncomments the selected text"
+msgstr "取消注释选择的文本"
+
+#. Resource IDs: (1009)
+msgid "Underline"
+msgstr "下划线"
+
+#. Resource IDs: (3751, 3754)
+msgid "Undo"
+msgstr "撤消"
+
+#. Resource IDs: (3754)
+msgid "Undo the last change"
+msgstr "撤消上次改变"
+
+#. Resource IDs: (3757)
+msgid "Unix (LF)"
+msgstr "Unix (LF)"
+
+#. Resource IDs: (7)
+msgid "Unsafed modifications"
+msgstr "不安全的修改"
+
+#. Resource IDs: (3759, 3760)
+msgid "Uppercase"
+msgstr "大写"
+
+#. Resource IDs: (3760)
+msgid "Use Tabs"
+msgstr "使用制表符"
+
+#. Resource IDs: (3751)
+msgid "Vertical Edge"
+msgstr "虚拟边界"
+
+#. Resource IDs: (3751)
+msgid "View"
+msgstr "查看"
+
+#. Resource IDs: (1026)
+msgid "Visit our Website"
+msgstr "访问我们的网站"
+
+#. Resource IDs: (1059)
+msgid "Web Search:"
+msgstr "网页搜索："
+
+#. Resource IDs: (3755)
+msgid "Whitespace"
+msgstr "空格"
+
+#. Resource IDs: (3757)
+msgid "Windows (CRLF)"
+msgstr "Windows (CRLF)"
+
+#. Resource IDs: (3755)
+msgid "Wrap Lines"
+msgstr "自动换行"
+
+#. Resource IDs: (9)
+msgid "Wrap around"
+msgstr "自动换行"
+
+#. Resource IDs: (3755)
+msgid "Wrap lines at the end of the window"
+msgstr "在窗口处自动换行"
+
+#. Resource IDs: (9)
+msgid ""
+"You can use the following strings in the command line:\r\n"
+"$(LINE)\t\t\tThe line where the cursor is\r\n"
+"$(POS)\t\t\tthe position where the cursor is\r\n"
+"$(TAB_PATH)\t\tthe path to the file of the active tab\r\n"
+"$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n"
+"$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n"
+"$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
+msgstr ""
+"您可以在命令行使用下列字符串：\r\n"
+"$(LINE)\t\t\t光标所在行\r\n"
+"$(POS)\t\t\t光标所在列\r\n"
+"$(TAB_PATH)\t\t当前标签页文件的路径\r\n"
+"$(TAB_DIR)\t\t当前标签页文件的目录\r\n"
+"$(SEL_TEXT)\t\t选中文本或光标当前所在的单词\r\n"
+"$(SEL_TEXT_ESCAPED)\t类似 $(SEL_TEXT) 的转义字符串，可用于 URL 链接"
+
+#. Resource IDs: (65535)
+msgid "background:"
+msgstr "背景："
+
+#. Resource IDs: (65535)
+msgid "foreground:"
+msgstr "前景："
+
+#. Resource IDs: (8)
+#, c-format
+msgid "from %ld to %ld"
+msgstr "从 %ld 到 %ld"
+
+#. Resource IDs: (3757)
+msgid "go to the next cursor position"
+msgstr "转到下一个光标位置"
+
+#. Resource IDs: (3757)
+msgid "go to the previous cursor position"
+msgstr "转到上一个光标位置"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 0"
+msgstr "运行自定义命令 0"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 1"
+msgstr "运行自定义命令 1"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 2"
+msgstr "运行自定义命令 2"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 3"
+msgstr "运行自定义命令 3"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 4"
+msgstr "运行自定义命令 4"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 5"
+msgstr "运行自定义命令 5"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 6"
+msgstr "运行自定义命令 6"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 7"
+msgstr "运行自定义命令 7"
+
+#. Resource IDs: (3772)
+msgid "runs the custom command 8"
+msgstr "运行自定义命令 8"
+
+#. Resource IDs: (3772)
+msgid "runs the custom command 9"
+msgstr "运行自定义命令 9"
+
+#. Resource IDs: (3760)
+msgid "tab size"
+msgstr "制表符大小"
