@@ -12,8 +12,7 @@
 #include "HanjaDic.h"
 
 #ifdef SCI_NAMESPACE
-namespace Scintilla
-{
+namespace Scintilla {
 #endif
 
 namespace HanjaDict {
