@@ -1093,11 +1093,17 @@ void CFindReplaceDlg::SearchDocument(int docID, const CDocument& doc, const std:
         {
             CSearchResult result;
             result.pos = ttf.chrgText.cpMin;
-            result.line = searchWnd->Call(SCI_LINEFROMPOSITION, ttf.chrgText.cpMin);
+            char c = (char)searchWnd->Call(SCI_GETCHARAT, result.pos);
+            while ((c == '\n') || (c == '\r'))
+            {
+                ++result.pos;
+                c = (char)searchWnd->Call(SCI_GETCHARAT, result.pos);
+            }
+            result.line = searchWnd->Call(SCI_LINEFROMPOSITION, result.pos);
             auto linepos = searchWnd->Call(SCI_POSITIONFROMLINE, result.line);
 
-            result.posInLineStart = ttf.chrgText.cpMin - linepos;
-            result.posInLineEnd = ttf.chrgText.cpMax - linepos;
+            result.posInLineStart = linepos >= 0 ? result.pos - linepos : 0;
+            result.posInLineEnd = linepos >= 0 ? ttf.chrgText.cpMax - linepos : 0;
             result.docID = docID;
             if (docID < 0)
                 result.pathIndex = fileIndex;
