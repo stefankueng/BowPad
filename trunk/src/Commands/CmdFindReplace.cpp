@@ -530,7 +530,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW * pLVCD)
         }
         rc = rect;
         drawPos = r.cpMin;
-        if (r.cpMax - drawPos)
+        if (r.cpMax - drawPos > 0)
         {
             SetTextColor(pLVCD->nmcd.hdc, RGB(255, 0, 0));
             DrawText(pLVCD->nmcd.hdc, &text[drawPos], r.cpMax - drawPos, &rc,
