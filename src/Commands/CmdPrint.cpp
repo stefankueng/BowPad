@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013, 2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 #include "UnicodeUtils.h"
 #include "Scintilla.h"
 #include "IniSettings.h"
+#include "Theme.h"
+#include "OnOutOfScope.h"
 
 #include <Commdlg.h>
 
@@ -52,6 +54,21 @@ void CCmdPrint::Print( bool bShowDlg )
     HRESULT hResult = PrintDlgEx(&pdlg);
     if ((hResult != S_OK) || ((pdlg.dwResultAction != PD_RESULT_PRINT) && bShowDlg))
         return;
+
+    // set the theme to normal
+    bool origTheme = CTheme::Instance().IsDarkTheme();
+    CTheme::Instance().SetDarkTheme(false);
+    CDocument doc = GetActiveDocument();
+    SetupLexerForLang(doc.m_language);
+    ScintillaCall(SCI_CLEARDOCUMENTSTYLE);
+    ScintillaCall(SCI_COLOURISE, 0, -1);
+    OnOutOfScope(
+        CTheme::Instance().SetDarkTheme(origTheme);
+        CDocument doc = GetActiveDocument();
+        SetupLexerForLang(doc.m_language);
+        ScintillaCall(SCI_CLEARDOCUMENTSTYLE);
+        ScintillaCall(SCI_COLOURISE, 0, -1);
+    );
 
     // reset all indicators
     size_t endpos = ScintillaCall(SCI_GETLENGTH);
