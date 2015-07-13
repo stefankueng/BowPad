@@ -1,0 +1,411 @@
+// This file is part of BowPad.
+//
+// Copyright (C) 2013-2015 - Stefan Kueng
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// See <http://www.gnu.org/licenses/> for a copy of the full license text
+//
+
+#include "stdafx.h"
+#include "BowPad.h"
+#include "MainWindow.h"
+#include "CmdLineParser.h"
+#include "KeyboardShortcutHandler.h"
+#include "BaseDialog.h"
+#include "AppUtils.h"
+#include "SmartHandle.h"
+#include "PathUtils.h"
+#include "StringUtils.h"
+#include "ProgressDlg.h"
+#include "DownloadFile.h"
+#include "SysInfo.h"
+#include "OnOutOfScope.h"
+#include "version.h"
+
+HINSTANCE hInst;
+HINSTANCE hRes;
+
+static void LoadLanguage(HINSTANCE hInstance)
+{
+    // load the language dll if required
+    std::wstring lang = CIniSettings::Instance().GetString(L"UI", L"language", L"");
+    if (!lang.empty())
+    {
+        std::wstring langdllpath = CAppUtils::GetDataPath(hInstance);
+        langdllpath += L"\\BowPad_";
+        langdllpath += lang;
+        langdllpath += L".lang";
+        if (!CAppUtils::HasSameMajorVersion(langdllpath))
+        {
+            // the language dll does not exist or does not match:
+            // try downloading the new language dll right now
+            // so the user gets the selected language immediately after
+            // updating BowPad
+            std::wstring sLangURL = CStringUtils::Format(L"https://svn.code.sf.net/p/bowpad-sk/code/branches/%d.%d.%d/Languages/%s/BowPad_%s.lang", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, LANGPLAT, lang.c_str());
+
+            // note: text below is in English and not translatable because
+            // we try to download the translation file here, so there's no
+            // point in having this translated...
+            CProgressDlg progDlg;
+            progDlg.SetTitle(L"BowPad Update");
+            progDlg.SetLine(1, L"Downloading BowPad Language file...");
+            progDlg.ResetTimer();
+            progDlg.SetTime();
+            progDlg.ShowModal(NULL);
+
+            CDownloadFile filedownloader(L"BowPad", &progDlg);
+
+            if (!filedownloader.DownloadFile(sLangURL, langdllpath))
+            {
+                DeleteFile(langdllpath.c_str());
+            }
+        }
+        if (CAppUtils::HasSameMajorVersion(langdllpath))
+        {
+            hRes = LoadLibraryEx(langdllpath.c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
+            if (hRes == NULL)
+                hRes = hInst;
+        }
+    }
+}
+
+static void SetIcon()
+{
+    HKEY hKey = 0;
+    if (RegOpenKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe", &hKey) == ERROR_SUCCESS)
+    {
+        // registry key exists, which means at least one file type was associated with BowPad by the user
+        RegCloseKey(hKey);
+        if (RegOpenKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe\\DefaultIcon", &hKey) != ERROR_SUCCESS)
+        {
+            OnOutOfScope(RegCloseKey(hKey));
+            // but the default icon hasn't been set yet: set the default icon now
+            if (RegCreateKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe\\DefaultIcon", &hKey) == ERROR_SUCCESS)
+            {
+                std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str(), IDI_BOWPAD_DOC);
+                if (RegSetValue(hKey, NULL, REG_SZ, sIconPath.c_str(), 0) == ERROR_SUCCESS)
+                {
+                    // now tell the shell about the changed icon
+                    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+                }
+            }
+        }
+    }
+}
+
+static void RegisterContextMenu(bool bAdd)
+{
+    if (bAdd)
+    {
+        std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str(), IDI_BOWPAD);
+        std::wstring sExePath = CStringUtils::Format(L"%s /path:\"%%1\"", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str());
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", NULL, REG_SZ, L"Edit in BowPad", sizeof(L"Edit in BowPad") + 2);
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", L"MultiSelectModel", REG_SZ, L"Player", sizeof(L"MultiSelectModel") + 2);
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad\\Command", NULL, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad", NULL, REG_SZ, L"Open Folder with BowPad", sizeof(L"Open Folder with BowPad") + 2);
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad\\Command", NULL, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad", NULL, REG_SZ, L"Open Folder with BowPad", sizeof(L"Open Folder with BowPad") + 2);
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
+
+        sExePath = CStringUtils::Format(L"%s /path:\"%%V\"", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str());
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad\\Command", NULL, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
+    }
+    else
+    {
+        SHDeleteKey(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad");
+        SHDeleteKey(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad");
+        SHDeleteKey(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad");
+    }
+}
+
+static void SetAppID()
+{
+    // set the AppID
+    typedef HRESULT STDAPICALLTYPE SetCurrentProcessExplicitAppUserModelIDFN(PCWSTR AppID);
+    CAutoLibrary hShell = LoadLibraryExW(L"Shell32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    if (hShell)
+    {
+        SetCurrentProcessExplicitAppUserModelIDFN *pfnSetCurrentProcessExplicitAppUserModelID = (SetCurrentProcessExplicitAppUserModelIDFN*)GetProcAddress(hShell, "SetCurrentProcessExplicitAppUserModelID");
+        if (pfnSetCurrentProcessExplicitAppUserModelID)
+        {
+            if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
+                pfnSetCurrentProcessExplicitAppUserModelID(APP_ID_ELEVATED);
+            else
+                pfnSetCurrentProcessExplicitAppUserModelID(APP_ID);
+        }
+    }
+}
+
+static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLineParser& parser)
+{
+    int nCmdShow = 0;
+
+    if (::IsZoomed(hBowPadWnd))
+        nCmdShow = SW_MAXIMIZE;
+    else if (::IsIconic(hBowPadWnd))
+        nCmdShow = SW_RESTORE;
+    else
+        nCmdShow = SW_SHOW;
+
+    ::ShowWindow(hBowPadWnd, nCmdShow);
+
+    ::SetForegroundWindow(hBowPadWnd);
+
+    size_t cmdLineLen = wcslen(lpCmdLine);
+    if (cmdLineLen)
+    {
+        COPYDATASTRUCT cds;
+        cds.dwData = CD_COMMAND_LINE;
+        if (!parser.HasVal(L"path"))
+        {
+            // create our own command line with all paths converted to long/full paths
+            // since the CWD of the other instance is most likely different
+            int nArgs;
+            std::wstring sCmdLine;
+            LPWSTR * szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+            if (szArglist)
+            {
+                bool bOmitNext = false;
+                for (int i = 0; i < nArgs; i++)
+                {
+                    if (bOmitNext)
+                    {
+                        bOmitNext = false;
+                        continue;
+                    }
+                    if ((szArglist[i][0] != '/') && (szArglist[i][0] != '-'))
+                    {
+                        std::wstring path = szArglist[i];
+                        CPathUtils::NormalizeFolderSeparators(path);
+                        path = CPathUtils::GetLongPathname(path);
+                        sCmdLine += L"\"" + path + L"\" ";
+                    }
+                    else
+                    {
+                        if (wcscmp(&szArglist[i][1], L"z") == 0)
+                            bOmitNext = true;
+                        sCmdLine += szArglist[i];
+                        sCmdLine += L" ";
+                    }
+                }
+
+                // Free memory allocated for CommandLineToArgvW arguments.
+                LocalFree(szArglist);
+            }
+            auto ownCmdLine = std::make_unique<wchar_t[]>(sCmdLine.size() + 2);
+            wcscpy_s(ownCmdLine.get(), sCmdLine.size() + 2, sCmdLine.c_str());
+            cds.cbData = (DWORD)((sCmdLine.size() + 1)*sizeof(wchar_t));
+            cds.lpData = ownCmdLine.get();
+            SendMessage(hBowPadWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&cds);
+        }
+        else
+        {
+            cds.cbData = (DWORD)((cmdLineLen + 1)*sizeof(wchar_t));
+            cds.lpData = lpCmdLine;
+            SendMessage(hBowPadWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&cds);
+        }
+    }
+}
+
+static HWND FindAndWaitForBowPad()
+{
+    // don't start another instance: reuse the existing one
+    // find the window of the existing instance
+    ResString clsResName(hInst, IDC_BOWPAD);
+    std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
+
+    HWND hBowPadWnd = ::FindWindow(clsName.c_str(), NULL);
+    // if we don't have a window yet, wait a little while
+    // to give the other process time to create the window
+    for (int i = 0; !hBowPadWnd && i < 5; i++)
+    {
+        Sleep(100);
+        hBowPadWnd = ::FindWindow(clsName.c_str(), NULL);
+    }
+    return hBowPadWnd;
+}
+
+static void ShowBowPadCommandLineHelp()
+{
+    std::wstring sMessage = CStringUtils::Format(L"BowPad version %d.%d.%d.%d\nusage: BowPad.exe /path:\"PATH\" [/line:number] [/multiple]\nor: BowPad.exe PATH [/line:number] [/multiple]\nwith /multiple forcing BowPad to open a new instance even if there's already an instance running."
+                                                    , BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
+    MessageBox(NULL, sMessage.c_str(), L"BowPad", MB_ICONINFORMATION);
+}
+
+static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
+{
+    if (parser.HasVal(L"path"))
+    {
+        size_t line = (size_t)-1;
+        if (parser.HasVal(L"line"))
+        {
+            line = parser.GetLongVal(L"line") - 1;
+        }
+        mainWindow.SetFileToOpen(parser.GetVal(L"path"), line);
+        if (parser.HasKey(L"elevate") && parser.HasKey(L"savepath"))
+        {
+            mainWindow.SetElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"), (long)line);
+            mainWindow.SetFileOpenMRU(false);
+        }
+        if (parser.HasKey(L"tabmove") && parser.HasKey(L"savepath"))
+        {
+            mainWindow.SetTabMove(parser.GetVal(L"path"), parser.GetVal(L"savepath"), !!parser.HasKey(L"modified"), (long)line);
+            mainWindow.SetFileOpenMRU(false);
+        }
+    }
+    else
+    {
+        // find out if there are paths specified without the key/value pair syntax
+        int nArgs;
+
+        LPWSTR * szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+        if (szArglist)
+        {
+            size_t line = (size_t)-1;
+            if (parser.HasVal(L"line"))
+            {
+                line = parser.GetLongVal(L"line") - 1;
+            }
+
+            bool bOmitNext = false;
+            for (int i = 1; i < nArgs; i++)
+            {
+                if (bOmitNext)
+                {
+                    bOmitNext = false;
+                    continue;
+                }
+                if ((szArglist[i][0] != '/') && (szArglist[i][0] != '-'))
+                {
+                    std::wstring path = szArglist[i];
+                    CPathUtils::NormalizeFolderSeparators(path);
+                    path = CPathUtils::GetLongPathname(path);
+                    if (!PathFileExists(path.c_str()))
+                    {
+                        std::wstring tmp = GetCommandLineW();
+                        auto pathpos = tmp.find(szArglist[i]);
+                        if (pathpos != std::wstring::npos)
+                        {
+                            tmp = tmp.substr(pathpos);
+                            if (PathFileExists(tmp.c_str()))
+                            {
+                                path = tmp;
+                                CPathUtils::NormalizeFolderSeparators(path);
+                                path = CPathUtils::GetLongPathname(path);
+                                mainWindow.SetFileToOpen(path, line);
+                                break;
+                            }
+                        }
+                    }
+                    mainWindow.SetFileToOpen(path, line);
+                }
+                else
+                {
+                    if (wcscmp(&szArglist[i][1], L"z") == 0)
+                        bOmitNext = true;
+                }
+            }
+
+            // Free memory allocated for CommandLineToArgvW arguments.
+            LocalFree(szArglist);
+        }
+    }
+}
+
+int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
+                       _In_opt_ HINSTANCE hPrevInstance,
+                       _In_ LPTSTR  lpCmdLine,
+                       _In_ int     nCmdShow)
+{
+    UNREFERENCED_PARAMETER(hPrevInstance);
+    UNREFERENCED_PARAMETER(nCmdShow);
+
+    SetDllDirectory(L"");
+    HRESULT hr = CoInitialize(NULL);
+    if (FAILED(hr))
+        return FALSE;
+    OnOutOfScope(CoUninitialize());
+
+    CCmdLineParser parser(lpCmdLine);
+    if (parser.HasKey(L"?") || parser.HasKey(L"help"))
+    {
+        ShowBowPadCommandLineHelp();
+        return FALSE;
+    }
+    if (parser.HasKey(L"register"))
+    {
+        RegisterContextMenu(true);
+        return FALSE;
+    }
+    if ((parser.HasKey(L"unregister")) || (parser.HasKey(L"deregister")))
+    {
+        RegisterContextMenu(false);
+        return FALSE;
+    }
+
+    bool bAlreadyRunning = false;
+    ::SetLastError(NO_ERROR);
+    std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
+    HANDLE hAppMutex = ::CreateMutex(NULL, false, sID.c_str());
+    OnOutOfScope(CloseHandle(hAppMutex));
+    if ((GetLastError() == ERROR_ALREADY_EXISTS) ||
+        (GetLastError() == ERROR_ACCESS_DENIED))
+        bAlreadyRunning = true;
+
+    if (bAlreadyRunning && !parser.HasKey(L"multiple"))
+    {
+        HWND hBowPadWnd = FindAndWaitForBowPad();
+        if (hBowPadWnd)
+        {
+            ForwardToOtherInstance(hBowPadWnd, lpCmdLine, parser);
+            return 0;
+        }
+    }
+
+    SetAppID();
+
+    CIniSettings::Instance().SetIniPath(CAppUtils::GetDataPath() + L"\\settings");
+    hInst = hInstance;
+    hRes = hInstance;
+    LoadLanguage(hInstance);
+
+    SetIcon();
+
+    MSG msg = { 0 };
+    CMainWindow mainWindow(hRes);
+    if (mainWindow.RegisterAndCreateWindow())
+    {
+        ParseCommandLine(parser, mainWindow);
+
+        // force CWD to the install path to avoid the CWD being locked:
+        // if BowPad is started from another path (e.g. via double click on a text file in
+        // explorer), the CWD is the directory of that file. As long as BowPad runs with the CWD
+        // set to that dir, that dir can't be removed or renamed due to the lock.
+        ::SetCurrentDirectory(CPathUtils::GetModuleDir().c_str());
+
+        mainWindow.EnsureAtLeastOneTab();
+        // Main message loop:
+        while (GetMessage(&msg, NULL, 0, 0))
+        {
+            if (!CKeyboardShortcutHandler::Instance().TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam) &&
+                !CDialog::IsDialogMessage(&msg))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+    }
+
+    return (int)msg.wParam;
+}
