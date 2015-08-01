@@ -189,14 +189,29 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLinePa
                         std::wstring path = szArglist[i];
                         CPathUtils::NormalizeFolderSeparators(path);
                         path = CPathUtils::GetLongPathname(path);
+                        if (!PathFileExists(path.c_str()))
+                        {
+                            std::wstring tmp = GetCommandLineW();
+                            auto pathpos = tmp.find(szArglist[i]);
+                            if (pathpos != std::wstring::npos)
+                            {
+                                tmp = tmp.substr(pathpos);
+                                if (PathFileExists(tmp.c_str()))
+                                {
+                                    path = tmp;
+                                    CPathUtils::NormalizeFolderSeparators(path);
+                                    path = CPathUtils::GetLongPathname(path);
+                                    sCmdLine += L"\"" + path + L"\" ";
+                                    break;
+                                }
+                            }
+                        }
                         sCmdLine += L"\"" + path + L"\" ";
                     }
                     else
                     {
                         if (wcscmp(&szArglist[i][1], L"z") == 0)
                             bOmitNext = true;
-                        sCmdLine += szArglist[i];
-                        sCmdLine += L" ";
                     }
                 }
 
