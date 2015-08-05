@@ -20,7 +20,10 @@
 #include "AppUtils.h"
 #include "Theme.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4458) // declaration of 'xxx' hides class member
 #include <gdiplus.h>
+#pragma warning(pop)
 
 static void FillSolidRect(HDC hDC, int left, int top, int right, int bottom, COLORREF clr)
 {
