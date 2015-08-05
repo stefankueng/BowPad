@@ -22,7 +22,10 @@
 #include "BowPad.h"
 #include "BowPadUI.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4458) // declaration of 'xxx' hides class member
 #include <gdiplus.h>
+#pragma warning(pop)
 #include <Uxtheme.h>
 #include <vsstyle.h>
 #include <UIRibbon.h>
