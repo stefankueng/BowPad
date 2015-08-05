@@ -148,6 +148,7 @@
     <ClCompile Include="lexers\LexBaan.cxx" />
     <ClCompile Include="lexers\LexBash.cxx" />
     <ClCompile Include="lexers\LexBasic.cxx" />
+    <ClCompile Include="lexers\LexBatch.cxx" />
     <ClCompile Include="lexers\LexBibTeX.cxx" />
     <ClCompile Include="lexers\LexBullant.cxx" />
     <ClCompile Include="lexers\LexCaml.cxx" />
@@ -161,11 +162,13 @@
     <ClCompile Include="lexers\LexCsound.cxx" />
     <ClCompile Include="lexers\LexCSS.cxx" />
     <ClCompile Include="lexers\LexD.cxx" />
+    <ClCompile Include="lexers\LexDiff.cxx" />
     <ClCompile Include="lexers\LexDMAP.cxx" />
     <ClCompile Include="lexers\LexDMIS.cxx" />
     <ClCompile Include="lexers\LexECL.cxx" />
     <ClCompile Include="lexers\LexEiffel.cxx" />
     <ClCompile Include="lexers\LexErlang.cxx" />
+    <ClCompile Include="lexers\LexErrorList.cxx" />
     <ClCompile Include="lexers\LexEScript.cxx" />
     <ClCompile Include="lexers\LexFlagship.cxx" />
     <ClCompile Include="lexers\LexForth.cxx" />
@@ -183,6 +186,7 @@
     <ClCompile Include="lexers\LexLout.cxx" />
     <ClCompile Include="lexers\LexLua.cxx" />
     <ClCompile Include="lexers\LexMagik.cxx" />
+    <ClCompile Include="lexers\LexMake.cxx" />
     <ClCompile Include="lexers\LexMarkdown.cxx" />
     <ClCompile Include="lexers\LexMatlab.cxx" />
     <ClCompile Include="lexers\LexMetapost.cxx" />
@@ -193,9 +197,9 @@
     <ClCompile Include="lexers\LexMySQL.cxx" />
     <ClCompile Include="lexers\LexNimrod.cxx" />
     <ClCompile Include="lexers\LexNsis.cxx" />
+    <ClCompile Include="lexers\LexNull.cxx" />
     <ClCompile Include="lexers\LexOpal.cxx" />
     <ClCompile Include="lexers\LexOScript.cxx" />
-    <ClCompile Include="lexers\LexOthers.cxx" />
     <ClCompile Include="lexers\LexPascal.cxx" />
     <ClCompile Include="lexers\LexPB.cxx" />
     <ClCompile Include="lexers\LexPerl.cxx" />
@@ -205,6 +209,7 @@
     <ClCompile Include="lexers\LexPowerPro.cxx" />
     <ClCompile Include="lexers\LexPowerShell.cxx" />
     <ClCompile Include="lexers\LexProgress.cxx" />
+    <ClCompile Include="lexers\LexProps.cxx" />
     <ClCompile Include="lexers\LexPS.cxx" />
     <ClCompile Include="lexers\LexPython.cxx" />
     <ClCompile Include="lexers\LexR.cxx" />
@@ -279,6 +284,7 @@
     <ClInclude Include="include\Platform.h" />
     <ClInclude Include="include\SciLexer.h" />
     <ClInclude Include="include\Scintilla.h" />
+    <ClInclude Include="include\Sci_Position.h" />
     <ClInclude Include="lexlib\Accessor.h" />
     <ClInclude Include="lexlib\CharacterCategory.h" />
     <ClInclude Include="lexlib\CharacterSet.h" />
@@ -315,6 +321,7 @@
     <ClInclude Include="src\MarginView.h" />
     <ClInclude Include="src\Partitioning.h" />
     <ClInclude Include="src\PerLine.h" />
+    <ClInclude Include="src\Position.h" />
     <ClInclude Include="src\PositionCache.h" />
     <ClInclude Include="src\RESearch.h" />
     <ClInclude Include="src\RunStyles.h" />
