@@ -177,6 +177,12 @@
     <ClInclude Include="win32\HanjaDic.h">
       <Filter>win32</Filter>
     </ClInclude>
+    <ClInclude Include="include\Sci_Position.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Position.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lexers\LexA68k.cxx">
@@ -342,9 +348,6 @@
       <Filter>lexers</Filter>
     </ClCompile>
     <ClCompile Include="lexers\LexOScript.cxx">
-      <Filter>lexers</Filter>
-    </ClCompile>
-    <ClCompile Include="lexers\LexOthers.cxx">
       <Filter>lexers</Filter>
     </ClCompile>
     <ClCompile Include="lexers\LexPascal.cxx">
@@ -592,6 +595,24 @@
     </ClCompile>
     <ClCompile Include="win32\HanjaDic.cxx">
       <Filter>win32</Filter>
+    </ClCompile>
+    <ClCompile Include="lexers\LexBatch.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="lexers\LexDiff.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="lexers\LexErrorList.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="lexers\LexMake.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="lexers\LexNull.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="lexers\LexProps.cxx">
+      <Filter>lexers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
