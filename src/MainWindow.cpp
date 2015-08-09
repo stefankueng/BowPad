@@ -2289,6 +2289,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     bool bRet = true;
     bool bAddToMRU = (openFlags & OpenFlags::AddToMRU) != 0;
     bool bAskToCreateIfMissing = (openFlags & OpenFlags::AskToCreateIfMissing) != 0;
+    bool bIgnoreIfMissing = (openFlags & OpenFlags::IgnoreIfMissing) != 0;
 
     int encoding = -1;
     std::wstring filepath = CPathUtils::GetLongPathname(file);
@@ -2324,6 +2325,8 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                     return false;
                 createIfMissing = true;
             }
+            if (bIgnoreIfMissing)
+                return false;
         }
 
         CDocument doc = m_DocManager.LoadFile(*this, filepath, encoding, createIfMissing);

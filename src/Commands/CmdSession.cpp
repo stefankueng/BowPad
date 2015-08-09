@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         std::wstring path = CIniSettings::Instance().GetString(L"TabSession", key.c_str(), L"");
         if (path.empty())
             break;
-        if (OpenFile(path.c_str(), 0))
+        if (OpenFile(path.c_str(), OpenFlags::IgnoreIfMissing))
         {
             if (HasActiveDocument())
             {
