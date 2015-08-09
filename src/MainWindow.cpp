@@ -1217,9 +1217,8 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         m_DocManager.UpdateFileTime(doc, false);
         if (bSaveAs)
         {
-            std::wstring ext = CPathUtils::GetFileExtension(doc.m_path);
-            doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
-            m_editor.SetupLexerForExt(ext);
+            doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
+            m_editor.SetupLexerForLang(doc.m_language);
         }
         std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
         m_TabBar.SetCurrentTitle(sFileName.c_str());
@@ -2346,17 +2345,13 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             if (bAddToMRU)
                 CMRU::Instance().AddPath(filepath);
             std::wstring sFileName = CPathUtils::GetFileName(filepath);
-            std::wstring ext = CPathUtils::GetFileExtension(filepath);
             int index = -1;
             if (m_insertionIndex >= 0)
                 index = m_TabBar.InsertAfter(m_insertionIndex, sFileName.c_str());
             else
                 index = m_TabBar.InsertAtEnd(sFileName.c_str());
             id = m_TabBar.GetIDFromIndex(index);
-            if (ext.empty())
-                doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
-            else
-                doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
+            doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
             if ((CPathUtils::PathCompare(filepath, m_tabmovepath) == 0) && m_tabmovemod)
             {
                 doc.m_path = m_tabmovesavepath;
@@ -2421,10 +2416,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 // and we then must not change the active tab.
                 bool bResize = m_fileTree.GetPath().empty() && !doc.m_path.empty();
                 m_TabBar.ActivateAt(index);
-                if (ext.empty())
-                    m_editor.SetupLexerForLang(doc.m_language);
-                else
-                    m_editor.SetupLexerForExt(ext);
+                m_editor.SetupLexerForLang(doc.m_language);
                 if (bResize)
                     ResizeChildWindows();
             }
@@ -2467,13 +2459,12 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
     doc.m_bIsDirty = bModified;
     doc.m_bNeedsSaving = bModified;
     m_DocManager.UpdateFileTime(doc, true);
-    std::wstring ext = CPathUtils::GetFileExtension(doc.m_path);
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
-    doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
+    doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
     m_DocManager.SetDocument(docID, doc);
     if (doc.m_bIsReadonly)
         m_editor.Call(SCI_SETREADONLY, true);
-    m_editor.SetupLexerForExt(ext);
+    m_editor.SetupLexerForLang(doc.m_language);
     UpdateTab(docID);
     if (sFileName.empty())
         m_TabBar.SetCurrentTitle(GetNewTabName().c_str());
@@ -2929,12 +2920,11 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
     if (doc.m_bIsReadonly)
         m_editor.Call(SCI_SETREADONLY, true);
 
-    std::wstring ext = CPathUtils::GetFileExtension(doc.m_path);
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
-    doc.m_language = CLexStyles::Instance().GetLanguageForExt(ext);
+    doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
     m_DocManager.SetDocument(docID, doc);
 
-    m_editor.SetupLexerForExt(ext);
+    m_editor.SetupLexerForLang(doc.m_language);
     if (sFileName.empty())
         m_TabBar.SetCurrentTitle(GetNewTabName().c_str());
     else
