@@ -533,13 +533,6 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     Call(SCI_LINESCROLL, 0, lineToShow);
 }
 
-void CScintillaWnd::SetupLexerForExt( const std::wstring& ext )
-{
-    auto lexerdata = CLexStyles::Instance().GetLexerDataForExt(CUnicodeUtils::StdGetUTF8(ext));
-    auto langdata = CLexStyles::Instance().GetKeywordsForExt(CUnicodeUtils::StdGetUTF8(ext));
-    SetupLexer(lexerdata, langdata);
-}
-
 void CScintillaWnd::SetupLexerForLang( const std::wstring& lang )
 {
     auto lexerdata = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(lang));

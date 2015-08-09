@@ -86,11 +86,9 @@ public:
     static CLexStyles&                  Instance();
 
     std::vector<std::wstring>           GetLanguages() const;
-    std::wstring                        GetLanguageForExt(const std::wstring& ext) const;
     std::wstring                        GetLanguageForDocument(const CDocument& doc);
     std::wstring                        GetUserExtensionsForLanguage(const std::wstring& lang) const;
 
-    const std::map<int, std::string>&   GetKeywordsForExt(const std::string& ext);
     const std::map<int, std::string>&   GetKeywordsForLang(const std::string& lang);
     const std::map<int, std::string>&   GetKeywordsForLexer(int lexer);
     const std::string&                  GetCommentLineForLang(const std::string& lang) const;
@@ -101,7 +99,6 @@ public:
     int                                 GetFunctionRegexSortForLang(const std::string& lang) const;
     const std::vector<std::string>&     GetFunctionRegexTrimForLang(const std::string& lang) const;
 
-    const LexerData&                    GetLexerDataForExt(const std::string& ext) const;
     const LexerData&                    GetLexerDataForLang(const std::string& lang) const;
     const LexerData&                    GetLexerDataForLexer(int lexer);
 
@@ -127,11 +124,12 @@ private:
                                                    LPCWSTR styleString,
                                                    std::map<std::wstring, std::wstring>& variables,
                                                    StyleData& style) const;
-
+    std::wstring                        GetLanguageForPath(const std::wstring& path);
 private:
     bool                                m_bLoaded;
 
     std::map<std::string, std::string>  m_extLang;
+    std::map<std::string, std::string>  m_fileLang;
     std::map<std::string, LanguageData> m_Langdata;
     std::map<int, LexerData>            m_lexerdata;
     std::map<int, std::wstring>         m_lexerSection;

@@ -237,6 +237,19 @@ void CLexStyles::Load()
 
                 for (auto& ini : inis)
                 {
+                    CSimpleIni::TNamesDepend filelangkeys;
+                    ini.GetAllKeys(L"filelanguage", filelangkeys);
+                    for (const auto& k : filelangkeys)
+                    {
+                        std::wstring v = ini.GetValue(L"filelanguage", k);
+                        ReplaceVariables(v, variables);
+                        std::vector<std::wstring> files;
+                        stringtok(files, v, true, L";");
+                        for (const auto& f : files)
+                        {
+                            m_fileLang[CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(f))] = CUnicodeUtils::StdGetUTF8(k);
+                        }
+                    }
                     CSimpleIni::TNamesDepend autolangkeys;
                     ini.GetAllKeys(L"autolanguage", autolangkeys);
                     for (const auto& k : autolangkeys)
@@ -247,9 +260,7 @@ void CLexStyles::Load()
                         stringtok(exts, v, true, L";");
                         for (const auto& e : exts)
                         {
-                            m_extLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
-                            if (&ini == &inis[1])
-                                m_autoextLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
+                            m_autoextLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
                         }
                     }
                     if (&ini == &inis[1])
@@ -360,24 +371,6 @@ void CLexStyles::Load()
     m_bLoaded = true;
 }
 
-const std::map<int, std::string>& CLexStyles::GetKeywordsForExt( const std::string& ext )
-{
-    std::string v = ext;
-    std::transform(v.begin(), v.end(), v.begin(), ::tolower);
-
-    auto it = m_extLang.find(v);
-    if (it != m_extLang.end())
-    {
-        auto lt = m_Langdata.find(it->second);
-        if (lt != m_Langdata.end())
-        {
-            GenerateUserKeywords(lt->second);
-            return lt->second.keywordlist;
-        }
-    }
-    return emptyIntStrVec;
-}
-
 const std::map<int, std::string>& CLexStyles::GetKeywordsForLang( const std::string& lang )
 {
     auto lt = m_Langdata.find(lang);
@@ -432,24 +425,6 @@ void CLexStyles::GenerateUserKeywords(LanguageData& ld)
     }
 }
 
-const LexerData& CLexStyles::GetLexerDataForExt( const std::string& ext ) const
-{
-    std::string v = ext;
-    std::transform(v.begin(), v.end(), v.begin(), ::tolower);
-    auto it = m_extLang.find(v);
-    if (it != m_extLang.end())
-    {
-        auto lt = m_Langdata.find(it->second);
-        if (lt != m_Langdata.end())
-        {
-            auto ld = m_lexerdata.find(lt->second.lexer);
-            if (ld != m_lexerdata.end())
-                return ld->second;
-        }
-    }
-    return emptyLexData;
-}
-
 const LexerData& CLexStyles::GetLexerDataForLang( const std::string& lang ) const
 {
     auto lt = m_Langdata.find(lang);
@@ -470,21 +445,11 @@ const LexerData& CLexStyles::GetLexerDataForLexer(int lexer)
     return emptyLexData;
 }
 
-std::wstring CLexStyles::GetLanguageForExt( const std::wstring& ext ) const
+std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
 {
-    std::string e = CUnicodeUtils::StdGetUTF8(ext);
-    std::transform(e.begin(), e.end(), e.begin(), ::tolower);
-    auto it = m_extLang.find(e);
-    if (it != m_extLang.end())
-    {
-        return CUnicodeUtils::StdGetUnicode(it->second);
-    }
-    return L"";
-}
+    std::wstring p = path;
+    std::transform(p.begin(), p.end(), p.begin(), ::tolower);
 
-std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc)
-{
-    std::wstring p = CStringUtils::to_lower(doc.m_path);
     auto it = m_pathsLang.find(p);
     if (it != m_pathsLang.end())
     {
@@ -500,8 +465,34 @@ std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc)
         }
         return CUnicodeUtils::StdGetUnicode(it->second);
     }
+
+    auto fit = m_fileLang.find(CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(p)));
+    if (fit != m_fileLang.end())
+    {
+        return CUnicodeUtils::StdGetUnicode(fit->second);
+    }
+    auto ext = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(p));
+    auto eit = m_extLang.find(ext);
+    if (eit != m_extLang.end())
+    {
+        return CUnicodeUtils::StdGetUnicode(eit->second);
+    }
+
+    auto ait = m_autoextLang.find(ext);
+    if (ait != m_autoextLang.end())
+    {
+        return CUnicodeUtils::StdGetUnicode(ait->second);
+    }
+    return L"";
+}
+
+std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc)
+{
     if (doc.m_path.empty())
         return L"";
+    auto lang = GetLanguageForPath(doc.m_path);
+    if (!lang.empty())
+        return lang;
 
     // no extension, and no previously set lexer for this path:
     // try using the file content to determine a lexer.
@@ -648,8 +639,7 @@ void CLexStyles::SaveUserData()
     }
 
     // first clear all user extensions, then add them again to the ini file
-    for (const auto& it : m_userextLang)
-        ini.SetValue(L"language", CUnicodeUtils::StdGetUnicode(it.second).c_str(), L"");
+    ini.Delete(L"language", nullptr);
 
     for (const auto& it : m_userextLang)
     {
@@ -661,8 +651,7 @@ void CLexStyles::SaveUserData()
     }
 
     // first clear all auto extensions, then add them again to the ini file
-    for (const auto& it : m_autoextLang)
-        ini.SetValue(L"autolanguage", CUnicodeUtils::StdGetUnicode(it.second).c_str(), L"");
+    ini.Delete(L"autolanguage", nullptr);
 
     for (const auto& it : m_autoextLang)
     {
@@ -768,32 +757,35 @@ const std::vector<std::string>& CLexStyles::GetFunctionRegexTrimForLang( const s
 
 void CLexStyles::SetLangForPath(const std::wstring& path, const std::wstring& language)
 {
-    std::wstring sExt = CPathUtils::GetFileExtension(path);
-    std::string e = CUnicodeUtils::StdGetUTF8(sExt);
-    if (sExt.empty())
+    std::wstring lang = GetLanguageForPath(path);
+    // there's nothing to do if the language is already set for that path
+    if (lang.compare(language))
     {
+        std::wstring sExt = CPathUtils::GetFileExtension(path);
+        if (!sExt.empty())
+        {
+            // extension has a different language set than the user selected
+            // only add this if the extension is set in m_autoextLang
+            std::string e = CUnicodeUtils::StdGetUTF8(sExt);
+            std::transform(e.begin(), e.end(), e.begin(), ::tolower);
+            auto it = m_extLang.find(e);
+            if (it == m_extLang.end())
+            {
+                // set user selected language as the default for this extension
+                m_autoextLang.erase(e);
+                m_autoextLang[e] = CUnicodeUtils::StdGetUTF8(language);
+                SaveUserData();
+                return;
+            }
+            else
+                m_autoextLang.erase(e);
+        }
         // store the full path and the language
         std::wstring lpath = CStringUtils::to_lower(path);
         m_pathsLang[lpath] = CUnicodeUtils::StdGetUTF8(language);
         m_pathsForLang.push_front(std::move(lpath));
         while (m_pathsForLang.size() > 100)
             m_pathsForLang.pop_back();
-        SaveUserData();
-    }
-    else
-    {
-        std::wstring lang = GetLanguageForExt(sExt);
-        if (!lang.empty())
-        {
-            // extension already has a language set
-            // only add this if the extension is set in m_autoextLang
-            std::transform(e.begin(), e.end(), e.begin(), ::tolower);
-            auto it = m_autoextLang.find(e);
-            if (it == m_autoextLang.end())
-                return;
-        }
-        m_autoextLang[e] = CUnicodeUtils::StdGetUTF8(language);
-        m_extLang[e] = CUnicodeUtils::StdGetUTF8(language);
         SaveUserData();
     }
 }

@@ -90,7 +90,6 @@ public :
     void UpdateLineNumberWidth();
     void SaveCurrentPos(CPosData * pPos);
     void RestoreCurrentPos(const CPosData& pos);
-    void SetupLexerForExt(const std::wstring& ext);
     void SetupLexerForLang(const std::wstring& lang);
     void MarginClick(Scintilla::SCNotification * pNotification);
     void MarkSelectedWord(bool clear);
