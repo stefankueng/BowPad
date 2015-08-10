@@ -1004,12 +1004,14 @@ void CMainWindow::HandleCreate(HWND hwnd)
     m_hwnd = hwnd;
     Initialize();
 
-    std::async([=]
+    auto t = std::thread([=]
     {
         bool bNewer = CAppUtils::CheckForUpdate(false);
         if (bNewer)
             PostMessage(m_hwnd, WM_UPDATEAVAILABLE, 0, 0);
     });
+    t.detach();
+
     PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
 
     if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
