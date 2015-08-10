@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
             m_resizer.AddControl(hwndDlg, IDOK, RESIZER_BOTTOMRIGHT);
             InitPluginsList();
 
-            std::async([=]
+            auto t = std::thread([=]
             {
                 CDownloadFile filedownloader(L"BowPad", NULL);
                 std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
@@ -100,6 +100,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
                     m_plugins.push_back(it.second);
                 InitPluginsList();
             });
+            t.detach();
         }
             return FALSE;
         case WM_SIZE:
