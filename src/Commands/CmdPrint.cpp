@@ -62,13 +62,15 @@ void CCmdPrint::Print( bool bShowDlg )
     SetupLexerForLang(doc.m_language);
     ScintillaCall(SCI_CLEARDOCUMENTSTYLE);
     ScintillaCall(SCI_COLOURISE, 0, -1);
+    TabActivateAt(GetActiveTabIndex());
     OnOutOfScope(
         CTheme::Instance().SetDarkTheme(origTheme);
         CDocument doc = GetActiveDocument();
         SetupLexerForLang(doc.m_language);
         ScintillaCall(SCI_CLEARDOCUMENTSTYLE);
         ScintillaCall(SCI_COLOURISE, 0, -1);
-    );
+        TabActivateAt(GetActiveTabIndex());
+        );
 
     // reset all indicators
     size_t endpos = ScintillaCall(SCI_GETLENGTH);
