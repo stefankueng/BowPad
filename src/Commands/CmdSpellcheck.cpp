@@ -199,7 +199,7 @@ void CCmdSpellcheck::Check()
                     case SCLEX_MARKDOWN:
                         break;
                     default:
-                        if (style < m_lexerData.Styles.size())
+                        if (style < (int)m_lexerData.Styles.size())
                         {
                             const auto& sStyle = m_lexerData.Styles[style].Name;
                             if ((sStyle.find(L"DOC") == std::wstring::npos) &&
