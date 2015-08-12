@@ -4,11 +4,11 @@ setlocal
 pushd %~dp0
 
 rem you can set the COVDIR variable to your coverity path
-if exist ..\..\cov-analysis-win64-7.6.0 (
-  set "COVDIR=..\..\cov-analysis-win64-7.6.0"
+if exist ..\..\cov-analysis-win64-7.7.0 (
+  set "COVDIR=..\..\cov-analysis-win64-7.7.0"
 )
-if not defined COVDIR if exist ..\..\cov-analysis-win32-7.6.0 (
-  set "COVDIR=..\..\cov-analysis-win32-7.6.0"
+if not defined COVDIR if exist ..\..\cov-analysis-win32-7.7.0 (
+  set "COVDIR=..\..\cov-analysis-win32-7.7.0"
 )
 if not defined COVDIR set "COVDIR=C:\cov-analysis"
 if defined COVDIR if not exist "%COVDIR%" (
@@ -32,7 +32,7 @@ if exist "BowPad.tgz"  del "BowPad.tgz"
 
 
 :main
-call "%VS120COMNTOOLS%\vsvars32.bat"
+call "%VS140COMNTOOLS%\vsvars32.bat"
 if %ERRORLEVEL% neq 0 (
   echo vsvars32.bat call failed.
   goto End
