@@ -441,7 +441,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             HDROP hDrop = reinterpret_cast<HDROP>(wParam);
             if (hDrop)
+            {
                 HandleDropFiles(hDrop);
+                DragFinish(hDrop);
+            }
         }
         break;
     case WM_COPYDATA:
@@ -2489,11 +2492,10 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
     for (int i = 0 ; i < filesDropped ; ++i)
     {
         UINT len = DragQueryFile(hDrop, i, nullptr, 0);
-        auto pathBuf = std::make_unique<wchar_t[]>(len+1);
+        auto pathBuf = std::make_unique<wchar_t[]>(len+2);
         DragQueryFile(hDrop, i, pathBuf.get(), len+1);
         files.push_back(pathBuf.get());
     }
-    DragFinish(hDrop);
     FileTreeBlockRefresh(true);
     OnOutOfScope(FileTreeBlockRefresh(false));
     for (const auto& filename : files)
