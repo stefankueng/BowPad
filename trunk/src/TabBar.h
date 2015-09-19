@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #define TCN_ORDERCHANGED                (WM_USER + 5)
 #define TCN_REFRESH                     (WM_USER + 6)
 #define TCN_GETCOLOR                    (WM_USER + 7)
+#define TCN_GETDROPICON                 (WM_USER + 8)
 
 const int SAVED_IMG_INDEX = 0;
 const int UNSAVED_IMG_INDEX = 1;
@@ -102,7 +103,7 @@ protected:
     void                        DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
     void                        DrawItemBorder(LPDRAWITEMSTRUCT lpDrawItemStruct);
 
-    void                        DraggingCursor(POINT screenPoint);
+    void                        DraggingCursor(POINT screenPoint, UINT item);
 
     int                         GetTabIndexAt(const POINT & p) const { return GetTabIndexAt(p.x, p.y); }
 
