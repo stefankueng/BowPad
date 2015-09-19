@@ -662,5 +662,11 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="res\darktheme.ini" />
+    <None Include="res\dropcopy.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\dropmove.cur">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
