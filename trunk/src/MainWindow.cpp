@@ -514,39 +514,64 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 
                 switch (nmhdr.code)
                 {
-                case TCN_GETCOLOR:
-                {
-                    if (tbhdr.tabOrigin >= 0 && tbhdr.tabOrigin < m_TabBar.GetItemCount())
+                    case TCN_GETCOLOR:
                     {
-                        int docId = m_TabBar.GetIDFromIndex(tbhdr.tabOrigin);
-                        APPVERIFY(docId >= 0);
-                        if (m_DocManager.HasDocumentID(docId))
+                        if (tbhdr.tabOrigin >= 0 && tbhdr.tabOrigin < m_TabBar.GetItemCount())
                         {
-                            auto clr = m_DocManager.GetColorForDocument(docId);
-                            return CTheme::Instance().GetThemeColor(clr);
+                            int docId = m_TabBar.GetIDFromIndex(tbhdr.tabOrigin);
+                            APPVERIFY(docId >= 0);
+                            if (m_DocManager.HasDocumentID(docId))
+                            {
+                                auto clr = m_DocManager.GetColorForDocument(docId);
+                                return CTheme::Instance().GetThemeColor(clr);
+                            }
                         }
+                        else
+                            APPVERIFY(false);
+                        break;
                     }
-                    else
-                        APPVERIFY(false);
-                    break;
-                }
-                case TCN_SELCHANGE:
+                    case TCN_SELCHANGE:
                     HandleTabChange(nmhdr);
                     InvalidateRect(m_fileTree, NULL, TRUE);
                     break;
-                case TCN_SELCHANGING:
+                    case TCN_SELCHANGING:
                     HandleTabChanging(nmhdr);
                     break;
-                case TCN_TABDELETE:
+                    case TCN_TABDELETE:
                     HandleTabDelete(tbhdr);
                     break;
-                case TCN_TABDROPPEDOUTSIDE:
+                    case TCN_TABDROPPEDOUTSIDE:
                     {
                         DWORD pos = GetMessagePos();
                         POINT pt;
                         pt.x = GET_X_LPARAM(pos);
                         pt.y = GET_Y_LPARAM(pos);
                         HandleTabDroppedOutside(ptbhdr->tabOrigin, pt);
+                    }
+                    break;
+                    case TCN_GETDROPICON:
+                    {
+                        DWORD pos = GetMessagePos();
+                        POINT pt;
+                        pt.x = GET_X_LPARAM(pos);
+                        pt.y = GET_Y_LPARAM(pos);
+                        auto hPtWnd = WindowFromPoint(pt);
+                        if (hPtWnd == m_fileTree)
+                        {
+                            auto docID = m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin);
+                            CDocument doc = m_DocManager.GetDocumentFromID(docID);
+                            if (!doc.m_path.empty())
+                            {
+                                if (GetKeyState(VK_CONTROL) & 0x8000)
+                                {
+                                    return (LRESULT)::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_COPYFILE));
+                                }
+                                else
+                                {
+                                    return (LRESULT)::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_MOVEFILE));
+                                }
+                            }
+                        }
                     }
                     break;
                 }
@@ -2674,11 +2699,8 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
     // the BowPad window the drop was done on. Then close this tab.
     // First save the file to a temp location to ensure all unsaved mods are saved.
     std::wstring temppath = CTempFiles::Instance().GetTempFilePath(true);
-    CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
-    CDocument tempdoc = doc;
-    tempdoc.m_path = temppath;
-    bool bDummy = false;
-    m_DocManager.SaveFile(*this, tempdoc, bDummy);
+    auto docID = m_TabBar.GetIDFromIndex(tab);
+    CDocument doc = m_DocManager.GetDocumentFromID(docID);
     HWND hDroppedWnd = WindowFromPoint(pt);
     if (hDroppedWnd)
     {
@@ -2723,7 +2745,81 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
             }
             return;
         }
+        else if ((hDroppedWnd == m_fileTree) && (!doc.m_path.empty()))
+        {
+            // drop over file tree
+            auto hitpath = m_fileTree.GetDirPathForHitItem();
+            if (!hitpath.empty())
+            {
+                auto filename = CPathUtils::GetFileName(doc.m_path);
+                auto destpath = CPathUtils::Append(hitpath, filename);
+
+                if (CPathUtils::PathCompare(doc.m_path, destpath))
+                {
+                    // ask whether to copy/move the file
+                    bool bCopy = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+
+                    ResString rTitle(hRes, IDS_FILE_DROP);
+                    ResString rQuestion(hRes, bCopy ? IDS_FILE_DROP_COPY : IDS_FILE_DROP_MOVE);
+                    ResString rDoit(hRes, bCopy ? IDS_FILE_DROP_DOCOPY : IDS_FILE_DROP_DOMOVE);
+                    ResString rCancel(hRes, IDS_FILE_DROP_CANCEL);
+                    // Show exactly what we are creating.
+                    std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str(), hitpath.c_str());
+
+                    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+                    TASKDIALOG_BUTTON aCustomButtons[2];
+                    int bi = 0;
+                    aCustomButtons[bi].nButtonID = 101;
+                    aCustomButtons[bi++].pszButtonText = rDoit;
+                    aCustomButtons[bi].nButtonID = 100;
+                    aCustomButtons[bi++].pszButtonText = rCancel;
+                    tdc.pButtons = aCustomButtons;
+                    tdc.cButtons = bi;
+                    assert(tdc.cButtons <= _countof(aCustomButtons));
+                    tdc.nDefaultButton = 101;
+
+                    tdc.hwndParent = *this;
+                    tdc.hInstance = hRes;
+                    tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+                    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+                    tdc.pszMainIcon = TD_INFORMATION_ICON;
+                    tdc.pszMainInstruction = rTitle;
+                    tdc.pszContent = sQuestion.c_str();
+                    int nClickedBtn = 0;
+                    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
+                    if (CAppUtils::FailedShowMessage(hr))
+                        nClickedBtn = 0;
+                    bool bDoIt = (nClickedBtn == 101);
+
+                    if (bDoIt)
+                    {
+                        if (bCopy)
+                        {
+                            CDocument tempdoc = doc;
+                            tempdoc.m_path = destpath;
+                            bool bDummy = false;
+                            m_DocManager.SaveFile(*this, tempdoc, bDummy);
+                            OpenFile(destpath, OpenFlags::AddToMRU);
+                        }
+                        else
+                        {
+                            if (MoveFile(doc.m_path.c_str(), destpath.c_str()))
+                            {
+                                doc.m_path = destpath;
+                                m_DocManager.SetDocument(docID, doc);
+                                m_TabBar.ActivateAt(tab);
+                            }
+                        }
+                    }
+                    return;
+                }
+            }
+        }
     }
+    CDocument tempdoc = doc;
+    tempdoc.m_path = temppath;
+    bool bDummy = false;
+    m_DocManager.SaveFile(*this, tempdoc, bDummy);
 
     // Start a new instance and open the tab there.
     std::wstring modpath = CPathUtils::GetModulePath();

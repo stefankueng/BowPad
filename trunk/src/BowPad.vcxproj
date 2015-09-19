@@ -450,6 +450,8 @@
     <None Include="res\drag_interdit.cur" />
     <None Include="res\drag_out.cur" />
     <None Include="res\drag_plus.cur" />
+    <None Include="res\dropcopy.cur" />
+    <None Include="res\dropmove.cur" />
     <None Include="res\Properties.ini" />
     <None Include="res\Shortcuts.ini" />
     <None Include="version.in" />
