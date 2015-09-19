@@ -41,6 +41,7 @@ public:
     void Refresh(HTREEITEM refreshRoot, bool force = false);
     std::wstring GetFilePathForHitItem();
     std::wstring GetFilePathForSelItem();
+    std::wstring GetDirPathForHitItem();
     
     virtual void OnThemeChanged(bool bDark) override;
     virtual bool Execute() override;

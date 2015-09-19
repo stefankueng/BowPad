@@ -586,6 +586,26 @@ std::wstring CFileTree::GetFilePathForSelItem()
     return std::wstring();
 }
 
+std::wstring CFileTree::GetDirPathForHitItem()
+{
+    HTREEITEM hItem = GetHitItem();
+    if (hItem)
+    {
+        TVITEM item = { 0 };
+        item.mask = TVIF_PARAM;
+        item.hItem = hItem;
+        TreeView_GetItem(*this, &item);
+        FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
+        if (pTreeItem)
+        {
+            if (pTreeItem->isDir)
+                return pTreeItem->path;
+            return pTreeItem->path.substr(0, pTreeItem->path.find_last_of('\\'));
+        }
+    }
+    return GetPath();
+}
+
 void CFileTree::OnThemeChanged(bool bDark)
 {
     if (bDark)
