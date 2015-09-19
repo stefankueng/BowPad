@@ -622,7 +622,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 // For using the function "WindowFromPoint" afterward!!!
                 ::GetCursorPos(&m_draggingPoint);
 
-                DraggingCursor(m_draggingPoint);
+                DraggingCursor(m_draggingPoint, m_nTabDragged);
                 return TRUE;
             }
 
@@ -953,7 +953,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
 }
 
 
-void CTabBar::DraggingCursor(POINT screenPoint)
+void CTabBar::DraggingCursor(POINT screenPoint, UINT item)
 {
     HWND hWin = ::WindowFromPoint(screenPoint);
     if (*this == hWin)
@@ -969,10 +969,21 @@ void CTabBar::DraggingCursor(POINT screenPoint)
             else
                 ::SetCursor(::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_TAB)));
         }
-        else if (IsPointInParentZone(screenPoint))
-            ::SetCursor(::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_INTERDIT_TAB)));
-        else // drag out of application
-            ::SetCursor(::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_OUT_TAB)));
+        else
+        {
+            TBHDR nmhdr;
+            nmhdr.hdr.hwndFrom = *this;
+            nmhdr.hdr.code = TCN_GETDROPICON;
+            nmhdr.hdr.idFrom = reinterpret_cast<UINT_PTR>(this);
+            nmhdr.tabOrigin = item;
+            HICON icon = (HICON)::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+            if (icon)
+                ::SetCursor(icon);
+            else if (IsPointInParentZone(screenPoint))
+                ::SetCursor(::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_INTERDIT_TAB)));
+            else // drag out of application
+                ::SetCursor(::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_OUT_TAB)));
+        }
     }
 }
 
