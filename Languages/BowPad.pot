@@ -253,6 +253,10 @@ msgstr ""
 msgid "Cancel\nDo not delete the file."
 msgstr ""
 
+#. Resource IDs: (14)
+msgid "Cancel\nLeave the file where it is."
+msgstr ""
+
 #. Resource IDs: (11)
 msgid "Cancel\nThe file is not created."
 msgstr ""
@@ -449,6 +453,10 @@ msgstr ""
 msgid "Copy the current selection to the clipboard"
 msgstr ""
 
+#. Resource IDs: (14)
+msgid "Copy the file\nThe copy is opened in another tab."
+msgstr ""
+
 #. Resource IDs: (3787)
 msgid "Correct spelling mistakes"
 msgstr ""
@@ -596,6 +604,16 @@ msgstr ""
 
 #. Resource IDs: (14)
 msgid "Do this for all files"
+msgstr ""
+
+#. Resource IDs: (14)
+#, c-format
+msgid "Do you want to copy the file %s to %s?"
+msgstr ""
+
+#. Resource IDs: (14)
+#, c-format
+msgid "Do you want to move the file %s to %s?"
 msgstr ""
 
 #. Resource IDs: (7)
@@ -1093,8 +1111,16 @@ msgstr ""
 msgid "Move the caret to the previous bookmark"
 msgstr ""
 
+#. Resource IDs: (14)
+msgid "Move the file\nThe file tab is updated to the new path."
+msgstr ""
+
 #. Resource IDs: (3761)
 msgid "Move up"
+msgstr ""
+
+#. Resource IDs: (14)
+msgid "Move/Copy File"
 msgstr ""
 
 #. Resource IDs: (3763)
