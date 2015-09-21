@@ -34,6 +34,21 @@ static COLORREF fgColor = RGB(0, 0, 0);
 static COLORREF bgColor = RGB(255, 255, 255);
 };
 
+static std::multimap<std::wstring, std::string> lexDetectStrings = {
+    // a '+' in front of the lexer name means the string can appear anywhere in the
+    // first line of the document.
+    // a '-' in front of the lexer name means the string must appear
+    // at the beginning of the first line of the document
+    { L"+C/C++", "*- C++ -*" },
+    { L"-Xml", "<?xml" },
+    { L"-Bash", "<?php" },
+    { L"-Bash", "#!/bin/sh" },
+    { L"-Bash", "#!/bin/bash" },
+    { L"-Bash", "#! /bin/bash" },
+    { L"-Html", "<html>" },
+    { L"-Html", "<!DOCTYPE html>" }
+};
+
 StyleData::StyleData()
     : ForegroundColor(fgColor)
     , BackgroundColor(bgColor)
@@ -491,25 +506,29 @@ std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc)
     if (doc.m_path.empty())
         return L"";
     auto lang = GetLanguageForPath(doc.m_path);
-    if (!lang.empty())
+    if (!lang.empty()/* && lang.compare(L"Text")*/)
         return lang;
 
     // no extension, and no previously set lexer for this path:
     // try using the file content to determine a lexer.
     // Since this needs to be fast, we don't do excessive checks but
     // keep it very, very simple.
-    std::wstring ret;
     m_scratchWnd.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
 
-    // currently, we only check for OpenFOAM and bash files
     std::string line = m_scratchWnd.GetLine(0);
-    if (line.find("*- C++ -*") != std::string::npos)
-        ret = L"C/C++";
-    if ((line.find("#! /bin/bash") != std::string::npos) || (line.find("#!/bin/bash") != std::string::npos))
-        ret = L"Bash";
+    for (const auto& m : lexDetectStrings)
+    {
+        auto foundpos = line.find(m.second);
+        if (((m.first[0] == '-') && (foundpos == 0)) ||
+            ((m.first[0] == '+') && (foundpos != std::string::npos)))
+        {
+            lang = &m.first[1];
+            break;
+        }
+    }
     m_scratchWnd.Call(SCI_SETDOCPOINTER, 0, 0);
 
-    return ret;
+    return lang;
 }
 
 std::wstring CLexStyles::GetUserExtensionsForLanguage( const std::wstring& lang ) const
