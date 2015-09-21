@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2015-09-21 20:39+0100\n"
+"PO-Revision-Date: 2015-09-21 20:49+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -262,6 +262,14 @@ msgstr ""
 "Abbrechen\n"
 "Datei nicht löschen"
 
+#. Resource IDs: (14)
+msgid ""
+"Cancel\n"
+"Leave the file where it is."
+msgstr ""
+"Abbrechen\n"
+"Die Datei bleibt wo sie ist."
+
 #. Resource IDs: (11)
 msgid ""
 "Cancel\n"
@@ -477,6 +485,14 @@ msgstr "Kopiere Pfad"
 msgid "Copy the current selection to the clipboard"
 msgstr "Kopiert die Auswahl in die Zwischenablage"
 
+#. Resource IDs: (14)
+msgid ""
+"Copy the file\n"
+"The copy is opened in another tab."
+msgstr ""
+"Datei kopieren\n"
+"Die Kopie wird in einem neuen Reiter geöffnet."
+
 #. Resource IDs: (3787)
 msgid "Correct spelling mistakes"
 msgstr "Rechtschreibfehler korrigieren"
@@ -640,6 +656,16 @@ msgstr ""
 #. Resource IDs: (14)
 msgid "Do this for all files"
 msgstr "Tu dies für alle Dateien"
+
+#. Resource IDs: (14)
+#, c-format
+msgid "Do you want to copy the file %s to %s?"
+msgstr "Möchten Sie die Datei %s nach %s kopieren?"
+
+#. Resource IDs: (14)
+#, c-format
+msgid "Do you want to move the file %s to %s?"
+msgstr "Möchten Sie die Datei %s nach %s verschieben?"
 
 #. Resource IDs: (7)
 #, c-format
@@ -1213,9 +1239,21 @@ msgstr "Verschiebt den Cursor zum nächsten Lesezeichen"
 msgid "Move the caret to the previous bookmark"
 msgstr "Verschiebt den Cursor zum vorherigen Lesezeichen"
 
+#. Resource IDs: (14)
+msgid ""
+"Move the file\n"
+"The file tab is updated to the new path."
+msgstr ""
+"Datei verschieben\n"
+"Der Dateireiter wird zum neuen Pfad aktualisiert."
+
 #. Resource IDs: (3761)
 msgid "Move up"
 msgstr "Nach oben"
+
+#. Resource IDs: (14)
+msgid "Move/Copy File"
+msgstr "Datei verschieben/kopieren"
 
 #. Resource IDs: (3763)
 msgid "Moves the cursor to the specified line"
