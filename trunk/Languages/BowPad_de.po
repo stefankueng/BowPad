@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2015-03-01 17:19+0100\n"
+"PO-Revision-Date: 2015-09-21 20:39+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -478,14 +478,12 @@ msgid "Copy the current selection to the clipboard"
 msgstr "Kopiert die Auswahl in die Zwischenablage"
 
 #. Resource IDs: (3787)
-#, fuzzy
 msgid "Correct spelling mistakes"
-msgstr "Entsprechende Dateien"
+msgstr "Rechtschreibfehler korrigieren"
 
 #. Resource IDs: (14)
-#, fuzzy
 msgid "Corrections"
-msgstr "Funktionen"
+msgstr "Korrekturen"
 
 #. Resource IDs: (3772)
 msgid "Corresponding File"
@@ -928,9 +926,8 @@ msgid "H"
 msgstr "H"
 
 #. Resource IDs: (14)
-#, fuzzy
 msgid "Ignore"
-msgstr "Gross/Kleinschreibung ignorieren"
+msgstr "Ignorieren"
 
 #. Resource IDs: (1079)
 msgid "Ignore &case."
@@ -941,9 +938,8 @@ msgid "Ignore word for this session"
 msgstr "Ignoriere Wort für diese Sitzung"
 
 #. Resource IDs: (3787)
-#, fuzzy
 msgid "Include uppercase"
-msgstr "Grossschreibung"
+msgstr "Grossschreibung einschliessen"
 
 #. Resource IDs: (3787)
 msgid "Include words that are all CAPS or have uppercase letters in the middle"
@@ -1271,9 +1267,8 @@ msgid "Next Bookmark"
 msgstr "Nächstes Lesezeichen"
 
 #. Resource IDs: (14)
-#, fuzzy
 msgid "No corrections found!"
-msgstr "Keine Funktionen gefunden"
+msgstr "Keine Korrekturen gefunden"
 
 #. Resource IDs: (13)
 msgid "No files found"
@@ -1308,9 +1303,8 @@ msgid "Online Languages"
 msgstr "Online Sprachen"
 
 #. Resource IDs: (3787)
-#, fuzzy
 msgid "Only comments"
-msgstr "Kommentar entfernen"
+msgstr "Nur Kommentare"
 
 #. Resource IDs: (3769)
 msgid "Open Console"
@@ -1697,9 +1691,8 @@ msgid "Select the language for BowPad"
 msgstr "Wähle die Sprache für BowPad"
 
 #. Resource IDs: (3787)
-#, fuzzy
 msgid "Selects the language for the spell checker"
-msgstr "Wähle die Sprache für BowPad"
+msgstr "Wähle die Sprache für die Rechtschreibkorrektur"
 
 #. Resource IDs: (3762)
 msgid "Sends the document to the default printer"
@@ -1807,9 +1800,8 @@ msgid "Spell checker"
 msgstr "Rechtschreibung"
 
 #. Resource IDs: (3787)
-#, fuzzy
 msgid "Spell checker language"
-msgstr "Wähle Sprache"
+msgstr "Wähle Rechtschreibkorrektur-Sprache"
 
 #. Resource IDs: (3761)
 msgid "Split Lines"
