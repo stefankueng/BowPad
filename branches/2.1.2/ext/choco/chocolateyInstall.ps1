@@ -1,1 +1,0 @@
-Install-ChocolateyPackage 'BowPad' 'msi' '/quiet' 'https://sourceforge.net/projects/bowpad-sk/files/$MajorVersion$.$MinorVersion$.$MicroVersion$/BowPad-$MajorVersion$.$MinorVersion$.$MicroVersion$.msi/download' 'https://sourceforge.net/projects/bowpad-sk/files/$MajorVersion$.$MinorVersion$.$MicroVersion$/BowPad64-$MajorVersion$.$MinorVersion$.$MicroVersion$.msi/download' 

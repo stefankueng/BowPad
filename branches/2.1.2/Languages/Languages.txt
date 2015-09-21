@@ -1,6 +1,0 @@
-de
-fr
-ja
-ro
-sv
-zh-CN
