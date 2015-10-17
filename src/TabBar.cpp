@@ -360,6 +360,21 @@ int CTabBar::GetCurrentTabId() const
     return (int)tci.lParam;
 }
 
+void CTabBar::SetCurrentTabId(int id)
+{
+    int index = TabCtrl_GetCurSel(*this);
+    if (index < 0)
+    {
+        index = TabCtrl_GetCurFocus(*this);
+        if (index < 0)
+            return;
+    }
+    TCITEM tci;
+    tci.mask = TCIF_PARAM;
+    tci.lParam = id;
+    TabCtrl_SetItem(*this, index, &tci);
+}
+
 void CTabBar::DeletAllItems()
 {
     TabCtrl_DeleteAllItems(*this);
