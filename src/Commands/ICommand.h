@@ -27,6 +27,7 @@ namespace OpenFlags
     const unsigned int AddToMRU = 1;
     const unsigned int AskToCreateIfMissing = 2;
     const unsigned int IgnoreIfMissing = 4;
+    const unsigned int OpenIntoActiveTab = 8;
 };
 
 class ICommand
