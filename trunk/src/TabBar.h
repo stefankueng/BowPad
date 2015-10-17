@@ -76,6 +76,7 @@ public :
     void                        SetCurrentTitle(LPCTSTR title);
     int                         GetCurrentTabIndex() const;
     int                         GetCurrentTabId() const;
+    void                        SetCurrentTabId(int id);
     void                        DeleteItemAt(int index);
     int                         GetIDFromIndex(int index) const;
     int                         GetIndexFromID(int id) const;
