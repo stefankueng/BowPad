@@ -633,7 +633,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         auto path = m_fileTree.GetFilePathForSelItem();
                         if (!path.empty())
                         {
-                            OpenFile(path.c_str(), OpenFlags::AddToMRU);
+                            bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+                            OpenFile(path.c_str(), OpenFlags::AddToMRU | (control ? OpenFlags::OpenIntoActiveTab : 0));
                             return TRUE;
                         }
                     }
@@ -643,7 +644,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         auto path = m_fileTree.GetFilePathForHitItem();
                         if (!path.empty())
                         {
-                            OpenFile(path.c_str(), OpenFlags::AddToMRU);
+                            bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+                            OpenFile(path.c_str(), OpenFlags::AddToMRU | (control ? OpenFlags::OpenIntoActiveTab : 0));
                             PostMessage(*this, WM_SETFOCUS, TRUE, 0);
                         }
                     }
@@ -2320,6 +2322,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     bool bAddToMRU = (openFlags & OpenFlags::AddToMRU) != 0;
     bool bAskToCreateIfMissing = (openFlags & OpenFlags::AskToCreateIfMissing) != 0;
     bool bIgnoreIfMissing = (openFlags & OpenFlags::IgnoreIfMissing) != 0;
+    bool bOpenIntoActiveTab = (openFlags & OpenFlags::OpenIntoActiveTab) != 0;
 
     int encoding = -1;
     std::wstring filepath = CPathUtils::GetLongPathname(file);
@@ -2362,7 +2365,17 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         CDocument doc = m_DocManager.LoadFile(*this, filepath, encoding, createIfMissing);
         if (doc.m_document)
         {
-            if (m_TabBar.GetItemCount() == 1)
+            int activetabid = -1;
+            if (bOpenIntoActiveTab)
+            {
+                activetabid = m_TabBar.GetCurrentTabId();
+                CDocument activedoc = m_DocManager.GetDocumentFromID(activetabid);
+                if (!activedoc.m_bIsDirty && !activedoc.m_bNeedsSaving)
+                    m_DocManager.RemoveDocument(activetabid);
+                else
+                    activetabid = -1;
+            }
+            if ((activetabid < 0) && (m_TabBar.GetItemCount() == 1))
             {
                 // check if the only tab is empty and if it is, remove it
                 auto docID = m_TabBar.GetIDFromIndex(0);
@@ -2379,11 +2392,21 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 CMRU::Instance().AddPath(filepath);
             std::wstring sFileName = CPathUtils::GetFileName(filepath);
             int index = -1;
-            if (m_insertionIndex >= 0)
-                index = m_TabBar.InsertAfter(m_insertionIndex, sFileName.c_str());
+            if (activetabid < 0)
+            {
+                if (m_insertionIndex >= 0)
+                    index = m_TabBar.InsertAfter(m_insertionIndex, sFileName.c_str());
+                else
+                    index = m_TabBar.InsertAtEnd(sFileName.c_str());
+                id = m_TabBar.GetIDFromIndex(index);
+            }
             else
-                index = m_TabBar.InsertAtEnd(sFileName.c_str());
-            id = m_TabBar.GetIDFromIndex(index);
+            {
+                index = m_TabBar.GetCurrentTabIndex();
+                m_TabBar.SetCurrentTabId(activetabid);
+                id = activetabid;
+                m_TabBar.SetCurrentTitle(sFileName.c_str());
+            }
             doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
             if ((CPathUtils::PathCompare(filepath, m_tabmovepath) == 0) && m_tabmovemod)
             {
