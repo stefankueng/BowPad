@@ -726,6 +726,7 @@ void CFileTree::OnClose()
     auto start = GetTickCount64();
     while (m_ThreadsRunning && (GetTickCount64() - start < 5000))
         Sleep(10);
+    m_bStop = false;
 }
 
 HTREEITEM CFileTree::GetItemForPath(const std::wstring& expandpath)
