@@ -2381,14 +2381,17 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 else
                     activetabid = -1;
             }
-            if ((activetabid < 0) && (m_TabBar.GetItemCount() == 1))
+            if (activetabid < 0)
             {
                 // check if the only tab is empty and if it is, remove it
-                auto docID = m_TabBar.GetIDFromIndex(0);
+                auto docID = m_TabBar.GetCurrentTabId();
                 CDocument existDoc = m_DocManager.GetDocumentFromID(docID);
                 if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH)==0) && (m_editor.Call(SCI_CANUNDO)==0))
                 {
-                    m_TabBar.DeleteItemAt(0);
+                    m_insertionIndex = m_TabBar.GetCurrentTabIndex();
+                    m_TabBar.DeleteItemAt(m_insertionIndex);
+                    if (m_insertionIndex)
+                        --m_insertionIndex;
                     // Prefer to remove the document after the tab has gone as it supports it
                     // and deletion causes events that may expect it to be there.
                     m_DocManager.RemoveDocument(docID);
