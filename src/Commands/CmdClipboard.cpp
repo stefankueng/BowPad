@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -171,9 +171,11 @@ void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml)
 
 bool CCmdCut::Execute()
 {
+    bool bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
     std::string sHtml = GetHtmlSelection();
     ScintillaCall(SCI_CUT);
-    AddHtmlStringToClipboard(sHtml);
+    if (bShift)
+        AddHtmlStringToClipboard(sHtml);
     return true;
 }
 
@@ -216,9 +218,11 @@ HRESULT CCmdCutPlain::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const 
 
 bool CCmdCopy::Execute()
 {
+    bool bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
     std::string sHtml = GetHtmlSelection();
     ScintillaCall(SCI_COPYALLOWLINE);
-    AddHtmlStringToClipboard(sHtml);
+    if (bShift)
+        AddHtmlStringToClipboard(sHtml);
     return true;
 }
 
