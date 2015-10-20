@@ -1074,8 +1074,13 @@ void CMainWindow::HandleAfterInit()
         unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
         if (m_bPathsToOpenMRU)
             openFlags |= OpenFlags::AddToMRU;
-        if ((m_pathsToOpen.size() == 1) && (PathIsDirectory(path.first.c_str())) && (m_fileTree.GetPath().empty()))
+        if ((m_pathsToOpen.size() == 1) && (PathIsDirectory(path.first.c_str())))
         {
+            if (!m_fileTree.GetPath().empty())
+            {
+                // file tree not empty: create a new empty tab first
+                OpenNewTab();
+            }
             m_fileTree.SetPath(path.first);
             ShowFileTree(true);
         }
