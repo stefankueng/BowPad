@@ -122,12 +122,12 @@
         <Image>res/CloseAllL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdCopy" LabelTitle="Copy" TooltipTitle="Clipboard" TooltipDescription="Copy the current selection to the clipboard" Keytip="C">
+    <Command Name="cmdCopy" LabelTitle="Copy" TooltipTitle="Clipboard" TooltipDescription="Copy the current selection to the clipboard. Hold down the shift key to copy the text formatted." Keytip="C">
       <Command.SmallImages>
         <Image>res/Copy.bmp</Image>
       </Command.SmallImages>
     </Command>
-    <Command Name="cmdCut" LabelTitle="Cut" TooltipTitle="Clipboard" TooltipDescription="Cut the current selection to the clipboard" Keytip="X">
+    <Command Name="cmdCut" LabelTitle="Cut" TooltipTitle="Clipboard" TooltipDescription="Cut the current selection to the clipboard. Hold down the shift key to cut the text formatted." Keytip="X">
       <Command.SmallImages>
         <Image>res/Cut.bmp</Image>
       </Command.SmallImages>
@@ -1196,8 +1196,8 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <ContextPopup.MiniToolbars>
         <MiniToolbar Name="CopyPasteToolbar">
           <MenuGroup>
-            <Button CommandName="cmdCut" />
-            <Button CommandName="cmdCopy" />
+            <Button CommandName="cmdCutPlain" />
+            <Button CommandName="cmdCopyPlain" />
             <Button CommandName="cmdPaste" />
           </MenuGroup>
         </MiniToolbar>
