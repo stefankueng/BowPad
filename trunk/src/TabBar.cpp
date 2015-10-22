@@ -660,7 +660,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 }
                 m_currentHoverTabItem = index;
                 m_bIsCloseHover = m_closeButtonZone.IsHit(xPos, yPos, m_currentHoverTabRect);
-                if (m_bIsCloseHover)
+
                 {
                     TRACKMOUSEEVENT tme = { 0 };
                     tme.cbSize = sizeof(TRACKMOUSEEVENT);
@@ -674,6 +674,17 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                         InvalidateRect(hwnd, &oldRect, FALSE);
                     InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
                 }
+                else if (m_currentHoverTabItem != oldIndex)
+                {
+                    if (oldIndex != -1)
+                        InvalidateRect(hwnd, &oldRect, FALSE);
+                    InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
+                }
+            }
+            else if (m_currentHoverTabItem != index)
+            {
+                InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
+                m_currentHoverTabItem = index;
             }
         }
             break;
@@ -685,6 +696,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             tme.hwndTrack = *this;
             TrackMouseEvent(&tme);
             m_bIsCloseHover = false;
+            m_currentHoverTabItem = -1;
             InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
         }
             break;
@@ -862,6 +874,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
 
     int curSel = TabCtrl_GetCurSel(*this);
     bool bSelected = (pDrawItemStruct->itemID == (UINT)curSel);
+    bool bMouseOver = (pDrawItemStruct->itemID == (UINT)m_currentHoverTabItem);
 
     RECT rItem(pDrawItemStruct->rcItem);
 
@@ -875,6 +888,9 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
     COLORREF crFrom = GetTabColor(bSelected, pDrawItemStruct->itemID);
 
     COLORREF crTo = bSelected ? ::GetSysColor(COLOR_3DFACE) : Darker(::GetSysColor(COLOR_3DFACE), 0.95f);
+    if (bMouseOver)
+        crTo = Darker(crTo, 0.7f);
+
     crTo = CTheme::Instance().GetThemeColor(crTo);
 
     int nROrg = GetRValue(crFrom);
