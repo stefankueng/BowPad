@@ -2385,16 +2385,19 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             {
                 // check if the only tab is empty and if it is, remove it
                 auto docID = m_TabBar.GetCurrentTabId();
-                CDocument existDoc = m_DocManager.GetDocumentFromID(docID);
-                if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH)==0) && (m_editor.Call(SCI_CANUNDO)==0))
+                if (docID >= 0)
                 {
-                    m_insertionIndex = m_TabBar.GetCurrentTabIndex();
-                    m_TabBar.DeleteItemAt(m_insertionIndex);
-                    if (m_insertionIndex)
-                        --m_insertionIndex;
-                    // Prefer to remove the document after the tab has gone as it supports it
-                    // and deletion causes events that may expect it to be there.
-                    m_DocManager.RemoveDocument(docID);
+                    CDocument existDoc = m_DocManager.GetDocumentFromID(docID);
+                    if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH) == 0) && (m_editor.Call(SCI_CANUNDO) == 0))
+                    {
+                        m_insertionIndex = m_TabBar.GetCurrentTabIndex();
+                        m_TabBar.DeleteItemAt(m_insertionIndex);
+                        if (m_insertionIndex)
+                            --m_insertionIndex;
+                        // Prefer to remove the document after the tab has gone as it supports it
+                        // and deletion causes events that may expect it to be there.
+                        m_DocManager.RemoveDocument(docID);
+                    }
                 }
             }
             if (bAddToMRU)
