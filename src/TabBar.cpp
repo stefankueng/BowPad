@@ -603,6 +603,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 // Yes, we're beginning to drag, so capture the mouse...
                 m_bIsDragging = true;
                 ::SetCapture(hwnd);
+                RegisterHotKey(hwnd, 0 /* id */, 0, VK_ESCAPE);
             }
 
             TBHDR nmhdr;
@@ -709,6 +710,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             {
                 if (::GetCapture() == *this)
                     ::ReleaseCapture();
+                UnregisterHotKey(hwnd, 0 /* id */);
 
                 // Send a notification message to the parent with wParam = 0, lParam = 0
                 // nmhdr.idFrom = this
@@ -754,13 +756,21 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             return TRUE;
         }
             break;
-        case WM_KEYDOWN:
+        case WM_HOTKEY:
         {
-            if (wParam == VK_LCONTROL)
-                ::SetCursor(::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_PLUS_TAB)));
-            return TRUE;
+            if (m_bIsDragging &&
+                VK_ESCAPE == HIWORD(lParam) &&
+                IDHOT_SNAPDESKTOP != wParam &&
+                IDHOT_SNAPWINDOW != wParam)
+            {
+                // handle ESC keypress
+                UnregisterHotKey(hwnd, 0 /* id */);
+                if (::GetCapture() == *this)
+                    ::ReleaseCapture();
+                m_bIsDragging = false;
+            }
         }
-            break;
+        break;
         case WM_MBUTTONUP:
         {
             int xPos = GET_X_LPARAM(lParam);
@@ -817,6 +827,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
         }
             break;
     }
+
     return ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
 }
 
