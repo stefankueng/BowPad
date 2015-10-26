@@ -316,12 +316,16 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                     POINT pt;
                     pt.x = GET_X_LPARAM(pos);
                     pt.y = GET_Y_LPARAM(pos);
-                    ScreenToClient(*this, &pt);
-                    if (PtInRect(&rc, pt))
+                    auto hptWnd = WindowFromPoint(pt);
+                    if (hptWnd == *this)
                     {
-                        m_bCursorShown = false;
-                        SetCursor(NULL);
-                        Call(SCI_SETCURSOR, (uptr_t)-2);
+                        ScreenToClient(*this, &pt);
+                        if (PtInRect(&rc, pt))
+                        {
+                            m_bCursorShown = false;
+                            SetCursor(NULL);
+                            Call(SCI_SETCURSOR, (uptr_t)-2);
+                        }
                     }
                 }
                 break;
