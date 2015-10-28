@@ -259,7 +259,7 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
             std::string funcregex = CLexStyles::Instance().GetFunctionRegexForLang(lang);
             if (!funcregex.empty())
             {
-                if (m_functionsStatus == FindFunctionsStatus::Finished)
+                if ((m_functionsStatus == FindFunctionsStatus::Finished)||(!m_autoscan))
                     enabled = true;
             }
         }
