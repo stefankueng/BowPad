@@ -549,6 +549,7 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
 {
     Call(SCI_STYLECLEARALL);
 
+    auto oldLexer = Call(SCI_GETLEXER);
     Call(SCI_SETLEXER, lexerdata.ID);
 
     for (const auto& it: lexerdata.Properties)
@@ -581,7 +582,8 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
     Call(SCI_SETLINEENDTYPESALLOWED, Call(SCI_GETLINEENDTYPESSUPPORTED));
 
     SetupDefaultStyles();
-    CCommandHandler::Instance().OnLexerChanged(lexerdata.ID);
+    if (oldLexer != lexerdata.ID)
+        CCommandHandler::Instance().OnLexerChanged(lexerdata.ID);
 }
 
 void CScintillaWnd::SetupDefaultStyles()
