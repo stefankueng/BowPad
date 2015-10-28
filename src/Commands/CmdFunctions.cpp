@@ -573,7 +573,7 @@ void CCmdFunctions::FindFunctions(int docID, bool bForce)
     // If we added some functions for this document and this document
     // is of the same language as the active doc then call setup lexer
     // so the current doc can reflect those additions.
-    if (updateLexer && docLang == activeDocLang)
+    if (!bForce && updateLexer && docLang == activeDocLang)
         SetupLexerForLang(doc.m_language);
 
     // If not time up, we must have finished.
