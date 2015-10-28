@@ -27,6 +27,7 @@
 #include "Document.h"
 #include "LexStyles.h"
 #include "DocScroll.h"
+#include "Commands\CommandHandler.h"
 #include "SmartHandle.h"
 #include "DPIAware.h"
 
@@ -580,6 +581,7 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
     Call(SCI_SETLINEENDTYPESALLOWED, Call(SCI_GETLINEENDTYPESSUPPORTED));
 
     SetupDefaultStyles();
+    CCommandHandler::Instance().OnLexerChanged(lexerdata.ID);
 }
 
 void CScintillaWnd::SetupDefaultStyles()

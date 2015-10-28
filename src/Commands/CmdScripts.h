@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,6 +54,8 @@ public:
     virtual void OnTimer(UINT id) override;
 
     virtual void OnThemeChanged(bool bDark) override;
+
+    virtual void OnLexerChanged(int lexer) override;
 
     int m_version;
 
