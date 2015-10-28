@@ -332,6 +332,18 @@ void CCommandHandler::OnThemeChanged(bool bDark)
     }
 }
 
+void CCommandHandler::OnLexerChanged(int lexer)
+{
+    for (auto& cmd : m_commands)
+    {
+        cmd.second->OnLexerChanged(lexer);
+    }
+    for (auto& cmd : m_nodeletecommands)
+    {
+        cmd.second->OnLexerChanged(lexer);
+    }
+}
+
 void CCommandHandler::InsertPlugins(void * obj)
 {
     // scan the paths, find all plugin files, create a plugin object

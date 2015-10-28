@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014-2015 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -318,5 +318,16 @@ void CCmdScript::OnThemeChanged(bool bDark)
     catch (std::exception&) {}
 }
 
+void CCmdScript::OnLexerChanged(int lexer)
+{
+    DISPPARAMS dispparams = { 0 };
+    dispparams.cArgs = 1;
+    VARIANT vI;
+    vI.intVal = lexer;
+    vI.vt = VT_INT;
+    dispparams.rgvarg = &vI;
+    try { m_host->CallFunction(L"OnLexerChanged", dispparams); }
+    catch (std::exception&) {}
+}
 
 
