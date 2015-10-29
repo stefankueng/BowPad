@@ -1385,8 +1385,10 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
             responsetoclosetab = AskToCloseTab();
 
         if (responsetoclosetab == ResponseToCloseTab::SaveAndClose)
+        {
             if (!SaveCurrentTab()) // Save And (fall through to) Close
                 return false;
+        }
 
         else if (responsetoclosetab == ResponseToCloseTab::CloseWithoutSaving)
             ;
