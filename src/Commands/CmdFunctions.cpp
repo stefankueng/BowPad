@@ -15,7 +15,6 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #include "stdafx.h"
-#include "CmdFunctions.h"
 #include "PropertySet.h"
 #include "BowPad.h"
 #include "StringUtils.h"
@@ -23,6 +22,7 @@
 #include "LexStyles.h"
 #include "PathUtils.h"
 #include "AppUtils.h"
+#include "CmdFunctions.h"
 
 #include <vector>
 #include <algorithm>
@@ -110,15 +110,23 @@ namespace {
 // Turns "Hello/* there */world" into "Helloworld"
 void StripComments(std::wstring& f)
 {
-    auto pos = f.find(L"/*");
-    while (pos != std::wstring::npos)
+    static wchar_t comment_begin[] = { L"/*" };
+    static wchar_t comment_end[] = { L"*/" };
+    size_t comment_begin_len = wcslen(comment_begin);
+    size_t comment_end_len = wcslen(comment_end);
+    size_t comment_begin_pos = 0;
+    for (;;)
     {
-        size_t posend = f.find(L"*/", pos);
-        if (posend != std::string::npos)
-        {
-            f.erase(pos, posend);
-        }
-        pos = f.find(L"/*");
+        comment_begin_pos = f.find(comment_begin, comment_begin_pos);
+        if (comment_begin_pos == std::wstring::npos)
+            break;
+        auto comment_end_pos = f.find(comment_end,
+            comment_begin_pos + comment_begin_len);
+        if (comment_end_pos == std::wstring::npos)
+            break;
+        auto e = f.erase(f.begin() + comment_begin_pos,
+            f.begin() + comment_end_pos + comment_end_len);
+        std::remove(e, f.end(), L'\0');
     }
 }
 
@@ -408,7 +416,7 @@ void CCmdFunctions::OnLexerChanged(int /*lexer*/)
     auto docId = GetDocIdOfCurrentTab();
     if (docId >= 0)
     {
-        ScheduleFunctionUpdate(docId, FunctionUpdateReason::DocModified);
+        ScheduleFunctionUpdate(docId, FunctionUpdateReason::LexerChanged);
         InvalidateFunctionsEnabled();
     }
 }
@@ -646,26 +654,27 @@ void CCmdFunctions::SaveFunctionForActiveDocument(
 void CCmdFunctions::AddDocumentToScan(int docId)
 {
     APPVERIFY(docId>=0);
-    // Remove any duplicate document Id's or non existent ones.
-    // A bit paranoid but it's cheap to be paranoid.
-    std::vector<int>::iterator foundPos;
-    while ( (foundPos = std::find(std::begin(m_docIDs), std::end(m_docIDs), docId)) != std::end(m_docIDs))
-        foundPos = m_docIDs.erase(foundPos);
+    // Remove any document Id's that match the one we are about to add,
+    // to avoid duplicates in the list.
+    // It's probably a bit paranoid but it's cheap to be paranoid.
+    auto e = std::remove_if(std::begin(m_docIDs), std::end(m_docIDs),
+        [&](int id)
+    {
+        return id == docId;
+    });
+    m_docIDs.erase(e, std::end(m_docIDs));
     m_docIDs.push_back(docId);
     RemoveNonExistantDocuments();
 }
 
-
 void CCmdFunctions::RemoveNonExistantDocuments()
 {
-    for ( auto it = std::begin(m_docIDs); it != std::end(m_docIDs); )
+    auto e = std::remove_if(std::begin(m_docIDs), std::end(m_docIDs),
+        [&](int id)
     {
-        int docID = *it;
-        if (!HasDocumentID(docID))
-            it = m_docIDs.erase(it);
-        else
-            ++it;
-    }
+        return !HasDocumentID(id);
+    });
+    m_docIDs.erase(e, std::end(m_docIDs));
 }
 
 void CCmdFunctions::InvalidateFunctionsSource()
@@ -759,6 +768,7 @@ void CCmdFunctions::ScheduleFunctionUpdate(int docId, FunctionUpdateReason reaso
     case FunctionUpdateReason::DocOpen:
     case FunctionUpdateReason::DocModified:
     case FunctionUpdateReason::DocSave:
+    case FunctionUpdateReason::LexerChanged:
         // Throw the data we have away if we are about to process
         // the current document.
         if (docId == activeDocId)
