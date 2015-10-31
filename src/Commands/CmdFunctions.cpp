@@ -361,6 +361,7 @@ void CCmdFunctions::TabNotify(TBHDR * ptbhdr)
     {
         int docId = GetDocIdOfCurrentTab();
         ScheduleFunctionUpdate(docId, FunctionUpdateReason::TabChange);
+        InvalidateFunctionsEnabled();
     }
 }
 
