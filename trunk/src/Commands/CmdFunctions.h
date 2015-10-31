@@ -61,6 +61,7 @@ enum class FunctionUpdateReason
     TabChange,
     DocOpen,
     DocModified,
+    LexerChanged,
     DocSave,
     DocProgress,
     DocNext
@@ -104,7 +105,6 @@ private:
     void UpdateFunctions(bool bForce);
     void RemoveNonExistantDocuments();
     void AddDocumentToScan(int docId);
-    void FunctionScanningComplet(int docId);
     void DocumentScanFinished(int docId, bool bForce);
     void DocumentScanInterrupted(int docId, int interruptingDocId);
     void DocumentScanProgressing(int docId);
