@@ -762,7 +762,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         HandleClipboardUpdate();
         break;
     case WM_TIMER:
-        CCommandHandler::Instance().OnTimer((UINT)wParam);
+        if (wParam >= COMMAND_TIMER_ID_START)
+            CCommandHandler::Instance().OnTimer((UINT)wParam);
         if (wParam == TIMER_UPDATECHECK)
         {
             KillTimer(*this, TIMER_UPDATECHECK);
