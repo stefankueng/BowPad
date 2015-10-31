@@ -117,5 +117,5 @@ protected:
 
 protected:
     void *              m_Obj;
-    UINT                m_nextTimerID;
+    static UINT         m_nextTimerID;
 };
