@@ -21,7 +21,7 @@
 
 extern IUIFramework *g_pFramework;
 
-UINT ICommand::m_nextTimerID = 1000;
+UINT ICommand::m_nextTimerID = COMMAND_TIMER_ID_START;
 
 
 ICommand::ICommand(void * obj)

@@ -27,6 +27,9 @@
 #include <UIRibbonPropertyHelpers.h>
 #include <list>
 
+
+#define COMMAND_TIMER_ID_START 1000
+
 enum class ResponseToOutsideModifiedFile
 {
     Cancel,
