@@ -1,0 +1,5 @@
+2.1.2.1429
+https://sourceforge.net/projects/bowpad-sk/files/2.1.2/BowPad64-2.1.2.msi/download
+BowPad64-2.1.2.msi
+https://sourceforge.net/projects/bowpad-sk/files/2.1.2/BowPad-2.1.2.msi/download
+BowPad-2.1.2.msi
