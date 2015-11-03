@@ -95,31 +95,31 @@ COLORREF CTabBar::m_activeTopBarUnfocusedColour = CTheme::Instance().GetThemeCol
 COLORREF CTabBar::m_inactiveTextColour = CTheme::Instance().GetThemeColor(RGB(128, 128, 128));
 COLORREF CTabBar::m_inactiveBgColour = CTheme::Instance().GetThemeColor(RGB(192, 192, 192));
 
-HWND CTabBar::m_hwndArray[nbCtrlMax] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-int CTabBar::m_nControls = 0;
-
 
 CTabBar::CTabBar(HINSTANCE hInst)
-        : CWindow(hInst)
-        , m_nItems(0)
-        , m_bHasImgList(false)
-        , m_hFont(nullptr)
-        , m_ctrlID(-1)
-        , m_bIsDragging(false)
-        , m_bIsDraggingInside(false)
-        , m_nSrcTab(-1)
-        , m_nTabDragged(-1)
-        , m_TabBarDefaultProc(nullptr)
-        , m_currentHoverTabItem(-1)
-        , m_bIsCloseHover(false)
-        , m_whichCloseClickDown(-1)
-        , m_lmbdHit(false)
-        , m_tabID(0)
+    : CWindow(hInst)
+    , m_nItems(0)
+    , m_bHasImgList(false)
+    , m_hFont(nullptr)
+    , m_ctrlID(-1)
+    , m_bIsDragging(false)
+    , m_bIsDraggingInside(false)
+    , m_nSrcTab(-1)
+    , m_nTabDragged(-1)
+    , m_TabBarDefaultProc(nullptr)
+    , m_currentHoverTabItem(-1)
+    , m_bIsCloseHover(false)
+    , m_whichCloseClickDown(-1)
+    , m_lmbdHit(false)
+    , m_tabID(0)
+    , m_nControls(0)
 {
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
     m_draggingPoint = {};
     m_currentHoverTabRect = {};
+    for (int i = 0; i < nbCtrlMax; ++i)
+        m_hwndArray[i] = nullptr;
 };
 
  CTabBar::~CTabBar()

@@ -142,10 +142,8 @@ private:
     static COLORREF             m_inactiveTextColour;
     static COLORREF             m_inactiveBgColour;
 
-    // FIXME, these shouldn't be static.
-    // Logically there is more than one tab control
-    static int                  m_nControls;
-    static HWND                 m_hwndArray[nbCtrlMax];
+    int                         m_nControls;
+    HWND                        m_hwndArray[nbCtrlMax];
 
     ULONG_PTR                   gdiplusToken;
 
