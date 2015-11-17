@@ -1494,7 +1494,7 @@ void CMainWindow::UpdateTab(int docID)
     TCITEM tie;
     tie.lParam = -1;
     tie.mask = TCIF_IMAGE;
-    if (doc.m_bIsReadonly)
+    if (doc.m_bIsReadonly || (m_editor.Call(SCI_GETREADONLY) != 0))
         tie.iImage = REDONLY_IMG_INDEX;
     else
         tie.iImage = doc.m_bIsDirty || doc.m_bNeedsSaving ? UNSAVED_IMG_INDEX : SAVED_IMG_INDEX;
@@ -2110,7 +2110,7 @@ void CMainWindow::HandleWriteProtectedEdit()
     if (m_DocManager.HasDocumentID(docID))
     {
         CDocument doc = m_DocManager.GetDocumentFromID(docID);
-        if (doc.m_bIsReadonly)
+        if (doc.m_bIsReadonly || (m_editor.Call(SCI_GETREADONLY) != 0))
         {
              // If the user really wants to edit despite it being read only, let them.
             if (AskToRemoveReadOnlyAttribute())
@@ -2533,8 +2533,7 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
     doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
     m_DocManager.SetDocument(docID, doc);
-    if (doc.m_bIsReadonly)
-        m_editor.Call(SCI_SETREADONLY, true);
+    m_editor.Call(SCI_SETREADONLY, doc.m_bIsReadonly);
     m_editor.SetupLexerForLang(doc.m_language);
     UpdateTab(docID);
     if (sFileName.empty())
@@ -3058,8 +3057,7 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
     doc.m_bIsDirty = bMod;
     doc.m_bNeedsSaving = bMod;
     m_DocManager.UpdateFileTime(doc, true);
-    if (doc.m_bIsReadonly)
-        m_editor.Call(SCI_SETREADONLY, true);
+    m_editor.Call(SCI_SETREADONLY, doc.m_bIsReadonly);
 
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
     doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
