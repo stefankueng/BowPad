@@ -163,10 +163,21 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
     if (!m_bLoaded)
         Load();
 
+    // split the vector into two: one with the pinned items and one with the unpinned items
+    std::vector<MRUItem> pinneditems;
+    std::vector<MRUItem> unpinneditems;
+    for (const auto& item : m_mruVec)
+    {
+        if (item.pinned)
+            pinneditems.push_back(item);
+        else
+            unpinneditems.push_back(item);
+    }
+
     HRESULT hr = E_FAIL;
     SAFEARRAY* psa = SafeArrayCreateVector(VT_UNKNOWN, 0, (ULONG)m_mruVec.size());
     LONG i = 0;
-    for (auto countPathPair = m_mruVec.crbegin(); countPathPair != m_mruVec.crend(); ++countPathPair)
+    for (auto countPathPair = pinneditems.crbegin(); countPathPair != pinneditems.crend(); ++countPathPair)
     {
         const MRUItem& mru = *countPathPair;
 
@@ -195,6 +206,36 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
 
         i++;
     }
+    for (auto countPathPair = unpinneditems.crbegin(); countPathPair != unpinneditems.crend(); ++countPathPair)
+    {
+        const MRUItem& mru = *countPathPair;
+
+        // TODO! Use Com smart ptr type RAII here.
+        CRecentFileProperties* pPropertiesObj = nullptr;
+        hr = CRecentFileProperties::CreateInstance(mru.path.c_str(), mru.pinned, &pPropertiesObj);
+
+        if (SUCCEEDED(hr))
+        {
+            IUnknown* pUnk = NULL;
+
+            hr = pPropertiesObj->QueryInterface(__uuidof(IUnknown), reinterpret_cast<void**>(&pUnk));
+
+            if (SUCCEEDED(hr))
+            {
+                hr = SafeArrayPutElement(psa, &i, static_cast<void*>(pUnk));
+                pUnk->Release();
+            }
+        }
+
+        if (pPropertiesObj)
+            pPropertiesObj->Release();
+
+        if (FAILED(hr))
+            break;
+
+        i++;
+    }
+
     // We will only populate items up to before the first failed item, and discard the rest.
     SAFEARRAYBOUND sab = {ULONG(i),0};
     SafeArrayRedim(psa, &sab);
