@@ -996,7 +996,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
     rc = rect;
     if ((afterMatchLen > 0) && (rect.left + 4 < rect.right)) // Draw the line text after the match.
         DrawText(pLVCD->nmcd.hdc, &text[matchEnd], afterMatchLen, &rc, mainDrawFlags);
-    //CloseThemeData(hTheme);
+
     return CDRF_SKIPDEFAULT;
 }
 
