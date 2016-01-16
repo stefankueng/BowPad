@@ -2428,6 +2428,11 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 doc.m_path = m_tabmovesavepath;
                 m_DocManager.UpdateFileTime(doc, true);
                 filepath = m_tabmovesavepath;
+                if (m_tabmovemod)
+                {
+                    doc.m_bIsDirty = true;
+                    doc.m_bNeedsSaving = true;
+                }
             }
             m_DocManager.AddDocumentAtEnd(doc, id);
 
