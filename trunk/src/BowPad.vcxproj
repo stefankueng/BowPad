@@ -322,6 +322,7 @@
     <ClCompile Include="..\ext\sktoolslib\AeroGlass.cpp" />
     <ClCompile Include="..\ext\sktoolslib\BaseDialog.cpp" />
     <ClCompile Include="..\ext\sktoolslib\BaseWindow.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\BrowseFolder.cpp" />
     <ClCompile Include="..\ext\sktoolslib\CmdLineParser.cpp" />
     <ClCompile Include="..\ext\sktoolslib\codecvt.cpp" />
     <ClCompile Include="..\ext\sktoolslib\DebugOutput.cpp" />

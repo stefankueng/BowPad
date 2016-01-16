@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ CAutoLibrary hUxThemeDll = LoadLibrary(L"uxtheme.dll");
 UINT32 contextID = cmdContextMap;
 
 extern IUIFramework * g_pFramework;
-extern std::string    sHighlightString;  // from CmdFindReplace
+extern std::string    g_sHighlightString;  // from CmdFindReplace
 
 
 #define TIM_HIDECURSOR              101
@@ -810,7 +810,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         return;
     }
     std::string sSelText = seltextbuffer.get();
-    sSelText = CStringUtils::trim(sSelText);
+    CStringUtils::trim(sSelText);
     if (sSelText.empty())
     {
         lastSelText.clear();
@@ -820,7 +820,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         return;
     }
     // don't mark the text again if it's already marked by the search feature
-    if (_stricmp(sHighlightString.c_str(), seltextbuffer.get()) == 0)
+    if (_stricmp(g_sHighlightString.c_str(), seltextbuffer.get()) == 0)
         return;
 
     auto textbuffer = std::make_unique<char[]>(len + 1);

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #include "stdafx.h"
+#include "CmdFunctions.h"
 #include "PropertySet.h"
 #include "BowPad.h"
 #include "StringUtils.h"
@@ -22,7 +23,6 @@
 #include "LexStyles.h"
 #include "PathUtils.h"
 #include "AppUtils.h"
-#include "CmdFunctions.h"
 
 #include <vector>
 #include <algorithm>

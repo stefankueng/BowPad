@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -159,14 +159,12 @@ private:
     void                        HandleSavePoint(const Scintilla::SCNotification& scn);
     void                        HandleUpdateUI(const Scintilla::SCNotification& scn);
     void                        HandleAutoIndent(const Scintilla::SCNotification &scn);
-    void                        DocumentChanged();
     HRESULT                     LoadRibbonSettings(IUnknown* pView);
     HRESULT                     SaveRibbonSettings();
     HRESULT                     ResizeToRibbon();
     bool                        OnLButtonDown(UINT nFlags, POINT point);
     bool                        OnMouseMove(UINT nFlags, POINT point);
     bool                        OnLButtonUp(UINT nFlags, POINT point);
-    void                        DrawXorBar(HDC hDC, LONG x1, LONG y1, LONG width, LONG height);
 private:
     LONG                        m_cRef;
     int                         m_newCount;
