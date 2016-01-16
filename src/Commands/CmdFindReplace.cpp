@@ -981,7 +981,11 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
         rect.left = rc.right;
     }
     rc = rect;
-    if (matchLen > 0) // Draw the text that is the match.
+    // DT_CALCRECT does not account for the last character that's not fully drawn but clipped,
+    // it only calculates until the last char that's fully drawn. To avoid drawing
+    // beyond the rect, only draw matches and after-match text if we have at least 4 pixels
+    // left to draw.
+    if ((matchLen > 0) && (rect.left + 4 < rect.right)) // Draw the text that is the match.
     {
         auto oldColor = SetTextColor(pLVCD->nmcd.hdc, MATCH_COLOR);
         DrawText(pLVCD->nmcd.hdc, &text[matchStart], matchLen, &rc, mainDrawFlags);
@@ -990,7 +994,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
         SetTextColor(pLVCD->nmcd.hdc, oldColor);
     }
     rc = rect;
-    if (afterMatchLen > 0) // Draw the line text after the match.
+    if ((afterMatchLen > 0) && (rect.left + 4 < rect.right)) // Draw the line text after the match.
         DrawText(pLVCD->nmcd.hdc, &text[matchEnd], afterMatchLen, &rc, mainDrawFlags);
     //CloseThemeData(hTheme);
     return CDRF_SKIPDEFAULT;
