@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -503,6 +503,11 @@ std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
 
 std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc)
 {
+    return GetLanguageForDocument(doc, m_scratchWnd);
+}
+
+std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit)
+{
     if (doc.m_path.empty())
         return L"";
     auto lang = GetLanguageForPath(doc.m_path);
@@ -513,9 +518,9 @@ std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc)
     // try using the file content to determine a lexer.
     // Since this needs to be fast, we don't do excessive checks but
     // keep it very, very simple.
-    m_scratchWnd.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+    edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
 
-    std::string line = m_scratchWnd.GetLine(0);
+    std::string line = edit.GetLine(0);
     for (const auto& m : lexDetectStrings)
     {
         auto foundpos = line.find(m.second);
@@ -526,7 +531,7 @@ std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc)
             break;
         }
     }
-    m_scratchWnd.Call(SCI_SETDOCPOINTER, 0, 0);
+    edit.Call(SCI_SETDOCPOINTER, 0, 0);
 
     return lang;
 }

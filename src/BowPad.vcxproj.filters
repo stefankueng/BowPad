@@ -593,6 +593,9 @@
     <ClCompile Include="Commands\CmdSpellcheck.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\BrowseFolder.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc">

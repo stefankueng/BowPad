@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,21 +22,25 @@
 #include "DlgResizer.h"
 #include "ScintillaWnd.h"
 
+#include <chrono>
+#include <mutex>
+#include <condition_variable>
 #include <deque>
-#include <list>
+#include <vector>
+#include <string>
+#include <utility>
 
 class CSearchResult
 {
 public:
     CSearchResult()
         : docID(-1)
-        , pathIndex(0)
+        , pathIndex(size_t(-1))
         , pos(0)
         , line(0)
         , posInLineStart(0)
         , posInLineEnd(0)
     {}
-    ~CSearchResult() {}
 
     int             docID;
     std::wstring    lineText;
@@ -45,93 +49,258 @@ public:
     size_t          line;
     size_t          posInLineStart;
     size_t          posInLineEnd;
+
+    inline bool hasPath() const
+    {
+        return pathIndex != size_t(-1);
+    }
 };
 
-
-class CFindReplaceDlg : public CDialog,  public ICommand
+enum class ResultsType
 {
+    Unknown, MatchedTerms, Functions, Filenames, FirstLines
+};
+
+class CFindReplaceDlg : public CDialog, public ICommand
+{
+    // vector or deque should work here. Usage pattern suggests deque
+    // might be better but simple tests didn't reveal much difference.
+    using SearchResults = std::deque<CSearchResult>;
+    using SearchPaths = std::deque<std::wstring>;
+
 public:
-    CFindReplaceDlg(void * obj);
-    ~CFindReplaceDlg(void);
+    CFindReplaceDlg(void* obj);
+    ~CFindReplaceDlg();
+
+    void ActivateDialog();
+    void SetSearchFolder(const std::wstring& folder);
+    void NotifyOnDocumentClose(int tabIndex);
+    void NotifyOnDocumentSave(int tabIndex, bool saveAs);
+
+protected: // override
+
+    bool Execute() override { return true; }
+    UINT GetCmdId() override { return 0; }
+    void OnClose() override;
+    LRESULT CALLBACK  DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    
+    enum class AlertMode { None, Flash };
 
 protected:
-    LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT                 DoCommand(int id, int msg);
-
-    void                    SetInfoText(UINT resid);
-    void                    DoSearch();
+    void                    SetInfoText(UINT resid, AlertMode alertMode = AlertMode::Flash);
+    bool                    DoSearch(bool replaceMode = false);
     void                    DoSearchAll(int id);
-
+    void                    DoFind();
+    void                    DoFindPrevious();
     void                    DoReplace(int id);
-    void                    SearchDocument(int docID, const CDocument& doc, const std::string& searchfor, int searchflags);
-    int                     ReplaceDocument(CDocument& doc, const std::string& sFindstring, const std::string& sReplaceString, int searchflags);
-    void                    CheckRegex();
-    void                    SearchThread(const std::wstring& searchpath, const std::string& searchfor, int flags);
 
+    void SearchDocument(
+        CScintillaWnd& searchWnd, int docID, const CDocument& doc,
+        const std::string& searchfor, int searchflags, unsigned int exSearchFlags,
+        SearchResults& searchResults,
+        SearchPaths& foundPaths);
+
+   int ReplaceDocument(
+        CDocument& doc, const std::string& sFindstring,
+        const std::string& sReplaceString, int searchflags);
+
+   void SearchThread(
+        int id, const std::wstring& searchpath, const std::string& searchfor,
+        int flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind);
+
+    void                    SortResults();
+    void                    CheckRegex();
     void                    ShowResults(bool bShow);
-    void                    InitResultList();
+    void                    InitResultsList();
     LRESULT                 DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
-    LRESULT                 DrawListItemWithMatches(NMLVCUSTOMDRAW * pLVCD);
-    RECT                    DrawListColumnBackground(NMLVCUSTOMDRAW * pLVCD);
-    std::string             UnEscape(const std::string& str);
-    bool                    ReadBase(const char * str, int * value, int base, int size);
+    LRESULT                 DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD);
+    RECT                    DrawListColumnBackground(NMLVCUSTOMDRAW* pLVCD);
+    LRESULT                 DrawListItem(NMLVCUSTOMDRAW* pLVCD);
+    LRESULT                 GetListItemDispInfo(NMLVDISPINFO* pDispInfo);
+    void                    HandleButtonDropDown(const NMBCDROPDOWN* pDropDown);
+
+    bool IsMatchingFile(
+        const std::wstring& path,
+        const std::vector<std::wstring>& filesToFind) const;
+
+    bool                    IsExcludedFile(const std::wstring& path) const;
+    bool                    IsExcludedFolder(const std::wstring& path) const;
 
     void                    EnableControls(bool bEnable);
+    void                    SearchStringNotFound();
+    std::wstring            GetCurrentDocumentFolder();
 
-    virtual bool Execute() override { return true; }
-    virtual UINT GetCmdId() override { return 0; }
+    void                    FocusOn(int id);
+    void                    SetDefaultButton(int id, bool savePervious = false);
+    void                    RestorePreviousDefaultButton();
+    int                     GetDefaultButton();
+    void                    Clear(int id);
 
-    virtual void OnClose() override;
+    void LoadSearchStrings();
+    void SaveSearchStrings();
+    void UpdateSearchStrings(const std::wstring& item);
+
+    void LoadReplaceStrings();
+    void SaveReplaceStrings();
+    void UpdateReplaceStrings(const std::wstring& item);
+
+    void LoadSearchFolderStrings();
+    void SaveSearchFolderStrings();
+    void UpdateSearchFolderStrings(const std::wstring& target);
+
+    void LoadSearchFileStrings();
+    void SaveSearchFileStrings();
+    void UpdateSearchFilesStrings(const std::wstring& target);
+
+    int LoadData(
+        std::vector<std::wstring>& data, int defaultMaxCount,
+        const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt);
+
+    void SaveData(
+        const std::vector<std::wstring>& data,
+        const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt);
+
+    void SaveCombo(
+        int combo_id,
+        std::vector<std::wstring>& data);
+
+    void LoadCombo(
+        int combo_id,
+        const std::vector<std::wstring>& data);
+
+    void UpdateCombo(
+        int comboId,
+        const std::wstring& item,
+        int maxCount);
+
+    std::wstring OfferFileSuggestion(
+        const std::wstring& searchFolder,
+        bool searchSubFolders,
+        const std::wstring& currentValue) const;
+
+    int GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount);
+
+    void CheckSearchOptions();
+    void AcceptData();
+    void NewData(
+        std::chrono::steady_clock::time_point& timeOfLastDataUpdate, bool finished);
+    void UpdateMatchCount(bool finished = true);
+    void DoListItemAction(int itemIndex);
+    void DoInitDialog(HWND hwndDlg);
+    void DoClose();
+    void InitSizing();
+    void OnSearchResultsReady(bool finished);
+    void FocusOnFirstListItem(bool keepAnyExistingSelection = false);
+    int GetScintillaOptions();
+    void CheckSearchFolder();
+    void SaveSettings();
+    void SelectItem(int item);
+    void OnListItemChanged(LPNMLISTVIEW pListView);
+    void LetUserSelectSearchFolder();
+
+    bool EnableComboBoxDeleteEvents(int combo_id, bool enable);
+    bool EnableListEndTracking(int list_id, bool enable);
+    static LRESULT CALLBACK ComboBoxListSubClassProc(
+        HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+        UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+    static LRESULT CALLBACK ListViewSubClassProc(
+        HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+        UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+    static LRESULT CALLBACK EditSubClassProc(
+        HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+        UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+
+    static std::string      UnEscape(const std::string& str);
+    static bool             ReadBase(const char* str, int* value, int base, int size);
 
 private:
     CDlgResizer                 m_resizer;
-    std::list<std::wstring>     m_searchStrings;
-    std::list<std::wstring>     m_replaceStrings;
-    bool                        m_freeresize;
+    bool                        m_freeresize = false;
     CScintillaWnd               m_searchWnd;
-    CScintillaWnd *             m_pSearchWnd;
-    std::deque<CSearchResult>   m_searchResults;
-    std::vector<std::wstring>   m_foundPaths;
+    SearchResults               m_searchResults;
+    SearchPaths                 m_foundPaths;
+    SearchResults               m_pendingSearchResults;
+    SearchPaths                 m_pendingFoundPaths;
+    bool                        m_dataAccepted = false;
+    bool                        m_dataReady = false;
+    std::mutex                  m_waitingDataMutex;
+    std::condition_variable     m_dataExchangeCondition;
+    bool                        m_bStop = false;
+    volatile LONG               m_ThreadsRunning = false;
+    int                         m_searchType = 0;
+    ResultsType                 m_resultsType = ResultsType::Unknown;
+    bool                        m_trackingOn = true;
+    int                         m_previousDefaultButton = 0;
+    int                         m_resultsWidthBefore;
+    int                         m_maxSearchStrings = 0;
+    int                         m_maxReplaceStrings = 0;
+    int                         m_maxSearchFolderStrings = 0;
+    int                         m_maxSearchFileStrings = 0;
+    RECT                        m_originalRect;
+    bool                        m_open = false;
 
-    bool                        m_bStop;
-    volatile LONG               m_ThreadsRunning;
+    // Some types usually best avoided while searching.
+    // The user can explicitly override these if they want them though.
+    // REVIEW: consider making this list configurable?
+    // NOTE: Keep filenames lower case as code assumes that.
+    const std::vector<std::wstring> excludedExtensions = {
+        // Binary types.
+        L"exe", L"dll", L"obj", L"lib", L"ilk", L"iobj", L"ipdb", L"idb",
+        L"pch", L"ipch", L"sdf", L"pdb", L"res", L"sdf", L"db", L"iso",
+        // Commmon temporary VC project types.
+        L"tlog",
+        // svn types.
+        L"svn-base",
+        // Image types.
+        L"bmp", L"png", L"jpg", L"ico", L"cur"
+    };
+    const std::vector<std::wstring> excludedFolders = {
+        L".svn", L".git"
+    };
 };
-
 
 class CCmdFindReplace : public ICommand
 {
 public:
 
-    CCmdFindReplace(void * obj)
-        : ICommand(obj)
-        , m_pFindReplaceDlg(nullptr)
-    {
-    }
+    CCmdFindReplace(void* obj);
+    ~CCmdFindReplace();
 
-    ~CCmdFindReplace(void)
-    {
-        delete m_pFindReplaceDlg;
-    }
+    bool Execute() override;
 
-    virtual bool Execute() override;
+    UINT GetCmdId() override { return cmdFindReplace; }
 
-    virtual UINT GetCmdId() override { return cmdFindReplace; }
-
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
+    HRESULT IUICommandHandlerUpdateProperty(
+        REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/,
+        PROPVARIANT* ppropvarNewValue) override
     {
         if (UI_PKEY_BooleanValue == key)
-        {
-            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETWRAPMODE) > 0, ppropvarNewValue);
-        }
+            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue,
+                ScintillaCall(SCI_GETWRAPMODE) > 0, ppropvarNewValue);
         return E_NOTIMPL;
     }
 
-    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(Scintilla::SCNotification* pScn) override;
 
-    virtual void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR* ptbhdr) override;
+
+    void OnDocumentClose(int tabIndex) override
+    {
+        if (m_pFindReplaceDlg != nullptr)
+            m_pFindReplaceDlg->NotifyOnDocumentClose(tabIndex);
+    }
+    void OnDocumentSave(int tabIndex, bool saveAs) override
+    {
+        if (m_pFindReplaceDlg != nullptr)
+            m_pFindReplaceDlg->NotifyOnDocumentSave(tabIndex, saveAs);
+    }
 
 private:
-    CFindReplaceDlg *           m_pFindReplaceDlg;
+    void SetSearchFolderToCurrentDocument();
+
+private:
+    CFindReplaceDlg*            m_pFindReplaceDlg = nullptr;
     std::string                 m_lastSelText;
 };
 
@@ -140,69 +309,53 @@ class CCmdFindNext : public ICommand
 public:
 
     CCmdFindNext(void * obj)
-        : ICommand(obj)
-    {
-    }
+        : ICommand(obj) { }
 
-    ~CCmdFindNext(void)
-    {
-    }
+    ~CCmdFindNext() { }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdFindNext; }
+    UINT GetCmdId() override { return cmdFindNext; }
 };
 
 class CCmdFindPrev : public ICommand
 {
 public:
 
-    CCmdFindPrev(void * obj)
-        : ICommand(obj)
-    {
-    }
+    CCmdFindPrev(void* obj)
+        : ICommand(obj) { }
 
-    ~CCmdFindPrev(void)
-    {
-    }
+    ~CCmdFindPrev() { }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdFindPrev; }
+    UINT GetCmdId() override { return cmdFindPrev; }
 };
 
 class CCmdFindSelectedNext : public ICommand
 {
 public:
 
-    CCmdFindSelectedNext(void * obj)
-        : ICommand(obj)
-    {
-    }
+    CCmdFindSelectedNext(void* obj)
+        : ICommand(obj) { }
 
-    ~CCmdFindSelectedNext(void)
-    {
-    }
+    ~CCmdFindSelectedNext() { }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdFindSelectedNext; }
+    UINT GetCmdId() override { return cmdFindSelectedNext; }
 };
 
 class CCmdFindSelectedPrev : public ICommand
 {
 public:
 
-    CCmdFindSelectedPrev(void * obj)
-        : ICommand(obj)
-    {
-    }
+    CCmdFindSelectedPrev(void* obj)
+        : ICommand(obj) { }
 
-    ~CCmdFindSelectedPrev(void)
-    {
-    }
+    ~CCmdFindSelectedPrev() { }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdFindSelectedPrev; }
+    UINT GetCmdId() override { return cmdFindSelectedPrev; }
 };
