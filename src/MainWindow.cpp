@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -2753,6 +2753,11 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
         if (hMainWnd && ! isThisInstance)
         {
             // dropped on another BowPad Window, 'move' this tab to that BowPad Window
+            CDocument tempdoc = doc;
+            tempdoc.m_path = temppath;
+            bool bDummy = false;
+            m_DocManager.SaveFile(*this, tempdoc, bDummy);
+
             COPYDATASTRUCT cpd = { 0 };
             cpd.dwData = CD_COMMAND_MOVETAB;
             std::wstring cpdata = doc.m_path + L"*" + temppath + L"*";
