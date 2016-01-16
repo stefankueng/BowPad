@@ -951,38 +951,13 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
 
     rc = rect;
 
-    // NOTE: Scintilla returns utf-8 strings and match position relate to those strings.
-    // These strings can contain embedded nuls and returned positions may be after those nuls.
-    // Unfortunately we translate the utf-8 results into "Windows unicode" and hope our
-    // the positions still map to the same place in the translated string.
-    // This isn't always realistic because the string can change size and especially because
-    // StdGetUnicode truncates at the first nul.
-    // This means we must anticipate match positions may end be out of sync or out of range.
-    // Other manipulations occur on the text may add to the issue.
-    // Because of this some defensive code is required to protect against using
-    // invalid positions however they arrive, otherwise BowPad will crash.
-    // To see the issues, try commenting out the defensive code and then:
-    // 1. Load a binary file like "bow ties are cool.pdn",
-    // 2. Do a "find all" on "x".
-    // 3. Then drag the scroll bar thumb through the whole document.
-    // Bowpad will eventually crash because of the out of range references without some defense.
-
-    // The match positions are also just present/relevant not just invalid. Some examples:
-    // * When finding files, there is no positional/substring info needed.
-    // * When finding functions the match position relates to the whole definition not just
-    //   the function name so might include the class name or blank lines or braces.
-    //   So for that we currently ignore the match position data.
-    // * Finding in files with no search term returns just the first line. Here it's
-    //   misleading to think in terms of a match on anything particular.
-    // For these types match data is irrelevant and where it is relevant it can be inaccurate.
-
     if (m_resultsType == ResultsType::Filenames || m_resultsType == ResultsType::FirstLines)
     {
         DrawText(pLVCD->nmcd.hdc, text.c_str(), (int)text.size(), &rc, mainDrawFlags);
         return CDRF_SKIPDEFAULT;
     }
 
-    bool invalid = (matchStart >= text.size() || matchEnd >= text.size() || matchEnd < matchStart);
+    bool invalid = (matchStart >= text.size() || matchEnd > text.size() || matchEnd < matchStart);
     // Functions are a kind of match but we don't know where exactly.
     // Same is true of anything with invalid data.
     if (m_resultsType == ResultsType::Functions || invalid)
@@ -2028,7 +2003,7 @@ void CFindReplaceDlg::SearchDocument(
             result.posInLineEnd = linepos >= 0 ? ttf.chrgText.cpMax - linepos : 0;
             // Don't use the document id as a reference to this file unless we have to,
             // use the path. The document might close, or be saved to another path,
-            // but by not using the document id we the result can just stick consistently
+            // but by not using the document id, the result can just stick consistently
             // to wherever it originally referred to.
             if (docID >= 0)
                 result.docID = docID;
@@ -2041,21 +2016,11 @@ void CFindReplaceDlg::SearchDocument(
             while (linesize > 0 && (line[linesize-1] == '\n' || line[linesize-1] == '\r'))
                 --linesize;
             line.resize(linesize);
-            result.lineText = CUnicodeUtils::StdGetUnicode(line);
-            // ^ Finding matches in utf-8 strings then expecting those matches to map
-            // to the same positions after the strings are converted to windows unicode
-            // is not ideal because the translation might not be an equivalent length etc.
-            // and especially while StdGetUnicode truncates at the first nul character.
-            // The asserts below highlight these issues for those interested.
-            // assert(result.posInLineStart < result.lineText.size());
-            // assert(result.posInLineEnd < result.lineText.size());
-            // assert(result.posInLineEnd >= result.posInLineStart);
-            // This issue is further exasperated by some of the text format manipulations we must do.
-            // This is something to be aware of.
-            // The drawing function is aware of this and deals with the problem by carefully
-            // making sure it doesn't trust the match positions completely and thereby
-            // avoids making out of bound references etc. which it otherwise would do which would
-            // crash the app. See DrawListItemWithMatches for more details.
+            result.lineText = CUnicodeUtils::StdGetUnicode(line, false);
+            // adjust the line positions: Scintilla uses utf8, but utf8 converted to
+            // utf16 can have different char sizes so the positions won't match anymore
+            result.posInLineStart = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineStart);
+            result.posInLineEnd = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineEnd);
 
             // When searching for functions, we have to narrow the match down by name ourself.
             bool matched = false;
