@@ -103,24 +103,53 @@ namespace
         return name;
     }
  
-    void Normalize(std::wstring& f)
+    void Normalize(CSearchResult& sr)
     {
-        // Remove certain chars and replace adjacent whitespace inside the string.
-        // Remember to patch up the size to reflect what we remove.
-        auto e = std::remove_if(f.begin(), f.end(), [](wchar_t c)
+        std::wstring normalized = sr.lineText;
+        bool bLastCharWasSpace = false;
+        size_t sLen = 0;
+        for (size_t i = 0; i < sr.lineText.size(); ++i)
         {
-            return c == L'\r' || c == L'{';
-        });
-        f.erase(e, f.end());
-        std::replace_if(f.begin(), f.end(), [](wchar_t c)
-        {
-            return c == L'\n' || c == L'\t';
-        }, L' ');
-        auto new_end = std::unique(f.begin(), f.end(), [](wchar_t lhs, wchar_t rhs) -> bool
-        {
-            return (lhs == rhs) && (lhs == L' ');
-        });
-        f.erase(new_end, f.end());
+            switch (sr.lineText[i])
+            {
+                case ' ':
+                {
+                    if (!bLastCharWasSpace)
+                    {
+                        normalized[sLen++] = ' ';
+                    }
+                    else
+                    {
+                        if (i < sr.posInLineEnd)
+                            --sr.posInLineEnd;
+                        if (i < sr.posInLineStart)
+                            --sr.posInLineStart;
+                    }
+                    bLastCharWasSpace = true;
+                }
+                break;
+                // remove carriage return and '{'
+                case '\r':
+                case '{':
+                if (i < sr.posInLineEnd)
+                    --sr.posInLineEnd;
+                if (i < sr.posInLineStart)
+                    --sr.posInLineStart;
+                bLastCharWasSpace = false;
+                break;
+                // replace newlines and tabs with spaces
+                case '\n':
+                case '\t':
+                normalized[sLen++] = ' ';
+                bLastCharWasSpace = false;
+                break;
+                default:
+                normalized[sLen++] = sr.lineText[i];
+                bLastCharWasSpace = false;
+                break;
+            }
+        }
+        sr.lineText = std::wstring(normalized.c_str(), sLen);
     }
 
     // Given "a,b" or "a  ,  b"  or "a,b ," or "a,,b" this routine will yield v[0] "a", v[1] "b" for all.
@@ -1520,10 +1549,10 @@ void CFindReplaceDlg::DoReplace( int id )
 bool CFindReplaceDlg::DoSearch(bool replaceMode)
 {
     Clear(IDC_SEARCHINFO);
-    // Review! Me thinks something like this is needed here:
-    //DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
-    //DocScrollClear(DOCSCROLLTYPE_SELTEXT);
-    //DocScrollUpdate();
+
+    DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
+    DocScrollClear(DOCSCROLLTYPE_SELTEXT);
+    OnOutOfScope(DocScrollUpdate());
 
     std::wstring findText = GetDlgItemText(IDC_SEARCHCOMBO).get();
     UpdateSearchStrings(findText);
@@ -2032,7 +2061,7 @@ void CFindReplaceDlg::SearchDocument(
                 matched = true;
             else
             {
-                Normalize(result.lineText);
+                Normalize(result);
                 // The set of regexp expressions we use to find functions 
                 // don't allow us to identiify a specificly named function.
                 // They just find any function definitions.
