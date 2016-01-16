@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -87,6 +87,7 @@ public:
 
     std::vector<std::wstring>           GetLanguages() const;
     std::wstring                        GetLanguageForDocument(const CDocument& doc);
+    std::wstring                        GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
     std::wstring                        GetUserExtensionsForLanguage(const std::wstring& lang) const;
 
     const std::map<int, std::string>&   GetKeywordsForLang(const std::string& lang);
