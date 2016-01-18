@@ -65,21 +65,21 @@ namespace
     const int DEFAULT_MAX_REPLACE_STRINGS = 20;
     const int DEFAULT_MAX_SEARCHFOLDER_STRINGS = 20;
     const int DEFAULT_MAX_SEARCHFILE_STRINGS = 20;
-    // The batch size and progress interval determines how much data to buffered up and
-    // when to flush the buffer even if it is not full by the time the interval has expired.
+    // The batch size and progress interval determine how much data to buffer up and
+    // when to flush the buffer - even if it is not full by the time the interval has expired.
     // If the time limit is too high it may appear like nothing is happening
-    // with search patterns that take a long time for find results.
+    // for search patterns that take a long time to find results.
     // If the batch size is too high, excessive memory use may occur.
-    // If the interval time or batch size is too low, performance may be affeced
+    // If the interval time or batch size is too low, performance may be affected
     // because the message delivery and progress reporting mechanism may
-    // become more of a bottle-neck in performance than time it takes to find results.
+    // become more of a bottle-neck in performance than time taken to find results.
     constexpr auto PROGRESS_UPDATE_INTERVAL = std::chrono::seconds(3);
     const size_t MAX_DATA_BATCH_SIZE = 1000;
     constexpr auto MATCH_COLOR = RGB(0xFF, 0, 0); // Red.
 
-    // A couple of functions here similar to those in CmdFunctions.cpp.
-    // Code sharing is possible but I've elected not to for now to keep unrelated modules
-    // unconnected and while this modules needs are in flux.
+    // A couple of functions here are similar to those in CmdFunctions.cpp.
+    // Code sharing is possible but for now the preference is not to do that
+    // to keep unrelated modules unconnected.
     
     // Find the name of the function from its definition.
     std::wstring ParseSignature(const std::wstring& sig)
@@ -250,7 +250,7 @@ void CFindReplaceDlg::UpdateMatchCount(bool finished)
 {
     ResString rInfo(hRes, IDS_FINDRESULT_COUNT);
     auto sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size());
-    if (!finished) // Indicate more results to come.
+    if (!finished) // Indicate more results might come.
         sInfo += L"...";
     SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
 }
@@ -298,19 +298,18 @@ void CFindReplaceDlg::HandleButtonDropDown(const NMBCDROPDOWN* pDropDown)
 }
 
 // The suggestion mechanism is a *basic* means to *quickly* assist
-// completing simple filenames that are just a bit long to type or
-// or remember.
-// It's useful for simple folder structures that can be searched fast.
-// It does not support lists or wildcards and nor will it find filenames
-// in deep folder structures that can't be searched quickly.
-// For those the user is expected to just type as much of the name as
-// they know and use * wildcard for the rest and then press enter to
-// let the normal search process find the file exactly.
+// completing simple filenames that are just a bit long to type/remember.
+// It's useful for simple folder structures that can be searched fast
+// but it will not find filenames in deep folder structures that can't
+// be searched quickly. For those the user is expected to just type
+// as much of the name as they know and use * wildcard for the rest and
+// then press enter to let the normal search process find the file exactly.
+// It does not support lists or wildcards.
 // This routine somewhat mimics what the find files logic does.
-// We don't suggest things the user likely doesn't want as that
-// can easily get in the way of suggestions they do want,
-// e.g. The user likely does not want to find bowpad.exe over bowpad.cpp.
-// We also try to find the shortest filename match in the short time given
+// We don't suggest things the user likely does not want as that
+// can easily get in the way of suggestions the user may want.
+// e.g. The user woulder likely prefer bowpad.cpp over bowpad.exe.
+// We try to find the shortest filename match in the time given
 // as the longest match will be found later if the user keeps typing.
 // If a longer match was accepted as soon as it was found we'd never
 // offer shorter suggestions and they'd appear to be non-existant.
@@ -375,8 +374,8 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
         if (wParam == WA_INACTIVE)
         {
             SetTransparency(150);
-            // This is arguable, but we don't make some seldom used options too "sticky.
-            // Later interaction with other buttons can be unexpected.
+            // This is arguable, but we don't make some seldom used options too "sticky"
+            // any later interaction with other buttons can be unexpected.
             SetDlgItemText(*this, IDC_SEARCHFILES, L"");
             Button_SetCheck(GetDlgItem(*this, IDC_FUNCTIONS), BST_UNCHECKED);
         }
@@ -400,7 +399,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
         int difference = resultsWidthNow - m_resultsWidthBefore;
 
         HWND hListControl = GetDlgItem(*this, IDC_FINDRESULTS);
-        int columnWidth = ListView_GetColumnWidth(hListControl, 2); // Line Text column
+        int columnWidth = ListView_GetColumnWidth(hListControl, 2); // Line Text column.
         int newColumnWidth = columnWidth + difference;
         ListView_SetColumnWidth(hListControl, 2, newColumnWidth);
         break;
@@ -516,7 +515,6 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
     // Try (unscientifically) to not get to close to the tab bar either.
     LONG y = rcScintilla.top + 15;
 
-    m_originalRect = { x, y, rcDlg.right, rcDlg.bottom };
     SetWindowPos(hwndDlg, HWND_TOP, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
 
     ResString findPreviousTip(hRes, IDS_TT_FINDPREVIOUS);
@@ -529,6 +527,8 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
     AddToolTip(IDC_SETSEARCHFOLDER, (LPCWSTR)setSearchFolderTip);
 
     InitSizing();
+    GetWindowRect(hwndDlg, &rcDlg);
+    m_originalSize = { rcDlg.right - rcDlg.left, rcDlg.bottom - rcDlg.top };
 
     m_searchWnd.Init(hRes, *this);
 
@@ -912,7 +912,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
     ListView_GetItem(hListControl, &item);
     assert(item.iItem == itemIndex);
 
-    // draw the icon for the first column
+    // Draw the icon for the first column.
     if (pLVCD->iSubItem == 0)
     {
         rect = boundsRC;
@@ -966,7 +966,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
     LVCOLUMN Column;
     Column.mask = LVCF_FMT;
     ListView_GetColumn(hListControl, pLVCD->iSubItem, &Column);
-    // Is the column left- or right-aligned? (we don't handle centered (yet))
+    // Is the column left- or right-aligned? (we don't handle centered yet).
     if (Column.fmt & LVCFMT_RIGHT)
     {
         DrawText(pLVCD->nmcd.hdc, text.c_str(), -1, &rc, mainDrawFlags | DT_CALCRECT);
@@ -2408,10 +2408,8 @@ void CFindReplaceDlg::DoClose()
     // Most users will probably find resetting the size helpful.
     // Resetting the position is more subjective and could be irritating so we don't do that.
     // Some experimentation may be required to find the best default. For now just do size.
-    RECT rc;
-    GetWindowRect(*this, &rc);
-    MoveWindow(*this, rc.left, rc.top,
-        m_originalRect.right - m_originalRect.left, m_originalRect.bottom - m_originalRect.top, FALSE);
+    SetWindowPos(*this, nullptr, 0, 0, m_originalSize.cx, m_originalSize.cy,
+        SWP_NOACTIVATE | SWP_NOREDRAW | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
 }
 
 void CFindReplaceDlg::OnClose()

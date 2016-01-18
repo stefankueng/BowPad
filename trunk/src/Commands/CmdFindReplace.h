@@ -237,7 +237,7 @@ private:
     int                         m_maxReplaceStrings = 0;
     int                         m_maxSearchFolderStrings = 0;
     int                         m_maxSearchFileStrings = 0;
-    RECT                        m_originalRect;
+    SIZE                        m_originalSize;
     bool                        m_open = false;
 
     // Some types usually best avoided while searching.
