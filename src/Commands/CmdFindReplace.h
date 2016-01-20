@@ -129,12 +129,12 @@ protected:
 
     void                    EnableControls(bool bEnable);
     void                    SearchStringNotFound();
-    std::wstring            GetCurrentDocumentFolder();
+    std::wstring            GetCurrentDocumentFolder() const;
 
     void                    FocusOn(int id);
     void                    SetDefaultButton(int id, bool savePervious = false);
     void                    RestorePreviousDefaultButton();
-    int                     GetDefaultButton();
+    int                     GetDefaultButton() const;
     void                    Clear(int id);
 
     void LoadSearchStrings();
@@ -155,7 +155,7 @@ protected:
 
     int LoadData(
         std::vector<std::wstring>& data, int defaultMaxCount,
-        const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt);
+        const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt) const;
 
     void SaveData(
         const std::vector<std::wstring>& data,
@@ -163,7 +163,7 @@ protected:
 
     void SaveCombo(
         int combo_id,
-        std::vector<std::wstring>& data);
+        std::vector<std::wstring>& data) const;
 
     void LoadCombo(
         int combo_id,
@@ -178,8 +178,9 @@ protected:
         const std::wstring& searchFolder,
         bool searchSubFolders,
         const std::wstring& currentValue) const;
+    std::wstring OfferFolderSuggestion(const std::wstring& currentValue) const;
 
-    int GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount);
+    int GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount) const;
 
     void CheckSearchOptions();
     void AcceptData();
@@ -192,7 +193,7 @@ protected:
     void InitSizing();
     void OnSearchResultsReady(bool finished);
     void FocusOnFirstListItem(bool keepAnyExistingSelection = false);
-    int GetScintillaOptions();
+    int GetScintillaOptions() const;
     void CheckSearchFolder();
     void SaveSettings();
     void SelectItem(int item);
@@ -208,6 +209,9 @@ protected:
         HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
         UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
     static LRESULT CALLBACK EditSubClassProc(
+        HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+        UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+    static LRESULT CALLBACK EditSubClassProcFolder(
         HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
         UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
