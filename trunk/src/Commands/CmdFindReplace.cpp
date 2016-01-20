@@ -27,6 +27,7 @@
 #include "BrowseFolder.h"
 #include "LexStyles.h"
 #include "OnOutOfScope.h"
+#include "ResString.h"
 
 #include <regex>
 #include <thread>
@@ -149,7 +150,7 @@ namespace
                 break;
             }
         }
-        sr.lineText = std::wstring(normalized.c_str(), sLen);
+        sr.lineText.assign(normalized, sLen);
     }
 
     // Given "a,b" or "a  ,  b"  or "a,b ," or "a,,b" this routine will yield v[0] "a", v[1] "b" for all.
@@ -230,7 +231,7 @@ CFindReplaceDlg::~CFindReplaceDlg()
 {
 }
 
-std::wstring CFindReplaceDlg::GetCurrentDocumentFolder()
+std::wstring CFindReplaceDlg::GetCurrentDocumentFolder() const
 {
     std::wstring currentDocFolder;
     if (this->HasActiveDocument())
@@ -323,7 +324,6 @@ std::wstring CFindReplaceDlg::OfferFileSuggestion(
     bool bIsDir = false;
     std::wstring path;
     std::wstring filename;
-    bool searchSubFoldersFlag = searchSubFolders;
 
     // Don't even attempt to hit storage with wildcard or lists.
     if (currentValue.find_first_of(L";*?") != std::wstring::npos)
@@ -331,12 +331,14 @@ std::wstring CFindReplaceDlg::OfferFileSuggestion(
 
     auto typedName = CStringUtils::to_lower(currentValue);
     CDirFileEnum enumerator(searchFolder);
+    bool searchSubFoldersFlag = searchSubFolders;
+    constexpr auto maxSearchTime = std::chrono::milliseconds(200);
     auto startTime = std::chrono::steady_clock::now();
     while (enumerator.NextFile(path, &bIsDir, searchSubFoldersFlag))
     {
         // See this functions block comments for details of what's happening here.
         auto ellapsedPeriod = std::chrono::steady_clock::now() - startTime;
-        if (ellapsedPeriod >= std::chrono::milliseconds(200))
+        if (ellapsedPeriod > maxSearchTime)
             break;
         if (bIsDir)
         {
@@ -352,6 +354,43 @@ std::wstring CFindReplaceDlg::OfferFileSuggestion(
             if (suggestedFilename.empty() ||
                 filename.length() < suggestedFilename.length())
                 suggestedFilename = filename;
+        }
+    }
+    return suggestedFilename;
+}
+
+// Make a quick attempt at suggesting a folder that will complete
+// any folder the user has typed. Note completion is case insensitive.
+std::wstring CFindReplaceDlg::OfferFolderSuggestion(const std::wstring& currentValue) const
+{
+    auto filename = CPathUtils::GetFileName(currentValue);
+    if (filename.empty())
+        return std::wstring();
+
+    std::wstring suggestedFilename;
+    std::wstring path;
+    bool bIsDir = false;
+    auto parentFolder = CPathUtils::GetParentDirectory(currentValue);
+    auto currentPath = currentValue;
+    CStringUtils::trim(currentPath);
+    CDirFileEnum enumerator(parentFolder);
+    constexpr auto maxSearchTime = std::chrono::milliseconds(200);
+    auto startTime = std::chrono::steady_clock::now();
+    while (enumerator.NextFile(path, &bIsDir, false))
+    {
+        auto ellapsedPeriod = std::chrono::steady_clock::now() - startTime;
+        if (ellapsedPeriod > maxSearchTime)
+            break;
+        if (!bIsDir)
+            continue;
+        path = CStringUtils::to_lower(path);
+        // Return the shortest suggestion in preference over a longer one.
+        // The user will encounter the longer suggestion later as they type.
+        if (path.find(currentPath, 0) == 0)
+        {
+            if (suggestedFilename.empty() ||
+                path.length() < suggestedFilename.length())
+                suggestedFilename = path;
         }
     }
     return suggestedFilename;
@@ -375,7 +414,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
         {
             SetTransparency(150);
             // This is arguable, but we don't make some seldom used options too "sticky"
-            // any later interaction with other buttons can be unexpected.
+            // because any later interaction with other buttons can be unexpected.
             SetDlgItemText(*this, IDC_SEARCHFILES, L"");
             Button_SetCheck(GetDlgItem(*this, IDC_FUNCTIONS), BST_UNCHECKED);
         }
@@ -425,8 +464,8 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
     case WM_TIMER:
         if (wParam == TIMER_INFOSTRING)
         {
-            Clear(IDC_SEARCHINFO);
             KillTimer(*this, TIMER_INFOSTRING);
+            Clear(IDC_SEARCHINFO);
         }
         break;
     case WM_THREADRESULTREADY:
@@ -518,13 +557,13 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
     SetWindowPos(hwndDlg, HWND_TOP, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
 
     ResString findPreviousTip(hRes, IDS_TT_FINDPREVIOUS);
-    AddToolTip(IDC_FINDPREVIOUS, (LPCWSTR)findPreviousTip);
+    AddToolTip(IDC_FINDPREVIOUS, findPreviousTip);
     ResString setSearchFolderToCurrentTip(hRes, IDS_TT_SETSEARCHFOLDERCURRENT);
-    AddToolTip(IDC_SETSEARCHFOLDERCURRENT, (LPCWSTR)setSearchFolderToCurrentTip);
+    AddToolTip(IDC_SETSEARCHFOLDERCURRENT, setSearchFolderToCurrentTip);
     ResString setSearchFolderToParentTip(hRes, IDS_TT_SETSEARCHFOLDERTOPARENT);
-    AddToolTip(IDC_SETSEARCHFOLDERTOPARENT, (LPCWSTR)setSearchFolderToParentTip);
+    AddToolTip(IDC_SETSEARCHFOLDERTOPARENT, setSearchFolderToParentTip);
     ResString setSearchFolderTip(hRes, IDS_TT_SETSEARCHFOLDER);
-    AddToolTip(IDC_SETSEARCHFOLDER, (LPCWSTR)setSearchFolderTip);
+    AddToolTip(IDC_SETSEARCHFOLDER, setSearchFolderTip);
 
     InitSizing();
     GetWindowRect(hwndDlg, &rcDlg);
@@ -559,6 +598,8 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
     COMBOBOXINFO cbInfo{ sizeof(cbInfo) };
     GetComboBoxInfo(GetDlgItem(*this, IDC_SEARCHFILES), &cbInfo);
     SetWindowSubclass(cbInfo.hwndItem, EditSubClassProc, 0, reinterpret_cast<DWORD_PTR>(this));
+    GetComboBoxInfo(GetDlgItem(*this, IDC_SEARCHFOLDER), &cbInfo);
+    SetWindowSubclass(cbInfo.hwndItem, EditSubClassProcFolder, 0, reinterpret_cast<DWORD_PTR>(this));
 
     // Note: This dialog is initiated by CCmdFindReplace::Execute
     // and the code expects ActivateDialog to be called next after this routine
@@ -590,7 +631,7 @@ void CFindReplaceDlg::Clear(int id)
     SetDlgItemText(*this, id, L"");
 }
 
-int CFindReplaceDlg::GetDefaultButton()
+int CFindReplaceDlg::GetDefaultButton() const
 {
     LRESULT result = SendMessage(*this, DM_GETDEFID, WPARAM(0), LPARAM(0));
     return (HIWORD(result) == DC_HASDEFID) ? LOWORD(result) : 0;
@@ -1369,7 +1410,7 @@ void CFindReplaceDlg::DoFindPrevious()
     UpdateSearchStrings(findText);
     g_findString = CUnicodeUtils::StdGetUTF8(findText);
     g_sHighlightString = g_findString;
-    ttf.lpstrText = const_cast<char*>(g_findString.c_str());
+    ttf.lpstrText = g_findString.c_str();
     g_searchFlags = GetScintillaOptions();
 
     if (g_findString.empty())
@@ -1568,7 +1609,7 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
     Scintilla::Sci_TextToFind ttf = { 0 };
     ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
     ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
-    ttf.lpstrText = const_cast<char*>(g_findString.c_str());
+    ttf.lpstrText = g_findString.c_str();
 
     sptr_t findRet = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
     if (findRet == -1)
@@ -1589,7 +1630,7 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
     return (findRet >= 0);
 }
 
-int CFindReplaceDlg::GetScintillaOptions()
+int CFindReplaceDlg::GetScintillaOptions() const
 {
     int flags = 0;
     if (IsDlgButtonChecked(*this, IDC_MATCHCASE) == BST_CHECKED)
@@ -1731,12 +1772,12 @@ void CFindReplaceDlg::DoSearchAll(int id)
         }
         else if (id == IDC_FINDALLINTABS)
         {
+            ResString rInfo(hRes, IDS_SEARCHING_FILE);
             int tabcount = GetTabCount();
             for (int i = 0; i < tabcount; ++i)
             {
                 int docID = GetDocIDFromTabIndex(i);
                 CDocument doc = GetDocumentFromID(docID);
-                ResString rInfo(hRes, IDS_SEARCHING_FILE);
                 auto sInfo = CStringUtils::Format(rInfo, CPathUtils::GetFileName(doc.m_path).c_str());
                 SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
                 SearchDocument(m_searchWnd, docID, doc, searchfor, searchflags, exSearchFlags,
@@ -1892,16 +1933,17 @@ void CFindReplaceDlg::SearchThread(
 
         // We must continue to the top of the loop and onto the next file
         // if we don't want the current file.
-        // This logic looks strange but hopefully is simple enough with comments:
-
-        bool match = IsMatchingFile(path, filesToFind);
-        if (match)
-            ; // If we explicitly want this, accept this.
-        else if (IsExcludedFile(path))
-            match = false; // If we implicitly don't want this, reject this.
-        else if (filesToFind.size() == 0)
-            match = true; // Match anything that isn't implicitly rejected.
-
+        
+        bool match = false;
+        if (filesToFind.size() == 0) // If we using implicit matching....
+        {
+            if (!IsExcludedFile(path))
+                match = true; // If we implicitly don't want this, reject it.
+        }
+        else // Using explicit matching.
+        {
+            match = IsMatchingFile(path, filesToFind);
+        }
         if (! match)
             continue; // Not a match.
 
@@ -2009,10 +2051,10 @@ void CFindReplaceDlg::SearchDocument(
         funcregex = CLexStyles::Instance().GetFunctionRegexForLang(lang);
         if (funcregex.empty())
             return;
-        ttf.lpstrText = const_cast<char*>(funcregex.c_str());
+        ttf.lpstrText = funcregex.c_str();
     }
     else
-        ttf.lpstrText = const_cast<char*>(searchfor.c_str());
+        ttf.lpstrText = searchfor.c_str();
 
     std::wstring funcName;
     sptr_t findRet = -1;
@@ -2203,13 +2245,14 @@ void CFindReplaceDlg::InitResultsList()
     LVCOLUMN lvc;
     lvc.mask = LVCF_TEXT | LVCF_FMT;
     lvc.fmt = LVCFMT_LEFT;
-    lvc.pszText = const_cast<LPWSTR>((LPCWSTR)sFile);
+    // Note: pszText does not change what it points to here despite not being const.
+    lvc.pszText = const_cast<LPWSTR>(sFile.c_str());
     ListView_InsertColumn(hListControl, 0, &lvc);
-    lvc.pszText = const_cast<LPWSTR>((LPCWSTR)sLine);
+    lvc.pszText = const_cast<LPWSTR>(sLine.c_str());
     lvc.fmt = LVCFMT_RIGHT;
     ListView_InsertColumn(hListControl, 1, &lvc);
     lvc.fmt = LVCFMT_LEFT;
-    lvc.pszText = const_cast<LPWSTR>((LPCWSTR)sLineText);
+    lvc.pszText = const_cast<LPWSTR>(sLineText.c_str());
     ListView_InsertColumn(hListControl, 2, &lvc);
 
     ListView_SetColumnWidth(hListControl, 0, 150);
@@ -2547,7 +2590,43 @@ LRESULT CALLBACK CFindReplaceDlg::EditSubClassProc(HWND hWnd, UINT uMsg, WPARAM 
     return result;
 }
 
-int CFindReplaceDlg::GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount)
+LRESULT CALLBACK CFindReplaceDlg::EditSubClassProcFolder(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+{
+    CFindReplaceDlg* pThis = reinterpret_cast<CFindReplaceDlg*>(dwRefData);
+    switch (uMsg)
+    {
+    case WM_NCDESTROY:
+    {
+        KillTimer(hWnd, TIMER_SUGGESTION);
+        RemoveWindowSubclass(hWnd, EditSubClassProcFolder, uIdSubclass);
+        break;
+    }
+    }
+    auto result = DefSubclassProc(hWnd, uMsg, wParam, lParam);
+    switch (uMsg)
+    {
+    case WM_CHAR:
+        if (wParam != VK_DELETE && wParam != VK_BACK)
+            SetTimer(hWnd, TIMER_SUGGESTION, 100, nullptr);
+        break;
+    case WM_TIMER:
+        if (wParam == TIMER_SUGGESTION)
+        {
+            KillTimer(hWnd, TIMER_SUGGESTION);
+            std::wstring searchFolder = pThis->GetDlgItemText(IDC_SEARCHFOLDER).get();
+            auto suggestion = pThis->OfferFolderSuggestion(searchFolder);
+            if (!suggestion.empty())
+            {
+                Edit_SetText(hWnd, suggestion.c_str());
+                Edit_SetSel(hWnd, searchFolder.size(), -1);
+            }
+        }
+        break;
+    }
+    return result;
+}
+
+int CFindReplaceDlg::GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount) const
 {
     int maxCount = (int)CIniSettings::Instance().GetInt64(section.c_str(), countKey.c_str(), defaultMaxCount);
     if (maxCount <= 0)
@@ -2559,7 +2638,7 @@ int CFindReplaceDlg::GetMaxCount(const std::wstring& section, const std::wstring
 // For the loaded count, check data.size().
 int CFindReplaceDlg::LoadData(
     std::vector<std::wstring>& data, int defaultMaxCount,
-    const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt)
+    const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt) const
 {
     data.clear();
     int maxCount = GetMaxCount(section.c_str(), countKey.c_str(), defaultMaxCount);
@@ -2608,7 +2687,7 @@ void CFindReplaceDlg::LoadCombo(
 
 void CFindReplaceDlg::SaveCombo(
     int combo_id,
-    std::vector<std::wstring>& data)
+    std::vector<std::wstring>& data) const
 {
     data.clear();
     HWND hCombo = GetDlgItem(*this, combo_id);
@@ -2990,7 +3069,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
         Scintilla::Sci_TextToFind FindText = { 0 };
         FindText.chrg.cpMin = startstylepos;
         FindText.chrg.cpMax = endstylepos;
-        FindText.lpstrText = const_cast<char*>(g_sHighlightString.c_str());
+        FindText.lpstrText = g_sHighlightString.c_str();
         while (ScintillaCall(SCI_FINDTEXT, g_searchFlags, (LPARAM)&FindText) >= 0)
         {
             ScintillaCall(SCI_INDICATORFILLRANGE, FindText.chrgText.cpMin, FindText.chrgText.cpMax-FindText.chrgText.cpMin);
@@ -3004,7 +3083,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
             DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
             FindText.chrg.cpMin = 0;
             FindText.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
-            FindText.lpstrText = const_cast<char*>(g_sHighlightString.c_str());
+            FindText.lpstrText = g_sHighlightString.c_str();
             while (ScintillaCall(SCI_FINDTEXT, g_searchFlags, (LPARAM)&FindText) >= 0)
             {
                 size_t line = ScintillaCall(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
@@ -3063,7 +3142,7 @@ bool CCmdFindNext::Execute()
     Scintilla::Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
     ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
-    ttf.lpstrText = const_cast<char*>(g_findString.c_str());
+    ttf.lpstrText = g_findString.c_str();
     sptr_t findRet = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
     if (findRet == -1)
     {
@@ -3092,7 +3171,7 @@ bool CCmdFindPrev::Execute()
     if (ttf.chrg.cpMin > 0)
         ttf.chrg.cpMin--;
     ttf.chrg.cpMax = 0;
-    ttf.lpstrText = const_cast<char*>(g_findString.c_str());
+    ttf.lpstrText = g_findString.c_str();
     sptr_t findRet = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
     if (findRet == -1)
     {
@@ -3129,7 +3208,7 @@ bool CCmdFindSelectedNext::Execute()
     Scintilla::Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
     ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
-    ttf.lpstrText = const_cast<char*>(g_findString.c_str());
+    ttf.lpstrText = g_findString.c_str();
     sptr_t findRet = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
     if (findRet == -1)
     {
@@ -3172,7 +3251,7 @@ bool CCmdFindSelectedPrev::Execute()
     if (ttf.chrg.cpMin > 0)
         ttf.chrg.cpMin--;
     ttf.chrg.cpMax = 0;
-    ttf.lpstrText = const_cast<char*>(g_findString.c_str());
+    ttf.lpstrText = g_findString.c_str();
     sptr_t findRet = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
     if (findRet == -1)
     {
