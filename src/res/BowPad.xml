@@ -770,8 +770,16 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdAbout" Id="10004" />
     <Command Name="cmdGotoBrace" Id="10005" />
     <Command Name="cmdRandom" Id="10006" />
-    <Command Name="cmdCutPlain" Id="10007" />
-    <Command Name="cmdCopyPlain" Id="10008" />
+    <Command Name="cmdCutPlain" Id="10007">
+      <Command.SmallImages>
+        <Image>res/Cut.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdCopyPlain" Id="10008">
+      <Command.SmallImages>
+        <Image>res/Copy.bmp</Image>
+      </Command.SmallImages>
+    </Command>
     <Command Name="cmdHeaderSource" Id="10009" LabelTitle="Corresponding File" TooltipTitle="Open corresponding File" TooltipDescription="Opens the corresponding file to the file in the current tab.
 (h/cpp, aspx/cs/vb)">
       <Command.LargeImages>
