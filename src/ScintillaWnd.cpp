@@ -318,7 +318,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                     pt.x = GET_X_LPARAM(pos);
                     pt.y = GET_Y_LPARAM(pos);
                     auto hptWnd = WindowFromPoint(pt);
-                    if (hptWnd == *this)
+                    if (hptWnd == *this && hptWnd == GetFocus())
                     {
                         ScreenToClient(*this, &pt);
                         if (PtInRect(&rc, pt))
