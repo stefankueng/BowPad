@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,8 +51,7 @@ public:
 class CCmdHeaderSource : public ICommand
 {
 public:
-    CCmdHeaderSource(void * obj);
-    ~CCmdHeaderSource(void) { }
+    CCmdHeaderSource(void* obj);
 
     // Overrides
     bool Execute() override;
@@ -62,13 +61,15 @@ public:
 
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR* ptbhdr) override;
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(Scintilla::SCNotification* pScn) override;
 
     void OnDocumentOpen(int id) override;
 
     void OnDocumentSave(int index, bool bSaveAs) override;
+
+    void OnLexerChanged(int lexer) override;
 
 private:
     void HandleIncludeFileMenuItem(const RelatedFileItem& item);

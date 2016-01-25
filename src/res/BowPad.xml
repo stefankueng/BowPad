@@ -2,7 +2,7 @@
 <!--
  This file is part of BowPad.
 
- Copyright (C) 2013 - Stefan Kueng
+ Copyright (C) 2013 - 2016 Stefan Kueng
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -243,6 +243,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/NextL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdFindFile" />
     <Command Name="cmdFindReplace" LabelTitle="Find/Replace" TooltipTitle="Find &amp;&amp; Replace" TooltipDescription="Search and/or replace text in documents/tabs" Keytip="F">
       <Command.LargeImages>
         <Image>res/FindReplaceL.bmp</Image>
