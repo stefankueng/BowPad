@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -67,12 +67,12 @@
 #include "UnicodeUtils.h"
 #include "KeyboardShortcutHandler.h"
 
-CCommandHandler::CCommandHandler(void)
+CCommandHandler::CCommandHandler()
     : m_highestCmdId(0)
 {
 }
 
-CCommandHandler::~CCommandHandler(void)
+CCommandHandler::~CCommandHandler()
 {
 }
 
@@ -149,6 +149,7 @@ void CCommandHandler::Init( void * obj )
     Add<CCmdFindPrev>(obj);
     Add<CCmdFindSelectedNext>(obj);
     Add<CCmdFindSelectedPrev>(obj);
+    Add<CCmdFindFile>(obj);
     Add<CCmdGotoLine>(obj);
     Add<CCmdFunctions>(obj);
 
