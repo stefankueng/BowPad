@@ -33,6 +33,7 @@
 #include <thread>
 #include <algorithm>
 #include <utility>
+#include <memory>
 
 // TODO:
 // It would be nice to fix min/max problems at the project level for all files.
@@ -52,6 +53,7 @@
 static std::string  g_findString;
 std::string         g_sHighlightString;
 static int          g_searchFlags;
+static std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
 
 namespace
 {
@@ -227,10 +229,6 @@ CFindReplaceDlg::CFindReplaceDlg(void* obj)
 {
 }
 
-CFindReplaceDlg::~CFindReplaceDlg()
-{
-}
-
 std::wstring CFindReplaceDlg::GetCurrentDocumentFolder() const
 {
     std::wstring currentDocFolder;
@@ -320,19 +318,17 @@ std::wstring CFindReplaceDlg::OfferFileSuggestion(
     const std::wstring& currentValue) const
 {
     std::wstring suggestedFilename;
-    
-    bool bIsDir = false;
-    std::wstring path;
-    std::wstring filename;
-
     // Don't even attempt to hit storage with wildcard or lists.
     if (currentValue.find_first_of(L";*?") != std::wstring::npos)
         return suggestedFilename; // Should be empty.
-
+    
+    constexpr auto maxSearchTime = std::chrono::milliseconds(200);
     auto typedName = CStringUtils::to_lower(currentValue);
     CDirFileEnum enumerator(searchFolder);
+    bool bIsDir = false;
+    std::wstring path;
+    std::wstring filename;
     bool searchSubFoldersFlag = searchSubFolders;
-    constexpr auto maxSearchTime = std::chrono::milliseconds(200);
     auto startTime = std::chrono::steady_clock::now();
     while (enumerator.NextFile(path, &bIsDir, searchSubFoldersFlag))
     {
@@ -354,43 +350,6 @@ std::wstring CFindReplaceDlg::OfferFileSuggestion(
             if (suggestedFilename.empty() ||
                 filename.length() < suggestedFilename.length())
                 suggestedFilename = filename;
-        }
-    }
-    return suggestedFilename;
-}
-
-// Make a quick attempt at suggesting a folder that will complete
-// any folder the user has typed. Note completion is case insensitive.
-std::wstring CFindReplaceDlg::OfferFolderSuggestion(const std::wstring& currentValue) const
-{
-    auto filename = CPathUtils::GetFileName(currentValue);
-    if (filename.empty())
-        return std::wstring();
-
-    std::wstring suggestedFilename;
-    std::wstring path;
-    bool bIsDir = false;
-    auto parentFolder = CPathUtils::GetParentDirectory(currentValue);
-    auto currentPath = currentValue;
-    CStringUtils::trim(currentPath);
-    CDirFileEnum enumerator(parentFolder);
-    constexpr auto maxSearchTime = std::chrono::milliseconds(200);
-    auto startTime = std::chrono::steady_clock::now();
-    while (enumerator.NextFile(path, &bIsDir, false))
-    {
-        auto ellapsedPeriod = std::chrono::steady_clock::now() - startTime;
-        if (ellapsedPeriod > maxSearchTime)
-            break;
-        if (!bIsDir)
-            continue;
-        path = CStringUtils::to_lower(path);
-        // Return the shortest suggestion in preference over a longer one.
-        // The user will encounter the longer suggestion later as they type.
-        if (path.find(currentPath, 0) == 0)
-        {
-            if (suggestedFilename.empty() ||
-                path.length() < suggestedFilename.length())
-                suggestedFilename = path;
         }
     }
     return suggestedFilename;
@@ -599,7 +558,7 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
     GetComboBoxInfo(GetDlgItem(*this, IDC_SEARCHFILES), &cbInfo);
     SetWindowSubclass(cbInfo.hwndItem, EditSubClassProc, 0, reinterpret_cast<DWORD_PTR>(this));
     GetComboBoxInfo(GetDlgItem(*this, IDC_SEARCHFOLDER), &cbInfo);
-    SetWindowSubclass(cbInfo.hwndItem, EditSubClassProcFolder, 0, reinterpret_cast<DWORD_PTR>(this));
+    SHAutoComplete(cbInfo.hwndItem, SHACF_FILESYS_DIRS);
 
     // Note: This dialog is initiated by CCmdFindReplace::Execute
     // and the code expects ActivateDialog to be called next after this routine
@@ -669,7 +628,7 @@ void CFindReplaceDlg::CheckSearchFolder()
     }
 }
 
-void CFindReplaceDlg::ActivateDialog()
+void CFindReplaceDlg::ActivateDialog(FindMode findMode)
 {
     size_t selStart = ScintillaCall(SCI_GETSELECTIONSTART);
     size_t selEnd = ScintillaCall(SCI_GETSELECTIONEND);
@@ -707,7 +666,7 @@ void CFindReplaceDlg::ActivateDialog()
     }
     CheckSearchFolder();
     CheckSearchOptions();
-    FocusOn(IDC_SEARCHCOMBO);
+    FocusOn(findMode == FindMode::FindText ? IDC_SEARCHCOMBO : IDC_SEARCHFILES);
 }
 
 bool CFindReplaceDlg::EnableListEndTracking(int list_id, bool enable)
@@ -2590,42 +2549,6 @@ LRESULT CALLBACK CFindReplaceDlg::EditSubClassProc(HWND hWnd, UINT uMsg, WPARAM 
     return result;
 }
 
-LRESULT CALLBACK CFindReplaceDlg::EditSubClassProcFolder(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-    CFindReplaceDlg* pThis = reinterpret_cast<CFindReplaceDlg*>(dwRefData);
-    switch (uMsg)
-    {
-    case WM_NCDESTROY:
-    {
-        KillTimer(hWnd, TIMER_SUGGESTION);
-        RemoveWindowSubclass(hWnd, EditSubClassProcFolder, uIdSubclass);
-        break;
-    }
-    }
-    auto result = DefSubclassProc(hWnd, uMsg, wParam, lParam);
-    switch (uMsg)
-    {
-    case WM_CHAR:
-        if (wParam != VK_DELETE && wParam != VK_BACK)
-            SetTimer(hWnd, TIMER_SUGGESTION, 100, nullptr);
-        break;
-    case WM_TIMER:
-        if (wParam == TIMER_SUGGESTION)
-        {
-            KillTimer(hWnd, TIMER_SUGGESTION);
-            std::wstring searchFolder = pThis->GetDlgItemText(IDC_SEARCHFOLDER).get();
-            auto suggestion = pThis->OfferFolderSuggestion(searchFolder);
-            if (!suggestion.empty())
-            {
-                Edit_SetText(hWnd, suggestion.c_str());
-                Edit_SetSel(hWnd, searchFolder.size(), -1);
-            }
-        }
-        break;
-    }
-    return result;
-}
-
 int CFindReplaceDlg::GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount) const
 {
     int maxCount = (int)CIniSettings::Instance().GetInt64(section.c_str(), countKey.c_str(), defaultMaxCount);
@@ -3028,14 +2951,14 @@ CCmdFindReplace::CCmdFindReplace(void* obj)
 
 CCmdFindReplace::~CCmdFindReplace()
 {
-    delete m_pFindReplaceDlg;
+    g_pFindReplaceDlg.reset();
 }
 
 bool CCmdFindReplace::Execute()
 {
-    if (m_pFindReplaceDlg == nullptr)
-        m_pFindReplaceDlg = new CFindReplaceDlg(m_Obj);
-    m_pFindReplaceDlg->ActivateDialog();
+    if (!g_pFindReplaceDlg)
+        g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(m_Obj);
+    g_pFindReplaceDlg->ActivateDialog(FindMode::FindText);
 
     return true;
 }
@@ -3054,7 +2977,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
             endstylepos = (long)ScintillaCall(SCI_GETLENGTH)-startstylepos;
 
         int len = endstylepos - startstylepos + 1;
-        // reset indicators
+        // Reset indicators.
         ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_FINDTEXT_MARK);
         ScintillaCall(SCI_INDICATORCLEARRANGE, startstylepos, len);
         ScintillaCall(SCI_INDICATORCLEARRANGE, startstylepos, len - 1);
@@ -3106,27 +3029,39 @@ void CCmdFindReplace::TabNotify(TBHDR* ptbhdr)
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
         m_lastSelText.clear();
-        if (m_pFindReplaceDlg != nullptr)
+        if (g_pFindReplaceDlg != nullptr)
         {
-            bool followTab = IsDlgButtonChecked(*m_pFindReplaceDlg, IDC_SEARCHFOLDERFOLLOWTAB) == BST_CHECKED;
+            bool followTab = IsDlgButtonChecked(*g_pFindReplaceDlg.get(), IDC_SEARCHFOLDERFOLLOWTAB) == BST_CHECKED;
             if (followTab)
                 SetSearchFolderToCurrentDocument();
         }
     }
 }
 
+void CCmdFindReplace::OnDocumentClose(int tabIndex)
+{
+    if (g_pFindReplaceDlg != nullptr)
+        g_pFindReplaceDlg->NotifyOnDocumentClose(tabIndex);
+}
+
+void CCmdFindReplace::OnDocumentSave(int tabIndex, bool saveAs)
+{
+    if (g_pFindReplaceDlg != nullptr)
+        g_pFindReplaceDlg->NotifyOnDocumentSave(tabIndex, saveAs);
+}
+
 void CCmdFindReplace::SetSearchFolderToCurrentDocument()
 {
-    if (m_pFindReplaceDlg != nullptr)
+    if (g_pFindReplaceDlg != nullptr)
     {
-        HWND hFindReplaceDlg = *m_pFindReplaceDlg;
+        HWND hFindReplaceDlg = *g_pFindReplaceDlg;
         if (hFindReplaceDlg != nullptr)
         {
             if (this->HasActiveDocument())
             {
                 auto doc = this->GetActiveDocument();
                 std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
-                m_pFindReplaceDlg->SetSearchFolder(folder);
+                g_pFindReplaceDlg->SetSearchFolder(folder);
             }
         }
     }
@@ -3265,5 +3200,19 @@ bool CCmdFindSelectedPrev::Execute()
     else
         FlashWindow(GetHwnd());
     DocScrollUpdate();
+    return true;
+}
+
+CCmdFindFile::~CCmdFindFile()
+{
+    g_pFindReplaceDlg.reset();
+}
+
+bool CCmdFindFile::Execute()
+{
+    if (!g_pFindReplaceDlg)
+        g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(m_Obj);
+    g_pFindReplaceDlg->ActivateDialog(FindMode::FindFile);
+
     return true;
 }

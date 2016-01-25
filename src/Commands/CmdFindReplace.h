@@ -33,22 +33,14 @@
 class CSearchResult
 {
 public:
-    CSearchResult()
-        : docID(-1)
-        , pathIndex(size_t(-1))
-        , pos(0)
-        , line(0)
-        , posInLineStart(0)
-        , posInLineEnd(0)
-    {}
 
-    int             docID;
+    int             docID = -1;
     std::wstring    lineText;
-    size_t          pathIndex;
-    size_t          pos;
-    size_t          line;
-    size_t          posInLineStart;
-    size_t          posInLineEnd;
+    size_t          pathIndex = size_t(-1);
+    size_t          pos = 0;
+    size_t          line = 0;
+    size_t          posInLineStart = 0;
+    size_t          posInLineEnd = 0;
 
     inline bool hasPath() const
     {
@@ -61,6 +53,11 @@ enum class ResultsType
     Unknown, MatchedTerms, Functions, Filenames, FirstLines
 };
 
+enum class FindMode
+{
+    FindText, FindFile
+};
+
 class CFindReplaceDlg : public CDialog, public ICommand
 {
     // vector or deque should work here. Usage pattern suggests deque
@@ -70,9 +67,8 @@ class CFindReplaceDlg : public CDialog, public ICommand
 
 public:
     CFindReplaceDlg(void* obj);
-    ~CFindReplaceDlg();
 
-    void ActivateDialog();
+    void ActivateDialog(FindMode findMode);
     void SetSearchFolder(const std::wstring& folder);
     void NotifyOnDocumentClose(int tabIndex);
     void NotifyOnDocumentSave(int tabIndex, bool saveAs);
@@ -178,7 +174,6 @@ protected:
         const std::wstring& searchFolder,
         bool searchSubFolders,
         const std::wstring& currentValue) const;
-    std::wstring OfferFolderSuggestion(const std::wstring& currentValue) const;
 
     int GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount) const;
 
@@ -209,9 +204,6 @@ protected:
         HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
         UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
     static LRESULT CALLBACK EditSubClassProc(
-        HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-        UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-    static LRESULT CALLBACK EditSubClassProcFolder(
         HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
         UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
@@ -289,22 +281,13 @@ public:
 
     void TabNotify(TBHDR* ptbhdr) override;
 
-    void OnDocumentClose(int tabIndex) override
-    {
-        if (m_pFindReplaceDlg != nullptr)
-            m_pFindReplaceDlg->NotifyOnDocumentClose(tabIndex);
-    }
-    void OnDocumentSave(int tabIndex, bool saveAs) override
-    {
-        if (m_pFindReplaceDlg != nullptr)
-            m_pFindReplaceDlg->NotifyOnDocumentSave(tabIndex, saveAs);
-    }
+    void OnDocumentClose(int tabIndex) override;
+    void OnDocumentSave(int tabIndex, bool saveAs) override;
 
 private:
     void SetSearchFolderToCurrentDocument();
 
 private:
-    CFindReplaceDlg*            m_pFindReplaceDlg = nullptr;
     std::string                 m_lastSelText;
 };
 
@@ -314,8 +297,6 @@ public:
 
     CCmdFindNext(void * obj)
         : ICommand(obj) { }
-
-    ~CCmdFindNext() { }
 
     bool Execute() override;
 
@@ -329,8 +310,6 @@ public:
     CCmdFindPrev(void* obj)
         : ICommand(obj) { }
 
-    ~CCmdFindPrev() { }
-
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdFindPrev; }
@@ -342,8 +321,6 @@ public:
 
     CCmdFindSelectedNext(void* obj)
         : ICommand(obj) { }
-
-    ~CCmdFindSelectedNext() { }
 
     bool Execute() override;
 
@@ -357,9 +334,21 @@ public:
     CCmdFindSelectedPrev(void* obj)
         : ICommand(obj) { }
 
-    ~CCmdFindSelectedPrev() { }
-
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdFindSelectedPrev; }
+};
+
+class CCmdFindFile : public ICommand
+{
+public:
+
+    CCmdFindFile(void* obj)
+        : ICommand(obj) { }
+
+    ~CCmdFindFile();
+
+    bool Execute() override;
+
+    UINT GetCmdId() override { return cmdFindFile; }
 };
