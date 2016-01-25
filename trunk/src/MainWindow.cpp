@@ -46,30 +46,31 @@
 
 IUIFramework *g_pFramework = nullptr;  // Reference to the Ribbon framework.
 
-const int STATUSBAR_DOC_TYPE      = 0;
-const int STATUSBAR_DOC_SIZE      = 1;
-const int STATUSBAR_CUR_POS       = 2;
-const int STATUSBAR_EOF_FORMAT    = 3;
-const int STATUSBAR_TABSPACE      = 4;
-const int STATUSBAR_UNICODE_TYPE  = 5;
-const int STATUSBAR_TYPING_MODE   = 6;
-const int STATUSBAR_CAPS          = 7;
-const int STATUSBAR_TABS          = 8;
-const int STATUSBAR_ZOOM          = 9;
+namespace
+{
+    const int STATUSBAR_DOC_TYPE        = 0;
+    const int STATUSBAR_DOC_SIZE        = 1;
+    const int STATUSBAR_CUR_POS         = 2;
+    const int STATUSBAR_EOF_FORMAT      = 3;
+    const int STATUSBAR_TABSPACE        = 4;
+    const int STATUSBAR_UNICODE_TYPE    = 5;
+    const int STATUSBAR_TYPING_MODE     = 6;
+    const int STATUSBAR_CAPS            = 7;
+    const int STATUSBAR_TABS            = 8;
+    const int STATUSBAR_ZOOM            = 9;
 
-// TODO:
-// change this to constexpr and constLength once VS2015 is out
-static const char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
-static const size_t URL_REG_EXPR_LENGTH = strlen(URL_REG_EXPR);
+    static constexpr char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
+    static constexpr size_t URL_REG_EXPR_LENGTH = _countof(URL_REG_EXPR) - 1;
 
-#define TIMER_UPDATECHECK           101
+    const int TIMER_UPDATECHECK = 101;
 
-static ResponseToOutsideModifiedFile responsetooutsidemodifiedfile = ResponseToOutsideModifiedFile::Reload;
-static BOOL                          responsetooutsidemodifiedfiledoall = FALSE;
+    static ResponseToOutsideModifiedFile responsetooutsidemodifiedfile = ResponseToOutsideModifiedFile::Reload;
+    static BOOL                          responsetooutsidemodifiedfiledoall = FALSE;
 
-static bool docloseall = false;
-static BOOL closealldoall = FALSE;
-static ResponseToCloseTab responsetoclosetab = ResponseToCloseTab::CloseWithoutSaving;
+    static bool docloseall = false;
+    static BOOL closealldoall = FALSE;
+    static ResponseToCloseTab responsetoclosetab = ResponseToCloseTab::CloseWithoutSaving;
+}
 
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
@@ -420,23 +421,14 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         }
         break;
     case WM_MOUSEMOVE:
-    {
-        POINT pt = { LOWORD(lParam), HIWORD(lParam) };
-        return OnMouseMove((UINT)wParam, pt);
-    }
-        break;
+        return OnMouseMove((UINT)wParam, { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+
     case WM_LBUTTONDOWN:
-    {
-        POINT pt = { LOWORD(lParam), HIWORD(lParam) };
-        return OnLButtonDown((UINT)wParam, pt);
-    }
-        break;
+        return OnLButtonDown((UINT)wParam, { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+
     case WM_LBUTTONUP:
-    {
-        POINT pt = { LOWORD(lParam), HIWORD(lParam) };
-        return OnLButtonUp((UINT)wParam, pt);
-    }
-        break;
+        return OnLButtonUp((UINT)wParam, { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+
     case WM_DROPFILES:
         {
             HDROP hDrop = reinterpret_cast<HDROP>(wParam);
@@ -1829,11 +1821,11 @@ void CMainWindow::HandleClipboardUpdate()
             if (hData)
             {
                 LPCWSTR lptstr = (LPCWSTR)GlobalLock(hData);
-                if (lptstr != nullptr)
-                {
-                    s = lptstr;
+                OnOutOfScope(
                     GlobalUnlock(hData);
-                }
+                );
+                if (lptstr != nullptr)
+                    s = lptstr;
             }
         }
     }
@@ -1989,7 +1981,9 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
         }
         if (!failed)
         {
-            std::string sCallTip = CStringUtils::Format("RGB(%d,%d,%d)\nHex: #%06lX\n####################\n####################\n####################", GetRValue(color), GetGValue(color), GetBValue(color), hexval);
+            std::string sCallTip = CStringUtils::Format(
+                "RGB(%d,%d,%d)\nHex: #%06lX\n####################\n####################\n####################",
+                GetRValue(color), GetGValue(color), GetBValue(color), hexval);
             m_editor.Call(SCI_CALLTIPSETFOREHLT, color);
             m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)sCallTip.c_str());
             size_t pos = sCallTip.find_first_of('\n');
@@ -2576,7 +2570,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
             while (enumerator.NextFile(path, &bIsDir, false))
             {
                 if (!bIsDir)
-                    recursefiles.push_back(path);
+                    recursefiles.push_back(std::move(path));
             }
             if (recursefiles.size() < 100)
             {

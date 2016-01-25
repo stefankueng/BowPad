@@ -52,18 +52,13 @@ enum class ResponseToOutsideDeletedFile
 
 
 class CMainWindow : public CWindow, public IUIApplication, public IUICommandHandler
-
 {
     friend class ICommand;
 public:
     CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL);
-    ~CMainWindow(void);
+    ~CMainWindow();
 
-    /**
-     * Registers the window class and creates the window.
-     */
     bool                RegisterAndCreateWindow();
-
     bool                Initialize();
     bool                CreateRibbon();
 
@@ -168,7 +163,7 @@ private:
 private:
     LONG                        m_cRef;
     int                         m_newCount;
-    IUIRibbon *                 m_pRibbon;
+    IUIRibbon*                  m_pRibbon;
     UINT                        m_RibbonHeight;
 
     CStatusBar                  m_StatusBar;
