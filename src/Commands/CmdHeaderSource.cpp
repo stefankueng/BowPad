@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -130,29 +130,8 @@ Mappings solve all these decisions ensure a single click is possible more often.
 
 END OVERVIEW.
 
-FUTURE IDEAS
-* Decide if to support a search path for user include files.
-The user will need to change it all the time though for each project they work on.
-We could look for a include.ini file up from the current working directory,
-but this starts getting more involved.
-* Remember the directories of previously opened files and re-search those; these would be lost on exit.
-* The include feature is quite C++ specific for now.
-The feature could be expanded for other languages / file types.
-
-TODO: Fix outstanding bug: /
-
-1. Press Ctrl-N to create an empty document.
-2. Type #include <cstdio>
-3. Notice include button is disabled - as it should be.
-4. From the Lexer ribbon menu, change the language to C++.
-5. Notice the include button is still disabled - it shouldn't be.
-6. Type something. Notice include is still disabled.
-7. Press enter. Notice include is no longer disabled.
-The solution is either of the following, preferably both:
-1. Make the drop down list alway re-populate when clicked.
-This is preferable for this feature, but I can't make that work yet.
-2. Add a "language changed event" which we can listen for to invalidate the
-drop down list when the lexer language changes. Other utilities need this too.
+It would be preferable for this feature if the menu could populate on demand when clicked.
+but I can't make that work.
 */
 
 #include "stdafx.h"
@@ -209,7 +188,7 @@ bool CCmdHeaderSource::UserFindFile(HWND hwndParent, const std::wstring& filenam
     return true;
 }
 
-CCmdHeaderSource::CCmdHeaderSource(void * obj)
+CCmdHeaderSource::CCmdHeaderSource(void* obj)
     : ICommand(obj)
     , m_edit(hRes)
     , m_bSearchedIncludePaths(false)
@@ -646,12 +625,18 @@ HRESULT CCmdHeaderSource::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const 
     return E_NOTIMPL;
 }
 
-void CCmdHeaderSource::TabNotify(TBHDR * ptbhdr)
+void CCmdHeaderSource::TabNotify(TBHDR* ptbhdr)
 {
     // Include list will be stale now.
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
         InvalidateMenu();
 }
+
+void CCmdHeaderSource::OnLexerChanged(int /*lexer*/)
+{
+    InvalidateMenu();
+}
+
 
 void CCmdHeaderSource::ScintillaNotify(Scintilla::SCNotification * pScn)
 {
@@ -887,7 +872,7 @@ void CCmdHeaderSource::GetFilesWithSameName(const std::wstring& targetPath, std:
                 }
             }
             if (useIt)
-                matchingfiles.push_back(matchingPath);
+                matchingfiles.push_back(std::move(matchingPath));
         }
     }
 }
