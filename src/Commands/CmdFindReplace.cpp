@@ -3031,7 +3031,7 @@ void CCmdFindReplace::TabNotify(TBHDR* ptbhdr)
         m_lastSelText.clear();
         if (g_pFindReplaceDlg != nullptr)
         {
-            bool followTab = IsDlgButtonChecked(*g_pFindReplaceDlg.get(), IDC_SEARCHFOLDERFOLLOWTAB) == BST_CHECKED;
+            bool followTab = IsDlgButtonChecked(*g_pFindReplaceDlg, IDC_SEARCHFOLDERFOLLOWTAB) == BST_CHECKED;
             if (followTab)
                 SetSearchFolderToCurrentDocument();
         }
