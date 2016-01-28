@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@
 class CStyleConfiguratorDlg : public CDialog,  public ICommand
 {
 public:
-    CStyleConfiguratorDlg(void * obj);
-    ~CStyleConfiguratorDlg(void);
+    CStyleConfiguratorDlg(void* obj);
+    ~CStyleConfiguratorDlg();
 
 protected:
     LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -41,7 +41,6 @@ protected:
     void                    SelectStyle( int style );
 private:
     std::vector<std::wstring>   m_fonts;
-    std::set<std::wstring>      m_tempFonts;
     CColorButton                m_fgColor;
     CColorButton                m_bkColor;
 };
@@ -51,25 +50,14 @@ class CCmdStyleConfigurator : public ICommand
 {
 public:
 
-    CCmdStyleConfigurator(void * obj)
-        : ICommand(obj)
-        , m_pStyleConfiguratorDlg(nullptr)
-    {
-    }
-
-    ~CCmdStyleConfigurator(void)
-    {
-        delete m_pStyleConfiguratorDlg;
-    }
+    CCmdStyleConfigurator(void* obj);
+    ~CCmdStyleConfigurator();
 
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdStyleConfigurator; }
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(Scintilla::SCNotification* pScn) override;
 
-    void TabNotify(TBHDR * ptbhdr) override;
-
-private:
-    CStyleConfiguratorDlg *           m_pStyleConfiguratorDlg;
+    void TabNotify(TBHDR* ptbhdr) override;
 };
