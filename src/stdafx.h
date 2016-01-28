@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -46,6 +46,15 @@
 #pragma comment(lib, "shlwapi.lib")
 
 #pragma comment(linker, "\"/manifestdependency:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
+// SDKs prior to Win10 don't have the IsWindows10OrGreater API in the versionhelpers header, so
+// we define it here just in case:
+#include <VersionHelpers.h>
+#ifndef _WIN32_WINNT_WIN10
+#define _WIN32_WINNT_WIN10 0x0A00
+#define _WIN32_WINNT_WINTHRESHOLD 0x0A00
+#define  IsWindows10OrGreater() (IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 0))
+#endif
 
 #define APP_ID L"TortoiseSVN.Tools.BowPad.1"
 #define APP_ID_ELEVATED L"TortoiseSVN.Tools.BowPad_elevated.1"
