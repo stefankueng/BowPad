@@ -30,8 +30,8 @@ std::map<int, std::string> emptyIntStrVec;
 std::string emptyString;
 std::vector<std::string> emptyStringVector;
 
-static COLORREF fgColor = RGB(0, 0, 0);
-static COLORREF bgColor = RGB(255, 255, 255);
+static const COLORREF fgColor = RGB(0, 0, 0);
+static const COLORREF bgColor = RGB(255, 255, 255);
 };
 
 static std::multimap<std::wstring, std::string> lexDetectStrings = {
@@ -58,13 +58,13 @@ StyleData::StyleData()
 {
 }
 
-CLexStyles::CLexStyles(void)
+CLexStyles::CLexStyles()
     : m_bLoaded(false)
     , m_scratchWnd(hRes)
 {
 }
 
-CLexStyles::~CLexStyles(void)
+CLexStyles::~CLexStyles()
 {
 }
 
