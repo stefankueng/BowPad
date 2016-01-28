@@ -354,7 +354,7 @@ HWND CMainWindow::FindAppMainWindow(HWND hStartWnd, bool* isThisInstance) const
     std::wstring clsName = GetWindowClassName();
     while (hStartWnd)
     {
-        wchar_t classname[MAX_PATH];
+        wchar_t classname[257]; // docs for WNDCLASS state that a class name is max 256 chars.
         GetClassName(hStartWnd, classname, _countof(classname));
         if (clsName.compare(classname) == 0)
             break;
