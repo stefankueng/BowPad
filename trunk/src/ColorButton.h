@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013 - 2016 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,30 +16,55 @@
 //
 #pragma once
 #include <windows.h>
+#include <vector>
+
+enum class ColorButtonDialogResult
+{
+    None,
+    Cancel,
+    Ok
+};
 
 class CColorButton
 {
 public:
-    CColorButton(void);
-    virtual ~CColorButton(void);
+    CColorButton();
+    virtual ~CColorButton();
 
     BOOL ConvertToColorButton(HWND hwndParent, UINT uiCtlId);
 
     void SetColor(COLORREF clr);
     COLORREF GetColor() const { return m_color; }
+    COLORREF GetLastColor() const { return m_lastColor; }
+    ColorButtonDialogResult GetDialogResult() const { return m_dialogResult; }
+    void Reset()
+    {
+        m_hasLastColor = false;
+    }
 
 protected:
 
 private:
-    WNDPROC     m_pfnOrigCtlProc;
-    COLORREF    m_color;
-    HWND        m_hwnd;
-    UINT        m_ctlId;
+    WNDPROC     m_pfnOrigCtlProc = nullptr;
+    COLORREF    m_color = 0;
+    HWND        m_hwnd = nullptr;
+    UINT        m_ctlId = 0;
+    bool        m_hasLastColor = false;
+    COLORREF    m_lastColor = 0;
+    std::vector<HWND> m_colorEdits;
+    ColorButtonDialogResult m_dialogResult = ColorButtonDialogResult::None;
 
-    BOOL ConvertToColorButton(HWND hwndCtl);
-    inline static CColorButton * GetObjectFromWindow(HWND hWnd)
+private:
+    bool ConvertToColorButton(HWND hwndCtl);
+    inline static CColorButton* GetObjectFromWindow(HWND hWnd)
     {
-        return (CColorButton *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+        return reinterpret_cast<CColorButton *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
     }
     static LRESULT CALLBACK _ColorButtonProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+    static UINT_PTR CALLBACK CCHookProc(
+        _In_ HWND   hdlg,
+        _In_ UINT   uiMsg,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam
+        );
 };
