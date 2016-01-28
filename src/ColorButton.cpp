@@ -118,9 +118,16 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
             cc.hwndOwner = hwnd;
             cc.rgbResult = pColorButton->m_color;
             cc.lpCustColors = g_acrCustClr;
-            cc.lCustData = (LPARAM)pColorButton;
-            cc.lpfnHook = CCHookProc;
-            cc.Flags = CC_ANYCOLOR | CC_RGBINIT | CC_ENABLEHOOK | CC_FULLOPEN;
+            if (!IsWindows10OrGreater())
+            {
+                cc.Flags = CC_ANYCOLOR | CC_RGBINIT | CC_FULLOPEN;
+            }
+            else
+            {
+                cc.lCustData = (LPARAM)pColorButton;
+                cc.lpfnHook = CCHookProc;
+                cc.Flags = CC_ANYCOLOR | CC_RGBINIT | CC_ENABLEHOOK | CC_FULLOPEN;
+            }
 
             if (ChooseColor(&cc) == TRUE)
             {
