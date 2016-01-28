@@ -115,8 +115,8 @@ public:
     void                                SaveUserData();
     bool                                AddUserFunctionForLang(const std::string& lang, const std::string& fnc);
 private:
-    CLexStyles(void);
-    ~CLexStyles(void);
+    CLexStyles();
+    ~CLexStyles();
 
     void                                Load();
     void                                ReplaceVariables(std::wstring& s, const std::map<std::wstring, std::wstring>& vars) const;
