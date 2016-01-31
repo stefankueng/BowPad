@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,128 +16,144 @@
 //
 #include "stdafx.h"
 #include "CmdPrevNext.h"
+#include "OnOutOfScope.h"
 
 #include <deque>
+
+#define NEW_VERSION 1
 
 class PositionData
 {
 public:
     PositionData()
         : id(-1)
-        , line((size_t)-1)
-        , column((size_t)-1)
+        , line(-1)
+        , column(-1)
     {
     }
-    PositionData(int i, size_t l, size_t c)
+    PositionData(int i, long l, long c)
         : id(i)
         , line(l)
         , column(c)
     {
     }
-    ~PositionData(){}
 
-    int             id;
-    size_t          line;
-    size_t          column;
+    bool operator == (const PositionData& other)
+    {
+        return (this->id == other.id && this->line == other.line && this->column == other.column);
+    }
+    bool operator != (const PositionData& other)
+    {
+        return (this->id != other.id || this->line != other.line || this->column != other.column);
+    }
+
+    int           id; // Doc Id.
+    long          line;
+    long          column;
 };
 
-// Don't share unless we need to.
 namespace
 {
-std::deque<PositionData>    positions;
-int                         currentDocId = -1;
-int                         offsetBeforeEnd = 0;
-size_t                      currentline = (size_t)-1;
-bool                        ignore = false;
-const size_t                MAX_PREV_NEXT_POSITIONS = 500;
+std::deque<PositionData>    g_positions;
+int                         g_currentDocId = -1;
+int                         g_offsetBeforeEnd = 0;
+long                        g_currentLine = -1;
+bool                        g_ignore = false;
+const long                  MAX_PREV_NEXT_POSITIONS = 500;
 // Only store a new position if it's more than N lines from the old one.
-const size_t                POSITION_SAVE_GRANULARITY = 10;
-};
+const long                  POSITION_SAVE_GRANULARITY = 10;
 
-void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification * pScn )
+void AddNewPosition(long id, long line, long col)
+{
+    PositionData data(id, line, col);
+    if (g_positions.empty() || (g_positions.back() != data))
+        g_positions.push_back(data);
+}
+
+bool ResizePositionSpace()
+{
+    if (g_offsetBeforeEnd)
+    {
+        size_t newSize = g_positions.size() - g_offsetBeforeEnd + 1;
+        g_positions.resize(newSize);
+        g_offsetBeforeEnd = 0;
+        return true;
+    }
+    return false;
+}
+
+void SetCurrentLine(long line)
+{
+    g_currentLine = line;
+}
+
+}
+
+void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification* pScn )
 {
     switch (pScn->nmhdr.code)
     {
     case SCN_UPDATEUI:
         {
-            if (ignore)
+            if (g_ignore)
                 return;
-            if (offsetBeforeEnd >= (int)positions.size())
-                offsetBeforeEnd = 0;
-            size_t line = ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
-            if ((currentDocId < 0) || (currentline == -1))
+            if (g_offsetBeforeEnd >= (int)g_positions.size())
+                g_offsetBeforeEnd = 0;
+            long line = (long) ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
+            if (g_currentDocId < 0 || g_currentLine == -1)
             {
-                if (offsetBeforeEnd)
+                ResizePositionSpace();
+                g_currentDocId = GetDocIdOfCurrentTab();
+                if (g_currentDocId >= 0)
                 {
-                    positions.resize(positions.size()-offsetBeforeEnd+1);
-                    offsetBeforeEnd = 0;
-                }
-                currentDocId = GetDocIdOfCurrentTab();
-                if (currentDocId >= 0)
-                {
-                    size_t col  = ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
-                    PositionData data(currentDocId, line, col);
-                    positions.push_back(data);
-                    currentline = line;
-                    InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
-                    InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, NULL);
+                    long col = (long) ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
+                    AddNewPosition(g_currentDocId, line, col);
+                    InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, nullptr);
+                    InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, nullptr);
                 }
                 return;
             }
-            else
+            else if (g_currentLine != line)
             {
-                // store a new position if it's more than 10 lines from the old one
-                if (currentline > line)
+                auto mark = [&]()
                 {
-                    if ((currentline - line) > POSITION_SAVE_GRANULARITY)
-                    {
-                        if (offsetBeforeEnd)
-                        {
-                            positions.resize(positions.size()-offsetBeforeEnd+1);
-                            offsetBeforeEnd = 0;
-                        }
-                        size_t col  = ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
-                        PositionData data(currentDocId, line, col);
-                        positions.push_back(data);
-                        InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
-                        InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, NULL);
-                        currentline = line;
-                    }
+                    ResizePositionSpace();
+                    long col = (long)ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
+                    AddNewPosition(g_currentDocId, line, col);
+                    InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, nullptr);
+                    InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, nullptr);
+                    SetCurrentLine(line);
+                };
+                // Store a new position if it's more than 10 lines from the old one.
+                if (g_currentLine > line)
+                {
+                    auto theDistance = g_currentLine - line;
+                    if (theDistance > POSITION_SAVE_GRANULARITY)
+                        mark();
                 }
-                else if (currentline < line)
+                else if (g_currentLine < line)
                 {
-                    if ((line - currentline) > POSITION_SAVE_GRANULARITY)
-                    {
-                        if (offsetBeforeEnd)
-                        {
-                            positions.resize(positions.size()-offsetBeforeEnd+1);
-                            offsetBeforeEnd = 0;
-                        }
-                        size_t col  = ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
-                        PositionData data(currentDocId, line, col);
-                        positions.push_back(data);
-                        InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
-                        InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, NULL);
-                        currentline = line;
-                    }
+                    auto theDistance = line - g_currentLine;
+                    if (theDistance > POSITION_SAVE_GRANULARITY)
+                        mark();
                 }
             }
             // don't store too many positions, drop the oldest ones
-            if (positions.size() > MAX_PREV_NEXT_POSITIONS)
-                positions.pop_front();
+            if (g_positions.size() > MAX_PREV_NEXT_POSITIONS)
+                g_positions.pop_front();
         }
         break;
     }
 }
 
-void CCmdPrevNext::TabNotify( TBHDR * ptbhdr )
+void CCmdPrevNext::TabNotify( TBHDR* ptbhdr )
 {
     switch (ptbhdr->hdr.code)
     {
     case TCN_SELCHANGE:
         {
             // document got activated
-            currentDocId = GetDocIdOfCurrentTab();
+            g_currentDocId = GetDocIdOfCurrentTab();
         }
         break;
     // Not definite event of closure. User may cancel so don't erase saved
@@ -148,26 +164,30 @@ void CCmdPrevNext::TabNotify( TBHDR * ptbhdr )
 
 void CCmdPrevNext::OnDocumentClose(int tab)
 {
-    // remove all positions in that tab
-    for (auto it = positions.begin(); it != positions.end();)
+    auto docId = this->GetDocIDFromTabIndex(tab);
+    for (auto it = g_positions.begin(); it != g_positions.end();)
     {
-        if (it->id == tab)
-            it = positions.erase(it);
+        if (it->id == docId)
+            it = g_positions.erase(it);
         else
             ++it;
     }
-    offsetBeforeEnd = 0;
-    InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
-    InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, NULL);
+    g_offsetBeforeEnd = 0;
+    InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, nullptr);
+    InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, nullptr);
 }
 
 bool CCmdPrevious::Execute()
 {
-    size_t i = 0;
+    long i = 0;
     PositionData data;
-    for (auto it = positions.crbegin(); it != positions.crend(); ++it)
+    for (auto it = g_positions.crbegin(); it != g_positions.crend(); ++it)
     {
-        if (i == (size_t)offsetBeforeEnd)
+#if NEW_VERSION
+        if (i == g_offsetBeforeEnd + 1)
+#else
+        if (i == g_offsetBeforeEnd)
+#endif
         {
             data = *it;
             break;
@@ -177,21 +197,28 @@ bool CCmdPrevious::Execute()
 
     if (data.id >= 0)
     {
-        ignore = true;
+        // Set ignore to true so we don't move the cursor to a position
+        // and in doing so trigger that position recorded as it already is.
+        g_ignore = true;
+        OnOutOfScope
+        (
+            if (g_ignore)
+                g_ignore = false;
+        );
         if (GetDocIdOfCurrentTab() != data.id)
             TabActivateAt(GetTabIndexFromDocID(data.id));
 
-        size_t pos = ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
+        long pos = (long) ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
         ScintillaCall(SCI_SETANCHOR, pos);
         ScintillaCall(SCI_SETCURRENTPOS, pos);
         ScintillaCall(SCI_CANCEL);
         ScintillaCall(SCI_SCROLLCARET);
         ScintillaCall(SCI_GRABFOCUS);
-        currentline = data.line;
-        offsetBeforeEnd++;
-        ignore = false;
-        InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
-        InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, NULL);
+        SetCurrentLine(data.line);
+        ++g_offsetBeforeEnd;
+        g_ignore = false;
+        InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, nullptr);
+        InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, nullptr);
         return true;
     }
     return false;
@@ -199,24 +226,27 @@ bool CCmdPrevious::Execute()
 
 HRESULT CCmdPrevious::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
 {
-    // enabled if there's something to go back to
+    // Enabled if there's something to go back to.
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, positions.size() > (size_t)offsetBeforeEnd, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, g_positions.size() > g_offsetBeforeEnd + 1, ppropvarNewValue);
     }
     return E_NOTIMPL;
 }
 
 bool CCmdNext::Execute()
 {
-    size_t i = 0;
+    long i = 0;
     PositionData data;
-    if (offsetBeforeEnd == 0)
+    if (g_offsetBeforeEnd == 0)
         return false;
-    --offsetBeforeEnd;
-    for (auto it = positions.crbegin(); it != positions.crend(); ++it)
+    for (auto it = g_positions.crbegin(); it != g_positions.crend(); ++it)
     {
-        if (i == (size_t)offsetBeforeEnd)
+#if NEW_VERSION
+        if (i == g_offsetBeforeEnd - 1)
+#else
+        if (i == g_offsetBeforeEnd)
+#endif
         {
             data = *it;
             break;
@@ -226,20 +256,27 @@ bool CCmdNext::Execute()
 
     if (data.id >= 0)
     {
-        ignore = true;
+        g_ignore = true;
+        OnOutOfScope
+        (
+            if (g_ignore)
+                g_ignore = false;
+        );
         if (GetDocIdOfCurrentTab() != data.id)
             TabActivateAt(GetTabIndexFromDocID(data.id));
-
-        size_t pos = ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
+#if NEW_VERSION
+        --g_offsetBeforeEnd;
+#endif
+        long pos = (long ) ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
         ScintillaCall(SCI_SETANCHOR, pos);
         ScintillaCall(SCI_SETCURRENTPOS, pos);
         ScintillaCall(SCI_CANCEL);
         ScintillaCall(SCI_SCROLLCARET);
         ScintillaCall(SCI_GRABFOCUS);
-        currentline = data.line;
-        ignore = false;
-        InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, NULL);
-        InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, NULL);
+        SetCurrentLine(data.line);
+        g_ignore = false;
+        InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, nullptr);
+        InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, nullptr);
         return true;
     }
     return false;
@@ -250,7 +287,7 @@ HRESULT CCmdNext::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PRO
     // enabled if there's something to go forward to
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, offsetBeforeEnd > 0, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, g_offsetBeforeEnd > 0, ppropvarNewValue);
     }
     return E_NOTIMPL;
 }

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,11 +26,11 @@ class CCmdPrevNext : public ICommand
 {
 public:
 
-    CCmdPrevNext(void * obj) : ICommand(obj)
+    CCmdPrevNext(void* obj) : ICommand(obj)
     {
     }
 
-    ~CCmdPrevNext(void)
+    ~CCmdPrevNext()
     {
     }
 
@@ -39,7 +39,7 @@ public:
 
     void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
-    void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR* ptbhdr) override;
     void OnDocumentClose(int tab) override;
 };
 
@@ -48,11 +48,11 @@ class CCmdPrevious : public ICommand
 {
 public:
 
-    CCmdPrevious(void * obj) : ICommand(obj)
+    CCmdPrevious(void* obj) : ICommand(obj)
     {
     }
 
-    ~CCmdPrevious(void)
+    ~CCmdPrevious()
     {
     }
 
@@ -68,11 +68,11 @@ class CCmdNext : public ICommand
 {
 public:
 
-    CCmdNext(void * obj) : ICommand(obj)
+    CCmdNext(void* obj) : ICommand(obj)
     {
     }
 
-    ~CCmdNext(void)
+    ~CCmdNext()
     {
     }
 
