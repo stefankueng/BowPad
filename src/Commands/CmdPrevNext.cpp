@@ -20,8 +20,6 @@
 
 #include <deque>
 
-#define NEW_VERSION 1
-
 class PositionData
 {
 public:
@@ -183,11 +181,7 @@ bool CCmdPrevious::Execute()
     PositionData data;
     for (auto it = g_positions.crbegin(); it != g_positions.crend(); ++it)
     {
-#if NEW_VERSION
         if (i == g_offsetBeforeEnd + 1)
-#else
-        if (i == g_offsetBeforeEnd)
-#endif
         {
             data = *it;
             break;
@@ -242,11 +236,7 @@ bool CCmdNext::Execute()
         return false;
     for (auto it = g_positions.crbegin(); it != g_positions.crend(); ++it)
     {
-#if NEW_VERSION
         if (i == g_offsetBeforeEnd - 1)
-#else
-        if (i == g_offsetBeforeEnd)
-#endif
         {
             data = *it;
             break;
@@ -264,9 +254,7 @@ bool CCmdNext::Execute()
         );
         if (GetDocIdOfCurrentTab() != data.id)
             TabActivateAt(GetTabIndexFromDocID(data.id));
-#if NEW_VERSION
         --g_offsetBeforeEnd;
-#endif
         long pos = (long ) ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
         ScintillaCall(SCI_SETANCHOR, pos);
         ScintillaCall(SCI_SETCURRENTPOS, pos);
