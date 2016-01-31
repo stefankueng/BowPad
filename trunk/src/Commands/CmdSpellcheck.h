@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2015 - Stefan Kueng
+// Copyright (C) 2015-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,17 +31,17 @@ public:
 
     CCmdSpellcheck(void * obj);
 
-    ~CCmdSpellcheck(void)
+    ~CCmdSpellcheck()
     {}
 
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdSpellCheck; }
 
-    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual void OnTimer(UINT id) override;
+    void OnTimer(UINT id) override;
 protected:
     void        Check();
 
@@ -87,7 +87,7 @@ public:
 
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
 private:
     std::vector<std::wstring>   m_suggestions;
@@ -106,7 +106,7 @@ public:
 
     UINT GetCmdId() override { return cmdSpellCheckAll; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };
 
 class CCmdSpellcheckUpper : public ICommand
@@ -122,5 +122,5 @@ public:
 
     UINT GetCmdId() override { return cmdSpellCheckUpper; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };
