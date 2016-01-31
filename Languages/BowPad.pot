@@ -33,6 +33,11 @@ msgstr ""
 # ONLY change the msgstr field. Do NOT change any other.
 # If you do not want to change an Accelerator Key, copy msgid to msgstr
 
+#. Resource IDs: (224)
+#, c-format
+msgid "%d occurrences were replaced."
+msgstr ""
+
 #. Resource IDs: (170)
 #, c-format
 msgid "%s (copy).%s"
@@ -78,16 +83,28 @@ msgstr ""
 msgid "&Save"
 msgstr ""
 
-#. Resource IDs: (1005)
+#. Resource IDs: (1081)
 msgid "&Search for:"
 msgstr ""
 
-#. Resource IDs: (1005)
+#. Resource IDs: (1083)
 msgid "&Sort Order:"
 msgstr ""
 
 #. Resource IDs: (1007)
 msgid "&Whole word"
+msgstr ""
+
+#. Resource IDs: (1074)
+msgid "."
+msgstr ""
+
+#. Resource IDs: (1069)
+msgid "..."
+msgstr ""
+
+#. Resource IDs: (1080)
+msgid "<"
 msgstr ""
 
 #. Resource IDs: (133)
@@ -465,7 +482,7 @@ msgstr ""
 msgid "Corrections"
 msgstr ""
 
-#. Resource IDs: (60591)
+#. Resource IDs: (60593)
 msgid "Corresponding File"
 msgstr ""
 
@@ -608,12 +625,12 @@ msgstr ""
 
 #. Resource IDs: (219)
 #, c-format
-msgid "Do you want to copy the file %s to %s?"
+msgid "Do you want to copy the file '%s' to '%s'?"
 msgstr ""
 
 #. Resource IDs: (220)
 #, c-format
-msgid "Do you want to move the file %s to %s?"
+msgid "Do you want to move the file '%s' to '%s'?"
 msgstr ""
 
 #. Resource IDs: (106)
@@ -714,6 +731,14 @@ msgstr ""
 msgid "F"
 msgstr ""
 
+#. Resource IDs: (235)
+msgid "F&iles (e.g.: *.txt;*.dat):"
+msgstr ""
+
+#. Resource IDs: (236)
+msgid "F&older to search:"
+msgstr ""
+
 #. Resource IDs: (60175, 60465)
 msgid "FN"
 msgstr ""
@@ -776,8 +801,20 @@ msgstr ""
 msgid "Find &All"
 msgstr ""
 
+#. Resource IDs: (210)
+msgid "Find All In &Folder"
+msgstr ""
+
 #. Resource IDs: (159)
 msgid "Find All In All &Tabs"
+msgstr ""
+
+#. Resource IDs: (1073)
+msgid "Find Fi&les"
+msgstr ""
+
+#. Resource IDs: (225)
+msgid "Find Files"
 msgstr ""
 
 #. Resource IDs: (60174, 60176)
@@ -792,12 +829,20 @@ msgstr ""
 msgid "Find Previous"
 msgstr ""
 
-#. Resource IDs: (210)
-msgid "Find all in &folder"
+#. Resource IDs: (1016)
+msgid "Find Result Action"
+msgstr ""
+
+#. Resource IDs: (233)
+msgid "Find and Replace for functions is not implemented."
 msgstr ""
 
 #. Resource IDs: (143)
 msgid "Find and replace"
+msgstr ""
+
+#. Resource IDs: (231)
+msgid "Find previous."
 msgstr ""
 
 #. Resource IDs: (60169)
@@ -808,18 +853,22 @@ msgstr ""
 msgid "Folding"
 msgstr ""
 
+#. Resource IDs: (1015)
+msgid "Follow Tab"
+msgstr ""
+
 #. Resource IDs: (60498, 65535)
 msgid "Font"
 msgstr ""
 
-#. Resource IDs: (198)
-#, c-format
-msgid "Found: %d matches"
-msgstr ""
-
 #. Resource IDs: (199)
 #, c-format
-msgid "Found: %d matches in %d tabs"
+msgid "Found: %d matches in %d tabs."
+msgstr ""
+
+#. Resource IDs: (198)
+#, c-format
+msgid "Found: %d matches."
 msgstr ""
 
 #. Resource IDs: (203)
@@ -827,7 +876,7 @@ msgstr ""
 msgid "Full file path:\r\n%s\r\n\r\nWord count: %ld\r\nLines: %ld\r\nEmpty lines: %ld\r\nParagraphs: %ld\r\n"
 msgstr ""
 
-#. Resource IDs: (60464, 60466)
+#. Resource IDs: (1010, 60464, 60466)
 msgid "Functions"
 msgstr ""
 
@@ -1177,15 +1226,23 @@ msgid "No corrections found!"
 msgstr ""
 
 #. Resource IDs: (197)
-msgid "No files found"
+msgid "No files found."
 msgstr ""
 
 #. Resource IDs: (151)
 msgid "No functions found!"
 msgstr ""
 
+#. Resource IDs: (234)
+msgid "No more occurances to replace."
+msgstr ""
+
 #. Resource IDs: (188)
 msgid "No plugins loaded"
+msgstr ""
+
+#. Resource IDs: (226)
+msgid "No search folder."
 msgstr ""
 
 #. Resource IDs: (134)
@@ -1228,7 +1285,7 @@ msgstr ""
 msgid "Open Files"
 msgstr ""
 
-#. Resource IDs: (60592)
+#. Resource IDs: (60594)
 msgid "Open corresponding File"
 msgstr ""
 
@@ -1261,7 +1318,7 @@ msgstr ""
 msgid "Opens the config file to configure keyboard shortcuts for any command in BowPad"
 msgstr ""
 
-#. Resource IDs: (60593)
+#. Resource IDs: (60595)
 msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
 msgstr ""
 
@@ -1337,6 +1394,10 @@ msgstr ""
 msgid "Paste"
 msgstr ""
 
+#. Resource IDs: (232)
+msgid "Please wait."
+msgstr ""
+
 #. Resource IDs: (189)
 msgid "Plugin Name"
 msgstr ""
@@ -1373,7 +1434,7 @@ msgstr ""
 msgid "Print setup"
 msgstr ""
 
-#. Resource IDs: (1006)
+#. Resource IDs: (1082)
 msgid "R&eplace with:"
 msgstr ""
 
@@ -1529,6 +1590,10 @@ msgstr ""
 msgid "Search and/or replace text in documents/tabs"
 msgstr ""
 
+#. Resource IDs: (227)
+msgid "Search folder not found."
+msgstr ""
+
 #. Resource IDs: (144)
 msgid "Search text not found!"
 msgstr ""
@@ -1571,8 +1636,20 @@ msgstr ""
 msgid "Set Encoding"
 msgstr ""
 
+#. Resource IDs: (230)
+msgid "Set a new search folder."
+msgstr ""
+
 #. Resource IDs: (60038)
 msgid "Set default encoding"
+msgstr ""
+
+#. Resource IDs: (228)
+msgid "Set search folder to its containing folder."
+msgstr ""
+
+#. Resource IDs: (229)
+msgid "Set search folder to the current documents folder."
 msgstr ""
 
 #. Resource IDs: (60143)
@@ -1685,6 +1762,10 @@ msgstr ""
 
 #. Resource IDs: (65535)
 msgid "Styles"
+msgstr ""
+
+#. Resource IDs: (1012)
+msgid "Sub Folders"
 msgstr ""
 
 #. Resource IDs: (156, 60530)
@@ -1969,7 +2050,7 @@ msgid "Wrap Lines"
 msgstr ""
 
 #. Resource IDs: (143)
-msgid "Wrap around"
+msgid "Wrap around."
 msgstr ""
 
 #. Resource IDs: (60106)
@@ -1999,6 +2080,10 @@ msgstr ""
 #. Resource IDs: (208)
 #, c-format
 msgid "Zoom: %d%%"
+msgstr ""
+
+#. Resource IDs: (1071)
+msgid "^"
 msgstr ""
 
 #. Resource IDs: (65535)
