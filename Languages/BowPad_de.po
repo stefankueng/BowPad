@@ -7,15 +7,33 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2015-11-01 12:49+0100\n"
+"POT-Creation-Date: 2016-01-31 13:49+0100\n"
+"PO-Revision-Date: 2016-01-31 14:09+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.4\n"
+"X-Generator: Poedit 1.8.2\n"
+
+# msgid/msgstr fields for Accelerator keys
+# Format is: "ID:xxxxxx:VACS+X" where:
+#    ID:xxxxx = the menu ID corresponding to the accelerator
+#    V = Virtual key (or blank if not used) - nearly always set!
+#    A = Alt key     (or blank if not used)
+#    C = Ctrl key    (or blank if not used)
+#    S = Shift key   (or blank if not used)
+#    X = upper case character
+# e.g. "V CS+Q" == Ctrl + Shift + 'Q'
+# ONLY Accelerator Keys with corresponding alphanumeric characters can be
+# updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
+# ONLY change the msgstr field. Do NOT change any other.
+# If you do not want to change an Accelerator Key, copy msgid to msgstr
+#. Resource IDs: (224)
+#, c-format
+msgid "%d occurrences were replaced."
+msgstr "%d Fundstellen wurden ersetzt."
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -75,17 +93,29 @@ msgstr "E&rsetzen"
 msgid "&Save"
 msgstr "&Speichern"
 
-#. Resource IDs: (1005)
+#. Resource IDs: (1081)
 msgid "&Search for:"
 msgstr "&Suche nach:"
 
-#. Resource IDs: (1005)
+#. Resource IDs: (1083)
 msgid "&Sort Order:"
 msgstr "&Sortierreihenfolge:"
 
 #. Resource IDs: (1007)
 msgid "&Whole word"
 msgstr "&Ganze Wörter"
+
+#. Resource IDs: (1074)
+msgid "."
+msgstr "."
+
+#. Resource IDs: (1069)
+msgid "..."
+msgstr "..."
+
+#. Resource IDs: (1080)
+msgid "<"
+msgstr "<"
 
 #. Resource IDs: (133)
 msgid ""
@@ -505,7 +535,7 @@ msgstr "Rechtschreibfehler korrigieren"
 msgid "Corrections"
 msgstr "Korrekturen"
 
-#. Resource IDs: (60591)
+#. Resource IDs: (60593)
 msgid "Corresponding File"
 msgstr "Entsprechende Datei"
 
@@ -666,13 +696,13 @@ msgid "Do this for all files"
 msgstr "Tu dies für alle Dateien"
 
 #. Resource IDs: (219)
-#, c-format
-msgid "Do you want to copy the file %s to %s?"
+#, fuzzy, c-format
+msgid "Do you want to copy the file '%s' to '%s'?"
 msgstr "Möchten Sie die Datei %s nach %s kopieren?"
 
 #. Resource IDs: (220)
-#, c-format
-msgid "Do you want to move the file %s to %s?"
+#, fuzzy, c-format
+msgid "Do you want to move the file '%s' to '%s'?"
 msgstr "Möchten Sie die Datei %s nach %s verschieben?"
 
 #. Resource IDs: (106)
@@ -796,6 +826,14 @@ msgstr "Erweiterung"
 msgid "F"
 msgstr "F"
 
+#. Resource IDs: (235)
+msgid "F&iles (e.g.: *.txt;*.dat):"
+msgstr "Date&ien (z.B.: *.txt;*.dat):"
+
+#. Resource IDs: (236)
+msgid "F&older to search:"
+msgstr "Such&ordner:"
+
 #. Resource IDs: (60175, 60465)
 msgid "FN"
 msgstr "FN"
@@ -874,9 +912,24 @@ msgstr "Suche && Ersetze"
 msgid "Find &All"
 msgstr "Suchen &Alle"
 
+#. Resource IDs: (210)
+#, fuzzy
+msgid "Find All In &Folder"
+msgstr "Suchen Alle in &Ordner"
+
 #. Resource IDs: (159)
 msgid "Find All In All &Tabs"
 msgstr "Finde Alle in allen &Tabs"
+
+#. Resource IDs: (1073)
+#, fuzzy
+msgid "Find Fi&les"
+msgstr "Suchen &Alle"
+
+#. Resource IDs: (225)
+#, fuzzy
+msgid "Find Files"
+msgstr "Öffne Dateien"
 
 #. Resource IDs: (60174, 60176)
 msgid "Find Next"
@@ -890,13 +943,22 @@ msgstr "Finde nächstes markiert"
 msgid "Find Previous"
 msgstr "Finde vorheriges"
 
-#. Resource IDs: (210)
-msgid "Find all in &folder"
-msgstr "Suchen Alle in &Ordner"
+#. Resource IDs: (1016)
+msgid "Find Result Action"
+msgstr "Such-Ergebnis Aktion"
+
+#. Resource IDs: (233)
+msgid "Find and Replace for functions is not implemented."
+msgstr "Suchen und Ersetzen für Funktionen ist nicht erlaubt"
 
 #. Resource IDs: (143)
 msgid "Find and replace"
 msgstr "Suche und ersetze"
+
+#. Resource IDs: (231)
+#, fuzzy
+msgid "Find previous."
+msgstr "Finde vorheriges"
 
 #. Resource IDs: (60169)
 msgid "Find/Replace"
@@ -906,19 +968,24 @@ msgstr "Suchen/Ersetzen"
 msgid "Folding"
 msgstr "Klappung"
 
+#. Resource IDs: (1015)
+#, fuzzy
+msgid "Follow Tab"
+msgstr "Schliesse Tab"
+
 #. Resource IDs: (60498, 65535)
 msgid "Font"
 msgstr "Schriftart"
 
-#. Resource IDs: (198)
-#, c-format
-msgid "Found: %d matches"
-msgstr "Gefunden: %d Markierungen"
-
 #. Resource IDs: (199)
-#, c-format
-msgid "Found: %d matches in %d tabs"
+#, fuzzy, c-format
+msgid "Found: %d matches in %d tabs."
 msgstr "Gefunden: %d in %d Tabs"
+
+#. Resource IDs: (198)
+#, fuzzy, c-format
+msgid "Found: %d matches."
+msgstr "Gefunden: %d Markierungen"
 
 #. Resource IDs: (203)
 #, c-format
@@ -939,7 +1006,7 @@ msgstr ""
 "Leere Zeilen: %ld\r\n"
 "Abschnitte: %ld\r\n"
 
-#. Resource IDs: (60464, 60466)
+#. Resource IDs: (1010, 60464, 60466)
 msgid "Functions"
 msgstr "Funktionen"
 
@@ -1317,16 +1384,26 @@ msgid "No corrections found!"
 msgstr "Keine Korrekturen gefunden"
 
 #. Resource IDs: (197)
-msgid "No files found"
+#, fuzzy
+msgid "No files found."
 msgstr "Keine Dateien gefunden"
 
 #. Resource IDs: (151)
 msgid "No functions found!"
 msgstr "Keine Funktionen gefunden"
 
+#. Resource IDs: (234)
+msgid "No more occurances to replace."
+msgstr "Nichts mehr zu ersetzen"
+
 #. Resource IDs: (188)
 msgid "No plugins loaded"
 msgstr "Keine Plugins geladen"
+
+#. Resource IDs: (226)
+#, fuzzy
+msgid "No search folder."
+msgstr "&Suche nach:"
 
 #. Resource IDs: (134)
 msgid ""
@@ -1372,7 +1449,7 @@ msgstr "Öffne Datei an Cursorposition"
 msgid "Open Files"
 msgstr "Öffne Dateien"
 
-#. Resource IDs: (60592)
+#. Resource IDs: (60594)
 msgid "Open corresponding File"
 msgstr "Öffne zugehörige Datei"
 
@@ -1412,7 +1489,7 @@ msgid ""
 msgstr ""
 "Öffnet die Konfigurationsdatei zum konfigurieren der Tastaturkürzel in BowPad"
 
-#. Resource IDs: (60593)
+#. Resource IDs: (60595)
 msgid ""
 "Opens the corresponding file to the file in the current tab.\n"
 "(h/cpp, aspx/cs/vb)"
@@ -1492,6 +1569,11 @@ msgstr "Seitenkonfiguration"
 msgid "Paste"
 msgstr "Einfügen"
 
+#. Resource IDs: (232)
+#, fuzzy
+msgid "Please wait."
+msgstr "Bitte warten..."
+
 #. Resource IDs: (189)
 msgid "Plugin Name"
 msgstr "Plugin Name:"
@@ -1528,7 +1610,7 @@ msgstr "Drucke jetzt"
 msgid "Print setup"
 msgstr "Drucker Setup"
 
-#. Resource IDs: (1006)
+#. Resource IDs: (1082)
 msgid "R&eplace with:"
 msgstr "E&rsetzen mit:"
 
@@ -1706,6 +1788,11 @@ msgstr "Suche in Wikipedia"
 msgid "Search and/or replace text in documents/tabs"
 msgstr "Suche und/oder ersetze Text in Dokumenten/Tabs"
 
+#. Resource IDs: (227)
+#, fuzzy
+msgid "Search folder not found."
+msgstr "Suchtext nicht gefunden!"
+
 #. Resource IDs: (144)
 msgid "Search text not found!"
 msgstr "Suchtext nicht gefunden!"
@@ -1748,9 +1835,22 @@ msgstr "Sendet das Dokument an den Standarddrucker"
 msgid "Set Encoding"
 msgstr "Setze Kodierung"
 
+#. Resource IDs: (230)
+msgid "Set a new search folder."
+msgstr "Setze neuen Suchordner"
+
 #. Resource IDs: (60038)
 msgid "Set default encoding"
 msgstr "Setze Default-Kodierung"
+
+#. Resource IDs: (228)
+msgid "Set search folder to its containing folder."
+msgstr "Setze Suchordner zum Oberordner"
+
+#. Resource IDs: (229)
+#, fuzzy
+msgid "Set search folder to the current documents folder."
+msgstr "Zeigt Statistiken über das aktuelle Dokument an"
 
 #. Resource IDs: (60143)
 msgid "Set the coloring according to the code language"
@@ -1868,6 +1968,10 @@ msgstr "Stil:"
 #. Resource IDs: (65535)
 msgid "Styles"
 msgstr "Stile:"
+
+#. Resource IDs: (1012)
+msgid "Sub Folders"
+msgstr "Unterordner"
 
 #. Resource IDs: (156, 60530)
 msgid "Summary"
@@ -2162,7 +2266,8 @@ msgid "Wrap Lines"
 msgstr "Zeilenumbruch"
 
 #. Resource IDs: (143)
-msgid "Wrap around"
+#, fuzzy
+msgid "Wrap around."
 msgstr "Weiter von Beginn"
 
 #. Resource IDs: (60106)
@@ -2208,6 +2313,10 @@ msgstr "Z"
 #, c-format
 msgid "Zoom: %d%%"
 msgstr "Zoom: %d%%"
+
+#. Resource IDs: (1071)
+msgid "^"
+msgstr "^"
 
 #. Resource IDs: (65535)
 msgid "background:"
