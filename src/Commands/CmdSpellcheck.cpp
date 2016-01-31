@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2015 - Stefan Kueng
+// Copyright (C) 2015-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,11 +32,14 @@
 extern IUIFramework *g_pFramework;
 extern UINT32 contextID;
 
+namespace
+{
 ISpellCheckerFactoryPtr     g_spellCheckerFactory = nullptr;
 ISpellCheckerPtr            g_SpellChecker = nullptr;
 std::vector<std::wstring>   g_languages;
 UINT                        g_checktimer = 0;
 std::string                 g_wordchars;
+}
 
 CCmdSpellcheck::CCmdSpellcheck(void * obj)
     : ICommand(obj)
@@ -59,13 +62,13 @@ CCmdSpellcheck::CCmdSpellcheck(void * obj)
         {
             while (S_OK == hr)
             {
-                LPOLESTR string = nullptr;
-                hr = enumLanguages->Next(1, &string, nullptr);
+                LPOLESTR lang = nullptr;
+                hr = enumLanguages->Next(1, &lang, nullptr);
 
                 if (S_OK == hr)
                 {
-                    g_languages.push_back(string);
-                    CoTaskMemFree(string);
+                    g_languages.push_back(lang);
+                    CoTaskMemFree(lang);
                 }
             }
         }
@@ -84,6 +87,10 @@ CCmdSpellcheck::CCmdSpellcheck(void * obj)
         }
         m_textbuflen = 1024;
         m_textbuffer = std::make_unique<char[]>(m_textbuflen);
+    }
+    else
+    {
+        m_enabled = false;
     }
 
     // create a string with all the word chars
@@ -104,17 +111,17 @@ void CCmdSpellcheck::ScintillaNotify(Scintilla::SCNotification * pScn)
     switch (pScn->nmhdr.code)
     {
         case SCN_UPDATEUI:
-            if (pScn->updated & (SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL))
+            if (m_enabled && (pScn->updated & (SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL)) != 0)
             {
                 m_lastcheckedpos = 0;
-                SetTimer(GetHwnd(), g_checktimer, 500, NULL);
+                SetTimer(GetHwnd(), g_checktimer, 500, nullptr);
             }
             break;
         case SCN_MODIFIED:
-            if (pScn->modificationType & (SC_MOD_DELETETEXT | SC_MOD_INSERTTEXT))
+            if (m_enabled && (pScn->modificationType & (SC_MOD_DELETETEXT | SC_MOD_INSERTTEXT)) != 0)
             {
                 m_lastcheckedpos = 0;
-                SetTimer(GetHwnd(), g_checktimer, 500, NULL);
+                SetTimer(GetHwnd(), g_checktimer, 500, nullptr);
             }
             break;
     }
@@ -122,8 +129,6 @@ void CCmdSpellcheck::ScintillaNotify(Scintilla::SCNotification * pScn)
 
 void CCmdSpellcheck::Check()
 {
-    static LRESULT s_lastpos = 0;
-
     if (m_enabled && g_SpellChecker)
     {
 #ifdef _DEBUG
@@ -136,7 +141,7 @@ void CCmdSpellcheck::Check()
             m_activeLexer = (int)ScintillaCall(SCI_GETLEXER);
             m_lexerData = CLexStyles::Instance().GetLexerDataForLexer(m_activeLexer);
             m_keywords.clear();
-            auto keywords = CLexStyles::Instance().GetKeywordsForLexer(m_activeLexer);
+            const auto& keywords = CLexStyles::Instance().GetKeywordsForLexer(m_activeLexer);
             for (const auto& words : keywords)
             {
                 stringtokset(m_keywords, words.second, true, " ", true);
@@ -166,7 +171,7 @@ void CCmdSpellcheck::Check()
             {
                 m_lastcheckedpos = textrange.chrg.cpMax;
                 if (g_checktimer)
-                    SetTimer(GetHwnd(), g_checktimer, 10, NULL);
+                    SetTimer(GetHwnd(), g_checktimer, 10, nullptr);
                 break;
             }
             textrange.chrg.cpMin = (LONG)ScintillaCall(SCI_WORDSTARTPOSITION, textrange.chrg.cpMax + 1, TRUE);
@@ -319,6 +324,11 @@ HRESULT CCmdSpellcheck::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, cons
 
 bool CCmdSpellcheck::Execute()
 {
+    // If we don't have a spell checker installed/working, we won't be enabled
+    // and we don't want to allow anything to toggle us to becoming enabled
+    // because we won't work.
+    if (!g_spellCheckerFactory)
+        return false;
     m_enabled = CIniSettings::Instance().GetInt64(L"spellcheck", L"enabled", 1) != 0;
     m_enabled = !m_enabled;
     CIniSettings::Instance().SetInt64(L"spellcheck", L"enabled", m_enabled);
@@ -340,12 +350,10 @@ bool CCmdSpellcheck::Execute()
 CCmdSpellcheckLang::CCmdSpellcheckLang(void * obj)
     : ICommand(obj)
 {
-
 }
 
 CCmdSpellcheckLang::~CCmdSpellcheckLang()
 {
-
 }
 
 HRESULT CCmdSpellcheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
@@ -369,8 +377,7 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, 
                 return hr;
             }
 
-            wchar_t sName[2] = { 0 };
-            sName[0] = i;
+            wchar_t sName[2] = { i, L'\0' };
             // Initialize the property set with the label that was just loaded and a category id of 0.
             pCat->InitializeCategoryProperties(sName, i - 'A');
             pCollection->Add(pCat);
@@ -537,15 +544,15 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
                 hr = S_OK;
                 while (hr == S_OK)
                 {
-                    LPOLESTR string = nullptr;
-                    hr = enumSpellingSuggestions->Next(1, &string, nullptr);
+                    LPOLESTR suggestion = nullptr;
+                    hr = enumSpellingSuggestions->Next(1, &suggestion, nullptr);
 
                     if (S_OK == hr)
                     {
-                        m_suggestions.push_back(string);
-                        CAppUtils::AddStringItem(pCollection, string, 0, pImg);
+                        m_suggestions.push_back(suggestion);
+                        CAppUtils::AddStringItem(pCollection, suggestion, 0, pImg);
 
-                        CoTaskMemFree(string);
+                        CoTaskMemFree(suggestion);
                     }
                 }
             }
@@ -652,7 +659,7 @@ bool CCmdSpellcheckAll::Execute()
     CIniSettings::Instance().SetInt64(L"spellcheck", L"checkall", bCheckall);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     if (g_checktimer)
-        SetTimer(GetHwnd(), g_checktimer, 1, NULL);
+        SetTimer(GetHwnd(), g_checktimer, 1, nullptr);
     return true;
 }
 
@@ -664,7 +671,6 @@ HRESULT CCmdSpellcheckAll::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
         return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, !bCheckall, ppropvarNewValue);
     }
     return E_NOTIMPL;
-
 }
 
 CCmdSpellcheckUpper::CCmdSpellcheckUpper(void * obj)
@@ -680,7 +686,7 @@ bool CCmdSpellcheckUpper::Execute()
     CIniSettings::Instance().SetInt64(L"spellcheck", L"uppercase", bCheckupper);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     if (g_checktimer)
-        SetTimer(GetHwnd(), g_checktimer, 1, NULL);
+        SetTimer(GetHwnd(), g_checktimer, 1, nullptr);
     return true;
 }
 
@@ -692,5 +698,4 @@ HRESULT CCmdSpellcheckUpper::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
         return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, bCheckupper, ppropvarNewValue);
     }
     return E_NOTIMPL;
-
 }
