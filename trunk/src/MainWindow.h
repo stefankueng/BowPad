@@ -70,7 +70,7 @@ public:
     bool                SaveCurrentTab(bool bSaveAs = false);
     void                EnsureAtLeastOneTab();
     void                GoToLine(size_t line);
-    bool                CloseTab(int tab, bool force = false);
+    bool                CloseTab(int tab, bool force = false, bool closingAll = false);
     bool                CloseAllTabs();
     void                SetFileToOpen(const std::wstring& path, size_t line = (size_t)-1) { m_pathsToOpen[path] = line; }
     void                SetFileOpenMRU(bool bUseMRU) { m_bPathsToOpenMRU = bUseMRU; }
@@ -160,6 +160,9 @@ private:
     bool                        OnLButtonDown(UINT nFlags, POINT point);
     bool                        OnMouseMove(UINT nFlags, POINT point);
     bool                        OnLButtonUp(UINT nFlags, POINT point);
+    void                        HandleStatusBarEOFFormat();
+    void                        HandleStatusBarZoom();
+
 private:
     LONG                        m_cRef;
     int                         m_newCount;

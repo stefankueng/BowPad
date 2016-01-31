@@ -329,15 +329,15 @@ void CMainWindow::About() const
 
 std::wstring CMainWindow::GetAppName() const
 {
-   ResString sTitle(hRes, IDS_APP_TITLE);
-   return (LPCWSTR)sTitle;
+   auto title = LoadResourceWString(hRes, IDS_APP_TITLE);
+   return title;
 }
 
 std::wstring CMainWindow::GetWindowClassName() const
 {
-    ResString clsResName(hResource, IDC_BOWPAD);
-    std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
-    return clsName;
+    auto className = LoadResourceWString(hResource, IDC_BOWPAD);
+    className += CAppUtils::GetSessionID();
+    return className;
 }
 
 std::wstring CMainWindow::GetNewTabName()
@@ -351,12 +351,12 @@ std::wstring CMainWindow::GetNewTabName()
 
 HWND CMainWindow::FindAppMainWindow(HWND hStartWnd, bool* isThisInstance) const
 {
-    std::wstring clsName = GetWindowClassName();
+    std::wstring myClassName = GetWindowClassName();
     while (hStartWnd)
     {
         wchar_t classname[257]; // docs for WNDCLASS state that a class name is max 256 chars.
         GetClassName(hStartWnd, classname, _countof(classname));
-        if (clsName.compare(classname) == 0)
+        if (myClassName.compare(classname) == 0)
             break;
         hStartWnd = GetParent(hStartWnd);
     }
@@ -434,8 +434,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             HDROP hDrop = reinterpret_cast<HDROP>(wParam);
             if (hDrop)
             {
+                OnOutOfScope(
+                    DragFinish(hDrop);
+                );
                 HandleDropFiles(hDrop);
-                DragFinish(hDrop);
             }
         }
         break;
@@ -535,18 +537,14 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     case TCN_TABDROPPEDOUTSIDE:
                     {
                         DWORD pos = GetMessagePos();
-                        POINT pt;
-                        pt.x = GET_X_LPARAM(pos);
-                        pt.y = GET_Y_LPARAM(pos);
+                        POINT pt{ GET_X_LPARAM(pos), pt.y = GET_Y_LPARAM(pos) };
                         HandleTabDroppedOutside(ptbhdr->tabOrigin, pt);
                     }
                     break;
                     case TCN_GETDROPICON:
                     {
                         DWORD pos = GetMessagePos();
-                        POINT pt;
-                        pt.x = GET_X_LPARAM(pos);
-                        pt.y = GET_Y_LPARAM(pos);
+                        POINT pt{ GET_X_LPARAM(pos), GET_Y_LPARAM(pos) };
                         auto hPtWnd = WindowFromPoint(pt);
                         if (hPtWnd == m_fileTree)
                         {
@@ -555,13 +553,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             if (!doc.m_path.empty())
                             {
                                 if (GetKeyState(VK_CONTROL) & 0x8000)
-                                {
                                     return (LRESULT)::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_COPYFILE));
-                                }
                                 else
-                                {
                                     return (LRESULT)::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_MOVEFILE));
-                                }
                             }
                         }
                     }
@@ -572,9 +566,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 (nmhdr.hwndFrom == m_editor))
             {
                 if (nmhdr.code == NM_COOLSB_CUSTOMDRAW)
-                {
                     return m_editor.HandleScrollbarCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
-                }
 
                 Scintilla::SCNotification* pScn = reinterpret_cast<Scintilla::SCNotification *>(lParam);
                 const Scintilla::SCNotification& scn = *pScn;
@@ -653,7 +645,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         break;
                     case TVN_ITEMEXPANDING:
                     {
-                        if (pnmtv->action & TVE_EXPAND)
+                        if ((pnmtv->action & TVE_EXPAND) != 0)
                             m_fileTree.Refresh(pnmtv->itemNew.hItem);
                     }
                         break;
@@ -689,13 +681,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 
     case WM_ACTIVATEAPP:
     {
-        //bool activating = (wParam != 0);
-// Handy for debugging until we're sure problems related here are definitely fixed.
-#if 0
-        DWORD threadIdOfWindowOwner = reinterpret_cast<DWORD>(lpParam);
-        OutputDebugStringA("WM_ACTIVATEAPP ");
-        OutputDebugStringA(activating ? "activating\n" : "deactivating\n");
-#endif
         // Only restore the window position on activation as that's when we'll
         // be showing any window and needing to use it.
         if (!m_windowRestored)
@@ -706,36 +691,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     }
         break;
     case WM_ACTIVATE:
-    {
-// Handy for debugging until we're sure problems related here are definitely fixed.
-#if 0
-        // Useful debugging details.
-        // Note WA_ activation codes are packed in the wParam parameter and not raw.
-        WORD activationType = LOWORD(wParam);
-        bool minimized = HIWORD(wParam) != 0;
-        HWND windowChangingActivation = reinterpret_cast<HWND>(lParam);
-        OutputDebugStringA("WM_ACTIVATE ");
-        switch (activationType)
-        {
-        case WA_CLICKACTIVE:
-            OutputDebugStringA("WA_CLICKACTIVE ");
-            break;
-        case WA_ACTIVE:
-            OutputDebugStringA("WA_ACTIVE ");
-            break;
-        case WA_INACTIVE:
-            OutputDebugStringA("WA_INACTIVE ");
-            break;
-        default:
-            break;
-        }
-        OutputDebugStringA(minimized? "minimized\n" : "\n");
-#endif
         // Ensure proper focus handling occurs such as
         // making sure WM_SETFOCUS is generated in all situations.
         return DefWindowProc(hwnd,uMsg,wParam,lParam);
-    }
-        break;
+
     case WM_SETFOCUS: // lParam HWND that is losing focus.
     {
         SetFocus(m_editor);
@@ -783,38 +742,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 switch (lParam)
                 {
                     case STATUSBAR_EOF_FORMAT:
-                    {
-                        int eolmode = (int)m_editor.Call(SCI_GETEOLMODE);
-                        FormatType format = UNKNOWN_FORMAT;
-                        switch (eolmode)
-                        {
-                            case SC_EOL_CRLF:
-                                eolmode = SC_EOL_CR;
-                                format = MAC_FORMAT;
-                                break;
-                            case SC_EOL_CR:
-                                eolmode = SC_EOL_LF;
-                                format = UNIX_FORMAT;
-                                break;
-                            case SC_EOL_LF:
-                                eolmode = SC_EOL_CRLF;
-                                format = WIN_FORMAT;
-                                break;
-                            default:
-                                eolmode = SC_EOL_CRLF;
-                                format = WIN_FORMAT;
-                                break;
-                        }
-                        m_editor.Call(SCI_SETEOLMODE, eolmode);
-                        m_editor.Call(SCI_CONVERTEOLS, eolmode);
-                        int id = m_TabBar.GetCurrentTabId();
-                        if (m_DocManager.HasDocumentID(id))
-                        {
-                            CDocument doc = m_DocManager.GetDocumentFromID(id);
-                            doc.m_format = format;
-                            m_DocManager.SetDocument(id, doc);
-                        }
-                    }
+                        HandleStatusBarEOFFormat();
                         break;
                     case STATUSBAR_TABSPACE:
                         m_editor.Call(SCI_SETUSETABS, !m_editor.Call(SCI_GETUSETABS));
@@ -825,7 +753,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     case STATUSBAR_ZOOM:
                         m_editor.Call(SCI_SETZOOM, 0);
                         break;
-
                 }
                 UpdateStatusBar(true);
             }
@@ -835,29 +762,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 switch (lParam)
                 {
                     case STATUSBAR_ZOOM:
-                    {
-                        DWORD msgpos = GetMessagePos();
-                        int xPos = GET_X_LPARAM(msgpos);
-                        int yPos = GET_Y_LPARAM(msgpos);
-
-                        HMENU hPopup = CreatePopupMenu();
-                        AppendMenu(hPopup, MF_BYPOSITION,  20,  L"20%");
-                        AppendMenu(hPopup, MF_BYPOSITION,  50,  L"50%");
-                        AppendMenu(hPopup, MF_BYPOSITION,  70,  L"70%");
-                        AppendMenu(hPopup, MF_BYPOSITION, 100, L"100%");
-                        AppendMenu(hPopup, MF_BYPOSITION, 150, L"150%");
-                        AppendMenu(hPopup, MF_BYPOSITION, 200, L"200%");
-                        AppendMenu(hPopup, MF_BYPOSITION, 400, L"400%");
-                        auto cmd = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, NULL);
-                        if (cmd != 0)
-                        {
-                            int fontsize = (int)m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT);
-                            int zoom = (fontsize * cmd / 100) - fontsize;
-                            m_editor.Call(SCI_SETZOOM, zoom);
-                        }
-                    }
+                        HandleStatusBarZoom();
                         break;
-
                 }
             }
                 break;
@@ -871,6 +777,63 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     }
 
     return 0;
+}
+
+void CMainWindow::HandleStatusBarEOFFormat()
+{
+    int eolmode = (int)m_editor.Call(SCI_GETEOLMODE);
+    FormatType format = UNKNOWN_FORMAT;
+    switch (eolmode)
+    {
+    case SC_EOL_CRLF:
+        eolmode = SC_EOL_CR;
+        format = MAC_FORMAT;
+        break;
+    case SC_EOL_CR:
+        eolmode = SC_EOL_LF;
+        format = UNIX_FORMAT;
+        break;
+    case SC_EOL_LF:
+        eolmode = SC_EOL_CRLF;
+        format = WIN_FORMAT;
+        break;
+    default:
+        eolmode = SC_EOL_CRLF;
+        format = WIN_FORMAT;
+        break;
+    }
+    m_editor.Call(SCI_SETEOLMODE, eolmode);
+    m_editor.Call(SCI_CONVERTEOLS, eolmode);
+    int id = m_TabBar.GetCurrentTabId();
+    if (m_DocManager.HasDocumentID(id))
+    {
+        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        doc.m_format = format;
+        m_DocManager.SetDocument(id, doc);
+    }
+}
+
+void CMainWindow::HandleStatusBarZoom()
+{
+    DWORD msgpos = GetMessagePos();
+    int xPos = GET_X_LPARAM(msgpos);
+    int yPos = GET_Y_LPARAM(msgpos);
+
+    HMENU hPopup = CreatePopupMenu();
+    AppendMenu(hPopup, MF_BYPOSITION, 20, L"20%");
+    AppendMenu(hPopup, MF_BYPOSITION, 50, L"50%");
+    AppendMenu(hPopup, MF_BYPOSITION, 70, L"70%");
+    AppendMenu(hPopup, MF_BYPOSITION, 100, L"100%");
+    AppendMenu(hPopup, MF_BYPOSITION, 150, L"150%");
+    AppendMenu(hPopup, MF_BYPOSITION, 200, L"200%");
+    AppendMenu(hPopup, MF_BYPOSITION, 400, L"400%");
+    auto cmd = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, NULL);
+    if (cmd != 0)
+    {
+        int fontsize = (int)m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT);
+        int zoom = (fontsize * cmd / 100) - fontsize;
+        m_editor.Call(SCI_SETZOOM, zoom);
+    }
 }
 
 LRESULT CMainWindow::DoCommand(int id)
@@ -1097,6 +1060,7 @@ void CMainWindow::HandleAfterInit()
         m_tabmovepath.clear();
         m_tabmovesavepath.clear();
     }
+    EnsureAtLeastOneTab();
 }
 
 void CMainWindow::ResizeChildWindows()
@@ -1310,15 +1274,15 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     static ResString rsStatusTTEncoding(hRes, IDS_STATUSTTENCODING);
     static ResString rsStatusZoom(hRes, IDS_STATUSZOOM);
 
-    TCHAR strLnCol[128] = { 0 };
-    TCHAR strSel[64] = {0};
+    TCHAR strLnCol[128];
+    TCHAR strSel[64];
     size_t selByte = 0;
     size_t selLine = 0;
     long selTextMarkerCount = m_editor.GetSelTextMarkerCount();
     if (m_editor.GetSelectedCount(selByte, selLine) && selByte)
         swprintf_s(strSel, rsStatusSelection, selByte, selLine, selTextMarkerCount);
     else
-        swprintf_s(strSel, L"Sel : %s", L"N/A");
+        _tcscpy_s(strSel, L"Sel : N/A");
     long line = (long)m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS)) + 1;
     long column = (long)m_editor.Call(SCI_GETCOLUMN, m_editor.Call(SCI_GETCURRENTPOS)) + 1;
     swprintf_s(strLnCol, L"Ln : %ld    Col : %ld    %s",
@@ -1332,11 +1296,11 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     std::wstring ttdocsize = CStringUtils::Format(rsStatusTTDocSize, m_editor.Call(SCI_GETLENGTH), m_editor.Call(SCI_GETLINECOUNT));
     m_StatusBar.SetText(strDocLen, ttdocsize.c_str(), STATUSBAR_DOC_SIZE);
 
-    std::wstring tttyping = CStringUtils::Format(rsStatusTTTyping, m_editor.Call(SCI_GETOVERTYPE) ? (LPCWSTR)rsStatusTTTypingOvl : (LPCWSTR)rsStatusTTTypingIns);
+    std::wstring tttyping = CStringUtils::Format(rsStatusTTTyping, m_editor.Call(SCI_GETOVERTYPE) ? rsStatusTTTypingOvl.c_str() : rsStatusTTTypingIns.c_str());
     m_StatusBar.SetText(m_editor.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", nullptr, STATUSBAR_CAPS);
-    m_StatusBar.SetText(m_editor.Call(SCI_GETUSETABS) ? L"tabs" : L"spaces", (LPCWSTR)rsStatusTTTabSpaces, STATUSBAR_TABSPACE);
+    m_StatusBar.SetText(m_editor.Call(SCI_GETUSETABS) ? L"tabs" : L"spaces", rsStatusTTTabSpaces.c_str(), STATUSBAR_TABSPACE);
 
     int fontsize = (int)m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT);
     int zoom = (int)m_editor.Call(SCI_GETZOOM);
@@ -1366,12 +1330,12 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     }
 }
 
-bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
+bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool closingAll )
 {
     if ((tab < 0) || (tab >= m_TabBar.GetItemCount()))
         return false;
     CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
-    if (!force && (doc.m_bIsDirty||doc.m_bNeedsSaving))
+    if (!force && (doc.m_bIsDirty || doc.m_bNeedsSaving))
     {
         m_TabBar.ActivateAt(tab);
         if (!docloseall || !closealldoall)
@@ -1408,9 +1372,16 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */ )
     int docId = m_TabBar.GetIDFromIndex(tab);
     m_TabBar.DeleteItemAt(tab);
     m_DocManager.RemoveDocument(docId);
-    EnsureAtLeastOneTab();
-    int nextTab = (tab < m_TabBar.GetItemCount()) ? tab : m_TabBar.GetItemCount() - 1;
-    m_TabBar.ActivateAt(nextTab);
+    if (!closingAll)
+    {
+        if (m_TabBar.GetItemCount() == 0)
+            EnsureAtLeastOneTab();
+        else
+        {
+            int nextTab = (tab < m_TabBar.GetItemCount()) ? tab : m_TabBar.GetItemCount() - 1;
+            m_TabBar.ActivateAt(nextTab);
+        }
+    }
     return true;
 }
 
@@ -1425,9 +1396,12 @@ bool CMainWindow::CloseAllTabs()
     OnOutOfScope(docloseall = false;);
     do
     {
-        if (CloseTab(m_TabBar.GetItemCount()-1) == false)
+        if (CloseTab(m_TabBar.GetItemCount()-1, false, true) == false)
             return false;
-        if ((m_TabBar.GetItemCount() == 1)&&(m_editor.Call(SCI_GETTEXTLENGTH)==0)&&(m_editor.Call(SCI_GETMODIFY)==0)&&m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0)).m_path.empty())
+        if (m_TabBar.GetItemCount() == 1 &&
+            m_editor.Call(SCI_GETTEXTLENGTH) == 0 &&
+            m_editor.Call(SCI_GETMODIFY) == 0 &&
+            m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0)).m_path.empty())
             return true;
     } while (m_TabBar.GetItemCount() > 0);
     return true;
@@ -2073,7 +2047,7 @@ bool CMainWindow::HandleDoubleClick(const Scintilla::SCNotification& scn)
     }
 
     std::wstring url = CUnicodeUtils::StdGetUnicode(urltext);
-    while ((*url.begin() == '(') || (*url.begin() == ')') || (*url.begin() == ','))
+    while (*url.begin() == '(' || *url.begin() == ')' || *url.begin() == ',')
         url.erase(url.begin());
 
     SearchReplace(url, L"&amp;", L"&");
@@ -3089,7 +3063,7 @@ bool CMainWindow::OnMouseMove(UINT nFlags, POINT point)
 {
     if (m_bDragging)
     {
-        if ((nFlags & MK_LBUTTON) && (point.x != m_oldPt.x))
+        if ((nFlags & MK_LBUTTON) != 0 && (point.x != m_oldPt.x))
         {
             m_treeWidth = point.x;
             m_treeWidth = max(50, m_treeWidth);

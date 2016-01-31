@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -409,7 +409,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         // set to that dir, that dir can't be removed or renamed due to the lock.
         ::SetCurrentDirectory(CPathUtils::GetModuleDir().c_str());
 
-        mainWindow.EnsureAtLeastOneTab();
         // Main message loop:
         while (GetMessage(&msg, NULL, 0, 0))
         {
