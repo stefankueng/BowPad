@@ -1,0 +1,7 @@
+de
+fr
+ja
+pt_pt
+ro
+sv
+zh-CN
