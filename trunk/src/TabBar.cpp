@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -89,12 +89,6 @@ static void FillSolidRect(HDC hDC, int left, int top, int right, int bottom, COL
     ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rect, nullptr, 0, nullptr);
 }
 
-COLORREF CTabBar::m_activeTextColour = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNTEXT));
-COLORREF CTabBar::m_activeTopBarFocusedColour = CTheme::Instance().GetThemeColor(RGB(250, 170, 60));
-COLORREF CTabBar::m_activeTopBarUnfocusedColour = CTheme::Instance().GetThemeColor(RGB(250, 210, 150));
-COLORREF CTabBar::m_inactiveTextColour = CTheme::Instance().GetThemeColor(RGB(128, 128, 128));
-COLORREF CTabBar::m_inactiveBgColour = CTheme::Instance().GetThemeColor(RGB(192, 192, 192));
-
 
 CTabBar::CTabBar(HINSTANCE hInst)
     : CWindow(hInst)
@@ -120,6 +114,12 @@ CTabBar::CTabBar(HINSTANCE hInst)
     m_currentHoverTabRect = {};
     for (int i = 0; i < nbCtrlMax; ++i)
         m_hwndArray[i] = nullptr;
+
+   m_activeTextColour = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNTEXT));
+   m_activeTopBarFocusedColour = CTheme::Instance().GetThemeColor(RGB(250, 170, 60));
+   m_activeTopBarUnfocusedColour = CTheme::Instance().GetThemeColor(RGB(250, 210, 150));
+   m_inactiveTextColour = CTheme::Instance().GetThemeColor(RGB(128, 128, 128));
+   m_inactiveBgColour = CTheme::Instance().GetThemeColor(RGB(192, 192, 192));
 };
 
  CTabBar::~CTabBar()
