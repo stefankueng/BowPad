@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -136,11 +136,11 @@ private:
     int                         m_whichCloseClickDown;
     bool                        m_lmbdHit; // Left Mouse Button Down Hit
 
-    static COLORREF             m_activeTextColour;
-    static COLORREF             m_activeTopBarFocusedColour;
-    static COLORREF             m_activeTopBarUnfocusedColour;
-    static COLORREF             m_inactiveTextColour;
-    static COLORREF             m_inactiveBgColour;
+    COLORREF                    m_activeTextColour;
+    COLORREF                    m_activeTopBarFocusedColour;
+    COLORREF                    m_activeTopBarUnfocusedColour;
+    COLORREF                    m_inactiveTextColour;
+    COLORREF                    m_inactiveBgColour;
 
     int                         m_nControls;
     HWND                        m_hwndArray[nbCtrlMax];
