@@ -896,7 +896,7 @@ LRESULT CMainWindow::DoCommand(int id)
         break;
     default:
         {
-            ICommand * pCmd = CCommandHandler::Instance().GetCommand(id);
+            ICommand* pCmd = CCommandHandler::Instance().GetCommand(id);
             if (pCmd)
                 pCmd->Execute();
         }
@@ -1042,6 +1042,7 @@ void CMainWindow::HandleAfterInit()
         }
         else
         {
+            EnsureAtLeastOneTab();
             OpenFile(path.first, openFlags);
             if (path.second != (size_t)-1)
                 GoToLine(path.second);
