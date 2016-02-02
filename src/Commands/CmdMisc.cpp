@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2015 - Stefan Kueng
+// Copyright (C) 2014-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ CCmdToggleTheme::CCmdToggleTheme(void * obj)
     int dark = (int)CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0);
     if (dark)
     {
-        CTheme::Instance().SetDarkTheme(!CTheme::Instance().IsDarkTheme());
+        CTheme::Instance().SetDarkTheme(dark != 0);
         CTheme::Instance().SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
     }
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
