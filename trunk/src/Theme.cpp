@@ -44,8 +44,6 @@ CTheme& CTheme::Instance()
 
 void CTheme::Load()
 {
-    m_bLoaded = true;
-
     CSimpleIni themeIni;
 
     HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_DARKTHEME), L"config");
@@ -82,6 +80,8 @@ void CTheme::Load()
 
         m_colorMap[clr1] = clr2;
     }
+
+    dark = CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0) != 0;
 
     m_bLoaded = true;
 }
