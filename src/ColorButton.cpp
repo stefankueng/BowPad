@@ -27,7 +27,7 @@ namespace
 
     static inline std::wstring GetWindowText(HWND hwnd)
     {
-        wchar_t buf[20] = { 0 };    // we're dealing with color values, which are no longer than three chars
+        wchar_t buf[20]; // We're dealing with color values no longer than three chars.
         ::GetWindowText(hwnd, buf, _countof(buf));
         return buf;
     }
@@ -118,16 +118,9 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
             cc.hwndOwner = hwnd;
             cc.rgbResult = pColorButton->m_color;
             cc.lpCustColors = g_acrCustClr;
-            if (!IsWindows10OrGreater())
-            {
-                cc.Flags = CC_ANYCOLOR | CC_RGBINIT | CC_FULLOPEN;
-            }
-            else
-            {
-                cc.lCustData = (LPARAM)pColorButton;
-                cc.lpfnHook = CCHookProc;
-                cc.Flags = CC_ANYCOLOR | CC_RGBINIT | CC_ENABLEHOOK | CC_FULLOPEN;
-            }
+            cc.lCustData = (LPARAM)pColorButton;
+            cc.lpfnHook = CCHookProc;
+            cc.Flags = CC_ANYCOLOR | CC_RGBINIT | CC_ENABLEHOOK | CC_FULLOPEN;
 
             if (ChooseColor(&cc) == TRUE)
             {
@@ -169,7 +162,7 @@ void CColorButton::SetColor(COLORREF clr)
 UINT_PTR CALLBACK CColorButton::CCHookProc(
     _In_ HWND   hdlg,
     _In_ UINT   uiMsg,
-    _In_ WPARAM /*wParam*/,
+    _In_ WPARAM wParam,
     _In_ LPARAM lParam
     )
 {
@@ -187,6 +180,19 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
             assert(pColorBtn->m_colorEdits.size() == 6);
         }
         break;
+        case WM_KEYUP:
+        {
+            const CColorButton* pColorButton = reinterpret_cast<CColorButton*>(lParam);
+            auto scanCode = (char)(wParam << 16);
+            if (wParam == VK_CONTROL && scanCode == 'c')
+            {
+                auto color = pColorButton->m_color;
+                std::wstring info = CStringUtils::Format(L"RGB(%d,%d,%d)\n",
+                    (int)GetRValue(color), (int)GetGValue(color), (int)GetBValue(color));
+                WriteAsciiStringToClipboard(info.c_str(), hdlg);
+            }
+            break;
+        }
         case WM_CTLCOLOREDIT:
         {
             // InitDialog should have set this.
