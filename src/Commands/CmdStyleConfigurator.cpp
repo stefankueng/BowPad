@@ -294,19 +294,12 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         {
                             CDocument doc = GetActiveDocument();
                             if (doc.m_language == currentLang)
-                            {
-                                COLORREF fore = (COLORREF)ScintillaCall(SCI_STYLEGETFORE, styleKey);
-                                COLORREF back = (COLORREF)ScintillaCall(SCI_STYLEGETBACK, styleKey);
-                                m_fgColor.SetColor(fore);
-                                m_bkColor.SetColor(back);
                                 useDefault = false;
-                            }
                         }
-                        if (useDefault)
-                        {
-                            m_fgColor.SetColor(foundStyle->second.ForegroundColor);
-                            m_bkColor.SetColor(foundStyle->second.BackgroundColor);
-                        }
+                        COLORREF fgc = useDefault ? foundStyle->second.ForegroundColor : (COLORREF)ScintillaCall(SCI_STYLEGETFORE, styleKey);
+                        COLORREF bgc = useDefault ? foundStyle->second.BackgroundColor : (COLORREF)ScintillaCall(SCI_STYLEGETBACK, styleKey);
+                        m_fgColor.SetColor(fgc);
+                        m_bkColor.SetColor(bgc);
                     }
                 }
             }
@@ -342,15 +335,25 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                 switch (id)
                 {
                 case IDC_FG_BTN:
-                    CLexStyles::Instance().SetUserForeground(lexID, styleKey, m_fgColor.GetColor());
+                {
+                    const auto& theme = CTheme::Instance();
+                    bool dark = theme.IsDarkTheme();
+                    auto fgcolor = dark ? theme.GetThemeColor(m_fgColor.GetColor()) : m_fgColor.GetColor();
+                    CLexStyles::Instance().SetUserForeground(lexID, styleKey, fgcolor);
                     if (updateView)
-                        ScintillaCall(SCI_STYLESETFORE, styleKey, m_fgColor.GetColor());
+                        ScintillaCall(SCI_STYLESETFORE, styleKey, fgcolor);
                     break;
+                }
                 case IDC_BK_BTN:
-                    CLexStyles::Instance().SetUserBackground(lexID, styleKey, m_bkColor.GetColor());
+                {
+                    const auto& theme = CTheme::Instance();
+                    bool dark = theme.IsDarkTheme();
+                    auto bgcolor = dark ? theme.GetThemeColor(m_bkColor.GetColor()) : m_bkColor.GetColor();
+                    CLexStyles::Instance().SetUserBackground(lexID, styleKey, bgcolor);
                     if (updateView)
-                        ScintillaCall(SCI_STYLESETBACK, styleKey, m_bkColor.GetColor());
+                        ScintillaCall(SCI_STYLESETBACK, styleKey, bgcolor);
                     break;
+                }
                 case IDC_FONTCOMBO:
                     {
                         if (msg == CBN_SELCHANGE)
@@ -473,10 +476,6 @@ bool CCmdStyleConfigurator::Execute()
     if (g_pStyleConfiguratorDlg == nullptr)
         g_pStyleConfiguratorDlg = std::make_unique<CStyleConfiguratorDlg>(m_Obj);
 
-    if (CTheme::Instance().IsDarkTheme())
-    {
-        SendMessage(GetHwnd(), WM_COMMAND, MAKEWPARAM(cmdToggleTheme, 1), 0);
-    }
     g_pStyleConfiguratorDlg->ShowModeless(hRes, IDD_STYLECONFIGURATOR, GetHwnd());
 
     return true;
