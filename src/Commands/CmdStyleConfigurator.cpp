@@ -443,6 +443,27 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
     return 1;
 }
 
+bool CStyleConfiguratorDlg::PreTranslateMessage(MSG * pMsg)
+{
+    if (pMsg->message == WM_KEYDOWN)
+    {
+        if (pMsg->wParam == 'C')
+        {
+            if (GetKeyState(VK_CONTROL)&0x8000)
+            {
+                auto fgcolor = m_fgColor.GetColor();
+                auto bgcolor = m_bkColor.GetColor();
+                std::wstring info = CStringUtils::Format(L"Background RGB(%d,%d,%d)\nForeground RGB(%d,%d,%d)\n",
+                                                         (int)GetRValue(bgcolor), (int)GetGValue(bgcolor), (int)GetBValue(bgcolor),
+                                                         (int)GetRValue(fgcolor), (int)GetGValue(fgcolor), (int)GetBValue(fgcolor));
+                WriteAsciiStringToClipboard(info.c_str(), *this);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void CStyleConfiguratorDlg::SelectStyle( int style )
 {
     auto hStyleCombo = GetDlgItem(*this, IDC_STYLECOMBO);
@@ -476,7 +497,7 @@ bool CCmdStyleConfigurator::Execute()
     if (g_pStyleConfiguratorDlg == nullptr)
         g_pStyleConfiguratorDlg = std::make_unique<CStyleConfiguratorDlg>(m_Obj);
 
-    g_pStyleConfiguratorDlg->ShowModeless(hRes, IDD_STYLECONFIGURATOR, GetHwnd());
+    g_pStyleConfiguratorDlg->ShowModeless(hRes, IDD_STYLECONFIGURATOR, GetHwnd(), 0);
 
     return true;
 }

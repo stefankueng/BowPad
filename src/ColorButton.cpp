@@ -180,19 +180,6 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
             assert(pColorBtn->m_colorEdits.size() == 6);
         }
         break;
-        case WM_KEYUP:
-        {
-            const CColorButton* pColorButton = reinterpret_cast<CColorButton*>(lParam);
-            auto scanCode = (char)(wParam << 16);
-            if (wParam == VK_CONTROL && scanCode == 'c')
-            {
-                auto color = pColorButton->m_color;
-                std::wstring info = CStringUtils::Format(L"RGB(%d,%d,%d)\n",
-                    (int)GetRValue(color), (int)GetGValue(color), (int)GetBValue(color));
-                WriteAsciiStringToClipboard(info.c_str(), hdlg);
-            }
-            break;
-        }
         case WM_CTLCOLOREDIT:
         {
             // InitDialog should have set this.
