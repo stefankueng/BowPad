@@ -33,7 +33,6 @@ public:
 protected:
     LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT                 DoCommand(int id, int msg);
-    bool                    PreTranslateMessage(MSG* pMsg);
 
     bool            Execute() override { return true; }
     UINT            GetCmdId() override { return 0; }
