@@ -65,7 +65,7 @@ std::wstring CDocument::GetEncodingString()
         sEnc = L"ANSI";
         break;
     default:
-        if (m_encoding == GetACP())
+        if ((UINT)m_encoding == GetACP())
             sEnc = L"ANSI";
         else
             sEnc = CStringUtils::Format(L"codepage: %d", m_encoding);
