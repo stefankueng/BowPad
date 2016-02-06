@@ -990,14 +990,6 @@ void CMainWindow::HandleCreate(HWND hwnd)
     m_hwnd = hwnd;
     Initialize();
 
-    auto t = std::thread([=]
-    {
-        bool bNewer = CAppUtils::CheckForUpdate(false);
-        if (bNewer)
-            PostMessage(m_hwnd, WM_UPDATEAVAILABLE, 0, 0);
-    });
-    t.detach();
-
     PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
 
     if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
@@ -1015,8 +1007,9 @@ void CMainWindow::HandleCreate(HWND hwnd)
         if (SUCCEEDED(hr))
         {
             pTaskbarInterface->SetOverlayIcon(m_hwnd, m_hShieldIcon, L"elevated");
-        }
     }
+    EnsureAtLeastOneTab();
+}
 }
 
 void CMainWindow::HandleAfterInit()
@@ -1062,6 +1055,14 @@ void CMainWindow::HandleAfterInit()
         m_tabmovesavepath.clear();
     }
     EnsureAtLeastOneTab();
+
+    auto t = std::thread([ = ]
+    {
+        bool bNewer = CAppUtils::CheckForUpdate(false);
+        if (bNewer)
+            PostMessage(m_hwnd, WM_UPDATEAVAILABLE, 0, 0);
+    });
+    t.detach();
 }
 
 void CMainWindow::ResizeChildWindows()
