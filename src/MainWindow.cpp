@@ -381,11 +381,8 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.hCursor = LoadCursor(NULL, (LPTSTR)IDC_SIZEWE);
     if (RegisterWindow(&wcx))
     {
-        if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, nullptr))
-        {
-            UpdateWindow(*this);
+        if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_VISIBLE, nullptr))
             return true;
-        }
     }
     return false;
 }
@@ -595,7 +592,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     break;
                 case SCN_DOUBLECLICK:
                     return HandleDoubleClick(scn);
-                    break;
                 case SCN_DWELLSTART:
                     HandleDwellStart(scn);
                     break;
@@ -685,8 +681,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         // be showing any window and needing to use it.
         if (!m_windowRestored)
         {
+            m_windowRestored = true; // Do now to avoid recursion which I've seen occasionaly.
             CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
-            m_windowRestored = true;
         }
     }
         break;
@@ -734,49 +730,50 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         }
         break;
     case WM_STATUSBAR_MSG:
-    {
-        switch (wParam)
-        {
-            case WM_LBUTTONDBLCLK:
-            {
-                switch (lParam)
-                {
-                    case STATUSBAR_EOF_FORMAT:
-                        HandleStatusBarEOFFormat();
-                        break;
-                    case STATUSBAR_TABSPACE:
-                        m_editor.Call(SCI_SETUSETABS, !m_editor.Call(SCI_GETUSETABS));
-                        break;
-                    case STATUSBAR_TYPING_MODE:
-                        m_editor.Call(SCI_EDITTOGGLEOVERTYPE);
-                        break;
-                    case STATUSBAR_ZOOM:
-                        m_editor.Call(SCI_SETZOOM, 0);
-                        break;
-                }
-                UpdateStatusBar(true);
-            }
-                break;
-            case WM_CONTEXTMENU:
-            {
-                switch (lParam)
-                {
-                    case STATUSBAR_ZOOM:
-                        HandleStatusBarZoom();
-                        break;
-                }
-            }
-                break;
-            default:
-                break;
-        }
-    }
+        HandleStatusBar(wParam, lParam);
         break;
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
 
     return 0;
+}
+
+void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
+{
+    switch (wParam)
+    {
+    case WM_LBUTTONDBLCLK:
+    {
+        switch (lParam)
+        {
+        case STATUSBAR_EOF_FORMAT:
+            HandleStatusBarEOFFormat();
+            break;
+        case STATUSBAR_TABSPACE:
+            m_editor.Call(SCI_SETUSETABS, !m_editor.Call(SCI_GETUSETABS));
+            break;
+        case STATUSBAR_TYPING_MODE:
+            m_editor.Call(SCI_EDITTOGGLEOVERTYPE);
+            break;
+        case STATUSBAR_ZOOM:
+            m_editor.Call(SCI_SETZOOM, 0);
+            break;
+        }
+        UpdateStatusBar(true);
+    }
+    break;
+    case WM_CONTEXTMENU:
+    {
+        switch (lParam)
+        {
+        case STATUSBAR_ZOOM:
+            HandleStatusBarZoom();
+            break;
+        }
+    }
+    break;
+    }
 }
 
 void CMainWindow::HandleStatusBarEOFFormat()
@@ -941,7 +938,7 @@ bool CMainWindow::Initialize()
     m_editor.Init(hResource, *this);
     m_scratchEditor.InitScratch(hResource);
     // Each value is the right edge of each status bar element.
-    m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 870, 920, 1000});
+    m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 865, 925, 1010});
     m_TabBar.Init(hResource, *this);
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
     HICON hIcon = ::LoadIcon(hResource, MAKEINTRESOURCE(IDI_SAVED_ICON));
@@ -1003,13 +1000,12 @@ void CMainWindow::HandleCreate(HWND hwnd)
     if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
     {
         ITaskbarList3Ptr pTaskbarInterface;
-        HRESULT hr = CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pTaskbarInterface));
+        HRESULT hr = CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pTaskbarInterface));
         if (SUCCEEDED(hr))
         {
             pTaskbarInterface->SetOverlayIcon(m_hwnd, m_hShieldIcon, L"elevated");
+        }
     }
-    EnsureAtLeastOneTab();
-}
 }
 
 void CMainWindow::HandleAfterInit()
@@ -1035,12 +1031,12 @@ void CMainWindow::HandleAfterInit()
         }
         else
         {
-            EnsureAtLeastOneTab();
             OpenFile(path.first, openFlags);
             if (path.second != (size_t)-1)
                 GoToLine(path.second);
         }
     }
+    m_pathsToOpen.clear();
     m_bPathsToOpenMRU = true;
     if (!m_elevatepath.empty())
     {
@@ -1284,25 +1280,30 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     if (m_editor.GetSelectedCount(selByte, selLine) && selByte)
         swprintf_s(strSel, rsStatusSelection, selByte, selLine, selTextMarkerCount);
     else
-        _tcscpy_s(strSel, L"Sel : N/A");
-    long line = (long)m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS)) + 1;
-    long column = (long)m_editor.Call(SCI_GETCOLUMN, m_editor.Call(SCI_GETCURRENTPOS)) + 1;
-    swprintf_s(strLnCol, L"Ln : %ld    Col : %ld    %s",
+        _tcscpy_s(strSel, L"Sel: N/A");
+    auto curPos = m_editor.Call(SCI_GETCURRENTPOS);
+    long line = (long)m_editor.Call(SCI_LINEFROMPOSITION, curPos) + 1;
+    long column = (long)m_editor.Call(SCI_GETCOLUMN, curPos) + 1;
+    swprintf_s(strLnCol, L"Ln: %ld    Col: %ld    %s",
                line, column,
                strSel);
-    std::wstring ttcurpos = CStringUtils::Format(rsStatusTTCurPos, line, column, selByte, selLine, selTextMarkerCount);
+    std::wstring ttcurpos = CStringUtils::Format(rsStatusTTCurPos,
+        line, column, selByte, selLine, selTextMarkerCount);
     m_StatusBar.SetText(strLnCol, ttcurpos.c_str(), STATUSBAR_CUR_POS);
 
     TCHAR strDocLen[256];
-    swprintf_s(strDocLen, L"length : %d    lines : %d", (int)m_editor.Call(SCI_GETLENGTH), (int)m_editor.Call(SCI_GETLINECOUNT));
-    std::wstring ttdocsize = CStringUtils::Format(rsStatusTTDocSize, m_editor.Call(SCI_GETLENGTH), m_editor.Call(SCI_GETLINECOUNT));
+    auto lengthInBytes = m_editor.Call(SCI_GETLENGTH);
+    auto lineCount = m_editor.Call(SCI_GETLINECOUNT);
+    swprintf_s(strDocLen, L"Length: %d    Lines: %d", (int)lengthInBytes, (int)lineCount);
+    std::wstring ttdocsize = CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, lineCount);
     m_StatusBar.SetText(strDocLen, ttdocsize.c_str(), STATUSBAR_DOC_SIZE);
 
-    std::wstring tttyping = CStringUtils::Format(rsStatusTTTyping, m_editor.Call(SCI_GETOVERTYPE) ? rsStatusTTTypingOvl.c_str() : rsStatusTTTypingIns.c_str());
-    m_StatusBar.SetText(m_editor.Call(SCI_GETOVERTYPE) ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
+    auto overType = m_editor.Call(SCI_GETOVERTYPE);
+    std::wstring tttyping = CStringUtils::Format(rsStatusTTTyping, overType ? rsStatusTTTypingOvl.c_str() : rsStatusTTTypingIns.c_str());
+    m_StatusBar.SetText(overType ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", nullptr, STATUSBAR_CAPS);
-    m_StatusBar.SetText(m_editor.Call(SCI_GETUSETABS) ? L"tabs" : L"spaces", rsStatusTTTabSpaces.c_str(), STATUSBAR_TABSPACE);
+    m_StatusBar.SetText(m_editor.Call(SCI_GETUSETABS) ? L"Tabs" : L"Spaces", rsStatusTTTabSpaces.c_str(), STATUSBAR_TABSPACE);
 
     int fontsize = (int)m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT);
     int zoom = (int)m_editor.Call(SCI_GETZOOM);
@@ -1321,8 +1322,9 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
         std::wstring ttencoding = CStringUtils::Format(rsStatusTTEncoding, doc.GetEncodingString().c_str());
         m_StatusBar.SetText(doc.GetEncodingString().c_str(), ttencoding.c_str(), STATUSBAR_UNICODE_TYPE);
 
-        std::wstring tttabs = CStringUtils::Format(rsStatusTTTabs, m_TabBar.GetItemCount());
-        m_StatusBar.SetText(CStringUtils::Format(L"tabs: %d", m_TabBar.GetItemCount()).c_str(), tttabs.c_str(), STATUSBAR_TABS);
+        auto tabCount = m_TabBar.GetItemCount();
+        std::wstring tttabs = CStringUtils::Format(rsStatusTTTabs, tabCount);
+        m_StatusBar.SetText(CStringUtils::Format(L"Open: %d", tabCount).c_str(), tttabs.c_str(), STATUSBAR_TABS);
 
         if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
         {

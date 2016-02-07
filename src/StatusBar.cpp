@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ static void DrawSizeGrip(HDC hdc, LPCRECT lpRect)
 
     hPenFace = CreatePen( PS_SOLID, 1, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
     hOldPen = (HPEN)SelectObject( hdc, hPenFace );
-    MoveToEx(hdc, pt.x - 12, pt.y, NULL);
+    MoveToEx(hdc, pt.x - 12, pt.y, nullptr);
     LineTo(hdc, pt.x, pt.y);
     LineTo(hdc, pt.x, pt.y - 13);
 
@@ -41,10 +41,10 @@ static void DrawSizeGrip(HDC hdc, LPCRECT lpRect)
     SelectObject( hdc, hPenShadow );
     for (i = 1; i < 11; i += 4)
     {
-        MoveToEx (hdc, pt.x - i, pt.y, NULL);
+        MoveToEx (hdc, pt.x - i, pt.y, nullptr);
         LineTo (hdc, pt.x + 1, pt.y - i - 1);
 
-        MoveToEx (hdc, pt.x - i - 1, pt.y, NULL);
+        MoveToEx (hdc, pt.x - i - 1, pt.y, nullptr);
         LineTo (hdc, pt.x + 1, pt.y - i - 2);
     }
 
@@ -52,7 +52,7 @@ static void DrawSizeGrip(HDC hdc, LPCRECT lpRect)
     SelectObject( hdc, hPenHighlight );
     for (i = 3; i < 13; i += 4)
     {
-        MoveToEx (hdc, pt.x - i, pt.y, NULL);
+        MoveToEx (hdc, pt.x - i, pt.y, nullptr);
         LineTo (hdc, pt.x + 1, pt.y - i - 1);
     }
 
@@ -90,10 +90,8 @@ static void DrawPart(HWND hWnd, HDC hdc, int itemID)
     DrawText(hdc, textbuf.get(), -1, &rcPart, DT_LEFT|DT_SINGLELINE|DT_VCENTER);
 }
 
-static void RefreshPart(HWND hWnd, HDC hdc, int itemID)
+static void RefreshPart(HWND hWnd, HDC hdc, HBRUSH hbrBk, int itemID)
 {
-    HBRUSH hbrBk;
-
     RECT rcPart;
     SendMessage(hWnd, SB_GETRECT, itemID, (LPARAM)&rcPart);
     if (rcPart.right < rcPart.left)
@@ -102,10 +100,7 @@ static void RefreshPart(HWND hWnd, HDC hdc, int itemID)
     if (!RectVisible(hdc, &rcPart))
         return;
 
-    hbrBk = CreateSolidBrush(CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
     FillRect(hdc, &rcPart, hbrBk);
-    DeleteObject (hbrBk);
-
     DrawPart (hWnd, hdc, itemID);
 }
 
@@ -122,16 +117,16 @@ static LRESULT Refresh(HWND hWnd, HDC hdc)
 
     hbrBk = CreateSolidBrush(CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
     FillRect(hdc, &rect, hbrBk);
-    DeleteObject(hbrBk);
 
     HFONT hFont = (HFONT)SendMessage(hWnd, WM_GETFONT, 0, 0);
 
     hOldFont = (HFONT)SelectObject(hdc, hFont);
     int numparts = (int)SendMessage(hWnd, SB_GETPARTS, 0, 0);
     for (int i = 0; i < numparts; i++)
-        RefreshPart(hWnd, hdc, i);
+        RefreshPart(hWnd, hdc, hbrBk, i);
 
     SelectObject(hdc, hOldFont);
+    DeleteObject(hbrBk);
 
     if (GetWindowLongW(hWnd, GWL_STYLE) & SBARS_SIZEGRIP)
         DrawSizeGrip(hdc, &rect);
