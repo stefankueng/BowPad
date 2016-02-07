@@ -162,6 +162,7 @@ private:
     bool                        OnLButtonUp(UINT nFlags, POINT point);
     void                        HandleStatusBarEOFFormat();
     void                        HandleStatusBarZoom();
+    void                        HandleStatusBar(WPARAM wParam, LPARAM lParam);
 
 private:
     LONG                        m_cRef;
