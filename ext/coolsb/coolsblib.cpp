@@ -36,7 +36,7 @@
 #include "userdefs.h"
 #include "coolsb_internal.h"
 
-static TCHAR szPropStr[] = _T("CoolSBSubclassPtr");
+static const TCHAR szPropStr[] = _T("CoolSBSubclassPtr");
 
 LRESULT CALLBACK CoolSBWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -79,9 +79,12 @@ BOOL GetScrollRect(SCROLLWND *sw, UINT nBar, HWND hwnd, RECT *rect);
 //  using Detours (or any other LIB??)
 //
 
-static BOOL (WINAPI * pEnableScrollBar) (HWND, UINT, UINT) = 0;
+using EnableScrollBarRoutine = BOOL(WINAPI *) (HWND, UINT, UINT);
 
-void WINAPI CoolSB_SetESBProc(void *proc)
+
+static EnableScrollBarRoutine pEnableScrollBar = nullptr;
+
+void WINAPI CoolSB_SetESBProc(EnableScrollBarRoutine proc)
 {
     pEnableScrollBar = proc;
 }

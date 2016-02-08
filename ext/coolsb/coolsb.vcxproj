@@ -130,8 +130,8 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="coolsblib.c" />
-    <ClCompile Include="coolscroll.c" />
+    <ClCompile Include="coolsblib.cpp" />
+    <ClCompile Include="coolscroll.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="coolsb_internal.h" />

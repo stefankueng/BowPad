@@ -92,16 +92,6 @@ static UINT uScrollTimerPortion = HTSCROLL_NONE;
 static UINT uScrollTimerId = 0;
 static HWND hwndCurCoolSB = 0;
 
-//
-//  Provide this so there are NO dependencies on CRT
-//
-static void CoolSB_ZeroMemory(void *ptr, DWORD bytes)
-{
-    BYTE *bptr = (BYTE *)ptr;
-
-    while(bytes--) *bptr++ = 0;
-}
-
 BOOL WINAPI CoolSB_IsThumbTracking(HWND hwnd)
 {
     SCROLLWND *sw;
@@ -197,14 +187,14 @@ static int DrawScrollArrow(SCROLLBAR *sbar, HDC hdc, RECT *rect, UINT arrow, BOO
         hdcmem1 = CreateCompatibleDC(hdc);
         hbm1    = CreateBitmap(width, height, 1, 1, NULL);
         UnrealizeObject(hbm1);
-        oldbm1  = SelectObject(hdcmem1, hbm1);
+        oldbm1  = SelectBitmap(hdcmem1, hbm1);
 
 
         //NORMAL bitmap to draw the arrow into
         hdcmem2 = CreateCompatibleDC(hdc);
         hbm2    = CreateCompatibleBitmap(hdc, width, height);
         UnrealizeObject(hbm2);
-        oldbm2  = SelectObject(hdcmem2, hbm2);
+        oldbm2  = SelectBitmap(hdcmem2, hbm2);
 
 
         flags = flags & ~DFCS_PUSHED | DFCS_FLAT;   //just in case
@@ -233,7 +223,7 @@ static int DrawScrollArrow(SCROLLBAR *sbar, HDC hdc, RECT *rect, UINT arrow, BOO
         else if(fMouseOver)
         {
             SetBkColor(hdcmem2, GetSysColor(COLOR_BTNTEXT));
-            FillRect(hdcmem1, &rc, GetStockObject(WHITE_BRUSH));
+            FillRect(hdcmem1, &rc, GetStockBrush(WHITE_BRUSH));
             BitBlt(hdcmem1, 0, 0, width, height, hdcmem2, 0, 0, SRCINVERT);
 
             SetBkColor(hdc, GetSysColor(COLOR_3DSHADOW));
@@ -335,7 +325,7 @@ static COLORREF GetSBBackColor(void)
 //
 static void DrawCheckedRect(HDC hdc, RECT *rect, COLORREF fg, COLORREF bg)
 {
-    static WORD wCheckPat[8] =
+    static const WORD wCheckPat[8] =
     {
         0xaaaa, 0x5555, 0xaaaa, 0x5555, 0xaaaa, 0x5555, 0xaaaa, 0x5555
     };
@@ -683,9 +673,8 @@ static UINT GetVertScrollPortion(SCROLLBAR *sb, HWND hwnd, RECT *rect, int x, in
 static LRESULT PostCustomPrePostPaint0(HWND hwnd, HDC hdc, SCROLLBAR *sb, UINT dwStage)
 {
 #ifdef CUSTOM_DRAW
-    NMCSBCUSTOMDRAW nmcd;
+    NMCSBCUSTOMDRAW nmcd{};
 
-    CoolSB_ZeroMemory(&nmcd, sizeof nmcd);
     nmcd.hdr.hwndFrom = hwnd;
     nmcd.hdr.idFrom   = GetWindowLongPtr(hwnd, GWL_ID);
     nmcd.hdr.code     = NM_COOLSB_CUSTOMDRAW;
@@ -788,9 +777,10 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
 {
     SCROLLINFO *si;
     RECT ctrl, thumb, fullpage;
+    RECT lrect = *rect;
     RECT sbm;
     int butwidth     = GetScrollMetric(sb, SM_SCROLL_LENGTH);
-    int scrollwidth  = rect->right-rect->left;
+    int scrollwidth  = lrect.right-lrect.left;
     int workingwidth = scrollwidth - butwidth*2;
     int thumbwidth   = 0, thumbpos = 0;
     int siMaxMin;
@@ -815,12 +805,12 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
     if(scrollwidth <= 0)
         return 0;
 
-    RotateRect0(sb, rect);
+    RotateRect0(sb, &lrect);
     HDC hdc = CreateCompatibleDC(hdcorig);
-    HBITMAP hBitmap = CreateCompatibleBitmap(hdcorig, rect->right - rect->left, rect->bottom - rect->top);
+    HBITMAP hBitmap = CreateCompatibleBitmap(hdcorig, lrect.right - lrect.left, lrect.bottom - lrect.top);
     HBITMAP hOldBitmap = (HBITMAP)SelectObject(hdc, hBitmap);
-    SetWindowOrgEx(hdc, rect->left, rect->top, NULL);
-    RotateRect0(sb, rect);
+    SetWindowOrgEx(hdc, lrect.left, lrect.top, NULL);
+    RotateRect0(sb, &lrect);
 
 
     si = &sb->scrollInfo;
@@ -831,7 +821,7 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
     //
     // work out the thumb size and position
     //
-    CalcThumbSize(sb, rect, &thumbwidth, &thumbpos);
+    CalcThumbSize(sb, &lrect, &thumbwidth, &thumbpos);
 
     if(sb->fScrollFlags & ESB_DISABLE_LEFT)     uLeftButFlags  |= DFCS_INACTIVE;
     if(sb->fScrollFlags & ESB_DISABLE_RIGHT)    uRightButFlags |= DFCS_INACTIVE;
@@ -869,13 +859,13 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
     if(scrollwidth > butwidth*2)
     {
         //FULL PAGE
-        SetRect(&fullpage, rect->left+butwidth, rect->top, rect->right-butwidth, rect->bottom);
+        SetRect(&fullpage, lrect.left+butwidth, lrect.top, lrect.right-butwidth, lrect.bottom);
         RotateRect0(sb, &fullpage);
         if(fCustomDraw)
             PostCustomDrawNotify(hwnd, hdc, sb->nBarType, &fullpage, HTSCROLL_PAGEFULL, fMouseDownL, 0, 0);
 
         //LEFT ARROW
-        SetRect(&ctrl, rect->left, rect->top, rect->left + butwidth, rect->bottom);
+        SetRect(&ctrl, lrect.left, lrect.top, lrect.left + butwidth, lrect.bottom);
 
         RotateRect0(sb, &ctrl);
 
@@ -892,7 +882,7 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
             && IsScrollInfoActive(si) && ((sb->fScrollFlags & ESB_DISABLE_BOTH) != ESB_DISABLE_BOTH))
         {
             //Draw the scrollbar margin above the thumb
-            SetRect(&sbm, rect->left + butwidth, rect->top, thumbpos, rect->bottom);
+            SetRect(&sbm, lrect.left + butwidth, lrect.top, thumbpos, lrect.bottom);
 
             RotateRect0(sb, &sbm);
 
@@ -913,7 +903,7 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
 
             //Draw the margin below the thumb
             sbm.left = thumbpos+thumbwidth;
-            sbm.right = rect->right - butwidth;
+            sbm.right = lrect.right - butwidth;
 
             RotateRect0(sb, &sbm);
             if(fCustomDraw)
@@ -931,7 +921,7 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
             RotateRect0(sb, &sbm);
 
             //Draw the THUMB finally
-            SetRect(&thumb, thumbpos, rect->top, thumbpos+thumbwidth, rect->bottom);
+            SetRect(&thumb, thumbpos, lrect.top, thumbpos+thumbwidth, lrect.bottom);
 
             RotateRect0(sb, &thumb);
 
@@ -961,7 +951,7 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
         else
         {
             OffsetRect(&ctrl, butwidth, 0);
-            ctrl.right = rect->right - butwidth;
+            ctrl.right = lrect.right - butwidth;
 
             //if we always show the thumb covering the whole scrollbar,
             //then draw it that way
@@ -1014,7 +1004,7 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
         }
 
         //RIGHT ARROW
-        SetRect(&ctrl, rect->right - butwidth, rect->top, rect->right, rect->bottom);
+        SetRect(&ctrl, lrect.right - butwidth, lrect.top, lrect.right, lrect.bottom);
 
         RotateRect0(sb, &ctrl);
 
@@ -1030,13 +1020,13 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
     {
         butwidth = scrollwidth / 2;
         //FULL PAGE
-        SetRect(&fullpage, rect->left+butwidth, rect->top, rect->right-butwidth, rect->bottom);
+        SetRect(&fullpage, lrect.left+butwidth, lrect.top, lrect.right-butwidth, lrect.bottom);
         RotateRect0(sb, &fullpage);
         if(fCustomDraw)
             PostCustomDrawNotify(hwnd, hdc, sb->nBarType, &fullpage, HTSCROLL_PAGEFULL, fMouseDownL, 0, 0);
 
         //LEFT ARROW
-        SetRect(&ctrl, rect->left, rect->top, rect->left + butwidth, rect->bottom);
+        SetRect(&ctrl, lrect.left, lrect.top, lrect.left + butwidth, lrect.bottom);
 
         RotateRect0(sb, &ctrl);
         if(fCustomDraw)
@@ -1057,7 +1047,7 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
 
         //if there is a gap between the buttons, fill it with a solid color
         //if(butwidth & 0x0001)
-        if(ctrl.left != rect->left + butwidth)
+        if(ctrl.left != lrect.left + butwidth)
         {
             ctrl.left --;
             ctrl.right -= butwidth;
@@ -1077,13 +1067,13 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
     PostCustomPrePostPaint(hwnd, hdc, sb, CDDS_POSTPAINT);
 #endif
 
-    RotateRect0(sb, rect);
-    BitBlt(hdcorig, rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top, hdc, rect->left, rect->top, SRCCOPY);
-    RotateRect0(sb, rect);
+    RotateRect0(sb, &lrect);
+    BitBlt(hdcorig, lrect.left, lrect.top, lrect.right - lrect.left, lrect.bottom - lrect.top, hdc, lrect.left, lrect.top, SRCCOPY);
+    RotateRect0(sb, &lrect);
 
     //Swap back the original bitmap.
-    SelectObject(hdc, hOldBitmap);
-    DeleteObject(hBitmap);
+    SelectBitmap(hdc, hOldBitmap);
+    DeleteBitmap(hBitmap);
     DeleteDC(hdc);
 
     return fCustomDraw;
@@ -3137,9 +3127,8 @@ static LRESULT CoolSB_SetCursor(SCROLLWND *swnd, HWND hwnd, WPARAM wParam, LPARA
 static void __stdcall RelayMouseEvent(HWND hwnd, HWND hwndToolTip, UINT event)
 {
 #ifdef COOLSB_TOOLTIPS
-    MSG msg;
+    MSG msg{};
 
-    CoolSB_ZeroMemory(&msg, sizeof(MSG));
     msg.hwnd = hwnd;
     msg.message = event;
 
