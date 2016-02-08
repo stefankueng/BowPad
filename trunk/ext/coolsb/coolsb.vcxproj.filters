@@ -11,10 +11,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="coolsblib.c">
+    <ClCompile Include="coolscroll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="coolscroll.c">
+    <ClCompile Include="coolsblib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
