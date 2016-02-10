@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -589,7 +589,7 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
         if (!result || bytesWritten != 2)
         {
             CFormatMessageWrapper errMsg;
-            err = (wchar_t) errMsg;
+            err = errMsg;
             return false;
         }
     }
@@ -612,7 +612,7 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
         if (!WriteFile(hFile, widebuf.get(), widelen*2, &bytesWritten, nullptr) || widelen != int(bytesWritten/2))
         {
             CFormatMessageWrapper errMsg;
-            err = (wchar_t) errMsg;
+            err = errMsg;
             return false;
         }
         writeBuf += charStart;
@@ -635,7 +635,7 @@ static bool SaveAsUtf32(const CDocument& doc, char*buf, size_t lengthDoc, CAutoF
     if (!result || bytesWritten != 4)
     {
         CFormatMessageWrapper errMsg;
-        err = (wchar_t) errMsg;
+        err = errMsg;
         return false;
     }
     char * writeBuf = buf;
@@ -677,7 +677,7 @@ static bool SaveAsUtf32(const CDocument& doc, char*buf, size_t lengthDoc, CAutoF
         if (!WriteFile(hFile, writeWide32buf.get(), widelen*4, &bytesWritten, nullptr) || widelen != int(bytesWritten/4))
         {
             CFormatMessageWrapper errMsg;
-            err = (wchar_t) errMsg;
+            err = errMsg;
             return false;
         }
         writeBuf += charStart;
@@ -695,7 +695,7 @@ static bool SaveAsUtf8(const CDocument& doc, char* buf, size_t lengthDoc, CAutoF
         if (!WriteFile(hFile, "\xEF\xBB\xBF", 3, &bytesWritten, nullptr) || bytesWritten != 3)
         {
             CFormatMessageWrapper errMsg;
-            err = (wchar_t) errMsg;
+            err = errMsg;
             return false;
         }
     }
@@ -705,7 +705,7 @@ static bool SaveAsUtf8(const CDocument& doc, char* buf, size_t lengthDoc, CAutoF
         if (!WriteFile(hFile, buf, writeLen, &bytesWritten, nullptr))
         {
             CFormatMessageWrapper errMsg;
-            err = (wchar_t) errMsg;
+            err = errMsg;
             return false;
         }
         lengthDoc -= writeLen;
@@ -731,7 +731,7 @@ static bool SaveAsOther(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
         if (!WriteFile(hFile, charbuf.get(), charlen, &bytesWritten, nullptr) || charlen != int(bytesWritten))
         {
             CFormatMessageWrapper errMsg;
-            err = (wchar_t) errMsg;
+            err = errMsg;
             return false;
         }
         writeBuf += charStart;
