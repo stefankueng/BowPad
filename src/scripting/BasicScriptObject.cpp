@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2015 - Stefan Kueng
+// Copyright (C) 2014-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -326,6 +326,8 @@ BasicScriptObject::BasicScriptObject(void * obj)
             { L"SciStartStyling", SCI_STARTSTYLING, SCI_STARTSTYLING, VT_NULL, VT_INT, VT_NULL },
             { L"SciSetStyling", SCI_SETSTYLING, SCI_SETSTYLING, VT_NULL, VT_INT, VT_INT },
             { L"SciSetStylingEx", SCI_SETSTYLINGEX, SCI_SETSTYLINGEX, VT_NULL, VT_INT, VT_BSTR },
+            { L"SciSetIdleStyling", SCI_SETIDLESTYLING, SCI_SETIDLESTYLING , VT_NULL, VT_INT, VT_NULL },
+            { L"SciGetIdleStyling", SCI_SETIDLESTYLING, SCI_GETIDLESTYLING , VT_INT, VT_NULL, VT_NULL },
             { L"SciSetLineState", SCI_SETLINESTATE, SCI_SETLINESTATE, VT_NULL, VT_INT, VT_INT },
             { L"SciGetLineState", SCI_GETLINESTATE, SCI_GETLINESTATE, VT_INT, VT_INT, VT_NULL },
             { L"SciGetMaxLineState", SCI_GETMAXLINESTATE, SCI_GETMAXLINESTATE, VT_INT, VT_NULL, VT_NULL },
