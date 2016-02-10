@@ -206,6 +206,17 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
     NMHDR *hdr = (NMHDR *)lParam;
     switch (uMsg)
     {
+    case WM_ERASEBKGND:
+        {
+            HDC hdc = (HDC)wParam;
+            auto bgc = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
+            auto oldBgc = SetBkColor(hdc, bgc);
+            RECT r;
+            GetClientRect(hwnd, &r);
+            ExtTextOut(hdc, r.left, r.top, ETO_CLIPPED | ETO_OPAQUE, &r, L"", 0, nullptr);
+            SetBkColor(hdc, oldBgc);
+            return TRUE;
+        }
     case WM_NOTIFY:
         if(hdr->code == NM_COOLSB_CUSTOMDRAW)
         {
