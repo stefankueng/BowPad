@@ -228,10 +228,10 @@ $(DIR_O)\ScintRes.res : ScintRes.rc
 	$(RC) -fo$@ $**
 
 $(COMPONENT): $(SOBJS) $(DIR_O)\ScintRes.res
-	$(LD) $(LDFLAGS) -DEF:Scintilla.def -DLL -OUT:$@ $** $(LIBS)
+	$(LD) $(LDFLAGS) -DLL -OUT:$@ $** $(LIBS)
 
 $(LEXCOMPONENT): $(LOBJS) $(DIR_O)\ScintRes.res
-	$(LD) $(LDFLAGS) -DEF:Scintilla.def -DLL -OUT:$@ $** $(LIBS)
+	$(LD) $(LDFLAGS) -DLL -OUT:$@ $** $(LIBS)
 
 $(LEXLIB): $(LEXOBJS)
 	LIB /OUT:$@ $(LEXOBJS)
