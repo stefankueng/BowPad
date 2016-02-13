@@ -172,8 +172,8 @@ bool ParseSignature(const std::wstring& sig, std::wstring& name, std::wstring& n
         // before the name. Ignore them. This logic is a bit C language based.
         while (spos < bracepos && (sig[spos] == L'*' || sig[spos] == L'&' || sig[spos] == L'^'))
             ++spos;
-        name = sig.substr(spos, bracepos - spos);
-        name_and_args = sig.substr(spos);
+        name.assign(sig, spos, bracepos - spos);
+        name_and_args.assign(sig, spos);
         CStringUtils::trim(name);
         parsed = !name.empty();
     }
@@ -193,7 +193,8 @@ bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf,
     // the start of the matched function text
     char c = (char)edit.Call(SCI_GETCHARAT, ttf.chrgText.cpMin);
     long cpmin = ttf.chrgText.cpMin;
-    while ((cpmin < ttf.chrgText.cpMax) && ((c == '\r') || (c == '\n') || (c == ';') || (c == '}') || (c == ' ') || (c == '\t')))
+    while ((cpmin < ttf.chrgText.cpMax) && 
+        ((c == '\r') || (c == '\n') || (c == ';') || (c == '}') || (c == ' ') || (c == '\t')))
     {
         ++cpmin;
         c = (char)edit.Call(SCI_GETCHARAT, cpmin);
@@ -722,7 +723,7 @@ void CCmdFunctions::DocumentScanFinished(int docId, bool bForce)
     m_endTime = std::chrono::steady_clock::now();
     std::chrono::duration<double> ellapsed = m_endTime - m_startTime;
 #if TIMED_FUNCTIONS
-    MessageBoxA(NULL, CStringUtils::Format("Completed in %d parts. Time taken: %f seconds\n",
+    MessageBoxA(nullptr, CStringUtils::Format("Completed in %d parts. Time taken: %f seconds\n",
         m_timedParts, ellapsed.count() / std::chrono::seconds(1).count()).c_str(), "", MB_OK);
 #else
     CTraceToOutputDebugString::Instance()(_T(__FUNCTION__) L" : Completed in %d parts. Time taken: %f seconds\n", m_timedParts, ellapsed.count() / std::chrono::seconds(1).count());
@@ -793,6 +794,6 @@ void CCmdFunctions::ScheduleFunctionUpdate(int docId, FunctionUpdateReason reaso
         break;
     }
     if (updateWhen >= 0)
-        SetTimer(GetHwnd(), m_timerID, updateWhen, NULL);
+        SetTimer(GetHwnd(), m_timerID, updateWhen, nullptr);
 }
 

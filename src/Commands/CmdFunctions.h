@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -72,27 +72,27 @@ class CCmdFunctions : public ICommand
 public:
     CCmdFunctions(void * obj);
 
-    ~CCmdFunctions(void)
+    ~CCmdFunctions()
     {}
 
-    virtual bool Execute() override { return false; }
-    virtual UINT GetCmdId() override { return cmdFunctions; }
+    bool Execute() override { return false; }
+    UINT GetCmdId() override { return cmdFunctions; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    virtual void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR* ptbhdr) override;
 
-    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
-    virtual void OnTimer(UINT id) override;
+    void OnTimer(UINT id) override;
 
-    virtual void OnDocumentOpen(int id) override;
+    void OnDocumentOpen(int id) override;
 
-    virtual void OnDocumentSave(int index, bool bSaveAs) override;
+    void OnDocumentSave(int index, bool bSaveAs) override;
 
-    virtual void OnLexerChanged(int lexer) override;
+    void OnLexerChanged(int lexer) override;
 private:
 
     void FindFunctions(int docID, bool bForce);
