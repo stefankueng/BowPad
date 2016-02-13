@@ -2483,7 +2483,8 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             }
             else // See comment above.
                 m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-            SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
+            if (bAddToMRU)
+                SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
             CCommandHandler::Instance().OnDocumentOpen(index);
             if (m_fileTree.GetPath().empty())
             {
