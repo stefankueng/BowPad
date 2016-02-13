@@ -166,6 +166,7 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
     _In_ LPARAM lParam
     )
 {
+    UNREFERENCED_PARAMETER(wParam);
     switch (uiMsg)
     {
         case WM_INITDIALOG:
