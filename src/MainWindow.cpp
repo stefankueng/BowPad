@@ -2304,6 +2304,16 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     bool bAskToCreateIfMissing = (openFlags & OpenFlags::AskToCreateIfMissing) != 0;
     bool bIgnoreIfMissing = (openFlags & OpenFlags::IgnoreIfMissing) != 0;
     bool bOpenIntoActiveTab = (openFlags & OpenFlags::OpenIntoActiveTab) != 0;
+    bool bActivate = (openFlags & OpenFlags::NoActivate) == 0;
+
+    // if we're opening the first file, we have to activate it
+    // to ensure all the activation stuff is handled for that first
+    // file.
+    // This is required since the tab bar automatically marks the
+    // first item as the active one even if it's not activated
+    // manually.
+    if (m_TabBar.GetItemCount() == 0)
+        bActivate = true;
 
     int encoding = -1;
     std::wstring filepath = CPathUtils::GetLongPathname(file);
@@ -2315,7 +2325,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     if (id != -1)
     {
         // document already open.
-        if (IsWindowEnabled(*this))
+        if (IsWindowEnabled(*this) && bActivate)
         {
             // only activate the new doc tab if the main window is enabled:
             // if it's disabled, a modal dialog is shown
@@ -2463,8 +2473,11 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 // (e.g., the handle-outside-modifications confirmation dialog)
                 // and we then must not change the active tab.
                 bool bResize = m_fileTree.GetPath().empty() && !doc.m_path.empty();
-                m_TabBar.ActivateAt(index);
-                m_editor.SetupLexerForLang(doc.m_language);
+                if (bActivate)
+                {
+                    m_TabBar.ActivateAt(index);
+                    m_editor.SetupLexerForLang(doc.m_language);
+                }
                 if (bResize)
                     ResizeChildWindows();
             }
