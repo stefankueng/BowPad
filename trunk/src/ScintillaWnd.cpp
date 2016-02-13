@@ -517,16 +517,16 @@ void CScintillaWnd::UpdateLineNumberWidth()
     }
 }
 
-void CScintillaWnd::SaveCurrentPos(CPosData * pPos)
+void CScintillaWnd::SaveCurrentPos(CPosData& pos)
 {
-    pPos->m_nFirstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
-    pPos->m_nFirstVisibleLine   = Call(SCI_DOCLINEFROMVISIBLE, pPos->m_nFirstVisibleLine);
+    pos.m_nFirstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
+    pos.m_nFirstVisibleLine   = Call(SCI_DOCLINEFROMVISIBLE, pos.m_nFirstVisibleLine);
 
-    pPos->m_nStartPos           = Call(SCI_GETANCHOR);
-    pPos->m_nEndPos             = Call(SCI_GETCURRENTPOS);
-    pPos->m_xOffset             = Call(SCI_GETXOFFSET);
-    pPos->m_nSelMode            = Call(SCI_GETSELECTIONMODE);
-    pPos->m_nScrollWidth        = Call(SCI_GETSCROLLWIDTH);
+    pos.m_nStartPos           = Call(SCI_GETANCHOR);
+    pos.m_nEndPos             = Call(SCI_GETCURRENTPOS);
+    pos.m_xOffset             = Call(SCI_GETXOFFSET);
+    pos.m_nSelMode            = Call(SCI_GETSELECTIONMODE);
+    pos.m_nScrollWidth        = Call(SCI_GETSCROLLWIDTH);
 }
 
 void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ bool CCmdNewCopy::Execute()
         ScintillaCall(SCI_GETTEXT, len + 1, (sptr_t)textbuf.get());
 
         CDocument doc = GetActiveDocument();
-        SaveCurrentPos(&doc.m_position);
+        SaveCurrentPos(doc.m_position);
         SendMessage(GetHwnd(), WM_COMMAND, MAKEWPARAM(cmdNew, 1), 0);
         CDocument docnew = GetActiveDocument();
         auto d = docnew.m_document;

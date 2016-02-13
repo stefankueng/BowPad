@@ -2252,7 +2252,7 @@ void CMainWindow::HandleTabChanging(const NMHDR& /*nmhdr*/)
     {
         m_editor.MatchBraces(Clear);
         CDocument doc = m_DocManager.GetDocumentFromID(docID);
-        m_editor.SaveCurrentPos(&doc.m_position);
+        m_editor.SaveCurrentPos(doc.m_position);
         m_DocManager.SetDocument(docID, doc);
     }
 }
@@ -2921,7 +2921,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
 
     if (bReloadCurrentTab)
     {
-        editor->SaveCurrentPos(&doc.m_position);
+        editor->SaveCurrentPos(doc.m_position);
         // Apply the new one.
         editor->Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
     }
