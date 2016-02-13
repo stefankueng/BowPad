@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ protected:
     CDocument           GetDocumentFromID(int id);
     void                SetDocument(int id, const CDocument& doc);
     void                RestoreCurrentPos(const CPosData& pos);
-    void                SaveCurrentPos(CPosData * pos);
+    void                SaveCurrentPos(CPosData& pos);
 
     sptr_t              ScintillaCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0);
     LRESULT             SendMessageToMainWnd(UINT msg, WPARAM wParam, LPARAM lParam);

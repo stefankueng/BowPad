@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ public :
     }
 
     void UpdateLineNumberWidth();
-    void SaveCurrentPos(CPosData * pPos);
+    void SaveCurrentPos(CPosData& pos);
     void RestoreCurrentPos(const CPosData& pos);
     void SetupLexerForLang(const std::wstring& lang);
     void MarginClick(Scintilla::SCNotification * pNotification);
