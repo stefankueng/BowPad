@@ -68,7 +68,7 @@ class CFindReplaceDlg : public CDialog, public ICommand
 public:
     CFindReplaceDlg(void* obj);
 
-    void ActivateDialog(FindMode findMode);
+    void ActivateDialog(FindMode findMode, LPCWSTR fileToFind = nullptr);
     void SetSearchFolder(const std::wstring& folder);
     void NotifyOnDocumentClose(int tabIndex);
     void NotifyOnDocumentSave(int tabIndex, bool saveAs);

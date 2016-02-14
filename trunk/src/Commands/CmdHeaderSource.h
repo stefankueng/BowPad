@@ -52,6 +52,7 @@ class CCmdHeaderSource : public ICommand
 {
 public:
     CCmdHeaderSource(void* obj);
+    ~CCmdHeaderSource();
 
     // Overrides
     bool Execute() override;

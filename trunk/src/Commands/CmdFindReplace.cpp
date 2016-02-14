@@ -53,7 +53,8 @@
 static std::string  g_findString;
 std::string         g_sHighlightString;
 static int          g_searchFlags;
-static std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
+
+std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
 
 namespace
 {
@@ -628,7 +629,7 @@ void CFindReplaceDlg::CheckSearchFolder()
     }
 }
 
-void CFindReplaceDlg::ActivateDialog(FindMode findMode)
+void CFindReplaceDlg::ActivateDialog(FindMode findMode, LPCWSTR fileToFind)
 {
     size_t selStart = ScintillaCall(SCI_GETSELECTIONSTART);
     size_t selEnd = ScintillaCall(SCI_GETSELECTIONEND);
@@ -666,6 +667,10 @@ void CFindReplaceDlg::ActivateDialog(FindMode findMode)
     }
     CheckSearchFolder();
     CheckSearchOptions();
+    if (fileToFind != nullptr)
+    {
+        SetDlgItemText(*this, IDC_SEARCHFILES, fileToFind);
+    }
     FocusOn(findMode == FindMode::FindText ? IDC_SEARCHCOMBO : IDC_SEARCHFILES);
 }
 
