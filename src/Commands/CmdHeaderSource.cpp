@@ -149,6 +149,9 @@ but I can't make that work.
 #include "PreserveChdir.h"
 #include "DirFileEnum.h"
 #include "Resource.h"
+#include "CmdFindReplace.h"
+
+extern std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
 
 namespace
 {
@@ -197,6 +200,13 @@ CCmdHeaderSource::CCmdHeaderSource(void* obj)
     // Because we don't know if this file type supports includes.
     InvalidateMenu();
 }
+
+CCmdHeaderSource::~CCmdHeaderSource()
+{
+    g_pFindReplaceDlg.reset();
+}
+
+
 
 void CCmdHeaderSource::InvalidateMenuEnabled()
 {
@@ -553,10 +563,16 @@ void CCmdHeaderSource::HandleIncludeFileMenuItem(const RelatedFileItem& item)
             return;
         }
     }
-    if (!UserFindFile(GetHwnd(), CPathUtils::GetFileName(item.Path), defaultFolder, fileToOpen))
-        return;
-    if (!OpenFileAsLanguage(fileToOpen))
-        return;
+    //if (!UserFindFile(GetHwnd(), CPathUtils::GetFileName(item.Path), defaultFolder, fileToOpen))
+        //return;
+    //if (!OpenFileAsLanguage(fileToOpen))
+        //return;
+
+    // TODO! Add support to allow open file as language to be used.
+    if (!g_pFindReplaceDlg)
+        g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(m_Obj);
+    auto filename = CPathUtils::GetFileName(item.Path);
+    g_pFindReplaceDlg->ActivateDialog(FindMode::FindFile, filename.c_str());
 }
 
 void CCmdHeaderSource::HandleCorrespondingFileMenuItem(const RelatedFileItem& item)
