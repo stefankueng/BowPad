@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -98,7 +98,8 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_MOVESELECTEDLINESUP);
+        if ((ScintillaCall(SCI_GETSELECTIONEMPTY) == 0) || ((GetKeyState(VK_CONTROL) & 0x8000) != 0))
+            ScintillaCall(SCI_MOVESELECTEDLINESUP);
         return true;
     }
 
@@ -119,7 +120,8 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_MOVESELECTEDLINESDOWN);
+        if ((ScintillaCall(SCI_GETSELECTIONEMPTY) == 0) || ((GetKeyState(VK_CONTROL) & 0x8000) != 0))
+            ScintillaCall(SCI_MOVESELECTEDLINESDOWN);
         return true;
     }
 
