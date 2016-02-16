@@ -3,5 +3,6 @@ fr
 ja
 pt_pt
 ro
+ru
 sv
 zh-CN
