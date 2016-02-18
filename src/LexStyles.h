@@ -114,6 +114,7 @@ public:
     void                                ResetUserData();
     void                                SaveUserData();
     bool                                AddUserFunctionForLang(const std::string& lang, const std::string& fnc);
+    std::wstring                        GetLanguageForPath(const std::wstring& path);
 private:
     CLexStyles();
     ~CLexStyles();
@@ -125,7 +126,6 @@ private:
                                                    LPCWSTR styleString,
                                                    std::map<std::wstring, std::wstring>& variables,
                                                    StyleData& style) const;
-    std::wstring                        GetLanguageForPath(const std::wstring& path);
 private:
     bool                                m_bLoaded;
 

@@ -375,8 +375,16 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             SetTransparency(150);
             // This is arguable, but we don't make some seldom used options too "sticky"
             // because any later interaction with other buttons can be unexpected.
-            SetDlgItemText(*this, IDC_SEARCHFILES, L"");
-            Button_SetCheck(GetDlgItem(*this, IDC_FUNCTIONS), BST_UNCHECKED);
+            // Only do this for re-activation because with initial activation
+            // the values can be set by the app and we don't want to clear them
+            // before we have even used them.
+            if (m_reactivation)
+            {
+                SetDlgItemText(*this, IDC_SEARCHFILES, L"");
+                Button_SetCheck(GetDlgItem(*this, IDC_FUNCTIONS), BST_UNCHECKED);
+                Button_SetCheck(GetDlgItem(*this, IDC_SEARCHSUBFOLDERS), BST_CHECKED);
+            }
+            m_reactivation = true;
         }
         else
         {
@@ -536,7 +544,10 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
     LoadSearchFolderStrings();
     LoadSearchFileStrings();
 
-    bool searchSubFolders = CIniSettings::Instance().GetInt64(L"searchreplace", L"searchsubfolders", 0LL) != 0LL;
+    // We don't make the search sub folder flag persistent as the app
+    // wants to set that itself and having the app persist it's own
+    // changes is confusing in the circumstances.
+    bool searchSubFolders = true;//CIniSettings::Instance().GetInt64(L"searchreplace", L"searchsubfolders", 1LL) != 0LL;
     Button_SetCheck(GetDlgItem(*this, IDC_SEARCHSUBFOLDERS), searchSubFolders ? BST_CHECKED : BST_UNCHECKED);
     bool followTab = CIniSettings::Instance().GetInt64(L"searchreplace", L"searchfolderfollowtab", 1LL) != 0LL;
     Button_SetCheck(GetDlgItem(*this, IDC_SEARCHFOLDERFOLLOWTAB), followTab ? BST_CHECKED : BST_UNCHECKED);
@@ -599,8 +610,8 @@ int CFindReplaceDlg::GetDefaultButton() const
 
 void CFindReplaceDlg::SaveSettings()
 {
-    bool searchSubFolders = IsDlgButtonChecked(*this, IDC_SEARCHSUBFOLDERS) == BST_CHECKED;
-    CIniSettings::Instance().SetInt64(L"searchreplace", L"searchsubfolders", searchSubFolders ? 1LL : 0LL);
+    //bool searchSubFolders = IsDlgButtonChecked(*this, IDC_SEARCHSUBFOLDERS) == BST_CHECKED;
+    //CIniSettings::Instance().SetInt64(L"searchreplace", L"searchsubfolders", searchSubFolders ? 1LL : 0LL);
     bool followTab = IsDlgButtonChecked(*this, IDC_SEARCHFOLDERFOLLOWTAB) == BST_CHECKED;
     CIniSettings::Instance().SetInt64(L"searchreplace", L"searchfolderfollowtab", followTab ? 1LL: 0LL);
     SaveSearchStrings();
