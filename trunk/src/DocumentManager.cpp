@@ -148,7 +148,8 @@ void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, int id )
 {
     // Catch attempts to id's that serve as null type values.
     if (id<0)
-        APPVERIFY(false); // Serious bug.
+        APPVERIFY(false); // Serious bug.    
+    APPVERIFY(m_documents.find(id) == m_documents.end()); // Should not already exist.
     m_documents[id] = doc;
 }
 

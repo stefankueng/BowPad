@@ -235,6 +235,7 @@ private:
     int                         m_maxSearchFileStrings = 0;
     SIZE                        m_originalSize;
     bool                        m_open = false;
+    bool                        m_reactivation = false;
 
     // Some types usually best avoided while searching.
     // The user can explicitly override these if they want them though.

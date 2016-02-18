@@ -30,7 +30,8 @@ enum class RelatedType
     Corresponding,
     UserInclude,
     SystemInclude,
-    CreateCorrespondingFile
+    CreateCorrespondingFile,
+    CreateCorrespondingFiles
 };
 
 class RelatedFileItem
@@ -93,6 +94,7 @@ private:
     bool GetDefaultCorrespondingFileExtMappings(const std::wstring& from, std::wstring& to) const;
     void GetCorrespondingFileMappings(const std::wstring& input_filename, std::vector<std::wstring>& corresponding_filenames) const;
     bool GetCPPIncludePathsForMS(std::wstring& systemIncludePaths);
+    bool InitSDK();
 private:
     std::vector<RelatedFileItem>    m_menuInfo;
     CScintillaWnd                   m_edit;

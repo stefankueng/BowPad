@@ -1147,6 +1147,9 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         if (!doc.m_path.empty())
         {
             std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
+            if (folder.empty())
+                folder = CPathUtils::GetCWD();
+            std::wstring filename = CPathUtils::GetFileName(doc.m_path);
             IShellItemPtr psiDefFolder = nullptr;
             hr = SHCreateItemFromParsingName(folder.c_str(), nullptr, IID_PPV_ARGS(&psiDefFolder));
             if (CAppUtils::FailedShowMessage(hr))
@@ -1154,7 +1157,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
             hr = pfd->SetFolder(psiDefFolder);
             if (CAppUtils::FailedShowMessage(hr))
                 return false;
-            hr = pfd->SetFileName(CPathUtils::GetFileName(doc.m_path).c_str());
+            hr = pfd->SetFileName(filename.c_str());
             if (CAppUtils::FailedShowMessage(hr))
                 return false;
         }
@@ -2302,9 +2305,35 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     bool bRet = true;
     bool bAddToMRU = (openFlags & OpenFlags::AddToMRU) != 0;
     bool bAskToCreateIfMissing = (openFlags & OpenFlags::AskToCreateIfMissing) != 0;
+    bool bCreateIfMissing = (openFlags & OpenFlags::CreateIfMissing) != 0;
     bool bIgnoreIfMissing = (openFlags & OpenFlags::IgnoreIfMissing) != 0;
     bool bOpenIntoActiveTab = (openFlags & OpenFlags::OpenIntoActiveTab) != 0;
     bool bActivate = (openFlags & OpenFlags::NoActivate) == 0;
+    bool bCreateTabOnly = (openFlags & OpenFlags::CreateTabOnly) != 0;
+
+    if (bCreateTabOnly)
+    {
+        auto fileName = CPathUtils::GetFileName(file);
+        CDocument doc;
+        doc.m_document = m_editor.Call(SCI_CREATEDOCUMENT);
+        doc.m_bHasBOM = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
+        doc.m_encoding = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
+        doc.m_bNeedsSaving = true;
+        doc.m_bDoSaveAs = true;
+        doc.m_path = file;
+        std::wstring lang = CLexStyles::Instance().GetLanguageForPath(fileName);
+        doc.m_language = lang;
+        auto index = m_TabBar.InsertAtEnd(fileName.c_str());
+        int docID = m_TabBar.GetIDFromIndex(index);
+        m_DocManager.AddDocumentAtEnd(doc, docID);
+        UpdateTab(docID);
+        m_TabBar.ActivateAt(index);
+        m_editor.SetupLexerForLang(lang);
+        m_editor.GotoLine(0);
+        CCommandHandler::Instance().OnDocumentOpen(index);
+
+        return index >= 0;
+    }
 
     // if we're opening the first file, we have to activate it
     // to ensure all the activation stuff is handled for that first
@@ -2338,7 +2367,8 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     }
     else
     {
-        bool createIfMissing = false;
+        bool createIfMissing = bCreateIfMissing;
+
         // Note PathFileExists returns true for existing folders,
         // not just files.
         if (!PathFileExists(file.c_str()))

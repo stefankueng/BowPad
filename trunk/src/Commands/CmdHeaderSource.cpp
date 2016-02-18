@@ -150,6 +150,7 @@ but I can't make that work.
 #include "DirFileEnum.h"
 #include "Resource.h"
 #include "CmdFindReplace.h"
+#include "CorrespondingFileDlg.h"
 
 extern std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
 
@@ -167,6 +168,7 @@ const int CREATE_CORRESPONDING_FILE_CATEGORY = 1;
 const int CORRESPONDING_FILES_CATEGORY = 2;
 const int USER_INCLUDE_CATEGORY = 3;
 const int SYSTEM_INCLUDE_CATEGORY = 4;
+
 };
 
 bool CCmdHeaderSource::UserFindFile(HWND hwndParent, const std::wstring& filename,
@@ -205,8 +207,6 @@ CCmdHeaderSource::~CCmdHeaderSource()
 {
     g_pFindReplaceDlg.reset();
 }
-
-
 
 void CCmdHeaderSource::InvalidateMenuEnabled()
 {
@@ -324,22 +324,8 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
 
     bool showCreate = true;
 
-#if 0
-    // Need to think more on this. For now offer all creation
-    // options though it is a little clutered.
-
-    // If a corresponding file exists, don't show create options.
-    // otherwise do. Note there isn't a one to one mapping of potential
-    // corresponding files, just a one to one of actual.
-    // e.g.
-    // if editing test.aspx, potential corresponding files might be
-    // be teas.apsx.cs or test.aspx.vb so create options would want
-    // to be shown for either file if neither file existed.
-    // But once one exists, e.g. if test.aspx.vb is created,
-    // creation options for both test.aspx.cs and test.aspx.vb are not
-    // offered again.
-
-    std::wstring menuText;
+    // If one of the corresponing files exists, don't offer to create
+    // any of the others.
     for (const std::wstring& filename : correspondingFiles)
     {
         correspondingFile = CPathUtils::Append(basePath, filename);
@@ -349,7 +335,18 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
             break;
         }
     }
-#endif
+
+    m_menuInfo.push_back(RelatedFileItem(correspondingFile,
+        RelatedType::CreateCorrespondingFiles));
+    ResString createCorrespondingFiles(hRes, IDS_NEWCORRESPONDINGFILES);
+
+    hr = CAppUtils::AddStringItem(collection, createCorrespondingFiles.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, pImg);
+    if (FAILED(hr))
+    {
+        m_menuInfo.pop_back();
+        return false;
+    }
+
     if (showCreate)
     {
         for (const std::wstring& filename : correspondingFiles)
@@ -607,6 +604,18 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
         case RelatedType::CreateCorrespondingFile:
             return OpenFile(item.Path.c_str(), OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing);
             break;
+        case RelatedType::CreateCorrespondingFiles:
+            auto pCorrespondingFileDlg = std::make_unique<CCorrespondingFileDlg>(m_Obj);
+
+            std::wstring initialFolder;
+            if (HasActiveDocument())
+            {
+                auto doc = GetActiveDocument();
+                initialFolder = CPathUtils::GetParentDirectory(doc.m_path);
+            }
+            pCorrespondingFileDlg->Show(GetHwnd(), initialFolder);
+            pCorrespondingFileDlg.release();
+            break;
     }
 
     return true;
@@ -745,10 +754,21 @@ bool CCmdHeaderSource::Execute()
             return OpenFile(matchingFiles[0].c_str(), OpenFlags::AddToMRU);
         }
 
-        // Note the menu is always shown if all other paths have been exhausted so
-        // that the user doesn't think the button didn't work.
-        ResString ctrlName(hRes, cmdHeaderSource_LabelTitle_RESID);
-        return CAppUtils::ShowDropDownList(GetHwnd(), ctrlName);
+        // To force a menu to be shown if all other paths have been exhausted so
+        // that the user doesn't think the button didn't work, do this:
+        // ResString ctrlName(hRes, cmdHeaderSource_LabelTitle_RESID);
+        // return CAppUtils::ShowDropDownList(GetHwnd(), ctrlName);
+
+        std::wstring fileNames;
+        for (size_t i = 0; i < correspondingFiles.size(); ++i)
+        {
+            fileNames += correspondingFiles[i];
+            if (i + 1 < correspondingFiles.size())
+                fileNames += ';';
+        }
+        if (!g_pFindReplaceDlg)
+            g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(m_Obj);
+        g_pFindReplaceDlg->ActivateDialog(FindMode::FindFile, fileNames.c_str());
     }
 
     return false;
@@ -1153,17 +1173,19 @@ bool CCmdHeaderSource::GetCPPIncludePathsForMS(std::wstring& systemIncludePaths)
 {
     systemIncludePaths.clear();
     // try to find sensible default paths
-    PWSTR programfiles = 0;
-    HRESULT hr = SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, NULL, &programfiles);
-    if (CAppUtils::FailedShowMessage(hr))
+    std::wstring programfiles = CAppUtils::GetProgramFilesX86Folder();
+    if (programfiles.empty())
         return false;
+
     // first the windows sdks
     std::vector<std::wstring> sdkvers = {
+        L"v10.0A",
         L"v8.1A", L"v8.1", L"v8.0A", L"v8.0",
         L"v7.1A", L"v7.1", L"v7.0A", L"v7.0" };
-    for (const auto& ver : sdkvers)
+    for (const auto& sdkver : sdkvers)
     {
-        std::wstring sTestPath = CStringUtils::Format(L"%s\\Microsoft SDKs\\Windows\\%s\\Include", programfiles, ver);
+        std::wstring sTestPath = CStringUtils::Format(L"%s\\Microsoft SDKs\\Windows\\%s\\Include",
+            programfiles.c_str(), sdkver);
         if (PathFileExists(sTestPath.c_str()))
         {
             systemIncludePaths += sTestPath;
@@ -1175,16 +1197,18 @@ bool CCmdHeaderSource::GetCPPIncludePathsForMS(std::wstring& systemIncludePaths)
 
     // now go through the visual studio paths
     std::vector<std::wstring> vsvers = {
+        L"Microsoft Visual Studio 14.0",
         L"Microsoft Visual Studio 13.0", L"Microsoft Visual Studio 12.0",
         L"Microsoft Visual Studio 11.0", L"Microsoft Visual Studio 10.0" };
-    for (const auto& ver : vsvers)
+    for (const auto& vsver : vsvers)
     {
-        std::wstring sTestPath = CStringUtils::Format(L"%s\\%s\\VC\\include", programfiles, ver.c_str());
+        std::wstring sTestPath = CStringUtils::Format(L"%s\\%s\\VC\\include",
+            programfiles.c_str(), vsver.c_str());
         if (PathFileExists(sTestPath.c_str()))
         {
             systemIncludePaths += sTestPath;
             systemIncludePaths += L";";
-            sTestPath = CStringUtils::Format(L"%s\\%s\\VC\\atlmfc\\include", programfiles, ver.c_str());
+            sTestPath = CStringUtils::Format(L"%s\\%s\\VC\\atlmfc\\include", programfiles.c_str(), vsver.c_str());
             if (PathFileExists(sTestPath.c_str()))
             {
                 systemIncludePaths += sTestPath;
