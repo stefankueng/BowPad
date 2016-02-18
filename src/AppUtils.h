@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 class CAppUtils
 {
 public:
-    CAppUtils(void);
-    ~CAppUtils(void);
+    CAppUtils();
+    ~CAppUtils();
 
     static std::wstring             GetDataPath(HMODULE hMod = NULL);
     static std::wstring             GetSessionID();
@@ -39,6 +39,7 @@ public:
     static HRESULT                  CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg );
     static bool                     HexStringToCOLORREF(const wchar_t* s, COLORREF* clr);
     static bool                     TryParse(const wchar_t* s, int& result, bool emptyOk = false, int def = 0);
+    static std::wstring             GetProgramFilesX86Folder();
 private:
     static std::wstring             updatefilename;
     static std::wstring             updateurl;
