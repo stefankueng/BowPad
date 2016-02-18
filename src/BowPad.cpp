@@ -87,10 +87,10 @@ static void SetIcon()
         RegCloseKey(hKey);
         if (RegOpenKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe\\DefaultIcon", &hKey) != ERROR_SUCCESS)
         {
-            OnOutOfScope(RegCloseKey(hKey));
             // but the default icon hasn't been set yet: set the default icon now
             if (RegCreateKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe\\DefaultIcon", &hKey) == ERROR_SUCCESS)
             {
+                OnOutOfScope(RegCloseKey(hKey));
                 std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str(), IDI_BOWPAD_DOC);
                 if (RegSetValue(hKey, NULL, REG_SZ, sIconPath.c_str(), 0) == ERROR_SUCCESS)
                 {
@@ -98,6 +98,10 @@ static void SetIcon()
                     SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
                 }
             }
+        }
+        else
+        {
+            RegCloseKey(hKey);
         }
     }
 }
@@ -421,5 +425,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
+    Scintilla_ReleaseResources();
     return (int)msg.wParam;
 }

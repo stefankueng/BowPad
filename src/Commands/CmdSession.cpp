@@ -127,7 +127,6 @@ void CCmdSessionLoad::RestoreSavedSession()
             }
         }
     }
-    APPVERIFY(activeDoc >= 0); // We expect something to have been marked active.
     if (activeDoc >= 0)
     {
         int activetab = GetTabIndexFromDocID(activeDoc);

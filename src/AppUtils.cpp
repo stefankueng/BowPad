@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,14 +39,41 @@
 std::wstring CAppUtils::updatefilename;
 std::wstring CAppUtils::updateurl;
 
-CAppUtils::CAppUtils(void)
+namespace
+{
+    struct task_mem_deleter
+    {
+        void operator()(wchar_t buf[])
+        {
+            if (buf != nullptr)
+                CoTaskMemFree(buf);
+        }
+    };
+};
+
+
+CAppUtils::CAppUtils()
 {
 }
 
 
-CAppUtils::~CAppUtils(void)
+CAppUtils::~CAppUtils()
 {
 }
+
+std::wstring CAppUtils::GetProgramFilesX86Folder()
+{
+    std::wstring programfiles;
+    PWSTR p = nullptr;
+    HRESULT hr = SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, nullptr, &p);
+    if (SUCCEEDED(hr))
+    {
+        std::unique_ptr<wchar_t[], task_mem_deleter> programfiles_ptr(p);
+        programfiles = programfiles_ptr.get();
+    }
+    return programfiles;
+}
+
 
 std::wstring CAppUtils::GetDataPath(HMODULE hMod)
 {
@@ -69,8 +96,8 @@ std::wstring CAppUtils::GetDataPath(HMODULE hMod)
             PWSTR outpath = nullptr;
             if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &outpath)))
             {
-                datapath = outpath;
-                CoTaskMemFree(outpath);
+                std::unique_ptr<wchar_t[], task_mem_deleter> outpath_ptr(outpath);
+                datapath = outpath_ptr.get();
                 datapath += L"\\BowPad";
                 datapath = CPathUtils::GetLongPathname(datapath);
                 CreateDirectory(datapath.c_str(), NULL);
@@ -210,12 +237,12 @@ bool CAppUtils::DownloadUpdate(HWND hWnd, bool bInstall)
     if (updatefilename.empty() || updateurl.empty())
         return false;
 
-    PWSTR downloadpath = NULL;
+    PWSTR downloadpath = nullptr;
     HRESULT hr = SHGetKnownFolderPath(FOLDERID_Downloads, 0, NULL, &downloadpath);
     if (SUCCEEDED(hr))
     {
-        std::wstring sDownloadFile = downloadpath;
-        CoTaskMemFree((LPVOID)downloadpath);
+        std::unique_ptr<wchar_t[], task_mem_deleter> downloadpath_ptr(downloadpath);
+        std::wstring sDownloadFile = downloadpath_ptr.get();
         sDownloadFile += L"\\";
         sDownloadFile += updatefilename;
 
