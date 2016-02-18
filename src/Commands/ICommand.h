@@ -29,6 +29,8 @@ namespace OpenFlags
     const unsigned int IgnoreIfMissing = 4;
     const unsigned int OpenIntoActiveTab = 8;
     const unsigned int NoActivate = 16;
+    const unsigned int CreateTabOnly = 32;
+    const unsigned int CreateIfMissing = 64;
 };
 
 class ICommand
