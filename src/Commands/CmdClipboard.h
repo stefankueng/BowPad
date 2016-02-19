@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@ public:
 protected:
     std::string GetHtmlSelection();
     void AddHtmlStringToClipboard(const std::string& sHtml);
+    void AddLexerToClipboard();
+    void SetLexerFromClipboard();
 };
 
 class CCmdCut : public ClipboardBase
@@ -114,11 +116,11 @@ public:
     UINT GetCmdId() override { return cmdCopyPlain; }
 };
 
-class CCmdPaste : public ICommand
+class CCmdPaste : public ClipboardBase
 {
 public:
 
-    CCmdPaste(void * obj) : ICommand(obj)
+    CCmdPaste(void * obj) : ClipboardBase(obj)
     {
     }
 

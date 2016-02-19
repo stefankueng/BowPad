@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2015 - Stefan Kueng
+// Copyright (C) 2014-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@
 #include "Theme.h"
 #include "LexStyles.h"
 #include "ClipboardHelper.h"
+#include "OnOutOfScope.h"
+
+#define CF_BPLEXER L"BP Lexer"
 
 std::string ClipboardBase::GetHtmlSelection()
 {
@@ -168,6 +171,65 @@ void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml)
     }
 }
 
+void ClipboardBase::AddLexerToClipboard()
+{
+    CDocument doc = GetActiveDocument();
+    std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
+    if (!lang.empty())
+    {
+        if (OpenClipboard(GetHwnd()))
+        {
+            HGLOBAL hClipboardData;
+            size_t sLen = lang.length();
+            hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1)*sizeof(char));
+            if (hClipboardData)
+            {
+                char * pchData;
+                pchData = (char*)GlobalLock(hClipboardData);
+                if (pchData)
+                {
+                    strcpy_s(pchData, sLen + 1, lang.c_str());
+                    if (GlobalUnlock(hClipboardData))
+                    {
+                        UINT CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
+                        SetClipboardData(CF_LEXER, hClipboardData);
+                    }
+                }
+            }
+            CloseClipboard();
+        }
+    }
+}
+
+void ClipboardBase::SetLexerFromClipboard()
+{
+    CDocument doc = GetActiveDocument();
+    if (doc.m_language.empty() || (doc.m_language.compare(L"Text") == 0))
+    {
+        CClipboardHelper clipboard;
+        if (clipboard.Open(GetHwnd()))
+        {
+            UINT CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
+
+            HANDLE hData = GetClipboardData(CF_LEXER);
+            if (hData)
+            {
+                LPCSTR lptstr = (LPCSTR)GlobalLock(hData);
+                OnOutOfScope(
+                    GlobalUnlock(hData);
+                );
+                if (lptstr != nullptr)
+                {
+                    auto lang = CUnicodeUtils::StdGetUnicode(lptstr);
+                    doc.m_language = lang;
+                    SetDocument(GetDocIdOfCurrentTab(), doc);
+                    SetupLexerForLang(lang);
+                }
+            }
+        }
+    }
+}
+
 
 bool CCmdCut::Execute()
 {
@@ -176,6 +238,7 @@ bool CCmdCut::Execute()
     ScintillaCall(SCI_CUT);
     if (bShift)
         AddHtmlStringToClipboard(sHtml);
+    AddLexerToClipboard();
     return true;
 }
 
@@ -197,6 +260,7 @@ HRESULT CCmdCut::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPV
 bool CCmdCutPlain::Execute()
 {
     ScintillaCall(SCI_CUT);
+    AddLexerToClipboard();
     return true;
 }
 
@@ -223,6 +287,7 @@ bool CCmdCopy::Execute()
     ScintillaCall(SCI_COPYALLOWLINE);
     if (bShift)
         AddHtmlStringToClipboard(sHtml);
+    AddLexerToClipboard();
     return true;
 }
 
@@ -230,6 +295,7 @@ bool CCmdCopy::Execute()
 bool CCmdCopyPlain::Execute()
 {
     ScintillaCall(SCI_COPYALLOWLINE);
+    AddLexerToClipboard();
     return true;
 }
 
@@ -252,6 +318,7 @@ bool CCmdPaste::Execute()
         }
     }
     ScintillaCall(SCI_PASTE);
+    SetLexerFromClipboard();
     return true;
 }
 
