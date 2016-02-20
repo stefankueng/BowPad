@@ -83,7 +83,7 @@ public :
 
     void                        DeletAllItems();
 
-    void                        SetImageList(HIMAGELIST himl);
+    HIMAGELIST                  SetImageList(HIMAGELIST himl);
 
     int                         GetItemCount() const { return (int)m_nItems; }
 
