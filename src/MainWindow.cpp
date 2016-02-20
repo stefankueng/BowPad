@@ -82,7 +82,6 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_fileTreeVisible(true)
     , m_TabBar(hInst)
     , m_editor(hInst)
-    , m_scratchEditor(hInst)
     , m_newCount(0)
     , m_cRef(1)
     , m_hShieldIcon(nullptr)
@@ -984,7 +983,6 @@ bool CMainWindow::Initialize()
     GetClientRect(*this, &rc);
     m_treeWidth = min(m_treeWidth, rc.right - rc.left - 500);
     m_editor.Init(hResource, *this);
-    m_scratchEditor.InitScratch(hResource);
     // Each value is the right edge of each status bar element.
     m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 865, 925, 1010});
     m_TabBar.Init(hResource, *this);
@@ -2973,8 +2971,11 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     bool bReloadCurrentTab = (tab == m_TabBar.GetCurrentTabIndex());
     CDocument doc = m_DocManager.GetDocumentFromID(docID);
 
-    m_scratchEditor.Call(SCI_SETDOCPOINTER, 0, 0);
-    CScintillaWnd * editor = bReloadCurrentTab ? &m_editor : &m_scratchEditor;
+    CScintillaWnd scratchEditor(hResource);
+    if (bReloadCurrentTab)
+        scratchEditor.InitScratch(hResource);
+
+    CScintillaWnd * editor = bReloadCurrentTab ? &m_editor : &scratchEditor;
     if (dueToOutsideChanges)
     {
         ResponseToOutsideModifiedFile response = AskToReloadOutsideModifiedFile(doc);
@@ -3039,8 +3040,6 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     UpdateTab(docID);
     if (bReloadCurrentTab)
         editor->Call(SCI_SETSAVEPOINT);
-
-    m_scratchEditor.Call(SCI_SETDOCPOINTER, 0, 0);
 
     // refresh the file tree
     m_fileTree.SetPath(m_fileTree.GetPath());
