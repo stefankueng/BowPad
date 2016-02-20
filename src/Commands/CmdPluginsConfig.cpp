@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2015 - Stefan Kueng
+// Copyright (C) 2014-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #include <codecvt>
 #include <VersionHelpers.h>
 
+const int WM_INITPLUGINS = (WM_APP + 10);
 
 CPluginsConfigDlg::CPluginsConfigDlg(void * obj)
     : ICommand(obj)
@@ -55,9 +56,9 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
             m_resizer.AddControl(hwndDlg, IDC_DESC, RESIZER_BOTTOMLEFTRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_INFO, RESIZER_BOTTOMLEFTRIGHT);
             m_resizer.AddControl(hwndDlg, IDOK, RESIZER_BOTTOMRIGHT);
-            InitPluginsList();
 
-            auto t = std::thread([=]
+            HWND hThisWnd = *this;
+            auto t = std::thread([hThisWnd]
             {
                 CDownloadFile filedownloader(L"BowPad", NULL);
                 std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
@@ -65,7 +66,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
 
                 //CopyFile(L"D:\\Development\\BowPad\\BowPad\\plugins\\plugins.txt", tempfile.c_str(), FALSE);
                 // parse the file and fill in the m_plugins set
-                std::map<std::wstring, PluginInfo> plugins;
+                auto plugins = std::make_unique<std::map<std::wstring, PluginInfo>>();
 
                 std::wifstream fin(tempfile);
                 fin.imbue(std::locale(fin.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
@@ -89,20 +90,28 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
 
                                     info.installedversion = CCommandHandler::Instance().GetPluginVersion(info.name);
                                     if (info.minversion <= (BP_VERMAJOR * 100 + BP_VERMINOR))
-                                        plugins[info.name] = info;
+                                        (*plugins)[info.name] = info;
                                 }
                             }
                         }
                     }
                     fin.close();
                 }
-                for (auto it : plugins)
-                    m_plugins.push_back(it.second);
-                InitPluginsList();
+                PostMessage(hThisWnd, WM_INITPLUGINS, WPARAM(0), LPARAM(plugins.release()));
             });
             t.detach();
         }
             return FALSE;
+        case WM_INITPLUGINS:
+        {
+            std::unique_ptr<std::map<std::wstring, PluginInfo>> plugins(
+                reinterpret_cast<std::map<std::wstring, PluginInfo>*>(lParam));
+            for (const auto& plugin : *plugins)
+                m_plugins.push_back(plugin.second);
+            InitPluginsList();
+
+            break;
+        }
         case WM_SIZE:
             m_resizer.DoResize(LOWORD(lParam), HIWORD(lParam));
             break;
@@ -276,7 +285,7 @@ void CPluginsConfigDlg::InitPluginsList()
     ListView_InsertColumn(hListControl, 2, &lvc);
 
     int index = 0;
-    for (auto info : m_plugins)
+    for (const auto& info : m_plugins)
     {
         wchar_t buf[1024] = { 0 };
         wcscpy_s(buf, info.name.c_str());
