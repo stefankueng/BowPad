@@ -184,7 +184,6 @@ private:
     CStatusBar                  m_StatusBar;
     CTabBar                     m_TabBar;
     CScintillaWnd               m_editor;
-    CScintillaWnd               m_scratchEditor;
     CFileTree                   m_fileTree;
     int                         m_treeWidth;
     bool                        m_bDragging;
