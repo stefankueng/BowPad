@@ -381,10 +381,10 @@ void CTabBar::DeletAllItems()
     m_nItems = 0;
 }
 
-void CTabBar::SetImageList(HIMAGELIST himl)
+HIMAGELIST CTabBar::SetImageList(HIMAGELIST himl)
 {
-    m_bHasImgList = true;
-    TabCtrl_SetImageList(*this, himl);
+    m_bHasImgList = (himl != nullptr);
+    return TabCtrl_SetImageList(*this, himl);
 }
 
 void CTabBar::DoOwnerDrawTab()
