@@ -72,8 +72,16 @@ public :
         , m_pSciWndData(0)
         , m_selTextMarkerCount(0)
         , m_bCursorShown(true)
+        , m_bScratch(false)
     {};
-    virtual ~CScintillaWnd() {}
+    virtual ~CScintillaWnd()
+    {
+        if (m_bScratch)
+        {
+            DestroyWindow(*this);
+            m_hwnd = nullptr;
+        }
+    }
 
     bool Init(HINSTANCE hInst, HWND hParent);
     bool InitScratch(HINSTANCE hInst);
@@ -143,4 +151,5 @@ private:
     CDocScroll                  m_docScroll;
     long                        m_selTextMarkerCount;
     bool                        m_bCursorShown;
+    bool                        m_bScratch;
 };

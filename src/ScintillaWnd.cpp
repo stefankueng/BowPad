@@ -198,6 +198,8 @@ bool CScintillaWnd::InitScratch( HINSTANCE hInst )
     if (m_pSciMsg==nullptr || m_pSciWndData==0)
         return false;
 
+    m_bScratch = true;
+
     return true;
 }
 
