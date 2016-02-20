@@ -49,9 +49,9 @@ IUIFramework *g_pFramework = nullptr;  // Reference to the Ribbon framework.
 namespace
 {
     const int STATUSBAR_DOC_TYPE        = 0;
-    const int STATUSBAR_DOC_SIZE        = 1;
-    const int STATUSBAR_CUR_POS         = 2;
-    const int STATUSBAR_EOF_FORMAT      = 3;
+    const int STATUSBAR_CUR_POS         = 1;
+    const int STATUSBAR_SEL             = 2;
+    const int STATUSBAR_EOL_FORMAT      = 3;
     const int STATUSBAR_TABSPACE        = 4;
     const int STATUSBAR_UNICODE_TYPE    = 5;
     const int STATUSBAR_TYPING_MODE     = 6;
@@ -63,6 +63,7 @@ namespace
     static constexpr size_t URL_REG_EXPR_LENGTH = _countof(URL_REG_EXPR) - 1;
 
     const int TIMER_UPDATECHECK = 101;
+    const int TIMER_ZOOM = 102;
 
     static ResponseToOutsideModifiedFile responsetooutsidemodifiedfile = ResponseToOutsideModifiedFile::Reload;
     static BOOL                          responsetooutsidemodifiedfiledoall = FALSE;
@@ -716,6 +717,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             KillTimer(*this, TIMER_UPDATECHECK);
             CheckForOutsideChanges();
         }
+        else if (wParam == TIMER_ZOOM)
+        {
+            KillTimer(*this, TIMER_ZOOM);
+            HandleStatusBarZoom();
+        }
         break;
     case WM_DESTROY:
         g_pFramework->Destroy();
@@ -732,6 +738,18 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     case WM_STATUSBAR_MSG:
         HandleStatusBar(wParam, lParam);
         break;
+    case WM_ENTERMENULOOP:
+        m_inMenuLoop = true;
+        break;
+    case WM_EXITMENULOOP:
+        m_inMenuLoop = false;
+        break;
+    case WM_CANHIDECURSOR:
+    {
+        BOOL* result = reinterpret_cast<BOOL*>(lParam);
+        *result = m_inMenuLoop ? FALSE : TRUE;
+        break;
+    }
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
@@ -743,13 +761,20 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
 {
     switch (wParam)
     {
+    case WM_LBUTTONDOWN:
+    {
+        switch (lParam)
+        {
+        case STATUSBAR_ZOOM:
+            SetTimer(*this, TIMER_ZOOM, GetDoubleClickTime(), nullptr);
+            break;
+        }
+        break;
+    }
     case WM_LBUTTONDBLCLK:
     {
         switch (lParam)
         {
-        case STATUSBAR_EOF_FORMAT:
-            HandleStatusBarEOFFormat();
-            break;
         case STATUSBAR_TABSPACE:
             m_editor.Call(SCI_SETUSETABS, !m_editor.Call(SCI_GETUSETABS));
             break;
@@ -757,56 +782,73 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
             m_editor.Call(SCI_EDITTOGGLEOVERTYPE);
             break;
         case STATUSBAR_ZOOM:
+            KillTimer(*this, TIMER_ZOOM);
             m_editor.Call(SCI_SETZOOM, 0);
             break;
         }
         UpdateStatusBar(true);
     }
     break;
-    case WM_CONTEXTMENU:
+    case WM_LBUTTONUP:
+    //case WM_CONTEXTMENU:
     {
         switch (lParam)
         {
-        case STATUSBAR_ZOOM:
-            HandleStatusBarZoom();
+        case STATUSBAR_EOL_FORMAT:
+            HandleStatusBarEOLFormat();
             break;
+        //case STATUSBAR_ZOOM:
+            //HandleStatusBarZoom();
+            //break;
         }
     }
     break;
     }
 }
 
-void CMainWindow::HandleStatusBarEOFFormat()
+void CMainWindow::HandleStatusBarEOLFormat()
 {
-    int eolmode = (int)m_editor.Call(SCI_GETEOLMODE);
-    FormatType format = UNKNOWN_FORMAT;
-    switch (eolmode)
+    DWORD msgpos = GetMessagePos();
+    int xPos = GET_X_LPARAM(msgpos);
+    int yPos = GET_Y_LPARAM(msgpos);
+
+    HMENU hPopup = CreatePopupMenu();
+    if (!hPopup)
+        return;
+    OnOutOfScope(
+        DestroyMenu(hPopup);
+    );
+    int currentEolMode = (int) m_editor.Call(SCI_GETEOLMODE);
+    EOLFormat currentEolFormat = ToEOLFormat(currentEolMode);
+    static const EOLFormat options[] = { WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT };
+    const int numOptions = std::extent<decltype(options)>::value;
+    for (size_t i = 0; i < numOptions; ++i)
     {
-    case SC_EOL_CRLF:
-        eolmode = SC_EOL_CR;
-        format = MAC_FORMAT;
-        break;
-    case SC_EOL_CR:
-        eolmode = SC_EOL_LF;
-        format = UNIX_FORMAT;
-        break;
-    case SC_EOL_LF:
-        eolmode = SC_EOL_CRLF;
-        format = WIN_FORMAT;
-        break;
-    default:
-        eolmode = SC_EOL_CRLF;
-        format = WIN_FORMAT;
-        break;
+        std::wstring eolName = GetEOLFormatDescription(options[i]);
+        UINT menuItemFlags = MF_STRING;
+        if (options[i] == currentEolFormat)
+            menuItemFlags |= MF_CHECKED | MF_DISABLED;
+        AppendMenu(hPopup, menuItemFlags, i + 1, eolName.c_str());
     }
-    m_editor.Call(SCI_SETEOLMODE, eolmode);
-    m_editor.Call(SCI_CONVERTEOLS, eolmode);
-    int id = m_TabBar.GetCurrentTabId();
-    if (m_DocManager.HasDocumentID(id))
+    auto result = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, NULL);
+    if (result != FALSE)
     {
-        CDocument doc = m_DocManager.GetDocumentFromID(id);
-        doc.m_format = format;
-        m_DocManager.SetDocument(id, doc);
+        size_t optionIndex = size_t(result) - 1;
+        auto selectedEolFormat = options[optionIndex];
+        if (selectedEolFormat != currentEolFormat)
+        {
+            auto selectedEolMode = ToEOLMode(selectedEolFormat);
+            m_editor.Call(SCI_SETEOLMODE, selectedEolMode);
+            m_editor.Call(SCI_CONVERTEOLS, selectedEolMode);
+            int id = m_TabBar.GetCurrentTabId();
+            if (m_DocManager.HasDocumentID(id))
+            {
+                CDocument doc = m_DocManager.GetDocumentFromID(id);
+                doc.m_format = selectedEolFormat;
+                m_DocManager.SetDocument(id, doc);
+                UpdateStatusBar(true);
+            }
+        }
     }
 }
 
@@ -817,19 +859,25 @@ void CMainWindow::HandleStatusBarZoom()
     int yPos = GET_Y_LPARAM(msgpos);
 
     HMENU hPopup = CreatePopupMenu();
-    AppendMenu(hPopup, MF_BYPOSITION, 20, L"20%");
-    AppendMenu(hPopup, MF_BYPOSITION, 50, L"50%");
-    AppendMenu(hPopup, MF_BYPOSITION, 70, L"70%");
-    AppendMenu(hPopup, MF_BYPOSITION, 100, L"100%");
-    AppendMenu(hPopup, MF_BYPOSITION, 150, L"150%");
-    AppendMenu(hPopup, MF_BYPOSITION, 200, L"200%");
-    AppendMenu(hPopup, MF_BYPOSITION, 400, L"400%");
-    auto cmd = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, NULL);
-    if (cmd != 0)
+    if (hPopup)
     {
-        int fontsize = (int)m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT);
-        int zoom = (fontsize * cmd / 100) - fontsize;
-        m_editor.Call(SCI_SETZOOM, zoom);
+        OnOutOfScope(
+            DestroyMenu(hPopup);
+        );
+        AppendMenu(hPopup, MF_STRING, 20, L"20%");
+        AppendMenu(hPopup, MF_STRING, 50, L"50%");
+        AppendMenu(hPopup, MF_STRING, 70, L"70%");
+        AppendMenu(hPopup, MF_STRING, 100, L"100%");
+        AppendMenu(hPopup, MF_STRING, 150, L"150%");
+        AppendMenu(hPopup, MF_STRING, 200, L"200%");
+        AppendMenu(hPopup, MF_STRING, 400, L"400%");
+        auto cmd = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, NULL);
+        if (cmd != 0)
+        {
+            int fontsize = (int)m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT);
+            int zoom = (fontsize * cmd / 100) - fontsize;
+            m_editor.Call(SCI_SETZOOM, zoom);
+        }
     }
 }
 
@@ -940,14 +988,20 @@ bool CMainWindow::Initialize()
     // Each value is the right edge of each status bar element.
     m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 865, 925, 1010});
     m_TabBar.Init(hResource, *this);
+    // Note DestroyIcon not technically needed here but we may as well leave in
+    // in case someone changes things to load a non static resource.
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
+    m_TabBarImageList.reset(hImgList);
     HICON hIcon = ::LoadIcon(hResource, MAKEINTRESOURCE(IDI_SAVED_ICON));
+    assert(hIcon != nullptr);
     ImageList_AddIcon(hImgList, hIcon);
     ::DestroyIcon(hIcon);
     hIcon = ::LoadIcon(hResource, MAKEINTRESOURCE(IDI_UNSAVED_ICON));
+    assert(hIcon != nullptr);
     ImageList_AddIcon(hImgList, hIcon);
     ::DestroyIcon(hIcon);
     hIcon = ::LoadIcon(hResource, MAKEINTRESOURCE(IDI_READONLY_ICON));
+    assert(hIcon != nullptr);
     ImageList_AddIcon(hImgList, hIcon);
     ::DestroyIcon(hIcon);
     m_TabBar.SetImageList(hImgList);
@@ -1287,19 +1341,19 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     auto curPos = m_editor.Call(SCI_GETCURRENTPOS);
     long line = (long)m_editor.Call(SCI_LINEFROMPOSITION, curPos) + 1;
     long column = (long)m_editor.Call(SCI_GETCOLUMN, curPos) + 1;
-    swprintf_s(strLnCol, L"Ln: %ld    Col: %ld    %s",
-               line, column,
-               strSel);
+    swprintf_s(strLnCol, L"Ln: %ld    Col: %ld",
+               line, column);
     std::wstring ttcurpos = CStringUtils::Format(rsStatusTTCurPos,
         line, column, selByte, selLine, selTextMarkerCount);
-    m_StatusBar.SetText(strLnCol, ttcurpos.c_str(), STATUSBAR_CUR_POS);
 
     TCHAR strDocLen[256];
     auto lengthInBytes = m_editor.Call(SCI_GETLENGTH);
     auto lineCount = m_editor.Call(SCI_GETLINECOUNT);
     swprintf_s(strDocLen, L"Length: %d    Lines: %d", (int)lengthInBytes, (int)lineCount);
     std::wstring ttdocsize = CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, lineCount);
-    m_StatusBar.SetText(strDocLen, ttdocsize.c_str(), STATUSBAR_DOC_SIZE);
+    //m_StatusBar.SetText(strDocLen, ttdocsize.c_str(), STATUSBAR_DOC_SIZE);
+    m_StatusBar.SetText(strLnCol, ttdocsize.c_str(), STATUSBAR_CUR_POS);
+    m_StatusBar.SetText(strSel, ttcurpos.c_str(), STATUSBAR_SEL);
 
     auto overType = m_editor.Call(SCI_GETOVERTYPE);
     std::wstring tttyping = CStringUtils::Format(rsStatusTTTyping, overType ? rsStatusTTTypingOvl.c_str() : rsStatusTTTypingIns.c_str());
@@ -1319,9 +1373,12 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     if (bEverything)
     {
         CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
+        int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
+        APPVERIFY(ToEOLMode(doc.m_format) == eolMode);
+        std::wstring eolDesc = GetEOLFormatDescription(doc.m_format);
         m_StatusBar.SetText(doc.m_language.c_str(), nullptr, STATUSBAR_DOC_TYPE);
-        std::wstring tteof = CStringUtils::Format(rsStatusTTEOF, FormatTypeToString(doc.m_format).c_str());
-        m_StatusBar.SetText(FormatTypeToString(doc.m_format).c_str(), tteof.c_str(), STATUSBAR_EOF_FORMAT);
+        std::wstring tteof = CStringUtils::Format(rsStatusTTEOF, eolDesc.c_str());
+        m_StatusBar.SetText(eolDesc.c_str(), tteof.c_str(), STATUSBAR_EOL_FORMAT);
         std::wstring ttencoding = CStringUtils::Format(rsStatusTTEncoding, doc.GetEncodingString().c_str());
         m_StatusBar.SetText(doc.GetEncodingString().c_str(), ttencoding.c_str(), STATUSBAR_UNICODE_TYPE);
 
@@ -1824,7 +1881,7 @@ void CMainWindow::HandleClipboardUpdate()
                     break;
                 }
             }
-            m_ClipboardHistory.push_front(s);
+            m_ClipboardHistory.push_front(std::move(s));
         }
     }
 
@@ -1841,6 +1898,9 @@ void CMainWindow::PasteHistory()
         HMENU hMenu = CreatePopupMenu();
         if (hMenu)
         {
+            OnOutOfScope(
+                DestroyMenu(hMenu);
+            );
             size_t pos = m_editor.Call(SCI_GETCURRENTPOS);
             POINT pt;
             pt.x = (LONG)m_editor.Call(SCI_POINTXFROMPOSITION, 0, pos);
@@ -1866,7 +1926,6 @@ void CMainWindow::PasteHistory()
                 ++index;
             }
             int selIndex = TrackPopupMenu(hMenu, TPM_LEFTALIGN|TPM_RETURNCMD, pt.x, pt.y, 0, m_editor, nullptr);
-            DestroyMenu (hMenu);
             if (selIndex > 0)
             {
                 index = 1;

@@ -20,13 +20,11 @@
 
 
 
-std::wstring FormatTypeToString( FormatType ft )
+std::wstring GetEOLFormatDescription( EOLFormat ft )
 {
     std::wstring sFt;
     switch (ft)
     {
-    case UNKNOWN_FORMAT:
-        break;
     case WIN_FORMAT:
         sFt = L"Windows (CRLF)";
         break;

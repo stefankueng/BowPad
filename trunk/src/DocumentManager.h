@@ -27,6 +27,9 @@ enum DocModifiedState
     DM_Unknown
 };
 
+EOLFormat ToEOLFormat(int eolMode);
+int ToEOLMode(EOLFormat eolFormat);
+
 class CDocumentManager
 {
 public:
@@ -47,8 +50,9 @@ public:
     bool                        SaveFile(HWND hWnd, const CDocument& doc, bool & bTabMoved);
     bool                        UpdateFileTime(CDocument& doc, bool bIncludeReadonly);
     DocModifiedState            HasFileChanged(int id) const;
+
 private:
-    FormatType                  GetEOLFormatForm(const char *data, DWORD len) const;
+    static EOLFormat            SenseEOLFormat(const char *data, DWORD len);
     bool                        SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc);
 
 private:
