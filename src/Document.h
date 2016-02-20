@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 
 typedef uptr_t Document;
 
-enum FormatType { UNKNOWN_FORMAT, WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT };
+enum EOLFormat { UNKNOWN_FORMAT, WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT };
 
-std::wstring FormatTypeToString(FormatType ft);
+std::wstring GetEOLFormatDescription(EOLFormat ft);
 
 class CPosData
 {
@@ -49,7 +49,7 @@ class CDocument
 public:
     CDocument()
         : m_document(NULL)
-        , m_format(UNKNOWN_FORMAT)
+        , m_format(WIN_FORMAT)
         , m_bHasBOM(false)
         , m_bTrimBeforeSave(false)
         , m_bEnsureNewlineAtEnd(false)
@@ -66,7 +66,7 @@ public:
     std::wstring GetEncodingString();
 
     Document                m_document;
-    FormatType              m_format;
+    EOLFormat               m_format;
     bool                    m_bHasBOM;
     bool                    m_bTrimBeforeSave;
     bool                    m_bEnsureNewlineAtEnd;
