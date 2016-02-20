@@ -429,6 +429,34 @@ static void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
     }
 }
 
+EOLFormat ToEOLFormat(int eolMode)
+{
+    switch (eolMode)
+    {
+    case SC_EOL_CRLF:
+        return WIN_FORMAT;
+    case SC_EOL_LF:
+        return UNIX_FORMAT;
+    case SC_EOL_CR:
+        return MAC_FORMAT;
+    }
+    return UNKNOWN_FORMAT;
+}
+
+int ToEOLMode(EOLFormat eolFormat)
+{
+    switch (eolFormat)
+    {
+    case WIN_FORMAT:
+        return SC_EOL_CRLF;
+    case UNIX_FORMAT:
+        return SC_EOL_LF;
+    case MAC_FORMAT:
+        return SC_EOL_CR;
+    }
+    return -1;
+}
+
 CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing)
 {
     CDocument doc;
@@ -532,7 +560,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
                   data, charbuf.get(), charbufSize, widebuf.get() );
 
         if (doc.m_format == UNKNOWN_FORMAT)
-            doc.m_format = GetEOLFormatForm(data, lenFile);
+            doc.m_format = SenseEOLFormat(data, lenFile);
 
         if (incompleteMultibyteChar != 0) // copy bytes to next buffer
             memcpy(data, data + ReadBlockSize - incompleteMultibyteChar, incompleteMultibyteChar);
@@ -557,7 +585,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     return doc;
 }
 
-FormatType CDocumentManager::GetEOLFormatForm( const char *data, DWORD len ) const
+EOLFormat CDocumentManager::SenseEOLFormat( const char *data, DWORD len )
 {
     for (size_t i = 0 ; i < len ; i++)
     {

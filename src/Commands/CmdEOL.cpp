@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ CCmdEOLWin::CCmdEOLWin(void * obj) : ICommand(obj)
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-CCmdEOLWin::~CCmdEOLWin(void)
+CCmdEOLWin::~CCmdEOLWin()
 {
 }
 
@@ -66,7 +66,7 @@ CCmdEOLUnix::CCmdEOLUnix(void * obj) : ICommand(obj)
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-CCmdEOLUnix::~CCmdEOLUnix(void)
+CCmdEOLUnix::~CCmdEOLUnix()
 {
 }
 
@@ -109,7 +109,7 @@ CCmdEOLMac::CCmdEOLMac(void * obj) : ICommand(obj)
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-CCmdEOLMac::~CCmdEOLMac(void)
+CCmdEOLMac::~CCmdEOLMac()
 {
 }
 

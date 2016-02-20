@@ -334,9 +334,17 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                         ScreenToClient(*this, &pt);
                         if (PtInRect(&rc, pt))
                         {
-                            m_bCursorShown = false;
-                            SetCursor(NULL);
-                            Call(SCI_SETCURSOR, (uptr_t)-2);
+                            // We want to hide the cusor, let the parent override that choice.
+                            // If they don't doesn't understand the message then the result
+                            // should remain TRUE and we'll go ahead and hide.
+                            BOOL hide = TRUE;
+                            SendMessage(GetParent(*this), WM_CANHIDECURSOR, WPARAM(0), LPARAM(&hide));
+                            if (hide)
+                            {
+                                m_bCursorShown = false;
+                                SetCursor(NULL);
+                                Call(SCI_SETCURSOR, (uptr_t)-2);
+                            }
                         }
                     }
                 }

@@ -264,14 +264,19 @@ void CFindReplaceDlg::HandleButtonDropDown(const NMBCDROPDOWN* pDropDown)
     ClientToScreen(pDropDown->hdr.hwndFrom, &pt);
     // Create a menu and add items.
     HMENU hSplitMenu = CreatePopupMenu();
+    if (!hSplitMenu)
+        return;
+    OnOutOfScope(
+        DestroyMenu(hSplitMenu);
+    );
     if (pDropDown->hdr.hwndFrom == GetDlgItem(*this, IDC_FINDBTN))
     {
         ResString sFindAll(hRes, IDS_FINDALL);
         ResString sFindAllInTabs(hRes, IDS_FINDALLINTABS);
         ResString findAllInDir(hRes, IDS_FINDALLINDIR);
-        AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_FINDALL, sFindAll);
-        AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_FINDALLINTABS, sFindAllInTabs);
-        AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_FINDALLINDIR, findAllInDir);
+        AppendMenu(hSplitMenu, MF_STRING, IDC_FINDALL, sFindAll);
+        AppendMenu(hSplitMenu, MF_STRING, IDC_FINDALLINTABS, sFindAllInTabs);
+        AppendMenu(hSplitMenu, MF_STRING, IDC_FINDALLINDIR, findAllInDir);
     }
     else if (pDropDown->hdr.hwndFrom == GetDlgItem(*this, IDC_REPLACEALLBTN))
     {
@@ -287,11 +292,11 @@ void CFindReplaceDlg::HandleButtonDropDown(const NMBCDROPDOWN* pDropDown)
 
         ResString sReplaceAll(hRes, IDS_REPLACEALL);
         ResString sReplaceAllInSelection(hRes, IDS_REPLACEALLINSELECTION);
-        AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_REPLACEALLBTN,
+        AppendMenu(hSplitMenu, MF_STRING, IDC_REPLACEALLBTN,
             bReplaceOnlyInSelection ? sReplaceAllInSelection : sReplaceAll);
 
         ResString sReplaceAllInTabs(hRes, IDS_REPLACEALLINTABS);
-        AppendMenu(hSplitMenu, MF_BYPOSITION, IDC_REPLACEALLINTABSBTN, sReplaceAllInTabs);
+        AppendMenu(hSplitMenu, MF_STRING, IDC_REPLACEALLINTABSBTN, sReplaceAllInTabs);
     }
     // Display the menu.
     TrackPopupMenu(hSplitMenu, TPM_LEFTALIGN | TPM_TOPALIGN, pt.x, pt.y, 0, *this, nullptr);
@@ -1928,7 +1933,7 @@ void CFindReplaceDlg::SearchThread(
             // If finding OF files, only the name is of interest so our job is done.
             CSearchResult result;
             result.pathIndex = m_pendingFoundPaths.size();
-            m_pendingFoundPaths.push_back(path);
+            m_pendingFoundPaths.push_back(std::move(path));
             m_pendingSearchResults.push_back(std::move(result));
             NewData(timeOfLastProgressUpdate, false);
 

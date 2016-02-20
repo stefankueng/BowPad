@@ -50,6 +50,17 @@ enum class ResponseToOutsideDeletedFile
     StayOpen
 };
 
+struct HIMAGELIST_Deleter
+{
+    void operator()(_IMAGELIST* hImageList)
+    {
+        if (hImageList != nullptr)
+        {
+            BOOL deleted = ImageList_Destroy(hImageList);
+            APPVERIFY(deleted != FALSE);
+        }
+    }
+};
 
 class CMainWindow : public CWindow, public IUIApplication, public IUICommandHandler
 {
@@ -160,7 +171,7 @@ private:
     bool                        OnLButtonDown(UINT nFlags, POINT point);
     bool                        OnMouseMove(UINT nFlags, POINT point);
     bool                        OnLButtonUp(UINT nFlags, POINT point);
-    void                        HandleStatusBarEOFFormat();
+    void                        HandleStatusBarEOLFormat();
     void                        HandleStatusBarZoom();
     void                        HandleStatusBar(WPARAM wParam, LPARAM lParam);
 
@@ -193,4 +204,6 @@ private:
     long                        m_initLine;
     int                         m_insertionIndex;
     bool                        m_windowRestored;
+    bool                        m_inMenuLoop = false;
+    std::unique_ptr<_IMAGELIST, HIMAGELIST_Deleter> m_TabBarImageList;
 };

@@ -73,3 +73,4 @@
 #define WM_AFTERINIT        (WM_APP + 11)
 #define WM_STATUSBAR_MSG    (WM_APP + 12)
 #define WM_THREADRESULTREADY    (WM_APP + 13)
+#define WM_CANHIDECURSOR    (WM_APP + 14)
