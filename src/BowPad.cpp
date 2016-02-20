@@ -177,7 +177,8 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLinePa
             // since the CWD of the other instance is most likely different
             int nArgs;
             std::wstring sCmdLine;
-            LPWSTR * szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+            const std::wstring commandLine = GetCommandLineW();
+            LPWSTR * szArglist = CommandLineToArgvW(commandLine.c_str(), &nArgs);
             if (szArglist)
             {
                 bool bOmitNext = false;
@@ -195,16 +196,14 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLinePa
                         path = CPathUtils::GetLongPathname(path);
                         if (!PathFileExists(path.c_str()))
                         {
-                            std::wstring tmp = GetCommandLineW();
-                            auto pathpos = tmp.find(szArglist[i]);
+                            auto pathpos = commandLine.find(szArglist[i]);
                             if (pathpos != std::wstring::npos)
                             {
-                                tmp = tmp.substr(pathpos);
-                                if (PathFileExists(tmp.c_str()))
+                                auto tempPath = commandLine.substr(pathpos);
+                                if (PathFileExists(tempPath.c_str()))
                                 {
-                                    path = tmp;
-                                    CPathUtils::NormalizeFolderSeparators(path);
-                                    path = CPathUtils::GetLongPathname(path);
+                                    CPathUtils::NormalizeFolderSeparators(tempPath);
+                                    path = CPathUtils::GetLongPathname(tempPath);
                                     sCmdLine += L"\"" + path + L"\" ";
                                     break;
                                 }
@@ -288,7 +287,8 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
         // find out if there are paths specified without the key/value pair syntax
         int nArgs;
 
-        LPWSTR * szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+        const std::wstring commandLine = GetCommandLineW();
+        LPWSTR* szArglist = CommandLineToArgvW(commandLine.c_str(), &nArgs);
         if (szArglist)
         {
             size_t line = (size_t)-1;
@@ -312,16 +312,14 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
                     path = CPathUtils::GetLongPathname(path);
                     if (!PathFileExists(path.c_str()))
                     {
-                        std::wstring tmp = GetCommandLineW();
-                        auto pathpos = tmp.find(szArglist[i]);
+                        auto pathpos = commandLine.find(szArglist[i]);
                         if (pathpos != std::wstring::npos)
                         {
-                            tmp = tmp.substr(pathpos);
-                            if (PathFileExists(tmp.c_str()))
+                            auto tempPath = commandLine.substr(pathpos);
+                            if (PathFileExists(tempPath.c_str()))
                             {
-                                path = tmp;
-                                CPathUtils::NormalizeFolderSeparators(path);
-                                path = CPathUtils::GetLongPathname(path);
+                                CPathUtils::NormalizeFolderSeparators(tempPath);
+                                path = CPathUtils::GetLongPathname(tempPath);
                                 mainWindow.SetFileToOpen(path, line);
                                 break;
                             }
@@ -342,10 +340,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
     }
 }
 
-int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
-                       _In_opt_ HINSTANCE hPrevInstance,
-                       _In_ LPTSTR  lpCmdLine,
-                       _In_ int     nCmdShow)
+int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
@@ -424,7 +419,16 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             }
         }
     }
-
-    Scintilla_ReleaseResources();
     return (int)msg.wParam;
+}
+
+int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
+                       _In_opt_ HINSTANCE hPrevInstance,
+                       _In_ LPTSTR  lpCmdLine,
+                       _In_ int     nCmdShow)
+{
+    auto mainResult = BPMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
+    Scintilla_ReleaseResources();
+
+    return mainResult;
 }
