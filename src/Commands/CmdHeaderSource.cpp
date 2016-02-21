@@ -151,6 +151,7 @@ but I can't make that work.
 #include "Resource.h"
 #include "CmdFindReplace.h"
 #include "CorrespondingFileDlg.h"
+#include "OnOutOfScope.h"
 
 extern std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
 
@@ -195,11 +196,9 @@ bool CCmdHeaderSource::UserFindFile(HWND hwndParent, const std::wstring& filenam
 
 CCmdHeaderSource::CCmdHeaderSource(void* obj)
     : ICommand(obj)
-    , m_edit(hRes)
     , m_bSearchedIncludePaths(false)
 {
-    m_edit.InitScratch(hRes);
-    // Because we don't know if this file type supports includes.
+        // Because we don't know if this file type supports includes.
     InvalidateMenu();
 }
 
@@ -272,12 +271,16 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
         if (!HasActiveDocument())
             return E_FAIL;
         CDocument doc = GetDocumentFromID(docId);
-        AttachDocument(m_edit, doc);
 
-        PopulateMenu(doc, collection);
+        CScintillaWnd edit(hRes);
+        edit.InitScratch(hRes);
 
-        // detach document
-        m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
+        AttachDocument(edit, doc);
+        OnOutOfScope(
+            edit.Call(SCI_SETDOCPOINTER, 0, 0); // Detach document
+        );
+
+        PopulateMenu(doc, edit, collection);
 
         return S_OK;
     }
@@ -308,7 +311,7 @@ bool CCmdHeaderSource::IsServiceAvailable()
 // Populate the dropdown with the details. Returns false if
 // any options couldn't be added but for some reason.
 // Not a good enough reason not to show the menu though.
-bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& collection)
+bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, IUICollectionPtr& collection)
 {
     // Create an IUIImage from a resource id.
     IUIImagePtr pImg = nullptr;
@@ -411,7 +414,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, IUICollectionPtr& coll
         // Include Files
 
         std::vector<RelatedFileItem> includes;
-        GetIncludes(doc, m_edit, includes);
+        GetIncludes(doc, edit, includes);
 
         std::wstring mainFolder;
         if (!doc.m_path.empty())

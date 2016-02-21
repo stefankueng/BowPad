@@ -71,7 +71,7 @@ static void LoadLanguage(HINSTANCE hInstance)
         }
         if (CAppUtils::HasSameMajorVersion(langdllpath))
         {
-            hRes = LoadLibraryEx(langdllpath.c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
+            hRes = LoadLibraryEx(langdllpath.c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE | LOAD_LIBRARY_AS_DATAFILE);
             if (hRes == NULL)
                 hRes = hInst;
         }
