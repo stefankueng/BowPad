@@ -20,13 +20,13 @@
 #include "Document.h"
 
 
-CEditorConfigHandler::CEditorConfigHandler(void)
+CEditorConfigHandler::CEditorConfigHandler()
 {
 }
 
-CEditorConfigHandler::~CEditorConfigHandler(void)
+CEditorConfigHandler::~CEditorConfigHandler()
 {
-    for (auto handle : m_handles)
+    for (const auto& handle : m_handles)
     {
         editorconfig_handle_destroy(handle.second);
     }
