@@ -76,7 +76,7 @@ public:
 private:
     void HandleIncludeFileMenuItem(const RelatedFileItem& item);
     void HandleCorrespondingFileMenuItem(const RelatedFileItem& item);
-    bool PopulateMenu(const CDocument& doc, IUICollectionPtr& collection);
+    bool PopulateMenu(const CDocument& doc, CScintillaWnd& edit, IUICollectionPtr& collection);
     void InvalidateMenu();
     void InvalidateMenuEnabled();
     bool HandleSelectedMenuItem(size_t selected);
@@ -94,10 +94,8 @@ private:
     bool GetDefaultCorrespondingFileExtMappings(const std::wstring& from, std::wstring& to) const;
     void GetCorrespondingFileMappings(const std::wstring& input_filename, std::vector<std::wstring>& corresponding_filenames) const;
     bool GetCPPIncludePathsForMS(std::wstring& systemIncludePaths);
-    bool InitSDK();
 private:
     std::vector<RelatedFileItem>    m_menuInfo;
-    CScintillaWnd                   m_edit;
     std::wstring                    m_systemIncludePaths;
     bool                            m_bSearchedIncludePaths;
 };

@@ -117,7 +117,7 @@ CFFileInfo CCorrespondingFileDlg::GetCFInfo()
     // decisions later in the process about these things.
 
     CFFileInfo info;
-    info.ok = true;
+    info.ok = false;
     info.f1Filename = GetDlgItemText(IDC_CFNAME1).get();
     info.f1Folder = GetDlgItemText(IDC_CFFOLDER1).get();
     info.f1Path = CPathUtils::Append(info.f1Folder, info.f1Filename);
@@ -133,14 +133,18 @@ CFFileInfo CCorrespondingFileDlg::GetCFInfo()
 
     if (info.f1Filename.empty())
     {
-        info.ok = false;
         info.status = L"Filename required for first file.";
         return info;
     }
     if (info.f2Filename.empty())
     {
-        info.ok = false;
         info.status = L"Filename required for second file.";
+        return info;
+    }
+
+    if (CPathUtils::PathCompare(info.f1Path, info.f2Path) == 0)
+    {
+        info.status = L"The files must be different.";
         return info;
     }
 
@@ -148,14 +152,12 @@ CFFileInfo CCorrespondingFileDlg::GetCFInfo()
     {
         info.status = CStringUtils::Format(L"Folder \"%s\" does not exist.",
             info.f1Folder.c_str());
-        info.ok = false;
         return info;
     }
     if (!info.f2Folder.empty() && !PathFileExists(info.f2Folder.c_str()))
     {
         info.status = CStringUtils::Format(L"Folder \"%s\" does not exist.",
             info.f2Folder.c_str());
-        info.ok = false;
         return info;
     }
 
@@ -164,13 +166,11 @@ CFFileInfo CCorrespondingFileDlg::GetCFInfo()
         if (info.f1Folder.empty())
         {
             info.status = L"Folder required for first file.";
-            info.ok = false;
             return info;
         }
         if (info.f2Folder.empty())
         {
             info.status = L"Folder required for second file.";
-            info.ok = false;
             return info;
         }
 
@@ -178,23 +178,21 @@ CFFileInfo CCorrespondingFileDlg::GetCFInfo()
         {
             info.status = CStringUtils::Format(L"Files \"%s\" and \"%s\" already exist.",
                 info.f1Path.c_str(), info.f2Path.c_str());
-            info.ok = false;
             return info;
         }
         if (info.f1Exists)
         {
             info.status = CStringUtils::Format(L"File \"%s\" already exists.", info.f1Path.c_str());
-            info.ok = false;
             return info;
         }
         if (info.f2Exists)
         {
             info.status = CStringUtils::Format(L"File \"%s\" already exists.", info.f2Path.c_str());
-            info.ok = false;
             return info;
         }
     }
 
+    info.ok = true;
     return info;
 }
 
