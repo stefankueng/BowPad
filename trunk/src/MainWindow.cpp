@@ -2289,6 +2289,7 @@ void CMainWindow::OpenNewTab()
     doc.m_document = m_editor.Call(SCI_CREATEDOCUMENT);
     doc.m_bHasBOM = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
     doc.m_encoding = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
+    doc.m_language = L"Text";
     std::wstring tabName = GetNewTabName();
     int index = -1;
     if (m_insertionIndex >= 0)
@@ -2379,11 +2380,14 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         doc.m_bDoSaveAs = true;
         doc.m_path = file;
         std::wstring lang = CLexStyles::Instance().GetLanguageForPath(fileName);
+        if (lang.empty())
+            lang = L"Text";
         doc.m_language = lang;
         auto index = m_TabBar.InsertAtEnd(fileName.c_str());
         int docID = m_TabBar.GetIDFromIndex(index);
         m_DocManager.AddDocumentAtEnd(doc, docID);
         UpdateTab(docID);
+        UpdateStatusBar(true);
         m_TabBar.ActivateAt(index);
         m_editor.SetupLexerForLang(lang);
         m_editor.GotoLine(0);

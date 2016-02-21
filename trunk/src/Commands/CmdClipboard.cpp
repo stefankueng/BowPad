@@ -224,6 +224,7 @@ void ClipboardBase::SetLexerFromClipboard()
                     doc.m_language = lang;
                     SetDocument(GetDocIdOfCurrentTab(), doc);
                     SetupLexerForLang(lang);
+                    UpdateStatusBar(true);
                 }
             }
         }
