@@ -185,7 +185,7 @@ bool CScintillaWnd::InitScratch( HINSTANCE hInst )
 {
     Scintilla_RegisterClasses(hInst);
 
-    CreateEx(0, 0, NULL, 0, L"Scintilla");
+    CreateEx(WS_EX_NOPARENTNOTIFY, 0, NULL, 0, L"Scintilla");
 
     if (!*this)
     {
