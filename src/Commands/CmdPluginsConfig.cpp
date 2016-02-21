@@ -38,7 +38,7 @@ CPluginsConfigDlg::CPluginsConfigDlg(void * obj)
     : ICommand(obj)
 {}
 
-CPluginsConfigDlg::~CPluginsConfigDlg(void)
+CPluginsConfigDlg::~CPluginsConfigDlg()
 {}
 
 LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -287,7 +287,7 @@ void CPluginsConfigDlg::InitPluginsList()
     int index = 0;
     for (const auto& info : m_plugins)
     {
-        wchar_t buf[1024] = { 0 };
+        wchar_t buf[1024];
         wcscpy_s(buf, info.name.c_str());
         LVITEM item = { 0 };
         item.iItem = index;

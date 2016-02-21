@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class CPluginsConfigDlg : public CDialog, public ICommand
 {
 public:
     CPluginsConfigDlg(void * obj);
-    ~CPluginsConfigDlg(void);
+    ~CPluginsConfigDlg();
 
 protected:
     LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -50,8 +50,8 @@ protected:
     LRESULT                 DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
     void                    InitPluginsList();
 
-    virtual bool Execute() override { return true; }
-    virtual UINT GetCmdId() override { return 0; }
+    bool Execute() override { return true; }
+    UINT GetCmdId() override { return 0; }
 private:
     CDlgResizer                         m_resizer;
     std::vector<PluginInfo>             m_plugins;
@@ -66,11 +66,11 @@ public:
         : ICommand(obj)
     {}
 
-    ~CCmdPluginsConfig(void)
+    ~CCmdPluginsConfig()
     {}
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdPluginConfig; }
+    UINT GetCmdId() override { return cmdPluginConfig; }
 
 };
