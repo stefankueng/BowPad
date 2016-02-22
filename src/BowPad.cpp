@@ -428,7 +428,18 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                        _In_ int     nCmdShow)
 {
     auto mainResult = BPMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-    Scintilla_ReleaseResources();
+
+    // Scintilla_ReleaseResources();
+    // For now, avoid shutting down Scintilla's resources because we
+    // have global statics like CCommandHandler::instance() that contain
+    // things like CCmdFunctions that contain CScintillaWnd's as members.
+    // This global static destructor chain is called AFTER WinMain
+    // exits, meaining some ~CScintillaWnd's will destruct after WinMain
+    // exits and refer to Scintilla resources and they won't be there if
+    // we call Scintilla_ReleaseResources() in WinMain.
+    // One solution is to avoid the singleton pattern as currently implemented
+    // but for now just avoid freeing the Scintilla resources anywhere and
+    // certainly not here.
 
     return mainResult;
 }
