@@ -22,6 +22,7 @@
 #include "PathUtils.h"
 #include "BowPad.h"
 #include "AppUtils.h"
+#include "OnOutOfScope.h"
 
 namespace
 {
@@ -34,7 +35,7 @@ static const COLORREF fgColor = RGB(0, 0, 0);
 static const COLORREF bgColor = RGB(255, 255, 255);
 };
 
-static std::multimap<std::wstring, std::string> lexDetectStrings = {
+static const std::pair<const wchar_t*const, const char*const> lexDetectStrings[] = {
     // a '+' in front of the lexer name means the string can appear anywhere in the
     // first line of the document.
     // a '-' in front of the lexer name means the string must appear
@@ -60,7 +61,6 @@ StyleData::StyleData()
 
 CLexStyles::CLexStyles()
     : m_bLoaded(false)
-    , m_scratchWnd(hRes)
 {
 }
 
@@ -74,7 +74,6 @@ CLexStyles& CLexStyles::Instance()
     if (!instance.m_bLoaded)
     {
         instance.Load();
-        instance.m_scratchWnd.Init(hRes, NULL);
     }
     return instance;
 }
@@ -501,11 +500,6 @@ std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
     return L"";
 }
 
-std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc)
-{
-    return GetLanguageForDocument(doc, m_scratchWnd);
-}
-
 std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit)
 {
     if (doc.m_path.empty())
@@ -519,8 +513,12 @@ std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintilla
     // Since this needs to be fast, we don't do excessive checks but
     // keep it very, very simple.
     edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+    OnOutOfScope(
+        edit.Call(SCI_SETDOCPOINTER, 0, 0);
+    );
 
     std::string line = edit.GetLine(0);
+    const size_t n = std::extent<decltype(lexDetectStrings)>::value;
     for (const auto& m : lexDetectStrings)
     {
         auto foundpos = line.find(m.second);
@@ -531,7 +529,6 @@ std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintilla
             break;
         }
     }
-    edit.Call(SCI_SETDOCPOINTER, 0, 0);
 
     return lang;
 }

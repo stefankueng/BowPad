@@ -66,22 +66,8 @@ class LexerData;
 class CScintillaWnd : public CWindow
 {
 public :
-    CScintillaWnd(HINSTANCE hInst)
-        : CWindow(hInst)
-        , m_pSciMsg(nullptr)
-        , m_pSciWndData(0)
-        , m_selTextMarkerCount(0)
-        , m_bCursorShown(true)
-        , m_bScratch(false)
-    {};
-    virtual ~CScintillaWnd()
-    {
-        if (m_bScratch)
-        {
-            DestroyWindow(*this);
-            m_hwnd = nullptr;
-        }
-    }
+    CScintillaWnd(HINSTANCE hInst);
+    virtual ~CScintillaWnd();
 
     bool Init(HINSTANCE hInst, HWND hParent);
     bool InitScratch(HINSTANCE hInst);

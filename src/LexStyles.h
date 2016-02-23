@@ -140,5 +140,4 @@ private:
     std::map<std::string, std::string>  m_autoextLang;
     std::map<std::wstring, std::string> m_pathsLang;
     std::list<std::wstring>             m_pathsForLang;
-    CScintillaWnd                       m_scratchWnd;
 };

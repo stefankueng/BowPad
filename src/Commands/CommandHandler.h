@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,16 +22,18 @@
 #include <memory>
 #include <vector>
 
+#include "MainWindow.h"
+
 class CCommandHandler
 {
-private:
-    CCommandHandler(void);
-    ~CCommandHandler(void);
+public:
+    CCommandHandler();
+    ~CCommandHandler();
 
 public:
     static CCommandHandler& Instance();
 
-    void                            Init(void * obj);
+    void                            Init(CMainWindow* obj);
     ICommand *                      GetCommand(UINT cmdId);
     void                            ScintillaNotify(Scintilla::SCNotification * pScn);
     void                            TabNotify(TBHDR * ptbhdr);

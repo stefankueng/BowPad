@@ -76,11 +76,18 @@ CCommandHandler::~CCommandHandler()
 {
 }
 
+//CCommandHandler& CCommandHandler::Instance()
+//{
+    //static CCommandHandler instance;
+    //return instance;
+//}
+
 CCommandHandler& CCommandHandler::Instance()
 {
-    static CCommandHandler instance;
-    return instance;
+    extern CCommandHandler* g_commandHandler;
+    return *g_commandHandler;
 }
+
 
 ICommand * CCommandHandler::GetCommand( UINT cmdId )
 {
@@ -93,7 +100,7 @@ ICommand * CCommandHandler::GetCommand( UINT cmdId )
     return nullptr;
 }
 
-void CCommandHandler::Init( void * obj )
+void CCommandHandler::Init(CMainWindow * obj )
 {
     Add<CCmdMRU>(obj);
     Add<CCmdToggleTheme>(obj);

@@ -205,4 +205,5 @@ private:
     bool                        m_windowRestored;
     bool                        m_inMenuLoop = false;
     std::unique_ptr<_IMAGELIST, HIMAGELIST_Deleter> m_TabBarImageList;
+    CScintillaWnd               m_scratchEditor;
 };
