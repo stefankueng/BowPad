@@ -100,7 +100,7 @@ ICommand * CCommandHandler::GetCommand( UINT cmdId )
     return nullptr;
 }
 
-void CCommandHandler::Init(CMainWindow * obj )
+void CCommandHandler::Init(void * obj)
 {
     Add<CCmdMRU>(obj);
     Add<CCmdToggleTheme>(obj);
