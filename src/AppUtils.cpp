@@ -145,11 +145,12 @@ bool CAppUtils::CheckForUpdate(bool force)
             if (result != ERROR_SUCCESS)
             {
                 // BowPad was not installed: portable version.
-                RegCloseKey(subKey);
                 // No auto update check for portable versions
                 if (!force)
                     return false;
             }
+            else
+                RegCloseKey(subKey);
 
             std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
 
@@ -163,7 +164,7 @@ bool CAppUtils::CheckForUpdate(bool force)
                 if (File.good())
                 {
                     char line[1024];
-                    char * pLine = line;
+                    const char* pLine = line;
                     File.getline(line, sizeof(line));
                     int major = 0;
                     int minor = 0;
@@ -214,6 +215,7 @@ bool CAppUtils::CheckForUpdate(bool force)
 #endif
                 }
                 File.close();
+                DeleteFile(tempfile.c_str());
             }
         }
     }
