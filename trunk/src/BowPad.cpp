@@ -30,9 +30,12 @@
 #include "SysInfo.h"
 #include "OnOutOfScope.h"
 #include "version.h"
+#include "CommandHandler.h"
 
 HINSTANCE hInst;
 HINSTANCE hRes;
+
+CCommandHandler* g_commandHandler;
 
 static void LoadLanguage(HINSTANCE hInstance)
 {
@@ -90,7 +93,7 @@ static void SetIcon()
             // but the default icon hasn't been set yet: set the default icon now
             if (RegCreateKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe\\DefaultIcon", &hKey) == ERROR_SUCCESS)
             {
-                OnOutOfScope(RegCloseKey(hKey));
+                OnOutOfScope(RegCloseKey(hKey););
                 std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str(), IDI_BOWPAD_DOC);
                 if (RegSetValue(hKey, NULL, REG_SZ, sIconPath.c_str(), 0) == ERROR_SUCCESS)
                 {
@@ -181,6 +184,7 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLinePa
             LPWSTR * szArglist = CommandLineToArgvW(commandLine.c_str(), &nArgs);
             if (szArglist)
             {
+                OnOutOfScope(LocalFree(szArglist););
                 bool bOmitNext = false;
                 for (int i = 0; i < nArgs; i++)
                 {
@@ -217,9 +221,6 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLinePa
                             bOmitNext = true;
                     }
                 }
-
-                // Free memory allocated for CommandLineToArgvW arguments.
-                LocalFree(szArglist);
             }
             auto ownCmdLine = std::make_unique<wchar_t[]>(sCmdLine.size() + 2);
             wcscpy_s(ownCmdLine.get(), sCmdLine.size() + 2, sCmdLine.c_str());
@@ -291,6 +292,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
         LPWSTR* szArglist = CommandLineToArgvW(commandLine.c_str(), &nArgs);
         if (szArglist)
         {
+            OnOutOfScope(LocalFree(szArglist););
             size_t line = (size_t)-1;
             if (parser.HasVal(L"line"))
             {
@@ -333,9 +335,6 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
                         bOmitNext = true;
                 }
             }
-
-            // Free memory allocated for CommandLineToArgvW arguments.
-            LocalFree(szArglist);
         }
     }
 }
@@ -349,7 +348,7 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int n
     HRESULT hr = CoInitialize(NULL);
     if (FAILED(hr))
         return FALSE;
-    OnOutOfScope(CoUninitialize());
+    OnOutOfScope(CoUninitialize(););
 
     CCmdLineParser parser(lpCmdLine);
     if (parser.HasKey(L"?") || parser.HasKey(L"help"))
@@ -398,6 +397,9 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int n
 
     MSG msg = { 0 };
     CMainWindow mainWindow(hRes);
+    CCommandHandler commandHandler;
+    g_commandHandler = &commandHandler;
+
     if (mainWindow.RegisterAndCreateWindow())
     {
         ParseCommandLine(parser, mainWindow);
@@ -428,18 +430,14 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                        _In_ int     nCmdShow)
 {
     auto mainResult = BPMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
+    g_commandHandler = nullptr;
 
-    // Scintilla_ReleaseResources();
-    // For now, avoid shutting down Scintilla's resources because we
-    // have global statics like CCommandHandler::instance() that contain
-    // things like CCmdFunctions that contain CScintillaWnd's as members.
-    // This global static destructor chain is called AFTER WinMain
-    // exits, meaining some ~CScintillaWnd's will destruct after WinMain
-    // exits and refer to Scintilla resources and they won't be there if
-    // we call Scintilla_ReleaseResources() in WinMain.
-    // One solution is to avoid the singleton pattern as currently implemented
-    // but for now just avoid freeing the Scintilla resources anywhere and
-    // certainly not here.
+    Scintilla_ReleaseResources();
+
+    // Be careful shutting down Scintilla's resources here if any
+    // global static objects contain things like CScintillaWnd as members
+    // as they will destruct AFTER WinMain. That won't be a good thing
+    // if we've released Scintilla resources IN WinMain.
 
     return mainResult;
 }

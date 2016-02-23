@@ -61,6 +61,25 @@ extern std::string    g_sHighlightString;  // from CmdFindReplace
 #define TIM_BRACEHIGHLIGHTTEXT      102
 #define TIM_BRACEHIGHLIGHTTEXTCLEAR 103
 
+CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
+    : CWindow(hInst)
+    , m_pSciMsg(nullptr)
+    , m_pSciWndData(0)
+    , m_selTextMarkerCount(0)
+    , m_bCursorShown(true)
+    , m_bScratch(false)
+{
+}
+
+CScintillaWnd::~CScintillaWnd()
+{
+    if (m_bScratch)
+    {
+        DestroyWindow(*this);
+        m_hwnd = nullptr;
+    }
+}
+
 bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 {
     Scintilla_RegisterClasses(hInst);

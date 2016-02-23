@@ -92,13 +92,15 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_windowRestored(false)
     , m_pRibbon(nullptr)
     , m_RibbonHeight(0)
+    , m_scratchEditor(hResource)
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
     m_fileTreeVisible = CIniSettings::Instance().GetInt64(L"View", L"FileTree", 1) != 0;
     m_oldPt.x = m_oldPt.y = 0;
+    m_scratchEditor.InitScratch(hRes);
 }
 
-CMainWindow::~CMainWindow(void)
+CMainWindow::~CMainWindow()
 {
     DestroyIcon(m_hShieldIcon);
 }
@@ -1264,7 +1266,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         m_DocManager.UpdateFileTime(doc, false);
         if (bSaveAs)
         {
-            doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
+            doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
             m_editor.SetupLexerForLang(doc.m_language);
         }
         std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
@@ -1344,12 +1346,9 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     std::wstring ttcurpos = CStringUtils::Format(rsStatusTTCurPos,
         line, column, selByte, selLine, selTextMarkerCount);
 
-    TCHAR strDocLen[256];
     auto lengthInBytes = m_editor.Call(SCI_GETLENGTH);
     auto lineCount = m_editor.Call(SCI_GETLINECOUNT);
-    swprintf_s(strDocLen, L"Length: %d    Lines: %d", (int)lengthInBytes, (int)lineCount);
     std::wstring ttdocsize = CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, lineCount);
-    //m_StatusBar.SetText(strDocLen, ttdocsize.c_str(), STATUSBAR_DOC_SIZE);
     m_StatusBar.SetText(strLnCol, ttdocsize.c_str(), STATUSBAR_CUR_POS);
     m_StatusBar.SetText(strSel, ttcurpos.c_str(), STATUSBAR_SEL);
 
@@ -2495,7 +2494,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 id = activetabid;
                 m_TabBar.SetCurrentTitle(sFileName.c_str());
             }
-            doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
+            doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
             if ((CPathUtils::PathCompare(filepath, m_tabmovepath) == 0) && m_tabmovemod)
             {
                 doc.m_path = m_tabmovesavepath;
@@ -2613,7 +2612,7 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
     doc.m_bNeedsSaving = bModified;
     m_DocManager.UpdateFileTime(doc, true);
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
-    doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
+    doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
     m_DocManager.SetDocument(docID, doc);
     m_editor.Call(SCI_SETREADONLY, doc.m_bIsReadonly);
     m_editor.SetupLexerForLang(doc.m_language);
@@ -2975,11 +2974,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     bool bReloadCurrentTab = (tab == m_TabBar.GetCurrentTabIndex());
     CDocument doc = m_DocManager.GetDocumentFromID(docID);
 
-    CScintillaWnd scratchEditor(hResource);
-    if (bReloadCurrentTab)
-        scratchEditor.InitScratch(hResource);
-
-    CScintillaWnd * editor = bReloadCurrentTab ? &m_editor : &scratchEditor;
+    CScintillaWnd* editor = bReloadCurrentTab ? &m_editor : &m_scratchEditor;
     if (dueToOutsideChanges)
     {
         ResponseToOutsideModifiedFile response = AskToReloadOutsideModifiedFile(doc);
@@ -3148,7 +3143,7 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
     m_editor.Call(SCI_SETREADONLY, doc.m_bIsReadonly);
 
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
-    doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc);
+    doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
     m_DocManager.SetDocument(docID, doc);
 
     m_editor.SetupLexerForLang(doc.m_language);
