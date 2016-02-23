@@ -226,6 +226,11 @@ CCmdFunctions::CCmdFunctions(void * obj)
     m_startTime = m_endTime = std::chrono::steady_clock::now();
 }
 
+CCmdFunctions::~CCmdFunctions()
+{
+}
+
+
 int CCmdFunctions::TopDocumentId() const
 {
     APPVERIFY(! m_docIDs.empty());

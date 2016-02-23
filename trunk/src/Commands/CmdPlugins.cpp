@@ -75,7 +75,7 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
         }
 
 
-        auto plugins = CCommandHandler::Instance().GetPluginMap();
+        const auto& plugins = CCommandHandler::Instance().GetPluginMap();
         if (plugins.empty())
         {
             // show text that no plugins are available
@@ -105,8 +105,8 @@ HRESULT CCmdPlugins::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROP
             UINT selected;
             hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
             UINT count = 0;
-            auto plugins = CCommandHandler::Instance().GetPluginMap();
-            for (auto p : plugins)
+            const auto& plugins = CCommandHandler::Instance().GetPluginMap();
+            for (const auto& p : plugins)
             {
                 if (count == selected)
                 {

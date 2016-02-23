@@ -86,14 +86,14 @@ static UINT64 inline DwordSwapBytes(UINT64 nValue)
     return nRet;
 }
 
-CDocumentManager::CDocumentManager(void)
+CDocumentManager::CDocumentManager()
     : m_scratchScintilla(hRes)
     , m_lastfoldercolorindex(0)
 {
     m_scratchScintilla.InitScratch(hRes);
 }
 
-CDocumentManager::~CDocumentManager(void)
+CDocumentManager::~CDocumentManager()
 {
 }
 
