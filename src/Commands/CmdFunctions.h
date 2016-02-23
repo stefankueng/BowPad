@@ -71,9 +71,7 @@ class CCmdFunctions : public ICommand
 {
 public:
     CCmdFunctions(void * obj);
-
-    ~CCmdFunctions()
-    {}
+    ~CCmdFunctions();
 
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdFunctions; }
