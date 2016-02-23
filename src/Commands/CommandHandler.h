@@ -22,8 +22,6 @@
 #include <memory>
 #include <vector>
 
-#include "MainWindow.h"
-
 class CCommandHandler
 {
 public:
@@ -33,7 +31,7 @@ public:
 public:
     static CCommandHandler& Instance();
 
-    void                            Init(CMainWindow* obj);
+    void                            Init(void* obj);
     ICommand *                      GetCommand(UINT cmdId);
     void                            ScintillaNotify(Scintilla::SCNotification * pScn);
     void                            TabNotify(TBHDR * ptbhdr);
