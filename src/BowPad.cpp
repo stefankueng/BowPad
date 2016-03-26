@@ -219,6 +219,11 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLinePa
                     {
                         if (wcscmp(&szArglist[i][1], L"z") == 0)
                             bOmitNext = true;
+                        else
+                        {
+                            sCmdLine += szArglist[i];
+                            sCmdLine += L" ";
+                        }
                     }
                 }
             }
