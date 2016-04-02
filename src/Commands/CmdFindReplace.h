@@ -208,7 +208,7 @@ protected:
         UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
     static std::string      UnEscape(const std::string& str);
-    static bool             ReadBase(const char* str, int* value, int base, int size);
+    static bool             ReadBase(const char* str, size_t* value, size_t base, size_t size);
 
 private:
     CDlgResizer                 m_resizer;
