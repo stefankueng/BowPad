@@ -3019,8 +3019,14 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     // LoadFile increases the reference count, so decrease it here first
     editor->Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
     CDocument docreload = m_DocManager.LoadFile(*this, doc.m_path.c_str(), encoding, false);
-    if (! docreload.m_document)
+    if (!docreload.m_document)
+    {
+        // since we called SCI_RELEASEDOCUMENT but LoadFile did not properly load,
+        // we have to increase the reference count again. Otherwise the document
+        // might get completely released.
+        editor->Call(SCI_ADDREFDOCUMENT, 0, doc.m_document);
         return false;
+    }
 
     if (bReloadCurrentTab)
     {
