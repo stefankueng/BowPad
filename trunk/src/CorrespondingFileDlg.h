@@ -50,7 +50,7 @@ protected:
     //void OnClose() override;
 
 protected:
-    LRESULT DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     LRESULT DoCommand(int id, int msg);
     void InitSizing();
     void DoInitDialog(HWND hwndDlg);
