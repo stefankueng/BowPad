@@ -1205,8 +1205,8 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <ContextPopup.MiniToolbars>
         <MiniToolbar Name="CopyPasteToolbar">
           <MenuGroup>
-            <Button CommandName="cmdCutPlain" />
-            <Button CommandName="cmdCopyPlain" />
+            <Button CommandName="cmdCut" />
+            <Button CommandName="cmdCopy" />
             <Button CommandName="cmdPaste" />
           </MenuGroup>
         </MiniToolbar>
@@ -1220,6 +1220,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           <MenuGroup>
             <Button CommandName="cmdSelectAll" />
             <Button CommandName="cmdDelete" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdCut" />
+            <Button CommandName="cmdCopy" />
+            <Button CommandName="cmdPaste" />
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="cmdLaunchSearch"/>
