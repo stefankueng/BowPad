@@ -503,6 +503,10 @@ msgstr ""
 msgid "Create Corresponding File"
 msgstr ""
 
+#. Resource IDs: (1089)
+msgid "Create files on OK."
+msgstr ""
+
 #. Resource IDs: (163)
 msgid "Create\nAn empty file is created."
 msgstr ""
@@ -1209,6 +1213,10 @@ msgstr ""
 msgid "New Copy"
 msgstr ""
 
+#. Resource IDs: (237)
+msgid "New Corresponding Files."
+msgstr ""
+
 #. Resource IDs: (60034)
 msgid "New Document"
 msgstr ""
@@ -1752,6 +1760,10 @@ msgstr ""
 msgid "Split long lines at the right window border"
 msgstr ""
 
+#. Resource IDs: (1088)
+msgid "Status"
+msgstr ""
+
 #. Resource IDs: (144)
 msgid "Style Configurator"
 msgstr ""
@@ -2082,7 +2094,7 @@ msgstr ""
 msgid "Zoom: %d%%"
 msgstr ""
 
-#. Resource IDs: (1071)
+#. Resource IDs: (1071, 1090, 1091)
 msgid "^"
 msgstr ""
 
