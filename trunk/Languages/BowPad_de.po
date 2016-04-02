@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-31 13:49+0100\n"
-"PO-Revision-Date: 2016-01-31 14:09+0100\n"
+"POT-Creation-Date: 2016-04-02 10:14+0200\n"
+"PO-Revision-Date: 2016-04-02 10:14+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.2\n"
+"X-Generator: Poedit 1.8.7\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -556,6 +556,10 @@ msgstr "Erstelle '%s'"
 msgid "Create Corresponding File"
 msgstr "Erstelle entsprechende Datei"
 
+#. Resource IDs: (1089)
+msgid "Create files on OK."
+msgstr "Erstelle Dateien mit OK."
+
 #. Resource IDs: (163)
 msgid ""
 "Create\n"
@@ -696,14 +700,14 @@ msgid "Do this for all files"
 msgstr "Tu dies für alle Dateien"
 
 #. Resource IDs: (219)
-#, fuzzy, c-format
+#, c-format
 msgid "Do you want to copy the file '%s' to '%s'?"
-msgstr "Möchten Sie die Datei %s nach %s kopieren?"
+msgstr "Möchten Sie die Datei '%s' nach '%s' kopieren?"
 
 #. Resource IDs: (220)
-#, fuzzy, c-format
+#, c-format
 msgid "Do you want to move the file '%s' to '%s'?"
-msgstr "Möchten Sie die Datei %s nach %s verschieben?"
+msgstr "Möchten Sie die Datei '%s' nach '%s' verschieben?"
 
 #. Resource IDs: (106)
 #, c-format
@@ -913,7 +917,6 @@ msgid "Find &All"
 msgstr "Suchen &Alle"
 
 #. Resource IDs: (210)
-#, fuzzy
 msgid "Find All In &Folder"
 msgstr "Suchen Alle in &Ordner"
 
@@ -922,14 +925,12 @@ msgid "Find All In All &Tabs"
 msgstr "Finde Alle in allen &Tabs"
 
 #. Resource IDs: (1073)
-#, fuzzy
 msgid "Find Fi&les"
-msgstr "Suchen &Alle"
+msgstr "Finde &Dateien"
 
 #. Resource IDs: (225)
-#, fuzzy
 msgid "Find Files"
-msgstr "Öffne Dateien"
+msgstr "Finde Dateien"
 
 #. Resource IDs: (60174, 60176)
 msgid "Find Next"
@@ -956,7 +957,6 @@ msgid "Find and replace"
 msgstr "Suche und ersetze"
 
 #. Resource IDs: (231)
-#, fuzzy
 msgid "Find previous."
 msgstr "Finde vorheriges"
 
@@ -969,23 +969,22 @@ msgid "Folding"
 msgstr "Klappung"
 
 #. Resource IDs: (1015)
-#, fuzzy
 msgid "Follow Tab"
-msgstr "Schliesse Tab"
+msgstr "Folge Tab"
 
 #. Resource IDs: (60498, 65535)
 msgid "Font"
 msgstr "Schriftart"
 
 #. Resource IDs: (199)
-#, fuzzy, c-format
+#, c-format
 msgid "Found: %d matches in %d tabs."
 msgstr "Gefunden: %d in %d Tabs"
 
 #. Resource IDs: (198)
-#, fuzzy, c-format
+#, c-format
 msgid "Found: %d matches."
-msgstr "Gefunden: %d Markierungen"
+msgstr "Gefunden: %d Treffer"
 
 #. Resource IDs: (203)
 #, c-format
@@ -1367,6 +1366,10 @@ msgstr "Neu %d"
 msgid "New Copy"
 msgstr "Neue Kopie"
 
+#. Resource IDs: (237)
+msgid "New Corresponding Files."
+msgstr "Neue entsprechende Dateien"
+
 #. Resource IDs: (60034)
 msgid "New Document"
 msgstr "Neues Dokument"
@@ -1384,7 +1387,6 @@ msgid "No corrections found!"
 msgstr "Keine Korrekturen gefunden"
 
 #. Resource IDs: (197)
-#, fuzzy
 msgid "No files found."
 msgstr "Keine Dateien gefunden"
 
@@ -1401,9 +1403,8 @@ msgid "No plugins loaded"
 msgstr "Keine Plugins geladen"
 
 #. Resource IDs: (226)
-#, fuzzy
 msgid "No search folder."
-msgstr "&Suche nach:"
+msgstr "Kein Suchordner."
 
 #. Resource IDs: (134)
 msgid ""
@@ -1570,9 +1571,8 @@ msgid "Paste"
 msgstr "Einfügen"
 
 #. Resource IDs: (232)
-#, fuzzy
 msgid "Please wait."
-msgstr "Bitte warten..."
+msgstr "Bitte warten."
 
 #. Resource IDs: (189)
 msgid "Plugin Name"
@@ -1789,9 +1789,8 @@ msgid "Search and/or replace text in documents/tabs"
 msgstr "Suche und/oder ersetze Text in Dokumenten/Tabs"
 
 #. Resource IDs: (227)
-#, fuzzy
 msgid "Search folder not found."
-msgstr "Suchtext nicht gefunden!"
+msgstr "Suchordner nicht gefunden!"
 
 #. Resource IDs: (144)
 msgid "Search text not found!"
@@ -1848,9 +1847,8 @@ msgid "Set search folder to its containing folder."
 msgstr "Setze Suchordner zum Oberordner"
 
 #. Resource IDs: (229)
-#, fuzzy
 msgid "Set search folder to the current documents folder."
-msgstr "Zeigt Statistiken über das aktuelle Dokument an"
+msgstr "Setzt aktuellen Dokument-Ordner als Suchordner"
 
 #. Resource IDs: (60143)
 msgid "Set the coloring according to the code language"
@@ -1956,6 +1954,10 @@ msgstr "Zeilen auftrennen"
 #. Resource IDs: (60253)
 msgid "Split long lines at the right window border"
 msgstr "Trennt Zeilen am rechten Fensterrand auf"
+
+#. Resource IDs: (1088)
+msgid "Status"
+msgstr "Status"
 
 #. Resource IDs: (144)
 msgid "Style Configurator"
@@ -2266,7 +2268,6 @@ msgid "Wrap Lines"
 msgstr "Zeilenumbruch"
 
 #. Resource IDs: (143)
-#, fuzzy
 msgid "Wrap around."
 msgstr "Weiter von Beginn"
 
@@ -2314,7 +2315,7 @@ msgstr "Z"
 msgid "Zoom: %d%%"
 msgstr "Zoom: %d%%"
 
-#. Resource IDs: (1071)
+#. Resource IDs: (1071, 1090, 1091)
 msgid "^"
 msgstr "^"
 
