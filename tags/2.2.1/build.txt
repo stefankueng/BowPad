@@ -1,0 +1,41 @@
+First, you need to install the compiler package.
+
+- You need VS2015.
+- You also need the Windows SDK for Windows 8
+
+Next you need to install some utilities/programs:
+- TortoiseSVN           : http://tortoisesvn.net
+- WiX 3.10(*)           : http://wixtoolset.org/
+- NAnt 0.92(*)          : http://nant.sourceforge.net
+
+(*) Add the paths of the binaries to the PATH environment variable
+    You may have to logoff/logon to make the new environment variables take effect!
+
+
+Now you're almost ready. Only a few more steps to do:
+- Checkout the BowPad sources from the Subversion repository
+- Make a copy of the file default.build.user.tmpl in the BowPad root folder and
+  rename that copy to default.build.user. Then adjust the paths as mentioned
+  in that file.
+
+
+Building packages
+
+  Hint: before you can start building BowPad, you need to call the vsvars32.bat
+  file which is located in %VS140COMNTOOLS%.
+
+  > nant
+  will compile BowPad and create the msi installer
+
+  If you encounter any build errors, you can run nant again like this:
+
+  > nant -l:buildlog.txt
+
+  which will create a build log file which you can use to analyse where
+  exactly the build failed.
+
+
+  After the script finished, the packages can be found in .\bin.
+
+Once BowPad has been built with the NAnt script, you can build it again
+with VS2015 alone.
