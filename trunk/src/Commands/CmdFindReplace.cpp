@@ -725,7 +725,7 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
         {
             LPNMLVGETINFOTIP tip = (LPNMLVGETINFOTIP)lpNMItemActivate;
             int itemIndex = (size_t)tip->iItem;
-            if (itemIndex < 0 || itemIndex >= m_searchResults.size())
+            if (itemIndex < 0 || itemIndex >= (int)m_searchResults.size())
             {
                 assert(false);
                 return 0;
@@ -872,7 +872,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
     HWND hListControl = pLVCD->nmcd.hdr.hwndFrom;
     const int itemIndex = (int)pLVCD->nmcd.dwItemSpec;
     assert(itemIndex >= 0 && itemIndex < (int)m_searchResults.size());
-    if (/*m_ThreadsRunning ||*/ itemIndex >= m_searchResults.size())
+    if (/*m_ThreadsRunning ||*/ itemIndex >= (int)m_searchResults.size())
         return CDRF_DODEFAULT;
 
     const CSearchResult& searchResult = m_searchResults[itemIndex];
@@ -2255,7 +2255,7 @@ void CFindReplaceDlg::CheckRegex()
     }
 }
 
-static inline int GetBase(char current, int& size) noexcept
+static inline size_t GetBase(char current, size_t& size) noexcept
 {
     switch (current)
     {
@@ -2313,11 +2313,11 @@ std::string CFindReplaceDlg::UnEscape(const std::string& str)
                     break;
                 default:
                 {
-                    int size;
-                    int base = GetBase(current, size);
+                    size_t size;
+                    auto base = GetBase(current, size);
                     if (base != 0 && charLeft >= size)
                     {
-                        int res = 0;
+                        size_t res = 0;
                         if (ReadBase(&str[i + 1], &res, base, size))
                         {
                             result.push_back((char)res);
@@ -2339,9 +2339,9 @@ std::string CFindReplaceDlg::UnEscape(const std::string& str)
     return result;
 }
 
-bool CFindReplaceDlg::ReadBase(const char* str, int* value, int base, int size)
+bool CFindReplaceDlg::ReadBase(const char* str, size_t* value, size_t base, size_t size)
 {
-    int i = 0, temp = 0;
+    size_t i = 0, temp = 0;
     *value = 0;
     char max = '0' + (char)base - 1;
     char current;

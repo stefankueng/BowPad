@@ -54,7 +54,7 @@ namespace
 {
 std::deque<PositionData>    g_positions;
 int                         g_currentDocId = -1;
-int                         g_offsetBeforeEnd = 0;
+size_t                      g_offsetBeforeEnd = 0;
 long                        g_currentLine = -1;
 bool                        g_ignore = false;
 const long                  MAX_PREV_NEXT_POSITIONS = 500;
@@ -177,7 +177,7 @@ void CCmdPrevNext::OnDocumentClose(int tab)
 
 bool CCmdPrevious::Execute()
 {
-    long i = 0;
+    size_t i = 0;
     PositionData data;
     for (auto it = g_positions.crbegin(); it != g_positions.crend(); ++it)
     {
@@ -230,7 +230,7 @@ HRESULT CCmdPrevious::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
 
 bool CCmdNext::Execute()
 {
-    long i = 0;
+    size_t i = 0;
     PositionData data;
     if (g_offsetBeforeEnd == 0)
         return false;
