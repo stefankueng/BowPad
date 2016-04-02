@@ -19,7 +19,7 @@
            Small problem in thumbsize calculation also fixed (thanks Diego!)
 
      V1.1: Added support for Right-left windows
-           Changed calling convention of APIs to WINAPI (__stdcall)
+           Changed calling convention of APIs to COOLSB_API (__stdcall)
            Completely standalone (no need for c-runtime)
 
      V1.0: Apr 2001: Initial Version
@@ -59,7 +59,7 @@ SCROLLBAR *GetScrollBarFromHwnd(HWND hwnd, UINT nBar)
         return 0;
 }
 
-BOOL WINAPI CoolSB_IsCoolScrollEnabled(HWND hwnd)
+BOOL COOLSB_API CoolSB_IsCoolScrollEnabled(HWND hwnd)
 {
     if(GetScrollWndFromHwnd(hwnd))
         return TRUE;
@@ -84,7 +84,7 @@ using EnableScrollBarRoutine = BOOL(WINAPI *) (HWND, UINT, UINT);
 
 static EnableScrollBarRoutine pEnableScrollBar = nullptr;
 
-void WINAPI CoolSB_SetESBProc(EnableScrollBarRoutine proc)
+void COOLSB_API CoolSB_SetESBProc(EnableScrollBarRoutine proc)
 {
     pEnableScrollBar = proc;
 }
@@ -126,7 +126,7 @@ static void RedrawNonClient(HWND hwnd, BOOL fFrameChanged)
 //
 //  return the default minimum size of a scrollbar thumb
 //
-int WINAPI CoolSB_GetDefaultMinThumbSize(void)
+int COOLSB_API CoolSB_GetDefaultMinThumbSize(void)
 {
     DWORD dwVersion = GetVersion();
 
@@ -168,7 +168,7 @@ static SCROLLINFO *GetScrollInfoFromHwnd(HWND hwnd, int fnBar)
 //  Initialize the cool scrollbars for a window by subclassing it
 //  and using the coolsb window procedure instead
 //
-BOOL WINAPI InitializeCoolSB(HWND hwnd)
+BOOL COOLSB_API InitializeCoolSB(HWND hwnd)
 {
     SCROLLWND *sw;
     SCROLLINFO *si;
@@ -282,7 +282,7 @@ BOOL WINAPI InitializeCoolSB(HWND hwnd)
     return TRUE;
 }
 
-BOOL WINAPI CoolSB_EnableScrollBar  (HWND hwnd, int wSBflags, UINT wArrows)
+BOOL COOLSB_API CoolSB_EnableScrollBar  (HWND hwnd, int wSBflags, UINT wArrows)
 {
     SCROLLBAR *sbar;
     UINT oldstate;
@@ -319,13 +319,13 @@ BOOL WINAPI CoolSB_EnableScrollBar  (HWND hwnd, int wSBflags, UINT wArrows)
     return !bFailed;
 }
 
-BOOL WINAPI CoolSB_GetScrollBarInfo(HWND hwnd)
+BOOL COOLSB_API CoolSB_GetScrollBarInfo(HWND hwnd)
 {
 //  SCROLLBARINFO sbi; not defined in winuser.h
     return FALSE;
 }
 
-BOOL WINAPI CoolSB_GetScrollInfo (HWND hwnd, int fnBar, LPSCROLLINFO lpsi)
+BOOL COOLSB_API CoolSB_GetScrollInfo (HWND hwnd, int fnBar, LPSCROLLINFO lpsi)
 {
     SCROLLINFO *mysi;
     BOOL copied = FALSE;
@@ -366,7 +366,7 @@ BOOL WINAPI CoolSB_GetScrollInfo (HWND hwnd, int fnBar, LPSCROLLINFO lpsi)
     return copied;
 }
 
-int WINAPI CoolSB_GetScrollPos (HWND hwnd, int nBar)
+int COOLSB_API CoolSB_GetScrollPos (HWND hwnd, int nBar)
 {
     SCROLLINFO *mysi;
 
@@ -376,7 +376,7 @@ int WINAPI CoolSB_GetScrollPos (HWND hwnd, int nBar)
     return mysi->nPos;
 }
 
-BOOL WINAPI CoolSB_GetScrollRange (HWND hwnd, int nBar, LPINT lpMinPos, LPINT lpMaxPos)
+BOOL COOLSB_API CoolSB_GetScrollRange (HWND hwnd, int nBar, LPINT lpMinPos, LPINT lpMaxPos)
 {
     SCROLLINFO *mysi;
 
@@ -392,7 +392,7 @@ BOOL WINAPI CoolSB_GetScrollRange (HWND hwnd, int nBar, LPINT lpMinPos, LPINT lp
     return TRUE;
 }
 
-int WINAPI CoolSB_SetScrollInfo (HWND hwnd, int fnBar, LPSCROLLINFO lpsi, BOOL fRedraw)
+int COOLSB_API CoolSB_SetScrollInfo (HWND hwnd, int fnBar, LPSCROLLINFO lpsi, BOOL fRedraw)
 {
     SCROLLINFO *mysi;
     SCROLLBAR *sbar;
@@ -469,7 +469,7 @@ int WINAPI CoolSB_SetScrollInfo (HWND hwnd, int fnBar, LPSCROLLINFO lpsi, BOOL f
 }
 
 
-int WINAPI CoolSB_SetScrollPos(HWND hwnd, int nBar, int nPos, BOOL fRedraw)
+int COOLSB_API CoolSB_SetScrollPos(HWND hwnd, int nBar, int nPos, BOOL fRedraw)
 {
     SCROLLINFO *mysi;
     int oldpos;
@@ -494,7 +494,7 @@ int WINAPI CoolSB_SetScrollPos(HWND hwnd, int nBar, int nPos, BOOL fRedraw)
     return oldpos;
 }
 
-int WINAPI CoolSB_SetScrollRange (HWND hwnd, int nBar, int nMinPos, int nMaxPos, BOOL fRedraw)
+int COOLSB_API CoolSB_SetScrollRange (HWND hwnd, int nBar, int nMinPos, int nMaxPos, BOOL fRedraw)
 {
     SCROLLINFO *mysi;
 
@@ -518,7 +518,7 @@ int WINAPI CoolSB_SetScrollRange (HWND hwnd, int nBar, int nMinPos, int nMaxPos,
 //
 //  Show or hide the specified scrollbars
 //
-BOOL WINAPI CoolSB_ShowScrollBar (HWND hwnd, int wBar, BOOL fShow)
+BOOL COOLSB_API CoolSB_ShowScrollBar (HWND hwnd, int wBar, BOOL fShow)
 {
     SCROLLBAR *sbar;
     BOOL bFailed = FALSE;
@@ -572,7 +572,7 @@ BOOL WINAPI CoolSB_ShowScrollBar (HWND hwnd, int wBar, BOOL fShow)
 //
 //  Remove cool scrollbars from the specified window.
 //
-HRESULT WINAPI UninitializeCoolSB(HWND hwnd)
+HRESULT COOLSB_API UninitializeCoolSB(HWND hwnd)
 {
     SCROLLWND *sw = GetScrollWndFromHwnd(hwnd);
     if(!sw) return E_FAIL;
@@ -607,7 +607,7 @@ HRESULT WINAPI UninitializeCoolSB(HWND hwnd)
 //              at the end of previously inserted buttons
 //
 
-BOOL WINAPI CoolSB_InsertButton(HWND hwnd, int wSBflags, UINT nPos, SCROLLBUT *psb)
+BOOL COOLSB_API CoolSB_InsertButton(HWND hwnd, int wSBflags, UINT nPos, SCROLLBUT *psb)
 {
     SCROLLBAR *sbar;
     SCROLLBUT *sbut;
@@ -737,7 +737,7 @@ static SCROLLBUT *GetButtonFromId(SCROLLBAR *sbar, UINT uCmdId)
 //             or a non-negative position of the button, depending on if
 //             fByCmd is FALSE or TRUE, respectively
 //
-BOOL WINAPI CoolSB_ModifyButton (HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd, SCROLLBUT *psb)
+BOOL COOLSB_API CoolSB_ModifyButton (HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd, SCROLLBUT *psb)
 {
     SCROLLBAR *sbar = NULL;
     SCROLLBUT *sbut = NULL;
@@ -783,7 +783,7 @@ BOOL WINAPI CoolSB_ModifyButton (HWND hwnd, int wSBflags, UINT uItem, BOOL fByCm
     return TRUE;
 }
 
-BOOL WINAPI CoolSB_RemoveButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd)
+BOOL COOLSB_API CoolSB_RemoveButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd)
 {
     int i;
     SCROLLBAR *sbar;
@@ -831,7 +831,7 @@ BOOL WINAPI CoolSB_RemoveButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd
 //
 //  fill in the supplied SCROLLBUT structure
 //
-BOOL WINAPI CoolSB_GetButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd, SCROLLBUT *psb)
+BOOL COOLSB_API CoolSB_GetButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd, SCROLLBUT *psb)
 {
     SCROLLBAR *sbar = NULL;
     SCROLLBUT *sbut = NULL;
@@ -867,17 +867,17 @@ BOOL WINAPI CoolSB_GetButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd, S
 
 #else
 
-BOOL WINAPI CoolSB_InsertButton(HWND hwnd, int wSBflags, UINT nPos,  SCROLLBUT *psb)                {   return FALSE; }
-BOOL WINAPI CoolSB_ModifyButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd, SCROLLBUT *psb)   {   return FALSE; }
-BOOL WINAPI CoolSB_RemoveButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd)                   {   return FALSE; }
-BOOL WINAPI CoolSB_GetButton   (HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd, SCROLLBUT *psb)   {   return FALSE; }
+BOOL COOLSB_API CoolSB_InsertButton(HWND hwnd, int wSBflags, UINT nPos,  SCROLLBUT *psb)                {   return FALSE; }
+BOOL COOLSB_API CoolSB_ModifyButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd, SCROLLBUT *psb)   {   return FALSE; }
+BOOL COOLSB_API CoolSB_RemoveButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd)                   {   return FALSE; }
+BOOL COOLSB_API CoolSB_GetButton   (HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd, SCROLLBUT *psb)   {   return FALSE; }
 
 #endif //INCLUDE_BUTTONS
 
 //
 //  Set the size of the scrollbars
 //
-BOOL WINAPI CoolSB_SetSize  (HWND hwnd, int wBar, int nLength, int nWidth)
+BOOL COOLSB_API CoolSB_SetSize  (HWND hwnd, int wBar, int nLength, int nWidth)
 {
     SCROLLBAR *sbar;
 
@@ -918,7 +918,7 @@ BOOL WINAPI CoolSB_SetSize  (HWND hwnd, int wBar, int nLength, int nWidth)
 //  wBar   - SB_HORZ / SB_VERT / SB_BOTH
 //  nStyle - CSBF_NORMAL / CSBF_FLAT / CSBF_HOTTRACKED
 //
-BOOL WINAPI CoolSB_SetStyle(HWND hwnd, int wBar, UINT nStyle)
+BOOL COOLSB_API CoolSB_SetStyle(HWND hwnd, int wBar, UINT nStyle)
 {
     SCROLLBAR *sbar;
 
@@ -947,7 +947,7 @@ BOOL WINAPI CoolSB_SetStyle(HWND hwnd, int wBar, UINT nStyle)
 //  scroll. Setting this keeps the scrollbar enabled, but the thumb
 //  covers the whole area
 //
-BOOL WINAPI CoolSB_SetThumbAlways(HWND hwnd, int wBar, BOOL fThumbAlways)
+BOOL COOLSB_API CoolSB_SetThumbAlways(HWND hwnd, int wBar, BOOL fThumbAlways)
 {
     SCROLLBAR *sbar;
 
@@ -980,7 +980,7 @@ BOOL WINAPI CoolSB_SetThumbAlways(HWND hwnd, int wBar, BOOL fThumbAlways)
 //
 //  Set the minimum size, in pixels, that the thumb box will shrink to.
 //
-BOOL WINAPI CoolSB_SetMinThumbSize(HWND hwnd, UINT wBar, UINT size)
+BOOL COOLSB_API CoolSB_SetMinThumbSize(HWND hwnd, UINT wBar, UINT size)
 {
     SCROLLBAR *sbar;
 

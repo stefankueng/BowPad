@@ -92,7 +92,7 @@ static UINT uScrollTimerPortion = HTSCROLL_NONE;
 static UINT uScrollTimerId = 0;
 static HWND hwndCurCoolSB = 0;
 
-BOOL WINAPI CoolSB_IsThumbTracking(HWND hwnd)
+BOOL COOLSB_API CoolSB_IsThumbTracking(HWND hwnd)
 {
     SCROLLWND *sw;
 
