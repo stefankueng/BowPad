@@ -7,9 +7,7 @@ extern "C"{
 
 #include <windows.h>
 
-#ifdef _LIB
-#define COOLSB_API 
-#else
+#ifndef COOLSB_API
 #define COOLSB_API WINAPI
 #endif
 
