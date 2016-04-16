@@ -717,6 +717,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/FoldL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdInitFoldingMargin" LabelTitle="Init Folding Margin" TooltipTitle="Init Folding Margin" TooltipDescription="Init Folding Margin" />
+    <Command Name="cmdFoldingOn" LabelTitle="Folidng On" TooltipTitle="Folding On" TooltipDescription="turn on folding" />
+    <Command Name="cmdFoldingOff" LabelTitle="Folding Off" TooltipTitle="Folding Off" TooltipDescription="turns off folding" />
     <Command Name="cmdFoldAll" LabelTitle="Toggle folding all" TooltipTitle="Toggle folding all" TooltipDescription="toggles folding all levels in the whole document" />
     <Command Name="cmdFoldLevel0" LabelTitle="Toggle level 0" TooltipTitle="Toggle level 0" TooltipDescription="toggles folding at level 0 in the whole document" />
     <Command Name="cmdFoldLevel1" LabelTitle="Toggle level 1" TooltipTitle="Toggle level 1" TooltipDescription="toggles folding at level 1 in the whole document" />
@@ -1242,6 +1245,8 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <DropDownButton CommandName="cmdFoldGroup">
               <MenuGroup>
                 <Button CommandName="cmdFoldAll" />
+                <Button CommandName="cmdFoldingOn" />
+                <Button CommandName="cmdFoldingOff" />
               </MenuGroup>
               <MenuGroup>
                 <Button CommandName="cmdFoldLevel0" />
