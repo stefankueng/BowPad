@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2015 - Stefan Kueng
+// Copyright (C) 2015-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ public:
 
     CCmdFoldAll(void * obj);
 
-    ~CCmdFoldAll(void);
+    ~CCmdFoldAll();
 
     bool Execute() override;
 
@@ -45,4 +45,41 @@ public:
 private:
     UINT            m_customId;
     UINT            m_customCmdId;
+};
+
+class CCmdInitFoldingMargin : public ICommand
+{
+public:
+    CCmdInitFoldingMargin(void* obj);
+    ~CCmdInitFoldingMargin() = default;
+
+    bool Execute() override;
+    UINT GetCmdId() override { return cmdInitFoldingMargin; }
+    void TabNotify(TBHDR* ptbhdr) override;
+
+private:
+};
+
+class CCmdFoldingOn : public ICommand
+{
+public:
+    CCmdFoldingOn(void* obj);
+    ~CCmdFoldingOn() = default;
+
+    bool Execute() override;
+    UINT GetCmdId() override { return cmdFoldingOn; }
+
+private:
+};
+
+class CCmdFoldingOff : public ICommand
+{
+public:
+    CCmdFoldingOff(void * obj);
+    ~CCmdFoldingOff() = default;
+
+    bool Execute() override;
+    UINT GetCmdId() override { return cmdFoldingOff; }
+
+private:
 };
