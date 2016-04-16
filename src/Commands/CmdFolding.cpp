@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2015 - Stefan Kueng
+// Copyright (C) 2015-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,17 +20,25 @@
 
 #include <functional>
 
+namespace
+{
+    int g_marginWidth = -1;
+    const wchar_t ShowFoldingMarginSettingSection[] = L"View";
+    const wchar_t ShowFoldingMarginSettingName[] = L"ShowFoldingMargin";
+}
+
 static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int level2Collapse = -1)
 {
     auto maxLine = ScintillaCall(SCI_GETLINECOUNT, 0, 0);
     int mode = 0;
     for (auto line = 0; line < maxLine; ++line)
     {
-        auto level = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
-        if (level & SC_FOLDLEVELHEADERFLAG)
+        auto info = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
+        if ((info & SC_FOLDLEVELHEADERFLAG) != 0)
         {
+            int level = info & SC_FOLDLEVELNUMBERMASK;
             level -= SC_FOLDLEVELBASE;
-            if ((level2Collapse < 0) || (level2Collapse == (level & SC_FOLDLEVELNUMBERMASK)))
+            if (level2Collapse < 0 || level2Collapse == level)
             {
                 mode = ScintillaCall(SCI_GETFOLDEXPANDED, line, 0) ? 0 : 1;
                 break;
@@ -40,11 +48,12 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
 
     for (auto line = 0; line < maxLine; ++line)
     {
-        auto level = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
-        if (level & SC_FOLDLEVELHEADERFLAG)
+        auto info = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
+        if ((info & SC_FOLDLEVELHEADERFLAG) != 0)
         {
+            int level = info & SC_FOLDLEVELNUMBERMASK;
             level -= SC_FOLDLEVELBASE;
-            if ((level2Collapse < 0) || (level2Collapse == (level & SC_FOLDLEVELNUMBERMASK)))
+            if (level2Collapse < 0 || level2Collapse == level)
             {
                 if (ScintillaCall(SCI_GETFOLDEXPANDED, line, 0) != mode)
                 {
@@ -54,10 +63,8 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
                     if (endStyled < len)
                         ScintillaCall(SCI_COLOURISE, 0, -1);
 
-                    level = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
-
                     auto headerLine = 0;
-                    if (level & SC_FOLDLEVELHEADERFLAG)
+                    if (info & SC_FOLDLEVELHEADERFLAG)
                         headerLine = line;
                     else
                     {
@@ -75,7 +82,6 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
         }
     }
     return true;
-
 }
 
 CCmdFoldAll::CCmdFoldAll(void * obj) : ICommand(obj)
@@ -83,7 +89,7 @@ CCmdFoldAll::CCmdFoldAll(void * obj) : ICommand(obj)
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-CCmdFoldAll::~CCmdFoldAll(void)
+CCmdFoldAll::~CCmdFoldAll()
 {
 }
 
@@ -111,3 +117,66 @@ bool CCmdFoldLevel::Execute()
         return ScintillaCall(cmd, wParam, lParam);
     }, m_customId);
 }
+
+
+CCmdInitFoldingMargin::CCmdInitFoldingMargin(void* obj) : ICommand(obj)
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+}
+
+void CCmdInitFoldingMargin::TabNotify(TBHDR* ptbhdr)
+{
+    // Switching to this document.
+    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    {
+        // Effectively query the margin width once and remember it.
+        // Turning folding off sets the width to 0. Turning folding on restores the width to this saved value.
+        if (g_marginWidth == -1)
+            g_marginWidth = (int)ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, sptr_t(0));
+
+        bool isOn = ((int)ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, sptr_t(0))) > 0;
+        bool shouldBeOn = CIniSettings::Instance().GetInt64(
+            ShowFoldingMarginSettingSection, ShowFoldingMarginSettingName, g_marginWidth > 0 ? 1 : 0) != 0;
+        if (isOn != shouldBeOn)
+            ScintillaCall(SCI_SETMARGINWIDTHN, SC_MARGIN_BACK, shouldBeOn ? g_marginWidth : 0);
+    }
+}
+
+bool CCmdInitFoldingMargin::Execute()
+{
+    return true;
+}
+
+CCmdFoldingOn::CCmdFoldingOn(void* obj) : ICommand(obj)
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+}
+
+bool CCmdFoldingOn::Execute()
+{
+    bool isOn = ((int)ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, sptr_t(0))) > 0;
+    if (!isOn)
+    {
+        ScintillaCall(SCI_SETMARGINWIDTHN, SC_MARGIN_BACK, g_marginWidth);
+        CIniSettings::Instance().SetInt64(ShowFoldingMarginSettingSection, ShowFoldingMarginSettingName, 1);
+    }
+    return true;
+}
+
+CCmdFoldingOff::CCmdFoldingOff(void* obj) : ICommand(obj)
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+}
+
+bool CCmdFoldingOff::Execute()
+{
+    bool isOn = ((int)ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, sptr_t(0))) > 0;
+    if (isOn)
+    {
+        ScintillaCall(SCI_FOLDALL, SC_FOLDACTION_EXPAND);
+        ScintillaCall(SCI_SETMARGINWIDTHN, SC_MARGIN_BACK, 0);
+        CIniSettings::Instance().SetInt64(ShowFoldingMarginSettingSection, ShowFoldingMarginSettingName, 0);
+    }
+    return true;
+}
+

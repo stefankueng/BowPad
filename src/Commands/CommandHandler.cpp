@@ -181,6 +181,9 @@ void CCommandHandler::Init(void * obj)
     Add<CCmdLineUp>(obj);
     Add<CCmdLineDown>(obj);
     Add<CCmdSort>(obj);
+    Add<CCmdInitFoldingMargin>(obj);
+    Add<CCmdFoldingOn>(obj);
+    Add<CCmdFoldingOff>(obj);
     Add<CCmdFoldAll>(obj);
 
     for (int i = 0; i < 10; ++i)
