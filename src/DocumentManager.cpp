@@ -460,6 +460,7 @@ int ToEOLMode(EOLFormat eolFormat)
 CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing)
 {
     CDocument doc;
+    doc.m_format = UNKNOWN_FORMAT;
     std::wstring sFileName = CPathUtils::GetFileName(path);
 
     CAutoFile hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, nullptr, createIfMissing ? CREATE_NEW : OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
