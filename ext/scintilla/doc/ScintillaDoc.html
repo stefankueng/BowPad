@@ -5042,9 +5042,11 @@ struct Sci_TextToFind {
     <code>SCK_WIN</code>.</p>
 
     <p>The modifiers are a combination of zero or more of <code>SCMOD_ALT</code>,
-    <code>SCMOD_CTRL</code>, <code>SCMOD_SHIFT</code>, and <code>SCMOD_META</code>.
+    <code>SCMOD_CTRL</code>, <code>SCMOD_SHIFT</code>,
+    <code>SCMOD_META</code>, and <code>SCMOD_SUPER</code>.
     On OS X, the Command key is mapped to <code>SCMOD_CTRL</code> and the Control key to
     <code>SCMOD_META</code>.
+    <code>SCMOD_SUPER</code> is only available on GTK+ which is commonly the Windows key.
     If you are building a table, you might
     want to use <code>SCMOD_NORM</code>, which has the value 0, to mean no modifiers.</p>
 

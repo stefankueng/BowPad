@@ -484,6 +484,10 @@
       </tr><tr>
 	<td>Mark C</td>
 	<td>Johannes Sasongko</td>
+	<td>fstirlitz</td>
+	<td>Robin Haberkorn</td>
+      </tr><tr>
+	<td>Pavel Sountsov</td>
     </tr>
     </table>
     <p>
@@ -494,6 +498,59 @@
         <a href="http://sourceforge.net/projects/icon-collection/">
         Icons</a> Copyright(C) 1998 by Dean S. Jones<br />
       </li>
+    </ul>
+    <h3>
+       <a href="http://www.scintilla.org/scite365.zip">Release 3.6.5</a>
+    </h3>
+    <ul>
+	<li>
+	Released 26 April 2016.
+	</li>
+	<li>
+	JSON lexer added.
+	<a href="http://sourceforge.net/p/scintilla/feature-requests/1140/">Feature #1140.</a>
+	</li>
+	<li>
+	The C++ lexer fixes a bug with multi-line strings with line continuation where the string style
+	overflowed after an edit.
+	<a href="http://sourceforge.net/p/scintilla/bugs/1824/">Bug #1824</a>.
+	</li>
+	<li>
+	The Python lexer treats '@' as an operator except when it is the first visible character on a line.
+	This is for Python 3.5.
+	</li>
+	<li>
+	The Rust lexer allows '?' as an operator.
+	<a href="http://sourceforge.net/p/scintilla/feature-requests/1146/">Feature #1146.</a>
+	</li>
+	<li>
+	Doubled size of compiled regex buffer.
+	<a href="http://sourceforge.net/p/scintilla/bugs/1822/">Bug #1822</a>.
+	</li>
+	<li>
+	For GTK+, the Super modifier key can be used in key bindings.
+	<a href="http://sourceforge.net/p/scintilla/feature-requests/1142/">Feature #1142.</a>
+	</li>
+	<li>
+	For GTK+, fix some crashes when using multiple threads.
+	</li>
+	<li>
+	Platform layer font cache removed on GTK+ as platform-independent caches are used.
+	This avoids the use of thread locking and initialisation of threads so any GTK+
+	applications that rely on Scintilla initialising threads will have to do that themselves.
+	</li>
+	<li>
+	SciTE bug fixed with exported HTML where extra line shown.
+	<a href="http://sourceforge.net/p/scintilla/bugs/1816/">Bug #1816</a>.
+	</li>
+	<li>
+	SciTE on Windows fixes bugs with pop-up menus in the find and replace strips.
+	For the replace strip, menu choices change the state.
+	For the find strip, menu choices are reflected in the appearance of their corresponding buttons.
+	</li>
+	<li>
+	SciTE on Windows on high DPI displays fixes the height of edit boxes in user strips.
+	</li>
     </ul>
     <h3>
        <a href="http://www.scintilla.org/scite364.zip">Release 3.6.4</a>
