@@ -44,18 +44,14 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
         IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (FAILED(hr))
-        {
             return hr;
-        }
 
         // Create an IUIImage from a resource id.
         IUIImagePtr pImg;
         IUIImageFromBitmapPtr pifbFactory;
         hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
         if (FAILED(hr))
-        {
             return hr;
-        }
 
         // Load the bitmap from the resource file.
         HBITMAP hbm = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_EMPTY), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
@@ -70,10 +66,7 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
         }
 
         if (FAILED(hr))
-        {
             return hr;
-        }
-
 
         const auto& plugins = CCommandHandler::Instance().GetPluginMap();
         if (plugins.empty())
@@ -83,9 +76,8 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
             CAppUtils::AddStringItem(pCollection, sNoPlugins);
         }
 
-
         // populate the dropdown with the plugins
-        for (auto p : plugins)
+        for (const auto& p : plugins)
         {
             CAppUtils::AddStringItem(pCollection, p.second.c_str(), -1, pImg);
         }

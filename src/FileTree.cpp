@@ -31,11 +31,11 @@
 
 #pragma comment(lib, "Uxtheme.lib")
 
-#define SCRATCH_QCM_FIRST 1
-#define SCRATCH_QCM_LAST  0x6FFF
+const int SCRATCH_QCM_FIRST = 1;
+const int SCRATCH_QCM_LAST = 0x6FFF;
 
-IContextMenu2 *g_pcm2 = nullptr;
-IContextMenu3 *g_pcm3 = nullptr;
+static IContextMenu2 *g_pcm2 = nullptr;
+static IContextMenu3 *g_pcm3 = nullptr;
 
 HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void **ppv)
 {

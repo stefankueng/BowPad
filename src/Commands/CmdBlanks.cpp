@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ bool CCmdTrim::Execute()
     ScintillaCall(SCI_SETSEARCHFLAGS, SCFIND_REGEXP);
     sptr_t findRet = -1;
     ScintillaCall(SCI_BEGINUNDOACTION);
-    std::string sFindString = "([ \\t]+$)|([ \\t]+\\r)|([ \\t]+\\n)";
+    const std::string sFindString = "([ \\t]+$)|([ \\t]+\\r)|([ \\t]+\\n)";
     do
     {
         findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), (sptr_t)sFindString.c_str());

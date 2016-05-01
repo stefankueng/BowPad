@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ static std::string sFindString;
 CDefaultEncodingDlg::CDefaultEncodingDlg()
 {}
 
-CDefaultEncodingDlg::~CDefaultEncodingDlg(void)
+CDefaultEncodingDlg::~CDefaultEncodingDlg()
 {}
 
 LRESULT CDefaultEncodingDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class CSortDlg : public CDialog // No need to be ICommand connected as yet.
 {
 public:
     CSortDlg();
-    ~CSortDlg(void);
+    ~CSortDlg();
 
 protected:
     LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -99,7 +99,7 @@ CSortDlg::CSortDlg() :
 {
 }
 
-CSortDlg::~CSortDlg(void)
+CSortDlg::~CSortDlg()
 {
 }
 
@@ -260,11 +260,11 @@ bool CCmdSort::Execute()
     return true;
 }
 
-SortOptions CCmdSort::GetSortOptions() const
+static SortOptions GetSortOptions(HWND hWnd)
 {
     CSortDlg sortDlg;
 
-    auto result = sortDlg.DoModal(hRes, IDD_SORTDLG, GetHwnd() );
+    auto result = sortDlg.DoModal(hRes, IDD_SORTDLG, hWnd);
 
     if (result == IDOK)
         return SortOptions(SortAction::Sort,
@@ -277,7 +277,7 @@ SortOptions CCmdSort::GetSortOptions() const
 
 void CCmdSort::Sort(std::vector<std::wstring>& lines) const
 {
-    SortOptions so = GetSortOptions();
+    SortOptions so = GetSortOptions(GetHwnd());
     if (so.sortAction == SortAction::None)
         return;
 

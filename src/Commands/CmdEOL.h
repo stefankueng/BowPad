@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ public:
 
     CCmdEOLWin(void * obj);
 
-    ~CCmdEOLWin(void);
+    ~CCmdEOLWin();
 
     bool Execute() override;
 
@@ -42,7 +42,7 @@ public:
 
     CCmdEOLUnix(void * obj);
 
-    ~CCmdEOLUnix(void);
+    ~CCmdEOLUnix();
 
     bool Execute() override;
 
@@ -59,7 +59,7 @@ public:
 
     CCmdEOLMac(void * obj);
 
-    ~CCmdEOLMac(void);
+    ~CCmdEOLMac();
 
     bool Execute() override;
 
