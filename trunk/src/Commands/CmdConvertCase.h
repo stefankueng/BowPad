@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,13 +28,13 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
-    ~CCmdConvertUppercase(void)
+    ~CCmdConvertUppercase()
     {
     }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdUppercase; }
+    UINT GetCmdId() override { return cmdUppercase; }
 };
 
 class CCmdConvertLowercase : public ICommand
@@ -46,13 +46,13 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
-    ~CCmdConvertLowercase(void)
+    ~CCmdConvertLowercase()
     {
     }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdLowercase; }
+    UINT GetCmdId() override { return cmdLowercase; }
 };
 
 class CCmdConvertTitlecase : public ICommand
@@ -64,10 +64,10 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
-    ~CCmdConvertTitlecase(void)
+    ~CCmdConvertTitlecase()
     {}
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdTitlecase; }
+    UINT GetCmdId() override { return cmdTitlecase; }
 };

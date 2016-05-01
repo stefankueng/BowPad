@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ class CAboutDlg : public CDialog
 {
 public:
     CAboutDlg(HWND hParent);
-    ~CAboutDlg(void);
+    ~CAboutDlg();
 
     void                    SetHiddenWnd(HWND hWnd) {m_hHiddenWnd = hWnd;}
 protected:

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,11 +29,11 @@ public:
     CCmdOpen(void * obj) : ICommand(obj)
     {}
 
-    ~CCmdOpen(void)
+    ~CCmdOpen()
     {}
 
-    virtual bool Execute() override;
-    virtual UINT GetCmdId() override { return cmdOpen; }
+    bool Execute() override;
+    UINT GetCmdId() override { return cmdOpen; }
 };
 
 class CCmdSave : public ICommand
@@ -46,13 +46,13 @@ public:
     ~CCmdSave() {}
 
 
-    virtual bool Execute() override;
-    virtual UINT GetCmdId() override { return cmdSave; }
+    bool Execute() override;
+    UINT GetCmdId() override { return cmdSave; }
 
-    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
-    virtual void TabNotify(TBHDR * ptbhdr) override;
+    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void TabNotify(TBHDR * ptbhdr) override;
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
 };
 
@@ -66,13 +66,13 @@ public:
     ~CCmdSaveAll() {}
 
 
-    virtual bool Execute() override;
-    virtual UINT GetCmdId() override { return cmdSaveAll; }
+    bool Execute() override;
+    UINT GetCmdId() override { return cmdSaveAll; }
 
-    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
-    virtual void TabNotify(TBHDR * ptbhdr) override;
+    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void TabNotify(TBHDR * ptbhdr) override;
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
 };
 
@@ -84,12 +84,12 @@ public:
     ~CCmdSaveAuto() {}
 
 
-    virtual bool Execute() override;
-    virtual UINT GetCmdId() override { return cmdSaveAuto; }
+    bool Execute() override;
+    UINT GetCmdId() override { return cmdSaveAuto; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
-    virtual void TabNotify(TBHDR * ptbhdr) override;
-    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    void TabNotify(TBHDR * ptbhdr) override;
+    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 private:
     void Save();
 };
@@ -102,8 +102,8 @@ public:
     ~CCmdSaveAs() {}
 
 
-    virtual bool Execute() override;
-    virtual UINT GetCmdId() override { return cmdSaveAs; }
+    bool Execute() override;
+    UINT GetCmdId() override { return cmdSaveAs; }
 };
 
 class CCmdReload : public ICommand
@@ -114,7 +114,7 @@ public:
     ~CCmdReload() {}
 
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         if (HasActiveDocument())
         {
@@ -122,11 +122,11 @@ public:
         }
         return true;
     }
-    virtual UINT GetCmdId() override { return cmdReload; }
+    UINT GetCmdId() override { return cmdReload; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR * ptbhdr) override;
 };
 
 class CCmdFileDelete : public ICommand
@@ -137,11 +137,11 @@ public:
     ~CCmdFileDelete() {}
 
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdFileDelete; }
+    UINT GetCmdId() override { return cmdFileDelete; }
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR * ptbhdr) override;
 };

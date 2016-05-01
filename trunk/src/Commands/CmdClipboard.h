@@ -26,7 +26,7 @@ public:
     {
     }
 
-    virtual ~ClipboardBase(void)
+    virtual ~ClipboardBase()
     {
     }
 
@@ -45,7 +45,7 @@ public:
     {
     }
 
-    ~CCmdCut(void)
+    ~CCmdCut()
     {
     }
 
@@ -67,7 +67,7 @@ public:
     {
     }
 
-    ~CCmdCutPlain(void)
+    ~CCmdCutPlain()
     {
     }
 
@@ -90,7 +90,7 @@ public:
     {
     }
 
-    ~CCmdCopy(void)
+    ~CCmdCopy()
     {
     }
 
@@ -107,7 +107,7 @@ public:
     {
     }
 
-    ~CCmdCopyPlain(void)
+    ~CCmdCopyPlain()
     {
     }
 
@@ -124,7 +124,7 @@ public:
     {
     }
 
-    ~CCmdPaste(void)
+    ~CCmdPaste()
     {
     }
 

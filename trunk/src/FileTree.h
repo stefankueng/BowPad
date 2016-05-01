@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2015 - Stefan Kueng
+// Copyright (C) 2014-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -43,14 +43,14 @@ public:
     std::wstring GetFilePathForSelItem();
     std::wstring GetDirPathForHitItem();
     
-    virtual void OnThemeChanged(bool bDark) override;
-    virtual bool Execute() override;
-    virtual UINT GetCmdId() override;
+    void OnThemeChanged(bool bDark) override;
+    bool Execute() override;
+    UINT GetCmdId() override;
 
     void BlockRefresh(bool bBlock);
 
 protected:
-    virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
     HTREEITEM RecurseTree(HTREEITEM hItem, ItemHandler handler);
     HTREEITEM GetItemForPath(const std::wstring& expandpath);
@@ -58,7 +58,7 @@ protected:
 
     virtual void TabNotify(TBHDR * ptbhdr);
 
-    virtual void OnClose() override;
+    void OnClose() override;
 
 private:
     std::wstring        m_path;
