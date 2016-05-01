@@ -27,7 +27,7 @@ public:
     {
     }
 
-    ~CCmdLineDuplicate(void)
+    ~CCmdLineDuplicate()
     {
     }
 
@@ -48,7 +48,7 @@ public:
     {
     }
 
-    ~CCmdLineSplit(void)
+    ~CCmdLineSplit()
     {
     }
 
@@ -70,7 +70,7 @@ public:
     {
     }
 
-    ~CCmdLineJoin(void)
+    ~CCmdLineJoin()
     {
     }
 
@@ -92,7 +92,7 @@ public:
     {
     }
 
-    ~CCmdLineUp(void)
+    ~CCmdLineUp()
     {
     }
 
@@ -114,7 +114,7 @@ public:
     {
     }
 
-    ~CCmdLineDown(void)
+    ~CCmdLineDown()
     {
     }
 

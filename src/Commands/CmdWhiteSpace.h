@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@ public:
 
     CCmdWhiteSpace(void * obj);
 
-    ~CCmdWhiteSpace(void);
+    ~CCmdWhiteSpace();
 
     bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdWhiteSpace; }
+    UINT GetCmdId() override { return cmdWhiteSpace; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };
@@ -40,7 +40,7 @@ public:
 
     CCmdTabSize(void * obj);
 
-    ~CCmdTabSize(void);
+    ~CCmdTabSize();
 
     bool Execute() override { return true; }
 
@@ -57,7 +57,7 @@ public:
 
     CCmdUseTabs(void * obj);
 
-    ~CCmdUseTabs(void);
+    ~CCmdUseTabs();
 
     bool Execute() override;
 

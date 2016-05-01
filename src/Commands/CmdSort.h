@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,12 +19,8 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 
+#include <string>
 #include <vector>
-
-namespace
-{
-struct SortOptions;
-};
 
 class CCmdSort : public ICommand
 {
@@ -32,7 +28,7 @@ public:
     CCmdSort(void* obj) : ICommand(obj)
     {
     }
-    ~CCmdSort(void)
+    ~CCmdSort()
     {
     }
 
@@ -41,5 +37,4 @@ public:
 
 private:
     void Sort(std::vector<std::wstring>& lines) const;
-    SortOptions GetSortOptions() const;
 };

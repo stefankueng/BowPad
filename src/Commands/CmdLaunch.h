@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class CCmdLaunchIE : public LaunchBase
 {
 public:
     CCmdLaunchIE(void * obj) : LaunchBase(obj) {}
-    ~CCmdLaunchIE(void) {}
+    ~CCmdLaunchIE() {}
 
     bool Execute() override { return Launch(L"iexplore \"$(TAB_PATH)\""); }
     UINT GetCmdId() override { return cmdLaunchIE; }
@@ -45,7 +45,7 @@ class CCmdLaunchFirefox : public LaunchBase
 {
 public:
     CCmdLaunchFirefox(void * obj) : LaunchBase(obj) {}
-    ~CCmdLaunchFirefox(void) {}
+    ~CCmdLaunchFirefox() {}
 
     bool Execute() override { return Launch(L"firefox \"$(TAB_PATH)\""); }
     UINT GetCmdId() override { return cmdLaunchFirefox; }
@@ -55,7 +55,7 @@ class CCmdLaunchChrome : public LaunchBase
 {
 public:
     CCmdLaunchChrome(void * obj) : LaunchBase(obj) {}
-    ~CCmdLaunchChrome(void) {}
+    ~CCmdLaunchChrome() {}
 
     bool Execute() override { return Launch(L"chrome \"$(TAB_PATH)\""); }
     UINT GetCmdId() override { return cmdLaunchChrome; }
@@ -65,7 +65,7 @@ class CCmdLaunchSafari : public LaunchBase
 {
 public:
     CCmdLaunchSafari(void * obj) : LaunchBase(obj) {}
-    ~CCmdLaunchSafari(void) {}
+    ~CCmdLaunchSafari() {}
 
     bool Execute() override { return Launch(L"safari \"$(TAB_PATH)\""); }
     UINT GetCmdId() override { return cmdLaunchSafari; }
@@ -75,7 +75,7 @@ class CCmdLaunchOpera : public LaunchBase
 {
 public:
     CCmdLaunchOpera(void * obj) : LaunchBase(obj) {}
-    ~CCmdLaunchOpera(void) {}
+    ~CCmdLaunchOpera() {}
 
     bool Execute() override { return Launch(L"opera \"$(TAB_PATH)\""); }
     UINT GetCmdId() override { return cmdLaunchOpera; }
@@ -85,7 +85,7 @@ class CCmdLaunchSearch : public LaunchBase
 {
 public:
     CCmdLaunchSearch(void * obj) : LaunchBase(obj) {}
-    ~CCmdLaunchSearch(void) {}
+    ~CCmdLaunchSearch() {}
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdLaunchSearch; }
@@ -95,7 +95,7 @@ class CCmdLaunchWikipedia : public LaunchBase
 {
 public:
     CCmdLaunchWikipedia(void * obj) : LaunchBase(obj) {}
-    ~CCmdLaunchWikipedia(void) {}
+    ~CCmdLaunchWikipedia() {}
 
     bool Execute() override { return Launch(L"http://en.wikipedia.org/wiki/Special:Search?search=$(SEL_TEXT_ESCAPED)"); }
     UINT GetCmdId() override { return cmdLaunchWikipedia; }
