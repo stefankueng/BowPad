@@ -25,8 +25,22 @@
 extern void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName);
 
 
+CCmdOpenSelection::CCmdOpenSelection(void * obj) : ICommand(obj)
+{
+    // invalidate the label and enabled state immediately here:
+    // if it's not invalidated here, the first attempt to show the
+    // context menu will only show the pre-set text for the command label.
+    InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
+    InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
+}
+
 bool CCmdOpenSelection::Execute()
 {
+    // ensure that the next attempt to show the context menu will
+    // re-evaluate both the label and enabled state
+    InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
+    InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
+
     // If the current selection (or default selection) is a folder
     // then show it in explorer. Else if it's a file then open it in the editor.
     // If it can't be found, then open it in the file finder.
