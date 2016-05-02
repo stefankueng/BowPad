@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -209,7 +209,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
                         while (std::getline(fin, line))
                         {
                             if (!line.empty())
-                                gRemotes.push_back(line);
+                                gRemotes.push_back(std::move(line));
                         }
                     }
                     ResString sLangLoadOk(hRes, IDS_LANGUAGE_DOWNLOADOK);

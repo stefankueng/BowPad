@@ -297,7 +297,7 @@ void CTheme::SetRibbonColorsHSB( UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HS
     }
 }
 
-void CTheme::GetRibbonColors( UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight )
+void CTheme::GetRibbonColors( UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight ) const
 {
     IPropertyStorePtr spPropertyStore;
 
