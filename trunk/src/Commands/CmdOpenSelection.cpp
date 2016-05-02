@@ -88,6 +88,10 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
     auto pathUnderCursor = CUnicodeUtils::StdGetUnicode(GetSelectedText(false));
     if (pathUnderCursor.empty())
     {
+        int len = (int)ConstCall(SCI_GETWORDCHARS);
+        auto linebuffer = std::make_unique<char[]>(len + 1);
+        ConstCall(SCI_GETWORDCHARS, 0, (LPARAM)linebuffer.get());
+
         // TODO! This would be much better if we analyzed all the characters either side
         // of the curent position to identify something that looked like a path.
         ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
@@ -95,7 +99,7 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
 
         std::string sWordA = GetTextRange(static_cast<long>(ConstCall(SCI_WORDSTARTPOSITION, pos, false)), static_cast<long>(ConstCall(SCI_WORDENDPOSITION, pos, false)));
         pathUnderCursor = CUnicodeUtils::StdGetUnicode(sWordA);
-        ConstCall(SCI_SETCHARSDEFAULT);
+        ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)linebuffer.get());
     }
 
     InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
