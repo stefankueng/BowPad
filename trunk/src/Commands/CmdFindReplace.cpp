@@ -54,7 +54,7 @@ static std::string  g_findString;
 std::string         g_sHighlightString;
 static int          g_searchFlags;
 
-std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
+static std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
 
 namespace
 {
@@ -153,7 +153,7 @@ namespace
                 break;
             }
         }
-        sr.lineText.assign(normalized, sLen);
+        sr.lineText.assign(normalized, 0, sLen);
     }
 
     // Given "a,b" or "a  ,  b"  or "a,b ," or "a,,b" this routine will yield v[0] "a", v[1] "b" for all.
@@ -388,6 +388,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
                 SetDlgItemText(*this, IDC_SEARCHFILES, L"");
                 Button_SetCheck(GetDlgItem(*this, IDC_FUNCTIONS), BST_UNCHECKED);
                 Button_SetCheck(GetDlgItem(*this, IDC_SEARCHSUBFOLDERS), BST_CHECKED);
+                Button_SetCheck(GetDlgItem(*this, IDC_MATCHWORD), BST_UNCHECKED);
             }
             m_reactivation = true;
         }
@@ -645,49 +646,56 @@ void CFindReplaceDlg::CheckSearchFolder()
     }
 }
 
-void CFindReplaceDlg::ActivateDialog(FindMode findMode, LPCWSTR fileToFind)
+
+void CFindReplaceDlg::FindText()
 {
-    size_t selStart = ScintillaCall(SCI_GETSELECTIONSTART);
-    size_t selEnd = ScintillaCall(SCI_GETSELECTIONEND);
-    size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-    size_t lineend = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    this->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
+    int selStart = (int)ScintillaCall(SCI_GETSELECTIONSTART);
+    int selEnd = (int)ScintillaCall(SCI_GETSELECTIONEND);
+    int linestart = (int)ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+    int lineend = (int)ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
 
+    std::string sSelText;
     if (linestart == lineend)
-    {
-        std::string sSelText = GetSelectedText();
+        sSelText = GetSelectedText(true);
 
-        if (sSelText.empty())
-        {
-            // get the current word instead
-            long currentPos = (long)ScintillaCall(SCI_GETCURRENTPOS);
-            long startPos = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
-            long endPos = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
-            auto textbuf = std::make_unique<char[]>(endPos - startPos + 1);
-            Scintilla::Sci_TextRange range;
-            range.chrg.cpMin = startPos;
-            range.chrg.cpMax = endPos;
-            range.lpstrText = textbuf.get();
-            ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&range);
-            sSelText = textbuf.get();
-        }
-        this->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
-        if (!sSelText.empty() && (sSelText.find_first_of("\r\n") == std::string::npos))
-            SetDlgItemText(*this, IDC_SEARCHCOMBO, CUnicodeUtils::StdGetUnicode(sSelText).c_str());
-        else
-            Clear(IDC_SEARCHCOMBO);
-    }
+    if (!sSelText.empty() && (sSelText.find_first_of("\r\n") == std::string::npos))
+        SetDlgItemText(*this, IDC_SEARCHCOMBO, CUnicodeUtils::StdGetUnicode(sSelText).c_str());
     else
-    {
-        this->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
         Clear(IDC_SEARCHCOMBO);
-    }
+
     CheckSearchFolder();
     CheckSearchOptions();
-    if (fileToFind != nullptr)
-    {
-        SetDlgItemText(*this, IDC_SEARCHFILES, fileToFind);
-    }
-    FocusOn(findMode == FindMode::FindText ? IDC_SEARCHCOMBO : IDC_SEARCHFILES);
+    FocusOn(IDC_SEARCHCOMBO);
+    UpdateWindow(*this);
+}
+
+void CFindReplaceDlg::FindFunction(const std::wstring& functionToFind)
+{
+    this->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
+    SetDlgItemText(*this, IDC_SEARCHCOMBO, functionToFind.c_str());
+    Button_SetCheck(GetDlgItem(*this, IDC_FUNCTIONS), BST_CHECKED);
+    Button_SetCheck(GetDlgItem(*this, IDC_MATCHWORD), BST_CHECKED);
+    CheckSearchFolder();
+    CheckSearchOptions();
+    FocusOn(IDC_SEARCHCOMBO);
+    UpdateWindow(*this);
+    PostMessage(*this, WM_COMMAND, MAKEWPARAM(IDC_FINDALLINTABS, BN_CLICKED),
+        LPARAM(GetDlgItem(*this, IDC_FINDALLINTABS)));
+}
+
+void CFindReplaceDlg::FindFile(const std::wstring& fileToFind)
+{
+    this->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
+    Clear(IDC_SEARCHCOMBO);
+    SetDlgItemText(*this, IDC_SEARCHFILES, CPathUtils::GetFileName(fileToFind).c_str());
+    auto parentDir = CPathUtils::GetParentDirectory(fileToFind);
+    if (!parentDir.empty())
+        SetDlgItemText(*this, IDC_SEARCHFOLDER, parentDir.c_str());
+    CheckSearchFolder();
+    CheckSearchOptions();
+    FocusOn(IDC_SEARCHFILES);
+    UpdateWindow(*this);
 }
 
 bool CFindReplaceDlg::EnableListEndTracking(int list_id, bool enable)
@@ -1169,7 +1177,10 @@ void CFindReplaceDlg::DoListItemAction(int itemIndex)
     // Close the dialog if asked too using the shift key or if there was only
     // one item as it's been actioned.
     if (shiftDown || m_searchResults.size() == 1)
+    {
+        UpdateWindow(*this);
         PostMessage(*this, WM_CLOSE, WPARAM(0), LPARAM(0));
+    }
 }
 
 LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
@@ -1760,6 +1771,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
                 CDocument doc = GetDocumentFromID(docID);
                 auto sInfo = CStringUtils::Format(rInfo, CPathUtils::GetFileName(doc.m_path).c_str());
                 SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
+                UpdateWindow(*this);
                 SearchDocument(m_searchWnd, docID, doc, searchfor, searchflags, exSearchFlags,
                     m_searchResults, m_foundPaths);
             }
@@ -1767,6 +1779,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
         }
         ListView_SetItemCountEx(hListControl, m_searchResults.size(), 0);
         ShowResults(true);
+        UpdateWindow(*this);
         std::wstring sInfo;
         if (id == IDC_FINDALLINTABS)
         {
@@ -2972,14 +2985,11 @@ CCmdFindReplace::CCmdFindReplace(void* obj)
 
 CCmdFindReplace::~CCmdFindReplace()
 {
-    g_pFindReplaceDlg.reset();
 }
 
 bool CCmdFindReplace::Execute()
 {
-    if (!g_pFindReplaceDlg)
-        g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(m_Obj);
-    g_pFindReplaceDlg->ActivateDialog(FindMode::FindText);
+    FindReplace_FindText(m_Obj);
 
     return true;
 }
@@ -3226,14 +3236,39 @@ bool CCmdFindSelectedPrev::Execute()
 
 CCmdFindFile::~CCmdFindFile()
 {
-    g_pFindReplaceDlg.reset();
 }
 
 bool CCmdFindFile::Execute()
 {
-    if (!g_pFindReplaceDlg)
-        g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(m_Obj);
-    g_pFindReplaceDlg->ActivateDialog(FindMode::FindFile);
+    FindReplace_FindFile(m_Obj, L"");
 
     return true;
 }
+
+void FindReplace_Finish()
+{
+    g_pFindReplaceDlg.reset();
+}
+
+void FindReplace_FindText(void* mainWnd)
+{
+    if (!g_pFindReplaceDlg)
+        g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(mainWnd);
+    g_pFindReplaceDlg->FindText();
+}
+
+void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName)
+{
+    // TODO! Add support to allow open file as language to be used.
+    if (!g_pFindReplaceDlg)
+        g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(mainWnd);
+    g_pFindReplaceDlg->FindFile(fileName);
+}
+
+void FindReplace_FindFunction(void* mainWnd, const std::wstring& functionName)
+{
+    if (!g_pFindReplaceDlg)
+        g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(mainWnd);
+    g_pFindReplaceDlg->FindFunction(functionName);
+}
+

@@ -55,8 +55,13 @@ enum class ResultsType
 
 enum class FindMode
 {
-    FindText, FindFile
+    FindText, FindFile, FindFunction
 };
+
+void FindReplace_Finish();
+void FindReplace_FindText(void* mainWnd);
+void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName);
+void FindReplace_FindFunction(void* mainWnd, const std::wstring& functionName);
 
 class CFindReplaceDlg : public CDialog, public ICommand
 {
@@ -68,13 +73,15 @@ class CFindReplaceDlg : public CDialog, public ICommand
 public:
     CFindReplaceDlg(void* obj);
 
-    void ActivateDialog(FindMode findMode, LPCWSTR fileToFind = nullptr);
+    void FindText();
+    void FindFunction(const std::wstring& functionToFind);
+    void FindFile(const std::wstring& fileToFind);
+
     void SetSearchFolder(const std::wstring& folder);
     void NotifyOnDocumentClose(int tabIndex);
     void NotifyOnDocumentSave(int tabIndex, bool saveAs);
 
 protected: // override
-
     bool Execute() override { return true; }
     UINT GetCmdId() override { return 0; }
     void OnClose() override;
@@ -177,7 +184,6 @@ protected:
 
     int GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount) const;
 
-    void CheckSearchOptions();
     void AcceptData();
     void NewData(
         std::chrono::steady_clock::time_point& timeOfLastDataUpdate, bool finished);
@@ -189,6 +195,7 @@ protected:
     void OnSearchResultsReady(bool finished);
     void FocusOnFirstListItem(bool keepAnyExistingSelection = false);
     int GetScintillaOptions() const;
+    void CheckSearchOptions();
     void CheckSearchFolder();
     void SaveSettings();
     void SelectItem(int item);

@@ -32,6 +32,7 @@
 #include "version.h"
 #include "CommandHandler.h"
 
+// TODO! make these g_
 HINSTANCE hInst;
 HINSTANCE hRes;
 
@@ -115,18 +116,18 @@ static void RegisterContextMenu(bool bAdd)
     {
         std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str(), IDI_BOWPAD);
         std::wstring sExePath = CStringUtils::Format(L"%s /path:\"%%1\"", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str());
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", NULL, REG_SZ, L"Edit in BowPad", sizeof(L"Edit in BowPad") + 2);
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", nullptr, REG_SZ, L"Edit in BowPad", sizeof(L"Edit in BowPad") + 2);
         SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
         SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", L"MultiSelectModel", REG_SZ, L"Player", sizeof(L"MultiSelectModel") + 2);
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad\\Command", NULL, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad", NULL, REG_SZ, L"Open Folder with BowPad", sizeof(L"Open Folder with BowPad") + 2);
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad\\Command", nullptr, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad", nullptr, REG_SZ, L"Open Folder with BowPad", sizeof(L"Open Folder with BowPad") + 2);
         SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad\\Command", NULL, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad", NULL, REG_SZ, L"Open Folder with BowPad", sizeof(L"Open Folder with BowPad") + 2);
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad\\Command", nullptr, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad", nullptr, REG_SZ, L"Open Folder with BowPad", sizeof(L"Open Folder with BowPad") + 2);
         SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
 
         sExePath = CStringUtils::Format(L"%s /path:\"%%V\"", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str());
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad\\Command", NULL, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
+        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad\\Command", nullptr, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
     }
     else
     {
@@ -344,49 +345,40 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
     }
 }
 
-int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
+int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow, bool bAlreadyRunning)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
 
     SetDllDirectory(L"");
-    HRESULT hr = CoInitialize(NULL);
+    HRESULT hr = CoInitialize(nullptr);
     if (FAILED(hr))
-        return FALSE;
+        return -1;
     OnOutOfScope(CoUninitialize(););
 
-    CCmdLineParser parser(lpCmdLine);
-    if (parser.HasKey(L"?") || parser.HasKey(L"help"))
+    auto parser = std::make_unique<CCmdLineParser>(lpCmdLine);
+    if (parser->HasKey(L"?") || parser->HasKey(L"help"))
     {
         ShowBowPadCommandLineHelp();
-        return FALSE;
+        return 0;
     }
-    if (parser.HasKey(L"register"))
+    if (parser->HasKey(L"register"))
     {
         RegisterContextMenu(true);
-        return FALSE;
+        return 0;
     }
-    if ((parser.HasKey(L"unregister")) || (parser.HasKey(L"deregister")))
+    if ((parser->HasKey(L"unregister")) || (parser->HasKey(L"deregister")))
     {
         RegisterContextMenu(false);
-        return FALSE;
+        return 0;
     }
 
-    bool bAlreadyRunning = false;
-    ::SetLastError(NO_ERROR);
-    std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
-    HANDLE hAppMutex = ::CreateMutex(NULL, false, sID.c_str());
-    OnOutOfScope(CloseHandle(hAppMutex));
-    if ((GetLastError() == ERROR_ALREADY_EXISTS) ||
-        (GetLastError() == ERROR_ACCESS_DENIED))
-        bAlreadyRunning = true;
-
-    if (bAlreadyRunning && !parser.HasKey(L"multiple"))
+    if (bAlreadyRunning && !parser->HasKey(L"multiple"))
     {
         HWND hBowPadWnd = FindAndWaitForBowPad();
         if (hBowPadWnd)
         {
-            ForwardToOtherInstance(hBowPadWnd, lpCmdLine, parser);
+            ForwardToOtherInstance(hBowPadWnd, lpCmdLine, *parser);
             return 0;
         }
     }
@@ -394,36 +386,38 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int n
     SetAppID();
 
     CIniSettings::Instance().SetIniPath(CAppUtils::GetDataPath() + L"\\settings");
-    hInst = hInstance;
-    hRes = hInstance;
     LoadLanguage(hInstance);
 
     SetIcon();
 
-    MSG msg = { 0 };
     CMainWindow mainWindow(hRes);
     CCommandHandler commandHandler;
     g_commandHandler = &commandHandler;
 
-    if (mainWindow.RegisterAndCreateWindow())
+    if (!mainWindow.RegisterAndCreateWindow())
+        return -1;
+
+    ParseCommandLine(*parser, mainWindow);
+
+    // Don't need the parser any more so don't keep it
+    // around taking up space.
+    parser.reset();
+
+    // force CWD to the install path to avoid the CWD being locked:
+    // if BowPad is started from another path (e.g. via double click on a text file in
+    // explorer), the CWD is the directory of that file. As long as BowPad runs with the CWD
+    // set to that dir, that dir can't be removed or renamed due to the lock.
+    ::SetCurrentDirectory(CPathUtils::GetModuleDir().c_str());
+
+    // Main message loop:
+    MSG msg = { 0 };
+    while (GetMessage(&msg, NULL, 0, 0))
     {
-        ParseCommandLine(parser, mainWindow);
-
-        // force CWD to the install path to avoid the CWD being locked:
-        // if BowPad is started from another path (e.g. via double click on a text file in
-        // explorer), the CWD is the directory of that file. As long as BowPad runs with the CWD
-        // set to that dir, that dir can't be removed or renamed due to the lock.
-        ::SetCurrentDirectory(CPathUtils::GetModuleDir().c_str());
-
-        // Main message loop:
-        while (GetMessage(&msg, NULL, 0, 0))
+        if (!CKeyboardShortcutHandler::Instance().TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam) &&
+            !CDialog::IsDialogMessage(&msg))
         {
-            if (!CKeyboardShortcutHandler::Instance().TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam) &&
-                !CDialog::IsDialogMessage(&msg))
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
     }
     return (int)msg.wParam;
@@ -434,9 +428,19 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                        _In_ LPTSTR  lpCmdLine,
                        _In_ int     nCmdShow)
 {
-    auto mainResult = BPMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-    g_commandHandler = nullptr;
+    hInst = hInstance;
+    hRes = hInstance;
 
+    const std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
+    ::SetLastError(NO_ERROR); // Don't do any work between these 3 statements to spoil the error code.
+    HANDLE hAppMutex = ::CreateMutex(NULL, false, sID.c_str());
+    DWORD mutexStatus = GetLastError();
+    OnOutOfScope(CloseHandle(hAppMutex););
+    bool bAlreadyRunning = (mutexStatus == ERROR_ALREADY_EXISTS || mutexStatus == ERROR_ACCESS_DENIED);
+
+    auto mainResult = BPMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow, bAlreadyRunning);
+
+    g_commandHandler = nullptr;
     Scintilla_ReleaseResources();
 
     // Be careful shutting down Scintilla's resources here if any

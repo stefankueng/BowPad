@@ -336,6 +336,12 @@
     <ClInclude Include="Commands\CmdSpellcheck.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="CorrespondingFileDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands\CmdGotoSymbol.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -595,6 +601,12 @@
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\BrowseFolder.cpp">
       <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="CorrespondingFileDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdGotoSymbol.cpp">
+      <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
