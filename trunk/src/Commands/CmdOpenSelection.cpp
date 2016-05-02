@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,13 +22,37 @@
 #include "UnicodeUtils.h"
 #include "PathUtils.h"
 
+extern void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName);
+
+
 bool CCmdOpenSelection::Execute()
 {
+    // If the current selection (or default selection) is a folder
+    // then show it in explorer. Else if it's a file then open it in the editor.
+    // If it can't be found, then open it in the file finder.
+    // If it's a relative path, look for it it relative from the current
+    // file's parent older.
     std::wstring path = GetPathUnderCursor();
-    if (!path.empty())
+    if (path.empty())
+        return false;
+
+    if (PathIsDirectory(path.c_str()))
     {
-        return OpenFile(path.c_str(), OpenFlags::AddToMRU);
+        SHELLEXECUTEINFO shi = { };
+        shi.cbSize = sizeof(SHELLEXECUTEINFO);
+        shi.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_UNICODE;
+        shi.hwnd = GetHwnd();
+        shi.lpVerb = L"open";
+        shi.lpFile = nullptr;
+        shi.lpParameters = nullptr;
+        shi.lpDirectory = path.c_str();
+        shi.nShow = SW_SHOW;
+
+        return !!ShellExecuteEx(&shi);
     }
+    if (PathFileExists(path.c_str()))
+        return OpenFile(path.c_str(), OpenFlags::AddToMRU);
+    FindReplace_FindFile(m_Obj, path);
     return false;
 }
 
@@ -42,7 +66,7 @@ HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
     {
         // add the filename to the command label
         std::wstring path = GetPathUnderCursor();
-        path = CPathUtils::GetFileName(path);
+        //path = CPathUtils::GetFileName(path);
 
         ResString label(hRes, cmdOpenSelection_LabelTitle_RESID);
         if (!path.empty())
@@ -56,13 +80,23 @@ HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
     return E_NOTIMPL;
 }
 
-std::wstring CCmdOpenSelection::GetPathUnderCursor()
+std::wstring CCmdOpenSelection::GetPathUnderCursor() 
 {
-    ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
-    size_t pos = ScintillaCall(SCI_GETCURRENTPOS);
-    std::string sWordA = GetTextRange(static_cast<long>(ScintillaCall(SCI_WORDSTARTPOSITION, pos, false)), static_cast<long>(ScintillaCall(SCI_WORDENDPOSITION, pos, false)));
-    std::wstring sWord = CUnicodeUtils::StdGetUnicode(sWordA);
-    ScintillaCall(SCI_SETCHARSDEFAULT);
+    if (!HasActiveDocument())
+        return std::wstring();
+
+    auto pathUnderCursor = CUnicodeUtils::StdGetUnicode(GetSelectedText(false));
+    if (pathUnderCursor.empty())
+    {
+        // TODO! This would be much better if we analyzed all the characters either side
+        // of the curent position to identify something that looked like a path.
+        ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
+        size_t pos = ConstCall(SCI_GETCURRENTPOS);
+
+        std::string sWordA = GetTextRange(static_cast<long>(ConstCall(SCI_WORDSTARTPOSITION, pos, false)), static_cast<long>(ConstCall(SCI_WORDENDPOSITION, pos, false)));
+        pathUnderCursor = CUnicodeUtils::StdGetUnicode(sWordA);
+        ConstCall(SCI_SETCHARSDEFAULT);
+    }
 
     InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
     InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
@@ -70,7 +104,7 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
     // Look for the file name under the cursor in either the same directory
     // as the current document or in it's parent directory.
     // Finally try look for it in the current directory.
-    if (PathIsRelative(sWord.c_str()))
+    if (PathIsRelative(pathUnderCursor.c_str()))
     {
         CDocument doc = GetActiveDocument();
         if (!doc.m_path.empty())
@@ -78,22 +112,18 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
             std::wstring parent = CPathUtils::GetParentDirectory(doc.m_path);
             if (!parent.empty())
             {
-                std::wstring path = CPathUtils::Append(parent, sWord);
-                if (PathFileExists(path.c_str()) && !PathIsDirectory(path.c_str()))
+                std::wstring path = CPathUtils::Append(parent, pathUnderCursor);
+                if (PathFileExists(path.c_str()))
                     return path;
                 parent = CPathUtils::GetParentDirectory(parent);
                 if (!parent.empty())
                 {
-                    path = CPathUtils::Append(parent, sWord);
-                    if (PathFileExists(path.c_str()) && !PathIsDirectory(path.c_str()))
+                    path = CPathUtils::Append(parent, pathUnderCursor);
+                    if (PathFileExists(path.c_str()))
                         return path;
                 }
             }
         }
     }
-    if (PathFileExists(sWord.c_str()) && !PathIsDirectory(sWord.c_str()))
-    {
-        return sWord;
-    }
-    return L"";
+    return pathUnderCursor;
 }
