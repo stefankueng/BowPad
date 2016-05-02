@@ -23,105 +23,102 @@
 
 #include <string>
 #include <vector>
-
-// Enable to test function scanning performance. If set to 1 a
-// a dialog box is shown showing how long each document took to scan
-// and how any many pieces it was scanned in.
-#define TIMED_FUNCTIONS 0
+#include <unordered_map>
 #include <chrono>
+#include <functional>
 
-enum class FindFunctionsStatus
+enum class FunctionDataStatus
 {
-    NotStarted,
-    InProgress,
-    Finished,
-    Failed
-};
-
-enum class FunctionDisplayMode
-{
-    NameAndArgs,
-    Name,
-    Signature
+    Invalid, InProgress, Ready
 };
 
 struct FunctionInfo
 {
-    inline FunctionInfo(size_t line, std::wstring&& sort_name, std::wstring&& display_name)
-        : line(std::move(line)), sort_name(std::move(sort_name)), display_name(std::move(display_name))
-    {}
-    size_t line;
-    std::wstring sort_name;
-    std::wstring display_name;
+    long lineNum;
+    std::wstring displayName;
 };
 
-enum class FunctionUpdateReason
+enum class DocEventType
 {
-    Unknown,
-    TabChange,
+    // When tab changes we must know in order to:
+    // 1. Clear current list of functions as they relate to the "previous" document
+    // 2. Disable the functions button so the user can't push it when there are no
+    // functions available yet.
+    // 3. Ensure we start finding functions for this document.
+    // 4  Re-enable the document.
     DocOpen,
+    // When a document opens what must we do?
     DocModified,
+    // When a document is modified, it may introduce new functions so we must
+    // scan for them.
     LexerChanged,
-    DocSave,
-    DocProgress,
-    DocNext
+    // When the lexer is changed, the regex expression for finding functions
+    // changes so we must look for them again.
+    DocSave
+    // If the user saves, a SaveAs might change the language/lexer type in
+    // the process? If so the function list needs to be rebuilt.
 };
+
+struct DocEvent
+{
+    int docID;
+    DocEventType eventID;
+};
+
+struct CaseInsensitiveLess
+{
+    bool operator()(const std::wstring& s1, const std::wstring& s2) const
+    {
+        return _wcsicmp(s1.c_str(), s2.c_str()) < 0;
+    }
+};
+
+struct FunctionData
+{
+    FunctionDataStatus status = FunctionDataStatus::Invalid;
+    std::map<std::wstring,std::vector<FunctionInfo>, CaseInsensitiveLess> functions;
+};
+
 
 class CCmdFunctions : public ICommand
 {
 public:
-    CCmdFunctions(void * obj);
+    CCmdFunctions(void* obj);
     ~CCmdFunctions();
 
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdFunctions; }
+    bool GotoSymbol(const std::wstring& symbolName);
 
+private:
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
-
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
     void TabNotify(TBHDR* ptbhdr) override;
-
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
-
+    void ScintillaNotify(Scintilla::SCNotification* pScn) override;
     void OnTimer(UINT id) override;
-
-    void OnDocumentOpen(int id) override;
-
+    void OnDocumentOpen(int index) override;
     void OnDocumentSave(int index, bool bSaveAs) override;
-
     void OnLexerChanged(int lexer) override;
-private:
-
-    void FindFunctions(int docID, bool bForce);
-    void SaveFunctionForActiveDocument(FunctionDisplayMode fdm, size_t line_no,
-                                       bool parsed, std::wstring&& sig, std::wstring&& name, std::wstring&& name_and_args);
+    void OnDocumentClose(int index) override;
+    void FindAllFunctions();
+    FunctionData FindFunctionsNow() const;
     void InvalidateFunctionsEnabled();
     void InvalidateFunctionsSource();
     HRESULT PopulateFunctions(IUICollectionPtr& collection);
-    void ScheduleFunctionUpdate(int docId, FunctionUpdateReason reason);
-    void UpdateFunctions(bool bForce);
-    void RemoveNonExistantDocuments();
-    void AddDocumentToScan(int docId);
-    void DocumentScanFinished(int docId, bool bForce);
-    void DocumentScanInterrupted(int docId, int interruptingDocId);
-    void DocumentScanProgressing(int docId);
-    int TopDocumentId() const;
+    void EventHappened(int docID, DocEventType eventType);
+    void FindFunctions(const CDocument& doc, std::function<bool(const std::wstring&, long lineNum)>& callback) const;
 
 private:
-    UINT m_timerID;
-    std::vector<int> m_docIDs;
-    CScintillaWnd m_edit;
-    std::vector<FunctionInfo> m_functions;
-    std::string m_funcRegex;
-    Scintilla::Sci_TextToFind m_ttf;
-    FindFunctionsStatus m_searchStatus;
-    FindFunctionsStatus m_functionsStatus;
     bool m_autoscan;
-    FunctionDisplayMode m_functionDisplayMode;
-
-    int m_timedParts;
-    std::chrono::steady_clock::time_point m_startTime;
-    std::chrono::steady_clock::time_point m_endTime;
+    UINT m_timerID;
+    CScintillaWnd m_edit;
+    std::vector<DocEvent> m_events;
+    Scintilla::Sci_TextToFind m_ttf;
+    std::string m_funcRegex;
+    std::string m_docLang;
+    int m_docID = -1;
+    std::vector<std::wstring> m_wtrimtokens;
+    std::vector<int> menuData;
 };
 

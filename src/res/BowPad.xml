@@ -405,6 +405,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/GotoLineL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdGotoSymbol" LabelTitle="Go to symbol" TooltipTitle="Go to symbol" TooltipDescription="Moves the cursor to the specified symbol" Keytip="GS">
+      <Command.LargeImages>
+        <Image>res/GotoSymbolL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
 
     <Command Name="cmdGroupBlanks" LabelTitle="Other operations">
       <Command.LargeImages>

@@ -37,6 +37,7 @@
 #include "CmdLines.h"
 #include "CmdPrint.h"
 #include "CmdGotoLine.h"
+#include "CmdGotoSymbol.h"
 #include "CmdSelectTab.h"
 #include "CmdBlanks.h"
 #include "CmdZoom.h"
@@ -157,8 +158,9 @@ void CCommandHandler::Init(void * obj)
     Add<CCmdFindSelectedNext>(obj);
     Add<CCmdFindSelectedPrev>(obj);
     Add<CCmdFindFile>(obj);
-    Add<CCmdGotoLine>(obj);
     Add<CCmdFunctions>(obj);
+    Add<CCmdGotoLine>(obj);
+    Add<CCmdGotoSymbol>(obj);
 
     Add<CCmdBookmarks>(obj);
     Add<CCmdBookmarkToggle>(obj);

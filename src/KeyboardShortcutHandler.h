@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -47,8 +47,8 @@ class CKeyboardShortcutHandler
 public:
     static CKeyboardShortcutHandler&        Instance();
     LRESULT CALLBACK                        TranslateAccelerator(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    std::wstring                            GetShortCutStringForCommand(WORD cmd);
-    std::wstring                            GetTooltipTitleForCommand(WORD cmd);
+    std::wstring                            GetShortCutStringForCommand(WORD cmd) const;
+    std::wstring                            GetTooltipTitleForCommand(WORD cmd) const;
     void                                    Reload();
     void                                    UpdateTooltips(bool bAll);
     void                                    ToolTipUpdated(WORD cmd);

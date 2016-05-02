@@ -22,6 +22,8 @@
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 
+class CMainWindow;
+
 namespace OpenFlags
 {
     const unsigned int AddToMRU = 1;
@@ -85,6 +87,7 @@ protected:
     void                SaveCurrentPos(CPosData& pos);
 
     sptr_t              ScintillaCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0);
+    sptr_t              ConstCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0) const;
     LRESULT             SendMessageToMainWnd(UINT msg, WPARAM wParam, LPARAM lParam);
     void                UpdateStatusBar(bool bEverything);
     void                SetupLexerForLang(const std::wstring& lang);
@@ -95,11 +98,11 @@ protected:
     void                GotoLine(long line);
     void                Center(long startPos, long endPos);
     void                GotoBrace();
-    std::string         GetLine(long line);
-    std::string         GetTextRange(long startpos, long endpos);
+    std::string         GetLine(long line) const;
+    std::string         GetTextRange(long startpos, long endpos) const;
     size_t              FindText(const std::string& tofind, long startpos, long endpos);
-    std::string         GetSelectedText();
-    std::string         GetCurrentLine();
+    std::string         GetSelectedText(bool useCurrentWordIfSelectionEmpty = false) const;
+    std::string         GetCurrentLine() const;
     void                ShowFileTree(bool bShow);
     bool                IsFileTreeShown();
     std::wstring        GetFileTreePath();
@@ -117,6 +120,16 @@ protected:
     HRESULT             InvalidateUICommand(UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY *key);
     HRESULT             SetUICommandProperty(UINT32 commandId, REFPROPERTYKEY key, PROPVARIANT value);
     HRESULT             SetUICommandProperty(REFPROPERTYKEY key, PROPVARIANT value);
+
+private:
+    inline CMainWindow* GetMainWindow()
+    {
+        return static_cast<CMainWindow*>(m_Obj);
+    }
+    inline CMainWindow* GetMainWindow() const
+    {
+        return static_cast<CMainWindow*>(m_Obj);
+    }
 
 protected:
     void *              m_Obj;

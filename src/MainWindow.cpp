@@ -43,6 +43,7 @@
 #include <type_traits>
 #include <future>
 #include <Shobjidl.h>
+#include <initializer_list>
 
 IUIFramework *g_pFramework = nullptr;  // Reference to the Ribbon framework.
 
@@ -100,8 +101,11 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     m_scratchEditor.InitScratch(hRes);
 }
 
+extern void FindReplace_Finish();
+
 CMainWindow::~CMainWindow()
 {
+    FindReplace_Finish();
     DestroyIcon(m_hShieldIcon);
 }
 
@@ -429,16 +433,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         return OnLButtonUp((UINT)wParam, { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
 
     case WM_DROPFILES:
-        {
-            HDROP hDrop = reinterpret_cast<HDROP>(wParam);
-            if (hDrop)
-            {
-                OnOutOfScope(
-                    DragFinish(hDrop);
-                );
-                HandleDropFiles(hDrop);
-            }
-        }
+        HandleDropFiles(reinterpret_cast<HDROP>(wParam));
         break;
     case WM_COPYDATA:
         {
@@ -478,201 +473,19 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 HandleGetDispInfo((int)nmhdr.idFrom, lpnmtdi);
                 }
                 break;
-            default:
-                break;
             }
 
             if (nmhdr.idFrom == (UINT_PTR)&m_TabBar || nmhdr.hwndFrom == m_TabBar)
             {
-                TBHDR tbh = { };
-                if (nmhdr.idFrom != (UINT_PTR)&m_TabBar)
-                {
-                    // Events that are not from CTabBar might be
-                    // lower level and of type HMHDR, not TBHDR
-                    // and therefore missing tabOrigin.
-                    // In case they are NMHDR, map them to TBHDR and set
-                    // an obviously bogus value for tabOrigin so it isn't
-                    // used by mistake.
-                    // We need a TBHDR type to notify commands with.
-                    tbh.hdr = nmhdr;
-                    tbh.tabOrigin = ~0; // Obviously bogus value.
-                    lParam = (LPARAM) &tbh;
-                }
-
-                TBHDR* ptbhdr = reinterpret_cast<TBHDR*>(lParam);
-                const TBHDR& tbhdr = *ptbhdr;
-                assert(tbhdr.hdr.code == nmhdr.code);
-
-                CCommandHandler::Instance().TabNotify(ptbhdr);
-
-                switch (nmhdr.code)
-                {
-                    case TCN_GETCOLOR:
-                    {
-                        if (tbhdr.tabOrigin >= 0 && tbhdr.tabOrigin < m_TabBar.GetItemCount())
-                        {
-                            int docId = m_TabBar.GetIDFromIndex(tbhdr.tabOrigin);
-                            APPVERIFY(docId >= 0);
-                            if (m_DocManager.HasDocumentID(docId))
-                            {
-                                auto clr = m_DocManager.GetColorForDocument(docId);
-                                return CTheme::Instance().GetThemeColor(clr);
-                            }
-                        }
-                        else
-                            APPVERIFY(false);
-                        break;
-                    }
-                    case TCN_SELCHANGE:
-                    HandleTabChange(nmhdr);
-                    InvalidateRect(m_fileTree, NULL, TRUE);
-                    break;
-                    case TCN_SELCHANGING:
-                    HandleTabChanging(nmhdr);
-                    break;
-                    case TCN_TABDELETE:
-                    HandleTabDelete(tbhdr);
-                    break;
-                    case TCN_TABDROPPEDOUTSIDE:
-                    {
-                        DWORD pos = GetMessagePos();
-                        POINT pt{ GET_X_LPARAM(pos), pt.y = GET_Y_LPARAM(pos) };
-                        HandleTabDroppedOutside(ptbhdr->tabOrigin, pt);
-                    }
-                    break;
-                    case TCN_GETDROPICON:
-                    {
-                        DWORD pos = GetMessagePos();
-                        POINT pt{ GET_X_LPARAM(pos), GET_Y_LPARAM(pos) };
-                        auto hPtWnd = WindowFromPoint(pt);
-                        if (hPtWnd == m_fileTree)
-                        {
-                            auto docID = m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin);
-                            CDocument doc = m_DocManager.GetDocumentFromID(docID);
-                            if (!doc.m_path.empty())
-                            {
-                                if (GetKeyState(VK_CONTROL) & 0x8000)
-                                    return (LRESULT)::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_COPYFILE));
-                                else
-                                    return (LRESULT)::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_MOVEFILE));
-                            }
-                        }
-                    }
-                    break;
-                }
+                return HandleTabBarEvents(nmhdr, wParam, lParam);
             }
-            else if ((nmhdr.idFrom == (UINT_PTR)&m_editor) ||
-                (nmhdr.hwndFrom == m_editor))
+            else if (nmhdr.idFrom == (UINT_PTR)&m_editor || nmhdr.hwndFrom == m_editor)
             {
-                if (nmhdr.code == NM_COOLSB_CUSTOMDRAW)
-                    return m_editor.HandleScrollbarCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
-
-                Scintilla::SCNotification* pScn = reinterpret_cast<Scintilla::SCNotification *>(lParam);
-                const Scintilla::SCNotification& scn = *pScn;
-
-                CCommandHandler::Instance().ScintillaNotify(pScn);
-                switch (scn.nmhdr.code)
-                {
-                case SCN_PAINTED:
-                    m_editor.UpdateLineNumberWidth();
-                    break;
-                case SCN_SAVEPOINTREACHED:
-                case SCN_SAVEPOINTLEFT:
-                    HandleSavePoint(scn);
-                    break;
-                case SCN_MARGINCLICK:
-                    m_editor.MarginClick(pScn);
-                    break;
-                case SCN_UPDATEUI:
-                    HandleUpdateUI(scn);
-                    break;
-                case SCN_CHARADDED:
-                    HandleAutoIndent(scn);
-                    break;
-                case SCN_MODIFYATTEMPTRO:
-                    HandleWriteProtectedEdit();
-                    break;
-                case SCN_DOUBLECLICK:
-                    return HandleDoubleClick(scn);
-                case SCN_DWELLSTART:
-                    HandleDwellStart(scn);
-                    break;
-                case SCN_DWELLEND:
-                    m_editor.Call(SCI_CALLTIPCANCEL);
-                    break;
-                case SCN_ZOOM:
-                    UpdateStatusBar(false);
-                    break;
-                }
+                return HandleEditorEvents(nmhdr, wParam, lParam);
             }
             else if (nmhdr.idFrom == (UINT_PTR)&m_fileTree || nmhdr.hwndFrom == m_fileTree)
             {
-                LPNMTREEVIEW pnmtv = (LPNMTREEVIEW)lParam;
-                switch (nmhdr.code)
-                {
-                    case NM_RETURN:
-                    {
-                        auto path = m_fileTree.GetFilePathForSelItem();
-                        if (!path.empty())
-                        {
-                            bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-                            OpenFile(path.c_str(), OpenFlags::AddToMRU | (control ? OpenFlags::OpenIntoActiveTab : 0));
-                            return TRUE;
-                        }
-                    }
-                        break;
-                    case NM_DBLCLK:
-                    {
-                        auto path = m_fileTree.GetFilePathForHitItem();
-                        if (!path.empty())
-                        {
-                            bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-                            OpenFile(path.c_str(), OpenFlags::AddToMRU | (control ? OpenFlags::OpenIntoActiveTab : 0));
-                            PostMessage(*this, WM_SETFOCUS, TRUE, 0);
-                        }
-                    }
-                        break;
-                    case NM_RCLICK:
-                    {
-                        // the tree control does not get the WM_CONTEXTMENU message.
-                        // see http://support.microsoft.com/kb/222905 for details about why
-                        // so we have to work around this and handle the NM_RCLICK instead
-                        // and send the WM_CONTEXTMENU message from here.
-                        SendMessage(m_fileTree, WM_CONTEXTMENU, (WPARAM)m_hwnd, GetMessagePos());
-                    }
-                        break;
-                    case TVN_ITEMEXPANDING:
-                    {
-                        if ((pnmtv->action & TVE_EXPAND) != 0)
-                            m_fileTree.Refresh(pnmtv->itemNew.hItem);
-                    }
-                        break;
-                    case NM_CUSTOMDRAW:
-                    {
-                        if (CTheme::Instance().IsDarkTheme())
-                        {
-                            LPNMTVCUSTOMDRAW lpNMCustomDraw = (LPNMTVCUSTOMDRAW)lParam;
-                            // only do custom drawing when in dark theme
-                            switch (lpNMCustomDraw->nmcd.dwDrawStage)
-                            {
-                                case CDDS_PREPAINT:
-                                    return CDRF_NOTIFYITEMDRAW;
-                                case CDDS_ITEMPREPAINT:
-                                {
-                                    lpNMCustomDraw->clrText = CTheme::Instance().GetThemeColor(RGB(0,0,0));
-                                    lpNMCustomDraw->clrTextBk = CTheme::Instance().GetThemeColor(RGB(255,255,255));
-
-                                    return CDRF_DODEFAULT;
-                                }
-                                    break;
-                            }
-                            return CDRF_DODEFAULT;
-                        }
-                    }
-                        break;
-                    default:
-                        break;
-                }
+                return HandleFileTreeEvents(nmhdr, wParam, lParam);
             }
         }
         break;
@@ -758,6 +571,206 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     return 0;
 }
 
+LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmhdr, WPARAM /*wParam*/, LPARAM lParam)
+{
+    TBHDR tbh = {};
+    if (nmhdr.idFrom != (UINT_PTR)&m_TabBar)
+    {
+        // Events that are not from CTabBar might be
+        // lower level and of type HMHDR, not TBHDR
+        // and therefore missing tabOrigin.
+        // In case they are NMHDR, map them to TBHDR and set
+        // an obviously bogus value for tabOrigin so it isn't
+        // used by mistake.
+        // We need a TBHDR type to notify commands with.
+        tbh.hdr = nmhdr;
+        tbh.tabOrigin = ~0; // Obviously bogus value.
+        lParam = (LPARAM)&tbh;
+    }
+
+    TBHDR* ptbhdr = reinterpret_cast<TBHDR*>(lParam);
+    const TBHDR& tbhdr = *ptbhdr;
+    assert(tbhdr.hdr.code == nmhdr.code);
+
+    CCommandHandler::Instance().TabNotify(ptbhdr);
+
+    switch (nmhdr.code)
+    {
+    case TCN_GETCOLOR:
+    {
+        if (tbhdr.tabOrigin >= 0 && tbhdr.tabOrigin < m_TabBar.GetItemCount())
+        {
+            int docId = m_TabBar.GetIDFromIndex(tbhdr.tabOrigin);
+            APPVERIFY(docId >= 0);
+            if (m_DocManager.HasDocumentID(docId))
+            {
+                auto clr = m_DocManager.GetColorForDocument(docId);
+                return CTheme::Instance().GetThemeColor(clr);
+            }
+        }
+        else
+            APPVERIFY(false);
+        break;
+    }
+    case TCN_SELCHANGE:
+        HandleTabChange(nmhdr);
+        InvalidateRect(m_fileTree, NULL, TRUE);
+        break;
+    case TCN_SELCHANGING:
+        HandleTabChanging(nmhdr);
+        break;
+    case TCN_TABDELETE:
+        HandleTabDelete(tbhdr);
+        break;
+    case TCN_TABDROPPEDOUTSIDE:
+    {
+        DWORD pos = GetMessagePos();
+        POINT pt{ GET_X_LPARAM(pos), pt.y = GET_Y_LPARAM(pos) };
+        HandleTabDroppedOutside(ptbhdr->tabOrigin, pt);
+    }
+    break;
+    case TCN_GETDROPICON:
+    {
+        DWORD pos = GetMessagePos();
+        POINT pt{ GET_X_LPARAM(pos), GET_Y_LPARAM(pos) };
+        auto hPtWnd = WindowFromPoint(pt);
+        if (hPtWnd == m_fileTree)
+        {
+            auto docID = m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin);
+            CDocument doc = m_DocManager.GetDocumentFromID(docID);
+            if (!doc.m_path.empty())
+            {
+                if (GetKeyState(VK_CONTROL) & 0x8000)
+                    return (LRESULT)::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_COPYFILE));
+                else
+                    return (LRESULT)::LoadCursor(hResource, MAKEINTRESOURCE(IDC_DRAG_MOVEFILE));
+            }
+        }
+    }
+    break;
+    }
+    return 0;
+}
+
+LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam)
+{
+    if (nmhdr.code == NM_COOLSB_CUSTOMDRAW)
+        return m_editor.HandleScrollbarCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
+
+    Scintilla::SCNotification* pScn = reinterpret_cast<Scintilla::SCNotification *>(lParam);
+    const Scintilla::SCNotification& scn = *pScn;
+
+    CCommandHandler::Instance().ScintillaNotify(pScn);
+    switch (scn.nmhdr.code)
+    {
+    case SCN_PAINTED:
+        m_editor.UpdateLineNumberWidth();
+        break;
+    case SCN_SAVEPOINTREACHED:
+    case SCN_SAVEPOINTLEFT:
+        HandleSavePoint(scn);
+        break;
+    case SCN_MARGINCLICK:
+        m_editor.MarginClick(pScn);
+        break;
+    case SCN_UPDATEUI:
+        HandleUpdateUI(scn);
+        break;
+    case SCN_CHARADDED:
+        HandleAutoIndent(scn);
+        break;
+    case SCN_MODIFYATTEMPTRO:
+        HandleWriteProtectedEdit();
+        break;
+    case SCN_DOUBLECLICK:
+        return HandleDoubleClick(scn);
+    case SCN_DWELLSTART:
+        HandleDwellStart(scn);
+        break;
+    case SCN_DWELLEND:
+        m_editor.Call(SCI_CALLTIPCANCEL);
+        break;
+    case SCN_ZOOM:
+        UpdateStatusBar(false);
+        break;
+    }
+    return 0;
+}
+
+LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM /*wParam*/, LPARAM lParam)
+{
+    LPNMTREEVIEW pnmtv = (LPNMTREEVIEW)lParam;
+    switch (nmhdr.code)
+    {
+    case NM_RETURN:
+    {
+        auto path = m_fileTree.GetFilePathForSelItem();
+        if (!path.empty())
+        {
+            bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+            unsigned int openFlags = OpenFlags::AddToMRU;
+            if (control)
+                openFlags |= OpenFlags::OpenIntoActiveTab;
+            OpenFile(path.c_str(), openFlags);
+            return TRUE;
+        }
+    }
+    break;
+    case NM_DBLCLK:
+    {
+        auto path = m_fileTree.GetFilePathForHitItem();
+        if (!path.empty())
+        {
+            bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+            OpenFile(path.c_str(), OpenFlags::AddToMRU | (control ? OpenFlags::OpenIntoActiveTab : 0));
+            PostMessage(*this, WM_SETFOCUS, TRUE, 0);
+        }
+    }
+    break;
+    case NM_RCLICK:
+    {
+        // the tree control does not get the WM_CONTEXTMENU message.
+        // see http://support.microsoft.com/kb/222905 for details about why
+        // so we have to work around this and handle the NM_RCLICK instead
+        // and send the WM_CONTEXTMENU message from here.
+        SendMessage(m_fileTree, WM_CONTEXTMENU, (WPARAM)m_hwnd, GetMessagePos());
+    }
+    break;
+    case TVN_ITEMEXPANDING:
+    {
+        if ((pnmtv->action & TVE_EXPAND) != 0)
+            m_fileTree.Refresh(pnmtv->itemNew.hItem);
+    }
+    break;
+    case NM_CUSTOMDRAW:
+    {
+        if (CTheme::Instance().IsDarkTheme())
+        {
+            LPNMTVCUSTOMDRAW lpNMCustomDraw = (LPNMTVCUSTOMDRAW)lParam;
+            // only do custom drawing when in dark theme
+            switch (lpNMCustomDraw->nmcd.dwDrawStage)
+            {
+            case CDDS_PREPAINT:
+                return CDRF_NOTIFYITEMDRAW;
+            case CDDS_ITEMPREPAINT:
+            {
+                lpNMCustomDraw->clrText = CTheme::Instance().GetThemeColor(RGB(0, 0, 0));
+                lpNMCustomDraw->clrTextBk = CTheme::Instance().GetThemeColor(RGB(255, 255, 255));
+
+                return CDRF_DODEFAULT;
+            }
+            break;
+            }
+            return CDRF_DODEFAULT;
+        }
+    }
+    break;
+    default:
+        break;
+    }
+    return 0;
+}
+
 void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
 {
     switch (wParam)
@@ -822,7 +835,7 @@ void CMainWindow::HandleStatusBarEOLFormat()
     int currentEolMode = (int) m_editor.Call(SCI_GETEOLMODE);
     EOLFormat currentEolFormat = ToEOLFormat(currentEolMode);
     static const EOLFormat options[] = { WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT };
-    const int numOptions = std::extent<decltype(options)>::value;
+    const size_t numOptions = std::size(options);
     for (size_t i = 0; i < numOptions; ++i)
     {
         std::wstring eolName = GetEOLFormatDescription(options[i]);
@@ -872,13 +885,10 @@ void CMainWindow::HandleStatusBarZoom()
         AppendMenu(hPopup, MF_STRING, 150, L"150%");
         AppendMenu(hPopup, MF_STRING, 200, L"200%");
         AppendMenu(hPopup, MF_STRING, 400, L"400%");
+
         auto cmd = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, NULL);
         if (cmd != 0)
-        {
-            int fontsize = (int)m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT);
-            int zoom = (fontsize * cmd / 100) - fontsize;
-            m_editor.Call(SCI_SETZOOM, zoom);
-        }
+            SetZoomPC(cmd);
     }
 }
 
@@ -1068,23 +1078,21 @@ void CMainWindow::HandleAfterInit()
     FileTreeBlockRefresh(true);
     OnOutOfScope(FileTreeBlockRefresh(false));
     CCommandHandler::Instance().AfterInit();
-    for (const auto& path : m_pathsToOpen)
+    
+    if ((m_pathsToOpen.size() == 1) && (PathIsDirectory(m_pathsToOpen.begin()->first.c_str())))
     {
-        unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
-        if (m_bPathsToOpenMRU)
-            openFlags |= OpenFlags::AddToMRU;
-        if ((m_pathsToOpen.size() == 1) && (PathIsDirectory(path.first.c_str())))
+        if (!m_fileTree.GetPath().empty()) // File tree not empty: create a new empty tab first.
+            OpenNewTab();
+        m_fileTree.SetPath(m_pathsToOpen.begin()->first);
+        ShowFileTree(true);
+    }
+    else
+    {
+        for (const auto& path : m_pathsToOpen)
         {
-            if (!m_fileTree.GetPath().empty())
-            {
-                // file tree not empty: create a new empty tab first
-                OpenNewTab();
-            }
-            m_fileTree.SetPath(path.first);
-            ShowFileTree(true);
-        }
-        else
-        {
+            unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
+            if (m_bPathsToOpenMRU)
+                openFlags |= OpenFlags::AddToMRU;
             OpenFile(path.first, openFlags);
             if (path.second != (size_t)-1)
                 GoToLine(path.second);
@@ -1315,6 +1323,23 @@ void CMainWindow::GoToLine( size_t line )
     m_editor.GotoLine((long)line);
 }
 
+int CMainWindow::GetZoomPC() const
+{
+    int fontsize = (int)m_editor.ConstCall(SCI_STYLEGETSIZE, STYLE_DEFAULT);
+    int zoom = (int)m_editor.ConstCall(SCI_GETZOOM);
+    int zoomfactor = (fontsize + zoom) * 100 / fontsize;
+    if (zoomfactor == 0)
+        zoomfactor = 1;
+    return zoomfactor;
+}
+
+void CMainWindow::SetZoomPC(int zoomPC)
+{
+    int fontsize = (int)m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT);
+    int zoom = (fontsize * zoomPC / 100) - fontsize;
+    m_editor.Call(SCI_SETZOOM, zoom);
+}
+
 void CMainWindow::UpdateStatusBar( bool bEverything )
 {
     static ResString rsStatusTTDocSize(hRes, IDS_STATUSTTDOCSIZE);
@@ -1359,11 +1384,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", nullptr, STATUSBAR_CAPS);
     m_StatusBar.SetText(m_editor.Call(SCI_GETUSETABS) ? L"Tabs" : L"Spaces", rsStatusTTTabSpaces.c_str(), STATUSBAR_TABSPACE);
 
-    int fontsize = (int)m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT);
-    int zoom = (int)m_editor.Call(SCI_GETZOOM);
-    int zoomfactor = (fontsize + zoom) * 100 / fontsize;
-    if (zoomfactor == 0)
-        zoomfactor = 1;
+    int zoomfactor = GetZoomPC();
     std::wstring szoomfactor = CStringUtils::Format(rsStatusZoom, zoomfactor);
     m_StatusBar.SetText(szoomfactor.c_str(), nullptr, STATUSBAR_ZOOM);
 
@@ -1707,23 +1728,20 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
 {
     ResString rTitle(hRes, IDS_FILEISREADONLY);
     ResString rQuestion(hRes, IDS_FILEMAKEWRITABLEASK);
-    ResString rEditFile(hRes, IDS_EDITFILE);
-    ResString rCancel(hRes, IDS_CANCEL);
+    auto rEditFile = LoadResourceWString(hRes, IDS_EDITFILE);
+    auto rCancel = LoadResourceWString(hRes, IDS_CANCEL);
+    // We remove the short cut accelerators from these buttons because this
+    // dialog pops up automatically and it's too easy to be typing into the editor
+    // when that happes and accidentally acknowledge a button.
+    SearchRemoveAll(rEditFile, L"&");
+    SearchRemoveAll(rCancel, L"&");
 
-    // TODO! remove the short cut accelerator &e &c
-    // options from these buttons because this dialog is automatically
-    // triggered by typing and it's too easy to accidentally
-    // acknowledge the button by typing hello into the editor
-    // and getting interrupted by the dialog popping up
-    // and matching the e of hello with the e of the edit button
-    // and effectively accidentally clicking it.
-    // Need mew resource entries for this.
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
     TASKDIALOG_BUTTON aCustomButtons[2];
     aCustomButtons[0].nButtonID = 101;
-    aCustomButtons[0].pszButtonText = rEditFile;
+    aCustomButtons[0].pszButtonText = rEditFile.c_str();
     aCustomButtons[1].nButtonID = 100;
-    aCustomButtons[1].pszButtonText = rCancel;
+    aCustomButtons[1].pszButtonText = rCancel.c_str();
     tdc.pButtons = aCustomButtons;
     tdc.cButtons = _countof(aCustomButtons);
     assert(tdc.cButtons <= _countof(aCustomButtons));
@@ -1913,9 +1931,9 @@ void CMainWindow::PasteHistory()
                 SearchReplace(sf, L"\r", L" ");
                 CStringUtils::trim(sf);
                 // remove unnecessary whitespace inside the string
-                std::wstring::iterator new_end = std::unique(sf.begin(), sf.end(), [&] (wchar_t lhs, wchar_t rhs) -> bool
+                std::wstring::iterator new_end = std::unique(sf.begin(), sf.end(), [] (wchar_t lhs, wchar_t rhs) -> bool
                 {
-                    return (lhs == rhs) && (lhs == ' ');
+                    return (lhs == ' ' && rhs == ' ');
                 });
                 sf.erase(new_end, sf.end());
 
@@ -1951,7 +1969,7 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
     {
         // an url hotspot
         ResString str(hRes, IDS_HOWTOOPENURL);
-        std::string strA = CUnicodeUtils::StdGetUTF8((LPCWSTR)str);
+        std::string strA = CUnicodeUtils::StdGetUTF8(str);
         m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)strA.c_str());
         return;
     }
@@ -2099,20 +2117,9 @@ bool CMainWindow::HandleDoubleClick(const Scintilla::SCNotification& scn)
     }
 
     std::string urltext = m_editor.GetTextRange(startPos, endPos);
-    if (urltext.empty())
-        return false;
     // This treatment would fail on some valid URLs where there's actually supposed to be a comma or parenthesis at the end.
-    size_t lastCharIndex = urltext.size() - 1;
-    while (lastCharIndex > 0 && (urltext[lastCharIndex] == ',' || urltext[lastCharIndex] == ')' || urltext[lastCharIndex] == '('))
-    {
-        urltext[lastCharIndex] = '\0';
-        --lastCharIndex;
-    }
-
+    CStringUtils::TrimLeadingAndTrailing(urltext, std::initializer_list<char>{ ',', ')', '(' });
     std::wstring url = CUnicodeUtils::StdGetUnicode(urltext);
-    while (*url.begin() == '(' || *url.begin() == ')' || *url.begin() == ',')
-        url.erase(url.begin());
-
     SearchReplace(url, L"&amp;", L"&");
 
     ::ShellExecute(*this, L"open", url.c_str(), nullptr, nullptr, SW_SHOW);
@@ -2630,6 +2637,11 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
 
 void CMainWindow::HandleDropFiles(HDROP hDrop)
 {
+    if (!hDrop)
+        return;
+    OnOutOfScope(
+        DragFinish(hDrop);
+    );
     int filesDropped = DragQueryFile(hDrop, 0xffffffff, nullptr, 0);
     std::vector<std::wstring> files;
     for (int i = 0 ; i < filesDropped ; ++i)
@@ -2689,7 +2701,8 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
         // find out if there are paths specified without the key/value pair syntax
         int nArgs;
 
-        LPWSTR * szArglist = CommandLineToArgvW((LPCWSTR)cds.lpData, &nArgs);
+        LPWSTR* szArglist = CommandLineToArgvW((LPCWSTR)cds.lpData, &nArgs);
+        OnOutOfScope(LocalFree(szArglist););
         if (!szArglist)
             return;
 
@@ -2709,9 +2722,6 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
                     ++filesOpened;
             }
         }
-
-        // Free memory allocated for CommandLineToArgvW arguments.
-        LocalFree(szArglist);
 
         if ((filesOpened == 1) && parser.HasVal(L"line"))
         {
@@ -2843,7 +2853,7 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
             cpd.dwData = CD_COMMAND_MOVETAB;
             std::wstring cpdata = doc.m_path + L"*" + temppath + L"*";
             cpdata += (doc.m_bIsDirty || doc.m_bNeedsSaving) ? L"1*" : L"0*";
-            cpdata += CStringUtils::Format(L"%ld", (long)(m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS)) + 1));
+            cpdata += std::to_wstring((long)(m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS)) + 1));
             cpd.lpData = (PVOID)cpdata.c_str();
             cpd.cbData = DWORD(cpdata.size()*sizeof(wchar_t));
 
