@@ -21,6 +21,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <cassert>
 
 class CCommandHandler
 {
@@ -43,7 +44,7 @@ public:
     void                            OnTimer(UINT id);
     void                            OnThemeChanged(bool bDark);
     void                            OnLexerChanged(int lexer);
-    const std::map<UINT, std::wstring>& GetPluginMap() { return m_plugins; }
+    const auto &                    GetPluginMap() { return m_plugins; }
     int                             GetPluginVersion(const std::wstring& name);
     void                            AddCommand(ICommand * cmd);
 private:
@@ -55,14 +56,16 @@ private:
         // We could use shared_ptr here but we control the life time so
         // no point paying the price as if we didn't.
         auto pCmd = std::make_unique<T>(args...);
-        auto cmdId = pCmd->GetCmdId();
+        auto cmdId = pCmd->GetCmdId();        
         m_highestCmdId = max(m_highestCmdId, cmdId);
         auto at = m_commands.insert({ cmdId, std::move(pCmd) });
+        assert(at.second); // Verify no command has the same ID as an existing command.
         return static_cast<T*>(at.first->second.get());
     }
 
     void                            InsertPlugins(void * obj);
 
+    // TODO! consider if unordered_map would be better here.
     std::map<UINT, std::unique_ptr<ICommand>>       m_commands;
     std::map<UINT, ICommand*>                       m_nodeletecommands;
     std::map<UINT, std::wstring>                    m_plugins;

@@ -149,11 +149,10 @@ but I can't make that work.
 #include "PreserveChdir.h"
 #include "DirFileEnum.h"
 #include "Resource.h"
-#include "CmdFindReplace.h"
 #include "CorrespondingFileDlg.h"
 #include "OnOutOfScope.h"
 
-extern std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
+extern void FindReplace_FindFile(void *mainWnd, const std::wstring& fileName);
 
 namespace
 {
@@ -204,7 +203,6 @@ CCmdHeaderSource::CCmdHeaderSource(void* obj)
 
 CCmdHeaderSource::~CCmdHeaderSource()
 {
-    g_pFindReplaceDlg.reset();
 }
 
 void CCmdHeaderSource::InvalidateMenuEnabled()
@@ -568,11 +566,8 @@ void CCmdHeaderSource::HandleIncludeFileMenuItem(const RelatedFileItem& item)
     //if (!OpenFileAsLanguage(fileToOpen))
         //return;
 
-    // TODO! Add support to allow open file as language to be used.
-    if (!g_pFindReplaceDlg)
-        g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(m_Obj);
     auto filename = CPathUtils::GetFileName(item.Path);
-    g_pFindReplaceDlg->ActivateDialog(FindMode::FindFile, filename.c_str());
+    FindReplace_FindFile(m_Obj, filename.c_str());
 }
 
 void CCmdHeaderSource::HandleCorrespondingFileMenuItem(const RelatedFileItem& item)
@@ -769,9 +764,7 @@ bool CCmdHeaderSource::Execute()
             if (i + 1 < correspondingFiles.size())
                 fileNames += ';';
         }
-        if (!g_pFindReplaceDlg)
-            g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(m_Obj);
-        g_pFindReplaceDlg->ActivateDialog(FindMode::FindFile, fileNames.c_str());
+        FindReplace_FindFile(m_Obj, fileNames.c_str());
     }
 
     return false;
@@ -1172,7 +1165,7 @@ void CCmdHeaderSource::GetCorrespondingFileMappings(const std::wstring& input_fi
     }
 }
 
-bool CCmdHeaderSource::GetCPPIncludePathsForMS(std::wstring& systemIncludePaths)
+bool CCmdHeaderSource::GetCPPIncludePathsForMS(std::wstring& systemIncludePaths) const
 {
     systemIncludePaths.clear();
     // try to find sensible default paths

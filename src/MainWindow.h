@@ -27,8 +27,7 @@
 #include <UIRibbonPropertyHelpers.h>
 #include <list>
 
-
-#define COMMAND_TIMER_ID_START 1000
+const int COMMAND_TIMER_ID_START = 1000;
 
 enum class ResponseToOutsideModifiedFile
 {
@@ -66,7 +65,7 @@ class CMainWindow : public CWindow, public IUIApplication, public IUICommandHand
 {
     friend class ICommand;
 public:
-    CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL);
+    CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = nullptr);
     ~CMainWindow();
 
     bool                RegisterAndCreateWindow();
@@ -121,7 +120,6 @@ private:
     HWND                        FindAppMainWindow(HWND hStartWnd, bool* isThisInstance = nullptr) const;
     void                        ResizeChildWindows();
     void                        UpdateStatusBar(bool bEverything);
-    void                        InitCommands();
     void                        AddHotSpots();
 
     bool                        AskToCreateNonExistingFile(const std::wstring& path) const;
@@ -145,7 +143,6 @@ private:
     bool                        HasOutsideChangesOccurred() const;
     void                        CheckForOutsideChanges();
     void                        UpdateCaptionBar();
-    void                        HandleOutsideModifiedFile(int docID);
     bool                        HandleOutsideDeletedFile(int docID);
     void                        HandleCreate(HWND hwnd);
     void                        HandleAfterInit();
@@ -174,6 +171,11 @@ private:
     void                        HandleStatusBarEOLFormat();
     void                        HandleStatusBarZoom();
     void                        HandleStatusBar(WPARAM wParam, LPARAM lParam);
+    LRESULT                     HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
+    LRESULT                     HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
+    LRESULT                     HandleTabBarEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
+    int                         GetZoomPC() const;
+    void                        SetZoomPC(int zoomPC);
 
 private:
     LONG                        m_cRef;

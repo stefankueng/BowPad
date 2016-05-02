@@ -93,7 +93,7 @@ private:
     bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<RelatedFileItem>& includes) const;
     bool GetDefaultCorrespondingFileExtMappings(const std::wstring& from, std::wstring& to) const;
     void GetCorrespondingFileMappings(const std::wstring& input_filename, std::vector<std::wstring>& corresponding_filenames) const;
-    bool GetCPPIncludePathsForMS(std::wstring& systemIncludePaths);
+    bool GetCPPIncludePathsForMS(std::wstring& systemIncludePaths) const;
 private:
     std::vector<RelatedFileItem>    m_menuInfo;
     std::wstring                    m_systemIncludePaths;

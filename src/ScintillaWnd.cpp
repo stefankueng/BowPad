@@ -204,7 +204,7 @@ bool CScintillaWnd::InitScratch( HINSTANCE hInst )
 {
     Scintilla_RegisterClasses(hInst);
 
-    CreateEx(WS_EX_NOPARENTNOTIFY, 0, NULL, 0, L"Scintilla");
+    CreateEx(WS_EX_NOPARENTNOTIFY, 0, NULL, nullptr, L"Scintilla");
 
     if (!*this)
     {
@@ -328,7 +328,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         // but set a timer to hide it after a while
         UINT elapse = (UINT)CIniSettings::Instance().GetInt64(L"View", L"hidecursortimeout", 3000);
         if (elapse != 0)
-            SetTimer(*this, TIM_HIDECURSOR, elapse, NULL);
+            SetTimer(*this, TIM_HIDECURSOR, elapse, nullptr);
         if (!m_bCursorShown)
         {
             Call(SCI_SETCURSOR, (uptr_t)-1);
@@ -580,8 +580,9 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
 
 void CScintillaWnd::SetupLexerForLang( const std::wstring& lang )
 {
-    auto lexerdata = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(lang));
-    auto langdata = CLexStyles::Instance().GetKeywordsForLang(CUnicodeUtils::StdGetUTF8(lang));
+    auto ulang = CUnicodeUtils::StdGetUTF8(lang);
+    auto lexerdata = CLexStyles::Instance().GetLexerDataForLang(ulang);
+    auto langdata = CLexStyles::Instance().GetKeywordsForLang(ulang);
     SetupLexer(lexerdata, langdata);
 }
 
@@ -1959,7 +1960,7 @@ void CScintillaWnd::MarkBookmarksInScrollbar()
 
 void CScintillaWnd::DocScrollUpdate()
 {
-    InvalidateRect(*this, NULL, TRUE);
+    InvalidateRect(*this, nullptr, TRUE);
     Scintilla::SCNotification Scn = { 0 };
     Scn.message = SCN_UPDATEUI;
     Scn.updated = SC_UPDATE_CONTENT;
@@ -2002,6 +2003,7 @@ std::string CScintillaWnd::GetTextRange(long startpos, long endpos) const
     assert(endpos - startpos >= 0);
     if (endpos < startpos)
         return "";
+    // TODO: Why + 5?
     auto strbuf = std::make_unique<char[]>(endpos - startpos + 5);
     Scintilla::Sci_TextRange rangestart;
     rangestart.chrg.cpMin = startpos;
@@ -2011,12 +2013,20 @@ std::string CScintillaWnd::GetTextRange(long startpos, long endpos) const
     return rangestart.lpstrText;
 }
 
-std::string CScintillaWnd::GetSelectedText() const
+std::string CScintillaWnd::GetSelectedText(bool useCurrentWordIfSelectionEmpty) const
 {
     int selTextLen = (int)ConstCall(SCI_GETSELTEXT);
     auto seltextbuffer = std::make_unique<char[]>(selTextLen + 1);
     ConstCall(SCI_GETSELTEXT, 0, (LPARAM)seltextbuffer.get());
-    return seltextbuffer.get();
+    std::string selText = seltextbuffer.get();
+    if (selText.empty() && useCurrentWordIfSelectionEmpty)
+    {
+        long currentPos = (long)ConstCall(SCI_GETCURRENTPOS);
+        long startPos = (long)ConstCall(SCI_WORDSTARTPOSITION, currentPos, true);
+        long endPos = (long)ConstCall(SCI_WORDENDPOSITION, currentPos, true);
+        selText = GetTextRange(startPos, endPos);
+    }
+    return selText;
 }
 
 std::string CScintillaWnd::GetCurrentLine() const

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,8 +27,23 @@
 #include <UIRibbonPropertyHelpers.h>
 
 #include <vector>
+#include <utility>
 
 extern IUIFramework *g_pFramework;
+
+namespace
+{
+    inline BYTE GetCtrlKeys()
+    {
+        BYTE ctrlkeys = (GetKeyState(VK_CONTROL) & 0x8000) ? 0x08 : 0;
+        if (GetKeyState(VK_SHIFT) & 0x8000)
+            ctrlkeys |= 0x04;
+        if (GetKeyState(VK_MENU) & 0x8000)
+            ctrlkeys |= 0x10;
+        return ctrlkeys;
+    }
+
+}
 
 CKeyboardShortcutHandler::CKeyboardShortcutHandler(void)
     : m_bLoaded(false)
@@ -89,7 +104,7 @@ void CKeyboardShortcutHandler::Load( CSimpleIni& ini )
     {
         wchar_t * endptr;
         std::wstring v = l;
-        std::transform(v.begin(), v.end(), v.begin(), ::tolower);
+        CStringUtils::emplace_to_lower(v);
         m_virtkeys[v] = wcstol(ini.GetValue(L"virtkeys", l), &endptr, 16);
     }
 
@@ -103,7 +118,7 @@ void CKeyboardShortcutHandler::Load( CSimpleIni& ini )
         for (auto vv : values)
         {
             std::wstring v = vv;
-            std::transform(v.begin(), v.end(), v.begin(), ::tolower);
+            CStringUtils::emplace_to_lower(v);
             std::vector<std::wstring> keyvec;
             stringtok(keyvec, v, false, L",");
             KSH_Accel accel;
@@ -137,7 +152,7 @@ void CKeyboardShortcutHandler::Load( CSimpleIni& ini )
                     {
                         accel.key1 = (WORD)::towupper(keyvec[i][0]);
                         if ((keyvec[i].size() > 2) && (keyvec[i][0]=='0') && (keyvec[i][1]=='x'))
-                            accel.key1 = (WORD)wcstol(keyvec[i].c_str(), NULL, 0);
+                            accel.key1 = (WORD)wcstol(keyvec[i].c_str(), nullptr, 0);
                     }
                     break;
                 case 2:
@@ -150,12 +165,12 @@ void CKeyboardShortcutHandler::Load( CSimpleIni& ini )
                     {
                         accel.key2 = (WORD)::towupper(keyvec[i][0]);
                         if ((keyvec[i].size() > 2) && (keyvec[i][0]=='0') && (keyvec[i][1]=='x'))
-                            accel.key2 = (WORD)wcstol(keyvec[i].c_str(), NULL, 0);
+                            accel.key2 = (WORD)wcstol(keyvec[i].c_str(), nullptr, 0);
                     }
                     break;
                 }
             }
-            m_accelerators.push_back(accel);
+            m_accelerators.push_back(std::move(accel));
         }
     }
 }
@@ -167,9 +182,7 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
         {
-            WORD ctrlkeys = (GetKeyState(VK_CONTROL)&0x8000) ? 0x08 : 0;
-            ctrlkeys |= (GetKeyState(VK_SHIFT)&0x8000) ? 0x04 : 0;
-            ctrlkeys |= (GetKeyState(VK_MENU)&0x8000) ? 0x10 : 0;
+            auto ctrlkeys = GetCtrlKeys();
             int nonvirt = MapVirtualKey((UINT)wParam, MAPVK_VK_TO_CHAR);
             for (auto accel = m_accelerators.crbegin(); accel != m_accelerators.crend(); ++accel)
             {
@@ -213,9 +226,7 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
         break;
     case WM_KEYUP:
         {
-            WORD ctrlkeys = (GetKeyState(VK_CONTROL)&0x8000) ? 0x08 : 0;
-            ctrlkeys |= (GetKeyState(VK_SHIFT)&0x8000) ? 0x04 : 0;
-            ctrlkeys |= (GetKeyState(VK_MENU)&0x8000) ? 0x10 : 0;
+            auto ctrlkeys = GetCtrlKeys();
             if (ctrlkeys == 0)
                 m_lastKey = 0;
         }
@@ -226,40 +237,43 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
     return FALSE;
 }
 
-std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd )
+std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd ) const
 {
     for (const auto& accel : m_accelerators)
     {
         if (accel.cmd == cmd)
         {
-            std::wstring s;
-            wchar_t buf[MAX_PATH] = {0};
+            std::wstring shortCut;
+            wchar_t buf[MAX_PATH];
             if (accel.fVirt & 0x08)
             {
                 LONG sc = MapVirtualKey(VK_CONTROL, MAPVK_VK_TO_VSC);
                 sc <<= 16;
-                GetKeyNameText(sc, buf, _countof(buf));
-                if (!s.empty())
-                    s += L"+";
-                s += buf;
+                int len = GetKeyNameText(sc, buf, _countof(buf));
+                if (!shortCut.empty())
+                    shortCut += L"+";
+                if (len > 0)
+                    shortCut += buf;
             }
             if (accel.fVirt & 0x10)
             {
                 LONG sc = MapVirtualKey(VK_MENU, MAPVK_VK_TO_VSC);
                 sc <<= 16;
-                GetKeyNameText(sc, buf, _countof(buf));
-                if (!s.empty())
-                    s += L"+";
-                s += buf;
+                int len = GetKeyNameText(sc, buf, _countof(buf));
+                if (!shortCut.empty())
+                    shortCut += L"+";
+                if (len > 0)
+                    shortCut += buf;
             }
             if (accel.fVirt & 0x04)
             {
                 LONG sc = MapVirtualKey(VK_SHIFT, MAPVK_VK_TO_VSC);
                 sc <<= 16;
-                GetKeyNameText(sc, buf, _countof(buf));
-                if (!s.empty())
-                    s += L"+";
-                s += buf;
+                int len = GetKeyNameText(sc, buf, _countof(buf));
+                if (!shortCut.empty())
+                    shortCut += L"+";
+                if (len > 0)
+                    shortCut += buf;
             }
             if (accel.key1)
             {
@@ -278,13 +292,16 @@ std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd )
                 case VK_UP:
                 case VK_DOWN:
                 case VK_SNAPSHOT:
+                case VK_OEM_COMMA:
+                case VK_OEM_PERIOD:
                     nScanCode |= 0x0100; // Add extended bit
                 }
                 nScanCode <<= 16;
-                GetKeyNameText(nScanCode, buf, _countof(buf));
-                if (!s.empty())
-                    s += L"+";
-                s += buf;
+                int len = GetKeyNameText(nScanCode, buf, _countof(buf));
+                if (!shortCut.empty())
+                    shortCut += L"+";
+                if (len > 0)
+                    shortCut += buf;
             }
 
             if (accel.key2)
@@ -304,15 +321,18 @@ std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd )
                 case VK_UP:
                 case VK_DOWN:
                 case VK_SNAPSHOT:
+                case VK_OEM_COMMA:
+                case VK_OEM_PERIOD:
                     nScanCode |= 0x0100; // Add extended bit
                 }
                 nScanCode <<= 16;
-                GetKeyNameText(nScanCode, buf, _countof(buf));
-                if (!s.empty())
-                    s += L",";
-                s += buf;
+                int len = GetKeyNameText(nScanCode, buf, _countof(buf));
+                if (!shortCut.empty())
+                    shortCut += L",";
+                if (len > 0)
+                    shortCut += buf;
             }
-            return L"(" + s + L")";
+            return L"(" + shortCut + L")";
         }
     }
     return L"";
@@ -391,7 +411,7 @@ void CKeyboardShortcutHandler::UpdateTooltips(bool bAll)
     }
 }
 
-std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand( WORD cmd )
+std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand( WORD cmd ) const
 {
     std::wstring sAcc = GetShortCutStringForCommand((WORD)cmd);
     if (!sAcc.empty())
