@@ -91,7 +91,7 @@ public :
     int                         GetSrcTab() const { return m_nSrcTab; }
     int                         GetDstTab() const { return m_nTabDragged; }
 protected:
-    void                        DoOwnerDrawTab();
+    void                        DoOwnerDrawTab() const;
 
     void                        SetColour(COLORREF colour2Set, tabColourIndex i);
 
@@ -99,10 +99,10 @@ protected:
     void                        ExchangeItemData(POINT point);
     LRESULT                     RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
-    COLORREF                    GetTabColor(bool bSelected, UINT item);
-    void                        DrawMainBorder(LPDRAWITEMSTRUCT lpDrawItemStruct);
-    void                        DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
-    void                        DrawItemBorder(LPDRAWITEMSTRUCT lpDrawItemStruct);
+    COLORREF                    GetTabColor(bool bSelected, UINT item) const;
+    void                        DrawMainBorder(LPDRAWITEMSTRUCT lpDrawItemStruct) const;
+    void                        DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) const;
+    void                        DrawItemBorder(LPDRAWITEMSTRUCT lpDrawItemStruct) const;
 
     void                        DraggingCursor(POINT screenPoint, UINT item);
 
@@ -112,12 +112,12 @@ protected:
 
     bool                        IsPointInParentZone(POINT screenPoint) const;
     void                        NotifyTabDelete(int tab);
+
 private:
     int                         m_nItems;
     bool                        m_bHasImgList;
     HFONT                       m_hFont;
     int                         m_tabID;
-
 
     int                         m_ctrlID;
 

@@ -16,7 +16,7 @@
 //
 #pragma once
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 
@@ -35,7 +35,7 @@ public:
 
     void                            SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight);
     void                            SetRibbonColorsHSB(UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight);
-    void                            GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight);
+    void                            GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight) const;
 
     static void                     RGBToHSB(COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightness);
     static void                     RGBtoHSL(COLORREF color, float& h, float& s, float& l);
@@ -46,6 +46,6 @@ private:
 
 private:
     bool                            m_bLoaded;
-    std::map<COLORREF, COLORREF>    m_colorMap;
+    std::unordered_map<COLORREF, COLORREF>    m_colorMap;
     bool                            dark;
 };
