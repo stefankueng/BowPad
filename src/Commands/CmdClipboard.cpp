@@ -25,14 +25,14 @@
 #include "ClipboardHelper.h"
 #include "OnOutOfScope.h"
 
-#define CF_BPLEXER L"BP Lexer"
+static const wchar_t CF_BPLEXER[] = { L"BP Lexer" };
 
 std::string ClipboardBase::GetHtmlSelection()
 {
     if (!HasActiveDocument())
         return "";
     CDocument doc = GetActiveDocument();
-    auto lexerdata = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(doc.m_language));
+    const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(doc.m_language));
 
     std::string sHtmlFragment;
     int style = 0;
@@ -47,8 +47,10 @@ std::string ClipboardBase::GetHtmlSelection()
     COLORREF back = (COLORREF)ScintillaCall(SCI_STYLEGETBACK, 0);
     if (CTheme::Instance().IsDarkTheme())
     {
-        fore = lexerdata.Styles[0].ForegroundColor;
-        back = lexerdata.Styles[0].BackgroundColor;
+        try { fore = lexerdata.Styles.at(0).ForegroundColor; }
+        catch (const std::out_of_range&) {}
+        try { back = lexerdata.Styles.at(0).BackgroundColor; }
+        catch (const std::out_of_range&) {}
     }
     std::string stylehtml = CStringUtils::Format("<pre style=\"font-family:%s;font-size:%dpt;font-weight:%s;font-style:%s;text-decoration:%s;color:#%06x;background:#%06x;\">",
         fontbuf, fontSize, bold ? "bold" : "normal", italic ? "italic" : "normal", underlined ? "underline" : "none",
@@ -88,8 +90,10 @@ std::string ClipboardBase::GetHtmlSelection()
                 back = (COLORREF)ScintillaCall(SCI_STYLEGETBACK, s);
                 if (CTheme::Instance().IsDarkTheme())
                 {
-                    fore = lexerdata.Styles[s].ForegroundColor;
-                    back = lexerdata.Styles[s].BackgroundColor;
+                    try { fore = lexerdata.Styles.at(s).ForegroundColor; }
+                    catch (const std::out_of_range&) {}
+                    try { back = lexerdata.Styles.at(s).BackgroundColor; }
+                    catch (const std::out_of_range&) {}
                 }
                 stylehtml = CStringUtils::Format("<span style=\"font-family:%s;font-size:%dpt;font-weight:%s;font-style:%s;text-decoration:%s;color:#%06x;background:#%06x;\">",
                     fontbuf, fontSize, bold ? "bold" : "normal", italic ? "italic" : "normal", underlined ? "underline" : "none",
@@ -215,11 +219,11 @@ void ClipboardBase::SetLexerFromClipboard()
             if (hData)
             {
                 LPCSTR lptstr = (LPCSTR)GlobalLock(hData);
-                OnOutOfScope(
-                    GlobalUnlock(hData);
-                );
                 if (lptstr != nullptr)
                 {
+                    OnOutOfScope(
+                        GlobalUnlock(hData);
+                    );
                     auto lang = CUnicodeUtils::StdGetUnicode(lptstr);
                     doc.m_language = lang;
                     SetDocument(GetDocIdOfCurrentTab(), doc);

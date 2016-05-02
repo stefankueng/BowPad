@@ -461,8 +461,7 @@ const LexerData& CLexStyles::GetLexerDataForLexer(int lexer)
 
 std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
 {
-    std::wstring p = path;
-    std::transform(p.begin(), p.end(), p.begin(), ::tolower);
+    std::wstring p = CStringUtils::to_lower(path);
 
     auto it = m_pathsLang.find(p);
     if (it != m_pathsLang.end())
@@ -537,7 +536,7 @@ std::wstring CLexStyles::GetUserExtensionsForLanguage( const std::wstring& lang 
 {
     std::wstring exts;
     std::string l = CUnicodeUtils::StdGetUTF8(lang);
-    for (const auto& e:m_userextLang)
+    for (const auto& e : m_userextLang)
     {
         if (e.second.compare(l) == 0)
         {
@@ -634,7 +633,7 @@ void CLexStyles::SaveUserData()
         ini.LoadFile(userStyleFile.c_str());
     }
 
-    for (const auto& it:m_userlexerdata)
+    for (const auto& it : m_userlexerdata)
     {
         if (it.first == 0)
             continue;
@@ -642,7 +641,7 @@ void CLexStyles::SaveUserData()
         std::wstring section = m_lexerSection[it.first];
         std::wstring v = CStringUtils::Format(L"%d", it.first);
         ini.SetValue(section.c_str(), L"Lexer", v.c_str());
-        for (const auto& s:it.second.Styles)
+        for (const auto& s : it.second.Styles)
         {
             std::wstring style = CStringUtils::Format(L"Style%d", s.first);
             std::wstring sSize = CStringUtils::Format(L"%d", s.second.FontSize);
@@ -787,8 +786,7 @@ void CLexStyles::SetLangForPath(const std::wstring& path, const std::wstring& la
         {
             // extension has a different language set than the user selected
             // only add this if the extension is set in m_autoextLang
-            std::string e = CUnicodeUtils::StdGetUTF8(sExt);
-            std::transform(e.begin(), e.end(), e.begin(), ::tolower);
+            std::string e = CUnicodeUtils::StdGetUTF8(CStringUtils::to_lower(sExt));
             auto it = m_extLang.find(e);
             if (it == m_extLang.end())
             {

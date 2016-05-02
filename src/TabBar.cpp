@@ -44,16 +44,13 @@ static COLORREF Darker(COLORREF crBase, float fFactor)
     fFactor = min(fFactor, 1.0f);
     fFactor = max(fFactor, 0.0f);
 
-    BYTE bRed, bBlue, bGreen;
-    BYTE bRedShadow, bBlueShadow, bGreenShadow;
+    const BYTE bRed = GetRValue(crBase);
+    const BYTE bBlue = GetBValue(crBase);
+    const BYTE bGreen = GetGValue(crBase);
 
-    bRed = GetRValue(crBase);
-    bBlue = GetBValue(crBase);
-    bGreen = GetGValue(crBase);
-
-    bRedShadow = (BYTE)(bRed * fFactor);
-    bBlueShadow = (BYTE)(bBlue * fFactor);
-    bGreenShadow = (BYTE)(bGreen * fFactor);
+    const BYTE bRedShadow = (BYTE)(bRed * fFactor);
+    const BYTE bBlueShadow = (BYTE)(bBlue * fFactor);
+    const BYTE bGreenShadow = (BYTE)(bGreen * fFactor);
 
     return RGB(bRedShadow, bGreenShadow, bBlueShadow);
 }
@@ -64,16 +61,13 @@ static COLORREF Lighter(COLORREF crBase, float fFactor)
 
     fFactor = max(fFactor, 1.0f);
 
-    BYTE bRed, bBlue, bGreen;
-    BYTE bRedHilite, bBlueHilite, bGreenHilite;
+    const BYTE bRed = GetRValue(crBase);
+    const BYTE bBlue = GetBValue(crBase);
+    const BYTE bGreen = GetGValue(crBase);
 
-    bRed = GetRValue(crBase);
-    bBlue = GetBValue(crBase);
-    bGreen = GetGValue(crBase);
-
-    bRedHilite = (BYTE)min((int)(bRed * fFactor), 255);
-    bBlueHilite = (BYTE)min((int)(bBlue * fFactor), 255);
-    bGreenHilite = (BYTE)min((int)(bGreen * fFactor), 255);
+    const BYTE bRedHilite = (BYTE)min((int)(bRed * fFactor), 255);
+    const BYTE bBlueHilite = (BYTE)min((int)(bBlue * fFactor), 255);
+    const BYTE bGreenHilite = (BYTE)min((int)(bGreen * fFactor), 255);
 
     return RGB(bRedHilite, bGreenHilite, bBlueHilite);
 }
@@ -387,7 +381,7 @@ HIMAGELIST CTabBar::SetImageList(HIMAGELIST himl)
     return TabCtrl_SetImageList(*this, himl);
 }
 
-void CTabBar::DoOwnerDrawTab()
+void CTabBar::DoOwnerDrawTab() const
 {
     int padx = int(GetSystemMetrics(SM_CXSMICON) / 2 * m_dpiScale);
     int pady = int(3.0 * m_dpiScale);
@@ -831,7 +825,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
     return ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
 }
 
-COLORREF CTabBar::GetTabColor(bool bSelected, UINT item)
+COLORREF CTabBar::GetTabColor(bool bSelected, UINT item) const
 {
     TBHDR nmhdr;
     nmhdr.hdr.hwndFrom = *this;
@@ -852,7 +846,7 @@ COLORREF CTabBar::GetTabColor(bool bSelected, UINT item)
     return Darker(clr, 0.9f);
 }
 
-void CTabBar::DrawItemBorder(LPDRAWITEMSTRUCT lpdis)
+void CTabBar::DrawItemBorder(LPDRAWITEMSTRUCT lpdis) const
 {
     int curSel = TabCtrl_GetCurSel(*this);
     bool bSelected = (lpdis->itemID == (UINT)curSel);
@@ -872,13 +866,13 @@ void CTabBar::DrawItemBorder(LPDRAWITEMSTRUCT lpdis)
     FillSolidRect(lpdis->hDC, rItem.right - 1, rItem.top, rItem.right, rItem.bottom, crShadow);
 }
 
-void CTabBar::DrawMainBorder(LPDRAWITEMSTRUCT lpdis)
+void CTabBar::DrawMainBorder(LPDRAWITEMSTRUCT lpdis) const
 {
     RECT rBorder(lpdis->rcItem);
     FillSolidRect(lpdis->hDC, rBorder.left, rBorder.top, rBorder.right, rBorder.bottom, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
 }
 
-void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
+void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct) const
 {
     TC_ITEM tci;
     HIMAGELIST hilTabs = (HIMAGELIST)TabCtrl_GetImageList(*this);
@@ -904,12 +898,12 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct)
 
     crTo = CTheme::Instance().GetThemeColor(crTo);
 
-    int nROrg = GetRValue(crFrom);
-    int nGOrg = GetGValue(crFrom);
-    int nBOrg = GetBValue(crFrom);
-    int nRDiff = GetRValue(crTo) - nROrg;
-    int nGDiff = GetGValue(crTo) - nGOrg;
-    int nBDiff = GetBValue(crTo) - nBOrg;
+    const int nROrg = GetRValue(crFrom);
+    const int nGOrg = GetGValue(crFrom);
+    const int nBOrg = GetBValue(crFrom);
+    const int nRDiff = GetRValue(crTo) - nROrg;
+    const int nGDiff = GetGValue(crTo) - nGOrg;
+    const int nBDiff = GetBValue(crTo) - nBOrg;
 
     int nHeight = rItem.bottom - rItem.top;
 
