@@ -419,6 +419,8 @@ bool CLexStyles::AddUserFunctionForLang(const std::string& lang, const std::stri
         if (lt->second.userfunctions)
         {
             auto result = lt->second.userkeywords.insert(fnc);
+            if (result.second)
+                lt->second.userkeywordsupdated = true;
             return result.second;
         }
     }
@@ -427,16 +429,19 @@ bool CLexStyles::AddUserFunctionForLang(const std::string& lang, const std::stri
 
 void CLexStyles::GenerateUserKeywords(LanguageData& ld)
 {
+    if (!ld.userkeywordsupdated)
+        return;
     if (ld.userfunctions && !ld.userkeywords.empty())
     {
         std::string keywords;
         for (const auto& w : ld.userkeywords)
         {
             keywords += w;
-            keywords += " ";
+            keywords += ' ';
         }
-        ld.keywordlist[ld.userfunctions] = keywords;
+        ld.keywordlist[ld.userfunctions] = std::move(keywords);
     }
+    ld.userkeywordsupdated = false;
 }
 
 const LexerData& CLexStyles::GetLexerDataForLang( const std::string& lang ) const
