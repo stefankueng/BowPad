@@ -26,6 +26,7 @@
 #include <unordered_map>
 #include <chrono>
 #include <functional>
+#include <set>
 
 enum class FunctionDataStatus
 {
@@ -102,6 +103,7 @@ private:
     void OnLexerChanged(int lexer) override;
     void OnDocumentClose(int index) override;
     void FindAllFunctions();
+    bool FindAllFunctionsInternal();
     FunctionData FindFunctionsNow() const;
     void InvalidateFunctionsEnabled();
     void InvalidateFunctionsSource();
@@ -111,6 +113,7 @@ private:
 
 private:
     bool m_autoscan;
+    bool m_autoscanTimed;
     UINT m_timerID;
     CScintillaWnd m_edit;
     std::vector<DocEvent> m_events;
@@ -119,6 +122,9 @@ private:
     std::string m_docLang;
     int m_docID = -1;
     std::vector<std::wstring> m_wtrimtokens;
-    std::vector<int> menuData;
+    std::vector<int> m_menuData;
+    std::chrono::time_point<std::chrono::steady_clock> m_funcProcessingStartTime;
+    bool m_funcProcessingStarted = false;
+    std::set<std::string> m_languagesUpdated;
 };
 
