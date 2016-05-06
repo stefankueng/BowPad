@@ -90,11 +90,18 @@ void CCmdSessionLoad::OnClose()
 
 void CCmdSessionLoad::RestoreSavedSession()
 {
+    // REIVEW: note the user can add text to a document and then exit without saving.
+    // This means the saved state could refer to a selection or cursorlocation that
+    // does not exist or refers to something else. This can be a bit confusing to the user.
+    // However if we don't save the state on quitting without saving, a user may also scroll
+    // to a new location then exit without saving but expect to return to where they were.
+    // It's not clear how to best satisfy these competing needs. Currently we save state
+    // regardless of exit status and if it's "wrong" on restore then user beware.
     int activeDoc = -1;
     FileTreeBlockRefresh(true);
     OnOutOfScope(FileTreeBlockRefresh(false));
     auto& settings = CIniSettings::Instance();
-    int openflags = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
+    const unsigned int openflags = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
     for (int i = 0; i < BP_MAX_SESSION_SIZE; ++i)
     {
         std::wstring key = CStringUtils::Format(L"path%d", i);
