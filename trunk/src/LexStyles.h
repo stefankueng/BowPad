@@ -45,6 +45,7 @@ public:
     int                         functionregexsort;
     int                         userfunctions;
     std::set<std::string>       userkeywords;
+    bool                        userkeywordsupdated = false;
 };
 
 enum FontStyle
