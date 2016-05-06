@@ -35,31 +35,33 @@
 #include <UIRibbonPropertyHelpers.h>
 #include <uxtheme.h>
 
-typedef BOOL(WINAPI * GetGestureInfoFN)(HGESTUREINFO hGestureInfo, PGESTUREINFO pGestureInfo);
-GetGestureInfoFN GetGestureInfoFunc = nullptr;
-typedef BOOL(WINAPI * CloseGestureInfoHandleFN)(HGESTUREINFO hGestureInfo);
-CloseGestureInfoHandleFN CloseGestureInfoHandleFunc = nullptr;
-typedef BOOL(WINAPI * SetGestureConfigFN)(HWND hwnd, DWORD dwReserved, UINT cIDs, PGESTURECONFIG pGestureConfig, UINT cbSize);
-SetGestureConfigFN SetGestureConfigFunc = nullptr;
-
-typedef BOOL(WINAPI * BeginPanningFeedbackFN)(HWND hwnd);
-BeginPanningFeedbackFN BeginPanningFeedbackFunc = nullptr;
-typedef BOOL(WINAPI * EndPanningFeedbackFN)(HWND hwnd, BOOL fAnimateBack);
-EndPanningFeedbackFN EndPanningFeedbackFunc = nullptr;
-typedef BOOL(WINAPI * UpdatePanningFeedbackFN)(HWND hwnd, LONG lTotalOverpanOffsetX, LONG lTotalOverpanOffsetY, BOOL fInInertia);
-UpdatePanningFeedbackFN UpdatePanningFeedbackFunc = nullptr;
-
-CAutoLibrary hUxThemeDll = LoadLibrary(L"uxtheme.dll");
-
-UINT32 contextID = cmdContextMap;
-
 extern IUIFramework * g_pFramework;
 extern std::string    g_sHighlightString;  // from CmdFindReplace
 
+namespace
+{
+    typedef BOOL(WINAPI * GetGestureInfoFN)(HGESTUREINFO hGestureInfo, PGESTUREINFO pGestureInfo);
+    GetGestureInfoFN GetGestureInfoFunc = nullptr;
+    typedef BOOL(WINAPI * CloseGestureInfoHandleFN)(HGESTUREINFO hGestureInfo);
+    CloseGestureInfoHandleFN CloseGestureInfoHandleFunc = nullptr;
+    typedef BOOL(WINAPI * SetGestureConfigFN)(HWND hwnd, DWORD dwReserved, UINT cIDs, PGESTURECONFIG pGestureConfig, UINT cbSize);
+    SetGestureConfigFN SetGestureConfigFunc = nullptr;
 
-#define TIM_HIDECURSOR              101
-#define TIM_BRACEHIGHLIGHTTEXT      102
-#define TIM_BRACEHIGHLIGHTTEXTCLEAR 103
+    typedef BOOL(WINAPI * BeginPanningFeedbackFN)(HWND hwnd);
+    BeginPanningFeedbackFN BeginPanningFeedbackFunc = nullptr;
+    typedef BOOL(WINAPI * EndPanningFeedbackFN)(HWND hwnd, BOOL fAnimateBack);
+    EndPanningFeedbackFN EndPanningFeedbackFunc = nullptr;
+    typedef BOOL(WINAPI * UpdatePanningFeedbackFN)(HWND hwnd, LONG lTotalOverpanOffsetX, LONG lTotalOverpanOffsetY, BOOL fInInertia);
+    UpdatePanningFeedbackFN UpdatePanningFeedbackFunc = nullptr;
+
+    CAutoLibrary hUxThemeDll = LoadLibrary(L"uxtheme.dll");
+}
+
+UINT32 g_contextID = cmdContextMap;
+
+const int TIM_HIDECURSOR = 101;
+const int TIM_BRACEHIGHLIGHTTEXT = 102;
+const int TIM_BRACEHIGHLIGHTTEXTCLEAR = 103;
 
 CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     : CWindow(hInst)
@@ -277,8 +279,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
             }
 
             // The basic pattern of how to show Contextual UI in a specified location.
-            IUIContextualUI * pContextualUI = NULL;
-            if (SUCCEEDED(g_pFramework->GetView(contextID, IID_PPV_ARGS(&pContextualUI))))
+            IUIContextualUI * pContextualUI = nullptr;
+            if (SUCCEEDED(g_pFramework->GetView(g_contextID, IID_PPV_ARGS(&pContextualUI))))
             {
                 pContextualUI->ShowAtLocation(pt.x, pt.y);
                 pContextualUI->Release();
@@ -581,13 +583,14 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
 void CScintillaWnd::SetupLexerForLang( const std::wstring& lang )
 {
     auto ulang = CUnicodeUtils::StdGetUTF8(lang);
-    auto lexerdata = CLexStyles::Instance().GetLexerDataForLang(ulang);
-    auto langdata = CLexStyles::Instance().GetKeywordsForLang(ulang);
+    const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(ulang);
+    const auto& langdata = CLexStyles::Instance().GetKeywordsForLang(ulang);
     SetupLexer(lexerdata, langdata);
 }
 
 void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, std::string>& langdata )
 {
+    const auto& theme = CTheme::Instance();
     Call(SCI_STYLECLEARALL);
 
     auto oldLexer = Call(SCI_GETLEXER);
@@ -599,22 +602,24 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
     }
     for (const auto& it: lexerdata.Styles)
     {
-        Call(SCI_STYLESETFORE, it.first, CTheme::Instance().GetThemeColor(it.second.ForegroundColor));
-        Call(SCI_STYLESETBACK, it.first, CTheme::Instance().GetThemeColor(it.second.BackgroundColor));
-        if (!it.second.FontName.empty())
-            Call(SCI_STYLESETFONT, it.first, (sptr_t)CUnicodeUtils::StdGetUTF8(it.second.FontName).c_str());
+        const int styleId = it.first;
+        const auto& sd = it.second;
+        Call(SCI_STYLESETFORE, styleId, theme.GetThemeColor(sd.ForegroundColor));
+        Call(SCI_STYLESETBACK, styleId, theme.GetThemeColor(sd.BackgroundColor));
+        if (!sd.FontName.empty())
+            Call(SCI_STYLESETFONT, styleId, (sptr_t)CUnicodeUtils::StdGetUTF8(sd.FontName).c_str());
 
         if (it.second.FontStyle & FONTSTYLE_BOLD)
-            Call(SCI_STYLESETBOLD, it.first, 1);
+            Call(SCI_STYLESETBOLD, styleId, 1);
         if (it.second.FontStyle & FONTSTYLE_ITALIC)
-            Call(SCI_STYLESETITALIC, it.first, 1);
+            Call(SCI_STYLESETITALIC, styleId, 1);
         if (it.second.FontStyle & FONTSTYLE_UNDERLINED)
-            Call(SCI_STYLESETUNDERLINE, it.first, 1);
+            Call(SCI_STYLESETUNDERLINE, styleId, 1);
 
         if (it.second.FontSize)
-            Call(SCI_STYLESETSIZE, it.first, it.second.FontSize);
+            Call(SCI_STYLESETSIZE, styleId, sd.FontSize);
         if (it.second.eolfilled)
-            Call(SCI_STYLESETEOLFILLED, it.first, 1);
+            Call(SCI_STYLESETEOLFILLED, styleId, 1);
     }
     for (const auto& it: langdata)
     {
@@ -629,11 +634,13 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
 
 void CScintillaWnd::SetupDefaultStyles()
 {
+    auto& theme = CTheme::Instance();
     Call(SCI_STYLERESETDEFAULT);
     // if possible, use the Consolas font
     // to determine whether Consolas is available, try to create
     // a font with it.
-    HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
+    HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
     if (hFont)
     {
         DeleteObject(hFont);
@@ -656,47 +663,47 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_STYLESETBOLD, STYLE_DEFAULT, bBold);
     Call(SCI_STYLESETITALIC, STYLE_DEFAULT, bItalic);
     Call(SCI_STYLESETSIZE, STYLE_DEFAULT, fontsize);
-    Call(SCI_STYLESETFORE, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
-    Call(SCI_STYLESETBACK, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
+    Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0)));
+    Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255)));
 
-    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(109, 109, 109)));
-    Call(SCI_STYLESETBACK, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(240, 240, 240)));
+    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, theme.GetThemeColor(RGB(109, 109, 109)));
+    Call(SCI_STYLESETBACK, STYLE_LINENUMBER, theme.GetThemeColor(RGB(240, 240, 240)));
 
     Call(SCI_INDICSETSTYLE, INDIC_SELECTION_MARK, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_SELECTION_MARK, 50);
     Call(SCI_INDICSETUNDER, INDIC_SELECTION_MARK, true);
-    Call(SCI_INDICSETFORE,  INDIC_SELECTION_MARK, CTheme::Instance().GetThemeColor(RGB(0,255,0)));
+    Call(SCI_INDICSETFORE,  INDIC_SELECTION_MARK, theme.GetThemeColor(RGB(0,255,0)));
 
     Call(SCI_INDICSETSTYLE, INDIC_FINDTEXT_MARK, INDIC_ROUNDBOX);
-    Call(SCI_INDICSETALPHA, INDIC_FINDTEXT_MARK, CTheme::Instance().IsDarkTheme() ? 100 : 200);
+    Call(SCI_INDICSETALPHA, INDIC_FINDTEXT_MARK, theme.IsDarkTheme() ? 100 : 200);
     Call(SCI_INDICSETUNDER, INDIC_FINDTEXT_MARK, true);
-    Call(SCI_INDICSETFORE,  INDIC_FINDTEXT_MARK, CTheme::Instance().GetThemeColor(RGB(255,255,0)));
+    Call(SCI_INDICSETFORE,  INDIC_FINDTEXT_MARK, theme.GetThemeColor(RGB(255,255,0)));
 
     Call(SCI_INDICSETSTYLE, INDIC_URLHOTSPOT, INDIC_HIDDEN);
     Call(SCI_INDICSETALPHA, INDIC_URLHOTSPOT, 5);
     Call(SCI_INDICSETUNDER, INDIC_URLHOTSPOT, true);
     Call(SCI_INDICSETHOVERSTYLE, INDIC_URLHOTSPOT, INDIC_DOTS);
-    Call(SCI_INDICSETHOVERFORE, INDIC_URLHOTSPOT, CTheme::Instance().GetThemeColor(RGB(0, 0, 255)));
+    Call(SCI_INDICSETHOVERFORE, INDIC_URLHOTSPOT, theme.GetThemeColor(RGB(0, 0, 255)));
 
     Call(SCI_INDICSETSTYLE, INDIC_BRACEMATCH, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, 30);
     Call(SCI_INDICSETOUTLINEALPHA, INDIC_BRACEMATCH, 0);
     Call(SCI_INDICSETUNDER, INDIC_BRACEMATCH, true);
-    Call(SCI_INDICSETFORE, INDIC_BRACEMATCH, CTheme::Instance().GetThemeColor(RGB(0, 150, 0)));
+    Call(SCI_INDICSETFORE, INDIC_BRACEMATCH, theme.GetThemeColor(RGB(0, 150, 0)));
 
     Call(SCI_INDICSETSTYLE, INDIC_MISSPELLED, INDIC_SQUIGGLE);
-    Call(SCI_INDICSETFORE, INDIC_MISSPELLED, CTheme::Instance().GetThemeColor(RGB(255, 0, 0)));
+    Call(SCI_INDICSETFORE, INDIC_MISSPELLED, theme.GetThemeColor(RGB(255, 0, 0)));
     Call(SCI_INDICSETUNDER, INDIC_MISSPELLED, true);
 
-    Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, CTheme::Instance().GetThemeColor(RGB(0,150,0)));
+    Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, theme.GetThemeColor(RGB(0,150,0)));
     Call(SCI_STYLESETBOLD, STYLE_BRACELIGHT, 1);
-    Call(SCI_STYLESETFORE, STYLE_BRACEBAD, CTheme::Instance().GetThemeColor(RGB(255,0,0)));
+    Call(SCI_STYLESETFORE, STYLE_BRACEBAD, theme.GetThemeColor(RGB(255,0,0)));
     Call(SCI_STYLESETBOLD, STYLE_BRACEBAD, 1);
 
-    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, CTheme::Instance().GetThemeColor(RGB(200,200,200)));
+    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, theme.GetThemeColor(RGB(200,200,200)));
 
-    Call(SCI_INDICSETFORE, INDIC_TAGMATCH, CTheme::Instance().GetThemeColor(RGB(0x80, 0x00, 0xFF)));
-    Call(SCI_INDICSETFORE, INDIC_TAGATTR, CTheme::Instance().GetThemeColor(RGB(0xFF, 0xFF, 0x00)));
+    Call(SCI_INDICSETFORE, INDIC_TAGMATCH, theme.GetThemeColor(RGB(0x80, 0x00, 0xFF)));
+    Call(SCI_INDICSETFORE, INDIC_TAGATTR, theme.GetThemeColor(RGB(0xFF, 0xFF, 0x00)));
     Call(SCI_INDICSETSTYLE, INDIC_TAGMATCH, INDIC_ROUNDBOX);
     Call(SCI_INDICSETSTYLE, INDIC_TAGATTR, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_TAGMATCH, 100);
@@ -704,13 +711,13 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETUNDER, INDIC_TAGMATCH, true);
     Call(SCI_INDICSETUNDER, INDIC_TAGATTR, true);
 
-    Call(SCI_SETFOLDMARGINCOLOUR, true, CTheme::Instance().GetThemeColor(RGB(240, 240, 240)));
-    Call(SCI_SETFOLDMARGINHICOLOUR, true, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
+    Call(SCI_SETFOLDMARGINCOLOUR, true, theme.GetThemeColor(RGB(240, 240, 240)));
+    Call(SCI_SETFOLDMARGINHICOLOUR, true, theme.GetThemeColor(RGB(255, 255, 255)));
 
     SetTabSettings();
     Call(SCI_SETINDENTATIONGUIDES, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"indent", SC_IV_LOOKBOTH));
 
-    const unsigned long foldmarkfore = CTheme::Instance().GetThemeColor(RGB(250,250,250));
+    const unsigned long foldmarkfore = theme.GetThemeColor(RGB(250,250,250));
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN, foldmarkfore);
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDER, foldmarkfore);
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERSUB, foldmarkfore);
@@ -719,7 +726,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, foldmarkfore);
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, foldmarkfore);
 
-    const unsigned long foldmarkback = CTheme::Instance().GetThemeColor(RGB(50,50,50));
+    const unsigned long foldmarkback = theme.GetThemeColor(RGB(50,50,50));
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN, foldmarkback);
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDER, foldmarkback);
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERSUB, foldmarkback);
@@ -728,23 +735,23 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, foldmarkback);
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, foldmarkback);
 
-    Call(SCI_STYLESETFORE, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
-    Call(SCI_STYLESETBACK, STYLE_DEFAULT, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
-    Call(SCI_SETSELFORE, TRUE, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
-    Call(SCI_SETSELBACK, TRUE, CTheme::Instance().GetThemeColor(RGB(51, 153, 255)));
-    Call(SCI_SETCARETFORE, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
+    Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0)));
+    Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255)));
+    Call(SCI_SETSELFORE, TRUE, theme.GetThemeColor(RGB(255, 255, 255)));
+    Call(SCI_SETSELBACK, TRUE, theme.GetThemeColor(RGB(51, 153, 255)));
+    Call(SCI_SETCARETFORE, theme.GetThemeColor(RGB(0, 0, 0)));
 
-    if (CTheme::Instance().IsDarkTheme())
+    if (theme.IsDarkTheme())
     {
         Call(SCI_SETCARETLINEBACK, RGB(0,0,0));
         Call(SCI_SETCARETLINEBACKALPHA, SC_ALPHA_NOALPHA);
     }
     else
     {
-        Call(SCI_SETCARETLINEBACK, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
+        Call(SCI_SETCARETLINEBACK, theme.GetThemeColor(RGB(0, 0, 0)));
         Call(SCI_SETCARETLINEBACKALPHA, 15);
     }
-    Call(SCI_SETWHITESPACEFORE, true, CTheme::Instance().GetThemeColor(RGB(255, 181, 106)));
+    Call(SCI_SETWHITESPACEFORE, true, theme.GetThemeColor(RGB(255, 181, 106)));
     Call(SCI_SETCODEPAGE, CP_UTF8);
     Call(SCI_COLOURISE, 0, -1);
 }
@@ -996,10 +1003,10 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
                     Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, 40);
 
                 Call(SCI_INDICATORFILLRANGE, lastIndicatorStart, lastIndicatorLength);
-                SetTimer(*this, TIM_BRACEHIGHLIGHTTEXTCLEAR, 5000, NULL);
+                SetTimer(*this, TIM_BRACEHIGHLIGHTTEXTCLEAR, 5000, nullptr);
             }
             else if (what == Braces)
-                SetTimer(*this, TIM_BRACEHIGHLIGHTTEXT, 1000, NULL);
+                SetTimer(*this, TIM_BRACEHIGHLIGHTTEXT, 1000, nullptr);
         }
 
         if ((what == Highlight) && (Call(SCI_GETINDENTATIONGUIDES) != 0))
