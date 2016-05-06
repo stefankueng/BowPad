@@ -1011,42 +1011,58 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
     }
 }
 
+// find matching brace position
 void CScintillaWnd::GotoBrace()
 {
-    int braceAtCaret = -1;
-    int braceOpposite = -1;
-
-    // find matching brace position
-    int caretPos = int(Call(SCI_GETCURRENTPOS));
-    WCHAR charBefore = '\0';
+    static const wchar_t brackets[] = L"[](){}";
 
     int lengthDoc = int(Call(SCI_GETLENGTH));
+    if (lengthDoc <= 1)
+        return;
 
-    if ((lengthDoc > 0) && (caretPos > 0))
+    int braceAtCaret = -1;
+    int braceOpposite = -1;
+    WCHAR charBefore = '\0';
+    WCHAR charAfter = '\0';
+    bool shift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+
+    int caretPos = int(Call(SCI_GETCURRENTPOS));
+    if (caretPos > 0)
     {
         charBefore = WCHAR(Call(SCI_GETCHARAT, caretPos - 1, 0));
-    }
-    // Priority goes to character before the caret
-    if (charBefore && wcschr(L"[](){}", charBefore))
-    {
-        braceAtCaret = caretPos - 1;
+        if (charBefore && wcschr(brackets, charBefore)) // Priority goes to character before the caret.
+            braceAtCaret = caretPos - 1;
     }
 
-    if (lengthDoc > 0  && (braceAtCaret < 0))
-    {
-        // No brace found so check other side
-        WCHAR charAfter = WCHAR(Call(SCI_GETCHARAT, caretPos, 0));
-        if (charAfter && wcschr(L"[](){}", charAfter))
-        {
+    if (braceAtCaret < 0) // No brace found so check other side
+    {        
+        charAfter = WCHAR(Call(SCI_GETCHARAT, caretPos, 0));
+        if (charAfter && wcschr(brackets, charAfter))
             braceAtCaret = caretPos;
-        }
     }
     if (braceAtCaret >= 0)
+    {
         braceOpposite = int(Call(SCI_BRACEMATCH, braceAtCaret, 0));
+        if (braceOpposite >= 0)
+        {
+            if (shift)
+            {
+                if (braceOpposite >= braceAtCaret)
+                    ++braceOpposite;
+                else
+                    ++braceAtCaret;
+            }
+            else if (braceAtCaret >= 0 && braceOpposite >= 0 && braceOpposite > braceAtCaret
+                && braceOpposite == braceAtCaret + 1 && charBefore)
+            {
+                --braceOpposite;
+            }
+        }
+    }
 
     if (braceOpposite >= 0)
     {
-        Call(SCI_SETSEL, (GetKeyState(VK_SHIFT)&0x8000) ? braceAtCaret : braceOpposite, braceOpposite);
+        Call(SCI_SETSEL, shift ? braceAtCaret : braceOpposite, braceOpposite);
     }
 }
 
