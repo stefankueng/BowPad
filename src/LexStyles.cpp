@@ -81,7 +81,7 @@ CLexStyles& CLexStyles::Instance()
 void CLexStyles::ParseStyle(
     LPCWSTR styleName,
     LPCWSTR styleString,
-    std::map<std::wstring, std::wstring>& variables,
+    const std::map<std::wstring, std::wstring>& variables,
     StyleData& style
     ) const
 {
@@ -96,11 +96,11 @@ void CLexStyles::ParseStyle(
         switch (i)
         {
         case 0: // Name
-            style.Name = s;
 #ifdef _DEBUG
             if (s.find(',') != std::wstring::npos)
                 APPVERIFYM(false, s.c_str());
 #endif
+            style.Name = s;
             break;
         case 1: // Foreground color
             if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
@@ -168,7 +168,7 @@ void CLexStyles::Load()
 
                 std::map<std::wstring, std::wstring> variables;
                 std::wstring key;
-                for (auto& ini : inis)
+                for (const auto& ini : inis)
                 {
                     CSimpleIni::TNamesDepend lexvars;
                     ini.GetAllKeys(L"variables", lexvars);
@@ -179,12 +179,12 @@ void CLexStyles::Load()
                         key = L"$(";
                         key += l;
                         key += L")";
-                        variables[key] = std::move(v);
+                        variables[std::move(key)] = std::move(v);
                     }
                 }
 
                 std::map<std::wstring, int> lexers;
-                for (auto& ini : inis)
+                for (const auto& ini : inis)
                 {
                     CSimpleIni::TNamesDepend lexkeys;
                     ini.GetAllKeys(L"lexers", lexkeys);
@@ -212,8 +212,8 @@ void CLexStyles::Load()
                             ReplaceVariables(v, variables);
                             std::vector<std::wstring> langs;
                             stringtok(langs, v, true, L";");
-                            for (const auto& x : langs)
-                                lexers[x] = lex;
+                            for (const auto& lang : langs)
+                                lexers[lang] = lex;
                         }
 
                         // now parse all the data for this lexer
@@ -249,7 +249,7 @@ void CLexStyles::Load()
                     }
                 }
 
-                for (auto& ini : inis)
+                for (const auto& ini : inis)
                 {
                     CSimpleIni::TNamesDepend filelangkeys;
                     ini.GetAllKeys(L"filelanguage", filelangkeys);
@@ -285,9 +285,12 @@ void CLexStyles::Load()
                         {
                             std::wstring v = ini.GetValue(L"pathlanguage", k);
                             auto f = v.find(L"*");
-                            std::wstring p = v.substr(0, f);
-                            m_pathsLang[p] = CUnicodeUtils::StdGetUTF8(v.substr(f + 1));
-                            m_pathsForLang.push_back(std::move(p));
+                            if (f != std::wstring::npos)
+                            {
+                                std::wstring p = v.substr(0, f);
+                                m_pathsLang[p] = CUnicodeUtils::StdGetUTF8(v.substr(f + 1));
+                                m_pathsForLang.push_back(std::move(p));
+                            }
                         }
                     }
 
@@ -466,9 +469,9 @@ const LexerData& CLexStyles::GetLexerDataForLexer(int lexer)
 
 std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
 {
-    std::wstring p = CStringUtils::to_lower(path);
+    std::wstring lpath = CStringUtils::to_lower(path);
 
-    auto it = m_pathsLang.find(p);
+    auto it = m_pathsLang.find(lpath);
     if (it != m_pathsLang.end())
     {
         // move the path to the top of the list
@@ -484,12 +487,12 @@ std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
         return CUnicodeUtils::StdGetUnicode(it->second);
     }
 
-    auto fit = m_fileLang.find(CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(p)));
+    auto fit = m_fileLang.find(CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(lpath)));
     if (fit != m_fileLang.end())
     {
         return CUnicodeUtils::StdGetUnicode(fit->second);
     }
-    auto ext = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(p));
+    auto ext = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(lpath));
     auto eit = m_extLang.find(ext);
     if (eit != m_extLang.end())
     {
@@ -522,7 +525,7 @@ std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintilla
     );
 
     std::string line = edit.GetLine(0);
-    const size_t n = std::extent<decltype(lexDetectStrings)>::value;
+    const size_t n = std::size(lexDetectStrings);
     for (const auto& m : lexDetectStrings)
     {
         auto foundpos = line.find(m.second);
@@ -640,25 +643,26 @@ void CLexStyles::SaveUserData()
 
     for (const auto& it : m_userlexerdata)
     {
-        if (it.first == 0)
+        int lexerID = it.first;
+        if (lexerID == 0)
             continue;
         // find the lexer section name
-        std::wstring section = m_lexerSection[it.first];
-        std::wstring v = CStringUtils::Format(L"%d", it.first);
+        std::wstring section = m_lexerSection[lexerID];
+        std::wstring v = std::to_wstring(lexerID);
         ini.SetValue(section.c_str(), L"Lexer", v.c_str());
-        for (const auto& s : it.second.Styles)
+        for (const auto& styleEntry : it.second.Styles)
         {
-            std::wstring style = CStringUtils::Format(L"Style%d", s.first);
-            std::wstring sSize = CStringUtils::Format(L"%d", s.second.FontSize);
-            if (s.second.FontSize == 0)
+            const int styleID = styleEntry.first;
+            const auto& styleData = styleEntry.second;
+            std::wstring style = CStringUtils::Format(L"Style%d", styleID);
+            std::wstring sSize = std::to_wstring(styleData.FontSize);
+            if (styleData.FontSize == 0)
                 sSize.clear();
-            std::wstring name = s.second.Name;
-            if (name.empty())
-                name = m_lexerdata[it.first].Styles[s.first].Name;
-            int fore = GetRValue(s.second.ForegroundColor)<<16 | GetGValue(s.second.ForegroundColor)<<8 | GetBValue(s.second.ForegroundColor);
-            int back = GetRValue(s.second.BackgroundColor)<<16 | GetGValue(s.second.BackgroundColor)<<8 | GetBValue(s.second.BackgroundColor);
+            int fore = GetRValue(styleData.ForegroundColor)<<16 | GetGValue(styleData.ForegroundColor)<<8 | GetBValue(styleData.ForegroundColor);
+            int back = GetRValue(styleData.BackgroundColor)<<16 | GetGValue(styleData.BackgroundColor)<<8 | GetBValue(styleData.BackgroundColor);
             // styleNR=name;foreground;background;fontname;fontstyle;fontsize
-            v = CStringUtils::Format(L"%s;%06X;%06X;%s;%d;%s", name.c_str(), fore, back, s.second.FontName.c_str(), s.second.FontStyle, sSize.c_str());
+            const auto& name = styleData.Name.empty() ? m_lexerdata[lexerID].Styles[styleID].Name : styleData.Name;
+            v = CStringUtils::Format(L"%s;%06X;%06X;%s;%d;%s", name.c_str(), fore, back, styleData.FontName.c_str(), styleData.FontStyle, sSize.c_str());
             ini.SetValue(section.c_str(), style.c_str(), v.c_str());
         }
     }
@@ -668,11 +672,12 @@ void CLexStyles::SaveUserData()
 
     for (const auto& it : m_userextLang)
     {
-        std::wstring v = ini.GetValue(L"language", CUnicodeUtils::StdGetUnicode(it.second).c_str(), L"");
+        auto lang = CUnicodeUtils::StdGetUnicode(it.second);
+        std::wstring v = ini.GetValue(L"language", lang.c_str(), L"");
         if (!v.empty())
             v += L";";
         v += CUnicodeUtils::StdGetUnicode(it.first);
-        ini.SetValue(L"language", CUnicodeUtils::StdGetUnicode(it.second).c_str(), v.c_str());
+        ini.SetValue(L"language", lang.c_str(), v.c_str());
     }
 
     // first clear all auto extensions, then add them again to the ini file
@@ -680,11 +685,12 @@ void CLexStyles::SaveUserData()
 
     for (const auto& it : m_autoextLang)
     {
-        std::wstring v = ini.GetValue(L"autolanguage", CUnicodeUtils::StdGetUnicode(it.second).c_str(), L"");
+        auto lang = CUnicodeUtils::StdGetUnicode(it.second);
+        std::wstring v = ini.GetValue(L"autolanguage", lang.c_str(), L"");
         if (!v.empty())
             v += L";";
         v += CUnicodeUtils::StdGetUnicode(it.first);
-        ini.SetValue(L"autolanguage", CUnicodeUtils::StdGetUnicode(it.second).c_str(), v.c_str());
+        ini.SetValue(L"autolanguage", lang.c_str(), v.c_str());
     }
 
     int pcount = 0;

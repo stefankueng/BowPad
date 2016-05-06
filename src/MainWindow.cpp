@@ -722,7 +722,10 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM /*wParam*/,
         if (!path.empty())
         {
             bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-            OpenFile(path.c_str(), OpenFlags::AddToMRU | (control ? OpenFlags::OpenIntoActiveTab : 0));
+            unsigned int openFlags = OpenFlags::AddToMRU;
+            if (control)
+                openFlags |= OpenFlags::OpenIntoActiveTab;
+            OpenFile(path.c_str(), openFlags);
             PostMessage(*this, WM_SETFOCUS, TRUE, 0);
         }
     }
@@ -1373,19 +1376,19 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
 
     auto lengthInBytes = m_editor.Call(SCI_GETLENGTH);
     auto lineCount = m_editor.Call(SCI_GETLINECOUNT);
-    std::wstring ttdocsize = CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, lineCount);
+    auto ttdocsize = CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, lineCount);
     m_StatusBar.SetText(strLnCol, ttdocsize.c_str(), STATUSBAR_CUR_POS);
     m_StatusBar.SetText(strSel, ttcurpos.c_str(), STATUSBAR_SEL);
 
     auto overType = m_editor.Call(SCI_GETOVERTYPE);
-    std::wstring tttyping = CStringUtils::Format(rsStatusTTTyping, overType ? rsStatusTTTypingOvl.c_str() : rsStatusTTTypingIns.c_str());
+    auto tttyping = CStringUtils::Format(rsStatusTTTyping, overType ? rsStatusTTTypingOvl.c_str() : rsStatusTTTypingIns.c_str());
     m_StatusBar.SetText(overType ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", nullptr, STATUSBAR_CAPS);
     m_StatusBar.SetText(m_editor.Call(SCI_GETUSETABS) ? L"Tabs" : L"Spaces", rsStatusTTTabSpaces.c_str(), STATUSBAR_TABSPACE);
 
     int zoomfactor = GetZoomPC();
-    std::wstring szoomfactor = CStringUtils::Format(rsStatusZoom, zoomfactor);
+    auto szoomfactor = CStringUtils::Format(rsStatusZoom, zoomfactor);
     m_StatusBar.SetText(szoomfactor.c_str(), nullptr, STATUSBAR_ZOOM);
 
     if (bEverything)
@@ -1393,15 +1396,15 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
         CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
         int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
         APPVERIFY(ToEOLMode(doc.m_format) == eolMode);
-        std::wstring eolDesc = GetEOLFormatDescription(doc.m_format);
+        auto eolDesc = GetEOLFormatDescription(doc.m_format);
         m_StatusBar.SetText(doc.m_language.c_str(), nullptr, STATUSBAR_DOC_TYPE);
-        std::wstring tteof = CStringUtils::Format(rsStatusTTEOF, eolDesc.c_str());
+        auto tteof = CStringUtils::Format(rsStatusTTEOF, eolDesc.c_str());
         m_StatusBar.SetText(eolDesc.c_str(), tteof.c_str(), STATUSBAR_EOL_FORMAT);
-        std::wstring ttencoding = CStringUtils::Format(rsStatusTTEncoding, doc.GetEncodingString().c_str());
+        auto ttencoding = CStringUtils::Format(rsStatusTTEncoding, doc.GetEncodingString().c_str());
         m_StatusBar.SetText(doc.GetEncodingString().c_str(), ttencoding.c_str(), STATUSBAR_UNICODE_TYPE);
 
         auto tabCount = m_TabBar.GetItemCount();
-        std::wstring tttabs = CStringUtils::Format(rsStatusTTTabs, tabCount);
+        auto tttabs = CStringUtils::Format(rsStatusTTTabs, tabCount);
         m_StatusBar.SetText(CStringUtils::Format(L"Open: %d", tabCount).c_str(), tttabs.c_str(), STATUSBAR_TABS);
 
         if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
@@ -2701,7 +2704,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
         // find out if there are paths specified without the key/value pair syntax
         int nArgs;
 
-        LPWSTR* szArglist = CommandLineToArgvW((LPCWSTR)cds.lpData, &nArgs);
+        LPCWSTR* szArglist = (LPCWSTR*) CommandLineToArgvW((LPCWSTR)cds.lpData, &nArgs);
         OnOutOfScope(LocalFree(szArglist););
         if (!szArglist)
             return;
