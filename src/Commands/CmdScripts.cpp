@@ -19,6 +19,7 @@
 #include "PathUtils.h"
 #include "AppUtils.h"
 #include "UnicodeUtils.h"
+#include "OnOutOfScope.h"
 
 #include "scripting/BasicScriptObject.h"
 #include "scripting/BasicScriptHost.h"
@@ -74,12 +75,16 @@ bool CCmdScript::Create(const std::wstring& path)
         m_host->m_path = path;
         m_host->m_hWnd = GetHwnd();
         std::wstring source;  // stores file contents
-        FILE * f = NULL;
+        FILE * f = nullptr;
         _wfopen_s(&f, path.c_str(), L"rtS, ccs=UTF-8");
 
         // Failed to open file
-        if (f != NULL)
+        if (f != nullptr)
         {
+			OnOutOfScope(
+				fclose(f);
+				f = nullptr;
+			);
             struct _stat fileinfo;
             _wstat(path.c_str(), &fileinfo);
 
@@ -87,12 +92,10 @@ bool CCmdScript::Create(const std::wstring& path)
             if (fileinfo.st_size > 0)
             {
                 source.resize(fileinfo.st_size);
-                size_t wchars_read = fread(&(source.front()), sizeof(wchar_t), fileinfo.st_size, f);
+                size_t wchars_read = fread(&(source.front()), sizeof(source[0]), fileinfo.st_size, f);
                 source.resize(wchars_read);
                 source.shrink_to_fit();
             }
-
-            fclose(f);
         }
 
         hr = m_host->Parse(source);
@@ -110,10 +113,10 @@ bool CCmdScript::Create(const std::wstring& path)
             if (SUCCEEDED(VariantChangeType(&ret, &ret, VARIANT_ALPHABOOL, VT_INT)))
                 m_version = ret.intVal;
         }
-        catch (std::exception&) {}
+        catch (const std::exception&) {}
 
     }
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
         if (CIniSettings::Instance().GetInt64(L"Debug", L"usemessagebox", 0))
         {
@@ -134,7 +137,7 @@ bool CCmdScript::Execute()
 {
     DISPPARAMS dispparams = { 0 };
     try { m_host->CallFunction(L"Execute", dispparams); }
-    catch (std::exception&) {}
+    catch (const std::exception&) {}
     return true;
 }
 
@@ -199,7 +202,7 @@ void CCmdScript::ScintillaNotify(Scintilla::SCNotification * pScn)
 
     dispparams.rgvarg = v;
     try { m_host->CallFunction(L"ScintillaNotify", dispparams); }
-    catch (std::exception&) {}
+    catch (const std::exception&) {}
 }
 
 void CCmdScript::TabNotify(TBHDR * ptbhdr)
@@ -213,21 +216,21 @@ void CCmdScript::TabNotify(TBHDR * ptbhdr)
     v[1].vt = VT_INT;
     dispparams.rgvarg = v;
     try { m_host->CallFunction(L"TabNotify", dispparams); }
-    catch (std::exception&) {}
+    catch (const std::exception&) {}
 }
 
 void CCmdScript::OnClose()
 {
     DISPPARAMS dispparams = { 0 };
     try { m_host->CallFunction(L"OnClose", dispparams); }
-    catch (std::exception&) {}
+    catch (const std::exception&) {}
 }
 
 void CCmdScript::AfterInit()
 {
     DISPPARAMS dispparams = { 0 };
     try { m_host->CallFunction(L"AfterInit", dispparams); }
-    catch (std::exception&) {}
+    catch (const std::exception&) {}
 }
 
 void CCmdScript::OnDocumentClose(int index)
@@ -239,7 +242,7 @@ void CCmdScript::OnDocumentClose(int index)
     vI.vt = VT_INT;
     dispparams.rgvarg = &vI;
     try { m_host->CallFunction(L"OnDocumentClose", dispparams); }
-    catch (std::exception&) {}
+    catch (const std::exception&) {}
 }
 
 void CCmdScript::OnDocumentOpen(int index)
@@ -251,7 +254,7 @@ void CCmdScript::OnDocumentOpen(int index)
     vI.vt = VT_INT;
     dispparams.rgvarg = &vI;
     try { m_host->CallFunction(L"OnDocumentOpen", dispparams); }
-    catch (std::exception&) {}
+    catch (const std::exception&) {}
 }
 
 void CCmdScript::OnDocumentSave(int index, bool bSaveAs)
@@ -265,7 +268,7 @@ void CCmdScript::OnDocumentSave(int index, bool bSaveAs)
     v[1].vt = VT_BOOL;
     dispparams.rgvarg = v;
     try { m_host->CallFunction(L"OnDocumentSave", dispparams); }
-    catch (std::exception&) {}
+    catch (const std::exception&) {}
 }
 
 HRESULT CCmdScript::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
@@ -279,7 +282,7 @@ HRESULT CCmdScript::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PR
             if (ret.vt == VT_BOOL)
                 return UIInitPropertyFromBoolean(UI_PKEY_Enabled, ret.boolVal, ppropvarNewValue);
         }
-        catch (std::exception&) {}
+        catch (const std::exception&) {}
 
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, true, ppropvarNewValue);
     }
@@ -292,7 +295,7 @@ HRESULT CCmdScript::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PR
             if (ret.vt == VT_BOOL)
                 return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ret.boolVal, ppropvarNewValue);
         }
-        catch (std::exception&) {}
+        catch (const std::exception&) {}
         return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, false, ppropvarNewValue);
     }
     return E_NOTIMPL;
@@ -307,7 +310,7 @@ void CCmdScript::OnTimer(UINT id)
     vI.vt = VT_UINT;
     dispparams.rgvarg = &vI;
     try { m_host->CallFunction(L"OnTimer", dispparams); }
-    catch (std::exception&) {}
+    catch (const std::exception&) {}
 }
 
 void CCmdScript::OnThemeChanged(bool bDark)
@@ -319,7 +322,7 @@ void CCmdScript::OnThemeChanged(bool bDark)
     vI.vt = VT_BOOL;
     dispparams.rgvarg = &vI;
     try { m_host->CallFunction(L"OnThemeChanged", dispparams); }
-    catch (std::exception&) {}
+    catch (const std::exception&) {}
 }
 
 void CCmdScript::OnLexerChanged(int lexer)
@@ -331,7 +334,7 @@ void CCmdScript::OnLexerChanged(int lexer)
     vI.vt = VT_INT;
     dispparams.rgvarg = &vI;
     try { m_host->CallFunction(L"OnLexerChanged", dispparams); }
-    catch (std::exception&) {}
+    catch (const std::exception&) {}
 }
 
 

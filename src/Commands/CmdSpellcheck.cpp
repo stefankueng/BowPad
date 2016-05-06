@@ -30,7 +30,7 @@
 #include <Richedit.h>
 
 extern IUIFramework *g_pFramework;
-extern UINT32 contextID;
+extern UINT32 g_contextID;
 
 namespace
 {
@@ -101,7 +101,7 @@ CCmdSpellcheck::CCmdSpellcheck(void * obj)
             g_wordchars += (char)ch;
     }
 
-    contextID = m_enabled && g_SpellChecker ? cmdContextSpellMap : cmdContextMap;
+    g_contextID = m_enabled && g_SpellChecker ? cmdContextSpellMap : cmdContextMap;
 
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
@@ -343,7 +343,7 @@ bool CCmdSpellcheck::Execute()
         ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
         ScintillaCall(SCI_INDICATORCLEARRANGE, 0, ScintillaCall(SCI_GETLENGTH));
     }
-    contextID = m_enabled && g_SpellChecker ? cmdContextSpellMap : cmdContextMap;
+    g_contextID = m_enabled && g_SpellChecker ? cmdContextSpellMap : cmdContextMap;
     return true;
 }
 

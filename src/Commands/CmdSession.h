@@ -67,7 +67,7 @@ public:
 
 struct SessionItem
 {
-    SessionItem(std::wstring& path , CPosData& posData)
+    SessionItem(std::wstring& path , const CPosData& posData)
         : path(path), posData(posData) {}
     std::wstring path;
     CPosData posData;

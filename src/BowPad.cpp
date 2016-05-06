@@ -155,7 +155,7 @@ static void SetAppID()
     }
 }
 
-static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLineParser& parser)
+static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineParser& parser)
 {
     int nCmdShow = 0;
 
@@ -232,13 +232,13 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPTSTR lpCmdLine, CCmdLinePa
             wcscpy_s(ownCmdLine.get(), sCmdLine.size() + 2, sCmdLine.c_str());
             cds.cbData = (DWORD)((sCmdLine.size() + 1)*sizeof(wchar_t));
             cds.lpData = ownCmdLine.get();
-            SendMessage(hBowPadWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&cds);
+            SendMessage(hBowPadWnd, WM_COPYDATA, NULL, (LPARAM)&cds);
         }
         else
         {
             cds.cbData = (DWORD)((cmdLineLen + 1)*sizeof(wchar_t));
-            cds.lpData = lpCmdLine;
-            SendMessage(hBowPadWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&cds);
+            cds.lpData = (PVOID) lpCmdLine;
+            SendMessage(hBowPadWnd, WM_COPYDATA, NULL, (LPARAM)&cds);
         }
     }
 }
@@ -345,7 +345,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
     }
 }
 
-int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow, bool bAlreadyRunning)
+int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int nCmdShow, bool bAlreadyRunning)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);

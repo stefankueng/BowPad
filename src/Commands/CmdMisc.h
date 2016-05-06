@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ public:
     {
     }
 
-    ~CCmdDelete(void)
+    ~CCmdDelete()
     {
     }
 
@@ -49,7 +49,7 @@ public:
     {
     }
 
-    ~CCmdSelectAll(void)
+    ~CCmdSelectAll()
     {
     }
 
@@ -70,7 +70,7 @@ public:
     {
     }
 
-    ~CCmdGotoBrace(void)
+    ~CCmdGotoBrace()
     {
     }
 
@@ -109,7 +109,7 @@ public:
     {
     }
 
-    ~CCmdConfigShortcuts(void)
+    ~CCmdConfigShortcuts()
     {
     }
 
@@ -124,7 +124,7 @@ public:
 
     CCmdAutoBraces(void * obj);
 
-    ~CCmdAutoBraces(void);
+    ~CCmdAutoBraces();
 
     bool Execute() override;
 
@@ -139,7 +139,7 @@ public:
 
     CCmdViewFileTree(void * obj);
 
-    ~CCmdViewFileTree(void);
+    ~CCmdViewFileTree();
 
     bool Execute() override;
 
