@@ -125,7 +125,7 @@ private:
     void                                GenerateUserKeywords(LanguageData& ld);
     void                                ParseStyle(LPCWSTR styleName,
                                                    LPCWSTR styleString,
-                                                   std::map<std::wstring, std::wstring>& variables,
+                                                   const std::map<std::wstring, std::wstring>& variables,
                                                    StyleData& style) const;
 private:
     bool                                m_bLoaded;
