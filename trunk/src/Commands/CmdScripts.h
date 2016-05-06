@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2015 - Stefan Kueng
+// Copyright (C) 2014-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,31 +31,31 @@ public:
     bool Create(const std::wstring& path);
     void SetCmdId(UINT cmdId) { m_cmdID = cmdId; }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override;
+    UINT GetCmdId() override;
 
-    virtual void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
-    virtual void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR * ptbhdr) override;
 
-    virtual void OnClose() override;
+    void OnClose() override;
 
-    virtual void AfterInit() override;
+    void AfterInit() override;
 
-    virtual void OnDocumentClose(int index) override;
+    void OnDocumentClose(int index) override;
 
-    virtual void OnDocumentOpen(int index) override;
+    void OnDocumentOpen(int index) override;
 
-    virtual void OnDocumentSave(int index, bool bSaveAs) override;
+    void OnDocumentSave(int index, bool bSaveAs) override;
 
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 
-    virtual void OnTimer(UINT id) override;
+    void OnTimer(UINT id) override;
 
-    virtual void OnThemeChanged(bool bDark) override;
+    void OnThemeChanged(bool bDark) override;
 
-    virtual void OnLexerChanged(int lexer) override;
+    void OnLexerChanged(int lexer) override;
 
     int m_version;
 

@@ -513,7 +513,7 @@ bool CAppUtils::TryParse(const wchar_t* s, int& result, bool emptyOk, int def)
     {
         result  = std::stoi(s);
     }
-    catch (std::invalid_argument& /*ex*/)
+    catch (const std::invalid_argument& /*ex*/)
     {
         result = def;
         return false;

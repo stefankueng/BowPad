@@ -46,8 +46,8 @@ public:
     {
     }
 
-    virtual bool Execute() override;
+    bool Execute() override;
 
-    virtual UINT GetCmdId() override { return cmdNewDefault; }
+    UINT GetCmdId() override { return cmdNewDefault; }
 };
 

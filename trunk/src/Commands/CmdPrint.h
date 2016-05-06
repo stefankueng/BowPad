@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
-    ~CCmdPrint(void)
+    ~CCmdPrint()
     {
     }
 
@@ -51,7 +51,7 @@ public:
     {
     }
 
-    ~CCmdPrintNow(void)
+    ~CCmdPrintNow()
     {
     }
 
@@ -72,7 +72,7 @@ public:
     {
     }
 
-    ~CCmdPageSetup(void)
+    ~CCmdPageSetup()
     {
     }
 
