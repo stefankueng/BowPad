@@ -203,6 +203,56 @@ bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf,
     return true;
 }
 
+// Turn a duration into something like 1h, 1m, 1s, 1ms.
+// Zero value elements are ommitted, e.g. 1h, 1ms.
+static std::string DurationToString(std::chrono::duration<double> d)
+{
+    using days = std::chrono::duration
+        <int, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>>;
+    days ds = std::chrono::duration_cast<days>(d);
+    auto rem = d - ds;
+    std::chrono::hours h = std::chrono::duration_cast<std::chrono::hours>(rem);
+    rem -= h;
+    std::chrono::minutes m = std::chrono::duration_cast<std::chrono::minutes>(rem);
+    rem -= m;
+    std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(rem);
+    rem -= s;
+    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(rem);
+
+    std::string result;
+    if (h.count() > 0)
+    {
+        if (!result.empty())
+            result += ',';
+        result +=  std::to_string(h.count());
+        result += 'h';
+    }
+    if (m.count() > 0)
+    {
+        if (!result.empty())
+            result += ',';
+        result += std::to_string(m.count());
+        result += 'm';
+    }
+    if (s.count() > 0)
+    {
+        if (!result.empty())
+            result += ',';
+        result += std::to_string(s.count());
+        result += 's';
+    }
+    // Empty check isto ensure at least something prints.
+    if (ms.count() > 0 || result.empty())
+    {
+        if (!result.empty())
+            result += ',';
+        result += std::to_string(ms.count());
+        result += "ms";
+    }
+
+    return result;
+}
+
 }; // unnamed namespace
 
 CCmdFunctions::CCmdFunctions(void* obj)
@@ -214,6 +264,7 @@ CCmdFunctions::CCmdFunctions(void* obj)
     // Need to restart BP if you change these settings but helps
     // performance a little to inquire them here.
     m_autoscan = (CIniSettings::Instance().GetInt64(L"functions", L"autoscan", 1) != 0);
+    m_autoscanTimed = (CIniSettings::Instance().GetInt64(L"functions", L"autoscantimed", 0) != 0);
     m_ttf = {};
 }
 
@@ -256,17 +307,13 @@ HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     HRESULT hr = S_OK;
     // The list will retain whatever from last time so clear it.
     collection->Clear();
-    menuData.clear();
-    if (!HasActiveDocument())
-        return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
+    m_menuData.clear();
  
     auto docId = GetDocIdOfCurrentTab();
     if (docId < 0)
-        return S_FALSE;
-    auto doc = GetActiveDocument();
-    auto functionData = FindFunctionsNow();
+        return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
 
-    // If the data is ready, but there isn't any, indicate that.
+    auto functionData = FindFunctionsNow();
     if (functionData.functions.empty())
         return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
 
@@ -285,7 +332,7 @@ HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
                 CAppUtils::FailedShowMessage(hrMissingHint);
                 return S_OK;
             }
-            menuData.push_back(funcInfo.lineNum);
+            m_menuData.push_back(funcInfo.lineNum);
         }
     }
 
@@ -319,14 +366,14 @@ HRESULT CCmdFunctions::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PRO
                 return S_FALSE;
 
             // Type of selected is unsigned which prevents negative tests.
-            if (selected < menuData.size())
+            if (selected < m_menuData.size())
             {
-                size_t line = menuData[selected];
+                size_t line = m_menuData[selected];
                 GotoLine((long)line);
                 return S_OK;
             }
             // A "..." indicator may be present, assume it's that.
-            else if (selected == menuData.size())
+            else if (selected == m_menuData.size())
                 return S_OK;
             else
             {
@@ -407,6 +454,9 @@ void CCmdFunctions::OnLexerChanged(int /*lexer*/)
 
 void CCmdFunctions::EventHappened(int docID, DocEventType eventType)
 {
+    if (!m_autoscan)
+        return;
+
     if (docID < 0) // Ignore anything bogus. Is likely to happen eventually.
         return;
     // If we are alreading doing this, cancel it in preperation for redoing it.
@@ -429,13 +479,48 @@ void CCmdFunctions::EventHappened(int docID, DocEventType eventType)
 
 void CCmdFunctions::FindAllFunctions()
 {
+    if (!m_funcProcessingStarted)
+    {
+        if (m_autoscanTimed)
+            m_funcProcessingStartTime = std::chrono::steady_clock::now();
+        m_funcProcessingStarted = true;
+    }
+
+    bool moreToDo = FindAllFunctionsInternal();
+
+    // If we started and now have finished processing.
+    if (m_funcProcessingStarted && m_events.empty() && m_docID == -1)
+    {
+        m_funcProcessingStarted = false;
+        if (!m_languagesUpdated.empty() && HasActiveDocument())
+        {
+            auto activeDoc = GetActiveDocument();
+            auto activeDocLang = CUnicodeUtils::StdGetUTF8(activeDoc.m_language);
+            if (m_languagesUpdated.find(activeDocLang) != m_languagesUpdated.end())
+                SetupLexerForLang(activeDoc.m_language);
+            m_languagesUpdated.clear();
+        }
+        if (m_autoscanTimed)
+        {
+            auto funcProcessingEndTime = std::chrono::steady_clock::now();
+            auto funcProcessingPeriod = funcProcessingEndTime - m_funcProcessingStartTime;
+            auto msg = DurationToString(funcProcessingPeriod);
+            MessageBoxA(GetHwnd(), msg.c_str(), "Autoscan Function Parsing Time", MB_OK);
+        }
+    }
+    if (moreToDo)
+        SetTimer(GetHwnd(), m_timerID, 0, nullptr);
+}
+
+bool CCmdFunctions::FindAllFunctionsInternal()
+{
     if (m_docID == -1)
     {
         m_docLang.clear();
         for (;;)
         {
             if (m_events.empty())
-                return;
+                return false;
             DocEvent event = m_events.back();
             // Remove all other events relating to this document because we
             // currently process all of them the same way.
@@ -502,7 +587,11 @@ void CCmdFunctions::FindAllFunctions()
         {
             if (lexStyles.AddUserFunctionForLang(
                 m_docLang, CUnicodeUtils::StdGetUTF8(name)))
+            {
+                if (!addedToLexer)
+                    m_languagesUpdated.insert(m_docLang);
                 addedToLexer = true;
+            }
         }
         auto timeNow = std::chrono::steady_clock::now();
         auto ellapsedPeriod = timeNow - startTime;
@@ -518,17 +607,8 @@ void CCmdFunctions::FindAllFunctions()
         m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
         m_docID = -1;
     }
-
-    if (addedToLexer && HasActiveDocument())
-    {
-        auto activeDoc = GetActiveDocument();
-        auto activeDocLang = CUnicodeUtils::StdGetUTF8(activeDoc.m_language);
-        if (m_docLang == activeDocLang)
-            SetupLexerForLang(activeDoc.m_language);
-    }
     // Re-schedule if we need to continue our existing work or there is other work to do.
-    if (tbc || ! m_events.empty())
-        SetTimer(GetHwnd(), m_timerID, 0, nullptr);
+    return (tbc || !m_events.empty());
 }
 
 FunctionData CCmdFunctions::FindFunctionsNow() const
