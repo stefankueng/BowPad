@@ -1459,8 +1459,9 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool leaveEmptyTa
         }
         // Will Close
     }
-    // REVIEW: This seems neccessary?
     else
+        // SCI_SETDOCPOINTER is necessary so the reference count of the document
+        // is decreased and the memory can be released.
         m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
 
     if (leaveEmptyTab && (m_TabBar.GetItemCount() == 1) &&
@@ -2569,8 +2570,9 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                     m_TabBar.ActivateAt(index);
                     m_editor.SetupLexerForLang(doc.m_language);
                 }
-                // REVIEW: Seems this is neccessary?
                 else
+                    // SCI_SETDOCPOINTER is necessary so the reference count of the document
+                    // is decreased and the memory can be released.
                     m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
                 if (bResize)
                     ResizeChildWindows();
