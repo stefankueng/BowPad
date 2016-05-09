@@ -201,7 +201,7 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
                 BYTE b = (BYTE)std::stoi(colorText[5]);
                 color = RGB(r, g, b);
             }
-            catch (std::exception& /*ex*/)
+            catch (const std::exception& /*ex*/)
             {
                 return 0;
             }

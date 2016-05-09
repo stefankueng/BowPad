@@ -58,8 +58,8 @@ public:
     void                                    AddCommand(const std::wstring& name, int id);
 
 private:
-    CKeyboardShortcutHandler(void);
-    ~CKeyboardShortcutHandler(void);
+    CKeyboardShortcutHandler();
+    ~CKeyboardShortcutHandler();
 
     void                                    LoadUIHeader();
     void                                    Load();
