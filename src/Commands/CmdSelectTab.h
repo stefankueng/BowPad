@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,11 +28,11 @@ public:
     {
     }
 
-    ~CCmdSelectTab(void)
+    ~CCmdSelectTab()
     {
     }
 
-    virtual bool Execute() override
+    bool Execute() override
     {
         // since this is a 'dummy' command, only executed via keyboard shortcuts
         // Ctrl+1 ... Ctrl+9
@@ -82,5 +82,5 @@ public:
         return true;
     }
 
-    virtual UINT GetCmdId() override { return cmdSelectTab; }
+    UINT GetCmdId() override { return cmdSelectTab; }
 };
