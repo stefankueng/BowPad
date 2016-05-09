@@ -108,7 +108,7 @@ bool CCmdConfigShortcuts::Execute()
             }
         }
     }
-    return OpenFile(userFile.c_str(), 0);
+    return OpenFile(userFile.c_str(), 0) >= 0;
 }
 
 

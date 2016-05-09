@@ -543,7 +543,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_CLOSE:
         CCommandHandler::Instance().OnClose();
-        if (CloseAllTabs())
+        // Close all tabs, don't leave any open even a blank one.
+        if (CloseAllTabs(false))
         {
             CIniSettings::Instance().SaveWindowPos(L"MainWindow", *this);
             ::DestroyWindow(m_hwnd);
@@ -1096,9 +1097,11 @@ void CMainWindow::HandleAfterInit()
             unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
             if (m_bPathsToOpenMRU)
                 openFlags |= OpenFlags::AddToMRU;
-            OpenFile(path.first, openFlags);
-            if (path.second != (size_t)-1)
-                GoToLine(path.second);
+            if (OpenFile(path.first, openFlags) >= 0)
+            {
+                if (path.second != (size_t)-1)
+                    GoToLine(path.second);
+            }
         }
     }
     m_pathsToOpen.clear();
@@ -1174,6 +1177,15 @@ void CMainWindow::EnsureNewLineAtEnd(const CDocument& doc)
 
 bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
 {
+    struct task_mem_deleter
+    {
+        void operator()(wchar_t buf[])
+        {
+            if (buf != nullptr)
+                CoTaskMemFree(buf);
+        }
+    };
+
     int docID = m_TabBar.GetCurrentTabId();
     if (docID < 0)
         return false;
@@ -1239,6 +1251,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
         if (CAppUtils::FailedShowMessage(hr))
             return false;
+        std::unique_ptr<wchar_t[], task_mem_deleter> path(pszPath);
         doc.m_path = pszPath;
         CMRU::Instance().AddPath(doc.m_path);
         if (m_fileTree.GetPath().empty())
@@ -1415,7 +1428,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     }
 }
 
-bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool closingAll )
+bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool leaveEmptyTab )
 {
     if ((tab < 0) || (tab >= m_TabBar.GetItemCount()))
         return false;
@@ -1446,8 +1459,14 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool closingAll )
         }
         // Will Close
     }
+    // REVIEW: This seems neccessary?
+    else
+        m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
 
-    if ((m_TabBar.GetItemCount() == 1)&&(m_editor.Call(SCI_GETTEXTLENGTH)==0)&&(m_editor.Call(SCI_GETMODIFY)==0)&&doc.m_path.empty())
+    if (leaveEmptyTab && (m_TabBar.GetItemCount() == 1) &&
+        (m_editor.Call(SCI_GETTEXTLENGTH)==0) &&
+        (m_editor.Call(SCI_GETMODIFY)==0) &&
+        doc.m_path.empty())
         return true;  // leave the empty, new document as is
 
     CCommandHandler::Instance().OnDocumentClose(tab);
@@ -1457,7 +1476,7 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool closingAll )
     int docId = m_TabBar.GetIDFromIndex(tab);
     m_TabBar.DeleteItemAt(tab);
     m_DocManager.RemoveDocument(docId);
-    if (!closingAll)
+    if (leaveEmptyTab)
     {
         if (m_TabBar.GetItemCount() == 0)
             EnsureAtLeastOneTab();
@@ -1470,7 +1489,7 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool closingAll )
     return true;
 }
 
-bool CMainWindow::CloseAllTabs()
+bool CMainWindow::CloseAllTabs(bool leaveEmptyTab)
 {
     FileTreeBlockRefresh(true);
     OnOutOfScope(FileTreeBlockRefresh(false));
@@ -1481,9 +1500,9 @@ bool CMainWindow::CloseAllTabs()
     OnOutOfScope(docloseall = false;);
     do
     {
-        if (CloseTab(m_TabBar.GetItemCount()-1, false, true) == false)
+        if (CloseTab(m_TabBar.GetItemCount()-1, false, leaveEmptyTab) == false)
             return false;
-        if (m_TabBar.GetItemCount() == 1 &&
+        if (leaveEmptyTab && m_TabBar.GetItemCount() == 1 &&
             m_editor.Call(SCI_GETTEXTLENGTH) == 0 &&
             m_editor.Call(SCI_GETMODIFY) == 0 &&
             m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0)).m_path.empty())
@@ -1987,9 +2006,8 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
     // Short form or long form html color e.g. #F0F or #FF00FF
     if (sWord[0] == '#' && (sWord.size() == 4 || sWord.size() == 7))
     {
-        bool failed = true;
+        bool ok = false;
         COLORREF color = 0;
-        DWORD hexval = 0;
 
         // Note: could use std::stoi family of functions but they throw
         // range exceptions etc. and VC reports those in the debugger output
@@ -1999,49 +2017,17 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
         std::string strNum = sWord.substr(1); // Drop #
         if (strNum.size() == 3) // short form .e.g. F0F
         {
-            BYTE rgb[3]; // [0]=red, [1]=green, [2]=blue
-            failed = false;
-            char dig[2];
-            dig[1] = '\0';
-            for (int i = 0; i < 3; ++i)
-            {
-                dig[0] = strNum[i];
-                BYTE& v = rgb[i];
-                char* ep = nullptr;
-                errno = 0;
-                // Must convert all digits of string.
-                v = (BYTE) strtoul(dig, &ep, 16);
-                if (errno == 0 && ep == &dig[1])
-                    v = v * 16 + v;
-                else
-                {
-                    v = 0;
-                    failed = true;
-                }
-            }
-            if (!failed)
-            {
-                color = RGB(rgb[0], rgb[1], rgb[2]);
-                hexval = (RGB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF)) | (color & 0xFF000000);
-            }
+            ok = CAppUtils::ShortHexStringToCOLORREF(strNum, &color);
         }
         else if (strNum.size() == 6) // normal/long form, e.g. FF00FF
         {
-            char* ep = nullptr;
-            failed = false;
-            errno = 0;
-            hexval = strtoul(strNum.c_str(), &ep, 16);
-            // Must convert all digits of string.
-            if (errno == 0 && ep == &strNum[6] )
-                color = (RGB((hexval >> 16) & 0xFF, (hexval >> 8) & 0xFF, hexval & 0xFF)) | (hexval & 0xFF000000);
-            else
-                failed = true;
+            ok = CAppUtils::HexStringToCOLORREF(strNum, &color);
         }
-        if (!failed)
+        if (ok)
         {
             std::string sCallTip = CStringUtils::Format(
                 "RGB(%d,%d,%d)\nHex: #%06lX\n####################\n####################\n####################",
-                GetRValue(color), GetGValue(color), GetBValue(color), hexval);
+                GetRValue(color), GetGValue(color), GetBValue(color), (DWORD) color);
             m_editor.Call(SCI_CALLTIPSETFOREHLT, color);
             m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)sCallTip.c_str());
             size_t pos = sCallTip.find_first_of('\n');
@@ -2054,17 +2040,15 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
         // Assume a number format determined by the string itself
         // and as recognized as a valid format according to strtoll:
         // e.g. 0xF0F hex == 3855 decimal == 07417 octal.
-        // Use long long to yield more conversion range than say just long.
-        long long number = 0;
+        // Use long long to yield more conversion range than say just long.        
         char* ep = nullptr;
         // 0 base means determine base from any format in the string.
         errno = 0;
-        number = strtoll(sWord.c_str(), &ep, 0);
+        long long number = strtoll(sWord.c_str(), &ep, 0);
         // Be forgiving if given 100xyz, show 100, but
         // don't accept xyz100, show nothing.
         // BTW: errno seems to be 0 even if nothing is converted.
         // Must convert some digits of string.
-
         if (errno == 0 && ep != &sWord[0])
         {
             std::string bs = to_bit_string(number,true);
@@ -2341,6 +2325,8 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.SetupLexerForLang(doc.m_language);
     m_editor.RestoreCurrentPos(doc.m_position);
     m_editor.SetTabSettings();
+    // REVIEW: SetupLexerForLang above calls SetDefaultStyles which calls Call(SCI_SETCODEPAGE, CP_UTF8)
+    // and that destroy the bookmark locations so call mark bookarks first.
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc);
     m_DocManager.SetDocument(docID, doc);
     m_editor.MarkSelectedWord(true);
@@ -2367,9 +2353,71 @@ void CMainWindow::HandleTabDelete(const TBHDR& tbhdr)
     CloseTab(tabToDelete);
 }
 
-bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
+// Note A: (relates to 'Note A' in the function below):
+// We've loaded a new document, now we'd like to activate it.
+// ActivateAt will cause a TCN_CHANGING and then a TCN_CHANGE
+// event to occur. The change will save the current documents
+// cursor position and whatever else it wants to do, then the
+// TCN_CHANGE event will fire and that will make the document
+// we just loaded current.
+// (note commands react (and need to) to both of these events
+// so being aware of their expectations is important and tricky.
+
+// If we call m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document)
+// before activate, we will in effect make the just loaded document
+// current and the TCN_CHANGING event will act on the new document
+// instead of the current document (thereby saving the new
+// documents cursor position as if it were the current document's,
+// etc. thereby losing the cursor position and other badness;
+// the TCN_CHANGE event will then install the new document as
+// active for the second time, possibly creating excess references.
+
+// Letting ActivateAt manage the setting of the new document,
+// at least for now but probably for ever, avoids these issues.
+// Calling m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document) ourselves
+// before ActivateAt causes the issues.
+
+// However the issue is complicated by the fact that (it seems)
+// we may not always be be able to activate the newly loaded document
+// (see existing comment a bit further below).
+// But if we don't activate the document we violate the callers expectations
+// that the newly loaded document will be made active, not just loaded.
+// I've added an else path to keep the code the same as before in this case
+// so things are no worse than before, but I think this still incorrect.
+// Another issue is that the IsWindowEnabled is probably not enough of a
+// test either, and possibly isn't applied rigorously enough in any case
+// (see above comment at top of function).
+
+// All in all this all indicates some further thought and restructuring is
+// required around this area and these issues; and a lot more testing.
+// I don't have time to do all that right now so this comment is a
+// reminder of the issues until then.
+// I suspect if we can't load a document and call ActivateAt to make it
+// active, we should return a false / "not now" status, but that's for
+// future analysis to confirm.
+
+// The actual change made in this commit at least fixes the cursor problem
+// at hand and probably some other issues by implication; but it is limited
+// to addressing just that for now and documenting the issues for later.
+// I don't want subsequent changes to lose simple change in this commit
+// and the reason for it.
+
+// Note B:
+// only activate the new doc tab if the main window is enabled:
+// if it's disabled, a modal dialog is shown
+// (e.g., the handle-outside-modifications confirmation dialog)
+// and we then must not change the active tab.
+
+// Note C:
+// only activate the new doc tab if the main window is enabled:
+// if it's disabled, a modal dialog is shown
+// (e.g., the handle-outside-modifications confirmation dialog)
+// and we then must not change the active tab.
+
+
+int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
 {
-    bool bRet = true;
+    int index = -1;
     bool bAddToMRU = (openFlags & OpenFlags::AddToMRU) != 0;
     bool bAskToCreateIfMissing = (openFlags & OpenFlags::AskToCreateIfMissing) != 0;
     bool bCreateIfMissing = (openFlags & OpenFlags::CreateIfMissing) != 0;
@@ -2392,7 +2440,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         if (lang.empty())
             lang = L"Text";
         doc.m_language = lang;
-        auto index = m_TabBar.InsertAtEnd(fileName.c_str());
+        index = m_TabBar.InsertAtEnd(fileName.c_str());
         int docID = m_TabBar.GetIDFromIndex(index);
         m_DocManager.AddDocumentAtEnd(doc, docID);
         UpdateTab(docID);
@@ -2402,7 +2450,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         m_editor.GotoLine(0);
         CCommandHandler::Instance().OnDocumentOpen(index);
 
-        return index >= 0;
+        return index;
     }
 
     // if we're opening the first file, we have to activate it
@@ -2423,15 +2471,11 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     int id = m_DocManager.GetIdForPath(filepath.c_str());
     if (id != -1)
     {
+        index = m_TabBar.GetIndexFromID(id);
         // document already open.
         if (IsWindowEnabled(*this) && bActivate)
         {
-            // only activate the new doc tab if the main window is enabled:
-            // if it's disabled, a modal dialog is shown
-            // (e.g., the handle-outside-modifications confirmation dialog)
-            // and we then must not change the active tab.
-
-            int index = m_TabBar.GetIndexFromID(id);
+            // See Note C above.
             m_TabBar.ActivateAt(index);
         }
     }
@@ -2488,7 +2532,6 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             if (bAddToMRU)
                 CMRU::Instance().AddPath(filepath);
             std::wstring sFileName = CPathUtils::GetFileName(filepath);
-            int index = -1;
             if (activetabid < 0)
             {
                 if (m_insertionIndex >= 0)
@@ -2517,67 +2560,20 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 }
             }
             m_DocManager.AddDocumentAtEnd(doc, id);
-
-            // We've loaded a new document, now we'd like to activate it.
-            // ActivateAt will cause a TCN_CHANGING and then a TCN_CHANGE
-            // event to occur. The change will save the current documents
-            // cursor position and whatever else it wants to do, then the
-            // TCN_CHANGE event will fire and that will make the document
-            // we just loaded current.
-            // (note commands react (and need to) to both of these events
-            // so being aware of their expectations is important and tricky.
-
-            // If we call m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document)
-            // before activate, we will in effect make the just loaded document
-            // current and the TCN_CHANGING event will act on the new document
-            // instead of the current document (thereby saving the new
-            // documents cursor position as if it were the current document's,
-            // etc. thereby losing the cursor position and other badness;
-            // the TCN_CHANGE event will then install the new document as
-            // active for the second time, possibly creating excess references.
-
-            // Letting ActivateAt manage the setting of the new document,
-            // at least for now but probably for ever, avoids these issues.
-            // Calling m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document) ourselves
-            // before ActivateAt causes the issues.
-
-            // However the issue is complicated by the fact that (it seems)
-            // we may not always be be able to activate the newly loaded document
-            // (see existing comment a bit further below).
-            // But if we don't activate the document we violate the callers expectations
-            // that the newly loaded document will be made active, not just loaded.
-            // I've added an else path to keep the code the same as before in this case
-            // so things are no worse than before, but I think this still incorrect.
-            // Another issue is that the IsWindowEnabled is probably not enough of a
-            // test either, and possibly isn't applied rigorously enough in any case
-            // (see above comment at top of function).
-
-            // All in all this all indicates some further thought and restructuring is
-            // required around this area and these issues; and a lot more testing.
-            // I don't have time to do all that right now so this comment is a
-            // reminder of the issues until then.
-            // I suspect if we can't load a document and call ActivateAt to make it
-            // active, we should return a false / "not now" status, but that's for
-            // future analysis to confirm.
-
-            // The actual change made in this commit at least fixes the cursor problem
-            // at hand and probably some other issues by implication; but it is limited
-            // to addressing just that for now and documenting the issues for later.
-            // I don't want subsequent changes to lose simple change in this commit
-            // and the reason for it.
+            // See Note A above for comments about this point in the code.
 
             if (IsWindowEnabled(*this))
             {
-                // only activate the new doc tab if the main window is enabled:
-                // if it's disabled, a modal dialog is shown
-                // (e.g., the handle-outside-modifications confirmation dialog)
-                // and we then must not change the active tab.
+                // See Note B above for commentsabout this point in the code.
                 bool bResize = m_fileTree.GetPath().empty() && !doc.m_path.empty();
                 if (bActivate)
                 {
                     m_TabBar.ActivateAt(index);
                     m_editor.SetupLexerForLang(doc.m_language);
                 }
+                // REVIEW: Seems this is neccessary?
+                else
+                    m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
                 if (bResize)
                     ResizeChildWindows();
             }
@@ -2595,11 +2591,10 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         else
         {
             CMRU::Instance().RemovePath(filepath, false);
-            bRet = false;
         }
     }
     m_insertionIndex = -1;
-    return bRet;
+    return index;
 }
 
 // TODO: consider continuing merging process,
@@ -2607,7 +2602,7 @@ bool CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
 bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& realpath, bool bModified )
 {
     // If we can't open it, not much we can do.
-    if (!OpenFile(temppath, 0))
+    if (OpenFile(temppath, 0)<0)
     {
         DeleteFile(temppath.c_str());
         return false;
@@ -2691,7 +2686,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
             m_fileTree.SetPath(path);
             ShowFileTree(true);
         }
-        else if (OpenFile(path, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
+        else if (OpenFile(path, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing) >= 0)
         {
             if (parser.HasVal(L"line"))
             {
@@ -2721,7 +2716,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
                     m_fileTree.SetPath(szArglist[i]);
                     ShowFileTree(true);
                 }
-                else if (OpenFile(szArglist[i], OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing))
+                else if (OpenFile(szArglist[i], OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing) >= 0)
                     ++filesOpened;
             }
         }
@@ -2824,6 +2819,42 @@ bool CMainWindow::HandleCopyDataMoveTab(const COPYDATASTRUCT& cds)
     return opened;
 }
 
+static bool AskToCopyOrMoveFile(HWND hWnd, const std::wstring& filename, const std::wstring& hitpath, bool bCopy)
+{
+    ResString rTitle(hRes, IDS_FILE_DROP);
+    ResString rQuestion(hRes, bCopy ? IDS_FILE_DROP_COPY : IDS_FILE_DROP_MOVE);
+    ResString rDoit(hRes, bCopy ? IDS_FILE_DROP_DOCOPY : IDS_FILE_DROP_DOMOVE);
+    ResString rCancel(hRes, IDS_FILE_DROP_CANCEL);
+    // Show exactly what we are creating.
+    std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str(), hitpath.c_str());
+
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    TASKDIALOG_BUTTON aCustomButtons[2];
+    int bi = 0;
+    aCustomButtons[bi].nButtonID = 101;
+    aCustomButtons[bi++].pszButtonText = rDoit;
+    aCustomButtons[bi].nButtonID = 100;
+    aCustomButtons[bi++].pszButtonText = rCancel;
+    tdc.pButtons = aCustomButtons;
+    tdc.cButtons = bi;
+    assert(tdc.cButtons <= _countof(aCustomButtons));
+    tdc.nDefaultButton = 101;
+
+    tdc.hwndParent = hWnd;
+    tdc.hInstance = hRes;
+    tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+    tdc.pszMainIcon = TD_INFORMATION_ICON;
+    tdc.pszMainInstruction = rTitle;
+    tdc.pszContent = sQuestion.c_str();
+    int nClickedBtn = 0;
+    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
+    if (CAppUtils::FailedShowMessage(hr))
+        nClickedBtn = 0;
+    bool bDoIt = (nClickedBtn == 101);
+    return bDoIt;
+}
+
 void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
 {
     // Start a new instance of BowPad with this dropped tab, or add this tab to
@@ -2892,42 +2923,8 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
 
                 if (CPathUtils::PathCompare(doc.m_path, destpath))
                 {
-                    // ask whether to copy/move the file
                     bool bCopy = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-
-                    ResString rTitle(hRes, IDS_FILE_DROP);
-                    ResString rQuestion(hRes, bCopy ? IDS_FILE_DROP_COPY : IDS_FILE_DROP_MOVE);
-                    ResString rDoit(hRes, bCopy ? IDS_FILE_DROP_DOCOPY : IDS_FILE_DROP_DOMOVE);
-                    ResString rCancel(hRes, IDS_FILE_DROP_CANCEL);
-                    // Show exactly what we are creating.
-                    std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str(), hitpath.c_str());
-
-                    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-                    TASKDIALOG_BUTTON aCustomButtons[2];
-                    int bi = 0;
-                    aCustomButtons[bi].nButtonID = 101;
-                    aCustomButtons[bi++].pszButtonText = rDoit;
-                    aCustomButtons[bi].nButtonID = 100;
-                    aCustomButtons[bi++].pszButtonText = rCancel;
-                    tdc.pButtons = aCustomButtons;
-                    tdc.cButtons = bi;
-                    assert(tdc.cButtons <= _countof(aCustomButtons));
-                    tdc.nDefaultButton = 101;
-
-                    tdc.hwndParent = *this;
-                    tdc.hInstance = hRes;
-                    tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-                    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-                    tdc.pszMainIcon = TD_INFORMATION_ICON;
-                    tdc.pszMainInstruction = rTitle;
-                    tdc.pszContent = sQuestion.c_str();
-                    int nClickedBtn = 0;
-                    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
-                    if (CAppUtils::FailedShowMessage(hr))
-                        nClickedBtn = 0;
-                    bool bDoIt = (nClickedBtn == 101);
-
-                    if (bDoIt)
+                    if (AskToCopyOrMoveFile(*this, filename, destpath, bCopy))
                     {
                         if (bCopy)
                         {

@@ -25,7 +25,7 @@ class LaunchBase : public ICommand
 {
 public:
     LaunchBase(void * obj) : ICommand(obj) {}
-    virtual ~LaunchBase(void) {}
+    virtual ~LaunchBase() {}
 
 protected:
     bool Launch(const std::wstring& cmdline);
@@ -105,7 +105,7 @@ class CCmdLaunchConsole : public LaunchBase
 {
 public:
     CCmdLaunchConsole(void * obj) : LaunchBase(obj) {}
-    ~CCmdLaunchConsole(void) {}
+    ~CCmdLaunchConsole() {}
 
     bool Execute() override
     {
@@ -121,7 +121,7 @@ class CCmdLaunchExplorer : public LaunchBase
 {
 public:
     CCmdLaunchExplorer(void * obj) : LaunchBase(obj) {}
-    ~CCmdLaunchExplorer(void) {}
+    ~CCmdLaunchExplorer() {}
 
     bool Execute() override { return Launch(L"explorer \"$(TAB_DIR)\""); }
     UINT GetCmdId() override { return cmdLaunchExplorer; }
@@ -131,7 +131,7 @@ class CCmdLaunchCustom : public LaunchBase
 {
 public:
     CCmdLaunchCustom(UINT customId, void * obj);
-    ~CCmdLaunchCustom(void) {}
+    ~CCmdLaunchCustom() {}
 
     bool Execute() override { return Launch(CIniSettings::Instance().GetString(L"CustomLaunch", m_settingsID.c_str(), L"")); }
     UINT GetCmdId() override { return m_customCmdId; }
@@ -148,7 +148,7 @@ class CCustomCommandsDlg : public CDialog
 {
 public:
     CCustomCommandsDlg();
-    ~CCustomCommandsDlg(void);
+    ~CCustomCommandsDlg();
 
 protected:
     LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -162,7 +162,7 @@ class CCmdCustomCommands : public ICommand
 {
 public:
     CCmdCustomCommands(void * obj) : ICommand(obj) {}
-    ~CCmdCustomCommands(void) {}
+    ~CCmdCustomCommands() {}
 
     virtual bool Execute() override;
     virtual UINT GetCmdId() override { return cmdCustomCommands; }

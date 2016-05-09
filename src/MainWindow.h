@@ -73,15 +73,15 @@ public:
     bool                CreateRibbon();
 
     // Load/Reload functions
-    bool                OpenFile(const std::wstring& file, unsigned int openFlags);
+    int                 OpenFile(const std::wstring& file, unsigned int openFlags);
     bool                OpenFileAs( const std::wstring& temppath, const std::wstring& realpath, bool bModified );
     bool                ReloadTab(int tab, int encoding, bool dueToOutsideChanges = false);
 
     bool                SaveCurrentTab(bool bSaveAs = false);
     void                EnsureAtLeastOneTab();
     void                GoToLine(size_t line);
-    bool                CloseTab(int tab, bool force = false, bool closingAll = false);
-    bool                CloseAllTabs();
+    bool                CloseTab(int tab, bool force = false, bool leaveEmptyTab = true);
+    bool                CloseAllTabs(bool leaveEmptyTab = true);
     void                SetFileToOpen(const std::wstring& path, size_t line = (size_t)-1) { m_pathsToOpen[path] = line; }
     void                SetFileOpenMRU(bool bUseMRU) { m_bPathsToOpenMRU = bUseMRU; }
     void                SetElevatedSave(const std::wstring& path, const std::wstring& savepath, long line) { m_elevatepath = path; m_elevatesavepath = savepath; m_initLine = line; }

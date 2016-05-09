@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -320,14 +320,18 @@ void CMRU::Load()
         if (!File.good())
             return;
 
-        const int maxlinelength = 65535;
+        const int maxlinelength = 1024;
+        wchar_t line[maxlinelength + 1];
 
-        auto line = std::make_unique<wchar_t[]>(maxlinelength);
-        do
+        std::wstring sLine;
+        for (;;)
         {
-            File.getline(line.get(), maxlinelength);
-
-            std::wstring sLine = line.get();
+            File.getline(line, maxlinelength);
+            if (File.gcount() <= 0)
+                break;
+            sLine = line;
+            // Line format is : x*filename
+            // Where x can be '0' (unpinned) or '1' (pinned)
             size_t pos = sLine.find(L'*');
             if (pos != std::wstring::npos)
             {
@@ -336,14 +340,14 @@ void CMRU::Load()
                 bool pinned = (sPinned == L"1");
                 m_mruVec.push_back(MRUItem(sPath, pinned));
             }
-        } while (File.gcount() > 0);
+        }
         File.close();
     }
-    catch (std::ios_base::failure &)
+    catch (const std::ios_base::failure &)
     {
         return;
     }
-    catch (std::exception&)
+    catch (const std::exception&)
     {
         return;
     }

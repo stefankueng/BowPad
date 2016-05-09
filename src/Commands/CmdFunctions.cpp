@@ -25,6 +25,7 @@
 #include "AppUtils.h"
 #include "OnOutOfScope.h"
 
+#include <string>
 #include <vector>
 #include <algorithm>
 
@@ -180,10 +181,10 @@ bool ParseName(const std::wstring& sig, std::wstring& name)
 }
 
 bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf,
-    std::string& foundText, long* lineNum)
+    std::string& foundText, int* lineNum)
 {
     foundText.clear();
-    *lineNum = 0L;
+    *lineNum = 0;
     // FIXME! In debug mode, regex takes a *long* time.
     auto findRet = edit.Call(SCI_FINDTEXT, SCFIND_REGEXP, (sptr_t)&ttf);
     if (findRet < 0)
@@ -199,7 +200,7 @@ bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf,
         c = (char)edit.Call(SCI_GETCHARAT, cpmin);
     }
     foundText = edit.GetTextRange(cpmin, ttf.chrgText.cpMax);
-    *lineNum = (long) edit.Call(SCI_LINEFROMPOSITION, cpmin);
+    *lineNum = (int) edit.Call(SCI_LINEFROMPOSITION, cpmin);
     return true;
 }
 
@@ -313,27 +314,24 @@ HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     if (docId < 0)
         return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
 
-    auto functionData = FindFunctionsNow();
-    if (functionData.functions.empty())
+    auto functions = FindFunctionsNow();
+    if (functions.empty())
         return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
 
     // Populate the dropdown with the function details.
-    for (const auto& func : functionData.functions)
+    for (const auto& func : functions)
     {
-        for (const auto& funcInfo : func.second)
+        hr = CAppUtils::AddStringItem(collection, func.displayName.c_str());
+        // If we fail to add a function, give up and assume
+        // no others adds will work though try to hint at that.
+        // Logically though, that might well not work either.
+        if (CAppUtils::FailedShowMessage(hr))
         {
-            hr = CAppUtils::AddStringItem(collection, funcInfo.displayName.c_str());
-            // If we fail to add a function, give up and assume
-            // no others adds will work though try to hint at that.
-            // Logically though, that might well not work either.
-            if (CAppUtils::FailedShowMessage(hr))
-            {
-                HRESULT hrMissingHint = CAppUtils::AddStringItem(collection, L"...");
-                CAppUtils::FailedShowMessage(hrMissingHint);
-                return S_OK;
-            }
-            m_menuData.push_back(funcInfo.lineNum);
+            HRESULT hrMissingHint = CAppUtils::AddStringItem(collection, L"...");
+            CAppUtils::FailedShowMessage(hrMissingHint);
+            return S_OK;
         }
+        m_menuData.push_back(func.lineNum);
     }
 
     return S_OK;
@@ -544,7 +542,8 @@ bool CCmdFunctions::FindAllFunctionsInternal()
             m_edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
             m_edit.Call(SCI_CLEARALL);
             m_edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-            m_edit.Call(SCI_SETCODEPAGE, CP_UTF8);
+            // REVIEW: why necessary?
+            //m_edit.Call(SCI_SETCODEPAGE, CP_UTF8);
 
             m_ttf = {};
             break;
@@ -561,7 +560,7 @@ bool CCmdFunctions::FindAllFunctionsInternal()
     }
 
     std::string textFound;
-    long lineNum;
+    int lineNum;
     std::wstring sig;
     std::wstring name;
     bool addedToLexer = false;
@@ -611,10 +610,9 @@ bool CCmdFunctions::FindAllFunctionsInternal()
     return (tbc || !m_events.empty());
 }
 
-FunctionData CCmdFunctions::FindFunctionsNow() const
+std::vector<FunctionInfo> CCmdFunctions::FindFunctionsNow() const
 {
-    FunctionData functions;
-    functions.status = FunctionDataStatus::Ready;
+    std::vector<FunctionInfo> functions;
     if (!HasActiveDocument())
         return functions;
 
@@ -627,10 +625,22 @@ FunctionData CCmdFunctions::FindFunctionsNow() const
     {
         bool parsed = ParseSignature(sig, name, nameAndArgs);
         if (parsed)
-            functions.functions[name].push_back({ lineNum, std::move(nameAndArgs) });
+            functions.push_back({ lineNum, std::move(name), std::move(nameAndArgs) });
         return true;
     };
     FindFunctions(doc, f);
+    // Sort by name then line number.
+    std::sort(functions.begin(), functions.end(),
+        [](const FunctionInfo& lhs, const FunctionInfo& rhs)
+    {
+        int result = _wcsicmp(lhs.sortName.c_str(), rhs.sortName.c_str());
+        if (result == 0)
+        {
+            return lhs.lineNum < rhs.lineNum;
+        }
+        return result < 0;
+    }
+    );
 
     return functions;
 }
@@ -654,15 +664,16 @@ void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const
     OnOutOfScope(
         edit.Call(SCI_SETDOCPOINTER, 0, 0);
     );
-    edit.Call(SCI_SETCODEPAGE, CP_UTF8);
+    // REVIEW: neccessary?
+    //edit.Call(SCI_SETCODEPAGE, CP_UTF8);
 
     auto trimtokens = CLexStyles::Instance().GetFunctionRegexTrimForLang(docLang);
     std::vector<std::wstring> wtrimtokens;
     for (const auto& token : trimtokens)
         wtrimtokens.push_back(CUnicodeUtils::StdGetUnicode(token));
 
+    int lineNum;
     std::string textFound;
-    long lineNum;
     std::wstring sig;
 
     Scintilla::Sci_TextToFind ttf = {};
@@ -702,6 +713,7 @@ void CCmdFunctions::InvalidateFunctionsEnabled()
     CAppUtils::FailedShowMessage(hr);
 }
 
+#if 0
 bool CCmdFunctions::GotoSymbol(const std::wstring& symbolName)
 {
     bool done = false;
@@ -721,7 +733,7 @@ bool CCmdFunctions::GotoSymbol(const std::wstring& symbolName)
             // instead of automatically picking the first one.
             if (parsed && _wcsicmp(name.c_str(), symbolName.c_str()) == 0)
             {
-                if (!OpenFile(doc.m_path.c_str(), 0))
+                if (OpenFile(doc.m_path.c_str(), 0)<0)
                     return false;
                 GotoLine(lineNum);
                 done = true;
@@ -738,3 +750,4 @@ bool CCmdFunctions::GotoSymbol(const std::wstring& symbolName)
 
     return done;
 }
+#endif

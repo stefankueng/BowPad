@@ -175,10 +175,40 @@ HWND ICommand::GetScintillaWnd() const
     return pMainWnd->m_editor;
 }
 
-bool ICommand::OpenFile(LPCWSTR file, unsigned int openFlags)
+int ICommand::OpenFile(LPCWSTR file, unsigned int openFlags)
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->OpenFile(file, openFlags);
+}
+
+void ICommand::OpenFiles(const std::vector<std::wstring>& paths)
+{
+    if (paths.size() == 1)
+    {
+        if (!paths[0].empty())
+        {
+            unsigned int openFlags = OpenFlags::AddToMRU;
+            if ((GetKeyState(VK_CONTROL) & 0x8000) != 0)
+                openFlags |= OpenFlags::OpenIntoActiveTab;
+            OpenFile(paths[0].c_str(), openFlags);
+        }
+    }
+    else
+    {
+        // Open all that was selected or at least returned.
+        int docToActivate = -1;
+        for (const auto& file : paths)
+        {
+            // Remember whatever we last successfully opened in order to activate it last.
+            if (OpenFile(file.c_str(), OpenFlags::AddToMRU | OpenFlags::NoActivate) >= 0)
+                docToActivate = GetDocIDFromPath(file.c_str());
+        }
+        if (docToActivate >= 0)
+        {
+            auto tabToActivate = GetTabIndexFromDocID(docToActivate);
+            TabActivateAt(tabToActivate);
+        }
+    }
 }
 
 bool ICommand::ReloadTab( int tab, int encoding )

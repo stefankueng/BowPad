@@ -102,36 +102,36 @@ void CCmdSessionLoad::RestoreSavedSession()
     OnOutOfScope(FileTreeBlockRefresh(false));
     auto& settings = CIniSettings::Instance();
     const unsigned int openflags = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
-    for (int i = 0; i < BP_MAX_SESSION_SIZE; ++i)
+    for (int fileNum = 0; fileNum < BP_MAX_SESSION_SIZE; ++fileNum)
     {
-        std::wstring key = CStringUtils::Format(L"path%d", i);
+        std::wstring key = CStringUtils::Format(L"path%d", fileNum);
         std::wstring path = settings.GetString(g_sessionSection, key.c_str(), L"");
         if (path.empty())
             break;
-        if (OpenFile(path.c_str(), openflags))
+        int tabIndex = OpenFile(path.c_str(), openflags);
+        if (tabIndex < 0)
+            continue;
+        auto docId = GetDocIDFromPath(path.c_str());
+        if (docId >= 0)
         {
-            auto docId = GetDocIDFromPath(path.c_str());
-            if (docId >= 0)
+            CDocument doc = GetDocumentFromID(docId);
+            auto& pos = doc.m_position;
+            pos.m_nSelMode           = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"selmode%d", fileNum).c_str(), 0);
+            pos.m_nStartPos          = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"startpos%d", fileNum).c_str(), 0);
+            pos.m_nEndPos            = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"endpos%d", fileNum).c_str(), 0);
+            pos.m_nScrollWidth       = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"scrollwidth%d", fileNum).c_str(), 0);
+            pos.m_xOffset            = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", fileNum).c_str(), 0);
+            pos.m_nFirstVisibleLine  = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
+            if ((int)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", fileNum).c_str(), 0))
             {
-                CDocument doc = GetDocumentFromID(docId);
-                auto& pos = doc.m_position;
-                pos.m_nSelMode           = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"selmode%d", i).c_str(), 0);
-                pos.m_nStartPos          = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"startpos%d", i).c_str(), 0);
-                pos.m_nEndPos            = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"endpos%d", i).c_str(), 0);
-                pos.m_nScrollWidth       = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"scrollwidth%d", i).c_str(), 0);
-                pos.m_xOffset            = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", i).c_str(), 0);
-                pos.m_nFirstVisibleLine  = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", i).c_str(), 0);
-                if ((int)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", i).c_str(), 0))
-                {
-                    // Don't use the index to track the active tab, as it's probably
-                    // not safe long term to assume the index where a tab was loaded
-                    // remains the same after other files load.
-                    activeDoc = docId;
-                    if (docId == GetDocIDFromTabIndex(GetActiveTabIndex()))
-                        RestoreCurrentPos(pos);
-                }
-                SetDocument(docId, doc);
+                // Don't use the index to track the active tab, as it's probably
+                // not safe long term to assume the index where a tab was loaded
+                // remains the same after other files load.
+                activeDoc = docId;
+                if (docId == GetDocIDFromTabIndex(GetActiveTabIndex()))
+                    RestoreCurrentPos(pos);
             }
+            SetDocument(docId, doc);
         }
     }
     if (activeDoc >= 0)

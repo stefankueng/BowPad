@@ -37,7 +37,9 @@ public:
     static bool                     FailedShowMessage(HRESULT hr);
     static bool                     ShowDropDownList(HWND hWnd, LPCWSTR ctrlName);
     static HRESULT                  CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg );
-    static bool                     HexStringToCOLORREF(const wchar_t* s, COLORREF* clr);
+    static bool                     HexStringToCOLORREF(const std::string& s, COLORREF* clr);
+    static bool                     HexStringToCOLORREF(const std::wstring& s, COLORREF* clr);
+    static bool                     ShortHexStringToCOLORREF(const std::string& s, COLORREF* clr);
     static bool                     TryParse(const wchar_t* s, int& result, bool emptyOk = false, int def = 0);
     static std::wstring             GetProgramFilesX86Folder();
 private:
