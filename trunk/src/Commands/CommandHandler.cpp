@@ -384,7 +384,7 @@ void CCommandHandler::InsertPlugins(void * obj)
                     CKeyboardShortcutHandler::Instance().AddCommand(sName, pluginCmd);
                 }
             }
-            catch (std::exception& e)
+            catch (const std::exception& e)
             {
                 // TODO: create a method in CAppUtils that shows the exception
                 if (CIniSettings::Instance().GetInt64(L"Debug", L"usemessagebox", 0))

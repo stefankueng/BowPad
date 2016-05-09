@@ -45,13 +45,13 @@ namespace
 
 }
 
-CKeyboardShortcutHandler::CKeyboardShortcutHandler(void)
+CKeyboardShortcutHandler::CKeyboardShortcutHandler()
     : m_bLoaded(false)
     , m_lastKey(0)
 {
 }
 
-CKeyboardShortcutHandler::~CKeyboardShortcutHandler(void)
+CKeyboardShortcutHandler::~CKeyboardShortcutHandler()
 {
 }
 
