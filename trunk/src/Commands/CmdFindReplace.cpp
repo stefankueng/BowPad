@@ -838,24 +838,6 @@ LRESULT CFindReplaceDlg::DrawListItem(NMLVCUSTOMDRAW* pLVCD)
     switch (pLVCD->nmcd.dwDrawStage)
     {
         case CDDS_PREPAINT:
-            // NOTE/Review:
-            pLVCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
-            // clrText is set above to work around this issue:
-            // When the list box is filled with a bunch of items, if one double clicks
-            // the last columns headers sizer to effect a size to content action,
-            // and then one does that a second time, the listview displays a strange color
-            // and doesn't repaint properly briefly.
-            // If you look carefully you will see the font has turned "bold" like
-            // but if one mouses over the listview a strange slow re-paint occurs, but not in bold.
-            // I don't understand what's going on./ It seems that it might be required to set the
-            // color or font the right time. But when?
-            // The setting of the color above fixes the strange color issue described above,
-            // but does not fix the bold issue.
-            // Returning CDRF_NEWFONT at some stage may help and DrawThemeText and GetThemeFont
-            // might be relevant here too, but I haven't attempted that.
-            // Read more here:
-            // https://msdn.microsoft.com/en-us/library/windows/desktop/ff919569(v=vs.85).aspx
-            // Removing the pLVCD->clrText = xxx statement above will demonstrate the issues described.
             return CDRF_NOTIFYITEMDRAW;
         case CDDS_ITEMPREPAINT:
             // Tell Windows to send draw notifications for each subitem.
@@ -1085,20 +1067,31 @@ RECT CFindReplaceDlg::DrawListColumnBackground(NMLVCUSTOMDRAW* pLVCD)
     // Fill the background.
     if (IsAppThemed())
     {
-        HTHEME hTheme = OpenThemeData(*this, L"Explorer");
-        int state = LISS_NORMAL;
+        auto brush = ::GetSysColorBrush(COLOR_WINDOW);
+        if (brush == nullptr)
+            return rect;
+
+        ::FillRect(pLVCD->nmcd.hdc, &rect, brush);
+        ::DeleteObject(brush);
+
+        HTHEME hTheme = OpenThemeData(*this, L"Explorer::ListView");
+        int state = pLVCD->nmcd.uItemState & CDIS_HOT ? LISS_HOT : LISS_NORMAL;
         if ((rItem.state & LVIS_SELECTED) != 0)
         {
             if (::GetFocus() == hListControl)
-                state = LISS_SELECTED;
+                state = pLVCD->nmcd.uItemState & CDIS_HOT ? LISS_HOTSELECTED : LISS_SELECTED;
             else
                 state = LISS_SELECTEDNOTFOCUS;
         }
-
         if (IsThemeBackgroundPartiallyTransparent(hTheme, LVP_LISTDETAIL, state))
             DrawThemeParentBackground(*this, pLVCD->nmcd.hdc, &rect);
-
-        DrawThemeBackground(hTheme, pLVCD->nmcd.hdc, LVP_LISTDETAIL, state, &rect, nullptr);
+        // don't draw the background if state is normal:
+        // it would draw a border around the item/subitem, which is *not* how the
+        // item should look!
+        if (state != LISS_NORMAL)
+        {
+            DrawThemeBackground(hTheme, pLVCD->nmcd.hdc, LVP_LISTITEM, state, &rect, nullptr);
+        }
         CloseThemeData(hTheme);
     }
     else
