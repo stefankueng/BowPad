@@ -1030,8 +1030,6 @@ void CCmdHeaderSource::AttachDocument(CScintillaWnd& edit, CDocument& doc)
     edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
     edit.Call(SCI_CLEARALL);
     edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-    // REVIEW: necessary?
-    //edit.Call(SCI_SETCODEPAGE, CP_UTF8);
 }
 
 bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<RelatedFileItem>& includes) const

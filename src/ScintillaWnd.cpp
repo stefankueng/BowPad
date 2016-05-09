@@ -753,11 +753,6 @@ void CScintillaWnd::SetupDefaultStyles()
     }
     Call(SCI_SETWHITESPACEFORE, true, theme.GetThemeColor(RGB(255, 181, 106)));
     
-    // REVIEW: SETCODEPAGE seems to destroy bookmarks. Removing this call
-    // seems to avoid that problem. The call here may or may not be wrong
-    // so just commented out until the issue is further investigated.
-
-    // Call(SCI_SETCODEPAGE, CP_UTF8);
     Call(SCI_COLOURISE, 0, -1);
 }
 

@@ -2325,8 +2325,6 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.SetupLexerForLang(doc.m_language);
     m_editor.RestoreCurrentPos(doc.m_position);
     m_editor.SetTabSettings();
-    // REVIEW: SetupLexerForLang above calls SetDefaultStyles which calls Call(SCI_SETCODEPAGE, CP_UTF8)
-    // and that destroy the bookmark locations so call mark bookarks first.
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc);
     m_DocManager.SetDocument(docID, doc);
     m_editor.MarkSelectedWord(true);
