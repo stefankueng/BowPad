@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,20 +27,16 @@ public:
     {
     }
 
-    ~CCmdLoadAsEncoded(void)
+    ~CCmdLoadAsEncoded()
     {
     }
 
-    virtual bool Execute() override { return false; }
-    virtual UINT GetCmdId() override { return cmdLoadAsEncoding; }
+    bool Execute() override { return false; }
+    UINT GetCmdId() override { return cmdLoadAsEncoding; }
 
-
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
-
-    virtual HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
-
-    virtual void TabNotify(TBHDR * ptbhdr) override;
-
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
+    void TabNotify(TBHDR * ptbhdr) override;
 };
 
 class CCmdConvertEncoding : public ICommand
@@ -51,18 +47,15 @@ public:
     {
     }
 
-    ~CCmdConvertEncoding(void)
+    ~CCmdConvertEncoding()
     {
     }
 
-    virtual bool Execute() override { return false; }
-    virtual UINT GetCmdId() override { return cmdConvertEncoding; }
+    bool Execute() override { return false; }
+    UINT GetCmdId() override { return cmdConvertEncoding; }
 
-
-    virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
-
-    virtual HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
-
-    virtual void TabNotify(TBHDR * ptbhdr) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
+    void TabNotify(TBHDR * ptbhdr) override;
 
 };

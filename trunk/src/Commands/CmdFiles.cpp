@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,10 +32,9 @@ bool CCmdOpen::Execute()
 {
     PreserveChdir keepCWD;
 
-    std::vector<std::wstring> paths;
-    IFileOpenDialogPtr pfd = NULL;
+    IFileOpenDialogPtr pfd;
 
-    HRESULT hr = pfd.CreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT hr = pfd.CreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
 
@@ -62,8 +61,8 @@ bool CCmdOpen::Execute()
         if (!doc.m_path.empty())
         {
             std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
-            IShellItemPtr psiDefFolder = NULL;
-            hr = SHCreateItemFromParsingName(folder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
+            IShellItemPtr psiDefFolder;
+            hr = SHCreateItemFromParsingName(folder.c_str(), nullptr, IID_PPV_ARGS(&psiDefFolder));
             if (!CAppUtils::FailedShowMessage(hr))
             {
                 // Assume if we can't set the folder we can at least continue
@@ -93,41 +92,36 @@ bool CCmdOpen::Execute()
     // but get as many as we can. We don't report partial failure.
     // We could make it an all or nothing deal but we have chosen not to.
 
+    struct task_mem_deleter
+    {
+        void operator()(wchar_t buf[])
+        {
+            if (buf != nullptr)
+                CoTaskMemFree(buf);
+        }
+    };
+
     DWORD count = 0;
     hr = psiaResults->GetCount(&count);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
+    std::vector<std::wstring> paths;
     for (DWORD i = 0; i < count; ++i)
     {
-        IShellItemPtr psiResult = NULL;
+        IShellItemPtr psiResult;
         hr = psiaResults->GetItemAt(i, &psiResult);
         if (!CAppUtils::FailedShowMessage(hr))
         {
-            PWSTR pszPath = NULL;
+            PWSTR pszPath = nullptr;
             hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
             if (!CAppUtils::FailedShowMessage(hr))
             {
+                std::unique_ptr<wchar_t[], task_mem_deleter> path(pszPath);
                 paths.push_back(pszPath);
             }
         }
     }
-
-    if (paths.size() == 1)
-    {
-        if (!paths[0].empty())
-        {
-            unsigned int openFlags = OpenFlags::AddToMRU;
-            if ((GetKeyState(VK_CONTROL) & 0x8000) != 0)
-                openFlags |= OpenFlags::OpenIntoActiveTab;
-            OpenFile(paths[0].c_str(), openFlags);
-        }
-    }
-    else
-    {
-        // Open all that was selected or at least returned.
-        for (const auto& file : paths)
-            OpenFile(file.c_str(), OpenFlags::AddToMRU);
-    }
+    OpenFiles(paths);
 
     return true;
 }

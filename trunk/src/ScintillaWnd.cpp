@@ -609,11 +609,11 @@ void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, 
         if (!sd.FontName.empty())
             Call(SCI_STYLESETFONT, styleId, (sptr_t)CUnicodeUtils::StdGetUTF8(sd.FontName).c_str());
 
-        if (it.second.FontStyle & FONTSTYLE_BOLD)
+        if ((it.second.FontStyle & FONTSTYLE_BOLD) != 0)
             Call(SCI_STYLESETBOLD, styleId, 1);
-        if (it.second.FontStyle & FONTSTYLE_ITALIC)
+        if ((it.second.FontStyle & FONTSTYLE_ITALIC) != 0)
             Call(SCI_STYLESETITALIC, styleId, 1);
-        if (it.second.FontStyle & FONTSTYLE_UNDERLINED)
+        if ((it.second.FontStyle & FONTSTYLE_UNDERLINED) !=0)
             Call(SCI_STYLESETUNDERLINE, styleId, 1);
 
         if (it.second.FontSize)
@@ -752,7 +752,12 @@ void CScintillaWnd::SetupDefaultStyles()
         Call(SCI_SETCARETLINEBACKALPHA, 15);
     }
     Call(SCI_SETWHITESPACEFORE, true, theme.GetThemeColor(RGB(255, 181, 106)));
-    Call(SCI_SETCODEPAGE, CP_UTF8);
+    
+    // REVIEW: SETCODEPAGE seems to destroy bookmarks. Removing this call
+    // seems to avoid that problem. The call here may or may not be wrong
+    // so just commented out until the issue is further investigated.
+
+    // Call(SCI_SETCODEPAGE, CP_UTF8);
     Call(SCI_COLOURISE, 0, -1);
 }
 
@@ -848,7 +853,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
 
     size_t selStartPos = Call(SCI_GETSELECTIONSTART);
     auto seltextbuffer = std::make_unique<char[]>(selTextLen + 1);
-    Call(SCI_GETSELTEXT, 0, (LPARAM)(char*)seltextbuffer.get());
+    Call(SCI_GETSELTEXT, 0, (LPARAM)seltextbuffer.get());
     if (seltextbuffer[0] == 0)
     {
         lastSelText.clear();
@@ -899,10 +904,11 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
             FindText.chrg.cpMin = 0;
             FindText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
             FindText.lpstrText = seltextbuffer.get();
+            const auto selTextColor = CTheme::Instance().GetThemeColor(RGB(0, 255, 0));
             while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&FindText) >= 0)
             {
                 size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
-                m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, CTheme::Instance().GetThemeColor(RGB(0,255,0)));
+                m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, selTextColor);
                 ++m_selTextMarkerCount;
                 if (FindText.chrg.cpMin >= FindText.chrgText.cpMax)
                     break;
@@ -1972,12 +1978,14 @@ void CScintillaWnd::BookmarkToggle( int lineno )
 
 void CScintillaWnd::MarkBookmarksInScrollbar()
 {
+    const auto bmColor = CTheme::Instance().GetThemeColor(RGB(255, 0, 0));
     m_docScroll.Clear(DOCSCROLLTYPE_BOOKMARK);
-    long line = (long)Call(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
-    while (line >= 0)
+    for (int line = -1;;)
     {
-        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, line, CTheme::Instance().GetThemeColor(RGB(255,0,0)));
-        line = (long)Call(SCI_MARKERNEXT, line+1, (1 << MARK_BOOKMARK));
+        line = (int)Call(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
+        if (line < 0)
+            break;
+        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, line, bmColor);
     }
 }
 

@@ -62,6 +62,8 @@ namespace
     const int TIMER_SUGGESTION = 101;
     const unsigned int SF_SEARCHSUBFOLDERS = 1;
     const unsigned int SF_SEARCHFORFUNCTIONS = 2;
+    // Limit the max search results so as not to crash by running out of memory or allowed memory.
+    const int MAX_SEARCHRESULTS = 5000;
 
     // The maximum for these values is set by the user in the config file.
     // These are just the default maximums.
@@ -86,10 +88,8 @@ namespace
     // to keep unrelated modules unconnected.
     
     // Find the name of the function from its definition.
-    std::wstring ParseSignature(const std::wstring& sig)
+    bool ParseSignature(std::wstring& name, const std::wstring& sig)
     {
-        std::wstring name;
-
         // Look for a ( of perhaps void x::f(whatever)
         auto bracepos = sig.find(L'(');
         if (bracepos != std::wstring::npos)
@@ -104,7 +104,9 @@ namespace
             name.assign(sig, spos, bracepos - spos);
             CStringUtils::trim(name);
         }
-        return name;
+        else
+            name.clear();
+        return !name.empty();
     }
  
     void Normalize(CSearchResult& sr)
@@ -1164,7 +1166,7 @@ void CFindReplaceDlg::DoListItemAction(int itemIndex)
     {
         path = m_foundPaths[item.pathIndex];
     }
-    if (!OpenFile(path.c_str(), openFlags))
+    if (OpenFile(path.c_str(), openFlags)<0)
         return;
     ScintillaCall(SCI_GOTOLINE, item.line);
     Center((long)item.pos, (long)item.pos);
@@ -1307,7 +1309,13 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
         break;
     case IDC_FUNCTIONS:
         if (msg == BN_CLICKED)
+        {
+            // If the user wants to find functions they probably don't want a partial match.
+            // But if they do, they can uncheck it.
+            if (Button_GetCheck(GetDlgItem(*this, IDC_FUNCTIONS))==BST_CHECKED)
+                Button_SetCheck(GetDlgItem(*this, IDC_MATCHWORD), BST_CHECKED);
             CheckSearchOptions();
+        }
         break;
     case IDC_SEARCHFILES:
         if (msg == CBN_SETFOCUS)
@@ -1700,9 +1708,10 @@ void CFindReplaceDlg::SortResults()
 
 void CFindReplaceDlg::DoSearchAll(int id)
 {
+    // Should have stopped bfore searching again.
+    APPVERIFY(m_ThreadsRunning == 0);
     if (m_ThreadsRunning)
         return;
-    assert(m_ThreadsRunning == 0);
     // To prevent having each document activate the tab while searching,
     // we use a dummy scintilla control and do the search in there
     // instead of using the active control.
@@ -1711,6 +1720,10 @@ void CFindReplaceDlg::DoSearchAll(int id)
     m_searchResults.clear();
     m_foundPaths.clear();
     m_bStop = false;
+    m_foundsize = 0;
+
+    // TODO! Use foundsize to notify the user that the find limit was reached,
+    // so they know not all search results may have been found.
 
     std::wstring findText = GetDlgItemText(IDC_SEARCHCOMBO).get();
     if (id != IDC_FINDFILES)
@@ -1774,6 +1787,8 @@ void CFindReplaceDlg::DoSearchAll(int id)
                 UpdateWindow(*this);
                 SearchDocument(m_searchWnd, docID, doc, searchfor, searchflags, exSearchFlags,
                     m_searchResults, m_foundPaths);
+                if (m_foundsize >= MAX_SEARCHRESULTS)
+                    break;
             }
             SortResults();
         }
@@ -1839,7 +1854,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
     }
     else
     {
-        assert(false);
+        APPVERIFY(false);
     }
 }
 
@@ -1949,6 +1964,8 @@ void CFindReplaceDlg::SearchThread(
             m_pendingFoundPaths.push_back(std::move(path));
             m_pendingSearchResults.push_back(std::move(result));
             NewData(timeOfLastProgressUpdate, false);
+            if (++m_foundsize >= MAX_SEARCHRESULTS)
+                break;
 
             continue;
         }
@@ -1969,8 +1986,10 @@ void CFindReplaceDlg::SearchThread(
                 SearchDocument(searchWnd, -1, doc, searchfor, flags, exSearchFlags,
                     m_pendingSearchResults, m_pendingFoundPaths);
                 if (m_pendingSearchResults.size() - resultSizeBefore > 0)
-                    m_pendingFoundPaths.push_back(path);
+                    m_pendingFoundPaths.push_back(std::move(path));
                 NewData(timeOfLastProgressUpdate, false);
+                if (m_foundsize >= MAX_SEARCHRESULTS)
+                    break;
             }
         }
     }
@@ -1989,10 +2008,12 @@ void CFindReplaceDlg::AcceptData()
     for (auto& item : m_pendingSearchResults)
         item.pathIndex += m_foundPaths.size();
     move_append(m_searchResults, m_pendingSearchResults);
+    // Enable this if something suspect occurs.
+    //for (const auto& item : m_pendingSearchResults)
+        //if (item.pathIndex < 0 || item.pathIndex >= m_foundPaths.size())
+            //APPVERIFY(false);
     move_append(m_foundPaths, m_pendingFoundPaths);
-    for (auto& item : m_pendingSearchResults)
-        if (item.pathIndex < 0 || item.pathIndex >= m_foundPaths.size())
-            assert(false);
+
     m_dataAccepted = true;
     lk.unlock();
     m_dataExchangeCondition.notify_one();
@@ -2022,7 +2043,8 @@ void CFindReplaceDlg::SearchDocument(
     bool previousReadOnlyFlag = searchWnd.Call(SCI_GETREADONLY) != sptr_t{};
     if (!previousReadOnlyFlag)
         searchWnd.Call(SCI_SETREADONLY, true);
-    searchWnd.Call(SCI_SETCODEPAGE, CP_UTF8);
+    // REVIEW: Necessary?
+    //searchWnd.Call(SCI_SETCODEPAGE, CP_UTF8);
 
     OnOutOfScope(
         if (!previousReadOnlyFlag)
@@ -2051,6 +2073,7 @@ void CFindReplaceDlg::SearchDocument(
 
     std::wstring funcName;
     sptr_t findRet = -1;
+    std::string line; // Reduce memory reallocations by keeping this out of the loop.
     do
     {
         findRet = searchWnd.Call(SCI_FINDTEXT, searchflags, (sptr_t)&ttf);
@@ -2077,7 +2100,6 @@ void CFindReplaceDlg::SearchDocument(
                 result.docID = docID;
 
             size_t linesize = (size_t) searchWnd.Call(SCI_LINELENGTH, result.line);
-            std::string line;
             line.resize(linesize);
             searchWnd.Call(SCI_GETLINE, result.line, reinterpret_cast<sptr_t>(line.data()));
             // remove EOLs
@@ -2111,9 +2133,7 @@ void CFindReplaceDlg::SearchDocument(
                     matched = true;
                 else
                 {
-                    funcName = ParseSignature(result.lineText);
-                    // Returns empty if failed to find a function name.
-                    if (!funcName.empty())
+                    if (ParseSignature(funcName, result.lineText))
                     {
                         if (! matchCase)
                             funcName = CStringUtils::to_lower(funcName);
@@ -2126,6 +2146,8 @@ void CFindReplaceDlg::SearchDocument(
                 if (docID < 0)
                     result.pathIndex = foundPaths.size();
                 searchResults.push_back(std::move(result));
+                if (++m_foundsize >= MAX_SEARCHRESULTS)
+                    break;
             }
 
             if (ttf.chrg.cpMin >= ttf.chrgText.cpMax)
@@ -2150,6 +2172,9 @@ void CFindReplaceDlg::NewData(
         (durationSinceLastDataUpdate >= PROGRESS_UPDATE_INTERVAL
         && (m_pendingFoundPaths.size() > 0 || m_pendingSearchResults.size() > 0)))
     {
+        // Hopefully safe to touch the size field.
+        if (m_searchResults.size() >= MAX_SEARCHRESULTS)
+            finished = true;
         // NOTE!! It's essential that data isn't sent to the client until
         // it's a full contained unit, i.e. search results must be complete
         // for a given file. Otherwise the file indexes won't match/fixup properly
@@ -2179,7 +2204,8 @@ int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindstr
     m_searchWnd.Call(SCI_SETSTATUS, SC_STATUS_OK);   // reset error status
     m_searchWnd.Call(SCI_CLEARALL);
     m_searchWnd.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-    m_searchWnd.Call(SCI_SETCODEPAGE, CP_UTF8);
+    // REVIEW: necessary?
+    // m_searchWnd.Call(SCI_SETCODEPAGE, CP_UTF8);
     m_searchWnd.Call(SCI_SETTARGETSTART, 0);
     m_searchWnd.Call(SCI_SETSEARCHFLAGS, searchflags);
     m_searchWnd.Call(SCI_SETTARGETEND, m_searchWnd.Call(SCI_GETLENGTH));

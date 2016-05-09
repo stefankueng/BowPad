@@ -461,7 +461,6 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
 {
     CDocument doc;
     doc.m_format = UNKNOWN_FORMAT;
-    std::wstring sFileName = CPathUtils::GetFileName(path);
 
     CAutoFile hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, nullptr, createIfMissing ? CREATE_NEW : OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (!hFile.IsValid())
@@ -469,7 +468,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         // Capture the access denied error, while it's valid.
         DWORD err = GetLastError();
         CFormatMessageWrapper errMsg(err);
-        if (((err == ERROR_ACCESS_DENIED)||(err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
+        if ((err == ERROR_ACCESS_DENIED || err == ERROR_WRITE_PROTECT) && (!SysInfo::Instance().IsElevated()))
         {
             if (!PathIsDirectory(path.c_str()) && AskToElevatePrivilegeForOpening(hWnd, path))
             {
@@ -498,14 +497,14 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
             // else if canceled elevation via various means or got an error even asking.
             // just fall through and issue the error that failed.
         }
-        ShowFileLoadError(hWnd,sFileName,errMsg);
+        ShowFileLoadError(hWnd,path,errMsg);
         return doc;
     }
     BY_HANDLE_FILE_INFORMATION fi = {0};
     if (!GetFileInformationByHandle(hFile, &fi))
     {
         CFormatMessageWrapper errMsg; // Calls GetLastError itself.
-        ShowFileLoadError(hWnd,sFileName,errMsg);
+        ShowFileLoadError(hWnd,path,errMsg);
         return doc;
     }
     doc.m_bIsReadonly = (fi.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)) != 0;
@@ -532,7 +531,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     Scintilla::ILoader * pdocLoad = reinterpret_cast<Scintilla::ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, (int)bufferSizeRequested));
     if (pdocLoad == nullptr)
     {
-        ShowFileLoadError(hWnd, sFileName,
+        ShowFileLoadError(hWnd, path,
                           CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str());
         return doc;
     }

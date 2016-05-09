@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2015 - Stefan Kueng
+// Copyright (C) 2014-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -143,15 +143,10 @@ bool CCmdTabList::PopulateMenu(const CDocument& /*doc*/, IUICollectionPtr& colle
     CAppUtils::FailedShowMessage(hr);
 
     int tabCount = GetTabCount();
-    std::wstring tabTitle;
     for ( int i  = 0; i < tabCount; ++i)
     {
-        // don't store tab ids since they won't match after
-        // a tab drag anymore
-        int docId = this->GetDocIDFromTabIndex(i);
-
-        tabTitle = GetTitleForTabIndex(i);
-        m_menuInfo.push_back(TabInfo(docId, tabTitle));
+        // Don't store tab ids since they won't match after a tab drag.
+        m_menuInfo.push_back(TabInfo(this->GetDocIDFromTabIndex(i), GetTitleForTabIndex(i)));
     }
 
     std::sort(std::begin(m_menuInfo), std::end(m_menuInfo),

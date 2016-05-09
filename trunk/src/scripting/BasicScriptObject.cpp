@@ -1176,8 +1176,8 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
                 return DISP_E_TYPEMISMATCH;
             if (FAILED(VariantChangeType(&p2, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_UINT)))
                 return DISP_E_TYPEMISMATCH;
-            ret->vt = VT_BOOL;
-            ret->boolVal = OpenFile(p1.bstrVal, p2.uintVal);
+            ret->vt = VT_INT;
+            ret->intVal = OpenFile(p1.bstrVal, p2.uintVal);
             break;
         case 129: // ReloadTab
             if (args->cArgs != 2)
