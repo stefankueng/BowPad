@@ -229,7 +229,7 @@ private:
     bool                        m_dataReady = false;
     std::mutex                  m_waitingDataMutex;
     std::condition_variable     m_dataExchangeCondition;
-    bool                        m_bStop = false;
+    volatile bool               m_bStop = false;
     volatile LONG               m_ThreadsRunning = false;
     int                         m_searchType = 0;
     ResultsType                 m_resultsType = ResultsType::Unknown;
@@ -243,6 +243,7 @@ private:
     SIZE                        m_originalSize;
     bool                        m_open = false;
     bool                        m_reactivation = false;
+    volatile size_t             m_foundsize = 0;
 
     // Some types usually best avoided while searching.
     // The user can explicitly override these if they want them though.

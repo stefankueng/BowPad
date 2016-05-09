@@ -103,13 +103,13 @@ void CLexStyles::ParseStyle(
             style.Name = s;
             break;
         case 1: // Foreground color
-            if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
+            if (CAppUtils::HexStringToCOLORREF(s, &clr))
                 style.ForegroundColor = clr;
             else
                 APPVERIFYM(s.empty(), styleName);
             break;
         case 2: // Background color
-            if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
+            if (CAppUtils::HexStringToCOLORREF(s, &clr))
                 style.BackgroundColor = clr;
             else
                 APPVERIFYM(s.empty(), styleName);

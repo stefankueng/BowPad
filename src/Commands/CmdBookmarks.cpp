@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2015 - Stefan Kueng
+// Copyright (C) 2014-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,93 +15,97 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #include "stdafx.h"
+#include "BowPad.h"
 #include "CmdBookmarks.h"
+#include "OnOutOfScope.h"
 #include "ScintillaWnd.h"
 #include "StringUtils.h"
 
+namespace
+{
+    constexpr const auto g_bmColor = RGB(255, 0, 0);
+}
+
 CCmdBookmarks::CCmdBookmarks(void * obj) : ICommand(obj)
 {
-    int maxFiles = (int)CIniSettings::Instance().GetInt64(L"bookmarks", L"maxfiles", 30);
+    auto& settings = CIniSettings::Instance();
+    int maxFiles = (int)settings.GetInt64(L"bookmarks", L"maxfiles", 30);
     m_bookmarks.clear();
-    for (int i = 0; i < maxFiles; ++i)
+    for (int fileIndex = 0; fileIndex < maxFiles; ++fileIndex)
     {
-        std::wstring sKey = CStringUtils::Format(L"file%d", i);
-        std::wstring sBmData = CIniSettings::Instance().GetString(L"bookmarks", sKey.c_str(), L"");
+        std::wstring sKey = CStringUtils::Format(L"file%d", fileIndex);
+        std::wstring sBmData = settings.GetString(L"bookmarks", sKey.c_str(), L"");
         if (!sBmData.empty())
         {
             std::vector<std::wstring> tokens;
             stringtok(tokens, sBmData, true, L"*");
-            std::vector<long> lines;
-            std::wstring filepath;
-            int j = 0;
-            for (const auto& t : tokens)
+            if (tokens.size() >= 1)
             {
-                if (j == 0)
-                    filepath = t;
-                else
-                    lines.push_back(_wtol(t.c_str()));
-                ++j;
+                const std::wstring& filepath = tokens[0];
+                if (tokens.size() > 1)
+                {
+                    auto& lines = m_bookmarks[filepath];
+                    for (size_t li = 1; li < tokens.size(); ++li)
+                        lines.push_back(std::stoi(tokens[li]));
+                }
             }
-            if (!filepath.empty() && !lines.empty())
-                m_bookmarks.push_back(std::make_tuple(filepath, lines));
         }
     }
 }
 
 void CCmdBookmarks::OnDocumentClose(int index)
 {
+
+    auto& settings = CIniSettings::Instance();
     CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(index));
     if (doc.m_path.empty())
         return;
-    bool bModified = false;
+
     // look if the path is already in our list
-    for (auto it = m_bookmarks.cbegin(); it != m_bookmarks.cend(); ++it)
-    {
-        if (_wcsicmp(doc.m_path.c_str(), std::get<0>(*it).c_str()) == 0)
-        {
-            // remove the entry for this path
-            m_bookmarks.erase(it);
-            bModified = true;
-            break;
-        }
-    }
+    bool bModified = (m_bookmarks.erase(doc.m_path) > 0);
 
     // find all bookmarks
-    std::vector<long> bookmarklines;
-    long line = -1;
-    do
+    std::vector<int> bookmarklines;
+    for (int line = -1;;)
     {
-        line = (long)ScintillaCall(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
-        if (line >= 0)
-            bookmarklines.push_back(line);
-    } while (line >= 0);
+        line = (int)ScintillaCall(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
+        if (line < 0)
+            break;
+        bookmarklines.push_back(line);
+    }
 
     if (!bookmarklines.empty())
     {
-        m_bookmarks.push_front(std::make_tuple(doc.m_path, bookmarklines));
+        m_bookmarks[doc.m_path] = std::move(bookmarklines);
         bModified = true;
     }
 
     if (bModified)
     {
         // Save the bookmarks to the ini file
-        int maxFiles = (int)CIniSettings::Instance().GetInt64(L"bookmarks", L"maxfiles", 30);
-        int i = 0;
+        int maxFiles = (int)settings.GetInt64(L"bookmarks", L"maxfiles", 30);
+        int fileNum = 0;
+        if (maxFiles == 0)
+            return;
+        std::wstring bmvalue;
         for (const auto& bm : m_bookmarks)
         {
-            std::wstring sValue = std::get<0>(bm);
-            const auto lines = std::get<1>(bm);
-            for (const auto& linenr : lines)
+            bmvalue = bm.first;
+            assert(!bmvalue.empty());
+            const auto& lines = bm.second;
+            for (const auto linenr : lines)
             {
-                sValue += L"*";
-                sValue += CStringUtils::Format(L"%ld", linenr);
+                bmvalue += L'*';
+                bmvalue += std::to_wstring(linenr);
             }
-            std::wstring sKey = CStringUtils::Format(L"file%d", i);
-            CIniSettings::Instance().SetString(L"bookmarks", sKey.c_str(), sValue.c_str());
-            if (i > maxFiles)
+            std::wstring sKey = CStringUtils::Format(L"file%d", fileNum);
+            settings.SetString(L"bookmarks", sKey.c_str(), bmvalue.c_str());
+            ++fileNum;
+            if (fileNum >= maxFiles)
                 break;
-            ++i;
         }
+        std::wstring sKey = CStringUtils::Format(L"file%d", fileNum);
+        settings.SetString(L"bookmarks", sKey.c_str(), L"");
     }
 }
 
@@ -111,19 +115,14 @@ void CCmdBookmarks::OnDocumentOpen(int index)
     if (doc.m_path.empty())
         return;
 
-    // look if the path is already in our list
-    for (auto it = m_bookmarks.cbegin(); it != m_bookmarks.cend(); ++it)
+    auto it = m_bookmarks.find(doc.m_path);
+    if (it != m_bookmarks.end())
     {
-        if (_wcsicmp(doc.m_path.c_str(), std::get<0>(*it).c_str()) == 0)
+        const auto& lines = it->second;
+        for (const auto line : lines)
         {
-            // apply the bookmarks
-            const auto lines = std::get<1>(*it);
-            for (const auto& line : lines)
-            {
-                ScintillaCall(SCI_MARKERADD, line, MARK_BOOKMARK);
-                DocScrollAddLineColor(DOCSCROLLTYPE_BOOKMARK, line, RGB(255, 0, 0));
-            }
-            break;
+            ScintillaCall(SCI_MARKERADD, line, MARK_BOOKMARK);
+            DocScrollAddLineColor(DOCSCROLLTYPE_BOOKMARK, line, g_bmColor);
         }
     }
 }
@@ -144,11 +143,11 @@ bool CCmdBookmarkToggle::Execute()
     else
     {
         ScintillaCall(SCI_MARKERADD, line, MARK_BOOKMARK);
-        DocScrollAddLineColor(DOCSCROLLTYPE_BOOKMARK, line, RGB(255,0,0));
+        DocScrollAddLineColor(DOCSCROLLTYPE_BOOKMARK, line, g_bmColor);
     }
-    InvalidateUICommand(cmdBookmarkNext, UI_INVALIDATIONS_STATE, NULL);
-    InvalidateUICommand(cmdBookmarkPrev, UI_INVALIDATIONS_STATE, NULL);
-    InvalidateUICommand(cmdBookmarkClearAll, UI_INVALIDATIONS_STATE, NULL);
+    InvalidateUICommand(cmdBookmarkNext, UI_INVALIDATIONS_STATE, nullptr);
+    InvalidateUICommand(cmdBookmarkPrev, UI_INVALIDATIONS_STATE, nullptr);
+    InvalidateUICommand(cmdBookmarkClearAll, UI_INVALIDATIONS_STATE, nullptr);
 
     return true;
 }
@@ -185,9 +184,9 @@ bool CCmdBookmarkNext::Execute()
 void CCmdBookmarkNext::ScintillaNotify(Scintilla::SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     else if ((pScn->nmhdr.code == SCN_MARGINCLICK) && (pScn->margin == SC_MARGE_SYBOLE) && !pScn->modifiers)
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
 HRESULT CCmdBookmarkNext::IUICommandHandlerUpdateProperty(

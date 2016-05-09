@@ -20,7 +20,7 @@
 #include "BowPadUI.h"
 
 #include <vector>
-#include <tuple>
+#include <map>
 
 namespace Scintilla
 {
@@ -29,6 +29,15 @@ namespace Scintilla
 
 class CCmdBookmarks : public ICommand
 {
+    struct CaseInsensitiveLess
+    {
+        bool operator()(const std::wstring& s1, const std::wstring& s2) const
+        {
+            return _wcsicmp(s1.c_str(), s2.c_str()) < 0;
+        }
+    };
+
+    using BookmarkContainer = std::map<std::wstring, std::vector<int>, CaseInsensitiveLess>;
 public:
 
     CCmdBookmarks(void * obj);
@@ -48,9 +57,7 @@ public:
     void OnDocumentOpen(int index) override;
 
 private:
-    // REVIEW: A case insensitive string map to vector<lomg>
-    // is a lot less code, way more readable and gets rid of tuple too!
-    std::list<std::tuple<std::wstring, std::vector<long>>> m_bookmarks;
+    BookmarkContainer m_bookmarks;
 };
 
 class CCmdBookmarkToggle : public ICommand

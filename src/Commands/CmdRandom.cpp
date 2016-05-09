@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2015 - Stefan Kueng
+// Copyright (C) 2014-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -263,7 +263,7 @@ bool CCmdRandom::Execute()
             --count;
         }
         // now load that file in the same tab
-        if (OpenFile(showpath.c_str(), 0))
+        if (OpenFile(showpath.c_str(), 0) >= 0)
         {
             CloseTab(tabIndex, false);
         }

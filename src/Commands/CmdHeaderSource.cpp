@@ -423,8 +423,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
         std::vector<std::wstring> systemFoldersToSearch;
 
         std::wstring cpptoolchain;
-        LPCWSTR configItem;
-        configItem = CIniSettings::Instance().GetString(L"cpp", L"toolchain");
+        LPCWSTR configItem = CIniSettings::Instance().GetString(L"cpp", L"toolchain");
         if (configItem != nullptr)
             cpptoolchain = configItem;
 
@@ -520,7 +519,7 @@ bool CCmdHeaderSource::IsValidMenuItem(size_t item) const
 bool CCmdHeaderSource::OpenFileAsLanguage(const std::wstring& filename)
 {
     SetInsertionIndex(GetActiveTabIndex());
-    if (!OpenFile(filename.c_str(), OpenFlags::AddToMRU))
+    if (OpenFile(filename.c_str(), OpenFlags::AddToMRU)<0)
         return false;
 
     const std::wstring desiredLang = L"C/C++";
@@ -600,7 +599,7 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
             HandleIncludeFileMenuItem(item);
             break;
         case RelatedType::CreateCorrespondingFile:
-            return OpenFile(item.Path.c_str(), OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing);
+            return OpenFile(item.Path.c_str(), OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing) >= 0;
             break;
         case RelatedType::CreateCorrespondingFiles:
             auto pCorrespondingFileDlg = std::make_unique<CCorrespondingFileDlg>(m_Obj);
@@ -716,7 +715,7 @@ bool CCmdHeaderSource::Execute()
             if (_waccess(correspondingFile.c_str(), 0) == 0)
             {
                 SetInsertionIndex(GetActiveTabIndex());
-                return OpenFile(correspondingFile.c_str(), OpenFlags::AddToMRU);
+                return OpenFile(correspondingFile.c_str(), OpenFlags::AddToMRU) >=0;
             }
         }
 
@@ -749,7 +748,7 @@ bool CCmdHeaderSource::Execute()
         if (matchingFiles.size() == 1 && autoload)
         {
             SetInsertionIndex(GetActiveTabIndex());
-            return OpenFile(matchingFiles[0].c_str(), OpenFlags::AddToMRU);
+            return OpenFile(matchingFiles[0].c_str(), OpenFlags::AddToMRU) >= 0;
         }
 
         // To force a menu to be shown if all other paths have been exhausted so
@@ -774,9 +773,9 @@ bool CCmdHeaderSource::ShowSingleFileSelectionDialog(HWND hWndParent, const std:
 {
     PreserveChdir keepCWD;
 
-    IFileOpenDialogPtr pfd = NULL;
+    IFileOpenDialogPtr pfd;
 
-    HRESULT hr = pfd.CreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER);
+    HRESULT hr = pfd.CreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
 
@@ -812,8 +811,8 @@ bool CCmdHeaderSource::ShowSingleFileSelectionDialog(HWND hWndParent, const std:
 
     if (!defaultFolder.empty())
     {
-        IShellItemPtr psiDefFolder = NULL;
-        hr = SHCreateItemFromParsingName(defaultFolder.c_str(), NULL, IID_PPV_ARGS(&psiDefFolder));
+        IShellItemPtr psiDefFolder;
+        hr = SHCreateItemFromParsingName(defaultFolder.c_str(), nullptr, IID_PPV_ARGS(&psiDefFolder));
         if (!CAppUtils::FailedShowMessage(hr))
         {
             // Assume if we can't set the folder we can at least continue
@@ -842,20 +841,32 @@ bool CCmdHeaderSource::ShowSingleFileSelectionDialog(HWND hWndParent, const std:
     // but get as many as we can. We don't report partial failure.
     // We could make it an all or nothing deal but we have chosen not to.
 
+    struct task_mem_deleter
+    {
+        void operator()(wchar_t buf[])
+        {
+            if (buf != nullptr)
+                CoTaskMemFree(buf);
+        }
+    };
+
     DWORD count = 0;
     hr = psiaResults->GetCount(&count);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
     if (count)
     {
-        IShellItemPtr psiResult = NULL;
+        IShellItemPtr psiResult;
         hr = psiaResults->GetItemAt(0, &psiResult);
         if (!CAppUtils::FailedShowMessage(hr))
         {
-            PWSTR pszPath = NULL;
+            PWSTR pszPath = nullptr;
             hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
             if (!CAppUtils::FailedShowMessage(hr))
+            {
+                std::unique_ptr<wchar_t[], task_mem_deleter> path(pszPath);
                 fileChosen = pszPath;
+            }
         }
     }
 
@@ -1019,7 +1030,8 @@ void CCmdHeaderSource::AttachDocument(CScintillaWnd& edit, CDocument& doc)
     edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
     edit.Call(SCI_CLEARALL);
     edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-    edit.Call(SCI_SETCODEPAGE, CP_UTF8);
+    // REVIEW: necessary?
+    //edit.Call(SCI_SETCODEPAGE, CP_UTF8);
 }
 
 bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<RelatedFileItem>& includes) const

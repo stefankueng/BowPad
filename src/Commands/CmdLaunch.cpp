@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
         return false;
     std::wstring cmd = cmdline;
     // remove eols
-    SearchReplace(cmd, L"\n", L"");
+    SearchRemoveAll(cmd, L"\n");
     SearchReplace(cmd, L"\r", L" ");
     // replace the macros in the command line
     CDocument doc = GetActiveDocument();
@@ -36,15 +36,15 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     if (PathFileExists(tabpath.c_str()))
         SearchReplace(cmd, L"$(TAB_PATH)", tabpath);
     else
-        SearchReplace(cmd, L"$(TAB_PATH)", L"");
+        SearchRemoveAll(cmd, L"$(TAB_PATH)");
     tabpath = CPathUtils::GetParentDirectory(tabpath);
     if (PathFileExists(tabpath.c_str()))
         SearchReplace(cmd, L"$(TAB_DIR)", tabpath);
     else
-        SearchReplace(cmd, L"$(TAB_DIR)", L"");
+        SearchRemoveAll(cmd, L"$(TAB_DIR)");
 
-    SearchReplace(cmd, L"$(LINE)", CStringUtils::Format(L"%lld", ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS))));
-    SearchReplace(cmd, L"$(POS)", CStringUtils::Format(L"%lld", ScintillaCall(SCI_GETCURRENTPOS)));
+    SearchReplace(cmd, L"$(LINE)", std::to_wstring(int(ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS)))));
+    SearchReplace(cmd, L"$(POS)", std::to_wstring(int(ScintillaCall(SCI_GETCURRENTPOS))));
     // find selected text or current word
     std::string sSelText = GetSelectedText();
     if (sSelText.empty())
@@ -93,7 +93,7 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     shi.hwnd = GetHwnd();
     shi.lpVerb = L"open";
     shi.lpFile = cmd.c_str();
-    shi.lpParameters = params.empty() ? NULL : params.c_str();
+    shi.lpParameters = params.empty() ? nullptr : params.c_str();
     shi.lpDirectory = directory.c_str();
     shi.nShow = SW_SHOW;
 
@@ -154,7 +154,7 @@ CCustomCommandsDlg::CCustomCommandsDlg()
 {
 }
 
-CCustomCommandsDlg::~CCustomCommandsDlg( void )
+CCustomCommandsDlg::~CCustomCommandsDlg()
 {
 }
 

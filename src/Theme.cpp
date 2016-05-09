@@ -70,12 +70,13 @@ void CTheme::Load()
     for (const auto& it : colors)
     {
         COLORREF clr1;
-        ok = CAppUtils::HexStringToCOLORREF(it, &clr1);
+        s = it;
+        ok = CAppUtils::HexStringToCOLORREF(s, &clr1);
         APPVERIFY(ok);
 
         COLORREF clr2;
         s = themeIni.GetValue(L"SubstColors", it);
-        ok = CAppUtils::HexStringToCOLORREF(s.c_str(), &clr2);
+        ok = CAppUtils::HexStringToCOLORREF(s, &clr2);
         APPVERIFY(ok);
 
         m_colorMap[clr1] = clr2;

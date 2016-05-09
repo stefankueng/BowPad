@@ -19,6 +19,8 @@
 #include "TabBar.h"
 #include "Document.h"
 
+#include <vector>
+#include <string>
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 
@@ -112,7 +114,8 @@ protected:
     HWND                GetHwnd() const;
     HWND                GetScintillaWnd() const;
     UINT                GetTimerID() { return m_nextTimerID++; }
-    bool                OpenFile(LPCWSTR file, unsigned int openFlags);
+    int                 OpenFile(LPCWSTR file, unsigned int openFlags);
+    void                OpenFiles(const std::vector<std::wstring>& paths);
     void                OpenHDROP(HDROP hDrop);
     bool                ReloadTab(int tab, int encoding = -1); // By default reload encoding
     bool                SaveCurrentTab(bool bSaveAs = false);

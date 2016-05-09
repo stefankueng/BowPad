@@ -23,19 +23,18 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
 #include <chrono>
 #include <functional>
 #include <set>
 
-enum class FunctionDataStatus
-{
-    Invalid, InProgress, Ready
-};
-
 struct FunctionInfo
 {
-    long lineNum;
+    inline FunctionInfo(int lineNum, std::wstring&& sortName, std::wstring&& displayName)
+        : lineNum(lineNum), sortName(std::move(sortName)), displayName(std::move(displayName))
+    {
+    }
+    int lineNum;
+    std::wstring sortName;
     std::wstring displayName;
 };
 
@@ -66,21 +65,6 @@ struct DocEvent
     DocEventType eventID;
 };
 
-struct CaseInsensitiveLess
-{
-    bool operator()(const std::wstring& s1, const std::wstring& s2) const
-    {
-        return _wcsicmp(s1.c_str(), s2.c_str()) < 0;
-    }
-};
-
-struct FunctionData
-{
-    FunctionDataStatus status = FunctionDataStatus::Invalid;
-    std::map<std::wstring,std::vector<FunctionInfo>, CaseInsensitiveLess> functions;
-};
-
-
 class CCmdFunctions : public ICommand
 {
 public:
@@ -89,7 +73,7 @@ public:
 
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdFunctions; }
-    bool GotoSymbol(const std::wstring& symbolName);
+    //bool GotoSymbol(const std::wstring& symbolName);
 
 private:
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
@@ -104,7 +88,7 @@ private:
     void OnDocumentClose(int index) override;
     void FindAllFunctions();
     bool FindAllFunctionsInternal();
-    FunctionData FindFunctionsNow() const;
+    std::vector<FunctionInfo> FindFunctionsNow() const;
     void InvalidateFunctionsEnabled();
     void InvalidateFunctionsSource();
     HRESULT PopulateFunctions(IUICollectionPtr& collection);
