@@ -542,8 +542,6 @@ bool CCmdFunctions::FindAllFunctionsInternal()
             m_edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
             m_edit.Call(SCI_CLEARALL);
             m_edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-            // REVIEW: why necessary?
-            //m_edit.Call(SCI_SETCODEPAGE, CP_UTF8);
 
             m_ttf = {};
             break;
@@ -664,8 +662,6 @@ void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const
     OnOutOfScope(
         edit.Call(SCI_SETDOCPOINTER, 0, 0);
     );
-    // REVIEW: neccessary?
-    //edit.Call(SCI_SETCODEPAGE, CP_UTF8);
 
     auto trimtokens = CLexStyles::Instance().GetFunctionRegexTrimForLang(docLang);
     std::vector<std::wstring> wtrimtokens;
