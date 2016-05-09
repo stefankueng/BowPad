@@ -2036,8 +2036,6 @@ void CFindReplaceDlg::SearchDocument(
     bool previousReadOnlyFlag = searchWnd.Call(SCI_GETREADONLY) != sptr_t{};
     if (!previousReadOnlyFlag)
         searchWnd.Call(SCI_SETREADONLY, true);
-    // REVIEW: Necessary?
-    //searchWnd.Call(SCI_SETCODEPAGE, CP_UTF8);
 
     OnOutOfScope(
         if (!previousReadOnlyFlag)
@@ -2197,8 +2195,6 @@ int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindstr
     m_searchWnd.Call(SCI_SETSTATUS, SC_STATUS_OK);   // reset error status
     m_searchWnd.Call(SCI_CLEARALL);
     m_searchWnd.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-    // REVIEW: necessary?
-    // m_searchWnd.Call(SCI_SETCODEPAGE, CP_UTF8);
     m_searchWnd.Call(SCI_SETTARGETSTART, 0);
     m_searchWnd.Call(SCI_SETSEARCHFLAGS, searchflags);
     m_searchWnd.Call(SCI_SETTARGETEND, m_searchWnd.Call(SCI_GETLENGTH));
