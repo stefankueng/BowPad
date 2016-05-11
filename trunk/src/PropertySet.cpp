@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 #include "stdafx.h"
 #include "PropertySet.h"
 
-#include <windows.h>
 #include <strsafe.h>
 #include <uiribbonpropertyhelpers.h>
 
@@ -50,9 +49,7 @@ STDMETHODIMP CPropertySet::GetValue(REFPROPERTYKEY key, PROPVARIANT *ppropvar)
     if (key == UI_PKEY_ItemImage)
     {
         if (m_pimgItem)
-        {
             return UIInitPropertyFromImage(UI_PKEY_ItemImage, m_pimgItem, ppropvar);
-        }
         return S_FALSE;
     }
     else if (key == UI_PKEY_Label)
@@ -66,9 +63,7 @@ STDMETHODIMP CPropertySet::GetValue(REFPROPERTYKEY key, PROPVARIANT *ppropvar)
     else if (key == UI_PKEY_CommandId)
     {
         if(m_commandId != -1)
-        {
             return UIInitPropertyFromUInt32(UI_PKEY_CommandId, m_commandId, ppropvar);
-        }
         return S_FALSE;
     }
     else if (key == UI_PKEY_CommandType)
@@ -81,27 +76,11 @@ STDMETHODIMP CPropertySet::GetValue(REFPROPERTYKEY key, PROPVARIANT *ppropvar)
 HRESULT CPropertySet::CreateInstance(CPropertySet **ppPropertySet)
 {
     if (!ppPropertySet)
-    {
         return E_POINTER;
-    }
 
-    *ppPropertySet = NULL;
+    *ppPropertySet = new CPropertySet();
 
-    HRESULT hr = S_OK;
-
-    CPropertySet* pPropertySet = new CPropertySet();
-
-    if (pPropertySet == NULL)
-    {
-        hr = E_OUTOFMEMORY;
-    }
-
-    if (SUCCEEDED(hr))
-    {
-        *ppPropertySet = pPropertySet;
-    }
-
-    return hr;
+    return S_OK;
 }
 
 // IUnknown methods.
@@ -114,9 +93,7 @@ STDMETHODIMP_(ULONG) CPropertySet::Release()
 {
     LONG cRef = InterlockedDecrement(&m_cRef);
     if (cRef == 0)
-    {
         delete this;
-    }
 
     return cRef;
 }
@@ -124,21 +101,15 @@ STDMETHODIMP_(ULONG) CPropertySet::Release()
 STDMETHODIMP CPropertySet::QueryInterface(REFIID iid, void** ppv)
 {
     if (!ppv)
-    {
         return E_POINTER;
-    }
 
     if (iid == __uuidof(IUnknown))
-    {
         *ppv = static_cast<IUnknown*>(this);
-    }
     else if (iid == __uuidof(IUISimplePropertySet))
-    {
         *ppv = static_cast<IUISimplePropertySet*>(this);
-    }
     else
     {
-        *ppv = NULL;
+        *ppv = nullptr;
         return E_NOINTERFACE;
     }
 
