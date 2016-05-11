@@ -129,6 +129,7 @@ CDocument CDocumentManager::GetDocumentFromID(int id) const
 
 void CDocumentManager::SetDocument(int id, const CDocument& doc)
 {
+    APPVERIFY(id >= 0);
     auto where = m_documents.find(id);
     // SetDocument/Find does not create a position if it doesn't exist.
     // Use Operator [] for that or really AddDocumentAtEnd etc. to add.
@@ -147,158 +148,153 @@ void CDocumentManager::SetDocument(int id, const CDocument& doc)
 void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, int id )
 {
     // Catch attempts to id's that serve as null type values.
-    if (id<0)
-        APPVERIFY(false); // Serious bug.    
+    APPVERIFY(id>=0); // Serious bug.    
     APPVERIFY(m_documents.find(id) == m_documents.end()); // Should not already exist.
     m_documents[id] = doc;
 }
 
-static void LoadSome( int encoding, Scintilla::ILoader * edit, const CDocument& doc, bool& bFirst, DWORD& lenFile,
-    int& incompleteMultibyteChar, char* data, char* charbuf, int charbufSize, wchar_t* widebuf )
-
+static void LoadSomeUtf8(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data)
 {
     char* pData = data;
-    int wideLen = 0;
-    switch (encoding)
+    // Nothing to convert, just pass it to Scintilla
+    if (bFirst && hasBOM)
     {
-        case -1:
-        case CP_UTF8:
-        {
-            // Nothing to convert, just pass it to Scintilla
-            if (bFirst && doc.m_bHasBOM)
-            {
-                pData += 3;
-                lenFile -= 3;
-            }
-            edit->AddData(pData, lenFile);
-            if (bFirst && doc.m_bHasBOM)
-                lenFile += 3;
-        }
-        break;
-    case 1200: // UTF16_LE
-        {
-            if (bFirst && doc.m_bHasBOM)
-            {
-                pData += 2;
-                lenFile -= 2;
-            }
-            memcpy(widebuf, pData, lenFile);
-            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, nullptr);
-            edit->AddData(charbuf, charlen);
-            if (bFirst && doc.m_bHasBOM)
-                lenFile += 2;
-        }
-        break;
-    case 1201: // UTF16_BE
-        {
-            if (bFirst && doc.m_bHasBOM)
-            {
-                pData += 2;
-                lenFile -= 2;
-            }
-            memcpy(widebuf, pData, lenFile);
-            // make in place WORD BYTEs swap
-            UINT64 * p_qw = (UINT64 *)widebuf;
-            int nQwords = lenFile/8;
-            for (int nQword = 0; nQword<nQwords; nQword++)
-                p_qw[nQword] = WordSwapBytes(p_qw[nQword]);
+        pData += 3;
+        lenFile -= 3;
+    }
+    edit.AddData(pData, lenFile);
+    if (bFirst && hasBOM)
+        lenFile += 3;
+}
 
-            wchar_t * p_w = (wchar_t *)p_qw;
-            int nWords = lenFile/2;
-            for (int nWord = nQwords*4; nWord<nWords; nWord++)
-                p_w[nWord] = WideCharSwap(p_w[nWord]);
+static void LoadSomeUtf16le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+    char* data, char* charbuf, int charbufSize, wchar_t* widebuf)
+{
+    char* pData = data;
+    if (bFirst && hasBOM)
+    {
+        pData += 2;
+        lenFile -= 2;
+    }
+    memcpy(widebuf, pData, lenFile);
+    int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile / 2, charbuf, charbufSize, 0, nullptr);
+    edit.AddData(charbuf, charlen);
+    if (bFirst && hasBOM)
+        lenFile += 2;
+}
 
-            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile/2, charbuf, charbufSize, 0, nullptr);
-            edit->AddData(charbuf, charlen);
-            if (bFirst && doc.m_bHasBOM)
-                lenFile += 2;
-        }
-        break;
-    case 12001: // UTF32_BE
+static void LoadSomeUtf16be(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+    char* data, char* charbuf, int charbufSize, wchar_t* widebuf)
+{
+    char* pData = data;
+    if (bFirst && hasBOM)
+    {
+        pData += 2;
+        lenFile -= 2;
+    }
+    memcpy(widebuf, pData, lenFile);
+    // make in place WORD BYTEs swap
+    UINT64 * p_qw = (UINT64 *)widebuf;
+    int nQwords = lenFile / 8;
+    for (int nQword = 0; nQword<nQwords; nQword++)
+        p_qw[nQword] = WordSwapBytes(p_qw[nQword]);
+
+    wchar_t * p_w = (wchar_t *)p_qw;
+    int nWords = lenFile / 2;
+    for (int nWord = nQwords * 4; nWord<nWords; nWord++)
+        p_w[nWord] = WideCharSwap(p_w[nWord]);
+
+    int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile / 2, charbuf, charbufSize, 0, nullptr);
+    edit.AddData(charbuf, charlen);
+    if (bFirst && hasBOM)
+        lenFile += 2;
+}
+
+static void LoadSomeUtf32be(DWORD lenFile, char* data)
+{
+    UINT64 * p64 = (UINT64 *)data;
+    int nQwords = lenFile / 8;
+    for (int nQword = 0; nQword<nQwords; nQword++)
+        p64[nQword] = DwordSwapBytes(p64[nQword]);
+
+    UINT32 * p32 = (UINT32 *)p64;
+    int nDwords = lenFile / 4;
+    for (int nDword = nQwords * 2; nDword<nDwords; nDword++)
+        p32[nDword] = DwordSwapBytes(p32[nDword]);
+}
+
+static void LoadSomeUtf32le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+    char* data, char* charbuf, int charbufSize, wchar_t* widebuf)
+{
+    char* pData = data;
+    if (bFirst && hasBOM)
+    {
+        pData += 4;
+        lenFile -= 4;
+    }
+    // UTF32 have four bytes per char
+    int nReadChars = lenFile / 4;
+    UINT32 * p32 = (UINT32 *)pData;
+
+    // fill buffer
+    wchar_t * pOut = (wchar_t *)widebuf;
+    for (int i = 0; i<nReadChars; ++i, ++pOut)
+    {
+        UINT32 zChar = p32[i];
+        if (zChar >= 0x110000)
         {
-            UINT64 * p64 = (UINT64 *)data;
-            int nQwords = lenFile/8;
-            for (int nQword = 0; nQword<nQwords; nQword++)
-                p64[nQword] = DwordSwapBytes(p64[nQword]);
-
-            UINT32 * p32 = (UINT32 *)p64;
-            int nDwords = lenFile/4;
-            for (int nDword = nQwords*2; nDword<nDwords; nDword++)
-                p32[nDword] = DwordSwapBytes(p32[nDword]);
+            *pOut = 0xfffd; // ? mark
         }
-        // intentional fall-through
-    case 12000: // UTF32_LE
+        else if (zChar >= 0x10000)
         {
-            if (bFirst && doc.m_bHasBOM)
-            {
-                pData += 4;
-                lenFile -= 4;
-            }
-            // UTF32 have four bytes per char
-            int nReadChars = lenFile/4;
-            UINT32 * p32 = (UINT32 *)pData;
-
-            // fill buffer
-            wchar_t * pOut = (wchar_t *)widebuf;
-            for (int i = 0; i<nReadChars; ++i, ++pOut)
-            {
-                UINT32 zChar = p32[i];
-                if (zChar>=0x110000)
-                {
-                    *pOut=0xfffd; // ? mark
-                }
-                else if (zChar>=0x10000)
-                {
-                    zChar-=0x10000;
-                    pOut[0] = ((zChar>>10)&0x3ff) | 0xd800; // lead surrogate
-                    pOut[1] = (zChar&0x7ff) | 0xdc00; // trail surrogate
-                    pOut++;
-                }
-                else
-                {
-                    *pOut = (wchar_t)zChar;
-                }
-            }
-            int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, nReadChars, charbuf, charbufSize, 0, nullptr);
-            edit->AddData(charbuf, charlen);
-            if (bFirst && doc.m_bHasBOM)
-                lenFile += 4;
+            zChar -= 0x10000;
+            pOut[0] = ((zChar >> 10) & 0x3ff) | 0xd800; // lead surrogate
+            pOut[1] = (zChar & 0x7ff) | 0xdc00; // trail surrogate
+            pOut++;
         }
-        break;
-    default:
+        else
         {
-            // For other encodings, ask system if there are any invalid characters; note that it will
-            // not correctly know if the last character is cut when there are invalid characters inside the text
-            wideLen = MultiByteToWideChar(encoding, (lenFile == -1) ? 0 : MB_ERR_INVALID_CHARS, data, lenFile, nullptr, 0);
-            if (wideLen == 0 && GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
-            {
-                // Test without last byte
-                if (lenFile > 1)
-                    wideLen = MultiByteToWideChar(encoding, MB_ERR_INVALID_CHARS, data, lenFile-1, nullptr, 0);
-                if (wideLen == 0)
-                {
-                    // don't have to check that the error is still ERROR_NO_UNICODE_TRANSLATION,
-                    // since only the length parameter changed
-
-                    // TODO: should warn user about incorrect loading due to invalid characters
-                    // We still load the file, but the system will either strip or replace invalid characters
-                    // (including the last character, if cut in half)
-                    wideLen = MultiByteToWideChar(encoding, 0, data, lenFile, nullptr, 0);
-                }
-                else
-                {
-                    // We found a valid text by removing one byte.
-                    incompleteMultibyteChar = 1;
-                }
-            }
+            *pOut = (wchar_t)zChar;
         }
-        break;
+    }
+    int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, nReadChars, charbuf, charbufSize, 0, nullptr);
+    edit.AddData(charbuf, charlen);
+    if (bFirst && hasBOM)
+        lenFile += 4;
+}
+
+static void LoadSomeOther(Scintilla::ILoader& edit, int encoding, DWORD lenFile,
+    int& incompleteMultibyteChar, char* data, char* charbuf, int charbufSize, wchar_t* widebuf)
+{
+    // For other encodings, ask system if there are any invalid characters; note that it will
+    // not correctly know if the last character is cut when there are invalid characters inside the text
+    int wideLen = MultiByteToWideChar(encoding, (lenFile == -1) ? 0 : MB_ERR_INVALID_CHARS, data, lenFile, nullptr, 0);
+    if (wideLen == 0 && GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
+    {
+        // Test without last byte
+        if (lenFile > 1)
+            wideLen = MultiByteToWideChar(encoding, MB_ERR_INVALID_CHARS, data, lenFile - 1, nullptr, 0);
+        if (wideLen == 0)
+        {
+            // don't have to check that the error is still ERROR_NO_UNICODE_TRANSLATION,
+            // since only the length parameter changed
+
+            // TODO: should warn user about incorrect loading due to invalid characters
+            // We still load the file, but the system will either strip or replace invalid characters
+            // (including the last character, if cut in half)
+            wideLen = MultiByteToWideChar(encoding, 0, data, lenFile, nullptr, 0);
+        }
+        else
+        {
+            // We found a valid text by removing one byte.
+            incompleteMultibyteChar = 1;
+        }
     }
     if (wideLen > 0)
     {
-        MultiByteToWideChar(encoding, 0, data, lenFile-incompleteMultibyteChar, widebuf, wideLen);
+        MultiByteToWideChar(encoding, 0, data, lenFile - incompleteMultibyteChar, widebuf, wideLen);
         int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, wideLen, charbuf, charbufSize, 0, nullptr);
-        edit->AddData(charbuf, charlen);
+        edit.AddData(charbuf, charlen);
     }
 }
 
@@ -500,7 +496,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         ShowFileLoadError(hWnd,path,errMsg);
         return doc;
     }
-    BY_HANDLE_FILE_INFORMATION fi = {0};
+    BY_HANDLE_FILE_INFORMATION fi;
     if (!GetFileInformationByHandle(hFile, &fi))
     {
         CFormatMessageWrapper errMsg; // Calls GetLastError itself.
@@ -528,13 +524,14 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     m_scratchScintilla.Call(SCI_CLEARALL);
     m_scratchScintilla.Call(SCI_SETCODEPAGE, CP_UTF8);
 
-    Scintilla::ILoader * pdocLoad = reinterpret_cast<Scintilla::ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, (int)bufferSizeRequested));
+    Scintilla::ILoader* pdocLoad = reinterpret_cast<Scintilla::ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, (int)bufferSizeRequested));
     if (pdocLoad == nullptr)
     {
         ShowFileLoadError(hWnd, path,
                           CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str());
         return doc;
     }
+    auto& edit = *pdocLoad;
 
     char data[ReadBlockSize+8];
     const int widebufSize = ReadBlockSize * 2;
@@ -556,9 +553,29 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
             encoding = GetCodepageFromBuf(data, lenFile, doc.m_bHasBOM);
 
         doc.m_encoding = encoding;
-        LoadSome(encoding, pdocLoad, doc, bFirst, lenFile, incompleteMultibyteChar,
-                  data, charbuf.get(), charbufSize, widebuf.get() );
 
+        switch (encoding)
+        {
+        case -1:
+        case CP_UTF8:
+            LoadSomeUtf8(edit, doc.m_bHasBOM, bFirst, lenFile, data);
+            break;
+        case 1200: // UTF16_LE
+            LoadSomeUtf16le(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get());
+            break;
+        case 1201: // UTF16_BE
+            LoadSomeUtf16be(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get());
+            break;
+        case 12001: // UTF32_BE
+            LoadSomeUtf32be(lenFile, data); // Doesn't load, falls through to load.
+            // intentional fall-through
+        case 12000: // UTF32_LE
+            LoadSomeUtf32le(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get());
+            break;
+        default:
+            LoadSomeOther(edit, encoding, lenFile, incompleteMultibyteChar, data, charbuf.get(), charbufSize, widebuf.get());
+            break;
+        }
         if (doc.m_format == UNKNOWN_FORMAT)
             doc.m_format = SenseEOLFormat(data, lenFile);
 
@@ -906,7 +923,7 @@ bool CDocumentManager::UpdateFileTime(CDocument& doc, bool bIncludeReadonly)
         }
         return false;
     }
-    BY_HANDLE_FILE_INFORMATION fi = {0};
+    BY_HANDLE_FILE_INFORMATION fi;
     if (!GetFileInformationByHandle(hFile, &fi))
         return false;
 
@@ -930,7 +947,7 @@ DocModifiedState CDocumentManager::HasFileChanged( int id ) const
             return DM_Removed;
         return DM_Unknown;
     }
-    BY_HANDLE_FILE_INFORMATION fi = {0};
+    BY_HANDLE_FILE_INFORMATION fi;
     if (!GetFileInformationByHandle(hFile, &fi))
         return DM_Unknown;
 

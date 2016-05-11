@@ -188,14 +188,18 @@ int CTabBar::InsertAtEnd(const TCHAR *subTabName)
 {
     TCITEM tie;
     tie.mask = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
-    int index = -1;
+    int imageIndex = -1;
 
     if (m_bHasImgList)
-        index = 0;
-    tie.iImage = TABBAR_SHOWDISKICON ? index : 0;
+        imageIndex = 0;
+    tie.iImage = TABBAR_SHOWDISKICON ? imageIndex : 0;
     tie.pszText = (TCHAR *)subTabName;
     tie.lParam = m_tabID++;
-    return TabCtrl_InsertItem(*this, m_nItems++, &tie);
+    int index = TabCtrl_InsertItem(*this, m_nItems++, &tie);
+    // TODO: inserting the first tab makes it selected think if we want to negate that:
+    //if (TabCtrl_GetItemCount(*this) == 0)
+        //TabCtrl_SetCurSel(*this, -1);
+    return index;
 }
 
 int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
@@ -212,6 +216,9 @@ int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
     if ((index + 1) >= m_nItems)
         index = m_nItems - 1;
     int ret = TabCtrl_InsertItem(*this, index + 1, &tie);
+    // TODO: inserting the first tab makes it selected think if we want to negate that:
+    //if (TabCtrl_GetItemCount(*this) == 0)
+        //TabCtrl_SetCurSel(*this, -1);
     ++m_nItems;
     return ret;
 }
@@ -285,7 +292,6 @@ void CTabBar::ActivateAt(int index) const
     ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
     if (index >= 0)
         TabCtrl_SetCurSel(*this, index);
-
     nmhdr.code = TCN_SELCHANGE;
     ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
 }

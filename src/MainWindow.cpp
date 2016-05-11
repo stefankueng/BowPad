@@ -544,7 +544,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     case WM_CLOSE:
         CCommandHandler::Instance().OnClose();
         // Close all tabs, don't leave any open even a blank one.
-        if (CloseAllTabs(false))
+        if (CloseAllTabs(true))
         {
             CIniSettings::Instance().SaveWindowPos(L"MainWindow", *this);
             ::DestroyWindow(m_hwnd);
@@ -1092,11 +1092,11 @@ void CMainWindow::HandleAfterInit()
     }
     else
     {
+        unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
+        if (m_bPathsToOpenMRU)
+            openFlags |= OpenFlags::AddToMRU;
         for (const auto& path : m_pathsToOpen)
         {
-            unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
-            if (m_bPathsToOpenMRU)
-                openFlags |= OpenFlags::AddToMRU;
             if (OpenFile(path.first, openFlags) >= 0)
             {
                 if (path.second != (size_t)-1)
@@ -1331,7 +1331,7 @@ void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& sa
 void CMainWindow::EnsureAtLeastOneTab()
 {
     if (m_TabBar.GetItemCount() == 0)
-        DoCommand(cmdNew);
+        OpenNewTab();
 }
 
 void CMainWindow::GoToLine( size_t line )
@@ -1428,10 +1428,11 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     }
 }
 
-bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool leaveEmptyTab )
+bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool quitting )
 {
     if ((tab < 0) || (tab >= m_TabBar.GetItemCount()))
         return false;
+
     CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
     if (!force && (doc.m_bIsDirty || doc.m_bNeedsSaving))
     {
@@ -1459,38 +1460,41 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool leaveEmptyTa
         }
         // Will Close
     }
-    else
-        // SCI_SETDOCPOINTER is necessary so the reference count of the document
-        // is decreased and the memory can be released.
-        m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-
-    if (leaveEmptyTab && (m_TabBar.GetItemCount() == 1) &&
-        (m_editor.Call(SCI_GETTEXTLENGTH)==0) &&
-        (m_editor.Call(SCI_GETMODIFY)==0) &&
-        doc.m_path.empty())
-        return true;  // leave the empty, new document as is
-
+    if (!quitting && m_TabBar.GetItemCount() == 1)
+    {
+        auto onlyDoc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0));
+        if (onlyDoc.m_path.empty() &&
+            m_editor.Call(SCI_GETTEXTLENGTH) == 0 &&
+            m_editor.Call(SCI_GETMODIFY) == 0)
+        {
+            return true;  // leave the empty, new document as is
+        }
+    }
+    // SCI_SETDOCPOINTER is necessary so the reference count of the document
+    // is decreased and the memory can be released.
+    m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
     CCommandHandler::Instance().OnDocumentClose(tab);
-
+ 
     // Prefer to remove the document after the tab has gone as it supports it
     // and deletion causes events that may expect it to be there.
     int docId = m_TabBar.GetIDFromIndex(tab);
     m_TabBar.DeleteItemAt(tab);
     m_DocManager.RemoveDocument(docId);
-    if (leaveEmptyTab)
+    if (!quitting)
     {
-        if (m_TabBar.GetItemCount() == 0)
+        int tabCount = m_TabBar.GetItemCount();
+        if (tabCount == 0)
             EnsureAtLeastOneTab();
         else
         {
-            int nextTab = (tab < m_TabBar.GetItemCount()) ? tab : m_TabBar.GetItemCount() - 1;
+            int nextTab = (tab < tabCount) ? tab : tabCount - 1;
             m_TabBar.ActivateAt(nextTab);
         }
     }
     return true;
 }
 
-bool CMainWindow::CloseAllTabs(bool leaveEmptyTab)
+bool CMainWindow::CloseAllTabs(bool quitting)
 {
     FileTreeBlockRefresh(true);
     OnOutOfScope(FileTreeBlockRefresh(false));
@@ -1501,9 +1505,9 @@ bool CMainWindow::CloseAllTabs(bool leaveEmptyTab)
     OnOutOfScope(docloseall = false;);
     do
     {
-        if (CloseTab(m_TabBar.GetItemCount()-1, false, leaveEmptyTab) == false)
+        if (CloseTab(m_TabBar.GetItemCount()-1, false, quitting) == false)
             return false;
-        if (leaveEmptyTab && m_TabBar.GetItemCount() == 1 &&
+        if (!quitting && m_TabBar.GetItemCount() == 1 &&
             m_editor.Call(SCI_GETTEXTLENGTH) == 0 &&
             m_editor.Call(SCI_GETMODIFY) == 0 &&
             m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0)).m_path.empty())
@@ -2422,7 +2426,8 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     bool bCreateIfMissing = (openFlags & OpenFlags::CreateIfMissing) != 0;
     bool bIgnoreIfMissing = (openFlags & OpenFlags::IgnoreIfMissing) != 0;
     bool bOpenIntoActiveTab = (openFlags & OpenFlags::OpenIntoActiveTab) != 0;
-    bool bActivate = (openFlags & OpenFlags::NoActivate) == 0;
+    // Ignore no activate flag for now. It causes too many issues.
+    bool bActivate = true;//(openFlags & OpenFlags::NoActivate) == 0;
     bool bCreateTabOnly = (openFlags & OpenFlags::CreateTabOnly) != 0;
 
     if (bCreateTabOnly)
