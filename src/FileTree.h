@@ -37,11 +37,11 @@ public:
     bool Init(HINSTANCE hInst, HWND hParent);
     void SetPath(const std::wstring& path) { m_path = path; Refresh(TVI_ROOT); }
     std::wstring GetPath()const { return m_path; }
-    HTREEITEM GetHitItem();
+    HTREEITEM GetHitItem() const;
     void Refresh(HTREEITEM refreshRoot, bool force = false);
-    std::wstring GetFilePathForHitItem();
-    std::wstring GetFilePathForSelItem();
-    std::wstring GetDirPathForHitItem();
+    std::wstring GetFilePathForHitItem() const;
+    std::wstring GetFilePathForSelItem() const;
+    std::wstring GetDirPathForHitItem() const;
     
     void OnThemeChanged(bool bDark) override;
     bool Execute() override;

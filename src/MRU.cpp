@@ -41,35 +41,27 @@ public:
         if (!wszFullPath || !ppProperties)
             return E_POINTER;
 
-        *ppProperties = NULL;
+        *ppProperties = nullptr;
 
         HRESULT hr;
 
         CRecentFileProperties* pProperties = new CRecentFileProperties();
 
-        if (pProperties != NULL)
-        {
-            hr = ::StringCchCopyW(pProperties->m_wszFullPath, MAX_PATH, wszFullPath);
-            SHFILEINFOW sfi = {0};
+        hr = ::StringCchCopyW(pProperties->m_wszFullPath, MAX_PATH, wszFullPath);
+        SHFILEINFOW sfi = {0};
 
-            DWORD_PTR dwPtr = NULL;
-            if (SUCCEEDED(hr))
-                dwPtr = ::SHGetFileInfoW(wszFullPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_DISPLAYNAME | SHGFI_USEFILEATTRIBUTES);
-
-            if (dwPtr != NULL)
-                hr = ::StringCchCopyW(pProperties->m_wszDisplayName, MAX_PATH, sfi.szDisplayName);
-            else // Provide a reasonable fallback.
-                hr = ::StringCchCopyW(pProperties->m_wszDisplayName, MAX_PATH, pProperties->m_wszFullPath);
-            pProperties->m_pinnedState = bPinned;
-        }
-        else
-            hr = E_OUTOFMEMORY;
-
+        DWORD_PTR dwPtr = 0;
         if (SUCCEEDED(hr))
-        {
-            *ppProperties = pProperties;
-            (*ppProperties)->AddRef();
-        }
+            dwPtr = ::SHGetFileInfoW(wszFullPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_DISPLAYNAME | SHGFI_USEFILEATTRIBUTES);
+
+        if (dwPtr != 0)
+            hr = ::StringCchCopyW(pProperties->m_wszDisplayName, MAX_PATH, sfi.szDisplayName);
+        else // Provide a reasonable fallback.
+            hr = ::StringCchCopyW(pProperties->m_wszDisplayName, MAX_PATH, pProperties->m_wszFullPath);
+        pProperties->m_pinnedState = bPinned;
+
+        *ppProperties = pProperties;
+        (*ppProperties)->AddRef();
 
         if (pProperties)
             pProperties->Release();
@@ -105,7 +97,7 @@ public:
             *ppv = static_cast<IUISimplePropertySet*>(this);
         else
         {
-            *ppv = NULL;
+            *ppv = nullptr;
             return E_NOINTERFACE;
         }
 
@@ -143,12 +135,12 @@ private:
 };
 
 
-CMRU::CMRU(void)
+CMRU::CMRU()
     : m_bLoaded(false)
 {
 }
 
-CMRU::~CMRU(void)
+CMRU::~CMRU()
 {
 }
 
@@ -184,13 +176,11 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
         // TODO! Use Com smart ptr type RAII here.
         CRecentFileProperties* pPropertiesObj = nullptr;
         hr = CRecentFileProperties::CreateInstance(mru.path.c_str(), mru.pinned, &pPropertiesObj);
-
         if (SUCCEEDED(hr))
         {
-            IUnknown* pUnk = NULL;
+            IUnknown* pUnk = nullptr;
 
             hr = pPropertiesObj->QueryInterface(__uuidof(IUnknown), reinterpret_cast<void**>(&pUnk));
-
             if (SUCCEEDED(hr))
             {
                 hr = SafeArrayPutElement(psa, &i, static_cast<void*>(pUnk));
@@ -216,10 +206,9 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
 
         if (SUCCEEDED(hr))
         {
-            IUnknown* pUnk = NULL;
+            IUnknown* pUnk = nullptr;
 
             hr = pPropertiesObj->QueryInterface(__uuidof(IUnknown), reinterpret_cast<void**>(&pUnk));
-
             if (SUCCEEDED(hr))
             {
                 hr = SafeArrayPutElement(psa, &i, static_cast<void*>(pUnk));
