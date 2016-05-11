@@ -169,61 +169,40 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
     HRESULT hr = E_FAIL;
     SAFEARRAY* psa = SafeArrayCreateVector(VT_UNKNOWN, 0, (ULONG)m_mruVec.size());
     LONG i = 0;
-    for (auto countPathPair = pinneditems.crbegin(); countPathPair != pinneditems.crend(); ++countPathPair)
+
+    auto FillItems = [](const std::vector<MRUItem>& items, SAFEARRAY* psa, LONG& i)
     {
-        const MRUItem& mru = *countPathPair;
-
-        // TODO! Use Com smart ptr type RAII here.
-        CRecentFileProperties* pPropertiesObj = nullptr;
-        hr = CRecentFileProperties::CreateInstance(mru.path.c_str(), mru.pinned, &pPropertiesObj);
-        if (SUCCEEDED(hr))
+        for (auto countPathPair = items.crbegin(); countPathPair != items.crend(); ++countPathPair)
         {
-            IUnknown* pUnk = nullptr;
+            const MRUItem& mru = *countPathPair;
 
-            hr = pPropertiesObj->QueryInterface(__uuidof(IUnknown), reinterpret_cast<void**>(&pUnk));
+            // TODO! Use Com smart ptr type RAII here.
+            CRecentFileProperties* pPropertiesObj = nullptr;
+            auto hr = CRecentFileProperties::CreateInstance(mru.path.c_str(), mru.pinned, &pPropertiesObj);
             if (SUCCEEDED(hr))
             {
-                hr = SafeArrayPutElement(psa, &i, static_cast<void*>(pUnk));
-                pUnk->Release();
+                IUnknown* pUnk = nullptr;
+
+                hr = pPropertiesObj->QueryInterface(__uuidof(IUnknown), reinterpret_cast<void**>(&pUnk));
+                if (SUCCEEDED(hr))
+                {
+                    hr = SafeArrayPutElement(psa, &i, static_cast<void*>(pUnk));
+                    pUnk->Release();
+                }
             }
+
+            if (pPropertiesObj)
+                pPropertiesObj->Release();
+
+            if (FAILED(hr))
+                break;
+
+            i++;
         }
+    };
 
-        if (pPropertiesObj)
-            pPropertiesObj->Release();
-
-        if (FAILED(hr))
-            break;
-
-        i++;
-    }
-    for (auto countPathPair = unpinneditems.crbegin(); countPathPair != unpinneditems.crend(); ++countPathPair)
-    {
-        const MRUItem& mru = *countPathPair;
-
-        // TODO! Use Com smart ptr type RAII here.
-        CRecentFileProperties* pPropertiesObj = nullptr;
-        hr = CRecentFileProperties::CreateInstance(mru.path.c_str(), mru.pinned, &pPropertiesObj);
-
-        if (SUCCEEDED(hr))
-        {
-            IUnknown* pUnk = nullptr;
-
-            hr = pPropertiesObj->QueryInterface(__uuidof(IUnknown), reinterpret_cast<void**>(&pUnk));
-            if (SUCCEEDED(hr))
-            {
-                hr = SafeArrayPutElement(psa, &i, static_cast<void*>(pUnk));
-                pUnk->Release();
-            }
-        }
-
-        if (pPropertiesObj)
-            pPropertiesObj->Release();
-
-        if (FAILED(hr))
-            break;
-
-        i++;
-    }
+    FillItems(pinneditems, psa, i);
+    FillItems(unpinneditems, psa, i);
 
     // We will only populate items up to before the first failed item, and discard the rest.
     SAFEARRAYBOUND sab = {ULONG(i),0};
