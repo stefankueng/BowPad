@@ -199,8 +199,8 @@ void ICommand::OpenFiles(const std::vector<std::wstring>& paths)
         int docToActivate = -1;
         for (const auto& file : paths)
         {
-            // Remember whatever we last successfully opened in order to activate it last.
-            if (OpenFile(file.c_str(), OpenFlags::AddToMRU | OpenFlags::NoActivate) >= 0)
+            // Remember whatever we first successfully open in order to return to it.
+            if (OpenFile(file.c_str(), OpenFlags::AddToMRU | OpenFlags::NoActivate) >= 0 && docToActivate < 0)
                 docToActivate = GetDocIDFromPath(file.c_str());
         }
         if (docToActivate >= 0)
