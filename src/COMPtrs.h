@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2015 - Stefan Kueng
+// Copyright (C) 2014-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@ _COM_SMARTPTR_TYPEDEF(IFileOperation, __uuidof(IFileOperation));
 _COM_SMARTPTR_TYPEDEF(IStream, __uuidof(IStream));
 _COM_SMARTPTR_TYPEDEF(IFileSaveDialog, __uuidof(IFileSaveDialog));
 _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
-_COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
+// Bowpad uses this interface but not the smart pointer for it yet.
+//_COM_SMARTPTR_TYPEDEF(IShellFolder, __uuidof(IShellFolder));
 _COM_SMARTPTR_TYPEDEF(IPropertyStore, __uuidof(IPropertyStore));
 _COM_SMARTPTR_TYPEDEF(ITaskbarList3, __uuidof(ITaskbarList3));
 _COM_SMARTPTR_TYPEDEF(ITaskbarList4, __uuidof(ITaskbarList4));
@@ -56,3 +57,8 @@ _COM_SMARTPTR_TYPEDEF(ISpellChecker, __uuidof(ISpellChecker));
 _COM_SMARTPTR_TYPEDEF(IEnumSpellingError, __uuidof(IEnumSpellingError));
 _COM_SMARTPTR_TYPEDEF(ISpellingError, __uuidof(ISpellingError));
 
+// These smart pointers are not yet used, but BowPad uses these COM interfaces
+// in at the FileTree at least.
+//_COM_SMARTPTR_TYPEDEF(IContextMenu, __uuidof(IContextMenu));
+//_COM_SMARTPTR_TYPEDEF(IContextMenu2, __uuidof(IContextMenu2));
+//_COM_SMARTPTR_TYPEDEF(IContextMenu3, __uuidof(IContextMenu3));

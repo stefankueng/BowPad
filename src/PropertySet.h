@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015 - Stefan Kueng
+// Copyright (C) 2013, 2015-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 //
 #pragma once
 
-#define MAX_RESOURCE_LENGTH     256
+const int MAX_RESOURCE_LENGTH = 256;
 #include <uiribbon.h>
 
 // The implementation of IUISimplePropertySet. This handles all of the properties used for the
@@ -45,7 +45,7 @@ public:
 private:
     CPropertySet()
         : m_categoryId(UI_COLLECTION_INVALIDINDEX)
-        , m_pimgItem(NULL)
+        , m_pimgItem(nullptr)
         , m_commandId(-1)
         , m_commandType(UI_COMMANDTYPE_UNKNOWN)
         , m_cRef(1)
@@ -55,7 +55,7 @@ private:
 
     ~CPropertySet()
     {
-        if (m_pimgItem != NULL)
+        if (m_pimgItem != nullptr)
         {
             m_pimgItem->Release();
         }
