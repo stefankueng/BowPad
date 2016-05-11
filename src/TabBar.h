@@ -63,9 +63,7 @@ public :
     };
 
     bool                        Init(HINSTANCE hInst, HWND hParent);
-
-    virtual LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
+    LRESULT CALLBACK            WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     int                         InsertAtEnd(const TCHAR *subTabName);
     int                         InsertAfter(int index, const TCHAR *subTabName);
     void                        ActivateAt(int index) const;
@@ -80,36 +78,25 @@ public :
     void                        DeleteItemAt(int index);
     int                         GetIDFromIndex(int index) const;
     int                         GetIndexFromID(int id) const;
-
     void                        DeletAllItems();
-
     HIMAGELIST                  SetImageList(HIMAGELIST himl);
-
-    int                         GetItemCount() const { return (int)m_nItems; }
-
+    int                         GetItemCount() const { return m_nItems; }
     void                        SetFont(const TCHAR *fontName, int fontSize);
     int                         GetSrcTab() const { return m_nSrcTab; }
     int                         GetDstTab() const { return m_nTabDragged; }
 protected:
     void                        DoOwnerDrawTab() const;
-
     void                        SetColour(COLORREF colour2Set, tabColourIndex i);
-
     static LRESULT CALLBACK     TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
     void                        ExchangeItemData(POINT point);
     LRESULT                     RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
-
     COLORREF                    GetTabColor(bool bSelected, UINT item) const;
     void                        DrawMainBorder(LPDRAWITEMSTRUCT lpDrawItemStruct) const;
     void                        DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) const;
     void                        DrawItemBorder(LPDRAWITEMSTRUCT lpDrawItemStruct) const;
-
     void                        DraggingCursor(POINT screenPoint, UINT item);
-
     int                         GetTabIndexAt(const POINT & p) const { return GetTabIndexAt(p.x, p.y); }
-
     int                         GetTabIndexAt(int x, int y) const;
-
     bool                        IsPointInParentZone(POINT screenPoint) const;
     void                        NotifyTabDelete(int tab);
 
@@ -146,5 +133,4 @@ private:
     HWND                        m_hwndArray[nbCtrlMax];
 
     ULONG_PTR                   gdiplusToken;
-
 };
