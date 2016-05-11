@@ -106,6 +106,7 @@ bool CCmdOpen::Execute()
     if (CAppUtils::FailedShowMessage(hr))
         return false;
     std::vector<std::wstring> paths;
+    paths.reserve(count);
     for (DWORD i = 0; i < count; ++i)
     {
         IShellItemPtr psiResult;
@@ -121,6 +122,10 @@ bool CCmdOpen::Execute()
             }
         }
     }
+    std::sort(paths.begin(), paths.end(), [](const auto& lhs, const auto& rhs)
+    {
+        return CPathUtils::PathCompare(lhs, rhs) < 0;
+    });
     OpenFiles(paths);
 
     return true;
