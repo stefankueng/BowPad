@@ -436,4 +436,9 @@ void ICommand::FileTreeBlockRefresh(bool bBlock)
     return pMainWnd->FileTreeBlockRefresh(bBlock);
 }
 
+long ICommand::GetCurrentLineNumber() const
+{
+    CMainWindow* pMainWnd = GetMainWindow();
+    return pMainWnd->m_editor.GetCurrentLineNumber();
+}
 

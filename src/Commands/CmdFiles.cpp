@@ -145,7 +145,7 @@ void CCmdSave::ScintillaNotify( Scintilla::SCNotification * pScn )
     case SCN_SAVEPOINTREACHED:
     case SCN_SAVEPOINTLEFT:
         {
-            InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+            InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
         }
         break;
     }
@@ -155,7 +155,7 @@ void CCmdSave::TabNotify(TBHDR * ptbhdr)
 {
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 }
 
@@ -193,7 +193,7 @@ void CCmdSaveAll::ScintillaNotify( Scintilla::SCNotification * pScn )
     case SCN_SAVEPOINTREACHED:
     case SCN_SAVEPOINTLEFT:
         {
-            InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+            InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
         }
         break;
     }
@@ -203,7 +203,7 @@ void CCmdSaveAll::TabNotify(TBHDR * ptbhdr)
 {
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 }
 
@@ -248,7 +248,7 @@ void CCmdReload::TabNotify(TBHDR * ptbhdr)
 {
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 }
 
@@ -270,7 +270,7 @@ void CCmdFileDelete::TabNotify(TBHDR * ptbhdr)
 {
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 }
 
@@ -308,7 +308,7 @@ bool CCmdFileDelete::Execute()
             tdc.pszContent = sQuestion.c_str();
             tdc.nDefaultButton = 101;
             int nClickedBtn = 0;
-            HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
+            HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
 
             if (!CAppUtils::FailedShowMessage(hr))
             {
@@ -319,7 +319,7 @@ bool CCmdFileDelete::Execute()
                         return false;
 
                     IFileOperationPtr pfo = NULL;
-                    hr = pfo.CreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL);
+                    hr = pfo.CreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL);
 
                     if (!CAppUtils::FailedShowMessage(hr))
                     {
@@ -333,12 +333,12 @@ bool CCmdFileDelete::Execute()
                         {
                             // Create IShellItem instance associated to file to delete
                             IShellItemPtr psiFileToDelete = NULL;
-                            hr = SHCreateItemFromParsingName(doc.m_path.c_str(), NULL, IID_PPV_ARGS(&psiFileToDelete));
+                            hr = SHCreateItemFromParsingName(doc.m_path.c_str(), nullptr, IID_PPV_ARGS(&psiFileToDelete));
 
                             if (!CAppUtils::FailedShowMessage(hr))
                             {
                                 // Declare this shell item (file) to be deleted
-                                hr = pfo->DeleteItem(psiFileToDelete, NULL);
+                                hr = pfo->DeleteItem(psiFileToDelete, nullptr);
                             }
                         }
                         pfo->SetOwnerWindow(GetHwnd());

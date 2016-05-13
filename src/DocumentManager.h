@@ -27,9 +27,6 @@ enum DocModifiedState
     DM_Unknown
 };
 
-EOLFormat ToEOLFormat(int eolMode);
-int ToEOLMode(EOLFormat eolFormat);
-
 class CDocumentManager
 {
 public:
@@ -44,7 +41,6 @@ public:
     bool                        HasDocumentID(int id) const;
     CDocument                   GetDocumentFromID(int id) const;
     Document                    GetScintillaDocument(int id) const { return GetDocumentFromID(id).m_document; }
-    COLORREF                    GetColorForDocument(int id);
 
     CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
     bool                        SaveFile(HWND hWnd, const CDocument& doc, bool & bTabMoved);
@@ -57,7 +53,5 @@ private:
 
 private:
     std::map<int,CDocument>     m_documents;
-    std::map<std::wstring, int> m_foldercolorindexes;
-    int                         m_lastfoldercolorindex;
     CScintillaWnd               m_scratchScintilla;
 };

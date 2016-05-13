@@ -132,7 +132,7 @@ void CCmdBookmarks::OnDocumentOpen(int index)
 
 bool CCmdBookmarkToggle::Execute()
 {
-    long line = long(ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS)));
+    long line = GetCurrentLineNumber();
 
     LRESULT state = ScintillaCall(SCI_MARKERGET, line);
     if ((state & (1 << MARK_BOOKMARK)) != 0)
@@ -166,7 +166,7 @@ bool CCmdBookmarkClearAll::Execute()
 
 bool CCmdBookmarkNext::Execute()
 {
-    long line = (long)ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
+    long line = GetCurrentLineNumber();
     line = (long)ScintillaCall(SCI_MARKERNEXT, line+1, (1 << MARK_BOOKMARK));
     if (line >= 0)
         ScintillaCall(SCI_GOTOLINE, line);
@@ -205,7 +205,7 @@ HRESULT CCmdBookmarkNext::IUICommandHandlerUpdateProperty(
 
 bool CCmdBookmarkPrev::Execute()
 {
-    long line = (long)ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
+    long line = GetCurrentLineNumber();
     line = (long)ScintillaCall(SCI_MARKERPREVIOUS, line-1, (1 << MARK_BOOKMARK));
     if (line >= 0)
         ScintillaCall(SCI_GOTOLINE, line);
@@ -222,9 +222,9 @@ bool CCmdBookmarkPrev::Execute()
 void CCmdBookmarkPrev::ScintillaNotify(Scintilla::SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     else if ((pScn->nmhdr.code == SCN_MARGINCLICK) && (pScn->margin == SC_MARGE_SYBOLE) && !pScn->modifiers)
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
 HRESULT CCmdBookmarkPrev::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)

@@ -44,23 +44,8 @@
 #include <stdexcept>
 #include <Shobjidl.h>
 
-static const COLORREF foldercolors[] = {
-    RGB(177,199,253),
-    RGB(221,253,177),
-    RGB(253,177,243),
-    RGB(177,253,240),
-    RGB(253,218,177),
-    RGB(196,177,253),
-    RGB(180,253,177),
-    RGB(253,177,202),
-    RGB(177,225,253),
-    RGB(247,253,177),
-};
-
 const int ReadBlockSize = 128 * 1024;   //128 kB
 const int WriteBlockSize = 128 * 1024;   //128 kB
-const int MAX_FOLDERCOLORS = (_countof(foldercolors));
-
 
 static wchar_t inline WideCharSwap(wchar_t nValue)
 {
@@ -84,73 +69,6 @@ static UINT64 inline DwordSwapBytes(UINT64 nValue)
     UINT64 nRet = ((nValue&0xffff0000ffffL)<<16) | ((nValue>>16)&0xffff0000ffffL); // swap WORDs in DWORDs
     nRet = ((nRet&0xff00ff00ff00ff)<<8) | ((nRet>>8)&0xff00ff00ff00ff); // swap BYTESs in WORDs
     return nRet;
-}
-
-CDocumentManager::CDocumentManager()
-    : m_scratchScintilla(hRes)
-    , m_lastfoldercolorindex(0)
-{
-    m_scratchScintilla.InitScratch(hRes);
-}
-
-CDocumentManager::~CDocumentManager()
-{
-}
-
-bool CDocumentManager::HasDocumentID(int id) const
-{
-    // Allow searches of things with an invalid id, to simplify things for the caller.
-    auto where = m_documents.find(id);
-    if (where == m_documents.end())
-        return false;
-
-    // If we find something with an invalid id, something is very wrong.
-    if (id < 0)
-        APPVERIFY(false);
-
-    return true;
-}
-
-// Must exist or it's a bug.
-CDocument CDocumentManager::GetDocumentFromID(int id) const
-{
-    // Pretty catastrophic if this ever fails.
-    // Use HasDocumentID to check first if you're not sure.
-    if (id < 0)
-        APPVERIFY(false);
-    auto pos = m_documents.find(id);
-    if (pos == std::end(m_documents))
-    {
-        APPVERIFY(false);
-        return CDocument();
-    }
-    return pos->second;
-}
-
-void CDocumentManager::SetDocument(int id, const CDocument& doc)
-{
-    APPVERIFY(id >= 0);
-    auto where = m_documents.find(id);
-    // SetDocument/Find does not create a position if it doesn't exist.
-    // Use Operator [] for that or really AddDocumentAtEnd etc. to add.
-    if (where == std::end(m_documents))
-    {
-        // Should never happen but if it does, it's a serious bug
-        // because we are throwing data away.
-        // Ideally we want to notify the user about this but their
-        // is no consensus to do that.
-        APPVERIFY(false);
-        return; // Return now to avoid overwriting memory.
-    }
-    where->second = doc;
-}
-
-void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, int id )
-{
-    // Catch attempts to id's that serve as null type values.
-    APPVERIFY(id>=0); // Serious bug.    
-    APPVERIFY(m_documents.find(id) == m_documents.end()); // Should not already exist.
-    m_documents[id] = doc;
 }
 
 static void LoadSomeUtf8(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data)
@@ -328,7 +246,7 @@ static bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent = sQuestion.c_str();
     int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, nullptr, nullptr );
+    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
     if (CAppUtils::FailedShowMessage(hr))
         return 0;
     // We've used TDCBF_CANCEL_BUTTON so IDCANCEL can be returned,
@@ -367,7 +285,7 @@ static bool AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent = sQuestion.c_str();
     int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect( &tdc, &nClickedBtn, nullptr, nullptr );
+    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
     if (CAppUtils::FailedShowMessage(hr))
         return 0;
     // We've used TDCBF_CANCEL_BUTTON so IDCANCEL can be returned,
@@ -387,20 +305,20 @@ static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params)
     shExecInfo.lpParameters = params.c_str();
     shExecInfo.nShow = SW_NORMAL;
 
-    if (! ShellExecuteEx(&shExecInfo))
+    if (!ShellExecuteEx(&shExecInfo))
         return ::GetLastError();
 
     return 0;
 }
 
-static void ShowFileLoadError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg )
+static void ShowFileLoadError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg)
 {
     ResString rTitle(hRes, IDS_APP_TITLE);
     ResString rLoadErr(hRes, IDS_FAILEDTOLOADFILE);
     MessageBox(hWnd, CStringUtils::Format(rLoadErr, fileName.c_str(), msg).c_str(), (LPCWSTR)rTitle, MB_ICONERROR);
 }
 
-static void ShowFileSaveError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg )
+static void ShowFileSaveError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg)
 {
     ResString rTitle(hRes, IDS_APP_TITLE);
     ResString rSaveErr(hRes, IDS_FAILEDTOSAVEFILE);
@@ -425,32 +343,70 @@ static void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
     }
 }
 
-EOLFormat ToEOLFormat(int eolMode)
+CDocumentManager::CDocumentManager()
+    : m_scratchScintilla(hRes)
 {
-    switch (eolMode)
-    {
-    case SC_EOL_CRLF:
-        return WIN_FORMAT;
-    case SC_EOL_LF:
-        return UNIX_FORMAT;
-    case SC_EOL_CR:
-        return MAC_FORMAT;
-    }
-    return UNKNOWN_FORMAT;
+    m_scratchScintilla.InitScratch(hRes);
 }
 
-int ToEOLMode(EOLFormat eolFormat)
+CDocumentManager::~CDocumentManager()
 {
-    switch (eolFormat)
+}
+
+bool CDocumentManager::HasDocumentID(int id) const
+{
+    // Allow searches of things with an invalid id, to simplify things for the caller.
+    auto where = m_documents.find(id);
+    if (where == m_documents.end())
+        return false;
+
+    // If we find something with an invalid id, something is very wrong.
+    if (id < 0)
+        APPVERIFY(false);
+
+    return true;
+}
+
+// Must exist or it's a bug.
+CDocument CDocumentManager::GetDocumentFromID(int id) const
+{
+    // Pretty catastrophic if this ever fails.
+    // Use HasDocumentID to check first if you're not sure.
+    if (id < 0)
+        APPVERIFY(false);
+    auto pos = m_documents.find(id);
+    if (pos == std::end(m_documents))
     {
-    case WIN_FORMAT:
-        return SC_EOL_CRLF;
-    case UNIX_FORMAT:
-        return SC_EOL_LF;
-    case MAC_FORMAT:
-        return SC_EOL_CR;
+        APPVERIFY(false);
+        return CDocument();
     }
-    return -1;
+    return pos->second;
+}
+
+void CDocumentManager::SetDocument(int id, const CDocument& doc)
+{
+    APPVERIFY(id >= 0);
+    auto where = m_documents.find(id);
+    // SetDocument/Find does not create a position if it doesn't exist.
+    // Use Operator [] for that or really AddDocumentAtEnd etc. to add.
+    if (where == std::end(m_documents))
+    {
+        // Should never happen but if it does, it's a serious bug
+        // because we are throwing data away.
+        // Ideally we want to notify the user about this but their
+        // is no consensus to do that.
+        APPVERIFY(false);
+        return; // Return now to avoid overwriting memory.
+    }
+    where->second = doc;
+}
+
+void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, int id )
+{
+    // Catch attempts to id's that serve as null type values.
+    APPVERIFY(id>=0); // Serious bug.    
+    APPVERIFY(m_documents.find(id) == m_documents.end()); // Should not already exist.
+    m_documents[id] = doc;
 }
 
 CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing)
@@ -972,18 +928,4 @@ void CDocumentManager::RemoveDocument( int id )
     CDocument doc = GetDocumentFromID(id);
     m_scratchScintilla.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
     m_documents.erase(id);
-}
-
-COLORREF CDocumentManager::GetColorForDocument( int id )
-{
-    CDocument doc = GetDocumentFromID(id);
-    std::wstring folderpath = CPathUtils::GetParentDirectory(doc.m_path);
-    CStringUtils::emplace_to_lower(folderpath);
-
-    auto foundIt = m_foldercolorindexes.find(folderpath);
-    if (foundIt != m_foldercolorindexes.end())
-        return foldercolors[foundIt->second % MAX_FOLDERCOLORS];
-
-    m_foldercolorindexes[folderpath] = m_lastfoldercolorindex;
-    return foldercolors[m_lastfoldercolorindex++ % MAX_FOLDERCOLORS];
 }

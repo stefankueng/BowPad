@@ -209,9 +209,7 @@ bool CScintillaWnd::InitScratch( HINSTANCE hInst )
     CreateEx(WS_EX_NOPARENTNOTIFY, 0, NULL, nullptr, L"Scintilla");
 
     if (!*this)
-    {
         return false;
-    }
 
     m_pSciMsg = (SciFnDirect)SendMessage(*this, SCI_GETDIRECTFUNCTION, 0, 0);
     m_pSciWndData = (sptr_t)SendMessage(*this, SCI_GETDIRECTPOINTER, 0, 0);
@@ -242,9 +240,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         }
     case WM_NOTIFY:
         if(hdr->code == NM_COOLSB_CUSTOMDRAW)
-        {
             return m_docScroll.HandleCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
-        }
         break;
     case WM_CONTEXTMENU:
         {
@@ -253,11 +249,9 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
 
             if (pt.x == -1 && pt.y == -1)
             {
-                HRESULT hr;
-
                 // Display the menu in the upper-left corner of the client area, below the ribbon.
                 IUIRibbon * pRibbon;
-                hr = g_pFramework->GetView(0, IID_PPV_ARGS(&pRibbon));
+                HRESULT hr = g_pFramework->GetView(0, IID_PPV_ARGS(&pRibbon));
                 if (SUCCEEDED(hr))
                 {
                     UINT32 uRibbonHeight = 0;
@@ -345,8 +339,6 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 // hide the mouse cursor so it does not get in the way
                 if (m_bCursorShown)
                 {
-                    RECT rc;
-                    GetClientRect(*this, &rc);
                     DWORD pos = GetMessagePos();
                     POINT pt;
                     pt.x = GET_X_LPARAM(pos);
@@ -354,6 +346,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                     auto hptWnd = WindowFromPoint(pt);
                     if (hptWnd == *this && hptWnd == GetFocus())
                     {
+                        RECT rc;
+                        GetClientRect(*this, &rc);
                         ScreenToClient(*this, &pt);
                         if (PtInRect(&rc, pt))
                         {
@@ -416,7 +410,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         static long yOverpan = 0;
 
         if ((GetGestureInfoFunc == nullptr) || (CloseGestureInfoHandleFunc == nullptr) ||
-            (BeginPanningFeedbackFunc == nullptr) || (EndPanningFeedbackFunc == nullptr) || (UpdatePanningFeedbackFunc == nullptr))
+            (BeginPanningFeedbackFunc == nullptr) || (EndPanningFeedbackFunc == nullptr) ||
+            (UpdatePanningFeedbackFunc == nullptr))
             break;
 
         GESTUREINFO gi;
@@ -2079,3 +2074,7 @@ std::string CScintillaWnd::GetWhitespaceChars() const
     return linebuffer.get();
 }
 
+long CScintillaWnd::GetCurrentLineNumber() const
+{
+    return (long)ConstCall(SCI_LINEFROMPOSITION, ConstCall(SCI_GETCURRENTPOS));
+}

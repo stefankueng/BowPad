@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 struct ScintillaCmd
 {
-    std::wstring    functionname;
+    const wchar_t*const functionname;
     UINT            cmd;
     UINT            cmdget;
     VARTYPE         retval;
@@ -60,8 +60,6 @@ public:
 private:
     bool ScintillaCommandsDispId(wchar_t * name, DISPID& id);
     HRESULT ScintillaCommandInvoke(DISPID id, WORD flags, DISPPARAMS* args, VARIANT* ret);
-    std::vector<ScintillaCmd>   m_ScintillaCmds;
     ICommand *                  m_Obj;
-
     ULONG                       m_refCount;
 };

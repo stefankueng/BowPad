@@ -41,7 +41,7 @@ class CCmdSave : public ICommand
 public:
     CCmdSave(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
     ~CCmdSave() {}
 
@@ -61,7 +61,7 @@ class CCmdSaveAll : public ICommand
 public:
     CCmdSaveAll(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
     ~CCmdSaveAll() {}
 

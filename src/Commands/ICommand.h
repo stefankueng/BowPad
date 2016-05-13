@@ -123,6 +123,7 @@ protected:
     HRESULT             InvalidateUICommand(UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY *key);
     HRESULT             SetUICommandProperty(UINT32 commandId, REFPROPERTYKEY key, PROPVARIANT value);
     HRESULT             SetUICommandProperty(REFPROPERTYKEY key, PROPVARIANT value);
+    long                GetCurrentLineNumber() const;
 
 private:
     inline CMainWindow* GetMainWindow()
