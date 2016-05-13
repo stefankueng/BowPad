@@ -109,6 +109,7 @@ public :
     std::string GetWordChars() const;
     std::string GetWhitespaceChars() const;
     long GetSelTextMarkerCount() const { return m_selTextMarkerCount; }
+    long GetCurrentLineNumber() const;
 
     LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
 

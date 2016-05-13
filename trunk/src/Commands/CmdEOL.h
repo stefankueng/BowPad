@@ -19,53 +19,38 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 
-class CCmdEOLWin : public ICommand
+class CCmdEOLBase : public ICommand
 {
-public:
-
-    CCmdEOLWin(void * obj);
-
-    ~CCmdEOLWin();
-
-    bool Execute() override;
-
-    UINT GetCmdId() override { return cmdEOLWin; }
-
+protected:
+    // Don't do anything in this base, like call InvalidateUICommand which
+    // might result in a virtual call and the derrived class won't be setup.
+    CCmdEOLBase(void* obj) : ICommand(obj) {}
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-
-    void TabNotify(TBHDR * ptbhdr) override;
-};
-
-class CCmdEOLUnix : public ICommand
-{
-public:
-
-    CCmdEOLUnix(void * obj);
-
-    ~CCmdEOLUnix();
-
-    bool Execute() override;
-
-    UINT GetCmdId() override { return cmdEOLUnix; }
-
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-
     void TabNotify(TBHDR* ptbhdr) override;
+    bool Execute() override;
+    virtual int GetLineType() const = 0;
 };
 
-class CCmdEOLMac : public ICommand
+class CCmdEOLWin : public CCmdEOLBase
 {
 public:
+    CCmdEOLWin(void* obj);
+    UINT GetCmdId() override { return cmdEOLWin; }
+    int GetLineType() const override { return SC_EOL_CRLF; }
+};
 
-    CCmdEOLMac(void * obj);
+class CCmdEOLUnix : public CCmdEOLBase
+{
+public:
+    CCmdEOLUnix(void* obj);
+    UINT GetCmdId() override { return cmdEOLUnix; }
+    int GetLineType() const override { return SC_EOL_LF; }
+};
 
-    ~CCmdEOLMac();
-
-    bool Execute() override;
-
+class CCmdEOLMac : public CCmdEOLBase
+{
+public:
+    CCmdEOLMac(void* obj);
     UINT GetCmdId() override { return cmdEOLMac; }
-
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-
-    void TabNotify(TBHDR * ptbhdr) override;
+    int GetLineType() const override { return SC_EOL_CR; }
 };

@@ -21,7 +21,6 @@
 
 CCmdWhiteSpace::CCmdWhiteSpace(void * obj) : ICommand(obj)
 {
-
     int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"whitespace", 0);
     ScintillaCall(SCI_SETVIEWWS, ws);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
@@ -58,6 +57,7 @@ CCmdTabSize::CCmdTabSize(void * obj) : ICommand(obj)
     int ve = (int)CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4);
     ScintillaCall(SCI_SETTABWIDTH, ve);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
+    UpdateStatusBar(false);
 }
 
 CCmdTabSize::~CCmdTabSize()
@@ -66,6 +66,8 @@ CCmdTabSize::~CCmdTabSize()
 
 HRESULT CCmdTabSize::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
 {
+    // REVIEW: ZeroMemory might not be the best tool here. VariantInit
+    // or UIInitPropertyFromDecimal or some such routine seems better.
     HRESULT hr = S_OK;
     // Set the minimum value
     if (IsEqualPropertyKey(key, UI_PKEY_MinValue))
@@ -111,6 +113,7 @@ HRESULT CCmdTabSize::IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const P
 {
     ScintillaCall(SCI_SETTABWIDTH, ppropvarValue->intVal);
     CIniSettings::Instance().SetInt64(L"View", L"tabsize", ppropvarValue->intVal);
+    UpdateStatusBar(false);
     return S_OK;
 }
 
@@ -130,6 +133,7 @@ bool CCmdUseTabs::Execute()
     ScintillaCall(SCI_SETUSETABS, ScintillaCall(SCI_GETUSETABS) ? 0 : 1);
     CIniSettings::Instance().SetInt64(L"View", L"usetabs", ScintillaCall(SCI_GETUSETABS));
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    UpdateStatusBar(false);
     return true;
 }
 

@@ -22,6 +22,8 @@ typedef uptr_t Document;
 enum EOLFormat { UNKNOWN_FORMAT, WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT };
 
 std::wstring GetEOLFormatDescription(EOLFormat ft);
+EOLFormat ToEOLFormat(int eolMode);
+int ToEOLMode(EOLFormat eolFormat);
 
 class CPosData
 {

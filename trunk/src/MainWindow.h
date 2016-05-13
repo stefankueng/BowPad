@@ -177,6 +177,7 @@ private:
     LRESULT                     HandleTabBarEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
     int                         GetZoomPC() const;
     void                        SetZoomPC(int zoomPC);
+    COLORREF                    GetColorForDocument(int id);
 
 private:
     LONG                        m_cRef;
@@ -209,4 +210,6 @@ private:
     bool                        m_inMenuLoop = false;
     std::unique_ptr<_IMAGELIST, HIMAGELIST_Deleter> m_TabBarImageList;
     CScintillaWnd               m_scratchEditor;
+    std::map<std::wstring, int> m_foldercolorindexes;
+    int                         m_lastfoldercolorindex;
 };
