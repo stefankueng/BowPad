@@ -542,7 +542,7 @@ bool CAppUtils::HexStringToCOLORREF(const std::wstring& s, COLORREF* clr)
     return false;
 }
 
-bool CAppUtils::TryParse(const wchar_t* s, int& result, bool emptyOk, int def)
+bool CAppUtils::TryParse(const wchar_t* s, int& result, bool emptyOk, int def, int base)
 {
     // At the time of writing _wtoi doesn't appear to set errno at all,
     // despite what the documentation suggests.
@@ -560,7 +560,7 @@ bool CAppUtils::TryParse(const wchar_t* s, int& result, bool emptyOk, int def)
     }
     try
     {
-        result  = std::stoi(s);
+        result  = std::stoi(s, nullptr, base);
     }
     catch (const std::invalid_argument& /*ex*/)
     {
@@ -570,3 +570,21 @@ bool CAppUtils::TryParse(const wchar_t* s, int& result, bool emptyOk, int def)
     return true;
 }
 
+bool CAppUtils::TryParse(const wchar_t* s, unsigned long & result, bool emptyOk, unsigned long def, int base)
+{
+    if (!*s)
+    {
+        result = def;
+        return emptyOk;
+    }
+    try
+    {
+        result = std::stoi(s, nullptr, base);
+    }
+    catch (const std::invalid_argument& /*ex*/)
+    {
+        result = def;
+        return false;
+    }
+    return true;
+}
