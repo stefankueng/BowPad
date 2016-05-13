@@ -40,7 +40,8 @@ public:
     static bool                     HexStringToCOLORREF(const std::string& s, COLORREF* clr);
     static bool                     HexStringToCOLORREF(const std::wstring& s, COLORREF* clr);
     static bool                     ShortHexStringToCOLORREF(const std::string& s, COLORREF* clr);
-    static bool                     TryParse(const wchar_t* s, int& result, bool emptyOk = false, int def = 0);
+    static bool                     TryParse(const wchar_t* s, int& result, bool emptyOk = false, int def = 0, int base = 10);
+    static bool                     TryParse(const wchar_t* s, unsigned long& result, bool emptyOk = false, unsigned long def = 0, int base = 10);
     static std::wstring             GetProgramFilesX86Folder();
 private:
     static std::wstring             updatefilename;
