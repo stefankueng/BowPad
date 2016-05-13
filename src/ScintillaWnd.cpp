@@ -749,6 +749,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_SETWHITESPACEFORE, true, theme.GetThemeColor(RGB(255, 181, 106)));
     
     Call(SCI_COLOURISE, 0, -1);
+    Call(SCI_SETCODEPAGE, CP_UTF8);
 }
 
 void CScintillaWnd::GotoLine(long line)
