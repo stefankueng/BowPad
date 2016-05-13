@@ -110,24 +110,37 @@ static void SetIcon()
     }
 }
 
+static void SetUserStringKey(LPCWSTR keyName, LPCWSTR subKeyName, const std::wstring& keyValue)
+{
+    DWORD dwSizeInBytes = DWORD((keyValue.length() + 1) * sizeof(WCHAR));
+    auto status = SHSetValue(HKEY_CURRENT_USER, keyName, subKeyName, REG_SZ, keyValue.c_str(), dwSizeInBytes);
+    if (status != ERROR_SUCCESS)
+    {
+        std::wstring msg = CStringUtils::Format(L"Registry key '%s' (subkey: '%s') could not be set.",
+            keyName, subKeyName ? subKeyName : L"(none)");
+        MessageBox(NULL, msg.c_str(), L"BowPad", MB_ICONINFORMATION);
+    }
+}
+
 static void RegisterContextMenu(bool bAdd)
 {
     if (bAdd)
     {
-        std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str(), IDI_BOWPAD);
-        std::wstring sExePath = CStringUtils::Format(L"%s /path:\"%%1\"", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str());
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", nullptr, REG_SZ, L"Edit in BowPad", sizeof(L"Edit in BowPad") + 2);
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad", L"MultiSelectModel", REG_SZ, L"Player", sizeof(L"MultiSelectModel") + 2);
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\BowPad\\Command", nullptr, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad", nullptr, REG_SZ, L"Open Folder with BowPad", sizeof(L"Open Folder with BowPad") + 2);
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\shell\\BowPad\\Command", nullptr, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad", nullptr, REG_SZ, L"Open Folder with BowPad", sizeof(L"Open Folder with BowPad") + 2);
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad", L"Icon", REG_SZ, sIconPath.c_str(), DWORD((sIconPath.size() + 1) * sizeof(WCHAR)));
+        auto modulePath = CPathUtils::GetLongPathname(CPathUtils::GetModulePath());
+        std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", modulePath.c_str(), IDI_BOWPAD);
+        std::wstring sExePath = CStringUtils::Format(L"%s /path:\"%%1\"", modulePath.c_str());
+        SetUserStringKey(L"Software\\Classes\\*\\shell\\BowPad", nullptr, L"Edit in BowPad");
+        SetUserStringKey(L"Software\\Classes\\*\\shell\\BowPad", L"Icon", sIconPath);
+        SetUserStringKey(L"Software\\Classes\\*\\shell\\BowPad", L"MultiSelectModel", L"Player");
+        SetUserStringKey(L"Software\\Classes\\*\\shell\\BowPad\\Command", nullptr, sExePath);
+        SetUserStringKey(L"Software\\Classes\\Directory\\shell\\BowPad", nullptr, L"Open Folder with BowPad");
+        SetUserStringKey(L"Software\\Classes\\Directory\\shell\\BowPad", L"Icon", sIconPath);
+        SetUserStringKey(L"Software\\Classes\\Directory\\shell\\BowPad\\Command", nullptr, sExePath);
+        SetUserStringKey(L"Software\\Classes\\Directory\\Background\\shell\\BowPad", nullptr, L"Open Folder with BowPad");
+        SetUserStringKey(L"Software\\Classes\\Directory\\Background\\shell\\BowPad", L"Icon", sIconPath);
 
-        sExePath = CStringUtils::Format(L"%s /path:\"%%V\"", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str());
-        SHSetValue(HKEY_CURRENT_USER, L"Software\\Classes\\Directory\\Background\\shell\\BowPad\\Command", nullptr, REG_SZ, sExePath.c_str(), DWORD((sExePath.size() + 1) * sizeof(WCHAR)));
+        sExePath = CStringUtils::Format(L"%s /path:\"%%V\"", modulePath.c_str());
+        SetUserStringKey(L"Software\\Classes\\Directory\\Background\\shell\\BowPad\\Command", nullptr, sExePath);
     }
     else
     {
@@ -399,8 +412,7 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
 
     ParseCommandLine(*parser, mainWindow);
 
-    // Don't need the parser any more so don't keep it
-    // around taking up space.
+    // Don't need the parser any more so don't keep it around taking up space.
     parser.reset();
 
     // force CWD to the install path to avoid the CWD being locked:
@@ -411,9 +423,10 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
 
     // Main message loop:
     MSG msg = { 0 };
+    auto& kb = CKeyboardShortcutHandler::Instance();
     while (GetMessage(&msg, NULL, 0, 0))
     {
-        if (!CKeyboardShortcutHandler::Instance().TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam) &&
+        if (!kb.TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam) &&
             !CDialog::IsDialogMessage(&msg))
         {
             TranslateMessage(&msg);
