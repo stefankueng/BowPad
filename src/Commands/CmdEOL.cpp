@@ -17,24 +17,17 @@
 
 #include "stdafx.h"
 #include "CmdEol.h"
+#include "Document.h"
 
-CCmdEOLWin::CCmdEOLWin(void * obj) : ICommand(obj)
+bool CCmdEOLBase::Execute()
 {
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-}
-
-CCmdEOLWin::~CCmdEOLWin()
-{
-}
-
-bool CCmdEOLWin::Execute()
-{
-    ScintillaCall(SCI_SETEOLMODE, SC_EOL_CRLF);
-    ScintillaCall(SCI_CONVERTEOLS, SC_EOL_CRLF);
+    int lineType = GetLineType();
+    ScintillaCall(SCI_SETEOLMODE, lineType);
+    ScintillaCall(SCI_CONVERTEOLS, lineType);
     if (HasActiveDocument())
     {
         CDocument doc = GetActiveDocument();
-        doc.m_format = WIN_FORMAT;
+        doc.m_format = ToEOLFormat(lineType);
         SetDocument(GetDocIdOfCurrentTab(), doc);
         UpdateStatusBar(true);
     }
@@ -44,16 +37,7 @@ bool CCmdEOLWin::Execute()
     return true;
 }
 
-HRESULT CCmdEOLWin::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
-{
-    if (UI_PKEY_BooleanValue == key)
-    {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETEOLMODE)==SC_EOL_CRLF, ppropvarNewValue);
-    }
-    return E_NOTIMPL;
-}
-
-void CCmdEOLWin::TabNotify(TBHDR * ptbhdr)
+void CCmdEOLBase::TabNotify(TBHDR* ptbhdr)
 {
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
@@ -61,88 +45,26 @@ void CCmdEOLWin::TabNotify(TBHDR * ptbhdr)
     }
 }
 
-CCmdEOLUnix::CCmdEOLUnix(void * obj) : ICommand(obj)
+HRESULT CCmdEOLBase::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+{
+    if (UI_PKEY_BooleanValue == key)
+    {
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETEOLMODE)==GetLineType(), ppropvarNewValue);
+    }
+    return E_NOTIMPL;
+}
+
+CCmdEOLWin::CCmdEOLWin(void* obj) : CCmdEOLBase(obj)
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-CCmdEOLUnix::~CCmdEOLUnix()
-{
-}
-
-bool CCmdEOLUnix::Execute()
-{
-    ScintillaCall(SCI_SETEOLMODE, SC_EOL_LF);
-    ScintillaCall(SCI_CONVERTEOLS, SC_EOL_LF);
-    if (HasActiveDocument())
-    {
-        CDocument doc = GetActiveDocument();
-        doc.m_format = UNIX_FORMAT;
-        SetDocument(GetDocIdOfCurrentTab(), doc);
-        UpdateStatusBar(true);
-    }
-    InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    InvalidateUICommand(cmdEOLUnix, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    InvalidateUICommand(cmdEOLMac,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    return true;
-}
-
-HRESULT CCmdEOLUnix::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
-{
-    if (UI_PKEY_BooleanValue == key)
-    {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETEOLMODE)==SC_EOL_LF, ppropvarNewValue);
-    }
-    return E_NOTIMPL;
-}
-
-void CCmdEOLUnix::TabNotify(TBHDR * ptbhdr)
-{
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
-    {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    }
-}
-
-CCmdEOLMac::CCmdEOLMac(void * obj) : ICommand(obj)
+CCmdEOLUnix::CCmdEOLUnix(void* obj) : CCmdEOLBase(obj)
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-CCmdEOLMac::~CCmdEOLMac()
+CCmdEOLMac::CCmdEOLMac(void* obj) : CCmdEOLBase(obj)
 {
-}
-
-bool CCmdEOLMac::Execute()
-{
-    ScintillaCall(SCI_SETEOLMODE, SC_EOL_CR);
-    ScintillaCall(SCI_CONVERTEOLS, SC_EOL_CR);
-    if (HasActiveDocument())
-    {
-        CDocument doc = GetActiveDocument();
-        doc.m_format = MAC_FORMAT;
-        SetDocument(GetDocIdOfCurrentTab(), doc);
-        UpdateStatusBar(true);
-    }
-    InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    InvalidateUICommand(cmdEOLUnix, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    InvalidateUICommand(cmdEOLMac,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    return true;
-}
-
-HRESULT CCmdEOLMac::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
-{
-    if (UI_PKEY_BooleanValue == key)
-    {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETEOLMODE)==SC_EOL_CR, ppropvarNewValue);
-    }
-    return E_NOTIMPL;
-}
-
-void CCmdEOLMac::TabNotify(TBHDR * ptbhdr)
-{
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
-    {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    }
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }

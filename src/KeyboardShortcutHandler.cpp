@@ -96,25 +96,27 @@ void CKeyboardShortcutHandler::Load()
     m_bLoaded = true;
 }
 
-void CKeyboardShortcutHandler::Load( CSimpleIni& ini )
+void CKeyboardShortcutHandler::Load( const CSimpleIni& ini )
 {
     CSimpleIni::TNamesDepend virtkeys;
     ini.GetAllKeys(L"virtkeys", virtkeys);
-    for (auto l : virtkeys)
+    for (auto keyName : virtkeys)
     {
-        wchar_t * endptr;
-        std::wstring v = l;
-        CStringUtils::emplace_to_lower(v);
-        m_virtkeys[v] = wcstol(ini.GetValue(L"virtkeys", l), &endptr, 16);
+        unsigned long vk = 0;
+        const wchar_t* keyDataString = ini.GetValue(L"virtkeys", keyName);
+        if (CAppUtils::TryParse(keyDataString, vk, false, 0, 16))
+            m_virtkeys[CStringUtils::to_lower(keyName)] = (UINT)vk;
+        else
+            APPVERIFYM(false, L"Invalid Virtual Key ini file. Cannot convert key '%s' to uint.", keyName);
     }
 
     CSimpleIni::TNamesDepend shortkeys;
     ini.GetAllKeys(L"shortcuts", shortkeys);
 
-    for (auto l : shortkeys)
+    for (auto cmd : shortkeys)
     {
         CSimpleIni::TNamesDepend values;
-        ini.GetAllValues(L"shortcuts", l, values);
+        ini.GetAllValues(L"shortcuts", cmd, values);
         for (auto vv : values)
         {
             std::wstring v = vv;
@@ -122,11 +124,11 @@ void CKeyboardShortcutHandler::Load( CSimpleIni& ini )
             std::vector<std::wstring> keyvec;
             stringtok(keyvec, v, false, L",");
             KSH_Accel accel;
-            accel.sCmd = l;
-            accel.cmd = (WORD)_wtoi(l);
+            accel.sCmd = cmd;
+            accel.cmd = (WORD)_wtoi(cmd);
             if (accel.cmd == 0)
             {
-                auto it = m_resourceData.find(l);
+                auto it = m_resourceData.find(cmd);
                 if (it != m_resourceData.end())
                     accel.cmd = (WORD)it->second;
             }
@@ -143,32 +145,41 @@ void CKeyboardShortcutHandler::Load( CSimpleIni& ini )
                         accel.fVirt |= 0x04;
                     break;
                 case 1:
-                    if (m_virtkeys.find(keyvec[i]) != m_virtkeys.end())
+                {
+                    auto whereAt = m_virtkeys.find(keyvec[i]);
+                    if (whereAt != m_virtkeys.end())
                     {
                         accel.fVirt1 = TRUE;
-                        accel.key1 = (WORD)m_virtkeys[keyvec[i]];
+                        accel.key1 = (WORD)whereAt->second;
                     }
                     else
                     {
-                        accel.key1 = (WORD)::towupper(keyvec[i][0]);
-                        if ((keyvec[i].size() > 2) && (keyvec[i][0]=='0') && (keyvec[i][1]=='x'))
+                        // REVIEW: should base be set to 16 here or are regular integers allowed?
+                        if ((keyvec[i].size() > 2) && (keyvec[i][0] == '0') && (keyvec[i][1] == 'x'))
                             accel.key1 = (WORD)wcstol(keyvec[i].c_str(), nullptr, 0);
+                        else
+                            accel.key1 = (WORD)::towupper(keyvec[i][0]);
                     }
+                }
                     break;
                 case 2:
-                    if (m_virtkeys.find(keyvec[i]) != m_virtkeys.end())
+                {
+                    auto whereAt = m_virtkeys.find(keyvec[i]);
+                    if (whereAt != m_virtkeys.end())
                     {
                         accel.fVirt2 = TRUE;
-                        accel.key2 = (WORD)m_virtkeys[keyvec[i]];
+                        accel.key2 = (WORD)whereAt->second;
                     }
                     else
                     {
-                        accel.key2 = (WORD)::towupper(keyvec[i][0]);
-                        if ((keyvec[i].size() > 2) && (keyvec[i][0]=='0') && (keyvec[i][1]=='x'))
+                        if ((keyvec[i].size() > 2) && (keyvec[i][0] == '0') && (keyvec[i][1] == 'x'))
                             accel.key2 = (WORD)wcstol(keyvec[i].c_str(), nullptr, 0);
+                        else
+                            accel.key2 = (WORD)::towupper(keyvec[i][0]);
                     }
                     break;
                 }
+                } // switch
             }
             m_accelerators.push_back(std::move(accel));
         }
@@ -239,101 +250,11 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
 
 std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd ) const
 {
-    for (const auto& accel : m_accelerators)
+    auto whereAt = std::find_if(m_accelerators.begin(), m_accelerators.end(),
+        [&](const auto& item) { return (item.cmd == cmd); });
+    if (whereAt != m_accelerators.end())
     {
-        if (accel.cmd == cmd)
-        {
-            std::wstring shortCut;
-            wchar_t buf[MAX_PATH];
-            if (accel.fVirt & 0x08)
-            {
-                LONG sc = MapVirtualKey(VK_CONTROL, MAPVK_VK_TO_VSC);
-                sc <<= 16;
-                int len = GetKeyNameText(sc, buf, _countof(buf));
-                if (!shortCut.empty())
-                    shortCut += L"+";
-                if (len > 0)
-                    shortCut += buf;
-            }
-            if (accel.fVirt & 0x10)
-            {
-                LONG sc = MapVirtualKey(VK_MENU, MAPVK_VK_TO_VSC);
-                sc <<= 16;
-                int len = GetKeyNameText(sc, buf, _countof(buf));
-                if (!shortCut.empty())
-                    shortCut += L"+";
-                if (len > 0)
-                    shortCut += buf;
-            }
-            if (accel.fVirt & 0x04)
-            {
-                LONG sc = MapVirtualKey(VK_SHIFT, MAPVK_VK_TO_VSC);
-                sc <<= 16;
-                int len = GetKeyNameText(sc, buf, _countof(buf));
-                if (!shortCut.empty())
-                    shortCut += L"+";
-                if (len > 0)
-                    shortCut += buf;
-            }
-            if (accel.key1)
-            {
-                LONG nScanCode = MapVirtualKey(accel.key1, MAPVK_VK_TO_VSC);
-                switch(accel.key1)
-                {
-                    // Keys which are "extended" (except for Return which is Numeric Enter as extended)
-                case VK_INSERT:
-                case VK_DELETE:
-                case VK_HOME:
-                case VK_END:
-                case VK_NEXT:  // Page down
-                case VK_PRIOR: // Page up
-                case VK_LEFT:
-                case VK_RIGHT:
-                case VK_UP:
-                case VK_DOWN:
-                case VK_SNAPSHOT:
-                case VK_OEM_COMMA:
-                case VK_OEM_PERIOD:
-                    nScanCode |= 0x0100; // Add extended bit
-                }
-                nScanCode <<= 16;
-                int len = GetKeyNameText(nScanCode, buf, _countof(buf));
-                if (!shortCut.empty())
-                    shortCut += L"+";
-                if (len > 0)
-                    shortCut += buf;
-            }
-
-            if (accel.key2)
-            {
-                LONG nScanCode = MapVirtualKey(accel.key2, MAPVK_VK_TO_VSC);
-                switch(accel.key2)
-                {
-                    // Keys which are "extended" (except for Return which is Numeric Enter as extended)
-                case VK_INSERT:
-                case VK_DELETE:
-                case VK_HOME:
-                case VK_END:
-                case VK_NEXT:  // Page down
-                case VK_PRIOR: // Page up
-                case VK_LEFT:
-                case VK_RIGHT:
-                case VK_UP:
-                case VK_DOWN:
-                case VK_SNAPSHOT:
-                case VK_OEM_COMMA:
-                case VK_OEM_PERIOD:
-                    nScanCode |= 0x0100; // Add extended bit
-                }
-                nScanCode <<= 16;
-                int len = GetKeyNameText(nScanCode, buf, _countof(buf));
-                if (!shortCut.empty())
-                    shortCut += L",";
-                if (len > 0)
-                    shortCut += buf;
-            }
-            return L"(" + shortCut + L")";
-        }
+        return MakeShortCutKeyForAccel(*whereAt);
     }
     return L"";
 }
@@ -372,8 +293,7 @@ void CKeyboardShortcutHandler::LoadUIHeader()
                             {
                                 std::string sIDString = sLine.substr(spacepos+1, spacepos2-spacepos-1);
                                 int ID = atoi(sLine.substr(spacepos2).c_str());
-                                std::wstring s = CUnicodeUtils::StdGetUnicode(sIDString);
-                                m_resourceData[s] = ID;
+                                m_resourceData[CUnicodeUtils::StdGetUnicode(sIDString)] = ID;
                             }
                         }
                     }
@@ -416,24 +336,21 @@ std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand( WORD cmd ) con
     std::wstring sAcc = GetShortCutStringForCommand((WORD)cmd);
     if (!sAcc.empty())
     {
-        std::wstring sID;
-        for (const auto& sc : m_resourceData)
+        auto whereAt = std::find_if(m_resourceData.begin(), m_resourceData.end(),
+            [&](const auto& item) { return (item.second == cmd); });
+        if (whereAt != m_resourceData.end())
         {
-            if (sc.second == cmd)
+            auto sID = whereAt->first;
+            sID += L"_TooltipTitle_RESID";
+
+            auto ttIDit = m_resourceData.find(sID);
+            if (ttIDit != m_resourceData.end())
             {
-                sID = sc.first;
-                break;
+                auto sRes = LoadResourceWString(hRes, ttIDit->second);
+                sRes += L' ';
+                sRes += sAcc;
+                return sRes;
             }
-        }
-        sID += L"_TooltipTitle_RESID";
-        auto ttIDit = m_resourceData.find(sID);
-        if (ttIDit != m_resourceData.end())
-        {
-            ResString rs(hRes, ttIDit->second);
-            std::wstring sRes = (LPCWSTR)rs;
-            sRes += L" ";
-            sRes += sAcc;
-            return sRes;
         }
     }
     return L"";
@@ -459,4 +376,98 @@ void CKeyboardShortcutHandler::AddCommand(const std::wstring& name, int id)
             break;
         }
     }
+}
+
+std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& accel)
+{
+    std::wstring shortCut;
+    wchar_t buf[MAX_PATH];
+    if (accel.fVirt & 0x08)
+    {
+        LONG sc = MapVirtualKey(VK_CONTROL, MAPVK_VK_TO_VSC);
+        sc <<= 16;
+        int len = GetKeyNameText(sc, buf, _countof(buf));
+        if (!shortCut.empty())
+            shortCut += L"+";
+        if (len > 0)
+            shortCut += buf;
+    }
+    if (accel.fVirt & 0x10)
+    {
+        LONG sc = MapVirtualKey(VK_MENU, MAPVK_VK_TO_VSC);
+        sc <<= 16;
+        int len = GetKeyNameText(sc, buf, _countof(buf));
+        if (!shortCut.empty())
+            shortCut += L"+";
+        if (len > 0)
+            shortCut += buf;
+    }
+    if (accel.fVirt & 0x04)
+    {
+        LONG sc = MapVirtualKey(VK_SHIFT, MAPVK_VK_TO_VSC);
+        sc <<= 16;
+        int len = GetKeyNameText(sc, buf, _countof(buf));
+        if (!shortCut.empty())
+            shortCut += L"+";
+        if (len > 0)
+            shortCut += buf;
+    }
+    if (accel.key1)
+    {
+        LONG nScanCode = MapVirtualKey(accel.key1, MAPVK_VK_TO_VSC);
+        switch (accel.key1)
+        {
+            // Keys which are "extended" (except for Return which is Numeric Enter as extended)
+        case VK_INSERT:
+        case VK_DELETE:
+        case VK_HOME:
+        case VK_END:
+        case VK_NEXT:  // Page down
+        case VK_PRIOR: // Page up
+        case VK_LEFT:
+        case VK_RIGHT:
+        case VK_UP:
+        case VK_DOWN:
+        case VK_SNAPSHOT:
+        case VK_OEM_COMMA:
+        case VK_OEM_PERIOD:
+            nScanCode |= 0x0100; // Add extended bit
+        }
+        nScanCode <<= 16;
+        int len = GetKeyNameText(nScanCode, buf, _countof(buf));
+        if (!shortCut.empty())
+            shortCut += L"+";
+        if (len > 0)
+            shortCut += buf;
+    }
+
+    if (accel.key2)
+    {
+        LONG nScanCode = MapVirtualKey(accel.key2, MAPVK_VK_TO_VSC);
+        switch (accel.key2)
+        {
+            // Keys which are "extended" (except for Return which is Numeric Enter as extended)
+        case VK_INSERT:
+        case VK_DELETE:
+        case VK_HOME:
+        case VK_END:
+        case VK_NEXT:  // Page down
+        case VK_PRIOR: // Page up
+        case VK_LEFT:
+        case VK_RIGHT:
+        case VK_UP:
+        case VK_DOWN:
+        case VK_SNAPSHOT:
+        case VK_OEM_COMMA:
+        case VK_OEM_PERIOD:
+            nScanCode |= 0x0100; // Add extended bit
+        }
+        nScanCode <<= 16;
+        int len = GetKeyNameText(nScanCode, buf, _countof(buf));
+        if (!shortCut.empty())
+            shortCut += L",";
+        if (len > 0)
+            shortCut += buf;
+    }
+    return L"(" + shortCut + L")";
 }

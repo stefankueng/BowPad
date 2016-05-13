@@ -147,7 +147,7 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                     {
                         if (info.version > info.installedversion)
                         {
-                            CDownloadFile filedownloader(L"BowPad", NULL);
+                            CDownloadFile filedownloader(L"BowPad", nullptr);
                             std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true, L".zip");
                             std::wstring pluginurl = L"https://svn.code.sf.net/p/bowpad-sk/code/trunk/plugins/";
                             pluginurl += info.name;
@@ -159,9 +159,9 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                             //pluginlocal += info.name;
                             //pluginlocal += L".zip";
                             //CopyFile(pluginlocal.c_str(), tempfile.c_str(), FALSE);
-                            CreateDirectory(CAppUtils::GetDataPath().c_str(), NULL);
+                            CreateDirectory(CAppUtils::GetDataPath().c_str(), nullptr);
                             std::wstring pluginsdir = CAppUtils::GetDataPath() + L"\\plugins";
-                            CreateDirectory(pluginsdir.c_str(), NULL);
+                            CreateDirectory(pluginsdir.c_str(), nullptr);
                             if (!CPathUtils::Unzip2Folder(tempfile.c_str(), pluginsdir.c_str()))
                             {
                                 // failed to unzip/install the plugin
@@ -194,12 +194,12 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                             {
                                 // Create IShellItem instance associated to file to delete
                                 IShellItemPtr psiFileToDelete = NULL;
-                                hr = SHCreateItemFromParsingName(pluginsdir.c_str(), NULL, IID_PPV_ARGS(&psiFileToDelete));
+                                hr = SHCreateItemFromParsingName(pluginsdir.c_str(), nullptr, IID_PPV_ARGS(&psiFileToDelete));
 
                                 if (!CAppUtils::FailedShowMessage(hr))
                                 {
                                     // Declare this shell item (file) to be deleted
-                                    hr = pfo->DeleteItem(psiFileToDelete, NULL);
+                                    hr = pfo->DeleteItem(psiFileToDelete, nullptr);
                                 }
                             }
                             pfo->SetOwnerWindow(GetHwnd());
@@ -306,7 +306,7 @@ void CPluginsConfigDlg::InitPluginsList()
     ListView_SetColumnWidth(hListControl, 1, LVSCW_AUTOSIZE_USEHEADER);
     ListView_SetColumnWidth(hListControl, 2, LVSCW_AUTOSIZE_USEHEADER);
 
-    SetWindowTheme(hListControl, L"Explorer", NULL);
+    SetWindowTheme(hListControl, L"Explorer", nullptr);
 
     SendMessage(hListControl, WM_SETREDRAW, TRUE, 0);
 }

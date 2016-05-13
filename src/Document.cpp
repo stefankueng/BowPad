@@ -18,8 +18,6 @@
 #include "Document.h"
 #include "StringUtils.h"
 
-
-
 std::wstring GetEOLFormatDescription( EOLFormat ft )
 {
     std::wstring sFt;
@@ -72,4 +70,32 @@ std::wstring CDocument::GetEncodingString()
     if (m_bHasBOM)
         sEnc += L", BOM";
     return sEnc;
+}
+
+EOLFormat ToEOLFormat(int eolMode)
+{
+    switch (eolMode)
+    {
+    case SC_EOL_CRLF:
+        return WIN_FORMAT;
+    case SC_EOL_LF:
+        return UNIX_FORMAT;
+    case SC_EOL_CR:
+        return MAC_FORMAT;
+    }
+    return UNKNOWN_FORMAT;
+}
+
+int ToEOLMode(EOLFormat eolFormat)
+{
+    switch (eolFormat)
+    {
+    case WIN_FORMAT:
+        return SC_EOL_CRLF;
+    case UNIX_FORMAT:
+        return SC_EOL_LF;
+    case MAC_FORMAT:
+        return SC_EOL_CR;
+    }
+    return -1;
 }

@@ -30,7 +30,7 @@ public:
     static CTheme& Instance();
 
     void                            SetDarkTheme(bool b = true);
-    bool                            IsDarkTheme() const { return dark; }
+    bool                            IsDarkTheme() const { return m_dark; }
     COLORREF                        GetThemeColor(COLORREF clr) const;
 
     void                            SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight);
@@ -47,5 +47,5 @@ private:
 private:
     bool                            m_bLoaded;
     std::unordered_map<COLORREF, COLORREF>    m_colorMap;
-    bool                            dark;
+    bool                            m_dark;
 };

@@ -96,7 +96,7 @@ public:
 
     CCmdBookmarkNext(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
     ~CCmdBookmarkNext() { }
@@ -117,7 +117,7 @@ public:
 
     CCmdBookmarkPrev(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
     ~CCmdBookmarkPrev() { }

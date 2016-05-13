@@ -49,7 +49,7 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
         // Create an IUIImage from a resource id.
         IUIImagePtr pImg;
         IUIImageFromBitmapPtr pifbFactory;
-        hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
+        hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
         if (FAILED(hr))
             return hr;
 

@@ -25,7 +25,7 @@ extern IUIFramework *g_pFramework;  // Reference to the Ribbon framework.
 
 CTheme::CTheme()
     : m_bLoaded(false)
-    , dark(false)
+    , m_dark(false)
 {
 }
 
@@ -82,7 +82,7 @@ void CTheme::Load()
         m_colorMap[clr1] = clr2;
     }
 
-    dark = CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0) != 0;
+    m_dark = CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0) != 0;
 
     m_bLoaded = true;
 }
@@ -123,9 +123,9 @@ void CTheme::RGBToHSB( COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightne
 
 void CTheme::RGBtoHSL(COLORREF color, float& h, float& s, float& l)
 {
-    float r_percent = float(GetRValue(color)) / 255;
-    float g_percent = float(GetGValue(color)) / 255;
-    float b_percent = float(GetBValue(color)) / 255;
+    const float r_percent = float(GetRValue(color)) / 255;
+    const float g_percent = float(GetGValue(color)) / 255;
+    const float b_percent = float(GetBValue(color)) / 255;
 
     float max_color = 0;
     if ((r_percent >= g_percent) && (r_percent >= b_percent))
@@ -177,44 +177,41 @@ void CTheme::RGBtoHSL(COLORREF color, float& h, float& s, float& l)
     h = H;
 }
 
-static void HSLtoRGB_Subfunction(float& pc, float temp1, float temp2, float temp3)
+static float HSLtoRGB_Subfunction(float temp1, float temp2, float temp3)
 {
     if ((temp3 * 6) < 1)
-        pc = (temp2 + (temp1 - temp2)*6*temp3)*100;
+        return (temp2 + (temp1 - temp2)*6*temp3)*100;
     else if ((temp3 * 2) < 1)
-        pc = temp1*100;
+        return temp1*100;
     else if ((temp3 * 3) < 2)
-        pc = (temp2 + (temp1 - temp2)*(.66666f - temp3)*6)*100;
+        return (temp2 + (temp1 - temp2)*(.66666f - temp3)*6)*100;
     else
-        pc = temp2*100;
-    return;
+        return temp2*100;
 }
 
 COLORREF CTheme::HSLtoRGB(float h, float s, float l)
 {
-    float pcr, pcg, pcb;
-
     if (s == 0)
     {
         BYTE t = BYTE(l/100*255);
         return RGB(t,t,t);
     }
-    float L = l/100;
-    float S = s/100;
-    float H = h/360;
-    float temp1 = (L < .50) ? L*(1 + S) : L + S - (L*S);
-    float temp2 = 2*L - temp1;
+    const float L = l/100;
+    const float S = s/100;
+    const float H = h/360;
+    const float temp1 = (L < .50) ? L*(1 + S) : L + S - (L*S);
+    const float temp2 = 2*L - temp1;
     float temp3 = 0;
     temp3 = H + .33333f;
     if (temp3 > 1)
         temp3 -= 1;
-    HSLtoRGB_Subfunction(pcr,temp1,temp2,temp3);
+    const float pcr = HSLtoRGB_Subfunction(temp1,temp2,temp3);
     temp3 = H;
-    HSLtoRGB_Subfunction(pcg,temp1,temp2,temp3);
+    const float pcg = HSLtoRGB_Subfunction(temp1,temp2,temp3);
     temp3 = H - .33333f;
     if (temp3 < 0)
         temp3 += 1;
-    HSLtoRGB_Subfunction(pcb,temp1,temp2,temp3);
+    const float pcb = HSLtoRGB_Subfunction(temp1,temp2,temp3);
     BYTE r = BYTE(pcr/100*255);
     BYTE g = BYTE(pcg/100*255);
     BYTE b = BYTE(pcb/100*255);
@@ -223,7 +220,7 @@ COLORREF CTheme::HSLtoRGB(float h, float s, float l)
 
 COLORREF CTheme::GetThemeColor( COLORREF clr ) const
 {
-    if (dark)
+    if (m_dark)
     {
         auto cIt = m_colorMap.find(clr);
         if (cIt != m_colorMap.end())
@@ -323,7 +320,7 @@ void CTheme::GetRibbonColors( UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSB
 
 void CTheme::SetDarkTheme(bool b /*= true*/)
 {
-    dark = b;
-    CCommandHandler::Instance().OnThemeChanged(dark);
+    m_dark = b;
+    CCommandHandler::Instance().OnThemeChanged(m_dark);
 }
 

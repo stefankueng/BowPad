@@ -250,7 +250,7 @@ bool CCmdCut::Execute()
 void CCmdCut::ScintillaNotify(Scintilla::SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
 HRESULT CCmdCut::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
@@ -272,7 +272,7 @@ bool CCmdCutPlain::Execute()
 void CCmdCutPlain::ScintillaNotify(Scintilla::SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
 HRESULT CCmdCutPlain::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
@@ -330,7 +330,7 @@ bool CCmdPaste::Execute()
 void CCmdPaste::ScintillaNotify(Scintilla::SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
 HRESULT CCmdPaste::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)

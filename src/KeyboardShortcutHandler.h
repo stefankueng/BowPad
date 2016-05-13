@@ -17,6 +17,7 @@
 #pragma once
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include <set>
 
@@ -52,10 +53,11 @@ public:
     void                                    Reload();
     void                                    UpdateTooltips(bool bAll);
     void                                    ToolTipUpdated(WORD cmd);
-    const std::map<std::wstring, int>&      GetResourceData() const { return m_resourceData; }
+    const std::unordered_map<std::wstring, int>&  GetResourceData() const { return m_resourceData; }
     const std::map<std::wstring, UINT>&     GetVirtKeys() const { return m_virtkeys; }
     const std::vector<KSH_Accel>&           GetAccelerators() const { return m_accelerators; }
     void                                    AddCommand(const std::wstring& name, int id);
+    static std::wstring                     MakeShortCutKeyForAccel(const KSH_Accel& accel);
 
 private:
     CKeyboardShortcutHandler();
@@ -63,13 +65,13 @@ private:
 
     void                                    LoadUIHeader();
     void                                    Load();
-    void                                    Load(CSimpleIni& ini);
+    void                                    Load(const CSimpleIni& ini);
 
 private:
     bool                                    m_bLoaded;
     std::vector<KSH_Accel>                  m_accelerators;
     std::map<std::wstring, UINT>            m_virtkeys;
     WORD                                    m_lastKey;
-    std::map<std::wstring, int>             m_resourceData;
+    std::unordered_map<std::wstring, int>             m_resourceData;
     std::set<WORD>                          m_tooltiptitlestoupdate;
 };

@@ -49,6 +49,20 @@ IUIFramework *g_pFramework = nullptr;  // Reference to the Ribbon framework.
 
 namespace
 {
+    static const COLORREF foldercolors[] = {
+        RGB(177,199,253),
+        RGB(221,253,177),
+        RGB(253,177,243),
+        RGB(177,253,240),
+        RGB(253,218,177),
+        RGB(196,177,253),
+        RGB(180,253,177),
+        RGB(253,177,202),
+        RGB(177,225,253),
+        RGB(247,253,177),
+    };
+    constexpr int MAX_FOLDERCOLORS = (int)std::size(foldercolors);
+
     const int STATUSBAR_DOC_TYPE        = 0;
     const int STATUSBAR_CUR_POS         = 1;
     const int STATUSBAR_SEL             = 2;
@@ -74,6 +88,75 @@ namespace
     static ResponseToCloseTab responsetoclosetab = ResponseToCloseTab::CloseWithoutSaving;
 }
 
+static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const std::wstring& path, std::wstring& outpath)
+{
+    outpath.clear();
+
+    struct task_mem_deleter
+    {
+        void operator()(wchar_t buf[])
+        {
+            if (buf != nullptr)
+                CoTaskMemFree(buf);
+        }
+    };
+    PreserveChdir keepCWD;
+
+    IFileSaveDialogPtr pfd;
+
+    HRESULT hr = pfd.CreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+
+    // Set the dialog options
+    DWORD dwOptions;
+    hr = pfd->GetOptions(&dwOptions);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+    hr = pfd->SetOptions(dwOptions | FOS_FORCEFILESYSTEM | FOS_OVERWRITEPROMPT);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+
+    hr = pfd->SetTitle(title.c_str());
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+
+    // set the default folder to the folder of the current tab
+    if (!path.empty())
+    {
+        std::wstring folder = CPathUtils::GetParentDirectory(path);
+        if (folder.empty())
+            folder = CPathUtils::GetCWD();
+        std::wstring filename = CPathUtils::GetFileName(path);
+        IShellItemPtr psiDefFolder = nullptr;
+        hr = SHCreateItemFromParsingName(folder.c_str(), nullptr, IID_PPV_ARGS(&psiDefFolder));
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+        hr = pfd->SetFolder(psiDefFolder);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+        hr = pfd->SetFileName(filename.c_str());
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+    }
+
+    // Show the save file dialog
+    hr = pfd->Show(hParentWnd);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+    IShellItemPtr psiResult = nullptr;
+    hr = pfd->GetResult(&psiResult);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+    PWSTR pszPath = nullptr;
+    hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+    std::unique_ptr<wchar_t[], task_mem_deleter> opath(pszPath);
+    outpath = pszPath;
+    return true;
+}
+
 CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
@@ -94,10 +177,11 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_pRibbon(nullptr)
     , m_RibbonHeight(0)
     , m_scratchEditor(hResource)
+    , m_lastfoldercolorindex(0)
+    , m_oldPt{ 0,0 }
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
     m_fileTreeVisible = CIniSettings::Instance().GetInt64(L"View", L"FileTree", 1) != 0;
-    m_oldPt.x = m_oldPt.y = 0;
     m_scratchEditor.InitScratch(hRes);
 }
 
@@ -105,7 +189,6 @@ extern void FindReplace_Finish();
 
 CMainWindow::~CMainWindow()
 {
-    FindReplace_Finish();
     DestroyIcon(m_hShieldIcon);
 }
 
@@ -205,8 +288,6 @@ HRESULT CMainWindow::ResizeToRibbon()
     return hr;
 }
 
-//  FUNCTION: OnCreateUICommand(UINT, UI_COMMANDTYPE, IUICommandHandler)
-//
 //  PURPOSE: Called by the Ribbon framework for each command specified in markup, to allow
 //           the host application to bind a command handler to that command.
 STDMETHODIMP CMainWindow::OnCreateUICommand(
@@ -220,8 +301,6 @@ STDMETHODIMP CMainWindow::OnCreateUICommand(
     return QueryInterface(IID_PPV_ARGS(ppCommandHandler));
 }
 
-//  FUNCTION: OnViewChanged(UINT, UI_VIEWTYPE, IUnknown*, UI_VIEWVERB, INT)
-//
 //  PURPOSE: Called when the state of a View (Ribbon is a view) changes, for example, created, destroyed, or resized.
 STDMETHODIMP CMainWindow::OnViewChanged(
     UINT viewId,
@@ -375,11 +454,10 @@ bool CMainWindow::RegisterAndCreateWindow()
 {
     WNDCLASSEX wcx = { sizeof(WNDCLASSEX) }; // Set size and zero out rest.
 
-    // Fill in the window class structure with default parameters
-    //wcx.style = 0; // Don't use CS_HREDRAW or CS_VREDRAW with a Ribbon
+    //wcx.style = 0; - Don't use CS_HREDRAW or CS_VREDRAW with a Ribbon
     wcx.lpfnWndProc = CWindow::stWinMsgHandler;
     wcx.hInstance = hResource;
-    std::wstring clsName = GetWindowClassName();
+    const std::wstring clsName = GetWindowClassName();
     wcx.lpszClassName = clsName.c_str();
     wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_BOWPAD));
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
@@ -418,9 +496,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             const DRAWITEMSTRUCT& dis = *(DRAWITEMSTRUCT *)lParam;
             if (dis.CtlType == ODT_TAB)
-            {
                 return ::SendMessage(dis.hwndItem, WM_DRAWITEM, wParam, lParam);
-            }
         }
         break;
     case WM_MOUSEMOVE:
@@ -538,6 +614,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         }
         break;
     case WM_DESTROY:
+        FindReplace_Finish();
         g_pFramework->Destroy();
         PostQuitMessage(0);
         break;
@@ -605,7 +682,7 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmhdr, WPARAM /*wParam*/, L
             APPVERIFY(docId >= 0);
             if (m_DocManager.HasDocumentID(docId))
             {
-                auto clr = m_DocManager.GetColorForDocument(docId);
+                auto clr = GetColorForDocument(docId);
                 return CTheme::Instance().GetThemeColor(clr);
             }
         }
@@ -1112,6 +1189,7 @@ void CMainWindow::HandleAfterInit()
         m_elevatepath.clear();
         m_elevatesavepath.clear();
     }
+
     if (!m_tabmovepath.empty())
     {
         TabMove(m_tabmovepath, m_tabmovesavepath, m_tabmovemod, m_initLine);
@@ -1177,15 +1255,6 @@ void CMainWindow::EnsureNewLineAtEnd(const CDocument& doc)
 
 bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
 {
-    struct task_mem_deleter
-    {
-        void operator()(wchar_t buf[])
-        {
-            if (buf != nullptr)
-                CoTaskMemFree(buf);
-        }
-    };
-
     int docID = m_TabBar.GetCurrentTabId();
     if (docID < 0)
         return false;
@@ -1196,63 +1265,15 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
     if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
     {
         bSaveAs = true;
-        PreserveChdir keepCWD;
+        std::wstring outpath;
 
-        IFileSaveDialogPtr pfd;
+        std::wstring title = GetAppName();
+        title += L" - ";
+        title += m_TabBar.GetCurrentTitle();
 
-        HRESULT hr = pfd.CreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER);
-        if (CAppUtils::FailedShowMessage(hr))
+        if (!ShowFileSaveDialog(*this, title, doc.m_path, outpath))
             return false;
-
-        // Set the dialog options
-        DWORD dwOptions;
-        hr = pfd->GetOptions(&dwOptions);
-        if (CAppUtils::FailedShowMessage(hr))
-            return false;
-        hr = pfd->SetOptions(dwOptions | FOS_FORCEFILESYSTEM | FOS_OVERWRITEPROMPT);
-        if (CAppUtils::FailedShowMessage(hr))
-            return false;
-
-        std::wstring s = GetAppName();
-        s += L" - ";
-        s += m_TabBar.GetCurrentTitle();
-        hr = pfd->SetTitle(s.c_str());
-        if (CAppUtils::FailedShowMessage(hr))
-            return false;
-
-        // set the default folder to the folder of the current tab
-        if (!doc.m_path.empty())
-        {
-            std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
-            if (folder.empty())
-                folder = CPathUtils::GetCWD();
-            std::wstring filename = CPathUtils::GetFileName(doc.m_path);
-            IShellItemPtr psiDefFolder = nullptr;
-            hr = SHCreateItemFromParsingName(folder.c_str(), nullptr, IID_PPV_ARGS(&psiDefFolder));
-            if (CAppUtils::FailedShowMessage(hr))
-                return false;
-            hr = pfd->SetFolder(psiDefFolder);
-            if (CAppUtils::FailedShowMessage(hr))
-                return false;
-            hr = pfd->SetFileName(filename.c_str());
-            if (CAppUtils::FailedShowMessage(hr))
-                return false;
-        }
-
-        // Show the save file dialog
-        hr = pfd->Show(*this);
-        if (CAppUtils::FailedShowMessage(hr))
-            return false;
-        IShellItemPtr psiResult = nullptr;
-        hr = pfd->GetResult(&psiResult);
-        if (CAppUtils::FailedShowMessage(hr))
-            return false;
-        PWSTR pszPath = nullptr;
-        hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
-        if (CAppUtils::FailedShowMessage(hr))
-            return false;
-        std::unique_ptr<wchar_t[], task_mem_deleter> path(pszPath);
-        doc.m_path = pszPath;
+        doc.m_path = outpath;
         CMRU::Instance().AddPath(doc.m_path);
         if (m_fileTree.GetPath().empty())
         {
@@ -1281,9 +1302,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         }
 
         if (_wcsicmp(CIniSettings::Instance().GetIniPath().c_str(), doc.m_path.c_str()) == 0)
-        {
             CIniSettings::Instance().Reload();
-        }
 
         doc.m_bIsDirty = false;
         doc.m_bNeedsSaving = false;
@@ -1306,6 +1325,51 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
     return true;
 }
 
+// TODO! Get rid of TabMove, make callers use OpenFileAs
+
+// path is the temporary file that contains the latest document.
+// savepath is the file we want to save the temporary file over and then use.
+void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line)
+{
+    std::wstring filepath = CPathUtils::GetLongPathname(path);
+
+    int docID = m_DocManager.GetIdForPath(filepath.c_str());
+    if (docID < 0)
+        return;
+
+    int tab = m_TabBar.GetIndexFromID(docID);
+    m_TabBar.ActivateAt(tab);
+    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    doc.m_path = CPathUtils::GetLongPathname(savepath);
+    doc.m_bIsDirty = bMod;
+    doc.m_bNeedsSaving = bMod;
+    m_DocManager.UpdateFileTime(doc, true);
+    m_editor.Call(SCI_SETREADONLY, doc.m_bIsReadonly);
+
+    std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
+    doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
+    m_DocManager.SetDocument(docID, doc);
+
+    m_editor.SetupLexerForLang(doc.m_language);
+    if (sFileName.empty())
+        m_TabBar.SetCurrentTitle(GetNewTabName().c_str());
+    else
+        m_TabBar.SetCurrentTitle(sFileName.c_str());
+
+    UpdateTab(docID);
+    UpdateCaptionBar();
+    UpdateStatusBar(true);
+
+    GoToLine(line);
+
+    m_fileTree.SetPath(CPathUtils::GetParentDirectory(savepath));
+    ResizeChildWindows();
+
+    DeleteFile(filepath.c_str());
+}
+
+// path is the temporary file that contains the latest document.
+// savepath is the file we want to save the temporary file over and then use.
 void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& savepath, long line )
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
@@ -1370,6 +1434,8 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     static ResString rsStatusTTEncoding(hRes, IDS_STATUSTTENCODING);
     static ResString rsStatusZoom(hRes, IDS_STATUSZOOM);
 
+    auto lineCount = (long)m_editor.Call(SCI_GETLINECOUNT);
+
     TCHAR strLnCol[128];
     TCHAR strSel[64];
     size_t selByte = 0;
@@ -1382,13 +1448,11 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     auto curPos = m_editor.Call(SCI_GETCURRENTPOS);
     long line = (long)m_editor.Call(SCI_LINEFROMPOSITION, curPos) + 1;
     long column = (long)m_editor.Call(SCI_GETCOLUMN, curPos) + 1;
-    swprintf_s(strLnCol, L"Ln: %ld    Col: %ld",
-               line, column);
+    swprintf_s(strLnCol, L"Ln: %ld / %ld    Col: %ld", line, lineCount, column);
     std::wstring ttcurpos = CStringUtils::Format(rsStatusTTCurPos,
         line, column, selByte, selLine, selTextMarkerCount);
 
     auto lengthInBytes = m_editor.Call(SCI_GETLENGTH);
-    auto lineCount = m_editor.Call(SCI_GETLINECOUNT);
     auto ttdocsize = CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, lineCount);
     m_StatusBar.SetText(strLnCol, ttdocsize.c_str(), STATUSBAR_CUR_POS);
     m_StatusBar.SetText(strSel, ttcurpos.c_str(), STATUSBAR_SEL);
@@ -1398,7 +1462,15 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     m_StatusBar.SetText(overType ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
     bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
     m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", nullptr, STATUSBAR_CAPS);
-    m_StatusBar.SetText(m_editor.Call(SCI_GETUSETABS) ? L"Tabs" : L"Spaces", rsStatusTTTabSpaces.c_str(), STATUSBAR_TABSPACE);
+    bool usingTabs = m_editor.Call(SCI_GETUSETABS) ? true : false;
+    if (usingTabs)
+    {
+        int tabSize = (int)m_editor.Call(SCI_GETTABWIDTH);
+        auto tabStatus = CStringUtils::Format(L"Tabs: %d", tabSize);
+        m_StatusBar.SetText(tabStatus.c_str(), rsStatusTTTabSpaces.c_str(), STATUSBAR_TABSPACE);
+    }
+    else
+        m_StatusBar.SetText(L"Spaces", rsStatusTTTabSpaces.c_str(), STATUSBAR_TABSPACE);
 
     int zoomfactor = GetZoomPC();
     auto szoomfactor = CStringUtils::Format(rsStatusZoom, zoomfactor);
@@ -2283,6 +2355,9 @@ void CMainWindow::HandleAutoIndent( const Scintilla::SCNotification& scn )
 
 void CMainWindow::OpenNewTab()
 {
+    OnOutOfScope(
+        m_insertionIndex = -1;
+    );
     CDocument doc;
     doc.m_document = m_editor.Call(SCI_CREATEDOCUMENT);
     doc.m_bHasBOM = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
@@ -2291,15 +2366,17 @@ void CMainWindow::OpenNewTab()
     std::wstring tabName = GetNewTabName();
     int index = -1;
     if (m_insertionIndex >= 0)
+    {
         index = m_TabBar.InsertAfter(m_insertionIndex, tabName.c_str());
+        m_insertionIndex = -1;
+    }
     else
         index = m_TabBar.InsertAtEnd(tabName.c_str());
     int docID = m_TabBar.GetIDFromIndex(index);
     m_DocManager.AddDocumentAtEnd(doc, docID);
     m_TabBar.ActivateAt(index);
-    m_editor.SetupLexerForLang(L"Text");
+    m_editor.SetupLexerForLang(doc.m_language);
     m_editor.GotoLine(0);
-    m_insertionIndex = -1;
     CCommandHandler::Instance().OnDocumentOpen(index);
 }
 
@@ -2892,7 +2969,7 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
             cpd.dwData = CD_COMMAND_MOVETAB;
             std::wstring cpdata = doc.m_path + L"*" + temppath + L"*";
             cpdata += (doc.m_bIsDirty || doc.m_bNeedsSaving) ? L"1*" : L"0*";
-            cpdata += std::to_wstring((long)(m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS)) + 1));
+            cpdata += std::to_wstring(m_editor.GetCurrentLineNumber() + 1);
             cpd.lpData = (PVOID)cpdata.c_str();
             cpd.cbData = DWORD(cpdata.size()*sizeof(wchar_t));
 
@@ -2963,7 +3040,7 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
     std::wstring modpath = CPathUtils::GetModulePath();
     std::wstring cmdline = CStringUtils::Format(L"/multiple /tabmove /savepath:\"%s\" /path:\"%s\" /line:%ld",
                                                 doc.m_path.c_str(), temppath.c_str(),
-                                                (long)(m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS)) + 1));
+                                                m_editor.GetCurrentLineNumber() + 1);
     if (doc.m_bIsDirty || doc.m_bNeedsSaving)
         cmdline += L" /modified";
     SHELLEXECUTEINFO shExecInfo = { };
@@ -3144,47 +3221,6 @@ void CMainWindow::CheckForOutsideChanges()
         m_TabBar.ActivateAt(activeTab);
 }
 
-// TODO! Get rid of TabMove, make callers use OpenFileAs
-
-void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line)
-{
-    std::wstring filepath = CPathUtils::GetLongPathname(path);
-
-    int docID = m_DocManager.GetIdForPath(filepath.c_str());
-    if (docID < 0)
-        return;
-
-    int tab = m_TabBar.GetIndexFromID(docID);
-    m_TabBar.ActivateAt(tab);
-    CDocument doc = m_DocManager.GetDocumentFromID(docID);
-    doc.m_path = CPathUtils::GetLongPathname(savepath);
-    doc.m_bIsDirty = bMod;
-    doc.m_bNeedsSaving = bMod;
-    m_DocManager.UpdateFileTime(doc, true);
-    m_editor.Call(SCI_SETREADONLY, doc.m_bIsReadonly);
-
-    std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
-    doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
-    m_DocManager.SetDocument(docID, doc);
-
-    m_editor.SetupLexerForLang(doc.m_language);
-    if (sFileName.empty())
-        m_TabBar.SetCurrentTitle(GetNewTabName().c_str());
-    else
-        m_TabBar.SetCurrentTitle(sFileName.c_str());
-
-    UpdateTab(docID);
-    UpdateCaptionBar();
-    UpdateStatusBar(true);
-
-    GoToLine(line);
-
-    m_fileTree.SetPath(CPathUtils::GetParentDirectory(savepath));
-    ResizeChildWindows();
-
-    DeleteFile(filepath.c_str());
-}
-
 bool CMainWindow::OnMouseMove(UINT nFlags, POINT point)
 {
     if (m_bDragging)
@@ -3259,3 +3295,16 @@ void CMainWindow::ShowFileTree(bool bShow)
     CIniSettings::Instance().SetInt64(L"View", L"FileTree", m_fileTreeVisible ? 1 : 0);
 }
 
+COLORREF CMainWindow::GetColorForDocument(int id)
+{
+    const CDocument& doc = m_DocManager.GetDocumentFromID(id);
+    std::wstring folderpath = CPathUtils::GetParentDirectory(doc.m_path);
+    CStringUtils::emplace_to_lower(folderpath);
+
+    auto foundIt = m_foldercolorindexes.find(folderpath);
+    if (foundIt != m_foldercolorindexes.end())
+        return foldercolors[foundIt->second % MAX_FOLDERCOLORS];
+
+    m_foldercolorindexes[folderpath] = m_lastfoldercolorindex;
+    return foldercolors[m_lastfoldercolorindex++ % MAX_FOLDERCOLORS];
+}

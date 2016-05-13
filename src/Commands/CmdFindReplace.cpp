@@ -545,6 +545,7 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
     GetWindowRect(hwndDlg, &rcDlg);
     m_originalSize = { rcDlg.right - rcDlg.left, rcDlg.bottom - rcDlg.top };
 
+    // REVIEW: should this be InitScratch?
     m_searchWnd.Init(hRes, *this);
 
     LoadSearchStrings();
