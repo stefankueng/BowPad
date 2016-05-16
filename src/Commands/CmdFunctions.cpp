@@ -297,8 +297,16 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
         return UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)UI_COLLECTION_INVALIDINDEX, ppropvarNewValue);
     }
 
-    //if (key == UI_PKEY_Enabled)
-        //return UIInitPropertyFromBoolean(UI_PKEY_Enabled, enabled, ppropvarNewValue);
+    if (key == UI_PKEY_Enabled)
+    {
+        if (HasActiveDocument())
+        {
+            CDocument doc = GetActiveDocument();
+            auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(CUnicodeUtils::StdGetUTF8(doc.m_language));
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), ppropvarNewValue);
+        }
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
+    }
 
     return E_NOTIMPL;
 }
@@ -698,6 +706,7 @@ void CCmdFunctions::InvalidateFunctionsSource()
 {
     HRESULT hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
     CAppUtils::FailedShowMessage(hr);
+    InvalidateFunctionsEnabled();
 }
 
 void CCmdFunctions::InvalidateFunctionsEnabled()
