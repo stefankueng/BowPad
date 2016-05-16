@@ -18,6 +18,7 @@
 #include "CmdGotoSymbol.h"
 #include "BowPad.h"
 #include "UnicodeUtils.h"
+#include "LexStyles.h"
 
 extern void FindReplace_FindFunction(void *mainWnd, const std::wstring& functionName);
 
@@ -35,5 +36,26 @@ bool CCmdGotoSymbol::Execute()
     std::wstring symbolName = CUnicodeUtils::StdGetUnicode(GetSelectedText(true));
     FindReplace_FindFunction(m_Obj, symbolName);
     return true;
+}
+
+HRESULT CCmdGotoSymbol::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT * ppropvarCurrentValue, PROPVARIANT * ppropvarNewValue)
+{
+    if (UI_PKEY_Enabled == key)
+    {
+        if (HasActiveDocument())
+        {
+            CDocument doc = GetActiveDocument();
+            auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(CUnicodeUtils::StdGetUTF8(doc.m_language));
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), ppropvarNewValue);
+        }
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
+    }
+    return E_NOTIMPL;
+}
+
+void CCmdGotoSymbol::TabNotify(TBHDR * ptbhdr)
+{
+    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
 }
 
