@@ -29,4 +29,8 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdGotoSymbol; }
+
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    void TabNotify(TBHDR* ptbhdr) override;
+
 };
