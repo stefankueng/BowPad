@@ -38,7 +38,7 @@ bool CCmdGotoSymbol::Execute()
     return true;
 }
 
-HRESULT CCmdGotoSymbol::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT * ppropvarCurrentValue, PROPVARIANT * ppropvarNewValue)
+HRESULT CCmdGotoSymbol::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT * /*ppropvarCurrentValue*/, PROPVARIANT * ppropvarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
