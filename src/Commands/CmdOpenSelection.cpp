@@ -21,6 +21,7 @@
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
 #include "PathUtils.h"
+#include "OnOutOfScope.h"
 
 extern void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName);
 
@@ -106,6 +107,7 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
         auto linebuffer = std::make_unique<char[]>(len + 1);
         ConstCall(SCI_GETWORDCHARS, 0, (LPARAM)linebuffer.get());
         linebuffer[len] = '\0';
+        OnOutOfScope(ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)linebuffer.get()));
 
         // TODO! This would be much better if we analyzed all the characters either side
         // of the curent position to identify something that looked like a path.
@@ -115,7 +117,6 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
         std::string sWordA = GetTextRange(static_cast<long>(ConstCall(SCI_WORDSTARTPOSITION, pos, false)),
             static_cast<long>(ConstCall(SCI_WORDENDPOSITION, pos, false)));
         pathUnderCursor = CUnicodeUtils::StdGetUnicode(sWordA);
-        ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)linebuffer.get());
     }
 
     InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
