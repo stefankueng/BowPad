@@ -3173,7 +3173,7 @@ bool CCmdFindSelectedNext::Execute()
 {
     g_sHighlightString.clear();
     int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
-    if (selTextLen == 0)
+    if (selTextLen <= 1) // Includes zero terminator so 1 means none.
     {
         DocScrollUpdate();
         return false;
@@ -3213,7 +3213,7 @@ bool CCmdFindSelectedPrev::Execute()
 {
     g_sHighlightString.clear();
     int selTextLen = (int)ScintillaCall(SCI_GETSELTEXT);
-    if (selTextLen == 0)
+    if (selTextLen <= 1) // Includes zero terminator so 1 means none.
     {
         DocScrollUpdate();
         return false;
