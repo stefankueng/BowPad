@@ -822,7 +822,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     Call(SCI_INDICATORCLEARRANGE, startstylepos, len);
 
     int selTextLen = (int)Call(SCI_GETSELTEXT);
-    if ((selTextLen == 0)||(clear))
+    if ((selTextLen <= 1)||(clear)) // Includes zero terminator so 1 means 0.
     {
         lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
@@ -2064,6 +2064,7 @@ std::string CScintillaWnd::GetWordChars() const
     int len = (int)ConstCall(SCI_GETWORDCHARS);
     auto linebuffer = std::make_unique<char[]>(len + 1);
     ConstCall(SCI_GETWORDCHARS, 0, (LPARAM)linebuffer.get());
+    linebuffer[len] = '\0';
     return linebuffer.get();
 }
 
