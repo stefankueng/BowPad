@@ -115,7 +115,7 @@ bool CCmdSummary::Execute()
         switch (*str)
         {
             case '\r':
-                if ((*(str + 1)) && (*(str + 1) == '\n'))
+                if (*(str + 1) == '\n')
                     ++str;
                 // intentional fall through
             case '\n':
