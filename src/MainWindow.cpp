@@ -959,15 +959,22 @@ void CMainWindow::HandleStatusBarZoom()
         OnOutOfScope(
             DestroyMenu(hPopup);
         );
-        AppendMenu(hPopup, MF_STRING, 20, L"20%");
+        AppendMenu(hPopup, MF_STRING, 25, L"25%");
         AppendMenu(hPopup, MF_STRING, 50, L"50%");
-        AppendMenu(hPopup, MF_STRING, 70, L"70%");
+        AppendMenu(hPopup, MF_STRING, 75, L"75%");
         AppendMenu(hPopup, MF_STRING, 100, L"100%");
+        AppendMenu(hPopup, MF_STRING, 125, L"125%");
         AppendMenu(hPopup, MF_STRING, 150, L"150%");
+        AppendMenu(hPopup, MF_STRING, 175, L"175%");
         AppendMenu(hPopup, MF_STRING, 200, L"200%");
-        AppendMenu(hPopup, MF_STRING, 400, L"400%");
 
-        auto cmd = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, NULL);
+        // Note the font point size is a factor in what determines the zoom percentage the user actually gets.
+        // So the values above are estimates. However, the status bar shows the true/exact setting that resulted.
+        // This might be neccessary as the user can adjust the zoom through ctrl + mouse wheel to get finer/other settings
+        // than we offer here. We could round and lie to make the status bar and estimates match (meh) or
+        // we could show real size in the menu to be consistent (arguably better), but we don't take either approach yet,
+        // and opt to show the user nice instantly relatable percentages that we then don't quite honor precisely in practice.
+        auto cmd = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, nullptr);
         if (cmd != 0)
             SetZoomPC(cmd);
     }
