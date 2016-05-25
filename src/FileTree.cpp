@@ -37,7 +37,32 @@ const int SCRATCH_QCM_LAST = 0x6FFF;
 static IContextMenu2 *g_pcm2 = nullptr;
 static IContextMenu3 *g_pcm3 = nullptr;
 
-HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void **ppv)
+namespace
+{
+    class FileTreeItem
+    {
+    public:
+        FileTreeItem()
+            : isDir(false)
+            , busy(false)
+        {}
+        std::wstring    path;
+        bool            isDir;
+        bool            busy;
+    };
+
+    class FileTreeData
+    {
+    public:
+        FileTreeData() {}
+
+        std::wstring                refreshpath;
+        HTREEITEM                   refreshRoot;
+        std::vector<FileTreeItem*>  data;
+    };
+};
+
+static HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void **ppv)
 {
     *ppv = nullptr;
     HRESULT hr = E_FAIL;
@@ -58,29 +83,17 @@ HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void **ppv)
     return hr;
 }
 
-class FileTreeItem
+static FileTreeItem* GetFileTreeItem(HWND hWnd, HTREEITEM hItem)
 {
-public:
-    FileTreeItem()
-        : isDir(false)
-        , busy(false)
-    {}
-    std::wstring    path;
-    bool            isDir;
-    bool            busy;
-};
+    TVITEM item; // No need to erase to zero, mask defines the valid fields.
+    item.mask = TVIF_PARAM;
+    item.hItem = hItem;
+    if (TreeView_GetItem(hWnd, &item) != FALSE)
+        return reinterpret_cast<FileTreeItem*>(item.lParam);
+    return nullptr;
+}
 
-class FileTreeData
-{
-public:
-    FileTreeData() {}
-
-    std::wstring                refreshpath;
-    HTREEITEM                   refreshRoot;
-    std::vector<FileTreeItem*>  data;
-};
-
-int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lParamSort*/)
+static int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lParamSort*/)
 {
     FileTreeItem * pTreeItem1 = reinterpret_cast<FileTreeItem*>(lParam1);
     FileTreeItem * pTreeItem2 = reinterpret_cast<FileTreeItem*>(lParam2);
@@ -97,17 +110,16 @@ int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lParamSort
 
 CFileTree::~CFileTree()
 {
+    Clear();
+}
+
+void CFileTree::Clear()
+{
     RecurseTree(TVI_ROOT, [&](HTREEITEM hItem)->bool
     {
-        TVITEM item = { 0 };
-        item.mask = TVIF_PARAM;
-        item.hItem = hItem;
-        TreeView_GetItem(*this, &item);
-        FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
+        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem); // Will delete but not change.
         if (pTreeItem)
-        {
             delete pTreeItem;
-        }
         return false;
     });
     TreeView_DeleteAllItems(*this);
@@ -197,13 +209,14 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
             }
             if (hSelItem == 0)
                 break;
-            TVITEM item = { 0 };
-            item.mask = TVIF_PARAM;
-            item.hItem = hSelItem;
-            TreeView_GetItem(*this, &item);
-            FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
+            const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hSelItem);
+            if (!pTreeItem)
+            {
+                APPVERIFY(false);
+                break; // switch.
+            }
 
-            IContextMenu *pcm = nullptr;
+            IContextMenuPtr pcm = nullptr;
             HTREEITEM hRefresh = NULL;
             if (SUCCEEDED(GetUIObjectOfFile(hwnd, pTreeItem->path.c_str(),
                 IID_IContextMenu, (void**)&pcm)))
@@ -211,6 +224,9 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 HMENU hmenu = CreatePopupMenu();
                 if (hmenu)
                 {
+                    OnOutOfScope(
+                        DestroyMenu(hmenu);
+                    );
                     if (SUCCEEDED(pcm->QueryContextMenu(hmenu, 1,
                         SCRATCH_QCM_FIRST, SCRATCH_QCM_LAST,
                         CMF_NORMAL)))
@@ -253,9 +269,8 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                                 hRefresh = TVI_ROOT;
                         }
                     }
-                    DestroyMenu(hmenu);
                 }
-                pcm->Release();
+                pcm.Release();
                 if (hRefresh)
                     Refresh(hRefresh);
             }
@@ -282,23 +297,17 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 }
             }
 
-            const FileTreeData* pData = (const FileTreeData*)lParam;
-            // will delete but not change.
+            const FileTreeData* pData = (const FileTreeData*)lParam; // Will delete but not change.
             if (pData)
             {
                 SendMessage(*this, WM_SETREDRAW, FALSE, 0);
                 OnOutOfScope(SendMessage(*this, WM_SETREDRAW, TRUE, 0));
 
                 // check if the refresh root is still there
-                FileTreeItem * fi = nullptr;
+                FileTreeItem* fi = nullptr;
                 if (pData->refreshRoot != TVI_ROOT)
-                {
-                    TVITEMEX tvex = { 0 };
-                    tvex.mask = TVIF_PARAM;
-                    tvex.hItem = pData->refreshRoot;
-                    TreeView_GetItem(*this, &tvex);
-                    fi = (FileTreeItem*)tvex.lParam;
-                }
+                    fi = GetFileTreeItem(*this, pData->refreshRoot);
+
                 bool activepathmarked = false;
                 if (((pData->refreshRoot == TVI_ROOT) && (pData->refreshpath.compare(m_path) == 0)) ||
                     (fi && (fi->path.compare(pData->refreshpath) == 0)))
@@ -440,15 +449,9 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
     if (m_bRootBusy)
         return;
 
-    FileTreeItem * fi = nullptr;
+    FileTreeItem* fi = nullptr;
     if (refreshRoot != TVI_ROOT)
-    {
-        TVITEMEX tvex = { 0 };
-        tvex.mask = TVIF_PARAM;
-        tvex.hItem = refreshRoot;
-        TreeView_GetItem(*this, &tvex);
-        fi = (FileTreeItem*)tvex.lParam;
-    }
+        fi = GetFileTreeItem(*this, refreshRoot);
     if (fi)
     {
         if (fi->busy)
@@ -465,11 +468,7 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
 
     RecurseTree(TreeView_GetChild(*this, refreshRoot), [&](HTREEITEM hItem)->bool
     {
-        TVITEM item = { 0 };
-        item.mask = TVIF_PARAM;
-        item.hItem = hItem;
-        TreeView_GetItem(*this, &item);
-        FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
+        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
         if (pTreeItem)
         {
             delete pTreeItem;
@@ -481,11 +480,7 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
     std::wstring refreshPath = m_path;
     if (refreshRoot != TVI_ROOT)
     {
-        TVITEM item = { 0 };
-        item.mask = TVIF_PARAM;
-        item.hItem = refreshRoot;
-        TreeView_GetItem(*this, &item);
-        FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
+        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, refreshRoot);
         if (pTreeItem && pTreeItem->isDir)
         {
             refreshPath = pTreeItem->path;
@@ -558,11 +553,7 @@ std::wstring CFileTree::GetFilePathForHitItem() const
     HTREEITEM hItem = GetHitItem();
     if (hItem)
     {
-        TVITEM item = { 0 };
-        item.mask = TVIF_PARAM;
-        item.hItem = hItem;
-        TreeView_GetItem(*this, &item);
-        const FileTreeItem * pTreeItem = reinterpret_cast<const FileTreeItem*>(item.lParam);
+        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
         if (pTreeItem && !pTreeItem->isDir)
         {
             return pTreeItem->path;
@@ -576,11 +567,7 @@ std::wstring CFileTree::GetFilePathForSelItem() const
     HTREEITEM hItem = TreeView_GetSelection(*this);
     if (hItem)
     {
-        TVITEM item = { 0 };
-        item.mask = TVIF_PARAM;
-        item.hItem = hItem;
-        TreeView_GetItem(*this, &item);
-        const FileTreeItem * pTreeItem = reinterpret_cast<const FileTreeItem*>(item.lParam);
+        const FileTreeItem * pTreeItem = GetFileTreeItem(*this, hItem);
         if (pTreeItem && !pTreeItem->isDir)
         {
             return pTreeItem->path;
@@ -594,11 +581,7 @@ std::wstring CFileTree::GetDirPathForHitItem() const
     HTREEITEM hItem = GetHitItem();
     if (hItem)
     {
-        TVITEM item = { 0 };
-        item.mask = TVIF_PARAM;
-        item.hItem = hItem;
-        TreeView_GetItem(*this, &item);
-        const FileTreeItem * pTreeItem = reinterpret_cast<const FileTreeItem*>(item.lParam);
+        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
         if (pTreeItem)
         {
             if (pTreeItem->isDir)
@@ -675,11 +658,7 @@ void CFileTree::TabNotify(TBHDR * ptbhdr)
                     // find the path
                     RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
                     {
-                        TVITEM item = { 0 };
-                        item.mask = TVIF_PARAM;
-                        item.hItem = hItem;
-                        TreeView_GetItem(*this, &item);
-                        const FileTreeItem* pTreeItem = reinterpret_cast<const FileTreeItem*>(item.lParam);
+                        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
                         if (pTreeItem)
                         {
                             if (!pTreeItem->isDir)
@@ -737,11 +716,7 @@ HTREEITEM CFileTree::GetItemForPath(const std::wstring& expandpath)
     HTREEITEM hResult = NULL;
     RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
     {
-        TVITEM item = { 0 };
-        item.mask = TVIF_PARAM;
-        item.hItem = hItem;
-        TreeView_GetItem(*this, &item);
-        FileTreeItem * pTreeItem = reinterpret_cast<FileTreeItem*>(item.lParam);
+        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
         if (pTreeItem)
         {
             if (pTreeItem->path.compare(expandpath) == 0)

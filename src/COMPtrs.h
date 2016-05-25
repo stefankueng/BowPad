@@ -59,6 +59,6 @@ _COM_SMARTPTR_TYPEDEF(ISpellingError, __uuidof(ISpellingError));
 
 // These smart pointers are not yet used, but BowPad uses these COM interfaces
 // in at the FileTree at least.
-//_COM_SMARTPTR_TYPEDEF(IContextMenu, __uuidof(IContextMenu));
+_COM_SMARTPTR_TYPEDEF(IContextMenu, __uuidof(IContextMenu));
 //_COM_SMARTPTR_TYPEDEF(IContextMenu2, __uuidof(IContextMenu2));
 //_COM_SMARTPTR_TYPEDEF(IContextMenu3, __uuidof(IContextMenu3));
