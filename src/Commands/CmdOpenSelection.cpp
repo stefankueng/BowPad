@@ -94,7 +94,7 @@ HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
     return E_NOTIMPL;
 }
 
-std::wstring CCmdOpenSelection::GetPathUnderCursor() 
+std::wstring CCmdOpenSelection::GetPathUnderCursor()
 {
     if (!HasActiveDocument())
         return std::wstring();
@@ -102,16 +102,18 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
     auto pathUnderCursor = CUnicodeUtils::StdGetUnicode(GetSelectedText(false));
     if (pathUnderCursor.empty())
     {
-        int len = (int)ConstCall(SCI_GETWORDCHARS);
+        int len = (int)ConstCall(SCI_GETWORDCHARS); // Does not zero terminate.
         auto linebuffer = std::make_unique<char[]>(len + 1);
         ConstCall(SCI_GETWORDCHARS, 0, (LPARAM)linebuffer.get());
+        linebuffer[len] = '\0';
 
         // TODO! This would be much better if we analyzed all the characters either side
         // of the curent position to identify something that looked like a path.
         ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
         size_t pos = ConstCall(SCI_GETCURRENTPOS);
 
-        std::string sWordA = GetTextRange(static_cast<long>(ConstCall(SCI_WORDSTARTPOSITION, pos, false)), static_cast<long>(ConstCall(SCI_WORDENDPOSITION, pos, false)));
+        std::string sWordA = GetTextRange(static_cast<long>(ConstCall(SCI_WORDSTARTPOSITION, pos, false)),
+            static_cast<long>(ConstCall(SCI_WORDENDPOSITION, pos, false)));
         pathUnderCursor = CUnicodeUtils::StdGetUnicode(sWordA);
         ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)linebuffer.get());
     }
