@@ -2079,15 +2079,31 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
         m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)strA.c_str());
         return;
     }
-    m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#");
-    std::string sWord = m_editor.GetTextRange(static_cast<long>(m_editor.Call(SCI_WORDSTARTPOSITION, scn.position, false)), static_cast<long>(m_editor.Call(SCI_WORDENDPOSITION, scn.position, false)));
 
-    m_editor.Call(SCI_SETCHARSDEFAULT);
+    // try the users real selection first
+    std::string sWord = m_editor.GetSelectedText();
+    auto selStart = m_editor.Call(SCI_GETSELECTIONSTART);
+    auto selEnd = m_editor.Call(SCI_GETSELECTIONEND);
+
+    if (sWord.empty() || 
+        (scn.position > selEnd) || (scn.position < selStart))
+    {
+        int len = (int)m_editor.Call(SCI_GETWORDCHARS); // Does not zero terminate.
+        auto wordcharsbuffer = std::make_unique<char[]>(len + 1);
+        m_editor.Call(SCI_GETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get());
+        wordcharsbuffer[len] = '\0';
+        OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get()));
+
+        m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#");
+        sWord = m_editor.GetTextRange(static_cast<long>(m_editor.Call(SCI_WORDSTARTPOSITION, scn.position, false)), static_cast<long>(m_editor.Call(SCI_WORDENDPOSITION, scn.position, false)));
+    }
     if (sWord.empty())
         return;
 
-    // TODO: Extract parsing to utility/functions for clarity.
     // Short form or long form html color e.g. #F0F or #FF00FF
+    // Use this to show color.
+    static const char swatch[] = { "####################\n####################\n####################" };
+
     if (sWord[0] == '#' && (sWord.size() == 4 || sWord.size() == 7))
     {
         bool ok = false;
@@ -2109,37 +2125,76 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
         }
         if (ok)
         {
+            // Don't display hex with # as that means web color hex triplet
+            // Show as hex with 0x and show what it was parsed to.
             std::string sCallTip = CStringUtils::Format(
-                "RGB(%d,%d,%d)\nHex: #%06lX\n####################\n####################\n####################",
+                "RGB(%d,%d,%d)\nHex: 0x%06lX\n",
                 GetRValue(color), GetGValue(color), GetBValue(color), (DWORD) color);
+            // Make pos the position after the main data, at start of # sequence.
+            size_t pos = sCallTip.length();
+            sCallTip += swatch;
             m_editor.Call(SCI_CALLTIPSETFOREHLT, color);
             m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)sCallTip.c_str());
-            size_t pos = sCallTip.find_first_of('\n');
-            pos = sCallTip.find_first_of('\n', pos+1);
-            m_editor.Call(SCI_CALLTIPSETHLT, pos, pos+63); // FIXME! What is 63?
+            m_editor.Call(SCI_CALLTIPSETHLT, pos, sCallTip.length() - pos);
+            return;
         }
     }
-    else
+
+    // See if the data looks like a pattern matching RGB(r,g,b) where each element
+    // can be decimal, hex with leading 0x, or octal with leading 0, like C/C++.
+    auto wword = CUnicodeUtils::StdGetUnicode(sWord);
+    const wchar_t rgb[] = { L"RGB(" };
+    const size_t rgblen = wcslen(rgb);
+    int r, g, b;
+    if (_wcsnicmp(wword.c_str(), rgb, rgblen) == 0 && wword[wword.length() - 1] == L')')
     {
-        // Assume a number format determined by the string itself
-        // and as recognized as a valid format according to strtoll:
-        // e.g. 0xF0F hex == 3855 decimal == 07417 octal.
-        // Use long long to yield more conversion range than say just long.        
-        char* ep = nullptr;
-        // 0 base means determine base from any format in the string.
-        errno = 0;
-        long long number = strtoll(sWord.c_str(), &ep, 0);
-        // Be forgiving if given 100xyz, show 100, but
-        // don't accept xyz100, show nothing.
-        // BTW: errno seems to be 0 even if nothing is converted.
-        // Must convert some digits of string.
-        if (errno == 0 && ep != &sWord[0])
+        // Grab the data the between brackets that follows the word RGB,
+        // if there looks to be 3 elements to it, try to parse each r,g,b element
+        // as a number in decimal, hex or octal.
+        wword = wword.substr(rgblen, (wword.length() - rgblen) - 1);
+        std::vector<std::wstring> vec;
+        stringtok(vec, wword, true, L",");
+        if (vec.size() == 3 &&
+                CAppUtils::TryParse(vec[0].c_str(), r, false, 0, 0) &&
+                CAppUtils::TryParse(vec[1].c_str(), g, false, 0, 0) &&
+                CAppUtils::TryParse(vec[2].c_str(), b, false, 0, 0))
         {
-            std::string bs = to_bit_string(number,true);
-            std::string sCallTip = CStringUtils::Format("Dec: %lld - Hex: %#llX - Oct: %#llo\nBin: %s (%d digits)",
-                number, number, number, bs.c_str(), (int)bs.size());
+            // Display the item back as RGB(r,g,b) where each is decimal
+            // (since they can already see any other element type that might have used,
+            // so all decimal might mean more info)
+            // and as a hex color triplet which is useful using # to indicate that.
+            auto color = RGB(r, g, b);
+            std::string sCallTip = CStringUtils::Format(
+                "RGB(%d,%d,%d)\n#%02X%02X%02X\nHex: 0x%06lX\n",
+                r, g, b, GetRValue(color), GetGValue(color), GetBValue(color), color);
+            auto pos = sCallTip.length();
+            sCallTip += swatch;
+            m_editor.Call(SCI_CALLTIPSETFOREHLT, color);
             m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)sCallTip.c_str());
+            m_editor.Call(SCI_CALLTIPSETHLT, pos, sCallTip.length());
+
+            return;
         }
+    }
+
+    // Assume a number format determined by the string itself
+    // and as recognized as a valid format according to strtoll:
+    // e.g. 0xF0F hex == 3855 decimal == 07417 octal.
+    // Use long long to yield more conversion range than say just long.        
+    char* ep = nullptr;
+    // 0 base means determine base from any format in the string.
+    errno = 0;
+    long long number = strtoll(sWord.c_str(), &ep, 0);
+    // Be forgiving if given 100xyz, show 100, but
+    // don't accept xyz100, show nothing.
+    // BTW: errno seems to be 0 even if nothing is converted.
+    // Must convert some digits of string.
+    if (errno == 0 && ep != &sWord[0])
+    {
+        std::string bs = to_bit_string(number,true);
+        std::string sCallTip = CStringUtils::Format("Dec: %lld - Hex: 0x%llX - Oct: %#llo\nBin: %s (%d digits)",
+            number, number, number, bs.c_str(), (int)bs.size());
+        m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)sCallTip.c_str());
     }
 }
 
@@ -2168,8 +2223,14 @@ void CMainWindow::HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi)
 
 bool CMainWindow::HandleDoubleClick(const Scintilla::SCNotification& scn)
 {
-   if (!(scn.modifiers & SCMOD_CTRL))
-       return false;
+    if (!(scn.modifiers & SCMOD_CTRL))
+        return false;
+
+    int len = (int)m_editor.Call(SCI_GETWORDCHARS); // Does not zero terminate.
+    auto wordcharsbuffer = std::make_unique<char[]>(len + 1);
+    m_editor.Call(SCI_GETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get());
+    wordcharsbuffer[len] = '\0';
+    OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get()));
 
     m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:;?&@=/%#()");
 
@@ -2194,7 +2255,6 @@ bool CMainWindow::HandleDoubleClick(const Scintilla::SCNotification& scn)
     SearchReplace(url, L"&amp;", L"&");
 
     ::ShellExecute(*this, L"open", url.c_str(), nullptr, nullptr, SW_SHOW);
-    m_editor.Call(SCI_SETCHARSDEFAULT);
 
     return true;
 }
