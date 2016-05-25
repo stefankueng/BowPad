@@ -35,6 +35,7 @@ public:
     virtual ~CFileTree();
 
     bool Init(HINSTANCE hInst, HWND hParent);
+    void Clear();
     void SetPath(const std::wstring& path) { m_path = path; Refresh(TVI_ROOT); }
     std::wstring GetPath()const { return m_path; }
     HTREEITEM GetHitItem() const;
