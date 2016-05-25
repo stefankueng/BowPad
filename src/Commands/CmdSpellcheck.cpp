@@ -25,6 +25,7 @@
 #include "AppUtils.h"
 #include "PropertySet.h"
 #include "SciLexer.h"
+#include "OnOutOfScope.h"
 
 #include <spellcheck.h>
 #include <Richedit.h>
@@ -148,6 +149,12 @@ void CCmdSpellcheck::Check()
             }
             m_lastcheckedpos = 0;
         }
+
+        int wordcharlen = (int)ScintillaCall(SCI_GETWORDCHARS); // Does not zero terminate.
+        auto wordcharsbuffer = std::make_unique<char[]>(wordcharlen + 1);
+        ScintillaCall(SCI_GETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get());
+        wordcharsbuffer[wordcharlen] = '\0';
+        OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get()));
 
         ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)g_wordchars.c_str());
         TEXTRANGEA textrange;
@@ -524,6 +531,12 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
         if (g_SpellChecker)
         {
             std::wstring sWord;
+
+            int len = (int)ScintillaCall(SCI_GETWORDCHARS); // Does not zero terminate.
+            auto wordcharsbuffer = std::make_unique<char[]>(len + 1);
+            ScintillaCall(SCI_GETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get());
+            wordcharsbuffer[len] = '\0';
+            OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get()));
 
             ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)g_wordchars.c_str());
             long currentPos = (long)ScintillaCall(SCI_GETCURRENTPOS);
