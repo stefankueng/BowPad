@@ -116,7 +116,7 @@ CTabBar::CTabBar(HINSTANCE hInst)
    m_inactiveBgColour = CTheme::Instance().GetThemeColor(RGB(192, 192, 192));
 };
 
- CTabBar::~CTabBar()
+CTabBar::~CTabBar()
 {
     if (m_hFont)
         DeleteObject(m_hFont);
@@ -193,7 +193,7 @@ int CTabBar::InsertAtEnd(const TCHAR *subTabName)
     if (m_bHasImgList)
         imageIndex = 0;
     tie.iImage = TABBAR_SHOWDISKICON ? imageIndex : 0;
-    tie.pszText = (TCHAR *)subTabName;
+    tie.pszText = const_cast<TCHAR *>(subTabName);
     tie.lParam = m_tabID++;
     int index = TabCtrl_InsertItem(*this, m_nItems++, &tie);
     // TODO: inserting the first tab makes it selected think if we want to negate that:
@@ -211,7 +211,7 @@ int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
     if (m_bHasImgList)
         imgindex = 0;
     tie.iImage = TABBAR_SHOWDISKICON ? imgindex : 0;
-    tie.pszText = (TCHAR *)subTabName;
+    tie.pszText = const_cast<TCHAR *>(subTabName);
     tie.lParam = m_tabID++;
     if ((index + 1) >= m_nItems)
         index = m_nItems - 1;
@@ -578,6 +578,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             if (m_closeButtonZone.IsHit(xPos, yPos, m_currentHoverTabRect))
             {
                 m_whichCloseClickDown = GetTabIndexAt(xPos, yPos);
+                APPVERIFY(m_whichCloseClickDown >= 0);
                 TBHDR nmhdr;
                 nmhdr.hdr.hwndFrom = *this;
                 nmhdr.hdr.code = TCN_REFRESH;
