@@ -295,9 +295,6 @@ public:
 
 private:
     void SetSearchFolderToCurrentDocument();
-
-private:
-    std::string                 m_lastSelText;
 };
 
 class CCmdFindNext : public ICommand
