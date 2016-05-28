@@ -413,5 +413,6 @@ int CCommandHandler::GetPluginVersion(const std::wstring& name)
 void CCommandHandler::AddCommand(ICommand * cmd)
 {
     m_highestCmdId = max(m_highestCmdId, cmd->GetCmdId());
-    m_nodeletecommands.insert({ cmd->GetCmdId(), cmd });
+    auto at = m_nodeletecommands.insert({ cmd->GetCmdId(), cmd });
+    assert(at.second); // Verify no command has the same ID as an existing command.
 }
