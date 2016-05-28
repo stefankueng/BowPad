@@ -1549,11 +1549,11 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool quitting )
             return true;  // leave the empty, new document as is
         }
     }
+    CCommandHandler::Instance().OnDocumentClose(tab);
     // SCI_SETDOCPOINTER is necessary so the reference count of the document
     // is decreased and the memory can be released.
-    m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-    CCommandHandler::Instance().OnDocumentClose(tab);
- 
+    m_editor.Call(SCI_SETDOCPOINTER, 0, 0);
+
     // Prefer to remove the document after the tab has gone as it supports it
     // and deletion causes events that may expect it to be there.
     int docId = m_TabBar.GetIDFromIndex(tab);
