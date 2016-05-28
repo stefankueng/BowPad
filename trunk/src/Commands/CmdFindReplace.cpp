@@ -53,6 +53,8 @@
 static std::string  g_findString;
 std::string         g_sHighlightString;
 static int          g_searchFlags;
+static std::string  g_lastSelText;
+static int          g_lastSearchFlags;
 
 static std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
 
@@ -1584,7 +1586,8 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
 {
     Clear(IDC_SEARCHINFO);
 
-    DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
+    if (g_lastSelText.empty() || g_lastSelText.compare(g_sHighlightString) || (g_searchFlags != g_lastSearchFlags))
+        DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
     DocScrollClear(DOCSCROLLTYPE_SELTEXT);
     OnOutOfScope(DocScrollUpdate());
 
@@ -3014,8 +3017,6 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
     {
-        static int lastSearchFlags;
-
         LRESULT firstline = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
         LRESULT lastline = firstline + ScintillaCall(SCI_LINESONSCREEN);
         long startstylepos = (long)ScintillaCall(SCI_POSITIONFROMLINE, firstline);
@@ -3031,7 +3032,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
 
         if (g_sHighlightString.empty())
         {
-            m_lastSelText.clear();
+            g_lastSelText.clear();
             DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
             return;
         }
@@ -3048,7 +3049,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
             FindText.chrg.cpMin = FindText.chrgText.cpMax;
         }
 
-        if (m_lastSelText.empty() || m_lastSelText.compare(g_sHighlightString) || (g_searchFlags != lastSearchFlags))
+        if (g_lastSelText.empty() || g_lastSelText.compare(g_sHighlightString) || (g_searchFlags != g_lastSearchFlags))
         {
             DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
             FindText.chrg.cpMin = 0;
@@ -3062,12 +3063,12 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
                     break;
                 FindText.chrg.cpMin = FindText.chrgText.cpMax;
             }
-            m_lastSelText = g_sHighlightString.c_str();
-            lastSearchFlags = g_searchFlags;
+            g_lastSelText = g_sHighlightString.c_str();
+            g_lastSearchFlags = g_searchFlags;
             DocScrollUpdate();
         }
-        m_lastSelText = g_sHighlightString.c_str();
-        lastSearchFlags = g_searchFlags;
+        g_lastSelText = g_sHighlightString.c_str();
+        g_lastSearchFlags = g_searchFlags;
     }
 }
 
@@ -3075,7 +3076,7 @@ void CCmdFindReplace::TabNotify(TBHDR* ptbhdr)
 {
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
-        m_lastSelText.clear();
+        g_lastSelText.clear();
         if (g_pFindReplaceDlg != nullptr)
         {
             bool followTab = IsDlgButtonChecked(*g_pFindReplaceDlg, IDC_SEARCHFOLDERFOLLOWTAB) == BST_CHECKED;
