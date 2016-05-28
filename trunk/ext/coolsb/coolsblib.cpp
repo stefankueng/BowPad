@@ -916,7 +916,7 @@ BOOL COOLSB_API CoolSB_SetSize  (HWND hwnd, int wBar, int nLength, int nWidth)
 //
 //  Alter the display mode of the scrollbars
 //  wBar   - SB_HORZ / SB_VERT / SB_BOTH
-//  nStyle - CSBF_NORMAL / CSBF_FLAT / CSBF_HOTTRACKED
+//  nStyle - CSBS_NORMAL / CSBS_FLAT / CSBS_HOTTRACKED
 //
 BOOL COOLSB_API CoolSB_SetStyle(HWND hwnd, int wBar, UINT nStyle)
 {
