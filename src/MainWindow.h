@@ -178,6 +178,7 @@ private:
     int                         GetZoomPC() const;
     void                        SetZoomPC(int zoomPC);
     COLORREF                    GetColorForDocument(int id);
+    void                        OpenFiles(const std::vector<std::wstring>& paths);
 
 private:
     LONG                        m_cRef;
