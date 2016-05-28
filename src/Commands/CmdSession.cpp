@@ -32,6 +32,18 @@ namespace
     const wchar_t g_sessionSection[] = { L"TabSession" };
 };
 
+static void SetAutoLoad(bool bAutoLoad)
+{
+    CIniSettings::Instance().SetInt64(g_sessionSection, L"autoload", bAutoLoad);
+}
+
+static bool GetAutoLoad()
+{
+    bool bAutoLoad = CIniSettings::Instance().GetInt64(g_sessionSection, L"autoload", 0) != 0;
+    return bAutoLoad;
+}
+
+
 bool CCmdSessionLoad::Execute()
 {
     RestoreSavedSession();
@@ -43,16 +55,16 @@ void CCmdSessionLoad::OnClose()
     // BowPad is closing, save the current session
 
     auto& settings = CIniSettings::Instance();
-    bool bAutoLoad = settings.GetInt64(g_sessionSection, L"autoload", 0) != 0;
+    bool bAutoLoad = GetAutoLoad();
     // first remove the whole session section
     settings.Delete(g_sessionSection, nullptr);
-    settings.SetInt64(g_sessionSection, L"autoload", bAutoLoad);
+    SetAutoLoad(bAutoLoad);
     // now go through all tabs and save their state
     int tabcount = GetTabCount();
     int activetab = GetActiveTabIndex();
     int saveindex = 0;
 
-    auto SavePosSettings = [&](int saveindex, CPosData& pos)
+    auto SavePosSettings = [&](int saveindex, const CPosData& pos)
     {
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"selmode%d", saveindex).c_str(), pos.m_nSelMode);
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"startpos%d", saveindex).c_str(), pos.m_nStartPos);
@@ -146,9 +158,7 @@ CCmdSessionAutoLoad::CCmdSessionAutoLoad(void * obj) : CCmdSessionLoad(obj)
 
 bool CCmdSessionAutoLoad::Execute()
 {
-    bool bAutoLoad = CIniSettings::Instance().GetInt64(g_sessionSection, L"autoload", 0) != 0;
-    bAutoLoad = !bAutoLoad;
-    CIniSettings::Instance().SetInt64(g_sessionSection, L"autoload", bAutoLoad);
+    SetAutoLoad(!GetAutoLoad());
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
 }
@@ -158,21 +168,20 @@ HRESULT CCmdSessionAutoLoad::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        bool bAutoLoad = CIniSettings::Instance().GetInt64(g_sessionSection, L"autoload", 0) != 0;
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, bAutoLoad, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, GetAutoLoad(), ppropvarNewValue);
     }
     return E_NOTIMPL;
 }
 
 void CCmdSessionAutoLoad::AfterInit()
 {
-    CCmdLineParser parser(GetCommandLine());
-
-    bool bAutoLoad = CIniSettings::Instance().GetInt64(g_sessionSection, L"autoload", 0) != 0;
-    if (bAutoLoad && !parser.HasKey(L"multiple"))
-        RestoreSavedSession();
+    if (GetAutoLoad()) // Don't parse the command line unless we are autoloading.
+    {
+        CCmdLineParser parser(GetCommandLine());
+        if (!parser.HasKey(L"multiple"))
+            RestoreSavedSession();
+    }
 }
-
 
 bool CCmdSessionRestoreLast::Execute()
 {
