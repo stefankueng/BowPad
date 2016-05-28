@@ -2442,7 +2442,6 @@ void CMainWindow::OpenNewTab()
     int docID = m_TabBar.GetIDFromIndex(index);
     m_DocManager.AddDocumentAtEnd(doc, docID);
     m_TabBar.ActivateAt(index);
-    m_editor.SetupLexerForLang(doc.m_language);
     m_editor.GotoLine(0);
     CCommandHandler::Instance().OnDocumentOpen(index);
 }
@@ -2594,7 +2593,6 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         UpdateTab(docID);
         UpdateStatusBar(true);
         m_TabBar.ActivateAt(index);
-        m_editor.SetupLexerForLang(lang);
         m_editor.GotoLine(0);
         CCommandHandler::Instance().OnDocumentOpen(index);
 
@@ -2717,7 +2715,6 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 if (bActivate)
                 {
                     m_TabBar.ActivateAt(index);
-                    m_editor.SetupLexerForLang(doc.m_language);
                 }
                 else
                     // SCI_SETDOCPOINTER is necessary so the reference count of the document
