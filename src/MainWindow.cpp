@@ -2782,6 +2782,8 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
     return true;
 }
 
+// Called when the user drops a selection of files (or a folder!) onto
+// bowpad's main window. The response is to try to load all those files.
 void CMainWindow::HandleDropFiles(HDROP hDrop)
 {
     if (!hDrop)
@@ -2800,6 +2802,8 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
     }
     FileTreeBlockRefresh(true);
     OnOutOfScope(FileTreeBlockRefresh(false));
+
+    const size_t maxFiles = 100;
     for (const auto& filename : files)
     {
         if (PathIsDirectory(filename.c_str()))
@@ -2808,13 +2812,23 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
             CDirFileEnum enumerator(filename);
             bool bIsDir = false;
             std::wstring path;
+            // Collect no more than maxFiles + 1 files. + 1 so we know we have too many.
             while (enumerator.NextFile(path, &bIsDir, false))
             {
                 if (!bIsDir)
+                {
                     recursefiles.push_back(std::move(path));
+                    if (recursefiles.size() > maxFiles)
+                        break;
+                }
             }
-            if (recursefiles.size() < 100)
+            if (recursefiles.size() <= maxFiles)
             {
+                std::sort(recursefiles.begin(), recursefiles.end(),
+                    [](const std::wstring& lhs, const std::wstring& rhs)
+                {
+                    return CPathUtils::PathCompare(lhs.c_str(), rhs.c_str()) < 0;
+                });
                 for (const auto& f : recursefiles)
                     OpenFile(f, 0);
             }
