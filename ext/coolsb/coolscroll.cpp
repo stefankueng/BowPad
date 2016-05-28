@@ -839,7 +839,7 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
         BOOL ldis = !(uLeftButFlags & DFCS_INACTIVE);
         BOOL rdis = !(uRightButFlags & DFCS_INACTIVE);
 
-        fBarHot = (sb->nBarType == (int)uMouseOverScrollbar && sb->fFlatScrollbar == CSBS_HOTTRACKED);
+        fBarHot = sb->nBarType == (int)uMouseOverScrollbar && (sb->fFlatScrollbar & CSBS_HOTTRACKED) != 0;
 
         fMouseOverL = uHitTestPortion == HTSCROLL_LEFT && fBarHot && ldis;
         fMouseOverR = uHitTestPortion == HTSCROLL_RIGHT && fBarHot && rdis;
