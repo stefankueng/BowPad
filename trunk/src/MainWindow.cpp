@@ -2085,7 +2085,7 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
     auto selStart = m_editor.Call(SCI_GETSELECTIONSTART);
     auto selEnd = m_editor.Call(SCI_GETSELECTIONEND);
 
-    if (sWord.empty() || 
+    if (sWord.empty() ||
         (scn.position > selEnd) || (scn.position < selStart))
     {
         int len = (int)m_editor.Call(SCI_GETWORDCHARS); // Does not zero terminate.
@@ -3374,4 +3374,36 @@ COLORREF CMainWindow::GetColorForDocument(int id)
 
     m_foldercolorindexes[folderpath] = m_lastfoldercolorindex;
     return foldercolors[m_lastfoldercolorindex++ % MAX_FOLDERCOLORS];
+}
+
+void CMainWindow::OpenFiles(const std::vector<std::wstring>& paths)
+{
+    if (paths.size() == 1)
+    {
+        if (!paths[0].empty())
+        {
+            unsigned int openFlags = OpenFlags::AddToMRU;
+            if ((GetKeyState(VK_CONTROL) & 0x8000) != 0)
+                openFlags |= OpenFlags::OpenIntoActiveTab;
+            OpenFile(paths[0].c_str(), openFlags);
+        }
+    }
+    else
+    {
+        FileTreeBlockRefresh(true);
+        OnOutOfScope(FileTreeBlockRefresh(false));
+        // Open all that was selected or at least returned.
+        int docToActivate = -1;
+        for (const auto& file : paths)
+        {
+            // Remember whatever we first successfully open in order to return to it.
+            if (OpenFile(file.c_str(), OpenFlags::AddToMRU) >= 0 && docToActivate < 0)
+                docToActivate = m_DocManager.GetIdForPath(file.c_str());
+        }
+        if (docToActivate >= 0)
+        {
+            auto tabToActivate = m_TabBar.GetIndexFromID(docToActivate);
+            m_TabBar.ActivateAt(tabToActivate);
+        }
+    }
 }
