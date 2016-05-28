@@ -81,7 +81,7 @@ HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
     {
         // add the filename to the command label
         std::wstring path = GetPathUnderCursor();
-        //path = CPathUtils::GetFileName(path);
+        path = CPathUtils::GetFileName(path);
 
         ResString label(hRes, cmdOpenSelection_LabelTitle_RESID);
         if (!path.empty())
