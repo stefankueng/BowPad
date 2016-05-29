@@ -32,7 +32,7 @@ bool CCmdTrim::Execute()
         ScintillaCall(SCI_TARGETFROMSELECTION);
     }
 
-    ScintillaCall(SCI_SETSEARCHFLAGS, SCFIND_REGEXP);
+    ScintillaCall(SCI_SETSEARCHFLAGS, SCFIND_REGEXP | SCFIND_CXX11REGEX);
     sptr_t findRet = -1;
     ScintillaCall(SCI_BEGINUNDOACTION);
     const std::string sFindString = "([ \\t]+$)|([ \\t]+\\r)|([ \\t]+\\n)";
