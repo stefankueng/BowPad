@@ -186,7 +186,7 @@ bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf,
     foundText.clear();
     *lineNum = 0;
     // FIXME! In debug mode, regex takes a *long* time.
-    auto findRet = edit.Call(SCI_FINDTEXT, SCFIND_REGEXP, (sptr_t)&ttf);
+    auto findRet = edit.Call(SCI_FINDTEXT, SCFIND_REGEXP | SCFIND_CXX11REGEX, (sptr_t)&ttf);
     if (findRet < 0)
         return false;
     // Skip newlines, whitespaces and possible leftover closing braces from

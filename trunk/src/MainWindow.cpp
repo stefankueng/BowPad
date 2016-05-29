@@ -2321,7 +2321,7 @@ void CMainWindow::AddHotSpots()
         endPos = (long)m_editor.Call(SCI_GETLINEENDPOSITION, lineFoundcolonSlash);
         fStartPos = (long)posFoundColonSlash + 1;
 
-        m_editor.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX);
+        m_editor.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP | SCFIND_CXX11REGEX);
 
         // 20 chars for the url protocol should be enough
         m_editor.Call(SCI_SETTARGETSTART, max(startPos, posFoundColonSlash-20));

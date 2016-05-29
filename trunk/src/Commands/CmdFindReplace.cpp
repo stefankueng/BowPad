@@ -1634,7 +1634,7 @@ int CFindReplaceDlg::GetScintillaOptions() const
     if (IsDlgButtonChecked(*this, IDC_MATCHWORD) == BST_CHECKED)
         flags |= SCFIND_WHOLEWORD;
     if (IsDlgButtonChecked(*this, IDC_MATCHREGEX) == BST_CHECKED)
-        flags |= SCFIND_REGEXP;
+        flags |= SCFIND_REGEXP | SCFIND_CXX11REGEX;
     return flags;
 }
 
@@ -2029,7 +2029,7 @@ void CFindReplaceDlg::SearchDocument(
     if (!matchCase)
         wsearchfor = CStringUtils::to_lower(wsearchfor);
     if (searchForFunctions)
-        searchflags |= SCFIND_REGEXP;
+        searchflags |= SCFIND_REGEXP | SCFIND_CXX11REGEX;
     bool wholeWord = (searchflags & SCFIND_WHOLEWORD) != 0;
     if (searchForFunctions && !wholeWord)
         wsearchfor = L"*" + wsearchfor + L"*";
