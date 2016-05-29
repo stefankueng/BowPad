@@ -1077,7 +1077,7 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
 
         // Use match case because the include keyword is case sensitive and the
         // rest of the regular expression is symbols.
-        if (!FindNext(edit, ttf, SCFIND_REGEXP | SCFIND_MATCHCASE, text_found, &line_no))
+        if (!FindNext(edit, ttf, SCFIND_REGEXP | SCFIND_CXX11REGEX | SCFIND_MATCHCASE, text_found, &line_no))
             break;
         ttf.chrg.cpMin = ttf.chrgText.cpMax + 1;
 
