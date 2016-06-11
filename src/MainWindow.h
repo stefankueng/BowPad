@@ -87,8 +87,8 @@ public:
     void                SetFileOpenMRU(bool bUseMRU) { m_bPathsToOpenMRU = bUseMRU; }
     void                SetElevatedSave(const std::wstring& path, const std::wstring& savepath, long line) { m_elevatepath = path; m_elevatesavepath = savepath; m_initLine = line; }
     void                ElevatedSave(const std::wstring& path, const std::wstring& savepath, long line);
-    void                TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line);
-    void                SetTabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line) { m_tabmovepath = path; m_tabmovesavepath = savepath; m_tabmovemod = bMod; m_initLine = line; }
+    void                TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line, const std::wstring& title);
+    void                SetTabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line, const std::wstring& title) { m_tabmovepath = path; m_tabmovesavepath = savepath; m_tabmovemod = bMod; m_initLine = line; m_tabmovetitle = title; }
     void                SetInsertionIndex(int index) { m_insertionIndex = index; }
     std::wstring        GetNewTabName();
     void                ShowFileTree(bool bShow);
@@ -204,6 +204,7 @@ private:
     std::wstring                m_elevatesavepath;
     std::wstring                m_tabmovepath;
     std::wstring                m_tabmovesavepath;
+    std::wstring                m_tabmovetitle;
     bool                        m_tabmovemod;
     long                        m_initLine;
     int                         m_insertionIndex;

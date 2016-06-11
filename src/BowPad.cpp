@@ -298,7 +298,8 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
         }
         if (parser.HasKey(L"tabmove") && parser.HasKey(L"savepath"))
         {
-            mainWindow.SetTabMove(parser.GetVal(L"path"), parser.GetVal(L"savepath"), !!parser.HasKey(L"modified"), (long)line);
+            std::wstring title = parser.HasVal(L"title") ? parser.GetVal(L"title") : L"";
+            mainWindow.SetTabMove(parser.GetVal(L"path"), parser.GetVal(L"savepath"), !!parser.HasKey(L"modified"), (long)line, title);
             mainWindow.SetFileOpenMRU(false);
         }
     }
