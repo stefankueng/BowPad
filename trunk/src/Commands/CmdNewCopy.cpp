@@ -37,14 +37,15 @@ bool CCmdNewCopy::Execute()
         CDocument docnew = GetActiveDocument();
         auto d = docnew.m_document;
         docnew = doc;
+        docnew.m_path.clear();
         docnew.m_document = d;
         docnew.m_bDoSaveAs = true;
         docnew.m_bIsDirty = true;
         docnew.m_bNeedsSaving = true;
 
+        SetDocument(GetDocIdOfCurrentTab(), docnew);
         SetupLexerForLang(docnew.m_language);
         ScintillaCall(SCI_APPENDTEXT, len, (sptr_t)textbuf.get());
-        SetDocument(GetDocIdOfCurrentTab(), docnew);
         RestoreCurrentPos(docnew.m_position);
         ScintillaCall(SCI_SETSAVEPOINT);
         std::wstring sTitle = CPathUtils::GetFileName(docnew.m_path);
@@ -57,6 +58,7 @@ bool CCmdNewCopy::Execute()
         else
             sTitle = CStringUtils::Format(sTitleFormat, sTitle.substr(0, sTitle.size() - sExt.size() - 1).c_str(), sExt.c_str());
         SetCurrentTitle(sTitle.c_str());
+        UpdateTab(this->GetActiveTabIndex());
         UpdateStatusBar(true);
     }
     return true;
