@@ -1199,9 +1199,10 @@ void CMainWindow::HandleAfterInit()
 
     if (!m_tabmovepath.empty())
     {
-        TabMove(m_tabmovepath, m_tabmovesavepath, m_tabmovemod, m_initLine);
+        TabMove(m_tabmovepath, m_tabmovesavepath, m_tabmovemod, m_initLine, m_tabmovetitle);
         m_tabmovepath.clear();
         m_tabmovesavepath.clear();
+        m_tabmovetitle.clear();
     }
     EnsureAtLeastOneTab();
 
@@ -1334,9 +1335,10 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
 
 // TODO! Get rid of TabMove, make callers use OpenFileAs
 
+// Happens when the user drags a tab out and drops it over a bowpad window.
 // path is the temporary file that contains the latest document.
 // savepath is the file we want to save the temporary file over and then use.
-void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line)
+void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line, const std::wstring& title)
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
 
@@ -1362,6 +1364,8 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
         m_TabBar.SetCurrentTitle(GetNewTabName().c_str());
     else
         m_TabBar.SetCurrentTitle(sFileName.c_str());
+    if (!title.empty())
+        m_TabBar.SetCurrentTitle(title.c_str());
 
     UpdateTab(docID);
     UpdateCaptionBar();
@@ -2694,6 +2698,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 m_TabBar.SetCurrentTitle(sFileName.c_str());
             }
             doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
+
             if ((CPathUtils::PathCompare(filepath, m_tabmovepath) == 0) && m_tabmovemod)
             {
                 doc.m_path = m_tabmovesavepath;
@@ -2704,7 +2709,10 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                     doc.m_bIsDirty = true;
                     doc.m_bNeedsSaving = true;
                 }
+                if (!m_tabmovetitle.empty())
+                    m_TabBar.SetCurrentTitle(m_tabmovetitle.c_str());
             }
+
             m_DocManager.AddDocumentAtEnd(doc, id);
             // See Note A above for comments about this point in the code.
 
@@ -2733,6 +2741,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 m_fileTree.SetPath(CPathUtils::GetParentDirectory(filepath));
                 ResizeChildWindows();
             }
+            UpdateTab(id);
         }
         else
         {
@@ -3116,9 +3125,10 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
 
     // Start a new instance and open the tab there.
     std::wstring modpath = CPathUtils::GetModulePath();
-    std::wstring cmdline = CStringUtils::Format(L"/multiple /tabmove /savepath:\"%s\" /path:\"%s\" /line:%ld",
+    std::wstring cmdline = CStringUtils::Format(L"/multiple /tabmove /savepath:\"%s\" /path:\"%s\" /line:%ld /title:\"%s\"",
                                                 doc.m_path.c_str(), temppath.c_str(),
-                                                m_editor.GetCurrentLineNumber() + 1);
+                                                m_editor.GetCurrentLineNumber() + 1,
+                                                m_TabBar.GetTitle(tab).c_str());
     if (doc.m_bIsDirty || doc.m_bNeedsSaving)
         cmdline += L" /modified";
     SHELLEXECUTEINFO shExecInfo = { };
