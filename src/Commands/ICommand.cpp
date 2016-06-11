@@ -122,8 +122,7 @@ void ICommand::SetCurrentTitle(LPCWSTR title)
 {
     CMainWindow* pMainWnd = GetMainWindow();
     pMainWnd->m_TabBar.SetCurrentTitle(title);
-    std::wstring sWindowTitle = CStringUtils::Format(L"%s - BowPad", title);
-    SetWindowText(*pMainWnd, sWindowTitle.c_str());
+    pMainWnd->UpdateCaptionBar();
 }
 
 int ICommand::GetSrcTab()
