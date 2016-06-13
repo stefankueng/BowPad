@@ -342,6 +342,9 @@
     <ClInclude Include="Commands\CmdGotoSymbol.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="TabBtn.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -607,6 +610,9 @@
     </ClCompile>
     <ClCompile Include="Commands\CmdGotoSymbol.cpp">
       <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="TabBtn.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
