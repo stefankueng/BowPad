@@ -161,6 +161,8 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
     , m_fileTree(hInst, this)
+    , m_newTabBtn(hInst)
+    , m_closeTabBtn(hInst)
     , m_treeWidth(0)
     , m_bDragging(false)
     , m_fileTreeVisible(true)
@@ -1086,6 +1088,10 @@ bool CMainWindow::Initialize()
     // Each value is the right edge of each status bar element.
     m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 865, 925, 1010});
     m_TabBar.Init(hResource, *this);
+    m_newTabBtn.Init(hResource, *this, (HMENU)cmdNew);
+    m_newTabBtn.SetText(L"+");
+    m_closeTabBtn.Init(hResource, *this, (HMENU)cmdClose);
+    m_closeTabBtn.SetText(L"X");
     // Note DestroyIcon not technically needed here but we may as well leave in
     // in case someone changes things to load a non static resource.
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
@@ -1223,12 +1229,17 @@ void CMainWindow::ResizeChildWindows()
     {
         const UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
         const UINT noshowflags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOCOPYBITS;
-        HDWP hDwp = BeginDeferWindowPos(4);
-        DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_TabBar, nullptr, rect.left, rect.top + m_RibbonHeight, rect.right - rect.left, rect.bottom - rect.top, flags);
+
         RECT tabrc;
         TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
         MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
+        const int tabBtnWidth = tabrc.bottom - tabrc.top + 2;
+
+        HDWP hDwp = BeginDeferWindowPos(6);
+        DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), flags);
+        DeferWindowPos(hDwp, m_TabBar, nullptr, rect.left, rect.top + m_RibbonHeight, rect.right - rect.left - tabBtnWidth - tabBtnWidth, rect.bottom - rect.top, flags);
+        DeferWindowPos(hDwp, m_newTabBtn, nullptr, rect.right - rect.left - tabBtnWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tabrc.bottom - tabrc.top, flags);
+        DeferWindowPos(hDwp, m_closeTabBtn, nullptr, rect.right - rect.left - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tabrc.bottom - tabrc.top, flags);
         int treeWidth = 0;
         if (m_fileTreeVisible && !m_fileTree.GetPath().empty())
             treeWidth = m_treeWidth;

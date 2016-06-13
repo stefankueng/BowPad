@@ -22,6 +22,7 @@
 #include "DocumentManager.h"
 #include "ScintillaWnd.h"
 #include "FileTree.h"
+#include "TabBtn.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -190,6 +191,8 @@ private:
     CTabBar                     m_TabBar;
     CScintillaWnd               m_editor;
     CFileTree                   m_fileTree;
+    CTabBtn                     m_newTabBtn;
+    CTabBtn                     m_closeTabBtn;
     int                         m_treeWidth;
     bool                        m_bDragging;
     POINT                       m_oldPt;
