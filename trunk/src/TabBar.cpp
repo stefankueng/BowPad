@@ -21,6 +21,7 @@
 #include "Theme.h"
 #include "BowPad.h"
 #include "BowPadUI.h"
+#include "GDIHelpers.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4458) // declaration of 'xxx' hides class member
@@ -36,52 +37,6 @@
 extern IUIFramework * g_pFramework;
 
 const int TABBAR_SHOWDISKICON = 0;
-
-static COLORREF Darker(COLORREF crBase, float fFactor)
-{
-    ASSERT(fFactor < 1.0f && fFactor > 0.0f);
-
-    fFactor = min(fFactor, 1.0f);
-    fFactor = max(fFactor, 0.0f);
-
-    const BYTE bRed = GetRValue(crBase);
-    const BYTE bBlue = GetBValue(crBase);
-    const BYTE bGreen = GetGValue(crBase);
-
-    const BYTE bRedShadow = (BYTE)(bRed * fFactor);
-    const BYTE bBlueShadow = (BYTE)(bBlue * fFactor);
-    const BYTE bGreenShadow = (BYTE)(bGreen * fFactor);
-
-    return RGB(bRedShadow, bGreenShadow, bBlueShadow);
-}
-
-static COLORREF Lighter(COLORREF crBase, float fFactor)
-{
-    ASSERT(fFactor > 1.0f);
-
-    fFactor = max(fFactor, 1.0f);
-
-    const BYTE bRed = GetRValue(crBase);
-    const BYTE bBlue = GetBValue(crBase);
-    const BYTE bGreen = GetGValue(crBase);
-
-    const BYTE bRedHilite = (BYTE)min((int)(bRed * fFactor), 255);
-    const BYTE bBlueHilite = (BYTE)min((int)(bBlue * fFactor), 255);
-    const BYTE bGreenHilite = (BYTE)min((int)(bGreen * fFactor), 255);
-
-    return RGB(bRedHilite, bGreenHilite, bBlueHilite);
-}
-
-static void FillSolidRect(HDC hDC, int left, int top, int right, int bottom, COLORREF clr)
-{
-    ::SetBkColor(hDC, clr);
-    RECT rect;
-    rect.left = left;
-    rect.top = top;
-    rect.right = right;
-    rect.bottom = bottom;
-    ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rect, nullptr, 0, nullptr);
-}
 
 
 CTabBar::CTabBar(HINSTANCE hInst)
@@ -848,9 +803,9 @@ COLORREF CTabBar::GetTabColor(bool bSelected, UINT item) const
     }
     if (bSelected)
     {
-        return Lighter(clr, lighterfactor);
+        return GDIHelpers::Lighter(clr, lighterfactor);
     }
-    return Darker(clr, 0.9f);
+    return GDIHelpers::Darker(clr, 0.9f);
 }
 
 void CTabBar::DrawItemBorder(LPDRAWITEMSTRUCT lpdis) const
@@ -861,22 +816,22 @@ void CTabBar::DrawItemBorder(LPDRAWITEMSTRUCT lpdis) const
     RECT rItem(lpdis->rcItem);
 
     COLORREF crTab = GetTabColor(bSelected, lpdis->itemID);
-    COLORREF crHighlight = Lighter(crTab, 1.5f);
-    COLORREF crShadow = Darker(crTab, 0.75f);
+    COLORREF crHighlight = GDIHelpers::Lighter(crTab, 1.5f);
+    COLORREF crShadow = GDIHelpers::Darker(crTab, 0.75f);
 
     rItem.bottom += bSelected ? -1 : 1;
 
     // edges
 
-    FillSolidRect(lpdis->hDC, rItem.left, rItem.top, rItem.left + 1, rItem.bottom, crHighlight);
-    FillSolidRect(lpdis->hDC, rItem.left, rItem.top, rItem.right, rItem.top + 1, crHighlight);
-    FillSolidRect(lpdis->hDC, rItem.right - 1, rItem.top, rItem.right, rItem.bottom, crShadow);
+    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.left, rItem.top, rItem.left + 1, rItem.bottom, crHighlight);
+    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.left, rItem.top, rItem.right, rItem.top + 1, crHighlight);
+    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.right - 1, rItem.top, rItem.right, rItem.bottom, crShadow);
 }
 
 void CTabBar::DrawMainBorder(LPDRAWITEMSTRUCT lpdis) const
 {
     RECT rBorder(lpdis->rcItem);
-    FillSolidRect(lpdis->hDC, rBorder.left, rBorder.top, rBorder.right, rBorder.bottom, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
+    GDIHelpers::FillSolidRect(lpdis->hDC, &rBorder, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
 }
 
 void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct) const
@@ -899,9 +854,9 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct) const
     // blend from back color to COLOR_3DFACE if 16 bit mode or better
     COLORREF crFrom = GetTabColor(bSelected, pDrawItemStruct->itemID);
 
-    COLORREF crTo = bSelected ? ::GetSysColor(COLOR_3DFACE) : Darker(::GetSysColor(COLOR_3DFACE), 0.95f);
+    COLORREF crTo = bSelected ? ::GetSysColor(COLOR_3DFACE) : GDIHelpers::Darker(::GetSysColor(COLOR_3DFACE), 0.95f);
     if (bMouseOver)
-        crTo = Darker(crTo, 0.7f);
+        crTo = GDIHelpers::Darker(crTo, 0.7f);
 
     crTo = CTheme::Instance().GetThemeColor(crTo);
 
@@ -920,7 +875,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct) const
         int nGreen = nGOrg + (nLine * nGDiff) / nHeight;
         int nBlue = nBOrg + (nLine * nBDiff) / nHeight;
 
-        FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top + nLine, rItem.right, rItem.top + nLine + 2, RGB(nRed, nGreen, nBlue));
+        GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top + nLine, rItem.right, rItem.top + nLine + 2, RGB(nRed, nGreen, nBlue));
     }
     wchar_t buf[100] = { 0 };
     tci.mask = TCIF_TEXT | TCIF_IMAGE;
@@ -931,7 +886,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct) const
     {
         // draw a line at the bottom indicating the active tab:
         // green if the tab is not modified, red if it is modified and needs saving
-        FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - 5, rItem.right, rItem.bottom,
+        GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - 5, rItem.right, rItem.bottom,
                       CTheme::Instance().GetThemeColor(tci.iImage == UNSAVED_IMG_INDEX ? RGB(200, 0, 0) : RGB(0, 200, 0)));
     }
     if (tci.iImage == UNSAVED_IMG_INDEX)
@@ -986,7 +941,7 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct) const
     rItem.right -= PADDING;
     UINT uFlags = DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER;
     ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, uFlags);
-    COLORREF textColor = CTheme::Instance().GetThemeColor(Darker(::GetSysColor(COLOR_3DDKSHADOW), 0.5f));
+    COLORREF textColor = CTheme::Instance().GetThemeColor(GDIHelpers::Darker(::GetSysColor(COLOR_3DDKSHADOW), 0.5f));
     if (bSelected)
         textColor = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT));
     if (tci.iImage == UNSAVED_IMG_INDEX)

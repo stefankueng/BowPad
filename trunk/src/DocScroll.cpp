@@ -19,30 +19,13 @@
 #include "ScintillaWnd.h"
 #include "AppUtils.h"
 #include "Theme.h"
+#include "GDIHelpers.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4458) // declaration of 'xxx' hides class member
 #include <gdiplus.h>
 #pragma warning(pop)
 
-enum
-{
-    AlphaShift = 24,
-    RedShift = 16,
-    GreenShift = 8,
-    BlueShift = 0
-};
-
-static Gdiplus::ARGB MakeARGB(IN BYTE a,
-                              IN BYTE r,
-                              IN BYTE g,
-                              IN BYTE b)
-{
-    return (((Gdiplus::ARGB)(b) << BlueShift) |
-            ((Gdiplus::ARGB)(g) << GreenShift) |
-            ((Gdiplus::ARGB)(r) << RedShift) |
-            ((Gdiplus::ARGB)(a) << AlphaShift));
-}
 
 static inline COLORREF GetThumbColor(const NMCSBCUSTOMDRAW& custDraw)
 {
@@ -55,17 +38,6 @@ static inline COLORREF GetThumbColor(const NMCSBCUSTOMDRAW& custDraw)
         return hot ? theme.GetThemeColor(RGB(128, 128, 128)) : theme.GetThemeColor(::GetSysColor(COLOR_3DSHADOW));
     else
         return theme.GetThemeColor(hot ? RGB(200, 200, 255) : ::GetSysColor(COLOR_3DSHADOW));
-}
-
-static void FillSolidRect(HDC hDC, LONG left, LONG top, LONG right, LONG bottom, COLORREF clr)
-{
-    ::SetBkColor(hDC, clr);
-    RECT rect;
-    rect.left = left;
-    rect.top = top;
-    rect.right = right;
-    rect.bottom = bottom;
-    ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rect, nullptr, 0, nullptr);
 }
 
 static void DrawTriangle(HDC hdc, COLORREF scroll, COLORREF thumb, const RECT& rect, LONG x0, LONG y0, LONG x1, LONG y1, LONG x2, LONG y2)
@@ -130,7 +102,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
     if (pCustDraw->nBar == SB_BOTH)
     {
         // the sizing gripper in the bottom-right corner
-        FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_SCROLLBAR)));
+        GDIHelpers::FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_SCROLLBAR)));
     }
     else if (pCustDraw->nBar == SB_HORZ)
     {
@@ -159,11 +131,11 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                          pCustDraw->rect.bottom - margin);
             break;
             case HTSCROLL_THUMB:
-            FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top,
+            GDIHelpers::FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top,
                           pCustDraw->rect.right, pCustDraw->rect.bottom, thumb);
             break;
             default:
-            FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top,
+            GDIHelpers::FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top,
                           pCustDraw->rect.right, pCustDraw->rect.bottom, scroll);
             break;
         }
@@ -220,7 +192,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                 // Fill the vertical thumb with only part of the color
                 // so the document info (selections, cursor pos, ...) can
                 // still be seen through it.
-                c1.SetValue(MakeARGB(100, GetRValue(thumb), GetGValue(thumb), GetBValue(thumb)));
+                c1.SetValue(GDIHelpers::MakeARGB(100, GetRValue(thumb), GetGValue(thumb), GetBValue(thumb)));
                 Gdiplus::SolidBrush brush(c1);
                 graphics.FillPath(&brush, &path);
             }
