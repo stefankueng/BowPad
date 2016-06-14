@@ -640,14 +640,14 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_SETCURSOR:
     {
+        // change the cursor to SIZEWE if the mouse pointer is below the tab bar,
+        // and to an arrow if the mouse pointer is above the bottom of the tab bar.
         RECT tabrc;
         TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
         MapWindowPoints(m_TabBar, nullptr, (LPPOINT)&tabrc, 2);
         DWORD pos = GetMessagePos();
-        POINT pt;
-        pt.x = GET_X_LPARAM(pos);
-        pt.y = GET_Y_LPARAM(pos);
-        if (pt.y < tabrc.bottom)
+        auto mousey = GET_Y_LPARAM(pos);
+        if (mousey < tabrc.bottom)
         {
             SetCursor(LoadCursor(NULL, (LPTSTR)IDC_ARROW));
             return TRUE;
