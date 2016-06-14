@@ -1092,6 +1092,7 @@ bool CMainWindow::Initialize()
     m_newTabBtn.SetText(L"+");
     m_closeTabBtn.Init(hResource, *this, (HMENU)cmdClose);
     m_closeTabBtn.SetText(L"X");
+    m_closeTabBtn.SetTextColor(RGB(255, 0, 0));
     // Note DestroyIcon not technically needed here but we may as well leave in
     // in case someone changes things to load a non static resource.
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
