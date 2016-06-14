@@ -345,6 +345,9 @@
     <ClInclude Include="TabBtn.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\GDIHelpers.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -613,6 +616,9 @@
     </ClCompile>
     <ClCompile Include="TabBtn.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\GDIHelpers.cpp">
+      <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
