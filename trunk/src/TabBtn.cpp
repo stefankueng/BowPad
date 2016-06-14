@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "TabBtn.h"
 #include "Theme.h"
+#include "GDIHelpers.h"
 
 bool CTabBtn::SetText(const TCHAR *str)
 {
@@ -60,13 +61,13 @@ void CTabBtn::SetFont(const TCHAR *fontName, int fontSize)
 
 LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    if (CTheme::Instance().IsDarkTheme())
+    switch (uMsg)
     {
-        // only do custom drawing when in dark theme
-        switch (uMsg)
+        case WM_PAINT:
         {
-            case WM_PAINT:
+            if (CTheme::Instance().IsDarkTheme())
             {
+                // only do custom drawing when in dark theme
                 PAINTSTRUCT ps;
                 HDC hdc = BeginPaint(hwnd, &ps);
 
@@ -74,6 +75,12 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
                 auto clr1 = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNSHADOW));
                 auto clr2 = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNFACE));
+
+                if (m_colorset)
+                {
+                    clr1 = CTheme::Instance().GetThemeColor(m_color);
+                    clr2 = GDIHelpers::Darker(clr1, 0.7f);
+                }
 
                 ::SetBkColor(hdc, (state & BST_HOT) != 0 ? clr2 : clr1);
 
@@ -84,10 +91,15 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 // now draw a slightly smaller area in a different color, which
                 // makes the outer area drawn before look like a border
                 InflateRect(&rect, -1, -1);
-                ::SetBkColor(hdc, (state & BST_HOT) != 0 ? clr1 : clr2);
-                ::ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &rect, nullptr, 0, nullptr);
+                auto halfpos = ((rect.bottom - rect.top) / 2) + rect.top;
+                GDIHelpers::FillSolidRect(hdc, rect.left, rect.top, rect.right, halfpos, (state & BST_HOT) != 0 ? clr1 : clr2);
+                GDIHelpers::FillSolidRect(hdc, rect.left, halfpos, rect.right, rect.bottom, GDIHelpers::Darker((state & BST_HOT) != 0 ? clr1 : clr2, 0.9f));
 
-                ::SetTextColor(hdc, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNTEXT)));
+                ::SetBkMode(hdc, TRANSPARENT);
+                if (m_textcolorset)
+                    ::SetTextColor(hdc, CTheme::Instance().GetThemeColor(m_textcolor));
+                else
+                    ::SetTextColor(hdc, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNTEXT)));
                 wchar_t buf[20]; // we don't handle big texts in these buttons because they're meant to be very small
                 ::GetWindowText(hwnd, buf, _countof(buf));
 
@@ -97,10 +109,10 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 EndPaint(hwnd, &ps);
                 return 0;
             }
-            break;
-            case WM_ERASEBKGND:
-            return TRUE;
         }
+        break;
+        case WM_ERASEBKGND:
+        return TRUE;
     }
     if (prevWndProc)
         return prevWndProc(hwnd, uMsg, wParam, lParam);

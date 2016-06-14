@@ -23,6 +23,10 @@ public :
     CTabBtn(HINSTANCE hInst)
         : CWindow(hInst)
         , m_hFont(nullptr)
+        , m_colorset(false)
+        , m_color(0)
+        , m_textcolorset(false)
+        , m_textcolor(0)
     {};
     virtual ~CTabBtn()
     {
@@ -34,9 +38,16 @@ public :
     void SetFont(const TCHAR *fontName, int fontSize);
     bool SetText(const TCHAR *str);
 
+    void SetColor(COLORREF clr) { m_color = clr; m_colorset = true; }
+    void SetTextColor(COLORREF clr) { m_textcolor = clr; m_textcolorset = true; }
+
 protected:
     LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 private:
     HFONT       m_hFont;
+    COLORREF    m_color;
+    bool        m_colorset;
+    COLORREF    m_textcolor;
+    bool        m_textcolorset;
 };
