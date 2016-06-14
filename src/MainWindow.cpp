@@ -638,12 +638,29 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     case WM_EXITMENULOOP:
         m_inMenuLoop = false;
         break;
+    case WM_SETCURSOR:
+    {
+        RECT tabrc;
+        TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
+        MapWindowPoints(m_TabBar, nullptr, (LPPOINT)&tabrc, 2);
+        DWORD pos = GetMessagePos();
+        POINT pt;
+        pt.x = GET_X_LPARAM(pos);
+        pt.y = GET_Y_LPARAM(pos);
+        if (pt.y < tabrc.bottom)
+        {
+            SetCursor(LoadCursor(NULL, (LPTSTR)IDC_ARROW));
+            return TRUE;
+        }
+        SetCursor(LoadCursor(NULL, (LPTSTR)IDC_SIZEWE));
+    }
+    break;
     case WM_CANHIDECURSOR:
     {
         BOOL* result = reinterpret_cast<BOOL*>(lParam);
         *result = m_inMenuLoop ? FALSE : TRUE;
-        break;
     }
+    break;
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
