@@ -63,6 +63,7 @@ bool CCmdToggleTheme::Execute()
     TabActivateAt(GetActiveTabIndex());
 
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    RedrawWindow(GetHwnd(), nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
     return true;
 }
 
