@@ -2075,6 +2075,12 @@ void CFindReplaceDlg::SearchDocument(
         if (findRet >= 0)
         {
             CSearchResult result;
+            // Don't use the document id as a reference to this file unless we have to,
+            // use the path. The document might close, or be saved to another path,
+            // but by not using the document id, the result can just stick consistently
+            // to wherever it originally referred to.
+            if (docID >= 0)
+                result.docID = docID;
             result.pos = ttf.chrgText.cpMin;
             char c = (char)searchWnd.Call(SCI_GETCHARAT, result.pos);
             while (c == '\n' || c == '\r')
@@ -2084,28 +2090,35 @@ void CFindReplaceDlg::SearchDocument(
             }
             result.line = searchWnd.Call(SCI_LINEFROMPOSITION, result.pos);
             auto linepos = searchWnd.Call(SCI_POSITIONFROMLINE, result.line);
+            if (searchForFunctions)
+            {
+                result.lineText = CUnicodeUtils::StdGetUnicode(searchWnd.GetTextRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax));
+                result.posInLineStart = 0;
+                size_t linesize = result.lineText.length();
+                while (linesize > 0 && (result.lineText[linesize - 1] == L'\n' || result.lineText[linesize - 1] == L'\r'))
+                    --linesize;
+                result.lineText.resize(linesize);
+                result.posInLineEnd = 0;
+                result.posInLineEnd = 0;
+            }
+            else
+            {
+                result.posInLineStart = linepos >= 0 ? result.pos - linepos : 0;
+                result.posInLineEnd = linepos >= 0 ? ttf.chrgText.cpMax - linepos : 0;
 
-            result.posInLineStart = linepos >= 0 ? result.pos - linepos : 0;
-            result.posInLineEnd = linepos >= 0 ? ttf.chrgText.cpMax - linepos : 0;
-            // Don't use the document id as a reference to this file unless we have to,
-            // use the path. The document might close, or be saved to another path,
-            // but by not using the document id, the result can just stick consistently
-            // to wherever it originally referred to.
-            if (docID >= 0)
-                result.docID = docID;
-
-            size_t linesize = (size_t) searchWnd.Call(SCI_LINELENGTH, result.line);
-            line.resize(linesize);
-            searchWnd.Call(SCI_GETLINE, result.line, reinterpret_cast<sptr_t>(line.data()));
-            // remove EOLs
-            while (linesize > 0 && (line[linesize-1] == '\n' || line[linesize-1] == '\r'))
-                --linesize;
-            line.resize(linesize);
-            result.lineText = CUnicodeUtils::StdGetUnicode(line, false);
-            // adjust the line positions: Scintilla uses utf8, but utf8 converted to
-            // utf16 can have different char sizes so the positions won't match anymore
-            result.posInLineStart = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineStart);
-            result.posInLineEnd = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineEnd);
+                size_t linesize = (size_t)searchWnd.Call(SCI_LINELENGTH, result.line);
+                line.resize(linesize);
+                searchWnd.Call(SCI_GETLINE, result.line, reinterpret_cast<sptr_t>(line.data()));
+                // remove EOLs
+                while (linesize > 0 && (line[linesize - 1] == '\n' || line[linesize - 1] == '\r'))
+                    --linesize;
+                line.resize(linesize);
+                result.lineText = CUnicodeUtils::StdGetUnicode(line, false);
+                // adjust the line positions: Scintilla uses utf8, but utf8 converted to
+                // utf16 can have different char sizes so the positions won't match anymore
+                result.posInLineStart = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineStart);
+                result.posInLineEnd = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineEnd);
+            }
 
             // When searching for functions, we have to narrow the match down by name ourself.
             bool matched = false;
