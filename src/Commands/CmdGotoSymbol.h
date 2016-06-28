@@ -32,5 +32,5 @@ public:
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
     void TabNotify(TBHDR* ptbhdr) override;
-
+    void OnLexerChanged(int lexer)  override;
 };
