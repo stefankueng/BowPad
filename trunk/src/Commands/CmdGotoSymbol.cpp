@@ -59,3 +59,7 @@ void CCmdGotoSymbol::TabNotify(TBHDR * ptbhdr)
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
 }
 
+void CCmdGotoSymbol::OnLexerChanged(int /*lexer*/)
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
+}
