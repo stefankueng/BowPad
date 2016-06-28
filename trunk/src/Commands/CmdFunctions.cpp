@@ -130,10 +130,6 @@ void Normalize(std::wstring& f)
     f.erase(new_end, f.end());
 }
 
-// Note: regexp incorrectly identifies functions so not everything that comes
-// here will look exactly like a function. But we have to deal with it unless
-// we want to write compilers for each supported language.
-// So we might get a switch like this: "case ISD::SHL: switch (VT.SimpleTy)"
 bool ParseSignature(const std::wstring& sig, std::wstring& name, std::wstring& name_and_args)
 {
     // Find the name of the function
@@ -152,6 +148,18 @@ bool ParseSignature(const std::wstring& sig, std::wstring& name, std::wstring& n
         // before the name. Ignore them. This logic is a bit C language based.
         while (spos < bracepos && (sig[spos] == L'*' || sig[spos] == L'&' || sig[spos] == L'^'))
             ++spos;
+        name.assign(sig, spos, bracepos - spos);
+        name_and_args.assign(sig, spos);
+        CStringUtils::trim(name);
+        parsed = !name.empty();
+    }
+    else
+    {
+        // some languages have functions without (), or pseudo-functions like
+        // properties in c#. Deal with those here.
+        auto wpos = sig.find_last_of(L"\t :,.", bracepos - 1, 5);
+        size_t spos = (wpos == std::wstring::npos) ? 0 : wpos + 1;
+
         name.assign(sig, spos, bracepos - spos);
         name_and_args.assign(sig, spos);
         CStringUtils::trim(name);
