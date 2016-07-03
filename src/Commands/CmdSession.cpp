@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "ICommand.h"
 #include "BowPadUI.h"
+#include "BowPad.h"
 
 #include "CmdSession.h"
 
@@ -25,6 +26,8 @@
 #include "IniSettings.h"
 #include "CmdLineParser.h"
 #include "OnOutOfScope.h"
+#include "ResString.h"
+#include "ProgressDlg.h"
 
 namespace
 {
@@ -109,16 +112,48 @@ void CCmdSessionLoad::RestoreSavedSession()
     // to a new location then exit without saving but expect to return to where they were.
     // It's not clear how to best satisfy these competing needs. Currently we save state
     // regardless of exit status and if it's "wrong" on restore then user beware.
-    int activeDoc = -1;
-    FileTreeBlockRefresh(true);
-    OnOutOfScope(FileTreeBlockRefresh(false));
+
+    ProfileTimer profile(L"RestoreSavedSession");
     auto& settings = CIniSettings::Instance();
-    const unsigned int openflags = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
+    int numFilesToRestore = 0;
     for (int fileNum = 0; fileNum < BP_MAX_SESSION_SIZE; ++fileNum)
     {
         std::wstring key = CStringUtils::Format(L"path%d", fileNum);
         std::wstring path = settings.GetString(g_sessionSection, key.c_str(), L"");
         if (path.empty())
+            break;
+        ++numFilesToRestore;
+    }
+
+    // Block the UI to avoid excessive drawing/painting if loading more than
+    // one file. Don't block the UI when loading one or less files as that
+    // itself would lead to excessive repainting.
+    if (numFilesToRestore > 1)
+        BlockAllUIUpdates(true);
+    OnOutOfScope(
+        if (numFilesToRestore > 1)
+            BlockAllUIUpdates(false);
+    );
+
+    CProgressDlg progDlg;
+    ResString rTitle(hRes, IDS_SESSIONLOADING_TITLE);
+    progDlg.SetLine(1, rTitle);
+    progDlg.SetProgress(0, numFilesToRestore);
+    if (numFilesToRestore > 3)
+        progDlg.ShowModeless(GetHwnd());
+    int activeDoc = -1;
+    const unsigned int openflags = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
+    int filecount = 0;
+    for (int fileNum = 0; fileNum < BP_MAX_SESSION_SIZE; ++fileNum)
+    {
+        std::wstring key = CStringUtils::Format(L"path%d", fileNum);
+        std::wstring path = settings.GetString(g_sessionSection, key.c_str(), L"");
+        if (path.empty())
+            break;
+        ++filecount;
+        progDlg.SetLine(2, path.c_str(), true);
+        progDlg.SetProgress(filecount, numFilesToRestore);
+        if (progDlg.HasUserCancelled())
             break;
         int tabIndex = OpenFile(path.c_str(), openflags);
         if (tabIndex < 0)
@@ -142,6 +177,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         SetDocument(docId, doc);
         RestoreCurrentPos(doc.m_position);
     }
+    progDlg.Stop();
     if (activeDoc >= 0)
     {
         int activeTabIndex = GetTabIndexFromDocID(activeDoc);

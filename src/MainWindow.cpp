@@ -37,6 +37,7 @@
 #include "DirFileEnum.h"
 #include "LexStyles.h"
 #include "OnOutOfScope.h"
+#include "ProgressDlg.h"
 
 #include <memory>
 #include <cassert>
@@ -1203,14 +1204,30 @@ void CMainWindow::HandleAfterInit()
         unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
         if (m_bPathsToOpenMRU)
             openFlags |= OpenFlags::AddToMRU;
+        BlockAllUIUpdates(true);
+        OnOutOfScope(BlockAllUIUpdates(false));
+
+        CProgressDlg progDlg;
+        ResString rTitle(hRes, IDS_FILELOADING_TITLE);
+        progDlg.SetLine(1, rTitle);
+        progDlg.SetProgress(0, (DWORD)m_pathsToOpen.size());
+        if (m_pathsToOpen.size() > 3)
+            progDlg.ShowModeless(*this);
+        int filecounter = 0;
         for (const auto& path : m_pathsToOpen)
         {
+            ++filecounter;
+            progDlg.SetLine(2, path.first.c_str(), true);
+            progDlg.SetProgress(filecounter, (DWORD)m_pathsToOpen.size());
+            if (progDlg.HasUserCancelled())
+                break;
             if (OpenFile(path.first, openFlags) >= 0)
             {
                 if (path.second != (size_t)-1)
                     GoToLine(path.second);
             }
         }
+        progDlg.Stop();
     }
     m_pathsToOpen.clear();
     m_bPathsToOpenMRU = true;
@@ -2835,12 +2852,25 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         DragQueryFile(hDrop, i, pathBuf.get(), len+1);
         files.push_back(pathBuf.get());
     }
-    FileTreeBlockRefresh(true);
-    OnOutOfScope(FileTreeBlockRefresh(false));
+
+    CProgressDlg progDlg;
+    ResString rTitle(hRes, IDS_FILELOADING_TITLE);
+    progDlg.SetLine(1, rTitle);
+    progDlg.SetProgress(0, (DWORD)m_pathsToOpen.size());
+    if (files.size() > 3)
+        progDlg.ShowModeless(*this);
+    int filecounter = 0;
+    BlockAllUIUpdates(true);
+    OnOutOfScope(BlockAllUIUpdates(false));
 
     const size_t maxFiles = 100;
     for (const auto& filename : files)
     {
+        ++filecounter;
+        progDlg.SetProgress(filecounter, (DWORD)files.size());
+        progDlg.SetLine(2, filename.c_str(), true);
+        if (progDlg.HasUserCancelled())
+            break;
         if (PathIsDirectory(filename.c_str()))
         {
             std::vector<std::wstring> recursefiles;
@@ -2864,6 +2894,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
                 {
                     return CPathUtils::PathCompare(lhs.c_str(), rhs.c_str()) < 0;
                 });
+
                 for (const auto& f : recursefiles)
                     OpenFile(f, 0);
             }
@@ -2871,6 +2902,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         else
             OpenFile(filename, OpenFlags::AddToMRU);
     }
+    progDlg.Stop();
 }
 
 void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
@@ -2905,6 +2937,11 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
         FileTreeBlockRefresh(true);
         OnOutOfScope(FileTreeBlockRefresh(false));
         int filesOpened = 0;
+        BlockAllUIUpdates(true);
+        OnOutOfScope(BlockAllUIUpdates(false));
+        // no need for a progress dialog here:
+        // the command line is limited in size, so there can't be too many
+        // filepaths passed here
         for (int i = 1; i < nArgs; i++)
         {
             if (szArglist[i][0] != '/')
@@ -3440,8 +3477,8 @@ void CMainWindow::OpenFiles(const std::vector<std::wstring>& paths)
     }
     else
     {
-        FileTreeBlockRefresh(true);
-        OnOutOfScope(FileTreeBlockRefresh(false));
+        BlockAllUIUpdates(true);
+        OnOutOfScope(BlockAllUIUpdates(false));
         // Open all that was selected or at least returned.
         int docToActivate = -1;
         for (const auto& file : paths)
@@ -3455,5 +3492,29 @@ void CMainWindow::OpenFiles(const std::vector<std::wstring>& paths)
             auto tabToActivate = m_TabBar.GetIndexFromID(docToActivate);
             m_TabBar.ActivateAt(tabToActivate);
         }
+    }
+}
+
+void CMainWindow::BlockAllUIUpdates(bool block)
+{
+    if (block)
+        ++m_blockCount;
+    else
+        --m_blockCount;
+    if (m_blockCount < 0)
+    {
+        APPVERIFY(false);
+        m_blockCount = 0;
+    }
+    if (m_blockCount == 1)
+    {
+        FileTreeBlockRefresh(true);
+        SendMessage(*this, WM_SETREDRAW, FALSE, 0);
+    }
+    else if (m_blockCount == 0)
+    {
+        SendMessage(*this, WM_SETREDRAW, TRUE, 0);
+        FileTreeBlockRefresh(false);
+        RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
     }
 }
