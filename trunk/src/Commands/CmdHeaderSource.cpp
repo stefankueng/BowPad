@@ -1183,7 +1183,47 @@ bool CCmdHeaderSource::GetCPPIncludePathsForMS(std::wstring& systemIncludePaths)
     if (programfiles.empty())
         return false;
 
-    // first the windows sdks
+    // newer SDKs are stored under %programfilesx86%\Windows Kits\(sdkver)\Include\(version)
+    std::vector<std::wstring> sdkversnew = { L"10",L"8.1", L"8.0" };
+    for (const auto& sdkver : sdkversnew)
+    {
+        std::wstring sTestPath = CStringUtils::Format(L"%s\\Windows Kits\\%s\\Include",
+                                                      programfiles.c_str(), sdkver.c_str());
+        if (PathFileExists(sTestPath.c_str()))
+        {
+            CDirFileEnum enumerator(sTestPath);
+            bool bIsDir = false;
+            std::wstring enumpath;
+            // first store the direct subfolders in a set: the set is ordered
+            // so that we then can enumerate those in reverse order, i.e. to
+            // get the latest version first
+            std::set<std::wstring> sdkpaths;
+            while (enumerator.NextFile(enumpath, &bIsDir, false))
+            {
+                if (bIsDir)
+                {
+                    sdkpaths.insert(enumpath);
+                    systemIncludePaths += enumpath;
+                    systemIncludePaths += L";";
+                }
+            }
+            for (auto it = sdkpaths.crbegin(); it != sdkpaths.crend(); ++it)
+            {
+                CDirFileEnum enumerator2(*it);
+                while (enumerator2.NextFile(enumpath, &bIsDir, true))
+                {
+                    if (bIsDir)
+                    {
+                        systemIncludePaths += enumpath;
+                        systemIncludePaths += L";";
+                    }
+                }
+            }
+            // The user shouldn't be mixing sdks, paths shouldn't be accumulative.
+            break;
+        }
+    }
+    // now try the older SDK paths
     std::vector<std::wstring> sdkvers = {
         L"v10.0A",
         L"v8.1A", L"v8.1", L"v8.0A", L"v8.0",
@@ -1191,7 +1231,7 @@ bool CCmdHeaderSource::GetCPPIncludePathsForMS(std::wstring& systemIncludePaths)
     for (const auto& sdkver : sdkvers)
     {
         std::wstring sTestPath = CStringUtils::Format(L"%s\\Microsoft SDKs\\Windows\\%s\\Include",
-            programfiles.c_str(), sdkver);
+                                                      programfiles.c_str(), sdkver);
         if (PathFileExists(sTestPath.c_str()))
         {
             systemIncludePaths += sTestPath;
