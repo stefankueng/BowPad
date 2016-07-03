@@ -33,15 +33,19 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     // replace the macros in the command line
     CDocument doc = GetActiveDocument();
     std::wstring tabpath = doc.m_path;
+    auto tabdirpath = CPathUtils::GetParentDirectory(tabpath);
     if (PathFileExists(tabpath.c_str()))
+    {
         SearchReplace(cmd, L"$(TAB_PATH)", tabpath);
+        SearchReplace(cmd, L"$(TAB_DIR)", tabdirpath);
+        SearchReplace(cmd, L"$(TAB_NAME)", CPathUtils::GetFileNameWithoutExtension(tabpath));
+        SearchReplace(cmd, L"$(TAB_EXT)", CPathUtils::GetFileExtension(tabpath));
+    }
     else
+    {
         SearchRemoveAll(cmd, L"$(TAB_PATH)");
-    tabpath = CPathUtils::GetParentDirectory(tabpath);
-    if (PathFileExists(tabpath.c_str()))
-        SearchReplace(cmd, L"$(TAB_DIR)", tabpath);
-    else
         SearchRemoveAll(cmd, L"$(TAB_DIR)");
+    }
 
     SearchReplace(cmd, L"$(LINE)", std::to_wstring(int(ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS)))));
     SearchReplace(cmd, L"$(POS)", std::to_wstring(int(ScintillaCall(SCI_GETCURRENTPOS))));
@@ -86,7 +90,6 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
         }
     }
 
-    std::wstring directory = CPathUtils::GetParentDirectory(tabpath);
     SHELLEXECUTEINFO shi = {0};
     shi.cbSize = sizeof(SHELLEXECUTEINFO);
     shi.fMask = SEE_MASK_DOENVSUBST|SEE_MASK_UNICODE;
@@ -94,7 +97,7 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     shi.lpVerb = L"open";
     shi.lpFile = cmd.c_str();
     shi.lpParameters = params.empty() ? nullptr : params.c_str();
-    shi.lpDirectory = directory.c_str();
+    shi.lpDirectory = tabdirpath.c_str();
     shi.nShow = SW_SHOW;
 
     return !!ShellExecuteEx(&shi);
