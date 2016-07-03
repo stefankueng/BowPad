@@ -180,6 +180,7 @@ private:
     void                        SetZoomPC(int zoomPC);
     COLORREF                    GetColorForDocument(int id);
     void                        OpenFiles(const std::vector<std::wstring>& paths);
+    void                        BlockAllUIUpdates(bool block);
 
 private:
     LONG                        m_cRef;
@@ -217,4 +218,5 @@ private:
     CScintillaWnd               m_scratchEditor;
     std::map<std::wstring, int> m_foldercolorindexes;
     int                         m_lastfoldercolorindex;
+    int                         m_blockCount = 0;
 };

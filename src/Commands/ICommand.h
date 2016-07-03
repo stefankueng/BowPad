@@ -124,6 +124,7 @@ protected:
     HRESULT             SetUICommandProperty(UINT32 commandId, REFPROPERTYKEY key, PROPVARIANT value);
     HRESULT             SetUICommandProperty(REFPROPERTYKEY key, PROPVARIANT value);
     long                GetCurrentLineNumber() const;
+    void                BlockAllUIUpdates(bool block);
 
 private:
     inline CMainWindow* GetMainWindow()

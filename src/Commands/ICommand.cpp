@@ -417,3 +417,8 @@ long ICommand::GetCurrentLineNumber() const
     return pMainWnd->m_editor.GetCurrentLineNumber();
 }
 
+void ICommand::BlockAllUIUpdates(bool block)
+{
+    CMainWindow* pMainWnd = GetMainWindow();
+    pMainWnd->BlockAllUIUpdates(block);
+}
