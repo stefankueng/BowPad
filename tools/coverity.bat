@@ -4,11 +4,11 @@ setlocal
 pushd %~dp0
 
 rem you can set the COVDIR variable to your coverity path
-if exist ..\..\cov-analysis-win64-7.7.0 (
-  set "COVDIR=..\..\cov-analysis-win64-7.7.0"
+if exist ..\..\cov-analysis-win64-8.5.0 (
+  set "COVDIR=..\..\cov-analysis-win64-8.5.0"
 )
-if not defined COVDIR if exist ..\..\cov-analysis-win32-7.7.0 (
-  set "COVDIR=..\..\cov-analysis-win32-7.7.0"
+if not defined COVDIR if exist ..\..\cov-analysis-win32-8.5.0 (
+  set "COVDIR=..\..\cov-analysis-win32-8.5.0"
 )
 if not defined COVDIR set "COVDIR=C:\cov-analysis"
 if defined COVDIR if not exist "%COVDIR%" (
