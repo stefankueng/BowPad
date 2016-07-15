@@ -1231,7 +1231,7 @@ bool CCmdHeaderSource::GetCPPIncludePathsForMS(std::wstring& systemIncludePaths)
     for (const auto& sdkver : sdkvers)
     {
         std::wstring sTestPath = CStringUtils::Format(L"%s\\Microsoft SDKs\\Windows\\%s\\Include",
-                                                      programfiles.c_str(), sdkver);
+                                                      programfiles.c_str(), sdkver.c_str());
         if (PathFileExists(sTestPath.c_str()))
         {
             systemIncludePaths += sTestPath;
