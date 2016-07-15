@@ -222,6 +222,8 @@ bool CScintillaWnd::InitScratch( HINSTANCE hInst )
     return true;
 }
 
+bool bEatNextEnterKey = false;
+
 LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
     NMHDR *hdr = (NMHDR *)lParam;
@@ -284,10 +286,17 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         break;
     case WM_CHAR:
         {
-            if (((wParam == VK_RETURN) || (wParam == '\n')) &&
-                ((GetKeyState(VK_CONTROL)&0x8000) || (GetKeyState(VK_SHIFT)&0x8000)))
+            if ((wParam == VK_RETURN) || (wParam == '\n'))
             {
-                return 0;
+                if (bEatNextEnterKey)
+                {
+                    bEatNextEnterKey = false;
+                    return 0;
+                }
+                if ((GetKeyState(VK_CONTROL) & 0x8000) || (GetKeyState(VK_SHIFT) & 0x8000))
+                {
+                    return 0;
+                }
             }
             if (AutoBraces(wParam))
                 return 0;
@@ -295,20 +304,36 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         break;
     case WM_KEYDOWN:
         {
-            if (((wParam == VK_RETURN) || (wParam == '\n')) &&
-                ((GetKeyState(VK_CONTROL)&0x8000) || (GetKeyState(VK_SHIFT)&0x8000)))
+            if ((wParam == VK_RETURN) || (wParam == '\n'))
             {
-                Call(SCI_BEGINUNDOACTION);
-                if (GetKeyState(VK_CONTROL)&0x8000)
+                if ((GetKeyState(VK_CONTROL) & 0x8000) || (GetKeyState(VK_SHIFT) & 0x8000))
                 {
-                    // Ctrl+Return: insert a line above the current line
-                    // Cursor-Up, End, Return
-                    Call(SCI_LINEUP);
+                    Call(SCI_BEGINUNDOACTION);
+                    if (GetKeyState(VK_CONTROL) & 0x8000)
+                    {
+                        // Ctrl+Return: insert a line above the current line
+                        // Cursor-Up, End, Return
+                        Call(SCI_LINEUP);
+                    }
+                    Call(SCI_LINEEND);
+                    Call(SCI_NEWLINE);
+                    Call(SCI_ENDUNDOACTION);
+                    return 0;
                 }
-                Call(SCI_LINEEND);
-                Call(SCI_NEWLINE);
-                Call(SCI_ENDUNDOACTION);
-                return 0;
+                char c = (char)Call(SCI_GETCHARAT, Call(SCI_GETCURRENTPOS) - 1);
+                char c1 = (char)Call(SCI_GETCHARAT, Call(SCI_GETCURRENTPOS));
+                if ((c == '{') && (c1 == '}'))
+                {
+                    Call(SCI_NEWLINE);
+                    Call(SCI_BEGINUNDOACTION);
+                    Call(SCI_LINEUP);
+                    Call(SCI_LINEEND);
+                    Call(SCI_NEWLINE);
+                    Call(SCI_TAB);
+                    Call(SCI_ENDUNDOACTION);
+                    bEatNextEnterKey = true;
+                    return 0;
+                }
             }
         }
         break;
@@ -1831,28 +1856,14 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
         {
             if (wParam == '{')
             {
-                // Auto-add the closing brace on a new line and indent the middle
-                size_t line = Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS));
-
-                // check if the line is empty (not counting whitespaces)
-                size_t linesize = Call(SCI_GETLINE, line, 0);
-                auto pLine = std::make_unique<char[]>(linesize+1);
-                Call(SCI_GETLINE, line, (sptr_t)pLine.get());
-                pLine[linesize] = 0;
+                // Auto-add the closing brace, then the closing brace
+                Call(SCI_BEGINUNDOACTION);
                 // insert the opening brace first
                 Call(SCI_ADDTEXT, 1, (sptr_t)braceBuf);
-
-                Call(SCI_BEGINUNDOACTION);
-                // now insert a newline
-                Call(SCI_NEWLINE);
-                // insert another newline
-                Call(SCI_NEWLINE);
                 // insert the closing brace
                 Call(SCI_ADDTEXT, 1, (sptr_t)braceCloseBuf);
-                // go back one line
-                Call(SCI_LINEUP);
-                // indent the empty line
-                Call(SCI_TAB);
+                // go back one char
+                Call(SCI_CHARLEFT);
                 Call(SCI_ENDUNDOACTION);
                 return true;
             }
