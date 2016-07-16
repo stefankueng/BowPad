@@ -235,12 +235,12 @@ private:
     ResultsType                 m_resultsType = ResultsType::Unknown;
     bool                        m_trackingOn = true;
     int                         m_previousDefaultButton = 0;
-    int                         m_resultsWidthBefore;
+    int                         m_resultsWidthBefore = 0;
     int                         m_maxSearchStrings = 0;
     int                         m_maxReplaceStrings = 0;
     int                         m_maxSearchFolderStrings = 0;
     int                         m_maxSearchFileStrings = 0;
-    SIZE                        m_originalSize;
+    SIZE                        m_originalSize = { 0 };
     bool                        m_open = false;
     bool                        m_reactivation = false;
     volatile size_t             m_foundsize = 0;
