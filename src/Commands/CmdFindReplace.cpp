@@ -971,7 +971,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
     InflateRect(&rect, -(2 * borderWidth), 0);
 
     // NOTE: Be aware of the comment about this field in the NM_CUSTOMDRAW event.
-    COLORREF textColor = textColor = pLVCD->clrText;
+    COLORREF textColor = pLVCD->clrText;
 
     SetTextColor(pLVCD->nmcd.hdc, textColor);
     SetBkMode(pLVCD->nmcd.hdc, TRANSPARENT);
