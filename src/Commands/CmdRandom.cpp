@@ -51,10 +51,12 @@ void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
         BY_HANDLE_FILE_INFORMATION fileinfo;
         if (GetFileInformationByHandle(hFile, &fileinfo))
         {
-            auto buffer = std::make_unique<wchar_t[]>(fileinfo.nFileSizeLow);
+            auto buffer = std::make_unique<wchar_t[]>(fileinfo.nFileSizeLow + sizeof(wchar_t));
             DWORD readbytes;
             if (ReadFile(hFile, buffer.get(), fileinfo.nFileSizeLow, &readbytes, NULL))
             {
+                buffer[fileinfo.nFileSizeLow] = 0;
+                buffer[fileinfo.nFileSizeLow + 1] = 0;
                 wchar_t * pPath = buffer.get();
                 while (pPath < (buffer.get()+fileinfo.nFileSizeLow))
                 {
