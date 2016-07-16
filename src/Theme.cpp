@@ -75,7 +75,7 @@ void CTheme::Load()
         APPVERIFY(ok);
 
         COLORREF clr2;
-        s = themeIni.GetValue(L"SubstColors", it);
+        s = themeIni.GetValue(L"SubstColors", it, L"");
         ok = CAppUtils::HexStringToCOLORREF(s, &clr2);
         APPVERIFY(ok);
 
