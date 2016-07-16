@@ -723,7 +723,7 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmhdr, WPARAM /*wParam*/, L
     case TCN_TABDROPPEDOUTSIDE:
     {
         DWORD pos = GetMessagePos();
-        POINT pt{ GET_X_LPARAM(pos), pt.y = GET_Y_LPARAM(pos) };
+        POINT pt{ GET_X_LPARAM(pos), GET_Y_LPARAM(pos) };
         HandleTabDroppedOutside(ptbhdr->tabOrigin, pt);
     }
     break;
