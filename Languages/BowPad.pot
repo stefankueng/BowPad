@@ -1112,6 +1112,14 @@ msgstr ""
 msgid "Load session on start"
 msgstr ""
 
+#. Resource IDs: (236)
+msgid "Loading files..."
+msgstr ""
+
+#. Resource IDs: (235)
+msgid "Loading session..."
+msgstr ""
+
 #. Resource IDs: (60467)
 msgid "Loads all files automatically that were open the last time BowPad got closed"
 msgstr ""
@@ -2102,7 +2110,7 @@ msgid "Y"
 msgstr ""
 
 #. Resource IDs: (142)
-msgid "You can use the following strings in the command line:\r\n$(LINE)\t\t\tThe line where the cursor is\r\n$(POS)\t\t\tthe position where the cursor is\r\n$(TAB_PATH)\t\tthe path to the file of the active tab\r\n$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
+msgid "You can use the following strings in the command line:\r\n$(LINE)\t\t\tThe line where the cursor is\r\n$(POS)\t\t\tthe position where the cursor is\r\n$(TAB_PATH)\t\tthe path to the file of the active tab\r\n$(TAB_NAME)\t\tthe file name without extension of the current tab\r\n$(TAB_EXT)\t\tthe file extension of the current tab\r\n$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
 msgstr ""
 
 #. Resource IDs: (192)
