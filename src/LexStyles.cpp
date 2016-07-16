@@ -228,7 +228,7 @@ void CLexStyles::Load()
                             if (_wcsnicmp(L"Style", it, 5) == 0)
                             {
                                 StyleData style;
-                                ParseStyle(it, ini.GetValue(l.second.c_str(), it), variables, style);
+                                ParseStyle(it, ini.GetValue(l.second.c_str(), it, L""), variables, style);
                                 int pos;
                                 if (!CAppUtils::TryParse(it+5, pos, false))
                                     APPVERIFY(false);
