@@ -60,6 +60,5 @@ public:
 private:
     bool ScintillaCommandsDispId(wchar_t * name, DISPID& id);
     HRESULT ScintillaCommandInvoke(DISPID id, WORD flags, DISPPARAMS* args, VARIANT* ret);
-    ICommand *                  m_Obj;
     ULONG                       m_refCount;
 };
