@@ -57,7 +57,7 @@ namespace
         FileTreeData() {}
 
         std::wstring                refreshpath;
-        HTREEITEM                   refreshRoot;
+        HTREEITEM                   refreshRoot = nullptr;
         std::vector<FileTreeItem*>  data;
     };
 };
