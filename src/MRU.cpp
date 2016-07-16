@@ -63,8 +63,7 @@ public:
         *ppProperties = pProperties;
         (*ppProperties)->AddRef();
 
-        if (pProperties)
-            pProperties->Release();
+        pProperties->Release();
 
         return hr;
     }
