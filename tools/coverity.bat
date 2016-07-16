@@ -17,13 +17,6 @@ if defined COVDIR if not exist "%COVDIR%" (
   goto End
 )
 
-rem add the tools paths in PATH
-set "NANT_PATH=C:\nant\bin"
-set "PERL_PATH=C:\Perl\perl\bin"
-set "PYTHON_PATH=C:\Python27"
-set "PATH=%NANT_PATH%;%PERL_PATH%;%PYTHON_PATH%;%PATH%"
-
-
 :cleanup
 if exist "cov-int" rd /q /s "cov-int"
 if exist "BowPad.lzma" del "BowPad.lzma"
