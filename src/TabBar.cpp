@@ -525,6 +525,86 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             EndPaint(*this, &ps);
         }
             break;
+        case WM_MOUSEWHEEL:
+        {
+            // Scroll or move tabs:
+            // Mousewheel: scrolls the tab bar area like Firefox does it. Only works if at least one tab is hidden.
+            // Ctrl+Mousewheel: moves the current tab left/right, loops around at the beginning/end
+            // Shift+Mousewheel: moves the current tab left/right, stops at the beginning/end
+            // Ctrl+Shift+Mousewheel: switch current tab to the first/last tab
+
+            if (m_bIsDragging)
+                return TRUE;
+
+            const bool isForward = ((short)HIWORD(wParam)) < 0; // wheel down: forward, wheel up: backward
+            const LRESULT lastTabIndex = ::SendMessage(*this, TCM_GETITEMCOUNT, 0, 0) - 1;
+
+            if ((wParam & MK_CONTROL) && (wParam & MK_SHIFT))
+            {
+                ::SendMessage(*this, TCM_SETCURFOCUS, (isForward ? lastTabIndex : 0), 0);
+            }
+            else if (wParam & (MK_CONTROL | MK_SHIFT))
+            {
+                LRESULT tabIndex = ::SendMessage(*this, TCM_GETCURSEL, 0, 0) + (isForward ? 1 : -1);
+                if (tabIndex < 0)
+                {
+                    if (wParam & MK_CONTROL)
+                        tabIndex = lastTabIndex; // wrap scrolling
+                    else
+                        return TRUE;
+                }
+                else if (tabIndex > lastTabIndex)
+                {
+                    if (wParam & MK_CONTROL)
+                        tabIndex = 0; // wrap scrolling
+                    else
+                        return TRUE;
+                }
+                ::SendMessage(*this, TCM_SETCURFOCUS, tabIndex, 0);
+            }
+            else
+            {
+                RECT rcTabCtrl, rcLastTab;
+                ::SendMessage(*this, TCM_GETITEMRECT, lastTabIndex, (LPARAM)&rcLastTab);
+                ::GetClientRect(*this, &rcTabCtrl);
+
+                // get index of the first visible tab
+                TC_HITTESTINFO hti;
+                LONG xy = 14; // arbitrary value: just inside the first tab
+                hti.pt = { xy, xy };
+                LRESULT scrollTabIndex = ::SendMessage(*this, TCM_HITTEST, 0, (LPARAM)&hti);
+
+                if (scrollTabIndex < 1 && (rcLastTab.right < rcTabCtrl.right)) // nothing to scroll
+                    return TRUE;
+
+                // maximal width/height of the msctls_updown32 class (arrow box in the tab bar), 
+                // this area may hide parts of the last tab and needs to be excluded
+                LONG maxLengthUpDownCtrl = 45; // sufficient static value
+
+                // scroll forward as long as the last tab is hidden; scroll backward till the first tab
+                if ((((rcTabCtrl.right - rcLastTab.right) < maxLengthUpDownCtrl)) || !isForward)
+                {
+                    if (isForward)
+                        ++scrollTabIndex;
+                    else
+                        --scrollTabIndex;
+
+                    if (scrollTabIndex < 0 || scrollTabIndex > lastTabIndex)
+                        return TRUE;
+
+                    // clear hover state of the close button,
+                    // WM_MOUSEMOVE won't handle this properly since the tab position will change
+                    if (m_bIsCloseHover)
+                    {
+                        m_bIsCloseHover = false;
+                        ::InvalidateRect(*this, &m_currentHoverTabRect, false);
+                    }
+
+                    ::SendMessage(*this, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, scrollTabIndex), 0);
+                }
+            }
+            return TRUE;
+        }
         case WM_LBUTTONDOWN:
         {
             int xPos = GET_X_LPARAM(lParam);
