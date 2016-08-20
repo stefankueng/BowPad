@@ -24,14 +24,7 @@ typedef std::function<bool(HTREEITEM)> ItemHandler;
 class CFileTree : public CWindow, public ICommand
 {
 public:
-    CFileTree(HINSTANCE hInst, void * obj)
-        : CWindow(hInst)
-        , ICommand(obj)
-        , m_nBlockRefresh(0)
-        , m_ThreadsRunning(0)
-        , m_bStop(false)
-        , m_bRootBusy(false)
-    {};
+    CFileTree(HINSTANCE hInst, void * obj);
     virtual ~CFileTree();
 
     bool Init(HINSTANCE hInst, HWND hParent);
@@ -57,7 +50,7 @@ protected:
     HTREEITEM GetItemForPath(const std::wstring& expandpath);
     void RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath);
 
-    virtual void TabNotify(TBHDR * ptbhdr);
+    void TabNotify(TBHDR * ptbhdr) override;
 
     void OnClose() override;
 
