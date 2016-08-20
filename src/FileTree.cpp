@@ -108,6 +108,16 @@ static int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lPa
     return res - 2;
 }
 
+CFileTree::CFileTree(HINSTANCE hInst, void * obj)
+    : CWindow(hInst)
+    , ICommand(obj)
+    , m_nBlockRefresh(0)
+    , m_ThreadsRunning(0)
+    , m_bStop(false)
+    , m_bRootBusy(false)
+{
+}
+
 CFileTree::~CFileTree()
 {
     Clear();
@@ -500,8 +510,7 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
 
     InterlockedIncrement(&m_ThreadsRunning);
 
-    std::thread t(&CFileTree::RefreshThread, this, refreshRoot, refreshPath);
-    t.detach();
+    std::thread(&CFileTree::RefreshThread, this, refreshRoot, refreshPath).detach();
 }
 
 void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath)
@@ -610,7 +619,9 @@ void CFileTree::OnThemeChanged(bool bDark)
             SetWindowTheme(*this, nullptr, nullptr);
         }
         else
+        {
             SetWindowTheme(*this, L"Explorer", nullptr);
+        }
     }
     else
     {
