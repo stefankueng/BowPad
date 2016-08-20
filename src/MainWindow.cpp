@@ -1254,13 +1254,12 @@ void CMainWindow::HandleAfterInit()
     }
     EnsureAtLeastOneTab();
 
-    auto t = std::thread([ = ]
+    std::thread([ = ]
     {
         bool bNewer = CAppUtils::CheckForUpdate(false);
         if (bNewer)
             PostMessage(m_hwnd, WM_UPDATEAVAILABLE, 0, 0);
-    });
-    t.detach();
+    }).detach();
 }
 
 void CMainWindow::ResizeChildWindows()
