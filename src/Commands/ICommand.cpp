@@ -423,10 +423,10 @@ void ICommand::BlockAllUIUpdates(bool block)
     pMainWnd->BlockAllUIUpdates(block);
 }
 
-void ICommand::ShowProgressCtrl()
+void ICommand::ShowProgressCtrl(UINT delay)
 {
     CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->ShowProgressCtrl();
+    pMainWnd->ShowProgressCtrl(delay);
 }
 
 void ICommand::HideProgressCtrl()

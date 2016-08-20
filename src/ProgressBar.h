@@ -31,8 +31,11 @@ public :
     void SetRange(DWORD32 start, DWORD32 end);
     void SetPos(DWORD32 pos);
     void SetDarkMode(bool bDark, COLORREF bkgnd);
+    void ShowWindow(bool show, UINT delay);
 protected:
     LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 private:
+    ULONGLONG m_startTicks = 0;
+    ULONGLONG m_delay = 0;
 };
