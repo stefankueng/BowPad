@@ -348,6 +348,9 @@
     <ClInclude Include="..\ext\sktoolslib\GDIHelpers.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="ProgressBar.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -619,6 +622,9 @@
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\GDIHelpers.cpp">
       <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressBar.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -125,6 +125,9 @@ protected:
     HRESULT             SetUICommandProperty(REFPROPERTYKEY key, PROPVARIANT value);
     long                GetCurrentLineNumber() const;
     void                BlockAllUIUpdates(bool block);
+    void                ShowProgressCtrl();
+    void                HideProgressCtrl();
+    void                SetProgress(DWORD32 pos, DWORD32 end);
 
 private:
     inline CMainWindow* GetMainWindow()

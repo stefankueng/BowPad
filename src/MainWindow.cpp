@@ -164,6 +164,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_fileTree(hInst, this)
     , m_newTabBtn(hInst)
     , m_closeTabBtn(hInst)
+    , m_progressBar(hInst)
     , m_treeWidth(0)
     , m_bDragging(false)
     , m_fileTreeVisible(true)
@@ -182,6 +183,8 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_scratchEditor(hResource)
     , m_lastfoldercolorindex(0)
     , m_oldPt{ 0,0 }
+    , m_inMenuLoop(false)
+    , m_blockCount(0)
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
     m_fileTreeVisible = CIniSettings::Instance().GetInt64(L"View", L"FileTree", 1) != 0;
@@ -1118,6 +1121,7 @@ bool CMainWindow::Initialize()
     m_closeTabBtn.Init(hResource, *this, (HMENU)cmdClose);
     m_closeTabBtn.SetText(L"X");
     m_closeTabBtn.SetTextColor(RGB(255, 0, 0));
+    m_progressBar.Init(hResource, *this);
     // Note DestroyIcon not technically needed here but we may as well leave in
     // in case someone changes things to load a non static resource.
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
@@ -1195,8 +1199,6 @@ void CMainWindow::HandleCreate(HWND hwnd)
 void CMainWindow::HandleAfterInit()
 {
     UpdateWindow(*this);
-    FileTreeBlockRefresh(true);
-    OnOutOfScope(FileTreeBlockRefresh(false));
     CCommandHandler::Instance().AfterInit();
     
     if ((m_pathsToOpen.size() == 1) && (PathIsDirectory(m_pathsToOpen.begin()->first.c_str())))
@@ -1206,35 +1208,28 @@ void CMainWindow::HandleAfterInit()
         m_fileTree.SetPath(m_pathsToOpen.begin()->first);
         ShowFileTree(true);
     }
-    else
+    else if (m_pathsToOpen.size() > 0)
     {
         unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
         if (m_bPathsToOpenMRU)
             openFlags |= OpenFlags::AddToMRU;
         BlockAllUIUpdates(true);
-        OnOutOfScope(BlockAllUIUpdates(false));
+        OnOutOfScope(BlockAllUIUpdates(false););
 
-        CProgressDlg progDlg;
-        ResString rTitle(hRes, IDS_FILELOADING_TITLE);
-        progDlg.SetLine(1, rTitle);
-        progDlg.SetProgress(0, (DWORD)m_pathsToOpen.size());
-        if (m_pathsToOpen.size() > 3)
-            progDlg.ShowModeless(*this);
+        ShowProgressCtrl();
+
         int filecounter = 0;
         for (const auto& path : m_pathsToOpen)
         {
             ++filecounter;
-            progDlg.SetLine(2, path.first.c_str(), true);
-            progDlg.SetProgress(filecounter, (DWORD)m_pathsToOpen.size());
-            if (progDlg.HasUserCancelled())
-                break;
+            SetProgress(filecounter, (DWORD)m_pathsToOpen.size());
             if (OpenFile(path.first, openFlags) >= 0)
             {
                 if (path.second != (size_t)-1)
                     GoToLine(path.second);
             }
         }
-        progDlg.Stop();
+        HideProgressCtrl();
     }
     m_pathsToOpen.clear();
     m_bPathsToOpenMRU = true;
@@ -1631,15 +1626,20 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool quitting )
 
 bool CMainWindow::CloseAllTabs(bool quitting)
 {
-    FileTreeBlockRefresh(true);
-    OnOutOfScope(FileTreeBlockRefresh(false));
+    BlockAllUIUpdates(true);
+    OnOutOfScope(BlockAllUIUpdates(false));
+
+    ShowProgressCtrl();
 
     closealldoall = FALSE;
     OnOutOfScope(closealldoall = FALSE;);
     docloseall = true;
     OnOutOfScope(docloseall = false;);
+    auto total = m_TabBar.GetItemCount();
+    int count = 0;
     do
     {
+        SetProgress(count++, total);
         if (CloseTab(m_TabBar.GetItemCount()-1, false, quitting) == false)
             return false;
         if (!quitting && m_TabBar.GetItemCount() == 1 &&
@@ -1648,15 +1648,20 @@ bool CMainWindow::CloseAllTabs(bool quitting)
             m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0)).m_path.empty())
             return true;
     } while (m_TabBar.GetItemCount() > 0);
+
+    HideProgressCtrl();
+
     return true;
 }
 
 void CMainWindow::CloseAllButCurrentTab()
 {
-    FileTreeBlockRefresh(true);
-    OnOutOfScope(FileTreeBlockRefresh(false));
+    BlockAllUIUpdates(true);
+    OnOutOfScope(BlockAllUIUpdates(false));
     int count = m_TabBar.GetItemCount();
     int current = m_TabBar.GetCurrentTabIndex();
+
+    ShowProgressCtrl();
 
     closealldoall = FALSE;
     OnOutOfScope(closealldoall = FALSE;);
@@ -1665,8 +1670,12 @@ void CMainWindow::CloseAllButCurrentTab()
     for (int i = count - 1; i >= 0; --i)
     {
         if (i != current)
+        {
             CloseTab(i);
+            SetProgress(count - i, count - 1);
+        }
     }
+    HideProgressCtrl();
 }
 
 void CMainWindow::UpdateCaptionBar()
@@ -2859,24 +2868,17 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         files.push_back(pathBuf.get());
     }
 
-    CProgressDlg progDlg;
-    ResString rTitle(hRes, IDS_FILELOADING_TITLE);
-    progDlg.SetLine(1, rTitle);
-    progDlg.SetProgress(0, (DWORD)m_pathsToOpen.size());
-    if (files.size() > 3)
-        progDlg.ShowModeless(*this);
-    int filecounter = 0;
     BlockAllUIUpdates(true);
-    OnOutOfScope(BlockAllUIUpdates(false));
+    OnOutOfScope(BlockAllUIUpdates(false););
+
+    ShowProgressCtrl();
 
     const size_t maxFiles = 100;
+    int filecounter = 0;
     for (const auto& filename : files)
     {
         ++filecounter;
-        progDlg.SetProgress(filecounter, (DWORD)files.size());
-        progDlg.SetLine(2, filename.c_str(), true);
-        if (progDlg.HasUserCancelled())
-            break;
+        SetProgress(filecounter, (DWORD)files.size());
         if (PathIsDirectory(filename.c_str()))
         {
             std::vector<std::wstring> recursefiles;
@@ -2908,7 +2910,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         else
             OpenFile(filename, OpenFlags::AddToMRU);
     }
-    progDlg.Stop();
+    HideProgressCtrl();
 }
 
 void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
@@ -2940,11 +2942,9 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
         if (!szArglist)
             return;
 
-        FileTreeBlockRefresh(true);
-        OnOutOfScope(FileTreeBlockRefresh(false));
-        int filesOpened = 0;
         BlockAllUIUpdates(true);
-        OnOutOfScope(BlockAllUIUpdates(false));
+        OnOutOfScope(BlockAllUIUpdates(false););
+        int filesOpened = 0;
         // no need for a progress dialog here:
         // the command line is limited in size, so there can't be too many
         // filepaths passed here
@@ -3481,18 +3481,25 @@ void CMainWindow::OpenFiles(const std::vector<std::wstring>& paths)
             OpenFile(paths[0].c_str(), openFlags);
         }
     }
-    else
+    else if (paths.size() > 0)
     {
         BlockAllUIUpdates(true);
         OnOutOfScope(BlockAllUIUpdates(false));
+        ShowProgressCtrl();
+        OnOutOfScope(HideProgressCtrl());
+
         // Open all that was selected or at least returned.
         int docToActivate = -1;
+        int filecounter = 0;
         for (const auto& file : paths)
         {
+            ++filecounter;
+            SetProgress(filecounter, (DWORD32)paths.size());
             // Remember whatever we first successfully open in order to return to it.
             if (OpenFile(file.c_str(), OpenFlags::AddToMRU) >= 0 && docToActivate < 0)
                 docToActivate = m_DocManager.GetIdForPath(file.c_str());
         }
+
         if (docToActivate >= 0)
         {
             auto tabToActivate = m_TabBar.GetIndexFromID(docToActivate);
@@ -3504,23 +3511,41 @@ void CMainWindow::OpenFiles(const std::vector<std::wstring>& paths)
 void CMainWindow::BlockAllUIUpdates(bool block)
 {
     if (block)
+    {
+        if (m_blockCount == 0)
+            SendMessage(*this, WM_SETREDRAW, FALSE, 0);
+        FileTreeBlockRefresh(block);
         ++m_blockCount;
+    }
     else
+    {
         --m_blockCount;
-    if (m_blockCount < 0)
-    {
-        APPVERIFY(false);
-        m_blockCount = 0;
+        APPVERIFY(m_blockCount >= 0);
+        if (m_blockCount == 0)
+            SendMessage(*this, WM_SETREDRAW, TRUE, 0);
+        FileTreeBlockRefresh(block);
+        if (m_blockCount == 0)
+            RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
     }
-    if (m_blockCount == 1)
-    {
-        FileTreeBlockRefresh(true);
-        SendMessage(*this, WM_SETREDRAW, FALSE, 0);
-    }
-    else if (m_blockCount == 0)
-    {
-        SendMessage(*this, WM_SETREDRAW, TRUE, 0);
-        FileTreeBlockRefresh(false);
-        RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
-    }
+}
+
+void CMainWindow::ShowProgressCtrl()
+{
+    APPVERIFY(m_blockCount > 0);
+
+    m_progressBar.SetDarkMode(CTheme::Instance().IsDarkTheme(), CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOW)));
+    RECT rect;
+    GetClientRect(*this, &rect);
+    MapWindowPoints(*this, nullptr, (LPPOINT)&rect, 2);
+    SetWindowPos(m_progressBar, HWND_TOP, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_SHOWWINDOW);
+}
+
+void CMainWindow::HideProgressCtrl()
+{
+    ShowWindow(m_progressBar, SW_HIDE);
+}
+void CMainWindow::SetProgress(DWORD32 pos, DWORD32 end)
+{
+    m_progressBar.SetRange(0, end);
+    m_progressBar.SetPos(pos);
 }
