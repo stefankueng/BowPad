@@ -58,7 +58,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
             m_resizer.AddControl(hwndDlg, IDOK, RESIZER_BOTTOMRIGHT);
 
             HWND hThisWnd = *this;
-            auto t = std::thread([hThisWnd]
+            std::thread([hThisWnd]
             {
                 CDownloadFile filedownloader(L"BowPad", NULL);
                 std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
@@ -98,8 +98,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
                     fin.close();
                 }
                 PostMessage(hThisWnd, WM_INITPLUGINS, WPARAM(0), LPARAM(plugins.release()));
-            });
-            t.detach();
+            }).detach();
         }
             return FALSE;
         case WM_INITPLUGINS:
