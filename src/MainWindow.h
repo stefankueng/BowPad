@@ -23,6 +23,7 @@
 #include "ScintillaWnd.h"
 #include "FileTree.h"
 #include "TabBtn.h"
+#include "ProgressBar.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -181,6 +182,9 @@ private:
     COLORREF                    GetColorForDocument(int id);
     void                        OpenFiles(const std::vector<std::wstring>& paths);
     void                        BlockAllUIUpdates(bool block);
+    void                        ShowProgressCtrl();
+    void                        HideProgressCtrl();
+    void                        SetProgress(DWORD32 pos, DWORD32 end);
 
 private:
     LONG                        m_cRef;
@@ -194,6 +198,7 @@ private:
     CFileTree                   m_fileTree;
     CTabBtn                     m_newTabBtn;
     CTabBtn                     m_closeTabBtn;
+    CProgressBar                m_progressBar;
     int                         m_treeWidth;
     bool                        m_bDragging;
     POINT                       m_oldPt;
@@ -213,10 +218,10 @@ private:
     long                        m_initLine;
     int                         m_insertionIndex;
     bool                        m_windowRestored;
-    bool                        m_inMenuLoop = false;
+    bool                        m_inMenuLoop;
     std::unique_ptr<_IMAGELIST, HIMAGELIST_Deleter> m_TabBarImageList;
     CScintillaWnd               m_scratchEditor;
     std::map<std::wstring, int> m_foldercolorindexes;
     int                         m_lastfoldercolorindex;
-    int                         m_blockCount = 0;
+    int                         m_blockCount;
 };

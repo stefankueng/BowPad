@@ -422,3 +422,21 @@ void ICommand::BlockAllUIUpdates(bool block)
     CMainWindow* pMainWnd = GetMainWindow();
     pMainWnd->BlockAllUIUpdates(block);
 }
+
+void ICommand::ShowProgressCtrl()
+{
+    CMainWindow* pMainWnd = GetMainWindow();
+    pMainWnd->ShowProgressCtrl();
+}
+
+void ICommand::HideProgressCtrl()
+{
+    CMainWindow* pMainWnd = GetMainWindow();
+    pMainWnd->HideProgressCtrl();
+}
+
+void ICommand::SetProgress(DWORD32 pos, DWORD32 end)
+{
+    CMainWindow* pMainWnd = GetMainWindow();
+    pMainWnd->SetProgress(pos, end);
+}

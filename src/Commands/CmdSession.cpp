@@ -97,7 +97,7 @@ void CCmdSessionLoad::OnClose()
         {
             settings.SetString(g_sessionSection, CStringUtils::Format(L"path%d", saveindex).c_str(), doc.m_path.c_str());
             SavePosSettings(saveindex, doc.m_position);
-            settings.SetInt64 (g_sessionSection, CStringUtils::Format(L"activetab%d", saveindex).c_str(), 0);
+            settings.SetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", saveindex).c_str(), 0);
         }
         ++saveindex;
     }
@@ -124,6 +124,8 @@ void CCmdSessionLoad::RestoreSavedSession()
             break;
         ++numFilesToRestore;
     }
+    if (numFilesToRestore == 0)
+        return;
 
     // Block the UI to avoid excessive drawing/painting if loading more than
     // one file. Don't block the UI when loading one or less files as that
@@ -135,12 +137,8 @@ void CCmdSessionLoad::RestoreSavedSession()
             BlockAllUIUpdates(false);
     );
 
-    CProgressDlg progDlg;
-    ResString rTitle(hRes, IDS_SESSIONLOADING_TITLE);
-    progDlg.SetLine(1, rTitle);
-    progDlg.SetProgress(0, numFilesToRestore);
-    if (numFilesToRestore > 3)
-        progDlg.ShowModeless(GetHwnd());
+    ShowProgressCtrl();
+
     int activeDoc = -1;
     const unsigned int openflags = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
     int filecount = 0;
@@ -151,10 +149,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         if (path.empty())
             break;
         ++filecount;
-        progDlg.SetLine(2, path.c_str(), true);
-        progDlg.SetProgress(filecount, numFilesToRestore);
-        if (progDlg.HasUserCancelled())
-            break;
+        SetProgress(filecount, numFilesToRestore);
         int tabIndex = OpenFile(path.c_str(), openflags);
         if (tabIndex < 0)
             continue;
@@ -177,7 +172,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         SetDocument(docId, doc);
         RestoreCurrentPos(doc.m_position);
     }
-    progDlg.Stop();
+    HideProgressCtrl();
     if (activeDoc >= 0)
     {
         int activeTabIndex = GetTabIndexFromDocID(activeDoc);
