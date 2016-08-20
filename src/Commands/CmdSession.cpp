@@ -137,7 +137,7 @@ void CCmdSessionLoad::RestoreSavedSession()
             BlockAllUIUpdates(false);
     );
 
-    ShowProgressCtrl();
+    ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
 
     int activeDoc = -1;
     const unsigned int openflags = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;

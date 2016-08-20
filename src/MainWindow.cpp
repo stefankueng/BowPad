@@ -1216,7 +1216,7 @@ void CMainWindow::HandleAfterInit()
         BlockAllUIUpdates(true);
         OnOutOfScope(BlockAllUIUpdates(false););
 
-        ShowProgressCtrl();
+        ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
 
         int filecounter = 0;
         for (const auto& path : m_pathsToOpen)
@@ -1629,7 +1629,7 @@ bool CMainWindow::CloseAllTabs(bool quitting)
     BlockAllUIUpdates(true);
     OnOutOfScope(BlockAllUIUpdates(false));
 
-    ShowProgressCtrl();
+    ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
 
     closealldoall = FALSE;
     OnOutOfScope(closealldoall = FALSE;);
@@ -1661,7 +1661,7 @@ void CMainWindow::CloseAllButCurrentTab()
     int count = m_TabBar.GetItemCount();
     int current = m_TabBar.GetCurrentTabIndex();
 
-    ShowProgressCtrl();
+    ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
 
     closealldoall = FALSE;
     OnOutOfScope(closealldoall = FALSE;);
@@ -2871,7 +2871,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
     BlockAllUIUpdates(true);
     OnOutOfScope(BlockAllUIUpdates(false););
 
-    ShowProgressCtrl();
+    ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
 
     const size_t maxFiles = 100;
     int filecounter = 0;
@@ -3485,7 +3485,7 @@ void CMainWindow::OpenFiles(const std::vector<std::wstring>& paths)
     {
         BlockAllUIUpdates(true);
         OnOutOfScope(BlockAllUIUpdates(false));
-        ShowProgressCtrl();
+        ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
         OnOutOfScope(HideProgressCtrl());
 
         // Open all that was selected or at least returned.
@@ -3529,7 +3529,7 @@ void CMainWindow::BlockAllUIUpdates(bool block)
     }
 }
 
-void CMainWindow::ShowProgressCtrl()
+void CMainWindow::ShowProgressCtrl(UINT delay)
 {
     APPVERIFY(m_blockCount > 0);
 
@@ -3537,7 +3537,9 @@ void CMainWindow::ShowProgressCtrl()
     RECT rect;
     GetClientRect(*this, &rect);
     MapWindowPoints(*this, nullptr, (LPPOINT)&rect, 2);
-    SetWindowPos(m_progressBar, HWND_TOP, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_SHOWWINDOW);
+    SetWindowPos(m_progressBar, HWND_TOP, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), SWP_NOACTIVATE | SWP_NOCOPYBITS);
+
+    m_progressBar.ShowWindow(true, delay);
 }
 
 void CMainWindow::HideProgressCtrl()

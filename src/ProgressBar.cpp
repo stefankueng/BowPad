@@ -47,6 +47,26 @@ void CProgressBar::SetRange(DWORD32 start, DWORD32 end)
 void CProgressBar::SetPos(DWORD32 pos)
 {
     SendMessage(*this, PBM_SETPOS, pos, 0);
+    // note:
+    // neither timers nor threads can be used to show the window after
+    // a delay: timers don't work because the message loop
+    // won't process it with WM_SETREDRAW set to false,
+    // and threads can't make the window show because they too
+    // would need the message loop to show the window.
+    // only ::ShowWindow() on the UI thread works because that
+    // doesn't use the message loop but shows the window directly
+    if (m_startTicks != 0)
+    {
+        if ((GetTickCount64() - m_delay) > m_startTicks)
+        {
+            auto end = SendMessage(*this, PBM_GETRANGE, 0, 0);
+            if ((double(pos) / double(end)) < 0.6)
+            {
+                ::ShowWindow(*this, SW_SHOW);
+                m_startTicks = 0;
+            }
+        }
+    }
 }
 
 void CProgressBar::SetDarkMode(bool bDark, COLORREF bkgnd)
@@ -62,6 +82,21 @@ void CProgressBar::SetDarkMode(bool bDark, COLORREF bkgnd)
     else
     {
         SetWindowTheme(*this, L"Explorer", nullptr);
+    }
+}
+
+void CProgressBar::ShowWindow(bool show, UINT delay)
+{
+    m_startTicks = 0;
+    int cmd = show ? SW_SHOW : SW_HIDE;
+    if (!show || (delay == 0))
+    {
+        ::ShowWindow(*this, cmd);
+    }
+    else
+    {
+        m_startTicks = GetTickCount64();
+        m_delay = delay;
     }
 }
 
