@@ -641,19 +641,26 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_SETCURSOR:
     {
-        // change the cursor to SIZEWE if the mouse pointer is below the tab bar,
-        // and to an arrow if the mouse pointer is above the bottom of the tab bar.
+        // Because the tab bar does not set the cursor if the mouse pointer
+        // is over its 'extended' area (the area where no tab buttons are shown
+        // on the right side up to the point where the scroll buttons would appear),
+        // we have to set the cursor for that area here to an arrow.
+        // The tab control resizes itself to the width of the area of the buttons!
+        DWORD pos = GetMessagePos();
+        POINT pt = { GET_X_LPARAM(pos), GET_Y_LPARAM(pos) };
         RECT tabrc;
         TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
         MapWindowPoints(m_TabBar, nullptr, (LPPOINT)&tabrc, 2);
-        DWORD pos = GetMessagePos();
-        auto mousey = GET_Y_LPARAM(pos);
-        if (mousey < tabrc.bottom)
+        tabrc.top -= 3; // adjust for margin
+        if ((pt.y <= tabrc.bottom) && (pt.y >= tabrc.top))
         {
             SetCursor(LoadCursor(NULL, (LPTSTR)IDC_ARROW));
             return TRUE;
         }
-        SetCursor(LoadCursor(NULL, (LPTSTR)IDC_SIZEWE));
+        // Pass the message onto the system so the cursor adapts
+        // such as changing to the appropriate sizing cursor when
+        // over the window border.
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
     break;
     case WM_CANHIDECURSOR:
