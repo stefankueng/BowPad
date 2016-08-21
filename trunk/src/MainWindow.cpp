@@ -1217,6 +1217,7 @@ void CMainWindow::HandleAfterInit()
         OnOutOfScope(BlockAllUIUpdates(false););
 
         ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
+        OnOutOfScope(HideProgressCtrl());
 
         int filecounter = 0;
         for (const auto& path : m_pathsToOpen)
@@ -1229,7 +1230,6 @@ void CMainWindow::HandleAfterInit()
                     GoToLine(path.second);
             }
         }
-        HideProgressCtrl();
     }
     m_pathsToOpen.clear();
     m_bPathsToOpenMRU = true;
@@ -1630,6 +1630,7 @@ bool CMainWindow::CloseAllTabs(bool quitting)
     OnOutOfScope(BlockAllUIUpdates(false));
 
     ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
+    OnOutOfScope(HideProgressCtrl());
 
     closealldoall = FALSE;
     OnOutOfScope(closealldoall = FALSE;);
@@ -1649,8 +1650,6 @@ bool CMainWindow::CloseAllTabs(bool quitting)
             return true;
     } while (m_TabBar.GetItemCount() > 0);
 
-    HideProgressCtrl();
-
     return true;
 }
 
@@ -1662,6 +1661,7 @@ void CMainWindow::CloseAllButCurrentTab()
     int current = m_TabBar.GetCurrentTabIndex();
 
     ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
+    OnOutOfScope(HideProgressCtrl());
 
     closealldoall = FALSE;
     OnOutOfScope(closealldoall = FALSE;);
@@ -1675,7 +1675,6 @@ void CMainWindow::CloseAllButCurrentTab()
             SetProgress(count - i, count - 1);
         }
     }
-    HideProgressCtrl();
 }
 
 void CMainWindow::UpdateCaptionBar()
@@ -2872,6 +2871,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
     OnOutOfScope(BlockAllUIUpdates(false););
 
     ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
+    OnOutOfScope(HideProgressCtrl());
 
     const size_t maxFiles = 100;
     int filecounter = 0;
@@ -2910,7 +2910,6 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         else
             OpenFile(filename, OpenFlags::AddToMRU);
     }
-    HideProgressCtrl();
 }
 
 void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
