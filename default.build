@@ -131,12 +131,29 @@
         <include name="BowPad.exe" />
       </fileset>
     </zip>
+    <exec program="checksum" output="bin\checksum.txt">
+      <arg value="-t" />
+      <arg value="sha256" />
+      <arg value="-f" />
+      <arg value="bin\BowPad-${verstring}.msi" />
+    </exec>
+    <loadfile file="bin\checksum.txt" property="checksum" />
+    <exec program="checksum" output="bin\checksum64.txt">
+      <arg value="-t" />
+      <arg value="sha256" />
+      <arg value="-f" />
+      <arg value="bin\BowPad64-${verstring}.msi" />
+    </exec>
+    <loadfile file="bin\checksum64.txt" property="checksum64" />
+
     <!-- now write the version.txt file -->
-    <echo file="version.txt">${verstringfull}
-https://sourceforge.net/projects/bowpad-sk/files/${verstring}/BowPad64-${verstring}.msi/download
-BowPad64-${verstring}.msi
-https://sourceforge.net/projects/bowpad-sk/files/${verstring}/BowPad-${verstring}.msi/download
-BowPad-${verstring}.msi</echo>
+    <echo file="version.txt">
+      ${verstringfull}
+      https://sourceforge.net/projects/bowpad-sk/files/${verstring}/BowPad64-${verstring}.msi/download
+      BowPad64-${verstring}.msi
+      https://sourceforge.net/projects/bowpad-sk/files/${verstring}/BowPad-${verstring}.msi/download
+      BowPad-${verstring}.msi
+    </echo>
     <loadfile file="ext\choco\bowpad.nuspec" property="nuspecfile">
       <filterchain>
         <replacetokens begintoken="$" endtoken="$">
@@ -157,6 +174,8 @@ BowPad-${verstring}.msi</echo>
           <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
           <token key="WCREV" value="${environment::get-variable('WCREV')}" />
           <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
+          <token key="checksum" value="${string::trim(checksum)}" />
+          <token key="checksum64" value="${string::trim(checksum64)}" />
         </replacetokens>
       </filterchain>
     </loadfile>
