@@ -1332,7 +1332,7 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
             {
                 // return value is a string
                 auto len = ScintillaCall(cmd.cmd, p1.intVal);
-                std::unique_ptr<char[]> buf(new char[len + 1]);
+                auto buf = std::make_unique<char[]>(len + 1);
                 ScintillaCall(cmd.cmd, p1.intVal, (sptr_t)buf.get());
                 buf[len] = 0;
                 ret->vt = VT_BSTR;
@@ -1379,7 +1379,7 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
             {
                 // return value is a string
                 auto len = ScintillaCall(cmd.cmd);
-                std::unique_ptr<char[]> buf(new char[len + 1]);
+                auto buf = std::make_unique<char[]>(len + 1);
                 ScintillaCall(cmd.cmd, len, (sptr_t)buf.get());
                 buf[len] = 0;
                 ret->vt = VT_BSTR;

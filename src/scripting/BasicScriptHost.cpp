@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -271,8 +271,9 @@ _variant_t BasicScriptHost::CallFunction(const std::wstring& strFunc,
     DISPPARAMS dispparams = { 0 };
     const int arraySize = (int)paramArray.size();
 
+    auto varmem = std::make_unique<VARIANT[]>(dispparams.cArgs);
     dispparams.cArgs = arraySize;
-    dispparams.rgvarg = new VARIANT[dispparams.cArgs];
+    dispparams.rgvarg = varmem.get();
     dispparams.cNamedArgs = 0;
 
     for (int i = 0; i < arraySize; i++)
@@ -288,7 +289,6 @@ _variant_t BasicScriptHost::CallFunction(const std::wstring& strFunc,
     {
         SysFreeString(dispparams.rgvarg[i].bstrVal);
     }
-    delete[] dispparams.rgvarg;
 
     return vaResult;
 }

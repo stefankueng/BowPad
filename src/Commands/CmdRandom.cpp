@@ -175,7 +175,7 @@ void CRandomFileList::Save()
     {
         try
         {
-            std::unique_ptr<wchar_t[]> buffer(new wchar_t[MAX_PATH * m_arShownFileList.size()]);
+            auto buffer = std::make_unique<wchar_t[]>(MAX_PATH * m_arShownFileList.size());
             wchar_t * pBuffer = buffer.get();
             for (auto it = m_arShownFileList.begin(); it != m_arShownFileList.end(); ++it)
             {
