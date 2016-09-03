@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ bool CCmdConvertUppercase::Execute()
             selEnd = (int)ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
         }
 
-        std::unique_ptr<char[]> strbuf(new char[abs(selEnd-selStart) + 5]);
+        auto strbuf = std::make_unique<char[]>(abs(selEnd-selStart) + 5);
         Scintilla::Sci_TextRange rangestart;
         rangestart.chrg.cpMin = long(selStart);
         rangestart.chrg.cpMax = long(selEnd);
@@ -74,7 +74,7 @@ bool CCmdConvertLowercase::Execute()
             selEnd = (int)ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
         }
 
-        std::unique_ptr<char[]> strbuf(new char[abs(selEnd-selStart) + 5]);
+        auto strbuf = std::make_unique<char[]>(abs(selEnd-selStart) + 5);
         Scintilla::Sci_TextRange rangestart;
         rangestart.chrg.cpMin = long(selStart);
         rangestart.chrg.cpMax = long(selEnd);
@@ -111,7 +111,7 @@ bool CCmdConvertTitlecase::Execute()
             selEnd = (int)ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
         }
 
-        std::unique_ptr<char[]> strbuf(new char[abs(selEnd - selStart) + 5]);
+        auto strbuf = std::make_unique<char[]>(abs(selEnd - selStart) + 5);
         Scintilla::Sci_TextRange rangestart;
         rangestart.chrg.cpMin = long(selStart);
         rangestart.chrg.cpMax = long(selEnd);
