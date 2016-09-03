@@ -82,8 +82,7 @@ bool CCmdTabs2Spaces::Execute()
             bIgnoreQuotes = true;
             break;
     }
-
-    std::unique_ptr<char[]> source(new char[docLength]);
+    auto source = std::make_unique<char[]>(docLength);
     ScintillaCall(SCI_GETTEXT, docLength, (LPARAM)source.get());
 
     // untabify the file
@@ -131,7 +130,7 @@ bool CCmdTabs2Spaces::Execute()
         size_t setpos = curpos;
         inlinepos = 0;
         size_t newfilelen = docLength + spacestoinsert;
-        std::unique_ptr<char[]> destination(new char[newfilelen]);
+        auto destination = std::make_unique<char[]>(newfilelen);
         char * pBufStart = destination.get();
         char * pOldBuf = (char*)source.get();
         pBuf = pBufStart;
@@ -203,7 +202,7 @@ bool CCmdSpaces2Tabs::Execute()
             break;
     }
 
-    std::unique_ptr<char[]> source(new char[docLength]);
+    auto source = std::make_unique<char[]>(docLength);
     ScintillaCall(SCI_GETTEXT, docLength, (LPARAM)source.get());
 
     // tabify the file
@@ -258,7 +257,7 @@ bool CCmdSpaces2Tabs::Execute()
         size_t setpos = curpos;
         size_t newfilelen = docLength;
         newfilelen -= count;
-        std::unique_ptr<char[]> destination(new char[newfilelen]);
+        auto destination = std::make_unique<char[]>(newfilelen);
         char * pBufStart = destination.get();
         char * pOldBuf = (char*)source.get();
         pBuf = pBufStart;

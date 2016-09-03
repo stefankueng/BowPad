@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ bool CCmdUnComment::Execute()
             break;
         }
 
-        std::unique_ptr<char[]> strbuf(new char[commentstreamstart.size() + commentstreamend.size() + 5]);
+        auto strbuf = std::make_unique<char[]>(commentstreamstart.size() + commentstreamend.size() + 5);
         Scintilla::Sci_TextRange rangestart;
         rangestart.chrg.cpMin = long(selStart - commentstreamstart.length());
         rangestart.chrg.cpMax = long(selStart);
@@ -219,7 +219,7 @@ bool CCmdUnComment::Execute()
     else
     {
         // remove block comment for the current line
-        std::unique_ptr<char[]> strbuf(new char[commentline.size() + 5]);
+        auto strbuf = std::make_unique<char[]>(commentline.size() + 5);
         size_t curPos   = ScintillaCall(SCI_GETCURRENTPOS);
         ScintillaCall(SCI_BEGINUNDOACTION);
         size_t pos = ScintillaCall(SCI_GETLINEINDENTPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));

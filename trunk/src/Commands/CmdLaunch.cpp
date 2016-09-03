@@ -57,7 +57,7 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
         long currentPos = (long)ScintillaCall(SCI_GETCURRENTPOS);
         long startPos   = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
         long endPos     = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
-        std::unique_ptr<char[]> textbuf(new char[endPos - startPos + 1]);
+        auto textbuf = std::make_unique<char[]>(endPos - startPos + 1);
         Scintilla::Sci_TextRange range;
         range.chrg.cpMin = startPos;
         range.chrg.cpMax = endPos;
