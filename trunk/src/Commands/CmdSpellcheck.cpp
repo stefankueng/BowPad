@@ -84,6 +84,7 @@ CCmdSpellcheck::CCmdSpellcheck(void * obj)
         hr = g_spellCheckerFactory->IsSupported(m_lang.c_str(), &supported);
         if (supported)
         {
+            g_SpellChecker = nullptr;
             hr = g_spellCheckerFactory->CreateSpellChecker(m_lang.c_str(), &g_SpellChecker);
         }
         m_textbuflen = 1024;
@@ -105,6 +106,12 @@ CCmdSpellcheck::CCmdSpellcheck(void * obj)
     g_contextID = m_enabled && g_SpellChecker ? cmdContextSpellMap : cmdContextMap;
 
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+}
+
+inline CCmdSpellcheck::~CCmdSpellcheck()
+{
+    g_SpellChecker = nullptr;
+    g_spellCheckerFactory = nullptr;
 }
 
 void CCmdSpellcheck::ScintillaNotify(Scintilla::SCNotification * pScn)
@@ -457,6 +464,7 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, cons
                 hr = g_spellCheckerFactory->IsSupported(lang.c_str(), &supported);
                 if (supported)
                 {
+                    g_SpellChecker = nullptr;
                     hr = g_spellCheckerFactory->CreateSpellChecker(lang.c_str(), &g_SpellChecker);
                     if (SUCCEEDED(hr))
                     {

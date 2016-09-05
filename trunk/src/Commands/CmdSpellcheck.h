@@ -31,8 +31,7 @@ public:
 
     CCmdSpellcheck(void * obj);
 
-    ~CCmdSpellcheck()
-    {}
+    ~CCmdSpellcheck();
 
     bool Execute() override;
 
