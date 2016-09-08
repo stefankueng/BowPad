@@ -526,7 +526,8 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     int incompleteMultibyteChar = 0;
     bool bFirst = true;
     bool preferutf8 = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingutf8overansi", 0) != 0;
-    bool inconclusive = true;
+    bool inconclusive = false;
+    bool encodingset = encoding != -1;
     do
     {
         if (!ReadFile(hFile, data + incompleteMultibyteChar, ReadBlockSize - incompleteMultibyteChar, &lenFile, nullptr))
@@ -534,8 +535,9 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         else
             lenFile += incompleteMultibyteChar;
 
-        if ((encoding == -1)||(inconclusive && encoding == CP_ACP))
+        if ((!encodingset)||(inconclusive && encoding == CP_ACP))
             encoding = GetCodepageFromBuf(data, lenFile, doc.m_bHasBOM, inconclusive);
+        encodingset = true;
 
         doc.m_encoding = encoding;
 
