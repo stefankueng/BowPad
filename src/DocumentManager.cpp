@@ -71,7 +71,24 @@ static UINT64 inline DwordSwapBytes(UINT64 nValue)
     return nRet;
 }
 
-static void LoadSomeUtf8(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data)
+static EOLFormat SenseEOLFormat(const char *data, DWORD len)
+{
+    for (size_t i = 0; i < len; i++)
+    {
+        if (data[i] == '\r')
+        {
+            if (i + 1 < len && data[i + 1] == '\n')
+                return WIN_FORMAT;
+            else
+                return MAC_FORMAT;
+        }
+        if (data[i] == '\n')
+            return UNIX_FORMAT;
+    }
+    return UNKNOWN_FORMAT;
+}
+
+static void LoadSomeUtf8(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data, EOLFormat & eolformat)
 {
     char* pData = data;
     // Nothing to convert, just pass it to Scintilla
@@ -80,13 +97,15 @@ static void LoadSomeUtf8(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWO
         pData += 3;
         lenFile -= 3;
     }
+    if (eolformat == EOLFormat::UNKNOWN_FORMAT)
+        eolformat = SenseEOLFormat(pData, lenFile);
     edit.AddData(pData, lenFile);
     if (bFirst && hasBOM)
         lenFile += 3;
 }
 
 static void LoadSomeUtf16le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-    char* data, char* charbuf, int charbufSize, wchar_t* widebuf)
+    char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat & eolformat)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -96,13 +115,15 @@ static void LoadSomeUtf16le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, 
     }
     memcpy(widebuf, pData, lenFile);
     int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile / 2, charbuf, charbufSize, 0, nullptr);
+    if (eolformat == EOLFormat::UNKNOWN_FORMAT)
+        eolformat = SenseEOLFormat(charbuf, charlen);
     edit.AddData(charbuf, charlen);
     if (bFirst && hasBOM)
         lenFile += 2;
 }
 
 static void LoadSomeUtf16be(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-    char* data, char* charbuf, int charbufSize, wchar_t* widebuf)
+    char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat & eolformat)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -123,6 +144,8 @@ static void LoadSomeUtf16be(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, 
         p_w[nWord] = WideCharSwap(p_w[nWord]);
 
     int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile / 2, charbuf, charbufSize, 0, nullptr);
+    if (eolformat == EOLFormat::UNKNOWN_FORMAT)
+        eolformat = SenseEOLFormat(charbuf, charlen);
     edit.AddData(charbuf, charlen);
     if (bFirst && hasBOM)
         lenFile += 2;
@@ -142,7 +165,7 @@ static void LoadSomeUtf32be(DWORD lenFile, char* data)
 }
 
 static void LoadSomeUtf32le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-    char* data, char* charbuf, int charbufSize, wchar_t* widebuf)
+    char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat & eolformat)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -176,13 +199,15 @@ static void LoadSomeUtf32le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, 
         }
     }
     int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, nReadChars, charbuf, charbufSize, 0, nullptr);
+    if (eolformat == EOLFormat::UNKNOWN_FORMAT)
+        eolformat = SenseEOLFormat(charbuf, charlen);
     edit.AddData(charbuf, charlen);
     if (bFirst && hasBOM)
         lenFile += 4;
 }
 
 static void LoadSomeOther(Scintilla::ILoader& edit, int encoding, DWORD lenFile,
-    int& incompleteMultibyteChar, char* data, char* charbuf, int charbufSize, wchar_t* widebuf)
+    int& incompleteMultibyteChar, char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat & eolformat)
 {
     // For other encodings, ask system if there are any invalid characters; note that it will
     // not correctly know if the last character is cut when there are invalid characters inside the text
@@ -212,6 +237,8 @@ static void LoadSomeOther(Scintilla::ILoader& edit, int encoding, DWORD lenFile,
     {
         MultiByteToWideChar(encoding, 0, data, lenFile - incompleteMultibyteChar, widebuf, wideLen);
         int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, wideLen, charbuf, charbufSize, 0, nullptr);
+        if (eolformat == EOLFormat::UNKNOWN_FORMAT)
+            eolformat = SenseEOLFormat(charbuf, charlen);
         edit.AddData(charbuf, charlen);
     }
 }
@@ -514,26 +541,24 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         {
         case -1:
         case CP_UTF8:
-            LoadSomeUtf8(edit, doc.m_bHasBOM, bFirst, lenFile, data);
+            LoadSomeUtf8(edit, doc.m_bHasBOM, bFirst, lenFile, data, doc.m_format);
             break;
         case 1200: // UTF16_LE
-            LoadSomeUtf16le(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get());
+            LoadSomeUtf16le(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get(), doc.m_format);
             break;
         case 1201: // UTF16_BE
-            LoadSomeUtf16be(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get());
+            LoadSomeUtf16be(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get(), doc.m_format);
             break;
         case 12001: // UTF32_BE
             LoadSomeUtf32be(lenFile, data); // Doesn't load, falls through to load.
             // intentional fall-through
         case 12000: // UTF32_LE
-            LoadSomeUtf32le(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get());
+            LoadSomeUtf32le(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get(), doc.m_format);
             break;
         default:
-            LoadSomeOther(edit, encoding, lenFile, incompleteMultibyteChar, data, charbuf.get(), charbufSize, widebuf.get());
+            LoadSomeOther(edit, encoding, lenFile, incompleteMultibyteChar, data, charbuf.get(), charbufSize, widebuf.get(), doc.m_format);
             break;
         }
-        if (doc.m_format == UNKNOWN_FORMAT)
-            doc.m_format = SenseEOLFormat(data, lenFile);
 
         if (incompleteMultibyteChar != 0) // copy bytes to next buffer
             memcpy(data, data + ReadBlockSize - incompleteMultibyteChar, incompleteMultibyteChar);
@@ -556,23 +581,6 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);               // now doc.m_document has reference count of 1, and the scratch does not hold any doc anymore
 
     return doc;
-}
-
-EOLFormat CDocumentManager::SenseEOLFormat( const char *data, DWORD len )
-{
-    for (size_t i = 0 ; i < len ; i++)
-    {
-        if (data[i] == '\r')
-        {
-            if (i+1 < len && data[i+1] == '\n')
-                return WIN_FORMAT;
-            else
-                return MAC_FORMAT;
-        }
-        if (data[i] == '\n')
-            return UNIX_FORMAT;
-    }
-    return UNKNOWN_FORMAT;
 }
 
 static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
