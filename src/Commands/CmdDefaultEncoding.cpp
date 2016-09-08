@@ -40,6 +40,7 @@ LRESULT CDefaultEncodingDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPA
 
             UINT cp = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
             bool bom = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
+            bool preferutf8 = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingutf8overansi", 0) != 0;
 
             if (cp == GetACP())
                 CheckRadioButton(*this, IDC_R_ANSI, IDC_R_UTF32BE, IDC_R_ANSI);
@@ -60,6 +61,8 @@ LRESULT CDefaultEncodingDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPA
                 CheckRadioButton(*this, IDC_R_ANSI, IDC_R_UTF32BE, IDC_R_UTF32BE);
             else
                 CheckRadioButton(*this, IDC_R_ANSI, IDC_R_UTF32BE, IDC_R_ANSI);
+
+            CheckDlgButton(*this, IDC_LOADASUTF8, preferutf8 ? BST_CHECKED : BST_UNCHECKED);
         }
             return FALSE;
         case WM_COMMAND:
@@ -81,6 +84,7 @@ LRESULT CDefaultEncodingDlg::DoCommand(int id, int /*msg*/)
         {
             UINT cp = GetACP();
             bool bom = false;
+            bool preferutf8 = IsDlgButtonChecked(*this, IDC_LOADASUTF8) == BST_CHECKED;
 
             if (IsDlgButtonChecked(*this, IDC_R_ANSI))
                 cp = GetACP();
@@ -99,8 +103,10 @@ LRESULT CDefaultEncodingDlg::DoCommand(int id, int /*msg*/)
                 cp = 12000;
             else if (IsDlgButtonChecked(*this, IDC_R_UTF32BE))
                 cp = 12001;
+
             CIniSettings::Instance().SetInt64(L"Defaults", L"encodingnew", cp);
             CIniSettings::Instance().SetInt64(L"Defaults", L"encodingnewbom", bom);
+            CIniSettings::Instance().SetInt64(L"Defaults", L"encodingutf8overansi", preferutf8);
 
             EndDialog(*this, id);
         }
