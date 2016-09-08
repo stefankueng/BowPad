@@ -48,7 +48,6 @@ public:
     DocModifiedState            HasFileChanged(int id) const;
 
 private:
-    static EOLFormat            SenseEOLFormat(const char *data, DWORD len);
     bool                        SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc);
 
 private:
