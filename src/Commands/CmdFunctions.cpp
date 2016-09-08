@@ -488,7 +488,7 @@ void CCmdFunctions::EventHappened(int docID, DocEventType eventType)
         [&](const DocEvent& e) { return e.docID == docID; });
     m_events.erase(newEnd, m_events.end());
     m_events.push_back({ docID, eventType });
-    SetTimer(GetHwnd(), m_timerID, 10, nullptr);
+    SetTimer(GetHwnd(), m_timerID, 1000, nullptr);
 }
 
 void CCmdFunctions::FindAllFunctions()
