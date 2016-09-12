@@ -131,13 +131,12 @@ void CCmdSessionLoad::RestoreSavedSession()
     // one file. Don't block the UI when loading one or less files as that
     // itself would lead to excessive repainting.
     if (numFilesToRestore > 1)
+    {
         BlockAllUIUpdates(true);
-    OnOutOfScope(
-        if (numFilesToRestore > 1)
-            BlockAllUIUpdates(false);
-    );
+        OnOutOfScope(BlockAllUIUpdates(false));
+        ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
+    }
 
-    ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
 
     int activeDoc = -1;
     const unsigned int openflags = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
