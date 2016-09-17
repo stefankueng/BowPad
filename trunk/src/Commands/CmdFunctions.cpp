@@ -588,6 +588,7 @@ bool CCmdFunctions::FindAllFunctionsInternal()
     bool tbc = false;
 
     auto& lexStyles = CLexStyles::Instance();
+    auto langData = lexStyles.GetLanguageData(m_docLang);
     const auto startTime = std::chrono::steady_clock::now();
     for (;;)
     {
@@ -605,12 +606,16 @@ bool CCmdFunctions::FindAllFunctionsInternal()
         bool parsed = ParseName(sig, name);
         if (parsed)
         {
-            if (lexStyles.AddUserFunctionForLang(
-                m_docLang, CUnicodeUtils::StdGetUTF8(name)))
+            if (langData->userfunctions)
             {
-                if (!addedToLexer)
-                    m_languagesUpdated.insert(m_docLang);
-                addedToLexer = true;
+                auto result = langData->userkeywords.insert(CUnicodeUtils::StdGetUTF8(name));
+                if (result.second)
+                {
+                    langData->userkeywordsupdated = true;
+                    if (!addedToLexer)
+                        m_languagesUpdated.insert(m_docLang);
+                    addedToLexer = true;
+                }
             }
         }
         auto timeNow = std::chrono::steady_clock::now();
