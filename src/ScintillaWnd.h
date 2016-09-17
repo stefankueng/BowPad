@@ -32,7 +32,7 @@ class CPosData;
 #define INDIC_MISSPELLED            (INDIC_CONTAINER+7)
 
 const int SC_MARGE_LINENUMBER = 0;
-const int SC_MARGE_SYBOLE = 1;
+const int SC_MARGE_SYMBOL = 1;
 const int SC_MARGE_FOLDER = 2;
 
 const int MARK_BOOKMARK = 24;

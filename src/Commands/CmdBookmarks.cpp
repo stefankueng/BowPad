@@ -185,7 +185,7 @@ void CCmdBookmarkNext::ScintillaNotify(Scintilla::SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
-    else if ((pScn->nmhdr.code == SCN_MARGINCLICK) && (pScn->margin == SC_MARGE_SYBOLE) && !pScn->modifiers)
+    else if ((pScn->nmhdr.code == SCN_MARGINCLICK) && (pScn->margin == SC_MARGE_SYMBOL) && !pScn->modifiers)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
@@ -223,7 +223,7 @@ void CCmdBookmarkPrev::ScintillaNotify(Scintilla::SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
-    else if ((pScn->nmhdr.code == SCN_MARGINCLICK) && (pScn->margin == SC_MARGE_SYBOLE) && !pScn->modifiers)
+    else if ((pScn->nmhdr.code == SCN_MARGINCLICK) && (pScn->margin == SC_MARGE_SYMBOL) && !pScn->modifiers)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
