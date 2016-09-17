@@ -2077,6 +2077,10 @@ msgstr ""
 msgid "Web Search:"
 msgstr ""
 
+#. Resource IDs: (1094)
+msgid "When loading, prefer utf8 over ANSI/Local"
+msgstr ""
+
 #. Resource IDs: (60109)
 msgid "Whitespace"
 msgstr ""
