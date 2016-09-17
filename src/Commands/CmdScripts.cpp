@@ -81,10 +81,10 @@ bool CCmdScript::Create(const std::wstring& path)
         // Failed to open file
         if (f != nullptr)
         {
-			OnOutOfScope(
-				fclose(f);
-				f = nullptr;
-			);
+            OnOutOfScope(
+                fclose(f);
+                f = nullptr;
+            );
             struct _stat fileinfo;
             _wstat(path.c_str(), &fileinfo);
 
