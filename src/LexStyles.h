@@ -93,6 +93,7 @@ public:
 
     const std::map<int, std::string>&   GetKeywordsForLang(const std::string& lang);
     const std::map<int, std::string>&   GetKeywordsForLexer(int lexer);
+    LanguageData *                      GetLanguageData(const std::string & lang);
     const std::string&                  GetCommentLineForLang(const std::string& lang) const;
     const std::string&                  GetCommentStreamStartForLang(const std::string& lang) const;
     const std::string&                  GetCommentStreamEndForLang(const std::string& lang) const;
