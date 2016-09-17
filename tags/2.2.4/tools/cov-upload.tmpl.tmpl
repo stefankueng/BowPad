@@ -1,0 +1,5 @@
+:: TODO:
+:: 1. copy this file as cov-upload.tmpl
+:: 2. replace <token> with the project token from Coverity
+:: 3. replace <myemail@email.com> with your own email address
+curl --form project=BowPad --form token=<token> --form email=myemail@email.com --form file=@BowPad.tgz --form version="r$WCREV$" --form description="BowPad" -k https://scan.coverity.com/builds?project=BowPad
