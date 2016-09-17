@@ -113,16 +113,16 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETMARGINCURSORN, SC_MARGE_FOLDER, SC_CURSORARROW);
     Call(SCI_SETAUTOMATICFOLD, SC_AUTOMATICFOLD_SHOW|SC_AUTOMATICFOLD_CLICK|SC_AUTOMATICFOLD_CHANGE);
 
-    Call(SCI_SETMARGINMASKN, SC_MARGE_SYBOLE, (1<<MARK_BOOKMARK));
-    Call(SCI_SETMARGINWIDTHN, SC_MARGE_SYBOLE, 14);
-    Call(SCI_SETMARGINCURSORN, SC_MARGE_SYBOLE, SC_CURSORARROW);
+    Call(SCI_SETMARGINMASKN, SC_MARGE_SYMBOL, (1<<MARK_BOOKMARK));
+    Call(SCI_SETMARGINWIDTHN, SC_MARGE_SYMBOL, 14);
+    Call(SCI_SETMARGINCURSORN, SC_MARGE_SYMBOL, SC_CURSORARROW);
     Call(SCI_MARKERSETALPHA, MARK_BOOKMARK, 70);
     Call(SCI_MARKERDEFINEPIXMAP, MARK_BOOKMARK, (LPARAM)bullet_red);
     // Scintilla has a marker for bookmarks, but I think our own looks better
     //Call(SCI_MARKERDEFINE, MARK_BOOKMARK, SC_MARK_BOOKMARK);
 
     Call(SCI_SETMARGINSENSITIVEN, SC_MARGE_FOLDER, true);
-    Call(SCI_SETMARGINSENSITIVEN, SC_MARGE_SYBOLE, true);
+    Call(SCI_SETMARGINSENSITIVEN, SC_MARGE_SYMBOL, true);
 
     Call(SCI_SETSCROLLWIDTHTRACKING, true);
     Call(SCI_SETSCROLLWIDTH, 1); // default empty document: override default width
@@ -832,7 +832,7 @@ void CScintillaWnd::Center(long posStart, long posEnd)
 
 void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
 {
-    if ((pNotification->margin == SC_MARGE_SYBOLE) && !pNotification->modifiers)
+    if ((pNotification->margin == SC_MARGE_SYMBOL) && !pNotification->modifiers)
         BookmarkToggle((int)Call(SCI_LINEFROMPOSITION, pNotification->position));
 }
 
