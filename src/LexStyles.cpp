@@ -414,6 +414,16 @@ const std::map<int, std::string>& CLexStyles::GetKeywordsForLexer(int lexer)
     return emptyIntStrVec;
 }
 
+LanguageData * CLexStyles::GetLanguageData(const std::string& lang)
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+    {
+        return &lt->second;
+    }
+    return nullptr;
+}
+
 bool CLexStyles::AddUserFunctionForLang(const std::string& lang, const std::string& fnc)
 {
     auto lt = m_Langdata.find(lang);
