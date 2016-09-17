@@ -97,6 +97,7 @@ private:
 
 private:
     bool m_autoscan;
+    sptr_t m_autoscanlimit;
     bool m_autoscanTimed;
     UINT m_timerID;
     CScintillaWnd m_edit;

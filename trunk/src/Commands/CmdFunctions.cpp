@@ -265,14 +265,16 @@ static std::string DurationToString(std::chrono::duration<double> d)
 }; // unnamed namespace
 
 CCmdFunctions::CCmdFunctions(void* obj)
-        : ICommand(obj)
-        , m_edit(hRes)
+    : ICommand(obj)
+    , m_edit(hRes)
+    , m_autoscanlimit(0)
 {
     m_timerID = GetTimerID();
     m_edit.InitScratch(hRes);
     // Need to restart BP if you change these settings but helps
     // performance a little to inquire them here.
     m_autoscan = (CIniSettings::Instance().GetInt64(L"functions", L"autoscan", 1) != 0);
+    m_autoscanlimit = CIniSettings::Instance().GetInt64(L"functions", L"autoscanlimit", 50*1024);
     m_autoscanTimed = (CIniSettings::Instance().GetInt64(L"functions", L"autoscantimed", 0) != 0);
     m_ttf = {};
 }
@@ -479,6 +481,11 @@ void CCmdFunctions::EventHappened(int docID, DocEventType eventType)
         m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
         m_docID = -1;
     }
+
+    // don't autoscan for big files
+    auto lengthInBytes = ScintillaCall(SCI_GETLENGTH);
+    if (lengthInBytes > m_autoscanlimit)
+        return;
 
     KillTimer(GetHwnd(), m_timerID);
     if (docID != -1 && GetDocIdOfCurrentTab() == docID)
