@@ -62,3 +62,5 @@ _COM_SMARTPTR_TYPEDEF(ISpellingError, __uuidof(ISpellingError));
 _COM_SMARTPTR_TYPEDEF(IContextMenu, __uuidof(IContextMenu));
 //_COM_SMARTPTR_TYPEDEF(IContextMenu2, __uuidof(IContextMenu2));
 //_COM_SMARTPTR_TYPEDEF(IContextMenu3, __uuidof(IContextMenu3));
+_COM_SMARTPTR_TYPEDEF(IUIRibbon, __uuidof(IUIRibbon));
+_COM_SMARTPTR_TYPEDEF(IUIContextualUI, __uuidof(IUIContextualUI));

@@ -260,7 +260,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
             if (pt.x == -1 && pt.y == -1)
             {
                 // Display the menu in the upper-left corner of the client area, below the ribbon.
-                IUIRibbon * pRibbon;
+                IUIRibbonPtr pRibbon;
                 HRESULT hr = g_pFramework->GetView(0, IID_PPV_ARGS(&pRibbon));
                 if (SUCCEEDED(hr))
                 {
@@ -272,7 +272,6 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                         pt.y = uRibbonHeight;
                         ClientToScreen(hwnd, &pt);
                     }
-                    pRibbon->Release();
                 }
                 if (FAILED(hr))
                 {
@@ -283,11 +282,10 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
             }
 
             // The basic pattern of how to show Contextual UI in a specified location.
-            IUIContextualUI * pContextualUI = nullptr;
+            IUIContextualUIPtr pContextualUI = nullptr;
             if (SUCCEEDED(g_pFramework->GetView(g_contextID, IID_PPV_ARGS(&pContextualUI))))
             {
                 pContextualUI->ShowAtLocation(pt.x, pt.y);
-                pContextualUI->Release();
             }
 
         }

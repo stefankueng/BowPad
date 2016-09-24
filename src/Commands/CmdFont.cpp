@@ -38,7 +38,7 @@ HRESULT CCmdFont::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROP
         if (ppropvarCurrentValue != NULL)
         {
             // Get the font values for the selected text in the font control.
-            IPropertyStore * pValues;
+            IPropertyStorePtr pValues;
             hr = UIPropertyToInterface(UI_PKEY_FontProperties, *ppropvarCurrentValue, &pValues);
             if (CAppUtils::FailedShowMessage(hr))
                 return hr;
@@ -77,7 +77,6 @@ HRESULT CCmdFont::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROP
 
             // Provide the new values to the font control.
             hr = UIInitPropertyFromInterface(UI_PKEY_FontProperties, pValues, ppropvarNewValue);
-            pValues->Release();
         }
     }
     return hr;
@@ -114,7 +113,7 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
         hr = pCommandExecutionProperties->GetValue(UI_PKEY_FontProperties_ChangedProperties, &varChanges);
         if (SUCCEEDED(hr))
         {
-            IPropertyStore *pChanges;
+            IPropertyStorePtr pChanges;
             hr = UIPropertyToInterface(UI_PKEY_FontProperties, varChanges, &pChanges);
             if (SUCCEEDED(hr))
             {
@@ -191,7 +190,6 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
                     }
                 }
                 PropVariantClear(&propvar);
-                pChanges->Release();
             }
             PropVariantClear(&varChanges);
         }
