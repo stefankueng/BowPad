@@ -472,7 +472,11 @@ bool CMainWindow::RegisterAndCreateWindow()
     if (RegisterWindow(&wcx))
     {
         if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_VISIBLE, nullptr))
+        {
+            CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
+            SetFileTreeWidth((int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200));
             return true;
+        }
     }
     return false;
 }
@@ -572,17 +576,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         }
         break;
 
-    case WM_ACTIVATEAPP:
-    {
-        // Only restore the window position on activation as that's when we'll
-        // be showing any window and needing to use it.
-        if (!m_windowRestored)
-        {
-            m_windowRestored = true; // Do now to avoid recursion which I've seen occasionaly.
-            CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
-        }
-    }
-        break;
     case WM_ACTIVATE:
         // Ensure proper focus handling occurs such as
         // making sure WM_SETFOCUS is generated in all situations.
