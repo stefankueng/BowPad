@@ -519,7 +519,13 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         return OnLButtonUp((UINT)wParam, { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
 
     case WM_DROPFILES:
-        HandleDropFiles(reinterpret_cast<HDROP>(wParam));
+    {
+        auto hDrop = reinterpret_cast<HDROP>(wParam);
+        OnOutOfScope(
+            DragFinish(hDrop);
+        );
+        HandleDropFiles(hDrop);
+    }
         break;
     case WM_COPYDATA:
         {
@@ -2829,13 +2835,12 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
 
 // Called when the user drops a selection of files (or a folder!) onto
 // bowpad's main window. The response is to try to load all those files.
+// Note: this function is also called from clipboard functions, so we must
+// not call DragFinish() on the hDrop object here!
 void CMainWindow::HandleDropFiles(HDROP hDrop)
 {
     if (!hDrop)
         return;
-    OnOutOfScope(
-        DragFinish(hDrop);
-    );
     int filesDropped = DragQueryFile(hDrop, 0xffffffff, nullptr, 0);
     std::vector<std::wstring> files;
     for (int i = 0 ; i < filesDropped ; ++i)
