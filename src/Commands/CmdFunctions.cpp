@@ -610,8 +610,10 @@ bool CCmdFunctions::FindAllFunctionsInternal()
                 {
                     langData->userkeywordsupdated = true;
                     if (!addedToLexer)
+                    {
                         m_languagesUpdated.insert(m_docLang);
-                    addedToLexer = true;
+                        addedToLexer = true;
+                    }
                 }
             }
         }
