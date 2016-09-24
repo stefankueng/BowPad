@@ -649,7 +649,7 @@ std::vector<FunctionInfo> CCmdFunctions::FindFunctionsNow() const
         std::wstring nameAndArgs;
         bool parsed = ParseSignature(sig, name, nameAndArgs);
         if (parsed)
-            functions.push_back({ lineNum, std::move(name), std::move(nameAndArgs) });
+            functions.emplace_back(lineNum, std::move(name), std::move(nameAndArgs));
         return true;
     };
     FindFunctions(doc, f);
