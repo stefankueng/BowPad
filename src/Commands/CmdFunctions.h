@@ -25,7 +25,7 @@
 #include <vector>
 #include <chrono>
 #include <functional>
-#include <set>
+#include <unordered_set>
 
 struct FunctionInfo
 {
@@ -110,6 +110,6 @@ private:
     std::vector<int> m_menuData;
     std::chrono::time_point<std::chrono::steady_clock> m_funcProcessingStartTime;
     bool m_funcProcessingStarted = false;
-    std::set<std::string> m_languagesUpdated;
+    std::unordered_set<std::string> m_languagesUpdated;
 };
 
