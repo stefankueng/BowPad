@@ -256,7 +256,7 @@ std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd ) c
     {
         return MakeShortCutKeyForAccel(*whereAt);
     }
-    return L"";
+    return {};
 }
 
 void CKeyboardShortcutHandler::LoadUIHeader()
@@ -353,7 +353,7 @@ std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand( WORD cmd ) con
             }
         }
     }
-    return L"";
+    return {};
 }
 
 void CKeyboardShortcutHandler::ToolTipUpdated( WORD cmd )
@@ -381,7 +381,8 @@ void CKeyboardShortcutHandler::AddCommand(const std::wstring& name, int id)
 std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& accel)
 {
     std::wstring shortCut;
-    wchar_t buf[MAX_PATH];
+    wchar_t buf[128];
+
     if (accel.fVirt & 0x08)
     {
         LONG sc = MapVirtualKey(VK_CONTROL, MAPVK_VK_TO_VSC);
