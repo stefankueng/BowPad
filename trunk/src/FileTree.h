@@ -21,6 +21,28 @@
 
 typedef std::function<bool(HTREEITEM)> ItemHandler;
 
+class FileTreeItem
+{
+public:
+    FileTreeItem()
+        : isDir(false)
+        , busy(false)
+    {}
+    std::wstring    path;
+    bool            isDir;
+    bool            busy;
+};
+
+class FileTreeData
+{
+public:
+    FileTreeData() {}
+
+    std::wstring                refreshpath;
+    HTREEITEM                   refreshRoot = nullptr;
+    std::vector<FileTreeItem*>  data;
+};
+
 class CFileTree : public CWindow, public ICommand
 {
 public:
