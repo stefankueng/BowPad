@@ -421,9 +421,12 @@ void CCmdFunctions::ScintillaNotify(Scintilla::SCNotification * pScn)
                 // (at least on my machine) during release mode testing but
                 // it is close to warranting it.
                 auto docID = GetDocIdOfCurrentTab();
-                const auto& doc = GetDocumentFromID(docID);
-                if (doc.m_bIsDirty)
-                    EventHappened(docID, DocEventType::DocModified);
+                if (docID >= 0)
+                {
+                    const auto& doc = GetDocumentFromID(docID);
+                    if (doc.m_bIsDirty)
+                        EventHappened(docID, DocEventType::DocModified);
+                }
             }
             break;
     }
