@@ -1096,7 +1096,7 @@ bool CMainWindow::Initialize()
             func(m_editor,    WM_COPYDATA, MSGFLT_ALLOW, nullptr );
             func(m_TabBar,    WM_COPYDATA, MSGFLT_ALLOW, nullptr );
             func(m_StatusBar, WM_COPYDATA, MSGFLT_ALLOW, nullptr );
-            func(m_fileTree, WM_COPYDATA, MSGFLT_ALLOW, nullptr );
+            func(m_fileTree,  WM_COPYDATA, MSGFLT_ALLOW, nullptr );
         }
         else
         {
@@ -1107,11 +1107,6 @@ bool CMainWindow::Initialize()
     m_fileTree.Init(hResource, *this);
     ShowWindow(m_fileTree, m_fileTreeVisible ? SW_SHOW : SW_HIDE);
     CCommandHandler::Instance().AddCommand(&m_fileTree);
-    m_treeWidth = (int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200);
-    m_treeWidth = max(50, m_treeWidth);
-    RECT rc;
-    GetClientRect(*this, &rc);
-    m_treeWidth = min(m_treeWidth, rc.right - rc.left - 500);
     m_editor.Init(hResource, *this);
     // Each value is the right edge of each status bar element.
     m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 865, 925, 1010});
@@ -2778,7 +2773,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
 
             if (IsWindowEnabled(*this))
             {
-                // See Note B above for commentsabout this point in the code.
+                // See Note B above for comments about this point in the code.
                 bool bResize = m_fileTree.GetPath().empty() && !doc.m_path.empty();
                 if (bActivate)
                 {
@@ -3386,11 +3381,7 @@ bool CMainWindow::OnMouseMove(UINT nFlags, POINT point)
     {
         if ((nFlags & MK_LBUTTON) != 0 && (point.x != m_oldPt.x))
         {
-            m_treeWidth = point.x;
-            m_treeWidth = max(50, m_treeWidth);
-            RECT rc;
-            GetClientRect(*this, &rc);
-            m_treeWidth = min(m_treeWidth, rc.right - rc.left - 200);
+            SetFileTreeWidth(point.x);
             ResizeChildWindows();
         }
     }
@@ -3430,11 +3421,7 @@ bool CMainWindow::OnLButtonUp(UINT nFlags, POINT point)
     if (!m_bDragging)
         return false;
 
-    m_treeWidth = point.x;
-    m_treeWidth = max(50, m_treeWidth);
-    RECT rc;
-    GetClientRect(*this, &rc);
-    m_treeWidth = min(m_treeWidth, rc.right - rc.left - 200);
+    SetFileTreeWidth(point.x);
 
     CIniSettings::Instance().SetInt64(L"View", L"FileTreeWidth", m_treeWidth);
 
@@ -3545,8 +3532,18 @@ void CMainWindow::HideProgressCtrl()
 {
     ShowWindow(m_progressBar, SW_HIDE);
 }
+
 void CMainWindow::SetProgress(DWORD32 pos, DWORD32 end)
 {
     m_progressBar.SetRange(0, end);
     m_progressBar.SetPos(pos);
+}
+
+void CMainWindow::SetFileTreeWidth(int width)
+{
+    m_treeWidth = width;
+    m_treeWidth = max(50, m_treeWidth);
+    RECT rc;
+    GetClientRect(*this, &rc);
+    m_treeWidth = min(m_treeWidth, rc.right - rc.left - 200);
 }
