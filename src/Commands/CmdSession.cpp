@@ -134,11 +134,17 @@ void CCmdSessionLoad::RestoreSavedSession()
     // Block the UI to avoid excessive drawing/painting if loading more than
     // one file. Don't block the UI when loading one or less files as that
     // itself would lead to excessive repainting.
+    OnOutOfScope(
+        if (numFilesToRestore > 1)
+        {
+            BlockAllUIUpdates(false);
+            HideProgressCtrl();
+        }
+    );
     if (numFilesToRestore > 1)
     {
         BlockAllUIUpdates(true);
-        OnOutOfScope(BlockAllUIUpdates(false));
-        ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
+        ShowProgressCtrl((UINT)settings.GetInt64(L"View", L"progressdelay", 1000));
     }
 
 
@@ -175,7 +181,6 @@ void CCmdSessionLoad::RestoreSavedSession()
         SetDocument(docId, doc);
         RestoreCurrentPos(doc.m_position);
     }
-    HideProgressCtrl();
     if (activeDoc >= 0)
     {
         int activeTabIndex = GetTabIndexFromDocID(activeDoc);
