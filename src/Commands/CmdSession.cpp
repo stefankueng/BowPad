@@ -31,8 +31,8 @@
 
 namespace
 {
-    const int BP_MAX_SESSION_SIZE = 100;
     const wchar_t g_sessionSection[] = { L"TabSession" };
+    const int BP_DEFAULT_SESSION_SIZE = 500;
 };
 
 static void SetAutoLoad(bool bAutoLoad)
@@ -76,8 +76,10 @@ void CCmdSessionLoad::OnClose()
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", saveindex).c_str(), pos.m_xOffset);
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", saveindex).c_str(), pos.m_nFirstVisibleLine);
     };
+
+    int sessionSize = (int)settings.GetInt64(g_sessionSection, L"session_size", BP_DEFAULT_SESSION_SIZE);
     // No point saving more than we are prepared to load.
-    int savecount = min(tabcount, BP_MAX_SESSION_SIZE);
+    int savecount = min(tabcount, sessionSize);
     for (int i = 0; i < savecount; ++i)
     {
         int docId = GetDocIDFromTabIndex(i);
@@ -116,7 +118,9 @@ void CCmdSessionLoad::RestoreSavedSession()
     ProfileTimer profile(L"RestoreSavedSession");
     auto& settings = CIniSettings::Instance();
     int numFilesToRestore = 0;
-    for (int fileNum = 0; fileNum < BP_MAX_SESSION_SIZE; ++fileNum)
+
+    int sessionSize = (int)settings.GetInt64(g_sessionSection, L"session_size", BP_DEFAULT_SESSION_SIZE);
+    for (int fileNum = 0; fileNum < sessionSize; ++fileNum)
     {
         std::wstring key = CStringUtils::Format(L"path%d", fileNum);
         std::wstring path = settings.GetString(g_sessionSection, key.c_str(), L"");
@@ -141,7 +145,7 @@ void CCmdSessionLoad::RestoreSavedSession()
     int activeDoc = -1;
     const unsigned int openflags = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
     int filecount = 0;
-    for (int fileNum = 0; fileNum < BP_MAX_SESSION_SIZE; ++fileNum)
+    for (int fileNum = 0; fileNum < sessionSize; ++fileNum)
     {
         std::wstring key = CStringUtils::Format(L"path%d", fileNum);
         std::wstring path = settings.GetString(g_sessionSection, key.c_str(), L"");
