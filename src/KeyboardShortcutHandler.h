@@ -72,6 +72,6 @@ private:
     std::vector<KSH_Accel>                  m_accelerators;
     std::map<std::wstring, UINT>            m_virtkeys;
     WORD                                    m_lastKey;
-    std::unordered_map<std::wstring, int>             m_resourceData;
+    std::unordered_map<std::wstring, int>   m_resourceData;
     std::set<WORD>                          m_tooltiptitlestoupdate;
 };
