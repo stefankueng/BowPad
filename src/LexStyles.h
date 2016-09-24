@@ -87,7 +87,6 @@ public:
     static CLexStyles&                  Instance();
 
     std::vector<std::wstring>           GetLanguages() const;
-    std::wstring                        GetLanguageForDocument(const CDocument& doc);
     std::wstring                        GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
     std::wstring                        GetUserExtensionsForLanguage(const std::wstring& lang) const;
 
