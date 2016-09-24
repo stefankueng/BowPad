@@ -1392,12 +1392,12 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
     m_DocManager.SetDocument(docID, doc);
 
     m_editor.SetupLexerForLang(doc.m_language);
-    if (sFileName.empty())
+    if (!title.empty())
+        m_TabBar.SetCurrentTitle(title.c_str());
+    else if (sFileName.empty())
         m_TabBar.SetCurrentTitle(GetNewTabName().c_str());
     else
         m_TabBar.SetCurrentTitle(sFileName.c_str());
-    if (!title.empty())
-        m_TabBar.SetCurrentTitle(title.c_str());
 
     UpdateTab(docID);
     UpdateCaptionBar();
