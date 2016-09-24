@@ -26,10 +26,10 @@
 
 namespace
 {
-LexerData emptyLexData;
-std::map<int, std::string> emptyIntStrVec;
-std::string emptyString;
-std::vector<std::string> emptyStringVector;
+const LexerData emptyLexData;
+const std::map<int, std::string> emptyIntStrVec;
+const std::string emptyString;
+const std::vector<std::string> emptyStringVector;
 
 static const COLORREF fgColor = RGB(0, 0, 0);
 static const COLORREF bgColor = RGB(255, 255, 255);
