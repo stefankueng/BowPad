@@ -2884,7 +2884,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
                 std::sort(recursefiles.begin(), recursefiles.end(),
                     [](const std::wstring& lhs, const std::wstring& rhs)
                 {
-                    return CPathUtils::PathCompare(lhs.c_str(), rhs.c_str()) < 0;
+                    return CPathUtils::PathCompare(lhs, rhs) < 0;
                 });
 
                 for (const auto& f : recursefiles)
