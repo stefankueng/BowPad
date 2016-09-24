@@ -27,7 +27,7 @@
 #include "Document.h"
 #include "LexStyles.h"
 #include "DocScroll.h"
-#include "Commands\CommandHandler.h"
+#include "CommandHandler.h"
 #include "SmartHandle.h"
 #include "DPIAware.h"
 
@@ -63,6 +63,9 @@ const int TIM_HIDECURSOR = 101;
 const int TIM_BRACEHIGHLIGHTTEXT = 102;
 const int TIM_BRACEHIGHLIGHTTEXTCLEAR = 103;
 
+static bool g_initialized = false;
+static bool g_scintillaInitialized = false;
+
 CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     : CWindow(hInst)
     , m_pSciMsg(nullptr)
@@ -84,13 +87,15 @@ CScintillaWnd::~CScintillaWnd()
 
 bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 {
-    Scintilla_RegisterClasses(hInst);
+    if (!g_scintillaInitialized)
+    {
+        Scintilla_RegisterClasses(hInst);
+    }
 
     if (hParent)
         CreateEx(0, WS_CHILD | WS_VISIBLE, hParent, 0, L"Scintilla");
     else
         CreateEx(0, 0, 0, 0, L"Scintilla");
-
 
     if (!*this)
     {
@@ -182,21 +187,24 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     SetupDefaultStyles();
 
-    // delay loaded functions, not available on Vista
-    HMODULE hDll = GetModuleHandle(TEXT("user32.dll"));
-    if (hDll)
+    if (!g_initialized)
     {
-        GetGestureInfoFunc = (GetGestureInfoFN)::GetProcAddress(hDll, "GetGestureInfo");
-        CloseGestureInfoHandleFunc = (CloseGestureInfoHandleFN)::GetProcAddress(hDll, "CloseGestureInfoHandle");
-        SetGestureConfigFunc = (SetGestureConfigFN)::GetProcAddress(hDll, "SetGestureConfig");
+        // delay loaded functions, not available on Vista
+        HMODULE hDll = GetModuleHandle(TEXT("user32.dll"));
+        if (hDll)
+        {
+            GetGestureInfoFunc = (GetGestureInfoFN)::GetProcAddress(hDll, "GetGestureInfo");
+            CloseGestureInfoHandleFunc = (CloseGestureInfoHandleFN)::GetProcAddress(hDll, "CloseGestureInfoHandle");
+            SetGestureConfigFunc = (SetGestureConfigFN)::GetProcAddress(hDll, "SetGestureConfig");
+        }
+        if (hUxThemeDll)
+        {
+            BeginPanningFeedbackFunc = (BeginPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "BeginPanningFeedback");
+            EndPanningFeedbackFunc = (EndPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "EndPanningFeedback");
+            UpdatePanningFeedbackFunc = (UpdatePanningFeedbackFN)::GetProcAddress(hUxThemeDll, "UpdatePanningFeedback");
+        }
+        g_initialized = true;
     }
-    if (hUxThemeDll)
-    {
-        BeginPanningFeedbackFunc = (BeginPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "BeginPanningFeedback");
-        EndPanningFeedbackFunc = (EndPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "EndPanningFeedback");
-        UpdatePanningFeedbackFunc = (UpdatePanningFeedbackFN)::GetProcAddress(hUxThemeDll, "UpdatePanningFeedback");
-    }
-
 
     return true;
 }
