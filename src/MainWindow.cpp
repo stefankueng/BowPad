@@ -1254,18 +1254,18 @@ void CMainWindow::ResizeChildWindows()
         RECT tabrc;
         TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
         MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
-        const int tabBtnWidth = tabrc.bottom - tabrc.top + 2;
+        const int tbHeight = tabrc.bottom - tabrc.top;
+        const int tabBtnWidth = tbHeight + 2;
+        const int mainWidth = rect.right - rect.left;
+        int treeWidth = (m_fileTreeVisible && !m_fileTree.GetPath().empty()) ? m_treeWidth : 0;
 
         HDWP hDwp = BeginDeferWindowPos(6);
-        DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_TabBar, nullptr, rect.left, rect.top + m_RibbonHeight, rect.right - rect.left - tabBtnWidth - tabBtnWidth, rect.bottom - rect.top, flags);
-        DeferWindowPos(hDwp, m_newTabBtn, nullptr, rect.right - rect.left - tabBtnWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tabrc.bottom - tabrc.top, flags);
-        DeferWindowPos(hDwp, m_closeTabBtn, nullptr, rect.right - rect.left - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tabrc.bottom - tabrc.top, flags);
-        int treeWidth = 0;
-        if (m_fileTreeVisible && !m_fileTree.GetPath().empty())
-            treeWidth = m_treeWidth;
-        DeferWindowPos(hDwp, m_editor, nullptr, rect.left + treeWidth, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, rect.right - rect.left - treeWidth, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight + tabrc.bottom - tabrc.top, treeWidth ? treeWidth - 5 : 0, rect.bottom - (m_RibbonHeight + tabrc.bottom - tabrc.top) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
+        DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), mainWidth, m_StatusBar.GetHeight(), flags);
+        DeferWindowPos(hDwp, m_TabBar, nullptr, rect.left, rect.top + m_RibbonHeight, mainWidth - tabBtnWidth - tabBtnWidth, rect.bottom - rect.top, flags);
+        DeferWindowPos(hDwp, m_newTabBtn, nullptr, mainWidth - tabBtnWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
+        DeferWindowPos(hDwp, m_closeTabBtn, nullptr, mainWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
+        DeferWindowPos(hDwp, m_editor, nullptr, rect.left + treeWidth, rect.top + m_RibbonHeight + tbHeight, mainWidth - treeWidth, rect.bottom - (m_RibbonHeight + tbHeight) - m_StatusBar.GetHeight(), flags);
+        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight + tbHeight, treeWidth ? treeWidth - 5 : 0, rect.bottom - (m_RibbonHeight + tbHeight) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
         EndDeferWindowPos(hDwp);
         m_StatusBar.Resize();
     }
