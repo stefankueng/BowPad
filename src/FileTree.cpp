@@ -37,31 +37,6 @@ const int SCRATCH_QCM_LAST = 0x6FFF;
 static IContextMenu2 *g_pcm2 = nullptr;
 static IContextMenu3 *g_pcm3 = nullptr;
 
-namespace
-{
-    class FileTreeItem
-    {
-    public:
-        FileTreeItem()
-            : isDir(false)
-            , busy(false)
-        {}
-        std::wstring    path;
-        bool            isDir;
-        bool            busy;
-    };
-
-    class FileTreeData
-    {
-    public:
-        FileTreeData() {}
-
-        std::wstring                refreshpath;
-        HTREEITEM                   refreshRoot = nullptr;
-        std::vector<FileTreeItem*>  data;
-    };
-};
-
 static HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void **ppv)
 {
     *ppv = nullptr;
