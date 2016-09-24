@@ -576,11 +576,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         }
         break;
 
-    case WM_ACTIVATE:
-        // Ensure proper focus handling occurs such as
-        // making sure WM_SETFOCUS is generated in all situations.
-        return DefWindowProc(hwnd,uMsg,wParam,lParam);
-
     case WM_SETFOCUS: // lParam HWND that is losing focus.
     {
         SetFocus(m_editor);
@@ -908,16 +903,12 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
     }
     break;
     case WM_LBUTTONUP:
-    //case WM_CONTEXTMENU:
     {
         switch (lParam)
         {
         case STATUSBAR_EOL_FORMAT:
             HandleStatusBarEOLFormat();
             break;
-        //case STATUSBAR_ZOOM:
-            //HandleStatusBarZoom();
-            //break;
         }
     }
     break;
