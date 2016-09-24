@@ -132,9 +132,6 @@ void Normalize(std::wstring& f)
 
 bool ParseSignature(const std::wstring& sig, std::wstring& name, std::wstring& name_and_args)
 {
-    // Find the name of the function
-    name.clear();
-    name_and_args.clear();
     bool parsed = false;
 
     // Look for a ( of perhaps void x::f(whatever)
@@ -170,7 +167,6 @@ bool ParseSignature(const std::wstring& sig, std::wstring& name, std::wstring& n
 
 bool ParseName(const std::wstring& sig, std::wstring& name)
 {
-    name.clear();
     // Look for a ( of perhaps void x::f(whatever)
     auto bracepos = sig.find(L'(');
     if (bracepos != std::wstring::npos)
@@ -191,8 +187,6 @@ bool ParseName(const std::wstring& sig, std::wstring& name)
 bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf,
     std::string& foundText, int* lineNum)
 {
-    foundText.clear();
-    *lineNum = 0;
     // FIXME! In debug mode, regex takes a *long* time.
     auto findRet = edit.Call(SCI_FINDTEXT, SCFIND_REGEXP | SCFIND_CXX11REGEX, (sptr_t)&ttf);
     if (findRet < 0)
@@ -644,11 +638,10 @@ std::vector<FunctionInfo> CCmdFunctions::FindFunctionsNow() const
 
     auto doc = GetActiveDocument();
 
-    std::wstring name;
-    std::wstring nameAndArgs;
-
     std::function<bool(const std::wstring&, long)> f = [&](const std::wstring& sig, long lineNum)->bool
     {
+        std::wstring name;
+        std::wstring nameAndArgs;
         bool parsed = ParseSignature(sig, name, nameAndArgs);
         if (parsed)
             functions.push_back({ lineNum, std::move(name), std::move(nameAndArgs) });
