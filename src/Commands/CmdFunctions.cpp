@@ -244,7 +244,7 @@ static std::string DurationToString(std::chrono::duration<double> d)
         result += std::to_string(s.count());
         result += 's';
     }
-    // Empty check isto ensure at least something prints.
+    // Empty check is to ensure at least something prints.
     if (ms.count() > 0 || result.empty())
     {
         if (!result.empty())
