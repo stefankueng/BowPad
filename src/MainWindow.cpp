@@ -666,6 +666,29 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         *result = m_inMenuLoop ? FALSE : TRUE;
     }
     break;
+    case WM_MOUSEWHEEL:
+    {
+        POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+        RECT rc;
+        GetWindowRect(m_TabBar, &rc);
+        RECT tabrc;
+        TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
+        MapWindowPoints(m_TabBar, nullptr, (LPPOINT)&tabrc, 2);
+        rc.bottom = tabrc.bottom;
+        if (PtInRect(&rc, pt))
+        {
+            if (SendMessage(m_TabBar, uMsg, wParam, lParam))
+                return 0;
+        }
+        GetWindowRect(m_fileTree, &rc);
+        if (PtInRect(&rc, pt))
+        {
+            if (SendMessage(m_fileTree, uMsg, wParam, lParam))
+                return 0;
+        }
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    break;
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
