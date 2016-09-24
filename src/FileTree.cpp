@@ -705,7 +705,7 @@ HTREEITEM CFileTree::GetItemForPath(const std::wstring& expandpath)
         const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
         if (pTreeItem)
         {
-            if (pTreeItem->path.compare(expandpath) == 0)
+            if (CPathUtils::PathCompare(pTreeItem->path, expandpath) == 0)
             {
                 hResult = hItem;
                 return true;
