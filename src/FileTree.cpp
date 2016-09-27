@@ -116,7 +116,7 @@ bool CFileTree::Init(HINSTANCE /*hInst*/, HWND hParent)
     icce.dwSize = sizeof(icce);
     icce.dwICC = ICC_TREEVIEW_CLASSES;
     InitCommonControlsEx(&icce);
-    CreateEx(0, WS_VISIBLE | WS_CHILD | WS_TABSTOP | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_NOHSCROLL, hParent, 0, WC_TREEVIEW);
+    CreateEx(0, WS_VISIBLE | WS_CHILD | WS_TABSTOP | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_NOHSCROLL | TVS_TRACKSELECT, hParent, 0, WC_TREEVIEW);
     if (!*this)
         return false;
     TreeView_SetExtendedStyle(*this, TVS_EX_AUTOHSCROLL | TVS_EX_DOUBLEBUFFER, TVS_EX_AUTOHSCROLL | TVS_EX_DOUBLEBUFFER);
@@ -151,19 +151,6 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
             if (wParam)
                 Refresh(TVI_ROOT, true);
             break;
-        case WM_ERASEBKGND:
-        {
-            if (CTheme::Instance().IsDarkTheme())
-            {
-                HDC hDC = (HDC)wParam;
-                ::SetBkColor(hDC, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
-                RECT rect;
-                GetClientRect(*this, &rect);
-                ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rect, nullptr, 0, nullptr);
-                return TRUE;
-            }
-        }
-        break;
         case WM_CONTEXTMENU:
         {
             HTREEITEM hSelItem = TreeView_GetSelection(*this);
@@ -578,30 +565,39 @@ std::wstring CFileTree::GetDirPathForHitItem() const
 
 void CFileTree::OnThemeChanged(bool bDark)
 {
-    if (bDark)
+    if (!IsWindows8OrGreater())
     {
-        // When in dark theme mode, we have to disable double buffering:
-        // if double buffering is enabled, the background of the tree
-        // control is always shown in white, even though we draw it black
-        // in the WM_ERASEBACKGROUND handler. Haven't found a way to work around this
-        TreeView_SetExtendedStyle(*this, 0, TVS_EX_DOUBLEBUFFER);
-        if (!IsWindows8OrGreater())
+        // At least on Windows 7:
+        // In dark mode the "Explorer" style icons for 'expand folder' aren't clear.
+        // The highlight mode for selected tree items that do not
+        // have the focus are too bright and blocky too such that they take attention
+        // away from the main editor window.
+        // THe main window has owner draw code to undo this effect
+        // but windows themes override that code so we turn them of here.
+        if (bDark)
         {
-            // disable the explorer theme in dark mode on Win7:
-            // the color of the selection is too bright and causes
-            // the text to be unreadable
-            // works much better on Win8 so we leave the explorer theme there
             SetWindowTheme(*this, nullptr, nullptr);
+            TreeView_SetBkColor(*this, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
+            TreeView_SetTextColor(*this, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
         }
         else
         {
             SetWindowTheme(*this, L"Explorer", nullptr);
+            TreeView_SetTextColor(*this, CLR_INVALID);
+            TreeView_SetBkColor(*this, CLR_INVALID);
         }
     }
     else
     {
-        TreeView_SetExtendedStyle(*this, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
         SetWindowTheme(*this, L"Explorer", nullptr);
+        if (bDark)
+        {
+            TreeView_SetBkColor(*this, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
+        }
+        else
+        {
+            TreeView_SetBkColor(*this, CLR_INVALID);
+        }
     }
 }
 
