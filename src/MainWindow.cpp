@@ -882,8 +882,20 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM /*wParam*/,
                 return CDRF_NOTIFYITEMDRAW;
             case CDDS_ITEMPREPAINT:
             {
-                lpNMCustomDraw->clrText = CTheme::Instance().GetThemeColor(RGB(0, 0, 0));
-                lpNMCustomDraw->clrTextBk = CTheme::Instance().GetThemeColor(RGB(255, 255, 255));
+                if (IsWindows8OrGreater())
+                {
+                    lpNMCustomDraw->clrText = CTheme::Instance().GetThemeColor(RGB(0, 0, 0));
+                    lpNMCustomDraw->clrTextBk = CTheme::Instance().GetThemeColor(RGB(255, 255, 255));
+                }
+                else
+                {
+                    if ((lpNMCustomDraw->nmcd.uItemState & CDIS_SELECTED) != 0 &&
+                        (lpNMCustomDraw->nmcd.uItemState & CDIS_FOCUS) == 0)
+                    {
+                        lpNMCustomDraw->clrTextBk = CTheme::Instance().GetThemeColor(RGB(255, 255, 255));
+                        lpNMCustomDraw->clrText = RGB(128, 128, 128);
+                    }
+                }
 
                 return CDRF_DODEFAULT;
             }
