@@ -2077,6 +2077,10 @@ msgstr "WS"
 msgid "Web Search:"
 msgstr "Веб-поиск:"
 
+#. Resource IDs: (1094)
+msgid "When loading, prefer utf8 over ANSI/Local"
+msgstr "При загрузке, предпочтение UTF8 над ANSI / Local"
+
 #. Resource IDs: (60109)
 msgid "Whitespace"
 msgstr "Пробел"
