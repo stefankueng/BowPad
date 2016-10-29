@@ -36,7 +36,8 @@
 #include <uxtheme.h>
 
 extern IUIFramework * g_pFramework;
-extern std::string    g_sHighlightString;  // from CmdFindReplace
+extern std::string    g_sHighlightString;       // from CmdFindReplace
+extern int            g_searchMarkerCount;      // from CmdFindReplace
 
 namespace
 {
@@ -908,7 +909,10 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     }
     // don't mark the text again if it's already marked by the search feature
     if (_stricmp(g_sHighlightString.c_str(), seltextbuffer.get()) == 0)
+    {
+        m_selTextMarkerCount = g_searchMarkerCount;
         return;
+    }
 
     auto textbuffer = std::make_unique<char[]>(len + 1);
     Scintilla::Sci_TextRange textrange;
