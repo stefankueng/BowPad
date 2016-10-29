@@ -52,9 +52,10 @@
 
 static std::string  g_findString;
 std::string         g_sHighlightString;
-static int          g_searchFlags;
+static int          g_searchFlags = 0;
+int                 g_searchMarkerCount = 0;
 static std::string  g_lastSelText;
-static int          g_lastSearchFlags;
+static int          g_lastSearchFlags = 0;
 
 static std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
 
@@ -1587,7 +1588,10 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
     Clear(IDC_SEARCHINFO);
 
     if (g_lastSelText.empty() || g_lastSelText.compare(g_sHighlightString) || (g_searchFlags != g_lastSearchFlags))
+    {
         DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
+        g_searchMarkerCount = 0;
+    }
     DocScrollClear(DOCSCROLLTYPE_SELTEXT);
     OnOutOfScope(DocScrollUpdate());
 
@@ -3046,6 +3050,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
         if (g_sHighlightString.empty())
         {
             g_lastSelText.clear();
+            g_searchMarkerCount = 0;
             DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
             return;
         }
@@ -3065,6 +3070,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
         if (g_lastSelText.empty() || g_lastSelText.compare(g_sHighlightString) || (g_searchFlags != g_lastSearchFlags))
         {
             DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
+            g_searchMarkerCount = 0;
             FindText.chrg.cpMin = 0;
             FindText.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
             FindText.lpstrText = g_sHighlightString.c_str();
@@ -3072,6 +3078,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
             {
                 size_t line = ScintillaCall(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
                 DocScrollAddLineColor(DOCSCROLLTYPE_SEARCHTEXT, line, RGB(200,200,0));
+                ++g_searchMarkerCount;
                 if (FindText.chrg.cpMin >= FindText.chrgText.cpMax)
                     break;
                 FindText.chrg.cpMin = FindText.chrgText.cpMax;
