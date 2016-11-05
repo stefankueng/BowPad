@@ -53,7 +53,7 @@ protected:
     LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     LRESULT DoCommand(int id, int msg);
     void InitSizing();
-    void DoInitDialog(HWND hwndDlg);
+    LRESULT DoInitDialog(HWND hwndDlg);
     void SyncFileNameParts();
     void SetStatus(const std::wstring& status);
     bool CheckStatus();
