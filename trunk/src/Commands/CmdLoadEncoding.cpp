@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2015 - Stefan Kueng
+// Copyright (C) 2013-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
                 if (pos != std::wstring::npos)
                     name.erase(pos, 1);
                 CStringUtils::trim(name);
-                codepages.push_back(CodePageItem(codepage, false, name, CP_CATEGORY_CODEPAGES));
+                codepages.emplace_back(codepage, false, name, CP_CATEGORY_CODEPAGES);
             }
         }
         break;
