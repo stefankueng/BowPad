@@ -2219,7 +2219,7 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
             sCallTip += swatch;
             m_editor.Call(SCI_CALLTIPSETFOREHLT, color);
             m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)sCallTip.c_str());
-            m_editor.Call(SCI_CALLTIPSETHLT, pos, sCallTip.length() - pos);
+            m_editor.Call(SCI_CALLTIPSETHLT, pos, sCallTip.length());
             return;
         }
     }
