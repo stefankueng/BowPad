@@ -1967,6 +1967,7 @@ void CScintillaWnd::BookmarkAdd( long lineno )
     {
         Call(SCI_MARKERADD, lineno, MARK_BOOKMARK);
         m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, lineno, CTheme::Instance().GetThemeColor(RGB(255,0,0)));
+        DocScrollUpdate();
     }
 }
 
@@ -1978,6 +1979,7 @@ void CScintillaWnd::BookmarkDelete( int lineno )
     {
         Call(SCI_MARKERDELETE, lineno, MARK_BOOKMARK);
         m_docScroll.RemoveLine(DOCSCROLLTYPE_BOOKMARK, lineno);
+        DocScrollUpdate();
     }
 }
 
@@ -2011,6 +2013,7 @@ void CScintillaWnd::MarkBookmarksInScrollbar()
             break;
         m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, line, bmColor);
     }
+    DocScrollUpdate();
 }
 
 void CScintillaWnd::DocScrollUpdate()
