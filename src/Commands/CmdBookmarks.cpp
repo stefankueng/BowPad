@@ -124,6 +124,7 @@ void CCmdBookmarks::OnDocumentOpen(int index)
             ScintillaCall(SCI_MARKERADD, line, MARK_BOOKMARK);
             DocScrollAddLineColor(DOCSCROLLTYPE_BOOKMARK, line, g_bmColor);
         }
+        DocScrollUpdate();
     }
 }
 
@@ -145,6 +146,7 @@ bool CCmdBookmarkToggle::Execute()
         ScintillaCall(SCI_MARKERADD, line, MARK_BOOKMARK);
         DocScrollAddLineColor(DOCSCROLLTYPE_BOOKMARK, line, g_bmColor);
     }
+    DocScrollUpdate();
     InvalidateUICommand(cmdBookmarkNext, UI_INVALIDATIONS_STATE, nullptr);
     InvalidateUICommand(cmdBookmarkPrev, UI_INVALIDATIONS_STATE, nullptr);
     InvalidateUICommand(cmdBookmarkClearAll, UI_INVALIDATIONS_STATE, nullptr);
