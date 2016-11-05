@@ -45,26 +45,23 @@ public:
         // Set the minimum value
         if (IsEqualPropertyKey(key, UI_PKEY_MinValue))
         {
-            ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-            ppropvarNewValue->vt = VT_DECIMAL;
-            VarDecFromR8(0, &ppropvarNewValue->decVal);
-            hr = S_OK;
+            DECIMAL decout;
+            VarDecFromI4(0, &decout);
+            hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
         }
         // Set the maximum value
         else if (IsEqualPropertyKey(key, UI_PKEY_MaxValue))
         {
-            ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-            ppropvarNewValue->vt = VT_DECIMAL;
-            VarDecFromR8(500, &ppropvarNewValue->decVal);
-            hr = S_OK;
+            DECIMAL decout;
+            VarDecFromI4(500, &decout);
+            hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
         }
         // Set the increment
         else if (IsEqualPropertyKey(key, UI_PKEY_Increment))
         {
-            ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-            ppropvarNewValue->vt = VT_DECIMAL;
-            VarDecFromR8(1, &ppropvarNewValue->decVal);
-            hr = S_OK;
+            DECIMAL decout;
+            VarDecFromI4(1, &decout);
+            hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
         }
         // Set the number of decimal places
         else if (IsEqualPropertyKey(key, UI_PKEY_DecimalPlaces))
@@ -75,10 +72,9 @@ public:
         else if (IsEqualPropertyKey(key, UI_PKEY_DecimalValue))
         {
             int ve = (int)CIniSettings::Instance().GetInt64(L"View", L"verticaledge", 0);
-            ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-            ppropvarNewValue->vt = VT_DECIMAL;
-            VarDecFromR8(ve, &ppropvarNewValue->decVal);
-            hr = S_OK;
+            DECIMAL decout;
+            VarDecFromI4(ve, &decout);
+            hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
         }
         return hr;
     }
