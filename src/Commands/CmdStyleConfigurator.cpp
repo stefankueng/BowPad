@@ -124,7 +124,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
             auto hFontSizeCombo = GetDlgItem(*this, IDC_FONTSIZECOMBO);
             int index = ComboBox_AddString(hFontSizeCombo, L"");
             ComboBox_SetItemData(hFontSizeCombo, 0, 0);
-            static const int fontsizes[] = { 5,6,7,8,9,10,11,12,14,16,18,20,22,24,26,28 };
+            static constexpr int fontsizes[] = { 5,6,7,8,9,10,11,12,14,16,18,20,22,24,26,28 };
             for (auto fontSize : fontsizes)
             {
                 std::wstring s = std::to_wstring(fontSize);

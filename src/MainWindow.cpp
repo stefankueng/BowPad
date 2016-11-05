@@ -50,7 +50,7 @@ IUIFramework *g_pFramework = nullptr;  // Reference to the Ribbon framework.
 
 namespace
 {
-    static const COLORREF foldercolors[] = {
+    static constexpr COLORREF foldercolors[] = {
         RGB(177,199,253),
         RGB(221,253,177),
         RGB(253,177,243),
@@ -2186,7 +2186,7 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
 
     // Short form or long form html color e.g. #F0F or #FF00FF
     // Use this to show color.
-    static const char swatch[] = { "####################\n####################\n####################" };
+    static constexpr char swatch[] = { "####################\n####################\n####################" };
 
     if (sWord[0] == '#' && (sWord.size() == 4 || sWord.size() == 7))
     {

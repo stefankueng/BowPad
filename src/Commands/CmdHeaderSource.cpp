@@ -158,16 +158,16 @@ namespace
 {
 // We may want to use this elsewhere in the future so draw attention to it, but
 // but for now it's only needed in this module.
-static const char CPP_INCLUDE_STATEMENT_REGEX[] = { "^\\#include\\s+((\\\"[^\\\"]+\\\")|(<[^>]+>))" };
+static constexpr char CPP_INCLUDE_STATEMENT_REGEX[] = { "^\\#include\\s+((\\\"[^\\\"]+\\\")|(<[^>]+>))" };
 
 // Maximum number of lines to scan for include statements.
 // NOTE: This could be a configuration item but that doesn't seem necessary for now.
-const int MAX_INCLUDE_SEARCH_LINES = 100;
+constexpr int MAX_INCLUDE_SEARCH_LINES = 100;
 
-const int CREATE_CORRESPONDING_FILE_CATEGORY = 1;
-const int CORRESPONDING_FILES_CATEGORY = 2;
-const int USER_INCLUDE_CATEGORY = 3;
-const int SYSTEM_INCLUDE_CATEGORY = 4;
+constexpr int CREATE_CORRESPONDING_FILE_CATEGORY = 1;
+constexpr int CORRESPONDING_FILES_CATEGORY = 2;
+constexpr int USER_INCLUDE_CATEGORY = 3;
+constexpr int SYSTEM_INCLUDE_CATEGORY = 4;
 
 };
 

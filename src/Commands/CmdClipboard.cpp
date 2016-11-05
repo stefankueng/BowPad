@@ -25,7 +25,7 @@
 #include "ClipboardHelper.h"
 #include "OnOutOfScope.h"
 
-static const wchar_t CF_BPLEXER[] = { L"BP Lexer" };
+static constexpr wchar_t CF_BPLEXER[] = { L"BP Lexer" };
 
 std::string ClipboardBase::GetHtmlSelection()
 {
