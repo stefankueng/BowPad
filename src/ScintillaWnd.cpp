@@ -1065,7 +1065,7 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
 // find matching brace position
 void CScintillaWnd::GotoBrace()
 {
-    static const wchar_t brackets[] = L"[](){}";
+    static constexpr wchar_t brackets[] = L"[](){}";
 
     int lengthDoc = int(Call(SCI_GETLENGTH));
     if (lengthDoc <= 1)

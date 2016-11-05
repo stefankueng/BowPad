@@ -90,10 +90,10 @@ const constexpr auto incremental_search_time = std::chrono::milliseconds(20);
 // Turns "Hello/* there */world" into "Helloworld"
 void StripComments(std::wstring& f)
 {
-    static const wchar_t comment_begin[] = { L"/*" };
-    static const wchar_t comment_end[] = { L"*/" };
-    const size_t comment_begin_len = wcslen(comment_begin);
-    const size_t comment_end_len = wcslen(comment_end);
+    static constexpr wchar_t comment_begin[] = { L"/*" };
+    static constexpr wchar_t comment_end[] = { L"*/" };
+    static constexpr size_t comment_begin_len = _countof(comment_begin)-1;
+    static constexpr size_t comment_end_len = _countof(comment_end)-1;
     size_t comment_begin_pos = 0;
     for (;;)
     {

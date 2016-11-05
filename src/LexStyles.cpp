@@ -31,11 +31,11 @@ const std::map<int, std::string> emptyIntStrVec;
 const std::string emptyString;
 const std::vector<std::string> emptyStringVector;
 
-static const COLORREF fgColor = RGB(0, 0, 0);
-static const COLORREF bgColor = RGB(255, 255, 255);
+static constexpr COLORREF fgColor = RGB(0, 0, 0);
+static constexpr COLORREF bgColor = RGB(255, 255, 255);
 };
 
-static const std::pair<const wchar_t*const, const char*const> lexDetectStrings[] = {
+static constexpr std::pair<const wchar_t*const, const char*const> lexDetectStrings[] = {
     // a '+' in front of the lexer name means the string can appear anywhere in the
     // first line of the document.
     // a '-' in front of the lexer name means the string must appear
