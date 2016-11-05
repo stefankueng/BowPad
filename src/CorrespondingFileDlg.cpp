@@ -133,31 +133,36 @@ CFFileInfo CCorrespondingFileDlg::GetCFInfo()
 
     if (info.f1Filename.empty())
     {
-        info.status = L"Filename required for first file.";
+        ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILENAMEFIRST);
+        info.status = rStatus.c_str();
         return info;
     }
     if (info.f2Filename.empty())
     {
-        info.status = L"Filename required for second file.";
+        ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILENAMESECOND);
+        info.status = rStatus.c_str();
         return info;
     }
 
     if (CPathUtils::PathCompare(info.f1Path, info.f2Path) == 0)
     {
-        info.status = L"The files must be different.";
+        ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILENAMESMUSTBEDIFFERENT);
+        info.status = rStatus.c_str();
         return info;
     }
 
     if (!info.f1Folder.empty() && !PathFileExists(info.f1Folder.c_str()))
     {
-        info.status = CStringUtils::Format(L"Folder \"%s\" does not exist.",
-            info.f1Folder.c_str());
+        ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_DIRNOTEXIST);
+        auto sStatus = CStringUtils::Format(rStatus, info.f1Folder.c_str());
+        info.status = sStatus;
         return info;
     }
     if (!info.f2Folder.empty() && !PathFileExists(info.f2Folder.c_str()))
     {
-        info.status = CStringUtils::Format(L"Folder \"%s\" does not exist.",
-            info.f2Folder.c_str());
+        ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_DIRNOTEXIST);
+        auto sStatus = CStringUtils::Format(rStatus, info.f2Folder.c_str());
+        info.status = sStatus;
         return info;
     }
 
@@ -165,29 +170,36 @@ CFFileInfo CCorrespondingFileDlg::GetCFInfo()
     {
         if (info.f1Folder.empty())
         {
-            info.status = L"Folder required for first file.";
+            ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FOLDERREQUIREDFIRST);
+            info.status = rStatus.c_str();
             return info;
         }
         if (info.f2Folder.empty())
         {
-            info.status = L"Folder required for second file.";
+            ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FOLDERREQUIREDSECOND);
+            info.status = rStatus.c_str();
             return info;
         }
 
         if (info.f1Exists && info.f2Exists)
         {
-            info.status = CStringUtils::Format(L"Files \"%s\" and \"%s\" already exist.",
-                info.f1Path.c_str(), info.f2Path.c_str());
+            ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILESEXIST);
+            auto sStatus = CStringUtils::Format(rStatus, info.f1Path.c_str(), info.f2Path.c_str());
+            info.status = sStatus;
             return info;
         }
         if (info.f1Exists)
         {
-            info.status = CStringUtils::Format(L"File \"%s\" already exists.", info.f1Path.c_str());
+            ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILEEXISTS);
+            auto sStatus = CStringUtils::Format(rStatus, info.f1Path.c_str());
+            info.status = sStatus;
             return info;
         }
         if (info.f2Exists)
         {
-            info.status = CStringUtils::Format(L"File \"%s\" already exists.", info.f2Path.c_str());
+            ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILEEXISTS);
+            auto sStatus = CStringUtils::Format(rStatus, info.f2Path.c_str());
+            info.status = sStatus;
             return info;
         }
     }
