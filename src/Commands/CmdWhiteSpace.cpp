@@ -66,32 +66,27 @@ CCmdTabSize::~CCmdTabSize()
 
 HRESULT CCmdTabSize::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
 {
-    // REVIEW: ZeroMemory might not be the best tool here. VariantInit
-    // or UIInitPropertyFromDecimal or some such routine seems better.
     HRESULT hr = S_OK;
     // Set the minimum value
     if (IsEqualPropertyKey(key, UI_PKEY_MinValue))
     {
-        ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-        ppropvarNewValue->vt = VT_DECIMAL;
-        VarDecFromR8(1, &ppropvarNewValue->decVal);
-        hr = S_OK;
+        DECIMAL decout;
+        VarDecFromI4(1, &decout);
+        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
     }
     // Set the maximum value
     else if (IsEqualPropertyKey(key, UI_PKEY_MaxValue))
     {
-        ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-        ppropvarNewValue->vt = VT_DECIMAL;
-        VarDecFromR8(20, &ppropvarNewValue->decVal);
-        hr = S_OK;
+        DECIMAL decout;
+        VarDecFromI4(20, &decout);
+        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
     }
     // Set the increment
     else if (IsEqualPropertyKey(key, UI_PKEY_Increment))
     {
-        ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-        ppropvarNewValue->vt = VT_DECIMAL;
-        VarDecFromR8(1, &ppropvarNewValue->decVal);
-        hr = S_OK;
+        DECIMAL decout;
+        VarDecFromI4(1, &decout);
+        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
     }
     // Set the number of decimal places
     else if (IsEqualPropertyKey(key, UI_PKEY_DecimalPlaces))
@@ -102,9 +97,9 @@ HRESULT CCmdTabSize::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
     else if (IsEqualPropertyKey(key, UI_PKEY_DecimalValue))
     {
         int ve = (int)CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4);
-        ZeroMemory(ppropvarNewValue, sizeof(*ppropvarNewValue));
-        ppropvarNewValue->vt = VT_DECIMAL;
-        VarDecFromR8(ve, &ppropvarNewValue->decVal);
+        DECIMAL decout;
+        VarDecFromI4(ve, &decout);
+        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
     }
     return hr;
 }
