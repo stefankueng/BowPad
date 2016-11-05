@@ -32,7 +32,6 @@
 #include "version.h"
 #include "CommandHandler.h"
 
-// TODO! make these g_
 HINSTANCE hInst;
 HINSTANCE hRes;
 

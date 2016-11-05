@@ -15,19 +15,6 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 
-// TODO: Currently, we use exceptions and asserts to detect some pretty serious
-// issues that may happen at runtime.
-// The idea eventually is to move to a model where we can catch these in
-// the message loop and ask the user to save their work and close the app.
-// For now just diagnose these problems with asserts and exceptions that will
-// abort as that's better than leaving the app in a wildly unknown state.
-// This allow also allows us to find these problems in testing and users
-// can report issues because they will be aware of them too and not just
-// continue with silent corruption problems.
-// Will envolve this further later but this is an improvement for now.
-//
-// Some button handling need work cleaning up.
-
 #include "stdafx.h"
 #include "BowPad.h"
 #include "DocumentManager.h"

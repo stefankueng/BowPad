@@ -151,9 +151,6 @@ int CTabBar::InsertAtEnd(const TCHAR *subTabName)
     tie.pszText = const_cast<TCHAR *>(subTabName);
     tie.lParam = m_tabID++;
     int index = TabCtrl_InsertItem(*this, m_nItems++, &tie);
-    // TODO: inserting the first tab makes it selected think if we want to negate that:
-    //if (TabCtrl_GetItemCount(*this) == 0)
-        //TabCtrl_SetCurSel(*this, -1);
     return index;
 }
 
@@ -171,9 +168,6 @@ int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
     if ((index + 1) >= m_nItems)
         index = m_nItems - 1;
     int ret = TabCtrl_InsertItem(*this, index + 1, &tie);
-    // TODO: inserting the first tab makes it selected think if we want to negate that:
-    //if (TabCtrl_GetItemCount(*this) == 0)
-        //TabCtrl_SetCurSel(*this, -1);
     ++m_nItems;
     return ret;
 }

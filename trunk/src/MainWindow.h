@@ -45,12 +45,6 @@ enum class ResponseToCloseTab
     CloseWithoutSaving
 };
 
-// TODO! This isn't used, use it or remove it. TBD.
-enum class ResponseToOutsideDeletedFile
-{
-    Close,
-    StayOpen
-};
 
 struct HIMAGELIST_Deleter
 {
