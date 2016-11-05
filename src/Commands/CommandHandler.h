@@ -65,7 +65,6 @@ private:
 
     void                            InsertPlugins(void * obj);
 
-    // TODO! consider if unordered_map would be better here.
     std::map<UINT, std::unique_ptr<ICommand>>       m_commands;
     std::map<UINT, ICommand*>                       m_nodeletecommands;
     std::map<UINT, std::wstring>                    m_plugins;

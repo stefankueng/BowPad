@@ -109,8 +109,6 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
         linebuffer[len] = '\0';
         OnOutOfScope(ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)linebuffer.get()));
 
-        // TODO! This would be much better if we analyzed all the characters either side
-        // of the curent position to identify something that looked like a path.
         ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
         size_t pos = ConstCall(SCI_GETCURRENTPOS);
 
