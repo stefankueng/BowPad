@@ -386,7 +386,6 @@ void CCommandHandler::InsertPlugins(void * obj)
             }
             catch (const std::exception& e)
             {
-                // TODO: create a method in CAppUtils that shows the exception
                 if (CIniSettings::Instance().GetInt64(L"Debug", L"usemessagebox", 0))
                 {
                     MessageBox(NULL, L"BowPad", CUnicodeUtils::StdGetUnicode(e.what()).c_str(), MB_ICONERROR);

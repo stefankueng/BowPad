@@ -3282,7 +3282,6 @@ void FindReplace_FindText(void* mainWnd)
 
 void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName)
 {
-    // TODO! Add support to allow open file as language to be used.
     if (!g_pFindReplaceDlg)
         g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(mainWnd);
     g_pFindReplaceDlg->FindFile(fileName);

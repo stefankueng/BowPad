@@ -175,7 +175,6 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
         {
             const MRUItem& mru = *countPathPair;
 
-            // TODO! Use Com smart ptr type RAII here.
             CRecentFileProperties* pPropertiesObj = nullptr;
             auto hr = CRecentFileProperties::CreateInstance(mru.path.c_str(), mru.pinned, &pPropertiesObj);
             if (SUCCEEDED(hr))

@@ -2061,7 +2061,6 @@ std::string CScintillaWnd::GetTextRange(long startpos, long endpos) const
     assert(endpos - startpos >= 0);
     if (endpos < startpos)
         return "";
-    // TODO: Why + 5?
     auto strbuf = std::make_unique<char[]>(endpos - startpos + 5);
     Scintilla::Sci_TextRange rangestart;
     rangestart.chrg.cpMin = startpos;

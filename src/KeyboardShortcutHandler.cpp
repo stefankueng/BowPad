@@ -154,7 +154,6 @@ void CKeyboardShortcutHandler::Load( const CSimpleIni& ini )
                     }
                     else
                     {
-                        // REVIEW: should base be set to 16 here or are regular integers allowed?
                         if ((keyvec[i].size() > 2) && (keyvec[i][0] == '0') && (keyvec[i][1] == 'x'))
                             accel.key1 = (WORD)wcstol(keyvec[i].c_str(), nullptr, 0);
                         else
