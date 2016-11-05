@@ -58,7 +58,7 @@ LRESULT CCorrespondingFileDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
     case WM_DESTROY:
         break;
     case WM_INITDIALOG:
-        DoInitDialog(hwndDlg);
+        return DoInitDialog(hwndDlg);
         break;
     case WM_ACTIVATE:
         if (wParam == WA_INACTIVE)
@@ -310,7 +310,7 @@ void CCorrespondingFileDlg::InitSizing()
     m_resizer.AdjustMinMaxSize();
 }
 
-void CCorrespondingFileDlg::DoInitDialog(HWND hwndDlg)
+LRESULT CCorrespondingFileDlg::DoInitDialog(HWND hwndDlg)
 {
     OnOutOfScope(
         m_initialisingDialog = false;
@@ -331,11 +331,8 @@ void CCorrespondingFileDlg::DoInitDialog(HWND hwndDlg)
     SHAutoComplete(hF2Folder, SHACF_FILESYS_DIRS);
     CheckStatus();
     auto hF1Filename = GetDlgItem(*this, IDC_CFNAME1);
-    // REVIEW: Edit_SetSel won't work here. This has something
-    // to do with the dialog setting focus I think but I can't
-    // remember what the correct solution is to setting the
-    // selection if it's not PostMessage and it isn't a bug.
-    PostMessage(hF1Filename, EM_SETSEL, 0, 0);
+    Edit_SetSel(hF1Filename, 0, 0);
+    return FALSE;
 }
 
 
