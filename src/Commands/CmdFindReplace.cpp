@@ -35,21 +35,6 @@
 #include <utility>
 #include <memory>
 
-// TODO:
-// It would be nice to fix min/max problems at the project level for all files.
-// NOMINMAX could be added to "stdafx.h" but gdiplus.h uses unqualified min/max references.
-// A using statement could be used in stdafx.h to bring std::min/std::max into
-// global scope and then gdiplus would pick up the C++ versions there.
-// Then the kind of change below isn't required for each file.
-// Change not done yet to avoid touching too many files as part of this change.
-
-#ifdef min
-#undef min
-#endif
-#ifdef max
-#undef max
-#endif
-
 static std::string  g_findString;
 std::string         g_sHighlightString;
 static int          g_searchFlags = 0;
@@ -548,7 +533,6 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
     GetWindowRect(hwndDlg, &rcDlg);
     m_originalSize = { rcDlg.right - rcDlg.left, rcDlg.bottom - rcDlg.top };
 
-    // REVIEW: should this be InitScratch?
     m_searchWnd.Init(hRes, *this);
 
     LoadSearchStrings();
@@ -1723,9 +1707,6 @@ void CFindReplaceDlg::DoSearchAll(int id)
     m_bStop = false;
     m_foundsize = 0;
 
-    // TODO! Use foundsize to notify the user that the find limit was reached,
-    // so they know not all search results may have been found.
-
     std::wstring findText = GetDlgItemText(IDC_SEARCHCOMBO).get();
     if (id != IDC_FINDFILES)
         UpdateSearchStrings(findText);
@@ -1789,7 +1770,12 @@ void CFindReplaceDlg::DoSearchAll(int id)
                 SearchDocument(m_searchWnd, docID, doc, searchfor, searchflags, exSearchFlags,
                     m_searchResults, m_foundPaths);
                 if (m_foundsize >= MAX_SEARCHRESULTS)
+                {
+                    ResString rInfoMax(hRes, IDS_SEARCHING_FILE_MAX);
+                    auto sInfoMax = CStringUtils::Format(rInfoMax, MAX_SEARCHRESULTS);
+                    SetDlgItemText(*this, IDC_SEARCHINFO, sInfoMax.c_str());
                     break;
+                }
             }
             SortResults();
         }
