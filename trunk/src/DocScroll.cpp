@@ -221,7 +221,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                         LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top)*line.first / m_lines);
                         if ((linepos > (lastLinePos + 1)) || (lastColor != line.second))
                         {
-                            Gdiplus::Color c2(150, GetRValue(line.second), GetGValue(line.second), GetBValue(line.second));
+                            Gdiplus::Color c2;
                             c2.SetFromCOLORREF(line.second);
                             Gdiplus::SolidBrush brushline(c2);
                             graphics.FillRectangle(&brushline, drawx, linepos, colwidth, 2);
