@@ -785,12 +785,34 @@ msgstr ""
 msgid "File Tree"
 msgstr ""
 
+#. Resource IDs: (246)
+#, c-format
+msgid "File \"%s\" already exists."
+msgstr ""
+
 #. Resource IDs: (161)
 msgid "File does not exist"
 msgstr ""
 
 #. Resource IDs: (104)
 msgid "File is too big to be opened by BowPad"
+msgstr ""
+
+#. Resource IDs: (239)
+msgid "Filename required for first file."
+msgstr ""
+
+#. Resource IDs: (240)
+msgid "Filename required for second file."
+msgstr ""
+
+#. Resource IDs: (241)
+msgid "Filenames must be different."
+msgstr ""
+
+#. Resource IDs: (245)
+#, c-format
+msgid "Files \"%s\" and \"%s\" already exist."
 msgstr ""
 
 #. Resource IDs: (60157)
@@ -851,6 +873,19 @@ msgstr ""
 
 #. Resource IDs: (60169)
 msgid "Find/Replace"
+msgstr ""
+
+#. Resource IDs: (242)
+#, c-format
+msgid "Folder \"%s\" does not exist."
+msgstr ""
+
+#. Resource IDs: (243)
+msgid "Folder required for first file."
+msgstr ""
+
+#. Resource IDs: (244)
+msgid "Folder required for second file."
 msgstr ""
 
 #. Resource IDs: (60539)
@@ -1056,6 +1091,11 @@ msgstr ""
 
 #. Resource IDs: (60140)
 msgid "Lexer"
+msgstr ""
+
+#. Resource IDs: (238)
+#, c-format
+msgid "Limit reached of %d matches found!"
 msgstr ""
 
 #. Resource IDs: (153)
