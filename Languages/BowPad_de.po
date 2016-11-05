@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-17 15:26+0200\n"
-"PO-Revision-Date: 2016-09-17 15:29+0200\n"
+"POT-Creation-Date: 2016-11-05 17:40+0100\n"
+"PO-Revision-Date: 2016-11-05 17:43+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -896,6 +896,11 @@ msgstr "Datei"
 msgid "File Tree"
 msgstr "Dateibaum"
 
+#. Resource IDs: (246)
+#, c-format
+msgid "File \"%s\" already exists."
+msgstr "Datei \"%s\" existiert bereits."
+
 #. Resource IDs: (161)
 msgid "File does not exist"
 msgstr "Datei nicht gefunden"
@@ -903,6 +908,23 @@ msgstr "Datei nicht gefunden"
 #. Resource IDs: (104)
 msgid "File is too big to be opened by BowPad"
 msgstr "Datei ist zu gross um mit BowPad geöffnet zu werden"
+
+#. Resource IDs: (239)
+msgid "Filename required for first file."
+msgstr "Dateiname fehlt für erste Datei."
+
+#. Resource IDs: (240)
+msgid "Filename required for second file."
+msgstr "Dateiname fehlt für zweite Datei."
+
+#. Resource IDs: (241)
+msgid "Filenames must be different."
+msgstr "Dateinamen müssen unterschiedlich sein."
+
+#. Resource IDs: (245)
+#, c-format
+msgid "Files \"%s\" and \"%s\" already exist."
+msgstr "Dateien \"%s\" und \"%s\" existieren bereits."
 
 #. Resource IDs: (60157)
 msgid "Find"
@@ -963,6 +985,19 @@ msgstr "Finde vorheriges"
 #. Resource IDs: (60169)
 msgid "Find/Replace"
 msgstr "Suchen/Ersetzen"
+
+#. Resource IDs: (242)
+#, c-format
+msgid "Folder \"%s\" does not exist."
+msgstr "Ordner \"%s\" existiert nicht."
+
+#. Resource IDs: (243)
+msgid "Folder required for first file."
+msgstr "Ordner für erste Datei fehlt."
+
+#. Resource IDs: (244)
+msgid "Folder required for second file."
+msgstr "Ordner für zweite Datei fehlt."
 
 #. Resource IDs: (60539)
 msgid "Folding"
@@ -1196,6 +1231,11 @@ msgstr ""
 #. Resource IDs: (60140)
 msgid "Lexer"
 msgstr "Lexer"
+
+#. Resource IDs: (238)
+#, c-format
+msgid "Limit reached of %d matches found!"
+msgstr "Limite von %d Fundstellen erreicht!"
 
 #. Resource IDs: (153)
 msgid "Line"
