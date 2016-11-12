@@ -147,3 +147,18 @@ public:
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };
+
+class CCmdWriteProtect : public ICommand
+{
+public:
+    CCmdWriteProtect(void * obj);
+    ~CCmdWriteProtect();
+
+    bool Execute() override;
+
+    UINT GetCmdId() override { return cmdWriteProtect; }
+
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    void TabNotify(TBHDR* ptbhdr) override;
+    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+};

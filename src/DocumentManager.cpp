@@ -569,7 +569,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     m_scratchScintilla.Call(SCI_EMPTYUNDOBUFFER);
     m_scratchScintilla.Call(SCI_SETSAVEPOINT);
     SetEOLType(m_scratchScintilla, doc);
-    if (ro || doc.m_bIsReadonly)
+    if (ro || doc.m_bIsReadonly || doc.m_bIsWriteProtected)
         m_scratchScintilla.Call(SCI_SETREADONLY, true);
     doc.m_document = m_scratchScintilla.Call(SCI_GETDOCPOINTER);    // doc.m_document has reference count of 2
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);               // now doc.m_document has reference count of 1, and the scratch does not hold any doc anymore
