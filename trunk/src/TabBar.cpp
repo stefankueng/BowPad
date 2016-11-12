@@ -958,8 +958,11 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct) const
     {
         // draw a line at the bottom indicating the active tab:
         // green if the tab is not modified, red if it is modified and needs saving
+        auto indicColor = tci.iImage == UNSAVED_IMG_INDEX ? RGB(200, 0, 0) : RGB(0, 200, 0);
+        if (tci.iImage == REDONLY_IMG_INDEX)
+            indicColor = RGB(80, 80, 80);
         GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - 5, rItem.right, rItem.bottom,
-                      CTheme::Instance().GetThemeColor(tci.iImage == UNSAVED_IMG_INDEX ? RGB(200, 0, 0) : RGB(0, 200, 0)));
+                      CTheme::Instance().GetThemeColor(indicColor));
     }
     if (tci.iImage == UNSAVED_IMG_INDEX)
         wcscat_s(buf, L"*");
@@ -1014,7 +1017,13 @@ void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct) const
     UINT uFlags = DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER;
     ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, uFlags);
     COLORREF textColor = CTheme::Instance().GetThemeColor(GDIHelpers::Darker(::GetSysColor(COLOR_3DDKSHADOW), 0.5f));
-    if (bSelected)
+    if (tci.iImage == REDONLY_IMG_INDEX)
+    {
+        textColor = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_GRAYTEXT));
+        if (bSelected)
+            textColor = CTheme::Instance().GetThemeColor(GDIHelpers::Darker(::GetSysColor(COLOR_GRAYTEXT), 0.8f));
+    }
+    else if (bSelected)
         textColor = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT));
     if (tci.iImage == UNSAVED_IMG_INDEX)
         textColor = CTheme::Instance().GetThemeColor(RGB(100, 0, 0));
