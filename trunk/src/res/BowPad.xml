@@ -122,6 +122,11 @@
         <Image>res/CloseAllL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdWriteProtect" LabelTitle="Readonly" TooltipTitle="Write protected" TooltipDescription="Prevents editing the file" Keytip="FR">
+      <Command.LargeImages>
+        <Image>res/LockedL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdCopy" LabelTitle="Copy" TooltipTitle="Clipboard" TooltipDescription="Copy the current selection to the clipboard. Hold down the shift key to copy the text formatted." Keytip="C">
       <Command.SmallImages>
         <Image>res/Copy.bmp</Image>
@@ -873,7 +878,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Scale Group="cmdSpellCheckGroup" Size="Small" />
             </ScalingPolicy>
           </Tab.ScalingPolicy>
-          <Group CommandName="cmdGroupFile" SizeDefinition="FiveOrSixButtons">
+          <Group CommandName="cmdGroupFile" SizeDefinition="SevenButtons">
             <Button CommandName="cmdOpen" />
             <SplitButton CommandName="cmdGroupNewBtn">
               <SplitButton.ButtonItem>
@@ -890,6 +895,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             </SplitButton>
             <Button CommandName="cmdSessionLoad" />
             <ToggleButton CommandName="cmdSessionAutoLoad" />
+            <ToggleButton CommandName="cmdWriteProtect" />
           </Group>
           <Group CommandName="cmdGroupClipboard" SizeDefinition="ThreeButtons-OneBigAndTwoSmall">
             <Button CommandName="cmdPaste" />
