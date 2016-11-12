@@ -87,7 +87,7 @@ bool CCmdConfigShortcuts::Execute()
             HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
             if (hResourceLoaded)
             {
-                const char* lpResLock = (const char *) LockResource(hResourceLoaded);
+                const char* lpResLock = (const char *)LockResource(hResourceLoaded);
                 if (lpResLock)
                 {
                     const char* lpStart = strstr(lpResLock, "#--");
@@ -100,7 +100,7 @@ bool CCmdConfigShortcuts::Execute()
                             if (hFile != INVALID_HANDLE_VALUE)
                             {
                                 DWORD dwWritten = 0;
-                                WriteFile(hFile, lpStart, (DWORD)(lpEnd-lpStart), &dwWritten, NULL);
+                                WriteFile(hFile, lpStart, (DWORD)(lpEnd - lpStart), &dwWritten, NULL);
                                 CloseHandle(hFile);
                             }
                         }
@@ -119,7 +119,8 @@ CCmdAutoBraces::CCmdAutoBraces(void * obj) : ICommand(obj)
 }
 
 CCmdAutoBraces::~CCmdAutoBraces(void)
-{}
+{
+}
 
 bool CCmdAutoBraces::Execute()
 {
@@ -143,7 +144,8 @@ CCmdViewFileTree::CCmdViewFileTree(void * obj) : ICommand(obj)
 }
 
 CCmdViewFileTree::~CCmdViewFileTree(void)
-{}
+{
+}
 
 bool CCmdViewFileTree::Execute()
 {
@@ -162,4 +164,77 @@ HRESULT CCmdViewFileTree::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !GetFileTreePath().empty(), ppropvarNewValue);
     }
     return E_NOTIMPL;
+}
+
+CCmdWriteProtect::CCmdWriteProtect(void * obj)
+    : ICommand(obj)
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
+}
+
+CCmdWriteProtect::~CCmdWriteProtect(void)
+{
+}
+
+bool CCmdWriteProtect::Execute()
+{
+    if (!HasActiveDocument())
+        return false;
+
+    auto doc = GetActiveDocument();
+    doc.m_bIsWriteProtected = !(doc.m_bIsWriteProtected || doc.m_bIsReadonly);
+    if (!doc.m_bIsWriteProtected && doc.m_bIsReadonly)
+        doc.m_bIsReadonly = false;
+    ScintillaCall(SCI_SETREADONLY, doc.m_bIsWriteProtected);
+    SetDocument(GetDocIdOfCurrentTab(), doc);
+    UpdateTab(GetDocIdOfCurrentTab());
+
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    return true;
+}
+
+HRESULT CCmdWriteProtect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+{
+    if (UI_PKEY_BooleanValue == key)
+    {
+        bool bWriteProtected = false;
+        if (HasActiveDocument())
+        {
+            auto doc = GetActiveDocument();
+            bWriteProtected = doc.m_bIsReadonly || doc.m_bIsWriteProtected;
+        }
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, bWriteProtected, ppropvarNewValue);
+    }
+
+    if (UI_PKEY_Enabled == key)
+    {
+        bool bHasPath = false;
+        if (HasActiveDocument())
+        {
+            auto doc = GetActiveDocument();
+            bHasPath = !doc.m_path.empty();
+        }
+
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, bHasPath, ppropvarNewValue);
+    }
+
+    return E_NOTIMPL;
+}
+
+void CCmdWriteProtect::TabNotify(TBHDR * ptbhdr)
+{
+    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    }
+}
+
+void CCmdWriteProtect::ScintillaNotify(Scintilla::SCNotification * pScn)
+{
+    if (pScn->nmhdr.code == SCN_SAVEPOINTREACHED)
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    }
 }

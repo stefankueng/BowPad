@@ -111,6 +111,7 @@ void CCommandHandler::Init(void * obj)
     Add<CCmdSaveAuto>(obj);
     Add<CCmdSaveAs>(obj);
     Add<CCmdReload>(obj);
+    Add<CCmdWriteProtect>(obj);
     Add<CCmdSummary>(obj);
     Add<CCmdFileDelete>(obj);
     Add<CCmdPrint>(obj);
