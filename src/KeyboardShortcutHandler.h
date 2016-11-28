@@ -16,28 +16,28 @@
 //
 #pragma once
 #include <string>
-#include <map>
 #include <unordered_map>
 #include <vector>
 #include <set>
+#include <unordered_set>
 
 class KSH_Accel
 {
 public:
     KSH_Accel()
         : fVirt(0)
-        , fVirt1(FALSE)
+        , fVirt1(false)
         , key1(0)
-        , fVirt2(FALSE)
+        , fVirt2(false)
         , key2(0)
         , cmd(0)
     {}
     ~KSH_Accel() {}
 
     BYTE            fVirt;      // 0x10 = ALT, 0x08 = Ctrl, 0x04 = Shift
-    BOOL            fVirt1;     // true if key1 is a virtual key, false if it's a character code
+    bool            fVirt1;     // true if key1 is a virtual key, false if it's a character code
     WORD            key1;
-    BOOL            fVirt2;
+    bool            fVirt2;
     WORD            key2;
     WORD            cmd;        // the command
     std::wstring    sCmd;       // the command as a string
@@ -54,7 +54,7 @@ public:
     void                                    UpdateTooltips(bool bAll);
     void                                    ToolTipUpdated(WORD cmd);
     const std::unordered_map<std::wstring, int>&  GetResourceData() const { return m_resourceData; }
-    const std::map<std::wstring, UINT>&     GetVirtKeys() const { return m_virtkeys; }
+    const std::unordered_map<std::wstring, UINT>& GetVirtKeys() const { return m_virtkeys; }
     const std::vector<KSH_Accel>&           GetAccelerators() const { return m_accelerators; }
     void                                    AddCommand(const std::wstring& name, int id);
     static std::wstring                     MakeShortCutKeyForAccel(const KSH_Accel& accel);
@@ -70,8 +70,8 @@ private:
 private:
     bool                                    m_bLoaded;
     std::vector<KSH_Accel>                  m_accelerators;
-    std::map<std::wstring, UINT>            m_virtkeys;
+    std::unordered_map<std::wstring, UINT>  m_virtkeys;
     WORD                                    m_lastKey;
     std::unordered_map<std::wstring, int>   m_resourceData;
-    std::set<WORD>                          m_tooltiptitlestoupdate;
+    std::unordered_set<WORD>                m_tooltiptitlestoupdate;
 };

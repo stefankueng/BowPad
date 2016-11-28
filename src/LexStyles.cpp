@@ -27,6 +27,7 @@
 namespace
 {
 const LexerData emptyLexData;
+const std::unordered_map<int, std::string> emptyUnorderedMap;
 const std::map<int, std::string> emptyIntStrVec;
 const std::string emptyString;
 const std::vector<std::string> emptyStringVector;
@@ -85,7 +86,7 @@ CLexStyles& CLexStyles::Instance()
 void CLexStyles::ParseStyle(
     LPCWSTR styleName,
     LPCWSTR styleString,
-    const std::map<std::wstring, std::wstring>& variables,
+    const std::unordered_map<std::wstring, std::wstring>& variables,
     StyleData& style
     ) const
 {
@@ -170,8 +171,7 @@ void CLexStyles::Load()
             {
                 inis[0].LoadFile(lpResLock, dwSizeRes);
 
-                std::map<std::wstring, std::wstring> variables;
-                std::wstring key;
+                std::unordered_map<std::wstring, std::wstring> variables;
                 for (const auto& ini : inis)
                 {
                     CSimpleIni::TNamesDepend lexvars;
@@ -180,7 +180,7 @@ void CLexStyles::Load()
                     {
                         APPVERIFY(*l != L'\0');
                         std::wstring v = ini.GetValue(L"variables", l);
-                        key = L"$(";
+                        std::wstring key = L"$(";
                         key += l;
                         key += L")";
                         variables[std::move(key)] = std::move(v);
@@ -244,7 +244,7 @@ void CLexStyles::Load()
                                 std::string n = CUnicodeUtils::StdGetUTF8(it+5);
                                 std::string vl = CUnicodeUtils::StdGetUTF8(ini.GetValue(l.second.c_str(), it, L""));
                                 lexerdata.Properties[n] = vl;
-                                userlexerdata.Properties[n] = std::move(vl);
+                                userlexerdata.Properties[std::move(n)] = std::move(vl);
                             }
                         }
                         m_lexerdata[lexerdata.ID] = std::move(lexerdata);
@@ -257,7 +257,7 @@ void CLexStyles::Load()
                 {
                     CSimpleIni::TNamesDepend filelangkeys;
                     ini.GetAllKeys(L"filelanguage", filelangkeys);
-                    for (const auto& k : filelangkeys)
+                    for (const auto& filelangkey : filelangkeys)
                     {
                         auto utf8filelangkey = CUnicodeUtils::StdGetUTF8(filelangkey);
                         std::wstring v = ini.GetValue(L"filelanguage", filelangkey);
@@ -287,9 +287,9 @@ void CLexStyles::Load()
                     {
                         CSimpleIni::TNamesDepend autopathkeys;
                         ini.GetAllKeys(L"pathlanguage", autopathkeys);
-                        for (const auto& k : autopathkeys)
+                        for (const auto& apppathkey : autopathkeys)
                         {
-                            std::wstring v = ini.GetValue(L"pathlanguage", k);
+                            std::wstring v = ini.GetValue(L"pathlanguage", apppathkey);
                             auto f = v.find(L"*");
                             if (f != std::wstring::npos)
                             {
@@ -396,7 +396,7 @@ void CLexStyles::Load()
     m_bLoaded = true;
 }
 
-const std::map<int, std::string>& CLexStyles::GetKeywordsForLang( const std::string& lang )
+const std::unordered_map<int, std::string>& CLexStyles::GetKeywordsForLang( const std::string& lang )
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
@@ -405,10 +405,10 @@ const std::map<int, std::string>& CLexStyles::GetKeywordsForLang( const std::str
         return lt->second.keywordlist;
     }
 
-    return emptyIntStrVec;
+    return emptyUnorderedMap;
 }
 
-const std::map<int, std::string>& CLexStyles::GetKeywordsForLexer(int lexer)
+const std::unordered_map<int, std::string>& CLexStyles::GetKeywordsForLexer(int lexer)
 {
     for (auto it = m_Langdata.begin(); it != m_Langdata.end(); ++it)
     {
@@ -419,7 +419,7 @@ const std::map<int, std::string>& CLexStyles::GetKeywordsForLexer(int lexer)
         }
     }
 
-    return emptyIntStrVec;
+    return emptyUnorderedMap;
 }
 
 LanguageData * CLexStyles::GetLanguageData(const std::string& lang)
@@ -452,7 +452,7 @@ void CLexStyles::GenerateUserKeywords(LanguageData& ld)
 {
     if (!ld.userkeywordsupdated)
         return;
-    if (ld.userfunctions && !ld.userkeywords.empty())
+    if (ld.userfunctions)
     {
         std::string keywords;
         for (const auto& w : ld.userkeywords)
@@ -583,7 +583,7 @@ std::vector<std::wstring> CLexStyles::GetLanguages() const
     return langs;
 }
 
-void CLexStyles::ReplaceVariables( std::wstring& s, const std::map<std::wstring, std::wstring>& vars ) const
+void CLexStyles::ReplaceVariables( std::wstring& s, const std::unordered_map<std::wstring, std::wstring>& vars ) const
 {
     size_t pos = s.find(L"$(");
     while (pos != std::wstring::npos)
