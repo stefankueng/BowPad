@@ -19,13 +19,11 @@
 #include "BowPad.h"
 #include "SysInfo.h"
 #include "AppUtils.h"
-#include "CommandHandler.h"
-
-extern IUIFramework *g_pFramework;  // Reference to the Ribbon framework.
 
 CTheme::CTheme()
     : m_bLoaded(false)
     , m_dark(false)
+    , m_lastThemeChangeCallbackId(0)
 {
 }
 
@@ -235,92 +233,19 @@ COLORREF CTheme::GetThemeColor( COLORREF clr ) const
     return clr;
 }
 
-void CTheme::SetRibbonColors( COLORREF text, COLORREF background, COLORREF highlight )
+int CTheme::RegisterThemeChangeCallback(ThemeChangeCallback&& cb)
 {
-    IPropertyStorePtr spPropertyStore;
-
-    // g_pFramework is a pointer to the IUIFramework interface that is assigned
-    // when the Ribbon is initialized.
-    if (SUCCEEDED(g_pFramework->QueryInterface(&spPropertyStore)))
-    {
-        PROPVARIANT propvarBackground;
-        PROPVARIANT propvarHighlight;
-        PROPVARIANT propvarText;
-
-        // UI_HSBCOLOR is a type defined in UIRibbon.h that is composed of
-        // three component values: hue, saturation and brightness, respectively.
-        BYTE h, s, b;
-        RGBToHSB(text, h, s, b);
-        UI_HSBCOLOR TextColor = UI_HSB(h, s, b);
-        RGBToHSB(background, h, s, b);
-        UI_HSBCOLOR BackgroundColor = UI_HSB(h, s, b);
-        RGBToHSB(highlight, h, s, b);
-        UI_HSBCOLOR HighlightColor = UI_HSB(h, s, b);
-
-        InitPropVariantFromUInt32(BackgroundColor, &propvarBackground);
-        InitPropVariantFromUInt32(HighlightColor, &propvarHighlight);
-        InitPropVariantFromUInt32(TextColor, &propvarText);
-
-        spPropertyStore->SetValue(UI_PKEY_GlobalBackgroundColor, propvarBackground);
-        spPropertyStore->SetValue(UI_PKEY_GlobalHighlightColor, propvarHighlight);
-        spPropertyStore->SetValue(UI_PKEY_GlobalTextColor, propvarText);
-
-        spPropertyStore->Commit();
-    }
-}
-
-void CTheme::SetRibbonColorsHSB( UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight )
-{
-    IPropertyStorePtr spPropertyStore;
-
-    APPVERIFY(g_pFramework != nullptr);
-    // g_pFramework is a pointer to the IUIFramework interface that is assigned
-    // when the Ribbon is initialized.
-    HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
-    if (SUCCEEDED(hr))
-    {
-        PROPVARIANT propvarBackground;
-        PROPVARIANT propvarHighlight;
-        PROPVARIANT propvarText;
-
-        InitPropVariantFromUInt32(background, &propvarBackground);
-        InitPropVariantFromUInt32(highlight, &propvarHighlight);
-        InitPropVariantFromUInt32(text, &propvarText);
-
-        spPropertyStore->SetValue(UI_PKEY_GlobalBackgroundColor, propvarBackground);
-        spPropertyStore->SetValue(UI_PKEY_GlobalHighlightColor, propvarHighlight);
-        spPropertyStore->SetValue(UI_PKEY_GlobalTextColor, propvarText);
-
-        spPropertyStore->Commit();
-    }
-}
-
-void CTheme::GetRibbonColors( UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight ) const
-{
-    IPropertyStorePtr spPropertyStore;
-
-    // g_pFramework is a pointer to the IUIFramework interface that is assigned
-    // when the Ribbon is initialized.
-    HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
-    if (SUCCEEDED(hr))
-    {
-        PROPVARIANT propvarBackground;
-        PROPVARIANT propvarHighlight;
-        PROPVARIANT propvarText;
-
-        spPropertyStore->GetValue(UI_PKEY_GlobalBackgroundColor, &propvarBackground);
-        spPropertyStore->GetValue(UI_PKEY_GlobalHighlightColor, &propvarHighlight);
-        spPropertyStore->GetValue(UI_PKEY_GlobalTextColor, &propvarText);
-
-        text = propvarText.uintVal;
-        background = propvarBackground.uintVal;
-        highlight = propvarHighlight.uintVal;
-    }
+    ++m_lastThemeChangeCallbackId;
+    int nextThemeCallBackId = m_lastThemeChangeCallbackId;
+    m_themeChangeCallbacks.emplace(nextThemeCallBackId, std::move(cb));
+    return nextThemeCallBackId;
 }
 
 void CTheme::SetDarkTheme(bool b /*= true*/)
 {
     m_dark = b;
-    CCommandHandler::Instance().OnThemeChanged(m_dark);
+    CIniSettings::Instance().SetInt64(L"View", L"darktheme", b ? 1 : 0);
+    for (auto& cb : m_themeChangeCallbacks)
+        cb.second();
 }
 
