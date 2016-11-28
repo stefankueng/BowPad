@@ -24,21 +24,16 @@
 
 CCmdToggleTheme::CCmdToggleTheme(void * obj)
     : ICommand(obj)
-    , text(0)
-    , back(0)
-    , high(0)
 {
-    CTheme::Instance().GetRibbonColors(text, back, high);
     int dark = (int)CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0);
     if (dark)
     {
         CTheme::Instance().SetDarkTheme(dark != 0);
-        CTheme::Instance().SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
     }
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-CCmdToggleTheme::~CCmdToggleTheme(void)
+CCmdToggleTheme::~CCmdToggleTheme()
 {
 }
 
@@ -47,23 +42,8 @@ bool CCmdToggleTheme::Execute()
     if (!HasActiveDocument())
         return false;
     CTheme::Instance().SetDarkTheme(!CTheme::Instance().IsDarkTheme());
-    CDocument doc = GetActiveDocument();
-    SetupLexerForLang(doc.m_language);
-    if (CTheme::Instance().IsDarkTheme())
-    {
-        CTheme::Instance().SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
-    }
-    else
-        CTheme::Instance().SetRibbonColorsHSB(text, back, high);
-
-    CIniSettings::Instance().SetInt64(L"View", L"darktheme", CTheme::Instance().IsDarkTheme() ? 1 : 0);
-
-    ScintillaCall(SCI_CLEARDOCUMENTSTYLE);
-    ScintillaCall(SCI_COLOURISE, 0, -1);
-    TabActivateAt(GetActiveTabIndex());
 
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    RedrawWindow(GetHwnd(), nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
     return true;
 }
 
@@ -87,7 +67,7 @@ bool CCmdConfigShortcuts::Execute()
             HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
             if (hResourceLoaded)
             {
-                const char* lpResLock = (const char *)LockResource(hResourceLoaded);
+                const char* lpResLock = (const char *) LockResource(hResourceLoaded);
                 if (lpResLock)
                 {
                     const char* lpStart = strstr(lpResLock, "#--");
@@ -100,7 +80,7 @@ bool CCmdConfigShortcuts::Execute()
                             if (hFile != INVALID_HANDLE_VALUE)
                             {
                                 DWORD dwWritten = 0;
-                                WriteFile(hFile, lpStart, (DWORD)(lpEnd - lpStart), &dwWritten, NULL);
+                                WriteFile(hFile, lpStart, (DWORD)(lpEnd - lpStart), &dwWritten, nullptr);
                                 CloseHandle(hFile);
                             }
                         }
@@ -118,7 +98,7 @@ CCmdAutoBraces::CCmdAutoBraces(void * obj) : ICommand(obj)
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-CCmdAutoBraces::~CCmdAutoBraces(void)
+CCmdAutoBraces::~CCmdAutoBraces()
 {
 }
 
@@ -143,7 +123,7 @@ CCmdViewFileTree::CCmdViewFileTree(void * obj) : ICommand(obj)
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-CCmdViewFileTree::~CCmdViewFileTree(void)
+CCmdViewFileTree::~CCmdViewFileTree()
 {
 }
 
