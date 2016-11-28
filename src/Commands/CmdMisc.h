@@ -96,9 +96,6 @@ public:
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
 private:
-    UI_HSBCOLOR text;
-    UI_HSBCOLOR back;
-    UI_HSBCOLOR high;
 };
 
 class CCmdConfigShortcuts : public ICommand
