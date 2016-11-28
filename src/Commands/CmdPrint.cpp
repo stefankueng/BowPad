@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015 - Stefan Kueng
+// Copyright (C) 2013, 2015-2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -56,20 +56,12 @@ void CCmdPrint::Print( bool bShowDlg )
         return;
 
     // set the theme to normal
-    bool origTheme = CTheme::Instance().IsDarkTheme();
-    CTheme::Instance().SetDarkTheme(false);
-    CDocument doc = GetActiveDocument();
-    SetupLexerForLang(doc.m_language);
-    ScintillaCall(SCI_CLEARDOCUMENTSTYLE);
-    ScintillaCall(SCI_COLOURISE, 0, -1);
-    TabActivateAt(GetActiveTabIndex());
+    bool dark = CTheme::Instance().IsDarkTheme();
+    if (dark)
+        CTheme::Instance().SetDarkTheme(false);
     OnOutOfScope(
-        CTheme::Instance().SetDarkTheme(origTheme);
-        CDocument doc = GetActiveDocument();
-        SetupLexerForLang(doc.m_language);
-        ScintillaCall(SCI_CLEARDOCUMENTSTYLE);
-        ScintillaCall(SCI_COLOURISE, 0, -1);
-        TabActivateAt(GetActiveTabIndex());
+        if (dark)
+            CTheme::Instance().SetDarkTheme(dark);
         );
 
     // reset all indicators
