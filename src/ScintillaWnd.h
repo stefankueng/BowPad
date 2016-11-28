@@ -84,7 +84,7 @@ public :
     void UpdateLineNumberWidth();
     void SaveCurrentPos(CPosData& pos);
     void RestoreCurrentPos(const CPosData& pos);
-    void SetupLexerForLang(const std::wstring& lang);
+    void SetupLexerForLang(const std::string& lang);
     void MarginClick(Scintilla::SCNotification * pNotification);
     void MarkSelectedWord(bool clear);
     void MatchBraces(BraceMatch what);

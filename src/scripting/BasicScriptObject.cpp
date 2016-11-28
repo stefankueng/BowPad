@@ -1100,7 +1100,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
                 return DISP_E_BADPARAMCOUNT;
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
                 return DISP_E_TYPEMISMATCH;
-            SetupLexerForLang(p1.bstrVal);
+            SetupLexerForLang(CUnicodeUtils::StdGetUTF8(p1.bstrVal));
             break;
         case 119: // DocScrollClear
             if (args->cArgs != 1)

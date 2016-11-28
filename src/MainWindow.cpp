@@ -1568,7 +1568,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
         int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
         APPVERIFY(ToEOLMode(doc.m_format) == eolMode);
         auto eolDesc = GetEOLFormatDescription(doc.m_format);
-        m_StatusBar.SetText(doc.m_language.c_str(), nullptr, STATUSBAR_DOC_TYPE);
+        m_StatusBar.SetText(CUnicodeUtils::StdGetUnicode(doc.m_language.c_str()).c_str(), nullptr, STATUSBAR_DOC_TYPE);
         auto tteof = CStringUtils::Format(rsStatusTTEOF, eolDesc.c_str());
         m_StatusBar.SetText(eolDesc.c_str(), tteof.c_str(), STATUSBAR_EOL_FORMAT);
         auto ttencoding = CStringUtils::Format(rsStatusTTEncoding, doc.GetEncodingString().c_str());
@@ -2521,7 +2521,7 @@ void CMainWindow::OpenNewTab()
     doc.m_document = m_editor.Call(SCI_CREATEDOCUMENT);
     doc.m_bHasBOM = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
     doc.m_encoding = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
-    doc.m_language = L"Text";
+    doc.m_language = "Text";
     std::wstring tabName = GetNewTabName();
     int index = -1;
     if (m_insertionIndex >= 0)
@@ -2675,9 +2675,9 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         doc.m_bNeedsSaving = true;
         doc.m_bDoSaveAs = true;
         doc.m_path = file;
-        std::wstring lang = CLexStyles::Instance().GetLanguageForPath(fileName);
+        auto lang = CLexStyles::Instance().GetLanguageForPath(fileName);
         if (lang.empty())
-            lang = L"Text";
+            lang = "Text";
         doc.m_language = lang;
         index = m_TabBar.InsertAtEnd(fileName.c_str());
         int docID = m_TabBar.GetIDFromIndex(index);
@@ -2686,7 +2686,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         UpdateStatusBar(true);
         m_TabBar.ActivateAt(index);
         m_editor.GotoLine(0);
-        CCommandHandler::Instance().OnDocumentOpen(index);
+        CCommandHandler::Instance().OnDocumentOpen(index, docID);
 
         return index;
     }

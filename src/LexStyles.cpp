@@ -35,19 +35,23 @@ static constexpr COLORREF fgColor = RGB(0, 0, 0);
 static constexpr COLORREF bgColor = RGB(255, 255, 255);
 };
 
-static constexpr std::pair<const wchar_t*const, const char*const> lexDetectStrings[] = {
+static constexpr struct
+{
+    const char*const lang;
+    const char*const firstLine;
+} lexDetectStrings[] = {
     // a '+' in front of the lexer name means the string can appear anywhere in the
     // first line of the document.
     // a '-' in front of the lexer name means the string must appear
     // at the beginning of the first line of the document
-    { L"+C/C++", "*- C++ -*" },
-    { L"-Xml", "<?xml" },
-    { L"-Bash", "<?php" },
-    { L"-Bash", "#!/bin/sh" },
-    { L"-Bash", "#!/bin/bash" },
-    { L"-Bash", "#! /bin/bash" },
-    { L"-Html", "<html>" },
-    { L"-Html", "<!DOCTYPE html>" }
+    { "+C/C++", "*- C++ -*" },
+    { "-Xml", "<?xml" },
+    { "-Bash", "<?php" },
+    { "-Bash", "#!/bin/sh" },
+    { "-Bash", "#!/bin/bash" },
+    { "-Bash", "#! /bin/bash" },
+    { "-Html", "<html>" },
+    { "-Html", "<!DOCTYPE html>" }
 };
 
 StyleData::StyleData()
@@ -255,26 +259,28 @@ void CLexStyles::Load()
                     ini.GetAllKeys(L"filelanguage", filelangkeys);
                     for (const auto& k : filelangkeys)
                     {
-                        std::wstring v = ini.GetValue(L"filelanguage", k);
+                        auto utf8filelangkey = CUnicodeUtils::StdGetUTF8(filelangkey);
+                        std::wstring v = ini.GetValue(L"filelanguage", filelangkey);
                         ReplaceVariables(v, variables);
                         std::vector<std::wstring> files;
                         stringtok(files, v, true, L";");
                         for (const auto& f : files)
                         {
-                            m_fileLang[CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(f))] = CUnicodeUtils::StdGetUTF8(k);
+                            m_fileLang[CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(f))] = utf8filelangkey;
                         }
                     }
                     CSimpleIni::TNamesDepend autolangkeys;
                     ini.GetAllKeys(L"autolanguage", autolangkeys);
-                    for (const auto& k : autolangkeys)
+                    for (const auto& autolangkey : autolangkeys)
                     {
-                        std::wstring v = ini.GetValue(L"autolanguage", k);
+                        auto utf8autolangkey = CUnicodeUtils::StdGetUTF8(autolangkey);
+                        std::wstring v = ini.GetValue(L"autolanguage", autolangkey);
                         ReplaceVariables(v, variables);
                         std::vector<std::wstring> exts;
                         stringtok(exts, v, true, L";");
                         for (const auto& e : exts)
                         {
-                            m_autoextLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
+                            m_autoextLang[CUnicodeUtils::StdGetUTF8(e)] = utf8autolangkey;
                         }
                     }
                     if (&ini == &inis[1])
@@ -296,29 +302,31 @@ void CLexStyles::Load()
 
                     CSimpleIni::TNamesDepend langkeys;
                     ini.GetAllKeys(L"language", langkeys);
-                    for (const auto& k : langkeys)
+                    for (const auto& langkey : langkeys)
                     {
-                        std::wstring v = ini.GetValue(L"language", k);
+                        auto utf8langkey = CUnicodeUtils::StdGetUTF8(langkey);
+                        auto& langdata = m_Langdata[utf8langkey];
+                        std::wstring v = ini.GetValue(L"language", langkey);
                         ReplaceVariables(v, variables);
                         std::vector<std::wstring> exts;
                         stringtok(exts, v, true, L";");
                         for (const auto& e : exts)
                         {
-                            m_extLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
+                            m_extLang[CUnicodeUtils::StdGetUTF8(e)] = utf8langkey;
                             if (&ini == &inis[1])
-                                m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = CUnicodeUtils::StdGetUTF8(k);
+                                m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = utf8langkey;
                         }
 
                         std::wstring langsect = L"lang_";
-                        langsect += k;
+                        langsect += langkey;
                         CSimpleIni::TNamesDepend specLangKeys;
                         ini.GetAllKeys(langsect.c_str(), specLangKeys);
                         LanguageData ld;
                         if (&ini != &inis[0])
                         {
-                            ld = m_Langdata[CUnicodeUtils::StdGetUTF8(k)];
+                            ld = langdata;
                         }
-                        ld.lexer = lexers[k];
+                        ld.lexer = lexers[langkey];
                         for (const auto& sk : specLangKeys)
                         {
                             if (_wcsnicmp(L"keywords", sk, 8) == 0)
@@ -378,7 +386,7 @@ void CLexStyles::Load()
                                     APPVERIFY(false);
                             }
                         }
-                        m_Langdata[CUnicodeUtils::StdGetUTF8(k)] = std::move(ld);
+                        langdata = std::move(ld);
                     }
                 }
             }
@@ -477,7 +485,7 @@ const LexerData& CLexStyles::GetLexerDataForLexer(int lexer)
     return emptyLexData;
 }
 
-std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
+std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
 {
     std::wstring lpath = CStringUtils::to_lower(path);
 
@@ -494,33 +502,33 @@ std::wstring CLexStyles::GetLanguageForPath(const std::wstring& path)
                 break;
             }
         }
-        return CUnicodeUtils::StdGetUnicode(it->second);
+        return it->second;
     }
 
     auto fit = m_fileLang.find(CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(lpath)));
     if (fit != m_fileLang.end())
     {
-        return CUnicodeUtils::StdGetUnicode(fit->second);
+        return fit->second;
     }
     auto ext = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(lpath));
     auto eit = m_extLang.find(ext);
     if (eit != m_extLang.end())
     {
-        return CUnicodeUtils::StdGetUnicode(eit->second);
+        return eit->second;
     }
 
     auto ait = m_autoextLang.find(ext);
     if (ait != m_autoextLang.end())
     {
-        return CUnicodeUtils::StdGetUnicode(ait->second);
+        return ait->second;
     }
-    return L"";
+    return "";
 }
 
-std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit)
+std::string CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit)
 {
     if (doc.m_path.empty())
-        return L"";
+        return "";
     auto lang = GetLanguageForPath(doc.m_path);
     if (!lang.empty()/* && lang.compare(L"Text")*/)
         return lang;
@@ -535,14 +543,13 @@ std::wstring CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintilla
     );
 
     std::string line = edit.GetLine(0);
-    const size_t n = std::size(lexDetectStrings);
     for (const auto& m : lexDetectStrings)
     {
-        auto foundpos = line.find(m.second);
-        if (((m.first[0] == '-') && (foundpos == 0)) ||
-            ((m.first[0] == '+') && (foundpos != std::string::npos)))
+        auto foundpos = line.find(m.firstLine);
+        if (((m.lang[0] == '-') && (foundpos == 0)) ||
+            ((m.lang[0] == '+') && (foundpos != std::string::npos)))
         {
-            lang = &m.first[1];
+            lang = &m.lang[1];
             break;
         }
     }
@@ -720,15 +727,14 @@ void CLexStyles::SaveUserData()
     ResetUserData();
 }
 
-void CLexStyles::SetUserExt( const std::wstring& ext, const std::wstring& lang )
+void CLexStyles::SetUserExt( const std::wstring& ext, const std::string& lang )
 {
-    std::string alang = CUnicodeUtils::StdGetUTF8(lang);
     auto iter = m_userextLang.begin();
     auto endIter = m_userextLang.end();
     for (; iter != endIter;)
     {
-        if (iter->second.compare(alang) == 0)
-            m_userextLang.erase(iter++);
+        if (iter->second.compare(lang) == 0)
+            iter = m_userextLang.erase(iter);
         else
             ++iter;
     }
@@ -736,7 +742,7 @@ void CLexStyles::SetUserExt( const std::wstring& ext, const std::wstring& lang )
     stringtok(exts, ext, true, L"; ,");
     for (const auto& e : exts)
     {
-        m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = alang;
+        m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = lang;
     }
 }
 
@@ -796,9 +802,9 @@ const std::vector<std::string>& CLexStyles::GetFunctionRegexTrimForLang( const s
     return emptyStringVector;
 }
 
-void CLexStyles::SetLangForPath(const std::wstring& path, const std::wstring& language)
+void CLexStyles::SetLangForPath(const std::wstring& path, const std::string& language)
 {
-    std::wstring lang = GetLanguageForPath(path);
+    std::string lang = GetLanguageForPath(path);
     // there's nothing to do if the language is already set for that path
     if (lang.compare(language))
     {
@@ -813,7 +819,7 @@ void CLexStyles::SetLangForPath(const std::wstring& path, const std::wstring& la
             {
                 // set user selected language as the default for this extension
                 m_autoextLang.erase(e);
-                m_autoextLang[e] = CUnicodeUtils::StdGetUTF8(language);
+                m_autoextLang[e] = language;
                 SaveUserData();
                 return;
             }
@@ -821,12 +827,11 @@ void CLexStyles::SetLangForPath(const std::wstring& path, const std::wstring& la
                 m_autoextLang.erase(e);
         }
         // store the full path and the language
-        std::wstring lpath = CStringUtils::to_lower(path);
-        m_pathsLang[lpath] = CUnicodeUtils::StdGetUTF8(language);
+        auto lpath = CStringUtils::to_lower(path);
+        m_pathsLang[lpath] = language;
         m_pathsForLang.push_front(std::move(lpath));
         while (m_pathsForLang.size() > 100)
             m_pathsForLang.pop_back();
         SaveUserData();
     }
 }
-
