@@ -477,7 +477,7 @@ const LexerData& CLexStyles::GetLexerDataForLang( const std::string& lang ) cons
     return emptyLexData;
 }
 
-const LexerData& CLexStyles::GetLexerDataForLexer(int lexer)
+const LexerData& CLexStyles::GetLexerDataForLexer(int lexer) const
 {
     auto ld = m_lexerdata.find(lexer);
     if (ld != m_lexerdata.end())

@@ -104,7 +104,7 @@ public:
     const std::vector<std::string>&     GetFunctionRegexTrimForLang(const std::string& lang) const;
 
     const LexerData&                    GetLexerDataForLang(const std::string& lang) const;
-    const LexerData&                    GetLexerDataForLexer(int lexer);
+    const LexerData&                    GetLexerDataForLexer(int lexer) const;
 
     void                                SetLangForPath(const std::wstring& path, const std::string& language);
 
