@@ -616,7 +616,7 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
     SetupLexer(lexerdata, langdata);
 }
 
-void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::map<int, std::string>& langdata )
+void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::unordered_map<int, std::string>& langdata )
 {
     const auto& theme = CTheme::Instance();
     Call(SCI_STYLECLEARALL);
@@ -2066,7 +2066,7 @@ std::string CScintillaWnd::GetTextRange(long startpos, long endpos) const
     rangestart.chrg.cpMax = endpos;
     rangestart.lpstrText = strbuf.get();
     ConstCall(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
-    return rangestart.lpstrText;
+    return strbuf.get();
 }
 
 std::string CScintillaWnd::GetSelectedText(bool useCurrentWordIfSelectionEmpty) const
