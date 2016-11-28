@@ -384,10 +384,6 @@ bool CDocumentManager::HasDocumentID(int id) const
 // Must exist or it's a bug.
 CDocument CDocumentManager::GetDocumentFromID(int id) const
 {
-    // Pretty catastrophic if this ever fails.
-    // Use HasDocumentID to check first if you're not sure.
-    if (id < 0)
-        APPVERIFY(false);
     auto pos = m_documents.find(id);
     if (pos == std::end(m_documents))
     {
@@ -399,20 +395,17 @@ CDocument CDocumentManager::GetDocumentFromID(int id) const
 
 void CDocumentManager::SetDocument(int id, const CDocument& doc)
 {
-    APPVERIFY(id >= 0);
     auto where = m_documents.find(id);
-    // SetDocument/Find does not create a position if it doesn't exist.
-    // Use Operator [] for that or really AddDocumentAtEnd etc. to add.
-    if (where == std::end(m_documents))
+    if (where != std::end(m_documents))
     {
-        // Should never happen but if it does, it's a serious bug
-        // because we are throwing data away.
-        // Ideally we want to notify the user about this but their
-        // is no consensus to do that.
-        APPVERIFY(false);
-        return; // Return now to avoid overwriting memory.
+        where->second = doc;
+        return;
     }
-    where->second = doc;
+    // Should never happen but if it does, it's a serious bug
+    // because we are throwing data away.
+    // Ideally we want to notify the user about this but their
+    // is no consensus to do that.
+    APPVERIFY(false);
 }
 
 void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, int id )
@@ -522,8 +515,10 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         else
             lenFile += incompleteMultibyteChar;
 
-        if ((!encodingset)||(inconclusive && encoding == CP_ACP))
+        if ((!encodingset) || (inconclusive && encoding == CP_ACP))
+        {
             encoding = GetCodepageFromBuf(data, lenFile, doc.m_bHasBOM, inconclusive);
+        }
         encodingset = true;
 
         doc.m_encoding = encoding;
