@@ -180,6 +180,10 @@ private:
     void                        ShowProgressCtrl(UINT delay);
     void                        HideProgressCtrl();
     void                        SetProgress(DWORD32 pos, DWORD32 end);
+    void                        SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight);
+    void                        SetRibbonColorsHSB(UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight);
+    void                        GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight) const;
+    void                        SetTheme(bool theme);
 
 private:
     LONG                        m_cRef;
@@ -219,4 +223,7 @@ private:
     std::map<std::wstring, int> m_foldercolorindexes;
     int                         m_lastfoldercolorindex;
     int                         m_blockCount;
+    UI_HSBCOLOR                 m_normalThemeText;
+    UI_HSBCOLOR                 m_normalThemeBack;
+    UI_HSBCOLOR                 m_normalThemeHigh;
 };

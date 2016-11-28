@@ -1163,6 +1163,13 @@ bool CMainWindow::Initialize()
     if (!CreateRibbon())
         return false;
 
+    GetRibbonColors(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
+    CTheme::Instance().RegisterThemeChangeCallback(
+        [this]()
+    {
+        SetTheme(CTheme::Instance().IsDarkTheme());
+    });
+
     CCommandHandler::Instance().Init(this);
     CKeyboardShortcutHandler::Instance().UpdateTooltips(true);
     AddClipboardFormatListener(*this);
@@ -3572,4 +3579,113 @@ void CMainWindow::SetFileTreeWidth(int width)
     RECT rc;
     GetClientRect(*this, &rc);
     m_treeWidth = min(m_treeWidth, rc.right - rc.left - 200);
+}
+
+void CMainWindow::SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight)
+{
+    IPropertyStorePtr spPropertyStore;
+
+    // g_pFramework is a pointer to the IUIFramework interface that is assigned
+    // when the Ribbon is initialized.
+    if (SUCCEEDED(g_pFramework->QueryInterface(&spPropertyStore)))
+    {
+        PROPVARIANT propvarBackground;
+        PROPVARIANT propvarHighlight;
+        PROPVARIANT propvarText;
+
+        // UI_HSBCOLOR is a type defined in UIRibbon.h that is composed of
+        // three component values: hue, saturation and brightness, respectively.
+        BYTE h, s, b;
+        CTheme::RGBToHSB(text, h, s, b);
+        UI_HSBCOLOR TextColor = UI_HSB(h, s, b);
+        CTheme::RGBToHSB(background, h, s, b);
+        UI_HSBCOLOR BackgroundColor = UI_HSB(h, s, b);
+        CTheme::RGBToHSB(highlight, h, s, b);
+        UI_HSBCOLOR HighlightColor = UI_HSB(h, s, b);
+
+        InitPropVariantFromUInt32(BackgroundColor, &propvarBackground);
+        InitPropVariantFromUInt32(HighlightColor, &propvarHighlight);
+        InitPropVariantFromUInt32(TextColor, &propvarText);
+
+        spPropertyStore->SetValue(UI_PKEY_GlobalBackgroundColor, propvarBackground);
+        spPropertyStore->SetValue(UI_PKEY_GlobalHighlightColor, propvarHighlight);
+        spPropertyStore->SetValue(UI_PKEY_GlobalTextColor, propvarText);
+
+        spPropertyStore->Commit();
+    }
+}
+
+void CMainWindow::SetRibbonColorsHSB(UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight)
+{
+    IPropertyStorePtr spPropertyStore;
+
+    APPVERIFY(g_pFramework != nullptr);
+    // g_pFramework is a pointer to the IUIFramework interface that is assigned
+    // when the Ribbon is initialized.
+    HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
+    if (SUCCEEDED(hr))
+    {
+        PROPVARIANT propvarBackground;
+        PROPVARIANT propvarHighlight;
+        PROPVARIANT propvarText;
+
+        InitPropVariantFromUInt32(background, &propvarBackground);
+        InitPropVariantFromUInt32(highlight, &propvarHighlight);
+        InitPropVariantFromUInt32(text, &propvarText);
+
+        spPropertyStore->SetValue(UI_PKEY_GlobalBackgroundColor, propvarBackground);
+        spPropertyStore->SetValue(UI_PKEY_GlobalHighlightColor, propvarHighlight);
+        spPropertyStore->SetValue(UI_PKEY_GlobalTextColor, propvarText);
+
+        spPropertyStore->Commit();
+    }
+}
+
+void CMainWindow::GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight) const
+{
+    IPropertyStorePtr spPropertyStore;
+
+    // g_pFramework is a pointer to the IUIFramework interface that is assigned
+    // when the Ribbon is initialized.
+    HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
+    if (SUCCEEDED(hr))
+    {
+        PROPVARIANT propvarBackground;
+        PROPVARIANT propvarHighlight;
+        PROPVARIANT propvarText;
+
+        spPropertyStore->GetValue(UI_PKEY_GlobalBackgroundColor, &propvarBackground);
+        spPropertyStore->GetValue(UI_PKEY_GlobalHighlightColor, &propvarHighlight);
+        spPropertyStore->GetValue(UI_PKEY_GlobalTextColor, &propvarText);
+
+        text = propvarText.uintVal;
+        background = propvarBackground.uintVal;
+        highlight = propvarHighlight.uintVal;
+    }
+}
+
+// Implementation helper only,
+// use CTheme::Instance::SetDarkTheme to actually set the theme.
+
+void CMainWindow::SetTheme(bool dark)
+{
+    if (dark)
+    {
+        SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
+    }
+    else
+    {
+        SetRibbonColorsHSB(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
+    }
+    int activeTabId = m_TabBar.GetCurrentTabId();
+    if (activeTabId >= 0)
+    {
+        m_editor.Call(SCI_CLEARDOCUMENTSTYLE);
+        m_editor.Call(SCI_COLOURISE, 0, -1);
+        CDocument doc = m_DocManager.GetDocumentFromID(activeTabId);
+        m_editor.SetupLexerForLang(doc.m_language);
+        RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
+    }
+
+    CCommandHandler::Instance().OnThemeChanged(dark);
 }
