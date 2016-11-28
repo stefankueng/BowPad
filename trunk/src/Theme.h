@@ -17,8 +17,9 @@
 #pragma once
 #include <string>
 #include <unordered_map>
-#include <UIRibbon.h>
-#include <UIRibbonPropertyHelpers.h>
+#include <functional>
+
+using ThemeChangeCallback = std::function<void(void)>;
 
 class CTheme
 {
@@ -29,23 +30,23 @@ private:
 public:
     static CTheme& Instance();
 
-    void                            SetDarkTheme(bool b = true);
-    bool                            IsDarkTheme() const { return m_dark; }
-    COLORREF                        GetThemeColor(COLORREF clr) const;
+    void                                            SetDarkTheme(bool b = true);
+    bool                                            IsDarkTheme() const { return m_dark; }
+    COLORREF                                        GetThemeColor(COLORREF clr) const;
 
-    void                            SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight);
-    void                            SetRibbonColorsHSB(UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight);
-    void                            GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight) const;
+    static void                                     RGBToHSB(COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightness);
+    static void                                     RGBtoHSL(COLORREF color, float& h, float& s, float& l);
+    static COLORREF                                 HSLtoRGB(float h, float s, float l);
 
-    static void                     RGBToHSB(COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightness);
-    static void                     RGBtoHSL(COLORREF color, float& h, float& s, float& l);
-    static COLORREF                 HSLtoRGB(float h, float s, float l);
+    int                                             RegisterThemeChangeCallback(ThemeChangeCallback&& cb);
 
 private:
-    void                            Load();
+    void                                            Load();
 
 private:
-    bool                            m_bLoaded;
-    std::unordered_map<COLORREF, COLORREF>    m_colorMap;
-    bool                            m_dark;
+    bool                                            m_bLoaded;
+    std::unordered_map<COLORREF, COLORREF>          m_colorMap;
+    bool                                            m_dark;
+    std::unordered_map<int, ThemeChangeCallback>    m_themeChangeCallbacks;
+    int                                             m_lastThemeChangeCallbackId;
 };
