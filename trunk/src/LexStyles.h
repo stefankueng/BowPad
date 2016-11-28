@@ -21,6 +21,8 @@
 #include <string>
 #include <map>
 #include <set>
+#include <unordered_set>
+#include <unordered_map>
 #include <vector>
 
 class LanguageData
@@ -35,7 +37,7 @@ public:
     }
 
     int                         lexer;
-    std::map<int, std::string>  keywordlist;
+    std::unordered_map<int, std::string> keywordlist;
     std::string                 commentline;
     bool                        commentlineatstart;
     std::string                 commentstreamstart;
@@ -44,7 +46,7 @@ public:
     std::vector<std::string>    functionregextrim;
     int                         functionregexsort;
     int                         userfunctions;
-    std::set<std::string>       userkeywords;
+    std::unordered_set<std::string> userkeywords;
     bool                        userkeywordsupdated = false;
 };
 
@@ -77,7 +79,7 @@ public:
         : ID(0)
     {}
     int                                 ID;
-    std::map<int, StyleData>            Styles;
+    std::unordered_map<int, StyleData>  Styles;
     std::map<std::string, std::string>  Properties;
 };
 
@@ -90,8 +92,8 @@ public:
     std::string                         GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
     std::wstring                        GetUserExtensionsForLanguage(const std::wstring& lang) const;
 
-    const std::map<int, std::string>&   GetKeywordsForLang(const std::string& lang);
-    const std::map<int, std::string>&   GetKeywordsForLexer(int lexer);
+    const std::unordered_map<int, std::string>&   GetKeywordsForLang(const std::string& lang);
+    const std::unordered_map<int, std::string>&   GetKeywordsForLexer(int lexer);
     LanguageData *                      GetLanguageData(const std::string & lang);
     const std::string&                  GetCommentLineForLang(const std::string& lang) const;
     const std::string&                  GetCommentStreamStartForLang(const std::string& lang) const;
@@ -123,11 +125,10 @@ private:
     ~CLexStyles();
 
     void                                Load();
-    void                                ReplaceVariables(std::wstring& s, const std::map<std::wstring, std::wstring>& vars) const;
-    void                                GenerateUserKeywords(LanguageData& ld);
+    void                                ReplaceVariables(std::wstring& s, const std::unordered_map<std::wstring, std::wstring>& vars) const;
     void                                ParseStyle(LPCWSTR styleName,
                                                    LPCWSTR styleString,
-                                                   const std::map<std::wstring, std::wstring>& variables,
+                                                   const std::unordered_map<std::wstring, std::wstring>& variables,
                                                    StyleData& style) const;
 private:
     bool                                m_bLoaded;
@@ -135,10 +136,10 @@ private:
     std::map<std::string, std::string>  m_extLang;
     std::map<std::string, std::string>  m_fileLang;
     std::map<std::string, LanguageData> m_Langdata;
-    std::map<int, LexerData>            m_lexerdata;
-    std::map<int, std::wstring>         m_lexerSection;
+    std::unordered_map<int, LexerData>  m_lexerdata;
+    std::unordered_map<int, std::wstring> m_lexerSection;
 
-    std::map<int, LexerData>            m_userlexerdata;
+    std::unordered_map<int, LexerData>  m_userlexerdata;
     std::map<std::string, std::string>  m_userextLang;
     std::map<std::string, std::string>  m_autoextLang;
     std::map<std::wstring, std::string> m_pathsLang;
