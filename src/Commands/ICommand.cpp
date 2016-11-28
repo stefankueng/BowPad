@@ -279,7 +279,7 @@ void ICommand::UpdateStatusBar( bool bEverything )
     pMainWnd->UpdateStatusBar(bEverything);
 }
 
-void ICommand::SetupLexerForLang( const std::wstring& lang )
+void ICommand::SetupLexerForLang( const std::string& lang )
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->m_editor.SetupLexerForLang(lang);

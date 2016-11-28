@@ -76,7 +76,7 @@ public:
     int                     m_encoding;
     std::wstring            m_path;
     FILETIME                m_lastWriteTime;
-    std::wstring            m_language;
+    std::string             m_language;
     CPosData                m_position;
     bool                    m_bIsDirty;
     bool                    m_bNeedsSaving;
