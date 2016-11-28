@@ -38,6 +38,7 @@
 #include "LexStyles.h"
 #include "OnOutOfScope.h"
 #include "ProgressDlg.h"
+#include "GDIHelpers.h"
 
 #include <memory>
 #include <cassert>
@@ -3596,11 +3597,11 @@ void CMainWindow::SetRibbonColors(COLORREF text, COLORREF background, COLORREF h
         // UI_HSBCOLOR is a type defined in UIRibbon.h that is composed of
         // three component values: hue, saturation and brightness, respectively.
         BYTE h, s, b;
-        CTheme::RGBToHSB(text, h, s, b);
+        GDIHelpers::RGBToHSB(text, h, s, b);
         UI_HSBCOLOR TextColor = UI_HSB(h, s, b);
-        CTheme::RGBToHSB(background, h, s, b);
+        GDIHelpers::RGBToHSB(background, h, s, b);
         UI_HSBCOLOR BackgroundColor = UI_HSB(h, s, b);
-        CTheme::RGBToHSB(highlight, h, s, b);
+        GDIHelpers::RGBToHSB(highlight, h, s, b);
         UI_HSBCOLOR HighlightColor = UI_HSB(h, s, b);
 
         InitPropVariantFromUInt32(BackgroundColor, &propvarBackground);
