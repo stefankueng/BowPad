@@ -65,24 +65,24 @@ protected:
     void                SetInsertionIndex(int index);
     void                TabActivateAt(int index);
     void                UpdateTab(int index);
-    int                 GetDocIdOfCurrentTab();
-    int                 GetActiveTabIndex();
-    int                 GetTabCount();
-    std::wstring        GetCurrentTitle();
-    std::wstring        GetTitleForTabIndex(int index);
-    std::wstring        GetTitleForDocID(int id);
+    int                 GetDocIdOfCurrentTab() const;
+    int                 GetActiveTabIndex() const;
+    int                 GetTabCount() const;
+    std::wstring        GetCurrentTitle() const;
+    std::wstring        GetTitleForTabIndex(int index) const;
+    std::wstring        GetTitleForDocID(int id) const;
     void                SetCurrentTitle(LPCWSTR title);
     int                 GetSrcTab();
     int                 GetDstTab();
     bool                CloseTab(int index, bool bForce);
-    int                 GetDocIDFromTabIndex(int tab);
-    int                 GetDocIDFromPath(LPCTSTR path);
-    int                 GetTabIndexFromDocID(int docID);
+    int                 GetDocIDFromTabIndex(int tab) const;
+    int                 GetDocIDFromPath(LPCTSTR path) const;
+    int                 GetTabIndexFromDocID(int docID) const;
 
     int                 GetDocumentCount() const;
     bool                HasActiveDocument() const;
     CDocument           GetActiveDocument() const;
-    bool                HasDocumentID(int id);
+    bool                HasDocumentID(int id) const;
     CDocument           GetDocumentFromID(int id);
     void                SetDocument(int id, const CDocument& doc);
     void                RestoreCurrentPos(const CPosData& pos);
@@ -106,8 +106,8 @@ protected:
     std::string         GetSelectedText(bool useCurrentWordIfSelectionEmpty = false) const;
     std::string         GetCurrentLine() const;
     void                ShowFileTree(bool bShow);
-    bool                IsFileTreeShown();
-    std::wstring        GetFileTreePath();
+    bool                IsFileTreeShown() const;
+    std::wstring        GetFileTreePath() const;
     void                FileTreeBlockRefresh(bool bBlock);
 
 

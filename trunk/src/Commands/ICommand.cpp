@@ -89,31 +89,31 @@ void ICommand::UpdateTab(int index)
     pMainWnd->UpdateTab(GetDocIDFromTabIndex(index));
 }
 
-int ICommand::GetActiveTabIndex()
+int ICommand::GetActiveTabIndex() const
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->m_TabBar.GetCurrentTabIndex();
 }
 
-int ICommand::GetDocIdOfCurrentTab()
+int ICommand::GetDocIdOfCurrentTab() const
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->m_TabBar.GetCurrentTabId();
 }
 
-std::wstring ICommand::GetCurrentTitle()
+std::wstring ICommand::GetCurrentTitle() const
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->m_TabBar.GetCurrentTitle();
 }
 
-std::wstring ICommand::GetTitleForTabIndex(int index)
+std::wstring ICommand::GetTitleForTabIndex(int index) const
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->m_TabBar.GetTitle(index);
 }
 
-std::wstring ICommand::GetTitleForDocID(int id)
+std::wstring ICommand::GetTitleForDocID(int id) const
 {
     return GetTitleForTabIndex(GetTabIndexFromDocID(id));
 }
@@ -137,7 +137,7 @@ int ICommand::GetDstTab()
     return pMainWnd->m_TabBar.GetDstTab();
 }
 
-int ICommand::GetTabCount()
+int ICommand::GetTabCount() const
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->m_TabBar.GetItemCount();
@@ -237,7 +237,7 @@ CDocument ICommand::GetActiveDocument() const
     return pMainWnd->m_DocManager.GetDocumentFromID(pMainWnd->m_TabBar.GetCurrentTabId());
 }
 
-bool ICommand::HasDocumentID(int id)
+bool ICommand::HasDocumentID(int id) const
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->m_DocManager.HasDocumentID(id);
@@ -327,19 +327,19 @@ void ICommand::GotoBrace()
     pMainWnd->m_editor.GotoBrace();
 }
 
-int ICommand::GetDocIDFromTabIndex( int tab )
+int ICommand::GetDocIDFromTabIndex( int tab ) const
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->m_TabBar.GetIDFromIndex(tab);
 }
 
-int ICommand::GetTabIndexFromDocID( int docID )
+int ICommand::GetTabIndexFromDocID( int docID ) const
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->m_TabBar.GetIndexFromID(docID);
 }
 
-int ICommand::GetDocIDFromPath( LPCTSTR path )
+int ICommand::GetDocIDFromPath( LPCTSTR path ) const
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->m_DocManager.GetIdForPath(path);
@@ -393,13 +393,13 @@ void ICommand::ShowFileTree(bool bShow)
     return pMainWnd->ShowFileTree(bShow);
 }
 
-bool ICommand::IsFileTreeShown()
+bool ICommand::IsFileTreeShown() const
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->IsFileTreeShown();
 }
 
-std::wstring ICommand::GetFileTreePath()
+std::wstring ICommand::GetFileTreePath() const
 {
     CMainWindow* pMainWnd = GetMainWindow();
     return pMainWnd->GetFileTreePath();
