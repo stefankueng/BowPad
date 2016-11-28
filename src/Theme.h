@@ -33,11 +33,6 @@ public:
     void                                            SetDarkTheme(bool b = true);
     bool                                            IsDarkTheme() const { return m_dark; }
     COLORREF                                        GetThemeColor(COLORREF clr) const;
-
-    static void                                     RGBToHSB(COLORREF rgb, BYTE& hue, BYTE& saturation, BYTE& brightness);
-    static void                                     RGBtoHSL(COLORREF color, float& h, float& s, float& l);
-    static COLORREF                                 HSLtoRGB(float h, float s, float l);
-
     int                                             RegisterThemeChangeCallback(ThemeChangeCallback&& cb);
 
 private:
