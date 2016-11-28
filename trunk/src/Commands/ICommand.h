@@ -92,7 +92,7 @@ protected:
     sptr_t              ConstCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0) const;
     LRESULT             SendMessageToMainWnd(UINT msg, WPARAM wParam, LPARAM lParam);
     void                UpdateStatusBar(bool bEverything);
-    void                SetupLexerForLang(const std::wstring& lang);
+    void                SetupLexerForLang(const std::string& lang);
     void                DocScrollClear(int type);
     void                DocScrollAddLineColor(int type, size_t line, COLORREF clr);
     void                DocScrollUpdate();

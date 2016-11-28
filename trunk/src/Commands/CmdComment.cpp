@@ -54,7 +54,7 @@ bool CCmdComment::Execute()
     if (!HasActiveDocument())
         return false;
     CDocument doc = GetActiveDocument();
-    std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
+    std::string lang = doc.m_language;
     std::string commentline = CLexStyles::Instance().GetCommentLineForLang(lang);
     std::string commentstreamstart = CLexStyles::Instance().GetCommentStreamStartForLang(lang);
     std::string commentstreamend = CLexStyles::Instance().GetCommentStreamEndForLang(lang);
@@ -128,7 +128,7 @@ bool CCmdUnComment::Execute()
     if (!HasActiveDocument())
         return false;
     CDocument doc = GetActiveDocument();
-    std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
+    std::string lang = doc.m_language;
     std::string commentline = CLexStyles::Instance().GetCommentLineForLang(lang);
     std::string commentstreamstart = CLexStyles::Instance().GetCommentStreamStartForLang(lang);
     std::string commentstreamend = CLexStyles::Instance().GetCommentStreamEndForLang(lang);

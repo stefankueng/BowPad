@@ -2043,9 +2043,9 @@ void CFindReplaceDlg::SearchDocument(
     std::string funcregex;
     if (searchForFunctions)
     {
-        std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
+        auto lang = doc.m_language;
         if (lang.empty())
-            lang = CUnicodeUtils::StdGetUTF8(CLexStyles::Instance().GetLanguageForDocument(doc, searchWnd));
+            lang = CLexStyles::Instance().GetLanguageForDocument(doc, searchWnd);
         if (lang.empty())
             return;
         funcregex = CLexStyles::Instance().GetFunctionRegexForLang(lang);

@@ -407,7 +407,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
         }
     }
 
-    if (doc.m_language == L"C/C++")
+    if (doc.m_language == "C/C++")
     {
         // Include Files
 
@@ -522,7 +522,7 @@ bool CCmdHeaderSource::OpenFileAsLanguage(const std::wstring& filename)
     if (OpenFile(filename.c_str(), OpenFlags::AddToMRU)<0)
         return false;
 
-    const std::wstring desiredLang = L"C/C++";
+    auto desiredLang = "C/C++";
     if (HasActiveDocument())
     {
         CDocument doc = GetActiveDocument();
@@ -1036,7 +1036,7 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
 {
     includes.clear();
 
-    std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
+    std::string lang = doc.m_language;
     if (lang != "C/C++")
         return false;
 

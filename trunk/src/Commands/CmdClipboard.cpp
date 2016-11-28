@@ -32,7 +32,7 @@ std::string ClipboardBase::GetHtmlSelection()
     if (!HasActiveDocument())
         return "";
     CDocument doc = GetActiveDocument();
-    const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(doc.m_language));
+    const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(doc.m_language);
 
     std::string sHtmlFragment;
     int style = 0;
@@ -178,7 +178,7 @@ void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml)
 void ClipboardBase::AddLexerToClipboard()
 {
     CDocument doc = GetActiveDocument();
-    std::string lang = CUnicodeUtils::StdGetUTF8(doc.m_language);
+    std::string lang = doc.m_language;
     if (!lang.empty())
     {
         if (OpenClipboard(GetHwnd()))
@@ -208,7 +208,7 @@ void ClipboardBase::AddLexerToClipboard()
 void ClipboardBase::SetLexerFromClipboard()
 {
     CDocument doc = GetActiveDocument();
-    if (doc.m_language.empty() || (doc.m_language.compare(L"Text") == 0))
+    if (doc.m_language.empty() || (doc.m_language.compare("Text") == 0))
     {
         CClipboardHelper clipboard;
         if (clipboard.Open(GetHwnd()))
@@ -224,7 +224,7 @@ void ClipboardBase::SetLexerFromClipboard()
                     OnOutOfScope(
                         GlobalUnlock(hData);
                     );
-                    auto lang = CUnicodeUtils::StdGetUnicode(lptstr);
+                    auto lang = lptstr;
                     doc.m_language = lang;
                     SetDocument(GetDocIdOfCurrentTab(), doc);
                     SetupLexerForLang(lang);

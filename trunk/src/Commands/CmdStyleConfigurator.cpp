@@ -163,7 +163,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
             auto languages = CLexStyles::Instance().GetLanguages();
             if (langSel >= 0 && langSel < (int)languages.size())
             {
-                std::wstring currentLang = languages[langSel];
+                auto currentLang = CUnicodeUtils::StdGetUTF8(languages[langSel]);
                 if (HasActiveDocument())
                 {
                     CDocument doc = GetActiveDocument();
@@ -261,11 +261,11 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                 auto languages = CLexStyles::Instance().GetLanguages();
                 if (langSel >= 0 && langSel < (int)languages.size())
                 {
-                    std::wstring currentLang = languages[langSel];
+                    auto currentLang = CUnicodeUtils::StdGetUTF8(languages[langSel]);
                     auto hStyleCombo = GetDlgItem(*this, IDC_STYLECOMBO);
                     int styleSel = ComboBox_GetCurSel(hStyleCombo);
                     int styleKey = (int)ComboBox_GetItemData(hStyleCombo, styleSel);
-                    const auto& lexData = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(currentLang));
+                    const auto& lexData = CLexStyles::Instance().GetLexerDataForLang(currentLang);
 
                     auto foundStyle = lexData.Styles.find(styleKey);
                     if (foundStyle != lexData.Styles.end())
@@ -319,8 +319,8 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
             auto languages = CLexStyles::Instance().GetLanguages();
             if (langSel >= 0 && langSel < (int)languages.size())
             {
-                const std::wstring currentLang = languages[langSel];
-                const auto& lexData = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(currentLang));
+                auto currentLang = CUnicodeUtils::StdGetUTF8(languages[langSel]);
+                const auto& lexData = CLexStyles::Instance().GetLexerDataForLang(currentLang);
                 const auto lexID = lexData.ID;
                 const auto hStyleCombo = GetDlgItem(*this, IDC_STYLECOMBO);
                 const int styleSel = ComboBox_GetCurSel(hStyleCombo);

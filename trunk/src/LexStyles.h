@@ -87,7 +87,7 @@ public:
     static CLexStyles&                  Instance();
 
     std::vector<std::wstring>           GetLanguages() const;
-    std::wstring                        GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
+    std::string                         GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
     std::wstring                        GetUserExtensionsForLanguage(const std::wstring& lang) const;
 
     const std::map<int, std::string>&   GetKeywordsForLang(const std::string& lang);
@@ -104,18 +104,20 @@ public:
     const LexerData&                    GetLexerDataForLang(const std::string& lang) const;
     const LexerData&                    GetLexerDataForLexer(int lexer);
 
-    void                                SetLangForPath(const std::wstring& path, const std::wstring& language);
+    void                                SetLangForPath(const std::wstring& path, const std::string& language);
 
     void                                SetUserForeground(int ID, int style, COLORREF clr);
     void                                SetUserBackground(int ID, int style, COLORREF clr);
     void                                SetUserFont(int ID, int style, const std::wstring& font);
     void                                SetUserFontSize(int ID, int style, int size);
     void                                SetUserFontStyle(int ID, int style, FontStyle fontstyle);
-    void                                SetUserExt(const std::wstring& ext, const std::wstring& lang);
+    void                                SetUserExt(const std::wstring& ext, const std::string& lang);
     void                                ResetUserData();
     void                                SaveUserData();
     bool                                AddUserFunctionForLang(const std::string& lang, const std::string& fnc);
-    std::wstring                        GetLanguageForPath(const std::wstring& path);
+    std::string                         GetLanguageForPath(const std::wstring& path);
+    void                                GenerateUserKeywords(LanguageData& ld);
+
 private:
     CLexStyles();
     ~CLexStyles();
