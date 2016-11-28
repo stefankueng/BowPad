@@ -31,8 +31,8 @@
 #include <stdexcept>
 #include <Shobjidl.h>
 
-const int ReadBlockSize = 128 * 1024;   //128 kB
-const int WriteBlockSize = 128 * 1024;   //128 kB
+constexpr int ReadBlockSize = 128 * 1024;   //128 kB
+constexpr int WriteBlockSize = 128 * 1024;   //128 kB
 
 static wchar_t inline WideCharSwap(wchar_t nValue)
 {
