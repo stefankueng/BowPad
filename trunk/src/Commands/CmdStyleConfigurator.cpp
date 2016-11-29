@@ -474,7 +474,7 @@ CCmdStyleConfigurator::~CCmdStyleConfigurator()
 bool CCmdStyleConfigurator::Execute()
 {
     if (g_pStyleConfiguratorDlg == nullptr)
-        g_pStyleConfiguratorDlg = std::make_unique<CStyleConfiguratorDlg>(m_Obj);
+        g_pStyleConfiguratorDlg = std::make_unique<CStyleConfiguratorDlg>(m_pMainWindow);
 
     g_pStyleConfiguratorDlg->ShowModeless(hRes, IDD_STYLECONFIGURATOR, GetHwnd());
 
