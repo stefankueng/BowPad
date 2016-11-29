@@ -306,7 +306,7 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
         if (HasActiveDocument())
         {
             CDocument doc = GetActiveDocument();
-            auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(CUnicodeUtils::StdGetUTF8(doc.m_language));
+            auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.m_language);
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), ppropvarNewValue);
         }
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
@@ -513,8 +513,7 @@ void CCmdFunctions::FindAllFunctions()
         if (!m_languagesUpdated.empty() && HasActiveDocument())
         {
             auto activeDoc = GetActiveDocument();
-            auto activeDocLang = CUnicodeUtils::StdGetUTF8(activeDoc.m_language);
-            if (m_languagesUpdated.find(activeDocLang) != m_languagesUpdated.end())
+            if (m_languagesUpdated.find(activeDoc.m_language) != m_languagesUpdated.end())
                 SetupLexerForLang(activeDoc.m_language);
             m_languagesUpdated.clear();
         }
@@ -551,7 +550,7 @@ bool CCmdFunctions::FindAllFunctionsInternal()
 
             const auto& doc = GetDocumentFromID(docID);
 
-            m_docLang = CUnicodeUtils::StdGetUTF8(doc.m_language);
+            m_docLang = doc.m_language;
             if (m_docLang.empty())
                 continue;
             m_funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(m_docLang);
@@ -671,10 +670,9 @@ std::vector<FunctionInfo> CCmdFunctions::FindFunctionsNow() const
 
 void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const std::wstring&, long lineNum)>& callback) const
 {
-    auto docLang = CUnicodeUtils::StdGetUTF8(doc.m_language);
-    if (docLang.empty())
+    if (doc.m_language.empty())
         return;
-    auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(docLang);
+    auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.m_language);
     if (funcRegex.empty())
         return;
 
@@ -689,7 +687,7 @@ void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const
         edit.Call(SCI_SETDOCPOINTER, 0, 0);
     );
 
-    auto trimtokens = CLexStyles::Instance().GetFunctionRegexTrimForLang(docLang);
+    auto trimtokens = CLexStyles::Instance().GetFunctionRegexTrimForLang(doc.m_language);
     std::vector<std::wstring> wtrimtokens;
     for (const auto& token : trimtokens)
         wtrimtokens.push_back(CUnicodeUtils::StdGetUnicode(token));
