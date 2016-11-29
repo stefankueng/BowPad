@@ -245,10 +245,10 @@ void CCmdSessionRestoreLast::OnDocumentClose(int index)
     {
         CPosData pos;
         SaveCurrentPos(pos);
-        m_docstates.push_back(SessionItem(doc.m_path, pos));
+        m_docstates.emplace_back(doc.m_path, pos);
     }
     else
     {
-        m_docstates.push_back(SessionItem(doc.m_path, doc.m_position));
+        m_docstates.emplace_back(doc.m_path, doc.m_position);
     }
 }
