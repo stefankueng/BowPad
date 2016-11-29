@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,12 +18,27 @@
 #include "coolscroll.h"
 
 #include <map>
-#include <tuple>
 
-#define DOCSCROLLTYPE_SELTEXT           1
-#define DOCSCROLLTYPE_BOOKMARK          2
-#define DOCSCROLLTYPE_SEARCHTEXT        3
-#define DOCSCROLLTYPE_END               4
+constexpr int DOCSCROLLTYPE_SELTEXT = 1;
+constexpr int DOCSCROLLTYPE_BOOKMARK = 2;
+constexpr int DOCSCROLLTYPE_SEARCHTEXT = 3;
+constexpr int DOCSCROLLTYPE_END = 4;
+
+struct LineColor
+{
+    inline LineColor(int type, size_t line) : type(type), line(line) {}
+    // Sort by type then line.
+    inline bool operator<(const LineColor& rhs) const
+    {
+        if (type != rhs.type)
+            return type < rhs.type;
+        else
+            return line < rhs.line;
+    }
+
+    int type;
+    size_t line;
+};
 
 class CScintillaWnd;
 
@@ -47,7 +62,7 @@ private:
 
 
     std::map<size_t, COLORREF>                  m_visibleLineColors[DOCSCROLLTYPE_END];
-    std::map<std::tuple<int,size_t>,COLORREF>   m_lineColors;
+    std::map<LineColor,COLORREF>                m_lineColors;
     size_t                                      m_visibleLines;
     size_t                                      m_lines;
     size_t                                      m_curPosVisLine;

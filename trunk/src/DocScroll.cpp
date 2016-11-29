@@ -27,7 +27,7 @@
 #pragma warning(pop)
 
 
-static inline COLORREF GetThumbColor(const NMCSBCUSTOMDRAW& custDraw)
+static COLORREF GetThumbColor(const NMCSBCUSTOMDRAW& custDraw)
 {
     const bool hot = (custDraw.uState & CDIS_HOT) != 0;
     auto& theme = CTheme::Instance();
@@ -256,35 +256,34 @@ void CDocScroll::CalcLines()
     {
         for (int i = 0; i < DOCSCROLLTYPE_END; ++i)
             m_visibleLineColors[i].clear();
-        for (auto it : m_lineColors)
+        for (const auto& lc : m_lineColors)
         {
-            m_visibleLineColors[std::get<0>(it.first)][m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, std::get<1>(it.first))] = it.second;
+            m_visibleLineColors[lc.first.type][m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, lc.first.line)] = lc.second;
         }
         m_visibleLines = m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, m_lines);
+        m_bDirty = false;
     }
-    m_bDirty = false;
 }
 
 void CDocScroll::AddLineColor(int type, size_t line, COLORREF clr)
 {
-    auto t = std::make_tuple(type, line);
-    auto foundIt = m_lineColors.find(t);
-    if (foundIt == m_lineColors.end())
-    {
-        m_lineColors[t] = clr;
+    auto foundIt = m_lineColors.insert({ LineColor(type,line) , clr });
+    if (foundIt.second)
         m_bDirty = true;
+    else
+    {
+        if (foundIt.first->second != clr)
+        {
+            foundIt.first->second = clr;
+            m_bDirty = true;
+        }
     }
 }
 
 void CDocScroll::RemoveLine(int type, size_t line)
 {
-    auto t = std::make_tuple(type, line);
-    auto foundIt = m_lineColors.find(t);
-    if (foundIt != m_lineColors.end())
-    {
-        m_lineColors.erase(foundIt);
+    if (m_lineColors.erase(LineColor(type, line)) > 0)
         m_bDirty = true;
-    }
 }
 
 void CDocScroll::SetTotalLines(size_t lines)
@@ -304,10 +303,9 @@ void CDocScroll::Clear(int type)
     }
     else
     {
-        auto it = m_lineColors.begin();
-        for (; it != m_lineColors.end(); )
+        for (auto it = m_lineColors.begin(); it != m_lineColors.end(); )
         {
-            if (std::get<0>(it->first) == type)
+            if (it->first.type == type)
             {
                 it = m_lineColors.erase(it);
                 m_bDirty = true;
