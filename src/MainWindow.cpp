@@ -2533,6 +2533,7 @@ void CMainWindow::OpenNewTab()
         index = m_TabBar.InsertAtEnd(tabName.c_str());
     auto docID = m_TabBar.GetIDFromIndex(index);
     m_DocManager.AddDocumentAtEnd(doc, docID);
+    CCommandHandler::Instance().OnDocumentOpen(docID);
     m_TabBar.ActivateAt(index);
     m_editor.GotoLine(0);
     CCommandHandler::Instance().OnDocumentOpen(docID);
