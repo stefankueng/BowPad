@@ -1384,7 +1384,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
             return false;
         }
 
-        if (_wcsicmp(CIniSettings::Instance().GetIniPath().c_str(), doc.m_path.c_str()) == 0)
+        if (CPathUtils::PathCompare(CIniSettings::Instance().GetIniPath(), doc.m_path))
             CIniSettings::Instance().Reload();
 
         doc.m_bIsDirty = false;
