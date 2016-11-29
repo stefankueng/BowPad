@@ -2686,7 +2686,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         UpdateStatusBar(true);
         m_TabBar.ActivateAt(index);
         m_editor.GotoLine(0);
-        CCommandHandler::Instance().OnDocumentOpen(index, docID);
+        CCommandHandler::Instance().OnDocumentOpen(index);
 
         return index;
     }
