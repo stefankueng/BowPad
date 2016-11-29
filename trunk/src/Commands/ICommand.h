@@ -130,16 +130,8 @@ protected:
     void                SetProgress(DWORD32 pos, DWORD32 end);
 
 private:
-    inline CMainWindow* GetMainWindow()
-    {
-        return static_cast<CMainWindow*>(m_Obj);
-    }
-    inline CMainWindow* GetMainWindow() const
-    {
-        return static_cast<CMainWindow*>(m_Obj);
-    }
 
 protected:
-    void *              m_Obj;
+    CMainWindow*        m_pMainWindow;
     static UINT         m_nextTimerID;
 };
