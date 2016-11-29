@@ -127,7 +127,7 @@ private:
     bool                        AskAboutOutsideDeletedFile(const CDocument& doc) const;
     bool                        AskToRemoveReadOnlyAttribute() const;
     ResponseToCloseTab          AskToCloseTab() const;
-    void                        UpdateTab(int docID);
+    void                        UpdateTab(DocID docID);
     void                        CloseAllButCurrentTab();
     void                        EnsureNewLineAtEnd(const CDocument& doc);
     void                        OpenNewTab();
@@ -174,7 +174,7 @@ private:
     LRESULT                     HandleTabBarEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
     int                         GetZoomPC() const;
     void                        SetZoomPC(int zoomPC);
-    COLORREF                    GetColorForDocument(int id);
+    COLORREF                    GetColorForDocument(DocID id);
     void                        OpenFiles(const std::vector<std::wstring>& paths);
     void                        BlockAllUIUpdates(bool block);
     void                        ShowProgressCtrl(UINT delay);

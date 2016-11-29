@@ -25,16 +25,16 @@
 
 struct TabInfo
 {
-    TabInfo(int docId, const std::wstring& title)
+    TabInfo(DocID docId, const std::wstring& title)
         : docId(docId), title(title)
     {
     }
-    TabInfo(int docId, std::wstring&& title)
+    TabInfo(DocID docId, std::wstring&& title)
         : docId(docId), title(std::move(title))
     {
     }
     std::wstring title;
-    int docId;
+    DocID docId;
 };
 
 class CCmdTabList : public ICommand
@@ -60,7 +60,7 @@ public:
 
     void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
-    void OnDocumentOpen(int tab) override;
+    void OnDocumentOpen(DocID id) override;
     void OnDocumentClose(int tab) override;
     void OnDocumentSave(int tab, bool bSaveAs) override;
 

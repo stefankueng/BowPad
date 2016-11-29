@@ -275,7 +275,7 @@ CCmdFunctions::CCmdFunctions(void* obj)
 
 CCmdFunctions::~CCmdFunctions()
 {
-    if (m_docID != -1)
+    if (m_docID.IsValid())
         m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
 }
 
@@ -323,7 +323,7 @@ HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     m_menuData.clear();
  
     auto docId = GetDocIdOfCurrentTab();
-    if (docId < 0)
+    if (!docId.IsValid())
         return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
 
     auto functions = FindFunctionsNow();
@@ -372,7 +372,7 @@ HRESULT CCmdFunctions::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PRO
                 return hr;
 
             auto docId = GetDocIdOfCurrentTab();
-            if (docId < 0)
+            if (!docId.IsValid())
                 return S_FALSE;
 
             // Type of selected is unsigned which prevents negative tests.
@@ -421,7 +421,7 @@ void CCmdFunctions::ScintillaNotify(Scintilla::SCNotification * pScn)
                 // (at least on my machine) during release mode testing but
                 // it is close to warranting it.
                 auto docID = GetDocIdOfCurrentTab();
-                if (docID >= 0)
+                if (docID.IsValid())
                 {
                     const auto& doc = GetDocumentFromID(docID);
                     if (doc.m_bIsDirty)
@@ -441,9 +441,9 @@ void CCmdFunctions::OnTimer(UINT id)
     }
 }
 
-void CCmdFunctions::OnDocumentOpen(int index)
+void CCmdFunctions::OnDocumentOpen(DocID id)
 {
-    EventHappened(GetDocIDFromTabIndex(index), DocEventType::DocOpen);
+    EventHappened(id, DocEventType::DocOpen);
 }
 
 void CCmdFunctions::OnDocumentClose(int index)
@@ -465,18 +465,18 @@ void CCmdFunctions::OnLexerChanged(int /*lexer*/)
     EventHappened(GetDocIdOfCurrentTab(), DocEventType::LexerChanged);
 }
 
-void CCmdFunctions::EventHappened(int docID, DocEventType eventType)
+void CCmdFunctions::EventHappened(DocID docID, DocEventType eventType)
 {
     if (!m_autoscan)
         return;
 
-    if (docID < 0) // Ignore anything bogus. Is likely to happen eventually.
+    if (!docID.IsValid()) // Ignore anything bogus. Is likely to happen eventually.
         return;
     // If we are alreading doing this, cancel it in preperation for redoing it.
-    if (m_docID != -1 && m_docID == docID)
+    if (m_docID.IsValid() && m_docID == docID)
     {
         m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
-        m_docID = -1;
+        m_docID = DocID();
     }
 
     // don't autoscan for big files
@@ -485,7 +485,7 @@ void CCmdFunctions::EventHappened(int docID, DocEventType eventType)
         return;
 
     KillTimer(GetHwnd(), m_timerID);
-    if (docID != -1 && GetDocIdOfCurrentTab() == docID)
+    if (docID.IsValid() && GetDocIdOfCurrentTab() == docID)
         InvalidateFunctionsSource();
 
     auto newEnd = std::remove_if(m_events.begin(), m_events.end(),
@@ -507,7 +507,7 @@ void CCmdFunctions::FindAllFunctions()
     bool moreToDo = FindAllFunctionsInternal();
 
     // If we started and now have finished processing.
-    if (m_funcProcessingStarted && m_events.empty() && m_docID == -1)
+    if (m_funcProcessingStarted && m_events.empty() && !m_docID.IsValid())
     {
         m_funcProcessingStarted = false;
         if (!m_languagesUpdated.empty() && HasActiveDocument())
@@ -531,7 +531,7 @@ void CCmdFunctions::FindAllFunctions()
 
 bool CCmdFunctions::FindAllFunctionsInternal()
 {
-    if (m_docID == -1)
+    if (!m_docID.IsValid())
     {
         m_docLang.clear();
         for (;;)
@@ -628,7 +628,7 @@ bool CCmdFunctions::FindAllFunctionsInternal()
     if (!tbc)
     {
         m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
-        m_docID = -1;
+        m_docID = DocID();
     }
     // Re-schedule if we need to continue our existing work or there is other work to do.
     return (tbc || !m_events.empty());

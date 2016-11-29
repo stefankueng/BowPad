@@ -83,8 +83,8 @@ HRESULT CCmdTabList::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
         m_menuInfo.clear();
 
         // We need to know have an active document to continue.
-        int docId = GetDocIdOfCurrentTab();
-        if (docId < 0)
+        auto docId = GetDocIdOfCurrentTab();
+        if (!docId.IsValid())
             return E_FAIL;
         if (!HasActiveDocument())
             return E_FAIL;
@@ -96,7 +96,7 @@ HRESULT CCmdTabList::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
     }
     else if (key == UI_PKEY_SelectedItem)
     {
-        int docId = GetDocIdOfCurrentTab();
+        auto docId = GetDocIdOfCurrentTab();
 
         UINT index = UI_COLLECTION_INVALIDINDEX;
         for (const auto& d : m_menuInfo)
@@ -269,7 +269,7 @@ void CCmdTabList::ScintillaNotify(Scintilla::SCNotification* /*pScn*/)
         //InvalidateTabList();
 }
 
-void CCmdTabList::OnDocumentOpen(int /*tab*/)
+void CCmdTabList::OnDocumentOpen(DocID /*id*/)
 {
     // Tab List will be stale now.
     InvalidateTabList();

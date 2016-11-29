@@ -82,7 +82,7 @@ void CCmdSessionLoad::OnClose()
     int savecount = min(tabcount, sessionSize);
     for (int i = 0; i < savecount; ++i)
     {
-        int docId = GetDocIDFromTabIndex(i);
+        auto docId = GetDocIDFromTabIndex(i);
         CDocument doc = GetDocumentFromID(docId);
         if (doc.m_path.empty())
             continue;
@@ -148,7 +148,7 @@ void CCmdSessionLoad::RestoreSavedSession()
     }
 
 
-    int activeDoc = -1;
+    DocID activeDoc;
     const unsigned int openflags = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
     int filecount = 0;
     for (int fileNum = 0; fileNum < sessionSize; ++fileNum)
@@ -166,7 +166,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         // not safe long term to assume the index where a tab was loaded
         // remains the same after other files load.
         auto docId = GetDocIDFromTabIndex(tabIndex);
-        if (docId < 0)
+        if (!docId.IsValid())
             continue;
         CDocument doc = GetDocumentFromID(docId);
         auto& pos = doc.m_position;
@@ -181,7 +181,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         SetDocument(docId, doc);
         RestoreCurrentPos(doc.m_position);
     }
-    if (activeDoc >= 0)
+    if (activeDoc.IsValid())
     {
         int activeTabIndex = GetTabIndexFromDocID(activeDoc);
         TabActivateAt(activeTabIndex);
