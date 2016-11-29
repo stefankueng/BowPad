@@ -2758,7 +2758,9 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                     CDocument existDoc = m_DocManager.GetDocumentFromID(docID);
                     if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH) == 0) && (m_editor.Call(SCI_CANUNDO) == 0))
                     {
-                        m_insertionIndex = m_TabBar.GetCurrentTabIndex();
+                        auto curtabIndex = m_TabBar.GetCurrentTabIndex();
+                        CCommandHandler::Instance().OnDocumentClose(curtabIndex);
+                        m_insertionIndex = curtabIndex;
                         m_TabBar.DeleteItemAt(m_insertionIndex);
                         if (m_insertionIndex)
                             --m_insertionIndex;
