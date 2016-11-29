@@ -167,7 +167,7 @@ bool CCmdWriteProtect::Execute()
         doc.m_bIsReadonly = false;
     ScintillaCall(SCI_SETREADONLY, doc.m_bIsWriteProtected);
     SetDocument(GetDocIdOfCurrentTab(), doc);
-    UpdateTab(GetDocIdOfCurrentTab());
+    UpdateTab(GetActiveTabIndex());
 
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
