@@ -69,18 +69,18 @@ public:
     std::wstring GetEncodingString();
 
     Document                m_document;
+    std::wstring            m_path;
+    std::string             m_language;
+    int                     m_encoding;
     EOLFormat               m_format;
     bool                    m_bHasBOM;
     bool                    m_bTrimBeforeSave;
     bool                    m_bEnsureNewlineAtEnd;
-    int                     m_encoding;
-    std::wstring            m_path;
-    FILETIME                m_lastWriteTime;
-    std::string             m_language;
-    CPosData                m_position;
     bool                    m_bIsDirty;
     bool                    m_bNeedsSaving;
     bool                    m_bIsReadonly;
     bool                    m_bIsWriteProtected;
     bool                    m_bDoSaveAs;        ///< even if m_path is set, always ask where to save
+    FILETIME                m_lastWriteTime;
+    CPosData                m_position;
 };
