@@ -25,7 +25,7 @@ UINT ICommand::m_nextTimerID = COMMAND_TIMER_ID_START;
 
 
 ICommand::ICommand(void * obj)
-    : m_Obj(obj)
+    : m_pMainWindow(static_cast<CMainWindow*>(obj))
 {
 }
 
@@ -79,38 +79,32 @@ void ICommand::OnLexerChanged(int /*lexer*/)
 
 void ICommand::TabActivateAt( int index )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->m_TabBar.ActivateAt(index);
+    m_pMainWindow->m_TabBar.ActivateAt(index);
 }
 
 void ICommand::UpdateTab(int index)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->UpdateTab(GetDocIDFromTabIndex(index));
+    m_pMainWindow->UpdateTab(GetDocIDFromTabIndex(index));
 }
 
 int ICommand::GetActiveTabIndex() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_TabBar.GetCurrentTabIndex();
+    return m_pMainWindow->m_TabBar.GetCurrentTabIndex();
 }
 
 DocID ICommand::GetDocIdOfCurrentTab() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_TabBar.GetCurrentTabId();
+    return m_pMainWindow->m_TabBar.GetCurrentTabId();
 }
 
 std::wstring ICommand::GetCurrentTitle() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_TabBar.GetCurrentTitle();
+    return m_pMainWindow->m_TabBar.GetCurrentTitle();
 }
 
 std::wstring ICommand::GetTitleForTabIndex(int index) const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_TabBar.GetTitle(index);
+    return m_pMainWindow->m_TabBar.GetTitle(index);
 }
 
 std::wstring ICommand::GetTitleForDocID(DocID id) const
@@ -120,76 +114,63 @@ std::wstring ICommand::GetTitleForDocID(DocID id) const
 
 void ICommand::SetCurrentTitle(LPCWSTR title)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->m_TabBar.SetCurrentTitle(title);
-    pMainWnd->UpdateCaptionBar();
+    m_pMainWindow->m_TabBar.SetCurrentTitle(title);
+    m_pMainWindow->UpdateCaptionBar();
 }
 
 int ICommand::GetSrcTab()
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_TabBar.GetSrcTab();
+    return m_pMainWindow->m_TabBar.GetSrcTab();
 }
 
 int ICommand::GetDstTab()
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_TabBar.GetDstTab();
+    return m_pMainWindow->m_TabBar.GetDstTab();
 }
 
 int ICommand::GetTabCount() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_TabBar.GetItemCount();
+    return m_pMainWindow->m_TabBar.GetItemCount();
 }
 
 bool ICommand::CloseTab( int index, bool bForce )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->CloseTab(index, bForce);
+    return m_pMainWindow->CloseTab(index, bForce);
 }
 
 sptr_t ICommand::ScintillaCall( unsigned int iMessage, uptr_t wParam /*= 0*/, sptr_t lParam /*= 0*/ )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_editor.Call(iMessage, wParam, lParam);
+    return m_pMainWindow->m_editor.Call(iMessage, wParam, lParam);
 }
 
 sptr_t ICommand::ConstCall(unsigned int iMessage, uptr_t wParam /*= 0*/, sptr_t lParam /*= 0*/) const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_editor.Call(iMessage, wParam, lParam);
+    return m_pMainWindow->m_editor.Call(iMessage, wParam, lParam);
 }
-
 
 HWND ICommand::GetHwnd() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return *pMainWnd;
+    return *m_pMainWindow;
 }
 
 HWND ICommand::GetScintillaWnd() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_editor;
+    return m_pMainWindow->m_editor;
 }
 
 int ICommand::OpenFile(LPCWSTR file, unsigned int openFlags)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->OpenFile(file, openFlags);
+    return m_pMainWindow->OpenFile(file, openFlags);
 }
 
 void ICommand::OpenFiles(const std::vector<std::wstring>& paths)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->OpenFiles(paths);
+    return m_pMainWindow->OpenFiles(paths);
 }
 
 bool ICommand::ReloadTab( int tab, int encoding )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->ReloadTab(tab, encoding);
+    return m_pMainWindow->ReloadTab(tab, encoding);
 }
 
 HRESULT ICommand::InvalidateUICommand( UI_INVALIDATIONS flags, const PROPERTYKEY *key )
@@ -214,229 +195,191 @@ HRESULT ICommand::SetUICommandProperty( REFPROPERTYKEY key, PROPVARIANT value )
 
 bool ICommand::SaveCurrentTab(bool bSaveAs /* = false */)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->SaveCurrentTab(bSaveAs);
+    return m_pMainWindow->SaveCurrentTab(bSaveAs);
 }
 
 int ICommand::GetDocumentCount() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_DocManager.GetCount();
+    return m_pMainWindow->m_DocManager.GetCount();
 }
 
 bool ICommand::HasActiveDocument() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    auto id = pMainWnd->m_TabBar.GetCurrentTabId();
-    return pMainWnd->m_DocManager.HasDocumentID(id);
+    auto id = m_pMainWindow->m_TabBar.GetCurrentTabId();
+    return m_pMainWindow->m_DocManager.HasDocumentID(id);
 }
 
 CDocument ICommand::GetActiveDocument() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_DocManager.GetDocumentFromID(pMainWnd->m_TabBar.GetCurrentTabId());
+    return m_pMainWindow->m_DocManager.GetDocumentFromID(m_pMainWindow->m_TabBar.GetCurrentTabId());
 }
 
 bool ICommand::HasDocumentID(DocID id) const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_DocManager.HasDocumentID(id);
+    return m_pMainWindow->m_DocManager.HasDocumentID(id);
 }
 
 CDocument ICommand::GetDocumentFromID(DocID id )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_DocManager.GetDocumentFromID(id);
+    return m_pMainWindow->m_DocManager.GetDocumentFromID(id);
 }
 
 void ICommand::SetDocument(DocID id, const CDocument& doc )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_DocManager.SetDocument(id, doc);
+    return m_pMainWindow->m_DocManager.SetDocument(id, doc);
 }
 
 void ICommand::RestoreCurrentPos(const CPosData& pos)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->m_editor.RestoreCurrentPos(pos);
+    m_pMainWindow->m_editor.RestoreCurrentPos(pos);
 }
 
 void ICommand::SaveCurrentPos(CPosData& pos)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_editor.SaveCurrentPos(pos);
+    return m_pMainWindow->m_editor.SaveCurrentPos(pos);
 }
 
 LRESULT ICommand::SendMessageToMainWnd( UINT msg, WPARAM wParam, LPARAM lParam )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return ::SendMessage(*pMainWnd, msg, wParam, lParam);
+    return ::SendMessage(*m_pMainWindow, msg, wParam, lParam);
 }
 
 void ICommand::UpdateStatusBar( bool bEverything )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->UpdateStatusBar(bEverything);
+    m_pMainWindow->UpdateStatusBar(bEverything);
 }
 
 void ICommand::SetupLexerForLang( const std::string& lang )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_editor.SetupLexerForLang(lang);
+    return m_pMainWindow->m_editor.SetupLexerForLang(lang);
 }
 
 void ICommand::DocScrollClear( int type )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->m_editor.DocScrollClear(type);
+    m_pMainWindow->m_editor.DocScrollClear(type);
 }
 
 void ICommand::DocScrollAddLineColor( int type, size_t line, COLORREF clr )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->m_editor.DocScrollAddLineColor(type, line, clr);
+    m_pMainWindow->m_editor.DocScrollAddLineColor(type, line, clr);
 }
 
 void ICommand::DocScrollRemoveLine( int type, size_t line )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->m_editor.DocScrollRemoveLine(type, line);
+    m_pMainWindow->m_editor.DocScrollRemoveLine(type, line);
 }
 
 void ICommand::DocScrollUpdate()
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->m_editor.DocScrollUpdate();
+    m_pMainWindow->m_editor.DocScrollUpdate();
 }
 
 void ICommand::GotoLine(long line)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->m_editor.GotoLine(line);
+    m_pMainWindow->m_editor.GotoLine(line);
 }
 
 void ICommand::Center( long startPos, long endPos )
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->m_editor.Center(startPos, endPos);
+    m_pMainWindow->m_editor.Center(startPos, endPos);
 }
 
 void ICommand::GotoBrace()
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->m_editor.GotoBrace();
+    m_pMainWindow->m_editor.GotoBrace();
 }
 
 DocID ICommand::GetDocIDFromTabIndex( int tab ) const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_TabBar.GetIDFromIndex(tab);
+    return m_pMainWindow->m_TabBar.GetIDFromIndex(tab);
 }
 
 int ICommand::GetTabIndexFromDocID(DocID docID ) const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_TabBar.GetIndexFromID(docID);
+    return m_pMainWindow->m_TabBar.GetIndexFromID(docID);
 }
 
 DocID ICommand::GetDocIDFromPath( LPCTSTR path ) const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_DocManager.GetIdForPath(path);
+    return m_pMainWindow->m_DocManager.GetIdForPath(path);
 }
 
 void ICommand::SetInsertionIndex(int index)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->SetInsertionIndex(index);
+    return m_pMainWindow->SetInsertionIndex(index);
 }
 
 std::string ICommand::GetLine(long line) const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_editor.GetLine(line);
+    return m_pMainWindow->m_editor.GetLine(line);
 }
 
 std::string ICommand::GetTextRange(long startpos, long endpos) const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_editor.GetTextRange(startpos, endpos);
+    return m_pMainWindow->m_editor.GetTextRange(startpos, endpos);
 }
 
 size_t ICommand::FindText(const std::string& tofind, long startpos, long endpos)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_editor.FindText(tofind, startpos, endpos);
+    return m_pMainWindow->m_editor.FindText(tofind, startpos, endpos);
 }
 
 std::string ICommand::GetSelectedText(bool useCurrentWordIfSelectionEmpty) const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_editor.GetSelectedText(useCurrentWordIfSelectionEmpty);
+    return m_pMainWindow->m_editor.GetSelectedText(useCurrentWordIfSelectionEmpty);
 }
 
 std::string ICommand::GetCurrentLine() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_editor.GetCurrentLine();
+    return m_pMainWindow->m_editor.GetCurrentLine();
 }
 
 void ICommand::OpenHDROP(HDROP hDrop)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->HandleDropFiles(hDrop);
+    return m_pMainWindow->HandleDropFiles(hDrop);
 }
 
 void ICommand::ShowFileTree(bool bShow)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->ShowFileTree(bShow);
+    return m_pMainWindow->ShowFileTree(bShow);
 }
 
 bool ICommand::IsFileTreeShown() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->IsFileTreeShown();
+    return m_pMainWindow->IsFileTreeShown();
 }
 
 std::wstring ICommand::GetFileTreePath() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->GetFileTreePath();
+    return m_pMainWindow->GetFileTreePath();
 }
 
 void ICommand::FileTreeBlockRefresh(bool bBlock)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->FileTreeBlockRefresh(bBlock);
+    return m_pMainWindow->FileTreeBlockRefresh(bBlock);
 }
 
 long ICommand::GetCurrentLineNumber() const
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    return pMainWnd->m_editor.GetCurrentLineNumber();
+    return m_pMainWindow->m_editor.GetCurrentLineNumber();
 }
 
 void ICommand::BlockAllUIUpdates(bool block)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->BlockAllUIUpdates(block);
+    m_pMainWindow->BlockAllUIUpdates(block);
 }
 
 void ICommand::ShowProgressCtrl(UINT delay)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->ShowProgressCtrl(delay);
+    m_pMainWindow->ShowProgressCtrl(delay);
 }
 
 void ICommand::HideProgressCtrl()
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->HideProgressCtrl();
+    m_pMainWindow->HideProgressCtrl();
 }
 
 void ICommand::SetProgress(DWORD32 pos, DWORD32 end)
 {
-    CMainWindow* pMainWnd = GetMainWindow();
-    pMainWnd->SetProgress(pos, end);
+    m_pMainWindow->SetProgress(pos, end);
 }
