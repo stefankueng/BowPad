@@ -34,7 +34,7 @@ class CSearchResult
 {
 public:
 
-    int             docID = -1;
+    DocID           docID;
     std::wstring    lineText;
     size_t          pathIndex = size_t(-1);
     size_t          pos = 0;
@@ -99,7 +99,7 @@ protected:
     void                    DoReplace(int id);
 
     void SearchDocument(
-        CScintillaWnd& searchWnd, int docID, const CDocument& doc,
+        CScintillaWnd& searchWnd, DocID docID, const CDocument& doc,
         const std::string& searchfor, int searchflags, unsigned int exSearchFlags,
         SearchResults& searchResults,
         SearchPaths& foundPaths);

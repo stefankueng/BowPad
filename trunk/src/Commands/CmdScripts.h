@@ -45,7 +45,7 @@ public:
 
     void OnDocumentClose(int index) override;
 
-    void OnDocumentOpen(int index) override;
+    void OnDocumentOpen(DocID id) override;
 
     void OnDocumentSave(int index, bool bSaveAs) override;
 

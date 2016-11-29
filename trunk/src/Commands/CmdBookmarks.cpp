@@ -109,9 +109,9 @@ void CCmdBookmarks::OnDocumentClose(int index)
     }
 }
 
-void CCmdBookmarks::OnDocumentOpen(int index)
+void CCmdBookmarks::OnDocumentOpen(DocID id)
 {
-    CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(index));
+    const CDocument& doc = GetDocumentFromID(id);
     if (doc.m_path.empty())
         return;
 

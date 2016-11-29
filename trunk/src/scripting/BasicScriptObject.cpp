@@ -985,7 +985,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             if (args->cArgs != 0)
                 return DISP_E_BADPARAMCOUNT;
             ret->vt = VT_INT;
-            ret->intVal = GetDocIdOfCurrentTab();
+            ret->intVal = GetDocIdOfCurrentTab().GetValue();
             break;
         case 104: // GetActiveTabIndex
             if (args->cArgs != 0)
@@ -1019,7 +1019,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
                 return DISP_E_TYPEMISMATCH;
             ret->vt = VT_BSTR;
-            ret->bstrVal = _bstr_t(GetTitleForDocID(p1.intVal).c_str()).Detach();
+            ret->bstrVal = _bstr_t(GetTitleForDocID(DocID(p1.intVal)).c_str()).Detach();
             break;
         case 109: // SetCurrentTitle
             if (args->cArgs != 1)
@@ -1044,7 +1044,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
                 return DISP_E_TYPEMISMATCH;
             ret->vt = VT_INT;
-            ret->intVal = GetDocIDFromTabIndex(p1.intVal);
+            ret->intVal = GetDocIDFromTabIndex(p1.intVal).GetValue();
             break;
         case 112: // GetDocIDFromPath
             if (args->cArgs != 1)
@@ -1052,7 +1052,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
                 return DISP_E_TYPEMISMATCH;
             ret->vt = VT_INT;
-            ret->intVal = GetDocIDFromPath(p1.bstrVal);
+            ret->intVal = GetDocIDFromPath(p1.bstrVal).GetValue();
             break;
         case 113: // GetTabIndexFromDocID
             if (args->cArgs != 1)
@@ -1060,7 +1060,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
                 return DISP_E_TYPEMISMATCH;
             ret->vt = VT_INT;
-            ret->intVal = GetTabIndexFromDocID(p1.intVal);
+            ret->intVal = GetTabIndexFromDocID(DocID(p1.intVal));
             break;
         case 114: // DocumentCount
             if (flags == DISPATCH_PROPERTYGET)
@@ -1086,7 +1086,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
                 return DISP_E_TYPEMISMATCH;
             ret->vt = VT_BOOL;
-            ret->boolVal = HasDocumentID(p1.intVal);
+            ret->boolVal = HasDocumentID(DocID({ p1.intVal }));
             break;
         case 117: // UpdateStatusBar
             if (args->cArgs != 1)

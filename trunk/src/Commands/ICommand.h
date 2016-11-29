@@ -55,7 +55,7 @@ public:
     virtual void        OnLexerChanged(int lexer);
     virtual void        OnThemeChanged(bool bDark);
     virtual void        OnDocumentClose(int index);
-    virtual void        OnDocumentOpen(int index);
+    virtual void        OnDocumentOpen(DocID id);
     virtual void        OnDocumentSave(int index, bool bSaveAs);
     virtual HRESULT     IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue);
     virtual HRESULT     IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties);
@@ -65,26 +65,26 @@ protected:
     void                SetInsertionIndex(int index);
     void                TabActivateAt(int index);
     void                UpdateTab(int index);
-    int                 GetDocIdOfCurrentTab() const;
+    DocID               GetDocIdOfCurrentTab() const;
     int                 GetActiveTabIndex() const;
     int                 GetTabCount() const;
     std::wstring        GetCurrentTitle() const;
     std::wstring        GetTitleForTabIndex(int index) const;
-    std::wstring        GetTitleForDocID(int id) const;
+    std::wstring        GetTitleForDocID(DocID id) const;
     void                SetCurrentTitle(LPCWSTR title);
     int                 GetSrcTab();
     int                 GetDstTab();
     bool                CloseTab(int index, bool bForce);
-    int                 GetDocIDFromTabIndex(int tab) const;
-    int                 GetDocIDFromPath(LPCTSTR path) const;
-    int                 GetTabIndexFromDocID(int docID) const;
+    DocID               GetDocIDFromTabIndex(int tab) const;
+    DocID               GetDocIDFromPath(LPCTSTR path) const;
+    int                 GetTabIndexFromDocID(DocID docID) const;
 
     int                 GetDocumentCount() const;
     bool                HasActiveDocument() const;
     CDocument           GetActiveDocument() const;
-    bool                HasDocumentID(int id) const;
-    CDocument           GetDocumentFromID(int id);
-    void                SetDocument(int id, const CDocument& doc);
+    bool                HasDocumentID(DocID id) const;
+    CDocument           GetDocumentFromID(DocID id);
+    void                SetDocument(DocID id, const CDocument& doc);
     void                RestoreCurrentPos(const CPosData& pos);
     void                SaveCurrentPos(CPosData& pos);
 

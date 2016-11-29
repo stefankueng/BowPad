@@ -27,30 +27,72 @@ enum DocModifiedState
     DM_Unknown
 };
 
+class DocID
+{
+public:
+    explicit DocID(int i) : id(i) {}
+    DocID() : id(-1) {}
+    bool IsValid() const { return id >= 0; }
+    int GetValue() const { return id; }
+
+    bool operator == (const DocID& other) const
+    {
+        return (this->id == other.id);
+    }
+    bool operator != (const DocID& other) const
+    {
+        return (this->id != other.id);
+    }
+    bool operator <(const DocID& rhs) const
+    {
+        return id < rhs.id;
+    }
+
+private:
+    int id;
+    friend struct std::hash<DocID>;
+};
+
+namespace std
+{
+    template<>
+    struct hash<DocID>
+    {
+        std::size_t operator()(const DocID& cmp) const
+        {
+            using std::size_t;
+            using std::hash;
+
+            return hash<int>()(cmp.id); // int hash has also been implemented
+        }
+    };
+}
+
+
 class CDocumentManager
 {
 public:
     CDocumentManager();
     ~CDocumentManager();
 
-    void                        AddDocumentAtEnd(const CDocument& doc, int id);
-    void                        RemoveDocument(int id);
-    void                        SetDocument(int id, const CDocument& doc);
+    void                        AddDocumentAtEnd(const CDocument& doc, DocID id);
+    void                        RemoveDocument(DocID id);
+    void                        SetDocument(DocID id, const CDocument& doc);
     int                         GetCount() const { return (int)m_documents.size(); }
-    int                         GetIdForPath(const std::wstring& path) const;
-    bool                        HasDocumentID(int id) const;
-    CDocument                   GetDocumentFromID(int id) const;
-    Document                    GetScintillaDocument(int id) const { return GetDocumentFromID(id).m_document; }
+    DocID                       GetIdForPath(const std::wstring& path) const;
+    bool                        HasDocumentID(DocID id) const;
+    CDocument                   GetDocumentFromID(DocID id) const;
+    Document                    GetScintillaDocument(DocID id) const { return GetDocumentFromID(id).m_document; }
 
     CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
     bool                        SaveFile(HWND hWnd, const CDocument& doc, bool & bTabMoved);
     bool                        UpdateFileTime(CDocument& doc, bool bIncludeReadonly);
-    DocModifiedState            HasFileChanged(int id) const;
+    DocModifiedState            HasFileChanged(DocID id) const;
 
 private:
     bool                        SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc);
 
 private:
-    std::map<int,CDocument>     m_documents;
+    std::map<DocID,CDocument>   m_documents;
     CScintillaWnd               m_scratchScintilla;
 };
