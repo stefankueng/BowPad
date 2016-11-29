@@ -312,7 +312,7 @@ void CPluginsConfigDlg::InitPluginsList()
 
 bool CCmdPluginsConfig::Execute()
 {
-    CPluginsConfigDlg dlg(m_Obj);
+    CPluginsConfigDlg dlg(m_pMainWindow);
     dlg.DoModal(hRes, IDD_PLUGINSCONFIGDLG, GetHwnd());
 
     return true;
