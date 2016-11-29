@@ -67,7 +67,7 @@ bool CCmdOpenSelection::Execute()
     }
     if (PathFileExists(path.c_str()))
         return OpenFile(path.c_str(), OpenFlags::AddToMRU) >= 0;
-    FindReplace_FindFile(m_Obj, path);
+    FindReplace_FindFile(m_pMainWindow, path);
     return false;
 }
 

@@ -566,7 +566,7 @@ void CCmdHeaderSource::HandleIncludeFileMenuItem(const RelatedFileItem& item)
         //return;
 
     auto filename = CPathUtils::GetFileName(item.Path);
-    FindReplace_FindFile(m_Obj, filename.c_str());
+    FindReplace_FindFile(m_pMainWindow, filename.c_str());
 }
 
 void CCmdHeaderSource::HandleCorrespondingFileMenuItem(const RelatedFileItem& item)
@@ -602,7 +602,7 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
             return OpenFile(item.Path.c_str(), OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing) >= 0;
             break;
         case RelatedType::CreateCorrespondingFiles:
-            auto pCorrespondingFileDlg = std::make_unique<CCorrespondingFileDlg>(m_Obj);
+            auto pCorrespondingFileDlg = std::make_unique<CCorrespondingFileDlg>(m_pMainWindow);
 
             std::wstring initialFolder;
             if (HasActiveDocument())
@@ -763,7 +763,7 @@ bool CCmdHeaderSource::Execute()
             if (i + 1 < correspondingFiles.size())
                 fileNames += ';';
         }
-        FindReplace_FindFile(m_Obj, fileNames.c_str());
+        FindReplace_FindFile(m_pMainWindow, fileNames.c_str());
     }
 
     return false;
