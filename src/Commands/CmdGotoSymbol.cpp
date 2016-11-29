@@ -34,7 +34,7 @@ CCmdGotoSymbol::~CCmdGotoSymbol()
 bool CCmdGotoSymbol::Execute()
 {
     std::wstring symbolName = CUnicodeUtils::StdGetUnicode(GetSelectedText(true));
-    FindReplace_FindFunction(m_Obj, symbolName);
+    FindReplace_FindFunction(m_pMainWindow, symbolName);
     return true;
 }
 

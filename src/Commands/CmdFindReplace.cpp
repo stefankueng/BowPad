@@ -3012,7 +3012,7 @@ CCmdFindReplace::~CCmdFindReplace()
 
 bool CCmdFindReplace::Execute()
 {
-    FindReplace_FindText(m_Obj);
+    FindReplace_FindText(m_pMainWindow);
 
     return true;
 }
@@ -3264,7 +3264,7 @@ CCmdFindFile::~CCmdFindFile()
 
 bool CCmdFindFile::Execute()
 {
-    FindReplace_FindFile(m_Obj, L"");
+    FindReplace_FindFile(m_pMainWindow, L"");
 
     return true;
 }
