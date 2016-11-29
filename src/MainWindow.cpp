@@ -726,8 +726,8 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmhdr, WPARAM /*wParam*/, L
     {
         if (tbhdr.tabOrigin >= 0 && tbhdr.tabOrigin < m_TabBar.GetItemCount())
         {
-            int docId = m_TabBar.GetIDFromIndex(tbhdr.tabOrigin);
-            APPVERIFY(docId >= 0);
+            auto docId = m_TabBar.GetIDFromIndex(tbhdr.tabOrigin);
+            APPVERIFY(docId.IsValid());
             if (m_DocManager.HasDocumentID(docId))
             {
                 auto clr = GetColorForDocument(docId);
@@ -991,7 +991,7 @@ void CMainWindow::HandleStatusBarEOLFormat()
             auto selectedEolMode = ToEOLMode(selectedEolFormat);
             m_editor.Call(SCI_SETEOLMODE, selectedEolMode);
             m_editor.Call(SCI_CONVERTEOLS, selectedEolMode);
-            int id = m_TabBar.GetCurrentTabId();
+            auto id = m_TabBar.GetCurrentTabId();
             if (m_DocManager.HasDocumentID(id))
             {
                 CDocument doc = m_DocManager.GetDocumentFromID(id);
@@ -1338,8 +1338,8 @@ void CMainWindow::EnsureNewLineAtEnd(const CDocument& doc)
 
 bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
 {
-    int docID = m_TabBar.GetCurrentTabId();
-    if (docID < 0)
+    auto docID = m_TabBar.GetCurrentTabId();
+    if (!docID.IsValid())
         return false;
     if (!m_DocManager.HasDocumentID(docID))
         return false;
@@ -1417,8 +1417,8 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
 
-    int docID = m_DocManager.GetIdForPath(filepath.c_str());
-    if (docID < 0)
+    auto docID = m_DocManager.GetIdForPath(filepath.c_str());
+    if (!docID.IsValid())
         return;
 
     int tab = m_TabBar.GetIndexFromID(docID);
@@ -1459,10 +1459,10 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
 void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& savepath, long line )
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
-    int docID = m_DocManager.GetIdForPath(filepath.c_str());
-    if (docID != -1)
+    auto docID = m_DocManager.GetIdForPath(filepath.c_str());
+    if (docID.IsValid())
     {
-        int tab = m_TabBar.GetIndexFromID(docID);
+        auto tab = m_TabBar.GetIndexFromID(docID);
         m_TabBar.ActivateAt(tab);
         CDocument doc = m_DocManager.GetDocumentFromID(docID);
         doc.m_path = CPathUtils::GetLongPathname(savepath);
@@ -1635,7 +1635,7 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool quitting )
 
     // Prefer to remove the document after the tab has gone as it supports it
     // and deletion causes events that may expect it to be there.
-    int docId = m_TabBar.GetIDFromIndex(tab);
+    auto docId = m_TabBar.GetIDFromIndex(tab);
     m_TabBar.DeleteItemAt(tab);
     m_DocManager.RemoveDocument(docId);
     if (!quitting)
@@ -1707,7 +1707,7 @@ void CMainWindow::CloseAllButCurrentTab()
 
 void CMainWindow::UpdateCaptionBar()
 {
-    int docID = m_TabBar.GetCurrentTabId();
+    auto docID = m_TabBar.GetCurrentTabId();
     std::wstring appName = GetAppName();
     std::wstring elev;
     ResString rElev(hRes, IDS_ELEVATED);
@@ -1734,7 +1734,7 @@ void CMainWindow::UpdateCaptionBar()
     }
 }
 
-void CMainWindow::UpdateTab(int docID)
+void CMainWindow::UpdateTab(DocID docID)
 {
     CDocument doc = m_DocManager.GetDocumentFromID(docID);
     TCITEM tie;
@@ -1999,7 +1999,7 @@ bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
 
 void CMainWindow::CopyCurDocPathToClipboard() const
 {
-    int id = m_TabBar.GetCurrentTabId();
+    auto id = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(id))
     {
         CDocument doc = m_DocManager.GetDocumentFromID(id);
@@ -2009,7 +2009,7 @@ void CMainWindow::CopyCurDocPathToClipboard() const
 
 void CMainWindow::CopyCurDocNameToClipboard() const
 {
-    int id = m_TabBar.GetCurrentTabId();
+    auto id = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(id))
     {
         CDocument doc = m_DocManager.GetDocumentFromID(id);
@@ -2019,7 +2019,7 @@ void CMainWindow::CopyCurDocNameToClipboard() const
 
 void CMainWindow::CopyCurDocDirToClipboard() const
 {
-    int id = m_TabBar.GetCurrentTabId();
+    auto id = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(id))
     {
         CDocument doc = m_DocManager.GetDocumentFromID(id);
@@ -2029,7 +2029,7 @@ void CMainWindow::CopyCurDocDirToClipboard() const
 
 void CMainWindow::ShowCurDocInExplorer() const
 {
-    int id = m_TabBar.GetCurrentTabId();
+    auto id = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(id))
     {
         CDocument doc = m_DocManager.GetDocumentFromID(id);
@@ -2044,7 +2044,7 @@ void CMainWindow::ShowCurDocInExplorer() const
 
 void CMainWindow::ShowCurDocExplorerProperties() const
 {
-    int id = m_TabBar.GetCurrentTabId();
+    auto id = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(id))
     {
         // This creates an ugly exception dialog on my machine in debug mode
@@ -2298,8 +2298,8 @@ void CMainWindow::HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi)
     HWND hWin = ::RealChildWindowFromPoint(*this, p);
     if (hWin == m_TabBar)
     {
-        int docId = m_TabBar.GetIDFromIndex(tab);
-        if (docId >= 0)
+        auto docId = m_TabBar.GetIDFromIndex(tab);
+        if (docId.IsValid())
         {
             if (m_DocManager.HasDocumentID(docId))
             {
@@ -2353,7 +2353,7 @@ bool CMainWindow::HandleDoubleClick(const Scintilla::SCNotification& scn)
 
 void CMainWindow::HandleSavePoint(const Scintilla::SCNotification& scn)
 {
-    int docID = m_TabBar.GetCurrentTabId();
+    auto docID = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(docID))
     {
         CDocument doc = m_DocManager.GetDocumentFromID(docID);
@@ -2367,7 +2367,7 @@ void CMainWindow::HandleWriteProtectedEdit()
 {
     // user tried to edit a readonly file: ask whether
     // to make the file writeable
-    int docID = m_TabBar.GetCurrentTabId();
+    auto docID = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(docID))
     {
         CDocument doc = m_DocManager.GetDocumentFromID(docID);
@@ -2531,17 +2531,17 @@ void CMainWindow::OpenNewTab()
     }
     else
         index = m_TabBar.InsertAtEnd(tabName.c_str());
-    int docID = m_TabBar.GetIDFromIndex(index);
+    auto docID = m_TabBar.GetIDFromIndex(index);
     m_DocManager.AddDocumentAtEnd(doc, docID);
     m_TabBar.ActivateAt(index);
     m_editor.GotoLine(0);
-    CCommandHandler::Instance().OnDocumentOpen(index);
+    CCommandHandler::Instance().OnDocumentOpen(docID);
 }
 
 void CMainWindow::HandleTabChanging(const NMHDR& /*nmhdr*/)
 {
     // document is about to be deactivated
-    int docID = m_TabBar.GetCurrentTabId();
+    auto docID = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(docID))
     {
         m_editor.MatchBraces(Clear);
@@ -2555,7 +2555,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
 {
     int curTab = m_TabBar.GetCurrentTabIndex();
     // document got activated
-    int docID = m_TabBar.GetCurrentTabId();
+    auto docID = m_TabBar.GetCurrentTabId();
     // Can't do much if no document for this tab.
     if (!m_DocManager.HasDocumentID(docID))
         return;
@@ -2680,13 +2680,13 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             lang = "Text";
         doc.m_language = lang;
         index = m_TabBar.InsertAtEnd(fileName.c_str());
-        int docID = m_TabBar.GetIDFromIndex(index);
+        auto docID = m_TabBar.GetIDFromIndex(index);
         m_DocManager.AddDocumentAtEnd(doc, docID);
         UpdateTab(docID);
         UpdateStatusBar(true);
         m_TabBar.ActivateAt(index);
         m_editor.GotoLine(0);
-        CCommandHandler::Instance().OnDocumentOpen(index);
+        CCommandHandler::Instance().OnDocumentOpen(docID);
 
         return index;
     }
@@ -2706,8 +2706,8 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     {
         CIniSettings::Instance().Save();
     }
-    int id = m_DocManager.GetIdForPath(filepath.c_str());
-    if (id != -1)
+    auto id = m_DocManager.GetIdForPath(filepath.c_str());
+    if (id.IsValid())
     {
         index = m_TabBar.GetIndexFromID(id);
         // document already open.
@@ -2738,7 +2738,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         CDocument doc = m_DocManager.LoadFile(*this, filepath, encoding, createIfMissing);
         if (doc.m_document)
         {
-            int activetabid = -1;
+            DocID activetabid;
             if (bOpenIntoActiveTab)
             {
                 activetabid = m_TabBar.GetCurrentTabId();
@@ -2746,13 +2746,13 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 if (!activedoc.m_bIsDirty && !activedoc.m_bNeedsSaving)
                     m_DocManager.RemoveDocument(activetabid);
                 else
-                    activetabid = -1;
+                    activetabid = DocID();
             }
-            if (activetabid < 0)
+            if (!activetabid.IsValid())
             {
                 // check if the only tab is empty and if it is, remove it
                 auto docID = m_TabBar.GetCurrentTabId();
-                if (docID >= 0)
+                if (docID.IsValid())
                 {
                     CDocument existDoc = m_DocManager.GetDocumentFromID(docID);
                     if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH) == 0) && (m_editor.Call(SCI_CANUNDO) == 0))
@@ -2770,7 +2770,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             if (bAddToMRU)
                 CMRU::Instance().AddPath(filepath);
             std::wstring sFileName = CPathUtils::GetFileName(filepath);
-            if (activetabid < 0)
+            if (!activetabid.IsValid())
             {
                 if (m_insertionIndex >= 0)
                     index = m_TabBar.InsertAfter(m_insertionIndex, sFileName.c_str());
@@ -2823,7 +2823,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
             if (bAddToMRU)
                 SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
-            CCommandHandler::Instance().OnDocumentOpen(index);
+            CCommandHandler::Instance().OnDocumentOpen(id);
             if (m_fileTree.GetPath().empty())
             {
                 m_fileTree.SetPath(CPathUtils::GetParentDirectory(filepath));
@@ -2853,7 +2853,7 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
 
     // Get the id for the document we just loaded,
     // it'll currently have a temporary name.
-    int docID = m_DocManager.GetIdForPath(temppath);
+    auto docID = m_DocManager.GetIdForPath(temppath);
     CDocument doc = m_DocManager.GetDocumentFromID(docID);
     doc.m_path = CPathUtils::GetLongPathname(realpath);
     doc.m_bIsDirty = bModified;
@@ -3065,8 +3065,8 @@ bool CMainWindow::HandleCopyDataMoveTab(const COPYDATASTRUCT& cds)
 
     if (!realpath.empty()) // If this is a saved file
     {
-        int docID = m_DocManager.GetIdForPath(realpath.c_str());
-        if (docID != -1) // If it already exists switch to it.
+        auto docID = m_DocManager.GetIdForPath(realpath.c_str());
+        if (docID.IsValid()) // If it already exists switch to it.
         {
             // TODO: we can lose work here, see notes above.
             // The document we switch to may be the same.
@@ -3244,8 +3244,8 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
 
 bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
 {
-    int docID = m_TabBar.GetIDFromIndex(tab);
-    if (docID < 0) // No such tab.
+    auto docID = m_TabBar.GetIDFromIndex(tab);
+    if (!docID.IsValid()) // No such tab.
         return false;
     if (!m_DocManager.HasDocumentID(docID)) // No such document
         return false;
@@ -3336,7 +3336,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
 bool CMainWindow::HandleOutsideDeletedFile(int tab)
 {
     assert(tab == m_TabBar.GetCurrentTabIndex());
-    int docID = m_TabBar.GetIDFromIndex(tab);
+    auto docID = m_TabBar.GetIDFromIndex(tab);
     CDocument doc = m_DocManager.GetDocumentFromID(docID);
     // file was removed. Options are:
     // * keep the file open
@@ -3386,7 +3386,7 @@ void CMainWindow::CheckForOutsideChanges()
     int activeTab = m_TabBar.GetCurrentTabIndex();
     for (int i = 0; i < m_TabBar.GetItemCount(); ++i)
     {
-        int docID = m_TabBar.GetIDFromIndex(i);
+        auto docID = m_TabBar.GetIDFromIndex(i);
         auto ds = m_DocManager.HasFileChanged(docID);
         if (ds == DM_Modified || ds == DM_Removed)
         {
@@ -3475,7 +3475,7 @@ void CMainWindow::ShowFileTree(bool bShow)
     CIniSettings::Instance().SetInt64(L"View", L"FileTree", m_fileTreeVisible ? 1 : 0);
 }
 
-COLORREF CMainWindow::GetColorForDocument(int id)
+COLORREF CMainWindow::GetColorForDocument(DocID id)
 {
     const CDocument& doc = m_DocManager.GetDocumentFromID(id);
     std::wstring folderpath = CPathUtils::GetParentDirectory(doc.m_path);
@@ -3509,18 +3509,18 @@ void CMainWindow::OpenFiles(const std::vector<std::wstring>& paths)
         OnOutOfScope(HideProgressCtrl());
 
         // Open all that was selected or at least returned.
-        int docToActivate = -1;
+        DocID docToActivate;
         int filecounter = 0;
         for (const auto& file : paths)
         {
             ++filecounter;
             SetProgress(filecounter, (DWORD32)paths.size());
             // Remember whatever we first successfully open in order to return to it.
-            if (OpenFile(file.c_str(), OpenFlags::AddToMRU) >= 0 && docToActivate < 0)
+            if (OpenFile(file.c_str(), OpenFlags::AddToMRU) >= 0 && !docToActivate.IsValid())
                 docToActivate = m_DocManager.GetIdForPath(file.c_str());
         }
 
-        if (docToActivate >= 0)
+        if (docToActivate.IsValid())
         {
             auto tabToActivate = m_TabBar.GetIndexFromID(docToActivate);
             m_TabBar.ActivateAt(tabToActivate);
@@ -3678,8 +3678,8 @@ void CMainWindow::SetTheme(bool dark)
     {
         SetRibbonColorsHSB(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
     }
-    int activeTabId = m_TabBar.GetCurrentTabId();
-    if (activeTabId >= 0)
+    auto activeTabId = m_TabBar.GetCurrentTabId();
+    if (activeTabId.IsValid())
     {
         m_editor.Call(SCI_CLEARDOCUMENTSTYLE);
         m_editor.Call(SCI_COLOURISE, 0, -1);

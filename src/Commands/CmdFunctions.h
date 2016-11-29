@@ -61,7 +61,7 @@ enum class DocEventType
 
 struct DocEvent
 {
-    int docID;
+    DocID docID;
     DocEventType eventID;
 };
 
@@ -82,7 +82,7 @@ private:
     void TabNotify(TBHDR* ptbhdr) override;
     void ScintillaNotify(Scintilla::SCNotification* pScn) override;
     void OnTimer(UINT id) override;
-    void OnDocumentOpen(int index) override;
+    void OnDocumentOpen(DocID id) override;
     void OnDocumentSave(int index, bool bSaveAs) override;
     void OnLexerChanged(int lexer) override;
     void OnDocumentClose(int index) override;
@@ -92,7 +92,7 @@ private:
     void InvalidateFunctionsEnabled();
     void InvalidateFunctionsSource();
     HRESULT PopulateFunctions(IUICollectionPtr& collection);
-    void EventHappened(int docID, DocEventType eventType);
+    void EventHappened(DocID docID, DocEventType eventType);
     void FindFunctions(const CDocument& doc, std::function<bool(const std::wstring&, long lineNum)>& callback) const;
 
 private:
@@ -105,7 +105,7 @@ private:
     Scintilla::Sci_TextToFind m_ttf;
     std::string m_funcRegex;
     std::string m_docLang;
-    int m_docID = -1;
+    DocID m_docID;
     std::vector<std::wstring> m_wtrimtokens;
     std::vector<int> m_menuData;
     std::chrono::time_point<std::chrono::steady_clock> m_funcProcessingStartTime;

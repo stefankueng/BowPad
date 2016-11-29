@@ -729,7 +729,7 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
                 return 0;
             }
             const auto& sr = m_searchResults[itemIndex];
-            if (sr.docID >= 0)
+            if (sr.docID.IsValid())
             {
                 CDocument doc = GetDocumentFromID(sr.docID);
                 _snwprintf_s(tip->pszText, tip->cchTextMax, _TRUNCATE, L"%s (#%d)",
@@ -795,7 +795,7 @@ LRESULT CFindReplaceDlg::GetListItemDispInfo(NMLVDISPINFO* pDispInfo)
         switch (pDispInfo->item.iSubItem)
         {
         case 0:     // file
-            if (item.docID < 0)
+            if (!item.docID.IsValid())
                 sTemp = CPathUtils::GetFileName(m_foundPaths[item.pathIndex]);
             else
                 sTemp = GetTitleForDocID(item.docID);
@@ -1491,7 +1491,7 @@ void CFindReplaceDlg::DoReplace( int id )
         int tabcount = GetTabCount();
         for (int i = 0; i < tabcount; ++i)
         {
-            int docID = GetDocIDFromTabIndex(i);
+            auto docID = GetDocIDFromTabIndex(i);
             CDocument doc = GetDocumentFromID(docID);
             int rcount = ReplaceDocument(doc, g_findString, sReplaceString, g_searchFlags);
             if (rcount)
@@ -1635,7 +1635,7 @@ void CFindReplaceDlg::SortResults()
         [&](const CSearchResult& lhs, const CSearchResult& rhs)
     {
         int result = -1;
-        if (lhs.docID >= 0 && rhs.docID >= 0)
+        if (lhs.docID.IsValid() && rhs.docID.IsValid())
         {
             CDocument ldoc = GetDocumentFromID(lhs.docID);
             CDocument rdoc = GetDocumentFromID(rhs.docID);
@@ -1668,13 +1668,13 @@ void CFindReplaceDlg::SortResults()
                     GetTitleForDocID(rhs.docID));
             }
         }
-        else if (lhs.docID >= 0)
+        else if (lhs.docID.IsValid())
         {
             assert(rhs.hasPath());
             result = CPathUtils::PathCompare(GetTitleForDocID(lhs.docID),
                 CPathUtils::GetFileName(m_foundPaths[rhs.pathIndex]));
         }
-        else if (rhs.docID >= 0)
+        else if (rhs.docID.IsValid())
         {
             assert(lhs.hasPath());
             result = CPathUtils::PathCompare(
@@ -1747,7 +1747,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
 
         if (id == IDC_FINDALL && HasActiveDocument())
         {
-            int docId = GetDocIDFromTabIndex(GetActiveTabIndex());
+            auto docId = GetDocIDFromTabIndex(GetActiveTabIndex());
             CDocument doc = GetActiveDocument();
             ResString rInfo(hRes, IDS_SEARCHING_FILE);
             auto sInfo = CStringUtils::Format(rInfo, CPathUtils::GetFileName(doc.m_path).c_str());
@@ -1762,7 +1762,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
             int tabcount = GetTabCount();
             for (int i = 0; i < tabcount; ++i)
             {
-                int docID = GetDocIDFromTabIndex(i);
+                auto docID = GetDocIDFromTabIndex(i);
                 CDocument doc = GetDocumentFromID(docID);
                 auto sInfo = CStringUtils::Format(rInfo, CPathUtils::GetFileName(doc.m_path).c_str());
                 SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
@@ -1965,12 +1965,13 @@ void CFindReplaceDlg::SearchThread(
         // Don't crash if the document cannot be loaded. .e.g. if it is locked.
         if (doc.m_document != Document(0))
         {
-            manager.AddDocumentAtEnd(doc, 1);
-            OnOutOfScope( manager.RemoveDocument(1); );
+            DocID did(1);
+            manager.AddDocumentAtEnd(doc, did);
+            OnOutOfScope( manager.RemoveDocument(did); );
             if (!m_bStop)
             {
                 size_t resultSizeBefore = m_pendingSearchResults.size();
-                SearchDocument(searchWnd, -1, doc, searchfor, flags, exSearchFlags,
+                SearchDocument(searchWnd, DocID(), doc, searchfor, flags, exSearchFlags,
                     m_pendingSearchResults, m_pendingFoundPaths);
                 if (m_pendingSearchResults.size() - resultSizeBefore > 0)
                     m_pendingFoundPaths.push_back(std::move(path));
@@ -2007,7 +2008,7 @@ void CFindReplaceDlg::AcceptData()
 }
 
 void CFindReplaceDlg::SearchDocument(
-    CScintillaWnd& searchWnd, int docID, const CDocument& doc,
+    CScintillaWnd& searchWnd, DocID docID, const CDocument& doc,
     const std::string& searchfor, int searchflags, unsigned int exSearchFlags,
     SearchResults& searchResults, SearchPaths& foundPaths
     )
@@ -2069,7 +2070,7 @@ void CFindReplaceDlg::SearchDocument(
             // use the path. The document might close, or be saved to another path,
             // but by not using the document id, the result can just stick consistently
             // to wherever it originally referred to.
-            if (docID >= 0)
+            if (docID.IsValid())
                 result.docID = docID;
             result.pos = ttf.chrgText.cpMin;
             char c = (char)searchWnd.Call(SCI_GETCHARAT, result.pos);
@@ -2141,7 +2142,7 @@ void CFindReplaceDlg::SearchDocument(
             }
             if (matched)
             {
-                if (docID < 0)
+                if (!docID.IsValid())
                     result.pathIndex = foundPaths.size();
                 searchResults.push_back(std::move(result));
                 if (++m_foundsize >= MAX_SEARCHRESULTS)
@@ -2817,7 +2818,7 @@ void CFindReplaceDlg::NotifyOnDocumentClose(int tabIndex)
     // Search Results can have negative document id's.
     // If the closing document should ever be negative too we would match them.
     // That might be bad so check to avoid that.
-    if (closingDocID < 0)
+    if (!closingDocID.IsValid())
     {
         assert(false);
         return;
@@ -2890,7 +2891,7 @@ void CFindReplaceDlg::NotifyOnDocumentClose(int tabIndex)
                     }
                     found = true;
                 }
-                item.docID = -1;
+                item.docID = DocID();
                 if (newPathIndex != size_t(-1))
                     item.pathIndex = newPathIndex;
                 ++redrawCount;

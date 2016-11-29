@@ -67,7 +67,7 @@ public:
 
     void ScintillaNotify(Scintilla::SCNotification* pScn) override;
 
-    void OnDocumentOpen(int id) override;
+    void OnDocumentOpen(DocID id) override;
 
     void OnDocumentSave(int index, bool bSaveAs) override;
 

@@ -289,14 +289,14 @@ int CTabBar::GetCurrentTabIndex() const
     return TabCtrl_GetCurSel(*this);
 }
 
-int CTabBar::GetCurrentTabId() const
+DocID CTabBar::GetCurrentTabId() const
 {
     int index = TabCtrl_GetCurSel(*this);
     if (index < 0)
     {
         index = TabCtrl_GetCurFocus(*this);
         if (index < 0)
-            return -1;
+            return{};
     }
     TCITEM tci;
     tci.mask = TCIF_PARAM;
@@ -304,12 +304,12 @@ int CTabBar::GetCurrentTabId() const
     if (!result)
     {
         assert(false);
-        return -1;
+        return{};
     }
-    return (int)tci.lParam;
+    return DocID((int)tci.lParam);
 }
 
-void CTabBar::SetCurrentTabId(int id)
+void CTabBar::SetCurrentTabId(DocID id)
 {
     int index = TabCtrl_GetCurSel(*this);
     if (index < 0)
@@ -320,7 +320,7 @@ void CTabBar::SetCurrentTabId(int id)
     }
     TCITEM tci;
     tci.mask = TCIF_PARAM;
-    tci.lParam = id;
+    tci.lParam = id.GetValue();
     TabCtrl_SetItem(*this, index, &tci);
 }
 
@@ -1161,21 +1161,21 @@ LRESULT CALLBACK CTabBar::TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LP
     return (((CTabBar *)(::GetWindowLongPtr(hwnd, GWLP_USERDATA)))->RunProc(hwnd, Message, wParam, lParam));
 }
 
-int CTabBar::GetIDFromIndex(int index) const
+DocID CTabBar::GetIDFromIndex(int index) const
 {
     TCITEM tci;
     tci.mask = TCIF_PARAM;
     auto result = TabCtrl_GetItem(*this, index, &tci);
     // Easier to set a break point on failed results.
     if (result)
-        return (int)tci.lParam;
+        return DocID((int)tci.lParam);
     else
-        return -1;
+        return{};
 }
 
-int CTabBar::GetIndexFromID(int id) const
+int CTabBar::GetIndexFromID(DocID id) const
 {
-    if (id >= 0) // Only look for an id that's legal to begin with.
+    if (id.IsValid()) // Only look for an id that's legal to begin with.
     {
         for (int i = 0; i < m_nItems; ++i)
         {

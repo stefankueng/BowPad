@@ -367,7 +367,7 @@ CDocumentManager::~CDocumentManager()
 {
 }
 
-bool CDocumentManager::HasDocumentID(int id) const
+bool CDocumentManager::HasDocumentID(DocID id) const
 {
     // Allow searches of things with an invalid id, to simplify things for the caller.
     auto where = m_documents.find(id);
@@ -375,14 +375,13 @@ bool CDocumentManager::HasDocumentID(int id) const
         return false;
 
     // If we find something with an invalid id, something is very wrong.
-    if (id < 0)
-        APPVERIFY(false);
+    APPVERIFY(id.IsValid());
 
     return true;
 }
 
 // Must exist or it's a bug.
-CDocument CDocumentManager::GetDocumentFromID(int id) const
+CDocument CDocumentManager::GetDocumentFromID(DocID id) const
 {
     auto pos = m_documents.find(id);
     if (pos == std::end(m_documents))
@@ -393,7 +392,7 @@ CDocument CDocumentManager::GetDocumentFromID(int id) const
     return pos->second;
 }
 
-void CDocumentManager::SetDocument(int id, const CDocument& doc)
+void CDocumentManager::SetDocument(DocID id, const CDocument& doc)
 {
     auto where = m_documents.find(id);
     if (where != std::end(m_documents))
@@ -408,10 +407,10 @@ void CDocumentManager::SetDocument(int id, const CDocument& doc)
     APPVERIFY(false);
 }
 
-void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, int id )
+void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, DocID id )
 {
     // Catch attempts to id's that serve as null type values.
-    APPVERIFY(id>=0); // Serious bug.    
+    APPVERIFY(id.IsValid()); // Serious bug.    
     APPVERIFY(m_documents.find(id) == m_documents.end()); // Should not already exist.
     m_documents[id] = doc;
 }
@@ -886,7 +885,7 @@ bool CDocumentManager::UpdateFileTime(CDocument& doc, bool bIncludeReadonly)
     return true;
 }
 
-DocModifiedState CDocumentManager::HasFileChanged( int id ) const
+DocModifiedState CDocumentManager::HasFileChanged(DocID id ) const
 {
     CDocument doc = GetDocumentFromID(id);
     if (doc.m_path.empty() || ((doc.m_lastWriteTime.dwLowDateTime == 0) && (doc.m_lastWriteTime.dwHighDateTime == 0)) || doc.m_bDoSaveAs)
@@ -910,17 +909,17 @@ DocModifiedState CDocumentManager::HasFileChanged( int id ) const
     return DM_Unmodified;
 }
 
-int CDocumentManager::GetIdForPath( const std::wstring& path ) const
+DocID CDocumentManager::GetIdForPath( const std::wstring& path ) const
 {
     for (const auto& d : m_documents)
     {
         if (CPathUtils::PathCompare(d.second.m_path, path) == 0)
             return d.first;
     }
-    return -1;
+    return{};
 }
 
-void CDocumentManager::RemoveDocument( int id )
+void CDocumentManager::RemoveDocument(DocID id )
 {
     CDocument doc = GetDocumentFromID(id);
     m_scratchScintilla.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);

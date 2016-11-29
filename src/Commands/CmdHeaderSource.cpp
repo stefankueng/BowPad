@@ -263,8 +263,8 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
         m_menuInfo.clear();
 
         // We need to know have an active document to continue.
-        int docId = GetDocIdOfCurrentTab();
-        if (docId < 0)
+        auto docId = GetDocIdOfCurrentTab();
+        if (!docId.IsValid())
             return E_FAIL;
         if (!HasActiveDocument())
             return E_FAIL;
@@ -676,7 +676,7 @@ void CCmdHeaderSource::ScintillaNotify(Scintilla::SCNotification * pScn)
     }
 }
 
-void CCmdHeaderSource::OnDocumentOpen(int /*index*/)
+void CCmdHeaderSource::OnDocumentOpen(DocID /*id*/)
 {
     // All new links to find.
     InvalidateMenu();

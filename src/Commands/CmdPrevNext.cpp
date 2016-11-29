@@ -24,12 +24,11 @@ class PositionData
 {
 public:
     PositionData()
-        : id(-1)
-        , line(-1)
+        : line(-1)
         , column(-1)
     {
     }
-    PositionData(int i, long l, long c)
+    PositionData(DocID i, long l, long c)
         : id(i)
         , line(l)
         , column(c)
@@ -45,7 +44,7 @@ public:
         return (this->id != other.id || this->line != other.line || this->column != other.column);
     }
 
-    int           id; // Doc Id.
+    DocID         id; // Doc Id.
     long          line;
     long          column;
 };
@@ -53,7 +52,7 @@ public:
 namespace
 {
 std::deque<PositionData>    g_positions;
-int                         g_currentDocId = -1;
+DocID                       g_currentDocId;
 size_t                      g_offsetBeforeEnd = 0;
 long                        g_currentLine = -1;
 bool                        g_ignore = false;
@@ -61,7 +60,7 @@ const long                  MAX_PREV_NEXT_POSITIONS = 500;
 // Only store a new position if it's more than N lines from the old one.
 const long                  POSITION_SAVE_GRANULARITY = 10;
 
-void AddNewPosition(long id, long line, long col)
+void AddNewPosition(DocID id, long line, long col)
 {
     PositionData data(id, line, col);
     if (g_positions.empty() || (g_positions.back() != data))
@@ -98,11 +97,11 @@ void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification* pScn )
             if (g_offsetBeforeEnd >= (int)g_positions.size())
                 g_offsetBeforeEnd = 0;
             long line = (long) ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
-            if (g_currentDocId < 0 || g_currentLine == -1)
+            if (!g_currentDocId.IsValid() || g_currentLine == -1)
             {
                 ResizePositionSpace();
                 g_currentDocId = GetDocIdOfCurrentTab();
-                if (g_currentDocId >= 0)
+                if (g_currentDocId.IsValid())
                 {
                     long col = (long) ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
                     AddNewPosition(g_currentDocId, line, col);
@@ -189,7 +188,7 @@ bool CCmdPrevious::Execute()
         ++i;
     }
 
-    if (data.id >= 0)
+    if (data.id.IsValid())
     {
         // Set ignore to true so we don't move the cursor to a position
         // and in doing so trigger that position recorded as it already is.
@@ -244,7 +243,7 @@ bool CCmdNext::Execute()
         ++i;
     }
 
-    if (data.id >= 0)
+    if (data.id.IsValid())
     {
         g_ignore = true;
         OnOutOfScope

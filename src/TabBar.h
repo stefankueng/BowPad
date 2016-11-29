@@ -16,6 +16,7 @@
 //
 #pragma once
 #include "BaseWindow.h"
+#include "DocumentManager.h"
 
 #define TCN_TABDROPPED                  (WM_USER + 1)
 #define TCN_TABDROPPEDOUTSIDE           (WM_USER + 2)
@@ -73,11 +74,11 @@ public :
     std::wstring                GetCurrentTitle() const;
     void                        SetCurrentTitle(LPCTSTR title);
     int                         GetCurrentTabIndex() const;
-    int                         GetCurrentTabId() const;
-    void                        SetCurrentTabId(int id);
+    DocID                       GetCurrentTabId() const;
+    void                        SetCurrentTabId(DocID id);
     void                        DeleteItemAt(int index);
-    int                         GetIDFromIndex(int index) const;
-    int                         GetIndexFromID(int id) const;
+    DocID                       GetIDFromIndex(int index) const;
+    int                         GetIndexFromID(DocID id) const;
     void                        DeletAllItems();
     HIMAGELIST                  SetImageList(HIMAGELIST himl);
     int                         GetItemCount() const { return m_nItems; }

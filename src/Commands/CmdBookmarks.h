@@ -54,7 +54,7 @@ public:
 
     void OnDocumentClose(int index) override;
 
-    void OnDocumentOpen(int index) override;
+    void OnDocumentOpen(DocID id) override;
 
 private:
     BookmarkContainer m_bookmarks;
