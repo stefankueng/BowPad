@@ -55,10 +55,10 @@ private:
         // out. We know it must be the type we want because we just created it.
         // We could use shared_ptr here but we control the life time so
         // no point paying the price as if we didn't.
-        auto pCmd = std::make_unique<T>(args...);
-        auto cmdId = pCmd->GetCmdId();        
+        auto pCmd = std::make_unique<T>(std::forward<ARGS>(args)...);
+        auto cmdId = pCmd->GetCmdId();
         m_highestCmdId = max(m_highestCmdId, cmdId);
-        auto at = m_commands.insert({ cmdId, std::move(pCmd) });
+        auto at = m_commands.emplace(cmdId, std::move(pCmd));
         assert(at.second); // Verify no command has the same ID as an existing command.
         return static_cast<T*>(at.first->second.get());
     }
