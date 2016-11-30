@@ -71,10 +71,10 @@ bool CCmdTabs2Spaces::Execute()
 {
     // convert the whole file, ignore the selection
     int tabsize = (int)ScintillaCall(SCI_GETTABWIDTH);
-    size_t docLength = ScintillaCall(SCI_GETLENGTH) + 1;
-    size_t curpos = ScintillaCall(SCI_GETCURRENTPOS);
+    auto docLength = ScintillaCall(SCI_GETLENGTH) + 1;
+    auto curpos = ScintillaCall(SCI_GETCURRENTPOS);
     bool bIgnoreQuotes = false;
-    int lexer = (int)ScintillaCall(SCI_GETLEXER);
+    auto lexer = ScintillaCall(SCI_GETLEXER);
     switch (lexer)
     {
         case SCLEX_XML:
@@ -87,14 +87,14 @@ bool CCmdTabs2Spaces::Execute()
 
     // untabify the file
     // first find the number of spaces we have to insert.
-    size_t pos = 0;
-    size_t inlinepos = 0;
-    size_t spacestoinsert = 0;
+    decltype(docLength) pos = 0;
+    decltype(docLength) inlinepos = 0;
+    decltype(docLength) spacestoinsert = 0;
     bool inChar = false;
     bool inString = false;
     bool escapeChar = false;
     char * pBuf = (char*)source.get();
-    for (size_t i = 0; i < docLength; ++i, ++pos, ++pBuf)
+    for (decltype(docLength) i = 0; i < docLength; ++i, ++pos, ++pBuf)
     {
         ++inlinepos;
         if (escapeChar)
@@ -117,7 +117,7 @@ bool CCmdTabs2Spaces::Execute()
         if (*pBuf == '\t')
         {
             inlinepos += tabsize - 1;
-            long inlinepostemp = tabsize - ((inlinepos + tabsize) % tabsize);
+            auto inlinepostemp = tabsize - ((inlinepos + tabsize) % tabsize);
             if (inlinepostemp == 0)
                 inlinepostemp = tabsize;
             spacestoinsert += (inlinepostemp - 1);      // minus one because the tab itself gets replaced
@@ -127,9 +127,9 @@ bool CCmdTabs2Spaces::Execute()
 
     if (spacestoinsert)
     {
-        size_t setpos = curpos;
+        auto setpos = curpos;
         inlinepos = 0;
-        size_t newfilelen = docLength + spacestoinsert;
+        auto newfilelen = docLength + spacestoinsert;
         auto destination = std::make_unique<char[]>(newfilelen);
         char * pBufStart = destination.get();
         char * pOldBuf = (char*)source.get();
@@ -137,7 +137,7 @@ bool CCmdTabs2Spaces::Execute()
         inChar = false;
         inString = false;
         escapeChar = false;
-        for (size_t i = 0; i < docLength; ++i)
+        for (decltype(docLength) i = 0; i < docLength; ++i)
         {
             ++inlinepos;
             if (escapeChar)
@@ -162,11 +162,11 @@ bool CCmdTabs2Spaces::Execute()
                 inlinepos = 0;
             if (*pOldBuf == '\t')
             {
-                size_t inlinepostemp = tabsize - (((inlinepos - 1) + tabsize) % tabsize);
+                auto inlinepostemp = tabsize - (((inlinepos - 1) + tabsize) % tabsize);
                 if (inlinepostemp == 0)
                     inlinepostemp = tabsize;
                 inlinepos += (inlinepostemp - 1);
-                for (size_t j = 0; j < inlinepostemp; ++j)
+                for (decltype(inlinepostemp) j = 0; j < inlinepostemp; ++j)
                 {
                     *pBuf++ = ' ';
                     if (i < curpos)
@@ -180,7 +180,7 @@ bool CCmdTabs2Spaces::Execute()
         ScintillaCall(SCI_BEGINUNDOACTION);
         ScintillaCall(SCI_SETTEXT, 0, (LPARAM)destination.get());
         ScintillaCall(SCI_ENDUNDOACTION);
-        Center((long)setpos, (long)setpos);
+        Center(setpos, setpos);
         return true;
     }
     return false;
@@ -190,10 +190,10 @@ bool CCmdSpaces2Tabs::Execute()
 {
     // convert the whole file, ignore the selection
     int tabsize = (int)ScintillaCall(SCI_GETTABWIDTH);
-    size_t docLength = ScintillaCall(SCI_GETLENGTH) + 1;
-    size_t curpos = ScintillaCall(SCI_GETCURRENTPOS);
+    auto docLength = ScintillaCall(SCI_GETLENGTH) + 1;
+    auto curpos = ScintillaCall(SCI_GETCURRENTPOS);
     bool bIgnoreQuotes = false;
-    int lexer = (int)ScintillaCall(SCI_GETLEXER);
+    auto lexer = ScintillaCall(SCI_GETLEXER);
     switch (lexer)
     {
         case SCLEX_XML:
@@ -207,15 +207,15 @@ bool CCmdSpaces2Tabs::Execute()
 
     // tabify the file
     // first find out how many spaces we have to convert into tabs
-    size_t count = 0;
-    size_t spacecount = 0;
-    std::vector<size_t> spacegrouppositions;
-    size_t pos = 0;
+    decltype(docLength) count = 0;
+    decltype(docLength) spacecount = 0;
+    std::vector<decltype(docLength)> spacegrouppositions;
+    decltype(docLength) pos = 0;
     bool inChar = false;
     bool inString = false;
     bool escapeChar = false;
     char * pBuf = (char*)source.get();
-    for (size_t i = 0; i < docLength; ++i, ++pos, ++pBuf)
+    for (decltype(docLength) i = 0; i < docLength; ++i, ++pos, ++pBuf)
     {
         if (escapeChar)
         {
@@ -237,7 +237,7 @@ bool CCmdSpaces2Tabs::Execute()
         if ((*pBuf == ' ') || (*pBuf == '\t'))
         {
             spacecount++;
-            if ((spacecount == (size_t)tabsize) || ((*pBuf == '\t') && (spacecount > 1)))
+            if ((spacecount == tabsize) || ((*pBuf == '\t') && (spacecount > 1)))
             {
                 spacegrouppositions.push_back(pos - spacecount + 1);
                 count += (spacecount - 1);
@@ -254,21 +254,21 @@ bool CCmdSpaces2Tabs::Execute()
     // groups with tabs.
     if (count)
     {
-        size_t setpos = curpos;
-        size_t newfilelen = docLength;
+        auto setpos = curpos;
+        auto newfilelen = docLength;
         newfilelen -= count;
         auto destination = std::make_unique<char[]>(newfilelen);
         char * pBufStart = destination.get();
         char * pOldBuf = (char*)source.get();
         pBuf = pBufStart;
         auto it = spacegrouppositions.begin();
-        for (size_t i = 0; i < (docLength); ++i)
+        for (decltype(docLength) i = 0; i < (docLength); ++i)
         {
             if ((it != spacegrouppositions.end()) && (*it == i))
             {
                 *pBuf++ = '\t';
                 spacecount = 0;
-                while ((spacecount < (size_t)tabsize) && (*pOldBuf == ' '))
+                while ((spacecount < tabsize) && (*pOldBuf == ' '))
                 {
                     i++;
                     spacecount++;
@@ -276,7 +276,7 @@ bool CCmdSpaces2Tabs::Execute()
                     if (i < curpos)
                         --setpos;
                 }
-                if ((spacecount < (size_t)tabsize) && (*pOldBuf == '\t'))
+                if ((spacecount < tabsize) && (*pOldBuf == '\t'))
                     pBuf--;
                 --i;
                 ++it;
@@ -287,7 +287,7 @@ bool CCmdSpaces2Tabs::Execute()
         ScintillaCall(SCI_BEGINUNDOACTION);
         ScintillaCall(SCI_SETTEXT, 0, (LPARAM)destination.get());
         ScintillaCall(SCI_ENDUNDOACTION);
-        Center((long)setpos, (long)setpos);
+        Center(setpos, setpos);
         return true;
     }
     return false;

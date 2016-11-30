@@ -31,7 +31,7 @@ std::string ClipboardBase::GetHtmlSelection()
 {
     if (!HasActiveDocument())
         return "";
-    CDocument doc = GetActiveDocument();
+    auto doc = GetActiveDocument();
     const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(doc.m_language);
 
     std::string sHtmlFragment;
@@ -159,14 +159,13 @@ void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml)
         hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen+1)*sizeof(char));
         if (hClipboardData)
         {
-            char * pchData;
-            pchData = (char*)GlobalLock(hClipboardData);
+            char * pchData = (char*)GlobalLock(hClipboardData);
             if (pchData)
             {
                 strcpy_s(pchData, sLen+1, sHtml.c_str());
                 if (GlobalUnlock(hClipboardData))
                 {
-                    UINT CF_HTML = RegisterClipboardFormat(L"HTML Format");
+                    auto CF_HTML = RegisterClipboardFormat(L"HTML Format");
                     SetClipboardData(CF_HTML, hClipboardData);
                 }
             }
@@ -184,18 +183,17 @@ void ClipboardBase::AddLexerToClipboard()
         if (OpenClipboard(GetHwnd()))
         {
             HGLOBAL hClipboardData;
-            size_t sLen = lang.length();
+            auto sLen = lang.length();
             hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1)*sizeof(char));
             if (hClipboardData)
             {
-                char * pchData;
-                pchData = (char*)GlobalLock(hClipboardData);
+                char * pchData = (char*)GlobalLock(hClipboardData);
                 if (pchData)
                 {
                     strcpy_s(pchData, sLen + 1, lang.c_str());
                     if (GlobalUnlock(hClipboardData))
                     {
-                        UINT CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
+                        auto CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
                         SetClipboardData(CF_LEXER, hClipboardData);
                     }
                 }
@@ -207,13 +205,13 @@ void ClipboardBase::AddLexerToClipboard()
 
 void ClipboardBase::SetLexerFromClipboard()
 {
-    CDocument doc = GetActiveDocument();
+    auto doc = GetActiveDocument();
     if (doc.m_language.empty() || (doc.m_language.compare("Text") == 0))
     {
         CClipboardHelper clipboard;
         if (clipboard.Open(GetHwnd()))
         {
-            UINT CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
+            auto CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
 
             HANDLE hData = GetClipboardData(CF_LEXER);
             if (hData)
