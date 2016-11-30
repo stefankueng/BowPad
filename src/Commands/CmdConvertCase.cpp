@@ -24,23 +24,23 @@ bool CCmdConvertUppercase::Execute()
 {
     ScintillaCall(SCI_BEGINUNDOACTION);
 
-    int numSelections = (int)ScintillaCall(SCI_GETSELECTIONS);
-    for (int i = 0; i < numSelections; ++i)
+    auto numSelections = ScintillaCall(SCI_GETSELECTIONS);
+    for (decltype(numSelections) i = 0; i < numSelections; ++i)
     {
-        int selStart = (int)ScintillaCall(SCI_GETSELECTIONNSTART, i);
-        int selEnd   = (int)ScintillaCall(SCI_GETSELECTIONNEND, i);
+        auto selStart = ScintillaCall(SCI_GETSELECTIONNSTART, i);
+        auto selEnd   = ScintillaCall(SCI_GETSELECTIONNEND, i);
 
         if ((selStart == selEnd) && (numSelections == 1))
         {
-            int curLine = (int)ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
-            selStart = (int)ScintillaCall(SCI_POSITIONFROMLINE, curLine);
-            selEnd = (int)ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
+            auto curLine = ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
+            selStart = ScintillaCall(SCI_POSITIONFROMLINE, curLine);
+            selEnd = ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
         }
 
         auto strbuf = std::make_unique<char[]>(abs(selEnd-selStart) + 5);
         Scintilla::Sci_TextRange rangestart;
-        rangestart.chrg.cpMin = long(selStart);
-        rangestart.chrg.cpMax = long(selEnd);
+        rangestart.chrg.cpMin = Sci_PositionCR(selStart);
+        rangestart.chrg.cpMax = Sci_PositionCR(selEnd);
         rangestart.lpstrText = strbuf.get();
         ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
 
@@ -61,23 +61,23 @@ bool CCmdConvertLowercase::Execute()
 {
     ScintillaCall(SCI_BEGINUNDOACTION);
 
-    int numSelections = (int)ScintillaCall(SCI_GETSELECTIONS);
-    for (int i = 0; i < numSelections; ++i)
+    auto numSelections = ScintillaCall(SCI_GETSELECTIONS);
+    for (decltype(numSelections) i = 0; i < numSelections; ++i)
     {
-        int selStart = (int)ScintillaCall(SCI_GETSELECTIONNSTART, i);
-        int selEnd   = (int)ScintillaCall(SCI_GETSELECTIONNEND, i);
+        auto selStart = ScintillaCall(SCI_GETSELECTIONNSTART, i);
+        auto selEnd   = ScintillaCall(SCI_GETSELECTIONNEND, i);
 
         if ((selStart == selEnd) && (numSelections == 1))
         {
-            int curLine = (int)ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
-            selStart = (int)ScintillaCall(SCI_POSITIONFROMLINE, curLine);
-            selEnd = (int)ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
+            auto curLine = ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
+            selStart = ScintillaCall(SCI_POSITIONFROMLINE, curLine);
+            selEnd = ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
         }
 
         auto strbuf = std::make_unique<char[]>(abs(selEnd-selStart) + 5);
         Scintilla::Sci_TextRange rangestart;
-        rangestart.chrg.cpMin = long(selStart);
-        rangestart.chrg.cpMax = long(selEnd);
+        rangestart.chrg.cpMin = Sci_PositionCR(selStart);
+        rangestart.chrg.cpMax = Sci_PositionCR(selEnd);
         rangestart.lpstrText = strbuf.get();
         ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
 
@@ -98,23 +98,23 @@ bool CCmdConvertTitlecase::Execute()
 {
     ScintillaCall(SCI_BEGINUNDOACTION);
 
-    int numSelections = (int)ScintillaCall(SCI_GETSELECTIONS);
-    for (int i = 0; i < numSelections; ++i)
+    auto numSelections = ScintillaCall(SCI_GETSELECTIONS);
+    for (decltype(numSelections) i = 0; i < numSelections; ++i)
     {
-        int selStart = (int)ScintillaCall(SCI_GETSELECTIONNSTART, i);
-        int selEnd = (int)ScintillaCall(SCI_GETSELECTIONNEND, i);
+        auto selStart = ScintillaCall(SCI_GETSELECTIONNSTART, i);
+        auto selEnd = ScintillaCall(SCI_GETSELECTIONNEND, i);
 
         if ((selStart == selEnd) && (numSelections == 1))
         {
-            int curLine = (int)ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
-            selStart = (int)ScintillaCall(SCI_POSITIONFROMLINE, curLine);
-            selEnd = (int)ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
+            auto curLine = ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
+            selStart = ScintillaCall(SCI_POSITIONFROMLINE, curLine);
+            selEnd = ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
         }
 
         auto strbuf = std::make_unique<char[]>(abs(selEnd - selStart) + 5);
         Scintilla::Sci_TextRange rangestart;
-        rangestart.chrg.cpMin = long(selStart);
-        rangestart.chrg.cpMax = long(selEnd);
+        rangestart.chrg.cpMin = Sci_PositionCR(selStart);
+        rangestart.chrg.cpMax = Sci_PositionCR(selEnd);
         rangestart.lpstrText = strbuf.get();
         ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
 

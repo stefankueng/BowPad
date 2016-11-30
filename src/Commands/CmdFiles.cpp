@@ -57,10 +57,10 @@ bool CCmdOpen::Execute()
     // Set the default folder to the folder of the current tab.
     if (HasActiveDocument())
     {
-        CDocument doc = GetActiveDocument();
+        auto doc = GetActiveDocument();
         if (!doc.m_path.empty())
         {
-            std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
+            auto folder = CPathUtils::GetParentDirectory(doc.m_path);
             IShellItemPtr psiDefFolder;
             hr = SHCreateItemFromParsingName(folder.c_str(), nullptr, IID_PPV_ARGS(&psiDefFolder));
             if (!CAppUtils::FailedShowMessage(hr))
@@ -107,7 +107,7 @@ bool CCmdOpen::Execute()
         return false;
     std::vector<std::wstring> paths;
     paths.reserve(count);
-    for (DWORD i = 0; i < count; ++i)
+    for (decltype(count) i = 0; i < count; ++i)
     {
         IShellItemPtr psiResult;
         hr = psiaResults->GetItemAt(i, &psiResult);
@@ -165,7 +165,7 @@ HRESULT CCmdSave::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PRO
     {
         if (HasActiveDocument())
         {
-            CDocument doc = GetActiveDocument();
+            auto doc = GetActiveDocument();
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, doc.m_bIsDirty||doc.m_bNeedsSaving, ppropvarNewValue);
         }
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
@@ -175,7 +175,8 @@ HRESULT CCmdSave::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PRO
 
 bool CCmdSaveAll::Execute()
 {
-    for (int i = 0; i < (int)GetDocumentCount(); ++i)
+    auto docCount = GetDocumentCount();
+    for (decltype(docCount) i = 0; i < docCount; ++i)
     {
         if (GetDocumentFromID(GetDocIDFromTabIndex(i)).m_bIsDirty)
         {
@@ -211,8 +212,9 @@ HRESULT CCmdSaveAll::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
 {
     if (UI_PKEY_Enabled == key)
     {
+        auto docCount = GetDocumentCount();
         int dirtycount = 0;
-        for (int i = 0; i < GetDocumentCount(); ++i)
+        for (decltype(docCount) i = 0; i < docCount; ++i)
         {
             CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(i));
             if (doc.m_bIsDirty||doc.m_bNeedsSaving)
@@ -236,7 +238,7 @@ HRESULT CCmdReload::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PR
     {
         if (HasActiveDocument())
         {
-            CDocument doc = GetActiveDocument();
+            auto doc = GetActiveDocument();
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
         }
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
@@ -258,7 +260,7 @@ HRESULT CCmdFileDelete::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, cons
     {
         if (HasActiveDocument())
         {
-            CDocument doc = GetActiveDocument();
+            auto doc = GetActiveDocument();
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
         }
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
@@ -278,7 +280,7 @@ bool CCmdFileDelete::Execute()
 {
     if (HasActiveDocument())
     {
-        CDocument doc = GetActiveDocument();
+        auto doc = GetActiveDocument();
         if (!doc.m_path.empty())
         {
             // ask first
@@ -398,7 +400,7 @@ void CCmdSaveAuto::Save()
     int autosave = (int)CIniSettings::Instance().GetInt64(L"View", L"autosave", 0);
     if (autosave)
     {
-        CDocument doc = GetActiveDocument();
+        auto doc = GetActiveDocument();
         if ((doc.m_bIsDirty || doc.m_bNeedsSaving) && !doc.m_path.empty())
             SaveCurrentTab();
     }

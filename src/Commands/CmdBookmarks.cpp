@@ -31,7 +31,7 @@ CCmdBookmarks::CCmdBookmarks(void * obj) : ICommand(obj)
     auto& settings = CIniSettings::Instance();
     int maxFiles = (int)settings.GetInt64(L"bookmarks", L"maxfiles", 30);
     m_bookmarks.clear();
-    for (int fileIndex = 0; fileIndex < maxFiles; ++fileIndex)
+    for (decltype(maxFiles) fileIndex = 0; fileIndex < maxFiles; ++fileIndex)
     {
         std::wstring sKey = CStringUtils::Format(L"file%d", fileIndex);
         std::wstring sBmData = settings.GetString(L"bookmarks", sKey.c_str(), L"");
@@ -45,8 +45,8 @@ CCmdBookmarks::CCmdBookmarks(void * obj) : ICommand(obj)
                 if (tokens.size() > 1)
                 {
                     auto& lines = m_bookmarks[filepath];
-                    for (size_t li = 1; li < tokens.size(); ++li)
-                        lines.push_back(std::stoi(tokens[li]));
+                    for (const auto& token : tokens)
+                        lines.push_back(std::stoi(token));
                 }
             }
         }
@@ -133,7 +133,7 @@ void CCmdBookmarks::OnDocumentOpen(DocID id)
 
 bool CCmdBookmarkToggle::Execute()
 {
-    long line = GetCurrentLineNumber();
+    auto line = GetCurrentLineNumber();
 
     LRESULT state = ScintillaCall(SCI_MARKERGET, line);
     if ((state & (1 << MARK_BOOKMARK)) != 0)
@@ -168,7 +168,7 @@ bool CCmdBookmarkClearAll::Execute()
 
 bool CCmdBookmarkNext::Execute()
 {
-    long line = GetCurrentLineNumber();
+    auto line = GetCurrentLineNumber();
     line = (long)ScintillaCall(SCI_MARKERNEXT, line+1, (1 << MARK_BOOKMARK));
     if (line >= 0)
         ScintillaCall(SCI_GOTOLINE, line);
@@ -207,7 +207,7 @@ HRESULT CCmdBookmarkNext::IUICommandHandlerUpdateProperty(
 
 bool CCmdBookmarkPrev::Execute()
 {
-    long line = GetCurrentLineNumber();
+    auto line = GetCurrentLineNumber();
     line = (long)ScintillaCall(SCI_MARKERPREVIOUS, line-1, (1 << MARK_BOOKMARK));
     if (line >= 0)
         ScintillaCall(SCI_GOTOLINE, line);

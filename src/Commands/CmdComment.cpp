@@ -24,17 +24,17 @@ bool CCmdComment::Execute()
 {
     // Get Selection
     bool bSelEmpty = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
-    size_t lineStartStart   = 0;
-    size_t lineEndEnd       = 0;
+    sptr_t lineStartStart   = 0;
+    sptr_t lineEndEnd       = 0;
     bool bForceStream       = false;
-    size_t selStart         = ScintillaCall(SCI_GETSELECTIONSTART);
-    size_t selEnd           = ScintillaCall(SCI_GETSELECTIONEND);
-    size_t linestart        = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-    size_t lineend          = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
-    size_t curPos           = ScintillaCall(SCI_GETCURRENTPOS);
+    sptr_t selStart         = ScintillaCall(SCI_GETSELECTIONSTART);
+    sptr_t selEnd           = ScintillaCall(SCI_GETSELECTIONEND);
+    sptr_t linestart        = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+    sptr_t lineend          = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    sptr_t curPos           = ScintillaCall(SCI_GETCURRENTPOS);
     if (!bSelEmpty)
     {
-        if (ScintillaCall(SCI_POSITIONFROMLINE, lineend) == (sptr_t)selEnd)
+        if (ScintillaCall(SCI_POSITIONFROMLINE, lineend) == selEnd)
         {
             --lineend;
             selEnd = ScintillaCall(SCI_GETLINEENDPOSITION, lineend);
@@ -53,7 +53,7 @@ bool CCmdComment::Execute()
     }
     if (!HasActiveDocument())
         return false;
-    CDocument doc = GetActiveDocument();
+    auto doc = GetActiveDocument();
     std::string lang = doc.m_language;
     std::string commentline = CLexStyles::Instance().GetCommentLineForLang(lang);
     std::string commentstreamstart = CLexStyles::Instance().GetCommentStreamStartForLang(lang);
@@ -68,20 +68,20 @@ bool CCmdComment::Execute()
         // insert a block comment, i.e. a comment marker at the beginning of each line
         // first find the leftmost indent of all lines
         sptr_t indent = INTPTR_MAX;
-        for (size_t line = linestart; line <= lineend; ++line)
+        for (auto line = linestart; line <= lineend; ++line)
         {
             indent = min(ScintillaCall(SCI_GETLINEINDENTATION, line), indent);
         }
         // now insert the comment marker at the leftmost indentation on every line
         ScintillaCall(SCI_BEGINUNDOACTION);
         size_t insertedchars = 0;
-        for (size_t line = linestart; line <= lineend; ++line)
+        for (auto line = linestart; line <= lineend; ++line)
         {
             size_t pos = ScintillaCall(SCI_POSITIONFROMLINE, line);
             if (!commentlineatstart)
             {
                 int tabsize = (int)ScintillaCall(SCI_GETTABWIDTH);
-                for (int i = 0; i < indent; )
+                for (decltype(indent) i = 0; i < indent; )
                 {
                     char c = (char)ScintillaCall(SCI_GETCHARAT, pos);
                     if (c == '\t')
@@ -120,14 +120,14 @@ bool CCmdUnComment::Execute()
 {
     // Get Selection
     bool bSelEmpty = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
-    size_t selStart         = 0;
-    size_t selEnd           = 0;
-    size_t lineStartStart   = 0;
-    size_t lineEndEnd       = 0;
+    sptr_t selStart         = 0;
+    sptr_t selEnd           = 0;
+    sptr_t lineStartStart   = 0;
+    sptr_t lineEndEnd       = 0;
 
     if (!HasActiveDocument())
         return false;
-    CDocument doc = GetActiveDocument();
+    auto doc = GetActiveDocument();
     std::string lang = doc.m_language;
     std::string commentline = CLexStyles::Instance().GetCommentLineForLang(lang);
     std::string commentstreamstart = CLexStyles::Instance().GetCommentStreamStartForLang(lang);
@@ -158,8 +158,8 @@ bool CCmdUnComment::Execute()
 
         auto strbuf = std::make_unique<char[]>(commentstreamstart.size() + commentstreamend.size() + 5);
         Scintilla::Sci_TextRange rangestart;
-        rangestart.chrg.cpMin = long(selStart - commentstreamstart.length());
-        rangestart.chrg.cpMax = long(selStart);
+        rangestart.chrg.cpMin = Sci_PositionCR(selStart - commentstreamstart.length());
+        rangestart.chrg.cpMax = Sci_PositionCR(selStart);
         rangestart.lpstrText = strbuf.get();
         ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
         bool bRemovedStream = false;
@@ -167,8 +167,8 @@ bool CCmdUnComment::Execute()
         {
             // find the end marker
             Scintilla::Sci_TextRange rangeend;
-            rangeend.chrg.cpMin = long(selEnd);
-            rangeend.chrg.cpMax = long(selEnd + commentstreamend.length());
+            rangeend.chrg.cpMin = Sci_PositionCR(selEnd);
+            rangeend.chrg.cpMax = Sci_PositionCR(selEnd + commentstreamend.length());
             rangeend.lpstrText = strbuf.get();
             ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&rangeend);
             if (_stricmp(commentstreamend.c_str(), strbuf.get())==0)
@@ -192,16 +192,16 @@ bool CCmdUnComment::Execute()
             if (lineStartStart == selStart)
             {
                 // remove block comments for each selected line
-                size_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-                size_t lineend   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+                sptr_t linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+                sptr_t lineend   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
                 ScintillaCall(SCI_BEGINUNDOACTION);
                 size_t removedchars = 0;
-                for (size_t line = linestart; line <= lineend; ++line)
+                for (auto line = linestart; line <= lineend; ++line)
                 {
                     size_t pos = ScintillaCall(SCI_GETLINEINDENTPOSITION, line);
                     Scintilla::Sci_TextRange range;
-                    range.chrg.cpMin = long(pos);
-                    range.chrg.cpMax = long(pos + commentline.length());
+                    range.chrg.cpMin = Sci_PositionCR(pos);
+                    range.chrg.cpMax = Sci_PositionCR(pos + commentline.length());
                     range.lpstrText = strbuf.get();
                     ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&range);
                     if (_stricmp(commentline.c_str(), strbuf.get())==0)
@@ -220,19 +220,19 @@ bool CCmdUnComment::Execute()
     {
         // remove block comment for the current line
         auto strbuf = std::make_unique<char[]>(commentline.size() + 5);
-        size_t curPos   = ScintillaCall(SCI_GETCURRENTPOS);
+        auto curPos = ScintillaCall(SCI_GETCURRENTPOS);
         ScintillaCall(SCI_BEGINUNDOACTION);
-        size_t pos = ScintillaCall(SCI_GETLINEINDENTPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
+        auto pos = ScintillaCall(SCI_GETLINEINDENTPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
         Scintilla::Sci_TextRange range;
-        range.chrg.cpMin = long(pos);
-        range.chrg.cpMax = long(pos + commentline.length());
+        range.chrg.cpMin = Sci_PositionCR(pos);
+        range.chrg.cpMax = Sci_PositionCR(pos + commentline.length());
         range.lpstrText = strbuf.get();
         ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&range);
         if (!commentline.empty() && (_stricmp(commentline.c_str(), strbuf.get())==0))
         {
             ScintillaCall(SCI_SETSEL, range.chrg.cpMin, range.chrg.cpMax);
             ScintillaCall(SCI_REPLACESEL, 0, (sptr_t)"");
-            size_t newcurpos = curPos > commentline.length() ? curPos - commentline.length() : 0;
+            auto newcurpos = curPos > (sptr_t)commentline.length() ? curPos - commentline.length() : 0;
             ScintillaCall(SCI_SETSEL, newcurpos, newcurpos);
         }
         else if (!commentstreamstart.empty() && !commentstreamend.empty())
@@ -245,19 +245,19 @@ bool CCmdUnComment::Execute()
                 ttf.chrg.cpMin--;
             ttf.chrg.cpMax = 0;
             ttf.lpstrText = const_cast<char*>(commentstreamstart.c_str());
-            sptr_t findRet = ScintillaCall(SCI_FINDTEXT, 0, (sptr_t)&ttf);
+            auto findRet = ScintillaCall(SCI_FINDTEXT, 0, (sptr_t)&ttf);
             if (findRet >= 0)
             {
                 ttf.lpstrText = const_cast<char*>(commentstreamend.c_str());
-                sptr_t findRet2 = ScintillaCall(SCI_FINDTEXT, 0, (sptr_t)&ttf);
+                auto findRet2 = ScintillaCall(SCI_FINDTEXT, 0, (sptr_t)&ttf);
                 // test if the start marker is found later than the end marker: if not, we found an independent comment outside of the current position
                 if (findRet2 < findRet)
                 {
                     // now find the end marker
-                    ttf.chrg.cpMin = (long)curPos;
-                    ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
+                    ttf.chrg.cpMin = (Sci_PositionCR)curPos;
+                    ttf.chrg.cpMax = (Sci_PositionCR)ScintillaCall(SCI_GETLENGTH);
                     ttf.lpstrText = const_cast<char*>(commentstreamend.c_str());
-                    sptr_t findRet3 = ScintillaCall(SCI_FINDTEXT, 0, (sptr_t)&ttf);
+                    auto findRet3 = ScintillaCall(SCI_FINDTEXT, 0, (sptr_t)&ttf);
                     if (findRet3 >= 0)
                     {
                         ScintillaCall(SCI_SETSEL, findRet3, findRet3 + commentstreamend.length());
