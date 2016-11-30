@@ -279,7 +279,7 @@ void ICommand::GotoLine(long line)
     m_pMainWindow->m_editor.GotoLine(line);
 }
 
-void ICommand::Center( long startPos, long endPos )
+void ICommand::Center(sptr_t startPos, sptr_t endPos )
 {
     m_pMainWindow->m_editor.Center(startPos, endPos);
 }
