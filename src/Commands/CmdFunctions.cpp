@@ -554,10 +554,10 @@ void CCmdFunctions::OnDocumentClose(DocID id)
     }
 }
 
-void CCmdFunctions::OnDocumentSave(int index, bool bSaveAs)
+void CCmdFunctions::OnDocumentSave(DocID id, bool bSaveAs)
 {
     if (bSaveAs)
-        EventHappened(GetDocIDFromTabIndex(index), DocEventType::SaveAs);
+        EventHappened(id, DocEventType::SaveAs);
 }
 
 void CCmdFunctions::OnLexerChanged(int /*lexer*/)

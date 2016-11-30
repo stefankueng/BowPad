@@ -257,12 +257,12 @@ void CCmdScript::OnDocumentOpen(DocID id)
     catch (const std::exception&) {}
 }
 
-void CCmdScript::OnDocumentSave(int index, bool bSaveAs)
+void CCmdScript::OnDocumentSave(DocID id, bool bSaveAs)
 {
     DISPPARAMS dispparams = { 0 };
     dispparams.cArgs = 2;
     VARIANT v[2];
-    v[0].intVal = index;
+    v[0].intVal = id.GetValue();
     v[0].vt = VT_INT;
     v[1].boolVal = bSaveAs;
     v[1].vt = VT_BOOL;

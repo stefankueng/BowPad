@@ -62,7 +62,7 @@ void ICommand::OnDocumentClose(DocID /*id*/)
 void ICommand::OnDocumentOpen(DocID /*id*/)
 {}
 
-void ICommand::OnDocumentSave(int /*index*/, bool /*bSaveAs*/)
+void ICommand::OnDocumentSave(DocID /*id*/, bool /*bSaveAs*/)
 {}
 
 void ICommand::OnTimer(UINT /*id*/)

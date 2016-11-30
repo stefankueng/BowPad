@@ -298,15 +298,15 @@ void CCommandHandler::OnDocumentOpen(DocID id)
     }
 }
 
-void CCommandHandler::OnDocumentSave(int index, bool bSaveAs)
+void CCommandHandler::OnDocumentSave(DocID id, bool bSaveAs)
 {
     for (auto& cmd : m_commands)
     {
-        cmd.second->OnDocumentSave(index, bSaveAs);
+        cmd.second->OnDocumentSave(id, bSaveAs);
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->OnDocumentSave(index, bSaveAs);
+        cmd.second->OnDocumentSave(id, bSaveAs);
     }
 }
 

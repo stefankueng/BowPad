@@ -69,7 +69,7 @@ public:
 
     void OnDocumentOpen(DocID id) override;
 
-    void OnDocumentSave(int index, bool bSaveAs) override;
+    void OnDocumentSave(DocID id, bool bSaveAs) override;
 
     void OnLexerChanged(int lexer) override;
 
