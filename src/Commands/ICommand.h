@@ -54,7 +54,7 @@ public:
     virtual void        AfterInit();
     virtual void        OnLexerChanged(int lexer);
     virtual void        OnThemeChanged(bool bDark);
-    virtual void        OnDocumentClose(int index);
+    virtual void        OnDocumentClose(DocID id);
     virtual void        OnDocumentOpen(DocID id);
     virtual void        OnDocumentSave(int index, bool bSaveAs);
     virtual HRESULT     IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue);

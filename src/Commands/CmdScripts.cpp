@@ -233,12 +233,12 @@ void CCmdScript::AfterInit()
     catch (const std::exception&) {}
 }
 
-void CCmdScript::OnDocumentClose(int index)
+void CCmdScript::OnDocumentClose(DocID id)
 {
     DISPPARAMS dispparams = { 0 };
     dispparams.cArgs = 1;
     VARIANT vI;
-    vI.intVal = index;
+    vI.intVal = id.GetValue();
     vI.vt = VT_INT;
     dispparams.rgvarg = &vI;
     try { m_host->CallFunction(L"OnDocumentClose", dispparams); }
