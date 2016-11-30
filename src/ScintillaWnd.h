@@ -98,7 +98,7 @@ public :
     void DocScrollRemoveLine(int type, size_t line) { m_docScroll.RemoveLine(type, line); }
     void MarkBookmarksInScrollbar();
     void GotoLine(long line);
-    void Center(long posStart, long posEnd);
+    void Center(sptr_t posStart, sptr_t posEnd);
     void SetTabSettings();
     void SetEOLType(int eolType);
     void AppendText(int len, const char* buf);

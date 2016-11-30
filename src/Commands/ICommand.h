@@ -98,7 +98,7 @@ protected:
     void                DocScrollUpdate();
     void                DocScrollRemoveLine(int type, size_t line);
     void                GotoLine(long line);
-    void                Center(long startPos, long endPos);
+    void                Center(sptr_t startPos, sptr_t endPos);
     void                GotoBrace();
     std::string         GetLine(long line) const;
     std::string         GetTextRange(long startpos, long endpos) const;
