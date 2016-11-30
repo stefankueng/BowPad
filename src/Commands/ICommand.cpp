@@ -55,7 +55,7 @@ void ICommand::AfterInit()
 {
 }
 
-void ICommand::OnDocumentClose( int /*index*/ )
+void ICommand::OnDocumentClose(DocID /*id*/)
 {
 }
 

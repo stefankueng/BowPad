@@ -61,7 +61,7 @@ public:
     void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
     void OnDocumentOpen(DocID id) override;
-    void OnDocumentClose(int tab) override;
+    void OnDocumentClose(DocID id) override;
     void OnDocumentSave(int tab, bool bSaveAs) override;
 
 private:

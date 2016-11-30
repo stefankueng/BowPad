@@ -40,7 +40,7 @@ public:
     void ScintillaNotify(Scintilla::SCNotification * pScn) override;
 
     void TabNotify(TBHDR* ptbhdr) override;
-    void OnDocumentClose(int tab) override;
+    void OnDocumentClose(DocID id) override;
 };
 
 

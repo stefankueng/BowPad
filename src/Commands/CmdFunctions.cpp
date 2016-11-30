@@ -510,10 +510,9 @@ void CCmdFunctions::OnDocumentOpen(DocID id)
     EventHappened(id, DocEventType::Open);
 }
 
-void CCmdFunctions::OnDocumentClose(int index)
+void CCmdFunctions::OnDocumentClose(DocID id)
 {
-    auto closingDocID = GetDocIDFromTabIndex(index);
-    const auto& closingDoc = GetDocumentFromID(closingDocID);
+    const auto& closingDoc = GetDocumentFromID(id);
 
     // Purge the user keywords once there are no more 
     // documents of this language open.
@@ -547,8 +546,8 @@ void CCmdFunctions::OnDocumentClose(int index)
             }
         }
     }
-    m_work.erase(closingDocID);
-    if (m_docID.IsValid() && closingDocID == m_docID)
+    m_work.erase(id);
+    if (m_docID.IsValid() && id == m_docID)
     {
         m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
         m_docID = DocID();

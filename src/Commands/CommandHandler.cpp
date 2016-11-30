@@ -274,15 +274,15 @@ void CCommandHandler::OnClose()
     }
 }
 
-void CCommandHandler::OnDocumentClose(int index)
+void CCommandHandler::OnDocumentClose(DocID id)
 {
     for (auto& cmd : m_commands)
     {
-        cmd.second->OnDocumentClose(index);
+        cmd.second->OnDocumentClose(id);
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->OnDocumentClose(index);
+        cmd.second->OnDocumentClose(id);
     }
 }
 

@@ -275,7 +275,7 @@ void CCmdTabList::OnDocumentOpen(DocID /*id*/)
     InvalidateTabList();
 }
 
-void CCmdTabList::OnDocumentClose(int /*tab*/)
+void CCmdTabList::OnDocumentClose(DocID /*id*/)
 {
     // Tab List will be stale now.
     InvalidateTabList();

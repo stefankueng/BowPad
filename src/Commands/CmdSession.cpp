@@ -234,13 +234,14 @@ bool CCmdSessionRestoreLast::Execute()
     return true;
 }
 
-void CCmdSessionRestoreLast::OnDocumentClose(int index)
+void CCmdSessionRestoreLast::OnDocumentClose(DocID id)
 {
-    CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(index));
+    CDocument doc = GetDocumentFromID(id);
     if (doc.m_path.empty())
         return;
 
-    int activeTabIndex = GetActiveTabIndex();
+    auto activeTabIndex = GetActiveTabIndex();
+    auto index = GetTabIndexFromDocID(id);
     if (index == activeTabIndex)
     {
         CPosData pos;

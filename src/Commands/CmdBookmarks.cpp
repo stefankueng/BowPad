@@ -53,11 +53,11 @@ CCmdBookmarks::CCmdBookmarks(void * obj) : ICommand(obj)
     }
 }
 
-void CCmdBookmarks::OnDocumentClose(int index)
+void CCmdBookmarks::OnDocumentClose(DocID id)
 {
 
     auto& settings = CIniSettings::Instance();
-    CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(index));
+    CDocument doc = GetDocumentFromID(id);
     if (doc.m_path.empty())
         return;
 
