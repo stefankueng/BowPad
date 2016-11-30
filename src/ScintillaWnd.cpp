@@ -801,22 +801,22 @@ void CScintillaWnd::GotoLine(long line)
     Center(linepos, linepos);
 }
 
-void CScintillaWnd::Center(long posStart, long posEnd)
+void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
 {
     // to make sure the found result is visible
     // When searching up, the beginning of the (possible multiline) result is important, when scrolling down the end
-    long testPos = (posStart > posEnd) ? posEnd : posStart;
+    auto testPos = (posStart > posEnd) ? posEnd : posStart;
     Call(SCI_SETCURRENTPOS, testPos);
-    long currentlineNumberDoc = (long)Call(SCI_LINEFROMPOSITION, testPos);
-    long currentlineNumberVis = (long)Call(SCI_VISIBLEFROMDOCLINE, currentlineNumberDoc);
+    auto currentlineNumberDoc = Call(SCI_LINEFROMPOSITION, testPos);
+    auto currentlineNumberVis = Call(SCI_VISIBLEFROMDOCLINE, currentlineNumberDoc);
     Call(SCI_ENSUREVISIBLE, currentlineNumberDoc);    // make sure target line is unfolded
 
-    long firstVisibleLineVis =   (long)Call(SCI_GETFIRSTVISIBLELINE);
-    long linesVisible =          (long)Call(SCI_LINESONSCREEN) - 1; //-1 for the scrollbar
-    long lastVisibleLineVis =    (long)linesVisible + firstVisibleLineVis;
+    auto firstVisibleLineVis =   Call(SCI_GETFIRSTVISIBLELINE);
+    auto linesVisible        =   Call(SCI_LINESONSCREEN) - 1; //-1 for the scrollbar
+    auto lastVisibleLineVis  =   linesVisible + firstVisibleLineVis;
 
     // if out of view vertically, scroll line into (center of) view
-    int linesToScroll = 0;
+    decltype(firstVisibleLineVis) linesToScroll = 0;
     if (currentlineNumberVis < (firstVisibleLineVis+(linesVisible/4)))
     {
         linesToScroll = currentlineNumberVis - firstVisibleLineVis;
