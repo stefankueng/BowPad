@@ -20,52 +20,81 @@
 #include "BowPadUI.h"
 #include "BowPad.h"
 #include "ScintillaWnd.h"
+#include "LexStyles.h"
 
 #include <string>
 #include <vector>
 #include <chrono>
 #include <functional>
 #include <unordered_set>
+#include <unordered_map>
+#include <deque>
 
 struct FunctionInfo
 {
-    inline FunctionInfo(int lineNum, std::wstring&& sortName, std::wstring&& displayName)
+    inline FunctionInfo(int lineNum, std::string&& sortName, std::string&& displayName)
         : lineNum(lineNum), sortName(std::move(sortName)), displayName(std::move(displayName))
     {
     }
     int lineNum;
-    std::wstring sortName;
-    std::wstring displayName;
+    std::string sortName;
+    std::string displayName;
 };
 
 enum class DocEventType
 {
+    None,
     // When tab changes we must know in order to:
     // 1. Clear current list of functions as they relate to the "previous" document
     // 2. Disable the functions button so the user can't push it when there are no
     // functions available yet.
     // 3. Ensure we start finding functions for this document.
     // 4  Re-enable the document.
-    DocOpen,
+    Open,
     // When a document opens what must we do?
-    DocModified,
+    Modified,
     // When a document is modified, it may introduce new functions so we must
     // scan for them.
     LexerChanged,
     // When the lexer is changed, the regex expression for finding functions
     // changes so we must look for them again.
-    DocSave
+    SaveAs
     // If the user saves, a SaveAs might change the language/lexer type in
     // the process? If so the function list needs to be rebuilt.
 };
 
-struct DocEvent
+class DocEvent
 {
-    DocID docID;
-    DocEventType eventID;
+public:
+    DocEvent();
+    DocEvent(DocEventType eventType, long pos = 0L, long len = 0L);
+    void Clear();
+    bool Empty() const;
+
+public:
+    DocEventType eventType;
+    long pos;
+    long len;
 };
 
-class CCmdFunctions : public ICommand
+class DocWork
+{
+public:
+    DocWork();
+    void InitLang(const CDocument& doc);
+    void ClearEvents();
+
+public:
+    std::deque<DocEvent> m_events;
+    Scintilla::Sci_TextToFind m_ttf;
+    std::string m_docLang;
+    std::string m_regex;
+    std::vector<std::string> m_trimtokens;
+    LanguageData* m_langData;
+    bool m_inProgress;
+};
+
+class CCmdFunctions final : public ICommand
 {
 public:
     CCmdFunctions(void* obj);
@@ -73,7 +102,6 @@ public:
 
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdFunctions; }
-    //bool GotoSymbol(const std::wstring& symbolName);
 
 private:
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
@@ -86,30 +114,28 @@ private:
     void OnDocumentSave(int index, bool bSaveAs) override;
     void OnLexerChanged(int lexer) override;
     void OnDocumentClose(int index) override;
-    void FindAllFunctions();
-    bool FindAllFunctionsInternal();
+    bool BackgroundFindFunctions();
     std::vector<FunctionInfo> FindFunctionsNow() const;
     void InvalidateFunctionsEnabled();
     void InvalidateFunctionsSource();
     HRESULT PopulateFunctions(IUICollectionPtr& collection);
-    void EventHappened(DocID docID, DocEventType eventType);
-    void FindFunctions(const CDocument& doc, std::function<bool(const std::wstring&, long lineNum)>& callback) const;
+    void EventHappened(DocID docID, DocEvent ev);
+    void FindFunctions(const CDocument& doc, std::function<bool(const std::string&, long lineNum)>& callback) const;
+    void SetSearchScope(DocWork& work, const DocEvent& event) const;
+    void SetWorkTimer(int ms);
 
 private:
     bool m_autoscan;
-    sptr_t m_autoscanlimit;
+    long m_autoscanlimit;
     bool m_autoscanTimed;
     UINT m_timerID;
-    CScintillaWnd m_edit;
-    std::vector<DocEvent> m_events;
-    Scintilla::Sci_TextToFind m_ttf;
-    std::string m_funcRegex;
-    std::string m_docLang;
-    DocID m_docID;
-    std::vector<std::wstring> m_wtrimtokens;
     std::vector<int> m_menuData;
     std::chrono::time_point<std::chrono::steady_clock> m_funcProcessingStartTime;
     bool m_funcProcessingStarted = false;
-    std::unordered_set<std::string> m_languagesUpdated;
+    std::unordered_map<DocID, DocWork> m_work;
+    DocID m_docID;
+    CScintillaWnd m_edit;
+    bool m_timerPending;
+    bool m_modified;
 };
 
