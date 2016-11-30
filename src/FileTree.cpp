@@ -250,131 +250,134 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
         break;
         case WM_THREADRESULTREADY:
         {
+            const FileTreeData* pData = (const FileTreeData*)lParam; // Will delete but not change.
+            assert(pData != nullptr); // not possible.
+
             if (m_bStop)
             {
                 m_bRootBusy = false;
-                break;
+                for (const auto& item : pData->data)
+                    delete item;
+                delete pData;
+                break; // switch
             }
 
-            std::wstring activepath;
-            if (HasActiveDocument())
+            SendMessage(*this, WM_SETREDRAW, FALSE, 0);
+            OnOutOfScope(SendMessage(*this, WM_SETREDRAW, TRUE, 0));
+
+            // check if the refresh root is still there
+            FileTreeItem* fi = nullptr;
+            if (pData->refreshRoot != TVI_ROOT)
+                fi = GetFileTreeItem(*this, pData->refreshRoot);
+
+            auto dirIconIndex = CSysImageList::GetInstance().GetDirIconIndex();
+            auto dirOpenIconIndex = CSysImageList::GetInstance().GetDirOpenIconIndex();
+
+            bool activepathmarked = false;
+            if (((pData->refreshRoot == TVI_ROOT) && (CPathUtils::PathCompare(pData->refreshpath, m_path) == 0)) ||
+                (fi && (CPathUtils::PathCompare(fi->path,pData->refreshpath) == 0)))
             {
-                auto doc = GetActiveDocument();
-                if (!doc.m_path.empty() && (m_path.size() < doc.m_path.size()))
+                std::wstring activepath;
+                if (HasActiveDocument())
                 {
-                    if (CPathUtils::PathCompare(m_path, doc.m_path.substr(0, m_path.size())) == 0)
+                    auto doc = GetActiveDocument();
+                    if (!doc.m_path.empty() && (m_path.size() < doc.m_path.size()))
                     {
-                        activepath = doc.m_path;
+                        if (CPathUtils::PathCompare(m_path, doc.m_path.substr(0, m_path.size())) == 0)
+                        {
+                            activepath = doc.m_path;
+                        }
+                    }
+                }
+                for (const auto* item : pData->data)
+                {
+                    TVITEMEX tvi = { 0 };
+                    TVINSERTSTRUCT tvins = { 0 };
+
+                    tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
+
+                    const auto filename = CPathUtils::GetFileName(item->path);
+                    tvi.pszText = const_cast<LPWSTR>(filename.c_str());
+                    tvi.cchTextMax = static_cast<int>(filename.length());
+                    tvi.cChildren = 0;
+
+                    if (item->isDir)
+                    {
+                        tvi.mask |= TVIF_EXPANDEDIMAGE;
+                        tvi.iImage = dirIconIndex;
+                        tvi.iSelectedImage = dirIconIndex;
+                        tvi.iExpandedImage = dirOpenIconIndex;
+                        tvi.cChildren = 1;
+                    }
+                    else
+                    {
+                        int fileIconIndex = CSysImageList::GetInstance().GetFileIconIndex(item->path);
+                        tvi.iImage = fileIconIndex;
+                        tvi.iSelectedImage = fileIconIndex;
+                    }
+                    if (!activepath.empty())
+                    {
+                        if (CPathUtils::PathCompare(item->path, activepath) == 0)
+                        {
+                            tvi.mask |= TVIF_STATE;
+                            tvi.state = TVIS_BOLD;
+                            tvi.stateMask = TVIS_BOLD;
+                            activepathmarked = true;
+                        }
+                    }
+                    tvi.lParam = (LPARAM)item;
+                    tvins.itemex = tvi;
+                    tvins.hInsertAfter = TVI_LAST;
+                    tvins.hParent = pData->refreshRoot;
+
+                    TreeView_InsertItem(*this, &tvins);
+                }
+
+                TVSORTCB sortcb = { 0 };
+                sortcb.hParent = pData->refreshRoot;
+                sortcb.lParam = (LPARAM)this;
+                sortcb.lpfnCompare = TreeCompareFunc;
+                TreeView_SortChildrenCB(*this, &sortcb, false);
+                TreeView_Expand(*this, pData->refreshRoot, TVE_EXPAND);
+                TreeView_SetItemState(*this, pData->refreshRoot, 0, TVIS_CUT);
+
+                if (fi)
+                    fi->busy = false;
+                m_bRootBusy = false;
+
+                delete pData;
+                pData = nullptr;
+
+                if (!activepath.empty() && !activepathmarked && !m_path.empty())
+                {
+                    // the current path does not appear to be visible, so
+                    // refresh all sub-paths down to the active path
+                    std::wstring expandpath = CPathUtils::GetParentDirectory(activepath);
+                    HTREEITEM hItem = GetItemForPath(expandpath);
+                    if (hItem == NULL)
+                    {
+                        while ((hItem == NULL) && (expandpath.size() > m_path.size()))
+                        {
+                            expandpath = CPathUtils::GetParentDirectory(expandpath);
+                            hItem = GetItemForPath(expandpath);
+                        }
+                        if (hItem)
+                            Refresh(hItem);
                     }
                 }
             }
-
-            const FileTreeData* pData = (const FileTreeData*)lParam; // Will delete but not change.
-            if (pData)
+            else
             {
-                SendMessage(*this, WM_SETREDRAW, FALSE, 0);
-                OnOutOfScope(SendMessage(*this, WM_SETREDRAW, TRUE, 0));
-
-                // check if the refresh root is still there
-                FileTreeItem* fi = nullptr;
-                if (pData->refreshRoot != TVI_ROOT)
-                    fi = GetFileTreeItem(*this, pData->refreshRoot);
-
-                bool activepathmarked = false;
-                if (((pData->refreshRoot == TVI_ROOT) && (pData->refreshpath.compare(m_path) == 0)) ||
-                    (fi && (fi->path.compare(pData->refreshpath) == 0)))
+                m_bRootBusy = false;
+                // the refresh root is not valid anymore (e.g., the tab
+                // was changed while the thread was running), so delete
+                // the data the thread provided
+                for (const auto& item : pData->data)
                 {
-                    wchar_t textbuf[MAX_PATH];
-                    for (const auto& item : pData->data)
-                    {
-                        TVITEMEX tvi = { 0 };
-                        TVINSERTSTRUCT tvins = { 0 };
-
-                        tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
-
-                        wcscpy_s(textbuf, CPathUtils::GetFileName(item->path).c_str());
-                        tvi.pszText = textbuf;
-                        tvi.cchTextMax = _countof(textbuf);
-                        tvi.cChildren = 0;
-
-                        if (item->isDir)
-                        {
-                            tvi.mask |= TVIF_EXPANDEDIMAGE;
-                            tvi.iImage = CSysImageList::GetInstance().GetDirIconIndex();
-                            tvi.iSelectedImage = CSysImageList::GetInstance().GetDirIconIndex();
-                            tvi.iExpandedImage = CSysImageList::GetInstance().GetDirOpenIconIndex();
-                            tvi.cChildren = 1;
-                        }
-                        else
-                        {
-                            tvi.iImage = CSysImageList::GetInstance().GetFileIconIndex(item->path);
-                            tvi.iSelectedImage = CSysImageList::GetInstance().GetFileIconIndex(item->path);
-                        }
-                        if (!activepath.empty())
-                        {
-                            if (CPathUtils::PathCompare(item->path, activepath) == 0)
-                            {
-                                tvi.mask |= TVIF_STATE;
-                                tvi.state = TVIS_BOLD;
-                                tvi.stateMask = TVIS_BOLD;
-                                activepathmarked = true;
-                            }
-                        }
-                        tvi.lParam = (LPARAM)item;
-                        tvins.itemex = tvi;
-                        tvins.hInsertAfter = TVI_LAST;
-                        tvins.hParent = pData->refreshRoot;
-
-                        TreeView_InsertItem(*this, &tvins);
-                    }
-
-                    TVSORTCB sortcb = { 0 };
-                    sortcb.hParent = pData->refreshRoot;
-                    sortcb.lParam = (LPARAM)this;
-                    sortcb.lpfnCompare = TreeCompareFunc;
-                    TreeView_SortChildrenCB(*this, &sortcb, false);
-                    TreeView_Expand(*this, pData->refreshRoot, TVE_EXPAND);
-                    TreeView_SetItemState(*this, pData->refreshRoot, 0, TVIS_CUT);
-
-                    if (fi)
-                        fi->busy = false;
-                    m_bRootBusy = false;
-
-
-                    delete pData;
-                    pData = nullptr;
-
-                    if (!activepath.empty() && !activepathmarked && !m_path.empty())
-                    {
-                        // the current path does not appear to be visible, so
-                        // refresh all sub-paths down to the active path
-                        std::wstring expandpath = CPathUtils::GetParentDirectory(activepath);
-                        HTREEITEM hItem = GetItemForPath(expandpath);
-                        if (hItem == NULL)
-                        {
-                            while ((hItem == NULL) && (expandpath.size() > m_path.size()))
-                            {
-                                expandpath = CPathUtils::GetParentDirectory(expandpath);
-                                hItem = GetItemForPath(expandpath);
-                            }
-                            if (hItem)
-                                Refresh(hItem);
-                        }
-                    }
+                    delete item;
                 }
-                else
-                {
-                    m_bRootBusy = false;
-                    // the refresh root is not valid anymore (e.g., the tab
-                    // was changed while the thread was running), so delete
-                    // the data the thread provided
-                    for (const auto& item : pData->data)
-                    {
-                        delete item;
-                    }
-                    delete pData;
-                    pData = nullptr;
-                }
+                delete pData;
+                pData = nullptr;
             }
         }
         break;
