@@ -79,7 +79,7 @@ public:
 
     void SetSearchFolder(const std::wstring& folder);
     void NotifyOnDocumentClose(DocID id);
-    void NotifyOnDocumentSave(int tabIndex, bool saveAs);
+    void NotifyOnDocumentSave(DocID id, bool saveAs);
 
 protected: // override
     bool Execute() override { return true; }
@@ -291,7 +291,7 @@ public:
     void TabNotify(TBHDR* ptbhdr) override;
 
     void OnDocumentClose(DocID id) override;
-    void OnDocumentSave(int tabIndex, bool saveAs) override;
+    void OnDocumentSave(DocID id, bool saveAs) override;
 
 private:
     void SetSearchFolderToCurrentDocument();

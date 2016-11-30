@@ -2903,20 +2903,19 @@ void CFindReplaceDlg::NotifyOnDocumentClose(DocID id)
     }
 }
 
-void CFindReplaceDlg::NotifyOnDocumentSave(int tabIndex, bool /*saveAs*/)
+void CFindReplaceDlg::NotifyOnDocumentSave(DocID id, bool /*saveAs*/)
 {
     if (!m_open)
         return;
     // When the user saves the document the path can change either by getting
     // a path or changing it. Force the search results to update to reflect that.
-    auto savingDocID = GetDocIDFromTabIndex(tabIndex);
     int firstItemIndex = -1;
     int itemCount = 0;
     bool found = false;
     for (int itemIndex = 0; itemIndex < (int)m_searchResults.size(); ++itemIndex)
     {
         auto& item = m_searchResults[itemIndex];
-        if (item.docID == savingDocID)
+        if (item.docID == id)
         {
             if (!found)
             {
@@ -3098,10 +3097,10 @@ void CCmdFindReplace::OnDocumentClose(DocID id)
         g_pFindReplaceDlg->NotifyOnDocumentClose(id);
 }
 
-void CCmdFindReplace::OnDocumentSave(int tabIndex, bool saveAs)
+void CCmdFindReplace::OnDocumentSave(DocID id, bool saveAs)
 {
     if (g_pFindReplaceDlg != nullptr)
-        g_pFindReplaceDlg->NotifyOnDocumentSave(tabIndex, saveAs);
+        g_pFindReplaceDlg->NotifyOnDocumentSave(id, saveAs);
 }
 
 void CCmdFindReplace::SetSearchFolderToCurrentDocument()

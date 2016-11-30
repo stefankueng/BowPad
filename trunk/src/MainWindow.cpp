@@ -1403,7 +1403,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         UpdateCaptionBar();
         UpdateStatusBar(true);
         m_editor.Call(SCI_SETSAVEPOINT);
-        CCommandHandler::Instance().OnDocumentSave(m_TabBar.GetCurrentTabIndex(), bSaveAs);
+        CCommandHandler::Instance().OnDocumentSave(docID, bSaveAs);
     }
     return true;
 }

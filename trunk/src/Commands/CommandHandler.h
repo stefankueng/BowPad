@@ -39,7 +39,7 @@ public:
     void                            OnClose();
     void                            OnDocumentClose(DocID id);
     void                            OnDocumentOpen(DocID id);
-    void                            OnDocumentSave(int index, bool bSaveAs);
+    void                            OnDocumentSave(DocID id, bool bSaveAs);
     void                            AfterInit();
     void                            OnTimer(UINT id);
     void                            OnThemeChanged(bool bDark);

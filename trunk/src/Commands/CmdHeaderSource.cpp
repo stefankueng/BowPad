@@ -682,7 +682,7 @@ void CCmdHeaderSource::OnDocumentOpen(DocID /*id*/)
     InvalidateMenu();
 }
 
-void CCmdHeaderSource::OnDocumentSave(int /*index*/, bool /*bSaveAs*/)
+void CCmdHeaderSource::OnDocumentSave(DocID /*id*/, bool /*bSaveAs*/)
 {
     // Language might have changed.
     InvalidateMenu();
