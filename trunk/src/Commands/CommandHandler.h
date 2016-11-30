@@ -37,7 +37,7 @@ public:
     void                            ScintillaNotify(Scintilla::SCNotification * pScn);
     void                            TabNotify(TBHDR * ptbhdr);
     void                            OnClose();
-    void                            OnDocumentClose(int index);
+    void                            OnDocumentClose(DocID id);
     void                            OnDocumentOpen(DocID id);
     void                            OnDocumentSave(int index, bool bSaveAs);
     void                            AfterInit();

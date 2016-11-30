@@ -52,7 +52,7 @@ public:
 
     UINT GetCmdId() override { return cmdBookmarks; }
 
-    void OnDocumentClose(int index) override;
+    void OnDocumentClose(DocID id) override;
 
     void OnDocumentOpen(DocID id) override;
 

@@ -159,12 +159,11 @@ void CCmdPrevNext::TabNotify( TBHDR* ptbhdr )
     }
 }
 
-void CCmdPrevNext::OnDocumentClose(int tab)
+void CCmdPrevNext::OnDocumentClose(DocID id)
 {
-    auto docId = this->GetDocIDFromTabIndex(tab);
     for (auto it = g_positions.begin(); it != g_positions.end();)
     {
-        if (it->id == docId)
+        if (it->id == id)
             it = g_positions.erase(it);
         else
             ++it;

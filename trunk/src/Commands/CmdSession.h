@@ -89,7 +89,7 @@ public:
 
     UINT GetCmdId() override { return cmdSessionLast; }
 
-    void OnDocumentClose(int index) override;
+    void OnDocumentClose(DocID id) override;
 
 private:
     std::vector<SessionItem> m_docstates;

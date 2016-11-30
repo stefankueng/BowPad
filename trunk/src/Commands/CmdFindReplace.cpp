@@ -2809,16 +2809,15 @@ void CFindReplaceDlg::UpdateSearchFilesStrings(const std::wstring& item)
     UpdateCombo( IDC_SEARCHFILES, item, m_maxSearchFileStrings);
 }
 
-void CFindReplaceDlg::NotifyOnDocumentClose(int tabIndex)
+void CFindReplaceDlg::NotifyOnDocumentClose(DocID id)
 {
     if (!m_open)
         return;
-    auto closingDocID = GetDocIDFromTabIndex(tabIndex);
     
     // Search Results can have negative document id's.
     // If the closing document should ever be negative too we would match them.
     // That might be bad so check to avoid that.
-    if (!closingDocID.IsValid())
+    if (!id.IsValid())
     {
         assert(false);
         return;
@@ -2843,7 +2842,7 @@ void CFindReplaceDlg::NotifyOnDocumentClose(int tabIndex)
     // we must/ delete the results for it, because we can't ever re-open a document
     // via it's result if it never persisted and is now gone.
 
-    auto doc = GetDocumentFromID(closingDocID);
+    auto doc = GetDocumentFromID(id);
     if (doc.m_path.empty())
     {
         // This is a "new" document that has never been saved, delete it's results
@@ -2851,7 +2850,7 @@ void CFindReplaceDlg::NotifyOnDocumentClose(int tabIndex)
         auto newEnd = std::remove_if(
             m_searchResults.begin(), m_searchResults.end(), [&](const CSearchResult& item)
         {
-            return (item.docID == closingDocID);
+            return (item.docID == id);
         });
         auto deletedCount = m_searchResults.end() - newEnd;
         m_searchResults.erase(newEnd, m_searchResults.end());
@@ -2877,7 +2876,7 @@ void CFindReplaceDlg::NotifyOnDocumentClose(int tabIndex)
         for (int itemIndex = 0; itemIndex < (int)m_searchResults.size(); ++itemIndex)
         {
             auto& item = m_searchResults[itemIndex];
-            if (item.docID == closingDocID)
+            if (item.docID == id)
             {
                 if (!found) // Found first.
                 {
@@ -3093,10 +3092,10 @@ void CCmdFindReplace::TabNotify(TBHDR* ptbhdr)
     }
 }
 
-void CCmdFindReplace::OnDocumentClose(int tabIndex)
+void CCmdFindReplace::OnDocumentClose(DocID id)
 {
     if (g_pFindReplaceDlg != nullptr)
-        g_pFindReplaceDlg->NotifyOnDocumentClose(tabIndex);
+        g_pFindReplaceDlg->NotifyOnDocumentClose(id);
 }
 
 void CCmdFindReplace::OnDocumentSave(int tabIndex, bool saveAs)

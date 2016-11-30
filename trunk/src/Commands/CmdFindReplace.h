@@ -78,7 +78,7 @@ public:
     void FindFile(const std::wstring& fileToFind);
 
     void SetSearchFolder(const std::wstring& folder);
-    void NotifyOnDocumentClose(int tabIndex);
+    void NotifyOnDocumentClose(DocID id);
     void NotifyOnDocumentSave(int tabIndex, bool saveAs);
 
 protected: // override
@@ -290,7 +290,7 @@ public:
 
     void TabNotify(TBHDR* ptbhdr) override;
 
-    void OnDocumentClose(int tabIndex) override;
+    void OnDocumentClose(DocID id) override;
     void OnDocumentSave(int tabIndex, bool saveAs) override;
 
 private:

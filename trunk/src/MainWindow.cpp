@@ -1628,14 +1628,14 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool quitting )
             return true;  // leave the empty, new document as is
         }
     }
-    CCommandHandler::Instance().OnDocumentClose(tab);
+    auto docId = m_TabBar.GetIDFromIndex(tab);
+    CCommandHandler::Instance().OnDocumentClose(docId);
     // SCI_SETDOCPOINTER is necessary so the reference count of the document
     // is decreased and the memory can be released.
     m_editor.Call(SCI_SETDOCPOINTER, 0, 0);
 
     // Prefer to remove the document after the tab has gone as it supports it
     // and deletion causes events that may expect it to be there.
-    auto docId = m_TabBar.GetIDFromIndex(tab);
     m_TabBar.DeleteItemAt(tab);
     m_DocManager.RemoveDocument(docId);
     if (!quitting)
@@ -2759,7 +2759,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                     if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH) == 0) && (m_editor.Call(SCI_CANUNDO) == 0))
                     {
                         auto curtabIndex = m_TabBar.GetCurrentTabIndex();
-                        CCommandHandler::Instance().OnDocumentClose(curtabIndex);
+                        CCommandHandler::Instance().OnDocumentClose(docID);
                         m_insertionIndex = curtabIndex;
                         m_TabBar.DeleteItemAt(m_insertionIndex);
                         if (m_insertionIndex)
