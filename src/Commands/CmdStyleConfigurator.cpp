@@ -275,9 +275,12 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         if (foundStyle->second.FontSize == 0)
                             fsize.clear();
                         ComboBox_SelectString(GetDlgItem(*this, IDC_FONTSIZECOMBO), -1, fsize.c_str());
-                        Button_SetCheck(GetDlgItem(*this, IDC_BOLDCHECK), (foundStyle->second.FontStyle & FONTSTYLE_BOLD) ? BST_CHECKED : BST_UNCHECKED);
-                        Button_SetCheck(GetDlgItem(*this, IDC_ITALICCHECK), (foundStyle->second.FontStyle & FONTSTYLE_ITALIC) ? BST_CHECKED : BST_UNCHECKED);
-                        Button_SetCheck(GetDlgItem(*this, IDC_UNDERLINECHECK), (foundStyle->second.FontStyle & FONTSTYLE_UNDERLINED) ? BST_CHECKED : BST_UNCHECKED);
+                        Button_SetCheck(GetDlgItem(*this, IDC_BOLDCHECK),
+                            (foundStyle->second.FontStyle & FONTSTYLE_BOLD) ? BST_CHECKED : BST_UNCHECKED);
+                        Button_SetCheck(GetDlgItem(*this, IDC_ITALICCHECK),
+                            (foundStyle->second.FontStyle & FONTSTYLE_ITALIC) ? BST_CHECKED : BST_UNCHECKED);
+                        Button_SetCheck(GetDlgItem(*this, IDC_UNDERLINECHECK),
+                            (foundStyle->second.FontStyle & FONTSTYLE_UNDERLINED) ? BST_CHECKED : BST_UNCHECKED);
 
                         // REVIEW:
                         // If the user changes a style from color A to color B,
@@ -296,8 +299,8 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                             if (doc.m_language == currentLang)
                                 useDefault = false;
                         }
-                        COLORREF fgc = useDefault ? foundStyle->second.ForegroundColor : (COLORREF)ScintillaCall(SCI_STYLEGETFORE, styleKey);
-                        COLORREF bgc = useDefault ? foundStyle->second.BackgroundColor : (COLORREF)ScintillaCall(SCI_STYLEGETBACK, styleKey);
+                        COLORREF fgc = foundStyle->second.ForegroundColor;
+                        COLORREF bgc = foundStyle->second.BackgroundColor;
                         m_fgColor.SetColor(fgc);
                         m_bkColor.SetColor(bgc);
                     }
@@ -336,22 +339,20 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                 {
                 case IDC_FG_BTN:
                 {
-                    const auto& theme = CTheme::Instance();
-                    bool dark = theme.IsDarkTheme();
-                    auto fgcolor = dark ? theme.GetThemeColor(m_fgColor.GetColor()) : m_fgColor.GetColor();
+                    auto fgcolor = m_fgColor.GetColor();
+                    // When colours are applied by SetupLexer GetThemeColor is applied,
+                    // so don't do it again here when storing the color.
                     CLexStyles::Instance().SetUserForeground(lexID, styleKey, fgcolor);
                     if (updateView)
-                        ScintillaCall(SCI_STYLESETFORE, styleKey, fgcolor);
+                        ScintillaCall(SCI_STYLESETFORE, styleKey, CTheme::Instance().GetThemeColor(fgcolor));
                     break;
                 }
                 case IDC_BK_BTN:
                 {
-                    const auto& theme = CTheme::Instance();
-                    bool dark = theme.IsDarkTheme();
-                    auto bgcolor = dark ? theme.GetThemeColor(m_bkColor.GetColor()) : m_bkColor.GetColor();
+                    auto bgcolor = m_bkColor.GetColor();
                     CLexStyles::Instance().SetUserBackground(lexID, styleKey, bgcolor);
                     if (updateView)
-                        ScintillaCall(SCI_STYLESETBACK, styleKey, bgcolor);
+                        ScintillaCall(SCI_STYLESETBACK, styleKey, CTheme::Instance().GetThemeColor(bgcolor));
                     break;
                 }
                 case IDC_FONTCOMBO:
