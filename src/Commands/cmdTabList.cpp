@@ -287,7 +287,7 @@ void CCmdTabList::TabNotify(TBHDR * /*ptbhdr*/)
 }
 
 
-void CCmdTabList::OnDocumentSave(int /*tab*/, bool /*bSaveAs*/)
+void CCmdTabList::OnDocumentSave(DocID /*id*/, bool /*bSaveAs*/)
 {
     // Tab List will be stale now. Tab may have changed name etc.
     InvalidateTabList();

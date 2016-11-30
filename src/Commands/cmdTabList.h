@@ -62,7 +62,7 @@ public:
 
     void OnDocumentOpen(DocID id) override;
     void OnDocumentClose(DocID id) override;
-    void OnDocumentSave(int tab, bool bSaveAs) override;
+    void OnDocumentSave(DocID id, bool bSaveAs) override;
 
 private:
     void InvalidateTabList();
