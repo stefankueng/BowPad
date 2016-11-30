@@ -21,12 +21,12 @@
 
 bool CCmdEOLBase::Execute()
 {
-    int lineType = GetLineType();
+    auto lineType = GetLineType();
     ScintillaCall(SCI_SETEOLMODE, lineType);
     ScintillaCall(SCI_CONVERTEOLS, lineType);
     if (HasActiveDocument())
     {
-        CDocument doc = GetActiveDocument();
+        auto doc = GetActiveDocument();
         doc.m_format = ToEOLFormat(lineType);
         SetDocument(GetDocIdOfCurrentTab(), doc);
         UpdateStatusBar(true);
