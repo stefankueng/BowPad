@@ -1586,17 +1586,24 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
     }
 }
 
-bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool quitting )
+bool CMainWindow::CloseTab(int closingTabIndex, bool force /* = false */, bool quitting)
 {
-    if ((tab < 0) || (tab >= m_TabBar.GetItemCount()))
-        return false;
-
-    CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab));
-    if (!force && (doc.m_bIsDirty || doc.m_bNeedsSaving))
+    if (closingTabIndex < 0 || closingTabIndex >= m_TabBar.GetItemCount())
     {
-        m_TabBar.ActivateAt(tab);
+        APPVERIFY(false);
+        return false;
+    }
+    auto closingDocID = m_TabBar.GetIDFromIndex(closingTabIndex);
+    const CDocument& closingDoc = m_DocManager.GetDocumentFromID(closingDocID);
+    if (!force && (closingDoc.m_bIsDirty || closingDoc.m_bNeedsSaving))
+    {
+        m_TabBar.ActivateAt(closingTabIndex);
         if (!docloseall || !closealldoall)
+        {
+            auto bc = UnblockUI();
             responsetoclosetab = AskToCloseTab();
+            ReBlockUI(bc);
+        }
 
         if (responsetoclosetab == ResponseToCloseTab::SaveAndClose)
         {
@@ -1613,42 +1620,32 @@ bool CMainWindow::CloseTab( int tab, bool force /* = false */, bool quitting )
             // Cancel And Stay Open
             // activate the tab: user might have clicked another than
             // the active tab to close: user clicked on that tab so activate that tab now
-            m_TabBar.ActivateAt(tab);
+            m_TabBar.ActivateAt(closingTabIndex);
             return false;
         }
         // Will Close
     }
-    if (!quitting && m_TabBar.GetItemCount() == 1)
-    {
-        auto onlyDoc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0));
-        if (onlyDoc.m_path.empty() &&
-            m_editor.Call(SCI_GETTEXTLENGTH) == 0 &&
-            m_editor.Call(SCI_GETMODIFY) == 0)
-        {
-            return true;  // leave the empty, new document as is
-        }
-    }
-    auto docId = m_TabBar.GetIDFromIndex(tab);
-    CCommandHandler::Instance().OnDocumentClose(docId);
+    CCommandHandler::Instance().OnDocumentClose(closingDocID);
+    // Prefer to remove the document after the tab has gone as it supports it
+    // and deletion causes events that may expect it to be there.
+    m_TabBar.DeleteItemAt(closingTabIndex);
     // SCI_SETDOCPOINTER is necessary so the reference count of the document
     // is decreased and the memory can be released.
     m_editor.Call(SCI_SETDOCPOINTER, 0, 0);
+    m_DocManager.RemoveDocument(closingDocID);
 
-    // Prefer to remove the document after the tab has gone as it supports it
-    // and deletion causes events that may expect it to be there.
-    m_TabBar.DeleteItemAt(tab);
-    m_DocManager.RemoveDocument(docId);
+    int tabCount = m_TabBar.GetItemCount();
+    int nextTabIndex = (closingTabIndex < tabCount) ? closingTabIndex : tabCount - 1;
+    auto nextDocID = m_TabBar.GetIDFromIndex(nextTabIndex);
     if (!quitting)
     {
-        int tabCount = m_TabBar.GetItemCount();
         if (tabCount == 0)
-            EnsureAtLeastOneTab();
-        else
         {
-            int nextTab = (tab < tabCount) ? tab : tabCount - 1;
-            m_TabBar.ActivateAt(nextTab);
+            EnsureAtLeastOneTab();
+            return true;
         }
     }
+    m_TabBar.ActivateAt(nextTabIndex);
     return true;
 }
 
@@ -1666,19 +1663,21 @@ bool CMainWindow::CloseAllTabs(bool quitting)
     OnOutOfScope(docloseall = false;);
     auto total = m_TabBar.GetItemCount();
     int count = 0;
-    do
+    for (;;)
     {
         SetProgress(count++, total);
-        if (CloseTab(m_TabBar.GetItemCount()-1, false, quitting) == false)
+        if (m_TabBar.GetItemCount() == 0)
+            break;
+        if (!CloseTab(m_TabBar.GetCurrentTabIndex(), false, quitting))
             return false;
         if (!quitting && m_TabBar.GetItemCount() == 1 &&
             m_editor.Call(SCI_GETTEXTLENGTH) == 0 &&
             m_editor.Call(SCI_GETMODIFY) == 0 &&
             m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0)).m_path.empty())
-            return true;
-    } while (m_TabBar.GetItemCount() > 0);
+            return false;
+    }
 
-    return true;
+    return m_TabBar.GetItemCount() == 0;
 }
 
 void CMainWindow::CloseAllButCurrentTab()
@@ -2536,7 +2535,6 @@ void CMainWindow::OpenNewTab()
     CCommandHandler::Instance().OnDocumentOpen(docID);
     m_TabBar.ActivateAt(index);
     m_editor.GotoLine(0);
-    CCommandHandler::Instance().OnDocumentOpen(docID);
 }
 
 void CMainWindow::HandleTabChanging(const NMHDR& /*nmhdr*/)
@@ -3549,6 +3547,25 @@ void CMainWindow::BlockAllUIUpdates(bool block)
         FileTreeBlockRefresh(block);
         if (m_blockCount == 0)
             RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
+    }
+}
+
+int  CMainWindow::UnblockUI()
+{
+    auto blockCount = m_blockCount;
+    m_blockCount = 0;
+    SendMessage(*this, WM_SETREDRAW, TRUE, 0);
+    FileTreeBlockRefresh(false);
+    RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
+    return blockCount;
+}
+void CMainWindow::ReBlockUI(int blockCount)
+{
+    if (blockCount)
+    {
+        m_blockCount = blockCount;
+        SendMessage(*this, WM_SETREDRAW, FALSE, 0);
+        FileTreeBlockRefresh(true);
     }
 }
 
