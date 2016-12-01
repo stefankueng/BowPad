@@ -55,9 +55,8 @@ CCmdBookmarks::CCmdBookmarks(void * obj) : ICommand(obj)
 
 void CCmdBookmarks::OnDocumentClose(DocID id)
 {
-
     auto& settings = CIniSettings::Instance();
-    CDocument doc = GetDocumentFromID(id);
+    auto doc = GetDocumentFromID(id);
     if (doc.m_path.empty())
         return;
 
@@ -124,7 +123,8 @@ void CCmdBookmarks::OnDocumentOpen(DocID id)
             ScintillaCall(SCI_MARKERADD, line, MARK_BOOKMARK);
             DocScrollAddLineColor(DOCSCROLLTYPE_BOOKMARK, line, g_bmColor);
         }
-        DocScrollUpdate();
+        if (!lines.empty())
+            DocScrollUpdate();
     }
 }
 
