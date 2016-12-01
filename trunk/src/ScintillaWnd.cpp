@@ -932,7 +932,6 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     int lineCount = (int)Call(SCI_GETLINECOUNT);
     if ((selTextLen > 2) || (lineCount < 100000))
     {
-        ULONGLONG startTicks = GetTickCount64();
         if (lastSelText.compare(seltextbuffer.get()))
         {
             m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
@@ -942,6 +941,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
             FindText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
             FindText.lpstrText = seltextbuffer.get();
             const auto selTextColor = CTheme::Instance().GetThemeColor(RGB(0, 255, 0));
+            ULONGLONG startTicks = GetTickCount64();
             while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&FindText) >= 0)
             {
                 size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
