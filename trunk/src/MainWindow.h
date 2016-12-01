@@ -177,6 +177,8 @@ private:
     COLORREF                    GetColorForDocument(DocID id);
     void                        OpenFiles(const std::vector<std::wstring>& paths);
     void                        BlockAllUIUpdates(bool block);
+    int                         UnblockUI();
+    void                        ReBlockUI(int blockCount);
     void                        ShowProgressCtrl(UINT delay);
     void                        HideProgressCtrl();
     void                        SetProgress(DWORD32 pos, DWORD32 end);
