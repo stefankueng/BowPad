@@ -40,7 +40,7 @@ enum class ResponseToOutsideModifiedFile
 
 enum class ResponseToCloseTab
 {
-    Cancel, // aka StayOpen
+    StayOpen,
     SaveAndClose,
     CloseWithoutSaving
 };

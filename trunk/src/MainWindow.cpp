@@ -1779,7 +1779,7 @@ ResponseToCloseTab CMainWindow::AskToCloseTab() const
     HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, &closealldoall);
     if (CAppUtils::FailedShowMessage(hr))
         nClickedBtn = 0;
-    ResponseToCloseTab response = ResponseToCloseTab::Cancel;
+    ResponseToCloseTab response = ResponseToCloseTab::StayOpen;
     switch (nClickedBtn)
     {
     case 100:
