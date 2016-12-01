@@ -45,8 +45,8 @@ CCmdBookmarks::CCmdBookmarks(void * obj) : ICommand(obj)
                 if (tokens.size() > 1)
                 {
                     auto& lines = m_bookmarks[filepath];
-                    for (const auto& token : tokens)
-                        lines.push_back(std::stoi(token));
+                    for (decltype(tokens.size()) li = 1; li < tokens.size(); ++li)
+                        lines.push_back(std::stoi(tokens[li]));
                 }
             }
         }
@@ -133,7 +133,7 @@ void CCmdBookmarks::OnDocumentOpen(DocID id)
 
 bool CCmdBookmarkToggle::Execute()
 {
-    auto line = GetCurrentLineNumber();
+    long line = GetCurrentLineNumber();
 
     LRESULT state = ScintillaCall(SCI_MARKERGET, line);
     if ((state & (1 << MARK_BOOKMARK)) != 0)
@@ -168,7 +168,7 @@ bool CCmdBookmarkClearAll::Execute()
 
 bool CCmdBookmarkNext::Execute()
 {
-    auto line = GetCurrentLineNumber();
+    long line = GetCurrentLineNumber();
     line = (long)ScintillaCall(SCI_MARKERNEXT, line+1, (1 << MARK_BOOKMARK));
     if (line >= 0)
         ScintillaCall(SCI_GOTOLINE, line);
@@ -207,7 +207,7 @@ HRESULT CCmdBookmarkNext::IUICommandHandlerUpdateProperty(
 
 bool CCmdBookmarkPrev::Execute()
 {
-    auto line = GetCurrentLineNumber();
+    long line = GetCurrentLineNumber();
     line = (long)ScintillaCall(SCI_MARKERPREVIOUS, line-1, (1 << MARK_BOOKMARK));
     if (line >= 0)
         ScintillaCall(SCI_GOTOLINE, line);
