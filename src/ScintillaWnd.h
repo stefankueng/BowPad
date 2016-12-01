@@ -38,7 +38,7 @@ const int SC_MARGE_FOLDER = 2;
 
 const int MARK_BOOKMARK = 24;
 
-enum BraceMatch
+enum class BraceMatch
 {
     Braces,
     Highlight,
