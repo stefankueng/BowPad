@@ -401,10 +401,10 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 }
                 break;
             case TIM_BRACEHIGHLIGHTTEXT:
-                MatchBraces(Highlight);
+                MatchBraces(BraceMatch::Highlight);
                 break;
             case TIM_BRACEHIGHLIGHTTEXTCLEAR:
-                MatchBraces(Clear);
+                MatchBraces(BraceMatch::Clear);
                 break;
         }
         break;
@@ -978,7 +978,7 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
     // setting the highlighting style triggers an UI update notification,
     // which in return calls MatchBraces(false). So to avoid an endless
     // loop, we bail out if the caret position has not changed.
-    if ((what==Braces) && (caretPos == lastCaretPos))
+    if ((what==BraceMatch::Braces) && (caretPos == lastCaretPos))
         return;
     lastCaretPos = caretPos;
 
@@ -1032,7 +1032,7 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
                 Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
                 Call(SCI_INDICATORCLEARRANGE, lastIndicatorStart, lastIndicatorLength);
             }
-            if (what == Highlight)
+            if (what == BraceMatch::Highlight)
             {
                 Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
                 lastIndicatorStart = braceAtCaret < braceOpposite ? braceAtCaret : braceOpposite;
@@ -1048,11 +1048,11 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
                 Call(SCI_INDICATORFILLRANGE, lastIndicatorStart, lastIndicatorLength);
                 SetTimer(*this, TIM_BRACEHIGHLIGHTTEXTCLEAR, 5000, nullptr);
             }
-            else if (what == Braces)
+            else if (what == BraceMatch::Braces)
                 SetTimer(*this, TIM_BRACEHIGHLIGHTTEXT, 1000, nullptr);
         }
 
-        if ((what == Highlight) && (Call(SCI_GETINDENTATIONGUIDES) != 0))
+        if ((what == BraceMatch::Highlight) && (Call(SCI_GETINDENTATIONGUIDES) != 0))
         {
             int columnAtCaret = int(Call(SCI_GETCOLUMN, braceAtCaret));
             int columnOpposite = int(Call(SCI_GETCOLUMN, braceOpposite));

@@ -2450,7 +2450,7 @@ void CMainWindow::HandleUpdateUI(const Scintilla::SCNotification& scn)
     if ((scn.updated & uiflags) != 0)
         m_editor.MarkSelectedWord(false);
 
-    m_editor.MatchBraces(Braces);
+    m_editor.MatchBraces(BraceMatch::Braces);
     m_editor.MatchTags();
     AddHotSpots();
     UpdateStatusBar(false);
@@ -2545,7 +2545,7 @@ void CMainWindow::HandleTabChanging(const NMHDR& /*nmhdr*/)
     auto docID = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(docID))
     {
-        m_editor.MatchBraces(Clear);
+        m_editor.MatchBraces(BraceMatch::Clear);
         CDocument doc = m_DocManager.GetDocumentFromID(docID);
         m_editor.SaveCurrentPos(doc.m_position);
         m_DocManager.SetDocument(docID, doc);
