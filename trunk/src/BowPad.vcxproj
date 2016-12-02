@@ -296,6 +296,7 @@
     <ClInclude Include="Commands\ICommand.h" />
     <ClInclude Include="COMPtrs.h" />
     <ClInclude Include="CorrespondingFileDlg.h" />
+    <ClInclude Include="CustomTooltip.h" />
     <ClInclude Include="DocScroll.h" />
     <ClInclude Include="Document.h" />
     <ClInclude Include="DocumentManager.h" />
@@ -392,6 +393,7 @@
     <ClCompile Include="Commands\CommandHandler.cpp" />
     <ClCompile Include="Commands\ICommand.cpp" />
     <ClCompile Include="CorrespondingFileDlg.cpp" />
+    <ClCompile Include="CustomTooltip.cpp" />
     <ClCompile Include="DocScroll.cpp" />
     <ClCompile Include="Document.cpp" />
     <ClCompile Include="DocumentManager.cpp" />
