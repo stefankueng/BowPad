@@ -38,6 +38,7 @@
 #include "LexStyles.h"
 #include "OnOutOfScope.h"
 #include "ProgressDlg.h"
+#include "CustomTooltip.h"
 #include "GDIHelpers.h"
 
 #include <memory>
@@ -186,6 +187,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_oldPt{ 0,0 }
     , m_inMenuLoop(false)
     , m_blockCount(0)
+    , m_custToolTip(hResource)
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
     m_fileTreeVisible = CIniSettings::Instance().GetInt64(L"View", L"FileTree", 1) != 0;
@@ -815,6 +817,7 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARA
         break;
     case SCN_DWELLEND:
         m_editor.Call(SCI_CALLTIPCANCEL);
+        ShowWindow(m_custToolTip, SW_HIDE);
         break;
     case SCN_ZOOM:
         UpdateStatusBar(false);
@@ -1143,6 +1146,7 @@ bool CMainWindow::Initialize()
     m_closeTabBtn.SetText(L"X");
     m_closeTabBtn.SetTextColor(RGB(255, 0, 0));
     m_progressBar.Init(hResource, *this);
+    m_custToolTip.Init(m_editor);
     // Note DestroyIcon not technically needed here but we may as well leave in
     // in case someone changes things to load a non static resource.
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
@@ -2192,8 +2196,6 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
         return;
 
     // Short form or long form html color e.g. #F0F or #FF00FF
-    // Use this to show color.
-    static constexpr char swatch[] = { "####################\n####################\n####################" };
 
     if (sWord[0] == '#' && (sWord.size() == 4 || sWord.size() == 7))
     {
@@ -2218,15 +2220,12 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
         {
             // Don't display hex with # as that means web color hex triplet
             // Show as hex with 0x and show what it was parsed to.
-            std::string sCallTip = CStringUtils::Format(
-                "RGB(%d,%d,%d)\nHex: 0x%06lX\n",
-                GetRValue(color), GetGValue(color), GetBValue(color), (DWORD) color);
-            // Make pos the position after the main data, at start of # sequence.
-            size_t pos = sCallTip.length();
-            sCallTip += swatch;
-            m_editor.Call(SCI_CALLTIPSETFOREHLT, color);
-            m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)sCallTip.c_str());
-            m_editor.Call(SCI_CALLTIPSETHLT, pos, sCallTip.length());
+            auto sCallTip = CStringUtils::Format(
+                L"RGB(%d, %d, %d)\nHex: 0x%06lX",
+                GetRValue(color), GetGValue(color), GetBValue(color), (DWORD)color);
+            auto msgPos = GetMessagePos();
+            POINT pt = { GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos) };
+            m_custToolTip.ShowTip(pt, sCallTip, &color);
             return;
         }
     }
@@ -2255,15 +2254,13 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
             // so all decimal might mean more info)
             // and as a hex color triplet which is useful using # to indicate that.
             auto color = RGB(r, g, b);
-            std::string sCallTip = CStringUtils::Format(
-                "RGB(%d,%d,%d)\n#%02X%02X%02X\nHex: 0x%06lX\n",
+            auto sCallTip = CStringUtils::Format(
+                L"RGB(%d, %d, %d)\n#%02X%02X%02X\nHex: 0x%06lX",
                 r, g, b, GetRValue(color), GetGValue(color), GetBValue(color), color);
-            auto pos = sCallTip.length();
-            sCallTip += swatch;
-            m_editor.Call(SCI_CALLTIPSETFOREHLT, color);
-            m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)sCallTip.c_str());
-            m_editor.Call(SCI_CALLTIPSETHLT, pos, sCallTip.length());
 
+            auto msgPos = GetMessagePos();
+            POINT pt = { GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos) };
+            m_custToolTip.ShowTip(pt, sCallTip, &color);
             return;
         }
     }
@@ -2282,10 +2279,12 @@ void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
     // Must convert some digits of string.
     if (errno == 0 && ep != &sWord[0])
     {
-        std::string bs = to_bit_string(number,true);
-        std::string sCallTip = CStringUtils::Format("Dec: %lld - Hex: 0x%llX - Oct: %#llo\nBin: %s (%d digits)",
-            number, number, number, bs.c_str(), (int)bs.size());
-        m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)sCallTip.c_str());
+        auto bs = to_bit_wstring(number, true);
+        auto sCallTip = CStringUtils::Format(L"Dec: %lld\nHex: 0x%llX\nOct: %#llo\nBin: %s (%d digits)",
+                                             number, number, number, bs.c_str(), (int)bs.size());
+        auto msgPos = GetMessagePos();
+        POINT pt = { GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos) };
+        m_custToolTip.ShowTip(pt, sCallTip, nullptr);
     }
 }
 

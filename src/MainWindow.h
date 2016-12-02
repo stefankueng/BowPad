@@ -24,6 +24,7 @@
 #include "FileTree.h"
 #include "TabBtn.h"
 #include "ProgressBar.h"
+#include "CustomTooltip.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -200,6 +201,7 @@ private:
     CTabBtn                     m_newTabBtn;
     CTabBtn                     m_closeTabBtn;
     CProgressBar                m_progressBar;
+    CCustomToolTip              m_custToolTip;
     int                         m_treeWidth;
     bool                        m_bDragging;
     POINT                       m_oldPt;
