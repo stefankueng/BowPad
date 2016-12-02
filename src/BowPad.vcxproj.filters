@@ -351,6 +351,9 @@
     <ClInclude Include="ProgressBar.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="CustomTooltip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -624,6 +627,9 @@
       <Filter>sktoolslib</Filter>
     </ClCompile>
     <ClCompile Include="ProgressBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomTooltip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
