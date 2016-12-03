@@ -138,7 +138,7 @@ bool CCmdSave::Execute()
     return SaveCurrentTab();
 }
 
-void CCmdSave::ScintillaNotify( Scintilla::SCNotification * pScn )
+void CCmdSave::ScintillaNotify( SCNotification * pScn )
 {
     switch (pScn->nmhdr.code)
     {
@@ -187,7 +187,7 @@ bool CCmdSaveAll::Execute()
     return true;
 }
 
-void CCmdSaveAll::ScintillaNotify( Scintilla::SCNotification * pScn )
+void CCmdSaveAll::ScintillaNotify( SCNotification * pScn )
 {
     switch (pScn->nmhdr.code)
     {
@@ -387,7 +387,7 @@ void CCmdSaveAuto::TabNotify(TBHDR * ptbhdr)
     }
 }
 
-void CCmdSaveAuto::ScintillaNotify(Scintilla::SCNotification * pScn)
+void CCmdSaveAuto::ScintillaNotify(SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_FOCUSOUT)
     {

@@ -35,7 +35,7 @@ public:
 
     UINT GetCmdId() override;
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification * pScn) override;
 
     void TabNotify(TBHDR * ptbhdr) override;
 

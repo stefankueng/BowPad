@@ -58,7 +58,7 @@ public:
 
     void TabNotify(TBHDR * ptbhdr) override;
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification * pScn) override;
 
     void OnDocumentOpen(DocID id) override;
     void OnDocumentClose(DocID id) override;

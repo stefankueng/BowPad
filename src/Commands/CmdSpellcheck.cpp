@@ -114,7 +114,7 @@ inline CCmdSpellcheck::~CCmdSpellcheck()
     g_spellCheckerFactory = nullptr;
 }
 
-void CCmdSpellcheck::ScintillaNotify(Scintilla::SCNotification * pScn)
+void CCmdSpellcheck::ScintillaNotify(SCNotification * pScn)
 {
     switch (pScn->nmhdr.code)
     {
@@ -550,7 +550,7 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
             long startPos = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
             long endPos = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
             auto textbuf = std::make_unique<char[]>(endPos - startPos + 1);
-            Scintilla::Sci_TextRange range;
+            Sci_TextRange range;
             range.chrg.cpMin = startPos;
             range.chrg.cpMax = endPos;
             range.lpstrText = textbuf.get();
@@ -619,7 +619,7 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, c
                 long startPos = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
                 long endPos = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
                 auto textbuf = std::make_unique<char[]>(endPos - startPos + 1);
-                Scintilla::Sci_TextRange range;
+                Sci_TextRange range;
                 range.chrg.cpMin = startPos;
                 range.chrg.cpMax = endPos;
                 range.lpstrText = textbuf.get();
@@ -657,7 +657,7 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, c
     return hr;
 }
 
-void CCmdSpellcheckCorrect::ScintillaNotify(Scintilla::SCNotification * pScn)
+void CCmdSpellcheckCorrect::ScintillaNotify(SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
     {

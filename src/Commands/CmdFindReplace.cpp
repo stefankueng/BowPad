@@ -1384,7 +1384,7 @@ void CFindReplaceDlg::DoFindPrevious()
 {
     // Same as find previous but uses the dialog.
     Clear(IDC_SEARCHINFO);
-    Scintilla::Sci_TextToFind ttf = { 0 };
+    Sci_TextToFind ttf = { 0 };
 
     std::wstring findText = GetDlgItemText(IDC_SEARCHCOMBO).get();
     UpdateSearchStrings(findText);
@@ -1590,7 +1590,7 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
         return false;
     }
 
-    Scintilla::Sci_TextToFind ttf = { 0 };
+    Sci_TextToFind ttf = { 0 };
     ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
     ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
     ttf.lpstrText = g_findString.c_str();
@@ -2038,7 +2038,7 @@ void CFindReplaceDlg::SearchDocument(
         searchWnd.Call(SCI_SETDOCPOINTER, 0, 0);
     );
 
-    Scintilla::Sci_TextToFind ttf = { 0 };
+    Sci_TextToFind ttf = { 0 };
     ttf.chrg.cpMin = 0;
     ttf.chrg.cpMax = (long)searchWnd.Call(SCI_GETLENGTH);
     std::string funcregex;
@@ -3015,7 +3015,7 @@ bool CCmdFindReplace::Execute()
     return true;
 }
 
-void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
+void CCmdFindReplace::ScintillaNotify( SCNotification* pScn )
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
     {
@@ -3040,7 +3040,7 @@ void CCmdFindReplace::ScintillaNotify( Scintilla::SCNotification* pScn )
             return;
         }
 
-        Scintilla::Sci_TextToFind FindText = { 0 };
+        Sci_TextToFind FindText = { 0 };
         FindText.chrg.cpMin = startstylepos;
         FindText.chrg.cpMax = endstylepos;
         FindText.lpstrText = g_sHighlightString.c_str();
@@ -3127,7 +3127,7 @@ bool CCmdFindNext::Execute()
         FlashWindow(GetHwnd());
         return true;
     }
-    Scintilla::Sci_TextToFind ttf = {0};
+    Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
     ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
     ttf.lpstrText = g_findString.c_str();
@@ -3154,7 +3154,7 @@ bool CCmdFindPrev::Execute()
         return true;
     }
 
-    Scintilla::Sci_TextToFind ttf = {0};
+    Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
     if (ttf.chrg.cpMin > 0)
         ttf.chrg.cpMin--;
@@ -3193,7 +3193,7 @@ bool CCmdFindSelectedNext::Execute()
     g_findString = seltext;
     g_sHighlightString = g_findString;
 
-    Scintilla::Sci_TextToFind ttf = {0};
+    Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
     ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
     ttf.lpstrText = g_findString.c_str();
@@ -3234,7 +3234,7 @@ bool CCmdFindSelectedPrev::Execute()
     g_findString = seltext;
     g_sHighlightString = g_findString;
 
-    Scintilla::Sci_TextToFind ttf = {0};
+    Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
     if (ttf.chrg.cpMin > 0)
         ttf.chrg.cpMin--;

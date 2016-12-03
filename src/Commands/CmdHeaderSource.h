@@ -65,7 +65,7 @@ public:
 
     void TabNotify(TBHDR* ptbhdr) override;
 
-    void ScintillaNotify(Scintilla::SCNotification* pScn) override;
+    void ScintillaNotify(SCNotification* pScn) override;
 
     void OnDocumentOpen(DocID id) override;
 
@@ -88,7 +88,7 @@ private:
     void GetFilesWithSameName(const std::wstring& targetPath, std::vector<std::wstring>& matchingfiles) const;
     bool FindFile(const std::wstring& fileToFind, const std::vector<std::wstring>& foldersToSearch, std::wstring& foundPath) const;
     bool ParseInclude(const std::wstring& raw, std::wstring& filename, RelatedType& incType) const;
-    bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf, int flags, std::string& found_text, size_t* line_no) const;
+    bool FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf, int flags, std::string& found_text, size_t* line_no) const;
     void AttachDocument(CScintillaWnd& edit, CDocument& doc);
     bool GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<RelatedFileItem>& includes) const;
     bool GetDefaultCorrespondingFileExtMappings(const std::wstring& from, std::wstring& to) const;

@@ -238,7 +238,7 @@ void CCommandHandler::Init(void * obj)
     InsertPlugins(obj);
 }
 
-void CCommandHandler::ScintillaNotify( Scintilla::SCNotification * pScn )
+void CCommandHandler::ScintillaNotify( SCNotification * pScn )
 {
     for (auto& cmd : m_commands)
     {

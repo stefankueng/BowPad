@@ -40,7 +40,7 @@ public:
 
     UINT GetCmdId() override { return cmdUndo; }
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override
+    void ScintillaNotify(SCNotification * pScn) override
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
@@ -79,7 +79,7 @@ public:
 
     UINT GetCmdId() override { return cmdRedo; }
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override
+    void ScintillaNotify(SCNotification * pScn) override
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);

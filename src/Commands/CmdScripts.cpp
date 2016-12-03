@@ -146,7 +146,7 @@ UINT CCmdScript::GetCmdId()
     return m_cmdID;
 }
 
-void CCmdScript::ScintillaNotify(Scintilla::SCNotification * pScn)
+void CCmdScript::ScintillaNotify(SCNotification * pScn)
 {
     _bstr_t btext;
     if (pScn->text && pScn->length)

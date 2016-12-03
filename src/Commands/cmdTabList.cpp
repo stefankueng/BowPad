@@ -258,7 +258,7 @@ void CCmdTabList::InvalidateTabList()
     m_menuInfo.clear();
 }
 
-void CCmdTabList::ScintillaNotify(Scintilla::SCNotification* /*pScn*/)
+void CCmdTabList::ScintillaNotify(SCNotification* /*pScn*/)
 {
     // ideally we want to invalidate this list when the user cancels
     // the drop down list without making a selection, but there isn't an

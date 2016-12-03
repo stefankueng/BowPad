@@ -286,7 +286,7 @@ public:
         return E_NOTIMPL;
     }
 
-    void ScintillaNotify(Scintilla::SCNotification* pScn) override;
+    void ScintillaNotify(SCNotification* pScn) override;
 
     void TabNotify(TBHDR* ptbhdr) override;
 
