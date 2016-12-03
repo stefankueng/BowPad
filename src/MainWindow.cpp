@@ -3530,10 +3530,11 @@ void CMainWindow::BlockAllUIUpdates(bool block)
         --m_blockCount;
         APPVERIFY(m_blockCount >= 0);
         if (m_blockCount == 0)
+        {
             SendMessage(*this, WM_SETREDRAW, TRUE, 0);
-        FileTreeBlockRefresh(block);
-        if (m_blockCount == 0)
+            FileTreeBlockRefresh(block);
             RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
+        }
     }
 }
 
