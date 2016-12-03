@@ -365,6 +365,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                             Refresh(hItem);
                     }
                 }
+                MarkActiveDocument();
             }
             else
             {
@@ -618,52 +619,59 @@ void CFileTree::TabNotify(TBHDR * ptbhdr)
 {
     if ((ptbhdr->hdr.code == TCN_SELCHANGE))
     {
-        InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
-        InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        // remove the bold status from all items
-        RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
+        if (m_nBlockRefresh)
+            return;
+        MarkActiveDocument();
+    }
+}
+
+void CFileTree::MarkActiveDocument()
+{
+    InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
+    InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    // remove the bold status from all items
+    RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [ & ](HTREEITEM hItem)->bool
+    {
+        TreeView_SetItemState(*this, hItem, 0, TVIS_BOLD);
+        return false;
+    });
+    if (HasActiveDocument())
+    {
+        const auto& doc = GetActiveDocument();
+        if (!doc.m_path.empty())
         {
-            TreeView_SetItemState(*this, hItem, 0, TVIS_BOLD);
-            return false;
-        });
-        if (HasActiveDocument())
-        {
-            const auto& doc = GetActiveDocument();
-            if (!doc.m_path.empty())
+            if (!CPathUtils::PathIsChild(m_path, doc.m_path))
             {
-                if (!CPathUtils::PathIsChild(m_path, doc.m_path))
-                {
-                    SetPath(CPathUtils::GetParentDirectory(doc.m_path));
-                }
+                SetPath(CPathUtils::GetParentDirectory(doc.m_path));
             }
-            if (!doc.m_path.empty() && (m_path.size() < doc.m_path.size()))
+        }
+        if (!doc.m_path.empty() && (m_path.size() < doc.m_path.size()))
+        {
+            if (CPathUtils::PathCompare(m_path, doc.m_path.substr(0, m_path.size())) == 0)
             {
-                if (CPathUtils::PathCompare(m_path, doc.m_path.substr(0, m_path.size())) == 0)
+                // find the path
+                RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [ & ](HTREEITEM hItem)->bool
                 {
-                    // find the path
-                    RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
+                    const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
+                    if (pTreeItem)
                     {
-                        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
-                        if (pTreeItem)
+                        if (!pTreeItem->isDir)
                         {
-                            if (!pTreeItem->isDir)
+                            if (CPathUtils::PathCompare(doc.m_path, pTreeItem->path) == 0)
                             {
-                                if (CPathUtils::PathCompare(doc.m_path, pTreeItem->path) == 0)
-                                {
-                                    TreeView_EnsureVisible(*this, hItem);
-                                    TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
-                                    return true;
-                                }
-                            }
-                            else
-                            {
-                                if (CPathUtils::PathIsChild(pTreeItem->path, doc.m_path))
-                                    TreeView_Expand(*this, hItem, TVE_EXPAND);
+                                TreeView_EnsureVisible(*this, hItem);
+                                TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
+                                return true;
                             }
                         }
-                        return false;
-                    });
-                }
+                        else
+                        {
+                            if (CPathUtils::PathIsChild(pTreeItem->path, doc.m_path))
+                                TreeView_Expand(*this, hItem, TVE_EXPAND);
+                        }
+                    }
+                    return false;
+                });
             }
         }
     }
