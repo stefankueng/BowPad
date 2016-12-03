@@ -369,7 +369,7 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
     {
         if (HasActiveDocument())
         {
-            CDocument doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.m_language);
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), ppropvarNewValue);
         }
@@ -525,7 +525,7 @@ void CCmdFunctions::OnDocumentClose(DocID id)
         for (decltype(tabCount) ti = 0; ti < tabCount; ++ti)
         {
             auto docID = GetDocIDFromTabIndex(ti);
-            auto doc = GetDocumentFromID(docID);
+            const auto& doc = GetDocumentFromID(docID);
             if (!doc.m_language.empty())
                 ++counts[doc.m_language];
         }
@@ -820,7 +820,7 @@ std::vector<FunctionInfo> CCmdFunctions::FindFunctionsNow() const
             functions.emplace_back(lineNum, std::move(name), std::move(nameAndArgs));
         return true;
     };
-    auto doc = GetActiveDocument();
+    const auto& doc = GetActiveDocument();
     FindFunctions(doc, f);
     // Sort by name then line number.
     std::sort(functions.begin(), functions.end(),

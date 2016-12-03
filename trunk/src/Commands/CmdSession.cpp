@@ -83,7 +83,7 @@ void CCmdSessionLoad::OnClose()
     for (int i = 0; i < savecount; ++i)
     {
         auto docId = GetDocIDFromTabIndex(i);
-        CDocument doc = GetDocumentFromID(docId);
+        const auto& doc = GetDocumentFromID(docId);
         if (doc.m_path.empty())
             continue;
         if (i == activetab)
@@ -168,7 +168,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         auto docId = GetDocIDFromTabIndex(tabIndex);
         if (!docId.IsValid())
             continue;
-        CDocument doc = GetDocumentFromID(docId);
+        auto& doc = GetModDocumentFromID(docId);
         auto& pos = doc.m_position;
         pos.m_nSelMode           = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"selmode%d", fileNum).c_str(), 0);
         pos.m_nStartPos          = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"startpos%d", fileNum).c_str(), 0);
@@ -178,7 +178,6 @@ void CCmdSessionLoad::RestoreSavedSession()
         pos.m_nFirstVisibleLine  = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
         if ((int)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", fileNum).c_str(), 0))
             activeDoc = docId;
-        SetDocument(docId, doc);
         RestoreCurrentPos(doc.m_position);
     }
     if (activeDoc.IsValid())
@@ -236,7 +235,7 @@ bool CCmdSessionRestoreLast::Execute()
 
 void CCmdSessionRestoreLast::OnDocumentClose(DocID id)
 {
-    CDocument doc = GetDocumentFromID(id);
+    const auto& doc = GetDocumentFromID(id);
     if (doc.m_path.empty())
         return;
 

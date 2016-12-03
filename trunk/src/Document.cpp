@@ -36,7 +36,7 @@ std::wstring GetEOLFormatDescription( EOLFormat ft )
     return sFt;
 }
 
-std::wstring CDocument::GetEncodingString()
+std::wstring CDocument::GetEncodingString() const
 {
     std::wstring sEnc;
     switch (m_encoding)

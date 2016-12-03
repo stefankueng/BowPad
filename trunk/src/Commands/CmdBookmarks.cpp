@@ -56,7 +56,7 @@ CCmdBookmarks::CCmdBookmarks(void * obj) : ICommand(obj)
 void CCmdBookmarks::OnDocumentClose(DocID id)
 {
     auto& settings = CIniSettings::Instance();
-    auto doc = GetDocumentFromID(id);
+    const auto& doc = GetDocumentFromID(id);
     if (doc.m_path.empty())
         return;
 

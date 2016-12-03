@@ -26,9 +26,8 @@ bool CCmdEOLBase::Execute()
     ScintillaCall(SCI_CONVERTEOLS, lineType);
     if (HasActiveDocument())
     {
-        auto doc = GetActiveDocument();
+        auto& doc = GetModActiveDocument();
         doc.m_format = ToEOLFormat(lineType);
-        SetDocument(GetDocIdOfCurrentTab(), doc);
         UpdateStatusBar(true);
     }
     InvalidateUICommand(cmdEOLWin,  UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);

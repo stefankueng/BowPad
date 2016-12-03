@@ -44,7 +44,7 @@ HRESULT CCmdGotoSymbol::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, cons
     {
         if (HasActiveDocument())
         {
-            CDocument doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.m_language);
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), ppropvarNewValue);
         }

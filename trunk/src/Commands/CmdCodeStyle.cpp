@@ -87,7 +87,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
     {
         if (HasActiveDocument())
         {
-            CDocument doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             auto docLang = CUnicodeUtils::StdGetUnicode(doc.m_language);
             hr = S_FALSE;
             for (size_t i = 0; i < langs.size(); ++i)
@@ -116,9 +116,8 @@ HRESULT CCmdCodeStyle::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PR
             if (HasActiveDocument())
             {
                 InvalidateUICommand(cmdFunctions, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
-                CDocument doc = GetActiveDocument();
+                auto& doc = GetModActiveDocument();
                 doc.m_language = CUnicodeUtils::StdGetUTF8(langs[selected]);
-                SetDocument(GetDocIdOfCurrentTab(), doc);
                 SetupLexerForLang(doc.m_language);
                 CLexStyles::Instance().SetLangForPath(doc.m_path, doc.m_language);
                 UpdateStatusBar(true);

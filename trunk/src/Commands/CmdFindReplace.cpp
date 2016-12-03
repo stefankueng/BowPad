@@ -225,7 +225,7 @@ std::wstring CFindReplaceDlg::GetCurrentDocumentFolder() const
     std::wstring currentDocFolder;
     if (this->HasActiveDocument())
     {
-        auto doc = this->GetActiveDocument();
+        const auto& doc = this->GetActiveDocument();
         if (!doc.m_path.empty())
         {
             currentDocFolder = CPathUtils::GetParentDirectory(doc.m_path);
@@ -731,7 +731,7 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
             const auto& sr = m_searchResults[itemIndex];
             if (sr.docID.IsValid())
             {
-                CDocument doc = GetDocumentFromID(sr.docID);
+                const auto& doc = GetDocumentFromID(sr.docID);
                 _snwprintf_s(tip->pszText, tip->cchTextMax, _TRUNCATE, L"%s (#%d)",
                     doc.m_path.c_str(), itemIndex);
             }
@@ -1140,7 +1140,7 @@ void CFindReplaceDlg::DoListItemAction(int itemIndex)
     std::wstring path;
     if (HasDocumentID(item.docID))
     {
-        auto doc = GetDocumentFromID(item.docID);
+        const auto& doc = GetDocumentFromID(item.docID);
         path = doc.m_path;
     }
     else if (item.hasPath())
@@ -1492,12 +1492,11 @@ void CFindReplaceDlg::DoReplace( int id )
         for (int i = 0; i < tabcount; ++i)
         {
             auto docID = GetDocIDFromTabIndex(i);
-            CDocument doc = GetDocumentFromID(docID);
+            auto& doc = GetModDocumentFromID(docID);
             int rcount = ReplaceDocument(doc, g_findString, sReplaceString, g_searchFlags);
             if (rcount)
             {
                 replaceCount += rcount;
-                SetDocument(docID, doc);
                 UpdateTab(i);
             }
         }
@@ -1637,8 +1636,8 @@ void CFindReplaceDlg::SortResults()
         int result = -1;
         if (lhs.docID.IsValid() && rhs.docID.IsValid())
         {
-            CDocument ldoc = GetDocumentFromID(lhs.docID);
-            CDocument rdoc = GetDocumentFromID(rhs.docID);
+            const auto& ldoc = GetDocumentFromID(lhs.docID);
+            const auto& rdoc = GetDocumentFromID(rhs.docID);
             // If both results are associated with files...
             if (!ldoc.m_path.empty() && !rdoc.m_path.empty())
             {
@@ -1748,7 +1747,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
         if (id == IDC_FINDALL && HasActiveDocument())
         {
             auto docId = GetDocIDFromTabIndex(GetActiveTabIndex());
-            CDocument doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             ResString rInfo(hRes, IDS_SEARCHING_FILE);
             auto sInfo = CStringUtils::Format(rInfo, CPathUtils::GetFileName(doc.m_path).c_str());
             SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
@@ -1763,7 +1762,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
             for (int i = 0; i < tabcount; ++i)
             {
                 auto docID = GetDocIDFromTabIndex(i);
-                CDocument doc = GetDocumentFromID(docID);
+                const auto& doc = GetDocumentFromID(docID);
                 auto sInfo = CStringUtils::Format(rInfo, CPathUtils::GetFileName(doc.m_path).c_str());
                 SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
                 UpdateWindow(*this);
@@ -2842,7 +2841,7 @@ void CFindReplaceDlg::NotifyOnDocumentClose(DocID id)
     // we must/ delete the results for it, because we can't ever re-open a document
     // via it's result if it never persisted and is now gone.
 
-    auto doc = GetDocumentFromID(id);
+    const auto& doc = GetDocumentFromID(id);
     if (doc.m_path.empty())
     {
         // This is a "new" document that has never been saved, delete it's results
@@ -3112,7 +3111,7 @@ void CCmdFindReplace::SetSearchFolderToCurrentDocument()
         {
             if (this->HasActiveDocument())
             {
-                auto doc = this->GetActiveDocument();
+                const auto& doc = this->GetActiveDocument();
                 std::wstring folder = CPathUtils::GetParentDirectory(doc.m_path);
                 g_pFindReplaceDlg->SetSearchFolder(folder);
             }

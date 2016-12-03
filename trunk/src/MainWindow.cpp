@@ -765,7 +765,7 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmhdr, WPARAM /*wParam*/, L
         if (hPtWnd == m_fileTree)
         {
             auto docID = m_TabBar.GetIDFromIndex(ptbhdr->tabOrigin);
-            CDocument doc = m_DocManager.GetDocumentFromID(docID);
+            const auto& doc = m_DocManager.GetDocumentFromID(docID);
             if (!doc.m_path.empty())
             {
                 if (GetKeyState(VK_CONTROL) & 0x8000)
@@ -997,9 +997,8 @@ void CMainWindow::HandleStatusBarEOLFormat()
             auto id = m_TabBar.GetCurrentTabId();
             if (m_DocManager.HasDocumentID(id))
             {
-                CDocument doc = m_DocManager.GetDocumentFromID(id);
+                auto& doc = m_DocManager.GetModDocumentFromID(id);
                 doc.m_format = selectedEolFormat;
-                m_DocManager.SetDocument(id, doc);
                 UpdateStatusBar(true);
             }
         }
@@ -1348,7 +1347,7 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
     if (!m_DocManager.HasDocumentID(docID))
         return false;
 
-    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    auto& doc = m_DocManager.GetModDocumentFromID(docID);
     if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
     {
         bSaveAs = true;
@@ -1401,7 +1400,6 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         }
         std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
         m_TabBar.SetCurrentTitle(sFileName.c_str());
-        m_DocManager.SetDocument(docID, doc);
         // Update tab so the various states are updated (readonly, modified, ...)
         UpdateTab(docID);
         UpdateCaptionBar();
@@ -1427,7 +1425,7 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
 
     int tab = m_TabBar.GetIndexFromID(docID);
     m_TabBar.ActivateAt(tab);
-    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    auto& doc = m_DocManager.GetModDocumentFromID(docID);
     doc.m_path = CPathUtils::GetLongPathname(savepath);
     doc.m_bIsDirty = bMod;
     doc.m_bNeedsSaving = bMod;
@@ -1436,7 +1434,6 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
 
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
     doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
-    m_DocManager.SetDocument(docID, doc);
 
     m_editor.SetupLexerForLang(doc.m_language);
     if (!title.empty())
@@ -1468,9 +1465,8 @@ void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& sa
     {
         auto tab = m_TabBar.GetIndexFromID(docID);
         m_TabBar.ActivateAt(tab);
-        CDocument doc = m_DocManager.GetDocumentFromID(docID);
+        auto& doc = m_DocManager.GetModDocumentFromID(docID);
         doc.m_path = CPathUtils::GetLongPathname(savepath);
-        m_DocManager.SetDocument(docID, doc);
         SaveCurrentTab();
         UpdateCaptionBar();
         UpdateStatusBar(true);
@@ -1568,7 +1564,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
 
     if (bEverything)
     {
-        CDocument doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
+        const auto& doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
         int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
         APPVERIFY(ToEOLMode(doc.m_format) == eolMode);
         auto eolDesc = GetEOLFormatDescription(doc.m_format);
@@ -1719,7 +1715,7 @@ void CMainWindow::UpdateCaptionBar()
 
     if (m_DocManager.HasDocumentID(docID))
     {
-        CDocument doc = m_DocManager.GetDocumentFromID(docID);
+        const auto& doc = m_DocManager.GetDocumentFromID(docID);
 
         std::wstring sTitle = elev;
         if (!elev.empty())
@@ -1739,7 +1735,7 @@ void CMainWindow::UpdateCaptionBar()
 
 void CMainWindow::UpdateTab(DocID docID)
 {
-    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    const auto& doc = m_DocManager.GetDocumentFromID(docID);
     TCITEM tie;
     tie.lParam = -1;
     tie.mask = TCIF_IMAGE;
@@ -2005,7 +2001,7 @@ void CMainWindow::CopyCurDocPathToClipboard() const
     auto id = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(id))
     {
-        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        const auto& doc = m_DocManager.GetDocumentFromID(id);
         WriteAsciiStringToClipboard(doc.m_path.c_str(), *this);
     }
 }
@@ -2015,7 +2011,7 @@ void CMainWindow::CopyCurDocNameToClipboard() const
     auto id = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(id))
     {
-        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        const auto& doc = m_DocManager.GetDocumentFromID(id);
         WriteAsciiStringToClipboard(CPathUtils::GetFileName(doc.m_path).c_str(), *this);
     }
 }
@@ -2025,7 +2021,7 @@ void CMainWindow::CopyCurDocDirToClipboard() const
     auto id = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(id))
     {
-        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        const auto& doc = m_DocManager.GetDocumentFromID(id);
         WriteAsciiStringToClipboard(CPathUtils::GetParentDirectory(doc.m_path).c_str(), *this);
     }
 }
@@ -2035,7 +2031,7 @@ void CMainWindow::ShowCurDocInExplorer() const
     auto id = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(id))
     {
-        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        const auto& doc = m_DocManager.GetDocumentFromID(id);
         PCIDLIST_ABSOLUTE __unaligned pidl = ILCreateFromPath(doc.m_path.c_str());
         if (pidl)
         {
@@ -2052,7 +2048,7 @@ void CMainWindow::ShowCurDocExplorerProperties() const
     {
         // This creates an ugly exception dialog on my machine in debug mode
         // but it seems to work anyway.
-        CDocument doc = m_DocManager.GetDocumentFromID(id);
+        const auto& doc = m_DocManager.GetDocumentFromID(id);
         SHELLEXECUTEINFO info = {sizeof(SHELLEXECUTEINFO)};
         info.lpVerb = L"properties";
         info.lpFile = doc.m_path.c_str();
@@ -2301,7 +2297,7 @@ void CMainWindow::HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi)
         {
             if (m_DocManager.HasDocumentID(docId))
             {
-                CDocument doc = m_DocManager.GetDocumentFromID(docId);
+                const auto& doc = m_DocManager.GetDocumentFromID(docId);
                 m_tooltipbuffer = std::make_unique<wchar_t[]>(doc.m_path.size()+1);
                 wcscpy_s(m_tooltipbuffer.get(), doc.m_path.size()+1, doc.m_path.c_str());
                 lpnmtdi->lpszText = m_tooltipbuffer.get();
@@ -2354,9 +2350,8 @@ void CMainWindow::HandleSavePoint(const SCNotification& scn)
     auto docID = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(docID))
     {
-        CDocument doc = m_DocManager.GetDocumentFromID(docID);
+        auto& doc = m_DocManager.GetModDocumentFromID(docID);
         doc.m_bIsDirty = scn.nmhdr.code == SCN_SAVEPOINTLEFT;
-        m_DocManager.SetDocument(docID, doc);
         UpdateTab(docID);
     }
 }
@@ -2368,14 +2363,13 @@ void CMainWindow::HandleWriteProtectedEdit()
     auto docID = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(docID))
     {
-        CDocument doc = m_DocManager.GetDocumentFromID(docID);
+        auto& doc = m_DocManager.GetModDocumentFromID(docID);
         if (!doc.m_bIsWriteProtected && (doc.m_bIsReadonly || (m_editor.Call(SCI_GETREADONLY) != 0)))
         {
              // If the user really wants to edit despite it being read only, let them.
             if (AskToRemoveReadOnlyAttribute())
             {
                 doc.m_bIsReadonly = false;
-                m_DocManager.SetDocument(docID, doc);
                 UpdateTab(docID);
                 m_editor.Call(SCI_SETREADONLY, false);
                 m_editor.Call(SCI_SETSAVEPOINT);
@@ -2543,9 +2537,8 @@ void CMainWindow::HandleTabChanging(const NMHDR& /*nmhdr*/)
     if (m_DocManager.HasDocumentID(docID))
     {
         m_editor.MatchBraces(BraceMatch::Clear);
-        CDocument doc = m_DocManager.GetDocumentFromID(docID);
+        auto& doc = m_DocManager.GetModDocumentFromID(docID);
         m_editor.SaveCurrentPos(doc.m_position);
-        m_DocManager.SetDocument(docID, doc);
     }
 }
 
@@ -2558,13 +2551,12 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     if (!m_DocManager.HasDocumentID(docID))
         return;
 
-    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    auto& doc = m_DocManager.GetModDocumentFromID(docID);
     m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
     m_editor.SetupLexerForLang(doc.m_language);
     m_editor.RestoreCurrentPos(doc.m_position);
     m_editor.SetTabSettings();
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc);
-    m_DocManager.SetDocument(docID, doc);
     m_editor.MarkSelectedWord(true);
     m_editor.MarkBookmarksInScrollbar();
     UpdateCaptionBar();
@@ -2740,7 +2732,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             if (bOpenIntoActiveTab)
             {
                 activetabid = m_TabBar.GetCurrentTabId();
-                CDocument activedoc = m_DocManager.GetDocumentFromID(activetabid);
+                const auto& activedoc = m_DocManager.GetDocumentFromID(activetabid);
                 if (!activedoc.m_bIsDirty && !activedoc.m_bNeedsSaving)
                     m_DocManager.RemoveDocument(activetabid);
                 else
@@ -2752,7 +2744,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 auto docID = m_TabBar.GetCurrentTabId();
                 if (docID.IsValid())
                 {
-                    CDocument existDoc = m_DocManager.GetDocumentFromID(docID);
+                    const auto& existDoc = m_DocManager.GetDocumentFromID(docID);
                     if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH) == 0) && (m_editor.Call(SCI_CANUNDO) == 0))
                     {
                         auto curtabIndex = m_TabBar.GetCurrentTabIndex();
@@ -2854,14 +2846,13 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
     // Get the id for the document we just loaded,
     // it'll currently have a temporary name.
     auto docID = m_DocManager.GetIdForPath(temppath);
-    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    auto& doc = m_DocManager.GetModDocumentFromID(docID);
     doc.m_path = CPathUtils::GetLongPathname(realpath);
     doc.m_bIsDirty = bModified;
     doc.m_bNeedsSaving = bModified;
     m_DocManager.UpdateFileTime(doc, true);
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
     doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
-    m_DocManager.SetDocument(docID, doc);
     m_editor.Call(SCI_SETREADONLY, doc.m_bIsReadonly);
     m_editor.SetupLexerForLang(doc.m_language);
     UpdateTab(docID);
@@ -3129,7 +3120,7 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
     // First save the file to a temp location to ensure all unsaved mods are saved.
     std::wstring temppath = CTempFiles::Instance().GetTempFilePath(true);
     auto docID = m_TabBar.GetIDFromIndex(tab);
-    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    auto& doc = m_DocManager.GetModDocumentFromID(docID);
     HWND hDroppedWnd = WindowFromPoint(pt);
     if (hDroppedWnd)
     {
@@ -3206,7 +3197,6 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
                             if (MoveFile(doc.m_path.c_str(), destpath.c_str()))
                             {
                                 doc.m_path = destpath;
-                                m_DocManager.SetDocument(docID, doc);
                                 m_TabBar.ActivateAt(tab);
                             }
                         }
@@ -3250,7 +3240,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     if (!m_DocManager.HasDocumentID(docID)) // No such document
         return false;
     bool bReloadCurrentTab = (tab == m_TabBar.GetCurrentTabIndex());
-    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    auto& doc = m_DocManager.GetModDocumentFromID(docID);
 
     CScintillaWnd* editor = bReloadCurrentTab ? &m_editor : &m_scratchEditor;
     if (dueToOutsideChanges)
@@ -3278,7 +3268,6 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
             // so the user knows he can save the changes.
             doc.m_bIsDirty = true;
             doc.m_bNeedsSaving = true;
-            m_DocManager.SetDocument(docID, doc);
             // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
             editor->Call(SCI_ADDUNDOACTION, 0, 0);
             editor->Call(SCI_UNDO);
@@ -3316,7 +3305,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     docreload.m_language = doc.m_language;
     docreload.m_position = doc.m_position;
     docreload.m_bIsWriteProtected = doc.m_bIsWriteProtected;
-    m_DocManager.SetDocument(docID, docreload);
+    doc = docreload;
     editor->SetupLexerForLang(docreload.m_language);
     editor->RestoreCurrentPos(docreload.m_position);
     editor->Call(SCI_SETREADONLY, docreload.m_bIsWriteProtected);
@@ -3337,7 +3326,7 @@ bool CMainWindow::HandleOutsideDeletedFile(int tab)
 {
     assert(tab == m_TabBar.GetCurrentTabIndex());
     auto docID = m_TabBar.GetIDFromIndex(tab);
-    CDocument doc = m_DocManager.GetDocumentFromID(docID);
+    auto& doc = m_DocManager.GetModDocumentFromID(docID);
     // file was removed. Options are:
     // * keep the file open
     // * close the tab
@@ -3352,7 +3341,6 @@ bool CMainWindow::HandleOutsideDeletedFile(int tab)
     doc.m_bNeedsSaving = true;
     // update the filetime of the document to avoid this warning
     m_DocManager.UpdateFileTime(doc, false);
-    m_DocManager.SetDocument(docID, doc);
     // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
     m_editor.Call(SCI_ADDUNDOACTION, 0, 0);
     m_editor.Call(SCI_UNDO);
@@ -3390,7 +3378,7 @@ void CMainWindow::CheckForOutsideChanges()
         auto ds = m_DocManager.HasFileChanged(docID);
         if (ds == DM_Modified || ds == DM_Removed)
         {
-            CDocument doc = m_DocManager.GetDocumentFromID(docID);
+            const auto& doc = m_DocManager.GetDocumentFromID(docID);
             if ((ds != DM_Removed) && !doc.m_bIsDirty && !doc.m_bNeedsSaving && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
             {
                 ReloadTab(i, -1);
@@ -3702,7 +3690,7 @@ void CMainWindow::SetTheme(bool dark)
     {
         m_editor.Call(SCI_CLEARDOCUMENTSTYLE);
         m_editor.Call(SCI_COLOURISE, 0, -1);
-        CDocument doc = m_DocManager.GetDocumentFromID(activeTabId);
+        const auto& doc = m_DocManager.GetDocumentFromID(activeTabId);
         m_editor.SetupLexerForLang(doc.m_language);
         RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
     }

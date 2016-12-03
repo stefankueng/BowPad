@@ -178,7 +178,7 @@ bool CCmdHeaderSource::UserFindFile(HWND hwndParent, const std::wstring& filenam
     std::wstring defFolder;
     if (defaultFolder.empty())
     {
-        CDocument doc = GetActiveDocument();
+        const auto& doc = GetActiveDocument();
         if (!doc.m_path.empty())
             defFolder = CPathUtils::GetParentDirectory(doc.m_path);
         else
@@ -268,7 +268,7 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
             return E_FAIL;
         if (!HasActiveDocument())
             return E_FAIL;
-        CDocument doc = GetDocumentFromID(docId);
+        auto& doc = GetModDocumentFromID(docId);
 
         CScintillaWnd edit(hRes);
         edit.InitScratch(hRes);
@@ -525,11 +525,10 @@ bool CCmdHeaderSource::OpenFileAsLanguage(const std::wstring& filename)
     auto desiredLang = "C/C++";
     if (HasActiveDocument())
     {
-        CDocument doc = GetActiveDocument();
+        auto& doc = GetModActiveDocument();
         if (doc.m_language != desiredLang)
         {
             doc.m_language = desiredLang;
-            SetDocument(GetDocIdOfCurrentTab(), doc);
             SetupLexerForLang(doc.m_language);
             CLexStyles::Instance().SetLangForPath(doc.m_path, doc.m_language);
             UpdateStatusBar(true);
@@ -607,7 +606,7 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
             std::wstring initialFolder;
             if (HasActiveDocument())
             {
-                auto doc = GetActiveDocument();
+                const auto& doc = GetActiveDocument();
                 initialFolder = CPathUtils::GetParentDirectory(doc.m_path);
             }
             pCorrespondingFileDlg->Show(GetHwnd(), initialFolder);
@@ -697,7 +696,7 @@ bool CCmdHeaderSource::Execute()
 
     if (HasActiveDocument())
     {
-        const CDocument doc = GetActiveDocument();
+        const auto& doc = GetActiveDocument();
         std::vector<std::wstring> matchingFiles;
         GetFilesWithSameName(doc.m_path, matchingFiles);
 

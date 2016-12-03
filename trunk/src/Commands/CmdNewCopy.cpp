@@ -31,10 +31,10 @@ bool CCmdNewCopy::Execute()
         auto textbuf = std::make_unique<char[]>(len + 1);
         ScintillaCall(SCI_GETTEXT, len + 1, (sptr_t)textbuf.get());
 
-        CDocument doc = GetActiveDocument();
+        auto& doc = GetModActiveDocument();
         SaveCurrentPos(doc.m_position);
         SendMessage(GetHwnd(), WM_COMMAND, MAKEWPARAM(cmdNew, 1), 0);
-        CDocument docnew = GetActiveDocument();
+        auto& docnew = GetModActiveDocument();
         auto d = docnew.m_document;
         docnew = doc;
         docnew.m_path.clear();
@@ -43,7 +43,6 @@ bool CCmdNewCopy::Execute()
         docnew.m_bIsDirty = true;
         docnew.m_bNeedsSaving = true;
 
-        SetDocument(GetDocIdOfCurrentTab(), docnew);
         SetupLexerForLang(docnew.m_language);
         ScintillaCall(SCI_APPENDTEXT, len, (sptr_t)textbuf.get());
         RestoreCurrentPos(docnew.m_position);

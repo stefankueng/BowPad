@@ -100,7 +100,7 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
         ScintillaCall(SCI_STYLESETSIZE, STYLE_DEFAULT, fontsize);
 
         // refresh lexer
-        CDocument doc = GetActiveDocument();
+        const auto& doc = GetActiveDocument();
         SetupLexerForLang(doc.m_language);
         return S_OK;
     }
@@ -195,7 +195,7 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
         }
         if ((verb == UI_EXECUTIONVERB_EXECUTE) || (verb == UI_EXECUTIONVERB_PREVIEW))
         {
-            CDocument doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             SetupLexerForLang(doc.m_language);
         }
     }

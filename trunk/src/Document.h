@@ -66,7 +66,7 @@ public:
         m_lastWriteTime.dwLowDateTime  = 0;
     }
 
-    std::wstring GetEncodingString();
+    std::wstring GetEncodingString() const;
 
     Document                m_document;
     std::wstring            m_path;

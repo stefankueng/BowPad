@@ -57,7 +57,7 @@ bool CCmdOpen::Execute()
     // Set the default folder to the folder of the current tab.
     if (HasActiveDocument())
     {
-        auto doc = GetActiveDocument();
+        const auto& doc = GetActiveDocument();
         if (!doc.m_path.empty())
         {
             auto folder = CPathUtils::GetParentDirectory(doc.m_path);
@@ -165,7 +165,7 @@ HRESULT CCmdSave::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PRO
     {
         if (HasActiveDocument())
         {
-            auto doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, doc.m_bIsDirty||doc.m_bNeedsSaving, ppropvarNewValue);
         }
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
@@ -216,7 +216,7 @@ HRESULT CCmdSaveAll::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
         int dirtycount = 0;
         for (decltype(docCount) i = 0; i < docCount; ++i)
         {
-            CDocument doc = GetDocumentFromID(GetDocIDFromTabIndex(i));
+            const auto& doc = GetDocumentFromID(GetDocIDFromTabIndex(i));
             if (doc.m_bIsDirty||doc.m_bNeedsSaving)
                 dirtycount++;
         }
@@ -238,7 +238,7 @@ HRESULT CCmdReload::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PR
     {
         if (HasActiveDocument())
         {
-            auto doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
         }
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
@@ -260,7 +260,7 @@ HRESULT CCmdFileDelete::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, cons
     {
         if (HasActiveDocument())
         {
-            auto doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
         }
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
@@ -280,7 +280,7 @@ bool CCmdFileDelete::Execute()
 {
     if (HasActiveDocument())
     {
-        auto doc = GetActiveDocument();
+        const auto& doc = GetActiveDocument();
         if (!doc.m_path.empty())
         {
             // ask first
@@ -400,7 +400,7 @@ void CCmdSaveAuto::Save()
     int autosave = (int)CIniSettings::Instance().GetInt64(L"View", L"autosave", 0);
     if (autosave)
     {
-        auto doc = GetActiveDocument();
+        const auto& doc = GetActiveDocument();
         if ((doc.m_bIsDirty || doc.m_bNeedsSaving) && !doc.m_path.empty())
             SaveCurrentTab();
     }
