@@ -1683,7 +1683,7 @@ std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t st
 
     size_t bufLen = end - start + 1;
     auto buf = std::make_unique<char[]>(bufLen+1);
-    TextRange tr;
+    Sci_TextRange tr;
     tr.chrg.cpMin = (long)start;
     tr.chrg.cpMax = (long)end;
     tr.lpstrText = buf.get();
