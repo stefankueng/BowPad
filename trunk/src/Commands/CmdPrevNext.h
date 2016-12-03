@@ -37,7 +37,7 @@ public:
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdPrevNext; }
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification * pScn) override;
 
     void TabNotify(TBHDR* ptbhdr) override;
     void OnDocumentClose(DocID id) override;

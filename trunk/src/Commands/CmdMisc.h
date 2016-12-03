@@ -157,5 +157,5 @@ public:
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
     void TabNotify(TBHDR* ptbhdr) override;
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification * pScn) override;
 };

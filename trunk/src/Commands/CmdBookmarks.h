@@ -105,7 +105,7 @@ public:
 
     UINT GetCmdId() override { return cmdBookmarkNext; }
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification * pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(
         REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
@@ -126,7 +126,7 @@ public:
 
     UINT GetCmdId() override { return cmdBookmarkPrev; }
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification * pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(
         REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;

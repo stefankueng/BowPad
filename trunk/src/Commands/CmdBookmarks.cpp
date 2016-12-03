@@ -183,7 +183,7 @@ bool CCmdBookmarkNext::Execute()
 }
 
 
-void CCmdBookmarkNext::ScintillaNotify(Scintilla::SCNotification * pScn)
+void CCmdBookmarkNext::ScintillaNotify(SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
@@ -221,7 +221,7 @@ bool CCmdBookmarkPrev::Execute()
     return true;
 }
 
-void CCmdBookmarkPrev::ScintillaNotify(Scintilla::SCNotification * pScn)
+void CCmdBookmarkPrev::ScintillaNotify(SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);

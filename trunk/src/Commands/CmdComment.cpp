@@ -157,7 +157,7 @@ bool CCmdUnComment::Execute()
         }
 
         auto strbuf = std::make_unique<char[]>(commentstreamstart.size() + commentstreamend.size() + 5);
-        Scintilla::Sci_TextRange rangestart;
+        Sci_TextRange rangestart;
         rangestart.chrg.cpMin = Sci_PositionCR(selStart - commentstreamstart.length());
         rangestart.chrg.cpMax = Sci_PositionCR(selStart);
         rangestart.lpstrText = strbuf.get();
@@ -166,7 +166,7 @@ bool CCmdUnComment::Execute()
         if (_stricmp(commentstreamstart.c_str(), strbuf.get())==0)
         {
             // find the end marker
-            Scintilla::Sci_TextRange rangeend;
+            Sci_TextRange rangeend;
             rangeend.chrg.cpMin = Sci_PositionCR(selEnd);
             rangeend.chrg.cpMax = Sci_PositionCR(selEnd + commentstreamend.length());
             rangeend.lpstrText = strbuf.get();
@@ -199,7 +199,7 @@ bool CCmdUnComment::Execute()
                 for (auto line = linestart; line <= lineend; ++line)
                 {
                     size_t pos = ScintillaCall(SCI_GETLINEINDENTPOSITION, line);
-                    Scintilla::Sci_TextRange range;
+                    Sci_TextRange range;
                     range.chrg.cpMin = Sci_PositionCR(pos);
                     range.chrg.cpMax = Sci_PositionCR(pos + commentline.length());
                     range.lpstrText = strbuf.get();
@@ -223,7 +223,7 @@ bool CCmdUnComment::Execute()
         auto curPos = ScintillaCall(SCI_GETCURRENTPOS);
         ScintillaCall(SCI_BEGINUNDOACTION);
         auto pos = ScintillaCall(SCI_GETLINEINDENTPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
-        Scintilla::Sci_TextRange range;
+        Sci_TextRange range;
         range.chrg.cpMin = Sci_PositionCR(pos);
         range.chrg.cpMax = Sci_PositionCR(pos + commentline.length());
         range.lpstrText = strbuf.get();
@@ -239,7 +239,7 @@ bool CCmdUnComment::Execute()
         {
             // try to find a stream comment the current position is maybe in, and if yes remove the stream comment
 
-            Scintilla::Sci_TextToFind ttf = {0};
+            Sci_TextToFind ttf = {0};
             ttf.chrg.cpMin = (long)curPos;
             if (ttf.chrg.cpMin > (long)commentstreamstart.length())
                 ttf.chrg.cpMin--;

@@ -49,7 +49,7 @@ public:
     bool Execute() override;
     UINT GetCmdId() override { return cmdSave; }
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification * pScn) override;
     void TabNotify(TBHDR * ptbhdr) override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
@@ -69,7 +69,7 @@ public:
     bool Execute() override;
     UINT GetCmdId() override { return cmdSaveAll; }
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification * pScn) override;
     void TabNotify(TBHDR * ptbhdr) override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
@@ -89,7 +89,7 @@ public:
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
     void TabNotify(TBHDR * ptbhdr) override;
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification * pScn) override;
 private:
     void Save();
 };

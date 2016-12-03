@@ -37,7 +37,7 @@ public:
 
     UINT GetCmdId() override { return cmdSpellCheck; }
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification * pScn) override;
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
     void OnTimer(UINT id) override;
@@ -86,7 +86,7 @@ public:
 
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void ScintillaNotify(Scintilla::SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification * pScn) override;
 
 private:
     std::vector<std::wstring>   m_suggestions;

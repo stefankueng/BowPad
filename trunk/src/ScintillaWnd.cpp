@@ -838,7 +838,7 @@ void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
     Call(SCI_SETANCHOR, posStart);
 }
 
-void CScintillaWnd::MarginClick( Scintilla::SCNotification * pNotification )
+void CScintillaWnd::MarginClick( SCNotification * pNotification )
 {
     if ((pNotification->margin == SC_MARGE_SYMBOL) && !pNotification->modifiers)
         BookmarkToggle((int)Call(SCI_LINEFROMPOSITION, pNotification->position));
@@ -914,7 +914,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     }
 
     auto textbuffer = std::make_unique<char[]>(len + 1);
-    Scintilla::Sci_TextRange textrange;
+    Sci_TextRange textrange;
     textrange.lpstrText = textbuffer.get();
     textrange.chrg.cpMin = startstylepos;
     textrange.chrg.cpMax = endstylepos;
@@ -936,7 +936,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         {
             m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
             m_selTextMarkerCount = 0;
-            Scintilla::Sci_TextToFind FindText;
+            Sci_TextToFind FindText;
             FindText.chrg.cpMin = 0;
             FindText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
             FindText.lpstrText = seltextbuffer.get();
@@ -1474,7 +1474,7 @@ FindResult CScintillaWnd::FindText( const char *text, size_t start, size_t end, 
 {
     FindResult returnValue = { 0 };
 
-    Scintilla::Sci_TextToFind search;
+    Sci_TextToFind search;
     search.lpstrText = const_cast<char *>(text);
     search.chrg.cpMin = (long)start;
     search.chrg.cpMax = (long)end;
@@ -1494,7 +1494,7 @@ FindResult CScintillaWnd::FindText( const char *text, size_t start, size_t end, 
 
 size_t CScintillaWnd::FindText(const std::string& tofind, long startpos, long endpos)
 {
-    Scintilla::Sci_TextToFind ttf = { 0 };
+    Sci_TextToFind ttf = { 0 };
     ttf.chrg.cpMin = startpos;
     ttf.chrg.cpMax = endpos;
     ttf.lpstrText = const_cast<char*>(tofind.c_str());
@@ -1683,7 +1683,7 @@ std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t st
 
     size_t bufLen = end - start + 1;
     auto buf = std::make_unique<char[]>(bufLen+1);
-    Scintilla::TextRange tr;
+    TextRange tr;
     tr.chrg.cpMin = (long)start;
     tr.chrg.cpMax = (long)end;
     tr.lpstrText = buf.get();
@@ -2018,7 +2018,7 @@ void CScintillaWnd::MarkBookmarksInScrollbar()
 void CScintillaWnd::DocScrollUpdate()
 {
     InvalidateRect(*this, nullptr, TRUE);
-    Scintilla::SCNotification Scn = { 0 };
+    SCNotification Scn = { 0 };
     Scn.message = SCN_UPDATEUI;
     Scn.updated = SC_UPDATE_CONTENT;
     Scn.nmhdr.code = SCN_UPDATEUI;
@@ -2061,7 +2061,7 @@ std::string CScintillaWnd::GetTextRange(long startpos, long endpos) const
     if (endpos < startpos)
         return "";
     auto strbuf = std::make_unique<char[]>(endpos - startpos + 5);
-    Scintilla::Sci_TextRange rangestart;
+    Sci_TextRange rangestart;
     rangestart.chrg.cpMin = startpos;
     rangestart.chrg.cpMax = endpos;
     rangestart.lpstrText = strbuf.get();

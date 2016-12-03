@@ -86,7 +86,7 @@ public :
     void SaveCurrentPos(CPosData& pos);
     void RestoreCurrentPos(const CPosData& pos);
     void SetupLexerForLang(const std::string& lang);
-    void MarginClick(Scintilla::SCNotification * pNotification);
+    void MarginClick(SCNotification * pNotification);
     void MarkSelectedWord(bool clear);
     void MatchBraces(BraceMatch what);
     void GotoBrace();

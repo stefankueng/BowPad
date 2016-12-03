@@ -245,7 +245,7 @@ bool CCmdCut::Execute()
     return true;
 }
 
-void CCmdCut::ScintillaNotify(Scintilla::SCNotification * pScn)
+void CCmdCut::ScintillaNotify(SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
@@ -267,7 +267,7 @@ bool CCmdCutPlain::Execute()
     return true;
 }
 
-void CCmdCutPlain::ScintillaNotify(Scintilla::SCNotification * pScn)
+void CCmdCutPlain::ScintillaNotify(SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
@@ -325,7 +325,7 @@ bool CCmdPaste::Execute()
     return true;
 }
 
-void CCmdPaste::ScintillaNotify(Scintilla::SCNotification * pScn)
+void CCmdPaste::ScintillaNotify(SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);

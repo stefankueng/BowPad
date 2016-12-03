@@ -86,7 +86,7 @@ public:
 
 public:
     std::deque<DocEvent> m_events;
-    Scintilla::Sci_TextToFind m_ttf;
+    Sci_TextToFind m_ttf;
     std::string m_docLang;
     std::string m_regex;
     std::vector<std::string> m_trimtokens;
@@ -108,7 +108,7 @@ private:
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
     void TabNotify(TBHDR* ptbhdr) override;
-    void ScintillaNotify(Scintilla::SCNotification* pScn) override;
+    void ScintillaNotify(SCNotification* pScn) override;
     void OnTimer(UINT id) override;
     void OnDocumentOpen(DocID id) override;
     void OnDocumentSave(DocID id, bool bSaveAs) override;

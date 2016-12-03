@@ -210,7 +210,7 @@ void CCmdWriteProtect::TabNotify(TBHDR * ptbhdr)
     }
 }
 
-void CCmdWriteProtect::ScintillaNotify(Scintilla::SCNotification * pScn)
+void CCmdWriteProtect::ScintillaNotify(SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_SAVEPOINTREACHED)
     {
