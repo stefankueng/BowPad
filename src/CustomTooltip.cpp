@@ -17,6 +17,7 @@
 #include "StdAfx.H"
 #include "CustomTooltip.h"
 #include "GDIHelpers.h"
+#include "Theme.h"
 
 constexpr int COLORBOX_SIZE = 20;
 constexpr int BORDER = 5;
@@ -84,19 +85,19 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
         rc.right = max(rc.right, COLORBOX_SIZE);
     }
     SetWindowPos(*this, nullptr,
-                 screenPt.x - rc.right/2, screenPt.y - rc.bottom - 20,
+                 screenPt.x - rc.right / 2, screenPt.y - rc.bottom - 20,
                  rc.right + BORDER + BORDER, rc.bottom + BORDER + BORDER,
                  SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW);
 }
 
 void CCustomToolTip::OnPaint(HDC hdc, RECT * pRc)
 {
-    GDIHelpers::FillSolidRect(hdc, pRc, GetSysColor(COLOR_INFOBK));
+    GDIHelpers::FillSolidRect(hdc, pRc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_INFOBK)));
     pRc->left += BORDER;
     pRc->top += BORDER;
     pRc->right -= BORDER;
     pRc->bottom -= BORDER;
-    ::SetTextColor(hdc, GetSysColor(COLOR_INFOTEXT));
+    ::SetTextColor(hdc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_INFOTEXT)));
     SetBkMode(hdc, TRANSPARENT);
     auto oldfont = SelectObject(hdc, m_hFont);
     auto textbuf = std::make_unique<wchar_t[]>(m_infoText.size() + 4);
