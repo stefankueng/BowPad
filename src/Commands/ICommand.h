@@ -81,10 +81,11 @@ protected:
 
     int                 GetDocumentCount() const;
     bool                HasActiveDocument() const;
-    CDocument           GetActiveDocument() const;
+    const CDocument&    GetActiveDocument() const;
+    CDocument&          GetModActiveDocument();
     bool                HasDocumentID(DocID id) const;
-    CDocument           GetDocumentFromID(DocID id);
-    void                SetDocument(DocID id, const CDocument& doc);
+    const CDocument&    GetDocumentFromID(DocID id) const;
+    CDocument&          GetModDocumentFromID(DocID id);
     void                RestoreCurrentPos(const CPosData& pos);
     void                SaveCurrentPos(CPosData& pos);
 

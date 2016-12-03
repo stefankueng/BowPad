@@ -77,11 +77,11 @@ public:
 
     void                        AddDocumentAtEnd(const CDocument& doc, DocID id);
     void                        RemoveDocument(DocID id);
-    void                        SetDocument(DocID id, const CDocument& doc);
     int                         GetCount() const { return (int)m_documents.size(); }
     DocID                       GetIdForPath(const std::wstring& path) const;
     bool                        HasDocumentID(DocID id) const;
-    CDocument                   GetDocumentFromID(DocID id) const;
+    const CDocument&            GetDocumentFromID(DocID id) const;
+    CDocument&                  GetModDocumentFromID(DocID id);
 
     CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
     bool                        SaveFile(HWND hWnd, const CDocument& doc, bool & bTabMoved);

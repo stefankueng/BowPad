@@ -31,7 +31,7 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     SearchRemoveAll(cmd, L"\n");
     SearchReplace(cmd, L"\r", L" ");
     // replace the macros in the command line
-    CDocument doc = GetActiveDocument();
+    const auto& doc = GetActiveDocument();
     std::wstring tabpath = doc.m_path;
     auto tabdirpath = CPathUtils::GetParentDirectory(tabpath);
     if (PathFileExists(tabpath.c_str()))

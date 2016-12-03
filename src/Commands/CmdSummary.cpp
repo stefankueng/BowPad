@@ -181,7 +181,7 @@ bool CCmdSummary::Execute()
     }
 
 
-    auto doc = GetActiveDocument();
+    const auto& doc = GetActiveDocument();
 
     ResString rSummary(hRes, IDS_SUMMARY);
     std::wstring sSummary = CStringUtils::Format(rSummary,

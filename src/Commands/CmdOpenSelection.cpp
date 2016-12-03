@@ -125,7 +125,7 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
     // Finally try look for it in the current directory.
     if (PathIsRelative(pathUnderCursor.c_str()))
     {
-        CDocument doc = GetActiveDocument();
+        const auto& doc = GetActiveDocument();
         if (!doc.m_path.empty())
         {
             std::wstring parent = CPathUtils::GetParentDirectory(doc.m_path);

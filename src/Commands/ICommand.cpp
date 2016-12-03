@@ -209,9 +209,14 @@ bool ICommand::HasActiveDocument() const
     return m_pMainWindow->m_DocManager.HasDocumentID(id);
 }
 
-CDocument ICommand::GetActiveDocument() const
+const CDocument& ICommand::GetActiveDocument() const
 {
     return m_pMainWindow->m_DocManager.GetDocumentFromID(m_pMainWindow->m_TabBar.GetCurrentTabId());
+}
+
+CDocument& ICommand::GetModActiveDocument()
+{
+    return m_pMainWindow->m_DocManager.GetModDocumentFromID(m_pMainWindow->m_TabBar.GetCurrentTabId());
 }
 
 bool ICommand::HasDocumentID(DocID id) const
@@ -219,14 +224,14 @@ bool ICommand::HasDocumentID(DocID id) const
     return m_pMainWindow->m_DocManager.HasDocumentID(id);
 }
 
-CDocument ICommand::GetDocumentFromID(DocID id )
+const CDocument& ICommand::GetDocumentFromID(DocID id) const
 {
     return m_pMainWindow->m_DocManager.GetDocumentFromID(id);
 }
 
-void ICommand::SetDocument(DocID id, const CDocument& doc )
+CDocument& ICommand::GetModDocumentFromID(DocID id)
 {
-    return m_pMainWindow->m_DocManager.SetDocument(id, doc);
+    return m_pMainWindow->m_DocManager.GetModDocumentFromID(id);
 }
 
 void ICommand::RestoreCurrentPos(const CPosData& pos)

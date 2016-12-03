@@ -204,7 +204,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         // only enabled if the current doc has a path!
         if (!HasActiveDocument())
             return E_FAIL;
-        CDocument doc = GetActiveDocument();
+        const auto& doc = GetActiveDocument();
         hr = UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
         return hr;
     }
@@ -213,7 +213,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         hr = S_FALSE;
         if (!HasActiveDocument())
             return S_FALSE;
-        CDocument doc = GetActiveDocument();
+        const auto& doc = GetActiveDocument();
         if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
             hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
             // Return value unused, just set for debugging.
@@ -325,7 +325,7 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key
         hr = S_FALSE;
         if (HasActiveDocument())
         {
-            CDocument doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
             {
                 hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
@@ -363,12 +363,11 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, co
             UINT codepage = codepages[selected].codepage;
             if (HasActiveDocument())
             {
-                CDocument doc = GetActiveDocument();
+                auto& doc = GetModActiveDocument();
                 doc.m_encoding = codepage;
                 doc.m_bHasBOM = codepages[selected].bom;
                 doc.m_bIsDirty = true;
                 doc.m_bNeedsSaving = true;
-                SetDocument(GetDocIdOfCurrentTab(), doc);
                 // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
                 ScintillaCall(SCI_ADDUNDOACTION, 0,0);
                 ScintillaCall(SCI_UNDO);

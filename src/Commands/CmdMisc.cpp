@@ -161,12 +161,11 @@ bool CCmdWriteProtect::Execute()
     if (!HasActiveDocument())
         return false;
 
-    auto doc = GetActiveDocument();
+    auto& doc = GetModActiveDocument();
     doc.m_bIsWriteProtected = !(doc.m_bIsWriteProtected || doc.m_bIsReadonly);
     if (!doc.m_bIsWriteProtected && doc.m_bIsReadonly)
         doc.m_bIsReadonly = false;
     ScintillaCall(SCI_SETREADONLY, doc.m_bIsWriteProtected);
-    SetDocument(GetDocIdOfCurrentTab(), doc);
     UpdateTab(GetActiveTabIndex());
 
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
@@ -180,7 +179,7 @@ HRESULT CCmdWriteProtect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
         bool bWriteProtected = false;
         if (HasActiveDocument())
         {
-            auto doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             bWriteProtected = doc.m_bIsReadonly || doc.m_bIsWriteProtected;
         }
         return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, bWriteProtected, ppropvarNewValue);
@@ -191,7 +190,7 @@ HRESULT CCmdWriteProtect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
         bool bHasPath = false;
         if (HasActiveDocument())
         {
-            auto doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             bHasPath = !doc.m_path.empty();
         }
 
