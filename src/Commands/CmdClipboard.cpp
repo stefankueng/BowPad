@@ -31,7 +31,7 @@ std::string ClipboardBase::GetHtmlSelection()
 {
     if (!HasActiveDocument())
         return "";
-    auto doc = GetActiveDocument();
+    const auto& doc = GetActiveDocument();
     const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(doc.m_language);
 
     std::string sHtmlFragment;
@@ -176,7 +176,7 @@ void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml)
 
 void ClipboardBase::AddLexerToClipboard()
 {
-    CDocument doc = GetActiveDocument();
+    const auto& doc = GetActiveDocument();
     std::string lang = doc.m_language;
     if (!lang.empty())
     {
@@ -205,7 +205,7 @@ void ClipboardBase::AddLexerToClipboard()
 
 void ClipboardBase::SetLexerFromClipboard()
 {
-    auto doc = GetActiveDocument();
+    auto& doc = GetModActiveDocument();
     if (doc.m_language.empty() || (doc.m_language.compare("Text") == 0))
     {
         CClipboardHelper clipboard;
@@ -224,7 +224,6 @@ void ClipboardBase::SetLexerFromClipboard()
                     );
                     auto lang = lptstr;
                     doc.m_language = lang;
-                    SetDocument(GetDocIdOfCurrentTab(), doc);
                     SetupLexerForLang(lang);
                     UpdateStatusBar(true);
                 }

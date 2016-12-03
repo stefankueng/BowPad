@@ -244,7 +244,7 @@ bool CCmdRandom::Execute()
     if (!HasActiveDocument())
         return false;
     int tabIndex = GetActiveTabIndex();
-    CDocument doc = GetActiveDocument();
+    const auto& doc = GetActiveDocument();
     if (doc.m_path.empty())
         return false;
     std::wstring dir = CPathUtils::GetParentDirectory(doc.m_path);

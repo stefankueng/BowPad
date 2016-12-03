@@ -280,7 +280,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 std::wstring activepath;
                 if (HasActiveDocument())
                 {
-                    auto doc = GetActiveDocument();
+                    const auto& doc = GetActiveDocument();
                     if (!doc.m_path.empty() && (m_path.size() < doc.m_path.size()))
                     {
                         if (CPathUtils::PathCompare(m_path, doc.m_path.substr(0, m_path.size())) == 0)
@@ -628,7 +628,7 @@ void CFileTree::TabNotify(TBHDR * ptbhdr)
         });
         if (HasActiveDocument())
         {
-            auto doc = GetActiveDocument();
+            const auto& doc = GetActiveDocument();
             if (!doc.m_path.empty())
             {
                 if (!CPathUtils::PathIsChild(m_path, doc.m_path))

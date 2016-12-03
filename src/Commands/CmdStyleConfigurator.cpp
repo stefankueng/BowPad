@@ -137,7 +137,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
             // Select the current language.
             if (HasActiveDocument())
             {
-                CDocument doc = GetActiveDocument();
+                const auto& doc = GetActiveDocument();
                 ComboBox_SelectString(hLangCombo, -1, doc.m_language.c_str());
             }
             DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
@@ -166,7 +166,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
                 auto currentLang = CUnicodeUtils::StdGetUTF8(languages[langSel]);
                 if (HasActiveDocument())
                 {
-                    CDocument doc = GetActiveDocument();
+                    const auto& doc = GetActiveDocument();
                     if (doc.m_language.compare(currentLang) == 0)
                     {
                         SelectStyle((int)wParam);
@@ -179,7 +179,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
         {
             if (HasActiveDocument())
             {
-                CDocument doc = GetActiveDocument();
+                const auto& doc = GetActiveDocument();
                 ComboBox_SelectString(GetDlgItem(*this, IDC_LANGCOMBO), -1, doc.m_language.c_str());
             }
             DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
@@ -204,7 +204,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
             CLexStyles::Instance().SaveUserData();
             if (HasActiveDocument())
             {
-                CDocument doc = GetActiveDocument();
+                const auto& doc = GetActiveDocument();
                 SetupLexerForLang(doc.m_language);
             }
             DestroyWindow(*this);
@@ -216,7 +216,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
             CLexStyles::Instance().ResetUserData();
             if (HasActiveDocument())
             {
-                CDocument doc = GetActiveDocument();
+                const auto& doc = GetActiveDocument();
                 SetupLexerForLang(doc.m_language);
             }
             DestroyWindow(*this);
@@ -295,7 +295,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         bool useDefault = true;
                         if (HasActiveDocument())
                         {
-                            CDocument doc = GetActiveDocument();
+                            const auto& doc = GetActiveDocument();
                             if (doc.m_language == currentLang)
                                 useDefault = false;
                         }
@@ -331,7 +331,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                 bool updateView = false;
                 if (HasActiveDocument())
                 {
-                    CDocument doc = GetActiveDocument();
+                    const auto& doc = GetActiveDocument();
                     if (doc.m_language.compare(currentLang) == 0)
                         updateView = true;
                 }

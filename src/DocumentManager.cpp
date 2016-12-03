@@ -34,6 +34,8 @@
 constexpr int ReadBlockSize = 128 * 1024;   //128 kB
 constexpr int WriteBlockSize = 128 * 1024;   //128 kB
 
+static CDocument g_EmptyDoc;
+
 static wchar_t inline WideCharSwap(wchar_t nValue)
 {
     return (((nValue>> 8)) | (nValue << 8));
@@ -381,30 +383,26 @@ bool CDocumentManager::HasDocumentID(DocID id) const
 }
 
 // Must exist or it's a bug.
-CDocument CDocumentManager::GetDocumentFromID(DocID id) const
+const CDocument& CDocumentManager::GetDocumentFromID(DocID id) const
 {
     auto pos = m_documents.find(id);
     if (pos == std::end(m_documents))
     {
         APPVERIFY(false);
-        return CDocument();
+        return g_EmptyDoc;
     }
     return pos->second;
 }
 
-void CDocumentManager::SetDocument(DocID id, const CDocument& doc)
+CDocument& CDocumentManager::GetModDocumentFromID(DocID id)
 {
-    auto where = m_documents.find(id);
-    if (where != std::end(m_documents))
+    auto pos = m_documents.find(id);
+    if (pos == std::end(m_documents))
     {
-        where->second = doc;
-        return;
+        APPVERIFY(false);
+        return g_EmptyDoc;
     }
-    // Should never happen but if it does, it's a serious bug
-    // because we are throwing data away.
-    // Ideally we want to notify the user about this but their
-    // is no consensus to do that.
-    APPVERIFY(false);
+    return pos->second;
 }
 
 void CDocumentManager::AddDocumentAtEnd( const CDocument& doc, DocID id )
@@ -887,7 +885,7 @@ bool CDocumentManager::UpdateFileTime(CDocument& doc, bool bIncludeReadonly)
 
 DocModifiedState CDocumentManager::HasFileChanged(DocID id ) const
 {
-    CDocument doc = GetDocumentFromID(id);
+    const auto& doc = GetDocumentFromID(id);
     if (doc.m_path.empty() || ((doc.m_lastWriteTime.dwLowDateTime == 0) && (doc.m_lastWriteTime.dwHighDateTime == 0)) || doc.m_bDoSaveAs)
         return DM_Unmodified;
 
@@ -921,7 +919,7 @@ DocID CDocumentManager::GetIdForPath( const std::wstring& path ) const
 
 void CDocumentManager::RemoveDocument(DocID id )
 {
-    CDocument doc = GetDocumentFromID(id);
+    const auto& doc = GetDocumentFromID(id);
     m_scratchScintilla.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
     m_documents.erase(id);
 }

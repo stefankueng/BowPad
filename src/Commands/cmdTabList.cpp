@@ -88,7 +88,7 @@ HRESULT CCmdTabList::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
             return E_FAIL;
         if (!HasActiveDocument())
             return E_FAIL;
-        CDocument doc = GetDocumentFromID(docId);
+        const auto& doc = GetDocumentFromID(docId);
 
         PopulateMenu(doc, collection);
 
