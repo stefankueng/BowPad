@@ -660,7 +660,7 @@ void CCmdHeaderSource::OnLexerChanged(int /*lexer*/)
 }
 
 
-void CCmdHeaderSource::ScintillaNotify(Scintilla::SCNotification * pScn)
+void CCmdHeaderSource::ScintillaNotify(SCNotification * pScn)
 {
     // TODO! Need to trap the language change too.
     // We get style needed events but that's not the same.
@@ -1004,7 +1004,7 @@ bool CCmdHeaderSource::ParseInclude(const std::wstring& raw, std::wstring& filen
     return false;
 }
 
-bool CCmdHeaderSource::FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf, int flags, std::string& found_text, size_t* line_no) const
+bool CCmdHeaderSource::FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf, int flags, std::string& found_text, size_t* line_no) const
 {
     found_text.clear();
     *line_no = 0;
@@ -1014,7 +1014,7 @@ bool CCmdHeaderSource::FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextTo
         return false;
     size_t len = ttf.chrgText.cpMax - ttf.chrgText.cpMin;
     found_text.resize(len + 1);
-    Scintilla::Sci_TextRange r{};
+    Sci_TextRange r{};
     r.chrg.cpMin = ttf.chrgText.cpMin;
     r.chrg.cpMax = ttf.chrgText.cpMax;
     r.lpstrText = &found_text[0];
@@ -1052,7 +1052,7 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
     // NOTE: If we want whole file scanned use:
     // long length = (long) edit.Call(SCI_GETLENGTH);
 
-    Scintilla::Sci_TextToFind ttf{}; // Zero initialize.
+    Sci_TextToFind ttf{}; // Zero initialize.
     ttf.chrg.cpMax = length;
     // NOTE: Intentionally hard coded for now. See overview for reasons.
     // Match an include statement: #include <x> or #include "x" at start of line.

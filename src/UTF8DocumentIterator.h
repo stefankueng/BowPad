@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ public:
     {
     }
 
-    UTF8DocumentIterator(Scintilla::Document* doc, int pos, int end)
+    UTF8DocumentIterator(Document* doc, int pos, int end)
         : m_doc(doc)
         , m_pos(pos)
         , m_end(end)
@@ -123,6 +123,6 @@ private:
 
     int m_pos;
     int m_end;
-    Scintilla::Document* m_doc;
+    Document* m_doc;
 };
 

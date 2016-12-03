@@ -38,7 +38,7 @@ bool CCmdConvertUppercase::Execute()
         }
 
         auto strbuf = std::make_unique<char[]>(abs(selEnd-selStart) + 5);
-        Scintilla::Sci_TextRange rangestart;
+        Sci_TextRange rangestart;
         rangestart.chrg.cpMin = Sci_PositionCR(selStart);
         rangestart.chrg.cpMax = Sci_PositionCR(selEnd);
         rangestart.lpstrText = strbuf.get();
@@ -75,7 +75,7 @@ bool CCmdConvertLowercase::Execute()
         }
 
         auto strbuf = std::make_unique<char[]>(abs(selEnd-selStart) + 5);
-        Scintilla::Sci_TextRange rangestart;
+        Sci_TextRange rangestart;
         rangestart.chrg.cpMin = Sci_PositionCR(selStart);
         rangestart.chrg.cpMax = Sci_PositionCR(selEnd);
         rangestart.lpstrText = strbuf.get();
@@ -112,7 +112,7 @@ bool CCmdConvertTitlecase::Execute()
         }
 
         auto strbuf = std::make_unique<char[]>(abs(selEnd - selStart) + 5);
-        Scintilla::Sci_TextRange rangestart;
+        Sci_TextRange rangestart;
         rangestart.chrg.cpMin = Sci_PositionCR(selStart);
         rangestart.chrg.cpMax = Sci_PositionCR(selEnd);
         rangestart.lpstrText = strbuf.get();

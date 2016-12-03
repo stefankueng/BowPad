@@ -1239,7 +1239,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
                 return DISP_E_TYPEMISMATCH;
             if (FAILED(VariantChangeType(&p4, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
                 return DISP_E_TYPEMISMATCH;
-            Scintilla::Sci_TextToFind ttf = { 0 };
+            Sci_TextToFind ttf = { 0 };
             ttf.chrg.cpMin = p2.intVal;
             ttf.chrg.cpMax = p3.intVal;
             std::string sText = CUnicodeUtils::StdGetUTF8(p4.bstrVal);

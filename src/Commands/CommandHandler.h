@@ -34,7 +34,7 @@ public:
 
     void                            Init(void* obj);
     ICommand *                      GetCommand(UINT cmdId);
-    void                            ScintillaNotify(Scintilla::SCNotification * pScn);
+    void                            ScintillaNotify(SCNotification * pScn);
     void                            TabNotify(TBHDR * ptbhdr);
     void                            OnClose();
     void                            OnDocumentClose(DocID id);

@@ -86,7 +86,7 @@ void SetCurrentLine(long line)
 
 }
 
-void CCmdPrevNext::ScintillaNotify( Scintilla::SCNotification* pScn )
+void CCmdPrevNext::ScintillaNotify( SCNotification* pScn )
 {
     switch (pScn->nmhdr.code)
     {

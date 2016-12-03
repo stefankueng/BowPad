@@ -47,7 +47,7 @@ public:
     virtual bool        Execute() = 0;
     virtual UINT        GetCmdId() = 0;
 
-    virtual void        ScintillaNotify(Scintilla::SCNotification * pScn);
+    virtual void        ScintillaNotify(SCNotification * pScn);
     // note: the 'tabOrigin' member of the TBHDR is only valid for TCN_GETCOLOR, TCN_TABDROPPED, TCN_TABDROPPEDOUTSIDE, TCN_ORDERCHANGED
     virtual void        TabNotify(TBHDR * ptbhdr);
     virtual void        OnClose();

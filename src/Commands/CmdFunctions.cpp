@@ -177,7 +177,7 @@ static inline bool ParseName(const std::string& sig, std::string& name)
     return false;
 }
 
-static bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf,
+static bool FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf,
                      std::string& foundText, int* lineNum)
 {
     if (ttf.chrg.cpMax - ttf.chrg.cpMin <= 0)
@@ -200,7 +200,7 @@ static bool FindNext(CScintillaWnd& edit, const Scintilla::Sci_TextToFind& ttf,
     if (len < 0)
         return false;
     foundText.resize(len + 1);
-    Scintilla::Sci_TextRange r{ cpmin, ttf.chrgText.cpMax, &foundText[0] };
+    Sci_TextRange r{ cpmin, ttf.chrgText.cpMax, &foundText[0] };
     edit.Call(SCI_GETTEXTRANGE, 0, (sptr_t)&r);
     foundText.resize(len);
 
@@ -476,7 +476,7 @@ void CCmdFunctions::TabNotify(TBHDR* ptbhdr)
         InvalidateFunctionsSource();
 }
 
-void CCmdFunctions::ScintillaNotify(Scintilla::SCNotification* pScn)
+void CCmdFunctions::ScintillaNotify(SCNotification* pScn)
 {
     switch (pScn->nmhdr.code)
     {
@@ -861,7 +861,7 @@ void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const
     int lineNum;
     std::string sig;
 
-    Scintilla::Sci_TextToFind ttf{};
+    Sci_TextToFind ttf{};
     Sci_PositionCR length = (Sci_PositionCR)edit.Call(SCI_GETLENGTH);
     ttf.chrg.cpMax = length;
     ttf.lpstrText = const_cast<char*>(langData->functionregex.c_str());

@@ -482,7 +482,7 @@ bool CCmdStyleConfigurator::Execute()
     return true;
 }
 
-void CCmdStyleConfigurator::ScintillaNotify( Scintilla::SCNotification* pScn )
+void CCmdStyleConfigurator::ScintillaNotify( SCNotification* pScn )
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
     {

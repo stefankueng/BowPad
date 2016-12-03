@@ -39,7 +39,7 @@ HRESULT ICommand::IUICommandHandlerExecute( UI_EXECUTIONVERB /*verb*/, const PRO
     return E_NOTIMPL;
 }
 
-void ICommand::ScintillaNotify( Scintilla::SCNotification * /*pScn*/ )
+void ICommand::ScintillaNotify( SCNotification * /*pScn*/ )
 {
 }
 

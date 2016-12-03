@@ -785,8 +785,8 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARA
     if (nmhdr.code == NM_COOLSB_CUSTOMDRAW)
         return m_editor.HandleScrollbarCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
 
-    Scintilla::SCNotification* pScn = reinterpret_cast<Scintilla::SCNotification *>(lParam);
-    const Scintilla::SCNotification& scn = *pScn;
+    SCNotification* pScn = reinterpret_cast<SCNotification *>(lParam);
+    const SCNotification& scn = *pScn;
 
     CCommandHandler::Instance().ScintillaNotify(pScn);
     switch (scn.nmhdr.code)
@@ -2163,7 +2163,7 @@ void CMainWindow::PasteHistory()
 // Show Tool Tips and colors for colors and numbers and their
 // conversions to hex octal etc.
 // e.g. 0xF0F hex == 3855 decimal == 07417 octal.
-void CMainWindow::HandleDwellStart(const Scintilla::SCNotification& scn)
+void CMainWindow::HandleDwellStart(const SCNotification& scn)
 {
     // Note style will be zero if no style or past end of the document.
     if ((scn.position >= 0) && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position))
@@ -2311,7 +2311,7 @@ void CMainWindow::HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi)
     }
 }
 
-bool CMainWindow::HandleDoubleClick(const Scintilla::SCNotification& scn)
+bool CMainWindow::HandleDoubleClick(const SCNotification& scn)
 {
     if (!(scn.modifiers & SCMOD_CTRL))
         return false;
@@ -2349,7 +2349,7 @@ bool CMainWindow::HandleDoubleClick(const Scintilla::SCNotification& scn)
     return true;
 }
 
-void CMainWindow::HandleSavePoint(const Scintilla::SCNotification& scn)
+void CMainWindow::HandleSavePoint(const SCNotification& scn)
 {
     auto docID = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(docID))
@@ -2441,7 +2441,7 @@ void CMainWindow::AddHotSpots()
     }
 }
 
-void CMainWindow::HandleUpdateUI(const Scintilla::SCNotification& scn)
+void CMainWindow::HandleUpdateUI(const SCNotification& scn)
 {
     const unsigned int uiflags = SC_UPDATE_SELECTION |
         SC_UPDATE_H_SCROLL | SC_UPDATE_V_SCROLL;
@@ -2454,7 +2454,7 @@ void CMainWindow::HandleUpdateUI(const Scintilla::SCNotification& scn)
     UpdateStatusBar(false);
 }
 
-void CMainWindow::HandleAutoIndent( const Scintilla::SCNotification& scn )
+void CMainWindow::HandleAutoIndent( const SCNotification& scn )
 {
     int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
     size_t curLine = m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS));
@@ -2472,7 +2472,7 @@ void CMainWindow::HandleAutoIndent( const Scintilla::SCNotification& scn )
 
         if (indentAmount > 0)
         {
-            Scintilla::CharacterRange crange;
+            Sci_CharacterRange crange;
             crange.cpMin = long(m_editor.Call(SCI_GETSELECTIONSTART));
             crange.cpMax = long(m_editor.Call(SCI_GETSELECTIONEND));
             int posBefore = (int)m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);

@@ -75,7 +75,7 @@ static EOLFormat SenseEOLFormat(const char *data, DWORD len)
     return UNKNOWN_FORMAT;
 }
 
-static void LoadSomeUtf8(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data, EOLFormat & eolformat)
+static void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data, EOLFormat & eolformat)
 {
     char* pData = data;
     // Nothing to convert, just pass it to Scintilla
@@ -91,7 +91,7 @@ static void LoadSomeUtf8(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWO
         lenFile += 3;
 }
 
-static void LoadSomeUtf16le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+static void LoadSomeUtf16le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
     char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat & eolformat)
 {
     char* pData = data;
@@ -109,7 +109,7 @@ static void LoadSomeUtf16le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, 
         lenFile += 2;
 }
 
-static void LoadSomeUtf16be(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+static void LoadSomeUtf16be(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
     char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat & eolformat)
 {
     char* pData = data;
@@ -151,7 +151,7 @@ static void LoadSomeUtf32be(DWORD lenFile, char* data)
         p32[nDword] = DwordSwapBytes(p32[nDword]);
 }
 
-static void LoadSomeUtf32le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+static void LoadSomeUtf32le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
     char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat & eolformat)
 {
     char* pData = data;
@@ -193,7 +193,7 @@ static void LoadSomeUtf32le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, 
         lenFile += 4;
 }
 
-static void LoadSomeOther(Scintilla::ILoader& edit, int encoding, DWORD lenFile,
+static void LoadSomeOther(ILoader& edit, int encoding, DWORD lenFile,
     int& incompleteMultibyteChar, char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat & eolformat)
 {
     // For other encodings, ask system if there are any invalid characters; note that it will
@@ -486,7 +486,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     m_scratchScintilla.Call(SCI_CLEARALL);
     m_scratchScintilla.Call(SCI_SETCODEPAGE, CP_UTF8);
 
-    Scintilla::ILoader* pdocLoad = reinterpret_cast<Scintilla::ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, (int)bufferSizeRequested));
+    ILoader* pdocLoad = reinterpret_cast<ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, (int)bufferSizeRequested));
     if (pdocLoad == nullptr)
     {
         ShowFileLoadError(hWnd, path,

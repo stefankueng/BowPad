@@ -153,14 +153,14 @@ private:
     void                        HandleClipboardUpdate();
     void                        HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi);
     // Scintilla events.
-    void                        HandleDwellStart(const Scintilla::SCNotification& scn);
-    bool                        HandleDoubleClick(const Scintilla::SCNotification& scn);
+    void                        HandleDwellStart(const SCNotification& scn);
+    bool                        HandleDoubleClick(const SCNotification& scn);
     void                        HandleCopyDataCommandLine(const COPYDATASTRUCT& cds);
     bool                        HandleCopyDataMoveTab(const COPYDATASTRUCT& cds);
     void                        HandleWriteProtectedEdit();
-    void                        HandleSavePoint(const Scintilla::SCNotification& scn);
-    void                        HandleUpdateUI(const Scintilla::SCNotification& scn);
-    void                        HandleAutoIndent(const Scintilla::SCNotification &scn);
+    void                        HandleSavePoint(const SCNotification& scn);
+    void                        HandleUpdateUI(const SCNotification& scn);
+    void                        HandleAutoIndent(const SCNotification &scn);
     HRESULT                     LoadRibbonSettings(IUnknown* pView);
     HRESULT                     SaveRibbonSettings();
     HRESULT                     ResizeToRibbon();
