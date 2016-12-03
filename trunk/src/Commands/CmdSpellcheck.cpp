@@ -164,7 +164,7 @@ void CCmdSpellcheck::Check()
         OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get()));
 
         ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)g_wordchars.c_str());
-        TEXTRANGEA textrange;
+        Sci_TextRange textrange;
         LRESULT firstline = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
         LRESULT lastline = firstline + ScintillaCall(SCI_LINESONSCREEN);
         textrange.chrg.cpMin = (LONG)ScintillaCall(SCI_POSITIONFROMLINE, firstline);
