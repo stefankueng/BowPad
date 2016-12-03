@@ -71,6 +71,7 @@ protected:
     HTREEITEM RecurseTree(HTREEITEM hItem, ItemHandler handler);
     HTREEITEM GetItemForPath(const std::wstring& expandpath);
     void RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath);
+    void MarkActiveDocument();
 
     void TabNotify(TBHDR * ptbhdr) override;
 
