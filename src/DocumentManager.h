@@ -82,7 +82,6 @@ public:
     DocID                       GetIdForPath(const std::wstring& path) const;
     bool                        HasDocumentID(DocID id) const;
     CDocument                   GetDocumentFromID(DocID id) const;
-    Document                    GetScintillaDocument(DocID id) const { return GetDocumentFromID(id).m_document; }
 
     CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
     bool                        SaveFile(HWND hWnd, const CDocument& doc, bool & bTabMoved);
