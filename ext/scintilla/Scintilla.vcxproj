@@ -166,6 +166,7 @@
     <ClCompile Include="lexers\LexDMAP.cxx" />
     <ClCompile Include="lexers\LexDMIS.cxx" />
     <ClCompile Include="lexers\LexECL.cxx" />
+    <ClCompile Include="lexers\LexEDIFACT.cxx" />
     <ClCompile Include="lexers\LexEiffel.cxx" />
     <ClCompile Include="lexers\LexErlang.cxx" />
     <ClCompile Include="lexers\LexErrorList.cxx" />
@@ -328,6 +329,7 @@
     <ClInclude Include="src\RunStyles.h" />
     <ClInclude Include="src\ScintillaBase.h" />
     <ClInclude Include="src\Selection.h" />
+    <ClInclude Include="src\SparseVector.h" />
     <ClInclude Include="src\SplitVector.h" />
     <ClInclude Include="src\Style.h" />
     <ClInclude Include="src\UnicodeFromUTF8.h" />
