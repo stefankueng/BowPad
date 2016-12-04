@@ -183,6 +183,9 @@
     <ClInclude Include="src\Position.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\SparseVector.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lexers\LexA68k.cxx">
@@ -615,6 +618,9 @@
       <Filter>lexers</Filter>
     </ClCompile>
     <ClCompile Include="lexers\LexJSON.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="lexers\LexEDIFACT.cxx">
       <Filter>lexers</Filter>
     </ClCompile>
   </ItemGroup>
