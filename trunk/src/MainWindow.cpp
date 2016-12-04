@@ -3543,7 +3543,6 @@ int  CMainWindow::UnblockUI()
     auto blockCount = m_blockCount;
     m_blockCount = 0;
     SendMessage(*this, WM_SETREDRAW, TRUE, 0);
-    FileTreeBlockRefresh(false);
     RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
     return blockCount;
 }
@@ -3553,7 +3552,6 @@ void CMainWindow::ReBlockUI(int blockCount)
     {
         m_blockCount = blockCount;
         SendMessage(*this, WM_SETREDRAW, FALSE, 0);
-        FileTreeBlockRefresh(true);
     }
 }
 
