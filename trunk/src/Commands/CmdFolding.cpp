@@ -75,7 +75,7 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
 
                     if (ScintillaCall(SCI_GETFOLDEXPANDED, headerLine, 0) != mode)
                     {
-                        ScintillaCall(SCI_TOGGLEFOLD, headerLine, 0);
+                        ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, (sptr_t)"...");
                     }
                 }
             }
