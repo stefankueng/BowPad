@@ -280,6 +280,8 @@ inline bool DocEvent::Empty() const
 }
 
 DocWork::DocWork()
+    : m_langData(nullptr)
+    , m_ttf({ 0 })
 {
     m_inProgress = false;
 }
