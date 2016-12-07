@@ -216,13 +216,13 @@ void CRandomFileList::SetNotShown(std::wstring file)
     m_arShownRepeatFileList.insert(file);
 }
 
-void CRandomFileList::RemoveFromShown(std::wstring file)
+void CRandomFileList::RemoveFromShown(const std::wstring& file)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
     m_arShownFileList.erase(file);
 }
 
-void CRandomFileList::RemoveFromNotShown(std::wstring file)
+void CRandomFileList::RemoveFromNotShown(const std::wstring& file)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
     m_arUnShownFileList.erase(file);
