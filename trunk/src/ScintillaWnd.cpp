@@ -617,11 +617,6 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
 {
     const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(lang);
     const auto& langdata = CLexStyles::Instance().GetKeywordsForLang(lang);
-    SetupLexer(lexerdata, langdata);
-}
-
-void CScintillaWnd::SetupLexer( const LexerData& lexerdata, const std::unordered_map<int, std::string>& langdata )
-{
     const auto& theme = CTheme::Instance();
     Call(SCI_STYLECLEARALL);
 
