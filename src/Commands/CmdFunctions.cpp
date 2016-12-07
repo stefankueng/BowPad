@@ -211,7 +211,7 @@ static bool FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf,
 
 // Turn a duration into something like 1h, 1m, 1s, 1ms.
 // Zero value elements are ommitted, e.g. 1h, 1ms.
-static std::string DurationToString(std::chrono::duration<double> d)
+static std::string DurationToString(const std::chrono::duration<double>& d)
 {
     using days = std::chrono::duration
         <int, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>>;
