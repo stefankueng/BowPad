@@ -386,24 +386,21 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             HDC hDC = (HDC)wParam;
             RECT rClient, rTab, rTotalTab, rBkgnd, rEdge;
             COLORREF crBack;
-            int nTab, nTabHeight = 0;
 
             ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
 
             // calc total tab width
             GetClientRect(*this, &rClient);
-            nTab = GetItemCount();
             SetRectEmpty(&rTotalTab);
 
-            while (nTab > 0)
+            for (int nTab = GetItemCount() - 1; nTab >= 0; --nTab)
             {
-                --nTab;
                 bool ok = TabCtrl_GetItemRect(*this, nTab, &rTab) != FALSE;
                 APPVERIFY(ok);
                 UnionRect(&rTotalTab, &rTab, &rTotalTab);
             }
 
-            nTabHeight = rTotalTab.bottom - rTotalTab.top;
+            int nTabHeight = rTotalTab.bottom - rTotalTab.top;
 
             // add a bit
             InflateRect(&rTotalTab, 2, 3);
@@ -464,28 +461,22 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             DrawMainBorder(&dis);
 
             // paint the tabs first and then the borders
-            int count = GetItemCount();
-            APPVERIFY(count>=0);
-            int nTab = count;
-
-            if (!nTab) // no pages added
+            auto count = GetItemCount();
+            if (!count) // no pages added
             {
                 SelectObject(hDC, hOldFont);
                 EndPaint(*this, &ps);
                 return 0;
             }
 
-            int nSel = TabCtrl_GetCurSel(*this);
+            auto nSel = TabCtrl_GetCurSel(*this);
 
-            do
+            for (int nTab = count-1; nTab >= 0; --nTab)
             {
-                --nTab;
                 if (nTab != nSel)
                 {
-                    APPVERIFY(nTab>=0 && nTab<count);
                     dis.itemID = nTab;
                     dis.itemState = 0;
-
                     bool got = TabCtrl_GetItemRect(*this, nTab, &dis.rcItem) != FALSE;
                     APPVERIFY(got);
                     if (got)
@@ -495,7 +486,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                         DrawItemBorder(&dis);
                     }
                 }
-            } while (nTab > 0);
+            }
 
             if (nSel != -1)
             {
@@ -735,7 +726,6 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
         {
             int xPos = GET_X_LPARAM(lParam);
             int yPos = GET_Y_LPARAM(lParam);
-            int currentTabOn = GetTabIndexAt(xPos, yPos);
             if (m_bIsDragging)
             {
                 if (::GetCapture() == *this)
@@ -754,7 +744,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
                 return TRUE;
             }
-
+            int currentTabOn = GetTabIndexAt(xPos, yPos);
             if ((m_whichCloseClickDown == currentTabOn) && m_closeButtonZone.IsHit(xPos, yPos, m_currentHoverTabRect))
             {
                 NotifyTabDelete(currentTabOn);
@@ -902,13 +892,11 @@ void CTabBar::DrawItemBorder(const LPDRAWITEMSTRUCT lpdis) const
 
 void CTabBar::DrawMainBorder(const LPDRAWITEMSTRUCT lpdis) const
 {
-    RECT rBorder(lpdis->rcItem);
-    GDIHelpers::FillSolidRect(lpdis->hDC, &rBorder, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
+    GDIHelpers::FillSolidRect(lpdis->hDC, &lpdis->rcItem, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
 }
 
 void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct) const
 {
-    TC_ITEM tci;
     HIMAGELIST hilTabs = (HIMAGELIST)TabCtrl_GetImageList(*this);
 
     int curSel = TabCtrl_GetCurSel(*this);
@@ -950,6 +938,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct) const
         GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top + nLine, rItem.right, rItem.top + nLine + 2, RGB(nRed, nGreen, nBlue));
     }
     wchar_t buf[100] = { 0 };
+    TC_ITEM tci;
     tci.mask = TCIF_TEXT | TCIF_IMAGE;
     tci.pszText = buf;
     tci.cchTextMax = _countof(buf) - 1;
