@@ -3545,14 +3545,19 @@ void CMainWindow::BlockAllUIUpdates(bool block)
     }
 }
 
-int  CMainWindow::UnblockUI()
+int CMainWindow::UnblockUI()
 {
     auto blockCount = m_blockCount;
-    m_blockCount = 0;
-    SendMessage(*this, WM_SETREDRAW, TRUE, 0);
-    RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
+    // Only unblock if it was blocked.
+    if (m_blockCount > 0)
+    {
+        m_blockCount = 0;
+        SendMessage(*this, WM_SETREDRAW, TRUE, 0);
+        RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
+    }
     return blockCount;
 }
+
 void CMainWindow::ReBlockUI(int blockCount)
 {
     if (blockCount)
