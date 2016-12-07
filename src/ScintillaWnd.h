@@ -117,7 +117,6 @@ public :
 protected:
     virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-    void SetupLexer(const LexerData& lexerdata, const std::unordered_map<int, std::string>& langdata);
     void SetupDefaultStyles();
 
     bool GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags );
