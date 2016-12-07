@@ -138,7 +138,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
             if (HasActiveDocument())
             {
                 const auto& doc = GetActiveDocument();
-                ComboBox_SelectString(hLangCombo, -1, doc.m_language.c_str());
+                ComboBox_SelectString(hLangCombo, -1, CUnicodeUtils::StdGetUnicode(doc.m_language).c_str());
             }
             DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
 
@@ -180,7 +180,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
             if (HasActiveDocument())
             {
                 const auto& doc = GetActiveDocument();
-                ComboBox_SelectString(GetDlgItem(*this, IDC_LANGCOMBO), -1, doc.m_language.c_str());
+                ComboBox_SelectString(GetDlgItem(*this, IDC_LANGCOMBO), -1, CUnicodeUtils::StdGetUnicode(doc.m_language).c_str());
             }
             DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
 
