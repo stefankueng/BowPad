@@ -62,69 +62,57 @@ static void DrawSizeGrip(HDC hdc, LPCRECT lpRect)
     DeleteObject( hPenHighlight );
 }
 
-static void DrawPart(HWND hWnd, HDC hdc, int itemID)
-{
-    RECT rcPart;
-    SendMessage(hWnd, SB_GETRECT, itemID, (LPARAM)&rcPart);
-
-    UINT border = BDR_SUNKENOUTER;
-    int x = 0;
-
-    DrawEdge(hdc, &rcPart, border, BF_RECT|BF_ADJUST);
-
-    HICON hIcon = (HICON)SendMessage(hWnd, SB_GETICON, itemID, 0);
-    if (hIcon)
-    {
-        INT cy = rcPart.bottom - rcPart.top;
-        DrawIconEx (hdc, rcPart.left + 2, rcPart.top, hIcon, 0, 0, 0, 0, DI_NORMAL);
-        x = 2 + cy;
-    }
-
-    rcPart.left += x;
-    int textlen = (int)SendMessage(hWnd, SB_GETTEXTLENGTH, itemID, 0);
-    auto textbuf = std::make_unique<wchar_t[]>(textlen + 1);
-    SendMessage(hWnd, SB_GETTEXT, itemID, (LPARAM)textbuf.get());
-    SetTextColor(hdc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)));
-    SetBkColor(hdc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
-    InflateRect(&rcPart, -2, 0);
-    DrawText(hdc, textbuf.get(), -1, &rcPart, DT_LEFT|DT_SINGLELINE|DT_VCENTER);
-}
-
-static void RefreshPart(HWND hWnd, HDC hdc, HBRUSH hbrBk, int itemID)
-{
-    RECT rcPart;
-    SendMessage(hWnd, SB_GETRECT, itemID, (LPARAM)&rcPart);
-    if (rcPart.right < rcPart.left)
-        return;
-
-    if (!RectVisible(hdc, &rcPart))
-        return;
-
-    FillRect(hdc, &rcPart, hbrBk);
-    DrawPart (hWnd, hdc, itemID);
-}
-
 static LRESULT Refresh(HWND hWnd, HDC hdc)
 {
-    RECT   rect;
-    HBRUSH hbrBk;
-    HFONT  hOldFont;
-
     if (!IsWindowVisible(hWnd))
         return 0;
 
+    RECT rect;
     GetClientRect(hWnd, &rect);
 
-    hbrBk = CreateSolidBrush(CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE)));
+    const auto faceClr = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
+    HBRUSH hbrBk = CreateSolidBrush(faceClr);
     FillRect(hdc, &rect, hbrBk);
 
+    auto textFgc = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT));
+    auto textBgc = faceClr;
+
     HFONT hFont = (HFONT)SendMessage(hWnd, WM_GETFONT, 0, 0);
+    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
 
-    hOldFont = (HFONT)SelectObject(hdc, hFont);
-    int numparts = (int)SendMessage(hWnd, SB_GETPARTS, 0, 0);
-    for (int i = 0; i < numparts; i++)
-        RefreshPart(hWnd, hdc, hbrBk, i);
+    const int numparts = (int)SendMessage(hWnd, SB_GETPARTS, 0, 0);
+    std::wstring textbuf;
+    for (int itemID = 0; itemID < numparts; itemID++)
+    {
+        RECT rcPart;
+        SendMessage(hWnd, SB_GETRECT, itemID, (LPARAM)&rcPart);
+        if (rcPart.right < rcPart.left)
+            continue;
 
+        if (!RectVisible(hdc, &rcPart))
+            continue;
+
+        DrawEdge(hdc, &rcPart, BDR_SUNKENOUTER, BF_RECT | BF_ADJUST);
+
+        int x = 0;
+        HICON hIcon = (HICON)SendMessage(hWnd, SB_GETICON, itemID, 0);
+        if (hIcon)
+        {
+            INT cy = rcPart.bottom - rcPart.top;
+            DrawIconEx(hdc, rcPart.left + 2, rcPart.top, hIcon, 0, 0, 0, 0, DI_NORMAL);
+            x = 2 + cy;
+        }
+
+        rcPart.left += x;
+        const int textlen = (int)SendMessage(hWnd, SB_GETTEXTLENGTH, itemID, 0);
+        textbuf.resize(textlen + 1);
+        SendMessage(hWnd, SB_GETTEXT, itemID, (LPARAM)&textbuf[0]);
+        textbuf.resize(textlen);
+        SetTextColor(hdc, textFgc);
+        SetBkColor(hdc, textBgc);
+        InflateRect(&rcPart, -2, 0);
+        DrawText(hdc, textbuf.c_str(), -1, &rcPart, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+    }
     SelectObject(hdc, hOldFont);
     DeleteObject(hbrBk);
 
