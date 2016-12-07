@@ -2083,12 +2083,11 @@ void CFindReplaceDlg::SearchDocument(
             if (searchForFunctions)
             {
                 result.lineText = CUnicodeUtils::StdGetUnicode(searchWnd.GetTextRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax));
-                result.posInLineStart = 0;
                 size_t linesize = result.lineText.length();
                 while (linesize > 0 && (result.lineText[linesize - 1] == L'\n' || result.lineText[linesize - 1] == L'\r'))
                     --linesize;
                 result.lineText.resize(linesize);
-                result.posInLineEnd = 0;
+                result.posInLineStart = 0;
                 result.posInLineEnd = 0;
             }
             else
