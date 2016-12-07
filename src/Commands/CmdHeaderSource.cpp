@@ -539,9 +539,6 @@ bool CCmdHeaderSource::OpenFileAsLanguage(const std::wstring& filename)
 
 void CCmdHeaderSource::HandleIncludeFileMenuItem(const RelatedFileItem& item)
 {
-    std::wstring defaultFolder;
-    std::wstring fileToOpen;
-
     // If the system has found a file, the filename will be non blank.
     // In that case, proceed to try and open the file but
     // let the user override that file choice first which they do by
@@ -559,10 +556,13 @@ void CCmdHeaderSource::HandleIncludeFileMenuItem(const RelatedFileItem& item)
             return;
         }
     }
+    //std::wstring defaultFolder;
+    //std::wstring fileToOpen;
+
     //if (!UserFindFile(GetHwnd(), CPathUtils::GetFileName(item.Path), defaultFolder, fileToOpen))
-        //return;
+    //    return;
     //if (!OpenFileAsLanguage(fileToOpen))
-        //return;
+    //    return;
 
     auto filename = CPathUtils::GetFileName(item.Path);
     FindReplace_FindFile(m_pMainWindow, filename.c_str());
