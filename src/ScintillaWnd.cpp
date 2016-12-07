@@ -74,6 +74,7 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_selTextMarkerCount(0)
     , m_bCursorShown(true)
     , m_bScratch(false)
+    , m_cursorTimeout(-1)
 {
 }
 
@@ -357,7 +358,9 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
     {
         // mouse cursor moved, ensure it's visible
         // but set a timer to hide it after a while
-        UINT elapse = (UINT)CIniSettings::Instance().GetInt64(L"View", L"hidecursortimeout", 3000);
+        if (m_cursorTimeout == -1)
+            m_cursorTimeout = (int) CIniSettings::Instance().GetInt64(L"View", L"hidecursortimeout", 3000);
+        UINT elapse = (UINT)m_cursorTimeout;
         if (elapse != 0)
             SetTimer(*this, TIM_HIDECURSOR, elapse, nullptr);
         if (!m_bCursorShown)
