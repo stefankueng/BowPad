@@ -880,7 +880,7 @@ COLORREF CTabBar::GetTabColor(bool bSelected, UINT item) const
     return GDIHelpers::Darker(clr, 0.9f);
 }
 
-void CTabBar::DrawItemBorder(LPDRAWITEMSTRUCT lpdis) const
+void CTabBar::DrawItemBorder(const LPDRAWITEMSTRUCT lpdis) const
 {
     int curSel = TabCtrl_GetCurSel(*this);
     bool bSelected = (lpdis->itemID == (UINT)curSel);
@@ -900,13 +900,13 @@ void CTabBar::DrawItemBorder(LPDRAWITEMSTRUCT lpdis) const
     GDIHelpers::FillSolidRect(lpdis->hDC, rItem.right - 1, rItem.top, rItem.right, rItem.bottom, crShadow);
 }
 
-void CTabBar::DrawMainBorder(LPDRAWITEMSTRUCT lpdis) const
+void CTabBar::DrawMainBorder(const LPDRAWITEMSTRUCT lpdis) const
 {
     RECT rBorder(lpdis->rcItem);
     GDIHelpers::FillSolidRect(lpdis->hDC, &rBorder, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
 }
 
-void CTabBar::DrawItem(LPDRAWITEMSTRUCT pDrawItemStruct) const
+void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct) const
 {
     TC_ITEM tci;
     HIMAGELIST hilTabs = (HIMAGELIST)TabCtrl_GetImageList(*this);
