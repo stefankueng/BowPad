@@ -71,7 +71,7 @@ void CKeyboardShortcutHandler::Load()
         HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
         if (hResourceLoaded)
         {
-            char * lpResLock = (char *) LockResource(hResourceLoaded);
+            const char* lpResLock = (const char *) LockResource(hResourceLoaded);
             DWORD dwSizeRes = SizeofResource(NULL, hResource);
             if (lpResLock)
             {
@@ -263,7 +263,7 @@ void CKeyboardShortcutHandler::LoadUIHeader()
         HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
         if (hResourceLoaded)
         {
-            char * lpResLock = (char *) LockResource(hResourceLoaded);
+            const char* lpResLock = (const char *) LockResource(hResourceLoaded);
             DWORD dwSizeRes = SizeofResource(NULL, hResource);
             if (lpResLock)
             {
