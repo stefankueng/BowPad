@@ -610,7 +610,6 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
                 initialFolder = CPathUtils::GetParentDirectory(doc.m_path);
             }
             pCorrespondingFileDlg->Show(GetHwnd(), initialFolder);
-            pCorrespondingFileDlg.release();
             break;
     }
 
