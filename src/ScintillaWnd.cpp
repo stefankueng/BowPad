@@ -616,7 +616,7 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
 void CScintillaWnd::SetupLexerForLang( const std::string& lang )
 {
     const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(lang);
-    const auto& langdata = CLexStyles::Instance().GetKeywordsForLang(lang);
+    const auto& keywords = CLexStyles::Instance().GetKeywordsForLang(lang);
     const auto& theme = CTheme::Instance();
     Call(SCI_STYLECLEARALL);
 
@@ -648,7 +648,7 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
         if (it.second.eolfilled)
             Call(SCI_STYLESETEOLFILLED, styleId, 1);
     }
-    for (const auto& it: langdata)
+    for (const auto& it: keywords)
     {
         Call(SCI_SETKEYWORDS, it.first-1, (LPARAM)it.second.c_str());
     }
