@@ -31,18 +31,14 @@
 
 extern IUIFramework *g_pFramework;
 
-namespace
+static BYTE GetCtrlKeys()
 {
-    inline BYTE GetCtrlKeys()
-    {
-        BYTE ctrlkeys = (GetKeyState(VK_CONTROL) & 0x8000) ? 0x08 : 0;
-        if (GetKeyState(VK_SHIFT) & 0x8000)
-            ctrlkeys |= 0x04;
-        if (GetKeyState(VK_MENU) & 0x8000)
-            ctrlkeys |= 0x10;
-        return ctrlkeys;
-    }
-
+    BYTE ctrlkeys = (GetKeyState(VK_CONTROL) & 0x8000) ? 0x08 : 0;
+    if (GetKeyState(VK_SHIFT) & 0x8000)
+        ctrlkeys |= 0x04;
+    if (GetKeyState(VK_MENU) & 0x8000)
+        ctrlkeys |= 0x10;
+    return ctrlkeys;
 }
 
 CKeyboardShortcutHandler::CKeyboardShortcutHandler()
