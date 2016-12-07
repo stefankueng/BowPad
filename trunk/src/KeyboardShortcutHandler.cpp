@@ -271,7 +271,7 @@ void CKeyboardShortcutHandler::LoadUIHeader()
                 DWORD lastLineStart = 0;
                 for (DWORD ind = 0; ind < dwSizeRes; ++ind)
                 {
-                    if (*((char*)(lpResLock + ind)) == '\n')
+                    if (lpResLock[ind] == '\n')
                     {
                         std::string sLine(lpResLock + lastLineStart, ind-lastLineStart);
                         lastLineStart = ind + 1;
