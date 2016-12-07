@@ -140,4 +140,5 @@ private:
     long                        m_selTextMarkerCount;
     bool                        m_bCursorShown;
     bool                        m_bScratch;
+    int                         m_cursorTimeout;
 };
