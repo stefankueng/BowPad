@@ -37,7 +37,7 @@ std::string ClipboardBase::GetHtmlSelection()
     std::string sHtmlFragment;
     int style = 0;
 
-    char fontbuf[40] = {0};
+    char fontbuf[40] = { 0 };
     ScintillaCall(SCI_STYLEGETFONT, 0, (sptr_t)fontbuf);
     int fontSize = (int)ScintillaCall(SCI_STYLEGETSIZE, 0);
     bool bold = !!ScintillaCall(SCI_STYLEGETBOLD, 0);
@@ -53,9 +53,9 @@ std::string ClipboardBase::GetHtmlSelection()
         catch (const std::out_of_range&) {}
     }
     std::string stylehtml = CStringUtils::Format("<pre style=\"font-family:%s;font-size:%dpt;font-weight:%s;font-style:%s;text-decoration:%s;color:#%06x;background:#%06x;\">",
-        fontbuf, fontSize, bold ? "bold" : "normal", italic ? "italic" : "normal", underlined ? "underline" : "none",
-        GetRValue(fore)<<16 | GetGValue(fore)<<8 | GetBValue(fore),
-        GetRValue(back)<<16 | GetGValue(back)<<8 | GetBValue(back));
+                                                 fontbuf, fontSize, bold ? "bold" : "normal", italic ? "italic" : "normal", underlined ? "underline" : "none",
+                                                 GetRValue(fore) << 16 | GetGValue(fore) << 8 | GetBValue(fore),
+                                                 GetRValue(back) << 16 | GetGValue(back) << 8 | GetBValue(back));
     sHtmlFragment += stylehtml;
 
 
@@ -64,7 +64,7 @@ std::string ClipboardBase::GetHtmlSelection()
     for (int i = 0; i < numSelections; ++i)
     {
         int selStart = (int)ScintillaCall(SCI_GETSELECTIONNSTART, i);
-        int selEnd   = (int)ScintillaCall(SCI_GETSELECTIONNEND, i);
+        int selEnd = (int)ScintillaCall(SCI_GETSELECTIONNEND, i);
 
         if ((selStart == selEnd) && (numSelections == 1))
         {
@@ -96,9 +96,9 @@ std::string ClipboardBase::GetHtmlSelection()
                     catch (const std::out_of_range&) {}
                 }
                 stylehtml = CStringUtils::Format("<span style=\"font-family:%s;font-size:%dpt;font-weight:%s;font-style:%s;text-decoration:%s;color:#%06x;background:#%06x;\">",
-                    fontbuf, fontSize, bold ? "bold" : "normal", italic ? "italic" : "normal", underlined ? "underline" : "none",
-                    GetRValue(fore)<<16 | GetGValue(fore)<<8 | GetBValue(fore),
-                    GetRValue(back)<<16 | GetGValue(back)<<8 | GetBValue(back));
+                                                 fontbuf, fontSize, bold ? "bold" : "normal", italic ? "italic" : "normal", underlined ? "underline" : "none",
+                                                 GetRValue(fore) << 16 | GetGValue(fore) << 8 | GetBValue(fore),
+                                                 GetRValue(back) << 16 | GetGValue(back) << 8 | GetBValue(back));
                 sHtmlFragment += stylehtml;
                 style = s;
                 spanset = true;
@@ -108,16 +108,16 @@ std::string ClipboardBase::GetHtmlSelection()
             cs += c;
             switch (c)
             {
-            case ' ':
+                case ' ':
                 cs = "&nbsp;";
                 break;
-            case '"':
+                case '"':
                 cs = "&quot;";
                 break;
-            case '<':
+                case '<':
                 cs = "&lt;";
                 break;
-            case '>':
+                case '>':
                 cs = "&gt;";
                 break;
             }
@@ -156,13 +156,13 @@ void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml)
     {
         HGLOBAL hClipboardData;
         size_t sLen = sHtml.length();
-        hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen+1)*sizeof(char));
+        hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
         if (hClipboardData)
         {
             char * pchData = (char*)GlobalLock(hClipboardData);
             if (pchData)
             {
-                strcpy_s(pchData, sLen+1, sHtml.c_str());
+                strcpy_s(pchData, sLen + 1, sHtml.c_str());
                 if (GlobalUnlock(hClipboardData))
                 {
                     auto CF_HTML = RegisterClipboardFormat(L"HTML Format");
@@ -184,7 +184,7 @@ void ClipboardBase::AddLexerToClipboard()
         {
             HGLOBAL hClipboardData;
             auto sLen = lang.length();
-            hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1)*sizeof(char));
+            hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
             if (hClipboardData)
             {
                 char * pchData = (char*)GlobalLock(hClipboardData);
@@ -312,10 +312,7 @@ bool CCmdPaste::Execute()
             if (hData)
             {
                 HDROP hDrop = reinterpret_cast<HDROP>(hData);
-                if (hDrop)
-                {
-                    OpenHDROP(hDrop);
-                }
+                OpenHDROP(hDrop);
             }
         }
     }
