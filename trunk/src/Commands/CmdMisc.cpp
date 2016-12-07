@@ -113,7 +113,7 @@ HRESULT CCmdAutoBraces::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, cons
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, (BOOL)CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1), ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1) != 0, ppropvarNewValue);
     }
     return E_NOTIMPL;
 }
