@@ -264,7 +264,7 @@ void CCmdScript::OnDocumentSave(DocID id, bool bSaveAs)
     VARIANT v[2];
     v[0].intVal = id.GetValue();
     v[0].vt = VT_INT;
-    v[1].boolVal = bSaveAs;
+    v[1].boolVal = bSaveAs ? VARIANT_TRUE : VARIANT_FALSE;
     v[1].vt = VT_BOOL;
     dispparams.rgvarg = v;
     try { m_host->CallFunction(L"OnDocumentSave", dispparams); }
@@ -318,7 +318,7 @@ void CCmdScript::OnThemeChanged(bool bDark)
     DISPPARAMS dispparams = { 0 };
     dispparams.cArgs = 1;
     VARIANT vI;
-    vI.boolVal = bDark;
+    vI.boolVal = bDark ? VARIANT_TRUE : VARIANT_FALSE;
     vI.vt = VT_BOOL;
     dispparams.rgvarg = &vI;
     try { m_host->CallFunction(L"OnThemeChanged", dispparams); }
