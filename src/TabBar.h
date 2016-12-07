@@ -92,9 +92,9 @@ protected:
     void                        ExchangeItemData(POINT point);
     LRESULT                     RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
     COLORREF                    GetTabColor(bool bSelected, UINT item) const;
-    void                        DrawMainBorder(LPDRAWITEMSTRUCT lpDrawItemStruct) const;
-    void                        DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) const;
-    void                        DrawItemBorder(LPDRAWITEMSTRUCT lpDrawItemStruct) const;
+    void                        DrawMainBorder(const LPDRAWITEMSTRUCT lpDrawItemStruct) const;
+    void                        DrawItem(const LPDRAWITEMSTRUCT lpDrawItemStruct) const;
+    void                        DrawItemBorder(const LPDRAWITEMSTRUCT lpDrawItemStruct) const;
     void                        DraggingCursor(POINT screenPoint, UINT item);
     int                         GetTabIndexAt(const POINT & p) const { return GetTabIndexAt(p.x, p.y); }
     int                         GetTabIndexAt(int x, int y) const;
