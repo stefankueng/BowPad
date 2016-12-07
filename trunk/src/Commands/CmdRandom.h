@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -49,8 +49,8 @@ public:
     void Save();
     void SetShown(std::wstring file);
     void SetNotShown(std::wstring file);
-    void RemoveFromShown(std::wstring file);
-    void RemoveFromNotShown(std::wstring file);
+    void RemoveFromShown(const std::wstring& file);
+    void RemoveFromNotShown(const std::wstring& file);
     void SetNewPath(const std::wstring& fileold, const std::wstring& filenew);
 
 private:
