@@ -101,7 +101,8 @@ static void StripComments(std::string& f)
             break;
         auto e = f.erase(f.begin() + comment_begin_pos,
                          f.begin() + comment_end_pos + comment_end_len);
-        std::remove(e, f.end(), '\0');
+        auto trash = std::remove(e, f.end(), '\0');
+        f.erase(trash, f.end());
     }
 }
 
