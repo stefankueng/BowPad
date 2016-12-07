@@ -290,7 +290,7 @@ void CLexStyles::Load()
                         for (const auto& apppathkey : autopathkeys)
                         {
                             std::wstring v = ini.GetValue(L"pathlanguage", apppathkey);
-                            auto f = v.find(L"*");
+                            auto f = v.find(L'*');
                             if (f != std::wstring::npos)
                             {
                                 std::wstring p = v.substr(0, f);
@@ -339,17 +339,17 @@ void CLexStyles::Load()
                             else if (_wcsicmp(L"CommentLine", sk) == 0)
                             {
                                 ld.commentline = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
-                                ld.commentline.erase(ld.commentline.find_last_not_of("~")+1); // Erase '~'
+                                ld.commentline.erase(ld.commentline.find_last_not_of('~')+1); // Erase '~'
                             }
                             else if (_wcsicmp(L"CommentStreamStart", sk) == 0)
                             {
                                 ld.commentstreamstart = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
-                                ld.commentstreamstart.erase(ld.commentstreamstart.find_last_not_of("~")+1); // Erase '~'
+                                ld.commentstreamstart.erase(ld.commentstreamstart.find_last_not_of('~')+1); // Erase '~'
                             }
                             else if (_wcsicmp(L"CommentStreamEnd", sk) == 0)
                             {
                                 ld.commentstreamend = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
-                                ld.commentstreamend.erase(ld.commentstreamend.find_last_not_of("~")+1); // Erase '~'
+                                ld.commentstreamend.erase(ld.commentstreamend.find_last_not_of('~')+1); // Erase '~'
                             }
                             else if (_wcsicmp(L"CommentLineAtStart", sk) == 0)
                             {
@@ -362,7 +362,7 @@ void CLexStyles::Load()
                             else if (_wcsicmp(L"FunctionRegex", sk) == 0)
                             {
                                 ld.functionregex = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
-                                ld.functionregex.erase(ld.functionregex.find_last_not_of("~")+1); // Erase '~'
+                                ld.functionregex.erase(ld.functionregex.find_last_not_of('~')+1); // Erase '~'
                             }
                             else if (_wcsicmp(L"FunctionRegexSort", sk) == 0)
                             {
@@ -374,7 +374,7 @@ void CLexStyles::Load()
                             else if (_wcsicmp(L"FunctionRegexTrim", sk) == 0)
                             {
                                 std::string s = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
-                                s.erase(s.find_last_not_of("~")+1); // Erase '~'
+                                s.erase(s.find_last_not_of('~')+1); // Erase '~'
                                 // REIVEW: Should make clear if this is appending or not.
                                 stringtok(ld.functionregextrim, s, true, ",");
                             }
@@ -588,7 +588,7 @@ void CLexStyles::ReplaceVariables( std::wstring& s, const std::unordered_map<std
     size_t pos = s.find(L"$(");
     while (pos != std::wstring::npos)
     {
-        size_t pos2 = s.find(L")", pos);
+        size_t pos2 = s.find(L')', pos);
         std::wstring varname = s.substr(pos, pos2-pos+1);
         auto foundIt = vars.find(varname);
         if (foundIt != vars.end())
