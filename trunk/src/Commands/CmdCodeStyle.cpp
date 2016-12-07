@@ -53,8 +53,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
                 return hr;
             }
 
-            wchar_t sName[2] = {0};
-            sName[0] = i;
+            wchar_t sName[2] = {i, L'\0'};
             // Initialize the property set with the label that was just loaded and a category id of 0.
             pCat->InitializeCategoryProperties(sName, i-'A');
             pCollection->Add(pCat);
