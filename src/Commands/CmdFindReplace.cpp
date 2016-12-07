@@ -2619,7 +2619,7 @@ int CFindReplaceDlg::LoadData(
     const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt) const
 {
     data.clear();
-    int maxCount = GetMaxCount(section.c_str(), countKey.c_str(), defaultMaxCount);
+    int maxCount = GetMaxCount(section, countKey, defaultMaxCount);
     std::wstring itemKey;
     for (int i = 0; i < maxCount; ++i)
     {
@@ -3066,11 +3066,11 @@ void CCmdFindReplace::ScintillaNotify( SCNotification* pScn )
                     break;
                 FindText.chrg.cpMin = FindText.chrgText.cpMax;
             }
-            g_lastSelText = g_sHighlightString.c_str();
+            g_lastSelText = g_sHighlightString;
             g_lastSearchFlags = g_searchFlags;
             DocScrollUpdate();
         }
-        g_lastSelText = g_sHighlightString.c_str();
+        g_lastSelText = g_sHighlightString;
         g_lastSearchFlags = g_searchFlags;
     }
 }

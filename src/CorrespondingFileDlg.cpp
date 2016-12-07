@@ -212,7 +212,7 @@ bool CCorrespondingFileDlg::CheckStatus()
 {
     bool ok = false;
     auto info = GetCFInfo();
-    SetStatus(info.status.c_str());
+    SetStatus(info.status);
     EnableWindow(GetDlgItem(*this, IDOK), info.ok);
     return ok;
 }
