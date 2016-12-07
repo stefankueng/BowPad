@@ -1658,9 +1658,11 @@ bool CMainWindow::CloseAllTabs(bool quitting)
     OnOutOfScope(HideProgressCtrl());
 
     closealldoall = FALSE;
-    OnOutOfScope(closealldoall = FALSE;);
     docloseall = true;
-    OnOutOfScope(docloseall = false;);
+    OnOutOfScope(
+        closealldoall = FALSE;
+        docloseall = false;
+    );
     auto total = m_TabBar.GetItemCount();
     int count = 0;
     for (;;)
@@ -1691,9 +1693,11 @@ void CMainWindow::CloseAllButCurrentTab()
     OnOutOfScope(HideProgressCtrl());
 
     closealldoall = FALSE;
-    OnOutOfScope(closealldoall = FALSE;);
     docloseall = true;
-    OnOutOfScope(docloseall = false;);
+    OnOutOfScope(
+        closealldoall = FALSE;
+        docloseall = false;
+    );
     for (int i = count - 1; i >= 0; --i)
     {
         if (i != current)
