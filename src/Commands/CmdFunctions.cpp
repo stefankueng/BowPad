@@ -656,7 +656,7 @@ bool CCmdFunctions::BackgroundFindFunctions()
         if (!pWork || pWork->m_events.empty())
         {
             auto nextWorkIt = std::find_if(m_work.begin(), m_work.end(),
-                                           [ & ](const auto& item)->bool
+                                           [](const auto& item)->bool
             {
                 const DocWork& work = item.second;
                 return !work.m_events.empty();
