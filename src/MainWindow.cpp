@@ -2570,7 +2570,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     auto ds = m_DocManager.HasFileChanged(docID);
     if (ds == DM_Modified)
     {
-        ReloadTab(curTab,-1,true);
+        ReloadTab(curTab, -1, true);
     }
     else if (ds == DM_Removed)
     {
@@ -3490,7 +3490,7 @@ void CMainWindow::OpenFiles(const std::vector<std::wstring>& paths)
             unsigned int openFlags = OpenFlags::AddToMRU;
             if ((GetKeyState(VK_CONTROL) & 0x8000) != 0)
                 openFlags |= OpenFlags::OpenIntoActiveTab;
-            OpenFile(paths[0].c_str(), openFlags);
+            OpenFile(paths[0], openFlags);
         }
     }
     else if (paths.size() > 0)
