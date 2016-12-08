@@ -131,7 +131,7 @@ bool CStatusBar::SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart)
     return (::SendMessage(*this, SB_SETTEXT, whichPart, (LPARAM)str) == TRUE);
 }
 
-bool CStatusBar::Init(HINSTANCE hInst, HWND hParent, std::initializer_list<int> parts)
+bool CStatusBar::Init(HINSTANCE hInst, HWND hParent, const std::initializer_list<int>& parts)
 {
     return Init(hInst, hParent, (int)parts.size(), std::cbegin(parts));
 }
