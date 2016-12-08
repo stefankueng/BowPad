@@ -31,7 +31,7 @@ public :
     {};
     virtual ~CStatusBar(){}
 
-    bool Init(HINSTANCE hInst, HWND hParent, std::initializer_list<int> parts);
+    bool Init(HINSTANCE hInst, HWND hParent, const std::initializer_list<int>& parts);
     bool Init(HINSTANCE hInst, HWND hParent, int numParts, const int parts[]);
     void Resize();
     int GetHeight() const { return m_height; }
