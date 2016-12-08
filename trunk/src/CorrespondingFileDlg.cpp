@@ -45,26 +45,17 @@ CCorrespondingFileDlg::~CCorrespondingFileDlg()
 void CCorrespondingFileDlg::Show(HWND parent, const std::wstring& initialPath)
 {
     m_initialPath = initialPath;
-    ShowModeless(hRes, IDD_CORRESPONDINGFILEDLG, parent);
+    DoModal(hRes, IDD_CORRESPONDINGFILEDLG, parent);
 }
 
 LRESULT CCorrespondingFileDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {
-    case WM_NCDESTROY:
-        delete this;
-        break;
     case WM_DESTROY:
         break;
     case WM_INITDIALOG:
         return DoInitDialog(hwndDlg);
-        break;
-    case WM_ACTIVATE:
-        if (wParam == WA_INACTIVE)
-            SetTransparency(150);
-        else
-            SetTransparency(255);
         break;
     case WM_SIZE:
     {
@@ -74,14 +65,13 @@ LRESULT CCorrespondingFileDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
         break;
     }
     case WM_GETMINMAXINFO:
-        if (!m_freeresize)
-        {
-            MINMAXINFO* mmi = (MINMAXINFO*)lParam;
-            mmi->ptMinTrackSize.x = m_resizer.GetDlgRectScreen()->right;
-            mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
-            return 0;
-        }
-        break;
+    {
+        MINMAXINFO* mmi = (MINMAXINFO*)lParam;
+        mmi->ptMinTrackSize.x = m_resizer.GetDlgRectScreen()->right;
+        mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
+        return 0;
+    }
+    break;
     case WM_COMMAND:
         return DoCommand(LOWORD(wParam), HIWORD(wParam));
     case WM_NOTIFY:
@@ -92,8 +82,6 @@ LRESULT CCorrespondingFileDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, L
 
 void CCorrespondingFileDlg::SyncFileNameParts()
 {
-    if (m_initialisingDialog)
-        return;
     std::wstring f1 = GetDlgItemText(IDC_CFNAME1).get();
     std::wstring f2 = CPathUtils::GetFileNameWithoutExtension(f1);
     f2 += L".cpp";
@@ -223,7 +211,7 @@ LRESULT CCorrespondingFileDlg::DoCommand(int id, int msg)
     {
     case IDCANCEL:
         if (msg == BN_CLICKED)
-            DestroyWindow(*this);
+            EndDialog(*this, id);
         break;
     case IDOK:
     {
@@ -242,8 +230,7 @@ LRESULT CCorrespondingFileDlg::DoCommand(int id, int msg)
                     openFlags = OpenFlags::CreateTabOnly;
                 OpenFile(info.f1Path.c_str(), openFlags);
                 OpenFile(info.f2Path.c_str(), openFlags);
-                ShowWindow(*this, SW_SHOW);
-                DestroyWindow(*this);
+                EndDialog(*this, id);
             }
         }
         break;
@@ -324,9 +311,6 @@ void CCorrespondingFileDlg::InitSizing()
 
 LRESULT CCorrespondingFileDlg::DoInitDialog(HWND hwndDlg)
 {
-    OnOutOfScope(
-        m_initialisingDialog = false;
-    );
     InitDialog(hwndDlg, IDI_BOWPAD, true);
     InitSizing();
     SetDlgItemText(*this, IDC_CFNAME1, L".h");
