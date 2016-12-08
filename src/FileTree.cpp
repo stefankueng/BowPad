@@ -103,8 +103,7 @@ void CFileTree::Clear()
     RecurseTree(TVI_ROOT, [&](HTREEITEM hItem)->bool
     {
         const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem); // Will delete but not change.
-        if (pTreeItem)
-            delete pTreeItem;
+        delete pTreeItem;
         return false;
     });
     TreeView_DeleteAllItems(*this);
