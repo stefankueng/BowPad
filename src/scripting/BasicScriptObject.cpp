@@ -1036,7 +1036,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[1], VARIANT_ALPHABOOL, VT_INT)))
                 return DISP_E_TYPEMISMATCH;
             ret->vt = VT_BOOL;
-            ret->boolVal = CloseTab(p1.intVal, !!p2.boolVal);
+            ret->boolVal = CloseTab(p1.intVal, !!p2.boolVal) ? VARIANT_TRUE : VARIANT_FALSE;
             break;
         case 111: // GetDocIDFromTabIndex
             if (args->cArgs != 1)
@@ -1074,7 +1074,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
         case 115: // HasActiveDocument
             if (flags == DISPATCH_PROPERTYGET)
             {
-                ret->boolVal = HasActiveDocument();
+                ret->boolVal = HasActiveDocument() ? VARIANT_TRUE : VARIANT_FALSE;
                 ret->vt = VT_BOOL;
                 return S_OK;
             }
@@ -1086,7 +1086,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
                 return DISP_E_TYPEMISMATCH;
             ret->vt = VT_BOOL;
-            ret->boolVal = HasDocumentID(DocID({ p1.intVal }));
+            ret->boolVal = HasDocumentID(DocID({ p1.intVal })) ? VARIANT_TRUE : VARIANT_FALSE;
             break;
         case 117: // UpdateStatusBar
             if (args->cArgs != 1)
@@ -1188,7 +1188,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             if (FAILED(VariantChangeType(&p2, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
                 return DISP_E_TYPEMISMATCH;
             ret->vt = VT_BOOL;
-            ret->boolVal = ReloadTab(p1.intVal, p2.intVal);
+            ret->boolVal = ReloadTab(p1.intVal, p2.intVal) ? VARIANT_TRUE : VARIANT_FALSE;
             break;
         case 130: // SaveCurrentTab
             if (args->cArgs != 1)
@@ -1196,7 +1196,7 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BOOL)))
                 return DISP_E_TYPEMISMATCH;
             ret->vt = VT_BOOL;
-            ret->boolVal = SaveCurrentTab(!!p1.boolVal);
+            ret->boolVal = SaveCurrentTab(!!p1.boolVal) ? VARIANT_TRUE : VARIANT_FALSE;
             break;
         case 131: // InvalidateState
             if (args->cArgs != 0)
