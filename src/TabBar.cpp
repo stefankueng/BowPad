@@ -1024,7 +1024,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct) const
     else
         textColor = CTheme::Instance().GetThemeColor(GDIHelpers::Darker(::GetSysColor(COLOR_3DDKSHADOW), 0.5f));
     SetTextColor(pDrawItemStruct->hDC, textColor);
-    DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER);
+    DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, uFlags);
 }
 
 
