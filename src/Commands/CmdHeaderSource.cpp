@@ -601,7 +601,7 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
             return OpenFile(item.Path.c_str(), OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing) >= 0;
             break;
         case RelatedType::CreateCorrespondingFiles:
-            auto pCorrespondingFileDlg = std::make_unique<CCorrespondingFileDlg>(m_pMainWindow);
+            CCorrespondingFileDlg dlg(m_pMainWindow);
 
             std::wstring initialFolder;
             if (HasActiveDocument())
@@ -609,7 +609,7 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
                 const auto& doc = GetActiveDocument();
                 initialFolder = CPathUtils::GetParentDirectory(doc.m_path);
             }
-            pCorrespondingFileDlg->Show(GetHwnd(), initialFolder);
+            dlg.Show(GetHwnd(), initialFolder);
             break;
     }
 

@@ -61,7 +61,5 @@ protected:
 
 protected:
     CDlgResizer                 m_resizer;
-    bool                        m_freeresize = false;
-    bool                        m_initialisingDialog = true;
     std::wstring                m_initialPath;
 };
