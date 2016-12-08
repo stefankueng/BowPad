@@ -122,7 +122,7 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
             cc.lpfnHook = CCHookProc;
             cc.Flags = CC_ANYCOLOR | CC_RGBINIT | CC_ENABLEHOOK | CC_FULLOPEN;
 
-            if (ChooseColor(&cc) == TRUE)
+            if (ChooseColor(&cc) != FALSE)
             {
                 pColorButton->m_dialogResult = ColorButtonDialogResult::Ok;
             }
