@@ -761,7 +761,7 @@ bool CCmdHeaderSource::Execute()
             if (i + 1 < correspondingFiles.size())
                 fileNames += ';';
         }
-        FindReplace_FindFile(m_pMainWindow, fileNames.c_str());
+        FindReplace_FindFile(m_pMainWindow, fileNames);
     }
 
     return false;
