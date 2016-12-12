@@ -375,13 +375,15 @@ void CCommandHandler::InsertPlugins(void * obj)
             try
             {
                 auto pScript = std::make_unique<CCmdScript>(obj);
+                int cmdID = ++pluginCmd;
                 if (pScript->Create(filename))
                 {
+                    pScript->SetCmdId(cmdID);
                     std::wstring sName = CPathUtils::GetParentDirectory(filename);
                     sName = CPathUtils::GetFileName(sName);
                     m_pluginversion.insert({ sName, pScript->m_version });
-                    m_commands.insert({ ++pluginCmd, std::move(pScript) });
-                    m_plugins.insert({ pluginCmd, sName });
+                    m_commands.insert({ cmdID, std::move(pScript) });
+                    m_plugins.insert({ cmdID, sName });
                     CKeyboardShortcutHandler::Instance().AddCommand(sName, pluginCmd);
                 }
             }
