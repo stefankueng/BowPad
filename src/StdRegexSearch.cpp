@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -295,11 +295,6 @@ StdRegexSearch::Match StdRegexSearch::EncodingDependent<CharT, CharacterIterator
 
     const bool end_reached = next_search_from_position > search._endPosition;
     found = !end_reached && std::regex_search(CharacterIterator(search._document, next_search_from_position, search._endPosition), endIterator, _match, _regex, search.regexFlags);
-    if (found)
-    {
-        const int  position = _match[0].first.pos();
-        next_search_from_position = search.nextCharacter(position);
-    }
 
     if (found)
         return Match(search._document, _match[0].first.pos(), _match[0].second.pos());
