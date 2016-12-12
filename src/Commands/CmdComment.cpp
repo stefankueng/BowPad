@@ -24,8 +24,6 @@ bool CCmdComment::Execute()
 {
     // Get Selection
     bool bSelEmpty = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
-    sptr_t lineStartStart   = 0;
-    sptr_t lineEndEnd       = 0;
     bool bForceStream       = false;
     sptr_t selStart         = ScintillaCall(SCI_GETSELECTIONSTART);
     sptr_t selEnd           = ScintillaCall(SCI_GETSELECTIONEND);
@@ -40,16 +38,14 @@ bool CCmdComment::Execute()
             selEnd = ScintillaCall(SCI_GETLINEENDPOSITION, lineend);
         }
 
-        lineStartStart  = ScintillaCall(SCI_POSITIONFROMLINE, ScintillaCall(SCI_LINEFROMPOSITION, selStart));
-        lineEndEnd      = ScintillaCall(SCI_GETLINEENDPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, selEnd));
-        bForceStream    = (lineStartStart != selStart) || (lineEndEnd != selEnd);
+        auto lineStartStart  = ScintillaCall(SCI_POSITIONFROMLINE, ScintillaCall(SCI_LINEFROMPOSITION, selStart));
+        auto lineEndEnd      = ScintillaCall(SCI_GETLINEENDPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, selEnd));
+        bForceStream         = (lineStartStart != selStart) || (lineEndEnd != selEnd);
     }
     else
     {
         selStart        = ScintillaCall(SCI_GETLINEINDENTPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
         selEnd          = ScintillaCall(SCI_GETLINEENDPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
-        lineStartStart  = ScintillaCall(SCI_GETLINEINDENTPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
-        lineEndEnd      = ScintillaCall(SCI_GETLINEENDPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
     }
     if (!HasActiveDocument())
         return false;
