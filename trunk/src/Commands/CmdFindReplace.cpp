@@ -1063,11 +1063,11 @@ RECT CFindReplaceDlg::DrawListColumnBackground(NMLVCUSTOMDRAW* pLVCD)
         ::DeleteObject(brush);
 
         HTHEME hTheme = OpenThemeData(*this, L"Explorer::ListView");
-        int state = pLVCD->nmcd.uItemState & CDIS_HOT ? LISS_HOT : LISS_NORMAL;
+        int state = (pLVCD->nmcd.uItemState & CDIS_HOT) ? LISS_HOT : LISS_NORMAL;
         if ((rItem.state & LVIS_SELECTED) != 0)
         {
             if (::GetFocus() == hListControl)
-                state = pLVCD->nmcd.uItemState & CDIS_HOT ? LISS_HOTSELECTED : LISS_SELECTED;
+                state = (pLVCD->nmcd.uItemState & CDIS_HOT) ? LISS_HOTSELECTED : LISS_SELECTED;
             else
                 state = LISS_SELECTEDNOTFOCUS;
         }
