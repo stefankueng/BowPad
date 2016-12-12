@@ -272,7 +272,6 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
             auto dirIconIndex = CSysImageList::GetInstance().GetDirIconIndex();
             auto dirOpenIconIndex = CSysImageList::GetInstance().GetDirOpenIconIndex();
 
-            bool activepathmarked = false;
             if (((pData->refreshRoot == TVI_ROOT) && (CPathUtils::PathCompare(pData->refreshpath, m_path) == 0)) ||
                 (fi && (CPathUtils::PathCompare(fi->path,pData->refreshpath) == 0)))
             {
@@ -288,6 +287,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                         }
                     }
                 }
+                bool activepathmarked = false;
                 for (const auto* item : pData->data)
                 {
                     TVITEMEX tvi = { 0 };
