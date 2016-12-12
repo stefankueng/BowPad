@@ -291,14 +291,6 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         // color A again and not B. This is confusing to the user.
                         // So we try to use the active style data not the original style data,
                         // if possible.
-
-                        bool useDefault = true;
-                        if (HasActiveDocument())
-                        {
-                            const auto& doc = GetActiveDocument();
-                            if (doc.m_language == currentLang)
-                                useDefault = false;
-                        }
                         COLORREF fgc = foundStyle->second.ForegroundColor;
                         COLORREF bgc = foundStyle->second.BackgroundColor;
                         m_fgColor.SetColor(fgc);
