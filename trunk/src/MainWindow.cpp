@@ -3531,8 +3531,6 @@ void CMainWindow::BlockAllUIUpdates(bool block)
     }
     else
     {
-        // FileTreeBlockRefresh maintains it's own count.
-        FileTreeBlockRefresh(block);
         --m_blockCount;
         APPVERIFY(m_blockCount >= 0);
         if (m_blockCount == 0)
@@ -3542,6 +3540,8 @@ void CMainWindow::BlockAllUIUpdates(bool block)
             // force a redraw
             RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
         }
+        // FileTreeBlockRefresh maintains it's own count.
+        FileTreeBlockRefresh(block);
     }
 }
 
