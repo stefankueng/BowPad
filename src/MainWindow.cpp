@@ -3542,6 +3542,8 @@ void CMainWindow::BlockAllUIUpdates(bool block)
         }
         // FileTreeBlockRefresh maintains it's own count.
         FileTreeBlockRefresh(block);
+        if (m_blockCount == 0)
+            ResizeChildWindows();
     }
 }
 
