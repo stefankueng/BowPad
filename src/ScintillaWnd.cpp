@@ -75,6 +75,7 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_bCursorShown(true)
     , m_bScratch(false)
     , m_cursorTimeout(-1)
+    , m_ScrollTool(hInst)
 {
 }
 
@@ -92,6 +93,10 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     if (!g_scintillaInitialized)
     {
         Scintilla_RegisterClasses(hInst);
+        INITCOMMONCONTROLSEX icce;
+        icce.dwSize = sizeof(icce);
+        icce.dwICC = ICC_BAR_CLASSES;
+        InitCommonControlsEx(&icce);
     }
 
     if (hParent)
@@ -367,6 +372,36 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         {
             Call(SCI_SETCURSOR, (uptr_t)-1);
             m_bCursorShown = true;
+        }
+        if (uMsg == WM_VSCROLL)
+        {
+            switch (LOWORD(wParam))
+            {
+                case SB_THUMBPOSITION:
+                m_ScrollTool.Clear();
+                break;
+                case SB_THUMBTRACK:
+                {
+                    RECT thumbrect;
+                    GetClientRect(*this, &thumbrect);
+                    MapWindowPoints(*this, nullptr, (LPPOINT)&thumbrect, 2);
+
+                    SCROLLINFO si = { 0 };
+                    si.cbSize = sizeof(SCROLLINFO);
+                    si.fMask = SIF_ALL;
+                    CoolSB_GetScrollInfo(*this, SB_VERT, &si);
+
+                    auto linecount = Call(SCI_GETLINECOUNT);
+                    auto w = m_ScrollTool.GetTextWidth(CStringUtils::Format(L"Line: %ld", linecount).c_str());
+                    POINT thumbpoint;
+                    thumbpoint.x = thumbrect.right - w;
+                    thumbpoint.y = thumbrect.top + ((thumbrect.bottom - thumbrect.top)*si.nTrackPos) / (si.nMax - si.nMin);
+
+                    m_ScrollTool.Init(*this, &thumbpoint);
+                    m_ScrollTool.SetText(&thumbpoint, L"Line: %ld", si.nTrackPos+1);
+                }
+                break;
+            }
         }
     }
     break;
