@@ -43,7 +43,7 @@ bool CCmdNewCopy::Execute()
         docnew.m_bIsDirty = true;
         docnew.m_bNeedsSaving = true;
 
-        SetupLexerForLang(docnew.m_language);
+        SetupLexerForLang(docnew.GetLanguage());
         ScintillaCall(SCI_APPENDTEXT, len, (sptr_t)textbuf.get());
         RestoreCurrentPos(docnew.m_position);
         ScintillaCall(SCI_SETSAVEPOINT);

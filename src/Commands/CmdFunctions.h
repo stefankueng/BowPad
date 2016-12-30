@@ -112,7 +112,7 @@ private:
     void OnTimer(UINT id) override;
     void OnDocumentOpen(DocID id) override;
     void OnDocumentSave(DocID id, bool bSaveAs) override;
-    void OnLexerChanged(int lexer) override;
+    void OnLangChanged() override;
     void OnDocumentClose(DocID id) override;
     bool BackgroundFindFunctions();
     std::vector<FunctionInfo> FindFunctionsNow() const;

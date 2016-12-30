@@ -66,11 +66,12 @@ public:
         m_lastWriteTime.dwLowDateTime  = 0;
     }
 
-    std::wstring GetEncodingString() const;
+    std::wstring            GetEncodingString() const;
+    const std::string&      GetLanguage() const { return m_language; }
+    void                    SetLanguage(const std::string& lang);
 
     Document                m_document;
     std::wstring            m_path;
-    std::string             m_language;
     int                     m_encoding;
     EOLFormat               m_format;
     bool                    m_bHasBOM;
@@ -83,4 +84,6 @@ public:
     bool                    m_bDoSaveAs;        ///< even if m_path is set, always ask where to save
     FILETIME                m_lastWriteTime;
     CPosData                m_position;
+private:
+    std::string             m_language;
 };

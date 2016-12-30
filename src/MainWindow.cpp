@@ -1395,8 +1395,9 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         m_DocManager.UpdateFileTime(doc, false);
         if (bSaveAs)
         {
-            doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
-            m_editor.SetupLexerForLang(doc.m_language);
+            const auto& lang = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
+            m_editor.SetupLexerForLang(lang);
+            doc.SetLanguage(lang);
         }
         std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
         m_TabBar.SetCurrentTitle(sFileName.c_str());
@@ -1433,9 +1434,10 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
     m_editor.Call(SCI_SETREADONLY, doc.m_bIsReadonly || doc.m_bIsWriteProtected);
 
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
-    doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
+    const auto& lang = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
+    m_editor.SetupLexerForLang(lang);
+    doc.SetLanguage(lang);
 
-    m_editor.SetupLexerForLang(doc.m_language);
     if (!title.empty())
         m_TabBar.SetCurrentTitle(title.c_str());
     else if (sFileName.empty())
@@ -1568,7 +1570,7 @@ void CMainWindow::UpdateStatusBar( bool bEverything )
         int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
         APPVERIFY(ToEOLMode(doc.m_format) == eolMode);
         auto eolDesc = GetEOLFormatDescription(doc.m_format);
-        m_StatusBar.SetText(CUnicodeUtils::StdGetUnicode(doc.m_language.c_str()).c_str(), nullptr, STATUSBAR_DOC_TYPE);
+        m_StatusBar.SetText(CUnicodeUtils::StdGetUnicode(doc.GetLanguage().c_str()).c_str(), nullptr, STATUSBAR_DOC_TYPE);
         auto tteof = CStringUtils::Format(rsStatusTTEOF, eolDesc.c_str());
         m_StatusBar.SetText(eolDesc.c_str(), tteof.c_str(), STATUSBAR_EOL_FORMAT);
         auto ttencoding = CStringUtils::Format(rsStatusTTEncoding, doc.GetEncodingString().c_str());
@@ -2517,7 +2519,7 @@ void CMainWindow::OpenNewTab()
     doc.m_document = m_editor.Call(SCI_CREATEDOCUMENT);
     doc.m_bHasBOM = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
     doc.m_encoding = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
-    doc.m_language = "Text";
+    doc.SetLanguage("Text");
     std::wstring tabName = GetNewTabName();
     int index = -1;
     if (m_insertionIndex >= 0)
@@ -2557,7 +2559,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
 
     auto& doc = m_DocManager.GetModDocumentFromID(docID);
     m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-    m_editor.SetupLexerForLang(doc.m_language);
+    m_editor.SetupLexerForLang(doc.GetLanguage());
     m_editor.RestoreCurrentPos(doc.m_position);
     m_editor.SetTabSettings();
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc);
@@ -2672,7 +2674,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         auto lang = CLexStyles::Instance().GetLanguageForPath(fileName);
         if (lang.empty())
             lang = "Text";
-        doc.m_language = lang;
+        doc.SetLanguage(lang);
         index = m_TabBar.InsertAtEnd(fileName.c_str());
         auto docID = m_TabBar.GetIDFromIndex(index);
         m_DocManager.AddDocumentAtEnd(doc, docID);
@@ -2781,7 +2783,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 id = activetabid;
                 m_TabBar.SetCurrentTitle(sFileName.c_str());
             }
-            doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
+            doc.SetLanguage(CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor));
 
             if ((CPathUtils::PathCompare(filepath, m_tabmovepath) == 0) && m_tabmovemod)
             {
@@ -2856,9 +2858,10 @@ bool CMainWindow::OpenFileAs( const std::wstring& temppath, const std::wstring& 
     doc.m_bNeedsSaving = bModified;
     m_DocManager.UpdateFileTime(doc, true);
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
-    doc.m_language = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
+    const auto& lang = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
     m_editor.Call(SCI_SETREADONLY, doc.m_bIsReadonly);
-    m_editor.SetupLexerForLang(doc.m_language);
+    m_editor.SetupLexerForLang(lang);
+    doc.SetLanguage(lang);
     UpdateTab(docID);
     if (sFileName.empty())
         m_TabBar.SetCurrentTitle(GetNewTabName().c_str());
@@ -3306,11 +3309,11 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
         editor->Call(SCI_SETDOCPOINTER, 0, docreload.m_document);
     }
 
-    docreload.m_language = doc.m_language;
     docreload.m_position = doc.m_position;
     docreload.m_bIsWriteProtected = doc.m_bIsWriteProtected;
     doc = docreload;
-    editor->SetupLexerForLang(docreload.m_language);
+    editor->SetupLexerForLang(doc.GetLanguage());
+    docreload.SetLanguage(doc.GetLanguage());
     editor->RestoreCurrentPos(docreload.m_position);
     editor->Call(SCI_SETREADONLY, docreload.m_bIsWriteProtected);
     if (bReloadCurrentTab)
@@ -3704,7 +3707,7 @@ void CMainWindow::SetTheme(bool dark)
         m_editor.Call(SCI_CLEARDOCUMENTSTYLE);
         m_editor.Call(SCI_COLOURISE, 0, -1);
         const auto& doc = m_DocManager.GetDocumentFromID(activeTabId);
-        m_editor.SetupLexerForLang(doc.m_language);
+        m_editor.SetupLexerForLang(doc.GetLanguage());
         RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
     }
 

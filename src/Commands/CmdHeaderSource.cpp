@@ -407,7 +407,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
         }
     }
 
-    if (doc.m_language == "C/C++")
+    if (doc.GetLanguage() == "C/C++")
     {
         // Include Files
 
@@ -526,11 +526,11 @@ bool CCmdHeaderSource::OpenFileAsLanguage(const std::wstring& filename)
     if (HasActiveDocument())
     {
         auto& doc = GetModActiveDocument();
-        if (doc.m_language != desiredLang)
+        if (doc.GetLanguage() != desiredLang)
         {
-            doc.m_language = desiredLang;
-            SetupLexerForLang(doc.m_language);
-            CLexStyles::Instance().SetLangForPath(doc.m_path, doc.m_language);
+            SetupLexerForLang(desiredLang);
+            doc.SetLanguage(desiredLang);
+            CLexStyles::Instance().SetLangForPath(doc.m_path, desiredLang);
             UpdateStatusBar(true);
         }
     }
@@ -652,7 +652,7 @@ void CCmdHeaderSource::TabNotify(TBHDR* ptbhdr)
         InvalidateMenu();
 }
 
-void CCmdHeaderSource::OnLexerChanged(int /*lexer*/)
+void CCmdHeaderSource::OnLangChanged()
 {
     InvalidateMenu();
 }
@@ -1034,7 +1034,7 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
 {
     includes.clear();
 
-    std::string lang = doc.m_language;
+    const auto& lang = doc.GetLanguage();
     if (lang != "C/C++")
         return false;
 
