@@ -346,15 +346,15 @@ void CCommandHandler::OnThemeChanged(bool bDark)
     }
 }
 
-void CCommandHandler::OnLexerChanged(int lexer)
+void CCommandHandler::OnLangChanged()
 {
     for (auto& cmd : m_commands)
     {
-        cmd.second->OnLexerChanged(lexer);
+        cmd.second->OnLangChanged();
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->OnLexerChanged(lexer);
+        cmd.second->OnLangChanged();
     }
 }
 

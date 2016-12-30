@@ -71,7 +71,7 @@ public:
 
     void OnDocumentSave(DocID id, bool bSaveAs) override;
 
-    void OnLexerChanged(int lexer) override;
+    void OnLangChanged() override;
 
 private:
     void HandleIncludeFileMenuItem(const RelatedFileItem& item);

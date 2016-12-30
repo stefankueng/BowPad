@@ -50,7 +50,7 @@ bool CCmdComment::Execute()
     if (!HasActiveDocument())
         return false;
     const auto& doc = GetActiveDocument();
-    std::string lang = doc.m_language;
+    const auto& lang = doc.GetLanguage();
     std::string commentline = CLexStyles::Instance().GetCommentLineForLang(lang);
     std::string commentstreamstart = CLexStyles::Instance().GetCommentStreamStartForLang(lang);
     std::string commentstreamend = CLexStyles::Instance().GetCommentStreamEndForLang(lang);
@@ -124,7 +124,7 @@ bool CCmdUnComment::Execute()
     if (!HasActiveDocument())
         return false;
     const auto& doc = GetActiveDocument();
-    std::string lang = doc.m_language;
+    const auto& lang = doc.GetLanguage();
     std::string commentline = CLexStyles::Instance().GetCommentLineForLang(lang);
     std::string commentstreamstart = CLexStyles::Instance().GetCommentStreamStartForLang(lang);
     std::string commentstreamend = CLexStyles::Instance().GetCommentStreamEndForLang(lang);

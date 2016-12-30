@@ -45,7 +45,7 @@ HRESULT CCmdGotoSymbol::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, cons
         if (HasActiveDocument())
         {
             const auto& doc = GetActiveDocument();
-            auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.m_language);
+            auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.GetLanguage());
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), ppropvarNewValue);
         }
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
@@ -59,7 +59,7 @@ void CCmdGotoSymbol::TabNotify(TBHDR * ptbhdr)
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
 }
 
-void CCmdGotoSymbol::OnLexerChanged(int /*lexer*/)
+void CCmdGotoSymbol::OnLangChanged()
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
 }

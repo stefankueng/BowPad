@@ -101,7 +101,7 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
 
         // refresh lexer
         const auto& doc = GetActiveDocument();
-        SetupLexerForLang(doc.m_language);
+        SetupLexerForLang(doc.GetLanguage());
         return S_OK;
     }
     if (key && *key == UI_PKEY_FontProperties)
@@ -196,7 +196,7 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
         if ((verb == UI_EXECUTIONVERB_EXECUTE) || (verb == UI_EXECUTIONVERB_PREVIEW))
         {
             const auto& doc = GetActiveDocument();
-            SetupLexerForLang(doc.m_language);
+            SetupLexerForLang(doc.GetLanguage());
         }
     }
     return hr;

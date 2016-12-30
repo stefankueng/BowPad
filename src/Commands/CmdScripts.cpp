@@ -325,14 +325,9 @@ void CCmdScript::OnThemeChanged(bool bDark)
     catch (const std::exception&) {}
 }
 
-void CCmdScript::OnLexerChanged(int lexer)
+void CCmdScript::OnLangChanged()
 {
     DISPPARAMS dispparams = { 0 };
-    dispparams.cArgs = 1;
-    VARIANT vI;
-    vI.intVal = lexer;
-    vI.vt = VT_INT;
-    dispparams.rgvarg = &vI;
     try { m_host->CallFunction(L"OnLexerChanged", dispparams); }
     catch (const std::exception&) {}
 }

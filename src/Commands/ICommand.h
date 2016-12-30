@@ -52,7 +52,7 @@ public:
     virtual void        TabNotify(TBHDR * ptbhdr);
     virtual void        OnClose();
     virtual void        AfterInit();
-    virtual void        OnLexerChanged(int lexer);
+    virtual void        OnLangChanged();
     virtual void        OnThemeChanged(bool bDark);
     virtual void        OnDocumentClose(DocID id);
     virtual void        OnDocumentOpen(DocID id);
