@@ -18,6 +18,7 @@
 #include "BaseWindow.h"
 #include "Scintilla.h"
 #include "DocScroll.h"
+#include "ScrollTool.h"
 
 #include <vector>
 #include <unordered_map>
@@ -136,6 +137,7 @@ private:
     SciFnDirect                 m_pSciMsg;
     sptr_t                      m_pSciWndData;
     CDocScroll                  m_docScroll;
+    CScrollTool                 m_ScrollTool;
     long                        m_selTextMarkerCount;
     bool                        m_bCursorShown;
     bool                        m_bScratch;

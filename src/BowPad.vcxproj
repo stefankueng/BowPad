@@ -232,6 +232,7 @@
     <ClInclude Include="..\ext\sktoolslib\ProgressDlg.h" />
     <ClInclude Include="..\ext\sktoolslib\Registry.h" />
     <ClInclude Include="..\ext\sktoolslib\ResString.h" />
+    <ClInclude Include="..\ext\sktoolslib\ScrollTool.h" />
     <ClInclude Include="..\ext\sktoolslib\SimpleIni.h" />
     <ClInclude Include="..\ext\sktoolslib\SmartHandle.h" />
     <ClInclude Include="..\ext\sktoolslib\StringUtils.h" />
@@ -344,6 +345,7 @@
     <ClCompile Include="..\ext\sktoolslib\PreserveChdir.cpp" />
     <ClCompile Include="..\ext\sktoolslib\ProgressDlg.cpp" />
     <ClCompile Include="..\ext\sktoolslib\Registry.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\ScrollTool.cpp" />
     <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysImageList.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
