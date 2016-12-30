@@ -620,7 +620,6 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
     const auto& theme = CTheme::Instance();
     Call(SCI_STYLECLEARALL);
 
-    auto oldLexer = Call(SCI_GETLEXER);
     Call(SCI_SETLEXER, lexerdata.ID);
 
     for (const auto& it: lexerdata.Properties)
@@ -655,8 +654,6 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
     Call(SCI_SETLINEENDTYPESALLOWED, Call(SCI_GETLINEENDTYPESSUPPORTED));
 
     SetupDefaultStyles();
-    if (oldLexer != lexerdata.ID)
-        CCommandHandler::Instance().OnLexerChanged(lexerdata.ID);
 }
 
 void CScintillaWnd::SetupDefaultStyles()

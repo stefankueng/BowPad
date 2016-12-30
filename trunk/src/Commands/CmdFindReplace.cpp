@@ -2043,7 +2043,7 @@ void CFindReplaceDlg::SearchDocument(
     std::string funcregex;
     if (searchForFunctions)
     {
-        auto lang = doc.m_language;
+        auto lang = doc.GetLanguage();
         if (lang.empty())
             lang = CLexStyles::Instance().GetLanguageForDocument(doc, searchWnd);
         if (lang.empty())

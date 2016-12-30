@@ -55,7 +55,7 @@ public:
 
     void OnThemeChanged(bool bDark) override;
 
-    void OnLexerChanged(int lexer) override;
+    void OnLangChanged() override;
 
     int m_version;
 

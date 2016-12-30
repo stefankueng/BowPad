@@ -301,7 +301,7 @@ void DocWork::InitLang(const CDocument& doc)
 
     ClearEvents();
 
-    m_docLang = doc.m_language;
+    m_docLang = doc.GetLanguage();
     if (!m_docLang.empty())
     {
         m_langData = CLexStyles::Instance().GetLanguageData(m_docLang);
@@ -373,7 +373,7 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
         if (HasActiveDocument())
         {
             const auto& doc = GetActiveDocument();
-            auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.m_language);
+            auto funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.GetLanguage());
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), ppropvarNewValue);
         }
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
@@ -520,7 +520,7 @@ void CCmdFunctions::OnDocumentClose(DocID id)
     // Purge the user keywords once there are no more 
     // documents of this language open.
 
-    if (!closingDoc.m_language.empty())
+    if (!closingDoc.GetLanguage().empty())
     {
         // Count the number of open documents by language.
         auto tabCount = GetTabCount();
@@ -529,16 +529,16 @@ void CCmdFunctions::OnDocumentClose(DocID id)
         {
             auto docID = GetDocIDFromTabIndex(ti);
             const auto& doc = GetDocumentFromID(docID);
-            if (!doc.m_language.empty())
-                ++counts[doc.m_language];
+            if (!doc.GetLanguage().empty())
+                ++counts[doc.GetLanguage()];
         }
         // We assume 1 is this document so we are testing that
         // the closing document is the last of it's type.
         // If so, purge the user keywords we added. And if it relates
 
-        if (counts[closingDoc.m_language] == 1)
+        if (counts[closingDoc.GetLanguage()] == 1)
         {
-            auto langData = CLexStyles::Instance().GetLanguageData(closingDoc.m_language);
+            auto langData = CLexStyles::Instance().GetLanguageData(closingDoc.GetLanguage());
             if (langData != nullptr)
             {
                 if (!langData->userkeywords.empty())
@@ -563,7 +563,7 @@ void CCmdFunctions::OnDocumentSave(DocID id, bool bSaveAs)
         EventHappened(id, DocEventType::SaveAs);
 }
 
-void CCmdFunctions::OnLexerChanged(int /*lexer*/)
+void CCmdFunctions::OnLangChanged()
 {
     EventHappened(GetDocIdOfCurrentTab(), DocEventType::LexerChanged);
 }
@@ -759,9 +759,9 @@ bool CCmdFunctions::BackgroundFindFunctions()
         if (HasActiveDocument())
         {
             const auto& activeDoc = GetActiveDocument();
-            auto langData = CLexStyles::Instance().GetLanguageData(activeDoc.m_language);
+            auto langData = CLexStyles::Instance().GetLanguageData(activeDoc.GetLanguage());
             if (langData != nullptr && langData->userkeywordsupdated)
-                SetupLexerForLang(activeDoc.m_language);
+                SetupLexerForLang(activeDoc.GetLanguage());
         }
         if (m_autoscanTimed)
         {
@@ -840,7 +840,7 @@ std::vector<FunctionInfo> CCmdFunctions::FindFunctionsNow() const
 
 void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const std::string&, long lineNum)>& callback) const
 {
-    auto docLang = doc.m_language;
+    const auto& docLang = doc.GetLanguage();
     if (docLang.empty())
         return;
     auto* langData = CLexStyles::Instance().GetLanguageData(docLang);

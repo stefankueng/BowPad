@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "Document.h"
 #include "StringUtils.h"
+#include <CommandHandler.h>
 
 std::wstring GetEOLFormatDescription( EOLFormat ft )
 {
@@ -70,6 +71,14 @@ std::wstring CDocument::GetEncodingString() const
     if (m_bHasBOM)
         sEnc += L", BOM";
     return sEnc;
+}
+
+void CDocument::SetLanguage(const std::string & lang)
+{
+    bool bDoEvents = !m_language.empty() && (m_language != lang);
+    m_language = lang;
+    if (bDoEvents)
+        CCommandHandler::Instance().OnLangChanged();
 }
 
 EOLFormat ToEOLFormat(int eolMode)

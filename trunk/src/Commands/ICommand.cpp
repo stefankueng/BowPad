@@ -73,7 +73,7 @@ void ICommand::OnThemeChanged(bool /*bDark*/)
 {
 }
 
-void ICommand::OnLexerChanged(int /*lexer*/)
+void ICommand::OnLangChanged()
 {
 }
 

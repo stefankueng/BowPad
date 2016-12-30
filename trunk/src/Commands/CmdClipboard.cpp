@@ -32,7 +32,7 @@ std::string ClipboardBase::GetHtmlSelection()
     if (!HasActiveDocument())
         return "";
     const auto& doc = GetActiveDocument();
-    const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(doc.m_language);
+    const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(doc.GetLanguage());
 
     std::string sHtmlFragment;
     int style = 0;
@@ -177,7 +177,7 @@ void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml)
 void ClipboardBase::AddLexerToClipboard()
 {
     const auto& doc = GetActiveDocument();
-    std::string lang = doc.m_language;
+    const auto& lang = doc.GetLanguage();
     if (!lang.empty())
     {
         if (OpenClipboard(GetHwnd()))
@@ -206,7 +206,7 @@ void ClipboardBase::AddLexerToClipboard()
 void ClipboardBase::SetLexerFromClipboard()
 {
     auto& doc = GetModActiveDocument();
-    if (doc.m_language.empty() || (doc.m_language.compare("Text") == 0))
+    if (doc.GetLanguage().empty() || (doc.GetLanguage().compare("Text") == 0))
     {
         CClipboardHelper clipboard;
         if (clipboard.Open(GetHwnd()))
@@ -223,8 +223,8 @@ void ClipboardBase::SetLexerFromClipboard()
                         GlobalUnlock(hData);
                     );
                     auto lang = lptstr;
-                    doc.m_language = lang;
                     SetupLexerForLang(lang);
+                    doc.SetLanguage(lang);
                     UpdateStatusBar(true);
                 }
             }

@@ -43,7 +43,7 @@ public:
     void                            AfterInit();
     void                            OnTimer(UINT id);
     void                            OnThemeChanged(bool bDark);
-    void                            OnLexerChanged(int lexer);
+    void                            OnLangChanged();
     const auto &                    GetPluginMap() { return m_plugins; }
     int                             GetPluginVersion(const std::wstring& name);
     void                            AddCommand(ICommand * cmd);
