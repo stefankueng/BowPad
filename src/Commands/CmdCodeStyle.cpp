@@ -118,8 +118,11 @@ HRESULT CCmdCodeStyle::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PR
                 auto& doc = GetModActiveDocument();
                 auto lang = CUnicodeUtils::StdGetUTF8(langs[selected]);
                 SetupLexerForLang(lang);
-                doc.SetLanguage(lang);
                 CLexStyles::Instance().SetLangForPath(doc.m_path, lang);
+                // set the language last, so that the OnLanguageChanged events happen last:
+                // otherwise the SetLangForPath() invalidates the LanguageData pointers after
+                // commands re-evaluated those!
+                doc.SetLanguage(lang);
                 UpdateStatusBar(true);
             }
             hr = S_OK;
