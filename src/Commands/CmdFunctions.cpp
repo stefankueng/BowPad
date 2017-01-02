@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ static void Normalize(std::string& f)
     std::replace_if(f.begin(), f.end(), [](auto c)
     {
         return c == '\n' || c == '\t';
-    }, L' ');
+    }, ' ');
     auto new_end = std::unique(f.begin(), f.end(), [](auto lhs, auto rhs) -> bool
     {
         return (lhs == ' ' && rhs == ' ');
@@ -139,7 +139,7 @@ static bool ParseSignature(const std::string& sig, std::string& name, std::strin
 
         // Functions returning pointer or reference will feature these symbols
         // before the name. Ignore them. This logic is a bit C language based.
-        while (spos < bracepos && (sig[spos] == L'*' || sig[spos] == L'&' || sig[spos] == L'^'))
+        while (spos < bracepos && (sig[spos] == '*' || sig[spos] == '&' || sig[spos] == '^'))
             ++spos;
         name.assign(sig, spos, bracepos - spos);
         name_and_args.assign(sig, spos);
