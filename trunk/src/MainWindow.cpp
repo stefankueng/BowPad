@@ -3474,8 +3474,8 @@ COLORREF CMainWindow::GetColorForDocument(DocID id)
 {
     const CDocument& doc = m_DocManager.GetDocumentFromID(id);
     std::wstring folderpath = CPathUtils::GetParentDirectory(doc.m_path);
-    CStringUtils::emplace_to_lower(folderpath);
-
+    // note: if the folder path is different in case but points to
+    // the same folder on disk, the color will be different!
     auto foundIt = m_foldercolorindexes.find(folderpath);
     if (foundIt != m_foldercolorindexes.end())
         return foldercolors[foundIt->second % MAX_FOLDERCOLORS];
