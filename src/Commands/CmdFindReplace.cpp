@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -319,7 +319,6 @@ std::wstring CFindReplaceDlg::OfferFileSuggestion(
         return suggestedFilename; // Should be empty.
     
     constexpr auto maxSearchTime = std::chrono::milliseconds(200);
-    auto typedName = CStringUtils::to_lower(currentValue);
     CDirFileEnum enumerator(searchFolder);
     bool bIsDir = false;
     std::wstring path;
@@ -340,8 +339,7 @@ std::wstring CFindReplaceDlg::OfferFileSuggestion(
         if (IsExcludedFile(path))
             continue;
         filename = CPathUtils::GetFileName(path);
-        filename = CStringUtils::to_lower(filename);
-        if (filename.find(typedName, 0) == 0)
+        if (_wcsnicmp(filename.c_str(), currentValue.c_str(), currentValue.size()) == 0)
         {
             if (suggestedFilename.empty() ||
                 filename.length() < suggestedFilename.length())
@@ -1864,7 +1862,7 @@ bool CFindReplaceDlg::IsMatchingFile(const std::wstring& path, const std::vector
     bool matched = false;
     if (filesToFind.size() > 0)
     {
-        auto targetName = CStringUtils::to_lower(CPathUtils::GetFileName(path));
+        auto targetName = CPathUtils::GetFileName(path);
         auto whereAt = std::find_if(filesToFind.begin(), filesToFind.end(),
             [&](const std::wstring& fileToFind)
         {
@@ -1878,16 +1876,24 @@ bool CFindReplaceDlg::IsMatchingFile(const std::wstring& path, const std::vector
 
 bool CFindReplaceDlg::IsExcludedFile(const std::wstring& path) const
 {
-    auto ext = CStringUtils::to_lower(CPathUtils::GetFileExtension(path));
-    return (std::find(excludedExtensions.begin(), excludedExtensions.end(), ext)
-        != excludedExtensions.end());
+    auto ext = CPathUtils::GetFileExtension(path);
+    for (const auto& e : excludedExtensions)
+    {
+        if (_wcsicmp(ext.c_str(), e.c_str()) == 0)
+            return true;
+    }
+    return false;
 }
 
 bool CFindReplaceDlg::IsExcludedFolder(const std::wstring& path) const
 {
-    auto targetName = CStringUtils::to_lower(CPathUtils::GetFileName(path));
-    auto whereAt = std::find(excludedFolders.begin(), excludedFolders.end(), targetName);
-    return (whereAt != excludedFolders.end());
+    auto targetName = CPathUtils::GetFileName(path);
+    for (const auto& e : excludedFolders)
+    {
+        if (_wcsicmp(targetName.c_str(), e.c_str()) == 0)
+            return true;
+    }
+    return false;
 }
 
 void CFindReplaceDlg::SearchThread(
@@ -2014,10 +2020,7 @@ void CFindReplaceDlg::SearchDocument(
 {
     bool searchForFunctions = (exSearchFlags & SF_SEARCHFORFUNCTIONS) != 0;
 
-    bool matchCase = (searchflags & SCFIND_MATCHCASE) != 0;
     auto wsearchfor = CUnicodeUtils::StdGetUnicode(searchfor);
-    if (!matchCase)
-        wsearchfor = CStringUtils::to_lower(wsearchfor);
     if (searchForFunctions)
         searchflags |= SCFIND_REGEXP | SCFIND_CXX11REGEX;
     bool wholeWord = (searchflags & SCFIND_WHOLEWORD) != 0;
@@ -2132,9 +2135,7 @@ void CFindReplaceDlg::SearchDocument(
                 {
                     if (ParseSignature(funcName, result.lineText))
                     {
-                        if (! matchCase)
-                            funcName = CStringUtils::to_lower(funcName);
-                        matched = wcswildcmp(wsearchfor.c_str(), funcName.c_str()) != 0;
+                        matched = wcswildicmp(wsearchfor.c_str(), funcName.c_str()) != 0;
                     }
                 }
             }

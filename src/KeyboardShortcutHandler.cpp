@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ void CKeyboardShortcutHandler::Load( const CSimpleIni& ini )
         unsigned long vk = 0;
         const wchar_t* keyDataString = ini.GetValue(L"virtkeys", keyName);
         if (CAppUtils::TryParse(keyDataString, vk, false, 0, 16))
-            m_virtkeys[CStringUtils::to_lower(keyName)] = (UINT)vk;
+            m_virtkeys[keyName] = (UINT)vk;
         else
             APPVERIFYM(false, L"Invalid Virtual Key ini file. Cannot convert key '%s' to uint.", keyName);
     }
@@ -113,10 +113,8 @@ void CKeyboardShortcutHandler::Load( const CSimpleIni& ini )
     {
         CSimpleIni::TNamesDepend values;
         ini.GetAllValues(L"shortcuts", cmd, values);
-        for (auto vv : values)
+        for (auto v : values)
         {
-            std::wstring v = vv;
-            CStringUtils::emplace_to_lower(v);
             std::vector<std::wstring> keyvec;
             stringtok(keyvec, v, false, L",");
             KSH_Accel accel;
@@ -133,17 +131,26 @@ void CKeyboardShortcutHandler::Load( const CSimpleIni& ini )
                 switch (i)
                 {
                 case 0:
-                    if (keyvec[i].find(L"alt") != std::wstring::npos)
+                    if (CStringUtils::find_caseinsensitive(keyvec[i], L"alt") != std::wstring::npos)
                         accel.fVirt |= 0x10;
-                    if (keyvec[i].find(L"ctrl") != std::wstring::npos)
+                    if (CStringUtils::find_caseinsensitive(keyvec[i], L"ctrl") != std::wstring::npos)
                         accel.fVirt |= 0x08;
-                    if (keyvec[i].find(L"shift") != std::wstring::npos)
+                    if (CStringUtils::find_caseinsensitive(keyvec[i], L"shift") != std::wstring::npos)
                         accel.fVirt |= 0x04;
                     break;
                 case 1:
                 {
-                    auto whereAt = m_virtkeys.find(keyvec[i]);
-                    if (whereAt != m_virtkeys.end())
+                    auto keyveci = keyvec[i].c_str();
+                    auto whereAt = m_virtkeys.cend();
+                    for (auto it = m_virtkeys.cbegin(); it != m_virtkeys.cend(); ++it)
+                    {
+                        if (_wcsicmp(keyveci, it->first.c_str()) == 0)
+                        {
+                            whereAt = it;
+                            break;
+                        }
+                    }
+                    if (whereAt != m_virtkeys.cend())
                     {
                         accel.fVirt1 = TRUE;
                         accel.key1 = (WORD)whereAt->second;
@@ -159,8 +166,17 @@ void CKeyboardShortcutHandler::Load( const CSimpleIni& ini )
                     break;
                 case 2:
                 {
-                    auto whereAt = m_virtkeys.find(keyvec[i]);
-                    if (whereAt != m_virtkeys.end())
+                    auto keyveci = keyvec[i].c_str();
+                    auto whereAt = m_virtkeys.cend();
+                    for (auto it = m_virtkeys.cbegin(); it != m_virtkeys.cend(); ++it)
+                    {
+                        if (_wcsicmp(keyveci, it->first.c_str()) == 0)
+                        {
+                            whereAt = it;
+                            break;
+                        }
+                    }
+                    if (whereAt != m_virtkeys.cend())
                     {
                         accel.fVirt2 = TRUE;
                         accel.key2 = (WORD)whereAt->second;
