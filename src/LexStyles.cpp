@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -487,15 +487,16 @@ const LexerData& CLexStyles::GetLexerDataForLexer(int lexer) const
 
 std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
 {
-    std::wstring lpath = CStringUtils::to_lower(path);
-
-    auto it = m_pathsLang.find(lpath);
+    auto it = std::find_if(m_pathsLang.begin(), m_pathsLang.end(), [ & ](const auto& toFind)
+    {
+        return _wcsicmp(toFind.first.c_str(), path.c_str()) == 0;
+    });
     if (it != m_pathsLang.end())
     {
         // move the path to the top of the list
         for (auto li = m_pathsForLang.begin(); li != m_pathsForLang.end(); ++li)
         {
-            if (it->first.compare(*li) == 0)
+            if (_wcsicmp(it->first.c_str(), li->c_str()) == 0)
             {
                 m_pathsForLang.erase(li);
                 m_pathsForLang.push_front(it->first);
@@ -505,19 +506,31 @@ std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
         return it->second;
     }
 
-    auto fit = m_fileLang.find(CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(lpath)));
+    auto pathA = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(path));
+    auto fit = std::find_if(m_fileLang.begin(), m_fileLang.end(), [ & ](const auto& toFind)
+    {
+        return _stricmp(toFind.first.c_str(), pathA.c_str()) == 0;
+    });
+
     if (fit != m_fileLang.end())
     {
         return fit->second;
     }
-    auto ext = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(lpath));
-    auto eit = m_extLang.find(ext);
+    auto ext = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(path));
+
+    auto eit = std::find_if(m_extLang.begin(), m_extLang.end(), [ & ](const auto& toFind)
+    {
+        return _stricmp(toFind.first.c_str(), ext.c_str()) == 0;
+    });
     if (eit != m_extLang.end())
     {
         return eit->second;
     }
 
-    auto ait = m_autoextLang.find(ext);
+    auto ait = std::find_if(m_autoextLang.begin(), m_autoextLang.end(), [ & ](const auto& toFind)
+    {
+        return _stricmp(toFind.first.c_str(), ext.c_str()) == 0;
+    });
     if (ait != m_autoextLang.end())
     {
         return ait->second;
@@ -813,8 +826,11 @@ void CLexStyles::SetLangForPath(const std::wstring& path, const std::string& lan
         {
             // extension has a different language set than the user selected
             // only add this if the extension is set in m_autoextLang
-            std::string e = CUnicodeUtils::StdGetUTF8(CStringUtils::to_lower(sExt));
-            auto it = m_extLang.find(e);
+            std::string e = CUnicodeUtils::StdGetUTF8(sExt);
+            auto it = std::find_if(m_extLang.begin(), m_extLang.end(), [ & ](const auto& toFind)
+            {
+                return _stricmp(toFind.first.c_str(), e.c_str()) == 0;
+            });
             if (it == m_extLang.end())
             {
                 // set user selected language as the default for this extension
@@ -827,9 +843,8 @@ void CLexStyles::SetLangForPath(const std::wstring& path, const std::string& lan
                 m_autoextLang.erase(e);
         }
         // store the full path and the language
-        auto lpath = CStringUtils::to_lower(path);
-        m_pathsLang[lpath] = language;
-        m_pathsForLang.push_front(std::move(lpath));
+        m_pathsLang[path] = language;
+        m_pathsForLang.push_front(path);
         while (m_pathsForLang.size() > 100)
             m_pathsForLang.pop_back();
         SaveUserData();
