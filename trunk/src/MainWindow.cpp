@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -474,7 +474,7 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.hCursor = LoadCursor(NULL, (LPTSTR)IDC_SIZEWE);
     if (RegisterWindow(&wcx))
     {
-        if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_VISIBLE, nullptr))
+        if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, nullptr))
         {
             CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
             SetFileTreeWidth((int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200));
