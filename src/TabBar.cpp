@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -125,8 +125,8 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
         ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
     }
 
-    TabCtrl_SetMinTabWidth(*this, LPARAM(GetSystemMetrics(SM_CXSMICON) * m_dpiScale * 4.0));
-    m_closeButtonZone.SetDPIScale(m_dpiScale);
+    TabCtrl_SetMinTabWidth(*this, LPARAM(GetSystemMetrics(SM_CXSMICON) * m_dpiScaleX * 4.0));
+    m_closeButtonZone.SetDPIScale(m_dpiScaleX);
 
     DoOwnerDrawTab();
     return true;
@@ -338,8 +338,8 @@ HIMAGELIST CTabBar::SetImageList(HIMAGELIST himl)
 
 void CTabBar::DoOwnerDrawTab() const
 {
-    int padx = int(GetSystemMetrics(SM_CXSMICON) / 2 * m_dpiScale);
-    int pady = int(3.0 * m_dpiScale);
+    int padx = int(GetSystemMetrics(SM_CXSMICON) / 2 * m_dpiScaleX);
+    int pady = int(3.0 * m_dpiScaleY);
     TabCtrl_SetPadding(m_hwndArray[0], padx, pady);
     for (int i = 0; i < m_nControls; i++)
     {
@@ -987,7 +987,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct) const
         idCloseImg = bSelected ? IDR_CLOSETAB : IDR_CLOSETAB_INACT;
     HDC hdcMemory;
     hdcMemory = ::CreateCompatibleDC(pDrawItemStruct->hDC);
-    HBITMAP hBmp = (HBITMAP)::LoadImage(hResource, MAKEINTRESOURCE(idCloseImg), IMAGE_BITMAP, int(11 * m_dpiScale), int(11 * m_dpiScale), 0);
+    HBITMAP hBmp = (HBITMAP)::LoadImage(hResource, MAKEINTRESOURCE(idCloseImg), IMAGE_BITMAP, int(11 * m_dpiScaleX), int(11 * m_dpiScaleY), 0);
     BITMAP bmp;
     ::GetObject(hBmp, sizeof(bmp), &bmp);
     rItem.right = closeButtonRect.left;
