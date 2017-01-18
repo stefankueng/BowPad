@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2016 - Stefan Kueng
+// Copyright (C) 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -69,11 +69,10 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
     RECT rc;
     rc.left = 0; rc.right = 800; rc.top = 0; rc.bottom = 800;
 
-    LOGFONT lf = { 0 };
-    GetObject(GetStockObject(DEFAULT_GUI_FONT), sizeof(lf), &lf);
-    lf.lfWeight = FW_REGULAR;
-    lstrcpyn(lf.lfFaceName, L"Segoe UI", _countof(lf.lfFaceName));
-    m_hFont = CreateFontIndirect(&lf);
+    NONCLIENTMETRICS ncm;
+    ncm.cbSize = sizeof(NONCLIENTMETRICS);
+    SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
+    m_hFont = CreateFontIndirect(&ncm.lfStatusFont);
 
     auto oldfont = SelectObject(dc, m_hFont);
     DrawText(dc, textbuf.get(), (int)m_infoText.size(), &rc, DT_LEFT | DT_TOP | DT_CALCRECT | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);

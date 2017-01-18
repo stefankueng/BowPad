@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2016 - Stefan Kueng
+// Copyright (C) 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,7 +36,10 @@ bool CTabBtn::Init(HINSTANCE /*hInst*/, HWND hParent, HMENU id)
 
     if (m_hFont == nullptr)
     {
-        m_hFont = (HFONT)::GetStockObject(DEFAULT_GUI_FONT);
+        NONCLIENTMETRICS ncm;
+        ncm.cbSize = sizeof(NONCLIENTMETRICS);
+        SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
+        m_hFont = CreateFontIndirect(&ncm.lfMessageFont);
         ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
     }
 
