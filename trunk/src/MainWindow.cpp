@@ -3696,10 +3696,12 @@ void CMainWindow::SetTheme(bool dark)
     if (dark)
     {
         SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
+        SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
     }
     else
     {
         SetRibbonColorsHSB(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
+        SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
     }
     auto activeTabId = m_TabBar.GetCurrentTabId();
     if (activeTabId.IsValid())
