@@ -1206,8 +1206,6 @@ void CMainWindow::HandleCreate(HWND hwnd)
     m_hwnd = hwnd;
     Initialize();
 
-    PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
-
     if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
     {
         // in case we're running elevated, use a BowPad icon with a shield
@@ -1225,6 +1223,8 @@ void CMainWindow::HandleCreate(HWND hwnd)
             pTaskbarInterface->SetOverlayIcon(m_hwnd, m_hShieldIcon, L"elevated");
         }
     }
+
+    PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
 }
 
 void CMainWindow::HandleAfterInit()
