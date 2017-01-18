@@ -121,7 +121,10 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
 
     if (m_hFont == nullptr)
     {
-        m_hFont = (HFONT)::GetStockObject(DEFAULT_GUI_FONT);
+        NONCLIENTMETRICS ncm;
+        ncm.cbSize = sizeof(NONCLIENTMETRICS);
+        SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
+        m_hFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
         ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
     }
 
