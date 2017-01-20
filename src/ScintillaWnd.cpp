@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -825,7 +825,7 @@ void CScintillaWnd::SetupDefaultStyles()
         Call(SCI_SETCARETLINEBACK, theme.GetThemeColor(RGB(0, 0, 0)));
         Call(SCI_SETCARETLINEBACKALPHA, 15);
     }
-    Call(SCI_SETWHITESPACEFORE, true, theme.GetThemeColor(RGB(255, 181, 106)));
+    Call(SCI_SETWHITESPACEFORE, true, theme.IsDarkTheme() ? RGB(20, 72, 82) : RGB(43, 145, 175));
     
     Call(SCI_COLOURISE, 0, -1);
     Call(SCI_SETCODEPAGE, CP_UTF8);
