@@ -2186,13 +2186,15 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
         (scn.position > selEnd) || (scn.position < selStart))
     {
         int len = (int)m_editor.Call(SCI_GETWORDCHARS); // Does not zero terminate.
-        auto wordcharsbuffer = std::make_unique<char[]>(len + 1);
+        auto wordcharsbuffer = std::make_unique<unsigned char[]>(len + 1);
         m_editor.Call(SCI_GETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get());
         wordcharsbuffer[len] = '\0';
         OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get()));
 
         m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#");
-        sWord = m_editor.GetTextRange(static_cast<long>(m_editor.Call(SCI_WORDSTARTPOSITION, scn.position, false)), static_cast<long>(m_editor.Call(SCI_WORDENDPOSITION, scn.position, false)));
+        selStart = m_editor.Call(SCI_WORDSTARTPOSITION, scn.position, false);
+        selEnd = m_editor.Call(SCI_WORDENDPOSITION, scn.position, false);
+        sWord = m_editor.GetTextRange(static_cast<long>(selStart), static_cast<long>(selEnd));
     }
     if (sWord.empty())
         return;
@@ -2235,15 +2237,26 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
     // See if the data looks like a pattern matching RGB(r,g,b) where each element
     // can be decimal, hex with leading 0x, or octal with leading 0, like C/C++.
     auto wword = CUnicodeUtils::StdGetUnicode(sWord);
-    const wchar_t rgb[] = { L"RGB(" };
+    const wchar_t rgb[] = { L"RGB" };
     const size_t rgblen = wcslen(rgb);
-    int r, g, b;
-    if (_wcsnicmp(wword.c_str(), rgb, rgblen) == 0 && wword[wword.length() - 1] == L')')
+    if (_wcsnicmp(wword.c_str(), rgb, rgblen) == 0)
     {
+        // get the word up to the closing bracket
+        int maxlength = 20;
+        while (((char)m_editor.Call(SCI_GETCHARAT, ++selEnd) != ')') && --maxlength)
+        {
+        }
+        if (maxlength == 0)
+            return;
+        sWord = m_editor.GetTextRange(static_cast<long>(selStart), static_cast<long>(selEnd));
+        wword = CUnicodeUtils::StdGetUnicode(sWord);
+
         // Grab the data the between brackets that follows the word RGB,
         // if there looks to be 3 elements to it, try to parse each r,g,b element
         // as a number in decimal, hex or octal.
-        wword = wword.substr(rgblen, (wword.length() - rgblen) - 1);
+        wword = wword.substr(rgblen, (wword.length() - rgblen));
+        CStringUtils::TrimLeadingAndTrailing(wword, std::wstring(L"()"));
+        int r, g, b;
         std::vector<std::wstring> vec;
         stringtok(vec, wword, true, L",");
         if (vec.size() == 3 &&
