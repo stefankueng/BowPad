@@ -392,7 +392,7 @@ BOOL COOLSB_API CoolSB_GetScrollRange (HWND hwnd, int nBar, LPINT lpMinPos, LPIN
     return TRUE;
 }
 
-int COOLSB_API CoolSB_SetScrollInfo (HWND hwnd, int fnBar, LPSCROLLINFO lpsi, BOOL fRedraw)
+int COOLSB_API CoolSB_SetScrollInfo (HWND hwnd, int fnBar, LPCSCROLLINFO lpsi, BOOL fRedraw)
 {
     SCROLLINFO *mysi;
     SCROLLBAR *sbar;

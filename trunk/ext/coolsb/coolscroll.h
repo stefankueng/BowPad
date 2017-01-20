@@ -142,7 +142,7 @@ int  COOLSB_API CoolSB_GetScrollPos (HWND hwnd, int nBar);
 BOOL COOLSB_API CoolSB_GetScrollRange   (HWND hwnd, int nBar, LPINT lpMinPos, LPINT lpMaxPos);
 
 //
-int  COOLSB_API CoolSB_SetScrollInfo    (HWND hwnd, int fnBar, LPSCROLLINFO lpsi, BOOL fRedraw);
+int  COOLSB_API CoolSB_SetScrollInfo    (HWND hwnd, int fnBar, LPCSCROLLINFO lpsi, BOOL fRedraw);
 int  COOLSB_API CoolSB_SetScrollPos (HWND hwnd, int nBar, int nPos, BOOL fRedraw);
 int  COOLSB_API CoolSB_SetScrollRange   (HWND hwnd, int nBar, int nMinPos, int nMaxPos, BOOL fRedraw);
 BOOL COOLSB_API CoolSB_ShowScrollBar    (HWND hwnd, int wBar, BOOL fShow);
