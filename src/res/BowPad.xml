@@ -1191,10 +1191,21 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       <Ribbon.QuickAccessToolbar>
         <QuickAccessToolbar CommandName="cmdQat">
           <QuickAccessToolbar.ApplicationDefaults>
-            <Button CommandName="cmdSave" ApplicationDefaults.IsChecked="true"/>
-            <Button CommandName="cmdClose" ApplicationDefaults.IsChecked="true"/>
             <Button CommandName="cmdOpen" ApplicationDefaults.IsChecked="true"/>
-            <Button CommandName="cmdNew" ApplicationDefaults.IsChecked="true"/>
+            <Button CommandName="cmdSave" ApplicationDefaults.IsChecked="true"/>
+            <Button CommandName="cmdClose" ApplicationDefaults.IsChecked="false"/>
+            <Button CommandName="cmdNew" ApplicationDefaults.IsChecked="false"/>
+            <DropDownGallery CommandName="cmdTabList" Type="Items" ItemHeight="16" ItemWidth="16" ApplicationDefaults.IsChecked="true">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout Gripper="None"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <Button CommandName="cmdFindReplace" ApplicationDefaults.IsChecked="false"/>
+            <DropDownGallery CommandName="cmdCodeStyle" ApplicationDefaults.IsChecked="false" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="4"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
           </QuickAccessToolbar.ApplicationDefaults>
         </QuickAccessToolbar>
       </Ribbon.QuickAccessToolbar>
