@@ -378,8 +378,8 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 delete pData;
                 pData = nullptr;
             }
-            MarkActiveDocument();
         }
+        MarkActiveDocument();
         break;
         default:
             break;
