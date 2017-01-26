@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ const int WM_INITPLUGINS = (WM_APP + 10);
 
 CPluginsConfigDlg::CPluginsConfigDlg(void * obj)
     : ICommand(obj)
+    , m_threadEnded(false)
 {}
 
 CPluginsConfigDlg::~CPluginsConfigDlg()
@@ -57,6 +58,8 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
             m_resizer.AddControl(hwndDlg, IDC_INFO, RESIZER_BOTTOMLEFTRIGHT);
             m_resizer.AddControl(hwndDlg, IDOK, RESIZER_BOTTOMRIGHT);
 
+            SetWindowTheme(GetDlgItem(*this, IDC_PLUGINSLIST), L"Explorer", nullptr);
+
             HWND hThisWnd = *this;
             std::thread([hThisWnd]
             {
@@ -64,10 +67,9 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
                 std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
                 filedownloader.DownloadFile(L"https://svn.code.sf.net/p/bowpad-sk/code/trunk/plugins/plugins.txt", tempfile);
 
-                //CopyFile(L"D:\\Development\\BowPad\\BowPad\\plugins\\plugins.txt", tempfile.c_str(), FALSE);
                 // parse the file and fill in the m_plugins set
                 auto plugins = std::make_unique<std::map<std::wstring, PluginInfo>>();
-
+                Sleep(5000);
                 std::wifstream fin(tempfile);
                 fin.imbue(std::locale(fin.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
                 if (fin.is_open())
@@ -108,7 +110,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
             for (const auto& plugin : *plugins)
                 m_plugins.push_back(plugin.second);
             InitPluginsList();
-
+            m_threadEnded = true;
             break;
         }
         case WM_SIZE:
@@ -245,9 +247,20 @@ LRESULT CPluginsConfigDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
             PluginInfo info = m_plugins[lpNMItemActivate->iItem];
             SetDlgItemText(*this, IDC_DESC, info.description.c_str());
         }
-            break;
+        break;
+        case LVN_GETEMPTYMARKUP:
+        {
+            NMLVEMPTYMARKUP * lpNMEmptyMarkup = (NMLVEMPTYMARKUP *)lpNMItemActivate;
+            lpNMEmptyMarkup->dwFlags = EMF_CENTERED;
+            ResString rThreadIsRunning(hRes, IDS_FETCHING_PLUGINS_LIST);
+            ResString rEmpty(hRes, IDS_NO_PLUGINS_AVAILABLE);
+            wcscpy_s(lpNMEmptyMarkup->szMarkup, m_threadEnded ? rEmpty : rThreadIsRunning);
+            lpNMEmptyMarkup->szMarkup;
+            return TRUE;
+        }
+        break;
         default:
-            break;
+        break;
     }
     return 0;
 
