@@ -785,6 +785,10 @@ msgstr ""
 msgid "Fetch remote languages..."
 msgstr ""
 
+#. Resource IDs: (247)
+msgid "Fetching plugins list - please wait..."
+msgstr ""
+
 #. Resource IDs: (152, 60007)
 msgid "File"
 msgstr ""
@@ -1323,6 +1327,10 @@ msgstr ""
 
 #. Resource IDs: (234)
 msgid "No more occurances to replace."
+msgstr ""
+
+#. Resource IDs: (248)
+msgid "No plugins found. Check your internet connection."
 msgstr ""
 
 #. Resource IDs: (188)
