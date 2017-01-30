@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -177,10 +177,18 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
         nCmdShow = SW_RESTORE;
     else
         nCmdShow = SW_SHOW;
-
-    ::ShowWindow(hBowPadWnd, nCmdShow);
-
-    ::SetForegroundWindow(hBowPadWnd);
+    // if the window is not yet visible, we wait a little bit
+    // and we don't make the window visible here: the message we send
+    // to open the file might get handled before the RegisterAndCreateWindow
+    // in MainWindow.cpp hasn't finished yet. Just let that function make
+    // the window visible in the right position.
+    if (IsWindowVisible(hBowPadWnd))
+    {
+        ::ShowWindow(hBowPadWnd, nCmdShow);
+        ::SetForegroundWindow(hBowPadWnd);
+    }
+    else
+        Sleep(500);
 
     size_t cmdLineLen = wcslen(lpCmdLine);
     if (cmdLineLen)
@@ -265,7 +273,7 @@ static HWND FindAndWaitForBowPad()
     HWND hBowPadWnd = ::FindWindow(clsName.c_str(), NULL);
     // if we don't have a window yet, wait a little while
     // to give the other process time to create the window
-    for (int i = 0; !hBowPadWnd && i < 5; i++)
+    for (int i = 0; !hBowPadWnd && i < 20; i++)
     {
         Sleep(100);
         hBowPadWnd = ::FindWindow(clsName.c_str(), NULL);
