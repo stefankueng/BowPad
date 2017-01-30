@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-21 18:17+0100\n"
-"PO-Revision-Date: 2017-01-21 18:18+0100\n"
+"POT-Creation-Date: 2017-01-30 19:49+0100\n"
+"PO-Revision-Date: 2017-01-30 19:49+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -896,6 +896,10 @@ msgstr ""
 msgid "Fetch remote languages..."
 msgstr "Hole Sprachliste von Server..."
 
+#. Resource IDs: (247)
+msgid "Fetching plugins list - please wait..."
+msgstr "Lade Liste der Plugins - bitte warten..."
+
 #. Resource IDs: (152, 60007)
 msgid "File"
 msgstr "Datei"
@@ -1477,6 +1481,10 @@ msgstr "Keine Funktionen gefunden"
 #. Resource IDs: (234)
 msgid "No more occurances to replace."
 msgstr "Nichts mehr zu ersetzen"
+
+#. Resource IDs: (248)
+msgid "No plugins found. Check your internet connection."
+msgstr "Keine Plugins gefunden. Überprüfen Sie Ihre Internet-Verbindung."
 
 #. Resource IDs: (188)
 msgid "No plugins loaded"
