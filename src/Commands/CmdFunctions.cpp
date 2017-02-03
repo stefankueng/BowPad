@@ -393,6 +393,9 @@ HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     if (!docId.IsValid())
         return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
 
+#ifdef _DEBUG
+    ProfileTimer profileTimer(L"FunctionParse");
+#endif
     auto funcProcessingStartTime = std::chrono::steady_clock::now();
     auto functions = FindFunctionsNow();
     if (m_autoscanTimed)
