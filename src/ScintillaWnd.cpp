@@ -378,6 +378,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
             switch (LOWORD(wParam))
             {
                 case SB_THUMBPOSITION:
+                case SB_ENDSCROLL:
                 m_ScrollTool.Clear();
                 break;
                 case SB_THUMBTRACK:
