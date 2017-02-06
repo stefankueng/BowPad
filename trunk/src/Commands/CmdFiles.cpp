@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -316,6 +316,8 @@ bool CCmdFileDelete::Execute()
             {
                 if (nClickedBtn == 100)
                 {
+                    // copy the path, doc and doc.m_path will be invalid after closing the tab
+                    auto path = doc.m_path;
                     // Close the tab
                     if (!CloseTab(GetTabIndexFromDocID(GetDocIdOfCurrentTab()), false))
                         return false;
@@ -335,7 +337,7 @@ bool CCmdFileDelete::Execute()
                         {
                             // Create IShellItem instance associated to file to delete
                             IShellItemPtr psiFileToDelete = NULL;
-                            hr = SHCreateItemFromParsingName(doc.m_path.c_str(), nullptr, IID_PPV_ARGS(&psiFileToDelete));
+                            hr = SHCreateItemFromParsingName(path.c_str(), nullptr, IID_PPV_ARGS(&psiFileToDelete));
 
                             if (!CAppUtils::FailedShowMessage(hr))
                             {
