@@ -3324,9 +3324,10 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
 
     docreload.m_position = doc.m_position;
     docreload.m_bIsWriteProtected = doc.m_bIsWriteProtected;
+    auto lang = doc.GetLanguage();
     doc = docreload;
-    editor->SetupLexerForLang(doc.GetLanguage());
-    docreload.SetLanguage(doc.GetLanguage());
+    editor->SetupLexerForLang(lang);
+    doc.SetLanguage(lang);
     editor->RestoreCurrentPos(docreload.m_position);
     editor->Call(SCI_SETREADONLY, docreload.m_bIsWriteProtected);
     if (bReloadCurrentTab)
