@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,9 +25,6 @@ public:
 
     CCmdLineWrap(void * obj) : ICommand(obj)
     {
-        int wrapmode = (int)CIniSettings::Instance().GetInt64(L"View", L"wrapmode", 0);
-        ScintillaCall(SCI_SETWRAPMODE, wrapmode);
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
     ~CCmdLineWrap()
@@ -40,6 +37,13 @@ public:
         CIniSettings::Instance().SetInt64(L"View", L"wrapmode", ScintillaCall(SCI_GETWRAPMODE));
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         return true;
+    }
+
+    void AfterInit() override
+    {
+        int wrapmode = (int)CIniSettings::Instance().GetInt64(L"View", L"wrapmode", 0);
+        ScintillaCall(SCI_SETWRAPMODE, wrapmode);
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
     UINT GetCmdId() override { return cmdLineWrap; }
