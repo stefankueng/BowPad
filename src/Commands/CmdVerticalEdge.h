@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,16 +25,19 @@ public:
 
     CCmdVerticalEdge(void * obj) : ICommand(obj)
     {
-        int ve = (int)CIniSettings::Instance().GetInt64(L"View", L"verticaledge", 0);
-        ScintillaCall(SCI_SETEDGECOLUMN, ve);
-        ScintillaCall(SCI_SETEDGEMODE, ve ? EDGE_LINE : EDGE_NONE);
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
     }
 
     ~CCmdVerticalEdge()
     {
     }
 
+    void AfterInit() override
+    {
+        int ve = (int)CIniSettings::Instance().GetInt64(L"View", L"verticaledge", 0);
+        ScintillaCall(SCI_SETEDGECOLUMN, ve);
+        ScintillaCall(SCI_SETEDGEMODE, ve ? EDGE_LINE : EDGE_NONE);
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
+    }
     bool Execute() override { return true; }
 
     UINT GetCmdId() override { return cmdVerticalEdge; }
