@@ -330,7 +330,7 @@ CCmdFunctions::CCmdFunctions(void* obj)
     // performance a little to inquire them here.
     static constexpr wchar_t functionsSection[] = { L"functions" };
     m_autoscan = CIniSettings::Instance().GetInt64(functionsSection, L"autoscan", 1) != 0;
-    m_autoscanlimit = (long)CIniSettings::Instance().GetInt64(functionsSection, L"autoscanlimit", -1);
+    m_autoscanlimit = (long)CIniSettings::Instance().GetInt64(functionsSection, L"autoscanlimit", 102400); // default to 100kb limit for autoscan
     if (!m_autoscanlimit)
         m_autoscan = false;
     m_autoscanTimed = CIniSettings::Instance().GetInt64(functionsSection, L"autoscantimed", 0) != 0;

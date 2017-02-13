@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,9 +21,6 @@
 
 CCmdWhiteSpace::CCmdWhiteSpace(void * obj) : ICommand(obj)
 {
-    int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"whitespace", 0);
-    ScintillaCall(SCI_SETVIEWWS, ws);
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 CCmdWhiteSpace::~CCmdWhiteSpace()
@@ -41,6 +38,13 @@ bool CCmdWhiteSpace::Execute()
         ScintillaCall(SCI_SETVIEWEOL, true);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
+}
+
+void CCmdWhiteSpace::AfterInit()
+{
+    int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"whitespace", 0);
+    ScintillaCall(SCI_SETVIEWWS, ws);
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 HRESULT CCmdWhiteSpace::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
