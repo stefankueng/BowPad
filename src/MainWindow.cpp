@@ -476,8 +476,8 @@ bool CMainWindow::RegisterAndCreateWindow()
     {
         if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, nullptr))
         {
-            CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
             SetFileTreeWidth((int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200));
+            CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
             return true;
         }
     }
@@ -1680,6 +1680,8 @@ bool CMainWindow::CloseAllTabs(bool quitting)
             m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(0)).m_path.empty())
             return false;
     }
+    if (quitting)
+        m_fileTree.BlockRefresh(true); // when we're quitting, don't let the file tree do a refresh
 
     return m_TabBar.GetItemCount() == 0;
 }
