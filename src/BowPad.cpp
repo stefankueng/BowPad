@@ -278,6 +278,11 @@ static HWND FindAndWaitForBowPad()
         Sleep(100);
         hBowPadWnd = ::FindWindow(clsName.c_str(), NULL);
     }
+    // also wait for the window to become visible first
+    for (int i = 0; !IsWindowVisible(hBowPadWnd) && i < 20; i++)
+    {
+        Sleep(100);
+    }
     return hBowPadWnd;
 }
 
