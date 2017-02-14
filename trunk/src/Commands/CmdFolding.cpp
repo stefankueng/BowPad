@@ -86,8 +86,13 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
 
 CCmdFoldAll::CCmdFoldAll(void * obj) : ICommand(obj)
 {
+}
+
+void CCmdFoldAll::AfterInit()
+{
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
+
 
 bool CCmdFoldAll::Execute()
 {
@@ -117,6 +122,10 @@ bool CCmdFoldLevel::Execute()
 
 CCmdInitFoldingMargin::CCmdInitFoldingMargin(void* obj) : ICommand(obj)
 {
+}
+
+void CCmdInitFoldingMargin::AfterInit()
+{
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
@@ -145,6 +154,10 @@ bool CCmdInitFoldingMargin::Execute()
 
 CCmdFoldingOn::CCmdFoldingOn(void* obj) : ICommand(obj)
 {
+}
+
+void CCmdFoldingOn::AfterInit()
+{
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
@@ -160,6 +173,10 @@ bool CCmdFoldingOn::Execute()
 }
 
 CCmdFoldingOff::CCmdFoldingOff(void* obj) : ICommand(obj)
+{
+}
+
+void CCmdFoldingOff::AfterInit()
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }

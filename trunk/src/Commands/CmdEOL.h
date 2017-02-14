@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ public:
     CCmdEOLWin(void* obj);
     UINT GetCmdId() override { return cmdEOLWin; }
     int GetLineType() const override { return SC_EOL_CRLF; }
+    void AfterInit() override;
 };
 
 class CCmdEOLUnix : public CCmdEOLBase
@@ -45,6 +46,7 @@ public:
     CCmdEOLUnix(void* obj);
     UINT GetCmdId() override { return cmdEOLUnix; }
     int GetLineType() const override { return SC_EOL_LF; }
+    void AfterInit() override;
 };
 
 class CCmdEOLMac : public CCmdEOLBase
@@ -53,4 +55,5 @@ public:
     CCmdEOLMac(void* obj);
     UINT GetCmdId() override { return cmdEOLMac; }
     int GetLineType() const override { return SC_EOL_CR; }
+    void AfterInit() override;
 };

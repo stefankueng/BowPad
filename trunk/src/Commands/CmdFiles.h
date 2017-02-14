@@ -40,13 +40,16 @@ class CCmdSave : public ICommand
 public:
     CCmdSave(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
     ~CCmdSave() = default;
 
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdSave; }
+    void AfterInit() override
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
+    }
 
     void ScintillaNotify(SCNotification * pScn) override;
     void TabNotify(TBHDR * ptbhdr) override;
@@ -60,13 +63,16 @@ class CCmdSaveAll : public ICommand
 public:
     CCmdSaveAll(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
     ~CCmdSaveAll() = default;
 
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdSaveAll; }
+    void AfterInit() override
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
+    }
 
     void ScintillaNotify(SCNotification * pScn) override;
     void TabNotify(TBHDR * ptbhdr) override;

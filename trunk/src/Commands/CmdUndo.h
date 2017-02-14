@@ -25,7 +25,6 @@ public:
 
     CCmdUndo(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
     ~CCmdUndo() = default;
@@ -37,6 +36,10 @@ public:
     }
 
     UINT GetCmdId() override { return cmdUndo; }
+    void AfterInit() override
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+    }
 
     void ScintillaNotify(SCNotification * pScn) override
     {
@@ -62,7 +65,6 @@ public:
 
     CCmdRedo(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
     }
 
     ~CCmdRedo() = default;
@@ -74,6 +76,10 @@ public:
     }
 
     UINT GetCmdId() override { return cmdRedo; }
+    void AfterInit() override
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+    }
 
     void ScintillaNotify(SCNotification * pScn) override
     {
