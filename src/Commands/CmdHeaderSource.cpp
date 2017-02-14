@@ -197,7 +197,11 @@ CCmdHeaderSource::CCmdHeaderSource(void* obj)
     : ICommand(obj)
     , m_bSearchedIncludePaths(false)
 {
-        // Because we don't know if this file type supports includes.
+}
+
+void CCmdHeaderSource::AfterInit()
+{
+    // Because we don't know if this file type supports includes.
     InvalidateMenu();
 }
 

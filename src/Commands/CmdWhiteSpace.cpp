@@ -54,6 +54,10 @@ HRESULT CCmdWhiteSpace::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, cons
 
 CCmdTabSize::CCmdTabSize(void * obj) : ICommand(obj)
 {
+}
+
+void CCmdTabSize::AfterInit()
+{
     int ve = (int)CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4);
     ScintillaCall(SCI_SETTABWIDTH, ve);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
@@ -110,9 +114,6 @@ HRESULT CCmdTabSize::IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const P
 
 CCmdUseTabs::CCmdUseTabs(void * obj) : ICommand(obj)
 {
-    int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1);
-    ScintillaCall(SCI_SETUSETABS, ws);
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 bool CCmdUseTabs::Execute()
@@ -122,6 +123,13 @@ bool CCmdUseTabs::Execute()
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     UpdateStatusBar(false);
     return true;
+}
+
+void CCmdUseTabs::AfterInit()
+{
+    int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1);
+    ScintillaCall(SCI_SETUSETABS, ws);
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 HRESULT CCmdUseTabs::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)

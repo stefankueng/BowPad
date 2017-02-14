@@ -25,7 +25,6 @@ public:
 
     CCmdConvertUppercase(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
     ~CCmdConvertUppercase() = default;
@@ -33,6 +32,10 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdUppercase; }
+    void AfterInit() override
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    }
 };
 
 class CCmdConvertLowercase : public ICommand
@@ -41,7 +44,6 @@ public:
 
     CCmdConvertLowercase(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
     ~CCmdConvertLowercase() = default;
@@ -49,6 +51,10 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdLowercase; }
+    void AfterInit() override
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    }
 };
 
 class CCmdConvertTitlecase : public ICommand
@@ -57,7 +63,6 @@ public:
 
     CCmdConvertTitlecase(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
     ~CCmdConvertTitlecase() = default;
@@ -65,4 +70,8 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdTitlecase; }
+    void AfterInit() override
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    }
 };

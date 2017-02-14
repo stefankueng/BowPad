@@ -95,7 +95,6 @@ public:
 
     CCmdBookmarkNext(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
     ~CCmdBookmarkNext() = default;
@@ -104,6 +103,10 @@ public:
 
     UINT GetCmdId() override { return cmdBookmarkNext; }
 
+    void AfterInit() override
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
+    }
     void ScintillaNotify(SCNotification * pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(
@@ -116,7 +119,6 @@ public:
 
     CCmdBookmarkPrev(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
     ~CCmdBookmarkPrev() = default;
@@ -124,6 +126,10 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdBookmarkPrev; }
+    void AfterInit() override
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
+    }
 
     void ScintillaNotify(SCNotification * pScn) override;
 

@@ -135,6 +135,7 @@ public:
 
     bool Execute() override { return Launch(CIniSettings::Instance().GetString(L"CustomLaunch", m_settingsID.c_str(), L"")); }
     UINT GetCmdId() override { return m_customCmdId; }
+    void AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 

@@ -47,6 +47,7 @@ public:
     bool Execute() override { return true; }
 
     UINT GetCmdId() override { return cmdTabSize; }
+    void AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
@@ -64,6 +65,7 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdUseTabs; }
+    void AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };

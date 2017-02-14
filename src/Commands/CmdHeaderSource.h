@@ -58,6 +58,7 @@ public:
     // Overrides
     bool Execute() override;
     UINT GetCmdId() override { return cmdHeaderSource; }
+    void AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 

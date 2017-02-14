@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,15 +55,27 @@ HRESULT CCmdEOLBase::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
 
 CCmdEOLWin::CCmdEOLWin(void* obj) : CCmdEOLBase(obj)
 {
+}
+
+void CCmdEOLWin::AfterInit()
+{
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 CCmdEOLUnix::CCmdEOLUnix(void* obj) : CCmdEOLBase(obj)
 {
+}
+
+void CCmdEOLUnix::AfterInit()
+{
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 CCmdEOLMac::CCmdEOLMac(void* obj) : CCmdEOLBase(obj)
+{
+}
+
+void CCmdEOLMac::AfterInit()
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
