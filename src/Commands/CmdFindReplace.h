@@ -73,19 +73,19 @@ class CFindReplaceDlg : public CDialog, public ICommand
 public:
     CFindReplaceDlg(void* obj);
 
-    void FindText();
-    void FindFunction(const std::wstring& functionToFind);
-    void FindFile(const std::wstring& fileToFind);
+    void                    FindText();
+    void                    FindFunction(const std::wstring& functionToFind);
+    void                    FindFile(const std::wstring& fileToFind);
 
-    void SetSearchFolder(const std::wstring& folder);
-    void NotifyOnDocumentClose(DocID id);
-    void NotifyOnDocumentSave(DocID id, bool saveAs);
+    void                    SetSearchFolder(const std::wstring& folder);
+    void                    NotifyOnDocumentClose(DocID id);
+    void                    NotifyOnDocumentSave(DocID id, bool saveAs);
 
 protected: // override
-    bool Execute() override { return true; }
-    UINT GetCmdId() override { return 0; }
-    void OnClose() override;
-    LRESULT CALLBACK  DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    bool                    Execute() override { return true; }
+    UINT                    GetCmdId() override { return 0; }
+    void                    OnClose() override;
+    LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     
     enum class AlertMode { None, Flash };
 
@@ -98,19 +98,16 @@ protected:
     void                    DoFindPrevious();
     void                    DoReplace(int id);
 
-    void SearchDocument(
-        CScintillaWnd& searchWnd, DocID docID, const CDocument& doc,
-        const std::string& searchfor, int searchflags, unsigned int exSearchFlags,
-        SearchResults& searchResults,
-        SearchPaths& foundPaths);
+    void                    SearchDocument(CScintillaWnd& searchWnd, DocID docID, const CDocument& doc,
+                                           const std::string& searchfor, int searchflags, unsigned int exSearchFlags,
+                                           SearchResults& searchResults,
+                                           SearchPaths& foundPaths);
 
-   int ReplaceDocument(
-        CDocument& doc, const std::string& sFindstring,
-        const std::string& sReplaceString, int searchflags);
+   int                      ReplaceDocument(CDocument& doc, const std::string& sFindstring,
+                                            const std::string& sReplaceString, int searchflags);
 
-   void SearchThread(
-        int id, const std::wstring& searchpath, const std::string& searchfor,
-        int flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind);
+   void                     SearchThread(int id, const std::wstring& searchpath, const std::string& searchfor,
+                                         int flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind);
 
     void                    SortResults();
     void                    CheckRegex();
@@ -123,9 +120,7 @@ protected:
     LRESULT                 GetListItemDispInfo(NMLVDISPINFO* pDispInfo);
     void                    HandleButtonDropDown(const NMBCDROPDOWN* pDropDown);
 
-    bool IsMatchingFile(
-        const std::wstring& path,
-        const std::vector<std::wstring>& filesToFind) const;
+    bool                    IsMatchingFile(const std::wstring& path, const std::vector<std::wstring>& filesToFind) const;
 
     bool                    IsExcludedFile(const std::wstring& path) const;
     bool                    IsExcludedFolder(const std::wstring& path) const;
@@ -140,79 +135,69 @@ protected:
     int                     GetDefaultButton() const;
     void                    Clear(int id);
 
-    void LoadSearchStrings();
-    void SaveSearchStrings();
-    void UpdateSearchStrings(const std::wstring& item);
+    void                    LoadSearchStrings();
+    void                    SaveSearchStrings();
+    void                    UpdateSearchStrings(const std::wstring& item);
 
-    void LoadReplaceStrings();
-    void SaveReplaceStrings();
-    void UpdateReplaceStrings(const std::wstring& item);
+    void                    LoadReplaceStrings();
+    void                    SaveReplaceStrings();
+    void                    UpdateReplaceStrings(const std::wstring& item);
 
-    void LoadSearchFolderStrings();
-    void SaveSearchFolderStrings();
-    void UpdateSearchFolderStrings(const std::wstring& target);
+    void                    LoadSearchFolderStrings();
+    void                    SaveSearchFolderStrings();
+    void                    UpdateSearchFolderStrings(const std::wstring& target);
 
-    void LoadSearchFileStrings();
-    void SaveSearchFileStrings();
-    void UpdateSearchFilesStrings(const std::wstring& target);
+    void                    LoadSearchFileStrings();
+    void                    SaveSearchFileStrings();
+    void                    UpdateSearchFilesStrings(const std::wstring& target);
 
-    int LoadData(
-        std::vector<std::wstring>& data, int defaultMaxCount,
-        const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt) const;
+    int                     LoadData(std::vector<std::wstring>& data, int defaultMaxCount,
+                                     const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt) const;
 
-    void SaveData(
-        const std::vector<std::wstring>& data,
-        const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt);
+    void                    SaveData(const std::vector<std::wstring>& data,
+                                     const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt);
 
-    void SaveCombo(
-        int combo_id,
-        std::vector<std::wstring>& data) const;
+    void                    SaveCombo(int combo_id,
+                                      std::vector<std::wstring>& data) const;
 
-    void LoadCombo(
-        int combo_id,
-        const std::vector<std::wstring>& data);
+    void                    LoadCombo(int combo_id,
+                                      const std::vector<std::wstring>& data);
 
-    void UpdateCombo(
-        int comboId,
-        const std::wstring& item,
-        int maxCount);
+    void                    UpdateCombo(int comboId,
+                                        const std::wstring& item,
+                                        int maxCount);
 
-    std::wstring OfferFileSuggestion(
-        const std::wstring& searchFolder,
-        bool searchSubFolders,
-        const std::wstring& currentValue) const;
+    std::wstring            OfferFileSuggestion(const std::wstring& searchFolder,
+                                                bool searchSubFolders,
+                                                const std::wstring& currentValue) const;
 
-    int GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount) const;
+    int                     GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount) const;
 
-    void AcceptData();
-    void NewData(
-        std::chrono::steady_clock::time_point& timeOfLastDataUpdate, bool finished);
-    void UpdateMatchCount(bool finished = true);
-    void DoListItemAction(int itemIndex);
-    void DoInitDialog(HWND hwndDlg);
-    void DoClose();
-    void InitSizing();
-    void OnSearchResultsReady(bool finished);
-    void FocusOnFirstListItem(bool keepAnyExistingSelection = false);
-    int GetScintillaOptions() const;
-    void CheckSearchOptions();
-    void CheckSearchFolder();
-    void SaveSettings();
-    void SelectItem(int item);
-    void OnListItemChanged(LPNMLISTVIEW pListView);
-    void LetUserSelectSearchFolder();
+    void                    AcceptData();
+    void                    NewData(std::chrono::steady_clock::time_point& timeOfLastDataUpdate, bool finished);
+    void                    UpdateMatchCount(bool finished = true);
+    void                    DoListItemAction(int itemIndex);
+    void                    DoInitDialog(HWND hwndDlg);
+    void                    DoClose();
+    void                    InitSizing();
+    void                    OnSearchResultsReady(bool finished);
+    void                    FocusOnFirstListItem(bool keepAnyExistingSelection = false);
+    int                     GetScintillaOptions() const;
+    void                    CheckSearchOptions();
+    void                    CheckSearchFolder();
+    void                    SaveSettings();
+    void                    SelectItem(int item);
+    void                    OnListItemChanged(LPNMLISTVIEW pListView);
+    void                    LetUserSelectSearchFolder();
 
-    bool EnableComboBoxDeleteEvents(int combo_id, bool enable);
-    bool EnableListEndTracking(int list_id, bool enable);
-    static LRESULT CALLBACK ComboBoxListSubClassProc(
-        HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-        UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-    static LRESULT CALLBACK ListViewSubClassProc(
-        HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-        UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-    static LRESULT CALLBACK EditSubClassProc(
-        HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-        UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+    bool                    EnableComboBoxDeleteEvents(int combo_id, bool enable);
+    bool                    EnableListEndTracking(int list_id, bool enable);
+    static LRESULT CALLBACK ComboBoxListSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+                                                     UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+    static LRESULT CALLBACK ListViewSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+                                                 UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+    static LRESULT CALLBACK EditSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+                                             UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
     static std::string      UnEscape(const std::string& str);
     static bool             ReadBase(const char* str, size_t* value, size_t base, size_t size);
