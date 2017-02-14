@@ -718,7 +718,7 @@ void CScintillaWnd::SetupDefaultStyles()
 
     bool bBold = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
     bool bItalic = !!CIniSettings::Instance().GetInt64(L"View", L"FontItalic", false);
-    int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 10);
+    int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11);
 
     Call(SCI_STYLESETBOLD, STYLE_DEFAULT, bBold);
     Call(SCI_STYLESETITALIC, STYLE_DEFAULT, bItalic);
