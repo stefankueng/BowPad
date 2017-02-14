@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2015-2016 - Stefan Kueng
+// Copyright (C) 2015-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -365,10 +365,6 @@ CCmdSpellcheckLang::CCmdSpellcheckLang(void * obj)
 {
 }
 
-CCmdSpellcheckLang::~CCmdSpellcheckLang()
-{
-}
-
 HRESULT CCmdSpellcheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
 {
     HRESULT hr = E_FAIL;
@@ -480,11 +476,6 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, cons
 
 CCmdSpellcheckCorrect::CCmdSpellcheckCorrect(void * obj)
     : ICommand(obj)
-{
-
-}
-
-CCmdSpellcheckCorrect::~CCmdSpellcheckCorrect()
 {
 
 }

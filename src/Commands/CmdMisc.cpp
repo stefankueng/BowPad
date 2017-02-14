@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,10 +31,6 @@ CCmdToggleTheme::CCmdToggleTheme(void * obj)
         CTheme::Instance().SetDarkTheme(dark != 0);
     }
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-}
-
-CCmdToggleTheme::~CCmdToggleTheme()
-{
 }
 
 bool CCmdToggleTheme::Execute()
@@ -98,10 +94,6 @@ CCmdAutoBraces::CCmdAutoBraces(void * obj) : ICommand(obj)
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-CCmdAutoBraces::~CCmdAutoBraces()
-{
-}
-
 bool CCmdAutoBraces::Execute()
 {
     CIniSettings::Instance().SetInt64(L"View", L"autobrace", CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1) ? 0 : 1);
@@ -121,10 +113,6 @@ HRESULT CCmdAutoBraces::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, cons
 CCmdViewFileTree::CCmdViewFileTree(void * obj) : ICommand(obj)
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-}
-
-CCmdViewFileTree::~CCmdViewFileTree()
-{
 }
 
 bool CCmdViewFileTree::Execute()
@@ -150,10 +138,6 @@ CCmdWriteProtect::CCmdWriteProtect(void * obj)
     : ICommand(obj)
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
-}
-
-CCmdWriteProtect::~CCmdWriteProtect(void)
-{
 }
 
 bool CCmdWriteProtect::Execute()

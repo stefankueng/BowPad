@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2015-2016 - Stefan Kueng
+// Copyright (C) 2015-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,8 +24,7 @@ class CCmdFoldAll : public ICommand
 public:
 
     CCmdFoldAll(void * obj);
-
-    ~CCmdFoldAll();
+    ~CCmdFoldAll() = default;
 
     bool Execute() override;
 
@@ -37,7 +36,7 @@ class CCmdFoldLevel : public ICommand
 {
 public:
     CCmdFoldLevel(UINT customId, void * obj);
-    ~CCmdFoldLevel(void) {}
+    ~CCmdFoldLevel() = default;
 
     bool Execute() override;
     UINT GetCmdId() override { return m_customCmdId; }

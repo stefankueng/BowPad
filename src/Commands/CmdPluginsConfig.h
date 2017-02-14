@@ -42,7 +42,7 @@ class CPluginsConfigDlg : public CDialog, public ICommand
 {
 public:
     CPluginsConfigDlg(void * obj);
-    ~CPluginsConfigDlg();
+    ~CPluginsConfigDlg() = default;
 
 protected:
     LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -67,8 +67,7 @@ public:
         : ICommand(obj)
     {}
 
-    ~CCmdPluginsConfig()
-    {}
+    ~CCmdPluginsConfig() = default;
 
     bool Execute() override;
 

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2015-2016 - Stefan Kueng
+// Copyright (C) 2015-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -87,10 +87,6 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
 CCmdFoldAll::CCmdFoldAll(void * obj) : ICommand(obj)
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-}
-
-CCmdFoldAll::~CCmdFoldAll()
-{
 }
 
 bool CCmdFoldAll::Execute()

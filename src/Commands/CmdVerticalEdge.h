@@ -27,9 +27,7 @@ public:
     {
     }
 
-    ~CCmdVerticalEdge()
-    {
-    }
+    ~CCmdVerticalEdge() = default;
 
     void AfterInit() override
     {

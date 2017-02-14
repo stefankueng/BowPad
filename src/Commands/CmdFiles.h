@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,8 +29,7 @@ public:
     CCmdOpen(void * obj) : ICommand(obj)
     {}
 
-    ~CCmdOpen()
-    {}
+    ~CCmdOpen() = default;
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdOpen; }
@@ -43,7 +42,7 @@ public:
     {
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
-    ~CCmdSave() {}
+    ~CCmdSave() = default;
 
 
     bool Execute() override;
@@ -63,7 +62,7 @@ public:
     {
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
-    ~CCmdSaveAll() {}
+    ~CCmdSaveAll() = default;
 
 
     bool Execute() override;
@@ -81,7 +80,7 @@ class CCmdSaveAuto : public ICommand
 public:
     CCmdSaveAuto(void * obj) : ICommand(obj)
     {}
-    ~CCmdSaveAuto() {}
+    ~CCmdSaveAuto() = default;
 
 
     bool Execute() override;
@@ -99,7 +98,7 @@ class CCmdSaveAs : public ICommand
 public:
     CCmdSaveAs(void * obj) : ICommand(obj)
     {}
-    ~CCmdSaveAs() {}
+    ~CCmdSaveAs() = default;
 
 
     bool Execute() override;
@@ -111,7 +110,7 @@ class CCmdReload : public ICommand
 public:
     CCmdReload(void * obj) : ICommand(obj)
     {}
-    ~CCmdReload() {}
+    ~CCmdReload() = default;
 
 
     bool Execute() override
@@ -134,7 +133,7 @@ class CCmdFileDelete : public ICommand
 public:
     CCmdFileDelete(void * obj) : ICommand(obj)
     {}
-    ~CCmdFileDelete() {}
+    ~CCmdFileDelete() = default;
 
 
     bool Execute() override;

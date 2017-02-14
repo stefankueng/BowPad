@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,8 +42,7 @@ public:
 
     CCmdBookmarks(void * obj);
 
-    ~CCmdBookmarks()
-    {}
+    ~CCmdBookmarks() = default;
 
     bool Execute() override
     {
@@ -68,7 +67,7 @@ public:
     {
     }
 
-    ~CCmdBookmarkToggle() { }
+    ~CCmdBookmarkToggle() = default;
 
     bool Execute() override;
 
@@ -83,7 +82,7 @@ public:
     {
     }
 
-    ~CCmdBookmarkClearAll() { }
+    ~CCmdBookmarkClearAll() = default;
 
     bool Execute() override;
 
@@ -99,7 +98,7 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
-    ~CCmdBookmarkNext() { }
+    ~CCmdBookmarkNext() = default;
 
     bool Execute() override;
 
@@ -120,7 +119,7 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
-    ~CCmdBookmarkPrev() { }
+    ~CCmdBookmarkPrev() = default;
 
     bool Execute() override;
 

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -270,7 +270,7 @@ class CCmdFindReplace : public ICommand
 public:
 
     CCmdFindReplace(void* obj);
-    ~CCmdFindReplace();
+    ~CCmdFindReplace() = default;
 
     bool Execute() override;
 
@@ -352,7 +352,7 @@ public:
     CCmdFindFile(void* obj)
         : ICommand(obj) { }
 
-    ~CCmdFindFile();
+    ~CCmdFindFile() = default;
 
     bool Execute() override;
 
