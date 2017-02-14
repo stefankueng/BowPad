@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -199,10 +199,6 @@ CCmdHeaderSource::CCmdHeaderSource(void* obj)
 {
         // Because we don't know if this file type supports includes.
     InvalidateMenu();
-}
-
-CCmdHeaderSource::~CCmdHeaderSource()
-{
 }
 
 void CCmdHeaderSource::InvalidateMenuEnabled()

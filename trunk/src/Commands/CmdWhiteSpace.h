@@ -25,7 +25,7 @@ public:
 
     CCmdWhiteSpace(void * obj);
 
-    ~CCmdWhiteSpace();
+    ~CCmdWhiteSpace() = default;
 
     bool Execute() override;
 
@@ -42,7 +42,7 @@ public:
 
     CCmdTabSize(void * obj);
 
-    ~CCmdTabSize();
+    ~CCmdTabSize() = default;
 
     bool Execute() override { return true; }
 
@@ -59,7 +59,7 @@ public:
 
     CCmdUseTabs(void * obj);
 
-    ~CCmdUseTabs();
+    ~CCmdUseTabs() = default;
 
     bool Execute() override;
 

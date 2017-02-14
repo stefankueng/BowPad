@@ -343,10 +343,6 @@ CCmdFunctions::CCmdFunctions(void* obj)
     m_edit.InitScratch(hRes);
 }
 
-CCmdFunctions::~CCmdFunctions()
-{
-}
-
 HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
 {
     HRESULT hr;

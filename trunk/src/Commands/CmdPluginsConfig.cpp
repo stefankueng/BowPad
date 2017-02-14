@@ -39,9 +39,6 @@ CPluginsConfigDlg::CPluginsConfigDlg(void * obj)
     , m_threadEnded(false)
 {}
 
-CPluginsConfigDlg::~CPluginsConfigDlg()
-{}
-
 LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
