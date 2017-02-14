@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ class CStyleConfiguratorDlg : public CDialog,  public ICommand
 {
 public:
     CStyleConfiguratorDlg(void* obj);
-    ~CStyleConfiguratorDlg();
+    ~CStyleConfiguratorDlg() = default;
 
 protected:
     LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);

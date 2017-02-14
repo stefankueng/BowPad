@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,9 +27,7 @@ public:
     {
     }
 
-    ~CCmdDelete()
-    {
-    }
+    ~CCmdDelete() = default;
 
     bool Execute() override
     {
@@ -49,9 +47,7 @@ public:
     {
     }
 
-    ~CCmdSelectAll()
-    {
-    }
+    ~CCmdSelectAll() = default;
 
     bool Execute() override
     {
@@ -70,9 +66,7 @@ public:
     {
     }
 
-    ~CCmdGotoBrace()
-    {
-    }
+    ~CCmdGotoBrace() = default;
 
     bool Execute() override
     {
@@ -87,7 +81,7 @@ class CCmdToggleTheme : public ICommand
 {
 public:
     CCmdToggleTheme(void * obj);
-    ~CCmdToggleTheme();
+    ~CCmdToggleTheme() = default;
 
     bool Execute() override;
 
@@ -106,9 +100,7 @@ public:
     {
     }
 
-    ~CCmdConfigShortcuts()
-    {
-    }
+    ~CCmdConfigShortcuts() = default;
 
     bool Execute() override;
 
@@ -121,7 +113,7 @@ public:
 
     CCmdAutoBraces(void * obj);
 
-    ~CCmdAutoBraces();
+    ~CCmdAutoBraces() = default;
 
     bool Execute() override;
 
@@ -136,7 +128,7 @@ public:
 
     CCmdViewFileTree(void * obj);
 
-    ~CCmdViewFileTree();
+    ~CCmdViewFileTree() = default;
 
     bool Execute() override;
 
@@ -149,7 +141,7 @@ class CCmdWriteProtect : public ICommand
 {
 public:
     CCmdWriteProtect(void * obj);
-    ~CCmdWriteProtect();
+    ~CCmdWriteProtect() = default;
 
     bool Execute() override;
 

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,9 +28,7 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
-    ~CCmdConvertUppercase()
-    {
-    }
+    ~CCmdConvertUppercase() = default;
 
     bool Execute() override;
 
@@ -46,9 +44,7 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
-    ~CCmdConvertLowercase()
-    {
-    }
+    ~CCmdConvertLowercase() = default;
 
     bool Execute() override;
 
@@ -64,8 +60,7 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
-    ~CCmdConvertTitlecase()
-    {}
+    ~CCmdConvertTitlecase() = default;
 
     bool Execute() override;
 

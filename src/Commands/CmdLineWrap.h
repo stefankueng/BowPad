@@ -27,9 +27,7 @@ public:
     {
     }
 
-    ~CCmdLineWrap()
-    {
-    }
+    ~CCmdLineWrap() = default;
 
     bool Execute() override
     {

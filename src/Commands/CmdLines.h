@@ -27,9 +27,7 @@ public:
     {
     }
 
-    ~CCmdLineDuplicate()
-    {
-    }
+    ~CCmdLineDuplicate() = default;
 
     bool Execute() override
     {
@@ -48,9 +46,7 @@ public:
     {
     }
 
-    ~CCmdLineSplit()
-    {
-    }
+    ~CCmdLineSplit() = default;
 
     bool Execute() override
     {
@@ -70,9 +66,7 @@ public:
     {
     }
 
-    ~CCmdLineJoin()
-    {
-    }
+    ~CCmdLineJoin() = default;
 
     bool Execute() override
     {
@@ -92,9 +86,7 @@ public:
     {
     }
 
-    ~CCmdLineUp()
-    {
-    }
+    ~CCmdLineUp() = default;
 
     bool Execute() override
     {
@@ -113,9 +105,7 @@ public:
     {
     }
 
-    ~CCmdLineDown()
-    {
-    }
+    ~CCmdLineDown() = default;
 
     bool Execute() override
     {

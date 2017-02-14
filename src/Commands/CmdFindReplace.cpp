@@ -3003,10 +3003,6 @@ CCmdFindReplace::CCmdFindReplace(void* obj)
 {
 }
 
-CCmdFindReplace::~CCmdFindReplace()
-{
-}
-
 bool CCmdFindReplace::Execute()
 {
     FindReplace_FindText(m_pMainWindow);
@@ -3253,10 +3249,6 @@ bool CCmdFindSelectedPrev::Execute()
         FlashWindow(GetHwnd());
     DocScrollUpdate();
     return true;
-}
-
-CCmdFindFile::~CCmdFindFile()
-{
 }
 
 bool CCmdFindFile::Execute()

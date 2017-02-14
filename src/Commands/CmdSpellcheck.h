@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2015-2016 - Stefan Kueng
+// Copyright (C) 2015-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ class CCmdSpellcheckLang : public ICommand
 {
 public:
     CCmdSpellcheckLang(void * obj);
-    ~CCmdSpellcheckLang();
+    ~CCmdSpellcheckLang() = default;
 
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdSpellCheckLang; }
@@ -77,7 +77,7 @@ class CCmdSpellcheckCorrect : public ICommand
 {
 public:
     CCmdSpellcheckCorrect(void * obj);
-    ~CCmdSpellcheckCorrect();
+    ~CCmdSpellcheckCorrect() = default;
 
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdSpellCheckCorrect; }
@@ -98,8 +98,7 @@ public:
 
     CCmdSpellcheckAll(void * obj);
 
-    ~CCmdSpellcheckAll(void)
-    {}
+    ~CCmdSpellcheckAll(void) = default;
 
     bool Execute() override;
 
@@ -114,8 +113,7 @@ public:
 
     CCmdSpellcheckUpper(void * obj);
 
-    ~CCmdSpellcheckUpper(void)
-    {}
+    ~CCmdSpellcheckUpper(void) = default;
 
     bool Execute() override;
 

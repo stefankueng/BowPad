@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2016 - Stefan Kueng
+// Copyright (C) 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,10 +24,6 @@ extern void FindReplace_FindFunction(void *mainWnd, const std::wstring& function
 
 CCmdGotoSymbol::CCmdGotoSymbol(void* obj)
     : ICommand(obj)
-{
-}
-
-CCmdGotoSymbol::~CCmdGotoSymbol()
 {
 }
 

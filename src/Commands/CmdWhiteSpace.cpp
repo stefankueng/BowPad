@@ -23,10 +23,6 @@ CCmdWhiteSpace::CCmdWhiteSpace(void * obj) : ICommand(obj)
 {
 }
 
-CCmdWhiteSpace::~CCmdWhiteSpace()
-{
-}
-
 bool CCmdWhiteSpace::Execute()
 {
     bool bShown = ScintillaCall(SCI_GETVIEWWS) != 0;
@@ -62,10 +58,6 @@ CCmdTabSize::CCmdTabSize(void * obj) : ICommand(obj)
     ScintillaCall(SCI_SETTABWIDTH, ve);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
     UpdateStatusBar(false);
-}
-
-CCmdTabSize::~CCmdTabSize()
-{
 }
 
 HRESULT CCmdTabSize::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
@@ -121,10 +113,6 @@ CCmdUseTabs::CCmdUseTabs(void * obj) : ICommand(obj)
     int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1);
     ScintillaCall(SCI_SETUSETABS, ws);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-}
-
-CCmdUseTabs::~CCmdUseTabs()
-{
 }
 
 bool CCmdUseTabs::Execute()

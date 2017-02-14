@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@
 class CDefaultEncodingDlg : public CDialog
 {
 public:
-    CDefaultEncodingDlg();
-    ~CDefaultEncodingDlg();
+    CDefaultEncodingDlg() = default;
+    ~CDefaultEncodingDlg() = default;
 
 protected:
     LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -42,9 +42,7 @@ public:
     {
     }
 
-    ~CCmdDefaultEncoding(void)
-    {
-    }
+    ~CCmdDefaultEncoding(void) = default;
 
     bool Execute() override;
 
