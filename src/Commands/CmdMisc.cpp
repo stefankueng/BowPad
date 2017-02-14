@@ -25,12 +25,6 @@
 CCmdToggleTheme::CCmdToggleTheme(void * obj)
     : ICommand(obj)
 {
-    int dark = (int)CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0);
-    if (dark)
-    {
-        CTheme::Instance().SetDarkTheme(dark != 0);
-    }
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 bool CCmdToggleTheme::Execute()
@@ -41,6 +35,16 @@ bool CCmdToggleTheme::Execute()
 
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
+}
+
+void CCmdToggleTheme::AfterInit()
+{
+    int dark = (int)CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0);
+    if (dark)
+    {
+        CTheme::Instance().SetDarkTheme(dark != 0);
+    }
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 HRESULT CCmdToggleTheme::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
@@ -91,7 +95,6 @@ bool CCmdConfigShortcuts::Execute()
 
 CCmdAutoBraces::CCmdAutoBraces(void * obj) : ICommand(obj)
 {
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 bool CCmdAutoBraces::Execute()
@@ -99,6 +102,11 @@ bool CCmdAutoBraces::Execute()
     CIniSettings::Instance().SetInt64(L"View", L"autobrace", CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1) ? 0 : 1);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
+}
+
+void CCmdAutoBraces::AfterInit()
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 HRESULT CCmdAutoBraces::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
@@ -112,13 +120,17 @@ HRESULT CCmdAutoBraces::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, cons
 
 CCmdViewFileTree::CCmdViewFileTree(void * obj) : ICommand(obj)
 {
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 bool CCmdViewFileTree::Execute()
 {
     ShowFileTree(!IsFileTreeShown());
     return true;
+}
+
+void CCmdViewFileTree::AfterInit()
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 HRESULT CCmdViewFileTree::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
@@ -137,7 +149,6 @@ HRESULT CCmdViewFileTree::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
 CCmdWriteProtect::CCmdWriteProtect(void * obj)
     : ICommand(obj)
 {
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
 }
 
 bool CCmdWriteProtect::Execute()
@@ -154,6 +165,11 @@ bool CCmdWriteProtect::Execute()
 
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
+}
+
+void CCmdWriteProtect::AfterInit()
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
 }
 
 HRESULT CCmdWriteProtect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)

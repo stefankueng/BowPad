@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,11 +28,6 @@ extern void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName);
 
 CCmdOpenSelection::CCmdOpenSelection(void * obj) : ICommand(obj)
 {
-    // invalidate the label and enabled state immediately here:
-    // if it's not invalidated here, the first attempt to show the
-    // context menu will only show the pre-set text for the command label.
-    InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
-    InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
 }
 
 bool CCmdOpenSelection::Execute()
@@ -69,6 +64,15 @@ bool CCmdOpenSelection::Execute()
         return OpenFile(path.c_str(), OpenFlags::AddToMRU) >= 0;
     FindReplace_FindFile(m_pMainWindow, path);
     return false;
+}
+
+void CCmdOpenSelection::AfterInit()
+{
+    // invalidate the label and enabled state immediately here:
+    // if it's not invalidated here, the first attempt to show the
+    // context menu will only show the pre-set text for the command label.
+    InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
+    InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
 }
 
 HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)

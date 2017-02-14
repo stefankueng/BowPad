@@ -117,6 +117,10 @@ CCmdLaunchCustom::CCmdLaunchCustom(UINT customId, void * obj)
 {
     m_customCmdId = cmdLaunchCustom0 + customId;
     m_settingsID = CStringUtils::Format(L"Command%u", customId);
+}
+
+void CCmdLaunchCustom::AfterInit()
+{
     InvalidateUICommand(m_customCmdId, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
     InvalidateUICommand(m_customCmdId, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
 }

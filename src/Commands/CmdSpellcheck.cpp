@@ -660,7 +660,6 @@ void CCmdSpellcheckCorrect::ScintillaNotify(SCNotification * pScn)
 CCmdSpellcheckAll::CCmdSpellcheckAll(void * obj)
     : ICommand(obj)
 {
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 bool CCmdSpellcheckAll::Execute()
@@ -672,6 +671,11 @@ bool CCmdSpellcheckAll::Execute()
     if (g_checktimer)
         SetTimer(GetHwnd(), g_checktimer, 1, nullptr);
     return true;
+}
+
+void CCmdSpellcheckAll::AfterInit()
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 HRESULT CCmdSpellcheckAll::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
@@ -687,7 +691,6 @@ HRESULT CCmdSpellcheckAll::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
 CCmdSpellcheckUpper::CCmdSpellcheckUpper(void * obj)
     : ICommand(obj)
 {
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 bool CCmdSpellcheckUpper::Execute()
@@ -699,6 +702,11 @@ bool CCmdSpellcheckUpper::Execute()
     if (g_checktimer)
         SetTimer(GetHwnd(), g_checktimer, 1, nullptr);
     return true;
+}
+
+void CCmdSpellcheckUpper::AfterInit()
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 HRESULT CCmdSpellcheckUpper::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)

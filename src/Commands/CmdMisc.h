@@ -86,6 +86,7 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdToggleTheme; }
+    void AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
@@ -118,6 +119,7 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdAutoBraces; }
+    void AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };
@@ -133,6 +135,7 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdFileTree; }
+    void AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };
@@ -146,6 +149,7 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdWriteProtect; }
+    void AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
     void TabNotify(TBHDR* ptbhdr) override;

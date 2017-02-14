@@ -29,7 +29,7 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdFoldAll; }
-
+    void AfterInit() override;
 };
 
 class CCmdFoldLevel : public ICommand
@@ -55,6 +55,7 @@ public:
     bool Execute() override;
     UINT GetCmdId() override { return cmdInitFoldingMargin; }
     void TabNotify(TBHDR* ptbhdr) override;
+    void AfterInit() override;
 
 private:
 };
@@ -67,6 +68,7 @@ public:
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdFoldingOn; }
+    void AfterInit() override;
 
 private:
 };
@@ -79,6 +81,7 @@ public:
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdFoldingOff; }
+    void AfterInit() override;
 
 private:
 };

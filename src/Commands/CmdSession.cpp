@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -190,7 +190,6 @@ void CCmdSessionLoad::RestoreSavedSession()
 
 CCmdSessionAutoLoad::CCmdSessionAutoLoad(void * obj) : CCmdSessionLoad(obj)
 {
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 
@@ -219,6 +218,7 @@ void CCmdSessionAutoLoad::AfterInit()
         if (!parser.HasKey(L"multiple"))
             RestoreSavedSession();
     }
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 bool CCmdSessionRestoreLast::Execute()

@@ -26,7 +26,6 @@ public:
 
     CCmdLineNumbers(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
     }
 
     ~CCmdLineNumbers() = default;
@@ -45,6 +44,10 @@ public:
     }
 
     UINT GetCmdId() override { return cmdLinenumbers; }
+    void AfterInit() override
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
+    }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
     {

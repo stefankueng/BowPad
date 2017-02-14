@@ -25,7 +25,6 @@ public:
 
     CCmdPrint(void * obj) : ICommand(obj)
     {
-        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
     ~CCmdPrint() = default;
@@ -37,6 +36,10 @@ public:
     }
 
     UINT GetCmdId() override { return cmdPrint; }
+    void AfterInit() override
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    }
 
     void Print(bool bShowDlg);
 };
