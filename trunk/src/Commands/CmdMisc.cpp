@@ -25,6 +25,11 @@
 CCmdToggleTheme::CCmdToggleTheme(void * obj)
     : ICommand(obj)
 {
+    int dark = (int)CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0);
+    if (dark)
+    {
+        CTheme::Instance().SetDarkTheme(dark != 0);
+    }
 }
 
 bool CCmdToggleTheme::Execute()
@@ -39,11 +44,6 @@ bool CCmdToggleTheme::Execute()
 
 void CCmdToggleTheme::AfterInit()
 {
-    int dark = (int)CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0);
-    if (dark)
-    {
-        CTheme::Instance().SetDarkTheme(dark != 0);
-    }
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
