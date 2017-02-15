@@ -63,12 +63,6 @@ CTabBar::CTabBar(HINSTANCE hInst)
     m_currentHoverTabRect = {};
     for (int i = 0; i < nbCtrlMax; ++i)
         m_hwndArray[i] = nullptr;
-
-   m_activeTextColour = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNTEXT));
-   m_activeTopBarFocusedColour = CTheme::Instance().GetThemeColor(RGB(250, 170, 60));
-   m_activeTopBarUnfocusedColour = CTheme::Instance().GetThemeColor(RGB(250, 210, 150));
-   m_inactiveTextColour = CTheme::Instance().GetThemeColor(RGB(128, 128, 128));
-   m_inactiveBgColour = CTheme::Instance().GetThemeColor(RGB(192, 192, 192));
 };
 
 CTabBar::~CTabBar()
@@ -353,32 +347,6 @@ void CTabBar::DoOwnerDrawTab() const
         }
     }
 }
-
-void CTabBar::SetColour(COLORREF colour2Set, tabColourIndex i)
-{
-    switch (i)
-    {
-        case activeText:
-            m_activeTextColour = colour2Set;
-            break;
-        case activeFocusedTop:
-            m_activeTopBarFocusedColour = colour2Set;
-            break;
-        case activeUnfocusedTop:
-            m_activeTopBarUnfocusedColour = colour2Set;
-            break;
-        case inactiveText:
-            m_inactiveTextColour = colour2Set;
-            break;
-        case inactiveBg:
-            m_inactiveBgColour = colour2Set;
-            break;
-        default:
-            return;
-    }
-    DoOwnerDrawTab();
-}
-
 
 LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -87,7 +87,6 @@ public :
     int                         GetDstTab() const { return m_nTabDragged; }
 protected:
     void                        DoOwnerDrawTab() const;
-    void                        SetColour(COLORREF colour2Set, tabColourIndex i);
     static LRESULT CALLBACK     TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
     void                        ExchangeItemData(POINT point);
     LRESULT                     RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -123,12 +122,6 @@ private:
     bool                        m_bIsCloseHover;
     int                         m_whichCloseClickDown;
     bool                        m_lmbdHit; // Left Mouse Button Down Hit
-
-    COLORREF                    m_activeTextColour;
-    COLORREF                    m_activeTopBarFocusedColour;
-    COLORREF                    m_activeTopBarUnfocusedColour;
-    COLORREF                    m_inactiveTextColour;
-    COLORREF                    m_inactiveBgColour;
 
     int                         m_nControls;
     HWND                        m_hwndArray[nbCtrlMax];
