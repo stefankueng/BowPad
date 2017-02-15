@@ -143,8 +143,8 @@ void CCmdSessionLoad::RestoreSavedSession()
     );
     if (numFilesToRestore > 1)
     {
-        ShowProgressCtrl((UINT)settings.GetInt64(L"View", L"progressdelay", 1000));
         BlockAllUIUpdates(true);
+        ShowProgressCtrl((UINT)settings.GetInt64(L"View", L"progressdelay", 1000));
     }
 
 

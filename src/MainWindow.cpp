@@ -1249,12 +1249,10 @@ void CMainWindow::HandleAfterInit()
         unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
         if (m_bPathsToOpenMRU)
             openFlags |= OpenFlags::AddToMRU;
-
-        ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
-
         BlockAllUIUpdates(true);
         OnOutOfScope(BlockAllUIUpdates(false););
 
+        ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
         OnOutOfScope(HideProgressCtrl());
 
         int filecounter = 0;
@@ -1660,11 +1658,10 @@ bool CMainWindow::CloseTab(int closingTabIndex, bool force /* = false */, bool q
 
 bool CMainWindow::CloseAllTabs(bool quitting)
 {
-    ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
-
     BlockAllUIUpdates(true);
     OnOutOfScope(BlockAllUIUpdates(false));
 
+    ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
     OnOutOfScope(HideProgressCtrl());
 
     closealldoall = FALSE;
@@ -1696,12 +1693,12 @@ bool CMainWindow::CloseAllTabs(bool quitting)
 
 void CMainWindow::CloseAllButCurrentTab()
 {
-    ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
     BlockAllUIUpdates(true);
     OnOutOfScope(BlockAllUIUpdates(false));
     int count = m_TabBar.GetItemCount();
     int current = m_TabBar.GetCurrentTabIndex();
 
+    ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
     OnOutOfScope(HideProgressCtrl());
 
     closealldoall = FALSE;
@@ -2915,10 +2912,10 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         files.push_back(pathBuf.get());
     }
 
-    ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
     BlockAllUIUpdates(true);
     OnOutOfScope(BlockAllUIUpdates(false););
 
+    ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
     OnOutOfScope(HideProgressCtrl());
 
     const size_t maxFiles = 100;
@@ -3522,9 +3519,9 @@ void CMainWindow::OpenFiles(const std::vector<std::wstring>& paths)
     }
     else if (paths.size() > 0)
     {
-        ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
         BlockAllUIUpdates(true);
         OnOutOfScope(BlockAllUIUpdates(false));
+        ShowProgressCtrl((UINT)CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000));
         OnOutOfScope(HideProgressCtrl());
 
         // Open all that was selected or at least returned.
@@ -3598,13 +3595,15 @@ void CMainWindow::ReBlockUI(int blockCount)
 
 void CMainWindow::ShowProgressCtrl(UINT delay)
 {
+    APPVERIFY(m_blockCount > 0);
+
     m_progressBar.SetDarkMode(CTheme::Instance().IsDarkTheme(), CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOW)));
     RECT rect;
     GetClientRect(*this, &rect);
     MapWindowPoints(*this, nullptr, (LPPOINT)&rect, 2);
     SetWindowPos(m_progressBar, HWND_TOP, rect.left, rect.bottom - m_StatusBar.GetHeight(), rect.right - rect.left, m_StatusBar.GetHeight(), SWP_NOACTIVATE | SWP_NOCOPYBITS);
 
-    m_progressBar.ShowWindow(true, delay);
+    m_progressBar.ShowWindow(delay);
 }
 
 void CMainWindow::HideProgressCtrl()
