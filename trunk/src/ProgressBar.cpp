@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2016 - Stefan Kueng
+// Copyright (C) 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -83,15 +83,15 @@ void CProgressBar::SetDarkMode(bool bDark, COLORREF bkgnd)
     {
         SetWindowTheme(*this, L"Explorer", nullptr);
     }
+    UpdateWindow(*this);
 }
 
-void CProgressBar::ShowWindow(bool show, UINT delay)
+void CProgressBar::ShowWindow(UINT delay)
 {
     m_startTicks = 0;
-    int cmd = show ? SW_SHOW : SW_HIDE;
-    if (!show || (delay == 0))
+    if (delay == 0)
     {
-        ::ShowWindow(*this, cmd);
+        ::ShowWindow(*this, SW_SHOW);
     }
     else
     {
