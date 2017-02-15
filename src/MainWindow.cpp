@@ -3615,6 +3615,7 @@ void CMainWindow::SetProgress(DWORD32 pos, DWORD32 end)
 {
     m_progressBar.SetRange(0, end);
     m_progressBar.SetPos(pos);
+    UpdateWindow(m_progressBar);
 }
 
 void CMainWindow::SetFileTreeWidth(int width)
