@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2016 - Stefan Kueng
+// Copyright (C) 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ public :
     void SetRange(DWORD32 start, DWORD32 end);
     void SetPos(DWORD32 pos);
     void SetDarkMode(bool bDark, COLORREF bkgnd);
-    void ShowWindow(bool show, UINT delay);
+    void ShowWindow(UINT delay);
 protected:
     LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
