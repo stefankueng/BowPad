@@ -474,6 +474,11 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.hCursor = LoadCursor(NULL, (LPTSTR)IDC_SIZEWE);
     if (RegisterWindow(&wcx))
     {
+        // create the window hidden, then after the window is created use the RestoreWindowPos
+        // methods of the CIniSettings to show the window and move it to the saved position.
+        // RestoreWindowPos uses the API SetWindowPlacement() which ensures the window is automatically
+        // shown on a monitor and not outside (e.g. if the window position was saved on an external
+        // monitor but that monitor is not connected now).
         if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, nullptr))
         {
             SetFileTreeWidth((int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200));
