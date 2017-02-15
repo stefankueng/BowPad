@@ -483,6 +483,8 @@ bool CMainWindow::RegisterAndCreateWindow()
         {
             SetFileTreeWidth((int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200));
             CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
+            UpdateWindow(*this);
+            PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
             return true;
         }
     }
@@ -1173,6 +1175,7 @@ bool CMainWindow::Initialize()
         return false;
 
     GetRibbonColors(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
+    SetTheme(CTheme::Instance().IsDarkTheme());
     CTheme::Instance().RegisterThemeChangeCallback(
         [this]()
     {
@@ -1228,8 +1231,6 @@ void CMainWindow::HandleCreate(HWND hwnd)
             pTaskbarInterface->SetOverlayIcon(m_hwnd, m_hShieldIcon, L"elevated");
         }
     }
-
-    PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
 }
 
 void CMainWindow::HandleAfterInit()
@@ -3719,11 +3720,31 @@ void CMainWindow::SetTheme(bool dark)
     {
         SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
         SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
+        if (IsWindow(m_StatusBar))
+            SetClassLongPtr(m_StatusBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
+        if (IsWindow(m_TabBar))
+            SetClassLongPtr(m_TabBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
+        if (IsWindow(m_fileTree))
+            SetClassLongPtr(m_fileTree, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
+        if (IsWindow(m_newTabBtn))
+            SetClassLongPtr(m_newTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
+        if (IsWindow(m_closeTabBtn))
+            SetClassLongPtr(m_closeTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
     }
     else
     {
         SetRibbonColorsHSB(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
         SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
+        if (IsWindow(m_StatusBar))
+            SetClassLongPtr(m_StatusBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
+        if (IsWindow(m_TabBar))
+            SetClassLongPtr(m_TabBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
+        if (IsWindow(m_fileTree))
+            SetClassLongPtr(m_fileTree, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
+        if (IsWindow(m_newTabBtn))
+            SetClassLongPtr(m_newTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
+        if (IsWindow(m_closeTabBtn))
+            SetClassLongPtr(m_closeTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
     }
     auto activeTabId = m_TabBar.GetCurrentTabId();
     if (activeTabId.IsValid())
