@@ -249,15 +249,26 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
     {
     case WM_ERASEBKGND:
         {
-            HDC hdc = (HDC)wParam;
-            auto bgc = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
-            auto oldBgc = SetBkColor(hdc, bgc);
-            RECT r;
-            GetClientRect(hwnd, &r);
-            ExtTextOut(hdc, r.left, r.top, ETO_CLIPPED | ETO_OPAQUE, &r, L"", 0, nullptr);
-            SetBkColor(hdc, oldBgc);
-            return TRUE;
+            // only erase the background manually once:
+            // the first time this is called is when BP starts, it helps
+            // reduce the white background shown in dark mode
+            // but once the window is drawn, erasing the background every time
+            // causes an annoying flicker when resizing the window.
+            static bool erased = false;
+            if (!erased)
+            {
+                HDC hdc = (HDC)wParam;
+                auto bgc = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
+                auto oldBgc = SetBkColor(hdc, bgc);
+                RECT r;
+                GetClientRect(hwnd, &r);
+                ExtTextOut(hdc, r.left, r.top, ETO_CLIPPED | ETO_OPAQUE, &r, L"", 0, nullptr);
+                SetBkColor(hdc, oldBgc);
+                erased = true;
+                return TRUE;
+            }
         }
+        break;
     case WM_NOTIFY:
         if(hdr->code == NM_COOLSB_CUSTOMDRAW)
             return m_docScroll.HandleCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
