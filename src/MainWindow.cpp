@@ -3730,6 +3730,8 @@ void CMainWindow::SetTheme(bool dark)
             SetClassLongPtr(m_newTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
         if (IsWindow(m_closeTabBtn))
             SetClassLongPtr(m_closeTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
+        if (IsWindow(m_editor))
+            SetClassLongPtr(m_editor, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
     }
     else
     {
@@ -3745,6 +3747,8 @@ void CMainWindow::SetTheme(bool dark)
             SetClassLongPtr(m_newTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
         if (IsWindow(m_closeTabBtn))
             SetClassLongPtr(m_closeTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
+        if (IsWindow(m_editor))
+            SetClassLongPtr(m_editor, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
     }
     auto activeTabId = m_TabBar.GetCurrentTabId();
     if (activeTabId.IsValid())
