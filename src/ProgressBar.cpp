@@ -63,6 +63,7 @@ void CProgressBar::SetPos(DWORD32 pos)
             if ((double(pos) / double(end)) < 0.6)
             {
                 ::ShowWindow(*this, SW_SHOW);
+                UpdateWindow(*this);
                 m_startTicks = 0;
             }
         }
@@ -78,10 +79,12 @@ void CProgressBar::SetDarkMode(bool bDark, COLORREF bkgnd)
         // might be better than using the Windows progress bar control.
         SetWindowTheme(*this, L"", L"");
         SendMessage(*this, PBM_SETBKCOLOR, 0, bkgnd);
+        SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
     }
     else
     {
         SetWindowTheme(*this, L"Explorer", nullptr);
+        SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
     }
     UpdateWindow(*this);
 }
@@ -95,6 +98,7 @@ void CProgressBar::ShowWindow(UINT delay)
     }
     else
     {
+        SendMessage(*this, PBM_SETPOS, 0, 0);
         m_startTicks = GetTickCount64();
         m_delay = delay;
     }
