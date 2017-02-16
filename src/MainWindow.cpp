@@ -46,7 +46,6 @@
 #include <type_traits>
 #include <future>
 #include <Shobjidl.h>
-#include <initializer_list>
 
 IUIFramework *g_pFramework = nullptr;  // Reference to the Ribbon framework.
 
@@ -2371,7 +2370,7 @@ bool CMainWindow::HandleDoubleClick(const SCNotification& scn)
 
     std::string urltext = m_editor.GetTextRange(startPos, endPos);
     // This treatment would fail on some valid URLs where there's actually supposed to be a comma or parenthesis at the end.
-    CStringUtils::TrimLeadingAndTrailing(urltext, std::initializer_list<char>{ ',', ')', '(' });
+    CStringUtils::TrimLeadingAndTrailing(urltext, std::vector<char>{ ',', ')', '(' });
     std::wstring url = CUnicodeUtils::StdGetUnicode(urltext);
     SearchReplace(url, L"&amp;", L"&");
 
