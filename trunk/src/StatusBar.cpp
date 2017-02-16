@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -131,12 +131,7 @@ bool CStatusBar::SetText(const TCHAR *str, const TCHAR *tooltip, int whichPart)
     return (::SendMessage(*this, SB_SETTEXT, whichPart, (LPARAM)str) == TRUE);
 }
 
-bool CStatusBar::Init(HINSTANCE hInst, HWND hParent, const std::initializer_list<int>& parts)
-{
-    return Init(hInst, hParent, (int)parts.size(), std::cbegin(parts));
-}
-
-bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int numParts, const int parts[])
+bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, const std::vector<int>& parts)
 {
     InitCommonControls();
 
@@ -144,10 +139,9 @@ bool CStatusBar::Init(HINSTANCE /*hInst*/, HWND hParent, int numParts, const int
     if (!*this)
         return false;
 
-    assert(numParts > 0); // Must have 1 part even if -1.
-    SendMessage(*this, SB_SETPARTS, (LPARAM) numParts, (WPARAM) parts);
+    SendMessage(*this, SB_SETPARTS, (LPARAM)parts.size(), (WPARAM)parts.data());
 
-    m_Parts = std::vector<int>(parts, parts + numParts);
+    m_Parts = parts;
     m_PartsTooltips = std::vector<std::wstring>(m_Parts.size());
     m_bHasOnlyFixedWidth = std::find(
         std::begin(m_Parts), std::end(m_Parts), -1) == std::end(m_Parts);
