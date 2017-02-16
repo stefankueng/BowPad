@@ -484,6 +484,7 @@ bool CMainWindow::RegisterAndCreateWindow()
             SetFileTreeWidth((int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200));
             CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
             UpdateWindow(*this);
+            m_editor.StartupDone();
             PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
             return true;
         }

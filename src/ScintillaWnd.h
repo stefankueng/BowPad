@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -73,6 +73,7 @@ public :
 
     bool Init(HINSTANCE hInst, HWND hParent);
     bool InitScratch(HINSTANCE hInst);
+    void StartupDone() { m_eraseBkgnd = false; }
 
     sptr_t Call(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0)
     {
@@ -141,5 +142,6 @@ private:
     long                        m_selTextMarkerCount;
     bool                        m_bCursorShown;
     bool                        m_bScratch;
+    bool                        m_eraseBkgnd;
     int                         m_cursorTimeout;
 };

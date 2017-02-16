@@ -74,6 +74,7 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_selTextMarkerCount(0)
     , m_bCursorShown(true)
     , m_bScratch(false)
+    , m_eraseBkgnd(true)
     , m_cursorTimeout(-1)
     , m_ScrollTool(hInst)
 {
@@ -249,13 +250,11 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
     {
     case WM_ERASEBKGND:
         {
-            // only erase the background manually once:
-            // the first time this is called is when BP starts, it helps
-            // reduce the white background shown in dark mode
+            // only erase the background during startup:
+            // it helps reduce the white background shown in dark mode
             // but once the window is drawn, erasing the background every time
             // causes an annoying flicker when resizing the window.
-            static bool erased = false;
-            if (!erased)
+            if (m_eraseBkgnd)
             {
                 HDC hdc = (HDC)wParam;
                 auto bgc = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
@@ -264,10 +263,9 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 GetClientRect(hwnd, &r);
                 ExtTextOut(hdc, r.left, r.top, ETO_CLIPPED | ETO_OPAQUE, &r, L"", 0, nullptr);
                 SetBkColor(hdc, oldBgc);
-                erased = true;
-                return TRUE;
             }
-        }
+            return TRUE;
+    }
         break;
     case WM_NOTIFY:
         if(hdr->code == NM_COOLSB_CUSTOMDRAW)
