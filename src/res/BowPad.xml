@@ -1082,15 +1082,20 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <GroupSizeDefinition Size="Large">
                 <ControlGroup>
                   <ControlSizeDefinition ControlName="button1" ImageSize="Large" IsLabelVisible="true" />
-                  <ControlSizeDefinition ControlName="button2" ImageSize="Large" IsLabelVisible="true" />
-                  <ControlSizeDefinition ControlName="button3" ImageSize="Large" IsLabelVisible="true" />
                 </ControlGroup>
                 <ColumnBreak ShowSeparator="true"/>
                 <Row>
-                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
+                  <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
                 <Row>
-                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
+                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <ColumnBreak ShowSeparator="true"/>
+                <Row>
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
                 </Row>
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
@@ -1100,21 +1105,22 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 </ControlGroup>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Medium">
-                <Row>
-                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="true" />
-                </Row>
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
+                <ColumnBreak ShowSeparator="true"/>
                 <Row>
                   <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
                 <Row>
                   <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
                 <ColumnBreak ShowSeparator="true"/>
                 <Row>
-                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
-                </Row>
-                <Row>
-                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
                 </Row>
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
@@ -1124,21 +1130,22 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 </ControlGroup>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Small">
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
+                <ColumnBreak ShowSeparator="true"/>
                 <Row>
-                  <ControlSizeDefinition ControlName="button1" ImageSize="Small" IsLabelVisible="false" />
+                  <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
                 <Row>
-                  <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="false" />
+                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
                 <Row>
-                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="false" />
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
                 <ColumnBreak ShowSeparator="true"/>
                 <Row>
-                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
-                </Row>
-                <Row>
-                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
                 </Row>
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
@@ -1148,13 +1155,13 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 </ControlGroup>
               </GroupSizeDefinition>
             </SizeDefinition>
+            <ToggleButton CommandName="cmdFileTree" />
             <ToggleButton CommandName="cmdLineWrap" />
             <ToggleButton CommandName="cmdWhiteSpace" />
             <ToggleButton CommandName="cmdLinenumbers" />
             <Spinner CommandName="cmdTabSize" />
             <ToggleButton CommandName="cmdUseTabs" />
             <Spinner CommandName="cmdVerticalEdge" />
-            <ToggleButton CommandName="cmdFileTree" />
           </Group>
           <Group CommandName="cmdGroupEncoding" SizeDefinition="ThreeButtons">
             <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
