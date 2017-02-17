@@ -481,14 +481,14 @@ bool CMainWindow::RegisterAndCreateWindow()
         if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, nullptr))
         {
             SetFileTreeWidth((int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200));
-            // resize the tab and status bar to zero so they won't show right away when
+            // hide the tab and status bar so they won't show right away when
             // restoring the window: those two show a white background until properly painted.
-            // After restoring and showing the main window, resize the controls to their proper
-            // size so they paint properly
-            MoveWindow(m_TabBar, 0, 0, 0, 0, FALSE);
-            MoveWindow(m_StatusBar, 0, 0, 0, 0, FALSE);
+            // After restoring and showing the main window, show them again.
+            ShowWindow(m_TabBar, SW_HIDE);
+            ShowWindow(m_StatusBar, SW_HIDE);
             CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
-            ResizeChildWindows();
+            ShowWindow(m_TabBar, SW_SHOW);
+            ShowWindow(m_StatusBar, SW_SHOW);
             UpdateWindow(*this);
             m_editor.StartupDone();
             PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
