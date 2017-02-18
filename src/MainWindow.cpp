@@ -93,14 +93,6 @@ static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const
 {
     outpath.clear();
 
-    struct task_mem_deleter
-    {
-        void operator()(wchar_t buf[])
-        {
-            if (buf != nullptr)
-                CoTaskMemFree(buf);
-        }
-    };
     PreserveChdir keepCWD;
 
     IFileSaveDialogPtr pfd;
@@ -153,8 +145,8 @@ static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const
     hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
-    std::unique_ptr<wchar_t[], task_mem_deleter> opath(pszPath);
     outpath = pszPath;
+    CoTaskMemFree(pszPath);
     return true;
 }
 
