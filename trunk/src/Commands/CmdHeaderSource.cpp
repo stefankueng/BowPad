@@ -839,15 +839,6 @@ bool CCmdHeaderSource::ShowSingleFileSelectionDialog(HWND hWndParent, const std:
     // but get as many as we can. We don't report partial failure.
     // We could make it an all or nothing deal but we have chosen not to.
 
-    struct task_mem_deleter
-    {
-        void operator()(wchar_t buf[])
-        {
-            if (buf != nullptr)
-                CoTaskMemFree(buf);
-        }
-    };
-
     DWORD count = 0;
     hr = psiaResults->GetCount(&count);
     if (CAppUtils::FailedShowMessage(hr))
@@ -862,8 +853,8 @@ bool CCmdHeaderSource::ShowSingleFileSelectionDialog(HWND hWndParent, const std:
             hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
             if (!CAppUtils::FailedShowMessage(hr))
             {
-                std::unique_ptr<wchar_t[], task_mem_deleter> path(pszPath);
                 fileChosen = pszPath;
+                CoTaskMemFree(pszPath);
             }
         }
     }
