@@ -943,6 +943,7 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
         }
         break;
     }
+    break;
     case WM_LBUTTONDBLCLK:
     {
         switch (lParam)
