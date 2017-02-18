@@ -80,7 +80,6 @@ namespace
     static constexpr size_t URL_REG_EXPR_LENGTH = _countof(URL_REG_EXPR) - 1;
 
     const int TIMER_UPDATECHECK = 101;
-    const int TIMER_ZOOM = 102;
 
     static ResponseToOutsideModifiedFile responsetooutsidemodifiedfile = ResponseToOutsideModifiedFile::Reload;
     static BOOL                          responsetooutsidemodifiedfiledoall = FALSE;
@@ -624,11 +623,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             KillTimer(*this, TIMER_UPDATECHECK);
             CheckForOutsideChanges();
         }
-        else if (wParam == TIMER_ZOOM)
-        {
-            KillTimer(*this, TIMER_ZOOM);
-            HandleStatusBarZoom();
-        }
         break;
     case WM_DESTROY:
         FindReplace_Finish();
@@ -933,45 +927,37 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
 {
     switch (wParam)
     {
-    case WM_LBUTTONDOWN:
-    {
-        switch (lParam)
+        case WM_CONTEXTMENU:
         {
-        case STATUSBAR_ZOOM:
-            SetTimer(*this, TIMER_ZOOM, GetDoubleClickTime(), nullptr);
+            switch (lParam)
+            {
+                case STATUSBAR_ZOOM:
+                HandleStatusBarZoom();
+                break;
+                case STATUSBAR_EOL_FORMAT:
+                HandleStatusBarEOLFormat();
+                break;
+            }
             break;
         }
         break;
-    }
-    break;
-    case WM_LBUTTONDBLCLK:
-    {
-        switch (lParam)
+        case WM_LBUTTONDBLCLK:
         {
-        case STATUSBAR_TABSPACE:
-            m_editor.Call(SCI_SETUSETABS, !m_editor.Call(SCI_GETUSETABS));
-            break;
-        case STATUSBAR_TYPING_MODE:
-            m_editor.Call(SCI_EDITTOGGLEOVERTYPE);
-            break;
-        case STATUSBAR_ZOOM:
-            KillTimer(*this, TIMER_ZOOM);
-            m_editor.Call(SCI_SETZOOM, 0);
-            break;
+            switch (lParam)
+            {
+                case STATUSBAR_TABSPACE:
+                m_editor.Call(SCI_SETUSETABS, !m_editor.Call(SCI_GETUSETABS));
+                break;
+                case STATUSBAR_TYPING_MODE:
+                m_editor.Call(SCI_EDITTOGGLEOVERTYPE);
+                break;
+                case STATUSBAR_ZOOM:
+                m_editor.Call(SCI_SETZOOM, 0);
+                break;
+            }
+            UpdateStatusBar(true);
         }
-        UpdateStatusBar(true);
-    }
-    break;
-    case WM_LBUTTONUP:
-    {
-        switch (lParam)
-        {
-        case STATUSBAR_EOL_FORMAT:
-            HandleStatusBarEOLFormat();
-            break;
-        }
-    }
-    break;
+        break;
     }
 }
 
