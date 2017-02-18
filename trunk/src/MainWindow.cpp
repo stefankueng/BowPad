@@ -3743,8 +3743,8 @@ void CMainWindow::SetTheme(bool dark)
         m_editor.Call(SCI_COLOURISE, 0, -1);
         const auto& doc = m_DocManager.GetDocumentFromID(activeTabId);
         m_editor.SetupLexerForLang(doc.GetLanguage());
-        RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
     }
 
     CCommandHandler::Instance().OnThemeChanged(dark);
+    RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
 }
