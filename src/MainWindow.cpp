@@ -184,12 +184,15 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_blockCount(0)
     , m_custToolTip(hResource)
 {
-    m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-    m_hCapslockIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_CAPSLOCK), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-    m_hLexerIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_LEXER), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-    m_hZoomIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ZOOM), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-    m_hZoomDarkIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ZOOMDARK), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-    m_hEmptyIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_EMPTY), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+    auto cxicon = GetSystemMetrics(SM_CXSMICON);
+    auto cyicon = GetSystemMetrics(SM_CYSMICON);
+
+    m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
+    m_hCapslockIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_CAPSLOCK), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
+    m_hLexerIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_LEXER), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
+    m_hZoomIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ZOOM), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
+    m_hZoomDarkIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ZOOMDARK), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
+    m_hEmptyIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_EMPTY), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
     m_fileTreeVisible = CIniSettings::Instance().GetInt64(L"View", L"FileTree", 1) != 0;
     m_scratchEditor.InitScratch(hRes);
 }
