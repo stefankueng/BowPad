@@ -681,6 +681,21 @@
     <Image Include="res\BowPadDoc.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\capslock.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\lexer.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\zoom.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\zoomdark.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\empty.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="res\BowPad.xml" />

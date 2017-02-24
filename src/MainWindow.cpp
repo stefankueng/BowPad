@@ -165,6 +165,11 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_newCount(0)
     , m_cRef(1)
     , m_hShieldIcon(nullptr)
+    , m_hCapslockIcon(nullptr)
+    , m_hLexerIcon(nullptr)
+    , m_hZoomIcon(nullptr)
+    , m_hZoomDarkIcon(nullptr)
+    , m_hEmptyIcon(nullptr)
     , m_tabmovemod(false)
     , m_initLine(0)
     , m_bPathsToOpenMRU(true)
@@ -180,6 +185,11 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
     , m_custToolTip(hResource)
 {
     m_hShieldIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+    m_hCapslockIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_CAPSLOCK), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+    m_hLexerIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_LEXER), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+    m_hZoomIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ZOOM), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+    m_hZoomDarkIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ZOOMDARK), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+    m_hEmptyIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_EMPTY), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
     m_fileTreeVisible = CIniSettings::Instance().GetInt64(L"View", L"FileTree", 1) != 0;
     m_scratchEditor.InitScratch(hRes);
 }
@@ -189,6 +199,11 @@ extern void FindReplace_Finish();
 CMainWindow::~CMainWindow()
 {
     DestroyIcon(m_hShieldIcon);
+    DestroyIcon(m_hCapslockIcon);
+    DestroyIcon(m_hLexerIcon);
+    DestroyIcon(m_hZoomIcon);
+    DestroyIcon(m_hZoomDarkIcon);
+    DestroyIcon(m_hEmptyIcon);
 }
 
 // IUnknown method implementations.
@@ -1537,7 +1552,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         CStringUtils::Format(rsStatusCurpos, line, lineCount, column),
                         CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, lineCount),
                         200,
-                        180,
+                        130,
                         0,
                         true);
     m_StatusBar.SetPart(STATUSBAR_SEL,
@@ -1545,7 +1560,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         selByte ? CStringUtils::Format(rsStatusSelection, selByte, selLine, (selTextMarkerCount ? 0x008000 : GetSysColor(COLOR_WINDOWTEXT)), selTextMarkerCount) : L"Sel: N/A",
                         CStringUtils::Format(rsStatusTTCurPos, line, column, selByte, selLine, selTextMarkerCount),
                         250,
-                        220,
+                        200,
                         0,
                         true);
 
@@ -1567,7 +1582,10 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         35,
                         35,
                         1,      // center
-                        true);
+                        true,
+                        false,
+                        nullptr,
+                        bCapsLockOn ? m_hCapslockIcon : m_hEmptyIcon);
 
     bool usingTabs = m_editor.Call(SCI_GETUSETABS) ? true : false;
     int tabSize = (int)m_editor.Call(SCI_GETTABWIDTH);
@@ -1589,7 +1607,9 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         85,
                         0,
                         false,
-                        true);
+                        true,
+                        nullptr,
+                        CTheme::Instance().IsDarkTheme() ? m_hZoomDarkIcon : m_hZoomIcon);
 
     if (bEverything)
     {
@@ -1603,7 +1623,8 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                             1,      // center
                             true,
                             false,
-                            SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated() ? m_hShieldIcon : nullptr);
+                            SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated() ? m_hShieldIcon : nullptr,
+                            m_hLexerIcon);
 
         int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
         APPVERIFY(ToEOLMode(doc.m_format) == eolMode);

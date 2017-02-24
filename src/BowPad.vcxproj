@@ -427,15 +427,20 @@
     <Image Include="res\BowPad.ico" />
     <Image Include="res\BowPadDoc.ico" />
     <Image Include="res\BowPad_elevated.ico" />
+    <Image Include="res\capslock.ico" />
     <Image Include="res\closeTabButton.bmp" />
     <Image Include="res\closeTabButton_hover.bmp" />
     <Image Include="res\closeTabButton_inact.bmp" />
     <Image Include="res\closeTabButton_push.bmp" />
     <Image Include="res\empty.bmp" />
+    <Image Include="res\empty.ico" />
+    <Image Include="res\lexer.ico" />
     <Image Include="res\readonly.ico" />
     <Image Include="res\saved.ico" />
     <Image Include="res\Shield.ico" />
     <Image Include="res\unsaved.ico" />
+    <Image Include="res\zoom.ico" />
+    <Image Include="res\zoomdark.ico" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="res\BowPad.xml">
