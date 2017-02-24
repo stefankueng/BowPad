@@ -208,7 +208,6 @@ private:
     bool                        m_fileTreeVisible;
     CDocumentManager            m_DocManager;
     std::unique_ptr<wchar_t[]>  m_tooltipbuffer;
-    HICON                       m_hShieldIcon;
     std::list<std::wstring>     m_ClipboardHistory;
     std::map<std::wstring, size_t> m_pathsToOpen;
     bool                        m_bPathsToOpenMRU;
@@ -230,4 +229,11 @@ private:
     UI_HSBCOLOR                 m_normalThemeText;
     UI_HSBCOLOR                 m_normalThemeBack;
     UI_HSBCOLOR                 m_normalThemeHigh;
+    // status bar icons
+    HICON                       m_hShieldIcon;
+    HICON                       m_hCapslockIcon;
+    HICON                       m_hLexerIcon;
+    HICON                       m_hZoomIcon;
+    HICON                       m_hZoomDarkIcon;
+    HICON                       m_hEmptyIcon;
 };
