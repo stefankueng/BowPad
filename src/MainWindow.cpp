@@ -1129,8 +1129,11 @@ bool CMainWindow::Initialize()
     ShowWindow(m_fileTree, m_fileTreeVisible ? SW_SHOW : SW_HIDE);
     CCommandHandler::Instance().AddCommand(&m_fileTree);
     m_editor.Init(hResource, *this);
-    // Each value is the right edge of each status bar element.
-    m_StatusBar.Init(hResource, *this, {100, 300, 550, 650, 700, 800, 830, 865, 925, 1010});
+    m_StatusBar.Init(*this);
+    m_StatusBar.SetHandlerFunc([](COLORREF clr)->COLORREF
+    {
+        return CTheme::Instance().GetThemeColor(clr);
+    });
     m_TabBar.Init(hResource, *this);
     m_newTabBtn.Init(hResource, *this, (HMENU)cmdNew);
     m_newTabBtn.SetText(L"+");
@@ -1305,7 +1308,6 @@ void CMainWindow::ResizeChildWindows()
         DeferWindowPos(hDwp, m_editor, nullptr, rect.left + treeWidth, rect.top + m_RibbonHeight + tbHeight, mainWidth - treeWidth, rect.bottom - (m_RibbonHeight + tbHeight) - m_StatusBar.GetHeight(), flags);
         DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight + tbHeight, treeWidth ? treeWidth - 5 : 0, rect.bottom - (m_RibbonHeight + tbHeight) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
         EndDeferWindowPos(hDwp);
-        m_StatusBar.Resize();
     }
 }
 
@@ -1500,84 +1502,140 @@ void CMainWindow::SetZoomPC(int zoomPC)
     m_editor.Call(SCI_SETZOOM, zoom);
 }
 
-void CMainWindow::UpdateStatusBar( bool bEverything )
+void CMainWindow::UpdateStatusBar(bool bEverything)
 {
-    static ResString rsStatusTTDocSize(hRes, IDS_STATUSTTDOCSIZE);
-    static ResString rsStatusTTCurPos(hRes, IDS_STATUSTTCURPOS);
-    static ResString rsStatusTTEOF(hRes, IDS_STATUSTTEOF);
-    static ResString rsStatusTTTyping(hRes, IDS_STATUSTTTYPING);
-    static ResString rsStatusTTTypingOvl(hRes, IDS_STATUSTTTYPINGOVL);
-    static ResString rsStatusTTTypingIns(hRes, IDS_STATUSTTTYPINGINS);
-    static ResString rsStatusTTTabs(hRes, IDS_STATUSTTTABS);
-    static ResString rsStatusSelection(hRes, IDS_STATUSSELECTION);
-    static ResString rsStatusTTTabSpaces(hRes, IDS_STATUSTTTABSPACES);
-    static ResString rsStatusTTEncoding(hRes, IDS_STATUSTTENCODING);
-    static ResString rsStatusZoom(hRes, IDS_STATUSZOOM);
+    static ResString rsStatusTTDocSize(hRes, IDS_STATUSTTDOCSIZE);              // Length in bytes: %ld\r\nLines: %ld
+    static ResString rsStatusTTCurPos(hRes, IDS_STATUSTTCURPOS);                // Line : %ld\r\nColumn : %ld\r\nSelection : %Iu | %Iu\r\nMatches: %ld
+    static ResString rsStatusTTEOF(hRes, IDS_STATUSTTEOF);                      // Line endings: %s
+    static ResString rsStatusTTTyping(hRes, IDS_STATUSTTTYPING);                // Typing mode: %s
+    static ResString rsStatusTTTypingOvl(hRes, IDS_STATUSTTTYPINGOVL);          // Overtype
+    static ResString rsStatusTTTypingIns(hRes, IDS_STATUSTTTYPINGINS);          // Insert
+    static ResString rsStatusTTTabs(hRes, IDS_STATUSTTTABS);                    // Open files: %d
+    static ResString rsStatusSelection(hRes, IDS_STATUSSELECTION);              // Sel: %Iu chars | %Iu lines | %ld matches.
+    static ResString rsStatusSelectionLong(hRes, IDS_STATUSSELECTIONLONG);      // Selection: %Iu chars | %Iu lines | %ld matches.
+    static ResString rsStatusTTTabSpaces(hRes, IDS_STATUSTTTABSPACES);          // Insert Tabs or Spaces
+    static ResString rsStatusTTEncoding(hRes, IDS_STATUSTTENCODING);            // Encoding: %s
+    static ResString rsStatusZoom(hRes, IDS_STATUSZOOM);                        // Zoom: %d%%
+    static ResString rsStatusCurposLong(hRes, IDS_STATUS_CURPOSLONG);           // Line: %ld / %ld   Column: %ld
+    static ResString rsStatusCurpos(hRes, IDS_STATUS_CURPOS);                   // Ln: %ld / %ld    Col: %ld
+    static ResString rsStatusTabsOpenLong(hRes, IDS_STATUS_TABSOPENLONG);       // Ln: %ld / %ld    Col: %ld
+    static ResString rsStatusTabsOpen(hRes, IDS_STATUS_TABSOPEN);               // Ln: %ld / %ld    Col: %ld
 
     auto lineCount = (long)m_editor.Call(SCI_GETLINECOUNT);
 
-    TCHAR strLnCol[128];
-    TCHAR strSel[64];
     size_t selByte = 0;
     size_t selLine = 0;
+    m_editor.GetSelectedCount(selByte, selLine);
     long selTextMarkerCount = m_editor.GetSelTextMarkerCount();
-    if (m_editor.GetSelectedCount(selByte, selLine) && selByte)
-        swprintf_s(strSel, rsStatusSelection, selByte, selLine, selTextMarkerCount);
-    else
-        _tcscpy_s(strSel, L"Sel: N/A");
     auto curPos = m_editor.Call(SCI_GETCURRENTPOS);
     long line = (long)m_editor.Call(SCI_LINEFROMPOSITION, curPos) + 1;
     long column = (long)m_editor.Call(SCI_GETCOLUMN, curPos) + 1;
-    swprintf_s(strLnCol, L"Ln: %ld / %ld    Col: %ld", line, lineCount, column);
-    std::wstring ttcurpos = CStringUtils::Format(rsStatusTTCurPos,
-        line, column, selByte, selLine, selTextMarkerCount);
-
     auto lengthInBytes = m_editor.Call(SCI_GETLENGTH);
-    auto ttdocsize = CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, lineCount);
-    m_StatusBar.SetText(strLnCol, ttdocsize.c_str(), STATUSBAR_CUR_POS);
-    m_StatusBar.SetText(strSel, ttcurpos.c_str(), STATUSBAR_SEL);
+
+    m_StatusBar.SetPart(STATUSBAR_CUR_POS,
+                        CStringUtils::Format(rsStatusCurposLong, line, lineCount, column),
+                        CStringUtils::Format(rsStatusCurpos, line, lineCount, column),
+                        CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, lineCount),
+                        200,
+                        180,
+                        0,
+                        true);
+    m_StatusBar.SetPart(STATUSBAR_SEL,
+                        selByte ? CStringUtils::Format(rsStatusSelectionLong, selByte, selLine, (selTextMarkerCount ? 0x008000 : GetSysColor(COLOR_WINDOWTEXT)), selTextMarkerCount) : L"Sel: N/A",
+                        selByte ? CStringUtils::Format(rsStatusSelection, selByte, selLine, (selTextMarkerCount ? 0x008000 : GetSysColor(COLOR_WINDOWTEXT)), selTextMarkerCount) : L"Sel: N/A",
+                        CStringUtils::Format(rsStatusTTCurPos, line, column, selByte, selLine, selTextMarkerCount),
+                        250,
+                        220,
+                        0,
+                        true);
 
     auto overType = m_editor.Call(SCI_GETOVERTYPE);
-    auto tttyping = CStringUtils::Format(rsStatusTTTyping, overType ? rsStatusTTTypingOvl.c_str() : rsStatusTTTypingIns.c_str());
-    m_StatusBar.SetText(overType ? L"OVR" : L"INS", tttyping.c_str(), STATUSBAR_TYPING_MODE);
-    bool bCapsLockOn = (GetKeyState(VK_CAPITAL)&0x01)!=0;
-    m_StatusBar.SetText(bCapsLockOn ? L"CAPS" : L"", nullptr, STATUSBAR_CAPS);
+    m_StatusBar.SetPart(STATUSBAR_TYPING_MODE,
+                        overType ? L"OVR" : L"INS",
+                        L"",
+                        CStringUtils::Format(rsStatusTTTyping, overType ? rsStatusTTTypingOvl.c_str() : rsStatusTTTypingIns.c_str()),
+                        0,
+                        0,
+                        1,      // center
+                        true);
+
+    bool bCapsLockOn = (GetKeyState(VK_CAPITAL) & 0x01) != 0;
+    m_StatusBar.SetPart(STATUSBAR_CAPS,
+                        bCapsLockOn ? L"CAPS" : L"",
+                        L"",
+                        L"",
+                        35,
+                        35,
+                        1,      // center
+                        true);
+
     bool usingTabs = m_editor.Call(SCI_GETUSETABS) ? true : false;
-    if (usingTabs)
-    {
-        int tabSize = (int)m_editor.Call(SCI_GETTABWIDTH);
-        auto tabStatus = CStringUtils::Format(L"Tabs: %d", tabSize);
-        m_StatusBar.SetText(tabStatus.c_str(), rsStatusTTTabSpaces.c_str(), STATUSBAR_TABSPACE);
-    }
-    else
-        m_StatusBar.SetText(L"Spaces", rsStatusTTTabSpaces.c_str(), STATUSBAR_TABSPACE);
+    int tabSize = (int)m_editor.Call(SCI_GETTABWIDTH);
+    m_StatusBar.SetPart(STATUSBAR_TABSPACE,
+                        usingTabs ? CStringUtils::Format(L"Tabs: %%c%06X%d", 0x900000, tabSize) : L"Spaces",
+                        L"",
+                        rsStatusTTTabSpaces,
+                        0,
+                        0,
+                        1,      // center
+                        true);
 
     int zoomfactor = GetZoomPC();
-    auto szoomfactor = CStringUtils::Format(rsStatusZoom, zoomfactor);
-    m_StatusBar.SetText(szoomfactor.c_str(), nullptr, STATUSBAR_ZOOM);
+    m_StatusBar.SetPart(STATUSBAR_ZOOM,
+                        CStringUtils::Format(rsStatusZoom, zoomfactor),
+                        L"",
+                        L"",
+                        85,
+                        85,
+                        0,
+                        false,
+                        true);
 
     if (bEverything)
     {
         const auto& doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
+        m_StatusBar.SetPart(STATUSBAR_DOC_TYPE,
+                            L"%b" + CUnicodeUtils::StdGetUnicode(doc.GetLanguage()),
+                            L"",
+                            L"",
+                            0,
+                            0,
+                            1,      // center
+                            true,
+                            false,
+                            SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated() ? m_hShieldIcon : nullptr);
+
         int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
         APPVERIFY(ToEOLMode(doc.m_format) == eolMode);
         auto eolDesc = GetEOLFormatDescription(doc.m_format);
-        m_StatusBar.SetText(CUnicodeUtils::StdGetUnicode(doc.GetLanguage().c_str()).c_str(), nullptr, STATUSBAR_DOC_TYPE);
-        auto tteof = CStringUtils::Format(rsStatusTTEOF, eolDesc.c_str());
-        m_StatusBar.SetText(eolDesc.c_str(), tteof.c_str(), STATUSBAR_EOL_FORMAT);
-        auto ttencoding = CStringUtils::Format(rsStatusTTEncoding, doc.GetEncodingString().c_str());
-        m_StatusBar.SetText(doc.GetEncodingString().c_str(), ttencoding.c_str(), STATUSBAR_UNICODE_TYPE);
+        m_StatusBar.SetPart(STATUSBAR_EOL_FORMAT,
+                            eolDesc,
+                            L"",
+                            CStringUtils::Format(rsStatusTTEOF, eolDesc.c_str()),
+                            0,
+                            0,
+                            1,      // center
+                            true,
+                            true);
+
+        m_StatusBar.SetPart(STATUSBAR_UNICODE_TYPE,
+                            doc.GetEncodingString(),
+                            L"",
+                            CStringUtils::Format(rsStatusTTEncoding, doc.GetEncodingString().c_str()),
+                            0,
+                            0,
+                            1       // center
+        );
 
         auto tabCount = m_TabBar.GetItemCount();
-        auto tttabs = CStringUtils::Format(rsStatusTTTabs, tabCount);
-        m_StatusBar.SetText(CStringUtils::Format(L"Open: %d", tabCount).c_str(), tttabs.c_str(), STATUSBAR_TABS);
-
-        if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
-        {
-            // in case we're running elevated, use a BowPad icon with a shield
-            SendMessage(m_StatusBar, SB_SETICON, 0, (LPARAM)m_hShieldIcon);
-        }
+        m_StatusBar.SetPart(STATUSBAR_TABS,
+                            CStringUtils::Format(rsStatusTabsOpenLong, tabCount),
+                            CStringUtils::Format(rsStatusTabsOpen, tabCount),
+                            CStringUtils::Format(rsStatusTTTabs, tabCount),
+                            65,
+                            55);
     }
+    m_StatusBar.CalcWidths();
 }
 
 bool CMainWindow::CloseTab(int closingTabIndex, bool force /* = false */, bool quitting)
