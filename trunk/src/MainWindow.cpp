@@ -1129,7 +1129,7 @@ bool CMainWindow::Initialize()
     ShowWindow(m_fileTree, m_fileTreeVisible ? SW_SHOW : SW_HIDE);
     CCommandHandler::Instance().AddCommand(&m_fileTree);
     m_editor.Init(hResource, *this);
-    m_StatusBar.Init(*this);
+    m_StatusBar.Init(*this, true);
     m_StatusBar.SetHandlerFunc([](COLORREF clr)->COLORREF
     {
         return CTheme::Instance().GetThemeColor(clr);
