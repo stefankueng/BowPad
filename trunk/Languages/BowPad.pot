@@ -1140,8 +1140,18 @@ msgstr ""
 msgid "Line:"
 msgstr ""
 
+#. Resource IDs: (250)
+#, c-format
+msgid "Line: %ld / %ld   Column: %ld"
+msgstr ""
+
 #. Resource IDs: (60248)
 msgid "Lines"
+msgstr ""
+
+#. Resource IDs: (249)
+#, c-format
+msgid "Ln: %ld / %ld    Col: %ld"
 msgstr ""
 
 #. Resource IDs: (60133, 60135)
@@ -1392,6 +1402,16 @@ msgstr ""
 #. Resource IDs: (182)
 #, c-format
 msgid "Open files: %d"
+msgstr ""
+
+#. Resource IDs: (252)
+#, c-format
+msgid "Open tabs: %ld"
+msgstr ""
+
+#. Resource IDs: (253)
+#, c-format
+msgid "Open: %ld"
 msgstr ""
 
 #. Resource IDs: (60045)
@@ -1713,7 +1733,7 @@ msgstr ""
 
 #. Resource IDs: (200)
 #, c-format
-msgid "Sel: %Iu chars | %Iu lines | %ld matches."
+msgid "Sel: %Iu chars | %Iu lines | %%c%06X%ld%%r matches."
 msgstr ""
 
 #. Resource IDs: (60376)
@@ -1726,6 +1746,11 @@ msgstr ""
 
 #. Resource IDs: (60377)
 msgid "Select the language for BowPad"
+msgstr ""
+
+#. Resource IDs: (251)
+#, c-format
+msgid "Selection: %Iu chars | %Iu lines | %%c%06X%ld%%r matches."
 msgstr ""
 
 #. Resource IDs: (60596)
