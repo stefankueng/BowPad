@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 #pragma once
 #include "BaseWindow.h"
 #include "resource.h"
-#include "StatusBar.h"
+#include "RichStatusBar.h"
 #include "TabBar.h"
 #include "DocumentManager.h"
 #include "ScintillaWnd.h"
@@ -194,7 +194,7 @@ private:
     IUIRibbon*                  m_pRibbon;
     UINT                        m_RibbonHeight;
 
-    CStatusBar                  m_StatusBar;
+    CRichStatusBar              m_StatusBar;
     CTabBar                     m_TabBar;
     CScintillaWnd               m_editor;
     CFileTree                   m_fileTree;

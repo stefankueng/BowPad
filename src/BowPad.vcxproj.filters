@@ -81,9 +81,6 @@
     <ClInclude Include="..\ext\sktoolslib\hyperlink.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
-    <ClInclude Include="StatusBar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TabBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -357,6 +354,9 @@
     <ClInclude Include="..\ext\sktoolslib\ScrollTool.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\RichStatusBar.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -394,9 +394,6 @@
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\hyperlink.cpp">
       <Filter>sktoolslib</Filter>
-    </ClCompile>
-    <ClCompile Include="StatusBar.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TabBar.cpp">
       <Filter>Source Files</Filter>
@@ -636,6 +633,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\ScrollTool.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\RichStatusBar.cpp">
       <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>
