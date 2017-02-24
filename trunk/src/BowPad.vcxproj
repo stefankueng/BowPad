@@ -228,6 +228,7 @@
     <ClInclude Include="..\ext\sktoolslib\ProgressDlg.h" />
     <ClInclude Include="..\ext\sktoolslib\Registry.h" />
     <ClInclude Include="..\ext\sktoolslib\ResString.h" />
+    <ClInclude Include="..\ext\sktoolslib\RichStatusBar.h" />
     <ClInclude Include="..\ext\sktoolslib\ScrollTool.h" />
     <ClInclude Include="..\ext\sktoolslib\SimpleIni.h" />
     <ClInclude Include="..\ext\sktoolslib\SmartHandle.h" />
@@ -310,7 +311,6 @@
     <ClInclude Include="ScintillaWnd.h" />
     <ClInclude Include="scripting\BasicScriptHost.h" />
     <ClInclude Include="scripting\BasicScriptObject.h" />
-    <ClInclude Include="StatusBar.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TabBar.h" />
     <ClInclude Include="TabBtn.h" />
@@ -341,6 +341,7 @@
     <ClCompile Include="..\ext\sktoolslib\PreserveChdir.cpp" />
     <ClCompile Include="..\ext\sktoolslib\ProgressDlg.cpp" />
     <ClCompile Include="..\ext\sktoolslib\Registry.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\RichStatusBar.cpp" />
     <ClCompile Include="..\ext\sktoolslib\ScrollTool.cpp" />
     <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\SysImageList.cpp" />
@@ -406,7 +407,6 @@
     <ClCompile Include="ScintillaWnd.cpp" />
     <ClCompile Include="scripting\BasicScriptHost.cpp" />
     <ClCompile Include="scripting\BasicScriptObject.cpp" />
-    <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
