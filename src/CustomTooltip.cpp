@@ -19,9 +19,9 @@
 #include "GDIHelpers.h"
 #include "Theme.h"
 
-constexpr int COLORBOX_SIZE = 20;
-constexpr int BORDER = 5;
-constexpr int RECTBORDER = 2;
+#define COLORBOX_SIZE int(20*m_dpiScaleY)
+#define BORDER int(5*m_dpiScaleX)
+#define RECTBORDER int(2*m_dpiScaleX)
 
 void CCustomToolTip::Init(HWND hParent)
 {
