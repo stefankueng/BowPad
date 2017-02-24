@@ -1581,7 +1581,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     m_StatusBar.SetPart(STATUSBAR_CAPS,
                         bCapsLockOn ? L"CAPS" : L"",
                         L"",
-                        L"",
+                        bCapsLockOn ? L"CAPS" : L"",
                         35,
                         35,
                         1,      // center
@@ -1602,10 +1602,12 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         true);
 
     int zoomfactor = GetZoomPC();
+    auto sZoom = CStringUtils::Format(rsStatusZoom, zoomfactor);
+    auto sZoomTT = CRichStatusBar::GetPlainString(sZoom);
     m_StatusBar.SetPart(STATUSBAR_ZOOM,
-                        CStringUtils::Format(rsStatusZoom, zoomfactor),
+                        sZoom,
                         L"",
-                        L"",
+                        sZoomTT,
                         85,
                         85,
                         0,
@@ -1617,10 +1619,11 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     if (bEverything)
     {
         const auto& doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
+        auto sLang = CUnicodeUtils::StdGetUnicode(doc.GetLanguage());
         m_StatusBar.SetPart(STATUSBAR_DOC_TYPE,
-                            L"%b" + CUnicodeUtils::StdGetUnicode(doc.GetLanguage()),
+                            L"%b" + sLang,
                             L"",
-                            L"",
+                            sLang,
                             0,
                             0,
                             1,      // center
