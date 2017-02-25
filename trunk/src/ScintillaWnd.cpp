@@ -1243,18 +1243,20 @@ void CScintillaWnd::MatchTags()
 
 bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
 {
-    // return false if it's multi-selection or rectangle selection
-    if ((Call(SCI_GETSELECTIONS) > 1) || Call(SCI_SELECTIONISRECTANGLE))
-        return false;
-    size_t start = Call(SCI_GETSELECTIONSTART);
-    size_t end = Call(SCI_GETSELECTIONEND);
-    selByte = (start < end)?end-start:start-end;
+    auto selCount = Call(SCI_GETSELECTIONS);
+    selByte = 0;
+    selLine = 0;
+    for (decltype(selCount) i = 0; i < selCount; ++i)
+    {
+        size_t start = Call(SCI_GETSELECTIONNSTART, i);
+        size_t end = Call(SCI_GETSELECTIONNEND, i);
+        selByte += (start < end) ? end - start : start - end;
 
-    start = Call(SCI_LINEFROMPOSITION, start);
-    end = Call(SCI_LINEFROMPOSITION, end);
-    selLine = (start < end)?end-start:start-end;
-    if (selLine)
+        start = Call(SCI_LINEFROMPOSITION, start);
+        end = Call(SCI_LINEFROMPOSITION, end);
+        selLine += (start < end) ? end - start : start - end;
         ++selLine;
+    }
 
     return true;
 };
