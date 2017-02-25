@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-30 19:49+0100\n"
-"PO-Revision-Date: 2017-01-30 19:49+0100\n"
+"POT-Creation-Date: 2017-02-25 15:13+0100\n"
+"PO-Revision-Date: 2017-02-25 15:17+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -16,6 +16,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.7\n"
+
+# msgid/msgstr fields for Accelerator keys
+# Format is: "ID:xxxxxx:VACS+X" where:
+#    ID:xxxxx = the menu ID corresponding to the accelerator
+#    V = Virtual key (or blank if not used) - nearly always set!
+#    A = Alt key     (or blank if not used)
+#    C = Ctrl key    (or blank if not used)
+#    S = Shift key   (or blank if not used)
+#    X = upper case character
+# e.g. "V CS+Q" == Ctrl + Shift + 'Q'
+# ONLY Accelerator Keys with corresponding alphanumeric characters can be
+# updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
+# ONLY change the msgstr field. Do NOT change any other.
+# If you do not want to change an Accelerator Key, copy msgid to msgstr
+#. Resource IDs: (254)
+#, c-format
+msgid "%%i%%c%06Xno selection"
+msgstr "%%i%%c%06Xkeine Auswahl"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -1286,9 +1304,19 @@ msgstr "Zeilennummern"
 msgid "Line:"
 msgstr "Zeile:"
 
+#. Resource IDs: (250)
+#, c-format
+msgid "Line: %ld / %ld   Column: %ld"
+msgstr "Linie: %ld / %ld   Spalte: %ld"
+
 #. Resource IDs: (60248)
 msgid "Lines"
 msgstr "Zeilen"
+
+#. Resource IDs: (249)
+#, c-format
+msgid "Ln: %ld / %ld    Col: %ld"
+msgstr "Ln: %ld / %ld    Splt: %ld"
 
 #. Resource IDs: (60133, 60135)
 msgid "Load as"
@@ -1554,6 +1582,16 @@ msgstr ""
 #, c-format
 msgid "Open files: %d"
 msgstr "Offene Dateien: %d"
+
+#. Resource IDs: (252)
+#, c-format
+msgid "Open tabs: %ld"
+msgstr "Offene Dateien: %ld"
+
+#. Resource IDs: (253)
+#, c-format
+msgid "Open: %ld"
+msgstr "Offen: %ld"
 
 #. Resource IDs: (60045)
 msgid "Opens one or more files"
@@ -1903,8 +1941,8 @@ msgstr "Suche in Datei '%s'"
 
 #. Resource IDs: (200)
 #, c-format
-msgid "Sel: %Iu chars | %Iu lines | %ld matches."
-msgstr "Sel: %lu Zeichen | %lu Zeilen | %ld Markierungen."
+msgid "Sel: %Iu chars | %Iu lines | %%c%06X%ld%%r matches."
+msgstr "Ausw: %lu Zeichen | %lu Zeilen | %%c%06X%ld%%r Markierungen."
 
 #. Resource IDs: (60376)
 msgid "Select Language"
@@ -1917,6 +1955,11 @@ msgstr "Alles auswählen"
 #. Resource IDs: (60377)
 msgid "Select the language for BowPad"
 msgstr "Wähle die Sprache für BowPad"
+
+#. Resource IDs: (251)
+#, c-format
+msgid "Selection: %Iu chars | %Iu lines | %%c%06X%ld%%r matches."
+msgstr "Auswahl: %lu Zeichen | %lu Zeilen | %%c%06X%ld%%r Markierungen."
 
 #. Resource IDs: (60596)
 msgid "Selects the language for the spell checker"
