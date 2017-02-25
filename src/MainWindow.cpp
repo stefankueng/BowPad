@@ -809,9 +809,6 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARA
     CCommandHandler::Instance().ScintillaNotify(pScn);
     switch (scn.nmhdr.code)
     {
-    case SCN_PAINTED:
-        m_editor.UpdateLineNumberWidth();
-        break;
     case SCN_SAVEPOINTREACHED:
     case SCN_SAVEPOINTLEFT:
         HandleSavePoint(scn);
@@ -2535,6 +2532,8 @@ void CMainWindow::AddHotSpots()
 
 void CMainWindow::HandleUpdateUI(const SCNotification& scn)
 {
+    if (scn.updated & SC_UPDATE_V_SCROLL)
+        m_editor.UpdateLineNumberWidth();
     const unsigned int uiflags = SC_UPDATE_SELECTION |
         SC_UPDATE_H_SCROLL | SC_UPDATE_V_SCROLL;
     if ((scn.updated & uiflags) != 0)
