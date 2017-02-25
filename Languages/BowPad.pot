@@ -33,6 +33,11 @@ msgstr ""
 # ONLY change the msgstr field. Do NOT change any other.
 # If you do not want to change an Accelerator Key, copy msgid to msgstr
 
+#. Resource IDs: (254)
+#, c-format
+msgid "%%i%%c%06Xno selection"
+msgstr ""
+
 #. Resource IDs: (224)
 #, c-format
 msgid "%d occurrences were replaced."
