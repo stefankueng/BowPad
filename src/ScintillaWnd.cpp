@@ -656,6 +656,9 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
 
     size_t lineToShow = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
     Call(SCI_LINESCROLL, 0, lineToShow);
+    // call UpdateLineNumberWidth() here, just in case the SCI_LINESCROLL call
+    // above does not scroll the window.
+    UpdateLineNumberWidth();
 }
 
 void CScintillaWnd::SetupLexerForLang( const std::string& lang )
