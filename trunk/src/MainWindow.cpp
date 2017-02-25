@@ -1528,6 +1528,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     static ResString rsStatusTTTabs(hRes, IDS_STATUSTTTABS);                    // Open files: %d
     static ResString rsStatusSelection(hRes, IDS_STATUSSELECTION);              // Sel: %Iu chars | %Iu lines | %ld matches.
     static ResString rsStatusSelectionLong(hRes, IDS_STATUSSELECTIONLONG);      // Selection: %Iu chars | %Iu lines | %ld matches.
+    static ResString rsStatusSelectionNone(hRes, IDS_STATUSSELECTIONNONE);      // no selection
     static ResString rsStatusTTTabSpaces(hRes, IDS_STATUSTTTABSPACES);          // Insert Tabs or Spaces
     static ResString rsStatusTTEncoding(hRes, IDS_STATUSTTENCODING);            // Encoding: %s
     static ResString rsStatusZoom(hRes, IDS_STATUSZOOM);                        // Zoom: %d%%
@@ -1555,9 +1556,10 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         130,
                         0,
                         true);
+    auto sNoSel = CStringUtils::Format(rsStatusSelectionNone, GetSysColor(COLOR_GRAYTEXT));
     m_StatusBar.SetPart(STATUSBAR_SEL,
-                        selByte ? CStringUtils::Format(rsStatusSelectionLong, selByte, selLine, (selTextMarkerCount ? 0x008000 : GetSysColor(COLOR_WINDOWTEXT)), selTextMarkerCount) : L"Sel: N/A",
-                        selByte ? CStringUtils::Format(rsStatusSelection, selByte, selLine, (selTextMarkerCount ? 0x008000 : GetSysColor(COLOR_WINDOWTEXT)), selTextMarkerCount) : L"Sel: N/A",
+                        selByte ? CStringUtils::Format(rsStatusSelectionLong, selByte, selLine, (selTextMarkerCount ? 0x008000 : GetSysColor(COLOR_WINDOWTEXT)), selTextMarkerCount) : sNoSel,
+                        selByte ? CStringUtils::Format(rsStatusSelection, selByte, selLine, (selTextMarkerCount ? 0x008000 : GetSysColor(COLOR_WINDOWTEXT)), selTextMarkerCount) : sNoSel,
                         CStringUtils::Format(rsStatusTTCurPos, line, column, selByte, selLine, selTextMarkerCount),
                         250,
                         200,
