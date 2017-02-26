@@ -1,0 +1,1389 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+ This file is part of BowPad.
+
+ Copyright (C) 2013 - 2016 Stefan Kueng
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ See <http://www.gnu.org/licenses/> for a copy of the full license text
+ -->
+
+<Application xmlns='http://schemas.microsoft.com/windows/2009/Ribbon'>
+  <!-- Commands section -->
+  <Application.Commands>
+
+    <Command Name="cmdMainTab" Symbol="IDC_CMD_MAINTAB" Keytip="M">
+      <Command.LabelTitle>Main</Command.LabelTitle>
+    </Command>
+    <Command Name="cmdOtherTab" Symbol="IDC_CMD_VIEWTAB" Keytip="V">
+      <Command.LabelTitle>Other</Command.LabelTitle>
+    </Command>
+    <Command Name="cmdEditTab" Symbol="IDC_CMD_EDITTAB" Keytip="E">
+      <Command.LabelTitle>Edit</Command.LabelTitle>
+    </Command>
+    <Command Name="cmdGroupFile" LabelTitle="File" Keytip="F">
+      <!-- This image is used for when the group shrinks into a "pop-up".  The other groups
+      in the markup don't display as pop-ups, so we don't specify an image for them.  -->
+      <Command.LargeImages>
+        <Image>res/SaveAllL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupClipboard" LabelTitle="Clipboard" Keytip="C">
+      <Command.LargeImages>
+        <Image>res/Paste.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupUndo" LabelTitle="Undo" Keytip="U">
+      <Command.LargeImages>
+        <Image>res/UndoL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupView" LabelTitle="View" Keytip="V">
+      <Command.LargeImages>
+        <Image>res/LineWrapL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupVEdge" LabelTitle="Vertical Edge" Keytip="VE">
+      <Command.LargeImages>
+        <Image>res/VEdgeL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupComment" LabelTitle="Code" Keytip="CO">
+      <Command.LargeImages>
+        <Image>res/CommentL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdQat" Keytip="H"/>
+    <Command Name="cmdFileMenu" Keytip="F"/>
+    <Command Name="cmdMRUList" Keytip="M">
+      <Command.LabelTitle>
+        <String>MRU List</String>
+      </Command.LabelTitle>
+    </Command>
+    <Command Name="cmdExit" LabelTitle="E&amp;xit" Keytip="X">
+      <Command.LargeImages>
+        <Image>res/ExitL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdNew" LabelTitle="&amp;New" TooltipTitle="New Document" TooltipDescription="Creates a new tab with an empty document" Keytip="N">
+      <Command.LargeImages>
+        <Image>res/NewL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdNewDefault" LabelTitle="Set Encoding" TooltipTitle="Set default encoding" TooltipDescription="Set the default encoding for new files, e.g. ANSI, UTF-8, ..." >
+      <Command.LargeImages>
+        <Image>res/keyL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/keyS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdOpen" LabelTitle="&amp;Open" TooltipTitle="Open Files" TooltipDescription="Opens one or more files" Keytip="O">
+      <Command.LargeImages>
+        <Image>res/OpenL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSave" LabelTitle="&amp;Save" TooltipTitle="Save File" TooltipDescription="Saves the current tab" Keytip="S">
+      <Command.LargeImages>
+        <Image>res/SaveL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSaveAll" LabelTitle="Save &amp;all" TooltipTitle="Save Files" TooltipDescription="Saves all open files" Keytip="A">
+      <Command.LargeImages>
+        <Image>res/SaveAllL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSaveAuto" LabelTitle="Auto save" TooltipTitle="Auto save" TooltipDescription="Saves changes automatically when the tab is switched or closed">
+      <Command.LargeImages>
+        <Image>res/SaveAutoL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSaveAs" LabelTitle="Sa&amp;ve as" TooltipTitle="Save as" TooltipDescription="Asks where to save the current tab" Keytip="AS">
+      <Command.LargeImages>
+        <Image>res/SaveAsL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdClose" LabelTitle="&amp;Close Tab" TooltipTitle="Close Tab" TooltipDescription="Close the current tab" Keytip="C">
+      <Command.LargeImages>
+        <Image>res/CloseL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdCloseAll" LabelTitle="Close all" TooltipTitle="Close All Tabs" TooltipDescription="Closes all open files" Keytip="CA">
+      <Command.LargeImages>
+        <Image>res/CloseAllL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdWriteProtect" LabelTitle="Readonly" TooltipTitle="Write protected" TooltipDescription="Prevents editing the file" Keytip="FR">
+      <Command.LargeImages>
+        <Image>res/LockedL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdCopy" LabelTitle="Copy" TooltipTitle="Clipboard" TooltipDescription="Copy the current selection to the clipboard. Hold down the shift key to copy the text formatted." Keytip="C">
+      <Command.SmallImages>
+        <Image>res/Copy.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdCut" LabelTitle="Cut" TooltipTitle="Clipboard" TooltipDescription="Cut the current selection to the clipboard. Hold down the shift key to cut the text formatted." Keytip="X">
+      <Command.SmallImages>
+        <Image>res/Cut.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdPaste" LabelTitle="Paste" TooltipTitle="Clipboard" TooltipDescription="Inserts the content of the clipboard at the cursor position" Keytip="V">
+      <Command.LargeImages>
+        <Image>res/Paste.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdUndo" LabelTitle="Undo" TooltipTitle="Undo" TooltipDescription="Undo the last change" Keytip="Z">
+      <Command.LargeImages>
+        <Image>res/UndoL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/Undo.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdRedo" LabelTitle="Redo" TooltipTitle="Redo" TooltipDescription="Redo what was undone before" Keytip="Y">
+      <Command.LargeImages>
+        <Image>res/RedoL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/Redo.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLineWrap" LabelTitle="Wrap Lines" TooltipTitle="Wrap Lines" TooltipDescription="Wrap lines at the end of the window" Keytip="W">
+      <Command.LargeImages>
+        <Image>res/LineWrapL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/LineWrap.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdWhiteSpace" LabelTitle="Whitespace" TooltipTitle="Show Whitespaces" TooltipDescription="Turns showing whitespaces on/off.
+Hold down the Shift key to show EOLs as well." Keytip="WS">
+      <Command.LargeImages>
+        <Image>res/wspaceL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/wspaceS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLinenumbers" LabelTitle="Line numbers" TooltipTitle="Show line numbers" TooltipDescription="Turns showing the line numbers on/off" Keytip="WL">
+      <Command.LargeImages>
+        <Image>res/LineNumbersL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdFileTree" LabelTitle="File Tree" TooltipTitle="Show the file tree" TooltipDescription="Shows or hides the file tree" Keytip="FT">
+      <Command.LargeImages>
+        <Image>res/FileTreeL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupEncoding" LabelTitle="Encoding" Keytip="ENC">
+      <Command.LargeImages>
+        <Image>res/KeyL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLoadAsEncoding" LabelTitle="Load as" TooltipTitle="Load as" TooltipDescription="Allows to load a file with a specific encoding" Keytip="LA">
+      <Command.LargeImages>
+        <Image>res/keyL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/keyS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdConvertEncoding" LabelTitle="Convert to" TooltipTitle="Convert to" TooltipDescription="Converts the file to the specified encoding" Keytip="CT">
+      <Command.LargeImages>
+        <Image>res/keyL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/keyS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdCodeStyle" LabelTitle="Lexer" TooltipTitle="Language Lexer" TooltipDescription="Set the coloring according to the code language" Keytip="LEX">
+      <Command.LargeImages>
+        <Image>res/CodeStyleL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdEOLGroup" LabelTitle="Line Endings" Keytip="EOL">
+      <Command.SmallImages>
+        <Image>res/crlfS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdEOLWin" LabelTitle="Windows (CRLF)" Keytip="CR">
+      <Command.SmallImages>
+        <Image>res/crlfS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdEOLUnix" LabelTitle="Unix (LF)" Keytip="LF">
+      <Command.SmallImages>
+        <Image>res/lfS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdEOLMac" LabelTitle="MAC (CR)" Keytip="MAC">
+      <Command.SmallImages>
+        <Image>res/crS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdGroupFind" LabelTitle="Find">
+      <Command.LargeImages>
+        <Image>res/FindReplaceL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdPrevNext" />
+    <!-- dummy command, does nothing -->
+    <Command Name="cmdPrevious" LabelTitle="Previous" TooltipTitle="Previous" TooltipDescription="go to the previous cursor position" Keytip="PREV">
+      <Command.LargeImages>
+        <Image>res/PrevL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdNext" LabelTitle="Next" TooltipTitle="Next" TooltipDescription="go to the next cursor position" Keytip="NEXT">
+      <Command.LargeImages>
+        <Image>res/NextL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdFindFile" />
+    <Command Name="cmdFindReplace" LabelTitle="Find/Replace" TooltipTitle="Find &amp;&amp; Replace" TooltipDescription="Search and/or replace text in documents/tabs" Keytip="F">
+      <Command.LargeImages>
+        <Image>res/FindReplaceL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdFindNext" LabelTitle="Find Next" TooltipTitle="Find Next" TooltipDescription="Moves to the next match of the last search" Keytip="FN">
+      <Command.LargeImages>
+        <Image>res/FindNextL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdFindPrev" LabelTitle="Find Previous" TooltipTitle="Find Previous" TooltipDescription="Moves to the previous match of the last search" Keytip="FP">
+      <Command.LargeImages>
+        <Image>res/FindPrevL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdFindSelectedNext" LabelTitle="Find Next Selected" TooltipTitle="Find Next Selected" TooltipDescription="Searches for the next match of the selected text" Keytip="FSN">
+      <Command.LargeImages>
+        <Image>res/FindNextSelL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdFindSelectedPrev" />
+    <Command Name="cmdDelete" LabelTitle="Delete" Keytip="DEL">
+      <Command.SmallImages>
+        <Image>res/DeleteS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdSelectAll" LabelTitle="Select all" Keytip="SA">
+      <Command.SmallImages>
+        <Image>res/SelectAllS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdStyleConfigurator" LabelTitle="Configure Styles" TooltipTitle="Configure Styles" TooltipDescription="Configure colors, fonts, styles and sizes" Keytip="ST">
+      <Command.LargeImages>
+        <Image>res/StyleConfigL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdVerticalEdge" LabelTitle="Right margin" TooltipTitle="Right margin" TooltipDescription="Sets the column at which the vertical edge is shown, indicating the right margin. Set to 0 to hide it." Keytip="VE">
+      <Command.LargeImages>
+        <Image>res/VEdgeL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdComment" LabelTitle="Comment" TooltipTitle="Comment" TooltipDescription="Comments the selected text" Keytip="CC">
+      <Command.LargeImages>
+        <Image>res/CommentL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/CommentS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdUnComment" LabelTitle="Uncomment" TooltipTitle="Uncomment" TooltipDescription="Uncomments the selected text" Keytip="CU">
+      <Command.LargeImages>
+        <Image>res/UnCommentL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/UnCommentS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdGroupCase" LabelTitle="Change Case">
+      <Command.SmallImages>
+        <Image>res/UpperCaseS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdUppercase" LabelTitle="Uppercase" TooltipTitle="Uppercase" TooltipDescription="Converts the selection to UPPERcase" Keytip="MU">
+      <Command.SmallImages>
+        <Image>res/UpperCaseS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLowercase" LabelTitle="Lowercase" TooltipTitle="Lowercase" TooltipDescription="Converts the selection to lowercase" Keytip="ML">
+      <Command.SmallImages>
+        <Image>res/LowerCaseS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdTitlecase" LabelTitle="Titlecase" TooltipTitle="Titlecase" TooltipDescription="Converts the selection to Title Case" Keytip="ML">
+      <Command.SmallImages>
+        <Image>res/TitleCaseS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdTabSize" LabelTitle="Tab Size" TooltipTitle="Tab Size" TooltipDescription="Set the number of columns for one tabulator." Keytip="TS">
+    </Command>
+    <Command Name="cmdUseTabs" LabelTitle="Use Tabs" TooltipTitle="Use Tabs" TooltipDescription="Determines whether a tab is inserted or spaces when the tab key is pressed." Keytip="UT">
+      <Command.SmallImages>
+        <Image>res/Space2TabL.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+
+    <Command Name="cmdGroupLines" LabelTitle="Lines">
+      <Command.LargeImages>
+        <Image>res/LineDupL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLineDuplicate" LabelTitle="Duplicate Line" TooltipTitle="Duplicate Line" TooltipDescription="Duplicates the current line" Keytip="DD">
+      <Command.LargeImages>
+        <Image>res/LineDupL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLineSplit" LabelTitle="Split Lines" TooltipTitle="Split Lines" TooltipDescription="Split long lines at the right window border" Keytip="LS">
+      <Command.LargeImages>
+        <Image>res/LineSplitL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/LineSplitS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLineJoin" LabelTitle="Join Lines" TooltipTitle="Join Lines" TooltipDescription="Join selected lines to one long line" Keytip="JL">
+      <Command.LargeImages>
+        <Image>res/LineJoinL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/LineJoinS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLineUp" LabelTitle="Move up" TooltipTitle="Move line up" TooltipDescription="Moves the selected lines upwards" Keytip="LU">
+      <Command.LargeImages>
+        <Image>res/LineUpL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLineDown" LabelTitle="Move down" TooltipTitle="Move line down" TooltipDescription="Moves the selected lines downwards" Keytip="LD">
+      <Command.LargeImages>
+        <Image>res/LineDownL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSort" LabelTitle="Sort Lines" TooltipTitle="Sort Lines" TooltipDescription="Sorts the current selection (normal or rectangular)." Keytip="SL">
+      <Command.LargeImages>
+        <Image>res/SortL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupPrint" LabelTitle="Print"  Keytip="P">
+      <Command.LargeImages>
+        <Image>res/PrintL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupPrint2" LabelTitle="Print"  Keytip="P">
+      <Command.LargeImages>
+        <Image>res/PrintL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupPrint3" LabelTitle="Print"  Keytip="P">
+      <Command.LargeImages>
+        <Image>res/PrintL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdPrintNow" LabelTitle="Print" TooltipTitle="Print now" TooltipDescription="Sends the document to the default printer">
+      <Command.LargeImages>
+        <Image>res/PrintNowL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdPrint" LabelTitle="Print setup" TooltipTitle="Print setup" TooltipDescription="Opens the printer setup dialog" Keytip="PP">
+      <Command.LargeImages>
+        <Image>res/PrintL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdPageSetup" LabelTitle="Page Setup" TooltipTitle="Print Page Setup" TooltipDescription="Set up print margins, page size, page orientation" Keytip="PS">
+      <Command.LargeImages>
+        <Image>res/PageSetupL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGotoLine" LabelTitle="Go to line" TooltipTitle="Go to line" TooltipDescription="Moves the cursor to the specified line" Keytip="GL">
+      <Command.LargeImages>
+        <Image>res/GotoLineL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGotoSymbol" LabelTitle="Go to symbol" TooltipTitle="Go to symbol" TooltipDescription="Moves the cursor to the specified symbol" Keytip="GS">
+      <Command.LargeImages>
+        <Image>res/GotoSymbolL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
+    <Command Name="cmdGroupBlanks" LabelTitle="Other operations">
+      <Command.LargeImages>
+        <Image>res/TrimL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdWhitespacecombo" LabelTitle="Whitespaces" Keytip="W">
+      <Command.LargeImages>
+        <Image>res/WhitespaceL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdTrim" LabelTitle="Trim Whitespaces" TooltipTitle="Trim Whitespaces" TooltipDescription="Removes whitespaces at the end of lines" Keytip="T">
+      <Command.LargeImages>
+        <Image>res/TrimL.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/TrimS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdTabs2Spaces" LabelTitle="Tabs to Spaces" TooltipTitle="Tabs to Spaces" TooltipDescription="Converts all tabs in the document to spaces" Keytip="TS">
+      <Command.LargeImages>
+        <Image>res/Tab2SpaceL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpaces2Tabs" LabelTitle="Spaces to Tabs" TooltipTitle="Spaces to Tabs" TooltipDescription="Converts all spaces in the document to tabs" Keytip="ST">
+      <Command.LargeImages>
+        <Image>res/Space2TabL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
+    <Command Name="cmdReload" LabelTitle="&amp;Reload" TooltipTitle="Reload" TooltipDescription="Reload the file from disk" Keytip="RELOAD">
+      <Command.LargeImages>
+        <Image>res/RefreshL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
+    <Command Name="cmdGroupGoto" LabelTitle="Goto">
+      <Command.LargeImages>
+        <Image>res/GotoLineL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdBookmarks" />
+    <Command Name="cmdGroupBookmarks" LabelTitle="Bookmarks">
+      <Command.LargeImages>
+        <Image>res/BookmarkL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdGroupBookmarksBtn" LabelTitle="Bookmarks">
+      <Command.LargeImages>
+        <Image>res/BookmarkL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdBookmarkToggle" LabelTitle="Bookmark" TooltipTitle="Toggle Bookmark" TooltipDescription="Toggle a bookmark on the current line" Keytip="BT">
+      <Command.LargeImages>
+        <Image>res/BookmarkL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdBookmarkClearAll" LabelTitle="Clear Bookmarks" TooltipTitle="Clear Bookmarks" TooltipDescription="Removes all bookmarks from the current file" Keytip="BC">
+      <Command.LargeImages>
+        <Image>res/BookmarkClearL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdBookmarkNext" LabelTitle="Next" TooltipTitle="Next Bookmark" TooltipDescription="Move the caret to the next bookmark" Keytip="BN">
+      <Command.LargeImages>
+        <Image>res/BookmarkNextL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdBookmarkPrev" LabelTitle="Previous" TooltipTitle="Previous Bookmark" TooltipDescription="Move the caret to the previous bookmark" Keytip="BP">
+      <Command.LargeImages>
+        <Image>res/BookmarkPrevL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
+    <Command Name="cmdGroupMisc" LabelTitle="Misc">
+      <Command.LargeImages>
+        <Image>res/LangL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdToggleTheme" LabelTitle="Dark Theme" TooltipTitle="Dark Theme" TooltipDescription="Toggles between the normal and the dark theme" Keytip="TT">
+      <Command.LargeImages>
+        <Image>res/DarkThemeL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLanguage" LabelTitle="Language" TooltipTitle="Select Language" TooltipDescription="Select the language for BowPad" Keytip="LS">
+      <Command.LargeImages>
+        <Image>res/LangL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
+    <Command Name="cmdGroupLaunch" LabelTitle="Cmd">
+      <Command.LargeImages>
+        <Image>res/PlayL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchGroup" LabelTitle="Run" TooltipTitle="Runs various commands">
+      <Command.LargeImages>
+        <Image>res/PlayL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchIE" LabelTitle="Launch in IE" TooltipTitle="Launch in Internet Explorer" TooltipDescription="Opens the current file in Microsoft Internet Explorer">
+      <Command.LargeImages>
+        <Image>res/IEL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchFirefox" LabelTitle="Launch in Firefox" TooltipTitle="Launch in Firefox" TooltipDescription="Opens the current file in the Firefox browser">
+      <Command.LargeImages>
+        <Image>res/FirefoxL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchChrome" LabelTitle="Launch in Chrome" TooltipTitle="Launch in Google Chrome" TooltipDescription="Opens the current file in the Google Chrome browser">
+      <Command.LargeImages>
+        <Image>res/ChromeL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchSafari" LabelTitle="Launch in Safari" TooltipTitle="Launch in Safari" TooltipDescription="Opens the current file in the Safari browser">
+      <Command.LargeImages>
+        <Image>res/SafariL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchOpera" LabelTitle="Launch in Opera" TooltipTitle="Launch in Opera" TooltipDescription="Opens the current file in the Opera browser">
+      <Command.LargeImages>
+        <Image>res/OperaL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchExplorer" LabelTitle="Open Explorer" TooltipTitle="Open Explorer" TooltipDescription="Opens the Windows Explorer at the current file location">
+      <Command.SmallImages>
+        <Image>res/ExplorerS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLaunchConsole" LabelTitle="Open Console" TooltipTitle="Open Console" TooltipDescription="Opens the Console at the current file location">
+      <Command.SmallImages>
+        <Image>res/ConsoleL.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdLaunchSearch" LabelTitle="Search Web" TooltipTitle="Search Web" TooltipDescription="Opens the default browser to search for the selected text">
+      <Command.LargeImages>
+        <Image>res/WorldL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchWikipedia" LabelTitle="Search Wikipedia" TooltipTitle="Search Wikipedia" TooltipDescription="Opens the default browser to search Wikipedia for the selected text">
+      <Command.LargeImages>
+        <Image>res/WikipediaL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom0" LabelTitle="Custom Command 0" TooltipTitle="Custom Command 0" TooltipDescription="runs the custom command 0">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom1" LabelTitle="Custom Command 1" TooltipTitle="Custom Command 1" TooltipDescription="runs the custom command 1">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom2" LabelTitle="Custom Command 2" TooltipTitle="Custom Command 2" TooltipDescription="runs the custom command 2">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom3" LabelTitle="Custom Command 3" TooltipTitle="Custom Command 3" TooltipDescription="runs the custom command 3">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom4" LabelTitle="Custom Command 4" TooltipTitle="Custom Command 4" TooltipDescription="runs the custom command 4">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom5" LabelTitle="Custom Command 5" TooltipTitle="Custom Command 5" TooltipDescription="runs the custom command 5">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom6" LabelTitle="Custom Command 6" TooltipTitle="Custom Command 6" TooltipDescription="runs the custom command 6">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom7" LabelTitle="Custom Command 7" TooltipTitle="Custom Command 7" TooltipDescription="runs the custom command 7">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom8" LabelTitle="Custom Command 8" TooltipTitle="Custom Command 8" TooltipDescription="runs the custom command 8">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdLaunchCustom9" LabelTitle="Custom Command 9" TooltipTitle="Custom Command 9" TooltipDescription="runs the custom command 9">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdCustomCommands" LabelTitle="Configure custom commands" TooltipTitle="Configure custom commands" TooltipDescription="Shows a dialog to configure custom commands">
+      <Command.LargeImages>
+        <Image>res/CustCommandS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
+    <Command Name="cmdSessionLoad" LabelTitle="Load session" TooltipTitle="Load last session" TooltipDescription="Loads all files that were open the last time BowPad got closed" Keytip="LS">
+      <Command.LargeImages>
+        <Image>res/SessionLoadL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSessionAutoLoad" LabelTitle="Load session on start" TooltipTitle="Load last session on start" TooltipDescription="Loads all files automatically that were open the last time BowPad got closed" Keytip="SAL">
+      <Command.LargeImages>
+        <Image>res/SessionAutoL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
+    <Command Name="cmdFunctions" LabelTitle="Functions" TooltipTitle="Functions" TooltipDescription="Shows a list of functions/methods in the file to jump to" Keytip="FN">
+      <Command.LargeImages>
+        <Image>res/func32.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/func16.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+
+    <Command Name="cmdCloseAllButThis" LabelTitle="Close all but this" TooltipTitle="Close All Tabs Except This One" TooltipDescription="Closes all open files except the current one">
+      <Command.LargeImages>
+        <Image>res/CloseAllL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdCopyPath" LabelTitle="Copy Path" TooltipTitle="Copy Path" TooltipDescription="Copies the path of the current file to the clipboard">
+      <Command.LargeImages>
+        <Image>res/Copy.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdCopyName" LabelTitle="Copy Name" TooltipTitle="Copy Name" TooltipDescription="Copies the name of the current file to the clipboard">
+      <Command.LargeImages>
+        <Image>res/Copy.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdCopyDir" LabelTitle="Copy Directory" TooltipTitle="Copy Directory" TooltipDescription="Copies the path of the directory of the current file to the clipboard">
+      <Command.LargeImages>
+        <Image>res/Copy.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdExplore" LabelTitle="Open Explorer" TooltipTitle="Open Explorer" TooltipDescription="Opens the Windows Explorer at the current file path">
+      <Command.LargeImages>
+        <Image>res/ExplorerS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdExploreProperties" LabelTitle="Show Properties" TooltipTitle="Show Properties" TooltipDescription="Shows the Windows Explorer file properties dialog for the current file">
+      <Command.LargeImages>
+        <Image>res/ExplorerS.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdConfigShortcuts" LabelTitle="Configure Shortcuts" TooltipTitle="Configure Keyboard Shortcuts" TooltipDescription="Opens the config file to configure keyboard shortcuts for any command in BowPad">
+      <Command.LargeImages>
+        <Image>res/KeyShortCutsL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
+    <Command Name="cmdFontOnlyGroup" LabelTitle="Font" />
+    <Command Name="cmdFontOnly" />
+
+    <Command Name="cmdAutoBraces" LabelTitle="Auto Braces" TooltipTitle="Auto Braces" TooltipDescription="Enable to automatically add a closing brace when an opening brace is entered" Keytip="AB">
+      <Command.SmallImages>
+        <Image>res/AutoBraces.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdOpenSelection" LabelTitle="Open File" TooltipTitle="Open File under cursor" TooltipDescription="Opens the file/path that's at the cursor position">
+      <Command.SmallImages>
+        <Image>res/OpenL.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+
+    <Command Name="cmdFileDelete" LabelTitle="Delete File" TooltipTitle="Delete File" TooltipDescription="Deletes the file of the current tab" >
+      <Command.LargeImages>
+        <Image>res/FileDeleteL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdNewCopy" LabelTitle="New Copy" TooltipTitle="New Copy" TooltipDescription="Creates a copy of the current tab" >
+      <Command.LargeImages>
+        <Image>res/FileNewCopyL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
+    <Command Name="cmdGroupPlugins" LabelTitle="Plugins">
+      <Command.LargeImages>
+        <Image>res/PluginsL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdPluginConfig" LabelTitle="Configure" TooltipTitle="Configure Plugins" TooltipDescription="Shows a dialog to configure the installed plugins and install new plugins">
+      <Command.LargeImages>
+        <Image>res/PluginsConfigL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdPlugins" LabelTitle="Plugins" TooltipTitle="Plugin commands" TooltipDescription="All plugin commands are listed here">
+      <Command.LargeImages>
+        <Image>res/PluginsL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdTabList" LabelTitle="Tabs" TooltipTitle="Tab List" TooltipDescription="Shows the list of all opened tabs.">
+      <Command.LargeImages>
+        <Image>res/TabListL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSummary" LabelTitle="Summary" TooltipTitle="Document Summary" TooltipDescription="Shows statistics about the current document">
+      <Command.LargeImages>
+        <Image>res/SummaryL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+
+    <Command Name="cmdFoldGroup" LabelTitle="Folding">
+      <Command.LargeImages>
+        <Image>res/FoldL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdInitFoldingMargin" LabelTitle="Init Folding Margin" TooltipTitle="Init Folding Margin" TooltipDescription="Init Folding Margin" />
+    <Command Name="cmdFoldingOn" LabelTitle="Folding On" TooltipTitle="Folding On" TooltipDescription="turn on folding" />
+    <Command Name="cmdFoldingOff" LabelTitle="Folding Off" TooltipTitle="Folding Off" TooltipDescription="turns off folding" />
+    <Command Name="cmdFoldAll" LabelTitle="Toggle folding all" TooltipTitle="Toggle folding all" TooltipDescription="toggles folding all levels in the whole document" />
+    <Command Name="cmdFoldLevel0" LabelTitle="Toggle level 0" TooltipTitle="Toggle level 0" TooltipDescription="toggles folding at level 0 in the whole document" />
+    <Command Name="cmdFoldLevel1" LabelTitle="Toggle level 1" TooltipTitle="Toggle level 1" TooltipDescription="toggles folding at level 1 in the whole document" />
+    <Command Name="cmdFoldLevel2" LabelTitle="Toggle level 2" TooltipTitle="Toggle level 2" TooltipDescription="toggles folding at level 2 in the whole document" />
+    <Command Name="cmdFoldLevel3" LabelTitle="Toggle level 3" TooltipTitle="Toggle level 3" TooltipDescription="toggles folding at level 3 in the whole document" />
+    <Command Name="cmdFoldLevel4" LabelTitle="Toggle level 4" TooltipTitle="Toggle level 4" TooltipDescription="toggles folding at level 4 in the whole document" />
+    <Command Name="cmdFoldLevel5" LabelTitle="Toggle level 5" TooltipTitle="Toggle level 5" TooltipDescription="toggles folding at level 5 in the whole document" />
+    <Command Name="cmdFoldLevel6" LabelTitle="Toggle level 6" TooltipTitle="Toggle level 6" TooltipDescription="toggles folding at level 6 in the whole document" />
+    <Command Name="cmdFoldLevel7" LabelTitle="Toggle level 7" TooltipTitle="Toggle level 7" TooltipDescription="toggles folding at level 7 in the whole document" />
+    <Command Name="cmdFoldLevel8" LabelTitle="Toggle level 8" TooltipTitle="Toggle level 8" TooltipDescription="toggles folding at level 8 in the whole document" />
+    <Command Name="cmdFoldLevel9" LabelTitle="Toggle level 9" TooltipTitle="Toggle level 9" TooltipDescription="toggles folding at level 9 in the whole document" />
+
+    <Command Name="cmdSpellCheckGroup" LabelTitle="Spell Check">
+      <Command.LargeImages>
+        <Image>res/FoldL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpellCheck" LabelTitle="Spell checker" TooltipTitle="Spell checker" TooltipDescription="Enables/Disables the spell checker">
+      <Command.LargeImages>
+        <Image>res/SpellCheckL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpellCheckLang" LabelTitle="Language" TooltipTitle="Spell checker language" TooltipDescription="Selects the language for the spell checker">
+      <Command.LargeImages>
+        <Image>res/LangL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpellCheckCorrect" LabelTitle="Spell checker" TooltipTitle="Spell checker" TooltipDescription="Correct spelling mistakes">
+      <Command.LargeImages>
+        <Image>res/SpellCheckL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpellCheckAll" LabelTitle="Only comments" TooltipTitle="Only comments" TooltipDescription="Check for errors only in comments, strings and text">
+      <Command.LargeImages>
+        <Image>res/CommentL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSpellCheckUpper" LabelTitle="Include uppercase" TooltipTitle="Include uppercase" TooltipDescription="Include words that are all CAPS or have uppercase letters in the middle">
+      <Command.SmallImages>
+        <Image>res/TitleCaseS.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+
+
+    <Command Name="cmdContextMap" />
+    <Command Name="cmdContextSpellMap" />
+    <Command Name="cmdTabContextMap" />
+    <Command Name="cmdSelectTab" Id="10000" />
+    <Command Name="cmdZoom100" Id="10001" />
+    <Command Name="cmdZoomIn" Id="10002" />
+    <Command Name="cmdZoomOut" Id="10003" />
+    <Command Name="cmdAbout" Id="10004" />
+    <Command Name="cmdGotoBrace" Id="10005" />
+    <Command Name="cmdRandom" Id="10006" />
+    <Command Name="cmdCutPlain" Id="10007">
+      <Command.SmallImages>
+        <Image>res/Cut.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdCopyPlain" Id="10008">
+      <Command.SmallImages>
+        <Image>res/Copy.bmp</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdHeaderSource" Id="10009" LabelTitle="Corresponding File" TooltipTitle="Open corresponding File" TooltipDescription="Opens the corresponding file to the file in the current tab.
+(h/cpp, aspx/cs/vb)">
+      <Command.LargeImages>
+        <Image>res/HeaderSourceL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdSessionLast" Id="10010" />
+    <Command Name="cmdPasteHistory" Id="10011" />
+    <Command Name="cmdGroupNewBtn" Id="10012" />
+    <Command Name="cmdFileTreeControl" Id="10013" />
+    <Command Name="cmdGroupSaveBtn" Id="10014" />
+    <!-- dummy command, does nothing. Used to disable hotkeys -->
+    <Command Name="cmdNothing" Id="30000" />
+
+  </Application.Commands>
+  <Application.Views>
+    <Ribbon>
+      <Ribbon.HelpButton>
+        <HelpButton CommandName="cmdAbout" />
+      </Ribbon.HelpButton>
+      <Ribbon.ApplicationMenu>
+        <ApplicationMenu CommandName="cmdFileMenu">
+          <ApplicationMenu.RecentItems>
+            <RecentItems CommandName="cmdMRUList" EnablePinning="true" MaxCount="20"/>
+          </ApplicationMenu.RecentItems>
+          <MenuGroup Class="MajorItems">
+            <Button CommandName="cmdNew" />
+            <Button CommandName="cmdOpen" />
+          </MenuGroup>
+          <MenuGroup>
+            <DropDownButton CommandName="cmdGroupPrint">
+              <Button CommandName="cmdPrintNow"/>
+              <Button CommandName="cmdPageSetup" />
+              <Button CommandName="cmdPrint" />
+            </DropDownButton>
+            <Button CommandName="cmdSummary" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdReload" />
+            <Button CommandName="cmdSave" />
+            <Button CommandName="cmdSaveAll" />
+            <Button CommandName="cmdSaveAs" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdClose" />
+            <Button CommandName="cmdCloseAll" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdConfigShortcuts" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdExit" />
+          </MenuGroup>
+        </ApplicationMenu>
+      </Ribbon.ApplicationMenu>
+      <Ribbon.Tabs>
+        <Tab CommandName="cmdMainTab">
+          <Tab.ScalingPolicy>
+            <ScalingPolicy>
+              <ScalingPolicy.IdealSizes>
+                <!-- This describes the maximum size of each group in the tab. -->
+                <Scale Group="cmdGroupFile" Size="Medium" />
+                <Scale Group="cmdGroupClipboard" Size="Medium" />
+                <Scale Group="cmdGroupUndo" Size="Large" />
+                <Scale Group="cmdGroupFind" Size="Large" />
+                <Scale Group="cmdGroupBookmarks" Size="Large" />
+                <Scale Group="cmdGroupComment" Size="Medium" />
+                <Scale Group="cmdGroupBlanks" Size="Medium" />
+                <Scale Group="cmdSpellCheckGroup" Size="Medium" />
+              </ScalingPolicy.IdealSizes>
+              <!-- This describes the order and how the groups shrink when the window is
+              resized. -->
+              <Scale Group="cmdGroupFind" Size="Medium" />
+              <Scale Group="cmdGroupFile" Size="Small" />
+              <Scale Group="cmdGroupClipboard" Size="Small" />
+              <Scale Group="cmdGroupFind" Size="Small" />
+              <Scale Group="cmdGroupGoto" Size="Medium" />
+              <Scale Group="cmdGroupBookmarks" Size="Medium" />
+              <Scale Group="cmdGroupComment" Size="Small" />
+              <Scale Group="cmdGroupBlanks" Size="Small" />
+              <Scale Group="cmdGroupUndo" Size="Medium" />
+              <Scale Group="cmdSpellCheckGroup" Size="Small" />
+            </ScalingPolicy>
+          </Tab.ScalingPolicy>
+          <Group CommandName="cmdGroupFile" SizeDefinition="SevenButtons">
+            <Button CommandName="cmdOpen" />
+            <SplitButton CommandName="cmdGroupNewBtn">
+              <SplitButton.ButtonItem>
+                <Button CommandName="cmdNew" />
+              </SplitButton.ButtonItem>
+              <Button CommandName="cmdNewDefault" />
+            </SplitButton>
+            <Button CommandName="cmdSave" />
+            <SplitButton CommandName="cmdGroupSaveBtn">
+              <SplitButton.ButtonItem>
+                <Button CommandName="cmdSaveAll" />
+              </SplitButton.ButtonItem>
+              <ToggleButton CommandName="cmdSaveAuto" />
+            </SplitButton>
+            <Button CommandName="cmdSessionLoad" />
+            <ToggleButton CommandName="cmdSessionAutoLoad" />
+            <ToggleButton CommandName="cmdWriteProtect" />
+          </Group>
+          <Group CommandName="cmdGroupClipboard" SizeDefinition="ThreeButtons-OneBigAndTwoSmall">
+            <Button CommandName="cmdPaste" />
+            <Button CommandName="cmdCopy" />
+            <Button CommandName="cmdCut" />
+          </Group>
+          <Group CommandName="cmdGroupUndo" SizeDefinition="TwoButtonsWithSmall">
+            <Button CommandName="cmdUndo" />
+            <Button CommandName="cmdRedo" />
+          </Group>
+          <Group CommandName="cmdGroupFind" SizeDefinition="FourButtons">
+            <Button CommandName="cmdFindReplace" />
+            <Button CommandName="cmdFindNext" />
+            <Button CommandName="cmdFindPrev" />
+            <Button CommandName="cmdFindSelectedNext" />
+          </Group>
+          <Group CommandName="cmdGroupGoto" SizeDefinition="FourButtons">
+            <DropDownGallery CommandName="cmdTabList" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout Gripper="None"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <Button CommandName="cmdGotoLine" />
+            <Button CommandName="cmdPrevious" />
+            <Button CommandName="cmdNext" />
+          </Group>
+          <Group CommandName="cmdGroupBookmarks" SizeDefinition="ThreeButtons">
+            <SplitButton CommandName="cmdGroupBookmarksBtn">
+              <SplitButton.ButtonItem>
+                <Button CommandName="cmdBookmarkToggle" />
+              </SplitButton.ButtonItem>
+              <Button CommandName="cmdBookmarkClearAll" />
+            </SplitButton>
+            <Button CommandName="cmdBookmarkPrev" />
+            <Button CommandName="cmdBookmarkNext" />
+          </Group>
+          <Group CommandName="cmdGroupLaunch" SizeDefinition="OneButton">
+            <DropDownButton CommandName="cmdLaunchGroup">
+              <MenuGroup>
+                <Button CommandName="cmdLaunchIE"/>
+                <Button CommandName="cmdLaunchFirefox"/>
+                <Button CommandName="cmdLaunchChrome"/>
+                <Button CommandName="cmdLaunchSafari"/>
+                <Button CommandName="cmdLaunchOpera"/>
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdLaunchSearch"/>
+                <Button CommandName="cmdLaunchWikipedia"/>
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdLaunchExplorer"/>
+                <Button CommandName="cmdLaunchConsole"/>
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdLaunchCustom0"/>
+                <Button CommandName="cmdLaunchCustom1"/>
+                <Button CommandName="cmdLaunchCustom2"/>
+                <Button CommandName="cmdLaunchCustom3"/>
+                <Button CommandName="cmdLaunchCustom4"/>
+                <Button CommandName="cmdLaunchCustom5"/>
+                <Button CommandName="cmdLaunchCustom6"/>
+                <Button CommandName="cmdLaunchCustom7"/>
+                <Button CommandName="cmdLaunchCustom8"/>
+                <Button CommandName="cmdLaunchCustom9"/>
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdCustomCommands"/>
+              </MenuGroup>
+            </DropDownButton>
+          </Group>
+          <Group CommandName="cmdGroupComment" SizeDefinition="SixButtons">
+            <DropDownGallery CommandName="cmdFunctions" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="1"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <SplitButtonGallery CommandName="cmdHeaderSource" TextPosition="Right" Type="Items" >
+              <SplitButtonGallery.MenuLayout>
+                <VerticalMenuLayout Gripper="None"/>
+              </SplitButtonGallery.MenuLayout>
+            </SplitButtonGallery>
+            <Button CommandName="cmdGotoSymbol" />
+            <Button CommandName="cmdComment" />
+            <Button CommandName="cmdUnComment" />
+            <DropDownGallery CommandName="cmdCodeStyle" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="4"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+          </Group>
+          <Group CommandName="cmdGroupBlanks" SizeDefinition="SixButtons-TwoColumns">
+            <DropDownButton CommandName="cmdGroupLines">
+              <Button CommandName="cmdLineDuplicate" />
+              <Button CommandName="cmdLineUp" />
+              <Button CommandName="cmdLineDown" />
+              <Button CommandName="cmdLineSplit" />
+              <Button CommandName="cmdLineJoin" />
+              <Button CommandName="cmdSort" />
+            </DropDownButton>
+            <DropDownButton CommandName="cmdGroupCase">
+              <MenuGroup>
+                <Button CommandName="cmdUppercase" />
+                <Button CommandName="cmdLowercase" />
+                <Button CommandName="cmdTitlecase" />
+              </MenuGroup>
+            </DropDownButton>
+            <Button CommandName="cmdTrim" />
+            <DropDownButton CommandName="cmdWhitespacecombo">
+              <MenuGroup>
+                <Button CommandName="cmdTabs2Spaces" />
+                <Button CommandName="cmdSpaces2Tabs" />
+              </MenuGroup>
+              <MenuGroup>
+                <ToggleButton CommandName="cmdWhiteSpace" />
+              </MenuGroup>
+            </DropDownButton>
+            <DropDownButton CommandName="cmdEOLGroup">
+              <MenuGroup>
+                <ToggleButton CommandName="cmdEOLWin"/>
+                <ToggleButton CommandName="cmdEOLUnix"/>
+                <ToggleButton CommandName="cmdEOLMac"/>
+              </MenuGroup>
+            </DropDownButton>
+            <ToggleButton CommandName="cmdLineWrap"/>
+          </Group>
+          <Group CommandName="cmdSpellCheckGroup" SizeDefinition="FourButtons" ApplicationModes='1'>
+            <ToggleButton CommandName="cmdSpellCheck" />
+            <DropDownGallery CommandName="cmdSpellCheckLang" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="4"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <ToggleButton CommandName="cmdSpellCheckAll" />
+            <ToggleButton CommandName="cmdSpellCheckUpper" />
+          </Group>
+        </Tab>
+        <Tab CommandName="cmdOtherTab">
+          <Tab.ScalingPolicy>
+            <ScalingPolicy>
+              <ScalingPolicy.IdealSizes>
+                <!-- This describes the maximum size of each group in the tab. -->
+                <Scale Group="cmdGroupView" Size="Large" />
+                <Scale Group="cmdGroupEncoding" Size="Medium" />
+                <Scale Group="cmdGroupMisc" Size="Medium" />
+              </ScalingPolicy.IdealSizes>
+              <!-- This describes the order and how the groups shrink when the window is
+              resized. -->
+              <Scale Group="cmdGroupView" Size="Medium" />
+              <Scale Group="cmdGroupView" Size="Small" />
+            </ScalingPolicy>
+          </Tab.ScalingPolicy>
+          <Group CommandName="cmdFontOnlyGroup" SizeDefinition="OneFontControl">
+            <FontControl CommandName="cmdFontOnly"
+                         FontType="FontOnly"
+                         IsUnderlineButtonVisible="false"
+                         IsStrikethroughButtonVisible="false"
+                         IsHighlightButtonVisible="false"
+                         ShowTrueTypeOnly="true"
+                         ShowVerticalFonts="false"
+                         MinimumFontSize="6"
+                         MaximumFontSize="50" />
+          </Group>
+          <Group CommandName="cmdGroupPrint2" SizeDefinition="OneButton">
+            <SplitButton CommandName="cmdGroupPrint3">
+              <SplitButton.ButtonItem>
+                <Button CommandName="cmdPrintNow"/>
+              </SplitButton.ButtonItem>
+              <Button CommandName="cmdPageSetup" />
+              <Button CommandName="cmdPrintNow"/>
+              <Button CommandName="cmdPrint" />
+            </SplitButton>
+          </Group>
+          <Group CommandName="cmdGroupView">
+            <SizeDefinition>
+              <ControlNameMap>
+                <ControlNameDefinition Name="button1"/>
+                <ControlNameDefinition Name="button2"/>
+                <ControlNameDefinition Name="button3"/>
+                <ControlNameDefinition Name="button4"/>
+                <ControlNameDefinition Name="button5"/>
+                <ControlNameDefinition Name="button6"/>
+                <ControlNameDefinition Name="button7"/>
+              </ControlNameMap>
+              <GroupSizeDefinition Size="Large">
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
+                <ColumnBreak ShowSeparator="true"/>
+                <Row>
+                  <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <ColumnBreak ShowSeparator="true"/>
+                <Row>
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button7" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
+              </GroupSizeDefinition>
+              <GroupSizeDefinition Size="Medium">
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
+                <ColumnBreak ShowSeparator="true"/>
+                <Row>
+                  <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <ColumnBreak ShowSeparator="true"/>
+                <Row>
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button7" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
+              </GroupSizeDefinition>
+              <GroupSizeDefinition Size="Small">
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button1" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
+                <ColumnBreak ShowSeparator="true"/>
+                <Row>
+                  <ControlSizeDefinition ControlName="button2" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button3" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button4" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <ColumnBreak ShowSeparator="true"/>
+                <Row>
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
+                </Row>
+                <Row>
+                  <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
+                </Row>
+                <ControlGroup>
+                  <ControlSizeDefinition ControlName="button7" ImageSize="Large" IsLabelVisible="true" />
+                </ControlGroup>
+              </GroupSizeDefinition>
+            </SizeDefinition>
+            <ToggleButton CommandName="cmdFileTree" />
+            <ToggleButton CommandName="cmdLineWrap" />
+            <ToggleButton CommandName="cmdWhiteSpace" />
+            <ToggleButton CommandName="cmdLinenumbers" />
+            <Spinner CommandName="cmdTabSize" />
+            <ToggleButton CommandName="cmdUseTabs" />
+            <Spinner CommandName="cmdVerticalEdge" />
+          </Group>
+          <Group CommandName="cmdGroupEncoding" SizeDefinition="ThreeButtons">
+            <DropDownGallery CommandName="cmdLoadAsEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <DropDownGallery CommandName="cmdConvertEncoding" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <Button CommandName="cmdStyleConfigurator" />
+          </Group>
+          <Group CommandName="cmdGroupMisc" SizeDefinition="ThreeButtons">
+            <ToggleButton CommandName="cmdAutoBraces" />
+            <ToggleButton CommandName="cmdToggleTheme" />
+            <DropDownGallery CommandName="cmdLanguage" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+          </Group>
+          <Group CommandName="cmdGroupPlugins" SizeDefinition="TwoButtons">
+            <Button CommandName="cmdPluginConfig" />
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+          </Group>
+        </Tab>
+      </Ribbon.Tabs>
+      <Ribbon.QuickAccessToolbar>
+        <QuickAccessToolbar CommandName="cmdQat">
+          <QuickAccessToolbar.ApplicationDefaults>
+            <Button CommandName="cmdOpen" ApplicationDefaults.IsChecked="true"/>
+            <Button CommandName="cmdSave" ApplicationDefaults.IsChecked="true"/>
+            <Button CommandName="cmdClose" ApplicationDefaults.IsChecked="false"/>
+            <Button CommandName="cmdNew" ApplicationDefaults.IsChecked="false"/>
+            <DropDownGallery CommandName="cmdTabList" Type="Items" ItemHeight="16" ItemWidth="16" ApplicationDefaults.IsChecked="true">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout Gripper="None"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <Button CommandName="cmdFindReplace" ApplicationDefaults.IsChecked="false"/>
+            <DropDownGallery CommandName="cmdCodeStyle" ApplicationDefaults.IsChecked="false" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="4"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+          </QuickAccessToolbar.ApplicationDefaults>
+        </QuickAccessToolbar>
+      </Ribbon.QuickAccessToolbar>
+
+      <Ribbon.SizeDefinitions>
+        <SizeDefinition Name="TwoButtonsWithSmall">
+          <GroupSizeDefinition Size="Large">
+            <ControlSizeDefinition ImageSize="Large" IsLabelVisible="true" />
+            <ControlSizeDefinition ImageSize="Large" IsLabelVisible="true" />
+          </GroupSizeDefinition>
+          <GroupSizeDefinition Size="Medium">
+            <ControlSizeDefinition ImageSize="Small" IsLabelVisible="false" />
+            <ControlSizeDefinition ImageSize="Small" IsLabelVisible="false" />
+          </GroupSizeDefinition>
+          <GroupSizeDefinition Size="Small">
+            <ControlSizeDefinition ImageSize="Small" IsLabelVisible="false" />
+            <ControlSizeDefinition ImageSize="Small" IsLabelVisible="false" />
+          </GroupSizeDefinition>
+        </SizeDefinition>
+      </Ribbon.SizeDefinitions>
+    </Ribbon>
+    <ContextPopup>
+      <ContextPopup.MiniToolbars>
+        <MiniToolbar Name="CopyPasteToolbar">
+          <MenuGroup>
+            <Button CommandName="cmdCut" />
+            <Button CommandName="cmdCopy" />
+            <Button CommandName="cmdPaste" />
+          </MenuGroup>
+        </MiniToolbar>
+      </ContextPopup.MiniToolbars>
+      <ContextPopup.ContextMenus>
+        <ContextMenu Name="ContextMenu">
+          <MenuGroup>
+            <Button CommandName="cmdUndo" />
+            <Button CommandName="cmdRedo" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdSelectAll" />
+            <Button CommandName="cmdDelete" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdCut" />
+            <Button CommandName="cmdCopy" />
+            <Button CommandName="cmdPaste" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdLaunchSearch"/>
+            <Button CommandName="cmdLaunchWikipedia"/>
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdUppercase" />
+            <Button CommandName="cmdLowercase" />
+            <Button CommandName="cmdTitlecase" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdOpenSelection" />
+          </MenuGroup>
+          <MenuGroup>
+            <DropDownButton CommandName="cmdFoldGroup">
+              <MenuGroup>
+                <Button CommandName="cmdFoldAll" />
+                <Button CommandName="cmdFoldingOn" />
+                <Button CommandName="cmdFoldingOff" />
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdFoldLevel0" />
+                <Button CommandName="cmdFoldLevel1" />
+                <Button CommandName="cmdFoldLevel2" />
+                <Button CommandName="cmdFoldLevel3" />
+                <Button CommandName="cmdFoldLevel4" />
+                <Button CommandName="cmdFoldLevel5" />
+                <Button CommandName="cmdFoldLevel6" />
+                <Button CommandName="cmdFoldLevel7" />
+                <Button CommandName="cmdFoldLevel8" />
+                <Button CommandName="cmdFoldLevel9" />
+              </MenuGroup>
+            </DropDownButton>
+          </MenuGroup>
+          <MenuGroup>
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+          </MenuGroup>
+        </ContextMenu>
+        <ContextMenu Name="ContextMenuSpell">
+          <MenuGroup>
+            <Button CommandName="cmdUndo" />
+            <Button CommandName="cmdRedo" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdSelectAll" />
+            <Button CommandName="cmdDelete" />
+          </MenuGroup>
+          <MenuGroup>
+            <DropDownGallery CommandName="cmdSpellCheckCorrect" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="1"/>
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdLaunchSearch"/>
+            <Button CommandName="cmdLaunchWikipedia"/>
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdUppercase" />
+            <Button CommandName="cmdLowercase" />
+            <Button CommandName="cmdTitlecase" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdOpenSelection" />
+          </MenuGroup>
+          <MenuGroup>
+            <DropDownButton CommandName="cmdFoldGroup">
+              <MenuGroup>
+                <Button CommandName="cmdFoldAll" />
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdFoldLevel0" />
+                <Button CommandName="cmdFoldLevel1" />
+                <Button CommandName="cmdFoldLevel2" />
+                <Button CommandName="cmdFoldLevel3" />
+                <Button CommandName="cmdFoldLevel4" />
+                <Button CommandName="cmdFoldLevel5" />
+                <Button CommandName="cmdFoldLevel6" />
+                <Button CommandName="cmdFoldLevel7" />
+                <Button CommandName="cmdFoldLevel8" />
+                <Button CommandName="cmdFoldLevel9" />
+              </MenuGroup>
+            </DropDownButton>
+          </MenuGroup>
+          <MenuGroup>
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+              <DropDownGallery.MenuLayout>
+                <VerticalMenuLayout />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+          </MenuGroup>
+        </ContextMenu>
+        <ContextMenu Name="TabContextMenu">
+          <MenuGroup>
+            <Button CommandName="cmdClose" />
+            <Button CommandName="cmdCloseAll" />
+            <Button CommandName="cmdCloseAllButThis" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdSave" />
+            <Button CommandName="cmdSaveAs" />
+            <Button CommandName="cmdReload" />
+            <Button CommandName="cmdFileDelete" />
+            <Button CommandName="cmdNewCopy" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdCopyPath" />
+            <Button CommandName="cmdCopyName" />
+            <Button CommandName="cmdCopyDir" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="cmdExplore" />
+            <Button CommandName="cmdExploreProperties" />
+          </MenuGroup>
+        </ContextMenu>
+      </ContextPopup.ContextMenus>
+      <ContextPopup.ContextMaps>
+        <ContextMap CommandName="cmdContextMap" ContextMenu="ContextMenu" MiniToolbar="CopyPasteToolbar"/>
+        <ContextMap CommandName="cmdContextSpellMap" ContextMenu="ContextMenuSpell" MiniToolbar="CopyPasteToolbar"/>
+        <ContextMap CommandName="cmdTabContextMap" ContextMenu="TabContextMenu" />
+      </ContextPopup.ContextMaps>
+    </ContextPopup>
+  </Application.Views>
+</Application>
