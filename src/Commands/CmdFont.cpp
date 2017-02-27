@@ -62,7 +62,7 @@ HRESULT CCmdFont::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROP
             pValues->SetValue(UI_PKEY_FontProperties_Family, propvar);
             PropVariantClear(&propvar);
 
-            int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 10);
+            int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11);
             DECIMAL decSize;
             // Font size value is available so get the font size.
             VarDecFromR8((DOUBLE)fontsize, &decSize);
