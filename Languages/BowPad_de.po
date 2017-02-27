@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-25 15:13+0100\n"
-"PO-Revision-Date: 2017-02-25 15:17+0100\n"
+"POT-Creation-Date: 2017-02-27 21:53+0100\n"
+"PO-Revision-Date: 2017-02-27 21:57+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -1306,8 +1306,8 @@ msgstr "Zeile:"
 
 #. Resource IDs: (250)
 #, c-format
-msgid "Line: %ld / %ld   Column: %ld"
-msgstr "Linie: %ld / %ld   Spalte: %ld"
+msgid "Line: %%c%06X%ld%%r / %%c%06X%ld%%r   Column: %%c%06X%ld%%r"
+msgstr "Linie: %%c%06X%ld%%r / %%c%06X%ld%%r   Spalte: %%c%06X%ld%%r"
 
 #. Resource IDs: (60248)
 msgid "Lines"
@@ -1315,8 +1315,8 @@ msgstr "Zeilen"
 
 #. Resource IDs: (249)
 #, c-format
-msgid "Ln: %ld / %ld    Col: %ld"
-msgstr "Ln: %ld / %ld    Splt: %ld"
+msgid "Ln: %%c%06X%ld%%r / %%c%06X%ld%%r    Col: %%c%06X%ld%%r"
+msgstr "Zl: %%c%06X%ld%%r / %%c%06X%ld%%r    Splt: %%c%06X%ld%%r"
 
 #. Resource IDs: (60133, 60135)
 msgid "Load as"
@@ -1585,13 +1585,13 @@ msgstr "Offene Dateien: %d"
 
 #. Resource IDs: (252)
 #, c-format
-msgid "Open tabs: %ld"
-msgstr "Offene Dateien: %ld"
+msgid "Open tabs: %%c%06X%ld%%r"
+msgstr "Offene Dateien: %%c%06X%ld%%r"
 
 #. Resource IDs: (253)
 #, c-format
-msgid "Open: %ld"
-msgstr "Offen: %ld"
+msgid "Open: %%c%06X%ld%%r"
+msgstr "Offen: %%c%06X%ld%%r"
 
 #. Resource IDs: (60045)
 msgid "Opens one or more files"
@@ -1941,8 +1941,8 @@ msgstr "Suche in Datei '%s'"
 
 #. Resource IDs: (200)
 #, c-format
-msgid "Sel: %Iu chars | %Iu lines | %%c%06X%ld%%r matches."
-msgstr "Ausw: %lu Zeichen | %lu Zeilen | %%c%06X%ld%%r Markierungen."
+msgid "Sel: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%ld%%r matches."
+msgstr "Ausw: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r Zeilen | %%c%06X%ld%%r Mrk."
 
 #. Resource IDs: (60376)
 msgid "Select Language"
@@ -1958,8 +1958,11 @@ msgstr "Wähle die Sprache für BowPad"
 
 #. Resource IDs: (251)
 #, c-format
-msgid "Selection: %Iu chars | %Iu lines | %%c%06X%ld%%r matches."
-msgstr "Auswahl: %lu Zeichen | %lu Zeilen | %%c%06X%ld%%r Markierungen."
+msgid ""
+"Selection: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%ld%%r matches."
+msgstr ""
+"Auswahl: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r Zeilen | %%c%06X%ld%%r "
+"Markierungen."
 
 #. Resource IDs: (60596)
 msgid "Selects the language for the spell checker"
@@ -2463,8 +2466,8 @@ msgstr "Z"
 
 #. Resource IDs: (208)
 #, c-format
-msgid "Zoom: %d%%"
-msgstr "Zoom: %d%%"
+msgid "Zoom: %%c%06X%d%%r%%"
+msgstr "Zoom: %%c%06X%d%%r%%"
 
 #. Resource IDs: (1071, 1090, 1091)
 msgid "^"

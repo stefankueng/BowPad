@@ -1548,9 +1548,11 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     long column = (long)m_editor.Call(SCI_GETCOLUMN, curPos) + 1;
     auto lengthInBytes = m_editor.Call(SCI_GETLENGTH);
 
+    auto numberColor = 0x600000;
+
     m_StatusBar.SetPart(STATUSBAR_CUR_POS,
-                        CStringUtils::Format(rsStatusCurposLong, line, lineCount, column),
-                        CStringUtils::Format(rsStatusCurpos, line, lineCount, column),
+                        CStringUtils::Format(rsStatusCurposLong, numberColor, line, numberColor, lineCount, numberColor, column),
+                        CStringUtils::Format(rsStatusCurpos, numberColor, line, numberColor, lineCount, numberColor, column),
                         CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, lineCount),
                         200,
                         130,
@@ -1558,8 +1560,8 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         true);
     auto sNoSel = CStringUtils::Format(rsStatusSelectionNone, GetSysColor(COLOR_GRAYTEXT));
     m_StatusBar.SetPart(STATUSBAR_SEL,
-                        selByte ? CStringUtils::Format(rsStatusSelectionLong, selByte, selLine, (selTextMarkerCount ? 0x008000 : GetSysColor(COLOR_WINDOWTEXT)), selTextMarkerCount) : sNoSel,
-                        selByte ? CStringUtils::Format(rsStatusSelection, selByte, selLine, (selTextMarkerCount ? 0x008000 : GetSysColor(COLOR_WINDOWTEXT)), selTextMarkerCount) : sNoSel,
+                        selByte ? CStringUtils::Format(rsStatusSelectionLong, numberColor, selByte, numberColor, selLine, (selTextMarkerCount ? 0x008000 : numberColor), selTextMarkerCount) : sNoSel,
+                        selByte ? CStringUtils::Format(rsStatusSelection, numberColor, selByte, numberColor, selLine, (selTextMarkerCount ? 0x008000 : numberColor), selTextMarkerCount) : sNoSel,
                         CStringUtils::Format(rsStatusTTCurPos, line, column, selByte, selLine, selTextMarkerCount),
                         250,
                         200,
@@ -1592,7 +1594,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     bool usingTabs = m_editor.Call(SCI_GETUSETABS) ? true : false;
     int tabSize = (int)m_editor.Call(SCI_GETTABWIDTH);
     m_StatusBar.SetPart(STATUSBAR_TABSPACE,
-                        usingTabs ? CStringUtils::Format(L"Tabs: %%c%06X%d", 0x900000, tabSize) : L"Spaces",
+                        usingTabs ? CStringUtils::Format(L"Tabs: %%c%06X%d", numberColor, tabSize) : L"Spaces",
                         L"",
                         rsStatusTTTabSpaces,
                         0,
@@ -1601,7 +1603,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         true);
 
     int zoomfactor = GetZoomPC();
-    auto sZoom = CStringUtils::Format(rsStatusZoom, zoomfactor);
+    auto sZoom = CStringUtils::Format(rsStatusZoom, numberColor, zoomfactor);
     auto sZoomTT = CRichStatusBar::GetPlainString(sZoom);
     m_StatusBar.SetPart(STATUSBAR_ZOOM,
                         sZoom,
@@ -1655,8 +1657,8 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
 
         auto tabCount = m_TabBar.GetItemCount();
         m_StatusBar.SetPart(STATUSBAR_TABS,
-                            CStringUtils::Format(rsStatusTabsOpenLong, tabCount),
-                            CStringUtils::Format(rsStatusTabsOpen, tabCount),
+                            CStringUtils::Format(rsStatusTabsOpenLong, numberColor, tabCount),
+                            CStringUtils::Format(rsStatusTabsOpen, numberColor, tabCount),
                             CStringUtils::Format(rsStatusTTTabs, tabCount),
                             65,
                             55);
