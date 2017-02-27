@@ -144,4 +144,5 @@ private:
     bool                        m_bScratch;
     bool                        m_eraseBkgnd;
     int                         m_cursorTimeout;
+    bool                        m_hasConsolas;
 };
