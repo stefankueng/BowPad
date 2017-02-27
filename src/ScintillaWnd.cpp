@@ -77,7 +77,15 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_eraseBkgnd(true)
     , m_cursorTimeout(-1)
     , m_ScrollTool(hInst)
+    , m_hasConsolas(false)
 {
+    HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+                             OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
+    if (hFont)
+    {
+        DeleteObject(hFont);
+        m_hasConsolas = true;
+    }
 }
 
 CScintillaWnd::~CScintillaWnd()
@@ -666,8 +674,31 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
     const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(lang);
     const auto& keywords = CLexStyles::Instance().GetKeywordsForLang(lang);
     const auto& theme = CTheme::Instance();
+
+    // first set up only the default styles
+    std::wstring defaultFont;
+    if (m_hasConsolas)
+        defaultFont = L"Consolas";
+    else
+        defaultFont = L"Courier New";
+    std::string sFontName = CUnicodeUtils::StdGetUTF8(CIniSettings::Instance().GetString(L"View", L"FontName", defaultFont.c_str()));
+    Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)sFontName.c_str());
+    bool bBold = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
+    bool bItalic = !!CIniSettings::Instance().GetInt64(L"View", L"FontItalic", false);
+    int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11);
+    Call(SCI_STYLESETBOLD, STYLE_DEFAULT, bBold);
+    Call(SCI_STYLESETITALIC, STYLE_DEFAULT, bItalic);
+    Call(SCI_STYLESETSIZE, STYLE_DEFAULT, fontsize);
+    Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0)));
+    Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255)));
+
+    // now call SCI_STYLECLEARALL to copy the default style to all styles
     Call(SCI_STYLECLEARALL);
 
+    // now set up the out own styles
+    SetupDefaultStyles();
+
+    // and now set the lexer styles
     Call(SCI_SETLEXER, lexerdata.ID);
 
     for (const auto& it: lexerdata.Properties)
@@ -700,43 +731,18 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
         Call(SCI_SETKEYWORDS, it.first-1, (LPARAM)it.second.c_str());
     }
     Call(SCI_SETLINEENDTYPESALLOWED, Call(SCI_GETLINEENDTYPESSUPPORTED));
-
-    SetupDefaultStyles();
 }
 
 void CScintillaWnd::SetupDefaultStyles()
 {
     auto& theme = CTheme::Instance();
-    Call(SCI_STYLERESETDEFAULT);
-    // if possible, use the Consolas font
-    // to determine whether Consolas is available, try to create
-    // a font with it.
-    HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
-    if (hFont)
-    {
-        DeleteObject(hFont);
-        Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Consolas");
-        Call(SCI_STYLESETFONT, STYLE_LINENUMBER, (LPARAM)"Consolas");
-    }
+    std::wstring defaultFont;
+    if (m_hasConsolas)
+        defaultFont = L"Consolas";
     else
-    {
-        Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Courier New");
-        Call(SCI_STYLESETFONT, STYLE_LINENUMBER, (LPARAM)"Courier New");
-    }
-
-    std::string sFontName = CUnicodeUtils::StdGetUTF8(CIniSettings::Instance().GetString(L"View", L"FontName", L"Consolas"));
-    Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)sFontName.c_str());
-
-    bool bBold = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
-    bool bItalic = !!CIniSettings::Instance().GetInt64(L"View", L"FontItalic", false);
-    int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11);
-
-    Call(SCI_STYLESETBOLD, STYLE_DEFAULT, bBold);
-    Call(SCI_STYLESETITALIC, STYLE_DEFAULT, bItalic);
-    Call(SCI_STYLESETSIZE, STYLE_DEFAULT, fontsize);
-    Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0)));
-    Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255)));
+        defaultFont = L"Courier New";
+    std::string sFontName = CUnicodeUtils::StdGetUTF8(CIniSettings::Instance().GetString(L"View", L"FontName", defaultFont.c_str()));
+    Call(SCI_STYLESETFONT, STYLE_LINENUMBER, (LPARAM)sFontName.c_str());
 
     Call(SCI_STYLESETFORE, STYLE_LINENUMBER, theme.GetThemeColor(RGB(109, 109, 109)));
     Call(SCI_STYLESETBACK, STYLE_LINENUMBER, theme.GetThemeColor(RGB(230, 230, 230)));
@@ -816,6 +822,9 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEROPENMID, foldmarkbackselected);
     Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERMIDTAIL, foldmarkbackselected);
 
+    bool bBold = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
+    bool bItalic = !!CIniSettings::Instance().GetInt64(L"View", L"FontItalic", false);
+    int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11);
     Call(SCI_STYLESETBOLD, STYLE_FOLDDISPLAYTEXT, bBold);
     Call(SCI_STYLESETITALIC, STYLE_FOLDDISPLAYTEXT, bItalic);
     Call(SCI_STYLESETSIZE, STYLE_FOLDDISPLAYTEXT, fontsize);
