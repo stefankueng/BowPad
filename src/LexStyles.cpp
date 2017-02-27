@@ -301,7 +301,8 @@ void CLexStyles::Load()
                     }
 
                     CSimpleIni::TNamesDepend langkeys;
-                    ini.GetAllKeys(L"language", langkeys);
+                    inis[0].GetAllKeys(L"language", langkeys);
+                    inis[1].GetAllKeys(L"language", langkeys);
                     for (const auto& langkey : langkeys)
                     {
                         auto utf8langkey = CUnicodeUtils::StdGetUTF8(langkey);
