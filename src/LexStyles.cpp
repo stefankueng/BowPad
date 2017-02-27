@@ -307,7 +307,7 @@ void CLexStyles::Load()
                     {
                         auto utf8langkey = CUnicodeUtils::StdGetUTF8(langkey);
                         auto& langdata = m_Langdata[utf8langkey];
-                        std::wstring v = ini.GetValue(L"language", langkey);
+                        std::wstring v = ini.GetValue(L"language", langkey, L"");
                         ReplaceVariables(v, variables);
                         std::vector<std::wstring> exts;
                         stringtok(exts, v, true, L";");
