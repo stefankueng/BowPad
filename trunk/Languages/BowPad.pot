@@ -1147,7 +1147,7 @@ msgstr ""
 
 #. Resource IDs: (250)
 #, c-format
-msgid "Line: %ld / %ld   Column: %ld"
+msgid "Line: %%c%06X%ld%%r / %%c%06X%ld%%r   Column: %%c%06X%ld%%r"
 msgstr ""
 
 #. Resource IDs: (60248)
@@ -1156,7 +1156,7 @@ msgstr ""
 
 #. Resource IDs: (249)
 #, c-format
-msgid "Ln: %ld / %ld    Col: %ld"
+msgid "Ln: %%c%06X%ld%%r / %%c%06X%ld%%r    Col: %%c%06X%ld%%r"
 msgstr ""
 
 #. Resource IDs: (60133, 60135)
@@ -1411,12 +1411,12 @@ msgstr ""
 
 #. Resource IDs: (252)
 #, c-format
-msgid "Open tabs: %ld"
+msgid "Open tabs: %%c%06X%ld%%r"
 msgstr ""
 
 #. Resource IDs: (253)
 #, c-format
-msgid "Open: %ld"
+msgid "Open: %%c%06X%ld%%r"
 msgstr ""
 
 #. Resource IDs: (60045)
@@ -1738,7 +1738,7 @@ msgstr ""
 
 #. Resource IDs: (200)
 #, c-format
-msgid "Sel: %Iu chars | %Iu lines | %%c%06X%ld%%r matches."
+msgid "Sel: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%ld%%r matches."
 msgstr ""
 
 #. Resource IDs: (60376)
@@ -1755,7 +1755,7 @@ msgstr ""
 
 #. Resource IDs: (251)
 #, c-format
-msgid "Selection: %Iu chars | %Iu lines | %%c%06X%ld%%r matches."
+msgid "Selection: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%ld%%r matches."
 msgstr ""
 
 #. Resource IDs: (60596)
@@ -2225,7 +2225,7 @@ msgstr ""
 
 #. Resource IDs: (208)
 #, c-format
-msgid "Zoom: %d%%"
+msgid "Zoom: %%c%06X%d%%r%%"
 msgstr ""
 
 #. Resource IDs: (1071, 1090, 1091)
