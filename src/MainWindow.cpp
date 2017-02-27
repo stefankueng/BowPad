@@ -1307,6 +1307,10 @@ void CMainWindow::ResizeChildWindows()
         const UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
         const UINT noshowflags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOCOPYBITS;
 
+        // note: if there are no tab items in the tab bar, the call to
+        // TabCtrl_GetItemRect will return FALSE but the tabrc rect still has
+        // the height data filled in.
+        // And we only use the height, so it makes no difference.
         RECT tabrc;
         TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
         MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
