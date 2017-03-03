@@ -2138,12 +2138,17 @@ std::string CScintillaWnd::GetSelectedText(bool useCurrentWordIfSelectionEmpty) 
     std::string selText = seltextbuffer.get();
     if (selText.empty() && useCurrentWordIfSelectionEmpty)
     {
-        long currentPos = (long)ConstCall(SCI_GETCURRENTPOS);
-        long startPos = (long)ConstCall(SCI_WORDSTARTPOSITION, currentPos, true);
-        long endPos = (long)ConstCall(SCI_WORDENDPOSITION, currentPos, true);
-        selText = GetTextRange(startPos, endPos);
+        selText = GetCurrentWord();
     }
     return selText;
+}
+
+std::string CScintillaWnd::GetCurrentWord() const
+{
+    long currentPos = (long)ConstCall(SCI_GETCURRENTPOS);
+    long startPos = (long)ConstCall(SCI_WORDSTARTPOSITION, currentPos, true);
+    long endPos = (long)ConstCall(SCI_WORDENDPOSITION, currentPos, true);
+    return GetTextRange(startPos, endPos);
 }
 
 std::string CScintillaWnd::GetCurrentLine() const
