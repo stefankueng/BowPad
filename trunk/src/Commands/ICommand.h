@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -105,6 +105,7 @@ protected:
     std::string         GetTextRange(long startpos, long endpos) const;
     size_t              FindText(const std::string& tofind, long startpos, long endpos);
     std::string         GetSelectedText(bool useCurrentWordIfSelectionEmpty = false) const;
+    std::string         GetCurrentWord() const;
     std::string         GetCurrentLine() const;
     void                ShowFileTree(bool bShow);
     bool                IsFileTreeShown() const;

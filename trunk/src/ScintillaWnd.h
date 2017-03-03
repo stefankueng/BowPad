@@ -108,6 +108,7 @@ public :
     std::string GetTextRange(long startpos, long endpos) const;
     size_t FindText(const std::string& tofind, long startpos, long endpos);
     std::string GetSelectedText(bool useCurrentWordIfSelectionEmpty = false) const;
+    std::string GetCurrentWord() const;
     std::string GetCurrentLine() const;
     std::string GetWordChars() const;
     std::string GetWhitespaceChars() const;
