@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
             // DE part as a locale name. If no "_" is present, the file is either
             // incorrectly named or is an  unrelated file that just happens to
             // have a .lang extension. Either way, if it happens we can't process it.
-            if (CPathUtils::PathCompare(CPathUtils::GetFileExtension(respath).c_str(), L"lang") != 0)
+            if (CPathUtils::PathCompare(CPathUtils::GetFileExtension(respath), L"lang") != 0)
                 continue; // Name of no interest.
 
             // Make sure the file matches our naming convention of BowPad*_Local.

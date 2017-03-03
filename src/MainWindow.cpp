@@ -855,7 +855,7 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM /*wParam*/,
             unsigned int openFlags = OpenFlags::AddToMRU;
             if (control)
                 openFlags |= OpenFlags::OpenIntoActiveTab;
-            OpenFile(path.c_str(), openFlags);
+            OpenFile(path, openFlags);
             return TRUE;
         }
     }
@@ -869,7 +869,7 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM /*wParam*/,
             unsigned int openFlags = OpenFlags::AddToMRU;
             if (control)
                 openFlags |= OpenFlags::OpenIntoActiveTab;
-            OpenFile(path.c_str(), openFlags);
+            OpenFile(path, openFlags);
             PostMessage(*this, WM_SETFOCUS, TRUE, 0);
         }
     }
@@ -1433,7 +1433,7 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
 
-    auto docID = m_DocManager.GetIdForPath(filepath.c_str());
+    auto docID = m_DocManager.GetIdForPath(filepath);
     if (!docID.IsValid())
         return;
 
@@ -1475,7 +1475,7 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
 void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& savepath, long line )
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
-    auto docID = m_DocManager.GetIdForPath(filepath.c_str());
+    auto docID = m_DocManager.GetIdForPath(filepath);
     if (docID.IsValid())
     {
         auto tab = m_TabBar.GetIndexFromID(docID);
@@ -2795,7 +2795,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     {
         CIniSettings::Instance().Save();
     }
-    auto id = m_DocManager.GetIdForPath(filepath.c_str());
+    auto id = m_DocManager.GetIdForPath(filepath);
     if (id.IsValid())
     {
         index = m_TabBar.GetIndexFromID(id);
@@ -3156,7 +3156,7 @@ bool CMainWindow::HandleCopyDataMoveTab(const COPYDATASTRUCT& cds)
 
     if (!realpath.empty()) // If this is a saved file
     {
-        auto docID = m_DocManager.GetIdForPath(realpath.c_str());
+        auto docID = m_DocManager.GetIdForPath(realpath);
         if (docID.IsValid()) // If it already exists switch to it.
         {
             // TODO: we can lose work here, see notes above.
@@ -3385,7 +3385,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
 
     // LoadFile increases the reference count, so decrease it here first
     editor->Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
-    CDocument docreload = m_DocManager.LoadFile(*this, doc.m_path.c_str(), encoding, false);
+    CDocument docreload = m_DocManager.LoadFile(*this, doc.m_path, encoding, false);
     if (!docreload.m_document)
     {
         // since we called SCI_RELEASEDOCUMENT but LoadFile did not properly load,
@@ -3605,8 +3605,8 @@ void CMainWindow::OpenFiles(const std::vector<std::wstring>& paths)
             ++filecounter;
             SetProgress(filecounter, (DWORD32)paths.size());
             // Remember whatever we first successfully open in order to return to it.
-            if (OpenFile(file.c_str(), OpenFlags::AddToMRU) >= 0 && !docToActivate.IsValid())
-                docToActivate = m_DocManager.GetIdForPath(file.c_str());
+            if (OpenFile(file, OpenFlags::AddToMRU) >= 0 && !docToActivate.IsValid())
+                docToActivate = m_DocManager.GetIdForPath(file);
         }
 
         if (docToActivate.IsValid())
