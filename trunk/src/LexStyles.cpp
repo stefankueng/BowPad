@@ -23,6 +23,7 @@
 #include "BowPad.h"
 #include "AppUtils.h"
 #include "OnOutOfScope.h"
+#include "GDIHelpers.h"
 
 namespace
 {
@@ -108,13 +109,13 @@ void CLexStyles::ParseStyle(
             style.Name = s;
             break;
         case 1: // Foreground color
-            if (CAppUtils::HexStringToCOLORREF(s, &clr))
+            if (GDIHelpers::HexStringToCOLORREF(s, &clr))
                 style.ForegroundColor = clr;
             else
                 APPVERIFYM(s.empty(), styleName);
             break;
         case 2: // Background color
-            if (CAppUtils::HexStringToCOLORREF(s, &clr))
+            if (GDIHelpers::HexStringToCOLORREF(s, &clr))
                 style.BackgroundColor = clr;
             else
                 APPVERIFYM(s.empty(), styleName);
@@ -135,7 +136,7 @@ void CLexStyles::ParseStyle(
                 APPVERIFYM(false, styleName);
             break;
         case 6: // Override default background color in case the style was set with a variable
-            if (CAppUtils::HexStringToCOLORREF(s.c_str(), &clr))
+            if (GDIHelpers::HexStringToCOLORREF(s.c_str(), &clr))
                 style.BackgroundColor = clr;
             else
                 APPVERIFYM(s.empty(), styleName);

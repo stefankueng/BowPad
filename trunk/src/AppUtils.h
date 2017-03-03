@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,9 +37,6 @@ public:
     static bool                     FailedShowMessage(HRESULT hr);
     static bool                     ShowDropDownList(HWND hWnd, LPCWSTR ctrlName);
     static HRESULT                  CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg );
-    static bool                     HexStringToCOLORREF(const std::string& s, COLORREF* clr);
-    static bool                     HexStringToCOLORREF(const std::wstring& s, COLORREF* clr);
-    static bool                     ShortHexStringToCOLORREF(const std::string& s, COLORREF* clr);
     static bool                     TryParse(const wchar_t* s, int& result, bool emptyOk = false, int def = 0, int base = 10);
     static bool                     TryParse(const wchar_t* s, unsigned long& result, bool emptyOk = false, unsigned long def = 0, int base = 10);
     static std::wstring             GetProgramFilesX86Folder();
