@@ -107,11 +107,8 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
     auto pathUnderCursor = CUnicodeUtils::StdGetUnicode(GetSelectedText(false));
     if (pathUnderCursor.empty())
     {
-        int len = (int)ConstCall(SCI_GETWORDCHARS); // Does not zero terminate.
-        auto linebuffer = std::make_unique<char[]>(len + 1);
-        ConstCall(SCI_GETWORDCHARS, 0, (LPARAM)linebuffer.get());
-        linebuffer[len] = '\0';
-        OnOutOfScope(ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)linebuffer.get()));
+        auto linebuffer = GetWordChars();
+        OnOutOfScope(ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)linebuffer.c_str()));
 
         ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
         size_t pos = ConstCall(SCI_GETCURRENTPOS);

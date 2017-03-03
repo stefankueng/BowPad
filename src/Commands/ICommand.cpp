@@ -344,6 +344,11 @@ std::string ICommand::GetCurrentLine() const
     return m_pMainWindow->m_editor.GetCurrentLine();
 }
 
+std::string ICommand::GetWordChars() const
+{
+    return m_pMainWindow->m_editor.GetWordChars();
+}
+
 void ICommand::OpenHDROP(HDROP hDrop)
 {
     return m_pMainWindow->HandleDropFiles(hDrop);

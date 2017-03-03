@@ -107,6 +107,7 @@ protected:
     std::string         GetSelectedText(bool useCurrentWordIfSelectionEmpty = false) const;
     std::string         GetCurrentWord() const;
     std::string         GetCurrentLine() const;
+    std::string         GetWordChars() const;
     void                ShowFileTree(bool bShow);
     bool                IsFileTreeShown() const;
     std::wstring        GetFileTreePath() const;

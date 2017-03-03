@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ void CCmdPrevNext::ScintillaNotify( SCNotification* pScn )
                 return;
             if (g_offsetBeforeEnd >= (int)g_positions.size())
                 g_offsetBeforeEnd = 0;
-            long line = (long) ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
+            auto line = GetCurrentLineNumber();
             if (!g_currentDocId.IsValid() || g_currentLine == -1)
             {
                 ResizePositionSpace();

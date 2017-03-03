@@ -157,11 +157,8 @@ void CCmdSpellcheck::Check()
             m_lastcheckedpos = 0;
         }
 
-        int wordcharlen = (int)ScintillaCall(SCI_GETWORDCHARS); // Does not zero terminate.
-        auto wordcharsbuffer = std::make_unique<char[]>(wordcharlen + 1);
-        ScintillaCall(SCI_GETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get());
-        wordcharsbuffer[wordcharlen] = '\0';
-        OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get()));
+        auto wordcharsbuffer = GetWordChars();
+        OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.c_str()));
 
         ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)g_wordchars.c_str());
         Sci_TextRange textrange;
@@ -530,23 +527,11 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
         {
             std::wstring sWord;
 
-            int len = (int)ScintillaCall(SCI_GETWORDCHARS); // Does not zero terminate.
-            auto wordcharsbuffer = std::make_unique<char[]>(len + 1);
-            ScintillaCall(SCI_GETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get());
-            wordcharsbuffer[len] = '\0';
-            OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get()));
+            auto wordcharsbuffer = GetWordChars();
+            OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.c_str()));
 
             ScintillaCall(SCI_SETWORDCHARS, 0, (LPARAM)g_wordchars.c_str());
-            long currentPos = (long)ScintillaCall(SCI_GETCURRENTPOS);
-            long startPos = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
-            long endPos = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
-            auto textbuf = std::make_unique<char[]>(endPos - startPos + 1);
-            Sci_TextRange range;
-            range.chrg.cpMin = startPos;
-            range.chrg.cpMax = endPos;
-            range.lpstrText = textbuf.get();
-            ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&range);
-            sWord = CUnicodeUtils::StdGetUnicode(textbuf.get());
+            sWord = CUnicodeUtils::StdGetUnicode(GetCurrentWord());
 
             IEnumStringPtr enumSpellingSuggestions = nullptr;
             hr = g_SpellChecker->Suggest(sWord.c_str(), &enumSpellingSuggestions);
@@ -606,21 +591,15 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, c
                 std::wstring sWord;
 
                 ScintillaCall(SCI_SETCHARSDEFAULT);
-                long currentPos = (long)ScintillaCall(SCI_GETCURRENTPOS);
-                long startPos = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
-                long endPos = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
-                auto textbuf = std::make_unique<char[]>(endPos - startPos + 1);
-                Sci_TextRange range;
-                range.chrg.cpMin = startPos;
-                range.chrg.cpMax = endPos;
-                range.lpstrText = textbuf.get();
-                ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&range);
-                sWord = CUnicodeUtils::StdGetUnicode(textbuf.get());
+                sWord = CUnicodeUtils::StdGetUnicode(GetCurrentWord());
 
                 if (m_suggestions.empty())
                     ++selected;     // adjust for the "no corrections found" entry
                 if (selected < m_suggestions.size())
                 {
+                    long currentPos = (long)ScintillaCall(SCI_GETCURRENTPOS);
+                    long startPos = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
+                    long endPos = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
                     ScintillaCall(SCI_SETSELECTION, startPos, endPos);
                     ScintillaCall(SCI_REPLACESEL, 0, (sptr_t)CUnicodeUtils::StdGetUTF8(m_suggestions[selected]).c_str());
                 }

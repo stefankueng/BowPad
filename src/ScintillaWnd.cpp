@@ -1272,7 +1272,7 @@ bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
 
 LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw )
 {
-    m_docScroll.SetCurrentPos(Call(SCI_VISIBLEFROMDOCLINE, Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS))), CTheme::Instance().GetThemeColor(RGB(40,40,40)));
+    m_docScroll.SetCurrentPos(Call(SCI_VISIBLEFROMDOCLINE, GetCurrentLineNumber()), CTheme::Instance().GetThemeColor(RGB(40,40,40)));
     m_docScroll.SetTotalLines(Call(SCI_VISIBLEFROMDOCLINE, (Call(SCI_GETLINECOUNT))));
     return m_docScroll.HandleCustomDraw(wParam, pCustDraw);
 }
@@ -2022,7 +2022,7 @@ void CScintillaWnd::SetTabSettings()
 void CScintillaWnd::BookmarkAdd( long lineno )
 {
     if (lineno == -1)
-        lineno = long(Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS)));
+        lineno = GetCurrentLineNumber();
     if (!IsBookmarkPresent(lineno))
     {
         Call(SCI_MARKERADD, lineno, MARK_BOOKMARK);
@@ -2034,7 +2034,7 @@ void CScintillaWnd::BookmarkAdd( long lineno )
 void CScintillaWnd::BookmarkDelete( int lineno )
 {
     if (lineno == -1)
-        lineno = long(Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS)));
+        lineno = GetCurrentLineNumber();
     if ( IsBookmarkPresent(lineno))
     {
         Call(SCI_MARKERDELETE, lineno, MARK_BOOKMARK);
@@ -2046,7 +2046,7 @@ void CScintillaWnd::BookmarkDelete( int lineno )
 bool CScintillaWnd::IsBookmarkPresent( int lineno )
 {
     if (lineno == -1)
-        lineno = long(Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS)));
+        lineno = GetCurrentLineNumber();
     LRESULT state = Call(SCI_MARKERGET, lineno);
     return ((state & (1 << MARK_BOOKMARK)) != 0);
 }
@@ -2054,7 +2054,7 @@ bool CScintillaWnd::IsBookmarkPresent( int lineno )
 void CScintillaWnd::BookmarkToggle( int lineno )
 {
     if (lineno == -1)
-        lineno = long(Call(SCI_LINEFROMPOSITION, Call(SCI_GETCURRENTPOS)));
+        lineno = GetCurrentLineNumber();
 
     if (IsBookmarkPresent(lineno))
         BookmarkDelete(lineno);

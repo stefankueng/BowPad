@@ -2269,11 +2269,8 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
     if (sWord.empty() ||
         (scn.position > selEnd) || (scn.position < selStart))
     {
-        int len = (int)m_editor.Call(SCI_GETWORDCHARS); // Does not zero terminate.
-        auto wordcharsbuffer = std::make_unique<unsigned char[]>(len + 1);
-        m_editor.Call(SCI_GETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get());
-        wordcharsbuffer[len] = '\0';
-        OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get()));
+        auto wordcharsbuffer = m_editor.GetWordChars();
+        OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.c_str()));
 
         m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#");
         selStart = m_editor.Call(SCI_WORDSTARTPOSITION, scn.position, false);
@@ -2415,11 +2412,8 @@ bool CMainWindow::HandleDoubleClick(const SCNotification& scn)
     if (!(scn.modifiers & SCMOD_CTRL))
         return false;
 
-    int len = (int)m_editor.Call(SCI_GETWORDCHARS); // Does not zero terminate.
-    auto wordcharsbuffer = std::make_unique<char[]>(len + 1);
-    m_editor.Call(SCI_GETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get());
-    wordcharsbuffer[len] = '\0';
-    OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.get()));
+    auto wordcharsbuffer = m_editor.GetWordChars();
+    OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.c_str()));
 
     m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:;?&@=/%#()");
 
@@ -2556,7 +2550,7 @@ void CMainWindow::HandleUpdateUI(const SCNotification& scn)
 void CMainWindow::HandleAutoIndent( const SCNotification& scn )
 {
     int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
-    size_t curLine = m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_GETCURRENTPOS));
+    size_t curLine = m_editor.GetCurrentLineNumber();
     size_t lastLine = curLine - 1;
     int indentAmount = 0;
 
