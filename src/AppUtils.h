@@ -40,6 +40,7 @@ public:
     static bool                     TryParse(const wchar_t* s, int& result, bool emptyOk = false, int def = 0, int base = 10);
     static bool                     TryParse(const wchar_t* s, unsigned long& result, bool emptyOk = false, unsigned long def = 0, int base = 10);
     static std::wstring             GetProgramFilesX86Folder();
+    static const char*              GetResourceData(const wchar_t * resname, int id, DWORD& reslen);
 private:
     static std::wstring             updatefilename;
     static std::wstring             updateurl;

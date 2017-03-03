@@ -508,3 +508,18 @@ bool CAppUtils::TryParse(const wchar_t* s, unsigned long & result, bool emptyOk,
     }
     return true;
 }
+
+const char* CAppUtils::GetResourceData(const wchar_t * resname, int id, DWORD& reslen)
+{
+    reslen = 0;
+    auto hResource = FindResource(nullptr, MAKEINTRESOURCE(id), resname);
+    if (!hResource)
+        return nullptr;
+    auto hResourceLoaded = LoadResource(nullptr, hResource);
+    if (!hResourceLoaded)
+        return nullptr;
+    auto lpResLock = (const char *)LockResource(hResourceLoaded);
+    reslen = SizeofResource(nullptr, hResource);
+    return lpResLock;
+}
+
