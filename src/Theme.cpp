@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -70,12 +70,12 @@ void CTheme::Load()
     {
         COLORREF clr1;
         s = it;
-        ok = CAppUtils::HexStringToCOLORREF(s, &clr1);
+        ok = GDIHelpers::HexStringToCOLORREF(s, &clr1);
         APPVERIFY(ok);
 
         COLORREF clr2;
         s = themeIni.GetValue(L"SubstColors", it, L"");
-        ok = CAppUtils::HexStringToCOLORREF(s, &clr2);
+        ok = GDIHelpers::HexStringToCOLORREF(s, &clr2);
         APPVERIFY(ok);
 
         m_colorMap[clr1] = clr2;
