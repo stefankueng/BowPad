@@ -1001,15 +1001,8 @@ bool CCmdHeaderSource::FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf, 
     auto findRet = edit.Call(SCI_FINDTEXT, flags, (sptr_t)&ttf);
     if (findRet < 0)
         return false;
-    size_t len = ttf.chrgText.cpMax - ttf.chrgText.cpMin;
-    found_text.resize(len + 1);
-    Sci_TextRange r{};
-    r.chrg.cpMin = ttf.chrgText.cpMin;
-    r.chrg.cpMax = ttf.chrgText.cpMax;
-    r.lpstrText = &found_text[0];
-    edit.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&r));
-    found_text.resize(len);
-    *line_no = edit.Call(SCI_LINEFROMPOSITION, r.chrg.cpMin);
+    found_text = GetTextRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
+    *line_no = edit.Call(SCI_LINEFROMPOSITION, ttf.chrgText.cpMin);
     return true;
 }
 

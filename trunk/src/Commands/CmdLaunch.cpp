@@ -47,23 +47,14 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
         SearchRemoveAll(cmd, L"$(TAB_DIR)");
     }
 
-    SearchReplace(cmd, L"$(LINE)", std::to_wstring(int(ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS)))));
+    SearchReplace(cmd, L"$(LINE)", std::to_wstring(GetCurrentLineNumber()));
     SearchReplace(cmd, L"$(POS)", std::to_wstring(int(ScintillaCall(SCI_GETCURRENTPOS))));
     // find selected text or current word
     std::string sSelText = GetSelectedText();
     if (sSelText.empty())
     {
         // get the current word instead
-        long currentPos = (long)ScintillaCall(SCI_GETCURRENTPOS);
-        long startPos   = (long)ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
-        long endPos     = (long)ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
-        auto textbuf = std::make_unique<char[]>(endPos - startPos + 1);
-        Sci_TextRange range;
-        range.chrg.cpMin = startPos;
-        range.chrg.cpMax = endPos;
-        range.lpstrText = textbuf.get();
-        ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&range);
-        sSelText = textbuf.get();
+        sSelText = GetCurrentWord();
     }
     std::wstring selText = CUnicodeUtils::StdGetUnicode(sSelText);
     SearchReplace(cmd, L"$(SEL_TEXT)", selText);

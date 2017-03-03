@@ -69,7 +69,7 @@ LRESULT CGotoLineDlg::DoCommand(int id, int /*msg*/)
 bool CCmdGotoLine::Execute()
 {
     CGotoLineDlg dlg;
-    dlg.line   = (long)ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS))+1;
+    dlg.line   = (long)GetCurrentLineNumber() + 1;
     long first = (long)ScintillaCall(SCI_LINEFROMPOSITION, 0)+1;
     long last  = (long)ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETLENGTH))+1;
     ResString lineformat(hRes, IDS_GOTOLINEINFO);
