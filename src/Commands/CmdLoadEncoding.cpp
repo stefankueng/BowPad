@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -49,6 +49,138 @@ std::vector<CodePageItem>  codepages;
 std::vector<UINT>  mrucodepages;
 };
 
+BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
+{
+    if (codepages.empty())
+    {
+        // insert the main encodings
+        codepages.push_back(CodePageItem(GetACP(), false, L"ANSI", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(CP_UTF8, false, L"UTF-8", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(CP_UTF8, true, L"UTF-8 BOM", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(1200, true, L"UTF-16 Little Endian", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(1201, true, L"UTF-16 Big Endian", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(12000, true, L"UTF-32 Little Endian", CP_CATEGORY_MAIN));
+        codepages.push_back(CodePageItem(12001, true, L"UTF-32 Big Endian", CP_CATEGORY_MAIN));
+        for (int i = 5; i >0; --i)
+        {
+            auto sKey = CStringUtils::Format(L"%02d", i);
+            UINT cp = (UINT)CIniSettings::Instance().GetInt64(L"codepagemru", sKey.c_str(), 0);
+            if (cp)
+            {
+                mrucodepages.push_back(cp);
+            }
+        }
+    }
+    UINT codepage = _wtoi(lpCodePageString);
+    switch (codepage)
+    {
+        case 1200:
+        case 1201:
+        case 12000:
+        case 12001:
+        case CP_UTF8:
+        break;
+        default:
+        {
+            CPINFOEX cpex = { 0 };
+            GetCPInfoEx(codepage, 0, &cpex);
+            if (cpex.CodePageName[0])
+            {
+                std::wstring name = cpex.CodePageName;
+                name = name.substr(name.find_first_of(' ') + 1);
+                size_t pos = name.find_first_of('(');
+                if (pos != std::wstring::npos)
+                    name.erase(pos, 1);
+                pos = name.find_last_of(')');
+                if (pos != std::wstring::npos)
+                    name.erase(pos, 1);
+                CStringUtils::trim(name);
+                codepages.emplace_back(codepage, false, name, CP_CATEGORY_CODEPAGES);
+            }
+        }
+        break;
+    }
+    return TRUE;
+}
+
+HRESULT HandleCategories(const PROPVARIANT* ppropvarCurrentValue)
+{
+    IUICollectionPtr pCollection;
+    auto hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+    if (CAppUtils::FailedShowMessage(hr))
+        return hr;
+
+    pCollection->Clear();
+
+    if (!mrucodepages.empty())
+    {
+        hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MRU, IDS_ENCODING_MRU);
+        if (FAILED(hr))
+            return hr;
+    }
+    hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MAIN, IDS_ENCODING_MAIN);
+    if (FAILED(hr))
+        return hr;
+    hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_CODEPAGES, IDS_ENCODING_CODEPAGES);
+    if (FAILED(hr))
+        return hr;
+
+    return S_OK;
+}
+
+HRESULT HandleItemsSource(const PROPVARIANT* ppropvarCurrentValue, bool ignoreUTF8BOM)
+{
+    IUICollectionPtr pCollection;
+    auto hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+    if (CAppUtils::FailedShowMessage(hr))
+        return hr;
+    pCollection->Clear();
+    if (codepages.empty())
+        EnumSystemCodePages(CodePageEnumerator, CP_INSTALLED);
+
+    IUIImagePtr pImg;
+    hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
+    CAppUtils::FailedShowMessage(hr); // Report any problem, don't let it stop us.
+
+    // populate the dropdown with the code pages
+    for (const auto& cp : codepages)
+    {
+        if (ignoreUTF8BOM && cp.bom && cp.name.compare(L"UTF-8 BOM") == 0)
+            continue;
+
+        CAppUtils::AddStringItem(pCollection, cp.name.c_str(), cp.category, pImg);
+    }
+    return S_OK;
+}
+
+HRESULT HandleSelectedItem(PROPVARIANT* ppropvarNewValue, int encoding, bool ignoreUTF8BOM)
+{
+    auto hr = S_FALSE;
+    if ((encoding == -1) || (encoding == 0))
+        hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
+        // Return value unused, just set for debugging.
+    else
+    {
+        int offset = 0;
+        for (size_t i = 0; i < codepages.size(); ++i)
+        {
+            if (ignoreUTF8BOM && codepages[i].bom && codepages[i].name.compare(L"UTF-8 BOM") == 0)
+            {
+                offset = 1;
+                continue;
+            }
+
+            if ((int)codepages[i].codepage == encoding)
+            {
+                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)(i - offset), ppropvarNewValue);
+                // Return value unused, just set for debugging.
+                break;
+            }
+        }
+    }
+    return S_OK;
+}
+
 void AddToMRU(const CodePageItem& cp)
 {
     if (cp.category == CP_CATEGORY_MAIN)
@@ -92,112 +224,15 @@ void AddToMRU(const CodePageItem& cp)
     g_pFramework->InvalidateUICommand(cmdConvertEncoding, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
 }
 
-BOOL CALLBACK CodePageEnumerator(LPTSTR lpCodePageString)
-{
-    if (codepages.empty())
-    {
-        // insert the main encodings
-        codepages.push_back(CodePageItem(GetACP(), false, L"ANSI", CP_CATEGORY_MAIN));
-        codepages.push_back(CodePageItem(CP_UTF8, false, L"UTF-8", CP_CATEGORY_MAIN));
-        codepages.push_back(CodePageItem(CP_UTF8, true, L"UTF-8 BOM", CP_CATEGORY_MAIN));
-        codepages.push_back(CodePageItem(1200, true, L"UTF-16 Little Endian", CP_CATEGORY_MAIN));
-        codepages.push_back(CodePageItem(1201, true, L"UTF-16 Big Endian", CP_CATEGORY_MAIN));
-        codepages.push_back(CodePageItem(12000, true, L"UTF-32 Little Endian", CP_CATEGORY_MAIN));
-        codepages.push_back(CodePageItem(12001, true, L"UTF-32 Big Endian", CP_CATEGORY_MAIN));
-        for (int i = 5; i >0 ; --i)
-        {
-            auto sKey = CStringUtils::Format(L"%02d", i);
-            UINT cp = (UINT)CIniSettings::Instance().GetInt64(L"codepagemru", sKey.c_str(), 0);
-            if (cp)
-            {
-                mrucodepages.push_back(cp);
-            }
-        }
-    }
-    UINT codepage = _wtoi(lpCodePageString);
-    switch (codepage)
-    {
-    case 1200:
-    case 1201:
-    case 12000:
-    case 12001:
-    case CP_UTF8:
-        break;
-    default:
-        {
-            CPINFOEX cpex = {0};
-            GetCPInfoEx(codepage, 0, &cpex);
-            if (cpex.CodePageName[0])
-            {
-                std::wstring name = cpex.CodePageName;
-                name = name.substr(name.find_first_of(' ')+1);
-                size_t pos = name.find_first_of('(');
-                if (pos != std::wstring::npos)
-                    name.erase(pos, 1);
-                pos = name.find_last_of(')');
-                if (pos != std::wstring::npos)
-                    name.erase(pos, 1);
-                CStringUtils::trim(name);
-                codepages.emplace_back(codepage, false, name, CP_CATEGORY_CODEPAGES);
-            }
-        }
-        break;
-    }
-    return TRUE;
-}
-
-
 HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
 {
-    HRESULT hr = E_FAIL;
-
     if (key == UI_PKEY_Categories)
     {
-        IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (CAppUtils::FailedShowMessage(hr))
-            return hr;
-
-        pCollection->Clear();
-
-        if (!mrucodepages.empty())
-        {
-            hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MRU, IDS_ENCODING_MRU);
-            if (FAILED(hr))
-                return hr;
-        }
-        hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MAIN, IDS_ENCODING_MAIN);
-        if (FAILED(hr))
-            return hr;
-        hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_CODEPAGES, IDS_ENCODING_CODEPAGES);
-        if (FAILED(hr))
-            return hr;
-
-        return S_OK;
+        return HandleCategories(ppropvarCurrentValue);
     }
     else if (key == UI_PKEY_ItemsSource)
     {
-        IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (CAppUtils::FailedShowMessage(hr))
-            return hr;
-        pCollection->Clear();
-        if (codepages.empty())
-            EnumSystemCodePages(CodePageEnumerator, CP_INSTALLED);
-
-        IUIImagePtr pImg;
-        hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY),pImg);
-        CAppUtils::FailedShowMessage(hr); // Report any problem, don't let it stop us.
-
-        // populate the dropdown with the code pages
-        for (const auto& cp : codepages)
-        {
-            if (cp.bom && cp.name.compare(L"UTF-8 BOM")==0)
-                continue;
-
-            CAppUtils::AddStringItem(pCollection, cp.name.c_str(), cp.category, pImg);
-        }
-        return S_OK;
+        return HandleItemsSource(ppropvarCurrentValue, true);
     }
     else if (key == UI_PKEY_Enabled)
     {
@@ -205,38 +240,14 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
         if (!HasActiveDocument())
             return E_FAIL;
         const auto& doc = GetActiveDocument();
-        hr = UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
-        return hr;
+        return  UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
     }
     else if (key == UI_PKEY_SelectedItem)
     {
-        hr = S_FALSE;
         if (!HasActiveDocument())
             return S_FALSE;
         const auto& doc = GetActiveDocument();
-        if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
-            hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
-            // Return value unused, just set for debugging.
-        else
-        {
-            int offset = 0;
-            for (size_t i = 0; i < codepages.size(); ++i)
-            {
-                if (codepages[i].bom && codepages[i].name.compare(L"UTF-8 BOM") == 0)
-                {
-                    offset = 1;
-                    continue;
-                }
-
-                if ((int)codepages[i].codepage == doc.m_encoding)
-                {
-                    hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)(i - offset), ppropvarNewValue);
-                    // Return value unused, just set for debugging.
-                    break;
-                }
-            }
-        }
-        return S_OK;
+        return HandleSelectedItem(ppropvarNewValue, doc.m_encoding, true);
     }
 
     return E_FAIL;
@@ -272,79 +283,20 @@ void CCmdLoadAsEncoded::TabNotify( TBHDR * ptbhdr )
 
 HRESULT CCmdConvertEncoding::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
 {
-    HRESULT hr = E_FAIL;
-
     if (key == UI_PKEY_Categories)
     {
-        IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (CAppUtils::FailedShowMessage(hr))
-            return hr;
-
-        pCollection->Clear();
-
-        if (!mrucodepages.empty())
-        {
-            hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MRU, IDS_ENCODING_MRU);
-            if (FAILED(hr))
-                return hr;
-        }
-        hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_MAIN, IDS_ENCODING_MAIN);
-        if (FAILED(hr))
-            return hr;
-        hr = CAppUtils::AddCategory(pCollection, CP_CATEGORY_CODEPAGES, IDS_ENCODING_CODEPAGES);
-        if (FAILED(hr))
-            return hr;
-
-        return S_OK;
+        return HandleCategories(ppropvarCurrentValue);
     }
     else if (key == UI_PKEY_ItemsSource)
     {
-        IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
-        if (CAppUtils::FailedShowMessage(hr))
-            return hr;
-
-        pCollection->Clear();
-
-        if (codepages.empty())
-            EnumSystemCodePages(CodePageEnumerator, CP_INSTALLED);
-
-        IUIImagePtr pImg;
-        hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
-        CAppUtils::FailedShowMessage(hr); // Report any errors, but don't let it stop us.
-
-        // populate the dropdown with the code pages
-        for (const auto& cp : codepages)
-            CAppUtils::AddStringItem(pCollection, cp.name.c_str(), cp.category, pImg);
-
-        return S_OK;
+        return HandleItemsSource(ppropvarCurrentValue, false);
     }
     else if (key == UI_PKEY_SelectedItem)
     {
-        hr = S_FALSE;
-        if (HasActiveDocument())
-        {
-            const auto& doc = GetActiveDocument();
-            if ((doc.m_encoding == -1)||(doc.m_encoding == 0))
-            {
-                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)0, ppropvarNewValue);
-                hr = S_OK;
-            }
-            else
-            {
-                for (size_t i = 0; i < codepages.size(); ++i)
-                {
-                    if (((int)codepages[i].codepage == doc.m_encoding)&&(codepages[i].bom == doc.m_bHasBOM))
-                    {
-                        hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
-                        hr = S_OK;
-                        break;
-                    }
-                }
-            }
-        }
-        return hr;
+        if (!HasActiveDocument())
+            return S_FALSE;
+        const auto& doc = GetActiveDocument();
+        return HandleSelectedItem(ppropvarNewValue, doc.m_encoding, false);
     }
 
     return E_FAIL;

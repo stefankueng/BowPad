@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -232,22 +232,20 @@ static void LoadSomeOther(ILoader& edit, int encoding, DWORD lenFile,
     }
 }
 
-static bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
+static bool AskToElevatePrivilege(HWND hWnd, const std::wstring& path, PCWSTR sElevate, PCWSTR sDontElevate)
 {
     // access to the file is denied, and we're not running with elevated privileges
     // offer to start BowPad with elevated privileges and open the file in that instance
     ResString rTitle(hRes, IDS_ACCESS_ELEVATE);
     ResString rQuestion(hRes, IDS_ACCESS_ASK_ELEVATE);
-    ResString rElevate(hRes, IDS_ELEVATEOPEN);
-    ResString rDontElevate(hRes, IDS_DONTELEVATEOPEN);
     std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
 
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
     TASKDIALOG_BUTTON aCustomButtons[2];
     aCustomButtons[0].nButtonID = 101;
-    aCustomButtons[0].pszButtonText = rElevate;
+    aCustomButtons[0].pszButtonText = sElevate;
     aCustomButtons[1].nButtonID = 100;
-    aCustomButtons[1].pszButtonText = rDontElevate;
+    aCustomButtons[1].pszButtonText = sDontElevate;
     tdc.pButtons = aCustomButtons;
     tdc.cButtons = _countof(aCustomButtons);
     tdc.nDefaultButton = 101;
@@ -271,43 +269,22 @@ static bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
     return bElevate;
 }
 
+static bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
+{
+    // access to the file is denied, and we're not running with elevated privileges
+    // offer to start BowPad with elevated privileges and open the file in that instance
+    ResString rElevate(hRes, IDS_ELEVATEOPEN);
+    ResString rDontElevate(hRes, IDS_DONTELEVATEOPEN);
+    return AskToElevatePrivilege(hWnd, path, rElevate, rDontElevate);
+}
+
 static bool AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
 {
     // access to the file is denied, and we're not running with elevated privileges
     // offer to start BowPad with elevated privileges and open the file in that instance
-    ResString rTitle(hRes, IDS_ACCESS_ELEVATE);
-    ResString rQuestion(hRes, IDS_ACCESS_ASK_ELEVATE);
     ResString rElevate(hRes, IDS_ELEVATESAVE);
     ResString rDontElevate(hRes, IDS_DONTELEVATESAVE);
-    std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
-
-    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-    TASKDIALOG_BUTTON aCustomButtons[2];
-    aCustomButtons[0].nButtonID = 101;
-    aCustomButtons[0].pszButtonText = rElevate;
-    aCustomButtons[1].nButtonID = 100;
-    aCustomButtons[1].pszButtonText = rDontElevate;
-    tdc.pButtons = aCustomButtons;
-    tdc.cButtons = _countof(aCustomButtons);
-    tdc.nDefaultButton = 101;
-
-    tdc.hwndParent = hWnd;
-    tdc.hInstance = hRes;
-    tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-    tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
-
-    tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-    tdc.pszMainIcon = TD_SHIELD_ICON;
-    tdc.pszMainInstruction = rTitle;
-    tdc.pszContent = sQuestion.c_str();
-    int nClickedBtn = 0;
-    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
-    if (CAppUtils::FailedShowMessage(hr))
-        return 0;
-    // We've used TDCBF_CANCEL_BUTTON so IDCANCEL can be returned,
-    // map that to don't elevate.
-    bool bElevate = (nClickedBtn == 101);
-    return bElevate;
+    return AskToElevatePrivilege(hWnd, path, rElevate, rDontElevate);
 }
 
 static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params)
