@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -332,6 +332,11 @@ size_t ICommand::FindText(const std::string& tofind, long startpos, long endpos)
 std::string ICommand::GetSelectedText(bool useCurrentWordIfSelectionEmpty) const
 {
     return m_pMainWindow->m_editor.GetSelectedText(useCurrentWordIfSelectionEmpty);
+}
+
+std::string ICommand::GetCurrentWord() const
+{
+    return m_pMainWindow->m_editor.GetCurrentWord();
 }
 
 std::string ICommand::GetCurrentLine() const
