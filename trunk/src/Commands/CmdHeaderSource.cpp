@@ -565,7 +565,7 @@ void CCmdHeaderSource::HandleIncludeFileMenuItem(const RelatedFileItem& item)
     //    return;
 
     auto filename = CPathUtils::GetFileName(item.Path);
-    FindReplace_FindFile(m_pMainWindow, filename.c_str());
+    FindReplace_FindFile(m_pMainWindow, filename);
 }
 
 void CCmdHeaderSource::HandleCorrespondingFileMenuItem(const RelatedFileItem& item)

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -259,7 +259,7 @@ bool CCmdRandom::Execute()
     {
         std::wstring showpath;
         int count = (int)m_fileList.GetCount();
-        while (CPathUtils::PathCompare(CPathUtils::GetFileExtension(showpath).c_str(), L"txt") && count)
+        while (CPathUtils::PathCompare(CPathUtils::GetFileExtension(showpath), L"txt") && count)
         {
             showpath = m_fileList.GetRandomFile();
             --count;
