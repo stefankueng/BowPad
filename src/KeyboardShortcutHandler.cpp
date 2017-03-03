@@ -65,22 +65,14 @@ CKeyboardShortcutHandler& CKeyboardShortcutHandler::Instance()
 
 void CKeyboardShortcutHandler::Load()
 {
-    HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_SHORTCUTS), L"config");
-    if (hResource)
+    DWORD resSize = 0;
+    const char* resData = CAppUtils::GetResourceData(L"config", IDR_SHORTCUTS, resSize);
+    if (resData != nullptr)
     {
-        HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
-        if (hResourceLoaded)
-        {
-            const char* lpResLock = (const char *) LockResource(hResourceLoaded);
-            DWORD dwSizeRes = SizeofResource(NULL, hResource);
-            if (lpResLock)
-            {
-                CSimpleIni ini;
-                ini.SetMultiKey(true);
-                ini.LoadFile(lpResLock, dwSizeRes);
-                Load(ini);
-            }
-        }
+        CSimpleIni ini;
+        ini.SetMultiKey(true);
+        ini.LoadFile(resData, resSize);
+        Load(ini);
     }
 
     std::wstring userFile = CAppUtils::GetDataPath() + L"\\shortcuts.ini";
@@ -273,40 +265,32 @@ std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd ) c
 void CKeyboardShortcutHandler::LoadUIHeader()
 {
     m_resourceData.clear();
-    HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_BOWPADUIH), L"config");
-    if (hResource)
+    DWORD resSize = 0;
+    const char* resData = CAppUtils::GetResourceData(L"config", IDR_BOWPADUIH, resSize);
+    if (resData != nullptr)
     {
-        HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
-        if (hResourceLoaded)
+        // parse the header file
+        DWORD lastLineStart = 0;
+        for (DWORD ind = 0; ind < resSize; ++ind)
         {
-            const char* lpResLock = (const char *) LockResource(hResourceLoaded);
-            DWORD dwSizeRes = SizeofResource(NULL, hResource);
-            if (lpResLock)
+            if (resData[ind] == '\n')
             {
-                // parse the header file
-                DWORD lastLineStart = 0;
-                for (DWORD ind = 0; ind < dwSizeRes; ++ind)
+                std::string sLine(resData + lastLineStart, ind - lastLineStart);
+                lastLineStart = ind + 1;
+                // cut off '#define'
+                if (sLine.empty())
+                    continue;
+                if (sLine[0] == '/')
+                    continue;
+                auto spacepos = sLine.find(' ');
+                if (spacepos != std::string::npos)
                 {
-                    if (lpResLock[ind] == '\n')
+                    auto spacepos2 = sLine.find(' ', spacepos + 1);
+                    if (spacepos2 != std::string::npos)
                     {
-                        std::string sLine(lpResLock + lastLineStart, ind-lastLineStart);
-                        lastLineStart = ind + 1;
-                        // cut off '#define'
-                        if (sLine.empty())
-                            continue;
-                        if (sLine[0] == '/')
-                            continue;
-                        auto spacepos = sLine.find(' ');
-                        if (spacepos != std::string::npos)
-                        {
-                            auto spacepos2 = sLine.find(' ', spacepos+1);
-                            if (spacepos2 != std::string::npos)
-                            {
-                                std::string sIDString = sLine.substr(spacepos+1, spacepos2-spacepos-1);
-                                int ID = atoi(sLine.substr(spacepos2).c_str());
-                                m_resourceData[CUnicodeUtils::StdGetUnicode(sIDString)] = ID;
-                            }
-                        }
+                        std::string sIDString = sLine.substr(spacepos + 1, spacepos2 - spacepos - 1);
+                        int ID = atoi(sLine.substr(spacepos2).c_str());
+                        m_resourceData[CUnicodeUtils::StdGetUnicode(sIDString)] = ID;
                     }
                 }
             }

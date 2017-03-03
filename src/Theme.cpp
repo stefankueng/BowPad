@@ -45,21 +45,12 @@ void CTheme::Load()
 {
     CSimpleIni themeIni;
 
-    HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_DARKTHEME), L"config");
-    if (hResource)
+    DWORD resLen = 0;
+    const char* resData = CAppUtils::GetResourceData(L"config", IDR_DARKTHEME, resLen);
+    if (resData != nullptr)
     {
-        HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
-        if (hResourceLoaded)
-        {
-            const char * lpResLock = (const char *) LockResource(hResourceLoaded);
-            DWORD dwSizeRes = SizeofResource(NULL, hResource);
-            if (lpResLock)
-            {
-                themeIni.LoadFile(lpResLock, dwSizeRes);
-            }
-        }
+        themeIni.LoadFile(resData, resLen);
     }
-
 
     CSimpleIni::TNamesDepend colors;
     themeIni.GetAllKeys(L"SubstColors", colors);
