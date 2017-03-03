@@ -378,55 +378,36 @@ std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& 
     std::wstring shortCut;
     wchar_t buf[128];
 
-    if (accel.fVirt & 0x08)
+    auto mapKey = [ & ](UINT code)
     {
-        LONG sc = MapVirtualKey(VK_CONTROL, MAPVK_VK_TO_VSC);
+        LONG sc = MapVirtualKey(code, MAPVK_VK_TO_VSC);
         sc <<= 16;
         int len = GetKeyNameText(sc, buf, _countof(buf));
         if (!shortCut.empty())
             shortCut += L"+";
         if (len > 0)
             shortCut += buf;
-    }
-    if (accel.fVirt & 0x10)
+    };
+
+    auto scanKey = [ & ](UINT code)
     {
-        LONG sc = MapVirtualKey(VK_MENU, MAPVK_VK_TO_VSC);
-        sc <<= 16;
-        int len = GetKeyNameText(sc, buf, _countof(buf));
-        if (!shortCut.empty())
-            shortCut += L"+";
-        if (len > 0)
-            shortCut += buf;
-    }
-    if (accel.fVirt & 0x04)
-    {
-        LONG sc = MapVirtualKey(VK_SHIFT, MAPVK_VK_TO_VSC);
-        sc <<= 16;
-        int len = GetKeyNameText(sc, buf, _countof(buf));
-        if (!shortCut.empty())
-            shortCut += L"+";
-        if (len > 0)
-            shortCut += buf;
-    }
-    if (accel.key1)
-    {
-        LONG nScanCode = MapVirtualKey(accel.key1, MAPVK_VK_TO_VSC);
-        switch (accel.key1)
+        LONG nScanCode = MapVirtualKey(code, MAPVK_VK_TO_VSC);
+        switch (code)
         {
             // Keys which are "extended" (except for Return which is Numeric Enter as extended)
-        case VK_INSERT:
-        case VK_DELETE:
-        case VK_HOME:
-        case VK_END:
-        case VK_NEXT:  // Page down
-        case VK_PRIOR: // Page up
-        case VK_LEFT:
-        case VK_RIGHT:
-        case VK_UP:
-        case VK_DOWN:
-        case VK_SNAPSHOT:
-        case VK_OEM_COMMA:
-        case VK_OEM_PERIOD:
+            case VK_INSERT:
+            case VK_DELETE:
+            case VK_HOME:
+            case VK_END:
+            case VK_NEXT:  // Page down
+            case VK_PRIOR: // Page up
+            case VK_LEFT:
+            case VK_RIGHT:
+            case VK_UP:
+            case VK_DOWN:
+            case VK_SNAPSHOT:
+            case VK_OEM_COMMA:
+            case VK_OEM_PERIOD:
             nScanCode |= 0x0100; // Add extended bit
         }
         nScanCode <<= 16;
@@ -435,35 +416,28 @@ std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& 
             shortCut += L"+";
         if (len > 0)
             shortCut += buf;
+    };
+
+    if (accel.fVirt & 0x08)
+    {
+        mapKey(VK_CONTROL);
+    }
+    if (accel.fVirt & 0x10)
+    {
+        mapKey(VK_MENU);
+    }
+    if (accel.fVirt & 0x04)
+    {
+        mapKey(VK_SHIFT);
+    }
+    if (accel.key1)
+    {
+        scanKey(accel.key1);
     }
 
     if (accel.key2)
     {
-        LONG nScanCode = MapVirtualKey(accel.key2, MAPVK_VK_TO_VSC);
-        switch (accel.key2)
-        {
-            // Keys which are "extended" (except for Return which is Numeric Enter as extended)
-        case VK_INSERT:
-        case VK_DELETE:
-        case VK_HOME:
-        case VK_END:
-        case VK_NEXT:  // Page down
-        case VK_PRIOR: // Page up
-        case VK_LEFT:
-        case VK_RIGHT:
-        case VK_UP:
-        case VK_DOWN:
-        case VK_SNAPSHOT:
-        case VK_OEM_COMMA:
-        case VK_OEM_PERIOD:
-            nScanCode |= 0x0100; // Add extended bit
-        }
-        nScanCode <<= 16;
-        int len = GetKeyNameText(nScanCode, buf, _countof(buf));
-        if (!shortCut.empty())
-            shortCut += L",";
-        if (len > 0)
-            shortCut += buf;
+        scanKey(accel.key2);
     }
     return L"(" + shortCut + L")";
 }
