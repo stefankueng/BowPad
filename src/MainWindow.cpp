@@ -2298,11 +2298,11 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
         std::string strNum = sWord.substr(1); // Drop #
         if (strNum.size() == 3) // short form .e.g. F0F
         {
-            ok = CAppUtils::ShortHexStringToCOLORREF(strNum, &color);
+            ok = GDIHelpers::ShortHexStringToCOLORREF(strNum, &color);
         }
         else if (strNum.size() == 6) // normal/long form, e.g. FF00FF
         {
-            ok = CAppUtils::HexStringToCOLORREF(strNum, &color);
+            ok = GDIHelpers::HexStringToCOLORREF(strNum, &color);
         }
         if (ok)
         {
