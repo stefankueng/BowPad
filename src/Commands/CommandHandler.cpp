@@ -377,9 +377,9 @@ void CCommandHandler::InsertPlugins(void * obj)
                     pScript->SetCmdId(cmdID);
                     std::wstring sName = CPathUtils::GetParentDirectory(filename);
                     sName = CPathUtils::GetFileName(sName);
-                    m_pluginversion.insert({ sName, pScript->m_version });
-                    m_commands.insert({ cmdID, std::move(pScript) });
-                    m_plugins.insert({ cmdID, sName });
+                    m_pluginversion.emplace(sName, pScript->m_version);
+                    m_commands.emplace(cmdID, std::move(pScript));
+                    m_plugins.emplace(cmdID, sName);
                     CKeyboardShortcutHandler::Instance().AddCommand(sName, pluginCmd);
                 }
             }
@@ -411,6 +411,6 @@ int CCommandHandler::GetPluginVersion(const std::wstring& name)
 void CCommandHandler::AddCommand(ICommand * cmd)
 {
     m_highestCmdId = max(m_highestCmdId, cmd->GetCmdId());
-    auto at = m_nodeletecommands.insert({ cmd->GetCmdId(), cmd });
+    auto at = m_nodeletecommands.emplace(cmd->GetCmdId(), cmd);
     assert(at.second); // Verify no command has the same ID as an existing command.
 }

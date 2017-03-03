@@ -136,7 +136,7 @@ void CLexStyles::ParseStyle(
                 APPVERIFYM(false, styleName);
             break;
         case 6: // Override default background color in case the style was set with a variable
-            if (GDIHelpers::HexStringToCOLORREF(s.c_str(), &clr))
+            if (GDIHelpers::HexStringToCOLORREF(s, &clr))
                 style.BackgroundColor = clr;
             else
                 APPVERIFYM(s.empty(), styleName);

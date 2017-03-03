@@ -407,7 +407,7 @@ HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     // Populate the dropdown with the function details.
     for (const auto& func : functions)
     {
-        hr = CAppUtils::AddStringItem(collection, CUnicodeUtils::StdGetUnicode(func.displayName.c_str()).c_str());
+        hr = CAppUtils::AddStringItem(collection, CUnicodeUtils::StdGetUnicode(func.displayName).c_str());
         // If we fail to add a function, give up and assume
         // no others adds will work though try to hint at that.
         // Logically though, that might well not work either.
