@@ -83,6 +83,7 @@ namespace
 
     static ResponseToOutsideModifiedFile responsetooutsidemodifiedfile = ResponseToOutsideModifiedFile::Reload;
     static BOOL                          responsetooutsidemodifiedfiledoall = FALSE;
+    static bool                          domodifiedall = FALSE;
 
     static bool docloseall = false;
     static BOOL closealldoall = FALSE;
@@ -1883,7 +1884,7 @@ ResponseToCloseTab CMainWindow::AskToCloseTab() const
 
 ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const CDocument& doc) const
 {
-    if (!responsetooutsidemodifiedfiledoall)
+    if (!responsetooutsidemodifiedfiledoall || !domodifiedall)
     {
         bool changed = doc.m_bNeedsSaving || doc.m_bIsDirty;
         if (!changed && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
@@ -3470,29 +3471,35 @@ void CMainWindow::CheckForOutsideChanges()
     // See if any doc has been changed externally.
     bInsideCheckForOutsideChanges = true;
     OnOutOfScope(bInsideCheckForOutsideChanges = false;);
-    responsetooutsidemodifiedfiledoall = FALSE;
     bool bChangedTab = false;
     int activeTab = m_TabBar.GetCurrentTabIndex();
-    for (int i = 0; i < m_TabBar.GetItemCount(); ++i)
     {
-        auto docID = m_TabBar.GetIDFromIndex(i);
-        auto ds = m_DocManager.HasFileChanged(docID);
-        if (ds == DM_Modified || ds == DM_Removed)
+        responsetooutsidemodifiedfiledoall = FALSE;
+        domodifiedall = true;
+        OnOutOfScope(
+            responsetooutsidemodifiedfiledoall = FALSE;
+            domodifiedall = false;
+            );
+        for (int i = 0; i < m_TabBar.GetItemCount(); ++i)
         {
-            const auto& doc = m_DocManager.GetDocumentFromID(docID);
-            if ((ds != DM_Removed) && !doc.m_bIsDirty && !doc.m_bNeedsSaving && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
+            auto docID = m_TabBar.GetIDFromIndex(i);
+            auto ds = m_DocManager.HasFileChanged(docID);
+            if (ds == DM_Modified || ds == DM_Removed)
             {
-                ReloadTab(i, -1);
-            }
-            else
-            {
-                m_TabBar.ActivateAt(i);
-                if (i != activeTab)
-                    bChangedTab = true;
+                const auto& doc = m_DocManager.GetDocumentFromID(docID);
+                if ((ds != DM_Removed) && !doc.m_bIsDirty && !doc.m_bNeedsSaving && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
+                {
+                    ReloadTab(i, -1);
+                }
+                else
+                {
+                    m_TabBar.ActivateAt(i);
+                    if (i != activeTab)
+                        bChangedTab = true;
+                }
             }
         }
     }
-    responsetooutsidemodifiedfiledoall = FALSE;
 
     if (bChangedTab)
         m_TabBar.ActivateAt(activeTab);
