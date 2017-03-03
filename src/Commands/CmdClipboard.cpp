@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ std::string ClipboardBase::GetHtmlSelection()
 
         if ((selStart == selEnd) && (numSelections == 1))
         {
-            int curLine = (int)ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS));
+            auto curLine = GetCurrentLineNumber();
             selStart = (int)ScintillaCall(SCI_POSITIONFROMLINE, curLine);
             selEnd = (int)ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
         }
