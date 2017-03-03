@@ -61,29 +61,22 @@ bool CCmdConfigShortcuts::Execute()
     std::wstring userFile = CAppUtils::GetDataPath() + L"\\shortcuts.ini";
     if (!PathFileExists(userFile.c_str()))
     {
-        HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_SHORTCUTS), L"config");
-        if (hResource)
+        DWORD resLen = 0;
+        const char* lpResLock = CAppUtils::GetResourceData(L"config", IDR_SHORTCUTS, resLen);
+        if (lpResLock)
         {
-            HGLOBAL hResourceLoaded = LoadResource(NULL, hResource);
-            if (hResourceLoaded)
+            const char* lpStart = strstr(lpResLock, "#--");
+            if (lpStart)
             {
-                const char* lpResLock = (const char *) LockResource(hResourceLoaded);
-                if (lpResLock)
+                const char* lpEnd = strstr(lpStart + 3, "#--");
+                if (lpEnd)
                 {
-                    const char* lpStart = strstr(lpResLock, "#--");
-                    if (lpStart)
+                    HANDLE hFile = CreateFile(userFile.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+                    if (hFile != INVALID_HANDLE_VALUE)
                     {
-                        const char* lpEnd = strstr(lpStart + 3, "#--");
-                        if (lpEnd)
-                        {
-                            HANDLE hFile = CreateFile(userFile.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-                            if (hFile != INVALID_HANDLE_VALUE)
-                            {
-                                DWORD dwWritten = 0;
-                                WriteFile(hFile, lpStart, (DWORD)(lpEnd - lpStart), &dwWritten, nullptr);
-                                CloseHandle(hFile);
-                            }
-                        }
+                        DWORD dwWritten = 0;
+                        WriteFile(hFile, lpStart, (DWORD)(lpEnd - lpStart), &dwWritten, nullptr);
+                        CloseHandle(hFile);
                     }
                 }
             }
