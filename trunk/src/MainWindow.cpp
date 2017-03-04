@@ -2379,9 +2379,23 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
         auto bs = to_bit_wstring(number, true);
         auto sCallTip = CStringUtils::Format(L"Dec: %lld\nHex: 0x%llX\nOct: %#llo\nBin: %s (%d digits)",
                                              number, number, number, bs.c_str(), (int)bs.size());
+        COLORREF color = 0;
+        COLORREF * pColor = nullptr;
+        if (sWord.size() > 7)
+        {
+            // may be a color: 0xFF205090 or just 0x205090
+            if (sWord[0] == '0' && (sWord[1] == 'x' || sWord[1] == 'X'))
+            {
+                BYTE r = (number >> 16) & 0xFF;
+                BYTE g = (number >> 8) & 0xFF;
+                BYTE b = number & 0xFF;
+                color = RGB(r, g, b) | (number & 0xFF000000);
+                pColor = &color;
+            }
+        }
         auto msgPos = GetMessagePos();
         POINT pt = { GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos) };
-        m_custToolTip.ShowTip(pt, sCallTip, nullptr);
+        m_custToolTip.ShowTip(pt, sCallTip, pColor);
     }
 }
 
