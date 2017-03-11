@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -233,7 +233,7 @@ bool CScintillaWnd::InitScratch( HINSTANCE hInst )
 {
     Scintilla_RegisterClasses(hInst);
 
-    CreateEx(WS_EX_NOPARENTNOTIFY, 0, NULL, nullptr, L"Scintilla");
+    CreateEx(WS_EX_NOPARENTNOTIFY, 0, nullptr, nullptr, L"Scintilla");
 
     if (!*this)
         return false;
@@ -450,7 +450,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                             if (hide)
                             {
                                 m_bCursorShown = false;
-                                SetCursor(NULL);
+                                SetCursor(nullptr);
                                 Call(SCI_SETCURSOR, (uptr_t)-2);
                             }
                         }
@@ -469,7 +469,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
         {
             if (!m_bCursorShown)
             {
-                SetCursor(NULL);
+                SetCursor(nullptr);
                 Call(SCI_SETCURSOR, (uptr_t)-2);
             }
 
@@ -540,7 +540,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                         siv.nPos -= scrollY;
                         siv.fMask = SIF_POS;
                         CoolSB_SetScrollInfo(hwnd, SB_VERT, &siv, TRUE);
-                        SendMessage(hwnd, WM_VSCROLL, MAKEWPARAM(SB_THUMBPOSITION, siv.nPos), NULL);
+                        SendMessage(hwnd, WM_VSCROLL, MAKEWPARAM(SB_THUMBPOSITION, siv.nPos), 0L);
                         lastY = gi.ptsLocation.y;
                     }
 
@@ -553,7 +553,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                         sih.nPos -= scrollX;
                         sih.fMask = SIF_POS;
                         CoolSB_SetScrollInfo(hwnd, SB_HORZ, &sih, TRUE);
-                        SendMessage(hwnd, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, sih.nPos), NULL);
+                        SendMessage(hwnd, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, sih.nPos), 0L);
                         lastX = gi.ptsLocation.x;
                     }
 
@@ -2089,7 +2089,7 @@ void CScintillaWnd::DocScrollUpdate()
 
     // force the scrollbar to redraw
 
-    bool ok = SetWindowPos(*this, NULL, 0, 0, 0, 0,
+    bool ok = SetWindowPos(*this, nullptr, 0, 0, 0, 0,
                            SWP_FRAMECHANGED | // NO to everything else
                            SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOOWNERZORDER |
                            SWP_NOACTIVATE | SWP_NOSENDCHANGING

@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -63,7 +63,7 @@ static void LoadLanguage(HINSTANCE hInstance)
             progDlg.SetLine(1, L"Downloading BowPad Language file...");
             progDlg.ResetTimer();
             progDlg.SetTime();
-            progDlg.ShowModal(NULL);
+            progDlg.ShowModal(nullptr);
 
             CDownloadFile filedownloader(L"BowPad", &progDlg);
 
@@ -74,8 +74,8 @@ static void LoadLanguage(HINSTANCE hInstance)
         }
         if (CAppUtils::HasSameMajorVersion(langdllpath))
         {
-            hRes = LoadLibraryEx(langdllpath.c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE | LOAD_LIBRARY_AS_DATAFILE);
-            if (hRes == NULL)
+            hRes = LoadLibraryEx(langdllpath.c_str(), nullptr, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE | LOAD_LIBRARY_AS_DATAFILE);
+            if (hRes == nullptr)
                 hRes = hInst;
         }
     }
@@ -95,10 +95,10 @@ static void SetIcon()
             {
                 OnOutOfScope(RegCloseKey(hKey););
                 std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str(), IDI_BOWPAD_DOC);
-                if (RegSetValue(hKey, NULL, REG_SZ, sIconPath.c_str(), 0) == ERROR_SUCCESS)
+                if (RegSetValue(hKey, nullptr, REG_SZ, sIconPath.c_str(), 0) == ERROR_SUCCESS)
                 {
                     // now tell the shell about the changed icon
-                    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+                    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
                 }
             }
         }
@@ -117,7 +117,7 @@ static void SetUserStringKey(LPCWSTR keyName, LPCWSTR subKeyName, const std::wst
     {
         std::wstring msg = CStringUtils::Format(L"Registry key '%s' (subkey: '%s') could not be set.",
             keyName, subKeyName ? subKeyName : L"(none)");
-        MessageBox(NULL, msg.c_str(), L"BowPad", MB_ICONINFORMATION);
+        MessageBox(nullptr, msg.c_str(), L"BowPad", MB_ICONINFORMATION);
     }
 }
 
@@ -153,7 +153,7 @@ static void SetAppID()
 {
     // set the AppID
     typedef HRESULT STDAPICALLTYPE SetCurrentProcessExplicitAppUserModelIDFN(PCWSTR AppID);
-    CAutoLibrary hShell = LoadLibraryExW(L"Shell32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    CAutoLibrary hShell = LoadLibraryExW(L"Shell32.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     if (hShell)
     {
         SetCurrentProcessExplicitAppUserModelIDFN *pfnSetCurrentProcessExplicitAppUserModelID = (SetCurrentProcessExplicitAppUserModelIDFN*)GetProcAddress(hShell, "SetCurrentProcessExplicitAppUserModelID");
@@ -252,13 +252,13 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
             wcscpy_s(ownCmdLine.get(), sCmdLine.size() + 2, sCmdLine.c_str());
             cds.cbData = (DWORD)((sCmdLine.size() + 1)*sizeof(wchar_t));
             cds.lpData = ownCmdLine.get();
-            SendMessage(hBowPadWnd, WM_COPYDATA, NULL, (LPARAM)&cds);
+            SendMessage(hBowPadWnd, WM_COPYDATA, 0, (LPARAM)&cds);
         }
         else
         {
             cds.cbData = (DWORD)((cmdLineLen + 1)*sizeof(wchar_t));
             cds.lpData = (PVOID) lpCmdLine;
-            SendMessage(hBowPadWnd, WM_COPYDATA, NULL, (LPARAM)&cds);
+            SendMessage(hBowPadWnd, WM_COPYDATA, 0, (LPARAM)&cds);
         }
     }
 }
@@ -270,7 +270,7 @@ static HWND FindAndWaitForBowPad()
     ResString clsResName(hInst, IDC_BOWPAD);
     std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
 
-    HWND hBowPadWnd = ::FindWindow(clsName.c_str(), NULL);
+    HWND hBowPadWnd = ::FindWindow(clsName.c_str(), nullptr);
     // if we don't have a window yet, wait a little while
     // to give the other process time to create the window
     for (int i = 0; !hBowPadWnd && i < 20; i++)
@@ -290,7 +290,7 @@ static void ShowBowPadCommandLineHelp()
 {
     std::wstring sMessage = CStringUtils::Format(L"BowPad version %d.%d.%d.%d\nusage: BowPad.exe /path:\"PATH\" [/line:number] [/multiple]\nor: BowPad.exe PATH [/line:number] [/multiple]\nwith /multiple forcing BowPad to open a new instance even if there's already an instance running."
                                                     , BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
-    MessageBox(NULL, sMessage.c_str(), L"BowPad", MB_ICONINFORMATION);
+    MessageBox(nullptr, sMessage.c_str(), L"BowPad", MB_ICONINFORMATION);
 }
 
 static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
@@ -437,7 +437,7 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     // Main message loop:
     MSG msg = { 0 };
     auto& kb = CKeyboardShortcutHandler::Instance();
-    while (GetMessage(&msg, NULL, 0, 0))
+    while (GetMessage(&msg, nullptr, 0, 0))
     {
         if (!kb.TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam) &&
             !CDialog::IsDialogMessage(&msg))
@@ -459,7 +459,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
     const std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
     ::SetLastError(NO_ERROR); // Don't do any work between these 3 statements to spoil the error code.
-    HANDLE hAppMutex = ::CreateMutex(NULL, false, sID.c_str());
+    HANDLE hAppMutex = ::CreateMutex(nullptr, false, sID.c_str());
     DWORD mutexStatus = GetLastError();
     OnOutOfScope(CloseHandle(hAppMutex););
     bool bAlreadyRunning = (mutexStatus == ERROR_ALREADY_EXISTS || mutexStatus == ERROR_ACCESS_DENIED);

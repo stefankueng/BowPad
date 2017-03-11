@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2014-2017 - Stefan Kueng
 //
@@ -188,7 +188,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
             }
 
             IContextMenuPtr pcm = nullptr;
-            HTREEITEM hRefresh = NULL;
+            HTREEITEM hRefresh = nullptr;
             if (SUCCEEDED(GetUIObjectOfFile(hwnd, pTreeItem->path.c_str(),
                 IID_IContextMenu, (void**)&pcm)))
             {
@@ -236,7 +236,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                             info.ptInvoke = pt;
                             pcm->InvokeCommand((LPCMINVOKECOMMANDINFO)&info);
                             hRefresh = TreeView_GetParent(*this, hSelItem);
-                            if (hRefresh == NULL)
+                            if (hRefresh == nullptr)
                                 hRefresh = TVI_ROOT;
                         }
                     }
@@ -353,9 +353,9 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                     // refresh all sub-paths down to the active path
                     std::wstring expandpath = CPathUtils::GetParentDirectory(activepath);
                     HTREEITEM hItem = GetItemForPath(expandpath);
-                    if (hItem == NULL)
+                    if (hItem == nullptr)
                     {
-                        while ((hItem == NULL) && (expandpath.size() > m_path.size()))
+                        while ((hItem == nullptr) && (expandpath.size() > m_path.size()))
                         {
                             expandpath = CPathUtils::GetParentDirectory(expandpath);
                             hItem = GetItemForPath(expandpath);
@@ -408,7 +408,7 @@ HTREEITEM CFileTree::RecurseTree(HTREEITEM hItem, ItemHandler handler)
         }
         hFound = hNext;
     }
-    return NULL;
+    return nullptr;
 }
 
 void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
@@ -518,7 +518,7 @@ HTREEITEM CFileTree::GetHitItem() const
     tvhti.pt = pt;
     HTREEITEM hItem = TreeView_HitTest(*this, &tvhti);
     if ((tvhti.flags & TVHT_ONITEM) == 0)
-        return NULL;
+        return nullptr;
     return hItem;
 }
 
@@ -705,7 +705,7 @@ void CFileTree::OnClose()
 
 HTREEITEM CFileTree::GetItemForPath(const std::wstring& expandpath)
 {
-    HTREEITEM hResult = NULL;
+    HTREEITEM hResult = nullptr;
     RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
     {
         const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);

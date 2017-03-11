@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
@@ -194,7 +194,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
                 std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
 
                 std::wstring sLangURL = CStringUtils::Format(L"https://svn.code.sf.net/p/bowpad-sk/code/branches/%d.%d.%d/Languages/Languages.txt", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO);
-                HRESULT res = URLDownloadToFile(NULL, sLangURL.c_str(), tempfile.c_str(), 0, NULL);
+                HRESULT res = URLDownloadToFile(nullptr, sLangURL.c_str(), tempfile.c_str(), 0, nullptr);
                 if (res == S_OK)
                 {
                     std::wifstream fin(tempfile);
@@ -228,7 +228,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
                 {
                     DeleteFile(langfile.c_str());
                     std::wstring sLangURL = CStringUtils::Format(L"https://svn.code.sf.net/p/bowpad-sk/code/branches/%d.%d.%d/Languages/%s/BowPad_%s.lang", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, LANGPLAT, gLanguages[selected].c_str());
-                    HRESULT res = URLDownloadToFile(NULL, sLangURL.c_str(), langfile.c_str(), 0, NULL);
+                    HRESULT res = URLDownloadToFile(nullptr, sLangURL.c_str(), langfile.c_str(), 0, nullptr);
                     if (FAILED(res))
                     {
                         ResString sLangLoadFailed(hRes, IDS_LANGUAGE_DOWNLOADFAILEDFILE);

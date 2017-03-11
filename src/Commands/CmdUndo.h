@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
@@ -38,13 +38,13 @@ public:
     UINT GetCmdId() override { return cmdUndo; }
     void AfterInit() override
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
     void ScintillaNotify(SCNotification * pScn) override
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
-            InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+            InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
@@ -78,13 +78,13 @@ public:
     UINT GetCmdId() override { return cmdRedo; }
     void AfterInit() override
     {
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
     void ScintillaNotify(SCNotification * pScn) override
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
-            InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+            InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override

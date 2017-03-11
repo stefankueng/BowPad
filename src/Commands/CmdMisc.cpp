@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2014-2017 - Stefan Kueng
 //
@@ -71,7 +71,7 @@ bool CCmdConfigShortcuts::Execute()
                 const char* lpEnd = strstr(lpStart + 3, "#--");
                 if (lpEnd)
                 {
-                    HANDLE hFile = CreateFile(userFile.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+                    HANDLE hFile = CreateFile(userFile.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
                     if (hFile != INVALID_HANDLE_VALUE)
                     {
                         DWORD dwWritten = 0;

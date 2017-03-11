@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2014-2017 - Stefan Kueng
 //
@@ -45,7 +45,7 @@ void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
     std::wstring temppath = m_sPath + L"\\_shownfilelist";
     if (nosubfolders)
         temppath += L"norecurse";
-    HANDLE hFile = CreateFile(temppath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_HIDDEN|FILE_ATTRIBUTE_SYSTEM, NULL);
+    HANDLE hFile = CreateFile(temppath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_HIDDEN|FILE_ATTRIBUTE_SYSTEM, nullptr);
     if (hFile != INVALID_HANDLE_VALUE)
     {
         BY_HANDLE_FILE_INFORMATION fileinfo;
@@ -53,7 +53,7 @@ void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
         {
             auto buffer = std::make_unique<wchar_t[]>(fileinfo.nFileSizeLow + sizeof(wchar_t));
             DWORD readbytes;
-            if (ReadFile(hFile, buffer.get(), fileinfo.nFileSizeLow, &readbytes, NULL))
+            if (ReadFile(hFile, buffer.get(), fileinfo.nFileSizeLow, &readbytes, nullptr))
             {
                 buffer[fileinfo.nFileSizeLow] = 0;
                 buffer[fileinfo.nFileSizeLow + 1] = 0;
@@ -170,7 +170,7 @@ void CRandomFileList::Save()
         return;
 
     std::wstring path = m_sPath + L"\\_shownfilelist";
-    HANDLE hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN, NULL);
+    HANDLE hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN, nullptr);
     if (hFile != INVALID_HANDLE_VALUE)
     {
         try
@@ -183,7 +183,7 @@ void CRandomFileList::Save()
                 pBuffer += it->size() + 1;
             }
             DWORD byteswritten;
-            WriteFile(hFile, buffer.get(), DWORD(pBuffer - buffer.get())*sizeof(wchar_t), &byteswritten, NULL);
+            WriteFile(hFile, buffer.get(), DWORD(pBuffer - buffer.get())*sizeof(wchar_t), &byteswritten, nullptr);
             CloseHandle(hFile);
         }
         catch (std::bad_alloc &/*e*/)
@@ -194,7 +194,7 @@ void CRandomFileList::Save()
                 ZeroMemory(filebuffer, sizeof(filebuffer));
                 _tcscpy_s(filebuffer, it->c_str());
                 DWORD byteswritten;
-                WriteFile(hFile, filebuffer, DWORD(_tcslen(filebuffer)+1)*sizeof(wchar_t), &byteswritten, NULL);
+                WriteFile(hFile, filebuffer, DWORD(_tcslen(filebuffer)+1)*sizeof(wchar_t), &byteswritten, nullptr);
             }
             CloseHandle(hFile);
         }

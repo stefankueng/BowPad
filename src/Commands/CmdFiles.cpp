@@ -313,7 +313,7 @@ bool CCmdFileDelete::Execute()
                     if (!CloseTab(GetTabIndexFromDocID(GetDocIdOfCurrentTab()), false))
                         return false;
 
-                    IFileOperationPtr pfo = NULL;
+                    IFileOperationPtr pfo = nullptr;
                     hr = pfo.CreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL);
 
                     if (!CAppUtils::FailedShowMessage(hr))
@@ -327,7 +327,7 @@ bool CCmdFileDelete::Execute()
                         if (!CAppUtils::FailedShowMessage(hr))
                         {
                             // Create IShellItem instance associated to file to delete
-                            IShellItemPtr psiFileToDelete = NULL;
+                            IShellItemPtr psiFileToDelete = nullptr;
                             hr = SHCreateItemFromParsingName(path.c_str(), nullptr, IID_PPV_ARGS(&psiFileToDelete));
 
                             if (!CAppUtils::FailedShowMessage(hr))
