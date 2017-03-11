@@ -1,4 +1,4 @@
-/*
+﻿/*
     Cool Scrollbar Library Version 1.2
 
     Module: coolscroll.c
@@ -96,7 +96,7 @@ BOOL COOLSB_API CoolSB_IsThumbTracking(HWND hwnd)
 {
     SCROLLWND *sw;
 
-    if((sw = GetScrollWndFromHwnd(hwnd)) == NULL)
+    if((sw = GetScrollWndFromHwnd(hwnd)) == nullptr)
         return FALSE;
     else
         return sw->fThumbTracking;
@@ -185,7 +185,7 @@ static int DrawScrollArrow(SCROLLBAR *sbar, HDC hdc, RECT *rect, UINT arrow, BOO
 
         //MONOCHROME bitmap to convert the arrow to black/white mask
         hdcmem1 = CreateCompatibleDC(hdc);
-        hbm1    = CreateBitmap(width, height, 1, 1, NULL);
+        hbm1    = CreateBitmap(width, height, 1, 1, nullptr);
         UnrealizeObject(hbm1);
         oldbm1  = SelectBitmap(hdcmem1, hbm1);
 
@@ -809,7 +809,7 @@ static LRESULT NCDrawHScrollbar(SCROLLBAR *sb, HWND hwnd, HDC hdcorig, const REC
     HDC hdc = CreateCompatibleDC(hdcorig);
     HBITMAP hBitmap = CreateCompatibleBitmap(hdcorig, lrect.right - lrect.left, lrect.bottom - lrect.top);
     HBITMAP hOldBitmap = (HBITMAP)SelectObject(hdc, hBitmap);
-    SetWindowOrgEx(hdc, lrect.left, lrect.top, NULL);
+    SetWindowOrgEx(hdc, lrect.left, lrect.top, nullptr);
     RotateRect0(sb, &lrect);
 
 
@@ -1124,7 +1124,7 @@ static void DrawImage(HDC hdc, HBITMAP hBitmap, RECT *rc)
     SIZE  delta;
     COLORREF colorOld;
 
-    if(hBitmap == NULL)
+    if(hBitmap == nullptr)
         return;
 
     // center bitmap in caller's rectangle
@@ -1210,7 +1210,7 @@ static UINT DrawScrollButton(SCROLLBUT *sbut, HDC hdc, const RECT *pctrl, UINT f
 
         IntersectClipRect(hdc, rect.left, rect.top, rect.right, rect.bottom);
         SendMessage(GetParent(hwnd), WM_NOTIFY, nmcd.hdr.idFrom, (LPARAM)&nmcd);
-        SelectClipRgn(hdc, NULL);
+        SelectClipRgn(hdc, nullptr);
 
         break;
 
@@ -1419,7 +1419,7 @@ HDC CoolSB_GetDC(HWND hwnd, WPARAM wParam)
     return GetDCEx(hwnd, hrgn, flags | DCX_CACHE|DCX_NORESETATTRS|DCX_WINDOW | DCX_INTERSECTUPDATE);
     */
 
-    //return GetDCEx(hwnd, NULL, flags | DCX_WINDOW| DCX_NORESETATTRS);
+    //return GetDCEx(hwnd, nullptr, flags | DCX_WINDOW| DCX_NORESETATTRS);
 }
 
 static LRESULT NCPaint(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lParam)
