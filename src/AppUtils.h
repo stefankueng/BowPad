@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
@@ -24,7 +24,7 @@ public:
     CAppUtils();
     ~CAppUtils();
 
-    static std::wstring             GetDataPath(HMODULE hMod = NULL);
+    static std::wstring             GetDataPath(HMODULE hMod = nullptr);
     static std::wstring             GetSessionID();
     static bool                     CheckForUpdate(bool force);
     static bool                     DownloadUpdate(HWND hWnd, bool bInstall);

@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2014-2017 - Stefan Kueng
 //
@@ -60,7 +60,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
             HWND hThisWnd = *this;
             std::thread([hThisWnd]
             {
-                CDownloadFile filedownloader(L"BowPad", NULL);
+                CDownloadFile filedownloader(L"BowPad", nullptr);
                 std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
                 filedownloader.DownloadFile(L"https://svn.code.sf.net/p/bowpad-sk/code/trunk/plugins/plugins.txt", tempfile);
 
@@ -177,8 +177,8 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                         std::wstring pluginsdir = CAppUtils::GetDataPath() + L"\\plugins\\";
                         pluginsdir += info.name;
 
-                        IFileOperationPtr pfo = NULL;
-                        HRESULT hr = pfo.CreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL);
+                        IFileOperationPtr pfo = nullptr;
+                        HRESULT hr = pfo.CreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL);
 
                         if (!CAppUtils::FailedShowMessage(hr))
                         {
@@ -191,7 +191,7 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                             if (!CAppUtils::FailedShowMessage(hr))
                             {
                                 // Create IShellItem instance associated to file to delete
-                                IShellItemPtr psiFileToDelete = NULL;
+                                IShellItemPtr psiFileToDelete = nullptr;
                                 hr = SHCreateItemFromParsingName(pluginsdir.c_str(), nullptr, IID_PPV_ARGS(&psiFileToDelete));
 
                                 if (!CAppUtils::FailedShowMessage(hr))

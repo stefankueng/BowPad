@@ -151,7 +151,7 @@ static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const
     return true;
 }
 
-CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = NULL*/)
+CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
     , m_fileTree(hInst, this)
@@ -480,7 +480,7 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_BOWPAD));
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
     wcx.hIconSm = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_BOWPAD));
-    wcx.hCursor = LoadCursor(NULL, (LPTSTR)IDC_SIZEWE); // for resizing the tree control
+    wcx.hCursor = LoadCursor(nullptr, (LPTSTR)IDC_SIZEWE); // for resizing the tree control
     if (RegisterWindow(&wcx))
     {
         // create the window hidden, then after the window is created use the RestoreWindowPos
@@ -619,7 +619,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         // To avoid these problems, set a timer instead. The timer
         // will fire after all messages related to the focus change have
         // been handled, and then it is save to show a message box dialog.
-        SetTimer(*this, TIMER_UPDATECHECK, 200, NULL);
+        SetTimer(*this, TIMER_UPDATECHECK, 200, nullptr);
     }
         break;
     case WM_CLIPBOARDUPDATE:
@@ -672,7 +672,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         tabrc.top -= 3; // adjust for margin
         if ((pt.y <= tabrc.bottom) && (pt.y >= tabrc.top))
         {
-            SetCursor(LoadCursor(NULL, (LPTSTR)IDC_ARROW));
+            SetCursor(LoadCursor(nullptr, (LPTSTR)IDC_ARROW));
             return TRUE;
         }
         // Pass the message onto the system so the cursor adapts
@@ -760,7 +760,7 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmhdr, WPARAM /*wParam*/, L
     }
     case TCN_SELCHANGE:
         HandleTabChange(nmhdr);
-        InvalidateRect(m_fileTree, NULL, TRUE);
+        InvalidateRect(m_fileTree, nullptr, TRUE);
         break;
     case TCN_SELCHANGING:
         HandleTabChanging(nmhdr);
@@ -992,7 +992,7 @@ void CMainWindow::HandleStatusBarEOLFormat()
             menuItemFlags |= MF_CHECKED | MF_DISABLED;
         AppendMenu(hPopup, menuItemFlags, i + 1, eolName.c_str());
     }
-    auto result = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, NULL);
+    auto result = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, nullptr);
     if (result != FALSE)
     {
         size_t optionIndex = size_t(result) - 1;
@@ -3553,7 +3553,7 @@ bool CMainWindow::OnLButtonDown(UINT nFlags, POINT point)
     {
         RECT rctree;
         GetWindowRect(m_fileTree, &rctree);
-        MapWindowPoints(NULL, *this, (LPPOINT)&rctree, 2);
+        MapWindowPoints(nullptr, *this, (LPPOINT)&rctree, 2);
         if (point.y < rctree.top)
             return true;
         if (point.y > rctree.bottom)

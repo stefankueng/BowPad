@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -387,7 +387,7 @@ void CCommandHandler::InsertPlugins(void * obj)
             {
                 if (CIniSettings::Instance().GetInt64(L"Debug", L"usemessagebox", 0))
                 {
-                    MessageBox(NULL, L"BowPad", CUnicodeUtils::StdGetUnicode(e.what()).c_str(), MB_ICONERROR);
+                    MessageBox(nullptr, L"BowPad", CUnicodeUtils::StdGetUnicode(e.what()).c_str(), MB_ICONERROR);
                 }
                 else
                 {
