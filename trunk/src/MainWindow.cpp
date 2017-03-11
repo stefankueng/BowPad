@@ -3384,7 +3384,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
         // the file isn't dirty or it wasn't appropriate to save.
         else if (response == ResponseToOutsideModifiedFile::KeepOurChanges) // Save
         {
-            SaveCurrentTab();
+            SaveDoc(docID);
         }
         else // Cancel or failed to ask
         {
