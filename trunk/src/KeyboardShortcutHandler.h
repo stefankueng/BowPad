@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ public:
     std::wstring                            GetShortCutStringForCommand(WORD cmd) const;
     std::wstring                            GetTooltipTitleForCommand(WORD cmd) const;
     void                                    Reload();
-    void                                    UpdateTooltips(bool bAll);
+    void                                    UpdateTooltips();
     void                                    ToolTipUpdated(WORD cmd);
     const std::unordered_map<std::wstring, int>&  GetResourceData() const { return m_resourceData; }
     const std::unordered_map<std::wstring, UINT>& GetVirtKeys() const { return m_virtkeys; }
