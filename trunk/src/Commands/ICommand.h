@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -122,6 +122,7 @@ protected:
     void                OpenHDROP(HDROP hDrop);
     bool                ReloadTab(int tab, int encoding = -1); // By default reload encoding
     bool                SaveCurrentTab(bool bSaveAs = false);
+    bool                SaveDoc(DocID docID, bool bSaveAs = false);
     HRESULT             InvalidateUICommand(UI_INVALIDATIONS flags, const PROPERTYKEY *key);
     HRESULT             InvalidateUICommand(UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY *key);
     HRESULT             SetUICommandProperty(UINT32 commandId, REFPROPERTYKEY key, PROPVARIANT value);

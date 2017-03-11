@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -196,6 +196,11 @@ HRESULT ICommand::SetUICommandProperty( REFPROPERTYKEY key, PROPVARIANT value )
 bool ICommand::SaveCurrentTab(bool bSaveAs /* = false */)
 {
     return m_pMainWindow->SaveCurrentTab(bSaveAs);
+}
+
+bool ICommand::SaveDoc(DocID docID, bool bSaveAs /* = false */)
+{
+    return m_pMainWindow->SaveDoc(docID, bSaveAs);
 }
 
 int ICommand::GetDocumentCount() const
