@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -905,6 +905,8 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID      /*riid*/,
             idList[i] = 130;
         else if (_wcsicmp(nameList[i], L"InvalidateState") == 0)
             idList[i] = 131;
+        else if (_wcsicmp(nameList[i], L"SaveDoc") == 0)
+            idList[i] = 132;
         else if (_wcsicmp(nameList[i], L"SciGetTextRange") == 0)
             idList[i] = 900;
         else if (_wcsicmp(nameList[i], L"SciGetCharAt") == 0)
@@ -1204,6 +1206,16 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
             InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
             InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+            break;
+        case 132: // SaveDoc
+            if (args->cArgs != 2)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
+                return DISP_E_TYPEMISMATCH;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[1], VARIANT_ALPHABOOL, VT_BOOL)))
+                return DISP_E_TYPEMISMATCH;
+            ret->vt = VT_BOOL;
+            ret->boolVal = SaveDoc(DocID({ p1.intVal }), !!p2.boolVal) ? VARIANT_TRUE : VARIANT_FALSE;
             break;
         case 900: // SciGetTextRange
             if (args->cArgs != 2)
