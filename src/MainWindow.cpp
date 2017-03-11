@@ -1358,12 +1358,18 @@ void CMainWindow::EnsureNewLineAtEnd(const CDocument& doc)
 bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
 {
     auto docID = m_TabBar.GetCurrentTabId();
+    return SaveDoc(docID, bSaveAs);
+}
+
+bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
+{
     if (!docID.IsValid())
         return false;
     if (!m_DocManager.HasDocumentID(docID))
         return false;
 
     auto& doc = m_DocManager.GetModDocumentFromID(docID);
+    auto isActiveTab = docID == m_TabBar.GetCurrentTabId();
     if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
     {
         bSaveAs = true;
@@ -1371,13 +1377,13 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
 
         std::wstring title = GetAppName();
         title += L" - ";
-        title += m_TabBar.GetCurrentTitle();
+        title += m_TabBar.GetTitle(m_TabBar.GetIndexFromID(docID));
 
         if (!ShowFileSaveDialog(*this, title, doc.m_path, outpath))
             return false;
         doc.m_path = outpath;
         CMRU::Instance().AddPath(doc.m_path);
-        if (m_fileTree.GetPath().empty())
+        if (isActiveTab && m_fileTree.GetPath().empty())
         {
             m_fileTree.SetPath(CPathUtils::GetParentDirectory(doc.m_path));
             ResizeChildWindows();
@@ -1412,16 +1418,20 @@ bool CMainWindow::SaveCurrentTab(bool bSaveAs /* = false */)
         if (bSaveAs)
         {
             const auto& lang = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
-            m_editor.SetupLexerForLang(lang);
+            if (isActiveTab)
+                m_editor.SetupLexerForLang(lang);
             doc.SetLanguage(lang);
         }
-        std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
-        m_TabBar.SetCurrentTitle(sFileName.c_str());
         // Update tab so the various states are updated (readonly, modified, ...)
         UpdateTab(docID);
-        UpdateCaptionBar();
-        UpdateStatusBar(true);
-        m_editor.Call(SCI_SETSAVEPOINT);
+        if (isActiveTab)
+        {
+            std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
+            m_TabBar.SetCurrentTitle(sFileName.c_str());
+            UpdateCaptionBar();
+            UpdateStatusBar(true);
+            m_editor.Call(SCI_SETSAVEPOINT);
+        }
         CCommandHandler::Instance().OnDocumentSave(docID, bSaveAs);
     }
     return true;
