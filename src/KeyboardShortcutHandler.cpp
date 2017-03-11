@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -298,30 +298,14 @@ void CKeyboardShortcutHandler::LoadUIHeader()
     }
 }
 
-void CKeyboardShortcutHandler::UpdateTooltips(bool bAll)
+void CKeyboardShortcutHandler::UpdateTooltips()
 {
-    if (bAll)
+    for (const auto& rsc : m_resourceData)
     {
-        m_tooltiptitlestoupdate.clear();
-        for (const auto& rsc : m_resourceData)
+        std::wstring sAcc = GetShortCutStringForCommand((WORD)rsc.second);
+        if (!sAcc.empty())
         {
-            std::wstring sAcc = GetShortCutStringForCommand((WORD)rsc.second);
-            if (!sAcc.empty())
-            {
-                g_pFramework->InvalidateUICommand(rsc.second, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
-                m_tooltiptitlestoupdate.insert((WORD)rsc.second);
-            }
-        }
-    }
-    else
-    {
-        for (const auto& w : m_tooltiptitlestoupdate)
-        {
-            std::wstring sAcc = GetShortCutStringForCommand(w);
-            if (!sAcc.empty())
-            {
-                g_pFramework->InvalidateUICommand(w, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
-            }
+            g_pFramework->InvalidateUICommand(rsc.second, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
         }
     }
 }
