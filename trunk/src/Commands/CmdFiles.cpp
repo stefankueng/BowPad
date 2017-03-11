@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -169,10 +169,10 @@ bool CCmdSaveAll::Execute()
     auto docCount = GetDocumentCount();
     for (decltype(docCount) i = 0; i < docCount; ++i)
     {
-        if (GetDocumentFromID(GetDocIDFromTabIndex(i)).m_bIsDirty)
+        auto docID = GetDocIDFromTabIndex(i);
+        if (GetDocumentFromID(docID).m_bIsDirty)
         {
-            TabActivateAt(i);
-            SaveCurrentTab();
+            SaveDoc(docID);
         }
     }
     return true;
