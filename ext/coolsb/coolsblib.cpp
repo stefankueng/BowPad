@@ -1,4 +1,4 @@
-/*
+﻿/*
 
     Cool Scrollbar Library Version 1.2
 
@@ -162,7 +162,7 @@ static SCROLLINFO *GetScrollInfoFromHwnd(HWND hwnd, int fnBar)
         return &sb->scrollInfo;
     }
     else
-        return NULL;
+        return nullptr;
 }
 //
 //  Initialize the cool scrollbars for a window by subclassing it
@@ -256,8 +256,8 @@ BOOL COOLSB_API InitializeCoolSB(HWND hwnd)
                             WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
-                            hwnd, NULL, GetModuleHandle(0),
-                            NULL);
+                            hwnd, nullptr, GetModuleHandle(0),
+        nullptr);
 
     ti.cbSize = sizeof(TOOLINFO);
     ti.uFlags = TTF_IDISHWND;
@@ -739,8 +739,8 @@ static SCROLLBUT *GetButtonFromId(SCROLLBAR *sbar, UINT uCmdId)
 //
 BOOL COOLSB_API CoolSB_ModifyButton (HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd, SCROLLBUT *psb)
 {
-    SCROLLBAR *sbar = NULL;
-    SCROLLBUT *sbut = NULL;
+    SCROLLBAR *sbar = nullptr;
+    SCROLLBUT *sbut = nullptr;
 
     if(!psb) return FALSE;
 
@@ -833,8 +833,8 @@ BOOL COOLSB_API CoolSB_RemoveButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fB
 //
 BOOL COOLSB_API CoolSB_GetButton(HWND hwnd, int wSBflags, UINT uItem, BOOL fByCmd, SCROLLBUT *psb)
 {
-    SCROLLBAR *sbar = NULL;
-    SCROLLBUT *sbut = NULL;
+    SCROLLBAR *sbar = nullptr;
+    SCROLLBUT *sbut = nullptr;
 
     if(!psb) return FALSE;
 
