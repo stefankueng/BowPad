@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -377,7 +377,7 @@ STDMETHODIMP CMainWindow::UpdateProperty(
     UNREFERENCED_PARAMETER(ppropvarCurrentValue);
 
     HRESULT hr = E_NOTIMPL;
-    ICommand * pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
+    ICommand* pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
     if (pCmd)
         hr = pCmd->IUICommandHandlerUpdateProperty(key, ppropvarCurrentValue, ppropvarNewValue);
 
@@ -408,7 +408,7 @@ STDMETHODIMP CMainWindow::Execute(
 {
     HRESULT hr = S_OK;
 
-    ICommand * pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
+    ICommand* pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
     if (pCmd)
     {
         hr = pCmd->IUICommandHandlerExecute(verb, key, ppropvarValue, pCommandExecutionProperties);
@@ -480,7 +480,7 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_BOWPAD));
     wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
     wcx.hIconSm = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_BOWPAD));
-    wcx.hCursor = LoadCursor(NULL, (LPTSTR)IDC_SIZEWE);
+    wcx.hCursor = LoadCursor(NULL, (LPTSTR)IDC_SIZEWE); // for resizing the tree control
     if (RegisterWindow(&wcx))
     {
         // create the window hidden, then after the window is created use the RestoreWindowPos
@@ -493,12 +493,11 @@ bool CMainWindow::RegisterAndCreateWindow()
             SetFileTreeWidth((int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200));
             // hide the tab and status bar so they won't show right away when
             // restoring the window: those two show a white background until properly painted.
-            // After restoring and showing the main window, show them again.
+            // After restoring and showing the main window, ResizeChildControls() is called
+            // which will show those controls again.
             ShowWindow(m_TabBar, SW_HIDE);
             ShowWindow(m_StatusBar, SW_HIDE);
             CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
-            ShowWindow(m_TabBar, SW_SHOW);
-            ShowWindow(m_StatusBar, SW_SHOW);
             UpdateWindow(*this);
             m_editor.StartupDone();
             PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
@@ -1142,7 +1141,6 @@ bool CMainWindow::Initialize()
     }
 
     m_fileTree.Init(hResource, *this);
-    ShowWindow(m_fileTree, m_fileTreeVisible ? SW_SHOW : SW_HIDE);
     CCommandHandler::Instance().AddCommand(&m_fileTree);
     m_editor.Init(hResource, *this);
     m_StatusBar.Init(*this, true);
@@ -1303,7 +1301,11 @@ void CMainWindow::ResizeChildWindows()
 {
     RECT rect;
     GetClientRect(*this, &rect);
-    if (!IsRectEmpty(&rect))
+    // if the main window is not visible (yet) or the UI is blocked,
+    // then don't resize the child controls.
+    // as soon as the UI is unblocked, ResizeChildWindows() is called
+    // again.
+    if (!IsRectEmpty(&rect) && IsWindowVisible(*this))
     {
         const UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
         const UINT noshowflags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOCOPYBITS;
