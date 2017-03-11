@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014 - 2016 Stefan Kueng
+// Copyright (C) 2014-2017 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
             return hr;
 
         // Load the bitmap from the resource file.
-        HBITMAP hbm = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_EMPTY), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+        HBITMAP hbm = (HBITMAP)LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDB_EMPTY), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
         if (hbm)
         {
             // Use the factory implemented by the framework to produce an IUIImage.

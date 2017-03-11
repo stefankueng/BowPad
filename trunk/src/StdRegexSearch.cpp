@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class StdRegexSearch : public RegexSearchBase
 {
 public:
     StdRegexSearch()
-        : _substituted(NULL)
+        : _substituted(nullptr)
         , _lastDirection(0)
     {
     }
@@ -48,7 +48,7 @@ public:
     virtual ~StdRegexSearch()
     {
         delete[] _substituted;
-        _substituted = NULL;
+        _substituted = nullptr;
     }
 
     virtual long FindText(Document* doc, int startPosition, int endPosition, const char *regex,
@@ -63,7 +63,7 @@ private:
     {
     public:
         Match()
-            : _document(NULL)
+            : _document(nullptr)
             , _position(-1)
             , _endPosition(-1)
             , _endPositionForContinuationCheck(-1)
@@ -72,10 +72,10 @@ private:
 
         ~Match()
         {
-            setDocument(NULL);
+            setDocument(nullptr);
         }
         Match(Document* document, int position = -1, int endPosition = -1)
-            : _document(NULL)
+            : _document(nullptr)
         {
             set(document, position, endPosition);
         }
@@ -90,7 +90,7 @@ private:
             return *this;
         }
 
-        void set(Document* document = NULL, int position = -1, int endPosition = -1)
+        void set(Document* document = nullptr, int position = -1, int endPosition = -1)
         {
             setDocument(document);
             _position = position;
@@ -266,7 +266,7 @@ long StdRegexSearch::FindText(Document* doc, int startPosition, int endPosition,
         }
         else
         {
-            _lastMatch = NULL;
+            _lastMatch = 0;
             return -1;
         }
     }

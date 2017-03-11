@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
@@ -81,13 +81,13 @@ std::wstring CAppUtils::GetDataPath(HMODULE hMod)
             // BowPad is installed: we must not store the application data
             // in the same directory as the exe is but in %APPDATA%\BowPad instead
             PWSTR outpath = nullptr;
-            if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &outpath)))
+            if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, nullptr, &outpath)))
             {
                 datapath = outpath;
                 CoTaskMemFree(outpath);
                 datapath += L"\\BowPad";
                 datapath = CPathUtils::GetLongPathname(datapath);
-                CreateDirectory(datapath.c_str(), NULL);
+                CreateDirectory(datapath.c_str(), nullptr);
             }
         }
     }
@@ -102,7 +102,7 @@ std::wstring CAppUtils::GetSessionID()
     if(result)
     {
         DWORD len = 0;
-        GetTokenInformation(token, TokenStatistics, NULL, 0, &len);
+        GetTokenInformation(token, TokenStatistics, nullptr, 0, &len);
         if (len >= sizeof (TOKEN_STATISTICS))
         {
             auto data = std::make_unique<BYTE[]>(len);
@@ -142,7 +142,7 @@ bool CAppUtils::CheckForUpdate(bool force)
             std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
 
             std::wstring sCheckURL = L"https://svn.code.sf.net/p/bowpad-sk/code/trunk/version.txt";
-            HRESULT res = URLDownloadToFile(NULL, sCheckURL.c_str(), tempfile.c_str(), 0, NULL);
+            HRESULT res = URLDownloadToFile(nullptr, sCheckURL.c_str(), tempfile.c_str(), 0, nullptr);
             if (res == S_OK)
             {
                 CIniSettings::Instance().SetInt64(L"updatecheck", L"last", now);
@@ -214,7 +214,7 @@ HRESULT CALLBACK CAppUtils::TDLinkClickCallback(HWND hwnd, UINT uNotification, W
     switch (uNotification)
     {
     case TDN_HYPERLINK_CLICKED:
-        ShellExecute(hwnd, _T("open"), (LPCWSTR) lParam, NULL, NULL, SW_SHOW);
+        ShellExecute(hwnd, _T("open"), (LPCWSTR) lParam, nullptr, nullptr, SW_SHOW);
         break;
     }
 
@@ -227,7 +227,7 @@ bool CAppUtils::DownloadUpdate(HWND hWnd, bool bInstall)
         return false;
 
     PWSTR downloadpath = nullptr;
-    HRESULT hr = SHGetKnownFolderPath(FOLDERID_Downloads, 0, NULL, &downloadpath);
+    HRESULT hr = SHGetKnownFolderPath(FOLDERID_Downloads, 0, nullptr, &downloadpath);
     if (SUCCEEDED(hr))
     {
         std::wstring sDownloadFile = downloadpath;
@@ -248,7 +248,7 @@ bool CAppUtils::DownloadUpdate(HWND hWnd, bool bInstall)
         {
             if (bInstall)
             {
-                ::ShellExecute(hWnd, L"open", sDownloadFile.c_str(), NULL, NULL, SW_SHOW);
+                ::ShellExecute(hWnd, L"open", sDownloadFile.c_str(), nullptr, nullptr, SW_SHOW);
                 PostQuitMessage(0);
             }
             else
@@ -295,7 +295,7 @@ bool CAppUtils::ShowUpdateAvailableDialog( HWND hWnd )
     tdc.pszFooterIcon =  TD_INFORMATION_ICON;
     tdc.pfCallback = CAppUtils::TDLinkClickCallback;
 
-    hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, &bCheckboxChecked);
+    hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, &bCheckboxChecked);
     if (SUCCEEDED(hr))
     {
         if ((nClickedBtn == 1000)||(nClickedBtn == 1001))
@@ -326,7 +326,7 @@ bool CAppUtils::FailedShowMessage(HRESULT hr)
         _com_error err(hr);
         if (CIniSettings::Instance().GetInt64(L"Debug", L"usemessagebox", 0))
         {
-            MessageBox(NULL, L"BowPad", err.ErrorMessage(), MB_ICONERROR);
+            MessageBox(nullptr, L"BowPad", err.ErrorMessage(), MB_ICONERROR);
         }
         else
         {
@@ -382,7 +382,7 @@ bool CAppUtils::ShowDropDownList(HWND hWnd, LPCWSTR ctrlName)
     HRESULT hr;
     // open the dropdown gallery using windows automation
     IUIAutomationPtr pAutomation;
-    hr = CoCreateInstance(__uuidof(CUIAutomation), NULL, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), (void **)&pAutomation);
+    hr = CoCreateInstance(__uuidof(CUIAutomation), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), (void **)&pAutomation);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
     // get the top element of this app window
@@ -439,11 +439,11 @@ HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg )
     // Create an IUIImage from a resource id.
     IUIImagePtr pImg;
     IUIImageFromBitmapPtr pifbFactory;
-    HRESULT hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
+    HRESULT hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
     if (SUCCEEDED(hr))
     {
         // Load the bitmap from the resource file.
-        HBITMAP hbm = (HBITMAP)LoadImage(GetModuleHandle(NULL), resName, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+        HBITMAP hbm = (HBITMAP)LoadImage(GetModuleHandle(nullptr), resName, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
         if (hbm)
         {
             // Use the factory implemented by the framework to produce an IUIImage.

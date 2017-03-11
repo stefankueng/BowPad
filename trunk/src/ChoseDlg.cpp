@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013 - Stefan Kueng
+// Copyright (C) 2013, 2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ LRESULT CChoseDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam
             width += 20;
             height = height * min((int)m_list.size(), 5);
             height += 20;
-            SetWindowPos(hwndDlg, NULL, 0, 0, width, height, SWP_NOMOVE|SWP_NOREPOSITION);
+            SetWindowPos(hwndDlg, nullptr, 0, 0, width, height, SWP_NOMOVE|SWP_NOREPOSITION);
         }
         return TRUE;
     case WM_SIZE:

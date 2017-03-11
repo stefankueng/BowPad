@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2016-2017 - Stefan Kueng
 //
@@ -35,10 +35,10 @@ void CCustomToolTip::Init(HWND hParent)
         wndcls.lpfnWndProc = ::DefWindowProc;
         wndcls.cbClsExtra = wndcls.cbWndExtra = 0;
         wndcls.hInstance = hResource;
-        wndcls.hIcon = NULL;
+        wndcls.hIcon = nullptr;
         wndcls.hCursor = LoadCursor(hResource, IDC_ARROW);
-        wndcls.hbrBackground = NULL;
-        wndcls.lpszMenuName = NULL;
+        wndcls.hbrBackground = nullptr;
+        wndcls.lpszMenuName = nullptr;
         wndcls.lpszClassName = TEXT(POPUPCLASSNAME);
 
         if (RegisterClassEx(&wndcls) == 0)

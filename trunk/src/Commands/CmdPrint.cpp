@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2016 - Stefan Kueng
+// Copyright (C) 2013, 2015-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ void CCmdPrint::Print( bool bShowDlg )
     PRINTDLGEX pdlg = {0};
     pdlg.lStructSize = sizeof(PRINTDLGEX);
     pdlg.hwndOwner = GetHwnd();
-    pdlg.hInstance = NULL;
+    pdlg.hInstance = nullptr;
     pdlg.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_ALLPAGES | PD_RETURNDC | PD_NOCURRENTPAGE | PD_NOPAGENUMS;
     pdlg.nMinPage = 1;
     pdlg.nMaxPage = 0xffffU; // We do not know how many pages in the document
@@ -234,11 +234,11 @@ void CCmdPrint::Print( bool bShowDlg )
     ::EndDoc(hdc);
     ::DeleteDC(hdc);
 
-    if (pdlg.hDevMode != NULL)
+    if (pdlg.hDevMode != nullptr)
         GlobalFree(pdlg.hDevMode);
-    if (pdlg.hDevNames != NULL)
+    if (pdlg.hDevNames != nullptr)
         GlobalFree(pdlg.hDevNames);
-    if (pdlg.lpPageRanges != NULL)
+    if (pdlg.lpPageRanges != nullptr)
         GlobalFree(pdlg.lpPageRanges);
 
     // reset the UI
@@ -253,7 +253,7 @@ bool CCmdPageSetup::Execute()
     PAGESETUPDLG pdlg = {0};
     pdlg.lStructSize = sizeof(PAGESETUPDLG);
     pdlg.hwndOwner = GetHwnd();
-    pdlg.hInstance = NULL;
+    pdlg.hInstance = nullptr;
     pdlg.Flags = PSD_DEFAULTMINMARGINS|PSD_MARGINS|PSD_DISABLEPAPER|PSD_DISABLEORIENTATION;
 
     pdlg.rtMargin.left   = (long)CIniSettings::Instance().GetInt64(L"print", L"pagesetupmarginleft", 2540);

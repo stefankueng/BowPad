@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2014, 2016-2017 - Stefan Kueng
 //
@@ -31,7 +31,7 @@ HRESULT CCmdFont::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROP
     if (key == UI_PKEY_FontProperties)
     {
         hr = E_POINTER;
-        if (ppropvarCurrentValue != NULL)
+        if (ppropvarCurrentValue != nullptr)
         {
             // Get the font values for the selected text in the font control.
             IPropertyStorePtr pValues;
