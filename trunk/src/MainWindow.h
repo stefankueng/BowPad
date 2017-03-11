@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -76,6 +76,7 @@ public:
     bool                ReloadTab(int tab, int encoding, bool dueToOutsideChanges = false);
 
     bool                SaveCurrentTab(bool bSaveAs = false);
+    bool                SaveDoc(DocID docID, bool bSaveAs = false);
     void                EnsureAtLeastOneTab();
     void                GoToLine(size_t line);
     bool                CloseTab(int tab, bool force = false, bool quitting = false);
