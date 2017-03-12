@@ -1,4 +1,4 @@
-﻿// This file is part of BowPad.
+// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -241,18 +241,15 @@ void CTabBar::SetFont(const TCHAR *fontName, int fontSize)
 
 void CTabBar::ActivateAt(int index) const
 {
-    if (index != GetCurrentTabIndex())
-    {
-        InvalidateRect(*this, nullptr, TRUE);
-        NMHDR nmhdr = {};
-        nmhdr.hwndFrom = *this;
-        nmhdr.code = TCN_SELCHANGING;
-        ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
-        if (index >= 0)
-            TabCtrl_SetCurSel(*this, index);
-        nmhdr.code = TCN_SELCHANGE;
-        ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
-    }
+    InvalidateRect(*this, nullptr, TRUE);
+    NMHDR nmhdr = {};
+    nmhdr.hwndFrom = *this;
+    nmhdr.code = TCN_SELCHANGING;
+    ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+    if (index >= 0)
+        TabCtrl_SetCurSel(*this, index);
+    nmhdr.code = TCN_SELCHANGE;
+    ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
 }
 
 void CTabBar::DeleteItemAt(int index)
