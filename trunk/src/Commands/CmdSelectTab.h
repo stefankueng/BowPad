@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
@@ -36,14 +36,15 @@ public:
         // Ctrl+1 ... Ctrl+9
         // we have to find out here which key was pressed and activate the
         // corresponding tab
-
+        auto curTab = GetActiveTabIndex();
         for (int key = 1; key < 9; ++key)
         {
             if ((GetKeyState(key+'0')&0x8000) || (GetKeyState(key + VK_NUMPAD0)&0x8000))
             {
                 if (GetTabCount() >= key)
                 {
-                    TabActivateAt(key-1);
+                    if (key - 1 != curTab)
+                        TabActivateAt(key - 1);
                     return true;
                 }
             }
@@ -51,7 +52,9 @@ public:
 
         if ((GetKeyState('9')&0x8000) || (GetKeyState(VK_NUMPAD9)&0x8000))
         {
-            TabActivateAt(GetTabCount()-1);
+            auto lastTab = GetTabCount() - 1;
+            if (curTab != lastTab)
+                TabActivateAt(lastTab);
             return true;
         }
         if (GetKeyState(VK_TAB)&0x8000)
@@ -73,7 +76,8 @@ public:
                 else
                     ++tab;
             }
-            TabActivateAt(tab);
+            if (tab != curTab)
+                TabActivateAt(tab);
             return true;
         }
 

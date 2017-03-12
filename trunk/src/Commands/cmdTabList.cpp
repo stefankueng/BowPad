@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -226,7 +226,8 @@ bool CCmdTabList::HandleSelectedMenuItem(size_t selected)
     int tab = GetTabIndexFromDocID(item.docId);
     if (tab >= 0)
     {
-        this->TabActivateAt(tab);
+        if (tab != GetActiveTabIndex())
+            TabActivateAt(tab);
         return true;
     }
     // In the current implementation, we don't build the tab list each time
