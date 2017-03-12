@@ -2701,68 +2701,6 @@ void CMainWindow::HandleTabDelete(const TBHDR& tbhdr)
     CloseTab(tabToDelete);
 }
 
-// Note A: (relates to 'Note A' in the function below):
-// We've loaded a new document, now we'd like to activate it.
-// ActivateAt will cause a TCN_CHANGING and then a TCN_CHANGE
-// event to occur. The change will save the current documents
-// cursor position and whatever else it wants to do, then the
-// TCN_CHANGE event will fire and that will make the document
-// we just loaded current.
-// (note commands react (and need to) to both of these events
-// so being aware of their expectations is important and tricky.
-
-// If we call m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document)
-// before activate, we will in effect make the just loaded document
-// current and the TCN_CHANGING event will act on the new document
-// instead of the current document (thereby saving the new
-// documents cursor position as if it were the current document's,
-// etc. thereby losing the cursor position and other badness;
-// the TCN_CHANGE event will then install the new document as
-// active for the second time, possibly creating excess references.
-
-// Letting ActivateAt manage the setting of the new document,
-// at least for now but probably for ever, avoids these issues.
-// Calling m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document) ourselves
-// before ActivateAt causes the issues.
-
-// However the issue is complicated by the fact that (it seems)
-// we may not always be be able to activate the newly loaded document
-// (see existing comment a bit further below).
-// But if we don't activate the document we violate the callers expectations
-// that the newly loaded document will be made active, not just loaded.
-// I've added an else path to keep the code the same as before in this case
-// so things are no worse than before, but I think this still incorrect.
-// Another issue is that the IsWindowEnabled is probably not enough of a
-// test either, and possibly isn't applied rigorously enough in any case
-// (see above comment at top of function).
-
-// All in all this all indicates some further thought and restructuring is
-// required around this area and these issues; and a lot more testing.
-// I don't have time to do all that right now so this comment is a
-// reminder of the issues until then.
-// I suspect if we can't load a document and call ActivateAt to make it
-// active, we should return a false / "not now" status, but that's for
-// future analysis to confirm.
-
-// The actual change made in this commit at least fixes the cursor problem
-// at hand and probably some other issues by implication; but it is limited
-// to addressing just that for now and documenting the issues for later.
-// I don't want subsequent changes to lose simple change in this commit
-// and the reason for it.
-
-// Note B:
-// only activate the new doc tab if the main window is enabled:
-// if it's disabled, a modal dialog is shown
-// (e.g., the handle-outside-modifications confirmation dialog)
-// and we then must not change the active tab.
-
-// Note C:
-// only activate the new doc tab if the main window is enabled:
-// if it's disabled, a modal dialog is shown
-// (e.g., the handle-outside-modifications confirmation dialog)
-// and we then must not change the active tab.
-
-
 int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
 {
     int index = -1;
@@ -2804,9 +2742,6 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     // if we're opening the first file, we have to activate it
     // to ensure all the activation stuff is handled for that first
     // file.
-    // This is required since the tab bar automatically marks the
-    // first item as the active one even if it's not activated
-    // manually.
     if (m_TabBar.GetItemCount() == 0)
         bActivate = true;
 
@@ -2823,7 +2758,10 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         // document already open.
         if (IsWindowEnabled(*this) && bActivate)
         {
-            // See Note C above.
+            // only activate the new doc tab if the main window is enabled:
+            // if it's disabled, a modal dialog is shown
+            // (e.g., the handle-outside-modifications confirmation dialog)
+            // and we then must not change the active tab.
             m_TabBar.ActivateAt(index);
         }
     }
@@ -2914,11 +2852,13 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             }
 
             m_DocManager.AddDocumentAtEnd(doc, id);
-            // See Note A above for comments about this point in the code.
 
+            // only activate the new doc tab if the main window is enabled:
+            // if it's disabled, a modal dialog is shown
+            // (e.g., the handle-outside-modifications confirmation dialog)
+            // and we then must not change the active tab.
             if (IsWindowEnabled(*this))
             {
-                // See Note B above for comments about this point in the code.
                 bool bResize = m_fileTree.GetPath().empty() && !doc.m_path.empty();
                 if (bActivate)
                 {
@@ -2931,7 +2871,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 if (bResize)
                     ResizeChildWindows();
             }
-            else // See comment above.
+            else
                 m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
             if (bAddToMRU)
                 SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
