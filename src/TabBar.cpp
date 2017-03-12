@@ -148,6 +148,11 @@ int CTabBar::InsertAtEnd(const TCHAR *subTabName)
     tie.pszText = const_cast<TCHAR *>(subTabName);
     tie.lParam = m_tabID++;
     int index = TabCtrl_InsertItem(*this, m_nItems++, &tie);
+    // if this is the first item added to the tab bar, it is automatically
+    // selected but without the proper notifications.
+    // remove the selection so it can be selected properly later.
+    if (m_nItems == 1)
+        TabCtrl_SetCurSel(*this, -1);
     return index;
 }
 
@@ -165,6 +170,11 @@ int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
     if ((index + 1) >= m_nItems)
         index = m_nItems - 1;
     int ret = TabCtrl_InsertItem(*this, index + 1, &tie);
+    // if this is the first item added to the tab bar, it is automatically
+    // selected but without the proper notifications.
+    // remove the selection so it can be selected properly later.
+    if (m_nItems == 0)
+        TabCtrl_SetCurSel(*this, -1);
     ++m_nItems;
     return ret;
 }
