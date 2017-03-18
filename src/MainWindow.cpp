@@ -825,7 +825,7 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARA
         break;
     case SCN_DWELLEND:
         m_editor.Call(SCI_CALLTIPCANCEL);
-        ShowWindow(m_custToolTip, SW_HIDE);
+        m_custToolTip.HideTip();
         break;
     case SCN_ZOOM:
         UpdateStatusBar(false);
