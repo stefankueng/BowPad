@@ -2306,7 +2306,6 @@ static LRESULT ThumbTrackHorz(SCROLLBAR *sbar, HWND hwnd, int x, int y)
     RECT rc, winrect, rc2, fullpage;
     COLORREF crCheck1 = GetSBForeColor();
     COLORREF crCheck2 = GetSBBackColor();
-    HDC hdc;
     int thumbpos = nThumbPos;
     int pos;
     int siMaxMin = 0;
@@ -2347,16 +2346,25 @@ static LRESULT ThumbTrackHorz(SCROLLBAR *sbar, HWND hwnd, int x, int y)
 
     GetWindowRect(hwnd, &winrect);
 
-    if(sbar->nBarType == SB_VERT)
+    if (sbar->nBarType == SB_VERT)
         RotateRect(&winrect);
+    OffsetRect(&rc, -winrect.left, -winrect.top);
 
-    hdc = GetWindowDC(hwnd);
+    auto hdcorig = GetWindowDC(hwnd);
+    HDC hdc = CreateCompatibleDC(hdcorig);
+    RECT rcmem;
+    SetRect(&rcmem, rc.left, rc.top, rc.right, rc.bottom);
+    RotateRect0(sbar, &rcmem);
+
+    HBITMAP hBitmap = CreateCompatibleBitmap(hdcorig, rcmem.right - rcmem.left, rcmem.bottom - rcmem.top);
+    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hdc, hBitmap);
+    SetWindowOrgEx(hdc, rcmem.left, rcmem.top, nullptr);
+
 
 #ifdef CUSTOM_DRAW
     fCustomDraw = PostCustomPrePostPaint(hwnd, hdc, sbar, CDDS_PREPAINT) == CDRF_SKIPDEFAULT;
 #endif
 
-    OffsetRect(&rc, -winrect.left, -winrect.top);
     //FULL PAGE
     SetRect(&fullpage, rc.left, rc.top, rc.right, rc.bottom);
     RotateRect0(sbar, &fullpage);
@@ -2410,8 +2418,15 @@ static LRESULT ThumbTrackHorz(SCROLLBAR *sbar, HWND hwnd, int x, int y)
         }
     }
 
+    BitBlt(hdcorig, rcmem.left, rcmem.top, rcmem.right - rcmem.left, rcmem.bottom - rcmem.top, hdc, rcmem.left, rcmem.top, SRCCOPY);
+
+    //Swap back the original bitmap.
+    SelectBitmap(hdc, hOldBitmap);
+    DeleteBitmap(hBitmap);
+    DeleteDC(hdc);
+
     RotateRect0(sbar, &rc2);
-    ReleaseDC(hwnd, hdc);
+    ReleaseDC(hwnd, hdcorig);
 
     //post a SB_TRACKPOS message!!!
     siMaxMin = si->nMax - si->nMin;
