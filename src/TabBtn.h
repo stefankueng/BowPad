@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016 - Stefan Kueng
+// Copyright (C) 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 //
 #pragma once
 #include "BaseWindow.h"
+#include "AnimationManager.h"
 
 class CTabBtn : public CWindow
 {
@@ -27,7 +28,9 @@ public :
         , m_color(0)
         , m_textcolorset(false)
         , m_textcolor(0)
-    {};
+    {
+        m_AnimVarHot = Animator::Instance().CreateAnimationVariable(0.0);
+    };
     virtual ~CTabBtn()
     {
         if (m_hFont)
@@ -50,4 +53,5 @@ private:
     bool        m_colorset;
     COLORREF    m_textcolor;
     bool        m_textcolorset;
+    IUIAnimationVariablePtr m_AnimVarHot;
 };
