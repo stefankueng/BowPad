@@ -357,6 +357,9 @@
     <ClInclude Include="..\ext\sktoolslib\RichStatusBar.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\AnimationManager.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -636,6 +639,9 @@
       <Filter>sktoolslib</Filter>
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\RichStatusBar.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\AnimationManager.cpp">
       <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>

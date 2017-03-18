@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016 - Stefan Kueng
+// Copyright (C) 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,11 +16,16 @@
 //
 #pragma once
 #include "BaseWindow.h"
+#include "AnimationManager.h"
 
 class CCustomToolTip : public CWindow
 {
 public:
-    CCustomToolTip(HINSTANCE hInst) : CWindow(hInst) {}
+    CCustomToolTip(HINSTANCE hInst)
+        : CWindow(hInst)
+    {
+        m_AnimVarAlpha = Animator::Instance().CreateAnimationVariable(0);
+    }
     virtual ~CCustomToolTip()
     {
         DeleteObject(m_hFont);
@@ -29,6 +34,7 @@ public:
     void Init(HWND hParent);
 
     void ShowTip(POINT screenPt, const std::wstring& text, COLORREF * color);
+    void HideTip();
 protected:
     void OnPaint(HDC hdc, RECT * pRc);
     LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -38,5 +44,6 @@ private:
     COLORREF        m_color = 0;
     HFONT           m_hFont = nullptr;
     bool            m_bShowColorBox = false;
+    IUIAnimationVariablePtr m_AnimVarAlpha;
 };
 
