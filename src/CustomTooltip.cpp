@@ -83,10 +83,33 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
         rc.bottom += COLORBOX_SIZE + BORDER;   // space for the color box
         rc.right = max(rc.right, COLORBOX_SIZE);
     }
+    SetTransparency(0);
     SetWindowPos(*this, nullptr,
                  screenPt.x - rc.right / 2, screenPt.y - rc.bottom - 20,
                  rc.right + BORDER + BORDER, rc.bottom + BORDER + BORDER,
                  SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW);
+
+    auto transAlpha = Animator::Instance().CreateLinearTransition(0.3, 255);
+    auto storyBoard = Animator::Instance().CreateStoryBoard();
+    storyBoard->AddTransition(m_AnimVarAlpha, transAlpha);
+    Animator::Instance().RunStoryBoard(storyBoard, [this]()
+    {
+        SetTransparency((BYTE)Animator::GetIntegerValue(m_AnimVarAlpha));
+    });
+}
+
+void CCustomToolTip::HideTip()
+{
+    auto transAlpha = Animator::Instance().CreateLinearTransition(0.5, 0);
+    auto storyBoard = Animator::Instance().CreateStoryBoard();
+    storyBoard->AddTransition(m_AnimVarAlpha, transAlpha);
+    Animator::Instance().RunStoryBoard(storyBoard, [this]()
+    {
+        auto alpha = Animator::GetIntegerValue(m_AnimVarAlpha);
+        SetTransparency((BYTE)alpha);
+        if (alpha == 0)
+            ShowWindow(*this, SW_HIDE);
+    });
 }
 
 void CCustomToolTip::OnPaint(HDC hdc, RECT * pRc)
@@ -118,7 +141,7 @@ LRESULT CCustomToolTip::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
         case WM_KEYDOWN:
         if (wParam == VK_ESCAPE)
         {
-            ShowWindow(*this, SW_HIDE);
+            HideTip();
             return TRUE;
         }
         break;
@@ -135,8 +158,8 @@ LRESULT CCustomToolTip::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             return 0;
         }
         case WM_RBUTTONDOWN:
-        ShowWindow(*this, SW_HIDE);
-        return 0;
+            HideTip();
+            return 0;
         case WM_PAINT:
         {
             PAINTSTRUCT ps;
