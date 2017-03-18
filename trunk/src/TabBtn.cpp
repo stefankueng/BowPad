@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2016-2017 - Stefan Kueng
 //
@@ -64,13 +64,13 @@ void CTabBtn::SetFont(const TCHAR *fontName, int fontSize)
 
 LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    switch (uMsg)
+    if (CTheme::Instance().IsDarkTheme())
     {
-        case WM_PAINT:
+        switch (uMsg)
         {
-            if (CTheme::Instance().IsDarkTheme())
+            case WM_PAINT:
             {
-                // only do custom drawing when in dark theme
+                    // only do custom drawing when in dark theme
                 PAINTSTRUCT ps;
                 HDC hdc = BeginPaint(hwnd, &ps);
 
@@ -78,12 +78,21 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
                 auto clr1 = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNSHADOW));
                 auto clr2 = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNFACE));
-
                 if (m_colorset)
                 {
                     clr1 = CTheme::Instance().GetThemeColor(m_color);
                     clr2 = GDIHelpers::Darker(clr1, 0.7f);
                 }
+                auto r1 = GetRValue(clr1);
+                auto g1 = GetGValue(clr1);
+                auto b1 = GetBValue(clr1);
+                auto r2 = GetRValue(clr2);
+                auto g2 = GetGValue(clr2);
+                auto b2 = GetBValue(clr2);
+                // m_AnimVarHot changes from 0.0 (not hot) to 1.0 (hot)
+                auto fraction = Animator::GetValue(m_AnimVarHot);
+                clr1 = RGB((r1 - r2)*fraction + r1, (g1 - g2)*fraction + g1, (b1 - b2)*fraction + b1);
+                clr2 = RGB((r1 - r2)*fraction + r2, (g1 - g2)*fraction + g2, (b1 - b2)*fraction + b2);
 
                 ::SetBkColor(hdc, (state & BST_HOT) != 0 ? clr2 : clr1);
 
@@ -112,10 +121,46 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 EndPaint(hwnd, &ps);
                 return 0;
             }
+            break;
+            case WM_ERASEBKGND:
+                return TRUE;
+            case WM_MOUSEMOVE:
+            {
+                if ((Button_GetState(*this) & BST_HOT) == 0)
+                {
+                    auto transHot = Animator::Instance().CreateLinearTransition(0.3, 1.0);
+                    auto storyBoard = Animator::Instance().CreateStoryBoard();
+                    storyBoard->AddTransition(m_AnimVarHot, transHot);
+                    Animator::Instance().RunStoryBoard(storyBoard, [this]()
+                    {
+                        InvalidateRect(*this, nullptr, false);
+                    });
+                    TRACKMOUSEEVENT tme = { sizeof(tme) };
+                    tme.dwFlags = TME_LEAVE;
+                    tme.hwndTrack = hwnd;
+                    TrackMouseEvent(&tme);
+                }
+            }
+            break;
+            case WM_MOUSELEAVE:
+            {
+                TRACKMOUSEEVENT tme = { 0 };
+                tme.cbSize = sizeof(TRACKMOUSEEVENT);
+                tme.dwFlags = TME_LEAVE | TME_CANCEL;
+                tme.hwndTrack = *this;
+                TrackMouseEvent(&tme);
+                if ((Button_GetState(*this) & BST_HOT) != 0)
+                {
+                    auto transHot = Animator::Instance().CreateLinearTransition(0.5, 0.0);
+                    auto storyBoard = Animator::Instance().CreateStoryBoard();
+                    storyBoard->AddTransition(m_AnimVarHot, transHot);
+                    Animator::Instance().RunStoryBoard(storyBoard, [this]()
+                    {
+                        InvalidateRect(*this, nullptr, false);
+                    });
+                }
+            }
         }
-        break;
-        case WM_ERASEBKGND:
-        return TRUE;
     }
     if (prevWndProc)
         return prevWndProc(hwnd, uMsg, wParam, lParam);
