@@ -705,14 +705,15 @@ static LRESULT PostCustomDrawNotify0(HWND hwnd, HDC hdc, UINT nBar, RECT *prect,
     nmcd.uItem        = nItem;
     nmcd.hdc          = hdc;
 
+    nmcd.uState = 0;
     if(fMouseDown)
-        nmcd.uState       = CDIS_SELECTED;
-    else if(fMouseOver)
-        nmcd.uState       = CDIS_HOT;
-    else if(fInactive)
-        nmcd.uState       = CDIS_DISABLED;
+        nmcd.uState       |= CDIS_SELECTED;
+    if(fMouseOver)
+        nmcd.uState       |= CDIS_HOT;
+    if(fInactive)
+        nmcd.uState       |= CDIS_DISABLED;
     else
-        nmcd.uState       = CDIS_DEFAULT;
+        nmcd.uState       |= CDIS_DEFAULT;
 
     hwnd = GetParent(hwnd);
     return SendMessage(hwnd, WM_NOTIFY, nmcd.hdr.idFrom, (LPARAM)&nmcd);
