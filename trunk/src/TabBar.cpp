@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -37,7 +37,7 @@
 extern IUIFramework * g_pFramework;
 
 const int TABBAR_SHOWDISKICON = 0;
-
+const double hoverFraction = 0.6;
 
 CTabBar::CTabBar(HINSTANCE hInst)
     : CWindow(hInst)
@@ -55,14 +55,11 @@ CTabBar::CTabBar(HINSTANCE hInst)
     , m_whichCloseClickDown(-1)
     , m_lmbdHit(false)
     , m_tabID(0)
-    , m_nControls(0)
 {
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
     m_draggingPoint = {};
     m_currentHoverTabRect = {};
-    for (int i = 0; i < nbCtrlMax; ++i)
-        m_hwndArray[i] = nullptr;
 };
 
 CTabBar::~CTabBar()
@@ -86,28 +83,6 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
         return false;
     }
 
-    if (!m_hwndArray[m_nControls])
-    {
-        m_hwndArray[m_nControls] = *this;
-        m_ctrlID = m_nControls;
-    }
-    else
-    {
-        int i = 0;
-        bool found = false;
-        for (; i < nbCtrlMax && !found; i++)
-            if (!m_hwndArray[i])
-                found = true;
-        if (!found)
-        {
-            m_ctrlID = -1;
-            return false;
-        }
-        m_hwndArray[i] = *this;
-        m_ctrlID = i;
-    }
-    m_nControls++;
-
     ::SetWindowLongPtr(*this, GWLP_USERDATA, (LONG_PTR)this);
     m_TabBarDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(*this, GWLP_WNDPROC, (LONG_PTR)TabBar_Proc));
 
@@ -125,7 +100,6 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
     TabCtrl_SetMinTabWidth(*this, LPARAM(GetSystemMetrics(SM_CXSMICON) * m_dpiScaleX * 4.0));
     m_closeButtonZone.SetDPIScale(m_dpiScaleX);
 
-    DoOwnerDrawTab();
     return true;
 }
 
@@ -146,6 +120,7 @@ int CTabBar::InsertAtEnd(const TCHAR *subTabName)
         imageIndex = 0;
     tie.iImage = TABBAR_SHOWDISKICON ? imageIndex : 0;
     tie.pszText = const_cast<TCHAR *>(subTabName);
+    m_animVars[m_tabID] = Animator::Instance().CreateAnimationVariable(1.0);
     tie.lParam = m_tabID++;
     int index = TabCtrl_InsertItem(*this, m_nItems++, &tie);
     // if this is the first item added to the tab bar, it is automatically
@@ -166,6 +141,7 @@ int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
         imgindex = 0;
     tie.iImage = TABBAR_SHOWDISKICON ? imgindex : 0;
     tie.pszText = const_cast<TCHAR *>(subTabName);
+    m_animVars[m_tabID] = Animator::Instance().CreateAnimationVariable(1.0);
     tie.lParam = m_tabID++;
     if ((index + 1) >= m_nItems)
         index = m_nItems - 1;
@@ -284,6 +260,10 @@ void CTabBar::DeleteItemAt(int index)
     // Failure to decrement the count first will show up as assertion
     // failures in calls to GetItemRect arond line 320 & 530 in the
     // paint logic.
+    auto foundIt = m_animVars.find(GetIDFromIndex(index).GetValue());
+    assert(foundIt != m_animVars.end());
+    m_animVars.erase(foundIt);
+
     m_nItems--;
     bool deleted = TabCtrl_DeleteItem(*this, index) != FALSE;
     APPVERIFY(deleted);
@@ -341,21 +321,6 @@ HIMAGELIST CTabBar::SetImageList(HIMAGELIST himl)
 {
     m_bHasImgList = (himl != nullptr);
     return TabCtrl_SetImageList(*this, himl);
-}
-
-void CTabBar::DoOwnerDrawTab() const
-{
-    int padx = int(GetSystemMetrics(SM_CXSMICON) / 2 * m_dpiScaleX);
-    int pady = int(3.0 * m_dpiScaleY);
-    TabCtrl_SetPadding(m_hwndArray[0], padx, pady);
-    for (int i = 0; i < m_nControls; i++)
-    {
-        if (m_hwndArray[i])
-        {
-            ::InvalidateRect(m_hwndArray[i], nullptr, TRUE);
-            TabCtrl_SetPadding(m_hwndArray[i], padx, pady);
-        }
-    }
 }
 
 LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -463,7 +428,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                     if (got)
                     {
                         dis.rcItem.bottom -= 2;
-                        DrawItem(&dis);
+                        DrawItem(&dis, (float)Animator::GetValue(m_animVars[GetIDFromIndex(nTab).GetValue()]));
                         DrawItemBorder(&dis);
                     }
                 }
@@ -482,7 +447,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 {
                     dis.rcItem.bottom += 2;
                     dis.rcItem.top -= 2;
-                    DrawItem(&dis);
+                    DrawItem(&dis, (float)Animator::GetValue(m_animVars[GetIDFromIndex(nSel).GetValue()]));
                     DrawItemBorder(&dis);
                 }
             }
@@ -677,16 +642,37 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                         InvalidateRect(hwnd, &oldRect, FALSE);
                     InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
                 }
-                else if (m_currentHoverTabItem != oldIndex)
+                if (m_currentHoverTabItem != oldIndex)
                 {
                     if (oldIndex != -1)
-                        InvalidateRect(hwnd, &oldRect, FALSE);
-                    InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
+                    {
+                        auto transHot = Animator::Instance().CreateLinearTransition(0.3, 1.0);
+                        auto storyBoard = Animator::Instance().CreateStoryBoard();
+                        storyBoard->AddTransition(m_animVars[GetIDFromIndex(oldIndex).GetValue()], transHot);
+                        Animator::Instance().RunStoryBoard(storyBoard, [hwnd,oldRect]()
+                        {
+                            InvalidateRect(hwnd, &oldRect, FALSE);
+                        });
+                    }
+                    auto transHot = Animator::Instance().CreateLinearTransition(0.3, hoverFraction);
+                    auto storyBoard = Animator::Instance().CreateStoryBoard();
+                    storyBoard->AddTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], transHot);
+                    Animator::Instance().RunStoryBoard(storyBoard, [hwnd, this]()
+                    {
+                        InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
+                    });
                 }
             }
             else if (m_currentHoverTabItem != index)
             {
-                InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
+                auto transHot = Animator::Instance().CreateLinearTransition(0.3, 1.0);
+                auto storyBoard = Animator::Instance().CreateStoryBoard();
+                storyBoard->AddTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], transHot);
+                auto animRect = m_currentHoverTabRect;
+                Animator::Instance().RunStoryBoard(storyBoard, [hwnd, animRect]()
+                {
+                    InvalidateRect(hwnd, &animRect, FALSE);
+                });
                 m_currentHoverTabItem = index;
             }
         }
@@ -699,8 +685,15 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             tme.hwndTrack = *this;
             TrackMouseEvent(&tme);
             m_bIsCloseHover = false;
+            auto transHot = Animator::Instance().CreateLinearTransition(0.3, 1.0);
+            auto storyBoard = Animator::Instance().CreateStoryBoard();
+            storyBoard->AddTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], transHot);
+            auto oldRect = m_currentHoverTabRect;
+            Animator::Instance().RunStoryBoard(storyBoard, [hwnd, oldRect]()
+            {
+                InvalidateRect(hwnd, &oldRect, FALSE);
+            });
             m_currentHoverTabItem = -1;
-            InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
         }
             break;
         case WM_LBUTTONUP:
@@ -751,11 +744,11 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             }
         }
             break;
-        case WM_DRAWITEM:
-        {
-            DrawItem((DRAWITEMSTRUCT *)lParam);
-            return TRUE;
-        }
+        //case WM_DRAWITEM:
+        //{
+        //    DrawItem((DRAWITEMSTRUCT *)lParam);
+        //    return TRUE;
+        //}
             break;
         case WM_HOTKEY:
         {
@@ -876,7 +869,7 @@ void CTabBar::DrawMainBorder(const LPDRAWITEMSTRUCT lpdis) const
     GDIHelpers::FillSolidRect(lpdis->hDC, &lpdis->rcItem, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
 }
 
-void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct) const
+void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) const
 {
     HIMAGELIST hilTabs = (HIMAGELIST)TabCtrl_GetImageList(*this);
 
@@ -896,8 +889,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct) const
     COLORREF crFrom = GetTabColor(bSelected, pDrawItemStruct->itemID);
 
     COLORREF crTo = bSelected ? ::GetSysColor(COLOR_3DFACE) : GDIHelpers::Darker(::GetSysColor(COLOR_3DFACE), 0.95f);
-    if (bMouseOver)
-        crTo = GDIHelpers::Darker(crTo, 0.7f);
+    crTo = GDIHelpers::Darker(crTo, fraction);
 
     crTo = CTheme::Instance().GetThemeColor(crTo);
 
