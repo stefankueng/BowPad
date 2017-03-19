@@ -35,8 +35,6 @@
 HINSTANCE hInst;
 HINSTANCE hRes;
 
-CCommandHandler* g_commandHandler;
-
 static void LoadLanguage(HINSTANCE hInstance)
 {
     // load the language dll if required
@@ -417,8 +415,6 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     SetIcon();
 
     CMainWindow mainWindow(hRes);
-    CCommandHandler commandHandler;
-    g_commandHandler = &commandHandler;
 
     if (!mainWindow.RegisterAndCreateWindow())
         return -1;
@@ -446,6 +442,7 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
             DispatchMessage(&msg);
         }
     }
+    CCommandHandler::ShutDown();
     Animator::ShutDown();
     return (int)msg.wParam;
 }
@@ -467,7 +464,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
     auto mainResult = BPMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow, bAlreadyRunning);
 
-    g_commandHandler = nullptr;
     Scintilla_ReleaseResources();
 
     // Be careful shutting down Scintilla's resources here if any
