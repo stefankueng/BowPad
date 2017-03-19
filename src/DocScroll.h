@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 //
 #pragma once
 #include "coolscroll.h"
+#include "AnimationManager.h"
 
 #include <map>
 
@@ -59,6 +60,7 @@ public:
     bool                        IsDirty() const { return m_bDirty; }
 private:
     void                        CalcLines();
+    void                        AnimateFraction(IUIAnimationVariablePtr animVar, double endVal);
 
 
     std::map<size_t, COLORREF>                  m_visibleLineColors[DOCSCROLLTYPE_END];
@@ -70,4 +72,17 @@ private:
     CScintillaWnd *                             m_pScintilla;
     bool                                        m_bDirty;
     ULONG_PTR                                   m_gdiplusToken;
+
+    IUIAnimationVariablePtr                     m_AnimVarHL;
+    IUIAnimationVariablePtr                     m_AnimVarHR;
+    IUIAnimationVariablePtr                     m_AnimVarHT;
+    IUIAnimationVariablePtr                     m_AnimVarVL;
+    IUIAnimationVariablePtr                     m_AnimVarVR;
+    IUIAnimationVariablePtr                     m_AnimVarVT;
+    bool                                        m_bHotHL;
+    bool                                        m_bHotHR;
+    bool                                        m_bHotHT;
+    bool                                        m_bHotVL;
+    bool                                        m_bHotVR;
+    bool                                        m_bHotVT;
 };
