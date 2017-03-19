@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -31,6 +31,7 @@ public:
 
 public:
     static CCommandHandler& Instance();
+    static void ShutDown();
 
     void                            Init(void* obj);
     ICommand *                      GetCommand(UINT cmdId);
@@ -70,4 +71,5 @@ private:
     std::map<UINT, std::wstring>                    m_plugins;
     std::map<std::wstring, int>                     m_pluginversion;
     UINT                                            m_highestCmdId;
+    static std::unique_ptr<CCommandHandler>         m_instance;
 };
