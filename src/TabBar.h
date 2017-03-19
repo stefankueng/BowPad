@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -17,6 +17,7 @@
 #pragma once
 #include "BaseWindow.h"
 #include "DocumentManager.h"
+#include "AnimationManager.h"
 
 #define TCN_TABDROPPED                  (WM_USER + 1)
 #define TCN_TABDROPPEDOUTSIDE           (WM_USER + 2)
@@ -86,13 +87,12 @@ public :
     int                         GetSrcTab() const { return m_nSrcTab; }
     int                         GetDstTab() const { return m_nTabDragged; }
 protected:
-    void                        DoOwnerDrawTab() const;
     static LRESULT CALLBACK     TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
     void                        ExchangeItemData(POINT point);
     LRESULT                     RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
     COLORREF                    GetTabColor(bool bSelected, UINT item) const;
     void                        DrawMainBorder(const LPDRAWITEMSTRUCT lpDrawItemStruct) const;
-    void                        DrawItem(const LPDRAWITEMSTRUCT lpDrawItemStruct) const;
+    void                        DrawItem(const LPDRAWITEMSTRUCT lpDrawItemStruct, float fraction) const;
     void                        DrawItemBorder(const LPDRAWITEMSTRUCT lpDrawItemStruct) const;
     void                        DraggingCursor(POINT screenPoint, UINT item);
     int                         GetTabIndexAt(const POINT & p) const { return GetTabIndexAt(p.x, p.y); }
@@ -123,8 +123,7 @@ private:
     int                         m_whichCloseClickDown;
     bool                        m_lmbdHit; // Left Mouse Button Down Hit
 
-    int                         m_nControls;
-    HWND                        m_hwndArray[nbCtrlMax];
+    std::map<int, IUIAnimationVariablePtr>  m_animVars;
 
     ULONG_PTR                   gdiplusToken;
 };
