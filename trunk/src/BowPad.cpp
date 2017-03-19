@@ -446,6 +446,7 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
             DispatchMessage(&msg);
         }
     }
+    Animator::ShutDown();
     return (int)msg.wParam;
 }
 
