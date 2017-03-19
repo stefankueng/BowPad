@@ -73,16 +73,18 @@ CCommandHandler::CCommandHandler()
 {
 }
 
-//CCommandHandler& CCommandHandler::Instance()
-//{
-    //static CCommandHandler instance;
-    //return instance;
-//}
+std::unique_ptr<CCommandHandler> CCommandHandler::m_instance = nullptr;
 
 CCommandHandler& CCommandHandler::Instance()
 {
-    extern CCommandHandler* g_commandHandler;
-    return *g_commandHandler;
+    if (m_instance == nullptr)
+        m_instance.reset(new CCommandHandler());
+    return *m_instance.get();
+}
+
+void CCommandHandler::ShutDown()
+{
+    m_instance.reset(nullptr);
 }
 
 
