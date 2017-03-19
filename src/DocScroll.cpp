@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -27,17 +27,16 @@
 #pragma warning(pop)
 
 
-static COLORREF GetThumbColor(const NMCSBCUSTOMDRAW& custDraw)
+static COLORREF GetThumbColor(double hotFraction)
 {
-    const bool hot = (custDraw.uState & CDIS_HOT) != 0;
     auto& theme = CTheme::Instance();
     // Use the first "if" to make things more readable in the dark theme. Or comment the "if" part out and use
     // the else path is the original theme code that works but makes things arguably less readable in the dark theme
     // because a small dark blue vertical scroll bar isn't that readable on a black background.
     if (theme.IsDarkTheme())
-        return hot ? theme.GetThemeColor(RGB(128, 128, 128)) : theme.GetThemeColor(::GetSysColor(COLOR_3DSHADOW));
+        return theme.GetThemeColor(GDIHelpers::InterpolateColors(::GetSysColor(COLOR_3DSHADOW), RGB(128, 128, 128), hotFraction));
     else
-        return theme.GetThemeColor(hot ? RGB(200, 200, 255) : ::GetSysColor(COLOR_3DSHADOW));
+        return theme.GetThemeColor(GDIHelpers::InterpolateColors(RGB(200, 200, 255), ::GetSysColor(COLOR_3DSHADOW), hotFraction));
 }
 
 static void DrawTriangle(HDC hdc, COLORREF scroll, COLORREF thumb, const RECT& rect, LONG x0, LONG y0, LONG x1, LONG y1, LONG x2, LONG y2)
@@ -68,9 +67,22 @@ CDocScroll::CDocScroll()
     , m_visibleLines(0)
     , m_curPosVisLine(0)
     , m_curPosColor(0)
+    , m_bHotHL(false)
+    , m_bHotHR(false)
+    , m_bHotHT(false)
+    , m_bHotVL(false)
+    , m_bHotVR(false)
+    , m_bHotVT(false)
 {
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, nullptr);
+
+    m_AnimVarHL = Animator::Instance().CreateAnimationVariable(0.0);
+    m_AnimVarHR = Animator::Instance().CreateAnimationVariable(0.0);
+    m_AnimVarHT = Animator::Instance().CreateAnimationVariable(0.0);
+    m_AnimVarVL = Animator::Instance().CreateAnimationVariable(0.0);
+    m_AnimVarVR = Animator::Instance().CreateAnimationVariable(0.0);
+    m_AnimVarVT = Animator::Instance().CreateAnimationVariable(0.0);
 }
 
 void CDocScroll::InitScintilla(CScintillaWnd * pScintilla)
@@ -104,142 +116,193 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
         // the sizing gripper in the bottom-right corner
         GDIHelpers::FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_SCROLLBAR)));
     }
-    else if (pCustDraw->nBar == SB_HORZ)
+    else if (pCustDraw->dwDrawStage == CDDS_ITEMPREPAINT)
     {
         const COLORREF scroll = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
-        const COLORREF thumb = GetThumbColor(*pCustDraw);
-
-        switch (pCustDraw->uItem)
+        if (pCustDraw->nBar == SB_HORZ)
         {
-            case HTSCROLL_LEFT:
-            DrawTriangle(pCustDraw->hdc, scroll, thumb,
-                         pCustDraw->rect,
-                         pCustDraw->rect.left + margin,
-                         pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top) / 2,
-                         pCustDraw->rect.right - margin,
-                         pCustDraw->rect.top + margin,
-                         pCustDraw->rect.right - margin,
-                         pCustDraw->rect.bottom - margin);
-            break;
-            case HTSCROLL_RIGHT:
-            DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
-                         pCustDraw->rect.right - margin,
-                         pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top) / 2,
-                         pCustDraw->rect.left + margin,
-                         pCustDraw->rect.top + margin,
-                         pCustDraw->rect.left + margin,
-                         pCustDraw->rect.bottom - margin);
-            break;
-            case HTSCROLL_THUMB:
-            GDIHelpers::FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top,
-                          pCustDraw->rect.right, pCustDraw->rect.bottom, thumb);
-            break;
-            default:
-            GDIHelpers::FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top,
-                          pCustDraw->rect.right, pCustDraw->rect.bottom, scroll);
-            break;
-        }
-        return CDRF_SKIPDEFAULT;
-    }
-    else if (pCustDraw->nBar == SB_VERT)
-    {
-        const COLORREF scroll = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
-        const COLORREF thumb = GetThumbColor(*pCustDraw);
-
-        switch (pCustDraw->uItem)
-        {
-            case HTSCROLL_DOWN:
-            DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
-                         pCustDraw->rect.left + (pCustDraw->rect.right - pCustDraw->rect.left) / 2,
-                         pCustDraw->rect.bottom - margin,
-                         pCustDraw->rect.left + margin,
-                         pCustDraw->rect.top + margin,
-                         pCustDraw->rect.right - margin,
-                         pCustDraw->rect.top + margin);
-            break;
-            case HTSCROLL_UP:
-            DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
-                         pCustDraw->rect.left + (pCustDraw->rect.right - pCustDraw->rect.left) / 2,
-                         pCustDraw->rect.top + margin,
-                         pCustDraw->rect.left + margin,
-                         pCustDraw->rect.bottom - margin,
-                         pCustDraw->rect.right - margin,
-                         pCustDraw->rect.bottom - margin);
-            break;
-            case HTSCROLL_THUMB:
+            switch (pCustDraw->uItem)
             {
-                Gdiplus::Graphics graphics(pCustDraw->hdc);
-                graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
-                Gdiplus::Color c1;
-                c1.SetFromCOLORREF(thumb);
-                Gdiplus::Pen p1(c1);
-                p1.SetWidth(2.0);
-
-                RECT rc = pCustDraw->rect;
-                InflateRect(&rc, -2, -2);
-                Gdiplus::GraphicsPath path;
-                // top left
-                path.AddArc(rc.left, rc.top, 4, 4, 180, 90);
-                // top right
-                path.AddArc(rc.right - 4 - 1, rc.top, 4, 4, 270, 90);
-                // bottom right
-                path.AddArc(rc.right - 4 - 1, rc.bottom - 4 - 1, 4, 4, 0, 90);
-                // bottom left
-                path.AddArc(rc.left, rc.bottom - 4 - 1, 4, 4, 90, 90);
-                path.CloseFigure();
-                graphics.DrawPath(&p1, &path);
-
-                // Fill the vertical thumb with only part of the color
-                // so the document info (selections, cursor pos, ...) can
-                // still be seen through it.
-                c1.SetValue(GDIHelpers::MakeARGB(100, GetRValue(thumb), GetGValue(thumb), GetBValue(thumb)));
-                Gdiplus::SolidBrush brush(c1);
-                graphics.FillPath(&brush, &path);
-            }
-            break;
-            case HTSCROLL_PAGEFULL:
-            {
-                Gdiplus::Graphics graphics(pCustDraw->hdc);
-                Gdiplus::Color c1;
-                c1.SetFromCOLORREF(scroll);
-                Gdiplus::SolidBrush brush(c1);
-                graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top);
-
-                if (m_bDirty)
-                    CalcLines();
-
-                LONG lastLinePos = -1;
-                COLORREF lastColor = (COLORREF)-1;
-                int colcount = DOCSCROLLTYPE_END;
-                int width = pCustDraw->rect.right - pCustDraw->rect.left;
-                int colwidth = width / (colcount - 1);
-                for (int c = 1; c < colcount; ++c)
+                case HTSCROLL_LEFT:
                 {
-                    int drawx = pCustDraw->rect.left + (c - 1)*colwidth;
-                    for (auto line : m_visibleLineColors[c])
+                    bool hotNow = (pCustDraw->uState&CDIS_HOT) != 0;
+                    if (m_bHotHL != hotNow)
                     {
-                        LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top)*line.first / m_lines);
-                        if ((linepos > (lastLinePos + 1)) || (lastColor != line.second))
+                        AnimateFraction(m_AnimVarHL, hotNow ? 1.0 : 0.0);
+                        m_bHotHL = hotNow;
+                    }
+                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarHL));
+                    DrawTriangle(pCustDraw->hdc, scroll, thumb,
+                                 pCustDraw->rect,
+                                 pCustDraw->rect.left + margin,
+                                 pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top) / 2,
+                                 pCustDraw->rect.right - margin,
+                                 pCustDraw->rect.top + margin,
+                                 pCustDraw->rect.right - margin,
+                                 pCustDraw->rect.bottom - margin);
+                }
+                break;
+                case HTSCROLL_RIGHT:
+                {
+                    bool hotNow = (pCustDraw->uState&CDIS_HOT) != 0;
+                    if (m_bHotHR != hotNow)
+                    {
+                        AnimateFraction(m_AnimVarHR, hotNow ? 1.0 : 0.0);
+                        m_bHotHR = hotNow;
+                    }
+                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarHR));
+                    DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
+                                 pCustDraw->rect.right - margin,
+                                 pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top) / 2,
+                                 pCustDraw->rect.left + margin,
+                                 pCustDraw->rect.top + margin,
+                                 pCustDraw->rect.left + margin,
+                                 pCustDraw->rect.bottom - margin);
+                }
+                break;
+                case HTSCROLL_THUMB:
+                {
+                    bool hotNow = (pCustDraw->uState&CDIS_HOT) != 0;
+                    if (m_bHotHT != hotNow)
+                    {
+                        AnimateFraction(m_AnimVarHT, hotNow ? 1.0 : 0.0);
+                        m_bHotHT = hotNow;
+                    }
+                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarHT));
+                    GDIHelpers::FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top,
+                                              pCustDraw->rect.right, pCustDraw->rect.bottom, thumb);
+                }
+                break;
+                default:
+                    GDIHelpers::FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top,
+                                              pCustDraw->rect.right, pCustDraw->rect.bottom, scroll);
+                    break;
+            }
+            return CDRF_SKIPDEFAULT;
+        }
+        else if (pCustDraw->nBar == SB_VERT)
+        {
+            switch (pCustDraw->uItem)
+            {
+                case HTSCROLL_DOWN:
+                {
+                    bool hotNow = (pCustDraw->uState&CDIS_HOT) != 0;
+                    if (m_bHotVL != hotNow)
+                    {
+                        AnimateFraction(m_AnimVarVL, hotNow ? 1.0 : 0.0);
+                        m_bHotVL = hotNow;
+                    }
+                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarVL));
+                    DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
+                                 pCustDraw->rect.left + (pCustDraw->rect.right - pCustDraw->rect.left) / 2,
+                                 pCustDraw->rect.bottom - margin,
+                                 pCustDraw->rect.left + margin,
+                                 pCustDraw->rect.top + margin,
+                                 pCustDraw->rect.right - margin,
+                                 pCustDraw->rect.top + margin);
+                }
+                break;
+                case HTSCROLL_UP:
+                {
+                    bool hotNow = (pCustDraw->uState&CDIS_HOT) != 0;
+                    if (m_bHotVR != hotNow)
+                    {
+                        AnimateFraction(m_AnimVarVR, hotNow ? 1.0 : 0.0);
+                        m_bHotVR = hotNow;
+                    }
+                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarVR));
+                    DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
+                                 pCustDraw->rect.left + (pCustDraw->rect.right - pCustDraw->rect.left) / 2,
+                                 pCustDraw->rect.top + margin,
+                                 pCustDraw->rect.left + margin,
+                                 pCustDraw->rect.bottom - margin,
+                                 pCustDraw->rect.right - margin,
+                                 pCustDraw->rect.bottom - margin);
+                }
+                break;
+                case HTSCROLL_THUMB:
+                {
+                    bool hotNow = (pCustDraw->uState&CDIS_HOT) != 0;
+                    if (m_bHotVT != hotNow)
+                    {
+                        AnimateFraction(m_AnimVarVT, hotNow ? 1.0 : 0.0);
+                        m_bHotVT = hotNow;
+                    }
+                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarVT));
+
+                    Gdiplus::Graphics graphics(pCustDraw->hdc);
+                    graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+                    Gdiplus::Color c1;
+                    c1.SetFromCOLORREF(thumb);
+                    Gdiplus::Pen p1(c1);
+                    p1.SetWidth(2.0);
+
+                    RECT rc = pCustDraw->rect;
+                    InflateRect(&rc, -2, -2);
+                    Gdiplus::GraphicsPath path;
+                    // top left
+                    path.AddArc(rc.left, rc.top, 4, 4, 180, 90);
+                    // top right
+                    path.AddArc(rc.right - 4 - 1, rc.top, 4, 4, 270, 90);
+                    // bottom right
+                    path.AddArc(rc.right - 4 - 1, rc.bottom - 4 - 1, 4, 4, 0, 90);
+                    // bottom left
+                    path.AddArc(rc.left, rc.bottom - 4 - 1, 4, 4, 90, 90);
+                    path.CloseFigure();
+                    graphics.DrawPath(&p1, &path);
+
+                    // Fill the vertical thumb with only part of the color
+                    // so the document info (selections, cursor pos, ...) can
+                    // still be seen through it.
+                    c1.SetValue(GDIHelpers::MakeARGB(100, GetRValue(thumb), GetGValue(thumb), GetBValue(thumb)));
+                    Gdiplus::SolidBrush brush(c1);
+                    graphics.FillPath(&brush, &path);
+                }
+                break;
+                case HTSCROLL_PAGEFULL:
+                {
+                    Gdiplus::Graphics graphics(pCustDraw->hdc);
+                    Gdiplus::Color c1;
+                    c1.SetFromCOLORREF(scroll);
+                    Gdiplus::SolidBrush brush(c1);
+                    graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top);
+
+                    if (m_bDirty)
+                        CalcLines();
+
+                    LONG lastLinePos = -1;
+                    COLORREF lastColor = (COLORREF)-1;
+                    int colcount = DOCSCROLLTYPE_END;
+                    int width = pCustDraw->rect.right - pCustDraw->rect.left;
+                    int colwidth = width / (colcount - 1);
+                    for (int c = 1; c < colcount; ++c)
+                    {
+                        int drawx = pCustDraw->rect.left + (c - 1)*colwidth;
+                        for (auto line : m_visibleLineColors[c])
                         {
-                            Gdiplus::Color c2;
-                            c2.SetFromCOLORREF(line.second);
-                            Gdiplus::SolidBrush brushline(c2);
-                            graphics.FillRectangle(&brushline, drawx, linepos, colwidth, 2);
-                            lastLinePos = linepos;
-                            lastColor = line.second;
+                            LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top)*line.first / m_lines);
+                            if ((linepos > (lastLinePos + 1)) || (lastColor != line.second))
+                            {
+                                Gdiplus::Color c2;
+                                c2.SetFromCOLORREF(line.second);
+                                Gdiplus::SolidBrush brushline(c2);
+                                graphics.FillRectangle(&brushline, drawx, linepos, colwidth, 2);
+                                lastLinePos = linepos;
+                                lastColor = line.second;
+                            }
                         }
                     }
-                }
-                LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top)*m_curPosVisLine / m_lines);
+                    LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top)*m_curPosVisLine / m_lines);
 
-                Gdiplus::Color c3;
-                c3.SetFromCOLORREF(m_curPosColor);
-                Gdiplus::SolidBrush brushcurline(c3);
-                graphics.FillRectangle(&brushcurline, pCustDraw->rect.left, linepos, pCustDraw->rect.right - pCustDraw->rect.left, 2);
+                    Gdiplus::Color c3;
+                    c3.SetFromCOLORREF(m_curPosColor);
+                    Gdiplus::SolidBrush brushcurline(c3);
+                    graphics.FillRectangle(&brushcurline, pCustDraw->rect.left, linepos, pCustDraw->rect.right - pCustDraw->rect.left, 2);
+                }
+                break;
             }
-            break;
+            return CDRF_SKIPDEFAULT;
         }
-        return CDRF_SKIPDEFAULT;
     }
     // INSERTED BUTTONS are handled here...
     else if (pCustDraw->nBar == SB_INSBUT)
@@ -263,6 +326,19 @@ void CDocScroll::CalcLines()
         m_visibleLines = m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, m_lines);
         m_bDirty = false;
     }
+}
+
+void CDocScroll::AnimateFraction(IUIAnimationVariablePtr animVar, double endVal)
+{
+    auto transHot = Animator::Instance().CreateLinearTransition(0.3, endVal);
+    auto storyBoard = Animator::Instance().CreateStoryBoard();
+    storyBoard->AddTransition(animVar, transHot);
+    Animator::Instance().RunStoryBoard(storyBoard, [this]()
+    {
+        SetWindowPos(*m_pScintilla, 0, 0, 0, 0, 0,
+                     SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
+    });
+
 }
 
 void CDocScroll::AddLineColor(int type, size_t line, COLORREF clr)
