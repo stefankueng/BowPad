@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -19,6 +19,7 @@
 #include "Scintilla.h"
 #include "DocScroll.h"
 #include "ScrollTool.h"
+#include "AnimationManager.h"
 
 #include <vector>
 #include <unordered_map>
@@ -121,6 +122,7 @@ protected:
     virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
     void SetupDefaultStyles();
+    void SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF backsel);
 
     bool GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags );
     FindResult FindText(const char *text, size_t start, size_t end, int flags);
@@ -145,5 +147,10 @@ private:
     bool                        m_bScratch;
     bool                        m_eraseBkgnd;
     int                         m_cursorTimeout;
+    bool                        m_bInFolderMargin;
     bool                        m_hasConsolas;
+    IUIAnimationVariablePtr     m_animVarGrayFore;
+    IUIAnimationVariablePtr     m_animVarGrayBack;
+    IUIAnimationVariablePtr     m_animVarGraySel;
+    IUIAnimationVariablePtr     m_animVarGrayLineNr;
 };
