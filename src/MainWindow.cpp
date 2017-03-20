@@ -1718,6 +1718,7 @@ bool CMainWindow::CloseTab(int closingTabIndex, bool force /* = false */, bool q
     }
     CCommandHandler::Instance().OnDocumentClose(closingDocID);
     auto currentTabId = m_TabBar.GetCurrentTabId();
+    auto closingTabId = m_TabBar.GetIDFromIndex(closingTabIndex);
     // Prefer to remove the document after the tab has gone as it supports it
     // and deletion causes events that may expect it to be there.
     m_TabBar.DeleteItemAt(closingTabIndex);
@@ -1728,8 +1729,12 @@ bool CMainWindow::CloseTab(int closingTabIndex, bool force /* = false */, bool q
 
     int tabCount = m_TabBar.GetItemCount();
     int nextTabIndex = (closingTabIndex < tabCount) ? closingTabIndex : tabCount - 1;
-    if (m_TabBar.GetIDFromIndex(closingTabIndex) != currentTabId)
-        nextTabIndex = m_TabBar.GetIndexFromID(currentTabId);
+    if (closingTabId != currentTabId)
+    {
+        auto nxtIndex = m_TabBar.GetIndexFromID(currentTabId);
+        if (nxtIndex >= 0)
+            nextTabIndex = nxtIndex;
+    }
     if (!quitting)
     {
         if (tabCount == 0)
