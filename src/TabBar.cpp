@@ -230,29 +230,6 @@ void CTabBar::ActivateAt(int index) const
 
 void CTabBar::DeleteItemAt(int index)
 {
-    if (index == m_nItems - 1)
-    {
-        // prevent invisible tabs. If last visible tab is removed, other tabs are put in view but not redrawn
-        // Therefore, scroll one tab to the left if only one tab visible
-        if (m_nItems > 1)
-        {
-            RECT itemRect;
-            bool got = TabCtrl_GetItemRect(*this, index, &itemRect) != FALSE;
-            APPVERIFY(got);
-            if (got)
-            {
-                if (itemRect.left < 5) // if last visible tab, scroll left once (no more than 5px away should be safe, usually 2px depending on the drawing)
-                {
-                    // To scroll the tab control to the left, use the WM_HSCROLL notification
-                    int wParam = MAKEWPARAM(SB_THUMBPOSITION, index - 1);
-                    ::SendMessage(*this, WM_HSCROLL, wParam, 0);
-
-                    wParam = MAKEWPARAM(SB_ENDSCROLL, index - 1);
-                    ::SendMessage(*this, WM_HSCROLL, wParam, 0);
-                }
-            }
-        }
-    }
     // Decrement the item count before calling delete as this delete
     // seems to initiate events (like paint) that will assume the extra
     // item is present if it's not already accounted as gone before then,
@@ -269,6 +246,33 @@ void CTabBar::DeleteItemAt(int index)
     APPVERIFY(deleted);
     if (m_currentHoverTabItem == index)
         m_currentHoverTabItem = -1;
+    // prevent invisible tabs. If last visible tab is removed, other tabs are put in view but not redrawn
+    // Therefore, scroll until the last tab is at the very right
+    if (m_nItems > 1)
+    {
+        RECT itemRect;
+        TabCtrl_GetItemRect(*this, m_nItems - 1, &itemRect);
+        RECT tabRect;
+        GetClientRect(*this, &tabRect);
+        TC_HITTESTINFO hti;
+        hti.pt = { 14, 14 }; // arbitrary value: just inside the first visible tab
+        LRESULT scrollTabIndex = ::SendMessage(*this, TCM_HITTEST, 0, (LPARAM)&hti);
+        do
+        {
+            if (itemRect.right < tabRect.right - (itemRect.right - itemRect.left))
+            {
+                --scrollTabIndex;
+                if (scrollTabIndex >= 0)
+                {
+                    int wParam = MAKEWPARAM(SB_THUMBPOSITION, scrollTabIndex);
+                    ::SendMessage(*this, WM_HSCROLL, wParam, 0);
+                }
+                else
+                    break;
+            }
+            TabCtrl_GetItemRect(*this, m_nItems - 1, &itemRect);
+        } while (itemRect.right < tabRect.right - (itemRect.right - itemRect.left));
+    }
 }
 
 int CTabBar::GetCurrentTabIndex() const
@@ -875,7 +879,6 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
 
     int curSel = TabCtrl_GetCurSel(*this);
     bool bSelected = (pDrawItemStruct->itemID == (UINT)curSel);
-    bool bMouseOver = (pDrawItemStruct->itemID == (UINT)m_currentHoverTabItem);
 
     RECT rItem(pDrawItemStruct->rcItem);
 
