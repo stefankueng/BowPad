@@ -67,6 +67,16 @@ const int TIM_BRACEHIGHLIGHTTEXTCLEAR = 103;
 static bool g_initialized = false;
 static bool g_scintillaInitialized = false;
 
+const int color_folding_fore_inactive = 255;
+const int color_folding_back_inactive = 220;
+const int color_folding_backsel_inactive = 150;
+const int color_folding_fore_active = 250;
+const int color_folding_back_active = 100;
+const int color_folding_backsel_active = 20;
+const int color_linenr_inactive = 109;
+const int color_linenr_active = 60;
+const double folding_color_animation_time = 0.3;
+
 CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     : CWindow(hInst)
     , m_pSciMsg(nullptr)
@@ -78,6 +88,7 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_cursorTimeout(-1)
     , m_ScrollTool(hInst)
     , m_hasConsolas(false)
+    , m_bInFolderMargin(false)
 {
     HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
                              OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
@@ -86,6 +97,11 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
         DeleteObject(hFont);
         m_hasConsolas = true;
     }
+
+    m_animVarGrayFore = Animator::Instance().CreateAnimationVariable(color_folding_fore_inactive);
+    m_animVarGrayBack = Animator::Instance().CreateAnimationVariable(color_folding_back_inactive);
+    m_animVarGraySel = Animator::Instance().CreateAnimationVariable(color_folding_backsel_inactive);
+    m_animVarGrayLineNr = Animator::Instance().CreateAnimationVariable(color_linenr_inactive);
 }
 
 CScintillaWnd::~CScintillaWnd()
@@ -421,6 +437,114 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 break;
             }
         }
+        if (uMsg == WM_MOUSEMOVE)
+        {
+            RECT rc;
+            GetClientRect(*this, &rc);
+            rc.right = rc.left;
+            for (int i = 0; i <= SC_MARGE_FOLDER; ++i)
+                rc.right += (long)Call(SCI_GETMARGINWIDTHN, i);
+            POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+            if (PtInRect(&rc, pt))
+            {
+                if (!m_bInFolderMargin)
+                {
+                    // animate the colors of the folder margin lines and symbols
+                    auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_active);
+                    auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_active);
+                    auto transSel = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_active);
+                    auto transNr = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_active);
+
+                    auto storyBoard = Animator::Instance().CreateStoryBoard();
+                    storyBoard->AddTransition(m_animVarGrayFore, transFore);
+                    storyBoard->AddTransition(m_animVarGrayBack, transBack);
+                    storyBoard->AddTransition(m_animVarGraySel, transSel);
+                    storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
+                    Animator::Instance().RunStoryBoard(storyBoard, [this]()
+                    {
+                        auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
+                        auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
+                        auto sb = Animator::GetIntegerValue(m_animVarGraySel);
+                        auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
+                        SetupFoldingColors(RGB(gf, gf, gf),
+                                           RGB(gb, gb, gb),
+                                           RGB(sb, sb, sb));
+                        Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln)));
+                    });
+
+                    m_bInFolderMargin = true;
+                    TRACKMOUSEEVENT tme = { 0 };
+                    tme.cbSize = sizeof(TRACKMOUSEEVENT);
+                    tme.dwFlags = TME_LEAVE;
+                    tme.hwndTrack = *this;
+                    TrackMouseEvent(&tme);
+                }
+            }
+            else
+            {
+                if (m_bInFolderMargin)
+                {
+                    // animate the colors of the folder margin lines and symbols
+                    auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_inactive);
+                    auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_inactive);
+                    auto transSel = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_inactive);
+                    auto transNr = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_inactive);
+
+                    auto storyBoard = Animator::Instance().CreateStoryBoard();
+                    storyBoard->AddTransition(m_animVarGrayFore, transFore);
+                    storyBoard->AddTransition(m_animVarGrayBack, transBack);
+                    storyBoard->AddTransition(m_animVarGraySel, transSel);
+                    storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
+                    Animator::Instance().RunStoryBoard(storyBoard, [this]()
+                    {
+                        auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
+                        auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
+                        auto sb = Animator::GetIntegerValue(m_animVarGraySel);
+                        auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
+                        SetupFoldingColors(RGB(gf, gf, gf),
+                                           RGB(gb, gb, gb),
+                                           RGB(sb, sb, sb));
+                        Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln)));
+                    });
+                    m_bInFolderMargin = false;
+                }
+            }
+        }
+    }
+    break;
+    case WM_MOUSELEAVE:
+    {
+        TRACKMOUSEEVENT tme = { 0 };
+        tme.cbSize = sizeof(TRACKMOUSEEVENT);
+        tme.dwFlags = TME_LEAVE | TME_CANCEL;
+        tme.hwndTrack = *this;
+        TrackMouseEvent(&tme);
+        if (m_bInFolderMargin)
+        {
+            // animate the colors of the folder margin lines and symbols
+            auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_inactive);
+            auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_inactive);
+            auto transSel = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_inactive);
+            auto transNr = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_inactive);
+
+            auto storyBoard = Animator::Instance().CreateStoryBoard();
+            storyBoard->AddTransition(m_animVarGrayFore, transFore);
+            storyBoard->AddTransition(m_animVarGrayBack, transBack);
+            storyBoard->AddTransition(m_animVarGraySel, transSel);
+            storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
+            Animator::Instance().RunStoryBoard(storyBoard, [this]()
+            {
+                auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
+                auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
+                auto sb = Animator::GetIntegerValue(m_animVarGraySel);
+                auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
+                SetupFoldingColors(RGB(gf, gf, gf),
+                                   RGB(gb, gb, gb),
+                                   RGB(sb, sb, sb));
+                Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln)));
+            });
+            m_bInFolderMargin = false;
+        }
     }
     break;
     case WM_TIMER:
@@ -744,7 +868,7 @@ void CScintillaWnd::SetupDefaultStyles()
     std::string sFontName = CUnicodeUtils::StdGetUTF8(CIniSettings::Instance().GetString(L"View", L"FontName", defaultFont.c_str()));
     Call(SCI_STYLESETFONT, STYLE_LINENUMBER, (LPARAM)sFontName.c_str());
 
-    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, theme.GetThemeColor(RGB(109, 109, 109)));
+    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, theme.GetThemeColor(RGB(color_linenr_inactive, color_linenr_inactive, color_linenr_inactive)));
     Call(SCI_STYLESETBACK, STYLE_LINENUMBER, theme.GetThemeColor(RGB(230, 230, 230)));
 
     Call(SCI_INDICSETSTYLE, INDIC_SELECTION_MARK, INDIC_ROUNDBOX);
@@ -795,32 +919,9 @@ void CScintillaWnd::SetupDefaultStyles()
     SetTabSettings();
     Call(SCI_SETINDENTATIONGUIDES, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"indent", SC_IV_LOOKBOTH));
 
-    const unsigned long foldmarkfore = theme.GetThemeColor(RGB(250,250,250));
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDER, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERSUB, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERTAIL, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEREND, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, foldmarkfore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, foldmarkfore);
-
-    const unsigned long foldmarkback = theme.GetThemeColor(RGB(150,150,150));
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDER, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERSUB, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERTAIL, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEREND, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, foldmarkback);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, foldmarkback);
-
-    const unsigned long foldmarkbackselected = theme.GetThemeColor(RGB(20, 20, 20));
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEROPEN, foldmarkbackselected);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDER, foldmarkbackselected);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERSUB, foldmarkbackselected);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERTAIL, foldmarkbackselected);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEREND, foldmarkbackselected);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEROPENMID, foldmarkbackselected);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERMIDTAIL, foldmarkbackselected);
+    SetupFoldingColors(RGB(color_folding_fore_inactive, color_folding_fore_inactive, color_folding_fore_inactive),
+                       RGB(color_folding_back_inactive, color_folding_back_inactive, color_folding_back_inactive),
+                       RGB(color_folding_backsel_inactive, color_folding_backsel_inactive, color_folding_backsel_inactive));
 
     bool bBold = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
     bool bItalic = !!CIniSettings::Instance().GetInt64(L"View", L"FontItalic", false);
@@ -828,8 +929,6 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_STYLESETBOLD, STYLE_FOLDDISPLAYTEXT, bBold);
     Call(SCI_STYLESETITALIC, STYLE_FOLDDISPLAYTEXT, bItalic);
     Call(SCI_STYLESETSIZE, STYLE_FOLDDISPLAYTEXT, fontsize);
-    Call(SCI_STYLESETFORE, STYLE_FOLDDISPLAYTEXT, foldmarkfore);
-    Call(SCI_STYLESETBACK, STYLE_FOLDDISPLAYTEXT, foldmarkback);
 
     Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0)));
     Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255)));
@@ -851,6 +950,44 @@ void CScintillaWnd::SetupDefaultStyles()
     
     Call(SCI_COLOURISE, 0, -1);
     Call(SCI_SETCODEPAGE, CP_UTF8);
+}
+
+void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF backsel)
+{
+    // set the folding colors according to the parameters, but leave the
+    // colors for the collapsed buttons (+ button) in the active color.
+    auto foldmarkfore = CTheme::Instance().GetThemeColor(fore);
+    auto foldmarkforeActive = CTheme::Instance().GetThemeColor(RGB(color_folding_fore_active, color_folding_fore_active, color_folding_fore_active));
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDER, foldmarkforeActive);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERSUB, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERTAIL, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEREND, foldmarkforeActive);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, foldmarkfore);
+    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, foldmarkfore);
+
+    auto foldmarkback = CTheme::Instance().GetThemeColor(back);
+    auto foldmarkbackActive = CTheme::Instance().GetThemeColor(RGB(color_folding_back_active, color_folding_back_active, color_folding_back_active));
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDER, foldmarkbackActive);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERSUB, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERTAIL, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEREND, foldmarkbackActive);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, foldmarkback);
+    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, foldmarkback);
+
+    auto foldmarkbackselected = CTheme::Instance().GetThemeColor(backsel);
+    auto foldmarkbackselectedActive = CTheme::Instance().GetThemeColor(RGB(color_folding_backsel_active, color_folding_backsel_active, color_folding_backsel_active));
+    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEROPEN, foldmarkbackselected);
+    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDER, foldmarkbackselectedActive);
+    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERSUB, foldmarkbackselected);
+    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERTAIL, foldmarkbackselected);
+    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEREND, foldmarkbackselectedActive);
+    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEROPENMID, foldmarkbackselected);
+    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERMIDTAIL, foldmarkbackselected);
+
+    Call(SCI_STYLESETFORE, STYLE_FOLDDISPLAYTEXT, foldmarkfore);
+    Call(SCI_STYLESETBACK, STYLE_FOLDDISPLAYTEXT, foldmarkback);
 }
 
 void CScintillaWnd::GotoLine(long line)
