@@ -658,7 +658,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                             InvalidateRect(hwnd, &oldRect, FALSE);
                         });
                     }
-                    auto transHot = Animator::Instance().CreateLinearTransition(0.3, hoverFraction);
+                    auto transHot = Animator::Instance().CreateLinearTransition(0.1, hoverFraction);
                     auto storyBoard = Animator::Instance().CreateStoryBoard();
                     storyBoard->AddTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], transHot);
                     Animator::Instance().RunStoryBoard(storyBoard, [hwnd, this]()
