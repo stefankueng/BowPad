@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
@@ -65,7 +65,7 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdUseTabs; }
-    void AfterInit() override;
+    void TabNotify(TBHDR* ptbhdr) override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };

@@ -19,7 +19,14 @@
 
 typedef uptr_t Document;
 
-enum EOLFormat { UNKNOWN_FORMAT, WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT };
+enum EOLFormat
+{
+    UNKNOWN_FORMAT, WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT
+};
+enum TabSpace
+{
+    Default, Tabs, Spaces
+};
 
 std::wstring GetEOLFormatDescription(EOLFormat ft);
 EOLFormat ToEOLFormat(int eolMode);
@@ -35,8 +42,11 @@ public:
         , m_xOffset(0)
         , m_nSelMode(0)
         , m_nScrollWidth(1)
-    {};
-    ~CPosData(){}
+    {
+    };
+    ~CPosData()
+    {
+    }
 
     size_t m_nFirstVisibleLine;
     size_t m_nStartPos;
@@ -61,13 +71,17 @@ public:
         , m_bIsReadonly(false)
         , m_bIsWriteProtected(false)
         , m_bDoSaveAs(false)
+        , m_TabSpace(Default)
     {
         m_lastWriteTime.dwHighDateTime = 0;
-        m_lastWriteTime.dwLowDateTime  = 0;
+        m_lastWriteTime.dwLowDateTime = 0;
     }
 
     std::wstring            GetEncodingString() const;
-    const std::string&      GetLanguage() const { return m_language; }
+    const std::string&      GetLanguage() const
+    {
+        return m_language;
+    }
     void                    SetLanguage(const std::string& lang);
 
     Document                m_document;
@@ -84,6 +98,7 @@ public:
     bool                    m_bDoSaveAs;        ///< even if m_path is set, always ask where to save
     FILETIME                m_lastWriteTime;
     CPosData                m_position;
+    TabSpace                m_TabSpace;
 private:
     std::string             m_language;
 };
