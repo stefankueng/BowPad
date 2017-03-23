@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2014, 2016-2017 - Stefan Kueng
 //
@@ -112,24 +112,64 @@ HRESULT CCmdTabSize::IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const P
     return S_OK;
 }
 
+// each document stores its own setting of tabs/spaces.
+// the 'use tabs' command toggles both the setting of the
+// current document as well as the global default.
+// When a document is opened the first time, it's setting
+// is set to 'default' and stays that way until the user
+// executes this command.
+// While the document has its setting set to 'default', it will
+// always use the global default setting or the settings set
+// by an editorconfig file.
+//
+// to think about:
+// * only toggle the current doc settings, have the global settings toggled via a settings dialog or a separate dropdown button
+// * allow to configure the tab/space setting with file extension masks, e.g. space for all *.cpp files but tabs for all *.py files
 CCmdUseTabs::CCmdUseTabs(void * obj) : ICommand(obj)
 {
 }
 
 bool CCmdUseTabs::Execute()
 {
-    ScintillaCall(SCI_SETUSETABS, ScintillaCall(SCI_GETUSETABS) ? 0 : 1);
-    CIniSettings::Instance().SetInt64(L"View", L"usetabs", ScintillaCall(SCI_GETUSETABS));
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    UpdateStatusBar(false);
-    return true;
+    if (HasActiveDocument())
+    {
+        auto& doc = GetModActiveDocument();
+        if (doc.m_TabSpace == Default)
+        {
+            ScintillaCall(SCI_SETUSETABS, ScintillaCall(SCI_GETUSETABS) ? 0 : 1);
+        }
+        else
+        {
+            ScintillaCall(SCI_SETUSETABS, doc.m_TabSpace == Tabs ? 0 : 1);
+        }
+        doc.m_TabSpace = ScintillaCall(SCI_GETUSETABS) ? Tabs : Spaces;
+        CIniSettings::Instance().SetInt64(L"View", L"usetabs", ScintillaCall(SCI_GETUSETABS));
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+        UpdateStatusBar(false);
+        return true;
+    }
+    return false;
 }
 
-void CCmdUseTabs::AfterInit()
+void CCmdUseTabs::TabNotify(TBHDR * ptbhdr)
 {
-    int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1);
-    ScintillaCall(SCI_SETUSETABS, ws);
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    {
+        if (HasActiveDocument())
+        {
+            auto doc = GetActiveDocument();
+            if (doc.m_TabSpace == Default)
+            {
+                int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1);
+                ScintillaCall(SCI_SETUSETABS, ws);
+            }
+            else
+            {
+                ScintillaCall(SCI_SETUSETABS, doc.m_TabSpace == Tabs ? 0 : 1);
+            }
+            InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+        }
+    }
 }
 
 HRESULT CCmdUseTabs::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)

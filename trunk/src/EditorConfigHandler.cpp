@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -64,17 +64,17 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
             const char*         value;
             editorconfig_handle_get_name_value(it->second, j, &name, &value);
 
-            if (strcmp(name, "indent_style") == 0)
+            if ((doc.m_TabSpace == Default) && (strcmp(name, "indent_style") == 0))
             {
                 // tab / space
                 pScintilla->Call(SCI_SETUSETABS, strcmp(value, "tab") == 0);
             }
-            else if (strcmp(name, "indent_size") == 0)
+            else if ((doc.m_TabSpace == Default) && (strcmp(name, "indent_size") == 0))
             {
                 // tab / number
                 pScintilla->Call(SCI_SETINDENT, strcmp(value, "tab") == 0 ? 0 : atoi(value));
             }
-            else if (strcmp(name, "tab_width") == 0)
+            else if ((doc.m_TabSpace == Default) && (strcmp(name, "tab_width") == 0))
             {
                 // number
                 pScintilla->Call(SCI_SETTABWIDTH, atoi(value));
