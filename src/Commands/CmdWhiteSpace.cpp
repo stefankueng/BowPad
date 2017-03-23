@@ -165,7 +165,7 @@ void CCmdUseTabs::TabNotify(TBHDR * ptbhdr)
             }
             else
             {
-                ScintillaCall(SCI_SETUSETABS, doc.m_TabSpace == Tabs ? 0 : 1);
+                ScintillaCall(SCI_SETUSETABS, doc.m_TabSpace == Tabs ? 1 : 0);
             }
             InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         }
