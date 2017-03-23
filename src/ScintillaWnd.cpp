@@ -916,7 +916,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_SETFOLDMARGINCOLOUR, true, theme.GetThemeColor(RGB(240, 240, 240)));
     Call(SCI_SETFOLDMARGINHICOLOUR, true, theme.GetThemeColor(RGB(255, 255, 255)));
 
-    SetTabSettings();
+    SetTabSettings(Default);
     Call(SCI_SETINDENTATIONGUIDES, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"indent", SC_IV_LOOKBOTH));
 
     SetupFoldingColors(RGB(color_folding_fore_inactive, color_folding_fore_inactive, color_folding_fore_inactive),
@@ -2147,10 +2147,13 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
     return false;
 }
 
-void CScintillaWnd::SetTabSettings()
+void CScintillaWnd::SetTabSettings(TabSpace ts)
 {
     Call(SCI_SETTABWIDTH, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
-    Call(SCI_SETUSETABS, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1));
+    if (ts == Default)
+        Call(SCI_SETUSETABS, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1));
+    else
+        Call(SCI_SETUSETABS, ts == Tabs ? 1 : 0);
     Call(SCI_SETBACKSPACEUNINDENTS, 1);
     Call(SCI_SETTABINDENTS, 1);
     Call(SCI_SETTABDRAWMODE, 1);
