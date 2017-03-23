@@ -2682,7 +2682,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
     m_editor.SetupLexerForLang(doc.GetLanguage());
     m_editor.RestoreCurrentPos(doc.m_position);
-    m_editor.SetTabSettings();
+    m_editor.SetTabSettings(doc.m_TabSpace);
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc);
     g_pFramework->InvalidateUICommand(cmdUseTabs, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     m_editor.MarkSelectedWord(true);
