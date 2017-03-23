@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2014-2017 - Stefan Kueng
 //
@@ -93,14 +93,15 @@ void CCmdSessionLoad::OnClose()
 
             settings.SetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", saveindex).c_str(), 1);
             SavePosSettings(saveindex, pos);
-            settings.SetString(g_sessionSection, CStringUtils::Format(L"path%d", saveindex).c_str(), doc.m_path.c_str());
         }
         else
         {
-            settings.SetString(g_sessionSection, CStringUtils::Format(L"path%d", saveindex).c_str(), doc.m_path.c_str());
             SavePosSettings(saveindex, doc.m_position);
             settings.SetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", saveindex).c_str(), 0);
         }
+        settings.SetString(g_sessionSection, CStringUtils::Format(L"path%d", saveindex).c_str(), doc.m_path.c_str());
+        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", saveindex).c_str(), doc.m_TabSpace);
+
         ++saveindex;
     }
 }
@@ -176,6 +177,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         pos.m_nScrollWidth       = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"scrollwidth%d", fileNum).c_str(), 0);
         pos.m_xOffset            = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", fileNum).c_str(), 0);
         pos.m_nFirstVisibleLine  = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
+        doc.m_TabSpace           = (TabSpace)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
         if ((int)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", fileNum).c_str(), 0))
             activeDoc = docId;
         RestoreCurrentPos(doc.m_position);
