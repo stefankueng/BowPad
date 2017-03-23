@@ -946,7 +946,7 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
             switch (lParam)
             {
                 case STATUSBAR_TABSPACE:
-                m_editor.Call(SCI_SETUSETABS, !m_editor.Call(SCI_GETUSETABS));
+                DoCommand(cmdUseTabs);
                 break;
                 case STATUSBAR_TYPING_MODE:
                 m_editor.Call(SCI_EDITTOGGLEOVERTYPE);
@@ -2684,6 +2684,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.RestoreCurrentPos(doc.m_position);
     m_editor.SetTabSettings();
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc);
+    g_pFramework->InvalidateUICommand(cmdUseTabs, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     m_editor.MarkSelectedWord(true);
     m_editor.MarkBookmarksInScrollbar();
     UpdateCaptionBar();
