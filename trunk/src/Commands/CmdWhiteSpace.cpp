@@ -155,20 +155,7 @@ void CCmdUseTabs::TabNotify(TBHDR * ptbhdr)
 {
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
     {
-        if (HasActiveDocument())
-        {
-            auto doc = GetActiveDocument();
-            if (doc.m_TabSpace == Default)
-            {
-                int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1);
-                ScintillaCall(SCI_SETUSETABS, ws);
-            }
-            else
-            {
-                ScintillaCall(SCI_SETUSETABS, doc.m_TabSpace == Tabs ? 1 : 0);
-            }
-            InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-        }
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 }
 
