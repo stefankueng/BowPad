@@ -32,9 +32,6 @@
 #include "../ext/scintilla/src/UniConversion.h"
 #include "UTF8DocumentIterator.h"
 
-#ifdef SCI_NAMESPACE
-using namespace Scintilla;
-#endif
 
 class StdRegexSearch : public RegexSearchBase
 {
@@ -202,19 +199,12 @@ private:
     int _lastDirection;
 };
 
-#ifdef SCI_NAMESPACE
-namespace Scintilla
-{
-#endif
 
 RegexSearchBase *CreateRegexSearch(CharClassify* /* charClassTable */)
 {
     return new StdRegexSearch();
 }
 
-#ifdef SCI_NAMESPACE
-}
-#endif
 
 /**
  * Find text in document, supporting both forward and backward
