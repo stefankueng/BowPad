@@ -49,9 +49,9 @@ public:
     }
 
     virtual long FindText(Document* doc, int startPosition, int endPosition, const char *regex,
-                          bool caseSensitive, bool word, bool wordStart, int sciSearchFlags, int *lengthRet);
+                          bool caseSensitive, bool word, bool wordStart, int sciSearchFlags, int *lengthRet) override;
 
-    virtual const char *SubstituteByPosition(Document* doc, const char *text, int *length);
+    virtual const char *SubstituteByPosition(Document* doc, const char *text, int *length) override;
 
 private:
     class SearchParameters;
