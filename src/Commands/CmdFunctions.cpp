@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -389,7 +389,7 @@ HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     if (!docId.IsValid())
         return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
 
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(PROFILING)
     ProfileTimer profileTimer(L"FunctionParse");
 #endif
     auto funcProcessingStartTime = std::chrono::steady_clock::now();
