@@ -96,7 +96,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;SCI_OWNREGEX;EnableScrollBar=CoolSB_EnableScrollBar;GetScrollInfo=CoolSB_GetScrollInfo;GetScrollPos=CoolSB_GetScrollPos;GetScrollRange=CoolSB_GetScrollRange;SetScrollInfo=CoolSB_SetScrollInfo;SetScrollPos=CoolSB_SetScrollPos;SetScrollRange=CoolSB_SetScrollRange;ShowScrollBar=CoolSB_ShowScrollBar;_WIN64;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;STATIC_BUILD;SCI_LEXER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SCI_OWNREGEX;EnableScrollBar=CoolSB_EnableScrollBar;GetScrollInfo=CoolSB_GetScrollInfo;GetScrollPos=CoolSB_GetScrollPos;GetScrollRange=CoolSB_GetScrollRange;SetScrollInfo=CoolSB_SetScrollInfo;SetScrollPos=CoolSB_SetScrollPos;SetScrollRange=CoolSB_SetScrollRange;ShowScrollBar=CoolSB_ShowScrollBar;_WIN64;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;STATIC_BUILD;SCI_LEXER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
