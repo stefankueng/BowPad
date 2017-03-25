@@ -419,7 +419,6 @@
     <ClCompile Include="TabBar.cpp" />
     <ClCompile Include="TabBtn.cpp" />
     <ClCompile Include="Theme.cpp" />
-    <ClCompile Include="UTF8DocumentIterator.cpp" />
     <ClCompile Include="XPMIcons.cpp" />
   </ItemGroup>
   <ItemGroup>

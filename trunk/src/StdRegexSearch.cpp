@@ -15,8 +15,10 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #include "stdafx.h"
+#include "UnicodeUtils.h"
 #include <iterator>
 #include <regex>
+#include <codecvt>
 #include "scintilla.h"
 #define PLATFORM_ASSERT(c) ((void)0)
 #include "../ext/scintilla/src/SplitVector.h"
@@ -37,15 +39,12 @@ class StdRegexSearch : public RegexSearchBase
 {
 public:
     StdRegexSearch()
-        : _substituted(nullptr)
-        , _lastDirection(0)
+        : _lastDirection(0)
     {
     }
 
     virtual ~StdRegexSearch()
     {
-        delete[] _substituted;
-        _substituted = nullptr;
     }
 
     virtual long FindText(Document* doc, int startPosition, int endPosition, const char *regex,
@@ -129,24 +128,6 @@ private:
         int _endPositionForContinuationCheck;
     };
 
-    class CharTPtr
-    {
-    public:
-        CharTPtr(const char* ptr)
-            : _charPtr(ptr)
-        {
-        }
-        ~CharTPtr()
-        {
-        }
-        operator const char*()
-        {
-            return _charPtr;
-        }
-    private:
-        const char* _charPtr;
-    };
-
     template <class CharT, class CharacterIterator>
     class EncodingDependent
     {
@@ -156,7 +137,7 @@ private:
         }
         void compileRegex(const char *regex, const int compileFlags);
         Match FindText(SearchParameters& search);
-        char *SubstituteByPosition(const char *text, int *length);
+        std::string SubstituteByPosition(const char *text, int *length);
     private:
         Match FindTextForward(SearchParameters& search);
         Match FindTextBackward(SearchParameters& search);
@@ -189,11 +170,9 @@ private:
         int _direction;
     };
 
-    static char    *stringToCharPtr(const std::string& str);
+    EncodingDependent<wchar_t, UTF8DocumentIterator> _utf8;
 
-    EncodingDependent<char, UTF8DocumentIterator> _utf8;
-
-    char *_substituted;
+    std::string _substituted;
 
     Match _lastMatch;
     int _lastDirection;
@@ -279,15 +258,15 @@ StdRegexSearch::Match StdRegexSearch::EncodingDependent<CharT, CharacterIterator
 template <class CharT, class CharacterIterator>
 StdRegexSearch::Match StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::FindTextForward(SearchParameters& search)
 {
-    CharacterIterator endIterator(search._document, search._endPosition, search._endPosition);
+    CharacterIterator endIterator(search._document, search._endPosition);
     int next_search_from_position = search._startPosition;
     bool found;
 
     const bool end_reached = next_search_from_position > search._endPosition;
-    found = !end_reached && std::regex_search(CharacterIterator(search._document, next_search_from_position, search._endPosition), endIterator, _match, _regex, search.regexFlags);
+    found = !end_reached && std::regex_search(CharacterIterator(search._document, next_search_from_position), endIterator, _match, _regex, search.regexFlags);
 
     if (found)
-        return Match(search._document, _match[0].first.pos(), _match[0].second.pos());
+        return Match(search._document, _match[0].first.Pos(), _match[0].second.Pos());
     else
         return Match();
 }
@@ -296,7 +275,7 @@ template <class CharT, class CharacterIterator>
 StdRegexSearch::Match StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::FindTextBackward(SearchParameters& search)
 {
     // Change backward search into series of forward search. It is slow: search all backward becomes O(n^2) instead of O(n) (if search forward is O(n)).
-    //NOTE: Maybe we should cache results. Maybe we could reverse regex to do a real backward search, for simple regex.
+    // NOTE: Maybe we should cache results. Maybe we could reverse regex to do a real backward search, for simple regex.
     search._direction = 1;
 
     MatchResults bestMatch;
@@ -309,7 +288,7 @@ StdRegexSearch::Match StdRegexSearch::EncodingDependent<CharT, CharacterIterator
             break;
         int position = matchRange.position();
         int endPosition = matchRange.endPosition();
-        if (endPosition > bestEnd && (endPosition < search._endPosition || position != endPosition)) // We are searching for the longest match which has the fathest end (but may not accept empty match at end position).
+        if (endPosition > bestEnd && (endPosition < search._endPosition || position != endPosition)) // We are searching for the longest match which has the farthest end (but may not accept empty match at end position).
         {
             bestMatch = _match;
             bestPosition = position;
@@ -328,7 +307,7 @@ void StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::compileRegex(c
 {
     if (_lastCompileFlags != compileFlags || _lastRegexString != regex)
     {
-        _regex = Regex(CharTPtr(regex), static_cast<std::regex_constants::syntax_option_type>(compileFlags));
+        _regex = Regex(CUnicodeUtils::StdGetUnicode(regex).c_str(), static_cast<std::regex_constants::syntax_option_type>(compileFlags));
         _lastRegexString = regex;
         _lastCompileFlags = compileFlags;
     }
@@ -358,23 +337,15 @@ bool StdRegexSearch::SearchParameters::isLineEnd(int position)
 
 const char *StdRegexSearch::SubstituteByPosition(Document* /*doc*/, const char *text, int *length)
 {
-    delete[] _substituted;
     _substituted = _utf8.SubstituteByPosition(text, length);
-    return _substituted;
+    return _substituted.c_str();
 }
 
 template <class CharT, class CharacterIterator>
-char *StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::SubstituteByPosition(const char *text, int *length)
+std::string StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::SubstituteByPosition(const char *text, int *length)
 {
-    char *substituted = stringToCharPtr(_match.format((const CharT*)CharTPtr(text), std::regex_constants::format_default));
-    *length = (int)strlen(substituted);
-    return substituted;
+    auto s = CUnicodeUtils::StdGetUTF8(_match.format(CUnicodeUtils::StdGetUnicode(text), std::regex_constants::format_default));
+    *length = (int)s.size();
+    return s;
 }
 
-
-char *StdRegexSearch::stringToCharPtr(const std::string& str)
-{
-    char *charPtr = new char[str.length() + 1];
-    strcpy_s(charPtr, str.length() + 1, str.c_str());
-    return charPtr;
-}
