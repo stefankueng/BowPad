@@ -29,58 +29,12 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <regex>
 
-// Overview:
-//
 // IMPORTANT: Testing this module can be difficult because debug mode
 // performance can be drastically slower than release builds.
-// Regex in particular can also be slower. See FIXME for more details.
-//
-// GENERAL OVERVIEW
-// When events happen in the editor that effect the state of functions
-// such as adding or removing text or changing the lexer etc. then
-// EventHappened is called.
-//
-// EventHappened consolidates and stores events for that document id
-// and sets a timer.
-//
-// When the timer expires, document ids are taken off of the event list
-// and documents are scanned for functions for a small duration of time.
-//
-// If a scan takes a long time it terminates and reschedules itself
-// to continue later so that other events can be processed and the
-// system stays responsive.This timer stops once the event list becomes empty.
-//
-// If for a given document scanning is interrupted by another full scan event,
-// then all existing events are cleared for that document and scanning
-// is restarted.
-//
-// Modification events are stored but scanning is not acted upon immediately.
-// This prevents typing from being interrupted.
-//
-// The net effect of all this is that closely occurring events for a given
-// document are condensed into one event for that document and the most recent
-// events are given priority over older events.
-//
-// Because large files can take a long time to scan, FindFunctions only does
-// a timed amount of work in each call and splits the work over a number of timer
-// events to find all the functions in a long document.
-//
-// The splitting of this necessitates a reasonable amount of global state
-// which by nature, makes this module a bit brittle. So test changes carefully.
-//
-// End Overview.
-//
-// The incremental_search_time parameter (roughly) determines how long each unit
-// of function searching lasts for, in 1000th of a second units.
-// 1000 = 1 second. 100 = 1/10th of a second.
-// The larger the number quicker the overall search will be, but the program
-// will feel less responsive.
-//
-// Experiment with values for this parameter and the SetTimer calls
-// to get the best balance of speed vs responsiveness.
-// DON'T tune/test these values in Debug builds.
-// See Overview at top of document for reasons why debug is problematic.
+// Regex in particular can also be slower.
+
 
 // Turns "Hello/* there */world" into "Helloworld"
 static void StripComments(std::string& f)
@@ -209,118 +163,6 @@ static bool FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf,
     return true;
 }
 
-// Turn a duration into something like 1h, 1m, 1s, 1ms.
-// Zero value elements are ommitted, e.g. 1h, 1ms.
-static std::string DurationToString(const std::chrono::duration<double>& d)
-{
-    using days = std::chrono::duration
-        <int, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>>;
-    days ds = std::chrono::duration_cast<days>(d);
-    auto rem = d - ds;
-    std::chrono::hours h = std::chrono::duration_cast<std::chrono::hours>(rem);
-    rem -= h;
-    std::chrono::minutes m = std::chrono::duration_cast<std::chrono::minutes>(rem);
-    rem -= m;
-    std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(rem);
-    rem -= s;
-    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(rem);
-
-    std::string result;
-    if (h.count() > 0)
-    {
-        if (!result.empty())
-            result += ',';
-        result += std::to_string(h.count());
-        result += 'h';
-    }
-    if (m.count() > 0)
-    {
-        if (!result.empty())
-            result += ',';
-        result += std::to_string(m.count());
-        result += 'm';
-    }
-    if (s.count() > 0)
-    {
-        if (!result.empty())
-            result += ',';
-        result += std::to_string(s.count());
-        result += 's';
-    }
-    // Empty check is to ensure at least something prints.
-    if (ms.count() > 0 || result.empty())
-    {
-        if (!result.empty())
-            result += ',';
-        result += std::to_string(ms.count());
-        result += "ms";
-    }
-
-    return result;
-}
-
-DocEvent::DocEvent()
-    : eventType(DocEventType::None), pos(0L), len(0L)
-{
-}
-
-DocEvent::DocEvent(DocEventType eventType, long pos, long len)
-    : eventType(eventType), pos(pos), len(len)
-{
-}
-
-void DocEvent::Clear()
-{
-    eventType = DocEventType::None;
-}
-
-inline bool DocEvent::Empty() const
-{
-    return eventType == DocEventType::None;
-}
-
-DocWork::DocWork()
-    : m_langData(nullptr)
-    , m_ttf({ 0 })
-{
-    m_inProgress = false;
-}
-
-void DocWork::ClearEvents()
-{
-    m_inProgress = false;
-    m_events.clear();
-}
-
-void DocWork::InitLang(const CDocument& doc)
-{
-    m_inProgress = false;
-    m_ttf = {};
-    m_langData = nullptr;
-    m_regex.clear();
-
-    ClearEvents();
-
-    m_docLang = doc.GetLanguage();
-    if (!m_docLang.empty())
-    {
-        m_langData = CLexStyles::Instance().GetLanguageData(m_docLang);
-        if (m_langData != nullptr)
-        {
-            if (!m_langData->functionregex.empty() && m_langData->userfunctions > 0)
-            {
-                m_regex = m_langData->functionregex;
-                m_trimtokens = m_langData->functionregextrim;
-                m_ttf.lpstrText = const_cast<char*>(m_regex.c_str());
-            }
-            else
-            {
-                m_langData = nullptr;
-            }
-        }
-    }
-}
-
 CCmdFunctions::CCmdFunctions(void* obj)
     : ICommand(obj)
     , m_autoscanlimit(-1)
@@ -333,14 +175,16 @@ CCmdFunctions::CCmdFunctions(void* obj)
     m_autoscanlimit = (long)CIniSettings::Instance().GetInt64(functionsSection, L"autoscanlimit", 1024000);
     if (!m_autoscanlimit)
         m_autoscan = false;
-    m_autoscanTimed = CIniSettings::Instance().GetInt64(functionsSection, L"autoscantimed", 0) != 0;
 
     m_timerID = GetTimerID();
-    m_docID = DocID();
-    m_timerPending = false;
-    m_modified = false;
 
     m_edit.InitScratch(hRes);
+
+    InterlockedExchange(&m_bThreadRunning, FALSE);
+
+    InterlockedExchange(&m_bRunThread, TRUE);
+    m_thread = std::thread(&CCmdFunctions::ThreadFunc, this);
+    m_thread.detach();
 }
 
 HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
@@ -394,13 +238,6 @@ HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
 #endif
     auto funcProcessingStartTime = std::chrono::steady_clock::now();
     auto functions = FindFunctionsNow();
-    if (m_autoscanTimed)
-    {
-        auto funcProcessingEndTime = std::chrono::steady_clock::now();
-        auto funcProcessingPeriod = funcProcessingEndTime - funcProcessingStartTime;
-        auto msg = DurationToString(funcProcessingPeriod);
-        MessageBoxA(GetHwnd(), msg.c_str(), "Function (Now) Parsing Time", MB_OK);
-    }
     if (functions.empty())
         return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
 
@@ -488,6 +325,7 @@ void CCmdFunctions::ScintillaNotify(SCNotification* pScn)
             // We ignore modifications that occur before the document is dirty
             // on the assumption that the modifications are just the result of
             // loading the file initially.
+            //
             // We could process modifications a bit more optimally i.e.
             // parse within the change area or something but we risk missing
             // data by only seeing a narrow part of the whole picture then.
@@ -495,7 +333,13 @@ void CCmdFunctions::ScintillaNotify(SCNotification* pScn)
             // (at least on my machine) during release mode testing but
             // it is close to warranting it.
             auto docID = GetDocIdOfCurrentTab();
-            EventHappened(docID, DocEvent(DocEventType::Modified, pScn->position, pScn->length));
+            auto doc = GetDocumentFromID(docID);
+            if (doc.m_bIsDirty)
+            {
+                m_eventData.insert(docID);
+                SetWorkTimer(1000);
+                InvalidateFunctionsSource();
+            }
         }
         break;
     }
@@ -504,12 +348,100 @@ void CCmdFunctions::ScintillaNotify(SCNotification* pScn)
 void CCmdFunctions::OnTimer(UINT id)
 {
     if (id == m_timerID)
-        BackgroundFindFunctions();
+    {
+        // first go through all events and create a WorkItem
+        // for each of them, and add them to the thread data list
+        // if necessary.
+        // If data is added to the thread data list, wake up the thread.
+        bool bWakeupThread = false;
+        for (const auto& docid : m_eventData)
+        {
+            auto doc = GetDocumentFromID(docid);
+            m_edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
+            m_edit.Call(SCI_CLEARALL);
+            m_edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+            OnOutOfScope(
+                m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
+            );
+
+            WorkItem w;
+            w.m_lang = doc.GetLanguage();
+            w.m_id = docid;
+            if (!w.m_lang.empty())
+            {
+                auto langData = CLexStyles::Instance().GetLanguageData(w.m_lang);
+                if (langData != nullptr)
+                {
+                    if (!langData->functionregex.empty() && langData->userfunctions > 0)
+                    {
+                        w.m_regex = langData->functionregex;
+                        w.m_trimtokens = langData->functionregextrim;
+
+                        ProfileTimer p(L"getting doc content");
+                        size_t lengthDoc = m_edit.Call(SCI_GETLENGTH);
+                        if ((lengthDoc <= m_autoscanlimit) || (m_autoscanlimit == -1))
+                        {
+                            // get characters directly from Scintilla buffer
+                            char* buf = (char*)m_edit.Call(SCI_GETCHARACTERPOINTER);
+                            w.m_data = std::string(buf, lengthDoc);
+
+                            std::unique_lock<std::mutex> lock(m_filedatamutex);
+                            // if there's already a work item queued up for this document,
+                            // remove it and add the new one
+                            auto found = std::find_if(m_fileData.begin(), m_fileData.end(), [w](const WorkItem & wi)
+                            {
+                                return wi.m_id == w.m_id;
+                            });
+                            if (found != m_fileData.end())
+                                m_fileData.erase(found);
+
+                            m_fileData.push_back(std::move(w));
+                            bWakeupThread = true;
+                        }
+                    }
+                }
+            }
+        }
+        m_eventData.clear();
+        if (bWakeupThread)
+            m_filedatacv.notify_one();
+
+        // now go through the lang data and see if we have to update those.
+        {
+            std::lock_guard<std::recursive_mutex> lock(m_langdatamutex);
+            for (const auto& data : m_langdata)
+            {
+                auto langData = CLexStyles::Instance().GetLanguageData(data.first);
+                if (langData)
+                {
+                    auto size1 = langData->userkeywords.size();
+                    langData->userkeywords.insert(data.second.begin(), data.second.end());
+                    auto size2 = langData->userkeywords.size();
+                    if (size1 != size2)
+                        langData->userkeywordsupdated = true;
+                }
+            }
+            m_langdata.clear();
+        }
+
+        // check if the userkeywords were updated for the active document:
+        // if it was, then update the lexer data
+        if (HasActiveDocument())
+        {
+            const auto& activeDoc = GetActiveDocument();
+            auto langData = CLexStyles::Instance().GetLanguageData(activeDoc.GetLanguage());
+            if (langData != nullptr && langData->userkeywordsupdated)
+                SetupLexerForLang(activeDoc.GetLanguage());
+        }
+        KillTimer(GetHwnd(), m_timerID);
+    }
 }
 
 void CCmdFunctions::OnDocumentOpen(DocID id)
 {
-    EventHappened(id, DocEventType::Open);
+    m_eventData.insert(id);
+    InvalidateFunctionsSource();
+    SetWorkTimer(1000);
 }
 
 void CCmdFunctions::OnDocumentClose(DocID id)
@@ -548,263 +480,99 @@ void CCmdFunctions::OnDocumentClose(DocID id)
             }
         }
     }
-    m_work.erase(id);
-    if (m_docID.IsValid() && id == m_docID)
-    {
-        m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
-        m_docID = DocID();
-    }
+    m_eventData.erase(id);
+}
+
+void CCmdFunctions::OnClose()
+{
+    InterlockedExchange(&m_bRunThread, FALSE);
+    std::unique_lock<std::mutex> lock(m_filedatamutex);
+    m_fileData.push_back(WorkItem());
+    m_filedatacv.notify_one();
+    int count = 50;
+    while (m_bThreadRunning && --count)
+        Sleep(100);
 }
 
 void CCmdFunctions::OnDocumentSave(DocID id, bool bSaveAs)
 {
     if (bSaveAs)
-        EventHappened(id, DocEventType::SaveAs);
+    {
+        m_eventData.insert(id);
+        InvalidateFunctionsSource();
+        SetWorkTimer(1000);
+    }
 }
 
 void CCmdFunctions::OnLangChanged()
 {
-    EventHappened(GetDocIdOfCurrentTab(), DocEventType::LexerChanged);
+    m_eventData.insert(GetDocIdOfCurrentTab());
+    InvalidateFunctionsSource();
+    SetWorkTimer(1000);
 }
 
 void CCmdFunctions::SetWorkTimer(int ms) // 0 means as fast as possible, not never.
 {
     SetTimer(GetHwnd(), m_timerID, ms, nullptr);
-    m_timerPending = true;
 }
 
-void CCmdFunctions::EventHappened(DocID docID, DocEvent ev)
+void CCmdFunctions::ThreadFunc()
 {
-    if (docID.IsValid() && GetDocIdOfCurrentTab() == docID)
-        InvalidateFunctionsSource();
-
-    if (!docID.IsValid()) // Ignore anything bogus. It may happen eventually.
+    InterlockedExchange(&m_bThreadRunning, TRUE);
+    do
     {
-        APPVERIFY(false);
-        return;
-    }
-
-    if (!m_autoscan)
-        return;
-
-    // We want at most 1 full scan event (i.e. open or lexer event etc.)
-    // to be present followed by N modified events.
-    // A full scan event clears partial scan events as it makes them redundant.
-
-    auto& work = m_work[docID];
-    const auto& doc = GetDocumentFromID(docID);
-    bool addEvent = true;
-    switch (ev.eventType)
-    {
-        case DocEventType::Open: // Set language
-        case DocEventType::SaveAs: // Language may change
-        case DocEventType::LexerChanged: // Language may change
-        work.InitLang(doc);
-        break;
-        case DocEventType::Modified: // New functions may appear
-        if (!doc.m_bIsDirty)
-            addEvent = false;
-        break;
-    }
-    m_modified = ev.eventType == DocEventType::Modified;
-
-    // If the language is or changes to something that doesn't support functions,
-    // cancel any pending scans.
-    if (work.m_langData == nullptr || work.m_regex.empty())
-    {
-        work.ClearEvents();
-        addEvent = false;
-        work.m_langData = nullptr;
-    }
-    else if (addEvent)
-        work.m_events.push_back(ev);
-
-    // We don't want to do any work for a while after a modification
-    // because other modification events will usuaully imminently follow and we
-    // want the system to be responsive to them to avoid slowing typing etc.
-    // But otherwise we want to get process events quickly.
-    if (addEvent)
-    {
-        if (m_modified)
-            SetWorkTimer(1000);
-        else if (!m_timerPending)
-            SetWorkTimer(0);
-    }
-}
-
-bool CCmdFunctions::BackgroundFindFunctions()
-{
-    const auto startTime = std::chrono::steady_clock::now();
-
-    if (!m_funcProcessingStarted)
-    {
-        if (m_autoscanTimed)
-            m_funcProcessingStartTime = startTime;
-        m_funcProcessingStarted = true;
-    }
-
-    bool more = true, timeup = false;
-    int lineNum;
-    std::string sig, name;
-    DocWork* pWork = nullptr;
-    constexpr auto incremental_search_time = std::chrono::milliseconds(20);
-    for (;;)
-    {
-        // Prefer to stick to the same document until it's done as it's more efficient.
-        if (m_docID.IsValid())
-            pWork = &m_work[m_docID];
-        // If we've not started or finished work, look for the next thing.
-        if (!pWork || pWork->m_events.empty())
+        WorkItem work;
         {
-            auto nextWorkIt = std::find_if(m_work.begin(), m_work.end(),
-                                           [](const auto& item)->bool
+            std::unique_lock<std::mutex> lock(m_filedatamutex);
+            m_filedatacv.wait(lock, [&]
             {
-                const DocWork& work = item.second;
-                return !work.m_events.empty();
+                return !m_fileData.empty();
             });
-
-            // Stop if we've nothing left/ready to do.
-            // Note we leave the last document active in our scratch edit.
-            if (nextWorkIt == m_work.end())
+            if (!m_fileData.empty())
             {
-                more = false;
-                break;
-            }
-
-            pWork = &nextWorkIt->second;
-            auto nextDocID = nextWorkIt->first;
-
-            // If we are going to work on something new release
-            // what we had (if anything) and make the new thing current.
-            if (!m_docID.IsValid() || m_docID != nextDocID)
-            {
-                if (m_docID.IsValid())
-                    m_edit.Call(SCI_SETDOCPOINTER, 0, 0);
-                m_docID = nextDocID;
-                m_edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
-                m_edit.Call(SCI_CLEARALL);
-                const auto& doc = GetDocumentFromID(m_docID);
-                m_edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+                work = std::move(m_fileData.front());
+                m_fileData.pop_front();
             }
         }
-        if (m_autoscanlimit != -1)
+        if (!work.m_regex.empty())
         {
-            // If there is a size limit active, don't work on any document
-            // that is or has gotten too big.
-            auto lengthInBytes = (long)m_edit.Call(SCI_GETLENGTH);
-            if (lengthInBytes > m_autoscanlimit)
+            auto sRegex = CUnicodeUtils::StdGetUnicode(work.m_regex);
+            auto sData = CUnicodeUtils::StdGetUnicode(work.m_data);
+
+            try
             {
-                pWork->ClearEvents();
-                continue;
+                std::wregex regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
+                const std::wsregex_token_iterator End;
+                ProfileTimer timer(L"parsing functions");
+                for (std::wsregex_token_iterator match(sData.begin(), sData.end(), regex, 0); match != End; ++match)
+                {
+                    if (!m_bRunThread)
+                        break;
+
+                    auto sig = CUnicodeUtils::StdGetUTF8(match->str());
+
+                    StripComments(sig);
+                    Normalize(sig);
+                    for (const auto& token : work.m_trimtokens)
+                        SearchRemoveAll(sig, token);
+                    CStringUtils::trim(sig);
+                    std::string name;
+                    if (ParseName(sig, name))
+                    {
+                        std::lock_guard<std::recursive_mutex> lock(m_langdatamutex);
+                        m_langdata[work.m_lang].insert(std::move(name));
+                    }
+                }
+            }
+            catch (const std::exception&)
+            {
+
             }
         }
+        SetWorkTimer(0);
 
-        if (!pWork->m_inProgress && !pWork->m_events.empty())
-            SetSearchScope(*pWork, pWork->m_events.front());
-
-        for (;;)
-        {
-            if (!FindNext(m_edit, pWork->m_ttf, sig, &lineNum))
-            {
-                // Break to outer loop to get next work for this or another document.
-                pWork->m_inProgress = false;
-                pWork->m_events.pop_front();
-                break;
-            }
-            pWork->m_ttf.chrg.cpMin = pWork->m_ttf.chrgText.cpMax + 1;
-
-            StripComments(sig);
-            Normalize(sig);
-            for (const auto& token : pWork->m_trimtokens)
-                SearchRemoveAll(sig, token);
-            CStringUtils::trim(sig);
-
-            if (ParseName(sig, name))
-            {
-                auto result = pWork->m_langData->userkeywords.insert(std::move(name));
-                if (result.second)
-                    pWork->m_langData->userkeywordsupdated = true;
-            }
-
-            auto ellapsedPeriod = std::chrono::steady_clock::now() - startTime;
-            if (ellapsedPeriod >= incremental_search_time)
-            {
-                timeup = true;
-                break;
-            }
-        } // Loop searching for items within scope of current event.
-        if (timeup)
-            break;
-    }
-    if (more)
-    {
-        // If there is more work to do then schedule a wakeup to finish it unless
-        // a wakeup is already queued. But if it is and relates to a modification,
-        // then assume the timer is a long timer that we have already waited
-        // so reset it to a shorter time so we can finish the remainding work sooner.
-        // Any new modification will make the wait a long time again.
-        // We try not to cancel or reset timers unless we have to.
-        if (!m_timerPending || (m_timerPending && m_modified))
-            SetWorkTimer(0);
-    }
-    else
-    {
-        if (m_timerPending)
-        {
-            KillTimer(GetHwnd(), m_timerID);
-            m_timerPending = false;
-        }
-        m_funcProcessingStarted = false;
-        if (HasActiveDocument())
-        {
-            const auto& activeDoc = GetActiveDocument();
-            auto langData = CLexStyles::Instance().GetLanguageData(activeDoc.GetLanguage());
-            if (langData != nullptr && langData->userkeywordsupdated)
-                SetupLexerForLang(activeDoc.GetLanguage());
-        }
-        if (m_autoscanTimed)
-        {
-            auto funcProcessingEndTime = std::chrono::steady_clock::now();
-            auto funcProcessingPeriod = funcProcessingEndTime - m_funcProcessingStartTime;
-            auto msg = DurationToString(funcProcessingPeriod);
-            MessageBoxA(GetHwnd(), msg.c_str(), "Autoscan Function Parsing Time", MB_OK);
-        }
-    }
-    m_modified = false;
-
-    return more;
-}
-
-void CCmdFunctions::SetSearchScope(DocWork& work, const DocEvent& ev) const
-{
-    // The look ahead and behind values are arbitary. We just want to make
-    // sure we capture the whole area around any line where a change happened
-    // to handle something like:
-    // static
-    // void
-    // myfunc( /* imagine a change occured on this line */
-    //     char* myarg1,
-    //     char* myarg2
-    // );
-    const Sci_PositionCR lookBehind = 256;
-    const Sci_PositionCR lookAhead = 512;
-
-    // Set the search scope to the region indicated in the event,
-    // which is specified as a starting position and a length.
-    // A length of 0 means "to the end".
-    const Sci_PositionCR length = (Sci_PositionCR)m_edit.ConstCall(SCI_GETLENGTH);
-    Sci_PositionCR spos = ev.pos;
-    Sci_PositionCR epos = ev.pos + (ev.len == 0L ? length : ev.len);
-    spos -= lookBehind;
-    if (spos < 0L)
-        spos = 0L;
-    epos += lookAhead;
-    if (epos > length)
-        epos = length;
-
-    work.m_ttf.chrg.cpMin = spos;
-    work.m_ttf.chrg.cpMax = epos;
-    work.m_inProgress = true;
+    } while (m_bRunThread);
+    InterlockedExchange(&m_bThreadRunning, FALSE);
 }
 
 std::vector<FunctionInfo> CCmdFunctions::FindFunctionsNow() const
