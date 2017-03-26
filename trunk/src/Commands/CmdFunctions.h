@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -29,6 +29,8 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <deque>
+#include <thread>
+#include <mutex>
 
 struct FunctionInfo
 {
@@ -63,35 +65,14 @@ enum class DocEventType
     // the process? If so the function list needs to be rebuilt.
 };
 
-class DocEvent
+
+struct WorkItem
 {
-public:
-    DocEvent();
-    DocEvent(DocEventType eventType, long pos = 0L, long len = 0L);
-    void Clear();
-    bool Empty() const;
-
-public:
-    DocEventType eventType;
-    long pos;
-    long len;
-};
-
-class DocWork
-{
-public:
-    DocWork();
-    void InitLang(const CDocument& doc);
-    void ClearEvents();
-
-public:
-    std::deque<DocEvent> m_events;
-    Sci_TextToFind m_ttf;
-    std::string m_docLang;
-    std::string m_regex;
-    std::vector<std::string> m_trimtokens;
-    LanguageData* m_langData;
-    bool m_inProgress;
+    DocID                       m_id;
+    std::string                 m_lang;
+    std::string                 m_regex;
+    std::string                 m_data;
+    std::vector<std::string>    m_trimtokens;
 };
 
 class CCmdFunctions final : public ICommand
@@ -114,28 +95,32 @@ private:
     void OnDocumentSave(DocID id, bool bSaveAs) override;
     void OnLangChanged() override;
     void OnDocumentClose(DocID id) override;
-    bool BackgroundFindFunctions();
+    void OnClose() override;
+
     std::vector<FunctionInfo> FindFunctionsNow() const;
     void InvalidateFunctionsEnabled();
     void InvalidateFunctionsSource();
     HRESULT PopulateFunctions(IUICollectionPtr& collection);
-    void EventHappened(DocID docID, DocEvent ev);
     void FindFunctions(const CDocument& doc, std::function<bool(const std::string&, long lineNum)>& callback) const;
-    void SetSearchScope(DocWork& work, const DocEvent& event) const;
     void SetWorkTimer(int ms);
+    void ThreadFunc();
 
 private:
     bool m_autoscan;
     long m_autoscanlimit;
-    bool m_autoscanTimed;
     UINT m_timerID;
     std::vector<int> m_menuData;
     std::chrono::time_point<std::chrono::steady_clock> m_funcProcessingStartTime;
-    bool m_funcProcessingStarted = false;
-    std::unordered_map<DocID, DocWork> m_work;
-    DocID m_docID;
     CScintillaWnd m_edit;
-    bool m_timerPending;
-    bool m_modified;
+
+    std::unordered_set<DocID> m_eventData;
+    std::list<WorkItem> m_fileData;
+    std::unordered_map<std::string, std::unordered_set<std::string>> m_langdata;
+    std::thread m_thread;
+    std::mutex m_filedatamutex;
+    std::condition_variable m_filedatacv;
+    std::recursive_mutex m_langdatamutex;
+    volatile long m_bRunThread;
+    volatile long m_bThreadRunning;
 };
 
