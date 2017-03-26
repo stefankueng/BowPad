@@ -80,7 +80,6 @@ public:
     }
     wchar_t operator*() const
     {
-        assert(lenCharacters != 0);
         return buffered[characterIndex];
     }
     UTF8DocumentIterator &operator++()
