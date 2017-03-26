@@ -506,9 +506,6 @@
     <ClCompile Include="Commands\CmdLanguage.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
-    <ClCompile Include="StdRegexSearch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ChoseDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

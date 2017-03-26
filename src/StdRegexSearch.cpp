@@ -14,11 +14,10 @@
 //
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
-#include "stdafx.h"
-#include "UnicodeUtils.h"
 #include <iterator>
 #include <regex>
 #include <codecvt>
+#include <memory>
 #include "scintilla.h"
 #define PLATFORM_ASSERT(c) ((void)0)
 #include "../ext/scintilla/src/SplitVector.h"
@@ -307,7 +306,9 @@ void StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::compileRegex(c
 {
     if (_lastCompileFlags != compileFlags || _lastRegexString != regex)
     {
-        _regex = Regex(CUnicodeUtils::StdGetUnicode(regex).c_str(), static_cast<std::regex_constants::syntax_option_type>(compileFlags));
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
+
+        _regex = Regex(convert.from_bytes(regex).c_str(), static_cast<std::regex_constants::syntax_option_type>(compileFlags));
         _lastRegexString = regex;
         _lastCompileFlags = compileFlags;
     }
@@ -344,7 +345,8 @@ const char *StdRegexSearch::SubstituteByPosition(Document* /*doc*/, const char *
 template <class CharT, class CharacterIterator>
 std::string StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::SubstituteByPosition(const char *text, int *length)
 {
-    auto s = CUnicodeUtils::StdGetUTF8(_match.format(CUnicodeUtils::StdGetUnicode(text), std::regex_constants::format_default));
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
+    auto s = convert.to_bytes(_match.format(convert.from_bytes(text), std::regex_constants::format_default));
     *length = (int)s.size();
     return s;
 }

@@ -626,5 +626,6 @@
     <ClCompile Include="lexers\LexIndent.cxx">
       <Filter>lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\StdRegexSearch.cpp" />
   </ItemGroup>
 </Project>
