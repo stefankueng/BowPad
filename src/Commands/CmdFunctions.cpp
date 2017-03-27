@@ -486,11 +486,13 @@ void CCmdFunctions::OnDocumentClose(DocID id)
 void CCmdFunctions::OnClose()
 {
     InterlockedExchange(&m_bRunThread, FALSE);
-    std::unique_lock<std::mutex> lock(m_filedatamutex);
-    m_fileData.push_back(WorkItem());
-    m_filedatacv.notify_one();
+    {
+        std::unique_lock<std::mutex> lock(m_filedatamutex);
+        m_fileData.push_back(WorkItem());
+        m_filedatacv.notify_one();
+    }
     int count = 50;
-    while (m_bThreadRunning && --count)
+    while (InterlockedExchange(&m_bThreadRunning, m_bThreadRunning) && --count)
         Sleep(100);
 }
 
@@ -534,6 +536,8 @@ void CCmdFunctions::ThreadFunc()
                 m_fileData.pop_front();
             }
         }
+        if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
+            break;
         if (!work.m_regex.empty())
         {
             auto sRegex = CUnicodeUtils::StdGetUnicode(work.m_regex);
@@ -546,7 +550,7 @@ void CCmdFunctions::ThreadFunc()
                 ProfileTimer timer(L"parsing functions");
                 for (std::wsregex_token_iterator match(sData.begin(), sData.end(), regex, 0); match != End; ++match)
                 {
-                    if (!m_bRunThread)
+                    if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
                         break;
 
                     auto sig = CUnicodeUtils::StdGetUTF8(match->str());
@@ -571,7 +575,7 @@ void CCmdFunctions::ThreadFunc()
         }
         SetWorkTimer(0);
 
-    } while (m_bRunThread);
+    } while (InterlockedExchange(&m_bRunThread, m_bRunThread));
     InterlockedExchange(&m_bThreadRunning, FALSE);
 }
 
