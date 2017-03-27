@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -108,6 +108,8 @@ bool CCmdTabs2Spaces::Execute()
             inChar = !inChar;
         if (!bIgnoreQuotes && !inChar && (*pBuf == '\"'))
             inString = !inString;
+        if ((*pBuf == '\n') || (*pBuf == '\r'))
+            inChar = false;
         if (inChar || inString)
             continue;
 
@@ -152,6 +154,8 @@ bool CCmdTabs2Spaces::Execute()
                 inChar = !inChar;
             if (!bIgnoreQuotes && !inChar && (*pOldBuf == '\"'))
                 inString = !inString;
+            if ((*pOldBuf == '\n') || (*pOldBuf == '\r'))
+                inChar = false;
             if (inChar || inString)
             {
                 *pBuf++ = *pOldBuf++;
@@ -228,6 +232,8 @@ bool CCmdSpaces2Tabs::Execute()
             inChar = !inChar;
         if (!bIgnoreQuotes && !inChar && (*pBuf == '\"'))
             inString = !inString;
+        if ((*pBuf == '\n') || (*pBuf == '\r'))
+            inChar = false;
         if (inChar || inString)
         {
             spacecount = 0;
