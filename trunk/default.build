@@ -1,8 +1,9 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <project name="BowPad" default="setup">
 
   <include buildfile="default.build.user" />
 
+  <property name="signtool" value="signtool.exe" />
   <property name="configuration" value="release" />
 
   <!-- the signinfo.txt file has to contain one line with parameters for signtool.exe,
@@ -100,7 +101,7 @@
           </items>
         </in>
         <do>
-          <exec program="signtool">
+          <exec program="${signtool}">
             <arg value="sign" />
             <arg value="${signinfo}" />
             <arg value="${filename}" />
