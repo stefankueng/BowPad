@@ -1,0 +1,5 @@
+2.3.1.1940
+https://sourceforge.net/projects/bowpad-sk/files/2.3.1/BowPad64-2.3.1.msi/download
+BowPad64-2.3.1.msi
+https://sourceforge.net/projects/bowpad-sk/files/2.3.1/BowPad-2.3.1.msi/download
+BowPad-2.3.1.msi

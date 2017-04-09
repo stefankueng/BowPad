@@ -1,0 +1,1489 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 1900-01-01 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Marius Davitoiu <mariusdavitoiu@yahoo.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+# msgid/msgstr fields for Accelerator keys
+# Format is: "ID:xxxxxx:VACS+X" where:
+#    ID:xxxxx = the menu ID corresponding to the accelerator
+#    V = Virtual key (or blank if not used) - nearly always set!
+#    A = Alt key     (or blank if not used)
+#    C = Ctrl key    (or blank if not used)
+#    S = Shift key   (or blank if not used)
+#    X = upper case character
+# e.g. "V CS+Q" == Ctrl + Shift + 'Q'
+
+# ONLY Accelerator Keys with corresponding alphanumeric characters can be
+# updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
+
+# ONLY change the msgstr field. Do NOT change any other.
+# If you do not want to change an Accelerator Key, copy msgid to msgstr
+
+#. Resource IDs: (104)
+msgid "&About ..."
+msgstr "&A Despre"
+
+#. Resource IDs: (7)
+msgid "&Cancel"
+msgstr "Anulare"
+
+#. Resource IDs: (3754)
+msgid "&Close Tab"
+msgstr "Inchide"
+
+#. Resource IDs: (65535)
+msgid "&File"
+msgstr "&Fisier"
+
+#. Resource IDs: (1001)
+msgid "&Find Next"
+msgstr "Gaseste urmatorul"
+
+#. Resource IDs: (65535)
+msgid "&Help"
+msgstr "Ajutor"
+
+#. Resource IDs: (3753)
+msgid "&New"
+msgstr "&Nou"
+
+#. Resource IDs: (3753)
+msgid "&Open"
+msgstr "&Deschide"
+
+#. Resource IDs: (3769)
+msgid "&Reload"
+msgstr "&Reincarca"
+
+#. Resource IDs: (1003)
+msgid "&Replace"
+msgstr "&Inlocuieste"
+
+#. Resource IDs: (7)
+msgid "&Save"
+msgstr "&Saveaza"
+
+#. Resource IDs: (1005)
+msgid "&Search for:"
+msgstr "Cauta :"
+
+#. Resource IDs: (9)
+msgid "<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Full details about this update</a>"
+msgstr "<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Toate detaliile despre acesta actualizare</a>"
+
+#. Resource IDs: (3754)
+msgid "A"
+msgstr "A"
+
+#. Resource IDs: (3780)
+msgid "AB"
+msgstr "AB"
+
+#. Resource IDs: (3754)
+msgid "AS"
+msgstr "AS"
+
+#. Resource IDs: (103)
+msgid "About BowPad"
+msgstr "Despre BowPad"
+
+#. Resource IDs: (10)
+msgid "Access denied!"
+msgstr "Acces blocat!"
+
+#. Resource IDs: (10)
+#, c-format
+msgid "Access to the file '%s' was denied. Do you want to try again with elevated privileges?"
+msgstr "Accesul la fisierul '%s' a fost blocat. Vreti sa mai incercati odata cu privilegii elevate?"
+
+#. Resource IDs: (3756)
+msgid "Allows to load a file with a specific encoding"
+msgstr "Permite incarcarea unui fisier cu o anumita codare"
+
+#. Resource IDs: (9)
+msgid "An update for BowPad is available"
+msgstr "O actualizare pentru BowPad este disponibila"
+
+#. Resource IDs: (3753)
+msgid "Asks where to save the current tab"
+msgstr "Unde sa fie salvata fila curenta?"
+
+#. Resource IDs: (65535)
+msgid "Author: Stefan Küng"
+msgstr "Autor : Stefan Küng; Tradus : Marius Davitoiu"
+
+#. Resource IDs: (3780)
+msgid "Auto Braces"
+msgstr "Acolade automat"
+
+#. Resource IDs: (9)
+msgid "Available Languages"
+msgstr "Limbi disponibile"
+
+#. Resource IDs: (3770)
+msgid "BC"
+msgstr "BC"
+
+#. Resource IDs: (3770)
+msgid "BN"
+msgstr "BN"
+
+#. Resource IDs: (7)
+msgid "BOWPAD"
+msgstr "BOWPAD"
+
+#. Resource IDs: (3770)
+msgid "BP"
+msgstr "BP"
+
+#. Resource IDs: (3769)
+msgid "BT"
+msgstr "BT"
+
+#. Resource IDs: (1020)
+msgid "bold"
+msgstr "bold"
+
+#. Resource IDs: (3764)
+msgid "Bookmark"
+msgstr "Semn de carte"
+
+#. Resource IDs: (7)
+msgid "BowPad"
+msgstr "BowPad"
+
+#. Resource IDs: (9)
+msgid "BowPad Text Editor"
+msgstr "Editor de texte BowPad"
+
+#. Resource IDs: (3751, 3754, 3755)
+msgid "C"
+msgstr "C"
+
+#. Resource IDs: (3754)
+msgid "CA"
+msgstr "CA"
+
+#. Resource IDs: (3762)
+msgid "CC"
+msgstr "CC"
+
+#. Resource IDs: (3752)
+msgid "CO"
+msgstr "CO"
+
+#. Resource IDs: (3759)
+msgid "CR"
+msgstr "CR"
+
+#. Resource IDs: (3758)
+msgid "CT"
+msgstr "CT"
+
+#. Resource IDs: (3763)
+msgid "CU"
+msgstr "CU"
+
+#. Resource IDs: (2)
+msgid "Cancel"
+msgstr "Anuleaza"
+
+#. Resource IDs: (8)
+msgid "Cancel\nThe file is not loaded again."
+msgstr "Anuleaza\nFisierul nu este reincarcat."
+
+#. Resource IDs: (3764)
+msgid "Char operations"
+msgstr "Operatii cu caractere"
+
+#. Resource IDs: (1027)
+msgid "Check for Updates"
+msgstr "Cauta dupa actualizari"
+
+#. Resource IDs: (2)
+msgid "Cl&ose"
+msgstr "Inchide"
+
+#. Resource IDs: (3765)
+msgid "Clear Bookmarks"
+msgstr "Sterge semnele de carte"
+
+#. Resource IDs: (3751, 3753, 3754)
+msgid "Clipboard"
+msgstr "Clipboard"
+
+#. Resource IDs: (3753)
+msgid "Close All Tabs"
+msgstr "Inchide toate filele"
+
+#. Resource IDs: (3773)
+msgid "Close All Tabs Except This One"
+msgstr "Inchide toate filele in afara the aceasta"
+
+#. Resource IDs: (3753)
+msgid "Close Tab"
+msgstr "Inchide fila"
+
+#. Resource IDs: (3753)
+msgid "Close all"
+msgstr "Inchide tot"
+
+#. Resource IDs: (3773)
+msgid "Close all but this"
+msgstr "Inchide tot in afara de acesta"
+
+#. Resource IDs: (3753)
+msgid "Close the current tab"
+msgstr "Inchide fila curenta"
+
+#. Resource IDs: (8)
+msgid "Close the document\nThe document tab is closed."
+msgstr "Inchide documentul\nFila document este inchisa."
+
+#. Resource IDs: (3753)
+msgid "Closes all open files"
+msgstr "Inchide toate fisierele deschise"
+
+#. Resource IDs: (3773)
+msgid "Closes all open files except the current one"
+msgstr "Inchide toate fisierele deschise in afara de cel curent"
+
+#. Resource IDs: (3767)
+msgid "Cmd"
+msgstr "Cmd"
+
+#. Resource IDs: (3751)
+msgid "Code"
+msgstr "Cod"
+
+#. Resource IDs: (8)
+msgid "Codepages/Character sets"
+msgstr "Coduri de pagina/caractere"
+
+#. Resource IDs: (65535)
+msgid "Color"
+msgstr "Culoare"
+
+#. Resource IDs: (1061)
+msgid "Command Line:"
+msgstr "Linie de comanda :"
+
+#. Resource IDs: (1060)
+msgid "Command Name:"
+msgstr "Numele comandei :"
+
+#. Resource IDs: (3751, 3759)
+msgid "Comment"
+msgstr "Comenteaza"
+
+#. Resource IDs: (3759)
+msgid "Comments the selected text"
+msgstr "Comenteaza textul selectat"
+
+#. Resource IDs: (3775)
+msgid "Configure Keyboard Shortcuts"
+msgstr "Configureaza Scurtaturile de Tastatura"
+
+#. Resource IDs: (3775)
+msgid "Configure Shortcuts"
+msgstr "Configureaza Scurtaturile"
+
+#. Resource IDs: (3758)
+msgid "Configure Styles"
+msgstr "Configureaza Stilurile"
+
+#. Resource IDs: (3758)
+msgid "Configure colors, fonts, styles and sizes"
+msgstr "Configureaza culorile, fonturile, stilurile si marimile"
+
+#. Resource IDs: (3772)
+msgid "Configure custom commands"
+msgstr "Configureaza comenzile personalizate"
+
+#. Resource IDs: (3756)
+msgid "Convert to"
+msgstr "Converteste la"
+
+#. Resource IDs: (3764)
+msgid "Converts all spaces in the document to tabs"
+msgstr "Converteste toate spatiile albe din document in taburi"
+
+#. Resource IDs: (3764)
+msgid "Converts all tabs in the document to spaces"
+msgstr "Converteste toate taburile din document in spatii"
+
+#. Resource IDs: (3756)
+msgid "Converts the file to the specified encoding"
+msgstr "Converteste fisierul la codarea specificata"
+
+#. Resource IDs: (3764)
+msgid "Converts the selection to Title Case"
+msgstr "Converteste selectia la Titlu"
+
+#. Resource IDs: (3760)
+msgid "Converts the selection to UPPERcase"
+msgstr "Converteste selectia la majuscule"
+
+#. Resource IDs: (3760)
+msgid "Converts the selection to lowercase"
+msgstr "Coverteste selectia la minuscule"
+
+#. Resource IDs: (3774)
+msgid "Copies the name of the current file to the clipboard"
+msgstr "Copiaza numele fisierului curent in clipboard"
+
+#. Resource IDs: (3774)
+msgid "Copies the path of the current file to the clipboard"
+msgstr "Copiaza calea fisierului curent in clipboard"
+
+#. Resource IDs: (3774)
+msgid "Copies the path of the directory of the current file to the clipboard"
+msgstr "Copiaza calea directorului fisierului curent in clipboard"
+
+#. Resource IDs: (3753)
+msgid "Copy"
+msgstr "Copiaza"
+
+#. Resource IDs: (3774)
+msgid "Copy Directory"
+msgstr "Copiaza Directorul"
+
+#. Resource IDs: (3774)
+msgid "Copy Name"
+msgstr "Copiaza Nume"
+
+#. Resource IDs: (3773, 3774)
+msgid "Copy Path"
+msgstr "Copiaza Calea"
+
+#. Resource IDs: (3754)
+msgid "Copy the current selection to the clipboard"
+msgstr "Copiaza selectia curenta in clipboard"
+
+#. Resource IDs: (3772)
+msgid "Corresponding File"
+msgstr "Fisierul Corespunzator"
+
+#. Resource IDs: (9)
+msgid "Could not download the language file!"
+msgstr "Nu s-a putut descarca fisierul de limba!"
+
+#. Resource IDs: (3752)
+msgid "Creates a new tab with an empty document"
+msgstr "Creaza o fila noua cu un document gol"
+
+#. Resource IDs: (8)
+msgid "Ctrl+Click to open the link in the default browser"
+msgstr "Ctrl + clic pentru a deschide legatura in navigatorul implicit"
+
+#. Resource IDs: (1049, 3770)
+msgid "Custom Command 0"
+msgstr "Comanda personalizata 0"
+
+#. Resource IDs: (1050, 3770)
+msgid "Custom Command 1"
+msgstr "Comanda personalizata 1"
+
+#. Resource IDs: (1051, 3770)
+msgid "Custom Command 2"
+msgstr "Comanda personalizata 2"
+
+#. Resource IDs: (1052, 3770)
+msgid "Custom Command 3"
+msgstr "Comanda personalizata 3"
+
+#. Resource IDs: (1053, 3771)
+msgid "Custom Command 4"
+msgstr "Comanda personalizata 4"
+
+#. Resource IDs: (1054, 3771)
+msgid "Custom Command 5"
+msgstr "Comanda personalizata 5"
+
+#. Resource IDs: (1055, 3771)
+msgid "Custom Command 6"
+msgstr "Comanda personalizata 6"
+
+#. Resource IDs: (1056, 3771)
+msgid "Custom Command 7"
+msgstr "Comanda personalizata 7"
+
+#. Resource IDs: (1057, 3772)
+msgid "Custom Command 8"
+msgstr "Comanda personalizata 8"
+
+#. Resource IDs: (1058, 3772)
+msgid "Custom Command 9"
+msgstr "Comanda personalizata 9"
+
+#. Resource IDs: (149)
+msgid "Custom Commands"
+msgstr "Comenzi personalizate"
+
+#. Resource IDs: (3754)
+msgid "Cut"
+msgstr "Decupeaza"
+
+#. Resource IDs: (3754)
+msgid "Cut the current selection to the clipboard"
+msgstr "Decupeaza selectia curenta in clipboard"
+
+#. Resource IDs: (3765)
+msgid "DD"
+msgstr "DD"
+
+#. Resource IDs: (3761)
+msgid "DEL"
+msgstr "DEL"
+
+#. Resource IDs: (3765, 3766)
+msgid "Dark Theme"
+msgstr "Tema sumbra"
+
+#. Resource IDs: (3758)
+msgid "Delete"
+msgstr "Sterge"
+
+#. Resource IDs: (3760)
+msgid "Determines whether a tab is inserted or spaces when the tab key is pressed."
+msgstr "Determina daca un tab este inserat sau spatii albe cand tasta de tab este apasata."
+
+#. Resource IDs: (9)
+msgid "Do &not download the update\nYou will be reminded again about the update in a week."
+msgstr "&Nu descarca acesta actualizare\n"Vei fi informat despre aceasta actualizare peste o saptamana.
+
+#. Resource IDs: (7)
+#, c-format
+msgid "Do you want to save changes to \"%s\""
+msgstr "Vrei sa salvezi schimbarile la \"%s\""
+
+#. Resource IDs: (7)
+msgid "Do&n't save"
+msgstr "&Nu salva"
+
+#. Resource IDs: (8)
+msgid "Document modified"
+msgstr "Document modificat"
+
+#. Resource IDs: (8)
+msgid "Document removed"
+msgstr "Document inlaturat"
+
+#. Resource IDs: (10)
+msgid "Don't Save\nThe file is not saved."
+msgstr "Nu salva\nFisierul nu este salvat."
+
+#. Resource IDs: (10)
+msgid "Don't open\nThe file is not opened."
+msgstr "Nu deschide\nFisierul nu este deschis."
+
+#. Resource IDs: (8)
+msgid "Download and install the update\nUpdates BowPad to the latest version."
+msgstr "Descarca si instaleaza actualizarea\nActualizeaza BowPad la cea mai recenta versiune."
+
+#. Resource IDs: (9)
+msgid "Download of language list succeeded. Now you can select a language from that list."
+msgstr "Descarcarea listei de limbi realizata cu succes.Acum se poate selecta o limba din lista."
+
+#. Resource IDs: (9)
+msgid "Download the update\nYou have to install the update manually."
+msgstr "Descarca actualizarea\nTrebuie sa instalezi actualizarea manual."
+
+#. Resource IDs: (3760, 3761)
+msgid "Duplicate Line"
+msgstr "Duplica Linia"
+
+#. Resource IDs: (3761)
+msgid "Duplicates the current line"
+msgstr "Duplica linia curenta"
+
+#. Resource IDs: (3751)
+msgid "E"
+msgstr "E"
+
+#. Resource IDs: (105)
+msgid "E&xit"
+msgstr "Iesire"
+
+#. Resource IDs: (3757)
+msgid "ENC"
+msgstr "ENC"
+
+#. Resource IDs: (3759)
+msgid "EOL"
+msgstr "EOL"
+
+#. Resource IDs: (3751)
+msgid "Edit"
+msgstr "Editeaza"
+
+#. Resource IDs: (3780)
+msgid "Enable to automatically add a closing brace when an opening brace is entered"
+msgstr "Permite inchiderea automata de acolade cand o acolada deschisa este introdusa"
+
+#. Resource IDs: (3755)
+msgid "Encoding"
+msgstr "Codare"
+
+#. Resource IDs: (65535)
+msgid "Extension"
+msgstr "Extensie"
+
+#. Resource IDs: (3751, 3752, 3760)
+msgid "F"
+msgstr "F"
+
+#. Resource IDs: (3760, 3777)
+msgid "FN"
+msgstr "FN"
+
+#. Resource IDs: (3761)
+msgid "FP"
+msgstr "FP"
+
+#. Resource IDs: (3761)
+msgid "FSN"
+msgstr "FSN"
+
+#. Resource IDs: (9)
+msgid "Failed to download the list of available languages."
+msgstr "Descarcarea listei de limbi disponibile a esuat."
+
+#. Resource IDs: (9)
+msgid "Fetch remote languages..."
+msgstr "Preia limbile externe..."
+
+#. Resource IDs: (3751)
+msgid "File"
+msgstr "Fisier"
+
+#. Resource IDs: (7)
+msgid "File is too big to be opened by BowPad"
+msgstr "Fisierul este prea mare sa fie deschis cu BowPad"
+
+#. Resource IDs: (3772)
+msgid "Find"
+msgstr "Cauta"
+
+#. Resource IDs: (3758)
+msgid "Find && Replace"
+msgstr "Cauta && inlocuieste"
+
+#. Resource IDs: (1065)
+msgid "Find &All"
+msgstr "Cauta tot"
+
+#. Resource IDs: (1066)
+msgid "Find All In All Open &Tabs"
+msgstr "Cauta &Tot in Toate Filele Deschise"
+
+#. Resource IDs: (3758)
+msgid "Find Next"
+msgstr "Cauta Urmatorul"
+
+#. Resource IDs: (3758)
+msgid "Find Next Selected"
+msgstr "Cauta Urmatorul Selectat"
+
+#. Resource IDs: (3758)
+msgid "Find Previous"
+msgstr "Cauta Anteriorul"
+
+#. Resource IDs: (143)
+msgid "Find and replace"
+msgstr "Cauta si inlocuieste"
+
+#. Resource IDs: (3758)
+msgid "Find/Replace"
+msgstr "Cauta/Inlocuieste"
+
+#. Resource IDs: (65535)
+msgid "Font"
+msgstr "Font"
+
+#. Resource IDs: (3773)
+msgid "Functions"
+msgstr "Functii"
+
+#. Resource IDs: (3767)
+msgid "GL"
+msgstr "GL"
+
+#. Resource IDs: (145, 3763)
+msgid "Go to line"
+msgstr "Du-te la linie"
+
+#. Resource IDs: (3764)
+msgid "Goto"
+msgstr "Du-te la"
+
+#. Resource IDs: (3752)
+msgid "H"
+msgstr "H"
+
+#. Resource IDs: (3754)
+msgid "Inserts the content of the clipboard at the cursor position"
+msgstr "Insereaza continutul din clipboard la pozitia cursorului"
+
+#. Resource IDs: (1021)
+msgid "Italic"
+msgstr "Cursiv"
+
+#. Resource IDs: (3765)
+msgid "JL"
+msgstr "JL"
+
+#. Resource IDs: (3761)
+msgid "Join Lines"
+msgstr "Uneste Liniile"
+
+#. Resource IDs: (3761)
+msgid "Join selected lines to one long line"
+msgstr "Uneste liniile selectate sa formeze o linie lunga"
+
+#. Resource IDs: (8)
+msgid "Keep the document\nThe document is kept open."
+msgstr "Pastreaza documentul\nDocumentul este pastrat deschis."
+
+#. Resource IDs: (3757)
+msgid "LA"
+msgstr "LA"
+
+#. Resource IDs: (3758)
+msgid "LANG"
+msgstr "LANG"
+
+#. Resource IDs: (3766)
+msgid "LD"
+msgstr "LD"
+
+#. Resource IDs: (3759)
+msgid "LF"
+msgstr "LF"
+
+#. Resource IDs: (3765, 3771, 3777)
+msgid "LS"
+msgstr "LS"
+
+#. Resource IDs: (3766)
+msgid "LU"
+msgstr "LU"
+
+#. Resource IDs: (3756)
+msgid "Language"
+msgstr "Limba"
+
+#. Resource IDs: (9)
+msgid "Language selected.\nYou need to restart BowPad for the changes to take effect."
+msgstr "Limba selectata.\nTrebuie sa reporniti BowPad ca schimbarile sa aiba efect."
+
+#. Resource IDs: (65535)
+msgid "Language:"
+msgstr "Limba :"
+
+#. Resource IDs: (3768)
+msgid "Launch in Chrome"
+msgstr "Lanseaza in Chrome"
+
+#. Resource IDs: (3768)
+msgid "Launch in Firefox"
+msgstr "Lanseaza in Firefox"
+
+#. Resource IDs: (3768)
+msgid "Launch in Google Chrome"
+msgstr "Lanseaza in Google Chrome"
+
+#. Resource IDs: (3767)
+msgid "Launch in IE"
+msgstr "Lanseaza in IE"
+
+#. Resource IDs: (3767)
+msgid "Launch in Internet Explorer"
+msgstr "Lanseaza in Internet Explorer"
+
+#. Resource IDs: (3768)
+msgid "Launch in Opera"
+msgstr "Lanseaza in Opera"
+
+#. Resource IDs: (3768)
+msgid "Launch in Safari"
+msgstr "Lanseaza in Safari"
+
+#. Resource IDs: (10)
+msgid "Line"
+msgstr "Linie"
+
+#. Resource IDs: (3756)
+msgid "Line Endings"
+msgstr "Terminatii de Linie"
+
+#. Resource IDs: (10)
+msgid "Line Text"
+msgstr "Linie de Text"
+
+#. Resource IDs: (65535)
+msgid "Line:"
+msgstr "Linie :"
+
+#. Resource IDs: (3760)
+msgid "Lines"
+msgstr "Linii"
+
+#. Resource IDs: (3756)
+msgid "Load as"
+msgstr "Incarcati ca"
+
+#. Resource IDs: (3772)
+msgid "Load last session"
+msgstr "Incarcati ultima sesiune"
+
+#. Resource IDs: (3773)
+msgid "Load last session on start"
+msgstr "Incarcati ultima sesiune la pornire"
+
+#. Resource IDs: (3772)
+msgid "Load session"
+msgstr "Incarcati sesiunea"
+
+#. Resource IDs: (3773)
+msgid "Load session on start"
+msgstr "Incarcati sesiunea la pornire"
+
+#. Resource IDs: (3773)
+msgid "Loads all files automatically that were open the last time BowPad got closed"
+msgstr "Incarcati automat toate fisierele care erau deschise ultima data cand BowPad a fost inchis"
+
+#. Resource IDs: (3772)
+msgid "Loads all files that were open the last time BowPad got closed"
+msgstr "Incarcati toate fisierele care erau deschise ultima data cand BowPad a fost inchis"
+
+#. Resource IDs: (3760)
+msgid "Lowercase"
+msgstr "Minuscule"
+
+#. Resource IDs: (3751, 3752)
+msgid "M"
+msgstr "M"
+
+#. Resource IDs: (3759)
+msgid "MAC"
+msgstr "MAC"
+
+#. Resource IDs: (3757)
+msgid "MAC (CR)"
+msgstr "MAC (CR)"
+
+#. Resource IDs: (3764)
+msgid "ML"
+msgstr "ML"
+
+#. Resource IDs: (18)
+msgid "MRU List"
+msgstr "Lista MRU"
+
+#. Resource IDs: (3763)
+msgid "MU"
+msgstr "MU"
+
+#. Resource IDs: (3751)
+msgid "Main"
+msgstr "Principal"
+
+#. Resource IDs: (8)
+msgid "Main Encodings"
+msgstr "Codari principale"
+
+#. Resource IDs: (1008)
+msgid "Match &case"
+msgstr "Respe&cta marimea"
+
+#. Resource IDs: (1007)
+msgid "Match &whole word only"
+msgstr "Respecta cuvantul in intregime"
+
+#. Resource IDs: (3765)
+msgid "Misc"
+msgstr "Divers"
+
+#. Resource IDs: (3762)
+msgid "Move down"
+msgstr "Deplaseaza in jos"
+
+#. Resource IDs: (3763)
+msgid "Move line down"
+msgstr "Deplaseaza linia in jos"
+
+#. Resource IDs: (3762)
+msgid "Move line up"
+msgstr "Deplaseaza linia in sus"
+
+#. Resource IDs: (3765)
+msgid "Move the caret to the next bookmark"
+msgstr "Muta cursorul la semnul de carte urmator"
+
+#. Resource IDs: (3765)
+msgid "Move the caret to the previous bookmark"
+msgstr "Muta cursorul la semnul de carte anterior"
+
+#. Resource IDs: (3761)
+msgid "Move up"
+msgstr "Deplaseaza in sus"
+
+#. Resource IDs: (3763)
+msgid "Moves the cursor to the specified line"
+msgstr "Muta cursorul la linia specificata"
+
+#. Resource IDs: (3762)
+msgid "Moves the selected lines downwards"
+msgstr "Muta ??liniile selectate în jos"
+
+#. Resource IDs: (3762)
+msgid "Moves the selected lines upwards"
+msgstr "Muta ??liniile selectate în sus"
+
+#. Resource IDs: (3758)
+msgid "Moves to the next match of the last search"
+msgstr "Trece la urmatoarea existenta a ultimei cautari"
+
+#. Resource IDs: (3758)
+msgid "Moves to the previous match of the last search"
+msgstr "Trece la precedenta existenta a ultimei cautari"
+
+#. Resource IDs: (3753)
+msgid "N"
+msgstr "N"
+
+#. Resource IDs: (3760)
+msgid "NEXT"
+msgstr "NEXT"
+
+#. Resource IDs: (7)
+#, c-format
+msgid "New %d"
+msgstr "%d Nou"
+
+#. Resource IDs: (3752)
+msgid "New Document"
+msgstr "Document Nou"
+
+#. Resource IDs: (3757)
+msgid "Next"
+msgstr "Urmatorul"
+
+#. Resource IDs: (3765)
+msgid "Next Bookmarks"
+msgstr "Urmatorul semn de carte"
+
+#. Resource IDs: (10)
+msgid "No functions found!"
+msgstr "Nicio functie nu a fost gasita!"
+
+#. Resource IDs: (9)
+msgid "No updates available.\nYou already have the current version."
+msgstr "Nu exista actualizari disponibile.\nAveti ultima versiune."
+
+#. Resource IDs: (3753)
+msgid "O"
+msgstr "O"
+
+#. Resource IDs: (1)
+msgid "OK"
+msgstr "OK"
+
+#. Resource IDs: (9)
+msgid "Online Languages"
+msgstr "Limbi online"
+
+#. Resource IDs: (3752)
+msgid "Open"
+msgstr "Deschide"
+
+#. Resource IDs: (3769)
+msgid "Open Console"
+msgstr "Deschide Consola"
+
+#. Resource IDs: (3769)
+msgid "Open Explorer"
+msgstr "Deschide Explorer"
+
+#. Resource IDs: (3752)
+msgid "Open Files"
+msgstr "Deschide Fisiere"
+
+#. Resource IDs: (3775)
+msgid "Open corresponding File"
+msgstr "Deschide Fisierul corespunzator"
+
+#. Resource IDs: (10)
+msgid "Open elevated\nBowPad is started again with elevated privileges."
+msgstr "Deschide cu privilegii elevate\nBowPad este repornit cu privilegii elevate."
+
+#. Resource IDs: (3752)
+msgid "Opens one or more files"
+msgstr "Deschide unu sau mai multe fisiere"
+
+#. Resource IDs: (3769)
+msgid "Opens the Console at the current file location"
+msgstr "Deschide Consola la calea fisierului curent"
+
+#. Resource IDs: (3769)
+msgid "Opens the Windows Explorer at the current file location"
+msgstr "Deschide Windows Explorer la calea fisierului curent"
+
+#. Resource IDs: (3774)
+msgid "Opens the Windows Explorer at the current file path"
+msgstr "Deschide Windows Explorer la calea fisierului curent"
+
+#. Resource IDs: (3775)
+msgid "Opens the config file to configure keyboard shortcuts for any command in BowPad"
+msgstr "Deschide fisierul de configurare a scurtaturilor de tastatura pentru orice comanda in BowPad"
+
+#. Resource IDs: (3772)
+msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
+msgstr "Deschide fisierul corespunzator fisierului deschis in fila curenta.\n(h/cpp, aspx/cs/vb)"
+
+#. Resource IDs: (3767)
+msgid "Opens the current file in Microsoft Internet Explorer"
+msgstr "Deschide fisierul curent in Microsoft Internet Explorer"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Firefox browser"
+msgstr "Deschide fisierul curent in Firefox"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Google Chrome browser"
+msgstr "Deschide fisierul curent in Google Chrome"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Opera browser"
+msgstr "Deschide fisierul curent in Opera"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Safari browser"
+msgstr "Deschide fisierul curent in Safari"
+
+#. Resource IDs: (3769)
+msgid "Opens the default browser to search Wikipedia for the selected text"
+msgstr "Deschide navigatorul implicit pentru a cauta in Wikipedia textul selectat"
+
+#. Resource IDs: (3769)
+msgid "Opens the default browser to search for the selected text"
+msgstr "Deschide navigatorul implicit pentru a cauta textul selectat"
+
+#. Resource IDs: (3766)
+msgid "P"
+msgstr "P"
+
+#. Resource IDs: (3767)
+msgid "PP"
+msgstr "PP"
+
+#. Resource IDs: (3759)
+msgid "PREV"
+msgstr "PREV"
+
+#. Resource IDs: (3767)
+msgid "PS"
+msgstr "PS"
+
+#. Resource IDs: (3763)
+msgid "Page Setup"
+msgstr "Configurare Pagina"
+
+#. Resource IDs: (3754)
+msgid "Paste"
+msgstr "Lipeste"
+
+#. Resource IDs: (3757)
+msgid "Previous"
+msgstr "Precedent"
+
+#. Resource IDs: (3765)
+msgid "Previous Bookmarks"
+msgstr "Semne de carte precedente"
+
+#. Resource IDs: (3762)
+msgid "Print"
+msgstr "Tipareste"
+
+#. Resource IDs: (3763)
+msgid "Print Page Setup"
+msgstr "Configurare Pagina de Tiparit"
+
+#. Resource IDs: (3762)
+msgid "Print now"
+msgstr "Tipareste Acum"
+
+#. Resource IDs: (3762)
+msgid "Print..."
+msgstr "Tipareste..."
+
+#. Resource IDs: (1006)
+msgid "R&eplace with:"
+msgstr "Inlocui&este cu :"
+
+#. Resource IDs: (3769)
+msgid "RELOAD"
+msgstr "RELOAD"
+
+#. Resource IDs: (3754, 3755)
+msgid "Redo"
+msgstr "Reface"
+
+#. Resource IDs: (3755)
+msgid "Redo what was undone before"
+msgstr "Reface ce a fost anulat anterior"
+
+#. Resource IDs: (10)
+msgid "Regex expression is invalid!"
+msgstr "Expresia regex este invalida!"
+
+#. Resource IDs: (10)
+msgid "Regex expression is valid"
+msgstr "Expresia regex este valida"
+
+#. Resource IDs: (3765)
+msgid "Reload"
+msgstr "Reincarca"
+
+#. Resource IDs: (8)
+msgid "Reload document\nThe document is refreshed from disk."
+msgstr "Reincarca documentul\nDocumentul este reincarcat de pe disc."
+
+#. Resource IDs: (8)
+msgid "Reload document\nThe unsaved modifications are lost."
+msgstr "Reincarca documentul\nSchimbarile nesalvate se vor pierde."
+
+#. Resource IDs: (3765)
+msgid "Reload the file from disk"
+msgstr "Reincarca fisierul de pe disc"
+
+#. Resource IDs: (3765)
+msgid "Removes all bookmarks from the current file"
+msgstr "Elimina toate semnele de carte din fisierul curent"
+
+#. Resource IDs: (3763)
+msgid "Removes whitespaces at the end of lines"
+msgstr "Elimina spatiile libere de la sfarsitul liniilor"
+
+#. Resource IDs: (1004)
+msgid "Replace A&ll"
+msgstr "In&locuieste tot"
+
+#. Resource IDs: (3759)
+msgid "Right margin"
+msgstr "Margine dreapta"
+
+#. Resource IDs: (3753)
+msgid "S"
+msgstr "S"
+
+#. Resource IDs: (3762)
+msgid "SA"
+msgstr "SA"
+
+#. Resource IDs: (3777)
+msgid "SAL"
+msgstr "SAL"
+
+#. Resource IDs: (3762, 3769)
+msgid "ST"
+msgstr "ST"
+
+#. Resource IDs: (3754)
+msgid "Sa&ve as"
+msgstr "Sal&veaza ca"
+
+#. Resource IDs: (3753)
+msgid "Save &all"
+msgstr "Salveaza to&ate"
+
+#. Resource IDs: (3752)
+msgid "Save File"
+msgstr "Salveaza Fisier"
+
+#. Resource IDs: (3753)
+msgid "Save Files"
+msgstr "Salveaza Fisiere"
+
+#. Resource IDs: (3753)
+msgid "Save as"
+msgstr "Salveaza ca"
+
+#. Resource IDs: (10)
+msgid "Save elevated\nBowPad is started again with elevated privileges."
+msgstr "Salveaza cu privilegii elevate\nBowPad este repornit cu privilegii elevate."
+
+#. Resource IDs: (8)
+msgid "Save modifications\nThe modifications that were made outside BowPad are overwritten."
+msgstr "Salveaza modificarile\nModificarile realizate in afara BowPad vor fi suprascrise."
+
+#. Resource IDs: (3753)
+msgid "Saves all open files"
+msgstr "Salveaza toate fisierele deschise"
+
+#. Resource IDs: (3752)
+msgid "Saves the current tab"
+msgstr "Salveaza fila curenta"
+
+#. Resource IDs: (1009)
+msgid "Search Regex mode"
+msgstr "Cautare in mod Regex"
+
+#. Resource IDs: (3769)
+msgid "Search Web"
+msgstr "Cauta in Web"
+
+#. Resource IDs: (3769)
+msgid "Search Wikipedia"
+msgstr "Cauta Wikipedia"
+
+#. Resource IDs: (3758)
+msgid "Search and/or replace text in documents/tabs"
+msgstr "Cauta si/sau inlocuieste text in documente/file"
+
+#. Resource IDs: (10)
+msgid "Search text not found!"
+msgstr "Textul cautat nu a fost gasit!"
+
+#. Resource IDs: (3759)
+msgid "Searches for the next match of the selected text"
+msgstr "Cauta urmatoarea potrivire pentru textul selectat"
+
+#. Resource IDs: (3766)
+msgid "Select Language"
+msgstr "Selecteaza o Limba"
+
+#. Resource IDs: (3758)
+msgid "Select all"
+msgstr "Selecteaza tot"
+
+#. Resource IDs: (3766)
+msgid "Select the language for BowPad"
+msgstr "Selecteaza limba pentru BowPad"
+
+#. Resource IDs: (3762)
+msgid "Sends the document to a printer"
+msgstr "Trimite documentul catre o imprimanta"
+
+#. Resource IDs: (3762)
+msgid "Sends the document to the default printer"
+msgstr "Trimite documentul catre imprimanta implicita"
+
+#. Resource IDs: (3756)
+msgid "Set the coloring according to the code language"
+msgstr "Setati culoarea in functie de limba de cod"
+
+#. Resource IDs: (3760)
+msgid "Set the number of columns for one tabulator."
+msgstr "Setati numarul de coloane pentru un tabulator."
+
+#. Resource IDs: (3763)
+msgid "Set up print margins, page size, page orientation"
+msgstr "Configurarea marginilor de imprimare, dimensiunea paginii, orientarea paginii"
+
+#. Resource IDs: (3759)
+msgid "Sets the column at which the vertical edge is shown, indicating the right margin. Set to 0 to hide it."
+msgstr "Seteaza coloana la care este afisata marginea verticala, indicand marginea din dreapta. Setati la 0 sa o ascundeti."
+
+#. Resource IDs: (3774, 3775)
+msgid "Show Properties"
+msgstr "Afiseaza Proprietati"
+
+#. Resource IDs: (3755)
+msgid "Show Whitespaces"
+msgstr "Afiseaza Spatiile Goale"
+
+#. Resource IDs: (3772)
+msgid "Shows a dialog to configure custom commands"
+msgstr "Afiseaza o fereastra de configurare comenzi personalizate"
+
+#. Resource IDs: (3773)
+msgid "Shows a list of functions/methods in the file to jump to"
+msgstr "Afiseaza o lista de functii/metode din fisier la care sa se sara"
+
+#. Resource IDs: (3775)
+msgid "Shows the Windows Explorer file properties dialog for the current file"
+msgstr "Afiseaza fereastra de proprietati din Windows Explorer pentru fisierul curent"
+
+#. Resource IDs: (3764)
+msgid "Spaces to Tabs"
+msgstr "Spatii in Taburi"
+
+#. Resource IDs: (3761)
+msgid "Split Lines"
+msgstr "Desparte Liniile"
+
+#. Resource IDs: (3761)
+msgid "Split long lines at the right window border"
+msgstr "Desparte liniile lungi de la marginea din dreapta a ferestrei"
+
+#. Resource IDs: (144)
+msgid "Style Configurator"
+msgstr "Configurator de Stil"
+
+#. Resource IDs: (65535)
+msgid "Style:"
+msgstr "Stil :"
+
+#. Resource IDs: (65535)
+msgid "Styles"
+msgstr "Stiluri :"
+
+#. Resource IDs: (3768)
+msgid "T"
+msgstr "T"
+
+#. Resource IDs: (3764, 3768)
+msgid "TS"
+msgstr "TS"
+
+#. Resource IDs: (3771)
+msgid "TT"
+msgstr "TT"
+
+#. Resource IDs: (3764)
+msgid "Tabs to Spaces"
+msgstr "Taburi in Spatii"
+
+#. Resource IDs: (8)
+#, c-format
+msgid "The document '%s' was modified outside of BowPad, but there are unsaved changes in the document."
+msgstr "Documentul '%s' a fost modificat in afara BowPad, dar exista modificari nesalvate in document."
+
+#. Resource IDs: (8)
+#, c-format
+msgid "The document '%s' was modified outside of BowPad."
+msgstr "Documentul '%s' a fost modificat in afara BowPad."
+
+#. Resource IDs: (8)
+#, c-format
+msgid "The document '%s' was removed outside of BowPad."
+msgstr "Documentul '%s' a fost eliminat in afara BowPad."
+
+#. Resource IDs: (3764)
+msgid "Title case"
+msgstr "Titlu"
+
+#. Resource IDs: (3765)
+msgid "Toggle Bookmark"
+msgstr "Comuta Semne de Carte"
+
+#. Resource IDs: (3765)
+msgid "Toggle a bookmark on the current line"
+msgstr "Comuta semnul de carte pe linia curenta"
+
+#. Resource IDs: (3766)
+msgid "Toggles between the normal and the dark theme"
+msgstr "Comuta intre tema normala si cea sumbra"
+
+#. Resource IDs: (3763)
+msgid "Trim Whitespaces"
+msgstr "Eliminare spatii goale"
+
+#. Resource IDs: (9)
+msgid "Turn off automatic update checks"
+msgstr "Dezactiveaza cautarile de actualizare automata"
+
+#. Resource IDs: (3757)
+msgid "Turns showing whitespaces on/off.\nHold down the Shift key to show EOLs as well."
+msgstr "Porneste/Opreste afisarea spatiilor goale.\nTine apasat tasta Shift pentru a afisa de asemenea toate finalurile de linie."
+
+#. Resource IDs: (3751)
+msgid "U"
+msgstr "U"
+
+#. Resource IDs: (3759)
+msgid "UPPER/lower"
+msgstr "Superior/Inferior"
+
+#. Resource IDs: (3764)
+msgid "UT"
+msgstr "UT"
+
+#. Resource IDs: (3759)
+msgid "Uncomment"
+msgstr "Decomenteaza"
+
+#. Resource IDs: (3759)
+msgid "Uncomments the selected text"
+msgstr "Decomenteaza textul selectat"
+
+#. Resource IDs: (1009)
+msgid "Underline"
+msgstr "Subliniere"
+
+#. Resource IDs: (3751, 3754)
+msgid "Undo"
+msgstr "Anulare"
+
+#. Resource IDs: (3754)
+msgid "Undo the last change"
+msgstr "Anuleaza ultima modificare"
+
+#. Resource IDs: (3757)
+msgid "Unix (LF)"
+msgstr "Unix (LF)"
+
+#. Resource IDs: (7)
+msgid "Unsafed modifications"
+msgstr "Modificari nesalvate"
+
+#. Resource IDs: (3759, 3760)
+msgid "Uppercase"
+msgstr "Majuscule"
+
+#. Resource IDs: (10)
+msgid "Use $0 for the whole match, and $1..$99 for group matches."
+msgstr "Utilizeaza $0 pentru o potrivire intreaga, si $1..$99 pentru potriviri de grup."
+
+#. Resource IDs: (3760)
+msgid "Use Tabs"
+msgstr "Utilizeaza File"
+
+#. Resource IDs: (3751, 3752, 3755)
+msgid "V"
+msgstr "V"
+
+#. Resource IDs: (3752, 3762)
+msgid "VE"
+msgstr "VE"
+
+#. Resource IDs: (3751)
+msgid "Vertical Edge"
+msgstr "Bordura Verticala"
+
+#. Resource IDs: (3751)
+msgid "View"
+msgstr "Vizualizeaza"
+
+#. Resource IDs: (1026)
+msgid "Visit our Website"
+msgstr "Vizitati pagina noastra web"
+
+#. Resource IDs: (3756)
+msgid "W"
+msgstr "W"
+
+#. Resource IDs: (3757)
+msgid "WS"
+msgstr "WS"
+
+#. Resource IDs: (1059)
+msgid "Web Search:"
+msgstr "Cautare pe internet:"
+
+#. Resource IDs: (3755)
+msgid "Whitespace"
+msgstr "Spatii goale"
+
+#. Resource IDs: (3757)
+msgid "Windows (CRLF)"
+msgstr "Windows (CRLF)"
+
+#. Resource IDs: (3755)
+msgid "Wrap Lines"
+msgstr "Incadrare linii"
+
+#. Resource IDs: (9)
+msgid "Wrap around"
+msgstr "Incadrare imprejur"
+
+#. Resource IDs: (3755)
+msgid "Wrap lines at the end of the window"
+msgstr "Incadrare linii la finalul ferestrei"
+
+#. Resource IDs: (3752, 3755)
+msgid "X"
+msgstr "X"
+
+#. Resource IDs: (3756)
+msgid "Y"
+msgstr "Y"
+
+#. Resource IDs: (9)
+msgid "You can use the following strings in the command line:\r\n$(LINE)\t\t\tThe line where the cursor is\r\n$(POS)\t\t\tthe position where the cursor is\r\n$(TAB_PATH)\t\tthe path to the file of the active tab\r\n$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
+msgstr "Puteti sa utilizati urmatorul text in linie de comanda:\r\n$(LINE)\t\t\Linia unde este cursorul\r\n$(POS)\t\t\tpozitia unde este cursorul\r\n$(TAB_PATH)\t\tcalea catre fisierul din fila activa\r\n$(TAB_DIR)\t\tdirectorul fisierului din fila activa\r\n$(SEL-TEXT)\t\ttextul selectat sau cuvantul de la pozitia cursorului\r\n$(SEL_TEXT_ESCAPED)\tca $(SEL_TEXT) dar fara caractere speciale, util pentru url-uri"
+
+#. Resource IDs: (3756)
+msgid "Z"
+msgstr "Z"
+
+#. Resource IDs: (65535)
+msgid "background:"
+msgstr "fond :"
+
+#. Resource IDs: (65535)
+msgid "foreground:"
+msgstr "prim plan :"
+
+#. Resource IDs: (8)
+#, c-format
+msgid "from %ld to %ld"
+msgstr "De la %ld la %ld"
+
+#. Resource IDs: (3757)
+msgid "go to the next cursor position"
+msgstr "mergi la urmatoarea pozitie a cursorului"
+
+#. Resource IDs: (3757)
+msgid "go to the previous cursor position"
+msgstr "mergi la precedenta pozitie a cursorului"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 0"
+msgstr "ruleaza comanda personalizata 0"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 1"
+msgstr "ruleaza comanda personalizata 1"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 2"
+msgstr "ruleaza comanda personalizata 2"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 3"
+msgstr "ruleaza comanda personalizata 3"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 4"
+msgstr "ruleaza comanda personalizata 4"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 5"
+msgstr "ruleaza comanda personalizata 5"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 6"
+msgstr "ruleaza comanda personalizata 6"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 7"
+msgstr "ruleaza comanda personalizata 7"
+
+#. Resource IDs: (3772)
+msgid "runs the custom command 8"
+msgstr "ruleaza comanda personalizata 8"
+
+#. Resource IDs: (3772)
+msgid "runs the custom command 9"
+msgstr "ruleaza comanda personalizata 9"
+
+#. Resource IDs: (3760)
+msgid "tab size"
+msgstr "dimensiune tab"

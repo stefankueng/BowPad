@@ -1,0 +1,93 @@
+﻿<?xml version="1.0"?>
+<project name="setup" default="setup">
+
+  <target name="VersionInfo">
+    <description>
+      Sets the version information as properties, env variables
+      and sets up the different version specific files.
+    </description>
+    <nant target="versioninfo">
+      <buildfiles>
+        <include name="..\..\versioninfo.build" />
+      </buildfiles>
+    </nant>
+    <loadfile file="VersionNumberInclude.in.wxi" property="versionwixfile">
+      <filterchain>
+        <replacetokens begintoken="$" endtoken="$">
+          <token key="MajorVersion" value="${environment::get-variable('MajorVersion')}" />
+          <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
+          <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
+          <token key="WCREV" value="${environment::get-variable('WCREV')}" />
+        </replacetokens>
+      </filterchain>
+    </loadfile>
+    <echo file="VersionNumberInclude.wxi" message="${versionwixfile}" />
+  </target>
+
+  <target name="setup" depends="VersionInfo">
+    <property name="verstring" value="${environment::get-variable('MajorVersion')}.${environment::get-variable('MinorVersion')}.${environment::get-variable('MicroVersion')}" />
+    <property name="msifilename" value="BowPad-${verstring}" />
+    <exec program="candle">
+      <arg value="-nologo" />
+      <arg value="-out" />
+      <arg value="..\..\bin\" />
+      <arg value="Setup.wxs" />
+    </exec>
+    <exec program="light">
+      <arg value="-nologo" />
+      <arg value="-ext" />
+      <arg value="WixUIExtension" />
+      <arg value="-ext" />
+      <arg value="WixUtilExtension" />
+      <arg value="-cultures:en-us" />
+      <arg value="-out" />
+      <arg value="..\..\bin\${msifilename}.msi" />
+      <arg value="..\..\bin\Setup.wixobj" />
+    </exec>
+    <delete>
+      <fileset>
+        <include name="..\..\bin\*.wixobj" />
+        <include name="..\..\bin\*.wixpdb" />
+      </fileset>
+    </delete>
+    <if test="${file::exists('..\..\signinfo.txt')}">
+      <exec program="${signtool}">
+        <arg value="sign" />
+        <arg value="${signinfo}" />
+        <arg value="..\..\bin\${msifilename}.msi" />
+      </exec>
+    </if>
+    <!-- x64 -->
+    <property name="msifilename64" value="BowPad64-${verstring}" />
+    <exec program="candle">
+      <arg value="-nologo" />
+      <arg value="-out" />
+      <arg value="..\..\bin\" />
+      <arg value="Setup64.wxs" />
+    </exec>
+    <exec program="light">
+      <arg value="-nologo" />
+      <arg value="-ext" />
+      <arg value="WixUIExtension" />
+      <arg value="-ext" />
+      <arg value="WixUtilExtension" />
+      <arg value="-cultures:en-us" />
+      <arg value="-out" />
+      <arg value="..\..\bin\${msifilename64}.msi" />
+      <arg value="..\..\bin\Setup64.wixobj" />
+    </exec>
+    <delete>
+      <fileset>
+        <include name="..\..\bin\*.wixobj" />
+        <include name="..\..\bin\*.wixpdb" />
+      </fileset>
+    </delete>
+    <if test="${file::exists('..\..\signinfo.txt')}">
+      <exec program="${signtool}">
+        <arg value="sign" />
+        <arg value="${signinfo}" />
+        <arg value="..\..\bin\${msifilename64}.msi" />
+      </exec>
+    </if>
+  </target>
+</project>
