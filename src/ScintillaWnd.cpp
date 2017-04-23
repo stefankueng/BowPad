@@ -190,6 +190,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETMULTIPLESELECTION, 1);
     Call(SCI_SETMOUSESELECTIONRECTANGULARSWITCH, true);
     Call(SCI_SETADDITIONALSELECTIONTYPING, true);
+    Call(SCI_SETADDITIONALCARETSBLINK, false);
     Call(SCI_SETMULTIPASTE, SC_MULTIPASTE_EACH);
     Call(SCI_SETVIRTUALSPACEOPTIONS, SCVS_RECTANGULARSELECTION);
 
@@ -935,6 +936,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_SETSELFORE, TRUE, theme.GetThemeColor(RGB(255, 255, 255)));
     Call(SCI_SETSELBACK, TRUE, theme.GetThemeColor(RGB(51, 153, 255)));
     Call(SCI_SETCARETFORE, theme.GetThemeColor(RGB(0, 0, 0)));
+    Call(SCI_SETADDITIONALCARETFORE, theme.GetThemeColor(RGB(0, 0, 80)));
 
     if (theme.IsDarkTheme())
     {
