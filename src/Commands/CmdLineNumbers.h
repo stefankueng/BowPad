@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2014, 2016-2017 - Stefan Kueng
 //
@@ -35,9 +35,7 @@ public:
         bool bShowLineNumbers = CIniSettings::Instance().GetInt64(L"View", L"linenumbers", 1) != 0;
         CIniSettings::Instance().SetInt64(L"View", L"linenumbers", bShowLineNumbers ? 0 : 1);
 
-        // Call DocScrollUpdate(): it updates the whole view, generating an SCN_PAINTED notification
-        // which then calls UpdateLineNumberWidth() - which is what we want.
-        DocScrollUpdate();
+        UpdateLineNumberWidth();
 
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         return true;
