@@ -279,6 +279,11 @@ void ICommand::DocScrollRemoveLine( int type, size_t line )
     m_pMainWindow->m_editor.DocScrollRemoveLine(type, line);
 }
 
+void ICommand::UpdateLineNumberWidth()
+{
+    m_pMainWindow->m_editor.UpdateLineNumberWidth();
+}
+
 void ICommand::DocScrollUpdate()
 {
     m_pMainWindow->m_editor.DocScrollUpdate();

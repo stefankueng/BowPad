@@ -907,6 +907,8 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID      /*riid*/,
             idList[i] = 131;
         else if (_wcsicmp(nameList[i], L"SaveDoc") == 0)
             idList[i] = 132;
+        else if (_wcsicmp(nameList[i], L"UpdateLineNumberWidth") == 0)
+            idList[i] = 133;
         else if (_wcsicmp(nameList[i], L"SciGetTextRange") == 0)
             idList[i] = 900;
         else if (_wcsicmp(nameList[i], L"SciGetCharAt") == 0)
@@ -1216,6 +1218,11 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
                 return DISP_E_TYPEMISMATCH;
             ret->vt = VT_BOOL;
             ret->boolVal = SaveDoc(DocID({ p1.intVal }), !!p2.boolVal) ? VARIANT_TRUE : VARIANT_FALSE;
+            break;
+        case 133: // UpdateLineNumberWidth
+            if (args->cArgs != 0)
+                return DISP_E_BADPARAMCOUNT;
+            UpdateLineNumberWidth();
             break;
         case 900: // SciGetTextRange
             if (args->cArgs != 2)
