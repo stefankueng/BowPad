@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -173,6 +173,8 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
     {
         for (auto countPathPair = items.crbegin(); countPathPair != items.crend(); ++countPathPair)
         {
+            if (i >= CIniSettings::Instance().GetInt64(L"Defaults", L"MRUSize", 20))
+                break;
             const MRUItem& mru = *countPathPair;
 
             CRecentFileProperties* pPropertiesObj = nullptr;
@@ -230,7 +232,7 @@ void CMRU::AddPath( const std::wstring& path )
             break;
         }
     }
-    if (m_mruVec.size() >= 20)
+    if (m_mruVec.size() >= (size_t)CIniSettings::Instance().GetInt64(L"Defaults", L"MRUSize", 20))
     {
         // Clear out an old entry if it's not pinned
         for (auto it = m_mruVec.begin(); it != m_mruVec.end(); ++it)
