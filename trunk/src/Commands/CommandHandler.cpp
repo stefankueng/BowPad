@@ -213,6 +213,7 @@ void CCommandHandler::Init(void * obj)
     Add<CCmdSpellcheckAll>(obj);
     Add<CCmdSpellcheckUpper>(obj);
 
+    Add<CCmdLaunchEdge>(obj);
     Add<CCmdLaunchIE>(obj);
     Add<CCmdLaunchFirefox>(obj);
     Add<CCmdLaunchChrome>(obj);
