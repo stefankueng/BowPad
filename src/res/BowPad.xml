@@ -514,6 +514,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/PlayL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdLaunchEdge" LabelTitle="Launch in Edge" TooltipTitle="Launch in Edge" TooltipDescription="Opens the current file in Microsoft Edge browser">
+      <Command.LargeImages>
+        <Image>res/EdgeL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdLaunchIE" LabelTitle="Launch in IE" TooltipTitle="Launch in Internet Explorer" TooltipDescription="Opens the current file in Microsoft Internet Explorer">
       <Command.LargeImages>
         <Image>res/IEL.bmp</Image>
@@ -935,11 +940,12 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           <Group CommandName="cmdGroupLaunch" SizeDefinition="OneButton">
             <DropDownButton CommandName="cmdLaunchGroup">
               <MenuGroup>
-                <Button CommandName="cmdLaunchIE"/>
+                <Button CommandName="cmdLaunchEdge"/>
                 <Button CommandName="cmdLaunchFirefox"/>
                 <Button CommandName="cmdLaunchChrome"/>
                 <Button CommandName="cmdLaunchSafari"/>
                 <Button CommandName="cmdLaunchOpera"/>
+                <Button CommandName="cmdLaunchIE"/>
               </MenuGroup>
               <MenuGroup>
                 <Button CommandName="cmdLaunchSearch"/>

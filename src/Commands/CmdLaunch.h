@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
@@ -20,6 +20,8 @@
 #include "BowPadUI.h"
 #include "BaseDialog.h"
 #include "DlgResizer.h"
+#include <Shobjidl.h>
+#include <VersionHelpers.h>
 
 class LaunchBase : public ICommand
 {
@@ -29,6 +31,70 @@ public:
 
 protected:
     bool Launch(const std::wstring& cmdline);
+};
+
+class CCmdLaunchEdge : public LaunchBase
+{
+public:
+    CCmdLaunchEdge(void * obj) : LaunchBase(obj)
+    {
+    }
+    ~CCmdLaunchEdge() = default;
+
+    bool Execute() override
+    {
+        // the Edge browser is not a normal executable but a Windows Store app, so it can't be started like
+        // a normal exe file.
+        // therefore we first try to find out the App ID of Edge (since I'm not sure if the ID won't change)
+        // using the path in Windows\SystemApps. Then we start the browser via the ApplicationActivationMananager
+        // object and pass the path of the file.
+        // only if all of that fails, we fall back to the "microsoft-edge:" protocol handler - this handler
+        // worked fine for all urls in early Win10, but unfortunately won't work in current Win10 versions for
+        // file:/// urls anymore due to security reasons.
+        std::wstring path = L"Microsoft.MicrosoftEdge_8wekyb3d8bbwe!MicrosoftEdge";
+        // first try to get the ID of the Edge browser
+        TCHAR pf[MAX_PATH];
+        SHGetFolderPath(nullptr, CSIDL_WINDOWS, nullptr, SHGFP_TYPE_CURRENT, pf);
+        std::wstring edgepath = pf;
+        edgepath += L"\\SystemApps\\Microsoft.MicrosoftEdge*";
+        WIN32_FIND_DATA filedata = { 0 };
+        auto hSearch = FindFirstFile(edgepath.c_str(), &filedata);
+        if (hSearch != INVALID_HANDLE_VALUE)
+        {
+            path = filedata.cFileName;
+            path += L"!MicrosoftEdge";
+            FindClose(hSearch);
+        }
+        IApplicationActivationManager * activationManager;
+        auto hr = CoCreateInstance(CLSID_ApplicationActivationManager, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&activationManager));
+        bool succeeded = false;
+        if (SUCCEEDED(hr))
+        {
+            const auto& doc = GetActiveDocument();
+            std::wstring tabpath = doc.m_path;
+
+            DWORD newProcessId;
+            hr = activationManager->ActivateApplication(path.c_str(), (L"file:///" + tabpath).c_str(), AO_NONE, &newProcessId);
+            if (SUCCEEDED(hr))
+                succeeded = true;
+        }
+        if (!succeeded)
+            return Launch(L"microsoft-edge:file:///$(TAB_PATH)");
+        return true;
+    }
+    UINT GetCmdId() override
+    {
+        return cmdLaunchEdge;
+    }
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
+    {
+        if (UI_PKEY_Enabled == key)
+        {
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, IsWindows10OrGreater(), ppropvarNewValue);
+        }
+        return E_NOTIMPL;
+    }
+
 };
 
 class CCmdLaunchIE : public LaunchBase
