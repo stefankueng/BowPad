@@ -22,6 +22,7 @@
     <ProjectGuid>{F767677D-B0FE-4C4F-B886-09E501C543B2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>BowPad</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
