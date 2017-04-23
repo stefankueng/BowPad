@@ -98,6 +98,7 @@ protected:
     void                DocScrollAddLineColor(int type, size_t line, COLORREF clr);
     void                DocScrollUpdate();
     void                DocScrollRemoveLine(int type, size_t line);
+    void                UpdateLineNumberWidth();
     void                GotoLine(long line);
     void                Center(sptr_t startPos, sptr_t endPos);
     void                GotoBrace();
