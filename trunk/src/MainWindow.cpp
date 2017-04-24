@@ -124,14 +124,18 @@ static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const
         std::wstring filename = CPathUtils::GetFileName(path);
         IShellItemPtr psiDefFolder = nullptr;
         hr = SHCreateItemFromParsingName(folder.c_str(), nullptr, IID_PPV_ARGS(&psiDefFolder));
-        if (CAppUtils::FailedShowMessage(hr))
-            return false;
-        hr = pfd->SetFolder(psiDefFolder);
-        if (CAppUtils::FailedShowMessage(hr))
-            return false;
-        hr = pfd->SetFileName(filename.c_str());
-        if (CAppUtils::FailedShowMessage(hr))
-            return false;
+        if (!CAppUtils::FailedShowMessage(hr))
+        {
+            hr = pfd->SetFolder(psiDefFolder);
+            if (CAppUtils::FailedShowMessage(hr))
+                return false;
+            if (!filename.empty())
+            {
+                hr = pfd->SetFileName(filename.c_str());
+                if (CAppUtils::FailedShowMessage(hr))
+                    return false;
+            }
+        }
     }
 
     // Show the save file dialog
