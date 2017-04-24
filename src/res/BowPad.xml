@@ -1106,9 +1106,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
-                <ControlGroup>
+                <Row>
                   <ControlSizeDefinition ControlName="button7" ImageSize="Large" IsLabelVisible="true" />
-                </ControlGroup>
+                </Row>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Medium">
                 <ControlGroup>
@@ -1131,9 +1131,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
-                <ControlGroup>
+                <Row>
                   <ControlSizeDefinition ControlName="button7" ImageSize="Large" IsLabelVisible="true" />
-                </ControlGroup>
+                </Row>
               </GroupSizeDefinition>
               <GroupSizeDefinition Size="Small">
                 <ControlGroup>
@@ -1156,9 +1156,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
-                <ControlGroup>
+                <Row>
                   <ControlSizeDefinition ControlName="button7" ImageSize="Large" IsLabelVisible="true" />
-                </ControlGroup>
+                </Row>
               </GroupSizeDefinition>
             </SizeDefinition>
             <ToggleButton CommandName="cmdFileTree" />
