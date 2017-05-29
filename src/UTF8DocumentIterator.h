@@ -32,19 +32,20 @@
 #include "../ext/scintilla/src/RESearch.h"
 #include "../ext/scintilla/src/Document.h"
 #include "../ext/scintilla/src/uniconversion.h"
+#include "../ext/scintilla/src/Position.h"
 
 class UTF8DocumentIterator : public std::iterator<std::bidirectional_iterator_tag, wchar_t>
 {
     // These 3 fields determine the iterator position and are used for comparisons
     const Document *doc;
-    Position position;
+    Sci::Position position;
     size_t characterIndex;
     // Remaining fields are derived from the determining fields so are excluded in comparisons
     unsigned int lenBytes;
     size_t lenCharacters;
     wchar_t buffered[2];
 public:
-    UTF8DocumentIterator(const Document *doc_ = 0, Position position_ = 0) :
+    UTF8DocumentIterator(const Document *doc_ = 0, Sci::Position position_ = 0) :
         doc(doc_), position(position_), characterIndex(0), lenBytes(0), lenCharacters(0)
     {
         buffered[0] = 0;
