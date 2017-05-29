@@ -186,6 +186,9 @@
     <ClInclude Include="src\SparseVector.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\UniqueString.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lexers\LexA68k.cxx">
