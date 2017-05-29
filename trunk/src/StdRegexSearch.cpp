@@ -20,6 +20,7 @@
 #include <memory>
 #include "scintilla.h"
 #define PLATFORM_ASSERT(c) ((void)0)
+#include "../ext/scintilla/src/Position.h"
 #include "../ext/scintilla/src/SplitVector.h"
 #include "../ext/scintilla/src/Partitioning.h"
 #include "../ext/scintilla/src/RunStyles.h"
