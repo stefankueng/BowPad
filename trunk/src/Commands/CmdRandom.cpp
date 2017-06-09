@@ -37,11 +37,22 @@ void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
     CDirFileEnum filefinder(m_sPath);
     bool bIsDirectory;
     std::wstring filename;
-    while (filefinder.NextFile(filename, &bIsDirectory, !nosubfolders))
+    std::list<std::wstring> tempList;
+    while (filefinder.NextFile(filename, &bIsDirectory, !m_noSubs))
     {
         if (!bIsDirectory)
-            m_arUnShownFileList.insert(filename);
+            tempList.emplace_back(filename);
     }
+    tempList.sort([](const std::wstring& a, const std::wstring& b) -> bool
+    {
+        return _wcsicmp(a.c_str(), b.c_str()) > 0;
+    });
+    {
+        auto lastIt = m_arUnShownFileList.end();
+        for (const auto& f : tempList)
+            lastIt = m_arUnShownFileList.emplace_hint(lastIt, f);
+    }
+
     std::wstring temppath = m_sPath + L"\\_shownfilelist";
     if (nosubfolders)
         temppath += L"norecurse";
@@ -51,18 +62,21 @@ void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
         BY_HANDLE_FILE_INFORMATION fileinfo;
         if (GetFileInformationByHandle(hFile, &fileinfo))
         {
-            auto buffer = std::make_unique<wchar_t[]>(fileinfo.nFileSizeLow + sizeof(wchar_t));
+            const int numberOfCharsInFile = fileinfo.nFileSizeLow / sizeof(wchar_t);
+            auto buffer = std::make_unique<wchar_t[]>(numberOfCharsInFile + 1);
             DWORD readbytes;
             if (ReadFile(hFile, buffer.get(), fileinfo.nFileSizeLow, &readbytes, nullptr))
             {
-                buffer[fileinfo.nFileSizeLow] = 0;
-                buffer[fileinfo.nFileSizeLow + 1] = 0;
+                buffer[numberOfCharsInFile] = 0;
                 wchar_t * pPath = buffer.get();
-                while (pPath < (buffer.get()+fileinfo.nFileSizeLow))
+                auto pStart = buffer.get();
+                auto pEnd = pStart + numberOfCharsInFile;
+                auto lastIt = m_arShownFileList.end();
+                while (pPath < pEnd)
                 {
                     temppath = pPath;
-                    pPath += temppath.size()+1;
-                    m_arShownFileList.insert(temppath);
+                    pPath += temppath.size() + 1;
+                    lastIt = m_arShownFileList.emplace_hint(lastIt, temppath);
                 }
             }
         }
@@ -88,6 +102,7 @@ void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
     for (const auto & file : m_arUnShownFileList)
         m_arShuffleList.push_back(file);
     auto gen = std::default_random_engine((unsigned int)time(0));
+    shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
     shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
 }
 
