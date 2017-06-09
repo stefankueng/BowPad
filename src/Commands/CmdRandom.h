@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
@@ -18,6 +18,7 @@
 #pragma once
 #include "ICommand.h"
 #include "BowPadUI.h"
+#include "DirFileEnum.h"
 
 #include <vector>
 #include <set>
@@ -54,6 +55,8 @@ public:
     void SetNewPath(const std::wstring& fileold, const std::wstring& filenew);
 
 private:
+    void FillUnShownPathList(CDirFileEnum& filefinder, bool recurse);
+
     std::wstring                m_sPath;
     std::set<std::wstring>      m_arShownFileList;
     std::set<std::wstring>      m_arUnShownFileList;
