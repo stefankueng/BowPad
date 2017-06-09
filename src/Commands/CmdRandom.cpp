@@ -20,7 +20,6 @@
 #include "CmdRandom.h"
 
 #include "PathUtils.h"
-#include "DirFileEnum.h"
 
 #include <random>
 #include <stdlib.h>
@@ -35,28 +34,12 @@ void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
     m_sPath = path;
 
     CDirFileEnum filefinder(m_sPath);
-    bool bIsDirectory;
-    std::wstring filename;
-    std::list<std::wstring> tempList;
-    while (filefinder.NextFile(filename, &bIsDirectory, !m_noSubs))
-    {
-        if (!bIsDirectory)
-            tempList.emplace_back(filename);
-    }
-    tempList.sort([](const std::wstring& a, const std::wstring& b) -> bool
-    {
-        return _wcsicmp(a.c_str(), b.c_str()) > 0;
-    });
-    {
-        auto lastIt = m_arUnShownFileList.end();
-        for (const auto& f : tempList)
-            lastIt = m_arUnShownFileList.emplace_hint(lastIt, f);
-    }
+    FillUnShownPathList(filefinder, !m_noSubs);
 
     std::wstring temppath = m_sPath + L"\\_shownfilelist";
     if (nosubfolders)
         temppath += L"norecurse";
-    HANDLE hFile = CreateFile(temppath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_HIDDEN|FILE_ATTRIBUTE_SYSTEM, nullptr);
+    HANDLE hFile = CreateFile(temppath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM, nullptr);
     if (hFile != INVALID_HANDLE_VALUE)
     {
         BY_HANDLE_FILE_INFORMATION fileinfo;
@@ -120,30 +103,21 @@ std::wstring CRandomFileList::GetRandomFile()
         {
             m_arUnShownFileList.clear();
             m_arShownFileList.clear();
-            bool bIsDirectory;
-            std::wstring filename;
             {
                 CDirFileEnum filefinder(m_sPath);
-                while (filefinder.NextFile(filename, &bIsDirectory, !m_noSubs))
-                {
-                    if (!bIsDirectory)
-                        m_arUnShownFileList.insert(m_arUnShownFileList.end(), filename);
-                }
+                FillUnShownPathList(filefinder, !m_noSubs);
             }
             if (m_arUnShownFileList.size() < 5)
             {
                 CDirFileEnum filefinder(m_sPath);
-                while (filefinder.NextFile(filename, &bIsDirectory, true))
-                {
-                    if (!bIsDirectory)
-                        m_arUnShownFileList.insert(m_arUnShownFileList.end(), filename);
-                }
+                FillUnShownPathList(filefinder, true);
             }
         }
         m_arShuffleList.clear();
         for (const auto & file : m_arUnShownFileList)
             m_arShuffleList.push_back(file);
         auto gen = std::default_random_engine((unsigned int)time(0));
+        shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
         shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
         m_shuffleIndex = 0;
     }
@@ -174,7 +148,8 @@ size_t CRandomFileList::GetCount()
     return (m_arUnShownFileList.size() + m_arShownFileList.size());
 }
 
-size_t CRandomFileList::GetShownCount() {
+size_t CRandomFileList::GetShownCount()
+{
     return m_arShownFileList.size();
 }
 
@@ -198,7 +173,7 @@ void CRandomFileList::Save()
                 pBuffer += it->size() + 1;
             }
             DWORD byteswritten;
-            WriteFile(hFile, buffer.get(), DWORD(pBuffer - buffer.get())*sizeof(wchar_t), &byteswritten, nullptr);
+            WriteFile(hFile, buffer.get(), DWORD(pBuffer - buffer.get()) * sizeof(wchar_t), &byteswritten, nullptr);
             CloseHandle(hFile);
         }
         catch (std::bad_alloc &/*e*/)
@@ -209,7 +184,7 @@ void CRandomFileList::Save()
                 ZeroMemory(filebuffer, sizeof(filebuffer));
                 _tcscpy_s(filebuffer, it->c_str());
                 DWORD byteswritten;
-                WriteFile(hFile, filebuffer, DWORD(_tcslen(filebuffer)+1)*sizeof(wchar_t), &byteswritten, nullptr);
+                WriteFile(hFile, filebuffer, DWORD(_tcslen(filebuffer) + 1) * sizeof(wchar_t), &byteswritten, nullptr);
             }
             CloseHandle(hFile);
         }
@@ -252,6 +227,25 @@ void CRandomFileList::SetNewPath(const std::wstring& fileold, const std::wstring
     {
         (*foundIT) = filenew;
     }
+}
+
+void CRandomFileList::FillUnShownPathList(CDirFileEnum & filefinder, bool recurse)
+{
+    bool bIsDirectory;
+    std::wstring filename;
+    std::list<std::wstring> tempList;
+    while (filefinder.NextFile(filename, &bIsDirectory, recurse))
+    {
+        if (!bIsDirectory)
+            tempList.emplace_back(filename);
+    }
+    tempList.sort([](const std::wstring& a, const std::wstring& b) -> bool
+    {
+        return wcscmp(a.c_str(), b.c_str()) > 0;
+    });
+    auto lastIt = m_arUnShownFileList.end();
+    for (const auto& f : tempList)
+        lastIt = m_arUnShownFileList.emplace_hint(lastIt, f);
 }
 
 bool CCmdRandom::Execute()
