@@ -240,7 +240,7 @@ void CRandomFileList::FillUnShownPathList(CDirFileEnum & filefinder, bool recurs
     }
     tempList.sort([](const std::wstring& a, const std::wstring& b) -> bool
     {
-        return wcscmp(a.c_str(), b.c_str()) > 0;
+        return _wcsicmp(a.c_str(), b.c_str()) > 0;
     });
     auto lastIt = m_arUnShownFileList.end();
     for (const auto& f : tempList)
