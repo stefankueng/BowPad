@@ -66,14 +66,13 @@ void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
         CloseHandle(hFile);
     }
 
-    for (auto it = m_arShownFileList.begin(); it != m_arShownFileList.end(); ++it)
+    for (auto it = m_arShownFileList.begin(); it != m_arShownFileList.end(); )
     {
         auto findit = m_arUnShownFileList.find(*it);
         if (findit == m_arUnShownFileList.end())
-        {
-            m_arShownFileList.erase(*it);
-            it = m_arShownFileList.begin();
-        }
+            m_arShownFileList.erase(it++);
+        else
+            ++it;
     }
     for (auto it = m_arShownFileList.begin(); it != m_arShownFileList.end(); ++it)
     {
