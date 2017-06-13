@@ -19,6 +19,7 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 #include "DirFileEnum.h"
+#include "StringUtils.h"
 
 #include <vector>
 #include <set>
@@ -57,14 +58,14 @@ public:
 private:
     void FillUnShownPathList(CDirFileEnum& filefinder, bool recurse);
 
-    std::wstring                m_sPath;
-    std::set<std::wstring>      m_arShownFileList;
-    std::set<std::wstring>      m_arUnShownFileList;
-    std::set<std::wstring>      m_arShownRepeatFileList;
-    std::vector<std::wstring>   m_arShuffleList;
-    size_t                      m_shuffleIndex;
-    bool                        m_noSubs;
-    std::mutex                  m_mutex;
+    std::wstring                        m_sPath;
+    std::set<std::wstring, ci_lessW>    m_arShownFileList;
+    std::set<std::wstring, ci_lessW>    m_arUnShownFileList;
+    std::set<std::wstring, ci_lessW>    m_arShownRepeatFileList;
+    std::vector<std::wstring>           m_arShuffleList;
+    size_t                              m_shuffleIndex;
+    bool                                m_noSubs;
+    std::mutex                          m_mutex;
 };
 
 
