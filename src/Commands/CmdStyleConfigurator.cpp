@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -129,6 +129,10 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
             }
             m_fgColor.ConvertToColorButton(*this, IDC_FG_BTN);
             m_bkColor.ConvertToColorButton(*this, IDC_BK_BTN);
+
+            ResString sExtTooltip(hRes, IDS_EXTENSIONTOOLTIP);
+
+            AddToolTip(IDC_EXTENSIONS, sExtTooltip);
 
             // Select the current language.
             if (HasActiveDocument())
