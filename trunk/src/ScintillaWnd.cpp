@@ -186,6 +186,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETCARETLINEVISIBLE, true);
     Call(SCI_SETCARETLINEVISIBLEALWAYS, true);
     Call(SCI_SETCARETWIDTH, bUseD2D ? 2 : 1);
+    if (CIniSettings::Instance().GetInt64(L"View", L"caretlineframe", 1) != 0)
+        Call(SCI_SETCARETLINEFRAME, CDPIAware::Instance().ScaleX(1));
     Call(SCI_SETWHITESPACESIZE, CDPIAware::Instance().ScaleX(1));
     Call(SCI_SETMULTIPLESELECTION, 1);
     Call(SCI_SETMOUSESELECTIONRECTANGULARSWITCH, true);
@@ -938,15 +940,23 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_SETCARETFORE, theme.GetThemeColor(RGB(0, 0, 0)));
     Call(SCI_SETADDITIONALCARETFORE, theme.GetThemeColor(RGB(0, 0, 80)));
 
-    if (theme.IsDarkTheme())
+    if (CIniSettings::Instance().GetInt64(L"View", L"caretlineframe", 1) != 0)
     {
-        Call(SCI_SETCARETLINEBACK, RGB(0,0,0));
-        Call(SCI_SETCARETLINEBACKALPHA, SC_ALPHA_NOALPHA);
+        Call(SCI_SETCARETLINEBACK, theme.GetThemeColor(RGB(0, 0, 0)));
+        Call(SCI_SETCARETLINEBACKALPHA, 80);
     }
     else
     {
-        Call(SCI_SETCARETLINEBACK, theme.GetThemeColor(RGB(0, 0, 0)));
-        Call(SCI_SETCARETLINEBACKALPHA, 15);
+        if (theme.IsDarkTheme())
+        {
+            Call(SCI_SETCARETLINEBACK, RGB(0, 0, 0));
+            Call(SCI_SETCARETLINEBACKALPHA, SC_ALPHA_NOALPHA);
+        }
+        else
+        {
+            Call(SCI_SETCARETLINEBACK, theme.GetThemeColor(RGB(0, 0, 0)));
+            Call(SCI_SETCARETLINEBACKALPHA, 25);
+        }
     }
     Call(SCI_SETWHITESPACEFORE, true, theme.IsDarkTheme() ? RGB(20, 72, 82) : RGB(43, 145, 175));
     
