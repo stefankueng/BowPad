@@ -396,6 +396,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
     case WM_RBUTTONDOWN:
     case WM_VSCROLL:
     case WM_HSCROLL:
+    case WM_MOUSEWHEEL:
+    case WM_MOUSEHWHEEL:
     {
         // mouse cursor moved, ensure it's visible
         // but set a timer to hide it after a while
