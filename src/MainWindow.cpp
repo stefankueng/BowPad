@@ -1318,7 +1318,7 @@ void CMainWindow::ResizeChildWindows()
         const int tbHeight = tabrc.bottom - tabrc.top;
         const int tabBtnWidth = tbHeight + 2;
         const int mainWidth = rect.right - rect.left;
-        int treeWidth = (m_fileTreeVisible && !m_fileTree.GetPath().empty()) ? m_treeWidth : 0;
+        int treeWidth = m_fileTreeVisible ? m_treeWidth : 0;
 
         HDWP hDwp = BeginDeferWindowPos(6);
         DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), mainWidth, m_StatusBar.GetHeight(), flags);
