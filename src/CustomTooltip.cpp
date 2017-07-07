@@ -61,7 +61,7 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
 {
     m_infoText = text;
     if (color)
-        m_color = *color;
+        m_color = (*color)&0xFFFFFF;
     m_bShowColorBox = color != nullptr;
     auto dc = GetDC(*this);
     auto textbuf = std::make_unique<wchar_t[]>(m_infoText.size() + 4);

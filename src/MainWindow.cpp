@@ -2300,7 +2300,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
 
     // Short form or long form html color e.g. #F0F or #FF00FF
 
-    if (sWord[0] == '#' && (sWord.size() == 4 || sWord.size() == 7))
+    if (sWord[0] == '#' && (sWord.size() == 4 || sWord.size() == 7 || sWord.size() == 9))
     {
         bool ok = false;
         COLORREF color = 0;
@@ -2316,6 +2316,10 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
             ok = GDIHelpers::ShortHexStringToCOLORREF(strNum, &color);
         }
         else if (strNum.size() == 6) // normal/long form, e.g. FF00FF
+        {
+            ok = GDIHelpers::HexStringToCOLORREF(strNum, &color);
+        }
+        else if (strNum.size() == 8) // normal/long form with alpha, e.g. 00FF00FF
         {
             ok = GDIHelpers::HexStringToCOLORREF(strNum, &color);
         }
