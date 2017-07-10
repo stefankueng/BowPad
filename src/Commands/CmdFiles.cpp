@@ -44,9 +44,13 @@ bool CCmdOpen::Execute()
     hr = pfd->GetOptions(&dwOptions);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
+
+    // allow the user to enter a filename that does not exist yet
+    dwOptions &= ~(FOS_FILEMUSTEXIST);
+
     // If we can't set our options, we have no idea what's happening
     // so don't continue.
-    hr = pfd->SetOptions(dwOptions | FOS_FILEMUSTEXIST | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_ALLOWMULTISELECT);
+    hr = pfd->SetOptions(dwOptions | FOS_ALLOWMULTISELECT);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
 
@@ -117,7 +121,11 @@ bool CCmdOpen::Execute()
     {
         return CPathUtils::PathCompare(lhs, rhs) < 0;
     });
-    OpenFiles(paths);
+    // treat opening a single file differently so we can pass OpenFlags.
+    if (paths.size() == 1)
+        OpenFile(paths[0].c_str(), OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing);
+    else
+        OpenFiles(paths);
 
     return true;
 }
