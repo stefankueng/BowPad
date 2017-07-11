@@ -83,11 +83,35 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
             {
                 // lf / cr / crlf
                 if (strcmp(value, "lf") == 0)
+                {
                     pScintilla->Call(SCI_SETEOLMODE, SC_EOL_LF);
+                    if (doc.m_format != UNIX_FORMAT)
+                    {
+                        doc.m_format = UNIX_FORMAT;
+                        if (!doc.m_bIsReadonly && !doc.m_bIsWriteProtected)
+                            pScintilla->Call(SCI_CONVERTEOLS, SC_EOL_LF);
+                    }
+                }
                 else if (strcmp(value, "cr") == 0)
+                {
                     pScintilla->Call(SCI_SETEOLMODE, SC_EOL_CR);
+                    if (doc.m_format != MAC_FORMAT)
+                    {
+                        doc.m_format = MAC_FORMAT;
+                        if (!doc.m_bIsReadonly && !doc.m_bIsWriteProtected)
+                            pScintilla->Call(SCI_CONVERTEOLS, SC_EOL_CR);
+                    }
+                }
                 else if (strcmp(value, "crlf") == 0)
+                {
                     pScintilla->Call(SCI_SETEOLMODE, SC_EOL_CRLF);
+                    if (doc.m_format != WIN_FORMAT)
+                    {
+                        doc.m_format = WIN_FORMAT;
+                        if (!doc.m_bIsReadonly && !doc.m_bIsWriteProtected)
+                            pScintilla->Call(SCI_CONVERTEOLS, SC_EOL_CRLF);
+                    }
+                }
 
                 //pScintilla->Call(SCI_CONVERTEOLS, eol);
             }
