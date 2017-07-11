@@ -79,7 +79,7 @@
         <Image>res/NewL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdNewDefault" LabelTitle="Set Encoding" TooltipTitle="Set default encoding" TooltipDescription="Set the default encoding for new files, e.g. ANSI, UTF-8, ..." >
+    <Command Name="cmdNewDefault" LabelTitle="Set Defaults" TooltipTitle="Set default encoding and EOL" TooltipDescription="Set the default encoding (e.g. ANSI, UTF-8, ...) and end-of-line style for new files" >
       <Command.LargeImages>
         <Image>res/keyL.bmp</Image>
       </Command.LargeImages>
