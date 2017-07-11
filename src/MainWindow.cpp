@@ -2688,6 +2688,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
 
     auto& doc = m_DocManager.GetModDocumentFromID(docID);
     m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+    m_editor.SetEOLType(ToEOLMode(doc.m_format));
     m_editor.SetupLexerForLang(doc.GetLanguage());
     m_editor.RestoreCurrentPos(doc.m_position);
     m_editor.SetTabSettings(doc.m_TabSpace);
