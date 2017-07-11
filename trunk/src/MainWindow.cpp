@@ -2648,6 +2648,10 @@ void CMainWindow::OpenNewTab()
     doc.m_document = m_editor.Call(SCI_CREATEDOCUMENT);
     doc.m_bHasBOM = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
     doc.m_encoding = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
+    doc.m_format = (EOLFormat)CIniSettings::Instance().GetInt64(L"Defaults", L"lineendingnew", WIN_FORMAT);
+    auto eolmode = ToEOLMode(doc.m_format);
+    m_editor.SetEOLType(eolmode);
+
     doc.SetLanguage("Text");
     std::wstring tabName = GetNewTabName();
     int index = -1;
