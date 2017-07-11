@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 
 <!-- use this file to set the paths to the required tools
      BowPad needs to build everything.
@@ -59,6 +59,8 @@
     -->
 
     <setenv>
+      <variable name="PATH" value="D:\smartcardtools\x64;%PATH%" if="${platform == 'x64'}" />
+      <variable name="PATH" value="D:\smartcardtools\x86;%PATH%" if="${platform != 'x64'}" />
       <variable name="PATH" value="%WIX%;%PATH%" />
       <variable name="WIXUI" value="%WIX%" />
     </setenv>
