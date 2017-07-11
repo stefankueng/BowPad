@@ -1,0 +1,493 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F767677D-B0FE-4C4F-B886-09E501C543B2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>BowPad</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfAtl>Static</UseOfAtl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfAtl>Static</UseOfAtl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfAtl>Static</UseOfAtl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfAtl>Static</UseOfAtl>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>..\obj\$(ProjectName)\$(Configuration)\</IntDir>
+    <OutDir>..\bin\$(Configuration)\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\bin\$(Configuration)64\bin\</OutDir>
+    <IntDir>..\obj\$(ProjectName)\$(Configuration)64\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IntDir>..\obj\$(ProjectName)\$(Configuration)\</IntDir>
+    <OutDir>..\bin\$(Configuration)\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\bin\$(Configuration)64\bin\</OutDir>
+    <IntDir>..\obj\$(ProjectName)\$(Configuration)64\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Msimg32.lib;Imm32.lib;Propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Msimg32.lib;Imm32.lib;Propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>Msimg32.lib;Imm32.lib;Propsys.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SetChecksum>true</SetChecksum>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
+    <PostBuildEvent>
+      <Command>"$(ProjectDir)..\tools\ResText.exe" extract "$(TargetPath)" "$(ProjectDir)..\Languages\BowPad.pot"</Command>
+      <Message>Extracting resources, creating pot file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>Msimg32.lib;Imm32.lib;Propsys.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SetChecksum>true</SetChecksum>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
+    <PostBuildEvent>
+      <Command>"$(ProjectDir)..\tools\ResText.exe" extract "$(TargetPath)" "$(ProjectDir)..\Languages\BowPad.pot"</Command>
+      <Message>Extracting resources, creating pot file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ext\sktoolslib\AeroControls.h" />
+    <ClInclude Include="..\ext\sktoolslib\AeroGlass.h" />
+    <ClInclude Include="..\ext\sktoolslib\AnimationManager.h" />
+    <ClInclude Include="..\ext\sktoolslib\BaseDialog.h" />
+    <ClInclude Include="..\ext\sktoolslib\BaseWindow.h" />
+    <ClInclude Include="..\ext\sktoolslib\ClipboardHelper.h" />
+    <ClInclude Include="..\ext\sktoolslib\CmdLineParser.h" />
+    <ClInclude Include="..\ext\sktoolslib\codecvt.h" />
+    <ClInclude Include="..\ext\sktoolslib\CreateProcessHelper.h" />
+    <ClInclude Include="..\ext\sktoolslib\DebugOutput.h" />
+    <ClInclude Include="..\ext\sktoolslib\DirFileEnum.h" />
+    <ClInclude Include="..\ext\sktoolslib\DlgResizer.h" />
+    <ClInclude Include="..\ext\sktoolslib\DownloadFile.h" />
+    <ClInclude Include="..\ext\sktoolslib\DPIAware.h" />
+    <ClInclude Include="..\ext\sktoolslib\EscapeUtils.h" />
+    <ClInclude Include="..\ext\sktoolslib\FormatMessageWrapper.h" />
+    <ClInclude Include="..\ext\sktoolslib\GDIHelpers.h" />
+    <ClInclude Include="..\ext\sktoolslib\hyperlink.h" />
+    <ClInclude Include="..\ext\sktoolslib\IniSettings.h" />
+    <ClInclude Include="..\ext\sktoolslib\Language.h" />
+    <ClInclude Include="..\ext\sktoolslib\OnOutOfScope.h" />
+    <ClInclude Include="..\ext\sktoolslib\PathUtils.h" />
+    <ClInclude Include="..\ext\sktoolslib\PreserveChdir.h" />
+    <ClInclude Include="..\ext\sktoolslib\ProgressDlg.h" />
+    <ClInclude Include="..\ext\sktoolslib\Registry.h" />
+    <ClInclude Include="..\ext\sktoolslib\ResString.h" />
+    <ClInclude Include="..\ext\sktoolslib\RichStatusBar.h" />
+    <ClInclude Include="..\ext\sktoolslib\ScrollTool.h" />
+    <ClInclude Include="..\ext\sktoolslib\SimpleIni.h" />
+    <ClInclude Include="..\ext\sktoolslib\SmartHandle.h" />
+    <ClInclude Include="..\ext\sktoolslib\StringUtils.h" />
+    <ClInclude Include="..\ext\sktoolslib\SysImageList.h" />
+    <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
+    <ClInclude Include="..\ext\sktoolslib\TempFile.h" />
+    <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
+    <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="AppUtils.h" />
+    <ClInclude Include="BowPadUI.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="ChoseDlg.h" />
+    <ClInclude Include="ColorButton.h" />
+    <ClInclude Include="Commands\CmdBlanks.h" />
+    <ClInclude Include="Commands\CmdBookmarks.h" />
+    <ClInclude Include="Commands\CmdClipboard.h" />
+    <ClInclude Include="Commands\CmdCodeStyle.h" />
+    <ClInclude Include="Commands\CmdComment.h" />
+    <ClInclude Include="Commands\CmdConvertCase.h" />
+    <ClInclude Include="Commands\CmdDefaultEncoding.h" />
+    <ClInclude Include="Commands\CmdEOL.h" />
+    <ClInclude Include="Commands\CmdFiles.h" />
+    <ClInclude Include="Commands\CmdFindReplace.h" />
+    <ClInclude Include="Commands\CmdFolding.h" />
+    <ClInclude Include="Commands\CmdFont.h" />
+    <ClInclude Include="Commands\CmdFunctions.h" />
+    <ClInclude Include="Commands\CmdGotoLine.h" />
+    <ClInclude Include="Commands\CmdGotoSymbol.h" />
+    <ClInclude Include="Commands\CmdHeaderSource.h" />
+    <ClInclude Include="Commands\CmdLanguage.h" />
+    <ClInclude Include="Commands\CmdLaunch.h" />
+    <ClInclude Include="Commands\CmdLineNumbers.h" />
+    <ClInclude Include="Commands\CmdLines.h" />
+    <ClInclude Include="Commands\CmdLineWrap.h" />
+    <ClInclude Include="Commands\CmdLoadEncoding.h" />
+    <ClInclude Include="Commands\CmdMisc.h" />
+    <ClInclude Include="Commands\CmdMRU.h" />
+    <ClInclude Include="Commands\CmdNewCopy.h" />
+    <ClInclude Include="Commands\CmdOpenSelection.h" />
+    <ClInclude Include="Commands\CmdPlugins.h" />
+    <ClInclude Include="Commands\CmdPluginsConfig.h" />
+    <ClInclude Include="Commands\CmdPrevNext.h" />
+    <ClInclude Include="Commands\CmdPrint.h" />
+    <ClInclude Include="Commands\CmdRandom.h" />
+    <ClInclude Include="Commands\CmdScripts.h" />
+    <ClInclude Include="Commands\CmdSelectTab.h" />
+    <ClInclude Include="Commands\CmdSession.h" />
+    <ClInclude Include="Commands\CmdSort.h" />
+    <ClInclude Include="Commands\CmdSpellcheck.h" />
+    <ClInclude Include="Commands\CmdStyleConfigurator.h" />
+    <ClInclude Include="Commands\CmdSummary.h" />
+    <ClInclude Include="Commands\cmdTabList.h" />
+    <ClInclude Include="Commands\CmdUndo.h" />
+    <ClInclude Include="Commands\CmdVerticalEdge.h" />
+    <ClInclude Include="Commands\CmdWhiteSpace.h" />
+    <ClInclude Include="Commands\CmdZoom.h" />
+    <ClInclude Include="Commands\CommandHandler.h" />
+    <ClInclude Include="Commands\ICommand.h" />
+    <ClInclude Include="COMPtrs.h" />
+    <ClInclude Include="CorrespondingFileDlg.h" />
+    <ClInclude Include="CustomTooltip.h" />
+    <ClInclude Include="DocScroll.h" />
+    <ClInclude Include="Document.h" />
+    <ClInclude Include="DocumentManager.h" />
+    <ClInclude Include="EditorConfigHandler.h" />
+    <ClInclude Include="FileTree.h" />
+    <ClInclude Include="KeyboardShortcutHandler.h" />
+    <ClInclude Include="LexStyles.h" />
+    <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="MRU.h" />
+    <ClInclude Include="ProgressBar.h" />
+    <ClInclude Include="PropertySet.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="BowPad.h" />
+    <ClInclude Include="ScintillaWnd.h" />
+    <ClInclude Include="scripting\BasicScriptHost.h" />
+    <ClInclude Include="scripting\BasicScriptObject.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TabBar.h" />
+    <ClInclude Include="TabBtn.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="Theme.h" />
+    <ClInclude Include="UTF8DocumentIterator.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="XPMIcons.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\sktoolslib\AeroControls.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\AeroGlass.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\AnimationManager.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\BaseDialog.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\BaseWindow.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\BrowseFolder.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\CmdLineParser.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\codecvt.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\DebugOutput.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\DirFileEnum.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\DlgResizer.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\DownloadFile.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\EscapeUtils.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\GDIHelpers.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\hyperlink.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\IniSettings.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\Language.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\PathUtils.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\PreserveChdir.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\ProgressDlg.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\Registry.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\RichStatusBar.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\ScrollTool.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\SysImageList.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\TempFile.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
+    <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="AppUtils.cpp" />
+    <ClCompile Include="BowPad.cpp" />
+    <ClCompile Include="ChoseDlg.cpp" />
+    <ClCompile Include="ColorButton.cpp" />
+    <ClCompile Include="Commands\CmdBlanks.cpp" />
+    <ClCompile Include="Commands\CmdBookmarks.cpp" />
+    <ClCompile Include="Commands\CmdClipboard.cpp" />
+    <ClCompile Include="Commands\CmdCodeStyle.cpp" />
+    <ClCompile Include="Commands\CmdComment.cpp" />
+    <ClCompile Include="Commands\CmdConvertCase.cpp" />
+    <ClCompile Include="Commands\CmdDefaultEncoding.cpp" />
+    <ClCompile Include="Commands\CmdEOL.cpp" />
+    <ClCompile Include="Commands\CmdFiles.cpp" />
+    <ClCompile Include="Commands\CmdFindReplace.cpp" />
+    <ClCompile Include="Commands\CmdFolding.cpp" />
+    <ClCompile Include="Commands\CmdFont.cpp" />
+    <ClCompile Include="Commands\CmdFunctions.cpp" />
+    <ClCompile Include="Commands\CmdGotoLine.cpp" />
+    <ClCompile Include="Commands\CmdGotoSymbol.cpp" />
+    <ClCompile Include="Commands\CmdHeaderSource.cpp" />
+    <ClCompile Include="Commands\CmdLanguage.cpp" />
+    <ClCompile Include="Commands\CmdLaunch.cpp" />
+    <ClCompile Include="Commands\CmdLoadEncoding.cpp" />
+    <ClCompile Include="Commands\CmdMisc.cpp" />
+    <ClCompile Include="Commands\CmdMRU.cpp" />
+    <ClCompile Include="Commands\CmdNewCopy.cpp" />
+    <ClCompile Include="Commands\CmdOpenSelection.cpp" />
+    <ClCompile Include="Commands\CmdPlugins.cpp" />
+    <ClCompile Include="Commands\CmdPluginsConfig.cpp" />
+    <ClCompile Include="Commands\CmdPrevNext.cpp" />
+    <ClCompile Include="Commands\CmdPrint.cpp" />
+    <ClCompile Include="Commands\CmdRandom.cpp" />
+    <ClCompile Include="Commands\CmdScripts.cpp" />
+    <ClCompile Include="Commands\CmdSession.cpp" />
+    <ClCompile Include="Commands\CmdSort.cpp" />
+    <ClCompile Include="Commands\CmdSpellcheck.cpp" />
+    <ClCompile Include="Commands\CmdStyleConfigurator.cpp" />
+    <ClCompile Include="Commands\CmdSummary.cpp" />
+    <ClCompile Include="Commands\cmdTabList.cpp" />
+    <ClCompile Include="Commands\CmdWhiteSpace.cpp" />
+    <ClCompile Include="Commands\CommandHandler.cpp" />
+    <ClCompile Include="Commands\ICommand.cpp" />
+    <ClCompile Include="CorrespondingFileDlg.cpp" />
+    <ClCompile Include="CustomTooltip.cpp" />
+    <ClCompile Include="DocScroll.cpp" />
+    <ClCompile Include="Document.cpp" />
+    <ClCompile Include="DocumentManager.cpp" />
+    <ClCompile Include="EditorConfigHandler.cpp" />
+    <ClCompile Include="FileTree.cpp" />
+    <ClCompile Include="KeyboardShortcutHandler.cpp" />
+    <ClCompile Include="LexStyles.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="MRU.cpp" />
+    <ClCompile Include="ProgressBar.cpp" />
+    <ClCompile Include="PropertySet.cpp" />
+    <ClCompile Include="ScintillaWnd.cpp" />
+    <ClCompile Include="scripting\BasicScriptHost.cpp" />
+    <ClCompile Include="scripting\BasicScriptObject.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TabBar.cpp" />
+    <ClCompile Include="TabBtn.cpp" />
+    <ClCompile Include="Theme.cpp" />
+    <ClCompile Include="XPMIcons.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BowPad.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\BowPad.ico" />
+    <Image Include="res\BowPadDoc.ico" />
+    <Image Include="res\BowPad_elevated.ico" />
+    <Image Include="res\capslock.ico" />
+    <Image Include="res\closeTabButton.bmp" />
+    <Image Include="res\closeTabButton_hover.bmp" />
+    <Image Include="res\closeTabButton_inact.bmp" />
+    <Image Include="res\closeTabButton_push.bmp" />
+    <Image Include="res\empty.bmp" />
+    <Image Include="res\empty.ico" />
+    <Image Include="res\lexer.ico" />
+    <Image Include="res\readonly.ico" />
+    <Image Include="res\saved.ico" />
+    <Image Include="res\Shield.ico" />
+    <Image Include="res\unsaved.ico" />
+    <Image Include="res\zoom.ico" />
+    <Image Include="res\zoomdark.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="res\BowPad.xml">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building BowPad.xml</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)BowPad.bml;$(IntDir)BowPadUI.h;$(IntDir)BowPadUI.rc</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building BowPad.xml</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)BowPad.bml;$(IntDir)BowPadUI.h;$(IntDir)BowPadUI.rc</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building BowPad.xml</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)BowPad.bml;$(IntDir)BowPadUI.h;$(IntDir)BowPadUI.rc</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">uicc.exe res\BowPad.xml $(IntDir)BowPad.bml /header:$(IntDir)BowPadUI.h /res:$(IntDir)BowPadUI.rc /name:BowPad</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building BowPad.xml</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)BowPad.bml;$(IntDir)BowPadUI.h;$(IntDir)BowPadUI.rc</Outputs>
+      <SubType>Designer</SubType>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\BowPad.rc2" />
+    <None Include="res\darktheme.ini" />
+    <None Include="res\drag.cur" />
+    <None Include="res\drag_interdit.cur" />
+    <None Include="res\drag_out.cur" />
+    <None Include="res\drag_plus.cur" />
+    <None Include="res\dropcopy.cur" />
+    <None Include="res\dropmove.cur" />
+    <None Include="res\Properties.ini" />
+    <None Include="res\Shortcuts.ini" />
+    <None Include="version.in" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ext\coolsb\coolsb.vcxproj">
+      <Project>{22b28d94-8fb7-484f-ad33-b3f2bd25351f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ext\editorconfig-core\editorconfig.vcxproj">
+      <Project>{ddecdf19-8125-4efe-bf88-72a61af8ff4b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ext\scintilla\Scintilla.vcxproj">
+      <Project>{5877b917-512b-49f5-b514-1b4159e7a9ca}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="compatibility.manifest" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

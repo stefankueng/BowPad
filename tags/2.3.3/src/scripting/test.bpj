@@ -1,0 +1,48 @@
+// called when the plugin command is executed, i.e. the "button" is clicked
+function Execute()
+{
+    return true;
+}
+
+// notification from the Scintilla control
+function ScintillaNotify(code, position, ch, modifiers, modificationType, text, length, linesAdded, message, wParam, lParam, line, foldLevelNow, foldLevelPrev, margin, listType, x, y, token, annotationLinesAdded, updated)
+{
+    //BowPad.debugprint("ScintillaNotify from script: " + text);
+    return;
+}
+
+// notification about tabs
+function TabNotify(code, tabOrigin)
+{
+    //var id = BowPad.GetDocIdOfCurrentTab();
+    //BowPad.debugprint("TabNotify: docid of current tab: " + id);
+    //BowPad.debugprint("TabNotify: number of documents: " + BowPad.DocumentCount);
+    var findret = BowPad.SciFindText(0, 0, 100, "find");
+    // jscript does not understand the returned array directly,
+    // we have to convert it to a real jscript array first
+    var findret2 = new VBArray(findret);
+    var findresult = findret2.toArray();
+    BowPad.debugprint("TabNotify: SciCanUndo: " + BowPad.SciCanUndo + "  " + BowPad.SciCanUndo());
+    BowPad.debugprint("TabNotify: FindText: " + findresult.length);
+    BowPad.debugprint("TabNotify: FindText: found start: " + findresult[0] + ", end:" + findresult[1]);
+    return;
+}
+
+// called just before BowPad exits
+function OnClose() { return; }
+// called after BowPad has fully initialized
+function AfterInit() { return; }
+// called just before a document is closed
+function OnDocumentClose(index) { return; }
+// called after a document was opened
+function OnDocumentOpen(index) { return; }
+// called after a document was saved
+function OnDocumentSave(index) { return; }
+// return true if the plugin command is enabled (used for the button)
+function IsEnabled() { return true; }
+// return true if the plugin button should appear as checked
+function IsChecked() { return true; }
+// called on a timer event
+function OnTimer(id) { return; }
+// called when the theme has changed
+function OnThemeChanged(bDark) { return; }

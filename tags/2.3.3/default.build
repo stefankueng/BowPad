@@ -1,0 +1,253 @@
+﻿<?xml version="1.0"?>
+<project name="BowPad" default="setup">
+
+  <include buildfile="default.build.user" />
+
+  <property name="signtool" value="signtool.exe" />
+  <property name="configuration" value="release" />
+
+  <!-- the signinfo.txt file has to contain one line with parameters for signtool.exe,
+       for example:
+       /t "url/to/timestamp/server" /q
+    -->
+  <loadfile file="signinfo.txt" property="signinfo" failonerror="false" if="${file::exists('signinfo.txt')}"/>
+
+  <!-- ====================================================================== -->
+  <!-- Configuration targets                                                  -->
+  <!-- ====================================================================== -->
+  <target name="debug">
+    <description>
+      Sets the environment up to build the debug versions.
+    </description>
+    <property name="configuration" value="debug" />
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Project targets                                                        -->
+  <!-- ====================================================================== -->
+  <target name="clean" depends="VSNET">
+    <description>
+      Cleans every subproject.
+    </description>
+    <exec program="msbuild.exe" >
+      <arg value="BowPad.sln" />
+      <arg value="/t:Clean" />
+      <arg value="/p:Configuration=${configuration}" />
+      <arg value="/p:Platform=win32" />
+      <arg value="/verbosity:quiet" />
+      <arg value="/maxcpucount" />
+    </exec>
+    <exec program="msbuild.exe" >
+      <arg value="BowPad.sln" />
+      <arg value="/t:Clean" />
+      <arg value="/p:Configuration=${configuration}" />
+      <arg value="/p:Platform=x64" />
+      <arg value="/verbosity:quiet" />
+      <arg value="/maxcpucount" />
+    </exec>
+  </target>
+
+  <target name="VersionInfo" depends="VSNET,env">
+    <description>
+      Sets the version information as properties, env variables
+      and sets up the different version specific files.
+    </description>
+    <nant target="versioninfo">
+      <buildfiles>
+        <include name="versioninfo.build" />
+      </buildfiles>
+    </nant>
+    <loadfile file="src\version.in" property="versionheaderfile">
+      <filterchain>
+        <replacetokens begintoken="$" endtoken="$">
+          <token key="MajorVersion" value="${environment::get-variable('MajorVersion')}" />
+          <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
+          <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
+          <token key="WCREV" value="${environment::get-variable('WCREV')}" />
+          <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
+        </replacetokens>
+      </filterchain>
+    </loadfile>
+    <echo file="src\version.h" message="${versionheaderfile}" />
+  </target>
+
+  <target name="BowPad" depends="VersionInfo">
+    <description>
+      Builds BowPad.
+    </description>
+    <exec program="msbuild.exe" >
+      <arg value="BowPad.sln" />
+      <arg value="/t:Rebuild" />
+      <arg value="/p:Configuration=${configuration}" />
+      <arg value="/p:Platform=win32" />
+      <arg value="/verbosity:minimal" />
+      <arg value="/maxcpucount" />
+    </exec>
+    <exec program="msbuild.exe" >
+      <arg value="BowPad.sln" />
+      <arg value="/t:Rebuild" />
+      <arg value="/p:Configuration=${configuration}" />
+      <arg value="/p:Platform=x64" />
+      <arg value="/verbosity:minimal" />
+      <arg value="/maxcpucount" />
+    </exec>
+    <!-- sign all binaries -->
+    <if test="${file::exists('signinfo.txt')}">
+      <foreach item="File" property="filename">
+        <in>
+          <items>
+            <include name="bin\${configuration}\bin\*.exe" />
+            <include name="bin\${configuration}64\bin\*.exe" />
+          </items>
+        </in>
+        <do>
+          <exec program="${signtool}">
+            <arg value="sign" />
+            <arg value="${signinfo}" />
+            <arg value="${filename}" />
+          </exec>
+        </do>
+      </foreach>
+    </if>
+  </target>
+
+  <target name="setup" depends="BowPad">
+    <description>
+      Uses WiX to create an msi installer file.
+    </description>
+    <nant target="setup">
+      <buildfiles>
+        <include name="src\Setup\setup.build" />
+      </buildfiles>
+    </nant>
+    <property name="verstring" value="${environment::get-variable('MajorVersion')}.${environment::get-variable('MinorVersion')}.${environment::get-variable('MicroVersion')}" />
+    <property name="verstringfull" value="${verstring}.${environment::get-variable('WCREV')}" />
+    <zip zipfile="bin\BowPad-${verstring}-portable.zip" ziplevel="9">
+      <fileset basedir="bin\${configuration}\bin">
+        <include name="BowPad.exe" />
+      </fileset>
+    </zip>
+    <zip zipfile="bin\BowPad64-${verstring}-portable.zip" ziplevel="9">
+      <fileset basedir="bin\${configuration}64\bin">
+        <include name="BowPad.exe" />
+      </fileset>
+    </zip>
+    <exec program="checksum" output="bin\checksum.txt">
+      <arg value="-t" />
+      <arg value="sha256" />
+      <arg value="-f" />
+      <arg value="bin\BowPad-${verstring}.msi" />
+    </exec>
+    <loadfile file="bin\checksum.txt" property="checksum" />
+    <exec program="checksum" output="bin\checksum64.txt">
+      <arg value="-t" />
+      <arg value="sha256" />
+      <arg value="-f" />
+      <arg value="bin\BowPad64-${verstring}.msi" />
+    </exec>
+    <loadfile file="bin\checksum64.txt" property="checksum64" />
+
+    <!-- now write the version.txt file -->
+    <echo file="version.txt">${verstringfull}
+https://sourceforge.net/projects/bowpad-sk/files/${verstring}/BowPad64-${verstring}.msi/download
+BowPad64-${verstring}.msi
+https://sourceforge.net/projects/bowpad-sk/files/${verstring}/BowPad-${verstring}.msi/download
+BowPad-${verstring}.msi</echo>
+    <loadfile file="ext\choco\bowpad.nuspec" property="nuspecfile">
+      <filterchain>
+        <replacetokens begintoken="$" endtoken="$">
+          <token key="MajorVersion" value="${environment::get-variable('MajorVersion')}" />
+          <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
+          <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
+          <token key="WCREV" value="${environment::get-variable('WCREV')}" />
+          <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
+        </replacetokens>
+      </filterchain>
+    </loadfile>
+    <echo file="ext\choco\package\bowpad.nuspec" message="${nuspecfile}" />
+    <loadfile file="ext\choco\chocolateyInstall.ps1" property="cinstfile">
+      <filterchain>
+        <replacetokens begintoken="$" endtoken="$">
+          <token key="MajorVersion" value="${environment::get-variable('MajorVersion')}" />
+          <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
+          <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
+          <token key="WCREV" value="${environment::get-variable('WCREV')}" />
+          <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
+          <token key="checksum" value="${string::trim(checksum)}" />
+          <token key="checksum64" value="${string::trim(checksum64)}" />
+        </replacetokens>
+      </filterchain>
+    </loadfile>
+    <echo file="ext\choco\package\tools\chocolateyInstall.ps1" message="${cinstfile}" />
+    <echo>
+      now start an admin console in ext\choco\package and then run
+      choco pack
+      to upload the package, run
+      cpush BowPad-x.x.x.nupkg
+    </echo>
+  </target>
+
+  <target name="msi" depends="VersionInfo">
+    <description>
+      Builds the msi installer from already built binaries.
+    </description>
+    <nant target="setup">
+      <buildfiles>
+        <include name="src\Setup\setup.build" />
+      </buildfiles>
+    </nant>
+  </target>
+
+  <target name="lang">
+    <delete file="Languages\Languages.txt" />
+    <foreach item="File" property="filename">
+      <in>
+        <items>
+          <include name="Languages\BowPad_*" />
+        </items>
+      </in>
+      <do>
+        <property name="fname" value="${path::get-file-name(filename)}" />
+        <exec program="tools\restext.exe">
+          <arg value="apply" />
+          <arg line="bin\Release\bin\Resource.dll" />
+          <arg line="bin\Release\bin\${path::get-file-name-without-extension(filename)}.lang" />
+          <arg line="${filename}" />
+        </exec>
+        <copy file="bin\Release\bin\${path::get-file-name-without-extension(filename)}.lang" tofile="Languages\x86\${path::get-file-name-without-extension(filename)}.lang" overwrite="true" />
+        <exec program="tools\restext.exe">
+          <arg value="apply" />
+          <arg line="bin\Release64\bin\Resource.dll" />
+          <arg line="bin\Release64\bin\${path::get-file-name-without-extension(filename)}.lang" />
+          <arg line="${filename}" />
+        </exec>
+        <copy file="bin\Release64\bin\${path::get-file-name-without-extension(filename)}.lang" tofile="Languages\x64\${path::get-file-name-without-extension(filename)}.lang" overwrite="true" />
+        <echo message="${string::substring(path::get-file-name-without-extension(filename), 7, string::get-length(path::get-file-name-without-extension(filename))-7)}
+" append="true" file="Languages\Languages.txt"/>
+      </do>
+    </foreach>
+  </target>
+
+  <target name="plugins">
+    <delete file="plugins\plugins.txt" />
+    <foreach item="Folder" in="plugins" property="foldername">
+      <loadfile file="${foldername}\${path::get-file-name(foldername)}.desc" property="desc" encoding="utf-8"/>
+      <echo message="${path::get-file-name(foldername)}${environment::newline()}" append="true" file="plugins\plugins.txt"/>
+      <property name="pver" value="${string::substring(desc, 0, string::index-of(desc, environment::newline()))}" />
+      <property name="desc" value="${string::trim-start(string::substring(desc, string::index-of(desc, environment::newline()), string::get-length(desc)-string::index-of(desc, environment::newline())))}" />
+      <property name="minver" value="${string::substring(desc, 0, string::index-of(desc, environment::newline()))}" />
+      <property name="desc" value="${string::trim-start(string::substring(desc, string::index-of(desc, environment::newline()), string::get-length(desc)-string::index-of(desc, environment::newline())))}" />
+      <property name="desc" value="${string::replace(desc, environment::newline(), '\n')}" />
+      <echo message="${pver}${environment::newline()}" append="true" file="plugins\plugins.txt"/>
+      <echo message="${minver}${environment::newline()}" append="true" file="plugins\plugins.txt"/>
+      <echo message="${desc}${environment::newline()}" append="true" file="plugins\plugins.txt"/>
+
+      <zip zipfile="plugins\${path::get-file-name(foldername)}.zip">
+        <fileset basedir="plugins">
+          <include name="${foldername}\**" />
+        </fileset>
+      </zip>
+
+    </foreach>
+  </target>
+</project>
