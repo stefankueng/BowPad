@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -870,7 +870,8 @@ DocModifiedState CDocumentManager::HasFileChanged(DocID id ) const
     CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (!hFile.IsValid())
     {
-        if (GetLastError() == ERROR_FILE_NOT_FOUND)
+        auto lastError = GetLastError();
+        if ((lastError == ERROR_FILE_NOT_FOUND) || (lastError == ERROR_PATH_NOT_FOUND))
             return DM_Removed;
         return DM_Unknown;
     }
