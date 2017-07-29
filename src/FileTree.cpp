@@ -326,7 +326,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                     }
                     tvi.lParam = (LPARAM)item;
                     tvins.itemex = tvi;
-                    tvins.hInsertAfter = TVI_LAST;
+                    tvins.hInsertAfter = TVI_FIRST;
                     tvins.hParent = pData->refreshRoot;
 
                     TreeView_InsertItem(*this, &tvins);
