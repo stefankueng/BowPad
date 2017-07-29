@@ -471,6 +471,11 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
         m_bRootBusy = false;
         return;
     }
+    if (!PathFileExists(refreshPath.c_str()))
+    {
+        m_bRootBusy = false;
+        return;
+    }
 
 
     InterlockedIncrement(&m_ThreadsRunning);
