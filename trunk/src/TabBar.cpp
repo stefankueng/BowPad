@@ -933,8 +933,6 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
         GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - 5, rItem.right, rItem.bottom,
                                   CTheme::Instance().GetThemeColor(indicColor));
     }
-    if (tci.iImage == UNSAVED_IMG_INDEX)
-        wcscat_s(buf, L"*");
 
     const int PADDING = 2;
     // text & icon
@@ -983,8 +981,6 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
 
     // text
     rItem.right -= PADDING;
-    UINT uFlags = DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER;
-    ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, uFlags);
     COLORREF textColor;
     if (tci.iImage == REDONLY_IMG_INDEX)
     {
@@ -1000,7 +996,25 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     else
         textColor = CTheme::Instance().GetThemeColor(GDIHelpers::Darker(::GetSysColor(COLOR_3DDKSHADOW), 0.5f));
     SetTextColor(pDrawItemStruct->hDC, textColor);
-    DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, uFlags);
+
+    // find the width of the asterisk
+    int AsteriskOffset = 0;
+    if (tci.iImage == UNSAVED_IMG_INDEX)
+    {
+        RECT rAsterisk = rItem;
+        ::DrawText(pDrawItemStruct->hDC, L"*", 1, &rAsterisk, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_CALCRECT);
+        AsteriskOffset = (rAsterisk.right - rAsterisk.left) + 4;
+    }
+
+    rItem.right -= AsteriskOffset;
+    ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER);
+    rItem.right += AsteriskOffset;
+    // now draw the asterisk if necessary
+    if (tci.iImage == UNSAVED_IMG_INDEX)
+    {
+        rItem.left = rItem.right - AsteriskOffset;
+        ::DrawText(pDrawItemStruct->hDC, L"*", 1, &rItem, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER);
+    }
 }
 
 
