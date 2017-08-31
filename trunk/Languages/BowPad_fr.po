@@ -5,17 +5,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: BowPad\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2014-10-27 19:19+0100\n"
-"Last-Translator: \n"
-"Language-Team: Non <LL@li.org>\n"
+"PO-Revision-Date: 2017-08-29 18:00+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Last-Translator: \n"
+"Language-Team: \n"
 "Language: fr\n"
-"X-Generator: Poedit 1.6.10\n"
+"X-Generator: Poedit 2.0.3\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -36,7 +36,7 @@ msgstr "&A propos"
 
 #. Resource IDs: (7)
 msgid "&Cancel"
-msgstr "Annulé"
+msgstr "Annuler"
 
 #. Resource IDs: (3754)
 msgid "&Close Tab"
@@ -48,7 +48,7 @@ msgstr "&Fichier"
 
 #. Resource IDs: (1001)
 msgid "&Find Next"
-msgstr "Trouver suivant"
+msgstr "&Suivant"
 
 #. Resource IDs: (65535)
 msgid "&Help"
@@ -68,7 +68,7 @@ msgstr "&Recharger"
 
 #. Resource IDs: (1003)
 msgid "&Replace"
-msgstr "&Remplacer"
+msgstr "Remplacer"
 
 #. Resource IDs: (7)
 msgid "&Save"
@@ -76,7 +76,7 @@ msgstr "Enregi&strer"
 
 #. Resource IDs: (1005)
 msgid "&Search for:"
-msgstr "Recherche de :"
+msgstr "Rechercher :"
 
 #. Resource IDs: (9)
 msgid "<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Full details about this update</a>"
@@ -109,7 +109,7 @@ msgstr "L'accès au dossier '%s' a été refusé. Voulez-vous essayer de nouveau
 
 #. Resource IDs: (3756)
 msgid "Allows to load a file with a specific encoding"
-msgstr "Permet de charger un fichier avec un codage spécifique"
+msgstr "Permet de charger un fichier avec un encodage spécifique"
 
 #. Resource IDs: (9)
 msgid "An update for BowPad is available"
@@ -117,11 +117,11 @@ msgstr "Une mise à jour pour BowPad est disponible"
 
 #. Resource IDs: (3753)
 msgid "Asks where to save the current tab"
-msgstr "Où enregistrer l'onglet actif ?"
+msgstr "Où enregistrer l'onglet actif"
 
 #. Resource IDs: (65535)
 msgid "Author: Stefan Küng"
-msgstr "Auteur : Stefan Küng"
+msgstr "Auteur : Stefan Küng - Traduction : Etienne Jacquemoud"
 
 #. Resource IDs: (3780)
 msgid "Auto Braces"
@@ -153,7 +153,7 @@ msgstr "BT"
 
 #. Resource IDs: (1020)
 msgid "bold"
-msgstr "bold"
+msgstr "gras"
 
 #. Resource IDs: (3764)
 msgid "Bookmark"
@@ -197,11 +197,15 @@ msgstr "CU"
 
 #. Resource IDs: (2)
 msgid "Cancel"
-msgstr "Annulé"
+msgstr "Annuler"
 
 #. Resource IDs: (8)
-msgid "Cancel\nThe file is not loaded again."
-msgstr "Annulé\nLe fichier n'est pas encore chargé"
+msgid ""
+"Cancel\n"
+"The file is not loaded again."
+msgstr ""
+"Annulé\n"
+"Le fichier n'est pas encore chargé."
 
 #. Resource IDs: (3764)
 msgid "Char operations"
@@ -209,7 +213,7 @@ msgstr "Opérations"
 
 #. Resource IDs: (1027)
 msgid "Check for Updates"
-msgstr "Vérifier les Mises à jour"
+msgstr "Vérifier les mises à jour"
 
 #. Resource IDs: (2)
 msgid "Cl&ose"
@@ -225,7 +229,7 @@ msgstr "Presse-papiers"
 
 #. Resource IDs: (3753)
 msgid "Close All Tabs"
-msgstr "Fermez tous les onglets"
+msgstr "Fermer tous les onglets"
 
 #. Resource IDs: (3773)
 msgid "Close All Tabs Except This One"
@@ -241,15 +245,19 @@ msgstr "Fermer tout"
 
 #. Resource IDs: (3773)
 msgid "Close all but this"
-msgstr "Fermer tout sauf cela"
+msgstr "Fermer tout sauf ceci"
 
 #. Resource IDs: (3753)
 msgid "Close the current tab"
 msgstr "Fermer l'onglet actif"
 
 #. Resource IDs: (8)
-msgid "Close the document\nThe document tab is closed."
-msgstr "Fermer le document\nL'onglet du document est fermé"
+msgid ""
+"Close the document\n"
+"The document tab is closed."
+msgstr ""
+"Fermer le document\n"
+"L'onglet du document est fermé."
 
 #. Resource IDs: (3753)
 msgid "Closes all open files"
@@ -257,7 +265,7 @@ msgstr "Ferme tous les fichiers ouverts"
 
 #. Resource IDs: (3773)
 msgid "Closes all open files except the current one"
-msgstr "Ferme tous les fichiers ouverts sauf l'actuel"
+msgstr "Ferme tous les fichiers ouverts sauf celui-ci"
 
 #. Resource IDs: (3767)
 msgid "Cmd"
@@ -301,7 +309,7 @@ msgstr "Configurer les raccourcis"
 
 #. Resource IDs: (3758)
 msgid "Configure Styles"
-msgstr "Configurer les Styles"
+msgstr "Configurer les styles"
 
 #. Resource IDs: (3758)
 msgid "Configure colors, fonts, styles and sizes"
@@ -313,15 +321,15 @@ msgstr "Configurer les commandes personnalisées"
 
 #. Resource IDs: (3756)
 msgid "Convert to"
-msgstr "Convertir en"
+msgstr "Convertir vers"
 
 #. Resource IDs: (3764)
 msgid "Converts all spaces in the document to tabs"
-msgstr "Convertit tous les espaces du document en tabulations"
+msgstr "Convertit tous les espaces du document en onglets"
 
 #. Resource IDs: (3764)
 msgid "Converts all tabs in the document to spaces"
-msgstr "Convertit toutes les tabulations du document en espaces"
+msgstr "Convertit tous les onglets du document en espaces"
 
 #. Resource IDs: (3756)
 msgid "Converts the file to the specified encoding"
@@ -341,15 +349,15 @@ msgstr "Convertit la sélection en minuscules"
 
 #. Resource IDs: (3774)
 msgid "Copies the name of the current file to the clipboard"
-msgstr "Copie le nom du fichier en cours dans le presse papier"
+msgstr "Copie le nom du fichier actuel dans le presse-papiers"
 
 #. Resource IDs: (3774)
 msgid "Copies the path of the current file to the clipboard"
-msgstr "Copie le chemin du fichier en cours dans le presse papier"
+msgstr "Copie le chemin du fichier actuel dans le presse-papiers"
 
 #. Resource IDs: (3774)
 msgid "Copies the path of the directory of the current file to the clipboard"
-msgstr "Copie le chemin du dossier du fichier actuel dans le presse papier"
+msgstr "Copie le chemin du répertoire du fichier actuel dans le presse-papiers"
 
 #. Resource IDs: (3753)
 msgid "Copy"
@@ -377,7 +385,7 @@ msgstr "Fichier correspondant"
 
 #. Resource IDs: (9)
 msgid "Could not download the language file!"
-msgstr "Impossible de télécharger le fichier de langue."
+msgstr "Impossible de télécharger le fichier de langue !"
 
 #. Resource IDs: (3752)
 msgid "Creates a new tab with an empty document"
@@ -457,16 +465,20 @@ msgstr "Supprimer"
 
 #. Resource IDs: (3760)
 msgid "Determines whether a tab is inserted or spaces when the tab key is pressed."
-msgstr "Détermine si une tabulation ou des espaces sont insérés lorsque la touche de tabulation est actionnée"
+msgstr "Détermine si un onglet ou des espaces sont insérés lorsque la touche de tabulation est actionnée"
 
 #. Resource IDs: (9)
-msgid "Do &not download the update\nYou will be reminded again about the update in a week."
-msgstr "&Ne pas télécharger la mise à jour\n"Un nouveau rappel de la mise à jour sera effectué dans une semaine.
+msgid ""
+"Do &not download the update\n"
+"You will be reminded again about the update in a week."
+msgstr ""
+"&Ne pas télécharger la mise à jour\n"
+"\"Un nouveau rappel de la mise à jour sera effectué dans une semaine"
 
 #. Resource IDs: (7)
 #, c-format
 msgid "Do you want to save changes to \"%s\""
-msgstr "Voulez-vous enregistrer les modifications apportées à \"%s\""
+msgstr "Voulez-vous enregistrer les modifications apportées à \"%s\" ?"
 
 #. Resource IDs: (7)
 msgid "Do&n't save"
@@ -481,24 +493,40 @@ msgid "Document removed"
 msgstr "Document supprimé"
 
 #. Resource IDs: (10)
-msgid "Don't Save\nThe file is not saved."
-msgstr "Ne pas enregistrer\nLe fichier n'est pas enregistré."
+msgid ""
+"Don't Save\n"
+"The file is not saved."
+msgstr ""
+"Ne pas enregistrer\n"
+"Le fichier n'est pas enregistré."
 
 #. Resource IDs: (10)
-msgid "Don't open\nThe file is not opened."
-msgstr "Ne pas ouvrir\nLe fichier n'est pas ouvert."
+msgid ""
+"Don't open\n"
+"The file is not opened."
+msgstr ""
+"Ne pas ouvrir\n"
+"Le fichier n'est pas ouvert."
 
 #. Resource IDs: (8)
-msgid "Download and install the update\nUpdates BowPad to the latest version."
-msgstr "Téléchargez et installez la mise à jour\nMise à jour de la dernière version"
+msgid ""
+"Download and install the update\n"
+"Updates BowPad to the latest version."
+msgstr ""
+"Téléchargez et installez la mise à jour\n"
+"Mise à jour de la dernière version"
 
 #. Resource IDs: (9)
 msgid "Download of language list succeeded. Now you can select a language from that list."
-msgstr "Téléchargement réussi de la liste des langues. Maintenant, vous pouvez sélectionner un langage de cette liste."
+msgstr "Téléchargement réussi de la liste des langues. Vous pouvez maintenant sélectionner une langue de cette liste."
 
 #. Resource IDs: (9)
-msgid "Download the update\nYou have to install the update manually."
-msgstr "Télécharger la mise à jour\nVous devez installer la mise à jour manuellement."
+msgid ""
+"Download the update\n"
+"You have to install the update manually."
+msgstr ""
+"Télécharger la mise à jour\n"
+"Vous devez installer la mise à jour manuellement."
 
 #. Resource IDs: (3760, 3761)
 msgid "Duplicate Line"
@@ -514,7 +542,7 @@ msgstr "E"
 
 #. Resource IDs: (105)
 msgid "E&xit"
-msgstr "Quitter"
+msgstr "&Quitter"
 
 #. Resource IDs: (3757)
 msgid "ENC"
@@ -562,7 +590,7 @@ msgstr "Impossible de télécharger la liste des langues disponibles."
 
 #. Resource IDs: (9)
 msgid "Fetch remote languages..."
-msgstr "Chercher des langues ailleurs..."
+msgstr "Récupérer la liste des langues..."
 
 #. Resource IDs: (3751)
 msgid "File"
@@ -590,15 +618,15 @@ msgstr "Rechercher tout dans les ongle&ts ouverts"
 
 #. Resource IDs: (3758)
 msgid "Find Next"
-msgstr "Recherche suivante"
+msgstr "Suivant"
 
 #. Resource IDs: (3758)
 msgid "Find Next Selected"
-msgstr "Rechercher la sélection suivante"
+msgstr "Sélection suivante"
 
 #. Resource IDs: (3758)
 msgid "Find Previous"
-msgstr "Recherche précédente"
+msgstr "Précédent"
 
 #. Resource IDs: (143)
 msgid "Find and replace"
@@ -638,7 +666,7 @@ msgstr "Insère le contenu du presse-papiers à la position du curseur"
 
 #. Resource IDs: (1021)
 msgid "Italic"
-msgstr "Italic"
+msgstr "Italique"
 
 #. Resource IDs: (3765)
 msgid "JL"
@@ -646,15 +674,19 @@ msgstr "JL"
 
 #. Resource IDs: (3761)
 msgid "Join Lines"
-msgstr "Relier les lignes"
+msgstr "Lier les lignes"
 
 #. Resource IDs: (3761)
 msgid "Join selected lines to one long line"
-msgstr "Relier les lignes sélectionnées par une longue ligne"
+msgstr "Lier les lignes sélectionnées par une longue ligne"
 
 #. Resource IDs: (8)
-msgid "Keep the document\nThe document is kept open."
-msgstr "Conserver le document\nLe document est maintenu ouvert"
+msgid ""
+"Keep the document\n"
+"The document is kept open."
+msgstr ""
+"Conserver le document\n"
+"Le document est maintenu ouvert"
 
 #. Resource IDs: (3757)
 msgid "LA"
@@ -685,8 +717,12 @@ msgid "Language"
 msgstr "Langue"
 
 #. Resource IDs: (9)
-msgid "Language selected.\nYou need to restart BowPad for the changes to take effect."
-msgstr "Langue sélectionnée.\nVous devez redémarrer BowPad pour que les modifications prennent effet."
+msgid ""
+"Language selected.\n"
+"You need to restart BowPad for the changes to take effect."
+msgstr ""
+"Langue sélectionnée.\n"
+"Vous devez redémarrer BowPad pour que les modifications prennent effet."
 
 #. Resource IDs: (65535)
 msgid "Language:"
@@ -726,11 +762,11 @@ msgstr "Ligne"
 
 #. Resource IDs: (3756)
 msgid "Line Endings"
-msgstr "Fins de lignes"
+msgstr "Fins de ligne"
 
 #. Resource IDs: (10)
 msgid "Line Text"
-msgstr "Ligne de texte"
+msgstr "Texte de ligne"
 
 #. Resource IDs: (65535)
 msgid "Line:"
@@ -742,7 +778,7 @@ msgstr "Lignes"
 
 #. Resource IDs: (3756)
 msgid "Load as"
-msgstr "Charger comme"
+msgstr "Charger en tant que"
 
 #. Resource IDs: (3772)
 msgid "Load last session"
@@ -766,7 +802,7 @@ msgstr "Charge automatiquement tous les fichiers ouverts lors de la dernière fe
 
 #. Resource IDs: (3772)
 msgid "Loads all files that were open the last time BowPad got closed"
-msgstr "Charge tous les fichiers qui étaient ouverts lors de la dernière fermeture de BowPad"
+msgstr "Charge tous les fichiers ouverts lors de la dernière fermeture de BowPad"
 
 #. Resource IDs: (3760)
 msgid "Lowercase"
@@ -798,11 +834,11 @@ msgstr "MU"
 
 #. Resource IDs: (3751)
 msgid "Main"
-msgstr "Principal"
+msgstr "Accueil"
 
 #. Resource IDs: (8)
 msgid "Main Encodings"
-msgstr "Principaux codages"
+msgstr "Principaux encodages"
 
 #. Resource IDs: (1008)
 msgid "Match &case"
@@ -830,11 +866,11 @@ msgstr "Déplacer la ligne vers le haut"
 
 #. Resource IDs: (3765)
 msgid "Move the caret to the next bookmark"
-msgstr "Déplacer le signe d'insertion vers le signet suivant"
+msgstr "Déplacer le chariot vers le signet suivant"
 
 #. Resource IDs: (3765)
 msgid "Move the caret to the previous bookmark"
-msgstr "Déplacer le signe d'insertion vers le signet précédent"
+msgstr "Déplacer le chariot vers le signet précédent"
 
 #. Resource IDs: (3761)
 msgid "Move up"
@@ -866,7 +902,7 @@ msgstr "N"
 
 #. Resource IDs: (3760)
 msgid "NEXT"
-msgstr "NEXT"
+msgstr "SUIVANT"
 
 #. Resource IDs: (7)
 #, c-format
@@ -890,8 +926,12 @@ msgid "No functions found!"
 msgstr "Pas de fonctions trouvées !"
 
 #. Resource IDs: (9)
-msgid "No updates available.\nYou already have the current version."
-msgstr "Aucune mise à jour de disponible.\nVous avez déjà la dernière version."
+msgid ""
+"No updates available.\n"
+"You already have the current version."
+msgstr ""
+"Aucune mise à jour n'est disponible.\n"
+"Vous avez déjà la dernière version."
 
 #. Resource IDs: (3753)
 msgid "O"
@@ -911,11 +951,11 @@ msgstr "Ouvrir"
 
 #. Resource IDs: (3769)
 msgid "Open Console"
-msgstr "Ouvrir la Console"
+msgstr "Ouvrir la console"
 
 #. Resource IDs: (3769)
 msgid "Open Explorer"
-msgstr "Ouvrir l'Explorateur"
+msgstr "Ouvrir l'explorateur"
 
 #. Resource IDs: (3752)
 msgid "Open Files"
@@ -926,8 +966,12 @@ msgid "Open corresponding File"
 msgstr "Ouvrir le fichier correspondant"
 
 #. Resource IDs: (10)
-msgid "Open elevated\nBowPad is started again with elevated privileges."
-msgstr "Elever les privilèges\nBowPad est redémarré avec des privilèges élevés."
+msgid ""
+"Open elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"Elever les privilèges\n"
+"BowPad est redémarré avec des privilèges élevés."
 
 #. Resource IDs: (3752)
 msgid "Opens one or more files"
@@ -935,7 +979,7 @@ msgstr "Ouvre un ou plusieurs fichiers"
 
 #. Resource IDs: (3769)
 msgid "Opens the Console at the current file location"
-msgstr "Ouvre la Console à l'emplacement actuel du fichier"
+msgstr "Ouvre la console à l'emplacement du fichier actuel"
 
 #. Resource IDs: (3769)
 msgid "Opens the Windows Explorer at the current file location"
@@ -943,15 +987,19 @@ msgstr "Ouvre l'explorateur Windows à l'emplacement du fichier actuel"
 
 #. Resource IDs: (3774)
 msgid "Opens the Windows Explorer at the current file path"
-msgstr "Ouvre l'explorateur Windows dans le chemin du fichier en cours"
+msgstr "Ouvre l'explorateur Windows à l'emplacement du fichier actuel"
 
 #. Resource IDs: (3775)
 msgid "Opens the config file to configure keyboard shortcuts for any command in BowPad"
-msgstr "Ouvre le fichier de configuration pour configurer les raccourcis clavier de toutes commandes de BowPad"
+msgstr "Ouvre le fichier de configuration pour paramétrer les raccourcis clavier des commandes de BowPad"
 
 #. Resource IDs: (3772)
-msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
-msgstr "Ouvre le fichier correspondant au fichier dans l'onglet actuel.\n(h/cpp, aspx/cs/vb)"
+msgid ""
+"Opens the corresponding file to the file in the current tab.\n"
+"(h/cpp, aspx/cs/vb)"
+msgstr ""
+"Ouvre le fichier correspondant au fichier dans l'onglet actuel.\n"
+"(h/cpp, aspx/cs/vb)"
 
 #. Resource IDs: (3767)
 msgid "Opens the current file in Microsoft Internet Explorer"
@@ -975,7 +1023,7 @@ msgstr "Ouvre le fichier en cours dans Safari"
 
 #. Resource IDs: (3769)
 msgid "Opens the default browser to search Wikipedia for the selected text"
-msgstr "Ouvre le navigateur par défaut pour rechercher dans Wikipedia le texte sélectionné"
+msgstr "Ouvre le navigateur par défaut pour rechercher sur Wikipédia le texte sélectionné"
 
 #. Resource IDs: (3769)
 msgid "Opens the default browser to search for the selected text"
@@ -1019,7 +1067,7 @@ msgstr "Imprimer"
 
 #. Resource IDs: (3763)
 msgid "Print Page Setup"
-msgstr "Imprimer la mise en Page"
+msgstr "Imprimer la mise en page"
 
 #. Resource IDs: (3762)
 msgid "Print now"
@@ -1035,7 +1083,7 @@ msgstr "R&emplacer par :"
 
 #. Resource IDs: (3769)
 msgid "RELOAD"
-msgstr "RELOAD"
+msgstr "RECHARGER"
 
 #. Resource IDs: (3754, 3755)
 msgid "Redo"
@@ -1047,27 +1095,35 @@ msgstr "Refaire ce qui a été annulé précédemment"
 
 #. Resource IDs: (10)
 msgid "Regex expression is invalid!"
-msgstr "L'expression Regex est invalide !"
+msgstr "L'expression régulière est invalide !"
 
 #. Resource IDs: (10)
 msgid "Regex expression is valid"
-msgstr "L'expression Regex est valide"
+msgstr "L'expression régulière est valide"
 
 #. Resource IDs: (3765)
 msgid "Reload"
 msgstr "Recharger"
 
 #. Resource IDs: (8)
-msgid "Reload document\nThe document is refreshed from disk."
-msgstr "Recharger le document\nLe document est actualisé à partir du disque."
+msgid ""
+"Reload document\n"
+"The document is refreshed from disk."
+msgstr ""
+"Recharger le document\n"
+"Le document est actualisé à partir du disque."
 
 #. Resource IDs: (8)
-msgid "Reload document\nThe unsaved modifications are lost."
-msgstr "Recharger le document\nLes modifications non enregistrées seront perdues."
+msgid ""
+"Reload document\n"
+"The unsaved modifications are lost."
+msgstr ""
+"Recharger le document\n"
+"Les modifications non enregistrées sont perdues."
 
 #. Resource IDs: (3765)
 msgid "Reload the file from disk"
-msgstr "Recharger le fichier du disque"
+msgstr "Recharger le fichier depuis le disque"
 
 #. Resource IDs: (3765)
 msgid "Removes all bookmarks from the current file"
@@ -1075,7 +1131,7 @@ msgstr "Supprime tous les signets dans le fichier actuel"
 
 #. Resource IDs: (3763)
 msgid "Removes whitespaces at the end of lines"
-msgstr "Supprime les espaces situés en fin de lignes"
+msgstr "Supprime les espaces à la fin des lignes"
 
 #. Resource IDs: (1004)
 msgid "Replace A&ll"
@@ -1122,12 +1178,20 @@ msgid "Save as"
 msgstr "Enregistrer sous"
 
 #. Resource IDs: (10)
-msgid "Save elevated\nBowPad is started again with elevated privileges."
-msgstr "Enregistrer l'élévation\nBowPad est redémarré avec des privilèges élevés."
+msgid ""
+"Save elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"Enregistrer avec élévation de privilèges\n"
+"BowPad est redémarré avec des privilèges élevés."
 
 #. Resource IDs: (8)
-msgid "Save modifications\nThe modifications that were made outside BowPad are overwritten."
-msgstr "Enregistrer les modifications\nLes modifications apportées précédemment à BowPad seront écrasées."
+msgid ""
+"Save modifications\n"
+"The modifications that were made outside BowPad are overwritten."
+msgstr ""
+"Enregistrer les modifications\n"
+"Les modifications apportées à l'extérieur de BowPad sont écrasées."
 
 #. Resource IDs: (3753)
 msgid "Saves all open files"
@@ -1147,7 +1211,7 @@ msgstr "Recherche Web"
 
 #. Resource IDs: (3769)
 msgid "Search Wikipedia"
-msgstr "Recherche Wikipedia"
+msgstr "Recherche Wikipédia"
 
 #. Resource IDs: (3758)
 msgid "Search and/or replace text in documents/tabs"
@@ -1159,7 +1223,7 @@ msgstr "Texte non trouvé !"
 
 #. Resource IDs: (3759)
 msgid "Searches for the next match of the selected text"
-msgstr "Recherche le prochain résultat du texte sélectionné"
+msgstr "Recherche le résultat suivant dans le texte sélectionné"
 
 #. Resource IDs: (3766)
 msgid "Select Language"
@@ -1171,7 +1235,7 @@ msgstr "Sélectionner tout"
 
 #. Resource IDs: (3766)
 msgid "Select the language for BowPad"
-msgstr "Sélectionnez la langue pour BowPad"
+msgstr "Sélectionner la langue de BowPad"
 
 #. Resource IDs: (3762)
 msgid "Sends the document to a printer"
@@ -1183,11 +1247,11 @@ msgstr "Envoie le document à l'imprimante par défaut"
 
 #. Resource IDs: (3756)
 msgid "Set the coloring according to the code language"
-msgstr "Définir la couleur selon le code de language"
+msgstr "Définir la couleur selon le langage du code"
 
 #. Resource IDs: (3760)
 msgid "Set the number of columns for one tabulator."
-msgstr "Définir le nombre de colonnes pour un tabulateur."
+msgstr "Définir le nombre de colonnes pour une tabulation."
 
 #. Resource IDs: (3763)
 msgid "Set up print margins, page size, page orientation"
@@ -1211,15 +1275,15 @@ msgstr "Affiche une boîte de dialogue pour configurer des commandes personnalis
 
 #. Resource IDs: (3773)
 msgid "Shows a list of functions/methods in the file to jump to"
-msgstr "Affiche une liste des fonctions/méthodes dans la Jump File"
+msgstr "Affiche une liste des fonctions/méthodes dans le fichier où aller"
 
 #. Resource IDs: (3775)
 msgid "Shows the Windows Explorer file properties dialog for the current file"
-msgstr "Affiche la boîte de dialogue Propriétés du fichier pour le fichier actuel"
+msgstr "Affiche la boîte de dialogue Propriétés du fichier actuel"
 
 #. Resource IDs: (3764)
 msgid "Spaces to Tabs"
-msgstr "Convertir les espaces en tabulations"
+msgstr "Espaces en Onglets"
 
 #. Resource IDs: (3761)
 msgid "Split Lines"
@@ -1239,7 +1303,7 @@ msgstr "Style :"
 
 #. Resource IDs: (65535)
 msgid "Styles"
-msgstr "Styles :"
+msgstr "Styles"
 
 #. Resource IDs: (3768)
 msgid "T"
@@ -1255,17 +1319,17 @@ msgstr "TT"
 
 #. Resource IDs: (3764)
 msgid "Tabs to Spaces"
-msgstr "Convertir les tabulations en espaces"
+msgstr "Onglets en Espaces"
 
 #. Resource IDs: (8)
 #, c-format
 msgid "The document '%s' was modified outside of BowPad, but there are unsaved changes in the document."
-msgstr "Le document '%s' a été modifiée en dehors de BowPad, de ce fait il comporte des modifications non enregistrées."
+msgstr "Le document '%s' a été modifié en dehors de BowPad, mais il comporte des modifications non enregistrées."
 
 #. Resource IDs: (8)
 #, c-format
 msgid "The document '%s' was modified outside of BowPad."
-msgstr "Le document '%s' a été modifiée en dehors de BowPad."
+msgstr "Le document '%s' a été modifié en dehors de BowPad."
 
 #. Resource IDs: (8)
 #, c-format
@@ -1278,7 +1342,7 @@ msgstr "Titre"
 
 #. Resource IDs: (3765)
 msgid "Toggle Bookmark"
-msgstr "Basculer le signet"
+msgstr "Ajouter/retirer le signet"
 
 #. Resource IDs: (3765)
 msgid "Toggle a bookmark on the current line"
@@ -1290,15 +1354,19 @@ msgstr "Basculer entre le thème normal et le thème sombre"
 
 #. Resource IDs: (3763)
 msgid "Trim Whitespaces"
-msgstr "Remplir les espaces"
+msgstr "Supprimer les espaces"
 
 #. Resource IDs: (9)
 msgid "Turn off automatic update checks"
-msgstr "Désactiver les contrôles de mise à jour automatique"
+msgstr "Désactiver le contrôle automatique des mises à jour"
 
 #. Resource IDs: (3757)
-msgid "Turns showing whitespaces on/off.\nHold down the Shift key to show EOLs as well."
-msgstr "Affichage des espaces on/off.\nMaintenez la touche Maj enfoncée pour bien voir la fin de ligne."
+msgid ""
+"Turns showing whitespaces on/off.\n"
+"Hold down the Shift key to show EOLs as well."
+msgstr ""
+"Affichage des espaces on/off.\n"
+"Maintenez la touche Shift enfoncée pour voir les fins de lignes."
 
 #. Resource IDs: (3751)
 msgid "U"
@@ -1306,7 +1374,7 @@ msgstr "U"
 
 #. Resource IDs: (3759)
 msgid "UPPER/lower"
-msgstr "Supérieure/Inférieure"
+msgstr "MAJUSCULES/minuscules"
 
 #. Resource IDs: (3764)
 msgid "UT"
@@ -1314,15 +1382,15 @@ msgstr "UT"
 
 #. Resource IDs: (3759)
 msgid "Uncomment"
-msgstr "Sans commentaire"
+msgstr "Décommenter"
 
 #. Resource IDs: (3759)
 msgid "Uncomments the selected text"
-msgstr "Sélection de texte sans commentaire"
+msgstr "Décommenter le texte sélectionné"
 
 #. Resource IDs: (1009)
 msgid "Underline"
-msgstr "Soulignement"
+msgstr "Souligner"
 
 #. Resource IDs: (3751, 3754)
 msgid "Undo"
@@ -1346,11 +1414,11 @@ msgstr "Majuscules"
 
 #. Resource IDs: (10)
 msgid "Use $0 for the whole match, and $1..$99 for group matches."
-msgstr "Utilisez $0 pour l'ensemble des résultats, et $1..$99 pour les groupes"
+msgstr "Utiliser $0 pour une correspondance exacte et $1..$99 pour les correspondances de groupe"
 
 #. Resource IDs: (3760)
 msgid "Use Tabs"
-msgstr "Utiliser des tabulations"
+msgstr "Utiliser les onglets"
 
 #. Resource IDs: (3751, 3752, 3755)
 msgid "V"
@@ -1366,11 +1434,11 @@ msgstr "Bordure verticale"
 
 #. Resource IDs: (3751)
 msgid "View"
-msgstr "Voir"
+msgstr "Affichage"
 
 #. Resource IDs: (1026)
 msgid "Visit our Website"
-msgstr "Visitez notre site Web"
+msgstr "Visiter notre site Web"
 
 #. Resource IDs: (3756)
 msgid "W"
@@ -1398,11 +1466,11 @@ msgstr "Retour à la ligne"
 
 #. Resource IDs: (9)
 msgid "Wrap around"
-msgstr "Entourer"
+msgstr "Wrap around"
 
 #. Resource IDs: (3755)
 msgid "Wrap lines at the end of the window"
-msgstr "Entourer les lignes à la fin de la fenêtre"
+msgstr "Retour à la ligne à la fin de la fenêtre"
 
 #. Resource IDs: (3752, 3755)
 msgid "X"
@@ -1413,8 +1481,22 @@ msgid "Y"
 msgstr "Y"
 
 #. Resource IDs: (9)
-msgid "You can use the following strings in the command line:\r\n$(LINE)\t\t\tThe line where the cursor is\r\n$(POS)\t\t\tthe position where the cursor is\r\n$(TAB_PATH)\t\tthe path to the file of the active tab\r\n$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
-msgstr "Vous pouvez utiliser les chaînes suivantes dans la ligne de commande :\r\n$(LINE)\t\t\tLa ligne où le curseur est\r\n$(POS)\t\t\tla position où le curseur est\r\n$(TAB_PATH)\t\tle chemin d'accès au fichier de l'onglet actif\r\n$(TAB_DIR)\t\tle répertoire du fichier de l'onglet actif\r\n$(SEL-TEXT)\t\tle texte sélectionné ou le mot à la position du curseur\r\n$(SEL_TEXT_ESCAPED)\tcomme $(SEL_TEXT) mais escaped, utilisé pour les URLs"
+msgid ""
+"You can use the following strings in the command line:\r\n"
+"$(LINE)\t\t\tThe line where the cursor is\r\n"
+"$(POS)\t\t\tthe position where the cursor is\r\n"
+"$(TAB_PATH)\t\tthe path to the file of the active tab\r\n"
+"$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n"
+"$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n"
+"$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
+msgstr ""
+"Vous pouvez utiliser les chaînes suivantes en ligne de commande :\r\n"
+"$(LINE)\t\t\\La ligne où se trouve le curseur\r\n"
+"$(POS)\t\t\tLa position où se trouve le curseur\r\n"
+"$(TAB_PATH)\t\tLe chemin du fichier de l'onglet actif\r\n"
+"$(TAB_DIR)\t\tLe répertoire du fichier de l'onglet actif\r\n"
+"$(SEL-TEXT)\t\tLe texte ou le mot sélectionné à l'emplacement du curseur\r\n"
+"$(SEL_TEXT_ESCAPED)\tComme la variable $(SEL_TEXT) mais échappé (utile pour les URL)"
 
 #. Resource IDs: (3756)
 msgid "Z"
@@ -1422,7 +1504,7 @@ msgstr "Z"
 
 #. Resource IDs: (65535)
 msgid "background:"
-msgstr "Fond :"
+msgstr "Arrière plan :"
 
 #. Resource IDs: (65535)
 msgid "foreground:"
