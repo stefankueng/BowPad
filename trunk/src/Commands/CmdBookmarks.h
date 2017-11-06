@@ -111,6 +111,13 @@ public:
 
     HRESULT IUICommandHandlerUpdateProperty(
         REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    void  TabNotify(TBHDR * ptbhdr) override
+    {
+        if (ptbhdr->hdr.code == TCN_SELCHANGE)
+        {
+            InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
+        }
+    }
 };
 
 class CCmdBookmarkPrev : public ICommand
@@ -135,4 +142,11 @@ public:
 
     HRESULT IUICommandHandlerUpdateProperty(
         REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    void  TabNotify(TBHDR * ptbhdr) override
+    {
+        if (ptbhdr->hdr.code == TCN_SELCHANGE)
+        {
+            InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
+        }
+    }
 };
