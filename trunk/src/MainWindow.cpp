@@ -1,4 +1,4 @@
-﻿// This file is part of BowPad.
+// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -2696,7 +2696,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.SetupLexerForLang(doc.GetLanguage());
     m_editor.RestoreCurrentPos(doc.m_position);
     m_editor.SetTabSettings(doc.m_TabSpace);
-    CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc);
+    CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, true);
     g_pFramework->InvalidateUICommand(cmdUseTabs, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     m_editor.MarkSelectedWord(true);
     m_editor.MarkBookmarksInScrollbar();
@@ -2871,6 +2871,8 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 if (!m_tabmovetitle.empty())
                     m_TabBar.SetCurrentTitle(m_tabmovetitle.c_str());
             }
+
+            CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, false);
 
             m_DocManager.AddDocumentAtEnd(doc, id);
 
@@ -3392,6 +3394,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
     doc.SetLanguage(lang);
     editor->RestoreCurrentPos(docreload.m_position);
     editor->Call(SCI_SETREADONLY, docreload.m_bIsWriteProtected);
+    CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, editor, doc, false);
     if (bReloadCurrentTab)
         UpdateStatusBar(true);
     UpdateTab(docID);
