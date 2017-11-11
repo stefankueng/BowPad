@@ -318,9 +318,11 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, co
                 auto& doc = GetModActiveDocument();
                 doc.m_encoding = codepage;
                 doc.m_bHasBOM = codepages[selected].bom;
+                doc.m_encodingSaving = -1;
+                doc.m_bHasBOMSaving = false;
                 doc.m_bIsDirty = true;
                 doc.m_bNeedsSaving = true;
-                // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
+                // the next two calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
                 ScintillaCall(SCI_ADDUNDOACTION, 0,0);
                 ScintillaCall(SCI_UNDO);
                 UpdateStatusBar(true);
