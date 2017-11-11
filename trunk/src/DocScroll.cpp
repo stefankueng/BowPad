@@ -1,4 +1,4 @@
-﻿// This file is part of BowPad.
+// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -34,9 +34,9 @@ static COLORREF GetThumbColor(double hotFraction)
     // the else path is the original theme code that works but makes things arguably less readable in the dark theme
     // because a small dark blue vertical scroll bar isn't that readable on a black background.
     if (theme.IsDarkTheme())
-        return theme.GetThemeColor(GDIHelpers::InterpolateColors(::GetSysColor(COLOR_3DSHADOW), RGB(128, 128, 128), hotFraction));
+        return theme.GetThemeColor(GDIHelpers::InterpolateColors(::GetSysColor(COLOR_3DDKSHADOW), RGB(70, 70, 70), hotFraction));
     else
-        return theme.GetThemeColor(GDIHelpers::InterpolateColors(RGB(200, 200, 255), ::GetSysColor(COLOR_3DSHADOW), hotFraction));
+        return theme.GetThemeColor(GDIHelpers::InterpolateColors(RGB(150, 150, 200), ::GetSysColor(COLOR_3DDKSHADOW), hotFraction));
 }
 
 static void DrawTriangle(HDC hdc, COLORREF scroll, COLORREF thumb, const RECT& rect, LONG x0, LONG y0, LONG x1, LONG y1, LONG x2, LONG y2)
