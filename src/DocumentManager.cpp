@@ -1,4 +1,4 @@
-﻿// This file is part of BowPad.
+// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -552,10 +552,19 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     auto widebuf = std::make_unique<wchar_t[]>(writeWidebufSize);
     err.clear();
     DWORD bytesWritten = 0;
-    if (doc.m_bHasBOM)
+
+    auto encoding = doc.m_encoding;
+    auto hasBOM = doc.m_bHasBOM;
+    if (doc.m_encodingSaving != -1)
+    {
+        encoding = doc.m_encodingSaving;
+        hasBOM = doc.m_bHasBOMSaving;
+    }
+
+    if (hasBOM)
     {
         BOOL result;
-        if (doc.m_encoding == 1200)
+        if (encoding == 1200)
             result = WriteFile(hFile, "\xFF\xFE", 2, &bytesWritten, nullptr);
         else
             result = WriteFile(hFile, "\xFE\xFF", 2, &bytesWritten, nullptr);
@@ -571,7 +580,7 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     {
         int charStart = UTF8Helper::characterStart(writeBuf, (int)min(WriteBlockSize, lengthDoc));
         int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), writeWidebufSize);
-        if (doc.m_encoding == 1201)
+        if (encoding == 1201)
         {
             UINT64 * p_qw = reinterpret_cast<UINT64 *>(widebuf.get());
             int nQwords = widelen/4;
@@ -601,7 +610,16 @@ static bool SaveAsUtf32(const CDocument& doc, char*buf, size_t lengthDoc, CAutoF
     auto writeWide32buf = std::make_unique<wchar_t[]>(writeWidebufSize*2);
     DWORD bytesWritten = 0;
     BOOL result;
-    if (doc.m_encoding == 12000)
+
+    auto encoding = doc.m_encoding;
+    auto hasBOM = doc.m_bHasBOM;
+    if (doc.m_encodingSaving != -1)
+    {
+        encoding = doc.m_encodingSaving;
+        hasBOM = doc.m_bHasBOMSaving;
+    }
+
+    if (encoding == 12000)
         result = WriteFile(hFile, "\xFF\xFE\0\0", 4, &bytesWritten, nullptr);
     else
         result= WriteFile(hFile, "\0\0\xFE\xFF", 4, &bytesWritten, nullptr);
@@ -635,7 +653,7 @@ static bool SaveAsUtf32(const CDocument& doc, char*buf, size_t lengthDoc, CAutoF
             p_Out[nOutDword] = zChar;
         }
 
-        if (doc.m_encoding == 12001)
+        if (encoding == 12001)
         {
             UINT64 * p64 = reinterpret_cast<UINT64 *>(writeWide32buf.get());
             int nQwords = widelen/2;
@@ -663,7 +681,15 @@ static bool SaveAsUtf8(const CDocument& doc, char* buf, size_t lengthDoc, CAutoF
 {
     // UTF8: save the buffer as it is
     DWORD bytesWritten = 0;
-    if (doc.m_bHasBOM)
+    auto encoding = doc.m_encoding;
+    auto hasBOM = doc.m_bHasBOM;
+    if (doc.m_encodingSaving != -1)
+    {
+        encoding = doc.m_encodingSaving;
+        hasBOM = doc.m_bHasBOMSaving;
+    }
+
+    if (hasBOM)
     {
         if (!WriteFile(hFile, "\xEF\xBB\xBF", 3, &bytesWritten, nullptr) || bytesWritten != 3)
         {
@@ -695,12 +721,19 @@ static bool SaveAsOther(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     auto charbuf = std::make_unique<char[]>(charbufSize);
     // first convert to wide char, then to the requested codepage
     DWORD bytesWritten = 0;
+    auto encoding = doc.m_encoding;
+    auto hasBOM = doc.m_bHasBOM;
+    if (doc.m_encodingSaving != -1)
+    {
+        encoding = doc.m_encodingSaving;
+        hasBOM = doc.m_bHasBOMSaving;
+    }
     char * writeBuf = buf;
     do
     {
         int charStart = UTF8Helper::characterStart(writeBuf, (int)min(WriteBlockSize, lengthDoc));
         int widelen = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), widebufSize);
-        int charlen = WideCharToMultiByte(doc.m_encoding < 0 ? CP_ACP : doc.m_encoding, 0, widebuf.get(), widelen, charbuf.get(), charbufSize, 0, nullptr);
+        int charlen = WideCharToMultiByte(encoding < 0 ? CP_ACP : encoding, 0, widebuf.get(), widelen, charbuf.get(), charbufSize, 0, nullptr);
         if (!WriteFile(hFile, charbuf.get(), charlen, &bytesWritten, nullptr) || charlen != int(bytesWritten))
         {
             CFormatMessageWrapper errMsg;
@@ -731,7 +764,14 @@ bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocu
     char* buf = (char*)m_scratchScintilla.Call(SCI_GETCHARACTERPOINTER);
     bool ok = false;
     std::wstring err;
-    switch (doc.m_encoding)
+    auto encoding = doc.m_encoding;
+    auto hasBOM = doc.m_bHasBOM;
+    if (doc.m_encodingSaving != -1)
+    {
+        encoding = doc.m_encodingSaving;
+        hasBOM = doc.m_bHasBOMSaving;
+    }
+    switch (encoding)
     {
     case CP_UTF8:
         ok = SaveAsUtf8(doc, buf, lengthDoc, hFile, err);
@@ -753,7 +793,7 @@ bool CDocumentManager::SaveDoc( HWND hWnd, const std::wstring& path, const CDocu
     return true;
 }
 
-bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc, bool & bTabMoved )
+bool CDocumentManager::SaveFile( HWND hWnd, CDocument& doc, bool & bTabMoved )
 {
     bTabMoved = false;
     if (doc.m_path.empty())
@@ -827,6 +867,13 @@ bool CDocumentManager::SaveFile( HWND hWnd, const CDocument& doc, bool & bTabMov
     {
         m_scratchScintilla.Call(SCI_SETSAVEPOINT);
         m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
+        if (doc.m_encodingSaving != -1)
+        {
+            doc.m_encoding = doc.m_encodingSaving;
+            doc.m_encodingSaving = -1;
+            doc.m_bHasBOM = doc.m_bHasBOMSaving;
+            doc.m_bHasBOMSaving = false;
+        }
     }
     if (attributes != INVALID_FILE_ATTRIBUTES)
     {

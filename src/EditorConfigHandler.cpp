@@ -1,4 +1,4 @@
-﻿// This file is part of BowPad.
+// This file is part of BowPad.
 //
 // Copyright (C) 2014, 2016-2017 - Stefan Kueng
 //
@@ -38,7 +38,7 @@ CEditorConfigHandler& CEditorConfigHandler::Instance()
     return instance;
 }
 
-void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScintillaWnd * pScintilla, CDocument& doc)
+void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScintillaWnd * pScintilla, CDocument& doc, bool keepEncoding)
 {
     if (path.empty())
         return;
@@ -115,28 +115,28 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
 
                 //pScintilla->Call(SCI_CONVERTEOLS, eol);
             }
-            else if (strcmp(name, "charset") == 0)
+            else if ((strcmp(name, "charset") == 0) && (!keepEncoding))
             {
                 // latin1 / utf-8 / utf-16be / utf-16le
                 if (strcmp(value, "latin1") == 0)
                 {
-                    doc.m_encoding = CP_ACP;
-                    doc.m_bHasBOM = false;
+                    doc.m_encodingSaving = CP_ACP;
+                    doc.m_bHasBOMSaving = false;
                 }
                 else if (strcmp(value, "utf-8") == 0)
                 {
-                    doc.m_encoding = CP_UTF8;
-                    doc.m_bHasBOM = false;
+                    doc.m_encodingSaving = CP_UTF8;
+                    doc.m_bHasBOMSaving = false;
                 }
                 else if (strcmp(value, "utf-16le") == 0)
                 {
-                    doc.m_encoding = 1200;
-                    doc.m_bHasBOM = false;
+                    doc.m_encodingSaving = 1200;
+                    doc.m_bHasBOMSaving = false;
                 }
                 else if (strcmp(value, "utf-16be") == 0)
                 {
-                    doc.m_encoding = 1201;
-                    doc.m_bHasBOM = false;
+                    doc.m_encodingSaving = 1201;
+                    doc.m_bHasBOMSaving = false;
                 }
             }
             else if (strcmp(name, "trim_trailing_whitespace") == 0)

@@ -1,4 +1,4 @@
-﻿// This file is part of BowPad.
+// This file is part of BowPad.
 //
 // Copyright (C) 2013-2017 - Stefan Kueng
 //
@@ -63,9 +63,11 @@ public:
         : m_document(0)
         , m_format(WIN_FORMAT)
         , m_bHasBOM(false)
+        , m_bHasBOMSaving(false)
         , m_bTrimBeforeSave(false)
         , m_bEnsureNewlineAtEnd(false)
         , m_encoding(-1)
+        , m_encodingSaving(-1)
         , m_bIsDirty(false)
         , m_bNeedsSaving(false)
         , m_bIsReadonly(false)
@@ -87,8 +89,10 @@ public:
     Document                m_document;
     std::wstring            m_path;
     int                     m_encoding;
+    int                     m_encodingSaving;
     EOLFormat               m_format;
     bool                    m_bHasBOM;
+    bool                    m_bHasBOMSaving;
     bool                    m_bTrimBeforeSave;
     bool                    m_bEnsureNewlineAtEnd;
     bool                    m_bIsDirty;

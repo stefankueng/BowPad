@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -70,6 +70,42 @@ std::wstring CDocument::GetEncodingString() const
     }
     if (m_bHasBOM)
         sEnc += L", BOM";
+
+    if ((m_encodingSaving != -1) &&
+        ((m_encoding != m_encodingSaving) || (m_bHasBOM != m_bHasBOMSaving)))
+    {
+        sEnc += L" --> ";
+        switch (m_encodingSaving)
+        {
+            case CP_UTF8:
+                sEnc += L"UTF-8";
+                break;
+            case 1200:
+                sEnc += L"UTF-16 LE";
+                break;
+            case 1201:
+                sEnc += L"UTF-16 BE";
+                break;
+            case 12001:
+                sEnc += L"UTF-32 BE";
+                break;
+            case 12000:
+                sEnc += L"UTF-32 LE";
+                break;
+            case 0:
+                sEnc += L"ANSI";
+                break;
+            default:
+                if ((UINT)m_encoding == GetACP())
+                    sEnc += L"ANSI";
+                else
+                    sEnc += CStringUtils::Format(L"codepage: %d", m_encoding);
+                break;
+        }
+        if (m_bHasBOMSaving)
+            sEnc += L", BOM";
+    }
+
     return sEnc;
 }
 

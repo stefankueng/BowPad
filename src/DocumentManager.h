@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ public:
     CDocument&                  GetModDocumentFromID(DocID id);
 
     CDocument                   LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
-    bool                        SaveFile(HWND hWnd, const CDocument& doc, bool & bTabMoved);
+    bool                        SaveFile(HWND hWnd, CDocument& doc, bool & bTabMoved);
     bool                        UpdateFileTime(CDocument& doc, bool bIncludeReadonly);
     DocModifiedState            HasFileChanged(DocID id) const;
 

@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014 - 2016 Stefan Kueng
+// Copyright (C) 2014-2017 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ private:
 public:
     static CEditorConfigHandler& Instance();
 
-    void ApplySettingsForPath(const std::wstring& path, CScintillaWnd * pScintilla, CDocument& doc);
+    void ApplySettingsForPath(const std::wstring& path, CScintillaWnd * pScintilla, CDocument& doc, bool keepEncoding);
 
 private:
     std::map<std::wstring, editorconfig_handle> m_handles;
