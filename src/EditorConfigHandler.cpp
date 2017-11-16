@@ -133,10 +133,20 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
                     doc.m_encodingSaving = 1200;
                     doc.m_bHasBOMSaving = false;
                 }
+                else if (strcmp(value, "utf-16le-bom") == 0)
+                {
+                    doc.m_encodingSaving = 1200;
+                    doc.m_bHasBOMSaving = true;
+                }
                 else if (strcmp(value, "utf-16be") == 0)
                 {
                     doc.m_encodingSaving = 1201;
                     doc.m_bHasBOMSaving = false;
+                }
+                else if (strcmp(value, "utf-16be-bom") == 0)
+                {
+                    doc.m_encodingSaving = 1201;
+                    doc.m_bHasBOMSaving = true;
                 }
             }
             else if (strcmp(name, "trim_trailing_whitespace") == 0)
