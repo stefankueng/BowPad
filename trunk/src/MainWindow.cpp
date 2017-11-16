@@ -2872,9 +2872,8 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                     m_TabBar.SetCurrentTitle(m_tabmovetitle.c_str());
             }
 
-            CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, false);
-
             m_DocManager.AddDocumentAtEnd(doc, id);
+            doc = m_DocManager.GetDocumentFromID(id);
 
             // only activate the new doc tab if the main window is enabled:
             // if it's disabled, a modal dialog is shown
@@ -2896,6 +2895,10 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             }
             else
                 m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+
+            CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, false);
+            InvalidateRect(m_TabBar, nullptr, FALSE);
+
             if (bAddToMRU)
                 SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
             CCommandHandler::Instance().OnDocumentOpen(id);
