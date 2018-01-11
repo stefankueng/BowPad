@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -240,6 +240,8 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         int styleSel = ComboBox_AddString(hStyleCombo, style.second.Name.c_str());
                         ComboBox_SetItemData(hStyleCombo, styleSel, style.first);
                     }
+                    int style = (int)ScintillaCall(SCI_GETSTYLEAT, ScintillaCall(SCI_GETCURRENTPOS));
+                    SelectStyle(style);
                     std::wstring exts = CLexStyles::Instance().GetUserExtensionsForLanguage(currentLang);
                     SetDlgItemText(*this, IDC_EXTENSIONS, exts.c_str());
                     DialogEnableWindow(IDC_EXTENSIONS, true);
@@ -440,6 +442,7 @@ void CStyleConfiguratorDlg::SelectStyle( int style )
 {
     auto hStyleCombo = GetDlgItem(*this, IDC_STYLECOMBO);
     int styleCount = ComboBox_GetCount(hStyleCombo);
+    bool selected = false;
     for (int i = 0; i < styleCount; ++i)
     {
         int stylec = (int)ComboBox_GetItemData(hStyleCombo, i);
@@ -447,8 +450,12 @@ void CStyleConfiguratorDlg::SelectStyle( int style )
         {
             ComboBox_SetCurSel(hStyleCombo, i);
             DoCommand(IDC_STYLECOMBO, CBN_SELCHANGE);
+            selected = true;
+            break;
         }
     }
+    if (!selected)
+        ComboBox_SetCurSel(hStyleCombo, 0);
 }
 
 CCmdStyleConfigurator::CCmdStyleConfigurator(void* obj)
