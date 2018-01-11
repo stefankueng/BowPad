@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -890,7 +890,8 @@ bool CDocumentManager::UpdateFileTime(CDocument& doc, bool bIncludeReadonly)
     CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (!hFile.IsValid())
     {
-        if (GetLastError() == ERROR_FILE_NOT_FOUND)
+        auto lastError = GetLastError();
+        if ((lastError == ERROR_FILE_NOT_FOUND) || (lastError == ERROR_PATH_NOT_FOUND))
         {
             doc.m_lastWriteTime.dwLowDateTime  = 0;
             doc.m_lastWriteTime.dwHighDateTime = 0;
