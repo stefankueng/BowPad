@@ -3,6 +3,7 @@ syntax: glob
 *.a
 *.lib
 *.obj
+*.iobj
 *.pyc
 *.dll
 *.dylib
@@ -11,6 +12,7 @@ syntax: glob
 *.exp
 *.lib
 *.pdb
+*.ipdb
 *.res
 *.bak
 *.sbr
@@ -50,6 +52,7 @@ Makefile.Release
 *_resource.rc
 moc_*
 *.pro.user
+.qmake.stash
 ScintillaEdit.cpp
 ScintillaEdit.h
 ScintillaConstants.py
