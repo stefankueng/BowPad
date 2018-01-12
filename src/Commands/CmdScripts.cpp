@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -159,7 +159,7 @@ void CCmdScript::ScintillaNotify(SCNotification * pScn)
     VARIANT v[21];
     v[20].uintVal = pScn->nmhdr.code;
     v[20].vt = VT_UINT;
-    v[19].intVal = pScn->position;
+    v[19].intVal = (int)pScn->position;
     v[19].vt = VT_INT;
     v[18].intVal = pScn->ch;
     v[18].vt = VT_INT;
@@ -169,9 +169,9 @@ void CCmdScript::ScintillaNotify(SCNotification * pScn)
     v[16].vt = VT_INT;
     v[15].bstrVal = btext;
     v[15].vt = VT_BSTR;
-    v[14].intVal = pScn->length;
+    v[14].intVal = (int)pScn->length;
     v[14].vt = VT_INT;
-    v[13].intVal = pScn->linesAdded;
+    v[13].intVal = (int)pScn->linesAdded;
     v[13].vt = VT_INT;
     v[12].intVal = pScn->message;
     v[12].vt = VT_INT;
@@ -179,7 +179,7 @@ void CCmdScript::ScintillaNotify(SCNotification * pScn)
     v[11].vt = VT_UI8;
     v[10].ullVal = pScn->lParam;
     v[10].vt = VT_UI8;
-    v[ 9].intVal = pScn->line;
+    v[ 9].intVal = (int)pScn->line;
     v[ 9].vt = VT_INT;
     v[ 8].intVal = pScn->foldLevelNow;
     v[ 8].vt = VT_INT;
@@ -195,7 +195,7 @@ void CCmdScript::ScintillaNotify(SCNotification * pScn)
     v[ 3].vt = VT_INT;
     v[ 2].intVal = pScn->token;
     v[ 2].vt = VT_INT;
-    v[ 1].intVal = pScn->annotationLinesAdded;
+    v[ 1].intVal = (int)pScn->annotationLinesAdded;
     v[ 1].vt = VT_INT;
     v[ 0].intVal = pScn->updated;
     v[ 0].vt = VT_INT;

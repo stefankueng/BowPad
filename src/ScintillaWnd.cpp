@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -214,7 +214,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_ASSIGNCMDKEY, 'L' + (SCMOD_CTRL << 16), SCI_LINECUT);
 
     Call(SCI_SETBUFFEREDDRAW, bUseD2D ? false : true);
-    Call(SCI_SETTWOPHASEDRAW, true);
+    Call(SCI_SETPHASESDRAW,bUseD2D ? SC_PHASES_MULTIPLE : SC_PHASES_TWO);
+    Call(SCI_SETLAYOUTCACHE, SC_CACHE_PAGE);
 
     Call(SCI_USEPOPUP, 0);  // no default context menu
 
@@ -2270,15 +2271,15 @@ std::string CScintillaWnd::GetLine(long line) const
     return pLine.get();
 }
 
-std::string CScintillaWnd::GetTextRange(long startpos, long endpos) const
+std::string CScintillaWnd::GetTextRange(Sci_Position startpos, Sci_Position endpos) const
 {
     assert(endpos - startpos >= 0);
     if (endpos < startpos)
         return "";
     auto strbuf = std::make_unique<char[]>(endpos - startpos + 5);
     Sci_TextRange rangestart;
-    rangestart.chrg.cpMin = startpos;
-    rangestart.chrg.cpMax = endpos;
+    rangestart.chrg.cpMin = (Sci_PositionCR)startpos;
+    rangestart.chrg.cpMax = (Sci_PositionCR)endpos;
     rangestart.lpstrText = strbuf.get();
     ConstCall(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
     return strbuf.get();
