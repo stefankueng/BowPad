@@ -8,9 +8,7 @@
 #ifndef EDITVIEW_H
 #define EDITVIEW_H
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 struct PrintParameters {
 	int magnification;
@@ -177,8 +175,6 @@ public:
 	}
 };
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 #endif

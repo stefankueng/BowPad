@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013, 2016-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include <iterator>
 #include <vector>
 #include "scintilla.h"
+#include "../ext/scintilla/include/ILoader.h"
 #define PLATFORM_ASSERT(c) ((void)0)
 #include "../ext/scintilla/src/SplitVector.h"
 #include "../ext/scintilla/src/Partitioning.h"
@@ -37,7 +38,7 @@
 class UTF8DocumentIterator : public std::iterator<std::bidirectional_iterator_tag, wchar_t>
 {
     // These 3 fields determine the iterator position and are used for comparisons
-    const Document *doc;
+    const Scintilla::Document *doc;
     Sci::Position position;
     size_t characterIndex;
     // Remaining fields are derived from the determining fields so are excluded in comparisons
@@ -45,7 +46,7 @@ class UTF8DocumentIterator : public std::iterator<std::bidirectional_iterator_ta
     size_t lenCharacters;
     wchar_t buffered[2];
 public:
-    UTF8DocumentIterator(const Document *doc_ = 0, Sci::Position position_ = 0) :
+    UTF8DocumentIterator(const Scintilla::Document *doc_ = 0, Sci::Position position_ = 0) :
         doc(doc_), position(position_), characterIndex(0), lenBytes(0), lenCharacters(0)
     {
         buffered[0] = 0;
@@ -155,16 +156,16 @@ public:
 private:
     void ReadCharacter()
     {
-        Document::CharacterExtracted charExtracted = doc->ExtractCharacter(position);
+        Scintilla::Document::CharacterExtracted charExtracted = doc->ExtractCharacter(position);
         lenBytes = charExtracted.widthBytes;
-        if (charExtracted.character == unicodeReplacementChar)
+        if (charExtracted.character == Scintilla::unicodeReplacementChar)
         {
             lenCharacters = 1;
             buffered[0] = static_cast<wchar_t>(charExtracted.character);
         }
         else
         {
-            lenCharacters = UTF16FromUTF32Character(charExtracted.character, buffered);
+            lenCharacters = Scintilla::UTF16FromUTF32Character(charExtracted.character, buffered);
         }
     }
 };

@@ -189,6 +189,15 @@
     <ClInclude Include="src\UniqueString.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="include\ILoader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="lexlib\DefaultLexer.h">
+      <Filter>lexlib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DBCS.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lexers\LexA68k.cxx">
@@ -630,5 +639,11 @@
       <Filter>lexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\StdRegexSearch.cpp" />
+    <ClCompile Include="lexlib\DefaultLexer.cxx">
+      <Filter>lexlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DBCS.cxx">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

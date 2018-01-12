@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #include <codecvt>
 #include <memory>
 #include "scintilla.h"
+#include "../ext/scintilla/include/ILoader.h"
 #define PLATFORM_ASSERT(c) ((void)0)
 #include "../ext/scintilla/src/Position.h"
 #include "../ext/scintilla/src/SplitVector.h"
@@ -34,7 +35,8 @@
 #include "../ext/scintilla/src/UniConversion.h"
 #include "UTF8DocumentIterator.h"
 
-
+namespace Scintilla
+{
 class StdRegexSearch : public RegexSearchBase
 {
 public:
@@ -352,3 +354,4 @@ std::string StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::Substit
     return s;
 }
 
+};
