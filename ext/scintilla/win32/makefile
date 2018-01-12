@@ -1,7 +1,7 @@
 # Make file for Scintilla on Windows
 # Copyright 1998-2010 by Neil Hodgson <neilh@scintilla.org>
 # The License.txt file describes the conditions under which this software may be distributed.
-# This makefile assumes the MinGW32 version of GCC 4.x is used and changes will
+# This makefile assumes the Mingw-w64 version of GCC 7.1+ is used and changes will
 # be needed to use other compilers.
 
 ifdef CLANG
@@ -13,7 +13,7 @@ else
 LDMINGW = -Wl,--enable-runtime-pseudo-reloc-v2 -Wl,--add-stdcall-alias
 LIBSMINGW = -lstdc++
 STRIPOPTION = -s
-CXXSTD = gnu++0x
+CXXSTD = gnu++17
 endif
 
 .SUFFIXES: .cxx
@@ -83,6 +83,7 @@ BASEOBJS = \
 	CharacterSet.o \
 	CharClassify.o \
 	ContractionState.o \
+	DBCS.o \
 	Decoration.o \
 	Document.o \
 	EditModel.o \
@@ -115,6 +116,7 @@ LOBJS = \
 	Accessor.o \
 	Catalogue.o \
 	ExternalLexer.o \
+	DefaultLexer.o \
 	LexerBase.o \
 	LexerModule.o \
 	LexerSimple.o \
