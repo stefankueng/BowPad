@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -493,7 +493,7 @@ void CCmdFunctions::OnClose()
     }
     int count = 50;
     while (InterlockedExchange(&m_bThreadRunning, m_bThreadRunning) && --count)
-        Sleep(100);
+        Sleep(1000);
 }
 
 void CCmdFunctions::OnDocumentSave(DocID id, bool bSaveAs)

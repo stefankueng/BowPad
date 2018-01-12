@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017 - Stefan Kueng
+// Copyright (C) 2014-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -442,9 +442,6 @@ static const ScintillaCmd g_ScintillaCmd[] = {
     { L"SciSetPhaseDraw", SCI_SETPHASESDRAW, SCI_SETPHASESDRAW, VT_NULL, VT_INT, VT_NULL },
     { L"SciGetPhaseDraw", SCI_GETPHASESDRAW, SCI_GETPHASESDRAW, VT_INT, VT_NULL, VT_NULL },
     { L"SciPhaseDraw", SCI_SETPHASESDRAW, SCI_GETPHASESDRAW, VT_INT, VT_INT, VT_NULL },
-    { L"SciSetTwoPhaseDraw", SCI_SETTWOPHASEDRAW, SCI_SETTWOPHASEDRAW, VT_NULL, VT_BOOL, VT_NULL },
-    { L"SciGetTwoPhaseDraw", SCI_GETTWOPHASEDRAW, SCI_GETTWOPHASEDRAW, VT_BOOL, VT_NULL, VT_NULL },
-    { L"SciTwoPhaseDraw", SCI_SETTWOPHASEDRAW, SCI_GETTWOPHASEDRAW, VT_BOOL, VT_BOOL, VT_NULL },
     { L"SciSetTechnology", SCI_SETTECHNOLOGY, SCI_SETTECHNOLOGY, VT_NULL, VT_INT, VT_NULL },
     { L"SciGetTechnology", SCI_GETTECHNOLOGY, SCI_GETTECHNOLOGY, VT_INT, VT_NULL, VT_NULL },
     { L"SciTechnology", SCI_SETTECHNOLOGY, SCI_GETTECHNOLOGY, VT_INT, VT_INT, VT_NULL },
