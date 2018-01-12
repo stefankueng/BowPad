@@ -26,6 +26,7 @@
 #include "TempFile.h"
 #include "AppUtils.h"
 #include "ILexer.h"
+#include "ILoader.h"
 
 #include <algorithm>
 #include <stdexcept>

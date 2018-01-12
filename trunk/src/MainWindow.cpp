@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -2453,18 +2453,18 @@ bool CMainWindow::HandleDoubleClick(const SCNotification& scn)
 
     m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:;?&@=/%#()");
 
-    long pos = scn.position;
-    long startPos = static_cast<long>(m_editor.Call(SCI_WORDSTARTPOSITION, pos, false));
-    long endPos = static_cast<long>(m_editor.Call(SCI_WORDENDPOSITION, pos, false));
+    Sci_Position pos = scn.position;
+    Sci_Position startPos = static_cast<Sci_Position>(m_editor.Call(SCI_WORDSTARTPOSITION, pos, false));
+    Sci_Position endPos = static_cast<Sci_Position>(m_editor.Call(SCI_WORDENDPOSITION, pos, false));
 
     m_editor.Call(SCI_SETTARGETSTART, startPos);
     m_editor.Call(SCI_SETTARGETEND, endPos);
 
-    long posFound = (long)m_editor.Call(SCI_SEARCHINTARGET, URL_REG_EXPR_LENGTH, (LPARAM)URL_REG_EXPR);
+    Sci_Position posFound = (Sci_Position)m_editor.Call(SCI_SEARCHINTARGET, URL_REG_EXPR_LENGTH, (LPARAM)URL_REG_EXPR);
     if (posFound != -1)
     {
-        startPos = int(m_editor.Call(SCI_GETTARGETSTART));
-        endPos = int(m_editor.Call(SCI_GETTARGETEND));
+        startPos = Sci_Position(m_editor.Call(SCI_GETTARGETSTART));
+        endPos = Sci_Position(m_editor.Call(SCI_GETTARGETEND));
     }
 
     std::string urltext = m_editor.GetTextRange(startPos, endPos);
