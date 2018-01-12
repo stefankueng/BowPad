@@ -1,0 +1,1919 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: BowPad\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 1900-01-01 00:00+0000\n"
+"PO-Revision-Date: 2014-06-04 14:10+0900\n"
+"Last-Translator: Hiroshi Kuno <hkuno9000@gmail.com>\n"
+"Language-Team: LANGUAGE <hkuno9000@gmail.com>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.5\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+# msgid/msgstr fields for Accelerator keys
+# Format is: "ID:xxxxxx:VACS+X" where:
+#    ID:xxxxx = the menu ID corresponding to the accelerator
+#    V = Virtual key (or blank if not used) - nearly always set!
+#    A = Alt key     (or blank if not used)
+#    C = Ctrl key    (or blank if not used)
+#    S = Shift key   (or blank if not used)
+#    X = upper case character
+# e.g. "V CS+Q" == Ctrl + Shift + 'Q'
+# ONLY Accelerator Keys with corresponding alphanumeric characters can be
+# updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
+# ONLY change the msgstr field. Do NOT change any other.
+# If you do not want to change an Accelerator Key, copy msgid to msgstr
+#. Resource IDs: (11)
+#, c-format
+msgid "%s (copy).%s"
+msgstr "%s (コピー).%s"
+
+#. Resource IDs: (7)
+msgid "&Cancel"
+msgstr "キャンセル(&C)"
+
+#. Resource IDs: (3754)
+msgid "&Close Tab"
+msgstr "タブを閉じる(&C)"
+
+#. Resource IDs: (12)
+msgid "&Edit"
+msgstr "編集(&E)"
+
+#. Resource IDs: (1001)
+msgid "&Find"
+msgstr "検索(&F)"
+
+#. Resource IDs: (3753)
+msgid "&New"
+msgstr "新規(&N)"
+
+#. Resource IDs: (3753)
+msgid "&Open"
+msgstr "開く(&O)"
+
+#. Resource IDs: (3769)
+msgid "&Reload"
+msgstr "リロード(&R)"
+
+#. Resource IDs: (1003)
+msgid "&Replace"
+msgstr "置換(&R)"
+
+#. Resource IDs: (7)
+msgid "&Save"
+msgstr "保存(&S)"
+
+#. Resource IDs: (1005)
+msgid "&Search for:"
+msgstr "検索する文字列(&S):"
+
+#. Resource IDs: (1007)
+msgid "&Whole word"
+msgstr "単語として検索(&w)"
+
+#. Resource IDs: (9)
+msgid ""
+"<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Full "
+"details about this update</a>"
+msgstr ""
+"<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">このアッ"
+"プデートの詳細</a>"
+
+#. Resource IDs: (3754)
+msgid "A"
+msgstr "A"
+
+#. Resource IDs: (3780)
+msgid "AB"
+msgstr "AB"
+
+#. Resource IDs: (1070)
+msgid "ANSI / Local encoding"
+msgstr "ANSI / ローカルエンコーディング"
+
+#. Resource IDs: (3754)
+msgid "AS"
+msgstr "AS"
+
+#. Resource IDs: (103)
+msgid "About BowPad"
+msgstr "BowPad について"
+
+#. Resource IDs: (10)
+msgid "Access denied!"
+msgstr "アクセス拒否!"
+
+#. Resource IDs: (10)
+#, c-format
+msgid ""
+"Access to the file '%s' was denied. Do you want to try again with elevated "
+"privileges?"
+msgstr "ファイル'%s'のアクセスが拒否されました。管理者権限でリトライしますか?"
+
+#. Resource IDs: (3782)
+msgid "All plugin commands are listed here"
+msgstr "全プラグインコマンドが一覧表示されます"
+
+#. Resource IDs: (3756)
+msgid "Allows to load a file with a specific encoding"
+msgstr "指定したエンコーディングでファイル読み込みを許可する"
+
+#. Resource IDs: (9)
+msgid "An update for BowPad is available"
+msgstr "BowPad のアップデートがあります"
+
+#. Resource IDs: (11)
+#, c-format
+msgid "Are you sure you want to delete the file '%s'?"
+msgstr "ファイル'%s'を削除して良いですか?"
+
+#. Resource IDs: (11)
+#, c-format
+msgid "Are you sure you want to reload '%s'?"
+msgstr "'%s' をリロードしますか?"
+
+#. Resource IDs: (3753)
+msgid "Asks where to save the current tab"
+msgstr "現在タブの保存先を尋ねる"
+
+#. Resource IDs: (65535)
+msgid "Author: Stefan Küng"
+msgstr "作者: Stefan Küng"
+
+#. Resource IDs: (3780)
+msgid "Auto Braces"
+msgstr "自動波括弧"
+
+#. Resource IDs: (9)
+msgid "Available Languages"
+msgstr "取り込み済みの翻訳言語"
+
+#. Resource IDs: (1075)
+msgid "Available plugins"
+msgstr "存在するプラグインの一覧"
+
+#. Resource IDs: (3770)
+msgid "BC"
+msgstr "BC"
+
+#. Resource IDs: (3770)
+msgid "BN"
+msgstr "BN"
+
+#. Resource IDs: (7)
+msgid "BOWPAD"
+msgstr "BOWPAD"
+
+#. Resource IDs: (3770)
+msgid "BP"
+msgstr "BP"
+
+#. Resource IDs: (3769)
+msgid "BT"
+msgstr "BT"
+
+#. Resource IDs: (1020)
+msgid "Bold"
+msgstr "太字"
+
+#. Resource IDs: (3764)
+msgid "Bookmark"
+msgstr "ブックマーク"
+
+#. Resource IDs: (3770)
+msgid "Bookmarks"
+msgstr "ブックマーク"
+
+#. Resource IDs: (7)
+msgid "BowPad"
+msgstr "BowPad"
+
+#. Resource IDs: (9)
+msgid "BowPad Text Editor"
+msgstr "BowPad Text Editor"
+
+#. Resource IDs: (3751, 3754, 3755)
+msgid "C"
+msgstr "C"
+
+#. Resource IDs: (3754)
+msgid "CA"
+msgstr "CA"
+
+#. Resource IDs: (3762)
+msgid "CC"
+msgstr "CC"
+
+#. Resource IDs: (3752)
+msgid "CO"
+msgstr "CO"
+
+#. Resource IDs: (3759)
+msgid "CR"
+msgstr "CR"
+
+#. Resource IDs: (3758)
+msgid "CT"
+msgstr "CT"
+
+#. Resource IDs: (3763)
+msgid "CU"
+msgstr "CU"
+
+#. Resource IDs: (2)
+msgid "Cancel"
+msgstr "キャンセル"
+
+#. Resource IDs: (11)
+msgid ""
+"Cancel\n"
+"Do not delete the file."
+msgstr ""
+"キャンセル\n"
+"ファイルを削除しません。"
+
+#. Resource IDs: (11)
+msgid ""
+"Cancel\n"
+"The file is not created."
+msgstr ""
+"キャンセル\n"
+"ファイルを作成しません。"
+
+#. Resource IDs: (8)
+msgid ""
+"Cancel\n"
+"The file is not loaded again."
+msgstr ""
+"キャンセル\n"
+"ファイルを再びロードしません。"
+
+#. Resource IDs: (11)
+msgid ""
+"Cancel\n"
+"The unsaved modifications will be kept."
+msgstr ""
+"キャンセルする\n"
+"未保存の変更内容を保持します。"
+
+#. Resource IDs: (3763)
+msgid "Change Case"
+msgstr "大小文字変換"
+
+#. Resource IDs: (1062)
+msgid "Check a plugin to install it, uncheck it to deinstall it."
+msgstr "チェックオンでインストール、チェックオフでアンインストールします。"
+
+#. Resource IDs: (1027)
+msgid "Check for Updates"
+msgstr "アップデートを確認する"
+
+#. Resource IDs: (65535)
+msgid "Chose the encoding of new files:"
+msgstr "新規ファイルのエンコーディング選択:"
+
+#. Resource IDs: (3765)
+msgid "Clear Bookmarks"
+msgstr "ブックマークを消す"
+
+#. Resource IDs: (3751, 3753, 3754)
+msgid "Clipboard"
+msgstr "クリップボード"
+
+#. Resource IDs: (3753)
+msgid "Close All Tabs"
+msgstr "タブを全部閉じる"
+
+#. Resource IDs: (3773)
+msgid "Close All Tabs Except This One"
+msgstr "これ以外のタブを全部閉じる"
+
+#. Resource IDs: (3753)
+msgid "Close Tab"
+msgstr "タブを閉じる"
+
+#. Resource IDs: (3753)
+msgid "Close all"
+msgstr "全部閉じる"
+
+#. Resource IDs: (3773)
+msgid "Close all but this"
+msgstr "これ以外を全部閉じる"
+
+#. Resource IDs: (3753)
+msgid "Close the current tab"
+msgstr "今のタブを閉じる"
+
+#. Resource IDs: (8)
+msgid ""
+"Close the document\n"
+"The document tab is closed."
+msgstr ""
+"文書を閉じる\n"
+"文書タブを閉じます。"
+
+#. Resource IDs: (3753)
+msgid "Closes all open files"
+msgstr "開いているファイルを全部閉じる"
+
+#. Resource IDs: (3773)
+msgid "Closes all open files except the current one"
+msgstr "これ以外の開いているファイルを全部閉じる"
+
+#. Resource IDs: (3767)
+msgid "Cmd"
+msgstr "コマンド"
+
+#. Resource IDs: (3751)
+msgid "Code"
+msgstr "コード"
+
+#. Resource IDs: (8)
+msgid "Codepages/Character sets"
+msgstr "コードページ/文字セット"
+
+#. Resource IDs: (65535)
+msgid "Color"
+msgstr "色"
+
+#. Resource IDs: (1061)
+msgid "Command Line:"
+msgstr "コマンドライン:"
+
+#. Resource IDs: (1060)
+msgid "Command Name:"
+msgstr "コマンド名:"
+
+#. Resource IDs: (3751, 3759)
+msgid "Comment"
+msgstr "コメント化"
+
+#. Resource IDs: (3759)
+msgid "Comments the selected text"
+msgstr "選択テキストをコメントアウトする"
+
+#. Resource IDs: (3782)
+msgid "Configure"
+msgstr "設定"
+
+#. Resource IDs: (3775)
+msgid "Configure Keyboard Shortcuts"
+msgstr "キーボードショートカット設定"
+
+#. Resource IDs: (154)
+msgid "Configure Plugins"
+msgstr "プラグイン設定"
+
+#. Resource IDs: (3775)
+msgid "Configure Shortcuts"
+msgstr "ショートカット設定"
+
+#. Resource IDs: (3758)
+msgid "Configure Styles"
+msgstr "構文スタイル設定"
+
+#. Resource IDs: (3758)
+msgid "Configure colors, fonts, styles and sizes"
+msgstr "色、フォント、スタイル、サイズ設定"
+
+#. Resource IDs: (3772)
+msgid "Configure custom commands"
+msgstr "カスタムコマンド設定"
+
+#. Resource IDs: (3756)
+msgid "Convert to"
+msgstr "変換"
+
+#. Resource IDs: (3764)
+msgid "Converts all spaces in the document to tabs"
+msgstr "文書中の全てのタブ文字をスペース文字に変換する"
+
+#. Resource IDs: (3764)
+msgid "Converts all tabs in the document to spaces"
+msgstr "文書中の全てのスペース文字をタブ文字に変換する"
+
+#. Resource IDs: (3756)
+msgid "Converts the file to the specified encoding"
+msgstr "このファイルを指定のエンコーディングに変換する"
+
+#. Resource IDs: (3764)
+msgid "Converts the selection to Title Case"
+msgstr "選択部分をタイトルケースに変換する"
+
+#. Resource IDs: (3760)
+msgid "Converts the selection to UPPERcase"
+msgstr "選択部分を大文字化する"
+
+#. Resource IDs: (3760)
+msgid "Converts the selection to lowercase"
+msgstr "選択部分を小文字化する"
+
+#. Resource IDs: (3774)
+msgid "Copies the name of the current file to the clipboard"
+msgstr "現在ファイルの名前をクリップボードにコピーする"
+
+#. Resource IDs: (3774)
+msgid "Copies the path of the current file to the clipboard"
+msgstr "現在ファイルのパス名をクリップボードにコピーする"
+
+#. Resource IDs: (3774)
+msgid "Copies the path of the directory of the current file to the clipboard"
+msgstr "現在ファイルのディレクトリ名をクリップボードにコピーする"
+
+#. Resource IDs: (3753)
+msgid "Copy"
+msgstr "コピー"
+
+#. Resource IDs: (3774)
+msgid "Copy Directory"
+msgstr "ディレクトリをコピー"
+
+#. Resource IDs: (3774)
+msgid "Copy Name"
+msgstr "名前をコピー"
+
+#. Resource IDs: (3773, 3774)
+msgid "Copy Path"
+msgstr "パス名をコピー"
+
+#. Resource IDs: (3754)
+msgid "Copy the current selection to the clipboard"
+msgstr "選択部分をクリップボードにコピー"
+
+#. Resource IDs: (3772)
+msgid "Corresponding File"
+msgstr "関連ファイル"
+
+#. Resource IDs: (9)
+msgid "Could not download the language file!"
+msgstr "翻訳言語ファイルがダウンロードできません!"
+
+#. Resource IDs: (11)
+msgid ""
+"Create\n"
+"An empty file is created."
+msgstr ""
+"作成\n"
+"空のファイルを作成します。"
+
+#. Resource IDs: (3782)
+msgid "Creates a copy of the current tab"
+msgstr "現在タブのコピーを作成する"
+
+#. Resource IDs: (3752)
+msgid "Creates a new tab with an empty document"
+msgstr "空の文書タブを新規作成する"
+
+#. Resource IDs: (8)
+msgid "Ctrl+Click to open the link in the default browser"
+msgstr "リンクを既定ブラウザで開くにはコントロールを押しながらクリックする"
+
+#. Resource IDs: (1049, 3770)
+msgid "Custom Command 0"
+msgstr "カスタムコマンド 0"
+
+#. Resource IDs: (1050, 3770)
+msgid "Custom Command 1"
+msgstr "カスタムコマンド 1"
+
+#. Resource IDs: (1051, 3770)
+msgid "Custom Command 2"
+msgstr "カスタムコマンド 2"
+
+#. Resource IDs: (1052, 3770)
+msgid "Custom Command 3"
+msgstr "カスタムコマンド 3"
+
+#. Resource IDs: (1053, 3771)
+msgid "Custom Command 4"
+msgstr "カスタムコマンド 4"
+
+#. Resource IDs: (1054, 3771)
+msgid "Custom Command 5"
+msgstr "カスタムコマンド 5"
+
+#. Resource IDs: (1055, 3771)
+msgid "Custom Command 6"
+msgstr "カスタムコマンド 6"
+
+#. Resource IDs: (1056, 3771)
+msgid "Custom Command 7"
+msgstr "カスタムコマンド 7"
+
+#. Resource IDs: (1057, 3772)
+msgid "Custom Command 8"
+msgstr "カスタムコマンド 8"
+
+#. Resource IDs: (1058, 3772)
+msgid "Custom Command 9"
+msgstr "カスタムコマンド 9"
+
+#. Resource IDs: (149)
+msgid "Custom Commands"
+msgstr "カスタムコマンド"
+
+#. Resource IDs: (3754)
+msgid "Cut"
+msgstr "切り取り"
+
+#. Resource IDs: (3754)
+msgid "Cut the current selection to the clipboard"
+msgstr "選択部分を切り取ってクリップボードに送る"
+
+#. Resource IDs: (3765)
+msgid "DD"
+msgstr "DD"
+
+#. Resource IDs: (3761)
+msgid "DEL"
+msgstr "DEL"
+
+#. Resource IDs: (3765, 3766)
+msgid "Dark Theme"
+msgstr "暗色テーマ"
+
+#. Resource IDs: (153)
+msgid "Default Encoding"
+msgstr "デフォルトエンコーディング"
+
+#. Resource IDs: (3758)
+msgid "Delete"
+msgstr "削除"
+
+#. Resource IDs: (3781)
+msgid "Delete File"
+msgstr "ファイル削除"
+
+#. Resource IDs: (11)
+msgid "Delete file"
+msgstr "ファイルを削除する"
+
+#. Resource IDs: (11)
+msgid ""
+"Delete\n"
+"The file will be removed."
+msgstr ""
+"削除\n"
+"このファイルを削除します。"
+
+#. Resource IDs: (3782)
+msgid "Deletes the file of the current tab"
+msgstr "現在タブのファイルを削除する"
+
+#. Resource IDs: (3760)
+msgid ""
+"Determines whether a tab is inserted or spaces when the tab key is pressed."
+msgstr "タブキー押下でタブを入力するかスペースを入力するかを決めます。"
+
+#. Resource IDs: (9)
+msgid ""
+"Do &not download the update\n"
+"You will be reminded again about the update in a week."
+msgstr ""
+"このアップデートをダウンロードしない(&n)\n"
+"後日、このアップデートについて再確認します。"
+
+#. Resource IDs: (7)
+#, c-format
+msgid "Do you want to save changes to \"%s\"?"
+msgstr "変更を \"%s\" に保存しますか?"
+
+#. Resource IDs: (7)
+msgid "Do&n't save"
+msgstr "保存しない(&n)"
+
+#. Resource IDs: (8)
+msgid "Document modified"
+msgstr "文書が変更されました"
+
+#. Resource IDs: (8)
+msgid "Document removed"
+msgstr "文書が削除されました"
+
+#. Resource IDs: (10)
+msgid ""
+"Don't Save\n"
+"The file is not saved."
+msgstr ""
+"保存しない\n"
+"このファイルは保存しません。"
+
+#. Resource IDs: (10)
+msgid ""
+"Don't open\n"
+"The file is not opened."
+msgstr ""
+"開かない\n"
+"このファイルは開きません。"
+
+#. Resource IDs: (8)
+msgid ""
+"Download and install the update\n"
+"Updates BowPad to the latest version."
+msgstr ""
+"アップデートをダウンロードしてインストールする\n"
+"BowPad を最新版にアップデートします。"
+
+#. Resource IDs: (9)
+msgid ""
+"Download of language list succeeded. Now you can select a language from that "
+"list."
+msgstr ""
+"翻訳言語リストのダウンロードに成功しました。リストから言語を選んでください。"
+
+#. Resource IDs: (9)
+msgid ""
+"Download the update\n"
+"You have to install the update manually."
+msgstr ""
+"アップデートをダウンロードする\n"
+"アップデートのインストールは手動で実施する必要があります。"
+
+#. Resource IDs: (3760, 3761)
+msgid "Duplicate Line"
+msgstr "行を複製"
+
+#. Resource IDs: (3761)
+msgid "Duplicates the current line"
+msgstr "現在行を複製します"
+
+#. Resource IDs: (3751)
+msgid "E"
+msgstr "E"
+
+#. Resource IDs: (105)
+msgid "E&xit"
+msgstr "終了(&x)"
+
+#. Resource IDs: (3757)
+msgid "ENC"
+msgstr "ENC"
+
+#. Resource IDs: (3759)
+msgid "EOL"
+msgstr "EOL"
+
+#. Resource IDs: (3751)
+msgid "Edit"
+msgstr "編集"
+
+# Where is used?
+#. Resource IDs: (12)
+msgid "Elevated"
+msgstr "管理者権限"
+
+#. Resource IDs: (3780)
+msgid ""
+"Enable to automatically add a closing brace when an opening brace is entered"
+msgstr "開き波括弧の入力に対して、自動的に閉じ波括弧を加えます"
+
+#. Resource IDs: (3755)
+msgid "Encoding"
+msgstr "エンコーディング"
+
+# What is mean, file extension or not?
+#. Resource IDs: (65535)
+#, fuzzy
+msgid "Extension"
+msgstr "拡張子"
+
+#. Resource IDs: (3751, 3752, 3760)
+msgid "F"
+msgstr "F"
+
+#. Resource IDs: (3760, 3777)
+msgid "FN"
+msgstr "FN"
+
+#. Resource IDs: (3761)
+msgid "FP"
+msgstr "FP"
+
+#. Resource IDs: (3761)
+msgid "FSN"
+msgstr "FSN"
+
+#. Resource IDs: (9)
+msgid "Failed to download the list of available languages."
+msgstr "存在する翻訳言語リストのダウンロードに失敗しました。"
+
+#. Resource IDs: (11)
+#, c-format
+msgid ""
+"Failed to load the file '%s'.\r\n"
+"\r\n"
+"The error message is:\r\n"
+"%s"
+msgstr ""
+"ファイル'%s'の読み込みに失敗しました\r\n"
+"\r\n"
+"エラーメッセージ:\r\n"
+"%s"
+
+#. Resource IDs: (12)
+#, c-format
+msgid ""
+"Failed to save the file '%s'.\r\n"
+"\r\n"
+"The error message is:\r\n"
+"%s"
+msgstr ""
+"ファイル'%s'の保存に失敗しました\r\n"
+"\r\n"
+"エラーメッセージ:\r\n"
+"%s"
+
+#. Resource IDs: (9)
+msgid "Fetch remote languages..."
+msgstr "翻訳言語を取り込む"
+
+#. Resource IDs: (3751)
+msgid "File"
+msgstr "ファイル"
+
+#. Resource IDs: (11)
+msgid "File does not exist"
+msgstr "ファイルが存在しません"
+
+#. Resource IDs: (7)
+msgid "File is too big to be opened by BowPad"
+msgstr "ファイルが大きすぎて BowPad では開けません"
+
+#. Resource IDs: (3772)
+msgid "Find"
+msgstr "検索"
+
+#. Resource IDs: (3758)
+msgid "Find && Replace"
+msgstr "検索 && 置換"
+
+#. Resource IDs: (1065)
+msgid "Find &All"
+msgstr "全検索する(&A)"
+
+#. Resource IDs: (10)
+msgid "Find All In All &Tabs"
+msgstr "全タブ内を全検索する(&T)"
+
+#. Resource IDs: (3758)
+msgid "Find Next"
+msgstr "次検索"
+
+#. Resource IDs: (3758)
+msgid "Find Next Selected"
+msgstr "選択文字列を次検索"
+
+#. Resource IDs: (3758)
+msgid "Find Previous"
+msgstr "前検索"
+
+#. Resource IDs: (143)
+msgid "Find and replace"
+msgstr "検索と置換"
+
+#. Resource IDs: (3758)
+msgid "Find/Replace"
+msgstr "検索/置換"
+
+#. Resource IDs: (65535)
+msgid "Font"
+msgstr "フォント"
+
+#. Resource IDs: (3773)
+msgid "Functions"
+msgstr "関数"
+
+#. Resource IDs: (3767)
+msgid "GL"
+msgstr "GL"
+
+#. Resource IDs: (145, 3763)
+msgid "Go to line"
+msgstr "行番号移動"
+
+#. Resource IDs: (3764)
+msgid "Goto"
+msgstr "移動"
+
+#. Resource IDs: (3752)
+msgid "H"
+msgstr "H"
+
+#. Resource IDs: (12)
+msgid "Insert"
+msgstr "挿入"
+
+#. Resource IDs: (3754)
+msgid "Inserts the content of the clipboard at the cursor position"
+msgstr "カーソル位置へクリップボードの内容を挿入する"
+
+#. Resource IDs: (13)
+#, c-format
+msgid "Installation of plugin \"%s\" failed!"
+msgstr "プラグイン \"%s\" のインストールに失敗!"
+
+#. Resource IDs: (12)
+msgid "Installed Version"
+msgstr "インストール済みバージョン"
+
+#. Resource IDs: (1021)
+msgid "Italic"
+msgstr "斜体"
+
+#. Resource IDs: (3765)
+msgid "JL"
+msgstr "JL"
+
+#. Resource IDs: (3761)
+msgid "Join Lines"
+msgstr "行を結合"
+
+#. Resource IDs: (3761)
+msgid "Join selected lines to one long line"
+msgstr "選択行を結合して一行にします"
+
+#. Resource IDs: (8)
+msgid ""
+"Keep the document\n"
+"The document is kept open."
+msgstr ""
+"文書を保持する\n"
+"文書を開いたままにします。"
+
+#. Resource IDs: (3757)
+msgid "LA"
+msgstr "LA"
+
+#. Resource IDs: (3766)
+msgid "LD"
+msgstr "LD"
+
+#. Resource IDs: (3758)
+msgid "LEX"
+msgstr "LEX"
+
+#. Resource IDs: (3759)
+msgid "LF"
+msgstr "LF"
+
+#. Resource IDs: (3765, 3771, 3777)
+msgid "LS"
+msgstr "LS"
+
+#. Resource IDs: (3766)
+msgid "LU"
+msgstr "LU"
+
+#. Resource IDs: (3756)
+msgid "Language"
+msgstr "言語"
+
+#. Resource IDs: (3759)
+msgid "Language Lexer"
+msgstr "構文色分け"
+
+#. Resource IDs: (9)
+msgid ""
+"Language selected.\n"
+"You need to restart BowPad for the changes to take effect."
+msgstr ""
+"翻訳言語を選択しました.\n"
+"選択結果を反映するため、BowPad を再起動してください。"
+
+#. Resource IDs: (65535)
+msgid "Language:"
+msgstr "翻訳言語:"
+
+#. Resource IDs: (3768)
+msgid "Launch in Chrome"
+msgstr "Chrome起動"
+
+#. Resource IDs: (3768)
+msgid "Launch in Firefox"
+msgstr "Firefox起動"
+
+#. Resource IDs: (3768)
+msgid "Launch in Google Chrome"
+msgstr "Google Chrome起動"
+
+#. Resource IDs: (3767)
+msgid "Launch in IE"
+msgstr "IE起動"
+
+#. Resource IDs: (3767)
+msgid "Launch in Internet Explorer"
+msgstr "Internet Explorer起動"
+
+#. Resource IDs: (3768)
+msgid "Launch in Opera"
+msgstr "Opera起動"
+
+#. Resource IDs: (3768)
+msgid "Launch in Safari"
+msgstr "Safari起動"
+
+#. Resource IDs: (12)
+#, c-format
+msgid ""
+"Length in bytes: %ld\r\n"
+"Lines: %ld"
+msgstr ""
+"バイト長: %ld\r\n"
+"行数: %ld"
+
+#. Resource IDs: (3758)
+msgid "Lexer"
+msgstr "構文"
+
+#. Resource IDs: (10)
+msgid "Line"
+msgstr "行"
+
+#. Resource IDs: (12)
+#, c-format
+msgid ""
+"Line : %ld\r\n"
+"Column : %ld\r\n"
+"Selection : %Iu | %Iu"
+msgstr ""
+"行番号 : %ld\r\n"
+"カラム : %ld\r\n"
+"選択部分 : %Iu | %Iu"
+
+#. Resource IDs: (3756)
+msgid "Line Endings"
+msgstr "行末記号"
+
+#. Resource IDs: (10)
+msgid "Line Text"
+msgstr "行のテキスト"
+
+#. Resource IDs: (12)
+#, c-format
+msgid "Line endings: %s"
+msgstr "行末記号: %s"
+
+#. Resource IDs: (65535)
+msgid "Line:"
+msgstr "行番号:"
+
+#. Resource IDs: (3760)
+msgid "Lines"
+msgstr "行"
+
+#. Resource IDs: (3756)
+msgid "Load as"
+msgstr "ロード"
+
+#. Resource IDs: (3772)
+msgid "Load last session"
+msgstr "前回復元ロード"
+
+#. Resource IDs: (3773)
+msgid "Load last session on start"
+msgstr "起動時に前回復元ロード"
+
+#. Resource IDs: (3772)
+msgid "Load session"
+msgstr "復元ロード"
+
+#. Resource IDs: (3773)
+msgid "Load session on start"
+msgstr "起動時復元ロード"
+
+#. Resource IDs: (3773)
+msgid ""
+"Loads all files automatically that were open the last time BowPad got closed"
+msgstr "BowPad が前回終了した時点で開いていた全てのファイルを自動的に開きます"
+
+#. Resource IDs: (3772)
+msgid "Loads all files that were open the last time BowPad got closed"
+msgstr "BowPad が前回終了した時点で開いていた全てのファイルを開きます"
+
+#. Resource IDs: (3760)
+msgid "Lowercase"
+msgstr "小文字化"
+
+#. Resource IDs: (3751, 3752)
+msgid "M"
+msgstr "M"
+
+#. Resource IDs: (3759)
+msgid "MAC"
+msgstr "MAC"
+
+#. Resource IDs: (3757)
+msgid "MAC (CR)"
+msgstr "MAC (CR)"
+
+#. Resource IDs: (3764)
+msgid "ML"
+msgstr "ML"
+
+#. Resource IDs: (18)
+msgid "MRU List"
+msgstr "最近使ったファイル一覧"
+
+#. Resource IDs: (3763)
+msgid "MU"
+msgstr "MU"
+
+#. Resource IDs: (3751)
+msgid "Main"
+msgstr "Main"
+
+#. Resource IDs: (8)
+msgid "Main Encodings"
+msgstr "主なエンコーディング"
+
+# that means not-ignore-case.
+#. Resource IDs: (1008)
+msgid "Match &case"
+msgstr "大文字小文字を区別する(&C)"
+
+#. Resource IDs: (3765)
+msgid "Misc"
+msgstr "雑設定"
+
+#. Resource IDs: (3762)
+msgid "Move down"
+msgstr "下移動"
+
+#. Resource IDs: (3763)
+msgid "Move line down"
+msgstr "行下移動"
+
+#. Resource IDs: (3762)
+msgid "Move line up"
+msgstr "行上移動"
+
+#. Resource IDs: (3765)
+msgid "Move the caret to the next bookmark"
+msgstr "次のブックマークへ移動します"
+
+#. Resource IDs: (3765)
+msgid "Move the caret to the previous bookmark"
+msgstr "前のブックマークへ移動します"
+
+#. Resource IDs: (3761)
+msgid "Move up"
+msgstr "上移動"
+
+#. Resource IDs: (3763)
+msgid "Moves the cursor to the specified line"
+msgstr "指定行へカーソル移動します"
+
+#. Resource IDs: (3762)
+msgid "Moves the selected lines downwards"
+msgstr "選択行を下へ移動します"
+
+#. Resource IDs: (3762)
+msgid "Moves the selected lines upwards"
+msgstr "選択行を上へ移動します"
+
+#. Resource IDs: (3758)
+msgid "Moves to the next match of the last search"
+msgstr "次検索位置へ移動します"
+
+#. Resource IDs: (3758)
+msgid "Moves to the previous match of the last search"
+msgstr "前検索位置へ移動します"
+
+#. Resource IDs: (3753)
+msgid "N"
+msgstr "N"
+
+#. Resource IDs: (3760)
+msgid "NEXT"
+msgstr "NEXT"
+
+#. Resource IDs: (7)
+#, c-format
+msgid "New %d"
+msgstr "新規 %d"
+
+#. Resource IDs: (3782)
+msgid "New Copy"
+msgstr "新規コピー"
+
+#. Resource IDs: (3752)
+msgid "New Document"
+msgstr "新規文書"
+
+#. Resource IDs: (3757)
+msgid "Next"
+msgstr "次へ"
+
+#. Resource IDs: (3771)
+msgid "Next Bookmark"
+msgstr "次のブックマーク"
+
+#. Resource IDs: (10)
+msgid "No functions found!"
+msgstr "関数が見つかりません!"
+
+#. Resource IDs: (12)
+msgid "No plugins loaded"
+msgstr "ロード済みのプラグインはありません"
+
+#. Resource IDs: (9)
+msgid ""
+"No updates available.\n"
+"You already have the current version."
+msgstr ""
+"アップデートはありません。\n"
+"これが最新版です。"
+
+#. Resource IDs: (3753)
+msgid "O"
+msgstr "O"
+
+#. Resource IDs: (1)
+msgid "OK"
+msgstr "OK"
+
+#. Resource IDs: (9)
+msgid "Online Languages"
+msgstr "オンライン上の翻訳言語"
+
+#. Resource IDs: (3769)
+msgid "Open Console"
+msgstr "コンソールを開く"
+
+#. Resource IDs: (3769)
+msgid "Open Explorer"
+msgstr "エクスプローラを開く"
+
+#. Resource IDs: (3781)
+msgid "Open File"
+msgstr "ファイルを開く"
+
+#. Resource IDs: (3781)
+msgid "Open File under cursor"
+msgstr "カーソル下のファイルを開く"
+
+#. Resource IDs: (3752)
+msgid "Open Files"
+msgstr "ファイルを開く"
+
+#. Resource IDs: (3775)
+msgid "Open corresponding File"
+msgstr "関連ファイルを開く"
+
+#. Resource IDs: (10)
+msgid ""
+"Open elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"管理者で開く\n"
+"BowPadを管理者権限で再起動します。"
+
+#. Resource IDs: (12)
+#, c-format
+msgid "Open files: %d"
+msgstr "開いているファイル数: %d"
+
+#. Resource IDs: (3752)
+msgid "Opens one or more files"
+msgstr "1つまたは複数のファイルを開きます"
+
+#. Resource IDs: (3769)
+msgid "Opens the Console at the current file location"
+msgstr "現在ファイル位置でコンソールを開きます"
+
+#. Resource IDs: (3769)
+msgid "Opens the Windows Explorer at the current file location"
+msgstr "現在ファイル位置でエクスプローラを開きます"
+
+#. Resource IDs: (3774)
+msgid "Opens the Windows Explorer at the current file path"
+msgstr "現在ファイルパスでエクスプローラを開きます"
+
+#. Resource IDs: (3775)
+msgid ""
+"Opens the config file to configure keyboard shortcuts for any command in "
+"BowPad"
+msgstr ""
+"BowPadのコマンドへのキーボードショートカット定義を保持する設定ファイルを開き"
+"ます"
+
+#. Resource IDs: (3772)
+msgid ""
+"Opens the corresponding file to the file in the current tab.\n"
+"(h/cpp, aspx/cs/vb)"
+msgstr ""
+"現在タブのファイルに関連したファイルを開きます\n"
+"(h/cpp, aspx/cs/vb)"
+
+#. Resource IDs: (3767)
+msgid "Opens the current file in Microsoft Internet Explorer"
+msgstr "現在ファイルを Microsoft Internet Explorer で開きます"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Firefox browser"
+msgstr "現在ファイルを Firefox ブラウザで開きます"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Google Chrome browser"
+msgstr "現在ファイルを Google Chrome ブラウザで開きます"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Opera browser"
+msgstr "現在ファイルを Opera ブラウザで開きます"
+
+#. Resource IDs: (3768)
+msgid "Opens the current file in the Safari browser"
+msgstr "現在ファイルを Safari ブラウザで開きます"
+
+#. Resource IDs: (3769)
+msgid "Opens the default browser to search Wikipedia for the selected text"
+msgstr "既定ブラウザを開いて、選択テキストを Wikipedia で検索します"
+
+#. Resource IDs: (3769)
+msgid "Opens the default browser to search for the selected text"
+msgstr "既定ブラウザを開いて、選択テキストを検索します"
+
+#. Resource IDs: (3781)
+msgid "Opens the file/path that's at the cursor position"
+msgstr "カーソル位置のファイル/パスを開きます"
+
+#. Resource IDs: (3768)
+msgid "Opens the printer setup dialog"
+msgstr "印刷設定ダイアログを開きます"
+
+#. Resource IDs: (3751)
+msgid "Other"
+msgstr "Other"
+
+#. Resource IDs: (3768)
+msgid "Other operations"
+msgstr "その他の操作"
+
+#. Resource IDs: (12)
+msgid "Overtype"
+msgstr "上書き"
+
+#. Resource IDs: (3766)
+msgid "P"
+msgstr "P"
+
+#. Resource IDs: (3767)
+msgid "PP"
+msgstr "PP"
+
+#. Resource IDs: (3759)
+msgid "PREV"
+msgstr "PREV"
+
+#. Resource IDs: (3767)
+msgid "PS"
+msgstr "PS"
+
+#. Resource IDs: (3763)
+msgid "Page Setup"
+msgstr "ページ設定"
+
+#. Resource IDs: (3754)
+msgid "Paste"
+msgstr "貼り付け"
+
+#. Resource IDs: (12)
+msgid "Plugin Name"
+msgstr "プラグイン名"
+
+#. Resource IDs: (3782)
+msgid "Plugin commands"
+msgstr "プラグインコマンド"
+
+#. Resource IDs: (3782)
+msgid "Plugins"
+msgstr "プラグイン"
+
+#. Resource IDs: (3757)
+msgid "Previous"
+msgstr "前へ"
+
+#. Resource IDs: (3772)
+msgid "Previous Bookmark"
+msgstr "前のブックマーク"
+
+#. Resource IDs: (3762)
+msgid "Print"
+msgstr "印刷"
+
+#. Resource IDs: (3763)
+msgid "Print Page Setup"
+msgstr "印刷ページ設定"
+
+#. Resource IDs: (3762)
+msgid "Print now"
+msgstr "印刷実行"
+
+#. Resource IDs: (3768)
+msgid "Print setup"
+msgstr "印刷設定"
+
+#. Resource IDs: (1006)
+msgid "R&eplace with:"
+msgstr "置換後の文字列(&e):"
+
+#. Resource IDs: (3769)
+msgid "RELOAD"
+msgstr "RELOAD"
+
+#. Resource IDs: (3754, 3755)
+msgid "Redo"
+msgstr "やり直す"
+
+#. Resource IDs: (3755)
+msgid "Redo what was undone before"
+msgstr "元に戻した部分をやり直します"
+
+#. Resource IDs: (10)
+msgid "Regex expression is invalid!"
+msgstr "不正な正規表現です!"
+
+#. Resource IDs: (10)
+msgid "Regex expression is valid"
+msgstr "正しい正規表現です"
+
+#. Resource IDs: (1009)
+msgid "Regex mode"
+msgstr "正規表現モード"
+
+#. Resource IDs: (3765)
+msgid "Reload"
+msgstr "リロード"
+
+#. Resource IDs: (8)
+msgid ""
+"Reload document\n"
+"The document is refreshed from disk."
+msgstr ""
+"文書をリロードする\n"
+"文書をディスクから読み直します。"
+
+#. Resource IDs: (8)
+msgid ""
+"Reload document\n"
+"The unsaved modifications are lost."
+msgstr ""
+"文書をリロードする\n"
+"未保存の変更内容は失われます。"
+
+#. Resource IDs: (3765)
+msgid "Reload the file from disk"
+msgstr "ディスクからファイルをリロードします"
+
+#. Resource IDs: (11)
+msgid ""
+"Reload\n"
+"The unsaved modifications will be lost!"
+msgstr ""
+"リロードする\n"
+"未保存の変更内容は失われます!"
+
+#. Resource IDs: (3765)
+msgid "Removes all bookmarks from the current file"
+msgstr "現在ファイルからブックマークを全部除去します"
+
+#. Resource IDs: (3763)
+msgid "Removes whitespaces at the end of lines"
+msgstr "行末の空白文字を除去します"
+
+#. Resource IDs: (11)
+msgid "Replace &All"
+msgstr "全置換する(&A)"
+
+#. Resource IDs: (11)
+msgid "Replace &all in selection"
+msgstr "セクション内を全置換する(&a)"
+
+#. Resource IDs: (11)
+msgid "Replace All In All &Tabs"
+msgstr "全タブ内を全置換する(&T)"
+
+#. Resource IDs: (3759)
+msgid "Right margin"
+msgstr "右マージン"
+
+#. Resource IDs: (3772)
+msgid "Run"
+msgstr "実行"
+
+#. Resource IDs: (3753)
+msgid "S"
+msgstr "S"
+
+#. Resource IDs: (3762)
+msgid "SA"
+msgstr "SA"
+
+#. Resource IDs: (3777)
+msgid "SAL"
+msgstr "SAL"
+
+#. Resource IDs: (3762, 3769)
+msgid "ST"
+msgstr "ST"
+
+#. Resource IDs: (3754)
+msgid "Sa&ve as"
+msgstr "名前を付けて保存(&v)"
+
+#. Resource IDs: (3753)
+msgid "Save &all"
+msgstr "全て保存(&a)"
+
+#. Resource IDs: (3752)
+msgid "Save File"
+msgstr "ファイルを保存する"
+
+#. Resource IDs: (3753)
+msgid "Save Files"
+msgstr "複数ファイルを保存する"
+
+#. Resource IDs: (3753)
+msgid "Save as"
+msgstr "名前を付けて保存"
+
+#. Resource IDs: (10)
+msgid ""
+"Save elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"管理者権限で保存\n"
+"管理者権限で BowPad を再起動します"
+
+#. Resource IDs: (8)
+msgid ""
+"Save modifications\n"
+"The modifications that were made outside BowPad are overwritten."
+msgstr ""
+"変更を保存する\n"
+"BowPadの外部でなされた変更内容は上書きされます"
+
+#. Resource IDs: (3753)
+msgid "Saves all open files"
+msgstr "開いているファイルを全て保存する"
+
+#. Resource IDs: (3752)
+msgid "Saves the current tab"
+msgstr "現在のタブを保存する"
+
+#. Resource IDs: (3769)
+msgid "Search Web"
+msgstr "Web検索"
+
+#. Resource IDs: (3769)
+msgid "Search Wikipedia"
+msgstr "Wikipedia検索"
+
+#. Resource IDs: (3758)
+msgid "Search and/or replace text in documents/tabs"
+msgstr "文書内/タブ内の検索と置換"
+
+#. Resource IDs: (10)
+msgid "Search text not found!"
+msgstr "検索文字列が見つかりません!"
+
+#. Resource IDs: (3759)
+msgid "Searches for the next match of the selected text"
+msgstr "選択文字列を次検索します"
+
+#. Resource IDs: (3766)
+msgid "Select Language"
+msgstr "翻訳言語選択"
+
+#. Resource IDs: (3758)
+msgid "Select all"
+msgstr "全て選択"
+
+#. Resource IDs: (3766)
+msgid "Select the language for BowPad"
+msgstr "BowPadの翻訳言語を選択します"
+
+#. Resource IDs: (3762)
+msgid "Sends the document to the default printer"
+msgstr "既定のプリンタで印刷します"
+
+#. Resource IDs: (3753)
+msgid "Set Encoding"
+msgstr "エンコーディング設定"
+
+#. Resource IDs: (3753)
+msgid "Set default encoding"
+msgstr "デフォルトエンコーディング設定"
+
+#. Resource IDs: (3756)
+msgid "Set the coloring according to the code language"
+msgstr "プログラミング言語に応じた色付けを設定します"
+
+#. Resource IDs: (3753)
+msgid "Set the default encoding for new files, e.g. ANSI, UTF-8, ..."
+msgstr ""
+"新規ファイルのデフォルトエンコーディングを設定します (例:ANSI, UTF-8, ...)"
+
+#. Resource IDs: (3760)
+msgid "Set the number of columns for one tabulator."
+msgstr "タブのカラム数を設定します"
+
+#. Resource IDs: (3763)
+msgid "Set up print margins, page size, page orientation"
+msgstr "印刷のマージン、用紙サイズと向きを設定します"
+
+#. Resource IDs: (3759)
+msgid ""
+"Sets the column at which the vertical edge is shown, indicating the right "
+"margin. Set to 0 to hide it."
+msgstr ""
+"右マージンを示す垂直線表示のカラム位置を設定します。0を設定すると非表示になり"
+"ます。"
+
+#. Resource IDs: (3774, 3775)
+msgid "Show Properties"
+msgstr "プロパティ表示"
+
+#. Resource IDs: (3755)
+msgid "Show Whitespaces"
+msgstr "空白文字を表示"
+
+#. Resource IDs: (3772)
+msgid "Shows a dialog to configure custom commands"
+msgstr "カスタムコマンドの設定ダイアログを表示します"
+
+#. Resource IDs: (3782)
+msgid ""
+"Shows a dialog to configure the installed plugins and install new plugins"
+msgstr ""
+"インストール済みプラグインの設定と、新プラグインのインストールを行うダイアロ"
+"グを開きます"
+
+#. Resource IDs: (3773)
+msgid "Shows a list of functions/methods in the file to jump to"
+msgstr "ファイル内ジャンプの関数/メソッドリストを表示します"
+
+#. Resource IDs: (3775)
+msgid "Shows the Windows Explorer file properties dialog for the current file"
+msgstr ""
+"現在ファイルについてWindows Explorerファイルプロパティダイアログを表示します"
+
+#. Resource IDs: (3764)
+msgid "Spaces to Tabs"
+msgstr "スペースをタブに変換"
+
+#. Resource IDs: (3761)
+msgid "Split Lines"
+msgstr "行を分割"
+
+#. Resource IDs: (3761)
+msgid "Split long lines at the right window border"
+msgstr "長い行をウィンドウの右端で分割します"
+
+#. Resource IDs: (144)
+msgid "Style Configurator"
+msgstr "スタイル設定"
+
+#. Resource IDs: (65535)
+msgid "Style:"
+msgstr "スタイル:"
+
+#. Resource IDs: (65535)
+msgid "Styles"
+msgstr "スタイル"
+
+#. Resource IDs: (3768)
+msgid "T"
+msgstr "T"
+
+#. Resource IDs: (3764, 3768)
+msgid "TS"
+msgstr "TS"
+
+#. Resource IDs: (3771)
+msgid "TT"
+msgstr "TT"
+
+#. Resource IDs: (3764)
+msgid "Tab Size"
+msgstr "タブサイズ"
+
+#. Resource IDs: (3764)
+msgid "Tabs to Spaces"
+msgstr "タブをスペースに変換"
+
+#. Resource IDs: (8)
+#, c-format
+msgid ""
+"The document '%s' was modified outside of BowPad, but there are unsaved "
+"changes in the document."
+msgstr "文書'%s'には未保存の変更がありますが、BowPad外部でも修正されています。"
+
+#. Resource IDs: (8)
+#, c-format
+msgid "The document '%s' was modified outside of BowPad."
+msgstr "文書'%s'はBowPad外部で修正されています。"
+
+#. Resource IDs: (8)
+#, c-format
+msgid "The document '%s' was removed outside of BowPad."
+msgstr "文書'%s'はBowPad外部で削除されています。"
+
+#. Resource IDs: (11)
+#, c-format
+msgid "The file '%s' does not exist. Do you want to create it?"
+msgstr "ファイル'%s'は存在しません。新規作成しますか?"
+
+#. Resource IDs: (12)
+msgid ""
+"The file is marked as read only. Are you sure you want to edit this file?"
+msgstr ""
+"このファイルは書き込み禁止に設定されています。このファイルを編集しますか?"
+
+#. Resource IDs: (12)
+msgid "The file is write protected"
+msgstr "このファイルは書き込みプロテクトされています"
+
+#. Resource IDs: (3764)
+msgid "Titlecase"
+msgstr "タイトルケース化"
+
+#. Resource IDs: (3765)
+msgid "Toggle Bookmark"
+msgstr "ブックマーク有無"
+
+#. Resource IDs: (3765)
+msgid "Toggle a bookmark on the current line"
+msgstr "現在行のブックマーク有無を交互に切り替えます"
+
+#. Resource IDs: (3766)
+msgid "Toggles between the normal and the dark theme"
+msgstr "通常テーマと暗色テーマを切り替えます"
+
+#. Resource IDs: (3763)
+msgid "Trim Whitespaces"
+msgstr "空白文字を刈取る"
+
+#. Resource IDs: (9)
+msgid "Turn off automatic update checks"
+msgstr "自動アップデートチェックを切る"
+
+#. Resource IDs: (3757)
+msgid ""
+"Turns showing whitespaces on/off.\n"
+"Hold down the Shift key to show EOLs as well."
+msgstr ""
+"空白文字表示のon/offを切り替えます\n"
+"シフトキーを押しながらonに切り替えると行末記号も表示します。"
+
+#. Resource IDs: (12)
+#, c-format
+msgid "Typing mode: %s"
+msgstr "入力モード: %s"
+
+#. Resource IDs: (3751)
+msgid "U"
+msgstr "U"
+
+#. Resource IDs: (3764)
+msgid "UT"
+msgstr "UT"
+
+#. Resource IDs: (1074)
+msgid "UTF-16 Big Endian"
+msgstr "UTF-16 Big Endian"
+
+#. Resource IDs: (1073)
+msgid "UTF-16 Little Endian"
+msgstr "UTF-16 Little Endian"
+
+#. Resource IDs: (1076)
+msgid "UTF-32 Big Endian"
+msgstr "UTF-32 Big Endian"
+
+#. Resource IDs: (1075)
+msgid "UTF-32 Little Endian"
+msgstr "UTF-32 Little Endian"
+
+#. Resource IDs: (1071)
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#. Resource IDs: (1072)
+msgid "UTF-8 with BOM"
+msgstr "UTF-8 with BOM"
+
+#. Resource IDs: (3759)
+msgid "Uncomment"
+msgstr "コメント解除"
+
+#. Resource IDs: (3759)
+msgid "Uncomments the selected text"
+msgstr "選択テキストのコメントアウトを解除する"
+
+#. Resource IDs: (1009)
+msgid "Underline"
+msgstr "下線"
+
+#. Resource IDs: (3751, 3754)
+msgid "Undo"
+msgstr "元に戻す"
+
+#. Resource IDs: (3754)
+msgid "Undo the last change"
+msgstr "直前の変更を元に戻します"
+
+#. Resource IDs: (3757)
+msgid "Unix (LF)"
+msgstr "Unix (LF)"
+
+#. Resource IDs: (7)
+msgid "Unsaved modifications"
+msgstr "未保存の変更内容があります"
+
+#. Resource IDs: (3759, 3760)
+msgid "Uppercase"
+msgstr "大文字化"
+
+#. Resource IDs: (10)
+msgid "Use $0 for the whole match, and $1..$99 for group matches."
+msgstr "$0 は合致全体、$1..$99 はグループ合致に使います。"
+
+#. Resource IDs: (3760)
+msgid "Use Tabs"
+msgstr "タブ文字を使う"
+
+#. Resource IDs: (3751, 3752, 3755)
+msgid "V"
+msgstr "V"
+
+#. Resource IDs: (3752, 3762)
+msgid "VE"
+msgstr "VE"
+
+#. Resource IDs: (12)
+msgid "Version"
+msgstr "バージョン"
+
+#. Resource IDs: (3751)
+msgid "Vertical Edge"
+msgstr "垂直線"
+
+#. Resource IDs: (3751)
+msgid "View"
+msgstr "表示"
+
+#. Resource IDs: (1026)
+msgid "Visit our Website"
+msgstr "公式ウェブサイトへ行く"
+
+#. Resource IDs: (3756)
+msgid "W"
+msgstr "W"
+
+#. Resource IDs: (3757)
+msgid "WS"
+msgstr "WS"
+
+#. Resource IDs: (1059)
+msgid "Web Search:"
+msgstr "Web検索:"
+
+#. Resource IDs: (3755)
+msgid "Whitespace"
+msgstr "空白文字"
+
+#. Resource IDs: (3768)
+msgid "Whitespaces"
+msgstr "空白文字"
+
+#. Resource IDs: (3757)
+msgid "Windows (CRLF)"
+msgstr "Windows (CRLF)"
+
+#. Resource IDs: (3755)
+msgid "Wrap Lines"
+msgstr "行折り返し"
+
+# This is used in the find-replace dialog. This means that find next to file top
+#. Resource IDs: (9)
+msgid "Wrap around"
+msgstr "折り返し"
+
+#. Resource IDs: (3755)
+msgid "Wrap lines at the end of the window"
+msgstr "ウィンドウの端で行を折り返す"
+
+#. Resource IDs: (3752, 3755)
+msgid "X"
+msgstr "X"
+
+#. Resource IDs: (3756)
+msgid "Y"
+msgstr "Y"
+
+#. Resource IDs: (9)
+msgid ""
+"You can use the following strings in the command line:\r\n"
+"$(LINE)\t\t\tThe line where the cursor is\r\n"
+"$(POS)\t\t\tthe position where the cursor is\r\n"
+"$(TAB_PATH)\t\tthe path to the file of the active tab\r\n"
+"$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n"
+"$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n"
+"$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
+msgstr ""
+"コマンドラインには下記のマクロ変数が使えます:\r\n"
+"$(LINE)\t\t\tカーソル行\r\n"
+"$(POS)\t\t\tカーソル位置\r\n"
+"$(TAB_PATH)\t\tアクティブタブのファイルパス\r\n"
+"$(TAB_DIR)\t\tアクティブタブのファイルディレクトリ\r\n"
+"$(SEL_TEXT)\t\t選択テキストまたはカーソル位置の単語\r\n"
+"$(SEL_TEXT_ESCAPED)\tURL用に$(SEL_TEXT)をエスケープしたもの"
+
+#. Resource IDs: (13)
+msgid "You have to restart BowPad for the plugin changes to take effect."
+msgstr "プラグイン変更結果を反映するため、BowPad を再起動してください。"
+
+#. Resource IDs: (3756)
+msgid "Z"
+msgstr "Z"
+
+#. Resource IDs: (65535)
+msgid "background:"
+msgstr "背景色:"
+
+#. Resource IDs: (65535)
+msgid "foreground:"
+msgstr "文字色:"
+
+#. Resource IDs: (8)
+#, c-format
+msgid "from %ld to %ld"
+msgstr "%ld から %ld まで"
+
+#. Resource IDs: (3757)
+msgid "go to the next cursor position"
+msgstr "次のカーソル位置へ移動します"
+
+#. Resource IDs: (3757)
+msgid "go to the previous cursor position"
+msgstr "前のカーソル位置へ移動します"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 0"
+msgstr "カスタムコマンド 0 を実行"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 1"
+msgstr "カスタムコマンド 1 を実行"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 2"
+msgstr "カスタムコマンド 2 を実行"
+
+#. Resource IDs: (3770)
+msgid "runs the custom command 3"
+msgstr "カスタムコマンド 3 を実行"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 4"
+msgstr "カスタムコマンド 4 を実行"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 5"
+msgstr "カスタムコマンド 5 を実行"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 6"
+msgstr "カスタムコマンド 6 を実行"
+
+#. Resource IDs: (3771)
+msgid "runs the custom command 7"
+msgstr "カスタムコマンド 7 を実行"
+
+#. Resource IDs: (3772)
+msgid "runs the custom command 8"
+msgstr "カスタムコマンド 8 を実行"
+
+#. Resource IDs: (3772)
+msgid "runs the custom command 9"
+msgstr "カスタムコマンド 9 を実行"
+
+#~ msgid "&About ..."
+#~ msgstr "バージョン情報(&A) ..."
+
+#~ msgid "&File"
+#~ msgstr "ファイル(&F)"
+
+#~ msgid "&Help"
+#~ msgstr "ヘルプ(&H)"
