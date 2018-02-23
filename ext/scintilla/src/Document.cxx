@@ -10,6 +10,7 @@
 #include <cassert>
 #include <cstring>
 #include <cstdio>
+#include <cmath>
 
 #include <stdexcept>
 #include <string>
@@ -89,7 +90,8 @@ int LexInterface::LineEndTypesSupported() {
 	return 0;
 }
 
-Document::Document() {
+Document::Document(int options) :
+	cb((options & SC_DOCUMENTOPTION_STYLES_NONE) == 0) {
 	refCount = 0;
 #ifdef _WIN32
 	eolMode = SC_EOL_CRLF;
@@ -559,7 +561,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 }
 
 Sci::Position Document::ClampPositionIntoDocument(Sci::Position pos) const {
-	return Sci::clamp(pos, 0, static_cast<Sci::Position>(Length()));
+	return std::clamp(pos, static_cast<Sci::Position>(0), static_cast<Sci::Position>(Length()));
 }
 
 bool Document::IsCrLf(Sci::Position pos) const {
@@ -877,7 +879,7 @@ Sci::Position Document::GetRelativePositionUTF16(Sci::Position positionStart, Sc
 			const Sci::Position posNext = NextPosition(pos, increment);
 			if (posNext == pos)
 				return INVALID_POSITION;
-			if (abs(pos-posNext) > 3)	// 4 byte character = 2*UTF16.
+			if (std::abs(pos-posNext) > 3)	// 4 byte character = 2*UTF16.
 				characterOffset -= increment;
 			pos = posNext;
 			characterOffset -= increment;
@@ -2600,8 +2602,14 @@ public:
 
 #ifndef NO_CXX11_REGEX
 
-class ByteIterator : public std::iterator<std::bidirectional_iterator_tag, char> {
+class ByteIterator {
 public:
+	typedef std::bidirectional_iterator_tag iterator_category;
+	typedef char value_type;
+	typedef ptrdiff_t difference_type;
+	typedef char* pointer;
+	typedef char& reference;
+
 	const Document *doc;
 	Sci::Position position;
 	ByteIterator(const Document *doc_ = 0, Sci::Position position_ = 0) : doc(doc_), position(position_) {
@@ -2663,7 +2671,7 @@ public:
 
 // On Windows, report non-BMP characters as 2 separate surrogates as that
 // matches wregex since it is based on wchar_t.
-class UTF8Iterator : public std::iterator<std::bidirectional_iterator_tag, wchar_t> {
+class UTF8Iterator {
 	// These 3 fields determine the iterator position and are used for comparisons
 	const Document *doc;
 	Sci::Position position;
@@ -2673,6 +2681,12 @@ class UTF8Iterator : public std::iterator<std::bidirectional_iterator_tag, wchar
 	size_t lenCharacters;
 	wchar_t buffered[2];
 public:
+	typedef std::bidirectional_iterator_tag iterator_category;
+	typedef wchar_t value_type;
+	typedef ptrdiff_t difference_type;
+	typedef wchar_t* pointer;
+	typedef wchar_t& reference;
+
 	UTF8Iterator(const Document *doc_ = 0, Sci::Position position_ = 0) :
 		doc(doc_), position(position_), characterIndex(0), lenBytes(0), lenCharacters(0) {
 		buffered[0] = 0;
@@ -2775,10 +2789,16 @@ private:
 
 // On Unix, report non-BMP characters as single characters
 
-class UTF8Iterator : public std::iterator<std::bidirectional_iterator_tag, wchar_t> {
+class UTF8Iterator {
 	const Document *doc;
 	Sci::Position position;
 public:
+	typedef std::bidirectional_iterator_tag iterator_category;
+	typedef wchar_t value_type;
+	typedef ptrdiff_t difference_type;
+	typedef wchar_t* pointer;
+	typedef wchar_t& reference;
+
 	UTF8Iterator(const Document *doc_=0, Sci::Position position_=0) : doc(doc_), position(position_) {
 	}
 	UTF8Iterator(const UTF8Iterator &other) NOEXCEPT {

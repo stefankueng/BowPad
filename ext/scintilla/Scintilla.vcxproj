@@ -87,6 +87,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -101,6 +102,7 @@
       <WarningLevel>Level3</WarningLevel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Lib>
       <TargetMachine>MachineX64</TargetMachine>
@@ -117,6 +119,7 @@
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;SCI_OWNREGEX;EnableScrollBar=CoolSB_EnableScrollBar;GetScrollInfo=CoolSB_GetScrollInfo;GetScrollPos=CoolSB_GetScrollPos;GetScrollRange=CoolSB_GetScrollRange;SetScrollInfo=CoolSB_SetScrollInfo;SetScrollPos=CoolSB_SetScrollPos;SetScrollRange=CoolSB_SetScrollRange;ShowScrollBar=CoolSB_ShowScrollBar;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;STATIC_BUILD;SCI_LEXER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,6 +132,7 @@
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;SCI_OWNREGEX;EnableScrollBar=CoolSB_EnableScrollBar;GetScrollInfo=CoolSB_GetScrollInfo;GetScrollPos=CoolSB_GetScrollPos;GetScrollRange=CoolSB_GetScrollRange;SetScrollInfo=CoolSB_SetScrollInfo;SetScrollPos=CoolSB_SetScrollPos;SetScrollRange=CoolSB_SetScrollRange;ShowScrollBar=CoolSB_ShowScrollBar;_WIN64;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;STATIC_BUILD;SCI_LEXER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Lib>
       <TargetMachine>MachineX64</TargetMachine>
