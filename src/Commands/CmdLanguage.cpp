@@ -193,7 +193,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
                 // fetch list of remotely available languages
                 std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
 
-                std::wstring sLangURL = CStringUtils::Format(L"https://svn.code.sf.net/p/bowpad-sk/code/branches/%d.%d.%d/Languages/Languages.txt", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO);
+                std::wstring sLangURL = CStringUtils::Format(L"https://github.com/stefankueng/BowPad/raw/master/Languages/Languages.txt", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO);
                 HRESULT res = URLDownloadToFile(nullptr, sLangURL.c_str(), tempfile.c_str(), 0, nullptr);
                 if (res == S_OK)
                 {
@@ -227,7 +227,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
                 if (!gLanguages[selected].empty() && !CAppUtils::HasSameMajorVersion(langfile))
                 {
                     DeleteFile(langfile.c_str());
-                    std::wstring sLangURL = CStringUtils::Format(L"https://svn.code.sf.net/p/bowpad-sk/code/branches/%d.%d.%d/Languages/%s/BowPad_%s.lang", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, LANGPLAT, gLanguages[selected].c_str());
+                    std::wstring sLangURL = CStringUtils::Format(L"https://github.com/stefankueng/BowPad/raw/&d.%d.%d/Languages/%s/BowPad_%s.lang", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, LANGPLAT, gLanguages[selected].c_str());
                     HRESULT res = URLDownloadToFile(nullptr, sLangURL.c_str(), langfile.c_str(), 0, nullptr);
                     if (FAILED(res))
                     {

@@ -62,7 +62,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
             {
                 CDownloadFile filedownloader(L"BowPad", nullptr);
                 std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
-                filedownloader.DownloadFile(L"https://svn.code.sf.net/p/bowpad-sk/code/trunk/plugins/plugins.txt", tempfile);
+                filedownloader.DownloadFile(L"https://github.com/stefankueng/BowPad/raw/master/plugins/plugins.txt", tempfile);
 
                 // parse the file and fill in the m_plugins set
                 auto plugins = std::make_unique<std::map<std::wstring, PluginInfo>>();
@@ -147,7 +147,7 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                         {
                             CDownloadFile filedownloader(L"BowPad", nullptr);
                             std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true, L".zip");
-                            std::wstring pluginurl = L"https://svn.code.sf.net/p/bowpad-sk/code/trunk/plugins/";
+                            std::wstring pluginurl = L"https://github.com/stefankueng/BowPad/raw/master/plugins/";
                             pluginurl += info.name;
                             pluginurl += L".zip";
                             filedownloader.DownloadFile(pluginurl, tempfile);
