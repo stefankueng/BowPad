@@ -1,0 +1,9 @@
+/.vs
+/bin
+/obj
+/default.build.user
+/ext/coolsb/obj
+/ext/editorconfig-core/obj
+/ext/scintilla/obj
+/signinfo.txt
+/src/BowPad.vcxproj.user
