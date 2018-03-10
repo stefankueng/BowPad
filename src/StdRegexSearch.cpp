@@ -34,9 +34,39 @@
 #include "../ext/scintilla/src/Document.h"
 #include "../ext/scintilla/src/UniConversion.h"
 #include "UTF8DocumentIterator.h"
+#include <Windows.h>
+
+#undef FindText
 
 namespace Scintilla
 {
+    std::wstring StdGetUnicode(const std::string& multibyte, bool stopAtNull = true)
+    {
+        int len = (int)multibyte.size();
+        if (len == 0)
+            return std::wstring();
+        int size = len * 4;
+        auto wide = std::make_unique<wchar_t[]>(size);
+        int ret = MultiByteToWideChar(CP_UTF8, 0, multibyte.c_str(), len, wide.get(), size - 1);
+        wide[ret] = 0;
+        if (stopAtNull)
+            return std::wstring(wide.get());
+        return std::wstring(wide.get(), ret);
+    }
+    std::string StdGetUTF8(const std::wstring& wide, bool stopAtNull = true)
+    {
+        int len = (int)wide.size();
+        if (len == 0)
+            return std::string();
+        int size = len * 4;
+        auto narrow = std::make_unique<char[]>(size);
+        int ret = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), len, narrow.get(), size - 1, nullptr, nullptr);
+        narrow[ret] = 0;
+        if (stopAtNull)
+            return std::string(narrow.get());
+        return std::string(narrow.get(), ret);
+    }
+
 class StdRegexSearch : public RegexSearchBase
 {
 public:
@@ -309,9 +339,8 @@ void StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::compileRegex(c
 {
     if (_lastCompileFlags != compileFlags || _lastRegexString != regex)
     {
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
+        _regex = Regex(StdGetUnicode(regex).c_str(), static_cast<std::regex_constants::syntax_option_type>(compileFlags));
 
-        _regex = Regex(convert.from_bytes(regex).c_str(), static_cast<std::regex_constants::syntax_option_type>(compileFlags));
         _lastRegexString = regex;
         _lastCompileFlags = compileFlags;
     }
@@ -348,8 +377,7 @@ const char *StdRegexSearch::SubstituteByPosition(Document* /*doc*/, const char *
 template <class CharT, class CharacterIterator>
 std::string StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::SubstituteByPosition(const char *text, int *length)
 {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
-    auto s = convert.to_bytes(_match.format(convert.from_bytes(text), std::regex_constants::format_default));
+    auto s = StdGetUTF8(_match.format(StdGetUnicode(text), std::regex_constants::format_default));
     *length = (int)s.size();
     return s;
 }

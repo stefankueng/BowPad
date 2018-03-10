@@ -35,7 +35,7 @@
 #include "../ext/scintilla/src/uniconversion.h"
 #include "../ext/scintilla/src/Position.h"
 
-class UTF8DocumentIterator : public std::iterator<std::bidirectional_iterator_tag, wchar_t>
+class UTF8DocumentIterator
 {
     // These 3 fields determine the iterator position and are used for comparisons
     const Scintilla::Document *doc;
@@ -46,6 +46,12 @@ class UTF8DocumentIterator : public std::iterator<std::bidirectional_iterator_ta
     size_t lenCharacters;
     wchar_t buffered[2];
 public:
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef wchar_t value_type;
+    typedef ptrdiff_t difference_type;
+    typedef wchar_t* pointer;
+    typedef wchar_t& reference;
+
     UTF8DocumentIterator(const Scintilla::Document *doc_ = 0, Sci::Position position_ = 0) :
         doc(doc_), position(position_), characterIndex(0), lenBytes(0), lenCharacters(0)
     {
