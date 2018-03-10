@@ -42,7 +42,7 @@ LRESULT CAboutDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
             // initialize the controls
-            m_link.ConvertStaticToHyperlink(hwndDlg, IDC_WEBLINK, _T("http://stefanstools.sourceforge.net"));
+            m_link.ConvertStaticToHyperlink(hwndDlg, IDC_WEBLINK, _T("http://tools.stefankueng.com"));
             TCHAR verbuf[1024] = {0};
 #ifdef _WIN64
             _stprintf_s(verbuf, _countof(verbuf), _T("BowPad version %d.%d.%d.%d (64-bit)"), BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);

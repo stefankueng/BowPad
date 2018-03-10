@@ -13,7 +13,7 @@
 
     <Package Id="*" Keywords="Installer"
           Description="BowPad Text Editor"
-          Comments="http://stefanstools.sourceforge.net" Manufacturer="Stefans Tools"
+          Comments="http://stefankueng.com" Manufacturer="Stefans Tools"
           InstallerVersion="200" Languages="1033" Compressed="yes" SummaryCodepage="1252" />
 
     <Upgrade Id="25629509-0CA5-493B-AA97-8A2B5C80EF10" >
@@ -69,7 +69,7 @@
         <Shortcut Id="startMenuBowPad" Directory="ProgramMenuDir" Name="BowPad" Target="[INSTALLDIR]BowPad.exe" Description="A Text Editor with a ribbon UI" />
         <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
         <RegistryValue Root="HKCU" Key="Software\BowPad" Name="installed" Type="integer" Value="1" KeyPath="yes" />
-        <IniFile Id="WebsiteUrl" Action="addLine" Name="Website.url" Directory="INSTALLDIR" Section="InternetShortcut" Key="URL" Value="http://stefanstools.sourceforge.net" />
+        <IniFile Id="WebsiteUrl" Action="addLine" Name="Website.url" Directory="INSTALLDIR" Section="InternetShortcut" Key="URL" Value="http://tools.stefankueng.com" />
         <Shortcut Id="WebsiteUrlShortCut" Directory="ProgramMenuDir" Name="Website" Target="[INSTALLDIR]Website.url" Description="Visit BowPad's Website" />
       </Component>
     </DirectoryRef>
