@@ -237,4 +237,6 @@ private:
     HICON                       m_hZoomIcon;
     HICON                       m_hZoomDarkIcon;
     HICON                       m_hEmptyIcon;
+    HICON                       hEditorconfigActive;
+    HICON                       hEditorconfigInactive;
 };

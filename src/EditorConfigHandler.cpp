@@ -28,7 +28,7 @@ CEditorConfigHandler::~CEditorConfigHandler()
 {
     for (const auto& handle : m_handles)
     {
-        editorconfig_handle_destroy(handle.second);
+        editorconfig_handle_destroy(handle.second.handle);
     }
 }
 
@@ -49,7 +49,10 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
 
         if (editorconfig_parse(CUnicodeUtils::StdGetANSI(path).c_str(), eh) == 0)
         {
-            m_handles[path] = eh;
+            EditorConfigData data;
+            data.handle = eh;
+            data.enabled = true;
+            m_handles[path] = data;
             it = m_handles.find(path);
         }
         else
@@ -57,12 +60,14 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
     }
     if (it != m_handles.end())
     {
-        int name_value_count = editorconfig_handle_get_name_value_count(it->second);
+        if (!it->second.enabled)
+            return;
+        int name_value_count = editorconfig_handle_get_name_value_count(it->second.handle);
         for (int j = 0; j < name_value_count; ++j)
         {
             const char*         name;
             const char*         value;
-            editorconfig_handle_get_name_value(it->second, j, &name, &value);
+            editorconfig_handle_get_name_value(it->second.handle, j, &name, &value);
 
             if ((doc.m_TabSpace == Default) && (strcmp(name, "indent_style") == 0))
             {
@@ -160,5 +165,29 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
                 doc.m_bEnsureNewlineAtEnd = strcmp(value, "true") == 0;
             }
         }
+    }
+}
+
+bool CEditorConfigHandler::IsEnabled(const std::wstring & path)
+{
+    if (path.empty())
+        return false;
+    auto it = m_handles.find(path);
+
+    if (it != m_handles.end())
+    {
+        int name_value_count = editorconfig_handle_get_name_value_count(it->second.handle);
+        return (name_value_count != 0) && it->second.enabled;
+    }
+    return false;
+}
+
+void CEditorConfigHandler::EnableForPath(const std::wstring & path, bool enable)
+{
+    auto it = m_handles.find(path);
+
+    if (it != m_handles.end())
+    {
+        it->second.enabled = enable;
     }
 }

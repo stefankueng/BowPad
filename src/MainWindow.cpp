@@ -68,13 +68,14 @@ namespace
     const int STATUSBAR_DOC_TYPE        = 0;
     const int STATUSBAR_CUR_POS         = 1;
     const int STATUSBAR_SEL             = 2;
-    const int STATUSBAR_EOL_FORMAT      = 3;
-    const int STATUSBAR_TABSPACE        = 4;
-    const int STATUSBAR_UNICODE_TYPE    = 5;
-    const int STATUSBAR_TYPING_MODE     = 6;
-    const int STATUSBAR_CAPS            = 7;
-    const int STATUSBAR_TABS            = 8;
-    const int STATUSBAR_ZOOM            = 9;
+    const int STATUSBAR_EDITORCONFIG    = 3;
+    const int STATUSBAR_EOL_FORMAT      = 4;
+    const int STATUSBAR_TABSPACE        = 5;
+    const int STATUSBAR_UNICODE_TYPE    = 6;
+    const int STATUSBAR_TYPING_MODE     = 7;
+    const int STATUSBAR_CAPS            = 8;
+    const int STATUSBAR_TABS            = 9;
+    const int STATUSBAR_ZOOM            = 10;
 
     static constexpr char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
     static constexpr size_t URL_REG_EXPR_LENGTH = _countof(URL_REG_EXPR) - 1;
@@ -175,6 +176,8 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     , m_hZoomIcon(nullptr)
     , m_hZoomDarkIcon(nullptr)
     , m_hEmptyIcon(nullptr)
+    , hEditorconfigActive(nullptr)
+    , hEditorconfigInactive(nullptr)
     , m_tabmovemod(false)
     , m_initLine(0)
     , m_bPathsToOpenMRU(true)
@@ -198,6 +201,8 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     m_hZoomIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ZOOM), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
     m_hZoomDarkIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_ZOOMDARK), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
     m_hEmptyIcon = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_EMPTY), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
+    hEditorconfigActive = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_EDITORCONFIGACTIVE), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
+    hEditorconfigInactive = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_EDITORCONFIGINACTIVE), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
     m_fileTreeVisible = CIniSettings::Instance().GetInt64(L"View", L"FileTree", 1) != 0;
     m_scratchEditor.InitScratch(hRes);
 }
@@ -212,6 +217,8 @@ CMainWindow::~CMainWindow()
     DestroyIcon(m_hZoomIcon);
     DestroyIcon(m_hZoomDarkIcon);
     DestroyIcon(m_hEmptyIcon);
+    DestroyIcon(hEditorconfigActive);
+    DestroyIcon(hEditorconfigInactive);
 }
 
 // IUnknown method implementations.
@@ -958,6 +965,13 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
                 case STATUSBAR_ZOOM:
                 m_editor.Call(SCI_SETZOOM, 0);
                 break;
+                case STATUSBAR_EDITORCONFIG:
+                {
+                    const auto& doc = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
+                    auto editorConfigEnabled = CEditorConfigHandler::Instance().IsEnabled(doc.m_path);
+                    CEditorConfigHandler::Instance().EnableForPath(doc.m_path, !editorConfigEnabled);
+                }
+                break;
             }
             UpdateStatusBar(true);
         }
@@ -1647,6 +1661,18 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                             false,
                             SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated() ? m_hShieldIcon : nullptr,
                             m_hLexerIcon);
+
+        auto editorConfigEnabled = CEditorConfigHandler::Instance().IsEnabled(doc.m_path);
+        m_StatusBar.SetPart(STATUSBAR_EDITORCONFIG,
+                            L"",
+                            L"",
+                            editorConfigEnabled ? L"Editorconfig active" : L"Editorconfig inactive",
+                            0,
+                            0,
+                            1,      // center
+                            true,
+                            false,
+                            editorConfigEnabled ? hEditorconfigActive : hEditorconfigInactive);
 
         int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
         APPVERIFY(ToEOLMode(doc.m_format) == eolMode);

@@ -22,6 +22,17 @@
 
 class CDocument;
 
+class EditorConfigData
+{
+public:
+    EditorConfigData()
+        : enabled(true)
+    { }
+
+    editorconfig_handle handle;
+    bool enabled;
+};
+
 class CEditorConfigHandler
 {
 private:
@@ -32,7 +43,9 @@ public:
     static CEditorConfigHandler& Instance();
 
     void ApplySettingsForPath(const std::wstring& path, CScintillaWnd * pScintilla, CDocument& doc, bool keepEncoding);
+    bool IsEnabled(const std::wstring& path);
+    void EnableForPath(const std::wstring& path, bool enable);
 
 private:
-    std::map<std::wstring, editorconfig_handle> m_handles;
+    std::map<std::wstring, EditorConfigData> m_handles;
 };
