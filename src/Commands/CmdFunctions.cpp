@@ -491,9 +491,9 @@ void CCmdFunctions::OnClose()
         m_fileData.push_back(WorkItem());
         m_filedatacv.notify_one();
     }
-    int count = 50;
+    int count = 200;
     while (InterlockedExchange(&m_bThreadRunning, m_bThreadRunning) && --count)
-        Sleep(1000);
+        Sleep(10);
 }
 
 void CCmdFunctions::OnDocumentSave(DocID id, bool bSaveAs)
