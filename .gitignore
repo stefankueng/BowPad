@@ -11,3 +11,4 @@
 /src/*.aps
 /src/version.h
 /version.build
+/ext/coolsb/coolsb.vcxproj.user
