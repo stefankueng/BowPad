@@ -83,10 +83,10 @@ msgstr "単語として検索(&w)"
 
 #. Resource IDs: (9)
 msgid ""
-"<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Full "
+"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full "
 "details about this update</a>"
 msgstr ""
-"<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">このアッ"
+"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">このアッ"
 "プデートの詳細</a>"
 
 #. Resource IDs: (3754)

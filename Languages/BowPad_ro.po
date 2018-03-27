@@ -82,8 +82,8 @@ msgid "&Search for:"
 msgstr "Cauta :"
 
 #. Resource IDs: (9)
-msgid "<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Full details about this update</a>"
-msgstr "<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Toate detaliile despre acesta actualizare</a>"
+msgid "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full details about this update</a>"
+msgstr "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Toate detaliile despre acesta actualizare</a>"
 
 #. Resource IDs: (3754)
 msgid "A"

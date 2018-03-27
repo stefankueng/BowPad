@@ -137,10 +137,10 @@ msgstr "<"
 
 #. Resource IDs: (133)
 msgid ""
-"<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Full "
+"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full "
 "details about this update</a>"
 msgstr ""
-"<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Mehr "
+"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Mehr "
 "Info über diese Update</a>"
 
 #. Resource IDs: (60053)

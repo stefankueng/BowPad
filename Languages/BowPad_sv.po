@@ -71,9 +71,9 @@ msgid "&Search for:"
 msgstr "&Sök efter:"
 
 #. Resource IDs: (9)
-msgid "<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Full details about this update</a>"
+msgid "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full details about this update</a>"
 msgstr ""
-"<a href=\"http://stefanstools.sourceforge.net/BowPad_history.html\">Utförlig "
+"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Utförlig "
 "information om denna uppdatering</a>"
 
 #. Resource IDs: (103)
