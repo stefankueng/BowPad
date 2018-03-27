@@ -1,7 +1,8 @@
 de
 fr
 ja
-pt_pt
+pt-br
+pt-pt
 ro
 ru
 sv
