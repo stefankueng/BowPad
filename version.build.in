@@ -6,6 +6,7 @@
             <variable name="MinorVersion" value="3" />
             <variable name="MicroVersion" value="5" />
             <variable name="WCREV" value="$WCREV$" />
+            <variable name="WCLOGCOUNT" value="$WCLOGCOUNT$" />
             <variable name="WCDATE" value="$WCDATE$" />
         </setenv>
     </target>

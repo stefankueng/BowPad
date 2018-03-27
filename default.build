@@ -64,6 +64,7 @@
           <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
           <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
           <token key="WCREV" value="${environment::get-variable('WCREV')}" />
+          <token key="WCLOGCOUNT" value="${environment::get-variable('WCLOGCOUNT')}" />
           <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
         </replacetokens>
       </filterchain>
