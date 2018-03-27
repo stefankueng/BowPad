@@ -8,11 +8,11 @@
     <owners>Stefan Kueng</owners>
     <summary>BowPad is a small and fast text editor with a ribbon user interface and syntax highlighting.</summary>
     <description>BowPad is a small and fast text editor with a ribbon user interface and syntax highlighting. It supports plugins written in jscript or vbscript and has a lot of useful features.</description>
-    <projectUrl>http://stefanstools.sourceforge.net/BowPad.html</projectUrl>
+    <projectUrl>http://tools.stefankueng.com/BowPad.html</projectUrl>
     <tags>bowpad notepad editor text plugins admin</tags>
     <licenseUrl>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <iconUrl>https://svn.code.sf.net/p/bowpad-sk/code/trunk/src/res/BowPad128.png</iconUrl>
+    <iconUrl>https://github.com/stefankueng/BowPad/raw/master/src/res/BowPad128.png</iconUrl>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
