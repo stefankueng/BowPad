@@ -12,3 +12,5 @@
 /src/version.h
 /version.build
 /ext/coolsb/coolsb.vcxproj.user
+/ext/choco/package
+/src/Setup/VersionNumberInclude.wxi
