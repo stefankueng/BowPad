@@ -150,9 +150,9 @@
 
     <!-- now write the version.txt file -->
     <echo file="version.txt">${verstringfull}
-https://github.com/stefankueng/BowPad/archive/${verstring}/BowPad64-${verstring}.msi/download
+https://github.com/stefankueng/BowPad/releases/download/${verstring}/BowPad64-${verstring}.msi
 BowPad64-${verstring}.msi
-https://github.com/stefankueng/BowPad/archive/${verstring}/BowPad-${verstring}.msi/download
+https://github.com/stefankueng/BowPad/releases/download/${verstring}/BowPad-${verstring}.msi/download
 BowPad-${verstring}.msi</echo>
     <loadfile file="ext\choco\bowpad.nuspec" property="nuspecfile">
       <filterchain>
