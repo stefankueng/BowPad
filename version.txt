@@ -1,5 +1,5 @@
-2.3.5.2071
-https://sourceforge.net/projects/bowpad-sk/files/2.3.5/BowPad64-2.3.5.msi/download
-BowPad64-2.3.5.msi
-https://sourceforge.net/projects/bowpad-sk/files/2.3.5/BowPad-2.3.5.msi/download
-BowPad-2.3.5.msi
+2.3.6.7e55cba54302af65d098c27de45b5ce308694f30
+https://github.com/stefankueng/BowPad/releases/download/2.3.6/BowPad64-2.3.6.msi
+BowPad64-2.3.6.msi
+https://github.com/stefankueng/BowPad/releases/download/2.3.6/BowPad-2.3.6.msi/download
+BowPad-2.3.6.msi
