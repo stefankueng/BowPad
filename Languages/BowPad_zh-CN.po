@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-01 19:00+0800\n"
-"PO-Revision-Date: 2018-04-01 19:00+0800\n"
+"PO-Revision-Date: 2018-04-03 08:00+0800\n"
 "Last-Translator: WMJ <wmjordan@163.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -178,7 +178,7 @@ msgstr "弹出保存文件对话框，保存当前文档"
 
 #. Resource IDs: (65535)
 msgid "Author: Stefan Küng"
-msgstr "作者: Stefan Küng；中文版翻译：左伟明"
+msgstr "作者: Stefan Küng；中文版翻译：wmjordan"
 
 #. Resource IDs: (60513, 60515)
 msgid "Auto Braces"
@@ -316,11 +316,11 @@ msgstr "仅在注释、字符串和文本中检查拼写错误"
 
 #. Resource IDs: (65535)
 msgid "Chose the encoding of new files"
-msgstr "选择新文件的文本编码"
+msgstr "新文件的文本编码"
 
 #. Resource IDs: (65535)
 msgid "Chose the line ending of new files"
-msgstr "选择新文件的换行方式"
+msgstr "新文件的换行方式"
 
 #. Resource IDs: (60352, 60354)
 msgid "Clear Bookmarks"
@@ -370,7 +370,7 @@ msgstr "关闭所有打开的文档，当前文档除外"
 
 #. Resource IDs: (60379)
 msgid "Cmd"
-msgstr ""
+msgstr "命令"
 
 #. Resource IDs: (60022)
 msgid "Code"
@@ -430,7 +430,7 @@ msgstr "配置自定义命令"
 
 #. Resource IDs: (60139, 60141)
 msgid "Convert to"
-msgstr "转换"
+msgstr "转换文本编码"
 
 #. Resource IDs: (60334)
 msgid "Converts all spaces in the document to tabs"
@@ -773,7 +773,7 @@ msgstr ""
 
 #. Resource IDs: (235)
 msgid "F&iles (e.g.: *.txt;*.dat):"
-msgstr "文件（例如：*.txt;*.dat）"
+msgstr "文件(如:*.txt;*.&c):"
 
 #. Resource IDs: (236)
 msgid "F&older to search:"
@@ -827,7 +827,7 @@ msgstr "无法保存文件“%s”。\r\n"
 
 #. Resource IDs: (137)
 msgid "Fetch remote languages..."
-msgstr "正在下载语言包列表文件..."
+msgstr "下载可用界面语言..."
 
 #. Resource IDs: (247)
 msgid "Fetching plugins list - please wait..."
@@ -891,15 +891,15 @@ msgstr "查找所有项"
 
 #. Resource IDs: (210)
 msgid "Find All In &Folder"
-msgstr "在文件夹中查找所有项(&J)"
+msgstr "在文件夹中查找所有项"
 
 #. Resource IDs: (159)
 msgid "Find All In All &Tabs"
-msgstr "在已打开文件中查找所有项(&D)"
+msgstr "在已打开文件中查找所有项"
 
 #. Resource IDs: (1073)
 msgid "Find Fi&les"
-msgstr "在文件中查找所有项(&W)"
+msgstr "在文件中查找所有项"
 
 #. Resource IDs: (225)
 msgid "Find Files"
@@ -911,7 +911,7 @@ msgstr "查找下一个"
 
 #. Resource IDs: (60189, 60191)
 msgid "Find Next Selected"
-msgstr "查找下一个选中项"
+msgstr "查找选中项"
 
 #. Resource IDs: (60184, 60186)
 msgid "Find Previous"
@@ -1031,7 +1031,7 @@ msgstr "忽略"
 
 #. Resource IDs: (1079)
 msgid "Ignore &case."
-msgstr "忽略大小写。"
+msgstr "忽略大小写(&D)"
 
 #. Resource IDs: (216)
 msgid "Ignore word for this session"
@@ -1175,7 +1175,7 @@ msgstr "字节数：%ld\r\n"
 
 #. Resource IDs: (60145)
 msgid "Lexer"
-msgstr "语法分析器"
+msgstr "编程语言"
 
 #. Resource IDs: (238)
 #, c-format
@@ -1393,7 +1393,7 @@ msgstr "新建副本文档"
 
 #. Resource IDs: (237)
 msgid "New Corresponding Files."
-msgstr "创建对应文件。"
+msgstr "创建对应文件"
 
 #. Resource IDs: (60034)
 msgid "New Document"
@@ -2166,19 +2166,19 @@ msgstr ""
 
 #. Resource IDs: (1074)
 msgid "UTF-16 Big Endian"
-msgstr "UTF-16 Big Endian（大尾序）"
+msgstr "UTF-16 Big Endian（高位在前）"
 
 #. Resource IDs: (1073)
 msgid "UTF-16 Little Endian"
-msgstr "UTF-16 Little Endian（小尾序）"
+msgstr "UTF-16 Little Endian（低位在前）"
 
 #. Resource IDs: (1076)
 msgid "UTF-32 Big Endian"
-msgstr "UTF-32 Big Endian（大尾序）"
+msgstr "UTF-32 Big Endian（高位在前）"
 
 #. Resource IDs: (1075)
 msgid "UTF-32 Little Endian"
-msgstr "UTF-32 Little Endian（小尾序）"
+msgstr "UTF-32 Little Endian（低位在前）"
 
 #. Resource IDs: (1071)
 msgid "UTF-8"
@@ -2186,7 +2186,7 @@ msgstr ""
 
 #. Resource IDs: (1072)
 msgid "UTF-8 with BOM"
-msgstr "UTF-8 带字节顺序标记"
+msgstr "UTF-8（带字节顺序标记）"
 
 #. Resource IDs: (60216, 60218)
 msgid "Uncomment"
@@ -2274,7 +2274,7 @@ msgstr "搜索互联网："
 
 #. Resource IDs: (1094)
 msgid "When loading, prefer utf8 over ANSI/Local"
-msgstr "加载文档时，优先使用 UTF-8 编码而不是系统区域设置的默认编码"
+msgstr "加载文档时，优先使用 UTF-8 编码而不是系统默认编码"
 
 #. Resource IDs: (60114)
 msgid "Whitespace"
@@ -2290,7 +2290,7 @@ msgstr ""
 
 #. Resource IDs: (60108, 60110)
 msgid "Wrap Lines"
-msgstr "换行"
+msgstr "自动换行"
 
 #. Resource IDs: (143)
 msgid "Wrap around."
