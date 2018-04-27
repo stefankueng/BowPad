@@ -73,6 +73,11 @@ static int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lPa
     FileTreeItem * pTreeItem1 = reinterpret_cast<FileTreeItem*>(lParam1);
     FileTreeItem * pTreeItem2 = reinterpret_cast<FileTreeItem*>(lParam2);
 
+    if (pTreeItem1->isDot)
+        return -1;
+    if (pTreeItem2->isDot)
+        return 1;
+
     if (pTreeItem1->isDir != pTreeItem2->isDir)
         return pTreeItem1->isDir ? -1 : 1;
 
@@ -307,6 +312,15 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                         tvi.iSelectedImage = dirIconIndex;
                         tvi.iExpandedImage = dirOpenIconIndex;
                         tvi.cChildren = 1;
+                        if (item->isDot)
+                        {
+                            tvi.iImage = 0;
+                            tvi.iSelectedImage = 0;
+                            tvi.iExpandedImage = 0;
+                            tvi.pszText = L"..";
+                            tvi.cchTextMax = 3;
+                            tvi.cChildren = 0;
+                        }
                     }
                     else
                     {
@@ -490,7 +504,24 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
     auto data = new FileTreeData();
     data->refreshpath = refreshPath;
     data->refreshRoot = refreshRoot;
+
+    if (refreshRoot == TVI_ROOT)
+    {
+        // add an entry ".." which is used to go to the
+        // parent folder.
+        if (refreshPath.size() > 3)
+        {
+            auto parentDir = CPathUtils::GetParentDirectory(refreshPath);
+            FileTreeItem * fi = new FileTreeItem();
+            fi->path = std::move(parentDir);
+            fi->isDir = true;
+            fi->isDot = true;
+
+            data->data.push_back(fi);
+        }
+    }
     CDirFileEnum enumerator(refreshPath);
+    enumerator.SetAttributesToIgnore(FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_VIRTUAL);
     bool bIsDir = false;
     std::wstring path;
     while (enumerator.NextFile(path, &bIsDir, false) && !m_bStop)
@@ -527,28 +558,44 @@ HTREEITEM CFileTree::GetHitItem() const
     return hItem;
 }
 
-std::wstring CFileTree::GetFilePathForHitItem() const
+std::wstring CFileTree::GetPathForHitItem(bool * isDir, bool * isDot) const
 {
+    if (isDir)
+        (*isDir) = false;
+    if (isDot)
+        (*isDot) = false;
     HTREEITEM hItem = GetHitItem();
     if (hItem)
     {
         const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
-        if (pTreeItem && !pTreeItem->isDir)
+        if (pTreeItem)
         {
+            if (isDir)
+                (*isDir) = pTreeItem->isDir;
+            if (isDot)
+                (*isDot) = pTreeItem->isDot;
             return pTreeItem->path;
         }
     }
     return std::wstring();
 }
 
-std::wstring CFileTree::GetFilePathForSelItem() const
+std::wstring CFileTree::GetPathForSelItem(bool * isDir, bool * isDot) const
 {
+    if (isDir)
+        (*isDir) = false;
+    if (isDot)
+        (*isDot) = false;
     HTREEITEM hItem = TreeView_GetSelection(*this);
     if (hItem)
     {
         const FileTreeItem * pTreeItem = GetFileTreeItem(*this, hItem);
-        if (pTreeItem && !pTreeItem->isDir)
+        if (pTreeItem)
         {
+            if (isDir)
+                (*isDir) = pTreeItem->isDir;
+            if (isDot)
+                (*isDot) = pTreeItem->isDot;
             return pTreeItem->path;
         }
     }

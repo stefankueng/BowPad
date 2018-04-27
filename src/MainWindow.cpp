@@ -852,28 +852,52 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM /*wParam*/,
     {
     case NM_RETURN:
     {
-        auto path = m_fileTree.GetFilePathForSelItem();
+        bool isDir = false;
+        bool isDot = false;
+        auto path = m_fileTree.GetPathForSelItem(&isDir, &isDot);
         if (!path.empty())
         {
-            bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-            unsigned int openFlags = OpenFlags::AddToMRU;
-            if (control)
-                openFlags |= OpenFlags::OpenIntoActiveTab;
-            OpenFile(path, openFlags);
+            if (isDir)
+            {
+                if (isDot)
+                {
+                    m_fileTree.SetPath(path);
+                }
+            }
+            else
+            {
+                bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+                unsigned int openFlags = OpenFlags::AddToMRU;
+                if (control)
+                    openFlags |= OpenFlags::OpenIntoActiveTab;
+                OpenFile(path, openFlags);
+            }
             return TRUE;
         }
     }
     break;
     case NM_DBLCLK:
     {
-        auto path = m_fileTree.GetFilePathForHitItem();
+        bool isDir = false;
+        bool isDot = false;
+        auto path = m_fileTree.GetPathForHitItem(&isDir, &isDot);
         if (!path.empty())
         {
-            bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-            unsigned int openFlags = OpenFlags::AddToMRU;
-            if (control)
-                openFlags |= OpenFlags::OpenIntoActiveTab;
-            OpenFile(path, openFlags);
+            if (isDir)
+            {
+                if (isDot)
+                {
+                    m_fileTree.SetPath(path);
+                }
+            }
+            else
+            {
+                bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+                unsigned int openFlags = OpenFlags::AddToMRU;
+                if (control)
+                    openFlags |= OpenFlags::OpenIntoActiveTab;
+                OpenFile(path, openFlags);
+            }
             PostMessage(*this, WM_SETFOCUS, TRUE, 0);
         }
     }

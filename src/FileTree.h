@@ -26,10 +26,12 @@ class FileTreeItem
 public:
     FileTreeItem()
         : isDir(false)
+        , isDot(false)
         , busy(false)
     {}
     std::wstring    path;
     bool            isDir;
+    bool            isDot;
     bool            busy;
 };
 
@@ -55,8 +57,8 @@ public:
     std::wstring GetPath()const { return m_path; }
     HTREEITEM GetHitItem() const;
     void Refresh(HTREEITEM refreshRoot, bool force = false);
-    std::wstring GetFilePathForHitItem() const;
-    std::wstring GetFilePathForSelItem() const;
+    std::wstring GetPathForHitItem(bool * isDir, bool * isDot) const;
+    std::wstring GetPathForSelItem(bool * isDir, bool * isDot) const;
     std::wstring GetDirPathForHitItem() const;
     
     void OnThemeChanged(bool bDark) override;
