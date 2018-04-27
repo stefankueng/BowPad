@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -303,11 +303,11 @@ void CFindReplaceDlg::HandleButtonDropDown(const NMBCDROPDOWN* pDropDown)
 // This routine somewhat mimics what the find files logic does.
 // We don't suggest things the user likely does not want as that
 // can easily get in the way of suggestions the user may want.
-// e.g. The user woulder likely prefer bowpad.cpp over bowpad.exe.
+// e.g. The user would likely prefer bowpad.cpp over bowpad.exe.
 // We try to find the shortest filename match in the time given
 // as the longest match will be found later if the user keeps typing.
 // If a longer match was accepted as soon as it was found we'd never
-// offer shorter suggestions and they'd appear to be non-existant.
+// offer shorter suggestions and they'd appear to be non-existent.
 
 std::wstring CFindReplaceDlg::OfferFileSuggestion(
     const std::wstring& searchFolder, bool searchSubFolders,
@@ -568,7 +568,7 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
 
     // Note: This dialog is initiated by CCmdFindReplace::Execute
     // and the code expects ActivateDialog to be called next after this routine
-    // to continue initialization / or peform re-initialization.
+    // to continue initialization / or perform re-initialization.
 }
 
 void CFindReplaceDlg::FocusOn(int id)
@@ -1155,7 +1155,7 @@ void CFindReplaceDlg::DoListItemAction(int itemIndex)
     if (m_resultsType == ResultsType::MatchedTerms)
         DoSearch();
     FocusOn(IDC_FINDRESULTS);
-    // Close the dialog if asked too using the shift key or if there was only
+    // Close the dialog if asked to using the shift key or if there was only
     // one item as it's been actioned.
     if (shiftDown || m_searchResults.size() == 1)
     {
@@ -1627,7 +1627,7 @@ void CFindReplaceDlg::SortResults()
 {
     // Where both are on disk files, sort by filename then folder.
     // Otherwise just order by the name.
-    // Lastly atter each compare, fallthrough to also sort by line number.
+    // Lastly after each compare, fallthrough to also sort by line number.
     std::sort(m_searchResults.begin(), m_searchResults.end(),
         [&](const CSearchResult& lhs, const CSearchResult& rhs)
     {
@@ -1659,7 +1659,7 @@ void CFindReplaceDlg::SortResults()
                     CPathUtils::GetFileName(rdoc.m_path));
             else
             {
-                // Otherise (implied) neither file is associated with a file,
+                // Otherwise (implied) neither file is associated with a file,
                 // i.e. new documents.
                 result = CPathUtils::PathCompare(GetTitleForDocID(lhs.docID),
                     GetTitleForDocID(rhs.docID));
@@ -1690,7 +1690,7 @@ void CFindReplaceDlg::SortResults()
 
 void CFindReplaceDlg::DoSearchAll(int id)
 {
-    // Should have stopped bfore searching again.
+    // Should have stopped before searching again.
     APPVERIFY(m_ThreadsRunning == 0);
     if (m_ThreadsRunning)
         return;
@@ -1818,7 +1818,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
         std::wstring filesString = GetDlgItemText(IDC_SEARCHFILES).get();
         std::vector<std::wstring> filesToFind;
         // If searching for specific files or terms in those files, we need the file list.
-        // ';' is perhaps not as naturual as ',', but Windows Common Dialog Box Controls use ';'
+        // ';' is perhaps not as natural as ',', but Windows Common Dialog Box Controls use ';'
         // as separator so we do too.
         split(filesToFind, filesString, L';');
         // Don't save invalid or empty file sets.
@@ -1900,7 +1900,7 @@ void CFindReplaceDlg::SearchThread(
     int id, const std::wstring& searchpath, const std::string& searchfor,
     int flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind)
 {
-    // NOTE: all paramter validation should be done before getting here.
+    // NOTE: all parameter validation should be done before getting here.
     auto timeOfLastProgressUpdate = std::chrono::steady_clock::now();
     assert(id == IDC_FINDFILES || id == IDC_FINDALLINDIR);
 
@@ -2120,7 +2120,7 @@ void CFindReplaceDlg::SearchDocument(
             {
                 Normalize(result);
                 // The set of regexp expressions we use to find functions 
-                // don't allow us to identiify a specificly named function.
+                // don't allow us to identify a specifically named function.
                 // They just find any function definitions.
                 // To narrow down to a particular function name means doing that ourself.
                 // We allow the user to use guess roughly the name by supporting
@@ -2252,7 +2252,7 @@ void CFindReplaceDlg::InitResultsList()
     DWORD exStyle = LVS_EX_DOUBLEBUFFER | LVS_EX_INFOTIP | LVS_EX_LABELTIP | LVS_EX_FULLROWSELECT;
     ListView_SetExtendedListViewStyle(hListControl, exStyle);
 
-    // NOTE: m_searchType or m_resultsType could be ysed here to adjust the titles if need be.
+    // NOTE: m_searchType or m_resultsType could be set here to adjust the titles if need be.
     ResString sFile(hRes, IDS_FINDRESULT_HEADERFILE);
     ResString sLine(hRes, IDS_FINDRESULT_HEADERLINE);
     ResString sLineText(hRes, IDS_FINDRESULT_HEADERLINETEXT);
@@ -2434,7 +2434,7 @@ void CFindReplaceDlg::EnableControls(bool bEnable)
 void CFindReplaceDlg::DoClose()
 {
     // If the user closes the window soon after an error,
-    // then re-opens, the previous eror will be there which will
+    // then re-opens, the previous error will be there which will
     // will make it look like they just did a new search or something.
     KillTimer(*this, TIMER_INFOSTRING);
     Clear(IDC_SEARCHINFO);
@@ -2688,7 +2688,7 @@ void CFindReplaceDlg::UpdateCombo( int comboId,const std::wstring& item, int max
         return;
     HWND hCombo = GetDlgItem(*this, comboId);
     int count = ComboBox_GetCount(hCombo);
-    // Remove any excess items to ensure we our within the maxmium,
+    // Remove any excess items to ensure we our within the maximum,
     // and never exceed it.
     while (count > maxCount)
     {
@@ -2825,7 +2825,7 @@ void CFindReplaceDlg::NotifyOnDocumentClose(DocID id)
     auto hFindResults = GetDlgItem(*this, IDC_FINDRESULTS);
 
     // Results are created by searching documents currently loaded into tabs
-    // or searching documents on on disk.
+    // or searching documents on disk.
     // The former result types initially obtain their path via their associated document.
     // The later result types initially obtain their path via a path variable.
 
@@ -2865,7 +2865,7 @@ void CFindReplaceDlg::NotifyOnDocumentClose(DocID id)
         // 2. On the first result, fix up a path for it which will be relevant
         //    to all the other related results.
         // 3. For all results of the closing document id, set the id to -1
-        // 4. We know we have found all results relatting to the closing document id,
+        // 4. We know we have found all results relating to the closing document id,
         //    after we've found one and then failed to match another.
         //    All document id's relating to the same document are contiguous.
         bool found = false;
@@ -2958,7 +2958,7 @@ void CFindReplaceDlg::OnListItemChanged(LPNMLISTVIEW pListView)
 void CFindReplaceDlg::OnSearchResultsReady(bool finished)
 {
     // If the user was at the end of the list before the items arrived,
-    // ensure they remain at the end of the list after the new items have been aded.
+    // ensure they remain at the end of the list after the new items have been added.
     HWND hFindResults = GetDlgItem(*this, IDC_FINDRESULTS);
     bool hadSome = (m_searchResults.size() > 0);
 
