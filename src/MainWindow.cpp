@@ -857,21 +857,7 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM /*wParam*/,
         auto path = m_fileTree.GetPathForSelItem(&isDir, &isDot);
         if (!path.empty())
         {
-            if (isDir)
-            {
-                if (isDot)
-                {
-                    m_fileTree.SetPath(path);
-                }
-            }
-            else
-            {
-                bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-                unsigned int openFlags = OpenFlags::AddToMRU;
-                if (control)
-                    openFlags |= OpenFlags::OpenIntoActiveTab;
-                OpenFile(path, openFlags);
-            }
+            HandleTreePath(path, isDir, isDot);
             return TRUE;
         }
     }
@@ -883,21 +869,7 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM /*wParam*/,
         auto path = m_fileTree.GetPathForHitItem(&isDir, &isDot);
         if (!path.empty())
         {
-            if (isDir)
-            {
-                if (isDot)
-                {
-                    m_fileTree.SetPath(path);
-                }
-            }
-            else
-            {
-                bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-                unsigned int openFlags = OpenFlags::AddToMRU;
-                if (control)
-                    openFlags |= OpenFlags::OpenIntoActiveTab;
-                OpenFile(path, openFlags);
-            }
+            HandleTreePath(path, isDir, isDot);
             PostMessage(*this, WM_SETFOCUS, TRUE, 0);
         }
     }
@@ -957,6 +929,26 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM /*wParam*/,
     }
     return 0;
 }
+
+void CMainWindow::HandleTreePath(const std::wstring & path, bool isDir, bool isDot)
+{
+    if (isDir)
+    {
+        if (isDot)
+        {
+            m_fileTree.SetPath(path);
+        }
+    }
+    else
+    {
+        bool control = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+        unsigned int openFlags = OpenFlags::AddToMRU;
+        if (control)
+            openFlags |= OpenFlags::OpenIntoActiveTab;
+        OpenFile(path, openFlags);
+    }
+}
+
 
 void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
 {

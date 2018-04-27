@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -153,6 +153,7 @@ private:
     void                        HandleTabDelete(const TBHDR& tbhdr);
     void                        HandleClipboardUpdate();
     void                        HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi);
+    void                        HandleTreePath(const std::wstring& path, bool isDir, bool isDot);
     // Scintilla events.
     void                        HandleDwellStart(const SCNotification& scn);
     bool                        HandleDoubleClick(const SCNotification& scn);
