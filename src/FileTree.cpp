@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017 - Stefan Kueng
+// Copyright (C) 2014-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -680,12 +680,7 @@ void CFileTree::MarkActiveDocument()
 {
     InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
     InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    // remove the bold status from all items
-    RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [ & ](HTREEITEM hItem)->bool
-    {
-        TreeView_SetItemState(*this, hItem, 0, TVIS_BOLD);
-        return false;
-    });
+    bool bRecurseDone = false;
     if (HasActiveDocument())
     {
         const auto& doc = GetActiveDocument();
@@ -710,21 +705,36 @@ void CFileTree::MarkActiveDocument()
                         {
                             if (CPathUtils::PathCompare(doc.m_path, pTreeItem->path) == 0)
                             {
-                                TreeView_EnsureVisible(*this, hItem);
-                                TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
-                                return true;
+                                if (TreeView_GetItemState(*this, hItem, TVIS_BOLD) == 0)
+                                {
+                                    TreeView_EnsureVisible(*this, hItem);
+                                    TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
+                                }
                             }
+                            else
+                                TreeView_SetItemState(*this, hItem, 0, TVIS_BOLD);
                         }
                         else
                         {
+                            TreeView_SetItemState(*this, hItem, 0, TVIS_BOLD);
                             if (CPathUtils::PathIsChild(pTreeItem->path, doc.m_path))
                                 TreeView_Expand(*this, hItem, TVE_EXPAND);
                         }
                     }
                     return false;
                 });
+                bRecurseDone = true;
             }
         }
+    }
+    if (!bRecurseDone)
+    {
+        // remove the bold status from all items
+        RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
+        {
+            TreeView_SetItemState(*this, hItem, 0, TVIS_BOLD);
+            return false;
+        });
     }
 }
 
