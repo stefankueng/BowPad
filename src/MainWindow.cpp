@@ -1267,7 +1267,6 @@ void CMainWindow::HandleCreate(HWND hwnd)
 void CMainWindow::HandleAfterInit()
 {
     UpdateWindow(*this);
-    CCommandHandler::Instance().AfterInit();
     
     if ((m_pathsToOpen.size() == 1) && (PathIsDirectory(m_pathsToOpen.begin()->first.c_str())))
     {
@@ -1323,6 +1322,8 @@ void CMainWindow::HandleAfterInit()
         if (bNewer)
             PostMessage(m_hwnd, WM_UPDATEAVAILABLE, 0, 0);
     }).detach();
+
+    CCommandHandler::Instance().AfterInit();
 }
 
 void CMainWindow::ResizeChildWindows()
@@ -2900,7 +2901,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             }
             doc.SetLanguage(CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor));
 
-            if ((CPathUtils::PathCompare(filepath, m_tabmovepath) == 0) && m_tabmovemod)
+            if (CPathUtils::PathCompare(filepath, m_tabmovepath) == 0)
             {
                 doc.m_path = m_tabmovesavepath;
                 m_DocManager.UpdateFileTime(doc, true);
@@ -3339,6 +3340,10 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
     tempdoc.m_path = temppath;
     bool bDummy = false;
     m_DocManager.SaveFile(*this, tempdoc, bDummy);
+
+    // have the plugins save any information for this document
+    // before we start the new process!
+    CCommandHandler::Instance().OnDocumentClose(docID);
 
     // Start a new instance and open the tab there.
     std::wstring modpath = CPathUtils::GetModulePath();
