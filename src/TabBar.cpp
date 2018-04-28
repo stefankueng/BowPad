@@ -235,7 +235,7 @@ void CTabBar::DeleteItemAt(int index)
     // item is present if it's not already accounted as gone before then,
     // even though it is gone, but the delete itself is initiating the actions.
     // Failure to decrement the count first will show up as assertion
-    // failures in calls to GetItemRect arond line 320 & 530 in the
+    // failures in calls to GetItemRect around line 320 & 530 in the
     // paint logic.
     auto foundIt = m_animVars.find(GetIDFromIndex(index).GetValue());
     assert(foundIt != m_animVars.end());
