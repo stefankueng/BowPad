@@ -122,7 +122,7 @@
       </buildfiles>
     </nant>
     <property name="verstring" value="${environment::get-variable('MajorVersion')}.${environment::get-variable('MinorVersion')}.${environment::get-variable('MicroVersion')}" />
-    <property name="verstringfull" value="${verstring}.${environment::get-variable('WCREV')}" />
+    <property name="verstringfull" value="${verstring}.${environment::get-variable('WCLOGCOUNT')}" />
     <zip zipfile="bin\BowPad-${verstring}-portable.zip" ziplevel="9">
       <fileset basedir="bin\${configuration}\bin">
         <include name="BowPad.exe" />
@@ -160,7 +160,7 @@ BowPad-${verstring}.msi</echo>
           <token key="MajorVersion" value="${environment::get-variable('MajorVersion')}" />
           <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
           <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
-          <token key="WCREV" value="${environment::get-variable('WCREV')}" />
+          <token key="WCREV" value="${environment::get-variable('WCLOGCOUNT')}" />
           <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
         </replacetokens>
       </filterchain>
@@ -172,7 +172,7 @@ BowPad-${verstring}.msi</echo>
           <token key="MajorVersion" value="${environment::get-variable('MajorVersion')}" />
           <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
           <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
-          <token key="WCREV" value="${environment::get-variable('WCREV')}" />
+          <token key="WCREV" value="${environment::get-variable('WCLOGCOUNT')}" />
           <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
           <token key="checksum" value="${string::trim(checksum)}" />
           <token key="checksum64" value="${string::trim(checksum64)}" />
