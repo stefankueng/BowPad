@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-11 21:11+0200\n"
-"PO-Revision-Date: 2017-07-11 21:14+0200\n"
+"POT-Creation-Date: 1900-01-01 00:00+0000\n"
+"PO-Revision-Date: 2018-04-28 15:09+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.7\n"
+"X-Generator: Poedit 2.0.6\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -137,11 +137,11 @@ msgstr "<"
 
 #. Resource IDs: (133)
 msgid ""
-"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full "
-"details about this update</a>"
+"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full details "
+"about this update</a>"
 msgstr ""
-"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Mehr "
-"Info über diese Update</a>"
+"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Mehr Info über "
+"diese Update</a>"
 
 #. Resource IDs: (60053)
 msgid "A"
@@ -1527,8 +1527,8 @@ msgid "No functions found!"
 msgstr "Keine Funktionen gefunden"
 
 #. Resource IDs: (234)
-msgid "No more occurances to replace."
-msgstr "Nichts mehr zu ersetzen"
+msgid "No more occurrences to replace."
+msgstr "Nichts mehr zu ersetzen."
 
 #. Resource IDs: (248)
 msgid "No plugins found. Check your internet connection."
