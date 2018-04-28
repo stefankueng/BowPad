@@ -1357,7 +1357,7 @@ msgid "No functions found!"
 msgstr ""
 
 #. Resource IDs: (234)
-msgid "No more occurances to replace."
+msgid "No more occurrences to replace."
 msgstr ""
 
 #. Resource IDs: (248)
