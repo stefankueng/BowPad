@@ -1149,11 +1149,31 @@ void CFindReplaceDlg::DoListItemAction(int itemIndex)
         return;
     ScintillaCall(SCI_GOTOLINE, item.line);
     Center((long)item.pos, (long)item.pos);
-    // NOTE: Calling DoSearch isn't ideal here because the current dialog
-    // options don't need to have any relationship to how any
-    // active search results were originally created. i.e. the search term may have changed.
     if (m_resultsType == ResultsType::MatchedTerms)
-        DoSearch();
+    {
+        // Set the color indicators for the doc scroll bar
+        if (g_lastSelText.empty() || g_lastSelText.compare(g_sHighlightString) || (g_searchFlags != g_lastSearchFlags))
+        {
+            DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
+            g_searchMarkerCount = 0;
+        }
+        OnOutOfScope(DocScrollUpdate());
+
+        std::wstring findText = GetDlgItemText(IDC_SEARCHCOMBO).get();
+        UpdateSearchStrings(findText);
+        g_findString = CUnicodeUtils::StdGetUTF8(findText);
+        g_sHighlightString = g_findString;
+        g_lastSelText = g_sHighlightString;
+
+        for (const auto& sRes : m_searchResults)
+        {
+            if (sRes.docID == item.docID)
+            {
+                DocScrollAddLineColor(DOCSCROLLTYPE_SEARCHTEXT, sRes.line, RGB(200, 200, 0));
+                ++g_searchMarkerCount;
+            }
+        }
+    }
     FocusOn(IDC_FINDRESULTS);
     // Close the dialog if asked to using the shift key or if there was only
     // one item as it's been actioned.
@@ -3079,6 +3099,8 @@ void CCmdFindReplace::TabNotify(TBHDR* ptbhdr)
         g_lastSelText.clear();
         if (g_pFindReplaceDlg != nullptr)
         {
+            g_sHighlightString = g_findString;
+            g_lastSelText = g_sHighlightString;
             bool followTab = IsDlgButtonChecked(*g_pFindReplaceDlg, IDC_SEARCHFOLDERFOLLOWTAB) == BST_CHECKED;
             if (followTab)
                 SetSearchFolderToCurrentDocument();
