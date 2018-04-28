@@ -18,3 +18,5 @@ A few notable features of BowPad:
 And before you ask: the name BowPad comes from the fact that it uses the ribbon user interface.
 Ribbon → Bow, Editor → NotePad = BowPad.
 And of course we all know that [Bowties are cool!](http://www.bbc.co.uk/doctorwho/)
+
+Please visit the [homepage](https://tools.stefankueng.com/BowPad.html) of BowPad for more information.
