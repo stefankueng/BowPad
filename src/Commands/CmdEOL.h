@@ -23,7 +23,7 @@ class CCmdEOLBase : public ICommand
 {
 protected:
     // Don't do anything in this base, like call InvalidateUICommand which
-    // might result in a virtual call and the derrived class won't be setup.
+    // might result in a virtual call and the derived class won't be setup.
     CCmdEOLBase(void* obj) : ICommand(obj) {}
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
     void TabNotify(TBHDR* ptbhdr) override;

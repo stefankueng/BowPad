@@ -96,10 +96,10 @@ void CCorrespondingFileDlg::SetStatus(const std::wstring& status)
 CFFileInfo CCorrespondingFileDlg::GetCFInfo()
 {
     // We currently allow the user to avoid creating the files
-    // or even specifiying a folder.
+    // or even specifying a folder.
     // But the header / source switch doesn't work so well when
-    // the user doesn't create the files or specifiy a folder,
-    // so may dissalow this flexibility in later patches. TBD.
+    // the user doesn't create the files or specify a folder,
+    // so may disallow this flexibility in later patches. TBD.
     // But allowing the user to defer creation or folder identification
     // until later offers the user some flexibility to make
     // decisions later in the process about these things.

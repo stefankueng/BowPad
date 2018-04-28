@@ -34,9 +34,9 @@
 // in the debugger may not reflect how things will work when in release mode.
 // This may be because the windows control capture the focus or cursor or
 // something else but be aware of that and test in release mode if you
-// observe strange behaviour before trying to fix it.
+// observe strange behavior before trying to fix it.
 // * Activating the configuration editor causes a "surprising" change from the dark to light theme.
-// * Changing theme while changing styles can leave the user usure about the state of their changes.
+// * Changing theme while changing styles can leave the user unsure about the state of their changes.
 
 #include "stdafx.h"
 #include "CmdStyleConfigurator.h"
@@ -334,7 +334,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                 case IDC_FG_BTN:
                 {
                     auto fgcolor = m_fgColor.GetColor();
-                    // When colours are applied by SetupLexer GetThemeColor is applied,
+                    // When colors are applied by SetupLexer GetThemeColor is applied,
                     // so don't do it again here when storing the color.
                     CLexStyles::Instance().SetUserForeground(lexID, styleKey, fgcolor);
                     if (updateView)

@@ -109,7 +109,7 @@ void CCmdSessionLoad::OnClose()
 void CCmdSessionLoad::RestoreSavedSession()
 {
     // REIVEW: note the user can add text to a document and then exit without saving.
-    // This means the saved state could refer to a selection or cursorlocation that
+    // This means the saved state could refer to a selection or cursor location that
     // does not exist or refers to something else. This can be a bit confusing to the user.
     // However if we don't save the state on quitting without saving, a user may also scroll
     // to a new location then exit without saving but expect to return to where they were.

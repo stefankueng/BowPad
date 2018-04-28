@@ -201,7 +201,7 @@ void AddToMRU(const CodePageItem& cp)
 
     mrucodepages.push_back(cp.codepage);
 
-    // go throuch all codepages and adjust the category
+    // go through all codepages and adjust the category
     for (auto& cpentry : codepages)
     {
         if (cpentry.category == CP_CATEGORY_MRU)

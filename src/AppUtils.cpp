@@ -421,7 +421,7 @@ bool CAppUtils::ShowDropDownList(HWND hWnd, LPCWSTR ctrlName)
     if (!pFound)
         return false;
 
-    // the the invoke pattern of the control so we can invoke it
+    // the invoke pattern of the control so we can invoke it
     IUIAutomationInvokePatternPtr pInvoke;
     hr = pFound->GetCurrentPatternAs(UIA_InvokePatternId, __uuidof(IUIAutomationInvokePattern),
         (void **)&pInvoke);

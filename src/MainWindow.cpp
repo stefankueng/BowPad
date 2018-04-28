@@ -1063,10 +1063,10 @@ void CMainWindow::HandleStatusBarZoom()
 
         // Note the font point size is a factor in what determines the zoom percentage the user actually gets.
         // So the values above are estimates. However, the status bar shows the true/exact setting that resulted.
-        // This might be neccessary as the user can adjust the zoom through ctrl + mouse wheel to get finer/other settings
+        // This might be necessary as the user can adjust the zoom through ctrl + mouse wheel to get finer/other settings
         // than we offer here. We could round and lie to make the status bar and estimates match (meh) or
         // we could show real size in the menu to be consistent (arguably better), but we don't take either approach yet,
-        // and opt to show the user nice instantly relatable percentages that we then don't quite honor precisely in practice.
+        // and opt to show the user nice instantly relateable percentages that we then don't quite honor precisely in practice.
         auto cmd = TrackPopupMenu(hPopup, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, xPos, yPos, 0, *this, nullptr);
         if (cmd != 0)
             SetZoomPC(cmd);
@@ -2079,7 +2079,7 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
     auto rCancel = LoadResourceWString(hRes, IDS_CANCEL);
     // We remove the short cut accelerators from these buttons because this
     // dialog pops up automatically and it's too easy to be typing into the editor
-    // when that happes and accidentally acknowledge a button.
+    // when that happens and accidentally acknowledge a button.
     SearchRemoveAll(rEditFile, L"&");
     SearchRemoveAll(rCancel, L"&");
 
@@ -2534,7 +2534,7 @@ void CMainWindow::HandleSavePoint(const SCNotification& scn)
 void CMainWindow::HandleWriteProtectedEdit()
 {
     // user tried to edit a readonly file: ask whether
-    // to make the file writeable
+    // to make the file writable
     auto docID = m_TabBar.GetCurrentTabId();
     if (m_DocManager.HasDocumentID(docID))
     {
@@ -3129,7 +3129,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
 // This is what happens currently but is arguably wrong.
 //
 // If the receiver refuses to load the document, the sender might not actually
-// have it open themselves and was just instructing the reciever to load it;
+// have it open themselves and was just instructing the receiver to load it;
 // if the receiver refuses, nothing will happen and that would be also wrong.
 //
 // The receiver could load the senders document but the receiver might have
@@ -3139,7 +3139,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
 // Even if the receivers document isn't modified, there is no
 // guarantee that the senders document is newer.
 //
-// The design probably needs to change so that the reciever asks
+// The design probably needs to change so that the receiver asks
 // the user what to do if they try to move a document to another
 // when it's open in two places.
 //
@@ -3153,7 +3153,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
 // Will revisit this later.
 
 // Returns true of the tab was moved in, else false.
-// Callers using SendMessage can check if the reciever
+// Callers using SendMessage can check if the receiver
 // loaded the tab they sent before they close their tab
 // it was sent from.
 

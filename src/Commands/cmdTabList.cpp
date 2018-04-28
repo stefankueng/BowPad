@@ -231,7 +231,7 @@ bool CCmdTabList::HandleSelectedMenuItem(size_t selected)
         return true;
     }
     // In the current implementation, we don't build the tab list each time
-    // the menu is clicked, because we don't know know how to determine
+    // the menu is clicked, because we don't know how to determine
     // when the menu is opened but then canceled without the user making
     // a selection. There is no InvalidateOnCancel type ribbon event that
     // I am aware of.

@@ -86,7 +86,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
             if (bIsDir) // Only interested in files.
                 continue; // Continue on to the next, save indentation.
 
-            // Only interested in files htat match BowPad*_*.lang, to extract the
+            // Only interested in files that match BowPad*_*.lang, to extract the
             // DE part as a locale name. If no "_" is present, the file is either
             // incorrectly named or is an  unrelated file that just happens to
             // have a .lang extension. Either way, if it happens we can't process it.
@@ -94,7 +94,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
                 continue; // Name of no interest.
 
             // Make sure the file matches our naming convention of BowPad*_Local.
-            // If notm, alert attention to any problems if in testing or diagnostic
+            // If not, alert attention to any problems if in testing or diagnostic
             // mode but otherwise we'll just ignore the files.
             std::wstring filename = CPathUtils::GetFileNameWithoutExtension(respath);
             auto pos = filename.find_last_of(L'_');

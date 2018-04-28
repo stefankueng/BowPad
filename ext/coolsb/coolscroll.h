@@ -11,7 +11,7 @@ extern "C"{
 #define COOLSB_API WINAPI
 #endif
 
-// To complement the exisiting SB_HORZ, SB_VERT, SB_BOTH
+// To complement the existing SB_HORZ, SB_VERT, SB_BOTH
 // scrollbar identifiers
 #define COOLSB_NONE (-1)
 #define SB_INSBUT   (-2)

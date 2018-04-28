@@ -238,7 +238,7 @@ private:
         // Binary types.
         L"exe", L"dll", L"obj", L"lib", L"ilk", L"iobj", L"ipdb", L"idb",
         L"pch", L"ipch", L"sdf", L"pdb", L"res", L"sdf", L"db", L"iso",
-        // Commmon temporary VC project types.
+        // Common temporary VC project types.
         L"tlog",
         // svn types.
         L"svn-base",

@@ -325,7 +325,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
 
     bool showCreate = true;
 
-    // If one of the corresponing files exists, don't offer to create
+    // If one of the corresponding files exists, don't offer to create
     // any of the others.
     for (const std::wstring& filename : correspondingFiles)
     {
@@ -727,7 +727,7 @@ bool CCmdHeaderSource::Execute()
         // If you are editing test.cpp, you are unlikely to
         // want test.aspx.cs just because it's the only other file there
         // and you definitely don't want to filter that file out.
-        // You want to see it and and switch to it you are editing test.aspx.
+        // You want to see it and switch to it you are editing test.aspx.
         // For all these reasons, autoload should be switched off by default,
         // If the user wants to load files, they should add a file mapping.
         //
