@@ -142,6 +142,9 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     m_docScroll.InitScintilla(this);
 
+    Call(SCI_SETMODEVENTMASK, SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO |
+        SC_PERFORMED_REDO | SC_MULTISTEPUNDOREDO | SC_LASTSTEPINUNDOREDO |
+        SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE | SC_MULTILINEUNDOREDO);
     bool bUseD2D = CIniSettings::Instance().GetInt64(L"View", L"d2d", 1) != 0;
     Call(SCI_SETTECHNOLOGY, bUseD2D ? SC_TECHNOLOGY_DIRECTWRITERETAIN : SC_TECHNOLOGY_DEFAULT);
 
@@ -963,8 +966,12 @@ void CScintillaWnd::SetupDefaultStyles()
     }
     Call(SCI_SETWHITESPACEFORE, true, theme.IsDarkTheme() ? RGB(20, 72, 82) : RGB(43, 145, 175));
     
+    auto modEventMask = Call(SCI_GETMODEVENTMASK);
+    Call(SCI_SETMODEVENTMASK, 0);
+
     Call(SCI_COLOURISE, 0, -1);
     Call(SCI_SETCODEPAGE, CP_UTF8);
+    Call(SCI_SETMODEVENTMASK, modEventMask);
 }
 
 void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF backsel)
