@@ -15,3 +15,4 @@
 /ext/choco/package
 /src/Setup/VersionNumberInclude.wxi
 /src/ResourceDll.vcxproj.user
+/ext/editorconfig-core/editorconfig.vcxproj.user
