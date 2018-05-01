@@ -226,6 +226,13 @@ void CCmdScript::OnClose()
     catch (const std::exception&) {}
 }
 
+void CCmdScript::BeforeLoad()
+{
+    DISPPARAMS dispparams = { 0 };
+    try { m_host->CallFunction(L"BeforeLoad", dispparams); }
+    catch (const std::exception&) {}
+}
+
 void CCmdScript::AfterInit()
 {
     DISPPARAMS dispparams = { 0 };

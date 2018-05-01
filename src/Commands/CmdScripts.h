@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,6 +40,8 @@ public:
     void TabNotify(TBHDR * ptbhdr) override;
 
     void OnClose() override;
+
+    void BeforeLoad() override;
 
     void AfterInit() override;
 

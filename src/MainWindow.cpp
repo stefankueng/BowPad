@@ -1268,6 +1268,8 @@ void CMainWindow::HandleAfterInit()
 {
     UpdateWindow(*this);
     
+    CCommandHandler::Instance().BeforeLoad();
+
     if ((m_pathsToOpen.size() == 1) && (PathIsDirectory(m_pathsToOpen.begin()->first.c_str())))
     {
         if (!m_fileTree.GetPath().empty()) // File tree not empty: create a new empty tab first.

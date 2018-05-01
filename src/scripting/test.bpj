@@ -30,6 +30,8 @@ function TabNotify(code, tabOrigin)
 
 // called just before BowPad exits
 function OnClose() { return; }
+// called after BowPad has fully initialized, but before any files are opened (e.g. via command line)
+function BeforeLoad() { return; }
 // called after BowPad has fully initialized
 function AfterInit() { return; }
 // called just before a document is closed

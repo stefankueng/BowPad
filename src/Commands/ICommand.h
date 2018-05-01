@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ public:
     // note: the 'tabOrigin' member of the TBHDR is only valid for TCN_GETCOLOR, TCN_TABDROPPED, TCN_TABDROPPEDOUTSIDE, TCN_ORDERCHANGED
     virtual void        TabNotify(TBHDR * ptbhdr);
     virtual void        OnClose();
+    virtual void        BeforeLoad();
     virtual void        AfterInit();
     virtual void        OnLangChanged();
     virtual void        OnThemeChanged(bool bDark);

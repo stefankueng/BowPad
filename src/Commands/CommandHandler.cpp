@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -306,6 +306,18 @@ void CCommandHandler::OnDocumentSave(DocID id, bool bSaveAs)
     for (auto& cmd : m_nodeletecommands)
     {
         cmd.second->OnDocumentSave(id, bSaveAs);
+    }
+}
+
+void CCommandHandler::BeforeLoad()
+{
+    for (auto& cmd : m_commands)
+    {
+        cmd.second->BeforeLoad();
+    }
+    for (auto& cmd : m_nodeletecommands)
+    {
+        cmd.second->BeforeLoad();
     }
 }
 
