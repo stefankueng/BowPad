@@ -31,7 +31,7 @@
 
 namespace
 {
-// Global but not externally accessable.
+// Global but not externally accessible.
 std::vector<std::wstring> gLanguages;
 std::vector<std::wstring> gRemotes;
 
