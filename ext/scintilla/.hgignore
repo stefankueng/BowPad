@@ -1,6 +1,7 @@
 syntax: glob
 *.o
 *.a
+*.asm
 *.lib
 *.obj
 *.iobj
@@ -9,6 +10,7 @@ syntax: glob
 *.dylib
 *.framework
 *.pyd
+*.exe
 *.exp
 *.lib
 *.pdb

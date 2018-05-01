@@ -79,7 +79,7 @@ public:
     {
     }
 
-    virtual long FindText(Document* doc, int startPosition, int endPosition, const char *regex,
+    virtual Sci::Position FindText(Document* doc, Sci::Position startPosition, Sci::Position endPosition, const char *regex,
                           bool caseSensitive, bool word, bool wordStart, int sciSearchFlags, int *lengthRet) override;
 
     virtual const char *SubstituteByPosition(Document* doc, const char *text, int *length) override;
@@ -222,7 +222,7 @@ RegexSearchBase *CreateRegexSearch(CharClassify* /* charClassTable */)
  * searches (just pass startPosition > endPosition to do a backward search).
  */
 
-long StdRegexSearch::FindText(Document* doc, int startPosition, int endPosition, const char *regexString,
+Sci::Position StdRegexSearch::FindText(Document* doc, Sci::Position startPosition, Sci::Position endPosition, const char *regexString,
                         bool caseSensitive, bool /*word*/, bool /*wordStart*/, int /*sciSearchFlags*/, int *lengthRet)
 {
     try

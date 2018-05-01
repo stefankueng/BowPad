@@ -125,11 +125,11 @@
     Scintilla</a>.<br />
      <a class="jump" href="ScintillaUsage.html">Some notes on using Scintilla</a>.<br />
      <a class="jump" href="Steps.html">How to use the Scintilla Edit Control on Windows</a>.<br />
-     <a class="jump" href="http://www.scintilla.org/dmapp.zip">A simple sample using Scintilla from
+     <a class="jump" href="https://www.scintilla.org/dmapp.zip">A simple sample using Scintilla from
     C++ on Windows</a>.<br />
-     <a class="jump" href="http://www.scintilla.org/SciTry.vb">A simple sample using Scintilla from
+     <a class="jump" href="https://www.scintilla.org/SciTry.vb">A simple sample using Scintilla from
     Visual Basic</a>.<br />
-     <a class="jump" href="http://www.scintilla.org/bait.zip">Bait is a tiny sample using Scintilla
+     <a class="jump" href="https://www.scintilla.org/bait.zip">Bait is a tiny sample using Scintilla
      on GTK+</a>.<br />
      <a class="jump" href="Lexer.txt">A detailed description of how to write a lexer, including a
     discussion of folding</a>.<br />
@@ -7227,8 +7227,10 @@ href="#SCI_POSITIONFROMLINE">SCI_POSITIONFROMLINE</a>(lineNumber);
     held down in a similar manner to <a class="message" href="#SCN_KEY">SCN_KEY</a>.</p>
 
     <p><b id="SCN_UPDATEUI">SCN_UPDATEUI</b><br />
-     Either the text or styling of the document has changed or the selection range or scroll position has changed.
+     Either the text or styling of the document has changed or the selection range or scroll position may have changed.
      Now would be a good time to update any container UI elements that depend on document or view state.
+     As it is sometimes difficult to determine whether a change has occurred, these events may also fire when there
+     has been no actual change.
      The <code>updated</code> field is set to the bit set of things changed since the previous notification.</p>
     <table class="standard" summary="Modify notification type flags">
       <tbody>
@@ -7248,7 +7250,7 @@ href="#SCI_POSITIONFROMLINE">SCI_POSITIONFROMLINE</a>(lineNumber);
 
           <td align="center">0x01</td>
 
-          <td>Contents, styling or markers have been changed.</td>
+          <td>Contents, styling or markers may have been changed.</td>
 
         </tr>
 
@@ -7257,7 +7259,7 @@ href="#SCI_POSITIONFROMLINE">SCI_POSITIONFROMLINE</a>(lineNumber);
 
           <td align="center">0x02</td>
 
-          <td>Selection has been changed.</td>
+          <td>Selection may have been changed.</td>
 
         </tr>
 
@@ -7266,7 +7268,7 @@ href="#SCI_POSITIONFROMLINE">SCI_POSITIONFROMLINE</a>(lineNumber);
 
           <td align="center">0x04</td>
 
-          <td>Scrolled vertically.</td>
+          <td>May have scrolled vertically.</td>
 
         </tr>
 
@@ -7275,7 +7277,7 @@ href="#SCI_POSITIONFROMLINE">SCI_POSITIONFROMLINE</a>(lineNumber);
 
           <td align="center">0x08</td>
 
-          <td>Scrolled horizontally.</td>
+          <td>May have scrolled horizontally.</td>
 
         </tr>
       </tbody>
@@ -8285,8 +8287,8 @@ EM_SETTARGETDEVICE
 
     <p>To build Scintilla or SciTE, see the README file present in both the Scintilla and SciTE
     directories.
-    The compiler must support C++14.
-    For Windows, GCC 7.1 or Microsoft Visual C++ 2017 can be used
+    The compiler must support C++17.
+    For Windows, GCC 7.1 or Microsoft Visual C++ 2017.5 can be used
     for building. For GTK+, GCC 7.1 or newer should be used. GTK+ 2.24 and 3.x are
     supported with glib 2.22+. The version of GTK+ installed should be detected automatically.
     When both GTK+ 2 and GTK+ 3 are present, building for GTK+ 3.x requires defining GTK3
@@ -8295,12 +8297,12 @@ EM_SETTARGETDEVICE
     <h3>Static linking</h3>
 
     <p>On Windows, Scintilla is normally used as a dynamic library as a .DLL file. If you want to
-    link Scintilla directly into your application .EXE or .DLL file, then the
-    <code>STATIC_BUILD</code> preprocessor symbol should be defined and
-    <code>Scintilla_RegisterClasses</code> called. <code>STATIC_BUILD</code> prevents compiling the
-    <code>DllMain</code> function which will conflict with any <code>DllMain</code> defined in your
-    code. <code>Scintilla_RegisterClasses</code> takes the <code>HINSTANCE</code> of your
+    link Scintilla directly into your application .EXE or .DLL file, then you can link to the static library
+    bin/libscintilla.lib (or .a if using GCC) and call <code>Scintilla_RegisterClasses</code>.
+    <code>Scintilla_RegisterClasses</code> takes the <code>HINSTANCE</code> of your
     application and ensures that the "Scintilla" window class is registered.</p>
+    <p>When producing a stand-alone Scintilla DLL, the ScintillaDLL.cxx file should be compiled and
+    linked in to provide <code>DllMain</code> and <code>Scintilla_RegisterClasses</code>.</p>
 
     <h3>Ensuring lexers are linked into Scintilla</h3>
 
