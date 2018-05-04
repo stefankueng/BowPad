@@ -1026,7 +1026,10 @@ void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
     Call(SCI_SETCURRENTPOS, testPos);
     auto currentlineNumberDoc = Call(SCI_LINEFROMPOSITION, testPos);
     auto currentlineNumberVis = Call(SCI_VISIBLEFROMDOCLINE, currentlineNumberDoc);
-    Call(SCI_ENSUREVISIBLE, currentlineNumberDoc);    // make sure target line is unfolded
+    // SCI_ENSUREVISIBLE resets the line-wrapping cache, so only
+    // call that if it's really necessary.
+    if (Call(SCI_GETLINEVISIBLE, currentlineNumberDoc) == 0)
+        Call(SCI_ENSUREVISIBLE, currentlineNumberDoc);    // make sure target line is unfolded
 
     auto firstVisibleLineVis =   Call(SCI_GETFIRSTVISIBLELINE);
     auto linesVisible        =   Call(SCI_LINESONSCREEN) - 1; //-1 for the scrollbar
