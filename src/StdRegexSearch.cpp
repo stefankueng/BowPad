@@ -79,10 +79,10 @@ public:
     {
     }
 
-    virtual Sci::Position FindText(Document* doc, Sci::Position startPosition, Sci::Position endPosition, const char *regex,
-                          bool caseSensitive, bool word, bool wordStart, int sciSearchFlags, int *lengthRet) override;
+    virtual Sci::Position FindText(Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
+        bool caseSensitive, bool word, bool wordStart, int flags, Sci::Position *length) override;
 
-    virtual const char *SubstituteByPosition(Document* doc, const char *text, int *length) override;
+    virtual const char *SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) override;
 
 private:
     class SearchParameters;
@@ -102,7 +102,7 @@ private:
         {
             setDocument(nullptr);
         }
-        Match(Document* document, int position = -1, int endPosition = -1)
+        Match(Document* document, Sci::Position position = -1, Sci::Position endPosition = -1)
             : _document(nullptr)
         {
             set(document, position, endPosition);
@@ -118,7 +118,7 @@ private:
             return *this;
         }
 
-        void set(Document* document = nullptr, int position = -1, int endPosition = -1)
+        void set(Document* document = nullptr, Sci::Position position = -1, Sci::Position endPosition = -1)
         {
             setDocument(document);
             _position = position;
@@ -129,15 +129,15 @@ private:
         {
             return _position == _endPosition;
         }
-        int position()
+        Sci::Position position()
         {
             return _position;
         }
-        int endPosition()
+        Sci::Position endPosition()
         {
             return _endPosition;
         }
-        int length()
+        Sci::Position length()
         {
             return _endPosition - _position;
         }
@@ -156,8 +156,8 @@ private:
         }
 
         Document* _document;
-        int _position, _endPosition;
-        int _endPositionForContinuationCheck;
+        Sci::Position _position, _endPosition;
+        Sci::Position _endPositionForContinuationCheck;
     };
 
     template <class CharT, class CharacterIterator>
@@ -169,7 +169,7 @@ private:
         }
         void compileRegex(const char *regex, const int compileFlags);
         Match FindText(SearchParameters& search);
-        std::string SubstituteByPosition(const char *text, int *length);
+        std::string SubstituteByPosition(const char *text, Sci::Position *length);
     private:
         Match FindTextForward(SearchParameters& search);
         Match FindTextBackward(SearchParameters& search);
@@ -189,15 +189,15 @@ private:
     class SearchParameters
     {
     public:
-        int nextCharacter(int position);
-        bool isLineStart(int position);
-        bool isLineEnd(int position);
+        Sci::Position nextCharacter(Sci::Position position);
+        bool isLineStart(Sci::Position position);
+        bool isLineEnd(Sci::Position position);
 
         Document* _document;
         const char *_regexString;
         int _compileFlags;
-        int _startPosition;
-        int _endPosition;
+        Sci::Position _startPosition;
+        Sci::Position _endPosition;
         std::regex_constants::match_flag_type regexFlags;
         int _direction;
     };
@@ -223,7 +223,7 @@ RegexSearchBase *CreateRegexSearch(CharClassify* /* charClassTable */)
  */
 
 Sci::Position StdRegexSearch::FindText(Document* doc, Sci::Position startPosition, Sci::Position endPosition, const char *regexString,
-                        bool caseSensitive, bool /*word*/, bool /*wordStart*/, int /*sciSearchFlags*/, int *lengthRet)
+                        bool caseSensitive, bool /*word*/, bool /*wordStart*/, int /*sciSearchFlags*/, Sci::Position *lengthRet)
 {
     try
     {
@@ -291,7 +291,7 @@ template <class CharT, class CharacterIterator>
 StdRegexSearch::Match StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::FindTextForward(SearchParameters& search)
 {
     CharacterIterator endIterator(search._document, search._endPosition);
-    int next_search_from_position = search._startPosition;
+    auto next_search_from_position = search._startPosition;
     bool found;
 
     const bool end_reached = next_search_from_position > search._endPosition;
@@ -311,15 +311,15 @@ StdRegexSearch::Match StdRegexSearch::EncodingDependent<CharT, CharacterIterator
     search._direction = 1;
 
     MatchResults bestMatch;
-    int bestPosition = -1;
-    int bestEnd = -1;
+    Sci::Position bestPosition = -1;
+    Sci::Position bestEnd = -1;
     for (;;)
     {
         Match matchRange = FindText(search);
         if (!matchRange.found())
             break;
-        int position = matchRange.position();
-        int endPosition = matchRange.endPosition();
+        auto position = matchRange.position();
+        auto endPosition = matchRange.endPosition();
         if (endPosition > bestEnd && (endPosition < search._endPosition || position != endPosition)) // We are searching for the longest match which has the farthest end (but may not accept empty match at end position).
         {
             bestMatch = _match;
@@ -346,7 +346,7 @@ void StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::compileRegex(c
     }
 }
 
-int StdRegexSearch::SearchParameters::nextCharacter(int position)
+Sci::Position StdRegexSearch::SearchParameters::nextCharacter(Sci::Position position)
 {
     if (_document->CharAt(position) == '\r' && _document->CharAt(position+1) == '\n')
         return position + 2;
@@ -354,31 +354,31 @@ int StdRegexSearch::SearchParameters::nextCharacter(int position)
         return position + 1;
 }
 
-bool StdRegexSearch::SearchParameters::isLineStart(int position)
+bool StdRegexSearch::SearchParameters::isLineStart(Sci::Position position)
 {
     return (position == 0)
         || _document->CharAt(position-1) == '\n'
         || _document->CharAt(position-1) == '\r' && _document->CharAt(position) != '\n';
 }
 
-bool StdRegexSearch::SearchParameters::isLineEnd(int position)
+bool StdRegexSearch::SearchParameters::isLineEnd(Sci::Position position)
 {
     return (position == _document->Length())
         || _document->CharAt(position) == '\r'
         || _document->CharAt(position) == '\n' && (position == 0 || _document->CharAt(position-1) != '\n');
 }
 
-const char *StdRegexSearch::SubstituteByPosition(Document* /*doc*/, const char *text, int *length)
+const char *StdRegexSearch::SubstituteByPosition(Document *doc, const char *text, Sci::Position *length)
 {
     _substituted = _utf8.SubstituteByPosition(text, length);
     return _substituted.c_str();
 }
 
 template <class CharT, class CharacterIterator>
-std::string StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::SubstituteByPosition(const char *text, int *length)
+std::string StdRegexSearch::EncodingDependent<CharT, CharacterIterator>::SubstituteByPosition(const char *text, Sci::Position *length)
 {
     auto s = StdGetUTF8(_match.format(StdGetUnicode(text), std::regex_constants::format_default));
-    *length = (int)s.size();
+    *length = (Sci::Position)s.size();
     return s;
 }
 

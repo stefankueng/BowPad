@@ -147,11 +147,11 @@ public:
             position != other.position ||
             characterIndex != other.characterIndex;
     }
-    int Pos() const
+    Sci::Position Pos() const
     {
         return position;
     }
-    int PosRoundUp() const
+    Sci::Position PosRoundUp() const
     {
         if (characterIndex)
             return position + lenBytes;	// Force to end of character
