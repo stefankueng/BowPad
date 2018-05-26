@@ -1,3 +1,4 @@
 [submodule "ext/sktoolslib"]
 	path = ext/sktoolslib
 	url = https://github.com/stefankueng/sktoolslib.git
+	branch = master
