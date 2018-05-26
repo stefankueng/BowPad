@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017 - Stefan Kueng
+// Copyright (C) 2014-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -67,23 +67,26 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
                 // parse the file and fill in the m_plugins set
                 auto plugins = std::make_unique<std::map<std::wstring, PluginInfo>>();
                 Sleep(5000);
-                std::wifstream fin(tempfile);
-                fin.imbue(std::locale(fin.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
+                std::ifstream fin(tempfile);
                 if (fin.is_open())
                 {
-                    std::wstring line;
-                    while (std::getline(fin, line))
+                    std::string lineA;
+                    while (std::getline(fin, lineA))
                     {
+                        auto line = CUnicodeUtils::StdGetUnicode(lineA);
                         PluginInfo info;
                         info.name = line;
-                        if (std::getline(fin, line))
+                        if (std::getline(fin, lineA))
                         {
+                            line = CUnicodeUtils::StdGetUnicode(lineA);
                             info.version = _wtoi(line.c_str());
-                            if (std::getline(fin, line))
+                            if (std::getline(fin, lineA))
                             {
+                                line = CUnicodeUtils::StdGetUnicode(lineA);
                                 info.minversion = _wtoi(line.c_str());
-                                if (std::getline(fin, line))
+                                if (std::getline(fin, lineA))
                                 {
+                                    line = CUnicodeUtils::StdGetUnicode(lineA);
                                     info.description = line;
                                     SearchReplace(info.description, L"\\n", L"\r\n");
 
