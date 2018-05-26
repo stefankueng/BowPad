@@ -3377,6 +3377,9 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
         return false;
     bool bReloadCurrentTab = (tab == m_TabBar.GetCurrentTabIndex());
     auto& doc = m_DocManager.GetModDocumentFromID(docID);
+    // if encoding is set to default, use the current encoding
+    if (encoding == -1)
+        encoding = doc.m_encoding;
 
     CScintillaWnd* editor = bReloadCurrentTab ? &m_editor : &m_scratchEditor;
     if (dueToOutsideChanges)
