@@ -2184,6 +2184,17 @@ void CScintillaWnd::SetTabSettings(TabSpace ts)
     Call(SCI_SETTABDRAWMODE, 1);
 }
 
+void CScintillaWnd::SetReadDirection(ReadDirection rd)
+{
+    //auto ex = GetWindowLongPtr(*this, GWL_EXSTYLE);
+    //if (rd != R2L)
+    //    ex &= WS_EX_LAYOUTRTL/*WS_EX_RTLREADING*/;
+    //else
+    //    ex |= WS_EX_LAYOUTRTL/*WS_EX_RTLREADING*/;
+    //SetWindowLongPtr(*this, GWL_EXSTYLE, ex);
+    Call(SCI_SETBIDIRECTIONAL, rd);
+}
+
 void CScintillaWnd::BookmarkAdd( long lineno )
 {
     if (lineno == -1)

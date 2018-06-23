@@ -71,11 +71,12 @@ namespace
     const int STATUSBAR_EDITORCONFIG    = 3;
     const int STATUSBAR_EOL_FORMAT      = 4;
     const int STATUSBAR_TABSPACE        = 5;
-    const int STATUSBAR_UNICODE_TYPE    = 6;
-    const int STATUSBAR_TYPING_MODE     = 7;
-    const int STATUSBAR_CAPS            = 8;
-    const int STATUSBAR_TABS            = 9;
-    const int STATUSBAR_ZOOM            = 10;
+    const int STATUSBAR_R2L             = 6;
+    const int STATUSBAR_UNICODE_TYPE    = 7;
+    const int STATUSBAR_TYPING_MODE     = 8;
+    const int STATUSBAR_CAPS            = 9;
+    const int STATUSBAR_TABS            = 10;
+    const int STATUSBAR_ZOOM            = 11;
 
     static constexpr char URL_REG_EXPR[] = { "\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b" };
     static constexpr size_t URL_REG_EXPR_LENGTH = _countof(URL_REG_EXPR) - 1;
@@ -492,7 +493,7 @@ bool CMainWindow::RegisterAndCreateWindow()
         // RestoreWindowPos uses the API SetWindowPlacement() which ensures the window is automatically
         // shown on a monitor and not outside (e.g. if the window position was saved on an external
         // monitor but that monitor is not connected now).
-        if (CreateEx(WS_EX_ACCEPTFILES, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, nullptr))
+        if (CreateEx(WS_EX_ACCEPTFILES | WS_EX_NOINHERITLAYOUT, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, nullptr))
         {
             SetFileTreeWidth((int)CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200));
             // hide the tab and status bar so they won't show right away when
@@ -974,6 +975,14 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
             {
                 case STATUSBAR_TABSPACE:
                 DoCommand(cmdUseTabs);
+                break;
+                case STATUSBAR_R2L:
+                {
+                    auto bidi = m_editor.Call(SCI_GETBIDIRECTIONAL);
+                    m_editor.SetReadDirection(bidi == SC_BIDIRECTIONAL_R2L ? L2R : R2L);
+                    auto& doc = m_DocManager.GetModDocumentFromID(m_TabBar.GetCurrentTabId());
+                    doc.m_ReadDir = (ReadDirection)m_editor.Call(SCI_GETBIDIRECTIONAL);
+                }
                 break;
                 case STATUSBAR_TYPING_MODE:
                 m_editor.Call(SCI_EDITTOGGLEOVERTYPE);
@@ -1578,6 +1587,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     static ResString rsStatusSelectionLong(hRes, IDS_STATUSSELECTIONLONG);      // Selection: %Iu chars | %Iu lines | %ld matches.
     static ResString rsStatusSelectionNone(hRes, IDS_STATUSSELECTIONNONE);      // no selection
     static ResString rsStatusTTTabSpaces(hRes, IDS_STATUSTTTABSPACES);          // Insert Tabs or Spaces
+    static ResString rsStatusTTR2L(hRes, IDS_STATUSTTR2L);                      // Reading order (left-to-right or right-to-left)
     static ResString rsStatusTTEncoding(hRes, IDS_STATUSTTENCODING);            // Encoding: %s
     static ResString rsStatusZoom(hRes, IDS_STATUSZOOM);                        // Zoom: %d%%
     static ResString rsStatusCurposLong(hRes, IDS_STATUS_CURPOSLONG);           // Line: %ld / %ld   Column: %ld
@@ -1595,6 +1605,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     long line = (long)m_editor.Call(SCI_LINEFROMPOSITION, curPos) + 1;
     long column = (long)m_editor.Call(SCI_GETCOLUMN, curPos) + 1;
     auto lengthInBytes = m_editor.Call(SCI_GETLENGTH);
+    auto bidi = m_editor.Call(SCI_GETBIDIRECTIONAL);
 
     auto numberColor = 0x600000;
 
@@ -1649,6 +1660,14 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         0,
                         1,      // center
                         true);
+    m_StatusBar.SetPart(STATUSBAR_R2L,
+        bidi == SC_BIDIRECTIONAL_R2L ? L"R2L" : L"L2R",
+        L"",
+        rsStatusTTR2L,
+        0,
+        0,
+        1,      // center
+        true);
 
     int zoomfactor = GetZoomPC();
     auto sZoom = CStringUtils::Format(rsStatusZoom, numberColor, zoomfactor);
@@ -2741,6 +2760,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.SetupLexerForLang(doc.GetLanguage());
     m_editor.RestoreCurrentPos(doc.m_position);
     m_editor.SetTabSettings(doc.m_TabSpace);
+    m_editor.SetReadDirection(doc.m_ReadDir);
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, true);
     g_pFramework->InvalidateUICommand(cmdUseTabs, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     m_editor.MarkSelectedWord(true);

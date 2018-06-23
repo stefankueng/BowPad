@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,6 +26,11 @@ enum EOLFormat
 enum TabSpace
 {
     Default, Tabs, Spaces
+};
+
+enum ReadDirection
+{
+    Disabled, L2R, R2L
 };
 
 std::wstring GetEOLFormatDescription(EOLFormat ft);
@@ -74,6 +79,7 @@ public:
         , m_bIsWriteProtected(false)
         , m_bDoSaveAs(false)
         , m_TabSpace(Default)
+        , m_ReadDir(Disabled)
     {
         m_lastWriteTime.dwHighDateTime = 0;
         m_lastWriteTime.dwLowDateTime = 0;
@@ -103,6 +109,7 @@ public:
     FILETIME                m_lastWriteTime;
     CPosData                m_position;
     TabSpace                m_TabSpace;
+    ReadDirection           m_ReadDir;
 private:
     std::string             m_language;
 };

@@ -101,6 +101,7 @@ void CCmdSessionLoad::OnClose()
         }
         settings.SetString(g_sessionSection, CStringUtils::Format(L"path%d", saveindex).c_str(), doc.m_path.c_str());
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", saveindex).c_str(), doc.m_TabSpace);
+        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"readdir%d", saveindex).c_str(), doc.m_ReadDir);
 
         ++saveindex;
     }
@@ -178,6 +179,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         pos.m_xOffset            = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", fileNum).c_str(), 0);
         pos.m_nFirstVisibleLine  = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
         doc.m_TabSpace           = (TabSpace)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
+        doc.m_ReadDir            = (ReadDirection)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0);
         if ((int)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", fileNum).c_str(), 0))
             activeDoc = docId;
         RestoreCurrentPos(doc.m_position);

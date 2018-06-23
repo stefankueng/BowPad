@@ -104,6 +104,7 @@ public :
     void GotoLine(long line);
     void Center(sptr_t posStart, sptr_t posEnd);
     void SetTabSettings(TabSpace ts);
+    void SetReadDirection(ReadDirection rd);
     void SetEOLType(int eolType);
     void AppendText(int len, const char* buf);
     std::string GetLine(long line) const;
