@@ -227,6 +227,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     Call(SCI_SETPASTECONVERTENDINGS, 1);
 
+    Call(SCI_SETSELALPHA, 128);
+
     SetupDefaultStyles();
 
     if (!g_initialized)
