@@ -943,7 +943,7 @@ void CScintillaWnd::SetupDefaultStyles()
 
     Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0)));
     Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255)));
-    Call(SCI_SETSELFORE, TRUE, theme.GetThemeColor(RGB(255, 255, 255)));
+    Call(SCI_SETSELFORE, TRUE, theme.GetThemeColor(RGB(0, 0, 0)));
     Call(SCI_SETSELBACK, TRUE, theme.GetThemeColor(RGB(51, 153, 255)));
     Call(SCI_SETCARETFORE, theme.GetThemeColor(RGB(0, 0, 0)));
     Call(SCI_SETADDITIONALCARETFORE, theme.GetThemeColor(RGB(0, 0, 80)));
