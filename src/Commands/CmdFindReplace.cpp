@@ -1261,6 +1261,8 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
             AddToolTip(cinfo.hwndItem, tipText);
             AddToolTip(cinfo.hwndList, tipText);
             AddToolTip(IDC_REPLACEWITHLABEL, tipText);
+            if (IsDlgButtonChecked(*this, IDC_MATCHREGEX) == BST_CHECKED)
+                CheckRegex();
         }
         break;
     case IDC_SEARCHCOMBO:
@@ -1527,6 +1529,7 @@ void CFindReplaceDlg::DoReplace( int id )
         do
         {
             findRet = ScintillaCall(SCI_SEARCHINTARGET, g_findString.length(), (sptr_t)g_findString.c_str());
+            // note: our regex search implementation returns -2 if the regex is invalid
             if (findRet == -1 && id == IDC_REPLACEBTN)
             {
                 SetInfoText(IDS_FINDRETRYWRAP);
@@ -1554,7 +1557,7 @@ void CFindReplaceDlg::DoReplace( int id )
                 else
                     ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
             }
-        } while (id == IDC_REPLACEALLBTN && findRet != -1);
+        } while (id == IDC_REPLACEALLBTN && findRet >= 0);
         ScintillaCall(SCI_ENDUNDOACTION);
     }
     if (id == IDC_REPLACEALLBTN || id == IDC_REPLACEALLINTABSBTN)
@@ -2252,7 +2255,7 @@ int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindstr
             m_searchWnd.Call(SCI_SETTARGETEND, m_searchWnd.Call(SCI_GETLENGTH));
             doc.m_bIsDirty = true;
         }
-    } while (findRet != -1);
+    } while (findRet >= 0);
     return replaceCount;
 }
 
