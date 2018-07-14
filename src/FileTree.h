@@ -42,7 +42,7 @@ public:
 
     std::wstring                refreshpath;
     HTREEITEM                   refreshRoot = nullptr;
-    std::vector<FileTreeItem*>  data;
+    std::vector<FileTreeItem>   data;
 };
 
 class CFileTree : public CWindow, public ICommand
@@ -53,7 +53,7 @@ public:
 
     bool Init(HINSTANCE hInst, HWND hParent);
     void Clear();
-    void SetPath(const std::wstring& path) { m_path = path; Refresh(TVI_ROOT); }
+    void SetPath(const std::wstring& path);
     std::wstring GetPath()const { return m_path; }
     HTREEITEM GetHitItem() const;
     void Refresh(HTREEITEM refreshRoot, bool force = false);
@@ -85,7 +85,8 @@ private:
     std::wstring        m_path;
     int                 m_nBlockRefresh;
     volatile LONG       m_ThreadsRunning;
-    bool                m_bStop;
+    volatile LONG       m_bStop;
     bool                m_bRootBusy;
     HTREEITEM           m_ActiveItem;
+    std::map<HTREEITEM, FileTreeData*> m_data;
 };

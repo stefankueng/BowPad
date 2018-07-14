@@ -76,26 +76,6 @@ static FileTreeItem* GetFileTreeItem(HWND hWnd, HTREEITEM hItem)
     return nullptr;
 }
 
-static int CALLBACK TreeCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lParamSort*/)
-{
-    FileTreeItem * pTreeItem1 = reinterpret_cast<FileTreeItem*>(lParam1);
-    FileTreeItem * pTreeItem2 = reinterpret_cast<FileTreeItem*>(lParam2);
-
-    if (pTreeItem1->isDot)
-        return -1;
-    if (pTreeItem2->isDot)
-        return 1;
-
-    if (pTreeItem1->isDir != pTreeItem2->isDir)
-        return pTreeItem1->isDir ? -1 : 1;
-
-    auto res = CompareStringEx(nullptr, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS | SORT_STRINGSORT,
-                               pTreeItem1->path.c_str(), (int)pTreeItem1->path.length(),
-                               pTreeItem2->path.c_str(), (int)pTreeItem2->path.length(),
-                               nullptr, nullptr, 0);
-    return res - 2;
-}
-
 CFileTree::CFileTree(HINSTANCE hInst, void * obj)
     : CWindow(hInst)
     , ICommand(obj)
@@ -114,14 +94,34 @@ CFileTree::~CFileTree()
 
 void CFileTree::Clear()
 {
-    RecurseTree(TVI_ROOT, [&](HTREEITEM hItem)->bool
-    {
-        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem); // Will delete but not change.
-        delete pTreeItem;
-        return false;
-    });
-    TreeView_DeleteAllItems(*this);
     m_ActiveItem = 0;
+    for (auto& item : m_data)
+    {
+        delete item.second;
+    }
+    TreeView_DeleteAllItems(*this);
+}
+
+void CFileTree::SetPath(const std::wstring & path)
+{
+    if (m_bRootBusy && (m_path != path))
+    {
+        InterlockedExchange(&m_bStop, TRUE);
+        int timeout = 100;
+        while (m_bRootBusy && timeout)
+        {
+            Sleep(20);
+            --timeout;
+        }
+        InterlockedExchange(&m_bStop, FALSE);
+        m_path = path;
+        Refresh(TVI_ROOT);
+    }
+    else
+    {
+        m_path = path;
+        Refresh(TVI_ROOT);
+    }
 }
 
 bool CFileTree::Init(HINSTANCE /*hInst*/, HWND hParent)
@@ -264,14 +264,12 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
         break;
         case WM_THREADRESULTREADY:
         {
-            const FileTreeData* pData = (const FileTreeData*)lParam; // Will delete but not change.
+            FileTreeData* pData = (FileTreeData*)lParam; // Will delete but not change.
             assert(pData != nullptr); // not possible.
 
             if (m_bStop)
             {
                 m_bRootBusy = false;
-                for (const auto& item : pData->data)
-                    delete item;
                 delete pData;
                 break; // switch
             }
@@ -303,26 +301,26 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                     }
                 }
                 bool activepathmarked = false;
-                for (const auto* item : pData->data)
+                for (const auto& item : pData->data)
                 {
                     TVITEMEX tvi = { 0 };
                     TVINSERTSTRUCT tvins = { 0 };
 
                     tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
 
-                    const auto filename = CPathUtils::GetFileName(item->path);
+                    const auto filename = CPathUtils::GetFileName(item.path);
                     tvi.pszText = const_cast<LPWSTR>(filename.c_str());
                     tvi.cchTextMax = static_cast<int>(filename.length());
                     tvi.cChildren = 0;
 
-                    if (item->isDir)
+                    if (item.isDir)
                     {
                         tvi.mask |= TVIF_EXPANDEDIMAGE;
                         tvi.iImage = dirIconIndex;
                         tvi.iSelectedImage = dirIconIndex;
                         tvi.iExpandedImage = dirOpenIconIndex;
                         tvi.cChildren = 1;
-                        if (item->isDot)
+                        if (item.isDot)
                         {
                             tvi.iImage = 0;
                             tvi.iSelectedImage = 0;
@@ -334,13 +332,13 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                     }
                     else
                     {
-                        int fileIconIndex = CSysImageList::GetInstance().GetFileIconIndex(item->path);
+                        int fileIconIndex = CSysImageList::GetInstance().GetFileIconIndex(item.path);
                         tvi.iImage = fileIconIndex;
                         tvi.iSelectedImage = fileIconIndex;
                     }
                     if (!activepath.empty())
                     {
-                        if (CPathUtils::PathCompare(item->path, activepath) == 0)
+                        if (CPathUtils::PathCompare(item.path, activepath) == 0)
                         {
                             tvi.mask |= TVIF_STATE;
                             tvi.state = TVIS_BOLD;
@@ -348,7 +346,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                             activepathmarked = true;
                         }
                     }
-                    tvi.lParam = (LPARAM)item;
+                    tvi.lParam = (LPARAM)&item;
                     tvins.itemex = tvi;
                     tvins.hInsertAfter = TVI_FIRST;
                     tvins.hParent = pData->refreshRoot;
@@ -358,11 +356,6 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                         SetActiveItem(hInsertedItem);
                 }
 
-                TVSORTCB sortcb = { 0 };
-                sortcb.hParent = pData->refreshRoot;
-                sortcb.lParam = (LPARAM)this;
-                sortcb.lpfnCompare = TreeCompareFunc;
-                TreeView_SortChildrenCB(*this, &sortcb, false);
                 TreeView_Expand(*this, pData->refreshRoot, TVE_EXPAND);
                 TreeView_SetItemState(*this, pData->refreshRoot, 0, TVIS_CUT);
 
@@ -370,8 +363,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                     fi->busy = false;
                 m_bRootBusy = false;
 
-                delete pData;
-                pData = nullptr;
+                m_data[pData->refreshRoot] = std::move(pData);
 
                 if (!activepath.empty() && !activepathmarked && !m_path.empty())
                 {
@@ -397,10 +389,6 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 // the refresh root is not valid anymore (e.g., the tab
                 // was changed while the thread was running), so delete
                 // the data the thread provided
-                for (const auto& item : pData->data)
-                {
-                    delete item;
-                }
                 delete pData;
                 pData = nullptr;
             }
@@ -467,16 +455,7 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
     SendMessage(*this, WM_SETREDRAW, FALSE, 0);
     OnOutOfScope(SendMessage(*this, WM_SETREDRAW, TRUE, 0));
 
-    RecurseTree(TreeView_GetChild(*this, refreshRoot), [&](HTREEITEM hItem)->bool
-    {
-        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
-        if (pTreeItem)
-        {
-            delete pTreeItem;
-        }
-        TreeView_DeleteItem(*this, hItem);
-        return false;
-    });
+    SetActiveItem(0);
 
     std::wstring refreshPath = m_path;
     if (refreshRoot != TVI_ROOT)
@@ -492,6 +471,36 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
             return;
         }
     }
+
+    if (refreshRoot == TVI_ROOT)
+        TreeView_DeleteAllItems(*this);
+    else
+    {
+        HWND hTree = *this;
+        RecurseTree(TreeView_GetChild(*this, refreshRoot), [hTree](HTREEITEM hItem)->bool
+        {
+            TreeView_DeleteItem(hTree, hItem);
+            return false;
+        });
+    }
+
+    for (auto it = m_data.cbegin(); it != m_data.cend(); /* no increment */)
+    {
+        if (PathIsChild(refreshPath, it->second->refreshpath))
+        {
+            delete it->second;
+            it = m_data.erase(it);
+        }
+        else
+            ++it;
+    }
+    auto oldDataIt = m_data.find(refreshRoot);
+    if (oldDataIt != m_data.end())
+    {
+        delete oldDataIt->second;
+        m_data.erase(oldDataIt);
+    }
+
     if (refreshPath.empty())
     {
         m_bRootBusy = false;
@@ -516,6 +525,7 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
     auto data = new FileTreeData();
     data->refreshpath = refreshPath;
     data->refreshRoot = refreshRoot;
+    data->data.reserve(50000);
 
     if (refreshRoot == TVI_ROOT)
     {
@@ -524,10 +534,10 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
         if (refreshPath.size() > 3)
         {
             auto parentDir = CPathUtils::GetParentDirectory(refreshPath);
-            FileTreeItem * fi = new FileTreeItem();
-            fi->path = std::move(parentDir);
-            fi->isDir = true;
-            fi->isDot = true;
+            FileTreeItem fi;
+            fi.path = std::move(parentDir);
+            fi.isDir = true;
+            fi.isDot = true;
 
             data->data.push_back(fi);
         }
@@ -538,16 +548,37 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
     std::wstring path;
     while (enumerator.NextFile(path, &bIsDir, false) && !m_bStop)
     {
-        FileTreeItem * fi = new FileTreeItem();
-        fi->path = std::move(path);
-        fi->isDir = bIsDir;
+        FileTreeItem fi;
+        fi.path = std::move(path);
+        fi.isDir = bIsDir;
 
         data->data.push_back(fi);
     }
     if (m_bStop)
     {
-        for (const auto& i : data->data)
-            delete i;
+        delete data;
+        m_bRootBusy = false;
+        return;
+    }
+    std::sort(data->data.begin(), data->data.end(), [](const auto& lhs, const auto& rhs)
+    {
+        if (lhs.isDot)
+            return false;
+        if (rhs.isDot)
+            return true;
+
+        if (lhs.isDir != rhs.isDir)
+            return !lhs.isDir;
+
+        auto res = CompareStringEx(nullptr, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS | SORT_STRINGSORT,
+            lhs.path.c_str(), (int)lhs.path.length(),
+            rhs.path.c_str(), (int)rhs.path.length(),
+            nullptr, nullptr, 0);
+        return res == CSTR_GREATER_THAN;
+    });
+
+    if (m_bStop)
+    {
         delete data;
         m_bRootBusy = false;
         return;
@@ -745,7 +776,8 @@ void CFileTree::SetActiveItem(HTREEITEM hItem)
 {
     if (m_ActiveItem)
         TreeView_SetItemState(*this, m_ActiveItem, 0, TVIS_BOLD);
-    TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
+    if (hItem)
+        TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
     m_ActiveItem = hItem;
 }
 
@@ -790,11 +822,11 @@ void CFileTree::BlockRefresh(bool bBlock)
 
 void CFileTree::OnClose()
 {
-    m_bStop = true;
+    InterlockedExchange(&m_bStop, TRUE);
     auto start = GetTickCount64();
     while (m_ThreadsRunning && (GetTickCount64() - start < 5000))
         Sleep(10);
-    m_bStop = false;
+    InterlockedExchange(&m_bStop, FALSE);
 }
 
 HTREEITEM CFileTree::GetItemForPath(const std::wstring& expandpath)
