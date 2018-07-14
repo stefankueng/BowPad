@@ -37,6 +37,14 @@ const int SCRATCH_QCM_LAST = 0x6FFF;
 static IContextMenu2 *g_pcm2 = nullptr;
 static IContextMenu3 *g_pcm3 = nullptr;
 
+const wchar_t ThisOSPathSeparator = L'\\';
+const wchar_t OtherOSPathSeparator = L'/';
+
+inline bool IsFolderSeparator(wchar_t c)
+{
+    return (c == ThisOSPathSeparator || c == OtherOSPathSeparator);
+}
+
 static HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void **ppv)
 {
     *ppv = nullptr;
@@ -95,6 +103,7 @@ CFileTree::CFileTree(HINSTANCE hInst, void * obj)
     , m_ThreadsRunning(0)
     , m_bStop(false)
     , m_bRootBusy(false)
+    , m_ActiveItem(0)
 {
 }
 
@@ -112,6 +121,7 @@ void CFileTree::Clear()
         return false;
     });
     TreeView_DeleteAllItems(*this);
+    m_ActiveItem = 0;
 }
 
 bool CFileTree::Init(HINSTANCE /*hInst*/, HWND hParent)
@@ -343,7 +353,9 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                     tvins.hInsertAfter = TVI_FIRST;
                     tvins.hParent = pData->refreshRoot;
 
-                    TreeView_InsertItem(*this, &tvins);
+                    auto hInsertedItem = TreeView_InsertItem(*this, &tvins);
+                    if (tvi.state == TVIS_BOLD)
+                        SetActiveItem(hInsertedItem);
                 }
 
                 TVSORTCB sortcb = { 0 };
@@ -461,8 +473,8 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
         if (pTreeItem)
         {
             delete pTreeItem;
-            TreeView_DeleteItem(*this, hItem);
         }
+        TreeView_DeleteItem(*this, hItem);
         return false;
     });
 
@@ -686,7 +698,7 @@ void CFileTree::MarkActiveDocument()
         const auto& doc = GetActiveDocument();
         if (!doc.m_path.empty())
         {
-            if (!CPathUtils::PathIsChild(m_path, doc.m_path))
+            if (!PathIsChild(m_path, doc.m_path))
             {
                 SetPath(CPathUtils::GetParentDirectory(doc.m_path));
             }
@@ -705,19 +717,15 @@ void CFileTree::MarkActiveDocument()
                         {
                             if (CPathUtils::PathCompare(doc.m_path, pTreeItem->path) == 0)
                             {
-                                if (TreeView_GetItemState(*this, hItem, TVIS_BOLD) == 0)
-                                {
-                                    TreeView_EnsureVisible(*this, hItem);
-                                    TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
-                                }
+                                TreeView_EnsureVisible(*this, hItem);
+                                TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
+                                SetActiveItem(hItem);
+                                return true;
                             }
-                            else
-                                TreeView_SetItemState(*this, hItem, 0, TVIS_BOLD);
                         }
                         else
                         {
-                            TreeView_SetItemState(*this, hItem, 0, TVIS_BOLD);
-                            if (CPathUtils::PathIsChild(pTreeItem->path, doc.m_path))
+                            if (PathIsChild(pTreeItem->path, doc.m_path))
                                 TreeView_Expand(*this, hItem, TVE_EXPAND);
                         }
                     }
@@ -729,13 +737,37 @@ void CFileTree::MarkActiveDocument()
     }
     if (!bRecurseDone)
     {
-        // remove the bold status from all items
-        RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
-        {
-            TreeView_SetItemState(*this, hItem, 0, TVIS_BOLD);
-            return false;
-        });
+        SetActiveItem(0);
     }
+}
+
+void CFileTree::SetActiveItem(HTREEITEM hItem)
+{
+    if (m_ActiveItem)
+        TreeView_SetItemState(*this, m_ActiveItem, 0, TVIS_BOLD);
+    TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
+    m_ActiveItem = hItem;
+}
+
+bool CFileTree::PathIsChild(const std::wstring & parent, const std::wstring & child)
+{
+    std::wstring sChildAsParent = child.substr(0, parent.size());
+    if (sChildAsParent.empty())
+        return false;
+    if (CPathUtils::PathCompare(parent, sChildAsParent) != 0)
+        return false;
+
+    if (IsFolderSeparator(*parent.rbegin()))
+    {
+        if (!IsFolderSeparator(*sChildAsParent.rbegin()))
+            return false;
+    }
+    else
+    {
+        if (!IsFolderSeparator(child[parent.size()]))
+            return false;
+    }
+    return true;
 }
 
 void CFileTree::BlockRefresh(bool bBlock)

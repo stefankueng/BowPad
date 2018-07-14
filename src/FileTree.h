@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -74,6 +74,8 @@ protected:
     HTREEITEM GetItemForPath(const std::wstring& expandpath);
     void RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath);
     void MarkActiveDocument();
+    void SetActiveItem(HTREEITEM hItem);
+    static bool PathIsChild(const std::wstring& parent, const std::wstring& child);
 
     void TabNotify(TBHDR * ptbhdr) override;
 
@@ -85,4 +87,5 @@ private:
     volatile LONG       m_ThreadsRunning;
     bool                m_bStop;
     bool                m_bRootBusy;
+    HTREEITEM           m_ActiveItem;
 };
