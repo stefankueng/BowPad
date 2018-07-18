@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2018-04-28 15:09+0200\n"
+"PO-Revision-Date: 2018-07-18 19:34+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -308,7 +308,7 @@ msgid ""
 "Do not delete the file."
 msgstr ""
 "Abbrechen\n"
-"Datei nicht löschen"
+"Datei nicht löschen."
 
 #. Resource IDs: (223)
 msgid ""
@@ -332,7 +332,7 @@ msgid ""
 "The file is not loaded again."
 msgstr ""
 "Abbrechen\n"
-"Die Datei wird nicht neu geladen"
+"Die Datei wird nicht neu geladen."
 
 #. Resource IDs: (167)
 msgid ""
@@ -361,11 +361,11 @@ msgstr "Überprüfe nur in Kommentaren, Strings und Text"
 
 #. Resource IDs: (65535)
 msgid "Chose the encoding of new files"
-msgstr "Wähle die Kodierung von neuen Dateien:"
+msgstr "Wähle die Kodierung von neuen Dateien"
 
 #. Resource IDs: (65535)
 msgid "Chose the line ending of new files"
-msgstr "Wähle die Zeilenenden von neuen Dateien:"
+msgstr "Wähle die Zeilenenden von neuen Dateien"
 
 #. Resource IDs: (60352, 60354)
 msgid "Clear Bookmarks"
@@ -1014,7 +1014,7 @@ msgstr "Such-Ergebnis Aktion"
 
 #. Resource IDs: (233)
 msgid "Find and Replace for functions is not implemented."
-msgstr "Suchen und Ersetzen für Funktionen ist nicht erlaubt"
+msgstr "Suchen und Ersetzen für Funktionen ist nicht erlaubt."
 
 #. Resource IDs: (143)
 msgid "Find and replace"
@@ -1022,7 +1022,7 @@ msgstr "Suche und ersetze"
 
 #. Resource IDs: (231)
 msgid "Find previous."
-msgstr "Finde vorheriges"
+msgstr "Finde vorheriges."
 
 #. Resource IDs: (60174)
 msgid "Find/Replace"
@@ -1064,12 +1064,12 @@ msgstr "Schriftart"
 #. Resource IDs: (199)
 #, c-format
 msgid "Found: %d matches in %d tabs."
-msgstr "Gefunden: %d in %d Tabs"
+msgstr "Gefunden: %d in %d Tabs."
 
 #. Resource IDs: (198)
 #, c-format
 msgid "Found: %d matches."
-msgstr "Gefunden: %d Treffer"
+msgstr "Gefunden: %d Treffer."
 
 #. Resource IDs: (203)
 #, c-format
@@ -1124,7 +1124,7 @@ msgstr "Ignorieren"
 
 #. Resource IDs: (1079)
 msgid "Ignore &case."
-msgstr "Gross/Kleinschreibung ignorieren"
+msgstr "Gross/Kleinschreibung ignorieren."
 
 #. Resource IDs: (216)
 msgid "Ignore word for this session"
@@ -1500,7 +1500,7 @@ msgstr "Neue Kopie"
 
 #. Resource IDs: (237)
 msgid "New Corresponding Files."
-msgstr "Neue entsprechende Dateien"
+msgstr "Neue entsprechende Dateien."
 
 #. Resource IDs: (60034)
 msgid "New Document"
@@ -1516,15 +1516,15 @@ msgstr "Nächstes Lesezeichen"
 
 #. Resource IDs: (215)
 msgid "No corrections found!"
-msgstr "Keine Korrekturen gefunden"
+msgstr "Keine Korrekturen gefunden!"
 
 #. Resource IDs: (197)
 msgid "No files found."
-msgstr "Keine Dateien gefunden"
+msgstr "Keine Dateien gefunden."
 
 #. Resource IDs: (151)
 msgid "No functions found!"
-msgstr "Keine Funktionen gefunden"
+msgstr "Keine Funktionen gefunden!"
 
 #. Resource IDs: (234)
 msgid "No more occurrences to replace."
@@ -1726,7 +1726,7 @@ msgstr "Bitte warten."
 
 #. Resource IDs: (189)
 msgid "Plugin Name"
-msgstr "Plugin Name:"
+msgstr "Plugin Name"
 
 #. Resource IDs: (60537)
 msgid "Plugin commands"
@@ -1771,6 +1771,10 @@ msgstr "E&rsetzen mit:"
 #. Resource IDs: (60337)
 msgid "RELOAD"
 msgstr "RELOAD"
+
+#. Resource IDs: (256)
+msgid "Reading order (left-to-right or right-to-left)"
+msgstr "Leserichtung (Links-nach-rechts oder Rechts-nach-links)"
 
 #. Resource IDs: (60076)
 msgid "Readonly"
@@ -1830,7 +1834,7 @@ msgid ""
 "The unsaved modifications will be lost!"
 msgstr ""
 "Dokument neu laden\n"
-"Nicht gespeicherte Änderungen gehen verloren."
+"Nicht gespeicherte Änderungen gehen verloren!"
 
 #. Resource IDs: (60355)
 msgid "Removes all bookmarks from the current file"
@@ -1948,7 +1952,7 @@ msgstr "Suche und/oder ersetze Text in Dokumenten/Tabs"
 
 #. Resource IDs: (227)
 msgid "Search folder not found."
-msgstr "Suchordner nicht gefunden!"
+msgstr "Suchordner nicht gefunden."
 
 #. Resource IDs: (144)
 msgid "Search text not found!"
@@ -2002,7 +2006,7 @@ msgstr "Setze Defaults"
 
 #. Resource IDs: (230)
 msgid "Set a new search folder."
-msgstr "Setze neuen Suchordner"
+msgstr "Setze neuen Suchordner."
 
 #. Resource IDs: (60038)
 msgid "Set default encoding and EOL"
@@ -2010,11 +2014,11 @@ msgstr "Setze Default-Kodierung und Zeilenenden"
 
 #. Resource IDs: (228)
 msgid "Set search folder to its containing folder."
-msgstr "Setze Suchordner zum Oberordner"
+msgstr "Setze Suchordner zum Oberordner."
 
 #. Resource IDs: (229)
 msgid "Set search folder to the current documents folder."
-msgstr "Setzt aktuellen Dokument-Ordner als Suchordner"
+msgstr "Setzt aktuellen Dokument-Ordner als Suchordner."
 
 #. Resource IDs: (60148)
 msgid "Set the coloring according to the code language"
@@ -2030,7 +2034,7 @@ msgstr ""
 
 #. Resource IDs: (60242)
 msgid "Set the number of columns for one tabulator."
-msgstr "Bestimmt die Anzahl Leerzeichen pro Tabulator"
+msgstr "Bestimmt die Anzahl Leerzeichen pro Tabulator."
 
 #. Resource IDs: (60303)
 msgid "Set up print margins, page size, page orientation"
@@ -2087,7 +2091,7 @@ msgstr "Öffnet den Windows Explorer Eigenschaftsdialog für die aktuelle Datei"
 
 #. Resource IDs: (60542)
 msgid "Shows the list of all opened tabs."
-msgstr "Zeigt eine Liste mit offenen Tabs"
+msgstr "Zeigt eine Liste mit offenen Tabs."
 
 #. Resource IDs: (60277, 60279)
 msgid "Sort Lines"
@@ -2139,7 +2143,7 @@ msgstr "Stil:"
 
 #. Resource IDs: (65535)
 msgid "Styles"
-msgstr "Stile:"
+msgstr "Stile"
 
 #. Resource IDs: (1012)
 msgid "Sub Folders"
@@ -2278,7 +2282,7 @@ msgstr "Schaltet um zwischen normalem und dunklem Stil"
 
 #. Resource IDs: (1078)
 msgid "Treat digits as &numbers."
-msgstr "&Nummern als Zahlen behandeln:"
+msgstr "&Nummern als Zahlen behandeln."
 
 #. Resource IDs: (60320, 60322)
 msgid "Trim Whitespaces"
@@ -2443,7 +2447,7 @@ msgstr "Zeilenumbruch"
 
 #. Resource IDs: (143)
 msgid "Wrap around."
-msgstr "Weiter von Beginn"
+msgstr "Weiter von Beginn."
 
 #. Resource IDs: (60111)
 msgid "Wrap lines at the end of the window"
