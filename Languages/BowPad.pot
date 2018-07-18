@@ -1587,6 +1587,10 @@ msgstr ""
 msgid "RELOAD"
 msgstr ""
 
+#. Resource IDs: (256)
+msgid "Reading order (left-to-right or right-to-left)"
+msgstr ""
+
 #. Resource IDs: (60076)
 msgid "Readonly"
 msgstr ""
