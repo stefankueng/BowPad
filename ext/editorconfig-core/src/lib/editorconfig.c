@@ -153,7 +153,7 @@ static int array_editorconfig_name_value_add(
 
 
     /* name_lwr is the lowercase property name */
-    strlwr(strcpy(name_lwr, name));
+    strlwr(strncpy(name_lwr, name, sizeof(name_lwr)));
 
     name_value_pos = find_name_value_from_name(
             aenv->name_values, aenv->current_value_count, name_lwr);

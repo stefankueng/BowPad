@@ -77,8 +77,8 @@ int ini_parse_file(FILE* file,
 #define INI_ALLOW_MULTILINE 0
 #endif
 
-#define MAX_SECTION_NAME 50
-#define MAX_PROPERTY_NAME 50
+#define MAX_SECTION_NAME 200
+#define MAX_PROPERTY_NAME 200
 
 /* Nonzero to allow a UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of
    the file. See http://code.google.com/p/inih/issues/detail?id=21 */

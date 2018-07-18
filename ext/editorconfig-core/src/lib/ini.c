@@ -40,7 +40,7 @@ http://code.google.com/p/inih/
 
 #include "ini.h"
 
-#define MAX_LINE 200
+#define MAX_LINE 500
 #define MAX_SECTION MAX_SECTION_NAME
 #define MAX_NAME MAX_PROPERTY_NAME
 
