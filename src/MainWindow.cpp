@@ -979,7 +979,7 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
                 case STATUSBAR_R2L:
                 {
                     auto bidi = m_editor.Call(SCI_GETBIDIRECTIONAL);
-                    m_editor.SetReadDirection(bidi == SC_BIDIRECTIONAL_R2L ? L2R : R2L);
+                    m_editor.SetReadDirection(bidi == SC_BIDIRECTIONAL_R2L ? Disabled : R2L);
                     auto& doc = m_DocManager.GetModDocumentFromID(m_TabBar.GetCurrentTabId());
                     doc.m_ReadDir = (ReadDirection)m_editor.Call(SCI_GETBIDIRECTIONAL);
                 }
