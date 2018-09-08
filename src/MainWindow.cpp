@@ -1093,24 +1093,6 @@ LRESULT CMainWindow::DoCommand(int id)
         OpenNewTab();
         break;
     case cmdClose:
-        // TODO:
-        // Clicking a tab header's X generates an TCN_TABDELETE event,
-        // that is forwarded to the commands through TabNotify,
-        // and results eventually in CloseTab being called.
-        // But closing this way (Ctrl-F4) and just call CloseTab,
-        // No TCN_TABDELETE message is sent to the children.
-        // If we want that we could call
-        // m_TabBar.NotifyTabDelete(m_TabBar.GetCurrentTabIndex());
-        // instead which would do that. But I'm leaving things
-        // as they are for now as nothing (now) uses TCN_TABDELETE
-        // and it still isn't generated in every circumstance
-        // anyway even if we catch this instance and do it here.
-        // But I want to record this fact as this area needs some
-        // attention, but later. I don't want to risk breaking
-        // anything yet until the topic gets more thought / discussion.
-        // But ultimate TCN_TABDELETE probably wants to be generated
-        // here as a "Hey command, I'm thinking about closing,
-        // are you cool with that", kind of thing.
         CloseTab(m_TabBar.GetCurrentTabIndex());
         break;
     case cmdCloseAll:
