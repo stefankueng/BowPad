@@ -2916,7 +2916,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                     doc.m_bNeedsSaving = true;
                 }
                 if (!m_tabmovetitle.empty())
-                    m_TabBar.SetCurrentTitle(m_tabmovetitle.c_str());
+                    m_TabBar.SetTitle(index, m_tabmovetitle.c_str());
             }
 
             m_DocManager.AddDocumentAtEnd(doc, id);

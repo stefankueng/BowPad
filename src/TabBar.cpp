@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -197,6 +197,14 @@ void CTabBar::SetCurrentTitle(LPCTSTR title)
     tci.mask = TCIF_TEXT;
     tci.pszText = const_cast<TCHAR*>(title);
     TabCtrl_SetItem(*this, GetCurrentTabIndex(), &tci);
+}
+
+void CTabBar::SetTitle(int index, LPCTSTR title)
+{
+    TCITEM tci;
+    tci.mask = TCIF_TEXT;
+    tci.pszText = const_cast<TCHAR*>(title);
+    TabCtrl_SetItem(*this, index, &tci);
 }
 
 void CTabBar::SetFont(const TCHAR *fontName, int fontSize)
