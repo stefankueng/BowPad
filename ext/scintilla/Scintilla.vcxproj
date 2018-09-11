@@ -226,6 +226,7 @@
     <ClCompile Include="lexers\LexRegistry.cxx" />
     <ClCompile Include="lexers\LexRuby.cxx" />
     <ClCompile Include="lexers\LexRust.cxx" />
+    <ClCompile Include="lexers\LexSAS.cxx" />
     <ClCompile Include="lexers\LexScriptol.cxx" />
     <ClCompile Include="lexers\LexSmalltalk.cxx" />
     <ClCompile Include="lexers\LexSML.cxx" />
@@ -233,6 +234,7 @@
     <ClCompile Include="lexers\LexSpecman.cxx" />
     <ClCompile Include="lexers\LexSpice.cxx" />
     <ClCompile Include="lexers\LexSQL.cxx" />
+    <ClCompile Include="lexers\LexStata.cxx" />
     <ClCompile Include="lexers\LexSTTXT.cxx" />
     <ClCompile Include="lexers\LexTACL.cxx" />
     <ClCompile Include="lexers\LexTADS3.cxx" />
