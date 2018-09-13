@@ -2,6 +2,7 @@
 A simple and fast text editor with a ribbon UI
 
 [![Build status](https://ci.appveyor.com/api/projects/status/kp9i9c0ncj8g1u9m?svg=true)](https://ci.appveyor.com/project/stefankueng/bowpad)
+[![Build Status](https://dev.azure.com/tortoisesvn/tortoisesvnGitHub/_apis/build/status/tortoisesvnGitHub%20BowPad)](https://dev.azure.com/tortoisesvn/tortoisesvnGitHub/_build/latest?definitionId=2)
 
 A few notable features of BowPad:
 
