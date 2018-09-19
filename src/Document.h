@@ -42,6 +42,7 @@ class CPosData
 public:
     CPosData()
         : m_nFirstVisibleLine(0)
+        , m_nWrapLineOffset(0)
         , m_nStartPos(0)
         , m_nEndPos(0)
         , m_xOffset(0)
@@ -54,6 +55,7 @@ public:
     }
 
     size_t m_nFirstVisibleLine;
+    size_t m_nWrapLineOffset;
     size_t m_nStartPos;
     size_t m_nEndPos;
     size_t m_xOffset;

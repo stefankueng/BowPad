@@ -75,6 +75,7 @@ void CCmdSessionLoad::OnClose()
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"scrollwidth%d", saveindex).c_str(), pos.m_nScrollWidth);
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", saveindex).c_str(), pos.m_xOffset);
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", saveindex).c_str(), pos.m_nFirstVisibleLine);
+        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"wraplineoffset%d", saveindex).c_str(), pos.m_nWrapLineOffset);
     };
 
     int sessionSize = (int)settings.GetInt64(g_sessionSection, L"session_size", BP_DEFAULT_SESSION_SIZE);
@@ -178,6 +179,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         pos.m_nScrollWidth       = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"scrollwidth%d", fileNum).c_str(), 0);
         pos.m_xOffset            = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", fileNum).c_str(), 0);
         pos.m_nFirstVisibleLine  = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
+        pos.m_nWrapLineOffset    = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"wraplineoffset%d", fileNum).c_str(), 0);
         doc.m_TabSpace           = (TabSpace)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
         doc.m_ReadDir            = (ReadDirection)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0);
         if ((int)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", fileNum).c_str(), 0))

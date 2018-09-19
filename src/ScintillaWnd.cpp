@@ -771,8 +771,10 @@ void CScintillaWnd::UpdateLineNumberWidth()
 
 void CScintillaWnd::SaveCurrentPos(CPosData& pos)
 {
-    pos.m_nFirstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
-    pos.m_nFirstVisibleLine   = Call(SCI_DOCLINEFROMVISIBLE, pos.m_nFirstVisibleLine);
+    auto firstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
+    pos.m_nFirstVisibleLine   = Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine);
+    if (Call(SCI_GETWRAPMODE) != SC_WRAP_NONE)
+        pos.m_nWrapLineOffset = firstVisibleLine - Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
 
     pos.m_nStartPos           = Call(SCI_GETANCHOR);
     pos.m_nEndPos             = Call(SCI_GETCURRENTPOS);
@@ -789,7 +791,8 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     Call(SCI_SETANCHOR, pos.m_nStartPos);
     Call(SCI_SETCURRENTPOS, pos.m_nEndPos);
     Call(SCI_CANCEL);
-    if (Call(SCI_GETWRAPMODE) != SC_WRAP_WORD)
+    auto wrapmode = Call(SCI_GETWRAPMODE);
+    if (wrapmode == SC_WRAP_NONE)
     {
         // only offset if not wrapping, otherwise the offset isn't needed at all
         Call(SCI_SETSCROLLWIDTH, pos.m_nScrollWidth);
@@ -798,6 +801,7 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     Call(SCI_CHOOSECARETX);
 
     size_t lineToShow = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
+    lineToShow += pos.m_nWrapLineOffset;
     Call(SCI_LINESCROLL, 0, lineToShow);
     // call UpdateLineNumberWidth() here, just in case the SCI_LINESCROLL call
     // above does not scroll the window.
