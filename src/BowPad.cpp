@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -339,6 +339,19 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
                 }
                 if ((szArglist[i][0] != '/') && (szArglist[i][0] != '-'))
                 {
+                    auto pathpos = commandLine.find(szArglist[i]);
+                    if (pathpos != std::wstring::npos)
+                    {
+                        auto tempPath = commandLine.substr(pathpos);
+                        if (PathFileExists(tempPath.c_str()))
+                        {
+                            CPathUtils::NormalizeFolderSeparators(tempPath);
+                            auto path = CPathUtils::GetLongPathname(tempPath);
+                            mainWindow.SetFileToOpen(path, line);
+                            break;
+                        }
+                    }
+
                     std::wstring path = szArglist[i];
                     CPathUtils::NormalizeFolderSeparators(path);
                     path = CPathUtils::GetLongPathname(path);
