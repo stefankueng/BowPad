@@ -357,7 +357,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
                     path = CPathUtils::GetLongPathname(path);
                     if (!PathFileExists(path.c_str()))
                     {
-                        auto pathpos = commandLine.find(szArglist[i]);
+                        pathpos = commandLine.find(szArglist[i]);
                         if (pathpos != std::wstring::npos)
                         {
                             auto tempPath = commandLine.substr(pathpos);
