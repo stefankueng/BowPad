@@ -119,6 +119,7 @@ public :
     long GetCurrentLineNumber() const;
 
     LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
+    void ReflectEvents(SCNotification * pScn);
 
 protected:
     virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -151,6 +152,7 @@ private:
     int                         m_cursorTimeout;
     bool                        m_bInFolderMargin;
     bool                        m_hasConsolas;
+    size_t                      m_LineToScrollToAfterPaint;
     IUIAnimationVariablePtr     m_animVarGrayFore;
     IUIAnimationVariablePtr     m_animVarGrayBack;
     IUIAnimationVariablePtr     m_animVarGraySel;

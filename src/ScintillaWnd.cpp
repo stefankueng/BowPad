@@ -89,6 +89,7 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_ScrollTool(hInst)
     , m_hasConsolas(false)
     , m_bInFolderMargin(false)
+    , m_LineToScrollToAfterPaint((size_t)-1)
 {
     HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
                              OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
@@ -803,6 +804,16 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     size_t lineToShow = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
     lineToShow += pos.m_nWrapLineOffset;
     Call(SCI_LINESCROLL, 0, lineToShow);
+    if (wrapmode != SC_WRAP_NONE)
+    {
+        // if wrapping is enabled, scrolling to a line won't work
+        // properly until scintilla has painted the document, because
+        // the wrap calculations aren't finished until then.
+        // So we set the scroll position here to a member variable,
+        // which then is used to scroll scintilla to that line after
+        // the first SCN_PAINTED event.
+        m_LineToScrollToAfterPaint = lineToShow;
+    }
     // call UpdateLineNumberWidth() here, just in case the SCI_LINESCROLL call
     // above does not scroll the window.
     UpdateLineNumberWidth();
@@ -2176,6 +2187,20 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
 
     }
     return false;
+}
+
+void CScintillaWnd::ReflectEvents(SCNotification * pScn)
+{
+    switch (pScn->nmhdr.code)
+    {
+    case SCN_PAINTED:
+        if (m_LineToScrollToAfterPaint != (size_t)-1)
+        {
+            Call(SCI_LINESCROLL, 0, m_LineToScrollToAfterPaint);
+            m_LineToScrollToAfterPaint = (size_t)-1;
+        }
+        break;
+    }
 }
 
 void CScintillaWnd::SetTabSettings(TabSpace ts)

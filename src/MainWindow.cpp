@@ -811,6 +811,8 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARA
     SCNotification* pScn = reinterpret_cast<SCNotification *>(lParam);
     const SCNotification& scn = *pScn;
 
+    m_editor.ReflectEvents(pScn);
+
     CCommandHandler::Instance().ScintillaNotify(pScn);
     switch (scn.nmhdr.code)
     {
