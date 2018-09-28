@@ -31,6 +31,9 @@
 #include "OnOutOfScope.h"
 #include "version.h"
 #include "CommandHandler.h"
+#include "JumpListHelpers.h"
+#include <wrl.h>
+using Microsoft::WRL::ComPtr;
 
 HINSTANCE hInst;
 HINSTANCE hRes;
@@ -110,11 +113,11 @@ static void SetIcon()
 static void SetUserStringKey(LPCWSTR keyName, LPCWSTR subKeyName, const std::wstring& keyValue)
 {
     DWORD dwSizeInBytes = DWORD((keyValue.length() + 1) * sizeof(WCHAR));
-    auto status = SHSetValue(HKEY_CURRENT_USER, keyName, subKeyName, REG_SZ, keyValue.c_str(), dwSizeInBytes);
+    auto  status        = SHSetValue(HKEY_CURRENT_USER, keyName, subKeyName, REG_SZ, keyValue.c_str(), dwSizeInBytes);
     if (status != ERROR_SUCCESS)
     {
         std::wstring msg = CStringUtils::Format(L"Registry key '%s' (subkey: '%s') could not be set.",
-            keyName, subKeyName ? subKeyName : L"(none)");
+                                                keyName, subKeyName ? subKeyName : L"(none)");
         MessageBox(nullptr, msg.c_str(), L"BowPad", MB_ICONINFORMATION);
     }
 }
@@ -123,9 +126,9 @@ static void RegisterContextMenu(bool bAdd)
 {
     if (bAdd)
     {
-        auto modulePath = CPathUtils::GetLongPathname(CPathUtils::GetModulePath());
-        std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", modulePath.c_str(), IDI_BOWPAD);
-        std::wstring sExePath = CStringUtils::Format(L"%s /path:\"%%1\"", modulePath.c_str());
+        auto         modulePath = CPathUtils::GetLongPathname(CPathUtils::GetModulePath());
+        std::wstring sIconPath  = CStringUtils::Format(L"%s,-%d", modulePath.c_str(), IDI_BOWPAD);
+        std::wstring sExePath   = CStringUtils::Format(L"%s /path:\"%%1\"", modulePath.c_str());
         SetUserStringKey(L"Software\\Classes\\*\\shell\\BowPad", nullptr, L"Edit in BowPad");
         SetUserStringKey(L"Software\\Classes\\*\\shell\\BowPad", L"Icon", sIconPath);
         SetUserStringKey(L"Software\\Classes\\*\\shell\\BowPad", L"MultiSelectModel", L"Player");
@@ -147,20 +150,51 @@ static void RegisterContextMenu(bool bAdd)
     }
 }
 
-static void SetAppID()
+static void SetJumplist(LPCTSTR appID)
 {
-    // set the AppID
-    typedef HRESULT STDAPICALLTYPE SetCurrentProcessExplicitAppUserModelIDFN(PCWSTR AppID);
-    CAutoLibrary hShell = LoadLibraryExW(L"Shell32.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
-    if (hShell)
+    CoInitialize(nullptr);
+    OnOutOfScope(CoUninitialize());
+    ComPtr<ICustomDestinationList> pcdl;
+    HRESULT                        hr = CoCreateInstance(CLSID_DestinationList, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(pcdl.GetAddressOf()));
+    if (SUCCEEDED(hr))
     {
-        SetCurrentProcessExplicitAppUserModelIDFN *pfnSetCurrentProcessExplicitAppUserModelID = (SetCurrentProcessExplicitAppUserModelIDFN*)GetProcAddress(hShell, "SetCurrentProcessExplicitAppUserModelID");
-        if (pfnSetCurrentProcessExplicitAppUserModelID)
+        hr = pcdl->DeleteList(appID);
+        hr = pcdl->SetAppID(appID);
+        if (FAILED(hr))
+            return;
+
+        UINT                 uMaxSlots;
+        ComPtr<IObjectArray> poaRemoved;
+        hr = pcdl->BeginList(&uMaxSlots, IID_PPV_ARGS(&poaRemoved));
+        if (FAILED(hr))
+            return;
+
+        ComPtr<IObjectCollection> poc;
+        hr = CoCreateInstance(CLSID_EnumerableObjectCollection, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(poc.GetAddressOf()));
+        if (FAILED(hr))
+            return;
+
+        if (!SysInfo::Instance().IsElevated())
         {
-            if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
-                pfnSetCurrentProcessExplicitAppUserModelID(APP_ID_ELEVATED);
-            else
-                pfnSetCurrentProcessExplicitAppUserModelID(APP_ID);
+            ResString sTemp(hRes, IDS_RUNASADMIN);
+
+            ComPtr<IShellLink> psladmin;
+            hr = CreateShellLink(L"/multiple", sTemp, 4, true, &psladmin);
+            if (SUCCEEDED(hr))
+            {
+                hr = poc->AddObject(psladmin.Get());
+            }
+        }
+
+        ComPtr<IObjectArray> poa;
+        hr = poc.As(&poa);
+        if (SUCCEEDED(hr))
+        {
+            hr = pcdl->AppendKnownCategory(KDC_FREQUENT);
+            hr = pcdl->AppendKnownCategory(KDC_RECENT);
+            if (!SysInfo::Instance().IsElevated())
+                hr = pcdl->AddUserTasks(poa.Get());
+            hr = pcdl->CommitList();
         }
     }
 }
@@ -197,10 +231,10 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
         {
             // create our own command line with all paths converted to long/full paths
             // since the CWD of the other instance is most likely different
-            int nArgs;
-            std::wstring sCmdLine;
+            int                nArgs;
+            std::wstring       sCmdLine;
             const std::wstring commandLine = GetCommandLineW();
-            LPWSTR * szArglist = CommandLineToArgvW(commandLine.c_str(), &nArgs);
+            LPWSTR*            szArglist   = CommandLineToArgvW(commandLine.c_str(), &nArgs);
             if (szArglist)
             {
                 OnOutOfScope(LocalFree(szArglist););
@@ -248,14 +282,14 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
             }
             auto ownCmdLine = std::make_unique<wchar_t[]>(sCmdLine.size() + 2);
             wcscpy_s(ownCmdLine.get(), sCmdLine.size() + 2, sCmdLine.c_str());
-            cds.cbData = (DWORD)((sCmdLine.size() + 1)*sizeof(wchar_t));
+            cds.cbData = (DWORD)((sCmdLine.size() + 1) * sizeof(wchar_t));
             cds.lpData = ownCmdLine.get();
             SendMessage(hBowPadWnd, WM_COPYDATA, 0, (LPARAM)&cds);
         }
         else
         {
-            cds.cbData = (DWORD)((cmdLineLen + 1)*sizeof(wchar_t));
-            cds.lpData = (PVOID) lpCmdLine;
+            cds.cbData = (DWORD)((cmdLineLen + 1) * sizeof(wchar_t));
+            cds.lpData = (PVOID)lpCmdLine;
             SendMessage(hBowPadWnd, WM_COPYDATA, 0, (LPARAM)&cds);
         }
     }
@@ -265,7 +299,7 @@ static HWND FindAndWaitForBowPad()
 {
     // don't start another instance: reuse the existing one
     // find the window of the existing instance
-    ResString clsResName(hInst, IDC_BOWPAD);
+    ResString    clsResName(hInst, IDC_BOWPAD);
     std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
 
     HWND hBowPadWnd = ::FindWindow(clsName.c_str(), nullptr);
@@ -286,8 +320,7 @@ static HWND FindAndWaitForBowPad()
 
 static void ShowBowPadCommandLineHelp()
 {
-    std::wstring sMessage = CStringUtils::Format(L"BowPad version %d.%d.%d.%d\nusage: BowPad.exe /path:\"PATH\" [/line:number] [/multiple]\nor: BowPad.exe PATH [/line:number] [/multiple]\nwith /multiple forcing BowPad to open a new instance even if there's already an instance running."
-                                                    , BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
+    std::wstring sMessage = CStringUtils::Format(L"BowPad version %d.%d.%d.%d\nusage: BowPad.exe /path:\"PATH\" [/line:number] [/multiple]\nor: BowPad.exe PATH [/line:number] [/multiple]\nwith /multiple forcing BowPad to open a new instance even if there's already an instance running.", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
     MessageBox(nullptr, sMessage.c_str(), L"BowPad", MB_ICONINFORMATION);
 }
 
@@ -319,7 +352,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
         int nArgs;
 
         const std::wstring commandLine = GetCommandLineW();
-        LPWSTR* szArglist = CommandLineToArgvW(commandLine.c_str(), &nArgs);
+        LPWSTR*            szArglist   = CommandLineToArgvW(commandLine.c_str(), &nArgs);
         if (szArglist)
         {
             OnOutOfScope(LocalFree(szArglist););
@@ -420,7 +453,9 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
         }
     }
 
-    SetAppID();
+    auto appID = SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated() ? APP_ID_ELEVATED : APP_ID;
+    SetAppID(appID);
+    SetJumplist(appID);
 
     CIniSettings::Instance().SetIniPath(CAppUtils::GetDataPath() + L"\\settings");
     LoadLanguage(hInstance);
@@ -443,9 +478,11 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     // set to that dir, that dir can't be removed or renamed due to the lock.
     ::SetCurrentDirectory(CPathUtils::GetModuleDir().c_str());
 
+    SetRelaunchCommand(mainWindow, appID, (CPathUtils::GetModulePath() + L" /multiple").c_str(), L"BowPad");
+
     // Main message loop:
-    MSG msg = { 0 };
-    auto& kb = CKeyboardShortcutHandler::Instance();
+    MSG   msg = {0};
+    auto& kb  = CKeyboardShortcutHandler::Instance();
     while (GetMessage(&msg, nullptr, 0, 0))
     {
         if (!kb.TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam) &&
@@ -462,16 +499,16 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                        _In_opt_ HINSTANCE hPrevInstance,
-                       _In_ LPTSTR  lpCmdLine,
-                       _In_ int     nCmdShow)
+                       _In_ LPTSTR lpCmdLine,
+                       _In_ int    nCmdShow)
 {
     hInst = hInstance;
-    hRes = hInstance;
+    hRes  = hInstance;
 
     const std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
     ::SetLastError(NO_ERROR); // Don't do any work between these 3 statements to spoil the error code.
-    HANDLE hAppMutex = ::CreateMutex(nullptr, false, sID.c_str());
-    DWORD mutexStatus = GetLastError();
+    HANDLE hAppMutex   = ::CreateMutex(nullptr, false, sID.c_str());
+    DWORD  mutexStatus = GetLastError();
     OnOutOfScope(CloseHandle(hAppMutex););
     bool bAlreadyRunning = (mutexStatus == ERROR_ALREADY_EXISTS || mutexStatus == ERROR_ACCESS_DENIED);
 
