@@ -1,5 +1,6 @@
 de
 fr
+it
 ja
 pt-br
 pt-pt
