@@ -443,6 +443,21 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
         return 0;
     }
 
+    bool isAdminMode = SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated();
+    if (parser->HasKey(L"admin") && !isAdminMode)
+    {
+        std::wstring modpath = CPathUtils::GetModulePath();
+        SHELLEXECUTEINFO shExecInfo = { sizeof(SHELLEXECUTEINFO) };
+
+        shExecInfo.hwnd = nullptr;
+        shExecInfo.lpVerb = L"runas";
+        shExecInfo.lpFile = modpath.c_str();
+        shExecInfo.lpParameters = parser->getCmdLine();
+        shExecInfo.nShow = SW_NORMAL;
+
+        if (ShellExecuteEx(&shExecInfo))
+            return 0;
+    }
     if (bAlreadyRunning && !parser->HasKey(L"multiple"))
     {
         HWND hBowPadWnd = FindAndWaitForBowPad();
@@ -453,7 +468,7 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
         }
     }
 
-    auto appID = SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated() ? APP_ID_ELEVATED : APP_ID;
+    auto appID = isAdminMode ? APP_ID_ELEVATED : APP_ID;
     SetAppID(appID);
     SetJumplist(appID);
 
@@ -478,7 +493,10 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     // set to that dir, that dir can't be removed or renamed due to the lock.
     ::SetCurrentDirectory(CPathUtils::GetModuleDir().c_str());
 
-    SetRelaunchCommand(mainWindow, appID, (CPathUtils::GetModulePath() + L" /multiple").c_str(), L"BowPad");
+    std::wstring params = L" /multiple";
+    if (isAdminMode)
+        params += L" /admin";
+   SetRelaunchCommand(mainWindow, appID, (CPathUtils::GetModulePath() + params).c_str(), L"BowPad");
 
     // Main message loop:
     MSG   msg = {0};
