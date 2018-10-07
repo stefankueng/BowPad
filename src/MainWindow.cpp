@@ -3840,7 +3840,39 @@ void CMainWindow::SetTheme(bool dark)
 {
     if (dark)
     {
-        SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
+        // as of the windows 10 update 1809, the background color
+        // of the ribbon does not change anymore!
+        // so to avoid having white text on a bright gray background,
+        // we have to check the version of the UIRibbon.dll and
+        // if it's the 1809 update or later, we don't change the background
+        // and leave the text black.
+        bool bCanChangeBackground = true;
+        PWSTR sysPath = nullptr;
+        if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_System, 0, nullptr, &sysPath)))
+        {
+            std::wstring dllPath = sysPath;
+            CoTaskMemFree(sysPath);
+            dllPath += L"\\uiribbon.dll";
+            auto version = CPathUtils::GetVersionFromFile(L"uiribbon.dll");
+            std::vector<std::wstring> tokens;
+            stringtok(tokens, version, false, L".");
+            if (tokens.size() == 4)
+            {
+                auto major = std::stol(tokens[0]);
+                //auto minor = std::stol(tokens[1]);
+                auto micro = std::stol(tokens[2]);
+                //auto build = std::stol(tokens[3]);
+
+                // the windows 10 update 1809 has the version
+                // number as 10.0.17763.10000
+                if (major == 10 && micro > 17762)
+                    bCanChangeBackground = false;
+            }
+        }
+        if (bCanChangeBackground)
+            SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
+        else
+            SetRibbonColorsHSB(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
         SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
         if (IsWindow(m_StatusBar))
             SetClassLongPtr(m_StatusBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
