@@ -1667,6 +1667,10 @@ msgstr ""
 msgid "Run"
 msgstr ""
 
+#. Resource IDs: (257)
+msgid "Run as Administrator"
+msgstr ""
+
 #. Resource IDs: (60382)
 msgid "Runs various commands"
 msgstr ""
