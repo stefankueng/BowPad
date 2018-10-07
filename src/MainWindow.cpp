@@ -3835,17 +3835,18 @@ void CMainWindow::GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI
 
 // Implementation helper only,
 // use CTheme::Instance::SetDarkTheme to actually set the theme.
-
+#ifndef UI_PKEY_DarkModeRibbon
+DEFINE_UIPROPERTYKEY(UI_PKEY_DarkModeRibbon, VT_BOOL, 2004);
+DEFINE_UIPROPERTYKEY(UI_PKEY_ApplicationButtonColor, VT_VECTOR | VT_UI4, 2003);
+#endif
 void CMainWindow::SetTheme(bool dark)
 {
     if (dark)
     {
         // as of the windows 10 update 1809, the background color
         // of the ribbon does not change anymore!
-        // so to avoid having white text on a bright gray background,
-        // we have to check the version of the UIRibbon.dll and
-        // if it's the 1809 update or later, we don't change the background
-        // and leave the text black.
+        // But, through reverse engineering I found the UI_PKEY_DarkModeRibbon
+        // property, which we can use instead.
         bool bCanChangeBackground = true;
         PWSTR sysPath = nullptr;
         if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_System, 0, nullptr, &sysPath)))
@@ -3872,7 +3873,17 @@ void CMainWindow::SetTheme(bool dark)
         if (bCanChangeBackground)
             SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
         else
-            SetRibbonColorsHSB(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
+        {
+            IPropertyStorePtr spPropertyStore;
+            HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
+            if (SUCCEEDED(hr))
+            {
+                PROPVARIANT propvarDarkMode;
+                InitPropVariantFromBoolean(1, &propvarDarkMode);
+                spPropertyStore->SetValue(UI_PKEY_DarkModeRibbon, propvarDarkMode);
+                spPropertyStore->Commit();
+            }
+        }
         SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
         if (IsWindow(m_StatusBar))
             SetClassLongPtr(m_StatusBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
