@@ -3841,35 +3841,36 @@ DEFINE_UIPROPERTYKEY(UI_PKEY_ApplicationButtonColor, VT_VECTOR | VT_UI4, 2003);
 #endif
 void CMainWindow::SetTheme(bool dark)
 {
+    // as of the windows 10 update 1809, the background color
+    // of the ribbon does not change anymore!
+    // But, through reverse engineering I found the UI_PKEY_DarkModeRibbon
+    // property, which we can use instead.
+    bool bCanChangeBackground = true;
+    PWSTR sysPath = nullptr;
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_System, 0, nullptr, &sysPath)))
+    {
+        std::wstring dllPath = sysPath;
+        CoTaskMemFree(sysPath);
+        dllPath += L"\\uiribbon.dll";
+        auto version = CPathUtils::GetVersionFromFile(L"uiribbon.dll");
+        std::vector<std::wstring> tokens;
+        stringtok(tokens, version, false, L".");
+        if (tokens.size() == 4)
+        {
+            auto major = std::stol(tokens[0]);
+            //auto minor = std::stol(tokens[1]);
+            auto micro = std::stol(tokens[2]);
+            //auto build = std::stol(tokens[3]);
+
+            // the windows 10 update 1809 has the version
+            // number as 10.0.17763.10000
+            if (major == 10 && micro > 17762)
+                bCanChangeBackground = false;
+        }
+    }
+
     if (dark)
     {
-        // as of the windows 10 update 1809, the background color
-        // of the ribbon does not change anymore!
-        // But, through reverse engineering I found the UI_PKEY_DarkModeRibbon
-        // property, which we can use instead.
-        bool bCanChangeBackground = true;
-        PWSTR sysPath = nullptr;
-        if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_System, 0, nullptr, &sysPath)))
-        {
-            std::wstring dllPath = sysPath;
-            CoTaskMemFree(sysPath);
-            dllPath += L"\\uiribbon.dll";
-            auto version = CPathUtils::GetVersionFromFile(L"uiribbon.dll");
-            std::vector<std::wstring> tokens;
-            stringtok(tokens, version, false, L".");
-            if (tokens.size() == 4)
-            {
-                auto major = std::stol(tokens[0]);
-                //auto minor = std::stol(tokens[1]);
-                auto micro = std::stol(tokens[2]);
-                //auto build = std::stol(tokens[3]);
-
-                // the windows 10 update 1809 has the version
-                // number as 10.0.17763.10000
-                if (major == 10 && micro > 17762)
-                    bCanChangeBackground = false;
-            }
-        }
         if (bCanChangeBackground)
             SetRibbonColorsHSB(UI_HSB(0, 0, 255), UI_HSB(160, 0, 0), UI_HSB(160, 44, 0));
         else
@@ -3901,6 +3902,18 @@ void CMainWindow::SetTheme(bool dark)
     else
     {
         SetRibbonColorsHSB(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
+        if (!bCanChangeBackground)
+        {
+            IPropertyStorePtr spPropertyStore;
+            HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
+            if (SUCCEEDED(hr))
+            {
+                PROPVARIANT propvarDarkMode;
+                InitPropVariantFromBoolean(false, &propvarDarkMode);
+                spPropertyStore->SetValue(UI_PKEY_DarkModeRibbon, propvarDarkMode);
+                spPropertyStore->Commit();
+            }
+        }
         SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
         if (IsWindow(m_StatusBar))
             SetClassLongPtr(m_StatusBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
