@@ -40,6 +40,7 @@
 #include "ProgressDlg.h"
 #include "CustomTooltip.h"
 #include "GDIHelpers.h"
+#include "Windows10Colors.h"
 
 #include <memory>
 #include <cassert>
@@ -714,6 +715,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         }
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
+    break;
+    case WM_SETTINGCHANGE:
+    case WM_SYSCOLORCHANGE:
+        SetTheme(CTheme::Instance().IsDarkTheme());
     break;
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -3837,7 +3842,7 @@ void CMainWindow::GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI
 // use CTheme::Instance::SetDarkTheme to actually set the theme.
 #ifndef UI_PKEY_DarkModeRibbon
 DEFINE_UIPROPERTYKEY(UI_PKEY_DarkModeRibbon, VT_BOOL, 2004);
-DEFINE_UIPROPERTYKEY(UI_PKEY_ApplicationButtonColor, VT_VECTOR | VT_UI4, 2003);
+DEFINE_UIPROPERTYKEY(UI_PKEY_ApplicationButtonColor, VT_UI4, 2003);
 #endif
 void CMainWindow::SetTheme(bool dark)
 {
@@ -3866,6 +3871,24 @@ void CMainWindow::SetTheme(bool dark)
             // number as 10.0.17763.10000
             if (major == 10 && micro > 17762)
                 bCanChangeBackground = false;
+        }
+    }
+
+    Win10Colors::AccentColor accentColor;
+    if (SUCCEEDED(Win10Colors::GetAccentColor(accentColor)))
+    {
+        BYTE h, s, b;
+        GDIHelpers::RGBToHSB(dark ? accentColor.accent : accentColor.accent, h, s, b);
+        UI_HSBCOLOR aColor = UI_HSB(h, s, b);
+
+        IPropertyStorePtr spPropertyStore;
+        HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
+        if (SUCCEEDED(hr))
+        {
+            PROPVARIANT propvarAccentColor;
+            InitPropVariantFromUInt32(aColor, &propvarAccentColor);
+            spPropertyStore->SetValue(UI_PKEY_ApplicationButtonColor, propvarAccentColor);
+            spPropertyStore->Commit();
         }
     }
 

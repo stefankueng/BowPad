@@ -244,6 +244,7 @@
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
     <ClInclude Include="..\ext\sktoolslib\TempFile.h" />
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
+    <ClInclude Include="..\ext\sktoolslib\Windows10Colors.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppUtils.h" />
     <ClInclude Include="BowPadUI.h">
@@ -357,6 +358,7 @@
     <ClCompile Include="..\ext\sktoolslib\SysInfo.cpp" />
     <ClCompile Include="..\ext\sktoolslib\TempFile.cpp" />
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\Windows10Colors.cpp" />
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AppUtils.cpp" />
     <ClCompile Include="BowPad.cpp" />
