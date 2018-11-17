@@ -347,7 +347,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
 
-            // calc total tab width
+            // calculate total tab width
             GetClientRect(*this, &rClient);
             SetRectEmpty(&rTotalTab);
 
@@ -366,9 +366,9 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             // then if background color is set, paint the visible background
             // area of the tabs in the bkgnd color
-            // note: the mfc code for drawing the tabs makes all sorts of assumptions
+            // note: the MFC code for drawing the tabs makes all sorts of assumptions
             // about the background color of the tab control being the same as the page
-            // color - in some places the background color shows thru' the pages!!
+            // color - in some places the background color shows through the pages!!
             // so we must only paint the background color where we need to, which is that
             // portion of the tab area not excluded by the tabs themselves
             crBack = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
@@ -595,7 +595,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             return TRUE;
         }
             break;
-        case WM_RBUTTONDOWN:   //rightclick selects tab aswell
+        case WM_RBUTTONDOWN:   //right click selects tab as well
         {
             ::CallWindowProc(m_TabBarDefaultProc, hwnd, WM_LBUTTONDOWN, wParam, lParam);
             return TRUE;
