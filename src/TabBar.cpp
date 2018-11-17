@@ -361,7 +361,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             int nTabHeight = rTotalTab.bottom - rTotalTab.top;
 
             // add a bit
-            InflateRect(&rTotalTab, 2, 3);
+            InflateRect(&rTotalTab, int(2.0f * m_dpiScaleX), int(3.0f * m_dpiScaleY));
             rEdge = rTotalTab;
 
             // then if background color is set, paint the visible background
@@ -375,20 +375,20 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             // full width of tab ctrl above top of tabs
             rBkgnd = rClient;
-            rBkgnd.bottom = rTotalTab.top + 3;
+            rBkgnd.bottom = rTotalTab.top + int(3.0f * m_dpiScaleY);
             SetBkColor(hDC, crBack);
             ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, nullptr);
 
             // width of tab ctrl visible bkgnd including bottom pixel of tabs to left of tabs
             rBkgnd = rClient;
             rBkgnd.right = 2;
-            rBkgnd.bottom = rBkgnd.top + (nTabHeight + 2);
+            rBkgnd.bottom = rBkgnd.top + (nTabHeight + int(2.0f * m_dpiScaleY));
             ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, nullptr);
 
             // to right of tabs
             rBkgnd = rClient;
-            rBkgnd.left += (rTotalTab.right - (max(rTotalTab.left, 0))) - 2;
-            rBkgnd.bottom = rBkgnd.top + (nTabHeight + 2);
+            rBkgnd.left += (rTotalTab.right - (max(rTotalTab.left, 0))) - int(2.0f * m_dpiScaleX);
+            rBkgnd.bottom = rBkgnd.top + (nTabHeight + int(2.0f * m_dpiScaleY));
             ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, nullptr);
 
             return TRUE;
@@ -414,7 +414,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             GetClientRect(*this, &dis.rcItem);
             rPage = dis.rcItem;
             TabCtrl_AdjustRect(*this, FALSE, &rPage);
-            dis.rcItem.top = rPage.top - 2;
+            dis.rcItem.top = rPage.top - int(2.0f * m_dpiScaleY);
 
             DrawMainBorder(&dis);
 
@@ -439,7 +439,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                     APPVERIFY(got);
                     if (got)
                     {
-                        dis.rcItem.bottom -= 2;
+                        dis.rcItem.bottom -= int(2.0f * m_dpiScaleY);
                         DrawItem(&dis, (float)Animator::GetValue(m_animVars[GetIDFromIndex(nTab).GetValue()]));
                         DrawItemBorder(&dis);
                     }
@@ -457,8 +457,8 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 APPVERIFY(got);
                 if (got)
                 {
-                    dis.rcItem.bottom += 2;
-                    dis.rcItem.top -= 2;
+                    dis.rcItem.bottom += int(2.0f * m_dpiScaleY);
+                    dis.rcItem.top -= int(2.0f * m_dpiScaleY);
                     DrawItem(&dis, (float)Animator::GetValue(m_animVars[GetIDFromIndex(nSel).GetValue()]));
                     DrawItemBorder(&dis);
                 }
@@ -867,13 +867,14 @@ void CTabBar::DrawItemBorder(const LPDRAWITEMSTRUCT lpdis) const
     COLORREF crHighlight = GDIHelpers::Lighter(crTab, 1.5f);
     COLORREF crShadow = GDIHelpers::Darker(crTab, 0.75f);
 
-    rItem.bottom += bSelected ? -1 : 1;
+    const int onedpi = int(1.0f * m_dpiScaleX);
+    rItem.bottom += bSelected ? -onedpi : onedpi;
 
     // edges
 
-    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.left, rItem.top, rItem.left + 1, rItem.bottom, crHighlight);
-    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.left, rItem.top, rItem.right, rItem.top + 1, crHighlight);
-    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.right - 1, rItem.top, rItem.right, rItem.bottom, crShadow);
+    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.left, rItem.top, rItem.left + onedpi, rItem.bottom, crHighlight);
+    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.left, rItem.top, rItem.right, rItem.top + onedpi, crHighlight);
+    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.right - onedpi, rItem.top, rItem.right, rItem.bottom, crShadow);
 }
 
 void CTabBar::DrawMainBorder(const LPDRAWITEMSTRUCT lpdis) const
@@ -891,9 +892,9 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     RECT rItem(pDrawItemStruct->rcItem);
 
     if (bSelected)
-        rItem.bottom -= 1;
+        rItem.bottom -= int(1.0f * m_dpiScaleY);
     else
-        rItem.bottom += 2;
+        rItem.bottom += int(2.0f * m_dpiScaleY);
 
     // tab
     // blend from back color to COLOR_3DFACE if 16 bit mode or better
@@ -935,24 +936,25 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
         if (tci.iImage == REDONLY_IMG_INDEX)
             indicColor = RGB(80, 80, 80);
         else if (tci.iImage == UNSAVED_IMG_INDEX)
-            indicColor = RGB(200, 0, 0);
+            indicColor = CTheme::Instance().IsDarkTheme() ? RGB(200, 0, 0) : RGB(150, 0, 0);
         else
-            indicColor = RGB(0, 200, 0);
-        GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - 5, rItem.right, rItem.bottom,
+            indicColor = CTheme::Instance().IsDarkTheme() ? RGB(0, 200, 0) : RGB(0, 150, 0);
+        const int off = int(5.0f * m_dpiScaleX);
+        GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - off, rItem.right, rItem.bottom,
                                   CTheme::Instance().GetThemeColor(indicColor));
     }
 
-    const int PADDING = 2;
+    const int PADDING = int(2.0f * m_dpiScaleX);
     // text & icon
     rItem.left += PADDING;
-    rItem.top += PADDING + (bSelected ? 1 : 0);
+    rItem.top += PADDING + (bSelected ? int(1.0f * m_dpiScaleY) : 0);
 
     SetBkMode(pDrawItemStruct->hDC, TRANSPARENT);
 
     // draw close button
     RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(pDrawItemStruct->rcItem);
     if (bSelected)
-        closeButtonRect.left -= 2;
+        closeButtonRect.left -= int(2.0f * m_dpiScaleX);
     // 3 status for each inactive tab and selected tab close item :
     // normal / hover / pushed
     int idCloseImg = IDR_CLOSETAB;
@@ -982,7 +984,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     if (TABBAR_SHOWDISKICON && hilTabs)
     {
         ImageList_Draw(hilTabs, tci.iImage, pDrawItemStruct->hDC, rItem.left, rItem.top, ILD_TRANSPARENT);
-        rItem.left += 16 + PADDING;
+        rItem.left += int(16.0f * m_dpiScaleX) + PADDING;
     }
     else
         rItem.left += PADDING;
@@ -1011,7 +1013,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     {
         RECT rAsterisk = rItem;
         ::DrawText(pDrawItemStruct->hDC, L"*", 1, &rAsterisk, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_CALCRECT);
-        AsteriskOffset = (rAsterisk.right - rAsterisk.left) + 4;
+        AsteriskOffset = (rAsterisk.right - rAsterisk.left) + int(4.0f * m_dpiScaleX);
     }
 
     rItem.right -= AsteriskOffset;

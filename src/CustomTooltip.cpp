@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2017 - Stefan Kueng
+// Copyright (C) 2016-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -67,7 +67,10 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
     auto textbuf = std::make_unique<wchar_t[]>(m_infoText.size() + 4);
     wcscpy_s(textbuf.get(), m_infoText.size() + 4, m_infoText.c_str());
     RECT rc;
-    rc.left = 0; rc.right = 800; rc.top = 0; rc.bottom = 800;
+    rc.left   = 0;
+    rc.right  = int(800.0f * m_dpiScaleX);
+    rc.top    = 0;
+    rc.bottom = int(800.0f * m_dpiScaleY);
 
     NONCLIENTMETRICS ncm;
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
@@ -85,7 +88,7 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
     }
     SetTransparency(0);
     SetWindowPos(*this, nullptr,
-                 screenPt.x - rc.right / 2, screenPt.y - rc.bottom - 20,
+                 screenPt.x - rc.right / 2, screenPt.y - rc.bottom - int(20.0f * m_dpiScaleY),
                  rc.right + BORDER + BORDER, rc.bottom + BORDER + BORDER,
                  SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW);
 
