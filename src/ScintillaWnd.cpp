@@ -191,8 +191,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETCARETLINEVISIBLEALWAYS, true);
     Call(SCI_SETCARETWIDTH, bUseD2D ? 2 : 1);
     if (CIniSettings::Instance().GetInt64(L"View", L"caretlineframe", 1) != 0)
-        Call(SCI_SETCARETLINEFRAME, CDPIAware::Instance().ScaleX(1));
-    Call(SCI_SETWHITESPACESIZE, CDPIAware::Instance().ScaleX(1));
+        Call(SCI_SETCARETLINEFRAME, CDPIAware::Instance().Scale(1));
+    Call(SCI_SETWHITESPACESIZE, CDPIAware::Instance().Scale(1));
     Call(SCI_SETMULTIPLESELECTION, 1);
     Call(SCI_SETMOUSESELECTIONRECTANGULARSWITCH, true);
     Call(SCI_SETADDITIONALSELECTIONTYPING, true);

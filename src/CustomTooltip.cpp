@@ -19,9 +19,9 @@
 #include "GDIHelpers.h"
 #include "Theme.h"
 
-#define COLORBOX_SIZE int(20*m_dpiScaleY)
-#define BORDER int(5*m_dpiScaleX)
-#define RECTBORDER int(2*m_dpiScaleX)
+#define COLORBOX_SIZE int(20*m_dpiScale)
+#define BORDER int(5*m_dpiScale)
+#define RECTBORDER int(2*m_dpiScale)
 
 void CCustomToolTip::Init(HWND hParent)
 {
@@ -68,9 +68,9 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
     wcscpy_s(textbuf.get(), m_infoText.size() + 4, m_infoText.c_str());
     RECT rc;
     rc.left   = 0;
-    rc.right  = int(800.0f * m_dpiScaleX);
+    rc.right  = int(800.0f * m_dpiScale);
     rc.top    = 0;
-    rc.bottom = int(800.0f * m_dpiScaleY);
+    rc.bottom = int(800.0f * m_dpiScale);
 
     NONCLIENTMETRICS ncm;
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
@@ -88,7 +88,7 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
     }
     SetTransparency(0);
     SetWindowPos(*this, nullptr,
-                 screenPt.x - rc.right / 2, screenPt.y - rc.bottom - int(20.0f * m_dpiScaleY),
+                 screenPt.x - rc.right / 2, screenPt.y - rc.bottom - int(20.0f * m_dpiScale),
                  rc.right + BORDER + BORDER, rc.bottom + BORDER + BORDER,
                  SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW);
 

@@ -100,7 +100,7 @@ void CDocScroll::InitScintilla(CScintillaWnd * pScintilla)
 
 LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW * pCustDraw)
 {
-    const int margin = CDPIAware::Instance().ScaleX(2);
+    const int margin = CDPIAware::Instance().Scale(2);
     // inserted buttons do not use PREPAINT etc..
     if (pCustDraw->nBar == SB_INSBUT)
     {
@@ -239,16 +239,16 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     p1.SetWidth(2.0);
 
                     RECT rc = pCustDraw->rect;
-                    InflateRect(&rc, CDPIAware::Instance().ScaleX(-2), CDPIAware::Instance().ScaleY(-2));
+                    InflateRect(&rc, CDPIAware::Instance().Scale(-2), CDPIAware::Instance().Scale(-2));
                     Gdiplus::GraphicsPath path;
                     // top left
-                    path.AddArc(rc.left, rc.top, CDPIAware::Instance().ScaleX(4), CDPIAware::Instance().ScaleY(4), 180, 90);
+                    path.AddArc(rc.left, rc.top, CDPIAware::Instance().Scale(4), CDPIAware::Instance().Scale(4), 180, 90);
                     // top right
-                    path.AddArc(rc.right - CDPIAware::Instance().ScaleX(4 - 1), rc.top, CDPIAware::Instance().ScaleX(4), CDPIAware::Instance().ScaleY(4), 270, 90);
+                    path.AddArc(rc.right - CDPIAware::Instance().Scale(4 - 1), rc.top, CDPIAware::Instance().Scale(4), CDPIAware::Instance().Scale(4), 270, 90);
                     // bottom right
-                    path.AddArc(rc.right - CDPIAware::Instance().ScaleX(4 - 1), rc.bottom - CDPIAware::Instance().ScaleY(4 - 1), CDPIAware::Instance().ScaleX(4), CDPIAware::Instance().ScaleY(4), 0, 90);
+                    path.AddArc(rc.right - CDPIAware::Instance().Scale(4 - 1), rc.bottom - CDPIAware::Instance().Scale(4 - 1), CDPIAware::Instance().Scale(4), CDPIAware::Instance().Scale(4), 0, 90);
                     // bottom left
-                    path.AddArc(rc.left, rc.bottom - CDPIAware::Instance().ScaleX(4 - 1), CDPIAware::Instance().ScaleX(4), CDPIAware::Instance().ScaleY(4), 90, 90);
+                    path.AddArc(rc.left, rc.bottom - CDPIAware::Instance().Scale(4 - 1), CDPIAware::Instance().Scale(4), CDPIAware::Instance().Scale(4), 90, 90);
                     path.CloseFigure();
                     graphics.DrawPath(&p1, &path);
 
@@ -287,7 +287,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                                 Gdiplus::Color c2;
                                 c2.SetFromCOLORREF(line.second);
                                 Gdiplus::SolidBrush brushline(c2);
-                                graphics.FillRectangle(&brushline, drawx, linepos, colwidth, CDPIAware::Instance().ScaleY(2));
+                                graphics.FillRectangle(&brushline, drawx, linepos, colwidth, CDPIAware::Instance().Scale(2));
                                 lastLinePos = linepos;
                                 lastColor = line.second;
                             }
@@ -298,7 +298,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     Gdiplus::Color c3;
                     c3.SetFromCOLORREF(m_curPosColor);
                     Gdiplus::SolidBrush brushcurline(c3);
-                    graphics.FillRectangle(&brushcurline, pCustDraw->rect.left, linepos, pCustDraw->rect.right - pCustDraw->rect.left, CDPIAware::Instance().ScaleX(2));
+                    graphics.FillRectangle(&brushcurline, pCustDraw->rect.left, linepos, pCustDraw->rect.right - pCustDraw->rect.left, CDPIAware::Instance().Scale(2));
                 }
                 break;
             }
