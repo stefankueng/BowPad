@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -62,13 +62,13 @@ bool ChangeCase(std::function<sptr_t(int msg, uptr_t wParam, sptr_t lParam)> Sci
 bool CCmdConvertUppercase::Execute()
 {
     auto SciCall = std::bind(&CCmdConvertUppercase::ScintillaCall, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    return ChangeCase(SciCall, [](auto& selText) { std::transform(selText.begin(), selText.end(), selText.begin(), ::towupper); });
+    return ChangeCase(SciCall, [](auto& selText) { CharUpper(selText.data()); });
 }
 
 bool CCmdConvertLowercase::Execute()
 {
     auto SciCall = std::bind(&CCmdConvertLowercase::ScintillaCall, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    return ChangeCase(SciCall, [](auto& selText) { std::transform(selText.begin(), selText.end(), selText.begin(), ::towlower); });
+    return ChangeCase(SciCall, [](auto& selText) { CharLower(selText.data()); });
 }
 
 bool CCmdConvertTitlecase::Execute()
@@ -78,12 +78,12 @@ bool CCmdConvertTitlecase::Execute()
     {
         if (selText.length() > 0)
         {
-            selText[0] = (wchar_t)toupper(selText[0]);
+            selText[0] = (wchar_t)LOWORD(CharUpper((LPWSTR)selText[0]));
             for (std::wstring::iterator it = selText.begin() + 1; it != selText.end(); ++it)
             {
-                if (!isalpha(*(it - 1)) && islower(*it))
+                if (!IsCharAlpha(*(it - 1)) && IsCharLower(*it))
                 {
-                    *it = (wchar_t)toupper(*it);
+                    *it = (wchar_t)LOWORD(CharUpper((LPWSTR)*it));
                 }
             }
         }
