@@ -142,6 +142,11 @@
         <Image>res/Paste.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdPasteHtml" LabelTitle="Paste Html" TooltipTitle="Clipboard" TooltipDescription="Inserts the html content of the clipboard at the cursor position" Keytip="H">
+      <Command.LargeImages>
+        <Image>res/Paste.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdUndo" LabelTitle="Undo" TooltipTitle="Undo" TooltipDescription="Undo the last change" Keytip="Z">
       <Command.LargeImages>
         <Image>res/UndoL.bmp</Image>
@@ -902,8 +907,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <ToggleButton CommandName="cmdSessionAutoLoad" />
             <ToggleButton CommandName="cmdWriteProtect" />
           </Group>
-          <Group CommandName="cmdGroupClipboard" SizeDefinition="ThreeButtons-OneBigAndTwoSmall">
+          <Group CommandName="cmdGroupClipboard" SizeDefinition="FourButtons">
             <Button CommandName="cmdPaste" />
+            <Button CommandName="cmdPasteHtml" />
             <Button CommandName="cmdCopy" />
             <Button CommandName="cmdCut" />
           </Group>
@@ -1247,6 +1253,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdCut" />
             <Button CommandName="cmdCopy" />
             <Button CommandName="cmdPaste" />
+            <Button CommandName="cmdPasteHtml" />
           </MenuGroup>
         </MiniToolbar>
       </ContextPopup.MiniToolbars>
@@ -1264,6 +1271,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdCut" />
             <Button CommandName="cmdCopy" />
             <Button CommandName="cmdPaste" />
+            <Button CommandName="cmdPasteHtml" />
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="cmdLaunchSearch"/>

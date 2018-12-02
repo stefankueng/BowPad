@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -123,4 +123,25 @@ public:
     void ScintillaNotify(SCNotification * pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+};
+
+class CCmdPasteHtml : public ClipboardBase
+{
+public:
+
+    CCmdPasteHtml(void * obj) : ClipboardBase(obj)
+    {
+    }
+
+    ~CCmdPasteHtml() = default;
+
+    bool Execute() override;
+
+    UINT GetCmdId() override { return cmdPasteHtml; }
+
+    void ScintillaNotify(SCNotification * pScn) override;
+
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+private:
+    void HtmlExtractMetadata(const std::string& cf_html, std::string* base_url, size_t* html_start, size_t* fragment_start, size_t* fragment_end);
 };

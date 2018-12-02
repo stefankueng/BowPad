@@ -125,6 +125,7 @@ void CCommandHandler::Init(void * obj)
     Add<CCmdCopy>(obj);
     Add<CCmdCopyPlain>(obj);
     Add<CCmdPaste>(obj);
+    Add<CCmdPasteHtml>(obj);
     Add<CCmdDelete>(obj);
     Add<CCmdSelectAll>(obj);
     Add<CCmdGotoBrace>(obj);

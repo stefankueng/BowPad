@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017 - Stefan Kueng
+// Copyright (C) 2014-2018 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 #include "OnOutOfScope.h"
 
 static constexpr wchar_t CF_BPLEXER[] = { L"BP Lexer" };
+static auto CF_HTML = RegisterClipboardFormat(L"HTML Format");
+
 
 std::string ClipboardBase::GetHtmlSelection()
 {
@@ -165,7 +167,6 @@ void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml)
                 strcpy_s(pchData, sLen + 1, sHtml.c_str());
                 if (GlobalUnlock(hClipboardData))
                 {
-                    auto CF_HTML = RegisterClipboardFormat(L"HTML Format");
                     SetClipboardData(CF_HTML, hClipboardData);
                 }
             }
@@ -334,4 +335,107 @@ HRESULT CCmdPaste::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PRO
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_CANPASTE) != 0), ppropvarNewValue);
     }
     return E_NOTIMPL;
+}
+
+bool CCmdPasteHtml::Execute()
+{
+    // test first if there's a file on the clipboard
+    {
+        CClipboardHelper clipboard;
+        if (clipboard.Open(GetHwnd()))
+        {
+            HANDLE hData = GetClipboardData(CF_HTML);
+            if (hData)
+            {
+                char* buffer = (char*)GlobalLock(hData);
+                std::string str(buffer);
+                ::GlobalUnlock(hData);
+                std::string baseUrl;
+                size_t html_start = 0;
+                size_t frag_start = 0;
+                size_t frag_end = 0;
+                HtmlExtractMetadata(str, &baseUrl, &html_start, &frag_start, &frag_end);
+                auto htmlStr = str.substr(frag_start, frag_end - frag_start);
+                ScintillaCall(SCI_ADDTEXT, htmlStr.size(), (sptr_t)htmlStr.c_str());
+            }
+        }
+    }
+    return true;
+}
+
+void CCmdPasteHtml::ScintillaNotify(SCNotification * pScn)
+{
+    if (pScn->nmhdr.code == SCN_MODIFIED)
+        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
+}
+
+HRESULT CCmdPasteHtml::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+{
+    if (UI_PKEY_Enabled == key)
+    {
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, IsClipboardFormatAvailable(CF_HTML), ppropvarNewValue);
+    }
+    return E_NOTIMPL;
+}
+
+void CCmdPasteHtml::HtmlExtractMetadata(const std::string& cf_html,
+                                        std::string*       base_url,
+                                        size_t*            html_start,
+                                        size_t*            fragment_start,
+                                        size_t*            fragment_end)
+{
+    // Obtain base_url if present.
+    if (base_url)
+    {
+        static std::string src_url_str("SourceURL:");
+        size_t             line_start = cf_html.find(src_url_str);
+        if (line_start != std::string::npos)
+        {
+            size_t src_end   = cf_html.find("\n", line_start);
+            size_t src_start = line_start + src_url_str.length();
+            if (src_end != std::string::npos && src_start != std::string::npos)
+            {
+                *base_url = cf_html.substr(src_start, src_end - src_start);
+                *base_url = CStringUtils::trim(*base_url);
+            }
+        }
+    }
+
+    // Find the markup between "<!--StartFragment-->" and "<!--EndFragment-->".
+    // If the comments cannot be found, like copying from OpenOffice Writer,
+    // we simply fall back to using StartFragment/EndFragment bytecount values
+    // to determine the fragment indexes.
+    std::string cf_html_lower = cf_html;
+    std::transform(cf_html_lower.begin(), cf_html_lower.end(), cf_html_lower.begin(), [](char c) { return (char)::tolower(c); });
+
+    size_t      markup_start  = cf_html_lower.find("<html", 0);
+    if (html_start)
+    {
+        *html_start = markup_start;
+    }
+    size_t tag_start = cf_html.find("<!--StartFragment", markup_start);
+    if (tag_start == std::string::npos)
+    {
+        static std::string start_fragment_str("StartFragment:");
+        size_t             start_fragment_start = cf_html.find(start_fragment_str);
+        if (start_fragment_start != std::string::npos)
+        {
+            *fragment_start = static_cast<size_t>(atoi(cf_html.c_str() +
+                                                       start_fragment_start + start_fragment_str.length()));
+        }
+
+        static std::string end_fragment_str("EndFragment:");
+        size_t             end_fragment_start = cf_html.find(end_fragment_str);
+        if (end_fragment_start != std::string::npos)
+        {
+            *fragment_end = static_cast<size_t>(atoi(cf_html.c_str() +
+                                                     end_fragment_start + end_fragment_str.length()));
+        }
+    }
+    else
+    {
+        *fragment_start = cf_html.find('>', tag_start) + 1;
+        size_t tag_end  = cf_html.rfind("<!--EndFragment", std::string::npos);
+        *fragment_end   = cf_html.rfind('<', tag_end);
+    }
 }
