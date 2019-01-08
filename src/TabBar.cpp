@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -894,7 +894,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     if (bSelected)
         rItem.bottom -= int(1.0f * m_dpiScale);
     else
-        rItem.bottom += int(2.0f * m_dpiScale);
+        rItem.bottom -= int(2.0f * m_dpiScale);
 
     // tab
     // blend from back color to COLOR_3DFACE if 16 bit mode or better
@@ -1016,14 +1016,16 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
         AsteriskOffset = (rAsterisk.right - rAsterisk.left) + int(4.0f * m_dpiScale);
     }
 
+    rItem.bottom = pDrawItemStruct->rcItem.bottom;
+    rItem.top = pDrawItemStruct->rcItem.top;
     rItem.right -= AsteriskOffset;
-    ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER);
+    ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
     rItem.right += AsteriskOffset;
     // now draw the asterisk if necessary
     if (tci.iImage == UNSAVED_IMG_INDEX)
     {
         rItem.left = rItem.right - AsteriskOffset;
-        ::DrawText(pDrawItemStruct->hDC, L"*", 1, &rItem, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER);
+        ::DrawText(pDrawItemStruct->hDC, L"*", 1, &rItem, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
     }
 }
 
