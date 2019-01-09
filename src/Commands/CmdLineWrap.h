@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ public:
         return true;
     }
 
-    void AfterInit() override
+    void BeforeLoad() override
     {
         int wrapmode = (int)CIniSettings::Instance().GetInt64(L"View", L"wrapmode", 0);
         ScintillaCall(SCI_SETWRAPMODE, wrapmode);
