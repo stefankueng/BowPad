@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -90,6 +90,7 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_hasConsolas(false)
     , m_bInFolderMargin(false)
     , m_LineToScrollToAfterPaint((size_t)-1)
+    , m_WrapOffsetToScrollToAfterPaint(0)
 {
     HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
                              OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
@@ -772,16 +773,27 @@ void CScintillaWnd::UpdateLineNumberWidth()
 
 void CScintillaWnd::SaveCurrentPos(CPosData& pos)
 {
-    auto firstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
-    pos.m_nFirstVisibleLine   = Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine);
-    if (Call(SCI_GETWRAPMODE) != SC_WRAP_NONE)
-        pos.m_nWrapLineOffset = firstVisibleLine - Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
+    // don't save the position if the window has never been
+    // painted: if there's still a valid m_LineToScrollToAfterPaint
+    // then the scroll position hasn't been set properly yet
+    // and reading the positions would be wrong.
+    if (m_LineToScrollToAfterPaint == (size_t)-1)
+    {
+        auto firstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
+        pos.m_nFirstVisibleLine   = Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine);
+        if (Call(SCI_GETWRAPMODE) != SC_WRAP_NONE)
+            pos.m_nWrapLineOffset = firstVisibleLine - Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
 
-    pos.m_nStartPos           = Call(SCI_GETANCHOR);
-    pos.m_nEndPos             = Call(SCI_GETCURRENTPOS);
-    pos.m_xOffset             = Call(SCI_GETXOFFSET);
-    pos.m_nSelMode            = Call(SCI_GETSELECTIONMODE);
-    pos.m_nScrollWidth        = Call(SCI_GETSCROLLWIDTH);
+        pos.m_nStartPos           = Call(SCI_GETANCHOR);
+        pos.m_nEndPos             = Call(SCI_GETCURRENTPOS);
+        pos.m_xOffset             = Call(SCI_GETXOFFSET);
+        pos.m_nSelMode            = Call(SCI_GETSELECTIONMODE);
+        pos.m_nScrollWidth        = Call(SCI_GETSCROLLWIDTH);
+    }
+    else
+    {
+        m_LineToScrollToAfterPaint = (size_t)-1;
+    }
 }
 
 void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
@@ -802,8 +814,6 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     Call(SCI_CHOOSECARETX);
 
     size_t lineToShow = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
-    lineToShow += pos.m_nWrapLineOffset;
-    Call(SCI_LINESCROLL, 0, lineToShow);
     if (wrapmode != SC_WRAP_NONE)
     {
         // if wrapping is enabled, scrolling to a line won't work
@@ -813,7 +823,10 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
         // which then is used to scroll scintilla to that line after
         // the first SCN_PAINTED event.
         m_LineToScrollToAfterPaint = lineToShow;
+        m_WrapOffsetToScrollToAfterPaint = pos.m_nWrapLineOffset;
     }
+    else
+        Call(SCI_LINESCROLL, 0, lineToShow);
     // call UpdateLineNumberWidth() here, just in case the SCI_LINESCROLL call
     // above does not scroll the window.
     UpdateLineNumberWidth();
@@ -2196,8 +2209,12 @@ void CScintillaWnd::ReflectEvents(SCNotification * pScn)
     case SCN_PAINTED:
         if (m_LineToScrollToAfterPaint != (size_t)-1)
         {
+            m_LineToScrollToAfterPaint = Call(SCI_VISIBLEFROMDOCLINE, m_LineToScrollToAfterPaint);
+            m_LineToScrollToAfterPaint += m_WrapOffsetToScrollToAfterPaint;
             Call(SCI_LINESCROLL, 0, m_LineToScrollToAfterPaint);
             m_LineToScrollToAfterPaint = (size_t)-1;
+            m_WrapOffsetToScrollToAfterPaint = 0;
+            UpdateLineNumberWidth();
         }
         break;
     }

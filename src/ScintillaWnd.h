@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -153,6 +153,7 @@ private:
     bool                        m_bInFolderMargin;
     bool                        m_hasConsolas;
     size_t                      m_LineToScrollToAfterPaint;
+    size_t                      m_WrapOffsetToScrollToAfterPaint;
     IUIAnimationVariablePtr     m_animVarGrayFore;
     IUIAnimationVariablePtr     m_animVarGrayBack;
     IUIAnimationVariablePtr     m_animVarGraySel;
