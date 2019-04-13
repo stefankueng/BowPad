@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018 - Stefan Kueng
+// Copyright (C) 2014-2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "LexStyles.h"
 #include "ClipboardHelper.h"
 #include "OnOutOfScope.h"
+#include <stdexcept>
 
 static constexpr wchar_t CF_BPLEXER[] = { L"BP Lexer" };
 static auto CF_HTML = RegisterClipboardFormat(L"HTML Format");
