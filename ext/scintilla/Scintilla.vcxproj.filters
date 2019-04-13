@@ -663,5 +663,8 @@
     <ClCompile Include="lexers\LexNim.cxx">
       <Filter>lexers</Filter>
     </ClCompile>
+    <ClCompile Include="lexers\LexCIL.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
-#include <cctype>
 #include <cstdio>
 #include <cmath>
 
@@ -64,7 +63,7 @@ static constexpr bool IsControlCharacter(int ch) noexcept {
 	return ch >= 0 && ch < ' ';
 }
 
-PrintParameters::PrintParameters() {
+PrintParameters::PrintParameters() noexcept {
 	magnification = 0;
 	colourMode = SC_PRINT_NORMAL;
 	wrapState = eWrapWord;
@@ -193,25 +192,25 @@ EditView::EditView() {
 EditView::~EditView() {
 }
 
-bool EditView::SetTwoPhaseDraw(bool twoPhaseDraw) {
+bool EditView::SetTwoPhaseDraw(bool twoPhaseDraw) noexcept {
 	const PhasesDraw phasesDrawNew = twoPhaseDraw ? phasesTwo : phasesOne;
 	const bool redraw = phasesDraw != phasesDrawNew;
 	phasesDraw = phasesDrawNew;
 	return redraw;
 }
 
-bool EditView::SetPhasesDraw(int phases) {
+bool EditView::SetPhasesDraw(int phases) noexcept {
 	const PhasesDraw phasesDrawNew = static_cast<PhasesDraw>(phases);
 	const bool redraw = phasesDraw != phasesDrawNew;
 	phasesDraw = phasesDrawNew;
 	return redraw;
 }
 
-bool EditView::LinesOverlap() const {
+bool EditView::LinesOverlap() const noexcept {
 	return phasesDraw == phasesMultiple;
 }
 
-void EditView::ClearAllTabstops() {
+void EditView::ClearAllTabstops() noexcept {
 	ldTabstops.reset();
 }
 
@@ -279,7 +278,7 @@ void EditView::AllocateGraphics(const ViewStyle &vsDraw) {
 		pixmapIndentGuideHighlight.reset(Surface::Allocate(vsDraw.technology));
 }
 
-static const char *ControlCharacterString(unsigned char ch) {
+static const char *ControlCharacterString(unsigned char ch) noexcept {
 	const char * const reps[] = {
 		"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
 		"BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI",
@@ -826,7 +825,7 @@ Sci::Position EditView::StartEndDisplayLine(Surface *surface, const EditModel &m
 	return posRet;
 }
 
-static ColourDesired SelectionBackground(const ViewStyle &vsDraw, bool main, bool primarySelection) {
+static ColourDesired SelectionBackground(const ViewStyle &vsDraw, bool main, bool primarySelection) noexcept {
 	return main ?
 		(primarySelection ? vsDraw.selColours.back : vsDraw.selBackground2) :
 		vsDraw.selAdditionalBackground;
@@ -1422,7 +1421,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 	for (size_t r = 0; (r<model.sel.Count()) || drawDrag; r++) {
 		const bool mainCaret = r == model.sel.Main();
 		SelectionPosition posCaret = (drawDrag ? model.posDrag : model.sel.Range(r).caret);
-		if (vsDraw.caretStyle == CARETSTYLE_BLOCK && !drawDrag && posCaret > model.sel.Range(r).anchor) {
+		if ((vsDraw.IsBlockCaretStyle() || imeCaretBlockOverride) && !drawDrag && posCaret > model.sel.Range(r).anchor) {
 			if (posCaret.VirtualSpace() > 0)
 				posCaret.SetVirtualSpace(posCaret.VirtualSpace() - 1);
 			else
@@ -1453,7 +1452,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 			const bool caretBlinkState = (model.caret.active && model.caret.on) || (!additionalCaretsBlink && !mainCaret);
 			const bool caretVisibleState = additionalCaretsVisible || mainCaret;
 			if ((xposCaret >= 0) && (vsDraw.caretWidth > 0) && (vsDraw.caretStyle != CARETSTYLE_INVISIBLE) &&
-				((model.posDrag.IsValid()) || (caretBlinkState && caretVisibleState))) {
+				(drawDrag || (caretBlinkState && caretVisibleState))) {
 				bool caretAtEOF = false;
 				bool caretAtEOL = false;
 				bool drawBlockCaret = false;
@@ -1477,16 +1476,17 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 				if (xposCaret > 0)
 					caretWidthOffset = 0.51f;	// Move back so overlaps both character cells.
 				xposCaret += xStart;
-				if (model.posDrag.IsValid()) {
+				const ViewStyle::CaretShape caretShape = drawDrag ? ViewStyle::CaretShape::line : vsDraw.CaretShapeForMode(model.inOverstrike);
+				if (drawDrag) {
 					/* Dragging text, use a line caret */
 					rcCaret.left = round(xposCaret - caretWidthOffset);
 					rcCaret.right = rcCaret.left + vsDraw.caretWidth;
-				} else if (model.inOverstrike && drawOverstrikeCaret) {
+				} else if ((caretShape == ViewStyle::CaretShape::bar) && drawOverstrikeCaret) {
 					/* Overstrike (insert mode), use a modified bar caret */
 					rcCaret.top = rcCaret.bottom - 2;
 					rcCaret.left = xposCaret + 1;
 					rcCaret.right = rcCaret.left + widthOverstrikeCaret - 1;
-				} else if ((vsDraw.caretStyle == CARETSTYLE_BLOCK) || imeCaretBlockOverride) {
+				} else if ((caretShape == ViewStyle::CaretShape::block) || imeCaretBlockOverride) {
 					/* Block caret */
 					rcCaret.left = xposCaret;
 					if (!caretAtEOL && !caretAtEOF && (ll->chars[offset] != '\t') && !(IsControlCharacter(ll->chars[offset]))) {
@@ -2335,7 +2335,7 @@ void EditView::FillLineRemainder(Surface *surface, const EditModel &model, const
 // Space (3 space characters) between line numbers and text when printing.
 #define lineNumberPrintSpace "   "
 
-static ColourDesired InvertedLight(ColourDesired orig) {
+static ColourDesired InvertedLight(ColourDesired orig) noexcept {
 	unsigned int r = orig.GetRed();
 	unsigned int g = orig.GetGreen();
 	unsigned int b = orig.GetBlue();

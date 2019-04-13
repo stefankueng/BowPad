@@ -27,6 +27,8 @@
 #include "Style.h"
 #include "ViewStyle.h"
 
+#define CARETSTYLE_INS_MASK 0xF
+
 using namespace Scintilla;
 
 MarginStyle::MarginStyle(int style_, int width_, int mask_) :
@@ -570,6 +572,19 @@ bool ViewStyle::SetWrapIndentMode(int wrapIndentMode_) {
 	const bool changed = wrapIndentMode != wrapIndentMode_;
 	wrapIndentMode = wrapIndentMode_;
 	return changed;
+}
+
+bool ViewStyle::IsBlockCaretStyle() const noexcept {
+	return (caretStyle == CARETSTYLE_BLOCK) || (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) != 0;
+}
+
+ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike) const noexcept {
+	if (inOverstrike) {
+		return (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) ? CaretShape::block : CaretShape::bar;
+	}
+
+	const int caret = caretStyle & CARETSTYLE_INS_MASK;
+	return (caret <= CARETSTYLE_BLOCK) ? static_cast<CaretShape>(caret) : CaretShape::line;
 }
 
 void ViewStyle::AllocStyles(size_t sizeNew) {

@@ -212,6 +212,10 @@ public:
 
 	bool WhiteSpaceVisible(bool inIndent) const;
 
+	enum class CaretShape { invisible, line, block, bar };
+	bool IsBlockCaretStyle() const noexcept;
+	CaretShape CaretShapeForMode(bool inOverstrike) const noexcept;
+
 private:
 	void AllocStyles(size_t sizeNew);
 	void CreateAndAddFont(const FontSpecification &fs);

@@ -120,6 +120,7 @@ LEXOBJS=\
 	$(DIR_O)\LexBibTeX.obj \
 	$(DIR_O)\LexBullant.obj \
 	$(DIR_O)\LexCaml.obj \
+	$(DIR_O)\LexCIL.obj \
 	$(DIR_O)\LexCLW.obj \
 	$(DIR_O)\LexCmake.obj \
 	$(DIR_O)\LexCOBOL.obj \
@@ -562,6 +563,8 @@ $(DIR_O)\LexBibTeX.obj: ..\lexers\LexBibTeX.cxx $(LEX_HEADERS)
 $(DIR_O)\LexBullant.obj: ..\lexers\LexBullant.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexCaml.obj: ..\lexers\LexCaml.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexCIL.obj: ..\lexers\LexCIL.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexCLW.obj: ..\lexers\LexCLW.cxx $(LEX_HEADERS)
 

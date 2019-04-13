@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
-#include <cctype>
 #include <cstdio>
 #include <cmath>
 
@@ -101,7 +100,7 @@ void DrawWrapMarker(Surface *surface, PRectangle rcPlace,
 		y - 2 * dy);
 }
 
-MarginView::MarginView() {
+MarginView::MarginView() noexcept {
 	wrapMarkerPaddingRight = 3;
 	customDrawWrapMarker = nullptr;
 }
