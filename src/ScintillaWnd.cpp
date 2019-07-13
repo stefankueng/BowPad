@@ -231,6 +231,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     Call(SCI_SETSELALPHA, 128);
 
+    Call(SCI_SETCHARACTERCATEGORYOPTIMIZATION, 0x10000);
     SetupDefaultStyles();
 
     if (!g_initialized)

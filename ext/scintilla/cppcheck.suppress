@@ -10,8 +10,8 @@ useInitializationList
 // produces same result on empty collections
 useStlAlgorithm
 
-// cppcheck 1.86 seems to be misunderstanding flow control in the large switch statement
-knownConditionTrueFalse:scintilla/src/Editor.cxx
+// The two sections are for different purposes: C1 control set and UTF-8 invalid bytes
+duplicateCondition:scintilla/src/Editor.cxx
 
 // Some non-explicit constructors are used for conversions or are private to lexers
 noExplicitConstructor
@@ -38,6 +38,7 @@ variableScope:scintilla/lexers/LexBash.cxx
 variableScope:scintilla/lexers/LexBatch.cxx
 variableScope:scintilla/lexers/LexCmake.cxx
 variableScope:scintilla/lexers/LexCSS.cxx
+variableScope:scintilla/lexers/LexDataflex.cxx
 variableScope:scintilla/lexers/LexErlang.cxx
 variableScope:scintilla/lexers/LexGui4Cli.cxx
 variableScope:scintilla/lexers/LexInno.cxx
@@ -67,6 +68,12 @@ shadowVar:scintilla/lexers/LexVHDL.cxx
 unreadVariable:scintilla/lexers/LexVHDL.cxx
 variableScope:scintilla/lexers/LexVHDL.cxx
 unreadVariable:scintilla/lexers/LexVisualProlog.cxx
+
+// bp.itBracket not actually redundant as needed by return statements
+redundantAssignment:scintilla/lexers/LexCPP.cxx
+
+// safety initializations at start of GetCharacterExtents
+redundantAssignment:scintilla/gtk/ScintillaGTKAccessible.cxx
 
 // Suppress everything in catch.hpp as won't be changing
 *:scintilla/test/unit/catch.hpp

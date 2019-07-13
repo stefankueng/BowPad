@@ -169,6 +169,7 @@
     <ClCompile Include="lexers\LexCsound.cxx" />
     <ClCompile Include="lexers\LexCSS.cxx" />
     <ClCompile Include="lexers\LexD.cxx" />
+    <ClCompile Include="lexers\LexDataflex.cxx" />
     <ClCompile Include="lexers\LexDiff.cxx" />
     <ClCompile Include="lexers\LexDMAP.cxx" />
     <ClCompile Include="lexers\LexDMIS.cxx" />
@@ -250,6 +251,7 @@
     <ClCompile Include="lexers\LexVerilog.cxx" />
     <ClCompile Include="lexers\LexVHDL.cxx" />
     <ClCompile Include="lexers\LexVisualProlog.cxx" />
+    <ClCompile Include="lexers\LexX12.cxx" />
     <ClCompile Include="lexers\LexYAML.cxx" />
     <ClCompile Include="lexlib\Accessor.cxx" />
     <ClCompile Include="lexlib\CharacterCategory.cxx" />
@@ -289,6 +291,7 @@
     <ClCompile Include="src\Selection.cxx" />
     <ClCompile Include="src\Style.cxx" />
     <ClCompile Include="src\UniConversion.cxx" />
+    <ClCompile Include="src\UniqueString.cxx" />
     <ClCompile Include="src\ViewStyle.cxx" />
     <ClCompile Include="src\XPM.cxx" />
     <ClCompile Include="win32\HanjaDic.cxx" />

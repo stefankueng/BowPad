@@ -666,5 +666,14 @@
     <ClCompile Include="lexers\LexCIL.cxx">
       <Filter>lexers</Filter>
     </ClCompile>
+    <ClCompile Include="src\UniqueString.cxx">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="lexers\LexDataflex.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="lexers\LexX12.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
