@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -219,6 +219,12 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
                         else
                         {
                             m_lastKey = accel->key1;
+                            // ignore altcodes
+                            if (accel->fVirt == 0x10)
+                            {
+                                if (accel->key1 >= VK_NUMPAD0 && accel->key1 <= VK_NUMPAD9)
+                                    return FALSE;
+                            }
                             return TRUE;
                         }
                     }
