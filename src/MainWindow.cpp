@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1348,16 +1348,16 @@ void CMainWindow::ResizeChildWindows()
         MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
         const int tbHeight = tabrc.bottom - tabrc.top;
         const int tabBtnWidth = tbHeight + 2;
+        const int treeWidth = m_fileTreeVisible ? m_treeWidth : 0;
         const int mainWidth = rect.right - rect.left;
-        int treeWidth = m_fileTreeVisible ? m_treeWidth : 0;
 
         HDWP hDwp = BeginDeferWindowPos(6);
         DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), mainWidth, m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_TabBar, nullptr, rect.left, rect.top + m_RibbonHeight, mainWidth - tabBtnWidth - tabBtnWidth, rect.bottom - rect.top, flags);
+        DeferWindowPos(hDwp, m_TabBar, nullptr, treeWidth+rect.left, rect.top + m_RibbonHeight, mainWidth - treeWidth - tabBtnWidth - tabBtnWidth, rect.bottom - rect.top, flags);
         DeferWindowPos(hDwp, m_newTabBtn, nullptr, mainWidth - tabBtnWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_closeTabBtn, nullptr, mainWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_editor, nullptr, rect.left + treeWidth, rect.top + m_RibbonHeight + tbHeight, mainWidth - treeWidth, rect.bottom - (m_RibbonHeight + tbHeight) - m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight + tbHeight, treeWidth ? treeWidth - 5 : 0, rect.bottom - (m_RibbonHeight + tbHeight) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
+        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight, treeWidth ? treeWidth - 5 : 0, rect.bottom - (m_RibbonHeight) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
         EndDeferWindowPos(hDwp);
     }
 }
