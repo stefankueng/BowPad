@@ -33,6 +33,7 @@
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 #include <uxtheme.h>
+#include <chrono>
 
 extern IUIFramework * g_pFramework;
 extern std::string    g_sHighlightString;       // from CmdFindReplace
@@ -1099,6 +1100,7 @@ void CScintillaWnd::MarginClick( SCNotification * pNotification )
 void CScintillaWnd::MarkSelectedWord( bool clear )
 {
     static std::string lastSelText;
+    static Sci_Position lastStopPosition = 0;
     LRESULT firstline = Call(SCI_GETFIRSTVISIBLELINE);
     LRESULT lastline = firstline + Call(SCI_LINESONSCREEN);
     long startstylepos = (long)Call(SCI_POSITIONFROMLINE, firstline);
@@ -1183,16 +1185,21 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     int lineCount = (int)Call(SCI_GETLINECOUNT);
     if ((selTextLen > 2) || (lineCount < 100000))
     {
-        if (lastSelText.compare(seltextbuffer.get()))
+        auto selTextDifferent = lastSelText.compare(seltextbuffer.get());
+        if (selTextDifferent || (lastStopPosition != 0))
         {
-            m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
-            m_selTextMarkerCount = 0;
+            auto start = std::chrono::steady_clock::now();
+            if (selTextDifferent)
+            {
+                m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
+                m_selTextMarkerCount = 0;
+            }
             Sci_TextToFind FindText;
-            FindText.chrg.cpMin = 0;
+            FindText.chrg.cpMin = lastStopPosition;
             FindText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
             FindText.lpstrText = seltextbuffer.get();
+            lastStopPosition = 0;
             const auto selTextColor = CTheme::Instance().GetThemeColor(RGB(0, 255, 0));
-            ULONGLONG startTicks = GetTickCount64();
             while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&FindText) >= 0)
             {
                 size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
@@ -1201,10 +1208,12 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
                 if (FindText.chrg.cpMin >= FindText.chrgText.cpMax)
                     break;
                 FindText.chrg.cpMin = FindText.chrgText.cpMax;
-                if ((GetTickCount64() - startTicks) > 2000)
+                
+                // stop after 1.5 seconds - users don't want to wait for too long
+                auto end = std::chrono::steady_clock::now();
+                if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() > 1500)
                 {
-                    m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
-                    m_selTextMarkerCount = 0;
+                    lastStopPosition = FindText.chrg.cpMin;
                     break;
                 }
             }
