@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,6 +33,14 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     // replace the macros in the command line
     const auto& doc = GetActiveDocument();
     std::wstring tabpath = doc.m_path;
+    if ((cmd.find(L"$(TAB_PATH)") != std::wstring::npos) ||
+        (cmd.find(L"$(TAB_NAME)") != std::wstring::npos) ||
+        (cmd.find(L"$(TAB_EXT)") != std::wstring::npos))
+    {
+        // save the file first
+        SaveCurrentTab();
+    }
+
     auto tabdirpath = CPathUtils::GetParentDirectory(tabpath);
     if (PathFileExists(tabpath.c_str()))
     {
