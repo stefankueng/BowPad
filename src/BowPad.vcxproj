@@ -326,7 +326,6 @@
     <ClInclude Include="Theme.h" />
     <ClInclude Include="UTF8DocumentIterator.h" />
     <ClInclude Include="version.h" />
-    <ClInclude Include="XPMIcons.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ext\sktoolslib\AeroControls.cpp" />
@@ -427,7 +426,6 @@
     <ClCompile Include="TabBar.cpp" />
     <ClCompile Include="TabBtn.cpp" />
     <ClCompile Include="Theme.cpp" />
-    <ClCompile Include="XPMIcons.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc" />

@@ -18,7 +18,6 @@
 #include "ScintillaWnd.h"
 #include "BowPad.h"
 #include "BowPadUI.h"
-#include "XPMIcons.h"
 #include "UnicodeUtils.h"
 #include "StringUtils.h"
 #include "AppUtils.h"
@@ -151,17 +150,15 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETTECHNOLOGY, bUseD2D ? SC_TECHNOLOGY_DIRECTWRITERETAIN : SC_TECHNOLOGY_DEFAULT);
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
-    Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, 14);
+    Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, CDPIAware::Instance().Scale(14));
     Call(SCI_SETMARGINCURSORN, SC_MARGE_FOLDER, SC_CURSORARROW);
     Call(SCI_SETAUTOMATICFOLD, SC_AUTOMATICFOLD_SHOW|SC_AUTOMATICFOLD_CLICK|SC_AUTOMATICFOLD_CHANGE);
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_SYMBOL, (1<<MARK_BOOKMARK));
-    Call(SCI_SETMARGINWIDTHN, SC_MARGE_SYMBOL, 14);
+    Call(SCI_SETMARGINWIDTHN, SC_MARGE_SYMBOL, CDPIAware::Instance().Scale(14));
     Call(SCI_SETMARGINCURSORN, SC_MARGE_SYMBOL, SC_CURSORARROW);
     Call(SCI_MARKERSETALPHA, MARK_BOOKMARK, 70);
-    Call(SCI_MARKERDEFINEPIXMAP, MARK_BOOKMARK, (LPARAM)bullet_red);
-    // Scintilla has a marker for bookmarks, but I think our own looks better
-    //Call(SCI_MARKERDEFINE, MARK_BOOKMARK, SC_MARK_BOOKMARK);
+    Call(SCI_MARKERDEFINE, MARK_BOOKMARK, SC_MARK_VERTICALBOOKMARK);
 
     Call(SCI_SETMARGINSENSITIVEN, SC_MARGE_FOLDER, true);
     Call(SCI_SETMARGINSENSITIVEN, SC_MARGE_SYMBOL, true);
@@ -955,6 +952,9 @@ void CScintillaWnd::SetupDefaultStyles()
 
     Call(SCI_SETFOLDMARGINCOLOUR, true, theme.GetThemeColor(RGB(240, 240, 240)));
     Call(SCI_SETFOLDMARGINHICOLOUR, true, theme.GetThemeColor(RGB(255, 255, 255)));
+
+    Call(SCI_MARKERSETFORE, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(80, 0, 0)));
+    Call(SCI_MARKERSETBACK, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(255, 0, 0)));
 
     SetTabSettings(Default);
     Call(SCI_SETINDENTATIONGUIDES, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"indent", SC_IV_LOOKBOTH));
