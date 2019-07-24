@@ -1,5 +1,5 @@
-2.4.3.2065
-https://github.com/stefankueng/BowPad/releases/download/2.4.3/BowPad64-2.4.3.msi
-BowPad64-2.4.3.msi
-https://github.com/stefankueng/BowPad/releases/download/2.4.3/BowPad-2.4.3.msi/download
-BowPad-2.4.3.msi
+2.4.4.2078
+https://github.com/stefankueng/BowPad/releases/download/2.4.4/BowPad64-2.4.4.msi
+BowPad64-2.4.4.msi
+https://github.com/stefankueng/BowPad/releases/download/2.4.4/BowPad-2.4.4.msi/download
+BowPad-2.4.4.msi
