@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2016 - Stefan Kueng
+// Copyright (C) 2013-2016, 2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -159,7 +159,7 @@ bool CCmdUnComment::Execute()
         rangestart.lpstrText = strbuf.get();
         ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
         bool bRemovedStream = false;
-        if (_stricmp(commentstreamstart.c_str(), strbuf.get())==0)
+        if (!commentstreamstart.empty() && _stricmp(commentstreamstart.c_str(), strbuf.get())==0)
         {
             // find the end marker
             Sci_TextRange rangeend;
