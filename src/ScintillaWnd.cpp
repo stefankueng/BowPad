@@ -1100,7 +1100,7 @@ void CScintillaWnd::MarginClick( SCNotification * pNotification )
 void CScintillaWnd::MarkSelectedWord( bool clear )
 {
     static std::string lastSelText;
-    static Sci_Position lastStopPosition = 0;
+    static Sci_PositionCR lastStopPosition = 0;
     LRESULT firstline = Call(SCI_GETFIRSTVISIBLELINE);
     LRESULT lastline = firstline + Call(SCI_LINESONSCREEN);
     long startstylepos = (long)Call(SCI_POSITIONFROMLINE, firstline);
