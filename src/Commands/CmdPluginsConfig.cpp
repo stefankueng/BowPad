@@ -239,7 +239,7 @@ LRESULT CPluginsConfigDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
     {
         case NM_CLICK:
         {
-            if (lpNMItemActivate->iItem >= (int)m_plugins.size())
+            if (lpNMItemActivate->iItem < 0 || lpNMItemActivate->iItem >= (int)m_plugins.size())
             {
                 SetDlgItemText(*this, IDC_DESC, L"");
                 return 0;
