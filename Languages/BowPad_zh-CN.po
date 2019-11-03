@@ -8,17 +8,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-01 19:00+0800\n"
-"PO-Revision-Date: 2018-04-03 08:00+0800\n"
-"Last-Translator: WMJ <wmjordan@163.com>\n"
+"POT-Creation-Date: 2019-11-03 9:00+0800\n"
+"PO-Revision-Date: 2019-11-03 9:00+0800\n"
+"Last-Translator: Song Baoming <songbaoming@yeah.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 
-#. Resource IDs: (254)
-#, c-format
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
 #    ID:xxxxx = the menu ID corresponding to the accelerator
@@ -28,17 +26,22 @@ msgstr ""
 #    S = Shift key   (or blank if not used)
 #    X = upper case character
 # e.g. "V CS+Q" == Ctrl + Shift + 'Q'
+
 # ONLY Accelerator Keys with corresponding alphanumeric characters can be
 # updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
+
 # ONLY change the msgstr field. Do NOT change any other.
 # If you do not want to change an Accelerator Key, copy msgid to msgstr
+
+#. Resource IDs: (254)
+#, c-format
 msgid "%%i%%c%06Xno selection"
-msgstr "%%i%%c%06X未选择内容"
+msgstr "%%i%%c%06X未选中内容"
 
 #. Resource IDs: (224)
 #, c-format
 msgid "%d occurrences were replaced."
-msgstr "已替换 %d 处内容。"
+msgstr "%d 处已被替换。"
 
 #. Resource IDs: (170)
 #, c-format
@@ -47,43 +50,43 @@ msgstr "%s (副本).%s"
 
 #. Resource IDs: (110)
 msgid "&Cancel"
-msgstr "取消"
+msgstr "取消(&C)"
 
 #. Resource IDs: (1)
 msgid "&Close"
-msgstr "关闭"
+msgstr "关闭(&C)"
 
 #. Resource IDs: (60066)
 msgid "&Close Tab"
-msgstr "关闭文档"
+msgstr "关闭标签(&C)"
 
 #. Resource IDs: (185)
 msgid "&Edit"
-msgstr "编辑"
+msgstr "编辑(&E)"
 
 #. Resource IDs: (1001)
 msgid "&Find"
-msgstr "查找"
+msgstr "查找(&F)"
 
 #. Resource IDs: (60032)
 msgid "&New"
-msgstr "新建"
+msgstr "新建(&N)"
 
 #. Resource IDs: (60042)
 msgid "&Open"
-msgstr "打开"
+msgstr "打开(&O)"
 
-#. Resource IDs: (60336)
+#. Resource IDs: (60341)
 msgid "&Reload"
-msgstr "重新打开"
+msgstr "重新读取(&R)"
 
 #. Resource IDs: (1003)
 msgid "&Replace"
-msgstr "替换"
+msgstr "替换(&R)"
 
 #. Resource IDs: (107, 60047)
 msgid "&Save"
-msgstr "保存"
+msgstr "保存(&S)"
 
 #. Resource IDs: (1081)
 msgid "&Search for:"
@@ -91,39 +94,39 @@ msgstr "搜索(&S)："
 
 #. Resource IDs: (1083)
 msgid "&Sort Order:"
-msgstr "排序顺序(&X)："
+msgstr "排序(&S)："
 
 #. Resource IDs: (1007)
 msgid "&Whole word"
-msgstr "整个单词(&Z)"
+msgstr "全字匹配(&W)"
 
 #. Resource IDs: (1074)
 msgid "."
-msgstr "."
+msgstr ""
 
 #. Resource IDs: (1069)
 msgid "..."
-msgstr "..."
+msgstr ""
 
 #. Resource IDs: (1080)
 msgid "<"
-msgstr "<"
+msgstr ""
 
 #. Resource IDs: (133)
 msgid "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full details about this update</a>"
-msgstr "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">关于此更新</a>"
+msgstr "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">更新详情</a>"
 
 #. Resource IDs: (60053)
 msgid "A"
 msgstr ""
 
-#. Resource IDs: (60514)
+#. Resource IDs: (60519)
 msgid "AB"
 msgstr ""
 
 #. Resource IDs: (1070)
 msgid "ANSI / Local encoding"
-msgstr "ANSI / 系统编码"
+msgstr "ANSI / 本地编码"
 
 #. Resource IDs: (60062)
 msgid "AS"
@@ -135,38 +138,38 @@ msgstr "关于 BowPad"
 
 #. Resource IDs: (145)
 msgid "Access denied!"
-msgstr "无法打开或写入文件"
+msgstr "拒绝访问！"
 
 #. Resource IDs: (146)
 #, c-format
 msgid "Access to the file '%s' was denied. Do you want to try again with elevated privileges?"
-msgstr "无法打开“%s”文件。是否尝试以系统管理员权限重试？"
+msgstr "打开文件“%s”失败，是否以管理员权限重试？"
 
 #. Resource IDs: (217)
 msgid "Add word to dictionary"
-msgstr "添加词条到拼写检查词典"
+msgstr "添加到拼写检查词典"
 
-#. Resource IDs: (60538)
+#. Resource IDs: (60543)
 msgid "All plugin commands are listed here"
 msgstr "此处列出了所有的插件命令"
 
-#. Resource IDs: (60136)
+#. Resource IDs: (60141)
 msgid "Allows to load a file with a specific encoding"
-msgstr "允许以特定编码打开文件"
+msgstr "允许以指定编码打开文件"
 
 #. Resource IDs: (131)
 msgid "An update for BowPad is available"
-msgstr "BowPad 有新版本了"
+msgstr "BowPad 发现新版本"
 
 #. Resource IDs: (172)
 #, c-format
 msgid "Are you sure you want to delete the file '%s'?"
-msgstr "您确定要删除“%s”吗？"
+msgstr "您确定要删除“%s”？"
 
 #. Resource IDs: (165)
 #, c-format
 msgid "Are you sure you want to reload '%s'?"
-msgstr "您确定要重新打开“%s”吗？"
+msgstr "您确定要重新读取“%s”？"
 
 #. Resource IDs: (204)
 msgid "Ascending (A-Z)"
@@ -174,15 +177,15 @@ msgstr "顺序（从 A 到 Z）"
 
 #. Resource IDs: (60064)
 msgid "Asks where to save the current tab"
-msgstr "弹出保存文件对话框，保存当前文档"
+msgstr "弹出保存文件对话框，保存当前标签内容"
 
 #. Resource IDs: (65535)
 msgid "Author: Stefan Küng"
-msgstr "作者: Stefan Küng；中文版翻译：wmjordan"
+msgstr "作者：Stefan Küng。中文：Song Baoming"
 
-#. Resource IDs: (60513, 60515)
+#. Resource IDs: (60518, 60520)
 msgid "Auto Braces"
-msgstr "自动花括号"
+msgstr "自动大括号"
 
 #. Resource IDs: (60057, 60058)
 msgid "Auto save"
@@ -190,17 +193,17 @@ msgstr "自动保存"
 
 #. Resource IDs: (135)
 msgid "Available Languages"
-msgstr "已安装界面语言"
+msgstr "有效的界面语言"
 
 #. Resource IDs: (1075)
 msgid "Available plugins"
-msgstr "已安装插件"
+msgstr "有效的插件"
 
-#. Resource IDs: (60353)
+#. Resource IDs: (60358)
 msgid "BC"
 msgstr ""
 
-#. Resource IDs: (60358)
+#. Resource IDs: (60363)
 msgid "BN"
 msgstr ""
 
@@ -208,11 +211,11 @@ msgstr ""
 msgid "BOWPAD"
 msgstr ""
 
-#. Resource IDs: (60363)
+#. Resource IDs: (60368)
 msgid "BP"
 msgstr ""
 
-#. Resource IDs: (60348)
+#. Resource IDs: (60353)
 msgid "BT"
 msgstr ""
 
@@ -220,11 +223,11 @@ msgstr ""
 msgid "Bold"
 msgstr "粗体"
 
-#. Resource IDs: (60347)
+#. Resource IDs: (60352)
 msgid "Bookmark"
 msgstr "书签"
 
-#. Resource IDs: (60343, 60345)
+#. Resource IDs: (60348, 60350)
 msgid "Bookmarks"
 msgstr "书签"
 
@@ -244,7 +247,7 @@ msgstr ""
 msgid "CA"
 msgstr ""
 
-#. Resource IDs: (60211)
+#. Resource IDs: (60216)
 msgid "CC"
 msgstr ""
 
@@ -252,15 +255,15 @@ msgstr ""
 msgid "CO"
 msgstr ""
 
-#. Resource IDs: (60154)
+#. Resource IDs: (60159)
 msgid "CR"
 msgstr ""
 
-#. Resource IDs: (60140)
+#. Resource IDs: (60145)
 msgid "CT"
 msgstr ""
 
-#. Resource IDs: (60217)
+#. Resource IDs: (60222)
 msgid "CU"
 msgstr ""
 
@@ -269,106 +272,94 @@ msgid "Cancel"
 msgstr "取消"
 
 #. Resource IDs: (174)
-msgid "Cancel\n"
-"Do not delete the file."
-msgstr "取消\n"
-"不要删除此文件。"
+msgid "Cancel\nDo not delete the file."
+msgstr "取消\n不删除此文件。"
 
 #. Resource IDs: (223)
-msgid "Cancel\n"
-"Leave the file where it is."
-msgstr "取消\n"
-"原样保留此文件。"
+msgid "Cancel\nLeave the file where it is."
+msgstr "取消\n保持原文件。"
 
 #. Resource IDs: (164)
-msgid "Cancel\n"
-"The file is not created."
-msgstr "取消\n"
-"不创建文件。"
+msgid "Cancel\nThe file is not created."
+msgstr "取消\n不创建文件。"
 
 #. Resource IDs: (122)
-msgid "Cancel\n"
-"The file is not loaded again."
-msgstr "取消\n"
-"不重新打开文件，保留文件编辑状态。"
+msgid "Cancel\nThe file is not loaded again."
+msgstr "取消\n不重新读取文件，保留文件当前状态。"
 
 #. Resource IDs: (167)
-msgid "Cancel\n"
-"The unsaved modifications will be kept."
-msgstr "取消\n"
-"保留未保存的修改。"
+msgid "Cancel\nThe unsaved modifications will be kept."
+msgstr "取消\n取消当前操作，保留未保存的修改。"
 
-#. Resource IDs: (60222)
+#. Resource IDs: (60227)
 msgid "Change Case"
-msgstr "改大小写"
+msgstr "大小写转换"
 
 #. Resource IDs: (1062)
 msgid "Check a plugin to install it, uncheck it to deinstall it."
-msgstr "选中安装插件，取消选中卸载插件。"
+msgstr "选中插件将会被安装，取消选中将会被卸载。"
 
 #. Resource IDs: (1027)
 msgid "Check for Updates"
 msgstr "检查更新"
 
-#. Resource IDs: (60608)
+#. Resource IDs: (60613)
 msgid "Check for errors only in comments, strings and text"
 msgstr "仅在注释、字符串和文本中检查拼写错误"
 
 #. Resource IDs: (65535)
 msgid "Chose the encoding of new files"
-msgstr "新文件的文本编码"
+msgstr "选择新文件的编码"
 
 #. Resource IDs: (65535)
 msgid "Chose the line ending of new files"
-msgstr "新文件的换行方式"
+msgstr "选择新文件的换行方式"
 
-#. Resource IDs: (60352, 60354)
+#. Resource IDs: (60357, 60359)
 msgid "Clear Bookmarks"
-msgstr "清除书签"
+msgstr "清除全部书签"
 
-#. Resource IDs: (60010, 60083, 60088, 60093)
+#. Resource IDs: (60010, 60083, 60088, 60093, 60098)
 msgid "Clipboard"
 msgstr "剪贴板"
 
 #. Resource IDs: (60073)
 msgid "Close All Tabs"
-msgstr "关闭所有文档"
+msgstr "关闭所有标签"
 
-#. Resource IDs: (60485)
+#. Resource IDs: (60490)
 msgid "Close All Tabs Except This One"
-msgstr "关闭其它文档"
+msgstr "关闭其它标签"
 
 #. Resource IDs: (60068)
 msgid "Close Tab"
-msgstr "关闭文档"
+msgstr "关闭标签"
 
 #. Resource IDs: (60071)
 msgid "Close all"
 msgstr "全部关闭"
 
-#. Resource IDs: (60484)
+#. Resource IDs: (60489)
 msgid "Close all but this"
 msgstr "关闭其它"
 
 #. Resource IDs: (60069)
 msgid "Close the current tab"
-msgstr "关闭当前文档"
+msgstr "关闭当前标签"
 
 #. Resource IDs: (126)
-msgid "Close the document\n"
-"The document tab is closed."
-msgstr "关闭文档\n"
-"关闭当前选项卡对应的文档。"
+msgid "Close the document\nThe document tab is closed."
+msgstr "关闭文件\n关闭当前文件标签。"
 
 #. Resource IDs: (60074)
 msgid "Closes all open files"
-msgstr "关闭所有打开的文档"
+msgstr "关闭所有打开的文件"
 
-#. Resource IDs: (60486)
+#. Resource IDs: (60491)
 msgid "Closes all open files except the current one"
-msgstr "关闭所有打开的文档，当前文档除外"
+msgstr "关闭除外当前文件以外的文件"
 
-#. Resource IDs: (60379)
+#. Resource IDs: (60384)
 msgid "Cmd"
 msgstr "命令"
 
@@ -392,127 +383,125 @@ msgstr "命令行："
 msgid "Command Name:"
 msgstr "名称："
 
-#. Resource IDs: (60210, 60212)
+#. Resource IDs: (60215, 60217)
 msgid "Comment"
-msgstr "注释"
+msgstr "注释内容"
 
-#. Resource IDs: (60213)
+#. Resource IDs: (60218)
 msgid "Comments the selected text"
-msgstr "注释选中的文本"
+msgstr "注释选中的内容"
 
-#. Resource IDs: (60532)
+#. Resource IDs: (60537)
 msgid "Configure"
-msgstr "配置"
+msgstr "设置"
 
-#. Resource IDs: (60509)
+#. Resource IDs: (60514)
 msgid "Configure Keyboard Shortcuts"
-msgstr "配置键盘快捷键"
+msgstr "快捷键设置"
 
-#. Resource IDs: (154, 60533)
+#. Resource IDs: (154, 60538)
 msgid "Configure Plugins"
-msgstr "配置插件"
+msgstr "插件设置"
 
-#. Resource IDs: (60508)
+#. Resource IDs: (60513)
 msgid "Configure Shortcuts"
-msgstr "配置快捷键"
+msgstr "快捷键设置"
 
-#. Resource IDs: (60200, 60202)
+#. Resource IDs: (60205, 60207)
 msgid "Configure Styles"
-msgstr "配置样式"
+msgstr "语言格式设置"
 
-#. Resource IDs: (60203)
+#. Resource IDs: (60208)
 msgid "Configure colors, fonts, styles and sizes"
-msgstr "配置语法突出显示的颜色、字体、样式和字体尺寸"
+msgstr "设置语言格式的颜色、字体、样式和字体大小"
 
-#. Resource IDs: (60464, 60465)
+#. Resource IDs: (60469, 60470)
 msgid "Configure custom commands"
-msgstr "配置自定义命令"
+msgstr "自定义命令设置"
 
-#. Resource IDs: (60139, 60141)
+#. Resource IDs: (60144, 60146)
 msgid "Convert to"
-msgstr "转换文本编码"
+msgstr "转换编码"
+
+#. Resource IDs: (60339)
+msgid "Converts all spaces in the document to tabs"
+msgstr "将文件中所有空格转换为制表符"
 
 #. Resource IDs: (60334)
-msgid "Converts all spaces in the document to tabs"
-msgstr "将文档中所有空格转换为制表符"
-
-#. Resource IDs: (60329)
 msgid "Converts all tabs in the document to spaces"
-msgstr "将文档中所有制表符转换为空格"
+msgstr "将文件中所有制表符转换为空格"
 
-#. Resource IDs: (60142)
+#. Resource IDs: (60147)
 msgid "Converts the file to the specified encoding"
-msgstr "转换文档为特定的文本编码"
+msgstr "将文件转换为指定的编码"
 
-#. Resource IDs: (60237)
+#. Resource IDs: (60242)
 msgid "Converts the selection to Title Case"
-msgstr "将选中内容转为首字母大写"
-
-#. Resource IDs: (60227)
-msgid "Converts the selection to UPPERcase"
-msgstr "将选中内容转为全大写"
+msgstr "将选中内容首字母转为大写"
 
 #. Resource IDs: (60232)
-msgid "Converts the selection to lowercase"
-msgstr "将选中内容转为全小写"
+msgid "Converts the selection to UPPERcase"
+msgstr "将选中内容转为大写"
 
-#. Resource IDs: (60494)
+#. Resource IDs: (60237)
+msgid "Converts the selection to lowercase"
+msgstr "将选中内容转为小写"
+
+#. Resource IDs: (60499)
 msgid "Copies the name of the current file to the clipboard"
 msgstr "复制当前文件名到剪贴板"
 
-#. Resource IDs: (60490)
+#. Resource IDs: (60495)
 msgid "Copies the path of the current file to the clipboard"
 msgstr "复制当前文件路径到剪贴板"
 
-#. Resource IDs: (60498)
+#. Resource IDs: (60503)
 msgid "Copies the path of the directory of the current file to the clipboard"
-msgstr "复制当前文件目录路径到剪贴板"
+msgstr "复制当前文件所在目录路径到剪贴板"
 
 #. Resource IDs: (60081)
 msgid "Copy"
 msgstr "复制"
 
-#. Resource IDs: (60496, 60497)
+#. Resource IDs: (60501, 60502)
 msgid "Copy Directory"
-msgstr "复制目录"
+msgstr "复制所在目录路径"
 
-#. Resource IDs: (60492, 60493)
+#. Resource IDs: (60497, 60498)
 msgid "Copy Name"
 msgstr "复制文件名"
 
-#. Resource IDs: (60488, 60489)
+#. Resource IDs: (60493, 60494)
 msgid "Copy Path"
 msgstr "复制文件路径"
 
 #. Resource IDs: (60084)
 msgid "Copy the current selection to the clipboard. Hold down the shift key to copy the text formatted."
-msgstr "复制当前选中内容到剪贴板。按住 Shift 键带格式复制文本。"
+msgstr "复制当前选中内容到剪贴板。按住 Shift 键复制带格式文本。"
 
 #. Resource IDs: (221)
-msgid "Copy the file\n"
-"The copy is opened in another tab."
-msgstr "创建副本窗口\n"
-"再开一个选项卡打开当前文件。"
+msgid "Copy the file\nThe copy is opened in another tab."
+msgstr "创建文件副本\n在新标签中创建当前文件副本。"
 
-#. Resource IDs: (60604)
+#. Resource IDs: (60609)
 msgid "Correct spelling mistakes"
-msgstr "改正拼写错误"
+msgstr "更正拼写错误"
 
 #. Resource IDs: (213)
 msgid "Corrections"
-msgstr "更正项"
+msgstr "更正"
 
-#. Resource IDs: (60616)
+#. Resource IDs: (60621)
 msgid "Corresponding File"
-msgstr "对应文件"
+msgstr "匹配文件"
 
 #. Resource IDs: (194)
 msgid "Corresponding Files"
-msgstr "对应文件"
+msgstr "匹配文件"
 
 #. Resource IDs: (141)
 msgid "Could not download the language file!"
-msgstr "无法下载语言包"
+msgstr "无法下载语言文件"
 
 #. Resource IDs: (201)
 #, c-format
@@ -521,71 +510,69 @@ msgstr "创建“%s”"
 
 #. Resource IDs: (202)
 msgid "Create Corresponding File"
-msgstr "创建对应的文件"
+msgstr "创建匹配文件"
 
 #. Resource IDs: (238)
 msgid "Create corresponding files"
-msgstr "创建对应的文件"
+msgstr "创建匹配文件"
 
 #. Resource IDs: (1089)
 msgid "Create files on OK."
-msgstr "确认操作后创建文件。"
+msgstr "确认后创建文件。"
 
 #. Resource IDs: (163)
-msgid "Create\n"
-"An empty file is created."
-msgstr "创建\n"
-"创建一个空白的文件。"
+msgid "Create\nAn empty file is created."
+msgstr "创建\n创建一个空白的文件。"
 
-#. Resource IDs: (60528)
+#. Resource IDs: (60533)
 msgid "Creates a copy of the current tab"
-msgstr "创建当前选项卡的副本窗口"
+msgstr "创建当前标签的副本窗口"
 
 #. Resource IDs: (60035)
 msgid "Creates a new tab with an empty document"
-msgstr "创建一个空文档选项卡"
+msgstr "创建一个空标签"
 
 #. Resource IDs: (114)
 msgid "Ctrl+Doubleclick to open the link in the default browser"
-msgstr "Ctrl＋鼠标双击 用系统默认的网页浏览器打开超级链接"
+msgstr "按住 Ctrl 键双击鼠标，用默认浏览器打开超链接"
 
-#. Resource IDs: (1049, 60424, 60425)
+#. Resource IDs: (1049, 60429, 60430)
 msgid "Custom Command 0"
 msgstr "自定义命令 0"
 
-#. Resource IDs: (1050, 60428, 60429)
+#. Resource IDs: (1050, 60433, 60434)
 msgid "Custom Command 1"
 msgstr "自定义命令 1"
 
-#. Resource IDs: (1051, 60432, 60433)
+#. Resource IDs: (1051, 60437, 60438)
 msgid "Custom Command 2"
 msgstr "自定义命令 2"
 
-#. Resource IDs: (1052, 60436, 60437)
+#. Resource IDs: (1052, 60441, 60442)
 msgid "Custom Command 3"
 msgstr "自定义命令 3"
 
-#. Resource IDs: (1053, 60440, 60441)
+#. Resource IDs: (1053, 60445, 60446)
 msgid "Custom Command 4"
 msgstr "自定义命令 4"
 
-#. Resource IDs: (1054, 60444, 60445)
+#. Resource IDs: (1054, 60449, 60450)
 msgid "Custom Command 5"
 msgstr "自定义命令 5"
 
-#. Resource IDs: (1055, 60448, 60449)
+#. Resource IDs: (1055, 60453, 60454)
 msgid "Custom Command 6"
 msgstr "自定义命令 6"
 
-#. Resource IDs: (1056, 60452, 60453)
+#. Resource IDs: (1056, 60457, 60458)
 msgid "Custom Command 7"
 msgstr "自定义命令 7"
 
-#. Resource IDs: (1057, 60456, 60457)
+#. Resource IDs: (1057, 60461, 60462)
 msgid "Custom Command 8"
 msgstr "自定义命令 8"
 
-#. Resource IDs: (1058, 60460, 60461)
+#. Resource IDs: (1058, 60465, 60466)
 msgid "Custom Command 9"
 msgstr "自定义命令 9"
 
@@ -599,29 +586,29 @@ msgstr "剪切"
 
 #. Resource IDs: (60089)
 msgid "Cut the current selection to the clipboard. Hold down the shift key to cut the text formatted."
-msgstr "剪切当前选中内容到剪贴板。按住 Shift 键带格式剪切文本。"
+msgstr "剪切当前选中内容到剪贴板。按住 Shift 键剪切带格式文本。"
 
-#. Resource IDs: (60251)
+#. Resource IDs: (60256)
 msgid "DD"
 msgstr ""
 
-#. Resource IDs: (60195)
+#. Resource IDs: (60200)
 msgid "DEL"
 msgstr ""
 
-#. Resource IDs: (60369, 60371)
+#. Resource IDs: (60374, 60376)
 msgid "Dark Theme"
-msgstr "暗黑模式"
+msgstr "暗色主题"
 
 #. Resource IDs: (153)
 msgid "Defaults for new files"
-msgstr "新文件默认配置"
+msgstr "新文件默认设置"
 
-#. Resource IDs: (60194)
+#. Resource IDs: (60199)
 msgid "Delete"
 msgstr "删除"
 
-#. Resource IDs: (60522, 60523)
+#. Resource IDs: (60527, 60528)
 msgid "Delete File"
 msgstr "删除文件"
 
@@ -630,28 +617,24 @@ msgid "Delete file"
 msgstr "删除文件"
 
 #. Resource IDs: (173)
-msgid "Delete\n"
-"The file will be removed."
-msgstr "删除\n"
-"删除选中的文件。"
+msgid "Delete\nThe file will be removed."
+msgstr "删除\n删除选中的文件。"
 
-#. Resource IDs: (60524)
+#. Resource IDs: (60529)
 msgid "Deletes the file of the current tab"
-msgstr "删除当前打开的文件"
+msgstr "删除当前标签的匹配文件"
 
 #. Resource IDs: (205)
 msgid "Descending (Z-A)"
 msgstr "倒序（从 Z 到 A）"
 
-#. Resource IDs: (60246)
+#. Resource IDs: (60251)
 msgid "Determines whether a tab is inserted or spaces when the tab key is pressed."
 msgstr "指定按下键盘 Tab 键时是插入制表符还是插入空格。"
 
 #. Resource IDs: (129)
-msgid "Do &not download the update\n"
-"You will be reminded again about the update in a week."
-msgstr "暂不更新\n"
-"您将在一周后再次收到更新提醒。"
+msgid "Do &not download the update\nYou will be reminded again about the update in a week."
+msgstr "暂不更新(&N)\n您将在一周后再次收到更新提醒。"
 
 #. Resource IDs: (212)
 msgid "Do this for all files"
@@ -660,67 +643,61 @@ msgstr "对所有文件执行相同操作"
 #. Resource IDs: (219)
 #, c-format
 msgid "Do you want to copy the file '%s' to '%s'?"
-msgstr "是否确定将文件“%s”复制到“%s”？"
+msgstr "确定将文件“%s”复制到“%s”？"
 
 #. Resource IDs: (220)
 #, c-format
 msgid "Do you want to move the file '%s' to '%s'?"
-msgstr "是否确定将文件“%s”移动到“%s”？"
+msgstr "确定将文件“%s”移动到“%s”？"
 
 #. Resource IDs: (106)
 #, c-format
 msgid "Do you want to save changes to \"%s\"?"
-msgstr "是否确定保存更改到文件“%s”？"
+msgstr "是否保存已修改的文件“%s”？"
 
 #. Resource IDs: (108)
 msgid "Do&n't save"
-msgstr "不要保存"
+msgstr "不保存(&N)"
 
-#. Resource IDs: (60545)
+#. Resource IDs: (60550)
 msgid "Document Summary"
-msgstr "文档摘要"
+msgstr "内容摘要"
 
 #. Resource IDs: (116)
 msgid "Document modified"
-msgstr "文档已被更改"
+msgstr "文件已被修改"
 
 #. Resource IDs: (123)
 msgid "Document removed"
-msgstr "文档已被删除"
+msgstr "文件已被删除"
 
 #. Resource IDs: (150)
-msgid "Don't Save\n"
-"The file is not saved."
-msgstr "不要保存"
+msgid "Don't Save\nThe file is not saved."
+msgstr "不保存\n文件将不会被保存。"
 
 #. Resource IDs: (148)
-msgid "Don't open\n"
-"The file is not opened."
-msgstr "不要打开"
+msgid "Don't open\nThe file is not opened."
+msgstr "不打开\n文件将不会被打开。"
 
 #. Resource IDs: (127)
-msgid "Download and install the update\n"
-"Updates BowPad to the latest version."
-msgstr "下载并安装\n"
-"将 BowPad 更新到最新版本"
+msgid "Download and install the update\nUpdates BowPad to the latest version."
+msgstr "下载并安装\n将 BowPad 更新到最新版本"
 
 #. Resource IDs: (140)
 msgid "Download of language list succeeded. Now you can select a language from that list."
-msgstr "已成功下载语言包。您可以从语言包列表中选择该语言。"
+msgstr "已成功下载语言列表。您可以从列表中选择界面语言。"
 
 #. Resource IDs: (128)
-msgid "Download the update\n"
-"You have to install the update manually."
-msgstr "下载更新\n"
-"您需要自行安装更新。"
+msgid "Download the update\nYou have to install the update manually."
+msgstr "下载更新\n您需要手动安装更新。"
 
-#. Resource IDs: (60250, 60252)
+#. Resource IDs: (60255, 60257)
 msgid "Duplicate Line"
-msgstr "重复当前行"
+msgstr "复制当前行"
 
-#. Resource IDs: (60253)
+#. Resource IDs: (60258)
 msgid "Duplicates the current line"
-msgstr "重复当前行的文本内容"
+msgstr "复制当前行并插入到行下"
 
 #. Resource IDs: (60006)
 msgid "E"
@@ -728,13 +705,13 @@ msgstr ""
 
 #. Resource IDs: (60029)
 msgid "E&xit"
-msgstr "退出(&T)"
+msgstr "退出(&X)"
 
-#. Resource IDs: (60131)
+#. Resource IDs: (60136)
 msgid "ENC"
 msgstr ""
 
-#. Resource IDs: (60151)
+#. Resource IDs: (60156)
 msgid "EOL"
 msgstr ""
 
@@ -744,46 +721,46 @@ msgstr "编辑"
 
 #. Resource IDs: (187)
 msgid "Elevated"
-msgstr "管理员权限"
+msgstr "提权"
 
-#. Resource IDs: (60516)
+#. Resource IDs: (60521)
 msgid "Enable to automatically add a closing brace when an opening brace is entered"
-msgstr "在输出起始花括号后自动插入对应的结束花括号"
+msgstr "输出开花括号后自动插入闭花括号"
 
-#. Resource IDs: (60596)
+#. Resource IDs: (60601)
 msgid "Enables/Disables the spell checker"
-msgstr "启用或禁用拼写检查器"
+msgstr "启用或禁用拼写检查"
 
-#. Resource IDs: (60130)
+#. Resource IDs: (60135)
 msgid "Encoding"
-msgstr "文本编码"
+msgstr "编码"
 
 #. Resource IDs: (207)
 #, c-format
 msgid "Encoding: %s"
-msgstr "文本编码：%s"
+msgstr "编码格式：%s"
 
 #. Resource IDs: (65535)
 msgid "Extension"
 msgstr "扩展名"
 
-#. Resource IDs: (60008, 60026, 60175)
+#. Resource IDs: (60008, 60026, 60180)
 msgid "F"
 msgstr ""
 
 #. Resource IDs: (235)
 msgid "F&iles (e.g.: *.txt;*.dat):"
-msgstr "文件(如:*.txt;*.&c):"
+msgstr "文件(如：*.txt;*.&ini):"
 
 #. Resource IDs: (236)
 msgid "F&older to search:"
-msgstr "搜索文件夹(&W)："
+msgstr "搜索目录(&O)："
 
-#. Resource IDs: (60180, 60479)
+#. Resource IDs: (60185, 60484)
 msgid "FN"
 msgstr ""
 
-#. Resource IDs: (60185)
+#. Resource IDs: (60190)
 msgid "FP"
 msgstr ""
 
@@ -791,70 +768,56 @@ msgstr ""
 msgid "FR"
 msgstr ""
 
-#. Resource IDs: (60190)
+#. Resource IDs: (60195)
 msgid "FSN"
 msgstr ""
 
-#. Resource IDs: (60126)
+#. Resource IDs: (60131)
 msgid "FT"
 msgstr ""
 
 #. Resource IDs: (139)
 msgid "Failed to download the list of available languages."
-msgstr "无法下载语言包列表文件。"
+msgstr "下载语言列表失败。"
 
 #. Resource IDs: (169)
 #, c-format
-msgid "Failed to load the file '%s'.\r\n"
-"\r\n"
-"The error message is:\r\n"
-"%s"
-msgstr "无法加载文件“%s”。\r\n"
-"\r\n"
-"错误原因是：\r\n"
-"%s"
+msgid "Failed to load the file '%s'.\r\n\r\nThe error message is:\r\n%s"
+msgstr "无法加载文件“%s”。\r\n\r\n错误原因是：\r\n%s"
 
 #. Resource IDs: (186)
 #, c-format
-msgid "Failed to save the file '%s'.\r\n"
-"\r\n"
-"The error message is:\r\n"
-"%s"
-msgstr "无法保存文件“%s”。\r\n"
-"\r\n"
-"错误原因是：\r\n"
-"%s"
+msgid "Failed to save the file '%s'.\r\n\r\nThe error message is:\r\n%s"
+msgstr "无法保存文件“%s”。\r\n\r\n错误原因是：\r\n%s"
 
 #. Resource IDs: (137)
 msgid "Fetch remote languages..."
-msgstr "下载可用界面语言..."
+msgstr "获取可用界面语言..."
 
 #. Resource IDs: (247)
 msgid "Fetching plugins list - please wait..."
-msgstr "正在下载插件列表，请稍候..."
+msgstr "正在获取插件列表，请稍候..."
 
 #. Resource IDs: (152, 60007)
 msgid "File"
 msgstr "文件"
 
-#. Resource IDs: (60125)
+#. Resource IDs: (60130)
 msgid "File Tree"
 msgstr "文件树"
 
 #. Resource IDs: (246)
 #, c-format
 msgid "File \"%s\" already exists."
-msgstr "已经存在名称为“%s”的文件。"
+msgstr "文件“%s”已存在。"
 
 #. Resource IDs: (161)
 msgid "File does not exist"
 msgstr "文件不存在"
 
 #. Resource IDs: (255)
-msgid "File extensions for this style, separated by semicolon.\n"
-"Example: cpp;c;h;hpp"
-msgstr "在此指定语法突出显示对应的文件扩展名。\n"
-"例如：cpp;c;h;hpp"
+msgid "File extensions for this style, separated by semicolon.\nExample: cpp;c;h;hpp"
+msgstr "应用该样式的文件扩展名，以英文分号分隔。\n例如：cpp;c;h;hpp"
 
 #. Resource IDs: (104)
 msgid "File is too big to be opened by BowPad"
@@ -870,110 +833,110 @@ msgstr "需要指定第二个文件的名称。"
 
 #. Resource IDs: (241)
 msgid "Filenames must be different."
-msgstr "文件名不能一样。"
+msgstr "文件名不能相同。"
 
 #. Resource IDs: (245)
 #, c-format
 msgid "Files \"%s\" and \"%s\" already exist."
-msgstr "文件“%s”和“%s”已经存在。"
+msgstr "文件“%s”和“%s”已存在。"
 
-#. Resource IDs: (60162)
+#. Resource IDs: (60167)
 msgid "Find"
 msgstr "查找"
 
-#. Resource IDs: (60176)
+#. Resource IDs: (60181)
 msgid "Find && Replace"
 msgstr "查找及替换"
 
 #. Resource IDs: (158)
 msgid "Find &All"
-msgstr "查找所有项"
+msgstr "查找所有匹配项(&A)"
 
 #. Resource IDs: (210)
 msgid "Find All In &Folder"
-msgstr "在文件夹中查找所有项"
+msgstr "在下方指定目录中查找(&F)"
 
 #. Resource IDs: (159)
 msgid "Find All In All &Tabs"
-msgstr "在已打开文件中查找所有项"
+msgstr "在已打开文件中查找(&T)"
 
 #. Resource IDs: (1073)
 msgid "Find Fi&les"
-msgstr "在文件中查找所有项"
+msgstr "在指定类型文件中查找(&L)"
 
 #. Resource IDs: (225)
 msgid "Find Files"
 msgstr "查找文件"
 
-#. Resource IDs: (60179, 60181)
+#. Resource IDs: (60184, 60186)
 msgid "Find Next"
 msgstr "查找下一个"
 
-#. Resource IDs: (60189, 60191)
+#. Resource IDs: (60194, 60196)
 msgid "Find Next Selected"
 msgstr "查找选中项"
 
-#. Resource IDs: (60184, 60186)
+#. Resource IDs: (60189, 60191)
 msgid "Find Previous"
 msgstr "查找上一个"
 
 #. Resource IDs: (1016)
 msgid "Find Result Action"
-msgstr "查找结果动作"
+msgstr "查找结果操作"
 
 #. Resource IDs: (233)
 msgid "Find and Replace for functions is not implemented."
-msgstr "目前尚未实现查找替换函数功能。"
+msgstr "查找替换函数功能未实现。"
 
 #. Resource IDs: (143)
 msgid "Find and replace"
-msgstr "查找并替换"
+msgstr "查找和替换"
 
 #. Resource IDs: (231)
 msgid "Find previous."
 msgstr "查找上一个匹配项"
 
-#. Resource IDs: (60174)
+#. Resource IDs: (60179)
 msgid "Find/Replace"
-msgstr "查找/替换"
+msgstr "查找和替换"
 
 #. Resource IDs: (242)
 #, c-format
 msgid "Folder \"%s\" does not exist."
-msgstr "不存在“%s”文件夹。"
+msgstr "不存在目录：“%s”。"
 
 #. Resource IDs: (243)
 msgid "Folder required for first file."
-msgstr "需要指定第一个文件的文件夹。"
+msgstr "需要指定第一个文件的目录。"
 
 #. Resource IDs: (244)
 msgid "Folder required for second file."
-msgstr "需要指定第二个文件的文件夹。"
+msgstr "需要指定第二个文件的目录。"
 
-#. Resource IDs: (60548)
+#. Resource IDs: (60553)
 msgid "Folding"
-msgstr "折叠文本"
+msgstr "折叠/展开"
 
-#. Resource IDs: (60556, 60557)
+#. Resource IDs: (60561, 60562)
 msgid "Folding Off"
-msgstr "禁用折叠文本功能"
+msgstr "禁用折叠"
 
-#. Resource IDs: (60553, 60554)
+#. Resource IDs: (60558, 60559)
 msgid "Folding On"
-msgstr "启用折叠文本功能"
+msgstr "启用折叠"
 
 #. Resource IDs: (1015)
 msgid "Follow Tab"
-msgstr "下一个文档"
+msgstr "下一个文件"
 
-#. Resource IDs: (60512, 65535)
+#. Resource IDs: (60517, 65535)
 msgid "Font"
 msgstr "字体"
 
 #. Resource IDs: (199)
 #, c-format
 msgid "Found: %d matches in %d tabs."
-msgstr "找到 %d 个匹配项（%d 个文档）"
+msgstr "找到 %d 个匹配项（%d 个文件）"
 
 #. Resource IDs: (198)
 #, c-format
@@ -982,46 +945,34 @@ msgstr "找到 %d 个匹配项。"
 
 #. Resource IDs: (203)
 #, c-format
-msgid "Full file path:\r\n"
-"%s\r\n"
-"\r\n"
-"Word count: %ld\r\n"
-"Lines: %ld\r\n"
-"Empty lines: %ld\r\n"
-"Paragraphs: %ld\r\n"
-msgstr "文件路径：\r\n"
-"%s\r\n"
-"\r\n"
-"词数：%ld\r\n"
-"行数：%ld\r\n"
-"空行：%ld\r\n"
-"段落：%ld\r\n"
+msgid "Full file path:\r\n%s\r\n\r\nWord count: %ld\r\nLines: %ld\r\nEmpty lines: %ld\r\nParagraphs: %ld\r\n"
+msgstr "文件路径：\r\n%s\r\n\r\n词数：%ld\r\n行数：%ld\r\n空行：%ld\r\n段落：%ld\r\n"
 
-#. Resource IDs: (1010, 60478, 60480)
+#. Resource IDs: (1010, 60483, 60485)
 msgid "Functions"
 msgstr "函数"
 
-#. Resource IDs: (60306)
+#. Resource IDs: (60311)
 msgid "GL"
 msgstr ""
 
-#. Resource IDs: (60311)
+#. Resource IDs: (60316)
 msgid "GS"
 msgstr ""
 
-#. Resource IDs: (145, 60305, 60307)
+#. Resource IDs: (145, 60310, 60312)
 msgid "Go to line"
 msgstr "转到指定行"
 
-#. Resource IDs: (60310, 60312)
+#. Resource IDs: (60315, 60317)
 msgid "Go to symbol"
 msgstr "转到符号定义"
 
-#. Resource IDs: (60341)
+#. Resource IDs: (60346)
 msgid "Goto"
 msgstr "跳转"
 
-#. Resource IDs: (60025)
+#. Resource IDs: (60025, 60097)
 msgid "H"
 msgstr ""
 
@@ -1031,23 +982,23 @@ msgstr "忽略"
 
 #. Resource IDs: (1079)
 msgid "Ignore &case."
-msgstr "忽略大小写(&D)"
+msgstr "忽略大小写(&C)"
 
 #. Resource IDs: (216)
 msgid "Ignore word for this session"
 msgstr "暂时忽略此单词"
 
-#. Resource IDs: (60610, 60611)
+#. Resource IDs: (60615, 60616)
 msgid "Include uppercase"
 msgstr "包含大写"
 
-#. Resource IDs: (60612)
+#. Resource IDs: (60617)
 msgid "Include words that are all CAPS or have uppercase letters in the middle"
 msgstr "包含全大写的单词或中间有大写字母的单词"
 
-#. Resource IDs: (60550, 60551, 60552)
+#. Resource IDs: (60555, 60556, 60557)
 msgid "Init Folding Margin"
-msgstr "初始折叠区"
+msgstr "初始化折叠区"
 
 #. Resource IDs: (181)
 msgid "Insert"
@@ -1059,7 +1010,11 @@ msgstr "插入制表符或空格"
 
 #. Resource IDs: (60094)
 msgid "Inserts the content of the clipboard at the cursor position"
-msgstr "将剪贴板的内容插入到当前光标所在位置"
+msgstr "把剪贴板中的内容粘贴到位置"
+
+#. Resource IDs: (60099)
+msgid "Inserts the html content of the clipboard at the cursor position"
+msgstr "把剪贴板中的 HTML 粘贴到当前位置"
 
 #. Resource IDs: (193)
 #, c-format
@@ -1074,108 +1029,102 @@ msgstr "已安装的版本"
 msgid "Italic"
 msgstr "斜体"
 
-#. Resource IDs: (60262)
+#. Resource IDs: (60267)
 msgid "JL"
 msgstr ""
 
-#. Resource IDs: (60261, 60263)
+#. Resource IDs: (60266, 60268)
 msgid "Join Lines"
 msgstr "合并行"
 
-#. Resource IDs: (60264)
+#. Resource IDs: (60269)
 msgid "Join selected lines to one long line"
 msgstr "将选中的行合并为一行"
 
 #. Resource IDs: (125)
-msgid "Keep the document\n"
-"The document is kept open."
-msgstr "保持文档\n"
-"文档将保持打开"
+msgid "Keep the document\nThe document is kept open."
+msgstr "保持打开\n保持文件打开"
 
-#. Resource IDs: (60134)
+#. Resource IDs: (60139)
 msgid "LA"
 msgstr ""
 
-#. Resource IDs: (60273)
+#. Resource IDs: (60278)
 msgid "LD"
 msgstr ""
 
-#. Resource IDs: (60146)
+#. Resource IDs: (60151)
 msgid "LEX"
 msgstr ""
 
-#. Resource IDs: (60157)
+#. Resource IDs: (60162)
 msgid "LF"
 msgstr ""
 
-#. Resource IDs: (60256, 60375, 60469)
+#. Resource IDs: (60261, 60380, 60474)
 msgid "LS"
 msgstr ""
 
-#. Resource IDs: (60268)
+#. Resource IDs: (60273)
 msgid "LU"
 msgstr ""
 
-#. Resource IDs: (60374, 60598)
+#. Resource IDs: (60379, 60603)
 msgid "Language"
 msgstr "语言"
 
-#. Resource IDs: (60147)
+#. Resource IDs: (60152)
 msgid "Language Lexer"
-msgstr "语言分析器"
+msgstr "语言词法分析器"
 
 #. Resource IDs: (138)
-msgid "Language selected.\n"
-"You need to restart BowPad for the changes to take effect."
-msgstr "已选择新的语言包\n"
-"您需要重新启动 BowPad 以使用新的语言包。"
+msgid "Language selected.\nYou need to restart BowPad for the changes to take effect."
+msgstr "语言已更改\n重新启动 BowPad 后生效。"
 
 #. Resource IDs: (65535)
 msgid "Language:"
 msgstr "语言："
 
-#. Resource IDs: (60396)
+#. Resource IDs: (60401)
 msgid "Launch in Chrome"
 msgstr "在 Chrome 中打开"
 
-#. Resource IDs: (60384, 60385)
+#. Resource IDs: (60389, 60390)
 msgid "Launch in Edge"
 msgstr "在 Edge 中打开"
 
-#. Resource IDs: (60392, 60393)
+#. Resource IDs: (60397, 60398)
 msgid "Launch in Firefox"
 msgstr "在 Firefox 中打开"
 
-#. Resource IDs: (60397)
+#. Resource IDs: (60402)
 msgid "Launch in Google Chrome"
 msgstr "在 Google Chrome 中打开"
 
-#. Resource IDs: (60388)
+#. Resource IDs: (60393)
 msgid "Launch in IE"
 msgstr "在 IE 中打开"
 
-#. Resource IDs: (60389)
+#. Resource IDs: (60394)
 msgid "Launch in Internet Explorer"
 msgstr "在 Internet Explorer 中打开"
 
-#. Resource IDs: (60404, 60405)
+#. Resource IDs: (60409, 60410)
 msgid "Launch in Opera"
 msgstr "在 Opera 中打开"
 
-#. Resource IDs: (60400, 60401)
+#. Resource IDs: (60405, 60406)
 msgid "Launch in Safari"
 msgstr "在 Safari 中打开"
 
 #. Resource IDs: (176)
 #, c-format
-msgid "Length in bytes: %ld\r\n"
-"Lines: %ld"
-msgstr "字节数：%ld\r\n"
-"行数：%ld"
+msgid "Length in bytes: %ld\r\nLines: %ld"
+msgstr "字节数：%ld\r\n行数：%ld"
 
-#. Resource IDs: (60145)
+#. Resource IDs: (60150)
 msgid "Lexer"
-msgstr "编程语言"
+msgstr "词法分析器"
 
 #. Resource IDs: (238)
 #, c-format
@@ -1188,18 +1137,12 @@ msgstr "行"
 
 #. Resource IDs: (177)
 #, c-format
-msgid "Line : %ld\r\n"
-"Column : %ld\r\n"
-"Selection : %Iu | %Iu\r\n"
-"Matches: %ld"
-msgstr "行：%ld\r\n"
-"列：%ld\r\n"
-"选择：%Iu | %Iu\r\n"
-"匹配：%ld"
+msgid "Line : %ld\r\nColumn : %ld\r\nSelection : %Iu | %Iu\r\nMatches: %ld"
+msgstr "行：%ld\r\n列：%ld\r\n选中：%Iu | %Iu\r\n匹配：%ld"
 
-#. Resource IDs: (60150)
+#. Resource IDs: (60155)
 msgid "Line Endings"
-msgstr "换行"
+msgstr "换行格式"
 
 #. Resource IDs: (154)
 msgid "Line Text"
@@ -1210,7 +1153,7 @@ msgstr "行文本"
 msgid "Line endings: %s"
 msgstr "换行：%s"
 
-#. Resource IDs: (60120)
+#. Resource IDs: (60125)
 msgid "Line numbers"
 msgstr "行号"
 
@@ -1223,68 +1166,68 @@ msgstr "行："
 msgid "Line: %%c%06X%ld%%r / %%c%06X%ld%%r   Column: %%c%06X%ld%%r"
 msgstr "行：%%c%06X%ld%%r / %%c%06X%ld%%r   列：%%c%06X%ld%%r"
 
-#. Resource IDs: (60248)
+#. Resource IDs: (60253)
 msgid "Lines"
-msgstr "选中行"
+msgstr "行操作"
 
 #. Resource IDs: (249)
 #, c-format
 msgid "Ln: %%c%06X%ld%%r / %%c%06X%ld%%r    Col: %%c%06X%ld%%r"
 msgstr "行：%%c%06X%ld%%r / %%c%06X%ld%%r    列：%%c%06X%ld%%r"
 
-#. Resource IDs: (60133, 60135)
+#. Resource IDs: (60138, 60140)
 msgid "Load as"
 msgstr "更换编码加载"
 
-#. Resource IDs: (60470)
-msgid "Load last session"
-msgstr "加载上次打开的文档"
-
 #. Resource IDs: (60475)
-msgid "Load last session on start"
-msgstr "启动时打开上次打开的文档"
+msgid "Load last session"
+msgstr "加载上次打开的文件"
 
-#. Resource IDs: (60468)
-msgid "Load session"
-msgstr "打开上次文档"
+#. Resource IDs: (60480)
+msgid "Load last session on start"
+msgstr "记住最后打开的文件"
 
 #. Resource IDs: (60473)
+msgid "Load session"
+msgstr "打开上次文件"
+
+#. Resource IDs: (60478)
 msgid "Load session on start"
-msgstr "启动时打开上次文档"
+msgstr "启动时打开上次文件"
 
 #. Resource IDs: (236)
 msgid "Loading files..."
-msgstr "正在打开文档..."
+msgstr "正在打开文件..."
 
 #. Resource IDs: (235)
 msgid "Loading session..."
-msgstr "正在打开上次打开的文档..."
+msgstr "正在打开上次打开的文件..."
+
+#. Resource IDs: (60481)
+msgid "Loads all files automatically that were open the last time BowPad got closed"
+msgstr "自动加载上次 BowPad 关闭时打开的文件"
 
 #. Resource IDs: (60476)
-msgid "Loads all files automatically that were open the last time BowPad got closed"
-msgstr "自动打开上一次关闭 BowPad 时打开的所有文档"
-
-#. Resource IDs: (60471)
 msgid "Loads all files that were open the last time BowPad got closed"
-msgstr "打开上一次关闭 BowPad 时打开的所有文档"
+msgstr "加载上次 BowPad 关闭时打开的文件"
 
-#. Resource IDs: (60229, 60231)
+#. Resource IDs: (60234, 60236)
 msgid "Lowercase"
-msgstr "小写"
+msgstr "转为小写"
 
 #. Resource IDs: (60002, 60028)
 msgid "M"
 msgstr ""
 
-#. Resource IDs: (60160)
+#. Resource IDs: (60165)
 msgid "MAC"
 msgstr ""
 
-#. Resource IDs: (60159)
+#. Resource IDs: (60164)
 msgid "MAC (CR)"
 msgstr ""
 
-#. Resource IDs: (60230, 60235)
+#. Resource IDs: (60235, 60240)
 msgid "ML"
 msgstr ""
 
@@ -1292,7 +1235,7 @@ msgstr ""
 msgid "MRU List"
 msgstr ""
 
-#. Resource IDs: (60225)
+#. Resource IDs: (60230)
 msgid "MU"
 msgstr ""
 
@@ -1302,7 +1245,7 @@ msgstr ""
 
 #. Resource IDs: (60001)
 msgid "Main"
-msgstr "常规"
+msgstr "主页"
 
 #. Resource IDs: (112)
 msgid "Main Encodings"
@@ -1310,67 +1253,65 @@ msgstr "常用编码"
 
 #. Resource IDs: (1008)
 msgid "Match &case"
-msgstr "匹配大小写"
+msgstr "匹配大小写(&C)"
 
-#. Resource IDs: (60367)
+#. Resource IDs: (60372)
 msgid "Misc"
 msgstr "其它"
 
-#. Resource IDs: (60272)
+#. Resource IDs: (60277)
 msgid "Move down"
-msgstr "下移"
+msgstr "下移行"
+
+#. Resource IDs: (60279)
+msgid "Move line down"
+msgstr "下移当前行"
 
 #. Resource IDs: (60274)
-msgid "Move line down"
-msgstr "下移一行"
-
-#. Resource IDs: (60269)
 msgid "Move line up"
-msgstr "上移一行"
-
-#. Resource IDs: (60360)
-msgid "Move the caret to the next bookmark"
-msgstr "将插入光标移到下一个书签"
+msgstr "上移当前行"
 
 #. Resource IDs: (60365)
+msgid "Move the caret to the next bookmark"
+msgstr "将光标移到下一个书签"
+
+#. Resource IDs: (60370)
 msgid "Move the caret to the previous bookmark"
-msgstr "将插入光标移到上一个书签"
+msgstr "将光标移到上一个书签"
 
 #. Resource IDs: (222)
-msgid "Move the file\n"
-"The file tab is updated to the new path."
-msgstr "移动文件\n"
-"更新当前文件到新的文件路径。"
+msgid "Move the file\nThe file tab is updated to the new path."
+msgstr "移动文件\n移动当前文件到新的文件路径。"
 
-#. Resource IDs: (60267)
+#. Resource IDs: (60272)
 msgid "Move up"
-msgstr "上移"
+msgstr "上移行"
 
 #. Resource IDs: (218)
 msgid "Move/Copy File"
 msgstr "移动或复制文件"
 
-#. Resource IDs: (60308)
+#. Resource IDs: (60313)
 msgid "Moves the cursor to the specified line"
 msgstr "移动光标到指定的行"
 
-#. Resource IDs: (60313)
+#. Resource IDs: (60318)
 msgid "Moves the cursor to the specified symbol"
-msgstr "移动光标到指定的符号定义"
+msgstr "移动光标到指定的符号"
 
-#. Resource IDs: (60275)
+#. Resource IDs: (60280)
 msgid "Moves the selected lines downwards"
 msgstr "将选中行向下移动"
 
-#. Resource IDs: (60270)
+#. Resource IDs: (60275)
 msgid "Moves the selected lines upwards"
 msgstr "将选中行向上移动"
 
-#. Resource IDs: (60182)
+#. Resource IDs: (60187)
 msgid "Moves to the next match of the last search"
 msgstr "移动光标到上次搜索的下一个匹配项"
 
-#. Resource IDs: (60187)
+#. Resource IDs: (60192)
 msgid "Moves to the previous match of the last search"
 msgstr "移动光标到上次搜索的上一个匹配项"
 
@@ -1378,32 +1319,32 @@ msgstr "移动光标到上次搜索的上一个匹配项"
 msgid "N"
 msgstr ""
 
-#. Resource IDs: (60170)
+#. Resource IDs: (60175)
 msgid "NEXT"
 msgstr ""
 
 #. Resource IDs: (105)
 #, c-format
 msgid "New %d"
-msgstr "新的文档 %d"
+msgstr "新文档 %d"
 
-#. Resource IDs: (60526, 60527)
+#. Resource IDs: (60531, 60532)
 msgid "New Copy"
-msgstr "新建副本文档"
+msgstr "创建文件副本"
 
 #. Resource IDs: (237)
 msgid "New Corresponding Files."
-msgstr "创建对应文件"
+msgstr "创建新的匹配文件"
 
 #. Resource IDs: (60034)
 msgid "New Document"
-msgstr "新建文档"
+msgstr "新建文件"
 
-#. Resource IDs: (60169, 60171, 60357)
+#. Resource IDs: (60174, 60176, 60362)
 msgid "Next"
 msgstr "下一处"
 
-#. Resource IDs: (60359)
+#. Resource IDs: (60364)
 msgid "Next Bookmark"
 msgstr "下一个书签"
 
@@ -1413,19 +1354,19 @@ msgstr "无修改建议。"
 
 #. Resource IDs: (197)
 msgid "No files found."
-msgstr "没有找到文件。"
+msgstr "未找到文件。"
 
 #. Resource IDs: (151)
 msgid "No functions found!"
-msgstr "没有找到函数。"
+msgstr "未找到函数。"
 
 #. Resource IDs: (234)
-msgid "No more occurances to replace."
-msgstr "没有更多需要替换的内容。"
+msgid "No more occurrences to replace."
+msgstr "无更多需要替换的内容。"
 
 #. Resource IDs: (248)
 msgid "No plugins found. Check your internet connection."
-msgstr "没有找到插件。请检查您的上网连接。"
+msgstr "未找到插件。请检查您的网络。"
 
 #. Resource IDs: (188)
 msgid "No plugins loaded"
@@ -1433,13 +1374,11 @@ msgstr "未加载插件"
 
 #. Resource IDs: (226)
 msgid "No search folder."
-msgstr "未指定搜索文件夹。"
+msgstr "未指定搜索目录。"
 
 #. Resource IDs: (134)
-msgid "No updates available.\n"
-"You already have the current version."
-msgstr "没有可用的更新。\n"
-"您正在使用的版本是最新的。"
+msgid "No updates available.\nYou already have the current version."
+msgstr "无可用的更新。\n您当前使用的是最新版。"
 
 #. Resource IDs: (60043)
 msgid "O"
@@ -1453,23 +1392,23 @@ msgstr "确定"
 msgid "Online Languages"
 msgstr "在线语言包"
 
-#. Resource IDs: (60606, 60607)
+#. Resource IDs: (60611, 60612)
 msgid "Only comments"
 msgstr "仅注释文本"
 
-#. Resource IDs: (60412, 60413)
+#. Resource IDs: (60417, 60418)
 msgid "Open Console"
 msgstr "打开命令提示符"
 
-#. Resource IDs: (60408, 60409, 60500, 60501)
+#. Resource IDs: (60413, 60414, 60505, 60506)
 msgid "Open Explorer"
-msgstr "打开文件资源管理器"
+msgstr "在资源管理器中定位"
 
-#. Resource IDs: (60518)
+#. Resource IDs: (60523)
 msgid "Open File"
 msgstr "打开文件"
 
-#. Resource IDs: (60519)
+#. Resource IDs: (60524)
 msgid "Open File under cursor"
 msgstr "打开光标下的文件"
 
@@ -1477,15 +1416,13 @@ msgstr "打开光标下的文件"
 msgid "Open Files"
 msgstr "打开文件"
 
-#. Resource IDs: (60617)
+#. Resource IDs: (60622)
 msgid "Open corresponding File"
-msgstr "打开对应的文件"
+msgstr "打开匹配的文件"
 
 #. Resource IDs: (147)
-msgid "Open elevated\n"
-"BowPad is started again with elevated privileges."
-msgstr "提升权限运行\n"
-"BowPad 已以提升的管理员权限重新启动。"
+msgid "Open elevated\nBowPad is started again with elevated privileges."
+msgstr "提升权限运行\nBowPad 已在管理员权限下运行。"
 
 #. Resource IDs: (182)
 #, c-format
@@ -1495,7 +1432,7 @@ msgstr "打开文件：%d"
 #. Resource IDs: (252)
 #, c-format
 msgid "Open tabs: %%c%06X%ld%%r"
-msgstr "打开文档：%%c%06X%ld%%r"
+msgstr "打开标签：%%c%06X%ld%%r"
 
 #. Resource IDs: (253)
 #, c-format
@@ -1506,103 +1443,105 @@ msgstr "打开：%%c%06X%ld%%r"
 msgid "Opens one or more files"
 msgstr "打开一个或多个文件"
 
-#. Resource IDs: (60414)
+#. Resource IDs: (60419)
 msgid "Opens the Console at the current file location"
 msgstr "在当前文件位置打开命令提示符"
 
-#. Resource IDs: (60410)
+#. Resource IDs: (60415)
 msgid "Opens the Windows Explorer at the current file location"
-msgstr "在当前文件位置打开系统文件资源管理器"
+msgstr "在当前文件位置打开文件资源管理器"
 
-#. Resource IDs: (60502)
+#. Resource IDs: (60507)
 msgid "Opens the Windows Explorer at the current file path"
-msgstr "在当前文件路径打开系统文件资源管理器"
+msgstr "在当前文件路径打开文件资源管理器"
 
-#. Resource IDs: (60510)
+#. Resource IDs: (60515)
 msgid "Opens the config file to configure keyboard shortcuts for any command in BowPad"
-msgstr "打开用于配置 BowPad 快捷键的配置文件"
+msgstr "打开 BowPad 的快捷键配置文件"
 
-#. Resource IDs: (60618)
-msgid "Opens the corresponding file to the file in the current tab.\n"
-"(h/cpp, aspx/cs/vb)"
-msgstr "打开与当前文件对应的文件。\n"
-"(h/cpp, aspx/cs/vb)"
+#. Resource IDs: (60623)
+msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
+msgstr "打开当前文件的匹配文件。\n(h/cpp, aspx/cs/vb)"
 
-#. Resource IDs: (60386)
+#. Resource IDs: (60391)
 msgid "Opens the current file in Microsoft Edge browser"
 msgstr "使用 Microsoft Edge 浏览器打开当前文件"
 
-#. Resource IDs: (60390)
+#. Resource IDs: (60395)
 msgid "Opens the current file in Microsoft Internet Explorer"
 msgstr "使用 Microsoft Internet Explorer 浏览器打开当前文件"
 
-#. Resource IDs: (60394)
+#. Resource IDs: (60399)
 msgid "Opens the current file in the Firefox browser"
 msgstr "使用 Firefox 浏览器打开当前文件"
 
-#. Resource IDs: (60398)
+#. Resource IDs: (60403)
 msgid "Opens the current file in the Google Chrome browser"
 msgstr "使用 Google Chrome 浏览器打开当前文件"
 
-#. Resource IDs: (60406)
+#. Resource IDs: (60411)
 msgid "Opens the current file in the Opera browser"
 msgstr "使用 Opera 浏览器打开当前文件"
 
-#. Resource IDs: (60402)
+#. Resource IDs: (60407)
 msgid "Opens the current file in the Safari browser"
 msgstr "使用 Safari 浏览器打开当前文件"
 
-#. Resource IDs: (60422)
+#. Resource IDs: (60427)
 msgid "Opens the default browser to search Wikipedia for the selected text"
-msgstr "打开默认网页浏览器，搜索维基百科中匹配选中文本的条目"
+msgstr "使用默认网页浏览器从维基百科搜索选中的内容"
 
-#. Resource IDs: (60418)
+#. Resource IDs: (60423)
 msgid "Opens the default browser to search for the selected text"
-msgstr "打开默认网页浏览器，用搜索引擎搜索选中文本"
+msgstr "使用默认网页浏览器搜索选中内容"
 
-#. Resource IDs: (60520)
+#. Resource IDs: (60525)
 msgid "Opens the file/path that's at the cursor position"
-msgstr "打开光标所处位置的文件"
+msgstr "打开光标所处位置的文件或路径"
 
-#. Resource IDs: (60298)
+#. Resource IDs: (60303)
 msgid "Opens the printer setup dialog"
-msgstr "打开设置打印机的对话框"
+msgstr "显示设置打印机的对话框"
 
 #. Resource IDs: (60003)
 msgid "Other"
 msgstr "其它"
 
-#. Resource IDs: (60315)
+#. Resource IDs: (60320)
 msgid "Other operations"
 msgstr "其它操作"
 
 #. Resource IDs: (180)
 msgid "Overtype"
-msgstr "覆盖"
+msgstr "改写"
 
-#. Resource IDs: (60283, 60286, 60289)
+#. Resource IDs: (60288, 60291, 60294)
 msgid "P"
 msgstr ""
 
-#. Resource IDs: (60296)
+#. Resource IDs: (60301)
 msgid "PP"
 msgstr ""
 
-#. Resource IDs: (60165)
+#. Resource IDs: (60170)
 msgid "PREV"
 msgstr ""
 
-#. Resource IDs: (60301)
+#. Resource IDs: (60306)
 msgid "PS"
 msgstr ""
 
-#. Resource IDs: (60300)
+#. Resource IDs: (60305)
 msgid "Page Setup"
 msgstr "页面设置"
 
 #. Resource IDs: (60091)
 msgid "Paste"
 msgstr "粘贴"
+
+#. Resource IDs: (60096)
+msgid "Paste Html"
+msgstr "粘贴 HTML"
 
 #. Resource IDs: (232)
 msgid "Please wait."
@@ -1612,49 +1551,53 @@ msgstr "请稍候。"
 msgid "Plugin Name"
 msgstr "插件名称"
 
-#. Resource IDs: (60537)
+#. Resource IDs: (60542)
 msgid "Plugin commands"
 msgstr "插件指令"
 
-#. Resource IDs: (60530, 60536)
+#. Resource IDs: (60535, 60541)
 msgid "Plugins"
 msgstr "插件"
 
 #. Resource IDs: (60079)
 msgid "Prevents editing the file"
-msgstr "防止编辑当前文档"
+msgstr "防止编辑当前文件"
 
-#. Resource IDs: (60164, 60166, 60362)
+#. Resource IDs: (60169, 60171, 60367)
 msgid "Previous"
 msgstr "上一处"
 
-#. Resource IDs: (60364)
+#. Resource IDs: (60369)
 msgid "Previous Bookmark"
 msgstr "上一个书签"
 
-#. Resource IDs: (60282, 60285, 60288, 60291)
+#. Resource IDs: (60287, 60290, 60293, 60296)
 msgid "Print"
 msgstr "打印"
 
-#. Resource IDs: (60302)
+#. Resource IDs: (60307)
 msgid "Print Page Setup"
 msgstr "打印页面设置"
 
-#. Resource IDs: (60292)
+#. Resource IDs: (60297)
 msgid "Print now"
 msgstr "立即打印"
 
-#. Resource IDs: (60295, 60297)
+#. Resource IDs: (60300, 60302)
 msgid "Print setup"
 msgstr "打印设置"
 
 #. Resource IDs: (1082)
 msgid "R&eplace with:"
-msgstr "替换为(H)："
+msgstr "替换为(&E)："
 
-#. Resource IDs: (60337)
+#. Resource IDs: (60342)
 msgid "RELOAD"
-msgstr ""
+msgstr "重新加载"
+
+#. Resource IDs: (256)
+msgid "Reading order (left-to-right or right-to-left)"
+msgstr "阅读顺序（从左至右或从右至左）"
 
 #. Resource IDs: (60076)
 msgid "Readonly"
@@ -1662,15 +1605,15 @@ msgstr "只读"
 
 #. Resource IDs: (209)
 msgid "Recently Used Encodings"
-msgstr "最近使用的文本编码"
+msgstr "最近使用的编码格式"
 
-#. Resource IDs: (60102, 60104)
+#. Resource IDs: (60107, 60109)
 msgid "Redo"
-msgstr "重做"
+msgstr "恢复"
 
-#. Resource IDs: (60105)
+#. Resource IDs: (60110)
 msgid "Redo what was undone before"
-msgstr "重做之前撤销的操作"
+msgstr "恢复到撤销之前的状态"
 
 #. Resource IDs: (157)
 msgid "Regex expression is invalid!"
@@ -1682,63 +1625,61 @@ msgstr "正则表达式有效"
 
 #. Resource IDs: (1009)
 msgid "Regex mode"
-msgstr "正则表达式模式"
+msgstr "正则表达式"
 
-#. Resource IDs: (60338)
+#. Resource IDs: (60343)
 msgid "Reload"
-msgstr "重新打开"
+msgstr "重新读取"
 
 #. Resource IDs: (120)
-msgid "Reload document\n"
-"The document is refreshed from disk."
-msgstr "重新打开文档\n"
-"打开磁盘中更新的文件。"
+msgid "Reload document\nThe document is refreshed from disk."
+msgstr "重新读取文件\n重新读取磁盘中的文件内容。"
 
 #. Resource IDs: (121)
-msgid "Reload document\n"
-"The unsaved modifications are lost."
-msgstr "重新打开文档\n"
-"丢弃未保存的更改。"
+msgid "Reload document\nThe unsaved modifications are lost."
+msgstr "重新读取文件\n丢弃未保存的修改。"
 
-#. Resource IDs: (60339)
+#. Resource IDs: (60344)
 msgid "Reload the file from disk"
-msgstr "从磁盘重新加载文件"
+msgstr "重新读取磁盘文件"
 
 #. Resource IDs: (166)
-msgid "Reload\n"
-"The unsaved modifications will be lost!"
-msgstr "查新加载\n"
-"未保存的更改将会丢失！"
+msgid "Reload\nThe unsaved modifications will be lost!"
+msgstr "重新读取\n未保存的修改将会丢失！"
 
-#. Resource IDs: (60355)
+#. Resource IDs: (60360)
 msgid "Removes all bookmarks from the current file"
-msgstr "删除当前文档的所有书签"
+msgstr "删除当前文件的所有书签"
 
-#. Resource IDs: (60323)
+#. Resource IDs: (60328)
 msgid "Removes whitespaces at the end of lines"
 msgstr "删除行尾的空白"
 
 #. Resource IDs: (1004, 160)
 msgid "Replace &All"
-msgstr "全部替换"
+msgstr "全部替换(&A)"
 
 #. Resource IDs: (168)
 msgid "Replace &all in selection"
-msgstr "替换选中内容的所有匹配项"
+msgstr "替换选取范围内所有匹配项(&A)"
 
 #. Resource IDs: (175)
 msgid "Replace All In All &Tabs"
-msgstr "替换所有打开文件的匹配项"
+msgstr "替换所有打开文件的匹配项(&T)"
 
-#. Resource IDs: (60205, 60207)
+#. Resource IDs: (60210, 60212)
 msgid "Right margin"
-msgstr "右边距"
+msgstr "右边线"
 
-#. Resource IDs: (60381)
+#. Resource IDs: (60386)
 msgid "Run"
 msgstr "运行"
 
-#. Resource IDs: (60382)
+#. Resource IDs: (257)
+msgid "Run as Administrator"
+msgstr "以管理员身份运行"
+
+#. Resource IDs: (60387)
 msgid "Runs various commands"
 msgstr "运行各种命令"
 
@@ -1746,33 +1687,33 @@ msgstr "运行各种命令"
 msgid "S"
 msgstr ""
 
-#. Resource IDs: (60198)
+#. Resource IDs: (60203)
 msgid "SA"
 msgstr ""
 
-#. Resource IDs: (60474)
+#. Resource IDs: (60479)
 msgid "SAL"
 msgstr ""
 
-#. Resource IDs: (60278)
+#. Resource IDs: (60283)
 msgid "SL"
 msgstr ""
 
-#. Resource IDs: (60201, 60332)
+#. Resource IDs: (60206, 60337)
 msgid "ST"
 msgstr ""
 
 #. Resource IDs: (60061)
 msgid "Sa&ve as"
-msgstr "换名保存文件(&M)"
+msgstr "另存为(&V)"
 
 #. Resource IDs: (60052)
 msgid "Save &all"
-msgstr "全部保存(&C)"
+msgstr "全部保存(&A)"
 
 #. Resource IDs: (60049)
 msgid "Save File"
-msgstr "保存文件"
+msgstr "保存"
 
 #. Resource IDs: (60054)
 msgid "Save Files"
@@ -1780,19 +1721,15 @@ msgstr "保存所有文件"
 
 #. Resource IDs: (60063)
 msgid "Save as"
-msgstr "换名保存"
+msgstr "另存为"
 
 #. Resource IDs: (149)
-msgid "Save elevated\n"
-"BowPad is started again with elevated privileges."
-msgstr "提升权限保存\n"
-"BowPad 将使用提升的管理员权限重新启动。"
+msgid "Save elevated\nBowPad is started again with elevated privileges."
+msgstr "提升权限保存\nBowPad 将使用提升的管理员权限重新启动。"
 
 #. Resource IDs: (119)
-msgid "Save modifications\n"
-"The modifications that were made outside BowPad are overwritten."
-msgstr "保存更改\n"
-"覆盖在 BowPad 以外对文件作出的更改。"
+msgid "Save modifications\nThe modifications that were made outside BowPad are overwritten."
+msgstr "保存修改\n覆盖在 BowPad 以外对文件作出的修改。"
 
 #. Resource IDs: (60055)
 msgid "Saves all open files"
@@ -1800,35 +1737,35 @@ msgstr "保存所有打开的文件"
 
 #. Resource IDs: (60059)
 msgid "Saves changes automatically when the tab is switched or closed"
-msgstr "在切换或关闭文件标签时自动保存文档"
+msgstr "在切换或关闭文件标签时自动保存文件"
 
 #. Resource IDs: (60050)
 msgid "Saves the current tab"
-msgstr "保存当前文档"
+msgstr "保存当前文件"
 
-#. Resource IDs: (60416, 60417)
+#. Resource IDs: (60421, 60422)
 msgid "Search Web"
-msgstr "搜索互联网"
+msgstr "在线搜索"
 
-#. Resource IDs: (60420, 60421)
+#. Resource IDs: (60425, 60426)
 msgid "Search Wikipedia"
-msgstr "搜索维基百科"
+msgstr "从维基百科搜索"
 
-#. Resource IDs: (60177)
+#. Resource IDs: (60182)
 msgid "Search and/or replace text in documents/tabs"
-msgstr "在文档中查找或替换文本"
+msgstr "在文件中查找或替换文本"
 
 #. Resource IDs: (227)
 msgid "Search folder not found."
-msgstr "找不到搜索文件夹。"
+msgstr "找不到搜索目录。"
 
 #. Resource IDs: (144)
 msgid "Search text not found!"
-msgstr "找不到要搜索的文本。"
+msgstr "找不到要搜索的内容。"
 
-#. Resource IDs: (60192)
+#. Resource IDs: (60197)
 msgid "Searches for the next match of the selected text"
-msgstr "搜索选中文本的下一个匹配项"
+msgstr "搜索选中内容的下一个匹配项"
 
 #. Resource IDs: (211)
 #, c-format
@@ -1838,32 +1775,32 @@ msgstr "在“%s”文件中搜索"
 #. Resource IDs: (200)
 #, c-format
 msgid "Sel: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%ld%%r matches."
-msgstr "选中文本：%%c%06X%Iu%%r 字符 | %%c%06X%Iu%%r 行 | %%c%06X%ld%%r 匹配项"
+msgstr "选中：%%c%06X%Iu%%r 个字符 | %%c%06X%Iu%%r 行 | %%c%06X%ld%%r 个匹配项"
 
-#. Resource IDs: (60376)
+#. Resource IDs: (60381)
 msgid "Select Language"
-msgstr "选择语言包"
+msgstr "选择语言"
 
-#. Resource IDs: (60197)
+#. Resource IDs: (60202)
 msgid "Select all"
 msgstr "全部选中"
 
-#. Resource IDs: (60377)
+#. Resource IDs: (60382)
 msgid "Select the language for BowPad"
-msgstr "选择用于显示 BowPad 界面的语言包"
+msgstr "选择 BowPad 的界面语言"
 
 #. Resource IDs: (251)
 #, c-format
 msgid "Selection: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%ld%%r matches."
-msgstr "选中文本：%%c%06X%Iu%%r 字符 | %%c%06X%Iu%%r 行 | %%c%06X%ld%%r 匹配项"
+msgstr "选中：%%c%06X%Iu%%r 个字符 | %%c%06X%Iu%%r 行 | %%c%06X%ld%%r 个匹配项"
 
-#. Resource IDs: (60600)
+#. Resource IDs: (60605)
 msgid "Selects the language for the spell checker"
 msgstr "选择拼写检查器的语言"
 
-#. Resource IDs: (60293)
+#. Resource IDs: (60298)
 msgid "Sends the document to the default printer"
-msgstr "向默认打印机发送文档"
+msgstr "从默认打印机打印文件"
 
 #. Resource IDs: (60037)
 msgid "Set Defaults"
@@ -1871,119 +1808,119 @@ msgstr "设置默认项"
 
 #. Resource IDs: (230)
 msgid "Set a new search folder."
-msgstr "设置新的搜索文件夹。"
+msgstr "设置新的搜索目录。"
 
 #. Resource IDs: (60038)
 msgid "Set default encoding and EOL"
-msgstr "设置默认的文本编码和换行字符。"
+msgstr "设置默认的编码和换行格式。"
 
 #. Resource IDs: (228)
 msgid "Set search folder to its containing folder."
-msgstr "将搜索文件夹设为上级文件夹。"
+msgstr "将搜索目录设为上级目录。"
 
 #. Resource IDs: (229)
 msgid "Set search folder to the current documents folder."
-msgstr "将搜索文件夹设为当前文档文件夹。"
+msgstr "将搜索目录设为当前文件目录。"
 
-#. Resource IDs: (60148)
+#. Resource IDs: (60153)
 msgid "Set the coloring according to the code language"
 msgstr "根据代码语言设置显示颜色"
 
 #. Resource IDs: (60039)
 msgid "Set the default encoding (e.g. ANSI, UTF-8, ...) and end-of-line style for new files"
-msgstr "为新建的文档设置默认的文本编码 (如：系统默认编码、UTF-8 等等)，以及换行字符"
+msgstr "为新文件设置默认的编码 (如：ANSI、UTF-8 等)和换行格式"
 
-#. Resource IDs: (60242)
+#. Resource IDs: (60247)
 msgid "Set the number of columns for one tabulator."
-msgstr "设置制表符对应的字符数量"
+msgstr "设置一个制表符对应的空格数量"
 
-#. Resource IDs: (60303)
+#. Resource IDs: (60308)
 msgid "Set up print margins, page size, page orientation"
 msgstr "设置打印边界、纸张尺寸、纸张方向等选项"
 
-#. Resource IDs: (60208)
+#. Resource IDs: (60213)
 msgid "Sets the column at which the vertical edge is shown, indicating the right margin. Set to 0 to hide it."
-msgstr "设置表示右边界的列位置（设为 0 可隐藏边界）"
+msgstr "设置指示右边界竖线距左边界的空格数，值为 0 时不显示"
 
-#. Resource IDs: (60504, 60505)
+#. Resource IDs: (60509, 60510)
 msgid "Show Properties"
 msgstr "显示文件属性"
 
-#. Resource IDs: (60116)
+#. Resource IDs: (60121)
 msgid "Show Whitespaces"
 msgstr "显示空白字符"
 
-#. Resource IDs: (60122)
+#. Resource IDs: (60127)
 msgid "Show line numbers"
 msgstr "显示行号"
 
-#. Resource IDs: (60127)
+#. Resource IDs: (60132)
 msgid "Show the file tree"
 msgstr "显示文件树"
 
-#. Resource IDs: (60466)
+#. Resource IDs: (60471)
 msgid "Shows a dialog to configure custom commands"
-msgstr "显示配置自定义命令的对话框"
+msgstr "显示设置自定义命令的对话框"
 
-#. Resource IDs: (60534)
+#. Resource IDs: (60539)
 msgid "Shows a dialog to configure the installed plugins and install new plugins"
-msgstr "显示配置已安装插件或安装新插件的对话框"
+msgstr "显示设置和安装插件的对话框"
 
-#. Resource IDs: (60481)
+#. Resource IDs: (60486)
 msgid "Shows a list of functions/methods in the file to jump to"
-msgstr "显示文件中的函数或方法列表以供跳转"
+msgstr "显示文件中可以跳转到的函数或方法列表"
 
-#. Resource IDs: (60128)
+#. Resource IDs: (60133)
 msgid "Shows or hides the file tree"
 msgstr "显示或隐藏文件树"
 
-#. Resource IDs: (60546)
+#. Resource IDs: (60551)
 msgid "Shows statistics about the current document"
-msgstr "显示当前文档的统计信息"
+msgstr "显示当前文件内容的统计信息"
 
-#. Resource IDs: (60506)
+#. Resource IDs: (60511)
 msgid "Shows the Windows Explorer file properties dialog for the current file"
 msgstr "显示当前文件的文件属性对话框"
 
-#. Resource IDs: (60542)
+#. Resource IDs: (60547)
 msgid "Shows the list of all opened tabs."
-msgstr "显示当前所有打开文档的列表"
+msgstr "显示当前所有文件标签的列表"
 
-#. Resource IDs: (60277, 60279)
+#. Resource IDs: (60282, 60284)
 msgid "Sort Lines"
-msgstr "排序"
+msgstr "行排序"
 
 #. Resource IDs: (203)
 msgid "Sort Lines - Options"
-msgstr "排序选项"
+msgstr "行排序选项"
 
-#. Resource IDs: (60280)
+#. Resource IDs: (60285)
 msgid "Sorts the current selection (normal or rectangular)."
-msgstr "排序当前选中的内容（普通选区或矩形选区）"
+msgstr "对当前选中区域的内容进行行排序（常规选区或矩形选区）"
 
-#. Resource IDs: (60331, 60333)
+#. Resource IDs: (60336, 60338)
 msgid "Spaces to Tabs"
 msgstr "空格转制表符"
 
-#. Resource IDs: (60592)
+#. Resource IDs: (60597)
 msgid "Spell Check"
 msgstr "拼写检查"
 
-#. Resource IDs: (60594, 60595, 60602, 60603)
+#. Resource IDs: (60599, 60600, 60607, 60608)
 msgid "Spell checker"
 msgstr "拼写检查器"
 
-#. Resource IDs: (60599)
+#. Resource IDs: (60604)
 msgid "Spell checker language"
 msgstr "拼写检查器语言"
 
-#. Resource IDs: (60255, 60257)
+#. Resource IDs: (60260, 60262)
 msgid "Split Lines"
 msgstr "拆分行"
 
-#. Resource IDs: (60258)
+#. Resource IDs: (60263)
 msgid "Split long lines at the right window border"
-msgstr "按窗口边界将行拆分成多行"
+msgstr "将超出窗口边界的行拆分成多行"
 
 #. Resource IDs: (1088)
 msgid "Status"
@@ -1991,7 +1928,7 @@ msgstr "状态"
 
 #. Resource IDs: (144)
 msgid "Style Configurator"
-msgstr "语法突出显示配置"
+msgstr "语言格式设置"
 
 #. Resource IDs: (65535)
 msgid "Style:"
@@ -1999,157 +1936,155 @@ msgstr "样式："
 
 #. Resource IDs: (65535)
 msgid "Styles"
-msgstr "样式"
+msgstr "语言格式"
 
 #. Resource IDs: (1012)
 msgid "Sub Folders"
-msgstr "子文件夹"
+msgstr "子目录"
 
-#. Resource IDs: (156, 60544)
+#. Resource IDs: (156, 60549)
 msgid "Summary"
 msgstr "摘要"
 
 #. Resource IDs: (196)
 msgid "System Includes"
-msgstr "系统包含文件"
+msgstr "系统头文件"
 
-#. Resource IDs: (60321)
+#. Resource IDs: (60326)
 msgid "T"
 msgstr ""
 
-#. Resource IDs: (60240, 60327)
+#. Resource IDs: (60245, 60332)
 msgid "TS"
 msgstr ""
 
-#. Resource IDs: (60370)
+#. Resource IDs: (60375)
 msgid "TT"
 msgstr ""
 
-#. Resource IDs: (60541)
+#. Resource IDs: (60546)
 msgid "Tab List"
-msgstr "文档列表"
+msgstr "标签列表"
 
-#. Resource IDs: (60239, 60241)
+#. Resource IDs: (60244, 60246)
 msgid "Tab Size"
-msgstr "制表符尺寸"
+msgstr "制表符宽度"
 
-#. Resource IDs: (60540)
+#. Resource IDs: (60545)
 msgid "Tabs"
-msgstr "文档"
+msgstr "标签"
 
-#. Resource IDs: (60326, 60328)
+#. Resource IDs: (60331, 60333)
 msgid "Tabs to Spaces"
 msgstr "制表符转空格"
 
 #. Resource IDs: (117)
 #, c-format
 msgid "The document '%s' was modified outside of BowPad, but there are unsaved changes in the document."
-msgstr "文档“%s”在 BowPad 外被修改，在编辑器中有未保存的更改。"
+msgstr "文件“%s”在 BowPad 外被修改，编辑器中还有未保存的修改。"
 
 #. Resource IDs: (118)
 #, c-format
 msgid "The document '%s' was modified outside of BowPad."
-msgstr "文档“%s”在 BowPad 外被修改。"
+msgstr "文件“%s”在 BowPad 外被修改。"
 
 #. Resource IDs: (124)
 #, c-format
 msgid "The document '%s' was removed outside of BowPad."
-msgstr "文档“%s”在 BowPad 外被删除。"
+msgstr "文件“%s”在 BowPad 外被删除。"
 
 #. Resource IDs: (162)
 #, c-format
 msgid "The file '%s' does not exist. Do you want to create it?"
-msgstr "文档“%s”不存在，是否创建该文档？"
+msgstr "文件“%s”不存在，是否创建？"
 
 #. Resource IDs: (184)
 msgid "The file is marked as read only. Are you sure you want to edit this file?"
-msgstr "此文件被标记为只读。您是否确定要编辑此文件？"
+msgstr "当前文件被标记为只读。您确定要编辑此文件？"
 
 #. Resource IDs: (183)
 msgid "The file is write protected"
-msgstr "此文件被禁止写入"
+msgstr "当前文件禁止写入"
 
-#. Resource IDs: (60234, 60236)
+#. Resource IDs: (60239, 60241)
 msgid "Titlecase"
 msgstr "首字母大写"
 
-#. Resource IDs: (60349)
+#. Resource IDs: (60354)
 msgid "Toggle Bookmark"
-msgstr "切换书签"
+msgstr "添加或移除书签"
 
-#. Resource IDs: (60350)
+#. Resource IDs: (60355)
 msgid "Toggle a bookmark on the current line"
-msgstr "切换当前行的书签标记状态"
+msgstr "添加或移除当前行的书签"
 
-#. Resource IDs: (60559, 60560)
+#. Resource IDs: (60564, 60565)
 msgid "Toggle folding all"
-msgstr "切换全部折叠"
+msgstr "全部折叠/展开"
 
-#. Resource IDs: (60562, 60563)
+#. Resource IDs: (60567, 60568)
 msgid "Toggle level 0"
-msgstr "切换折叠级别 0"
+msgstr "折叠/展开层级 0"
 
-#. Resource IDs: (60565, 60566)
+#. Resource IDs: (60570, 60571)
 msgid "Toggle level 1"
-msgstr "切换折叠级别 1"
+msgstr "折叠/展开层级 1"
 
-#. Resource IDs: (60568, 60569)
+#. Resource IDs: (60573, 60574)
 msgid "Toggle level 2"
-msgstr "切换折叠级别 2"
+msgstr "折叠/展开层级 2"
 
-#. Resource IDs: (60571, 60572)
+#. Resource IDs: (60576, 60577)
 msgid "Toggle level 3"
-msgstr "切换折叠级别 3"
+msgstr "折叠/展开层级 3"
 
-#. Resource IDs: (60574, 60575)
+#. Resource IDs: (60579, 60580)
 msgid "Toggle level 4"
-msgstr "切换折叠级别 4"
+msgstr "折叠/展开层级 4"
 
-#. Resource IDs: (60577, 60578)
+#. Resource IDs: (60582, 60583)
 msgid "Toggle level 5"
-msgstr "切换折叠级别 5"
+msgstr "折叠/展开层级 5"
 
-#. Resource IDs: (60580, 60581)
+#. Resource IDs: (60585, 60586)
 msgid "Toggle level 6"
-msgstr "切换折叠级别 6"
+msgstr "折叠/展开层级 6"
 
-#. Resource IDs: (60583, 60584)
+#. Resource IDs: (60588, 60589)
 msgid "Toggle level 7"
-msgstr "切换折叠级别 7"
+msgstr "折叠/展开层级 7"
 
-#. Resource IDs: (60586, 60587)
+#. Resource IDs: (60591, 60592)
 msgid "Toggle level 8"
-msgstr "切换折叠级别 8"
+msgstr "折叠/展开层级 8"
 
-#. Resource IDs: (60589, 60590)
+#. Resource IDs: (60594, 60595)
 msgid "Toggle level 9"
-msgstr "切换折叠级别 9"
+msgstr "折叠/展开层级 9"
 
-#. Resource IDs: (60372)
+#. Resource IDs: (60377)
 msgid "Toggles between the normal and the dark theme"
-msgstr "切换普通主题及暗黑主题"
+msgstr "切换亮色主题或暗色主题"
 
 #. Resource IDs: (1078)
 msgid "Treat digits as &numbers."
-msgstr "将数字字符视为数值(&S)"
+msgstr "将数字视为数值(&N)"
 
-#. Resource IDs: (60320, 60322)
+#. Resource IDs: (60325, 60327)
 msgid "Trim Whitespaces"
-msgstr "剪除空白"
+msgstr "移除空白"
 
 #. Resource IDs: (132)
 msgid "Turn off automatic update checks"
-msgstr "禁止自动检查更新"
+msgstr "关闭自动更新"
 
-#. Resource IDs: (60123)
+#. Resource IDs: (60128)
 msgid "Turns showing the line numbers on/off"
-msgstr "切换行号的显示状态"
+msgstr "显示或隐藏行号栏"
 
-#. Resource IDs: (60117)
-msgid "Turns showing whitespaces on/off.\n"
-"Hold down the Shift key to show EOLs as well."
-msgstr "切换空白字符的显示状态。\n"
-"按住 Shift 键切换换行字符的显示状态。"
+#. Resource IDs: (60122)
+msgid "Turns showing whitespaces on/off.\nHold down the Shift key to show EOLs as well."
+msgstr "显示或隐藏空白字符。\n按住 Shift 键可同时设置换行方式"
 
 #. Resource IDs: (179)
 #, c-format
@@ -2160,25 +2095,25 @@ msgstr "输入模式：%s"
 msgid "U"
 msgstr ""
 
-#. Resource IDs: (60244)
+#. Resource IDs: (60249)
 msgid "UT"
 msgstr ""
 
 #. Resource IDs: (1074)
 msgid "UTF-16 Big Endian"
-msgstr "UTF-16 Big Endian（高位在前）"
+msgstr ""
 
 #. Resource IDs: (1073)
 msgid "UTF-16 Little Endian"
-msgstr "UTF-16 Little Endian（低位在前）"
+msgstr ""
 
 #. Resource IDs: (1076)
 msgid "UTF-32 Big Endian"
-msgstr "UTF-32 Big Endian（高位在前）"
+msgstr ""
 
 #. Resource IDs: (1075)
 msgid "UTF-32 Little Endian"
-msgstr "UTF-32 Little Endian（低位在前）"
+msgstr ""
 
 #. Resource IDs: (1071)
 msgid "UTF-8"
@@ -2186,57 +2121,57 @@ msgstr ""
 
 #. Resource IDs: (1072)
 msgid "UTF-8 with BOM"
-msgstr "UTF-8（带字节顺序标记）"
+msgstr "UTF-8 有 BOM"
 
-#. Resource IDs: (60216, 60218)
+#. Resource IDs: (60221, 60223)
 msgid "Uncomment"
 msgstr "取消注释"
 
-#. Resource IDs: (60219)
+#. Resource IDs: (60224)
 msgid "Uncomments the selected text"
-msgstr "取消选中文本的注释标记"
+msgstr "取消选中内容的注释"
 
 #. Resource IDs: (1009)
 msgid "Underline"
 msgstr "下划线"
 
-#. Resource IDs: (60013, 60096, 60098)
+#. Resource IDs: (60013, 60101, 60103)
 msgid "Undo"
 msgstr "撤销"
 
-#. Resource IDs: (60099)
+#. Resource IDs: (60104)
 msgid "Undo the last change"
-msgstr "撤销上一次编辑操作"
+msgstr "撤销上一次更改"
 
-#. Resource IDs: (1096, 60156)
+#. Resource IDs: (1096, 60161)
 msgid "Unix (LF)"
 msgstr ""
 
 #. Resource IDs: (111)
 msgid "Unsaved modifications"
-msgstr "未保存的更改"
+msgstr "未保存的修改"
 
-#. Resource IDs: (60224, 60226)
+#. Resource IDs: (60229, 60231)
 msgid "Uppercase"
-msgstr "大写"
+msgstr "转为大写"
 
 #. Resource IDs: (155)
 msgid "Use $0 for the whole match, and $1..$99 for group matches."
 msgstr "“$0”代表整个匹配项，“$1”到“$99”代表对应的括号分组匹配项"
 
-#. Resource IDs: (60243, 60245)
+#. Resource IDs: (60248, 60250)
 msgid "Use Tabs"
 msgstr "使用制表符"
 
 #. Resource IDs: (195)
 msgid "User Includes"
-msgstr "用户包含文件"
+msgstr "用户头文件"
 
 #. Resource IDs: (60004, 60017, 60092)
 msgid "V"
 msgstr ""
 
-#. Resource IDs: (60020, 60206)
+#. Resource IDs: (60020, 60211)
 msgid "VE"
 msgstr ""
 
@@ -2256,39 +2191,39 @@ msgstr "显示方式"
 msgid "Visit our Website"
 msgstr "访问我们的网站"
 
-#. Resource IDs: (60109, 60318)
+#. Resource IDs: (60114, 60323)
 msgid "W"
 msgstr ""
 
-#. Resource IDs: (60121)
+#. Resource IDs: (60126)
 msgid "WL"
 msgstr ""
 
-#. Resource IDs: (60115)
+#. Resource IDs: (60120)
 msgid "WS"
 msgstr ""
 
 #. Resource IDs: (1059)
 msgid "Web Search:"
-msgstr "搜索互联网："
+msgstr "在线搜索："
 
 #. Resource IDs: (1094)
 msgid "When loading, prefer utf8 over ANSI/Local"
-msgstr "加载文档时，优先使用 UTF-8 编码而不是系统默认编码"
+msgstr "加载文件时，优先使用 UTF-8 编码而不是系统默认编码"
 
-#. Resource IDs: (60114)
+#. Resource IDs: (60119)
 msgid "Whitespace"
 msgstr "空白字符"
 
-#. Resource IDs: (60317)
+#. Resource IDs: (60322)
 msgid "Whitespaces"
 msgstr "空白字符"
 
-#. Resource IDs: (1095, 60153)
+#. Resource IDs: (1095, 60158)
 msgid "Windows (CRLF)"
-msgstr ""
+msgstr "Windows (CRLF)"
 
-#. Resource IDs: (60108, 60110)
+#. Resource IDs: (60113, 60115)
 msgid "Wrap Lines"
 msgstr "自动换行"
 
@@ -2296,9 +2231,9 @@ msgstr "自动换行"
 msgid "Wrap around."
 msgstr "自动换行"
 
-#. Resource IDs: (60111)
+#. Resource IDs: (60116)
 msgid "Wrap lines at the end of the window"
-msgstr "在编辑器窗口的边缘换行"
+msgstr "在编辑窗口的边缘自动换行"
 
 #. Resource IDs: (60078)
 msgid "Write protected"
@@ -2308,34 +2243,19 @@ msgstr "禁止写入"
 msgid "X"
 msgstr ""
 
-#. Resource IDs: (60103)
+#. Resource IDs: (60108)
 msgid "Y"
 msgstr ""
 
 #. Resource IDs: (142)
-msgid "You can use the following strings in the command line:\r\n"
-"$(LINE)\t\t\tThe line where the cursor is\r\n"
-"$(POS)\t\t\tthe position where the cursor is\r\n"
-"$(TAB_PATH)\t\tthe path to the file of the active tab\r\n"
-"$(TAB_NAME)\t\tthe file name without extension of the current tab\r\n"
-"$(TAB_EXT)\t\tthe file extension of the current tab\r\n"
-"$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n"
-"$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n"
-"$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
-msgstr "你可以在命令行里使用如下替代符：\n"
-"$(LINE)\t\t\t当前光标行号\n"
-"$(POS)\t\t\t当前光标位置\n"
-"$(TAB_PATH)\t\t文件路径\n"
-"$(TAB_NAME)\t\t文件名称\n"
-"$(TAB_DIR)\t\t文件目录\n"
-"$(SEL_TEXT)\t\t选中文本\n"
-"$(SEL_TEXT_ESCAPED)\t类似于 $(SEL_TEXT)，但使用 URL 转义编码"
+msgid "You can use the following strings in the command line:\r\n$(LINE)\t\t\tThe line where the cursor is\r\n$(POS)\t\t\tthe position where the cursor is\r\n$(TAB_PATH)\t\tthe path to the file of the active tab\r\n$(TAB_NAME)\t\tthe file name without extension of the current tab\r\n$(TAB_EXT)\t\tthe file extension of the current tab\r\n$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
+msgstr "您可以使用这些宏：\n$(LINE)\t\t\t当前光标行号\n$(POS)\t\t\t当前光标位置\n$(TAB_PATH)\t\t文件路径\n$(TAB_NAME)\t\t文件名称\n$(TAB_DIR)\t\t文件目录\n$(SEL_TEXT)\t\t选中内容\n$(SEL_TEXT_ESCAPED)\t类似于 $(SEL_TEXT)，但使用 URL 转义编码"
 
 #. Resource IDs: (192)
 msgid "You have to restart BowPad for the plugin changes to take effect."
-msgstr "您需要重新启动 BowPad 以应用更改后的插件设置。"
+msgstr "您需要重新启动 BowPad 才能应用修改后的插件设置。"
 
-#. Resource IDs: (60097)
+#. Resource IDs: (60102)
 msgid "Z"
 msgstr ""
 
@@ -2361,103 +2281,103 @@ msgstr "前景色："
 msgid "from %ld to %ld"
 msgstr "从 %ld 到 %ld"
 
-#. Resource IDs: (60172)
+#. Resource IDs: (60177)
 msgid "go to the next cursor position"
 msgstr "转到光标的后一个位置"
 
-#. Resource IDs: (60167)
+#. Resource IDs: (60172)
 msgid "go to the previous cursor position"
 msgstr "转到光标的前一个位置"
 
-#. Resource IDs: (60426)
+#. Resource IDs: (60431)
 msgid "runs the custom command 0"
 msgstr "执行自定义命令 0"
 
-#. Resource IDs: (60430)
+#. Resource IDs: (60435)
 msgid "runs the custom command 1"
 msgstr "执行自定义命令 1"
 
-#. Resource IDs: (60434)
+#. Resource IDs: (60439)
 msgid "runs the custom command 2"
 msgstr "执行自定义命令 2"
 
-#. Resource IDs: (60438)
+#. Resource IDs: (60443)
 msgid "runs the custom command 3"
 msgstr "执行自定义命令 3"
 
-#. Resource IDs: (60442)
+#. Resource IDs: (60447)
 msgid "runs the custom command 4"
 msgstr "执行自定义命令 4"
 
-#. Resource IDs: (60446)
+#. Resource IDs: (60451)
 msgid "runs the custom command 5"
 msgstr "执行自定义命令 5"
 
-#. Resource IDs: (60450)
+#. Resource IDs: (60455)
 msgid "runs the custom command 6"
 msgstr "执行自定义命令 6"
 
-#. Resource IDs: (60454)
+#. Resource IDs: (60459)
 msgid "runs the custom command 7"
 msgstr "执行自定义命令 7"
 
-#. Resource IDs: (60458)
+#. Resource IDs: (60463)
 msgid "runs the custom command 8"
 msgstr "执行自定义命令 8"
 
-#. Resource IDs: (60462)
+#. Resource IDs: (60467)
 msgid "runs the custom command 9"
 msgstr "执行自定义命令 9"
 
-#. Resource IDs: (60561)
+#. Resource IDs: (60566)
 msgid "toggles folding all levels in the whole document"
-msgstr "切换整个文档的折叠状态"
+msgstr "切换整个文件的折叠层级"
 
-#. Resource IDs: (60564)
+#. Resource IDs: (60569)
 msgid "toggles folding at level 0 in the whole document"
-msgstr "切换整个文档的折叠状态到级别 0"
+msgstr "切换整个文件的折叠层级到级别 0"
 
-#. Resource IDs: (60567)
+#. Resource IDs: (60572)
 msgid "toggles folding at level 1 in the whole document"
-msgstr "切换整个文档的折叠状态到级别 1"
+msgstr "切换整个文件的折叠层级到级别 1"
 
-#. Resource IDs: (60570)
+#. Resource IDs: (60575)
 msgid "toggles folding at level 2 in the whole document"
-msgstr "切换整个文档的折叠状态到级别 2"
+msgstr "切换整个文件的折叠层级到级别 2"
 
-#. Resource IDs: (60573)
+#. Resource IDs: (60578)
 msgid "toggles folding at level 3 in the whole document"
-msgstr "切换整个文档的折叠状态到级别 3"
+msgstr "切换整个文件的折叠层级到级别 3"
 
-#. Resource IDs: (60576)
+#. Resource IDs: (60581)
 msgid "toggles folding at level 4 in the whole document"
-msgstr "切换整个文档的折叠状态到级别 4"
+msgstr "切换整个文件的折叠层级到级别 4"
 
-#. Resource IDs: (60579)
+#. Resource IDs: (60584)
 msgid "toggles folding at level 5 in the whole document"
-msgstr "切换整个文档的折叠状态到级别 5"
+msgstr "切换整个文件的折叠层级到级别 5"
 
-#. Resource IDs: (60582)
+#. Resource IDs: (60587)
 msgid "toggles folding at level 6 in the whole document"
-msgstr "切换整个文档的折叠状态到级别 6"
+msgstr "切换整个文件的折叠层级到级别 6"
 
-#. Resource IDs: (60585)
+#. Resource IDs: (60590)
 msgid "toggles folding at level 7 in the whole document"
-msgstr "切换整个文档的折叠状态到级别 7"
+msgstr "切换整个文件的折叠层级到级别 7"
 
-#. Resource IDs: (60588)
+#. Resource IDs: (60593)
 msgid "toggles folding at level 8 in the whole document"
-msgstr "切换整个文档的折叠状态到级别 8"
+msgstr "切换整个文件的折叠层级到级别 8"
 
-#. Resource IDs: (60591)
+#. Resource IDs: (60596)
 msgid "toggles folding at level 9 in the whole document"
-msgstr "切换整个文档的折叠状态到级别 9"
+msgstr "切换整个文件的折叠层级到级别 9"
 
-#. Resource IDs: (60555)
+#. Resource IDs: (60560)
 msgid "turn on folding"
-msgstr "启用文本折叠功能"
+msgstr "启用折叠"
 
-#. Resource IDs: (60558)
+#. Resource IDs: (60563)
 msgid "turns off folding"
-msgstr "禁用文本折叠功能"
+msgstr "禁用折叠"
 
