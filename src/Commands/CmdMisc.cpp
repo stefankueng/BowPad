@@ -134,7 +134,7 @@ HRESULT CCmdViewFileTree::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
     }
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !GetFileTreePath().empty(), ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, true, ppropvarNewValue);
     }
     return E_NOTIMPL;
 }

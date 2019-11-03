@@ -263,7 +263,11 @@ HRESULT CCmdCut::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPV
 
 bool CCmdCutPlain::Execute()
 {
-    ScintillaCall(SCI_CUT);
+    bool bEmpty = ScintillaCall(SCI_GETSELECTIONEMPTY) != 0;
+    if (bEmpty)
+        ScintillaCall(SCI_LINECUT);
+    else
+        ScintillaCall(SCI_CUT);
     AddLexerToClipboard();
     return true;
 }
