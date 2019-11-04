@@ -162,8 +162,6 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
     , m_fileTree(hInst, this)
-    , m_newTabBtn(hInst)
-    , m_closeTabBtn(hInst)
     , m_progressBar(hInst)
     , m_treeWidth(0)
     , m_bDragging(false)
@@ -479,14 +477,15 @@ bool CMainWindow::RegisterAndCreateWindow()
     WNDCLASSEX wcx = { sizeof(WNDCLASSEX) }; // Set size and zero out rest.
 
     //wcx.style = 0; - Don't use CS_HREDRAW or CS_VREDRAW with a Ribbon
-    wcx.lpfnWndProc = CWindow::stWinMsgHandler;
-    wcx.hInstance = hResource;
+    wcx.style                  = CS_DBLCLKS;
+    wcx.lpfnWndProc            = CWindow::stWinMsgHandler;
+    wcx.hInstance              = hResource;
     const std::wstring clsName = GetWindowClassName();
-    wcx.lpszClassName = clsName.c_str();
-    wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_BOWPAD));
-    wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
-    wcx.hIconSm = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_BOWPAD));
-    wcx.hCursor = LoadCursor(nullptr, (LPTSTR)IDC_SIZEWE); // for resizing the tree control
+    wcx.lpszClassName          = clsName.c_str();
+    wcx.hIcon                  = LoadIcon(hResource, MAKEINTRESOURCE(IDI_BOWPAD));
+    wcx.hbrBackground          = (HBRUSH)(COLOR_3DFACE + 1);
+    wcx.hIconSm                = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_BOWPAD));
+    wcx.hCursor                = LoadCursor(nullptr, (LPTSTR)IDC_SIZEWE); // for resizing the tree control
     if (RegisterWindow(&wcx))
     {
         // create the window hidden, then after the window is created use the RestoreWindowPos
@@ -719,6 +718,25 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     case WM_SETTINGCHANGE:
     case WM_SYSCOLORCHANGE:
         SetTheme(CTheme::Instance().IsDarkTheme());
+    break;
+    case WM_LBUTTONDBLCLK:
+    {
+        RECT rc, tabrc;
+        GetWindowRect(m_TabBar, &rc);
+        TabCtrl_GetItemRect(m_TabBar, m_TabBar.GetItemCount() - 1, &tabrc);
+        MapWindowPoints(m_TabBar, nullptr, (LPPOINT)&tabrc, 2);
+        if (tabrc.right > rc.right)
+            break;
+        rc.bottom = tabrc.bottom;
+        rc.left   = tabrc.right;
+        POINT pt;
+        pt.x = GET_X_LPARAM(lParam);
+        pt.y = GET_Y_LPARAM(lParam);
+        MapWindowPoints(*this, nullptr, &pt, 1);
+
+        if (PtInRect(&rc, pt))
+            OpenNewTab();
+    }
     break;
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -1169,16 +1187,10 @@ bool CMainWindow::Initialize()
     CCommandHandler::Instance().AddCommand(&m_fileTree);
     m_editor.Init(hResource, *this);
     m_StatusBar.Init(*this, true);
-    m_StatusBar.SetHandlerFunc([](COLORREF clr)->COLORREF
-    {
+    m_StatusBar.SetHandlerFunc([](COLORREF clr) -> COLORREF {
         return CTheme::Instance().GetThemeColor(clr);
     });
     m_TabBar.Init(hResource, *this);
-    m_newTabBtn.Init(hResource, *this, (HMENU)cmdNew);
-    m_newTabBtn.SetText(L"+");
-    m_closeTabBtn.Init(hResource, *this, (HMENU)cmdClose);
-    m_closeTabBtn.SetText(L"X");
-    m_closeTabBtn.SetTextColor(RGB(255, 0, 0));
     m_progressBar.Init(hResource, *this);
     m_custToolTip.Init(m_editor);
     // Note DestroyIcon not technically needed here but we may as well leave in
@@ -1205,10 +1217,9 @@ bool CMainWindow::Initialize()
     GetRibbonColors(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
     SetTheme(CTheme::Instance().IsDarkTheme());
     CTheme::Instance().RegisterThemeChangeCallback(
-        [this]()
-    {
-        SetTheme(CTheme::Instance().IsDarkTheme());
-    });
+        [this]() {
+            SetTheme(CTheme::Instance().IsDarkTheme());
+        });
 
     CCommandHandler::Instance().Init(this);
     CKeyboardShortcutHandler::Instance().UpdateTooltips();
@@ -1351,13 +1362,11 @@ void CMainWindow::ResizeChildWindows()
         const int treeWidth = m_fileTreeVisible ? m_treeWidth : 0;
         const int mainWidth = rect.right - rect.left;
 
-        HDWP hDwp = BeginDeferWindowPos(6);
+        HDWP hDwp = BeginDeferWindowPos(4);
         DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), mainWidth, m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_TabBar, nullptr, treeWidth+rect.left, rect.top + m_RibbonHeight, mainWidth - treeWidth - tabBtnWidth - tabBtnWidth, rect.bottom - rect.top, flags);
-        DeferWindowPos(hDwp, m_newTabBtn, nullptr, mainWidth - tabBtnWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
-        DeferWindowPos(hDwp, m_closeTabBtn, nullptr, mainWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
+        DeferWindowPos(hDwp, m_TabBar, nullptr, treeWidth + rect.left, rect.top + m_RibbonHeight, mainWidth - treeWidth, rect.bottom - rect.top, flags);
         DeferWindowPos(hDwp, m_editor, nullptr, rect.left + treeWidth, rect.top + m_RibbonHeight + tbHeight, mainWidth - treeWidth, rect.bottom - (m_RibbonHeight + tbHeight) - m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight, treeWidth ? treeWidth - 5 : 0, rect.bottom - (m_RibbonHeight) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
+        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight, treeWidth ? treeWidth - 5 : 0, rect.bottom - (m_RibbonHeight)-m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
         EndDeferWindowPos(hDwp);
     }
 }
@@ -3915,10 +3924,6 @@ void CMainWindow::SetTheme(bool dark)
             SetClassLongPtr(m_TabBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
         if (IsWindow(m_fileTree))
             SetClassLongPtr(m_fileTree, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
-        if (IsWindow(m_newTabBtn))
-            SetClassLongPtr(m_newTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
-        if (IsWindow(m_closeTabBtn))
-            SetClassLongPtr(m_closeTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
         if (IsWindow(m_editor))
             SetClassLongPtr(m_editor, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
     }
@@ -3944,10 +3949,6 @@ void CMainWindow::SetTheme(bool dark)
             SetClassLongPtr(m_TabBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
         if (IsWindow(m_fileTree))
             SetClassLongPtr(m_fileTree, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
-        if (IsWindow(m_newTabBtn))
-            SetClassLongPtr(m_newTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
-        if (IsWindow(m_closeTabBtn))
-            SetClassLongPtr(m_closeTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
         if (IsWindow(m_editor))
             SetClassLongPtr(m_editor, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
     }

@@ -200,8 +200,6 @@ private:
     CTabBar                     m_TabBar;
     CScintillaWnd               m_editor;
     CFileTree                   m_fileTree;
-    CTabBtn                     m_newTabBtn;
-    CTabBtn                     m_closeTabBtn;
     CProgressBar                m_progressBar;
     CCustomToolTip              m_custToolTip;
     int                         m_treeWidth;
