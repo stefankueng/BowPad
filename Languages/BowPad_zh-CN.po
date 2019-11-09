@@ -2229,7 +2229,7 @@ msgstr "自动换行"
 
 #. Resource IDs: (143)
 msgid "Wrap around."
-msgstr "自动换行"
+msgstr "到达文件结尾，已转到文件开头搜索。"
 
 #. Resource IDs: (60116)
 msgid "Wrap lines at the end of the window"
