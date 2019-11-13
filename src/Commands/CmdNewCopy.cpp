@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2014, 2016 - Stefan Kueng
 //
@@ -47,13 +47,16 @@ bool CCmdNewCopy::Execute()
         ScintillaCall(SCI_APPENDTEXT, len, (sptr_t)textbuf.get());
         RestoreCurrentPos(docnew.m_position);
         ScintillaCall(SCI_SETSAVEPOINT);
-        std::wstring sTitle = CPathUtils::GetFileName(docnew.m_path);
+        std::wstring sTitle = CPathUtils::GetFileName(doc.m_path);
         if (sTitle.empty())
             sTitle = GetCurrentTitle();
-        std::wstring sExt = CPathUtils::GetFileExtension(docnew.m_path);
+        std::wstring sExt = CPathUtils::GetFileExtension(doc.m_path);
         ResString sTitleFormat(hRes, IDS_COPYTITLE);
         if (sExt.empty())
+        {
             sTitle = CStringUtils::Format(sTitleFormat, sTitle.c_str(), sExt.c_str());
+            sTitle.erase(sTitle.end() - 1);
+        }
         else
             sTitle = CStringUtils::Format(sTitleFormat, sTitle.substr(0, sTitle.size() - sExt.size() - 1).c_str(), sExt.c_str());
         SetCurrentTitle(sTitle.c_str());

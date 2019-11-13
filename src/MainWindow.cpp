@@ -479,6 +479,7 @@ bool CMainWindow::RegisterAndCreateWindow()
     WNDCLASSEX wcx = { sizeof(WNDCLASSEX) }; // Set size and zero out rest.
 
     //wcx.style = 0; - Don't use CS_HREDRAW or CS_VREDRAW with a Ribbon
+    wcx.style                  = CS_DBLCLKS;
     wcx.lpfnWndProc = CWindow::stWinMsgHandler;
     wcx.hInstance = hResource;
     const std::wstring clsName = GetWindowClassName();
@@ -719,6 +720,25 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     case WM_SETTINGCHANGE:
     case WM_SYSCOLORCHANGE:
         SetTheme(CTheme::Instance().IsDarkTheme());
+    break;
+    case WM_LBUTTONDBLCLK:
+    {
+        RECT rc, tabrc;
+        GetWindowRect(m_TabBar, &rc);
+        TabCtrl_GetItemRect(m_TabBar, m_TabBar.GetItemCount() - 1, &tabrc);
+        MapWindowPoints(m_TabBar, nullptr, (LPPOINT)&tabrc, 2);
+        if (tabrc.right > rc.right)
+            break;
+        rc.bottom = tabrc.bottom;
+        rc.left   = tabrc.right;
+        POINT pt;
+        pt.x = GET_X_LPARAM(lParam);
+        pt.y = GET_Y_LPARAM(lParam);
+        MapWindowPoints(*this, nullptr, &pt, 1);
+
+        if (PtInRect(&rc, pt))
+            OpenNewTab();
+    }
     break;
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
