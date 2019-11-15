@@ -1428,7 +1428,7 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         CMRU::Instance().AddPath(doc.m_path);
         if (isActiveTab && m_fileTree.GetPath().empty())
         {
-            m_fileTree.SetPath(CPathUtils::GetParentDirectory(doc.m_path));
+            m_fileTree.SetPath(CPathUtils::GetParentDirectory(doc.m_path), false);
             ResizeChildWindows();
         }
     }
@@ -1520,7 +1520,7 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savepath
 
     GoToLine(line);
 
-    m_fileTree.SetPath(CPathUtils::GetParentDirectory(savepath));
+    m_fileTree.SetPath(CPathUtils::GetParentDirectory(savepath), false);
     ResizeChildWindows();
 
     DeleteFile(filepath.c_str());
@@ -1542,7 +1542,7 @@ void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& sa
         UpdateCaptionBar();
         UpdateStatusBar(true);
         GoToLine(line);
-        m_fileTree.SetPath(CPathUtils::GetParentDirectory(savepath));
+        m_fileTree.SetPath(CPathUtils::GetParentDirectory(savepath), false);
         ResizeChildWindows();
         // delete the temp file used for the elevated save
         DeleteFile(path.c_str());
@@ -2972,7 +2972,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             CCommandHandler::Instance().OnDocumentOpen(id);
             if (m_fileTree.GetPath().empty())
             {
-                m_fileTree.SetPath(CPathUtils::GetParentDirectory(filepath));
+                m_fileTree.SetPath(CPathUtils::GetParentDirectory(filepath), false);
                 ResizeChildWindows();
             }
             UpdateTab(id);
@@ -3480,7 +3480,7 @@ bool CMainWindow::ReloadTab( int tab, int encoding, bool dueToOutsideChanges )
         editor->Call(SCI_SETSAVEPOINT);
 
     // refresh the file tree
-    m_fileTree.SetPath(m_fileTree.GetPath());
+    m_fileTree.SetPath(m_fileTree.GetPath(), !dueToOutsideChanges);
 
     return true;
 }
@@ -3551,7 +3551,7 @@ void CMainWindow::CheckForOutsideChanges()
                 const auto& doc = m_DocManager.GetDocumentFromID(docID);
                 if ((ds != DM_Removed) && !doc.m_bIsDirty && !doc.m_bNeedsSaving && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
                 {
-                    ReloadTab(i, -1);
+                    ReloadTab(i, -1, true);
                 }
                 else
                 {

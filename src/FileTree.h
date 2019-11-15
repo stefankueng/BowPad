@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2018 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018-2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ public:
 
     bool Init(HINSTANCE hInst, HWND hParent);
     void Clear();
-    void SetPath(const std::wstring& path);
+    void SetPath(const std::wstring& path, bool forcerefresh = true);
     std::wstring GetPath()const { return m_path; }
     HTREEITEM GetHitItem() const;
     void Refresh(HTREEITEM refreshRoot, bool force = false);

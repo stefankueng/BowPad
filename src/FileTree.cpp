@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018 - Stefan Kueng
+// Copyright (C) 2014-2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ void CFileTree::Clear()
     TreeView_DeleteAllItems(*this);
 }
 
-void CFileTree::SetPath(const std::wstring & path)
+void CFileTree::SetPath(const std::wstring & path, bool forcerefresh)
 {
     if (m_bRootBusy && (m_path != path))
     {
@@ -119,8 +119,11 @@ void CFileTree::SetPath(const std::wstring & path)
     }
     else
     {
-        m_path = path;
-        Refresh(TVI_ROOT);
+        if (forcerefresh || (m_path != path))
+        {
+            m_path = path;
+            Refresh(TVI_ROOT);
+        }
     }
 }
 
