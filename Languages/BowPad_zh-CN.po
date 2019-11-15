@@ -1233,7 +1233,7 @@ msgstr ""
 
 #. Resource IDs: (60027)
 msgid "MRU List"
-msgstr ""
+msgstr "最近使用的文档"
 
 #. Resource IDs: (60230)
 msgid "MU"
@@ -1427,12 +1427,12 @@ msgstr "提升权限运行\nBowPad 已在管理员权限下运行。"
 #. Resource IDs: (182)
 #, c-format
 msgid "Open files: %d"
-msgstr "打开文件：%d"
+msgstr "打开的标签数量：%d"
 
 #. Resource IDs: (252)
 #, c-format
 msgid "Open tabs: %%c%06X%ld%%r"
-msgstr "打开标签：%%c%06X%ld%%r"
+msgstr "标签数：%%c%06X%ld%%r"
 
 #. Resource IDs: (253)
 #, c-format
@@ -2229,7 +2229,7 @@ msgstr "自动换行"
 
 #. Resource IDs: (143)
 msgid "Wrap around."
-msgstr "自动换行"
+msgstr "到达文件结尾，已转到文件开头搜索。"
 
 #. Resource IDs: (60116)
 msgid "Wrap lines at the end of the window"

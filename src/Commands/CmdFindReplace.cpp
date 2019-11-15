@@ -362,6 +362,14 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
     case WM_INITDIALOG:
         DoInitDialog(hwndDlg);
         break;
+    case WM_CTLCOLORSTATIC:
+        if (GetDlgCtrlID((HWND)lParam) == IDC_SEARCHINFO)
+        {
+            SetTextColor((HDC)wParam, RGB(0, 128, 0));
+            SetBkMode((HDC)wParam, TRANSPARENT);
+            return (LRESULT)GetSysColorBrush(COLOR_BTNFACE);
+        }
+        break;
     case WM_ACTIVATE:
         if (wParam == WA_INACTIVE)
         {
