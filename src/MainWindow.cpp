@@ -1408,6 +1408,20 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         title += L" - ";
         title += m_TabBar.GetTitle(m_TabBar.GetIndexFromID(docID));
 
+        auto ext = CPathUtils::GetFileExtension(doc.m_path);
+        if (ext.empty())
+        {
+            // if there's a lexer active, use the default extension
+            // for that lexer
+            auto defext = CLexStyles::Instance().GetDefaultExtensionForLanguage(doc.GetLanguage());
+            if (!defext.empty())
+            {
+                if (doc.m_path.empty())
+                    doc.m_path = m_TabBar.GetCurrentTitle() + L"." + defext;
+                else
+                    doc.m_path += L"." + defext;
+            }
+        }
         if (!ShowFileSaveDialog(*this, title, doc.m_path, outpath))
             return false;
         doc.m_path = outpath;

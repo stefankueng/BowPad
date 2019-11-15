@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -578,6 +578,27 @@ std::wstring CLexStyles::GetUserExtensionsForLanguage( const std::wstring& lang 
         }
     }
     return exts;
+}
+
+std::wstring CLexStyles::GetDefaultExtensionForLanguage(const std::string& lang) const
+{
+    // if there's a user set extension, use that
+    for (const auto& e : m_userextLang)
+    {
+        if (e.second.compare(lang) == 0)
+        {
+            return CUnicodeUtils::StdGetUnicode(e.first);
+        }
+    }
+    // fall back to the global extension
+    for (const auto& e : m_extLang)
+    {
+        if (e.second.compare(lang) == 0)
+        {
+            return CUnicodeUtils::StdGetUnicode(e.first);
+        }
+    }
+    return {};
 }
 
 std::vector<std::wstring> CLexStyles::GetLanguages() const
