@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1548,7 +1548,7 @@ void CFindReplaceDlg::DoReplace( int id )
                 long tend = (long)ScintillaCall(SCI_GETTARGETEND);
                 if (id == IDC_REPLACEBTN)
                     Center(tstart, tend);
-                if (tend > tstart || sReplaceString.empty())
+                if ((tend > tstart || sReplaceString.empty()) && (tstart != tend))
                     ScintillaCall(SCI_SETTARGETSTART, tend);
                 else
                     ScintillaCall(SCI_SETTARGETSTART, tend + 1);
