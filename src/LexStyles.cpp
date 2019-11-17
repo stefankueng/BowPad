@@ -306,12 +306,21 @@ void CLexStyles::Load()
                 ReplaceVariables(v, variables);
                 std::vector<std::wstring> exts;
                 stringtok(exts, v, true, L";");
+                std::wstring filters;
                 for (const auto& e : exts)
                 {
-                    m_extLang[CUnicodeUtils::StdGetUTF8(e)] = utf8langkey;
+                    m_extLang.insert({CUnicodeUtils::StdGetUTF8(e), utf8langkey});
                     if (&ini == &inis[1])
                         m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = utf8langkey;
+                    else
+                    {
+                        if (!filters.empty())
+                            filters.push_back(TEXT(';'));
+                        filters += TEXT("*.") + e;
+                    }
                 }
+                if (!filters.empty())
+                    m_fileTypes.push_back(std::make_pair(std::wstring(langkey) + TEXT(" file"), std::move(filters)));
 
                 std::wstring langsect = L"lang_";
                 langsect += langkey;
@@ -385,6 +394,12 @@ void CLexStyles::Load()
                 langdata = std::move(ld);
             }
         }
+        m_fileTypes.sort([](const auto& first, const auto& second) {
+            return _tcsicmp(first.first.c_str(), second.first.c_str()) < 0;
+        });
+        m_fileTypes.push_front(std::make_pair(TEXT("All file"), TEXT("*.*")));
+        for (auto& e : m_fileTypes)
+            m_filterSpec.push_back({e.first.c_str(), e.second.c_str()});
     }
 
     m_bLoaded = true;
@@ -560,6 +575,9 @@ std::string CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaW
             break;
         }
     }
+    // Unknown language,use "Text" as default
+    if (lang.empty())
+        lang = "Text";
 
     return lang;
 }
@@ -580,25 +598,43 @@ std::wstring CLexStyles::GetUserExtensionsForLanguage( const std::wstring& lang 
     return exts;
 }
 
-std::wstring CLexStyles::GetDefaultExtensionForLanguage(const std::string& lang) const
+bool CLexStyles::GetDefaultExtensionForLanguage(const std::string& lang, std::wstring& ext, UINT& index) const
 {
     // if there's a user set extension, use that
     for (const auto& e : m_userextLang)
     {
         if (e.second.compare(lang) == 0)
         {
-            return CUnicodeUtils::StdGetUnicode(e.first);
+            ext = CUnicodeUtils::StdGetUnicode(e.first);
+            return true;
         }
     }
-    // fall back to the global extension
-    for (const auto& e : m_extLang)
+    // Search in filter pattern, use the first extension as the default and return file type index.
+    auto langW = CUnicodeUtils::StdGetUnicode(lang) + TEXT(" file");
+    for (size_t i = 0, count = m_filterSpec.size(); i < count; ++i)
     {
-        if (e.second.compare(lang) == 0)
+        if (m_filterSpec[i].pszName == langW)
         {
-            return CUnicodeUtils::StdGetUnicode(e.first);
+            index    = i;
+            auto pos = _tcschr(m_filterSpec[i].pszSpec, TEXT(';'));
+            if (pos)
+                ext.assign(m_filterSpec[i].pszSpec + 2, pos);
+            else
+                ext = m_filterSpec[i].pszSpec + 2;
+            return true;
         }
     }
-    return {};
+    return false;
+}
+
+size_t CLexStyles::GetFilterSpceCount() const
+{
+    return m_filterSpec.size();
+}
+
+const COMDLG_FILTERSPEC* CLexStyles::GetFilterSpceData() const
+{
+    return m_filterSpec.data();
 }
 
 std::vector<std::wstring> CLexStyles::GetLanguages() const

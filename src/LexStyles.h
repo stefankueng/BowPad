@@ -91,7 +91,10 @@ public:
     std::vector<std::wstring>           GetLanguages() const;
     std::string                         GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
     std::wstring                        GetUserExtensionsForLanguage(const std::wstring& lang) const;
-    std::wstring                        GetDefaultExtensionForLanguage(const std::string& lang) const;
+    bool                                GetDefaultExtensionForLanguage(const std::string& lang, std::wstring &ext, UINT &index) const;
+
+    size_t                              GetFilterSpceCount() const;
+    const COMDLG_FILTERSPEC*            GetFilterSpceData() const;
 
     const std::unordered_map<int, std::string>&   GetKeywordsForLang(const std::string& lang);
     const std::unordered_map<int, std::string>&   GetKeywordsForLexer(int lexer);
@@ -134,7 +137,8 @@ private:
 private:
     bool                                m_bLoaded;
 
-    std::map<std::string, std::string>  m_extLang;
+    // Different languages may have the same file extension
+    std::multimap<std::string, std::string>  m_extLang;
     std::map<std::string, std::string>  m_fileLang;
     std::map<std::string, LanguageData> m_Langdata;
     std::unordered_map<int, LexerData>  m_lexerdata;
@@ -145,4 +149,7 @@ private:
     std::map<std::string, std::string>  m_autoextLang;
     std::map<std::wstring, std::string> m_pathsLang;
     std::list<std::wstring>             m_pathsForLang;
+    // Used by the Save File Dialog filter.
+    std::list<std::pair<std::wstring, std::wstring>> m_fileTypes;
+    std::vector<COMDLG_FILTERSPEC>                     m_filterSpec;
 };
