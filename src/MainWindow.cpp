@@ -1442,6 +1442,9 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         return false;
 
     auto& doc = m_DocManager.GetModDocumentFromID(docID);
+    if (!bSaveAs && !doc.m_bIsDirty && !doc.m_bNeedsSaving)
+        return false;
+
     auto isActiveTab = docID == m_TabBar.GetCurrentTabId();
     if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
     {
