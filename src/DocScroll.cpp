@@ -47,12 +47,12 @@ static void DrawThumb(HDC hdc, COLORREF thumb, const RECT& rect, UINT uBar)
     Gdiplus::Color c1;
     c1.SetValue(GDIHelpers::MakeARGB(152, GetRValue(thumb), GetGValue(thumb), GetBValue(thumb)));
     Gdiplus::SolidBrush brush(c1);
-
+    const int margin = CDPIAware::Instance().Scale(3);
     Gdiplus::Rect rc(
-        (uBar == SB_HORZ ? rect.left : rect.left + 3),
-        (uBar == SB_HORZ ? rect.top + 3 : rect.top),
-        (uBar == SB_HORZ ? rect.right - rect.left : rect.right - rect.left - 7),
-        (uBar == SB_HORZ ? rect.bottom - rect.top - 7 : rect.bottom - rect.top));
+        (uBar == SB_HORZ ? rect.left : rect.left + margin),
+        (uBar == SB_HORZ ? rect.top + margin : rect.top),
+        (uBar == SB_HORZ ? rect.right - rect.left : rect.right - rect.left - margin * 2 - 1),
+        (uBar == SB_HORZ ? rect.bottom - rect.top - margin * 2 - 1 : rect.bottom - rect.top));
     Gdiplus::GraphicsPath path;
     path.AddRectangle(rc);
     
