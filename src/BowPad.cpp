@@ -201,24 +201,15 @@ static void SetJumplist(LPCTSTR appID)
 
 static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineParser& parser)
 {
-    int nCmdShow = 0;
-
-    if (::IsZoomed(hBowPadWnd))
-        nCmdShow = SW_MAXIMIZE;
-    else if (::IsIconic(hBowPadWnd))
-        nCmdShow = SW_RESTORE;
-    else
-        nCmdShow = SW_SHOW;
+    if (::IsIconic(hBowPadWnd))
+        ::ShowWindow(hBowPadWnd, SW_RESTORE);
     // if the window is not yet visible, we wait a little bit
     // and we don't make the window visible here: the message we send
     // to open the file might get handled before the RegisterAndCreateWindow
     // in MainWindow.cpp hasn't finished yet. Just let that function make
     // the window visible in the right position.
     if (IsWindowVisible(hBowPadWnd))
-    {
-        ::ShowWindow(hBowPadWnd, nCmdShow);
         ::SetForegroundWindow(hBowPadWnd);
-    }
     else
         Sleep(500);
 
