@@ -1081,7 +1081,20 @@ void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
         // use center
         linesToScroll += linesVisible/2;
     }
-    Call(SCI_LINESCROLL, 0, linesToScroll);
+    auto wrapmode = Call(SCI_GETWRAPMODE);
+    if (wrapmode != SC_WRAP_NONE)
+    {
+        // if wrapping is enabled, scrolling to a line won't work
+        // properly until scintilla has painted the document, because
+        // the wrap calculations aren't finished until then.
+        // So we set the scroll position here to a member variable,
+        // which then is used to scroll scintilla to that line after
+        // the first SCN_PAINTED event.
+        m_LineToScrollToAfterPaint = currentlineNumberDoc;
+        m_WrapOffsetToScrollToAfterPaint = 0;
+    }
+    else
+        Call(SCI_LINESCROLL, 0, linesToScroll);
 
     // Make sure the caret is visible, scroll horizontally
     Call(SCI_GOTOPOS, posStart);
@@ -2219,9 +2232,11 @@ void CScintillaWnd::ReflectEvents(SCNotification * pScn)
     case SCN_PAINTED:
         if (m_LineToScrollToAfterPaint != (size_t)-1)
         {
-            m_LineToScrollToAfterPaint = Call(SCI_VISIBLEFROMDOCLINE, m_LineToScrollToAfterPaint);
-            m_LineToScrollToAfterPaint += m_WrapOffsetToScrollToAfterPaint;
-            Call(SCI_LINESCROLL, 0, m_LineToScrollToAfterPaint);
+            auto visLineToScrollTo = Call(SCI_VISIBLEFROMDOCLINE, m_LineToScrollToAfterPaint);
+            visLineToScrollTo += m_WrapOffsetToScrollToAfterPaint;
+            auto currentVisPos = Call(SCI_VISIBLEFROMDOCLINE, Call(SCI_GETFIRSTVISIBLELINE));
+            visLineToScrollTo -= currentVisPos;
+            Call(SCI_LINESCROLL, 0, visLineToScrollTo);
             m_LineToScrollToAfterPaint = (size_t)-1;
             m_WrapOffsetToScrollToAfterPaint = 0;
             UpdateLineNumberWidth();
