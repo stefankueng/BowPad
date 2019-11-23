@@ -332,6 +332,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.SmallImages>
     </Command>
     <Command Name="cmdTabSize" LabelTitle="Tab Size" TooltipTitle="Tab Size" TooltipDescription="Set the number of columns for one tabulator." Keytip="TS">
+      <Command.SmallImages>
+        <Image>res/TabSizeL.bmp</Image>
+      </Command.SmallImages>
     </Command>
     <Command Name="cmdUseTabs" LabelTitle="Use Tabs" TooltipTitle="Use Tabs" TooltipDescription="Determines whether a tab is inserted or spaces when the tab key is pressed." Keytip="UT">
       <Command.SmallImages>
@@ -1104,7 +1107,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 </Row>
                 <ColumnBreak ShowSeparator="true"/>
                 <Row>
-                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
@@ -1129,7 +1132,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 </Row>
                 <ColumnBreak ShowSeparator="true"/>
                 <Row>
-                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />
@@ -1154,7 +1157,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 </Row>
                 <ColumnBreak ShowSeparator="true"/>
                 <Row>
-                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" IsImageVisible="false" />
+                  <ControlSizeDefinition ControlName="button5" ImageSize="Small" IsLabelVisible="true" />
                 </Row>
                 <Row>
                   <ControlSizeDefinition ControlName="button6" ImageSize="Small" IsLabelVisible="true" />

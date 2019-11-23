@@ -50,9 +50,6 @@ public:
     UINT GetCmdId() override { return cmdCut; }
 
     void ScintillaNotify(SCNotification * pScn) override;
-
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-
 };
 
 class CCmdCutPlain : public ClipboardBase
@@ -70,9 +67,6 @@ public:
     UINT GetCmdId() override { return cmdCutPlain; }
 
     void ScintillaNotify(SCNotification * pScn) override;
-
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-
 };
 
 

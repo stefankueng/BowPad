@@ -252,15 +252,6 @@ void CCmdCut::ScintillaNotify(SCNotification * pScn)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
-HRESULT CCmdCut::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
-{
-    if (UI_PKEY_Enabled == key)
-    {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_GETSELTEXT) > 1), ppropvarNewValue);
-    }
-    return E_NOTIMPL;
-}
-
 bool CCmdCutPlain::Execute()
 {
     bool bEmpty = ScintillaCall(SCI_GETSELECTIONEMPTY) != 0;
@@ -276,15 +267,6 @@ void CCmdCutPlain::ScintillaNotify(SCNotification * pScn)
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
-}
-
-HRESULT CCmdCutPlain::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
-{
-    if (UI_PKEY_Enabled == key)
-    {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_GETSELTEXT) > 1), ppropvarNewValue);
-    }
-    return E_NOTIMPL;
 }
 
 

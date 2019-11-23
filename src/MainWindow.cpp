@@ -93,12 +93,19 @@ namespace
     static ResponseToCloseTab responsetoclosetab = ResponseToCloseTab::CloseWithoutSaving;
 }
 
-static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const std::wstring& path, std::wstring& outpath)
+inline bool IsHexDigitString(const char* str)
 {
-    outpath.clear();
+    for (int i = 0; str[i]; ++i)
+    {
+        if (!isxdigit(str[i]))
+            return false;
+    }
+    return true;
+}
 
+static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const std::wstring fileExt, UINT extIndex, std::wstring& path)
+{
     PreserveChdir keepCWD;
-
     IFileSaveDialogPtr pfd;
 
     HRESULT hr = pfd.CreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER);
@@ -117,6 +124,23 @@ static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const
     hr = pfd->SetTitle(title.c_str());
     if (CAppUtils::FailedShowMessage(hr))
         return false;
+
+    hr = pfd->SetFileTypes(CLexStyles::Instance().GetFilterSpceCount(), CLexStyles::Instance().GetFilterSpceData());
+    if (CAppUtils::FailedShowMessage(hr))
+        return false;
+
+    if (extIndex > 0)
+    {
+        hr = pfd->SetFileTypeIndex(extIndex + 1);
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+    }
+    if (!fileExt.empty())
+    {
+        hr = pfd->SetDefaultExtension(fileExt.c_str());
+        if (CAppUtils::FailedShowMessage(hr))
+            return false;
+    }
 
     // set the default folder to the folder of the current tab
     if (!path.empty())
@@ -153,7 +177,7 @@ static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const
     hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
-    outpath = pszPath;
+    path = pszPath;
     CoTaskMemFree(pszPath);
     return true;
 }
@@ -1418,33 +1442,33 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         return false;
 
     auto& doc = m_DocManager.GetModDocumentFromID(docID);
+    if (!bSaveAs && !doc.m_bIsDirty && !doc.m_bNeedsSaving)
+        return false;
+
     auto isActiveTab = docID == m_TabBar.GetCurrentTabId();
     if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
     {
         bSaveAs = true;
-        std::wstring outpath;
+        std::wstring filePath;
 
         std::wstring title = GetAppName();
+        std::wstring fileName = m_TabBar.GetTitle(m_TabBar.GetIndexFromID(docID));
         title += L" - ";
-        title += m_TabBar.GetTitle(m_TabBar.GetIndexFromID(docID));
+        title += fileName;
+        // Do not change doc.m_path until the user determines to save
+        if (doc.m_path.empty())
+            filePath = fileName;
+        else
+            filePath = doc.m_path;
 
-        auto ext = CPathUtils::GetFileExtension(doc.m_path);
-        if (ext.empty())
-        {
-            // if there's a lexer active, use the default extension
-            // for that lexer
-            auto defext = CLexStyles::Instance().GetDefaultExtensionForLanguage(doc.GetLanguage());
-            if (!defext.empty())
-            {
-                if (doc.m_path.empty())
-                    doc.m_path = m_TabBar.GetCurrentTitle() + L"." + defext;
-                else
-                    doc.m_path += L"." + defext;
-            }
-        }
-        if (!ShowFileSaveDialog(*this, title, doc.m_path, outpath))
+        UINT          extIndex = 0;
+        std::wstring ext;
+        // if there's a lexer active, get the default extension and default filet type index in filter types
+        CLexStyles::Instance().GetDefaultExtensionForLanguage(doc.GetLanguage(), ext, extIndex);
+
+        if (!ShowFileSaveDialog(*this, title, ext, extIndex, filePath))
             return false;
-        doc.m_path = outpath;
+        doc.m_path = filePath;
         CMRU::Instance().AddPath(doc.m_path);
         if (isActiveTab && m_fileTree.GetPath().empty())
         {
@@ -2386,8 +2410,8 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
         return;
 
     // Short form or long form html color e.g. #F0F or #FF00FF
-
-    if (sWord[0] == '#' && (sWord.size() == 4 || sWord.size() == 7 || sWord.size() == 9))
+    // Make sure the string is hexadecimal
+    if (sWord[0] == '#' && (sWord.size() == 4 || sWord.size() == 7 || sWord.size() == 9) && IsHexDigitString(sWord.c_str() + 1))
     {
         bool ok = false;
         COLORREF color = 0;
