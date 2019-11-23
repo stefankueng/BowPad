@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -225,6 +225,7 @@ private:
     int                         m_maxReplaceStrings = 0;
     int                         m_maxSearchFolderStrings = 0;
     int                         m_maxSearchFileStrings = 0;
+    int                         m_maxSearchResults = 10000;
     SIZE                        m_originalSize = { 0 };
     bool                        m_open = false;
     bool                        m_reactivation = false;

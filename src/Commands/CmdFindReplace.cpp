@@ -51,7 +51,7 @@ namespace
     const unsigned int SF_SEARCHSUBFOLDERS = 1;
     const unsigned int SF_SEARCHFORFUNCTIONS = 2;
     // Limit the max search results so as not to crash by running out of memory or allowed memory.
-    const int MAX_SEARCHRESULTS = 5000;
+    const int MAX_SEARCHRESULTS = 10000;
 
     // The maximum for these values is set by the user in the config file.
     // These are just the default maximums.
@@ -218,6 +218,7 @@ CFindReplaceDlg::CFindReplaceDlg(void* obj)
     : ICommand(obj)
     , m_searchWnd(hRes)
 {
+    m_maxSearchResults = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearchresults", MAX_SEARCHRESULTS);
 }
 
 std::wstring CFindReplaceDlg::GetCurrentDocumentFolder() const
@@ -1797,10 +1798,10 @@ void CFindReplaceDlg::DoSearchAll(int id)
                 UpdateWindow(*this);
                 SearchDocument(m_searchWnd, docID, doc, searchfor, searchflags, exSearchFlags,
                     m_searchResults, m_foundPaths);
-                if (m_foundsize >= MAX_SEARCHRESULTS)
+                if (m_foundsize >= m_maxSearchResults)
                 {
                     ResString rInfoMax(hRes, IDS_SEARCHING_FILE_MAX);
-                    auto sInfoMax = CStringUtils::Format(rInfoMax, MAX_SEARCHRESULTS);
+                    auto sInfoMax = CStringUtils::Format(rInfoMax, m_maxSearchResults);
                     SetDlgItemText(*this, IDC_SEARCHINFO, sInfoMax.c_str());
                     break;
                 }
@@ -1813,13 +1814,29 @@ void CFindReplaceDlg::DoSearchAll(int id)
         std::wstring sInfo;
         if (id == IDC_FINDALLINTABS)
         {
-            ResString rInfo(hRes, IDS_FINDRESULT_COUNTALL);
-            sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size(), GetTabCount());
+            if (m_searchResults.size() >= m_maxSearchResults)
+            {
+                ResString rInfoMax(hRes, IDS_SEARCHING_FILE_MAX);
+                sInfo = CStringUtils::Format(rInfoMax, m_maxSearchResults);
+            }
+            else
+            {
+                ResString rInfo(hRes, IDS_FINDRESULT_COUNTALL);
+                sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size(), GetTabCount());
+            }
         }
         else
         {
-            ResString rInfo(hRes, IDS_FINDRESULT_COUNT);
-            sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size());
+            if (m_searchResults.size() >= m_maxSearchResults)
+            {
+                ResString rInfoMax(hRes, IDS_SEARCHING_FILE_MAX);
+                sInfo = CStringUtils::Format(rInfoMax, m_maxSearchResults);
+            }
+            else
+            {
+                ResString rInfo(hRes, IDS_FINDRESULT_COUNT);
+                sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size());
+            }
         }
         // We don't action the first result because we can't consistently do that.
         // For multi-tab going to the item might involve opening another
@@ -1987,7 +2004,7 @@ void CFindReplaceDlg::SearchThread(
             m_pendingFoundPaths.push_back(std::move(path));
             m_pendingSearchResults.push_back(std::move(result));
             NewData(timeOfLastProgressUpdate, false);
-            if (++m_foundsize >= MAX_SEARCHRESULTS)
+            if (++m_foundsize >= m_maxSearchResults)
                 break;
 
             continue;
@@ -2012,7 +2029,7 @@ void CFindReplaceDlg::SearchThread(
                 if (m_pendingSearchResults.size() - resultSizeBefore > 0)
                     m_pendingFoundPaths.push_back(std::move(path));
                 NewData(timeOfLastProgressUpdate, false);
-                if (m_foundsize >= MAX_SEARCHRESULTS)
+                if (m_foundsize >= m_maxSearchResults)
                     break;
             }
         }
@@ -2175,7 +2192,7 @@ void CFindReplaceDlg::SearchDocument(
                 if (!docID.IsValid())
                     result.pathIndex = foundPaths.size();
                 searchResults.push_back(std::move(result));
-                if (++m_foundsize >= MAX_SEARCHRESULTS)
+                if (++m_foundsize >= m_maxSearchResults)
                     break;
             }
 
@@ -2202,7 +2219,7 @@ void CFindReplaceDlg::NewData(
         && (m_pendingFoundPaths.size() > 0 || m_pendingSearchResults.size() > 0)))
     {
         // Hopefully safe to touch the size field.
-        if (m_searchResults.size() >= MAX_SEARCHRESULTS)
+        if (m_searchResults.size() >= m_maxSearchResults)
             finished = true;
         // NOTE!! It's essential that data isn't sent to the client until
         // it's a full contained unit, i.e. search results must be complete
