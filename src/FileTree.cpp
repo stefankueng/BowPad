@@ -23,6 +23,7 @@
 #include "DirFileEnum.h"
 #include "PathUtils.h"
 #include "OnOutOfScope.h"
+#include "DarkModeHelper.h"
 
 #include <thread>
 #include <vector>
@@ -690,7 +691,14 @@ void CFileTree::OnThemeChanged(bool bDark)
     }
     else
     {
-        SetWindowTheme(*this, L"Explorer", nullptr);
+        if (bDark)
+        {
+            DarkModeHelper::Instance().AllowDarkModeForWindow(*this, TRUE);
+            if FAILED(SetWindowTheme(*this, L"DarkMode_Explorer", nullptr))
+                SetWindowTheme(*this, L"Explorer", nullptr);
+        }
+        else
+            SetWindowTheme(*this, L"Explorer", nullptr);
         if (bDark)
         {
             TreeView_SetBkColor(*this, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));

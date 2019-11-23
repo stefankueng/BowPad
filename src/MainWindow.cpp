@@ -41,6 +41,7 @@
 #include "CustomTooltip.h"
 #include "GDIHelpers.h"
 #include "Windows10Colors.h"
+#include "DarkModeHelper.h"
 
 #include <memory>
 #include <cassert>
@@ -125,7 +126,7 @@ static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const
     if (CAppUtils::FailedShowMessage(hr))
         return false;
 
-    hr = pfd->SetFileTypes(CLexStyles::Instance().GetFilterSpceCount(), CLexStyles::Instance().GetFilterSpceData());
+    hr = pfd->SetFileTypes((UINT)CLexStyles::Instance().GetFilterSpceCount(), CLexStyles::Instance().GetFilterSpceData());
     if (CAppUtils::FailedShowMessage(hr))
         return false;
 
@@ -3960,6 +3961,7 @@ void CMainWindow::SetTheme(bool dark)
             HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
             if (SUCCEEDED(hr))
             {
+                DarkModeHelper::Instance().AllowDarkModeForWindow(*this, TRUE);
                 PROPVARIANT propvarDarkMode;
                 InitPropVariantFromBoolean(1, &propvarDarkMode);
                 spPropertyStore->SetValue(UI_PKEY_DarkModeRibbon, propvarDarkMode);
@@ -3985,6 +3987,7 @@ void CMainWindow::SetTheme(bool dark)
         SetRibbonColorsHSB(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
         if (!bCanChangeBackground)
         {
+            DarkModeHelper::Instance().AllowDarkModeForWindow(*this, FALSE);
             IPropertyStorePtr spPropertyStore;
             HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
             if (SUCCEEDED(hr))

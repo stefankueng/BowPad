@@ -217,6 +217,7 @@
     <ClInclude Include="..\ext\sktoolslib\CmdLineParser.h" />
     <ClInclude Include="..\ext\sktoolslib\codecvt.h" />
     <ClInclude Include="..\ext\sktoolslib\CreateProcessHelper.h" />
+    <ClInclude Include="..\ext\sktoolslib\DarkModeHelper.h" />
     <ClInclude Include="..\ext\sktoolslib\DebugOutput.h" />
     <ClInclude Include="..\ext\sktoolslib\DirFileEnum.h" />
     <ClInclude Include="..\ext\sktoolslib\DlgResizer.h" />
@@ -336,6 +337,7 @@
     <ClCompile Include="..\ext\sktoolslib\BrowseFolder.cpp" />
     <ClCompile Include="..\ext\sktoolslib\CmdLineParser.cpp" />
     <ClCompile Include="..\ext\sktoolslib\codecvt.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\DarkModeHelper.cpp" />
     <ClCompile Include="..\ext\sktoolslib\DebugOutput.cpp" />
     <ClCompile Include="..\ext\sktoolslib\DirFileEnum.cpp" />
     <ClCompile Include="..\ext\sktoolslib\DlgResizer.cpp" />

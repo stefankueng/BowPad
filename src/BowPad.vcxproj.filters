@@ -363,6 +363,9 @@
     <ClInclude Include="..\ext\sktoolslib\Windows10Colors.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\DarkModeHelper.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -642,6 +645,9 @@
       <Filter>sktoolslib</Filter>
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\Windows10Colors.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\DarkModeHelper.cpp">
       <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>
