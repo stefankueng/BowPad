@@ -615,7 +615,7 @@ bool CLexStyles::GetDefaultExtensionForLanguage(const std::string& lang, std::ws
     {
         if (m_filterSpec[i].pszName == langW)
         {
-            index    = i;
+            index    = (UINT)i;
             auto pos = _tcschr(m_filterSpec[i].pszSpec, TEXT(';'));
             if (pos)
                 ext.assign(m_filterSpec[i].pszSpec + 2, pos);
