@@ -821,8 +821,8 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
         // So we set the scroll position here to a member variable,
         // which then is used to scroll scintilla to that line after
         // the first SCN_PAINTED event.
-        m_LineToScrollToAfterPaint = lineToShow;
-        m_WrapOffsetToScrollToAfterPaint = pos.m_nWrapLineOffset;
+        m_LineToScrollToAfterPaint       = pos.m_nFirstVisibleLine;
+        m_WrapOffsetToScrollToAfterPaint = 0;
     }
     else
         Call(SCI_LINESCROLL, 0, lineToShow);
@@ -1068,34 +1068,30 @@ void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
     auto lastVisibleLineVis  =   linesVisible + firstVisibleLineVis;
 
     // if out of view vertically, scroll line into (center of) view
-    decltype(firstVisibleLineVis) linesToScroll = 0;
-    if (currentlineNumberVis < (firstVisibleLineVis+(linesVisible/4)))
+    // If m_LineToScrollToAfterPaint is not equal -1, modiry its value
+    // and wait for the paint to complete, then go to the line.
+    if (m_LineToScrollToAfterPaint != -1)
     {
-        linesToScroll = currentlineNumberVis - firstVisibleLineVis;
-        // use center
-        linesToScroll -= linesVisible/2;
-    }
-    else if (currentlineNumberVis > (lastVisibleLineVis - (linesVisible / 4)))
-    {
-        linesToScroll = currentlineNumberVis - lastVisibleLineVis;
-        // use center
-        linesToScroll += linesVisible/2;
-    }
-    auto wrapmode = Call(SCI_GETWRAPMODE);
-    if (wrapmode != SC_WRAP_NONE)
-    {
-        // if wrapping is enabled, scrolling to a line won't work
-        // properly until scintilla has painted the document, because
-        // the wrap calculations aren't finished until then.
-        // So we set the scroll position here to a member variable,
-        // which then is used to scroll scintilla to that line after
-        // the first SCN_PAINTED event.
         m_LineToScrollToAfterPaint = currentlineNumberDoc;
         m_WrapOffsetToScrollToAfterPaint = 0;
     }
     else
+    {
+        decltype(firstVisibleLineVis) linesToScroll = 0;
+        if (currentlineNumberVis < (firstVisibleLineVis+(linesVisible/4)))
+        {
+            linesToScroll = currentlineNumberVis - firstVisibleLineVis;
+            // use center
+            linesToScroll -= linesVisible/2;
+        }
+        else if (currentlineNumberVis > (lastVisibleLineVis - (linesVisible / 4)))
+        {
+            linesToScroll = currentlineNumberVis - lastVisibleLineVis;
+            // use center
+            linesToScroll += linesVisible/2;
+        }
         Call(SCI_LINESCROLL, 0, linesToScroll);
-
+    }
     // Make sure the caret is visible, scroll horizontally
     Call(SCI_GOTOPOS, posStart);
     Call(SCI_GOTOPOS, posEnd);

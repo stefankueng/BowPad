@@ -68,6 +68,8 @@ public :
     LRESULT CALLBACK            WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     int                         InsertAtEnd(const TCHAR *subTabName);
     int                         InsertAfter(int index, const TCHAR *subTabName);
+    inline void                        SelectChanging() const;
+    inline void                        SelectChange(int index) const;
     void                        ActivateAt(int index) const;
     void                        GetTitle(int index, TCHAR *title, int titleLen) const;
     std::wstring                GetTitle(int index) const;

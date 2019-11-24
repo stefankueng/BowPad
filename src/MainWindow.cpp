@@ -1800,11 +1800,13 @@ bool CMainWindow::CloseTab(int closingTabIndex, bool force /* = false */, bool q
         APPVERIFY(false);
         return false;
     }
-    auto closingDocID = m_TabBar.GetIDFromIndex(closingTabIndex);
-    const CDocument& closingDoc = m_DocManager.GetDocumentFromID(closingDocID);
+    auto closingTabId = m_TabBar.GetIDFromIndex(closingTabIndex);
+    auto currentTabId = m_TabBar.GetCurrentTabId();
+    const CDocument& closingDoc = m_DocManager.GetDocumentFromID(closingTabId);
     if (!force && (closingDoc.m_bIsDirty || closingDoc.m_bNeedsSaving))
     {
-        m_TabBar.ActivateAt(closingTabIndex);
+        if (closingTabId != currentTabId)
+            m_TabBar.ActivateAt(closingTabIndex);
         if (!docloseall || !closealldoall)
         {
             auto bc = UnblockUI();
@@ -1817,31 +1819,24 @@ bool CMainWindow::CloseTab(int closingTabIndex, bool force /* = false */, bool q
             if (!SaveCurrentTab()) // Save And (fall through to) Close
                 return false;
         }
-
-        else if (responsetoclosetab == ResponseToCloseTab::CloseWithoutSaving)
-            ;
-        // If you don't want to save and close and
-        // you don't want to close without saving, you must want to stay open.
-        else
+        else if (responsetoclosetab != ResponseToCloseTab::CloseWithoutSaving)
         {
             // Cancel And Stay Open
             // activate the tab: user might have clicked another than
             // the active tab to close: user clicked on that tab so activate that tab now
-            m_TabBar.ActivateAt(closingTabIndex);
+            //m_TabBar.ActivateAt(closingTabIndex);
             return false;
         }
-        // Will Close
+        // If the save successful or closed without saveing, the tab will be closed.
     }
-    CCommandHandler::Instance().OnDocumentClose(closingDocID);
-    auto currentTabId = m_TabBar.GetCurrentTabId();
-    auto closingTabId = m_TabBar.GetIDFromIndex(closingTabIndex);
+    CCommandHandler::Instance().OnDocumentClose(closingTabId);
     // Prefer to remove the document after the tab has gone as it supports it
     // and deletion causes events that may expect it to be there.
     m_TabBar.DeleteItemAt(closingTabIndex);
     // SCI_SETDOCPOINTER is necessary so the reference count of the document
     // is decreased and the memory can be released.
     m_editor.Call(SCI_SETDOCPOINTER, 0, 0);
-    m_DocManager.RemoveDocument(closingDocID);
+    m_DocManager.RemoveDocument(closingTabId);
 
     int tabCount = m_TabBar.GetItemCount();
     int nextTabIndex = (closingTabIndex < tabCount) ? closingTabIndex : tabCount - 1;
@@ -1851,15 +1846,12 @@ bool CMainWindow::CloseTab(int closingTabIndex, bool force /* = false */, bool q
         if (nxtIndex >= 0)
             nextTabIndex = nxtIndex;
     }
-    if (!quitting)
+    else if (tabCount == 0 && !quitting)
     {
-        if (tabCount == 0)
-        {
-            EnsureAtLeastOneTab();
-            return true;
-        }
+        EnsureAtLeastOneTab();
+        return true;
     }
-    m_TabBar.ActivateAt(nextTabIndex);
+    m_TabBar.SelectChange(nextTabIndex);
     return true;
 }
 
@@ -2756,6 +2748,9 @@ void CMainWindow::OpenNewTab()
     OnOutOfScope(
         m_insertionIndex = -1;
     );
+
+    m_TabBar.SelectChanging();
+
     CDocument doc;
     doc.m_document = m_editor.Call(SCI_CREATEDOCUMENT);
     doc.m_bHasBOM = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
@@ -2777,8 +2772,9 @@ void CMainWindow::OpenNewTab()
     auto docID = m_TabBar.GetIDFromIndex(index);
     m_DocManager.AddDocumentAtEnd(doc, docID);
     CCommandHandler::Instance().OnDocumentOpen(docID);
-    m_TabBar.ActivateAt(index);
-    m_editor.GotoLine(0);
+
+    m_TabBar.SelectChange(index);
+    //m_editor.GotoLine(0);
 }
 
 void CMainWindow::HandleTabChanging(const NMHDR& /*nmhdr*/)
@@ -2867,7 +2863,6 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         UpdateTab(docID);
         UpdateStatusBar(true);
         m_TabBar.ActivateAt(index);
-        m_editor.GotoLine(0);
         CCommandHandler::Instance().OnDocumentOpen(docID);
 
         return index;
@@ -2890,7 +2885,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     {
         index = m_TabBar.GetIndexFromID(id);
         // document already open.
-        if (IsWindowEnabled(*this) && bActivate)
+        if (IsWindowEnabled(*this) && m_TabBar.GetCurrentTabIndex() != index)
         {
             // only activate the new doc tab if the main window is enabled:
             // if it's disabled, a modal dialog is shown

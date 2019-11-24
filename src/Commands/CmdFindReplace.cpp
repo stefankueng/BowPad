@@ -1156,7 +1156,6 @@ void CFindReplaceDlg::DoListItemAction(int itemIndex)
     }
     if (OpenFile(path.c_str(), openFlags)<0)
         return;
-    ScintillaCall(SCI_GOTOLINE, item.line);
     Center((long)item.pos, (long)item.pos);
     if (m_resultsType == ResultsType::MatchedTerms)
     {

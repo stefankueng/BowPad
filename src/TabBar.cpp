@@ -223,17 +223,29 @@ void CTabBar::SetFont(const TCHAR *fontName, int fontSize)
         ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
 }
 
-void CTabBar::ActivateAt(int index) const
+void CTabBar::SelectChanging() const
 {
-    InvalidateRect(*this, nullptr, TRUE);
-    NMHDR nmhdr = {};
+    NMHDR nmhdr    = {};
     nmhdr.hwndFrom = *this;
     nmhdr.code = TCN_SELCHANGING;
     ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+}
+
+void CTabBar::SelectChange(int index) const
+{
     if (index >= 0)
         TabCtrl_SetCurSel(*this, index);
+
+    NMHDR nmhdr    = {};
+    nmhdr.hwndFrom = *this;
     nmhdr.code = TCN_SELCHANGE;
     ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+}
+
+void CTabBar::ActivateAt(int index) const
+{
+    SelectChanging();
+    SelectChange(index);
 }
 
 void CTabBar::DeleteItemAt(int index)
