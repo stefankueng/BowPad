@@ -53,6 +53,8 @@ bool ChangeCase(std::function<sptr_t(int msg, uptr_t wParam, sptr_t lParam)> Sci
         ScintillaCall(SCI_SETTARGETSTART, selStart, 0);
         ScintillaCall(SCI_SETTARGETEND, selEnd, 0);
         ScintillaCall(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)sUpper.c_str());
+        ScintillaCall(SCI_SETSELECTIONNSTART, i, selStart);
+        ScintillaCall(SCI_SETSELECTIONNEND, i, selEnd);
     }
     ScintillaCall(SCI_ENDUNDOACTION, 0, 0);
 
