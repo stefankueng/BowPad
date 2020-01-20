@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -487,7 +487,8 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     std::wstring params = L" /multiple";
     if (isAdminMode)
         params += L" /admin";
-   SetRelaunchCommand(mainWindow, appID, (CPathUtils::GetModulePath() + params).c_str(), L"BowPad");
+    std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str(), IDI_BOWPAD);
+    SetRelaunchCommand(mainWindow, appID, (CPathUtils::GetModulePath() + params).c_str(), L"BowPad", sIconPath.c_str());
 
     // Main message loop:
     MSG   msg = {0};
