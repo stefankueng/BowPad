@@ -1,0 +1,29 @@
+// returns the version of the plugin
+// this callback is not optional! If you fail to implement this, the plugin
+// config dialog won't work properly with your plugin
+function Version() { return 100; }
+
+// this is the main function that gets executed when the command is run, i.e.
+// the button is clicked
+function Execute()
+{
+    // execute whatever the plugin should do here,
+    // return true if the command was successful or false if it didn't run
+    // successfully
+    return true;
+}
+
+// return true if the plugin command is enabled (used for the button)
+// note: not used yet by BowPad, but planned for the future
+function IsEnabled() { return true; }
+
+// return true if the plugin button should appear as checked
+// note: not used yet by BowPad, but planned for the future
+function IsChecked() { return true; }
+
+// called after a document was opened
+function OnDocumentOpen(index) {
+ BowPad.SciSetFontQuality(2);
+ return;
+}
+
