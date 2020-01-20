@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2019 - Stefan Kueng
+// Copyright (C) 2013-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -2570,7 +2570,8 @@ bool CMainWindow::HandleDoubleClick(const SCNotification& scn)
         startPos = Sci_Position(m_editor.Call(SCI_GETTARGETSTART));
         endPos = Sci_Position(m_editor.Call(SCI_GETTARGETEND));
     }
-
+    else
+        return false;
     std::string urltext = m_editor.GetTextRange(startPos, endPos);
     // This treatment would fail on some valid URLs where there's actually supposed to be a comma or parenthesis at the end.
     CStringUtils::TrimLeadingAndTrailing(urltext, std::vector<char>{ ',', ')', '(' });
@@ -3905,27 +3906,20 @@ void CMainWindow::SetTheme(bool dark)
     // But, through reverse engineering I found the UI_PKEY_DarkModeRibbon
     // property, which we can use instead.
     bool bCanChangeBackground = true;
-    PWSTR sysPath = nullptr;
-    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_System, 0, nullptr, &sysPath)))
+    auto version = CPathUtils::GetVersionFromFile(L"uiribbon.dll");
+    std::vector<std::wstring> tokens;
+    stringtok(tokens, version, false, L".");
+    if (tokens.size() == 4)
     {
-        std::wstring dllPath = sysPath;
-        CoTaskMemFree(sysPath);
-        dllPath += L"\\uiribbon.dll";
-        auto version = CPathUtils::GetVersionFromFile(L"uiribbon.dll");
-        std::vector<std::wstring> tokens;
-        stringtok(tokens, version, false, L".");
-        if (tokens.size() == 4)
-        {
-            auto major = std::stol(tokens[0]);
-            //auto minor = std::stol(tokens[1]);
-            auto micro = std::stol(tokens[2]);
-            //auto build = std::stol(tokens[3]);
+        auto major = std::stol(tokens[0]);
+        //auto minor = std::stol(tokens[1]);
+        auto micro = std::stol(tokens[2]);
+        //auto build = std::stol(tokens[3]);
 
-            // the windows 10 update 1809 has the version
-            // number as 10.0.17763.10000
-            if (major == 10 && micro > 17762)
-                bCanChangeBackground = false;
-        }
+        // the windows 10 update 1809 has the version
+        // number as 10.0.17763.10000
+        if (major == 10 && micro > 17762)
+            bCanChangeBackground = false;
     }
 
     Win10Colors::AccentColor accentColor;
