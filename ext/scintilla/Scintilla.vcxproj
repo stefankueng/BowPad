@@ -308,6 +308,7 @@
     <ClInclude Include="include\Scintilla.h" />
     <ClInclude Include="include\Sci_Position.h" />
     <ClInclude Include="lexlib\Accessor.h" />
+    <ClInclude Include="lexlib\CatalogueModules.h" />
     <ClInclude Include="lexlib\CharacterCategory.h" />
     <ClInclude Include="lexlib\CharacterSet.h" />
     <ClInclude Include="lexlib\DefaultLexer.h" />

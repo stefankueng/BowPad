@@ -204,6 +204,9 @@
     <ClInclude Include="src\IntegerRectangle.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="lexlib\CatalogueModules.h">
+      <Filter>lexlib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lexers\LexA68k.cxx">
