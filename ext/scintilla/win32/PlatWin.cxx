@@ -58,6 +58,11 @@
 #define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
 #endif
 
+// __uuidof is a Microsoft extension but makes COM code neater, so disable warning
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wlanguage-extension-token"
+#endif
+
 namespace Scintilla {
 
 UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage);
@@ -471,7 +476,7 @@ public:
 
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) override;
 
-	void DrawTextCommon(PRectangle rc, Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
+	void DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
 	void DrawTextNoClip(PRectangle rc, Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
 	void DrawTextClipped(PRectangle rc, Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
 	void DrawTextTransparent(PRectangle rc, Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
@@ -817,7 +822,7 @@ std::unique_ptr<IScreenLineLayout> SurfaceGDI::Layout(const IScreenLine *) {
 
 typedef VarBuffer<int, stackBufferLength> TextPositionsI;
 
-void SurfaceGDI::DrawTextCommon(PRectangle rc, Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
+void SurfaceGDI::DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
 	SetFont(font_);
 	const RECT rcw = RectFromPRectangle(rc);
 	const int x = static_cast<int>(rc.left);
@@ -1038,7 +1043,7 @@ public:
 
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) override;
 
-	void DrawTextCommon(PRectangle rc, Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
+	void DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
 	void DrawTextNoClip(PRectangle rc, Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
 	void DrawTextClipped(PRectangle rc, Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
 	void DrawTextTransparent(PRectangle rc, Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
@@ -1361,7 +1366,7 @@ void SurfaceD2D::AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fil
 			const float cornerSizeF = static_cast<float>(cornerSize);
 			D2D1_ROUNDED_RECT roundedRectFill = {
 				D2D1::RectF(std::round(rc.left) + 1.0f, rc.top + 1.0f, std::round(rc.right) - 1.0f, rc.bottom - 1.0f),
-				cornerSizeF, cornerSizeF};
+				cornerSizeF - 1.0f, cornerSizeF - 1.0f };
 			D2DPenColour(fill, alphaFill);
 			pRenderTarget->FillRoundedRectangle(roundedRectFill, pBrush);
 
@@ -1502,7 +1507,7 @@ class BlobInline : public IDWriteInlineObject {
 	STDMETHODIMP_(ULONG)Release() override;
 
 	// IDWriteInlineObject
-	STDMETHODIMP Draw(
+	COM_DECLSPEC_NOTHROW STDMETHODIMP Draw(
 		void *clientDrawingContext,
 		IDWriteTextRenderer *renderer,
 		FLOAT originX,
@@ -1511,9 +1516,9 @@ class BlobInline : public IDWriteInlineObject {
 		BOOL isRightToLeft,
 		IUnknown *clientDrawingEffect
 		) override;
-	STDMETHODIMP GetMetrics(DWRITE_INLINE_OBJECT_METRICS *metrics) override;
-	STDMETHODIMP GetOverhangMetrics(DWRITE_OVERHANG_METRICS *overhangs) override;
-	STDMETHODIMP GetBreakConditions(
+	COM_DECLSPEC_NOTHROW STDMETHODIMP GetMetrics(DWRITE_INLINE_OBJECT_METRICS *metrics) override;
+	COM_DECLSPEC_NOTHROW STDMETHODIMP GetOverhangMetrics(DWRITE_OVERHANG_METRICS *overhangs) override;
+	COM_DECLSPEC_NOTHROW STDMETHODIMP GetBreakConditions(
 		DWRITE_BREAK_CONDITION *breakConditionBefore,
 		DWRITE_BREAK_CONDITION *breakConditionAfter) override;
 public:
@@ -1552,7 +1557,7 @@ STDMETHODIMP_(ULONG) BlobInline::Release() {
 }
 
 /// Implement IDWriteInlineObject
-HRESULT STDMETHODCALLTYPE BlobInline::Draw(
+COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::Draw(
 	void*,
 	IDWriteTextRenderer*,
 	FLOAT,
@@ -1566,7 +1571,7 @@ HRESULT STDMETHODCALLTYPE BlobInline::Draw(
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE BlobInline::GetMetrics(
+COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetMetrics(
 	DWRITE_INLINE_OBJECT_METRICS *metrics
 ) {
 	metrics->width = width;
@@ -1576,7 +1581,7 @@ HRESULT STDMETHODCALLTYPE BlobInline::GetMetrics(
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE BlobInline::GetOverhangMetrics(
+COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetOverhangMetrics(
 	DWRITE_OVERHANG_METRICS *overhangs
 ) {
 	overhangs->left = 0;
@@ -1586,7 +1591,7 @@ HRESULT STDMETHODCALLTYPE BlobInline::GetOverhangMetrics(
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE BlobInline::GetBreakConditions(
+COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetBreakConditions(
 	DWRITE_BREAK_CONDITION *breakConditionBefore,
 	DWRITE_BREAK_CONDITION *breakConditionAfter
 ) {
@@ -1884,7 +1889,7 @@ std::unique_ptr<IScreenLineLayout> SurfaceD2D::Layout(const IScreenLine *screenL
 	return std::make_unique<ScreenLineLayout>(screenLine);
 }
 
-void SurfaceD2D::DrawTextCommon(PRectangle rc, Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
+void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
 	SetFont(font_);
 
 	// Use Unicode calls
@@ -3252,13 +3257,12 @@ public:
 	// Use GetProcAddress to get a pointer to the relevant function.
 	Function FindFunction(const char *name) noexcept override {
 		if (h) {
-			// C++ standard doesn't like casts between function pointers and void pointers so use a union
-			union {
-				FARPROC fp;
-				Function f;
-			} fnConv;
-			fnConv.fp = ::GetProcAddress(h, name);
-			return fnConv.f;
+			// Use memcpy as it doesn't invoke undefined or conditionally defined behaviour.
+			FARPROC fp = ::GetProcAddress(h, name);
+			Function f = nullptr;
+			static_assert(sizeof(f) == sizeof(fp));
+			memcpy(&f, &fp, sizeof(f));
+			return f;
 		} else {
 			return nullptr;
 		}

@@ -675,5 +675,11 @@
     <ClCompile Include="lexers\LexX12.cxx">
       <Filter>lexers</Filter>
     </ClCompile>
+    <ClCompile Include="lexers\LexRaku.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="lexers\LexHollywood.cxx">
+      <Filter>lexers</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
