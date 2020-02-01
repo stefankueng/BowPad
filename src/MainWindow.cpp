@@ -2563,6 +2563,10 @@ bool CMainWindow::HandleDoubleClick(const SCNotification& scn)
 
     m_editor.Call(SCI_SETTARGETSTART, startPos);
     m_editor.Call(SCI_SETTARGETEND, endPos);
+    auto originalSearchFlags = m_editor.Call(SCI_GETSEARCHFLAGS);
+    OnOutOfScope(m_editor.Call(SCI_SETSEARCHFLAGS, originalSearchFlags));
+
+    m_editor.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP);
 
     Sci_Position posFound = (Sci_Position)m_editor.Call(SCI_SEARCHINTARGET, URL_REG_EXPR_LENGTH, (LPARAM)URL_REG_EXPR);
     if (posFound != -1)
