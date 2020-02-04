@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2019 - Stefan Kueng
+// Copyright (C) 2014-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -111,6 +111,15 @@ void CFileTree::SetPath(const std::wstring & path, bool forcerefresh)
         int timeout = 100;
         while (m_bRootBusy && timeout)
         {
+            // if the root is busy but the thread has already finished,
+            // we need to handle the WM_THREADRESULTREADY message to get
+            // the busy flag cleared.
+            MSG msg;
+            while (PeekMessage(&msg, *this, WM_THREADRESULTREADY, WM_THREADRESULTREADY, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
             Sleep(20);
             --timeout;
         }
