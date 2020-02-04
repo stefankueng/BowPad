@@ -1580,8 +1580,10 @@ void CMainWindow::ElevatedSave( const std::wstring& path, const std::wstring& sa
     if (docID.IsValid())
     {
         auto tab = m_TabBar.GetIndexFromID(docID);
+        m_TabBar.SetTitle(tab, CPathUtils::GetFileName(savepath).c_str());
         m_TabBar.ActivateAt(tab);
         auto& doc = m_DocManager.GetModDocumentFromID(docID);
+        doc.m_bNeedsSaving = true;
         doc.m_path = CPathUtils::GetLongPathname(savepath);
         SaveCurrentTab();
         UpdateCaptionBar();
