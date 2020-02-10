@@ -42,6 +42,7 @@
 #include "GDIHelpers.h"
 #include "Windows10Colors.h"
 #include "DarkModeHelper.h"
+#include "../ext/tinyexpr/tinyexpr.h"
 
 #include <memory>
 #include <cassert>
@@ -2523,6 +2524,18 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
         auto msgPos = GetMessagePos();
         POINT pt = { GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos) };
         m_custToolTip.ShowTip(pt, sCallTip, pColor);
+        return;
+    }
+    int err = 0;
+    auto exprValue = te_interp(sWord.c_str(), &err);
+    if (err == 0)
+    {
+        long long ulongVal = (long long)exprValue;
+        auto sCallTip = CStringUtils::Format(L"Expr: %S\n-->\nVal: %f\nDec: %lld\nHex: 0x%llX\nOct: %#llo",
+            sWord.c_str(), exprValue, ulongVal, ulongVal, ulongVal);
+        auto msgPos = GetMessagePos();
+        POINT pt = { GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos) };
+        m_custToolTip.ShowTip(pt, sCallTip, nullptr);
     }
 }
 

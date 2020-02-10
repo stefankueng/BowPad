@@ -22,6 +22,9 @@
     <Filter Include="Scripting">
       <UniqueIdentifier>{3e5571ca-95e3-4a38-a26a-da71cf8f2554}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tinyexpr">
+      <UniqueIdentifier>{ce722194-8b55-4561-bb01-c866d3a801cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -366,6 +369,9 @@
     <ClInclude Include="..\ext\sktoolslib\DarkModeHelper.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\tinyexpr\tinyexpr.h">
+      <Filter>tinyexpr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -649,6 +655,9 @@
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\DarkModeHelper.cpp">
       <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\tinyexpr\tinyexpr.c">
+      <Filter>tinyexpr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

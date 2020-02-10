@@ -2,3 +2,6 @@
 	path = ext/sktoolslib
 	url = https://github.com/stefankueng/sktoolslib.git
 	branch = master
+[submodule "ext/tinyexpr"]
+	path = ext/tinyexpr
+	url = https://github.com/codeplea/tinyexpr.git
