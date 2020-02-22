@@ -3977,19 +3977,24 @@ void CMainWindow::SetTheme(bool dark)
                 spPropertyStore->Commit();
             }
         }
+        DarkModeHelper::Instance().AllowDarkModeForApp(TRUE);
+
+        auto DarkModeForWindow = [](HWND hWnd) {
+            DarkModeHelper::Instance().AllowDarkModeForWindow(hWnd, TRUE);
+            if (FAILED(SetWindowTheme(hWnd, L"DarkMode_Explorer", nullptr)))
+                SetWindowTheme(hWnd, L"Explorer", nullptr);
+        };
+
         SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
-        if (IsWindow(m_StatusBar))
-            SetClassLongPtr(m_StatusBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
-        if (IsWindow(m_TabBar))
-            SetClassLongPtr(m_TabBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
-        if (IsWindow(m_fileTree))
-            SetClassLongPtr(m_fileTree, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
-        if (IsWindow(m_newTabBtn))
-            SetClassLongPtr(m_newTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
-        if (IsWindow(m_closeTabBtn))
-            SetClassLongPtr(m_closeTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
-        if (IsWindow(m_editor))
-            SetClassLongPtr(m_editor, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
+        DarkModeForWindow(m_hwnd);
+        DarkModeForWindow(m_StatusBar);
+        DarkModeForWindow(m_TabBar);
+        DarkModeForWindow(m_fileTree);
+        DarkModeForWindow(m_newTabBtn);
+        DarkModeForWindow(m_closeTabBtn);
+        DarkModeForWindow(m_editor);
+
+        DarkModeHelper::Instance().RefreshImmersiveColorPolicyState();
     }
     else
     {
@@ -4007,19 +4012,24 @@ void CMainWindow::SetTheme(bool dark)
                 spPropertyStore->Commit();
             }
         }
+
+        auto NormalModeForWindow = [](HWND hWnd) {
+            DarkModeHelper::Instance().AllowDarkModeForWindow(hWnd, FALSE);
+            SetWindowTheme(hWnd, L"Explorer", nullptr);
+        };
+
         SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
-        if (IsWindow(m_StatusBar))
-            SetClassLongPtr(m_StatusBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
-        if (IsWindow(m_TabBar))
-            SetClassLongPtr(m_TabBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
-        if (IsWindow(m_fileTree))
-            SetClassLongPtr(m_fileTree, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
-        if (IsWindow(m_newTabBtn))
-            SetClassLongPtr(m_newTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
-        if (IsWindow(m_closeTabBtn))
-            SetClassLongPtr(m_closeTabBtn, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
-        if (IsWindow(m_editor))
-            SetClassLongPtr(m_editor, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
+        NormalModeForWindow(m_hwnd);
+        NormalModeForWindow(m_StatusBar);
+        NormalModeForWindow(m_TabBar);
+        NormalModeForWindow(m_fileTree);
+        NormalModeForWindow(m_newTabBtn);
+        NormalModeForWindow(m_closeTabBtn);
+        NormalModeForWindow(m_editor);
+
+
+        DarkModeHelper::Instance().AllowDarkModeForApp(FALSE);
+        DarkModeHelper::Instance().RefreshImmersiveColorPolicyState();
     }
     auto activeTabId = m_TabBar.GetCurrentTabId();
     if (activeTabId.IsValid())
