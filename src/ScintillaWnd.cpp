@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2019 - Stefan Kueng
+// Copyright (C) 2013-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -481,7 +481,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                         SetupFoldingColors(RGB(gf, gf, gf),
                                            RGB(gb, gb, gb),
                                            RGB(sb, sb, sb));
-                        Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln)));
+                        Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
                     });
 
                     m_bInFolderMargin = true;
@@ -516,7 +516,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                         SetupFoldingColors(RGB(gf, gf, gf),
                                            RGB(gb, gb, gb),
                                            RGB(sb, sb, sb));
-                        Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln)));
+                        Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
                     });
                     m_bInFolderMargin = false;
                 }
@@ -553,7 +553,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 SetupFoldingColors(RGB(gf, gf, gf),
                                    RGB(gb, gb, gb),
                                    RGB(sb, sb, sb));
-                Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln)));
+                Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
             });
             m_bInFolderMargin = false;
         }
@@ -851,8 +851,8 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
     Call(SCI_STYLESETBOLD, STYLE_DEFAULT, bBold);
     Call(SCI_STYLESETITALIC, STYLE_DEFAULT, bItalic);
     Call(SCI_STYLESETSIZE, STYLE_DEFAULT, fontsize);
-    Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0)));
-    Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255)));
+    Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0), true));
+    Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255), true));
 
     // now call SCI_STYLECLEARALL to copy the default style to all styles
     Call(SCI_STYLECLEARALL);
@@ -871,8 +871,8 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
     {
         const int styleId = it.first;
         const auto& sd = it.second;
-        Call(SCI_STYLESETFORE, styleId, theme.GetThemeColor(sd.ForegroundColor));
-        Call(SCI_STYLESETBACK, styleId, theme.GetThemeColor(sd.BackgroundColor));
+        Call(SCI_STYLESETFORE, styleId, theme.GetThemeColor(sd.ForegroundColor, true));
+        Call(SCI_STYLESETBACK, styleId, theme.GetThemeColor(sd.BackgroundColor, true));
         if (!sd.FontName.empty())
             Call(SCI_STYLESETFONT, styleId, (sptr_t)CUnicodeUtils::StdGetUTF8(sd.FontName).c_str());
 
@@ -906,44 +906,44 @@ void CScintillaWnd::SetupDefaultStyles()
     std::string sFontName = CUnicodeUtils::StdGetUTF8(CIniSettings::Instance().GetString(L"View", L"FontName", defaultFont.c_str()));
     Call(SCI_STYLESETFONT, STYLE_LINENUMBER, (LPARAM)sFontName.c_str());
 
-    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, theme.GetThemeColor(RGB(color_linenr_inactive, color_linenr_inactive, color_linenr_inactive)));
-    Call(SCI_STYLESETBACK, STYLE_LINENUMBER, theme.GetThemeColor(RGB(230, 230, 230)));
+    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, theme.GetThemeColor(RGB(color_linenr_inactive, color_linenr_inactive, color_linenr_inactive), true));
+    Call(SCI_STYLESETBACK, STYLE_LINENUMBER, theme.GetThemeColor(RGB(230, 230, 230), true));
 
     Call(SCI_INDICSETSTYLE, INDIC_SELECTION_MARK, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_SELECTION_MARK, 50);
     Call(SCI_INDICSETUNDER, INDIC_SELECTION_MARK, true);
-    Call(SCI_INDICSETFORE,  INDIC_SELECTION_MARK, theme.GetThemeColor(RGB(0,255,0)));
+    Call(SCI_INDICSETFORE,  INDIC_SELECTION_MARK, theme.GetThemeColor(RGB(0,255,0), true));
 
     Call(SCI_INDICSETSTYLE, INDIC_FINDTEXT_MARK, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_FINDTEXT_MARK, theme.IsDarkTheme() ? 100 : 200);
     Call(SCI_INDICSETUNDER, INDIC_FINDTEXT_MARK, true);
-    Call(SCI_INDICSETFORE,  INDIC_FINDTEXT_MARK, theme.GetThemeColor(RGB(255,255,0)));
+    Call(SCI_INDICSETFORE,  INDIC_FINDTEXT_MARK, theme.GetThemeColor(RGB(255,255,0), true));
 
     Call(SCI_INDICSETSTYLE, INDIC_URLHOTSPOT, INDIC_HIDDEN);
     Call(SCI_INDICSETALPHA, INDIC_URLHOTSPOT, 5);
     Call(SCI_INDICSETUNDER, INDIC_URLHOTSPOT, true);
     Call(SCI_INDICSETHOVERSTYLE, INDIC_URLHOTSPOT, INDIC_DOTS);
-    Call(SCI_INDICSETHOVERFORE, INDIC_URLHOTSPOT, theme.GetThemeColor(RGB(0, 0, 255)));
+    Call(SCI_INDICSETHOVERFORE, INDIC_URLHOTSPOT, theme.GetThemeColor(RGB(0, 0, 255), true));
 
     Call(SCI_INDICSETSTYLE, INDIC_BRACEMATCH, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, 30);
     Call(SCI_INDICSETOUTLINEALPHA, INDIC_BRACEMATCH, 0);
     Call(SCI_INDICSETUNDER, INDIC_BRACEMATCH, true);
-    Call(SCI_INDICSETFORE, INDIC_BRACEMATCH, theme.GetThemeColor(RGB(0, 150, 0)));
+    Call(SCI_INDICSETFORE, INDIC_BRACEMATCH, theme.GetThemeColor(RGB(0, 150, 0), true));
 
     Call(SCI_INDICSETSTYLE, INDIC_MISSPELLED, INDIC_SQUIGGLE);
-    Call(SCI_INDICSETFORE, INDIC_MISSPELLED, theme.GetThemeColor(RGB(255, 0, 0)));
+    Call(SCI_INDICSETFORE, INDIC_MISSPELLED, theme.GetThemeColor(RGB(255, 0, 0), true));
     Call(SCI_INDICSETUNDER, INDIC_MISSPELLED, true);
 
-    Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, theme.GetThemeColor(RGB(0,150,0)));
+    Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, theme.GetThemeColor(RGB(0,150,0), true));
     Call(SCI_STYLESETBOLD, STYLE_BRACELIGHT, 1);
-    Call(SCI_STYLESETFORE, STYLE_BRACEBAD, theme.GetThemeColor(RGB(255,0,0)));
+    Call(SCI_STYLESETFORE, STYLE_BRACEBAD, theme.GetThemeColor(RGB(255,0,0), true));
     Call(SCI_STYLESETBOLD, STYLE_BRACEBAD, 1);
 
-    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, theme.GetThemeColor(RGB(200,200,200)));
+    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, theme.GetThemeColor(RGB(200,200,200), true));
 
-    Call(SCI_INDICSETFORE, INDIC_TAGMATCH, theme.GetThemeColor(RGB(0x80, 0x00, 0xFF)));
-    Call(SCI_INDICSETFORE, INDIC_TAGATTR, theme.GetThemeColor(RGB(0xFF, 0xFF, 0x00)));
+    Call(SCI_INDICSETFORE, INDIC_TAGMATCH, theme.GetThemeColor(RGB(0x80, 0x00, 0xFF), true));
+    Call(SCI_INDICSETFORE, INDIC_TAGATTR, theme.GetThemeColor(RGB(0xFF, 0xFF, 0x00), true));
     Call(SCI_INDICSETSTYLE, INDIC_TAGMATCH, INDIC_ROUNDBOX);
     Call(SCI_INDICSETSTYLE, INDIC_TAGATTR, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_TAGMATCH, 100);
@@ -951,11 +951,11 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETUNDER, INDIC_TAGMATCH, true);
     Call(SCI_INDICSETUNDER, INDIC_TAGATTR, true);
 
-    Call(SCI_SETFOLDMARGINCOLOUR, true, theme.GetThemeColor(RGB(240, 240, 240)));
-    Call(SCI_SETFOLDMARGINHICOLOUR, true, theme.GetThemeColor(RGB(255, 255, 255)));
+    Call(SCI_SETFOLDMARGINCOLOUR, true, theme.GetThemeColor(RGB(240, 240, 240), true));
+    Call(SCI_SETFOLDMARGINHICOLOUR, true, theme.GetThemeColor(RGB(255, 255, 255), true));
 
-    Call(SCI_MARKERSETFORE, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(80, 0, 0)));
-    Call(SCI_MARKERSETBACK, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(255, 0, 0)));
+    Call(SCI_MARKERSETFORE, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(80, 0, 0), true));
+    Call(SCI_MARKERSETBACK, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(255, 0, 0), true));
 
     SetTabSettings(Default);
     Call(SCI_SETINDENTATIONGUIDES, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"indent", SC_IV_LOOKBOTH));
@@ -971,16 +971,16 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_STYLESETITALIC, STYLE_FOLDDISPLAYTEXT, bItalic);
     Call(SCI_STYLESETSIZE, STYLE_FOLDDISPLAYTEXT, fontsize);
 
-    Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0)));
-    Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255)));
-    Call(SCI_SETSELFORE, TRUE, theme.GetThemeColor(RGB(0, 0, 0)));
-    Call(SCI_SETSELBACK, TRUE, theme.GetThemeColor(RGB(51, 153, 255)));
-    Call(SCI_SETCARETFORE, theme.GetThemeColor(RGB(0, 0, 0)));
-    Call(SCI_SETADDITIONALCARETFORE, theme.GetThemeColor(RGB(0, 0, 80)));
+    Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0), true));
+    Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255), true));
+    Call(SCI_SETSELFORE, TRUE, theme.GetThemeColor(RGB(0, 0, 0), true));
+    Call(SCI_SETSELBACK, TRUE, theme.GetThemeColor(RGB(51, 153, 255), true));
+    Call(SCI_SETCARETFORE, theme.GetThemeColor(RGB(0, 0, 0), true));
+    Call(SCI_SETADDITIONALCARETFORE, theme.GetThemeColor(RGB(0, 0, 80), true));
 
     if (CIniSettings::Instance().GetInt64(L"View", L"caretlineframe", 1) != 0)
     {
-        Call(SCI_SETCARETLINEBACK, theme.GetThemeColor(RGB(0, 0, 0)));
+        Call(SCI_SETCARETLINEBACK, theme.GetThemeColor(RGB(0, 0, 0), true));
         Call(SCI_SETCARETLINEBACKALPHA, 80);
     }
     else
@@ -992,7 +992,7 @@ void CScintillaWnd::SetupDefaultStyles()
         }
         else
         {
-            Call(SCI_SETCARETLINEBACK, theme.GetThemeColor(RGB(0, 0, 0)));
+            Call(SCI_SETCARETLINEBACK, theme.GetThemeColor(RGB(0, 0, 0), true));
             Call(SCI_SETCARETLINEBACKALPHA, 25);
         }
     }
@@ -1010,8 +1010,8 @@ void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF ba
 {
     // set the folding colors according to the parameters, but leave the
     // colors for the collapsed buttons (+ button) in the active color.
-    auto foldmarkfore = CTheme::Instance().GetThemeColor(fore);
-    auto foldmarkforeActive = CTheme::Instance().GetThemeColor(RGB(color_folding_fore_active, color_folding_fore_active, color_folding_fore_active));
+    auto foldmarkfore = CTheme::Instance().GetThemeColor(fore, true);
+    auto foldmarkforeActive = CTheme::Instance().GetThemeColor(RGB(color_folding_fore_active, color_folding_fore_active, color_folding_fore_active), true);
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN, foldmarkfore);
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDER, foldmarkforeActive);
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERSUB, foldmarkfore);
@@ -1020,8 +1020,8 @@ void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF ba
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, foldmarkfore);
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, foldmarkfore);
 
-    auto foldmarkback = CTheme::Instance().GetThemeColor(back);
-    auto foldmarkbackActive = CTheme::Instance().GetThemeColor(RGB(color_folding_back_active, color_folding_back_active, color_folding_back_active));
+    auto foldmarkback = CTheme::Instance().GetThemeColor(back, true);
+    auto foldmarkbackActive = CTheme::Instance().GetThemeColor(RGB(color_folding_back_active, color_folding_back_active, color_folding_back_active), true);
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN, foldmarkback);
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDER, foldmarkbackActive);
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERSUB, foldmarkback);
@@ -1030,8 +1030,8 @@ void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF ba
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, foldmarkback);
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, foldmarkback);
 
-    auto foldmarkbackselected = CTheme::Instance().GetThemeColor(backsel);
-    auto foldmarkbackselectedActive = CTheme::Instance().GetThemeColor(RGB(color_folding_backsel_active, color_folding_backsel_active, color_folding_backsel_active));
+    auto foldmarkbackselected = CTheme::Instance().GetThemeColor(backsel, true);
+    auto foldmarkbackselectedActive = CTheme::Instance().GetThemeColor(RGB(color_folding_backsel_active, color_folding_backsel_active, color_folding_backsel_active), true);
     Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEROPEN, foldmarkbackselected);
     Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDER, foldmarkbackselectedActive);
     Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERSUB, foldmarkbackselected);
@@ -1208,7 +1208,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
             FindText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
             FindText.lpstrText = seltextbuffer.get();
             lastStopPosition = 0;
-            const auto selTextColor = CTheme::Instance().GetThemeColor(RGB(0, 255, 0));
+            const auto selTextColor = CTheme::Instance().GetThemeColor(RGB(0, 255, 0), true);
             while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&FindText) >= 0)
             {
                 size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
@@ -1483,7 +1483,7 @@ bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
 
 LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw )
 {
-    m_docScroll.SetCurrentPos(Call(SCI_VISIBLEFROMDOCLINE, GetCurrentLineNumber()), CTheme::Instance().GetThemeColor(RGB(40,40,40)));
+    m_docScroll.SetCurrentPos(Call(SCI_VISIBLEFROMDOCLINE, GetCurrentLineNumber()), CTheme::Instance().GetThemeColor(RGB(40,40,40), true));
     m_docScroll.SetTotalLines(Call(SCI_VISIBLEFROMDOCLINE, (Call(SCI_GETLINECOUNT))));
     return m_docScroll.HandleCustomDraw(wParam, pCustDraw);
 }
@@ -2271,7 +2271,7 @@ void CScintillaWnd::BookmarkAdd( long lineno )
     if (!IsBookmarkPresent(lineno))
     {
         Call(SCI_MARKERADD, lineno, MARK_BOOKMARK);
-        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, lineno, CTheme::Instance().GetThemeColor(RGB(255,0,0)));
+        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, lineno, CTheme::Instance().GetThemeColor(RGB(255,0,0), true));
         DocScrollUpdate();
     }
 }
@@ -2309,7 +2309,7 @@ void CScintillaWnd::BookmarkToggle( int lineno )
 
 void CScintillaWnd::MarkBookmarksInScrollbar()
 {
-    const auto bmColor = CTheme::Instance().GetThemeColor(RGB(255, 0, 0));
+    const auto bmColor = CTheme::Instance().GetThemeColor(RGB(255, 0, 0), true);
     m_docScroll.Clear(DOCSCROLLTYPE_BOOKMARK);
     for (int line = -1;;)
     {

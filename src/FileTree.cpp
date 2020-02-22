@@ -688,8 +688,8 @@ void CFileTree::OnThemeChanged(bool bDark)
         if (bDark)
         {
             SetWindowTheme(*this, nullptr, nullptr);
-            TreeView_SetBkColor(*this, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
-            TreeView_SetTextColor(*this, CTheme::Instance().GetThemeColor(RGB(0, 0, 0)));
+            TreeView_SetBkColor(*this, CTheme::Instance().GetThemeColor(RGB(255, 255, 255), true));
+            TreeView_SetTextColor(*this, CTheme::Instance().GetThemeColor(RGB(0, 0, 0), true));
         }
         else
         {
@@ -710,7 +710,7 @@ void CFileTree::OnThemeChanged(bool bDark)
             SetWindowTheme(*this, L"Explorer", nullptr);
         if (bDark)
         {
-            TreeView_SetBkColor(*this, CTheme::Instance().GetThemeColor(RGB(255, 255, 255)));
+            TreeView_SetBkColor(*this, CTheme::Instance().GetThemeColor(RGB(255, 255, 255), true));
         }
         else
         {

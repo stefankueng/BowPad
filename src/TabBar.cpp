@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2019 - Stefan Kueng
+// Copyright (C) 2013-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -357,7 +357,10 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             RECT rClient, rTab, rTotalTab, rBkgnd, rEdge;
             COLORREF crBack;
 
-            ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
+            if (CTheme::Instance().IsHighContrastMode())
+                return ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
+            else
+                ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
 
             // calculate total tab width
             GetClientRect(*this, &rClient);
@@ -856,7 +859,7 @@ COLORREF CTabBar::GetTabColor(bool bSelected, UINT item) const
     nmhdr.tabOrigin = item;
     COLORREF clr = (COLORREF)::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
     float lighterfactor = 1.1f;
-    if (clr == 0)
+    if (clr == 0 || CTheme::Instance().IsHighContrastMode())
     {
         clr = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
         lighterfactor = 1.4f;
@@ -916,6 +919,8 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     crTo = GDIHelpers::Darker(crTo, fraction);
 
     crTo = CTheme::Instance().GetThemeColor(crTo);
+    if (CTheme::Instance().IsHighContrastMode())
+        crTo = crFrom;
 
     const int nROrg = GetRValue(crFrom);
     const int nGOrg = GetGValue(crFrom);
@@ -953,7 +958,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
             indicColor = CTheme::Instance().IsDarkTheme() ? RGB(0, 200, 0) : RGB(0, 150, 0);
         const int off = int(5.0f * m_dpiScale);
         GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - off, rItem.right, rItem.bottom,
-                                  CTheme::Instance().GetThemeColor(indicColor));
+                                  CTheme::Instance().GetThemeColor(indicColor, true));
     }
 
     const int PADDING = int(2.0f * m_dpiScale);
@@ -1012,7 +1017,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
             textColor = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_GRAYTEXT));
     }
     else if (tci.iImage == UNSAVED_IMG_INDEX)
-        textColor = CTheme::Instance().GetThemeColor(RGB(100, 0, 0));
+        textColor = CTheme::Instance().GetThemeColor(RGB(100, 0, 0), true);
     else if (bSelected)
         textColor = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT));
     else

@@ -745,6 +745,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     break;
     case WM_SETTINGCHANGE:
     case WM_SYSCOLORCHANGE:
+        CTheme::Instance().OnSysColorChanged();
         SetTheme(CTheme::Instance().IsDarkTheme());
     break;
     case WM_LBUTTONDBLCLK:
@@ -807,7 +808,7 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmhdr, WPARAM /*wParam*/, L
             if (m_DocManager.HasDocumentID(docId))
             {
                 auto clr = GetColorForDocument(docId);
-                return CTheme::Instance().GetThemeColor(clr);
+                return CTheme::Instance().GetThemeColor(clr, true);
             }
         }
         else
@@ -957,15 +958,15 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM /*wParam*/,
             {
                 if (IsWindows8OrGreater())
                 {
-                    lpNMCustomDraw->clrText = CTheme::Instance().GetThemeColor(RGB(0, 0, 0));
-                    lpNMCustomDraw->clrTextBk = CTheme::Instance().GetThemeColor(RGB(255, 255, 255));
+                    lpNMCustomDraw->clrText = CTheme::Instance().GetThemeColor(RGB(0, 0, 0), true);
+                    lpNMCustomDraw->clrTextBk = CTheme::Instance().GetThemeColor(RGB(255, 255, 255), true);
                 }
                 else
                 {
                     if ((lpNMCustomDraw->nmcd.uItemState & CDIS_SELECTED) != 0 &&
                         (lpNMCustomDraw->nmcd.uItemState & CDIS_FOCUS) == 0)
                     {
-                        lpNMCustomDraw->clrTextBk = CTheme::Instance().GetThemeColor(RGB(255, 255, 255));
+                        lpNMCustomDraw->clrTextBk = CTheme::Instance().GetThemeColor(RGB(255, 255, 255), true);
                         lpNMCustomDraw->clrText = RGB(128, 128, 128);
                     }
                 }

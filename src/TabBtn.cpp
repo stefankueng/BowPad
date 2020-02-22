@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2018 - Stefan Kueng
+// Copyright (C) 2016-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -78,9 +78,9 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
                 auto clr1 = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNSHADOW));
                 auto clr2 = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNFACE));
-                if (m_colorset)
+                if (m_colorset && !CTheme::Instance().IsHighContrastMode())
                 {
-                    clr1 = CTheme::Instance().GetThemeColor(m_color);
+                    clr1 = CTheme::Instance().GetThemeColor(m_color, true);
                     clr2 = GDIHelpers::Darker(clr1, 0.7f);
                 }
                 auto r1 = GetRValue(clr1);
@@ -109,7 +109,7 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 GDIHelpers::FillSolidRect(hdc, rect.left, halfpos, rect.right, rect.bottom, GDIHelpers::Darker((state & BST_HOT) != 0 ? clr1 : clr2, 0.9f));
 
                 ::SetBkMode(hdc, TRANSPARENT);
-                if (m_textcolorset)
+                if (m_textcolorset && !CTheme::Instance().IsHighContrastMode())
                     ::SetTextColor(hdc, CTheme::Instance().GetThemeColor(m_textcolor));
                 else
                     ::SetTextColor(hdc, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNTEXT)));

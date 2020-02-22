@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 Stefan Kueng
+// Copyright (C) 2013-2014, 2016, 2020 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,18 +30,24 @@ private:
 public:
     static CTheme& Instance();
 
-    void                                            SetDarkTheme(bool b = true);
-    bool                                            IsDarkTheme() const { return m_dark; }
-    COLORREF                                        GetThemeColor(COLORREF clr) const;
-    int                                             RegisterThemeChangeCallback(ThemeChangeCallback&& cb);
+    /// call this on every WM_SYSCOLORCHANGED message
+    void     OnSysColorChanged();
+    void     SetDarkTheme(bool b = true);
+    bool     IsDarkTheme() const { return m_dark; }
+    bool     IsHighContrastMode() const;
+    bool     IsHighContrastModeDark() const;
+    COLORREF GetThemeColor(COLORREF clr, bool fixed = false) const;
+    int      RegisterThemeChangeCallback(ThemeChangeCallback&& cb);
 
 private:
-    void                                            Load();
+    void Load();
 
 private:
-    bool                                            m_bLoaded;
-    std::unordered_map<COLORREF, COLORREF>          m_colorMap;
-    bool                                            m_dark;
-    std::unordered_map<int, ThemeChangeCallback>    m_themeChangeCallbacks;
-    int                                             m_lastThemeChangeCallbackId;
+    bool                                         m_bLoaded;
+    std::unordered_map<COLORREF, COLORREF>       m_colorMap;
+    bool                                         m_isHighContrastMode;
+    bool                                         m_isHighContrastModeDark;
+    bool                                         m_dark;
+    std::unordered_map<int, ThemeChangeCallback> m_themeChangeCallbacks;
+    int                                          m_lastThemeChangeCallbackId;
 };
