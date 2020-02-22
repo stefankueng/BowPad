@@ -1660,6 +1660,10 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     auto bidi = m_editor.Call(SCI_GETBIDIRECTIONAL);
 
     auto numberColor = 0x600000;
+    if (CTheme::Instance().IsHighContrastModeDark())
+        numberColor = 0xFF0000;
+    else if (CTheme::Instance().IsHighContrastMode())
+        numberColor = 0x200000;
 
     m_StatusBar.SetPart(STATUSBAR_CUR_POS,
                         CStringUtils::Format(rsStatusCurposLong, numberColor, line, numberColor, lineCount, numberColor, column),
