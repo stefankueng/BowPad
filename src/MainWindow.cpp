@@ -42,6 +42,7 @@
 #include "GDIHelpers.h"
 #include "Windows10Colors.h"
 #include "DarkModeHelper.h"
+#include "DPIAware.h"
 #include "../ext/tinyexpr/tinyexpr.h"
 
 #include <memory>
@@ -1394,7 +1395,7 @@ void CMainWindow::ResizeChildWindows()
         TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
         MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
         const int tbHeight = tabrc.bottom - tabrc.top;
-        const int tabBtnWidth = tbHeight + 2;
+        const int tabBtnWidth = tbHeight + CDPIAware::Instance().Scale(2);
         const int treeWidth = m_fileTreeVisible ? m_treeWidth : 0;
         const int mainWidth = rect.right - rect.left;
 
@@ -1404,7 +1405,7 @@ void CMainWindow::ResizeChildWindows()
         DeferWindowPos(hDwp, m_newTabBtn, nullptr, mainWidth - tabBtnWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_closeTabBtn, nullptr, mainWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_editor, nullptr, rect.left + treeWidth, rect.top + m_RibbonHeight + tbHeight, mainWidth - treeWidth, rect.bottom - (m_RibbonHeight + tbHeight) - m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight, treeWidth ? treeWidth - 5 : 0, rect.bottom - (m_RibbonHeight) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
+        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight, treeWidth ? treeWidth - CDPIAware::Instance().Scale(5) : 0, rect.bottom - (m_RibbonHeight) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
         EndDeferWindowPos(hDwp);
     }
 }
