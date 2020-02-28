@@ -895,6 +895,7 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARA
         m_custToolTip.HideTip();
         break;
     case SCN_ZOOM:
+        m_editor.UpdateLineNumberWidth();
         UpdateStatusBar(false);
         break;
     }
