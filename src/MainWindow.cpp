@@ -4000,6 +4000,10 @@ void CMainWindow::SetTheme(bool dark)
         DarkModeForWindow(m_closeTabBtn);
         DarkModeForWindow(m_editor);
 
+        BOOL darkFlag = TRUE;
+        DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA data = { DarkModeHelper::WCA_USEDARKMODECOLORS, &darkFlag, sizeof(darkFlag) };
+        DarkModeHelper::Instance().SetWindowCompositionAttribute(*this, &data);
+        DarkModeHelper::Instance().FlushMenuThemes();
         DarkModeHelper::Instance().RefreshImmersiveColorPolicyState();
     }
     else
@@ -4034,6 +4038,10 @@ void CMainWindow::SetTheme(bool dark)
         NormalModeForWindow(m_editor);
 
 
+        BOOL darkFlag = FALSE;
+        DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA data = { DarkModeHelper::WCA_USEDARKMODECOLORS, &darkFlag, sizeof(darkFlag) };
+        DarkModeHelper::Instance().SetWindowCompositionAttribute(*this, &data);
+        DarkModeHelper::Instance().FlushMenuThemes();
         DarkModeHelper::Instance().AllowDarkModeForApp(FALSE);
         DarkModeHelper::Instance().RefreshImmersiveColorPolicyState();
     }
@@ -4047,5 +4055,5 @@ void CMainWindow::SetTheme(bool dark)
     }
 
     CCommandHandler::Instance().OnThemeChanged(dark);
-    RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
+    RedrawWindow(*this, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
 }
