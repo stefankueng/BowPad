@@ -2331,8 +2331,8 @@ void CFindReplaceDlg::InitResultsList()
     lvc.pszText = const_cast<LPWSTR>(sLineText.c_str());
     ListView_InsertColumn(hListControl, 2, &lvc);
 
-    ListView_SetColumnWidth(hListControl, 0, 150);
-    ListView_SetColumnWidth(hListControl, 1, 50);
+    ListView_SetColumnWidth(hListControl, 0, 200);
+    ListView_SetColumnWidth(hListControl, 1, 70);
     ListView_SetColumnWidth(hListControl, 2, LVSCW_AUTOSIZE_USEHEADER);
 }
 
