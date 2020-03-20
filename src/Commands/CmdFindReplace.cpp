@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2019 - Stefan Kueng
+// Copyright (C) 2013-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "LexStyles.h"
 #include "OnOutOfScope.h"
 #include "ResString.h"
+#include "Theme.h"
 
 #include <regex>
 #include <thread>
@@ -475,6 +476,7 @@ void CFindReplaceDlg::InitSizing()
     AdjustControlSize(IDC_MATCHREGEX);
     AdjustControlSize(IDC_FUNCTIONS);
     m_resizer.Init(hwndDlg);
+    m_resizer.UseSizeGrip(!CTheme::Instance().IsDarkTheme());
     m_resizer.AddControl(hwndDlg, IDC_SEARCHFORLABEL, RESIZER_TOPLEFT);
     m_resizer.AddControl(hwndDlg, IDC_REPLACEWITHLABEL, RESIZER_TOPLEFT);
     m_resizer.AddControl(hwndDlg, IDC_SEARCHCOMBO, RESIZER_TOPLEFTRIGHT);
@@ -505,6 +507,12 @@ void CFindReplaceDlg::InitSizing()
 
 void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
 {
+    m_themeCallbackId = CTheme::Instance().RegisterThemeChangeCallback(
+        [this]()
+        {
+            SetTheme(CTheme::Instance().IsDarkTheme());
+        });
+    SetTheme(CTheme::Instance().IsDarkTheme());
     InitDialog(hwndDlg, IDI_BOWPAD, false);
 
     // Position the find dialog in the top right corner.
@@ -707,6 +715,11 @@ bool CFindReplaceDlg::EnableListEndTracking(int list_id, bool enable)
     return RemoveWindowSubclass(hList, ListViewSubClassProc, 0) != FALSE;
 }
 
+void CFindReplaceDlg::SetTheme(bool bDark)
+{
+    CTheme::Instance().SetThemeForDialog(*this, bDark);
+}
+
 bool CFindReplaceDlg::EnableComboBoxDeleteEvents(int combo_id, bool enable)
 {
     auto hCombo = GetDlgItem(*this, combo_id);
@@ -839,6 +852,7 @@ LRESULT CFindReplaceDlg::DrawListItem(NMLVCUSTOMDRAW* pLVCD)
             return CDRF_NOTIFYSUBITEMDRAW;
         case CDDS_ITEMPREPAINT | CDDS_ITEM | CDDS_SUBITEM:
         {
+            pLVCD->clrText = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT));
             switch (pLVCD->iSubItem)
             {
                 case 0:     // file
@@ -1062,7 +1076,7 @@ RECT CFindReplaceDlg::DrawListColumnBackground(NMLVCUSTOMDRAW* pLVCD)
     // Fill the background.
     if (IsAppThemed())
     {
-        auto brush = ::GetSysColorBrush(COLOR_WINDOW);
+        auto brush = ::CreateSolidBrush(CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOW)));
         if (brush == nullptr)
             return rect;
 
@@ -1095,12 +1109,12 @@ RECT CFindReplaceDlg::DrawListColumnBackground(NMLVCUSTOMDRAW* pLVCD)
         if ((rItem.state & LVIS_SELECTED) != 0)
         {
             if (::GetFocus() == hListControl)
-                brush = ::GetSysColorBrush(COLOR_HIGHLIGHT);
+                brush = CreateSolidBrush(CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_HIGHLIGHT)));
             else
-                brush = ::GetSysColorBrush(COLOR_BTNFACE);
+                brush = CreateSolidBrush(CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNFACE)));
         }
         else
-            brush = ::GetSysColorBrush(COLOR_WINDOW);
+            brush = CreateSolidBrush(CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOW)));
         if (brush == nullptr)
             return rect;
 
@@ -2288,7 +2302,7 @@ void CFindReplaceDlg::InitResultsList()
     m_trackingOn = true;
 
     HWND hListControl = GetDlgItem(*this, IDC_FINDRESULTS);
-    SetWindowTheme(hListControl, L"Explorer", nullptr);
+    //SetWindowTheme(hListControl, L"Explorer", nullptr);
     ListView_SetItemCountEx(hListControl, 0, 0);
 
     auto hListHeader = ListView_GetHeader(hListControl);

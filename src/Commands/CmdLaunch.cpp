@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "PathUtils.h"
 #include "UnicodeUtils.h"
 #include "EscapeUtils.h"
+#include "Theme.h"
 
 bool LaunchBase::Launch( const std::wstring& cmdline )
 {
@@ -168,6 +169,7 @@ LRESULT CALLBACK CCustomCommandsDlg::DlgFunc( HWND hwndDlg, UINT uMsg, WPARAM wP
     case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
+            CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
             ResString sInfo(hRes, IDS_CUSTOMCOMMANDSINFO);
             SetDlgItemText(hwndDlg, IDC_INFO, sInfo);
 

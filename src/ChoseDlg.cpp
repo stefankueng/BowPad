@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2017 - Stefan Kueng
+// Copyright (C) 2013, 2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #include "ChoseDlg.h"
 #include "AppUtils.h"
 #include "version.h"
+#include "Theme.h"
 #include <string>
 #include <Commdlg.h>
 
@@ -40,9 +41,10 @@ LRESULT CChoseDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam
     case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
+            CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
             m_resizer.Init(hwndDlg);
             m_resizer.AddControl(hwndDlg, IDC_LIST, RESIZER_TOPLEFTBOTTOMRIGHT);
-            m_resizer.ShowSizeGrip(false);
+            m_resizer.UseSizeGrip(false);
             // initialize the controls
             int maxlen = 0;
             for (const auto& item : m_list)

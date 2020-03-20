@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@
 #include "LexStyles.h"
 #include "Theme.h"
 #include "OnOutOfScope.h"
+#include "Theme.h"
 
 #include <memory>
 
@@ -92,6 +93,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
     case WM_INITDIALOG:
         {
             InitDialog(*this, IDI_BOWPAD);
+            CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
             auto languages = CLexStyles::Instance().GetLanguages();
             auto hLangCombo = GetDlgItem(*this, IDC_LANGCOMBO);
             for (const auto& langName : languages)

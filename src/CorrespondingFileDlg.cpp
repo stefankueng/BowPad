@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2016, 2018 Stefan Kueng
+// Copyright (C) 2013-2016, 2018, 2020 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "StringUtils.h"
 #include "OnOutOfScope.h"
 #include "version.h"
+#include "Theme.h"
 #include <string>
 #include <Commdlg.h>
 
@@ -295,6 +296,7 @@ void CCorrespondingFileDlg::InitSizing()
     HWND hwndDlg = *this;
     AdjustControlSize(IDC_CFCREATE);
     m_resizer.Init(hwndDlg);
+    m_resizer.UseSizeGrip(!CTheme::Instance().IsDarkTheme());
     m_resizer.AddControl(hwndDlg, IDC_CFNAME1, RESIZER_TOPLEFT);
     m_resizer.AddControl(hwndDlg, IDC_CFFOLDER1, RESIZER_TOPLEFTRIGHT);
     m_resizer.AddControl(hwndDlg, IDC_CFSETFOLDER1TOPARENT, RESIZER_TOPRIGHT);
@@ -310,6 +312,7 @@ void CCorrespondingFileDlg::InitSizing()
 LRESULT CCorrespondingFileDlg::DoInitDialog(HWND hwndDlg)
 {
     InitDialog(hwndDlg, IDI_BOWPAD, true);
+    CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
     InitSizing();
     SetDlgItemText(*this, IDC_CFNAME1, L".h");
     SetDlgItemText(*this, IDC_CFNAME2, L".cpp");

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018 - Stefan Kueng
+// Copyright (C) 2014-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "TempFile.h"
 #include "CommandHandler.h"
 #include "version.h"
+#include "Theme.h"
 
 #include <future>
 #include <fstream>
@@ -47,8 +48,10 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
         case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
+            CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
 
             m_resizer.Init(hwndDlg);
+            m_resizer.UseSizeGrip(!CTheme::Instance().IsDarkTheme());
             m_resizer.AddControl(hwndDlg, IDC_PLUGINGROUP, RESIZER_TOPLEFTBOTTOMRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_PLUGINSLIST, RESIZER_TOPLEFTBOTTOMRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_DESC, RESIZER_BOTTOMLEFTRIGHT);

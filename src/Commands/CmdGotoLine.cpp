@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "ScintillaWnd.h"
 #include "UnicodeUtils.h"
 #include "StringUtils.h"
+#include "Theme.h"
 
 CGotoLineDlg::CGotoLineDlg()
     : line(0)
@@ -34,6 +35,7 @@ LRESULT CGotoLineDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPa
     case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
+            CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
 
             SetDlgItemText(hwndDlg, IDC_LINEINFO, lineinfo.c_str());
             std::wstring sLine = CStringUtils::Format(L"%ld", line);

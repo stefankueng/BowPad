@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -192,6 +192,9 @@ protected:
 
     bool                    EnableComboBoxDeleteEvents(int combo_id, bool enable);
     bool                    EnableListEndTracking(int list_id, bool enable);
+
+    void                    SetTheme(bool bDark);
+
     static LRESULT CALLBACK ComboBoxListSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
                                                      UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
     static LRESULT CALLBACK ListViewSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -230,6 +233,7 @@ private:
     bool                        m_open = false;
     bool                        m_reactivation = false;
     volatile size_t             m_foundsize = 0;
+    int                         m_themeCallbackId = 0;
 
     // Some types usually best avoided while searching.
     // The user can explicitly override these if they want them though.

@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016 - Stefan Kueng
+// Copyright (C) 2014, 2016, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "UnicodeUtils.h"
 #include "Resource.h"
 #include "BaseDialog.h"
+#include "Theme.h"
 
 #include <algorithm>
 
@@ -111,6 +112,7 @@ LRESULT CSortDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
+            CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
             auto sortOrderList = GetDlgItem(*this,IDC_SORTDLG_ORDER);
             ResString ascending(hRes, IDS_ASCENDING );
             ResString descending(hRes, IDS_DESCENDING );
