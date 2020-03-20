@@ -20,6 +20,29 @@
 #include "SysInfo.h"
 #include "AppUtils.h"
 #include "GDIHelpers.h"
+#include "DarkModeHelper.h"
+#include "DPIAware.h"
+#include <Uxtheme.h>
+#include <vssym32.h>
+#include <richedit.h>
+#pragma warning(push)
+#pragma warning(disable : 4458) // declaration of 'xxx' hides class member
+#include <gdiplus.h>
+#pragma warning(pop)
+
+constexpr COLORREF darkBkColor           = 0x101010;
+constexpr COLORREF darkTextColor         = 0xEEEEEE;
+constexpr COLORREF darkDisabledTextColor = 0x808080;
+
+HBRUSH CTheme::s_backBrush = nullptr;
+
+static int  GetStateFromBtnState(LONG_PTR dwStyle, BOOL bHot, BOOL bFocus, LRESULT dwCheckState, int iPartId, BOOL bHasMouseCapture);
+static void GetRoundRectPath(Gdiplus::GraphicsPath* pPath, const Gdiplus::Rect& r, int dia);
+static void DrawRect(LPRECT prc, HDC hdcPaint, Gdiplus::DashStyle dashStyle, Gdiplus::Color clr, Gdiplus::REAL width);
+static void DrawFocusRect(LPRECT prcFocus, HDC hdcPaint);
+static void PaintControl(HWND hWnd, HDC hdc, RECT* prc, bool bDrawBorder);
+static BOOL DetermineGlowSize(int* piSize, LPCWSTR pszClassIdList = NULL);
+static BOOL GetEditBorderColor(HWND hWnd, COLORREF* pClr);
 
 CTheme::CTheme()
     : m_bLoaded(false)
@@ -132,6 +155,18 @@ int CTheme::RegisterThemeChangeCallback(ThemeChangeCallback&& cb)
     return nextThemeCallBackId;
 }
 
+bool CTheme::RemoveRegisteredCallback(int id)
+{
+    auto foundIt = m_themeChangeCallbacks.find(id);
+    if (foundIt != m_themeChangeCallbacks.end())
+    {
+        m_themeChangeCallbacks.erase(foundIt);
+        return true;
+    }
+    return false;
+}
+
+
 void CTheme::SetDarkTheme(bool b /*= true*/)
 {
     if (IsHighContrastMode())
@@ -140,4 +175,899 @@ void CTheme::SetDarkTheme(bool b /*= true*/)
     CIniSettings::Instance().SetInt64(L"View", L"darktheme", b ? 1 : 0);
     for (auto& cb : m_themeChangeCallbacks)
         cb.second();
+}
+
+bool CTheme::SetThemeForDialog(HWND hWnd, bool bDark)
+{
+    DarkModeHelper::Instance().AllowDarkModeForWindow(hWnd, bDark);
+    if (bDark)
+    {
+        SetWindowSubclass(hWnd, MainSubclassProc, 1234, (DWORD_PTR)&s_backBrush);
+    }
+    else
+    {
+        RemoveWindowSubclass(hWnd, MainSubclassProc, 1234);
+    }
+    EnumChildWindows(hWnd, AdjustThemeForChildrenProc, bDark ? TRUE : FALSE);
+    ::RedrawWindow(hWnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
+    return true;
+}
+
+BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
+{
+    DarkModeHelper::Instance().AllowDarkModeForWindow(hwnd, (BOOL)lParam);
+    TCHAR szWndClassName[MAX_PATH] = {0};
+    GetClassName(hwnd, szWndClassName, _countof(szWndClassName));
+    if (lParam)
+    {
+        if ((wcscmp(szWndClassName, WC_LISTVIEW) == 0) || (wcscmp(szWndClassName, WC_LISTBOX) == 0))
+        {
+            // theme "Explorer" also gets the scrollbars with dark mode, but the hover color
+            // is the blueish from the bright mode.
+            // theme "ItemsView" has the hover color the same as the windows explorer (grayish),
+            // but then the scrollbars are not drawn for dark mode.
+            // theme "DarkMode_Explorer" doesn't paint a hover color at all.
+            //
+            // Also, the group headers are not affected in dark mode and therefore the group texts are
+            // hardly visible.
+            //
+            // so use "Explorer" for now. The downside of the bluish hover color isn't that bad,
+            // except in situations where both a treeview and a listview are on the same dialog
+            // at the same time (e.g. repobrowser) - then the difference is unfortunately very
+            // noticeable...
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            auto header = ListView_GetHeader(hwnd);
+            DarkModeHelper::Instance().AllowDarkModeForWindow(header, (BOOL)lParam);
+            SetWindowTheme(header, L"Explorer", nullptr);
+            ListView_SetTextColor(hwnd, darkTextColor);
+            ListView_SetTextBkColor(hwnd, darkBkColor);
+            ListView_SetBkColor(hwnd, darkBkColor);
+            auto hTT = ListView_GetToolTips(hwnd);
+            if (hTT)
+            {
+                DarkModeHelper::Instance().AllowDarkModeForWindow(hTT, (BOOL)lParam);
+                SetWindowTheme(hTT, L"Explorer", nullptr);
+            }
+            SetWindowSubclass(hwnd, ListViewSubclassProc, 1234, (DWORD_PTR)&s_backBrush);
+        }
+        else if (wcscmp(szWndClassName, WC_HEADER) == 0)
+        {
+            SetWindowTheme(hwnd, L"ItemsView", nullptr);
+        }
+        else if (wcscmp(szWndClassName, WC_BUTTON) == 0)
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            auto style = GetWindowLongPtr(hwnd, GWL_STYLE) & 0x0F;
+            if ((style & BS_GROUPBOX) == BS_GROUPBOX)
+            {
+                SetWindowSubclass(hwnd, ButtonSubclassProc, 1234, (DWORD_PTR)&s_backBrush);
+            }
+            else if (style == BS_CHECKBOX || style == BS_AUTOCHECKBOX || style == BS_3STATE || style == BS_AUTO3STATE || style == BS_RADIOBUTTON || style == BS_AUTORADIOBUTTON)
+            {
+                SetWindowSubclass(hwnd, ButtonSubclassProc, 1234, (DWORD_PTR)&s_backBrush);
+            }
+        }
+        else if (wcscmp(szWndClassName, WC_STATIC) == 0)
+        {
+            SetWindowTheme(hwnd, L"", L"");
+        }
+        else if (wcscmp(szWndClassName, L"SysDateTimePick32") == 0)
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+        }
+        else if ((wcscmp(szWndClassName, WC_COMBOBOXEX) == 0) ||
+                 (wcscmp(szWndClassName, WC_COMBOBOX) == 0))
+        {
+            SetWindowTheme(hwnd, L"DarkMode_Explorer", nullptr);
+            HWND hCombo = hwnd;
+            if (wcscmp(szWndClassName, WC_COMBOBOXEX) == 0)
+            {
+                SendMessage(hwnd, CBEM_SETWINDOWTHEME, 0, (LPARAM)L"DarkMode_Explorer");
+                hCombo = (HWND)SendMessage(hwnd, CBEM_GETCOMBOCONTROL, 0, 0);
+            }
+            if (hCombo)
+            {
+                SetWindowSubclass(hCombo, ComboBoxSubclassProc, 1234, (DWORD_PTR)&s_backBrush);
+                COMBOBOXINFO info = {0};
+                info.cbSize       = sizeof(COMBOBOXINFO);
+                if (SendMessage(hCombo, CB_GETCOMBOBOXINFO, 0, (LPARAM)&info))
+                {
+                    DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndList, (BOOL)lParam);
+                    DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndItem, (BOOL)lParam);
+                    DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndCombo, (BOOL)lParam);
+
+                    SetWindowTheme(info.hwndList, L"DarkMode_Explorer", nullptr);
+                    SetWindowTheme(info.hwndItem, L"DarkMode_Explorer", nullptr);
+                    SetWindowTheme(info.hwndCombo, L"DarkMode_Explorer", nullptr);
+                }
+            }
+        }
+        else if (wcscmp(szWndClassName, WC_TREEVIEW) == 0)
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            TreeView_SetTextColor(hwnd, darkTextColor);
+            TreeView_SetBkColor(hwnd, darkBkColor);
+            auto hTT = TreeView_GetToolTips(hwnd);
+            if (hTT)
+            {
+                DarkModeHelper::Instance().AllowDarkModeForWindow(hTT, (BOOL)lParam);
+                SetWindowTheme(hTT, L"Explorer", nullptr);
+            }
+        }
+        else if (wcsncmp(szWndClassName, L"RICHEDIT", 8) == 0)
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            CHARFORMAT2 format = {0};
+            format.cbSize      = sizeof(CHARFORMAT2);
+            format.dwMask      = CFM_COLOR | CFM_BACKCOLOR;
+            format.crTextColor = darkTextColor;
+            format.crBackColor = darkBkColor;
+            SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, (LPARAM)&format);
+            SendMessage(hwnd, EM_SETBKGNDCOLOR, 0, (LPARAM)format.crBackColor);
+        }
+        else if (FAILED(SetWindowTheme(hwnd, L"DarkMode_Explorer", nullptr)))
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+    }
+    else
+    {
+        if (wcscmp(szWndClassName, WC_LISTVIEW) == 0)
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            HTHEME hTheme = OpenThemeData(nullptr, L"ItemsView");
+            if (hTheme)
+            {
+                COLORREF color;
+                if (SUCCEEDED(::GetThemeColor(hTheme, 0, 0, TMT_TEXTCOLOR, &color)))
+                {
+                    ListView_SetTextColor(hwnd, color);
+                }
+                if (SUCCEEDED(::GetThemeColor(hTheme, 0, 0, TMT_FILLCOLOR, &color)))
+                {
+                    ListView_SetTextBkColor(hwnd, color);
+                    ListView_SetBkColor(hwnd, color);
+                }
+                CloseThemeData(hTheme);
+            }
+            auto hTT = ListView_GetToolTips(hwnd);
+            if (hTT)
+            {
+                DarkModeHelper::Instance().AllowDarkModeForWindow(hTT, (BOOL)lParam);
+                SetWindowTheme(hTT, L"Explorer", nullptr);
+            }
+            RemoveWindowSubclass(hwnd, ListViewSubclassProc, 1234);
+        }
+        else if (wcscmp(szWndClassName, WC_BUTTON) == 0)
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            RemoveWindowSubclass(hwnd, ButtonSubclassProc, 1234);
+        }
+        else if ((wcscmp(szWndClassName, WC_COMBOBOXEX) == 0) ||
+            (wcscmp(szWndClassName, WC_COMBOBOX) == 0))
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            HWND hCombo = hwnd;
+            if (wcscmp(szWndClassName, WC_COMBOBOXEX) == 0)
+            {
+                SendMessage(hwnd, CBEM_SETWINDOWTHEME, 0, (LPARAM)L"Explorer");
+                hCombo = (HWND)SendMessage(hwnd, CBEM_GETCOMBOCONTROL, 0, 0);
+            }
+            if (hCombo)
+            {
+                COMBOBOXINFO info = {0};
+                info.cbSize       = sizeof(COMBOBOXINFO);
+                if (SendMessage(hCombo, CB_GETCOMBOBOXINFO, 0, (LPARAM)&info))
+                {
+                    DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndList, (BOOL)lParam);
+                    DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndItem, (BOOL)lParam);
+                    DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndCombo, (BOOL)lParam);
+
+                    SetWindowTheme(info.hwndList, L"Explorer", nullptr);
+                    SetWindowTheme(info.hwndItem, L"Explorer", nullptr);
+                    SetWindowTheme(info.hwndCombo, L"Explorer", nullptr);
+
+                    HTHEME hTheme = OpenThemeData(nullptr, L"ItemsView");
+                    if (hTheme)
+                    {
+                        COLORREF color;
+                        if (SUCCEEDED(::GetThemeColor(hTheme, 0, 0, TMT_TEXTCOLOR, &color)))
+                        {
+                            ListView_SetTextColor(info.hwndList, color);
+                        }
+                        if (SUCCEEDED(::GetThemeColor(hTheme, 0, 0, TMT_FILLCOLOR, &color)))
+                        {
+                            ListView_SetTextBkColor(info.hwndList, color);
+                            ListView_SetBkColor(info.hwndList, color);
+                        }
+                        CloseThemeData(hTheme);
+                    }
+
+                    RemoveWindowSubclass(info.hwndList, ListViewSubclassProc, 1234);
+                }
+                RemoveWindowSubclass(hCombo, ComboBoxSubclassProc, 1234);
+            }
+        }
+        else if (wcscmp(szWndClassName, WC_TREEVIEW) == 0)
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            HTHEME hTheme = OpenThemeData(nullptr, L"ItemsView");
+            if (hTheme)
+            {
+                COLORREF color;
+                if (SUCCEEDED(::GetThemeColor(hTheme, 0, 0, TMT_TEXTCOLOR, &color)))
+                {
+                    TreeView_SetTextColor(hwnd, color);
+                }
+                if (SUCCEEDED(::GetThemeColor(hTheme, 0, 0, TMT_FILLCOLOR, &color)))
+                {
+                    TreeView_SetBkColor(hwnd, color);
+                }
+                CloseThemeData(hTheme);
+            }
+            auto hTT = TreeView_GetToolTips(hwnd);
+            if (hTT)
+            {
+                DarkModeHelper::Instance().AllowDarkModeForWindow(hTT, (BOOL)lParam);
+                SetWindowTheme(hTT, L"Explorer", nullptr);
+            }
+        }
+        else if (wcsncmp(szWndClassName, L"RICHEDIT", 8) == 0)
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            CHARFORMAT2 format = {0};
+            format.cbSize      = sizeof(CHARFORMAT2);
+            format.dwMask      = CFM_COLOR | CFM_BACKCOLOR;
+            format.crTextColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT));
+            format.crBackColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOW));
+            SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, (LPARAM)&format);
+            SendMessage(hwnd, EM_SETBKGNDCOLOR, 0, (LPARAM)format.crBackColor);
+        }
+        else
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+    }
+    return TRUE;
+}
+
+LRESULT CTheme::ListViewSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uIdSubclass*/, DWORD_PTR /*dwRefData*/)
+{
+    switch (uMsg)
+    {
+        case WM_NOTIFY: {
+            if (reinterpret_cast<LPNMHDR>(lParam)->code == NM_CUSTOMDRAW)
+            {
+                LPNMCUSTOMDRAW nmcd = reinterpret_cast<LPNMCUSTOMDRAW>(lParam);
+                switch (nmcd->dwDrawStage)
+                {
+                    case CDDS_PREPAINT:
+                        return CDRF_NOTIFYITEMDRAW;
+                    case CDDS_ITEMPREPAINT: {
+                        SetTextColor(nmcd->hdc, darkTextColor);
+                        return CDRF_DODEFAULT;
+                    }
+                }
+            }
+        }
+        break;
+    }
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+LRESULT CTheme::ComboBoxSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uIdSubclass*/, DWORD_PTR dwRefData)
+{
+    switch (uMsg)
+    {
+        case WM_CTLCOLORDLG:
+        case WM_CTLCOLORSTATIC:
+        case WM_CTLCOLOREDIT:
+        case WM_CTLCOLORLISTBOX:
+        case WM_CTLCOLORBTN:
+        case WM_CTLCOLORSCROLLBAR: {
+            auto hbrBkgnd = (HBRUSH*)dwRefData;
+            HDC  hdc      = reinterpret_cast<HDC>(wParam);
+            SetBkMode(hdc, TRANSPARENT);
+            SetTextColor(hdc, darkTextColor);
+            SetBkColor(hdc, darkBkColor);
+            if (!*hbrBkgnd)
+                *hbrBkgnd = CreateSolidBrush(darkBkColor);
+            return reinterpret_cast<LRESULT>(*hbrBkgnd);
+        }
+        break;
+    }
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+LRESULT CTheme::MainSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uIdSubclass*/, DWORD_PTR dwRefData)
+{
+    switch (uMsg)
+    {
+        case WM_CTLCOLORDLG:
+        case WM_CTLCOLORSTATIC:
+        case WM_CTLCOLOREDIT:
+        case WM_CTLCOLORLISTBOX:
+        case WM_CTLCOLORBTN:
+        case WM_CTLCOLORSCROLLBAR: {
+            auto hbrBkgnd = (HBRUSH*)dwRefData;
+            HDC  hdc      = reinterpret_cast<HDC>(wParam);
+            SetBkMode(hdc, TRANSPARENT);
+            SetTextColor(hdc, darkTextColor);
+            SetBkColor(hdc, darkBkColor);
+            if (!*hbrBkgnd)
+                *hbrBkgnd = CreateSolidBrush(darkBkColor);
+            return reinterpret_cast<LRESULT>(*hbrBkgnd);
+        }
+        break;
+    }
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+#ifndef RECTWIDTH
+#define RECTWIDTH(rc) ((rc).right - (rc).left)
+#endif
+
+#ifndef RECTHEIGHT
+#define RECTHEIGHT(rc) ((rc).bottom - (rc).top)
+#endif
+
+LRESULT CTheme::ButtonSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uIdSubclass*/, DWORD_PTR /*dwRefData*/)
+{
+    switch (uMsg)
+    {
+        case WM_SETTEXT:
+        case WM_ENABLE:
+        case WM_STYLECHANGED: {
+            LRESULT res = DefSubclassProc(hWnd, uMsg, wParam, lParam);
+            InvalidateRgn(hWnd, NULL, FALSE);
+            return res;
+        }
+        break;
+        case WM_PAINT: {
+            PAINTSTRUCT ps;
+            HDC         hdc = BeginPaint(hWnd, &ps);
+            if (hdc)
+            {
+                LONG_PTR dwStyle       = GetWindowLongPtr(hWnd, GWL_STYLE);
+                LONG_PTR dwButtonStyle = LOWORD(dwStyle);
+                LONG_PTR dwButtonType  = dwButtonStyle & 0xF;
+                RECT     rcClient;
+                GetClientRect(hWnd, &rcClient);
+
+                if ((dwButtonType & BS_GROUPBOX) == BS_GROUPBOX)
+                {
+                    HTHEME hTheme = OpenThemeData(hWnd, L"Button");
+                    if (hTheme)
+                    {
+                        BP_PAINTPARAMS params = {sizeof(BP_PAINTPARAMS)};
+                        params.dwFlags        = BPPF_ERASE;
+
+                        RECT rcExclusion  = rcClient;
+                        params.prcExclude = &rcExclusion;
+
+                        // We have to calculate the exclusion rect and therefore
+                        // calculate the font height. We select the control's font
+                        // into the DC and fake a drawing operation:
+                        HFONT hFontOld = (HFONT)SendMessage(hWnd, WM_GETFONT, 0L, NULL);
+                        if (hFontOld)
+                            hFontOld = (HFONT)SelectObject(hdc, hFontOld);
+
+                        RECT  rcDraw  = rcClient;
+                        DWORD dwFlags = DT_SINGLELINE;
+
+                        // we use uppercase A to determine the height of text, so we
+                        // can draw the upper line of the groupbox:
+                        DrawTextW(hdc, L"A", -1, &rcDraw, dwFlags | DT_CALCRECT);
+
+                        if (hFontOld)
+                        {
+                            SelectObject(hdc, hFontOld);
+                            hFontOld = NULL;
+                        }
+
+                        rcExclusion.left += 2;
+                        rcExclusion.top += RECTHEIGHT(rcDraw);
+                        rcExclusion.right -= 2;
+                        rcExclusion.bottom -= 2;
+
+                        HDC          hdcPaint       = NULL;
+                        HPAINTBUFFER hBufferedPaint = BeginBufferedPaint(hdc, &rcClient, BPBF_TOPDOWNDIB,
+                                                                         &params, &hdcPaint);
+                        if (hdcPaint)
+                        {
+                            // now we again retrieve the font, but this time we select it into
+                            // the buffered DC:
+                            hFontOld = (HFONT)SendMessage(hWnd, WM_GETFONT, 0L, NULL);
+                            if (hFontOld)
+                                hFontOld = (HFONT)SelectObject(hdcPaint, hFontOld);
+
+                            PatBlt(hdcPaint, 0, 0, RECTWIDTH(rcClient), RECTHEIGHT(rcClient), BLACKNESS);
+
+                            BufferedPaintSetAlpha(hBufferedPaint, &ps.rcPaint, 0x00);
+
+                            DTTOPTS DttOpts   = {sizeof(DTTOPTS)};
+                            DttOpts.dwFlags   = DTT_COMPOSITED | DTT_GLOWSIZE;
+                            DttOpts.crText    = darkTextColor;
+                            DttOpts.iGlowSize = 12; // Default value
+
+                            DetermineGlowSize(&DttOpts.iGlowSize);
+
+                            COLORREF cr = RGB(0x00, 0x00, 0x00);
+                            GetEditBorderColor(hWnd, &cr);
+                            cr |= 0xff000000;
+
+                            std::unique_ptr<Gdiplus::Pen>      myPen(new Gdiplus::Pen(Gdiplus::Color(cr), 1));
+                            std::unique_ptr<Gdiplus::Graphics> myGraphics(new Gdiplus::Graphics(hdcPaint));
+                            int                                iY = RECTHEIGHT(rcDraw) / 2;
+                            Gdiplus::Rect                      rr = Gdiplus::Rect(rcClient.left, rcClient.top + iY,
+                                                             RECTWIDTH(rcClient), RECTHEIGHT(rcClient) - iY - 1);
+                            Gdiplus::GraphicsPath              path;
+                            GetRoundRectPath(&path, rr, 5);
+                            myGraphics->DrawPath(myPen.get(), &path);
+                            myGraphics.reset();
+                            myPen.reset();
+
+                            int iLen = GetWindowTextLength(hWnd);
+
+                            if (iLen)
+                            {
+                                iLen += 5; // 1 for terminating zero, 4 for DT_MODIFYSTRING
+                                LPWSTR szText = (LPWSTR)LocalAlloc(LPTR, sizeof(WCHAR) * iLen);
+                                if (szText)
+                                {
+                                    iLen = GetWindowTextW(hWnd, szText, iLen);
+                                    if (iLen)
+                                    {
+                                        int iX = RECTWIDTH(rcDraw);
+                                        rcDraw = rcClient;
+                                        rcDraw.left += iX;
+                                        DrawTextW(hdcPaint, szText, -1, &rcDraw, dwFlags | DT_CALCRECT);
+                                        PatBlt(hdcPaint, rcDraw.left, rcDraw.top, RECTWIDTH(rcDraw) + 3, RECTHEIGHT(rcDraw), BLACKNESS);
+                                        rcDraw.left++;
+                                        rcDraw.right++;
+
+                                        SetBkMode(hdcPaint, TRANSPARENT);
+                                        SetTextColor(hdcPaint, darkTextColor);
+                                        DrawText(hdcPaint, szText, -1, &rcDraw, dwFlags);
+                                    }
+
+                                    LocalFree(szText);
+                                }
+                            }
+
+                            if (hFontOld)
+                            {
+                                SelectObject(hdcPaint, hFontOld);
+                                hFontOld = NULL;
+                            }
+
+                            EndBufferedPaint(hBufferedPaint, TRUE);
+                        }
+
+                        CloseThemeData(hTheme);
+                    }
+                }
+
+                else if (dwButtonType == BS_CHECKBOX || dwButtonType == BS_AUTOCHECKBOX ||
+                         dwButtonType == BS_3STATE || dwButtonType == BS_AUTO3STATE || dwButtonType == BS_RADIOBUTTON || dwButtonType == BS_AUTORADIOBUTTON)
+                {
+                    HTHEME hTheme = OpenThemeData(hWnd, L"Button");
+                    if (hTheme)
+                    {
+                        HDC            hdcPaint     = NULL;
+                        BP_PAINTPARAMS params       = {sizeof(BP_PAINTPARAMS)};
+                        params.dwFlags              = BPPF_ERASE;
+                        HPAINTBUFFER hBufferedPaint = BeginBufferedPaint(hdc, &rcClient, BPBF_TOPDOWNDIB, &params, &hdcPaint);
+                        if (hdcPaint)
+                        {
+                            PatBlt(hdcPaint, 0, 0, RECTWIDTH(rcClient), RECTHEIGHT(rcClient), BLACKNESS);
+
+                            BufferedPaintSetAlpha(hBufferedPaint, &ps.rcPaint, 0x00);
+
+                            LRESULT dwCheckState = SendMessage(hWnd, BM_GETCHECK, 0, NULL);
+                            POINT   pt;
+                            RECT    rc;
+                            GetWindowRect(hWnd, &rc);
+                            GetCursorPos(&pt);
+                            BOOL bHot   = PtInRect(&rc, pt);
+                            BOOL bFocus = GetFocus() == hWnd;
+
+                            int iPartId = BP_CHECKBOX;
+                            if (dwButtonType == BS_RADIOBUTTON || dwButtonType == BS_AUTORADIOBUTTON)
+                                iPartId = BP_RADIOBUTTON;
+
+                            int iState = GetStateFromBtnState(dwStyle, bHot, bFocus, dwCheckState, iPartId, FALSE);
+
+                            int bmWidth = int(ceil(13.0 * CDPIAware::Instance().GetDPI() / 96.0));
+
+                            UINT uiHalfWidth = (RECTWIDTH(rcClient) - bmWidth) / 2;
+
+                            // we have to use the whole client area, otherwise we get only partially
+                            // drawn areas:
+                            RECT rcPaint = rcClient;
+
+                            if (dwButtonStyle & BS_LEFTTEXT)
+                            {
+                                rcPaint.left += uiHalfWidth;
+                                rcPaint.right += uiHalfWidth;
+                            }
+                            else
+                            {
+                                rcPaint.left -= uiHalfWidth;
+                                rcPaint.right -= uiHalfWidth;
+                            }
+
+                            // we assume that bmWidth is both the horizontal and the vertical
+                            // dimension of the control bitmap and that it is square. bm.bmHeight
+                            // seems to be the height of a striped bitmap because it is an absurdly
+                            // high dimension value
+                            if ((dwButtonStyle & BS_VCENTER) == BS_VCENTER) /// BS_VCENTER is BS_TOP|BS_BOTTOM
+                            {
+                                int h          = RECTHEIGHT(rcPaint);
+                                rcPaint.top    = (h - bmWidth) / 2;
+                                rcPaint.bottom = rcPaint.top + bmWidth;
+                            }
+                            else if (dwButtonStyle & BS_TOP)
+                            {
+                                rcPaint.bottom = rcPaint.top + bmWidth;
+                            }
+                            else if (dwButtonStyle & BS_BOTTOM)
+                            {
+                                rcPaint.top = rcPaint.bottom - bmWidth;
+                            }
+                            else // default: center the checkbox/radiobutton vertically
+                            {
+                                int h          = RECTHEIGHT(rcPaint);
+                                rcPaint.top    = (h - bmWidth) / 2;
+                                rcPaint.bottom = rcPaint.top + bmWidth;
+                            }
+
+                            DrawThemeBackground(hTheme, hdcPaint, iPartId, iState, &rcPaint, NULL);
+                            rcPaint = rcClient;
+
+                            GetThemeBackgroundContentRect(hTheme, hdcPaint, iPartId, iState, &rcPaint, &rc);
+
+                            if (dwButtonStyle & BS_LEFTTEXT)
+                                rc.right -= bmWidth + 2 * GetSystemMetrics(SM_CXEDGE);
+                            else
+                                rc.left += bmWidth + 2 * GetSystemMetrics(SM_CXEDGE);
+
+                            DTTOPTS DttOpts   = {sizeof(DTTOPTS)};
+                            DttOpts.dwFlags   = DTT_COMPOSITED | DTT_GLOWSIZE;
+                            DttOpts.crText    = darkTextColor;
+                            DttOpts.iGlowSize = 12; // Default value
+
+                            DetermineGlowSize(&DttOpts.iGlowSize);
+
+                            HFONT hFontOld = (HFONT)SendMessage(hWnd, WM_GETFONT, 0L, NULL);
+                            if (hFontOld)
+                                hFontOld = (HFONT)SelectObject(hdcPaint, hFontOld);
+                            int iLen = GetWindowTextLength(hWnd);
+
+                            if (iLen)
+                            {
+                                iLen += 5; // 1 for terminating zero, 4 for DT_MODIFYSTRING
+                                LPWSTR szText = (LPWSTR)LocalAlloc(LPTR, sizeof(WCHAR) * iLen);
+                                if (szText)
+                                {
+                                    iLen = GetWindowTextW(hWnd, szText, iLen);
+                                    if (iLen)
+                                    {
+                                        DWORD dwFlags = DT_SINGLELINE /*|DT_VCENTER*/;
+                                        if (dwButtonStyle & BS_MULTILINE)
+                                        {
+                                            dwFlags |= DT_WORDBREAK;
+                                            dwFlags &= ~(DT_SINGLELINE | DT_VCENTER);
+                                        }
+
+                                        if ((dwButtonStyle & BS_CENTER) == BS_CENTER) /// BS_CENTER is BS_LEFT|BS_RIGHT
+                                            dwFlags |= DT_CENTER;
+                                        else if (dwButtonStyle & BS_LEFT)
+                                            dwFlags |= DT_LEFT;
+                                        else if (dwButtonStyle & BS_RIGHT)
+                                            dwFlags |= DT_RIGHT;
+
+                                        if ((dwButtonStyle & BS_VCENTER) == BS_VCENTER) /// BS_VCENTER is BS_TOP|BS_BOTTOM
+                                            dwFlags |= DT_VCENTER;
+                                        else if (dwButtonStyle & BS_TOP)
+                                            dwFlags |= DT_TOP;
+                                        else if (dwButtonStyle & BS_BOTTOM)
+                                            dwFlags |= DT_BOTTOM;
+                                        else
+                                            dwFlags |= DT_VCENTER;
+
+                                        if ((dwButtonStyle & BS_MULTILINE) && (dwFlags & DT_VCENTER))
+                                        {
+                                            // the DT_VCENTER flag only works for DT_SINGLELINE, so
+                                            // we have to center the text ourselves here
+                                            RECT rcdummy  = rc;
+                                            int  height   = DrawText(hdcPaint, szText, -1, &rcdummy, dwFlags | DT_WORDBREAK | DT_CALCRECT);
+                                            int  center_y = rc.top + (RECTHEIGHT(rc) / 2);
+                                            rc.top        = center_y - height / 2;
+                                            rc.bottom     = center_y + height / 2;
+                                        }
+                                        SetBkMode(hdcPaint, TRANSPARENT);
+                                        if (dwStyle & WS_DISABLED)
+                                            SetTextColor(hdcPaint, darkDisabledTextColor);
+                                        else
+                                            SetTextColor(hdcPaint, darkTextColor);
+                                        DrawText(hdcPaint, szText, -1, &rc, dwFlags);
+
+                                        // draw the focus rectangle if neccessary:
+                                        if (bFocus)
+                                        {
+                                            RECT rcDraw = rc;
+
+                                            DrawTextW(hdcPaint, szText, -1, &rcDraw, dwFlags | DT_CALCRECT);
+                                            if (dwFlags & DT_SINGLELINE)
+                                            {
+                                                dwFlags &= ~DT_VCENTER;
+                                                RECT rcDrawTop;
+                                                DrawTextW(hdcPaint, szText, -1, &rcDrawTop, dwFlags | DT_CALCRECT);
+                                                rcDraw.top = rcDraw.bottom - RECTHEIGHT(rcDrawTop);
+                                            }
+
+                                            if (dwFlags & DT_RIGHT)
+                                            {
+                                                int iWidth   = RECTWIDTH(rcDraw);
+                                                rcDraw.right = rc.right;
+                                                rcDraw.left  = rcDraw.right - iWidth;
+                                            }
+
+                                            RECT rcFocus;
+                                            IntersectRect(&rcFocus, &rc, &rcDraw);
+
+                                            DrawFocusRect(&rcFocus, hdcPaint);
+                                        }
+                                    }
+                                    LocalFree(szText);
+                                }
+                            }
+
+                            if (hFontOld)
+                            {
+                                SelectObject(hdcPaint, hFontOld);
+                                hFontOld = NULL;
+                            }
+
+                            EndBufferedPaint(hBufferedPaint, TRUE);
+                        }
+                        CloseThemeData(hTheme);
+                    }
+                }
+                else if (BS_PUSHBUTTON == dwButtonType || BS_DEFPUSHBUTTON == dwButtonType)
+                {
+                    // push buttons are drawn properly in dark mode without us doing anything
+                    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+                }
+                else
+                    PaintControl(hWnd, hdc, &ps.rcPaint, false);
+            }
+
+            EndPaint(hWnd, &ps);
+            return 0;
+        }
+        break;
+        case WM_DESTROY:
+        case WM_NCDESTROY:
+            RemoveWindowSubclass(hWnd, ButtonSubclassProc, 1234);
+            break;
+    }
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+int GetStateFromBtnState(LONG_PTR dwStyle, BOOL bHot, BOOL bFocus, LRESULT dwCheckState, int iPartId, BOOL bHasMouseCapture)
+{
+    int iState = 0;
+    switch (iPartId)
+    {
+        case BP_PUSHBUTTON:
+            iState = PBS_NORMAL;
+            if (dwStyle & WS_DISABLED)
+                iState = PBS_DISABLED;
+            else
+            {
+                if (dwStyle & BS_DEFPUSHBUTTON)
+                    iState = PBS_DEFAULTED;
+
+                if (bHasMouseCapture && bHot)
+                    iState = PBS_PRESSED;
+                else if (bHasMouseCapture || bHot)
+                    iState = PBS_HOT;
+            }
+            break;
+        case BP_GROUPBOX:
+            iState = (dwStyle & WS_DISABLED) ? GBS_DISABLED : GBS_NORMAL;
+            break;
+
+        case BP_RADIOBUTTON:
+            iState = RBS_UNCHECKEDNORMAL;
+            switch (dwCheckState)
+            {
+                case BST_CHECKED:
+                    if (dwStyle & WS_DISABLED)
+                        iState = RBS_CHECKEDDISABLED;
+                    else if (bFocus)
+                        iState = RBS_CHECKEDPRESSED;
+                    else if (bHot)
+                        iState = RBS_CHECKEDHOT;
+                    else
+                        iState = RBS_CHECKEDNORMAL;
+                    break;
+                case BST_UNCHECKED:
+                    if (dwStyle & WS_DISABLED)
+                        iState = RBS_UNCHECKEDDISABLED;
+                    else if (bFocus)
+                        iState = RBS_UNCHECKEDPRESSED;
+                    else if (bHot)
+                        iState = RBS_UNCHECKEDHOT;
+                    else
+                        iState = RBS_UNCHECKEDNORMAL;
+                    break;
+            }
+            break;
+
+        case BP_CHECKBOX:
+            switch (dwCheckState)
+            {
+                case BST_CHECKED:
+                    if (dwStyle & WS_DISABLED)
+                        iState = CBS_CHECKEDDISABLED;
+                    else if (bFocus)
+                        iState = CBS_CHECKEDPRESSED;
+                    else if (bHot)
+                        iState = CBS_CHECKEDHOT;
+                    else
+                        iState = CBS_CHECKEDNORMAL;
+                    break;
+                case BST_INDETERMINATE:
+                    if (dwStyle & WS_DISABLED)
+                        iState = CBS_MIXEDDISABLED;
+                    else if (bFocus)
+                        iState = CBS_MIXEDPRESSED;
+                    else if (bHot)
+                        iState = CBS_MIXEDHOT;
+                    else
+                        iState = CBS_MIXEDNORMAL;
+                    break;
+                case BST_UNCHECKED:
+                    if (dwStyle & WS_DISABLED)
+                        iState = CBS_UNCHECKEDDISABLED;
+                    else if (bFocus)
+                        iState = CBS_UNCHECKEDPRESSED;
+                    else if (bHot)
+                        iState = CBS_UNCHECKEDHOT;
+                    else
+                        iState = CBS_UNCHECKEDNORMAL;
+                    break;
+            }
+            break;
+        default:
+            ASSERT(0);
+            break;
+    }
+
+    return iState;
+}
+
+void GetRoundRectPath(Gdiplus::GraphicsPath* pPath, const Gdiplus::Rect& r, int dia)
+{
+    // diameter can't exceed width or height
+    if (dia > r.Width)
+        dia = r.Width;
+    if (dia > r.Height)
+        dia = r.Height;
+
+    // define a corner
+    Gdiplus::Rect Corner(r.X, r.Y, dia, dia);
+
+    // begin path
+    pPath->Reset();
+    pPath->StartFigure();
+
+    // top left
+    pPath->AddArc(Corner, 180, 90);
+
+    // top right
+    Corner.X += (r.Width - dia - 1);
+    pPath->AddArc(Corner, 270, 90);
+
+    // bottom right
+    Corner.Y += (r.Height - dia - 1);
+    pPath->AddArc(Corner, 0, 90);
+
+    // bottom left
+    Corner.X -= (r.Width - dia - 1);
+    pPath->AddArc(Corner, 90, 90);
+
+    // end path
+    pPath->CloseFigure();
+}
+
+void DrawRect(LPRECT prc, HDC hdcPaint, Gdiplus::DashStyle dashStyle, Gdiplus::Color clr, Gdiplus::REAL width)
+{
+    std::unique_ptr<Gdiplus::Pen> myPen(new Gdiplus::Pen(clr, width));
+    myPen->SetDashStyle(dashStyle);
+    std::unique_ptr<Gdiplus::Graphics> myGraphics(new Gdiplus::Graphics(hdcPaint));
+
+    myGraphics->DrawRectangle(myPen.get(), prc->left, prc->top,
+                              prc->right - 1 - prc->left, prc->bottom - 1 - prc->top);
+}
+
+void DrawFocusRect(LPRECT prcFocus, HDC hdcPaint)
+{
+    DrawRect(prcFocus, hdcPaint, Gdiplus::DashStyleDot, Gdiplus::Color(0xFF, 0, 0, 0), 1.0);
+}
+
+void PaintControl(HWND hWnd, HDC hdc, RECT* prc, bool bDrawBorder)
+{
+    HDC hdcPaint = NULL;
+
+    if (bDrawBorder)
+        InflateRect(prc, 1, 1);
+    HPAINTBUFFER hBufferedPaint = BeginBufferedPaint(hdc, prc, BPBF_TOPDOWNDIB, NULL, &hdcPaint);
+    if (hdcPaint)
+    {
+        RECT rc;
+        GetWindowRect(hWnd, &rc);
+
+        PatBlt(hdcPaint, 0, 0, RECTWIDTH(rc), RECTHEIGHT(rc), BLACKNESS);
+        BufferedPaintSetAlpha(hBufferedPaint, &rc, 0x00);
+
+        ///
+        /// first blit white so list ctrls don't look ugly:
+        ///
+        PatBlt(hdcPaint, 0, 0, RECTWIDTH(rc), RECTHEIGHT(rc), WHITENESS);
+
+        if (bDrawBorder)
+            InflateRect(prc, -1, -1);
+        // Tell the control to paint itself in our memory buffer
+        SendMessage(hWnd, WM_PRINTCLIENT, (WPARAM)hdcPaint, PRF_CLIENT | PRF_ERASEBKGND | PRF_NONCLIENT | PRF_CHECKVISIBLE);
+
+        if (bDrawBorder)
+        {
+            InflateRect(prc, 1, 1);
+            FrameRect(hdcPaint, prc, (HBRUSH)GetStockObject(BLACK_BRUSH));
+        }
+
+        // don't make a possible border opaque, only the inner part of the control
+        InflateRect(prc, -2, -2);
+        // Make every pixel opaque
+        BufferedPaintSetAlpha(hBufferedPaint, prc, 255);
+        EndBufferedPaint(hBufferedPaint, TRUE);
+    }
+}
+
+BOOL DetermineGlowSize(int* piSize, LPCWSTR pszClassIdList /*= NULL*/)
+{
+    if (!piSize)
+    {
+        SetLastError(ERROR_INVALID_PARAMETER);
+        return FALSE;
+    }
+
+    if (!pszClassIdList)
+        pszClassIdList = L"CompositedWindow::Window";
+
+    HTHEME hThemeWindow = OpenThemeData(NULL, pszClassIdList);
+    if (hThemeWindow != NULL)
+    {
+        SUCCEEDED(GetThemeInt(hThemeWindow, 0, 0, TMT_TEXTGLOWSIZE, piSize));
+        SUCCEEDED(CloseThemeData(hThemeWindow));
+        return TRUE;
+    }
+
+    SetLastError(ERROR_FILE_NOT_FOUND);
+    return FALSE;
+}
+
+BOOL GetEditBorderColor(HWND hWnd, COLORREF* pClr)
+{
+    ASSERT(pClr);
+
+    HTHEME hTheme = OpenThemeData(hWnd, L"Edit");
+    if (hTheme)
+    {
+        ::GetThemeColor(hTheme, EP_BACKGROUNDWITHBORDER, EBWBS_NORMAL, TMT_BORDERCOLOR, pClr);
+        CloseThemeData(hTheme);
+        return TRUE;
+    }
+
+    return FALSE;
 }
