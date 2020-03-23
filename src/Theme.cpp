@@ -34,6 +34,8 @@ constexpr COLORREF darkBkColor           = 0x101010;
 constexpr COLORREF darkTextColor         = 0xEEEEEE;
 constexpr COLORREF darkDisabledTextColor = 0x808080;
 
+constexpr auto SubclassID = 1234;
+
 HBRUSH CTheme::s_backBrush = nullptr;
 
 static int  GetStateFromBtnState(LONG_PTR dwStyle, BOOL bHot, BOOL bFocus, LRESULT dwCheckState, int iPartId, BOOL bHasMouseCapture);
@@ -181,11 +183,11 @@ bool CTheme::SetThemeForDialog(HWND hWnd, bool bDark)
     DarkModeHelper::Instance().AllowDarkModeForWindow(hWnd, bDark);
     if (bDark)
     {
-        SetWindowSubclass(hWnd, MainSubclassProc, 1234, (DWORD_PTR)&s_backBrush);
+        SetWindowSubclass(hWnd, MainSubclassProc, SubclassID, (DWORD_PTR)&s_backBrush);
     }
     else
     {
-        RemoveWindowSubclass(hWnd, MainSubclassProc, 1234);
+        RemoveWindowSubclass(hWnd, MainSubclassProc, SubclassID);
     }
     EnumChildWindows(hWnd, AdjustThemeForChildrenProc, bDark ? TRUE : FALSE);
     ::RedrawWindow(hWnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
@@ -227,7 +229,7 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                 DarkModeHelper::Instance().AllowDarkModeForWindow(hTT, (BOOL)lParam);
                 SetWindowTheme(hTT, L"Explorer", nullptr);
             }
-            SetWindowSubclass(hwnd, ListViewSubclassProc, 1234, (DWORD_PTR)&s_backBrush);
+            SetWindowSubclass(hwnd, ListViewSubclassProc, SubclassID, (DWORD_PTR)&s_backBrush);
         }
         else if (wcscmp(szWndClassName, WC_HEADER) == 0)
         {
@@ -239,11 +241,11 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
             auto style = GetWindowLongPtr(hwnd, GWL_STYLE) & 0x0F;
             if ((style & BS_GROUPBOX) == BS_GROUPBOX)
             {
-                SetWindowSubclass(hwnd, ButtonSubclassProc, 1234, (DWORD_PTR)&s_backBrush);
+                SetWindowSubclass(hwnd, ButtonSubclassProc, SubclassID, (DWORD_PTR)&s_backBrush);
             }
             else if (style == BS_CHECKBOX || style == BS_AUTOCHECKBOX || style == BS_3STATE || style == BS_AUTO3STATE || style == BS_RADIOBUTTON || style == BS_AUTORADIOBUTTON)
             {
-                SetWindowSubclass(hwnd, ButtonSubclassProc, 1234, (DWORD_PTR)&s_backBrush);
+                SetWindowSubclass(hwnd, ButtonSubclassProc, SubclassID, (DWORD_PTR)&s_backBrush);
             }
         }
         else if (wcscmp(szWndClassName, WC_STATIC) == 0)
@@ -266,7 +268,7 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
             }
             if (hCombo)
             {
-                SetWindowSubclass(hCombo, ComboBoxSubclassProc, 1234, (DWORD_PTR)&s_backBrush);
+                SetWindowSubclass(hCombo, ComboBoxSubclassProc, SubclassID, (DWORD_PTR)&s_backBrush);
                 COMBOBOXINFO info = {0};
                 info.cbSize       = sizeof(COMBOBOXINFO);
                 if (SendMessage(hCombo, CB_GETCOMBOBOXINFO, 0, (LPARAM)&info))
@@ -333,12 +335,12 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                 DarkModeHelper::Instance().AllowDarkModeForWindow(hTT, (BOOL)lParam);
                 SetWindowTheme(hTT, L"Explorer", nullptr);
             }
-            RemoveWindowSubclass(hwnd, ListViewSubclassProc, 1234);
+            RemoveWindowSubclass(hwnd, ListViewSubclassProc, SubclassID);
         }
         else if (wcscmp(szWndClassName, WC_BUTTON) == 0)
         {
             SetWindowTheme(hwnd, L"Explorer", nullptr);
-            RemoveWindowSubclass(hwnd, ButtonSubclassProc, 1234);
+            RemoveWindowSubclass(hwnd, ButtonSubclassProc, SubclassID);
         }
         else if ((wcscmp(szWndClassName, WC_COMBOBOXEX) == 0) ||
                  (wcscmp(szWndClassName, WC_COMBOBOX) == 0))
@@ -380,9 +382,9 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                         CloseThemeData(hTheme);
                     }
 
-                    RemoveWindowSubclass(info.hwndList, ListViewSubclassProc, 1234);
+                    RemoveWindowSubclass(info.hwndList, ListViewSubclassProc, SubclassID);
                 }
-                RemoveWindowSubclass(hCombo, ComboBoxSubclassProc, 1234);
+                RemoveWindowSubclass(hCombo, ComboBoxSubclassProc, SubclassID);
             }
         }
         else if (wcscmp(szWndClassName, WC_TREEVIEW) == 0)
@@ -448,7 +450,7 @@ LRESULT CTheme::ListViewSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
         break;
         case WM_DESTROY:
         case WM_NCDESTROY:
-            RemoveWindowSubclass(hWnd, ListViewSubclassProc, 1234);
+            RemoveWindowSubclass(hWnd, ListViewSubclassProc, SubclassID);
             break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
@@ -476,7 +478,7 @@ LRESULT CTheme::ComboBoxSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
         break;
         case WM_DESTROY:
         case WM_NCDESTROY:
-            RemoveWindowSubclass(hWnd, ComboBoxSubclassProc, 1234);
+            RemoveWindowSubclass(hWnd, ComboBoxSubclassProc, SubclassID);
             break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
@@ -504,7 +506,7 @@ LRESULT CTheme::MainSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         break;
         case WM_DESTROY:
         case WM_NCDESTROY:
-            RemoveWindowSubclass(hWnd, MainSubclassProc, 1234);
+            RemoveWindowSubclass(hWnd, MainSubclassProc, SubclassID);
             break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
@@ -857,7 +859,7 @@ LRESULT CTheme::ButtonSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         break;
         case WM_DESTROY:
         case WM_NCDESTROY:
-            RemoveWindowSubclass(hWnd, ButtonSubclassProc, 1234);
+            RemoveWindowSubclass(hWnd, ButtonSubclassProc, SubclassID);
             break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
