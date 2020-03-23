@@ -166,7 +166,6 @@ bool CTheme::RemoveRegisteredCallback(int id)
     return false;
 }
 
-
 void CTheme::SetDarkTheme(bool b /*= true*/)
 {
     if (IsHighContrastMode())
@@ -342,7 +341,7 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
             RemoveWindowSubclass(hwnd, ButtonSubclassProc, 1234);
         }
         else if ((wcscmp(szWndClassName, WC_COMBOBOXEX) == 0) ||
-            (wcscmp(szWndClassName, WC_COMBOBOX) == 0))
+                 (wcscmp(szWndClassName, WC_COMBOBOX) == 0))
         {
             SetWindowTheme(hwnd, L"Explorer", nullptr);
             HWND hCombo = hwnd;
@@ -447,6 +446,10 @@ LRESULT CTheme::ListViewSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
             }
         }
         break;
+        case WM_DESTROY:
+        case WM_NCDESTROY:
+            RemoveWindowSubclass(hWnd, ListViewSubclassProc, 1234);
+            break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }
@@ -471,6 +474,10 @@ LRESULT CTheme::ComboBoxSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
             return reinterpret_cast<LRESULT>(*hbrBkgnd);
         }
         break;
+        case WM_DESTROY:
+        case WM_NCDESTROY:
+            RemoveWindowSubclass(hWnd, ComboBoxSubclassProc, 1234);
+            break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }
@@ -495,6 +502,10 @@ LRESULT CTheme::MainSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             return reinterpret_cast<LRESULT>(*hbrBkgnd);
         }
         break;
+        case WM_DESTROY:
+        case WM_NCDESTROY:
+            RemoveWindowSubclass(hWnd, MainSubclassProc, 1234);
+            break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }
