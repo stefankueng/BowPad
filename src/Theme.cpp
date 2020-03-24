@@ -29,6 +29,7 @@
 #pragma warning(disable : 4458) // declaration of 'xxx' hides class member
 #include <gdiplus.h>
 #pragma warning(pop)
+#include <algorithm>
 
 constexpr COLORREF darkBkColor           = 0x101010;
 constexpr COLORREF darkTextColor         = 0xEEEEEE;
@@ -142,7 +143,15 @@ COLORREF CTheme::GetThemeColor(COLORREF clr, bool fixed /*= false*/) const
 
         float h, s, l;
         GDIHelpers::RGBtoHSL(clr, h, s, l);
-        l = 100 - l;
+        l = 100.0f - l;
+        if (!m_isHighContrastModeDark)
+        {
+            // to avoid too much contrast, prevent
+            // too dark and too bright colors.
+            // this is because in dark mode, contrast is
+            // much more visible.
+            l = std::clamp(l, 5.0f, 90.0f);
+        }
         return GDIHelpers::HSLtoRGB(h, s, l);
     }
 
