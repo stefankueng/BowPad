@@ -3992,6 +3992,7 @@ void CMainWindow::SetTheme(bool dark)
         };
 
         SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
+        SetClassLongPtr(m_TabBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
         DarkModeForWindow(m_hwnd);
         DarkModeForWindow(m_StatusBar);
         DarkModeForWindow(m_TabBar);
@@ -4029,6 +4030,7 @@ void CMainWindow::SetTheme(bool dark)
         };
 
         SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
+        SetClassLongPtr(m_TabBar, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
         NormalModeForWindow(m_hwnd);
         NormalModeForWindow(m_StatusBar);
         NormalModeForWindow(m_TabBar);
