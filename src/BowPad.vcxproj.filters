@@ -723,6 +723,9 @@
     <Image Include="res\EditorConfigInactive.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\emptyChecked.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="res\BowPad.xml" />

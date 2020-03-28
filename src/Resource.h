@@ -198,6 +198,8 @@
 #define IDI_ICON4                       245
 #define IDI_EDITORCONFIGINACTIVE        245
 #define IDS_CORRESPONDING_FILE_ERR_FILEEXISTS 246
+#define IDB_BITMAP1                     246
+#define IDB_EMPTYCHECKED                246
 #define IDS_FETCHING_PLUGINS_LIST       247
 #define IDS_NO_PLUGINS_AVAILABLE        248
 #define IDS_STATUS_CURPOS               249
@@ -326,7 +328,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        246
+#define _APS_NEXT_RESOURCE_VALUE        247
 #define _APS_NEXT_COMMAND_VALUE         32773
 #define _APS_NEXT_CONTROL_VALUE         1098
 #define _APS_NEXT_SYMED_VALUE           110

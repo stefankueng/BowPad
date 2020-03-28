@@ -456,6 +456,7 @@
     <Image Include="res\EditorConfigInactive.ico" />
     <Image Include="res\empty.bmp" />
     <Image Include="res\empty.ico" />
+    <Image Include="res\emptyChecked.bmp" />
     <Image Include="res\lexer.ico" />
     <Image Include="res\readonly.ico" />
     <Image Include="res\saved.ico" />
