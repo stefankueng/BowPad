@@ -1,5 +1,5 @@
 // returns the version of the plugin
-function Version() { return 100; }
+function Version() { return 101; }
 // called when the plugin command is executed, i.e. the "button" is clicked
 function Execute()
 {
@@ -58,6 +58,6 @@ function OnDocumentSave(index) { return; }
 // return true if the plugin command is enabled (used for the button)
 function IsEnabled() { return true; }
 // return true if the plugin button should appear as checked
-function IsChecked() { return true; }
+function IsChecked() { return false; }
 // called on a timer event
 function OnTimer(id) { return; }
