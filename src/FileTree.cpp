@@ -406,7 +406,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 pData = nullptr;
             }
         }
-        MarkActiveDocument();
+        MarkActiveDocument(wParam == 0);
         break;
         default:
             break;
@@ -438,7 +438,12 @@ HTREEITEM CFileTree::RecurseTree(HTREEITEM hItem, ItemHandler handler)
     return nullptr;
 }
 
-void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
+void CFileTree::ExpandItem(HTREEITEM hItem)
+{
+    Refresh(hItem, false, true);
+}
+
+void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/, bool expanding /*= false*/)
 {
     InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
     InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
@@ -468,7 +473,8 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
     SendMessage(*this, WM_SETREDRAW, FALSE, 0);
     OnOutOfScope(SendMessage(*this, WM_SETREDRAW, TRUE, 0));
 
-    SetActiveItem(0);
+    if (!expanding)
+        SetActiveItem(0);
 
     std::wstring refreshPath = m_path;
     if (refreshRoot != TVI_ROOT)
@@ -528,10 +534,10 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/)
 
     InterlockedIncrement(&m_ThreadsRunning);
 
-    std::thread(&CFileTree::RefreshThread, this, refreshRoot, refreshPath).detach();
+    std::thread(&CFileTree::RefreshThread, this, refreshRoot, refreshPath, expanding).detach();
 }
 
-void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath)
+void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath, bool expanding)
 {
     OnOutOfScope(InterlockedDecrement(&m_ThreadsRunning););
 
@@ -596,7 +602,7 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
         m_bRootBusy = false;
         return;
     }
-    PostMessage(*this, WM_THREADRESULTREADY, 0, (LPARAM)data);
+    PostMessage(*this, WM_THREADRESULTREADY, (WPARAM)expanding, (LPARAM)data);
 }
 
 HTREEITEM CFileTree::GetHitItem() const
@@ -735,11 +741,11 @@ void CFileTree::TabNotify(TBHDR * ptbhdr)
     {
         if (m_nBlockRefresh)
             return;
-        MarkActiveDocument();
+        MarkActiveDocument(true);
     }
 }
 
-void CFileTree::MarkActiveDocument()
+void CFileTree::MarkActiveDocument(bool ensureVisible)
 {
     InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
     InvalidateUICommand(cmdFileTree, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
@@ -768,7 +774,8 @@ void CFileTree::MarkActiveDocument()
                         {
                             if (CPathUtils::PathCompare(doc.m_path, pTreeItem->path) == 0)
                             {
-                                TreeView_EnsureVisible(*this, hItem);
+                                if (ensureVisible)
+                                    TreeView_EnsureVisible(*this, hItem);
                                 TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
                                 SetActiveItem(hItem);
                                 return true;

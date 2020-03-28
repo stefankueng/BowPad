@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2018-2019 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -56,7 +56,8 @@ public:
     void SetPath(const std::wstring& path, bool forcerefresh = true);
     std::wstring GetPath()const { return m_path; }
     HTREEITEM GetHitItem() const;
-    void Refresh(HTREEITEM refreshRoot, bool force = false);
+    void ExpandItem(HTREEITEM hItem);
+    void Refresh(HTREEITEM refreshRoot, bool force = false, bool expanding = false);
     std::wstring GetPathForHitItem(bool * isDir, bool * isDot) const;
     std::wstring GetPathForSelItem(bool * isDir, bool * isDot) const;
     std::wstring GetDirPathForHitItem() const;
@@ -72,8 +73,8 @@ protected:
 
     HTREEITEM RecurseTree(HTREEITEM hItem, ItemHandler handler);
     HTREEITEM GetItemForPath(const std::wstring& expandpath);
-    void RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath);
-    void MarkActiveDocument();
+    void RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath, bool expanding);
+    void MarkActiveDocument(bool ensureVisible);
     void SetActiveItem(HTREEITEM hItem);
     static bool PathIsChild(const std::wstring& parent, const std::wstring& child);
 
