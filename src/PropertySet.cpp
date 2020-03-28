@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2016 - Stefan Kueng
+// Copyright (C) 2013, 2016, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ void CPropertySet::InitializeCommandProperties(int categoryId, int commandId, UI
 
 void CPropertySet::InitializeItemProperties(IUIImage *image, PCWSTR label, int categoryId)
 {
+    if (m_pimgItem)
+        m_pimgItem->Release();
     m_pimgItem = image;
     if (m_pimgItem)
     {
