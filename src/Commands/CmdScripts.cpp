@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2018 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -139,6 +139,28 @@ bool CCmdScript::Execute()
     try { m_host->CallFunction(L"Execute", dispparams); }
     catch (const std::exception&) {}
     return true;
+}
+
+bool CCmdScript::IsEnabled()
+{
+    DISPPARAMS dispparams = { 0 };
+    _variant_t ret = { 0 };
+    try { ret = m_host->CallFunction(L"IsEnabled", dispparams); }
+    catch (const std::exception&) {}
+    if (ret.vt == VT_BOOL)
+        return ret.boolVal != VARIANT_FALSE;
+    return false;
+}
+
+bool CCmdScript::IsChecked()
+{
+    DISPPARAMS dispparams = { 0 };
+    _variant_t ret = { 0 };
+    try { ret = m_host->CallFunction(L"IsChecked", dispparams); }
+    catch (const std::exception&) {}
+    if (ret.vt == VT_BOOL)
+        return ret.boolVal != VARIANT_FALSE;
+    return false;
 }
 
 UINT CCmdScript::GetCmdId()
