@@ -145,7 +145,7 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
             HWND hListCtrl = GetDlgItem(*this, IDC_PLUGINSLIST);
             for (const auto& info : m_plugins)
             {
-                if (info.minversion >= (BP_VERMAJOR * 100 + BP_VERMINOR))
+                if (info.minversion <= (BP_VERMAJOR * 100 + BP_VERMINOR))
                 {
                     if (ListView_GetCheckState(hListCtrl, index))
                     {
