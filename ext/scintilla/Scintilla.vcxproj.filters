@@ -16,6 +16,9 @@
     <Filter Include="win32">
       <UniqueIdentifier>{afe7e35e-cd81-406c-a770-df29d2b3fc95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lexilla">
+      <UniqueIdentifier>{21c48415-e02a-46f1-b9d6-4417f2733592}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ILexer.h">
@@ -206,6 +209,9 @@
     </ClInclude>
     <ClInclude Include="lexlib\CatalogueModules.h">
       <Filter>lexlib</Filter>
+    </ClInclude>
+    <ClInclude Include="lexilla\src\Lexilla.h">
+      <Filter>lexilla</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -683,6 +689,9 @@
     </ClCompile>
     <ClCompile Include="lexers\LexHollywood.cxx">
       <Filter>lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="lexilla\src\Lexilla.cxx">
+      <Filter>lexilla</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
