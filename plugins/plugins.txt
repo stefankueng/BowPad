@@ -1,8 +1,8 @@
 DisableClearType
-100
+101
 200
-Disables ClearType\nAuthor: wmjordan@163.com\n
+Disables ClearType\nAuthor: wmjordan@163.com, Stefan Küng\n
 SortLines
-0100
+0101
 0200
 A script to sort the selected lines.\nAuthor: Stefan Küng\nWebsite: http://stefanstools.sourceforge.net
