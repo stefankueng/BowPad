@@ -970,6 +970,8 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_STYLESETBOLD, STYLE_FOLDDISPLAYTEXT, bBold);
     Call(SCI_STYLESETITALIC, STYLE_FOLDDISPLAYTEXT, bItalic);
     Call(SCI_STYLESETSIZE, STYLE_FOLDDISPLAYTEXT, fontsize);
+    Call(SCI_STYLESETFORE, STYLE_FOLDDISPLAYTEXT, theme.GetThemeColor(RGB(0, 0, 0), true));
+    Call(SCI_STYLESETBACK, STYLE_FOLDDISPLAYTEXT, theme.GetThemeColor(RGB(255, 255, 255), true));
 
     Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0), true));
     Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255), true));
