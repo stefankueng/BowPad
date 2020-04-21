@@ -35,12 +35,12 @@ public:
 
     void push(int level)
     {
-        if (level >= _countof(levelStack))
-            return;
         while (levelCount != 0 && level <= levelStack[levelCount - 1])
         {
             --levelCount;
         }
+        if (levelCount > (_countof(levelStack) - 1))
+            return;
         levelStack[levelCount++] = level;
     }
 };
@@ -101,6 +101,7 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
                     if (ScintillaCall(SCI_GETFOLDEXPANDED, headerLine, 0) != mode)
                     {
                         ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, (sptr_t) "...");
+                        //line = ScintillaCall(SCI_GETLASTCHILD, line, level2Collapse);
                     }
                 }
             }
