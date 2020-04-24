@@ -153,7 +153,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
     Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
     Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, CDPIAware::Instance().Scale(14));
     Call(SCI_SETMARGINCURSORN, SC_MARGE_FOLDER, SC_CURSORARROW);
-    Call(SCI_SETAUTOMATICFOLD, SC_AUTOMATICFOLD_SHOW|SC_AUTOMATICFOLD_CLICK|SC_AUTOMATICFOLD_CHANGE);
+    Call(SCI_SETAUTOMATICFOLD, SC_AUTOMATICFOLD_SHOW|SC_AUTOMATICFOLD_CHANGE);
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_SYMBOL, (1<<MARK_BOOKMARK));
     Call(SCI_SETMARGINWIDTHN, SC_MARGE_SYMBOL, CDPIAware::Instance().Scale(14));
@@ -965,13 +965,12 @@ void CScintillaWnd::SetupDefaultStyles()
                        RGB(color_folding_backsel_inactive, color_folding_backsel_inactive, color_folding_backsel_inactive));
 
     bool bBold = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
-    bool bItalic = !!CIniSettings::Instance().GetInt64(L"View", L"FontItalic", false);
     int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11);
     Call(SCI_STYLESETBOLD, STYLE_FOLDDISPLAYTEXT, bBold);
-    Call(SCI_STYLESETITALIC, STYLE_FOLDDISPLAYTEXT, bItalic);
+    Call(SCI_STYLESETITALIC, STYLE_FOLDDISPLAYTEXT, true);
     Call(SCI_STYLESETSIZE, STYLE_FOLDDISPLAYTEXT, fontsize);
-    Call(SCI_STYLESETFORE, STYLE_FOLDDISPLAYTEXT, theme.GetThemeColor(RGB(0, 0, 0), true));
-    Call(SCI_STYLESETBACK, STYLE_FOLDDISPLAYTEXT, theme.GetThemeColor(RGB(255, 255, 255), true));
+    Call(SCI_STYLESETFORE, STYLE_FOLDDISPLAYTEXT, theme.GetThemeColor(RGB(120, 120, 120), true));
+    Call(SCI_STYLESETBACK, STYLE_FOLDDISPLAYTEXT, theme.GetThemeColor(RGB(230, 230, 230), true));
 
     Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0), true));
     Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255), true));
@@ -1042,8 +1041,8 @@ void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF ba
     Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEROPENMID, foldmarkbackselected);
     Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERMIDTAIL, foldmarkbackselected);
 
-    Call(SCI_STYLESETFORE, STYLE_FOLDDISPLAYTEXT, foldmarkfore);
-    Call(SCI_STYLESETBACK, STYLE_FOLDDISPLAYTEXT, foldmarkback);
+    //Call(SCI_STYLESETFORE, STYLE_FOLDDISPLAYTEXT, foldmarkfore);
+    //Call(SCI_STYLESETBACK, STYLE_FOLDDISPLAYTEXT, foldmarkback);
 }
 
 void CScintillaWnd::GotoLine(long line)

@@ -17,7 +17,12 @@
 
 #include "stdafx.h"
 #include "CmdFolding.h"
+#include "ResString.h"
 #include "SciLexer.h"
+#include "StringUtils.h"
+#include "UnicodeUtils.h"
+#include "BowPad.h"
+#include "../../ext/scintilla/src/KeyMap.h"
 
 #include <functional>
 
@@ -49,6 +54,8 @@ public:
 static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int level2Collapse = -1)
 {
     FoldLevelStack levelStack;
+    ResString      rFoldText(hRes, IDS_FOLDTEXT);
+    auto           sFoldTextA = CUnicodeUtils::StdGetUTF8(rFoldText);
 
     ScintillaCall(SCI_SETDEFAULTFOLDDISPLAYTEXT, 0, (sptr_t) "...");
 
@@ -100,8 +107,10 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
 
                     if (ScintillaCall(SCI_GETFOLDEXPANDED, headerLine, 0) != mode)
                     {
-                        ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, (sptr_t) "...");
-                        //line = ScintillaCall(SCI_GETLASTCHILD, line, level2Collapse);
+                        auto endline   = ScintillaCall(SCI_GETLASTCHILD, line, -1);
+                        auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), int(endline - line + 1));
+
+                        ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, (sptr_t)sFoldText.c_str());
                     }
                 }
             }
@@ -167,6 +176,100 @@ void CCmdInitFoldingMargin::TabNotify(TBHDR* ptbhdr)
                               ShowFoldingMarginSettingSection, ShowFoldingMarginSettingName, g_marginWidth > 0 ? 1 : 0) != 0;
         if (isOn != shouldBeOn)
             ScintillaCall(SCI_SETMARGINWIDTHN, SC_MARGIN_BACK, shouldBeOn ? g_marginWidth : 0);
+    }
+}
+
+void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
+{
+    // instead of using the flag SC_AUTOMATICFOLD_CLICK with SCI_SETAUTOMATICFOLD,
+    // we handle the click here separately so we can set the collapsed fold text.
+    if ((pScn->nmhdr.code == SCN_MARGINCLICK) && (pScn->margin == SC_MARGE_FOLDER))
+    {
+        const bool  ctrl      = (pScn->modifiers & SCI_CTRL) != 0;
+        const bool  shift     = (pScn->modifiers & SCI_SHIFT) != 0;
+        const auto& lineClick = ScintillaCall(SCI_LINEFROMPOSITION, pScn->position);
+        if (shift && ctrl)
+        {
+            Fold([=](int cmd, uptr_t wParam, sptr_t lParam) -> sptr_t {
+                return ScintillaCall(cmd, wParam, lParam);
+            });
+        }
+        else
+        {
+            const auto levelClick = ScintillaCall(SCI_GETFOLDLEVEL, lineClick, 0);
+            if (levelClick & SC_FOLDLEVELHEADERFLAG)
+            {
+                ResString rFoldText(hRes, IDS_FOLDTEXT);
+                auto      sFoldTextA = CUnicodeUtils::StdGetUTF8(rFoldText);
+
+                if (shift)
+                {
+                    // Ensure all children visible
+                    ScintillaCall(SCI_EXPANDCHILDREN, lineClick, levelClick);
+                }
+                else if (ctrl)
+                {
+                    auto maxline = ScintillaCall(SCI_GETLASTCHILD, lineClick, -1);
+                    auto mode    = ScintillaCall(SCI_GETFOLDEXPANDED, lineClick, 0) ? 0 : 1;
+
+                    for (int line = lineClick; line < maxline; ++line)
+                    {
+                        auto info = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
+                        if ((info & SC_FOLDLEVELHEADERFLAG) != 0)
+                        {
+                            int level = info & SC_FOLDLEVELNUMBERMASK;
+                            level -= SC_FOLDLEVELBASE;
+                            if (ScintillaCall(SCI_GETFOLDEXPANDED, line, 0) != mode)
+                            {
+                                auto endStyled = ScintillaCall(SCI_GETENDSTYLED, 0, 0);
+                                auto len       = ScintillaCall(SCI_GETTEXTLENGTH, 0, 0);
+
+                                if (endStyled < len)
+                                    ScintillaCall(SCI_COLOURISE, 0, -1);
+
+                                auto headerLine = 0;
+                                if (info & SC_FOLDLEVELHEADERFLAG)
+                                    headerLine = line;
+                                else
+                                {
+                                    headerLine = (int)ScintillaCall(SCI_GETFOLDPARENT, line, 0);
+                                    if (headerLine == -1)
+                                        return;
+                                }
+
+                                if (ScintillaCall(SCI_GETFOLDEXPANDED, headerLine, 0) != mode)
+                                {
+                                    auto endline   = ScintillaCall(SCI_GETLASTCHILD, line, -1);
+                                    auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), int(endline - line + 1));
+
+                                    ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, (sptr_t)sFoldText.c_str());
+                                }
+                            }
+                        }
+                    }
+
+                    //ScintillaCall(SCI_FOLDCHILDREN, lineClick, SC_FOLDACTION_TOGGLE);
+                }
+                else
+                {
+                    // Toggle this line
+                    auto endStyled = ScintillaCall(SCI_GETENDSTYLED, 0, 0);
+                    auto len       = ScintillaCall(SCI_GETTEXTLENGTH, 0, 0);
+
+                    if (endStyled < len)
+                        ScintillaCall(SCI_COLOURISE, 0, -1);
+
+                    auto headerLine = lineClick;
+
+                    auto endline   = ScintillaCall(SCI_GETLASTCHILD, lineClick, -1);
+                    auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), int(endline - lineClick + 1));
+
+                    ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, (sptr_t)sFoldText.c_str());
+
+                    //ScintillaCall(SCI_FOLDLINE, lineClick, SC_FOLDACTION_TOGGLE);
+                }
+            }
+        }
     }
 }
 

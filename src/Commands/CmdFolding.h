@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2015-2017 - Stefan Kueng
+// Copyright (C) 2015-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ public:
     bool Execute() override;
     UINT GetCmdId() override { return cmdInitFoldingMargin; }
     void TabNotify(TBHDR* ptbhdr) override;
+    void ScintillaNotify(SCNotification* pScn) override;
     void AfterInit() override;
 
 private:

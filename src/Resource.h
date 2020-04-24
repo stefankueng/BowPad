@@ -211,6 +211,7 @@
 #define IDS_EXTENSIONTOOLTIP            255
 #define IDS_STATUSTTR2L                 256
 #define IDS_RUNASADMIN                  257
+#define IDS_FOLDTEXT                    258
 #define IDC_SEARCHCOMBO                 1000
 #define IDC_FINDBTN                     1001
 #define IDC_REPLACECOMBO                1002
