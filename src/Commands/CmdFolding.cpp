@@ -212,7 +212,7 @@ void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
                     auto maxline = ScintillaCall(SCI_GETLASTCHILD, lineClick, -1);
                     auto mode    = ScintillaCall(SCI_GETFOLDEXPANDED, lineClick, 0) ? 0 : 1;
 
-                    for (int line = lineClick; line < maxline; ++line)
+                    for (auto line = lineClick; line < maxline; ++line)
                     {
                         auto info = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
                         if ((info & SC_FOLDLEVELHEADERFLAG) != 0)
