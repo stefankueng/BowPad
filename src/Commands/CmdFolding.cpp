@@ -227,7 +227,7 @@ void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
                                 if (endStyled < len)
                                     ScintillaCall(SCI_COLOURISE, 0, -1);
 
-                                auto headerLine = 0;
+                                sptr_t headerLine = 0;
                                 if (info & SC_FOLDLEVELHEADERFLAG)
                                     headerLine = line;
                                 else
