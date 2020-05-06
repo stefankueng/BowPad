@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018 - Stefan Kueng
+// Copyright (C) 2014-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -218,10 +218,9 @@ HRESULT CCmdSessionAutoLoad::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
 
 void CCmdSessionAutoLoad::BeforeLoad()
 {
-    if (GetAutoLoad()) // Don't parse the command line unless we are autoloading.
+    if (GetAutoLoad())
     {
-        CCmdLineParser parser(GetCommandLine());
-        if (!parser.HasKey(L"multiple"))
+        if (firstInstance)
             RestoreSavedSession();
     }
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);

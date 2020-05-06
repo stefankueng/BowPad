@@ -37,6 +37,7 @@ using Microsoft::WRL::ComPtr;
 
 HINSTANCE hInst;
 HINSTANCE hRes;
+bool firstInstance = false;
 
 static void LoadLanguage(HINSTANCE hInstance)
 {
@@ -524,6 +525,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     DWORD  mutexStatus = GetLastError();
     OnOutOfScope(CloseHandle(hAppMutex););
     bool bAlreadyRunning = (mutexStatus == ERROR_ALREADY_EXISTS || mutexStatus == ERROR_ACCESS_DENIED);
+    firstInstance = !bAlreadyRunning;
 
     auto mainResult = BPMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow, bAlreadyRunning);
 
