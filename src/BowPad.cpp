@@ -487,8 +487,11 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     std::wstring params = L" /multiple";
     if (isAdminMode)
         params += L" /admin";
-    std::wstring sIconPath = CStringUtils::Format(L"%s,-%d", CPathUtils::GetLongPathname(CPathUtils::GetModulePath()).c_str(), IDI_BOWPAD);
-    SetRelaunchCommand(mainWindow, appID, (CPathUtils::GetModulePath() + params).c_str(), L"BowPad", sIconPath.c_str());
+    auto         modulePath = CPathUtils::GetLongPathname(CPathUtils::GetModulePath());
+    std::wstring sIconPath  = CStringUtils::Format(L"%s,-%d", modulePath.c_str(), IDI_BOWPAD);
+    if (modulePath.find(' ') != std::wstring::npos)
+        modulePath = L"\"" + modulePath + L"\"";
+    SetRelaunchCommand(mainWindow, appID, (modulePath + params).c_str(), L"BowPad", sIconPath.c_str());
 
     // Main message loop:
     MSG   msg = {0};
