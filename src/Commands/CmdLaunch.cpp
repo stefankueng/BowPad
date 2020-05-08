@@ -23,7 +23,7 @@
 #include "EscapeUtils.h"
 #include "Theme.h"
 
-bool LaunchBase::Launch( const std::wstring& cmdline )
+bool LaunchBase::Launch(const std::wstring& cmdline)
 {
     if (cmdline.empty() || !HasActiveDocument())
         return false;
@@ -32,7 +32,7 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     SearchRemoveAll(cmd, L"\n");
     SearchReplace(cmd, L"\r", L" ");
     // replace the macros in the command line
-    const auto& doc = GetActiveDocument();
+    const auto&  doc     = GetActiveDocument();
     std::wstring tabpath = doc.m_path;
     if ((cmd.find(L"$(TAB_PATH)") != std::wstring::npos) ||
         (cmd.find(L"$(TAB_NAME)") != std::wstring::npos) ||
@@ -73,32 +73,32 @@ bool LaunchBase::Launch( const std::wstring& cmdline )
     std::wstring params;
     if (cmd[0] == '"')
     {
-        cmd = cmd.substr(1);
+        cmd             = cmd.substr(1);
         size_t quotepos = cmd.find_first_of('"');
         if (quotepos == std::wstring::npos)
             return false;
-        params = cmd.substr(quotepos+1);
-        cmd = cmd.substr(0, quotepos);
+        params = cmd.substr(quotepos + 1);
+        cmd    = cmd.substr(0, quotepos);
     }
     else
     {
         size_t spacepos = cmd.find_first_of(' ');
         if (spacepos != std::wstring::npos)
         {
-            params = cmd.substr(spacepos+1);
-            cmd = cmd.substr(0, spacepos);
+            params = cmd.substr(spacepos + 1);
+            cmd    = cmd.substr(0, spacepos);
         }
     }
 
     SHELLEXECUTEINFO shi = {0};
-    shi.cbSize = sizeof(SHELLEXECUTEINFO);
-    shi.fMask = SEE_MASK_DOENVSUBST|SEE_MASK_UNICODE;
-    shi.hwnd = GetHwnd();
-    shi.lpVerb = L"open";
-    shi.lpFile = cmd.c_str();
-    shi.lpParameters = params.empty() ? nullptr : params.c_str();
-    shi.lpDirectory = tabdirpath.c_str();
-    shi.nShow = SW_SHOW;
+    shi.cbSize           = sizeof(SHELLEXECUTEINFO);
+    shi.fMask            = SEE_MASK_DOENVSUBST | SEE_MASK_UNICODE;
+    shi.hwnd             = GetHwnd();
+    shi.lpVerb           = L"open";
+    shi.lpFile           = cmd.c_str();
+    shi.lpParameters     = params.empty() ? nullptr : params.c_str();
+    shi.lpDirectory      = tabdirpath.c_str();
+    shi.nShow            = SW_SHOW;
 
     return !!ShellExecuteEx(&shi);
 }
@@ -111,12 +111,12 @@ bool CCmdLaunchSearch::Execute()
     return Launch(sLaunch);
 }
 
-CCmdLaunchCustom::CCmdLaunchCustom(UINT customId, void * obj)
+CCmdLaunchCustom::CCmdLaunchCustom(UINT customId, void* obj)
     : m_customId(customId)
     , LaunchBase(obj)
 {
     m_customCmdId = cmdLaunchCustom0 + customId;
-    m_settingsID = CStringUtils::Format(L"Command%u", customId);
+    m_settingsID  = CStringUtils::Format(L"Command%u", customId);
 }
 
 void CCmdLaunchCustom::AfterInit()
@@ -125,7 +125,7 @@ void CCmdLaunchCustom::AfterInit()
     InvalidateUICommand(m_customCmdId, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
 }
 
-HRESULT CCmdLaunchCustom::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdLaunchCustom::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
 {
     if (m_customId < 9)
     {
@@ -134,8 +134,8 @@ HRESULT CCmdLaunchCustom::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, c
         // least before the control has been shown. Since all these buttons are not shown until the dropdown-button
         // is clicked, all but the first button gets updated properly with the custom name text.
         // By invalidating the next command here we can work around that problem.
-        InvalidateUICommand(m_customCmdId+1, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
-        InvalidateUICommand(m_customCmdId+1, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
+        InvalidateUICommand(m_customCmdId + 1, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
+        InvalidateUICommand(m_customCmdId + 1, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
     }
     if (UI_PKEY_Enabled == key)
     {
@@ -145,13 +145,14 @@ HRESULT CCmdLaunchCustom::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, c
     if (UI_PKEY_Label == key)
     {
         std::wstring settingsIDName = m_settingsID + L"Label";
-        std::wstring commandLabel = CIniSettings::Instance().GetString(L"CustomLaunch", settingsIDName.c_str(), L"");
+        std::wstring commandLabel   = CIniSettings::Instance().GetString(L"CustomLaunch", settingsIDName.c_str(), L"");
         if (!commandLabel.empty())
             return UIInitPropertyFromString(UI_PKEY_Label, commandLabel.c_str(), ppropvarNewValue);
         else
         {
-            ResString label(hRes, cmdLaunchCustom0_LabelTitle_RESID + (m_customId * 4));
-            return UIInitPropertyFromString(UI_PKEY_Label, label, ppropvarNewValue);
+            ResString label(hRes, IDS_CUSTOMCOMMANDTITLE);
+            auto      sLabel = CStringUtils::Format(label, m_customId);
+            return UIInitPropertyFromString(UI_PKEY_Label, sLabel.c_str(), ppropvarNewValue);
         }
     }
     return E_FAIL;
@@ -161,12 +162,12 @@ CCustomCommandsDlg::CCustomCommandsDlg()
 {
 }
 
-LRESULT CALLBACK CCustomCommandsDlg::DlgFunc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT CALLBACK CCustomCommandsDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
     switch (uMsg)
     {
-    case WM_INITDIALOG:
+        case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
             CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
@@ -180,37 +181,37 @@ LRESULT CALLBACK CCustomCommandsDlg::DlgFunc( HWND hwndDlg, UINT uMsg, WPARAM wP
             m_resizer.AddControl(hwndDlg, IDC_STATICNAME, RESIZER_TOPLEFT);
             m_resizer.AddControl(hwndDlg, IDC_STATICCMDLINE, RESIZER_TOPLEFTRIGHT);
 
-            m_resizer.AddControl(hwndDlg, IDC_STATIC0,      RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME0,    RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD0,     RESIZER_TOPLEFTRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_STATIC1,      RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME1,    RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD1,     RESIZER_TOPLEFTRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_STATIC2,      RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME2,    RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD2,     RESIZER_TOPLEFTRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_STATIC3,      RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME3,    RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD3,     RESIZER_TOPLEFTRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_STATIC4,      RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME4,    RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD4,     RESIZER_TOPLEFTRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_STATIC5,      RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME5,    RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD5,     RESIZER_TOPLEFTRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_STATIC6,      RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME6,    RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD6,     RESIZER_TOPLEFTRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_STATIC7,      RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME7,    RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD7,     RESIZER_TOPLEFTRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_STATIC8,      RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME8,    RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD8,     RESIZER_TOPLEFTRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_STATIC9,      RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME9,    RESIZER_TOPLEFT);
-            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD9,     RESIZER_TOPLEFTRIGHT);
-            m_resizer.AddControl(hwndDlg, IDC_INFO,         RESIZER_TOPLEFTBOTTOMRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_STATIC0, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME0, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD0, RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_STATIC1, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME1, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD1, RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_STATIC2, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME2, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD2, RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_STATIC3, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME3, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD3, RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_STATIC4, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME4, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD4, RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_STATIC5, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME5, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD5, RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_STATIC6, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME6, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD6, RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_STATIC7, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME7, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD7, RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_STATIC8, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME8, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD8, RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_STATIC9, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTNAME9, RESIZER_TOPLEFT);
+            m_resizer.AddControl(hwndDlg, IDC_CUSTCMD9, RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_INFO, RESIZER_TOPLEFTBOTTOMRIGHT);
 
             m_resizer.AddControl(hwndDlg, IDOK, RESIZER_BOTTOMRIGHT);
             m_resizer.AddControl(hwndDlg, IDCANCEL, RESIZER_BOTTOMRIGHT);
@@ -261,31 +262,31 @@ LRESULT CALLBACK CCustomCommandsDlg::DlgFunc( HWND hwndDlg, UINT uMsg, WPARAM wP
             sCmd = CIniSettings::Instance().GetString(L"CustomLaunch", L"Command9", L"");
             SetDlgItemText(*this, IDC_CUSTCMD9, sCmd.c_str());
         }
-        return FALSE;
-    case WM_SIZE:
-        m_resizer.DoResize(LOWORD(lParam), HIWORD(lParam));
-        break;
-    case WM_GETMINMAXINFO:
+            return FALSE;
+        case WM_SIZE:
+            m_resizer.DoResize(LOWORD(lParam), HIWORD(lParam));
+            break;
+        case WM_GETMINMAXINFO:
         {
-            MINMAXINFO * mmi = (MINMAXINFO*)lParam;
+            MINMAXINFO* mmi       = (MINMAXINFO*)lParam;
             mmi->ptMinTrackSize.x = m_resizer.GetDlgRectScreen()->right;
             mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
             return 0;
         }
         break;
-    case WM_COMMAND:
-        return DoCommand(LOWORD(wParam));
-    default:
-        return FALSE;
+        case WM_COMMAND:
+            return DoCommand(LOWORD(wParam));
+        default:
+            return FALSE;
     }
     return FALSE;
 }
 
-LRESULT CCustomCommandsDlg::DoCommand( int id )
+LRESULT CCustomCommandsDlg::DoCommand(int id)
 {
     switch (id)
     {
-    case IDOK:
+        case IDOK:
         {
             auto name = GetDlgItemText(IDC_CUSTNAME0);
             CIniSettings::Instance().SetString(L"CustomLaunch", L"Command0Label", name.get());
@@ -334,9 +335,9 @@ LRESULT CCustomCommandsDlg::DoCommand( int id )
             EndDialog(*this, id);
         }
         break;
-    case IDCANCEL:
-        EndDialog(*this, id);
-        break;
+        case IDCANCEL:
+            EndDialog(*this, id);
+            break;
     }
     return 1;
 }
@@ -344,12 +345,11 @@ LRESULT CCustomCommandsDlg::DoCommand( int id )
 bool CCmdCustomCommands::Execute()
 {
     CCustomCommandsDlg dlg;
-    if (dlg.DoModal(hRes, IDD_CUSTOMCOMMANDSDLG, GetHwnd())==IDOK)
+    if (dlg.DoModal(hRes, IDD_CUSTOMCOMMANDSDLG, GetHwnd()) == IDOK)
     {
         for (int i = 0; i < 10; ++i)
         {
-            InvalidateUICommand(cmdLaunchCustom0+i, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);
-            InvalidateUICommand(cmdLaunchCustom0+i, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
+            InvalidateUICommand(cmdLaunchCustom0 + i, UI_INVALIDATIONS_ALLPROPERTIES, &UI_PKEY_Label);
         }
     }
     return true;

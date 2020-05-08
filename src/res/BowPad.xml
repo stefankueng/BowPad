@@ -572,52 +572,52 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/WikipediaL.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchCustom0" LabelTitle="Custom Command 0" TooltipTitle="Custom Command 0" TooltipDescription="runs the custom command 0">
+    <Command Name="cmdLaunchCustom0" TooltipTitle="Custom Command 0" TooltipDescription="runs the custom command 0">
       <Command.LargeImages>
         <Image>res/CustCommandS.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchCustom1" LabelTitle="Custom Command 1" TooltipTitle="Custom Command 1" TooltipDescription="runs the custom command 1">
+    <Command Name="cmdLaunchCustom1" TooltipTitle="Custom Command 1" TooltipDescription="runs the custom command 1">
       <Command.LargeImages>
         <Image>res/CustCommandS.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchCustom2" LabelTitle="Custom Command 2" TooltipTitle="Custom Command 2" TooltipDescription="runs the custom command 2">
+    <Command Name="cmdLaunchCustom2" TooltipTitle="Custom Command 2" TooltipDescription="runs the custom command 2">
       <Command.LargeImages>
         <Image>res/CustCommandS.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchCustom3" LabelTitle="Custom Command 3" TooltipTitle="Custom Command 3" TooltipDescription="runs the custom command 3">
+    <Command Name="cmdLaunchCustom3" TooltipTitle="Custom Command 3" TooltipDescription="runs the custom command 3">
       <Command.LargeImages>
         <Image>res/CustCommandS.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchCustom4" LabelTitle="Custom Command 4" TooltipTitle="Custom Command 4" TooltipDescription="runs the custom command 4">
+    <Command Name="cmdLaunchCustom4" TooltipTitle="Custom Command 4" TooltipDescription="runs the custom command 4">
       <Command.LargeImages>
         <Image>res/CustCommandS.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchCustom5" LabelTitle="Custom Command 5" TooltipTitle="Custom Command 5" TooltipDescription="runs the custom command 5">
+    <Command Name="cmdLaunchCustom5" TooltipTitle="Custom Command 5" TooltipDescription="runs the custom command 5">
       <Command.LargeImages>
         <Image>res/CustCommandS.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchCustom6" LabelTitle="Custom Command 6" TooltipTitle="Custom Command 6" TooltipDescription="runs the custom command 6">
+    <Command Name="cmdLaunchCustom6" TooltipTitle="Custom Command 6" TooltipDescription="runs the custom command 6">
       <Command.LargeImages>
         <Image>res/CustCommandS.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchCustom7" LabelTitle="Custom Command 7" TooltipTitle="Custom Command 7" TooltipDescription="runs the custom command 7">
+    <Command Name="cmdLaunchCustom7" TooltipTitle="Custom Command 7" TooltipDescription="runs the custom command 7">
       <Command.LargeImages>
         <Image>res/CustCommandS.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchCustom8" LabelTitle="Custom Command 8" TooltipTitle="Custom Command 8" TooltipDescription="runs the custom command 8">
+    <Command Name="cmdLaunchCustom8" TooltipTitle="Custom Command 8" TooltipDescription="runs the custom command 8">
       <Command.LargeImages>
         <Image>res/CustCommandS.bmp</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdLaunchCustom9" LabelTitle="Custom Command 9" TooltipTitle="Custom Command 9" TooltipDescription="runs the custom command 9">
+    <Command Name="cmdLaunchCustom9" TooltipTitle="Custom Command 9" TooltipDescription="runs the custom command 9">
       <Command.LargeImages>
         <Image>res/CustCommandS.bmp</Image>
       </Command.LargeImages>
