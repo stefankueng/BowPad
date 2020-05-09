@@ -442,9 +442,9 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                     POINT thumbpoint;
                     thumbpoint.x = thumbrect.right - w;
                     thumbpoint.y = thumbrect.top + ((thumbrect.bottom - thumbrect.top)*si.nTrackPos) / (si.nMax - si.nMin);
-
+                    auto docline = Call(SCI_DOCLINEFROMVISIBLE, si.nTrackPos);
                     m_ScrollTool.Init();
-                    m_ScrollTool.SetText(&thumbpoint, L"Line: %ld", si.nTrackPos+1);
+                    m_ScrollTool.SetText(&thumbpoint, L"Line: %ld", docline+1);
                 }
                 break;
             }
