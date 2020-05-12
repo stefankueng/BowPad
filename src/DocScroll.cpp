@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -282,7 +282,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                         int drawx = pCustDraw->rect.left + (c - 1)*colwidth;
                         for (auto line : m_visibleLineColors[c])
                         {
-                            LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top)*line.first / m_lines);
+                            LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top)*line.first / m_visibleLines);
                             if ((linepos > (lastLinePos + 1)) || (lastColor != line.second))
                             {
                                 Gdiplus::Color c2;
@@ -294,7 +294,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                             }
                         }
                     }
-                    LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top)*m_curPosVisLine / m_lines);
+                    LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top)*m_curPosVisLine / m_visibleLines);
 
                     Gdiplus::Color c3;
                     c3.SetFromCOLORREF(m_curPosColor);
@@ -362,6 +362,17 @@ void CDocScroll::RemoveLine(int type, size_t line)
 {
     if (m_lineColors.erase(LineColor(type, line)) > 0)
         m_bDirty = true;
+}
+
+void CDocScroll::VisibleLinesChanged()
+{
+    auto visibleLines = m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, m_lines);
+    if (m_visibleLines != visibleLines)
+    {
+        m_bDirty = true;
+        SetWindowPos(*m_pScintilla, 0, 0, 0, 0, 0,
+            SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_DRAWFRAME);
+    }
 }
 
 void CDocScroll::SetTotalLines(size_t lines)

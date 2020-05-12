@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2019 - Stefan Kueng
+// Copyright (C) 2013-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -117,6 +117,7 @@ public :
     std::string GetWhitespaceChars() const;
     long GetSelTextMarkerCount() const { return m_selTextMarkerCount; }
     long GetCurrentLineNumber() const;
+    void VisibleLinesChanged() { m_docScroll.VisibleLinesChanged(); }
 
     LRESULT CALLBACK HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw );
     void ReflectEvents(SCNotification * pScn);

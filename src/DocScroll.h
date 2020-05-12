@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ public:
     void                        AddLineColor(int type, size_t line, COLORREF clr);
     void                        RemoveLine(int type, size_t line);
     void                        SetCurrentPos(size_t visibleline, COLORREF clr) { m_curPosVisLine = visibleline; m_curPosColor = clr; }
-    void                        VisibleLinesChanged() { m_bDirty = true; }
+    void                        VisibleLinesChanged();
     bool                        IsDirty() const { return m_bDirty; }
 private:
     void                        CalcLines();

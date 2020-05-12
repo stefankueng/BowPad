@@ -147,7 +147,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     Call(SCI_SETMODEVENTMASK, SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO |
         SC_PERFORMED_REDO | SC_MULTISTEPUNDOREDO | SC_LASTSTEPINUNDOREDO |
-        SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE | SC_MULTILINEUNDOREDO);
+        SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE | SC_MULTILINEUNDOREDO | SC_MOD_CHANGEFOLD);
     bool bUseD2D = CIniSettings::Instance().GetInt64(L"View", L"d2d", 1) != 0;
     Call(SCI_SETTECHNOLOGY, bUseD2D ? SC_TECHNOLOGY_DIRECTWRITERETAIN : SC_TECHNOLOGY_DEFAULT);
 
@@ -1108,6 +1108,7 @@ void CScintillaWnd::MarginClick( SCNotification * pNotification )
 {
     if ((pNotification->margin == SC_MARGE_SYMBOL) && !pNotification->modifiers)
         BookmarkToggle((int)Call(SCI_LINEFROMPOSITION, pNotification->position));
+    m_docScroll.VisibleLinesChanged();
 }
 
 
