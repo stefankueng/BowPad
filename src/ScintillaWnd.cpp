@@ -22,6 +22,7 @@
 #include "StringUtils.h"
 #include "AppUtils.h"
 #include "Theme.h"
+#include "DarkModeHelper.h"
 #include "SciLexer.h"
 #include "Document.h"
 #include "LexStyles.h"
@@ -444,6 +445,9 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                     thumbpoint.y = thumbrect.top + ((thumbrect.bottom - thumbrect.top)*si.nTrackPos) / (si.nMax - si.nMin);
                     auto docline = Call(SCI_DOCLINEFROMVISIBLE, si.nTrackPos);
                     m_ScrollTool.Init();
+                    DarkModeHelper::Instance().AllowDarkModeForWindow(m_ScrollTool, CTheme::Instance().IsDarkTheme());
+                    SetWindowTheme(m_ScrollTool, L"Explorer", nullptr);
+
                     m_ScrollTool.SetText(&thumbpoint, L"Line: %ld", docline+1);
                 }
                 break;
