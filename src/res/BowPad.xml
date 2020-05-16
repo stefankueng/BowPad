@@ -729,6 +729,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/TabListL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdTabListDropdownMenu"/>
     <Command Name="cmdSummary" LabelTitle="Summary" TooltipTitle="Document Summary" TooltipDescription="Shows statistics about the current document">
       <Command.LargeImages>
         <Image>res/SummaryL.bmp</Image>

@@ -189,6 +189,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     : CWindow(hInst, wcx)
     , m_StatusBar(hInst)
     , m_fileTree(hInst, this)
+    , m_TablistBtn(hInst)
     , m_newTabBtn(hInst)
     , m_closeTabBtn(hInst)
     , m_progressBar(hInst)
@@ -449,11 +450,11 @@ STDMETHODIMP CMainWindow::Execute(
         {
             hr = S_OK;
             if (verb == UI_EXECUTIONVERB_EXECUTE)
-                DoCommand(nCmdID);
+                DoCommand(nCmdID, 0);
         }
     }
     else
-        DoCommand(nCmdID);
+        DoCommand(nCmdID, 0);
     return hr;
 }
 
@@ -549,7 +550,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         HandleCreate(hwnd);
         break;
     case WM_COMMAND:
-        return DoCommand(LOWORD(wParam));
+        return DoCommand(wParam, lParam);
         break;
     case WM_SIZE:
         ResizeChildWindows();
@@ -856,6 +857,42 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmhdr, WPARAM /*wParam*/, L
     return 0;
 }
 
+void CMainWindow::ShowTablistDropdown(HWND hWnd)
+{
+    if (hWnd)
+    {
+        RECT rc{};
+        GetWindowRect(hWnd, &rc);
+        auto hMenu = CreatePopupMenu();
+        if (hMenu)
+        {
+            OnOutOfScope(DestroyMenu(hMenu));
+
+            std::map<std::wstring, int, ci_lessW> tablist;
+            int                         tabCount = m_TabBar.GetItemCount();
+            for (int i = 0; i < tabCount; ++i)
+            {
+                tablist[m_TabBar.GetTitle(i)] = i + 1;
+            }
+
+            for (auto& tab : tablist)
+            {
+                AppendMenu(hMenu, MF_STRING, tab.second, tab.first.c_str());
+            }
+            TPMPARAMS tpm;
+            tpm.cbSize    = sizeof(TPMPARAMS);
+            tpm.rcExclude = rc;
+            auto tab      = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL, rc.left, rc.bottom, *this, &tpm);
+            if (tab > 0)
+            {
+                --tab;
+                if (tab != m_TabBar.GetCurrentTabIndex())
+                    m_TabBar.ActivateAt(tab);
+            }
+        }
+    }
+}
+
 LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam)
 {
     if (nmhdr.code == NM_COOLSB_CUSTOMDRAW)
@@ -1030,7 +1067,7 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
             switch (lParam)
             {
                 case STATUSBAR_TABSPACE:
-                DoCommand(cmdUseTabs);
+                DoCommand(cmdUseTabs, 0);
                 break;
                 case STATUSBAR_R2L:
                 {
@@ -1138,8 +1175,9 @@ void CMainWindow::HandleStatusBarZoom()
     }
 }
 
-LRESULT CMainWindow::DoCommand(int id)
+LRESULT CMainWindow::DoCommand(WPARAM wParam, LPARAM lParam)
 {
+    auto id = LOWORD(wParam);
     switch (id)
     {
     case cmdExit:
@@ -1174,6 +1212,9 @@ LRESULT CMainWindow::DoCommand(int id)
         break;
     case cmdPasteHistory:
         PasteHistory();
+        break;
+    case cmdTabListDropdownMenu:
+        ShowTablistDropdown(HWND(lParam));
         break;
     case cmdAbout:
         About();
@@ -1223,6 +1264,8 @@ bool CMainWindow::Initialize()
         return CTheme::Instance().GetThemeColor(clr);
     });
     m_TabBar.Init(hResource, *this);
+    m_TablistBtn.Init(hResource, *this, (HMENU)cmdTabListDropdownMenu);
+    m_TablistBtn.SetText(L"\u25BC");
     m_newTabBtn.Init(hResource, *this, (HMENU)cmdNew);
     m_newTabBtn.SetText(L"+");
     m_closeTabBtn.Init(hResource, *this, (HMENU)cmdClose);
@@ -1403,6 +1446,7 @@ void CMainWindow::ResizeChildWindows()
         HDWP hDwp = BeginDeferWindowPos(6);
         DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), mainWidth, m_StatusBar.GetHeight(), flags);
         DeferWindowPos(hDwp, m_TabBar, nullptr, treeWidth+rect.left, rect.top + m_RibbonHeight, mainWidth - treeWidth - tabBtnWidth - tabBtnWidth, rect.bottom - rect.top, flags);
+        DeferWindowPos(hDwp, m_TablistBtn, nullptr, mainWidth - tabBtnWidth - tabBtnWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_newTabBtn, nullptr, mainWidth - tabBtnWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_closeTabBtn, nullptr, mainWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_editor, nullptr, rect.left + treeWidth, rect.top + m_RibbonHeight + tbHeight, mainWidth - treeWidth, rect.bottom - (m_RibbonHeight + tbHeight) - m_StatusBar.GetHeight(), flags);
@@ -3997,6 +4041,7 @@ void CMainWindow::SetTheme(bool dark)
         DarkModeForWindow(m_StatusBar);
         DarkModeForWindow(m_TabBar);
         DarkModeForWindow(m_fileTree);
+        DarkModeForWindow(m_TablistBtn);
         DarkModeForWindow(m_newTabBtn);
         DarkModeForWindow(m_closeTabBtn);
         DarkModeForWindow(m_editor);
@@ -4035,6 +4080,7 @@ void CMainWindow::SetTheme(bool dark)
         NormalModeForWindow(m_StatusBar);
         NormalModeForWindow(m_TabBar);
         NormalModeForWindow(m_fileTree);
+        NormalModeForWindow(m_TablistBtn);
         NormalModeForWindow(m_newTabBtn);
         NormalModeForWindow(m_closeTabBtn);
         NormalModeForWindow(m_editor);

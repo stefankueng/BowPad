@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ protected:
     LRESULT CALLBACK            WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
-    LRESULT                     DoCommand(int id);
+    LRESULT                     DoCommand(WPARAM wParam, LPARAM lParam);
 
 private:
     std::wstring                GetWindowClassName() const;
@@ -175,6 +175,7 @@ private:
     LRESULT                     HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
     LRESULT                     HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
     LRESULT                     HandleTabBarEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
+    void                        ShowTablistDropdown(HWND hWnd);
     int                         GetZoomPC() const;
     void                        SetZoomPC(int zoomPC);
     COLORREF                    GetColorForDocument(DocID id);
@@ -200,6 +201,7 @@ private:
     CTabBar                     m_TabBar;
     CScintillaWnd               m_editor;
     CFileTree                   m_fileTree;
+    CTabBtn                     m_TablistBtn;
     CTabBtn                     m_newTabBtn;
     CTabBtn                     m_closeTabBtn;
     CProgressBar                m_progressBar;
