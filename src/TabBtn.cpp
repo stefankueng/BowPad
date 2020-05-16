@@ -78,6 +78,7 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
                 auto clr1 = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNSHADOW));
                 auto clr2 = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNFACE));
+                clr1 = GDIHelpers::Darker(clr1, 0.5f);
                 if (m_colorset && !CTheme::Instance().IsHighContrastMode())
                 {
                     clr1 = CTheme::Instance().GetThemeColor(m_color, true);
