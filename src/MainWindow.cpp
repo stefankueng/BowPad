@@ -1442,13 +1442,14 @@ void CMainWindow::ResizeChildWindows()
         const int tabBtnWidth = tbHeight + CDPIAware::Instance().Scale(2);
         const int treeWidth = m_fileTreeVisible ? m_treeWidth : 0;
         const int mainWidth = rect.right - rect.left;
+        const int btnMargin = CDPIAware::Instance().Scale(2);
 
         HDWP hDwp = BeginDeferWindowPos(6);
         DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), mainWidth, m_StatusBar.GetHeight(), flags);
         DeferWindowPos(hDwp, m_TabBar, nullptr, treeWidth+rect.left, rect.top + m_RibbonHeight, mainWidth - treeWidth - tabBtnWidth - tabBtnWidth, rect.bottom - rect.top, flags);
-        DeferWindowPos(hDwp, m_TablistBtn, nullptr, mainWidth - tabBtnWidth - tabBtnWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
-        DeferWindowPos(hDwp, m_newTabBtn, nullptr, mainWidth - tabBtnWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
-        DeferWindowPos(hDwp, m_closeTabBtn, nullptr, mainWidth - tabBtnWidth, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
+        DeferWindowPos(hDwp, m_TablistBtn, nullptr, mainWidth - (3 * (tabBtnWidth + btnMargin)), rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
+        DeferWindowPos(hDwp, m_newTabBtn, nullptr, mainWidth - (2 * (tabBtnWidth + btnMargin)), rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
+        DeferWindowPos(hDwp, m_closeTabBtn, nullptr, mainWidth - tabBtnWidth - btnMargin, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_editor, nullptr, rect.left + treeWidth, rect.top + m_RibbonHeight + tbHeight, mainWidth - treeWidth, rect.bottom - (m_RibbonHeight + tbHeight) - m_StatusBar.GetHeight(), flags);
         DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight, treeWidth ? treeWidth - CDPIAware::Instance().Scale(5) : 0, rect.bottom - (m_RibbonHeight) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
         EndDeferWindowPos(hDwp);
