@@ -867,9 +867,9 @@ void CMainWindow::ShowTablistDropdown(HWND hWnd)
         if (hMenu)
         {
             OnOutOfScope(DestroyMenu(hMenu));
-
+            auto                                  currentIndex = m_TabBar.GetCurrentTabIndex();
             std::map<std::wstring, int, ci_lessW> tablist;
-            int                         tabCount = m_TabBar.GetItemCount();
+            int                                   tabCount = m_TabBar.GetItemCount();
             for (int i = 0; i < tabCount; ++i)
             {
                 tablist[m_TabBar.GetTitle(i)] = i + 1;
@@ -877,7 +877,10 @@ void CMainWindow::ShowTablistDropdown(HWND hWnd)
 
             for (auto& tab : tablist)
             {
-                AppendMenu(hMenu, MF_STRING, tab.second, tab.first.c_str());
+                if (tab.second == (currentIndex + 1))
+                    AppendMenu(hMenu, MF_STRING | MF_CHECKED, tab.second, tab.first.c_str());
+                else
+                    AppendMenu(hMenu, MF_STRING, tab.second, tab.first.c_str());
             }
             TPMPARAMS tpm;
             tpm.cbSize    = sizeof(TPMPARAMS);
@@ -886,7 +889,7 @@ void CMainWindow::ShowTablistDropdown(HWND hWnd)
             if (tab > 0)
             {
                 --tab;
-                if (tab != m_TabBar.GetCurrentTabIndex())
+                if (tab != currentIndex)
                     m_TabBar.ActivateAt(tab);
             }
         }
