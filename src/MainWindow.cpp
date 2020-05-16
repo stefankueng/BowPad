@@ -1270,9 +1270,15 @@ bool CMainWindow::Initialize()
     m_TablistBtn.Init(hResource, *this, (HMENU)cmdTabListDropdownMenu);
     m_TablistBtn.SetText(L"\u25BC");
     m_newTabBtn.Init(hResource, *this, (HMENU)cmdNew);
-    m_newTabBtn.SetText(L"+");
+    if (IsWindows10OrGreater())
+        m_newTabBtn.SetText(L"\u2795");
+    else
+        m_newTabBtn.SetText(L"+");
     m_closeTabBtn.Init(hResource, *this, (HMENU)cmdClose);
-    m_closeTabBtn.SetText(L"X");
+    if (IsWindows10OrGreater())
+        m_closeTabBtn.SetText(L"\u274C");
+    else
+        m_closeTabBtn.SetText(L"X");
     m_closeTabBtn.SetTextColor(RGB(255, 0, 0));
     m_progressBar.Init(hResource, *this);
     m_custToolTip.Init(m_editor);
@@ -1447,9 +1453,9 @@ void CMainWindow::ResizeChildWindows()
         const int mainWidth = rect.right - rect.left;
         const int btnMargin = CDPIAware::Instance().Scale(2);
 
-        HDWP hDwp = BeginDeferWindowPos(6);
+        HDWP hDwp = BeginDeferWindowPos(7);
         DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), mainWidth, m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_TabBar, nullptr, treeWidth+rect.left, rect.top + m_RibbonHeight, mainWidth - treeWidth - tabBtnWidth - tabBtnWidth, rect.bottom - rect.top, flags);
+        DeferWindowPos(hDwp, m_TabBar, nullptr, treeWidth + rect.left, rect.top + m_RibbonHeight, mainWidth - treeWidth - (3 * (tabBtnWidth + btnMargin)), rect.bottom - rect.top, flags);
         DeferWindowPos(hDwp, m_TablistBtn, nullptr, mainWidth - (3 * (tabBtnWidth + btnMargin)), rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_newTabBtn, nullptr, mainWidth - (2 * (tabBtnWidth + btnMargin)), rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_closeTabBtn, nullptr, mainWidth - tabBtnWidth - btnMargin, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
