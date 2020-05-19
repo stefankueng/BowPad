@@ -367,7 +367,7 @@ void CDocScroll::RemoveLine(int type, size_t line)
 void CDocScroll::VisibleLinesChanged()
 {
     auto visibleLines = m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, m_lines);
-    if (m_visibleLines != visibleLines)
+    if (m_visibleLines != size_t(visibleLines))
     {
         m_bDirty = true;
         SetWindowPos(*m_pScintilla, 0, 0, 0, 0, 0,

@@ -228,7 +228,7 @@ private:
     int                         m_maxReplaceStrings = 0;
     int                         m_maxSearchFolderStrings = 0;
     int                         m_maxSearchFileStrings = 0;
-    int                         m_maxSearchResults = 10000;
+    size_t                      m_maxSearchResults = 10000;
     SIZE                        m_originalSize = { 0 };
     bool                        m_open = false;
     bool                        m_reactivation = false;

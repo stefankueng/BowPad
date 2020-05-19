@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,10 +35,12 @@
 struct FunctionInfo
 {
     inline FunctionInfo(int lineNum, std::string&& sortName, std::string&& displayName)
-        : lineNum(lineNum), sortName(std::move(sortName)), displayName(std::move(displayName))
+        : lineNum(lineNum)
+        , sortName(std::move(sortName))
+        , displayName(std::move(displayName))
     {
     }
-    int lineNum;
+    int         lineNum;
     std::string sortName;
     std::string displayName;
 };
@@ -65,14 +67,13 @@ enum class DocEventType
     // the process? If so the function list needs to be rebuilt.
 };
 
-
 struct WorkItem
 {
-    DocID                       m_id;
-    std::string                 m_lang;
-    std::string                 m_regex;
-    std::string                 m_data;
-    std::vector<std::string>    m_trimtokens;
+    DocID                    m_id;
+    std::string              m_lang;
+    std::string              m_regex;
+    std::string              m_data;
+    std::vector<std::string> m_trimtokens;
 };
 
 class CCmdFunctions final : public ICommand
@@ -98,29 +99,28 @@ private:
     void OnClose() override;
 
     std::vector<FunctionInfo> FindFunctionsNow() const;
-    void InvalidateFunctionsEnabled();
-    void InvalidateFunctionsSource();
-    HRESULT PopulateFunctions(IUICollectionPtr& collection);
-    void FindFunctions(const CDocument& doc, std::function<bool(const std::string&, long lineNum)>& callback) const;
-    void SetWorkTimer(int ms);
-    void ThreadFunc();
+    void                      InvalidateFunctionsEnabled();
+    void                      InvalidateFunctionsSource();
+    HRESULT                   PopulateFunctions(IUICollectionPtr& collection);
+    void                      FindFunctions(const CDocument& doc, std::function<bool(const std::string&, long lineNum)>& callback) const;
+    void                      SetWorkTimer(int ms);
+    void                      ThreadFunc();
 
 private:
-    bool m_autoscan;
-    long m_autoscanlimit;
-    UINT m_timerID;
-    std::vector<int> m_menuData;
+    bool                                               m_autoscan;
+    size_t                                             m_autoscanlimit;
+    UINT                                               m_timerID;
+    std::vector<int>                                   m_menuData;
     std::chrono::time_point<std::chrono::steady_clock> m_funcProcessingStartTime;
-    CScintillaWnd m_edit;
+    CScintillaWnd                                      m_edit;
 
-    std::unordered_set<DocID> m_eventData;
-    std::list<WorkItem> m_fileData;
+    std::unordered_set<DocID>                                        m_eventData;
+    std::list<WorkItem>                                              m_fileData;
     std::unordered_map<std::string, std::unordered_set<std::string>> m_langdata;
-    std::thread m_thread;
-    std::mutex m_filedatamutex;
-    std::condition_variable m_filedatacv;
-    std::recursive_mutex m_langdatamutex;
-    volatile long m_bRunThread;
-    volatile long m_bThreadRunning;
+    std::thread                                                      m_thread;
+    std::mutex                                                       m_filedatamutex;
+    std::condition_variable                                          m_filedatacv;
+    std::recursive_mutex                                             m_langdatamutex;
+    volatile long                                                    m_bRunThread;
+    volatile long                                                    m_bThreadRunning;
 };
-

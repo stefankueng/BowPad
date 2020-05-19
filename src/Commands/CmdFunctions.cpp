@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -165,7 +165,7 @@ static bool FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf,
 
 CCmdFunctions::CCmdFunctions(void* obj)
     : ICommand(obj)
-    , m_autoscanlimit(-1)
+    , m_autoscanlimit((size_t)-1)
     , m_edit(hRes)
 {
     // Need to restart BP if you change these settings but helps
@@ -379,7 +379,7 @@ void CCmdFunctions::OnTimer(UINT id)
 
                         ProfileTimer p(L"getting doc content");
                         size_t lengthDoc = m_edit.Call(SCI_GETLENGTH);
-                        if ((lengthDoc <= m_autoscanlimit) || (m_autoscanlimit == -1))
+                        if ((lengthDoc <= m_autoscanlimit) || (m_autoscanlimit == (size_t)-1))
                         {
                             // get characters directly from Scintilla buffer
                             char* buf = (char*)m_edit.Call(SCI_GETCHARACTERPOINTER);
