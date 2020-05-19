@@ -1632,6 +1632,15 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
         return false;
     }
 
+    if (g_searchFlags & SCFIND_REGEXP)
+    {
+        // replace all "\n" chars with "(?:\n|\r\n|\n\r)"
+        if ((g_findString.size() > 1) && (g_findString.find("\\r") == std::wstring::npos))
+        {
+            SearchReplace(g_findString, "\\n", "(!:\\n|\\r\\n|\\n\\r)");
+        }
+    }
+
     Sci_TextToFind ttf = { 0 };
     ttf.chrg.cpMin = (long)ScintillaCall(SCI_GETCURRENTPOS);
     ttf.chrg.cpMax = (long)ScintillaCall(SCI_GETLENGTH);
