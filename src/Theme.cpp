@@ -199,6 +199,7 @@ bool CTheme::SetThemeForDialog(HWND hWnd, bool bDark)
     {
         RemoveWindowSubclass(hWnd, MainSubclassProc, SubclassID);
     }
+    EnumThreadWindows(GetCurrentThreadId(), AdjustThemeForChildrenProc, bDark ? TRUE : FALSE);
     EnumChildWindows(hWnd, AdjustThemeForChildrenProc, bDark ? TRUE : FALSE);
     ::RedrawWindow(hWnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
     return true;
@@ -267,6 +268,7 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
             SetWindowTheme(hwnd, L"Explorer", nullptr);
         }
         else if ((wcscmp(szWndClassName, WC_COMBOBOXEX) == 0) ||
+                 (wcscmp(szWndClassName, L"ComboLBox") == 0) ||
                  (wcscmp(szWndClassName, WC_COMBOBOX) == 0))
         {
             SetWindowTheme(hwnd, L"DarkMode_Explorer", nullptr);
@@ -305,7 +307,7 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                 SetWindowTheme(hTT, L"Explorer", nullptr);
             }
         }
-        else if (_wcsnicmp(szWndClassName, L"RICHEDIT", 8) == 0)
+        else if (wcsncmp(szWndClassName, L"RICHEDIT", 8) == 0)
         {
             SetWindowTheme(hwnd, L"Explorer", nullptr);
             CHARFORMAT2 format = {0};
@@ -316,6 +318,22 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
             SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, (LPARAM)&format);
             SendMessage(hwnd, EM_SETBKGNDCOLOR, 0, (LPARAM)format.crBackColor);
         }
+        else if (wcscmp(szWndClassName, PROGRESS_CLASS) == 0)
+        {
+            SetWindowTheme(hwnd, L"", L"");
+            SendMessage(hwnd, PBM_SETBKCOLOR, 0, (LPARAM)darkBkColor);
+            SendMessage(hwnd, PBM_SETBARCOLOR, 0, (LPARAM)RGB(50, 50, 180));
+        }
+        else if (wcscmp(szWndClassName, L"Auto-Suggest Dropdown") == 0)
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            SetWindowSubclass(hwnd, AutoSuggestSubclassProc, SubclassID, (DWORD_PTR)&s_backBrush);
+            EnumChildWindows(hwnd, AdjustThemeForChildrenProc, lParam);
+        }
+        else if (wcscmp(szWndClassName, TOOLTIPS_CLASSW) == 0)
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+        }
         else if (FAILED(SetWindowTheme(hwnd, L"DarkMode_Explorer", nullptr)))
             SetWindowTheme(hwnd, L"Explorer", nullptr);
     }
@@ -324,7 +342,7 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
         if (wcscmp(szWndClassName, WC_LISTVIEW) == 0)
         {
             SetWindowTheme(hwnd, L"Explorer", nullptr);
-            HTHEME hTheme = OpenThemeData(nullptr, L"ItemsView");
+            CAutoThemeData hTheme = OpenThemeData(nullptr, L"ItemsView");
             if (hTheme)
             {
                 COLORREF color;
@@ -337,7 +355,6 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                     ListView_SetTextBkColor(hwnd, color);
                     ListView_SetBkColor(hwnd, color);
                 }
-                CloseThemeData(hTheme);
             }
             auto hTT = ListView_GetToolTips(hwnd);
             if (hTT)
@@ -355,11 +372,11 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
         else if ((wcscmp(szWndClassName, WC_COMBOBOXEX) == 0) ||
                  (wcscmp(szWndClassName, WC_COMBOBOX) == 0))
         {
-            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            SetWindowTheme(hwnd, L"DarkMode_Explorer", nullptr);
             HWND hCombo = hwnd;
             if (wcscmp(szWndClassName, WC_COMBOBOXEX) == 0)
             {
-                SendMessage(hwnd, CBEM_SETWINDOWTHEME, 0, (LPARAM)L"Explorer");
+                SendMessage(hwnd, CBEM_SETWINDOWTHEME, 0, (LPARAM)L"DarkMode_Explorer");
                 hCombo = (HWND)SendMessage(hwnd, CBEM_GETCOMBOCONTROL, 0, 0);
             }
             if (hCombo)
@@ -376,7 +393,7 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                     SetWindowTheme(info.hwndItem, L"Explorer", nullptr);
                     SetWindowTheme(info.hwndCombo, L"Explorer", nullptr);
 
-                    HTHEME hTheme = OpenThemeData(nullptr, L"ItemsView");
+                    CAutoThemeData hTheme = OpenThemeData(nullptr, L"ItemsView");
                     if (hTheme)
                     {
                         COLORREF color;
@@ -389,7 +406,6 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                             ListView_SetTextBkColor(info.hwndList, color);
                             ListView_SetBkColor(info.hwndList, color);
                         }
-                        CloseThemeData(hTheme);
                     }
 
                     RemoveWindowSubclass(info.hwndList, ListViewSubclassProc, SubclassID);
@@ -400,7 +416,7 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
         else if (wcscmp(szWndClassName, WC_TREEVIEW) == 0)
         {
             SetWindowTheme(hwnd, L"Explorer", nullptr);
-            HTHEME hTheme = OpenThemeData(nullptr, L"ItemsView");
+            CAutoThemeData hTheme = OpenThemeData(nullptr, L"ItemsView");
             if (hTheme)
             {
                 COLORREF color;
@@ -412,7 +428,6 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                 {
                     TreeView_SetBkColor(hwnd, color);
                 }
-                CloseThemeData(hTheme);
             }
             auto hTT = TreeView_GetToolTips(hwnd);
             if (hTT)
@@ -421,7 +436,7 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                 SetWindowTheme(hTT, L"Explorer", nullptr);
             }
         }
-        else if (_wcsnicmp(szWndClassName, L"RICHEDIT", 8) == 0)
+        else if (wcsncmp(szWndClassName, L"RICHEDIT", 8) == 0)
         {
             SetWindowTheme(hwnd, L"Explorer", nullptr);
             CHARFORMAT2 format = {0};
@@ -431,6 +446,20 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
             format.crBackColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOW));
             SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, (LPARAM)&format);
             SendMessage(hwnd, EM_SETBKGNDCOLOR, 0, (LPARAM)format.crBackColor);
+        }
+        else if (wcscmp(szWndClassName, PROGRESS_CLASS) == 0)
+        {
+            SetWindowTheme(hwnd, nullptr, nullptr);
+        }
+        else if (wcscmp(szWndClassName, PROGRESS_CLASS) == 0)
+        {
+            SetWindowTheme(hwnd, nullptr, nullptr);
+        }
+        else if (wcscmp(szWndClassName, L"Auto-Suggest Dropdown") == 0)
+        {
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
+            RemoveWindowSubclass(hwnd, AutoSuggestSubclassProc, SubclassID);
+            EnumChildWindows(hwnd, AdjustThemeForChildrenProc, lParam);
         }
         else
             SetWindowTheme(hwnd, L"Explorer", nullptr);
@@ -489,6 +518,54 @@ LRESULT CTheme::ComboBoxSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
             return reinterpret_cast<LRESULT>(*hbrBkgnd);
         }
         break;
+        case WM_DRAWITEM:
+        {
+            LPDRAWITEMSTRUCT pDIS           = (LPDRAWITEMSTRUCT)(lParam);
+            HDC              hDC            = pDIS->hDC;
+            RECT             rc             = pDIS->rcItem;
+            wchar_t          itemText[1024] = {0};
+
+            COMBOBOXEXITEM cbi = {0};
+            cbi.mask           = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_OVERLAY | CBEIF_INDENT;
+            cbi.iItem          = pDIS->itemID;
+            cbi.cchTextMax     = _countof(itemText);
+            cbi.pszText        = itemText;
+
+            auto cwnd = GetParent(hWnd);
+
+            if (SendMessage(cwnd, CBEM_GETITEM, 0, (LPARAM)&cbi))
+            {
+                rc.left += (cbi.iIndent * 10);
+                auto img = (pDIS->itemState & LVIS_SELECTED) ? cbi.iSelectedImage : cbi.iImage;
+                if (pDIS->itemState & LVIS_FOCUSED)
+                {
+                    ::SetBkColor(hDC, darkDisabledTextColor);
+                }
+                else
+                {
+                    ::SetBkColor(hDC, darkBkColor);
+                }
+                ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rc, nullptr, 0, nullptr);
+
+                if (img)
+                {
+                    auto imglist = (HIMAGELIST)SendMessage(cwnd, CBEM_GETIMAGELIST, 0, 0);
+                    if (imglist)
+                    {
+                        int iconX(0), iconY(0);
+                        ImageList_GetIconSize(imglist, &iconX, &iconY);
+                        ImageList_Draw(imglist, img, hDC, rc.left, rc.top, ILD_TRANSPARENT | INDEXTOOVERLAYMASK(cbi.iOverlay));
+                        rc.left += (iconX + 2);
+                    }
+                }
+
+                SetTextColor(pDIS->hDC, darkTextColor);
+                SetBkMode(hDC, TRANSPARENT);
+                DrawText(hDC, cbi.pszText, -1, &rc, DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
+                return TRUE;
+            }
+        }
+        break;
         case WM_DESTROY:
         case WM_NCDESTROY:
             RemoveWindowSubclass(hWnd, ComboBoxSubclassProc, SubclassID);
@@ -521,6 +598,38 @@ LRESULT CTheme::MainSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         case WM_DESTROY:
         case WM_NCDESTROY:
             RemoveWindowSubclass(hWnd, MainSubclassProc, SubclassID);
+            break;
+    }
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+LRESULT CTheme::AutoSuggestSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uIdSubclass*/, DWORD_PTR /*dwRefData*/)
+{
+    switch (uMsg)
+    {
+        case WM_DRAWITEM:
+        {
+            LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)(lParam);
+            HDC              hDC  = pDIS->hDC;
+            RECT             rc   = pDIS->rcItem;
+            wchar_t          itemText[256];
+            // get the text from sub-items
+            ListView_GetItemText(pDIS->hwndItem, pDIS->itemID, 0, itemText, _countof(itemText));
+
+            if (pDIS->itemState & LVIS_FOCUSED)
+                ::SetBkColor(hDC, darkDisabledTextColor);
+            else
+                ::SetBkColor(hDC, darkBkColor);
+            ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rc, nullptr, 0, nullptr);
+
+            SetTextColor(pDIS->hDC, darkTextColor);
+            SetBkMode(hDC, TRANSPARENT);
+            DrawText(hDC, itemText, -1, &rc, DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
+        }
+            return TRUE;
+        case WM_DESTROY:
+        case WM_NCDESTROY:
+            RemoveWindowSubclass(hWnd, AutoSuggestSubclassProc, SubclassID);
             break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
@@ -880,7 +989,6 @@ LRESULT CTheme::ButtonSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }
-
 
 int GetStateFromBtnState(LONG_PTR dwStyle, BOOL bHot, BOOL bFocus, LRESULT dwCheckState, int iPartId, BOOL bHasMouseCapture)
 {
