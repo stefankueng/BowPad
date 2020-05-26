@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -53,7 +53,9 @@ static constexpr struct
     { "-Bash", "#!/bin/bash" },
     { "-Bash", "#! /bin/bash" },
     { "-Html", "<html>" },
-    { "-Html", "<!DOCTYPE html>" }
+    { "-Html", "<!DOCTYPE html>" },
+    { "-Java", "#!groovy" },
+    { "-Java", "#!/usr/bin/env groovy" }
 };
 
 StyleData::StyleData()
