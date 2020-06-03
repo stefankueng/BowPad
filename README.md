@@ -1,8 +1,7 @@
 # BowPad
 A simple and fast text editor with a ribbon UI
 
-[![Build Status](https://tortoisesvn.visualstudio.com/tortoisesvnGitHub/_apis/build/status/stefankueng.BowPad)](https://tortoisesvn.visualstudio.com/tortoisesvnGitHub/_build/latest?definitionId=5)
-
+[![Build Status](https://dev.azure.com/tortoisesvn/tortoisesvnGitHub/_apis/build/status/stefankueng.BowPad?branchName=master)](https://dev.azure.com/tortoisesvn/tortoisesvnGitHub/_build/latest?definitionId=5&branchName=master)
 A few notable features of BowPad:
 
 - syntax highlighting for over 100 file types and languages
@@ -12,8 +11,8 @@ A few notable features of BowPad:
 - coloring of open tabs according to their path
 - extendable with [plugins](https://tools.stefankueng.com/BowPad_plugins.html) written in JScript or VBScript
 
-[![BowPad with default color theme](https://tools.stefankueng.com/img/bowpad/BowPadDefaultTheme-small.27006c89.png)](https://tools.stefankueng.com/img/bowpad/BowPadDefaultTheme.fc56fdf3.png)
-[![BowPad with dark color theme](https://tools.stefankueng.com/img/bowpad/BowPadDarkTheme-small.1f85b4ea.png)](https://tools.stefankueng.com/img/bowpad/BowPadDarkTheme.7d6cfe54.png)
+[![BowPad with default color theme](https://github.com/stefankueng/tools/raw/master/www/source/img/bowpad/BowPadDefaultTheme-small.png)](https://github.com/stefankueng/tools/raw/master/www/source/img/bowpad/BowPadDefaultTheme.png)
+[![BowPad with dark color theme](https://github.com/stefankueng/tools/raw/master/www/source/img/bowpad/BowPadDarkTheme-small.png)](https://github.com/stefankueng/tools/raw/master/www/source/img/bowpad/BowPadDarkTheme.png)
 
 And before you ask: the name BowPad comes from the fact that it uses the ribbon user interface.
 Ribbon → Bow, Editor → NotePad = BowPad.
