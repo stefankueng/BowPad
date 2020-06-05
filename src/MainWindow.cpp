@@ -747,6 +747,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     break;
     case WM_SETTINGCHANGE:
     case WM_SYSCOLORCHANGE:
+    case WM_DPICHANGED:
+        SendMessage(m_editor, uMsg, wParam, lParam);
         CTheme::Instance().OnSysColorChanged();
         SetTheme(CTheme::Instance().IsDarkTheme());
     break;
