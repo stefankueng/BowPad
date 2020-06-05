@@ -152,7 +152,7 @@
       <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Manifest>
-      <EnableDpiAwareness>true</EnableDpiAwareness>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -177,7 +177,7 @@
       <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Manifest>
-      <EnableDpiAwareness>true</EnableDpiAwareness>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -202,7 +202,7 @@
       <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Manifest>
-      <EnableDpiAwareness>true</EnableDpiAwareness>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -231,7 +231,7 @@
       <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Manifest>
-      <EnableDpiAwareness>true</EnableDpiAwareness>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
     <PostBuildEvent>
       <Command>"$(ProjectDir)..\tools\ResText.exe" extract "$(TargetPath)" "$(ProjectDir)..\Languages\BowPad.pot"</Command>
@@ -264,7 +264,7 @@
       <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Manifest>
-      <EnableDpiAwareness>true</EnableDpiAwareness>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
     <PostBuildEvent>
       <Command>"$(ProjectDir)..\tools\ResText.exe" extract "$(TargetPath)" "$(ProjectDir)..\Languages\BowPad.pot"</Command>
@@ -297,7 +297,7 @@
       <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Manifest>
-      <EnableDpiAwareness>true</EnableDpiAwareness>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
     <PostBuildEvent>
       <Command>"$(ProjectDir)..\tools\ResText.exe" extract "$(TargetPath)" "$(ProjectDir)..\Languages\BowPad.pot"</Command>
