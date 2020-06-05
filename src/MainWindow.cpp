@@ -749,6 +749,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
     case WM_SYSCOLORCHANGE:
     case WM_DPICHANGED:
         SendMessage(m_editor, uMsg, wParam, lParam);
+        CDPIAware::Instance().Invalidate();
         CTheme::Instance().OnSysColorChanged();
         SetTheme(CTheme::Instance().IsDarkTheme());
     break;
