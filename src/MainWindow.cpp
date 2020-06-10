@@ -752,6 +752,13 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         CDPIAware::Instance().Invalidate();
         CTheme::Instance().OnSysColorChanged();
         SetTheme(CTheme::Instance().IsDarkTheme());
+        if (uMsg == WM_DPICHANGED)
+        {
+            RECT rc;
+            GetWindowRect(*this, &rc);
+            const RECT* rect = reinterpret_cast<RECT*>(lParam);
+            ::SetWindowPos(*this, nullptr, rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top, SWP_NOZORDER | SWP_NOACTIVATE);
+        }
     break;
     case WM_LBUTTONDBLCLK:
     {
@@ -1451,10 +1458,10 @@ void CMainWindow::ResizeChildWindows()
         TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
         MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
         const int tbHeight = tabrc.bottom - tabrc.top;
-        const int tabBtnWidth = tbHeight + CDPIAware::Instance().Scale(2);
+        const int tabBtnWidth = tbHeight + CDPIAware::Instance().Scale(*this, 2);
         const int treeWidth = m_fileTreeVisible ? m_treeWidth : 0;
         const int mainWidth = rect.right - rect.left;
-        const int btnMargin = CDPIAware::Instance().Scale(2);
+        const int btnMargin = CDPIAware::Instance().Scale(*this, 2);
 
         HDWP hDwp = BeginDeferWindowPos(7);
         DeferWindowPos(hDwp, m_StatusBar, nullptr, rect.left, rect.bottom - m_StatusBar.GetHeight(), mainWidth, m_StatusBar.GetHeight(), flags);
@@ -1463,7 +1470,7 @@ void CMainWindow::ResizeChildWindows()
         DeferWindowPos(hDwp, m_newTabBtn, nullptr, mainWidth - (2 * (tabBtnWidth + btnMargin)), rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_closeTabBtn, nullptr, mainWidth - tabBtnWidth - btnMargin, rect.top + m_RibbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_editor, nullptr, rect.left + treeWidth, rect.top + m_RibbonHeight + tbHeight, mainWidth - treeWidth, rect.bottom - (m_RibbonHeight + tbHeight) - m_StatusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight, treeWidth ? treeWidth - CDPIAware::Instance().Scale(5) : 0, rect.bottom - (m_RibbonHeight) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
+        DeferWindowPos(hDwp, m_fileTree, nullptr, rect.left, rect.top + m_RibbonHeight, treeWidth ? treeWidth - CDPIAware::Instance().Scale(*this, 5) : 0, rect.bottom - (m_RibbonHeight) - m_StatusBar.GetHeight(), m_fileTreeVisible ? flags : noshowflags);
         EndDeferWindowPos(hDwp);
     }
 }

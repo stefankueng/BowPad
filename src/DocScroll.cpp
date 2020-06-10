@@ -40,14 +40,14 @@ static COLORREF GetThumbColor(double hotFraction)
         return theme.GetThemeColor(GDIHelpers::InterpolateColors(RGB(150, 150, 200), ::GetSysColor(COLOR_3DDKSHADOW), hotFraction));
 }
 
-static void DrawThumb(HDC hdc, COLORREF thumb, const RECT& rect, UINT uBar)
+static void DrawThumb(HWND hwnd, HDC hdc, COLORREF thumb, const RECT& rect, UINT uBar)
 {
     Gdiplus::Graphics graphics(hdc);
     graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
     Gdiplus::Color c1;
     c1.SetValue(GDIHelpers::MakeARGB(152, GetRValue(thumb), GetGValue(thumb), GetBValue(thumb)));
     Gdiplus::SolidBrush brush(c1);
-    const int margin = CDPIAware::Instance().Scale(3);
+    const int margin = CDPIAware::Instance().Scale(hwnd, 3);
     Gdiplus::Rect rc(
         (uBar == SB_HORZ ? rect.left : rect.left + margin),
         (uBar == SB_HORZ ? rect.top + margin : rect.top),
@@ -209,7 +209,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                         m_bHotHT = hotNow;
                     }
                     auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarHT));
-                    DrawThumb(pCustDraw->hdc, thumb, pCustDraw->rect, pCustDraw->nBar);
+                    DrawThumb(pCustDraw->hdr.hwndFrom, pCustDraw->hdc, thumb, pCustDraw->rect, pCustDraw->nBar);
                 }
                 break;
                 default:
@@ -258,7 +258,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                         m_bHotVT = hotNow;
                     }
                     auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarVT));
-                    DrawThumb(pCustDraw->hdc, thumb, pCustDraw->rect, pCustDraw->nBar);
+                    DrawThumb(pCustDraw->hdr.hwndFrom, pCustDraw->hdc, thumb, pCustDraw->rect, pCustDraw->nBar);
                 }
                 break;
                 case HTSCROLL_PAGEFULL:
@@ -288,7 +288,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                                 Gdiplus::Color c2;
                                 c2.SetFromCOLORREF(line.second);
                                 Gdiplus::SolidBrush brushline(c2);
-                                graphics.FillRectangle(&brushline, drawx, linepos, colwidth, CDPIAware::Instance().Scale(2));
+                                graphics.FillRectangle(&brushline, drawx, linepos, colwidth, CDPIAware::Instance().Scale(pCustDraw->hdr.hwndFrom, 2));
                                 lastLinePos = linepos;
                                 lastColor = line.second;
                             }
@@ -299,7 +299,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     Gdiplus::Color c3;
                     c3.SetFromCOLORREF(m_curPosColor);
                     Gdiplus::SolidBrush brushcurline(c3);
-                    graphics.FillRectangle(&brushcurline, pCustDraw->rect.left, linepos, pCustDraw->rect.right - pCustDraw->rect.left, CDPIAware::Instance().Scale(2));
+                    graphics.FillRectangle(&brushcurline, pCustDraw->rect.left, linepos, pCustDraw->rect.right - pCustDraw->rect.left, CDPIAware::Instance().Scale(pCustDraw->hdr.hwndFrom, 2));
                 }
                 break;
             }
