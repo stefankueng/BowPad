@@ -1,7 +1,7 @@
 [submodule "ext/sktoolslib"]
 	path = ext/sktoolslib
 	url = https://github.com/stefankueng/sktoolslib.git
-	branch = master
+	branch = main
 [submodule "ext/tinyexpr"]
 	path = ext/tinyexpr
 	url = https://github.com/codeplea/tinyexpr.git
