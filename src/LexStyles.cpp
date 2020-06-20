@@ -24,39 +24,39 @@
 #include "AppUtils.h"
 #include "OnOutOfScope.h"
 #include "GDIHelpers.h"
+#include "DirFileEnum.h"
 
 namespace
 {
-const LexerData emptyLexData;
+const LexerData                            emptyLexData;
 const std::unordered_map<int, std::string> emptyUnorderedMap;
-const std::map<int, std::string> emptyIntStrVec;
-const std::string emptyString;
-const std::vector<std::string> emptyStringVector;
+const std::map<int, std::string>           emptyIntStrVec;
+const std::string                          emptyString;
+const std::vector<std::string>             emptyStringVector;
 
 static constexpr COLORREF fgColor = RGB(0, 0, 0);
 static constexpr COLORREF bgColor = RGB(255, 255, 255);
-};
+}; // namespace
 
 static constexpr struct
 {
-    const char*const lang;
-    const char*const firstLine;
+    const char* const lang;
+    const char* const firstLine;
 } lexDetectStrings[] = {
     // a '+' in front of the lexer name means the string can appear anywhere in the
     // first line of the document.
     // a '-' in front of the lexer name means the string must appear
     // at the beginning of the first line of the document
-    { "+C/C++", "*- C++ -*" },
-    { "-Xml", "<?xml" },
-    { "-Bash", "<?php" },
-    { "-Bash", "#!/bin/sh" },
-    { "-Bash", "#!/bin/bash" },
-    { "-Bash", "#! /bin/bash" },
-    { "-Html", "<html>" },
-    { "-Html", "<!DOCTYPE html>" },
-    { "-Java", "#!groovy" },
-    { "-Java", "#!/usr/bin/env groovy" }
-};
+    {"+C/C++", "*- C++ -*"},
+    {"-Xml", "<?xml"},
+    {"-Bash", "<?php"},
+    {"-Bash", "#!/bin/sh"},
+    {"-Bash", "#!/bin/bash"},
+    {"-Bash", "#! /bin/bash"},
+    {"-Html", "<html>"},
+    {"-Html", "<!DOCTYPE html>"},
+    {"-Java", "#!groovy"},
+    {"-Java", "#!/usr/bin/env groovy"}};
 
 StyleData::StyleData()
     : ForegroundColor(fgColor)
@@ -87,327 +87,336 @@ CLexStyles& CLexStyles::Instance()
 }
 
 void CLexStyles::ParseStyle(
-    LPCWSTR styleName,
-    LPCWSTR styleString,
+    LPCWSTR                                               styleName,
+    LPCWSTR                                               styleString,
     const std::unordered_map<std::wstring, std::wstring>& variables,
-    StyleData& style
-    ) const
+    StyleData&                                            style) const
 {
     std::wstring v = styleString;
     ReplaceVariables(v, variables);
     std::vector<std::wstring> vec;
     stringtok(vec, v, false, L";");
-    int i = 0;
+    int      i = 0;
     COLORREF clr;
     for (const auto& s : vec)
     {
         switch (i)
         {
-        case 0: // Name
+            case 0: // Name
 #ifdef _DEBUG
-            if (s.find(',') != std::wstring::npos)
-                APPVERIFYM(false, s.c_str());
+                if (s.find(',') != std::wstring::npos)
+                    APPVERIFYM(false, s.c_str());
 #endif
-            style.Name = s;
+                style.Name = s;
+                break;
+            case 1: // Foreground color
+                if (GDIHelpers::HexStringToCOLORREF(s, &clr))
+                    style.ForegroundColor = clr;
+                else
+                    APPVERIFYM(s.empty(), styleName);
+                break;
+            case 2: // Background color
+                if (GDIHelpers::HexStringToCOLORREF(s, &clr))
+                    style.BackgroundColor = clr;
+                else
+                    APPVERIFYM(s.empty(), styleName);
+                break;
+            case 3: // Font name
+                style.FontName = s;
+                break;
+            case 4: // Font style
+            {
+                int fs;
+                if (!CAppUtils::TryParse(s.c_str(), fs, true))
+                    APPVERIFYM(false, styleName);
+                style.FontStyle = (FontStyle)fs;
+            }
             break;
-        case 1: // Foreground color
-            if (GDIHelpers::HexStringToCOLORREF(s, &clr))
-                style.ForegroundColor = clr;
-            else
-                APPVERIFYM(s.empty(), styleName);
-            break;
-        case 2: // Background color
-            if (GDIHelpers::HexStringToCOLORREF(s, &clr))
-                style.BackgroundColor = clr;
-            else
-                APPVERIFYM(s.empty(), styleName);
-            break;
-        case 3: // Font name
-            style.FontName = s;
-            break;
-        case 4: // Font style
-        {
-            int fs;
-            if (!CAppUtils::TryParse(s.c_str(), fs, true))
-                APPVERIFYM(false, styleName);
-            style.FontStyle = (FontStyle)fs;
-        }
-            break;
-        case 5: // Font size
-            if (!CAppUtils::TryParse(s.c_str(), style.FontSize, true))
-                APPVERIFYM(false, styleName);
-            break;
-        case 6: // Override default background color in case the style was set with a variable
-            if (GDIHelpers::HexStringToCOLORREF(s, &clr))
-                style.BackgroundColor = clr;
-            else
-                APPVERIFYM(s.empty(), styleName);
-            break;
-        case 7: // eolstylefilled
-            if (!s.empty())
-                style.eolfilled = true;
+            case 5: // Font size
+                if (!CAppUtils::TryParse(s.c_str(), style.FontSize, true))
+                    APPVERIFYM(false, styleName);
+                break;
+            case 6: // Override default background color in case the style was set with a variable
+                if (GDIHelpers::HexStringToCOLORREF(s, &clr))
+                    style.BackgroundColor = clr;
+                else
+                    APPVERIFYM(s.empty(), styleName);
+                break;
+            case 7: // eolstylefilled
+                if (!s.empty())
+                    style.eolfilled = true;
         }
         ++i;
     }
-
 }
 
 void CLexStyles::Load()
 {
-    CSimpleIni inis[2];
-    std::wstring userStyleFile = CAppUtils::GetDataPath() + L"\\userconfig";
-
-    if (PathFileExists(userStyleFile.c_str()))
-    {
-        inis[1].LoadFile(userStyleFile.c_str());
-    }
-
-    DWORD resLen = 0;
-    const char* resData = CAppUtils::GetResourceData(L"config", IDR_LEXSTYLES, resLen);
+    std::vector<std::tuple<std::unique_ptr<CSimpleIni>, bool>> inis;
+    DWORD                                                      resLen  = 0;
+    const char*                                                resData = CAppUtils::GetResourceData(L"config", IDR_LEXSTYLES, resLen);
     if (resData != nullptr)
     {
-        inis[0].LoadFile(resData, resLen);
-
-        std::unordered_map<std::wstring, std::wstring> variables;
-        for (const auto& ini : inis)
-        {
-            CSimpleIni::TNamesDepend lexvars;
-            ini.GetAllKeys(L"variables", lexvars);
-            for (const auto& l : lexvars)
-            {
-                APPVERIFY(*l != L'\0');
-                std::wstring v = ini.GetValue(L"variables", l);
-                std::wstring key = L"$(";
-                key += l;
-                key += L")";
-                variables[std::move(key)] = std::move(v);
-            }
-        }
-
-        std::map<std::wstring, int> lexers;
-        for (const auto& ini : inis)
-        {
-            CSimpleIni::TNamesDepend lexkeys;
-            ini.GetAllKeys(L"lexers", lexkeys);
-            for (const auto& l : lexkeys)
-            {
-                APPVERIFY(*l != L'\0');
-                int lex;
-                if (! CAppUtils::TryParse(ini.GetValue(l, L"Lexer", L""), lex, false))
-                    APPVERIFY(false);
-                m_lexerSection[lex] = l;
-            }
-            std::wstring slex;
-            for (const auto& l : m_lexerSection)
-            {
-                slex = ini.GetValue(l.second.c_str(), L"Lexer", L"");
-                if (slex.empty())
-                    continue;
-                int lex;
-                if (! CAppUtils::TryParse(slex.c_str(), lex, false))
-                    APPVERIFY(false);
-
-                std::wstring v = ini.GetValue(L"lexers", l.second.c_str(), L"");
-                if (!v.empty())
-                {
-                    ReplaceVariables(v, variables);
-                    std::vector<std::wstring> langs;
-                    stringtok(langs, v, true, L";");
-                    for (const auto& lang : langs)
-                        lexers[lang] = lex;
-                }
-
-                // now parse all the data for this lexer
-                LexerData lexerdata = m_lexerdata[lex];
-                LexerData userlexerdata;
-                lexerdata.ID = lex;
-                userlexerdata.ID = lex;
-                CSimpleIni::TNamesDepend lexdatakeys;
-                ini.GetAllKeys(l.second.c_str(), lexdatakeys);
-                for (const auto& it : lexdatakeys)
-                {
-                    if (_wcsnicmp(L"Style", it, 5) == 0)
-                    {
-                        StyleData style;
-                        ParseStyle(it, ini.GetValue(l.second.c_str(), it, L""), variables, style);
-                        int pos;
-                        if (!CAppUtils::TryParse(it+5, pos, false))
-                            APPVERIFY(false);
-                        lexerdata.Styles[pos] = style;
-                        userlexerdata.Styles[pos] = std::move(style);
-                    }
-                    else if (_wcsnicmp(L"Prop_", it, 5) == 0)
-                    {
-                        std::string n = CUnicodeUtils::StdGetUTF8(it+5);
-                        std::string vl = CUnicodeUtils::StdGetUTF8(ini.GetValue(l.second.c_str(), it, L""));
-                        lexerdata.Properties[n] = vl;
-                        userlexerdata.Properties[std::move(n)] = std::move(vl);
-                    }
-                }
-                m_lexerdata[lexerdata.ID] = std::move(lexerdata);
-                if (&ini == &inis[1])
-                    m_userlexerdata[lexerdata.ID] = std::move(userlexerdata);
-            }
-        }
-
-        for (const auto& ini : inis)
-        {
-            CSimpleIni::TNamesDepend filelangkeys;
-            ini.GetAllKeys(L"filelanguage", filelangkeys);
-            for (const auto& filelangkey : filelangkeys)
-            {
-                auto utf8filelangkey = CUnicodeUtils::StdGetUTF8(filelangkey);
-                std::wstring v = ini.GetValue(L"filelanguage", filelangkey);
-                ReplaceVariables(v, variables);
-                std::vector<std::wstring> files;
-                stringtok(files, v, true, L";");
-                for (const auto& f : files)
-                {
-                    m_fileLang[CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(f))] = utf8filelangkey;
-                }
-            }
-            CSimpleIni::TNamesDepend autolangkeys;
-            ini.GetAllKeys(L"autolanguage", autolangkeys);
-            for (const auto& autolangkey : autolangkeys)
-            {
-                auto utf8autolangkey = CUnicodeUtils::StdGetUTF8(autolangkey);
-                std::wstring v = ini.GetValue(L"autolanguage", autolangkey);
-                ReplaceVariables(v, variables);
-                std::vector<std::wstring> exts;
-                stringtok(exts, v, true, L";");
-                for (const auto& e : exts)
-                {
-                    m_autoextLang[CUnicodeUtils::StdGetUTF8(e)] = utf8autolangkey;
-                }
-            }
-            if (&ini == &inis[1])
-            {
-                CSimpleIni::TNamesDepend autopathkeys;
-                ini.GetAllKeys(L"pathlanguage", autopathkeys);
-                for (const auto& apppathkey : autopathkeys)
-                {
-                    std::wstring v = ini.GetValue(L"pathlanguage", apppathkey);
-                    auto f = v.find(L'*');
-                    if (f != std::wstring::npos)
-                    {
-                        std::wstring p = v.substr(0, f);
-                        m_pathsLang[p] = CUnicodeUtils::StdGetUTF8(v.substr(f + 1));
-                        m_pathsForLang.push_back(std::move(p));
-                    }
-                }
-            }
-
-            CSimpleIni::TNamesDepend langkeys;
-            inis[0].GetAllKeys(L"language", langkeys);
-            inis[1].GetAllKeys(L"language", langkeys);
-            for (const auto& langkey : langkeys)
-            {
-                auto utf8langkey = CUnicodeUtils::StdGetUTF8(langkey);
-                auto& langdata = m_Langdata[utf8langkey];
-                std::wstring v = ini.GetValue(L"language", langkey, L"");
-                ReplaceVariables(v, variables);
-                std::vector<std::wstring> exts;
-                stringtok(exts, v, true, L";");
-                std::wstring filters;
-                for (const auto& e : exts)
-                {
-                    m_extLang.insert({CUnicodeUtils::StdGetUTF8(e), utf8langkey});
-                    if (&ini == &inis[1])
-                        m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = utf8langkey;
-                    else
-                    {
-                        if (!filters.empty())
-                            filters.push_back(TEXT(';'));
-                        filters += TEXT("*.") + e;
-                    }
-                }
-                if (!filters.empty())
-                    m_fileTypes.push_back(std::make_pair(std::wstring(langkey) + TEXT(" file"), std::move(filters)));
-
-                std::wstring langsect = L"lang_";
-                langsect += langkey;
-                CSimpleIni::TNamesDepend specLangKeys;
-                ini.GetAllKeys(langsect.c_str(), specLangKeys);
-                LanguageData ld;
-                if (&ini != &inis[0])
-                {
-                    ld = langdata;
-                }
-                ld.lexer = lexers[langkey];
-                for (const auto& sk : specLangKeys)
-                {
-                    if (_wcsnicmp(L"keywords", sk, 8) == 0)
-                    {
-                        int vn;
-                        if (!CAppUtils::TryParse(sk+8,vn,false))
-                            APPVERIFY(false);
-                        ld.keywordlist[vn] = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
-                    }
-                    else if (_wcsicmp(L"CommentLine", sk) == 0)
-                    {
-                        ld.commentline = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
-                        ld.commentline.erase(ld.commentline.find_last_not_of('~')+1); // Erase '~'
-                    }
-                    else if (_wcsicmp(L"CommentStreamStart", sk) == 0)
-                    {
-                        ld.commentstreamstart = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
-                        ld.commentstreamstart.erase(ld.commentstreamstart.find_last_not_of('~')+1); // Erase '~'
-                    }
-                    else if (_wcsicmp(L"CommentStreamEnd", sk) == 0)
-                    {
-                        ld.commentstreamend = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
-                        ld.commentstreamend.erase(ld.commentstreamend.find_last_not_of('~')+1); // Erase '~'
-                    }
-                    else if (_wcsicmp(L"CommentLineAtStart", sk) == 0)
-                    {
-                        int vn;
-                        if (!CAppUtils::TryParse(
-                            ini.GetValue(langsect.c_str(), sk),vn,false))
-                            APPVERIFY(false);
-                        ld.commentlineatstart = vn != 0;
-                    }
-                    else if (_wcsicmp(L"FunctionRegex", sk) == 0)
-                    {
-                        ld.functionregex = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
-                        ld.functionregex.erase(ld.functionregex.find_last_not_of('~')+1); // Erase '~'
-                    }
-                    else if (_wcsicmp(L"FunctionRegexSort", sk) == 0)
-                    {
-                        if (!CAppUtils::TryParse(
-                            ini.GetValue(langsect.c_str(), sk),
-                            ld.functionregexsort, false))
-                            APPVERIFY(false);
-                    }
-                    else if (_wcsicmp(L"FunctionRegexTrim", sk) == 0)
-                    {
-                        std::string s = CUnicodeUtils::StdGetUTF8(ini.GetValue(langsect.c_str(), sk));
-                        s.erase(s.find_last_not_of('~')+1); // Erase '~'
-                        // REIVEW: Should make clear if this is appending or not.
-                        stringtok(ld.functionregextrim, s, true, ",");
-                    }
-                    else if (_wcsicmp(L"UserFunctions", sk) == 0)
-                    {
-                        if (!CAppUtils::TryParse(
-                            ini.GetValue(langsect.c_str(), sk),
-                            ld.userfunctions, false))
-                            APPVERIFY(false);
-                    }
-                }
-                langdata = std::move(ld);
-            }
-        }
-        m_fileTypes.sort([](const auto& first, const auto& second) {
-            return _tcsicmp(first.first.c_str(), second.first.c_str()) < 0;
-        });
-        m_fileTypes.push_front(std::make_pair(TEXT("All file"), TEXT("*.*")));
-        for (auto& e : m_fileTypes)
-            m_filterSpec.push_back({e.first.c_str(), e.second.c_str()});
+        inis.push_back(std::make_tuple(std::make_unique<CSimpleIni>(), false));
+        std::get<0>(inis.back())->LoadFile(resData, resLen);
     }
+
+    CDirFileEnum enumerator(CAppUtils::GetDataPath());
+    bool         bIsDir = false;
+    std::wstring path;
+    while (enumerator.NextFile(path, &bIsDir, false))
+    {
+        if (CPathUtils::GetFileExtension(path) == L"bplex")
+        {
+            inis.push_back(std::make_tuple(std::make_unique<CSimpleIni>(), false));
+            std::get<0>(inis.back())->LoadFile(path.c_str());
+        }
+    }
+
+    std::wstring userStyleFile = CAppUtils::GetDataPath() + L"\\userconfig";
+    if (PathFileExists(userStyleFile.c_str()))
+    {
+        inis.push_back(std::make_tuple(std::make_unique<CSimpleIni>(), true));
+        std::get<0>(inis.back())->LoadFile(userStyleFile.c_str());
+    }
+
+    std::unordered_map<std::wstring, std::wstring> variables;
+    for (const auto& [ini, isUserConfig] : inis)
+    {
+        CSimpleIni::TNamesDepend lexvars;
+        ini->GetAllKeys(L"variables", lexvars);
+        for (const auto& l : lexvars)
+        {
+            APPVERIFY(*l != L'\0');
+            std::wstring v   = ini->GetValue(L"variables", l);
+            std::wstring key = L"$(";
+            key += l;
+            key += L")";
+            variables[std::move(key)] = std::move(v);
+        }
+    }
+
+    std::map<std::wstring, int> lexers;
+    for (const auto& [ini, isUserConfig] : inis)
+    {
+        CSimpleIni::TNamesDepend lexkeys;
+        ini->GetAllKeys(L"lexers", lexkeys);
+        for (const auto& l : lexkeys)
+        {
+            APPVERIFY(*l != L'\0');
+            int lex;
+            if (!CAppUtils::TryParse(ini->GetValue(l, L"Lexer", L""), lex, false))
+                APPVERIFY(false);
+            m_lexerSection[lex] = l;
+        }
+        std::wstring slex;
+        for (const auto& l : m_lexerSection)
+        {
+            slex = ini->GetValue(l.second.c_str(), L"Lexer", L"");
+            if (slex.empty())
+                continue;
+            int lex;
+            if (!CAppUtils::TryParse(slex.c_str(), lex, false))
+                APPVERIFY(false);
+
+            std::wstring v = ini->GetValue(L"lexers", l.second.c_str(), L"");
+            if (!v.empty())
+            {
+                ReplaceVariables(v, variables);
+                std::vector<std::wstring> langs;
+                stringtok(langs, v, true, L";");
+                for (const auto& lang : langs)
+                    lexers[lang] = lex;
+            }
+
+            // now parse all the data for this lexer
+            LexerData lexerdata = m_lexerdata[lex];
+            LexerData userlexerdata;
+            lexerdata.ID     = lex;
+            userlexerdata.ID = lex;
+            CSimpleIni::TNamesDepend lexdatakeys;
+            ini->GetAllKeys(l.second.c_str(), lexdatakeys);
+            for (const auto& it : lexdatakeys)
+            {
+                if (_wcsnicmp(L"Style", it, 5) == 0)
+                {
+                    StyleData style;
+                    ParseStyle(it, ini->GetValue(l.second.c_str(), it, L""), variables, style);
+                    int pos;
+                    if (!CAppUtils::TryParse(it + 5, pos, false))
+                        APPVERIFY(false);
+                    lexerdata.Styles[pos]     = style;
+                    userlexerdata.Styles[pos] = std::move(style);
+                }
+                else if (_wcsnicmp(L"Prop_", it, 5) == 0)
+                {
+                    std::string n                          = CUnicodeUtils::StdGetUTF8(it + 5);
+                    std::string vl                         = CUnicodeUtils::StdGetUTF8(ini->GetValue(l.second.c_str(), it, L""));
+                    lexerdata.Properties[n]                = vl;
+                    userlexerdata.Properties[std::move(n)] = std::move(vl);
+                }
+            }
+            m_lexerdata[lexerdata.ID] = std::move(lexerdata);
+            if (isUserConfig)
+                m_userlexerdata[lexerdata.ID] = std::move(userlexerdata);
+        }
+    }
+
+    for (const auto& [ini, isUserConfig] : inis)
+    {
+        CSimpleIni::TNamesDepend filelangkeys;
+        ini->GetAllKeys(L"filelanguage", filelangkeys);
+        for (const auto& filelangkey : filelangkeys)
+        {
+            auto         utf8filelangkey = CUnicodeUtils::StdGetUTF8(filelangkey);
+            std::wstring v               = ini->GetValue(L"filelanguage", filelangkey);
+            ReplaceVariables(v, variables);
+            std::vector<std::wstring> files;
+            stringtok(files, v, true, L";");
+            for (const auto& f : files)
+            {
+                m_fileLang[CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(f))] = utf8filelangkey;
+            }
+        }
+        CSimpleIni::TNamesDepend autolangkeys;
+        ini->GetAllKeys(L"autolanguage", autolangkeys);
+        for (const auto& autolangkey : autolangkeys)
+        {
+            auto         utf8autolangkey = CUnicodeUtils::StdGetUTF8(autolangkey);
+            std::wstring v               = ini->GetValue(L"autolanguage", autolangkey);
+            ReplaceVariables(v, variables);
+            std::vector<std::wstring> exts;
+            stringtok(exts, v, true, L";");
+            for (const auto& e : exts)
+            {
+                m_autoextLang[CUnicodeUtils::StdGetUTF8(e)] = utf8autolangkey;
+            }
+        }
+        if (isUserConfig)
+        {
+            CSimpleIni::TNamesDepend autopathkeys;
+            ini->GetAllKeys(L"pathlanguage", autopathkeys);
+            for (const auto& apppathkey : autopathkeys)
+            {
+                std::wstring v = ini->GetValue(L"pathlanguage", apppathkey);
+                auto         f = v.find(L'*');
+                if (f != std::wstring::npos)
+                {
+                    std::wstring p = v.substr(0, f);
+                    m_pathsLang[p] = CUnicodeUtils::StdGetUTF8(v.substr(f + 1));
+                    m_pathsForLang.push_back(std::move(p));
+                }
+            }
+        }
+
+        CSimpleIni::TNamesDepend langkeys;
+        ini->GetAllKeys(L"language", langkeys);
+        for (const auto& langkey : langkeys)
+        {
+            auto         utf8langkey = CUnicodeUtils::StdGetUTF8(langkey);
+            auto&        langdata    = m_Langdata[utf8langkey];
+            std::wstring v           = ini->GetValue(L"language", langkey, L"");
+            ReplaceVariables(v, variables);
+            std::vector<std::wstring> exts;
+            stringtok(exts, v, true, L";");
+            std::wstring filters;
+            for (const auto& e : exts)
+            {
+                m_extLang.insert({CUnicodeUtils::StdGetUTF8(e), utf8langkey});
+                if (isUserConfig)
+                    m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = utf8langkey;
+                else
+                {
+                    if (!filters.empty())
+                        filters.push_back(TEXT(';'));
+                    filters += TEXT("*.") + e;
+                }
+            }
+            if (!filters.empty())
+                m_fileTypes.push_back(std::make_pair(std::wstring(langkey) + TEXT(" file"), std::move(filters)));
+
+            std::wstring langsect = L"lang_";
+            langsect += langkey;
+            CSimpleIni::TNamesDepend specLangKeys;
+            ini->GetAllKeys(langsect.c_str(), specLangKeys);
+            LanguageData ld;
+            if (isUserConfig)
+            {
+                ld = langdata;
+            }
+            ld.lexer = lexers[langkey];
+            for (const auto& sk : specLangKeys)
+            {
+                if (_wcsnicmp(L"keywords", sk, 8) == 0)
+                {
+                    int vn;
+                    if (!CAppUtils::TryParse(sk + 8, vn, false))
+                        APPVERIFY(false);
+                    ld.keywordlist[vn] = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
+                }
+                else if (_wcsicmp(L"CommentLine", sk) == 0)
+                {
+                    ld.commentline = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
+                    ld.commentline.erase(ld.commentline.find_last_not_of('~') + 1); // Erase '~'
+                }
+                else if (_wcsicmp(L"CommentStreamStart", sk) == 0)
+                {
+                    ld.commentstreamstart = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
+                    ld.commentstreamstart.erase(ld.commentstreamstart.find_last_not_of('~') + 1); // Erase '~'
+                }
+                else if (_wcsicmp(L"CommentStreamEnd", sk) == 0)
+                {
+                    ld.commentstreamend = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
+                    ld.commentstreamend.erase(ld.commentstreamend.find_last_not_of('~') + 1); // Erase '~'
+                }
+                else if (_wcsicmp(L"CommentLineAtStart", sk) == 0)
+                {
+                    int vn;
+                    if (!CAppUtils::TryParse(
+                            ini->GetValue(langsect.c_str(), sk), vn, false))
+                        APPVERIFY(false);
+                    ld.commentlineatstart = vn != 0;
+                }
+                else if (_wcsicmp(L"FunctionRegex", sk) == 0)
+                {
+                    ld.functionregex = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
+                    ld.functionregex.erase(ld.functionregex.find_last_not_of('~') + 1); // Erase '~'
+                }
+                else if (_wcsicmp(L"FunctionRegexSort", sk) == 0)
+                {
+                    if (!CAppUtils::TryParse(
+                            ini->GetValue(langsect.c_str(), sk),
+                            ld.functionregexsort, false))
+                        APPVERIFY(false);
+                }
+                else if (_wcsicmp(L"FunctionRegexTrim", sk) == 0)
+                {
+                    std::string s = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
+                    s.erase(s.find_last_not_of('~') + 1); // Erase '~'
+                    stringtok(ld.functionregextrim, s, true, ",");
+                }
+                else if (_wcsicmp(L"UserFunctions", sk) == 0)
+                {
+                    if (!CAppUtils::TryParse(
+                            ini->GetValue(langsect.c_str(), sk),
+                            ld.userfunctions, false))
+                        APPVERIFY(false);
+                }
+            }
+            langdata = std::move(ld);
+        }
+    }
+    m_fileTypes.sort([](const auto& first, const auto& second) {
+        return _tcsicmp(first.first.c_str(), second.first.c_str()) < 0;
+    });
+    m_fileTypes.push_front(std::make_pair(TEXT("All file"), TEXT("*.*")));
+    for (auto& e : m_fileTypes)
+        m_filterSpec.push_back({e.first.c_str(), e.second.c_str()});
 
     m_bLoaded = true;
 }
 
-const std::unordered_map<int, std::string>& CLexStyles::GetKeywordsForLang( const std::string& lang )
+const std::unordered_map<int, std::string>& CLexStyles::GetKeywordsForLang(const std::string& lang)
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
@@ -433,7 +442,7 @@ const std::unordered_map<int, std::string>& CLexStyles::GetKeywordsForLexer(int 
     return emptyUnorderedMap;
 }
 
-LanguageData * CLexStyles::GetLanguageData(const std::string& lang)
+LanguageData* CLexStyles::GetLanguageData(const std::string& lang)
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
@@ -476,7 +485,7 @@ void CLexStyles::GenerateUserKeywords(LanguageData& ld)
     ld.userkeywordsupdated = false;
 }
 
-const LexerData& CLexStyles::GetLexerDataForLang( const std::string& lang ) const
+const LexerData& CLexStyles::GetLexerDataForLang(const std::string& lang) const
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
@@ -498,8 +507,7 @@ const LexerData& CLexStyles::GetLexerDataForLexer(int lexer) const
 
 std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
 {
-    auto it = std::find_if(m_pathsLang.begin(), m_pathsLang.end(), [ & ](const auto& toFind)
-    {
+    auto it = std::find_if(m_pathsLang.begin(), m_pathsLang.end(), [&](const auto& toFind) {
         return _wcsicmp(toFind.first.c_str(), path.c_str()) == 0;
     });
     if (it != m_pathsLang.end())
@@ -518,8 +526,7 @@ std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
     }
 
     auto pathA = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(path));
-    auto fit = std::find_if(m_fileLang.begin(), m_fileLang.end(), [ & ](const auto& toFind)
-    {
+    auto fit   = std::find_if(m_fileLang.begin(), m_fileLang.end(), [&](const auto& toFind) {
         return _stricmp(toFind.first.c_str(), pathA.c_str()) == 0;
     });
 
@@ -529,8 +536,7 @@ std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
     }
     auto ext = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(path));
 
-    auto eit = std::find_if(m_extLang.begin(), m_extLang.end(), [ & ](const auto& toFind)
-    {
+    auto eit = std::find_if(m_extLang.begin(), m_extLang.end(), [&](const auto& toFind) {
         return _stricmp(toFind.first.c_str(), ext.c_str()) == 0;
     });
     if (eit != m_extLang.end())
@@ -538,8 +544,7 @@ std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
         return eit->second;
     }
 
-    auto ait = std::find_if(m_autoextLang.begin(), m_autoextLang.end(), [ & ](const auto& toFind)
-    {
+    auto ait = std::find_if(m_autoextLang.begin(), m_autoextLang.end(), [&](const auto& toFind) {
         return _stricmp(toFind.first.c_str(), ext.c_str()) == 0;
     });
     if (ait != m_autoextLang.end())
@@ -554,7 +559,7 @@ std::string CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaW
     if (doc.m_path.empty())
         return "";
     auto lang = GetLanguageForPath(doc.m_path);
-    if (!lang.empty()/* && lang.compare(L"Text")*/)
+    if (!lang.empty() /* && lang.compare(L"Text")*/)
         return lang;
 
     // no extension, and no previously set lexer for this path:
@@ -563,8 +568,7 @@ std::string CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaW
     // keep it very, very simple.
     edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
     OnOutOfScope(
-        edit.Call(SCI_SETDOCPOINTER, 0, 0);
-    );
+        edit.Call(SCI_SETDOCPOINTER, 0, 0););
 
     std::string line = edit.GetLine(0);
     for (const auto& m : lexDetectStrings)
@@ -584,10 +588,10 @@ std::string CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaW
     return lang;
 }
 
-std::wstring CLexStyles::GetUserExtensionsForLanguage( const std::wstring& lang ) const
+std::wstring CLexStyles::GetUserExtensionsForLanguage(const std::wstring& lang) const
 {
     std::wstring exts;
-    std::string l = CUnicodeUtils::StdGetUTF8(lang);
+    std::string  l = CUnicodeUtils::StdGetUTF8(lang);
     for (const auto& e : m_userextLang)
     {
         if (e.second.compare(l) == 0)
@@ -649,17 +653,17 @@ std::vector<std::wstring> CLexStyles::GetLanguages() const
     return langs;
 }
 
-void CLexStyles::ReplaceVariables( std::wstring& s, const std::unordered_map<std::wstring, std::wstring>& vars ) const
+void CLexStyles::ReplaceVariables(std::wstring& s, const std::unordered_map<std::wstring, std::wstring>& vars) const
 {
     size_t pos = s.find(L"$(");
     while (pos != std::wstring::npos)
     {
-        size_t pos2 = s.find(L')', pos);
-        std::wstring varname = s.substr(pos, pos2-pos+1);
-        auto foundIt = vars.find(varname);
+        size_t       pos2    = s.find(L')', pos);
+        std::wstring varname = s.substr(pos, pos2 - pos + 1);
+        auto         foundIt = vars.find(varname);
         if (foundIt != vars.end())
         {
-            s = s.substr(0, pos) + foundIt->second + s.substr(pos2+1);
+            s = s.substr(0, pos) + foundIt->second + s.substr(pos2 + 1);
         }
         else
         {
@@ -669,39 +673,39 @@ void CLexStyles::ReplaceVariables( std::wstring& s, const std::unordered_map<std
     }
 }
 
-void CLexStyles::SetUserForeground( int ID, int style, COLORREF clr )
+void CLexStyles::SetUserForeground(int ID, int style, COLORREF clr)
 {
-    LexerData& ld = m_userlexerdata[ID];
-    StyleData& sd = ld.Styles[style];
+    LexerData& ld      = m_userlexerdata[ID];
+    StyleData& sd      = ld.Styles[style];
     sd.ForegroundColor = clr;
 }
 
-void CLexStyles::SetUserBackground( int ID, int style, COLORREF clr )
+void CLexStyles::SetUserBackground(int ID, int style, COLORREF clr)
 {
-    LexerData& ld = m_userlexerdata[ID];
-    StyleData& sd = ld.Styles[style];
+    LexerData& ld      = m_userlexerdata[ID];
+    StyleData& sd      = ld.Styles[style];
     sd.BackgroundColor = clr;
 }
 
-void CLexStyles::SetUserFont( int ID, int style, const std::wstring& font )
+void CLexStyles::SetUserFont(int ID, int style, const std::wstring& font)
 {
     LexerData& ld = m_userlexerdata[ID];
     StyleData& sd = ld.Styles[style];
-    sd.FontName = font;
+    sd.FontName   = font;
 }
 
-void CLexStyles::SetUserFontSize( int ID, int style, int size )
+void CLexStyles::SetUserFontSize(int ID, int style, int size)
 {
     LexerData& ld = m_userlexerdata[ID];
     StyleData& sd = ld.Styles[style];
-    sd.FontSize = size;
+    sd.FontSize   = size;
 }
 
-void CLexStyles::SetUserFontStyle( int ID, int style, FontStyle fontstyle )
+void CLexStyles::SetUserFontStyle(int ID, int style, FontStyle fontstyle)
 {
     LexerData& ld = m_userlexerdata[ID];
     StyleData& sd = ld.Styles[style];
-    sd.FontStyle = fontstyle;
+    sd.FontStyle  = fontstyle;
 }
 
 void CLexStyles::ResetUserData()
@@ -716,7 +720,7 @@ void CLexStyles::ResetUserData()
 
 void CLexStyles::SaveUserData()
 {
-    CSimpleIni ini;
+    CSimpleIni   ini;
     std::wstring userStyleFile = CAppUtils::GetDataPath() + L"\\userconfig";
 
     if (PathFileExists(userStyleFile.c_str()))
@@ -731,21 +735,21 @@ void CLexStyles::SaveUserData()
             continue;
         // find the lexer section name
         std::wstring section = m_lexerSection[lexerID];
-        std::wstring v = std::to_wstring(lexerID);
+        std::wstring v       = std::to_wstring(lexerID);
         ini.SetValue(section.c_str(), L"Lexer", v.c_str());
         for (const auto& styleEntry : it.second.Styles)
         {
-            const int styleID = styleEntry.first;
-            const auto& styleData = styleEntry.second;
-            std::wstring style = CStringUtils::Format(L"Style%d", styleID);
-            std::wstring sSize = std::to_wstring(styleData.FontSize);
+            const int    styleID   = styleEntry.first;
+            const auto&  styleData = styleEntry.second;
+            std::wstring style     = CStringUtils::Format(L"Style%d", styleID);
+            std::wstring sSize     = std::to_wstring(styleData.FontSize);
             if (styleData.FontSize == 0)
                 sSize.clear();
-            int fore = GetRValue(styleData.ForegroundColor)<<16 | GetGValue(styleData.ForegroundColor)<<8 | GetBValue(styleData.ForegroundColor);
-            int back = GetRValue(styleData.BackgroundColor)<<16 | GetGValue(styleData.BackgroundColor)<<8 | GetBValue(styleData.BackgroundColor);
+            int fore = GetRValue(styleData.ForegroundColor) << 16 | GetGValue(styleData.ForegroundColor) << 8 | GetBValue(styleData.ForegroundColor);
+            int back = GetRValue(styleData.BackgroundColor) << 16 | GetGValue(styleData.BackgroundColor) << 8 | GetBValue(styleData.BackgroundColor);
             // styleNR=name;foreground;background;fontname;fontstyle;fontsize
             const auto& name = styleData.Name.empty() ? m_lexerdata[lexerID].Styles[styleID].Name : styleData.Name;
-            v = CStringUtils::Format(L"%s;%06X;%06X;%s;%d;%s", name.c_str(), fore, back, styleData.FontName.c_str(), styleData.FontStyle, sSize.c_str());
+            v                = CStringUtils::Format(L"%s;%06X;%06X;%s;%d;%s", name.c_str(), fore, back, styleData.FontName.c_str(), styleData.FontStyle, sSize.c_str());
             ini.SetValue(section.c_str(), style.c_str(), v.c_str());
         }
     }
@@ -755,8 +759,8 @@ void CLexStyles::SaveUserData()
 
     for (const auto& it : m_userextLang)
     {
-        auto lang = CUnicodeUtils::StdGetUnicode(it.second);
-        std::wstring v = ini.GetValue(L"language", lang.c_str(), L"");
+        auto         lang = CUnicodeUtils::StdGetUnicode(it.second);
+        std::wstring v    = ini.GetValue(L"language", lang.c_str(), L"");
         if (!v.empty())
             v += L";";
         v += CUnicodeUtils::StdGetUnicode(it.first);
@@ -768,8 +772,8 @@ void CLexStyles::SaveUserData()
 
     for (const auto& it : m_autoextLang)
     {
-        auto lang = CUnicodeUtils::StdGetUnicode(it.second);
-        std::wstring v = ini.GetValue(L"autolanguage", lang.c_str(), L"");
+        auto         lang = CUnicodeUtils::StdGetUnicode(it.second);
+        std::wstring v    = ini.GetValue(L"autolanguage", lang.c_str(), L"");
         if (!v.empty())
             v += L";";
         v += CUnicodeUtils::StdGetUnicode(it.first);
@@ -793,9 +797,9 @@ void CLexStyles::SaveUserData()
     ResetUserData();
 }
 
-void CLexStyles::SetUserExt( const std::wstring& ext, const std::string& lang )
+void CLexStyles::SetUserExt(const std::wstring& ext, const std::string& lang)
 {
-    auto iter = m_userextLang.begin();
+    auto iter    = m_userextLang.begin();
     auto endIter = m_userextLang.end();
     for (; iter != endIter;)
     {
@@ -812,7 +816,7 @@ void CLexStyles::SetUserExt( const std::wstring& ext, const std::string& lang )
     }
 }
 
-const std::string& CLexStyles::GetCommentLineForLang( const std::string& lang ) const
+const std::string& CLexStyles::GetCommentLineForLang(const std::string& lang) const
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
@@ -820,7 +824,7 @@ const std::string& CLexStyles::GetCommentLineForLang( const std::string& lang ) 
     return emptyString;
 }
 
-const std::string& CLexStyles::GetCommentStreamStartForLang( const std::string& lang ) const
+const std::string& CLexStyles::GetCommentStreamStartForLang(const std::string& lang) const
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
@@ -828,7 +832,7 @@ const std::string& CLexStyles::GetCommentStreamStartForLang( const std::string& 
     return emptyString;
 }
 
-const std::string& CLexStyles::GetCommentStreamEndForLang( const std::string& lang ) const
+const std::string& CLexStyles::GetCommentStreamEndForLang(const std::string& lang) const
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
@@ -836,7 +840,7 @@ const std::string& CLexStyles::GetCommentStreamEndForLang( const std::string& la
     return emptyString;
 }
 
-bool CLexStyles::GetCommentLineAtStartForLang( const std::string& lang ) const
+bool CLexStyles::GetCommentLineAtStartForLang(const std::string& lang) const
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
@@ -844,7 +848,7 @@ bool CLexStyles::GetCommentLineAtStartForLang( const std::string& lang ) const
     return false;
 }
 
-const std::string& CLexStyles::GetFunctionRegexForLang( const std::string& lang ) const
+const std::string& CLexStyles::GetFunctionRegexForLang(const std::string& lang) const
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
@@ -852,7 +856,7 @@ const std::string& CLexStyles::GetFunctionRegexForLang( const std::string& lang 
     return emptyString;
 }
 
-int CLexStyles::GetFunctionRegexSortForLang( const std::string& lang ) const
+int CLexStyles::GetFunctionRegexSortForLang(const std::string& lang) const
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
@@ -860,7 +864,7 @@ int CLexStyles::GetFunctionRegexSortForLang( const std::string& lang ) const
     return 0;
 }
 
-const std::vector<std::string>& CLexStyles::GetFunctionRegexTrimForLang( const std::string& lang ) const
+const std::vector<std::string>& CLexStyles::GetFunctionRegexTrimForLang(const std::string& lang) const
 {
     auto lt = m_Langdata.find(lang);
     if (lt != m_Langdata.end())
@@ -879,9 +883,8 @@ void CLexStyles::SetLangForPath(const std::wstring& path, const std::string& lan
         {
             // extension has a different language set than the user selected
             // only add this if the extension is set in m_autoextLang
-            std::string e = CUnicodeUtils::StdGetUTF8(sExt);
-            auto it = std::find_if(m_extLang.begin(), m_extLang.end(), [ & ](const auto& toFind)
-            {
+            std::string e  = CUnicodeUtils::StdGetUTF8(sExt);
+            auto        it = std::find_if(m_extLang.begin(), m_extLang.end(), [&](const auto& toFind) {
                 return _stricmp(toFind.first.c_str(), e.c_str()) == 0;
             });
             if (it == m_extLang.end())
