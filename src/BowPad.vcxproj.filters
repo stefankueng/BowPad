@@ -25,6 +25,9 @@
     <Filter Include="tinyexpr">
       <UniqueIdentifier>{ce722194-8b55-4561-bb01-c866d3a801cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Lexer">
+      <UniqueIdentifier>{f9239f5e-a879-4435-a086-a6299f7d59a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -658,6 +661,9 @@
     </ClCompile>
     <ClCompile Include="..\ext\tinyexpr\tinyexpr.c">
       <Filter>tinyexpr</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomLexers\LexSimple.cxx">
+      <Filter>Lexer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

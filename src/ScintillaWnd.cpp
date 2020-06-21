@@ -30,15 +30,19 @@
 #include "CommandHandler.h"
 #include "SmartHandle.h"
 #include "DPIAware.h"
+#include "../ext/scintilla/include/ILexer.h"
+#include "../ext/scintilla/lexlib/LexerModule.h"
+#include "../ext/scintilla/src/Catalogue.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 #include <uxtheme.h>
 #include <chrono>
 
-extern IUIFramework * g_pFramework;
-extern std::string    g_sHighlightString;       // from CmdFindReplace
-extern int            g_searchMarkerCount;      // from CmdFindReplace
+extern IUIFramework*          g_pFramework;
+extern std::string            g_sHighlightString;  // from CmdFindReplace
+extern int                    g_searchMarkerCount; // from CmdFindReplace
+extern Scintilla::LexerModule lmSimple;
 
 namespace
 {
@@ -142,6 +146,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     if (m_pSciMsg==nullptr || m_pSciWndData==0)
         return false;
+
+    Scintilla::Catalogue::AddLexerModule(&lmSimple);
 
     m_docScroll.InitScintilla(this);
 
