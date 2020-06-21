@@ -2571,9 +2571,8 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
     long long number = strtoll(sWord.c_str(), &ep, 0);
     // Be forgiving if given 100xyz, show 100, but
     // don't accept xyz100, show nothing.
-    // BTW: errno seems to be 0 even if nothing is converted.
     // Must convert some digits of string.
-    if (errno == 0 && ep != &sWord[0])
+    if (errno == 0 && (*ep == 0))
     {
         auto bs = to_bit_wstring(number, true);
         auto sCallTip = CStringUtils::Format(L"Dec: %lld\nHex: 0x%llX\nOct: %#llo\nBin: %s (%d digits)",
@@ -2599,6 +2598,17 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
     }
     int err = 0;
     auto exprValue = te_interp(sWord.c_str(), &err);
+    if (err)
+    {
+        auto wordcharsbuffer = m_editor.GetWordChars();
+        OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)wordcharsbuffer.c_str()));
+
+        m_editor.Call(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-+*/!%~()_.,");
+        selStart = m_editor.Call(SCI_WORDSTARTPOSITION, scn.position, false);
+        selEnd = m_editor.Call(SCI_WORDENDPOSITION, scn.position, false);
+        sWord = m_editor.GetTextRange(static_cast<long>(selStart), static_cast<long>(selEnd));
+    }
+    exprValue = te_interp(sWord.c_str(), &err);
     if (err == 0)
     {
         long long ulongVal = (long long)exprValue;
