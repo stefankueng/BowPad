@@ -63,7 +63,9 @@ enum SimpleStyles
     Word6,
     Word7,
     Word8,
-    Word9
+    Word9,
+    MarkedWord1,
+    MarkedWord2
 };
 
 struct OptionsSimple
@@ -75,6 +77,9 @@ struct OptionsSimple
     std::string linecomment;
     std::string inlineCommentStart;
     std::string inlineCommentEnd;
+
+    std::string markedWords1;
+    std::string markedWords2;
 
     int  eol              = 0;
     bool ws1CaseSensitive = false;
@@ -132,6 +137,9 @@ struct OptionSetSimple : public OptionSet<OptionsSimple>
         DefineProperty("inlineCommentStart", &OptionsSimple::inlineCommentStart);
         DefineProperty("inlineCommentEnd", &OptionsSimple::inlineCommentEnd);
         DefineProperty("eol", &OptionsSimple::eol);
+
+        DefineProperty("markedWords1", &OptionsSimple::markedWords1);
+        DefineProperty("markedWords2", &OptionsSimple::markedWords2);
 
         DefineProperty("ws1CaseSensitive", &OptionsSimple::ws1CaseSensitive);
         DefineProperty("ws2CaseSensitive", &OptionsSimple::ws2CaseSensitive);
@@ -405,6 +413,16 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
                     sc.GetCurrentLowered(sl, _countof(sl));
                     sc.GetCurrent(s, _countof(s));
 
+                    // first check for markedWords
+                    if (!options.markedWords1.empty() && (strncmp(options.markedWords1.c_str(), s, options.markedWords1.size())==0))
+                    {
+                        sc.ChangeState(SimpleStyles::MarkedWord1);
+                    }
+                    else if (!options.markedWords2.empty() && (strncmp(options.markedWords2.c_str(), s, options.markedWords2.size()) == 0))
+                    {
+                        sc.ChangeState(SimpleStyles::MarkedWord2);
+                    }
+
                     auto doKeyWords = [&](WordListAbridged& keywords, int style) {
                         if (keywords.Length())
                         {
@@ -447,6 +465,11 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
                     visibleChars = 0;
                 }
                 break;
+            case SimpleStyles::MarkedWord1:
+            case SimpleStyles::MarkedWord2:
+                if (IsASpaceOrTab(sc.ch) || sc.ch == '\r' || sc.ch == '\n' || IsAnOperator(&sc, options.operatorsvec))
+                    sc.SetState(SimpleStyles::Default);
+                break;
         }
 
         // Determine if a new state should be entered.
@@ -481,6 +504,14 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
             else if (IsAnOperator(&sc, options.operatorsvec))
             {
                 sc.SetState(SimpleStyles::Operator);
+            }
+            else if (sc.Match(options.markedWords1.c_str()))
+            {
+                sc.SetState(SimpleStyles::MarkedWord1);
+            }
+            else if (sc.Match(options.markedWords2.c_str()))
+            {
+                sc.SetState(SimpleStyles::MarkedWord2);
             }
         }
 
