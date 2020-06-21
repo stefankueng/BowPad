@@ -3171,6 +3171,49 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         files.push_back(pathBuf.get());
     }
 
+    if (files.size() == 1)
+    {
+        if (CPathUtils::GetFileExtension(files[0]) == L"bplex")
+        {
+            // ask whether to install or open the file
+            ResString rTitle(hRes, IDS_IMPORTBPLEX_TITLE);
+            ResString rQuestion(hRes, IDS_IMPORTBPLEX_QUESTION);
+            ResString rImport(hRes, IDS_IMPORTBPLEX_IMPORT);
+            ResString rOpen(hRes, IDS_IMPORTBPLEX_OPEN);
+            std::wstring sQuestion = CStringUtils::Format(rQuestion, CPathUtils::GetFileName(files[0]).c_str());
+
+            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+            TASKDIALOG_BUTTON aCustomButtons[2];
+            aCustomButtons[0].nButtonID = 100;
+            aCustomButtons[0].pszButtonText = rImport;
+            aCustomButtons[1].nButtonID = 101;
+            aCustomButtons[1].pszButtonText = rOpen;
+            tdc.pButtons = aCustomButtons;
+            tdc.cButtons = _countof(aCustomButtons);
+            assert(tdc.cButtons <= _countof(aCustomButtons));
+            tdc.nDefaultButton = 100;
+
+            tdc.hwndParent = *this;
+            tdc.hInstance = hRes;
+            tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
+            tdc.pszMainIcon = TD_INFORMATION_ICON;
+            tdc.pszMainInstruction = rTitle;
+            tdc.pszContent = sQuestion.c_str();
+            int nClickedBtn = 0;
+            HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, &closealldoall);
+            if (CAppUtils::FailedShowMessage(hr))
+                nClickedBtn = 0;
+            if (nClickedBtn == 100)
+            {
+                // import the file
+                CopyFile(files[0].c_str(), (CAppUtils::GetDataPath() + L"\\" + CPathUtils::GetFileName(files[0])).c_str(), FALSE);
+                return;
+            }
+        }
+    }
+
     BlockAllUIUpdates(true);
     OnOutOfScope(BlockAllUIUpdates(false););
 

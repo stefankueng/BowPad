@@ -213,6 +213,10 @@
 #define IDS_RUNASADMIN                  257
 #define IDS_FOLDTEXT                    258
 #define IDS_CUSTOMCOMMANDTITLE          259
+#define IDS_IMPORTBPLEX_TITLE           260
+#define IDS_IMPORTBPLEX_QUESTION        261
+#define IDS_IMPORTBPLEX_IMPORT          262
+#define IDS_IMPORTBPLEX_OPEN            263
 #define IDC_SEARCHCOMBO                 1000
 #define IDC_FINDBTN                     1001
 #define IDC_REPLACECOMBO                1002
