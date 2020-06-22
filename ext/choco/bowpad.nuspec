@@ -11,8 +11,10 @@
     <projectUrl>http://tools.stefankueng.com/BowPad.html</projectUrl>
     <tags>bowpad notepad editor text plugins admin</tags>
     <licenseUrl>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</licenseUrl>
-    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <iconUrl>https://github.com/stefankueng/BowPad/raw/main/src/res/BowPad256.png</iconUrl>
+    <projectSourceUrl>https://github.com/stefankueng/BowPad</projectSourceUrl>
+    <bugTrackerUrl>https://github.com/stefankueng/BowPad/issues</bugTrackerUrl>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
