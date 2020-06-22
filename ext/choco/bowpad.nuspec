@@ -12,7 +12,7 @@
     <tags>bowpad notepad editor text plugins admin</tags>
     <licenseUrl>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <iconUrl>https://github.com/stefankueng/BowPad/raw/master/src/res/BowPad128.png</iconUrl>
+    <iconUrl>https://github.com/stefankueng/BowPad/raw/main/src/res/BowPad256.png</iconUrl>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
