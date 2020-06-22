@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2020-05-08 20:52+0200\n"
+"PO-Revision-Date: 2020-06-22 18:58+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -269,6 +269,10 @@ msgstr "BowPad"
 #. Resource IDs: (130)
 msgid "BowPad Text Editor"
 msgstr "BowPad Text Editor"
+
+#. Resource IDs: (260)
+msgid "BowPad lexer file"
+msgstr "BowPad Lexerdatei"
 
 #. Resource IDs: (60011, 60067, 60082)
 msgid "C"
@@ -1135,6 +1139,15 @@ msgstr "Gross/Kleinschreibung ignorieren."
 msgid "Ignore word for this session"
 msgstr "Ignoriere Wort für diese Sitzung"
 
+#. Resource IDs: (262)
+msgid ""
+"Import\n"
+"The lexer file is imported. Restart BowPad to use the new lexer."
+msgstr ""
+"Importieren\n"
+"Die Lexerdatei wird importiert. Starten Sie BowPad neu um die neuen "
+"Farbstile zu verwenden."
+
 #. Resource IDs: (60606, 60607)
 msgid "Include uppercase"
 msgstr "Grossschreibung einschliessen"
@@ -1621,6 +1634,14 @@ msgstr "Offene Dateien: %%c%06X%ld%%r"
 #, c-format
 msgid "Open: %%c%06X%ld%%r"
 msgstr "Offen: %%c%06X%ld%%r"
+
+#. Resource IDs: (263)
+msgid ""
+"Open\n"
+"The lexer file is opened in BowPad, ready for editing."
+msgstr ""
+"Öffnen\n"
+"Die Lexerdatei wird in BowPad geöffnet zum editieren."
 
 #. Resource IDs: (60045)
 msgid "Opens one or more files"
@@ -2441,6 +2462,11 @@ msgstr "WS"
 #. Resource IDs: (1059)
 msgid "Web Search:"
 msgstr "Websuche:"
+
+#. Resource IDs: (261)
+#, c-format
+msgid "What do you want to do with the BowPad lexer file \"%s\"?"
+msgstr "Was möchten Sie mit der BowPad Lexerdatei \"%s\" machen?"
 
 #. Resource IDs: (1094)
 msgid "When loading, prefer utf8 over ANSI/Local"
