@@ -239,6 +239,10 @@ msgstr ""
 msgid "BowPad Text Editor"
 msgstr ""
 
+#. Resource IDs: (260)
+msgid "BowPad lexer file"
+msgstr ""
+
 #. Resource IDs: (60011, 60067, 60082)
 msgid "C"
 msgstr ""
@@ -993,6 +997,10 @@ msgstr ""
 msgid "Ignore word for this session"
 msgstr ""
 
+#. Resource IDs: (262)
+msgid "Import\nThe lexer file is imported. Restart BowPad to use the new lexer."
+msgstr ""
+
 #. Resource IDs: (60606, 60607)
 msgid "Include uppercase"
 msgstr ""
@@ -1442,6 +1450,10 @@ msgstr ""
 #. Resource IDs: (253)
 #, c-format
 msgid "Open: %%c%06X%ld%%r"
+msgstr ""
+
+#. Resource IDs: (263)
+msgid "Open\nThe lexer file is opened in BowPad, ready for editing."
 msgstr ""
 
 #. Resource IDs: (60045)
@@ -2210,6 +2222,11 @@ msgstr ""
 
 #. Resource IDs: (1059)
 msgid "Web Search:"
+msgstr ""
+
+#. Resource IDs: (261)
+#, c-format
+msgid "What do you want to do with the BowPad lexer file \"%s\"?"
 msgstr ""
 
 #. Resource IDs: (1094)
