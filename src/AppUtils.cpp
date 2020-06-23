@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -141,7 +141,7 @@ bool CAppUtils::CheckForUpdate(bool force)
 
             std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
 
-            std::wstring sCheckURL = L"https://github.com/stefankueng/BowPad/raw/master/version.txt";
+            std::wstring sCheckURL = L"https://raw.githubusercontent.com/stefankueng/BowPad/main/version.txt";
             HRESULT res = URLDownloadToFile(nullptr, sCheckURL.c_str(), tempfile.c_str(), 0, nullptr);
             if (res == S_OK)
             {
