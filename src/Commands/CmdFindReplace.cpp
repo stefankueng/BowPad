@@ -1499,6 +1499,14 @@ void CFindReplaceDlg::DoReplace( int id )
         SearchStringNotFound();
         return; // Empty search term, nothing to find.
     }
+    if (g_searchFlags & SCFIND_REGEXP)
+    {
+        // replace all "\n" chars with "(?:\n|\r\n|\n\r)"
+        if ((g_findString.size() > 1) && (g_findString.find("\\r") == std::wstring::npos))
+        {
+            SearchReplace(g_findString, "\\n", "(!:\\n|\\r\\n|\\n\\r)");
+        }
+    }
 
     std::string sReplaceString = CUnicodeUtils::StdGetUTF8(replaceText);
     if ((g_searchFlags & SCFIND_REGEXP) != 0)
