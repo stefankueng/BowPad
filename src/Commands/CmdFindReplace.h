@@ -231,7 +231,6 @@ private:
     size_t                      m_maxSearchResults = 10000;
     SIZE                        m_originalSize = { 0 };
     bool                        m_open = false;
-    bool                        m_reactivation = false;
     volatile size_t             m_foundsize = 0;
     int                         m_themeCallbackId = 0;
 

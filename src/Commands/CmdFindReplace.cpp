@@ -372,29 +372,6 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             return (LRESULT)GetSysColorBrush(COLOR_BTNFACE);
         }
         break;
-    case WM_ACTIVATE:
-        if (wParam == WA_INACTIVE)
-        {
-            SetTransparency(150);
-            // This is arguable, but we don't make some seldom used options too "sticky"
-            // because any later interaction with other buttons can be unexpected.
-            // Only do this for re-activation because with initial activation
-            // the values can be set by the app and we don't want to clear them
-            // before we have even used them.
-            if (m_reactivation)
-            {
-                SetDlgItemText(*this, IDC_SEARCHFILES, L"");
-                Button_SetCheck(GetDlgItem(*this, IDC_FUNCTIONS), BST_UNCHECKED);
-                Button_SetCheck(GetDlgItem(*this, IDC_SEARCHSUBFOLDERS), BST_CHECKED);
-                Button_SetCheck(GetDlgItem(*this, IDC_MATCHWORD), BST_UNCHECKED);
-            }
-            m_reactivation = true;
-        }
-        else
-        {
-            SetTransparency(255);
-        }
-        break;
     case WM_ENTERSIZEMOVE:
     {
         RECT resultsRect;
