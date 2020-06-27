@@ -275,6 +275,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.LargeImages>
     </Command>
     <Command Name="cmdFindSelectedPrev" />
+    <Command Name="cmdRegexCapture" LabelTitle="Capture Regex" TooltipTitle="Capture regular expressions" TooltipDescription="Get captures of a regular expression from the current tab" Keytip="F">
+      <Command.LargeImages>
+        <Image>res/RegexCaptureL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdDelete" LabelTitle="Delete" Keytip="DEL">
       <Command.SmallImages>
         <Image>res/DeleteS.bmp</Image>
@@ -921,8 +926,9 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdUndo" />
             <Button CommandName="cmdRedo" />
           </Group>
-          <Group CommandName="cmdGroupFind" SizeDefinition="FourButtons">
+          <Group CommandName="cmdGroupFind" SizeDefinition="FiveButtons">
             <Button CommandName="cmdFindReplace" />
+            <Button CommandName="cmdRegexCapture" />
             <Button CommandName="cmdFindNext" />
             <Button CommandName="cmdFindPrev" />
             <Button CommandName="cmdFindSelectedNext" />

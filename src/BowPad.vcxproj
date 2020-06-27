@@ -354,6 +354,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="BPBaseDialog.h" />
     <ClInclude Include="ChoseDlg.h" />
     <ClInclude Include="ColorButton.h" />
     <ClInclude Include="Commands\CmdBlanks.h" />
@@ -387,6 +388,7 @@
     <ClInclude Include="Commands\CmdPrevNext.h" />
     <ClInclude Include="Commands\CmdPrint.h" />
     <ClInclude Include="Commands\CmdRandom.h" />
+    <ClInclude Include="Commands\CmdRegexCapture.h" />
     <ClInclude Include="Commands\CmdScripts.h" />
     <ClInclude Include="Commands\CmdSelectTab.h" />
     <ClInclude Include="Commands\CmdSession.h" />
@@ -477,6 +479,7 @@
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AppUtils.cpp" />
     <ClCompile Include="BowPad.cpp" />
+    <ClCompile Include="BPBaseDialog.cpp" />
     <ClCompile Include="ChoseDlg.cpp" />
     <ClCompile Include="ColorButton.cpp" />
     <ClCompile Include="Commands\CmdBlanks.cpp" />
@@ -507,6 +510,7 @@
     <ClCompile Include="Commands\CmdPrevNext.cpp" />
     <ClCompile Include="Commands\CmdPrint.cpp" />
     <ClCompile Include="Commands\CmdRandom.cpp" />
+    <ClCompile Include="Commands\CmdRegexCapture.cpp" />
     <ClCompile Include="Commands\CmdScripts.cpp" />
     <ClCompile Include="Commands\CmdSession.cpp" />
     <ClCompile Include="Commands\CmdSort.cpp" />

@@ -375,6 +375,12 @@
     <ClInclude Include="..\ext\tinyexpr\tinyexpr.h">
       <Filter>tinyexpr</Filter>
     </ClInclude>
+    <ClInclude Include="Commands\CmdRegexCapture.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="BPBaseDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -664,6 +670,12 @@
     </ClCompile>
     <ClCompile Include="CustomLexers\LexSimple.cxx">
       <Filter>Lexer</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\CmdRegexCapture.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="BPBaseDialog.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

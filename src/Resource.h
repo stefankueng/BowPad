@@ -201,6 +201,7 @@
 #define IDB_BITMAP1                     246
 #define IDB_EMPTYCHECKED                246
 #define IDS_FETCHING_PLUGINS_LIST       247
+#define IDD_REGEXCAPTUREDLG             247
 #define IDS_NO_PLUGINS_AVAILABLE        248
 #define IDS_STATUS_CURPOS               249
 #define IDS_STATUS_CURPOSLONG           250
@@ -327,6 +328,16 @@
 #define IDC_LF_RADIO                    1096
 #define IDC_RADIO3                      1097
 #define IDC_CR_RADIO                    1097
+#define IDC_REGEXCOMBO                  1098
+#define IDC_CAPTURECOMBO                1099
+#define IDC_CUSTOM1                     1100
+#define IDC_SCINTILLA                   1100
+#define IDC_REGEXLABEL                  1101
+#define IDC_CAPTURELABEL                1102
+#define IDC_INFOLABEL                   1103
+#define IDC_ICASE                       1104
+#define IDC_CHECK2                      1105
+#define IDC_DOTNEWLINE                  1105
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -334,9 +345,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        247
+#define _APS_NEXT_RESOURCE_VALUE        248
 #define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         1098
+#define _APS_NEXT_CONTROL_VALUE         1106
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

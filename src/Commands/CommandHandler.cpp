@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,49 +18,50 @@
 
 #include "CommandHandler.h"
 
-#include "CmdMRU.h"
-#include "CmdFiles.h"
-#include "CmdUndo.h"
+#include "CmdBlanks.h"
+#include "CmdBookmarks.h"
 #include "CmdClipboard.h"
-#include "CmdLineWrap.h"
-#include "CmdWhiteSpace.h"
-#include "CmdLoadEncoding.h"
 #include "CmdCodeStyle.h"
-#include "CmdEOL.h"
-#include "CmdPrevNext.h"
-#include "CmdFindReplace.h"
-#include "CmdMisc.h"
-#include "CmdStyleConfigurator.h"
-#include "CmdVerticalEdge.h"
 #include "CmdComment.h"
 #include "CmdConvertCase.h"
-#include "CmdLines.h"
-#include "CmdPrint.h"
+#include "CmdDefaultEncoding.h"
+#include "CmdEOL.h"
+#include "CmdFiles.h"
+#include "CmdFindReplace.h"
+#include "CmdFolding.h"
+#include "CmdFont.h"
+#include "CmdFunctions.h"
 #include "CmdGotoLine.h"
 #include "CmdGotoSymbol.h"
-#include "CmdSelectTab.h"
-#include "CmdBlanks.h"
-#include "CmdZoom.h"
-#include "CmdBookmarks.h"
-#include "CmdRandom.h"
-#include "CmdLanguage.h"
 #include "CmdHeaderSource.h"
+#include "CmdLanguage.h"
 #include "CmdLaunch.h"
-#include "CmdSession.h"
-#include "CmdFunctions.h"
-#include "CmdFont.h"
-#include "CmdOpenSelection.h"
+#include "CmdLineNumbers.h"
+#include "CmdLines.h"
+#include "CmdLineWrap.h"
+#include "CmdLoadEncoding.h"
+#include "CmdMisc.h"
+#include "CmdMRU.h"
 #include "CmdNewCopy.h"
-#include "CmdDefaultEncoding.h"
-#include "CmdScripts.h"
-#include "CmdSpellcheck.h"
+#include "CmdOpenSelection.h"
 #include "CmdPlugins.h"
 #include "CmdPluginsConfig.h"
-#include "CmdTabList.h"
+#include "CmdPrevNext.h"
+#include "CmdPrint.h"
+#include "CmdRandom.h"
+#include "CmdRegexCapture.h"
+#include "CmdScripts.h"
+#include "CmdSelectTab.h"
+#include "CmdSession.h"
 #include "CmdSort.h"
+#include "CmdSpellcheck.h"
+#include "CmdStyleConfigurator.h"
 #include "CmdSummary.h"
-#include "CmdLineNumbers.h"
-#include "CmdFolding.h"
+#include "CmdTabList.h"
+#include "CmdUndo.h"
+#include "CmdVerticalEdge.h"
+#include "CmdWhiteSpace.h"
+#include "CmdZoom.h"
 
 #include "DirFileEnum.h"
 #include "AppUtils.h"
@@ -161,6 +162,7 @@ void CCommandHandler::Init(void * obj)
     Add<CCmdFunctions>(obj);
     Add<CCmdGotoLine>(obj);
     Add<CCmdGotoSymbol>(obj);
+    Add<CCmdRegexCapture>(obj);
 
     Add<CCmdBookmarks>(obj);
     Add<CCmdBookmarkToggle>(obj);

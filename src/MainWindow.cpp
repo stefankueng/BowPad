@@ -238,6 +238,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
 }
 
 extern void FindReplace_Finish();
+extern void RegexCapture_Finish();
 
 CMainWindow::~CMainWindow()
 {
@@ -671,6 +672,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         break;
     case WM_DESTROY:
         FindReplace_Finish();
+        RegexCapture_Finish();
         g_pFramework->Destroy();
         PostQuitMessage(0);
         break;
