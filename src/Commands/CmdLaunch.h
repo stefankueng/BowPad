@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "BowPadUI.h"
 #include "BaseDialog.h"
 #include "DlgResizer.h"
+#include "StringUtils.h"
 #include <Shobjidl.h>
 #include <VersionHelpers.h>
 
@@ -72,6 +73,7 @@ public:
         {
             const auto& doc = GetActiveDocument();
             std::wstring tabpath = doc.m_path;
+            SearchReplace(tabpath, L"\\", L"/");
 
             DWORD newProcessId;
             hr = activationManager->ActivateApplication(path.c_str(), (L"file:///" + tabpath).c_str(), AO_NONE, &newProcessId);
@@ -79,7 +81,12 @@ public:
                 succeeded = true;
         }
         if (!succeeded)
-            return Launch(L"microsoft-edge:file:///$(TAB_PATH)");
+        {
+            // get the shell execute command for the new edge chrome
+            std::wstring cmd = CRegStdString(L"SOFTWARE\\Classes\\MSEdgeHTM\\shell\\open\\command\\", L"", false, HKEY_LOCAL_MACHINE);
+            SearchReplace(cmd, L"%1", L"$(TAB_PATH)");
+            return Launch(cmd);
+        }
         return true;
     }
     UINT GetCmdId() override
