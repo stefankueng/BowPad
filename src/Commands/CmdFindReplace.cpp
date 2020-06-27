@@ -178,16 +178,6 @@ namespace
         }
     }
 
-    void FlashWindow(HWND hwnd)
-    {
-        FLASHWINFO fi{ sizeof(FLASHWINFO) };
-        fi.hwnd = hwnd;
-        fi.dwFlags = FLASHW_CAPTION;
-        fi.uCount = 5;
-        fi.dwTimeout = 40;
-        FlashWindowEx(&fi);
-    }
-
     // Will work with vector or deque.
     template<typename T> static inline void move_append(T& dst, T& src)
     {
@@ -217,6 +207,7 @@ namespace
 
 CFindReplaceDlg::CFindReplaceDlg(void* obj)
     : ICommand(obj)
+    , CBPBaseDialog()
     , m_searchWnd(hRes)
 {
     m_maxSearchResults = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearchresults", MAX_SEARCHRESULTS);
@@ -695,20 +686,6 @@ bool CFindReplaceDlg::EnableListEndTracking(int list_id, bool enable)
 void CFindReplaceDlg::SetTheme(bool bDark)
 {
     CTheme::Instance().SetThemeForDialog(*this, bDark);
-}
-
-bool CFindReplaceDlg::EnableComboBoxDeleteEvents(int combo_id, bool enable)
-{
-    auto hCombo = GetDlgItem(*this, combo_id);
-    APPVERIFY(hCombo != nullptr);
-    if (!hCombo)
-        return false;
-    COMBOBOXINFO comboInfo = { sizeof comboInfo };
-    APPVERIFY(SendMessage(hCombo, CB_GETCOMBOBOXINFO, 0, reinterpret_cast<LPARAM>(&comboInfo)) != 0);
-    if (enable)
-        return SetWindowSubclass(comboInfo.hwndItem, ComboBoxListSubClassProc, 0,
-            reinterpret_cast<DWORD_PTR>(this)) != FALSE;
-    return RemoveWindowSubclass(comboInfo.hwndItem, ComboBoxListSubClassProc, 0) != FALSE;
 }
 
 
@@ -2345,121 +2322,6 @@ void CFindReplaceDlg::CheckRegex()
     }
 }
 
-static inline size_t GetBase(char current, size_t& size) noexcept
-{
-    switch (current)
-    {
-        case 'b': // 11111111
-            size = 8;
-            return 2;
-        case 'o': // 377
-            size = 3;
-            return 8;
-        case 'd': // 255
-            size = 3;
-            return 10;
-        case 'x': // 0xFF
-            size = 2;
-            return 16;
-        case 'u': // 0xCDCD
-            size = 4;
-            return 16;
-    }
-    size = 0;
-    return 0;
-}
-
-std::string CFindReplaceDlg::UnEscape(const std::string& str)
-{
-    size_t charLeft = str.length();
-    std::string result;
-    result.reserve(charLeft);
-    for (size_t i = 0; i < str.length(); ++i)
-    {
-        char current = str[i];
-        --charLeft;
-        if (current == '\\' && charLeft > 0)
-        {
-            // possible escape sequence
-            ++i;
-            --charLeft;
-            current = str[i];
-            switch (current)
-            {
-                case 'r':
-                    result.push_back('\r');
-                    break;
-                case 'n':
-                    result.push_back('\n');
-                    break;
-                case '0':
-                    result.push_back('\0');
-                    break;
-                case 't':
-                    result.push_back('\t');
-                    break;
-                case '\\':
-                    result.push_back('\\');
-                    break;
-                default:
-                {
-                    size_t size;
-                    auto base = GetBase(current, size);
-                    if (base != 0 && charLeft >= size)
-                    {
-                        size_t res = 0;
-                        if (ReadBase(&str[i + 1], &res, base, size))
-                        {
-                            result.push_back((char)res);
-                            i += size;
-                            break;
-                        }
-                    }
-                    // Unknown/invalid sequence, treat as regular text.
-                    result.push_back('\\');
-                    result.push_back(current);
-                }
-            }
-        }
-        else
-        {
-            result.push_back(current);
-        }
-    }
-    return result;
-}
-
-bool CFindReplaceDlg::ReadBase(const char* str, size_t* value, size_t base, size_t size)
-{
-    size_t i = 0, temp = 0;
-    *value = 0;
-    char max = '0' + (char)base - 1;
-    char current;
-    while (i < size)
-    {
-        current = str[i];
-        if (current >= 'A')
-        {
-            current &= 0xdf;
-            current -= ('A' - '0' - 10);
-        }
-        else if (current > '9')
-            return false;
-
-        if (current >= '0' && current <= max)
-        {
-            temp *= base;
-            temp += (current - '0');
-        }
-        else
-        {
-            return false;
-        }
-        ++i;
-    }
-    *value = temp;
-    return true;
-}
 
 void CFindReplaceDlg::EnableControls(bool bEnable)
 {
@@ -2561,67 +2423,6 @@ LRESULT CALLBACK CFindReplaceDlg::ListViewSubClassProc(HWND hWnd, UINT uMsg, WPA
     return result;
 }
 
-LRESULT CALLBACK CFindReplaceDlg::ComboBoxListSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR /*dwRefData*/)
-{
-    //CFindReplaceDlg* pThis = reinterpret_cast<CFindReplaceDlg*>(dwRefData);
-    switch (uMsg)
-    {
-        case WM_SYSKEYDOWN:
-        {
-            HWND hCombo = GetParent(hWnd);
-            auto isDroppedDown = ComboBox_GetDroppedState(hCombo) != FALSE;
-            if (isDroppedDown)
-            {
-                auto shiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-                auto controlDown = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-                auto altDown = (GetKeyState(VK_MENU) & 0x8000) != 0;
-                auto delDown = (GetKeyState(VK_DELETE) & 0x8000) != 0;
-                if (altDown && delDown && !controlDown && !shiftDown)
-                {
-                    // We don't use ResetContent because that clears
-                    // the edit control as well.
-                    int count = ComboBox_GetCount(hCombo);
-                    while (count > 0)
-                    {
-                        --count;
-                        ComboBox_DeleteString(hCombo, count);
-                    }
-                }
-            }
-            break;
-        }
-        case WM_KEYDOWN:
-        {
-            // When the dropdown list of the combobox is showing:
-            // Let control+delete clear the combobox is the listbox is currently dropped.
-            // Let delete do a delete of the currently selected item.
-            if (wParam == VK_DELETE)
-            {
-                HWND hCombo = GetParent(hWnd);
-                auto isDroppedDown = ComboBox_GetDroppedState(hCombo);
-                if (isDroppedDown)
-                {
-                    auto shiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-                    auto controlDown = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-                    if (!shiftDown && !controlDown)
-                    {
-                        int curSel = ComboBox_GetCurSel(hCombo);
-                        if (curSel >= 0)
-                            ComboBox_DeleteString(hCombo, curSel);
-                    }
-                }
-            }
-            break;
-        }
-        case WM_NCDESTROY:
-        {
-            RemoveWindowSubclass(hWnd, ComboBoxListSubClassProc, uIdSubclass);
-            break;
-        }
-    }
-    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
-}
-
 LRESULT CALLBACK CFindReplaceDlg::EditSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
     CFindReplaceDlg* pThis = reinterpret_cast<CFindReplaceDlg*>(dwRefData);
@@ -2658,129 +2459,6 @@ LRESULT CALLBACK CFindReplaceDlg::EditSubClassProc(HWND hWnd, UINT uMsg, WPARAM 
             break;
     }
     return result;
-}
-
-int CFindReplaceDlg::GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount) const
-{
-    int maxCount = (int)CIniSettings::Instance().GetInt64(section.c_str(), countKey.c_str(), defaultMaxCount);
-    if (maxCount <= 0)
-        maxCount = defaultMaxCount;
-    return maxCount;
-}
-
-// The return value is the maximum count allowed, not the default count or count loaded.
-// For the loaded count, check data.size().
-int CFindReplaceDlg::LoadData(
-    std::vector<std::wstring>& data, int defaultMaxCount,
-    const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt) const
-{
-    data.clear();
-    int maxCount = GetMaxCount(section, countKey, defaultMaxCount);
-    std::wstring itemKey;
-    for (int i = 0; i < maxCount; ++i)
-    {
-        itemKey = CStringUtils::Format(itemKeyFmt.c_str(), i);
-        std::wstring value = CIniSettings::Instance().GetString(section.c_str(), itemKey.c_str(), L"");
-        if (!value.empty())
-            data.push_back(std::move(value));
-    }
-    return maxCount;
-}
-
-void CFindReplaceDlg::SaveData(
-    const std::vector<std::wstring>& data,
-    const std::wstring& section, const std::wstring& /*countKey*/, const std::wstring& itemKeyFmt
-    )
-{
-    int i = 0;
-    for (const auto& item : data)
-    {
-        std::wstring itemKey = CStringUtils::Format(itemKeyFmt.c_str(), i);
-        if (!item.empty())
-            CIniSettings::Instance().SetString(section.c_str(), itemKey.c_str(), item.c_str());
-        ++i;
-    }
-    // Terminate list with an empty key.
-    std::wstring itemKey = CStringUtils::Format(itemKeyFmt.c_str(), i);
-    CIniSettings::Instance().SetString(section.c_str(), itemKey.c_str(), L"");
-}
-
-void CFindReplaceDlg::LoadCombo(
-    int combo_id,
-    const std::vector<std::wstring>& data
-    )
-{
-
-    HWND hCombo = GetDlgItem(*this, combo_id);
-    for (const auto& item : data)
-    {
-        if (!item.empty())
-            ComboBox_InsertString(hCombo, -1, item.c_str());
-    }
-}
-
-void CFindReplaceDlg::SaveCombo(
-    int combo_id,
-    std::vector<std::wstring>& data) const
-{
-    data.clear();
-    HWND hCombo = GetDlgItem(*this, combo_id);
-    int count = ComboBox_GetCount(hCombo);
-    for (int i = 0; i < count; ++i)
-    {
-        std::wstring item;
-        auto item_size = ComboBox_GetLBTextLen(hCombo, i);
-        item.resize(item_size + 1);
-        ComboBox_GetLBText(hCombo, i, item.data());
-        item.resize(item_size);
-        data.emplace_back(std::move(item));
-    }
-}
-
-void CFindReplaceDlg::UpdateCombo( int comboId,const std::wstring& item, int maxCount )
-{
-    if (item.empty())
-        return;
-    HWND hCombo = GetDlgItem(*this, comboId);
-    int count = ComboBox_GetCount(hCombo);
-    // Remove any excess items to ensure we our within the maximum,
-    // and never exceed it.
-    while (count > maxCount)
-    {
-        --count;
-        ComboBox_DeleteString(hCombo, count);
-    }
-    int pos = ComboBox_FindStringExact(hCombo, -1, item.c_str());
-    bool itemExists = (pos != CB_ERR);
-    // If the item exists, make sure it's selected and at the top.
-    if (itemExists)
-    {
-        if (pos == 0) // Right position, make sure it's selected too.
-            ComboBox_SetCurSel(hCombo, 0);
-        else // Wrong position, bring it to the top by removing it and re-adding it.
-        {
-            ComboBox_DeleteString(hCombo, pos);
-            int whereAt = ComboBox_InsertString(hCombo, 0, item.c_str());
-            if (whereAt >= 0)
-                ComboBox_SetCurSel(hCombo, whereAt);
-        }
-    }
-    else
-    {
-        // Item does not exist, prepare to add it by purging the oldest
-        // item if there is one and we need to in order to stay within the limit.
-        if (count > 0 && count >= maxCount)
-        {
-            ComboBox_DeleteString(hCombo, count - 1);
-            --count;
-        }
-        if (count < maxCount)
-        {
-            int whereAt = ComboBox_InsertString(hCombo, 0, item.c_str());
-            if (whereAt >= 0)
-                ComboBox_SetCurSel(hCombo, whereAt);
-        }
-    }
 }
 
 void CFindReplaceDlg::LoadSearchStrings()
@@ -3174,7 +2852,7 @@ bool CCmdFindNext::Execute()
 {
     if (g_findString.empty())
     {
-        FlashWindow(GetHwnd());
+        CBPBaseDialog::FlashWindow(GetHwnd());
         return true;
     }
     Sci_TextToFind ttf = {0};
@@ -3192,7 +2870,7 @@ bool CCmdFindNext::Execute()
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
     else
-        FlashWindow(GetHwnd());
+        CBPBaseDialog::FlashWindow(GetHwnd());
     return true;
 }
 
@@ -3200,7 +2878,7 @@ bool CCmdFindPrev::Execute()
 {
     if (g_findString.empty())
     {
-        FlashWindow(GetHwnd());
+        CBPBaseDialog::FlashWindow(GetHwnd());
         return true;
     }
 
@@ -3221,7 +2899,7 @@ bool CCmdFindPrev::Execute()
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
     else
-        FlashWindow(GetHwnd());
+        CBPBaseDialog::FlashWindow(GetHwnd());
     return true;
 }
 
@@ -3259,7 +2937,7 @@ bool CCmdFindSelectedNext::Execute()
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
     else
     {
-        FlashWindow(GetHwnd());
+        CBPBaseDialog::FlashWindow(GetHwnd());
     }
     DocScrollUpdate();
     return true;
@@ -3301,7 +2979,7 @@ bool CCmdFindSelectedPrev::Execute()
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
     else
-        FlashWindow(GetHwnd());
+        CBPBaseDialog::FlashWindow(GetHwnd());
     DocScrollUpdate();
     return true;
 }

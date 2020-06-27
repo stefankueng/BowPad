@@ -18,9 +18,9 @@
 #pragma once
 #include "ICommand.h"
 #include "BowPadUI.h"
-#include "BaseDialog.h"
 #include "DlgResizer.h"
 #include "ScintillaWnd.h"
+#include "BPBaseDialog.h"
 
 #include <chrono>
 #include <mutex>
@@ -63,7 +63,7 @@ void FindReplace_FindText(void* mainWnd);
 void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName);
 void FindReplace_FindFunction(void* mainWnd, const std::wstring& functionName);
 
-class CFindReplaceDlg : public CDialog, public ICommand
+class CFindReplaceDlg : public CBPBaseDialog, public ICommand
 {
     // vector or deque should work here. Usage pattern suggests deque
     // might be better but simple tests didn't reveal much difference.
@@ -151,27 +151,10 @@ protected:
     void                    SaveSearchFileStrings();
     void                    UpdateSearchFilesStrings(const std::wstring& target);
 
-    int                     LoadData(std::vector<std::wstring>& data, int defaultMaxCount,
-                                     const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt) const;
-
-    void                    SaveData(const std::vector<std::wstring>& data,
-                                     const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt);
-
-    void                    SaveCombo(int combo_id,
-                                      std::vector<std::wstring>& data) const;
-
-    void                    LoadCombo(int combo_id,
-                                      const std::vector<std::wstring>& data);
-
-    void                    UpdateCombo(int comboId,
-                                        const std::wstring& item,
-                                        int maxCount);
 
     std::wstring            OfferFileSuggestion(const std::wstring& searchFolder,
                                                 bool searchSubFolders,
                                                 const std::wstring& currentValue) const;
-
-    int                     GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount) const;
 
     void                    AcceptData();
     void                    NewData(std::chrono::steady_clock::time_point& timeOfLastDataUpdate, bool finished);
@@ -190,20 +173,14 @@ protected:
     void                    OnListItemChanged(LPNMLISTVIEW pListView);
     void                    LetUserSelectSearchFolder();
 
-    bool                    EnableComboBoxDeleteEvents(int combo_id, bool enable);
     bool                    EnableListEndTracking(int list_id, bool enable);
 
     void                    SetTheme(bool bDark);
 
-    static LRESULT CALLBACK ComboBoxListSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-                                                     UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
     static LRESULT CALLBACK ListViewSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
                                                  UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
     static LRESULT CALLBACK EditSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
                                              UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-
-    static std::string      UnEscape(const std::string& str);
-    static bool             ReadBase(const char* str, size_t* value, size_t base, size_t size);
 
 private:
     CDlgResizer                 m_resizer;
