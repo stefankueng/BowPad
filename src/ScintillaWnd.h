@@ -73,7 +73,7 @@ public :
     CScintillaWnd(HINSTANCE hInst);
     virtual ~CScintillaWnd();
 
-    bool Init(HINSTANCE hInst, HWND hParent);
+    bool Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo = nullptr);
     bool InitScratch(HINSTANCE hInst);
     void StartupDone() { m_eraseBkgnd = false; }
 

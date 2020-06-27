@@ -120,7 +120,7 @@ CScintillaWnd::~CScintillaWnd()
     }
 }
 
-bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
+bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
 {
     if (!g_scintillaInitialized)
     {
@@ -131,10 +131,15 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
         InitCommonControlsEx(&icce);
     }
 
-    if (hParent)
-        CreateEx(0, WS_CHILD | WS_VISIBLE, hParent, 0, L"Scintilla");
+    if (hWndAttachTo == nullptr)
+    {
+        if (hParent)
+            CreateEx(0, WS_CHILD | WS_VISIBLE, hParent, 0, L"Scintilla");
+        else
+            CreateEx(0, 0, 0, 0, L"Scintilla");
+    }
     else
-        CreateEx(0, 0, 0, 0, L"Scintilla");
+        m_hwnd = hWndAttachTo;
 
     if (!*this)
     {
@@ -260,7 +265,6 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent)
 
     return true;
 }
-
 
 bool CScintillaWnd::InitScratch( HINSTANCE hInst )
 {
