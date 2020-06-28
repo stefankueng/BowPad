@@ -254,6 +254,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.LargeImages>
     </Command>
     <Command Name="cmdFindFile" />
+    <Command Name="cmdGroupFindBtn" LabelTitle="Find/Replace">
+      <Command.LargeImages>
+        <Image>res/FindReplaceL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdFindReplace" LabelTitle="Find/Replace" TooltipTitle="Find &amp;&amp; Replace" TooltipDescription="Search and/or replace text in documents/tabs" Keytip="F">
       <Command.LargeImages>
         <Image>res/FindReplaceL.bmp</Image>
@@ -926,9 +931,13 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdUndo" />
             <Button CommandName="cmdRedo" />
           </Group>
-          <Group CommandName="cmdGroupFind" SizeDefinition="FiveButtons">
-            <Button CommandName="cmdFindReplace" />
-            <Button CommandName="cmdRegexCapture" />
+          <Group CommandName="cmdGroupFind" SizeDefinition="FourButtons">
+            <SplitButton CommandName="cmdGroupFindBtn">
+              <SplitButton.ButtonItem>
+                <Button CommandName="cmdFindReplace" />
+              </SplitButton.ButtonItem>
+              <Button CommandName="cmdRegexCapture" />
+            </SplitButton>
             <Button CommandName="cmdFindNext" />
             <Button CommandName="cmdFindPrev" />
             <Button CommandName="cmdFindSelectedNext" />
