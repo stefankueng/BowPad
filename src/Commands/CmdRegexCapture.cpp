@@ -197,6 +197,12 @@ void CRegexCaptureDlg::DoCapture()
         std::regex::flag_type rxFlags  = std::regex_constants::ECMAScript;
         if (IsDlgButtonChecked(*this, IDC_ICASE))
             rxFlags |= std::regex_constants::icase;
+        // replace all "\n" chars with "(?:\n|\r\n|\n\r)"
+        if ((sRegex.size() > 1) && (sRegex.find("\\r") == std::wstring::npos))
+        {
+            SearchReplace(sRegex, "\\n", "(!:\\n|\\r\\n|\\n\\r)");
+        }
+
         const std::regex rx(sRegex, rxFlags);
 
         m_captureWnd.Call(SCI_CLEARALL);
