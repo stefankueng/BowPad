@@ -107,6 +107,7 @@ LRESULT CRegexCaptureDlg::DoCommand(int id, int /*msg*/)
     switch (id)
     {
         case IDCANCEL:
+            m_captureWnd.Call(SCI_CLEARALL);
             ShowWindow(*this, SW_HIDE);
             break;
         case IDOK:
