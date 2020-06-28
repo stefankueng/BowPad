@@ -965,6 +965,23 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETUNDER, INDIC_TAGMATCH, true);
     Call(SCI_INDICSETUNDER, INDIC_TAGATTR, true);
 
+    std::vector<COLORREF> captureColors = {
+        RGB(80, 0, 0),
+        RGB(0, 80, 0),
+        RGB(0, 0, 80),
+        RGB(0, 80, 80),
+        RGB(80, 80, 0),
+        RGB(80, 0, 80),
+        RGB(80, 80, 80),
+        RGB(80, 40, 40),
+        RGB(40, 80, 40),
+        RGB(40, 40, 80)};
+    for (int i = INDIC_REGEXCAPTURE; i < INDIC_REGEXCAPTURE_END; ++i)
+    {
+        Call(SCI_INDICSETSTYLE, i, INDIC_BOX);
+        Call(SCI_INDICSETFORE, i, CTheme::Instance().GetThemeColor(captureColors[i - INDIC_REGEXCAPTURE]));
+    }
+
     Call(SCI_SETFOLDMARGINCOLOUR, true, theme.GetThemeColor(RGB(240, 240, 240), true));
     Call(SCI_SETFOLDMARGINHICOLOUR, true, theme.GetThemeColor(RGB(255, 255, 255), true));
 

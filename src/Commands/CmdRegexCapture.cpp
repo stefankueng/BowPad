@@ -107,9 +107,18 @@ LRESULT CRegexCaptureDlg::DoCommand(int id, int /*msg*/)
     switch (id)
     {
         case IDCANCEL:
+        {
             m_captureWnd.Call(SCI_CLEARALL);
+            size_t lengthDoc = ScintillaCall(SCI_GETLENGTH);
+            for (int i = INDIC_REGEXCAPTURE; i < INDIC_REGEXCAPTURE_END; ++i)
+            {
+                ScintillaCall(SCI_SETINDICATORCURRENT, i);
+                ScintillaCall(SCI_INDICATORCLEARRANGE, 0, lengthDoc);
+            }
+
             ShowWindow(*this, SW_HIDE);
-            break;
+        }
+        break;
         case IDOK:
             DoCapture();
             break;
@@ -208,21 +217,35 @@ void CRegexCaptureDlg::DoCapture()
 
         m_captureWnd.Call(SCI_CLEARALL);
 
-        size_t                                               lengthDoc = ScintillaCall(SCI_GETLENGTH);
-        const char*                                          pText     = (const char*)ScintillaCall(SCI_GETCHARACTERPOINTER);
+        size_t lengthDoc = ScintillaCall(SCI_GETLENGTH);
+        for (int i = INDIC_REGEXCAPTURE; i < INDIC_REGEXCAPTURE_END; ++i)
+        {
+            ScintillaCall(SCI_SETINDICATORCURRENT, i);
+            ScintillaCall(SCI_INDICATORCLEARRANGE, 0, lengthDoc);
+        }
+
+        const char*                                          pText = (const char*)ScintillaCall(SCI_GETCHARACTERPOINTER);
         std::string_view                                     searchText(pText, lengthDoc);
         std::match_results<std::string_view::const_iterator> whatc;
         std::regex_constants::match_flag_type                flags = std::regex_constants::match_flag_type::match_default | std::regex_constants::match_flag_type::match_not_null;
         if (IsDlgButtonChecked(*this, IDC_DOTNEWLINE))
             flags |= std::regex_constants::match_flag_type::match_not_eol;
-        auto start = searchText.cbegin();
-        auto end   = searchText.cend();
+        auto                                         start = searchText.cbegin();
+        auto                                         end   = searchText.cend();
+        std::vector<std::tuple<int, size_t, size_t>> capturePositions;
         while (std::regex_search(start, end, whatc, rx, flags))
         {
             if (whatc[0].matched)
             {
                 auto out = whatc.format(sCapture, flags);
                 m_captureWnd.Call(SCI_APPENDTEXT, out.size(), (sptr_t)out.c_str());
+
+                int captureCount = 0;
+                for (const auto& w : whatc)
+                {
+                    capturePositions.push_back(std::make_tuple(captureCount, w.first - searchText.cbegin(), w.length()));
+                    ++captureCount;
+                }
             }
             // update search position:
             if (start == whatc[0].second)
@@ -237,6 +260,12 @@ void CRegexCaptureDlg::DoCapture()
             flags |= std::regex_constants::match_flag_type::match_prev_avail;
         }
         m_captureWnd.UpdateLineNumberWidth();
+
+        for (const auto& [num, begin, length] : capturePositions)
+        {
+            ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_REGEXCAPTURE + num);
+            ScintillaCall(SCI_INDICATORFILLRANGE, begin, length);
+        }
 
         std::vector<std::wstring> regexStrings;
         SaveCombo(IDC_REGEXCOMBO, regexStrings);
