@@ -102,7 +102,7 @@ LRESULT CRegexCaptureDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM
     return FALSE;
 }
 
-LRESULT CRegexCaptureDlg::DoCommand(int id, int msg)
+LRESULT CRegexCaptureDlg::DoCommand(int id, int /*msg*/)
 {
     switch (id)
     {
