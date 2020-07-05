@@ -38,11 +38,13 @@ static constexpr COLORREF fgColor = RGB(0, 0, 0);
 static constexpr COLORREF bgColor = RGB(255, 255, 255);
 }; // namespace
 
-static constexpr struct
+struct sLexDetectStrings
 {
-    const char* const lang;
-    const char* const firstLine;
-} lexDetectStrings[] = {
+    std::string lang;
+    std::string firstLine;
+};
+
+static std::vector<sLexDetectStrings> lexDetectStrings = {
     // a '+' in front of the lexer name means the string can appear anywhere in the
     // first line of the document.
     // a '-' in front of the lexer name means the string must appear
@@ -401,6 +403,13 @@ void CLexStyles::Load()
                             ini->GetValue(langsect.c_str(), sk),
                             ld.userfunctions, false))
                         APPVERIFY(false);
+                }
+                else if (_wcsicmp(L"DetectionString", sk) == 0)
+                {
+                    sLexDetectStrings lds;
+                    lds.lang = CUnicodeUtils::StdGetUTF8(langkey);
+                    lds.firstLine = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
+                    lexDetectStrings.push_back(std::move(lds));
                 }
             }
             langdata = std::move(ld);
