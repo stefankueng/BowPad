@@ -74,6 +74,7 @@ struct OptionsSimple
     bool        stylenumbers = false;
     std::string operators;
 
+    std::vector<std::string> linecomments;
     std::string linecomment;
     std::string inlineCommentStart;
     std::string inlineCommentEnd;
@@ -109,6 +110,10 @@ struct OptionsSimple
     void initOperators()
     {
         stringtok(operatorsvec, operators, true, " \t\n");
+    }
+    void initLinecomments()
+    {
+        stringtok(linecomments, linecomment, true, " \t\n");
     }
 };
 
@@ -277,6 +282,17 @@ public:
         return NULL;
     }
 
+
+    bool checkLineComments(Scintilla::StyleContext* sc)
+    {
+        for (const auto& cs : options.linecomments)
+        {
+            if (sc->Match(cs.c_str()))
+                return true;
+        }
+        return false;
+    }
+
     static ILexer5* LexerFactorySimple()
     {
         return new LexerSimple();
@@ -290,6 +306,10 @@ Sci_Position SCI_METHOD LexerSimple::PropertySet(const char* key, const char* va
         if (strcmp(key, "operators") == 0)
         {
             options.initOperators();
+        }
+        if (strcmp(key, "linecomment") == 0)
+        {
+            options.initLinecomments();
         }
         return 0;
     }
@@ -485,17 +505,17 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
                 }
                 sc.SetState(SimpleStyles::Number);
             }
-            else if (iswordstart(sc.ch) || (std::find(wordchars.cbegin(), wordchars.cend(), sc.ch) != wordchars.cend()))
-            {
-                sc.SetState(SimpleStyles::Identifier);
-            }
             else if (sc.Match(options.inlineCommentStart.c_str()))
             {
                 sc.SetState(SimpleStyles::Comment);
             }
-            else if (sc.Match(options.linecomment.c_str()))
+            else if (checkLineComments(&sc))
             {
                 sc.SetState(SimpleStyles::CommentLine);
+            }
+            else if (iswordstart(sc.ch) || (std::find(wordchars.cbegin(), wordchars.cend(), sc.ch) != wordchars.cend()))
+            {
+                sc.SetState(SimpleStyles::Identifier);
             }
             else if (options.stringchars.find(sc.ch) != std::string::npos)
             {
