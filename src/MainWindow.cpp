@@ -3550,6 +3550,7 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
     CDocument tempdoc = doc;
     tempdoc.m_path = temppath;
     bool bDummy = false;
+    bool bModified = doc.m_bIsDirty || doc.m_bNeedsSaving;
     m_DocManager.SaveFile(*this, tempdoc, bDummy);
 
     // have the plugins save any information for this document
@@ -3562,7 +3563,7 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
                                                 doc.m_path.c_str(), temppath.c_str(),
                                                 m_editor.GetCurrentLineNumber() + 1,
                                                 m_TabBar.GetTitle(tab).c_str());
-    if (doc.m_bIsDirty || doc.m_bNeedsSaving)
+    if (bModified)
         cmdline += L" /modified";
     SHELLEXECUTEINFO shExecInfo = { };
     shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
