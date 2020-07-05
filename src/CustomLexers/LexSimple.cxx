@@ -75,9 +75,9 @@ struct OptionsSimple
     std::string operators;
 
     std::vector<std::string> linecomments;
-    std::string linecomment;
-    std::string inlineCommentStart;
-    std::string inlineCommentEnd;
+    std::string              linecomment;
+    std::string              inlineCommentStart;
+    std::string              inlineCommentEnd;
 
     std::string markedWords1;
     std::string markedWords2;
@@ -282,7 +282,6 @@ public:
         return NULL;
     }
 
-
     bool checkLineComments(Scintilla::StyleContext* sc)
     {
         for (const auto& cs : options.linecomments)
@@ -411,7 +410,7 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
                     sc.SetState(SimpleStyles::Default);
                 break;
             case SimpleStyles::Number:
-                if (IsASpaceOrTab(sc.ch) || sc.ch == '\r' || sc.ch == '\n' || IsAnOperator(&sc, options.operatorsvec))
+                if (IsASpaceOrTab(sc.ch) || sc.ch == '\r' || sc.ch == '\n' || sc.ch == ',' || sc.ch == ';' || IsAnOperator(&sc, options.operatorsvec))
                 {
                     sc.SetState(SimpleStyles::Default);
                 }
@@ -434,7 +433,7 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
                     sc.GetCurrent(s, _countof(s));
 
                     // first check for markedWords
-                    if (!options.markedWords1.empty() && (strncmp(options.markedWords1.c_str(), s, options.markedWords1.size())==0))
+                    if (!options.markedWords1.empty() && (strncmp(options.markedWords1.c_str(), s, options.markedWords1.size()) == 0))
                     {
                         sc.ChangeState(SimpleStyles::MarkedWord1);
                     }
