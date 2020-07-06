@@ -42,6 +42,7 @@ struct sLexDetectStrings
 {
     std::string lang;
     std::string firstLine;
+    std::vector<std::string> extensions;
 };
 
 static std::vector<sLexDetectStrings> lexDetectStrings = {
@@ -404,11 +405,22 @@ void CLexStyles::Load()
                             ld.userfunctions, false))
                         APPVERIFY(false);
                 }
-                else if (_wcsicmp(L"DetectionString", sk) == 0)
+                else if (_wcsicmp(L"DetectionString+", sk) == 0)
                 {
                     sLexDetectStrings lds;
-                    lds.lang = CUnicodeUtils::StdGetUTF8(langkey);
+                    lds.lang = "+" + CUnicodeUtils::StdGetUTF8(langkey);
                     lds.firstLine = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
+                    auto sExts = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), L"DetectionStringExts"));
+                    stringtok(lds.extensions, sExts, true, ";");
+                    lexDetectStrings.push_back(std::move(lds));
+                }
+                else if (_wcsicmp(L"DetectionString-", sk) == 0)
+                {
+                    sLexDetectStrings lds;
+                    lds.lang = "-" + CUnicodeUtils::StdGetUTF8(langkey);
+                    lds.firstLine = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
+                    auto sExts = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), L"DetectionStringExts"));
+                    stringtok(lds.extensions, sExts, true, ";");
                     lexDetectStrings.push_back(std::move(lds));
                 }
             }
@@ -567,11 +579,25 @@ std::string CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaW
 {
     if (doc.m_path.empty())
         return "";
+    auto sExt = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(doc.m_path));
+    bool hasExtOverride = false;
+    for (const auto& m : lexDetectStrings)
+    {
+        for (const auto& e : m.extensions)
+        {
+            if (_stricmp(sExt.c_str(), e.c_str()) == 0)
+            {
+                hasExtOverride = true;
+                break;
+            }
+        }
+    }
+
     auto lang = GetLanguageForPath(doc.m_path);
-    if (!lang.empty() /* && lang.compare(L"Text")*/)
+    if (!lang.empty() && !hasExtOverride)
         return lang;
 
-    // no extension, and no previously set lexer for this path:
+    // no known extension, and no previously set lexer for this path:
     // try using the file content to determine a lexer.
     // Since this needs to be fast, we don't do excessive checks but
     // keep it very, very simple.
