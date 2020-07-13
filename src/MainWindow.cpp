@@ -3071,16 +3071,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
 
             if (CPathUtils::PathCompare(filepath, m_tabmovepath) == 0)
             {
-                doc.m_path = m_tabmovesavepath;
-                m_DocManager.UpdateFileTime(doc, true);
                 filepath = m_tabmovesavepath;
-                if (m_tabmovemod)
-                {
-                    doc.m_bIsDirty = true;
-                    doc.m_bNeedsSaving = true;
-                }
-                if (!m_tabmovetitle.empty())
-                    m_TabBar.SetTitle(index, m_tabmovetitle.c_str());
             }
 
             m_DocManager.AddDocumentAtEnd(doc, id);
@@ -3480,12 +3471,13 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
             CDocument tempdoc = doc;
             tempdoc.m_path = temppath;
             bool bDummy = false;
+            bool bModified = doc.m_bIsDirty || doc.m_bNeedsSaving;
             m_DocManager.SaveFile(*this, tempdoc, bDummy);
 
             COPYDATASTRUCT cpd = { 0 };
             cpd.dwData = CD_COMMAND_MOVETAB;
             std::wstring cpdata = doc.m_path + L"*" + temppath + L"*";
-            cpdata += (doc.m_bIsDirty || doc.m_bNeedsSaving) ? L"1*" : L"0*";
+            cpdata += bModified ? L"1*" : L"0*";
             cpdata += std::to_wstring(m_editor.GetCurrentLineNumber() + 1);
             cpd.lpData = (PVOID)cpdata.c_str();
             cpd.cbData = DWORD(cpdata.size()*sizeof(wchar_t));

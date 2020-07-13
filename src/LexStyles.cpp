@@ -578,7 +578,7 @@ std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
 std::string CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit)
 {
     if (doc.m_path.empty())
-        return "";
+        return "Text";
     auto sExt = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(doc.m_path));
     bool hasExtOverride = false;
     for (const auto& m : lexDetectStrings)
