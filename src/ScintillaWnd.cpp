@@ -2092,7 +2092,8 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
     }
     if ((wParam == '(') ||
         (wParam == '{') ||
-        (wParam == '[') )
+        (wParam == '[') ||
+        (wParam == '-'))
     {
         if (CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1) == 0)
             return false;
@@ -2116,7 +2117,7 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
         bool bSelEmpty          = !!Call(SCI_GETSELECTIONEMPTY);
         size_t lineStartStart   = 0;
         size_t lineEndEnd       = 0;
-        if (!bSelEmpty)
+        if (!bSelEmpty && braceCloseBuf[0])
         {
             size_t selStart  = Call(SCI_GETSELECTIONSTART);
             size_t selEnd    = Call(SCI_GETSELECTIONEND);
@@ -2192,6 +2193,67 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 Call(SCI_ENDUNDOACTION);
                 return true;
             }
+            else if ((wParam == '[')|| (wParam == '-'))
+            {
+                lexer = Call(SCI_GETLEXER);
+                switch (lexer)
+                {
+                    // add the closing tag only for xml and html lexers
+                case SCLEX_XML:
+                case SCLEX_HTML:
+                    break;
+                default:
+                    return false;
+                }
+                if (CIniSettings::Instance().GetInt64(L"View", L"autobracexml", 1) == 0)
+                    return false;
+
+                FindResult result1, result2;
+                size_t currentpos = Call(SCI_GETCURRENTPOS);
+                result1 = FindText("/", currentpos, 0, 0);
+                result2 = FindText("<", currentpos, 0, 0);
+                if (result2.success)
+                {
+                    if (!result1.success || (result2.start > result1.start))
+                    {
+                        // seems like an opening xml tag
+                        // prevent closing tags that are not full tags
+                        auto c = Call(SCI_GETCHARAT, result2.start + 1, 0);
+                        if ((c == '?') || (c == '%'))
+                            return false;
+                        // find the tag id
+                        std::string tagName;
+                        size_t position = result2.start + 1;
+                        int nextChar = (int)Call(SCI_GETCHARAT, position);
+                        while (position < currentpos && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
+                        {
+                            tagName.push_back((char)nextChar);
+                            ++position;
+                            nextChar = (int)Call(SCI_GETCHARAT, position);
+                        }
+                        if (tagName.starts_with("![CDATA"))
+                        {
+                            // insert the [ now
+                            Call(SCI_ADDTEXT, 1, (sptr_t)"[");
+                            size_t cursorPos = Call(SCI_GETCURRENTPOS);
+                            Call(SCI_BEGINUNDOACTION);
+                            Call(SCI_ADDTEXT, 3, (sptr_t)"]]>");
+                            Call(SCI_GOTOPOS, cursorPos);
+                            Call(SCI_ENDUNDOACTION);
+                        }
+                        if (tagName == "!-")
+                        {
+                            // insert the - now
+                            Call(SCI_ADDTEXT, 1, (sptr_t)"-");
+                            size_t cursorPos = Call(SCI_GETCURRENTPOS);
+                            Call(SCI_BEGINUNDOACTION);
+                            Call(SCI_ADDTEXT, 3, (sptr_t)"-->");
+                            Call(SCI_GOTOPOS, cursorPos);
+                            Call(SCI_ENDUNDOACTION);
+                        }
+                    }
+                }
+            }
         }
     }
     else if (wParam == '>')
@@ -2239,10 +2301,21 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 if (!tagName.empty())
                 {
                     Call(SCI_BEGINUNDOACTION);
-                    // we found the tag id, now insert the closing xml tag
-                    Call(SCI_ADDTEXT, 2, (sptr_t)"</");
-                    Call(SCI_ADDTEXT, tagName.size(), (sptr_t)tagName.c_str());
-                    Call(SCI_ADDTEXT, 1, (sptr_t)">");
+                    if (tagName.starts_with("![CDATA"))
+                    {
+                        // do nothing
+                    }
+                    else if (tagName.starts_with("!--"))
+                    {
+                        // do nothing
+                    }
+                    else
+                    {
+                        // we found the tag id, now insert the closing xml tag
+                        Call(SCI_ADDTEXT, 2, (sptr_t)"</");
+                        Call(SCI_ADDTEXT, tagName.size(), (sptr_t)tagName.c_str());
+                        Call(SCI_ADDTEXT, 1, (sptr_t)">");
+                    }
                     Call(SCI_GOTOPOS, cursorPos);
                     Call(SCI_ENDUNDOACTION);
                 }
