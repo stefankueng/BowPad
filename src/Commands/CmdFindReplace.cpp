@@ -380,7 +380,9 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
         HWND hListControl = GetDlgItem(*this, IDC_FINDRESULTS);
         int columnWidth = ListView_GetColumnWidth(hListControl, 2); // Line Text column.
         int newColumnWidth = columnWidth + difference;
-        ListView_SetColumnWidth(hListControl, 2, newColumnWidth);
+        auto currentWidth = ListView_GetColumnWidth(hListControl, 2);
+        if (currentWidth < newColumnWidth);
+            ListView_SetColumnWidth(hListControl, 2, newColumnWidth);
         break;
     }
     case WM_SIZE:
@@ -1086,12 +1088,13 @@ void CFindReplaceDlg::ShowResults(bool bShow)
     GetWindowRect(GetDlgItem(*this, IDC_SEARCHINFO), &infoRect);
     int height = infoRect.bottom - windowRect.top;
     HWND hListControl = GetDlgItem(*this, IDC_FINDRESULTS);
-    if (bShow)
+    auto isVisible = IsWindowVisible(hListControl);
+    if (bShow && !isVisible)
     {
         MoveWindow(*this, windowRect.left, windowRect.top, windowRect.right - windowRect.left, height + 300, TRUE);
         ShowWindow(hListControl, SW_SHOW);
     }
-    else
+    else if (!bShow && isVisible)
     {
         MoveWindow(*this, windowRect.left, windowRect.top, windowRect.right - windowRect.left, height + 15, TRUE);
         ShowWindow(hListControl, SW_HIDE);
@@ -2276,6 +2279,9 @@ void CFindReplaceDlg::InitResultsList()
     //SetWindowTheme(hListControl, L"Explorer", nullptr);
     ListView_SetItemCountEx(hListControl, 0, 0);
 
+    if (m_resultsListInitialized)
+        return;
+
     auto hListHeader = ListView_GetHeader(hListControl);
     int c = Header_GetItemCount(hListHeader) - 1;
     while (c >= 0)
@@ -2305,6 +2311,7 @@ void CFindReplaceDlg::InitResultsList()
     ListView_SetColumnWidth(hListControl, 0, 200);
     ListView_SetColumnWidth(hListControl, 1, 70);
     ListView_SetColumnWidth(hListControl, 2, LVSCW_AUTOSIZE_USEHEADER);
+    m_resultsListInitialized = true;
 }
 
 void CFindReplaceDlg::CheckRegex()
@@ -2385,6 +2392,7 @@ void CFindReplaceDlg::DoClose()
     // Some experimentation may be required to find the best default. For now just do size.
     SetWindowPos(*this, nullptr, 0, 0, m_originalSize.cx, m_originalSize.cy,
         SWP_NOACTIVATE | SWP_NOREDRAW | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+    m_resultsListInitialized = false;
 }
 
 void CFindReplaceDlg::OnClose()

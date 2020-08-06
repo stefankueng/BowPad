@@ -210,6 +210,7 @@ private:
     bool                        m_open = false;
     volatile size_t             m_foundsize = 0;
     int                         m_themeCallbackId = 0;
+    bool                        m_resultsListInitialized = false;
 
     // Some types usually best avoided while searching.
     // The user can explicitly override these if they want them though.
