@@ -60,6 +60,9 @@
             <RegistryValue Root="HKLM" Key="Software\Classes\BowPad.file" Name="AppUserModelID" Value='TortoiseSVN.Tools.BowPad.1' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\BowPad.file\DefaultIcon" Value='[INSTALLDIR]BowPad.exe,-155' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\BowPad.file\shell\BowPad\command" Value='[INSTALLDIR]BowPad.exe /path:"%1"' Type="string" />
+            <RegistryKey Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\BowPad.exe" />
+            <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\BowPad.exe" Name="Path" Value="[INSTALLDIR]" Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\BowPad.exe" Value="[INSTALLDIR]BowPad.exe" Type="string" />
           </Component>
 
         </Directory>
