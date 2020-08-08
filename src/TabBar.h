@@ -104,7 +104,6 @@ protected:
     COLORREF                    GetTabColor(bool bSelected, UINT item) const;
     void                        DrawMainBorder(const LPDRAWITEMSTRUCT lpDrawItemStruct) const;
     void                        DrawItem(const LPDRAWITEMSTRUCT lpDrawItemStruct, float fraction) const;
-    void                        DrawItemBorder(const LPDRAWITEMSTRUCT lpDrawItemStruct) const;
     void                        DraggingCursor(POINT screenPoint, UINT item);
     int                         GetTabIndexAt(const POINT & p) const { return GetTabIndexAt(p.x, p.y); }
     int                         GetTabIndexAt(int x, int y) const;

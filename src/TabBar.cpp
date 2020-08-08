@@ -37,7 +37,7 @@
 extern IUIFramework * g_pFramework;
 
 const int TABBAR_SHOWDISKICON = 0;
-const double hoverFraction = 0.6;
+const double hoverFraction = 0.8;
 
 CTabBar::CTabBar(HINSTANCE hInst)
     : CWindow(hInst)
@@ -464,9 +464,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                     APPVERIFY(got);
                     if (got)
                     {
-                        dis.rcItem.bottom -= int(2.0f * m_dpiScale);
                         DrawItem(&dis, (float)Animator::GetValue(m_animVars[GetIDFromIndex(nTab).GetValue()]));
-                        DrawItemBorder(&dis);
                     }
                 }
             }
@@ -482,10 +480,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 APPVERIFY(got);
                 if (got)
                 {
-                    dis.rcItem.bottom += int(2.0f * m_dpiScale);
-                    dis.rcItem.top -= int(2.0f * m_dpiScale);
                     DrawItem(&dis, (float)Animator::GetValue(m_animVars[GetIDFromIndex(nSel).GetValue()]));
-                    DrawItemBorder(&dis);
                 }
             }
 
@@ -881,27 +876,6 @@ COLORREF CTabBar::GetTabColor(bool bSelected, UINT item) const
     return GDIHelpers::Darker(clr, 0.9f);
 }
 
-void CTabBar::DrawItemBorder(const LPDRAWITEMSTRUCT lpdis) const
-{
-    int curSel = TabCtrl_GetCurSel(*this);
-    bool bSelected = (lpdis->itemID == (UINT)curSel);
-
-    RECT rItem(lpdis->rcItem);
-
-    COLORREF crTab = GetTabColor(bSelected, lpdis->itemID);
-    COLORREF crHighlight = GDIHelpers::Lighter(crTab, 1.5f);
-    COLORREF crShadow = GDIHelpers::Darker(crTab, 0.75f);
-
-    const int onedpi = int(1.0f * m_dpiScale);
-    rItem.bottom += bSelected ? -onedpi : onedpi;
-
-    // edges
-
-    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.left, rItem.top, rItem.left + onedpi, rItem.bottom, crHighlight);
-    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.left, rItem.top, rItem.right, rItem.top + onedpi, crHighlight);
-    GDIHelpers::FillSolidRect(lpdis->hDC, rItem.right - onedpi, rItem.top, rItem.right, rItem.bottom, crShadow);
-}
-
 void CTabBar::DrawMainBorder(const LPDRAWITEMSTRUCT lpdis) const
 {
     GDIHelpers::FillSolidRect(lpdis->hDC, &lpdis->rcItem, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
@@ -915,37 +889,36 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     bool bSelected = (pDrawItemStruct->itemID == (UINT)curSel);
 
     RECT rItem(pDrawItemStruct->rcItem);
-    rItem.bottom -= int(2.0f * m_dpiScale);
 
-    // tab
-    // blend from back color to COLOR_3DFACE if 16 bit mode or better
-    COLORREF crFrom = GetTabColor(bSelected, pDrawItemStruct->itemID);
-
-    COLORREF crTo = bSelected ? ::GetSysColor(COLOR_3DFACE) : GDIHelpers::Darker(::GetSysColor(COLOR_3DFACE), 0.95f);
-    crTo = GDIHelpers::Darker(crTo, fraction);
-
-    crTo = CTheme::Instance().GetThemeColor(crTo);
-    if (CTheme::Instance().IsHighContrastMode())
-        crTo = crFrom;
-
-    const int nROrg = GetRValue(crFrom);
-    const int nGOrg = GetGValue(crFrom);
-    const int nBOrg = GetBValue(crFrom);
-    const int nRDiff = GetRValue(crTo) - nROrg;
-    const int nGDiff = GetGValue(crTo) - nGOrg;
-    const int nBDiff = GetBValue(crTo) - nBOrg;
-
-    int nHeight = rItem.bottom - rItem.top;
-
-    for (int nLine = 0; nLine < nHeight; nLine += 2)
+    COLORREF crFill  = GetTabColor(bSelected, pDrawItemStruct->itemID);
+    COLORREF crBkgnd = crFill;
+    if (CTheme::Instance().IsDarkTheme())
     {
-        int nRed = nROrg + (nLine * nRDiff) / nHeight;
-        int nGreen = nGOrg + (nLine * nGDiff) / nHeight;
-        int nBlue = nBOrg + (nLine * nBDiff) / nHeight;
-
-        GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top + nLine, rItem.right, rItem.top + nLine + 2, RGB(nRed, nGreen, nBlue));
+        crBkgnd = GDIHelpers::Lighter(crBkgnd, 1.6f);
+        crFill = GDIHelpers::Darker(crFill, 0.5f);
+        if (fraction != 1.0f)
+            crFill = GDIHelpers::Lighter(crFill, 1.0f / fraction);
     }
-    wchar_t buf[256] = { 0 };
+    else
+    {
+        crBkgnd = GDIHelpers::Darker(crBkgnd, 0.8f);
+        if (!bSelected)
+            crFill = GDIHelpers::Lighter(crFill, 1.4f);
+        if (fraction != 1.0f)
+            crFill = GDIHelpers::Darker(crFill, fraction);
+    }
+    GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crBkgnd);
+
+    auto borderWidth = (long)std::round(1.0f * m_dpiScale);
+    rItem.left += borderWidth;
+    rItem.right -= borderWidth;
+    rItem.top += borderWidth;
+    if (!bSelected)
+        rItem.bottom -= (2 * borderWidth);
+
+    GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crFill);
+
+        wchar_t buf[256] = { 0 };
     TC_ITEM tci;
     tci.mask = TCIF_TEXT | TCIF_IMAGE;
     tci.pszText = buf;
