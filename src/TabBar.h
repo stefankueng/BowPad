@@ -50,6 +50,15 @@ struct CloseButtonZone
     int m_fromRight;    // distance from right in pixel
 };
 
+enum class TabButtonType
+{
+    None,
+    Selected,
+    Close,
+    CloseHover,
+    ClosePush
+};
+
 const int nbCtrlMax = 10;
 
 class CTabBar : public CWindow
@@ -106,6 +115,7 @@ private:
     int                         m_nItems;
     bool                        m_bHasImgList;
     HFONT                       m_hFont;
+    HFONT                       m_hBoldFont;
     int                         m_tabID;
 
     int                         m_ctrlID;

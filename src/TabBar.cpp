@@ -44,6 +44,7 @@ CTabBar::CTabBar(HINSTANCE hInst)
     , m_nItems(0)
     , m_bHasImgList(false)
     , m_hFont(nullptr)
+    , m_hBoldFont(nullptr)
     , m_ctrlID(-1)
     , m_bIsDragging(false)
     , m_bIsDraggingInside(false)
@@ -66,6 +67,8 @@ CTabBar::~CTabBar()
 {
     if (m_hFont)
         DeleteObject(m_hFont);
+    if (m_hBoldFont)
+        DeleteObject(m_hBoldFont);
     Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
@@ -86,20 +89,16 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
     ::SetWindowLongPtr(*this, GWLP_USERDATA, (LONG_PTR)this);
     m_TabBarDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(*this, GWLP_WNDPROC, (LONG_PTR)TabBar_Proc));
 
-    m_hFont = (HFONT)::SendMessage(*this, WM_GETFONT, 0, 0);
+    NONCLIENTMETRICS ncm;
+    ncm.cbSize = sizeof(NONCLIENTMETRICS);
+    SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
+    m_hFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
+    ncm.lfSmCaptionFont.lfWeight = FW_BOLD;
+    m_hBoldFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
+    ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
 
-    if (m_hFont == nullptr)
-    {
-        NONCLIENTMETRICS ncm;
-        ncm.cbSize = sizeof(NONCLIENTMETRICS);
-        SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
-        m_hFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
-        ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
-    }
-
-    TabCtrl_SetMinTabWidth(*this, LPARAM(float(GetSystemMetrics(SM_CXSMICON)) * m_dpiScale * 4.0f));
     TabCtrl_SetItemSize(*this, 300.0f * m_dpiScale, 25.0f * m_dpiScale);
-    TabCtrl_SetPadding(*this, 10.0f * m_dpiScale, 0);
+    TabCtrl_SetPadding(*this, 13.0f * m_dpiScale, 0);
     m_closeButtonZone.SetDPIScale(m_dpiScale);
 
     return true;
@@ -213,6 +212,8 @@ void CTabBar::SetFont(const TCHAR *fontName, int fontSize)
 {
     if (m_hFont)
         ::DeleteObject(m_hFont);
+    if (m_hBoldFont)
+        ::DeleteObject(m_hBoldFont);
 
     m_hFont = ::CreateFont((int)fontSize, 0,
                            0,
@@ -223,6 +224,13 @@ void CTabBar::SetFont(const TCHAR *fontName, int fontSize)
                            fontName);
     if (m_hFont)
         ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
+    m_hBoldFont = ::CreateFont((int)fontSize, 0,
+                               0,
+                               0,
+                               FW_BOLD,
+                               0, 0, 0, 0,
+                               0, 0, 0, 0,
+                               fontName);
 }
 
 void CTabBar::SelectChanging() const
@@ -907,11 +915,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     bool bSelected = (pDrawItemStruct->itemID == (UINT)curSel);
 
     RECT rItem(pDrawItemStruct->rcItem);
-
-    if (bSelected)
-        rItem.bottom -= int(1.0f * m_dpiScale);
-    else
-        rItem.bottom -= int(2.0f * m_dpiScale);
+    rItem.bottom -= int(2.0f * m_dpiScale);
 
     // tab
     // blend from back color to COLOR_3DFACE if 16 bit mode or better
@@ -941,75 +945,13 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
 
         GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top + nLine, rItem.right, rItem.top + nLine + 2, RGB(nRed, nGreen, nBlue));
     }
-    wchar_t buf[100] = { 0 };
+    wchar_t buf[256] = { 0 };
     TC_ITEM tci;
     tci.mask = TCIF_TEXT | TCIF_IMAGE;
     tci.pszText = buf;
-    tci.cchTextMax = _countof(buf) - 1;
+    tci.cchTextMax = _countof(buf) - 2;
     TabCtrl_GetItem(*this, pDrawItemStruct->itemID, &tci);
-    if (bSelected)
-    {
-        // draw a line at the bottom indicating the active tab:
-        // green if the tab is not modified, red if it is modified and needs saving
-        COLORREF indicColor;
-        if (tci.iImage == REDONLY_IMG_INDEX)
-            indicColor = RGB(80, 80, 80);
-        else if (tci.iImage == UNSAVED_IMG_INDEX)
-            indicColor = CTheme::Instance().IsDarkTheme() ? RGB(200, 0, 0) : RGB(150, 0, 0);
-        else
-            indicColor = CTheme::Instance().IsDarkTheme() ? RGB(0, 200, 0) : RGB(0, 150, 0);
-        const int off = int(5.0f * m_dpiScale);
-        GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.bottom - off, rItem.right, rItem.bottom,
-                                  CTheme::Instance().GetThemeColor(indicColor, true));
-    }
 
-    const int PADDING = int(2.0f * m_dpiScale);
-    // text & icon
-    rItem.left += PADDING;
-    rItem.top += PADDING + (bSelected ? int(1.0f * m_dpiScale) : 0);
-
-    SetBkMode(pDrawItemStruct->hDC, TRANSPARENT);
-
-    // draw close button
-    RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(pDrawItemStruct->rcItem);
-    if (bSelected)
-        closeButtonRect.left -= int(2.0f * m_dpiScale);
-    // 3 status for each inactive tab and selected tab close item :
-    // normal / hover / pushed
-    int idCloseImg = IDR_CLOSETAB;
-    if (m_bIsCloseHover && (m_currentHoverTabItem == (int)pDrawItemStruct->itemID) && (m_whichCloseClickDown == -1)) // hover
-        idCloseImg = IDR_CLOSETAB_HOVER;
-    else if (m_bIsCloseHover && (m_currentHoverTabItem == (int)pDrawItemStruct->itemID) && (m_whichCloseClickDown == m_currentHoverTabItem)) // pushed
-    {
-        // The pushed state doesn't work and this line related to it creates painting glitches.
-        // So just disable the line until someone cares about the pushed state enough
-        // to make it work properly.
-        // idCloseImg = IDR_CLOSETAB_PUSH;
-    }
-    else
-        idCloseImg = bSelected ? IDR_CLOSETAB : IDR_CLOSETAB_INACT;
-    HDC hdcMemory;
-    hdcMemory = ::CreateCompatibleDC(pDrawItemStruct->hDC);
-    HBITMAP hBmp = (HBITMAP)::LoadImage(hResource, MAKEINTRESOURCE(idCloseImg), IMAGE_BITMAP, int(11 * m_dpiScale), int(11 * m_dpiScale), 0);
-    BITMAP bmp;
-    ::GetObject(hBmp, sizeof(bmp), &bmp);
-    rItem.right = closeButtonRect.left;
-    ::SelectObject(hdcMemory, hBmp);
-    ::BitBlt(pDrawItemStruct->hDC, closeButtonRect.left, closeButtonRect.top, bmp.bmWidth, bmp.bmHeight, hdcMemory, 0, 0, SRCCOPY);
-    ::DeleteDC(hdcMemory);
-    ::DeleteObject(hBmp);
-
-    // icon
-    if (TABBAR_SHOWDISKICON && hilTabs)
-    {
-        ImageList_Draw(hilTabs, tci.iImage, pDrawItemStruct->hDC, rItem.left, rItem.top, ILD_TRANSPARENT);
-        rItem.left += int(16.0f * m_dpiScale) + PADDING;
-    }
-    else
-        rItem.left += PADDING;
-
-    // text
-    rItem.right -= PADDING;
     COLORREF textColor;
     if (tci.iImage == REDONLY_IMG_INDEX)
     {
@@ -1026,26 +968,69 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
         textColor = CTheme::Instance().GetThemeColor(GDIHelpers::Darker(::GetSysColor(COLOR_3DDKSHADOW), 0.5f));
     SetTextColor(pDrawItemStruct->hDC, textColor);
 
-    // find the width of the asterisk
-    int AsteriskOffset = 0;
+    const int PADDING = int(2.0f * m_dpiScale);
+    // text & icon
+    rItem.left += PADDING;
+
+    SetBkMode(pDrawItemStruct->hDC, TRANSPARENT);
+
+    // draw close/active button
+    RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(pDrawItemStruct->rcItem);
+
+    TabButtonType buttonType = TabButtonType::None;
+    if (bSelected)
+    {
+        buttonType = TabButtonType::Selected;
+    }
+    else if (m_currentHoverTabItem == (int)pDrawItemStruct->itemID)
+        buttonType = TabButtonType::Close;
+    if (m_bIsCloseHover)
+        buttonType = TabButtonType::CloseHover;
+
+
+    switch (buttonType)
+    {
+        case TabButtonType::Selected:
+            ::DrawText(pDrawItemStruct->hDC, L"\u2B24", 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
+            break;
+        case TabButtonType::Close:
+            ::DrawText(pDrawItemStruct->hDC, L"\u274C", 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
+            break;
+        case TabButtonType::CloseHover:
+        {
+            auto oldFont = (HFONT)SelectObject(pDrawItemStruct->hDC, m_hBoldFont);
+            ::DrawText(pDrawItemStruct->hDC, L"\u274C", 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
+            SelectObject(pDrawItemStruct->hDC, oldFont);
+        }
+        break;
+    }
+    rItem.right = closeButtonRect.left;
+
+    // icon
+    if (TABBAR_SHOWDISKICON && hilTabs)
+    {
+        ImageList_Draw(hilTabs, tci.iImage, pDrawItemStruct->hDC, rItem.left, rItem.top, ILD_TRANSPARENT);
+        rItem.left += int(16.0f * m_dpiScale) + PADDING;
+    }
+    else
+        rItem.left += PADDING;
+
+    // text
+    rItem.right -= PADDING;
+
     if (tci.iImage == UNSAVED_IMG_INDEX)
     {
-        RECT rAsterisk = rItem;
-        ::DrawText(pDrawItemStruct->hDC, L"*", 1, &rAsterisk, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_CALCRECT);
-        AsteriskOffset = (rAsterisk.right - rAsterisk.left) + int(4.0f * m_dpiScale);
+        wcscat_s(buf, L" *");
     }
 
     rItem.bottom = pDrawItemStruct->rcItem.bottom;
     rItem.top = pDrawItemStruct->rcItem.top;
-    rItem.right -= AsteriskOffset;
+    HFONT oldFont = nullptr;
+    if (bSelected)
+        oldFont = (HFONT)SelectObject(pDrawItemStruct->hDC, m_hBoldFont);
     ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
-    rItem.right += AsteriskOffset;
-    // now draw the asterisk if necessary
-    if (tci.iImage == UNSAVED_IMG_INDEX)
-    {
-        rItem.left = rItem.right - AsteriskOffset;
-        ::DrawText(pDrawItemStruct->hDC, L"*", 1, &rItem, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
-    }
+    if (bSelected)
+        SelectObject(pDrawItemStruct->hDC, oldFont);
 }
 
 
