@@ -381,7 +381,7 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
         int columnWidth = ListView_GetColumnWidth(hListControl, 2); // Line Text column.
         int newColumnWidth = columnWidth + difference;
         auto currentWidth = ListView_GetColumnWidth(hListControl, 2);
-        if (currentWidth < newColumnWidth);
+        if (currentWidth < newColumnWidth)
             ListView_SetColumnWidth(hListControl, 2, newColumnWidth);
         break;
     }
