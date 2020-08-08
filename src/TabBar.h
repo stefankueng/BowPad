@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,14 +40,13 @@ struct TBHDR
 
 struct CloseButtonZone
 {
-    CloseButtonZone(): m_width(11), m_height(11), m_fromTop(3), m_fromRight(3){};
+    CloseButtonZone(): m_width(11), m_height(11), m_fromRight(3){};
     bool IsHit(int x, int y, const RECT & testZone) const;
     RECT GetButtonRectFrom(const RECT & tabItemRect) const;
-    void SetDPIScale(float scale) { m_width = int(m_width * scale); m_height = int(m_height * scale); m_fromRight = int(m_fromRight * scale); m_fromTop = int (m_fromTop * scale); }
+    void SetDPIScale(float scale) { m_width = int(m_width * scale); m_height = int(m_height * scale); m_fromRight = int(m_fromRight * scale); }
 
     int m_width;
     int m_height;
-    int m_fromTop;      // distance from top in pixel
     int m_fromRight;    // distance from right in pixel
 };
 

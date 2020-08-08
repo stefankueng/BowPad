@@ -1217,8 +1217,8 @@ bool CloseButtonZone::IsHit(int x, int y, const RECT & testZone) const
 {
     if (((x + m_width + m_fromRight) < testZone.right) || (x > (testZone.right - m_fromRight)))
         return false;
-
-    if (((y - m_height - m_fromTop) > testZone.top) || (y < (testZone.top + m_fromTop)))
+    auto fromTop = (testZone.bottom - testZone.top - m_height) / 2;
+    if (((y - m_height - fromTop) > testZone.top) || (y < (testZone.top + fromTop)))
         return false;
 
     return true;
@@ -1226,10 +1226,12 @@ bool CloseButtonZone::IsHit(int x, int y, const RECT & testZone) const
 
 RECT CloseButtonZone::GetButtonRectFrom(const RECT & tabItemRect) const
 {
+    auto fromTop = (tabItemRect.bottom - tabItemRect.top - m_height) / 2;
+
     RECT rect;
     rect.right = tabItemRect.right - m_fromRight;
     rect.left = rect.right - m_width;
-    rect.top = tabItemRect.top + m_fromTop;
+    rect.top = tabItemRect.top + fromTop;
     rect.bottom = rect.top + m_height;
 
     return rect;
