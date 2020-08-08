@@ -1541,9 +1541,9 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
             return false;
         doc.m_path = filePath;
         CMRU::Instance().AddPath(doc.m_path);
-        if (isActiveTab && m_fileTree.GetPath().empty())
+        if ((isActiveTab && m_fileTree.GetPath().empty()) || bSaveAs)
         {
-            m_fileTree.SetPath(CPathUtils::GetParentDirectory(doc.m_path), false);
+            m_fileTree.SetPath(CPathUtils::GetParentDirectory(doc.m_path), bSaveAs);
             ResizeChildWindows();
         }
     }
