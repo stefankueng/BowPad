@@ -97,7 +97,9 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
         ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
     }
 
-    TabCtrl_SetMinTabWidth(*this, LPARAM(GetSystemMetrics(SM_CXSMICON) * m_dpiScale * 4.0));
+    TabCtrl_SetMinTabWidth(*this, LPARAM(float(GetSystemMetrics(SM_CXSMICON)) * m_dpiScale * 4.0f));
+    TabCtrl_SetItemSize(*this, 300.0f * m_dpiScale, 25.0f * m_dpiScale);
+    TabCtrl_SetPadding(*this, 10.0f * m_dpiScale, 0);
     m_closeButtonZone.SetDPIScale(m_dpiScale);
 
     return true;
