@@ -151,19 +151,23 @@ static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const
         std::wstring folder = CPathUtils::GetParentDirectory(path);
         if (folder.empty())
             folder = CPathUtils::GetCWD();
-        std::wstring filename = CPathUtils::GetFileName(path);
-        IShellItemPtr psiDefFolder = nullptr;
-        hr = SHCreateItemFromParsingName(folder.c_str(), nullptr, IID_PPV_ARGS(&psiDefFolder));
-        if (!CAppUtils::FailedShowMessage(hr))
+        auto modDir = CPathUtils::GetLongPathname(CPathUtils::GetModuleDir());
+        if (_wcsicmp(folder.c_str(), modDir.c_str())!=0)
         {
-            hr = pfd->SetFolder(psiDefFolder);
-            if (CAppUtils::FailedShowMessage(hr))
-                return false;
-            if (!filename.empty())
+            std::wstring filename = CPathUtils::GetFileName(path);
+            IShellItemPtr psiDefFolder = nullptr;
+            hr = SHCreateItemFromParsingName(folder.c_str(), nullptr, IID_PPV_ARGS(&psiDefFolder));
+            if (!CAppUtils::FailedShowMessage(hr))
             {
-                hr = pfd->SetFileName(filename.c_str());
+                hr = pfd->SetFolder(psiDefFolder);
                 if (CAppUtils::FailedShowMessage(hr))
                     return false;
+                if (!filename.empty())
+                {
+                    hr = pfd->SetFileName(filename.c_str());
+                    if (CAppUtils::FailedShowMessage(hr))
+                        return false;
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -182,7 +182,12 @@ bool CCmdHeaderSource::UserFindFile(HWND hwndParent, const std::wstring& filenam
         if (!doc.m_path.empty())
             defFolder = CPathUtils::GetParentDirectory(doc.m_path);
         else
+        {
             defFolder = CPathUtils::GetCWD();
+            auto modDir = CPathUtils::GetLongPathname(CPathUtils::GetModuleDir());
+            if (_wcsicmp(defFolder.c_str(), modDir.c_str()) == 0)
+                defFolder.clear();
+        }
     }
     else
         defFolder = defaultFolder;
