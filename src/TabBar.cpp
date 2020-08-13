@@ -129,6 +129,7 @@ int CTabBar::InsertAtEnd(const TCHAR *subTabName)
     // remove the selection so it can be selected properly later.
     if (m_nItems == 1)
         TabCtrl_SetCurSel(*this, -1);
+    InvalidateRect(*this, nullptr, FALSE);
     return index;
 }
 
@@ -153,6 +154,7 @@ int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
     if (m_nItems == 0)
         TabCtrl_SetCurSel(*this, -1);
     ++m_nItems;
+    InvalidateRect(*this, nullptr, FALSE);
     return ret;
 }
 
@@ -198,6 +200,7 @@ void CTabBar::SetCurrentTitle(LPCTSTR title)
     tci.mask    = TCIF_TEXT;
     tci.pszText = const_cast<TCHAR *>(title);
     TabCtrl_SetItem(*this, GetCurrentTabIndex(), &tci);
+    InvalidateRect(*this, nullptr, FALSE);
 }
 
 void CTabBar::SetTitle(int index, LPCTSTR title)
@@ -206,6 +209,7 @@ void CTabBar::SetTitle(int index, LPCTSTR title)
     tci.mask    = TCIF_TEXT;
     tci.pszText = const_cast<TCHAR *>(title);
     TabCtrl_SetItem(*this, index, &tci);
+    InvalidateRect(*this, nullptr, FALSE);
 }
 
 void CTabBar::SetFont(const TCHAR *fontName, int fontSize)
@@ -250,12 +254,14 @@ void CTabBar::SelectChange(int index) const
     nmhdr.hwndFrom = *this;
     nmhdr.code     = TCN_SELCHANGE;
     ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+    InvalidateRect(*this, nullptr, FALSE);
 }
 
 void CTabBar::ActivateAt(int index) const
 {
     SelectChanging();
     SelectChange(index);
+    InvalidateRect(*this, nullptr, FALSE);
 }
 
 void CTabBar::DeleteItemAt(int index)
@@ -303,6 +309,7 @@ void CTabBar::DeleteItemAt(int index)
             TabCtrl_GetItemRect(*this, m_nItems - 1, &itemRect);
         } while (itemRect.right < tabRect.right - (itemRect.right - itemRect.left));
     }
+    InvalidateRect(*this, nullptr, FALSE);
 }
 
 int CTabBar::GetCurrentTabIndex() const
@@ -349,6 +356,7 @@ void CTabBar::DeletAllItems()
 {
     TabCtrl_DeleteAllItems(*this);
     m_nItems = 0;
+    InvalidateRect(*this, nullptr, FALSE);
 }
 
 HIMAGELIST CTabBar::SetImageList(HIMAGELIST himl)
