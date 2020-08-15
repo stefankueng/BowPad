@@ -961,7 +961,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     }
     else if (m_currentHoverTabItem == (int)pDrawItemStruct->itemID)
         buttonType = TabButtonType::Close;
-    if (m_bIsCloseHover)
+    if (m_bIsCloseHover && (m_currentHoverTabItem == (int)pDrawItemStruct->itemID))
         buttonType = TabButtonType::CloseHover;
 
     switch (buttonType)
