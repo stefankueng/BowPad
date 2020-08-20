@@ -23,6 +23,7 @@
 #include "CmdSession.h"
 
 #include "StringUtils.h"
+#include "PathUtils.h"
 #include "IniSettings.h"
 #include "CmdLineParser.h"
 #include "OnOutOfScope.h"
@@ -31,9 +32,9 @@
 
 namespace
 {
-    const wchar_t g_sessionSection[] = { L"TabSession" };
-    const int BP_DEFAULT_SESSION_SIZE = 500;
-};
+const wchar_t g_sessionSection[]      = {L"TabSession"};
+const int     BP_DEFAULT_SESSION_SIZE = 500;
+}; // namespace
 
 static void SetAutoLoad(bool bAutoLoad)
 {
@@ -46,6 +47,25 @@ static bool GetAutoLoad()
     return bAutoLoad;
 }
 
+static std::wstring GetBackupPath()
+{
+    auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
+    auto sessionPath    = CPathUtils::GetAppDataPath() + L"\\BowPad\\backup";
+    // check for portable version
+    HKEY subKey = nullptr;
+    LONG result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Software\\BowPad", 0, KEY_READ, &subKey);
+    if (result != ERROR_SUCCESS)
+    {
+        // BowPad was not installed: portable version.
+        sessionPath = CPathUtils::GetModuleDir() + L"\\backup";
+    }
+    else
+        RegCloseKey(subKey);
+    CPathUtils::CreateRecursiveDirectory(sessionPath);
+    if (handleModified)
+        return sessionPath;
+    return {};
+}
 
 bool CCmdSessionLoad::Execute()
 {
@@ -57,18 +77,17 @@ void CCmdSessionLoad::OnClose()
 {
     // BowPad is closing, save the current session
 
-    auto& settings = CIniSettings::Instance();
-    bool bAutoLoad = GetAutoLoad();
+    auto& settings  = CIniSettings::Instance();
+    bool  bAutoLoad = GetAutoLoad();
     // first remove the whole session section
     settings.Delete(g_sessionSection, nullptr);
     SetAutoLoad(bAutoLoad);
     // now go through all tabs and save their state
-    int tabcount = GetTabCount();
+    int tabcount  = GetTabCount();
     int activetab = GetActiveTabIndex();
     int saveindex = 0;
 
-    auto SavePosSettings = [&](int saveindex, const CPosData& pos)
-    {
+    auto SavePosSettings = [&](int saveindex, const CPosData& pos) {
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"selmode%d", saveindex).c_str(), pos.m_nSelMode);
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"startpos%d", saveindex).c_str(), pos.m_nStartPos);
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"endpos%d", saveindex).c_str(), pos.m_nEndPos);
@@ -78,15 +97,20 @@ void CCmdSessionLoad::OnClose()
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"wraplineoffset%d", saveindex).c_str(), pos.m_nWrapLineOffset);
     };
 
+    auto sessionPath = GetBackupPath();
+
     int sessionSize = (int)settings.GetInt64(g_sessionSection, L"session_size", BP_DEFAULT_SESSION_SIZE);
     // No point saving more than we are prepared to load.
     int savecount = min(tabcount, sessionSize);
     for (int i = 0; i < savecount; ++i)
     {
-        auto docId = GetDocIDFromTabIndex(i);
-        const auto& doc = GetDocumentFromID(docId);
+        auto  docId = GetDocIDFromTabIndex(i);
+        auto& doc   = GetModDocumentFromID(docId);
         if (doc.m_path.empty())
-            continue;
+        {
+            if (sessionPath.empty())
+                continue;
+        }
         if (i == activetab)
         {
             CPosData pos;
@@ -100,6 +124,23 @@ void CCmdSessionLoad::OnClose()
             SavePosSettings(saveindex, doc.m_position);
             settings.SetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", saveindex).c_str(), 0);
         }
+
+        if (!sessionPath.empty() && (doc.m_bIsDirty || doc.m_bNeedsSaving))
+        {
+            auto filename = CPathUtils::GetFileName(doc.m_path);
+            auto title = GetTitleForTabIndex(i);
+            if (doc.m_path.empty())
+            {
+                filename = title;
+            }
+            auto backupPath = CStringUtils::Format(L"%s\\%s.%d", sessionPath.c_str(), filename.c_str(), saveindex);
+            settings.SetString(g_sessionSection, CStringUtils::Format(L"origpath%d", saveindex).c_str(), doc.m_path.c_str());
+            settings.SetString(g_sessionSection, CStringUtils::Format(L"origtitle%d", saveindex).c_str(), title.c_str());
+            doc.m_path = backupPath;
+            doc.m_bIsDirty = false;
+            doc.m_bNeedsSaving = false;
+            SaveDoc(docId, backupPath);
+        }
         settings.SetString(g_sessionSection, CStringUtils::Format(L"path%d", saveindex).c_str(), doc.m_path.c_str());
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", saveindex).c_str(), doc.m_TabSpace);
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"readdir%d", saveindex).c_str(), doc.m_ReadDir);
@@ -110,22 +151,14 @@ void CCmdSessionLoad::OnClose()
 
 void CCmdSessionLoad::RestoreSavedSession()
 {
-    // REIVEW: note the user can add text to a document and then exit without saving.
-    // This means the saved state could refer to a selection or cursor location that
-    // does not exist or refers to something else. This can be a bit confusing to the user.
-    // However if we don't save the state on quitting without saving, a user may also scroll
-    // to a new location then exit without saving but expect to return to where they were.
-    // It's not clear how to best satisfy these competing needs. Currently we save state
-    // regardless of exit status and if it's "wrong" on restore then user beware.
-
     ProfileTimer profile(L"RestoreSavedSession");
-    auto& settings = CIniSettings::Instance();
-    int numFilesToRestore = 0;
+    auto&        settings          = CIniSettings::Instance();
+    int          numFilesToRestore = 0;
 
     int sessionSize = (int)settings.GetInt64(g_sessionSection, L"session_size", BP_DEFAULT_SESSION_SIZE);
     for (int fileNum = 0; fileNum < sessionSize; ++fileNum)
     {
-        std::wstring key = CStringUtils::Format(L"path%d", fileNum);
+        std::wstring key  = CStringUtils::Format(L"path%d", fileNum);
         std::wstring path = settings.GetString(g_sessionSection, key.c_str(), L"");
         if (path.empty())
             break;
@@ -138,25 +171,23 @@ void CCmdSessionLoad::RestoreSavedSession()
     // one file. Don't block the UI when loading one or less files as that
     // itself would lead to excessive repainting.
     OnOutOfScope(
-        if (numFilesToRestore > 1)
-        {
+        if (numFilesToRestore > 1) {
             BlockAllUIUpdates(false);
             HideProgressCtrl();
-        }
-    );
+        });
     if (numFilesToRestore > 1)
     {
         BlockAllUIUpdates(true);
         ShowProgressCtrl((UINT)settings.GetInt64(L"View", L"progressdelay", 1000));
     }
 
-
-    DocID activeDoc;
-    const unsigned int openflags = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
-    int filecount = 0;
+    DocID              activeDoc;
+    const unsigned int openflags   = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
+    int                filecount   = 0;
+    auto               sessionPath = GetBackupPath();
     for (int fileNum = 0; fileNum < sessionSize; ++fileNum)
     {
-        std::wstring key = CStringUtils::Format(L"path%d", fileNum);
+        std::wstring key  = CStringUtils::Format(L"path%d", fileNum);
         std::wstring path = settings.GetString(g_sessionSection, key.c_str(), L"");
         if (path.empty())
             break;
@@ -171,17 +202,30 @@ void CCmdSessionLoad::RestoreSavedSession()
         auto docId = GetDocIDFromTabIndex(tabIndex);
         if (!docId.IsValid())
             continue;
-        auto& doc = GetModDocumentFromID(docId);
-        auto& pos = doc.m_position;
-        pos.m_nSelMode           = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"selmode%d", fileNum).c_str(), 0);
-        pos.m_nStartPos          = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"startpos%d", fileNum).c_str(), 0);
-        pos.m_nEndPos            = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"endpos%d", fileNum).c_str(), 0);
-        pos.m_nScrollWidth       = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"scrollwidth%d", fileNum).c_str(), 0);
-        pos.m_xOffset            = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", fileNum).c_str(), 0);
-        pos.m_nFirstVisibleLine  = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
-        pos.m_nWrapLineOffset    = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"wraplineoffset%d", fileNum).c_str(), 0);
-        doc.m_TabSpace           = (TabSpace)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
-        doc.m_ReadDir            = (ReadDirection)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0);
+        auto& doc               = GetModDocumentFromID(docId);
+        auto& pos               = doc.m_position;
+        pos.m_nSelMode          = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"selmode%d", fileNum).c_str(), 0);
+        pos.m_nStartPos         = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"startpos%d", fileNum).c_str(), 0);
+        pos.m_nEndPos           = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"endpos%d", fileNum).c_str(), 0);
+        pos.m_nScrollWidth      = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"scrollwidth%d", fileNum).c_str(), 0);
+        pos.m_xOffset           = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", fileNum).c_str(), 0);
+        pos.m_nFirstVisibleLine = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
+        pos.m_nWrapLineOffset   = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"wraplineoffset%d", fileNum).c_str(), 0);
+        doc.m_TabSpace          = (TabSpace)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
+        doc.m_ReadDir           = (ReadDirection)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0);
+
+        auto origPath = settings.GetString(g_sessionSection, CStringUtils::Format(L"origpath%d", fileNum).c_str(), nullptr);
+        if (origPath)
+        {
+            doc.m_path = origPath;
+            doc.m_bIsDirty = true;
+            doc.m_bNeedsSaving = true;
+            auto origTitle = settings.GetString(g_sessionSection, CStringUtils::Format(L"origtitle%d", fileNum).c_str(), nullptr);
+            SetTitleForDocID(docId, origTitle);
+            UpdateFileTime(doc, true);
+            UpdateTab(GetTabIndexFromDocID(docId));
+        }
+
         if ((int)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", fileNum).c_str(), 0))
             activeDoc = docId;
         RestoreCurrentPos(doc.m_position);
@@ -193,11 +237,10 @@ void CCmdSessionLoad::RestoreSavedSession()
     }
 }
 
-
-CCmdSessionAutoLoad::CCmdSessionAutoLoad(void * obj) : CCmdSessionLoad(obj)
+CCmdSessionAutoLoad::CCmdSessionAutoLoad(void* obj)
+    : CCmdSessionLoad(obj)
 {
 }
-
 
 bool CCmdSessionAutoLoad::Execute()
 {
@@ -207,7 +250,7 @@ bool CCmdSessionAutoLoad::Execute()
 }
 
 HRESULT CCmdSessionAutoLoad::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
-    const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+                                                             const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
@@ -230,8 +273,8 @@ bool CCmdSessionRestoreLast::Execute()
 {
     if (m_docstates.empty())
         return false;
-    const SessionItem si = m_docstates.back();
-    const auto& pos = si.posData;
+    const SessionItem si  = m_docstates.back();
+    const auto&       pos = si.posData;
     if (OpenFile(si.path.c_str(), OpenFlags::AddToMRU))
         RestoreCurrentPos(pos);
     m_docstates.pop_back();
@@ -245,7 +288,7 @@ void CCmdSessionRestoreLast::OnDocumentClose(DocID id)
         return;
 
     auto activeTabIndex = GetActiveTabIndex();
-    auto index = GetTabIndexFromDocID(id);
+    auto index          = GetTabIndexFromDocID(id);
     if (index == activeTabIndex)
     {
         CPosData pos;
