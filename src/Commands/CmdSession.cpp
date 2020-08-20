@@ -133,7 +133,7 @@ void CCmdSessionLoad::OnClose()
             {
                 filename = title;
             }
-            auto backupPath = CStringUtils::Format(L"%s\\%s.%d", sessionPath.c_str(), filename.c_str(), saveindex);
+            auto backupPath = CStringUtils::Format(L"%s\\%d%s.%d", sessionPath.c_str(), saveindex, filename.c_str(), saveindex);
             settings.SetString(g_sessionSection, CStringUtils::Format(L"origpath%d", saveindex).c_str(), doc.m_path.c_str());
             settings.SetString(g_sessionSection, CStringUtils::Format(L"origtitle%d", saveindex).c_str(), title.c_str());
             doc.m_path = backupPath;
