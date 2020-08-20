@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -122,6 +122,12 @@ void ICommand::SetCurrentTitle(LPCWSTR title)
     m_pMainWindow->UpdateCaptionBar();
 }
 
+void ICommand::SetTitleForDocID(DocID id, LPCWSTR title)
+{
+    m_pMainWindow->m_TabBar.SetTitle(m_pMainWindow->m_TabBar.GetIndexFromID(id), title);
+    m_pMainWindow->UpdateCaptionBar();
+}
+
 int ICommand::GetSrcTab()
 {
     return m_pMainWindow->m_TabBar.GetSrcTab();
@@ -207,6 +213,11 @@ bool ICommand::SaveDoc(DocID docID, bool bSaveAs /* = false */)
     return m_pMainWindow->SaveDoc(docID, bSaveAs);
 }
 
+bool ICommand::SaveDoc(DocID docID, const std::wstring& path)
+{
+    return m_pMainWindow->SaveDoc(docID, path);
+}
+
 int ICommand::GetDocumentCount() const
 {
     return m_pMainWindow->m_DocManager.GetCount();
@@ -251,6 +262,11 @@ void ICommand::RestoreCurrentPos(const CPosData& pos)
 void ICommand::SaveCurrentPos(CPosData& pos)
 {
     return m_pMainWindow->m_editor.SaveCurrentPos(pos);
+}
+
+bool ICommand::UpdateFileTime(CDocument& doc, bool bIncludeReadonly)
+{
+    return m_pMainWindow->m_DocManager.UpdateFileTime(doc, bIncludeReadonly);
 }
 
 LRESULT ICommand::SendMessageToMainWnd( UINT msg, WPARAM wParam, LPARAM lParam )

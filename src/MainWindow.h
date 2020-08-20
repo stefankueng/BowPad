@@ -77,6 +77,7 @@ public:
 
     bool                SaveCurrentTab(bool bSaveAs = false);
     bool                SaveDoc(DocID docID, bool bSaveAs = false);
+    bool                SaveDoc(DocID docID, const std::wstring& path);
     void                EnsureAtLeastOneTab();
     void                GoToLine(size_t line);
     bool                CloseTab(int tab, bool force = false, bool quitting = false);

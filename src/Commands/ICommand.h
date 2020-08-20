@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -73,6 +73,7 @@ protected:
     std::wstring        GetTitleForTabIndex(int index) const;
     std::wstring        GetTitleForDocID(DocID id) const;
     void                SetCurrentTitle(LPCWSTR title);
+    void                SetTitleForDocID(DocID id, LPCWSTR title);
     int                 GetSrcTab();
     int                 GetDstTab();
     bool                CloseTab(int index, bool bForce);
@@ -89,6 +90,8 @@ protected:
     CDocument&          GetModDocumentFromID(DocID id);
     void                RestoreCurrentPos(const CPosData& pos);
     void                SaveCurrentPos(CPosData& pos);
+    bool                UpdateFileTime(CDocument& doc, bool bIncludeReadonly);
+
 
     sptr_t              ScintillaCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0);
     sptr_t              ConstCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0) const;
@@ -125,6 +128,7 @@ protected:
     bool                ReloadTab(int tab, int encoding = -1); // By default reload encoding
     bool                SaveCurrentTab(bool bSaveAs = false);
     bool                SaveDoc(DocID docID, bool bSaveAs = false);
+    bool                SaveDoc(DocID docID, const std::wstring& path);
     HRESULT             InvalidateUICommand(UI_INVALIDATIONS flags, const PROPERTYKEY *key);
     HRESULT             InvalidateUICommand(UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY *key);
     HRESULT             SetUICommandProperty(UINT32 commandId, REFPROPERTYKEY key, PROPVARIANT value);

@@ -1599,6 +1599,25 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
     return true;
 }
 
+bool CMainWindow::SaveDoc(DocID docID, const std::wstring& path)
+{
+    if (!docID.IsValid())
+        return false;
+    if (!m_DocManager.HasDocumentID(docID))
+        return false;
+    if (path.empty())
+        return false;
+
+    auto& doc = m_DocManager.GetModDocumentFromID(docID);
+
+    if (!m_DocManager.SaveFile(*this, doc, path))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 // TODO! Get rid of TabMove, make callers use OpenFileAs
 
 // Happens when the user drags a tab out and drops it over a bowpad window.

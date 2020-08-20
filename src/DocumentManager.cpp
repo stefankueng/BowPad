@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -882,6 +882,11 @@ bool CDocumentManager::SaveFile( HWND hWnd, CDocument& doc, bool & bTabMoved )
         SetFileAttributes(doc.m_path.c_str(), attributes);
     }
     return true;
+}
+
+bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, const std::wstring& path)
+{
+    return SaveDoc(hWnd, path, doc);
 }
 
 bool CDocumentManager::UpdateFileTime(CDocument& doc, bool bIncludeReadonly)
