@@ -118,6 +118,7 @@ void CCommandHandler::Init(void * obj)
     Add<CCmdPageSetup>(obj);
     Add<CCmdSessionLoad>(obj);
     Add<CCmdSessionAutoLoad>(obj);
+    Add<CCmdSessionAutoSave>(obj);
     Add<CCmdSessionRestoreLast>(obj);
     Add<CCmdUndo>(obj);
     Add<CCmdRedo>(obj);

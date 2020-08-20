@@ -648,6 +648,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/SessionAutoL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdSessionAutoSave" LabelTitle="Auto-save" TooltipTitle="Auto-saves modified files" TooltipDescription="Auto-saves modified files when the session closes and restores the modified state on load" Keytip="SAS">
+      <Command.LargeImages>
+        <Image>res/SessionAutoL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
 
     <Command Name="cmdFunctions" LabelTitle="Functions" TooltipTitle="Functions" TooltipDescription="Shows a list of functions/methods in the file to jump to" Keytip="FN">
       <Command.LargeImages>
@@ -829,6 +834,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdGroupNewBtn" Id="10012" />
     <Command Name="cmdFileTreeControl" Id="10013" />
     <Command Name="cmdGroupSaveBtn" Id="10014" />
+    <Command Name="cmdGroupSessionAuto" Id="10015" />
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />
 
@@ -915,10 +921,17 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <SplitButton.ButtonItem>
                 <Button CommandName="cmdSaveAll" />
               </SplitButton.ButtonItem>
+              <Button CommandName="cmdSaveAll" />
               <ToggleButton CommandName="cmdSaveAuto" />
             </SplitButton>
             <Button CommandName="cmdSessionLoad" />
-            <ToggleButton CommandName="cmdSessionAutoLoad" />
+            <SplitButton CommandName="cmdGroupSessionAuto">
+              <SplitButton.ButtonItem>
+                <ToggleButton CommandName="cmdSessionAutoLoad" />
+              </SplitButton.ButtonItem>
+              <ToggleButton CommandName="cmdSessionAutoLoad" />
+              <ToggleButton CommandName="cmdSessionAutoSave" />
+            </SplitButton>
             <ToggleButton CommandName="cmdWriteProtect" />
           </Group>
           <Group CommandName="cmdGroupClipboard" SizeDefinition="FourButtons">

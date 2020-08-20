@@ -246,6 +246,7 @@ bool CCmdSessionAutoLoad::Execute()
 {
     SetAutoLoad(!GetAutoLoad());
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    InvalidateUICommand(cmdSessionAutoSave, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
     return true;
 }
 
@@ -260,6 +261,44 @@ HRESULT CCmdSessionAutoLoad::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
 }
 
 void CCmdSessionAutoLoad::BeforeLoad()
+{
+    if (GetAutoLoad())
+    {
+        if (firstInstance)
+            RestoreSavedSession();
+    }
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+}
+
+CCmdSessionAutoSave::CCmdSessionAutoSave(void* obj)
+    : CCmdSessionLoad(obj)
+{
+}
+
+bool CCmdSessionAutoSave::Execute()
+{
+    auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
+    CIniSettings::Instance().SetInt64(g_sessionSection, L"handlemodified", handleModified ? 1 : 0);
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    return true;
+}
+
+HRESULT CCmdSessionAutoSave::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
+    const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+{
+    if (UI_PKEY_BooleanValue == key)
+    {
+        auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, handleModified, ppropvarNewValue);
+    }
+    else if (UI_PKEY_Enabled == key)
+    {
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, GetAutoLoad(), ppropvarNewValue);
+    }
+    return E_NOTIMPL;
+}
+
+void CCmdSessionAutoSave::BeforeLoad()
 {
     if (GetAutoLoad())
     {

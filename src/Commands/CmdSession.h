@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2018 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -52,6 +52,26 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdSessionAutoLoad; }
+
+    void OnClose() override {}
+
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+
+    void BeforeLoad() override;
+
+};
+
+class CCmdSessionAutoSave : public CCmdSessionLoad
+{
+public:
+
+    CCmdSessionAutoSave(void* obj);
+
+    ~CCmdSessionAutoSave() = default;
+
+    bool Execute() override;
+
+    UINT GetCmdId() override { return cmdSessionAutoSave; }
 
     void OnClose() override {}
 
