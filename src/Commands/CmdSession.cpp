@@ -128,7 +128,7 @@ void CCmdSessionLoad::OnClose()
         if (!sessionPath.empty() && (doc.m_bIsDirty || doc.m_bNeedsSaving))
         {
             auto filename = CPathUtils::GetFileName(doc.m_path);
-            auto title = GetTitleForTabIndex(i);
+            auto title    = GetTitleForTabIndex(i);
             if (doc.m_path.empty())
             {
                 filename = title;
@@ -136,8 +136,8 @@ void CCmdSessionLoad::OnClose()
             auto backupPath = CStringUtils::Format(L"%s\\%d%s.%d", sessionPath.c_str(), saveindex, filename.c_str(), saveindex);
             settings.SetString(g_sessionSection, CStringUtils::Format(L"origpath%d", saveindex).c_str(), doc.m_path.c_str());
             settings.SetString(g_sessionSection, CStringUtils::Format(L"origtitle%d", saveindex).c_str(), title.c_str());
-            doc.m_path = backupPath;
-            doc.m_bIsDirty = false;
+            doc.m_path         = backupPath;
+            doc.m_bIsDirty     = false;
             doc.m_bNeedsSaving = false;
             SaveDoc(docId, backupPath);
         }
@@ -181,10 +181,11 @@ void CCmdSessionLoad::RestoreSavedSession()
         ShowProgressCtrl((UINT)settings.GetInt64(L"View", L"progressdelay", 1000));
     }
 
-    DocID              activeDoc;
-    const unsigned int openflags   = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
-    int                filecount   = 0;
-    auto               sessionPath = GetBackupPath();
+    DocID                     activeDoc;
+    const unsigned int        openflags   = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
+    int                       filecount   = 0;
+    auto                      sessionPath = GetBackupPath();
+    std::vector<std::wstring> filesToDelete;
     for (int fileNum = 0; fileNum < sessionSize; ++fileNum)
     {
         std::wstring key  = CStringUtils::Format(L"path%d", fileNum);
@@ -217,13 +218,16 @@ void CCmdSessionLoad::RestoreSavedSession()
         auto origPath = settings.GetString(g_sessionSection, CStringUtils::Format(L"origpath%d", fileNum).c_str(), nullptr);
         if (origPath)
         {
-            doc.m_path = origPath;
-            doc.m_bIsDirty = true;
+            filesToDelete.push_back(doc.m_path);
+            doc.m_path         = origPath;
+            doc.m_bIsDirty     = true;
             doc.m_bNeedsSaving = true;
-            auto origTitle = settings.GetString(g_sessionSection, CStringUtils::Format(L"origtitle%d", fileNum).c_str(), nullptr);
+            auto origTitle     = settings.GetString(g_sessionSection, CStringUtils::Format(L"origtitle%d", fileNum).c_str(), nullptr);
             SetTitleForDocID(docId, origTitle);
             UpdateFileTime(doc, true);
             UpdateTab(GetTabIndexFromDocID(docId));
+            settings.Delete(g_sessionSection, CStringUtils::Format(L"origpath%d", fileNum).c_str());
+            settings.SetString(g_sessionSection, CStringUtils::Format(L"path%d", fileNum).c_str(), doc.m_path.c_str());
         }
 
         if ((int)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", fileNum).c_str(), 0))
@@ -234,6 +238,16 @@ void CCmdSessionLoad::RestoreSavedSession()
     {
         int activeTabIndex = GetTabIndexFromDocID(activeDoc);
         TabActivateAt(activeTabIndex);
+    }
+
+    for (const auto& path : filesToDelete)
+    {
+        if (!path.empty())
+            DeleteFile(path.c_str());
+    }
+    if (!filesToDelete.empty())
+    {
+        settings.Save();
     }
 }
 
@@ -284,7 +298,7 @@ bool CCmdSessionAutoSave::Execute()
 }
 
 HRESULT CCmdSessionAutoSave::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
-    const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+                                                             const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
@@ -296,16 +310,6 @@ HRESULT CCmdSessionAutoSave::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
         return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, GetAutoLoad(), ppropvarNewValue);
     }
     return E_NOTIMPL;
-}
-
-void CCmdSessionAutoSave::BeforeLoad()
-{
-    if (GetAutoLoad())
-    {
-        if (firstInstance)
-            RestoreSavedSession();
-    }
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
 bool CCmdSessionRestoreLast::Execute()

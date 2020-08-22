@@ -24,8 +24,8 @@
 class CCmdSessionLoad : public ICommand
 {
 public:
-
-    CCmdSessionLoad(void * obj) : ICommand(obj)
+    CCmdSessionLoad(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -38,14 +38,13 @@ public:
     void OnClose() override;
 
 protected:
-    void    RestoreSavedSession();
+    void RestoreSavedSession();
 };
 
 class CCmdSessionAutoLoad : public CCmdSessionLoad
 {
 public:
-
-    CCmdSessionAutoLoad(void * obj);
+    CCmdSessionAutoLoad(void* obj);
 
     ~CCmdSessionAutoLoad() = default;
 
@@ -58,13 +57,11 @@ public:
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 
     void BeforeLoad() override;
-
 };
 
 class CCmdSessionAutoSave : public CCmdSessionLoad
 {
 public:
-
     CCmdSessionAutoSave(void* obj);
 
     ~CCmdSessionAutoSave() = default;
@@ -76,24 +73,24 @@ public:
     void OnClose() override {}
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-
-    void BeforeLoad() override;
-
 };
 
 struct SessionItem
 {
-    SessionItem(const std::wstring& path , const CPosData& posData)
-        : path(path), posData(posData) {}
+    SessionItem(const std::wstring& path, const CPosData& posData)
+        : path(path)
+        , posData(posData)
+    {
+    }
     std::wstring path;
-    CPosData posData;
+    CPosData     posData;
 };
 
 class CCmdSessionRestoreLast : public ICommand
 {
 public:
-
-    CCmdSessionRestoreLast(void * obj) : ICommand(obj)
+    CCmdSessionRestoreLast(void* obj)
+        : ICommand(obj)
     {
     }
 
