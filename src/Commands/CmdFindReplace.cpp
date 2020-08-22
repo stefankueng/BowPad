@@ -1125,7 +1125,9 @@ void CFindReplaceDlg::DoListItemAction(int itemIndex)
     {
         path = m_foundPaths[item.pathIndex];
     }
-    if (OpenFile(path.c_str(), openFlags)<0)
+    if (path.empty())
+        TabActivateAt(GetTabIndexFromDocID(item.docID));
+    else if (OpenFile(path.c_str(), openFlags)<0)
         return;
     Center((long)item.pos, (long)item.pos);
     if (m_resultsType == ResultsType::MatchedTerms)
