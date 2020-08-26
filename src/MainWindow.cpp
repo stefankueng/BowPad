@@ -884,11 +884,11 @@ void CMainWindow::ShowTablistDropdown(HWND hWnd)
         {
             OnOutOfScope(DestroyMenu(hMenu));
             auto                                  currentIndex = m_TabBar.GetCurrentTabIndex();
-            std::map<std::wstring, int, ci_lessW> tablist;
+            std::multimap<std::wstring, int, ci_lessW> tablist;
             int                                   tabCount = m_TabBar.GetItemCount();
             for (int i = 0; i < tabCount; ++i)
             {
-                tablist[m_TabBar.GetTitle(i)] = i + 1;
+                tablist.insert(std::make_pair(m_TabBar.GetTitle(i), i + 1));
             }
 
             for (auto& tab : tablist)
