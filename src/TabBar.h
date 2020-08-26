@@ -40,7 +40,7 @@ struct TBHDR
 
 struct CloseButtonZone
 {
-    CloseButtonZone(): m_width(11), m_height(11), m_fromRight(3){};
+    CloseButtonZone(): m_width(11), m_height(11), m_fromRight(7){};
     bool IsHit(int x, int y, const RECT & testZone) const;
     RECT GetButtonRectFrom(const RECT & tabItemRect) const;
     void SetDPIScale(float scale) { m_width = int(m_width * scale); m_height = int(m_height * scale); m_fromRight = int(m_fromRight * scale); }
