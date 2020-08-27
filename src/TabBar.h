@@ -115,6 +115,8 @@ private:
     bool                        m_bHasImgList;
     HFONT                       m_hFont;
     HFONT                       m_hBoldFont;
+    HFONT                       m_hSymbolFont;
+    HFONT                       m_hSymbolBoldFont;
     int                         m_tabID;
 
     int                         m_ctrlID;
@@ -133,6 +135,8 @@ private:
     bool                        m_bIsCloseHover;
     int                         m_whichCloseClickDown;
     bool                        m_lmbdHit; // Left Mouse Button Down Hit
+    wchar_t                     m_closeChar;
+    wchar_t                     m_activeChar;
 
     std::map<int, IUIAnimationVariablePtr>  m_animVars;
 

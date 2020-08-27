@@ -45,6 +45,8 @@ CTabBar::CTabBar(HINSTANCE hInst)
     , m_bHasImgList(false)
     , m_hFont(nullptr)
     , m_hBoldFont(nullptr)
+    , m_hSymbolFont(nullptr)
+    , m_hSymbolBoldFont(nullptr)
     , m_ctrlID(-1)
     , m_bIsDragging(false)
     , m_bIsDraggingInside(false)
@@ -56,11 +58,15 @@ CTabBar::CTabBar(HINSTANCE hInst)
     , m_whichCloseClickDown(-1)
     , m_lmbdHit(false)
     , m_tabID(0)
+    , m_closeChar(L'\u274C')
+    , m_activeChar(L'\u25CF')
 {
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
     m_draggingPoint       = {};
     m_currentHoverTabRect = {};
+    if (IsWindows10OrGreater())
+        m_activeChar = L'\u2B24';
 };
 
 CTabBar::~CTabBar()
@@ -69,6 +75,10 @@ CTabBar::~CTabBar()
         DeleteObject(m_hFont);
     if (m_hBoldFont)
         DeleteObject(m_hBoldFont);
+    if (m_hSymbolFont)
+        DeleteObject(m_hSymbolFont);
+    if (m_hSymbolBoldFont)
+        DeleteObject(m_hSymbolBoldFont);
     Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
@@ -92,14 +102,20 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
     NONCLIENTMETRICS ncm;
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
     SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
+    ncm.lfSmCaptionFont.lfWeight = FW_NORMAL;
     m_hFont                      = CreateFontIndirect(&ncm.lfSmCaptionFont);
     ncm.lfSmCaptionFont.lfWeight = FW_BOLD;
     m_hBoldFont                  = CreateFontIndirect(&ncm.lfSmCaptionFont);
+    wcscpy_s(ncm.lfSmCaptionFont.lfFaceName, L"Segoe UI Symbol");
+    ncm.lfSmCaptionFont.lfWeight = FW_NORMAL;
+    m_hSymbolFont                = CreateFontIndirect(&ncm.lfSmCaptionFont);
+    ncm.lfSmCaptionFont.lfWeight = FW_BOLD;
+    m_hSymbolBoldFont            = CreateFontIndirect(&ncm.lfSmCaptionFont);
     ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
 
     TabCtrl_SetItemSize(*this, 300.0f * m_dpiScale, 25.0f * m_dpiScale);
     TabCtrl_SetPadding(*this, 13.0f * m_dpiScale, 0);
-    m_closeButtonZone.m_height = m_closeButtonZone.m_width  = -ncm.lfSmCaptionFont.lfHeight;
+    m_closeButtonZone.m_height = m_closeButtonZone.m_width = -ncm.lfSmCaptionFont.lfHeight;
     //m_closeButtonZone.SetDPIScale(m_dpiScale);
 
     return true;
@@ -968,15 +984,23 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     switch (buttonType)
     {
         case TabButtonType::Selected:
-            ::DrawText(pDrawItemStruct->hDC, L"\u2B24", 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
-            break;
+        {
+            auto oldFont = (HFONT)SelectObject(pDrawItemStruct->hDC, m_hSymbolFont);
+            ::DrawText(pDrawItemStruct->hDC, &m_activeChar, 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
+            SelectObject(pDrawItemStruct->hDC, oldFont);
+        }
+        break;
         case TabButtonType::Close:
-            ::DrawText(pDrawItemStruct->hDC, L"\u274C", 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
-            break;
+        {
+            auto oldFont = (HFONT)SelectObject(pDrawItemStruct->hDC, m_hSymbolFont);
+            ::DrawText(pDrawItemStruct->hDC, &m_closeChar, 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
+            SelectObject(pDrawItemStruct->hDC, oldFont);
+        }
+        break;
         case TabButtonType::CloseHover:
         {
-            auto oldFont = (HFONT)SelectObject(pDrawItemStruct->hDC, m_hBoldFont);
-            ::DrawText(pDrawItemStruct->hDC, L"\u274C", 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
+            auto oldFont = (HFONT)SelectObject(pDrawItemStruct->hDC, m_hSymbolBoldFont);
+            ::DrawText(pDrawItemStruct->hDC, &m_closeChar, 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
             SelectObject(pDrawItemStruct->hDC, oldFont);
         }
         break;
