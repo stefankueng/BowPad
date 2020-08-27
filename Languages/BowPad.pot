@@ -124,7 +124,7 @@ msgstr ""
 msgid "A"
 msgstr ""
 
-#. Resource IDs: (60517)
+#. Resource IDs: (60522)
 msgid "AB"
 msgstr ""
 
@@ -153,7 +153,7 @@ msgstr ""
 msgid "Add word to dictionary"
 msgstr ""
 
-#. Resource IDs: (60541)
+#. Resource IDs: (60546)
 msgid "All plugin commands are listed here"
 msgstr ""
 
@@ -187,12 +187,24 @@ msgstr ""
 msgid "Author: Stefan Küng"
 msgstr ""
 
-#. Resource IDs: (60516, 60518)
+#. Resource IDs: (60521, 60523)
 msgid "Auto Braces"
 msgstr ""
 
 #. Resource IDs: (60057, 60058)
 msgid "Auto save"
+msgstr ""
+
+#. Resource IDs: (60481)
+msgid "Auto-save"
+msgstr ""
+
+#. Resource IDs: (60483)
+msgid "Auto-saves modified files"
+msgstr ""
+
+#. Resource IDs: (60484)
+msgid "Auto-saves modified files when the session closes and restores the modified state on load"
 msgstr ""
 
 #. Resource IDs: (135)
@@ -323,7 +335,7 @@ msgstr ""
 msgid "Check for Updates"
 msgstr ""
 
-#. Resource IDs: (60611)
+#. Resource IDs: (60616)
 msgid "Check for errors only in comments, strings and text"
 msgstr ""
 
@@ -347,7 +359,7 @@ msgstr ""
 msgid "Close All Tabs"
 msgstr ""
 
-#. Resource IDs: (60488)
+#. Resource IDs: (60493)
 msgid "Close All Tabs Except This One"
 msgstr ""
 
@@ -359,7 +371,7 @@ msgstr ""
 msgid "Close all"
 msgstr ""
 
-#. Resource IDs: (60487)
+#. Resource IDs: (60492)
 msgid "Close all but this"
 msgstr ""
 
@@ -375,7 +387,7 @@ msgstr ""
 msgid "Closes all open files"
 msgstr ""
 
-#. Resource IDs: (60489)
+#. Resource IDs: (60494)
 msgid "Closes all open files except the current one"
 msgstr ""
 
@@ -411,19 +423,19 @@ msgstr ""
 msgid "Comments the selected text"
 msgstr ""
 
-#. Resource IDs: (60535)
+#. Resource IDs: (60540)
 msgid "Configure"
 msgstr ""
 
-#. Resource IDs: (60512)
+#. Resource IDs: (60517)
 msgid "Configure Keyboard Shortcuts"
 msgstr ""
 
-#. Resource IDs: (154, 60536)
+#. Resource IDs: (154, 60541)
 msgid "Configure Plugins"
 msgstr ""
 
-#. Resource IDs: (60511)
+#. Resource IDs: (60516)
 msgid "Configure Shortcuts"
 msgstr ""
 
@@ -467,15 +479,15 @@ msgstr ""
 msgid "Converts the selection to lowercase"
 msgstr ""
 
-#. Resource IDs: (60497)
+#. Resource IDs: (60502)
 msgid "Copies the name of the current file to the clipboard"
 msgstr ""
 
-#. Resource IDs: (60493)
+#. Resource IDs: (60498)
 msgid "Copies the path of the current file to the clipboard"
 msgstr ""
 
-#. Resource IDs: (60501)
+#. Resource IDs: (60506)
 msgid "Copies the path of the directory of the current file to the clipboard"
 msgstr ""
 
@@ -483,15 +495,15 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
-#. Resource IDs: (60499, 60500)
+#. Resource IDs: (60504, 60505)
 msgid "Copy Directory"
 msgstr ""
 
-#. Resource IDs: (60495, 60496)
+#. Resource IDs: (60500, 60501)
 msgid "Copy Name"
 msgstr ""
 
-#. Resource IDs: (60491, 60492)
+#. Resource IDs: (60496, 60497)
 msgid "Copy Path"
 msgstr ""
 
@@ -503,7 +515,7 @@ msgstr ""
 msgid "Copy the file\nThe copy is opened in another tab."
 msgstr ""
 
-#. Resource IDs: (60607)
+#. Resource IDs: (60612)
 msgid "Correct spelling mistakes"
 msgstr ""
 
@@ -511,7 +523,7 @@ msgstr ""
 msgid "Corrections"
 msgstr ""
 
-#. Resource IDs: (60619)
+#. Resource IDs: (60624)
 msgid "Corresponding File"
 msgstr ""
 
@@ -544,7 +556,7 @@ msgstr ""
 msgid "Create\nAn empty file is created."
 msgstr ""
 
-#. Resource IDs: (60531)
+#. Resource IDs: (60536)
 msgid "Creates a copy of the current tab"
 msgstr ""
 
@@ -633,7 +645,7 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#. Resource IDs: (60525, 60526)
+#. Resource IDs: (60530, 60531)
 msgid "Delete File"
 msgstr ""
 
@@ -645,7 +657,7 @@ msgstr ""
 msgid "Delete\nThe file will be removed."
 msgstr ""
 
-#. Resource IDs: (60527)
+#. Resource IDs: (60532)
 msgid "Deletes the file of the current tab"
 msgstr ""
 
@@ -684,7 +696,7 @@ msgstr ""
 msgid "Do&n't save"
 msgstr ""
 
-#. Resource IDs: (60548)
+#. Resource IDs: (60553)
 msgid "Document Summary"
 msgstr ""
 
@@ -748,11 +760,11 @@ msgstr ""
 msgid "Elevated"
 msgstr ""
 
-#. Resource IDs: (60519)
+#. Resource IDs: (60524)
 msgid "Enable to automatically add a closing brace when an opening brace is entered"
 msgstr ""
 
-#. Resource IDs: (60599)
+#. Resource IDs: (60604)
 msgid "Enables/Disables the spell checker"
 msgstr ""
 
@@ -781,7 +793,7 @@ msgstr ""
 msgid "F&older to search:"
 msgstr ""
 
-#. Resource IDs: (60187, 60482)
+#. Resource IDs: (60187, 60487)
 msgid "FN"
 msgstr ""
 
@@ -938,15 +950,15 @@ msgstr ""
 msgid "Folder required for second file."
 msgstr ""
 
-#. Resource IDs: (60551)
+#. Resource IDs: (60556)
 msgid "Folding"
 msgstr ""
 
-#. Resource IDs: (60559, 60560)
+#. Resource IDs: (60564, 60565)
 msgid "Folding Off"
 msgstr ""
 
-#. Resource IDs: (60556, 60557)
+#. Resource IDs: (60561, 60562)
 msgid "Folding On"
 msgstr ""
 
@@ -954,7 +966,7 @@ msgstr ""
 msgid "Follow Tab"
 msgstr ""
 
-#. Resource IDs: (60515, 65535)
+#. Resource IDs: (60520, 65535)
 msgid "Font"
 msgstr ""
 
@@ -973,7 +985,7 @@ msgstr ""
 msgid "Full file path:\r\n%s\r\n\r\nWord count: %ld\r\nLines: %ld\r\nEmpty lines: %ld\r\nParagraphs: %ld\r\n"
 msgstr ""
 
-#. Resource IDs: (1010, 60481, 60483)
+#. Resource IDs: (1010, 60486, 60488)
 msgid "Functions"
 msgstr ""
 
@@ -1021,15 +1033,15 @@ msgstr ""
 msgid "Import\nThe lexer file is imported. Restart BowPad to use the new lexer."
 msgstr ""
 
-#. Resource IDs: (60613, 60614)
+#. Resource IDs: (60618, 60619)
 msgid "Include uppercase"
 msgstr ""
 
-#. Resource IDs: (60615)
+#. Resource IDs: (60620)
 msgid "Include words that are all CAPS or have uppercase letters in the middle"
 msgstr ""
 
-#. Resource IDs: (60553, 60554, 60555)
+#. Resource IDs: (60558, 60559, 60560)
 msgid "Init Folding Margin"
 msgstr ""
 
@@ -1102,7 +1114,7 @@ msgstr ""
 msgid "LU"
 msgstr ""
 
-#. Resource IDs: (60387, 60601)
+#. Resource IDs: (60387, 60606)
 msgid "Language"
 msgstr ""
 
@@ -1361,7 +1373,7 @@ msgstr ""
 msgid "New %d"
 msgstr ""
 
-#. Resource IDs: (60529, 60530)
+#. Resource IDs: (60534, 60535)
 msgid "New Copy"
 msgstr ""
 
@@ -1425,7 +1437,7 @@ msgstr ""
 msgid "Online Languages"
 msgstr ""
 
-#. Resource IDs: (60609, 60610)
+#. Resource IDs: (60614, 60615)
 msgid "Only comments"
 msgstr ""
 
@@ -1433,15 +1445,15 @@ msgstr ""
 msgid "Open Console"
 msgstr ""
 
-#. Resource IDs: (60421, 60422, 60503, 60504)
+#. Resource IDs: (60421, 60422, 60508, 60509)
 msgid "Open Explorer"
 msgstr ""
 
-#. Resource IDs: (60521)
+#. Resource IDs: (60526)
 msgid "Open File"
 msgstr ""
 
-#. Resource IDs: (60522)
+#. Resource IDs: (60527)
 msgid "Open File under cursor"
 msgstr ""
 
@@ -1449,7 +1461,7 @@ msgstr ""
 msgid "Open Files"
 msgstr ""
 
-#. Resource IDs: (60620)
+#. Resource IDs: (60625)
 msgid "Open corresponding File"
 msgstr ""
 
@@ -1488,15 +1500,15 @@ msgstr ""
 msgid "Opens the Windows Explorer at the current file location"
 msgstr ""
 
-#. Resource IDs: (60505)
+#. Resource IDs: (60510)
 msgid "Opens the Windows Explorer at the current file path"
 msgstr ""
 
-#. Resource IDs: (60513)
+#. Resource IDs: (60518)
 msgid "Opens the config file to configure keyboard shortcuts for any command in BowPad"
 msgstr ""
 
-#. Resource IDs: (60621)
+#. Resource IDs: (60626)
 msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
 msgstr ""
 
@@ -1532,7 +1544,7 @@ msgstr ""
 msgid "Opens the default browser to search for the selected text"
 msgstr ""
 
-#. Resource IDs: (60523)
+#. Resource IDs: (60528)
 msgid "Opens the file/path that's at the cursor position"
 msgstr ""
 
@@ -1588,11 +1600,11 @@ msgstr ""
 msgid "Plugin Name"
 msgstr ""
 
-#. Resource IDs: (60540)
+#. Resource IDs: (60545)
 msgid "Plugin commands"
 msgstr ""
 
-#. Resource IDs: (60533, 60539)
+#. Resource IDs: (60538, 60544)
 msgid "Plugins"
 msgstr ""
 
@@ -1732,6 +1744,10 @@ msgstr ""
 msgid "SAL"
 msgstr ""
 
+#. Resource IDs: (60482)
+msgid "SAS"
+msgstr ""
+
 #. Resource IDs: (60291)
 msgid "SL"
 msgstr ""
@@ -1835,7 +1851,7 @@ msgstr ""
 msgid "Selection: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%ld%%r matches."
 msgstr ""
 
-#. Resource IDs: (60603)
+#. Resource IDs: (60608)
 msgid "Selects the language for the spell checker"
 msgstr ""
 
@@ -1883,7 +1899,7 @@ msgstr ""
 msgid "Sets the column at which the vertical edge is shown, indicating the right margin. Set to 0 to hide it."
 msgstr ""
 
-#. Resource IDs: (60507, 60508)
+#. Resource IDs: (60512, 60513)
 msgid "Show Properties"
 msgstr ""
 
@@ -1903,11 +1919,11 @@ msgstr ""
 msgid "Shows a dialog to configure custom commands"
 msgstr ""
 
-#. Resource IDs: (60537)
+#. Resource IDs: (60542)
 msgid "Shows a dialog to configure the installed plugins and install new plugins"
 msgstr ""
 
-#. Resource IDs: (60484)
+#. Resource IDs: (60489)
 msgid "Shows a list of functions/methods in the file to jump to"
 msgstr ""
 
@@ -1915,15 +1931,15 @@ msgstr ""
 msgid "Shows or hides the file tree"
 msgstr ""
 
-#. Resource IDs: (60549)
+#. Resource IDs: (60554)
 msgid "Shows statistics about the current document"
 msgstr ""
 
-#. Resource IDs: (60509)
+#. Resource IDs: (60514)
 msgid "Shows the Windows Explorer file properties dialog for the current file"
 msgstr ""
 
-#. Resource IDs: (60545)
+#. Resource IDs: (60550)
 msgid "Shows the list of all opened tabs."
 msgstr ""
 
@@ -1943,15 +1959,15 @@ msgstr ""
 msgid "Spaces to Tabs"
 msgstr ""
 
-#. Resource IDs: (60595)
+#. Resource IDs: (60600)
 msgid "Spell Check"
 msgstr ""
 
-#. Resource IDs: (60597, 60598, 60605, 60606)
+#. Resource IDs: (60602, 60603, 60610, 60611)
 msgid "Spell checker"
 msgstr ""
 
-#. Resource IDs: (60602)
+#. Resource IDs: (60607)
 msgid "Spell checker language"
 msgstr ""
 
@@ -1983,7 +1999,7 @@ msgstr ""
 msgid "Sub Folders"
 msgstr ""
 
-#. Resource IDs: (156, 60547)
+#. Resource IDs: (156, 60552)
 msgid "Summary"
 msgstr ""
 
@@ -2003,7 +2019,7 @@ msgstr ""
 msgid "TT"
 msgstr ""
 
-#. Resource IDs: (60544)
+#. Resource IDs: (60549)
 msgid "Tab List"
 msgstr ""
 
@@ -2011,7 +2027,7 @@ msgstr ""
 msgid "Tab Size"
 msgstr ""
 
-#. Resource IDs: (60543)
+#. Resource IDs: (60548)
 msgid "Tabs"
 msgstr ""
 
@@ -2059,47 +2075,47 @@ msgstr ""
 msgid "Toggle a bookmark on the current line"
 msgstr ""
 
-#. Resource IDs: (60562, 60563)
+#. Resource IDs: (60567, 60568)
 msgid "Toggle folding all"
 msgstr ""
 
-#. Resource IDs: (60565, 60566)
+#. Resource IDs: (60570, 60571)
 msgid "Toggle level 0"
 msgstr ""
 
-#. Resource IDs: (60568, 60569)
+#. Resource IDs: (60573, 60574)
 msgid "Toggle level 1"
 msgstr ""
 
-#. Resource IDs: (60571, 60572)
+#. Resource IDs: (60576, 60577)
 msgid "Toggle level 2"
 msgstr ""
 
-#. Resource IDs: (60574, 60575)
+#. Resource IDs: (60579, 60580)
 msgid "Toggle level 3"
 msgstr ""
 
-#. Resource IDs: (60577, 60578)
+#. Resource IDs: (60582, 60583)
 msgid "Toggle level 4"
 msgstr ""
 
-#. Resource IDs: (60580, 60581)
+#. Resource IDs: (60585, 60586)
 msgid "Toggle level 5"
 msgstr ""
 
-#. Resource IDs: (60583, 60584)
+#. Resource IDs: (60588, 60589)
 msgid "Toggle level 6"
 msgstr ""
 
-#. Resource IDs: (60586, 60587)
+#. Resource IDs: (60591, 60592)
 msgid "Toggle level 7"
 msgstr ""
 
-#. Resource IDs: (60589, 60590)
+#. Resource IDs: (60594, 60595)
 msgid "Toggle level 8"
 msgstr ""
 
-#. Resource IDs: (60592, 60593)
+#. Resource IDs: (60597, 60598)
 msgid "Toggle level 9"
 msgstr ""
 
@@ -2387,55 +2403,55 @@ msgstr ""
 msgid "runs the custom command 9"
 msgstr ""
 
-#. Resource IDs: (60564)
+#. Resource IDs: (60569)
 msgid "toggles folding all levels in the whole document"
 msgstr ""
 
-#. Resource IDs: (60567)
+#. Resource IDs: (60572)
 msgid "toggles folding at level 0 in the whole document"
 msgstr ""
 
-#. Resource IDs: (60570)
+#. Resource IDs: (60575)
 msgid "toggles folding at level 1 in the whole document"
 msgstr ""
 
-#. Resource IDs: (60573)
+#. Resource IDs: (60578)
 msgid "toggles folding at level 2 in the whole document"
 msgstr ""
 
-#. Resource IDs: (60576)
+#. Resource IDs: (60581)
 msgid "toggles folding at level 3 in the whole document"
 msgstr ""
 
-#. Resource IDs: (60579)
+#. Resource IDs: (60584)
 msgid "toggles folding at level 4 in the whole document"
 msgstr ""
 
-#. Resource IDs: (60582)
+#. Resource IDs: (60587)
 msgid "toggles folding at level 5 in the whole document"
 msgstr ""
 
-#. Resource IDs: (60585)
+#. Resource IDs: (60590)
 msgid "toggles folding at level 6 in the whole document"
 msgstr ""
 
-#. Resource IDs: (60588)
+#. Resource IDs: (60593)
 msgid "toggles folding at level 7 in the whole document"
 msgstr ""
 
-#. Resource IDs: (60591)
+#. Resource IDs: (60596)
 msgid "toggles folding at level 8 in the whole document"
 msgstr ""
 
-#. Resource IDs: (60594)
+#. Resource IDs: (60599)
 msgid "toggles folding at level 9 in the whole document"
 msgstr ""
 
-#. Resource IDs: (60558)
+#. Resource IDs: (60563)
 msgid "turn on folding"
 msgstr ""
 
-#. Resource IDs: (60561)
+#. Resource IDs: (60566)
 msgid "turns off folding"
 msgstr ""
 
