@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2020-06-28 11:52+0200\n"
+"PO-Revision-Date: 2020-08-27 19:17+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -151,7 +151,7 @@ msgstr ""
 msgid "A"
 msgstr "A"
 
-#. Resource IDs: (60517)
+#. Resource IDs: (60522)
 msgid "AB"
 msgstr "AB"
 
@@ -184,7 +184,7 @@ msgstr ""
 msgid "Add word to dictionary"
 msgstr "Füge Wort zum Wörterbuch hinzu"
 
-#. Resource IDs: (60541)
+#. Resource IDs: (60546)
 msgid "All plugin commands are listed here"
 msgstr "Alle Plugin-Befehle werden hier aufgelistet"
 
@@ -218,13 +218,29 @@ msgstr "Fragt nach wo der aktuelle Tab gespeichert werden soll"
 msgid "Author: Stefan Küng"
 msgstr "Autor: Stefan Küng"
 
-#. Resource IDs: (60516, 60518)
+#. Resource IDs: (60521, 60523)
 msgid "Auto Braces"
 msgstr "Auto-Klammern"
 
 #. Resource IDs: (60057, 60058)
 msgid "Auto save"
 msgstr "Auto-Speichern"
+
+#. Resource IDs: (60481)
+msgid "Auto-save"
+msgstr "Auto-Speichern"
+
+#. Resource IDs: (60483)
+msgid "Auto-saves modified files"
+msgstr "Speichert geänderte Dateien automatisch"
+
+#. Resource IDs: (60484)
+msgid ""
+"Auto-saves modified files when the session closes and restores the modified "
+"state on load"
+msgstr ""
+"Speichert geänderte Dateien automatisch wenn BowPad beendet wird und stellt "
+"den geänderten Zustand beim Laden wieder her"
 
 #. Resource IDs: (135)
 msgid "Available Languages"
@@ -375,7 +391,7 @@ msgstr ""
 msgid "Check for Updates"
 msgstr "Auf Updates überprüfen"
 
-#. Resource IDs: (60611)
+#. Resource IDs: (60616)
 msgid "Check for errors only in comments, strings and text"
 msgstr "Überprüfe nur in Kommentaren, Strings und Text"
 
@@ -399,7 +415,7 @@ msgstr "Zwischenablage"
 msgid "Close All Tabs"
 msgstr "Schliesse alle Tabs"
 
-#. Resource IDs: (60488)
+#. Resource IDs: (60493)
 msgid "Close All Tabs Except This One"
 msgstr "Schliesse alle Tabs ausser diesen"
 
@@ -411,7 +427,7 @@ msgstr "Schliesse Tab"
 msgid "Close all"
 msgstr "Schliesse alle"
 
-#. Resource IDs: (60487)
+#. Resource IDs: (60492)
 msgid "Close all but this"
 msgstr "Schliesse alle ausser diesen"
 
@@ -431,7 +447,7 @@ msgstr ""
 msgid "Closes all open files"
 msgstr "Schliesse alle offenen Dateien"
 
-#. Resource IDs: (60489)
+#. Resource IDs: (60494)
 msgid "Closes all open files except the current one"
 msgstr "Schliesse alle offenen Dateien ausser der aktuellen"
 
@@ -467,19 +483,19 @@ msgstr "Kommentieren"
 msgid "Comments the selected text"
 msgstr "Kommentiert den ausgewählten Text"
 
-#. Resource IDs: (60535)
+#. Resource IDs: (60540)
 msgid "Configure"
 msgstr "Konfigurieren"
 
-#. Resource IDs: (60512)
+#. Resource IDs: (60517)
 msgid "Configure Keyboard Shortcuts"
 msgstr "Tastenkürzel konfigurieren"
 
-#. Resource IDs: (154, 60536)
+#. Resource IDs: (154, 60541)
 msgid "Configure Plugins"
 msgstr "Plugins konfigurieren"
 
-#. Resource IDs: (60511)
+#. Resource IDs: (60516)
 msgid "Configure Shortcuts"
 msgstr "Tastaturkürzel Konfigurieren"
 
@@ -525,15 +541,15 @@ msgstr "Konvertiert die Auswahl zu GROSSbuchstaben"
 msgid "Converts the selection to lowercase"
 msgstr "Konvertiert die Auswahl zu kleinbuchstaben"
 
-#. Resource IDs: (60497)
+#. Resource IDs: (60502)
 msgid "Copies the name of the current file to the clipboard"
 msgstr "Kopiert den aktuellen Dateinamen in die Zwischenablage"
 
-#. Resource IDs: (60493)
+#. Resource IDs: (60498)
 msgid "Copies the path of the current file to the clipboard"
 msgstr "Kopiert den aktuellen Dateipfad in die Zwischenablage"
 
-#. Resource IDs: (60501)
+#. Resource IDs: (60506)
 msgid "Copies the path of the directory of the current file to the clipboard"
 msgstr "Kopiert den aktuellen Dateiordnerpfad in die Zwischenablage"
 
@@ -541,15 +557,15 @@ msgstr "Kopiert den aktuellen Dateiordnerpfad in die Zwischenablage"
 msgid "Copy"
 msgstr "Kopieren"
 
-#. Resource IDs: (60499, 60500)
+#. Resource IDs: (60504, 60505)
 msgid "Copy Directory"
 msgstr "Ordner kopieren"
 
-#. Resource IDs: (60495, 60496)
+#. Resource IDs: (60500, 60501)
 msgid "Copy Name"
 msgstr "Kopiere Name"
 
-#. Resource IDs: (60491, 60492)
+#. Resource IDs: (60496, 60497)
 msgid "Copy Path"
 msgstr "Kopiere Pfad"
 
@@ -569,7 +585,7 @@ msgstr ""
 "Datei kopieren\n"
 "Die Kopie wird in einem neuen Reiter geöffnet."
 
-#. Resource IDs: (60607)
+#. Resource IDs: (60612)
 msgid "Correct spelling mistakes"
 msgstr "Rechtschreibfehler korrigieren"
 
@@ -577,7 +593,7 @@ msgstr "Rechtschreibfehler korrigieren"
 msgid "Corrections"
 msgstr "Korrekturen"
 
-#. Resource IDs: (60619)
+#. Resource IDs: (60624)
 msgid "Corresponding File"
 msgstr "Entsprechende Datei"
 
@@ -614,7 +630,7 @@ msgstr ""
 "Erstellen\n"
 "Eine leere Datei wird erstellt."
 
-#. Resource IDs: (60531)
+#. Resource IDs: (60536)
 msgid "Creates a copy of the current tab"
 msgstr "Erstellt eine Kopie des aktuellen Tabs"
 
@@ -707,7 +723,7 @@ msgstr "Defaults für neue Dateien"
 msgid "Delete"
 msgstr "Löschen"
 
-#. Resource IDs: (60525, 60526)
+#. Resource IDs: (60530, 60531)
 msgid "Delete File"
 msgstr "Datei löschen"
 
@@ -723,7 +739,7 @@ msgstr ""
 "Löschen\n"
 "Die Datei wird gelöscht."
 
-#. Resource IDs: (60527)
+#. Resource IDs: (60532)
 msgid "Deletes the file of the current tab"
 msgstr "Löscht die Datei des aktuellen Tabs"
 
@@ -769,7 +785,7 @@ msgstr "Möchten Sie die Änderungen speichern nach \"%s\"?"
 msgid "Do&n't save"
 msgstr "&Nicht speichern"
 
-#. Resource IDs: (60548)
+#. Resource IDs: (60553)
 msgid "Document Summary"
 msgstr "Dokument Statistik"
 
@@ -853,14 +869,14 @@ msgstr "Verändern"
 msgid "Elevated"
 msgstr "Elevated"
 
-#. Resource IDs: (60519)
+#. Resource IDs: (60524)
 msgid ""
 "Enable to automatically add a closing brace when an opening brace is entered"
 msgstr ""
 "Aktivieren um automatisch eine schliessende Klammer einzufügen sobald eine "
 "öffnende Klammer eingegeben wird"
 
-#. Resource IDs: (60599)
+#. Resource IDs: (60604)
 msgid "Enables/Disables the spell checker"
 msgstr "Aktiviert/Deaktiviert die Rechtschreibkorrektur"
 
@@ -889,7 +905,7 @@ msgstr "Date&ien (z.B.: *.txt;*.dat):"
 msgid "F&older to search:"
 msgstr "Such&ordner:"
 
-#. Resource IDs: (60187, 60482)
+#. Resource IDs: (60187, 60487)
 msgid "FN"
 msgstr "FN"
 
@@ -1066,15 +1082,15 @@ msgstr "Ordner für erste Datei fehlt."
 msgid "Folder required for second file."
 msgstr "Ordner für zweite Datei fehlt."
 
-#. Resource IDs: (60551)
+#. Resource IDs: (60556)
 msgid "Folding"
 msgstr "Klappung"
 
-#. Resource IDs: (60559, 60560)
+#. Resource IDs: (60564, 60565)
 msgid "Folding Off"
 msgstr "Klappung Aus"
 
-#. Resource IDs: (60556, 60557)
+#. Resource IDs: (60561, 60562)
 msgid "Folding On"
 msgstr "Klappung Ein"
 
@@ -1082,7 +1098,7 @@ msgstr "Klappung Ein"
 msgid "Follow Tab"
 msgstr "Folge Tab"
 
-#. Resource IDs: (60515, 65535)
+#. Resource IDs: (60520, 65535)
 msgid "Font"
 msgstr "Schriftart"
 
@@ -1115,7 +1131,7 @@ msgstr ""
 "Leere Zeilen: %ld\r\n"
 "Abschnitte: %ld\r\n"
 
-#. Resource IDs: (1010, 60481, 60483)
+#. Resource IDs: (1010, 60486, 60488)
 msgid "Functions"
 msgstr "Funktionen"
 
@@ -1168,17 +1184,17 @@ msgstr ""
 "Die Lexerdatei wird importiert. Starten Sie BowPad neu um die neuen "
 "Farbstile zu verwenden."
 
-#. Resource IDs: (60613, 60614)
+#. Resource IDs: (60618, 60619)
 msgid "Include uppercase"
 msgstr "Grossschreibung einschliessen"
 
-#. Resource IDs: (60615)
+#. Resource IDs: (60620)
 msgid "Include words that are all CAPS or have uppercase letters in the middle"
 msgstr ""
 "Korrigiere Worte in Grossbuchstaben und auch Worte welche Grossbuchstaben in "
 "der Mitte haben"
 
-#. Resource IDs: (60553, 60554, 60555)
+#. Resource IDs: (60558, 60559, 60560)
 msgid "Init Folding Margin"
 msgstr "Initialisiere Klappungsrand"
 
@@ -1255,7 +1271,7 @@ msgstr "LS"
 msgid "LU"
 msgstr "LU"
 
-#. Resource IDs: (60387, 60601)
+#. Resource IDs: (60387, 60606)
 msgid "Language"
 msgstr "Sprache"
 
@@ -1536,7 +1552,7 @@ msgstr "NEXT"
 msgid "New %d"
 msgstr "Neu %d"
 
-#. Resource IDs: (60529, 60530)
+#. Resource IDs: (60534, 60535)
 msgid "New Copy"
 msgstr "Neue Kopie"
 
@@ -1604,7 +1620,7 @@ msgstr "OK"
 msgid "Online Languages"
 msgstr "Online Sprachen"
 
-#. Resource IDs: (60609, 60610)
+#. Resource IDs: (60614, 60615)
 msgid "Only comments"
 msgstr "Nur Kommentare"
 
@@ -1612,15 +1628,15 @@ msgstr "Nur Kommentare"
 msgid "Open Console"
 msgstr "Öffne Konsole"
 
-#. Resource IDs: (60421, 60422, 60503, 60504)
+#. Resource IDs: (60421, 60422, 60508, 60509)
 msgid "Open Explorer"
 msgstr "Öffne Explorer"
 
-#. Resource IDs: (60521)
+#. Resource IDs: (60526)
 msgid "Open File"
 msgstr "Öffne Datei"
 
-#. Resource IDs: (60522)
+#. Resource IDs: (60527)
 msgid "Open File under cursor"
 msgstr "Öffne Datei an Cursorposition"
 
@@ -1628,7 +1644,7 @@ msgstr "Öffne Datei an Cursorposition"
 msgid "Open Files"
 msgstr "Öffne Dateien"
 
-#. Resource IDs: (60620)
+#. Resource IDs: (60625)
 msgid "Open corresponding File"
 msgstr "Öffne zugehörige Datei"
 
@@ -1675,18 +1691,18 @@ msgstr "Öffnet die Konsole im aktuellen Verzeichnis"
 msgid "Opens the Windows Explorer at the current file location"
 msgstr "Öffnet den Windows Explorer im aktuellen Verzeichnis"
 
-#. Resource IDs: (60505)
+#. Resource IDs: (60510)
 msgid "Opens the Windows Explorer at the current file path"
 msgstr "Öffnet den Windows Explorer im aktuellen Dateipfad"
 
-#. Resource IDs: (60513)
+#. Resource IDs: (60518)
 msgid ""
 "Opens the config file to configure keyboard shortcuts for any command in "
 "BowPad"
 msgstr ""
 "Öffnet die Konfigurationsdatei zum konfigurieren der Tastaturkürzel in BowPad"
 
-#. Resource IDs: (60621)
+#. Resource IDs: (60626)
 msgid ""
 "Opens the corresponding file to the file in the current tab.\n"
 "(h/cpp, aspx/cs/vb)"
@@ -1726,7 +1742,7 @@ msgstr "Sucht nach dem markierten Text in Wikipedia"
 msgid "Opens the default browser to search for the selected text"
 msgstr "Sucht mit dem Standardbrowser nach dem markierten Text"
 
-#. Resource IDs: (60523)
+#. Resource IDs: (60528)
 msgid "Opens the file/path that's at the cursor position"
 msgstr "Öffnet die Datei/Pfad welche an der Cursorposition steht"
 
@@ -1782,11 +1798,11 @@ msgstr "Bitte warten."
 msgid "Plugin Name"
 msgstr "Plugin Name"
 
-#. Resource IDs: (60540)
+#. Resource IDs: (60545)
 msgid "Plugin commands"
 msgstr "Plugin Befehle"
 
-#. Resource IDs: (60533, 60539)
+#. Resource IDs: (60538, 60544)
 msgid "Plugins"
 msgstr "Plugins"
 
@@ -1938,6 +1954,10 @@ msgstr "SA"
 msgid "SAL"
 msgstr "SAL"
 
+#. Resource IDs: (60482)
+msgid "SAS"
+msgstr "SAS"
+
 #. Resource IDs: (60291)
 msgid "SL"
 msgstr "SL"
@@ -2054,7 +2074,7 @@ msgstr ""
 "Auswahl: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r Zeilen | %%c%06X%ld%%r "
 "Markierungen."
 
-#. Resource IDs: (60603)
+#. Resource IDs: (60608)
 msgid "Selects the language for the spell checker"
 msgstr "Wähle die Sprache für die Rechtschreibkorrektur"
 
@@ -2110,7 +2130,7 @@ msgstr ""
 "Bestimmt die Spalte an welcher eine Vertikale Linie als rechter Rand "
 "angezeigt wird. Zum nicht-Anzeigen der Linie auf 0 setzen."
 
-#. Resource IDs: (60507, 60508)
+#. Resource IDs: (60512, 60513)
 msgid "Show Properties"
 msgstr "Zeige Eigenschaften"
 
@@ -2130,12 +2150,12 @@ msgstr "Zeige Dateibaum"
 msgid "Shows a dialog to configure custom commands"
 msgstr "Zeigt den Konfigurationsdialog für Benutzerbefehle"
 
-#. Resource IDs: (60537)
+#. Resource IDs: (60542)
 msgid ""
 "Shows a dialog to configure the installed plugins and install new plugins"
 msgstr "Zeigt einen Dialog an um Plugins zu installieren und konfigurieren"
 
-#. Resource IDs: (60484)
+#. Resource IDs: (60489)
 msgid "Shows a list of functions/methods in the file to jump to"
 msgstr "Zeigt eine Liste von Funktionen/Methoden an in der aktuellen Datei"
 
@@ -2143,15 +2163,15 @@ msgstr "Zeigt eine Liste von Funktionen/Methoden an in der aktuellen Datei"
 msgid "Shows or hides the file tree"
 msgstr "Zeigt den Dateibaum an oder versteckt diesen"
 
-#. Resource IDs: (60549)
+#. Resource IDs: (60554)
 msgid "Shows statistics about the current document"
 msgstr "Zeigt Statistiken über das aktuelle Dokument an"
 
-#. Resource IDs: (60509)
+#. Resource IDs: (60514)
 msgid "Shows the Windows Explorer file properties dialog for the current file"
 msgstr "Öffnet den Windows Explorer Eigenschaftsdialog für die aktuelle Datei"
 
-#. Resource IDs: (60545)
+#. Resource IDs: (60550)
 msgid "Shows the list of all opened tabs."
 msgstr "Zeigt eine Liste mit offenen Tabs."
 
@@ -2171,15 +2191,15 @@ msgstr "Sortiert die aktuelle Auswahl (Normale Auswahl oder Rechteckauswahl)"
 msgid "Spaces to Tabs"
 msgstr "Leerzeichen zu Tabulatoren"
 
-#. Resource IDs: (60595)
+#. Resource IDs: (60600)
 msgid "Spell Check"
 msgstr "Rechtschreibung"
 
-#. Resource IDs: (60597, 60598, 60605, 60606)
+#. Resource IDs: (60602, 60603, 60610, 60611)
 msgid "Spell checker"
 msgstr "Rechtschreibung"
 
-#. Resource IDs: (60602)
+#. Resource IDs: (60607)
 msgid "Spell checker language"
 msgstr "Wähle Rechtschreibkorrektur-Sprache"
 
@@ -2211,7 +2231,7 @@ msgstr "Stile"
 msgid "Sub Folders"
 msgstr "Unterordner"
 
-#. Resource IDs: (156, 60547)
+#. Resource IDs: (156, 60552)
 msgid "Summary"
 msgstr "Statistik"
 
@@ -2231,7 +2251,7 @@ msgstr "TS"
 msgid "TT"
 msgstr "TT"
 
-#. Resource IDs: (60544)
+#. Resource IDs: (60549)
 msgid "Tab List"
 msgstr "Tabs Liste"
 
@@ -2239,7 +2259,7 @@ msgstr "Tabs Liste"
 msgid "Tab Size"
 msgstr "Tabulatorgrösse"
 
-#. Resource IDs: (60543)
+#. Resource IDs: (60548)
 msgid "Tabs"
 msgstr "Tabs"
 
@@ -2294,47 +2314,47 @@ msgstr "Lesezeichen ein/aus"
 msgid "Toggle a bookmark on the current line"
 msgstr "Setzt/entfernt ein Lesezeichen an der aktuellen Zeile"
 
-#. Resource IDs: (60562, 60563)
+#. Resource IDs: (60567, 60568)
 msgid "Toggle folding all"
 msgstr "Wechsle Einklappung"
 
-#. Resource IDs: (60565, 60566)
+#. Resource IDs: (60570, 60571)
 msgid "Toggle level 0"
 msgstr "Wechsle Einklappung Stufe 0"
 
-#. Resource IDs: (60568, 60569)
+#. Resource IDs: (60573, 60574)
 msgid "Toggle level 1"
 msgstr "Wechsle Einklappung Stufe 1"
 
-#. Resource IDs: (60571, 60572)
+#. Resource IDs: (60576, 60577)
 msgid "Toggle level 2"
 msgstr "Wechsle Einklappung Stufe 2"
 
-#. Resource IDs: (60574, 60575)
+#. Resource IDs: (60579, 60580)
 msgid "Toggle level 3"
 msgstr "Wechsle Einklappung Stufe 3"
 
-#. Resource IDs: (60577, 60578)
+#. Resource IDs: (60582, 60583)
 msgid "Toggle level 4"
 msgstr "Wechsle Einklappung Stufe 4"
 
-#. Resource IDs: (60580, 60581)
+#. Resource IDs: (60585, 60586)
 msgid "Toggle level 5"
 msgstr "Wechsle Einklappung Stufe 5"
 
-#. Resource IDs: (60583, 60584)
+#. Resource IDs: (60588, 60589)
 msgid "Toggle level 6"
 msgstr "Wechsle Einklappung Stufe 6"
 
-#. Resource IDs: (60586, 60587)
+#. Resource IDs: (60591, 60592)
 msgid "Toggle level 7"
 msgstr "Wechsle Einklappung Stufe 7"
 
-#. Resource IDs: (60589, 60590)
+#. Resource IDs: (60594, 60595)
 msgid "Toggle level 8"
 msgstr "Wechsle Einklappung Stufe 8"
 
-#. Resource IDs: (60592, 60593)
+#. Resource IDs: (60597, 60598)
 msgid "Toggle level 9"
 msgstr "Wechsle Einklappung Stufe 9"
 
@@ -2645,55 +2665,55 @@ msgstr "Führt den Benutzerbefehl 8 aus"
 msgid "runs the custom command 9"
 msgstr "Führt den Benutzerbefehl 9 aus"
 
-#. Resource IDs: (60564)
+#. Resource IDs: (60569)
 msgid "toggles folding all levels in the whole document"
 msgstr "Wechselt die Einklappung im ganzen Dokument"
 
-#. Resource IDs: (60567)
+#. Resource IDs: (60572)
 msgid "toggles folding at level 0 in the whole document"
 msgstr "Wechselt die Einklappung in Stufe 0 im ganzen Dokument"
 
-#. Resource IDs: (60570)
+#. Resource IDs: (60575)
 msgid "toggles folding at level 1 in the whole document"
 msgstr "Wechselt die Einklappung in Stufe 1 im ganzen Dokument"
 
-#. Resource IDs: (60573)
+#. Resource IDs: (60578)
 msgid "toggles folding at level 2 in the whole document"
 msgstr "Wechselt die Einklappung in Stufe 2 im ganzen Dokument"
 
-#. Resource IDs: (60576)
+#. Resource IDs: (60581)
 msgid "toggles folding at level 3 in the whole document"
 msgstr "Wechselt die Einklappung in Stufe 3 im ganzen Dokument"
 
-#. Resource IDs: (60579)
+#. Resource IDs: (60584)
 msgid "toggles folding at level 4 in the whole document"
 msgstr "Wechselt die Einklappung in Stufe 4 im ganzen Dokument"
 
-#. Resource IDs: (60582)
+#. Resource IDs: (60587)
 msgid "toggles folding at level 5 in the whole document"
 msgstr "Wechselt die Einklappung in Stufe 5 im ganzen Dokument"
 
-#. Resource IDs: (60585)
+#. Resource IDs: (60590)
 msgid "toggles folding at level 6 in the whole document"
 msgstr "Wechselt die Einklappung in Stufe 6 im ganzen Dokument"
 
-#. Resource IDs: (60588)
+#. Resource IDs: (60593)
 msgid "toggles folding at level 7 in the whole document"
 msgstr "Wechselt die Einklappung in Stufe 7 im ganzen Dokument"
 
-#. Resource IDs: (60591)
+#. Resource IDs: (60596)
 msgid "toggles folding at level 8 in the whole document"
 msgstr "Wechselt die Einklappung in Stufe 8 im ganzen Dokument"
 
-#. Resource IDs: (60594)
+#. Resource IDs: (60599)
 msgid "toggles folding at level 9 in the whole document"
 msgstr "Wechselt die Einklappung in Stufe 9 im ganzen Dokument"
 
-#. Resource IDs: (60558)
+#. Resource IDs: (60563)
 msgid "turn on folding"
 msgstr "Schaltet Klappung ein"
 
-#. Resource IDs: (60561)
+#. Resource IDs: (60566)
 msgid "turns off folding"
 msgstr "Schaltet Klappung aus"
 
