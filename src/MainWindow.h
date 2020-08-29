@@ -46,7 +46,6 @@ enum class ResponseToCloseTab
     CloseWithoutSaving
 };
 
-
 struct HIMAGELIST_Deleter
 {
     void operator()(_IMAGELIST* hImageList)
@@ -59,43 +58,47 @@ struct HIMAGELIST_Deleter
     }
 };
 
-class CMainWindow : public CWindow, public IUIApplication, public IUICommandHandler
+class CMainWindow : public CWindow
+    , public IUIApplication
+    , public IUICommandHandler
 {
     friend class ICommand;
+
 public:
     CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = nullptr);
     ~CMainWindow();
 
-    bool                RegisterAndCreateWindow();
-    bool                Initialize();
-    bool                CreateRibbon();
+    bool RegisterAndCreateWindow();
+    bool Initialize();
+    bool CreateRibbon();
 
     // Load/Reload functions
-    int                 OpenFile(const std::wstring& file, unsigned int openFlags);
-    bool                OpenFileAs( const std::wstring& temppath, const std::wstring& realpath, bool bModified );
-    bool                ReloadTab(int tab, int encoding, bool dueToOutsideChanges = false);
+    int  OpenFile(const std::wstring& file, unsigned int openFlags);
+    bool OpenFileAs(const std::wstring& temppath, const std::wstring& realpath, bool bModified);
+    bool ReloadTab(int tab, int encoding, bool dueToOutsideChanges = false);
 
-    bool                SaveCurrentTab(bool bSaveAs = false);
-    bool                SaveDoc(DocID docID, bool bSaveAs = false);
-    bool                SaveDoc(DocID docID, const std::wstring& path);
-    void                EnsureAtLeastOneTab();
-    void                GoToLine(size_t line);
-    bool                CloseTab(int tab, bool force = false, bool quitting = false);
-    bool                CloseAllTabs(bool quitting = false);
-    void                SetFileToOpen(const std::wstring& path, size_t line = (size_t)-1) { m_pathsToOpen[path] = line; }
-    void                SetFileOpenMRU(bool bUseMRU) { m_bPathsToOpenMRU = bUseMRU; }
-    void                SetElevatedSave(const std::wstring& path, const std::wstring& savepath, long line) { m_elevatepath = path; m_elevatesavepath = savepath; m_initLine = line; }
-    void                ElevatedSave(const std::wstring& path, const std::wstring& savepath, long line);
-    void                TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line, const std::wstring& title);
-    void                SetTabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line, const std::wstring& title) { m_tabmovepath = path; m_tabmovesavepath = savepath; m_tabmovemod = bMod; m_initLine = line; m_tabmovetitle = title; }
-    void                SetInsertionIndex(int index) { m_insertionIndex = index; }
-    std::wstring        GetNewTabName();
-    void                ShowFileTree(bool bShow);
-    bool                IsFileTreeShown() const { return m_fileTreeVisible; }
-    std::wstring        GetFileTreePath() const { return m_fileTree.GetPath(); }
-    void                FileTreeBlockRefresh(bool bBlock) { m_fileTree.BlockRefresh(bBlock); }
-    void                SetFileTreeWidth(int width);
+    bool         SaveCurrentTab(bool bSaveAs = false);
+    bool         SaveDoc(DocID docID, bool bSaveAs = false);
+    bool         SaveDoc(DocID docID, const std::wstring& path);
+    void         EnsureAtLeastOneTab();
+    void         GoToLine(size_t line);
+    bool         CloseTab(int tab, bool force = false, bool quitting = false);
+    bool         CloseAllTabs(bool quitting = false);
+    void         SetFileToOpen(const std::wstring& path, size_t line = (size_t)-1) { m_pathsToOpen[path] = line; }
+    void         SetFileOpenMRU(bool bUseMRU) { m_bPathsToOpenMRU = bUseMRU; }
+    void         SetElevatedSave(const std::wstring& path, const std::wstring& savepath, long line);
+    void         ElevatedSave(const std::wstring& path, const std::wstring& savepath, long line);
+    void         TabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line, const std::wstring& title);
+    void         SetTabMove(const std::wstring& path, const std::wstring& savepath, bool bMod, long line, const std::wstring& title);
+    void         SetInsertionIndex(int index) { m_insertionIndex = index; }
+    std::wstring GetNewTabName();
+    void         ShowFileTree(bool bShow);
+    bool         IsFileTreeShown() const { return m_fileTreeVisible; }
+    std::wstring GetFileTreePath() const { return m_fileTree.GetPath(); }
+    void         FileTreeBlockRefresh(bool bBlock) { m_fileTree.BlockRefresh(bBlock); }
+    void         SetFileTreeWidth(int width);
 
+    // clang-format off
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
     IFACEMETHODIMP_(ULONG) AddRef();
@@ -107,140 +110,141 @@ public:
     // IUICommandHandler methods
     STDMETHOD(UpdateProperty)(UINT nCmdID, REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue);
     STDMETHOD(Execute)(UINT nCmdID, UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties);
-
+    // clang-format on
 protected:
     /// the message handler for this window
-    LRESULT CALLBACK            WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
-    LRESULT                     DoCommand(WPARAM wParam, LPARAM lParam);
+    LRESULT DoCommand(WPARAM wParam, LPARAM lParam);
 
 private:
-    std::wstring                GetWindowClassName() const;
-    std::wstring                GetAppName() const;
-    HWND                        FindAppMainWindow(HWND hStartWnd, bool* isThisInstance = nullptr) const;
-    void                        ResizeChildWindows();
-    void                        UpdateStatusBar(bool bEverything);
-    void                        AddHotSpots();
+    std::wstring GetWindowClassName() const;
+    std::wstring GetAppName() const;
+    HWND         FindAppMainWindow(HWND hStartWnd, bool* isThisInstance = nullptr) const;
+    void         ResizeChildWindows();
+    void         UpdateStatusBar(bool bEverything);
+    void         AddHotSpots();
 
-    bool                        AskToCreateNonExistingFile(const std::wstring& path) const;
-    bool                        AskToReload(const CDocument& doc) const;
-    ResponseToOutsideModifiedFile
-                                AskToReloadOutsideModifiedFile(const CDocument& doc) const;
-    bool                        AskAboutOutsideDeletedFile(const CDocument& doc) const;
-    bool                        AskToRemoveReadOnlyAttribute() const;
-    ResponseToCloseTab          AskToCloseTab() const;
-    void                        UpdateTab(DocID docID);
-    void                        CloseAllButCurrentTab();
-    void                        EnsureNewLineAtEnd(const CDocument& doc);
-    void                        OpenNewTab();
-    void                        CopyCurDocPathToClipboard() const;
-    void                        CopyCurDocNameToClipboard() const;
-    void                        CopyCurDocDirToClipboard() const;
-    void                        ShowCurDocInExplorer() const;
-    void                        ShowCurDocExplorerProperties() const;
-    void                        PasteHistory();
-    void                        About() const;
-    bool                        HasOutsideChangesOccurred() const;
-    void                        CheckForOutsideChanges();
-    void                        UpdateCaptionBar();
-    bool                        HandleOutsideDeletedFile(int docID);
-    void                        HandleCreate(HWND hwnd);
-    void                        HandleAfterInit();
-    void                        HandleDropFiles(HDROP hDrop);
-    void                        HandleTabDroppedOutside(int tab, POINT pt);
-    void                        HandleTabChange(const NMHDR& tbhdr);
-    void                        HandleTabChanging(const NMHDR& tbhdr);
-    void                        HandleTabDelete(const TBHDR& tbhdr);
-    void                        HandleClipboardUpdate();
-    void                        HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi);
-    void                        HandleTreePath(const std::wstring& path, bool isDir, bool isDot);
+    bool                          AskToCreateNonExistingFile(const std::wstring& path) const;
+    bool                          AskToReload(const CDocument& doc) const;
+    ResponseToOutsideModifiedFile AskToReloadOutsideModifiedFile(const CDocument& doc) const;
+    bool                          AskAboutOutsideDeletedFile(const CDocument& doc) const;
+    bool                          AskToRemoveReadOnlyAttribute() const;
+    ResponseToCloseTab            AskToCloseTab() const;
+    void                          UpdateTab(DocID docID);
+    void                          CloseAllButCurrentTab();
+    void                          EnsureNewLineAtEnd(const CDocument& doc);
+    void                          OpenNewTab();
+    void                          CopyCurDocPathToClipboard() const;
+    void                          CopyCurDocNameToClipboard() const;
+    void                          CopyCurDocDirToClipboard() const;
+    void                          ShowCurDocInExplorer() const;
+    void                          ShowCurDocExplorerProperties() const;
+    void                          PasteHistory();
+    void                          About() const;
+    bool                          HasOutsideChangesOccurred() const;
+    void                          CheckForOutsideChanges();
+    void                          UpdateCaptionBar();
+    bool                          HandleOutsideDeletedFile(int docID);
+    void                          HandleCreate(HWND hwnd);
+    void                          HandleAfterInit();
+    void                          HandleDropFiles(HDROP hDrop);
+    void                          HandleTabDroppedOutside(int tab, POINT pt);
+    void                          HandleTabChange(const NMHDR& tbhdr);
+    void                          HandleTabChanging(const NMHDR& tbhdr);
+    void                          HandleTabDelete(const TBHDR& tbhdr);
+    void                          HandleClipboardUpdate();
+    void                          HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi);
+    void                          HandleTreePath(const std::wstring& path, bool isDir, bool isDot);
+
     // Scintilla events.
-    void                        HandleDwellStart(const SCNotification& scn);
-    bool                        HandleDoubleClick(const SCNotification& scn);
-    void                        HandleCopyDataCommandLine(const COPYDATASTRUCT& cds);
-    bool                        HandleCopyDataMoveTab(const COPYDATASTRUCT& cds);
-    void                        HandleWriteProtectedEdit();
-    void                        HandleSavePoint(const SCNotification& scn);
-    void                        HandleUpdateUI(const SCNotification& scn);
-    void                        HandleAutoIndent(const SCNotification &scn);
-    HRESULT                     LoadRibbonSettings(IUnknown* pView);
-    HRESULT                     SaveRibbonSettings();
-    HRESULT                     ResizeToRibbon();
-    bool                        OnLButtonDown(UINT nFlags, POINT point);
-    bool                        OnMouseMove(UINT nFlags, POINT point);
-    bool                        OnLButtonUp(UINT nFlags, POINT point);
-    void                        HandleStatusBarEOLFormat();
-    void                        HandleStatusBarZoom();
-    void                        HandleStatusBar(WPARAM wParam, LPARAM lParam);
-    LRESULT                     HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
-    LRESULT                     HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
-    LRESULT                     HandleTabBarEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
-    void                        ShowTablistDropdown(HWND hWnd);
-    int                         GetZoomPC() const;
-    void                        SetZoomPC(int zoomPC);
-    COLORREF                    GetColorForDocument(DocID id);
-    void                        OpenFiles(const std::vector<std::wstring>& paths);
-    void                        BlockAllUIUpdates(bool block);
-    int                         UnblockUI();
-    void                        ReBlockUI(int blockCount);
-    void                        ShowProgressCtrl(UINT delay);
-    void                        HideProgressCtrl();
-    void                        SetProgress(DWORD32 pos, DWORD32 end);
-    void                        SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight);
-    void                        SetRibbonColorsHSB(UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight);
-    void                        GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight) const;
-    void                        SetTheme(bool theme);
+    void     HandleDwellStart(const SCNotification& scn);
+    bool     HandleDoubleClick(const SCNotification& scn);
+    void     HandleCopyDataCommandLine(const COPYDATASTRUCT& cds);
+    bool     HandleCopyDataMoveTab(const COPYDATASTRUCT& cds);
+    void     HandleWriteProtectedEdit();
+    void     HandleSavePoint(const SCNotification& scn);
+    void     HandleUpdateUI(const SCNotification& scn);
+    void     HandleAutoIndent(const SCNotification& scn);
+    HRESULT  LoadRibbonSettings(IUnknown* pView);
+    HRESULT  SaveRibbonSettings();
+    HRESULT  ResizeToRibbon();
+    bool     OnLButtonDown(UINT nFlags, POINT point);
+    bool     OnMouseMove(UINT nFlags, POINT point);
+    bool     OnLButtonUp(UINT nFlags, POINT point);
+    void     HandleStatusBarEOLFormat();
+    void     HandleStatusBarZoom();
+    void     HandleStatusBar(WPARAM wParam, LPARAM lParam);
+    LRESULT  HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
+    LRESULT  HandleFileTreeEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
+    LRESULT  HandleTabBarEvents(const NMHDR& nmhdr, WPARAM wParam, LPARAM lParam);
+    void     ShowTablistDropdown(HWND hWnd);
+    int      GetZoomPC() const;
+    void     SetZoomPC(int zoomPC);
+    COLORREF GetColorForDocument(DocID id);
+    void     OpenFiles(const std::vector<std::wstring>& paths);
+    void     BlockAllUIUpdates(bool block);
+    int      UnblockUI();
+    void     ReBlockUI(int blockCount);
+    void     ShowProgressCtrl(UINT delay);
+    void     HideProgressCtrl();
+    void     SetProgress(DWORD32 pos, DWORD32 end);
+    void     SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight);
+    void     SetRibbonColorsHSB(UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight);
+    void     GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight) const;
+    void     SetTheme(bool theme);
 
 private:
-    LONG                        m_cRef;
-    int                         m_newCount;
-    IUIRibbon*                  m_pRibbon;
-    UINT                        m_RibbonHeight;
-
-    CRichStatusBar              m_StatusBar;
-    CTabBar                     m_TabBar;
-    CScintillaWnd               m_editor;
-    CFileTree                   m_fileTree;
-    CTabBtn                     m_TablistBtn;
-    CTabBtn                     m_newTabBtn;
-    CTabBtn                     m_closeTabBtn;
-    CProgressBar                m_progressBar;
-    CCustomToolTip              m_custToolTip;
-    int                         m_treeWidth;
-    bool                        m_bDragging;
-    POINT                       m_oldPt;
-    bool                        m_fileTreeVisible;
-    CDocumentManager            m_DocManager;
-    std::unique_ptr<wchar_t[]>  m_tooltipbuffer;
-    std::list<std::wstring>     m_ClipboardHistory;
-    std::map<std::wstring, size_t> m_pathsToOpen;
-    bool                        m_bPathsToOpenMRU;
-    std::wstring                m_elevatepath;
-    std::wstring                m_elevatesavepath;
-    std::wstring                m_tabmovepath;
-    std::wstring                m_tabmovesavepath;
-    std::wstring                m_tabmovetitle;
-    bool                        m_tabmovemod;
-    long                        m_initLine;
-    int                         m_insertionIndex;
-    bool                        m_windowRestored;
-    bool                        m_inMenuLoop;
+    CRichStatusBar                                  m_StatusBar;
+    CTabBar                                         m_TabBar;
+    CScintillaWnd                                   m_editor;
+    CFileTree                                       m_fileTree;
+    CTabBtn                                         m_TablistBtn;
+    CTabBtn                                         m_newTabBtn;
+    CTabBtn                                         m_closeTabBtn;
+    CProgressBar                                    m_progressBar;
+    CCustomToolTip                                  m_custToolTip;
+    int                                             m_treeWidth;
+    bool                                            m_bDragging;
+    POINT                                           m_oldPt;
+    bool                                            m_fileTreeVisible;
+    CDocumentManager                                m_DocManager;
+    std::unique_ptr<wchar_t[]>                      m_tooltipbuffer;
+    std::list<std::wstring>                         m_ClipboardHistory;
+    std::map<std::wstring, size_t>                  m_pathsToOpen;
+    bool                                            m_bPathsToOpenMRU;
+    std::wstring                                    m_elevatepath;
+    std::wstring                                    m_elevatesavepath;
+    std::wstring                                    m_tabmovepath;
+    std::wstring                                    m_tabmovesavepath;
+    std::wstring                                    m_tabmovetitle;
+    bool                                            m_tabmovemod;
+    long                                            m_initLine;
+    int                                             m_insertionIndex;
+    bool                                            m_windowRestored;
+    bool                                            m_inMenuLoop;
     std::unique_ptr<_IMAGELIST, HIMAGELIST_Deleter> m_TabBarImageList;
-    CScintillaWnd               m_scratchEditor;
-    std::map<std::wstring, int> m_foldercolorindexes;
-    int                         m_lastfoldercolorindex;
-    int                         m_blockCount;
-    UI_HSBCOLOR                 m_normalThemeText;
-    UI_HSBCOLOR                 m_normalThemeBack;
-    UI_HSBCOLOR                 m_normalThemeHigh;
+    CScintillaWnd                                   m_scratchEditor;
+    std::map<std::wstring, int>                     m_foldercolorindexes;
+    int                                             m_lastfoldercolorindex;
+    int                                             m_blockCount;
+    UI_HSBCOLOR                                     m_normalThemeText;
+    UI_HSBCOLOR                                     m_normalThemeBack;
+    UI_HSBCOLOR                                     m_normalThemeHigh;
+
     // status bar icons
-    HICON                       m_hShieldIcon;
-    HICON                       m_hCapslockIcon;
-    HICON                       m_hLexerIcon;
-    HICON                       m_hZoomIcon;
-    HICON                       m_hZoomDarkIcon;
-    HICON                       m_hEmptyIcon;
-    HICON                       hEditorconfigActive;
-    HICON                       hEditorconfigInactive;
+    HICON m_hShieldIcon;
+    HICON m_hCapslockIcon;
+    HICON m_hLexerIcon;
+    HICON m_hZoomIcon;
+    HICON m_hZoomDarkIcon;
+    HICON m_hEmptyIcon;
+    HICON hEditorconfigActive;
+    HICON hEditorconfigInactive;
+
+    LONG       m_cRef;
+    int        m_newCount;
+    IUIRibbon* m_pRibbon;
+    UINT       m_RibbonHeight;
 };

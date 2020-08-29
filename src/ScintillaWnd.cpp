@@ -46,41 +46,41 @@ extern Scintilla::LexerModule lmSimple;
 
 namespace
 {
-    typedef BOOL(WINAPI * GetGestureInfoFN)(HGESTUREINFO hGestureInfo, PGESTUREINFO pGestureInfo);
-    GetGestureInfoFN GetGestureInfoFunc = nullptr;
-    typedef BOOL(WINAPI * CloseGestureInfoHandleFN)(HGESTUREINFO hGestureInfo);
-    CloseGestureInfoHandleFN CloseGestureInfoHandleFunc = nullptr;
-    typedef BOOL(WINAPI * SetGestureConfigFN)(HWND hwnd, DWORD dwReserved, UINT cIDs, PGESTURECONFIG pGestureConfig, UINT cbSize);
-    SetGestureConfigFN SetGestureConfigFunc = nullptr;
+typedef BOOL(WINAPI* GetGestureInfoFN)(HGESTUREINFO hGestureInfo, PGESTUREINFO pGestureInfo);
+GetGestureInfoFN GetGestureInfoFunc = nullptr;
+typedef BOOL(WINAPI* CloseGestureInfoHandleFN)(HGESTUREINFO hGestureInfo);
+CloseGestureInfoHandleFN CloseGestureInfoHandleFunc = nullptr;
+typedef BOOL(WINAPI* SetGestureConfigFN)(HWND hwnd, DWORD dwReserved, UINT cIDs, PGESTURECONFIG pGestureConfig, UINT cbSize);
+SetGestureConfigFN SetGestureConfigFunc = nullptr;
 
-    typedef BOOL(WINAPI * BeginPanningFeedbackFN)(HWND hwnd);
-    BeginPanningFeedbackFN BeginPanningFeedbackFunc = nullptr;
-    typedef BOOL(WINAPI * EndPanningFeedbackFN)(HWND hwnd, BOOL fAnimateBack);
-    EndPanningFeedbackFN EndPanningFeedbackFunc = nullptr;
-    typedef BOOL(WINAPI * UpdatePanningFeedbackFN)(HWND hwnd, LONG lTotalOverpanOffsetX, LONG lTotalOverpanOffsetY, BOOL fInInertia);
-    UpdatePanningFeedbackFN UpdatePanningFeedbackFunc = nullptr;
+typedef BOOL(WINAPI* BeginPanningFeedbackFN)(HWND hwnd);
+BeginPanningFeedbackFN BeginPanningFeedbackFunc = nullptr;
+typedef BOOL(WINAPI* EndPanningFeedbackFN)(HWND hwnd, BOOL fAnimateBack);
+EndPanningFeedbackFN EndPanningFeedbackFunc = nullptr;
+typedef BOOL(WINAPI* UpdatePanningFeedbackFN)(HWND hwnd, LONG lTotalOverpanOffsetX, LONG lTotalOverpanOffsetY, BOOL fInInertia);
+UpdatePanningFeedbackFN UpdatePanningFeedbackFunc = nullptr;
 
-    CAutoLibrary hUxThemeDll = LoadLibrary(L"uxtheme.dll");
-}
+CAutoLibrary hUxThemeDll = LoadLibrary(L"uxtheme.dll");
+} // namespace
 
 UINT32 g_contextID = cmdContextMap;
 
-const int TIM_HIDECURSOR = 101;
-const int TIM_BRACEHIGHLIGHTTEXT = 102;
+const int TIM_HIDECURSOR              = 101;
+const int TIM_BRACEHIGHLIGHTTEXT      = 102;
 const int TIM_BRACEHIGHLIGHTTEXTCLEAR = 103;
 
-static bool g_initialized = false;
+static bool g_initialized          = false;
 static bool g_scintillaInitialized = false;
 
-const int color_folding_fore_inactive = 255;
-const int color_folding_back_inactive = 220;
-const int color_folding_backsel_inactive = 150;
-const int color_folding_fore_active = 250;
-const int color_folding_back_active = 100;
-const int color_folding_backsel_active = 20;
-const int color_linenr_inactive = 109;
-const int color_linenr_active = 60;
-const double folding_color_animation_time = 0.3;
+const int    color_folding_fore_inactive    = 255;
+const int    color_folding_back_inactive    = 220;
+const int    color_folding_backsel_inactive = 150;
+const int    color_folding_fore_active      = 250;
+const int    color_folding_back_active      = 100;
+const int    color_folding_backsel_active   = 20;
+const int    color_linenr_inactive          = 109;
+const int    color_linenr_active            = 60;
+const double folding_color_animation_time   = 0.3;
 
 CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     : CWindow(hInst)
@@ -105,9 +105,9 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
         m_hasConsolas = true;
     }
 
-    m_animVarGrayFore = Animator::Instance().CreateAnimationVariable(color_folding_fore_inactive);
-    m_animVarGrayBack = Animator::Instance().CreateAnimationVariable(color_folding_back_inactive);
-    m_animVarGraySel = Animator::Instance().CreateAnimationVariable(color_folding_backsel_inactive);
+    m_animVarGrayFore   = Animator::Instance().CreateAnimationVariable(color_folding_fore_inactive);
+    m_animVarGrayBack   = Animator::Instance().CreateAnimationVariable(color_folding_back_inactive);
+    m_animVarGraySel    = Animator::Instance().CreateAnimationVariable(color_folding_backsel_inactive);
     m_animVarGrayLineNr = Animator::Instance().CreateAnimationVariable(color_linenr_inactive);
 }
 
@@ -127,7 +127,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
         Scintilla_RegisterClasses(hInst);
         INITCOMMONCONTROLSEX icce;
         icce.dwSize = sizeof(icce);
-        icce.dwICC = ICC_BAR_CLASSES;
+        icce.dwICC  = ICC_BAR_CLASSES;
         InitCommonControlsEx(&icce);
     }
 
@@ -146,10 +146,10 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
         return false;
     }
 
-    m_pSciMsg = (SciFnDirect)SendMessage(*this, SCI_GETDIRECTFUNCTION, 0, 0);
+    m_pSciMsg     = (SciFnDirect)SendMessage(*this, SCI_GETDIRECTFUNCTION, 0, 0);
     m_pSciWndData = (sptr_t)SendMessage(*this, SCI_GETDIRECTPOINTER, 0, 0);
 
-    if (m_pSciMsg==nullptr || m_pSciWndData==0)
+    if (m_pSciMsg == nullptr || m_pSciWndData == 0)
         return false;
 
     Scintilla::Catalogue::AddLexerModule(&lmSimple);
@@ -157,17 +157,17 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     m_docScroll.InitScintilla(this);
 
     Call(SCI_SETMODEVENTMASK, SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO |
-        SC_PERFORMED_REDO | SC_MULTISTEPUNDOREDO | SC_LASTSTEPINUNDOREDO |
-        SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE | SC_MULTILINEUNDOREDO | SC_MOD_CHANGEFOLD);
+                                  SC_PERFORMED_REDO | SC_MULTISTEPUNDOREDO | SC_LASTSTEPINUNDOREDO |
+                                  SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE | SC_MULTILINEUNDOREDO | SC_MOD_CHANGEFOLD);
     bool bUseD2D = CIniSettings::Instance().GetInt64(L"View", L"d2d", 1) != 0;
     Call(SCI_SETTECHNOLOGY, bUseD2D ? SC_TECHNOLOGY_DIRECTWRITERETAIN : SC_TECHNOLOGY_DEFAULT);
 
     Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
     Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, CDPIAware::Instance().Scale(*this, 14));
     Call(SCI_SETMARGINCURSORN, SC_MARGE_FOLDER, SC_CURSORARROW);
-    Call(SCI_SETAUTOMATICFOLD, SC_AUTOMATICFOLD_SHOW|SC_AUTOMATICFOLD_CHANGE);
+    Call(SCI_SETAUTOMATICFOLD, SC_AUTOMATICFOLD_SHOW | SC_AUTOMATICFOLD_CHANGE);
 
-    Call(SCI_SETMARGINMASKN, SC_MARGE_SYMBOL, (1<<MARK_BOOKMARK));
+    Call(SCI_SETMARGINMASKN, SC_MARGE_SYMBOL, (1 << MARK_BOOKMARK));
     Call(SCI_SETMARGINWIDTHN, SC_MARGE_SYMBOL, CDPIAware::Instance().Scale(*this, 14));
     Call(SCI_SETMARGINCURSORN, SC_MARGE_SYMBOL, SC_CURSORARROW);
     Call(SCI_MARKERSETALPHA, MARK_BOOKMARK, 70);
@@ -214,7 +214,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     Call(SCI_SETMOUSEWHEELCAPTURES, 0);
 
     // For Ctrl+C, use SCI_COPYALLOWLINE instead of SCI_COPY
-    Call(SCI_ASSIGNCMDKEY, 'C'+(SCMOD_CTRL<<16), SCI_COPYALLOWLINE);
+    Call(SCI_ASSIGNCMDKEY, 'C' + (SCMOD_CTRL << 16), SCI_COPYALLOWLINE);
 
     // change the home and end key to honor wrapped lines
     // but allow the line-home and line-end to be used with the ALT key
@@ -229,10 +229,10 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     Call(SCI_ASSIGNCMDKEY, 'L' + (SCMOD_CTRL << 16), SCI_LINECUT);
 
     Call(SCI_SETBUFFEREDDRAW, bUseD2D ? false : true);
-    Call(SCI_SETPHASESDRAW,bUseD2D ? SC_PHASES_MULTIPLE : SC_PHASES_TWO);
+    Call(SCI_SETPHASESDRAW, bUseD2D ? SC_PHASES_MULTIPLE : SC_PHASES_TWO);
     Call(SCI_SETLAYOUTCACHE, SC_CACHE_PAGE);
 
-    Call(SCI_USEPOPUP, 0);  // no default context menu
+    Call(SCI_USEPOPUP, 0); // no default context menu
 
     Call(SCI_SETMOUSEDWELLTIME, GetDoubleClickTime());
     Call(SCI_CALLTIPSETPOSITION, 1);
@@ -250,14 +250,14 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
         HMODULE hDll = GetModuleHandle(TEXT("user32.dll"));
         if (hDll)
         {
-            GetGestureInfoFunc = (GetGestureInfoFN)::GetProcAddress(hDll, "GetGestureInfo");
+            GetGestureInfoFunc         = (GetGestureInfoFN)::GetProcAddress(hDll, "GetGestureInfo");
             CloseGestureInfoHandleFunc = (CloseGestureInfoHandleFN)::GetProcAddress(hDll, "CloseGestureInfoHandle");
-            SetGestureConfigFunc = (SetGestureConfigFN)::GetProcAddress(hDll, "SetGestureConfig");
+            SetGestureConfigFunc       = (SetGestureConfigFN)::GetProcAddress(hDll, "SetGestureConfig");
         }
         if (hUxThemeDll)
         {
-            BeginPanningFeedbackFunc = (BeginPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "BeginPanningFeedback");
-            EndPanningFeedbackFunc = (EndPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "EndPanningFeedback");
+            BeginPanningFeedbackFunc  = (BeginPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "BeginPanningFeedback");
+            EndPanningFeedbackFunc    = (EndPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "EndPanningFeedback");
             UpdatePanningFeedbackFunc = (UpdatePanningFeedbackFN)::GetProcAddress(hUxThemeDll, "UpdatePanningFeedback");
         }
         g_initialized = true;
@@ -266,7 +266,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     return true;
 }
 
-bool CScintillaWnd::InitScratch( HINSTANCE hInst )
+bool CScintillaWnd::InitScratch(HINSTANCE hInst)
 {
     Scintilla_RegisterClasses(hInst);
 
@@ -275,10 +275,10 @@ bool CScintillaWnd::InitScratch( HINSTANCE hInst )
     if (!*this)
         return false;
 
-    m_pSciMsg = (SciFnDirect)SendMessage(*this, SCI_GETDIRECTFUNCTION, 0, 0);
+    m_pSciMsg     = (SciFnDirect)SendMessage(*this, SCI_GETDIRECTFUNCTION, 0, 0);
     m_pSciWndData = (sptr_t)SendMessage(*this, SCI_GETDIRECTPOINTER, 0, 0);
 
-    if (m_pSciMsg==nullptr || m_pSciWndData==0)
+    if (m_pSciMsg == nullptr || m_pSciWndData == 0)
         return false;
 
     m_bScratch = true;
@@ -288,12 +288,12 @@ bool CScintillaWnd::InitScratch( HINSTANCE hInst )
 
 bool bEatNextEnterKey = false;
 
-LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    NMHDR *hdr = (NMHDR *)lParam;
+    NMHDR* hdr = (NMHDR*)lParam;
     switch (uMsg)
     {
-    case WM_ERASEBKGND:
+        case WM_ERASEBKGND:
         {
             // only erase the background during startup:
             // it helps reduce the white background shown in dark mode
@@ -301,8 +301,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
             // causes an annoying flicker when resizing the window.
             if (m_eraseBkgnd)
             {
-                HDC hdc = (HDC)wParam;
-                auto bgc = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
+                HDC  hdc    = (HDC)wParam;
+                auto bgc    = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
                 auto oldBgc = SetBkColor(hdc, bgc);
                 RECT r;
                 GetClientRect(hwnd, &r);
@@ -310,13 +310,13 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 SetBkColor(hdc, oldBgc);
             }
             return TRUE;
-    }
+        }
         break;
-    case WM_NOTIFY:
-        if(hdr->code == NM_COOLSB_CUSTOMDRAW)
-            return m_docScroll.HandleCustomDraw(wParam, (NMCSBCUSTOMDRAW *)lParam);
-        break;
-    case WM_CONTEXTMENU:
+        case WM_NOTIFY:
+            if (hdr->code == NM_COOLSB_CUSTOMDRAW)
+                return m_docScroll.HandleCustomDraw(wParam, (NMCSBCUSTOMDRAW*)lParam);
+            break;
+        case WM_CONTEXTMENU:
         {
             POINT pt;
             POINTSTOPOINT(pt, lParam);
@@ -325,11 +325,11 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
             {
                 // Display the menu in the upper-left corner of the client area, below the ribbon.
                 IUIRibbonPtr pRibbon;
-                HRESULT hr = g_pFramework->GetView(0, IID_PPV_ARGS(&pRibbon));
+                HRESULT      hr = g_pFramework->GetView(0, IID_PPV_ARGS(&pRibbon));
                 if (SUCCEEDED(hr))
                 {
                     UINT32 uRibbonHeight = 0;
-                    hr = pRibbon->GetHeight(&uRibbonHeight);
+                    hr                   = pRibbon->GetHeight(&uRibbonHeight);
                     if (SUCCEEDED(hr))
                     {
                         pt.x = 0;
@@ -351,10 +351,9 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
             {
                 pContextualUI->ShowAtLocation(pt.x, pt.y);
             }
-
         }
         break;
-    case WM_CHAR:
+        case WM_CHAR:
         {
             if ((wParam == VK_RETURN) || (wParam == '\n'))
             {
@@ -372,7 +371,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 return 0;
         }
         break;
-    case WM_KEYDOWN:
+        case WM_KEYDOWN:
         {
             if ((wParam == VK_RETURN) || (wParam == '\n'))
             {
@@ -390,7 +389,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                     Call(SCI_ENDUNDOACTION);
                     return 0;
                 }
-                char c = (char)Call(SCI_GETCHARAT, Call(SCI_GETCURRENTPOS) - 1);
+                char c  = (char)Call(SCI_GETCHARAT, Call(SCI_GETCURRENTPOS) - 1);
                 char c1 = (char)Call(SCI_GETCHARAT, Call(SCI_GETCURRENTPOS));
                 if ((c == '{') && (c1 == '}'))
                 {
@@ -407,215 +406,212 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
             }
         }
         break;
-    case WM_MOUSEMOVE:
-    case WM_LBUTTONDBLCLK:
-    case WM_LBUTTONDOWN:
-    case WM_RBUTTONDBLCLK:
-    case WM_RBUTTONDOWN:
-    case WM_VSCROLL:
-    case WM_HSCROLL:
-    case WM_MOUSEWHEEL:
-    case WM_MOUSEHWHEEL:
-    {
-        // mouse cursor moved, ensure it's visible
-        // but set a timer to hide it after a while
-        if (m_cursorTimeout == -1)
-            m_cursorTimeout = (int) CIniSettings::Instance().GetInt64(L"View", L"hidecursortimeout", 3000);
-        UINT elapse = (UINT)m_cursorTimeout;
-        if (elapse != 0)
-            SetTimer(*this, TIM_HIDECURSOR, elapse, nullptr);
-        if (!m_bCursorShown)
+        case WM_MOUSEMOVE:
+        case WM_LBUTTONDBLCLK:
+        case WM_LBUTTONDOWN:
+        case WM_RBUTTONDBLCLK:
+        case WM_RBUTTONDOWN:
+        case WM_VSCROLL:
+        case WM_HSCROLL:
+        case WM_MOUSEWHEEL:
+        case WM_MOUSEHWHEEL:
         {
-            Call(SCI_SETCURSOR, (uptr_t)-1);
-            m_bCursorShown = true;
-        }
-        if (uMsg == WM_VSCROLL)
-        {
-            switch (LOWORD(wParam))
+            // mouse cursor moved, ensure it's visible
+            // but set a timer to hide it after a while
+            if (m_cursorTimeout == -1)
+                m_cursorTimeout = (int)CIniSettings::Instance().GetInt64(L"View", L"hidecursortimeout", 3000);
+            UINT elapse = (UINT)m_cursorTimeout;
+            if (elapse != 0)
+                SetTimer(*this, TIM_HIDECURSOR, elapse, nullptr);
+            if (!m_bCursorShown)
             {
-                case SB_THUMBPOSITION:
-                case SB_ENDSCROLL:
-                m_ScrollTool.Clear();
-                break;
-                case SB_THUMBTRACK:
-                {
-                    RECT thumbrect;
-                    GetClientRect(*this, &thumbrect);
-                    MapWindowPoints(*this, nullptr, (LPPOINT)&thumbrect, 2);
-
-                    SCROLLINFO si = { 0 };
-                    si.cbSize = sizeof(SCROLLINFO);
-                    si.fMask = SIF_ALL;
-                    CoolSB_GetScrollInfo(*this, SB_VERT, &si);
-
-                    auto linecount = Call(SCI_GETLINECOUNT);
-                    auto w = m_ScrollTool.GetTextWidth(CStringUtils::Format(L"Line: %ld", linecount).c_str());
-                    POINT thumbpoint;
-                    thumbpoint.x = thumbrect.right - w;
-                    thumbpoint.y = thumbrect.top + ((thumbrect.bottom - thumbrect.top)*si.nTrackPos) / (si.nMax - si.nMin);
-                    auto docline = Call(SCI_DOCLINEFROMVISIBLE, si.nTrackPos);
-                    m_ScrollTool.Init();
-                    DarkModeHelper::Instance().AllowDarkModeForWindow(m_ScrollTool, CTheme::Instance().IsDarkTheme());
-                    SetWindowTheme(m_ScrollTool, L"Explorer", nullptr);
-
-                    m_ScrollTool.SetText(&thumbpoint, L"Line: %ld", docline+1);
-                }
-                break;
+                Call(SCI_SETCURSOR, (uptr_t)-1);
+                m_bCursorShown = true;
             }
-        }
-        if (uMsg == WM_MOUSEMOVE)
-        {
-            RECT rc;
-            GetClientRect(*this, &rc);
-            rc.right = rc.left;
-            for (int i = 0; i <= SC_MARGE_FOLDER; ++i)
-                rc.right += (long)Call(SCI_GETMARGINWIDTHN, i);
-            POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-            if (PtInRect(&rc, pt))
+            if (uMsg == WM_VSCROLL)
             {
-                if (!m_bInFolderMargin)
+                switch (LOWORD(wParam))
                 {
-                    // animate the colors of the folder margin lines and symbols
-                    auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_active);
-                    auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_active);
-                    auto transSel = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_active);
-                    auto transNr = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_active);
-
-                    auto storyBoard = Animator::Instance().CreateStoryBoard();
-                    storyBoard->AddTransition(m_animVarGrayFore, transFore);
-                    storyBoard->AddTransition(m_animVarGrayBack, transBack);
-                    storyBoard->AddTransition(m_animVarGraySel, transSel);
-                    storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
-                    Animator::Instance().RunStoryBoard(storyBoard, [this]()
+                    case SB_THUMBPOSITION:
+                    case SB_ENDSCROLL:
+                        m_ScrollTool.Clear();
+                        break;
+                    case SB_THUMBTRACK:
                     {
-                        auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
-                        auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
-                        auto sb = Animator::GetIntegerValue(m_animVarGraySel);
-                        auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
-                        SetupFoldingColors(RGB(gf, gf, gf),
-                                           RGB(gb, gb, gb),
-                                           RGB(sb, sb, sb));
-                        Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
-                    });
+                        RECT thumbrect;
+                        GetClientRect(*this, &thumbrect);
+                        MapWindowPoints(*this, nullptr, (LPPOINT)&thumbrect, 2);
 
-                    m_bInFolderMargin = true;
-                    TRACKMOUSEEVENT tme = { 0 };
-                    tme.cbSize = sizeof(TRACKMOUSEEVENT);
-                    tme.dwFlags = TME_LEAVE;
-                    tme.hwndTrack = *this;
-                    TrackMouseEvent(&tme);
+                        SCROLLINFO si = {0};
+                        si.cbSize     = sizeof(SCROLLINFO);
+                        si.fMask      = SIF_ALL;
+                        CoolSB_GetScrollInfo(*this, SB_VERT, &si);
+
+                        auto  linecount = Call(SCI_GETLINECOUNT);
+                        auto  w         = m_ScrollTool.GetTextWidth(CStringUtils::Format(L"Line: %ld", linecount).c_str());
+                        POINT thumbpoint;
+                        thumbpoint.x = thumbrect.right - w;
+                        thumbpoint.y = thumbrect.top + ((thumbrect.bottom - thumbrect.top) * si.nTrackPos) / (si.nMax - si.nMin);
+                        auto docline = Call(SCI_DOCLINEFROMVISIBLE, si.nTrackPos);
+                        m_ScrollTool.Init();
+                        DarkModeHelper::Instance().AllowDarkModeForWindow(m_ScrollTool, CTheme::Instance().IsDarkTheme());
+                        SetWindowTheme(m_ScrollTool, L"Explorer", nullptr);
+
+                        m_ScrollTool.SetText(&thumbpoint, L"Line: %ld", docline + 1);
+                    }
+                    break;
                 }
             }
-            else
+            if (uMsg == WM_MOUSEMOVE)
             {
-                if (m_bInFolderMargin)
+                RECT rc;
+                GetClientRect(*this, &rc);
+                rc.right = rc.left;
+                for (int i = 0; i <= SC_MARGE_FOLDER; ++i)
+                    rc.right += (long)Call(SCI_GETMARGINWIDTHN, i);
+                POINT pt = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+                if (PtInRect(&rc, pt))
                 {
-                    // animate the colors of the folder margin lines and symbols
-                    auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_inactive);
-                    auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_inactive);
-                    auto transSel = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_inactive);
-                    auto transNr = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_inactive);
-
-                    auto storyBoard = Animator::Instance().CreateStoryBoard();
-                    storyBoard->AddTransition(m_animVarGrayFore, transFore);
-                    storyBoard->AddTransition(m_animVarGrayBack, transBack);
-                    storyBoard->AddTransition(m_animVarGraySel, transSel);
-                    storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
-                    Animator::Instance().RunStoryBoard(storyBoard, [this]()
+                    if (!m_bInFolderMargin)
                     {
-                        auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
-                        auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
-                        auto sb = Animator::GetIntegerValue(m_animVarGraySel);
-                        auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
-                        SetupFoldingColors(RGB(gf, gf, gf),
-                                           RGB(gb, gb, gb),
-                                           RGB(sb, sb, sb));
-                        Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
-                    });
-                    m_bInFolderMargin = false;
+                        // animate the colors of the folder margin lines and symbols
+                        auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_active);
+                        auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_active);
+                        auto transSel  = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_active);
+                        auto transNr   = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_active);
+
+                        auto storyBoard = Animator::Instance().CreateStoryBoard();
+                        storyBoard->AddTransition(m_animVarGrayFore, transFore);
+                        storyBoard->AddTransition(m_animVarGrayBack, transBack);
+                        storyBoard->AddTransition(m_animVarGraySel, transSel);
+                        storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
+                        Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                            auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
+                            auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
+                            auto sb = Animator::GetIntegerValue(m_animVarGraySel);
+                            auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
+                            SetupFoldingColors(RGB(gf, gf, gf),
+                                               RGB(gb, gb, gb),
+                                               RGB(sb, sb, sb));
+                            Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                        });
+
+                        m_bInFolderMargin   = true;
+                        TRACKMOUSEEVENT tme = {0};
+                        tme.cbSize          = sizeof(TRACKMOUSEEVENT);
+                        tme.dwFlags         = TME_LEAVE;
+                        tme.hwndTrack       = *this;
+                        TrackMouseEvent(&tme);
+                    }
+                }
+                else
+                {
+                    if (m_bInFolderMargin)
+                    {
+                        // animate the colors of the folder margin lines and symbols
+                        auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_inactive);
+                        auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_inactive);
+                        auto transSel  = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_inactive);
+                        auto transNr   = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_inactive);
+
+                        auto storyBoard = Animator::Instance().CreateStoryBoard();
+                        storyBoard->AddTransition(m_animVarGrayFore, transFore);
+                        storyBoard->AddTransition(m_animVarGrayBack, transBack);
+                        storyBoard->AddTransition(m_animVarGraySel, transSel);
+                        storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
+                        Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                            auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
+                            auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
+                            auto sb = Animator::GetIntegerValue(m_animVarGraySel);
+                            auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
+                            SetupFoldingColors(RGB(gf, gf, gf),
+                                               RGB(gb, gb, gb),
+                                               RGB(sb, sb, sb));
+                            Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                        });
+                        m_bInFolderMargin = false;
+                    }
                 }
             }
         }
-    }
-    break;
-    case WM_MOUSELEAVE:
-    {
-        TRACKMOUSEEVENT tme = { 0 };
-        tme.cbSize = sizeof(TRACKMOUSEEVENT);
-        tme.dwFlags = TME_LEAVE | TME_CANCEL;
-        tme.hwndTrack = *this;
-        TrackMouseEvent(&tme);
-        if (m_bInFolderMargin)
+        break;
+        case WM_MOUSELEAVE:
         {
-            // animate the colors of the folder margin lines and symbols
-            auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_inactive);
-            auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_inactive);
-            auto transSel = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_inactive);
-            auto transNr = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_inactive);
-
-            auto storyBoard = Animator::Instance().CreateStoryBoard();
-            storyBoard->AddTransition(m_animVarGrayFore, transFore);
-            storyBoard->AddTransition(m_animVarGrayBack, transBack);
-            storyBoard->AddTransition(m_animVarGraySel, transSel);
-            storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
-            Animator::Instance().RunStoryBoard(storyBoard, [this]()
+            TRACKMOUSEEVENT tme = {0};
+            tme.cbSize          = sizeof(TRACKMOUSEEVENT);
+            tme.dwFlags         = TME_LEAVE | TME_CANCEL;
+            tme.hwndTrack       = *this;
+            TrackMouseEvent(&tme);
+            if (m_bInFolderMargin)
             {
-                auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
-                auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
-                auto sb = Animator::GetIntegerValue(m_animVarGraySel);
-                auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
-                SetupFoldingColors(RGB(gf, gf, gf),
-                                   RGB(gb, gb, gb),
-                                   RGB(sb, sb, sb));
-                Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
-            });
-            m_bInFolderMargin = false;
+                // animate the colors of the folder margin lines and symbols
+                auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_inactive);
+                auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_inactive);
+                auto transSel  = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_inactive);
+                auto transNr   = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_inactive);
+
+                auto storyBoard = Animator::Instance().CreateStoryBoard();
+                storyBoard->AddTransition(m_animVarGrayFore, transFore);
+                storyBoard->AddTransition(m_animVarGrayBack, transBack);
+                storyBoard->AddTransition(m_animVarGraySel, transSel);
+                storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
+                Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                    auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
+                    auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
+                    auto sb = Animator::GetIntegerValue(m_animVarGraySel);
+                    auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
+                    SetupFoldingColors(RGB(gf, gf, gf),
+                                       RGB(gb, gb, gb),
+                                       RGB(sb, sb, sb));
+                    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                });
+                m_bInFolderMargin = false;
+            }
         }
-    }
-    break;
-    case WM_TIMER:
-        switch (wParam)
-        {
-            case TIM_HIDECURSOR:
-                // hide the mouse cursor so it does not get in the way
-                if (m_bCursorShown)
-                {
-                    DWORD pos = GetMessagePos();
-                    POINT pt;
-                    pt.x = GET_X_LPARAM(pos);
-                    pt.y = GET_Y_LPARAM(pos);
-                    auto hptWnd = WindowFromPoint(pt);
-                    if (hptWnd == *this && hptWnd == GetFocus())
+        break;
+        case WM_TIMER:
+            switch (wParam)
+            {
+                case TIM_HIDECURSOR:
+                    // hide the mouse cursor so it does not get in the way
+                    if (m_bCursorShown)
                     {
-                        RECT rc;
-                        GetClientRect(*this, &rc);
-                        ScreenToClient(*this, &pt);
-                        if (PtInRect(&rc, pt))
+                        DWORD pos = GetMessagePos();
+                        POINT pt;
+                        pt.x        = GET_X_LPARAM(pos);
+                        pt.y        = GET_Y_LPARAM(pos);
+                        auto hptWnd = WindowFromPoint(pt);
+                        if (hptWnd == *this && hptWnd == GetFocus())
                         {
-                            // We want to hide the cusor, let the parent override that choice.
-                            // If they don't doesn't understand the message then the result
-                            // should remain TRUE and we'll go ahead and hide.
-                            BOOL hide = TRUE;
-                            SendMessage(GetParent(*this), WM_CANHIDECURSOR, WPARAM(0), LPARAM(&hide));
-                            if (hide)
+                            RECT rc;
+                            GetClientRect(*this, &rc);
+                            ScreenToClient(*this, &pt);
+                            if (PtInRect(&rc, pt))
                             {
-                                m_bCursorShown = false;
-                                SetCursor(nullptr);
-                                Call(SCI_SETCURSOR, (uptr_t)-2);
+                                // We want to hide the cusor, let the parent override that choice.
+                                // If they don't doesn't understand the message then the result
+                                // should remain TRUE and we'll go ahead and hide.
+                                BOOL hide = TRUE;
+                                SendMessage(GetParent(*this), WM_CANHIDECURSOR, WPARAM(0), LPARAM(&hide));
+                                if (hide)
+                                {
+                                    m_bCursorShown = false;
+                                    SetCursor(nullptr);
+                                    Call(SCI_SETCURSOR, (uptr_t)-2);
+                                }
                             }
                         }
                     }
-                }
-                break;
-            case TIM_BRACEHIGHLIGHTTEXT:
-                MatchBraces(BraceMatch::Highlight);
-                break;
-            case TIM_BRACEHIGHLIGHTTEXTCLEAR:
-                MatchBraces(BraceMatch::Clear);
-                break;
-        }
-        break;
-    case WM_SETCURSOR:
+                    break;
+                case TIM_BRACEHIGHLIGHTTEXT:
+                    MatchBraces(BraceMatch::Highlight);
+                    break;
+                case TIM_BRACEHIGHLIGHTTEXTCLEAR:
+                    MatchBraces(BraceMatch::Clear);
+                    break;
+            }
+            break;
+        case WM_SETCURSOR:
         {
             if (!m_bCursorShown)
             {
@@ -628,129 +624,129 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler( HWND hwnd, UINT uMsg, WPARAM wPar
                 Call(SCI_SETCURSOR, (uptr_t)SC_CURSORNORMAL);
         }
         break;
-    case WM_GESTURENOTIFY:
-    {
-        if (SetGestureConfigFunc)
+        case WM_GESTURENOTIFY:
         {
-            DWORD panWant = GC_PAN | GC_PAN_WITH_INERTIA | GC_PAN_WITH_SINGLE_FINGER_VERTICALLY;
-            GESTURECONFIG gestureConfig[] =
+            if (SetGestureConfigFunc)
             {
-                { GID_PAN, panWant, GC_PAN_WITH_GUTTER },
-                { GID_TWOFINGERTAP, GC_TWOFINGERTAP, 0 },
-            };
-            SetGestureConfigFunc(*this, 0, _countof(gestureConfig), gestureConfig, sizeof(GESTURECONFIG));
+                DWORD         panWant = GC_PAN | GC_PAN_WITH_INERTIA | GC_PAN_WITH_SINGLE_FINGER_VERTICALLY;
+                GESTURECONFIG gestureConfig[] =
+                    {
+                        {GID_PAN, panWant, GC_PAN_WITH_GUTTER},
+                        {GID_TWOFINGERTAP, GC_TWOFINGERTAP, 0},
+                    };
+                SetGestureConfigFunc(*this, 0, _countof(gestureConfig), gestureConfig, sizeof(GESTURECONFIG));
+            }
+            return 0;
         }
-        return 0;
-    }
-    case WM_GESTURE:
-    {
-        static int scale = 8;   // altering the scale value will change how fast the page scrolls
-        static int lastY = 0;   // used for panning calculations (initial / previous vertical position)
-        static int lastX = 0;   // used for panning calculations (initial / previous horizontal position)
-        static long xOverpan = 0;
-        static long yOverpan = 0;
-
-        if ((GetGestureInfoFunc == nullptr) || (CloseGestureInfoHandleFunc == nullptr) ||
-            (BeginPanningFeedbackFunc == nullptr) || (EndPanningFeedbackFunc == nullptr) ||
-            (UpdatePanningFeedbackFunc == nullptr))
-            break;
-
-        GESTUREINFO gi;
-        ZeroMemory(&gi, sizeof(GESTUREINFO));
-        gi.cbSize = sizeof(GESTUREINFO);
-        BOOL bResult = GetGestureInfoFunc((HGESTUREINFO)lParam, &gi);
-
-        if (bResult)
+        case WM_GESTURE:
         {
-            // now interpret the gesture
-            switch (gi.dwID)
+            static int  scale    = 8; // altering the scale value will change how fast the page scrolls
+            static int  lastY    = 0; // used for panning calculations (initial / previous vertical position)
+            static int  lastX    = 0; // used for panning calculations (initial / previous horizontal position)
+            static long xOverpan = 0;
+            static long yOverpan = 0;
+
+            if ((GetGestureInfoFunc == nullptr) || (CloseGestureInfoHandleFunc == nullptr) ||
+                (BeginPanningFeedbackFunc == nullptr) || (EndPanningFeedbackFunc == nullptr) ||
+                (UpdatePanningFeedbackFunc == nullptr))
+                break;
+
+            GESTUREINFO gi;
+            ZeroMemory(&gi, sizeof(GESTUREINFO));
+            gi.cbSize    = sizeof(GESTUREINFO);
+            BOOL bResult = GetGestureInfoFunc((HGESTUREINFO)lParam, &gi);
+
+            if (bResult)
             {
-                case GID_BEGIN:
-                    lastY = 0;
-                    lastX = 0;
-                    break;
-                case GID_PAN:
+                // now interpret the gesture
+                switch (gi.dwID)
                 {
-                    if ((lastY == 0) && (lastX == 0))
-                    {
-                        lastY = gi.ptsLocation.y;
-                        lastX = gi.ptsLocation.x;
+                    case GID_BEGIN:
+                        lastY = 0;
+                        lastX = 0;
                         break;
-                    }
-                    // Get all the vertical scroll bar information
-                    int scrollX = (gi.ptsLocation.x - lastX) / scale;
-                    int scrollY = (gi.ptsLocation.y - lastY) / scale;
+                    case GID_PAN:
+                    {
+                        if ((lastY == 0) && (lastX == 0))
+                        {
+                            lastY = gi.ptsLocation.y;
+                            lastX = gi.ptsLocation.x;
+                            break;
+                        }
+                        // Get all the vertical scroll bar information
+                        int scrollX = (gi.ptsLocation.x - lastX) / scale;
+                        int scrollY = (gi.ptsLocation.y - lastY) / scale;
 
-                    SCROLLINFO siv = { 0 };
-                    siv.cbSize = sizeof(siv);
-                    siv.fMask = SIF_ALL;
-                    CoolSB_GetScrollInfo(*this, SB_VERT, &siv);
-                    if (scrollY)
-                    {
-                        siv.nPos -= scrollY;
-                        siv.fMask = SIF_POS;
-                        CoolSB_SetScrollInfo(hwnd, SB_VERT, &siv, TRUE);
-                        SendMessage(hwnd, WM_VSCROLL, MAKEWPARAM(SB_THUMBPOSITION, siv.nPos), 0L);
-                        lastY = gi.ptsLocation.y;
-                    }
+                        SCROLLINFO siv = {0};
+                        siv.cbSize     = sizeof(siv);
+                        siv.fMask      = SIF_ALL;
+                        CoolSB_GetScrollInfo(*this, SB_VERT, &siv);
+                        if (scrollY)
+                        {
+                            siv.nPos -= scrollY;
+                            siv.fMask = SIF_POS;
+                            CoolSB_SetScrollInfo(hwnd, SB_VERT, &siv, TRUE);
+                            SendMessage(hwnd, WM_VSCROLL, MAKEWPARAM(SB_THUMBPOSITION, siv.nPos), 0L);
+                            lastY = gi.ptsLocation.y;
+                        }
 
-                    SCROLLINFO sih = { 0 };
-                    sih.cbSize = sizeof(sih);
-                    sih.fMask = SIF_ALL;
-                    CoolSB_GetScrollInfo(*this, SB_HORZ, &sih);
-                    if (scrollX)
-                    {
-                        sih.nPos -= scrollX;
-                        sih.fMask = SIF_POS;
-                        CoolSB_SetScrollInfo(hwnd, SB_HORZ, &sih, TRUE);
-                        SendMessage(hwnd, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, sih.nPos), 0L);
-                        lastX = gi.ptsLocation.x;
-                    }
+                        SCROLLINFO sih = {0};
+                        sih.cbSize     = sizeof(sih);
+                        sih.fMask      = SIF_ALL;
+                        CoolSB_GetScrollInfo(*this, SB_HORZ, &sih);
+                        if (scrollX)
+                        {
+                            sih.nPos -= scrollX;
+                            sih.fMask = SIF_POS;
+                            CoolSB_SetScrollInfo(hwnd, SB_HORZ, &sih, TRUE);
+                            SendMessage(hwnd, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, sih.nPos), 0L);
+                            lastX = gi.ptsLocation.x;
+                        }
 
-                    yOverpan -= lastY - gi.ptsLocation.y;
-                    xOverpan -= lastX - gi.ptsLocation.x;
+                        yOverpan -= lastY - gi.ptsLocation.y;
+                        xOverpan -= lastX - gi.ptsLocation.x;
 
-                    if (gi.dwFlags & GF_BEGIN)
-                    {
-                        BeginPanningFeedbackFunc(hwnd);
-                        yOverpan = 0;
-                        xOverpan = 0;
-                    }
-                    else if (gi.dwFlags & GF_END)
-                    {
-                        EndPanningFeedbackFunc(hwnd, TRUE);
-                        yOverpan = 0;
-                        xOverpan = 0;
-                    }
+                        if (gi.dwFlags & GF_BEGIN)
+                        {
+                            BeginPanningFeedbackFunc(hwnd);
+                            yOverpan = 0;
+                            xOverpan = 0;
+                        }
+                        else if (gi.dwFlags & GF_END)
+                        {
+                            EndPanningFeedbackFunc(hwnd, TRUE);
+                            yOverpan = 0;
+                            xOverpan = 0;
+                        }
 
-                    if ((siv.nPos == siv.nMin) || (siv.nPos >= (siv.nMax - int(siv.nPage))))
-                    {
-                        // we reached the bottom / top, pan
-                        UpdatePanningFeedbackFunc(hwnd, 0, yOverpan, gi.dwFlags & GF_INERTIA);
+                        if ((siv.nPos == siv.nMin) || (siv.nPos >= (siv.nMax - int(siv.nPage))))
+                        {
+                            // we reached the bottom / top, pan
+                            UpdatePanningFeedbackFunc(hwnd, 0, yOverpan, gi.dwFlags & GF_INERTIA);
+                        }
+                        if ((sih.nPos == sih.nMin) || (sih.nPos >= (sih.nMax - int(sih.nPage))))
+                        {
+                            // we reached the bottom / top, pan
+                            UpdatePanningFeedbackFunc(hwnd, xOverpan, 0, gi.dwFlags & GF_INERTIA);
+                        }
+                        UpdateWindow(hwnd);
+                        CloseGestureInfoHandleFunc((HGESTUREINFO)lParam);
+                        return 0;
                     }
-                    if ((sih.nPos == sih.nMin) || (sih.nPos >= (sih.nMax - int(sih.nPage))))
-                    {
-                        // we reached the bottom / top, pan
-                        UpdatePanningFeedbackFunc(hwnd, xOverpan, 0, gi.dwFlags & GF_INERTIA);
-                    }
-                    UpdateWindow(hwnd);
-                    CloseGestureInfoHandleFunc((HGESTUREINFO)lParam);
-                    return 0;
+                    break;
+                    case GID_TWOFINGERTAP:
+                        Call(SCI_SETZOOM, 0);
+                        //UpdateStatusBar(false);
+                        break;
+                    default:
+                        // You have encountered an unknown gesture
+                        break;
                 }
-                    break;
-                case GID_TWOFINGERTAP:
-                    Call(SCI_SETZOOM, 0);
-                    //UpdateStatusBar(false);
-                    break;
-                default:
-                    // You have encountered an unknown gesture
-                    break;
             }
         }
-    }
         break;
-    default:
-        break;
+        default:
+            break;
     }
     if (prevWndProc)
         return CallWindowProc(prevWndProc, hwnd, uMsg, wParam, lParam);
@@ -765,12 +761,12 @@ void CScintillaWnd::UpdateLineNumberWidth()
         Call(SCI_SETMARGINWIDTHN, SC_MARGE_LINENUMBER, 0);
         return;
     }
-    int linesVisible = (int) Call(SCI_LINESONSCREEN);
+    int linesVisible = (int)Call(SCI_LINESONSCREEN);
     if (linesVisible)
     {
-        int firstVisibleLineVis = (int) Call(SCI_GETFIRSTVISIBLELINE);
-        int lastVisibleLineVis = linesVisible + firstVisibleLineVis + 1;
-        int i = 0;
+        int firstVisibleLineVis = (int)Call(SCI_GETFIRSTVISIBLELINE);
+        int lastVisibleLineVis  = linesVisible + firstVisibleLineVis + 1;
+        int i                   = 0;
         while (lastVisibleLineVis)
         {
             lastVisibleLineVis /= 10;
@@ -778,7 +774,7 @@ void CScintillaWnd::UpdateLineNumberWidth()
         }
         i = max(i, 3);
         {
-            int pixelWidth = int(8 + i * Call(SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)"8"));
+            int pixelWidth = int(8 + i * Call(SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM) "8"));
             Call(SCI_SETMARGINWIDTHN, SC_MARGE_LINENUMBER, pixelWidth);
         }
     }
@@ -793,15 +789,15 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
     if (m_LineToScrollToAfterPaint == (size_t)-1)
     {
         auto firstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
-        pos.m_nFirstVisibleLine   = Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine);
+        pos.m_nFirstVisibleLine = Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine);
         if (Call(SCI_GETWRAPMODE) != SC_WRAP_NONE)
             pos.m_nWrapLineOffset = firstVisibleLine - Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
 
-        pos.m_nStartPos           = Call(SCI_GETANCHOR);
-        pos.m_nEndPos             = Call(SCI_GETCURRENTPOS);
-        pos.m_xOffset             = Call(SCI_GETXOFFSET);
-        pos.m_nSelMode            = Call(SCI_GETSELECTIONMODE);
-        pos.m_nScrollWidth        = Call(SCI_GETSCROLLWIDTH);
+        pos.m_nStartPos    = Call(SCI_GETANCHOR);
+        pos.m_nEndPos      = Call(SCI_GETCURRENTPOS);
+        pos.m_xOffset      = Call(SCI_GETXOFFSET);
+        pos.m_nSelMode     = Call(SCI_GETSELECTIONMODE);
+        pos.m_nScrollWidth = Call(SCI_GETSCROLLWIDTH);
     }
     else
     {
@@ -845,11 +841,11 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     UpdateLineNumberWidth();
 }
 
-void CScintillaWnd::SetupLexerForLang( const std::string& lang )
+void CScintillaWnd::SetupLexerForLang(const std::string& lang)
 {
     const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(lang);
-    const auto& keywords = CLexStyles::Instance().GetKeywordsForLang(lang);
-    const auto& theme = CTheme::Instance();
+    const auto& keywords  = CLexStyles::Instance().GetKeywordsForLang(lang);
+    const auto& theme     = CTheme::Instance();
 
     // first set up only the default styles
     std::wstring defaultFont;
@@ -859,9 +855,9 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
         defaultFont = L"Courier New";
     std::string sFontName = CUnicodeUtils::StdGetUTF8(CIniSettings::Instance().GetString(L"View", L"FontName", defaultFont.c_str()));
     Call(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)sFontName.c_str());
-    bool bBold = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
-    bool bItalic = !!CIniSettings::Instance().GetInt64(L"View", L"FontItalic", false);
-    int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11);
+    bool bBold    = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
+    bool bItalic  = !!CIniSettings::Instance().GetInt64(L"View", L"FontItalic", false);
+    int  fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11);
     Call(SCI_STYLESETBOLD, STYLE_DEFAULT, bBold);
     Call(SCI_STYLESETITALIC, STYLE_DEFAULT, bItalic);
     Call(SCI_STYLESETSIZE, STYLE_DEFAULT, fontsize);
@@ -877,14 +873,14 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
     // and now set the lexer styles
     Call(SCI_SETLEXER, lexerdata.ID);
 
-    for (const auto& it: lexerdata.Properties)
+    for (const auto& it : lexerdata.Properties)
     {
         Call(SCI_SETPROPERTY, (WPARAM)it.first.c_str(), (LPARAM)it.second.c_str());
     }
-    for (const auto& it: lexerdata.Styles)
+    for (const auto& it : lexerdata.Styles)
     {
-        const int styleId = it.first;
-        const auto& sd = it.second;
+        const int   styleId = it.first;
+        const auto& sd      = it.second;
         Call(SCI_STYLESETFORE, styleId, theme.GetThemeColor(sd.ForegroundColor, true));
         Call(SCI_STYLESETBACK, styleId, theme.GetThemeColor(sd.BackgroundColor, true));
         if (!sd.FontName.empty())
@@ -894,7 +890,7 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
             Call(SCI_STYLESETBOLD, styleId, 1);
         if ((it.second.FontStyle & FONTSTYLE_ITALIC) != 0)
             Call(SCI_STYLESETITALIC, styleId, 1);
-        if ((it.second.FontStyle & FONTSTYLE_UNDERLINED) !=0)
+        if ((it.second.FontStyle & FONTSTYLE_UNDERLINED) != 0)
             Call(SCI_STYLESETUNDERLINE, styleId, 1);
 
         if (it.second.FontSize)
@@ -902,16 +898,16 @@ void CScintillaWnd::SetupLexerForLang( const std::string& lang )
         if (it.second.eolfilled)
             Call(SCI_STYLESETEOLFILLED, styleId, 1);
     }
-    for (const auto& it: keywords)
+    for (const auto& it : keywords)
     {
-        Call(SCI_SETKEYWORDS, it.first-1, (LPARAM)it.second.c_str());
+        Call(SCI_SETKEYWORDS, it.first - 1, (LPARAM)it.second.c_str());
     }
     Call(SCI_SETLINEENDTYPESALLOWED, Call(SCI_GETLINEENDTYPESSUPPORTED));
 }
 
 void CScintillaWnd::SetupDefaultStyles()
 {
-    auto& theme = CTheme::Instance();
+    auto&        theme = CTheme::Instance();
     std::wstring defaultFont;
     if (m_hasConsolas)
         defaultFont = L"Consolas";
@@ -926,12 +922,12 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETSTYLE, INDIC_SELECTION_MARK, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_SELECTION_MARK, 50);
     Call(SCI_INDICSETUNDER, INDIC_SELECTION_MARK, true);
-    Call(SCI_INDICSETFORE,  INDIC_SELECTION_MARK, theme.GetThemeColor(RGB(0,255,0), true));
+    Call(SCI_INDICSETFORE, INDIC_SELECTION_MARK, theme.GetThemeColor(RGB(0, 255, 0), true));
 
     Call(SCI_INDICSETSTYLE, INDIC_FINDTEXT_MARK, INDIC_ROUNDBOX);
     Call(SCI_INDICSETALPHA, INDIC_FINDTEXT_MARK, theme.IsDarkTheme() ? 100 : 200);
     Call(SCI_INDICSETUNDER, INDIC_FINDTEXT_MARK, true);
-    Call(SCI_INDICSETFORE,  INDIC_FINDTEXT_MARK, theme.GetThemeColor(RGB(255,255,0), true));
+    Call(SCI_INDICSETFORE, INDIC_FINDTEXT_MARK, theme.GetThemeColor(RGB(255, 255, 0), true));
 
     Call(SCI_INDICSETSTYLE, INDIC_URLHOTSPOT, INDIC_HIDDEN);
     Call(SCI_INDICSETALPHA, INDIC_URLHOTSPOT, 5);
@@ -949,12 +945,12 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_INDICSETFORE, INDIC_MISSPELLED, theme.GetThemeColor(RGB(255, 0, 0), true));
     Call(SCI_INDICSETUNDER, INDIC_MISSPELLED, true);
 
-    Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, theme.GetThemeColor(RGB(0,150,0), true));
+    Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, theme.GetThemeColor(RGB(0, 150, 0), true));
     Call(SCI_STYLESETBOLD, STYLE_BRACELIGHT, 1);
-    Call(SCI_STYLESETFORE, STYLE_BRACEBAD, theme.GetThemeColor(RGB(255,0,0), true));
+    Call(SCI_STYLESETFORE, STYLE_BRACEBAD, theme.GetThemeColor(RGB(255, 0, 0), true));
     Call(SCI_STYLESETBOLD, STYLE_BRACEBAD, 1);
 
-    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, theme.GetThemeColor(RGB(200,200,200), true));
+    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, theme.GetThemeColor(RGB(200, 200, 200), true));
 
     Call(SCI_INDICSETFORE, INDIC_TAGMATCH, theme.GetThemeColor(RGB(0x80, 0x00, 0xFF), true));
     Call(SCI_INDICSETFORE, INDIC_TAGATTR, theme.GetThemeColor(RGB(0xFF, 0xFF, 0x00), true));
@@ -995,8 +991,8 @@ void CScintillaWnd::SetupDefaultStyles()
                        RGB(color_folding_back_inactive, color_folding_back_inactive, color_folding_back_inactive),
                        RGB(color_folding_backsel_inactive, color_folding_backsel_inactive, color_folding_backsel_inactive));
 
-    bool bBold = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
-    int fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11);
+    bool bBold    = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
+    int  fontsize = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11);
     Call(SCI_STYLESETBOLD, STYLE_FOLDDISPLAYTEXT, bBold);
     Call(SCI_STYLESETITALIC, STYLE_FOLDDISPLAYTEXT, true);
     Call(SCI_STYLESETSIZE, STYLE_FOLDDISPLAYTEXT, fontsize);
@@ -1029,7 +1025,7 @@ void CScintillaWnd::SetupDefaultStyles()
         }
     }
     Call(SCI_SETWHITESPACEFORE, true, theme.IsDarkTheme() ? RGB(20, 72, 82) : RGB(43, 145, 175));
-    
+
     auto modEventMask = Call(SCI_GETMODEVENTMASK);
     Call(SCI_SETMODEVENTMASK, 0);
 
@@ -1042,7 +1038,7 @@ void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF ba
 {
     // set the folding colors according to the parameters, but leave the
     // colors for the collapsed buttons (+ button) in the active color.
-    auto foldmarkfore = CTheme::Instance().GetThemeColor(fore, true);
+    auto foldmarkfore       = CTheme::Instance().GetThemeColor(fore, true);
     auto foldmarkforeActive = CTheme::Instance().GetThemeColor(RGB(color_folding_fore_active, color_folding_fore_active, color_folding_fore_active), true);
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN, foldmarkfore);
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDER, foldmarkforeActive);
@@ -1052,7 +1048,7 @@ void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF ba
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, foldmarkfore);
     Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, foldmarkfore);
 
-    auto foldmarkback = CTheme::Instance().GetThemeColor(back, true);
+    auto foldmarkback       = CTheme::Instance().GetThemeColor(back, true);
     auto foldmarkbackActive = CTheme::Instance().GetThemeColor(RGB(color_folding_back_active, color_folding_back_active, color_folding_back_active), true);
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN, foldmarkback);
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDER, foldmarkbackActive);
@@ -1062,7 +1058,7 @@ void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF ba
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, foldmarkback);
     Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, foldmarkback);
 
-    auto foldmarkbackselected = CTheme::Instance().GetThemeColor(backsel, true);
+    auto foldmarkbackselected       = CTheme::Instance().GetThemeColor(backsel, true);
     auto foldmarkbackselectedActive = CTheme::Instance().GetThemeColor(RGB(color_folding_backsel_active, color_folding_backsel_active, color_folding_backsel_active), true);
     Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEROPEN, foldmarkbackselected);
     Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDER, foldmarkbackselectedActive);
@@ -1093,34 +1089,34 @@ void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
     // SCI_ENSUREVISIBLE resets the line-wrapping cache, so only
     // call that if it's really necessary.
     if (Call(SCI_GETLINEVISIBLE, currentlineNumberDoc) == 0)
-        Call(SCI_ENSUREVISIBLE, currentlineNumberDoc);    // make sure target line is unfolded
+        Call(SCI_ENSUREVISIBLE, currentlineNumberDoc); // make sure target line is unfolded
 
-    auto firstVisibleLineVis =   Call(SCI_GETFIRSTVISIBLELINE);
-    auto linesVisible        =   Call(SCI_LINESONSCREEN) - 1; //-1 for the scrollbar
-    auto lastVisibleLineVis  =   linesVisible + firstVisibleLineVis;
+    auto firstVisibleLineVis = Call(SCI_GETFIRSTVISIBLELINE);
+    auto linesVisible        = Call(SCI_LINESONSCREEN) - 1; //-1 for the scrollbar
+    auto lastVisibleLineVis  = linesVisible + firstVisibleLineVis;
 
     // if out of view vertically, scroll line into (center of) view
     // If m_LineToScrollToAfterPaint is not equal -1, modiry its value
     // and wait for the paint to complete, then go to the line.
     if (m_LineToScrollToAfterPaint != -1)
     {
-        m_LineToScrollToAfterPaint = currentlineNumberDoc;
+        m_LineToScrollToAfterPaint       = currentlineNumberDoc;
         m_WrapOffsetToScrollToAfterPaint = 0;
     }
     else
     {
         decltype(firstVisibleLineVis) linesToScroll = 0;
-        if (currentlineNumberVis < (firstVisibleLineVis+(linesVisible/4)))
+        if (currentlineNumberVis < (firstVisibleLineVis + (linesVisible / 4)))
         {
             linesToScroll = currentlineNumberVis - firstVisibleLineVis;
             // use center
-            linesToScroll -= linesVisible/2;
+            linesToScroll -= linesVisible / 2;
         }
         else if (currentlineNumberVis > (lastVisibleLineVis - (linesVisible / 4)))
         {
             linesToScroll = currentlineNumberVis - lastVisibleLineVis;
             // use center
-            linesToScroll += linesVisible/2;
+            linesToScroll += linesVisible / 2;
         }
         Call(SCI_LINESCROLL, 0, linesToScroll);
     }
@@ -1131,13 +1127,12 @@ void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
     Call(SCI_SETANCHOR, posStart);
 }
 
-void CScintillaWnd::MarginClick( SCNotification * pNotification )
+void CScintillaWnd::MarginClick(SCNotification* pNotification)
 {
     if ((pNotification->margin == SC_MARGE_SYMBOL) && !pNotification->modifiers)
         BookmarkToggle((int)Call(SCI_LINEFROMPOSITION, pNotification->position));
     m_docScroll.VisibleLinesChanged();
 }
-
 
 void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
 {
@@ -1275,11 +1270,11 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
 
 void CScintillaWnd::MatchBraces(BraceMatch what)
 {
-    static int lastIndicatorStart = 0;
+    static int lastIndicatorStart  = 0;
     static int lastIndicatorLength = 0;
-    static int lastCaretPos = 0;
+    static int lastCaretPos        = 0;
 
-    int braceAtCaret = -1;
+    int braceAtCaret  = -1;
     int braceOpposite = -1;
 
     // find matching brace position
@@ -1288,7 +1283,7 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
     // setting the highlighting style triggers an UI update notification,
     // which in return calls MatchBraces(false). So to avoid an endless
     // loop, we bail out if the caret position has not changed.
-    if ((what==BraceMatch::Braces) && (caretPos == lastCaretPos))
+    if ((what == BraceMatch::Braces) && (caretPos == lastCaretPos))
         return;
     lastCaretPos = caretPos;
 
@@ -1306,7 +1301,7 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
         braceAtCaret = caretPos - 1;
     }
 
-    if (lengthDoc > 0  && (braceAtCaret < 0))
+    if (lengthDoc > 0 && (braceAtCaret < 0))
     {
         // No brace found so check other side
         WCHAR charAfter = WCHAR(Call(SCI_GETCHARAT, caretPos, 0));
@@ -1317,7 +1312,6 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
     }
     if (braceAtCaret >= 0)
         braceOpposite = int(Call(SCI_BRACEMATCH, braceAtCaret, 0));
-
 
     KillTimer(*this, TIM_BRACEHIGHLIGHTTEXT);
     KillTimer(*this, TIM_BRACEHIGHLIGHTTEXTCLEAR);
@@ -1345,11 +1339,11 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
             if (what == BraceMatch::Highlight)
             {
                 Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
-                lastIndicatorStart = braceAtCaret < braceOpposite ? braceAtCaret : braceOpposite;
+                lastIndicatorStart  = braceAtCaret < braceOpposite ? braceAtCaret : braceOpposite;
                 lastIndicatorLength = braceAtCaret < braceOpposite ? braceOpposite - braceAtCaret : braceAtCaret - braceOpposite;
                 ++lastIndicatorLength;
                 int startLine = int(Call(SCI_LINEFROMPOSITION, lastIndicatorStart));
-                int endLine = int(Call(SCI_LINEFROMPOSITION, lastIndicatorStart + lastIndicatorLength));
+                int endLine   = int(Call(SCI_LINEFROMPOSITION, lastIndicatorStart + lastIndicatorLength));
                 if (endLine != startLine)
                     Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, CTheme::Instance().IsDarkTheme() ? 3 : 10);
                 else
@@ -1364,7 +1358,7 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
 
         if ((what == BraceMatch::Highlight) && (Call(SCI_GETINDENTATIONGUIDES) != 0))
         {
-            int columnAtCaret = int(Call(SCI_GETCOLUMN, braceAtCaret));
+            int columnAtCaret  = int(Call(SCI_GETCOLUMN, braceAtCaret));
             int columnOpposite = int(Call(SCI_GETCOLUMN, braceOpposite));
             Call(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite) ? columnAtCaret : columnOpposite);
         }
@@ -1380,11 +1374,11 @@ void CScintillaWnd::GotoBrace()
     if (lengthDoc <= 1)
         return;
 
-    int braceAtCaret = -1;
-    int braceOpposite = -1;
-    WCHAR charBefore = '\0';
-    WCHAR charAfter = '\0';
-    bool shift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+    int   braceAtCaret  = -1;
+    int   braceOpposite = -1;
+    WCHAR charBefore    = '\0';
+    WCHAR charAfter     = '\0';
+    bool  shift         = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
 
     int caretPos = int(Call(SCI_GETCURRENTPOS));
     if (caretPos > 0)
@@ -1395,7 +1389,7 @@ void CScintillaWnd::GotoBrace()
     }
 
     if (braceAtCaret < 0) // No brace found so check other side
-    {        
+    {
         charAfter = WCHAR(Call(SCI_GETCHARAT, caretPos, 0));
         if (charAfter && wcschr(brackets, charAfter))
             braceAtCaret = caretPos;
@@ -1412,8 +1406,7 @@ void CScintillaWnd::GotoBrace()
                 else
                     ++braceAtCaret;
             }
-            else if (braceAtCaret >= 0 && braceOpposite >= 0 && braceOpposite > braceAtCaret
-                && braceOpposite == braceAtCaret + 1 && charBefore)
+            else if (braceAtCaret >= 0 && braceOpposite >= 0 && braceOpposite > braceAtCaret && braceOpposite == braceAtCaret + 1 && charBefore)
             {
                 --braceOpposite;
             }
@@ -1432,11 +1425,11 @@ void CScintillaWnd::MatchTags()
     // finding xml tags is harder than just finding braces...
 
     size_t docStart = 0;
-    size_t docEnd = Call(SCI_GETLENGTH);
+    size_t docEnd   = Call(SCI_GETLENGTH);
     Call(SCI_SETINDICATORCURRENT, INDIC_TAGMATCH);
-    Call(SCI_INDICATORCLEARRANGE, docStart, docEnd-docStart);
+    Call(SCI_INDICATORCLEARRANGE, docStart, docEnd - docStart);
     Call(SCI_SETINDICATORCURRENT, INDIC_TAGATTR);
-    Call(SCI_INDICATORCLEARRANGE, docStart, docEnd-docStart);
+    Call(SCI_INDICATORCLEARRANGE, docStart, docEnd - docStart);
 
     int lexer = (int)Call(SCI_GETLEXER);
     if ((lexer != SCLEX_HTML) &&
@@ -1445,8 +1438,8 @@ void CScintillaWnd::MatchTags()
         return;
 
     // Get the original targets and search options to restore after tag matching operation
-    size_t originalStartPos = Call(SCI_GETTARGETSTART);
-    size_t originalEndPos = Call(SCI_GETTARGETEND);
+    size_t originalStartPos    = Call(SCI_GETTARGETSTART);
+    size_t originalEndPos      = Call(SCI_GETTARGETEND);
     size_t originalSearchFlags = Call(SCI_GETSEARCHFLAGS);
 
     XmlMatchedTagsPos xmlTags = {0};
@@ -1460,19 +1453,18 @@ void CScintillaWnd::MatchTags()
         // Coloring the close tag first
         if ((xmlTags.tagCloseStart != -1) && (xmlTags.tagCloseEnd != -1))
         {
-            Call(SCI_INDICATORFILLRANGE,  xmlTags.tagCloseStart, xmlTags.tagCloseEnd - xmlTags.tagCloseStart);
+            Call(SCI_INDICATORFILLRANGE, xmlTags.tagCloseStart, xmlTags.tagCloseEnd - xmlTags.tagCloseStart);
             // tag close is present, so it's not single tag
             openTagTailLen = 1;
         }
 
         // Coloring the open tag
-        Call(SCI_INDICATORFILLRANGE,  xmlTags.tagOpenStart, xmlTags.tagNameEnd - xmlTags.tagOpenStart);
-        Call(SCI_INDICATORFILLRANGE,  xmlTags.tagOpenEnd - openTagTailLen, openTagTailLen);
-
+        Call(SCI_INDICATORFILLRANGE, xmlTags.tagOpenStart, xmlTags.tagNameEnd - xmlTags.tagOpenStart);
+        Call(SCI_INDICATORFILLRANGE, xmlTags.tagOpenEnd - openTagTailLen, openTagTailLen);
 
         // Coloring its attributes
         std::vector<std::pair<size_t, size_t>> attributes = GetAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
-        Call(SCI_SETINDICATORCURRENT,  INDIC_TAGATTR);
+        Call(SCI_SETINDICATORCURRENT, INDIC_TAGATTR);
         for (const auto& attr : attributes)
         {
             Call(SCI_INDICATORFILLRANGE, attr.first, attr.second - attr.first);
@@ -1489,8 +1481,8 @@ void CScintillaWnd::MatchTags()
 
             if (xmlTags.tagCloseStart != -1 && lineAtCaret != lineOpposite)
             {
-                Call(SCI_BRACEHIGHLIGHT, xmlTags.tagOpenStart, xmlTags.tagCloseEnd-1);
-                Call(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite)?columnAtCaret:columnOpposite);
+                Call(SCI_BRACEHIGHLIGHT, xmlTags.tagOpenStart, xmlTags.tagCloseEnd - 1);
+                Call(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite) ? columnAtCaret : columnOpposite);
             }
         }
     }
@@ -1499,22 +1491,21 @@ void CScintillaWnd::MatchTags()
     Call(SCI_SETTARGETSTART, originalStartPos);
     Call(SCI_SETTARGETEND, originalEndPos);
     Call(SCI_SETSEARCHFLAGS, originalSearchFlags);
-
 }
 
 bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
 {
     auto selCount = Call(SCI_GETSELECTIONS);
-    selByte = 0;
-    selLine = 0;
+    selByte       = 0;
+    selLine       = 0;
     for (decltype(selCount) i = 0; i < selCount; ++i)
     {
         size_t start = Call(SCI_GETSELECTIONNSTART, i);
-        size_t end = Call(SCI_GETSELECTIONNEND, i);
+        size_t end   = Call(SCI_GETSELECTIONNEND, i);
         selByte += (start < end) ? end - start : start - end;
 
         start = Call(SCI_LINEFROMPOSITION, start);
-        end = Call(SCI_LINEFROMPOSITION, end);
+        end   = Call(SCI_LINEFROMPOSITION, end);
         selLine += (start < end) ? end - start : start - end;
         ++selLine;
     }
@@ -1522,27 +1513,27 @@ bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
     return true;
 };
 
-LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw( WPARAM wParam, NMCSBCUSTOMDRAW * pCustDraw )
+LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw(WPARAM wParam, NMCSBCUSTOMDRAW* pCustDraw)
 {
-    m_docScroll.SetCurrentPos(Call(SCI_VISIBLEFROMDOCLINE, GetCurrentLineNumber()), CTheme::Instance().GetThemeColor(RGB(40,40,40), true));
+    m_docScroll.SetCurrentPos(Call(SCI_VISIBLEFROMDOCLINE, GetCurrentLineNumber()), CTheme::Instance().GetThemeColor(RGB(40, 40, 40), true));
     m_docScroll.SetTotalLines(Call(SCI_GETLINECOUNT));
     return m_docScroll.HandleCustomDraw(wParam, pCustDraw);
 }
 
-bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
+bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
 {
-    bool tagFound = false;
-    size_t caret = Call(SCI_GETCURRENTPOS);
-    size_t searchStartPoint = caret;
-    size_t styleAt;
+    bool       tagFound         = false;
+    size_t     caret            = Call(SCI_GETCURRENTPOS);
+    size_t     searchStartPoint = caret;
+    size_t     styleAt;
     FindResult openFound;
 
     // Search back for the previous open angle bracket.
     // Keep looking whilst the angle bracket found is inside an XML attribute
     do
     {
-        openFound = FindText("<", searchStartPoint, 0, 0);
-        styleAt = Call(SCI_GETSTYLEAT, openFound.start);
+        openFound        = FindText("<", searchStartPoint, 0, 0);
+        styleAt          = Call(SCI_GETSTYLEAT, openFound.start);
         searchStartPoint = openFound.start - 1;
     } while (openFound.success && (styleAt == SCE_H_DOUBLESTRING || styleAt == SCE_H_SINGLESTRING) && (int)searchStartPoint > 0);
 
@@ -1553,8 +1544,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
         searchStartPoint = openFound.start;
         do
         {
-            closeFound = FindText(">", searchStartPoint, caret, 0);
-            styleAt = (int)Call(SCI_GETSTYLEAT, closeFound.start);
+            closeFound       = FindText(">", searchStartPoint, caret, 0);
+            styleAt          = (int)Call(SCI_GETSTYLEAT, closeFound.start);
             searchStartPoint = closeFound.end;
         } while (closeFound.success && (styleAt == SCE_H_DOUBLESTRING || styleAt == SCE_H_SINGLESTRING) && (int)searchStartPoint <= caret);
 
@@ -1563,14 +1554,13 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
             // We're in a tag (either a start tag or an end tag)
             int nextChar = (int)Call(SCI_GETCHARAT, openFound.start + 1);
 
-
             /////////////////////////////////////////////////////////////////////////
             // CURSOR IN CLOSE TAG
             /////////////////////////////////////////////////////////////////////////
             if ('/' == nextChar)
             {
-                xmlTags.tagCloseStart = openFound.start;
-                size_t docLength = Call(SCI_GETLENGTH);
+                xmlTags.tagCloseStart  = openFound.start;
+                size_t     docLength   = Call(SCI_GETLENGTH);
                 FindResult endCloseTag = FindText(">", caret, docLength, 0);
                 if (endCloseTag.success)
                 {
@@ -1583,7 +1573,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                 std::string tagName;
                 nextChar = (int)Call(SCI_GETCHARAT, position);
                 // Checking for " or ' is actually wrong here, but it means it works better with invalid XML
-                while(position < docLength && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
+                while (position < docLength && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                 {
                     tagName.push_back((char)nextChar);
                     ++position;
@@ -1609,8 +1599,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                     * <TAGNAME attrib="value"><TAGNAME>something</TAGNAME></TAGNAME></TAGNA|ME>
                     * Maybe count all closing tags between start point and start of our end tag.???
                     */
-                    size_t currentEndPoint = xmlTags.tagCloseStart;
-                    size_t openTagsRemaining = 1;
+                    size_t     currentEndPoint   = xmlTags.tagCloseStart;
+                    size_t     openTagsRemaining = 1;
                     FindResult nextOpenTag;
                     do
                     {
@@ -1626,9 +1616,9 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                             //                         ^^^^^^^^ we've found this guy
                             //                                           ^^^^^^^^^^ ^^^^^^^^ Now we need to count these fellas
                             FindResult inbetweenCloseTag;
-                            size_t currentStartPosition = nextOpenTag.end;
-                            size_t closeTagsFound = 0;
-                            bool forwardSearch = (currentStartPosition < currentEndPoint);
+                            size_t     currentStartPosition = nextOpenTag.end;
+                            size_t     closeTagsFound       = 0;
+                            bool       forwardSearch        = (currentStartPosition < currentEndPoint);
 
                             do
                             {
@@ -1647,7 +1637,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                                     }
                                 }
 
-                            } while(inbetweenCloseTag.success);
+                            } while (inbetweenCloseTag.success);
 
                             // If we didn't find any close tags between the open and our close,
                             // and there's no open tags remaining to find
@@ -1655,13 +1645,12 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                             if (0 == closeTagsFound && 0 == openTagsRemaining)
                             {
                                 xmlTags.tagOpenStart = nextOpenTag.start;
-                                xmlTags.tagOpenEnd = nextOpenTag.end + 1;
-                                xmlTags.tagNameEnd = nextOpenTag.start + (int)tagName.size() + 1;  /* + 1 to account for '<' */
-                                tagFound = true;
+                                xmlTags.tagOpenEnd   = nextOpenTag.end + 1;
+                                xmlTags.tagNameEnd   = nextOpenTag.start + (int)tagName.size() + 1; /* + 1 to account for '<' */
+                                tagFound             = true;
                             }
                             else
                             {
-
                                 // Need to find the same number of opening tags, without closing tags etc.
                                 openTagsRemaining += closeTagsFound;
                                 currentEndPoint = nextOpenTag.start;
@@ -1675,7 +1664,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                 /////////////////////////////////////////////////////////////////////////
                 // CURSOR IN OPEN TAG
                 /////////////////////////////////////////////////////////////////////////
-                size_t position = openFound.start + 1;
+                size_t position  = openFound.start + 1;
                 size_t docLength = (int)Call(SCI_GETLENGTH);
 
                 xmlTags.tagOpenStart = openFound.start;
@@ -1683,7 +1672,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                 std::string tagName;
                 nextChar = (int)Call(SCI_GETCHARAT, position);
                 // Checking for " or ' is actually wrong here, but it means it works better with invalid XML
-                while(position < docLength && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
+                while (position < docLength && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                 {
                     tagName.push_back((char)nextChar);
                     ++position;
@@ -1695,7 +1684,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                 {
                     // First we need to check if this is a self-closing tag.
                     // If it is, then we can just return this tag to highlight itself.
-                    xmlTags.tagNameEnd = openFound.start + tagName.size() + 1;
+                    xmlTags.tagNameEnd        = openFound.start + tagName.size() + 1;
                     size_t closeAnglePosition = FindCloseAngle(position, docLength);
                     if (-1 != closeAnglePosition)
                     {
@@ -1704,15 +1693,13 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                         if (Call(SCI_GETCHARAT, closeAnglePosition - 1) == '/')
                         {
                             // Set it as found, and mark that there's no close tag
-                            xmlTags.tagCloseEnd = (size_t)-1;
+                            xmlTags.tagCloseEnd   = (size_t)-1;
                             xmlTags.tagCloseStart = (size_t)-1;
-                            tagFound = true;
+                            tagFound              = true;
                         }
                         else
                         {
                             // It's a normal open tag
-
-
 
                             /* Now we need to find the close tag.  The logic here is that we search for "</TAGNAME",
                             * then check the next character - if it's '>' or whitespace followed by '>' then we've
@@ -1722,8 +1709,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                             *       e.g.  <TA|GNAME><TAGNAME attrib="value">some text</TAGNAME></TAGNAME>
                             *             (cursor represented by |)
                             */
-                            size_t currentStartPosition = xmlTags.tagOpenEnd;
-                            size_t closeTagsRemaining = 1;
+                            size_t     currentStartPosition = xmlTags.tagOpenEnd;
+                            size_t     closeTagsRemaining   = 1;
                             FindResult nextCloseTag;
                             do
                             {
@@ -1739,8 +1726,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                                     //                                            ^^^^^^^^ we've found this guy
                                     //                         ^^^^^^^^^ Now we need to find this fella
                                     FindResult inbetweenOpenTag;
-                                    size_t currentEndPosition = nextCloseTag.start;
-                                    size_t openTagsFound = 0;
+                                    size_t     currentEndPosition = nextCloseTag.start;
+                                    size_t     openTagsFound      = 0;
 
                                     do
                                     {
@@ -1752,7 +1739,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                                             currentStartPosition = inbetweenOpenTag.end;
                                         }
 
-                                    } while(inbetweenOpenTag.success);
+                                    } while (inbetweenOpenTag.success);
 
                                     // If we didn't find any open tags between our open and the close,
                                     // and there's no close tags remaining to find
@@ -1760,12 +1747,11 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                                     if (0 == openTagsFound && 0 == closeTagsRemaining)
                                     {
                                         xmlTags.tagCloseStart = nextCloseTag.start;
-                                        xmlTags.tagCloseEnd = nextCloseTag.end + 1;
-                                        tagFound = true;
+                                        xmlTags.tagCloseEnd   = nextCloseTag.end + 1;
+                                        tagFound              = true;
                                     }
                                     else
                                     {
-
                                         // Need to find the same number of closing tags, without opening tags etc.
                                         closeTagsRemaining += openTagsFound;
                                         currentStartPosition = nextCloseTag.end;
@@ -1773,24 +1759,24 @@ bool CScintillaWnd::GetXmlMatchedTagsPos( XmlMatchedTagsPos& xmlTags )
                                 }
                             } while (!tagFound && closeTagsRemaining > 0 && nextCloseTag.success);
                         } // end if (selfclosingtag)... else {
-                    } // end if (-1 != closeAngle)  {
+                    }     // end if (-1 != closeAngle)  {
 
                 } // end if !tagName.empty()
-            } // end open tag test
+            }     // end open tag test
         }
     }
     return tagFound;
 }
 
-FindResult CScintillaWnd::FindText( const char *text, size_t start, size_t end, int flags )
+FindResult CScintillaWnd::FindText(const char* text, size_t start, size_t end, int flags)
 {
-    FindResult returnValue = { 0 };
+    FindResult returnValue = {0};
 
     Sci_TextToFind search;
-    search.lpstrText = const_cast<char *>(text);
+    search.lpstrText  = const_cast<char*>(text);
     search.chrg.cpMin = (long)start;
     search.chrg.cpMax = (long)end;
-    size_t result = Call(SCI_FINDTEXT, flags, reinterpret_cast<LPARAM>(&search));
+    size_t result     = Call(SCI_FINDTEXT, flags, reinterpret_cast<LPARAM>(&search));
     if (-1 == result)
     {
         returnValue.success = false;
@@ -1798,18 +1784,18 @@ FindResult CScintillaWnd::FindText( const char *text, size_t start, size_t end, 
     else
     {
         returnValue.success = true;
-        returnValue.start = search.chrgText.cpMin;
-        returnValue.end = search.chrgText.cpMax;
+        returnValue.start   = search.chrgText.cpMin;
+        returnValue.end     = search.chrgText.cpMax;
     }
     return returnValue;
 }
 
 size_t CScintillaWnd::FindText(const std::string& tofind, long startpos, long endpos)
 {
-    Sci_TextToFind ttf = { 0 };
-    ttf.chrg.cpMin = startpos;
-    ttf.chrg.cpMax = endpos;
-    ttf.lpstrText = const_cast<char*>(tofind.c_str());
+    Sci_TextToFind ttf = {0};
+    ttf.chrg.cpMin     = startpos;
+    ttf.chrg.cpMax     = endpos;
+    ttf.lpstrText      = const_cast<char*>(tofind.c_str());
     return Call(SCI_FINDTEXT, 0, (sptr_t)&ttf);
 }
 
@@ -1817,22 +1803,21 @@ FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, 
 {
     std::string search("<");
     search.append(tagName);
-    FindResult openTagFound = { 0 };
-    openTagFound.success = false;
+    FindResult openTagFound = {0};
+    openTagFound.success    = false;
     FindResult result;
-    int nextChar = 0;
-    size_t styleAt;
-    size_t searchStart = start;
-    size_t searchEnd = end;
-    bool forwardSearch = (start < end);
+    int        nextChar = 0;
+    size_t     styleAt;
+    size_t     searchStart   = start;
+    size_t     searchEnd     = end;
+    bool       forwardSearch = (start < end);
     do
     {
-
         result = FindText(search.c_str(), searchStart, searchEnd, 0);
         if (result.success)
         {
             nextChar = (int)Call(SCI_GETCHARAT, result.end);
-            styleAt = Call(SCI_GETSTYLEAT, result.start);
+            styleAt  = Call(SCI_GETSTYLEAT, result.start);
             if (styleAt != SCE_H_CDATA && styleAt != SCE_H_DOUBLESTRING && styleAt != SCE_H_SINGLESTRING)
             {
                 // We've got an open tag for this tag name (i.e. nextChar was space or '>')
@@ -1841,7 +1826,7 @@ FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, 
                 // Common case, the tag is an empty tag with no whitespace. e.g. <TAGNAME>
                 if (nextChar == '>')
                 {
-                    openTagFound.end = result.end;
+                    openTagFound.end     = result.end;
                     openTagFound.success = true;
                 }
                 else if (IsXMLWhitespace(nextChar))
@@ -1849,12 +1834,11 @@ FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, 
                     size_t closeAnglePosition = FindCloseAngle(result.end, forwardSearch ? end : start);
                     if (-1 != closeAnglePosition && '/' != Call(SCI_GETCHARAT, closeAnglePosition - 1))
                     {
-                        openTagFound.end = closeAnglePosition;
+                        openTagFound.end     = closeAnglePosition;
                         openTagFound.success = true;
                     }
                 }
             }
-
         }
 
         if (forwardSearch)
@@ -1872,25 +1856,22 @@ FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, 
 
     openTagFound.start = result.start;
 
-
     return openTagFound;
-
 }
-
 
 size_t CScintillaWnd::FindCloseAngle(size_t startPosition, size_t endPosition)
 {
     // We'll search for the next '>', and check it's not in an attribute using the style
     FindResult closeAngle;
 
-    bool isValidClose;
+    bool   isValidClose;
     size_t returnPosition = (size_t)-1;
 
     // Only search forwards
     if (startPosition > endPosition)
     {
-        size_t temp = endPosition;
-        endPosition = startPosition;
+        size_t temp   = endPosition;
+        endPosition   = startPosition;
         startPosition = temp;
     }
 
@@ -1906,7 +1887,7 @@ size_t CScintillaWnd::FindCloseAngle(size_t startPosition, size_t endPosition)
             if (style != SCE_H_DOUBLESTRING && style != SCE_H_SINGLESTRING)
             {
                 returnPosition = closeAngle.start;
-                isValidClose = true;
+                isValidClose   = true;
             }
             else
             {
@@ -1919,28 +1900,27 @@ size_t CScintillaWnd::FindCloseAngle(size_t startPosition, size_t endPosition)
     return returnPosition;
 }
 
-
 FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, size_t start, size_t end)
 {
     std::string search("</");
     search.append(tagName);
-    FindResult closeTagFound = { 0 };
-    closeTagFound.success = false;
+    FindResult closeTagFound = {0};
+    closeTagFound.success    = false;
     FindResult result;
-    int nextChar;
-    size_t styleAt;
-    size_t searchStart = start;
-    size_t searchEnd = end;
-    bool forwardSearch = (start < end);
-    bool validCloseTag;
+    int        nextChar;
+    size_t     styleAt;
+    size_t     searchStart   = start;
+    size_t     searchEnd     = end;
+    bool       forwardSearch = (start < end);
+    bool       validCloseTag;
     do
     {
         validCloseTag = false;
-        result = FindText(search.c_str(), searchStart, searchEnd, 0);
+        result        = FindText(search.c_str(), searchStart, searchEnd, 0);
         if (result.success)
         {
             nextChar = (int)Call(SCI_GETCHARAT, result.end);
-            styleAt = Call(SCI_GETSTYLEAT, result.start);
+            styleAt  = Call(SCI_GETSTYLEAT, result.start);
 
             // Setup the parameters for the next search, if there is one.
             if (forwardSearch)
@@ -1957,12 +1937,12 @@ FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, size_t start,
                 // Common case - '>' follows the tag name directly
                 if (nextChar == '>')
                 {
-                    validCloseTag = true;
-                    closeTagFound.start = result.start;
-                    closeTagFound.end = result.end;
+                    validCloseTag         = true;
+                    closeTagFound.start   = result.start;
+                    closeTagFound.end     = result.end;
                     closeTagFound.success = true;
                 }
-                else if (IsXMLWhitespace(nextChar))  // Otherwise, if it's whitespace, then allow whitespace until a '>' - any other character is invalid.
+                else if (IsXMLWhitespace(nextChar)) // Otherwise, if it's whitespace, then allow whitespace until a '>' - any other character is invalid.
                 {
                     size_t whitespacePoint = result.end;
                     do
@@ -1970,13 +1950,13 @@ FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, size_t start,
                         ++whitespacePoint;
                         nextChar = (int)Call(SCI_GETCHARAT, whitespacePoint);
 
-                    } while(IsXMLWhitespace(nextChar));
+                    } while (IsXMLWhitespace(nextChar));
 
                     if (nextChar == '>')
                     {
-                        validCloseTag = true;
-                        closeTagFound.start = result.start;
-                        closeTagFound.end = whitespacePoint;
+                        validCloseTag         = true;
+                        closeTagFound.start   = result.start;
+                        closeTagFound.end     = whitespacePoint;
                         closeTagFound.success = true;
                     }
                 }
@@ -1986,19 +1966,18 @@ FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, size_t start,
     } while (result.success && !validCloseTag);
 
     return closeTagFound;
-
 }
 
 std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t start, size_t end)
 {
     std::vector<std::pair<size_t, size_t>> attributes;
 
-    size_t bufLen = end - start + 1;
-    auto buf = std::make_unique<char[]>(bufLen+1);
+    size_t        bufLen = end - start + 1;
+    auto          buf    = std::make_unique<char[]>(bufLen + 1);
     Sci_TextRange tr;
     tr.chrg.cpMin = (long)start;
     tr.chrg.cpMax = (long)end;
-    tr.lpstrText = buf.get();
+    tr.lpstrText  = buf.get();
     Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
 
     enum
@@ -2012,29 +1991,29 @@ std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t st
         attr_valid
     } state = attr_invalid;
 
-    size_t startPos = (size_t)-1;
-    int oneMoreChar = 1;
-    size_t i = 0;
-    for (; i < bufLen ; i++)
+    size_t startPos    = (size_t)-1;
+    int    oneMoreChar = 1;
+    size_t i           = 0;
+    for (; i < bufLen; i++)
     {
         switch (buf[i])
         {
-        case ' ':
-        case '\t':
-        case '\n':
-        case '\r':
+            case ' ':
+            case '\t':
+            case '\n':
+            case '\r':
             {
                 if (state == attr_key)
                     state = attr_pre_assign;
                 else if (state == attr_value)
                 {
-                    state = attr_valid;
+                    state       = attr_valid;
                     oneMoreChar = 0;
                 }
             }
             break;
 
-        case '=':
+            case '=':
             {
                 if (state == attr_key || state == attr_pre_assign)
                     state = attr_assign;
@@ -2043,11 +2022,11 @@ std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t st
             }
             break;
 
-        case '"':
+            case '"':
             {
                 if (state == attr_string)
                 {
-                    state = attr_valid;
+                    state       = attr_valid;
                     oneMoreChar = 1;
                 }
                 else if (state == attr_key || state == attr_pre_assign || state == attr_value)
@@ -2057,11 +2036,11 @@ std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t st
             }
             break;
 
-        default:
+            default:
             {
                 if (state == attr_invalid)
                 {
-                    state = attr_key;
+                    state    = attr_key;
                     startPos = i;
                 }
                 else if (state == attr_pre_assign)
@@ -2073,17 +2052,17 @@ std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t st
 
         if (state == attr_valid)
         {
-            attributes.push_back(std::pair<size_t, size_t>(start+startPos, start+i+oneMoreChar));
+            attributes.push_back(std::pair<size_t, size_t>(start + startPos, start + i + oneMoreChar));
             state = attr_invalid;
         }
     }
     if (state == attr_value)
-        attributes.push_back(std::pair<size_t, size_t>(start+startPos, start+i-1));
+        attributes.push_back(std::pair<size_t, size_t>(start + startPos, start + i - 1));
 
     return attributes;
 }
 
-bool CScintillaWnd::AutoBraces( WPARAM wParam )
+bool CScintillaWnd::AutoBraces(WPARAM wParam)
 {
     auto lexer = Call(SCI_GETLEXER);
     switch (lexer)
@@ -2105,26 +2084,26 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
     {
         if (CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1) == 0)
             return false;
-        char braceBuf[2] = { 0 };
-        braceBuf[0] = (char)wParam;
+        char braceBuf[2]      = {0};
+        braceBuf[0]           = (char)wParam;
         char braceCloseBuf[2] = {0};
         switch (wParam)
         {
-        case '(':
-            braceCloseBuf[0] = ')';
-            break;
-        case '{':
-            braceCloseBuf[0] = '}';
-            break;
-        case '[':
-            braceCloseBuf[0] = ']';
-            break;
+            case '(':
+                braceCloseBuf[0] = ')';
+                break;
+            case '{':
+                braceCloseBuf[0] = '}';
+                break;
+            case '[':
+                braceCloseBuf[0] = ']';
+                break;
         }
 
         // Get Selection
-        bool bSelEmpty          = !!Call(SCI_GETSELECTIONEMPTY);
-        size_t lineStartStart   = 0;
-        size_t lineEndEnd       = 0;
+        bool   bSelEmpty      = !!Call(SCI_GETSELECTIONEMPTY);
+        size_t lineStartStart = 0;
+        size_t lineEndEnd     = 0;
         if (!bSelEmpty && braceCloseBuf[0])
         {
             size_t selStart  = Call(SCI_GETSELECTIONSTART);
@@ -2136,25 +2115,25 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 --lineEnd;
                 selEnd = Call(SCI_GETLINEENDPOSITION, lineEnd);
             }
-            lineStartStart  = Call(SCI_POSITIONFROMLINE, lineStart);
-            lineEndEnd      = Call(SCI_GETLINEENDPOSITION, lineEnd);
+            lineStartStart = Call(SCI_POSITIONFROMLINE, lineStart);
+            lineEndEnd     = Call(SCI_GETLINEENDPOSITION, lineEnd);
             if ((lineStartStart != selStart) || (lineEndEnd != selEnd) || (wParam == '(') || (wParam == '['))
             {
                 // insert the brace before the selection and the closing brace after the selection
                 Call(SCI_SETSEL, (uptr_t)-1, selStart);
                 Call(SCI_BEGINUNDOACTION);
                 Call(SCI_INSERTTEXT, selStart, (sptr_t)braceBuf);
-                Call(SCI_INSERTTEXT, selEnd+1, (sptr_t)braceCloseBuf);
-                Call(SCI_SETSEL, selStart+1, selStart+1);
+                Call(SCI_INSERTTEXT, selEnd + 1, (sptr_t)braceCloseBuf);
+                Call(SCI_SETSEL, selStart + 1, selStart + 1);
                 Call(SCI_ENDUNDOACTION);
                 return true;
             }
             else
             {
                 // get info
-                size_t tabIndent = Call(SCI_GETTABWIDTH);
-                int indentAmount = (int)Call(SCI_GETLINEINDENTATION, lineStart > 0 ? lineStart-1 : lineStart);
-                int indentAmountfirst = (int)Call(SCI_GETLINEINDENTATION, lineStart);
+                size_t tabIndent         = Call(SCI_GETTABWIDTH);
+                int    indentAmount      = (int)Call(SCI_GETLINEINDENTATION, lineStart > 0 ? lineStart - 1 : lineStart);
+                int    indentAmountfirst = (int)Call(SCI_GETLINEINDENTATION, lineStart);
                 if (indentAmount == 0)
                     indentAmount = indentAmountfirst;
                 Call(SCI_BEGINUNDOACTION);
@@ -2164,12 +2143,12 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 Call(SCI_NEWLINE);
                 // now insert the end-brace and indent it
                 Call(SCI_INSERTTEXT, (uptr_t)-1, (sptr_t)braceCloseBuf);
-                Call(SCI_SETLINEINDENTATION, lineEnd+1, indentAmount);
+                Call(SCI_SETLINEINDENTATION, lineEnd + 1, indentAmount);
 
                 Call(SCI_SETSEL, lineStartStart, lineStartStart);
                 // now insert the start-brace and a newline after it
                 Call(SCI_INSERTTEXT, (uptr_t)-1, (sptr_t)braceBuf);
-                Call(SCI_SETSEL, lineStartStart+1, lineStartStart+1);
+                Call(SCI_SETSEL, lineStartStart + 1, lineStartStart + 1);
                 Call(SCI_NEWLINE);
                 // now indent the line with the start brace
                 Call(SCI_SETLINEINDENTATION, lineStart, indentAmount);
@@ -2177,9 +2156,9 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 // increase the indentation of all selected lines
                 if (indentAmount == indentAmountfirst)
                 {
-                    for (size_t line = lineStart+1; line <= lineEnd+1; ++line)
+                    for (size_t line = lineStart + 1; line <= lineEnd + 1; ++line)
                     {
-                        Call(SCI_SETLINEINDENTATION, line, Call(SCI_GETLINEINDENTATION, line)+tabIndent);
+                        Call(SCI_SETLINEINDENTATION, line, Call(SCI_GETLINEINDENTATION, line) + tabIndent);
                     }
                 }
                 Call(SCI_ENDUNDOACTION);
@@ -2201,25 +2180,25 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 Call(SCI_ENDUNDOACTION);
                 return true;
             }
-            else if ((wParam == '[')|| (wParam == '-'))
+            else if ((wParam == '[') || (wParam == '-'))
             {
                 lexer = Call(SCI_GETLEXER);
                 switch (lexer)
                 {
-                    // add the closing tag only for xml and html lexers
-                case SCLEX_XML:
-                case SCLEX_HTML:
-                    break;
-                default:
-                    return false;
+                        // add the closing tag only for xml and html lexers
+                    case SCLEX_XML:
+                    case SCLEX_HTML:
+                        break;
+                    default:
+                        return false;
                 }
                 if (CIniSettings::Instance().GetInt64(L"View", L"autobracexml", 1) == 0)
                     return false;
 
                 FindResult result1, result2;
-                size_t currentpos = Call(SCI_GETCURRENTPOS);
-                result1 = FindText("/", currentpos, 0, 0);
-                result2 = FindText("<", currentpos, 0, 0);
+                size_t     currentpos = Call(SCI_GETCURRENTPOS);
+                result1               = FindText("/", currentpos, 0, 0);
+                result2               = FindText("<", currentpos, 0, 0);
                 if (result2.success)
                 {
                     if (!result1.success || (result2.start > result1.start))
@@ -2231,8 +2210,8 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                             return false;
                         // find the tag id
                         std::string tagName;
-                        size_t position = result2.start + 1;
-                        int nextChar = (int)Call(SCI_GETCHARAT, position);
+                        size_t      position = result2.start + 1;
+                        int         nextChar = (int)Call(SCI_GETCHARAT, position);
                         while (position < currentpos && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                         {
                             tagName.push_back((char)nextChar);
@@ -2242,20 +2221,20 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                         if (tagName.starts_with("![CDATA"))
                         {
                             // insert the [ now
-                            Call(SCI_ADDTEXT, 1, (sptr_t)"[");
+                            Call(SCI_ADDTEXT, 1, (sptr_t) "[");
                             size_t cursorPos = Call(SCI_GETCURRENTPOS);
                             Call(SCI_BEGINUNDOACTION);
-                            Call(SCI_ADDTEXT, 3, (sptr_t)"]]>");
+                            Call(SCI_ADDTEXT, 3, (sptr_t) "]]>");
                             Call(SCI_GOTOPOS, cursorPos);
                             Call(SCI_ENDUNDOACTION);
                         }
                         if (tagName == "!-")
                         {
                             // insert the - now
-                            Call(SCI_ADDTEXT, 1, (sptr_t)"-");
+                            Call(SCI_ADDTEXT, 1, (sptr_t) "-");
                             size_t cursorPos = Call(SCI_GETCURRENTPOS);
                             Call(SCI_BEGINUNDOACTION);
-                            Call(SCI_ADDTEXT, 3, (sptr_t)"-->");
+                            Call(SCI_ADDTEXT, 3, (sptr_t) "-->");
                             Call(SCI_GOTOPOS, cursorPos);
                             Call(SCI_ENDUNDOACTION);
                         }
@@ -2281,9 +2260,9 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
 
         // check if there's a '/' char before the opening '<' (searching backwards)
         FindResult result1, result2;
-        size_t currentpos = Call(SCI_GETCURRENTPOS);
-        result1 = FindText("/", currentpos, 0, 0);
-        result2 = FindText("<", currentpos, 0, 0);
+        size_t     currentpos = Call(SCI_GETCURRENTPOS);
+        result1               = FindText("/", currentpos, 0, 0);
+        result2               = FindText("<", currentpos, 0, 0);
         if (result2.success)
         {
             if (!result1.success || (result2.start > result1.start))
@@ -2294,13 +2273,13 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 if ((c == '?') || (c == '%'))
                     return false;
                 // insert the closing tag now
-                Call(SCI_ADDTEXT, 1, (sptr_t)">");
+                Call(SCI_ADDTEXT, 1, (sptr_t) ">");
                 size_t cursorPos = Call(SCI_GETCURRENTPOS);
                 // find the tag id
                 std::string tagName;
-                size_t position = result2.start + 1;
-                int nextChar = (int)Call(SCI_GETCHARAT, position);
-                while(position < currentpos && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
+                size_t      position = result2.start + 1;
+                int         nextChar = (int)Call(SCI_GETCHARAT, position);
+                while (position < currentpos && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                 {
                     tagName.push_back((char)nextChar);
                     ++position;
@@ -2320,9 +2299,9 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                     else
                     {
                         // we found the tag id, now insert the closing xml tag
-                        Call(SCI_ADDTEXT, 2, (sptr_t)"</");
+                        Call(SCI_ADDTEXT, 2, (sptr_t) "</");
                         Call(SCI_ADDTEXT, tagName.size(), (sptr_t)tagName.c_str());
-                        Call(SCI_ADDTEXT, 1, (sptr_t)">");
+                        Call(SCI_ADDTEXT, 1, (sptr_t) ">");
                     }
                     Call(SCI_GOTOPOS, cursorPos);
                     Call(SCI_ENDUNDOACTION);
@@ -2330,28 +2309,27 @@ bool CScintillaWnd::AutoBraces( WPARAM wParam )
                 return true;
             }
         }
-
     }
     return false;
 }
 
-void CScintillaWnd::ReflectEvents(SCNotification * pScn)
+void CScintillaWnd::ReflectEvents(SCNotification* pScn)
 {
     switch (pScn->nmhdr.code)
     {
-    case SCN_PAINTED:
-        if (m_LineToScrollToAfterPaint != (size_t)-1)
-        {
-            auto visLineToScrollTo = Call(SCI_VISIBLEFROMDOCLINE, m_LineToScrollToAfterPaint);
-            visLineToScrollTo += m_WrapOffsetToScrollToAfterPaint;
-            auto currentVisPos = Call(SCI_VISIBLEFROMDOCLINE, Call(SCI_GETFIRSTVISIBLELINE));
-            visLineToScrollTo -= currentVisPos;
-            Call(SCI_LINESCROLL, 0, visLineToScrollTo);
-            m_LineToScrollToAfterPaint = (size_t)-1;
-            m_WrapOffsetToScrollToAfterPaint = 0;
-            UpdateLineNumberWidth();
-        }
-        break;
+        case SCN_PAINTED:
+            if (m_LineToScrollToAfterPaint != (size_t)-1)
+            {
+                auto visLineToScrollTo = Call(SCI_VISIBLEFROMDOCLINE, m_LineToScrollToAfterPaint);
+                visLineToScrollTo += m_WrapOffsetToScrollToAfterPaint;
+                auto currentVisPos = Call(SCI_VISIBLEFROMDOCLINE, Call(SCI_GETFIRSTVISIBLELINE));
+                visLineToScrollTo -= currentVisPos;
+                Call(SCI_LINESCROLL, 0, visLineToScrollTo);
+                m_LineToScrollToAfterPaint       = (size_t)-1;
+                m_WrapOffsetToScrollToAfterPaint = 0;
+                UpdateLineNumberWidth();
+            }
+            break;
     }
 }
 
@@ -2378,23 +2356,23 @@ void CScintillaWnd::SetReadDirection(ReadDirection rd)
     Call(SCI_SETBIDIRECTIONAL, rd);
 }
 
-void CScintillaWnd::BookmarkAdd( long lineno )
+void CScintillaWnd::BookmarkAdd(long lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
     if (!IsBookmarkPresent(lineno))
     {
         Call(SCI_MARKERADD, lineno, MARK_BOOKMARK);
-        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, lineno, CTheme::Instance().GetThemeColor(RGB(255,0,0), true));
+        m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, lineno, CTheme::Instance().GetThemeColor(RGB(255, 0, 0), true));
         DocScrollUpdate();
     }
 }
 
-void CScintillaWnd::BookmarkDelete( int lineno )
+void CScintillaWnd::BookmarkDelete(int lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
-    if ( IsBookmarkPresent(lineno))
+    if (IsBookmarkPresent(lineno))
     {
         Call(SCI_MARKERDELETE, lineno, MARK_BOOKMARK);
         m_docScroll.RemoveLine(DOCSCROLLTYPE_BOOKMARK, lineno);
@@ -2402,7 +2380,7 @@ void CScintillaWnd::BookmarkDelete( int lineno )
     }
 }
 
-bool CScintillaWnd::IsBookmarkPresent( int lineno )
+bool CScintillaWnd::IsBookmarkPresent(int lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
@@ -2410,7 +2388,7 @@ bool CScintillaWnd::IsBookmarkPresent( int lineno )
     return ((state & (1 << MARK_BOOKMARK)) != 0);
 }
 
-void CScintillaWnd::BookmarkToggle( int lineno )
+void CScintillaWnd::BookmarkToggle(int lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
@@ -2438,21 +2416,20 @@ void CScintillaWnd::MarkBookmarksInScrollbar()
 void CScintillaWnd::DocScrollUpdate()
 {
     InvalidateRect(*this, nullptr, TRUE);
-    SCNotification Scn = { 0 };
-    Scn.message = SCN_UPDATEUI;
-    Scn.updated = SC_UPDATE_CONTENT;
-    Scn.nmhdr.code = SCN_UPDATEUI;
+    SCNotification Scn = {0};
+    Scn.message        = SCN_UPDATEUI;
+    Scn.updated        = SC_UPDATE_CONTENT;
+    Scn.nmhdr.code     = SCN_UPDATEUI;
     Scn.nmhdr.hwndFrom = *this;
-    Scn.nmhdr.idFrom = (uptr_t)this;
+    Scn.nmhdr.idFrom   = (uptr_t)this;
     SendMessage(GetParent(*this), WM_NOTIFY, (WPARAM)(this), (LPARAM)&Scn);
 
     // force the scrollbar to redraw
 
     bool ok = SetWindowPos(*this, nullptr, 0, 0, 0, 0,
                            SWP_FRAMECHANGED | // NO to everything else
-                           SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOOWNERZORDER |
-                           SWP_NOACTIVATE | SWP_NOSENDCHANGING
-                           ) != FALSE;
+                               SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOOWNERZORDER |
+                               SWP_NOACTIVATE | SWP_NOSENDCHANGING) != FALSE;
     APPVERIFY(ok);
 }
 
@@ -2469,7 +2446,7 @@ void CScintillaWnd::AppendText(int len, const char* buf)
 std::string CScintillaWnd::GetLine(long line) const
 {
     size_t linesize = ConstCall(SCI_GETLINE, line, 0);
-    auto pLine = std::make_unique<char[]>(linesize + 1);
+    auto   pLine    = std::make_unique<char[]>(linesize + 1);
     ConstCall(SCI_GETLINE, line, (sptr_t)pLine.get());
     pLine[linesize] = 0;
     return pLine.get();
@@ -2480,18 +2457,18 @@ std::string CScintillaWnd::GetTextRange(Sci_Position startpos, Sci_Position endp
     assert(endpos - startpos >= 0);
     if (endpos < startpos)
         return "";
-    auto strbuf = std::make_unique<char[]>(endpos - startpos + 5);
+    auto          strbuf = std::make_unique<char[]>(endpos - startpos + 5);
     Sci_TextRange rangestart;
     rangestart.chrg.cpMin = (Sci_PositionCR)startpos;
     rangestart.chrg.cpMax = (Sci_PositionCR)endpos;
-    rangestart.lpstrText = strbuf.get();
+    rangestart.lpstrText  = strbuf.get();
     ConstCall(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
     return strbuf.get();
 }
 
 std::string CScintillaWnd::GetSelectedText(bool useCurrentWordIfSelectionEmpty) const
 {
-    int selTextLen = (int)ConstCall(SCI_GETSELTEXT);
+    int  selTextLen    = (int)ConstCall(SCI_GETSELTEXT);
     auto seltextbuffer = std::make_unique<char[]>(selTextLen + 1);
     ConstCall(SCI_GETSELTEXT, 0, (LPARAM)seltextbuffer.get());
     std::string selText = seltextbuffer.get();
@@ -2505,14 +2482,14 @@ std::string CScintillaWnd::GetSelectedText(bool useCurrentWordIfSelectionEmpty) 
 std::string CScintillaWnd::GetCurrentWord() const
 {
     long currentPos = (long)ConstCall(SCI_GETCURRENTPOS);
-    long startPos = (long)ConstCall(SCI_WORDSTARTPOSITION, currentPos, true);
-    long endPos = (long)ConstCall(SCI_WORDENDPOSITION, currentPos, true);
+    long startPos   = (long)ConstCall(SCI_WORDSTARTPOSITION, currentPos, true);
+    long endPos     = (long)ConstCall(SCI_WORDENDPOSITION, currentPos, true);
     return GetTextRange(startPos, endPos);
 }
 
 std::string CScintillaWnd::GetCurrentLine() const
 {
-    int LineLen = (int)ConstCall(SCI_GETCURLINE);
+    int  LineLen    = (int)ConstCall(SCI_GETCURLINE);
     auto linebuffer = std::make_unique<char[]>(LineLen + 1);
     ConstCall(SCI_GETCURLINE, LineLen + 1, (LPARAM)linebuffer.get());
     return linebuffer.get();
@@ -2520,7 +2497,7 @@ std::string CScintillaWnd::GetCurrentLine() const
 
 std::string CScintillaWnd::GetWordChars() const
 {
-    int len = (int)ConstCall(SCI_GETWORDCHARS);
+    int  len        = (int)ConstCall(SCI_GETWORDCHARS);
     auto linebuffer = std::make_unique<char[]>(len + 1);
     ConstCall(SCI_GETWORDCHARS, 0, (LPARAM)linebuffer.get());
     linebuffer[len] = '\0';
@@ -2529,7 +2506,7 @@ std::string CScintillaWnd::GetWordChars() const
 
 std::string CScintillaWnd::GetWhitespaceChars() const
 {
-    int len = (int)ConstCall(SCI_GETWHITESPACECHARS);
+    int  len        = (int)ConstCall(SCI_GETWHITESPACECHARS);
     auto linebuffer = std::make_unique<char[]>(len + 1);
     ConstCall(SCI_GETWHITESPACECHARS, 0, (LPARAM)linebuffer.get());
     return linebuffer.get();
