@@ -53,7 +53,7 @@ struct CloseButtonZone
 enum class TabButtonType
 {
     None,
-    Selected,
+    Modified,
     Close,
     CloseHover,
     ClosePush
@@ -136,7 +136,7 @@ private:
     int                         m_whichCloseClickDown;
     bool                        m_lmbdHit; // Left Mouse Button Down Hit
     wchar_t                     m_closeChar;
-    wchar_t                     m_activeChar;
+    wchar_t                     m_modifiedChar;
 
     std::map<int, IUIAnimationVariablePtr>  m_animVars;
 

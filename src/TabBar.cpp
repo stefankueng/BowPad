@@ -59,14 +59,14 @@ CTabBar::CTabBar(HINSTANCE hInst)
     , m_lmbdHit(false)
     , m_tabID(0)
     , m_closeChar(L'\u274C')
-    , m_activeChar(L'\u25CF')
+    , m_modifiedChar(L'\u25CF')
 {
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
     m_draggingPoint       = {};
     m_currentHoverTabRect = {};
     if (IsWindows10OrGreater())
-        m_activeChar = L'\u2B24';
+        m_modifiedChar = L'\u2B24';
 };
 
 CTabBar::~CTabBar()
@@ -972,10 +972,8 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(pDrawItemStruct->rcItem);
 
     TabButtonType buttonType = TabButtonType::None;
-    if (bSelected)
-    {
-        buttonType = TabButtonType::Selected;
-    }
+    if (tci.iImage == UNSAVED_IMG_INDEX)
+        buttonType = TabButtonType::Modified;
     else if (m_currentHoverTabItem == (int)pDrawItemStruct->itemID)
         buttonType = TabButtonType::Close;
     if (m_bIsCloseHover && (m_currentHoverTabItem == (int)pDrawItemStruct->itemID))
@@ -983,10 +981,10 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
 
     switch (buttonType)
     {
-        case TabButtonType::Selected:
+        case TabButtonType::Modified:
         {
             auto oldFont = (HFONT)SelectObject(pDrawItemStruct->hDC, m_hSymbolFont);
-            ::DrawText(pDrawItemStruct->hDC, &m_activeChar, 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
+            ::DrawText(pDrawItemStruct->hDC, &m_modifiedChar, 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
             SelectObject(pDrawItemStruct->hDC, oldFont);
         }
         break;
@@ -1018,11 +1016,6 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
 
     // text
     rItem.right -= PADDING;
-
-    if (tci.iImage == UNSAVED_IMG_INDEX)
-    {
-        wcscat_s(buf, L" *");
-    }
 
     rItem.bottom  = pDrawItemStruct->rcItem.bottom;
     rItem.top     = pDrawItemStruct->rcItem.top;
