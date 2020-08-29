@@ -19,7 +19,6 @@
 #include "LexStyles.h"
 #include "UnicodeUtils.h"
 
-
 bool CCmdEditSelection::Execute()
 {
     MarkSelectedWord(false, true);

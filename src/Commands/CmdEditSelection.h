@@ -22,8 +22,8 @@
 class CCmdEditSelection : public ICommand
 {
 public:
-
-    CCmdEditSelection(void * obj) : ICommand(obj)
+    CCmdEditSelection(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -33,7 +33,6 @@ public:
 
     UINT GetCmdId() override { return cmdEditSelection; }
 
-    void ScintillaNotify(SCNotification* pScn) override;
+    void    ScintillaNotify(SCNotification* pScn) override;
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
 };
-
