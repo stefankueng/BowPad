@@ -972,6 +972,8 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(pDrawItemStruct->rcItem);
 
     TabButtonType buttonType = TabButtonType::None;
+    if (bSelected)
+        buttonType = TabButtonType::Close;
     if (tci.iImage == UNSAVED_IMG_INDEX)
         buttonType = TabButtonType::Modified;
     else if (m_currentHoverTabItem == (int)pDrawItemStruct->itemID)
