@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -90,7 +90,9 @@ HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
         ResString label(hRes, cmdOpenSelection_LabelTitle_RESID);
         if (!path.empty())
         {
-            std::wstring tip = CStringUtils::Format(L"%s \"%s\"", (LPCWSTR)label, path.c_str());
+            wchar_t compactPath[100] = {};
+            PathCompactPathEx(compactPath, path.c_str(), 30, 0);
+            std::wstring tip = CStringUtils::Format(L"%s \"%s\"", (LPCWSTR)label, compactPath);
             return UIInitPropertyFromString(UI_PKEY_Label, tip.c_str(), ppropvarNewValue);
         }
         else
