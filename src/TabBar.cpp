@@ -104,12 +104,12 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
     SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
     ncm.lfSmCaptionFont.lfWeight = FW_NORMAL;
     m_hFont                      = CreateFontIndirect(&ncm.lfSmCaptionFont);
-    ncm.lfSmCaptionFont.lfWeight = FW_BOLD;
+    ncm.lfSmCaptionFont.lfWeight = FW_EXTRABOLD;
     m_hBoldFont                  = CreateFontIndirect(&ncm.lfSmCaptionFont);
     wcscpy_s(ncm.lfSmCaptionFont.lfFaceName, L"Segoe UI Symbol");
     ncm.lfSmCaptionFont.lfWeight = FW_NORMAL;
     m_hSymbolFont                = CreateFontIndirect(&ncm.lfSmCaptionFont);
-    ncm.lfSmCaptionFont.lfWeight = FW_BOLD;
+    ncm.lfSmCaptionFont.lfWeight = FW_EXTRABOLD;
     m_hSymbolBoldFont            = CreateFontIndirect(&ncm.lfSmCaptionFont);
     ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
 
@@ -248,7 +248,7 @@ void CTabBar::SetFont(const TCHAR *fontName, int fontSize)
     m_hBoldFont = ::CreateFont((int)fontSize, 0,
                                0,
                                0,
-                               FW_BOLD,
+                               FW_EXTRABOLD,
                                0, 0, 0, 0,
                                0, 0, 0, 0,
                                fontName);
