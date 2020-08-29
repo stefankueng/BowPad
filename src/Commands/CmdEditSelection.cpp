@@ -35,7 +35,7 @@ void CCmdEditSelection::ScintillaNotify(SCNotification* pScn)
     }
 }
 
-HRESULT CCmdEditSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdEditSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
@@ -43,4 +43,3 @@ HRESULT CCmdEditSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
     }
     return E_NOTIMPL;
 }
-
