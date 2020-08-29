@@ -931,6 +931,8 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crBkgnd);
 
     auto borderWidth = (long)std::round(1.0f * m_dpiScale);
+    if (bSelected)
+        borderWidth *= 4;
     rItem.left += borderWidth;
     rItem.right -= borderWidth;
     rItem.top += borderWidth;
@@ -965,11 +967,14 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     const int PADDING = int(2.0f * m_dpiScale);
     // text & icon
     rItem.left += PADDING;
+    rItem.right -= PADDING;
+    rItem.bottom = pDrawItemStruct->rcItem.bottom;
+    rItem.top    = pDrawItemStruct->rcItem.top;
 
     SetBkMode(pDrawItemStruct->hDC, TRANSPARENT);
 
     // draw close/active button
-    RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(pDrawItemStruct->rcItem);
+    RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(rItem);
 
     TabButtonType buttonType = TabButtonType::None;
     if (bSelected)
@@ -1011,13 +1016,11 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     if (TABBAR_SHOWDISKICON && hilTabs)
     {
         ImageList_Draw(hilTabs, tci.iImage, pDrawItemStruct->hDC, rItem.left, rItem.top, ILD_TRANSPARENT);
-        rItem.left += int(16.0f * m_dpiScale) + PADDING;
+        rItem.left += int(16.0f * m_dpiScale);
     }
-    else
-        rItem.left += PADDING;
 
     // text
-    rItem.right -= PADDING;
+    rItem.right -= (2 * PADDING);
 
     rItem.bottom  = pDrawItemStruct->rcItem.bottom;
     rItem.top     = pDrawItemStruct->rcItem.top;
