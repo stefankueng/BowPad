@@ -19,6 +19,7 @@
 #include "TabBtn.h"
 #include "Theme.h"
 #include "GDIHelpers.h"
+#include "DPIAware.h"
 
 bool CTabBtn::SetText(const TCHAR *str)
 {
@@ -103,7 +104,7 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 ::ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &rect, nullptr, 0, nullptr);
                 // now draw a slightly smaller area in a different color, which
                 // makes the outer area drawn before look like a border
-                const auto onedpi = int(1.0f * m_dpiScale);
+                const auto onedpi = CDPIAware::Instance().Scale(*this, 1);
                 InflateRect(&rect, -onedpi, -onedpi);
                 auto halfpos = ((rect.bottom - rect.top) / 2) + rect.top;
                 GDIHelpers::FillSolidRect(hdc, rect.left, rect.top, rect.right, halfpos, (state & BST_HOT) != 0 ? clr1 : clr2);

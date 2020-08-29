@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2018 - Stefan Kueng
+// Copyright (C) 2016-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,10 +18,12 @@
 #include "CustomTooltip.h"
 #include "GDIHelpers.h"
 #include "Theme.h"
+#include "DPIAware.h"
 
-#define COLORBOX_SIZE int(20*m_dpiScale)
-#define BORDER int(5*m_dpiScale)
-#define RECTBORDER int(2*m_dpiScale)
+
+#define COLORBOX_SIZE CDPIAware::Instance().Scale(*this, 20)
+#define BORDER        CDPIAware::Instance().Scale(*this, 5)
+#define RECTBORDER    CDPIAware::Instance().Scale(*this, 2)
 
 void CCustomToolTip::Init(HWND hParent)
 {
@@ -68,9 +70,9 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
     wcscpy_s(textbuf.get(), m_infoText.size() + 4, m_infoText.c_str());
     RECT rc;
     rc.left   = 0;
-    rc.right  = int(800.0f * m_dpiScale);
+    rc.right  = CDPIAware::Instance().Scale(*this, 800);
     rc.top    = 0;
-    rc.bottom = int(800.0f * m_dpiScale);
+    rc.bottom = CDPIAware::Instance().Scale(*this, 800);
 
     NONCLIENTMETRICS ncm;
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
@@ -88,7 +90,7 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
     }
     SetTransparency(0);
     SetWindowPos(*this, nullptr,
-                 screenPt.x - rc.right / 2, screenPt.y - rc.bottom - int(20.0f * m_dpiScale),
+                 screenPt.x - rc.right / 2, screenPt.y - rc.bottom - CDPIAware::Instance().Scale(*this, 20),
                  rc.right + BORDER + BORDER, rc.bottom + BORDER + BORDER,
                  SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW);
 

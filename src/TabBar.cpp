@@ -22,6 +22,7 @@
 #include "BowPad.h"
 #include "BowPadUI.h"
 #include "GDIHelpers.h"
+#include "DPIAware.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4458) // declaration of 'xxx' hides class member
@@ -113,10 +114,10 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
     m_hSymbolBoldFont            = CreateFontIndirect(&ncm.lfSmCaptionFont);
     ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
 
-    TabCtrl_SetItemSize(*this, 300.0f * m_dpiScale, 25.0f * m_dpiScale);
-    TabCtrl_SetPadding(*this, 13.0f * m_dpiScale, 0);
+    TabCtrl_SetItemSize(*this, CDPIAware::Instance().Scale(*this, 300), CDPIAware::Instance().Scale(*this, 25));
+    TabCtrl_SetPadding(*this, CDPIAware::Instance().Scale(*this, 13), 0);
     m_closeButtonZone.m_height = m_closeButtonZone.m_width = -ncm.lfSmCaptionFont.lfHeight;
-    m_closeButtonZone.m_fromRight = int(m_closeButtonZone.m_fromRight * m_dpiScale);
+    m_closeButtonZone.m_fromRight                          = CDPIAware::Instance().Scale(*this, m_closeButtonZone.m_fromRight);
 
     return true;
 }
@@ -411,7 +412,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             int nTabHeight = rTotalTab.bottom - rTotalTab.top;
 
             // add a bit
-            InflateRect(&rTotalTab, int(2.0f * m_dpiScale), int(3.0f * m_dpiScale));
+            InflateRect(&rTotalTab, CDPIAware::Instance().Scale(*this, 2), CDPIAware::Instance().Scale(*this, 3));
             rEdge = rTotalTab;
 
             // then if background color is set, paint the visible background
@@ -425,20 +426,20 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             // full width of tab ctrl above top of tabs
             rBkgnd        = rClient;
-            rBkgnd.bottom = rTotalTab.top + int(3.0f * m_dpiScale);
+            rBkgnd.bottom = rTotalTab.top + CDPIAware::Instance().Scale(*this, 3);
             SetBkColor(hDC, crBack);
             ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, nullptr);
 
             // width of tab ctrl visible bkgnd including bottom pixel of tabs to left of tabs
             rBkgnd        = rClient;
             rBkgnd.right  = 2;
-            rBkgnd.bottom = rBkgnd.top + (nTabHeight + int(2.0f * m_dpiScale));
+            rBkgnd.bottom = rBkgnd.top + (nTabHeight + CDPIAware::Instance().Scale(*this, 2));
             ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, nullptr);
 
             // to right of tabs
             rBkgnd = rClient;
-            rBkgnd.left += (rTotalTab.right - (max(rTotalTab.left, 0))) - int(2.0f * m_dpiScale);
-            rBkgnd.bottom = rBkgnd.top + (nTabHeight + int(2.0f * m_dpiScale));
+            rBkgnd.left += (rTotalTab.right - (max(rTotalTab.left, 0))) - CDPIAware::Instance().Scale(*this, 2);
+            rBkgnd.bottom = rBkgnd.top + (nTabHeight + CDPIAware::Instance().Scale(*this, 2));
             ExtTextOut(hDC, rBkgnd.left, rBkgnd.top, ETO_CLIPPED | ETO_OPAQUE, &rBkgnd, L"", 0, nullptr);
 
             return TRUE;
@@ -464,7 +465,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             GetClientRect(*this, &dis.rcItem);
             rPage = dis.rcItem;
             TabCtrl_AdjustRect(*this, FALSE, &rPage);
-            dis.rcItem.top = rPage.top - int(2.0f * m_dpiScale);
+            dis.rcItem.top = rPage.top - CDPIAware::Instance().Scale(*this, 2);
 
             DrawMainBorder(&dis);
 
@@ -913,7 +914,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
 
     GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crBkgnd);
 
-    auto borderWidth = (long)std::round(1.0f * m_dpiScale);
+    auto borderWidth = CDPIAware::Instance().Scale(*this, 1);
     if (bSelected)
         borderWidth *= 2;
     rItem.left += borderWidth;
@@ -947,7 +948,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
         textColor = CTheme::Instance().GetThemeColor(GDIHelpers::Darker(::GetSysColor(COLOR_3DDKSHADOW), 0.5f));
     SetTextColor(pDrawItemStruct->hDC, textColor);
 
-    const int PADDING = int(2.0f * m_dpiScale);
+    const int PADDING = CDPIAware::Instance().Scale(*this, 2);
     // text & icon
     rItem.left += PADDING;
     rItem.right -= PADDING;
@@ -999,7 +1000,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     if (TABBAR_SHOWDISKICON && hilTabs)
     {
         ImageList_Draw(hilTabs, tci.iImage, pDrawItemStruct->hDC, rItem.left, rItem.top, ILD_TRANSPARENT);
-        rItem.left += int(16.0f * m_dpiScale);
+        rItem.left += CDPIAware::Instance().Scale(*this, 16);
     }
 
     // text
