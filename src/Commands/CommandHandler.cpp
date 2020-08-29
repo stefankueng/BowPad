@@ -25,6 +25,7 @@
 #include "CmdComment.h"
 #include "CmdConvertCase.h"
 #include "CmdDefaultEncoding.h"
+#include "CmdEditSelection.h"
 #include "CmdEOL.h"
 #include "CmdFiles.h"
 #include "CmdFindReplace.h"
@@ -186,6 +187,7 @@ void CCommandHandler::Init(void * obj)
     Add<CCmdLineUp>(obj);
     Add<CCmdLineDown>(obj);
     Add<CCmdSort>(obj);
+    Add<CCmdEditSelection>(obj);
     Add<CCmdInitFoldingMargin>(obj);
     Add<CCmdFoldingOn>(obj);
     Add<CCmdFoldingOff>(obj);

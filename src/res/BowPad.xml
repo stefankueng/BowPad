@@ -393,6 +393,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/SortL.bmp</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdEditSelection" LabelTitle="Edit Selection" TooltipTitle="Multi-Edit" TooltipDescription="Edit all occurrences of the current selection at once" Keytip="ES">
+      <Command.LargeImages>
+        <Image>res/editselectionL.bmp</Image>
+      </Command.LargeImages>
+    </Command>
     <Command Name="cmdGroupPrint" LabelTitle="Print"  Keytip="P">
       <Command.LargeImages>
         <Image>res/PrintL.bmp</Image>
@@ -1038,6 +1043,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Button CommandName="cmdLineSplit" />
               <Button CommandName="cmdLineJoin" />
               <Button CommandName="cmdSort" />
+              <Button CommandName="cmdEditSelection" />
             </DropDownButton>
             <DropDownButton CommandName="cmdGroupCase">
               <MenuGroup>

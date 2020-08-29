@@ -1229,7 +1229,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     if ((selTextLen > 2) || (lineCount < 100000))
     {
         auto selTextDifferent = lastSelText.compare(seltextbuffer.get());
-        if (selTextDifferent || (lastStopPosition != 0))
+        if (selTextDifferent || (lastStopPosition != 0) || edit)
         {
             auto start = std::chrono::steady_clock::now();
             if (selTextDifferent)
