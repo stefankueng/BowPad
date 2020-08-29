@@ -37,7 +37,7 @@
 extern IUIFramework *g_pFramework;
 
 const int    TABBAR_SHOWDISKICON = 0;
-const double hoverFraction       = 0.8;
+const double hoverFraction       = 0.4;
 
 CTabBar::CTabBar(HINSTANCE hInst)
     : CWindow(hInst)
@@ -876,25 +876,19 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
     return ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
 }
 
-COLORREF CTabBar::GetTabColor(bool bSelected, UINT item) const
+COLORREF CTabBar::GetTabColor(UINT item) const
 {
     TBHDR nmhdr;
-    nmhdr.hdr.hwndFrom     = *this;
-    nmhdr.hdr.code         = TCN_GETCOLOR;
-    nmhdr.hdr.idFrom       = reinterpret_cast<UINT_PTR>(this);
-    nmhdr.tabOrigin        = item;
-    COLORREF clr           = (COLORREF)::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
-    float    lighterfactor = 1.1f;
+    nmhdr.hdr.hwndFrom = *this;
+    nmhdr.hdr.code     = TCN_GETCOLOR;
+    nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
+    nmhdr.tabOrigin    = item;
+    COLORREF clr       = (COLORREF)::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
     if (clr == 0 || CTheme::Instance().IsHighContrastMode())
     {
-        clr           = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
-        lighterfactor = 1.4f;
+        clr = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
     }
-    if (bSelected)
-    {
-        return GDIHelpers::Lighter(clr, lighterfactor);
-    }
-    return GDIHelpers::Darker(clr, 0.9f);
+    return clr;
 }
 
 void CTabBar::DrawMainBorder(const LPDRAWITEMSTRUCT lpdis) const
@@ -911,28 +905,17 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
 
     RECT rItem(pDrawItemStruct->rcItem);
 
-    COLORREF crFill  = GetTabColor(bSelected, pDrawItemStruct->itemID);
-    COLORREF crBkgnd = crFill;
-    if (CTheme::Instance().IsDarkTheme())
-    {
-        crBkgnd = GDIHelpers::Lighter(crBkgnd, 1.6f);
-        crFill  = GDIHelpers::Darker(crFill, 0.5f);
-        if (fraction != 1.0f)
-            crFill = GDIHelpers::Lighter(crFill, 1.0f / fraction);
-    }
-    else
-    {
-        crBkgnd = GDIHelpers::Darker(crBkgnd, 0.8f);
-        if (!bSelected)
-            crFill = GDIHelpers::Lighter(crFill, 1.4f);
-        if (fraction != 1.0f)
-            crFill = GDIHelpers::Darker(crFill, fraction);
-    }
+    auto crBkgnd = GetTabColor(pDrawItemStruct->itemID);
+
+    auto crFill = GDIHelpers::InterpolateColors(crBkgnd,
+                                                CTheme::Instance().GetThemeColor(RGB(250, 250, 250), true),
+                                                max(0.0, fraction - (bSelected ? 0.4 : 0.1)));
+
     GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crBkgnd);
 
     auto borderWidth = (long)std::round(1.0f * m_dpiScale);
     if (bSelected)
-        borderWidth *= 4;
+        borderWidth *= 2;
     rItem.left += borderWidth;
     rItem.right -= borderWidth;
     rItem.top += borderWidth;

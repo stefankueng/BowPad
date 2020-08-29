@@ -101,7 +101,7 @@ protected:
     static LRESULT CALLBACK     TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
     void                        ExchangeItemData(POINT point);
     LRESULT                     RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
-    COLORREF                    GetTabColor(bool bSelected, UINT item) const;
+    COLORREF                    GetTabColor(UINT item) const;
     void                        DrawMainBorder(const LPDRAWITEMSTRUCT lpDrawItemStruct) const;
     void                        DrawItem(const LPDRAWITEMSTRUCT lpDrawItemStruct, float fraction) const;
     void                        DraggingCursor(POINT screenPoint, UINT item);
