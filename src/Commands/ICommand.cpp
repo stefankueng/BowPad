@@ -379,6 +379,11 @@ std::string ICommand::GetWordChars() const
     return m_pMainWindow->m_editor.GetWordChars();
 }
 
+void ICommand::MarkSelectedWord(bool clear, bool edit) const
+{
+    return m_pMainWindow->m_editor.MarkSelectedWord(clear, edit);
+}
+
 void ICommand::OpenHDROP(HDROP hDrop)
 {
     return m_pMainWindow->HandleDropFiles(hDrop);

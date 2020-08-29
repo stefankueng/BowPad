@@ -113,6 +113,7 @@ protected:
     std::string         GetCurrentWord() const;
     std::string         GetCurrentLine() const;
     std::string         GetWordChars() const;
+    void                MarkSelectedWord(bool clear, bool edit) const;
     void                ShowFileTree(bool bShow);
     bool                IsFileTreeShown() const;
     std::wstring        GetFileTreePath() const;
