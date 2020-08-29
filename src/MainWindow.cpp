@@ -430,16 +430,15 @@ STDMETHODIMP CMainWindow::UpdateProperty(
         std::wstring shortkey = CKeyboardShortcutHandler::Instance().GetTooltipTitleForCommand((WORD)nCmdID);
         if (!shortkey.empty())
             g_pFramework->InvalidateUICommand(nCmdID, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
-    }
-
-    if (key == UI_PKEY_TooltipTitle)
-    {
-        std::wstring shortkey = CKeyboardShortcutHandler::Instance().GetTooltipTitleForCommand((WORD)nCmdID);
-        if (!shortkey.empty())
+        if (key == UI_PKEY_TooltipTitle)
         {
-            hr = UIInitPropertyFromString(UI_PKEY_TooltipTitle, shortkey.c_str(), ppropvarNewValue);
+            if (!shortkey.empty())
+            {
+                hr = UIInitPropertyFromString(UI_PKEY_TooltipTitle, shortkey.c_str(), ppropvarNewValue);
+            }
         }
     }
+
     return hr;
 }
 
