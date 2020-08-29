@@ -93,7 +93,7 @@ public :
     void RestoreCurrentPos(const CPosData& pos);
     void SetupLexerForLang(const std::string& lang);
     void MarginClick(SCNotification * pNotification);
-    void MarkSelectedWord(bool clear);
+    void MarkSelectedWord(bool clear, bool edit);
     void MatchBraces(BraceMatch what);
     void GotoBrace();
     void MatchTags();

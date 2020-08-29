@@ -2805,7 +2805,7 @@ void CMainWindow::HandleUpdateUI(const SCNotification& scn)
     const unsigned int uiflags = SC_UPDATE_SELECTION |
         SC_UPDATE_H_SCROLL | SC_UPDATE_V_SCROLL;
     if ((scn.updated & uiflags) != 0)
-        m_editor.MarkSelectedWord(false);
+        m_editor.MarkSelectedWord(false, false);
 
     m_editor.MatchBraces(BraceMatch::Braces);
     m_editor.MatchTags();
@@ -2933,7 +2933,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.SetReadDirection(doc.m_ReadDir);
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, true);
     g_pFramework->InvalidateUICommand(cmdUseTabs, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    m_editor.MarkSelectedWord(true);
+    m_editor.MarkSelectedWord(true, false);
     m_editor.MarkBookmarksInScrollbar();
     UpdateCaptionBar();
     SetFocus(m_editor);

@@ -1139,17 +1139,17 @@ void CScintillaWnd::MarginClick( SCNotification * pNotification )
 }
 
 
-void CScintillaWnd::MarkSelectedWord( bool clear )
+void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
 {
-    static std::string lastSelText;
+    static std::string    lastSelText;
     static Sci_PositionCR lastStopPosition = 0;
-    LRESULT firstline = Call(SCI_GETFIRSTVISIBLELINE);
-    LRESULT lastline = firstline + Call(SCI_LINESONSCREEN);
-    long startstylepos = (long)Call(SCI_POSITIONFROMLINE, firstline);
-    startstylepos = max(startstylepos, 0);
-    long endstylepos = (long)Call(SCI_POSITIONFROMLINE, lastline) + (long)Call(SCI_LINELENGTH, lastline);
+    LRESULT               firstline        = Call(SCI_GETFIRSTVISIBLELINE);
+    LRESULT               lastline         = firstline + Call(SCI_LINESONSCREEN);
+    long                  startstylepos    = (long)Call(SCI_POSITIONFROMLINE, firstline);
+    startstylepos                          = max(startstylepos, 0);
+    long endstylepos                       = (long)Call(SCI_POSITIONFROMLINE, lastline) + (long)Call(SCI_LINELENGTH, lastline);
     if (endstylepos < 0)
-        endstylepos = (long)Call(SCI_GETLENGTH)-startstylepos;
+        endstylepos = (long)Call(SCI_GETLENGTH) - startstylepos;
 
     int len = endstylepos - startstylepos;
     if (len <= 0)
@@ -1160,7 +1160,7 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     Call(SCI_INDICATORCLEARRANGE, startstylepos, len);
 
     int selTextLen = (int)Call(SCI_GETSELTEXT);
-    if ((selTextLen <= 1)||(clear)) // Includes zero terminator so 1 means 0.
+    if ((selTextLen <= 1) || (clear)) // Includes zero terminator so 1 means 0.
     {
         lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
@@ -1168,9 +1168,10 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
     }
-
-    size_t selStartLine = Call(SCI_LINEFROMPOSITION, Call(SCI_GETSELECTIONSTART), 0);
-    size_t selEndLine   = Call(SCI_LINEFROMPOSITION, Call(SCI_GETSELECTIONEND), 0);
+    auto   origSelStart = Call(SCI_GETSELECTIONSTART);
+    auto   origSelEnd   = Call(SCI_GETSELECTIONEND);
+    size_t selStartLine = Call(SCI_LINEFROMPOSITION, origSelStart, 0);
+    size_t selEndLine   = Call(SCI_LINEFROMPOSITION, origSelEnd, 0);
     if (selStartLine != selEndLine)
     {
         lastSelText.clear();
@@ -1180,8 +1181,8 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         return;
     }
 
-    size_t selStartPos = Call(SCI_GETSELECTIONSTART);
-    auto seltextbuffer = std::make_unique<char[]>(selTextLen + 1);
+    size_t selStartPos   = Call(SCI_GETSELECTIONSTART);
+    auto   seltextbuffer = std::make_unique<char[]>(selTextLen + 1);
     Call(SCI_GETSELTEXT, 0, (LPARAM)seltextbuffer.get());
     if (seltextbuffer[0] == 0)
     {
@@ -1208,9 +1209,9 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
         return;
     }
 
-    auto textbuffer = std::make_unique<char[]>(len + 1);
+    auto          textbuffer = std::make_unique<char[]>(len + 1);
     Sci_TextRange textrange;
-    textrange.lpstrText = textbuffer.get();
+    textrange.lpstrText  = textbuffer.get();
     textrange.chrg.cpMin = startstylepos;
     textrange.chrg.cpMax = endstylepos;
     Call(SCI_GETTEXTRANGE, 0, (LPARAM)&textrange);
@@ -1220,8 +1221,8 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
     {
         // don't style the selected text itself
         if (selStartPos != size_t(startstylepos + (startPos - textbuffer.get())))
-            Call(SCI_INDICATORFILLRANGE, startstylepos + (startPos - textbuffer.get()), selTextLen-1);
-        startPos = strstr(startPos+1, seltextbuffer.get());
+            Call(SCI_INDICATORFILLRANGE, startstylepos + (startPos - textbuffer.get()), selTextLen - 1);
+        startPos = strstr(startPos + 1, seltextbuffer.get());
     }
 
     int lineCount = (int)Call(SCI_GETLINECOUNT);
@@ -1237,28 +1238,35 @@ void CScintillaWnd::MarkSelectedWord( bool clear )
                 m_selTextMarkerCount = 0;
             }
             Sci_TextToFind FindText;
-            FindText.chrg.cpMin = lastStopPosition;
-            FindText.chrg.cpMax = (long)Call(SCI_GETLENGTH);
-            FindText.lpstrText = seltextbuffer.get();
-            lastStopPosition = 0;
+            FindText.chrg.cpMin     = lastStopPosition;
+            FindText.chrg.cpMax     = (long)Call(SCI_GETLENGTH);
+            FindText.lpstrText      = seltextbuffer.get();
+            lastStopPosition        = 0;
             const auto selTextColor = CTheme::Instance().GetThemeColor(RGB(0, 255, 0), true);
             while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&FindText) >= 0)
             {
+                if (edit)
+                    Call(SCI_ADDSELECTION, FindText.chrgText.cpMax, FindText.chrgText.cpMin);
                 size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
                 m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, selTextColor);
                 ++m_selTextMarkerCount;
                 if (FindText.chrg.cpMin >= FindText.chrgText.cpMax)
                     break;
                 FindText.chrg.cpMin = FindText.chrgText.cpMax;
-                
-                // stop after 1.5 seconds - users don't want to wait for too long
-                auto end = std::chrono::steady_clock::now();
-                if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() > 1500)
+
+                if (!edit)
                 {
-                    lastStopPosition = FindText.chrg.cpMin;
-                    break;
+                    // stop after 1.5 seconds - users don't want to wait for too long
+                    auto end = std::chrono::steady_clock::now();
+                    if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() > 1500)
+                    {
+                        lastStopPosition = FindText.chrg.cpMin;
+                        break;
+                    }
                 }
             }
+            if (edit)
+                Call(SCI_ADDSELECTION, origSelEnd, origSelStart);
             SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         }
         lastSelText = seltextbuffer.get();
