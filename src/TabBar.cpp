@@ -116,7 +116,7 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
     TabCtrl_SetItemSize(*this, 300.0f * m_dpiScale, 25.0f * m_dpiScale);
     TabCtrl_SetPadding(*this, 13.0f * m_dpiScale, 0);
     m_closeButtonZone.m_height = m_closeButtonZone.m_width = -ncm.lfSmCaptionFont.lfHeight;
-    //m_closeButtonZone.SetDPIScale(m_dpiScale);
+    m_closeButtonZone.m_fromRight = int(m_closeButtonZone.m_fromRight * m_dpiScale);
 
     return true;
 }
@@ -957,7 +957,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     SetBkMode(pDrawItemStruct->hDC, TRANSPARENT);
 
     // draw close/active button
-    RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(rItem);
+    RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(pDrawItemStruct->rcItem);
 
     TabButtonType buttonType = TabButtonType::None;
     if (bSelected)
