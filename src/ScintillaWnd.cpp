@@ -1241,7 +1241,10 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
             while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, (LPARAM)&FindText) >= 0)
             {
                 if (edit)
-                    Call(SCI_ADDSELECTION, FindText.chrgText.cpMax, FindText.chrgText.cpMin);
+                {
+                    if ((origSelStart != FindText.chrgText.cpMin) || (origSelEnd != FindText.chrgText.cpMax))
+                        Call(SCI_ADDSELECTION, FindText.chrgText.cpMax, FindText.chrgText.cpMin);
+                }
                 size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
                 m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, selTextColor);
                 ++m_selTextMarkerCount;
