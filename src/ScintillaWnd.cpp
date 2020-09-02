@@ -2221,20 +2221,16 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam)
                             ++position;
                             nextChar = (int)Call(SCI_GETCHARAT, position);
                         }
-                        if (tagName.starts_with("![CDATA"))
+                        if (tagName.starts_with("![CDATA") && (wParam == '['))
                         {
-                            // insert the [ now
-                            Call(SCI_ADDTEXT, 1, (sptr_t) "[");
                             size_t cursorPos = Call(SCI_GETCURRENTPOS);
                             Call(SCI_BEGINUNDOACTION);
                             Call(SCI_ADDTEXT, 3, (sptr_t) "]]>");
                             Call(SCI_GOTOPOS, cursorPos);
                             Call(SCI_ENDUNDOACTION);
                         }
-                        if (tagName == "!-")
+                        if ((tagName == "!-") && (wParam == '-'))
                         {
-                            // insert the - now
-                            Call(SCI_ADDTEXT, 1, (sptr_t) "-");
                             size_t cursorPos = Call(SCI_GETCURRENTPOS);
                             Call(SCI_BEGINUNDOACTION);
                             Call(SCI_ADDTEXT, 3, (sptr_t) "-->");
