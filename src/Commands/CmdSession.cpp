@@ -50,6 +50,7 @@ static bool GetAutoLoad()
 static std::wstring GetBackupPath()
 {
     auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
+    handleModified = handleModified && GetAutoLoad();
     auto sessionPath    = CPathUtils::GetAppDataPath() + L"\\BowPad\\backup";
     // check for portable version
     HKEY subKey = nullptr;
@@ -292,6 +293,7 @@ CCmdSessionAutoSave::CCmdSessionAutoSave(void* obj)
 bool CCmdSessionAutoSave::Execute()
 {
     auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
+    handleModified = handleModified && GetAutoLoad();
     CIniSettings::Instance().SetInt64(g_sessionSection, L"handlemodified", handleModified ? 1 : 0);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
@@ -303,6 +305,7 @@ HRESULT CCmdSessionAutoSave::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
     if (UI_PKEY_BooleanValue == key)
     {
         auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
+        handleModified = handleModified && GetAutoLoad();
         return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, handleModified, ppropvarNewValue);
     }
     else if (UI_PKEY_Enabled == key)
