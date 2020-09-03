@@ -2221,7 +2221,7 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam)
                             ++position;
                             nextChar = (int)Call(SCI_GETCHARAT, position);
                         }
-                        if (tagName.starts_with("![CDATA") && (wParam == '['))
+                        if ((wParam == '[') && tagName.starts_with("![CDATA") && !tagName.starts_with("![CDATA["))
                         {
                             size_t cursorPos = Call(SCI_GETCURRENTPOS);
                             Call(SCI_BEGINUNDOACTION);
