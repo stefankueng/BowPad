@@ -4199,5 +4199,9 @@ void CMainWindow::SetTheme(bool dark)
     }
 
     CCommandHandler::Instance().OnThemeChanged(dark);
-    RedrawWindow(*this, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
+    RedrawWindow(*this, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW | RDW_ERASENOW);
+    RECT rc{ 0 };
+    GetWindowRect(*this, &rc);
+    SetWindowPos(*this, nullptr, 0, 0, rc.right - rc.left, rc.bottom - rc.top - 1, SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+    SetWindowPos(*this, nullptr, 0, 0, rc.right - rc.left, rc.bottom - rc.top, SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
 }
