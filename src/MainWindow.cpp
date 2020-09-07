@@ -2043,6 +2043,8 @@ void CMainWindow::UpdateCaptionBar()
         if (!elev.empty())
             sTitle += L" : ";
         sTitle += doc.m_path.empty() ? m_TabBar.GetCurrentTitle() : doc.m_path;
+        if (doc.m_bNeedsSaving || doc.m_bIsDirty)
+            sTitle += L" * ";
         sTitle += L" - ";
         sTitle += appName;
         SetWindowText(*this, sTitle.c_str());
@@ -2066,6 +2068,7 @@ void CMainWindow::UpdateTab(DocID docID)
     else
         tie.iImage = doc.m_bIsDirty || doc.m_bNeedsSaving ? UNSAVED_IMG_INDEX : SAVED_IMG_INDEX;
     TabCtrl_SetItem(m_TabBar, m_TabBar.GetIndexFromID(docID), &tie);
+    UpdateCaptionBar();
 }
 
 ResponseToCloseTab CMainWindow::AskToCloseTab() const
