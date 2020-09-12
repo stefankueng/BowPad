@@ -23,7 +23,6 @@
 #include <string>
 #include <Commdlg.h>
 
-
 CAboutDlg::CAboutDlg(HWND hParent)
     : m_hParent(hParent)
     , m_hHiddenWnd(nullptr)
@@ -39,25 +38,25 @@ LRESULT CAboutDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam
     UNREFERENCED_PARAMETER(lParam);
     switch (uMsg)
     {
-    case WM_INITDIALOG:
+        case WM_INITDIALOG:
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
             CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
             // initialize the controls
-            m_link.ConvertStaticToHyperlink(hwndDlg, IDC_WEBLINK, _T("http://tools.stefankueng.com"));
-            TCHAR verbuf[1024] = {0};
+            m_link.ConvertStaticToHyperlink(hwndDlg, IDC_WEBLINK, L"http://tools.stefankueng.com");
+            wchar_t verbuf[1024] = {0};
 #ifdef _WIN64
-            _stprintf_s(verbuf, _countof(verbuf), _T("BowPad version %d.%d.%d.%d (64-bit)"), BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
+            swprintf_s(verbuf, _countof(verbuf), L"BowPad version %d.%d.%d.%d (64-bit)", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
 #else
-            _stprintf_s(verbuf, _countof(verbuf), _T("BowPad version %d.%d.%d.%d"), BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
+            swprintf_s(verbuf, _countof(verbuf), "BowPad version %d.%d.%d.%d", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
 #endif
             SetDlgItemText(hwndDlg, IDC_VERSIONLABEL, verbuf);
         }
-        return TRUE;
-    case WM_COMMAND:
-        return DoCommand(LOWORD(wParam));
-    default:
-        return FALSE;
+            return TRUE;
+        case WM_COMMAND:
+            return DoCommand(LOWORD(wParam));
+        default:
+            return FALSE;
     }
 }
 
@@ -65,12 +64,12 @@ LRESULT CAboutDlg::DoCommand(int id)
 {
     switch (id)
     {
-    case IDOK:
-        // fall through
-    case IDCANCEL:
-        EndDialog(*this, id);
-        break;
-    case IDC_UPDATECHECK:
+        case IDOK:
+            // fall through
+        case IDCANCEL:
+            EndDialog(*this, id);
+            break;
+        case IDC_UPDATECHECK:
         {
             bool bNewer = CAppUtils::CheckForUpdate(true);
             if (bNewer)

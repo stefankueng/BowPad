@@ -48,7 +48,6 @@
 #include <windows.h>
 #include <Windowsx.h>
 #include <commctrl.h>
-#include <tchar.h>
 #include "coolscroll.h"
 #include "userdefs.h"
 #include "coolsb_internal.h"
@@ -364,7 +363,7 @@ static void DrawCheckedRect(HDC hdc, RECT *rect, COLORREF fg, COLORREF bg)
 static void PaintRect(HDC hdc, RECT *rect, COLORREF color)
 {
     COLORREF oldcol = SetBkColor(hdc, color);
-    ExtTextOut(hdc, 0, 0, ETO_OPAQUE, rect, _T(""), 0, 0);
+    ExtTextOut(hdc, 0, 0, ETO_OPAQUE, rect, L"", 0, 0);
     SetBkColor(hdc, oldcol);
 }
 

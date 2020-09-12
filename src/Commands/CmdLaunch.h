@@ -54,7 +54,7 @@ public:
         // file:/// urls anymore due to security reasons.
         std::wstring path = L"Microsoft.MicrosoftEdge_8wekyb3d8bbwe!MicrosoftEdge";
         // first try to get the ID of the Edge browser
-        TCHAR pf[MAX_PATH];
+        wchar_t pf[MAX_PATH];
         SHGetFolderPath(nullptr, CSIDL_WINDOWS, nullptr, SHGFP_TYPE_CURRENT, pf);
         std::wstring edgepath = pf;
         edgepath += L"\\SystemApps\\Microsoft.MicrosoftEdge*";

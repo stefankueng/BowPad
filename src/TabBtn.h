@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2017 - Stefan Kueng
+// Copyright (C) 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@ public :
     }
 
     bool Init(HINSTANCE hInst, HWND hParent, HMENU id);
-    void SetFont(const TCHAR *fontName, int fontSize);
-    bool SetText(const TCHAR *str);
+    void SetFont(const wchar_t *fontName, int fontSize);
+    bool SetText(const wchar_t *str);
 
     void SetColor(COLORREF clr) { m_color = clr; m_colorset = true; }
     void SetTextColor(COLORREF clr) { m_textcolor = clr; m_textcolorset = true; }

@@ -428,7 +428,7 @@ void CLexStyles::Load()
         }
     }
     m_fileTypes.sort([](const auto& first, const auto& second) {
-        return _tcsicmp(first.first.c_str(), second.first.c_str()) < 0;
+        return _wcsicmp(first.first.c_str(), second.first.c_str()) < 0;
     });
     m_fileTypes.push_front(std::make_pair(TEXT("All file"), TEXT("*.*")));
     for (auto& e : m_fileTypes)
@@ -657,7 +657,7 @@ bool CLexStyles::GetDefaultExtensionForLanguage(const std::string& lang, std::ws
         if (m_filterSpec[i].pszName == langW)
         {
             index    = (UINT)i;
-            auto pos = _tcschr(m_filterSpec[i].pszSpec, TEXT(';'));
+            auto pos = wcschr(m_filterSpec[i].pszSpec, TEXT(';'));
             if (pos)
                 ext.assign(m_filterSpec[i].pszSpec + 2, pos);
             else
@@ -825,7 +825,7 @@ void CLexStyles::SaveUserData()
     }
 
     FILE* pFile = nullptr;
-    _tfopen_s(&pFile, userStyleFile.c_str(), _T("wb"));
+    _wfopen_s(&pFile, userStyleFile.c_str(), L"wb");
     ini.SaveFile(pFile);
     fclose(pFile);
 

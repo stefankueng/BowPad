@@ -31,12 +31,11 @@
 #include <windows.h>
 #include <Windowsx.h>
 #include <commctrl.h>
-#include <tchar.h>
 #include "coolscroll.h"
 #include "userdefs.h"
 #include "coolsb_internal.h"
 
-static const TCHAR szPropStr[] = _T("CoolSBSubclassPtr");
+static const wchar_t szPropStr[] = L"CoolSBSubclassPtr";
 
 LRESULT CALLBACK CoolSBWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 

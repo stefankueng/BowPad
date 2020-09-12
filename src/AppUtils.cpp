@@ -214,7 +214,7 @@ HRESULT CALLBACK CAppUtils::TDLinkClickCallback(HWND hwnd, UINT uNotification, W
     switch (uNotification)
     {
     case TDN_HYPERLINK_CLICKED:
-        ShellExecute(hwnd, _T("open"), (LPCWSTR) lParam, nullptr, nullptr, SW_SHOW);
+        ShellExecute(hwnd, L"open", (LPCWSTR) lParam, nullptr, nullptr, SW_SHOW);
         break;
     }
 
@@ -314,7 +314,7 @@ bool CAppUtils::HasSameMajorVersion( const std::wstring& path )
     std::wstring sVer = CPathUtils::GetVersionFromFile(path);
     // cut off the build version
     sVer = sVer.substr(0, sVer.find_last_of('.'));
-    std::wstring sAppVer = _T(STRPRODUCTVER);
+    std::wstring sAppVer = TEXT(STRPRODUCTVER);
     sAppVer = sAppVer.substr(0, sAppVer.find_last_of('.'));
     return (_wcsicmp(sVer.c_str(), sAppVer.c_str()) == 0);
 }

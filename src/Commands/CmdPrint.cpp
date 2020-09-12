@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2017 - Stefan Kueng
+// Copyright (C) 2013, 2015-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ void CCmdPrint::Print( bool bShowDlg )
         - GetDeviceCaps(hdc, VERTRES)                       // printable height
         - rectPhysMargins.top;                              // right unprintable margin
 
-    TCHAR localeInfo[3];
+    wchar_t localeInfo[3];
     GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, 3);
     // Metric system. '1' is US System
     int defaultMargin = localeInfo[0] == '0' ? 2540 : 1000;

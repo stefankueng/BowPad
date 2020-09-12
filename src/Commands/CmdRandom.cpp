@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017 - Stefan Kueng
+// Copyright (C) 2014-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -168,7 +168,7 @@ void CRandomFileList::Save()
             wchar_t * pBuffer = buffer.get();
             for (auto it = m_arShownFileList.begin(); it != m_arShownFileList.end(); ++it)
             {
-                _tcscpy_s(pBuffer, MAX_PATH, it->c_str());
+                wcscpy_s(pBuffer, MAX_PATH, it->c_str());
                 pBuffer += it->size() + 1;
             }
             DWORD byteswritten;
@@ -181,9 +181,9 @@ void CRandomFileList::Save()
             {
                 wchar_t filebuffer[MAX_PATH];
                 ZeroMemory(filebuffer, sizeof(filebuffer));
-                _tcscpy_s(filebuffer, it->c_str());
+                wcscpy_s(filebuffer, it->c_str());
                 DWORD byteswritten;
-                WriteFile(hFile, filebuffer, DWORD(_tcslen(filebuffer) + 1) * sizeof(wchar_t), &byteswritten, nullptr);
+                WriteFile(hFile, filebuffer, DWORD(wcslen(filebuffer) + 1) * sizeof(wchar_t), &byteswritten, nullptr);
             }
             CloseHandle(hFile);
         }

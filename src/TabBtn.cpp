@@ -21,7 +21,7 @@
 #include "GDIHelpers.h"
 #include "DPIAware.h"
 
-bool CTabBtn::SetText(const TCHAR *str)
+bool CTabBtn::SetText(const wchar_t*str)
 {
     return SetWindowText(*this, str) != 0;
 }
@@ -47,7 +47,7 @@ bool CTabBtn::Init(HINSTANCE /*hInst*/, HWND hParent, HMENU id)
     return true;
 }
 
-void CTabBtn::SetFont(const TCHAR *fontName, int fontSize)
+void CTabBtn::SetFont(const wchar_t*fontName, int fontSize)
 {
     if (m_hFont)
         ::DeleteObject(m_hFont);

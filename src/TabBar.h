@@ -74,14 +74,14 @@ public :
 
     bool                        Init(HINSTANCE hInst, HWND hParent);
     LRESULT CALLBACK            WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-    int                         InsertAtEnd(const TCHAR *subTabName);
-    int                         InsertAfter(int index, const TCHAR *subTabName);
-    inline void                        SelectChanging() const;
-    inline void                        SelectChange(int index) const;
+    int                         InsertAtEnd(const wchar_t *subTabName);
+    int                         InsertAfter(int index, const wchar_t *subTabName);
+    void                        SelectChanging() const;
+    void                        SelectChange(int index) const;
     void                        ActivateAt(int index) const;
-    void                        GetTitle(int index, TCHAR *title, int titleLen) const;
+    void                        GetTitle(int index, wchar_t *title, int titleLen) const;
     std::wstring                GetTitle(int index) const;
-    void                        GetCurrentTitle(TCHAR *title, int titleLen) const;
+    void                        GetCurrentTitle(wchar_t *title, int titleLen) const;
     std::wstring                GetCurrentTitle() const;
     void                        SetCurrentTitle(LPCTSTR title);
     void                        SetTitle(int index, LPCTSTR title);
@@ -94,7 +94,7 @@ public :
     void                        DeletAllItems();
     HIMAGELIST                  SetImageList(HIMAGELIST himl);
     int                         GetItemCount() const { return m_nItems; }
-    void                        SetFont(const TCHAR *fontName, int fontSize);
+    void                        SetFont(const wchar_t *fontName, int fontSize);
     int                         GetSrcTab() const { return m_nSrcTab; }
     int                         GetDstTab() const { return m_nTabDragged; }
 protected:

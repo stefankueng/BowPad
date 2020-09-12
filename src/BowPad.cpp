@@ -511,10 +511,10 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     return (int)msg.wParam;
 }
 
-int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
-                       _In_opt_ HINSTANCE hPrevInstance,
-                       _In_ LPTSTR lpCmdLine,
-                       _In_ int    nCmdShow)
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+                      _In_opt_ HINSTANCE hPrevInstance,
+                      _In_ LPTSTR lpCmdLine,
+                      _In_ int    nCmdShow)
 {
     hInst = hInstance;
     hRes  = hInstance;

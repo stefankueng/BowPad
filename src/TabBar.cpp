@@ -129,7 +129,7 @@ LRESULT CALLBACK CTabBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-int CTabBar::InsertAtEnd(const TCHAR *subTabName)
+int CTabBar::InsertAtEnd(const wchar_t *subTabName)
 {
     TCITEM tie;
     tie.mask       = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
@@ -138,7 +138,7 @@ int CTabBar::InsertAtEnd(const TCHAR *subTabName)
     if (m_bHasImgList)
         imageIndex = 0;
     tie.iImage          = TABBAR_SHOWDISKICON ? imageIndex : 0;
-    tie.pszText         = const_cast<TCHAR *>(subTabName);
+    tie.pszText         = const_cast<wchar_t *>(subTabName);
     m_animVars[m_tabID] = Animator::Instance().CreateAnimationVariable(1.0);
     tie.lParam          = m_tabID++;
     int index           = TabCtrl_InsertItem(*this, m_nItems++, &tie);
@@ -151,7 +151,7 @@ int CTabBar::InsertAtEnd(const TCHAR *subTabName)
     return index;
 }
 
-int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
+int CTabBar::InsertAfter(int index, const wchar_t *subTabName)
 {
     TCITEM tie;
     tie.mask     = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
@@ -160,7 +160,7 @@ int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
     if (m_bHasImgList)
         imgindex = 0;
     tie.iImage          = TABBAR_SHOWDISKICON ? imgindex : 0;
-    tie.pszText         = const_cast<TCHAR *>(subTabName);
+    tie.pszText         = const_cast<wchar_t *>(subTabName);
     m_animVars[m_tabID] = Animator::Instance().CreateAnimationVariable(1.0);
     tie.lParam          = m_tabID++;
     if ((index + 1) >= m_nItems)
@@ -176,7 +176,7 @@ int CTabBar::InsertAfter(int index, const TCHAR *subTabName)
     return ret;
 }
 
-void CTabBar::GetTitle(int index, TCHAR *title, int titleLen) const
+void CTabBar::GetTitle(int index, wchar_t *title, int titleLen) const
 {
     TCITEM tci;
     tci.mask       = TCIF_TEXT;
@@ -202,7 +202,7 @@ std::wstring CTabBar::GetTitle(int index) const
     return (ret && tci.pszText != nullptr) ? buf : L"";
 }
 
-void CTabBar::GetCurrentTitle(TCHAR *title, int titleLen) const
+void CTabBar::GetCurrentTitle(wchar_t *title, int titleLen) const
 {
     GetTitle(GetCurrentTabIndex(), title, titleLen);
 }
@@ -216,7 +216,7 @@ void CTabBar::SetCurrentTitle(LPCTSTR title)
 {
     TCITEM tci;
     tci.mask    = TCIF_TEXT;
-    tci.pszText = const_cast<TCHAR *>(title);
+    tci.pszText = const_cast<wchar_t *>(title);
     TabCtrl_SetItem(*this, GetCurrentTabIndex(), &tci);
     InvalidateRect(*this, nullptr, FALSE);
 }
@@ -225,12 +225,12 @@ void CTabBar::SetTitle(int index, LPCTSTR title)
 {
     TCITEM tci;
     tci.mask    = TCIF_TEXT;
-    tci.pszText = const_cast<TCHAR *>(title);
+    tci.pszText = const_cast<wchar_t *>(title);
     TabCtrl_SetItem(*this, index, &tci);
     InvalidateRect(*this, nullptr, FALSE);
 }
 
-void CTabBar::SetFont(const TCHAR *fontName, int fontSize)
+void CTabBar::SetFont(const wchar_t *fontName, int fontSize)
 {
     if (m_hFont)
         ::DeleteObject(m_hFont);
@@ -1023,7 +1023,7 @@ void CTabBar::DraggingCursor(POINT screenPoint, UINT item)
         ::SetCursor(::LoadCursor(nullptr, IDC_ARROW));
     else
     {
-        TCHAR className[256];
+        wchar_t className[256];
         ::GetClassName(hWin, className, 256);
         if ((!lstrcmp(className, TEXT("Scintilla"))) || (!lstrcmp(className, WC_TABCONTROL)))
         {
@@ -1070,8 +1070,8 @@ void CTabBar::ExchangeItemData(POINT point)
             TCITEM itemData_nDraggedTab, itemData_shift;
             itemData_nDraggedTab.mask = itemData_shift.mask = TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM;
             const int stringSize                            = 256;
-            TCHAR     str1[stringSize];
-            TCHAR     str2[stringSize];
+            wchar_t   str1[stringSize];
+            wchar_t   str2[stringSize];
 
             itemData_nDraggedTab.pszText    = str1;
             itemData_nDraggedTab.cchTextMax = (stringSize);
