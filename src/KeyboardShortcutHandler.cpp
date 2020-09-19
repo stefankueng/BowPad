@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@
 #include "BowPad.h"
 #include "ResString.h"
 #include "AppUtils.h"
+#include "BowPadUI.h"
+
+#include "..\ext\scintilla\src\KeyMap.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -57,8 +60,76 @@ CKeyboardShortcutHandler& CKeyboardShortcutHandler::Instance()
     static CKeyboardShortcutHandler instance;
     if (!instance.m_bLoaded)
     {
-        instance.LoadUIHeader();
+        instance.LoadUIHeaders();
         instance.Load();
+#ifdef _DEBUG
+        // check if one of our shortcuts overrides a built-in Scintilla shortcut
+        Scintilla::KeyMap kmap;
+        auto keyMap = kmap.GetKeyMap();
+        for (auto k : instance.m_accelerators)
+        {
+#define SCMOD_SHIFT 1
+#define SCMOD_CTRL 2
+#define SCMOD_ALT 4
+
+            int modifier = 0;
+            std::string sMod;
+            if (k.fVirt & 0x10)
+            {
+                modifier |= SCI_ALT;
+                sMod += "Alt ";
+            }
+            if (k.fVirt & 0x08)
+            {
+                modifier |= SCI_CTRL;
+                sMod += "Ctrl ";
+            }
+            if (k.fVirt & 0x04)
+            {
+                modifier |= SCI_SHIFT;
+                sMod += "Shift ";
+            }
+            Scintilla::KeyModifiers sm(k.key1, modifier);
+            auto foundIt = keyMap.find(sm);
+            if (foundIt != keyMap.end())
+            {
+                // before hitting a break, check if it's a command we want to override
+                switch (k.cmd)
+                {
+                case cmdCopyPlain:
+                case cmdCutPlain:
+                case cmdEditSelection:
+                case cmdLineDuplicate:
+                case cmdLowercase:
+                case cmdPaste:
+                case cmdRedo:
+                case cmdSessionLast:
+                case cmdUndo:
+                case cmdUppercase:
+                case cmdNew:
+                    continue;
+                default:
+                    break;
+                }
+                const char key = (const char)sm.key;
+                sMod += key;
+                OutputDebugString(L"\nScintilla key shortcut overridden! : ");
+                OutputDebugStringA(sMod.c_str());
+                for (const auto& r : instance.m_resourceData)
+                {
+                    if (r.second == (int)foundIt->second)
+                    {
+                        OutputDebugString(L" - ");
+                        OutputDebugString(r.first.c_str());
+                    }
+                }
+                OutputDebugString(L"\n");
+                OutputDebugString(k.sCmd.c_str());
+                OutputDebugString(L"\n");
+                DebugBreak();
+            }
+        }
+#endif
     }
     return instance;
 }
@@ -268,11 +339,19 @@ std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd ) c
     return {};
 }
 
-void CKeyboardShortcutHandler::LoadUIHeader()
+void CKeyboardShortcutHandler::LoadUIHeaders()
 {
     m_resourceData.clear();
     DWORD resSize = 0;
     const char* resData = CAppUtils::GetResourceData(L"config", IDR_BOWPADUIH, resSize);
+    LoadUIHeader(resData, resSize);
+
+    resData = CAppUtils::GetResourceData(L"config", IDR_SCINTILLAH, resSize);
+    LoadUIHeader(resData, resSize);
+}
+
+void CKeyboardShortcutHandler::LoadUIHeader(const char* resData, DWORD resSize)
+{
     if (resData != nullptr)
     {
         // parse the header file
@@ -287,6 +366,8 @@ void CKeyboardShortcutHandler::LoadUIHeader()
                 if (sLine.empty())
                     continue;
                 if (sLine[0] == '/')
+                    continue;
+                if (sLine.find("#define") == std::string::npos)
                     continue;
                 auto spacepos = sLine.find(' ');
                 if (spacepos != std::string::npos)

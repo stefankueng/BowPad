@@ -85,6 +85,7 @@
 #define IDS_FINDRESULT_HEADERFILE       152
 #define IDS_FINDRESULT_HEADERLINE       153
 #define IDD_DEFAULTENCODING             153
+#define IDR_SCINTILLAH                  153
 #define IDS_FINDRESULT_HEADERLINETEXT   154
 #define IDD_PLUGINSCONFIGDLG            154
 #define IDS_REGEXTOOLTIP                155
