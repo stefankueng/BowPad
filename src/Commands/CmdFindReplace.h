@@ -37,7 +37,8 @@ public:
     DocID           docID;
     std::wstring    lineText;
     size_t          pathIndex = size_t(-1);
-    size_t          pos = 0;
+    size_t          posBegin = 0;
+    size_t          posEnd = 0;
     size_t          line = 0;
     size_t          posInLineStart = 0;
     size_t          posInLineEnd = 0;
