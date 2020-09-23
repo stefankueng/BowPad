@@ -854,7 +854,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
     ListView_GetItemRect(hListControl, itemIndex, &iconRC, LVIR_ICON);
     ListView_GetItemRect(hListControl, itemIndex, &boundsRC, LVIR_BOUNDS);
 
-    DrawListColumnBackground(pLVCD);
+    //DrawListColumnBackground(pLVCD);
     int leftmargin = labelRC.left - boundsRC.left;
     if (pLVCD->iSubItem)
         leftmargin -= (iconRC.right - iconRC.left);
