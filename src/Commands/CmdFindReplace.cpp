@@ -854,7 +854,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
     ListView_GetItemRect(hListControl, itemIndex, &iconRC, LVIR_ICON);
     ListView_GetItemRect(hListControl, itemIndex, &boundsRC, LVIR_BOUNDS);
 
-    DrawListColumnBackground(pLVCD);
+    //DrawListColumnBackground(pLVCD);
     int leftmargin = labelRC.left - boundsRC.left;
     if (pLVCD->iSubItem)
         leftmargin -= (iconRC.right - iconRC.left);
@@ -1129,31 +1129,32 @@ void CFindReplaceDlg::DoListItemAction(int itemIndex)
         TabActivateAt(GetTabIndexFromDocID(item.docID));
     else if (OpenFile(path.c_str(), openFlags)<0)
         return;
-    Center((long)item.pos, (long)item.pos);
+    Center((long)item.posBegin, (long)item.posEnd);
     if (m_resultsType == ResultsType::MatchedTerms)
     {
         // Set the color indicators for the doc scroll bar
-        if (g_lastSelText.empty() || g_lastSelText.compare(g_sHighlightString) || (g_searchFlags != g_lastSearchFlags))
+        if (g_lastSelText.empty() || g_lastSelText != g_findString || g_sHighlightString != g_findString || (g_searchFlags != g_lastSearchFlags))
         {
             DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
             g_searchMarkerCount = 0;
-        }
-        OnOutOfScope(DocScrollUpdate());
 
-        std::wstring findText = GetDlgItemText(IDC_SEARCHCOMBO).get();
-        UpdateSearchStrings(findText);
-        g_findString = CUnicodeUtils::StdGetUTF8(findText);
-        g_sHighlightString = g_findString;
-        g_lastSelText = g_sHighlightString;
+            //std::wstring findText = GetDlgItemText(IDC_SEARCHCOMBO).get();
+            //UpdateSearchStrings(findText);
+            //g_findString = CUnicodeUtils::StdGetUTF8(findText);
+            g_sHighlightString = g_findString;
+            g_lastSelText = g_sHighlightString;
 
-        for (const auto& sRes : m_searchResults)
-        {
-            if (sRes.docID == item.docID)
+            for (const auto& sRes : m_searchResults)
             {
-                DocScrollAddLineColor(DOCSCROLLTYPE_SEARCHTEXT, sRes.line, RGB(200, 200, 0));
-                ++g_searchMarkerCount;
+                if (sRes.docID == item.docID)
+                {
+                    DocScrollAddLineColor(DOCSCROLLTYPE_SEARCHTEXT, sRes.line, RGB(200, 200, 0));
+                    ++g_searchMarkerCount;
+                }
             }
         }
+        OnOutOfScope(DocScrollUpdate());
+        UpdateWindow(*this);
     }
     FocusOn(IDC_FINDRESULTS);
     // Close the dialog if asked to using the shift key or if there was only
@@ -1729,6 +1730,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
     if (id != IDC_FINDFILES)
         UpdateSearchStrings(findText);
     std::string searchfor = CUnicodeUtils::StdGetUTF8(findText);
+    g_findString = searchfor;
 
     int searchflags = GetScintillaOptions();
     unsigned int exSearchFlags = 0;
@@ -2111,14 +2113,15 @@ void CFindReplaceDlg::SearchDocument(
             // to wherever it originally referred to.
             if (docID.IsValid())
                 result.docID = docID;
-            result.pos = ttf.chrgText.cpMin;
-            char c = (char)searchWnd.Call(SCI_GETCHARAT, result.pos);
+            result.posBegin = ttf.chrgText.cpMin;
+            result.posEnd = ttf.chrgText.cpMax;
+            char c = (char)searchWnd.Call(SCI_GETCHARAT, result.posBegin);
             while (c == '\n' || c == '\r')
             {
-                ++result.pos;
-                c = (char)searchWnd.Call(SCI_GETCHARAT, result.pos);
+                ++result.posBegin;
+                c = (char)searchWnd.Call(SCI_GETCHARAT, result.posBegin);
             }
-            result.line = searchWnd.Call(SCI_LINEFROMPOSITION, result.pos);
+            result.line = searchWnd.Call(SCI_LINEFROMPOSITION, result.posBegin);
             auto linepos = searchWnd.Call(SCI_POSITIONFROMLINE, result.line);
             if (searchForFunctions)
             {
@@ -2132,7 +2135,7 @@ void CFindReplaceDlg::SearchDocument(
             }
             else
             {
-                result.posInLineStart = linepos >= 0 ? result.pos - linepos : 0;
+                result.posInLineStart = linepos >= 0 ? result.posBegin - linepos : 0;
                 result.posInLineEnd = linepos >= 0 ? ttf.chrgText.cpMax - linepos : 0;
 
                 size_t linesize = (size_t)searchWnd.Call(SCI_LINELENGTH, result.line);
@@ -2147,6 +2150,14 @@ void CFindReplaceDlg::SearchDocument(
                 // utf16 can have different char sizes so the positions won't match anymore
                 result.posInLineStart = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineStart);
                 result.posInLineEnd = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineEnd);
+                linesize = result.posInLineEnd - result.posInLineStart;
+                if (result.lineText.size() > max(linesize + 40, 100)) {
+                    size_t index = max(0, (int)result.posInLineStart - 15);
+                    result.lineText = result.lineText.substr(index, linesize + 40);
+                    result.lineText.shrink_to_fit();
+                    result.posInLineStart -= index;
+                    result.posInLineEnd -= index;
+                }
             }
 
             // When searching for functions, we have to narrow the match down by name ourself.

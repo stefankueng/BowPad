@@ -1144,7 +1144,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     startstylepos                          = max(startstylepos, 0);
     long endstylepos                       = (long)Call(SCI_POSITIONFROMLINE, lastline) + (long)Call(SCI_LINELENGTH, lastline);
     if (endstylepos < 0)
-        endstylepos = (long)Call(SCI_GETLENGTH) - startstylepos;
+        endstylepos = (long)Call(SCI_GETLENGTH);
 
     int len = endstylepos - startstylepos;
     if (len <= 0)
