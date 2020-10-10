@@ -334,6 +334,11 @@ int ICommand::GetTabIndexFromDocID(DocID docID ) const
     return m_pMainWindow->m_TabBar.GetIndexFromID(docID);
 }
 
+void ICommand::OpenNewTab() const
+{
+    return m_pMainWindow->OpenNewTab();
+}
+
 DocID ICommand::GetDocIDFromPath( LPCTSTR path ) const
 {
     return m_pMainWindow->m_DocManager.GetIdForPath(path);

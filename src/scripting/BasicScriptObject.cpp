@@ -906,6 +906,8 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID      /*riid*/,
             idList[i] = 132;
         else if (_wcsicmp(nameList[i], L"UpdateLineNumberWidth") == 0)
             idList[i] = 133;
+        else if (_wcsicmp(nameList[i], L"OpenNewTab") == 0)
+            idList[i] = 134;
         else if (_wcsicmp(nameList[i], L"SciGetTextRange") == 0)
             idList[i] = 900;
         else if (_wcsicmp(nameList[i], L"SciGetCharAt") == 0)
@@ -1221,6 +1223,11 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             if (args->cArgs != 0)
                 return DISP_E_BADPARAMCOUNT;
             UpdateLineNumberWidth();
+            break;
+        case 134: // OpenNewTab
+            if (args->cArgs != 0)
+                return DISP_E_BADPARAMCOUNT;
+            OpenNewTab();
             break;
         case 900: // SciGetTextRange
             if (args->cArgs != 2)

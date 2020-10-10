@@ -80,6 +80,7 @@ protected:
     DocID               GetDocIDFromTabIndex(int tab) const;
     DocID               GetDocIDFromPath(LPCTSTR path) const;
     int                 GetTabIndexFromDocID(DocID docID) const;
+    void                OpenNewTab() const;
 
     int                 GetDocumentCount() const;
     bool                HasActiveDocument() const;
