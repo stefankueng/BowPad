@@ -1,0 +1,49 @@
+// returns the version of the plugin
+// this callback is not optional! If you fail to implement this, the plugin
+// config dialog won't work properly with your plugin
+function Version() { return 100; }
+
+// this is the main function that gets executed when the command is run, i.e.
+// the button is clicked
+function Execute()
+{
+    var selStart = BowPad.SciGetSelectionStart();
+    var selEnd = BowPad.SciGetSelectionEnd();
+    if (selStart == selEnd)
+        return false;
+    if (BowPad.SciLineFromPosition(selStart) != BowPad.SciLineFromPosition(selEnd)) {
+        alert("Multiline selection is not yet supported.");
+	return false;
+    }
+    
+    var selText = BowPad.SciGetSelText();
+    var extractedLines = [];
+    var docLen = BowPad.SciGetLength();
+    var foundPos = BowPad.SciFindText(0, 0, docLen, selText).toArray()[0];
+
+    while (foundPos >= 0)
+    {
+        var line = BowPad.SciLineFromPosition(foundPos);
+        var lineText = BowPad.SciGetLine(line);
+        extractedLines.push(lineText);
+        foundPos = BowPad.SciFindText(0, foundPos+1, docLen, selText).toArray()[0];
+    }
+    BowPad.OpenNewTab();
+    BowPad.SciInsertText(0, extractedLines.join());
+    BowPad.SciSetSavePoint();
+
+    return true;
+}
+
+// return true if the plugin command is enabled (used for the button)
+// note: not used yet by BowPad, but planned for the future
+function IsEnabled() { return BowPad.SciGetSelectionStart() != BowPad.SciGetSelectionEnd(); }
+
+// return true if the plugin button should appear as checked
+// note: not used yet by BowPad, but planned for the future
+function IsChecked() { return false; }
+
+// called after a document was opened
+function OnDocumentOpen(index) {
+}
+

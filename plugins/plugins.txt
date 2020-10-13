@@ -2,7 +2,7 @@ DisableClearType
 101
 200
 Disables ClearType\nAuthor: wmjordan@163.com, Stefan Küng\n
-SortLines
-0101
-0200
-A script to sort the selected lines.\nAuthor: Stefan Küng\nWebsite: http://stefanstools.sourceforge.net
+SearchSelection
+100
+200
+Search Selection: extracts all lines that contain the selected text.\nStefan Küng, wmjordan\n
