@@ -1316,7 +1316,7 @@ bool BasicScriptObject::ScintillaCommandsDispId(wchar_t * name, DISPID& id)
 HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPARAMS* args, VARIANT* ret)
 {
     size_t vectIndex = id - 1000;
-    if ((vectIndex > 0) && (vectIndex < std::size(g_ScintillaCmd)))
+    if ((vectIndex >= 0) && (vectIndex < std::size(g_ScintillaCmd)))
     {
         _variant_t p1;
         _variant_t p2;
