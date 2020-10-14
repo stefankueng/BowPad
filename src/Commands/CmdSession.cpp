@@ -80,9 +80,12 @@ void CCmdSessionLoad::OnClose()
 
     auto& settings  = CIniSettings::Instance();
     bool  bAutoLoad = GetAutoLoad();
+    auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
     // first remove the whole session section
     settings.Delete(g_sessionSection, nullptr);
+    // now restore the settings of the session section
     SetAutoLoad(bAutoLoad);
+    CIniSettings::Instance().SetInt64(g_sessionSection, L"handlemodified", handleModified ? 1 : 0);
     // now go through all tabs and save their state
     int tabcount  = GetTabCount();
     int activetab = GetActiveTabIndex();
