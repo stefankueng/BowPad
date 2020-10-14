@@ -293,7 +293,7 @@ CCmdSessionAutoSave::CCmdSessionAutoSave(void* obj)
 bool CCmdSessionAutoSave::Execute()
 {
     auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
-    handleModified = handleModified && GetAutoLoad();
+    handleModified = !handleModified && GetAutoLoad();
     CIniSettings::Instance().SetInt64(g_sessionSection, L"handlemodified", handleModified ? 1 : 0);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
