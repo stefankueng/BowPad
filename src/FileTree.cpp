@@ -85,6 +85,7 @@ CFileTree::CFileTree(HINSTANCE hInst, void * obj)
     , m_bStop(false)
     , m_bRootBusy(false)
     , m_ActiveItem(0)
+    , m_bBlockExpansion(false)
 {
 }
 
@@ -131,6 +132,7 @@ void CFileTree::SetPath(const std::wstring & path, bool forcerefresh)
     {
         if (forcerefresh || (m_path != path))
         {
+            m_bBlockExpansion = false;
             m_path = path;
             Refresh(TVI_ROOT);
         }
@@ -741,6 +743,7 @@ void CFileTree::TabNotify(TBHDR * ptbhdr)
     {
         if (m_nBlockRefresh)
             return;
+        m_bBlockExpansion = false;
         MarkActiveDocument(true);
     }
 }
@@ -778,12 +781,13 @@ void CFileTree::MarkActiveDocument(bool ensureVisible)
                                     TreeView_EnsureVisible(*this, hItem);
                                 TreeView_SetItemState(*this, hItem, TVIS_BOLD, TVIS_BOLD);
                                 SetActiveItem(hItem);
+                                m_bBlockExpansion = true;
                                 return true;
                             }
                         }
                         else
                         {
-                            if (PathIsChild(pTreeItem->path, doc.m_path))
+                            if (!m_bBlockExpansion && PathIsChild(pTreeItem->path, doc.m_path))
                                 TreeView_Expand(*this, hItem, TVE_EXPAND);
                         }
                     }
