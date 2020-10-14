@@ -33,12 +33,12 @@
 #pragma comment(lib, "Uxtheme.lib")
 
 const int SCRATCH_QCM_FIRST = 1;
-const int SCRATCH_QCM_LAST = 0x6FFF;
+const int SCRATCH_QCM_LAST  = 0x6FFF;
 
-static IContextMenu2 *g_pcm2 = nullptr;
-static IContextMenu3 *g_pcm3 = nullptr;
+static IContextMenu2* g_pcm2 = nullptr;
+static IContextMenu3* g_pcm3 = nullptr;
 
-const wchar_t ThisOSPathSeparator = L'\\';
+const wchar_t ThisOSPathSeparator  = L'\\';
 const wchar_t OtherOSPathSeparator = L'/';
 
 inline bool IsFolderSeparator(wchar_t c)
@@ -46,18 +46,18 @@ inline bool IsFolderSeparator(wchar_t c)
     return (c == ThisOSPathSeparator || c == OtherOSPathSeparator);
 }
 
-static HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void **ppv)
+static HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void** ppv)
 {
-    *ppv = nullptr;
-    HRESULT hr = E_FAIL;
+    *ppv            = nullptr;
+    HRESULT      hr = E_FAIL;
     LPITEMIDLIST pidl;
-    SFGAOF sfgao;
+    SFGAOF       sfgao;
     if (SUCCEEDED(hr = SHParseDisplayName(pszPath, nullptr, &pidl, 0, &sfgao)))
     {
-        IShellFolder *psf;
+        IShellFolder* psf;
         LPCITEMIDLIST pidlChild;
         if (SUCCEEDED(hr = SHBindToParent(pidl, IID_IShellFolder,
-            (void**)&psf, &pidlChild)))
+                                          (void**)&psf, &pidlChild)))
         {
             hr = psf->GetUIObjectOf(hwnd, 1, &pidlChild, riid, nullptr, ppv);
             psf->Release();
@@ -70,14 +70,14 @@ static HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void *
 static FileTreeItem* GetFileTreeItem(HWND hWnd, HTREEITEM hItem)
 {
     TVITEM item; // No need to erase to zero, mask defines the valid fields.
-    item.mask = TVIF_PARAM;
+    item.mask  = TVIF_PARAM;
     item.hItem = hItem;
     if (TreeView_GetItem(hWnd, &item) != FALSE)
         return reinterpret_cast<FileTreeItem*>(item.lParam);
     return nullptr;
 }
 
-CFileTree::CFileTree(HINSTANCE hInst, void * obj)
+CFileTree::CFileTree(HINSTANCE hInst, void* obj)
     : CWindow(hInst)
     , ICommand(obj)
     , m_nBlockRefresh(0)
@@ -104,7 +104,7 @@ void CFileTree::Clear()
     TreeView_DeleteAllItems(*this);
 }
 
-void CFileTree::SetPath(const std::wstring & path, bool forcerefresh)
+void CFileTree::SetPath(const std::wstring& path, bool forcerefresh)
 {
     if (m_bRootBusy && (m_path != path))
     {
@@ -133,7 +133,7 @@ void CFileTree::SetPath(const std::wstring & path, bool forcerefresh)
         if (forcerefresh || (m_path != path))
         {
             m_bBlockExpansion = false;
-            m_path = path;
+            m_path            = path;
             Refresh(TVI_ROOT);
         }
     }
@@ -143,7 +143,7 @@ bool CFileTree::Init(HINSTANCE /*hInst*/, HWND hParent)
 {
     INITCOMMONCONTROLSEX icce;
     icce.dwSize = sizeof(icce);
-    icce.dwICC = ICC_TREEVIEW_CLASSES;
+    icce.dwICC  = ICC_TREEVIEW_CLASSES;
     InitCommonControlsEx(&icce);
     CreateEx(0, WS_VISIBLE | WS_CHILD | WS_TABSTOP | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_NOHSCROLL | TVS_TRACKSELECT, hParent, 0, WC_TREEVIEW);
     if (!*this)
@@ -183,7 +183,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
         case WM_CONTEXTMENU:
         {
             HTREEITEM hSelItem = TreeView_GetSelection(*this);
-            POINT pt;
+            POINT     pt;
             POINTSTOPOINT(pt, lParam);
 
             if (pt.x == -1 && pt.y == -1)
@@ -200,7 +200,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 ScreenToClient(*this, &pt);
 
                 TV_HITTESTINFO tvhti;
-                tvhti.pt = pt;
+                tvhti.pt        = pt;
                 HTREEITEM hItem = TreeView_HitTest(*this, &tvhti);
                 if ((tvhti.flags & TVHT_ONITEM) != 0)
                 {
@@ -217,20 +217,19 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 break; // switch.
             }
 
-            IContextMenuPtr pcm = nullptr;
-            HTREEITEM hRefresh = nullptr;
+            IContextMenuPtr pcm      = nullptr;
+            HTREEITEM       hRefresh = nullptr;
             if (SUCCEEDED(GetUIObjectOfFile(hwnd, pTreeItem->path.c_str(),
-                IID_IContextMenu, (void**)&pcm)))
+                                            IID_IContextMenu, (void**)&pcm)))
             {
                 HMENU hmenu = CreatePopupMenu();
                 if (hmenu)
                 {
                     OnOutOfScope(
-                        DestroyMenu(hmenu);
-                    );
+                        DestroyMenu(hmenu););
                     if (SUCCEEDED(pcm->QueryContextMenu(hmenu, 1,
-                        SCRATCH_QCM_FIRST, SCRATCH_QCM_LAST,
-                        CMF_NORMAL)))
+                                                        SCRATCH_QCM_FIRST, SCRATCH_QCM_LAST,
+                                                        CMF_NORMAL)))
                     {
                         pcm->QueryInterface(IID_IContextMenu2, (void**)&g_pcm2);
                         pcm->QueryInterface(IID_IContextMenu3, (void**)&g_pcm3);
@@ -248,9 +247,9 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                         }
                         if (iCmd > 0)
                         {
-                            CMINVOKECOMMANDINFOEX info = { 0 };
-                            info.cbSize = sizeof(info);
-                            info.fMask = CMIC_MASK_UNICODE | CMIC_MASK_PTINVOKE;
+                            CMINVOKECOMMANDINFOEX info = {0};
+                            info.cbSize                = sizeof(info);
+                            info.fMask                 = CMIC_MASK_UNICODE | CMIC_MASK_PTINVOKE;
                             if (GetKeyState(VK_CONTROL) < 0)
                             {
                                 info.fMask |= CMIC_MASK_CONTROL_DOWN;
@@ -259,10 +258,10 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                             {
                                 info.fMask |= CMIC_MASK_SHIFT_DOWN;
                             }
-                            info.hwnd = hwnd;
-                            info.lpVerb = MAKEINTRESOURCEA(iCmd - SCRATCH_QCM_FIRST);
-                            info.lpVerbW = MAKEINTRESOURCEW(iCmd - SCRATCH_QCM_FIRST);
-                            info.nShow = SW_SHOWNORMAL;
+                            info.hwnd     = hwnd;
+                            info.lpVerb   = MAKEINTRESOURCEA(iCmd - SCRATCH_QCM_FIRST);
+                            info.lpVerbW  = MAKEINTRESOURCEW(iCmd - SCRATCH_QCM_FIRST);
+                            info.nShow    = SW_SHOWNORMAL;
                             info.ptInvoke = pt;
                             pcm->InvokeCommand((LPCMINVOKECOMMANDINFO)&info);
                             hRefresh = TreeView_GetParent(*this, hSelItem);
@@ -280,7 +279,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
         case WM_THREADRESULTREADY:
         {
             FileTreeData* pData = (FileTreeData*)lParam; // Will delete but not change.
-            assert(pData != nullptr); // not possible.
+            assert(pData != nullptr);                    // not possible.
 
             if (m_bStop)
             {
@@ -297,11 +296,11 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
             if (pData->refreshRoot != TVI_ROOT)
                 fi = GetFileTreeItem(*this, pData->refreshRoot);
 
-            auto dirIconIndex = CSysImageList::GetInstance().GetDirIconIndex();
+            auto dirIconIndex     = CSysImageList::GetInstance().GetDirIconIndex();
             auto dirOpenIconIndex = CSysImageList::GetInstance().GetDirOpenIconIndex();
 
             if (((pData->refreshRoot == TVI_ROOT) && (CPathUtils::PathCompare(pData->refreshpath, m_path) == 0)) ||
-                (fi && (CPathUtils::PathCompare(fi->path,pData->refreshpath) == 0)))
+                (fi && (CPathUtils::PathCompare(fi->path, pData->refreshpath) == 0)))
             {
                 std::wstring activepath;
                 if (HasActiveDocument())
@@ -318,37 +317,37 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 bool activepathmarked = false;
                 for (const auto& item : pData->data)
                 {
-                    TVITEMEX tvi = { 0 };
-                    TVINSERTSTRUCT tvins = { 0 };
+                    TVITEMEX       tvi   = {0};
+                    TVINSERTSTRUCT tvins = {0};
 
                     tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
 
                     const auto filename = CPathUtils::GetFileName(item.path);
-                    tvi.pszText = const_cast<LPWSTR>(filename.c_str());
-                    tvi.cchTextMax = static_cast<int>(filename.length());
-                    tvi.cChildren = 0;
+                    tvi.pszText         = const_cast<LPWSTR>(filename.c_str());
+                    tvi.cchTextMax      = static_cast<int>(filename.length());
+                    tvi.cChildren       = 0;
 
                     if (item.isDir)
                     {
                         tvi.mask |= TVIF_EXPANDEDIMAGE;
-                        tvi.iImage = dirIconIndex;
+                        tvi.iImage         = dirIconIndex;
                         tvi.iSelectedImage = dirIconIndex;
                         tvi.iExpandedImage = dirOpenIconIndex;
-                        tvi.cChildren = 1;
+                        tvi.cChildren      = 1;
                         if (item.isDot)
                         {
-                            tvi.iImage = 0;
+                            tvi.iImage         = 0;
                             tvi.iSelectedImage = 0;
                             tvi.iExpandedImage = 0;
-                            tvi.pszText = L"..";
-                            tvi.cchTextMax = 3;
-                            tvi.cChildren = 0;
+                            tvi.pszText        = L"..";
+                            tvi.cchTextMax     = 3;
+                            tvi.cChildren      = 0;
                         }
                     }
                     else
                     {
-                        int fileIconIndex = CSysImageList::GetInstance().GetFileIconIndex(item.path);
-                        tvi.iImage = fileIconIndex;
+                        int fileIconIndex  = CSysImageList::GetInstance().GetFileIconIndex(item.path);
+                        tvi.iImage         = fileIconIndex;
                         tvi.iSelectedImage = fileIconIndex;
                     }
                     if (!activepath.empty())
@@ -356,15 +355,15 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                         if (CPathUtils::PathCompare(item.path, activepath) == 0)
                         {
                             tvi.mask |= TVIF_STATE;
-                            tvi.state = TVIS_BOLD;
-                            tvi.stateMask = TVIS_BOLD;
+                            tvi.state        = TVIS_BOLD;
+                            tvi.stateMask    = TVIS_BOLD;
                             activepathmarked = true;
                         }
                     }
-                    tvi.lParam = (LPARAM)&item;
-                    tvins.itemex = tvi;
+                    tvi.lParam         = (LPARAM)&item;
+                    tvins.itemex       = tvi;
                     tvins.hInsertAfter = TVI_FIRST;
-                    tvins.hParent = pData->refreshRoot;
+                    tvins.hParent      = pData->refreshRoot;
 
                     auto hInsertedItem = TreeView_InsertItem(*this, &tvins);
                     if (tvi.state == TVIS_BOLD)
@@ -385,13 +384,13 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                     // the current path does not appear to be visible, so
                     // refresh all sub-paths down to the active path
                     std::wstring expandpath = CPathUtils::GetParentDirectory(activepath);
-                    HTREEITEM hItem = GetItemForPath(expandpath);
+                    HTREEITEM    hItem      = GetItemForPath(expandpath);
                     if (hItem == nullptr)
                     {
                         while ((hItem == nullptr) && (expandpath.size() > m_path.size()))
                         {
                             expandpath = CPathUtils::GetParentDirectory(expandpath);
-                            hItem = GetItemForPath(expandpath);
+                            hItem      = GetItemForPath(expandpath);
                         }
                         if (hItem)
                             Refresh(hItem);
@@ -408,8 +407,8 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 pData = nullptr;
             }
         }
-        MarkActiveDocument(wParam == 0);
-        break;
+            MarkActiveDocument(wParam == 0);
+            break;
         default:
             break;
     }
@@ -498,8 +497,7 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/, bool expa
     else
     {
         HWND hTree = *this;
-        RecurseTree(TreeView_GetChild(*this, refreshRoot), [hTree](HTREEITEM hItem)->bool
-        {
+        RecurseTree(TreeView_GetChild(*this, refreshRoot), [hTree](HTREEITEM hItem) -> bool {
             TreeView_DeleteItem(hTree, hItem);
             return false;
         });
@@ -533,7 +531,6 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/, bool expa
         return;
     }
 
-
     InterlockedIncrement(&m_ThreadsRunning);
 
     std::thread(&CFileTree::RefreshThread, this, refreshRoot, refreshPath, expanding).detach();
@@ -543,7 +540,7 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
 {
     OnOutOfScope(InterlockedDecrement(&m_ThreadsRunning););
 
-    auto data = new FileTreeData();
+    auto data         = new FileTreeData();
     data->refreshpath = refreshPath;
     data->refreshRoot = refreshRoot;
     data->data.reserve(50000);
@@ -554,9 +551,9 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
         // parent folder.
         if (refreshPath.size() > 3)
         {
-            auto parentDir = CPathUtils::GetParentDirectory(refreshPath);
+            auto         parentDir = CPathUtils::GetParentDirectory(refreshPath);
             FileTreeItem fi;
-            fi.path = std::move(parentDir);
+            fi.path  = std::move(parentDir);
             fi.isDir = true;
             fi.isDot = true;
 
@@ -565,12 +562,12 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
     }
     CDirFileEnum enumerator(refreshPath);
     enumerator.SetAttributesToIgnore(FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_VIRTUAL);
-    bool bIsDir = false;
+    bool         bIsDir = false;
     std::wstring path;
     while (enumerator.NextFile(path, &bIsDir, false) && !m_bStop)
     {
         FileTreeItem fi;
-        fi.path = std::move(path);
+        fi.path  = std::move(path);
         fi.isDir = bIsDir;
 
         data->data.push_back(fi);
@@ -581,8 +578,7 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
         m_bRootBusy = false;
         return;
     }
-    std::sort(data->data.begin(), data->data.end(), [](const auto& lhs, const auto& rhs)
-    {
+    std::sort(data->data.begin(), data->data.end(), [](const auto& lhs, const auto& rhs) {
         if (lhs.isDot)
             return false;
         if (rhs.isDot)
@@ -592,9 +588,9 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
             return !lhs.isDir;
 
         auto res = CompareStringEx(nullptr, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS | SORT_STRINGSORT,
-            lhs.path.c_str(), (int)lhs.path.length(),
-            rhs.path.c_str(), (int)rhs.path.length(),
-            nullptr, nullptr, 0);
+                                   lhs.path.c_str(), (int)lhs.path.length(),
+                                   rhs.path.c_str(), (int)rhs.path.length(),
+                                   nullptr, nullptr, 0);
         return res == CSTR_GREATER_THAN;
     });
 
@@ -615,14 +611,14 @@ HTREEITEM CFileTree::GetHitItem() const
     pt.y = GET_Y_LPARAM(mpos);
     ScreenToClient(*this, &pt);
     TV_HITTESTINFO tvhti;
-    tvhti.pt = pt;
+    tvhti.pt        = pt;
     HTREEITEM hItem = TreeView_HitTest(*this, &tvhti);
     if ((tvhti.flags & TVHT_ONITEM) == 0)
         return nullptr;
     return hItem;
 }
 
-std::wstring CFileTree::GetPathForHitItem(bool * isDir, bool * isDot) const
+std::wstring CFileTree::GetPathForHitItem(bool* isDir, bool* isDot) const
 {
     if (isDir)
         (*isDir) = false;
@@ -644,7 +640,7 @@ std::wstring CFileTree::GetPathForHitItem(bool * isDir, bool * isDot) const
     return std::wstring();
 }
 
-std::wstring CFileTree::GetPathForSelItem(bool * isDir, bool * isDot) const
+std::wstring CFileTree::GetPathForSelItem(bool* isDir, bool* isDot) const
 {
     if (isDir)
         (*isDir) = false;
@@ -653,7 +649,7 @@ std::wstring CFileTree::GetPathForSelItem(bool * isDir, bool * isDot) const
     HTREEITEM hItem = TreeView_GetSelection(*this);
     if (hItem)
     {
-        const FileTreeItem * pTreeItem = GetFileTreeItem(*this, hItem);
+        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
         if (pTreeItem)
         {
             if (isDir)
@@ -711,7 +707,7 @@ void CFileTree::OnThemeChanged(bool bDark)
         if (bDark)
         {
             DarkModeHelper::Instance().AllowDarkModeForWindow(*this, TRUE);
-            if FAILED(SetWindowTheme(*this, L"DarkMode_Explorer", nullptr))
+            if FAILED (SetWindowTheme(*this, L"DarkMode_Explorer", nullptr))
                 SetWindowTheme(*this, L"Explorer", nullptr);
         }
         else
@@ -737,7 +733,7 @@ UINT CFileTree::GetCmdId()
     return cmdFileTreeControl;
 }
 
-void CFileTree::TabNotify(TBHDR * ptbhdr)
+void CFileTree::TabNotify(TBHDR* ptbhdr)
 {
     if ((ptbhdr->hdr.code == TCN_SELCHANGE))
     {
@@ -768,8 +764,7 @@ void CFileTree::MarkActiveDocument(bool ensureVisible)
             if (CPathUtils::PathCompare(m_path, doc.m_path.substr(0, m_path.size())) == 0)
             {
                 // find the path
-                RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [ & ](HTREEITEM hItem)->bool
-                {
+                RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem) -> bool {
                     const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
                     if (pTreeItem)
                     {
@@ -812,7 +807,7 @@ void CFileTree::SetActiveItem(HTREEITEM hItem)
     m_ActiveItem = hItem;
 }
 
-bool CFileTree::PathIsChild(const std::wstring & parent, const std::wstring & child)
+bool CFileTree::PathIsChild(const std::wstring& parent, const std::wstring& child)
 {
     std::wstring sChildAsParent = child.substr(0, parent.size());
     if (sChildAsParent.empty())
@@ -863,8 +858,7 @@ void CFileTree::OnClose()
 HTREEITEM CFileTree::GetItemForPath(const std::wstring& expandpath)
 {
     HTREEITEM hResult = nullptr;
-    RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem)->bool
-    {
+    RecurseTree(TreeView_GetChild(*this, TVI_ROOT), [&](HTREEITEM hItem) -> bool {
         const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
         if (pTreeItem)
         {
@@ -878,5 +872,3 @@ HTREEITEM CFileTree::GetItemForPath(const std::wstring& expandpath)
     });
     return hResult;
 }
-
-
