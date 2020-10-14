@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@
 class CCmdSort : public ICommand
 {
 public:
-    CCmdSort(void* obj) : ICommand(obj)
+    CCmdSort(void* obj)
+        : ICommand(obj)
     {
     }
     ~CCmdSort() = default;
@@ -33,6 +34,9 @@ public:
     UINT GetCmdId() override { return cmdSort; }
     bool Execute() override;
 
+    void    ScintillaNotify(SCNotification* pScn) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+
 private:
-    void Sort(std::vector<std::wstring>& lines) const;
+    bool Sort(std::vector<std::wstring>& lines) const;
 };

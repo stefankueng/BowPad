@@ -305,6 +305,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\ext\scintilla\include\Scintilla.h" />
     <ClInclude Include="..\ext\sktoolslib\AeroControls.h" />
     <ClInclude Include="..\ext\sktoolslib\AeroGlass.h" />
     <ClInclude Include="..\ext\sktoolslib\AnimationManager.h" />

@@ -384,6 +384,9 @@
     <ClInclude Include="Commands\CmdEditSelection.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\scintilla\include\Scintilla.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -339,6 +339,7 @@
 #define IDC_ICASE                       1104
 #define IDC_CHECK2                      1105
 #define IDC_DOTNEWLINE                  1105
+#define IDC_REMOVEDUPLICATES            1106
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -348,7 +349,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        248
 #define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         1106
+#define _APS_NEXT_CONTROL_VALUE         1107
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
