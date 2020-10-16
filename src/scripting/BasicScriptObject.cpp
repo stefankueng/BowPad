@@ -1279,9 +1279,9 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             {
                 VARIANT * pInteger;
                 SafeArrayAccessData(psarray, (void**)&pInteger);
-                pInteger[0].intVal = sret > 0 ? ttf.chrgText.cpMin : -1;
+                pInteger[0].intVal = sret >= 0 ? ttf.chrgText.cpMin : -1;
                 pInteger[0].vt = VT_INT;
-                pInteger[1].intVal = sret > 0 ? ttf.chrgText.cpMax : -1;
+                pInteger[1].intVal = sret >= 0 ? ttf.chrgText.cpMax : -1;
                 pInteger[1].vt = VT_INT;
                 SafeArrayUnaccessData(psarray);
 
