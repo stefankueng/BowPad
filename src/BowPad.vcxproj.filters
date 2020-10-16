@@ -686,6 +686,9 @@
     <ClCompile Include="Commands\CmdEditSelection.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
+    <ClCompile Include="CustomLexers\LexLog.cxx">
+      <Filter>Lexer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc">

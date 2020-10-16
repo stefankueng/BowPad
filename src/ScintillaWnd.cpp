@@ -43,6 +43,7 @@ extern IUIFramework*          g_pFramework;
 extern std::string            g_sHighlightString;  // from CmdFindReplace
 extern int                    g_searchMarkerCount; // from CmdFindReplace
 extern Scintilla::LexerModule lmSimple;
+extern Scintilla::LexerModule lmLog;
 
 namespace
 {
@@ -153,6 +154,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
         return false;
 
     Scintilla::Catalogue::AddLexerModule(&lmSimple);
+    Scintilla::Catalogue::AddLexerModule(&lmLog);
 
     m_docScroll.InitScintilla(this);
 

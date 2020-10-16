@@ -525,6 +525,7 @@
     <ClCompile Include="Commands\CommandHandler.cpp" />
     <ClCompile Include="Commands\ICommand.cpp" />
     <ClCompile Include="CorrespondingFileDlg.cpp" />
+    <ClCompile Include="CustomLexers\LexLog.cxx" />
     <ClCompile Include="CustomLexers\LexSimple.cxx" />
     <ClCompile Include="CustomTooltip.cpp" />
     <ClCompile Include="DocScroll.cpp" />
