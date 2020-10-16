@@ -1567,6 +1567,8 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
                 CloseTab(m_TabBar.GetCurrentTabIndex(), true);
             return false;
         }
+        if (doc.m_saveCallback)
+            doc.m_saveCallback();
 
         if (CPathUtils::PathCompare(CIniSettings::Instance().GetIniPath(), doc.m_path))
             CIniSettings::Instance().Reload();
@@ -1611,7 +1613,8 @@ bool CMainWindow::SaveDoc(DocID docID, const std::wstring& path)
     {
         return false;
     }
-
+    if (doc.m_saveCallback)
+        doc.m_saveCallback();
     return true;
 }
 
@@ -3104,6 +3107,24 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             {
                 filepath = m_tabmovesavepath;
             }
+            // check if the file is special, i.e. if we need to do something
+            // when the file is saved
+            auto sExt = CStringUtils::to_lower(CPathUtils::GetFileExtension(doc.m_path));
+            if (sExt == L"bpj" || sExt == L"bpv")
+            {
+                doc.m_saveCallback = [this]() { CCommandHandler::Instance().InsertPlugins(this); };
+            }
+            else if (sExt == L"ini")
+            {
+                if (doc.m_path == CIniSettings::Instance().GetIniPath())
+                {
+                    doc.m_saveCallback = []() { CIniSettings::Instance().Reload(); };
+                }
+            }
+            else if (sExt == L"bplex")
+            {
+                doc.m_saveCallback = []() { CLexStyles::Instance().Reload(); };
+            }
 
             m_DocManager.AddDocumentAtEnd(doc, id);
             doc = m_DocManager.GetDocumentFromID(id);
@@ -3675,6 +3696,7 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
 
     docreload.m_position          = doc.m_position;
     docreload.m_bIsWriteProtected = doc.m_bIsWriteProtected;
+    docreload.m_saveCallback      = doc.m_saveCallback;
     auto lang                     = doc.GetLanguage();
     doc                           = docreload;
     editor->SetupLexerForLang(lang);
@@ -4200,7 +4222,7 @@ void CMainWindow::SetTheme(bool dark)
 
     CCommandHandler::Instance().OnThemeChanged(dark);
     RedrawWindow(*this, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW | RDW_ERASENOW);
-    RECT rc{ 0 };
+    RECT rc{0};
     GetWindowRect(*this, &rc);
     SetWindowPos(*this, nullptr, 0, 0, rc.right - rc.left, rc.bottom - rc.top - 1, SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
     SetWindowPos(*this, nullptr, 0, 0, rc.right - rc.left, rc.bottom - rc.top, SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);

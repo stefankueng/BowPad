@@ -89,8 +89,7 @@ void CCommandHandler::ShutDown()
     m_instance.reset(nullptr);
 }
 
-
-ICommand * CCommandHandler::GetCommand( UINT cmdId )
+ICommand* CCommandHandler::GetCommand(UINT cmdId)
 {
     auto c = m_commands.find(cmdId);
     if (c != m_commands.end())
@@ -101,7 +100,7 @@ ICommand * CCommandHandler::GetCommand( UINT cmdId )
     return nullptr;
 }
 
-void CCommandHandler::Init(void * obj)
+void CCommandHandler::Init(void* obj)
 {
     Add<CCmdMRU>(obj);
     Add<CCmdToggleTheme>(obj);
@@ -243,7 +242,7 @@ void CCommandHandler::Init(void * obj)
     InsertPlugins(obj);
 }
 
-void CCommandHandler::ScintillaNotify( SCNotification * pScn )
+void CCommandHandler::ScintillaNotify(SCNotification* pScn)
 {
     for (auto& cmd : m_commands)
     {
@@ -255,9 +254,9 @@ void CCommandHandler::ScintillaNotify( SCNotification * pScn )
     }
 }
 
-void CCommandHandler::TabNotify( TBHDR * ptbhdr )
+void CCommandHandler::TabNotify(TBHDR* ptbhdr)
 {
-    for (auto& cmd:m_commands)
+    for (auto& cmd : m_commands)
     {
         cmd.second->TabNotify(ptbhdr);
     }
@@ -375,16 +374,16 @@ void CCommandHandler::OnLangChanged()
     }
 }
 
-void CCommandHandler::InsertPlugins(void * obj)
+void CCommandHandler::InsertPlugins(void* obj)
 {
     // scan the paths, find all plugin files, create a plugin object
     // for every found file and store the plugin for later use
     std::wstring sPluginDir = CAppUtils::GetDataPath();
     sPluginDir += L"\\plugins";
     CDirFileEnum filefinder(sPluginDir);
-    bool bIsDirectory;
+    bool         bIsDirectory;
     std::wstring filename;
-    UINT pluginCmd = m_highestCmdId + 1000;
+    UINT         pluginCmd = m_highestCmdId + 1000;
     while (filefinder.NextFile(filename, &bIsDirectory, true))
     {
         if (!bIsDirectory)
@@ -392,15 +391,15 @@ void CCommandHandler::InsertPlugins(void * obj)
             try
             {
                 auto pScript = std::make_unique<CCmdScript>(obj);
-                int cmdID = ++pluginCmd;
+                int  cmdID   = ++pluginCmd;
                 if (pScript->Create(filename))
                 {
                     pScript->SetCmdId(cmdID);
-                    std::wstring sName = CPathUtils::GetParentDirectory(filename);
-                    sName = CPathUtils::GetFileName(sName);
-                    m_pluginversion.emplace(sName, pScript->m_version);
-                    m_commands.emplace(cmdID, std::move(pScript));
-                    m_plugins.emplace(cmdID, sName);
+                    std::wstring sName     = CPathUtils::GetParentDirectory(filename);
+                    sName                  = CPathUtils::GetFileName(sName);
+                    m_pluginversion[sName] = pScript->m_version;
+                    m_commands[cmdID]      = std::move(pScript);
+                    m_plugins[cmdID]       = sName;
                     CKeyboardShortcutHandler::Instance().AddCommand(sName, pluginCmd);
                 }
             }
@@ -429,9 +428,9 @@ int CCommandHandler::GetPluginVersion(const std::wstring& name)
     return 0;
 }
 
-void CCommandHandler::AddCommand(ICommand * cmd)
+void CCommandHandler::AddCommand(ICommand* cmd)
 {
     m_highestCmdId = max(m_highestCmdId, cmd->GetCmdId());
-    auto at = m_nodeletecommands.emplace(cmd->GetCmdId(), cmd);
+    auto at        = m_nodeletecommands.emplace(cmd->GetCmdId(), cmd);
     assert(at.second); // Verify no command has the same ID as an existing command.
 }

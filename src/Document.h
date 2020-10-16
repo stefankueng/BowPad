@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,26 +16,34 @@
 //
 #pragma once
 #include "Scintilla.h"
+#include <functional>
 
 typedef uptr_t Document;
 
 enum EOLFormat
 {
-    UNKNOWN_FORMAT, WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT
+    UNKNOWN_FORMAT,
+    WIN_FORMAT,
+    MAC_FORMAT,
+    UNIX_FORMAT
 };
 enum TabSpace
 {
-    Default, Tabs, Spaces
+    Default,
+    Tabs,
+    Spaces
 };
 
 enum ReadDirection
 {
-    Disabled, L2R, R2L
+    Disabled,
+    L2R,
+    R2L
 };
 
 std::wstring GetEOLFormatDescription(EOLFormat ft);
-EOLFormat ToEOLFormat(int eolMode);
-int ToEOLMode(EOLFormat eolFormat);
+EOLFormat    ToEOLFormat(int eolMode);
+int          ToEOLMode(EOLFormat eolFormat);
 
 class CPosData
 {
@@ -47,9 +55,7 @@ public:
         , m_nEndPos(0)
         , m_xOffset(0)
         , m_nSelMode(0)
-        , m_nScrollWidth(1)
-    {
-    };
+        , m_nScrollWidth(1){};
     ~CPosData()
     {
     }
@@ -84,34 +90,36 @@ public:
         , m_ReadDir(Disabled)
     {
         m_lastWriteTime.dwHighDateTime = 0;
-        m_lastWriteTime.dwLowDateTime = 0;
+        m_lastWriteTime.dwLowDateTime  = 0;
     }
 
-    std::wstring            GetEncodingString() const;
-    const std::string&      GetLanguage() const
+    std::wstring       GetEncodingString() const;
+    const std::string& GetLanguage() const
     {
         return m_language;
     }
-    void                    SetLanguage(const std::string& lang);
+    void SetLanguage(const std::string& lang);
 
-    Document                m_document;
-    std::wstring            m_path;
-    int                     m_encoding;
-    int                     m_encodingSaving;
-    EOLFormat               m_format;
-    bool                    m_bHasBOM;
-    bool                    m_bHasBOMSaving;
-    bool                    m_bTrimBeforeSave;
-    bool                    m_bEnsureNewlineAtEnd;
-    bool                    m_bIsDirty;
-    bool                    m_bNeedsSaving;
-    bool                    m_bIsReadonly;
-    bool                    m_bIsWriteProtected;
-    bool                    m_bDoSaveAs;        ///< even if m_path is set, always ask where to save
-    FILETIME                m_lastWriteTime;
-    CPosData                m_position;
-    TabSpace                m_TabSpace;
-    ReadDirection           m_ReadDir;
+    Document              m_document;
+    std::wstring          m_path;
+    int                   m_encoding;
+    int                   m_encodingSaving;
+    EOLFormat             m_format;
+    bool                  m_bHasBOM;
+    bool                  m_bHasBOMSaving;
+    bool                  m_bTrimBeforeSave;
+    bool                  m_bEnsureNewlineAtEnd;
+    bool                  m_bIsDirty;
+    bool                  m_bNeedsSaving;
+    bool                  m_bIsReadonly;
+    bool                  m_bIsWriteProtected;
+    bool                  m_bDoSaveAs; ///< even if m_path is set, always ask where to save
+    FILETIME              m_lastWriteTime;
+    CPosData              m_position;
+    TabSpace              m_TabSpace;
+    ReadDirection         m_ReadDir;
+    std::function<void()> m_saveCallback;
+
 private:
-    std::string             m_language;
+    std::string m_language;
 };

@@ -40,8 +40,8 @@ static constexpr COLORREF bgColor = RGB(255, 255, 255);
 
 struct sLexDetectStrings
 {
-    std::string lang;
-    std::string firstLine;
+    std::string              lang;
+    std::string              firstLine;
     std::vector<std::string> extensions;
 };
 
@@ -408,18 +408,18 @@ void CLexStyles::Load()
                 else if (_wcsicmp(L"DetectionString+", sk) == 0)
                 {
                     sLexDetectStrings lds;
-                    lds.lang = "+" + CUnicodeUtils::StdGetUTF8(langkey);
+                    lds.lang      = "+" + CUnicodeUtils::StdGetUTF8(langkey);
                     lds.firstLine = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
-                    auto sExts = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), L"DetectionStringExts"));
+                    auto sExts    = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), L"DetectionStringExts"));
                     stringtok(lds.extensions, sExts, true, ";");
                     lexDetectStrings.push_back(std::move(lds));
                 }
                 else if (_wcsicmp(L"DetectionString-", sk) == 0)
                 {
                     sLexDetectStrings lds;
-                    lds.lang = "-" + CUnicodeUtils::StdGetUTF8(langkey);
+                    lds.lang      = "-" + CUnicodeUtils::StdGetUTF8(langkey);
                     lds.firstLine = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
-                    auto sExts = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), L"DetectionStringExts"));
+                    auto sExts    = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), L"DetectionStringExts"));
                     stringtok(lds.extensions, sExts, true, ";");
                     lexDetectStrings.push_back(std::move(lds));
                 }
@@ -506,6 +506,24 @@ void CLexStyles::GenerateUserKeywords(LanguageData& ld)
     ld.userkeywordsupdated = false;
 }
 
+void CLexStyles::Reload()
+{
+    m_extLang.clear();
+    m_fileLang.clear();
+    m_Langdata.clear();
+    m_lexerdata.clear();
+    m_lexerSection.clear();
+    m_userlexerdata.clear();
+    m_userextLang.clear();
+    m_autoextLang.clear();
+    m_pathsLang.clear();
+    m_pathsForLang.clear();
+    m_fileTypes.clear();
+    m_filterSpec.clear();
+
+    Load();
+}
+
 const LexerData& CLexStyles::GetLexerDataForLang(const std::string& lang) const
 {
     auto lt = m_Langdata.find(lang);
@@ -579,7 +597,7 @@ std::string CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaW
 {
     if (doc.m_path.empty())
         return "Text";
-    auto sExt = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(doc.m_path));
+    auto sExt           = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(doc.m_path));
     bool hasExtOverride = false;
     for (const auto& m : lexDetectStrings)
     {

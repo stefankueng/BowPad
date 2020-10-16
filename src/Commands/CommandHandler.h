@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ public:
     const auto &                    GetPluginMap() { return m_plugins; }
     int                             GetPluginVersion(const std::wstring& name);
     void                            AddCommand(ICommand * cmd);
+    void                            InsertPlugins(void* obj);
 private:
     template<typename T, typename ... ARGS> T* Add(ARGS ... args)
     {
@@ -65,7 +66,6 @@ private:
         return static_cast<T*>(at.first->second.get());
     }
 
-    void                            InsertPlugins(void * obj);
 
     std::map<UINT, std::unique_ptr<ICommand>>       m_commands;
     std::map<UINT, ICommand*>                       m_nodeletecommands;
