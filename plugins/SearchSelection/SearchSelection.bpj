@@ -1,7 +1,7 @@
 // returns the version of the plugin
 // this callback is not optional! If you fail to implement this, the plugin
 // config dialog won't work properly with your plugin
-function Version() { return 101; }
+function Version() { return 102; }
 
 // this is the main function that gets executed when the command is run, i.e.
 // the button is clicked
@@ -30,9 +30,17 @@ function Execute()
         foundPos = BowPad.SciPositionFromLine(line+1)
         foundPos = BowPad.SciFindText(0, foundPos, docLen, selText).toArray()[0];
     }
-    BowPad.OpenNewTab();
-    BowPad.SciInsertText(0, extractedLines.join());
-    BowPad.SciSetSavePoint();
+    if (extractedLines.length > 1)
+    {
+        BowPad.OpenNewTab();
+        BowPad.SciInsertText(0, extractedLines.join(""));
+        BowPad.SciEmptyUndoBuffer();
+        BowPad.SciSetSavePoint();
+    }
+    else
+    {
+        BowPad.alert("Only a single instance is found in document.");
+    }
 
     return true;
 }

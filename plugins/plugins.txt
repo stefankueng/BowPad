@@ -3,6 +3,6 @@ DisableClearType
 200
 Disables ClearType\nAuthor: wmjordan@163.com, Stefan Küng\n
 SearchSelection
-101
+102
 200
 Search Selection: extracts all lines that contain the selected text.\nStefan Küng, wmjordan\n
