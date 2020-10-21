@@ -250,7 +250,8 @@ void CCommandHandler::ScintillaNotify(SCNotification* pScn)
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->ScintillaNotify(pScn);
+        if (cmd.second)
+            cmd.second->ScintillaNotify(pScn);
     }
 }
 
@@ -262,7 +263,8 @@ void CCommandHandler::TabNotify(TBHDR* ptbhdr)
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->TabNotify(ptbhdr);
+        if (cmd.second)
+            cmd.second->TabNotify(ptbhdr);
     }
 }
 
@@ -274,7 +276,8 @@ void CCommandHandler::OnClose()
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->OnClose();
+        if (cmd.second)
+            cmd.second->OnClose();
     }
 }
 
@@ -286,7 +289,8 @@ void CCommandHandler::OnDocumentClose(DocID id)
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->OnDocumentClose(id);
+        if (cmd.second)
+            cmd.second->OnDocumentClose(id);
     }
 }
 
@@ -298,7 +302,8 @@ void CCommandHandler::OnDocumentOpen(DocID id)
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->OnDocumentOpen(id);
+        if (cmd.second)
+            cmd.second->OnDocumentOpen(id);
     }
 }
 
@@ -310,7 +315,8 @@ void CCommandHandler::OnDocumentSave(DocID id, bool bSaveAs)
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->OnDocumentSave(id, bSaveAs);
+        if (cmd.second)
+            cmd.second->OnDocumentSave(id, bSaveAs);
     }
 }
 
@@ -322,7 +328,8 @@ void CCommandHandler::BeforeLoad()
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->BeforeLoad();
+        if (cmd.second)
+            cmd.second->BeforeLoad();
     }
 }
 
@@ -334,7 +341,8 @@ void CCommandHandler::AfterInit()
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->AfterInit();
+        if (cmd.second)
+            cmd.second->AfterInit();
     }
 }
 
@@ -346,7 +354,8 @@ void CCommandHandler::OnTimer(UINT id)
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->OnTimer(id);
+        if (cmd.second)
+            cmd.second->OnTimer(id);
     }
 }
 
@@ -358,7 +367,8 @@ void CCommandHandler::OnThemeChanged(bool bDark)
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->OnThemeChanged(bDark);
+        if (cmd.second)
+            cmd.second->OnThemeChanged(bDark);
     }
 }
 
@@ -370,7 +380,8 @@ void CCommandHandler::OnLangChanged()
     }
     for (auto& cmd : m_nodeletecommands)
     {
-        cmd.second->OnLangChanged();
+        if (cmd.second)
+            cmd.second->OnLangChanged();
     }
 }
 
@@ -432,5 +443,12 @@ void CCommandHandler::AddCommand(ICommand* cmd)
 {
     m_highestCmdId = max(m_highestCmdId, cmd->GetCmdId());
     auto at        = m_nodeletecommands.emplace(cmd->GetCmdId(), cmd);
+    assert(at.second); // Verify no command has the same ID as an existing command.
+}
+
+void CCommandHandler::AddCommand(UINT cmdId)
+{
+    m_highestCmdId = max(m_highestCmdId, cmdId);
+    auto at = m_nodeletecommands.emplace(cmdId, nullptr);
     assert(at.second); // Verify no command has the same ID as an existing command.
 }

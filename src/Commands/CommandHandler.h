@@ -49,11 +49,16 @@ public:
     const auto& GetPluginMap() { return m_plugins; }
     int         GetPluginVersion(const std::wstring& name);
     void        AddCommand(ICommand* cmd);
+    void        AddCommand(UINT cmdId);
     void        InsertPlugins(void* obj);
 
     const std::map<UINT, std::unique_ptr<ICommand>>& GetCommands() const
     {
         return m_commands;
+    };
+    const std::map<UINT, ICommand*>& GetNoDeleteCommands() const
+    {
+        return m_nodeletecommands;
     };
 
 private:

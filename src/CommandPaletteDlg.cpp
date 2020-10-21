@@ -116,6 +116,40 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                     }
                 }
             }
+            const auto& noDelCommands = CCommandHandler::Instance().GetNoDeleteCommands();
+            for (const auto& cmd : noDelCommands)
+            {
+                auto whereAt = std::find_if(resourceData.begin(), resourceData.end(),
+                    [&](const auto& item) { return ((UINT)item.second == cmd.first); });
+                if (whereAt != resourceData.end())
+                {
+                    CmdPalData data;
+                    data.cmdId = cmd.first;
+
+                    auto sID = whereAt->first + L"_TooltipDescription_RESID";
+
+                    auto ttIDit = resourceData.find(sID);
+                    if (ttIDit != resourceData.end())
+                    {
+                        auto sRes = LoadResourceWString(hRes, ttIDit->second);
+                        data.description = sRes;
+                    }
+
+                    sID = whereAt->first + L"_LabelTitle_RESID";
+
+                    auto ltIDit = resourceData.find(sID);
+                    if (ltIDit != resourceData.end())
+                    {
+                        auto sRes = LoadResourceWString(hRes, ltIDit->second);
+                        data.command = sRes;
+                        SearchReplace(data.command, L"&", L"");
+                    }
+
+                    data.shortcut = CKeyboardShortcutHandler::Instance().GetShortCutStringForCommand((WORD)cmd.first);
+                    if (!data.command.empty())
+                        m_allResults.push_back(data);
+                }
+            }
             std::sort(m_allResults.begin(), m_allResults.end(),
                       [](const CmdPalData& a, const CmdPalData& b) -> bool {
                           return StrCmpLogicalW(a.command.c_str(), b.command.c_str()) < 0;

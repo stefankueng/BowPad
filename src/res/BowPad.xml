@@ -835,7 +835,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.LargeImages>
     </Command>
     <Command Name="cmdSessionLast" Id="10010" />
-    <Command Name="cmdPasteHistory" Id="10011" />
+    <Command Name="cmdPasteHistory" Id="10011" LabelTitle="Show clipboard history"/>
     <Command Name="cmdGroupNewBtn" Id="10012" />
     <Command Name="cmdFileTreeControl" Id="10013" />
     <Command Name="cmdGroupSaveBtn" Id="10014" />

@@ -1310,6 +1310,19 @@ bool CMainWindow::Initialize()
 
     m_fileTree.Init(hResource, *this);
     CCommandHandler::Instance().AddCommand(&m_fileTree);
+    CCommandHandler::Instance().AddCommand(cmdNew);
+    CCommandHandler::Instance().AddCommand(cmdClose);
+    CCommandHandler::Instance().AddCommand(cmdCloseAll);
+    CCommandHandler::Instance().AddCommand(cmdCloseAllButThis);
+    CCommandHandler::Instance().AddCommand(cmdCopyPath);
+    CCommandHandler::Instance().AddCommand(cmdCopyName);
+    CCommandHandler::Instance().AddCommand(cmdCopyDir);
+    CCommandHandler::Instance().AddCommand(cmdExplore);
+    CCommandHandler::Instance().AddCommand(cmdExploreProperties);
+    CCommandHandler::Instance().AddCommand(cmdPasteHistory);
+    CCommandHandler::Instance().AddCommand(cmdTabListDropdownMenu);
+    CCommandHandler::Instance().AddCommand(cmdAbout);
+
     m_editor.Init(hResource, *this);
     m_StatusBar.Init(*this, true);
     m_StatusBar.SetHandlerFunc([](COLORREF clr) -> COLORREF {
