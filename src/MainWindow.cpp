@@ -473,6 +473,37 @@ void CMainWindow::About() const
     dlg.DoModal(hRes, IDD_ABOUTBOX, *this);
 }
 
+void CMainWindow::ShowCommandPalette()
+{
+    if (!m_commandPaletteDlg)
+        m_commandPaletteDlg = std::make_unique<CCommandPaletteDlg>(*this);
+
+    RECT rect{};
+    GetClientRect(*this, &rect);
+    RECT tabrc{};
+    TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
+    MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
+    const int  treeWidth = m_fileTreeVisible ? m_treeWidth : 0;
+    const int  marginy   = CDPIAware::Instance().Scale(*this, 10);
+    const int  marginx   = CDPIAware::Instance().Scale(*this, 30);
+    const UINT flags     = SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
+
+    m_commandPaletteDlg->ShowModeless(hRes, IDD_COMMANDPALETTE, *this, false);
+    RECT thisRc{};
+    GetClientRect(*m_commandPaletteDlg, &thisRc);
+    m_commandPaletteDlg->ClearFilterText();
+    RECT pos{};
+    pos.left   = treeWidth + marginx + rect.left;
+    pos.top    = tabrc.bottom + marginy + rect.top;
+    pos.right  = rect.right - marginx;
+    pos.bottom = pos.top + thisRc.bottom - thisRc.top;
+    MapWindowPoints(*this, nullptr, (LPPOINT)&pos, 2);
+
+    SetWindowPos(*m_commandPaletteDlg, nullptr,
+                 pos.left, pos.top, pos.right - pos.left, pos.bottom - pos.top,
+                 flags);
+}
+
 std::wstring CMainWindow::GetAppName() const
 {
     auto title = LoadResourceWString(hRes, IDS_APP_TITLE);
@@ -1237,6 +1268,9 @@ LRESULT CMainWindow::DoCommand(WPARAM wParam, LPARAM lParam)
             break;
         case cmdAbout:
             About();
+            break;
+        case cmdCommandPalette:
+            ShowCommandPalette();
             break;
         default:
         {

@@ -387,6 +387,9 @@
     <ClInclude Include="..\ext\scintilla\include\Scintilla.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CommandPaletteDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -688,6 +691,9 @@
     </ClCompile>
     <ClCompile Include="CustomLexers\LexLog.cxx">
       <Filter>Lexer</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandPaletteDlg.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

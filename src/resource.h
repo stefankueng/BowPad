@@ -204,6 +204,7 @@
 #define IDS_FETCHING_PLUGINS_LIST       247
 #define IDD_REGEXCAPTUREDLG             247
 #define IDS_NO_PLUGINS_AVAILABLE        248
+#define IDD_COMMANDPALETTE              248
 #define IDS_STATUS_CURPOS               249
 #define IDS_STATUS_CURPOSLONG           250
 #define IDS_STATUSSELECTIONLONG         251
@@ -340,6 +341,8 @@
 #define IDC_CHECK2                      1105
 #define IDC_DOTNEWLINE                  1105
 #define IDC_REMOVEDUPLICATES            1106
+#define IDC_FILTER                      1107
+#define IDC_RESULTS                     1110
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -347,9 +350,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        248
+#define _APS_NEXT_RESOURCE_VALUE        249
 #define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         1107
+#define _APS_NEXT_CONTROL_VALUE         1113
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

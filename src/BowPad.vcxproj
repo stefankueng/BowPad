@@ -358,6 +358,7 @@
     <ClInclude Include="BPBaseDialog.h" />
     <ClInclude Include="ChoseDlg.h" />
     <ClInclude Include="ColorButton.h" />
+    <ClInclude Include="CommandPaletteDlg.h" />
     <ClInclude Include="Commands\CmdBlanks.h" />
     <ClInclude Include="Commands\CmdBookmarks.h" />
     <ClInclude Include="Commands\CmdClipboard.h" />
@@ -484,6 +485,7 @@
     <ClCompile Include="BPBaseDialog.cpp" />
     <ClCompile Include="ChoseDlg.cpp" />
     <ClCompile Include="ColorButton.cpp" />
+    <ClCompile Include="CommandPaletteDlg.cpp" />
     <ClCompile Include="Commands\CmdBlanks.cpp" />
     <ClCompile Include="Commands\CmdBookmarks.cpp" />
     <ClCompile Include="Commands\CmdClipboard.cpp" />

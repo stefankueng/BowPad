@@ -31,46 +31,52 @@ public:
 
 public:
     static CCommandHandler& Instance();
-    static void ShutDown();
+    static void             ShutDown();
 
-    void                            Init(void* obj);
-    ICommand *                      GetCommand(UINT cmdId);
-    void                            ScintillaNotify(SCNotification * pScn);
-    void                            TabNotify(TBHDR * ptbhdr);
-    void                            OnClose();
-    void                            OnDocumentClose(DocID id);
-    void                            OnDocumentOpen(DocID id);
-    void                            OnDocumentSave(DocID id, bool bSaveAs);
-    void                            BeforeLoad();
-    void                            AfterInit();
-    void                            OnTimer(UINT id);
-    void                            OnThemeChanged(bool bDark);
-    void                            OnLangChanged();
-    const auto &                    GetPluginMap() { return m_plugins; }
-    int                             GetPluginVersion(const std::wstring& name);
-    void                            AddCommand(ICommand * cmd);
-    void                            InsertPlugins(void* obj);
+    void        Init(void* obj);
+    ICommand*   GetCommand(UINT cmdId);
+    void        ScintillaNotify(SCNotification* pScn);
+    void        TabNotify(TBHDR* ptbhdr);
+    void        OnClose();
+    void        OnDocumentClose(DocID id);
+    void        OnDocumentOpen(DocID id);
+    void        OnDocumentSave(DocID id, bool bSaveAs);
+    void        BeforeLoad();
+    void        AfterInit();
+    void        OnTimer(UINT id);
+    void        OnThemeChanged(bool bDark);
+    void        OnLangChanged();
+    const auto& GetPluginMap() { return m_plugins; }
+    int         GetPluginVersion(const std::wstring& name);
+    void        AddCommand(ICommand* cmd);
+    void        InsertPlugins(void* obj);
+
+    const std::map<UINT, std::unique_ptr<ICommand>>& GetCommands() const
+    {
+        return m_commands;
+    };
+
 private:
-    template<typename T, typename ... ARGS> T* Add(ARGS ... args)
+    template <typename T, typename... ARGS>
+    T* Add(ARGS... args)
     {
         // Construct the type we want. We need to get the id out of it.
         // Move it into the map, then return the pointer we got
         // out. We know it must be the type we want because we just created it.
         // We could use shared_ptr here but we control the life time so
         // no point paying the price as if we didn't.
-        auto pCmd = std::make_unique<T>(std::forward<ARGS>(args)...);
-        auto cmdId = pCmd->GetCmdId();
+        auto pCmd      = std::make_unique<T>(std::forward<ARGS>(args)...);
+        auto cmdId     = pCmd->GetCmdId();
         m_highestCmdId = max(m_highestCmdId, cmdId);
-        auto at = m_commands.emplace(cmdId, std::move(pCmd));
+        auto at        = m_commands.emplace(cmdId, std::move(pCmd));
         assert(at.second); // Verify no command has the same ID as an existing command.
         return static_cast<T*>(at.first->second.get());
     }
 
-
-    std::map<UINT, std::unique_ptr<ICommand>>       m_commands;
-    std::map<UINT, ICommand*>                       m_nodeletecommands;
-    std::map<UINT, std::wstring>                    m_plugins;
-    std::map<std::wstring, int>                     m_pluginversion;
-    UINT                                            m_highestCmdId;
-    static std::unique_ptr<CCommandHandler>         m_instance;
+    std::map<UINT, std::unique_ptr<ICommand>> m_commands;
+    std::map<UINT, ICommand*>                 m_nodeletecommands;
+    std::map<UINT, std::wstring>              m_plugins;
+    std::map<std::wstring, int>               m_pluginversion;
+    UINT                                      m_highestCmdId;
+    static std::unique_ptr<CCommandHandler>   m_instance;
 };

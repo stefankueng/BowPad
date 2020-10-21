@@ -25,6 +25,7 @@
 #include "TabBtn.h"
 #include "ProgressBar.h"
 #include "CustomTooltip.h"
+#include "CommandPaletteDlg.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -143,6 +144,7 @@ private:
     void                          ShowCurDocExplorerProperties() const;
     void                          PasteHistory();
     void                          About() const;
+    void                          ShowCommandPalette();
     bool                          HasOutsideChangesOccurred() const;
     void                          CheckForOutsideChanges();
     void                          UpdateCaptionBar();
@@ -232,7 +234,7 @@ private:
     UI_HSBCOLOR                                     m_normalThemeText;
     UI_HSBCOLOR                                     m_normalThemeBack;
     UI_HSBCOLOR                                     m_normalThemeHigh;
-
+    std::unique_ptr<CCommandPaletteDlg>             m_commandPaletteDlg;
     // status bar icons
     HICON m_hShieldIcon;
     HICON m_hCapslockIcon;
