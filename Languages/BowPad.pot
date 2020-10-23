@@ -84,6 +84,10 @@ msgstr ""
 msgid "&Reload"
 msgstr ""
 
+#. Resource IDs: (1106)
+msgid "&Remove duplicate lines"
+msgstr ""
+
 #. Resource IDs: (1003)
 msgid "&Replace"
 msgstr ""
@@ -196,7 +200,7 @@ msgid "Auto save"
 msgstr ""
 
 #. Resource IDs: (60486)
-msgid "Auto-save"
+msgid "Auto-save on close"
 msgstr ""
 
 #. Resource IDs: (60488)
@@ -339,6 +343,10 @@ msgstr ""
 msgid "Check for errors only in comments, strings and text"
 msgstr ""
 
+#. Resource IDs: (60615)
+msgid "Check spelling"
+msgstr ""
+
 #. Resource IDs: (65535)
 msgid "Chose the encoding of new files"
 msgstr ""
@@ -423,10 +431,6 @@ msgstr ""
 msgid "Comments the selected text"
 msgstr ""
 
-#. Resource IDs: (60545)
-msgid "Configure"
-msgstr ""
-
 #. Resource IDs: (60522)
 msgid "Configure Keyboard Shortcuts"
 msgstr ""
@@ -449,6 +453,10 @@ msgstr ""
 
 #. Resource IDs: (60472, 60473)
 msgid "Configure custom commands"
+msgstr ""
+
+#. Resource IDs: (60545)
+msgid "Configure plugins"
 msgstr ""
 
 #. Resource IDs: (60144, 60146)
@@ -787,6 +795,10 @@ msgstr ""
 #. Resource IDs: (207)
 #, c-format
 msgid "Encoding: %s"
+msgstr ""
+
+#. Resource IDs: (264)
+msgid "Enter command name"
 msgstr ""
 
 #. Resource IDs: (65535)
@@ -1923,6 +1935,10 @@ msgstr ""
 msgid "Show Whitespaces"
 msgstr ""
 
+#. Resource IDs: (60633)
+msgid "Show clipboard history"
+msgstr ""
+
 #. Resource IDs: (60127)
 msgid "Show line numbers"
 msgstr ""
@@ -1979,7 +1995,7 @@ msgstr ""
 msgid "Spell Check"
 msgstr ""
 
-#. Resource IDs: (60607, 60608, 60615, 60616)
+#. Resource IDs: (60607, 60608, 60616)
 msgid "Spell checker"
 msgstr ""
 
