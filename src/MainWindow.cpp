@@ -4271,7 +4271,7 @@ void CMainWindow::SetTheme(bool dark)
         const auto& doc = m_DocManager.GetDocumentFromID(activeTabId);
         m_editor.SetupLexerForLang(doc.GetLanguage());
     }
-
+    DarkModeHelper::Instance().RefreshTitleBarThemeColor(*this, dark);
     CCommandHandler::Instance().OnThemeChanged(dark);
     RedrawWindow(*this, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW | RDW_ERASENOW);
     RECT rc{0};
