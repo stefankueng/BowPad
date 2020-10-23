@@ -65,6 +65,8 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             m_hFilter  = GetDlgItem(*this, IDC_FILTER);
             m_hResults = GetDlgItem(*this, IDC_RESULTS);
 
+            ResString sFilterCue(hRes, IDS_COMMANDPALETTE_FILTERCUE);
+            SendMessage(m_hFilter, EM_SETCUEBANNER, 1, (LPARAM)sFilterCue.c_str());
             SetWindowSubclass(m_hFilter, EditSubClassProc, 0, reinterpret_cast<DWORD_PTR>(this));
 
             auto        resourceData = CKeyboardShortcutHandler::Instance().GetResourceData();
