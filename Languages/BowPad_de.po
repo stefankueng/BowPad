@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2020-09-01 20:04+0200\n"
+"PO-Revision-Date: 2020-10-23 22:34+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -106,6 +106,10 @@ msgstr "Ö&ffnen"
 #. Resource IDs: (60354)
 msgid "&Reload"
 msgstr "Neu &laden"
+
+#. Resource IDs: (1106)
+msgid "&Remove duplicate lines"
+msgstr "doppelte Zeilen entfernen"
 
 #. Resource IDs: (1003)
 msgid "&Replace"
@@ -227,8 +231,8 @@ msgid "Auto save"
 msgstr "Auto-Speichern"
 
 #. Resource IDs: (60486)
-msgid "Auto-save"
-msgstr "Auto-Speichern"
+msgid "Auto-save on close"
+msgstr "Auto-Speichern beim Beenden"
 
 #. Resource IDs: (60488)
 msgid "Auto-saves modified files"
@@ -395,6 +399,10 @@ msgstr "Auf Updates überprüfen"
 msgid "Check for errors only in comments, strings and text"
 msgstr "Überprüfe nur in Kommentaren, Strings und Text"
 
+#. Resource IDs: (60615)
+msgid "Check spelling"
+msgstr "Rechtschreibung prüfen"
+
 #. Resource IDs: (65535)
 msgid "Chose the encoding of new files"
 msgstr "Wähle die Kodierung von neuen Dateien"
@@ -483,10 +491,6 @@ msgstr "Kommentieren"
 msgid "Comments the selected text"
 msgstr "Kommentiert den ausgewählten Text"
 
-#. Resource IDs: (60545)
-msgid "Configure"
-msgstr "Konfigurieren"
-
 #. Resource IDs: (60522)
 msgid "Configure Keyboard Shortcuts"
 msgstr "Tastenkürzel konfigurieren"
@@ -510,6 +514,10 @@ msgstr "Konfiguriert Farben, Schriftarten, Stile und Grössen"
 #. Resource IDs: (60472, 60473)
 msgid "Configure custom commands"
 msgstr "Benutzerdefinierte Befehle konfigurieren"
+
+#. Resource IDs: (60545)
+msgid "Configure plugins"
+msgstr "Plugins konfigurieren"
 
 #. Resource IDs: (60144, 60146)
 msgid "Convert to"
@@ -900,6 +908,10 @@ msgstr "Kodierung"
 #, c-format
 msgid "Encoding: %s"
 msgstr "Kodierung: %s"
+
+#. Resource IDs: (264)
+msgid "Enter command name"
+msgstr "Befehlsnamen eingeben"
 
 #. Resource IDs: (65535)
 msgid "Extension"
@@ -2154,6 +2166,10 @@ msgstr "Zeige Eigenschaften"
 msgid "Show Whitespaces"
 msgstr "Zeige Leerzeichen"
 
+#. Resource IDs: (60633)
+msgid "Show clipboard history"
+msgstr "Verlauf der Zwischenablage"
+
 #. Resource IDs: (60127)
 msgid "Show line numbers"
 msgstr "Zeige Zeilennummern"
@@ -2211,7 +2227,7 @@ msgstr "Leerzeichen zu Tabulatoren"
 msgid "Spell Check"
 msgstr "Rechtschreibung"
 
-#. Resource IDs: (60607, 60608, 60615, 60616)
+#. Resource IDs: (60607, 60608, 60616)
 msgid "Spell checker"
 msgstr "Rechtschreibung"
 
@@ -2738,11 +2754,11 @@ msgstr "Schaltet Klappung aus"
 msgid "{ %d lines }"
 msgstr "{ %d Linien }"
 
+#~ msgid "Configure"
+#~ msgstr "Konfigurieren"
+
 #~ msgid "Default Encoding"
 #~ msgstr "Default Kodierung"
 
 #~ msgid "Set Encoding"
 #~ msgstr "Setze Kodierung"
-
-#~ msgid "Configure plugins"
-#~ msgstr "Plugins konfigurieren"
