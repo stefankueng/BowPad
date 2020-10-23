@@ -1565,6 +1565,7 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         return false;
 
     auto isActiveTab = docID == m_TabBar.GetCurrentTabId();
+    bool updateFileTree = false;
     if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
     {
         bSaveAs = true;
@@ -1591,8 +1592,7 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         CMRU::Instance().AddPath(doc.m_path);
         if ((isActiveTab && m_fileTree.GetPath().empty()) || bSaveAs)
         {
-            m_fileTree.SetPath(CPathUtils::GetParentDirectory(doc.m_path), bSaveAs);
-            ResizeChildWindows();
+            updateFileTree = true;
         }
     }
     if (!doc.m_path.empty())
@@ -1639,6 +1639,11 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
             UpdateCaptionBar();
             UpdateStatusBar(true);
             m_editor.Call(SCI_SETSAVEPOINT);
+        }
+        if (updateFileTree)
+        {
+            m_fileTree.SetPath(CPathUtils::GetParentDirectory(doc.m_path), bSaveAs);
+            ResizeChildWindows();
         }
         CCommandHandler::Instance().OnDocumentSave(docID, bSaveAs);
     }
