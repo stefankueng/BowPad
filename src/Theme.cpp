@@ -201,6 +201,7 @@ bool CTheme::SetThemeForDialog(HWND hWnd, bool bDark)
     }
     EnumThreadWindows(GetCurrentThreadId(), AdjustThemeForChildrenProc, bDark ? TRUE : FALSE);
     EnumChildWindows(hWnd, AdjustThemeForChildrenProc, bDark ? TRUE : FALSE);
+    DarkModeHelper::Instance().RefreshTitleBarThemeColor(hWnd, bDark);
     ::RedrawWindow(hWnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
     return true;
 }
@@ -271,11 +272,11 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                  (wcscmp(szWndClassName, L"ComboLBox") == 0) ||
                  (wcscmp(szWndClassName, WC_COMBOBOX) == 0))
         {
-            SetWindowTheme(hwnd, L"DarkMode_Explorer", nullptr);
+            SetWindowTheme(hwnd, L"Explorer", nullptr);
             HWND hCombo = hwnd;
             if (wcscmp(szWndClassName, WC_COMBOBOXEX) == 0)
             {
-                SendMessage(hwnd, CBEM_SETWINDOWTHEME, 0, (LPARAM)L"DarkMode_Explorer");
+                SendMessage(hwnd, CBEM_SETWINDOWTHEME, 0, (LPARAM)L"Explorer");
                 hCombo = (HWND)SendMessage(hwnd, CBEM_GETCOMBOCONTROL, 0, 0);
             }
             if (hCombo)
@@ -289,9 +290,9 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                     DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndItem, (BOOL)lParam);
                     DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndCombo, (BOOL)lParam);
 
-                    SetWindowTheme(info.hwndList, L"DarkMode_Explorer", nullptr);
-                    SetWindowTheme(info.hwndItem, L"DarkMode_Explorer", nullptr);
-                    SetWindowTheme(info.hwndCombo, L"DarkMode_Explorer", nullptr);
+                    SetWindowTheme(info.hwndList, L"Explorer", nullptr);
+                    SetWindowTheme(info.hwndItem, L"Explorer", nullptr);
+                    SetWindowTheme(info.hwndCombo, L"CFD", nullptr);
                 }
             }
         }
