@@ -48,7 +48,7 @@ LRESULT CAboutDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam
 #ifdef _WIN64
             swprintf_s(verbuf, _countof(verbuf), L"BowPad version %d.%d.%d.%d (64-bit)", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
 #else
-            swprintf_s(verbuf, _countof(verbuf), "BowPad version %d.%d.%d.%d", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
+            swprintf_s(verbuf, _countof(verbuf), L"BowPad version %d.%d.%d.%d", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
 #endif
             SetDlgItemText(hwndDlg, IDC_VERSIONLABEL, verbuf);
         }
