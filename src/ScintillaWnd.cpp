@@ -800,6 +800,20 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
         pos.m_xOffset      = Call(SCI_GETXOFFSET);
         pos.m_nSelMode     = Call(SCI_GETSELECTIONMODE);
         pos.m_nScrollWidth = Call(SCI_GETSCROLLWIDTH);
+
+        pos.m_lineStateVector.clear();
+        size_t contractedFoldHeaderLine = 0;
+        do
+        {
+            contractedFoldHeaderLine = static_cast<size_t>(Call(SCI_CONTRACTEDFOLDNEXT, contractedFoldHeaderLine));
+            if (contractedFoldHeaderLine != -1)
+            {
+                // Store contracted line
+                pos.m_lineStateVector.push_back(contractedFoldHeaderLine);
+                // Start next search with next line
+                ++contractedFoldHeaderLine;
+            }
+        } while (contractedFoldHeaderLine != -1);
     }
     else
     {
@@ -809,6 +823,31 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
 
 void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
 {
+    // if the document hasn't been styled yet, do it now
+    // otherwise restoring the folds won't work.
+    auto endStyled = Call(SCI_GETENDSTYLED);
+    auto len = Call(SCI_GETTEXTLENGTH);
+    if (endStyled < len)
+        Call(SCI_COLOURISE, 0, -1);
+
+    for (const auto& foldLine : pos.m_lineStateVector)
+    {
+        auto level = Call(SCI_GETFOLDLEVEL, foldLine);
+
+        auto headerLine = 0;
+        if (level & SC_FOLDLEVELHEADERFLAG)
+            headerLine = static_cast<int>(foldLine);
+        else
+        {
+            headerLine = static_cast<int>(Call(SCI_GETFOLDPARENT, foldLine));
+            if (headerLine == -1)
+                return;
+        }
+
+        if (Call(SCI_GETFOLDEXPANDED, headerLine) != 0)
+            Call(SCI_TOGGLEFOLD, headerLine);
+    }
+
     Call(SCI_GOTOPOS, 0);
 
     Call(SCI_SETSELECTIONMODE, pos.m_nSelMode);

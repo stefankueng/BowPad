@@ -60,13 +60,14 @@ public:
     {
     }
 
-    size_t m_nFirstVisibleLine;
-    size_t m_nWrapLineOffset;
-    size_t m_nStartPos;
-    size_t m_nEndPos;
-    size_t m_xOffset;
-    size_t m_nSelMode;
-    size_t m_nScrollWidth;
+    size_t              m_nFirstVisibleLine;
+    size_t              m_nWrapLineOffset;
+    size_t              m_nStartPos;
+    size_t              m_nEndPos;
+    size_t              m_xOffset;
+    size_t              m_nSelMode;
+    size_t              m_nScrollWidth;
+    std::vector<size_t> m_lineStateVector;
 };
 
 class CDocument
