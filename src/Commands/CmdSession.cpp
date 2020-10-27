@@ -235,11 +235,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         pos.m_lineStateVector.clear();
         if (folds)
         {
-            std::vector<std::wstring> lineStateVector;
-            stringtok(lineStateVector, folds, true, L";", false);
-            wchar_t* endp = nullptr;
-            for (const auto& s : lineStateVector)
-                pos.m_lineStateVector.push_back(wcstoull(s.c_str(), &endp, 10));
+            stringtok(pos.m_lineStateVector, folds, true, L";", false);
         }
         auto origPath = settings.GetString(g_sessionSection, CStringUtils::Format(L"origpath%d", fileNum).c_str(), nullptr);
         if (origPath)
