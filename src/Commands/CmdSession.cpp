@@ -29,6 +29,11 @@
 #include "OnOutOfScope.h"
 #include "ResString.h"
 #include "ProgressDlg.h"
+#include <sstream>
+#include <string>
+#include <vector>
+#include <iterator>
+#include <iostream>
 
 namespace
 {
@@ -50,7 +55,7 @@ static bool GetAutoLoad()
 static std::wstring GetBackupPath()
 {
     auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
-    handleModified = handleModified && GetAutoLoad();
+    handleModified      = handleModified && GetAutoLoad();
     auto sessionPath    = CPathUtils::GetAppDataPath() + L"\\BowPad\\backup";
     // check for portable version
     HKEY subKey = nullptr;
@@ -78,9 +83,9 @@ void CCmdSessionLoad::OnClose()
 {
     // BowPad is closing, save the current session
 
-    auto& settings  = CIniSettings::Instance();
-    bool  bAutoLoad = GetAutoLoad();
-    auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
+    auto& settings       = CIniSettings::Instance();
+    bool  bAutoLoad      = GetAutoLoad();
+    auto  handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
     // first remove the whole session section
     settings.Delete(g_sessionSection, nullptr);
     // now restore the settings of the session section
@@ -99,6 +104,14 @@ void CCmdSessionLoad::OnClose()
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", saveindex).c_str(), pos.m_xOffset);
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", saveindex).c_str(), pos.m_nFirstVisibleLine);
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"wraplineoffset%d", saveindex).c_str(), pos.m_nWrapLineOffset);
+        std::wostringstream out;
+        if (!pos.m_lineStateVector.empty())
+        {
+            std::copy(pos.m_lineStateVector.begin(), pos.m_lineStateVector.end() - 1, std::ostream_iterator<size_t, wchar_t>(out, L";"));
+            out << pos.m_lineStateVector.back();
+        }
+        std::wstring result(out.str());
+        settings.SetString(g_sessionSection, CStringUtils::Format(L"foldlines%d", saveindex).c_str(), result.c_str());
     };
 
     auto sessionPath = GetBackupPath();
@@ -218,7 +231,16 @@ void CCmdSessionLoad::RestoreSavedSession()
         pos.m_nWrapLineOffset   = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"wraplineoffset%d", fileNum).c_str(), 0);
         doc.m_TabSpace          = (TabSpace)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
         doc.m_ReadDir           = (ReadDirection)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0);
-
+        auto folds              = settings.GetString(g_sessionSection, CStringUtils::Format(L"foldlines%d", fileNum).c_str(), 0);
+        pos.m_lineStateVector.clear();
+        if (folds)
+        {
+            std::vector<std::wstring> lineStateVector;
+            stringtok(lineStateVector, folds, true, L";", false);
+            wchar_t* endp = nullptr;
+            for (const auto& s : lineStateVector)
+                pos.m_lineStateVector.push_back(wcstoull(s.c_str(), &endp, 10));
+        }
         auto origPath = settings.GetString(g_sessionSection, CStringUtils::Format(L"origpath%d", fileNum).c_str(), nullptr);
         if (origPath)
         {
@@ -296,7 +318,7 @@ CCmdSessionAutoSave::CCmdSessionAutoSave(void* obj)
 bool CCmdSessionAutoSave::Execute()
 {
     auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
-    handleModified = !handleModified && GetAutoLoad();
+    handleModified      = !handleModified && GetAutoLoad();
     CIniSettings::Instance().SetInt64(g_sessionSection, L"handlemodified", handleModified ? 1 : 0);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
@@ -308,7 +330,7 @@ HRESULT CCmdSessionAutoSave::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
     if (UI_PKEY_BooleanValue == key)
     {
         auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
-        handleModified = handleModified && GetAutoLoad();
+        handleModified      = handleModified && GetAutoLoad();
         return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, handleModified, ppropvarNewValue);
     }
     else if (UI_PKEY_Enabled == key)
