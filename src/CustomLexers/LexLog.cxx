@@ -80,17 +80,9 @@ static inline bool IsAWordChar(const int ch)
     return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '$');
 }
 
-static inline bool find_caseinsensitive(const std::string& haystack, const std::string& needle)
+static char ascii_toupper_char(char c)
 {
-    for (size_t i = 0; i < haystack.size(); ++i)
-    {
-        if (_strnicmp(&haystack[i], needle.c_str(), needle.size()) == 0)
-        {
-            if (i == 0 || (!isalpha(haystack[i - 1])) && haystack[i - 1] != '"')
-                return true;
-        }
-    }
-    return false;
+    return ('a' <= c && c <= 'z') ? c ^ 0x20 : c;    // ^ autovectorizes to PXOR: runs on more ports than paddb
 }
 
 static LogStates GetState(LogStyles style)
@@ -270,6 +262,8 @@ public:
 void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess)
 {
     bool numberIsHex = false;
+    size_t lineSize = 1000;
+    auto line = std::make_unique<char[]>(lineSize);
 
     LexAccessor  styler(pAccess);
     StyleContext sc(startPos, length, initStyle, styler);
@@ -282,28 +276,35 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
         {
             logState            = LogStates::None;
             auto        lineEnd = pAccess->LineEnd(sc.currentLine);
-            std::string line;
-            line.resize(lineEnd - sc.currentPos + 2);
-            pAccess->GetCharRange(line.data(), sc.currentPos, lineEnd - sc.currentPos);
-            if (find_caseinsensitive(line, "debug"))
+            auto lineLen = lineEnd - sc.currentPos + 2;
+            if (lineSize < lineLen)
+            {
+                lineSize = lineLen + 200;
+                line = std::make_unique<char[]>(lineSize);
+            }
+            pAccess->GetCharRange(line.get(), sc.currentPos, lineEnd - sc.currentPos);
+            for (size_t i = 0; i < lineLen; ++i)
+                line[i] = ascii_toupper_char(line[i]);
+            std::string_view sline(line.get(), lineEnd - sc.currentPos + 2);
+            if (sline.find("DEBUG") != std::string::npos)
                 logState = LogStates::Debug;
-            if (find_caseinsensitive(line, "{d}"))
+            if (sline.find("{D}") != std::string::npos)
                 logState = LogStates::Debug;
-            if (find_caseinsensitive(line, "inf"))
+            if (sline.find("INF") != std::string::npos)
                 logState = LogStates::Info;
-            if (find_caseinsensitive(line, "{i}"))
+            if (sline.find("{I}") != std::string::npos)
                 logState = LogStates::Info;
-            if (find_caseinsensitive(line, "warn"))
+            if (sline.find("WARN") != std::string::npos)
                 logState = LogStates::Warn;
-            if (find_caseinsensitive(line, "{w}"))
+            if (sline.find("{W}") != std::string::npos)
                 logState = LogStates::Warn;
-            if (find_caseinsensitive(line, "err"))
+            if (sline.find("{ERR}") != std::string::npos)
                 logState = LogStates::Error;
-            if (find_caseinsensitive(line, "crit"))
+            if (sline.find("{CRIT}") != std::string::npos)
                 logState = LogStates::Error;
-            if (find_caseinsensitive(line, "{e}"))
+            if (sline.find("{E}") != std::string::npos)
                 logState = LogStates::Error;
-            if (find_caseinsensitive(line, "{c}"))
+            if (sline.find("{C}") != std::string::npos)
                 logState = LogStates::Error;
         }
         // Determine if the current state should terminate.
