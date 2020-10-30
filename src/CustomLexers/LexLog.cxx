@@ -353,9 +353,10 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
                          (!numberIsHex && !(MakeLowerCase(sc.ch) == 'e' || IsADigit(sc.ch) || sc.ch == '.' || sc.ch == '-' || sc.ch == '+')))
                 {
                     // check '-' for possible -10e-5. Add '+' as well.
-                    numberIsHex = false;
-                    sc.ChangeState(GetLogStyle(LogStyles::Default, logState));
-                    sc.SetState(GetLogStyle(LogStyles::Default, logState));
+                    numberIsHex    = false;
+                    auto baseStyle = GetLogStyle(LogStyles::Default, logState);
+                    sc.ChangeState(baseStyle);
+                    sc.SetState(baseStyle);
                 }
                 break;
             case LogStyles::String:
@@ -438,67 +439,7 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
 
 void SCI_METHOD LexerLog::Fold(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess)
 {
-    LexAccessor   styler(pAccess);
-    Sci_PositionU endPos       = startPos + length;
-    Sci_Position  lineCurrent  = styler.GetLine(startPos);
-    int           visibleChars = 0;
-
-    // Backtrack to previous line in case need to fix its fold status
-    if (startPos > 0)
-    {
-        if (lineCurrent > 0)
-        {
-            --lineCurrent;
-            startPos = styler.LineStart(lineCurrent);
-        }
-    }
-
-    int levelPrev = SC_FOLDLEVELBASE;
-    if (lineCurrent > 0)
-        levelPrev = styler.LevelAt(lineCurrent - 1) >> 16;
-    int  levelCurrent = levelPrev;
-    int  state        = GetState((LogStyles)initStyle);
-    auto stateNext    = GetState((LogStyles)styler.StyleAt(startPos));
-    char chNext       = styler[startPos];
-
-    for (Sci_PositionU i = startPos; i < endPos; ++i)
-    {
-        state          = stateNext;
-        stateNext      = GetState((LogStyles)styler.StyleAt(i + 1));
-        auto stylePrev = (i) ? GetState((LogStyles)styler.StyleAt(i - 1)) : LogStates::Debug;
-        char ch        = chNext;
-        chNext         = styler.SafeGetCharAt(i + 1);
-        bool atEOL     = (ch == '\r' && chNext != '\n') || (ch == '\n');
-
-        if (state != stylePrev)
-        {
-            ++levelCurrent;
-        }
-        else if (state != stateNext)
-        {
-            --levelCurrent;
-        }
-        if (atEOL || i == (endPos - 1))
-        {
-            int lev = levelPrev;
-            lev |= levelCurrent << 16;
-            if (visibleChars == 0)
-                lev |= SC_FOLDLEVELWHITEFLAG;
-            if ((levelCurrent > levelPrev) && (visibleChars > 0))
-                lev |= SC_FOLDLEVELHEADERFLAG;
-            if (lev != styler.LevelAt(lineCurrent))
-            {
-                styler.SetLevel(lineCurrent, lev);
-            }
-            ++lineCurrent;
-            levelPrev    = levelCurrent;
-            visibleChars = 0;
-        }
-        if (!isspacechar(ch))
-            ++visibleChars;
-    }
-    int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
-    styler.SetLevel(lineCurrent, levelPrev | flagsNext);
+    // no folding : log files are usually big, and this simply is too slow
 }
 
 LexerModule lmLog(SCLEX_AUTOMATIC + 101, LexerLog::LexerFactorySimple, "log", 0);
