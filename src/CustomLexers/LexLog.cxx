@@ -82,7 +82,7 @@ static inline bool IsAWordChar(const int ch)
 
 static char ascii_toupper_char(char c)
 {
-    return ('a' <= c && c <= 'z') ? c ^ 0x20 : c;    // ^ autovectorizes to PXOR: runs on more ports than paddb
+    return ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ^ autovectorizes to PXOR: runs on more ports than paddb
 }
 
 static LogStates GetState(LogStyles style)
@@ -261,9 +261,9 @@ public:
 
 void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess)
 {
-    bool numberIsHex = false;
-    size_t lineSize = 1000;
-    auto line = std::make_unique<char[]>(lineSize);
+    bool   numberIsHex = false;
+    size_t lineSize    = 1000;
+    auto   line        = std::make_unique<char[]>(lineSize);
 
     LexAccessor  styler(pAccess);
     StyleContext sc(startPos, length, initStyle, styler);
@@ -274,38 +274,68 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
     {
         if (sc.atLineStart)
         {
-            logState            = LogStates::None;
-            auto        lineEnd = pAccess->LineEnd(sc.currentLine);
+            logState     = LogStates::None;
+            auto lineEnd = pAccess->LineEnd(sc.currentLine);
             auto lineLen = lineEnd - sc.currentPos + 2;
             if (lineSize < lineLen)
             {
                 lineSize = lineLen + 200;
-                line = std::make_unique<char[]>(lineSize);
+                line     = std::make_unique<char[]>(lineSize);
             }
             pAccess->GetCharRange(line.get(), sc.currentPos, lineEnd - sc.currentPos);
             for (size_t i = 0; i < lineLen; ++i)
                 line[i] = ascii_toupper_char(line[i]);
             std::string_view sline(line.get(), lineEnd - sc.currentPos + 2);
-            if (sline.find("DEBUG") != std::string::npos)
-                logState = LogStates::Debug;
-            if (sline.find("{D}") != std::string::npos)
-                logState = LogStates::Debug;
-            if (sline.find("INF") != std::string::npos)
-                logState = LogStates::Info;
-            if (sline.find("{I}") != std::string::npos)
-                logState = LogStates::Info;
-            if (sline.find("WARN") != std::string::npos)
-                logState = LogStates::Warn;
-            if (sline.find("{W}") != std::string::npos)
-                logState = LogStates::Warn;
-            if (sline.find("{ERR}") != std::string::npos)
-                logState = LogStates::Error;
-            if (sline.find("{CRIT}") != std::string::npos)
-                logState = LogStates::Error;
-            if (sline.find("{E}") != std::string::npos)
-                logState = LogStates::Error;
-            if (sline.find("{C}") != std::string::npos)
-                logState = LogStates::Error;
+            if (auto pos = sline.find("DEBUG"); pos != std::string::npos)
+            {
+                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    logState = LogStates::Debug;
+            }
+            if (auto pos = sline.find("{D}"); pos != std::string::npos)
+            {
+                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    logState = LogStates::Debug;
+            }
+            if (auto pos = sline.find("INF"); pos != std::string::npos)
+            {
+                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    logState = LogStates::Info;
+            }
+            if (auto pos = sline.find("{I}"); pos != std::string::npos)
+            {
+                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    logState = LogStates::Info;
+            }
+            if (auto pos = sline.find("WARN"); pos != std::string::npos)
+            {
+                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    logState = LogStates::Warn;
+            }
+            if (auto pos = sline.find("{W}"); pos != std::string::npos)
+            {
+                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    logState = LogStates::Warn;
+            }
+            if (auto pos = sline.find("{ERR}"); pos != std::string::npos)
+            {
+                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    logState = LogStates::Error;
+            }
+            if (auto pos = sline.find("{CRIT}"); pos != std::string::npos)
+            {
+                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    logState = LogStates::Error;
+            }
+            if (auto pos = sline.find("{E}"); pos != std::string::npos)
+            {
+                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    logState = LogStates::Error;
+            }
+            if (auto pos = sline.find("{C}"); pos != std::string::npos)
+            {
+                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    logState = LogStates::Error;
+            }
         }
         // Determine if the current state should terminate.
         switch (sc.state)
