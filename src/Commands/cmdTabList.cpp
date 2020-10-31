@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017 - Stefan Kueng
+// Copyright (C) 2014-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ circumstances anyway.
 
 */
 
-HRESULT CCmdTabList::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdTabList::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
 {
     HRESULT hr = E_FAIL;
 
@@ -78,7 +78,7 @@ HRESULT CCmdTabList::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
             return hr;
 
         // The list will retain whatever from last time so clear it.
-        collection->Clear();
+        hr = collection->Clear();
         // We will rebuild this information so clear it.
         m_menuInfo.clear();
 
@@ -88,11 +88,10 @@ HRESULT CCmdTabList::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const 
             return E_FAIL;
         if (!HasActiveDocument())
             return E_FAIL;
-        const auto& doc = GetDocumentFromID(docId);
 
-        PopulateMenu(doc, collection);
+        PopulateMenu(collection);
 
-        return S_OK;
+        return hr;
     }
     else if (key == UI_PKEY_SelectedItem)
     {
@@ -134,30 +133,43 @@ bool CCmdTabList::IsServiceAvailable() const
 // Populate the dropdown with the details. Returns false if
 // any options couldn't be added but for some reason.
 // Not a good enough reason not to show the menu though.
-bool CCmdTabList::PopulateMenu(const CDocument& /*doc*/, IUICollectionPtr& collection)
+bool CCmdTabList::PopulateMenu(IUICollectionPtr& collection)
 {
     IUIImagePtr pImg;
-    HRESULT hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
+    HRESULT     hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
     // If image creation fails we can't do much about it other than report it.
     // Images aren't essential, so try to continue without them if we need to.
     CAppUtils::FailedShowMessage(hr);
 
     int tabCount = GetTabCount();
-    for ( int i  = 0; i < tabCount; ++i)
+    for (int i = 0; i < tabCount; ++i)
     {
         // Don't store tab ids since they won't match after a tab drag.
-        m_menuInfo.push_back(TabInfo(this->GetDocIDFromTabIndex(i), GetTitleForTabIndex(i)));
+        auto docId = GetDocIDFromTabIndex(i);
+        auto path  = GetDocumentFromID(docId).m_path;
+        m_menuInfo.push_back(TabInfo(docId, GetTitleForTabIndex(i), path));
     }
 
     std::sort(std::begin(m_menuInfo), std::end(m_menuInfo),
-        [&](const TabInfo& lhs, const TabInfo& rhs)->bool
-    {
-        return _wcsicmp(lhs.title.c_str(), rhs.title.c_str()) < 0;
-    });
+              [&](const TabInfo& lhs, const TabInfo& rhs) -> bool {
+                  return _wcsicmp(lhs.title.c_str(), rhs.title.c_str()) < 0;
+              });
 
     for (const auto& tabInfo : m_menuInfo)
     {
-        hr = CAppUtils::AddStringItem(collection, tabInfo.title.c_str(), -1, pImg);
+        auto text  = tabInfo.title;
+        auto count = std::count_if(m_menuInfo.begin(), m_menuInfo.end(), [&](const TabInfo& item) -> bool {
+            return item.title == tabInfo.title;
+        });
+        if (count > 1)
+        {
+            wchar_t pathBuf[30] = {0};
+            PathCompactPathEx(pathBuf, CPathUtils::GetParentDirectory(tabInfo.path).c_str(), _countof(pathBuf), 0);
+            text = CStringUtils::Format(L"%s (%s)",
+                                        tabInfo.title.c_str(),
+                                        pathBuf);
+        }
+        hr = CAppUtils::AddStringItem(collection, text.c_str(), -1, pImg);
         // If we can't add one, assume we can't add any more so quit
         // not to avoid spamming the user with a sequence of errors.
         if (FAILED(hr))
@@ -175,7 +187,7 @@ bool CCmdTabList::PopulateMenu(const CDocument& /*doc*/, IUICollectionPtr& colle
     return true;
 }
 
-HRESULT CCmdTabList::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ )
+HRESULT CCmdTabList::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
     HRESULT hr = E_FAIL;
 
@@ -223,7 +235,7 @@ bool CCmdTabList::HandleSelectedMenuItem(size_t selected)
     }
 
     const auto& item = m_menuInfo[selected];
-    int tab = GetTabIndexFromDocID(item.docId);
+    int         tab  = GetTabIndexFromDocID(item.docId);
     if (tab >= 0)
     {
         if (tab != GetActiveTabIndex())
@@ -248,7 +260,6 @@ bool CCmdTabList::HandleSelectedMenuItem(size_t selected)
     APPVERIFY(false);
     InvalidateTabList();
 
-
     return false;
 }
 
@@ -267,7 +278,7 @@ void CCmdTabList::ScintillaNotify(SCNotification* /*pScn*/)
     // When a solution appears for that problem we likely want some
     // code here to invalidate the tab list on the appropriate event.
     //if (pScn->nmhdr.code == SCN_FOCUSIN)
-        //InvalidateTabList();
+    //InvalidateTabList();
 }
 
 void CCmdTabList::OnDocumentOpen(DocID /*id*/)
@@ -282,11 +293,10 @@ void CCmdTabList::OnDocumentClose(DocID /*id*/)
     InvalidateTabList();
 }
 
-void CCmdTabList::TabNotify(TBHDR * /*ptbhdr*/)
+void CCmdTabList::TabNotify(TBHDR* /*ptbhdr*/)
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
 }
-
 
 void CCmdTabList::OnDocumentSave(DocID /*id*/, bool /*bSaveAs*/)
 {
@@ -299,4 +309,3 @@ bool CCmdTabList::Execute()
     ResString ctrlName(hRes, cmdTabList_LabelTitle_RESID);
     return CAppUtils::ShowDropDownList(GetHwnd(), ctrlName);
 }
-

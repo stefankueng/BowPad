@@ -918,11 +918,30 @@ void CMainWindow::ShowTablistDropdown(HWND hWnd)
         {
             OnOutOfScope(DestroyMenu(hMenu));
             auto                                       currentIndex = m_TabBar.GetCurrentTabIndex();
-            std::multimap<std::wstring, int, ci_lessW> tablist;
+            std::multimap<std::wstring, int, ci_lessW> preplist;
             int                                        tabCount = m_TabBar.GetItemCount();
             for (int i = 0; i < tabCount; ++i)
             {
-                tablist.insert(std::make_pair(m_TabBar.GetTitle(i), i + 1));
+                preplist.insert(std::make_pair(m_TabBar.GetTitle(i), i));
+            }
+            std::multimap<std::wstring, int, ci_lessW> tablist;
+            for (auto& tab : preplist)
+            {
+                auto count = std::count_if(preplist.begin(), preplist.end(), [&](const auto& item) -> bool {
+                    return item.first == tab.first;
+                    });
+                if (count > 1)
+                {
+                    wchar_t pathBuf[30] = { 0 };
+                    const auto& doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab.second));
+                    PathCompactPathEx(pathBuf, CPathUtils::GetParentDirectory(doc.m_path).c_str(), _countof(pathBuf), 0);
+                    auto text = CStringUtils::Format(L"%s (%s)",
+                        tab.first.c_str(),
+                        pathBuf);
+                    tablist.insert(std::make_pair(text, tab.second + 1));
+                }
+                else
+                    tablist.insert(std::make_pair(tab.first, tab.second + 1));
             }
 
             for (auto& tab : tablist)

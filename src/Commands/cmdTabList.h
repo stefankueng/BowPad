@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,26 +22,30 @@
 #include <string>
 #include <vector>
 
-
 struct TabInfo
 {
-    TabInfo(DocID docId, const std::wstring& title)
-        : docId(docId), title(title)
+    TabInfo(DocID docId, const std::wstring& title, const std::wstring& path)
+        : docId(docId)
+        , title(title)
+        , path(path)
     {
     }
-    TabInfo(DocID docId, std::wstring&& title)
-        : docId(docId), title(std::move(title))
+    TabInfo(DocID docId, std::wstring&& title, std::wstring&& path)
+        : docId(docId)
+        , title(std::move(title))
+        , path(std::move(path))
     {
     }
     std::wstring title;
-    DocID docId;
+    std::wstring path;
+    DocID        docId;
 };
 
 class CCmdTabList : public ICommand
 {
 public:
-
-    CCmdTabList(void * obj) : ICommand(obj)
+    CCmdTabList(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -51,23 +55,20 @@ public:
     UINT GetCmdId() override { return cmdTabList; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
-
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void TabNotify(TBHDR * ptbhdr) override;
-
-    void ScintillaNotify(SCNotification * pScn) override;
+    void TabNotify(TBHDR* ptbhdr) override;
+    void ScintillaNotify(SCNotification* pScn) override;
 
     void OnDocumentOpen(DocID id) override;
     void OnDocumentClose(DocID id) override;
     void OnDocumentSave(DocID id, bool bSaveAs) override;
 
 private:
-    void InvalidateTabList();
-    bool IsValidMenuItem(size_t item) const;
-    bool IsServiceAvailable() const;
-    bool PopulateMenu(const CDocument& doc, IUICollectionPtr& collection);
-    bool HandleSelectedMenuItem(size_t selected);
+    void                 InvalidateTabList();
+    bool                 IsValidMenuItem(size_t item) const;
+    bool                 IsServiceAvailable() const;
+    bool                 PopulateMenu(IUICollectionPtr& collection);
+    bool                 HandleSelectedMenuItem(size_t selected);
     std::vector<TabInfo> m_menuInfo;
 };
-
