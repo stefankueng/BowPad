@@ -802,6 +802,7 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
         pos.m_nScrollWidth = Call(SCI_GETSCROLLWIDTH);
 
         pos.m_lineStateVector.clear();
+        pos.m_lastStyleLine = 0;
         size_t contractedFoldHeaderLine = 0;
         do
         {
@@ -810,6 +811,7 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
             {
                 // Store contracted line
                 pos.m_lineStateVector.push_back(contractedFoldHeaderLine);
+                pos.m_lastStyleLine = max(pos.m_lastStyleLine, (size_t)Call(SCI_GETLASTCHILD, contractedFoldHeaderLine, -1));
                 // Start next search with next line
                 ++contractedFoldHeaderLine;
             }
@@ -825,10 +827,13 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
 {
     // if the document hasn't been styled yet, do it now
     // otherwise restoring the folds won't work.
-    auto endStyled = Call(SCI_GETENDSTYLED);
-    auto len = Call(SCI_GETTEXTLENGTH);
-    if (endStyled < len)
-        Call(SCI_COLOURISE, 0, -1);
+    if (!pos.m_lineStateVector.empty())
+    {
+        auto endStyled = Call(SCI_GETENDSTYLED);
+        auto len       = Call(SCI_GETTEXTLENGTH);
+        if (endStyled < len && pos.m_lastStyleLine)
+            Call(SCI_COLOURISE, 0, Call(SCI_POSITIONFROMLINE, pos.m_lastStyleLine + 1));
+    }
 
     for (const auto& foldLine : pos.m_lineStateVector)
     {

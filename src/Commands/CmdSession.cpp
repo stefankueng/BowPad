@@ -104,6 +104,7 @@ void CCmdSessionLoad::OnClose()
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", saveindex).c_str(), pos.m_xOffset);
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", saveindex).c_str(), pos.m_nFirstVisibleLine);
         settings.SetInt64(g_sessionSection, CStringUtils::Format(L"wraplineoffset%d", saveindex).c_str(), pos.m_nWrapLineOffset);
+        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"laststyleline%d", saveindex).c_str(), pos.m_lastStyleLine);
         std::wostringstream out;
         if (!pos.m_lineStateVector.empty())
         {
@@ -229,6 +230,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         pos.m_xOffset           = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", fileNum).c_str(), 0);
         pos.m_nFirstVisibleLine = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
         pos.m_nWrapLineOffset   = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"wraplineoffset%d", fileNum).c_str(), 0);
+        pos.m_lastStyleLine     = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"laststyleline%d", fileNum).c_str(), 0);
         doc.m_TabSpace          = (TabSpace)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
         doc.m_ReadDir           = (ReadDirection)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0);
         auto folds              = settings.GetString(g_sessionSection, CStringUtils::Format(L"foldlines%d", fileNum).c_str(), 0);

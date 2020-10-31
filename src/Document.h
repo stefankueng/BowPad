@@ -55,7 +55,8 @@ public:
         , m_nEndPos(0)
         , m_xOffset(0)
         , m_nSelMode(0)
-        , m_nScrollWidth(1){};
+        , m_nScrollWidth(1)
+        , m_lastStyleLine(0){};
     ~CPosData()
     {
     }
@@ -68,6 +69,7 @@ public:
     size_t              m_nSelMode;
     size_t              m_nScrollWidth;
     std::vector<size_t> m_lineStateVector;
+    size_t              m_lastStyleLine;
 };
 
 class CDocument
