@@ -4267,7 +4267,7 @@ void CMainWindow::SetTheme(bool dark)
     if (activeTabId.IsValid())
     {
         m_editor.Call(SCI_CLEARDOCUMENTSTYLE);
-        m_editor.Call(SCI_COLOURISE, 0, -1);
+        m_editor.Call(SCI_COLOURISE, 0, m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_LINESONSCREEN) + 1));
         const auto& doc = m_DocManager.GetDocumentFromID(activeTabId);
         m_editor.SetupLexerForLang(doc.GetLanguage());
     }
