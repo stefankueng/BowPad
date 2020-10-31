@@ -85,33 +85,33 @@ static char ascii_toupper_char(char c)
     return ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ^ autovectorizes to PXOR: runs on more ports than paddb
 }
 
-static LogStates GetState(LogStyles style)
-{
-    switch (style)
-    {
-        case LogStyles::Default:
-        case LogStyles::Block:
-        case LogStyles::String:
-        case LogStyles::Number:
-            return LogStates::Debug;
-        case LogStyles::InfoDefault:
-        case LogStyles::InfoBlock:
-        case LogStyles::InfoString:
-        case LogStyles::InfoNumber:
-            return LogStates::Info;
-        case LogStyles::WarnDefault:
-        case LogStyles::WarnBlock:
-        case LogStyles::WarnString:
-        case LogStyles::WarnNumber:
-            return LogStates::Warn;
-        case LogStyles::ErrorDefault:
-        case LogStyles::ErrorBlock:
-        case LogStyles::ErrorString:
-        case LogStyles::ErrorNumber:
-            return LogStates::Error;
-    }
-    return LogStates::Debug;
-}
+//static LogStates GetState(LogStyles style)
+//{
+//    switch (style)
+//    {
+//        case LogStyles::Default:
+//        case LogStyles::Block:
+//        case LogStyles::String:
+//        case LogStyles::Number:
+//            return LogStates::Debug;
+//        case LogStyles::InfoDefault:
+//        case LogStyles::InfoBlock:
+//        case LogStyles::InfoString:
+//        case LogStyles::InfoNumber:
+//            return LogStates::Info;
+//        case LogStyles::WarnDefault:
+//        case LogStyles::WarnBlock:
+//        case LogStyles::WarnString:
+//        case LogStyles::WarnNumber:
+//            return LogStates::Warn;
+//        case LogStyles::ErrorDefault:
+//        case LogStyles::ErrorBlock:
+//        case LogStyles::ErrorString:
+//        case LogStyles::ErrorNumber:
+//            return LogStates::Error;
+//    }
+//    return LogStates::Debug;
+//}
 
 static LogStyles GetLogStyle(LogStyles style, LogStates state)
 {
@@ -437,7 +437,7 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
     sc.Complete();
 }
 
-void SCI_METHOD LexerLog::Fold(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess)
+void SCI_METHOD LexerLog::Fold(Sci_PositionU /*startPos*/, Sci_Position /*length*/, int /*initStyle*/, IDocument* /*pAccess*/)
 {
     // no folding : log files are usually big, and this simply is too slow
 }
