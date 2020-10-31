@@ -1070,7 +1070,7 @@ void CScintillaWnd::SetupDefaultStyles()
     auto modEventMask = Call(SCI_GETMODEVENTMASK);
     Call(SCI_SETMODEVENTMASK, 0);
 
-    Call(SCI_COLOURISE, 0, -1);
+    Call(SCI_COLOURISE, 0, Call(SCI_POSITIONFROMLINE, Call(SCI_LINESONSCREEN) + 1));
     Call(SCI_SETCODEPAGE, CP_UTF8);
     Call(SCI_SETMODEVENTMASK, modEventMask);
 }
