@@ -187,8 +187,34 @@ static LogStyles GetLogStyle(LogStyles style, LogStates state)
 
 } // namespace
 
+struct OptionsSimple
+{
+    std::string              debugstrings;
+    std::string              infostrings;
+    std::string              warnstrings;
+    std::string              errorstrings;
+    std::vector<std::string> debugTokens;
+    std::vector<std::string> infoTokens;
+    std::vector<std::string> warnTokens;
+    std::vector<std::string> errorTokens;
+};
+
+struct OptionSetSimple : public OptionSet<OptionsSimple>
+{
+    OptionSetSimple()
+    {
+        DefineProperty("debugstrings", &OptionsSimple::debugstrings);
+        DefineProperty("infostrings", &OptionsSimple::infostrings);
+        DefineProperty("warnstrings", &OptionsSimple::warnstrings);
+        DefineProperty("errorstrings", &OptionsSimple::errorstrings);
+    }
+};
+
 class LexerLog : public DefaultLexer
 {
+    OptionsSimple   options;
+    OptionSetSimple osSimple;
+
 public:
     LexerLog()
         : DefaultLexer("log", SCLEX_AUTOMATIC + 101)
@@ -211,32 +237,29 @@ public:
 
     const char* SCI_METHOD PropertyNames() override
     {
-        return nullptr;
+        return osSimple.PropertyNames();
     }
 
-    int SCI_METHOD PropertyType(const char* /*name*/) override
+    int SCI_METHOD PropertyType(const char* name) override
     {
-        return 0;
+        return osSimple.PropertyType(name);
     }
 
-    const char* SCI_METHOD DescribeProperty(const char* /*name*/) override
+    const char* SCI_METHOD DescribeProperty(const char* name) override
     {
-        return nullptr;
+        return osSimple.DescribeProperty(name);
     }
 
-    Sci_Position SCI_METHOD PropertySet(const char* /*key*/, const char* /*val*/) override
-    {
-        return {};
-    }
+    Sci_Position SCI_METHOD PropertySet(const char* key, const char* val) override;
 
-    const char* SCI_METHOD PropertyGet(const char* /*key*/) override
+    const char* SCI_METHOD PropertyGet(const char* key) override
     {
-        return nullptr;
+        return osSimple.PropertyGet(key);
     }
 
     const char* SCI_METHOD DescribeWordListSets() override
     {
-        return nullptr;
+        return osSimple.DescribeWordListSets();
     }
 
     Sci_Position SCI_METHOD WordListSet(int /*n*/, const char* /*wl*/) override
@@ -258,6 +281,40 @@ public:
         return new LexerLog();
     }
 };
+
+Sci_Position SCI_METHOD LexerLog::PropertySet(const char* key, const char* val)
+{
+    if (osSimple.PropertySet(&options, key, val))
+    {
+        if (strcmp(key, "debugstrings") == 0)
+        {
+            for (size_t i = 0; i < options.debugstrings.size(); ++i)
+                options.debugstrings[i] = ascii_toupper_char(options.debugstrings[i]);
+            stringtok(options.debugTokens, options.debugstrings, true, " \t\n");
+        }
+        if (strcmp(key, "infostrings") == 0)
+        {
+            for (size_t i = 0; i < options.infostrings.size(); ++i)
+                options.infostrings[i] = ascii_toupper_char(options.infostrings[i]);
+            stringtok(options.infoTokens, options.infostrings, true, " \t\n");
+        }
+        if (strcmp(key, "warnstrings") == 0)
+        {
+            for (size_t i = 0; i < options.warnstrings.size(); ++i)
+                options.warnstrings[i] = ascii_toupper_char(options.warnstrings[i]);
+            stringtok(options.warnTokens, options.warnstrings, true, " \t\n");
+        }
+        if (strcmp(key, "errorstrings") == 0)
+        {
+            for (size_t i = 0; i < options.errorstrings.size(); ++i)
+                options.errorstrings[i] = ascii_toupper_char(options.errorstrings[i]);
+            stringtok(options.errorTokens, options.errorstrings, true, " \t\n");
+        }
+
+        return 0;
+    }
+    return -1;
+}
 
 void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess)
 {
@@ -286,55 +343,37 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
             for (size_t i = 0; i < lineLen; ++i)
                 line[i] = ascii_toupper_char(line[i]);
             std::string_view sline(line.get(), lineEnd - sc.currentPos + 2);
-            if (auto pos = sline.find("DEBUG"); pos != std::string::npos)
+            for (const auto& token : options.debugTokens)
             {
-                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
-                    logState = LogStates::Debug;
+                if (auto pos = sline.find(token); pos != std::string::npos)
+                {
+                    if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                        logState = LogStates::Debug;
+                }
             }
-            if (auto pos = sline.find("{D}"); pos != std::string::npos)
+            for (const auto& token : options.infoTokens)
             {
-                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
-                    logState = LogStates::Debug;
+                if (auto pos = sline.find(token); pos != std::string::npos)
+                {
+                    if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                        logState = LogStates::Info;
+                }
             }
-            if (auto pos = sline.find("INF"); pos != std::string::npos)
+            for (const auto& token : options.warnTokens)
             {
-                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
-                    logState = LogStates::Info;
+                if (auto pos = sline.find(token); pos != std::string::npos)
+                {
+                    if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                        logState = LogStates::Warn;
+                }
             }
-            if (auto pos = sline.find("{I}"); pos != std::string::npos)
+            for (const auto& token : options.errorTokens)
             {
-                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
-                    logState = LogStates::Info;
-            }
-            if (auto pos = sline.find("WARN"); pos != std::string::npos)
-            {
-                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
-                    logState = LogStates::Warn;
-            }
-            if (auto pos = sline.find("{W}"); pos != std::string::npos)
-            {
-                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
-                    logState = LogStates::Warn;
-            }
-            if (auto pos = sline.find("{ERR}"); pos != std::string::npos)
-            {
-                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
-                    logState = LogStates::Error;
-            }
-            if (auto pos = sline.find("{CRIT}"); pos != std::string::npos)
-            {
-                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
-                    logState = LogStates::Error;
-            }
-            if (auto pos = sline.find("{E}"); pos != std::string::npos)
-            {
-                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
-                    logState = LogStates::Error;
-            }
-            if (auto pos = sline.find("{C}"); pos != std::string::npos)
-            {
-                if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
-                    logState = LogStates::Error;
+                if (auto pos = sline.find(token); pos != std::string::npos)
+                {
+                    if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                        logState = LogStates::Error;
+                }
             }
         }
         // Determine if the current state should terminate.
