@@ -2151,9 +2151,9 @@ void CFindReplaceDlg::SearchDocument(
                 result.posInLineStart = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineStart);
                 result.posInLineEnd = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineEnd);
                 linesize = result.posInLineEnd - result.posInLineStart;
-                if (result.lineText.size() > max(linesize + 40, 100)) {
+                if (result.lineText.size() > max(linesize + 40, 255)) {
                     size_t index = max(0, (int)result.posInLineStart - 15);
-                    result.lineText = result.lineText.substr(index, linesize + 40);
+                    result.lineText = L"... " + result.lineText.substr(index, linesize + 40);
                     result.lineText.shrink_to_fit();
                     result.posInLineStart -= index;
                     result.posInLineEnd -= index;
