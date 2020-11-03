@@ -409,7 +409,7 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
                 }
                 else if (sc.atLineEnd)
                 {
-                    sc.ChangeState(GetLogStyle(LogStyles::String, logState));
+                    sc.ChangeState(GetLogStyle(LogStyles::Default, logState));
                     sc.ForwardSetState(GetLogStyle(LogStyles::Default, logState));
                 }
                 break;
