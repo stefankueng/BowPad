@@ -290,25 +290,25 @@ Sci_Position SCI_METHOD LexerLog::PropertySet(const char* key, const char* val)
         {
             for (size_t i = 0; i < options.debugstrings.size(); ++i)
                 options.debugstrings[i] = ascii_toupper_char(options.debugstrings[i]);
-            stringtok(options.debugTokens, options.debugstrings, true, " \t\n");
+            stringtok(options.debugTokens, options.debugstrings, true, " \t\n", false);
         }
         if (strcmp(key, "infostrings") == 0)
         {
             for (size_t i = 0; i < options.infostrings.size(); ++i)
                 options.infostrings[i] = ascii_toupper_char(options.infostrings[i]);
-            stringtok(options.infoTokens, options.infostrings, true, " \t\n");
+            stringtok(options.infoTokens, options.infostrings, true, " \t\n", false);
         }
         if (strcmp(key, "warnstrings") == 0)
         {
             for (size_t i = 0; i < options.warnstrings.size(); ++i)
                 options.warnstrings[i] = ascii_toupper_char(options.warnstrings[i]);
-            stringtok(options.warnTokens, options.warnstrings, true, " \t\n");
+            stringtok(options.warnTokens, options.warnstrings, true, " \t\n", false);
         }
         if (strcmp(key, "errorstrings") == 0)
         {
             for (size_t i = 0; i < options.errorstrings.size(); ++i)
                 options.errorstrings[i] = ascii_toupper_char(options.errorstrings[i]);
-            stringtok(options.errorTokens, options.errorstrings, true, " \t\n");
+            stringtok(options.errorTokens, options.errorstrings, true, " \t\n", false);
         }
 
         return 0;
