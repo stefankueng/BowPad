@@ -347,7 +347,7 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
             {
                 if (auto pos = sline.find(token); pos != std::string::npos)
                 {
-                    if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    if (pos == 0 || ((!isalpha(sline[pos - 1]) || isalpha(sline[pos])) && sline[pos - 1] != '"'))
                         logState = LogStates::Debug;
                 }
             }
@@ -355,7 +355,7 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
             {
                 if (auto pos = sline.find(token); pos != std::string::npos)
                 {
-                    if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    if (pos == 0 || ((!isalpha(sline[pos - 1]) || isalpha(sline[pos])) && sline[pos - 1] != '"'))
                         logState = LogStates::Info;
                 }
             }
@@ -363,7 +363,7 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
             {
                 if (auto pos = sline.find(token); pos != std::string::npos)
                 {
-                    if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    if (pos == 0 || ((!isalpha(sline[pos - 1]) || isalpha(sline[pos])) && sline[pos - 1] != '"'))
                         logState = LogStates::Warn;
                 }
             }
@@ -371,7 +371,7 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
             {
                 if (auto pos = sline.find(token); pos != std::string::npos)
                 {
-                    if (pos == 0 || (!isalpha(sline[pos - 1])) && sline[pos - 1] != '"')
+                    if (pos == 0 || ((!isalpha(sline[pos - 1]) || isalpha(sline[pos])) && sline[pos - 1] != '"'))
                         logState = LogStates::Error;
                 }
             }
