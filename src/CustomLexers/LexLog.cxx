@@ -375,6 +375,7 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
                         logState = LogStates::Error;
                 }
             }
+            sc.SetState(GetLogStyle(LogStyles::Default, logState));
         }
         // Determine if the current state should terminate.
         switch (sc.state)
