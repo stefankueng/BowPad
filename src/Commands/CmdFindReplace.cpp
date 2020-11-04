@@ -2136,9 +2136,9 @@ void CFindReplaceDlg::SearchDocument(
             else
             {
                 result.posInLineStart = linepos >= 0 ? result.posBegin - linepos : 0;
-                result.posInLineEnd = linepos >= 0 ? ttf.chrgText.cpMax - linepos : 0;
-
-                size_t linesize = (size_t)searchWnd.Call(SCI_LINELENGTH, result.line);
+                result.posInLineEnd   = linepos >= 0 ? ttf.chrgText.cpMax - linepos : 0;
+                auto   matchLen       = int(result.posInLineEnd - result.posInLineStart);
+                size_t linesize       = (size_t)searchWnd.Call(SCI_LINELENGTH, result.line);
                 line.resize(linesize);
                 searchWnd.Call(SCI_GETLINE, result.line, reinterpret_cast<sptr_t>(line.data()));
                 // remove EOLs
@@ -2149,12 +2149,16 @@ void CFindReplaceDlg::SearchDocument(
                 // adjust the line positions: Scintilla uses utf8, but utf8 converted to
                 // utf16 can have different char sizes so the positions won't match anymore
                 result.posInLineStart = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineStart);
-                result.posInLineEnd = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineEnd);
-                linesize = result.posInLineEnd - result.posInLineStart;
-                if (result.lineText.size() > max(linesize + 40, 255)) {
-                    size_t index = max(0, (int)result.posInLineStart - 15);
-                    result.lineText = L"... " + result.lineText.substr(index, linesize + 40);
+                result.posInLineEnd   = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineEnd);
+                linesize              = result.posInLineEnd - result.posInLineStart;
+                constexpr int maxResultLineLen = 255;
+                if (result.lineText.size() > max(linesize + 40, maxResultLineLen))
+                {
+                    size_t index    = max(0, (int)result.posInLineStart - (maxResultLineLen - matchLen - 40));
+                    result.lineText = (index ? L"... " : L"") + result.lineText.substr(index, maxResultLineLen);
                     result.lineText.shrink_to_fit();
+                    if (index)
+                        index -= 4; // adjust for the "... " we inserted at the beginning
                     result.posInLineStart -= index;
                     result.posInLineEnd -= index;
                 }
