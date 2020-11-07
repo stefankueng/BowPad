@@ -29,6 +29,7 @@
 #include "OnOutOfScope.h"
 #include "ResString.h"
 #include "ProgressDlg.h"
+#include "SysInfo.h"
 #include <sstream>
 #include <string>
 #include <vector>
@@ -37,24 +38,32 @@
 
 namespace
 {
-const wchar_t g_sessionSection[]      = {L"TabSession"};
-const int     BP_DEFAULT_SESSION_SIZE = 500;
+const wchar_t g_sessionSection[]         = {L"TabSession"};
+const wchar_t g_sessionSectionElevated[] = {L"TabSessionElevated"};
+const int     BP_DEFAULT_SESSION_SIZE    = 500;
 }; // namespace
+
+static const wchar_t* sessionSection()
+{
+    if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
+        return g_sessionSectionElevated;
+    return g_sessionSection;
+}
 
 static void SetAutoLoad(bool bAutoLoad)
 {
-    CIniSettings::Instance().SetInt64(g_sessionSection, L"autoload", bAutoLoad);
+    CIniSettings::Instance().SetInt64(sessionSection(), L"autoload", bAutoLoad);
 }
 
 static bool GetAutoLoad()
 {
-    bool bAutoLoad = CIniSettings::Instance().GetInt64(g_sessionSection, L"autoload", 0) != 0;
+    bool bAutoLoad = CIniSettings::Instance().GetInt64(sessionSection(), L"autoload", 0) != 0;
     return bAutoLoad;
 }
 
 static std::wstring GetBackupPath()
 {
-    auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
+    auto handleModified = CIniSettings::Instance().GetInt64(sessionSection(), L"handlemodified", 1) != 0;
     handleModified      = handleModified && GetAutoLoad();
     auto sessionPath    = CPathUtils::GetAppDataPath() + L"\\BowPad\\backup";
     // check for portable version
@@ -85,26 +94,26 @@ void CCmdSessionLoad::OnClose()
 
     auto& settings       = CIniSettings::Instance();
     bool  bAutoLoad      = GetAutoLoad();
-    auto  handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
+    auto  handleModified = CIniSettings::Instance().GetInt64(sessionSection(), L"handlemodified", 1) != 0;
     // first remove the whole session section
-    settings.Delete(g_sessionSection, nullptr);
+    settings.Delete(sessionSection(), nullptr);
     // now restore the settings of the session section
     SetAutoLoad(bAutoLoad);
-    CIniSettings::Instance().SetInt64(g_sessionSection, L"handlemodified", handleModified ? 1 : 0);
+    CIniSettings::Instance().SetInt64(sessionSection(), L"handlemodified", handleModified ? 1 : 0);
     // now go through all tabs and save their state
     int tabcount  = GetTabCount();
     int activetab = GetActiveTabIndex();
     int saveindex = 0;
 
     auto SavePosSettings = [&](int saveindex, const CPosData& pos) {
-        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"selmode%d", saveindex).c_str(), pos.m_nSelMode);
-        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"startpos%d", saveindex).c_str(), pos.m_nStartPos);
-        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"endpos%d", saveindex).c_str(), pos.m_nEndPos);
-        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"scrollwidth%d", saveindex).c_str(), pos.m_nScrollWidth);
-        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", saveindex).c_str(), pos.m_xOffset);
-        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", saveindex).c_str(), pos.m_nFirstVisibleLine);
-        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"wraplineoffset%d", saveindex).c_str(), pos.m_nWrapLineOffset);
-        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"laststyleline%d", saveindex).c_str(), pos.m_lastStyleLine);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"selmode%d", saveindex).c_str(), pos.m_nSelMode);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"startpos%d", saveindex).c_str(), pos.m_nStartPos);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"endpos%d", saveindex).c_str(), pos.m_nEndPos);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"scrollwidth%d", saveindex).c_str(), pos.m_nScrollWidth);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"xoffset%d", saveindex).c_str(), pos.m_xOffset);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"firstvisible%d", saveindex).c_str(), pos.m_nFirstVisibleLine);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"wraplineoffset%d", saveindex).c_str(), pos.m_nWrapLineOffset);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"laststyleline%d", saveindex).c_str(), pos.m_lastStyleLine);
         std::wostringstream out;
         if (!pos.m_lineStateVector.empty())
         {
@@ -112,12 +121,12 @@ void CCmdSessionLoad::OnClose()
             out << pos.m_lineStateVector.back();
         }
         std::wstring result(out.str());
-        settings.SetString(g_sessionSection, CStringUtils::Format(L"foldlines%d", saveindex).c_str(), result.c_str());
+        settings.SetString(sessionSection(), CStringUtils::Format(L"foldlines%d", saveindex).c_str(), result.c_str());
     };
 
     auto sessionPath = GetBackupPath();
 
-    int sessionSize = (int)settings.GetInt64(g_sessionSection, L"session_size", BP_DEFAULT_SESSION_SIZE);
+    int sessionSize = (int)settings.GetInt64(sessionSection(), L"session_size", BP_DEFAULT_SESSION_SIZE);
     // No point saving more than we are prepared to load.
     int savecount = min(tabcount, sessionSize);
     for (int i = 0; i < savecount; ++i)
@@ -134,13 +143,13 @@ void CCmdSessionLoad::OnClose()
             CPosData pos;
             SaveCurrentPos(pos);
 
-            settings.SetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", saveindex).c_str(), 1);
+            settings.SetInt64(sessionSection(), CStringUtils::Format(L"activetab%d", saveindex).c_str(), 1);
             SavePosSettings(saveindex, pos);
         }
         else
         {
             SavePosSettings(saveindex, doc.m_position);
-            settings.SetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", saveindex).c_str(), 0);
+            settings.SetInt64(sessionSection(), CStringUtils::Format(L"activetab%d", saveindex).c_str(), 0);
         }
 
         if (!sessionPath.empty() && (doc.m_bIsDirty || doc.m_bNeedsSaving))
@@ -152,16 +161,16 @@ void CCmdSessionLoad::OnClose()
                 filename = title;
             }
             auto backupPath = CStringUtils::Format(L"%s\\%d%s", sessionPath.c_str(), saveindex, filename.c_str());
-            settings.SetString(g_sessionSection, CStringUtils::Format(L"origpath%d", saveindex).c_str(), doc.m_path.c_str());
-            settings.SetString(g_sessionSection, CStringUtils::Format(L"origtitle%d", saveindex).c_str(), title.c_str());
+            settings.SetString(sessionSection(), CStringUtils::Format(L"origpath%d", saveindex).c_str(), doc.m_path.c_str());
+            settings.SetString(sessionSection(), CStringUtils::Format(L"origtitle%d", saveindex).c_str(), title.c_str());
             doc.m_path         = backupPath;
             doc.m_bIsDirty     = false;
             doc.m_bNeedsSaving = false;
             SaveDoc(docId, backupPath);
         }
-        settings.SetString(g_sessionSection, CStringUtils::Format(L"path%d", saveindex).c_str(), doc.m_path.c_str());
-        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", saveindex).c_str(), doc.m_TabSpace);
-        settings.SetInt64(g_sessionSection, CStringUtils::Format(L"readdir%d", saveindex).c_str(), doc.m_ReadDir);
+        settings.SetString(sessionSection(), CStringUtils::Format(L"path%d", saveindex).c_str(), doc.m_path.c_str());
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", saveindex).c_str(), doc.m_TabSpace);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", saveindex).c_str(), doc.m_ReadDir);
 
         ++saveindex;
     }
@@ -173,11 +182,11 @@ void CCmdSessionLoad::RestoreSavedSession()
     auto&        settings          = CIniSettings::Instance();
     int          numFilesToRestore = 0;
 
-    int sessionSize = (int)settings.GetInt64(g_sessionSection, L"session_size", BP_DEFAULT_SESSION_SIZE);
+    int sessionSize = (int)settings.GetInt64(sessionSection(), L"session_size", BP_DEFAULT_SESSION_SIZE);
     for (int fileNum = 0; fileNum < sessionSize; ++fileNum)
     {
         std::wstring key  = CStringUtils::Format(L"path%d", fileNum);
-        std::wstring path = settings.GetString(g_sessionSection, key.c_str(), L"");
+        std::wstring path = settings.GetString(sessionSection(), key.c_str(), L"");
         if (path.empty())
             break;
         ++numFilesToRestore;
@@ -207,7 +216,7 @@ void CCmdSessionLoad::RestoreSavedSession()
     for (int fileNum = 0; fileNum < sessionSize; ++fileNum)
     {
         std::wstring key  = CStringUtils::Format(L"path%d", fileNum);
-        std::wstring path = settings.GetString(g_sessionSection, key.c_str(), L"");
+        std::wstring path = settings.GetString(sessionSection(), key.c_str(), L"");
         if (path.empty())
             break;
         ++filecount;
@@ -223,38 +232,38 @@ void CCmdSessionLoad::RestoreSavedSession()
             continue;
         auto& doc               = GetModDocumentFromID(docId);
         auto& pos               = doc.m_position;
-        pos.m_nSelMode          = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"selmode%d", fileNum).c_str(), 0);
-        pos.m_nStartPos         = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"startpos%d", fileNum).c_str(), 0);
-        pos.m_nEndPos           = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"endpos%d", fileNum).c_str(), 0);
-        pos.m_nScrollWidth      = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"scrollwidth%d", fileNum).c_str(), 0);
-        pos.m_xOffset           = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"xoffset%d", fileNum).c_str(), 0);
-        pos.m_nFirstVisibleLine = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
-        pos.m_nWrapLineOffset   = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"wraplineoffset%d", fileNum).c_str(), 0);
-        pos.m_lastStyleLine     = (size_t)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"laststyleline%d", fileNum).c_str(), 0);
-        doc.m_TabSpace          = (TabSpace)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
-        doc.m_ReadDir           = (ReadDirection)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0);
-        auto folds              = settings.GetString(g_sessionSection, CStringUtils::Format(L"foldlines%d", fileNum).c_str(), 0);
+        pos.m_nSelMode          = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"selmode%d", fileNum).c_str(), 0);
+        pos.m_nStartPos         = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"startpos%d", fileNum).c_str(), 0);
+        pos.m_nEndPos           = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"endpos%d", fileNum).c_str(), 0);
+        pos.m_nScrollWidth      = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"scrollwidth%d", fileNum).c_str(), 0);
+        pos.m_xOffset           = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"xoffset%d", fileNum).c_str(), 0);
+        pos.m_nFirstVisibleLine = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
+        pos.m_nWrapLineOffset   = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"wraplineoffset%d", fileNum).c_str(), 0);
+        pos.m_lastStyleLine     = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"laststyleline%d", fileNum).c_str(), 0);
+        doc.m_TabSpace          = (TabSpace)settings.GetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
+        doc.m_ReadDir           = (ReadDirection)settings.GetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0);
+        auto folds              = settings.GetString(sessionSection(), CStringUtils::Format(L"foldlines%d", fileNum).c_str(), 0);
         pos.m_lineStateVector.clear();
         if (folds)
         {
             stringtok(pos.m_lineStateVector, folds, true, L";", false);
         }
-        auto origPath = settings.GetString(g_sessionSection, CStringUtils::Format(L"origpath%d", fileNum).c_str(), nullptr);
+        auto origPath = settings.GetString(sessionSection(), CStringUtils::Format(L"origpath%d", fileNum).c_str(), nullptr);
         if (origPath)
         {
             filesToDelete.push_back(doc.m_path);
             doc.m_path         = origPath;
             doc.m_bIsDirty     = true;
             doc.m_bNeedsSaving = true;
-            auto origTitle     = settings.GetString(g_sessionSection, CStringUtils::Format(L"origtitle%d", fileNum).c_str(), nullptr);
+            auto origTitle     = settings.GetString(sessionSection(), CStringUtils::Format(L"origtitle%d", fileNum).c_str(), nullptr);
             SetTitleForDocID(docId, origTitle);
             UpdateFileTime(doc, true);
             UpdateTab(GetTabIndexFromDocID(docId));
-            settings.Delete(g_sessionSection, CStringUtils::Format(L"origpath%d", fileNum).c_str());
-            settings.SetString(g_sessionSection, CStringUtils::Format(L"path%d", fileNum).c_str(), doc.m_path.c_str());
+            settings.Delete(sessionSection(), CStringUtils::Format(L"origpath%d", fileNum).c_str());
+            settings.SetString(sessionSection(), CStringUtils::Format(L"path%d", fileNum).c_str(), doc.m_path.c_str());
         }
 
-        if ((int)settings.GetInt64(g_sessionSection, CStringUtils::Format(L"activetab%d", fileNum).c_str(), 0))
+        if ((int)settings.GetInt64(sessionSection(), CStringUtils::Format(L"activetab%d", fileNum).c_str(), 0))
             activeDoc = docId;
         RestoreCurrentPos(doc.m_position);
     }
@@ -315,9 +324,9 @@ CCmdSessionAutoSave::CCmdSessionAutoSave(void* obj)
 
 bool CCmdSessionAutoSave::Execute()
 {
-    auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
+    auto handleModified = CIniSettings::Instance().GetInt64(sessionSection(), L"handlemodified", 1) != 0;
     handleModified      = !handleModified && GetAutoLoad();
-    CIniSettings::Instance().SetInt64(g_sessionSection, L"handlemodified", handleModified ? 1 : 0);
+    CIniSettings::Instance().SetInt64(sessionSection(), L"handlemodified", handleModified ? 1 : 0);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
 }
@@ -327,7 +336,7 @@ HRESULT CCmdSessionAutoSave::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        auto handleModified = CIniSettings::Instance().GetInt64(g_sessionSection, L"handlemodified", 1) != 0;
+        auto handleModified = CIniSettings::Instance().GetInt64(sessionSection(), L"handlemodified", 1) != 0;
         handleModified      = handleModified && GetAutoLoad();
         return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, handleModified, ppropvarNewValue);
     }
