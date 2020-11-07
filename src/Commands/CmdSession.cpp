@@ -30,6 +30,7 @@
 #include "ResString.h"
 #include "ProgressDlg.h"
 #include "SysInfo.h"
+#include "AppUtils.h"
 #include <sstream>
 #include <string>
 #include <vector>
@@ -65,17 +66,7 @@ static std::wstring GetBackupPath()
 {
     auto handleModified = CIniSettings::Instance().GetInt64(sessionSection(), L"handlemodified", 1) != 0;
     handleModified      = handleModified && GetAutoLoad();
-    auto sessionPath    = CPathUtils::GetAppDataPath() + L"\\BowPad\\backup";
-    // check for portable version
-    HKEY subKey = nullptr;
-    LONG result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Software\\BowPad", 0, KEY_READ, &subKey);
-    if (result != ERROR_SUCCESS)
-    {
-        // BowPad was not installed: portable version.
-        sessionPath = CPathUtils::GetModuleDir() + L"\\backup";
-    }
-    else
-        RegCloseKey(subKey);
+    auto sessionPath    = CAppUtils::GetDataPath() + L"\\BowPad\\backup";
     CPathUtils::CreateRecursiveDirectory(sessionPath);
     if (handleModified)
         return sessionPath;
