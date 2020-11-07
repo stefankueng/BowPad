@@ -37,7 +37,7 @@ using Microsoft::WRL::ComPtr;
 
 HINSTANCE hInst;
 HINSTANCE hRes;
-bool firstInstance = false;
+bool      firstInstance = false;
 
 static void LoadLanguage(HINSTANCE hInstance)
 {
@@ -330,6 +330,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
         {
             mainWindow.SetElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"), (long)line);
             mainWindow.SetFileOpenMRU(false);
+            firstInstance = false;
         }
         if (parser.HasKey(L"tabmove") && parser.HasKey(L"savepath"))
         {
@@ -438,14 +439,14 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     bool isAdminMode = SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated();
     if (parser->HasKey(L"admin") && !isAdminMode)
     {
-        std::wstring modpath = CPathUtils::GetModulePath();
-        SHELLEXECUTEINFO shExecInfo = { sizeof(SHELLEXECUTEINFO) };
+        std::wstring     modpath    = CPathUtils::GetModulePath();
+        SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
 
-        shExecInfo.hwnd = nullptr;
-        shExecInfo.lpVerb = L"runas";
-        shExecInfo.lpFile = modpath.c_str();
+        shExecInfo.hwnd         = nullptr;
+        shExecInfo.lpVerb       = L"runas";
+        shExecInfo.lpFile       = modpath.c_str();
         shExecInfo.lpParameters = parser->getCmdLine();
-        shExecInfo.nShow = SW_NORMAL;
+        shExecInfo.nShow        = SW_NORMAL;
 
         if (ShellExecuteEx(&shExecInfo))
             return 0;
@@ -511,10 +512,10 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     return (int)msg.wParam;
 }
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+int APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
                       _In_opt_ HINSTANCE hPrevInstance,
-                      _In_ LPTSTR lpCmdLine,
-                      _In_ int    nCmdShow)
+                      _In_ LPTSTR        lpCmdLine,
+                      _In_ int           nCmdShow)
 {
     hInst = hInstance;
     hRes  = hInstance;
@@ -525,7 +526,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     DWORD  mutexStatus = GetLastError();
     OnOutOfScope(CloseHandle(hAppMutex););
     bool bAlreadyRunning = (mutexStatus == ERROR_ALREADY_EXISTS || mutexStatus == ERROR_ACCESS_DENIED);
-    firstInstance = !bAlreadyRunning;
+    firstInstance        = !bAlreadyRunning;
 
     auto mainResult = BPMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow, bAlreadyRunning);
 
