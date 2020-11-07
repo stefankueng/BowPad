@@ -929,15 +929,15 @@ void CMainWindow::ShowTablistDropdown(HWND hWnd)
             {
                 auto count = std::count_if(preplist.begin(), preplist.end(), [&](const auto& item) -> bool {
                     return item.first == tab.first;
-                    });
+                });
                 if (count > 1)
                 {
-                    wchar_t pathBuf[30] = { 0 };
-                    const auto& doc = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab.second));
+                    wchar_t     pathBuf[30] = {0};
+                    const auto& doc         = m_DocManager.GetDocumentFromID(m_TabBar.GetIDFromIndex(tab.second));
                     PathCompactPathEx(pathBuf, CPathUtils::GetParentDirectory(doc.m_path).c_str(), _countof(pathBuf), 0);
                     auto text = CStringUtils::Format(L"%s (%s)",
-                        tab.first.c_str(),
-                        pathBuf);
+                                                     tab.first.c_str(),
+                                                     pathBuf);
                     tablist.insert(std::make_pair(text, tab.second + 1));
                 }
                 else
@@ -1304,29 +1304,6 @@ LRESULT CMainWindow::DoCommand(WPARAM wParam, LPARAM lParam)
 
 bool CMainWindow::Initialize()
 {
-    // Tell UAC that lower integrity processes are allowed to send WM_COPYDATA messages to this process (or window)
-    HMODULE hDll = GetModuleHandle(TEXT("user32.dll"));
-    if (hDll)
-    {
-        // first try ChangeWindowMessageFilterEx, if it's not available (i.e., running on Vista), then
-        // try ChangeWindowMessageFilter.
-        typedef BOOL(WINAPI * MESSAGEFILTERFUNCEX)(HWND hWnd, UINT message, DWORD action, VOID * pChangeFilterStruct);
-        MESSAGEFILTERFUNCEX func = (MESSAGEFILTERFUNCEX)::GetProcAddress(hDll, "ChangeWindowMessageFilterEx");
-
-        if (func)
-        {
-            func(*this, WM_COPYDATA, MSGFLT_ALLOW, nullptr);
-            func(m_editor, WM_COPYDATA, MSGFLT_ALLOW, nullptr);
-            func(m_TabBar, WM_COPYDATA, MSGFLT_ALLOW, nullptr);
-            func(m_StatusBar, WM_COPYDATA, MSGFLT_ALLOW, nullptr);
-            func(m_fileTree, WM_COPYDATA, MSGFLT_ALLOW, nullptr);
-        }
-        else
-        {
-            ChangeWindowMessageFilter(WM_COPYDATA, MSGFLT_ADD);
-        }
-    }
-
     m_fileTree.Init(hResource, *this);
     CCommandHandler::Instance().AddCommand(&m_fileTree);
     CCommandHandler::Instance().AddCommand(cmdNew);
@@ -1383,6 +1360,38 @@ bool CMainWindow::Initialize()
 
     if (!CreateRibbon())
         return false;
+
+    // Tell UAC that lower integrity processes are allowed to send WM_COPYDATA messages to this process (or window)
+    HMODULE hDll = GetModuleHandle(TEXT("user32.dll"));
+    if (hDll)
+    {
+        // first try ChangeWindowMessageFilterEx, if it's not available (i.e., running on Vista), then
+        // try ChangeWindowMessageFilter.
+        typedef BOOL(WINAPI * MESSAGEFILTERFUNCEX)(HWND hWnd, UINT message, DWORD action, VOID * pChangeFilterStruct);
+        MESSAGEFILTERFUNCEX func = (MESSAGEFILTERFUNCEX)::GetProcAddress(hDll, "ChangeWindowMessageFilterEx");
+
+        constexpr UINT WM_COPYGLOBALDATA = 0x0049;
+        if (func)
+        {
+            // note:
+            // this enabled dropping files from e.g. explorer, but only
+            // on the main window, status bar, tab bar and the file tree.
+            // it does NOT work on the scintilla window because scintilla
+            // calls RegisterDragDrop() - and OLE drag'n'drop does not work
+            // between different elevation levels! Unfortunately, once
+            // a window calls RegisterDragDrop() the WM_DROPFILES message also
+            // won't work anymore...
+            func(*this, WM_COPYDATA, MSGFLT_ALLOW, nullptr);
+            func(*this, WM_COPYGLOBALDATA, MSGFLT_ALLOW, nullptr);
+            func(*this, WM_DROPFILES, MSGFLT_ALLOW, nullptr);
+        }
+        else
+        {
+            ChangeWindowMessageFilter(WM_COPYDATA, MSGFLT_ADD);
+            ChangeWindowMessageFilter(WM_COPYGLOBALDATA, MSGFLT_ADD);
+            ChangeWindowMessageFilter(WM_DROPFILES, MSGFLT_ADD);
+        }
+    }
 
     GetRibbonColors(m_normalThemeText, m_normalThemeBack, m_normalThemeHigh);
     SetTheme(CTheme::Instance().IsDarkTheme());
@@ -1583,7 +1592,7 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
     if (!bSaveAs && !doc.m_bIsDirty && !doc.m_bNeedsSaving)
         return false;
 
-    auto isActiveTab = docID == m_TabBar.GetCurrentTabId();
+    auto isActiveTab    = docID == m_TabBar.GetCurrentTabId();
     bool updateFileTree = false;
     if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
     {
