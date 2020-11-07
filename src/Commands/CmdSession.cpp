@@ -82,6 +82,8 @@ bool CCmdSessionLoad::Execute()
 void CCmdSessionLoad::OnClose()
 {
     // BowPad is closing, save the current session
+    if (!firstInstance)
+        return;
 
     auto& settings       = CIniSettings::Instance();
     bool  bAutoLoad      = GetAutoLoad();
@@ -278,12 +280,15 @@ void CCmdSessionLoad::RestoreSavedSession()
 CCmdSessionAutoLoad::CCmdSessionAutoLoad(void* obj)
     : CCmdSessionLoad(obj)
 {
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
 }
 
 bool CCmdSessionAutoLoad::Execute()
 {
     SetAutoLoad(!GetAutoLoad());
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
     InvalidateUICommand(cmdSessionAutoSave, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
     return true;
 }
@@ -294,6 +299,10 @@ HRESULT CCmdSessionAutoLoad::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
     if (UI_PKEY_BooleanValue == key)
     {
         return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, GetAutoLoad(), ppropvarNewValue);
+    }
+    else if (UI_PKEY_Enabled == key)
+    {
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, firstInstance, ppropvarNewValue);
     }
     return E_NOTIMPL;
 }
@@ -333,7 +342,7 @@ HRESULT CCmdSessionAutoSave::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key,
     }
     else if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, GetAutoLoad(), ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, GetAutoLoad() && firstInstance, ppropvarNewValue);
     }
     return E_NOTIMPL;
 }
