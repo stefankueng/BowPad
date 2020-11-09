@@ -910,7 +910,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
 
     auto crFill = GDIHelpers::InterpolateColors(crBkgnd,
                                                 CTheme::Instance().GetThemeColor(RGB(250, 250, 250), true),
-                                                max(0.0, fraction - (bSelected ? 0.4 : 0.1)));
+                                                max(0.0, fraction - (bSelected ? 0.6 : 0.1)));
 
     GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crBkgnd);
 
