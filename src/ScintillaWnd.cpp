@@ -244,6 +244,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     Call(SCI_SETSELALPHA, 128);
 
     Call(SCI_SETCHARACTERCATEGORYOPTIMIZATION, 0x10000);
+    Call(SCI_SETACCESSIBILITY, SC_ACCESSIBILITY_ENABLED);
+
     SetupDefaultStyles();
 
     if (!g_initialized)
