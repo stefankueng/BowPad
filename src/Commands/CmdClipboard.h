@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2018 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -114,7 +114,7 @@ public:
 
     UINT GetCmdId() override { return cmdPaste; }
 
-    void ScintillaNotify(SCNotification * pScn) override;
+    void OnClipboardChanged() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 };
@@ -133,7 +133,7 @@ public:
 
     UINT GetCmdId() override { return cmdPasteHtml; }
 
-    void ScintillaNotify(SCNotification * pScn) override;
+    void OnClipboardChanged() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
 private:

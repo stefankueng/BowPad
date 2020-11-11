@@ -320,6 +320,19 @@ void CCommandHandler::OnDocumentSave(DocID id, bool bSaveAs)
     }
 }
 
+void CCommandHandler::OnClipboardChanged()
+{
+    for (auto& cmd : m_commands)
+    {
+        cmd.second->OnClipboardChanged();
+    }
+    for (auto& cmd : m_nodeletecommands)
+    {
+        if (cmd.second)
+            cmd.second->OnClipboardChanged();
+    }
+}
+
 void CCommandHandler::BeforeLoad()
 {
     for (auto& cmd : m_commands)

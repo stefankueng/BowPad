@@ -339,10 +339,9 @@ bool CCmdPaste::Execute()
     return true;
 }
 
-void CCmdPaste::ScintillaNotify(SCNotification* pScn)
+void CCmdPaste::OnClipboardChanged()
 {
-    if (pScn->nmhdr.code == SCN_MODIFIED)
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
+    InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
 HRESULT CCmdPaste::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
@@ -380,10 +379,9 @@ bool CCmdPasteHtml::Execute()
     return true;
 }
 
-void CCmdPasteHtml::ScintillaNotify(SCNotification* pScn)
+void CCmdPasteHtml::OnClipboardChanged()
 {
-    if (pScn->nmhdr.code == SCN_MODIFIED)
-        InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
+    InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
 HRESULT CCmdPasteHtml::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)

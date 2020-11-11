@@ -69,6 +69,10 @@ void ICommand::OnDocumentOpen(DocID /*id*/)
 void ICommand::OnDocumentSave(DocID /*id*/, bool /*bSaveAs*/)
 {}
 
+void ICommand::OnClipboardChanged()
+{
+}
+
 void ICommand::OnTimer(UINT /*id*/)
 {
 }

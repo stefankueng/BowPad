@@ -2469,6 +2469,7 @@ void CMainWindow::ShowCurDocExplorerProperties() const
 
 void CMainWindow::HandleClipboardUpdate()
 {
+    CCommandHandler::Instance().OnClipboardChanged();
     std::wstring s;
     if (IsClipboardFormatAvailable(CF_UNICODETEXT))
     {

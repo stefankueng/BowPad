@@ -41,6 +41,7 @@ public:
     void        OnDocumentClose(DocID id);
     void        OnDocumentOpen(DocID id);
     void        OnDocumentSave(DocID id, bool bSaveAs);
+    void        OnClipboardChanged();
     void        BeforeLoad();
     void        AfterInit();
     void        OnTimer(UINT id);
