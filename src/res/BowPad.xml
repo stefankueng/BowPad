@@ -144,7 +144,7 @@
     </Command>
     <Command Name="cmdPasteHtml" LabelTitle="Paste Html" TooltipTitle="Clipboard" TooltipDescription="Inserts the html content of the clipboard at the cursor position" Keytip="H">
       <Command.LargeImages>
-        <Image>res/Paste.bmp</Image>
+        <Image>res/PasteHtml.bmp</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdUndo" LabelTitle="Undo" TooltipTitle="Undo" TooltipDescription="Undo the last change" Keytip="Z">
@@ -1285,7 +1285,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <ContextPopup>
       <ContextPopup.MiniToolbars>
         <MiniToolbar Name="CopyPasteToolbar">
-          <MenuGroup>
+          <MenuGroup Class="MajorItems">
             <Button CommandName="cmdCut" />
             <Button CommandName="cmdCopy" />
             <Button CommandName="cmdPaste" />
