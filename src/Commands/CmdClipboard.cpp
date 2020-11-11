@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2019 - Stefan Kueng
+// Copyright (C) 2014-2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,34 +26,43 @@
 #include "OnOutOfScope.h"
 #include <stdexcept>
 
-static constexpr wchar_t CF_BPLEXER[] = { L"BP Lexer" };
-static auto CF_HTML = RegisterClipboardFormat(L"HTML Format");
-
+static constexpr wchar_t CF_BPLEXER[] = {L"BP Lexer"};
+static auto              CF_HTML      = RegisterClipboardFormat(L"HTML Format");
 
 std::string ClipboardBase::GetHtmlSelection()
 {
     if (!HasActiveDocument())
         return "";
-    const auto& doc = GetActiveDocument();
+    const auto& doc       = GetActiveDocument();
     const auto& lexerdata = CLexStyles::Instance().GetLexerDataForLang(doc.GetLanguage());
 
     std::string sHtmlFragment;
-    int style = 0;
+    int         style = 0;
 
-    char fontbuf[40] = { 0 };
+    char fontbuf[40] = {0};
     ScintillaCall(SCI_STYLEGETFONT, 0, (sptr_t)fontbuf);
-    int fontSize = (int)ScintillaCall(SCI_STYLEGETSIZE, 0);
-    bool bold = !!ScintillaCall(SCI_STYLEGETBOLD, 0);
-    bool italic = !!ScintillaCall(SCI_STYLEGETITALIC, 0);
-    bool underlined = !!ScintillaCall(SCI_STYLEGETUNDERLINE, 0);
-    COLORREF fore = (COLORREF)ScintillaCall(SCI_STYLEGETFORE, 0);
-    COLORREF back = (COLORREF)ScintillaCall(SCI_STYLEGETBACK, 0);
+    int      fontSize   = (int)ScintillaCall(SCI_STYLEGETSIZE, 0);
+    bool     bold       = !!ScintillaCall(SCI_STYLEGETBOLD, 0);
+    bool     italic     = !!ScintillaCall(SCI_STYLEGETITALIC, 0);
+    bool     underlined = !!ScintillaCall(SCI_STYLEGETUNDERLINE, 0);
+    COLORREF fore       = (COLORREF)ScintillaCall(SCI_STYLEGETFORE, 0);
+    COLORREF back       = (COLORREF)ScintillaCall(SCI_STYLEGETBACK, 0);
     if (CTheme::Instance().IsDarkTheme())
     {
-        try { fore = lexerdata.Styles.at(0).ForegroundColor; }
-        catch (const std::out_of_range&) {}
-        try { back = lexerdata.Styles.at(0).BackgroundColor; }
-        catch (const std::out_of_range&) {}
+        try
+        {
+            fore = lexerdata.Styles.at(0).ForegroundColor;
+        }
+        catch (const std::out_of_range&)
+        {
+        }
+        try
+        {
+            back = lexerdata.Styles.at(0).BackgroundColor;
+        }
+        catch (const std::out_of_range&)
+        {
+        }
     }
     std::string stylehtml = CStringUtils::Format("<pre style=\"font-family:%s;font-size:%dpt;font-weight:%s;font-style:%s;text-decoration:%s;color:#%06x;background:#%06x;\">",
                                                  fontbuf, fontSize, bold ? "bold" : "normal", italic ? "italic" : "normal", underlined ? "underline" : "none",
@@ -61,19 +70,18 @@ std::string ClipboardBase::GetHtmlSelection()
                                                  GetRValue(back) << 16 | GetGValue(back) << 8 | GetBValue(back));
     sHtmlFragment += stylehtml;
 
-
-    int numSelections = (int)ScintillaCall(SCI_GETSELECTIONS);
-    bool spanset = false;
+    int  numSelections = (int)ScintillaCall(SCI_GETSELECTIONS);
+    bool spanset       = false;
     for (int i = 0; i < numSelections; ++i)
     {
         int selStart = (int)ScintillaCall(SCI_GETSELECTIONNSTART, i);
-        int selEnd = (int)ScintillaCall(SCI_GETSELECTIONNEND, i);
+        int selEnd   = (int)ScintillaCall(SCI_GETSELECTIONNEND, i);
 
         if ((selStart == selEnd) && (numSelections == 1))
         {
             auto curLine = GetCurrentLineNumber();
-            selStart = (int)ScintillaCall(SCI_POSITIONFROMLINE, curLine);
-            selEnd = (int)ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
+            selStart     = (int)ScintillaCall(SCI_POSITIONFROMLINE, curLine);
+            selEnd       = (int)ScintillaCall(SCI_GETLINEENDPOSITION, curLine);
         }
 
         int p = selStart;
@@ -85,44 +93,54 @@ std::string ClipboardBase::GetHtmlSelection()
                 if (spanset)
                     sHtmlFragment += "</span>";
                 ScintillaCall(SCI_STYLEGETFONT, s, (sptr_t)fontbuf);
-                fontSize = (int)ScintillaCall(SCI_STYLEGETSIZE, s);
-                bold = !!ScintillaCall(SCI_STYLEGETBOLD, s);
-                italic = !!ScintillaCall(SCI_STYLEGETITALIC, s);
+                fontSize   = (int)ScintillaCall(SCI_STYLEGETSIZE, s);
+                bold       = !!ScintillaCall(SCI_STYLEGETBOLD, s);
+                italic     = !!ScintillaCall(SCI_STYLEGETITALIC, s);
                 underlined = !!ScintillaCall(SCI_STYLEGETUNDERLINE, s);
-                fore = (COLORREF)ScintillaCall(SCI_STYLEGETFORE, s);
-                back = (COLORREF)ScintillaCall(SCI_STYLEGETBACK, s);
+                fore       = (COLORREF)ScintillaCall(SCI_STYLEGETFORE, s);
+                back       = (COLORREF)ScintillaCall(SCI_STYLEGETBACK, s);
                 if (CTheme::Instance().IsDarkTheme())
                 {
-                    try { fore = lexerdata.Styles.at(s).ForegroundColor; }
-                    catch (const std::out_of_range&) {}
-                    try { back = lexerdata.Styles.at(s).BackgroundColor; }
-                    catch (const std::out_of_range&) {}
+                    try
+                    {
+                        fore = lexerdata.Styles.at(s).ForegroundColor;
+                    }
+                    catch (const std::out_of_range&)
+                    {
+                    }
+                    try
+                    {
+                        back = lexerdata.Styles.at(s).BackgroundColor;
+                    }
+                    catch (const std::out_of_range&)
+                    {
+                    }
                 }
                 stylehtml = CStringUtils::Format("<span style=\"font-family:%s;font-size:%dpt;font-weight:%s;font-style:%s;text-decoration:%s;color:#%06x;background:#%06x;\">",
                                                  fontbuf, fontSize, bold ? "bold" : "normal", italic ? "italic" : "normal", underlined ? "underline" : "none",
                                                  GetRValue(fore) << 16 | GetGValue(fore) << 8 | GetBValue(fore),
                                                  GetRValue(back) << 16 | GetGValue(back) << 8 | GetBValue(back));
                 sHtmlFragment += stylehtml;
-                style = s;
+                style   = s;
                 spanset = true;
             }
-            char c = (char)ScintillaCall(SCI_GETCHARAT, p);
+            char        c = (char)ScintillaCall(SCI_GETCHARAT, p);
             std::string cs;
             cs += c;
             switch (c)
             {
                 case ' ':
-                cs = "&nbsp;";
-                break;
+                    cs = "&nbsp;";
+                    break;
                 case '"':
-                cs = "&quot;";
-                break;
+                    cs = "&quot;";
+                    break;
                 case '<':
-                cs = "&lt;";
-                break;
+                    cs = "&lt;";
+                    break;
                 case '>':
-                cs = "&gt;";
-                break;
+                    cs = "&gt;";
+                    break;
             }
             sHtmlFragment += cs;
             ++p;
@@ -132,11 +150,11 @@ std::string ClipboardBase::GetHtmlSelection()
     sHtmlFragment += "</span></pre>";
 
     std::string header = "Version:0.9\r\nStartHTML:<<<<<<<1\r\nEndHTML:<<<<<<<2\r\nStartFragment:<<<<<<<3\r\nEndFragment:<<<<<<<4\r\nStartSelection:<<<<<<<3\r\nEndSelection:<<<<<<<3\r\n";
-    std::string pre = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\r\n<HTML><HEAD></HEAD>\r\n<BODY>\r\n<!--StartFragment-->";
-    std::string post = "<!--EndFragment--></BODY></HTML>";
+    std::string pre    = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\r\n<HTML><HEAD></HEAD>\r\n<BODY>\r\n<!--StartFragment-->";
+    std::string post   = "<!--EndFragment--></BODY></HTML>";
 
-    std::string sHtml = header;
-    int startHtml = (int)sHtml.length();
+    std::string sHtml     = header;
+    int         startHtml = (int)sHtml.length();
     sHtml += pre;
     int startFragment = (int)sHtml.length();
     sHtml += sHtmlFragment;
@@ -155,52 +173,68 @@ std::string ClipboardBase::GetHtmlSelection()
 
 void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml)
 {
-    if (OpenClipboard(GetHwnd()))
+    for (int attempt = 0; attempt < 8; ++attempt)
     {
-        HGLOBAL hClipboardData;
-        size_t sLen = sHtml.length();
-        hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
-        if (hClipboardData)
+        if (attempt > 0)
         {
-            char * pchData = (char*)GlobalLock(hClipboardData);
-            if (pchData)
+            ::Sleep(1 << (attempt - 1));
+        }
+        if (OpenClipboard(GetHwnd()))
+        {
+            OnOutOfScope(CloseClipboard());
+            HGLOBAL hClipboardData;
+            size_t  sLen   = sHtml.length();
+            hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
+            if (hClipboardData)
             {
-                strcpy_s(pchData, sLen + 1, sHtml.c_str());
-                if (GlobalUnlock(hClipboardData))
+                char* pchData = (char*)GlobalLock(hClipboardData);
+                if (pchData)
                 {
-                    SetClipboardData(CF_HTML, hClipboardData);
+                    strcpy_s(pchData, sLen + 1, sHtml.c_str());
+                    if (GlobalUnlock(hClipboardData))
+                    {
+                        SetClipboardData(CF_HTML, hClipboardData);
+                    }
                 }
             }
+            break;
         }
-        CloseClipboard();
     }
 }
 
 void ClipboardBase::AddLexerToClipboard()
 {
-    const auto& doc = GetActiveDocument();
+    const auto& doc  = GetActiveDocument();
     const auto& lang = doc.GetLanguage();
     if (!lang.empty())
     {
-        if (OpenClipboard(GetHwnd()))
+        for (int attempt = 0; attempt < 8; ++attempt)
         {
-            HGLOBAL hClipboardData;
-            auto sLen = lang.length();
-            hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
-            if (hClipboardData)
+            if (attempt > 0)
             {
-                char * pchData = (char*)GlobalLock(hClipboardData);
-                if (pchData)
+                ::Sleep(1 << (attempt - 1));
+            }
+            if (OpenClipboard(GetHwnd()))
+            {
+                OnOutOfScope(CloseClipboard());
+                HGLOBAL hClipboardData;
+                auto    sLen   = lang.length();
+                hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
+                if (hClipboardData)
                 {
-                    strcpy_s(pchData, sLen + 1, lang.c_str());
-                    if (GlobalUnlock(hClipboardData))
+                    char* pchData = (char*)GlobalLock(hClipboardData);
+                    if (pchData)
                     {
-                        auto CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
-                        SetClipboardData(CF_LEXER, hClipboardData);
+                        strcpy_s(pchData, sLen + 1, lang.c_str());
+                        if (GlobalUnlock(hClipboardData))
+                        {
+                            auto CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
+                            SetClipboardData(CF_LEXER, hClipboardData);
+                        }
                     }
                 }
+                break;
             }
-            CloseClipboard();
         }
     }
 }
@@ -222,8 +256,7 @@ void ClipboardBase::SetLexerFromClipboard()
                 if (lptstr != nullptr)
                 {
                     OnOutOfScope(
-                        GlobalUnlock(hData);
-                    );
+                        GlobalUnlock(hData););
                     auto lang = lptstr;
                     SetupLexerForLang(lang);
                     doc.SetLanguage(lang);
@@ -234,11 +267,10 @@ void ClipboardBase::SetLexerFromClipboard()
     }
 }
 
-
 bool CCmdCut::Execute()
 {
-    bool bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-    std::string sHtml = GetHtmlSelection();
+    bool        bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+    std::string sHtml  = GetHtmlSelection();
     ScintillaCall(SCI_CUT);
     if (bShift)
         AddHtmlStringToClipboard(sHtml);
@@ -246,7 +278,7 @@ bool CCmdCut::Execute()
     return true;
 }
 
-void CCmdCut::ScintillaNotify(SCNotification * pScn)
+void CCmdCut::ScintillaNotify(SCNotification* pScn)
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
@@ -263,24 +295,22 @@ bool CCmdCutPlain::Execute()
     return true;
 }
 
-void CCmdCutPlain::ScintillaNotify(SCNotification * pScn)
+void CCmdCutPlain::ScintillaNotify(SCNotification* pScn)
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
-
 bool CCmdCopy::Execute()
 {
-    bool bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-    std::string sHtml = GetHtmlSelection();
+    bool        bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+    std::string sHtml  = GetHtmlSelection();
     ScintillaCall(SCI_COPYALLOWLINE);
     if (bShift)
         AddHtmlStringToClipboard(sHtml);
     AddLexerToClipboard();
     return true;
 }
-
 
 bool CCmdCopyPlain::Execute()
 {
@@ -309,7 +339,7 @@ bool CCmdPaste::Execute()
     return true;
 }
 
-void CCmdPaste::ScintillaNotify(SCNotification * pScn)
+void CCmdPaste::ScintillaNotify(SCNotification* pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
@@ -334,13 +364,13 @@ bool CCmdPasteHtml::Execute()
             HANDLE hData = GetClipboardData(CF_HTML);
             if (hData)
             {
-                char* buffer = (char*)GlobalLock(hData);
+                char*       buffer = (char*)GlobalLock(hData);
                 std::string str(buffer);
                 ::GlobalUnlock(hData);
                 std::string baseUrl;
-                size_t html_start = 0;
-                size_t frag_start = 0;
-                size_t frag_end = 0;
+                size_t      html_start = 0;
+                size_t      frag_start = 0;
+                size_t      frag_end   = 0;
                 HtmlExtractMetadata(str, &baseUrl, &html_start, &frag_start, &frag_end);
                 auto htmlStr = str.substr(frag_start, frag_end - frag_start);
                 ScintillaCall(SCI_ADDTEXT, htmlStr.size(), (sptr_t)htmlStr.c_str());
@@ -350,7 +380,7 @@ bool CCmdPasteHtml::Execute()
     return true;
 }
 
-void CCmdPasteHtml::ScintillaNotify(SCNotification * pScn)
+void CCmdPasteHtml::ScintillaNotify(SCNotification* pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
@@ -395,7 +425,7 @@ void CCmdPasteHtml::HtmlExtractMetadata(const std::string& cf_html,
     std::string cf_html_lower = cf_html;
     std::transform(cf_html_lower.begin(), cf_html_lower.end(), cf_html_lower.begin(), [](char c) { return (char)::tolower(c); });
 
-    size_t      markup_start  = cf_html_lower.find("<html", 0);
+    size_t markup_start = cf_html_lower.find("<html", 0);
     if (html_start)
     {
         *html_start = markup_start;
