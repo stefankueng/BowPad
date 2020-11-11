@@ -17,6 +17,11 @@
 #include "stdafx.h"
 #include "BasicScriptObject.h"
 #include "UnicodeUtils.h"
+#include "ClipboardHelper.h"
+#include "OnOutOfScope.h"
+#include "StringUtils.h"
+
+static auto CF_HTML = RegisterClipboardFormat(L"HTML Format");
 
 static const ScintillaCmd g_ScintillaCmd[] = {
     // SCI_GETTEXT
@@ -914,6 +919,12 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID      /*riid*/,
             idList[i] = 901;
         else if (_wcsicmp(nameList[i], L"SciFindText") == 0)
             idList[i] = 902;
+        else if (_wcsicmp(nameList[i], L"SetClipboardData") == 0)
+            idList[i] = 903;
+        else if (_wcsicmp(nameList[i], L"GetClipboardText") == 0)
+            idList[i] = 904;
+        else if (_wcsicmp(nameList[i], L"GetClipboardHtml") == 0)
+            idList[i] = 905;
         else if (ScintillaCommandsDispId(nameList[i], idList[i]))
             return S_OK;
         else
@@ -1290,6 +1301,125 @@ HRESULT BasicScriptObject::Invoke(DISPID      id,
             }
         }
             break;
+        case 903: // SetClipboardData
+        {
+            if (args->cArgs != 2)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[1], VARIANT_ALPHABOOL, VT_BSTR)))
+                return DISP_E_TYPEMISMATCH;
+            if (FAILED(VariantChangeType(&p2, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
+                return DISP_E_TYPEMISMATCH;
+            ret->vt = VT_BOOL;
+            ret->boolVal = VARIANT_FALSE;
+
+            CClipboardHelper clipboard;
+            if (clipboard.Open(GetHwnd()))
+            {
+                HGLOBAL hClipboardData;
+                size_t  sLen = wcslen(p1.bstrVal);
+                hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(wchar_t));
+                if (hClipboardData)
+                {
+                    wchar_t* pchData = (wchar_t*)GlobalLock(hClipboardData);
+                    if (pchData)
+                    {
+                        wcscpy_s(pchData, sLen + 1, p1.bstrVal);
+                        if (GlobalUnlock(hClipboardData))
+                        {
+                            SetClipboardData(CF_UNICODETEXT, hClipboardData);
+                        }
+                    }
+                }
+                auto sHtmlFragment = CUnicodeUtils::StdGetUTF8(p2.bstrVal);
+                if (!sHtmlFragment.empty())
+                {
+                    std::string header = "Version:0.9\r\nStartHTML:<<<<<<<1\r\nEndHTML:<<<<<<<2\r\nStartFragment:<<<<<<<3\r\nEndFragment:<<<<<<<4\r\nStartSelection:<<<<<<<3\r\nEndSelection:<<<<<<<3\r\n";
+                    std::string pre = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\r\n<HTML><HEAD></HEAD>\r\n<BODY>\r\n<!--StartFragment-->";
+                    std::string post = "<!--EndFragment--></BODY></HTML>";
+
+                    std::string sHtml = header;
+                    int         startHtml = (int)sHtml.length();
+                    sHtml += pre;
+                    int startFragment = (int)sHtml.length();
+                    sHtml += sHtmlFragment;
+                    int endFragment = (int)sHtml.length();
+                    sHtml += post;
+                    int endHtml = (int)sHtml.length();
+
+                    // replace back offsets
+                    SearchReplace(sHtml, "<<<<<<<1", CStringUtils::Format("%08d", startHtml));
+                    SearchReplace(sHtml, "<<<<<<<2", CStringUtils::Format("%08d", endHtml));
+                    SearchReplace(sHtml, "<<<<<<<3", CStringUtils::Format("%08d", startFragment));
+                    SearchReplace(sHtml, "<<<<<<<4", CStringUtils::Format("%08d", endFragment));
+
+
+                    hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sHtml.size() + 1) * sizeof(char));
+                    if (hClipboardData)
+                    {
+                        char* pchData = (char*)GlobalLock(hClipboardData);
+                        if (pchData)
+                        {
+                            strcpy_s(pchData, sHtml.size() + 1, sHtml.c_str());
+                            if (GlobalUnlock(hClipboardData))
+                            {
+                                SetClipboardData(CF_HTML, hClipboardData);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        break;
+        case 904: // GetClipboardText
+        {
+            if (args->cArgs != 0)
+                return DISP_E_BADPARAMCOUNT;
+            ret->vt = VT_BSTR;
+            CClipboardHelper clipboard;
+            if (clipboard.Open(GetHwnd()))
+            {
+                HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+                if (hData)
+                {
+                    LPCWSTR lptstr = (LPCWSTR)GlobalLock(hData);
+                    OnOutOfScope(
+                        GlobalUnlock(hData););
+                    if (lptstr != nullptr)
+                    {
+                        ret->vt = VT_BSTR;
+                        ret->bstrVal = _bstr_t(lptstr).Detach();
+                        break;
+                    }
+                }
+            }
+            ret->bstrVal = _bstr_t(L"").Detach();
+        }
+        break;
+        case 905: // GetClipboardHtml
+        {
+            if (args->cArgs != 0)
+                return DISP_E_BADPARAMCOUNT;
+            ret->vt = VT_BSTR;
+            CClipboardHelper clipboard;
+            if (clipboard.Open(GetHwnd()))
+            {
+                HANDLE hData = GetClipboardData(CF_HTML);
+                if (hData)
+                {
+                    LPCSTR lptstr = (LPCSTR)GlobalLock(hData);
+                    OnOutOfScope(
+                        GlobalUnlock(hData););
+                    if (lptstr != nullptr)
+                    {
+                        ret->vt = VT_BSTR;
+                        ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(lptstr).c_str()).Detach();
+                        break;
+                    }
+                }
+            }
+            ret->bstrVal = _bstr_t(L"").Detach();
+        }
+        break;
         default:
             return ScintillaCommandInvoke(id, flags, args, ret);
     }
