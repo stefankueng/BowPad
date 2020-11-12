@@ -3023,16 +3023,11 @@ static LRESULT CoolSB_Notify(SCROLLWND *swnd, HWND hwnd, WPARAM wParam, LPARAM l
     return CallWindowProc(swnd->oldproc, hwnd, WM_NOTIFY, wParam, lParam);
 }
 
-static LRESULT SendToolTipMessage0(HWND hwndTT, UINT message, WPARAM wParam, LPARAM lParam)
+static LRESULT SendToolTipMessage(HWND hwndTT, UINT message, WPARAM wParam, LPARAM lParam)
 {
     return SendMessage(hwndTT, message, wParam, lParam);
 }
 
-#ifdef COOLSB_TOOLTIPS
-#define SendToolTipMessage      SendToolTipMessage0
-#else
-#define SendToolTipMessage      1 ? (void)0 : SendToolTipMessage0
-#endif
 
 
 //
@@ -3085,19 +3080,23 @@ static LRESULT CoolSB_SetCursor(SCROLLWND *swnd, HWND hwnd, WPARAM wParam, LPARA
 
         if(id != HTSCROLL_INSERTED)
         {
+#ifdef COOLSB_TOOLTIPS
             if(swnd->hwndToolTip != 0)
             {
                 SendToolTipMessage(swnd->hwndToolTip, TTM_ACTIVATE, FALSE, 0);
                 SendToolTipMessage(swnd->hwndToolTip, TTM_POP, 0, 0);
             }
+#endif
 
             return CallWindowProc(swnd->oldproc, hwnd, WM_SETCURSOR, wParam, lParam);
         }
 
+#ifdef COOLSB_TOOLTIPS
         if(swnd->hwndToolTip != 0)
         {
             SendToolTipMessage(swnd->hwndToolTip, TTM_ACTIVATE, TRUE, 0);
         }
+#endif
 
         //set the cursor if one has been specified
         if((id = GetButtonFromPt(sbar, &rect, pt, TRUE)) != -1)
@@ -3107,8 +3106,10 @@ static LRESULT CoolSB_SetCursor(SCROLLWND *swnd, HWND hwnd, WPARAM wParam, LPARA
 
             if(lastid != id && swnd->hwndToolTip != 0)
             {
+#ifdef COOLSB_TOOLTIPS
                 if(IsWindowVisible(swnd->hwndToolTip))
                     SendToolTipMessage(swnd->hwndToolTip, TTM_UPDATE, TRUE, 0);
+#endif
             }
 
             lastid = id;
@@ -3127,8 +3128,10 @@ static LRESULT CoolSB_SetCursor(SCROLLWND *swnd, HWND hwnd, WPARAM wParam, LPARA
     }
     else if(swnd->hwndToolTip != 0)
     {
+#ifdef COOLSB_TOOLTIPS
         SendToolTipMessage(swnd->hwndToolTip, TTM_ACTIVATE, FALSE, 0);
         SendToolTipMessage(swnd->hwndToolTip, TTM_POP, 0, 0);
+#endif
     }
 
 #endif  //INCLUDE_BUTTONS

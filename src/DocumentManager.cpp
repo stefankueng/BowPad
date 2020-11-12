@@ -572,7 +572,7 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
         if (!result || bytesWritten != 2)
         {
             CFormatMessageWrapper errMsg;
-            err = errMsg;
+            err = errMsg.c_str();
             return false;
         }
     }
@@ -595,7 +595,7 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
         if (!WriteFile(hFile, widebuf.get(), widelen*2, &bytesWritten, nullptr) || widelen != int(bytesWritten/2))
         {
             CFormatMessageWrapper errMsg;
-            err = errMsg;
+            err = errMsg.c_str();
             return false;
         }
         writeBuf += charStart;
@@ -627,7 +627,7 @@ static bool SaveAsUtf32(const CDocument& doc, char*buf, size_t lengthDoc, CAutoF
     if (!result || bytesWritten != 4)
     {
         CFormatMessageWrapper errMsg;
-        err = errMsg;
+        err = errMsg.c_str();
         return false;
     }
     char * writeBuf = buf;
@@ -669,7 +669,7 @@ static bool SaveAsUtf32(const CDocument& doc, char*buf, size_t lengthDoc, CAutoF
         if (!WriteFile(hFile, writeWide32buf.get(), widelen*4, &bytesWritten, nullptr) || widelen != int(bytesWritten/4))
         {
             CFormatMessageWrapper errMsg;
-            err = errMsg;
+            err = errMsg.c_str();
             return false;
         }
         writeBuf += charStart;
@@ -695,7 +695,7 @@ static bool SaveAsUtf8(const CDocument& doc, char* buf, size_t lengthDoc, CAutoF
         if (!WriteFile(hFile, "\xEF\xBB\xBF", 3, &bytesWritten, nullptr) || bytesWritten != 3)
         {
             CFormatMessageWrapper errMsg;
-            err = errMsg;
+            err = errMsg.c_str();
             return false;
         }
     }
@@ -705,7 +705,7 @@ static bool SaveAsUtf8(const CDocument& doc, char* buf, size_t lengthDoc, CAutoF
         if (!WriteFile(hFile, buf, writeLen, &bytesWritten, nullptr))
         {
             CFormatMessageWrapper errMsg;
-            err = errMsg;
+            err = errMsg.c_str();
             return false;
         }
         lengthDoc -= writeLen;
@@ -738,7 +738,7 @@ static bool SaveAsOther(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
         if (!WriteFile(hFile, charbuf.get(), charlen, &bytesWritten, nullptr) || charlen != int(bytesWritten))
         {
             CFormatMessageWrapper errMsg;
-            err = errMsg;
+            err = errMsg.c_str();
             return false;
         }
         writeBuf += charStart;

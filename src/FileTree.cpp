@@ -319,6 +319,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 {
                     TVITEMEX       tvi   = {0};
                     TVINSERTSTRUCT tvins = {0};
+                    wchar_t dots[] = L"..";
 
                     tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
 
@@ -339,7 +340,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                             tvi.iImage         = 0;
                             tvi.iSelectedImage = 0;
                             tvi.iExpandedImage = 0;
-                            tvi.pszText        = L"..";
+                            tvi.pszText        = dots;
                             tvi.cchTextMax     = 3;
                             tvi.cChildren      = 0;
                         }

@@ -267,7 +267,7 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     Gdiplus::Color c1;
                     c1.SetFromCOLORREF(scroll);
                     Gdiplus::SolidBrush brush(c1);
-                    graphics.FillRectangle(&brush, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right - pCustDraw->rect.left, pCustDraw->rect.bottom - pCustDraw->rect.top);
+                    graphics.FillRectangle(&brush, (INT)pCustDraw->rect.left, (INT)pCustDraw->rect.top, (INT)(pCustDraw->rect.right - pCustDraw->rect.left), (INT)(pCustDraw->rect.bottom - pCustDraw->rect.top));
 
                     if (m_bDirty)
                         CalcLines();
