@@ -173,31 +173,23 @@ std::string ClipboardBase::GetHtmlSelection()
 
 void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml)
 {
-    for (int attempt = 0; attempt < 8; ++attempt)
+    CClipboardHelper clipBoard;
+    if (clipBoard.Open(GetHwnd()))
     {
-        if (attempt > 0)
+        HGLOBAL hClipboardData;
+        size_t  sLen   = sHtml.length();
+        hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
+        if (hClipboardData)
         {
-            ::Sleep(1 << (attempt - 1));
-        }
-        if (OpenClipboard(GetHwnd()))
-        {
-            OnOutOfScope(CloseClipboard());
-            HGLOBAL hClipboardData;
-            size_t  sLen   = sHtml.length();
-            hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
-            if (hClipboardData)
+            char* pchData = (char*)GlobalLock(hClipboardData);
+            if (pchData)
             {
-                char* pchData = (char*)GlobalLock(hClipboardData);
-                if (pchData)
+                strcpy_s(pchData, sLen + 1, sHtml.c_str());
+                if (GlobalUnlock(hClipboardData))
                 {
-                    strcpy_s(pchData, sLen + 1, sHtml.c_str());
-                    if (GlobalUnlock(hClipboardData))
-                    {
-                        SetClipboardData(CF_HTML, hClipboardData);
-                    }
+                    SetClipboardData(CF_HTML, hClipboardData);
                 }
             }
-            break;
         }
     }
 }
@@ -208,32 +200,24 @@ void ClipboardBase::AddLexerToClipboard()
     const auto& lang = doc.GetLanguage();
     if (!lang.empty())
     {
-        for (int attempt = 0; attempt < 8; ++attempt)
+        CClipboardHelper clipBoard;
+        if (clipBoard.Open(GetHwnd()))
         {
-            if (attempt > 0)
+            HGLOBAL hClipboardData;
+            auto    sLen   = lang.length();
+            hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
+            if (hClipboardData)
             {
-                ::Sleep(1 << (attempt - 1));
-            }
-            if (OpenClipboard(GetHwnd()))
-            {
-                OnOutOfScope(CloseClipboard());
-                HGLOBAL hClipboardData;
-                auto    sLen   = lang.length();
-                hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
-                if (hClipboardData)
+                char* pchData = (char*)GlobalLock(hClipboardData);
+                if (pchData)
                 {
-                    char* pchData = (char*)GlobalLock(hClipboardData);
-                    if (pchData)
+                    strcpy_s(pchData, sLen + 1, lang.c_str());
+                    if (GlobalUnlock(hClipboardData))
                     {
-                        strcpy_s(pchData, sLen + 1, lang.c_str());
-                        if (GlobalUnlock(hClipboardData))
-                        {
-                            auto CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
-                            SetClipboardData(CF_LEXER, hClipboardData);
-                        }
+                        auto CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
+                        SetClipboardData(CF_LEXER, hClipboardData);
                     }
                 }
-                break;
             }
         }
     }
