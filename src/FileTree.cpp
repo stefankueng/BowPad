@@ -54,7 +54,7 @@ static HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void**
     SFGAOF       sfgao;
     if (SUCCEEDED(hr = SHParseDisplayName(pszPath, nullptr, &pidl, 0, &sfgao)))
     {
-        IShellFolder* psf;
+        IShellFolder* psf = nullptr;
         LPCITEMIDLIST pidlChild;
         if (SUCCEEDED(hr = SHBindToParent(pidl, IID_IShellFolder,
                                           (void**)&psf, &pidlChild)))
@@ -69,9 +69,9 @@ static HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void**
 
 static FileTreeItem* GetFileTreeItem(HWND hWnd, HTREEITEM hItem)
 {
-    TVITEM item; // No need to erase to zero, mask defines the valid fields.
-    item.mask  = TVIF_PARAM;
-    item.hItem = hItem;
+    TVITEM item = {}; // No need to erase to zero, mask defines the valid fields.
+    item.mask   = TVIF_PARAM;
+    item.hItem  = hItem;
     if (TreeView_GetItem(hWnd, &item) != FALSE)
         return reinterpret_cast<FileTreeItem*>(item.lParam);
     return nullptr;
@@ -141,9 +141,9 @@ void CFileTree::SetPath(const std::wstring& path, bool forcerefresh)
 
 bool CFileTree::Init(HINSTANCE /*hInst*/, HWND hParent)
 {
-    INITCOMMONCONTROLSEX icce;
-    icce.dwSize = sizeof(icce);
-    icce.dwICC  = ICC_TREEVIEW_CLASSES;
+    INITCOMMONCONTROLSEX icce = {};
+    icce.dwSize               = sizeof(icce);
+    icce.dwICC                = ICC_TREEVIEW_CLASSES;
     InitCommonControlsEx(&icce);
     CreateEx(0, WS_VISIBLE | WS_CHILD | WS_TABSTOP | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_NOHSCROLL | TVS_TRACKSELECT, hParent, 0, WC_TREEVIEW);
     if (!*this)
@@ -183,13 +183,13 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
         case WM_CONTEXTMENU:
         {
             HTREEITEM hSelItem = TreeView_GetSelection(*this);
-            POINT     pt;
+            POINT     pt{};
             POINTSTOPOINT(pt, lParam);
 
             if (pt.x == -1 && pt.y == -1)
             {
                 hSelItem = TreeView_GetSelection(*this);
-                RECT rc;
+                RECT rc{};
                 TreeView_GetItemRect(*this, hSelItem, &rc, TRUE);
                 pt.x = rc.left;
                 pt.y = rc.top;
@@ -199,7 +199,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
             {
                 ScreenToClient(*this, &pt);
 
-                TV_HITTESTINFO tvhti;
+                TV_HITTESTINFO tvhti{};
                 tvhti.pt        = pt;
                 HTREEITEM hItem = TreeView_HitTest(*this, &tvhti);
                 if ((tvhti.flags & TVHT_ONITEM) != 0)
@@ -317,9 +317,9 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 bool activepathmarked = false;
                 for (const auto& item : pData->data)
                 {
-                    TVITEMEX       tvi   = {0};
-                    TVINSERTSTRUCT tvins = {0};
-                    wchar_t dots[] = L"..";
+                    TVITEMEX       tvi    = {0};
+                    TVINSERTSTRUCT tvins  = {0};
+                    wchar_t        dots[] = L"..";
 
                     tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
 
@@ -607,11 +607,11 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
 HTREEITEM CFileTree::GetHitItem() const
 {
     DWORD mpos = GetMessagePos();
-    POINT pt;
+    POINT pt{};
     pt.x = GET_X_LPARAM(mpos);
     pt.y = GET_Y_LPARAM(mpos);
     ScreenToClient(*this, &pt);
-    TV_HITTESTINFO tvhti;
+    TV_HITTESTINFO tvhti{};
     tvhti.pt        = pt;
     HTREEITEM hItem = TreeView_HitTest(*this, &tvhti);
     if ((tvhti.flags & TVHT_ONITEM) == 0)

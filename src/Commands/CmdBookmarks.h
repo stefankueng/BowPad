@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 namespace Scintilla
 {
-    struct SCNotification;
+struct SCNotification;
 };
 
 class CCmdBookmarks : public ICommand
@@ -37,10 +37,10 @@ class CCmdBookmarks : public ICommand
         }
     };
 
-    using BookmarkContainer = std::map<std::wstring, std::vector<int>, CaseInsensitiveLess>;
-public:
+    using BookmarkContainer = std::map<std::wstring, std::vector<sptr_t>, CaseInsensitiveLess>;
 
-    CCmdBookmarks(void * obj);
+public:
+    CCmdBookmarks(void* obj);
 
     ~CCmdBookmarks() = default;
 
@@ -62,8 +62,8 @@ private:
 class CCmdBookmarkToggle : public ICommand
 {
 public:
-
-    CCmdBookmarkToggle(void * obj) : ICommand(obj)
+    CCmdBookmarkToggle(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -77,8 +77,8 @@ public:
 class CCmdBookmarkClearAll : public ICommand
 {
 public:
-
-    CCmdBookmarkClearAll(void * obj) : ICommand(obj)
+    CCmdBookmarkClearAll(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -92,8 +92,8 @@ public:
 class CCmdBookmarkNext : public ICommand
 {
 public:
-
-    CCmdBookmarkNext(void * obj) : ICommand(obj)
+    CCmdBookmarkNext(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -107,11 +107,11 @@ public:
     {
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
-    void ScintillaNotify(SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification* pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(
         REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-    void  TabNotify(TBHDR * ptbhdr) override
+    void TabNotify(TBHDR* ptbhdr) override
     {
         if (ptbhdr->hdr.code == TCN_SELCHANGE)
         {
@@ -123,8 +123,8 @@ public:
 class CCmdBookmarkPrev : public ICommand
 {
 public:
-
-    CCmdBookmarkPrev(void * obj) : ICommand(obj)
+    CCmdBookmarkPrev(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -138,11 +138,11 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
-    void ScintillaNotify(SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification* pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(
         REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-    void  TabNotify(TBHDR * ptbhdr) override
+    void TabNotify(TBHDR* ptbhdr) override
     {
         if (ptbhdr->hdr.code == TCN_SELCHANGE)
         {

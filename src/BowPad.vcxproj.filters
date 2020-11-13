@@ -342,14 +342,8 @@
     <ClInclude Include="Commands\CmdGotoSymbol.h">
       <Filter>Commands</Filter>
     </ClInclude>
-    <ClInclude Include="TabBtn.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\ext\sktoolslib\GDIHelpers.h">
       <Filter>sktoolslib</Filter>
-    </ClInclude>
-    <ClInclude Include="ProgressBar.h">
-      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="CustomTooltip.h">
       <Filter>Header Files</Filter>
@@ -388,6 +382,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CommandPaletteDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgressBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TabBtn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

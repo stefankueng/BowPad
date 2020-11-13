@@ -136,7 +136,7 @@ protected:
     HRESULT             InvalidateUICommand(UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY *key);
     HRESULT             SetUICommandProperty(UINT32 commandId, REFPROPERTYKEY key, PROPVARIANT value);
     HRESULT             SetUICommandProperty(REFPROPERTYKEY key, PROPVARIANT value);
-    long                GetCurrentLineNumber() const;
+    sptr_t              GetCurrentLineNumber() const;
     void                BlockAllUIUpdates(bool block);
     void                ShowProgressCtrl(UINT delay);
     void                HideProgressCtrl();

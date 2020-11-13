@@ -19,7 +19,7 @@
 
 #include "Document.h"
 
-enum DocModifiedState
+enum class DocModifiedState
 {
     DM_Unmodified,
     DM_Modified,

@@ -32,7 +32,7 @@
 #include <vector>
 #include <utility>
 
-extern IUIFramework *g_pFramework;
+extern IUIFramework* g_pFramework;
 
 static BYTE GetCtrlKeys()
 {
@@ -54,7 +54,6 @@ CKeyboardShortcutHandler::~CKeyboardShortcutHandler()
 {
 }
 
-
 CKeyboardShortcutHandler& CKeyboardShortcutHandler::Instance()
 {
     static CKeyboardShortcutHandler instance;
@@ -65,14 +64,14 @@ CKeyboardShortcutHandler& CKeyboardShortcutHandler::Instance()
 #ifdef _DEBUG
         // check if one of our shortcuts overrides a built-in Scintilla shortcut
         Scintilla::KeyMap kmap;
-        auto keyMap = kmap.GetKeyMap();
-        for (auto k : instance.m_accelerators)
+        const auto&       keyMap = kmap.GetKeyMap();
+        for (auto& k : instance.m_accelerators)
         {
-#define SCMOD_SHIFT 1
-#define SCMOD_CTRL 2
-#define SCMOD_ALT 4
+            constexpr auto SCMOD_SHIFT = 1;
+            constexpr auto SCMOD_CTRL  = 2;
+            constexpr auto SCMOD_ALT   = 4;
 
-            int modifier = 0;
+            int         modifier = 0;
             std::string sMod;
             if (k.fVirt & 0x10)
             {
@@ -90,26 +89,26 @@ CKeyboardShortcutHandler& CKeyboardShortcutHandler::Instance()
                 sMod += "Shift ";
             }
             Scintilla::KeyModifiers sm(k.key1, modifier);
-            auto foundIt = keyMap.find(sm);
+            auto                    foundIt = keyMap.find(sm);
             if (foundIt != keyMap.end())
             {
                 // before hitting a break, check if it's a command we want to override
                 switch (k.cmd)
                 {
-                case cmdCopyPlain:
-                case cmdCutPlain:
-                case cmdEditSelection:
-                case cmdLineDuplicate:
-                case cmdLowercase:
-                case cmdPaste:
-                case cmdRedo:
-                case cmdSessionLast:
-                case cmdUndo:
-                case cmdUppercase:
-                case cmdNew:
-                    continue;
-                default:
-                    break;
+                    case cmdCopyPlain:
+                    case cmdCutPlain:
+                    case cmdEditSelection:
+                    case cmdLineDuplicate:
+                    case cmdLowercase:
+                    case cmdPaste:
+                    case cmdRedo:
+                    case cmdSessionLast:
+                    case cmdUndo:
+                    case cmdUppercase:
+                    case cmdNew:
+                        continue;
+                    default:
+                        break;
                 }
                 const char key = (const char)sm.key;
                 sMod += key;
@@ -136,7 +135,7 @@ CKeyboardShortcutHandler& CKeyboardShortcutHandler::Instance()
 
 void CKeyboardShortcutHandler::Load()
 {
-    DWORD resSize = 0;
+    DWORD       resSize = 0;
     const char* resData = CAppUtils::GetResourceData(L"config", IDR_SHORTCUTS, resSize);
     if (resData != nullptr)
     {
@@ -147,7 +146,7 @@ void CKeyboardShortcutHandler::Load()
     }
 
     std::wstring userFile = CAppUtils::GetDataPath() + L"\\shortcuts.ini";
-    CSimpleIni userIni;
+    CSimpleIni   userIni;
     userIni.SetMultiKey(true);
     userIni.LoadFile(userFile.c_str());
     Load(userIni);
@@ -155,13 +154,13 @@ void CKeyboardShortcutHandler::Load()
     m_bLoaded = true;
 }
 
-void CKeyboardShortcutHandler::Load( const CSimpleIni& ini )
+void CKeyboardShortcutHandler::Load(const CSimpleIni& ini)
 {
     CSimpleIni::TNamesDepend virtkeys;
     ini.GetAllKeys(L"virtkeys", virtkeys);
     for (auto keyName : virtkeys)
     {
-        unsigned long vk = 0;
+        unsigned long  vk            = 0;
         const wchar_t* keyDataString = ini.GetValue(L"virtkeys", keyName);
         if (CAppUtils::TryParse(keyDataString, vk, false, 0, 16))
             m_virtkeys[keyName] = (UINT)vk;
@@ -182,7 +181,7 @@ void CKeyboardShortcutHandler::Load( const CSimpleIni& ini )
             stringtok(keyvec, v, false, L",");
             KSH_Accel accel;
             accel.sCmd = cmd;
-            accel.cmd = (WORD)_wtoi(cmd);
+            accel.cmd  = (WORD)_wtoi(cmd);
             if (accel.cmd == 0)
             {
                 auto it = m_resourceData.find(cmd);
@@ -193,66 +192,66 @@ void CKeyboardShortcutHandler::Load( const CSimpleIni& ini )
             {
                 switch (i)
                 {
-                case 0:
-                    if (CStringUtils::find_caseinsensitive(keyvec[i], L"alt") != std::wstring::npos)
-                        accel.fVirt |= 0x10;
-                    if (CStringUtils::find_caseinsensitive(keyvec[i], L"ctrl") != std::wstring::npos)
-                        accel.fVirt |= 0x08;
-                    if (CStringUtils::find_caseinsensitive(keyvec[i], L"shift") != std::wstring::npos)
-                        accel.fVirt |= 0x04;
-                    break;
-                case 1:
-                {
-                    auto keyveci = keyvec[i].c_str();
-                    auto whereAt = m_virtkeys.cend();
-                    for (auto it = m_virtkeys.cbegin(); it != m_virtkeys.cend(); ++it)
+                    case 0:
+                        if (CStringUtils::find_caseinsensitive(keyvec[i], L"alt") != std::wstring::npos)
+                            accel.fVirt |= 0x10;
+                        if (CStringUtils::find_caseinsensitive(keyvec[i], L"ctrl") != std::wstring::npos)
+                            accel.fVirt |= 0x08;
+                        if (CStringUtils::find_caseinsensitive(keyvec[i], L"shift") != std::wstring::npos)
+                            accel.fVirt |= 0x04;
+                        break;
+                    case 1:
                     {
-                        if (_wcsicmp(keyveci, it->first.c_str()) == 0)
+                        auto keyveci = keyvec[i].c_str();
+                        auto whereAt = m_virtkeys.cend();
+                        for (auto it = m_virtkeys.cbegin(); it != m_virtkeys.cend(); ++it)
                         {
-                            whereAt = it;
-                            break;
+                            if (_wcsicmp(keyveci, it->first.c_str()) == 0)
+                            {
+                                whereAt = it;
+                                break;
+                            }
+                        }
+                        if (whereAt != m_virtkeys.cend())
+                        {
+                            accel.fVirt1 = TRUE;
+                            accel.key1   = (WORD)whereAt->second;
+                        }
+                        else
+                        {
+                            if ((keyvec[i].size() > 2) && (keyvec[i][0] == '0') && (keyvec[i][1] == 'x'))
+                                accel.key1 = (WORD)wcstol(keyvec[i].c_str(), nullptr, 0);
+                            else
+                                accel.key1 = (WORD)::towupper(keyvec[i][0]);
                         }
                     }
-                    if (whereAt != m_virtkeys.cend())
-                    {
-                        accel.fVirt1 = TRUE;
-                        accel.key1 = (WORD)whereAt->second;
-                    }
-                    else
-                    {
-                        if ((keyvec[i].size() > 2) && (keyvec[i][0] == '0') && (keyvec[i][1] == 'x'))
-                            accel.key1 = (WORD)wcstol(keyvec[i].c_str(), nullptr, 0);
-                        else
-                            accel.key1 = (WORD)::towupper(keyvec[i][0]);
-                    }
-                }
                     break;
-                case 2:
-                {
-                    auto keyveci = keyvec[i].c_str();
-                    auto whereAt = m_virtkeys.cend();
-                    for (auto it = m_virtkeys.cbegin(); it != m_virtkeys.cend(); ++it)
+                    case 2:
                     {
-                        if (_wcsicmp(keyveci, it->first.c_str()) == 0)
+                        auto keyveci = keyvec[i].c_str();
+                        auto whereAt = m_virtkeys.cend();
+                        for (auto it = m_virtkeys.cbegin(); it != m_virtkeys.cend(); ++it)
                         {
-                            whereAt = it;
-                            break;
+                            if (_wcsicmp(keyveci, it->first.c_str()) == 0)
+                            {
+                                whereAt = it;
+                                break;
+                            }
                         }
-                    }
-                    if (whereAt != m_virtkeys.cend())
-                    {
-                        accel.fVirt2 = TRUE;
-                        accel.key2 = (WORD)whereAt->second;
-                    }
-                    else
-                    {
-                        if ((keyvec[i].size() > 2) && (keyvec[i][0] == '0') && (keyvec[i][1] == 'x'))
-                            accel.key2 = (WORD)wcstol(keyvec[i].c_str(), nullptr, 0);
+                        if (whereAt != m_virtkeys.cend())
+                        {
+                            accel.fVirt2 = TRUE;
+                            accel.key2   = (WORD)whereAt->second;
+                        }
                         else
-                            accel.key2 = (WORD)::towupper(keyvec[i][0]);
+                        {
+                            if ((keyvec[i].size() > 2) && (keyvec[i][0] == '0') && (keyvec[i][1] == 'x'))
+                                accel.key2 = (WORD)wcstol(keyvec[i].c_str(), nullptr, 0);
+                            else
+                                accel.key2 = (WORD)::towupper(keyvec[i][0]);
+                        }
+                        break;
                     }
-                    break;
-                }
                 } // switch
             }
             m_accelerators.push_back(std::move(accel));
@@ -260,22 +259,21 @@ void CKeyboardShortcutHandler::Load( const CSimpleIni& ini )
     }
 }
 
-LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM /*lParam*/ )
+LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM /*lParam*/)
 {
     switch (uMsg)
     {
-    case WM_SYSKEYDOWN:
-    case WM_KEYDOWN:
+        case WM_SYSKEYDOWN:
+        case WM_KEYDOWN:
         {
             auto ctrlkeys = GetCtrlKeys();
-            int nonvirt = MapVirtualKey((UINT)wParam, MAPVK_VK_TO_CHAR);
+            int  nonvirt  = MapVirtualKey((UINT)wParam, MAPVK_VK_TO_CHAR);
             for (auto accel = m_accelerators.crbegin(); accel != m_accelerators.crend(); ++accel)
             {
                 if (accel->fVirt == ctrlkeys)
                 {
                     if ((m_lastKey == 0) &&
-                        (((accel->key1 == wParam) && accel->fVirt1) || (nonvirt && (accel->key1 == nonvirt) && !accel->fVirt1))
-                        )
+                        (((accel->key1 == wParam) && accel->fVirt1) || (nonvirt && (accel->key1 == nonvirt) && !accel->fVirt1)))
                     {
                         if (accel->key2 == 0)
                         {
@@ -300,8 +298,7 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
                         }
                     }
                     else if ((m_lastKey == accel->key1) &&
-                             (((accel->key2 == wParam) && accel->fVirt2) || (nonvirt && (accel->key2 == nonvirt) && !accel->fVirt2))
-                        )
+                             (((accel->key2 == wParam) && accel->fVirt2) || (nonvirt && (accel->key2 == nonvirt) && !accel->fVirt2)))
                     {
                         // execute the command
                         if (GetForegroundWindow() == hwnd)
@@ -315,23 +312,23 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator( HWND hwnd, UINT
             }
         }
         break;
-    case WM_KEYUP:
+        case WM_KEYUP:
         {
             auto ctrlkeys = GetCtrlKeys();
             if (ctrlkeys == 0)
                 m_lastKey = 0;
         }
         break;
-    default:
-        break;
+        default:
+            break;
     }
     return FALSE;
 }
 
-std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd ) const
+std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand(WORD cmd) const
 {
     auto whereAt = std::find_if(m_accelerators.begin(), m_accelerators.end(),
-        [&](const auto& item) { return (item.cmd == cmd); });
+                                [&](const auto& item) { return (item.cmd == cmd); });
     if (whereAt != m_accelerators.end())
     {
         return MakeShortCutKeyForAccel(*whereAt);
@@ -342,7 +339,7 @@ std::wstring CKeyboardShortcutHandler::GetShortCutStringForCommand( WORD cmd ) c
 void CKeyboardShortcutHandler::LoadUIHeaders()
 {
     m_resourceData.clear();
-    DWORD resSize = 0;
+    DWORD       resSize = 0;
     const char* resData = CAppUtils::GetResourceData(L"config", IDR_BOWPADUIH, resSize);
     LoadUIHeader(resData, resSize);
 
@@ -375,8 +372,8 @@ void CKeyboardShortcutHandler::LoadUIHeader(const char* resData, DWORD resSize)
                     auto spacepos2 = sLine.find(' ', spacepos + 1);
                     if (spacepos2 != std::string::npos)
                     {
-                        std::string sIDString = sLine.substr(spacepos + 1, spacepos2 - spacepos - 1);
-                        int ID = atoi(sLine.substr(spacepos2).c_str());
+                        std::string sIDString                                   = sLine.substr(spacepos + 1, spacepos2 - spacepos - 1);
+                        int         ID                                          = atoi(sLine.substr(spacepos2).c_str());
                         m_resourceData[CUnicodeUtils::StdGetUnicode(sIDString)] = ID;
                     }
                 }
@@ -397,19 +394,19 @@ void CKeyboardShortcutHandler::UpdateTooltips()
     }
 }
 
-std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand( WORD cmd ) const
+std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand(WORD cmd) const
 {
     std::wstring sAcc = GetShortCutStringForCommand((WORD)cmd);
     if (!sAcc.empty())
     {
         auto whereAt = std::find_if(m_resourceData.begin(), m_resourceData.end(),
-            [&](const auto& item) { return (item.second == cmd); });
+                                    [&](const auto& item) { return (item.second == cmd); });
         if (whereAt != m_resourceData.end())
         {
             auto sID = whereAt->first;
             sID += L"_TooltipTitle_RESID";
 
-            auto ttIDit = m_resourceData.find(sID);
+            const auto& ttIDit = m_resourceData.find(sID);
             if (ttIDit != m_resourceData.end())
             {
                 auto sRes = LoadResourceWString(hRes, ttIDit->second);
@@ -422,7 +419,7 @@ std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand( WORD cmd ) con
     return {};
 }
 
-void CKeyboardShortcutHandler::ToolTipUpdated( WORD cmd )
+void CKeyboardShortcutHandler::ToolTipUpdated(WORD cmd)
 {
     m_tooltiptitlestoupdate.erase(cmd);
 }
@@ -447,10 +444,9 @@ void CKeyboardShortcutHandler::AddCommand(const std::wstring& name, int id)
 std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& accel)
 {
     std::wstring shortCut;
-    wchar_t buf[128];
+    wchar_t      buf[128] = {};
 
-    auto mapKey = [ & ](UINT code)
-    {
+    auto mapKey = [&](UINT code) {
         LONG sc = MapVirtualKey(code, MAPVK_VK_TO_VSC);
         sc <<= 16;
         int len = GetKeyNameText(sc, buf, _countof(buf));
@@ -460,8 +456,7 @@ std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& 
             shortCut += buf;
     };
 
-    auto scanKey = [ & ](UINT code)
-    {
+    auto scanKey = [&](UINT code) {
         LONG nScanCode = MapVirtualKey(code, MAPVK_VK_TO_VSC);
         switch (code)
         {
@@ -479,7 +474,7 @@ std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& 
             case VK_SNAPSHOT:
             case VK_OEM_COMMA:
             case VK_OEM_PERIOD:
-            nScanCode |= 0x0100; // Add extended bit
+                nScanCode |= 0x0100; // Add extended bit
         }
         nScanCode <<= 16;
         int len = GetKeyNameText(nScanCode, buf, _countof(buf));

@@ -217,8 +217,8 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
     size_t cmdLineLen = wcslen(lpCmdLine);
     if (cmdLineLen)
     {
-        COPYDATASTRUCT cds;
-        cds.dwData = CD_COMMAND_LINE;
+        COPYDATASTRUCT cds = {};
+        cds.dwData         = CD_COMMAND_LINE;
         if (!parser.HasVal(L"path"))
         {
             // create our own command line with all paths converted to long/full paths

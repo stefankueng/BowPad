@@ -69,7 +69,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             SendMessage(m_hFilter, EM_SETCUEBANNER, 1, (LPARAM)sFilterCue.c_str());
             SetWindowSubclass(m_hFilter, EditSubClassProc, 0, reinterpret_cast<DWORD_PTR>(this));
 
-            auto        resourceData = CKeyboardShortcutHandler::Instance().GetResourceData();
+            const auto& resourceData = CKeyboardShortcutHandler::Instance().GetResourceData();
             const auto& commands     = CCommandHandler::Instance().GetCommands();
             for (const auto& cmd : commands)
             {
@@ -122,7 +122,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             for (const auto& cmd : noDelCommands)
             {
                 auto whereAt = std::find_if(resourceData.begin(), resourceData.end(),
-                    [&](const auto& item) { return ((UINT)item.second == cmd.first); });
+                                            [&](const auto& item) { return ((UINT)item.second == cmd.first); });
                 if (whereAt != resourceData.end())
                 {
                     CmdPalData data;
@@ -133,7 +133,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                     auto ttIDit = resourceData.find(sID);
                     if (ttIDit != resourceData.end())
                     {
-                        auto sRes = LoadResourceWString(hRes, ttIDit->second);
+                        auto sRes        = LoadResourceWString(hRes, ttIDit->second);
                         data.description = sRes;
                     }
 
@@ -142,7 +142,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                     auto ltIDit = resourceData.find(sID);
                     if (ltIDit != resourceData.end())
                     {
-                        auto sRes = LoadResourceWString(hRes, ltIDit->second);
+                        auto sRes    = LoadResourceWString(hRes, ltIDit->second);
                         data.command = sRes;
                         SearchReplace(data.command, L"&", L"");
                     }
@@ -317,7 +317,7 @@ LRESULT CCommandPaletteDlg::DrawListItem(NMLVCUSTOMDRAW* pLVCD)
         case CDDS_ITEMPREPAINT | CDDS_ITEM | CDDS_SUBITEM:
         {
             pLVCD->clrText = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT));
-            if (ListView_GetItemState(m_hResults, pLVCD->nmcd.dwItemSpec, LVIS_SELECTED)& LVIS_SELECTED)
+            if (ListView_GetItemState(m_hResults, pLVCD->nmcd.dwItemSpec, LVIS_SELECTED) & LVIS_SELECTED)
                 pLVCD->clrText = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_HOTLIGHT));
         }
         break;

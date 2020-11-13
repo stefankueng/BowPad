@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2016, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,17 +23,18 @@
 
 namespace
 {
-    constexpr const auto g_bmColor = RGB(255, 0, 0);
+constexpr const auto g_bmColor = RGB(255, 0, 0);
 }
 
-CCmdBookmarks::CCmdBookmarks(void * obj) : ICommand(obj)
+CCmdBookmarks::CCmdBookmarks(void* obj)
+    : ICommand(obj)
 {
     auto& settings = CIniSettings::Instance();
-    int maxFiles = (int)settings.GetInt64(L"bookmarks", L"maxfiles", 30);
+    int   maxFiles = (int)settings.GetInt64(L"bookmarks", L"maxfiles", 30);
     m_bookmarks.clear();
     for (decltype(maxFiles) fileIndex = 0; fileIndex < maxFiles; ++fileIndex)
     {
-        std::wstring sKey = CStringUtils::Format(L"file%d", fileIndex);
+        std::wstring sKey    = CStringUtils::Format(L"file%d", fileIndex);
         std::wstring sBmData = settings.GetString(L"bookmarks", sKey.c_str(), L"");
         if (!sBmData.empty())
         {
@@ -55,8 +56,8 @@ CCmdBookmarks::CCmdBookmarks(void * obj) : ICommand(obj)
 
 void CCmdBookmarks::OnDocumentClose(DocID id)
 {
-    auto& settings = CIniSettings::Instance();
-    const auto& doc = GetDocumentFromID(id);
+    auto&       settings = CIniSettings::Instance();
+    const auto& doc      = GetDocumentFromID(id);
     if (doc.m_path.empty())
         return;
 
@@ -64,10 +65,10 @@ void CCmdBookmarks::OnDocumentClose(DocID id)
     bool bModified = (m_bookmarks.erase(doc.m_path) > 0);
 
     // find all bookmarks
-    std::vector<int> bookmarklines;
-    for (int line = -1;;)
+    std::vector<sptr_t> bookmarklines;
+    for (sptr_t line = -1;;)
     {
-        line = (int)ScintillaCall(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
+        line = ScintillaCall(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
         if (line < 0)
             break;
         bookmarklines.push_back(line);
@@ -76,14 +77,14 @@ void CCmdBookmarks::OnDocumentClose(DocID id)
     if (!bookmarklines.empty())
     {
         m_bookmarks[doc.m_path] = std::move(bookmarklines);
-        bModified = true;
+        bModified               = true;
     }
 
     if (bModified)
     {
         // Save the bookmarks to the ini file
         int maxFiles = (int)settings.GetInt64(L"bookmarks", L"maxfiles", 30);
-        int fileNum = 0;
+        int fileNum  = 0;
         if (maxFiles == 0)
             return;
         std::wstring bmvalue;
@@ -128,12 +129,11 @@ void CCmdBookmarks::OnDocumentOpen(DocID id)
     }
 }
 
-
 // CCmdBookmarkToggle
 
 bool CCmdBookmarkToggle::Execute()
 {
-    long line = GetCurrentLineNumber();
+    auto line = GetCurrentLineNumber();
 
     LRESULT state = ScintillaCall(SCI_MARKERGET, line);
     if ((state & (1 << MARK_BOOKMARK)) != 0)
@@ -163,27 +163,25 @@ bool CCmdBookmarkClearAll::Execute()
     return true;
 }
 
-
 // CCmdBookmarkNext
 
 bool CCmdBookmarkNext::Execute()
 {
-    long line = GetCurrentLineNumber();
-    line = (long)ScintillaCall(SCI_MARKERNEXT, line+1, (1 << MARK_BOOKMARK));
+    auto line = GetCurrentLineNumber();
+    line      = ScintillaCall(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
     if (line >= 0)
         ScintillaCall(SCI_GOTOLINE, line);
     else
     {
         // retry from the start of the document
-        line = (long)ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
+        line = ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
         if (line >= 0)
             ScintillaCall(SCI_GOTOLINE, line);
     }
     return true;
 }
 
-
-void CCmdBookmarkNext::ScintillaNotify(SCNotification * pScn)
+void CCmdBookmarkNext::ScintillaNotify(SCNotification* pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
@@ -196,32 +194,31 @@ HRESULT CCmdBookmarkNext::IUICommandHandlerUpdateProperty(
 {
     if (UI_PKEY_Enabled == key)
     {
-        long nextpos = (long)ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
+        auto nextpos = ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, nextpos >= 0, ppropvarNewValue);
     }
     return E_NOTIMPL;
 }
 
-
 // CCmdBookmarkPrev
 
 bool CCmdBookmarkPrev::Execute()
 {
-    long line = GetCurrentLineNumber();
-    line = (long)ScintillaCall(SCI_MARKERPREVIOUS, line-1, (1 << MARK_BOOKMARK));
+    auto line = GetCurrentLineNumber();
+    line      = ScintillaCall(SCI_MARKERPREVIOUS, line - 1, (1 << MARK_BOOKMARK));
     if (line >= 0)
         ScintillaCall(SCI_GOTOLINE, line);
     else
     {
         // retry from the start of the document
-        line = (long)ScintillaCall(SCI_MARKERPREVIOUS, ScintillaCall(SCI_GETLINECOUNT), (1 << MARK_BOOKMARK));
+        line = ScintillaCall(SCI_MARKERPREVIOUS, ScintillaCall(SCI_GETLINECOUNT), (1 << MARK_BOOKMARK));
         if (line >= 0)
             ScintillaCall(SCI_GOTOLINE, line);
     }
     return true;
 }
 
-void CCmdBookmarkPrev::ScintillaNotify(SCNotification * pScn)
+void CCmdBookmarkPrev::ScintillaNotify(SCNotification* pScn)
 {
     if (pScn->nmhdr.code == SCN_MODIFIED)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
@@ -233,7 +230,7 @@ HRESULT CCmdBookmarkPrev::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
 {
     if (UI_PKEY_Enabled == key)
     {
-        long nextpos = (long)ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
+        auto nextpos = ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, nextpos >= 0, ppropvarNewValue);
     }
     return E_NOTIMPL;

@@ -610,10 +610,10 @@ LRESULT CTheme::AutoSuggestSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     {
         case WM_DRAWITEM:
         {
-            LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)(lParam);
-            HDC              hDC  = pDIS->hDC;
-            RECT             rc   = pDIS->rcItem;
-            wchar_t          itemText[256];
+            LPDRAWITEMSTRUCT pDIS          = (LPDRAWITEMSTRUCT)(lParam);
+            HDC              hDC           = pDIS->hDC;
+            RECT             rc            = pDIS->rcItem;
+            wchar_t          itemText[256] = {};
             // get the text from sub-items
             ListView_GetItemText(pDIS->hwndItem, pDIS->itemID, 0, itemText, _countof(itemText));
 

@@ -85,7 +85,7 @@ CTabBar::~CTabBar()
 
 bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
 {
-    INITCOMMONCONTROLSEX icce;
+    INITCOMMONCONTROLSEX icce{};
     icce.dwSize = sizeof(icce);
     icce.dwICC  = ICC_TAB_CLASSES;
     InitCommonControlsEx(&icce);
@@ -100,7 +100,7 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
     ::SetWindowLongPtr(*this, GWLP_USERDATA, (LONG_PTR)this);
     m_TabBarDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(*this, GWLP_WNDPROC, (LONG_PTR)TabBar_Proc));
 
-    NONCLIENTMETRICS ncm;
+    NONCLIENTMETRICS ncm{};
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
     SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
     ncm.lfSmCaptionFont.lfWeight = FW_NORMAL;
@@ -131,7 +131,7 @@ LRESULT CALLBACK CTabBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
 int CTabBar::InsertAtEnd(const wchar_t *subTabName)
 {
-    TCITEM tie;
+    TCITEM tie{};
     tie.mask       = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
     int imageIndex = -1;
 
@@ -153,7 +153,7 @@ int CTabBar::InsertAtEnd(const wchar_t *subTabName)
 
 int CTabBar::InsertAfter(int index, const wchar_t *subTabName)
 {
-    TCITEM tie;
+    TCITEM tie{};
     tie.mask     = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
     int imgindex = -1;
 
@@ -178,7 +178,7 @@ int CTabBar::InsertAfter(int index, const wchar_t *subTabName)
 
 void CTabBar::GetTitle(int index, wchar_t *title, int titleLen) const
 {
-    TCITEM tci;
+    TCITEM tci{};
     tci.mask       = TCIF_TEXT;
     tci.pszText    = title;
     tci.cchTextMax = titleLen - 1;
@@ -187,10 +187,10 @@ void CTabBar::GetTitle(int index, wchar_t *title, int titleLen) const
 
 std::wstring CTabBar::GetTitle(int index) const
 {
-    wchar_t    buf[100];
+    wchar_t    buf[100] = {};
     const auto bufCount = _countof(buf);
 
-    TCITEM tci;
+    TCITEM tci{};
     tci.mask       = TCIF_TEXT;
     tci.pszText    = buf;
     tci.cchTextMax = bufCount - 1;
@@ -214,7 +214,7 @@ std::wstring CTabBar::GetCurrentTitle() const
 
 void CTabBar::SetCurrentTitle(LPCTSTR title)
 {
-    TCITEM tci;
+    TCITEM tci{};
     tci.mask    = TCIF_TEXT;
     tci.pszText = const_cast<wchar_t *>(title);
     TabCtrl_SetItem(*this, GetCurrentTabIndex(), &tci);
@@ -223,7 +223,7 @@ void CTabBar::SetCurrentTitle(LPCTSTR title)
 
 void CTabBar::SetTitle(int index, LPCTSTR title)
 {
-    TCITEM tci;
+    TCITEM tci{};
     tci.mask    = TCIF_TEXT;
     tci.pszText = const_cast<wchar_t *>(title);
     TabCtrl_SetItem(*this, index, &tci);
@@ -304,11 +304,11 @@ void CTabBar::DeleteItemAt(int index)
     // Therefore, scroll until the last tab is at the very right
     if (m_nItems > 1)
     {
-        RECT itemRect;
+        RECT itemRect{};
         TabCtrl_GetItemRect(*this, m_nItems - 1, &itemRect);
         RECT tabRect;
         GetClientRect(*this, &tabRect);
-        TC_HITTESTINFO hti;
+        TC_HITTESTINFO hti{};
         hti.pt                 = {14, 14}; // arbitrary value: just inside the first visible tab
         LRESULT scrollTabIndex = ::SendMessage(*this, TCM_HITTEST, 0, (LPARAM)&hti);
         do
@@ -344,7 +344,7 @@ DocID CTabBar::GetCurrentTabId() const
         if (index < 0)
             return {};
     }
-    TCITEM tci;
+    TCITEM tci{};
     tci.mask    = TCIF_PARAM;
     BOOL result = TabCtrl_GetItem(*this, index, &tci);
     if (!result)
@@ -364,7 +364,7 @@ void CTabBar::SetCurrentTabId(DocID id)
         if (index < 0)
             return;
     }
-    TCITEM tci;
+    TCITEM tci{};
     tci.mask   = TCIF_PARAM;
     tci.lParam = id.GetValue();
     TabCtrl_SetItem(*this, index, &tci);
@@ -390,7 +390,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
         case WM_ERASEBKGND:
         {
             HDC      hDC = (HDC)wParam;
-            RECT     rClient, rTab, rTotalTab, rBkgnd, rEdge;
+            RECT     rClient{}, rTab{}, rTotalTab{}, rBkgnd{}, rEdge{};
             COLORREF crBack;
 
             if (CTheme::Instance().IsHighContrastMode())
@@ -553,12 +553,12 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             }
             else
             {
-                RECT rcTabCtrl, rcLastTab;
+                RECT rcTabCtrl{}, rcLastTab{};
                 ::SendMessage(*this, TCM_GETITEMRECT, lastTabIndex, (LPARAM)&rcLastTab);
                 ::GetClientRect(*this, &rcTabCtrl);
 
                 // get index of the first visible tab
-                TC_HITTESTINFO hti;
+                TC_HITTESTINFO hti{};
                 LONG           xy      = 14; // arbitrary value: just inside the first tab
                 hti.pt                 = {xy, xy};
                 LRESULT scrollTabIndex = ::SendMessage(*this, TCM_HITTEST, 0, (LPARAM)&hti);
@@ -603,7 +603,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             {
                 m_whichCloseClickDown = GetTabIndexAt(xPos, yPos);
                 APPVERIFY(m_whichCloseClickDown >= 0);
-                TBHDR nmhdr;
+                TBHDR nmhdr{};
                 nmhdr.hdr.hwndFrom = *this;
                 nmhdr.hdr.code     = TCN_REFRESH;
                 nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
@@ -619,7 +619,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             m_nSrcTab = m_nTabDragged = currentTabOn;
 
-            POINT point;
+            POINT point{};
             point.x = xPos;
             point.y = yPos;
             ::ClientToScreen(hwnd, &point);
@@ -631,7 +631,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 RegisterHotKey(hwnd, 0 /* id */, 0, VK_ESCAPE);
             }
 
-            TBHDR nmhdr;
+            TBHDR nmhdr{};
             nmhdr.hdr.hwndFrom = *this;
             nmhdr.hdr.code     = NM_CLICK;
             nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
@@ -654,7 +654,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             if (m_bIsDragging)
             {
-                POINT p;
+                POINT p{};
                 p.x = xPos;
                 p.y = yPos;
                 ExchangeItemData(p);
@@ -764,7 +764,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 // nmhdr.idFrom = this
                 // destIndex = this->_nSrcTab
                 // scrIndex  = this->_nTabDragged
-                TBHDR nmhdr;
+                TBHDR nmhdr{};
                 nmhdr.hdr.hwndFrom = *this;
                 nmhdr.hdr.code     = m_bIsDraggingInside ? TCN_TABDROPPED : TCN_TABDROPPEDOUTSIDE;
                 nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
@@ -834,7 +834,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             int xPos = GET_X_LPARAM(lParam);
             int yPos = GET_Y_LPARAM(lParam);
 
-            POINT pt;
+            POINT pt{};
             pt.x = xPos;
             pt.y = yPos;
 
@@ -879,7 +879,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
 COLORREF CTabBar::GetTabColor(UINT item) const
 {
-    TBHDR nmhdr;
+    TBHDR nmhdr{};
     nmhdr.hdr.hwndFrom = *this;
     nmhdr.hdr.code     = TCN_GETCOLOR;
     nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
@@ -926,7 +926,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crFill);
 
     wchar_t buf[256] = {0};
-    TC_ITEM tci;
+    TC_ITEM tci{};
     tci.mask       = TCIF_TEXT | TCIF_IMAGE;
     tci.pszText    = buf;
     tci.cchTextMax = _countof(buf) - 2;
@@ -1023,7 +1023,7 @@ void CTabBar::DraggingCursor(POINT screenPoint, UINT item)
         ::SetCursor(::LoadCursor(nullptr, IDC_ARROW));
     else
     {
-        wchar_t className[256];
+        wchar_t className[256] = {};
         ::GetClassName(hWin, className, 256);
         if ((!lstrcmp(className, TEXT("Scintilla"))) || (!lstrcmp(className, WC_TABCONTROL)))
         {
@@ -1034,7 +1034,7 @@ void CTabBar::DraggingCursor(POINT screenPoint, UINT item)
         }
         else
         {
-            TBHDR nmhdr;
+            TBHDR nmhdr{};
             nmhdr.hdr.hwndFrom = *this;
             nmhdr.hdr.code     = TCN_GETDROPICON;
             nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
@@ -1067,11 +1067,11 @@ void CTabBar::ExchangeItemData(POINT point)
             TabCtrl_SetCurSel(*this, nTab);
 
             //2. shift their data, and insert the source
-            TCITEM itemData_nDraggedTab, itemData_shift;
+            TCITEM itemData_nDraggedTab{}, itemData_shift{};
             itemData_nDraggedTab.mask = itemData_shift.mask = TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM;
             const int stringSize                            = 256;
-            wchar_t   str1[stringSize];
-            wchar_t   str2[stringSize];
+            wchar_t   str1[stringSize]                      = {};
+            wchar_t   str2[stringSize]                      = {};
 
             itemData_nDraggedTab.pszText    = str1;
             itemData_nDraggedTab.cchTextMax = (stringSize);
@@ -1109,7 +1109,7 @@ void CTabBar::ExchangeItemData(POINT point)
             //3. update the current index
             m_nTabDragged = nTab;
 
-            TBHDR nmhdr;
+            TBHDR nmhdr{};
             nmhdr.hdr.hwndFrom = *this;
             nmhdr.hdr.code     = TCN_ORDERCHANGED;
             nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
@@ -1125,7 +1125,7 @@ void CTabBar::ExchangeItemData(POINT point)
 
 int CTabBar::GetTabIndexAt(int x, int y) const
 {
-    TCHITTESTINFO hitInfo;
+    TCHITTESTINFO hitInfo{};
     hitInfo.pt.x = x;
     hitInfo.pt.y = y;
     return TabCtrl_HitTest(*this, &hitInfo);
@@ -1146,7 +1146,7 @@ LRESULT CALLBACK CTabBar::TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LP
 
 DocID CTabBar::GetIDFromIndex(int index) const
 {
-    TCITEM tci;
+    TCITEM tci{};
     tci.mask    = TCIF_PARAM;
     auto result = TabCtrl_GetItem(*this, index, &tci);
     // Easier to set a break point on failed results.
@@ -1171,7 +1171,7 @@ int CTabBar::GetIndexFromID(DocID id) const
 
 void CTabBar::NotifyTabDelete(int tab)
 {
-    TBHDR nmhdr;
+    TBHDR nmhdr{};
     nmhdr.hdr.hwndFrom = *this;
     nmhdr.hdr.code     = TCN_TABDELETE;
     nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
@@ -1194,7 +1194,7 @@ RECT CloseButtonZone::GetButtonRectFrom(const RECT &tabItemRect) const
 {
     auto fromTop = (tabItemRect.bottom - tabItemRect.top - m_height) / 2;
 
-    RECT rect;
+    RECT rect{};
     rect.right  = tabItemRect.right - m_fromRight;
     rect.left   = rect.right - m_width;
     rect.top    = tabItemRect.top + fromTop;

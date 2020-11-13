@@ -20,7 +20,6 @@
 #include "Theme.h"
 #include "DPIAware.h"
 
-
 #define COLORBOX_SIZE CDPIAware::Instance().Scale(*this, 20)
 #define BORDER        CDPIAware::Instance().Scale(*this, 5)
 #define RECTBORDER    CDPIAware::Instance().Scale(*this, 2)
@@ -29,19 +28,19 @@ void CCustomToolTip::Init(HWND hParent)
 {
 #define POPUPCLASSNAME "BASEPOPUPWNDCLASS"
     // Register the window class if it has not already been registered.
-    WNDCLASSEX wndcls = { sizeof(WNDCLASSEX) };
+    WNDCLASSEX wndcls = {sizeof(WNDCLASSEX)};
     if (!(::GetClassInfoEx(hResource, TEXT(POPUPCLASSNAME), &wndcls)))
     {
         // otherwise we need to register a new class
-        wndcls.style = CS_SAVEBITS;
+        wndcls.style       = CS_SAVEBITS;
         wndcls.lpfnWndProc = ::DefWindowProc;
         wndcls.cbClsExtra = wndcls.cbWndExtra = 0;
-        wndcls.hInstance = hResource;
-        wndcls.hIcon = nullptr;
-        wndcls.hCursor = LoadCursor(hResource, IDC_ARROW);
-        wndcls.hbrBackground = nullptr;
-        wndcls.lpszMenuName = nullptr;
-        wndcls.lpszClassName = TEXT(POPUPCLASSNAME);
+        wndcls.hInstance                      = hResource;
+        wndcls.hIcon                          = nullptr;
+        wndcls.hCursor                        = LoadCursor(hResource, IDC_ARROW);
+        wndcls.hbrBackground                  = nullptr;
+        wndcls.lpszMenuName                   = nullptr;
+        wndcls.lpszClassName                  = TEXT(POPUPCLASSNAME);
 
         if (RegisterClassEx(&wndcls) == 0)
         {
@@ -50,7 +49,7 @@ void CCustomToolTip::Init(HWND hParent)
         }
     }
 
-    DWORD dwStyle = WS_POPUP | WS_BORDER;
+    DWORD dwStyle   = WS_POPUP | WS_BORDER;
     DWORD dwExStyle = 0;
 
     m_hParent = hParent;
@@ -59,22 +58,22 @@ void CCustomToolTip::Init(HWND hParent)
         return;
 }
 
-void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF * color)
+void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF* color)
 {
     m_infoText = text;
     if (color)
-        m_color = (*color)&0xFFFFFF;
+        m_color = (*color) & 0xFFFFFF;
     m_bShowColorBox = color != nullptr;
-    auto dc = GetDC(*this);
-    auto textbuf = std::make_unique<wchar_t[]>(m_infoText.size() + 4);
+    auto dc         = GetDC(*this);
+    auto textbuf    = std::make_unique<wchar_t[]>(m_infoText.size() + 4);
     wcscpy_s(textbuf.get(), m_infoText.size() + 4, m_infoText.c_str());
-    RECT rc;
+    RECT rc{};
     rc.left   = 0;
     rc.right  = CDPIAware::Instance().Scale(*this, 800);
     rc.top    = 0;
     rc.bottom = CDPIAware::Instance().Scale(*this, 800);
 
-    NONCLIENTMETRICS ncm;
+    NONCLIENTMETRICS ncm{};
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
     SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
     m_hFont = CreateFontIndirect(&ncm.lfStatusFont);
@@ -85,7 +84,7 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
 
     if (m_bShowColorBox)
     {
-        rc.bottom += COLORBOX_SIZE + BORDER;   // space for the color box
+        rc.bottom += COLORBOX_SIZE + BORDER; // space for the color box
         rc.right = max(rc.right, COLORBOX_SIZE);
     }
     SetTransparency(0);
@@ -97,8 +96,7 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring & text, COLORREF
     auto transAlpha = Animator::Instance().CreateLinearTransition(0.3, 255);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
     storyBoard->AddTransition(m_AnimVarAlpha, transAlpha);
-    Animator::Instance().RunStoryBoard(storyBoard, [this]()
-    {
+    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
         SetTransparency((BYTE)Animator::GetIntegerValue(m_AnimVarAlpha));
     });
 }
@@ -108,8 +106,7 @@ void CCustomToolTip::HideTip()
     auto transAlpha = Animator::Instance().CreateLinearTransition(0.5, 0);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
     storyBoard->AddTransition(m_AnimVarAlpha, transAlpha);
-    Animator::Instance().RunStoryBoard(storyBoard, [this]()
-    {
+    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
         auto alpha = Animator::GetIntegerValue(m_AnimVarAlpha);
         SetTransparency((BYTE)alpha);
         if (alpha == 0)
@@ -117,7 +114,7 @@ void CCustomToolTip::HideTip()
     });
 }
 
-void CCustomToolTip::OnPaint(HDC hdc, RECT * pRc)
+void CCustomToolTip::OnPaint(HDC hdc, RECT* pRc)
 {
     GDIHelpers::FillSolidRect(hdc, pRc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_INFOBK)));
     pRc->left += BORDER;
@@ -144,18 +141,18 @@ LRESULT CCustomToolTip::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
     switch (uMsg)
     {
         case WM_KEYDOWN:
-        if (wParam == VK_ESCAPE)
-        {
-            HideTip();
-            return TRUE;
-        }
-        break;
+            if (wParam == VK_ESCAPE)
+            {
+                HideTip();
+                return TRUE;
+            }
+            break;
         case WM_ERASEBKGND:
-        return TRUE;
+            return TRUE;
         case WM_LBUTTONDOWN:
         {
             // send the click to the parent window
-            POINT pt;
+            POINT pt{};
             pt.x = GET_X_LPARAM(lParam);
             pt.y = GET_Y_LPARAM(lParam);
             MapWindowPoints(m_hwnd, m_hParent, &pt, 1);
@@ -168,7 +165,7 @@ LRESULT CCustomToolTip::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
         case WM_PAINT:
         {
             PAINTSTRUCT ps;
-            HDC hdc;
+            HDC         hdc;
             hdc = BeginPaint(hwnd, &ps);
             RECT rc;
             GetClientRect(hwnd, &rc);

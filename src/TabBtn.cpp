@@ -21,7 +21,7 @@
 #include "GDIHelpers.h"
 #include "DPIAware.h"
 
-bool CTabBtn::SetText(const wchar_t*str)
+bool CTabBtn::SetText(const wchar_t* str)
 {
     return SetWindowText(*this, str) != 0;
 }
@@ -37,7 +37,7 @@ bool CTabBtn::Init(HINSTANCE /*hInst*/, HWND hParent, HMENU id)
 
     if (m_hFont == nullptr)
     {
-        NONCLIENTMETRICS ncm;
+        NONCLIENTMETRICS ncm{};
         ncm.cbSize = sizeof(NONCLIENTMETRICS);
         SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
         m_hFont = CreateFontIndirect(&ncm.lfMessageFont);
@@ -47,7 +47,7 @@ bool CTabBtn::Init(HINSTANCE /*hInst*/, HWND hParent, HMENU id)
     return true;
 }
 
-void CTabBtn::SetFont(const wchar_t*fontName, int fontSize)
+void CTabBtn::SetFont(const wchar_t* fontName, int fontSize)
 {
     if (m_hFont)
         ::DeleteObject(m_hFont);
@@ -71,15 +71,15 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
         {
             case WM_PAINT:
             {
-                    // only do custom drawing when in dark theme
+                // only do custom drawing when in dark theme
                 PAINTSTRUCT ps;
-                HDC hdc = BeginPaint(hwnd, &ps);
+                HDC         hdc = BeginPaint(hwnd, &ps);
 
                 auto state = Button_GetState(*this);
 
                 auto clr1 = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNSHADOW));
                 auto clr2 = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_BTNFACE));
-                clr1 = GDIHelpers::Darker(clr1, 0.5f);
+                clr1      = GDIHelpers::Darker(clr1, 0.5f);
                 if (m_colorset && !CTheme::Instance().IsHighContrastMode())
                 {
                     clr1 = CTheme::Instance().GetThemeColor(m_color, true);
@@ -93,8 +93,8 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 auto b2 = GetBValue(clr2);
                 // m_AnimVarHot changes from 0.0 (not hot) to 1.0 (hot)
                 auto fraction = Animator::GetValue(m_AnimVarHot);
-                clr1 = RGB((r1 - r2)*fraction + r1, (g1 - g2)*fraction + g1, (b1 - b2)*fraction + b1);
-                clr2 = RGB((r1 - r2)*fraction + r2, (g1 - g2)*fraction + g2, (b1 - b2)*fraction + b2);
+                clr1          = RGB((r1 - r2) * fraction + r1, (g1 - g2) * fraction + g1, (b1 - b2) * fraction + b1);
+                clr2          = RGB((r1 - r2) * fraction + r2, (g1 - g2) * fraction + g2, (b1 - b2) * fraction + b2);
 
                 ::SetBkColor(hdc, (state & BST_HOT) != 0 ? clr2 : clr1);
 
@@ -131,34 +131,32 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
             {
                 if ((Button_GetState(*this) & BST_HOT) == 0)
                 {
-                    auto transHot = Animator::Instance().CreateLinearTransition(0.3, 1.0);
+                    auto transHot   = Animator::Instance().CreateLinearTransition(0.3, 1.0);
                     auto storyBoard = Animator::Instance().CreateStoryBoard();
                     storyBoard->AddTransition(m_AnimVarHot, transHot);
-                    Animator::Instance().RunStoryBoard(storyBoard, [this]()
-                    {
+                    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
                         InvalidateRect(*this, nullptr, false);
                     });
-                    TRACKMOUSEEVENT tme = { sizeof(tme) };
-                    tme.dwFlags = TME_LEAVE;
-                    tme.hwndTrack = hwnd;
+                    TRACKMOUSEEVENT tme = {sizeof(tme)};
+                    tme.dwFlags         = TME_LEAVE;
+                    tme.hwndTrack       = hwnd;
                     TrackMouseEvent(&tme);
                 }
             }
             break;
             case WM_MOUSELEAVE:
             {
-                TRACKMOUSEEVENT tme = { 0 };
-                tme.cbSize = sizeof(TRACKMOUSEEVENT);
-                tme.dwFlags = TME_LEAVE | TME_CANCEL;
-                tme.hwndTrack = *this;
+                TRACKMOUSEEVENT tme = {0};
+                tme.cbSize          = sizeof(TRACKMOUSEEVENT);
+                tme.dwFlags         = TME_LEAVE | TME_CANCEL;
+                tme.hwndTrack       = *this;
                 TrackMouseEvent(&tme);
                 if ((Button_GetState(*this) & BST_HOT) != 0)
                 {
-                    auto transHot = Animator::Instance().CreateLinearTransition(0.5, 0.0);
+                    auto transHot   = Animator::Instance().CreateLinearTransition(0.5, 0.0);
                     auto storyBoard = Animator::Instance().CreateStoryBoard();
                     storyBoard->AddTransition(m_AnimVarHot, transHot);
-                    Animator::Instance().RunStoryBoard(storyBoard, [this]()
-                    {
+                    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
                         InvalidateRect(*this, nullptr, false);
                     });
                 }
@@ -169,4 +167,3 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
         return prevWndProc(hwnd, uMsg, wParam, lParam);
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
-

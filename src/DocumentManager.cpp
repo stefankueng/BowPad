@@ -242,7 +242,7 @@ static bool AskToElevatePrivilege(HWND hWnd, const std::wstring& path, PCWSTR sE
     std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
 
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-    TASKDIALOG_BUTTON aCustomButtons[2];
+    TASKDIALOG_BUTTON aCustomButtons[2] = {};
     aCustomButtons[0].nButtonID = 101;
     aCustomButtons[0].pszButtonText = sElevate;
     aCustomButtons[1].nButtonID = 100;
@@ -471,7 +471,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
     }
     auto& edit = *pdocLoad;
 
-    char data[ReadBlockSize+8];
+    char data[ReadBlockSize + 8] = {};
     const int widebufSize = ReadBlockSize * 2;
     auto widebuf = std::make_unique<wchar_t[]>(widebufSize);
     const int charbufSize = widebufSize * 2;
@@ -513,6 +513,7 @@ CDocument CDocumentManager::LoadFile( HWND hWnd, const std::wstring& path, int e
         case 12001: // UTF32_BE
             LoadSomeUtf32be(lenFile, data); // Doesn't load, falls through to load.
             // intentional fall-through
+            [[fallthrough]];
         case 12000: // UTF32_LE
             LoadSomeUtf32le(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get(), doc.m_format);
             break;
@@ -918,7 +919,7 @@ DocModifiedState CDocumentManager::HasFileChanged(DocID id ) const
 {
     const auto& doc = GetDocumentFromID(id);
     if (doc.m_path.empty() || ((doc.m_lastWriteTime.dwLowDateTime == 0) && (doc.m_lastWriteTime.dwHighDateTime == 0)) || doc.m_bDoSaveAs)
-        return DM_Unmodified;
+        return DocModifiedState::DM_Unmodified;
 
     // get the last write time of the base doc file
     CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
@@ -926,17 +927,17 @@ DocModifiedState CDocumentManager::HasFileChanged(DocID id ) const
     {
         auto lastError = GetLastError();
         if ((lastError == ERROR_FILE_NOT_FOUND) || (lastError == ERROR_PATH_NOT_FOUND))
-            return DM_Removed;
-        return DM_Unknown;
+            return DocModifiedState::DM_Removed;
+        return DocModifiedState::DM_Unknown;
     }
     BY_HANDLE_FILE_INFORMATION fi;
     if (!GetFileInformationByHandle(hFile, &fi))
-        return DM_Unknown;
+        return DocModifiedState::DM_Unknown;
 
     if (CompareFileTime(&doc.m_lastWriteTime, &fi.ftLastWriteTime))
-        return DM_Modified;
+        return DocModifiedState::DM_Modified;
 
-    return DM_Unmodified;
+    return DocModifiedState::DM_Unmodified;
 }
 
 DocID CDocumentManager::GetIdForPath( const std::wstring& path ) const

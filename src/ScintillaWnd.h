@@ -118,7 +118,7 @@ public:
     std::string GetWordChars() const;
     std::string GetWhitespaceChars() const;
     long        GetSelTextMarkerCount() const { return m_selTextMarkerCount; }
-    long        GetCurrentLineNumber() const;
+    sptr_t      GetCurrentLineNumber() const;
     void        VisibleLinesChanged() { m_docScroll.VisibleLinesChanged(); }
 
     LRESULT CALLBACK HandleScrollbarCustomDraw(WPARAM wParam, NMCSBCUSTOMDRAW* pCustDraw);
@@ -139,10 +139,10 @@ protected:
     bool                                   IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
     bool                                   AutoBraces(WPARAM wParam);
 
-    void BookmarkAdd(long lineno);
-    void BookmarkDelete(int lineno);
-    bool IsBookmarkPresent(int lineno);
-    void BookmarkToggle(int lineno);
+    void BookmarkAdd(size_t lineno);
+    void BookmarkDelete(size_t lineno);
+    bool IsBookmarkPresent(size_t lineno);
+    void BookmarkToggle(size_t lineno);
 
 private:
     SciFnDirect             m_pSciMsg;

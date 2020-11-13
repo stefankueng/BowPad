@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,39 +28,39 @@ public:
         , column(-1)
     {
     }
-    PositionData(DocID i, long l, long c)
+    PositionData(DocID i, sptr_t l, sptr_t c)
         : id(i)
         , line(l)
         , column(c)
     {
     }
 
-    bool operator == (const PositionData& other)
+    bool operator==(const PositionData& other)
     {
         return (this->id == other.id && this->line == other.line && this->column == other.column);
     }
-    bool operator != (const PositionData& other)
+    bool operator!=(const PositionData& other)
     {
         return (this->id != other.id || this->line != other.line || this->column != other.column);
     }
 
-    DocID         id; // Doc Id.
-    long          line;
-    long          column;
+    DocID  id; // Doc Id.
+    sptr_t line;
+    sptr_t column;
 };
 
 namespace
 {
-std::deque<PositionData>    g_positions;
-DocID                       g_currentDocId;
-size_t                      g_offsetBeforeEnd = 0;
-long                        g_currentLine = -1;
-bool                        g_ignore = false;
-const long                  MAX_PREV_NEXT_POSITIONS = 500;
+std::deque<PositionData> g_positions;
+DocID                    g_currentDocId;
+size_t                   g_offsetBeforeEnd       = 0;
+sptr_t                   g_currentLine           = -1;
+bool                     g_ignore                = false;
+const long               MAX_PREV_NEXT_POSITIONS = 500;
 // Only store a new position if it's more than N lines from the old one.
-const long                  POSITION_SAVE_GRANULARITY = 10;
+const long POSITION_SAVE_GRANULARITY = 10;
 
-void AddNewPosition(DocID id, long line, long col)
+void AddNewPosition(DocID id, sptr_t line, sptr_t col)
 {
     PositionData data(id, line, col);
     if (g_positions.empty() || (g_positions.back() != data))
@@ -79,18 +79,18 @@ bool ResizePositionSpace()
     return false;
 }
 
-void SetCurrentLine(long line)
+void SetCurrentLine(sptr_t line)
 {
     g_currentLine = line;
 }
 
-}
+} // namespace
 
-void CCmdPrevNext::ScintillaNotify( SCNotification* pScn )
+void CCmdPrevNext::ScintillaNotify(SCNotification* pScn)
 {
     switch (pScn->nmhdr.code)
     {
-    case SCN_UPDATEUI:
+        case SCN_UPDATEUI:
         {
             if (g_ignore)
                 return;
@@ -103,7 +103,7 @@ void CCmdPrevNext::ScintillaNotify( SCNotification* pScn )
                 g_currentDocId = GetDocIdOfCurrentTab();
                 if (g_currentDocId.IsValid())
                 {
-                    long col = (long) ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
+                    auto col = ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
                     AddNewPosition(g_currentDocId, line, col);
                     InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, nullptr);
                     InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, nullptr);
@@ -112,10 +112,9 @@ void CCmdPrevNext::ScintillaNotify( SCNotification* pScn )
             }
             else if (g_currentLine != line)
             {
-                auto mark = [&]()
-                {
+                auto mark = [&]() {
                     ResizePositionSpace();
-                    long col = (long)ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
+                    auto col = ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
                     AddNewPosition(g_currentDocId, line, col);
                     InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, nullptr);
                     InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, nullptr);
@@ -143,19 +142,19 @@ void CCmdPrevNext::ScintillaNotify( SCNotification* pScn )
     }
 }
 
-void CCmdPrevNext::TabNotify( TBHDR* ptbhdr )
+void CCmdPrevNext::TabNotify(TBHDR* ptbhdr)
 {
     switch (ptbhdr->hdr.code)
     {
-    case TCN_SELCHANGE:
+        case TCN_SELCHANGE:
         {
             // document got activated
             g_currentDocId = GetDocIdOfCurrentTab();
         }
         break;
-    // Not definite event of closure. User may cancel so don't erase saved
-    // positions here. Do it on OnDocumentClose.
-    // case TCN_TABDELETE:
+            // Not definite event of closure. User may cancel so don't erase saved
+            // positions here. Do it on OnDocumentClose.
+            // case TCN_TABDELETE:
     }
 }
 
@@ -175,7 +174,7 @@ void CCmdPrevNext::OnDocumentClose(DocID id)
 
 bool CCmdPrevious::Execute()
 {
-    size_t i = 0;
+    size_t       i = 0;
     PositionData data;
     for (auto it = g_positions.crbegin(); it != g_positions.crend(); ++it)
     {
@@ -192,15 +191,13 @@ bool CCmdPrevious::Execute()
         // Set ignore to true so we don't move the cursor to a position
         // and in doing so trigger that position recorded as it already is.
         g_ignore = true;
-        OnOutOfScope
-        (
+        OnOutOfScope(
             if (g_ignore)
-                g_ignore = false;
-        );
+                g_ignore = false;);
         if (GetDocIdOfCurrentTab() != data.id)
             TabActivateAt(GetTabIndexFromDocID(data.id));
 
-        long pos = (long) ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
+        long pos = (long)ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
         ScintillaCall(SCI_SETANCHOR, pos);
         ScintillaCall(SCI_SETCURRENTPOS, pos);
         ScintillaCall(SCI_CANCEL);
@@ -216,7 +213,7 @@ bool CCmdPrevious::Execute()
     return false;
 }
 
-HRESULT CCmdPrevious::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdPrevious::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
 {
     // Enabled if there's something to go back to.
     if (UI_PKEY_Enabled == key)
@@ -228,7 +225,7 @@ HRESULT CCmdPrevious::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
 
 bool CCmdNext::Execute()
 {
-    size_t i = 0;
+    size_t       i = 0;
     PositionData data;
     if (g_offsetBeforeEnd == 0)
         return false;
@@ -245,15 +242,13 @@ bool CCmdNext::Execute()
     if (data.id.IsValid())
     {
         g_ignore = true;
-        OnOutOfScope
-        (
+        OnOutOfScope(
             if (g_ignore)
-                g_ignore = false;
-        );
+                g_ignore = false;);
         if (GetDocIdOfCurrentTab() != data.id)
             TabActivateAt(GetTabIndexFromDocID(data.id));
         --g_offsetBeforeEnd;
-        long pos = (long ) ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
+        long pos = (long)ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
         ScintillaCall(SCI_SETANCHOR, pos);
         ScintillaCall(SCI_SETCURRENTPOS, pos);
         ScintillaCall(SCI_CANCEL);
@@ -268,7 +263,7 @@ bool CCmdNext::Execute()
     return false;
 }
 
-HRESULT CCmdNext::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdNext::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
 {
     // enabled if there's something to go forward to
     if (UI_PKEY_Enabled == key)

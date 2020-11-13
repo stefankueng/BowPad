@@ -126,7 +126,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     if (!g_scintillaInitialized)
     {
         Scintilla_RegisterClasses(hInst);
-        INITCOMMONCONTROLSEX icce;
+        INITCOMMONCONTROLSEX icce{};
         icce.dwSize = sizeof(icce);
         icce.dwICC  = ICC_BAR_CLASSES;
         InitCommonControlsEx(&icce);
@@ -308,7 +308,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                 HDC  hdc    = (HDC)wParam;
                 auto bgc    = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE));
                 auto oldBgc = SetBkColor(hdc, bgc);
-                RECT r;
+                RECT r{};
                 GetClientRect(hwnd, &r);
                 ExtTextOut(hdc, r.left, r.top, ETO_CLIPPED | ETO_OPAQUE, &r, L"", 0, nullptr);
                 SetBkColor(hdc, oldBgc);
@@ -322,7 +322,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
             break;
         case WM_CONTEXTMENU:
         {
-            POINT pt;
+            POINT pt{};
             POINTSTOPOINT(pt, lParam);
 
             if (pt.x == -1 && pt.y == -1)
@@ -453,7 +453,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
 
                         auto  linecount = Call(SCI_GETLINECOUNT);
                         auto  w         = m_ScrollTool.GetTextWidth(CStringUtils::Format(L"Line: %ld", linecount).c_str());
-                        POINT thumbpoint;
+                        POINT thumbpoint{};
                         thumbpoint.x = thumbrect.right - w;
                         thumbpoint.y = thumbrect.top + ((thumbrect.bottom - thumbrect.top) * si.nTrackPos) / (si.nMax - si.nMin);
                         auto docline = Call(SCI_DOCLINEFROMVISIBLE, si.nTrackPos);
@@ -581,7 +581,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                     if (m_bCursorShown)
                     {
                         DWORD pos = GetMessagePos();
-                        POINT pt;
+                        POINT pt{};
                         pt.x        = GET_X_LPARAM(pos);
                         pt.y        = GET_Y_LPARAM(pos);
                         auto hptWnd = WindowFromPoint(pt);
@@ -804,7 +804,7 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
         pos.m_nScrollWidth = Call(SCI_GETSCROLLWIDTH);
 
         pos.m_lineStateVector.clear();
-        pos.m_lastStyleLine = 0;
+        pos.m_lastStyleLine             = 0;
         size_t contractedFoldHeaderLine = 0;
         do
         {
@@ -1253,7 +1253,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     }
 
     auto          textbuffer = std::make_unique<char[]>(len + 1);
-    Sci_TextRange textrange;
+    Sci_TextRange textrange{};
     textrange.lpstrText  = textbuffer.get();
     textrange.chrg.cpMin = startstylepos;
     textrange.chrg.cpMax = endstylepos;
@@ -1280,7 +1280,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
                 m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
                 m_selTextMarkerCount = 0;
             }
-            Sci_TextToFind FindText;
+            Sci_TextToFind FindText{};
             FindText.chrg.cpMin     = lastStopPosition;
             FindText.chrg.cpMax     = (long)Call(SCI_GETLENGTH);
             FindText.lpstrText      = seltextbuffer.get();
@@ -1576,8 +1576,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
     bool       tagFound         = false;
     size_t     caret            = Call(SCI_GETCURRENTPOS);
     size_t     searchStartPoint = caret;
-    size_t     styleAt;
-    FindResult openFound;
+    size_t     styleAt          = 0;
+    FindResult openFound{};
 
     // Search back for the previous open angle bracket.
     // Keep looking whilst the angle bracket found is inside an XML attribute
@@ -1591,7 +1591,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
     if (openFound.success && styleAt != SCE_H_CDATA)
     {
         // Found the "<" before the caret, now check there isn't a > between that position and the caret.
-        FindResult closeFound;
+        FindResult closeFound{};
         searchStartPoint = openFound.start;
         do
         {
@@ -1652,7 +1652,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                     */
                     size_t     currentEndPoint   = xmlTags.tagCloseStart;
                     size_t     openTagsRemaining = 1;
-                    FindResult nextOpenTag;
+                    FindResult nextOpenTag{};
                     do
                     {
                         nextOpenTag = FindOpenTag(tagName, currentEndPoint, 0);
@@ -1666,7 +1666,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                             // <TAGNAME attrib="value"><TAGNAME>something</TAGNAME></TAGNAME></TAGNA|ME>
                             //                         ^^^^^^^^ we've found this guy
                             //                                           ^^^^^^^^^^ ^^^^^^^^ Now we need to count these fellas
-                            FindResult inbetweenCloseTag;
+                            FindResult inbetweenCloseTag{};
                             size_t     currentStartPosition = nextOpenTag.end;
                             size_t     closeTagsFound       = 0;
                             bool       forwardSearch        = (currentStartPosition < currentEndPoint);
@@ -1762,7 +1762,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                             */
                             size_t     currentStartPosition = xmlTags.tagOpenEnd;
                             size_t     closeTagsRemaining   = 1;
-                            FindResult nextCloseTag;
+                            FindResult nextCloseTag{};
                             do
                             {
                                 nextCloseTag = FindCloseTag(tagName, currentStartPosition, docLength);
@@ -1776,7 +1776,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                                     // <TAGNAM|E attrib="value"><TAGNAME>something</TAGNAME></TAGNAME></TAGNAME>
                                     //                                            ^^^^^^^^ we've found this guy
                                     //                         ^^^^^^^^^ Now we need to find this fella
-                                    FindResult inbetweenOpenTag;
+                                    FindResult inbetweenOpenTag{};
                                     size_t     currentEndPosition = nextCloseTag.start;
                                     size_t     openTagsFound      = 0;
 
@@ -1823,7 +1823,7 @@ FindResult CScintillaWnd::FindText(const char* text, size_t start, size_t end, i
 {
     FindResult returnValue = {0};
 
-    Sci_TextToFind search;
+    Sci_TextToFind search{};
     search.lpstrText  = const_cast<char*>(text);
     search.chrg.cpMin = (long)start;
     search.chrg.cpMax = (long)end;
@@ -1856,7 +1856,7 @@ FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, 
     search.append(tagName);
     FindResult openTagFound = {0};
     openTagFound.success    = false;
-    FindResult result;
+    FindResult result{};
     int        nextChar = 0;
     size_t     styleAt;
     size_t     searchStart   = start;
@@ -1913,9 +1913,9 @@ FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, 
 size_t CScintillaWnd::FindCloseAngle(size_t startPosition, size_t endPosition)
 {
     // We'll search for the next '>', and check it's not in an attribute using the style
-    FindResult closeAngle;
+    FindResult closeAngle{};
 
-    bool   isValidClose;
+    bool   isValidClose   = false;
     size_t returnPosition = (size_t)-1;
 
     // Only search forwards
@@ -1957,13 +1957,13 @@ FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, size_t start,
     search.append(tagName);
     FindResult closeTagFound = {0};
     closeTagFound.success    = false;
-    FindResult result;
-    int        nextChar;
-    size_t     styleAt;
+    FindResult result{};
+    int        nextChar      = 0;
+    size_t     styleAt       = 0;
     size_t     searchStart   = start;
     size_t     searchEnd     = end;
     bool       forwardSearch = (start < end);
-    bool       validCloseTag;
+    bool       validCloseTag = false;
     do
     {
         validCloseTag = false;
@@ -2025,7 +2025,7 @@ std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t st
 
     size_t        bufLen = end - start + 1;
     auto          buf    = std::make_unique<char[]>(bufLen + 1);
-    Sci_TextRange tr;
+    Sci_TextRange tr{};
     tr.chrg.cpMin = (long)start;
     tr.chrg.cpMax = (long)end;
     tr.lpstrText  = buf.get();
@@ -2403,7 +2403,7 @@ void CScintillaWnd::SetReadDirection(ReadDirection rd)
     Call(SCI_SETBIDIRECTIONAL, rd);
 }
 
-void CScintillaWnd::BookmarkAdd(long lineno)
+void CScintillaWnd::BookmarkAdd(size_t lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
@@ -2415,7 +2415,7 @@ void CScintillaWnd::BookmarkAdd(long lineno)
     }
 }
 
-void CScintillaWnd::BookmarkDelete(int lineno)
+void CScintillaWnd::BookmarkDelete(size_t lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
@@ -2427,7 +2427,7 @@ void CScintillaWnd::BookmarkDelete(int lineno)
     }
 }
 
-bool CScintillaWnd::IsBookmarkPresent(int lineno)
+bool CScintillaWnd::IsBookmarkPresent(size_t lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
@@ -2435,7 +2435,7 @@ bool CScintillaWnd::IsBookmarkPresent(int lineno)
     return ((state & (1 << MARK_BOOKMARK)) != 0);
 }
 
-void CScintillaWnd::BookmarkToggle(int lineno)
+void CScintillaWnd::BookmarkToggle(size_t lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
@@ -2450,9 +2450,9 @@ void CScintillaWnd::MarkBookmarksInScrollbar()
 {
     const auto bmColor = CTheme::Instance().GetThemeColor(RGB(255, 0, 0), true);
     m_docScroll.Clear(DOCSCROLLTYPE_BOOKMARK);
-    for (int line = -1;;)
+    for (size_t line = (size_t)-1;;)
     {
-        line = (int)Call(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
+        line = Call(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
         if (line < 0)
             break;
         m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, line, bmColor);
@@ -2505,7 +2505,7 @@ std::string CScintillaWnd::GetTextRange(Sci_Position startpos, Sci_Position endp
     if (endpos < startpos)
         return "";
     auto          strbuf = std::make_unique<char[]>(endpos - startpos + 5);
-    Sci_TextRange rangestart;
+    Sci_TextRange rangestart{};
     rangestart.chrg.cpMin = (Sci_PositionCR)startpos;
     rangestart.chrg.cpMax = (Sci_PositionCR)endpos;
     rangestart.lpstrText  = strbuf.get();
@@ -2536,7 +2536,7 @@ std::string CScintillaWnd::GetCurrentWord() const
 
 std::string CScintillaWnd::GetCurrentLine() const
 {
-    int  LineLen    = (int)ConstCall(SCI_GETCURLINE);
+    auto LineLen    = ConstCall(SCI_GETCURLINE);
     auto linebuffer = std::make_unique<char[]>(LineLen + 1);
     ConstCall(SCI_GETCURLINE, LineLen + 1, (LPARAM)linebuffer.get());
     return linebuffer.get();
@@ -2544,7 +2544,7 @@ std::string CScintillaWnd::GetCurrentLine() const
 
 std::string CScintillaWnd::GetWordChars() const
 {
-    int  len        = (int)ConstCall(SCI_GETWORDCHARS);
+    auto len        = ConstCall(SCI_GETWORDCHARS);
     auto linebuffer = std::make_unique<char[]>(len + 1);
     ConstCall(SCI_GETWORDCHARS, 0, (LPARAM)linebuffer.get());
     linebuffer[len] = '\0';
@@ -2553,13 +2553,13 @@ std::string CScintillaWnd::GetWordChars() const
 
 std::string CScintillaWnd::GetWhitespaceChars() const
 {
-    int  len        = (int)ConstCall(SCI_GETWHITESPACECHARS);
+    auto len        = ConstCall(SCI_GETWHITESPACECHARS);
     auto linebuffer = std::make_unique<char[]>(len + 1);
     ConstCall(SCI_GETWHITESPACECHARS, 0, (LPARAM)linebuffer.get());
     return linebuffer.get();
 }
 
-long CScintillaWnd::GetCurrentLineNumber() const
+sptr_t CScintillaWnd::GetCurrentLineNumber() const
 {
-    return (long)ConstCall(SCI_LINEFROMPOSITION, ConstCall(SCI_GETCURRENTPOS));
+    return ConstCall(SCI_LINEFROMPOSITION, ConstCall(SCI_GETCURRENTPOS));
 }

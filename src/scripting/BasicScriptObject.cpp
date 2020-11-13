@@ -1275,14 +1275,14 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             ttf.lpstrText      = sText.c_str();
             auto sret          = ScintillaCall(SCI_FINDTEXT, p1.intVal, (sptr_t)&ttf);
 
-            SAFEARRAYBOUND sabounds;
+            SAFEARRAYBOUND sabounds{};
             sabounds.lLbound   = 0;
             sabounds.cElements = 2;
             SAFEARRAY* psarray = SafeArrayCreate(VT_VARIANT, 1, &sabounds);
 
             if (psarray != NULL)
             {
-                VARIANT* pInteger;
+                VARIANT* pInteger = nullptr;
                 SafeArrayAccessData(psarray, (void**)&pInteger);
                 pInteger[0].intVal = sret >= 0 ? ttf.chrgText.cpMin : -1;
                 pInteger[0].vt     = VT_INT;

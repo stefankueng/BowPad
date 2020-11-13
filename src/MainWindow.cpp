@@ -322,8 +322,8 @@ HRESULT CMainWindow::SaveRibbonSettings()
                                         STGM_WRITE | STGM_CREATE, FILE_ATTRIBUTE_NORMAL, TRUE, nullptr, &pStrm);
     if (!CAppUtils::FailedShowMessage(hr))
     {
-        LARGE_INTEGER  liPos;
-        ULARGE_INTEGER uliSize;
+        LARGE_INTEGER  liPos{};
+        ULARGE_INTEGER uliSize{};
 
         liPos.QuadPart   = 0;
         uliSize.QuadPart = 0;
@@ -741,7 +741,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             // The tab control resizes itself to the width of the area of the buttons!
             DWORD pos = GetMessagePos();
             POINT pt  = {GET_X_LPARAM(pos), GET_Y_LPARAM(pos)};
-            RECT  tabrc;
+            RECT  tabrc{};
             TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
             MapWindowPoints(m_TabBar, nullptr, (LPPOINT)&tabrc, 2);
             tabrc.top -= 3; // adjust for margin
@@ -767,7 +767,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             POINT pt = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
             RECT  rc;
             GetWindowRect(m_TabBar, &rc);
-            RECT tabrc;
+            RECT tabrc{};
             TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
             MapWindowPoints(m_TabBar, nullptr, (LPPOINT)&tabrc, 2);
             rc.bottom = tabrc.bottom;
@@ -802,7 +802,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             break;
         case WM_LBUTTONDBLCLK:
         {
-            RECT rc, tabrc;
+            RECT rc{}, tabrc{};
             GetWindowRect(m_TabBar, &rc);
             TabCtrl_GetItemRect(m_TabBar, m_TabBar.GetItemCount() - 1, &tabrc);
             MapWindowPoints(m_TabBar, nullptr, (LPPOINT)&tabrc, 2);
@@ -810,7 +810,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 break;
             rc.bottom = tabrc.bottom;
             rc.left   = tabrc.right;
-            POINT pt;
+            POINT pt{};
             pt.x = GET_X_LPARAM(lParam);
             pt.y = GET_Y_LPARAM(lParam);
             MapWindowPoints(*this, nullptr, &pt, 1);
@@ -951,7 +951,7 @@ void CMainWindow::ShowTablistDropdown(HWND hWnd)
                 else
                     AppendMenu(hMenu, MF_STRING, tab.second, tab.first.c_str());
             }
-            TPMPARAMS tpm;
+            TPMPARAMS tpm{};
             tpm.cbSize    = sizeof(TPMPARAMS);
             tpm.rcExclude = rc;
             auto tab      = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL, rc.left, rc.bottom, *this, &tpm);
@@ -1532,7 +1532,7 @@ void CMainWindow::ResizeChildWindows()
         // TabCtrl_GetItemRect will return FALSE but the tabrc rect still has
         // the height data filled in.
         // And we only use the height, so it makes no difference.
-        RECT tabrc;
+        RECT tabrc{};
         TabCtrl_GetItemRect(m_TabBar, 0, &tabrc);
         MapWindowPoints(m_TabBar, *this, (LPPOINT)&tabrc, 2);
         const int tbHeight    = tabrc.bottom - tabrc.top;
@@ -2143,7 +2143,7 @@ void CMainWindow::UpdateCaptionBar()
 void CMainWindow::UpdateTab(DocID docID)
 {
     const auto& doc = m_DocManager.GetDocumentFromID(docID);
-    TCITEM      tie;
+    TCITEM      tie{};
     tie.lParam = -1;
     tie.mask   = TCIF_IMAGE;
     if (doc.m_bIsReadonly || doc.m_bIsWriteProtected || (m_editor.Call(SCI_GETREADONLY) != 0))
@@ -2162,14 +2162,14 @@ ResponseToCloseTab CMainWindow::AskToCloseTab() const
     ResString    rDontSave(hRes, IDS_DONTSAVE);
     std::wstring sQuestion = CStringUtils::Format(rQuestion, m_TabBar.GetCurrentTitle().c_str());
 
-    TASKDIALOGCONFIG  tdc = {sizeof(TASKDIALOGCONFIG)};
-    TASKDIALOG_BUTTON aCustomButtons[2];
-    aCustomButtons[0].nButtonID     = 100;
-    aCustomButtons[0].pszButtonText = rSave;
-    aCustomButtons[1].nButtonID     = 101;
-    aCustomButtons[1].pszButtonText = rDontSave;
-    tdc.pButtons                    = aCustomButtons;
-    tdc.cButtons                    = _countof(aCustomButtons);
+    TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
+    TASKDIALOG_BUTTON aCustomButtons[2] = {};
+    aCustomButtons[0].nButtonID         = 100;
+    aCustomButtons[0].pszButtonText     = rSave;
+    aCustomButtons[1].nButtonID         = 101;
+    aCustomButtons[1].pszButtonText     = rDontSave;
+    tdc.pButtons                        = aCustomButtons;
+    tdc.cButtons                        = _countof(aCustomButtons);
     assert(tdc.cButtons <= _countof(aCustomButtons));
     tdc.nDefaultButton = 100;
 
@@ -2214,11 +2214,11 @@ ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const 
         // Be specific about what they are re-loading.
         std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
 
-        TASKDIALOGCONFIG  tdc = {sizeof(TASKDIALOGCONFIG)};
-        TASKDIALOG_BUTTON aCustomButtons[3];
-        int               bi               = 0;
-        aCustomButtons[bi].nButtonID       = 101;
-        aCustomButtons[bi++].pszButtonText = rReload;
+        TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
+        TASKDIALOG_BUTTON aCustomButtons[3] = {};
+        int               bi                = 0;
+        aCustomButtons[bi].nButtonID        = 101;
+        aCustomButtons[bi++].pszButtonText  = rReload;
         if (changed)
         {
             aCustomButtons[bi].nButtonID       = 102;
@@ -2266,14 +2266,14 @@ bool CMainWindow::AskToReload(const CDocument& doc) const
     // Be specific about what they are re-loading.
     std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
 
-    TASKDIALOGCONFIG  tdc = {sizeof(TASKDIALOGCONFIG)};
-    TASKDIALOG_BUTTON aCustomButtons[2];
-    aCustomButtons[0].nButtonID     = 101;
-    aCustomButtons[0].pszButtonText = rReload;
-    aCustomButtons[1].nButtonID     = 100;
-    aCustomButtons[1].pszButtonText = rCancel;
-    tdc.pButtons                    = aCustomButtons;
-    tdc.cButtons                    = _countof(aCustomButtons);
+    TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
+    TASKDIALOG_BUTTON aCustomButtons[2] = {};
+    aCustomButtons[0].nButtonID         = 101;
+    aCustomButtons[0].pszButtonText     = rReload;
+    aCustomButtons[1].nButtonID         = 100;
+    aCustomButtons[1].pszButtonText     = rCancel;
+    tdc.pButtons                        = aCustomButtons;
+    tdc.cButtons                        = _countof(aCustomButtons);
     assert(tdc.cButtons <= _countof(aCustomButtons));
     tdc.nDefaultButton = 100; // Default to cancel
 
@@ -2301,16 +2301,16 @@ bool CMainWindow::AskAboutOutsideDeletedFile(const CDocument& doc) const
     // Be specific about what they are removing.
     std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
 
-    TASKDIALOGCONFIG  tdc = {sizeof(TASKDIALOGCONFIG)};
-    TASKDIALOG_BUTTON aCustomButtons[2];
-    int               bi               = 0;
-    aCustomButtons[bi].nButtonID       = 100;
-    aCustomButtons[bi++].pszButtonText = rKeep;
-    aCustomButtons[bi].nButtonID       = 101;
-    aCustomButtons[bi].pszButtonText   = rClose;
-    tdc.pButtons                       = aCustomButtons;
-    tdc.cButtons                       = _countof(aCustomButtons);
-    tdc.nDefaultButton                 = 100;
+    TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
+    TASKDIALOG_BUTTON aCustomButtons[2] = {};
+    int               bi                = 0;
+    aCustomButtons[bi].nButtonID        = 100;
+    aCustomButtons[bi++].pszButtonText  = rKeep;
+    aCustomButtons[bi].nButtonID        = 101;
+    aCustomButtons[bi].pszButtonText    = rClose;
+    tdc.pButtons                        = aCustomButtons;
+    tdc.cButtons                        = _countof(aCustomButtons);
+    tdc.nDefaultButton                  = 100;
 
     tdc.hwndParent         = *this;
     tdc.hInstance          = hRes;
@@ -2341,14 +2341,14 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
     SearchRemoveAll(rEditFile, L"&");
     SearchRemoveAll(rCancel, L"&");
 
-    TASKDIALOGCONFIG  tdc = {sizeof(TASKDIALOGCONFIG)};
-    TASKDIALOG_BUTTON aCustomButtons[2];
-    aCustomButtons[0].nButtonID     = 101;
-    aCustomButtons[0].pszButtonText = rEditFile.c_str();
-    aCustomButtons[1].nButtonID     = 100;
-    aCustomButtons[1].pszButtonText = rCancel.c_str();
-    tdc.pButtons                    = aCustomButtons;
-    tdc.cButtons                    = _countof(aCustomButtons);
+    TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
+    TASKDIALOG_BUTTON aCustomButtons[2] = {};
+    aCustomButtons[0].nButtonID         = 101;
+    aCustomButtons[0].pszButtonText     = rEditFile.c_str();
+    aCustomButtons[1].nButtonID         = 100;
+    aCustomButtons[1].pszButtonText     = rCancel.c_str();
+    tdc.pButtons                        = aCustomButtons;
+    tdc.cButtons                        = _countof(aCustomButtons);
     assert(tdc.cButtons <= _countof(aCustomButtons));
     tdc.nDefaultButton = 100; // Default to cancel
 
@@ -2377,15 +2377,15 @@ bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
     // Show exactly what we are creating.
     std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
 
-    TASKDIALOGCONFIG  tdc = {sizeof(TASKDIALOGCONFIG)};
-    TASKDIALOG_BUTTON aCustomButtons[2];
-    int               bi               = 0;
-    aCustomButtons[bi].nButtonID       = 101;
-    aCustomButtons[bi++].pszButtonText = rCreate;
-    aCustomButtons[bi].nButtonID       = 100;
-    aCustomButtons[bi++].pszButtonText = rCancel;
-    tdc.pButtons                       = aCustomButtons;
-    tdc.cButtons                       = bi;
+    TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
+    TASKDIALOG_BUTTON aCustomButtons[2] = {};
+    int               bi                = 0;
+    aCustomButtons[bi].nButtonID        = 101;
+    aCustomButtons[bi++].pszButtonText  = rCreate;
+    aCustomButtons[bi].nButtonID        = 100;
+    aCustomButtons[bi++].pszButtonText  = rCancel;
+    tdc.pButtons                        = aCustomButtons;
+    tdc.cButtons                        = bi;
     assert(tdc.cButtons <= _countof(aCustomButtons));
     tdc.nDefaultButton = 101;
 
@@ -2521,7 +2521,7 @@ void CMainWindow::PasteHistory()
             OnOutOfScope(
                 DestroyMenu(hMenu););
             size_t pos = m_editor.Call(SCI_GETCURRENTPOS);
-            POINT  pt;
+            POINT  pt{};
             pt.x = (LONG)m_editor.Call(SCI_POINTXFROMPOSITION, 0, pos);
             pt.y = (LONG)m_editor.Call(SCI_POINTYFROMPOSITION, 0, pos);
             ClientToScreen(m_editor, &pt);
@@ -2839,7 +2839,7 @@ void CMainWindow::HandleWriteProtectedEdit()
 void CMainWindow::AddHotSpots()
 {
     long startPos = 0;
-    long endPos;
+    long endPos   = 0;
 
     long firstVisibleLine = (long)m_editor.Call(SCI_GETFIRSTVISIBLELINE);
     startPos              = (long)m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine));
@@ -2924,7 +2924,7 @@ void CMainWindow::HandleAutoIndent(const SCNotification& scn)
 
         if (indentAmount > 0)
         {
-            Sci_CharacterRange crange;
+            Sci_CharacterRange crange{};
             crange.cpMin  = long(m_editor.Call(SCI_GETSELECTIONSTART));
             crange.cpMax  = long(m_editor.Call(SCI_GETSELECTIONEND));
             int posBefore = (int)m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);
@@ -3032,11 +3032,11 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.Call(SCI_GRABFOCUS);
     UpdateStatusBar(true);
     auto ds = m_DocManager.HasFileChanged(docID);
-    if (ds == DM_Modified)
+    if (ds == DocModifiedState::DM_Modified)
     {
         ReloadTab(curTab, -1, true);
     }
-    else if (ds == DM_Removed)
+    else if (ds == DocModifiedState::DM_Removed)
     {
         HandleOutsideDeletedFile(curTab);
     }
@@ -3318,15 +3318,15 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
             ResString    rOpen(hRes, IDS_IMPORTBPLEX_OPEN);
             std::wstring sQuestion = CStringUtils::Format(rQuestion, CPathUtils::GetFileName(files[0]).c_str());
 
-            TASKDIALOGCONFIG tdc = {sizeof(TASKDIALOGCONFIG)};
-            tdc.dwFlags          = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-            TASKDIALOG_BUTTON aCustomButtons[2];
-            aCustomButtons[0].nButtonID     = 100;
-            aCustomButtons[0].pszButtonText = rImport;
-            aCustomButtons[1].nButtonID     = 101;
-            aCustomButtons[1].pszButtonText = rOpen;
-            tdc.pButtons                    = aCustomButtons;
-            tdc.cButtons                    = _countof(aCustomButtons);
+            TASKDIALOGCONFIG tdc                = {sizeof(TASKDIALOGCONFIG)};
+            tdc.dwFlags                         = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+            TASKDIALOG_BUTTON aCustomButtons[2] = {};
+            aCustomButtons[0].nButtonID         = 100;
+            aCustomButtons[0].pszButtonText     = rImport;
+            aCustomButtons[1].nButtonID         = 101;
+            aCustomButtons[1].pszButtonText     = rOpen;
+            tdc.pButtons                        = aCustomButtons;
+            tdc.cButtons                        = _countof(aCustomButtons);
             assert(tdc.cButtons <= _countof(aCustomButtons));
             tdc.nDefaultButton = 100;
 
@@ -3409,14 +3409,14 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
         {
             if (parser.HasVal(L"line"))
             {
-                GoToLine(parser.GetLongVal(L"line") - 1);
+                GoToLine(parser.GetLongLongVal(L"line") - 1);
             }
         }
     }
     else
     {
         // find out if there are paths specified without the key/value pair syntax
-        int nArgs;
+        int nArgs = 0;
 
         LPCWSTR* szArglist = (LPCWSTR*)CommandLineToArgvW((LPCWSTR)cds.lpData, &nArgs);
         OnOutOfScope(LocalFree(szArglist););
@@ -3445,7 +3445,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
 
         if ((filesOpened == 1) && parser.HasVal(L"line"))
         {
-            GoToLine(parser.GetLongVal(L"line") - 1);
+            GoToLine(parser.GetLongLongVal(L"line") - 1);
         }
     }
 }
@@ -3550,15 +3550,15 @@ static bool AskToCopyOrMoveFile(HWND hWnd, const std::wstring& filename, const s
     // Show exactly what we are creating.
     std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str(), hitpath.c_str());
 
-    TASKDIALOGCONFIG  tdc = {sizeof(TASKDIALOGCONFIG)};
-    TASKDIALOG_BUTTON aCustomButtons[2];
-    int               bi               = 0;
-    aCustomButtons[bi].nButtonID       = 101;
-    aCustomButtons[bi++].pszButtonText = rDoit;
-    aCustomButtons[bi].nButtonID       = 100;
-    aCustomButtons[bi++].pszButtonText = rCancel;
-    tdc.pButtons                       = aCustomButtons;
-    tdc.cButtons                       = bi;
+    TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
+    TASKDIALOG_BUTTON aCustomButtons[2] = {};
+    int               bi                = 0;
+    aCustomButtons[bi].nButtonID        = 101;
+    aCustomButtons[bi++].pszButtonText  = rDoit;
+    aCustomButtons[bi].nButtonID        = 100;
+    aCustomButtons[bi++].pszButtonText  = rCancel;
+    tdc.pButtons                        = aCustomButtons;
+    tdc.cButtons                        = bi;
     assert(tdc.cButtons <= _countof(aCustomButtons));
     tdc.nDefaultButton = 101;
 
@@ -3778,7 +3778,7 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     docreload.m_position          = doc.m_position;
     docreload.m_bIsWriteProtected = doc.m_bIsWriteProtected;
     docreload.m_saveCallback      = doc.m_saveCallback;
-    auto lang                     = doc.GetLanguage();
+    const auto& lang              = doc.GetLanguage();
     doc                           = docreload;
     editor->SetupLexerForLang(lang);
     doc.SetLanguage(lang);
@@ -3830,7 +3830,7 @@ bool CMainWindow::HasOutsideChangesOccurred() const
     {
         auto docID = m_TabBar.GetIDFromIndex(i);
         auto ds    = m_DocManager.HasFileChanged(docID);
-        if (ds == DM_Modified || ds == DM_Removed)
+        if (ds == DocModifiedState::DM_Modified || ds == DocModifiedState::DM_Removed)
             return true;
     }
     return false;
@@ -3857,10 +3857,10 @@ void CMainWindow::CheckForOutsideChanges()
         {
             auto docID = m_TabBar.GetIDFromIndex(i);
             auto ds    = m_DocManager.HasFileChanged(docID);
-            if (ds == DM_Modified || ds == DM_Removed)
+            if (ds == DocModifiedState::DM_Modified || ds == DocModifiedState::DM_Removed)
             {
                 const auto& doc = m_DocManager.GetDocumentFromID(docID);
-                if ((ds != DM_Removed) && !doc.m_bIsDirty && !doc.m_bNeedsSaving && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
+                if ((ds != DocModifiedState::DM_Removed) && !doc.m_bIsDirty && !doc.m_bNeedsSaving && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
                 {
                     ReloadTab(i, -1, true);
                 }

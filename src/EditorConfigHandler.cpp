@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 #include "EditorConfigHandler.h"
 #include "UnicodeUtils.h"
 #include "Document.h"
-
 
 CEditorConfigHandler::CEditorConfigHandler()
 {
@@ -38,7 +37,7 @@ CEditorConfigHandler& CEditorConfigHandler::Instance()
     return instance;
 }
 
-void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScintillaWnd * pScintilla, CDocument& doc, bool keepEncoding)
+void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScintillaWnd* pScintilla, CDocument& doc, bool keepEncoding)
 {
     if (path.empty())
         return;
@@ -49,11 +48,11 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
 
         if (editorconfig_parse(CUnicodeUtils::StdGetANSI(path).c_str(), eh) == 0)
         {
-            EditorConfigData data;
-            data.handle = eh;
-            data.enabled = true;
+            EditorConfigData data{};
+            data.handle     = eh;
+            data.enabled    = true;
             m_handles[path] = data;
-            it = m_handles.find(path);
+            it              = m_handles.find(path);
         }
         else
             editorconfig_handle_destroy(eh);
@@ -65,8 +64,8 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
         int name_value_count = editorconfig_handle_get_name_value_count(it->second.handle);
         for (int j = 0; j < name_value_count; ++j)
         {
-            const char*         name;
-            const char*         value;
+            const char* name  = nullptr;
+            const char* value = nullptr;
             editorconfig_handle_get_name_value(it->second.handle, j, &name, &value);
 
             if ((doc.m_TabSpace == Default) && (strcmp(name, "indent_style") == 0))
@@ -126,32 +125,32 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
                 if (strcmp(value, "latin1") == 0)
                 {
                     doc.m_encodingSaving = CP_ACP;
-                    doc.m_bHasBOMSaving = false;
+                    doc.m_bHasBOMSaving  = false;
                 }
                 else if (strcmp(value, "utf-8") == 0)
                 {
                     doc.m_encodingSaving = CP_UTF8;
-                    doc.m_bHasBOMSaving = false;
+                    doc.m_bHasBOMSaving  = false;
                 }
                 else if (strcmp(value, "utf-16le") == 0)
                 {
                     doc.m_encodingSaving = 1200;
-                    doc.m_bHasBOMSaving = false;
+                    doc.m_bHasBOMSaving  = false;
                 }
                 else if (strcmp(value, "utf-16le-bom") == 0)
                 {
                     doc.m_encodingSaving = 1200;
-                    doc.m_bHasBOMSaving = true;
+                    doc.m_bHasBOMSaving  = true;
                 }
                 else if (strcmp(value, "utf-16be") == 0)
                 {
                     doc.m_encodingSaving = 1201;
-                    doc.m_bHasBOMSaving = false;
+                    doc.m_bHasBOMSaving  = false;
                 }
                 else if (strcmp(value, "utf-16be-bom") == 0)
                 {
                     doc.m_encodingSaving = 1201;
-                    doc.m_bHasBOMSaving = true;
+                    doc.m_bHasBOMSaving  = true;
                 }
             }
             else if (strcmp(name, "trim_trailing_whitespace") == 0)
@@ -168,7 +167,7 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
     }
 }
 
-bool CEditorConfigHandler::IsEnabled(const std::wstring & path)
+bool CEditorConfigHandler::IsEnabled(const std::wstring& path)
 {
     if (path.empty())
         return false;
@@ -182,7 +181,7 @@ bool CEditorConfigHandler::IsEnabled(const std::wstring & path)
     return false;
 }
 
-void CEditorConfigHandler::EnableForPath(const std::wstring & path, bool enable)
+void CEditorConfigHandler::EnableForPath(const std::wstring& path, bool enable)
 {
     auto it = m_handles.find(path);
 
