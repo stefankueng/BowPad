@@ -162,8 +162,8 @@ void CCmdSessionLoad::OnClose()
             SaveDoc(docId, backupPath);
         }
         settings.SetString(sessionSection(), CStringUtils::Format(L"path%d", saveindex).c_str(), doc.m_path.c_str());
-        settings.SetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", saveindex).c_str(), doc.m_TabSpace);
-        settings.SetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", saveindex).c_str(), doc.m_ReadDir);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", saveindex).c_str(), (int)doc.m_TabSpace);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", saveindex).c_str(), (int)doc.m_ReadDir);
 
         ++saveindex;
     }

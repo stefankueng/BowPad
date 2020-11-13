@@ -28,27 +28,27 @@
 
 extern HINSTANCE hRes;
 
-
 class CSummaryDlg : public CDialog
 {
 public:
     CSummaryDlg();
     ~CSummaryDlg();
 
-    std::wstring            m_sSummary;
+    std::wstring m_sSummary;
 
 protected:
-    LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT                 DoCommand(int id, int msg);
-    CDlgResizer             m_resizer;
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT          DoCommand(int id, int msg);
+    CDlgResizer      m_resizer;
 };
 
-
 CSummaryDlg::CSummaryDlg()
-{}
+{
+}
 
 CSummaryDlg::~CSummaryDlg()
-{}
+{
+}
 
 LRESULT CSummaryDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -73,7 +73,7 @@ LRESULT CSummaryDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPar
             break;
         case WM_GETMINMAXINFO:
         {
-            MINMAXINFO * mmi = (MINMAXINFO*)lParam;
+            MINMAXINFO* mmi       = (MINMAXINFO*)lParam;
             mmi->ptMinTrackSize.x = 200;
             mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
             return 0;
@@ -103,14 +103,14 @@ bool CCmdSummary::Execute()
     if (!HasActiveDocument())
         return false;
 
-    size_t len = ScintillaCall(SCI_GETLENGTH);
-    char * str = (char*)ScintillaCall(SCI_GETCHARACTERPOINTER);
-    bool inSpaces = true;
-    bool inLine = false;
-    bool inParagraph = true;
-    long numWords = 0;
-    long numParagraphs = 0;
-    long numEmptyLines = 0;
+    auto   len           = ScintillaCall(SCI_GETLENGTH);
+    char*  str           = (char*)ScintillaCall(SCI_GETCHARACTERPOINTER);
+    bool   inSpaces      = true;
+    bool   inLine        = false;
+    bool   inParagraph   = true;
+    sptr_t numWords      = 0;
+    sptr_t numParagraphs = 0;
+    sptr_t numEmptyLines = 0;
 
     while (len)
     {
@@ -120,7 +120,7 @@ bool CCmdSummary::Execute()
             case '\r':
                 if (*(str + 1) == '\n')
                     ++str;
-                // intentional fall through
+                [[fallthrough]];
             case '\n':
                 inSpaces = true;
                 if (!inLine)
@@ -162,15 +162,15 @@ bool CCmdSummary::Execute()
             case '=':
             case '|':
             case '\\':
-                inSpaces = true;
-                inLine = true;
+                inSpaces    = true;
+                inLine      = true;
                 inParagraph = true;
                 break;
             default:
                 if (inSpaces)
                     ++numWords;
-                inSpaces = false;
-                inLine = true;
+                inSpaces    = false;
+                inLine      = true;
                 inParagraph = true;
                 break;
         }
@@ -183,10 +183,9 @@ bool CCmdSummary::Execute()
             ++numParagraphs;
     }
 
-
     const auto& doc = GetActiveDocument();
 
-    ResString rSummary(hRes, IDS_SUMMARY);
+    ResString    rSummary(hRes, IDS_SUMMARY);
     std::wstring sSummary = CStringUtils::Format(rSummary,
                                                  doc.m_path.c_str(),
                                                  numWords,
@@ -200,4 +199,3 @@ bool CCmdSummary::Execute()
 
     return true;
 }
-

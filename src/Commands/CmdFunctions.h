@@ -34,13 +34,13 @@
 
 struct FunctionInfo
 {
-    inline FunctionInfo(int lineNum, std::string&& sortName, std::string&& displayName)
+    inline FunctionInfo(sptr_t lineNum, std::string&& sortName, std::string&& displayName)
         : lineNum(lineNum)
         , sortName(std::move(sortName))
         , displayName(std::move(displayName))
     {
     }
-    int         lineNum;
+    sptr_t      lineNum;
     std::string sortName;
     std::string displayName;
 };
@@ -102,7 +102,7 @@ private:
     void                      InvalidateFunctionsEnabled();
     void                      InvalidateFunctionsSource();
     HRESULT                   PopulateFunctions(IUICollectionPtr& collection);
-    void                      FindFunctions(const CDocument& doc, std::function<bool(const std::string&, long lineNum)>& callback) const;
+    void                      FindFunctions(const CDocument& doc, std::function<bool(const std::string&, sptr_t lineNum)>& callback) const;
     void                      SetWorkTimer(int ms);
     void                      ThreadFunc();
 
@@ -110,7 +110,7 @@ private:
     bool                                               m_autoscan;
     size_t                                             m_autoscanlimit;
     UINT                                               m_timerID;
-    std::vector<int>                                   m_menuData;
+    std::vector<sptr_t>                                m_menuData;
     std::chrono::time_point<std::chrono::steady_clock> m_funcProcessingStartTime;
     CScintillaWnd                                      m_edit;
 

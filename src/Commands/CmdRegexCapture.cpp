@@ -232,7 +232,7 @@ void CRegexCaptureDlg::DoCapture()
             flags |= std::regex_constants::match_flag_type::match_not_eol;
         auto                                         start = searchText.cbegin();
         auto                                         end   = searchText.cend();
-        std::vector<std::tuple<int, size_t, size_t>> capturePositions;
+        std::vector<std::tuple<sptr_t, size_t, size_t>> capturePositions;
         while (std::regex_search(start, end, whatc, rx, flags))
         {
             if (whatc[0].matched)
@@ -240,7 +240,7 @@ void CRegexCaptureDlg::DoCapture()
                 auto out = whatc.format(sCapture, flags);
                 m_captureWnd.Call(SCI_APPENDTEXT, out.size(), (sptr_t)out.c_str());
 
-                int captureCount = 0;
+                sptr_t captureCount = 0;
                 for (const auto& w : whatc)
                 {
                     capturePositions.push_back(std::make_tuple(captureCount, w.first - searchText.cbegin(), w.length()));

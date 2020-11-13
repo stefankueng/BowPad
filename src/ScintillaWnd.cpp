@@ -95,7 +95,7 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_ScrollTool(hInst)
     , m_hasConsolas(false)
     , m_bInFolderMargin(false)
-    , m_LineToScrollToAfterPaint((size_t)-1)
+    , m_LineToScrollToAfterPaint(-1)
     , m_WrapOffsetToScrollToAfterPaint(0)
 {
     HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
@@ -765,12 +765,12 @@ void CScintillaWnd::UpdateLineNumberWidth()
         Call(SCI_SETMARGINWIDTHN, SC_MARGE_LINENUMBER, 0);
         return;
     }
-    int linesVisible = (int)Call(SCI_LINESONSCREEN);
+    auto linesVisible = Call(SCI_LINESONSCREEN);
     if (linesVisible)
     {
-        int firstVisibleLineVis = (int)Call(SCI_GETFIRSTVISIBLELINE);
-        int lastVisibleLineVis  = linesVisible + firstVisibleLineVis + 1;
-        int i                   = 0;
+        auto   firstVisibleLineVis = Call(SCI_GETFIRSTVISIBLELINE);
+        auto   lastVisibleLineVis  = linesVisible + firstVisibleLineVis + 1;
+        sptr_t i                   = 0;
         while (lastVisibleLineVis)
         {
             lastVisibleLineVis /= 10;
@@ -790,7 +790,7 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
     // painted: if there's still a valid m_LineToScrollToAfterPaint
     // then the scroll position hasn't been set properly yet
     // and reading the positions would be wrong.
-    if (m_LineToScrollToAfterPaint == (size_t)-1)
+    if (m_LineToScrollToAfterPaint == -1)
     {
         auto firstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
         pos.m_nFirstVisibleLine = Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine);
@@ -805,15 +805,15 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
 
         pos.m_lineStateVector.clear();
         pos.m_lastStyleLine             = 0;
-        size_t contractedFoldHeaderLine = 0;
+        sptr_t contractedFoldHeaderLine = 0;
         do
         {
-            contractedFoldHeaderLine = static_cast<size_t>(Call(SCI_CONTRACTEDFOLDNEXT, contractedFoldHeaderLine));
+            contractedFoldHeaderLine = static_cast<sptr_t>(Call(SCI_CONTRACTEDFOLDNEXT, contractedFoldHeaderLine));
             if (contractedFoldHeaderLine != -1)
             {
                 // Store contracted line
                 pos.m_lineStateVector.push_back(contractedFoldHeaderLine);
-                pos.m_lastStyleLine = max(pos.m_lastStyleLine, (size_t)Call(SCI_GETLASTCHILD, contractedFoldHeaderLine, -1));
+                pos.m_lastStyleLine = max(pos.m_lastStyleLine, (sptr_t)Call(SCI_GETLASTCHILD, contractedFoldHeaderLine, -1));
                 // Start next search with next line
                 ++contractedFoldHeaderLine;
             }
@@ -821,7 +821,7 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
     }
     else
     {
-        m_LineToScrollToAfterPaint = (size_t)-1;
+        m_LineToScrollToAfterPaint = -1;
     }
 }
 
@@ -870,7 +870,7 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     }
     Call(SCI_CHOOSECARETX);
 
-    size_t lineToShow = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
+    auto lineToShow = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
     if (wrapmode != SC_WRAP_NONE)
     {
         // if wrapping is enabled, scrolling to a line won't work
@@ -1032,7 +1032,7 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_MARKERSETFORE, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(80, 0, 0), true));
     Call(SCI_MARKERSETBACK, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(255, 0, 0), true));
 
-    SetTabSettings(Default);
+    SetTabSettings(TabSpace::Default);
     Call(SCI_SETINDENTATIONGUIDES, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"indent", SC_IV_LOOKBOTH));
 
     SetupFoldingColors(RGB(color_folding_fore_inactive, color_folding_fore_inactive, color_folding_fore_inactive),
@@ -1120,9 +1120,9 @@ void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF ba
     //Call(SCI_STYLESETBACK, STYLE_FOLDDISPLAYTEXT, foldmarkback);
 }
 
-void CScintillaWnd::GotoLine(long line)
+void CScintillaWnd::GotoLine(sptr_t line)
 {
-    long linepos = (long)Call(SCI_POSITIONFROMLINE, line);
+    auto linepos = Call(SCI_POSITIONFROMLINE, line);
     Center(linepos, linepos);
 }
 
@@ -1178,7 +1178,7 @@ void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
 void CScintillaWnd::MarginClick(SCNotification* pNotification)
 {
     if ((pNotification->margin == SC_MARGE_SYMBOL) && !pNotification->modifiers)
-        BookmarkToggle((int)Call(SCI_LINEFROMPOSITION, pNotification->position));
+        BookmarkToggle(Call(SCI_LINEFROMPOSITION, pNotification->position));
     m_docScroll.VisibleLinesChanged();
 }
 
@@ -1188,11 +1188,11 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     static Sci_PositionCR lastStopPosition = 0;
     LRESULT               firstline        = Call(SCI_GETFIRSTVISIBLELINE);
     LRESULT               lastline         = firstline + Call(SCI_LINESONSCREEN);
-    long                  startstylepos    = (long)Call(SCI_POSITIONFROMLINE, firstline);
+    auto                  startstylepos    = Call(SCI_POSITIONFROMLINE, firstline);
     startstylepos                          = max(startstylepos, 0);
-    long endstylepos                       = (long)Call(SCI_POSITIONFROMLINE, lastline) + (long)Call(SCI_LINELENGTH, lastline);
+    auto endstylepos                       = Call(SCI_POSITIONFROMLINE, lastline) + Call(SCI_LINELENGTH, lastline);
     if (endstylepos < 0)
-        endstylepos = (long)Call(SCI_GETLENGTH);
+        endstylepos = Call(SCI_GETLENGTH);
 
     int len = endstylepos - startstylepos;
     if (len <= 0)
@@ -1202,7 +1202,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     Call(SCI_SETINDICATORCURRENT, INDIC_SELECTION_MARK);
     Call(SCI_INDICATORCLEARRANGE, startstylepos, len);
 
-    int selTextLen = (int)Call(SCI_GETSELTEXT);
+    auto selTextLen = Call(SCI_GETSELTEXT);
     if ((selTextLen <= 1) || (clear)) // Includes zero terminator so 1 means 0.
     {
         lastSelText.clear();
@@ -1211,10 +1211,10 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
         SendMessage(*this, WM_NCPAINT, (WPARAM)1, 0);
         return;
     }
-    auto   origSelStart = Call(SCI_GETSELECTIONSTART);
-    auto   origSelEnd   = Call(SCI_GETSELECTIONEND);
-    size_t selStartLine = Call(SCI_LINEFROMPOSITION, origSelStart, 0);
-    size_t selEndLine   = Call(SCI_LINEFROMPOSITION, origSelEnd, 0);
+    auto origSelStart = Call(SCI_GETSELECTIONSTART);
+    auto origSelEnd   = Call(SCI_GETSELECTIONEND);
+    auto selStartLine = Call(SCI_LINEFROMPOSITION, origSelStart, 0);
+    auto selEndLine   = Call(SCI_LINEFROMPOSITION, origSelEnd, 0);
     if (selStartLine != selEndLine)
     {
         lastSelText.clear();
@@ -1224,8 +1224,8 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
         return;
     }
 
-    size_t selStartPos   = Call(SCI_GETSELECTIONSTART);
-    auto   seltextbuffer = std::make_unique<char[]>(selTextLen + 1);
+    auto selStartPos   = Call(SCI_GETSELECTIONSTART);
+    auto seltextbuffer = std::make_unique<char[]>(selTextLen + 1);
     Call(SCI_GETSELTEXT, 0, (LPARAM)seltextbuffer.get());
     if (seltextbuffer[0] == 0)
     {
@@ -1263,12 +1263,12 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     while (startPos)
     {
         // don't style the selected text itself
-        if (selStartPos != size_t(startstylepos + (startPos - textbuffer.get())))
+        if (selStartPos != sptr_t(startstylepos + (startPos - textbuffer.get())))
             Call(SCI_INDICATORFILLRANGE, startstylepos + (startPos - textbuffer.get()), selTextLen - 1);
         startPos = strstr(startPos + 1, seltextbuffer.get());
     }
 
-    int lineCount = (int)Call(SCI_GETLINECOUNT);
+    auto lineCount = Call(SCI_GETLINECOUNT);
     if ((selTextLen > 2) || (lineCount < 100000))
     {
         auto selTextDifferent = lastSelText.compare(seltextbuffer.get());
@@ -1282,7 +1282,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
             }
             Sci_TextToFind FindText{};
             FindText.chrg.cpMin     = lastStopPosition;
-            FindText.chrg.cpMax     = (long)Call(SCI_GETLENGTH);
+            FindText.chrg.cpMax     = Call(SCI_GETLENGTH);
             FindText.lpstrText      = seltextbuffer.get();
             lastStopPosition        = 0;
             const auto selTextColor = CTheme::Instance().GetThemeColor(RGB(0, 255, 0), true);
@@ -1293,7 +1293,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
                     if ((origSelStart != FindText.chrgText.cpMin) || (origSelEnd != FindText.chrgText.cpMax))
                         Call(SCI_ADDSELECTION, FindText.chrgText.cpMax, FindText.chrgText.cpMin);
                 }
-                size_t line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
+                auto line = Call(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
                 m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, selTextColor);
                 ++m_selTextMarkerCount;
                 if (FindText.chrg.cpMin >= FindText.chrgText.cpMax)
@@ -1475,8 +1475,8 @@ void CScintillaWnd::MatchTags()
     // basically the same as MatchBraces(), but much more complicated since
     // finding xml tags is harder than just finding braces...
 
-    size_t docStart = 0;
-    size_t docEnd   = Call(SCI_GETLENGTH);
+    sptr_t docStart = 0;
+    sptr_t docEnd   = Call(SCI_GETLENGTH);
     Call(SCI_SETINDICATORCURRENT, INDIC_TAGMATCH);
     Call(SCI_INDICATORCLEARRANGE, docStart, docEnd - docStart);
     Call(SCI_SETINDICATORCURRENT, INDIC_TAGATTR);
@@ -1489,9 +1489,9 @@ void CScintillaWnd::MatchTags()
         return;
 
     // Get the original targets and search options to restore after tag matching operation
-    size_t originalStartPos    = Call(SCI_GETTARGETSTART);
-    size_t originalEndPos      = Call(SCI_GETTARGETEND);
-    size_t originalSearchFlags = Call(SCI_GETSEARCHFLAGS);
+    auto originalStartPos    = Call(SCI_GETTARGETSTART);
+    auto originalEndPos      = Call(SCI_GETTARGETEND);
+    auto originalSearchFlags = Call(SCI_GETSEARCHFLAGS);
 
     XmlMatchedTagsPos xmlTags = {0};
 
@@ -1514,7 +1514,7 @@ void CScintillaWnd::MatchTags()
         Call(SCI_INDICATORFILLRANGE, xmlTags.tagOpenEnd - openTagTailLen, openTagTailLen);
 
         // Coloring its attributes
-        std::vector<std::pair<size_t, size_t>> attributes = GetAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
+        auto attributes = GetAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
         Call(SCI_SETINDICATORCURRENT, INDIC_TAGATTR);
         for (const auto& attr : attributes)
         {
@@ -1524,11 +1524,11 @@ void CScintillaWnd::MatchTags()
         // Coloring indent guide line position
         if (Call(SCI_GETINDENTATIONGUIDES) != 0)
         {
-            size_t columnAtCaret  = Call(SCI_GETCOLUMN, xmlTags.tagOpenStart);
-            size_t columnOpposite = Call(SCI_GETCOLUMN, xmlTags.tagCloseStart);
+            auto columnAtCaret  = Call(SCI_GETCOLUMN, xmlTags.tagOpenStart);
+            auto columnOpposite = Call(SCI_GETCOLUMN, xmlTags.tagCloseStart);
 
-            size_t lineAtCaret  = Call(SCI_LINEFROMPOSITION, xmlTags.tagOpenStart);
-            size_t lineOpposite = Call(SCI_LINEFROMPOSITION, xmlTags.tagCloseStart);
+            auto lineAtCaret  = Call(SCI_LINEFROMPOSITION, xmlTags.tagOpenStart);
+            auto lineOpposite = Call(SCI_LINEFROMPOSITION, xmlTags.tagCloseStart);
 
             if (xmlTags.tagCloseStart != -1 && lineAtCaret != lineOpposite)
             {
@@ -1544,15 +1544,15 @@ void CScintillaWnd::MatchTags()
     Call(SCI_SETSEARCHFLAGS, originalSearchFlags);
 }
 
-bool CScintillaWnd::GetSelectedCount(size_t& selByte, size_t& selLine)
+bool CScintillaWnd::GetSelectedCount(sptr_t& selByte, sptr_t& selLine)
 {
     auto selCount = Call(SCI_GETSELECTIONS);
     selByte       = 0;
     selLine       = 0;
     for (decltype(selCount) i = 0; i < selCount; ++i)
     {
-        size_t start = Call(SCI_GETSELECTIONNSTART, i);
-        size_t end   = Call(SCI_GETSELECTIONNEND, i);
+        auto start = Call(SCI_GETSELECTIONNSTART, i);
+        auto end   = Call(SCI_GETSELECTIONNEND, i);
         selByte += (start < end) ? end - start : start - end;
 
         start = Call(SCI_LINEFROMPOSITION, start);
@@ -1574,9 +1574,9 @@ LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw(WPARAM wParam, NMCSBCU
 bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
 {
     bool       tagFound         = false;
-    size_t     caret            = Call(SCI_GETCURRENTPOS);
-    size_t     searchStartPoint = caret;
-    size_t     styleAt          = 0;
+    auto       caret            = Call(SCI_GETCURRENTPOS);
+    auto       searchStartPoint = caret;
+    sptr_t     styleAt          = 0;
     FindResult openFound{};
 
     // Search back for the previous open angle bracket.
@@ -1586,7 +1586,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
         openFound        = FindText("<", searchStartPoint, 0, 0);
         styleAt          = Call(SCI_GETSTYLEAT, openFound.start);
         searchStartPoint = openFound.start - 1;
-    } while (openFound.success && (styleAt == SCE_H_DOUBLESTRING || styleAt == SCE_H_SINGLESTRING) && (int)searchStartPoint > 0);
+    } while (openFound.success && (styleAt == SCE_H_DOUBLESTRING || styleAt == SCE_H_SINGLESTRING) && searchStartPoint > 0);
 
     if (openFound.success && styleAt != SCE_H_CDATA)
     {
@@ -1596,14 +1596,14 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
         do
         {
             closeFound       = FindText(">", searchStartPoint, caret, 0);
-            styleAt          = (int)Call(SCI_GETSTYLEAT, closeFound.start);
+            styleAt          = Call(SCI_GETSTYLEAT, closeFound.start);
             searchStartPoint = closeFound.end;
-        } while (closeFound.success && (styleAt == SCE_H_DOUBLESTRING || styleAt == SCE_H_SINGLESTRING) && (int)searchStartPoint <= caret);
+        } while (closeFound.success && (styleAt == SCE_H_DOUBLESTRING || styleAt == SCE_H_SINGLESTRING) && searchStartPoint <= caret);
 
         if (!closeFound.success)
         {
             // We're in a tag (either a start tag or an end tag)
-            int nextChar = (int)Call(SCI_GETCHARAT, openFound.start + 1);
+            auto nextChar = Call(SCI_GETCHARAT, openFound.start + 1);
 
             /////////////////////////////////////////////////////////////////////////
             // CURSOR IN CLOSE TAG
@@ -1611,24 +1611,24 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
             if ('/' == nextChar)
             {
                 xmlTags.tagCloseStart  = openFound.start;
-                size_t     docLength   = Call(SCI_GETLENGTH);
+                auto       docLength   = Call(SCI_GETLENGTH);
                 FindResult endCloseTag = FindText(">", caret, docLength, 0);
                 if (endCloseTag.success)
                 {
                     xmlTags.tagCloseEnd = endCloseTag.end;
                 }
                 // Now find the tagName
-                size_t position = openFound.start + 2;
+                auto position = openFound.start + 2;
 
                 // UTF-8 or ASCII tag name
                 std::string tagName;
-                nextChar = (int)Call(SCI_GETCHARAT, position);
+                nextChar = Call(SCI_GETCHARAT, position);
                 // Checking for " or ' is actually wrong here, but it means it works better with invalid XML
                 while (position < docLength && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                 {
                     tagName.push_back((char)nextChar);
                     ++position;
-                    nextChar = (int)Call(SCI_GETCHARAT, position);
+                    nextChar = Call(SCI_GETCHARAT, position);
                 }
 
                 // Now we know where the end of the tag is, and we know what the tag is called
@@ -1650,8 +1650,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                     * <TAGNAME attrib="value"><TAGNAME>something</TAGNAME></TAGNAME></TAGNA|ME>
                     * Maybe count all closing tags between start point and start of our end tag.???
                     */
-                    size_t     currentEndPoint   = xmlTags.tagCloseStart;
-                    size_t     openTagsRemaining = 1;
+                    auto       currentEndPoint   = xmlTags.tagCloseStart;
+                    auto       openTagsRemaining = 1;
                     FindResult nextOpenTag{};
                     do
                     {
@@ -1667,8 +1667,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                             //                         ^^^^^^^^ we've found this guy
                             //                                           ^^^^^^^^^^ ^^^^^^^^ Now we need to count these fellas
                             FindResult inbetweenCloseTag{};
-                            size_t     currentStartPosition = nextOpenTag.end;
-                            size_t     closeTagsFound       = 0;
+                            auto       currentStartPosition = nextOpenTag.end;
+                            sptr_t     closeTagsFound       = 0;
                             bool       forwardSearch        = (currentStartPosition < currentEndPoint);
 
                             do
@@ -1697,7 +1697,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                             {
                                 xmlTags.tagOpenStart = nextOpenTag.start;
                                 xmlTags.tagOpenEnd   = nextOpenTag.end + 1;
-                                xmlTags.tagNameEnd   = nextOpenTag.start + (int)tagName.size() + 1; /* + 1 to account for '<' */
+                                xmlTags.tagNameEnd   = nextOpenTag.start + (sptr_t)tagName.size() + 1; /* + 1 to account for '<' */
                                 tagFound             = true;
                             }
                             else
@@ -1715,19 +1715,19 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                 /////////////////////////////////////////////////////////////////////////
                 // CURSOR IN OPEN TAG
                 /////////////////////////////////////////////////////////////////////////
-                size_t position  = openFound.start + 1;
-                size_t docLength = (int)Call(SCI_GETLENGTH);
+                auto position  = openFound.start + 1;
+                auto docLength = Call(SCI_GETLENGTH);
 
                 xmlTags.tagOpenStart = openFound.start;
 
                 std::string tagName;
-                nextChar = (int)Call(SCI_GETCHARAT, position);
+                nextChar = Call(SCI_GETCHARAT, position);
                 // Checking for " or ' is actually wrong here, but it means it works better with invalid XML
                 while (position < docLength && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                 {
                     tagName.push_back((char)nextChar);
                     ++position;
-                    nextChar = (int)Call(SCI_GETCHARAT, position);
+                    nextChar = Call(SCI_GETCHARAT, position);
                 }
 
                 // Now we know where the end of the tag is, and we know what the tag is called
@@ -1735,8 +1735,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                 {
                     // First we need to check if this is a self-closing tag.
                     // If it is, then we can just return this tag to highlight itself.
-                    xmlTags.tagNameEnd        = openFound.start + tagName.size() + 1;
-                    size_t closeAnglePosition = FindCloseAngle(position, docLength);
+                    xmlTags.tagNameEnd      = openFound.start + tagName.size() + 1;
+                    auto closeAnglePosition = FindCloseAngle(position, docLength);
                     if (-1 != closeAnglePosition)
                     {
                         xmlTags.tagOpenEnd = closeAnglePosition + 1;
@@ -1744,8 +1744,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                         if (Call(SCI_GETCHARAT, closeAnglePosition - 1) == '/')
                         {
                             // Set it as found, and mark that there's no close tag
-                            xmlTags.tagCloseEnd   = (size_t)-1;
-                            xmlTags.tagCloseStart = (size_t)-1;
+                            xmlTags.tagCloseEnd   = -1;
+                            xmlTags.tagCloseStart = -1;
                             tagFound              = true;
                         }
                         else
@@ -1760,8 +1760,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                             *       e.g.  <TA|GNAME><TAGNAME attrib="value">some text</TAGNAME></TAGNAME>
                             *             (cursor represented by |)
                             */
-                            size_t     currentStartPosition = xmlTags.tagOpenEnd;
-                            size_t     closeTagsRemaining   = 1;
+                            auto       currentStartPosition = xmlTags.tagOpenEnd;
+                            auto       closeTagsRemaining   = 1;
                             FindResult nextCloseTag{};
                             do
                             {
@@ -1777,8 +1777,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
                                     //                                            ^^^^^^^^ we've found this guy
                                     //                         ^^^^^^^^^ Now we need to find this fella
                                     FindResult inbetweenOpenTag{};
-                                    size_t     currentEndPosition = nextCloseTag.start;
-                                    size_t     openTagsFound      = 0;
+                                    auto       currentEndPosition = nextCloseTag.start;
+                                    sptr_t     openTagsFound      = 0;
 
                                     do
                                     {
@@ -1819,15 +1819,15 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags)
     return tagFound;
 }
 
-FindResult CScintillaWnd::FindText(const char* text, size_t start, size_t end, int flags)
+FindResult CScintillaWnd::FindText(const char* text, sptr_t start, sptr_t end, int flags)
 {
     FindResult returnValue = {0};
 
     Sci_TextToFind search{};
     search.lpstrText  = const_cast<char*>(text);
-    search.chrg.cpMin = (long)start;
-    search.chrg.cpMax = (long)end;
-    size_t result     = Call(SCI_FINDTEXT, flags, reinterpret_cast<LPARAM>(&search));
+    search.chrg.cpMin = start;
+    search.chrg.cpMax = end;
+    auto result       = Call(SCI_FINDTEXT, flags, reinterpret_cast<LPARAM>(&search));
     if (-1 == result)
     {
         returnValue.success = false;
@@ -1841,7 +1841,7 @@ FindResult CScintillaWnd::FindText(const char* text, size_t start, size_t end, i
     return returnValue;
 }
 
-size_t CScintillaWnd::FindText(const std::string& tofind, long startpos, long endpos)
+sptr_t CScintillaWnd::FindText(const std::string& tofind, sptr_t startpos, sptr_t endpos)
 {
     Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin     = startpos;
@@ -1850,17 +1850,17 @@ size_t CScintillaWnd::FindText(const std::string& tofind, long startpos, long en
     return Call(SCI_FINDTEXT, 0, (sptr_t)&ttf);
 }
 
-FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, size_t end)
+FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, sptr_t start, sptr_t end)
 {
     std::string search("<");
     search.append(tagName);
     FindResult openTagFound = {0};
     openTagFound.success    = false;
     FindResult result{};
-    int        nextChar = 0;
-    size_t     styleAt;
-    size_t     searchStart   = start;
-    size_t     searchEnd     = end;
+    int        nextChar      = 0;
+    sptr_t     styleAt       = 0;
+    auto       searchStart   = start;
+    auto       searchEnd     = end;
     bool       forwardSearch = (start < end);
     do
     {
@@ -1882,7 +1882,7 @@ FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, 
                 }
                 else if (IsXMLWhitespace(nextChar))
                 {
-                    size_t closeAnglePosition = FindCloseAngle(result.end, forwardSearch ? end : start);
+                    auto closeAnglePosition = FindCloseAngle(result.end, forwardSearch ? end : start);
                     if (-1 != closeAnglePosition && '/' != Call(SCI_GETCHARAT, closeAnglePosition - 1))
                     {
                         openTagFound.end     = closeAnglePosition;
@@ -1910,18 +1910,18 @@ FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, size_t start, 
     return openTagFound;
 }
 
-size_t CScintillaWnd::FindCloseAngle(size_t startPosition, size_t endPosition)
+sptr_t CScintillaWnd::FindCloseAngle(sptr_t startPosition, sptr_t endPosition)
 {
     // We'll search for the next '>', and check it's not in an attribute using the style
     FindResult closeAngle{};
 
     bool   isValidClose   = false;
-    size_t returnPosition = (size_t)-1;
+    sptr_t returnPosition = -1;
 
     // Only search forwards
     if (startPosition > endPosition)
     {
-        size_t temp   = endPosition;
+        auto temp     = endPosition;
         endPosition   = startPosition;
         startPosition = temp;
     }
@@ -1951,7 +1951,7 @@ size_t CScintillaWnd::FindCloseAngle(size_t startPosition, size_t endPosition)
     return returnPosition;
 }
 
-FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, size_t start, size_t end)
+FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, sptr_t start, sptr_t end)
 {
     std::string search("</");
     search.append(tagName);
@@ -1959,9 +1959,9 @@ FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, size_t start,
     closeTagFound.success    = false;
     FindResult result{};
     int        nextChar      = 0;
-    size_t     styleAt       = 0;
-    size_t     searchStart   = start;
-    size_t     searchEnd     = end;
+    sptr_t     styleAt       = 0;
+    auto       searchStart   = start;
+    auto       searchEnd     = end;
     bool       forwardSearch = (start < end);
     bool       validCloseTag = false;
     do
@@ -1995,7 +1995,7 @@ FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, size_t start,
                 }
                 else if (IsXMLWhitespace(nextChar)) // Otherwise, if it's whitespace, then allow whitespace until a '>' - any other character is invalid.
                 {
-                    size_t whitespacePoint = result.end;
+                    auto whitespacePoint = result.end;
                     do
                     {
                         ++whitespacePoint;
@@ -2019,15 +2019,15 @@ FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, size_t start,
     return closeTagFound;
 }
 
-std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t start, size_t end)
+std::vector<std::pair<sptr_t, sptr_t>> CScintillaWnd::GetAttributesPos(sptr_t start, sptr_t end)
 {
-    std::vector<std::pair<size_t, size_t>> attributes;
+    std::vector<std::pair<sptr_t, sptr_t>> attributes;
 
-    size_t        bufLen = end - start + 1;
+    auto          bufLen = end - start + 1;
     auto          buf    = std::make_unique<char[]>(bufLen + 1);
     Sci_TextRange tr{};
-    tr.chrg.cpMin = (long)start;
-    tr.chrg.cpMax = (long)end;
+    tr.chrg.cpMin = start;
+    tr.chrg.cpMax = end;
     tr.lpstrText  = buf.get();
     Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
 
@@ -2042,9 +2042,9 @@ std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t st
         attr_valid
     } state = attr_invalid;
 
-    size_t startPos    = (size_t)-1;
+    sptr_t startPos    = -1;
     int    oneMoreChar = 1;
-    size_t i           = 0;
+    sptr_t i           = 0;
     for (; i < bufLen; i++)
     {
         switch (buf[i])
@@ -2103,12 +2103,12 @@ std::vector<std::pair<size_t, size_t>> CScintillaWnd::GetAttributesPos(size_t st
 
         if (state == attr_valid)
         {
-            attributes.push_back(std::pair<size_t, size_t>(start + startPos, start + i + oneMoreChar));
+            attributes.push_back(std::pair<sptr_t, sptr_t>(start + startPos, start + i + oneMoreChar));
             state = attr_invalid;
         }
     }
     if (state == attr_value)
-        attributes.push_back(std::pair<size_t, size_t>(start + startPos, start + i - 1));
+        attributes.push_back(std::pair<sptr_t, sptr_t>(start + startPos, start + i - 1));
 
     return attributes;
 }
@@ -2153,14 +2153,14 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam)
 
         // Get Selection
         bool   bSelEmpty      = !!Call(SCI_GETSELECTIONEMPTY);
-        size_t lineStartStart = 0;
-        size_t lineEndEnd     = 0;
+        sptr_t lineStartStart = 0;
+        sptr_t lineEndEnd     = 0;
         if (!bSelEmpty && braceCloseBuf[0])
         {
-            size_t selStart  = Call(SCI_GETSELECTIONSTART);
-            size_t selEnd    = Call(SCI_GETSELECTIONEND);
-            size_t lineStart = Call(SCI_LINEFROMPOSITION, selStart);
-            size_t lineEnd   = Call(SCI_LINEFROMPOSITION, selEnd);
+            auto selStart  = Call(SCI_GETSELECTIONSTART);
+            auto selEnd    = Call(SCI_GETSELECTIONEND);
+            auto lineStart = Call(SCI_LINEFROMPOSITION, selStart);
+            auto lineEnd   = Call(SCI_LINEFROMPOSITION, selEnd);
             if (Call(SCI_POSITIONFROMLINE, lineEnd) == (sptr_t)selEnd)
             {
                 --lineEnd;
@@ -2182,9 +2182,9 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam)
             else
             {
                 // get info
-                size_t tabIndent         = Call(SCI_GETTABWIDTH);
-                int    indentAmount      = (int)Call(SCI_GETLINEINDENTATION, lineStart > 0 ? lineStart - 1 : lineStart);
-                int    indentAmountfirst = (int)Call(SCI_GETLINEINDENTATION, lineStart);
+                auto tabIndent         = Call(SCI_GETTABWIDTH);
+                auto indentAmount      = Call(SCI_GETLINEINDENTATION, lineStart > 0 ? lineStart - 1 : lineStart);
+                auto indentAmountfirst = Call(SCI_GETLINEINDENTATION, lineStart);
                 if (indentAmount == 0)
                     indentAmount = indentAmountfirst;
                 Call(SCI_BEGINUNDOACTION);
@@ -2207,7 +2207,7 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam)
                 // increase the indentation of all selected lines
                 if (indentAmount == indentAmountfirst)
                 {
-                    for (size_t line = lineStart + 1; line <= lineEnd + 1; ++line)
+                    for (sptr_t line = lineStart + 1; line <= lineEnd + 1; ++line)
                     {
                         Call(SCI_SETLINEINDENTATION, line, Call(SCI_GETLINEINDENTATION, line) + tabIndent);
                     }
@@ -2247,7 +2247,7 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam)
                     return false;
 
                 FindResult result1, result2;
-                size_t     currentpos = Call(SCI_GETCURRENTPOS);
+                auto       currentpos = Call(SCI_GETCURRENTPOS);
                 result1               = FindText("/", currentpos, 0, 0);
                 result2               = FindText("<", currentpos, 0, 0);
                 if (result2.success)
@@ -2261,7 +2261,7 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam)
                             return false;
                         // find the tag id
                         std::string tagName;
-                        size_t      position = result2.start + 1;
+                        auto        position = result2.start + 1;
                         int         nextChar = (int)Call(SCI_GETCHARAT, position);
                         while (position < currentpos && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                         {
@@ -2271,7 +2271,7 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam)
                         }
                         if ((wParam == '[') && tagName.starts_with("![CDATA") && !tagName.starts_with("![CDATA["))
                         {
-                            size_t cursorPos = Call(SCI_GETCURRENTPOS);
+                            auto cursorPos = Call(SCI_GETCURRENTPOS);
                             Call(SCI_BEGINUNDOACTION);
                             Call(SCI_ADDTEXT, 3, (sptr_t) "]]>");
                             Call(SCI_GOTOPOS, cursorPos);
@@ -2279,7 +2279,7 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam)
                         }
                         if ((tagName == "!-") && (wParam == '-'))
                         {
-                            size_t cursorPos = Call(SCI_GETCURRENTPOS);
+                            auto cursorPos = Call(SCI_GETCURRENTPOS);
                             Call(SCI_BEGINUNDOACTION);
                             Call(SCI_ADDTEXT, 3, (sptr_t) "-->");
                             Call(SCI_GOTOPOS, cursorPos);
@@ -2307,7 +2307,7 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam)
 
         // check if there's a '/' char before the opening '<' (searching backwards)
         FindResult result1, result2;
-        size_t     currentpos = Call(SCI_GETCURRENTPOS);
+        auto       currentpos = Call(SCI_GETCURRENTPOS);
         result1               = FindText("/", currentpos, 0, 0);
         result2               = FindText("<", currentpos, 0, 0);
         if (result2.success)
@@ -2321,10 +2321,10 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam)
                     return false;
                 // insert the closing tag now
                 Call(SCI_ADDTEXT, 1, (sptr_t) ">");
-                size_t cursorPos = Call(SCI_GETCURRENTPOS);
+                auto cursorPos = Call(SCI_GETCURRENTPOS);
                 // find the tag id
                 std::string tagName;
-                size_t      position = result2.start + 1;
+                auto        position = result2.start + 1;
                 int         nextChar = (int)Call(SCI_GETCHARAT, position);
                 while (position < currentpos && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                 {
@@ -2365,14 +2365,14 @@ void CScintillaWnd::ReflectEvents(SCNotification* pScn)
     switch (pScn->nmhdr.code)
     {
         case SCN_PAINTED:
-            if (m_LineToScrollToAfterPaint != (size_t)-1)
+            if (m_LineToScrollToAfterPaint != -1)
             {
                 auto visLineToScrollTo = Call(SCI_VISIBLEFROMDOCLINE, m_LineToScrollToAfterPaint);
                 visLineToScrollTo += m_WrapOffsetToScrollToAfterPaint;
                 auto currentVisPos = Call(SCI_VISIBLEFROMDOCLINE, Call(SCI_GETFIRSTVISIBLELINE));
                 visLineToScrollTo -= currentVisPos;
                 Call(SCI_LINESCROLL, 0, visLineToScrollTo);
-                m_LineToScrollToAfterPaint       = (size_t)-1;
+                m_LineToScrollToAfterPaint       = -1;
                 m_WrapOffsetToScrollToAfterPaint = 0;
                 UpdateLineNumberWidth();
             }
@@ -2383,10 +2383,10 @@ void CScintillaWnd::ReflectEvents(SCNotification* pScn)
 void CScintillaWnd::SetTabSettings(TabSpace ts)
 {
     Call(SCI_SETTABWIDTH, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
-    if (ts == Default)
+    if (ts == TabSpace::Default)
         Call(SCI_SETUSETABS, (uptr_t)CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1));
     else
-        Call(SCI_SETUSETABS, ts == Tabs ? 1 : 0);
+        Call(SCI_SETUSETABS, ts == TabSpace::Tabs ? 1 : 0);
     Call(SCI_SETBACKSPACEUNINDENTS, 1);
     Call(SCI_SETTABINDENTS, 1);
     Call(SCI_SETTABDRAWMODE, 1);
@@ -2400,10 +2400,10 @@ void CScintillaWnd::SetReadDirection(ReadDirection rd)
     //else
     //    ex |= WS_EX_LAYOUTRTL/*WS_EX_RTLREADING*/;
     //SetWindowLongPtr(*this, GWL_EXSTYLE, ex);
-    Call(SCI_SETBIDIRECTIONAL, rd);
+    Call(SCI_SETBIDIRECTIONAL, (int)rd);
 }
 
-void CScintillaWnd::BookmarkAdd(size_t lineno)
+void CScintillaWnd::BookmarkAdd(sptr_t lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
@@ -2415,7 +2415,7 @@ void CScintillaWnd::BookmarkAdd(size_t lineno)
     }
 }
 
-void CScintillaWnd::BookmarkDelete(size_t lineno)
+void CScintillaWnd::BookmarkDelete(sptr_t lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
@@ -2427,7 +2427,7 @@ void CScintillaWnd::BookmarkDelete(size_t lineno)
     }
 }
 
-bool CScintillaWnd::IsBookmarkPresent(size_t lineno)
+bool CScintillaWnd::IsBookmarkPresent(sptr_t lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
@@ -2435,7 +2435,7 @@ bool CScintillaWnd::IsBookmarkPresent(size_t lineno)
     return ((state & (1 << MARK_BOOKMARK)) != 0);
 }
 
-void CScintillaWnd::BookmarkToggle(size_t lineno)
+void CScintillaWnd::BookmarkToggle(sptr_t lineno)
 {
     if (lineno == -1)
         lineno = GetCurrentLineNumber();
@@ -2450,7 +2450,7 @@ void CScintillaWnd::MarkBookmarksInScrollbar()
 {
     const auto bmColor = CTheme::Instance().GetThemeColor(RGB(255, 0, 0), true);
     m_docScroll.Clear(DOCSCROLLTYPE_BOOKMARK);
-    for (size_t line = (size_t)-1;;)
+    for (sptr_t line = -1;;)
     {
         line = Call(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
         if (line < 0)
@@ -2485,15 +2485,15 @@ void CScintillaWnd::SetEOLType(int eolType)
     Call(SCI_SETEOLMODE, eolType);
 }
 
-void CScintillaWnd::AppendText(int len, const char* buf)
+void CScintillaWnd::AppendText(sptr_t len, const char* buf)
 {
     Call(SCI_APPENDTEXT, len, reinterpret_cast<LPARAM>(buf));
 }
 
-std::string CScintillaWnd::GetLine(long line) const
+std::string CScintillaWnd::GetLine(sptr_t line) const
 {
-    size_t linesize = ConstCall(SCI_GETLINE, line, 0);
-    auto   pLine    = std::make_unique<char[]>(linesize + 1);
+    auto linesize = ConstCall(SCI_GETLINE, line, 0);
+    auto pLine    = std::make_unique<char[]>(linesize + 1);
     ConstCall(SCI_GETLINE, line, (sptr_t)pLine.get());
     pLine[linesize] = 0;
     return pLine.get();
@@ -2515,7 +2515,7 @@ std::string CScintillaWnd::GetTextRange(Sci_Position startpos, Sci_Position endp
 
 std::string CScintillaWnd::GetSelectedText(bool useCurrentWordIfSelectionEmpty) const
 {
-    int  selTextLen    = (int)ConstCall(SCI_GETSELTEXT);
+    auto selTextLen    = ConstCall(SCI_GETSELTEXT);
     auto seltextbuffer = std::make_unique<char[]>(selTextLen + 1);
     ConstCall(SCI_GETSELTEXT, 0, (LPARAM)seltextbuffer.get());
     std::string selText = seltextbuffer.get();
@@ -2528,9 +2528,9 @@ std::string CScintillaWnd::GetSelectedText(bool useCurrentWordIfSelectionEmpty) 
 
 std::string CScintillaWnd::GetCurrentWord() const
 {
-    long currentPos = (long)ConstCall(SCI_GETCURRENTPOS);
-    long startPos   = (long)ConstCall(SCI_WORDSTARTPOSITION, currentPos, true);
-    long endPos     = (long)ConstCall(SCI_WORDENDPOSITION, currentPos, true);
+    auto currentPos = ConstCall(SCI_GETCURRENTPOS);
+    auto startPos   = ConstCall(SCI_WORDSTARTPOSITION, currentPos, true);
+    auto endPos     = ConstCall(SCI_WORDENDPOSITION, currentPos, true);
     return GetTextRange(startPos, endPos);
 }
 

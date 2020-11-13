@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2015-2017 - Stefan Kueng
+// Copyright (C) 2015-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ private:
     LexerData                   m_lexerData;
     std::unique_ptr<char[]>     m_textbuffer;
     int                         m_textbuflen;
-    LRESULT                     m_lastcheckedpos;
+    sptr_t                      m_lastcheckedpos;
 };
 
 class CCmdSpellcheckLang : public ICommand

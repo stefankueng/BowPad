@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013 - 2016 Stefan Kueng
+// Copyright (C) 2013 - 2016, 2020 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@
 struct CFFileInfo
 {
     std::wstring status;
-    bool ok;
-    bool create;
-    bool f1Exists;
-    bool f2Exists;
+    bool         ok       = false;
+    bool         create   = false;
+    bool         f1Exists = false;
+    bool         f2Exists = false;
     std::wstring f1Filename;
     std::wstring f1Folder;
     std::wstring f1Path;
@@ -36,7 +36,8 @@ struct CFFileInfo
     std::wstring f2Path;
 };
 
-class CCorrespondingFileDlg : public CDialog, public ICommand
+class CCorrespondingFileDlg : public CDialog
+    , public ICommand
 {
 public:
     CCorrespondingFileDlg(void* obj);
@@ -44,22 +45,21 @@ public:
     void Show(HWND hParent, const std::wstring& initialPath);
 
 protected:
-
     bool Execute() override { return true; }
     UINT GetCmdId() override { return 0; }
     //void OnClose() override;
 
 protected:
     LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-    LRESULT DoCommand(int id, int msg);
-    void InitSizing();
-    LRESULT DoInitDialog(HWND hwndDlg);
-    void SyncFileNameParts();
-    void SetStatus(const std::wstring& status);
-    bool CheckStatus();
-    CFFileInfo GetCFInfo();
+    LRESULT          DoCommand(int id, int msg);
+    void             InitSizing();
+    LRESULT          DoInitDialog(HWND hwndDlg);
+    void             SyncFileNameParts();
+    void             SetStatus(const std::wstring& status);
+    bool             CheckStatus();
+    CFFileInfo       GetCFInfo();
 
 protected:
-    CDlgResizer                 m_resizer;
-    std::wstring                m_initialPath;
+    CDlgResizer  m_resizer;
+    std::wstring m_initialPath;
 };

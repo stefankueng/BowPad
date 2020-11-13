@@ -313,7 +313,7 @@ void ICommand::DocScrollUpdate()
     m_pMainWindow->m_editor.DocScrollUpdate();
 }
 
-void ICommand::GotoLine(long line)
+void ICommand::GotoLine(sptr_t line)
 {
     m_pMainWindow->m_editor.GotoLine(line);
 }
@@ -353,17 +353,17 @@ void ICommand::SetInsertionIndex(int index)
     return m_pMainWindow->SetInsertionIndex(index);
 }
 
-std::string ICommand::GetLine(long line) const
+std::string ICommand::GetLine(sptr_t line) const
 {
     return m_pMainWindow->m_editor.GetLine(line);
 }
 
-std::string ICommand::GetTextRange(long startpos, long endpos) const
+std::string ICommand::GetTextRange(sptr_t startpos, sptr_t endpos) const
 {
     return m_pMainWindow->m_editor.GetTextRange(startpos, endpos);
 }
 
-size_t ICommand::FindText(const std::string& tofind, long startpos, long endpos)
+size_t ICommand::FindText(const std::string& tofind, sptr_t startpos, sptr_t endpos)
 {
     return m_pMainWindow->m_editor.FindText(tofind, startpos, endpos);
 }

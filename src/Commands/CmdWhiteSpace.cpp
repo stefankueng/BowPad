@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -134,15 +134,15 @@ bool CCmdUseTabs::Execute()
     if (HasActiveDocument())
     {
         auto& doc = GetModActiveDocument();
-        if (doc.m_TabSpace == Default)
+        if (doc.m_TabSpace == TabSpace::Default)
         {
             ScintillaCall(SCI_SETUSETABS, ScintillaCall(SCI_GETUSETABS) ? 0 : 1);
         }
         else
         {
-            ScintillaCall(SCI_SETUSETABS, doc.m_TabSpace == Tabs ? 0 : 1);
+            ScintillaCall(SCI_SETUSETABS, doc.m_TabSpace == TabSpace::Tabs ? 0 : 1);
         }
-        doc.m_TabSpace = ScintillaCall(SCI_GETUSETABS) ? Tabs : Spaces;
+        doc.m_TabSpace = ScintillaCall(SCI_GETUSETABS) ? TabSpace::Tabs : TabSpace::Spaces;
         CIniSettings::Instance().SetInt64(L"View", L"usetabs", ScintillaCall(SCI_GETUSETABS));
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         UpdateStatusBar(false);

@@ -38,7 +38,7 @@ LRESULT CGotoLineDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPa
             CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
 
             SetDlgItemText(hwndDlg, IDC_LINEINFO, lineinfo.c_str());
-            std::wstring sLine = CStringUtils::Format(L"%ld", line);
+            std::wstring sLine = CStringUtils::Format(L"%lld", line);
             SetDlgItemText(hwndDlg, IDC_LINE, sLine.c_str());
             SendDlgItemMessage(hwndDlg, IDC_LINE, EM_SETSEL, 0, -1);
         }
@@ -71,9 +71,9 @@ LRESULT CGotoLineDlg::DoCommand(int id, int /*msg*/)
 bool CCmdGotoLine::Execute()
 {
     CGotoLineDlg dlg;
-    dlg.line   = (long)GetCurrentLineNumber() + 1;
-    long first = (long)ScintillaCall(SCI_LINEFROMPOSITION, 0)+1;
-    long last  = (long)ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETLENGTH))+1;
+    dlg.line   = GetCurrentLineNumber() + 1;
+    auto first = ScintillaCall(SCI_LINEFROMPOSITION, 0)+1;
+    auto last  = ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETLENGTH))+1;
     ResString lineformat(hRes, IDS_GOTOLINEINFO);
     dlg.lineinfo = CStringUtils::Format(lineformat, first, last);
     if (dlg.DoModal(hRes, IDD_GOTOLINE, GetHwnd())==IDOK)

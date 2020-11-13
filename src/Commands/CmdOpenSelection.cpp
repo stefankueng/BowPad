@@ -25,8 +25,8 @@
 
 extern void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName);
 
-
-CCmdOpenSelection::CCmdOpenSelection(void * obj) : ICommand(obj)
+CCmdOpenSelection::CCmdOpenSelection(void* obj)
+    : ICommand(obj)
 {
 }
 
@@ -48,15 +48,15 @@ bool CCmdOpenSelection::Execute()
 
     if (PathIsDirectory(path.c_str()))
     {
-        SHELLEXECUTEINFO shi = { };
-        shi.cbSize = sizeof(SHELLEXECUTEINFO);
-        shi.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_UNICODE;
-        shi.hwnd = GetHwnd();
-        shi.lpVerb = L"open";
-        shi.lpFile = nullptr;
-        shi.lpParameters = nullptr;
-        shi.lpDirectory = path.c_str();
-        shi.nShow = SW_SHOW;
+        SHELLEXECUTEINFO shi = {};
+        shi.cbSize           = sizeof(SHELLEXECUTEINFO);
+        shi.fMask            = SEE_MASK_DOENVSUBST | SEE_MASK_UNICODE;
+        shi.hwnd             = GetHwnd();
+        shi.lpVerb           = L"open";
+        shi.lpFile           = nullptr;
+        shi.lpParameters     = nullptr;
+        shi.lpDirectory      = path.c_str();
+        shi.nShow            = SW_SHOW;
 
         return !!ShellExecuteEx(&shi);
     }
@@ -85,7 +85,7 @@ HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
     {
         // add the filename to the command label
         std::wstring path = GetPathUnderCursor();
-        path = CPathUtils::GetFileName(path);
+        path              = CPathUtils::GetFileName(path);
 
         ResString label(hRes, cmdOpenSelection_LabelTitle_RESID);
         if (!path.empty())
@@ -112,12 +112,12 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
         auto linebuffer = GetWordChars();
         OnOutOfScope(ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)linebuffer.c_str()));
 
-        ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
+        ConstCall(SCI_SETWORDCHARS, 0, (LPARAM) "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
         size_t pos = ConstCall(SCI_GETCURRENTPOS);
 
-        std::string sWordA = GetTextRange(static_cast<long>(ConstCall(SCI_WORDSTARTPOSITION, pos, false)),
-            static_cast<long>(ConstCall(SCI_WORDENDPOSITION, pos, false)));
-        pathUnderCursor = CUnicodeUtils::StdGetUnicode(sWordA);
+        std::string sWordA = GetTextRange(ConstCall(SCI_WORDSTARTPOSITION, pos, false),
+                                          ConstCall(SCI_WORDENDPOSITION, pos, false));
+        pathUnderCursor    = CUnicodeUtils::StdGetUnicode(sWordA);
     }
 
     InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Label);

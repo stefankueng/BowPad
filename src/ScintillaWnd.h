@@ -52,18 +52,18 @@ enum class BraceMatch
 
 struct XmlMatchedTagsPos
 {
-    size_t tagOpenStart;
-    size_t tagNameEnd;
-    size_t tagOpenEnd;
+    sptr_t tagOpenStart;
+    sptr_t tagNameEnd;
+    sptr_t tagOpenEnd;
 
-    size_t tagCloseStart;
-    size_t tagCloseEnd;
+    sptr_t tagCloseStart;
+    sptr_t tagCloseEnd;
 };
 
 struct FindResult
 {
-    size_t start;
-    size_t end;
+    sptr_t start;
+    sptr_t end;
     bool   success;
 };
 
@@ -97,21 +97,21 @@ public:
     void        MatchBraces(BraceMatch what);
     void        GotoBrace();
     void        MatchTags();
-    bool        GetSelectedCount(size_t& selByte, size_t& selLine);
+    bool        GetSelectedCount(sptr_t& selByte, sptr_t& selLine);
     void        DocScrollClear(int type) { m_docScroll.Clear(type); }
-    void        DocScrollAddLineColor(int type, size_t line, COLORREF clr) { m_docScroll.AddLineColor(type, line, clr); }
+    void        DocScrollAddLineColor(int type, sptr_t line, COLORREF clr) { m_docScroll.AddLineColor(type, line, clr); }
     void        DocScrollUpdate();
-    void        DocScrollRemoveLine(int type, size_t line) { m_docScroll.RemoveLine(type, line); }
+    void        DocScrollRemoveLine(int type, sptr_t line) { m_docScroll.RemoveLine(type, line); }
     void        MarkBookmarksInScrollbar();
-    void        GotoLine(long line);
+    void        GotoLine(sptr_t line);
     void        Center(sptr_t posStart, sptr_t posEnd);
     void        SetTabSettings(TabSpace ts);
     void        SetReadDirection(ReadDirection rd);
     void        SetEOLType(int eolType);
-    void        AppendText(int len, const char* buf);
-    std::string GetLine(long line) const;
+    void        AppendText(sptr_t len, const char* buf);
+    std::string GetLine(sptr_t line) const;
     std::string GetTextRange(Sci_Position startpos, Sci_Position endpos) const;
-    size_t      FindText(const std::string& tofind, long startpos, long endpos);
+    sptr_t      FindText(const std::string& tofind, sptr_t startpos, sptr_t endpos);
     std::string GetSelectedText(bool useCurrentWordIfSelectionEmpty = false) const;
     std::string GetCurrentWord() const;
     std::string GetCurrentLine() const;
@@ -131,18 +131,18 @@ protected:
     void SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF backsel);
 
     bool                                   GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags);
-    FindResult                             FindText(const char* text, size_t start, size_t end, int flags);
-    FindResult                             FindOpenTag(const std::string& tagName, size_t start, size_t end);
-    size_t                                 FindCloseAngle(size_t startPosition, size_t endPosition);
-    FindResult                             FindCloseTag(const std::string& tagName, size_t start, size_t end);
-    std::vector<std::pair<size_t, size_t>> GetAttributesPos(size_t start, size_t end);
+    FindResult                             FindText(const char* text, sptr_t start, sptr_t end, int flags);
+    FindResult                             FindOpenTag(const std::string& tagName, sptr_t start, sptr_t end);
+    sptr_t                                 FindCloseAngle(sptr_t startPosition, sptr_t endPosition);
+    FindResult                             FindCloseTag(const std::string& tagName, sptr_t start, sptr_t end);
+    std::vector<std::pair<sptr_t, sptr_t>> GetAttributesPos(sptr_t start, sptr_t end);
     bool                                   IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
     bool                                   AutoBraces(WPARAM wParam);
 
-    void BookmarkAdd(size_t lineno);
-    void BookmarkDelete(size_t lineno);
-    bool IsBookmarkPresent(size_t lineno);
-    void BookmarkToggle(size_t lineno);
+    void BookmarkAdd(sptr_t lineno);
+    void BookmarkDelete(sptr_t lineno);
+    bool IsBookmarkPresent(sptr_t lineno);
+    void BookmarkToggle(sptr_t lineno);
 
 private:
     SciFnDirect             m_pSciMsg;
@@ -156,8 +156,8 @@ private:
     int                     m_cursorTimeout;
     bool                    m_bInFolderMargin;
     bool                    m_hasConsolas;
-    size_t                  m_LineToScrollToAfterPaint;
-    size_t                  m_WrapOffsetToScrollToAfterPaint;
+    sptr_t                  m_LineToScrollToAfterPaint;
+    sptr_t                  m_WrapOffsetToScrollToAfterPaint;
     IUIAnimationVariablePtr m_animVarGrayFore;
     IUIAnimationVariablePtr m_animVarGrayBack;
     IUIAnimationVariablePtr m_animVarGraySel;

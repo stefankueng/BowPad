@@ -292,7 +292,7 @@ LRESULT CCommandPaletteDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
         case NM_RETURN:
         case NM_DBLCLK:
             // execute the selected command
-            if (lpNMItemActivate->iItem >= 0 && lpNMItemActivate->iItem < m_results.size())
+            if (lpNMItemActivate->iItem >= 0 && lpNMItemActivate->iItem < (int)m_results.size())
             {
                 const auto& data = m_results[lpNMItemActivate->iItem];
                 SendMessage(m_hParent, WM_COMMAND, MAKEWPARAM(data.cmdId, 1), 0);

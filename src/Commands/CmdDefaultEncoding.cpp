@@ -38,7 +38,7 @@ LRESULT CDefaultEncodingDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPA
             UINT cp = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
             bool bom = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
             bool preferutf8 = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingutf8overansi", 0) != 0;
-            EOLFormat eol = (EOLFormat)CIniSettings::Instance().GetInt64(L"Defaults", L"lineendingnew", WIN_FORMAT);
+            EOLFormat eol = (EOLFormat)CIniSettings::Instance().GetInt64(L"Defaults", L"lineendingnew", (int)EOLFormat::WIN_FORMAT);
 
             if (cp == GetACP())
                 CheckRadioButton(*this, IDC_R_ANSI, IDC_R_UTF32BE, IDC_R_ANSI);
@@ -65,13 +65,13 @@ LRESULT CDefaultEncodingDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPA
             switch (eol)
             {
                 default:
-                case WIN_FORMAT:
+            case EOLFormat::WIN_FORMAT:
                     CheckRadioButton(*this, IDC_CRLF_RADIO, IDC_CR_RADIO, IDC_CRLF_RADIO);
                     break;
-                case MAC_FORMAT:
+            case EOLFormat::MAC_FORMAT:
                     CheckRadioButton(*this, IDC_CRLF_RADIO, IDC_CR_RADIO, IDC_CR_RADIO);
                     break;
-                case UNIX_FORMAT:
+            case EOLFormat::UNIX_FORMAT:
                     CheckRadioButton(*this, IDC_CRLF_RADIO, IDC_CR_RADIO, IDC_LF_RADIO);
                     break;
             }
@@ -117,11 +117,11 @@ LRESULT CDefaultEncodingDlg::DoCommand(int id, int /*msg*/)
                 cp = 12001;
 
             if (IsDlgButtonChecked(*this, IDC_CRLF_RADIO))
-                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", WIN_FORMAT);
+                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", (int)EOLFormat::WIN_FORMAT);
             if (IsDlgButtonChecked(*this, IDC_CR_RADIO))
-                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", MAC_FORMAT);
+                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", (int)EOLFormat::MAC_FORMAT);
             if (IsDlgButtonChecked(*this, IDC_LF_RADIO))
-                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", UNIX_FORMAT);
+                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", (int)EOLFormat::UNIX_FORMAT);
 
             CIniSettings::Instance().SetInt64(L"Defaults", L"encodingnew", cp);
             CIniSettings::Instance().SetInt64(L"Defaults", L"encodingnewbom", bom);

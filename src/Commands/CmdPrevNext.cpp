@@ -94,7 +94,7 @@ void CCmdPrevNext::ScintillaNotify(SCNotification* pScn)
         {
             if (g_ignore)
                 return;
-            if (g_offsetBeforeEnd >= (int)g_positions.size())
+            if (g_offsetBeforeEnd >= g_positions.size())
                 g_offsetBeforeEnd = 0;
             auto line = GetCurrentLineNumber();
             if (!g_currentDocId.IsValid() || g_currentLine == -1)
@@ -197,7 +197,7 @@ bool CCmdPrevious::Execute()
         if (GetDocIdOfCurrentTab() != data.id)
             TabActivateAt(GetTabIndexFromDocID(data.id));
 
-        long pos = (long)ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
+        auto pos = ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
         ScintillaCall(SCI_SETANCHOR, pos);
         ScintillaCall(SCI_SETCURRENTPOS, pos);
         ScintillaCall(SCI_CANCEL);
@@ -248,7 +248,7 @@ bool CCmdNext::Execute()
         if (GetDocIdOfCurrentTab() != data.id)
             TabActivateAt(GetTabIndexFromDocID(data.id));
         --g_offsetBeforeEnd;
-        long pos = (long)ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
+        auto pos = ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
         ScintillaCall(SCI_SETANCHOR, pos);
         ScintillaCall(SCI_SETCURRENTPOS, pos);
         ScintillaCall(SCI_CANCEL);

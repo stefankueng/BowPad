@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2018 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ bool ChangeCase(std::function<sptr_t(int msg, uptr_t wParam, sptr_t lParam)> Sci
         }
 
         auto strbuf = std::make_unique<char[]>(abs(selEnd - selStart) + 5);
-        Sci_TextRange rangestart;
+        Sci_TextRange rangestart{};
         rangestart.chrg.cpMin = Sci_PositionCR(selStart);
         rangestart.chrg.cpMax = Sci_PositionCR(selEnd);
         rangestart.lpstrText = strbuf.get();

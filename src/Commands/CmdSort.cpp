@@ -201,24 +201,24 @@ bool CCmdSort::Execute()
             APPVERIFY(false); // Shouldn't happen.
     }
 
-    long selStart       = (long)ScintillaCall(SCI_GETSELECTIONSTART);
-    long selEnd         = (long)ScintillaCall(SCI_GETSELECTIONEND);
-    long selEndOriginal = selEnd;
-    long lineStart      = (long)ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-    long lineEnd        = (long)ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    auto selStart       = ScintillaCall(SCI_GETSELECTIONSTART);
+    auto selEnd         = ScintillaCall(SCI_GETSELECTIONEND);
+    auto selEndOriginal = selEnd;
+    auto lineStart      = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+    auto lineEnd        = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
 
-    long lineCount = lineEnd - lineStart;
+    auto lineCount = lineEnd - lineStart;
     if (lineCount <= 1)
         return true;
 
     if (isRectangular) // Find and sort lines in rectangular selections.
     {
         std::vector<std::wstring> lines;
-        std::vector<long>         positions;
-        for (long lineNum = lineStart; lineNum <= lineEnd; ++lineNum)
+        std::vector<sptr_t>       positions;
+        for (sptr_t lineNum = lineStart; lineNum <= lineEnd; ++lineNum)
         {
-            long         lineSelStart = (long)ScintillaCall(SCI_GETLINESELSTARTPOSITION, lineNum);
-            long         lineSelEnd   = (long)ScintillaCall(SCI_GETLINESELENDPOSITION, lineNum);
+            auto         lineSelStart = ScintillaCall(SCI_GETLINESELSTARTPOSITION, lineNum);
+            auto         lineSelEnd   = ScintillaCall(SCI_GETLINESELENDPOSITION, lineNum);
             std::wstring line         = CUnicodeUtils::StdGetUnicode(GetTextRange(lineSelStart, lineSelEnd));
             lines.push_back(std::move(line));
             positions.push_back(lineSelStart);
@@ -232,7 +232,7 @@ bool CCmdSort::Execute()
 
             ScintillaCall(SCI_BEGINUNDOACTION);
             size_t ln = 0;
-            for (long line = lineStart; line <= lineEnd; ++line, ++ln)
+            for (sptr_t line = lineStart; line <= lineEnd; ++line, ++ln)
             {
                 const auto& lineText = CUnicodeUtils::StdGetUTF8(lines[ln]);
                 ScintillaCall(SCI_DELETERANGE, positions[ln], lineText.length());
@@ -244,10 +244,10 @@ bool CCmdSort::Execute()
     else // Find an sort lines for regular (non rectangular selections).
     {
         // Avoid any trailing blank line in the users selection.
-        if (ScintillaCall(SCI_POSITIONFROMLINE, lineEnd) == (sptr_t)selEnd)
+        if (ScintillaCall(SCI_POSITIONFROMLINE, lineEnd) == selEnd)
         {
             --lineEnd;
-            selEnd = (long)ScintillaCall(SCI_GETLINEENDPOSITION, lineEnd);
+            selEnd = ScintillaCall(SCI_GETLINEENDPOSITION, lineEnd);
         }
         std::wstring selText = CUnicodeUtils::StdGetUnicode(GetSelectedText());
         // Whatever the line breaks type is current, standardize on "\n".

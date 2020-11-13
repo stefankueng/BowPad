@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,20 +19,20 @@
 #include "StringUtils.h"
 #include <CommandHandler.h>
 
-std::wstring GetEOLFormatDescription( EOLFormat ft )
+std::wstring GetEOLFormatDescription(EOLFormat ft)
 {
     std::wstring sFt;
     switch (ft)
     {
-    case WIN_FORMAT:
-        sFt = L"Windows (CRLF)";
-        break;
-    case MAC_FORMAT:
-        sFt = L"Mac (CR)";
-        break;
-    case UNIX_FORMAT:
-        sFt = L"Unix (LF)";
-        break;
+        case EOLFormat::WIN_FORMAT:
+            sFt = L"Windows (CRLF)";
+            break;
+        case EOLFormat::MAC_FORMAT:
+            sFt = L"Mac (CR)";
+            break;
+        case EOLFormat::UNIX_FORMAT:
+            sFt = L"Unix (LF)";
+            break;
     }
     return sFt;
 }
@@ -42,31 +42,31 @@ std::wstring CDocument::GetEncodingString() const
     std::wstring sEnc;
     switch (m_encoding)
     {
-    case CP_UTF8:
-        sEnc = L"UTF-8";
-        break;
-    case 1200:
-        sEnc = L"UTF-16 LE";
-        break;
-    case 1201:
-        sEnc = L"UTF-16 BE";
-        break;
-    case 12001:
-        sEnc = L"UTF-32 BE";
-        break;
-    case 12000:
-        sEnc = L"UTF-32 LE";
-        break;
-    case 0:
-    case -1:
-        sEnc = L"ANSI";
-        break;
-    default:
-        if ((UINT)m_encoding == GetACP())
+        case CP_UTF8:
+            sEnc = L"UTF-8";
+            break;
+        case 1200:
+            sEnc = L"UTF-16 LE";
+            break;
+        case 1201:
+            sEnc = L"UTF-16 BE";
+            break;
+        case 12001:
+            sEnc = L"UTF-32 BE";
+            break;
+        case 12000:
+            sEnc = L"UTF-32 LE";
+            break;
+        case 0:
+        case -1:
             sEnc = L"ANSI";
-        else
-            sEnc = CStringUtils::Format(L"codepage: %d", m_encoding);
-        break;
+            break;
+        default:
+            if ((UINT)m_encoding == GetACP())
+                sEnc = L"ANSI";
+            else
+                sEnc = CStringUtils::Format(L"codepage: %d", m_encoding);
+            break;
     }
     if (m_bHasBOM)
         sEnc += L", BOM";
@@ -109,10 +109,10 @@ std::wstring CDocument::GetEncodingString() const
     return sEnc;
 }
 
-void CDocument::SetLanguage(const std::string & lang)
+void CDocument::SetLanguage(const std::string& lang)
 {
     bool bDoEvents = !m_language.empty() && (m_language != lang);
-    m_language = lang;
+    m_language     = lang;
     if (bDoEvents)
         CCommandHandler::Instance().OnLangChanged();
 }
@@ -121,26 +121,26 @@ EOLFormat ToEOLFormat(int eolMode)
 {
     switch (eolMode)
     {
-    case SC_EOL_CRLF:
-        return WIN_FORMAT;
-    case SC_EOL_LF:
-        return UNIX_FORMAT;
-    case SC_EOL_CR:
-        return MAC_FORMAT;
+        case SC_EOL_CRLF:
+            return EOLFormat::WIN_FORMAT;
+        case SC_EOL_LF:
+            return EOLFormat::UNIX_FORMAT;
+        case SC_EOL_CR:
+            return EOLFormat::MAC_FORMAT;
     }
-    return UNKNOWN_FORMAT;
+    return EOLFormat::UNKNOWN_FORMAT;
 }
 
 int ToEOLMode(EOLFormat eolFormat)
 {
     switch (eolFormat)
     {
-    case WIN_FORMAT:
-        return SC_EOL_CRLF;
-    case UNIX_FORMAT:
-        return SC_EOL_LF;
-    case MAC_FORMAT:
-        return SC_EOL_CR;
+        case EOLFormat::WIN_FORMAT:
+            return SC_EOL_CRLF;
+        case EOLFormat::UNIX_FORMAT:
+            return SC_EOL_LF;
+        case EOLFormat::MAC_FORMAT:
+            return SC_EOL_CR;
     }
     return -1;
 }

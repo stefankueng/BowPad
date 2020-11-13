@@ -20,21 +20,21 @@
 
 typedef uptr_t Document;
 
-enum EOLFormat
+enum class EOLFormat : int
 {
     UNKNOWN_FORMAT,
     WIN_FORMAT,
     MAC_FORMAT,
     UNIX_FORMAT
 };
-enum TabSpace
+enum class TabSpace : int
 {
     Default,
     Tabs,
     Spaces
 };
 
-enum ReadDirection
+enum class ReadDirection : int
 {
     Disabled,
     L2R,
@@ -61,15 +61,15 @@ public:
     {
     }
 
-    size_t              m_nFirstVisibleLine;
-    size_t              m_nWrapLineOffset;
-    size_t              m_nStartPos;
-    size_t              m_nEndPos;
-    size_t              m_xOffset;
-    size_t              m_nSelMode;
-    size_t              m_nScrollWidth;
-    std::vector<size_t> m_lineStateVector;
-    size_t              m_lastStyleLine;
+    sptr_t              m_nFirstVisibleLine;
+    sptr_t              m_nWrapLineOffset;
+    sptr_t              m_nStartPos;
+    sptr_t              m_nEndPos;
+    sptr_t              m_xOffset;
+    sptr_t              m_nSelMode;
+    sptr_t              m_nScrollWidth;
+    std::vector<sptr_t> m_lineStateVector;
+    sptr_t              m_lastStyleLine;
 };
 
 class CDocument
@@ -77,7 +77,7 @@ class CDocument
 public:
     CDocument()
         : m_document(0)
-        , m_format(WIN_FORMAT)
+        , m_format(EOLFormat::WIN_FORMAT)
         , m_bHasBOM(false)
         , m_bHasBOMSaving(false)
         , m_bTrimBeforeSave(false)
@@ -89,8 +89,8 @@ public:
         , m_bIsReadonly(false)
         , m_bIsWriteProtected(false)
         , m_bDoSaveAs(false)
-        , m_TabSpace(Default)
-        , m_ReadDir(Disabled)
+        , m_TabSpace(TabSpace::Default)
+        , m_ReadDir(ReadDirection::Disabled)
     {
         m_lastWriteTime.dwHighDateTime = 0;
         m_lastWriteTime.dwLowDateTime  = 0;

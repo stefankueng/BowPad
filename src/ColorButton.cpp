@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2016 - Stefan Kueng
+// Copyright (C) 2013, 2016, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,43 +23,43 @@
 
 namespace
 {
-    COLORREF g_acrCustClr[16];
+COLORREF g_acrCustClr[16] = {};
 
-    static inline std::wstring GetWindowText(HWND hwnd)
-    {
-        wchar_t buf[20]; // We're dealing with color values no longer than three chars.
-        ::GetWindowText(hwnd, buf, _countof(buf));
-        return buf;
-    }
-
-    static BOOL CALLBACK EnumChildWindowProc(HWND hwnd, LPARAM lParam)
-    {
-        auto& state = *reinterpret_cast<std::pair<std::wstring, std::vector<HWND>>*>(lParam);
-
-        if (state.first.empty())
-            state.second.push_back(hwnd);
-        else
-        {
-            wchar_t className[257];
-            auto status = ::GetClassName(hwnd, className, _countof(className));
-            if (status > 0)
-            {
-                if (_wcsicmp(className, state.first.c_str()) == 0)
-                    state.second.push_back(hwnd);
-            }
-        }
-        return TRUE;
-    }
-
-    // Empty classname means match child windows of ANY classname.
-    inline std::vector<HWND> GetChildWindows(HWND hwnd, const std::wstring& classname)
-    {
-        std::pair<std::wstring, std::vector<HWND>> state;
-        state.first = classname;
-        EnumChildWindows(hwnd, EnumChildWindowProc, reinterpret_cast<LPARAM>(&state));
-        return state.second;
-    }
+static inline std::wstring GetWindowText(HWND hwnd)
+{
+    wchar_t buf[20]; // We're dealing with color values no longer than three chars.
+    ::GetWindowText(hwnd, buf, _countof(buf));
+    return buf;
 }
+
+static BOOL CALLBACK EnumChildWindowProc(HWND hwnd, LPARAM lParam)
+{
+    auto& state = *reinterpret_cast<std::pair<std::wstring, std::vector<HWND>>*>(lParam);
+
+    if (state.first.empty())
+        state.second.push_back(hwnd);
+    else
+    {
+        wchar_t className[257];
+        auto    status = ::GetClassName(hwnd, className, _countof(className));
+        if (status > 0)
+        {
+            if (_wcsicmp(className, state.first.c_str()) == 0)
+                state.second.push_back(hwnd);
+        }
+    }
+    return TRUE;
+}
+
+// Empty classname means match child windows of ANY classname.
+inline std::vector<HWND> GetChildWindows(HWND hwnd, const std::wstring& classname)
+{
+    std::pair<std::wstring, std::vector<HWND>> state;
+    state.first = classname;
+    EnumChildWindows(hwnd, EnumChildWindowProc, reinterpret_cast<LPARAM>(&state));
+    return state.second;
+}
+} // namespace
 
 CColorButton::CColorButton()
 {
@@ -93,7 +93,7 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
         case WM_PAINT:
         {
             PAINTSTRUCT ps;
-            HDC hdc;
+            HDC         hdc;
             hdc = BeginPaint(hwnd, &ps);
             RECT rc;
             GetClientRect(hwnd, &rc);
@@ -104,23 +104,23 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
         }
         break;
         case WM_ERASEBKGND:
-        return TRUE;
+            return TRUE;
         case WM_KEYUP:
         {
             if (wParam != VK_SPACE)
                 break;
         }
-        // Fall through
+            [[fallthrough]];
         case WM_LBUTTONUP:
         {
-            CHOOSECOLOR cc = { 0 };
-            cc.lStructSize = sizeof(CHOOSECOLOR);
-            cc.hwndOwner = hwnd;
-            cc.rgbResult = pColorButton->m_color;
+            CHOOSECOLOR cc  = {0};
+            cc.lStructSize  = sizeof(CHOOSECOLOR);
+            cc.hwndOwner    = hwnd;
+            cc.rgbResult    = pColorButton->m_color;
             cc.lpCustColors = g_acrCustClr;
-            cc.lCustData = (LPARAM)pColorButton;
-            cc.lpfnHook = CCHookProc;
-            cc.Flags = CC_ANYCOLOR | CC_RGBINIT | CC_ENABLEHOOK | CC_FULLOPEN;
+            cc.lCustData    = (LPARAM)pColorButton;
+            cc.lpfnHook     = CCHookProc;
+            cc.Flags        = CC_ANYCOLOR | CC_RGBINIT | CC_ENABLEHOOK | CC_FULLOPEN;
 
             if (ChooseColor(&cc) != FALSE)
             {
@@ -136,8 +136,8 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
         }
         break;
         case WM_DESTROY:
-        SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)pColorButton->m_pfnOrigCtlProc);
-        break;
+            SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)pColorButton->m_pfnOrigCtlProc);
+            break;
     }
 
     return CallWindowProc(pColorButton->m_pfnOrigCtlProc, hwnd, message, wParam, lParam);
@@ -163,8 +163,7 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
     _In_ HWND   hdlg,
     _In_ UINT   uiMsg,
     _In_ WPARAM wParam,
-    _In_ LPARAM lParam
-    )
+    _In_ LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(wParam);
     switch (uiMsg)
@@ -175,9 +174,9 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
             // Crude attempt to assert this data slot isn't used by anybody but us.
             assert(GetWindowLongPtr(hdlg, GWLP_USERDATA) == LONG_PTR(0));
             SetWindowLongPtr(hdlg, GWLP_USERDATA, cc.lCustData);
-            CColorButton* pColorBtn = reinterpret_cast<CColorButton*>(cc.lCustData);
-            auto mainWindow = GetAncestor(hdlg, GA_ROOT);
-            pColorBtn->m_colorEdits = GetChildWindows(mainWindow, L"Edit");
+            CColorButton* pColorBtn  = reinterpret_cast<CColorButton*>(cc.lCustData);
+            auto          mainWindow = GetAncestor(hdlg, GA_ROOT);
+            pColorBtn->m_colorEdits  = GetChildWindows(mainWindow, L"Edit");
             assert(pColorBtn->m_colorEdits.size() == 6);
         }
         break;
@@ -199,7 +198,7 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
                 BYTE r = (BYTE)std::stoi(colorText[3]);
                 BYTE g = (BYTE)std::stoi(colorText[4]);
                 BYTE b = (BYTE)std::stoi(colorText[5]);
-                color = RGB(r, g, b);
+                color  = RGB(r, g, b);
             }
             catch (const std::exception& /*ex*/)
             {
@@ -207,7 +206,7 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
             }
             if (!pColorButton->m_hasLastColor || color != pColorButton->m_lastColor)
             {
-                pColorButton->m_lastColor = color;
+                pColorButton->m_lastColor    = color;
                 pColorButton->m_hasLastColor = true;
 #ifdef _DEBUG
                 std::wstring msg = CStringUtils::Format(L"RGB(%d,%d,%d)\n",

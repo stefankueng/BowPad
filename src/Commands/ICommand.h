@@ -105,12 +105,12 @@ protected:
     void                DocScrollUpdate();
     void                DocScrollRemoveLine(int type, size_t line);
     void                UpdateLineNumberWidth();
-    void                GotoLine(long line);
+    void                GotoLine(sptr_t line);
     void                Center(sptr_t startPos, sptr_t endPos);
     void                GotoBrace();
-    std::string         GetLine(long line) const;
-    std::string         GetTextRange(long startpos, long endpos) const;
-    size_t              FindText(const std::string& tofind, long startpos, long endpos);
+    std::string         GetLine(sptr_t line) const;
+    std::string         GetTextRange(sptr_t startpos, sptr_t endpos) const;
+    size_t              FindText(const std::string& tofind, sptr_t startpos, sptr_t endpos);
     std::string         GetSelectedText(bool useCurrentWordIfSelectionEmpty = false) const;
     std::string         GetCurrentWord() const;
     std::string         GetCurrentLine() const;

@@ -232,7 +232,7 @@ void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
                                     headerLine = line;
                                 else
                                 {
-                                    headerLine = (int)ScintillaCall(SCI_GETFOLDPARENT, line, 0);
+                                    headerLine = ScintillaCall(SCI_GETFOLDPARENT, line, 0);
                                     if (headerLine == -1)
                                         return;
                                 }

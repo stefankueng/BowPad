@@ -225,6 +225,9 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     , m_inMenuLoop(false)
     , m_blockCount(0)
     , m_custToolTip(hResource)
+    , m_normalThemeBack(0)
+    , m_normalThemeHigh(0)
+    , m_normalThemeText(0)
 {
     auto cxicon = GetSystemMetrics(SM_CXSMICON);
     auto cyicon = GetSystemMetrics(SM_CYSMICON);
@@ -1143,7 +1146,7 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
                 case STATUSBAR_R2L:
                 {
                     auto bidi = m_editor.Call(SCI_GETBIDIRECTIONAL);
-                    m_editor.SetReadDirection(bidi == SC_BIDIRECTIONAL_R2L ? Disabled : R2L);
+                    m_editor.SetReadDirection(bidi == SC_BIDIRECTIONAL_R2L ? ReadDirection::Disabled : ReadDirection::R2L);
                     auto& doc     = m_DocManager.GetModDocumentFromID(m_TabBar.GetCurrentTabId());
                     doc.m_ReadDir = (ReadDirection)m_editor.Call(SCI_GETBIDIRECTIONAL);
                 }
@@ -1181,7 +1184,7 @@ void CMainWindow::HandleStatusBarEOLFormat()
         DestroyMenu(hPopup););
     int                    currentEolMode   = (int)m_editor.Call(SCI_GETEOLMODE);
     EOLFormat              currentEolFormat = ToEOLFormat(currentEolMode);
-    static const EOLFormat options[]        = {WIN_FORMAT, MAC_FORMAT, UNIX_FORMAT};
+    static const EOLFormat options[]        = {EOLFormat::WIN_FORMAT, EOLFormat::MAC_FORMAT, EOLFormat::UNIX_FORMAT};
     const size_t           numOptions       = std::size(options);
     for (size_t i = 0; i < numOptions; ++i)
     {
@@ -1561,13 +1564,13 @@ void CMainWindow::EnsureNewLineAtEnd(const CDocument& doc)
     {
         switch (doc.m_format)
         {
-            case WIN_FORMAT:
+            case EOLFormat::WIN_FORMAT:
                 m_editor.AppendText(2, "\r\n");
                 break;
-            case MAC_FORMAT:
+            case EOLFormat::MAC_FORMAT:
                 m_editor.AppendText(1, "\r");
                 break;
-            case UNIX_FORMAT:
+            case EOLFormat::UNIX_FORMAT:
             default:
                 m_editor.AppendText(1, "\n");
                 break;
@@ -1836,8 +1839,8 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
 
     auto lineCount = (long)m_editor.Call(SCI_GETLINECOUNT);
 
-    size_t selByte = 0;
-    size_t selLine = 0;
+    sptr_t selByte = 0;
+    sptr_t selLine = 0;
     m_editor.GetSelectedCount(selByte, selLine);
     long selTextMarkerCount = m_editor.GetSelTextMarkerCount();
     auto curPos             = m_editor.Call(SCI_GETCURRENTPOS);
@@ -2973,7 +2976,7 @@ void CMainWindow::OpenNewTab()
     doc.m_document = m_editor.Call(SCI_CREATEDOCUMENT);
     doc.m_bHasBOM  = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
     doc.m_encoding = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
-    doc.m_format   = (EOLFormat)CIniSettings::Instance().GetInt64(L"Defaults", L"lineendingnew", WIN_FORMAT);
+    doc.m_format   = (EOLFormat)CIniSettings::Instance().GetInt64(L"Defaults", L"lineendingnew", (int)EOLFormat::WIN_FORMAT);
     auto eolmode   = ToEOLMode(doc.m_format);
     m_editor.SetEOLType(eolmode);
 
