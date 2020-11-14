@@ -14,34 +14,33 @@ function Execute()
     if (BowPad.SciLineFromPosition(selStart) != BowPad.SciLineFromPosition(selEnd))
     {
         BowPad.alert("Multiline selection is not yet supported.");
-        return false;
+	return false;
     }
     
     var selText = BowPad.SciGetSelText();
     var extractedLines = [];
     var docLen = BowPad.SciGetLength();
     var foundPos = BowPad.SciFindText(0, 0, docLen, selText).toArray()[0];
+    var lexer = BowPad.GetCurrentLanguage();
 
     while (foundPos >= 0)
     {
         var line = BowPad.SciLineFromPosition(foundPos);
         var lineText = BowPad.SciGetLine(line);
         extractedLines.push(lineText);
-        foundPos = BowPad.SciPositionFromLine(line+1)
-        foundPos = BowPad.SciFindText(0, foundPos, docLen, selText).toArray()[0];
+        foundPos = BowPad.SciFindText(0, BowPad.SciPositionFromLine(line+1), docLen, selText).toArray()[0];
     }
-    if (extractedLines.length > 1)
-    {
+    
+    if (extractedLines.length > 1) {
         BowPad.OpenNewTab();
         BowPad.SciInsertText(0, extractedLines.join(""));
         BowPad.SciEmptyUndoBuffer();
         BowPad.SciSetSavePoint();
+	BowPad.SetupLexerForLang(lexer);
     }
-    else
-    {
-        BowPad.alert("Only a single instance is found in document.");
+    else {
+	BowPad.alert("Only a single instance is found in document.");
     }
-
     return true;
 }
 
