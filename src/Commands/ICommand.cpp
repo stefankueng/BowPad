@@ -18,6 +18,7 @@
 #include "ICommand.h"
 #include "MainWindow.h"
 #include "StringUtils.h"
+#include "LexStyles.h"
 
 extern IUIFramework *g_pFramework;
 
@@ -286,6 +287,11 @@ void ICommand::UpdateStatusBar( bool bEverything )
 void ICommand::SetupLexerForLang( const std::string& lang )
 {
     return m_pMainWindow->m_editor.SetupLexerForLang(lang);
+}
+
+std::string ICommand::GetCurrentLanguage()
+{
+    return GetActiveDocument().GetLanguage();
 }
 
 void ICommand::DocScrollClear( int type )

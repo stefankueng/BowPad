@@ -544,6 +544,16 @@ const LexerData& CLexStyles::GetLexerDataForLexer(int lexer) const
     return emptyLexData;
 }
 
+const std::string& CLexStyles::GetLanguageForLexer(int lexer) const
+{
+    for (const auto& data : m_Langdata)
+    {
+        if (data.second.lexer == lexer)
+            return data.first;
+    }
+    return emptyString;
+}
+
 std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
 {
     auto it = std::find_if(m_pathsLang.begin(), m_pathsLang.end(), [&](const auto& toFind) {

@@ -907,6 +907,8 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID /*riid*/,
             idList[i] = 133;
         else if (_wcsicmp(nameList[i], L"OpenNewTab") == 0)
             idList[i] = 134;
+        else if (_wcsicmp(nameList[i], L"GetCurrentLanguage") == 0)
+            idList[i] = 135;
         else if (_wcsicmp(nameList[i], L"SciGetTextRange") == 0)
             idList[i] = 900;
         else if (_wcsicmp(nameList[i], L"SciGetCharAt") == 0)
@@ -1109,6 +1111,9 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
                 return DISP_E_TYPEMISMATCH;
             SetupLexerForLang(CUnicodeUtils::StdGetUTF8(p1.bstrVal));
+            // also set the lang for the doc and update the status bar
+            GetModActiveDocument().SetLanguage(CUnicodeUtils::StdGetUTF8(p1.bstrVal));
+            UpdateStatusBar(true);
             break;
         case 119: // DocScrollClear
             if (args->cArgs != 1)
@@ -1233,6 +1238,12 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             if (args->cArgs != 0)
                 return DISP_E_BADPARAMCOUNT;
             OpenNewTab();
+            break;
+        case 135: // GetCurrentLanguage
+            if (args->cArgs != 0)
+                return DISP_E_BADPARAMCOUNT;
+            ret->vt = VT_BSTR;
+            ret->bstrVal = _bstr_t(GetCurrentLanguage().c_str()).Detach();
             break;
         case 900: // SciGetTextRange
             if (args->cArgs != 2)

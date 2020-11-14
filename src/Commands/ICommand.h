@@ -100,6 +100,7 @@ protected:
     LRESULT             SendMessageToMainWnd(UINT msg, WPARAM wParam, LPARAM lParam);
     void                UpdateStatusBar(bool bEverything);
     void                SetupLexerForLang(const std::string& lang);
+    std::string         GetCurrentLanguage();
     void                DocScrollClear(int type);
     void                DocScrollAddLineColor(int type, size_t line, COLORREF clr);
     void                DocScrollUpdate();
