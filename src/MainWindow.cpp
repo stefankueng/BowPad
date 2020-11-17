@@ -3781,7 +3781,7 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     docreload.m_position          = doc.m_position;
     docreload.m_bIsWriteProtected = doc.m_bIsWriteProtected;
     docreload.m_saveCallback      = doc.m_saveCallback;
-    const auto& lang              = doc.GetLanguage();
+    auto lang                     = doc.GetLanguage();
     doc                           = docreload;
     editor->SetupLexerForLang(lang);
     doc.SetLanguage(lang);
