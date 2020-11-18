@@ -69,7 +69,7 @@ static HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void**
 
 static FileTreeItem* GetFileTreeItem(HWND hWnd, HTREEITEM hItem)
 {
-    TVITEM item = {}; // No need to erase to zero, mask defines the valid fields.
+    TVITEM item = {};
     item.mask   = TVIF_PARAM;
     item.hItem  = hItem;
     if (TreeView_GetItem(hWnd, &item) != FALSE)
@@ -388,7 +388,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                     HTREEITEM    hItem      = GetItemForPath(expandpath);
                     if (hItem == nullptr)
                     {
-                        while ((hItem == nullptr) && (expandpath.size() > m_path.size()))
+                        while ((hItem == nullptr) && !expandpath.empty() && (expandpath.size() > m_path.size()))
                         {
                             expandpath = CPathUtils::GetParentDirectory(expandpath);
                             hItem      = GetItemForPath(expandpath);
