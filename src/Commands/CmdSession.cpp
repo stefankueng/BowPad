@@ -214,6 +214,23 @@ void CCmdSessionLoad::RestoreSavedSession()
             break;
         ++filecount;
         SetProgress(filecount, numFilesToRestore);
+
+        auto origPath = settings.GetString(sessionSection(), CStringUtils::Format(L"origpath%d", fileNum).c_str(), nullptr);
+        if (origPath)
+        {
+            WIN32_FILE_ATTRIBUTE_DATA savedFileData = {};
+            GetFileAttributesEx(path.c_str(), GetFileExInfoStandard, &savedFileData);
+            WIN32_FILE_ATTRIBUTE_DATA origFileData = {};
+            GetFileAttributesEx(origPath, GetFileExInfoStandard, &origFileData);
+            if (CompareFileTime(&savedFileData.ftLastWriteTime, &origFileData.ftLastWriteTime) < 0)
+            {
+                // the original file was modified after we saved the modifications
+                // --> use the original file
+                filesToDelete.push_back(path);
+                path = origPath;
+                origPath = nullptr;
+            }
+        }
         int tabIndex = OpenFile(path.c_str(), openflags);
         if (tabIndex < 0)
             continue;
@@ -241,7 +258,6 @@ void CCmdSessionLoad::RestoreSavedSession()
         {
             stringtok(pos.m_lineStateVector, folds, true, L";", false);
         }
-        auto origPath = settings.GetString(sessionSection(), CStringUtils::Format(L"origpath%d", fileNum).c_str(), nullptr);
         if (origPath)
         {
             filesToDelete.push_back(doc.m_path);
