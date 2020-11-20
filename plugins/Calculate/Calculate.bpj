@@ -1,0 +1,87 @@
+// returns the version of the plugin
+// this callback is not optional! If you fail to implement this, the plugin
+// config dialog won't work properly with your plugin
+function Version() { return 100; }
+
+
+// this is the main function that gets executed when the command is run, i.e.
+// the button is clicked
+function Execute()
+{
+	var s = BowPad.SciGetSelText();
+	if (s.length == 0) {
+		var l = BowPad.SciGetLength(); // limit the amount of characters to 8192 to avoid accidental execution on large documents
+		if (l > 8192) {
+			BowPad.alert("Expression too long. Please select no more than 8192 characters to calculate.");
+			return;
+		}
+		s = BowPad.SciGetTextRange(0, l);
+	}
+	var exp = /[\-+*\/\.\(\)^,\s\uFF0B\uFF0D\u00D7\u00F7\uFF08\uFF09\u3014\u3015]|0x[0-9a-f]+|\d+|\bMath.(?:E|LN2|LN10|LOG2E|LOG10E|PI|SQRT1_2|SQRT2)\b|\b(?:Math.)?(?:abs|acos|asin|atan|atan2|ceil|cos|exp|floor|log|max|min|pow|random|round|sin|sqrt|tan)\b/gi;
+	var op = "+-*/()()";
+	var opf = "\uFF0B\uFF0D\u00D7\u00F7\uFF08\uFF09\u3014\u3015";
+	var m = [];
+	var out = [];
+	var arr;
+	while ((arr = exp.exec(s)) != null) {
+		m.push (arr.join("")); // extract expression
+	}
+	s = m.join("").replace (
+		/(?:Math.)?(abs|acos|asin|atan|atan2|ceil|cos|exp|floor|log|max|min|pow|random|round|sin|sqrt|tan)/gi, 
+		function($0,$1,$2) { return "Math." + $1.toLowerCase (); }
+		) // Math functions
+		.replace (
+		/Math.(E|LN2|LN10|LOG2E|LOG10E|PI|SQRT1_2|SQRT2)/gi,
+		function($0,$1) { return "Math." + $1.toUpperCase (); }
+		) // Math constants
+		.replace(
+		/([\uFF0B\uFF0D\u00D7\u00F7\uFF08\uFF09\u3014\u3015])/g,
+		function($0,$1) { return op.substr(opf.indexOf($0), 1); }
+		) // convert full width operators to ASCII operators
+		.replace (/(^|[^\.\d])0{2,}(?=\.)/g, "0") // merge leading 0 before .
+		.replace (/(^|[^\.\d])0+([1-9])/g, "$1$2") // remove leading 0 in numbers
+		.replace (/([0-9])\s+(?=[0-9])/gm, "$1+") // spaces between number -> plus
+		.replace (/\s/g, ""); // remove spaces
+	var hex = s.indexOf ("0x") != -1;
+
+	out.push("Eval expression:");
+	out.push(s);
+	out.push();
+	out.push("Result:");
+	try {
+		var r = eval(s);
+		s = r.toFixed (10).replace (/\.([0-9]*?)0+$/g, "\.$1").replace (/\.$/, "");
+		out.push (s);
+		// copy result to clipboard
+		// BowPad.SetClipboardData(s, "");
+		if (hex) {
+			out.push ("HEX:");
+			s = r >= 0 ? "0x" + r.toString(16).toUpperCase() : "-0x" + (-r).toString(16).toUpperCase();
+			out.push (s);
+		}
+	}
+	catch (e) {
+		out.push ("Evaluation exception occured: ");
+		out.push (e.message);
+	}
+	
+	BowPad.OpenNewTab();
+	BowPad.SciInsertText(0, out.join("\r\n"));
+	BowPad.SciEmptyUndoBuffer();
+	BowPad.SciSetSavePoint();
+
+	return true;
+}
+
+// return true if the plugin command is enabled (used for the button)
+// note: not used yet by BowPad, but planned for the future
+function IsEnabled() { return BowPad.HasActiveDocument; }
+
+// return true if the plugin button should appear as checked
+// note: not used yet by BowPad, but planned for the future
+function IsChecked() { return false; }
+
+// called after a document was opened
+function OnDocumentOpen(index) {
+}
+

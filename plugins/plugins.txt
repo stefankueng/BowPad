@@ -1,3 +1,7 @@
+Calculate
+100
+200
+Calculate arithmetic expressions\nwmjordan\n
 DisableClearType
 101
 200
