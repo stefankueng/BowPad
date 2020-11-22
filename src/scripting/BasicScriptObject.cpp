@@ -921,6 +921,8 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID /*riid*/,
             idList[i] = 904;
         else if (_wcsicmp(nameList[i], L"GetClipboardHtml") == 0)
             idList[i] = 905;
+        else if (_wcsicmp(nameList[i], L"GetKeyState") == 0)
+            idList[i] = 906;
         else if (ScintillaCommandsDispId(nameList[i], idList[i]))
             return S_OK;
         else
@@ -1242,7 +1244,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
         case 135: // GetCurrentLanguage
             if (args->cArgs != 0)
                 return DISP_E_BADPARAMCOUNT;
-            ret->vt = VT_BSTR;
+            ret->vt      = VT_BSTR;
             ret->bstrVal = _bstr_t(GetCurrentLanguage().c_str()).Detach();
             break;
         case 900: // SciGetTextRange
@@ -1422,6 +1424,16 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                 }
             }
             ret->bstrVal = _bstr_t(L"").Detach();
+        }
+        break;
+        case 906: // GetKeyState
+        {
+            if (args->cArgs != 1)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
+                return DISP_E_TYPEMISMATCH;
+            ret->vt      = VT_BOOL;
+            ret->boolVal = (GetKeyState(p1.intVal) & 0x8000) != 0 ? VARIANT_TRUE : VARIANT_FALSE;
         }
         break;
         default:
