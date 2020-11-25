@@ -7,6 +7,6 @@ DisableClearType
 200
 Disables ClearType\nAuthor: wmjordan@163.com, Stefan Küng\n
 SearchSelection
-102
+103
 200
-Search Selection: extracts all lines that contain the selected text.\nStefan Küng, wmjordan\n
+Search Selection: extracts all lines that contain the selected text.\r\nCtrl click: match whole word; Shift click: match case.\nStefan Küng, wmjordan\n

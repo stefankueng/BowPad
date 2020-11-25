@@ -1,7 +1,7 @@
 // returns the version of the plugin
 // this callback is not optional! If you fail to implement this, the plugin
 // config dialog won't work properly with your plugin
-function Version() { return 102; }
+function Version() { return 103; }
 
 // this is the main function that gets executed when the command is run, i.e.
 // the button is clicked
@@ -20,7 +20,8 @@ function Execute()
     var selText = BowPad.SciGetSelText();
     var extractedLines = [];
     var docLen = BowPad.SciGetLength();
-    var foundPos = BowPad.SciFindText(0, 0, docLen, selText).toArray()[0];
+    var searchFlags = (BowPad.GetKeyState(0x11) ? 2 : 0 /*ctrl: whole word*/) | (BowPad.GetKeyState(0x10) ? 4 : 0 /*shift: match case*/);
+    var foundPos = BowPad.SciFindText(searchFlags, 0, docLen, selText).toArray()[0];
     var lexer = BowPad.GetCurrentLanguage();
 
     while (foundPos >= 0)
@@ -28,7 +29,7 @@ function Execute()
         var line = BowPad.SciLineFromPosition(foundPos);
         var lineText = BowPad.SciGetLine(line);
         extractedLines.push(lineText);
-        foundPos = BowPad.SciFindText(0, BowPad.SciPositionFromLine(line+1), docLen, selText).toArray()[0];
+        foundPos = BowPad.SciFindText(searchFlags, BowPad.SciPositionFromLine(line+1), docLen, selText).toArray()[0];
     }
     
     if (extractedLines.length > 1) {
