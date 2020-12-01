@@ -87,8 +87,7 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
         if (plugins.empty())
         {
             // show text that no plugins are available
-            ResString sNoPlugins(hRes, IDS_NO_PLUGINS);
-            CAppUtils::AddStringItem(pCollection, sNoPlugins);
+            CAppUtils::AddCommandItem(pCollection, UI_COLLECTION_INVALIDINDEX, cmdNoPlugins, UI_COMMANDTYPE_ACTION);
         }
 
         // populate the dropdown with the plugins
@@ -98,7 +97,7 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
 
             if (plugin)
             {
-                CAppUtils::AddStringItem(pCollection, p.second.c_str(), -1, plugin->IsChecked() ? pImgChecked : pImg);
+                CAppUtils::AddCommandItem(pCollection, UI_COLLECTION_INVALIDINDEX, p.first, UI_COMMANDTYPE_ACTION);
             }
         }
         hr = S_OK;
