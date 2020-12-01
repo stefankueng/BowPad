@@ -843,7 +843,53 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdCommandPalette" Id="10016" />
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />
-
+    
+    <!-- commands for plugins, required so they can be added to the QAT -->
+    <Command Name="cmdInvisTabForQAT" Id="39996" />
+    <Command Name="cmdInvisGroupForQAT" Id="39997" />
+    <Command Name="cmdInvisBtnForQAT" Id="39998" />
+    <Command Name="cmdNoPlugins" Id="39999" LabelTitle="no plugins loaded"/>
+    <Command Name="cmdPluginCmd00" Id="40000"/>
+    <Command Name="cmdPluginCmd01" Id="40001"/>
+    <Command Name="cmdPluginCmd02" Id="40002"/>
+    <Command Name="cmdPluginCmd03" Id="40003"/>
+    <Command Name="cmdPluginCmd04" Id="40004"/>
+    <Command Name="cmdPluginCmd05" Id="40005"/>
+    <Command Name="cmdPluginCmd06" Id="40006"/>
+    <Command Name="cmdPluginCmd07" Id="40007"/>
+    <Command Name="cmdPluginCmd08" Id="40008"/>
+    <Command Name="cmdPluginCmd09" Id="40009"/>
+    <Command Name="cmdPluginCmd10" Id="40010"/>
+    <Command Name="cmdPluginCmd11" Id="40011"/>
+    <Command Name="cmdPluginCmd12" Id="40012"/>
+    <Command Name="cmdPluginCmd13" Id="40013"/>
+    <Command Name="cmdPluginCmd14" Id="40014"/>
+    <Command Name="cmdPluginCmd15" Id="40015"/>
+    <Command Name="cmdPluginCmd16" Id="40016"/>
+    <Command Name="cmdPluginCmd17" Id="40017"/>
+    <Command Name="cmdPluginCmd18" Id="40018"/>
+    <Command Name="cmdPluginCmd19" Id="40019"/>
+    <Command Name="cmdPluginCmd20" Id="40020"/>
+    <Command Name="cmdPluginCmd21" Id="40021"/>
+    <Command Name="cmdPluginCmd22" Id="40022"/>
+    <Command Name="cmdPluginCmd23" Id="40023"/>
+    <Command Name="cmdPluginCmd24" Id="40024"/>
+    <Command Name="cmdPluginCmd25" Id="40025"/>
+    <Command Name="cmdPluginCmd26" Id="40026"/>
+    <Command Name="cmdPluginCmd27" Id="40027"/>
+    <Command Name="cmdPluginCmd28" Id="40028"/>
+    <Command Name="cmdPluginCmd29" Id="40029"/>
+    <Command Name="cmdPluginCmd30" Id="40030"/>
+    <Command Name="cmdPluginCmd31" Id="40031"/>
+    <Command Name="cmdPluginCmd32" Id="40032"/>
+    <Command Name="cmdPluginCmd33" Id="40033"/>
+    <Command Name="cmdPluginCmd34" Id="40034"/>
+    <Command Name="cmdPluginCmd35" Id="40035"/>
+    <Command Name="cmdPluginCmd36" Id="40036"/>
+    <Command Name="cmdPluginCmd37" Id="40037"/>
+    <Command Name="cmdPluginCmd38" Id="40038"/>
+    <Command Name="cmdPluginCmd39" Id="40039"/>
+    
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -1235,12 +1281,66 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           </Group>
           <Group CommandName="cmdGroupPlugins" SizeDefinition="TwoButtons">
             <Button CommandName="cmdPluginConfig" />
-            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Commands" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
-                <VerticalMenuLayout />
+                <VerticalMenuLayout/>
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
           </Group>
+        </Tab>
+        <!-- invisible tab, used so the commands inside can be added to the QAT -->
+        <Tab CommandName="cmdInvisTabForQAT" ApplicationModes="31">
+          <Group CommandName="cmdInvisGroupForQAT" SizeDefinition="OneButton">
+            <DropDownButton CommandName="cmdInvisBtnForQAT">
+              <MenuGroup>
+                <Button CommandName="cmdPluginCmd00"/>
+                <Button CommandName="cmdPluginCmd01"/>
+                <Button CommandName="cmdPluginCmd02"/>
+                <Button CommandName="cmdPluginCmd03"/>
+                <Button CommandName="cmdPluginCmd04"/>
+                <Button CommandName="cmdPluginCmd05"/>
+                <Button CommandName="cmdPluginCmd06"/>
+                <Button CommandName="cmdPluginCmd07"/>
+                <Button CommandName="cmdPluginCmd08"/>
+                <Button CommandName="cmdPluginCmd09"/>
+                <Button CommandName="cmdPluginCmd10"/>
+                <Button CommandName="cmdPluginCmd11"/>
+                <Button CommandName="cmdPluginCmd12"/>
+                <Button CommandName="cmdPluginCmd13"/>
+                <Button CommandName="cmdPluginCmd14"/>
+                <Button CommandName="cmdPluginCmd15"/>
+                <Button CommandName="cmdPluginCmd16"/>
+                <Button CommandName="cmdPluginCmd17"/>
+                <Button CommandName="cmdPluginCmd18"/>
+                <Button CommandName="cmdPluginCmd19"/>
+                <Button CommandName="cmdPluginCmd20"/>
+                <Button CommandName="cmdPluginCmd21"/>
+                <Button CommandName="cmdPluginCmd22"/>
+                <Button CommandName="cmdPluginCmd23"/>
+                <Button CommandName="cmdPluginCmd24"/>
+                <Button CommandName="cmdPluginCmd25"/>
+                <Button CommandName="cmdPluginCmd26"/>
+                <Button CommandName="cmdPluginCmd27"/>
+                <Button CommandName="cmdPluginCmd28"/>
+                <Button CommandName="cmdPluginCmd29"/>
+                <Button CommandName="cmdPluginCmd30"/>
+                <Button CommandName="cmdPluginCmd31"/>
+                <Button CommandName="cmdPluginCmd32"/>
+                <Button CommandName="cmdPluginCmd33"/>
+                <Button CommandName="cmdPluginCmd34"/>
+                <Button CommandName="cmdPluginCmd35"/>
+                <Button CommandName="cmdPluginCmd36"/>
+                <Button CommandName="cmdPluginCmd37"/>
+                <Button CommandName="cmdPluginCmd38"/>
+                <Button CommandName="cmdPluginCmd39"/>
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdGotoBrace"/>
+                <Button CommandName="cmdCutPlain"/>
+              </MenuGroup>
+            </DropDownButton>
+          </Group>
+
         </Tab>
       </Ribbon.Tabs>
       <Ribbon.QuickAccessToolbar>
@@ -1343,7 +1443,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             </DropDownButton>
           </MenuGroup>
           <MenuGroup>
-            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Commands" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>
@@ -1398,7 +1498,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             </DropDownButton>
           </MenuGroup>
           <MenuGroup>
-            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Commands" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>

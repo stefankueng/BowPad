@@ -407,7 +407,7 @@ void CCommandHandler::InsertPlugins(void* obj)
     CDirFileEnum filefinder(sPluginDir);
     bool         bIsDirectory;
     std::wstring filename;
-    UINT         pluginCmd = m_highestCmdId + 1000;
+    UINT         pluginCmd = cmdPluginCmd00;
     while (filefinder.NextFile(filename, &bIsDirectory, true))
     {
         if (!bIsDirectory)
@@ -415,7 +415,7 @@ void CCommandHandler::InsertPlugins(void* obj)
             try
             {
                 auto pScript = std::make_unique<CCmdScript>(obj);
-                int  cmdID   = ++pluginCmd;
+                int  cmdID   = pluginCmd++;
                 if (pScript->Create(filename))
                 {
                     pScript->SetCmdId(cmdID);
@@ -424,7 +424,7 @@ void CCommandHandler::InsertPlugins(void* obj)
                     m_pluginversion[sName] = pScript->m_version;
                     m_commands[cmdID]      = std::move(pScript);
                     m_plugins[cmdID]       = sName;
-                    CKeyboardShortcutHandler::Instance().AddCommand(sName, pluginCmd);
+                    CKeyboardShortcutHandler::Instance().AddCommand(sName, cmdID);
                 }
             }
             catch (const std::exception& e)
