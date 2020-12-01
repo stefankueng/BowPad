@@ -69,6 +69,7 @@
 #include "PathUtils.h"
 #include "UnicodeUtils.h"
 #include "KeyboardShortcutHandler.h"
+#include "IniSettings.h"
 
 CCommandHandler::CCommandHandler()
     : m_highestCmdId(0)
@@ -407,7 +408,8 @@ void CCommandHandler::InsertPlugins(void* obj)
     CDirFileEnum filefinder(sPluginDir);
     bool         bIsDirectory;
     std::wstring filename;
-    UINT         pluginCmd = cmdPluginCmd00;
+
+    std::map<std::wstring, std::unique_ptr<CCmdScript>> scripts;
     while (filefinder.NextFile(filename, &bIsDirectory, true))
     {
         if (!bIsDirectory)
@@ -415,16 +417,11 @@ void CCommandHandler::InsertPlugins(void* obj)
             try
             {
                 auto pScript = std::make_unique<CCmdScript>(obj);
-                int  cmdID   = pluginCmd++;
                 if (pScript->Create(filename))
                 {
-                    pScript->SetCmdId(cmdID);
-                    std::wstring sName     = CPathUtils::GetParentDirectory(filename);
-                    sName                  = CPathUtils::GetFileName(sName);
-                    m_pluginversion[sName] = pScript->m_version;
-                    m_commands[cmdID]      = std::move(pScript);
-                    m_plugins[cmdID]       = sName;
-                    CKeyboardShortcutHandler::Instance().AddCommand(sName, cmdID);
+                    std::wstring sName = CPathUtils::GetParentDirectory(filename);
+                    sName              = CPathUtils::GetFileName(sName);
+                    scripts[sName]     = std::move(pScript);
                 }
             }
             catch (const std::exception& e)
@@ -440,6 +437,49 @@ void CCommandHandler::InsertPlugins(void* obj)
                     CTraceToOutputDebugString::Instance()(L"\n");
                 }
             }
+        }
+    }
+
+    std::set<UINT> usedCmdIds;
+    for (const auto& [name, script] : scripts)
+    {
+        auto foundCmd = (UINT)CIniSettings::Instance().GetInt64(L"pluginCmdMap", name.c_str(), 0);
+        if (foundCmd)
+        {
+            if (usedCmdIds.find(foundCmd) == usedCmdIds.end())
+            {
+                script->SetCmdId(foundCmd);
+                usedCmdIds.insert(foundCmd);
+            }
+        }
+    }
+
+    CIniSettings::Instance().Delete(L"pluginCmdMap", nullptr);
+    UINT pluginCmd = cmdPluginCmd00;
+    for (auto& [name, script] : scripts)
+    {
+        if (script->GetCmdId() == 0)
+        {
+            // find the next free plugin cmd id
+            while (usedCmdIds.find(pluginCmd) != usedCmdIds.end())
+                ++pluginCmd;
+            usedCmdIds.insert(pluginCmd);
+
+            script->SetCmdId(pluginCmd);
+            m_pluginversion[name] = script->m_version;
+            m_commands[pluginCmd] = std::move(script);
+            m_plugins[pluginCmd]  = name;
+            CKeyboardShortcutHandler::Instance().AddCommand(name, pluginCmd);
+            CIniSettings::Instance().SetInt64(L"pluginCmdMap", name.c_str(), pluginCmd);
+        }
+        else
+        {
+            auto cmdId            = script->GetCmdId();
+            m_pluginversion[name] = script->m_version;
+            m_commands[cmdId]     = std::move(script);
+            m_plugins[cmdId]      = name;
+            CKeyboardShortcutHandler::Instance().AddCommand(name, cmdId);
+            CIniSettings::Instance().SetInt64(L"pluginCmdMap", name.c_str(), cmdId);
         }
     }
 }
@@ -462,6 +502,6 @@ void CCommandHandler::AddCommand(ICommand* cmd)
 void CCommandHandler::AddCommand(UINT cmdId)
 {
     m_highestCmdId = max(m_highestCmdId, cmdId);
-    auto at = m_nodeletecommands.emplace(cmdId, nullptr);
+    auto at        = m_nodeletecommands.emplace(cmdId, nullptr);
     assert(at.second); // Verify no command has the same ID as an existing command.
 }

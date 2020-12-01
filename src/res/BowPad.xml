@@ -889,6 +889,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdPluginCmd37" Id="40037"/>
     <Command Name="cmdPluginCmd38" Id="40038"/>
     <Command Name="cmdPluginCmd39" Id="40039"/>
+    <Command Name="cmdPluginCmdLast" Id="40040"/>
     
   </Application.Commands>
   <Application.Views>
