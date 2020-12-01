@@ -355,6 +355,23 @@ HRESULT CAppUtils::AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int
     return hr;
 }
 
+HRESULT CAppUtils::AddCommandItem(IUICollectionPtr& collection, int cat, int commandId, UI_COMMANDTYPE commandType)
+{
+    HRESULT hr;
+    CPropertySet* pItem;
+    hr = CPropertySet::CreateInstance(&pItem);
+    if (FailedShowMessage(hr))
+        return hr;
+
+    pItem->InitializeCommandProperties(cat, commandId, commandType);
+
+    // Add the newly-created property set to the collection supplied by the framework.
+    hr = collection->Add(pItem);
+    FailedShowMessage(hr);
+    pItem->Release();
+    return hr;
+}
+
 HRESULT CAppUtils::AddCategory(IUICollectionPtr& coll, int catId, int catNameResId)
 {
     // TOOD! Use a RAII type to manage life time of the category objects.

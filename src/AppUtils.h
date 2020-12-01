@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ public:
     static bool                     HasSameMajorVersion(const std::wstring& path);
     static HRESULT                  AddResStringItem(IUICollectionPtr& collection, int resId, int cat = UI_COLLECTION_INVALIDINDEX, IUIImage * pImg = nullptr);
     static HRESULT                  AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int cat = UI_COLLECTION_INVALIDINDEX, IUIImage * pImg = nullptr);
+    static HRESULT                  AddCommandItem(IUICollectionPtr& collection, int cat, int commandId, UI_COMMANDTYPE commandType);
     static HRESULT                  AddCategory(IUICollectionPtr& coll, int catId, int catNameResId);
     static bool                     FailedShowMessage(HRESULT hr);
     static bool                     ShowDropDownList(HWND hWnd, LPCWSTR ctrlName);
