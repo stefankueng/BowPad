@@ -34,6 +34,7 @@ public:
     bool Execute() override;
     bool IsEnabled();
     bool IsChecked();
+    IUIImagePtr getIcon();
 
     UINT GetCmdId() override;
 
@@ -67,5 +68,7 @@ private:
     BasicScriptObject * m_appObject;
     BasicScriptHost *   m_host;
     UINT                m_cmdID;
+    IUIImagePtr         m_image;
+    std::wstring        m_name;
 };
 
