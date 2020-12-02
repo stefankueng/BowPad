@@ -221,6 +221,7 @@
 #define IDS_IMPORTBPLEX_IMPORT          262
 #define IDS_IMPORTBPLEX_OPEN            263
 #define IDS_COMMANDPALETTE_FILTERCUE    264
+#define IDS_ADDTOQAT                    265
 #define IDC_SEARCHCOMBO                 1000
 #define IDC_FINDBTN                     1001
 #define IDC_REPLACECOMBO                1002

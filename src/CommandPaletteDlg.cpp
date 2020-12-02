@@ -23,12 +23,14 @@
 #include "CmdScripts.h"
 #include "StringUtils.h"
 #include "Theme.h"
+#include "OnOutOfScope.h"
 #include <string>
 #include <algorithm>
 #include <memory>
 #include <Commdlg.h>
 
-extern HINSTANCE hRes;
+extern HINSTANCE     hRes;
+extern IUIFramework* g_pFramework;
 
 CCommandPaletteDlg::CCommandPaletteDlg(HWND hParent)
     : m_hParent(hParent)
@@ -77,34 +79,6 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                                             [&](const auto& item) { return ((UINT)item.second == cmd.first); });
                 if (whereAt != resourceData.end())
                 {
-                    CmdPalData data;
-                    data.cmdId = cmd.first;
-
-                    auto sID = whereAt->first + L"_TooltipDescription_RESID";
-
-                    auto ttIDit = resourceData.find(sID);
-                    if (ttIDit != resourceData.end())
-                    {
-                        auto sRes        = LoadResourceWString(hRes, ttIDit->second);
-                        data.description = sRes;
-                    }
-
-                    sID = whereAt->first + L"_LabelTitle_RESID";
-
-                    auto ltIDit = resourceData.find(sID);
-                    if (ltIDit != resourceData.end())
-                    {
-                        auto sRes    = LoadResourceWString(hRes, ltIDit->second);
-                        data.command = sRes;
-                        SearchReplace(data.command, L"&", L"");
-                    }
-
-                    data.shortcut = CKeyboardShortcutHandler::Instance().GetShortCutStringForCommand((WORD)cmd.first);
-                    if (!data.command.empty())
-                        m_allResults.push_back(data);
-                }
-                else
-                {
                     auto pScript = dynamic_cast<CCmdScript*>(cmd.second.get());
                     if (pScript)
                     {
@@ -112,6 +86,34 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                         data.cmdId   = cmd.first;
                         data.command = CCommandHandler::Instance().GetPluginMap().at(cmd.first);
                         SearchReplace(data.command, L"&", L"");
+                        data.shortcut = CKeyboardShortcutHandler::Instance().GetShortCutStringForCommand((WORD)cmd.first);
+                        if (!data.command.empty())
+                            m_allResults.push_back(data);
+                    }
+                    else
+                    {
+                        CmdPalData data;
+                        data.cmdId = cmd.first;
+
+                        auto sID = whereAt->first + L"_TooltipDescription_RESID";
+
+                        auto ttIDit = resourceData.find(sID);
+                        if (ttIDit != resourceData.end())
+                        {
+                            auto sRes        = LoadResourceWString(hRes, ttIDit->second);
+                            data.description = sRes;
+                        }
+
+                        sID = whereAt->first + L"_LabelTitle_RESID";
+
+                        auto ltIDit = resourceData.find(sID);
+                        if (ltIDit != resourceData.end())
+                        {
+                            auto sRes    = LoadResourceWString(hRes, ltIDit->second);
+                            data.command = sRes;
+                            SearchReplace(data.command, L"&", L"");
+                        }
+
                         data.shortcut = CKeyboardShortcutHandler::Instance().GetShortCutStringForCommand((WORD)cmd.first);
                         if (!data.command.empty())
                             m_allResults.push_back(data);
@@ -199,6 +201,63 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             int newWidth  = LOWORD(lParam);
             int newHeight = HIWORD(lParam);
             m_resizer.DoResize(newWidth, newHeight);
+        }
+        break;
+        case WM_CONTEXTMENU:
+        {
+            if (GetFocus() == m_hResults)
+            {
+                POINT pt{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+                int   selIndex = -1;
+                if (pt.x == -1 && pt.y == -1)
+                {
+                    selIndex = ListView_GetNextItem(m_hResults, -1, LVNI_SELECTED);
+                    RECT rc{};
+                    ListView_GetItemRect(m_hResults, selIndex, &rc, LVIR_LABEL);
+                    pt.x = rc.left;
+                    pt.y = rc.top;
+                    ClientToScreen(m_hResults, &pt);
+                }
+                else
+                {
+                    ScreenToClient(m_hResults, &pt);
+
+                    LV_HITTESTINFO lvhti{};
+                    lvhti.pt = pt;
+                    ListView_HitTest(m_hResults, &lvhti);
+                    if ((lvhti.flags & LVHT_ONITEM) != 0)
+                    {
+                        selIndex = lvhti.iItem;
+                    }
+                    ClientToScreen(m_hResults, &pt);
+                }
+                if (selIndex < 0)
+                    break;
+
+                HMENU hPopup = CreatePopupMenu();
+                if (hPopup)
+                {
+                    OnOutOfScope(
+                        DestroyMenu(hPopup));
+                    ResString sFindAll(hRes, IDS_ADDTOQAT);
+                    AppendMenu(hPopup, MF_STRING, IDS_ADDTOQAT, sFindAll);
+                    auto cmd = TrackPopupMenu(hPopup, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, *this, nullptr);
+                    if (cmd == IDS_ADDTOQAT)
+                    {
+                        PROPVARIANT propvar;
+                        if (SUCCEEDED(g_pFramework->GetUICommandProperty(cmdQat, UI_PKEY_ItemsSource, &propvar)))
+                        {
+                            IUICollectionPtr pCollection = (IUICollection*)propvar.punkVal;
+                            if (pCollection)
+                            {
+                                const auto& data = m_results[selIndex];
+
+                                CAppUtils::AddCommandItem(pCollection, UI_COLLECTION_INVALIDINDEX, data.cmdId, UI_COMMANDTYPE_ACTION);
+                            }
+                        }
+                    }
+                }
+            }
         }
         break;
     }
