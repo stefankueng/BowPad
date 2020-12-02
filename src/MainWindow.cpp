@@ -494,7 +494,6 @@ void CMainWindow::ShowCommandPalette()
     m_commandPaletteDlg->ShowModeless(hRes, IDD_COMMANDPALETTE, *this, false);
     RECT thisRc{};
     GetClientRect(*m_commandPaletteDlg, &thisRc);
-    m_commandPaletteDlg->ClearFilterText();
     RECT pos{};
     pos.left   = treeWidth + marginx + rect.left;
     pos.top    = tabrc.bottom + marginy + rect.top;
@@ -505,6 +504,7 @@ void CMainWindow::ShowCommandPalette()
     SetWindowPos(*m_commandPaletteDlg, nullptr,
                  pos.left, pos.top, pos.right - pos.left, pos.bottom - pos.top,
                  flags);
+    m_commandPaletteDlg->ClearFilterText();
 }
 
 std::wstring CMainWindow::GetAppName() const

@@ -47,6 +47,7 @@ void CCommandPaletteDlg::ClearFilterText()
 {
     SetWindowText(m_hFilter, L"");
     FillResults();
+    SetFocus(m_hFilter);
 }
 
 LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
