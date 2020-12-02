@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -138,17 +138,13 @@ HRESULT HandleItemsSource(const PROPVARIANT* ppropvarCurrentValue, bool ignoreUT
     if (codepages.empty())
         EnumSystemCodePages(CodePageEnumerator, CP_INSTALLED);
 
-    IUIImagePtr pImg;
-    hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
-    CAppUtils::FailedShowMessage(hr); // Report any problem, don't let it stop us.
-
     // populate the dropdown with the code pages
     for (const auto& cp : codepages)
     {
         if (ignoreUTF8BOM && cp.bom && cp.name.compare(L"UTF-8 BOM") == 0)
             continue;
 
-        CAppUtils::AddStringItem(pCollection, cp.name.c_str(), cp.category, pImg);
+        CAppUtils::AddStringItem(pCollection, cp.name.c_str(), cp.category, nullptr);
     }
     return S_OK;
 }
@@ -232,7 +228,9 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
     }
     else if (key == UI_PKEY_ItemsSource)
     {
-        return HandleItemsSource(ppropvarCurrentValue, true);
+        auto hr = HandleItemsSource(ppropvarCurrentValue, true);
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+        return hr;
     }
     else if (key == UI_PKEY_Enabled)
     {

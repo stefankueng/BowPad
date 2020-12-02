@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2018 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@
 
 #include <fstream>
 
-
 namespace
 {
 // Global but not externally accessible.
@@ -36,10 +35,10 @@ std::vector<std::wstring> gLanguages;
 std::vector<std::wstring> gRemotes;
 
 const int CAT_LANGS_AVAILABLE = 0;
-const int CAT_LANGS_REMOTE = 1;
-};
+const int CAT_LANGS_REMOTE    = 1;
+}; // namespace
 
-HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
 {
     HRESULT hr = E_FAIL;
 
@@ -66,24 +65,19 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
             return hr;
         pCollection->Clear();
 
-        IUIImagePtr pImg;
-        hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY),pImg);
-        // Don't worry if it failed. Show list without images.
-        CAppUtils::FailedShowMessage(hr);
-
         gLanguages.clear();
 
         // English as the first language, always installed
-        CAppUtils::AddStringItem(pCollection, L"English", CAT_LANGS_AVAILABLE, pImg);
+        CAppUtils::AddStringItem(pCollection, L"English", CAT_LANGS_AVAILABLE, nullptr);
         gLanguages.push_back(L"");
 
         std::wstring path = CAppUtils::GetDataPath();
         CDirFileEnum enumerator(path);
         std::wstring respath;
-        bool bIsDir = false;
+        bool         bIsDir = false;
         while (enumerator.NextFile(respath, &bIsDir, false))
         {
-            if (bIsDir) // Only interested in files.
+            if (bIsDir)   // Only interested in files.
                 continue; // Continue on to the next, save indentation.
 
             // Only interested in files that match BowPad*_*.lang, to extract the
@@ -97,14 +91,14 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
             // If not, alert attention to any problems if in testing or diagnostic
             // mode but otherwise we'll just ignore the files.
             std::wstring filename = CPathUtils::GetFileNameWithoutExtension(respath);
-            auto pos = filename.find_last_of(L'_');
+            auto         pos      = filename.find_last_of(L'_');
             if (pos == std::wstring::npos) // No "_"
             {
                 APPVERIFY(false);
                 continue;
             }
             // Extract the locale name, note the extension is already removed.
-            std::wstring sLocale = filename.substr(pos+1);
+            std::wstring sLocale = filename.substr(pos + 1);
             if (sLocale.empty()) // Just BowPad_, no language name.
             {
                 APPVERIFY(false);
@@ -121,7 +115,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
             auto langbuf = std::make_unique<wchar_t[]>(len);
             if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langbuf.get(), len))
             {
-                CAppUtils::AddStringItem(pCollection, langbuf.get(), CAT_LANGS_AVAILABLE, pImg);
+                CAppUtils::AddStringItem(pCollection, langbuf.get(), CAT_LANGS_AVAILABLE, nullptr);
                 gLanguages.push_back(sLocale);
             }
         }
@@ -129,7 +123,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         if (gRemotes.empty())
         {
             // Dummy entry for fetching the remote language list
-            CAppUtils::AddResStringItem(pCollection, IDS_LANGUAGE_FETCH, CAT_LANGS_REMOTE, pImg);
+            CAppUtils::AddResStringItem(pCollection, IDS_LANGUAGE_FETCH, CAT_LANGS_REMOTE, nullptr);
             gLanguages.push_back(L"*");
         }
         else
@@ -143,11 +137,13 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
                 auto langbuf = std::make_unique<wchar_t[]>(len);
                 if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langbuf.get(), len))
                 {
-                    CAppUtils::AddStringItem(pCollection, langbuf.get(), CAT_LANGS_AVAILABLE, pImg);
+                    CAppUtils::AddStringItem(pCollection, langbuf.get(), CAT_LANGS_AVAILABLE, nullptr);
                     gLanguages.push_back(sLocale);
                 }
             }
         }
+
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
 
         return S_OK;
     }
@@ -160,7 +156,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
         {
             for (size_t i = 0; i < gLanguages.size(); ++i)
             {
-                if (_wcsicmp(gLanguages[i].c_str(), lang.c_str())==0)
+                if (_wcsicmp(gLanguages[i].c_str(), lang.c_str()) == 0)
                 {
                     hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
                     break;
@@ -177,13 +173,13 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const
     return E_NOTIMPL;
 }
 
-HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ )
+HRESULT CCmdLanguage::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
     HRESULT hr = E_FAIL;
 
     if (verb == UI_EXECUTIONVERB_EXECUTE)
     {
-        if ( key && *key == UI_PKEY_SelectedItem)
+        if (key && *key == UI_PKEY_SelectedItem)
         {
             UINT selected;
             hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
@@ -194,7 +190,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
                 std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
 
                 std::wstring sLangURL = CStringUtils::Format(L"https://github.com/stefankueng/BowPad/raw/%d.%d.%d/Languages/Languages.txt", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO);
-                HRESULT res = URLDownloadToFile(nullptr, sLangURL.c_str(), tempfile.c_str(), 0, nullptr);
+                HRESULT      res      = URLDownloadToFile(nullptr, sLangURL.c_str(), tempfile.c_str(), 0, nullptr);
                 if (res == S_OK)
                 {
                     std::wifstream fin(tempfile);
@@ -228,7 +224,7 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
                 {
                     DeleteFile(langfile.c_str());
                     std::wstring sLangURL = CStringUtils::Format(L"https://github.com/stefankueng/BowPad/raw/%d.%d.%d/Languages/%s/BowPad_%s.lang", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, LANGPLAT, gLanguages[selected].c_str());
-                    HRESULT res = URLDownloadToFile(nullptr, sLangURL.c_str(), langfile.c_str(), 0, nullptr);
+                    HRESULT      res      = URLDownloadToFile(nullptr, sLangURL.c_str(), langfile.c_str(), 0, nullptr);
                     if (FAILED(res))
                     {
                         ResString sLangLoadFailed(hRes, IDS_LANGUAGE_DOWNLOADFAILEDFILE);
@@ -245,4 +241,3 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PRO
     }
     return hr;
 }
-

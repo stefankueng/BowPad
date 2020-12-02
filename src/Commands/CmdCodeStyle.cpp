@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -70,17 +70,16 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
         if (langs.empty())
             langs = CLexStyles::Instance().GetLanguages();
 
-        IUIImagePtr pImg;
-        hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
         // Not a concern if it fails, just show the list without images.
         CAppUtils::FailedShowMessage(hr);
         // populate the dropdown with the code pages
         for (const auto& lang : langs)
         {
             int catId = lang.c_str()[0] - 'A';
-            CAppUtils::AddStringItem(pCollection, lang.c_str(), catId, pImg);
+            CAppUtils::AddStringItem(pCollection, lang.c_str(), catId, nullptr);
         }
         hr = S_OK;
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
     }
     else if (key == UI_PKEY_SelectedItem)
     {

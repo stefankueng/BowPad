@@ -723,9 +723,6 @@
     <Image Include="res\unsaved.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\empty.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="res\BowPad_elevated.ico">
       <Filter>Resource Files</Filter>
     </Image>
@@ -757,9 +754,6 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\EditorConfigInactive.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\emptyChecked.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

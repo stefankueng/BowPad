@@ -91,6 +91,8 @@ HRESULT CCmdTabList::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
 
         PopulateMenu(collection);
 
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+
         return hr;
     }
     else if (key == UI_PKEY_SelectedItem)
@@ -135,12 +137,6 @@ bool CCmdTabList::IsServiceAvailable() const
 // Not a good enough reason not to show the menu though.
 bool CCmdTabList::PopulateMenu(IUICollectionPtr& collection)
 {
-    IUIImagePtr pImg;
-    HRESULT     hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
-    // If image creation fails we can't do much about it other than report it.
-    // Images aren't essential, so try to continue without them if we need to.
-    CAppUtils::FailedShowMessage(hr);
-
     int tabCount = GetTabCount();
     for (int i = 0; i < tabCount; ++i)
     {
@@ -169,7 +165,7 @@ bool CCmdTabList::PopulateMenu(IUICollectionPtr& collection)
                                         tabInfo.title.c_str(),
                                         pathBuf);
         }
-        hr = CAppUtils::AddStringItem(collection, text.c_str(), -1, pImg);
+        auto hr = CAppUtils::AddStringItem(collection, text.c_str(), -1, nullptr);
         // If we can't add one, assume we can't add any more so quit
         // not to avoid spamming the user with a sequence of errors.
         if (FAILED(hr))

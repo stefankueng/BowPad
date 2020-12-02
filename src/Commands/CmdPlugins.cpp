@@ -56,33 +56,6 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
         if (FAILED(hr))
             return hr;
 
-        // Load the bitmap from the resource file.
-        IUIImagePtr pImg;
-        HBITMAP hbm = (HBITMAP)LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDB_EMPTY), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-        if (hbm)
-        {
-            // Use the factory implemented by the framework to produce an IUIImage.
-            hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_TRANSFER, &pImg);
-            if (FAILED(hr))
-            {
-                DeleteObject(hbm);
-            }
-        }
-        IUIImagePtr pImgChecked;
-        hbm = (HBITMAP)LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDB_EMPTYCHECKED), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-        if (hbm)
-        {
-            // Use the factory implemented by the framework to produce an IUIImage.
-            hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_TRANSFER, &pImgChecked);
-            if (FAILED(hr))
-            {
-                DeleteObject(hbm);
-            }
-        }
-
-        if (FAILED(hr))
-            return hr;
-
         const auto& plugins = CCommandHandler::Instance().GetPluginMap();
         if (plugins.empty())
         {
@@ -100,6 +73,7 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
                 CAppUtils::AddCommandItem(pCollection, UI_COLLECTION_INVALIDINDEX, p.first, UI_COMMANDTYPE_ACTION);
             }
         }
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
         hr = S_OK;
     }
     return hr;

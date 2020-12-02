@@ -60,7 +60,6 @@
 #define IDS_LANGUAGE_DOWNLOADOK         140
 #define IDR_SHORTCUTS                   141
 #define IDS_LANGUAGE_DOWNLOADFAILEDFILE 141
-#define IDB_EMPTY                       142
 #define IDS_CUSTOMCOMMANDSINFO          142
 #define IDD_FINDREPLACEDLG              143
 #define IDS_FINDRETRYWRAP               143
@@ -200,7 +199,6 @@
 #define IDI_EDITORCONFIGINACTIVE        245
 #define IDS_CORRESPONDING_FILE_ERR_FILEEXISTS 246
 #define IDB_BITMAP1                     246
-#define IDB_EMPTYCHECKED                246
 #define IDS_FETCHING_PLUGINS_LIST       247
 #define IDD_REGEXCAPTUREDLG             247
 #define IDS_NO_PLUGINS_AVAILABLE        248

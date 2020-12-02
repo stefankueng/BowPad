@@ -397,10 +397,6 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, 
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
 
-        IUIImagePtr pImg;
-        hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
-        // Not a concern if it fails, just show the list without images.
-        CAppUtils::FailedShowMessage(hr);
         // populate the dropdown with the languages
         wchar_t buf[1024] = {};
         for (const auto& lang : g_languages)
@@ -410,16 +406,17 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, 
                 int catId = buf[0] - 'A';
                 if (catId > 26)
                     catId = buf[0] - 'a';
-                CAppUtils::AddStringItem(pCollection, buf, catId, pImg);
+                CAppUtils::AddStringItem(pCollection, buf, catId, nullptr);
             }
             else
             {
                 int catId = lang[0] - 'A';
                 if (catId > 26)
                     catId = lang[0] - 'a';
-                CAppUtils::AddStringItem(pCollection, lang.c_str(), catId, pImg);
+                CAppUtils::AddStringItem(pCollection, lang.c_str(), catId, nullptr);
             }
         }
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
         hr = S_OK;
     }
     else if (key == UI_PKEY_SelectedItem)
@@ -517,10 +514,6 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
         // The list will retain whatever from last time so clear it.
         pCollection->Clear();
 
-        IUIImagePtr pImg;
-        hr = CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), pImg);
-        // Not a concern if it fails, just show the list without images.
-        CAppUtils::FailedShowMessage(hr);
         // populate the dropdown with the suggestions
         if (g_SpellChecker)
         {
@@ -545,7 +538,7 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
                     if (S_OK == hr)
                     {
                         m_suggestions.push_back(suggestion);
-                        CAppUtils::AddStringItem(pCollection, suggestion, 0, pImg);
+                        CAppUtils::AddStringItem(pCollection, suggestion, 0, nullptr);
 
                         CoTaskMemFree(suggestion);
                     }
@@ -555,16 +548,17 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
         if (m_suggestions.empty())
         {
             ResString sNoSuggestions(hRes, IDS_SPELLCHECK_NOSUGGESTIONS);
-            CAppUtils::AddStringItem(pCollection, sNoSuggestions, 0, pImg);
+            CAppUtils::AddStringItem(pCollection, sNoSuggestions, 0, nullptr);
         }
         else
         {
             ResString sIgnoreSession(hRes, IDS_SPELLCHECK_IGNORESESSION);
             ResString sAddToDictionary(hRes, IDS_SPELLCHECK_ADDTODICTIONARY);
 
-            CAppUtils::AddStringItem(pCollection, sIgnoreSession, 1, pImg);
-            CAppUtils::AddStringItem(pCollection, sAddToDictionary, 1, pImg);
+            CAppUtils::AddStringItem(pCollection, sIgnoreSession, 1, nullptr);
+            CAppUtils::AddStringItem(pCollection, sAddToDictionary, 1, nullptr);
         }
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
 
         hr = S_OK;
     }
