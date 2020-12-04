@@ -43,6 +43,7 @@
 #include "Windows10Colors.h"
 #include "DarkModeHelper.h"
 #include "DPIAware.h"
+#include "Monitor.h"
 #include "../ext/tinyexpr/tinyexpr.h"
 
 #include <memory>
@@ -575,7 +576,8 @@ bool CMainWindow::RegisterAndCreateWindow()
             // which will show those controls again.
             ShowWindow(m_TabBar, SW_HIDE);
             ShowWindow(m_StatusBar, SW_HIDE);
-            CIniSettings::Instance().RestoreWindowPos(L"MainWindow", *this, 0);
+            std::wstring winPosKey = L"MainWindow_" + GetMonitorSetupHash();
+            CIniSettings::Instance().RestoreWindowPos(winPosKey.c_str(), *this, 0);
             UpdateWindow(*this);
             m_editor.StartupDone();
             PostMessage(m_hwnd, WM_AFTERINIT, 0, 0);
@@ -722,7 +724,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             // Close all tabs, don't leave any open even a blank one.
             if (CloseAllTabs(true))
             {
-                CIniSettings::Instance().SaveWindowPos(L"MainWindow", *this);
+                std::wstring winPosKey = L"MainWindow_" + GetMonitorSetupHash();
+                CIniSettings::Instance().SaveWindowPos(winPosKey.c_str(), *this);
                 ::DestroyWindow(m_hwnd);
             }
             break;

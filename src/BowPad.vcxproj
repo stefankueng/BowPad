@@ -324,10 +324,12 @@
     <ClInclude Include="..\ext\sktoolslib\EscapeUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\FormatMessageWrapper.h" />
     <ClInclude Include="..\ext\sktoolslib\GDIHelpers.h" />
+    <ClInclude Include="..\ext\sktoolslib\Hash.h" />
     <ClInclude Include="..\ext\sktoolslib\hyperlink.h" />
     <ClInclude Include="..\ext\sktoolslib\IniSettings.h" />
     <ClInclude Include="..\ext\sktoolslib\JumpListHelpers.h" />
     <ClInclude Include="..\ext\sktoolslib\Language.h" />
+    <ClInclude Include="..\ext\sktoolslib\Monitor.h" />
     <ClInclude Include="..\ext\sktoolslib\OnOutOfScope.h" />
     <ClInclude Include="..\ext\sktoolslib\PathUtils.h" />
     <ClInclude Include="..\ext\sktoolslib\PreserveChdir.h" />
@@ -449,10 +451,12 @@
     <ClCompile Include="..\ext\sktoolslib\DownloadFile.cpp" />
     <ClCompile Include="..\ext\sktoolslib\EscapeUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\GDIHelpers.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\Hash.cpp" />
     <ClCompile Include="..\ext\sktoolslib\hyperlink.cpp" />
     <ClCompile Include="..\ext\sktoolslib\IniSettings.cpp" />
     <ClCompile Include="..\ext\sktoolslib\JumpListHelpers.cpp" />
     <ClCompile Include="..\ext\sktoolslib\Language.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\Monitor.cpp" />
     <ClCompile Include="..\ext\sktoolslib\PathUtils.cpp" />
     <ClCompile Include="..\ext\sktoolslib\PreserveChdir.cpp" />
     <ClCompile Include="..\ext\sktoolslib\ProgressDlg.cpp" />

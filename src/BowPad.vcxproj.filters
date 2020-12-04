@@ -390,6 +390,12 @@
     <ClInclude Include="TabBtn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\Monitor.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\Hash.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -694,6 +700,12 @@
     </ClCompile>
     <ClCompile Include="CommandPaletteDlg.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\Hash.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\Monitor.cpp">
+      <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
