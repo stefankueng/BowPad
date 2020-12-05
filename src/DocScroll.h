@@ -60,7 +60,7 @@ public:
     bool                        IsDirty() const { return m_bDirty; }
 private:
     void                        CalcLines();
-    void                        AnimateFraction(IUIAnimationVariablePtr animVar, double endVal);
+    void                        AnimateFraction(AnimationVariable& animVar, double endVal);
 
 
     std::map<size_t, COLORREF>                  m_visibleLineColors[DOCSCROLLTYPE_END];
@@ -73,12 +73,12 @@ private:
     bool                                        m_bDirty;
     ULONG_PTR                                   m_gdiplusToken;
 
-    IUIAnimationVariablePtr                     m_AnimVarHL;
-    IUIAnimationVariablePtr                     m_AnimVarHR;
-    IUIAnimationVariablePtr                     m_AnimVarHT;
-    IUIAnimationVariablePtr                     m_AnimVarVL;
-    IUIAnimationVariablePtr                     m_AnimVarVR;
-    IUIAnimationVariablePtr                     m_AnimVarVT;
+    AnimationVariable                           m_AnimVarHL;
+    AnimationVariable                           m_AnimVarHR;
+    AnimationVariable                           m_AnimVarHT;
+    AnimationVariable                           m_AnimVarVL;
+    AnimationVariable                           m_AnimVarVR;
+    AnimationVariable                           m_AnimVarVT;
     bool                                        m_bHotHL;
     bool                                        m_bHotHR;
     bool                                        m_bHotHT;

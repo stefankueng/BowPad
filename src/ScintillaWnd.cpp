@@ -106,10 +106,10 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
         m_hasConsolas = true;
     }
 
-    m_animVarGrayFore   = Animator::Instance().CreateAnimationVariable(color_folding_fore_inactive);
-    m_animVarGrayBack   = Animator::Instance().CreateAnimationVariable(color_folding_back_inactive);
-    m_animVarGraySel    = Animator::Instance().CreateAnimationVariable(color_folding_backsel_inactive);
-    m_animVarGrayLineNr = Animator::Instance().CreateAnimationVariable(color_linenr_inactive);
+    m_animVarGrayFore   = Animator::Instance().CreateAnimationVariable(color_folding_fore_inactive, color_folding_fore_active);
+    m_animVarGrayBack   = Animator::Instance().CreateAnimationVariable(color_folding_back_inactive, color_folding_back_active);
+    m_animVarGraySel    = Animator::Instance().CreateAnimationVariable(color_folding_backsel_inactive, color_folding_backsel_active);
+    m_animVarGrayLineNr = Animator::Instance().CreateAnimationVariable(color_linenr_inactive, color_linenr_active);
 }
 
 CScintillaWnd::~CScintillaWnd()
@@ -479,17 +479,31 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                     if (!m_bInFolderMargin)
                     {
                         // animate the colors of the folder margin lines and symbols
-                        auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_active);
-                        auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_active);
-                        auto transSel  = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_active);
-                        auto transNr   = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_active);
+                        auto transFore = Animator::Instance().CreateLinearTransition(m_animVarGrayFore, folding_color_animation_time, color_folding_fore_active);
+                        auto transBack = Animator::Instance().CreateLinearTransition(m_animVarGrayBack, folding_color_animation_time, color_folding_back_active);
+                        auto transSel  = Animator::Instance().CreateLinearTransition(m_animVarGraySel, folding_color_animation_time, color_folding_backsel_active);
+                        auto transNr   = Animator::Instance().CreateLinearTransition(m_animVarGrayLineNr, folding_color_animation_time, color_linenr_active);
 
-                        auto storyBoard = Animator::Instance().CreateStoryBoard();
-                        storyBoard->AddTransition(m_animVarGrayFore, transFore);
-                        storyBoard->AddTransition(m_animVarGrayBack, transBack);
-                        storyBoard->AddTransition(m_animVarGraySel, transSel);
-                        storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
-                        Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                        if (transFore && transBack && transSel && transNr)
+                        {
+                            auto storyBoard = Animator::Instance().CreateStoryBoard();
+                            storyBoard->AddTransition(m_animVarGrayFore.m_animVar, transFore);
+                            storyBoard->AddTransition(m_animVarGrayBack.m_animVar, transBack);
+                            storyBoard->AddTransition(m_animVarGraySel.m_animVar, transSel);
+                            storyBoard->AddTransition(m_animVarGrayLineNr.m_animVar, transNr);
+                            Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                                auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
+                                auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
+                                auto sb = Animator::GetIntegerValue(m_animVarGraySel);
+                                auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
+                                SetupFoldingColors(RGB(gf, gf, gf),
+                                                   RGB(gb, gb, gb),
+                                                   RGB(sb, sb, sb));
+                                Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                            });
+                        }
+                        else
+                        {
                             auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
                             auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
                             auto sb = Animator::GetIntegerValue(m_animVarGraySel);
@@ -498,7 +512,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                                                RGB(gb, gb, gb),
                                                RGB(sb, sb, sb));
                             Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
-                        });
+                        }
 
                         m_bInFolderMargin   = true;
                         TRACKMOUSEEVENT tme = {0};
@@ -513,17 +527,31 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                     if (m_bInFolderMargin)
                     {
                         // animate the colors of the folder margin lines and symbols
-                        auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_inactive);
-                        auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_inactive);
-                        auto transSel  = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_inactive);
-                        auto transNr   = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_inactive);
+                        auto transFore = Animator::Instance().CreateLinearTransition(m_animVarGrayFore, folding_color_animation_time, color_folding_fore_inactive);
+                        auto transBack = Animator::Instance().CreateLinearTransition(m_animVarGrayBack, folding_color_animation_time, color_folding_back_inactive);
+                        auto transSel  = Animator::Instance().CreateLinearTransition(m_animVarGraySel, folding_color_animation_time, color_folding_backsel_inactive);
+                        auto transNr   = Animator::Instance().CreateLinearTransition(m_animVarGrayLineNr, folding_color_animation_time, color_linenr_inactive);
 
-                        auto storyBoard = Animator::Instance().CreateStoryBoard();
-                        storyBoard->AddTransition(m_animVarGrayFore, transFore);
-                        storyBoard->AddTransition(m_animVarGrayBack, transBack);
-                        storyBoard->AddTransition(m_animVarGraySel, transSel);
-                        storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
-                        Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                        if (transFore && transBack && transSel && transNr)
+                        {
+                            auto storyBoard = Animator::Instance().CreateStoryBoard();
+                            storyBoard->AddTransition(m_animVarGrayFore.m_animVar, transFore);
+                            storyBoard->AddTransition(m_animVarGrayBack.m_animVar, transBack);
+                            storyBoard->AddTransition(m_animVarGraySel.m_animVar, transSel);
+                            storyBoard->AddTransition(m_animVarGrayLineNr.m_animVar, transNr);
+                            Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                                auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
+                                auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
+                                auto sb = Animator::GetIntegerValue(m_animVarGraySel);
+                                auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
+                                SetupFoldingColors(RGB(gf, gf, gf),
+                                                   RGB(gb, gb, gb),
+                                                   RGB(sb, sb, sb));
+                                Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                            });
+                        }
+                        else
+                        {
                             auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
                             auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
                             auto sb = Animator::GetIntegerValue(m_animVarGraySel);
@@ -532,7 +560,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                                                RGB(gb, gb, gb),
                                                RGB(sb, sb, sb));
                             Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
-                        });
+                        }
                         m_bInFolderMargin = false;
                     }
                 }
@@ -549,17 +577,31 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
             if (m_bInFolderMargin)
             {
                 // animate the colors of the folder margin lines and symbols
-                auto transFore = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_fore_inactive);
-                auto transBack = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_back_inactive);
-                auto transSel  = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_folding_backsel_inactive);
-                auto transNr   = Animator::Instance().CreateLinearTransition(folding_color_animation_time, color_linenr_inactive);
+                auto transFore = Animator::Instance().CreateLinearTransition(m_animVarGrayFore, folding_color_animation_time, color_folding_fore_inactive);
+                auto transBack = Animator::Instance().CreateLinearTransition(m_animVarGrayBack, folding_color_animation_time, color_folding_back_inactive);
+                auto transSel  = Animator::Instance().CreateLinearTransition(m_animVarGraySel, folding_color_animation_time, color_folding_backsel_inactive);
+                auto transNr   = Animator::Instance().CreateLinearTransition(m_animVarGrayLineNr, folding_color_animation_time, color_linenr_inactive);
 
-                auto storyBoard = Animator::Instance().CreateStoryBoard();
-                storyBoard->AddTransition(m_animVarGrayFore, transFore);
-                storyBoard->AddTransition(m_animVarGrayBack, transBack);
-                storyBoard->AddTransition(m_animVarGraySel, transSel);
-                storyBoard->AddTransition(m_animVarGrayLineNr, transNr);
-                Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                if (transFore && transBack && transSel && transNr)
+                {
+                    auto storyBoard = Animator::Instance().CreateStoryBoard();
+                    storyBoard->AddTransition(m_animVarGrayFore.m_animVar, transFore);
+                    storyBoard->AddTransition(m_animVarGrayBack.m_animVar, transBack);
+                    storyBoard->AddTransition(m_animVarGraySel.m_animVar, transSel);
+                    storyBoard->AddTransition(m_animVarGrayLineNr.m_animVar, transNr);
+                    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                        auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
+                        auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
+                        auto sb = Animator::GetIntegerValue(m_animVarGraySel);
+                        auto ln = Animator::GetIntegerValue(m_animVarGrayLineNr);
+                        SetupFoldingColors(RGB(gf, gf, gf),
+                                           RGB(gb, gb, gb),
+                                           RGB(sb, sb, sb));
+                        Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                    });
+                }
+                else
+                {
                     auto gf = Animator::GetIntegerValue(m_animVarGrayFore);
                     auto gb = Animator::GetIntegerValue(m_animVarGrayBack);
                     auto sb = Animator::GetIntegerValue(m_animVarGraySel);
@@ -568,7 +610,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                                        RGB(gb, gb, gb),
                                        RGB(sb, sb, sb));
                     Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
-                });
+                }
                 m_bInFolderMargin = false;
             }
         }

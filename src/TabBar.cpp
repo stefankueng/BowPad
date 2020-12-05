@@ -139,7 +139,7 @@ int CTabBar::InsertAtEnd(const wchar_t *subTabName)
         imageIndex = 0;
     tie.iImage          = TABBAR_SHOWDISKICON ? imageIndex : 0;
     tie.pszText         = const_cast<wchar_t *>(subTabName);
-    m_animVars[m_tabID] = Animator::Instance().CreateAnimationVariable(1.0);
+    m_animVars[m_tabID] = Animator::Instance().CreateAnimationVariable(1.0, 1.0);
     tie.lParam          = m_tabID++;
     int index           = TabCtrl_InsertItem(*this, m_nItems++, &tie);
     // if this is the first item added to the tab bar, it is automatically
@@ -161,7 +161,7 @@ int CTabBar::InsertAfter(int index, const wchar_t *subTabName)
         imgindex = 0;
     tie.iImage          = TABBAR_SHOWDISKICON ? imgindex : 0;
     tie.pszText         = const_cast<wchar_t *>(subTabName);
-    m_animVars[m_tabID] = Animator::Instance().CreateAnimationVariable(1.0);
+    m_animVars[m_tabID] = Animator::Instance().CreateAnimationVariable(1.0, 1.0);
     tie.lParam          = m_tabID++;
     if ((index + 1) >= m_nItems)
         index = m_nItems - 1;
@@ -704,30 +704,45 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 {
                     if (oldIndex != -1)
                     {
-                        auto transHot   = Animator::Instance().CreateLinearTransition(0.3, 1.0);
+                        auto transHot   = Animator::Instance().CreateLinearTransition(m_animVars[GetIDFromIndex(oldIndex).GetValue()], 0.3, 1.0);
                         auto storyBoard = Animator::Instance().CreateStoryBoard();
-                        storyBoard->AddTransition(m_animVars[GetIDFromIndex(oldIndex).GetValue()], transHot);
-                        Animator::Instance().RunStoryBoard(storyBoard, [hwnd, oldRect]() {
+                        if (storyBoard && transHot)
+                        {
+                            storyBoard->AddTransition(m_animVars[GetIDFromIndex(oldIndex).GetValue()].m_animVar, transHot);
+                            Animator::Instance().RunStoryBoard(storyBoard, [hwnd, oldRect]() {
+                                InvalidateRect(hwnd, &oldRect, FALSE);
+                            });
+                        }
+                        else
                             InvalidateRect(hwnd, &oldRect, FALSE);
+                    }
+                    auto transHot   = Animator::Instance().CreateLinearTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], 0.1, hoverFraction);
+                    auto storyBoard = Animator::Instance().CreateStoryBoard();
+                    if (storyBoard && transHot)
+                    {
+                        storyBoard->AddTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()].m_animVar, transHot);
+                        Animator::Instance().RunStoryBoard(storyBoard, [hwnd, this]() {
+                            InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
                         });
                     }
-                    auto transHot   = Animator::Instance().CreateLinearTransition(0.1, hoverFraction);
-                    auto storyBoard = Animator::Instance().CreateStoryBoard();
-                    storyBoard->AddTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], transHot);
-                    Animator::Instance().RunStoryBoard(storyBoard, [hwnd, this]() {
+                    else
                         InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
-                    });
                 }
             }
             else if (m_currentHoverTabItem != index)
             {
-                auto transHot   = Animator::Instance().CreateLinearTransition(0.3, 1.0);
+                auto transHot   = Animator::Instance().CreateLinearTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], 0.3, 1.0);
                 auto storyBoard = Animator::Instance().CreateStoryBoard();
-                storyBoard->AddTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], transHot);
-                auto animRect = m_currentHoverTabRect;
-                Animator::Instance().RunStoryBoard(storyBoard, [hwnd, animRect]() {
-                    InvalidateRect(hwnd, &animRect, FALSE);
-                });
+                if (storyBoard && transHot)
+                {
+                    storyBoard->AddTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()].m_animVar, transHot);
+                    auto animRect = m_currentHoverTabRect;
+                    Animator::Instance().RunStoryBoard(storyBoard, [hwnd, animRect]() {
+                        InvalidateRect(hwnd, &animRect, FALSE);
+                    });
+                }
+                else
+                    InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
                 m_currentHoverTabItem = index;
             }
         }
@@ -740,13 +755,18 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             tme.hwndTrack       = *this;
             TrackMouseEvent(&tme);
             m_bIsCloseHover = false;
-            auto transHot   = Animator::Instance().CreateLinearTransition(0.3, 1.0);
+            auto transHot   = Animator::Instance().CreateLinearTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], 0.3, 1.0);
             auto storyBoard = Animator::Instance().CreateStoryBoard();
-            storyBoard->AddTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], transHot);
-            auto oldRect = m_currentHoverTabRect;
-            Animator::Instance().RunStoryBoard(storyBoard, [hwnd, oldRect]() {
-                InvalidateRect(hwnd, &oldRect, FALSE);
-            });
+            if (storyBoard && transHot)
+            {
+                storyBoard->AddTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()].m_animVar, transHot);
+                auto oldRect = m_currentHoverTabRect;
+                Animator::Instance().RunStoryBoard(storyBoard, [hwnd, oldRect]() {
+                    InvalidateRect(hwnd, &oldRect, FALSE);
+                });
+            }
+            else
+                InvalidateRect(hwnd, &m_currentHoverTabRect, FALSE);
             m_currentHoverTabItem = -1;
         }
         break;

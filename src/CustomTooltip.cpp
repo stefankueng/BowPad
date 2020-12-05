@@ -93,25 +93,35 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
                  rc.right + BORDER + BORDER, rc.bottom + BORDER + BORDER,
                  SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW);
 
-    auto transAlpha = Animator::Instance().CreateLinearTransition(0.3, 255);
+    auto transAlpha = Animator::Instance().CreateLinearTransition(m_AnimVarAlpha, 0.3, 255);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
-    storyBoard->AddTransition(m_AnimVarAlpha, transAlpha);
-    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+    if (storyBoard && transAlpha)
+    {
+        storyBoard->AddTransition(m_AnimVarAlpha.m_animVar, transAlpha);
+        Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+            SetTransparency((BYTE)Animator::GetIntegerValue(m_AnimVarAlpha));
+        });
+    }
+    else
         SetTransparency((BYTE)Animator::GetIntegerValue(m_AnimVarAlpha));
-    });
 }
 
 void CCustomToolTip::HideTip()
 {
-    auto transAlpha = Animator::Instance().CreateLinearTransition(0.5, 0);
+    auto transAlpha = Animator::Instance().CreateLinearTransition(m_AnimVarAlpha, 0.5, 0);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
-    storyBoard->AddTransition(m_AnimVarAlpha, transAlpha);
-    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
-        auto alpha = Animator::GetIntegerValue(m_AnimVarAlpha);
-        SetTransparency((BYTE)alpha);
-        if (alpha == 0)
-            ShowWindow(*this, SW_HIDE);
-    });
+    if (storyBoard && transAlpha)
+    {
+        storyBoard->AddTransition(m_AnimVarAlpha.m_animVar, transAlpha);
+        Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+            auto alpha = Animator::GetIntegerValue(m_AnimVarAlpha);
+            SetTransparency((BYTE)alpha);
+            if (alpha == 0)
+                ShowWindow(*this, SW_HIDE);
+        });
+    }
+    else
+        SetTransparency((BYTE)Animator::GetIntegerValue(m_AnimVarAlpha));
 }
 
 void CCustomToolTip::OnPaint(HDC hdc, RECT* pRc)

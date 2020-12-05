@@ -138,7 +138,7 @@ private:
     wchar_t                     m_closeChar;
     wchar_t                     m_modifiedChar;
 
-    std::map<int, IUIAnimationVariablePtr>  m_animVars;
+    std::map<int, AnimationVariable>  m_animVars;
 
     ULONG_PTR                   gdiplusToken;
 };

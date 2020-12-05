@@ -131,12 +131,17 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
             {
                 if ((Button_GetState(*this) & BST_HOT) == 0)
                 {
-                    auto transHot   = Animator::Instance().CreateLinearTransition(0.3, 1.0);
+                    auto transHot   = Animator::Instance().CreateLinearTransition(m_AnimVarHot, 0.3, 1.0);
                     auto storyBoard = Animator::Instance().CreateStoryBoard();
-                    storyBoard->AddTransition(m_AnimVarHot, transHot);
-                    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                    if (storyBoard && transHot)
+                    {
+                        storyBoard->AddTransition(m_AnimVarHot.m_animVar, transHot);
+                        Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                            InvalidateRect(*this, nullptr, false);
+                        });
+                    }
+                    else
                         InvalidateRect(*this, nullptr, false);
-                    });
                     TRACKMOUSEEVENT tme = {sizeof(tme)};
                     tme.dwFlags         = TME_LEAVE;
                     tme.hwndTrack       = hwnd;
@@ -153,12 +158,17 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 TrackMouseEvent(&tme);
                 if ((Button_GetState(*this) & BST_HOT) != 0)
                 {
-                    auto transHot   = Animator::Instance().CreateLinearTransition(0.5, 0.0);
+                    auto transHot   = Animator::Instance().CreateLinearTransition(m_AnimVarHot, 0.5, 0.0);
                     auto storyBoard = Animator::Instance().CreateStoryBoard();
-                    storyBoard->AddTransition(m_AnimVarHot, transHot);
-                    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                    if (storyBoard && transHot)
+                    {
+                        storyBoard->AddTransition(m_AnimVarHot.m_animVar, transHot);
+                        Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                            InvalidateRect(*this, nullptr, false);
+                        });
+                    }
+                    else
                         InvalidateRect(*this, nullptr, false);
-                    });
                 }
             }
         }

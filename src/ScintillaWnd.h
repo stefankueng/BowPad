@@ -158,8 +158,8 @@ private:
     bool                    m_hasConsolas;
     sptr_t                  m_LineToScrollToAfterPaint;
     sptr_t                  m_WrapOffsetToScrollToAfterPaint;
-    IUIAnimationVariablePtr m_animVarGrayFore;
-    IUIAnimationVariablePtr m_animVarGrayBack;
-    IUIAnimationVariablePtr m_animVarGraySel;
-    IUIAnimationVariablePtr m_animVarGrayLineNr;
+    AnimationVariable       m_animVarGrayFore;
+    AnimationVariable       m_animVarGrayBack;
+    AnimationVariable       m_animVarGraySel;
+    AnimationVariable       m_animVarGrayLineNr;
 };

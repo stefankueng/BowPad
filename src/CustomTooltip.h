@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2017 - Stefan Kueng
+// Copyright (C) 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ public:
     CCustomToolTip(HINSTANCE hInst)
         : CWindow(hInst)
     {
-        m_AnimVarAlpha = Animator::Instance().CreateAnimationVariable(0);
+        m_AnimVarAlpha = Animator::Instance().CreateAnimationVariable(0, 1);
     }
     virtual ~CCustomToolTip()
     {
@@ -44,6 +44,6 @@ private:
     COLORREF        m_color = 0;
     HFONT           m_hFont = nullptr;
     bool            m_bShowColorBox = false;
-    IUIAnimationVariablePtr m_AnimVarAlpha;
+    AnimationVariable m_AnimVarAlpha;
 };
 

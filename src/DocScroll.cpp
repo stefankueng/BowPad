@@ -128,12 +128,12 @@ CDocScroll::CDocScroll()
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, nullptr);
 
-    m_AnimVarHL = Animator::Instance().CreateAnimationVariable(0.0);
-    m_AnimVarHR = Animator::Instance().CreateAnimationVariable(0.0);
-    m_AnimVarHT = Animator::Instance().CreateAnimationVariable(0.0);
-    m_AnimVarVL = Animator::Instance().CreateAnimationVariable(0.0);
-    m_AnimVarVR = Animator::Instance().CreateAnimationVariable(0.0);
-    m_AnimVarVT = Animator::Instance().CreateAnimationVariable(0.0);
+    m_AnimVarHL = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
+    m_AnimVarHR = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
+    m_AnimVarHT = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
+    m_AnimVarVL = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
+    m_AnimVarVR = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
+    m_AnimVarVT = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
 }
 
 void CDocScroll::InitScintilla(CScintillaWnd* pScintilla)
@@ -178,8 +178,8 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     bool hotNow = (pCustDraw->uState & CDIS_HOT) != 0;
                     if (m_bHotHL != hotNow)
                     {
-                        AnimateFraction(m_AnimVarHL, hotNow ? 1.0 : 0.0);
                         m_bHotHL = hotNow;
+                        AnimateFraction(m_AnimVarHL, hotNow ? 1.0 : 0.0);
                     }
                     auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarHL));
                     DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
@@ -191,8 +191,8 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     bool hotNow = (pCustDraw->uState & CDIS_HOT) != 0;
                     if (m_bHotHR != hotNow)
                     {
-                        AnimateFraction(m_AnimVarHR, hotNow ? 1.0 : 0.0);
                         m_bHotHR = hotNow;
+                        AnimateFraction(m_AnimVarHR, hotNow ? 1.0 : 0.0);
                     }
                     auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarHR));
                     DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
@@ -204,8 +204,8 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     bool hotNow = (pCustDraw->uState & CDIS_HOT) != 0;
                     if (m_bHotHT != hotNow)
                     {
-                        AnimateFraction(m_AnimVarHT, hotNow ? 1.0 : 0.0);
                         m_bHotHT = hotNow;
+                        AnimateFraction(m_AnimVarHT, hotNow ? 1.0 : 0.0);
                     }
                     auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarHT));
                     DrawThumb(pCustDraw->hdr.hwndFrom, pCustDraw->hdc, thumb, pCustDraw->rect, pCustDraw->nBar);
@@ -227,8 +227,8 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     bool hotNow = (pCustDraw->uState & CDIS_HOT) != 0;
                     if (m_bHotVL != hotNow)
                     {
-                        AnimateFraction(m_AnimVarVL, hotNow ? 1.0 : 0.0);
                         m_bHotVL = hotNow;
+                        AnimateFraction(m_AnimVarVL, hotNow ? 1.0 : 0.0);
                     }
                     auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarVL));
                     DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
@@ -240,8 +240,8 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     bool hotNow = (pCustDraw->uState & CDIS_HOT) != 0;
                     if (m_bHotVR != hotNow)
                     {
-                        AnimateFraction(m_AnimVarVR, hotNow ? 1.0 : 0.0);
                         m_bHotVR = hotNow;
+                        AnimateFraction(m_AnimVarVR, hotNow ? 1.0 : 0.0);
                     }
                     auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarVR));
                     DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
@@ -253,8 +253,8 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     bool hotNow = (pCustDraw->uState & CDIS_HOT) != 0;
                     if (m_bHotVT != hotNow)
                     {
-                        AnimateFraction(m_AnimVarVT, hotNow ? 1.0 : 0.0);
                         m_bHotVT = hotNow;
+                        AnimateFraction(m_AnimVarVT, hotNow ? 1.0 : 0.0);
                     }
                     auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarVT));
                     DrawThumb(pCustDraw->hdr.hwndFrom, pCustDraw->hdc, thumb, pCustDraw->rect, pCustDraw->nBar);
@@ -329,15 +329,21 @@ void CDocScroll::CalcLines()
     }
 }
 
-void CDocScroll::AnimateFraction(IUIAnimationVariablePtr animVar, double endVal)
+void CDocScroll::AnimateFraction(AnimationVariable& animVar, double endVal)
 {
-    auto transHot   = Animator::Instance().CreateLinearTransition(0.3, endVal);
+    auto transHot   = Animator::Instance().CreateLinearTransition(animVar, 0.3, endVal);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
-    storyBoard->AddTransition(animVar, transHot);
-    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+    if (storyBoard && transHot)
+    {
+        storyBoard->AddTransition(animVar.m_animVar, transHot);
+        Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+            SetWindowPos(*m_pScintilla, 0, 0, 0, 0, 0,
+                         SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
+        });
+    }
+    else
         SetWindowPos(*m_pScintilla, 0, 0, 0, 0, 0,
                      SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
-    });
 }
 
 void CDocScroll::AddLineColor(int type, size_t line, COLORREF clr)

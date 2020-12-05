@@ -29,7 +29,7 @@ public :
         , m_textcolorset(false)
         , m_textcolor(0)
     {
-        m_AnimVarHot = Animator::Instance().CreateAnimationVariable(0.0);
+        m_AnimVarHot = Animator::Instance().CreateAnimationVariable(0.0, 0.0);
     };
     virtual ~CTabBtn()
     {
@@ -53,5 +53,5 @@ private:
     bool        m_colorset;
     COLORREF    m_textcolor;
     bool        m_textcolorset;
-    IUIAnimationVariablePtr m_AnimVarHot;
+    AnimationVariable m_AnimVarHot;
 };
