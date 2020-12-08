@@ -1527,7 +1527,7 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
             {
                 // if the one argument is a string, pass it as the second param to ScintillaCall
                 ret->vt     = VT_INT;
-                ret->intVal = (int)ScintillaCall(cmd.cmd, 0, (sptr_t)CUnicodeUtils::StdGetUTF8(p2.bstrVal).c_str());
+                ret->intVal = (int)ScintillaCall(cmd.cmd, 0, (sptr_t)CUnicodeUtils::StdGetUTF8(p1.bstrVal).c_str());
                 VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retval);
                 return S_OK;
             }
