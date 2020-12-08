@@ -32,7 +32,6 @@
 #include "version.h"
 #include "CommandHandler.h"
 #include "JumpListHelpers.h"
-#include "Monitor.h"
 #include <wrl.h>
 using Microsoft::WRL::ComPtr;
 
@@ -436,9 +435,6 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
         RegisterContextMenu(false);
         return 0;
     }
-
-    auto hash = GetMonitorSetupHash();
-
 
     bool isAdminMode = SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated();
     if (parser->HasKey(L"admin") && !isAdminMode)
