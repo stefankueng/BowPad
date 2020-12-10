@@ -434,6 +434,18 @@ HRESULT CCmdScript::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PR
     {
         return UIInitPropertyFromImage(UI_PKEY_LargeImage, m_image, ppropvarNewValue);
     }
+    else if (UI_PKEY_SmallImage == key)
+    {
+        return UIInitPropertyFromImage(UI_PKEY_SmallImage, m_image, ppropvarNewValue);
+    }
+    else if (UI_PKEY_LargeHighContrastImage == key)
+    {
+        return UIInitPropertyFromImage(UI_PKEY_LargeHighContrastImage, m_image, ppropvarNewValue);
+    }
+    else if (UI_PKEY_SmallHighContrastImage == key)
+    {
+        return UIInitPropertyFromImage(UI_PKEY_SmallHighContrastImage, m_image, ppropvarNewValue);
+    }
 
     return E_NOTIMPL;
 }

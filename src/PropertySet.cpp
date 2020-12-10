@@ -54,6 +54,30 @@ STDMETHODIMP CPropertySet::GetValue(REFPROPERTYKEY key, PROPVARIANT *ppropvar)
             return UIInitPropertyFromImage(UI_PKEY_ItemImage, m_pimgItem, ppropvar);
         return S_FALSE;
     }
+    else if (key == UI_PKEY_SmallImage)
+    {
+        if (m_pimgItem)
+            return UIInitPropertyFromImage(UI_PKEY_SmallImage, m_pimgItem, ppropvar);
+        return S_FALSE;
+    }
+    else if (key == UI_PKEY_LargeImage)
+    {
+        if (m_pimgItem)
+            return UIInitPropertyFromImage(UI_PKEY_LargeImage, m_pimgItem, ppropvar);
+        return S_FALSE;
+    }
+    else if (key == UI_PKEY_SmallHighContrastImage)
+    {
+        if (m_pimgItem)
+            return UIInitPropertyFromImage(UI_PKEY_SmallHighContrastImage, m_pimgItem, ppropvar);
+        return S_FALSE;
+    }
+    else if (key == UI_PKEY_LargeHighContrastImage)
+    {
+        if (m_pimgItem)
+            return UIInitPropertyFromImage(UI_PKEY_LargeHighContrastImage, m_pimgItem, ppropvar);
+        return S_FALSE;
+    }
     else if (key == UI_PKEY_Label)
     {
         return UIInitPropertyFromString(UI_PKEY_Label, m_wszLabel, ppropvar);
