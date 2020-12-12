@@ -478,6 +478,12 @@ std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& 
         }
         nScanCode <<= 16;
         int len = GetKeyNameText(nScanCode, buf, _countof(buf));
+        if (len == 0)
+        {
+            buf[0] = code;
+            buf[1] = 0;
+            len = 1;
+        }
         if (!shortCut.empty())
             shortCut += L"+";
         if (len > 0)
