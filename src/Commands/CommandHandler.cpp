@@ -136,6 +136,7 @@ void CCommandHandler::Init(void* obj)
     Add<CCmdGotoBrace>(obj);
     Add<CCmdConfigShortcuts>(obj);
     Add<CCmdLineWrap>(obj);
+    Add<CCmdLineWrapIndent>(obj);
     Add<CCmdWhiteSpace>(obj);
     Add<CCmdLineNumbers>(obj);
     Add<CCmdUseTabs>(obj);

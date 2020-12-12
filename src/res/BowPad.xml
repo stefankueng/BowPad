@@ -806,6 +806,14 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/TitleCaseS.bmp</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdLineWrapIndent" LabelTitle="indent wrapped lines" TooltipTitle="indent wrapped lines" TooltipDescription="indents wrapped sublines" Keytip="WS">
+      <Command.LargeImages>
+        <Image>res/Arrow-Right.bmp</Image>
+      </Command.LargeImages>
+      <Command.SmallImages>
+        <Image>res/Arrow-Right.bmp</Image>
+      </Command.SmallImages>
+    </Command>
 
 
     <Command Name="cmdContextMap" />
@@ -841,6 +849,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdGroupSaveBtn" Id="10014" />
     <Command Name="cmdGroupSessionAuto" Id="10015" />
     <Command Name="cmdCommandPalette" Id="10016" />
+    <Command Name="cmdGroupWrapLines" Id="10017" />
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />
     
@@ -1083,7 +1092,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
           </Group>
-          <Group CommandName="cmdGroupBlanks" SizeDefinition="SixButtons-TwoColumns">
+          <Group CommandName="cmdGroupBlanks" SizeDefinition="FiveButtons">
             <DropDownButton CommandName="cmdGroupLines">
               <Button CommandName="cmdLineDuplicate" />
               <Button CommandName="cmdLineUp" />
@@ -1114,7 +1123,6 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <ToggleButton CommandName="cmdEOLMac"/>
               </MenuGroup>
             </DropDownButton>
-            <ToggleButton CommandName="cmdLineWrap"/>
           </Group>
           <Group CommandName="cmdSpellCheckGroup" SizeDefinition="FourButtons" ApplicationModes='1'>
             <ToggleButton CommandName="cmdSpellCheck" />
@@ -1251,7 +1259,12 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               </GroupSizeDefinition>
             </SizeDefinition>
             <ToggleButton CommandName="cmdFileTree" />
-            <ToggleButton CommandName="cmdLineWrap" />
+            <SplitButton CommandName="cmdGroupWrapLines">
+              <SplitButton.ButtonItem>
+                <ToggleButton CommandName="cmdLineWrap" />
+              </SplitButton.ButtonItem>
+              <ToggleButton CommandName="cmdLineWrapIndent" />
+            </SplitButton>
             <ToggleButton CommandName="cmdWhiteSpace" />
             <ToggleButton CommandName="cmdLinenumbers" />
             <Spinner CommandName="cmdTabSize" />
