@@ -164,6 +164,14 @@ bool CCmdScript::Create(const std::wstring& path)
     return true;
 }
 
+void CCmdScript::SetCmdId(UINT cmdId)
+{
+    m_cmdID = cmdId;
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SmallImage);
+}
+
 bool CCmdScript::Execute()
 {
     DISPPARAMS dispparams = {0};

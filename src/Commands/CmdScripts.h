@@ -29,7 +29,7 @@ public:
     virtual ~CCmdScript();
 
     bool Create(const std::wstring& path);
-    void SetCmdId(UINT cmdId) { m_cmdID = cmdId; }
+    void SetCmdId(UINT cmdId);
     void SetDescription(const std::wstring& desc) { m_description = desc; }
 
     bool        Execute() override;
