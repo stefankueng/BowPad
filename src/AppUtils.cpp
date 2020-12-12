@@ -32,9 +32,11 @@
 #include <time.h>
 #include <ctime>
 #include <fstream>
+#include <DbgHelp.h>
 
 #pragma comment(lib, "Urlmon.lib")
 #pragma comment(lib, "Shell32.lib")
+#pragma comment(lib, "DbgHelp.lib")
 
 std::wstring CAppUtils::updatefilename;
 std::wstring CAppUtils::updateurl;
@@ -316,7 +318,31 @@ bool CAppUtils::HasSameMajorVersion( const std::wstring& path )
     sVer = sVer.substr(0, sVer.find_last_of('.'));
     std::wstring sAppVer = TEXT(STRPRODUCTVER);
     sAppVer = sAppVer.substr(0, sAppVer.find_last_of('.'));
-    return (_wcsicmp(sVer.c_str(), sAppVer.c_str()) == 0);
+    if (_wcsicmp(sVer.c_str(), sAppVer.c_str()) == 0)
+    {
+        // ensure the bitness matches as well
+        CAutoFile hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        if (hFile)
+        {
+            CAutoFile hFileMapping = CreateFileMapping(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
+            if (hFileMapping)
+            {
+                void* imagePtr = MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
+                if (imagePtr)
+                {
+                    PIMAGE_NT_HEADERS headersPtr = ImageNtHeader(imagePtr);
+                    auto machine = headersPtr->FileHeader.Machine;
+                    UnmapViewOfFile(imagePtr);
+#ifdef _WIN64
+                    return machine == IMAGE_FILE_MACHINE_AMD64;
+#else
+                    return machine == IMAGE_FILE_MACHINE_I386;
+#endif
+                }
+            }
+        }
+    }
+    return false;
 }
 
 bool CAppUtils::FailedShowMessage(HRESULT hr)
