@@ -25,22 +25,23 @@ class BasicScriptHost;
 class CCmdScript : public ICommand
 {
 public:
-    CCmdScript(void * obj);
+    CCmdScript(void* obj);
     virtual ~CCmdScript();
 
     bool Create(const std::wstring& path);
     void SetCmdId(UINT cmdId) { m_cmdID = cmdId; }
+    void SetDescription(const std::wstring& desc) { m_description = desc; }
 
-    bool Execute() override;
-    bool IsEnabled();
-    bool IsChecked();
+    bool        Execute() override;
+    bool        IsEnabled();
+    bool        IsChecked();
     IUIImagePtr getIcon();
 
     UINT GetCmdId() override;
 
-    void ScintillaNotify(SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification* pScn) override;
 
-    void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR* ptbhdr) override;
 
     void OnClose() override;
 
@@ -65,10 +66,10 @@ public:
     int m_version;
 
 private:
-    BasicScriptObject * m_appObject;
-    BasicScriptHost *   m_host;
-    UINT                m_cmdID;
-    IUIImagePtr         m_image;
-    std::wstring        m_name;
+    BasicScriptObject* m_appObject;
+    BasicScriptHost*   m_host;
+    UINT               m_cmdID;
+    IUIImagePtr        m_image;
+    std::wstring       m_name;
+    std::wstring       m_description;
 };
-

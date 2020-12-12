@@ -69,7 +69,6 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
 
                 // parse the file and fill in the m_plugins set
                 auto plugins = std::make_unique<std::map<std::wstring, PluginInfo>>();
-                Sleep(5000);
                 std::ifstream fin(tempfile);
                 if (fin.is_open())
                 {

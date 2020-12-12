@@ -430,6 +430,10 @@ HRESULT CCmdScript::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PR
     {
         return UIInitPropertyFromString(UI_PKEY_LabelDescription, m_name.c_str(), ppropvarNewValue);
     }
+    else if (UI_PKEY_TooltipDescription == key)
+    {
+        return UIInitPropertyFromString(UI_PKEY_TooltipDescription, m_description.c_str(), ppropvarNewValue);
+    }
     else if (UI_PKEY_LargeImage == key)
     {
         return UIInitPropertyFromImage(UI_PKEY_LargeImage, m_image, ppropvarNewValue);

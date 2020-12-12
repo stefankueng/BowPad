@@ -71,6 +71,8 @@
 #include "KeyboardShortcutHandler.h"
 #include "IniSettings.h"
 
+#include <fstream>
+
 CCommandHandler::CCommandHandler()
     : m_highestCmdId(0)
 {
@@ -414,27 +416,52 @@ void CCommandHandler::InsertPlugins(void* obj)
     {
         if (!bIsDirectory)
         {
-            try
+            if (filename.ends_with(L"bpj") || filename.ends_with(L"bpv"))
             {
-                auto pScript = std::make_unique<CCmdScript>(obj);
-                if (pScript->Create(filename))
+                try
                 {
-                    std::wstring sName = CPathUtils::GetParentDirectory(filename);
-                    sName              = CPathUtils::GetFileName(sName);
-                    scripts[sName]     = std::move(pScript);
+                    auto pScript = std::make_unique<CCmdScript>(obj);
+                    if (pScript->Create(filename))
+                    {
+                        try
+                        {
+                            auto          descPath = CPathUtils::GetParentDirectory(filename) + L"\\" + CPathUtils::GetFileNameWithoutExtension(filename) + L".desc";
+                            std::ifstream fin(descPath);
+                            if (fin.is_open())
+                            {
+                                std::string lineA;
+                                std::getline(fin, lineA); // version
+                                std::getline(fin, lineA); // min BP version
+                                std::getline(fin, lineA); // description
+
+                                SearchReplace(lineA, "\\n", "\n");
+                                SearchReplace(lineA, "\\r", "");
+                                SearchReplace(lineA, "\\t", "\t");
+                                auto line = CUnicodeUtils::StdGetUnicode(lineA);
+                                pScript->SetDescription(line);
+                                fin.close();
+                            }
+                        }
+                        catch (const std::exception&)
+                        {
+                        }
+                        std::wstring sName = CPathUtils::GetParentDirectory(filename);
+                        sName              = CPathUtils::GetFileName(sName);
+                        scripts[sName]     = std::move(pScript);
+                    }
                 }
-            }
-            catch (const std::exception& e)
-            {
-                if (CIniSettings::Instance().GetInt64(L"Debug", L"usemessagebox", 0))
+                catch (const std::exception& e)
                 {
-                    MessageBox(nullptr, L"BowPad", CUnicodeUtils::StdGetUnicode(e.what()).c_str(), MB_ICONERROR);
-                }
-                else
-                {
-                    CTraceToOutputDebugString::Instance()(L"BowPad : ");
-                    CTraceToOutputDebugString::Instance()(e.what());
-                    CTraceToOutputDebugString::Instance()(L"\n");
+                    if (CIniSettings::Instance().GetInt64(L"Debug", L"usemessagebox", 0))
+                    {
+                        MessageBox(nullptr, L"BowPad", CUnicodeUtils::StdGetUnicode(e.what()).c_str(), MB_ICONERROR);
+                    }
+                    else
+                    {
+                        CTraceToOutputDebugString::Instance()(L"BowPad : ");
+                        CTraceToOutputDebugString::Instance()(e.what());
+                        CTraceToOutputDebugString::Instance()(L"\n");
+                    }
                 }
             }
         }
