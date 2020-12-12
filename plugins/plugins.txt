@@ -1,12 +1,16 @@
 Calculate
-100
+101
 200
 Calculate arithmetic expressions\nwmjordan\n
+CsvJoinLines
+100
+200
+Join lines with commas.\nCtrl click: trim each line; Shift click: quote lines.\nwmjordan\n
 DisableClearType
 101
 200
 Disables ClearType\nAuthor: wmjordan@163.com, Stefan Küng\n
 SearchSelection
-103
+104
 200
 Search Selection: extracts all lines that contain the selected text.\r\nCtrl click: match whole word; Shift click: match case.\nStefan Küng, wmjordan\n

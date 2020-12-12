@@ -1,7 +1,7 @@
 // returns the version of the plugin
 // this callback is not optional! If you fail to implement this, the plugin
 // config dialog won't work properly with your plugin
-function Version() { return 103; }
+function Version() { return 104; }
 
 // this is the main function that gets executed when the command is run, i.e.
 // the button is clicked
@@ -57,3 +57,9 @@ function IsChecked() { return false; }
 function OnDocumentOpen(index) {
 }
 
+// notification from the Scintilla control
+function ScintillaNotify(code, position, ch, modifiers, modificationType, text, length, linesAdded, message, wParam, lParam, line, foldLevelNow, foldLevelPrev, margin, listType, x, y, token, annotationLinesAdded, updated) {
+	if (code == 2007 && (updated & 0x02)) {	//SCN_UPDATEUI
+		BowPad.InvalidateState();
+	}
+}

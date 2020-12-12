@@ -1,7 +1,7 @@
 // returns the version of the plugin
 // this callback is not optional! If you fail to implement this, the plugin
 // config dialog won't work properly with your plugin
-function Version() { return 100; }
+function Version() { return 101; }
 
 
 // this is the main function that gets executed when the command is run, i.e.
@@ -16,6 +16,9 @@ function Execute()
 			return;
 		}
 		s = BowPad.SciGetTextRange(0, l);
+	}
+	if (s.length == 0) {
+		return;
 	}
 	var exp = /[\-+*\/\.\(\)^,\s\uFF0B\uFF0D\u00D7\u00F7\uFF08\uFF09\u3014\u3015]|0x[0-9a-f]+|\d+|\bMath.(?:E|LN2|LN10|LOG2E|LOG10E|PI|SQRT1_2|SQRT2)\b|\b(?:Math.)?(?:abs|acos|asin|atan|atan2|ceil|cos|exp|floor|log|max|min|pow|random|round|sin|sqrt|tan)\b/gi;
 	var op = "+-*/()()";

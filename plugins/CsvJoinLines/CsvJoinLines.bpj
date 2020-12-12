@@ -1,0 +1,56 @@
+// returns the version of the plugin
+// this callback is not optional! If you fail to implement this, the plugin
+// config dialog won't work properly with your plugin
+function Version() { return 100; }
+
+
+// this is the main function that gets executed when the command is run, i.e.
+// the button is clicked
+function Execute()
+{
+	var s = BowPad.SciGetSelText();
+	if (s.length == 0) {
+		var l = BowPad.SciGetLength(); // limit the amount of characters to 65535 to avoid accidental execution on large documents
+		if (l > 65535) {
+			BowPad.alert("Content too long. Please select no more than 65535 characters to join.");
+			return;
+		}
+		s = BowPad.SciGetTextRange(0, l);
+		BowPad.SciSelectAll();
+	}
+	if (s.length == 0) {
+		return;
+	}
+	var exp = /\r\n|\r|\n/g;
+	var arr = s.split(exp);
+	if (BowPad.GetKeyState(0x11) /*ctrl: trim*/) {
+		var trim = /^\s+|\s+$/gm;
+		for (var i = 0; i < arr.length; i++) {
+			arr[i] = arr[i].replace(trim, "");
+		}
+	}
+	if (BowPad.GetKeyState(0x10) /*shift: quote*/) {
+		var quote = "'";
+		arr[0] = quote + arr[0];
+		arr[arr.length - 1] = arr[arr.length - 1] + quote;
+		s = arr.join("', '");
+	}
+	else {
+		s = arr.join(", ");
+	}
+	BowPad.SciReplaceSel(s);
+	return true;
+}
+
+// return true if the plugin command is enabled (used for the button)
+// note: not used yet by BowPad, but planned for the future
+function IsEnabled() { return BowPad.HasActiveDocument; }
+
+// return true if the plugin button should appear as checked
+// note: not used yet by BowPad, but planned for the future
+function IsChecked() { return false; }
+
+// called after a document was opened
+function OnDocumentOpen(index) {
+}
+
