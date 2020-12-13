@@ -480,7 +480,7 @@ std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& 
         int len = GetKeyNameText(nScanCode, buf, _countof(buf));
         if (len == 0)
         {
-            buf[0] = code;
+            buf[0] = (wchar_t)code;
             buf[1] = 0;
             len = 1;
         }
