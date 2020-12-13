@@ -187,7 +187,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
     <Command Name="cmdFileTree" LabelTitle="File Tree" TooltipTitle="Show the file tree" TooltipDescription="Shows or hides the file tree" Keytip="FT">
       <Command.LargeImages>
-        <Image>res/FileTreeL.bmp</Image>
+        <Image>res/FileTreeL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdGroupEncoding" LabelTitle="Encoding" Keytip="ENC">
@@ -238,7 +238,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
     <Command Name="cmdGroupFind" LabelTitle="Find">
       <Command.LargeImages>
-        <Image>res/FindReplaceL.bmp</Image>
+        <Image>res/FindReplaceL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdPrevNext" />
@@ -256,12 +256,12 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdFindFile" />
     <Command Name="cmdGroupFindBtn" LabelTitle="Find/Replace">
       <Command.LargeImages>
-        <Image>res/FindReplaceL.bmp</Image>
+        <Image>res/FindReplaceL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdFindReplace" LabelTitle="Find/Replace" TooltipTitle="Find &amp;&amp; Replace" TooltipDescription="Search and/or replace text in documents/tabs" Keytip="F">
       <Command.LargeImages>
-        <Image>res/FindReplaceL.bmp</Image>
+        <Image>res/FindReplaceL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdFindNext" LabelTitle="Find Next" TooltipTitle="Find Next" TooltipDescription="Moves to the next match of the last search" Keytip="FN">
@@ -282,7 +282,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdFindSelectedPrev" />
     <Command Name="cmdRegexCapture" LabelTitle="Capture Regex" TooltipTitle="Capture regular expressions" TooltipDescription="Get captures of a regular expression from the current tab" Keytip="F">
       <Command.LargeImages>
-        <Image>res/RegexCaptureL.bmp</Image>
+        <Image>res/RegexCaptureL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdDelete" LabelTitle="Delete" Keytip="DEL">
@@ -395,7 +395,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
     <Command Name="cmdEditSelection" LabelTitle="Edit Selection" TooltipTitle="Multi-Edit" TooltipDescription="Edit all occurrences of the current selection at once" Keytip="ES">
       <Command.LargeImages>
-        <Image>res/editselectionL.bmp</Image>
+        <Image>res/editselectionL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdGroupPrint" LabelTitle="Print"  Keytip="P">
@@ -539,7 +539,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
     <Command Name="cmdLaunchEdge" LabelTitle="Launch in Edge" TooltipTitle="Launch in Edge" TooltipDescription="Opens the current file in Microsoft Edge browser">
       <Command.LargeImages>
-        <Image>res/EdgeL.bmp</Image>
+        <Image>res/EdgeL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdLaunchIE" LabelTitle="Launch in IE" TooltipTitle="Launch in Internet Explorer" TooltipDescription="Opens the current file in Microsoft Internet Explorer">
@@ -731,17 +731,17 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
 
     <Command Name="cmdGroupPlugins" LabelTitle="Plugins">
       <Command.LargeImages>
-        <Image>res/PluginsL.bmp</Image>
+        <Image>res/PluginsL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdPluginConfig" LabelTitle="Configure plugins" TooltipTitle="Configure Plugins" TooltipDescription="Shows a dialog to configure the installed plugins and install new plugins">
       <Command.LargeImages>
-        <Image>res/PluginsConfigL.bmp</Image>
+        <Image>res/PluginsConfigL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdPlugins" LabelTitle="Plugins" TooltipTitle="Plugin commands" TooltipDescription="All plugin commands are listed here">
       <Command.LargeImages>
-        <Image>res/PluginsL.bmp</Image>
+        <Image>res/PluginsL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdTabList" LabelTitle="Tabs" TooltipTitle="Tab List" TooltipDescription="Shows the list of all opened tabs.">
@@ -783,7 +783,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
     <Command Name="cmdSpellCheck" LabelTitle="Spell checker" TooltipTitle="Spell checker" TooltipDescription="Enables/Disables the spell checker">
       <Command.LargeImages>
-        <Image>res/SpellCheckL.bmp</Image>
+        <Image>res/SpellCheckL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdSpellCheckLang" LabelTitle="Language" TooltipTitle="Spell checker language" TooltipDescription="Selects the language for the spell checker">
@@ -793,7 +793,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
     <Command Name="cmdSpellCheckCorrect" LabelTitle="Check spelling" TooltipTitle="Spell checker" TooltipDescription="Correct spelling mistakes">
       <Command.LargeImages>
-        <Image>res/SpellCheckL.bmp</Image>
+        <Image>res/SpellCheckL.png</Image>
       </Command.LargeImages>
     </Command>
     <Command Name="cmdSpellCheckAll" LabelTitle="Only comments" TooltipTitle="Only comments" TooltipDescription="Check for errors only in comments, strings and text">
@@ -808,10 +808,10 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
     <Command Name="cmdLineWrapIndent" LabelTitle="indent wrapped lines" TooltipTitle="indent wrapped lines" TooltipDescription="indents wrapped sublines" Keytip="WS">
       <Command.LargeImages>
-        <Image>res/Arrow-Right.bmp</Image>
+        <Image>res/Arrow-Right.png</Image>
       </Command.LargeImages>
       <Command.SmallImages>
-        <Image>res/Arrow-Right.bmp</Image>
+        <Image>res/Arrow-Right.png</Image>
       </Command.SmallImages>
     </Command>
 
