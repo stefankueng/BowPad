@@ -41,13 +41,9 @@
 #define IDS_UPDATEAVAILABLE_TASKDLG_HEADER 131
 #define IDC_DRAG_PLUS_TAB               132
 #define IDS_UPDATEAVAILABLE_TASKDLG_CHKBOX_TEXT 132
-#define IDR_CLOSETAB                    133
 #define IDS_UPDATEAVAILABLE_TASKDLG_FOOTER 133
-#define IDR_CLOSETAB_HOVER              134
 #define IDS_NOUPDATES                   134
-#define IDR_CLOSETAB_INACT              135
 #define IDS_LANGUAGE_AVAILABLE          135
-#define IDR_CLOSETAB_PUSH               136
 #define IDS_LANGUAGE_REMOTE             136
 #define IDI_READONLY_ICON               137
 #define IDS_LANGUAGE_FETCH              137
