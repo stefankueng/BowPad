@@ -153,6 +153,10 @@ msgstr ""
 msgid "Access to the file '%s' was denied. Do you want to try again with elevated privileges?"
 msgstr ""
 
+#. Resource IDs: (265)
+msgid "Add to quick access toolbar"
+msgstr ""
+
 #. Resource IDs: (217)
 msgid "Add word to dictionary"
 msgstr ""
@@ -531,7 +535,7 @@ msgstr ""
 msgid "Corrections"
 msgstr ""
 
-#. Resource IDs: (60629)
+#. Resource IDs: (60635)
 msgid "Corresponding File"
 msgstr ""
 
@@ -1489,7 +1493,7 @@ msgstr ""
 msgid "Open Files"
 msgstr ""
 
-#. Resource IDs: (60630)
+#. Resource IDs: (60636)
 msgid "Open corresponding File"
 msgstr ""
 
@@ -1536,7 +1540,7 @@ msgstr ""
 msgid "Opens the config file to configure keyboard shortcuts for any command in BowPad"
 msgstr ""
 
-#. Resource IDs: (60631)
+#. Resource IDs: (60637)
 msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
 msgstr ""
 
@@ -1935,7 +1939,7 @@ msgstr ""
 msgid "Show Whitespaces"
 msgstr ""
 
-#. Resource IDs: (60633)
+#. Resource IDs: (60639)
 msgid "Show clipboard history"
 msgstr ""
 
@@ -2288,7 +2292,7 @@ msgstr ""
 msgid "WL"
 msgstr ""
 
-#. Resource IDs: (60120)
+#. Resource IDs: (60120, 60628)
 msgid "WS"
 msgstr ""
 
@@ -2389,6 +2393,18 @@ msgstr ""
 
 #. Resource IDs: (60172)
 msgid "go to the previous cursor position"
+msgstr ""
+
+#. Resource IDs: (60627, 60629)
+msgid "indent wrapped lines"
+msgstr ""
+
+#. Resource IDs: (60630)
+msgid "indents wrapped sublines"
+msgstr ""
+
+#. Resource IDs: (60640)
+msgid "no plugins loaded"
 msgstr ""
 
 #. Resource IDs: (1101)
