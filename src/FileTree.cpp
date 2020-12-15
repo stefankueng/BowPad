@@ -472,64 +472,66 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/, bool expa
 
     TreeView_SetItemState(*this, refreshRoot, TVIS_CUT, TVIS_CUT);
 
-    SendMessage(*this, WM_SETREDRAW, FALSE, 0);
-    OnOutOfScope(SendMessage(*this, WM_SETREDRAW, TRUE, 0));
-
-    if (!expanding)
-        SetActiveItem(0);
-
     std::wstring refreshPath = m_path;
-    if (refreshRoot != TVI_ROOT)
     {
-        const FileTreeItem* pTreeItem = GetFileTreeItem(*this, refreshRoot);
-        if (pTreeItem && pTreeItem->isDir)
+        SendMessage(*this, WM_SETREDRAW, FALSE, 0);
+        OnOutOfScope(SendMessage(*this, WM_SETREDRAW, TRUE, 0));
+
+        if (!expanding)
+            SetActiveItem(0);
+
+        if (refreshRoot != TVI_ROOT)
         {
-            refreshPath = pTreeItem->path;
+            const FileTreeItem* pTreeItem = GetFileTreeItem(*this, refreshRoot);
+            if (pTreeItem && pTreeItem->isDir)
+            {
+                refreshPath = pTreeItem->path;
+            }
+            else
+            {
+                m_bRootBusy = false;
+                return;
+            }
         }
+
+        if (refreshRoot == TVI_ROOT)
+            TreeView_DeleteAllItems(*this);
         else
+        {
+            HWND hTree = *this;
+            RecurseTree(TreeView_GetChild(*this, refreshRoot), [hTree](HTREEITEM hItem) -> bool {
+                TreeView_DeleteItem(hTree, hItem);
+                return false;
+                });
+        }
+
+        for (auto it = m_data.cbegin(); it != m_data.cend(); /* no increment */)
+        {
+            if (PathIsChild(refreshPath, it->second->refreshpath))
+            {
+                delete it->second;
+                it = m_data.erase(it);
+            }
+            else
+                ++it;
+        }
+        auto oldDataIt = m_data.find(refreshRoot);
+        if (oldDataIt != m_data.end())
+        {
+            delete oldDataIt->second;
+            m_data.erase(oldDataIt);
+        }
+
+        if (refreshPath.empty())
         {
             m_bRootBusy = false;
             return;
         }
-    }
-
-    if (refreshRoot == TVI_ROOT)
-        TreeView_DeleteAllItems(*this);
-    else
-    {
-        HWND hTree = *this;
-        RecurseTree(TreeView_GetChild(*this, refreshRoot), [hTree](HTREEITEM hItem) -> bool {
-            TreeView_DeleteItem(hTree, hItem);
-            return false;
-        });
-    }
-
-    for (auto it = m_data.cbegin(); it != m_data.cend(); /* no increment */)
-    {
-        if (PathIsChild(refreshPath, it->second->refreshpath))
+        if (!PathFileExists(refreshPath.c_str()))
         {
-            delete it->second;
-            it = m_data.erase(it);
+            m_bRootBusy = false;
+            return;
         }
-        else
-            ++it;
-    }
-    auto oldDataIt = m_data.find(refreshRoot);
-    if (oldDataIt != m_data.end())
-    {
-        delete oldDataIt->second;
-        m_data.erase(oldDataIt);
-    }
-
-    if (refreshPath.empty())
-    {
-        m_bRootBusy = false;
-        return;
-    }
-    if (!PathFileExists(refreshPath.c_str()))
-    {
-        m_bRootBusy = false;
-        return;
     }
 
     InterlockedIncrement(&m_ThreadsRunning);
