@@ -1854,9 +1854,9 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
 
     auto numberColor = 0x600000;
     if (CTheme::Instance().IsHighContrastModeDark())
-        numberColor = 0xFF0000;
+        numberColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT));
     else if (CTheme::Instance().IsHighContrastMode())
-        numberColor = 0x200000;
+        numberColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT));
 
     m_StatusBar.SetPart(STATUSBAR_CUR_POS,
                         CStringUtils::Format(rsStatusCurposLong, numberColor, line, numberColor, lineCount, numberColor, column),
