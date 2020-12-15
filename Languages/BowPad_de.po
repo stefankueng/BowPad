@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2020-10-23 22:34+0200\n"
+"PO-Revision-Date: 2020-12-15 21:19+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.2.3\n"
+"X-Generator: Poedit 2.4.2\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -183,6 +183,10 @@ msgid ""
 msgstr ""
 "Zugriff auf die Datei '%s' wurde verweigert. Möchten Sie mit erhöhten "
 "Rechten erneut versuchen?"
+
+#. Resource IDs: (265)
+msgid "Add to quick access toolbar"
+msgstr "zur Schnellzugriffsleiste hinzufügen"
 
 #. Resource IDs: (217)
 msgid "Add word to dictionary"
@@ -601,7 +605,7 @@ msgstr "Rechtschreibfehler korrigieren"
 msgid "Corrections"
 msgstr "Korrekturen"
 
-#. Resource IDs: (60629)
+#. Resource IDs: (60635)
 msgid "Corresponding File"
 msgstr "Entsprechende Datei"
 
@@ -1672,7 +1676,7 @@ msgstr "Öffne Datei an Cursorposition"
 msgid "Open Files"
 msgstr "Öffne Dateien"
 
-#. Resource IDs: (60630)
+#. Resource IDs: (60636)
 msgid "Open corresponding File"
 msgstr "Öffne zugehörige Datei"
 
@@ -1730,7 +1734,7 @@ msgid ""
 msgstr ""
 "Öffnet die Konfigurationsdatei zum konfigurieren der Tastaturkürzel in BowPad"
 
-#. Resource IDs: (60631)
+#. Resource IDs: (60637)
 msgid ""
 "Opens the corresponding file to the file in the current tab.\n"
 "(h/cpp, aspx/cs/vb)"
@@ -2166,7 +2170,7 @@ msgstr "Zeige Eigenschaften"
 msgid "Show Whitespaces"
 msgstr "Zeige Leerzeichen"
 
-#. Resource IDs: (60633)
+#. Resource IDs: (60639)
 msgid "Show clipboard history"
 msgstr "Verlauf der Zwischenablage"
 
@@ -2531,7 +2535,7 @@ msgstr "W"
 msgid "WL"
 msgstr "WL"
 
-#. Resource IDs: (60120)
+#. Resource IDs: (60120, 60628)
 msgid "WS"
 msgstr "WS"
 
@@ -2652,6 +2656,18 @@ msgstr "Gehe zur nächsten Cursorposition"
 #. Resource IDs: (60172)
 msgid "go to the previous cursor position"
 msgstr "Gehe zur vorherigen Cursorposition"
+
+#. Resource IDs: (60627, 60629)
+msgid "indent wrapped lines"
+msgstr "umbrochene Zeilen einrücken"
+
+#. Resource IDs: (60630)
+msgid "indents wrapped sublines"
+msgstr "rückt umbrochene Unterzeilen ein"
+
+#. Resource IDs: (60640)
+msgid "no plugins loaded"
+msgstr "Keine Plugins geladen"
 
 #. Resource IDs: (1101)
 msgid "regular expression:"
