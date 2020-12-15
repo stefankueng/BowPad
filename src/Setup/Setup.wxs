@@ -28,7 +28,7 @@
     <Property Id="RIBBONFRAMEWORK">
       <RegistrySearch Id="UIRibbon" Root="HKCR" Key="CLSID\{926749fa-2615-4987-8845-c33e65f2b957}\InProcServer32" Type="raw" />
     </Property>
-    <Condition Message="This application requires the Windows Ribbon Framework to be installed, i.e. Vista with the Platform update">
+    <Condition Message="This application requires the Windows Ribbon Framework to be installed.">
       Installed OR RIBBONFRAMEWORK
     </Condition>
 
