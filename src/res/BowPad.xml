@@ -1088,7 +1088,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdUnComment" />
             <DropDownGallery CommandName="cmdCodeStyle" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
-                <FlowMenuLayout Columns="4"/>
+                <VerticalMenuLayout Gripper="None"/>
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
           </Group>
@@ -1372,7 +1372,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <Button CommandName="cmdFindReplace" ApplicationDefaults.IsChecked="false"/>
             <DropDownGallery CommandName="cmdCodeStyle" ApplicationDefaults.IsChecked="false" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
-                <FlowMenuLayout Columns="4"/>
+                <VerticalMenuLayout Gripper="None"/>
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
           </QuickAccessToolbar.ApplicationDefaults>
