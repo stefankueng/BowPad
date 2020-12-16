@@ -25,7 +25,7 @@
 
 #include <algorithm>
 
-extern HINSTANCE hRes;
+extern HINSTANCE g_hRes;
 
 // OVERVIEW:
 //
@@ -134,8 +134,8 @@ LRESULT CSortDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             InitDialog(hwndDlg, IDI_BOWPAD);
             CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
             auto      sortOrderList = GetDlgItem(*this, IDC_SORTDLG_ORDER);
-            ResString ascending(hRes, IDS_ASCENDING);
-            ResString descending(hRes, IDS_DESCENDING);
+            ResString ascending(g_hRes, IDS_ASCENDING);
+            ResString descending(g_hRes, IDS_DESCENDING);
             int       defSel = ListBox_AddString(sortOrderList, ascending);
             ListBox_AddString(sortOrderList, descending);
             ListBox_SetCurSel(sortOrderList, defSel);
@@ -309,7 +309,7 @@ static SortOptions GetSortOptions(HWND hWnd)
 {
     CSortDlg sortDlg;
 
-    auto result = sortDlg.DoModal(hRes, IDD_SORTDLG, hWnd);
+    auto result = sortDlg.DoModal(g_hRes, IDD_SORTDLG, hWnd);
 
     if (result == IDOK)
         return SortOptions(SortAction::Sort,

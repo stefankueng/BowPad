@@ -54,7 +54,7 @@ public:
 static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int level2Collapse = -1)
 {
     FoldLevelStack levelStack;
-    ResString      rFoldText(hRes, IDS_FOLDTEXT);
+    ResString      rFoldText(g_hRes, IDS_FOLDTEXT);
     auto           sFoldTextA = CUnicodeUtils::StdGetUTF8(rFoldText);
 
     ScintillaCall(SCI_SETDEFAULTFOLDDISPLAYTEXT, 0, (sptr_t) "...");
@@ -199,7 +199,7 @@ void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
             const auto levelClick = ScintillaCall(SCI_GETFOLDLEVEL, lineClick, 0);
             if (levelClick & SC_FOLDLEVELHEADERFLAG)
             {
-                ResString rFoldText(hRes, IDS_FOLDTEXT);
+                ResString rFoldText(g_hRes, IDS_FOLDTEXT);
                 auto      sFoldTextA = CUnicodeUtils::StdGetUTF8(rFoldText);
 
                 if (shift)

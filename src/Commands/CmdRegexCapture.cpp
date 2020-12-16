@@ -41,7 +41,7 @@ void RegexCapture_Finish()
 
 CRegexCaptureDlg::CRegexCaptureDlg(void* obj)
     : ICommand(obj)
-    , m_captureWnd(hRes)
+    , m_captureWnd(g_hRes)
     , m_themeCallbackId(-1)
     , m_maxRegexStrings(DEFAULT_MAX_SEARCH_STRINGS)
     , m_maxCaptureStrings(DEFAULT_MAX_SEARCH_STRINGS)
@@ -50,7 +50,7 @@ CRegexCaptureDlg::CRegexCaptureDlg(void* obj)
 
 void CRegexCaptureDlg::Show()
 {
-    this->ShowModeless(hRes, IDD_REGEXCAPTUREDLG, GetHwnd());
+    this->ShowModeless(g_hRes, IDD_REGEXCAPTUREDLG, GetHwnd());
     SetFocus(GetDlgItem(*this, IDC_REGEXCOMBO));
     UpdateWindow(*this);
 }
@@ -132,7 +132,7 @@ void CRegexCaptureDlg::DoInitDialog(HWND hwndDlg)
         [this]() {
             SetTheme(CTheme::Instance().IsDarkTheme());
         });
-    m_captureWnd.Init(hRes, *this, GetDlgItem(*this, IDC_SCINTILLA));
+    m_captureWnd.Init(g_hRes, *this, GetDlgItem(*this, IDC_SCINTILLA));
     m_captureWnd.SetupLexerForLang("Text");
     SetTheme(CTheme::Instance().IsDarkTheme());
     InitDialog(hwndDlg, IDI_BOWPAD, false);
@@ -282,7 +282,7 @@ void CRegexCaptureDlg::DoCapture()
 
 void CRegexCaptureDlg::SetInfoText(UINT resid, AlertMode alertMode)
 {
-    ResString str(hRes, resid);
+    ResString str(g_hRes, resid);
     SetDlgItemText(*this, IDC_INFOLABEL, str);
     if (alertMode == AlertMode::Flash)
         FlashWindow(*this);

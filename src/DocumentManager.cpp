@@ -237,8 +237,8 @@ static bool AskToElevatePrivilege(HWND hWnd, const std::wstring& path, PCWSTR sE
 {
     // access to the file is denied, and we're not running with elevated privileges
     // offer to start BowPad with elevated privileges and open the file in that instance
-    ResString    rTitle(hRes, IDS_ACCESS_ELEVATE);
-    ResString    rQuestion(hRes, IDS_ACCESS_ASK_ELEVATE);
+    ResString    rTitle(g_hRes, IDS_ACCESS_ELEVATE);
+    ResString    rQuestion(g_hRes, IDS_ACCESS_ASK_ELEVATE);
     std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
 
     TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
@@ -252,7 +252,7 @@ static bool AskToElevatePrivilege(HWND hWnd, const std::wstring& path, PCWSTR sE
     tdc.nDefaultButton                  = 101;
 
     tdc.hwndParent      = hWnd;
-    tdc.hInstance       = hRes;
+    tdc.hInstance       = g_hRes;
     tdc.dwFlags         = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
     tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
 
@@ -274,8 +274,8 @@ static bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
 {
     // access to the file is denied, and we're not running with elevated privileges
     // offer to start BowPad with elevated privileges and open the file in that instance
-    ResString rElevate(hRes, IDS_ELEVATEOPEN);
-    ResString rDontElevate(hRes, IDS_DONTELEVATEOPEN);
+    ResString rElevate(g_hRes, IDS_ELEVATEOPEN);
+    ResString rDontElevate(g_hRes, IDS_DONTELEVATEOPEN);
     return AskToElevatePrivilege(hWnd, path, rElevate, rDontElevate);
 }
 
@@ -283,8 +283,8 @@ static bool AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
 {
     // access to the file is denied, and we're not running with elevated privileges
     // offer to start BowPad with elevated privileges and open the file in that instance
-    ResString rElevate(hRes, IDS_ELEVATESAVE);
-    ResString rDontElevate(hRes, IDS_DONTELEVATESAVE);
+    ResString rElevate(g_hRes, IDS_ELEVATESAVE);
+    ResString rDontElevate(g_hRes, IDS_DONTELEVATESAVE);
     return AskToElevatePrivilege(hWnd, path, rElevate, rDontElevate);
 }
 
@@ -307,15 +307,15 @@ static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params)
 
 static void ShowFileLoadError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg)
 {
-    ResString rTitle(hRes, IDS_APP_TITLE);
-    ResString rLoadErr(hRes, IDS_FAILEDTOLOADFILE);
+    ResString rTitle(g_hRes, IDS_APP_TITLE);
+    ResString rLoadErr(g_hRes, IDS_FAILEDTOLOADFILE);
     MessageBox(hWnd, CStringUtils::Format(rLoadErr, fileName.c_str(), msg).c_str(), (LPCWSTR)rTitle, MB_ICONERROR);
 }
 
 static void ShowFileSaveError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg)
 {
-    ResString rTitle(hRes, IDS_APP_TITLE);
-    ResString rSaveErr(hRes, IDS_FAILEDTOSAVEFILE);
+    ResString rTitle(g_hRes, IDS_APP_TITLE);
+    ResString rSaveErr(g_hRes, IDS_FAILEDTOSAVEFILE);
     MessageBox(hWnd, CStringUtils::Format(rSaveErr, fileName.c_str(), msg).c_str(), (LPCWSTR)rTitle, MB_ICONERROR);
 }
 
@@ -338,9 +338,9 @@ static void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
 }
 
 CDocumentManager::CDocumentManager()
-    : m_scratchScintilla(hRes)
+    : m_scratchScintilla(g_hRes)
 {
-    m_scratchScintilla.InitScratch(hRes);
+    m_scratchScintilla.InitScratch(g_hRes);
 }
 
 CDocumentManager::~CDocumentManager()
@@ -466,7 +466,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     if (pdocLoad == nullptr)
     {
         ShowFileLoadError(hWnd, path,
-                          CLanguage::Instance().GetTranslatedString(ResString(hRes, IDS_ERR_FILETOOBIG)).c_str());
+                          CLanguage::Instance().GetTranslatedString(ResString(g_hRes, IDS_ERR_FILETOOBIG)).c_str());
         return doc;
     }
     auto& edit = *pdocLoad;

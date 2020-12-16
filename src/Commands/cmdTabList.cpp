@@ -302,6 +302,6 @@ void CCmdTabList::OnDocumentSave(DocID /*id*/, bool /*bSaveAs*/)
 
 bool CCmdTabList::Execute()
 {
-    ResString ctrlName(hRes, cmdTabList_LabelTitle_RESID);
+    ResString ctrlName(g_hRes, cmdTabList_LabelTitle_RESID);
     return CAppUtils::ShowDropDownList(GetHwnd(), ctrlName);
 }

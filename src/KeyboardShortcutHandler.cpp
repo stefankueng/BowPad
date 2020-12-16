@@ -409,7 +409,7 @@ std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand(WORD cmd) const
             const auto& ttIDit = m_resourceData.find(sID);
             if (ttIDit != m_resourceData.end())
             {
-                auto sRes = LoadResourceWString(hRes, ttIDit->second);
+                auto sRes = LoadResourceWString(g_hRes, ttIDit->second);
                 sRes += L' ';
                 sRes += sAcc;
                 return sRes;

@@ -242,7 +242,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     hEditorconfigActive   = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_EDITORCONFIGACTIVE), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
     hEditorconfigInactive = (HICON)::LoadImage(hResource, MAKEINTRESOURCE(IDI_EDITORCONFIGINACTIVE), IMAGE_ICON, cxicon, cyicon, LR_DEFAULTCOLOR);
     m_fileTreeVisible     = CIniSettings::Instance().GetInt64(L"View", L"FileTree", 1) != 0;
-    m_scratchEditor.InitScratch(hRes);
+    m_scratchEditor.InitScratch(g_hRes);
 }
 
 extern void FindReplace_Finish();
@@ -520,7 +520,7 @@ STDMETHODIMP CMainWindow::Execute(
 void CMainWindow::About() const
 {
     CAboutDlg dlg(*this);
-    dlg.DoModal(hRes, IDD_ABOUTBOX, *this);
+    dlg.DoModal(g_hRes, IDD_ABOUTBOX, *this);
 }
 
 void CMainWindow::ShowCommandPalette()
@@ -538,7 +538,7 @@ void CMainWindow::ShowCommandPalette()
     const int  marginx   = CDPIAware::Instance().Scale(*this, 30);
     const UINT flags     = SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
 
-    m_commandPaletteDlg->ShowModeless(hRes, IDD_COMMANDPALETTE, *this, false);
+    m_commandPaletteDlg->ShowModeless(g_hRes, IDD_COMMANDPALETTE, *this, false);
     RECT thisRc{};
     GetClientRect(*m_commandPaletteDlg, &thisRc);
     RECT pos{};
@@ -556,7 +556,7 @@ void CMainWindow::ShowCommandPalette()
 
 std::wstring CMainWindow::GetAppName() const
 {
-    auto title = LoadResourceWString(hRes, IDS_APP_TITLE);
+    auto title = LoadResourceWString(g_hRes, IDS_APP_TITLE);
     return title;
 }
 
@@ -571,7 +571,7 @@ std::wstring CMainWindow::GetNewTabName()
 {
     // Tab's start at 1, m_mewCount left at value of last ticket used.
     int          newCount = ++m_newCount;
-    ResString    newRes(hRes, IDS_NEW_TABTITLE);
+    ResString    newRes(g_hRes, IDS_NEW_TABTITLE);
     std::wstring tabName = CStringUtils::Format(newRes, newCount);
     return tabName;
 }
@@ -1474,7 +1474,7 @@ bool CMainWindow::CreateRibbon()
     // Finally, we load the binary markup.  This will initiate callbacks to the IUIApplication object
     // that was provided to the framework earlier, allowing command handlers to be bound to individual
     // commands.
-    hr = g_pFramework->LoadUI(hRes, L"BOWPAD_RIBBON");
+    hr = g_pFramework->LoadUI(g_hRes, L"BOWPAD_RIBBON");
     if (CAppUtils::FailedShowMessage(hr))
         return false;
     return true;
@@ -1867,24 +1867,24 @@ void CMainWindow::SetZoomPC(int zoomPC)
 
 void CMainWindow::UpdateStatusBar(bool bEverything)
 {
-    static ResString rsStatusTTDocSize(hRes, IDS_STATUSTTDOCSIZE);         // Length in bytes: %ld\r\nLines: %ld
-    static ResString rsStatusTTCurPos(hRes, IDS_STATUSTTCURPOS);           // Line : %ld\r\nColumn : %ld\r\nSelection : %Iu | %Iu\r\nMatches: %ld
-    static ResString rsStatusTTEOF(hRes, IDS_STATUSTTEOF);                 // Line endings: %s
-    static ResString rsStatusTTTyping(hRes, IDS_STATUSTTTYPING);           // Typing mode: %s
-    static ResString rsStatusTTTypingOvl(hRes, IDS_STATUSTTTYPINGOVL);     // Overtype
-    static ResString rsStatusTTTypingIns(hRes, IDS_STATUSTTTYPINGINS);     // Insert
-    static ResString rsStatusTTTabs(hRes, IDS_STATUSTTTABS);               // Open files: %d
-    static ResString rsStatusSelection(hRes, IDS_STATUSSELECTION);         // Sel: %Iu chars | %Iu lines | %ld matches.
-    static ResString rsStatusSelectionLong(hRes, IDS_STATUSSELECTIONLONG); // Selection: %Iu chars | %Iu lines | %ld matches.
-    static ResString rsStatusSelectionNone(hRes, IDS_STATUSSELECTIONNONE); // no selection
-    static ResString rsStatusTTTabSpaces(hRes, IDS_STATUSTTTABSPACES);     // Insert Tabs or Spaces
-    static ResString rsStatusTTR2L(hRes, IDS_STATUSTTR2L);                 // Reading order (left-to-right or right-to-left)
-    static ResString rsStatusTTEncoding(hRes, IDS_STATUSTTENCODING);       // Encoding: %s
-    static ResString rsStatusZoom(hRes, IDS_STATUSZOOM);                   // Zoom: %d%%
-    static ResString rsStatusCurposLong(hRes, IDS_STATUS_CURPOSLONG);      // Line: %ld / %ld   Column: %ld
-    static ResString rsStatusCurpos(hRes, IDS_STATUS_CURPOS);              // Ln: %ld / %ld    Col: %ld
-    static ResString rsStatusTabsOpenLong(hRes, IDS_STATUS_TABSOPENLONG);  // Ln: %ld / %ld    Col: %ld
-    static ResString rsStatusTabsOpen(hRes, IDS_STATUS_TABSOPEN);          // Ln: %ld / %ld    Col: %ld
+    static ResString rsStatusTTDocSize(g_hRes, IDS_STATUSTTDOCSIZE);         // Length in bytes: %ld\r\nLines: %ld
+    static ResString rsStatusTTCurPos(g_hRes, IDS_STATUSTTCURPOS);           // Line : %ld\r\nColumn : %ld\r\nSelection : %Iu | %Iu\r\nMatches: %ld
+    static ResString rsStatusTTEOF(g_hRes, IDS_STATUSTTEOF);                 // Line endings: %s
+    static ResString rsStatusTTTyping(g_hRes, IDS_STATUSTTTYPING);           // Typing mode: %s
+    static ResString rsStatusTTTypingOvl(g_hRes, IDS_STATUSTTTYPINGOVL);     // Overtype
+    static ResString rsStatusTTTypingIns(g_hRes, IDS_STATUSTTTYPINGINS);     // Insert
+    static ResString rsStatusTTTabs(g_hRes, IDS_STATUSTTTABS);               // Open files: %d
+    static ResString rsStatusSelection(g_hRes, IDS_STATUSSELECTION);         // Sel: %Iu chars | %Iu lines | %ld matches.
+    static ResString rsStatusSelectionLong(g_hRes, IDS_STATUSSELECTIONLONG); // Selection: %Iu chars | %Iu lines | %ld matches.
+    static ResString rsStatusSelectionNone(g_hRes, IDS_STATUSSELECTIONNONE); // no selection
+    static ResString rsStatusTTTabSpaces(g_hRes, IDS_STATUSTTTABSPACES);     // Insert Tabs or Spaces
+    static ResString rsStatusTTR2L(g_hRes, IDS_STATUSTTR2L);                 // Reading order (left-to-right or right-to-left)
+    static ResString rsStatusTTEncoding(g_hRes, IDS_STATUSTTENCODING);       // Encoding: %s
+    static ResString rsStatusZoom(g_hRes, IDS_STATUSZOOM);                   // Zoom: %d%%
+    static ResString rsStatusCurposLong(g_hRes, IDS_STATUS_CURPOSLONG);      // Line: %ld / %ld   Column: %ld
+    static ResString rsStatusCurpos(g_hRes, IDS_STATUS_CURPOS);              // Ln: %ld / %ld    Col: %ld
+    static ResString rsStatusTabsOpenLong(g_hRes, IDS_STATUS_TABSOPENLONG);  // Ln: %ld / %ld    Col: %ld
+    static ResString rsStatusTabsOpen(g_hRes, IDS_STATUS_TABSOPEN);          // Ln: %ld / %ld    Col: %ld
 
     auto lineCount = (long)m_editor.Call(SCI_GETLINECOUNT);
 
@@ -2166,7 +2166,7 @@ void CMainWindow::UpdateCaptionBar()
     auto         docID   = m_TabBar.GetCurrentTabId();
     std::wstring appName = GetAppName();
     std::wstring elev;
-    ResString    rElev(hRes, IDS_ELEVATED);
+    ResString    rElev(g_hRes, IDS_ELEVATED);
     if (SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated())
         elev = (LPCWSTR)rElev;
 
@@ -2208,10 +2208,10 @@ void CMainWindow::UpdateTab(DocID docID)
 
 ResponseToCloseTab CMainWindow::AskToCloseTab() const
 {
-    ResString    rTitle(hRes, IDS_HASMODIFICATIONS);
-    ResString    rQuestion(hRes, IDS_DOYOUWANTOSAVE);
-    ResString    rSave(hRes, IDS_SAVE);
-    ResString    rDontSave(hRes, IDS_DONTSAVE);
+    ResString    rTitle(g_hRes, IDS_HASMODIFICATIONS);
+    ResString    rQuestion(g_hRes, IDS_DOYOUWANTOSAVE);
+    ResString    rSave(g_hRes, IDS_SAVE);
+    ResString    rDontSave(g_hRes, IDS_DONTSAVE);
     std::wstring sQuestion = CStringUtils::Format(rQuestion, m_TabBar.GetCurrentTitle().c_str());
 
     TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
@@ -2226,7 +2226,7 @@ ResponseToCloseTab CMainWindow::AskToCloseTab() const
     tdc.nDefaultButton = 100;
 
     tdc.hwndParent         = *this;
-    tdc.hInstance          = hRes;
+    tdc.hInstance          = g_hRes;
     tdc.dwCommonButtons    = TDCBF_CANCEL_BUTTON;
     tdc.pszWindowTitle     = MAKEINTRESOURCE(IDS_APP_TITLE);
     tdc.pszMainIcon        = TD_INFORMATION_ICON;
@@ -2258,11 +2258,11 @@ ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const 
         bool changed = doc.m_bNeedsSaving || doc.m_bIsDirty;
         if (!changed && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
             return ResponseToOutsideModifiedFile::Reload;
-        ResString rTitle(hRes, IDS_OUTSIDEMODIFICATIONS);
-        ResString rQuestion(hRes, changed ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
-        ResString rSave(hRes, IDS_SAVELOSTOUTSIDEMODS);
-        ResString rReload(hRes, changed ? IDS_RELOADLOSTMODS : IDS_RELOAD);
-        ResString rCancel(hRes, IDS_NORELOAD);
+        ResString rTitle(g_hRes, IDS_OUTSIDEMODIFICATIONS);
+        ResString rQuestion(g_hRes, changed ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
+        ResString rSave(g_hRes, IDS_SAVELOSTOUTSIDEMODS);
+        ResString rReload(g_hRes, changed ? IDS_RELOADLOSTMODS : IDS_RELOAD);
+        ResString rCancel(g_hRes, IDS_NORELOAD);
         // Be specific about what they are re-loading.
         std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
 
@@ -2284,7 +2284,7 @@ ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const 
         tdc.nDefaultButton = 100; // default to "Cancel" in case the file is modified
 
         tdc.hwndParent          = *this;
-        tdc.hInstance           = hRes;
+        tdc.hInstance           = g_hRes;
         tdc.dwFlags             = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
         tdc.pszWindowTitle      = MAKEINTRESOURCE(IDS_APP_TITLE);
         tdc.pszMainIcon         = changed ? TD_WARNING_ICON : TD_INFORMATION_ICON;
@@ -2311,10 +2311,10 @@ ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const 
 
 bool CMainWindow::AskToReload(const CDocument& doc) const
 {
-    ResString rTitle(hRes, IDS_HASMODIFICATIONS);
-    ResString rQuestion(hRes, IDS_RELOADREALLY);
-    ResString rReload(hRes, IDS_DORELOAD);
-    ResString rCancel(hRes, IDS_DONTRELOAD);
+    ResString rTitle(g_hRes, IDS_HASMODIFICATIONS);
+    ResString rQuestion(g_hRes, IDS_RELOADREALLY);
+    ResString rReload(g_hRes, IDS_DORELOAD);
+    ResString rCancel(g_hRes, IDS_DONTRELOAD);
     // Be specific about what they are re-loading.
     std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
 
@@ -2330,7 +2330,7 @@ bool CMainWindow::AskToReload(const CDocument& doc) const
     tdc.nDefaultButton = 100; // Default to cancel
 
     tdc.hwndParent         = *this;
-    tdc.hInstance          = hRes;
+    tdc.hInstance          = g_hRes;
     tdc.dwFlags            = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
     tdc.pszWindowTitle     = MAKEINTRESOURCE(IDS_APP_TITLE);
     tdc.pszMainIcon        = TD_WARNING_ICON; // Warn because we are going to throw away the document.
@@ -2346,10 +2346,10 @@ bool CMainWindow::AskToReload(const CDocument& doc) const
 
 bool CMainWindow::AskAboutOutsideDeletedFile(const CDocument& doc) const
 {
-    ResString rTitle(hRes, IDS_OUTSIDEREMOVEDHEAD);
-    ResString rQuestion(hRes, IDS_OUTSIDEREMOVED);
-    ResString rKeep(hRes, IDS_OUTSIDEREMOVEDKEEP);
-    ResString rClose(hRes, IDS_OUTSIDEREMOVEDCLOSE);
+    ResString rTitle(g_hRes, IDS_OUTSIDEREMOVEDHEAD);
+    ResString rQuestion(g_hRes, IDS_OUTSIDEREMOVED);
+    ResString rKeep(g_hRes, IDS_OUTSIDEREMOVEDKEEP);
+    ResString rClose(g_hRes, IDS_OUTSIDEREMOVEDCLOSE);
     // Be specific about what they are removing.
     std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
 
@@ -2365,7 +2365,7 @@ bool CMainWindow::AskAboutOutsideDeletedFile(const CDocument& doc) const
     tdc.nDefaultButton                  = 100;
 
     tdc.hwndParent         = *this;
-    tdc.hInstance          = hRes;
+    tdc.hInstance          = g_hRes;
     tdc.dwFlags            = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
     tdc.pszWindowTitle     = MAKEINTRESOURCE(IDS_APP_TITLE);
     tdc.pszMainIcon        = TD_INFORMATION_ICON;
@@ -2383,10 +2383,10 @@ bool CMainWindow::AskAboutOutsideDeletedFile(const CDocument& doc) const
 
 bool CMainWindow::AskToRemoveReadOnlyAttribute() const
 {
-    ResString rTitle(hRes, IDS_FILEISREADONLY);
-    ResString rQuestion(hRes, IDS_FILEMAKEWRITABLEASK);
-    auto      rEditFile = LoadResourceWString(hRes, IDS_EDITFILE);
-    auto      rCancel   = LoadResourceWString(hRes, IDS_CANCEL);
+    ResString rTitle(g_hRes, IDS_FILEISREADONLY);
+    ResString rQuestion(g_hRes, IDS_FILEMAKEWRITABLEASK);
+    auto      rEditFile = LoadResourceWString(g_hRes, IDS_EDITFILE);
+    auto      rCancel   = LoadResourceWString(g_hRes, IDS_CANCEL);
     // We remove the short cut accelerators from these buttons because this
     // dialog pops up automatically and it's too easy to be typing into the editor
     // when that happens and accidentally acknowledge a button.
@@ -2405,7 +2405,7 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
     tdc.nDefaultButton = 100; // Default to cancel
 
     tdc.hwndParent         = *this;
-    tdc.hInstance          = hRes;
+    tdc.hInstance          = g_hRes;
     tdc.dwFlags            = TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
     tdc.pszWindowTitle     = MAKEINTRESOURCE(IDS_APP_TITLE);
     tdc.pszMainIcon        = TD_WARNING_ICON;
@@ -2422,10 +2422,10 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
 // Returns true if file exists or was created.
 bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
 {
-    ResString rTitle(hRes, IDS_FILE_DOESNT_EXIST);
-    ResString rQuestion(hRes, IDS_FILE_ASK_TO_CREATE);
-    ResString rCreate(hRes, IDS_FILE_CREATE);
-    ResString rCancel(hRes, IDS_FILE_CREATE_CANCEL);
+    ResString rTitle(g_hRes, IDS_FILE_DOESNT_EXIST);
+    ResString rQuestion(g_hRes, IDS_FILE_ASK_TO_CREATE);
+    ResString rCreate(g_hRes, IDS_FILE_CREATE);
+    ResString rCancel(g_hRes, IDS_FILE_CREATE_CANCEL);
     // Show exactly what we are creating.
     std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
 
@@ -2442,7 +2442,7 @@ bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
     tdc.nDefaultButton = 101;
 
     tdc.hwndParent         = *this;
-    tdc.hInstance          = hRes;
+    tdc.hInstance          = g_hRes;
     tdc.dwFlags            = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
     tdc.pszWindowTitle     = MAKEINTRESOURCE(IDS_APP_TITLE);
     tdc.pszMainIcon        = TD_INFORMATION_ICON;
@@ -2623,7 +2623,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
     if ((scn.position >= 0) && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position))
     {
         // an url hotspot
-        ResString   str(hRes, IDS_HOWTOOPENURL);
+        ResString   str(g_hRes, IDS_HOWTOOPENURL);
         std::string strA = CUnicodeUtils::StdGetUTF8(str);
         m_editor.Call(SCI_CALLTIPSHOW, scn.position, (sptr_t)strA.c_str());
         return;
@@ -3364,10 +3364,10 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         if (CPathUtils::GetFileExtension(files[0]) == L"bplex")
         {
             // ask whether to install or open the file
-            ResString    rTitle(hRes, IDS_IMPORTBPLEX_TITLE);
-            ResString    rQuestion(hRes, IDS_IMPORTBPLEX_QUESTION);
-            ResString    rImport(hRes, IDS_IMPORTBPLEX_IMPORT);
-            ResString    rOpen(hRes, IDS_IMPORTBPLEX_OPEN);
+            ResString    rTitle(g_hRes, IDS_IMPORTBPLEX_TITLE);
+            ResString    rQuestion(g_hRes, IDS_IMPORTBPLEX_QUESTION);
+            ResString    rImport(g_hRes, IDS_IMPORTBPLEX_IMPORT);
+            ResString    rOpen(g_hRes, IDS_IMPORTBPLEX_OPEN);
             std::wstring sQuestion = CStringUtils::Format(rQuestion, CPathUtils::GetFileName(files[0]).c_str());
 
             TASKDIALOGCONFIG tdc                = {sizeof(TASKDIALOGCONFIG)};
@@ -3383,7 +3383,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
             tdc.nDefaultButton = 100;
 
             tdc.hwndParent         = *this;
-            tdc.hInstance          = hRes;
+            tdc.hInstance          = g_hRes;
             tdc.dwCommonButtons    = TDCBF_CANCEL_BUTTON;
             tdc.pszWindowTitle     = MAKEINTRESOURCE(IDS_APP_TITLE);
             tdc.pszMainIcon        = TD_INFORMATION_ICON;
@@ -3595,10 +3595,10 @@ bool CMainWindow::HandleCopyDataMoveTab(const COPYDATASTRUCT& cds)
 
 static bool AskToCopyOrMoveFile(HWND hWnd, const std::wstring& filename, const std::wstring& hitpath, bool bCopy)
 {
-    ResString rTitle(hRes, IDS_FILE_DROP);
-    ResString rQuestion(hRes, bCopy ? IDS_FILE_DROP_COPY : IDS_FILE_DROP_MOVE);
-    ResString rDoit(hRes, bCopy ? IDS_FILE_DROP_DOCOPY : IDS_FILE_DROP_DOMOVE);
-    ResString rCancel(hRes, IDS_FILE_DROP_CANCEL);
+    ResString rTitle(g_hRes, IDS_FILE_DROP);
+    ResString rQuestion(g_hRes, bCopy ? IDS_FILE_DROP_COPY : IDS_FILE_DROP_MOVE);
+    ResString rDoit(g_hRes, bCopy ? IDS_FILE_DROP_DOCOPY : IDS_FILE_DROP_DOMOVE);
+    ResString rCancel(g_hRes, IDS_FILE_DROP_CANCEL);
     // Show exactly what we are creating.
     std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str(), hitpath.c_str());
 
@@ -3615,7 +3615,7 @@ static bool AskToCopyOrMoveFile(HWND hWnd, const std::wstring& filename, const s
     tdc.nDefaultButton = 101;
 
     tdc.hwndParent         = hWnd;
-    tdc.hInstance          = hRes;
+    tdc.hInstance          = g_hRes;
     tdc.dwFlags            = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
     tdc.pszWindowTitle     = MAKEINTRESOURCE(IDS_APP_TITLE);
     tdc.pszMainIcon        = TD_INFORMATION_ICON;

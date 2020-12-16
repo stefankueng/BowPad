@@ -132,7 +132,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
             m_fgColor.ConvertToColorButton(*this, IDC_FG_BTN);
             m_bkColor.ConvertToColorButton(*this, IDC_BK_BTN);
 
-            ResString sExtTooltip(hRes, IDS_EXTENSIONTOOLTIP);
+            ResString sExtTooltip(g_hRes, IDS_EXTENSIONTOOLTIP);
 
             AddToolTip(IDC_EXTENSIONS, sExtTooltip);
 
@@ -478,7 +478,7 @@ bool CCmdStyleConfigurator::Execute()
     if (g_pStyleConfiguratorDlg == nullptr)
         g_pStyleConfiguratorDlg = std::make_unique<CStyleConfiguratorDlg>(m_pMainWindow);
 
-    g_pStyleConfiguratorDlg->ShowModeless(hRes, IDD_STYLECONFIGURATOR, GetHwnd());
+    g_pStyleConfiguratorDlg->ShowModeless(g_hRes, IDD_STYLECONFIGURATOR, GetHwnd());
 
     return true;
 }

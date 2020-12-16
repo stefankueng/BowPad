@@ -78,7 +78,7 @@ LRESULT CAboutDlg::DoCommand(int id)
             }
             else
             {
-                ResString sNoUpdate(hRes, IDS_NOUPDATES);
+                ResString sNoUpdate(g_hRes, IDS_NOUPDATES);
                 MessageBox(*this, sNoUpdate, L"BowPad", MB_ICONINFORMATION);
             }
         }

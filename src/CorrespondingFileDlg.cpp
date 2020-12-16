@@ -46,7 +46,7 @@ CCorrespondingFileDlg::~CCorrespondingFileDlg()
 void CCorrespondingFileDlg::Show(HWND parent, const std::wstring& initialPath)
 {
     m_initialPath = initialPath;
-    DoModal(hRes, IDD_CORRESPONDINGFILEDLG, parent);
+    DoModal(g_hRes, IDD_CORRESPONDINGFILEDLG, parent);
 }
 
 LRESULT CCorrespondingFileDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -120,34 +120,34 @@ CFFileInfo CCorrespondingFileDlg::GetCFInfo()
 
     if (info.f1Filename.empty())
     {
-        ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILENAMEFIRST);
+        ResString rStatus(g_hRes, IDS_CORRESPONDING_FILE_ERR_FILENAMEFIRST);
         info.status = rStatus.c_str();
         return info;
     }
     if (info.f2Filename.empty())
     {
-        ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILENAMESECOND);
+        ResString rStatus(g_hRes, IDS_CORRESPONDING_FILE_ERR_FILENAMESECOND);
         info.status = rStatus.c_str();
         return info;
     }
 
     if (CPathUtils::PathCompare(info.f1Path, info.f2Path) == 0)
     {
-        ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILENAMESMUSTBEDIFFERENT);
+        ResString rStatus(g_hRes, IDS_CORRESPONDING_FILE_ERR_FILENAMESMUSTBEDIFFERENT);
         info.status = rStatus.c_str();
         return info;
     }
 
     if (!info.f1Folder.empty() && !PathFileExists(info.f1Folder.c_str()))
     {
-        ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_DIRNOTEXIST);
+        ResString rStatus(g_hRes, IDS_CORRESPONDING_FILE_ERR_DIRNOTEXIST);
         auto sStatus = CStringUtils::Format(rStatus, info.f1Folder.c_str());
         info.status = sStatus;
         return info;
     }
     if (!info.f2Folder.empty() && !PathFileExists(info.f2Folder.c_str()))
     {
-        ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_DIRNOTEXIST);
+        ResString rStatus(g_hRes, IDS_CORRESPONDING_FILE_ERR_DIRNOTEXIST);
         auto sStatus = CStringUtils::Format(rStatus, info.f2Folder.c_str());
         info.status = sStatus;
         return info;
@@ -157,34 +157,34 @@ CFFileInfo CCorrespondingFileDlg::GetCFInfo()
     {
         if (info.f1Folder.empty())
         {
-            ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FOLDERREQUIREDFIRST);
+            ResString rStatus(g_hRes, IDS_CORRESPONDING_FILE_ERR_FOLDERREQUIREDFIRST);
             info.status = rStatus.c_str();
             return info;
         }
         if (info.f2Folder.empty())
         {
-            ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FOLDERREQUIREDSECOND);
+            ResString rStatus(g_hRes, IDS_CORRESPONDING_FILE_ERR_FOLDERREQUIREDSECOND);
             info.status = rStatus.c_str();
             return info;
         }
 
         if (info.f1Exists && info.f2Exists)
         {
-            ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILESEXIST);
+            ResString rStatus(g_hRes, IDS_CORRESPONDING_FILE_ERR_FILESEXIST);
             auto sStatus = CStringUtils::Format(rStatus, info.f1Path.c_str(), info.f2Path.c_str());
             info.status = sStatus;
             return info;
         }
         if (info.f1Exists)
         {
-            ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILEEXISTS);
+            ResString rStatus(g_hRes, IDS_CORRESPONDING_FILE_ERR_FILEEXISTS);
             auto sStatus = CStringUtils::Format(rStatus, info.f1Path.c_str());
             info.status = sStatus;
             return info;
         }
         if (info.f2Exists)
         {
-            ResString rStatus(hRes, IDS_CORRESPONDING_FILE_ERR_FILEEXISTS);
+            ResString rStatus(g_hRes, IDS_CORRESPONDING_FILE_ERR_FILEEXISTS);
             auto sStatus = CStringUtils::Format(rStatus, info.f2Path.c_str());
             info.status = sStatus;
             return info;

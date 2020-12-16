@@ -18,6 +18,6 @@
 
 #include "resource.h"
 
-extern HINSTANCE hRes;
+extern HINSTANCE g_hRes;
 extern HINSTANCE g_hInst;
 extern bool firstInstance;

@@ -36,7 +36,7 @@
 using Microsoft::WRL::ComPtr;
 
 HINSTANCE g_hInst;
-HINSTANCE hRes;
+HINSTANCE g_hRes;
 bool      firstInstance = false;
 
 static void LoadLanguage(HINSTANCE hInstance)
@@ -76,9 +76,9 @@ static void LoadLanguage(HINSTANCE hInstance)
         }
         if (CAppUtils::HasSameMajorVersion(langdllpath))
         {
-            hRes = LoadLibraryEx(langdllpath.c_str(), nullptr, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE | LOAD_LIBRARY_AS_DATAFILE);
-            if (hRes == nullptr)
-                hRes = g_hInst;
+            g_hRes = LoadLibraryEx(langdllpath.c_str(), nullptr, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE | LOAD_LIBRARY_AS_DATAFILE);
+            if (g_hRes == nullptr)
+                g_hRes = g_hInst;
         }
     }
 }
@@ -177,7 +177,7 @@ static void SetJumplist(LPCTSTR appID)
 
         if (!SysInfo::Instance().IsElevated())
         {
-            ResString sTemp(hRes, IDS_RUNASADMIN);
+            ResString sTemp(g_hRes, IDS_RUNASADMIN);
 
             ComPtr<IShellLink> psladmin;
             hr = CreateShellLink(L"/multiple", sTemp, 4, true, &psladmin);
@@ -470,7 +470,7 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
 
     SetIcon();
 
-    CMainWindow mainWindow(hRes);
+    CMainWindow mainWindow(g_hRes);
 
     if (!mainWindow.RegisterAndCreateWindow())
         return -1;
@@ -518,7 +518,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
                       _In_ int           nCmdShow)
 {
     g_hInst = hInstance;
-    hRes  = hInstance;
+    g_hRes  = hInstance;
 
     const std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
     ::SetLastError(NO_ERROR); // Don't do any work between these 3 statements to spoil the error code.

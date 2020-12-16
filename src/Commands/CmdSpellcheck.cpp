@@ -479,8 +479,8 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
 
     if (key == UI_PKEY_Categories)
     {
-        ResString sCorrect(hRes, IDS_SPELLCHECK_CORRECT);
-        ResString sIgnore(hRes, IDS_SPELLCHECK_IGNORE);
+        ResString sCorrect(g_hRes, IDS_SPELLCHECK_CORRECT);
+        ResString sIgnore(g_hRes, IDS_SPELLCHECK_IGNORE);
 
         IUICollectionPtr pCollection;
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
@@ -547,13 +547,13 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
         }
         if (m_suggestions.empty())
         {
-            ResString sNoSuggestions(hRes, IDS_SPELLCHECK_NOSUGGESTIONS);
+            ResString sNoSuggestions(g_hRes, IDS_SPELLCHECK_NOSUGGESTIONS);
             CAppUtils::AddStringItem(pCollection, sNoSuggestions, 0, nullptr);
         }
         else
         {
-            ResString sIgnoreSession(hRes, IDS_SPELLCHECK_IGNORESESSION);
-            ResString sAddToDictionary(hRes, IDS_SPELLCHECK_ADDTODICTIONARY);
+            ResString sIgnoreSession(g_hRes, IDS_SPELLCHECK_IGNORESESSION);
+            ResString sAddToDictionary(g_hRes, IDS_SPELLCHECK_ADDTODICTIONARY);
 
             CAppUtils::AddStringItem(pCollection, sIgnoreSession, 1, nullptr);
             CAppUtils::AddStringItem(pCollection, sAddToDictionary, 1, nullptr);

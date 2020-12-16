@@ -204,13 +204,13 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROP
                                 gRemotes.push_back(std::move(line));
                         }
                     }
-                    ResString sLangLoadOk(hRes, IDS_LANGUAGE_DOWNLOADOK);
+                    ResString sLangLoadOk(g_hRes, IDS_LANGUAGE_DOWNLOADOK);
                     MessageBox(GetHwnd(), sLangLoadOk, L"BowPad", MB_ICONINFORMATION);
                     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
                 }
                 else
                 {
-                    ResString sLangLoadFailed(hRes, IDS_LANGUAGE_DOWNLOADFAILED);
+                    ResString sLangLoadFailed(g_hRes, IDS_LANGUAGE_DOWNLOADFAILED);
                     MessageBox(GetHwnd(), sLangLoadFailed, L"BowPad", MB_ICONERROR);
                 }
             }
@@ -227,13 +227,13 @@ HRESULT CCmdLanguage::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROP
                     HRESULT      res      = URLDownloadToFile(nullptr, sLangURL.c_str(), langfile.c_str(), 0, nullptr);
                     if (FAILED(res))
                     {
-                        ResString sLangLoadFailed(hRes, IDS_LANGUAGE_DOWNLOADFAILEDFILE);
+                        ResString sLangLoadFailed(g_hRes, IDS_LANGUAGE_DOWNLOADFAILEDFILE);
                         MessageBox(GetHwnd(), sLangLoadFailed, L"BowPad", MB_ICONERROR);
                         return res;
                     }
                 }
                 CIniSettings::Instance().SetString(L"UI", L"language", gLanguages[selected].c_str());
-                ResString sLangRestart(hRes, IDS_LANGUAGE_RESTART);
+                ResString sLangRestart(g_hRes, IDS_LANGUAGE_RESTART);
                 MessageBox(GetHwnd(), sLangRestart, L"BowPad", MB_ICONINFORMATION);
             }
             hr = S_OK;

@@ -150,7 +150,7 @@ HRESULT CCmdLaunchCustom::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
             return UIInitPropertyFromString(UI_PKEY_Label, commandLabel.c_str(), ppropvarNewValue);
         else
         {
-            ResString label(hRes, IDS_CUSTOMCOMMANDTITLE);
+            ResString label(g_hRes, IDS_CUSTOMCOMMANDTITLE);
             auto      sLabel = CStringUtils::Format(label, m_customId);
             return UIInitPropertyFromString(UI_PKEY_Label, sLabel.c_str(), ppropvarNewValue);
         }
@@ -171,7 +171,7 @@ LRESULT CALLBACK CCustomCommandsDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wPa
         {
             InitDialog(hwndDlg, IDI_BOWPAD);
             CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
-            ResString sInfo(hRes, IDS_CUSTOMCOMMANDSINFO);
+            ResString sInfo(g_hRes, IDS_CUSTOMCOMMANDSINFO);
             SetDlgItemText(hwndDlg, IDC_INFO, sInfo);
 
             m_resizer.Init(hwndDlg);
@@ -345,7 +345,7 @@ LRESULT CCustomCommandsDlg::DoCommand(int id)
 bool CCmdCustomCommands::Execute()
 {
     CCustomCommandsDlg dlg;
-    if (dlg.DoModal(hRes, IDD_CUSTOMCOMMANDSDLG, GetHwnd()) == IDOK)
+    if (dlg.DoModal(g_hRes, IDD_CUSTOMCOMMANDSDLG, GetHwnd()) == IDOK)
     {
         for (int i = 0; i < 10; ++i)
         {

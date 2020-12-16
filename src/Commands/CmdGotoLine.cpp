@@ -74,9 +74,9 @@ bool CCmdGotoLine::Execute()
     dlg.line   = GetCurrentLineNumber() + 1;
     auto first = ScintillaCall(SCI_LINEFROMPOSITION, 0)+1;
     auto last  = ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETLENGTH))+1;
-    ResString lineformat(hRes, IDS_GOTOLINEINFO);
+    ResString lineformat(g_hRes, IDS_GOTOLINEINFO);
     dlg.lineinfo = CStringUtils::Format(lineformat, first, last);
-    if (dlg.DoModal(hRes, IDD_GOTOLINE, GetHwnd())==IDOK)
+    if (dlg.DoModal(g_hRes, IDD_GOTOLINE, GetHwnd())==IDOK)
     {
         GotoLine(dlg.line - 1);
     }

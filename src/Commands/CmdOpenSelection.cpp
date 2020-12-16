@@ -87,7 +87,7 @@ HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
         std::wstring path = GetPathUnderCursor();
         path              = CPathUtils::GetFileName(path);
 
-        ResString label(hRes, cmdOpenSelection_LabelTitle_RESID);
+        ResString label(g_hRes, cmdOpenSelection_LabelTitle_RESID);
         if (!path.empty())
         {
             wchar_t compactPath[100] = {};

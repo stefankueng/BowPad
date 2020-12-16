@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ bool CCmdOpen::Execute()
         return false;
 
     // Set the standard title.
-    ResString rTitle(hRes, IDS_APP_TITLE);
+    ResString rTitle(g_hRes, IDS_APP_TITLE);
     pfd->SetTitle(rTitle);
 
     // Set the default folder to the folder of the current tab.
@@ -283,10 +283,10 @@ bool CCmdFileDelete::Execute()
         if (!doc.m_path.empty())
         {
             // ask first
-            ResString rTitle(hRes, IDS_FILEDELETE_TITLE);
-            ResString rQuestion(hRes, IDS_FILEDELETE_ASK);
-            ResString rDelete(hRes, IDS_FILEDELETE_DEL);
-            ResString rCancel(hRes, IDS_FILEDELETE_CANCEL);
+            ResString rTitle(g_hRes, IDS_FILEDELETE_TITLE);
+            ResString rQuestion(g_hRes, IDS_FILEDELETE_ASK);
+            ResString rDelete(g_hRes, IDS_FILEDELETE_DEL);
+            ResString rCancel(g_hRes, IDS_FILEDELETE_CANCEL);
             std::wstring filename = CPathUtils::GetFileName(doc.m_path);
             std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str());
 
@@ -298,7 +298,7 @@ bool CCmdFileDelete::Execute()
             aCustomButtons[1].pszButtonText = rCancel;
 
             tdc.hwndParent = GetHwnd();
-            tdc.hInstance = hRes;
+            tdc.hInstance = g_hRes;
             tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
             tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
             tdc.pButtons = aCustomButtons;

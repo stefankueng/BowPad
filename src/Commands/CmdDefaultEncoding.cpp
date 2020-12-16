@@ -136,7 +136,7 @@ LRESULT CDefaultEncodingDlg::DoCommand(int id, int /*msg*/)
 bool CCmdDefaultEncoding::Execute()
 {
     CDefaultEncodingDlg dlg;
-    dlg.DoModal(hRes, IDD_DEFAULTENCODING, GetHwnd());
+    dlg.DoModal(g_hRes, IDD_DEFAULTENCODING, GetHwnd());
 
     return true;
 }

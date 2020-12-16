@@ -26,7 +26,7 @@
 
 #include <algorithm>
 
-extern HINSTANCE hRes;
+extern HINSTANCE g_hRes;
 
 class CSummaryDlg : public CDialog
 {
@@ -185,7 +185,7 @@ bool CCmdSummary::Execute()
 
     const auto& doc = GetActiveDocument();
 
-    ResString    rSummary(hRes, IDS_SUMMARY);
+    ResString    rSummary(g_hRes, IDS_SUMMARY);
     std::wstring sSummary = CStringUtils::Format(rSummary,
                                                  doc.m_path.c_str(),
                                                  numWords,
@@ -195,7 +195,7 @@ bool CCmdSummary::Execute()
 
     CSummaryDlg dlg;
     dlg.m_sSummary = sSummary;
-    dlg.DoModal(hRes, IDD_SUMMARY, GetHwnd());
+    dlg.DoModal(g_hRes, IDD_SUMMARY, GetHwnd());
 
     return true;
 }

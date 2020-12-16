@@ -29,7 +29,7 @@
 #include <memory>
 #include <Commdlg.h>
 
-extern HINSTANCE     hRes;
+extern HINSTANCE     g_hRes;
 extern IUIFramework* g_pFramework;
 
 CCommandPaletteDlg::CCommandPaletteDlg(HWND hParent)
@@ -68,7 +68,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             m_hFilter  = GetDlgItem(*this, IDC_FILTER);
             m_hResults = GetDlgItem(*this, IDC_RESULTS);
 
-            ResString sFilterCue(hRes, IDS_COMMANDPALETTE_FILTERCUE);
+            ResString sFilterCue(g_hRes, IDS_COMMANDPALETTE_FILTERCUE);
             SendMessage(m_hFilter, EM_SETCUEBANNER, 1, (LPARAM)sFilterCue.c_str());
             SetWindowSubclass(m_hFilter, EditSubClassProc, 0, reinterpret_cast<DWORD_PTR>(this));
 
@@ -101,7 +101,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                         auto ttIDit = resourceData.find(sID);
                         if (ttIDit != resourceData.end())
                         {
-                            auto sRes        = LoadResourceWString(hRes, ttIDit->second);
+                            auto sRes        = LoadResourceWString(g_hRes, ttIDit->second);
                             data.description = sRes;
                         }
 
@@ -110,7 +110,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                         auto ltIDit = resourceData.find(sID);
                         if (ltIDit != resourceData.end())
                         {
-                            auto sRes    = LoadResourceWString(hRes, ltIDit->second);
+                            auto sRes    = LoadResourceWString(g_hRes, ltIDit->second);
                             data.command = sRes;
                             SearchReplace(data.command, L"&", L"");
                         }
@@ -136,7 +136,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                     auto ttIDit = resourceData.find(sID);
                     if (ttIDit != resourceData.end())
                     {
-                        auto sRes        = LoadResourceWString(hRes, ttIDit->second);
+                        auto sRes        = LoadResourceWString(g_hRes, ttIDit->second);
                         data.description = sRes;
                     }
 
@@ -145,7 +145,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                     auto ltIDit = resourceData.find(sID);
                     if (ltIDit != resourceData.end())
                     {
-                        auto sRes    = LoadResourceWString(hRes, ltIDit->second);
+                        auto sRes    = LoadResourceWString(g_hRes, ltIDit->second);
                         data.command = sRes;
                         SearchReplace(data.command, L"&", L"");
                     }
@@ -240,7 +240,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                 {
                     OnOutOfScope(
                         DestroyMenu(hPopup));
-                    ResString sFindAll(hRes, IDS_ADDTOQAT);
+                    ResString sFindAll(g_hRes, IDS_ADDTOQAT);
                     AppendMenu(hPopup, MF_STRING, IDS_ADDTOQAT, sFindAll);
                     auto cmd = TrackPopupMenu(hPopup, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, *this, nullptr);
                     if (cmd == IDS_ADDTOQAT)

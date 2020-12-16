@@ -168,7 +168,7 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                             if (!CPathUtils::Unzip2Folder(tempfile.c_str(), pluginsdir.c_str()))
                             {
                                 // failed to unzip/install the plugin
-                                ResString rPluginInstallFailed(hRes, IDS_PLUGINS_INSTALLFAILED);
+                                ResString rPluginInstallFailed(g_hRes, IDS_PLUGINS_INSTALLFAILED);
                                 std::wstring sMsg = CStringUtils::Format((LPCWSTR)rPluginInstallFailed, info.name.c_str());
                                 MessageBox(GetHwnd(), sMsg.c_str(), L"BowPad", MB_ICONINFORMATION);
                             }
@@ -223,7 +223,7 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
             }
             if (bChanged)
             {
-                ResString rRestartRequired(hRes, IDS_PLUGINS_RESTARTREQUIRED);
+                ResString rRestartRequired(g_hRes, IDS_PLUGINS_RESTARTREQUIRED);
                 MessageBox(GetHwnd(), (LPCWSTR)rRestartRequired, L"BowPad", MB_ICONINFORMATION);
             }
         }
@@ -254,8 +254,8 @@ LRESULT CPluginsConfigDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
         {
             NMLVEMPTYMARKUP * lpNMEmptyMarkup = (NMLVEMPTYMARKUP *)lpNMItemActivate;
             lpNMEmptyMarkup->dwFlags = EMF_CENTERED;
-            ResString rThreadIsRunning(hRes, IDS_FETCHING_PLUGINS_LIST);
-            ResString rEmpty(hRes, IDS_NO_PLUGINS_AVAILABLE);
+            ResString rThreadIsRunning(g_hRes, IDS_FETCHING_PLUGINS_LIST);
+            ResString rEmpty(g_hRes, IDS_NO_PLUGINS_AVAILABLE);
             wcscpy_s(lpNMEmptyMarkup->szMarkup, m_threadEnded ? rEmpty : rThreadIsRunning);
             lpNMEmptyMarkup->szMarkup;
             return TRUE;
@@ -281,9 +281,9 @@ void CPluginsConfigDlg::InitPluginsList()
 
     ListView_SetExtendedListViewStyle(hListControl, exStyle);
 
-    ResString sName(hRes, IDS_PLUGINLIST_NAME);
-    ResString sVersion(hRes, IDS_PLUGINLIST_VERSION);
-    ResString sInstVersion(hRes, IDS_PLUGINLIST_INSTVERSION);
+    ResString sName(g_hRes, IDS_PLUGINLIST_NAME);
+    ResString sVersion(g_hRes, IDS_PLUGINLIST_VERSION);
+    ResString sInstVersion(g_hRes, IDS_PLUGINLIST_INSTVERSION);
 
     LVCOLUMN lvc = { 0 };
     lvc.mask = LVCF_TEXT | LVCF_FMT;
@@ -328,7 +328,7 @@ void CPluginsConfigDlg::InitPluginsList()
 bool CCmdPluginsConfig::Execute()
 {
     CPluginsConfigDlg dlg(m_pMainWindow);
-    dlg.DoModal(hRes, IDD_PLUGINSCONFIGDLG, GetHwnd());
+    dlg.DoModal(g_hRes, IDD_PLUGINSCONFIGDLG, GetHwnd());
 
     return true;
 }

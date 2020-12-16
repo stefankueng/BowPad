@@ -289,7 +289,7 @@ bool CAppUtils::ShowUpdateAvailableDialog( HWND hWnd )
     };
 
     tdc.hwndParent = hWnd;
-    tdc.hInstance = hRes;
+    tdc.hInstance = g_hRes;
     tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
     tdc.pButtons = aCustomButtons;
     tdc.cButtons = _countof(aCustomButtons);
@@ -412,7 +412,7 @@ HRESULT CAppUtils::AddCategory(IUICollectionPtr& coll, int catId, int catNameRes
     if (CAppUtils::FailedShowMessage(hr))
         return hr;
 
-    ResString catName(hRes, catNameResId);
+    ResString catName(g_hRes, catNameResId);
     cat->InitializeCategoryProperties(catName, catId);
     hr = coll->Add(cat);
     cat->Release();
@@ -421,7 +421,7 @@ HRESULT CAppUtils::AddCategory(IUICollectionPtr& coll, int catId, int catNameRes
 
 HRESULT CAppUtils::AddResStringItem(IUICollectionPtr& collection, int resId, int cat, IUIImage * pImg)
 {
-    ResString rs(hRes, resId);
+    ResString rs(g_hRes, resId);
     return AddStringItem(collection, rs, cat, pImg);
 }
 

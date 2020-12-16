@@ -208,7 +208,7 @@ std::wstring GetHomeFolder()
 CFindReplaceDlg::CFindReplaceDlg(void* obj)
     : ICommand(obj)
     , CBPBaseDialog()
-    , m_searchWnd(hRes)
+    , m_searchWnd(g_hRes)
 {
     m_maxSearchResults = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearchresults", MAX_SEARCHRESULTS);
 }
@@ -231,7 +231,7 @@ std::wstring CFindReplaceDlg::GetCurrentDocumentFolder() const
 
 void CFindReplaceDlg::UpdateMatchCount(bool finished)
 {
-    ResString rInfo(hRes, IDS_FINDRESULT_COUNT);
+    ResString rInfo(g_hRes, IDS_FINDRESULT_COUNT);
     auto      sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size());
     if (!finished) // Indicate more results might come.
         sInfo += L"...";
@@ -253,9 +253,9 @@ void CFindReplaceDlg::HandleButtonDropDown(const NMBCDROPDOWN* pDropDown)
         DestroyMenu(hSplitMenu););
     if (pDropDown->hdr.hwndFrom == GetDlgItem(*this, IDC_FINDBTN))
     {
-        ResString sFindAll(hRes, IDS_FINDALL);
-        ResString sFindAllInTabs(hRes, IDS_FINDALLINTABS);
-        ResString findAllInDir(hRes, IDS_FINDALLINDIR);
+        ResString sFindAll(g_hRes, IDS_FINDALL);
+        ResString sFindAllInTabs(g_hRes, IDS_FINDALLINTABS);
+        ResString findAllInDir(g_hRes, IDS_FINDALLINDIR);
         AppendMenu(hSplitMenu, MF_STRING, IDC_FINDALL, sFindAll);
         AppendMenu(hSplitMenu, MF_STRING, IDC_FINDALLINTABS, sFindAllInTabs);
         AppendMenu(hSplitMenu, MF_STRING, IDC_FINDALLINDIR, findAllInDir);
@@ -272,12 +272,12 @@ void CFindReplaceDlg::HandleButtonDropDown(const NMBCDROPDOWN* pDropDown)
             wrapcount = ScintillaCall(SCI_WRAPCOUNT, linestart);
         bool bReplaceOnlyInSelection = (linestart != lineend) || ((wrapcount > 1) && (selEnd - selStart > 20));
 
-        ResString sReplaceAll(hRes, IDS_REPLACEALL);
-        ResString sReplaceAllInSelection(hRes, IDS_REPLACEALLINSELECTION);
+        ResString sReplaceAll(g_hRes, IDS_REPLACEALL);
+        ResString sReplaceAllInSelection(g_hRes, IDS_REPLACEALLINSELECTION);
         AppendMenu(hSplitMenu, MF_STRING, IDC_REPLACEALLBTN,
                    bReplaceOnlyInSelection ? sReplaceAllInSelection : sReplaceAll);
 
-        ResString sReplaceAllInTabs(hRes, IDS_REPLACEALLINTABS);
+        ResString sReplaceAllInTabs(g_hRes, IDS_REPLACEALLINTABS);
         AppendMenu(hSplitMenu, MF_STRING, IDC_REPLACEALLINTABSBTN, sReplaceAllInTabs);
     }
     // Display the menu.
@@ -503,20 +503,20 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
 
     SetWindowPos(hwndDlg, HWND_TOP, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
 
-    ResString findPreviousTip(hRes, IDS_TT_FINDPREVIOUS);
+    ResString findPreviousTip(g_hRes, IDS_TT_FINDPREVIOUS);
     AddToolTip(IDC_FINDPREVIOUS, findPreviousTip);
-    ResString setSearchFolderToCurrentTip(hRes, IDS_TT_SETSEARCHFOLDERCURRENT);
+    ResString setSearchFolderToCurrentTip(g_hRes, IDS_TT_SETSEARCHFOLDERCURRENT);
     AddToolTip(IDC_SETSEARCHFOLDERCURRENT, setSearchFolderToCurrentTip);
-    ResString setSearchFolderToParentTip(hRes, IDS_TT_SETSEARCHFOLDERTOPARENT);
+    ResString setSearchFolderToParentTip(g_hRes, IDS_TT_SETSEARCHFOLDERTOPARENT);
     AddToolTip(IDC_SETSEARCHFOLDERTOPARENT, setSearchFolderToParentTip);
-    ResString setSearchFolderTip(hRes, IDS_TT_SETSEARCHFOLDER);
+    ResString setSearchFolderTip(g_hRes, IDS_TT_SETSEARCHFOLDER);
     AddToolTip(IDC_SETSEARCHFOLDER, setSearchFolderTip);
 
     InitSizing();
     GetWindowRect(hwndDlg, &rcDlg);
     m_originalSize = {rcDlg.right - rcDlg.left, rcDlg.bottom - rcDlg.top};
 
-    m_searchWnd.Init(hRes, *this);
+    m_searchWnd.Init(g_hRes, *this);
 
     LoadSearchStrings();
     LoadReplaceStrings();
@@ -621,7 +621,7 @@ void CFindReplaceDlg::CheckSearchFolder()
 
 void CFindReplaceDlg::FindText()
 {
-    this->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
+    this->ShowModeless(g_hRes, IDD_FINDREPLACEDLG, GetHwnd());
     auto selStart  = ScintillaCall(SCI_GETSELECTIONSTART);
     auto selEnd    = ScintillaCall(SCI_GETSELECTIONEND);
     auto linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
@@ -644,7 +644,7 @@ void CFindReplaceDlg::FindText()
 
 void CFindReplaceDlg::FindFunction(const std::wstring& functionToFind)
 {
-    this->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
+    this->ShowModeless(g_hRes, IDD_FINDREPLACEDLG, GetHwnd());
     SetDlgItemText(*this, IDC_SEARCHCOMBO, functionToFind.c_str());
     Button_SetCheck(GetDlgItem(*this, IDC_FUNCTIONS), BST_CHECKED);
     Button_SetCheck(GetDlgItem(*this, IDC_MATCHWORD), BST_CHECKED);
@@ -658,7 +658,7 @@ void CFindReplaceDlg::FindFunction(const std::wstring& functionToFind)
 
 void CFindReplaceDlg::FindFile(const std::wstring& fileToFind)
 {
-    this->ShowModeless(hRes, IDD_FINDREPLACEDLG, GetHwnd());
+    this->ShowModeless(g_hRes, IDD_FINDREPLACEDLG, GetHwnd());
     Clear(IDC_SEARCHCOMBO);
     SetDlgItemText(*this, IDC_SEARCHFILES, CPathUtils::GetFileName(fileToFind).c_str());
     auto parentDir = CPathUtils::GetParentDirectory(fileToFind);
@@ -1230,7 +1230,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
         case IDC_MATCHREGEX:
             if (msg == BN_CLICKED)
             {
-                ResString    sInfo(hRes, IDS_REGEXTOOLTIP);
+                ResString    sInfo(g_hRes, IDS_REGEXTOOLTIP);
                 bool         useRegEx = IsDlgButtonChecked(*this, IDC_MATCHREGEX) == BST_CHECKED;
                 COMBOBOXINFO cinfo{sizeof(COMBOBOXINFO)};
                 GetComboBoxInfo(GetDlgItem(*this, IDC_REPLACECOMBO), &cinfo);
@@ -1338,7 +1338,7 @@ void CFindReplaceDlg::LetUserSelectSearchFolder()
     std::wstring selectedFolder;
 
     CBrowseFolder bf;
-    ResString     title(hRes, IDS_APP_TITLE);
+    ResString     title(g_hRes, IDS_APP_TITLE);
     bf.SetInfo(title);
     // Don't use a path that doesn't exist as the dialog will refuse to open.
     // Try to offer something other than blank.
@@ -1371,7 +1371,7 @@ void CFindReplaceDlg::LetUserSelectSearchFolder()
 
 void CFindReplaceDlg::SetInfoText(UINT resid, AlertMode alertMode)
 {
-    ResString str(hRes, resid);
+    ResString str(g_hRes, resid);
     SetDlgItemText(*this, IDC_SEARCHINFO, str);
     if (alertMode == AlertMode::Flash)
         FlashWindow(*this);
@@ -1550,7 +1550,7 @@ void CFindReplaceDlg::DoReplace(int id)
     {
         if (replaceCount > 0)
         {
-            ResString rInfo(hRes, IDS_REPLACEDCOUNT);
+            ResString rInfo(g_hRes, IDS_REPLACEDCOUNT);
             auto      sInfo = CStringUtils::Format(rInfo, replaceCount);
             SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
             // We can assume replaced everything so there is no point stay focused
@@ -1764,7 +1764,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
         {
             auto        docId = GetDocIDFromTabIndex(GetActiveTabIndex());
             const auto& doc   = GetActiveDocument();
-            ResString   rInfo(hRes, IDS_SEARCHING_FILE);
+            ResString   rInfo(g_hRes, IDS_SEARCHING_FILE);
             auto        sInfo = CStringUtils::Format(rInfo, CPathUtils::GetFileName(doc.m_path).c_str());
             SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
             SearchDocument(m_searchWnd, docId, doc, searchfor, searchflags, exSearchFlags,
@@ -1773,7 +1773,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
         }
         else if (id == IDC_FINDALLINTABS)
         {
-            ResString rInfo(hRes, IDS_SEARCHING_FILE);
+            ResString rInfo(g_hRes, IDS_SEARCHING_FILE);
             int       tabcount = GetTabCount();
             for (int i = 0; i < tabcount; ++i)
             {
@@ -1786,7 +1786,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
                                m_searchResults, m_foundPaths);
                 if (m_foundsize >= m_maxSearchResults)
                 {
-                    ResString rInfoMax(hRes, IDS_SEARCHING_FILE_MAX);
+                    ResString rInfoMax(g_hRes, IDS_SEARCHING_FILE_MAX);
                     auto      sInfoMax = CStringUtils::Format(rInfoMax, m_maxSearchResults);
                     SetDlgItemText(*this, IDC_SEARCHINFO, sInfoMax.c_str());
                     break;
@@ -1802,12 +1802,12 @@ void CFindReplaceDlg::DoSearchAll(int id)
         {
             if (m_searchResults.size() >= m_maxSearchResults)
             {
-                ResString rInfoMax(hRes, IDS_SEARCHING_FILE_MAX);
+                ResString rInfoMax(g_hRes, IDS_SEARCHING_FILE_MAX);
                 sInfo = CStringUtils::Format(rInfoMax, m_maxSearchResults);
             }
             else
             {
-                ResString rInfo(hRes, IDS_FINDRESULT_COUNTALL);
+                ResString rInfo(g_hRes, IDS_FINDRESULT_COUNTALL);
                 sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size(), GetTabCount());
             }
         }
@@ -1815,12 +1815,12 @@ void CFindReplaceDlg::DoSearchAll(int id)
         {
             if (m_searchResults.size() >= m_maxSearchResults)
             {
-                ResString rInfoMax(hRes, IDS_SEARCHING_FILE_MAX);
+                ResString rInfoMax(g_hRes, IDS_SEARCHING_FILE_MAX);
                 sInfo = CStringUtils::Format(rInfoMax, m_maxSearchResults);
             }
             else
             {
-                ResString rInfo(hRes, IDS_FINDRESULT_COUNT);
+                ResString rInfo(g_hRes, IDS_FINDRESULT_COUNT);
                 sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size());
             }
         }
@@ -1945,8 +1945,8 @@ void CFindReplaceDlg::SearchThread(
 
     // We need a Scintilla object created on the same thread as it will be used,
     // that's why we can't use the m_searchWnd object.
-    CScintillaWnd searchWnd(hRes);
-    searchWnd.InitScratch(hRes);
+    CScintillaWnd searchWnd(g_hRes);
+    searchWnd.InitScratch(g_hRes);
 
     CDirFileEnum     enumerator(searchpath);
     bool             bIsDir = false;
@@ -2300,9 +2300,9 @@ void CFindReplaceDlg::InitResultsList()
     ListView_SetExtendedListViewStyle(hListControl, exStyle);
 
     // NOTE: m_searchType or m_resultsType could be set here to adjust the titles if need be.
-    ResString sFile(hRes, IDS_FINDRESULT_HEADERFILE);
-    ResString sLine(hRes, IDS_FINDRESULT_HEADERLINE);
-    ResString sLineText(hRes, IDS_FINDRESULT_HEADERLINETEXT);
+    ResString sFile(g_hRes, IDS_FINDRESULT_HEADERFILE);
+    ResString sLine(g_hRes, IDS_FINDRESULT_HEADERLINE);
+    ResString sLineText(g_hRes, IDS_FINDRESULT_HEADERLINETEXT);
 
     LVCOLUMN lvc{};
     lvc.mask = LVCF_TEXT | LVCF_FMT;

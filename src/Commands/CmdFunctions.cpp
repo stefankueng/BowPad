@@ -164,7 +164,7 @@ static bool FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf,
 CCmdFunctions::CCmdFunctions(void* obj)
     : ICommand(obj)
     , m_autoscanlimit((size_t)-1)
-    , m_edit(hRes)
+    , m_edit(g_hRes)
 {
     // Need to restart BP if you change these settings but helps
     // performance a little to inquire them here.
@@ -176,7 +176,7 @@ CCmdFunctions::CCmdFunctions(void* obj)
 
     m_timerID = GetTimerID();
 
-    m_edit.InitScratch(hRes);
+    m_edit.InitScratch(g_hRes);
 
     InterlockedExchange(&m_bThreadRunning, FALSE);
 
@@ -613,8 +613,8 @@ void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const
     if (langData->functionregex.empty())
         return;
 
-    CScintillaWnd edit(hRes);
-    edit.InitScratch(hRes);
+    CScintillaWnd edit(g_hRes);
+    edit.InitScratch(g_hRes);
 
     edit.Call(SCI_SETDOCPOINTER, 0, 0);
     edit.Call(SCI_SETSTATUS, SC_STATUS_OK);

@@ -275,8 +275,8 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
             return E_FAIL;
         auto& doc = GetModDocumentFromID(docId);
 
-        CScintillaWnd edit(hRes);
-        edit.InitScratch(hRes);
+        CScintillaWnd edit(g_hRes);
+        edit.InitScratch(g_hRes);
 
         AttachDocument(edit, doc);
         OnOutOfScope(
@@ -338,7 +338,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
 
     m_menuInfo.push_back(RelatedFileItem(correspondingFile,
         RelatedType::CreateCorrespondingFiles));
-    ResString createCorrespondingFiles(hRes, IDS_NEWCORRESPONDINGFILES);
+    ResString createCorrespondingFiles(g_hRes, IDS_NEWCORRESPONDINGFILES);
 
     auto hr = CAppUtils::AddStringItem(collection, createCorrespondingFiles.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, nullptr);
     if (FAILED(hr))
@@ -357,7 +357,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
                 m_menuInfo.push_back(RelatedFileItem(correspondingFile,
                     RelatedType::CreateCorrespondingFile));
 
-                ResString createMenuItem(hRes, IDS_CREATE_CORRESPONDING_FILE);
+                ResString createMenuItem(g_hRes, IDS_CREATE_CORRESPONDING_FILE);
                 std::wstring menuText = CStringUtils::Format(createMenuItem, filename.c_str());
 
                 hr = CAppUtils::AddStringItem(collection, menuText.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, nullptr);
@@ -805,7 +805,7 @@ bool CCmdHeaderSource::ShowSingleFileSelectionDialog(HWND hWndParent, const std:
     }
 
     // Set the standard title.
-    ResString rTitle(hRes, IDS_APP_TITLE);
+    ResString rTitle(g_hRes, IDS_APP_TITLE);
     pfd->SetTitle(rTitle);
 
     if (!defaultFolder.empty())

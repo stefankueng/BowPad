@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016 - Stefan Kueng
+// Copyright (C) 2014, 2016, 2020§ - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ bool CCmdNewCopy::Execute()
         if (sTitle.empty())
             sTitle = GetCurrentTitle();
         std::wstring sExt = CPathUtils::GetFileExtension(doc.m_path);
-        ResString sTitleFormat(hRes, IDS_COPYTITLE);
+        ResString sTitleFormat(g_hRes, IDS_COPYTITLE);
         if (sExt.empty())
         {
             sTitle = CStringUtils::Format(sTitleFormat, sTitle.c_str(), sExt.c_str());
