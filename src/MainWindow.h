@@ -245,6 +245,8 @@ private:
     HICON hEditorconfigActive;
     HICON hEditorconfigInactive;
 
+    std::map<int, IUIImagePtr> m_win7PNGWorkaroundData;
+
     LONG       m_cRef;
     int        m_newCount;
     IUIRibbon* m_pRibbon;

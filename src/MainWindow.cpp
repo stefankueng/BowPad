@@ -427,18 +427,64 @@ STDMETHODIMP CMainWindow::UpdateProperty(
     UNREFERENCED_PARAMETER(ppropvarCurrentValue);
 
     HRESULT   hr   = E_NOTIMPL;
-    ICommand* pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
-    if (pCmd)
+    if ((key == UI_PKEY_LargeImage) ||
+        (key == UI_PKEY_SmallImage))
     {
-        hr                    = pCmd->IUICommandHandlerUpdateProperty(key, ppropvarCurrentValue, ppropvarNewValue);
-        std::wstring shortkey = CKeyboardShortcutHandler::Instance().GetTooltipTitleForCommand((WORD)nCmdID);
-        if (!shortkey.empty())
-            g_pFramework->InvalidateUICommand(nCmdID, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
-        if (key == UI_PKEY_TooltipTitle)
+        if (!IsWindows8OrGreater())
         {
-            if (!shortkey.empty())
+            IUIImagePtr image = nullptr;
+            const auto& imgIt = m_win7PNGWorkaroundData.find(nCmdID);
+            if (imgIt != m_win7PNGWorkaroundData.end())
             {
-                hr = UIInitPropertyFromString(UI_PKEY_TooltipTitle, shortkey.c_str(), ppropvarNewValue);
+                image = imgIt->second;
+            }
+            else
+            {
+                const auto& resourceData = CKeyboardShortcutHandler::Instance().GetResourceData();
+                auto whereAt = std::find_if(resourceData.begin(), resourceData.end(),
+                    [&](const auto& item) { return ((UINT)item.second == nCmdID); });
+                if (whereAt != resourceData.end())
+                {
+                    auto sID = whereAt->first;
+                    sID += L"_LargeImages_RESID";
+
+                    auto ttIDit = resourceData.find(sID);
+                    if (ttIDit == resourceData.end())
+                    {
+                        sID = whereAt->first;
+                        sID += L"_SmallImages_RESID";
+                        ttIDit = resourceData.find(sID);
+                    }
+                    if (ttIDit != resourceData.end())
+                    {
+                        if (SUCCEEDED(CAppUtils::CreateImage(MAKEINTRESOURCE(ttIDit->second), image)))
+                        {
+                            m_win7PNGWorkaroundData[nCmdID] = image;
+                        }
+                    }
+                }
+            }
+            if (image)
+            {
+                hr = UIInitPropertyFromImage(key, image, ppropvarNewValue);
+            }
+        }
+    }
+    else
+    {
+        ICommand* pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
+        if (pCmd)
+        {
+            hr = pCmd->IUICommandHandlerUpdateProperty(key, ppropvarCurrentValue, ppropvarNewValue);
+            std::wstring shortkey = CKeyboardShortcutHandler::Instance().GetTooltipTitleForCommand((WORD)nCmdID);
+            if (!shortkey.empty())
+                g_pFramework->InvalidateUICommand(nCmdID, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
+            if (key == UI_PKEY_TooltipTitle)
+            {
+                if (!shortkey.empty())
+                {
+                    hr = UIInitPropertyFromString(UI_PKEY_TooltipTitle, shortkey.c_str(), ppropvarNewValue);
+                }
             }
         }
     }

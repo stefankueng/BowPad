@@ -35,7 +35,7 @@
 #include <wrl.h>
 using Microsoft::WRL::ComPtr;
 
-HINSTANCE hInst;
+HINSTANCE g_hInst;
 HINSTANCE hRes;
 bool      firstInstance = false;
 
@@ -78,7 +78,7 @@ static void LoadLanguage(HINSTANCE hInstance)
         {
             hRes = LoadLibraryEx(langdllpath.c_str(), nullptr, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE | LOAD_LIBRARY_AS_DATAFILE);
             if (hRes == nullptr)
-                hRes = hInst;
+                hRes = g_hInst;
         }
     }
 }
@@ -291,7 +291,7 @@ static HWND FindAndWaitForBowPad()
 {
     // don't start another instance: reuse the existing one
     // find the window of the existing instance
-    ResString    clsResName(hInst, IDC_BOWPAD);
+    ResString    clsResName(g_hInst, IDC_BOWPAD);
     std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
 
     HWND hBowPadWnd = ::FindWindow(clsName.c_str(), nullptr);
@@ -517,7 +517,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
                       _In_ LPTSTR        lpCmdLine,
                       _In_ int           nCmdShow)
 {
-    hInst = hInstance;
+    g_hInst = hInstance;
     hRes  = hInstance;
 
     const std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();

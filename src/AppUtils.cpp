@@ -34,6 +34,11 @@
 #include <fstream>
 #include <DbgHelp.h>
 
+#pragma warning(push)
+#pragma warning(disable : 4458) // declaration of 'xxx' hides class member
+#include <gdiplus.h>
+#pragma warning(pop)
+
 #pragma comment(lib, "Urlmon.lib")
 #pragma comment(lib, "Shell32.lib")
 #pragma comment(lib, "DbgHelp.lib")
@@ -476,13 +481,13 @@ bool CAppUtils::ShowDropDownList(HWND hWnd, LPCWSTR ctrlName)
     return true;
 }
 
-HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg )
+HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg)
 {
     pOutImg = nullptr;
     // Create an IUIImage from a resource id.
-    IUIImagePtr pImg;
+    IUIImagePtr           pImg;
     IUIImageFromBitmapPtr pifbFactory;
-    HRESULT hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
+    HRESULT               hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
     if (SUCCEEDED(hr))
     {
         // Load the bitmap from the resource file.
@@ -499,6 +504,48 @@ HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg )
             else
             {
                 pOutImg = pImg;
+            }
+        }
+        else
+        {
+            hr = E_FAIL;
+            // before giving up, try loading the image resource with GDI+
+            DWORD resLen = 0;
+            auto resourceData = GetResourceData(L"IMAGE", LOWORD(resName), resLen);
+
+            if (resLen)
+            {
+                auto hBuffer = ::GlobalAlloc(GMEM_MOVEABLE, resLen);
+                if (hBuffer)
+                {
+                    void* pBuffer = ::GlobalLock(hBuffer);
+                    if (pBuffer)
+                    {
+                        CopyMemory(pBuffer, resourceData, resLen);
+
+                        IStream* pStream = NULL;
+                        if (::CreateStreamOnHGlobal(hBuffer, FALSE, &pStream) == S_OK)
+                        {
+                            auto pBitmap = Gdiplus::Bitmap::FromStream(pStream);
+                            pStream->Release();
+                            if (pBitmap)
+                            {
+                                if (pBitmap->GetLastStatus() == Gdiplus::Ok)
+                                {
+                                    pBitmap->GetHBITMAP(Gdiplus::Color(0xFFFFFFFF), &hbm);
+                                    hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_COPY, &pImg);
+                                    if (SUCCEEDED(hr))
+                                        pOutImg = pImg;
+                                    ::DeleteObject(hbm);
+                                }
+
+                                delete pBitmap;
+                            }
+                        }
+                        ::GlobalUnlock(hBuffer);
+                    }
+                    ::GlobalFree(hBuffer);
+                }
             }
         }
     }
