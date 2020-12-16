@@ -336,7 +336,14 @@ void CLexStyles::Load()
                 }
             }
             if (!filters.empty())
-                m_fileTypes.push_back(std::make_pair(std::wstring(langkey) + TEXT(" file"), std::move(filters)));
+            {
+                auto sKey = std::wstring(langkey) + TEXT(" file");
+                auto foundIt = std::find_if(m_fileTypes.begin(), m_fileTypes.end(),
+                    [&](const auto& item) { return (std::get<0>(item) == sKey); });
+                if (foundIt != m_fileTypes.end())
+                    m_fileTypes.erase(foundIt);
+                m_fileTypes.push_back(std::make_pair(sKey, std::move(filters)));
+            }
 
             std::wstring langsect = L"lang_";
             langsect += langkey;
