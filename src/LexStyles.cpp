@@ -830,6 +830,7 @@ void CLexStyles::ResetUserData()
     m_extLang.clear();
     m_Langdata.clear();
     m_lexerdata.clear();
+    m_filterSpec.clear();
     Load();
 }
 
