@@ -426,7 +426,7 @@ STDMETHODIMP CMainWindow::UpdateProperty(
 {
     UNREFERENCED_PARAMETER(ppropvarCurrentValue);
 
-    HRESULT   hr   = E_NOTIMPL;
+    HRESULT hr = E_NOTIMPL;
     if ((key == UI_PKEY_LargeImage) ||
         (key == UI_PKEY_SmallImage))
     {
@@ -441,8 +441,8 @@ STDMETHODIMP CMainWindow::UpdateProperty(
             else
             {
                 const auto& resourceData = CKeyboardShortcutHandler::Instance().GetResourceData();
-                auto whereAt = std::find_if(resourceData.begin(), resourceData.end(),
-                    [&](const auto& item) { return ((UINT)item.second == nCmdID); });
+                auto        whereAt      = std::find_if(resourceData.begin(), resourceData.end(),
+                                            [&](const auto& item) { return ((UINT)item.second == nCmdID); });
                 if (whereAt != resourceData.end())
                 {
                     auto sID = whereAt->first;
@@ -470,21 +470,18 @@ STDMETHODIMP CMainWindow::UpdateProperty(
             }
         }
     }
-    else
+    ICommand* pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
+    if (pCmd)
     {
-        ICommand* pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
-        if (pCmd)
+        hr                    = pCmd->IUICommandHandlerUpdateProperty(key, ppropvarCurrentValue, ppropvarNewValue);
+        std::wstring shortkey = CKeyboardShortcutHandler::Instance().GetTooltipTitleForCommand((WORD)nCmdID);
+        if (!shortkey.empty())
+            g_pFramework->InvalidateUICommand(nCmdID, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
+        if (key == UI_PKEY_TooltipTitle)
         {
-            hr = pCmd->IUICommandHandlerUpdateProperty(key, ppropvarCurrentValue, ppropvarNewValue);
-            std::wstring shortkey = CKeyboardShortcutHandler::Instance().GetTooltipTitleForCommand((WORD)nCmdID);
             if (!shortkey.empty())
-                g_pFramework->InvalidateUICommand(nCmdID, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
-            if (key == UI_PKEY_TooltipTitle)
             {
-                if (!shortkey.empty())
-                {
-                    hr = UIInitPropertyFromString(UI_PKEY_TooltipTitle, shortkey.c_str(), ppropvarNewValue);
-                }
+                hr = UIInitPropertyFromString(UI_PKEY_TooltipTitle, shortkey.c_str(), ppropvarNewValue);
             }
         }
     }
