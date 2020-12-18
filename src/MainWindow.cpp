@@ -427,6 +427,7 @@ STDMETHODIMP CMainWindow::UpdateProperty(
     UNREFERENCED_PARAMETER(ppropvarCurrentValue);
 
     HRESULT hr = E_NOTIMPL;
+    HRESULT hrImg = E_NOTIMPL;
     if ((key == UI_PKEY_LargeImage) ||
         (key == UI_PKEY_SmallImage))
     {
@@ -466,7 +467,7 @@ STDMETHODIMP CMainWindow::UpdateProperty(
             }
             if (image)
             {
-                hr = UIInitPropertyFromImage(key, image, ppropvarNewValue);
+                hrImg = UIInitPropertyFromImage(key, image, ppropvarNewValue);
             }
         }
     }
@@ -484,8 +485,17 @@ STDMETHODIMP CMainWindow::UpdateProperty(
                 hr = UIInitPropertyFromString(UI_PKEY_TooltipTitle, shortkey.c_str(), ppropvarNewValue);
             }
         }
+        if (!IsWindows8OrGreater())
+        {
+            if (m_win7PNGWorkaroundData.find(nCmdID) == m_win7PNGWorkaroundData.end())
+            {
+                g_pFramework->InvalidateUICommand(nCmdID, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_LargeImage);
+                g_pFramework->InvalidateUICommand(nCmdID, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SmallImage);
+            }
+        }
     }
-
+    if ((hrImg != E_NOTIMPL)&& FAILED(hr))
+        return hrImg;
     return hr;
 }
 
