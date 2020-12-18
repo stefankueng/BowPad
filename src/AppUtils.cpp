@@ -533,10 +533,11 @@ HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg)
                                 if (pBitmap->GetLastStatus() == Gdiplus::Ok)
                                 {
                                     pBitmap->GetHBITMAP(Gdiplus::Color(0xFFFFFFFF), &hbm);
-                                    hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_COPY, &pImg);
+                                    hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_TRANSFER, &pImg);
                                     if (SUCCEEDED(hr))
                                         pOutImg = pImg;
-                                    ::DeleteObject(hbm);
+                                    else
+                                        ::DeleteObject(hbm);
                                 }
 
                                 delete pBitmap;
