@@ -1075,7 +1075,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           <Group CommandName="cmdGroupComment" SizeDefinition="SixButtons">
             <DropDownGallery CommandName="cmdFunctions" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
-                <FlowMenuLayout Columns="1"/>
+                <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
             <SplitButtonGallery CommandName="cmdHeaderSource" TextPosition="Right" Type="Items" >
@@ -1128,7 +1128,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             <ToggleButton CommandName="cmdSpellCheck" />
             <DropDownGallery CommandName="cmdSpellCheckLang" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
-                <FlowMenuLayout Columns="4"/>
+                <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
             <ToggleButton CommandName="cmdSpellCheckAll" />
@@ -1476,7 +1476,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           <MenuGroup>
             <DropDownGallery CommandName="cmdSpellCheckCorrect" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
-                <FlowMenuLayout Columns="1"/>
+                <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
           </MenuGroup>
