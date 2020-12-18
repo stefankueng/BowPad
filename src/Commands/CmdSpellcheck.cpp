@@ -417,6 +417,7 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, 
             }
         }
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+        InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
         hr = S_OK;
     }
     else if (key == UI_PKEY_SelectedItem)
@@ -559,6 +560,7 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
             CAppUtils::AddStringItem(pCollection, sAddToDictionary, 1, nullptr);
         }
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+        InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
 
         hr = S_OK;
     }

@@ -508,6 +508,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
     }
 
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+    InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
 
     return true;
 }
@@ -636,6 +637,7 @@ HRESULT CCmdHeaderSource::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const 
             // The user selected a file to open, we don't want that file
             // to remain selected because the user is supposed to
             // reselect a new one each time,so clear the selection status.
+            InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
             hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
             if (CAppUtils::FailedShowMessage(hr))
                 return hr;

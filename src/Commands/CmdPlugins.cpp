@@ -74,6 +74,7 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
             }
         }
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+        InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
         hr = S_OK;
     }
     return hr;
@@ -97,6 +98,7 @@ HRESULT CCmdPlugins::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPE
                 {
                     SendMessage(GetHwnd(), WM_COMMAND, MAKEWPARAM(p.first, 1), 0);
                     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+                    InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
                     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
                     break;
                 }

@@ -92,6 +92,7 @@ HRESULT CCmdTabList::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
         PopulateMenu(collection);
 
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+        InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
 
         return hr;
     }
@@ -202,6 +203,7 @@ HRESULT CCmdTabList::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPE
             // The user selected a file to open, we don't want that file
             // to remain selected because the user is supposed to
             // reselect a new one each time,so clear the selection status.
+            InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
             hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
             if (CAppUtils::FailedShowMessage(hr))
                 return hr;
@@ -292,6 +294,7 @@ void CCmdTabList::OnDocumentClose(DocID /*id*/)
 void CCmdTabList::TabNotify(TBHDR* /*ptbhdr*/)
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+    InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
 }
 
 void CCmdTabList::OnDocumentSave(DocID /*id*/, bool /*bSaveAs*/)

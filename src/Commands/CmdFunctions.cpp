@@ -276,6 +276,7 @@ HRESULT CCmdFunctions::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PRO
             // The user selected a function to goto, we don't want that function
             // to remain selected because the user is supposed to
             // reselect a new one each time,so clear the selection status.
+            InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
             hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
             if (CAppUtils::FailedShowMessage(hr))
                 return hr;

@@ -230,6 +230,7 @@ HRESULT CCmdLoadAsEncoded::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, 
     {
         auto hr = HandleItemsSource(ppropvarCurrentValue, true);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+        InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
         return hr;
     }
     else if (key == UI_PKEY_Enabled)
@@ -276,6 +277,7 @@ void CCmdLoadAsEncoded::TabNotify( TBHDR * ptbhdr )
     {
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+        InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
     }
 }
 
@@ -338,5 +340,6 @@ void CCmdConvertEncoding::TabNotify( TBHDR * ptbhdr )
     {
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+        InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
     }
 }
