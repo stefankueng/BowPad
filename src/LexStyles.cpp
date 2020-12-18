@@ -437,7 +437,7 @@ void CLexStyles::Load()
     m_fileTypes.sort([](const auto& first, const auto& second) {
         return _wcsicmp(first.first.c_str(), second.first.c_str()) < 0;
     });
-    m_fileTypes.push_front(std::make_pair(TEXT("All file"), TEXT("*.*")));
+    m_fileTypes.push_front(std::make_pair(TEXT("All files"), TEXT("*.*")));
     for (auto& e : m_fileTypes)
         m_filterSpec.push_back({e.first.c_str(), e.second.c_str()});
 
@@ -830,6 +830,7 @@ void CLexStyles::ResetUserData()
     m_extLang.clear();
     m_Langdata.clear();
     m_lexerdata.clear();
+    m_fileTypes.clear();
     m_filterSpec.clear();
     Load();
 }
