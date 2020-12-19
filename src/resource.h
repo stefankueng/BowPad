@@ -56,6 +56,7 @@
 #define IDS_LANGUAGE_DOWNLOADOK         140
 #define IDR_SHORTCUTS                   141
 #define IDS_LANGUAGE_DOWNLOADFAILEDFILE 141
+#define IDB_EMPTY                       142
 #define IDS_CUSTOMCOMMANDSINFO          142
 #define IDD_FINDREPLACEDLG              143
 #define IDS_FINDRETRYWRAP               143

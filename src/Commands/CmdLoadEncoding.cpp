@@ -144,7 +144,7 @@ HRESULT HandleItemsSource(const PROPVARIANT* ppropvarCurrentValue, bool ignoreUT
         if (ignoreUTF8BOM && cp.bom && cp.name.compare(L"UTF-8 BOM") == 0)
             continue;
 
-        CAppUtils::AddStringItem(pCollection, cp.name.c_str(), cp.category, nullptr);
+        CAppUtils::AddStringItem(pCollection, cp.name.c_str(), cp.category, EMPTY_IMAGE);
     }
     return S_OK;
 }

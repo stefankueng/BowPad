@@ -574,6 +574,7 @@
     <Image Include="res\closeTabButton_push.bmp" />
     <Image Include="res\EditorConfigActive.ico" />
     <Image Include="res\EditorConfigInactive.ico" />
+    <Image Include="res\empty.bmp" />
     <Image Include="res\empty.ico" />
     <Image Include="res\lexer.ico" />
     <Image Include="res\readonly.ico" />

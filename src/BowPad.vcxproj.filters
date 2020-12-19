@@ -735,6 +735,9 @@
     <Image Include="res\unsaved.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\empty.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
     <Image Include="res\BowPad_elevated.ico">
       <Filter>Resource Files</Filter>
     </Image>

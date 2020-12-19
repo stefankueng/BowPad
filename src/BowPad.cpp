@@ -38,6 +38,8 @@ using Microsoft::WRL::ComPtr;
 HINSTANCE g_hInst;
 HINSTANCE g_hRes;
 bool      firstInstance = false;
+IUIImagePtr g_emptyIcon;
+bool g_useItemIcons = true;
 
 static void LoadLanguage(HINSTANCE hInstance)
 {
@@ -469,6 +471,30 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     LoadLanguage(hInstance);
 
     SetIcon();
+
+    auto ribbonVer = CPathUtils::GetVersionFromFile(L"UIRibbon.dll");
+    std::vector<std::wstring> tokens;
+    stringtok(tokens, ribbonVer, false, L".");
+    g_useItemIcons = true;
+    if (tokens.size() == 4)
+    {
+        auto major = std::stol(tokens[0]);
+        auto minor = std::stol(tokens[1]);
+        auto micro = std::stol(tokens[2]);
+        //auto build = std::stol(tokens[3]);
+        if (major > 10)
+            g_useItemIcons = false;
+        else if (major == 10)
+        {
+            if (minor > 0)
+                g_useItemIcons = false;
+            else if (micro >= 19041)
+                g_useItemIcons = false;
+        }
+        if (g_useItemIcons)
+            CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), g_emptyIcon);
+    }
+
 
     CMainWindow mainWindow(g_hRes);
 

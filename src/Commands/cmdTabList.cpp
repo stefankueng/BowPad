@@ -166,7 +166,7 @@ bool CCmdTabList::PopulateMenu(IUICollectionPtr& collection)
                                         tabInfo.title.c_str(),
                                         pathBuf);
         }
-        auto hr = CAppUtils::AddStringItem(collection, text.c_str(), -1, nullptr);
+        auto hr = CAppUtils::AddStringItem(collection, text.c_str(), -1, EMPTY_IMAGE);
         // If we can't add one, assume we can't add any more so quit
         // not to avoid spamming the user with a sequence of errors.
         if (FAILED(hr))

@@ -68,7 +68,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const 
         gLanguages.clear();
 
         // English as the first language, always installed
-        CAppUtils::AddStringItem(pCollection, L"English", CAT_LANGS_AVAILABLE, nullptr);
+        CAppUtils::AddStringItem(pCollection, L"English", CAT_LANGS_AVAILABLE, EMPTY_IMAGE);
         gLanguages.push_back(L"");
 
         std::wstring path = CAppUtils::GetDataPath();
@@ -115,7 +115,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const 
             auto langbuf = std::make_unique<wchar_t[]>(len);
             if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langbuf.get(), len))
             {
-                CAppUtils::AddStringItem(pCollection, langbuf.get(), CAT_LANGS_AVAILABLE, nullptr);
+                CAppUtils::AddStringItem(pCollection, langbuf.get(), CAT_LANGS_AVAILABLE, EMPTY_IMAGE);
                 gLanguages.push_back(sLocale);
             }
         }
@@ -123,7 +123,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const 
         if (gRemotes.empty())
         {
             // Dummy entry for fetching the remote language list
-            CAppUtils::AddResStringItem(pCollection, IDS_LANGUAGE_FETCH, CAT_LANGS_REMOTE, nullptr);
+            CAppUtils::AddResStringItem(pCollection, IDS_LANGUAGE_FETCH, CAT_LANGS_REMOTE, EMPTY_IMAGE);
             gLanguages.push_back(L"*");
         }
         else
@@ -137,7 +137,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const 
                 auto langbuf = std::make_unique<wchar_t[]>(len);
                 if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langbuf.get(), len))
                 {
-                    CAppUtils::AddStringItem(pCollection, langbuf.get(), CAT_LANGS_AVAILABLE, nullptr);
+                    CAppUtils::AddStringItem(pCollection, langbuf.get(), CAT_LANGS_AVAILABLE, EMPTY_IMAGE);
                     gLanguages.push_back(sLocale);
                 }
             }
