@@ -534,6 +534,7 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
         }
     }
     CCommandHandler::ShutDown();
+    g_emptyIcon = nullptr;
     Animator::ShutDown();
     return (int)msg.wParam;
 }

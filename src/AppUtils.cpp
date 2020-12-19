@@ -370,7 +370,7 @@ bool CAppUtils::FailedShowMessage(HRESULT hr)
     return false;
 }
 
-HRESULT CAppUtils::AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int cat, IUIImage * pImg)
+HRESULT CAppUtils::AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int cat, IUIImagePtr pImg)
 {
     HRESULT hr;
     CPropertySet* pItem;
@@ -419,7 +419,7 @@ HRESULT CAppUtils::AddCategory(IUICollectionPtr& coll, int catId, int catNameRes
     return hr;
 }
 
-HRESULT CAppUtils::AddResStringItem(IUICollectionPtr& collection, int resId, int cat, IUIImage * pImg)
+HRESULT CAppUtils::AddResStringItem(IUICollectionPtr& collection, int resId, int cat, IUIImagePtr pImg)
 {
     ResString rs(g_hRes, resId);
     return AddStringItem(collection, rs, cat, pImg);

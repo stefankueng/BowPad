@@ -27,7 +27,7 @@ void CPropertySet::InitializeCommandProperties(int categoryId, int commandId, UI
     m_commandType = commandType;
 }
 
-void CPropertySet::InitializeItemProperties(IUIImage *image, PCWSTR label, int categoryId)
+void CPropertySet::InitializeItemProperties(IUIImagePtr image, PCWSTR label, int categoryId)
 {
     if (m_pimgItem)
         m_pimgItem->Release();

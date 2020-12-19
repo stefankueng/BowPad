@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2016 - Stefan Kueng
+// Copyright (C) 2013, 2015-2016, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ public:
 
     void InitializeCommandProperties(int categoryId, int commandId, UI_COMMANDTYPE commandType);
 
-    void InitializeItemProperties(IUIImage *image, PCWSTR label, int categoryId);
+    void InitializeItemProperties(IUIImagePtr image, PCWSTR label, int categoryId);
 
     void InitializeCategoryProperties(PCWSTR label, int categoryId);
 
@@ -55,15 +55,11 @@ private:
 
     ~CPropertySet()
     {
-        if (m_pimgItem != nullptr)
-        {
-            m_pimgItem->Release();
-        }
     }
 
     WCHAR           m_wszLabel[MAX_RESOURCE_LENGTH];    // Used for items and categories.
     int             m_categoryId;                       // Used for items, categories, and commands.
-    IUIImage *      m_pimgItem;                         // Used for items only.
+    IUIImagePtr     m_pimgItem;                         // Used for items only.
     int             m_commandId;                        // Used for commands only.
     UI_COMMANDTYPE  m_commandType;                      // Used for commands only.
 
