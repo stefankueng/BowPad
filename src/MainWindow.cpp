@@ -426,7 +426,7 @@ STDMETHODIMP CMainWindow::UpdateProperty(
 {
     UNREFERENCED_PARAMETER(ppropvarCurrentValue);
 
-    HRESULT hr = E_NOTIMPL;
+    HRESULT hr    = E_NOTIMPL;
     HRESULT hrImg = E_NOTIMPL;
     if ((key == UI_PKEY_LargeImage) ||
         (key == UI_PKEY_SmallImage))
@@ -444,7 +444,7 @@ STDMETHODIMP CMainWindow::UpdateProperty(
                 const auto& resourceData = CKeyboardShortcutHandler::Instance().GetResourceData();
                 auto        whereAt      = std::find_if(resourceData.begin(), resourceData.end(),
                                             [&](const auto& item) { return ((UINT)item.second == nCmdID); });
-                if (whereAt != resourceData.end())
+                while (whereAt != resourceData.end())
                 {
                     auto sID = whereAt->first;
                     sID += L"_LargeImages_RESID";
@@ -461,8 +461,11 @@ STDMETHODIMP CMainWindow::UpdateProperty(
                         if (SUCCEEDED(CAppUtils::CreateImage(MAKEINTRESOURCE(ttIDit->second), image)))
                         {
                             m_win7PNGWorkaroundData[nCmdID] = image;
+                            break;
                         }
                     }
+                    whereAt = std::find_if(std::next(whereAt), resourceData.end(),
+                                           [&](const auto& item) { return ((UINT)item.second == nCmdID); });
                 }
             }
             if (image)
@@ -494,7 +497,7 @@ STDMETHODIMP CMainWindow::UpdateProperty(
             }
         }
     }
-    if ((hrImg != E_NOTIMPL)&& FAILED(hr))
+    if ((hrImg != E_NOTIMPL) && FAILED(hr))
         return hrImg;
     return hr;
 }
