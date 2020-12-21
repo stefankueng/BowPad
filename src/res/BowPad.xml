@@ -1295,7 +1295,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           </Group>
           <Group CommandName="cmdGroupPlugins" SizeDefinition="TwoButtons">
             <Button CommandName="cmdPluginConfig" />
-            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Commands" ItemHeight="16" ItemWidth="16">
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Commands" ItemHeight="16" ItemWidth="16" HasLargeItems="false">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout/>
               </DropDownGallery.MenuLayout>
@@ -1457,7 +1457,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             </DropDownButton>
           </MenuGroup>
           <MenuGroup>
-            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Commands" ItemHeight="16" ItemWidth="16">
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Commands" ItemHeight="16" ItemWidth="16" HasLargeItems="false">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>
@@ -1512,7 +1512,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             </DropDownButton>
           </MenuGroup>
           <MenuGroup>
-            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Commands" ItemHeight="16" ItemWidth="16">
+            <DropDownGallery CommandName="cmdPlugins" TextPosition="Right" Type="Commands" ItemHeight="16" ItemWidth="16" HasLargeItems="false">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout />
               </DropDownGallery.MenuLayout>
