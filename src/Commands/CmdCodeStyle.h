@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,6 +41,6 @@ public:
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
     void TabNotify(TBHDR * ptbhdr) override;
-
+    void OnPluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data) override;
 };
 

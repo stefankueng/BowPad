@@ -41,7 +41,15 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
             return hr;
 
         if (langs.empty())
-            langs = CLexStyles::Instance().GetLanguages();
+        {
+            auto ls = CLexStyles::Instance().GetLanguages();
+            for (const auto& l : ls)
+            {
+                const auto& ldata = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(l));
+                if (!ldata.hidden)
+                    langs.push_back(l);
+            }
+        }
 
         for (wchar_t i = 'A'; i <= 'Z'; ++i)
         {
@@ -138,6 +146,15 @@ void CCmdCodeStyle::TabNotify( TBHDR * ptbhdr )
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
         InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
+    }
+}
+
+void CCmdCodeStyle::OnPluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data)
+{
+    if (cmdId == cmdStyleConfigurator)
+    {
+        langs.clear();
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
     }
 }
 

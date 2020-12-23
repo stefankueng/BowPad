@@ -258,6 +258,10 @@ void CLexStyles::Load()
                     lexerdata.Properties[n]                = vl;
                     userlexerdata.Properties[std::move(n)] = std::move(vl);
                 }
+                else if (_wcsnicmp(L"hidden", it, 6) == 0)
+                {
+                    lexerdata.hidden = _wtoi(ini->GetValue(l.second.c_str(), it, L"")) != 0;
+                }
             }
             m_lexerdata[lexerdata.ID] = std::move(lexerdata);
             if (isUserConfig)
@@ -723,6 +727,11 @@ std::vector<std::wstring> CLexStyles::GetLanguages() const
     return langs;
 }
 
+std::map<std::string, LanguageData>& CLexStyles::GetLanguageDataMap()
+{
+    return m_Langdata;
+}
+
 void CLexStyles::ReplaceVariables(std::wstring& s, const std::unordered_map<std::wstring, std::wstring>& vars) const
 {
     size_t pos = s.find(L"$(");
@@ -835,6 +844,12 @@ void CLexStyles::ResetUserData()
     Load();
 }
 
+void CLexStyles::SetUserHidden(int ID, bool hidden)
+{
+    LexerData& ld = m_userlexerdata[ID];
+    ld.hidden = hidden;
+}
+
 void CLexStyles::SaveUserData()
 {
     CSimpleIni   ini;
@@ -852,22 +867,27 @@ void CLexStyles::SaveUserData()
             continue;
         // find the lexer section name
         std::wstring section = m_lexerSection[lexerID];
+        ini.Delete(section.c_str(), nullptr);
         std::wstring v       = std::to_wstring(lexerID);
-        ini.SetValue(section.c_str(), L"Lexer", v.c_str());
-        for (const auto& styleEntry : it.second.Styles)
+        if (!it.second.Styles.empty() || it.second.hidden)
         {
-            const int    styleID   = styleEntry.first;
-            const auto&  styleData = styleEntry.second;
-            std::wstring style     = CStringUtils::Format(L"Style%d", styleID);
-            std::wstring sSize     = std::to_wstring(styleData.FontSize);
-            if (styleData.FontSize == 0)
-                sSize.clear();
-            int fore = GetRValue(styleData.ForegroundColor) << 16 | GetGValue(styleData.ForegroundColor) << 8 | GetBValue(styleData.ForegroundColor);
-            int back = GetRValue(styleData.BackgroundColor) << 16 | GetGValue(styleData.BackgroundColor) << 8 | GetBValue(styleData.BackgroundColor);
-            // styleNR=name;foreground;background;fontname;fontstyle;fontsize
-            const auto& name = styleData.Name.empty() ? m_lexerdata[lexerID].Styles[styleID].Name : styleData.Name;
-            v                = CStringUtils::Format(L"%s;%06X;%06X;%s;%d;%s", name.c_str(), fore, back, styleData.FontName.c_str(), styleData.FontStyle, sSize.c_str());
-            ini.SetValue(section.c_str(), style.c_str(), v.c_str());
+            ini.SetValue(section.c_str(), L"Lexer", v.c_str());
+            for (const auto& styleEntry : it.second.Styles)
+            {
+                const int    styleID = styleEntry.first;
+                const auto& styleData = styleEntry.second;
+                std::wstring style = CStringUtils::Format(L"Style%d", styleID);
+                std::wstring sSize = std::to_wstring(styleData.FontSize);
+                if (styleData.FontSize == 0)
+                    sSize.clear();
+                int fore = GetRValue(styleData.ForegroundColor) << 16 | GetGValue(styleData.ForegroundColor) << 8 | GetBValue(styleData.ForegroundColor);
+                int back = GetRValue(styleData.BackgroundColor) << 16 | GetGValue(styleData.BackgroundColor) << 8 | GetBValue(styleData.BackgroundColor);
+                // styleNR=name;foreground;background;fontname;fontstyle;fontsize
+                const auto& name = styleData.Name.empty() ? m_lexerdata[lexerID].Styles[styleID].Name : styleData.Name;
+                v = CStringUtils::Format(L"%s;%06X;%06X;%s;%d;%s", name.c_str(), fore, back, styleData.FontName.c_str(), styleData.FontStyle, sSize.c_str());
+                ini.SetValue(section.c_str(), style.c_str(), v.c_str());
+            }
+            ini.SetValue(section.c_str(), L"hidden", std::to_wstring(it.second.hidden).c_str());
         }
     }
 

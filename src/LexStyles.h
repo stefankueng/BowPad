@@ -77,11 +77,13 @@ class LexerData
 public:
     LexerData()
         : ID(0)
+        , hidden(false)
     {
     }
     int                                ID;
     std::unordered_map<int, StyleData> Styles;
     std::map<std::string, std::string> Properties;
+    bool                               hidden;
 };
 
 class CLexStyles
@@ -89,10 +91,11 @@ class CLexStyles
 public:
     static CLexStyles& Instance();
 
-    std::vector<std::wstring> GetLanguages() const;
-    std::string               GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
-    std::wstring              GetUserExtensionsForLanguage(const std::wstring& lang) const;
-    bool                      GetDefaultExtensionForLanguage(const std::string& lang, std::wstring& ext, UINT& index) const;
+    std::vector<std::wstring>            GetLanguages() const;
+    std::map<std::string, LanguageData>& GetLanguageDataMap();
+    std::string                          GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
+    std::wstring                         GetUserExtensionsForLanguage(const std::wstring& lang) const;
+    bool                                 GetDefaultExtensionForLanguage(const std::string& lang, std::wstring& ext, UINT& index) const;
 
     size_t                   GetFilterSpceCount() const;
     const COMDLG_FILTERSPEC* GetFilterSpceData() const;
@@ -120,6 +123,7 @@ public:
     void        SetUserFontSize(int ID, int style, int size);
     void        SetUserFontStyle(int ID, int style, FontStyle fontstyle);
     void        SetUserExt(const std::wstring& ext, const std::string& lang);
+    void        SetUserHidden(int ID, bool hidden);
     void        ResetUserData();
     void        SaveUserData();
     bool        AddUserFunctionForLang(const std::string& lang, const std::string& fnc);

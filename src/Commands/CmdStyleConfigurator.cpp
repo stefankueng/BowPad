@@ -247,6 +247,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                     std::wstring exts = CLexStyles::Instance().GetUserExtensionsForLanguage(currentLang);
                     SetDlgItemText(*this, IDC_EXTENSIONS, exts.c_str());
                     DialogEnableWindow(IDC_EXTENSIONS, true);
+                    CheckDlgButton(m_hwnd, IDC_HIDE, lexData.hidden ? BST_CHECKED : BST_UNCHECKED);
                 }
                 else
                 {
@@ -312,6 +313,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
     case IDC_ITALICCHECK:
     case IDC_UNDERLINECHECK:
     case IDC_EXTENSIONS:
+    case IDC_HIDE:
         {
             auto hLangCombo = GetDlgItem(*this, IDC_LANGCOMBO);
             int langSel = ComboBox_GetCurSel(hLangCombo);
@@ -333,6 +335,12 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                 }
                 switch (id)
                 {
+                case IDC_HIDE:
+                {
+                    CLexStyles::Instance().SetUserHidden(lexID, IsDlgButtonChecked(m_hwnd, IDC_HIDE) != 0);
+                    NotifyPlugins(L"cmdStyleConfigurator", 1);
+                    break;
+                }
                 case IDC_FG_BTN:
                 {
                     auto fgcolor = m_fgColor.GetColor();
