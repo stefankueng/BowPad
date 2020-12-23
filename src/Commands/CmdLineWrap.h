@@ -68,9 +68,10 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_SETWRAPSTARTINDENT, ScintillaCall(SCI_GETWRAPSTARTINDENT) ? 0 : max(1, ScintillaCall(SCI_GETTABWIDTH) / 2));
-        CIniSettings::Instance().SetInt64(L"View", L"wrapmodeindent", ScintillaCall(SCI_GETWRAPSTARTINDENT) ? 1 : 0);
-        ScintillaCall(SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_INDENT);
+        int wrapIndent = ScintillaCall(SCI_GETWRAPSTARTINDENT) ? 0 : 1;
+        ScintillaCall(SCI_SETWRAPSTARTINDENT, wrapIndent ? max(1, ScintillaCall(SCI_GETTABWIDTH) / 2):0);
+        CIniSettings::Instance().SetInt64(L"View", L"wrapmodeindent", wrapIndent);
+        ScintillaCall(SCI_SETWRAPINDENTMODE, wrapIndent ? SC_WRAPINDENT_INDENT : SC_WRAPINDENT_FIXED);
         ScintillaCall(SCI_SETWRAPVISUALFLAGS, SC_WRAPVISUALFLAG_MARGIN | SC_WRAPVISUALFLAG_START | SC_WRAPVISUALFLAG_END);
         ScintillaCall(SCI_SETWRAPVISUALFLAGSLOCATION, SC_WRAPVISUALFLAGLOC_START_BY_TEXT);
         ScintillaCall(SCI_SETMARGINOPTIONS, SC_MARGINOPTION_SUBLINESELECT);
@@ -82,7 +83,7 @@ public:
     {
         int wrapIndent = (int)CIniSettings::Instance().GetInt64(L"View", L"wrapmodeindent", 0);
         ScintillaCall(SCI_SETWRAPSTARTINDENT, wrapIndent ? max(1, ScintillaCall(SCI_GETTABWIDTH) / 2) : 0);
-        ScintillaCall(SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_INDENT);
+        ScintillaCall(SCI_SETWRAPINDENTMODE, wrapIndent ? SC_WRAPINDENT_INDENT : SC_WRAPINDENT_FIXED);
         ScintillaCall(SCI_SETWRAPVISUALFLAGS, SC_WRAPVISUALFLAG_MARGIN | SC_WRAPVISUALFLAG_START | SC_WRAPVISUALFLAG_END);
         ScintillaCall(SCI_SETWRAPVISUALFLAGSLOCATION, SC_WRAPVISUALFLAGLOC_START_BY_TEXT);
         ScintillaCall(SCI_SETMARGINOPTIONS, SC_MARGINOPTION_SUBLINESELECT);
