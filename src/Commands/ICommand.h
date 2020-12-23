@@ -62,6 +62,7 @@ public:
     virtual HRESULT     IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue);
     virtual HRESULT     IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties);
     virtual void        OnTimer(UINT id);
+    virtual void        OnPluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data);
 
 protected:
     void                SetInsertionIndex(int index);
@@ -142,6 +143,7 @@ protected:
     void                ShowProgressCtrl(UINT delay);
     void                HideProgressCtrl();
     void                SetProgress(DWORD32 pos, DWORD32 end);
+    void                NotifyPlugins(const std::wstring& pluginName, LPARAM data);
 
 private:
 

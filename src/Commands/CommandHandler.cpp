@@ -512,6 +512,19 @@ void CCommandHandler::InsertPlugins(void* obj)
     }
 }
 
+void CCommandHandler::PluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data)
+{
+    for (auto& cmd : m_commands)
+    {
+        cmd.second->OnPluginNotify(cmdId, pluginName, data);
+    }
+    for (auto& cmd : m_nodeletecommands)
+    {
+        if (cmd.second)
+            cmd.second->OnPluginNotify(cmdId, pluginName, data);
+    }
+}
+
 int CCommandHandler::GetPluginVersion(const std::wstring& name)
 {
     auto it = m_pluginversion.find(name);

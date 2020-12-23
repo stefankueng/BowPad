@@ -52,6 +52,7 @@ public:
     void        AddCommand(ICommand* cmd);
     void        AddCommand(UINT cmdId);
     void        InsertPlugins(void* obj);
+    void        PluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data);
 
     const std::map<UINT, std::unique_ptr<ICommand>>& GetCommands() const
     {

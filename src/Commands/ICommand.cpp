@@ -19,6 +19,7 @@
 #include "MainWindow.h"
 #include "StringUtils.h"
 #include "LexStyles.h"
+#include "CommandHandler.h"
 
 extern IUIFramework *g_pFramework;
 
@@ -75,6 +76,10 @@ void ICommand::OnClipboardChanged()
 }
 
 void ICommand::OnTimer(UINT /*id*/)
+{
+}
+
+void ICommand::OnPluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data)
 {
 }
 
@@ -447,4 +452,9 @@ void ICommand::HideProgressCtrl()
 void ICommand::SetProgress(DWORD32 pos, DWORD32 end)
 {
     m_pMainWindow->SetProgress(pos, end);
+}
+
+void ICommand::NotifyPlugins(const std::wstring& pluginName, LPARAM data)
+{
+    CCommandHandler::Instance().PluginNotify(GetCmdId(), pluginName, data);
 }
