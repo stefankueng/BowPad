@@ -20,6 +20,7 @@
 #include "AppUtils.h"
 #include "UnicodeUtils.h"
 #include "OnOutOfScope.h"
+#include "BowPad.h"
 
 #include "scripting/BasicScriptObject.h"
 #include "scripting/BasicScriptHost.h"
@@ -126,15 +127,25 @@ bool CCmdScript::Create(const std::wstring& path)
         auto iconPath = CPathUtils::GetParentDirectory(path) + L"\\" + m_name + L".png";
         if (PathFileExists(iconPath.c_str()))
         {
-            auto bmp = Gdiplus::Bitmap(iconPath.c_str(), TRUE);
+            auto bmp  = Gdiplus::Bitmap(iconPath.c_str(), TRUE);
+            auto pBmp = &bmp;
             if (bmp.GetLastStatus() == Gdiplus::Ok)
             {
+                Gdiplus::Bitmap resized(16, 16);
+                if (!IsWindows8OrGreater())
+                {
+                    auto g = Gdiplus::Graphics::FromImage(&resized);
+                    g->SetInterpolationMode(Gdiplus::InterpolationModeNearestNeighbor);
+                    g->Clear(Gdiplus::Color::Transparent);
+                    g->DrawImage(&bmp, Gdiplus::Rect(0, 0, 16, 16));
+                    pBmp = &resized;
+                }
                 IUIImageFromBitmapPtr pifbFactory;
                 hr = CoCreateInstance(CLSID_UIRibbonImageFromBitmapFactory, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pifbFactory));
                 if (SUCCEEDED(hr))
                 {
                     HBITMAP hbm = nullptr;
-                    bmp.GetHBITMAP(Gdiplus::Color(0xFFFFFFFF), &hbm);
+                    pBmp->GetHBITMAP(Gdiplus::Color(0xFFFFFFFF), &hbm);
                     hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_TRANSFER, &m_image);
                     if (FAILED(hr))
                         ::DeleteObject(hbm);
@@ -144,7 +155,10 @@ bool CCmdScript::Create(const std::wstring& path)
         else
         {
             // use the plugin default icon
-            hr = CAppUtils::CreateImage(MAKEINTRESOURCE(cmdPlugins_LargeImages_RESID), m_image);
+            if (IsWindows8OrGreater())
+                hr = CAppUtils::CreateImage(MAKEINTRESOURCE(cmdPlugins_LargeImages_RESID), m_image);
+            else
+                hr = CAppUtils::CreateImage(MAKEINTRESOURCE(cmdPlugins_LargeImages_RESID), m_image, 16, 16);
         }
     }
     catch (const std::exception& e)

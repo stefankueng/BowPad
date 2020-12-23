@@ -37,7 +37,7 @@ public:
     static HRESULT                  AddCategory(IUICollectionPtr& coll, int catId, int catNameResId);
     static bool                     FailedShowMessage(HRESULT hr);
     static bool                     ShowDropDownList(HWND hWnd, LPCWSTR ctrlName);
-    static HRESULT                  CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg );
+    static HRESULT                  CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg, int width = 0, int height = 0 );
     static bool                     TryParse(const wchar_t* s, int& result, bool emptyOk = false, int def = 0, int base = 10);
     static bool                     TryParse(const wchar_t* s, unsigned long& result, bool emptyOk = false, unsigned long def = 0, int base = 10);
     static std::wstring             GetProgramFilesX86Folder();

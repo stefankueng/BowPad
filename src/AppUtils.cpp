@@ -481,7 +481,7 @@ bool CAppUtils::ShowDropDownList(HWND hWnd, LPCWSTR ctrlName)
     return true;
 }
 
-HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg)
+HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg, int width/* = 0*/, int height/* = 0*/)
 {
     pOutImg = nullptr;
     // Create an IUIImage from a resource id.
@@ -532,6 +532,16 @@ HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg)
                             {
                                 if (pBitmap->GetLastStatus() == Gdiplus::Ok)
                                 {
+                                    if (width || height)
+                                    {
+                                        auto resized = new Gdiplus::Bitmap(width, height);
+                                        auto g = Gdiplus::Graphics::FromImage(resized);
+                                        g->SetInterpolationMode(Gdiplus::InterpolationModeNearestNeighbor);
+                                        g->Clear(Gdiplus::Color::Transparent);
+                                        g->DrawImage(pBitmap, Gdiplus::Rect(0, 0, width, height));
+                                        delete pBitmap;
+                                        pBitmap = resized;
+                                    }
                                     pBitmap->GetHBITMAP(Gdiplus::Color(0xFFFFFFFF), &hbm);
                                     hr = pifbFactory->CreateImage(hbm, UI_OWNERSHIP_TRANSFER, &pImg);
                                     if (SUCCEEDED(hr))
