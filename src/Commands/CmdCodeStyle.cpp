@@ -149,7 +149,7 @@ void CCmdCodeStyle::TabNotify( TBHDR * ptbhdr )
     }
 }
 
-void CCmdCodeStyle::OnPluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data)
+void CCmdCodeStyle::OnPluginNotify(UINT cmdId, const std::wstring& /*pluginName*/, LPARAM /*data*/)
 {
     if (cmdId == cmdStyleConfigurator)
     {

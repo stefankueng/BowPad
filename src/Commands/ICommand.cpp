@@ -79,7 +79,7 @@ void ICommand::OnTimer(UINT /*id*/)
 {
 }
 
-void ICommand::OnPluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data)
+void ICommand::OnPluginNotify(UINT /*cmdId*/, const std::wstring& /*pluginName*/, LPARAM /*data*/)
 {
 }
 
