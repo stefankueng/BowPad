@@ -258,11 +258,6 @@ void CLexStyles::Load()
                     lexerdata.Properties[n]                = vl;
                     userlexerdata.Properties[std::move(n)] = std::move(vl);
                 }
-                else if (_wcsnicmp(L"hidden", it, 6) == 0)
-                {
-                    lexerdata.hidden     = _wtoi(ini->GetValue(l.second.c_str(), it, L"")) != 0;
-                    userlexerdata.hidden = lexerdata.hidden;
-                }
             }
             m_lexerdata[lexerdata.ID] = std::move(lexerdata);
             if (isUserConfig)
@@ -438,6 +433,12 @@ void CLexStyles::Load()
             }
             langdata = std::move(ld);
         }
+        CSimpleIni::TNamesDepend hiddenKeys;
+        ini->GetAllKeys(L"hiddenLangs", hiddenKeys);
+        for (const auto& hiddenkey : hiddenKeys)
+        {
+            m_hiddenLangs.insert(hiddenkey);
+        }
     }
     m_fileTypes.sort([](const auto& first, const auto& second) {
         return _wcsicmp(first.first.c_str(), second.first.c_str()) < 0;
@@ -532,6 +533,7 @@ void CLexStyles::Reload()
     m_pathsForLang.clear();
     m_fileTypes.clear();
     m_filterSpec.clear();
+    m_hiddenLangs.clear();
 
     Load();
 }
@@ -708,6 +710,11 @@ bool CLexStyles::GetDefaultExtensionForLanguage(const std::string& lang, std::ws
     return false;
 }
 
+bool CLexStyles::IsLanguageHidden(const std::wstring& lang) const
+{
+    return m_hiddenLangs.find(lang) != m_hiddenLangs.end();
+}
+
 size_t CLexStyles::GetFilterSpceCount() const
 {
     return m_filterSpec.size();
@@ -842,15 +849,8 @@ void CLexStyles::ResetUserData()
     m_lexerdata.clear();
     m_fileTypes.clear();
     m_filterSpec.clear();
+    m_hiddenLangs.clear();
     Load();
-}
-
-void CLexStyles::SetUserHidden(int ID, bool hidden)
-{
-    LexerData& ldu = m_userlexerdata[ID];
-    ldu.hidden     = hidden;
-    LexerData& ld  = m_lexerdata[ID];
-    ld.hidden      = hidden;
 }
 
 void CLexStyles::SaveUserData()
@@ -872,27 +872,26 @@ void CLexStyles::SaveUserData()
         std::wstring section = m_lexerSection[lexerID];
         ini.Delete(section.c_str(), nullptr);
         std::wstring v = std::to_wstring(lexerID);
-        if (!it.second.Styles.empty() || it.second.hidden)
+        ini.SetValue(section.c_str(), L"Lexer", v.c_str());
+        for (const auto& styleEntry : it.second.Styles)
         {
-            ini.SetValue(section.c_str(), L"Lexer", v.c_str());
-            for (const auto& styleEntry : it.second.Styles)
-            {
-                const int    styleID   = styleEntry.first;
-                const auto&  styleData = styleEntry.second;
-                std::wstring style     = CStringUtils::Format(L"Style%d", styleID);
-                std::wstring sSize     = std::to_wstring(styleData.FontSize);
-                if (styleData.FontSize == 0)
-                    sSize.clear();
-                int fore = GetRValue(styleData.ForegroundColor) << 16 | GetGValue(styleData.ForegroundColor) << 8 | GetBValue(styleData.ForegroundColor);
-                int back = GetRValue(styleData.BackgroundColor) << 16 | GetGValue(styleData.BackgroundColor) << 8 | GetBValue(styleData.BackgroundColor);
-                // styleNR=name;foreground;background;fontname;fontstyle;fontsize
-                const auto& name = styleData.Name.empty() ? m_lexerdata[lexerID].Styles[styleID].Name : styleData.Name;
-                v                = CStringUtils::Format(L"%s;%06X;%06X;%s;%d;%s", name.c_str(), fore, back, styleData.FontName.c_str(), styleData.FontStyle, sSize.c_str());
-                ini.SetValue(section.c_str(), style.c_str(), v.c_str());
-            }
-            ini.SetValue(section.c_str(), L"hidden", std::to_wstring(it.second.hidden).c_str());
+            const int    styleID   = styleEntry.first;
+            const auto&  styleData = styleEntry.second;
+            std::wstring style     = CStringUtils::Format(L"Style%d", styleID);
+            std::wstring sSize     = std::to_wstring(styleData.FontSize);
+            if (styleData.FontSize == 0)
+                sSize.clear();
+            int fore = GetRValue(styleData.ForegroundColor) << 16 | GetGValue(styleData.ForegroundColor) << 8 | GetBValue(styleData.ForegroundColor);
+            int back = GetRValue(styleData.BackgroundColor) << 16 | GetGValue(styleData.BackgroundColor) << 8 | GetBValue(styleData.BackgroundColor);
+            // styleNR=name;foreground;background;fontname;fontstyle;fontsize
+            const auto& name = styleData.Name.empty() ? m_lexerdata[lexerID].Styles[styleID].Name : styleData.Name;
+            v                = CStringUtils::Format(L"%s;%06X;%06X;%s;%d;%s", name.c_str(), fore, back, styleData.FontName.c_str(), styleData.FontStyle, sSize.c_str());
+            ini.SetValue(section.c_str(), style.c_str(), v.c_str());
         }
     }
+    ini.Delete(L"hiddenLangs", nullptr);
+    for (const auto& l : m_hiddenLangs)
+        ini.SetValue(L"hiddenLangs", l.c_str(), L"hidden");
 
     // first clear all user extensions, then add them again to the ini file
     ini.Delete(L"language", nullptr);
@@ -954,6 +953,14 @@ void CLexStyles::SetUserExt(const std::wstring& ext, const std::string& lang)
     {
         m_userextLang[CUnicodeUtils::StdGetUTF8(e)] = lang;
     }
+}
+
+void CLexStyles::SetLanguageHidden(const std::wstring& lang, bool hidden)
+{
+    if (hidden)
+        m_hiddenLangs.insert(lang);
+    else
+        m_hiddenLangs.erase(lang);
 }
 
 const std::string& CLexStyles::GetCommentLineForLang(const std::string& lang) const

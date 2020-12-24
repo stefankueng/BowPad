@@ -77,13 +77,11 @@ class LexerData
 public:
     LexerData()
         : ID(0)
-        , hidden(false)
     {
     }
     int                                ID;
     std::unordered_map<int, StyleData> Styles;
     std::map<std::string, std::string> Properties;
-    bool                               hidden;
 };
 
 class CLexStyles
@@ -96,9 +94,9 @@ public:
     std::string                          GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
     std::wstring                         GetUserExtensionsForLanguage(const std::wstring& lang) const;
     bool                                 GetDefaultExtensionForLanguage(const std::string& lang, std::wstring& ext, UINT& index) const;
-
-    size_t                   GetFilterSpceCount() const;
-    const COMDLG_FILTERSPEC* GetFilterSpceData() const;
+    bool                                 IsLanguageHidden(const std::wstring& lang) const;
+    size_t                               GetFilterSpceCount() const;
+    const COMDLG_FILTERSPEC*             GetFilterSpceData() const;
 
     const std::unordered_map<int, std::string>& GetKeywordsForLang(const std::string& lang);
     const std::unordered_map<int, std::string>& GetKeywordsForLexer(int lexer);
@@ -123,7 +121,7 @@ public:
     void        SetUserFontSize(int ID, int style, int size);
     void        SetUserFontStyle(int ID, int style, FontStyle fontstyle);
     void        SetUserExt(const std::wstring& ext, const std::string& lang);
-    void        SetUserHidden(int ID, bool hidden);
+    void        SetLanguageHidden(const std::wstring& lang, bool hidden);
     void        ResetUserData();
     void        SaveUserData();
     bool        AddUserFunctionForLang(const std::string& lang, const std::string& fnc);
@@ -151,6 +149,7 @@ private:
     std::map<std::string, LanguageData>     m_Langdata;
     std::unordered_map<int, LexerData>      m_lexerdata;
     std::unordered_map<int, std::wstring>   m_lexerSection;
+    std::set<std::wstring>                  m_hiddenLangs;
 
     std::unordered_map<int, LexerData>  m_userlexerdata;
     std::map<std::string, std::string>  m_userextLang;

@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ protected:
     LRESULT                 DoCommand(int id, int msg);
 
     bool            Execute() override { return true; }
-    UINT            GetCmdId() override { return 0; }
+    UINT            GetCmdId() override { return cmdStyleConfigurator; }
 
     static int CALLBACK     EnumFontFamExProc(const LOGFONT *lpelfe, const TEXTMETRIC *lpntme, DWORD FontType, LPARAM lParam);
     void                    SelectStyle( int style );

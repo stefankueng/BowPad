@@ -39,14 +39,13 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
         hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
-
+        pCollection->Clear();
         if (langs.empty())
         {
             auto ls = CLexStyles::Instance().GetLanguages();
             for (const auto& l : ls)
             {
-                const auto& ldata = CLexStyles::Instance().GetLexerDataForLang(CUnicodeUtils::StdGetUTF8(l));
-                if (!ldata.hidden)
+                if (!CLexStyles::Instance().IsLanguageHidden(l))
                     langs.push_back(l);
             }
         }
@@ -75,8 +74,16 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
 
+        pCollection->Clear();
         if (langs.empty())
-            langs = CLexStyles::Instance().GetLanguages();
+        {
+            auto ls = CLexStyles::Instance().GetLanguages();
+            for (const auto& l : ls)
+            {
+                if (!CLexStyles::Instance().IsLanguageHidden(l))
+                    langs.push_back(l);
+            }
+        }
 
         // Not a concern if it fails, just show the list without images.
         CAppUtils::FailedShowMessage(hr);
@@ -154,7 +161,10 @@ void CCmdCodeStyle::OnPluginNotify(UINT cmdId, const std::wstring& /*pluginName*
     if (cmdId == cmdStyleConfigurator)
     {
         langs.clear();
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
+        InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Categories);
     }
 }
 
