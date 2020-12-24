@@ -260,7 +260,8 @@ void CLexStyles::Load()
                 }
                 else if (_wcsnicmp(L"hidden", it, 6) == 0)
                 {
-                    lexerdata.hidden = _wtoi(ini->GetValue(l.second.c_str(), it, L"")) != 0;
+                    lexerdata.hidden     = _wtoi(ini->GetValue(l.second.c_str(), it, L"")) != 0;
+                    userlexerdata.hidden = lexerdata.hidden;
                 }
             }
             m_lexerdata[lexerdata.ID] = std::move(lexerdata);
