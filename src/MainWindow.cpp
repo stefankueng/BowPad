@@ -4285,8 +4285,7 @@ void CMainWindow::SetTheme(bool dark)
 
         auto DarkModeForWindow = [](HWND hWnd) {
             DarkModeHelper::Instance().AllowDarkModeForWindow(hWnd, TRUE);
-            if (FAILED(SetWindowTheme(hWnd, L"DarkMode_Explorer", nullptr)))
-                SetWindowTheme(hWnd, L"Explorer", nullptr);
+            SetWindowTheme(hWnd, L"Explorer", nullptr);
         };
 
         SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
