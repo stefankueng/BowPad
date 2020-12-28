@@ -97,6 +97,7 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_bInFolderMargin(false)
     , m_LineToScrollToAfterPaint(-1)
     , m_WrapOffsetToScrollToAfterPaint(0)
+    , m_LineToScrollToAfterPaintCounter(0)
 {
     HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
                              OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
@@ -921,8 +922,9 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
         // So we set the scroll position here to a member variable,
         // which then is used to scroll scintilla to that line after
         // the first SCN_PAINTED event.
-        m_LineToScrollToAfterPaint       = pos.m_nFirstVisibleLine;
-        m_WrapOffsetToScrollToAfterPaint = 0;
+        m_LineToScrollToAfterPaint        = pos.m_nFirstVisibleLine;
+        m_WrapOffsetToScrollToAfterPaint  = pos.m_nWrapLineOffset;
+        m_LineToScrollToAfterPaintCounter = 5;
     }
     else
         Call(SCI_LINESCROLL, 0, lineToShow);
@@ -1190,8 +1192,9 @@ void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
     // and wait for the paint to complete, then go to the line.
     if (m_LineToScrollToAfterPaint != -1)
     {
-        m_LineToScrollToAfterPaint       = currentlineNumberDoc;
-        m_WrapOffsetToScrollToAfterPaint = 0;
+        m_LineToScrollToAfterPaint        = currentlineNumberDoc;
+        m_WrapOffsetToScrollToAfterPaint  = 0;
+        m_LineToScrollToAfterPaintCounter = 5;
     }
     else
     {
@@ -2411,11 +2414,14 @@ void CScintillaWnd::ReflectEvents(SCNotification* pScn)
             {
                 auto visLineToScrollTo = Call(SCI_VISIBLEFROMDOCLINE, m_LineToScrollToAfterPaint);
                 visLineToScrollTo += m_WrapOffsetToScrollToAfterPaint;
-                auto currentVisPos = Call(SCI_VISIBLEFROMDOCLINE, Call(SCI_GETFIRSTVISIBLELINE));
-                visLineToScrollTo -= currentVisPos;
-                Call(SCI_LINESCROLL, 0, visLineToScrollTo);
-                m_LineToScrollToAfterPaint       = -1;
-                m_WrapOffsetToScrollToAfterPaint = 0;
+                Call(SCI_SETFIRSTVISIBLELINE, visLineToScrollTo);
+                --m_LineToScrollToAfterPaintCounter;
+                if ((m_LineToScrollToAfterPaintCounter <= 0) || ((Call(SCI_GETFIRSTVISIBLELINE) + 2) > Call(SCI_VISIBLEFROMDOCLINE, m_LineToScrollToAfterPaint)))
+                {
+                    m_LineToScrollToAfterPaint        = -1;
+                    m_WrapOffsetToScrollToAfterPaint  = 0;
+                    m_LineToScrollToAfterPaintCounter = 0;
+                }
                 UpdateLineNumberWidth();
             }
             break;
