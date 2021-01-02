@@ -95,9 +95,6 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_ScrollTool(hInst)
     , m_hasConsolas(false)
     , m_bInFolderMargin(false)
-    , m_LineToScrollToAfterPaint(-1)
-    , m_WrapOffsetToScrollToAfterPaint(0)
-    , m_LineToScrollToAfterPaintCounter(0)
 {
     HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
                              OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
@@ -829,43 +826,32 @@ void CScintillaWnd::UpdateLineNumberWidth()
 
 void CScintillaWnd::SaveCurrentPos(CPosData& pos)
 {
-    // don't save the position if the window has never been
-    // painted: if there's still a valid m_LineToScrollToAfterPaint
-    // then the scroll position hasn't been set properly yet
-    // and reading the positions would be wrong.
-    if (m_LineToScrollToAfterPaint == -1)
+    auto firstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
+    pos.m_nFirstVisibleLine = Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine);
+    if (Call(SCI_GETWRAPMODE) != SC_WRAP_NONE || Call(SCI_GETWRAPINDENTMODE) != SC_WRAPINDENT_FIXED)
+        pos.m_nWrapLineOffset = firstVisibleLine - Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
+
+    pos.m_nStartPos    = Call(SCI_GETANCHOR);
+    pos.m_nEndPos      = Call(SCI_GETCURRENTPOS);
+    pos.m_xOffset      = Call(SCI_GETXOFFSET);
+    pos.m_nSelMode     = Call(SCI_GETSELECTIONMODE);
+    pos.m_nScrollWidth = Call(SCI_GETSCROLLWIDTH);
+
+    pos.m_lineStateVector.clear();
+    pos.m_lastStyleLine             = 0;
+    sptr_t contractedFoldHeaderLine = 0;
+    do
     {
-        auto firstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
-        pos.m_nFirstVisibleLine = Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine);
-        if (Call(SCI_GETWRAPMODE) != SC_WRAP_NONE)
-            pos.m_nWrapLineOffset = firstVisibleLine - Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
-
-        pos.m_nStartPos    = Call(SCI_GETANCHOR);
-        pos.m_nEndPos      = Call(SCI_GETCURRENTPOS);
-        pos.m_xOffset      = Call(SCI_GETXOFFSET);
-        pos.m_nSelMode     = Call(SCI_GETSELECTIONMODE);
-        pos.m_nScrollWidth = Call(SCI_GETSCROLLWIDTH);
-
-        pos.m_lineStateVector.clear();
-        pos.m_lastStyleLine             = 0;
-        sptr_t contractedFoldHeaderLine = 0;
-        do
+        contractedFoldHeaderLine = static_cast<sptr_t>(Call(SCI_CONTRACTEDFOLDNEXT, contractedFoldHeaderLine));
+        if (contractedFoldHeaderLine != -1)
         {
-            contractedFoldHeaderLine = static_cast<sptr_t>(Call(SCI_CONTRACTEDFOLDNEXT, contractedFoldHeaderLine));
-            if (contractedFoldHeaderLine != -1)
-            {
-                // Store contracted line
-                pos.m_lineStateVector.push_back(contractedFoldHeaderLine);
-                pos.m_lastStyleLine = max(pos.m_lastStyleLine, (sptr_t)Call(SCI_GETLASTCHILD, contractedFoldHeaderLine, -1));
-                // Start next search with next line
-                ++contractedFoldHeaderLine;
-            }
-        } while (contractedFoldHeaderLine != -1);
-    }
-    else
-    {
-        m_LineToScrollToAfterPaint = -1;
-    }
+            // Store contracted line
+            pos.m_lineStateVector.push_back(contractedFoldHeaderLine);
+            pos.m_lastStyleLine = max(pos.m_lastStyleLine, (sptr_t)Call(SCI_GETLASTCHILD, contractedFoldHeaderLine, -1));
+            // Start next search with next line
+            ++contractedFoldHeaderLine;
+        }
+    } while (contractedFoldHeaderLine != -1);
 }
 
 void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
@@ -913,18 +899,13 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     }
     Call(SCI_CHOOSECARETX);
 
+    Call(SCI_ENSUREVISIBLE, pos.m_nFirstVisibleLine);
     auto lineToShow = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
     if (wrapmode != SC_WRAP_NONE)
     {
-        // if wrapping is enabled, scrolling to a line won't work
-        // properly until scintilla has painted the document, because
-        // the wrap calculations aren't finished until then.
-        // So we set the scroll position here to a member variable,
-        // which then is used to scroll scintilla to that line after
-        // the first SCN_PAINTED event.
-        m_LineToScrollToAfterPaint        = pos.m_nFirstVisibleLine;
-        m_WrapOffsetToScrollToAfterPaint  = pos.m_nWrapLineOffset;
-        m_LineToScrollToAfterPaintCounter = 5;
+        auto visLineToScrollTo = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
+        visLineToScrollTo += pos.m_nWrapLineOffset;
+        Call(SCI_SETFIRSTVISIBLELINE, visLineToScrollTo);
     }
     else
         Call(SCI_LINESCROLL, 0, lineToShow);
@@ -1187,32 +1168,20 @@ void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
     auto linesVisible        = Call(SCI_LINESONSCREEN) - 1; //-1 for the scrollbar
     auto lastVisibleLineVis  = linesVisible + firstVisibleLineVis;
 
-    // if out of view vertically, scroll line into (center of) view
-    // If m_LineToScrollToAfterPaint is not equal -1, modiry its value
-    // and wait for the paint to complete, then go to the line.
-    if (m_LineToScrollToAfterPaint != -1)
+    decltype(firstVisibleLineVis) linesToScroll = 0;
+    if (currentlineNumberVis < (firstVisibleLineVis + (linesVisible / 4)))
     {
-        m_LineToScrollToAfterPaint        = currentlineNumberDoc;
-        m_WrapOffsetToScrollToAfterPaint  = 0;
-        m_LineToScrollToAfterPaintCounter = 5;
+        linesToScroll = currentlineNumberVis - firstVisibleLineVis;
+        // use center
+        linesToScroll -= linesVisible / 2;
     }
-    else
+    else if (currentlineNumberVis > (lastVisibleLineVis - (linesVisible / 4)))
     {
-        decltype(firstVisibleLineVis) linesToScroll = 0;
-        if (currentlineNumberVis < (firstVisibleLineVis + (linesVisible / 4)))
-        {
-            linesToScroll = currentlineNumberVis - firstVisibleLineVis;
-            // use center
-            linesToScroll -= linesVisible / 2;
-        }
-        else if (currentlineNumberVis > (lastVisibleLineVis - (linesVisible / 4)))
-        {
-            linesToScroll = currentlineNumberVis - lastVisibleLineVis;
-            // use center
-            linesToScroll += linesVisible / 2;
-        }
-        Call(SCI_LINESCROLL, 0, linesToScroll);
+        linesToScroll = currentlineNumberVis - lastVisibleLineVis;
+        // use center
+        linesToScroll += linesVisible / 2;
     }
+    Call(SCI_LINESCROLL, 0, linesToScroll);
     // Make sure the caret is visible, scroll horizontally
     Call(SCI_GOTOPOS, posStart);
     Call(SCI_GOTOPOS, posEnd);
@@ -2410,20 +2379,6 @@ void CScintillaWnd::ReflectEvents(SCNotification* pScn)
     switch (pScn->nmhdr.code)
     {
         case SCN_PAINTED:
-            if (m_LineToScrollToAfterPaint != -1)
-            {
-                auto visLineToScrollTo = Call(SCI_VISIBLEFROMDOCLINE, m_LineToScrollToAfterPaint);
-                visLineToScrollTo += m_WrapOffsetToScrollToAfterPaint;
-                Call(SCI_SETFIRSTVISIBLELINE, visLineToScrollTo);
-                --m_LineToScrollToAfterPaintCounter;
-                if ((m_LineToScrollToAfterPaintCounter <= 0) || ((Call(SCI_GETFIRSTVISIBLELINE) + 2) > Call(SCI_VISIBLEFROMDOCLINE, m_LineToScrollToAfterPaint)))
-                {
-                    m_LineToScrollToAfterPaint        = -1;
-                    m_WrapOffsetToScrollToAfterPaint  = 0;
-                    m_LineToScrollToAfterPaintCounter = 0;
-                }
-                UpdateLineNumberWidth();
-            }
             break;
     }
 }

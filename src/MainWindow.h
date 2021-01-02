@@ -74,7 +74,7 @@ public:
     bool CreateRibbon();
 
     // Load/Reload functions
-    int  OpenFile(const std::wstring& file, unsigned int openFlags);
+    int  OpenFile(const std::wstring& file, unsigned int openFlags, CDocumentRestoreData* restoreData = nullptr);
     bool OpenFileAs(const std::wstring& temppath, const std::wstring& realpath, bool bModified);
     bool ReloadTab(int tab, int encoding, bool dueToOutsideChanges = false);
 

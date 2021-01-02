@@ -72,6 +72,15 @@ public:
     sptr_t              m_lastStyleLine;
 };
 
+struct CDocumentRestoreData
+{
+    std::wstring  m_originalPath;
+    std::wstring  m_originalTitle;
+    CPosData      m_position;
+    TabSpace      m_tabSpace;
+    ReadDirection m_readDir;
+};
+
 class CDocument
 {
 public:

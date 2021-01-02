@@ -3103,8 +3103,11 @@ void CMainWindow::HandleTabDelete(const TBHDR& tbhdr)
     CloseTab(tabToDelete);
 }
 
-int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
+int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags, CDocumentRestoreData* restoreData)
 {
+    OnOutOfScope(
+        m_insertionIndex = -1;);
+
     int  index                 = -1;
     bool bAddToMRU             = (openFlags & OpenFlags::AddToMRU) != 0;
     bool bAskToCreateIfMissing = (openFlags & OpenFlags::AskToCreateIfMissing) != 0;
@@ -3112,7 +3115,6 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     bool bIgnoreIfMissing      = (openFlags & OpenFlags::IgnoreIfMissing) != 0;
     bool bOpenIntoActiveTab    = (openFlags & OpenFlags::OpenIntoActiveTab) != 0;
     // Ignore no activate flag for now. It causes too many issues.
-    bool bActivate      = true; //(openFlags & OpenFlags::NoActivate) == 0;
     bool bCreateTabOnly = (openFlags & OpenFlags::CreateTabOnly) != 0;
 
     if (bCreateTabOnly)
@@ -3143,8 +3145,6 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     // if we're opening the first file, we have to activate it
     // to ensure all the activation stuff is handled for that first
     // file.
-    if (m_TabBar.GetItemCount() == 0)
-        bActivate = true;
 
     int          encoding = -1;
     std::wstring filepath = CPathUtils::GetLongPathname(file);
@@ -3165,145 +3165,159 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             // and we then must not change the active tab.
             m_TabBar.ActivateAt(index);
         }
+        return index;
     }
-    else
-    {
-        bool createIfMissing = bCreateIfMissing;
 
-        // Note PathFileExists returns true for existing folders,
-        // not just files.
-        if (!PathFileExists(file.c_str()))
+    bool createIfMissing = bCreateIfMissing;
+
+    // Note PathFileExists returns true for existing folders,
+    // not just files.
+    if (!PathFileExists(filepath.c_str()))
+    {
+        if (bAskToCreateIfMissing)
         {
-            if (bAskToCreateIfMissing)
+            if (!AskToCreateNonExistingFile(filepath))
+                return -1;
+            createIfMissing = true;
+        }
+        if (bIgnoreIfMissing)
+            return -1;
+    }
+
+    CDocument doc = m_DocManager.LoadFile(*this, filepath, encoding, createIfMissing);
+    if (doc.m_document)
+    {
+        DocID activetabid;
+        if (bOpenIntoActiveTab)
+        {
+            activetabid           = m_TabBar.GetCurrentTabId();
+            const auto& activedoc = m_DocManager.GetDocumentFromID(activetabid);
+            if (!activedoc.m_bIsDirty && !activedoc.m_bNeedsSaving)
+                m_DocManager.RemoveDocument(activetabid);
+            else
+                activetabid = DocID();
+        }
+        if (!activetabid.IsValid())
+        {
+            // check if the only tab is empty and if it is, remove it
+            auto docID = m_TabBar.GetCurrentTabId();
+            if (docID.IsValid())
             {
-                if (!AskToCreateNonExistingFile(file))
-                    return false;
-                createIfMissing = true;
+                const auto& existDoc = m_DocManager.GetDocumentFromID(docID);
+                if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH) == 0) && (m_editor.Call(SCI_CANUNDO) == 0))
+                {
+                    auto curtabIndex = m_TabBar.GetCurrentTabIndex();
+                    CCommandHandler::Instance().OnDocumentClose(docID);
+                    m_insertionIndex = curtabIndex;
+                    m_TabBar.DeleteItemAt(m_insertionIndex);
+                    if (m_insertionIndex)
+                        --m_insertionIndex;
+                    // Prefer to remove the document after the tab has gone as it supports it
+                    // and deletion causes events that may expect it to be there.
+                    m_DocManager.RemoveDocument(docID);
+                }
             }
-            if (bIgnoreIfMissing)
-                return false;
         }
 
-        CDocument doc = m_DocManager.LoadFile(*this, filepath, encoding, createIfMissing);
-        if (doc.m_document)
+        std::wstring sTitle;
+        if (restoreData != nullptr)
         {
-            DocID activetabid;
-            if (bOpenIntoActiveTab)
+            doc.m_position = restoreData->m_position;
+            doc.m_ReadDir = restoreData->m_readDir;
+            doc.m_TabSpace = restoreData->m_tabSpace;
+            if (!restoreData->m_originalPath.empty())
             {
-                activetabid           = m_TabBar.GetCurrentTabId();
-                const auto& activedoc = m_DocManager.GetDocumentFromID(activetabid);
-                if (!activedoc.m_bIsDirty && !activedoc.m_bNeedsSaving)
-                    m_DocManager.RemoveDocument(activetabid);
-                else
-                    activetabid = DocID();
-            }
-            if (!activetabid.IsValid())
-            {
-                // check if the only tab is empty and if it is, remove it
-                auto docID = m_TabBar.GetCurrentTabId();
-                if (docID.IsValid())
-                {
-                    const auto& existDoc = m_DocManager.GetDocumentFromID(docID);
-                    if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH) == 0) && (m_editor.Call(SCI_CANUNDO) == 0))
-                    {
-                        auto curtabIndex = m_TabBar.GetCurrentTabIndex();
-                        CCommandHandler::Instance().OnDocumentClose(docID);
-                        m_insertionIndex = curtabIndex;
-                        m_TabBar.DeleteItemAt(m_insertionIndex);
-                        if (m_insertionIndex)
-                            --m_insertionIndex;
-                        // Prefer to remove the document after the tab has gone as it supports it
-                        // and deletion causes events that may expect it to be there.
-                        m_DocManager.RemoveDocument(docID);
-                    }
-                }
-            }
-            if (bAddToMRU)
-                CMRU::Instance().AddPath(filepath);
-            std::wstring sFileName = CPathUtils::GetFileName(filepath);
-            if (!activetabid.IsValid())
-            {
-                if (m_insertionIndex >= 0)
-                    index = m_TabBar.InsertAfter(m_insertionIndex, sFileName.c_str());
-                else
-                    index = m_TabBar.InsertAtEnd(sFileName.c_str());
-                id = m_TabBar.GetIDFromIndex(index);
+                doc.m_path = restoreData->m_originalPath;
+                doc.m_bIsDirty = true;
+                doc.m_bNeedsSaving = true;
+                m_DocManager.UpdateFileTime(doc, true);
+                sTitle = restoreData->m_originalTitle;
             }
             else
-            {
-                index = m_TabBar.GetCurrentTabIndex();
-                m_TabBar.SetCurrentTabId(activetabid);
-                id = activetabid;
-                m_TabBar.SetCurrentTitle(sFileName.c_str());
-            }
-            doc.SetLanguage(CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor));
+                sTitle = CPathUtils::GetFileName(filepath);
+        }
+        else
+            sTitle = CPathUtils::GetFileName(filepath);
 
-            if (CPathUtils::PathCompare(filepath, m_tabmovepath) == 0)
-            {
-                filepath = m_tabmovesavepath;
-            }
-            // check if the file is special, i.e. if we need to do something
-            // when the file is saved
-            auto sExt = CStringUtils::to_lower(CPathUtils::GetFileExtension(doc.m_path));
-            if (sExt == L"bpj" || sExt == L"bpv")
-            {
-                doc.m_saveCallback = [this]() { CCommandHandler::Instance().InsertPlugins(this); };
-            }
-            else if (sExt == L"ini")
-            {
-                if (doc.m_path == CIniSettings::Instance().GetIniPath())
-                {
-                    doc.m_saveCallback = []() { CIniSettings::Instance().Reload(); };
-                }
-            }
-            else if (sExt == L"bplex")
-            {
-                doc.m_saveCallback = []() { CLexStyles::Instance().Reload(); };
-            }
-
-            m_DocManager.AddDocumentAtEnd(doc, id);
-            doc = m_DocManager.GetDocumentFromID(id);
-
-            // only activate the new doc tab if the main window is enabled:
-            // if it's disabled, a modal dialog is shown
-            // (e.g., the handle-outside-modifications confirmation dialog)
-            // and we then must not change the active tab.
-            if (IsWindowEnabled(*this))
-            {
-                bool bResize = m_fileTree.GetPath().empty() && !doc.m_path.empty();
-                if (bActivate)
-                {
-                    m_TabBar.ActivateAt(index);
-                }
-                else
-                    // SCI_SETDOCPOINTER is necessary so the reference count of the document
-                    // is decreased and the memory can be released.
-                    m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-                if (bResize)
-                    ResizeChildWindows();
-            }
+        if (bAddToMRU)
+            CMRU::Instance().AddPath(doc.m_path);
+        if (!activetabid.IsValid())
+        {
+            if (m_insertionIndex >= 0)
+                index = m_TabBar.InsertAfter(m_insertionIndex, sTitle.c_str());
             else
-                m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-
-            CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, false);
-            InvalidateRect(m_TabBar, nullptr, FALSE);
-
-            if (bAddToMRU)
-                SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
-            CCommandHandler::Instance().OnDocumentOpen(id);
-            if (m_fileTree.GetPath().empty())
-            {
-                m_fileTree.SetPath(CPathUtils::GetParentDirectory(filepath), false);
-                ResizeChildWindows();
-            }
-            UpdateTab(id);
+                index = m_TabBar.InsertAtEnd(sTitle.c_str());
+            id = m_TabBar.GetIDFromIndex(index);
         }
         else
         {
-            CMRU::Instance().RemovePath(filepath, false);
+            index = m_TabBar.GetCurrentTabIndex();
+            m_TabBar.SetCurrentTabId(activetabid);
+            id = activetabid;
+            m_TabBar.SetCurrentTitle(sTitle.c_str());
         }
+        doc.SetLanguage(CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor));
+
+        if (CPathUtils::PathCompare(filepath, m_tabmovepath) == 0)
+        {
+            filepath = m_tabmovesavepath;
+        }
+        // check if the file is special, i.e. if we need to do something
+        // when the file is saved
+        auto sExt = CStringUtils::to_lower(CPathUtils::GetFileExtension(doc.m_path));
+        if (sExt == L"bpj" || sExt == L"bpv")
+        {
+            doc.m_saveCallback = [this]() { CCommandHandler::Instance().InsertPlugins(this); };
+        }
+        else if (sExt == L"ini")
+        {
+            if (doc.m_path == CIniSettings::Instance().GetIniPath())
+            {
+                doc.m_saveCallback = []() { CIniSettings::Instance().Reload(); };
+            }
+        }
+        else if (sExt == L"bplex")
+        {
+            doc.m_saveCallback = []() { CLexStyles::Instance().Reload(); };
+        }
+
+        m_DocManager.AddDocumentAtEnd(doc, id);
+        doc = m_DocManager.GetDocumentFromID(id);
+
+        // only activate the new doc tab if the main window is enabled:
+        // if it's disabled, a modal dialog is shown
+        // (e.g., the handle-outside-modifications confirmation dialog)
+        // and we then must not change the active tab.
+        // SCI_SETDOCPOINTER is necessary so the reference count of the document
+        // is decreased and the memory can be released.
+        if (IsWindowEnabled(*this))
+        {
+            bool bResize = m_fileTree.GetPath().empty() && !doc.m_path.empty();
+            m_TabBar.ActivateAt(index);
+            if (bResize)
+                ResizeChildWindows();
+        }
+        else
+            m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+
+        CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, false);
+        InvalidateRect(m_TabBar, nullptr, FALSE);
+
+        if (bAddToMRU)
+            SHAddToRecentDocs(SHARD_PATHW, doc.m_path.c_str());
+        CCommandHandler::Instance().OnDocumentOpen(id);
+        if (m_fileTree.GetPath().empty())
+        {
+            m_fileTree.SetPath(CPathUtils::GetParentDirectory(doc.m_path), false);
+            ResizeChildWindows();
+        }
+        UpdateTab(id);
     }
-    m_insertionIndex = -1;
+    else
+    {
+        CMRU::Instance().RemovePath(filepath, false);
+    }
+
     return index;
 }
 
@@ -4285,7 +4299,7 @@ void CMainWindow::SetTheme(bool dark)
 
         auto DarkModeForWindow = [](HWND hWnd) {
             DarkModeHelper::Instance().AllowDarkModeForWindow(hWnd, TRUE);
-            SetWindowTheme(hWnd, L"Explorer", nullptr);
+                SetWindowTheme(hWnd, L"Explorer", nullptr);
         };
 
         SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));

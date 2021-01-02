@@ -31,6 +31,8 @@
 #include "ProgressDlg.h"
 #include "SysInfo.h"
 #include "AppUtils.h"
+#include "MainWindow.h"
+
 #include <sstream>
 #include <string>
 #include <vector>
@@ -206,6 +208,7 @@ void CCmdSessionLoad::RestoreSavedSession()
     int                       filecount   = 0;
     auto                      sessionPath = GetBackupPath();
     std::vector<std::wstring> filesToDelete;
+    DocID lastActivated;
     for (int fileNum = 0; fileNum < sessionSize; ++fileNum)
     {
         std::wstring key  = CStringUtils::Format(L"path%d", fileNum);
@@ -215,23 +218,50 @@ void CCmdSessionLoad::RestoreSavedSession()
         ++filecount;
         SetProgress(filecount, numFilesToRestore);
 
+        CDocumentRestoreData restoreData;
         auto origPath = settings.GetString(sessionSection(), CStringUtils::Format(L"origpath%d", fileNum).c_str(), nullptr);
         if (origPath)
         {
-            WIN32_FILE_ATTRIBUTE_DATA savedFileData = {};
-            GetFileAttributesEx(path.c_str(), GetFileExInfoStandard, &savedFileData);
-            WIN32_FILE_ATTRIBUTE_DATA origFileData = {};
-            GetFileAttributesEx(origPath, GetFileExInfoStandard, &origFileData);
-            if (CompareFileTime(&savedFileData.ftLastWriteTime, &origFileData.ftLastWriteTime) < 0)
+            // If 'original path' settings value is present, 'path' is assumed to be a backup file
+            // and 'original path' is assumed to be the file the backup relates to.
+            // If the original file is more recent than the backup file,
+            // we use the original file and delete the backup file.
+
+            restoreData.m_originalPath = origPath;
+            auto origTitle = settings.GetString(sessionSection(), CStringUtils::Format(L"origtitle%d", fileNum).c_str(), nullptr);
+            restoreData.m_originalTitle = origTitle;
+
+            filesToDelete.push_back(path);
+
+            WIN32_FILE_ATTRIBUTE_DATA savedFileData{};
+            WIN32_FILE_ATTRIBUTE_DATA origFileData{};
+            if (GetFileAttributesEx(path.c_str(), GetFileExInfoStandard, &savedFileData)
+                && GetFileAttributesEx(origPath, GetFileExInfoStandard, &origFileData)
+                && CompareFileTime(&origFileData.ftLastWriteTime, &savedFileData.ftLastWriteTime) > 0)
             {
-                // the original file was modified after we saved the modifications
-                // --> use the original file
-                filesToDelete.push_back(path);
                 path = origPath;
-                origPath = nullptr;
             }
         }
-        int tabIndex = OpenFile(path.c_str(), openflags);
+        
+        auto& pos = restoreData.m_position;
+        pos.m_nSelMode = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"selmode%d", fileNum).c_str(), 0);
+        pos.m_nStartPos = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"startpos%d", fileNum).c_str(), 0);
+        pos.m_nEndPos = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"endpos%d", fileNum).c_str(), 0);
+        pos.m_nScrollWidth = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"scrollwidth%d", fileNum).c_str(), 0);
+        pos.m_xOffset = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"xoffset%d", fileNum).c_str(), 0);
+        pos.m_nFirstVisibleLine = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
+        pos.m_nWrapLineOffset = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"wraplineoffset%d", fileNum).c_str(), 0);
+        pos.m_lastStyleLine = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"laststyleline%d", fileNum).c_str(), 0);
+        auto folds = settings.GetString(sessionSection(), CStringUtils::Format(L"foldlines%d", fileNum).c_str(), 0);
+        pos.m_lineStateVector.clear();
+        if (folds)
+        {
+            stringtok(pos.m_lineStateVector, folds, true, L";", false);
+        }
+        restoreData.m_tabSpace = (TabSpace)settings.GetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
+        restoreData.m_readDir = (ReadDirection)settings.GetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0);
+
+        int tabIndex = m_pMainWindow->OpenFile(path.c_str(), openflags, &restoreData);
         if (tabIndex < 0)
             continue;
         // Don't use the index to track the active tab, as it's probably
@@ -240,43 +270,19 @@ void CCmdSessionLoad::RestoreSavedSession()
         auto docId = GetDocIDFromTabIndex(tabIndex);
         if (!docId.IsValid())
             continue;
+        lastActivated = docId;
         auto& doc               = GetModDocumentFromID(docId);
-        auto& pos               = doc.m_position;
-        pos.m_nSelMode          = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"selmode%d", fileNum).c_str(), 0);
-        pos.m_nStartPos         = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"startpos%d", fileNum).c_str(), 0);
-        pos.m_nEndPos           = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"endpos%d", fileNum).c_str(), 0);
-        pos.m_nScrollWidth      = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"scrollwidth%d", fileNum).c_str(), 0);
-        pos.m_xOffset           = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"xoffset%d", fileNum).c_str(), 0);
-        pos.m_nFirstVisibleLine = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"firstvisible%d", fileNum).c_str(), 0);
-        pos.m_nWrapLineOffset   = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"wraplineoffset%d", fileNum).c_str(), 0);
-        pos.m_lastStyleLine     = (size_t)settings.GetInt64(sessionSection(), CStringUtils::Format(L"laststyleline%d", fileNum).c_str(), 0);
-        doc.m_TabSpace          = (TabSpace)settings.GetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
-        doc.m_ReadDir           = (ReadDirection)settings.GetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0);
-        auto folds              = settings.GetString(sessionSection(), CStringUtils::Format(L"foldlines%d", fileNum).c_str(), 0);
-        pos.m_lineStateVector.clear();
-        if (folds)
-        {
-            stringtok(pos.m_lineStateVector, folds, true, L";", false);
-        }
         if (origPath)
         {
-            filesToDelete.push_back(doc.m_path);
-            doc.m_path         = origPath;
-            doc.m_bIsDirty     = true;
-            doc.m_bNeedsSaving = true;
-            auto origTitle     = settings.GetString(sessionSection(), CStringUtils::Format(L"origtitle%d", fileNum).c_str(), nullptr);
-            SetTitleForDocID(docId, origTitle);
-            UpdateFileTime(doc, true);
-            UpdateTab(GetTabIndexFromDocID(docId));
             settings.Delete(sessionSection(), CStringUtils::Format(L"origpath%d", fileNum).c_str());
             settings.SetString(sessionSection(), CStringUtils::Format(L"path%d", fileNum).c_str(), doc.m_path.c_str());
         }
 
         if ((int)settings.GetInt64(sessionSection(), CStringUtils::Format(L"activetab%d", fileNum).c_str(), 0))
             activeDoc = docId;
-        RestoreCurrentPos(doc.m_position);
+        //RestoreCurrentPos(doc.m_position);
     }
-    if (activeDoc.IsValid())
+    if (activeDoc.IsValid() && activeDoc != lastActivated)
     {
         int activeTabIndex = GetTabIndexFromDocID(activeDoc);
         TabActivateAt(activeTabIndex);

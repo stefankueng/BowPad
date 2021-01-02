@@ -156,9 +156,6 @@ private:
     int                     m_cursorTimeout;
     bool                    m_bInFolderMargin;
     bool                    m_hasConsolas;
-    sptr_t                  m_LineToScrollToAfterPaint;
-    sptr_t                  m_WrapOffsetToScrollToAfterPaint;
-    int                     m_LineToScrollToAfterPaintCounter;
     AnimationVariable       m_animVarGrayFore;
     AnimationVariable       m_animVarGrayBack;
     AnimationVariable       m_animVarGraySel;
