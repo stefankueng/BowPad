@@ -516,64 +516,93 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
         break;
         case WM_MOUSEWHEEL:
         {
-            // Scroll or move tabs:
-            // Mousewheel: scrolls the tab bar area like Firefox does it. Only works if at least one tab is hidden.
-            // Ctrl+Mousewheel: moves the current tab left/right, loops around at the beginning/end
-            // Shift+Mousewheel: moves the current tab left/right, stops at the beginning/end
-            // Ctrl+Shift+Mousewheel: switch current tab to the first/last tab
-
             if (m_bIsDragging)
                 return TRUE;
 
-            const bool    isForward    = ((short)HIWORD(wParam)) < 0; // wheel down: forward, wheel up: backward
-            const LRESULT lastTabIndex = ::SendMessage(*this, TCM_GETITEMCOUNT, 0, 0) - 1;
+            const short wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+            const short keyState = GET_KEYSTATE_WPARAM(wParam);
+            const int xPos = GET_X_LPARAM(lParam);
+            const int yPos = GET_Y_LPARAM(lParam);
 
-            if ((wParam & MK_CONTROL) && (wParam & MK_SHIFT))
+            // Positive wheel delta means wheel moved forward (away from user).
+            // Negative wheel delta means wheel moved backward (towards user).
+            const bool wheelForward = wheelDelta >= 0;
+
+            const int tabCount = TabCtrl_GetItemCount(*this);
+            if (tabCount == 0)
+                return TRUE;
+            const int lastTabIndex = tabCount - 1;
+
+            // If wheel moves forward, we wish to scroll backward (towards beginning).
+            // If wheel moves backward, we wish to scroll forward (towards end).
+            const bool scrollForward = !wheelForward;
+
+            // Mousewheel: scrolls the tab bar area like Firefox does it.
+            // Only works if at least one tab is hidden.
+            // 1.
+            // Wheel forward + control + shift == focus on first tab.
+            // Wheel backward + control + shift == focus on last tab.            
+            // 2.
+            // Wheel forward + control == focus on next tab (wrap).
+            // Wheel backward + control == focus on previous tab (wrap).
+            // 3.
+            // Wheel forward + shift == focus on next tab (no wrap).
+            // Wheel backward + shift == focus on previous tab (no wrap).
+            // 4.
+            // Wheel forward + no keys == scroll towards beginning.
+            // Wheel backward + no keys == scroll towards end.
+
+            if ((keyState & MK_CONTROL) && (keyState & MK_SHIFT))
             {
-                ::SendMessage(*this, TCM_SETCURFOCUS, (isForward ? lastTabIndex : 0), 0);
+                TabCtrl_SetCurFocus(*this, scrollForward ? lastTabIndex : 0);
+                return TRUE;
             }
-            else if (wParam & (MK_CONTROL | MK_SHIFT))
+            else if (keyState & (MK_CONTROL | MK_SHIFT))
             {
-                LRESULT tabIndex = ::SendMessage(*this, TCM_GETCURSEL, 0, 0) + (isForward ? 1 : -1);
-                if (tabIndex < 0)
+                int curTabIndex = TabCtrl_GetCurSel(*this);
+                int newTabIndex = curTabIndex + (scrollForward ? 1 : -1);
+                if (newTabIndex < 0)
                 {
-                    if (wParam & MK_CONTROL)
-                        tabIndex = lastTabIndex; // wrap scrolling
+                    if (keyState & MK_CONTROL)
+                        newTabIndex = lastTabIndex; // Wrap to last tab.
                     else
                         return TRUE;
                 }
-                else if (tabIndex > lastTabIndex)
+                else if (newTabIndex > lastTabIndex)
                 {
-                    if (wParam & MK_CONTROL)
-                        tabIndex = 0; // wrap scrolling
+                    if (keyState & MK_CONTROL)
+                        newTabIndex = 0; // Wrap to first tab.
                     else
                         return TRUE;
                 }
-                ::SendMessage(*this, TCM_SETCURFOCUS, tabIndex, 0);
+                TabCtrl_SetCurFocus(*this, newTabIndex);
+                return TRUE;
             }
             else
             {
                 RECT rcTabCtrl{}, rcLastTab{};
-                ::SendMessage(*this, TCM_GETITEMRECT, lastTabIndex, (LPARAM)&rcLastTab);
+                BOOL gotItemRect = TabCtrl_GetItemRect(*this, lastTabIndex, &rcLastTab);
+                if (!gotItemRect)
+                    return TRUE;
                 ::GetClientRect(*this, &rcTabCtrl);
 
-                // get index of the first visible tab
+                // Get index of the first visible tab.
                 TC_HITTESTINFO hti{};
-                LONG           xy      = 14; // arbitrary value: just inside the first tab
+                LONG           xy      = 14; // Arbitrary value: just inside the first tab.
                 hti.pt                 = {xy, xy};
-                LRESULT scrollTabIndex = ::SendMessage(*this, TCM_HITTEST, 0, (LPARAM)&hti);
+                int scrollTabIndex     = TabCtrl_HitTest(*this, &hti);
 
-                if (scrollTabIndex < 1 && (rcLastTab.right < rcTabCtrl.right)) // nothing to scroll
+                if (scrollTabIndex < 1 && (rcLastTab.right < rcTabCtrl.right)) // Nothing to scroll.
                     return TRUE;
 
-                // maximal width/height of the msctls_updown32 class (arrow box in the tab bar),
-                // this area may hide parts of the last tab and needs to be excluded
-                LONG maxLengthUpDownCtrl = 45; // sufficient static value
+                // Maximal width/height of the msctls_updown32 class (arrow box in the tab bar),
+                // This area may hide parts of the last tab and needs to be excluded.
+                const LONG maxLengthUpDownCtrl = 45; // sufficient static value
 
-                // scroll forward as long as the last tab is hidden; scroll backward till the first tab
-                if ((((rcTabCtrl.right - rcLastTab.right) < maxLengthUpDownCtrl)) || !isForward)
+                // Scroll forward as long as the last tab is hidden; scroll backward till the first tab
+                if ((rcTabCtrl.right - rcLastTab.right < maxLengthUpDownCtrl) || !scrollForward)
                 {
-                    if (isForward)
+                    if (scrollForward)
                         ++scrollTabIndex;
                     else
                         --scrollTabIndex;
@@ -581,15 +610,17 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                     if (scrollTabIndex < 0 || scrollTabIndex > lastTabIndex)
                         return TRUE;
 
-                    // clear hover state of the close button,
-                    // WM_MOUSEMOVE won't handle this properly since the tab position will change
+                    // Clear hover state of the close button,
+                    // WM_MOUSEMOVE won't handle this properly since the tab position will change.
                     if (m_bIsCloseHover)
                     {
                         m_bIsCloseHover = false;
-                        ::InvalidateRect(*this, &m_currentHoverTabRect, false);
+                        ::InvalidateRect(*this, &m_currentHoverTabRect, FALSE);
                     }
 
                     ::SendMessage(*this, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, scrollTabIndex), 0);
+
+                    return TRUE;
                 }
             }
             return TRUE;
