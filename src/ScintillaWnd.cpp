@@ -899,7 +899,8 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     }
     Call(SCI_CHOOSECARETX);
 
-    Call(SCI_ENSUREVISIBLE, pos.m_nFirstVisibleLine);
+    if (Call(SCI_GETLINEVISIBLE, pos.m_nFirstVisibleLine) == 0)
+        Call(SCI_ENSUREVISIBLE, pos.m_nFirstVisibleLine);
     auto lineToShow = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
     if (wrapmode != SC_WRAP_NONE)
     {
