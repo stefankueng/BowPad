@@ -31,7 +31,6 @@
 #include "ProgressDlg.h"
 #include "SysInfo.h"
 #include "AppUtils.h"
-#include "MainWindow.h"
 
 #include <sstream>
 #include <string>
@@ -261,7 +260,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         restoreData.m_tabSpace = (TabSpace)settings.GetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0);
         restoreData.m_readDir = (ReadDirection)settings.GetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0);
 
-        int tabIndex = m_pMainWindow->OpenFile(path.c_str(), openflags, &restoreData);
+        int tabIndex = OpenFile(path.c_str(), openflags, &restoreData);
         if (tabIndex < 0)
             continue;
         // Don't use the index to track the active tab, as it's probably

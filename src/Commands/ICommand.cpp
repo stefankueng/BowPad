@@ -178,9 +178,9 @@ HWND ICommand::GetScintillaWnd() const
     return m_pMainWindow->m_editor;
 }
 
-int ICommand::OpenFile(LPCWSTR file, unsigned int openFlags)
+int ICommand::OpenFile(LPCWSTR file, unsigned int openFlags, CDocumentRestoreData* restoreData)
 {
-    return m_pMainWindow->OpenFile(file, openFlags);
+    return m_pMainWindow->OpenFile(file, openFlags, restoreData);
 }
 
 void ICommand::OpenFiles(const std::vector<std::wstring>& paths)

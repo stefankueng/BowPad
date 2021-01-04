@@ -127,7 +127,7 @@ protected:
     HWND                GetHwnd() const;
     HWND                GetScintillaWnd() const;
     UINT                GetTimerID() { return m_nextTimerID++; }
-    int                 OpenFile(LPCWSTR file, unsigned int openFlags);
+    int                 OpenFile(LPCWSTR file, unsigned int openFlags, CDocumentRestoreData* restoreData = nullptr);
     void                OpenFiles(const std::vector<std::wstring>& paths);
     void                OpenHDROP(HDROP hDrop);
     bool                ReloadTab(int tab, int encoding = -1); // By default reload encoding
