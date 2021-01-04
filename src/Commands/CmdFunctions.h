@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -84,6 +84,7 @@ public:
 
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdFunctions; }
+    bool IsItemsSourceCommand() override { return true; }
 
 private:
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;

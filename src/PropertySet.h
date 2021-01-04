@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2016, 2020 - Stefan Kueng
+// Copyright (C) 2013, 2015-2016, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,9 +25,7 @@ const int MAX_RESOURCE_LENGTH = 256;
 class CPropertySet : public IUISimplePropertySet
 {
 public:
-
-    static HRESULT CreateInstance(CPropertySet **ppPropertySet);
-
+    static HRESULT CreateInstance(CPropertySet** ppPropertySet);
 
     void InitializeCommandProperties(int categoryId, int commandId, UI_COMMANDTYPE commandType);
 
@@ -35,12 +33,17 @@ public:
 
     void InitializeCategoryProperties(PCWSTR label, int categoryId);
 
-    STDMETHOD(GetValue)(REFPROPERTYKEY key, PROPVARIANT *ppropvar);
+    STDMETHOD(GetValue) (REFPROPERTYKEY key, PROPVARIANT* ppropvar);
 
     // IUnknown
     IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
     IFACEMETHODIMP_(ULONG) AddRef();
     IFACEMETHODIMP_(ULONG) Release();
+
+    const std::wstring& GetLabel() const
+    {
+        return m_wszLabel;
+    }
 
 private:
     CPropertySet()
@@ -57,11 +60,11 @@ private:
     {
     }
 
-    WCHAR           m_wszLabel[MAX_RESOURCE_LENGTH];    // Used for items and categories.
-    int             m_categoryId;                       // Used for items, categories, and commands.
-    IUIImagePtr     m_pimgItem;                         // Used for items only.
-    int             m_commandId;                        // Used for commands only.
-    UI_COMMANDTYPE  m_commandType;                      // Used for commands only.
+    WCHAR          m_wszLabel[MAX_RESOURCE_LENGTH]; // Used for items and categories.
+    int            m_categoryId;                    // Used for items, categories, and commands.
+    IUIImagePtr    m_pimgItem;                      // Used for items only.
+    int            m_commandId;                     // Used for commands only.
+    UI_COMMANDTYPE m_commandType;                   // Used for commands only.
 
-    LONG            m_cRef;
+    LONG m_cRef;
 };

@@ -432,6 +432,7 @@
     <ClInclude Include="TabBtn.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Theme.h" />
+    <ClInclude Include="UICollection.h" />
     <ClInclude Include="UTF8DocumentIterator.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>
@@ -559,6 +560,7 @@
     <ClCompile Include="TabBar.cpp" />
     <ClCompile Include="TabBtn.cpp" />
     <ClCompile Include="Theme.cpp" />
+    <ClCompile Include="UICollection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc" />

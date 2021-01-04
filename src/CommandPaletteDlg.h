@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,12 +17,14 @@
 #pragma once
 #include "BaseDialog.h"
 #include "DlgResizer.h"
+#include "ICommand.h"
 #include <vector>
 
 class CmdPalData
 {
 public:
     UINT         cmdId = 0;
+    int          collectionIndex = -1;
     std::wstring command;
     std::wstring description;
     std::wstring shortcut;
@@ -43,7 +45,7 @@ protected:
     LRESULT          DoCommand(int id, int code);
 
     void    InitResultsList();
-    void    FillResults();
+    void    FillResults(bool force);
     LRESULT DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
     LRESULT GetListItemDispInfo(NMLVDISPINFO* pDispInfo);
     LRESULT DrawListItem(NMLVCUSTOMDRAW* pLVCD);
@@ -58,4 +60,6 @@ private:
 
     std::vector<CmdPalData> m_results;
     std::vector<CmdPalData> m_allResults;
+    std::vector<CmdPalData> m_collectionResults;
+    ICommand*               m_pCmd;
 };

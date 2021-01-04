@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016 - Stefan Kueng
+// Copyright (C) 2014-2016, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include <spellcheck.h>
 
 _COM_SMARTPTR_TYPEDEF(IUICollection, __uuidof(IUICollection));
+_COM_SMARTPTR_TYPEDEF(IUISimplePropertySet, __uuidof(IUISimplePropertySet));
 _COM_SMARTPTR_TYPEDEF(IUIImage, __uuidof(IUIImage));
 _COM_SMARTPTR_TYPEDEF(IUIImageFromBitmap, __uuidof(IUIImageFromBitmap));
 _COM_SMARTPTR_TYPEDEF(IFileOpenDialog, __uuidof(IFileOpenDialog));
@@ -36,6 +37,7 @@ _COM_SMARTPTR_TYPEDEF(IFileOperation, __uuidof(IFileOperation));
 _COM_SMARTPTR_TYPEDEF(IStream, __uuidof(IStream));
 _COM_SMARTPTR_TYPEDEF(IFileSaveDialog, __uuidof(IFileSaveDialog));
 _COM_SMARTPTR_TYPEDEF(IShellItem, __uuidof(IShellItem));
+_COM_SMARTPTR_TYPEDEF(IUnknown, __uuidof(IUnknown));
 // Bowpad uses this interface but not the smart pointer for it yet.
 //_COM_SMARTPTR_TYPEDEF(IShellFolder, __uuidof(IShellFolder));
 _COM_SMARTPTR_TYPEDEF(IPropertyStore, __uuidof(IPropertyStore));

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013, 2015-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 #include "StringUtils.h"
 #include "Theme.h"
 #include "OnOutOfScope.h"
+#include "PropertySet.h"
+#include "UICollection.h"
 #include <string>
 #include <algorithm>
 #include <memory>
@@ -36,6 +38,7 @@ CCommandPaletteDlg::CCommandPaletteDlg(HWND hParent)
     : m_hParent(hParent)
     , m_hFilter(nullptr)
     , m_hResults(nullptr)
+    , m_pCmd(nullptr)
 {
 }
 
@@ -45,8 +48,11 @@ CCommandPaletteDlg::~CCommandPaletteDlg()
 
 void CCommandPaletteDlg::ClearFilterText()
 {
+    SetDlgItemText(*this, IDC_COLLECTIONNAME, L"");
+    m_pCmd = nullptr;
+    m_collectionResults.clear();
     SetWindowText(m_hFilter, L"");
-    FillResults();
+    FillResults(false);
     SetFocus(m_hFilter);
 }
 
@@ -163,10 +169,11 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             m_resizer.Init(hwndDlg);
             m_resizer.UseSizeGrip(!CTheme::Instance().IsDarkTheme());
             m_resizer.AddControl(hwndDlg, IDC_FILTER, RESIZER_TOPLEFTRIGHT);
+            m_resizer.AddControl(hwndDlg, IDC_COLLECTIONNAME, RESIZER_TOPLEFTRIGHT);
             m_resizer.AddControl(hwndDlg, IDC_RESULTS, RESIZER_TOPLEFTBOTTOMRIGHT);
             InvalidateRect(*this, nullptr, true);
             InitResultsList();
-            FillResults();
+            FillResults(true);
         }
             return TRUE;
         case WM_COMMAND:
@@ -183,7 +190,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             break;
         case WM_TIMER:
         {
-            FillResults();
+            FillResults(false);
             KillTimer(*this, 101);
         }
         break;
@@ -196,6 +203,9 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             {
                 SetFocus(m_hFilter);
             }
+            m_pCmd = nullptr;
+            m_collectionResults.clear();
+            SetDlgItemText(*this, IDC_COLLECTIONNAME, L"");
             break;
         case WM_SIZE:
         {
@@ -275,12 +285,101 @@ LRESULT CCommandPaletteDlg::DoCommand(int id, int code)
             if (i >= 0)
             {
                 const auto& data = m_results[i];
-                SendMessage(m_hParent, WM_COMMAND, MAKEWPARAM(data.cmdId, 1), 0);
+                auto*       cmd  = CCommandHandler::Instance().GetCommand(data.cmdId);
+                if (cmd && cmd->IsItemsSourceCommand())
+                {
+                    if (m_pCmd)
+                    {
+                        // execute the collection item
+                        PROPVARIANT propIndex = {};
+                        UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, data.collectionIndex, &propIndex);
+                        m_pCmd->IUICommandHandlerExecute(UI_EXECUTIONVERB_EXECUTE, &UI_PKEY_SelectedItem, &propIndex, nullptr);
+                        m_collectionResults.clear();
+                        m_pCmd = nullptr;
+                        SetDlgItemText(*this, IDC_COLLECTIONNAME, L"");
+                    }
+                    else
+                    {
+                        m_collectionResults.clear();
+                        m_pCmd = cmd;
+                        SetDlgItemText(*this, IDC_COLLECTIONNAME, data.command.c_str());
+                        CUICollection collection;
+                        PROPVARIANT   propvarCurrentValue = {};
+                        PROPVARIANT   propvarNewValue     = {};
+                        UIInitPropertyFromInterface(UI_PKEY_ItemsSource, &collection, &propvarCurrentValue);
+                        UIInitPropertyFromInterface(UI_PKEY_ItemsSource, &collection, &propvarNewValue);
+                        m_pCmd->IUICommandHandlerUpdateProperty(UI_PKEY_ItemsSource, &propvarCurrentValue, &propvarNewValue);
+                        UINT32 count = 0;
+                        collection.GetCount(&count);
+                        if (count == 0)
+                        {
+                            m_pCmd->IUICommandHandlerUpdateProperty(UI_PKEY_RecentItems, &propvarCurrentValue, &propvarNewValue);
+                            SAFEARRAY* psa = nullptr;
+                            UIPropertyToIUnknownArrayAlloc(UI_PKEY_RecentItems, propvarNewValue, &psa);
+                            if (psa)
+                            {
+                                for (LONG a = 0; a < (LONG)psa->rgsabound->cElements; ++a)
+                                {
+                                    IUnknown* iu{};
+                                    SafeArrayGetElement(psa, &a, &iu);
+
+                                    collection.Add(iu);
+                                }
+                                SafeArrayDestroy(psa);
+                            }
+                            collection.GetCount(&count);
+                        }
+                        for (UINT32 c = 0; c < count; ++c)
+                        {
+                            CmdPalData colData;
+                            colData.cmdId                 = data.cmdId;
+                            colData.collectionIndex       = c;
+                            IUISimplePropertySetPtr pItem = nullptr;
+                            collection.GetItem(c, (IUnknown**)&pItem);
+                            if (pItem)
+                            {
+                                PROPVARIANT propVar = {};
+                                if (SUCCEEDED(pItem->GetValue(UI_PKEY_LabelDescription, &propVar)))
+                                    colData.command = propVar.bstrVal;
+                                else if (SUCCEEDED(pItem->GetValue(UI_PKEY_Label, &propVar)))
+                                    colData.command = propVar.bstrVal;
+                                PropVariantClear(&propVar);
+                                if (SUCCEEDED(pItem->GetValue(UI_PKEY_TooltipDescription, &propVar)))
+                                    colData.description = propVar.bstrVal;
+                                PropVariantClear(&propVar);
+                                m_collectionResults.push_back(colData);
+                            }
+                        }
+                        PropVariantClear(&propvarCurrentValue);
+                        PropVariantClear(&propvarNewValue);
+                    }
+                    SetWindowText(m_hFilter, L"");
+                    FillResults(true);
+                }
+                else
+                {
+                    SetDlgItemText(*this, IDC_COLLECTIONNAME, L"");
+                    m_pCmd = nullptr;
+                    m_collectionResults.clear();
+                    SendMessage(m_hParent, WM_COMMAND, MAKEWPARAM(data.cmdId, 1), 0);
+                }
             }
         }
         break;
         case IDCANCEL:
-            ShowWindow(*this, SW_HIDE);
+            SetDlgItemText(*this, IDC_COLLECTIONNAME, L"");
+            if (!m_pCmd && m_collectionResults.empty())
+            {
+                ShowWindow(*this, SW_HIDE);
+                m_pCmd = nullptr;
+                m_collectionResults.clear();
+            }
+            else
+            {
+                m_pCmd = nullptr;
+                m_collectionResults.clear();
+                FillResults(true);
+            }
             break;
         case IDC_FILTER:
             if (code == EN_CHANGE)
@@ -354,8 +453,7 @@ LRESULT CCommandPaletteDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
             // execute the selected command
             if (lpNMItemActivate->iItem >= 0 && lpNMItemActivate->iItem < (int)m_results.size())
             {
-                const auto& data = m_results[lpNMItemActivate->iItem];
-                SendMessage(m_hParent, WM_COMMAND, MAKEWPARAM(data.cmdId, 1), 0);
+                SendMessage(*this, WM_COMMAND, MAKEWPARAM(IDOK, 1), 0);
             }
             break;
         case NM_CUSTOMDRAW:
@@ -415,17 +513,21 @@ LRESULT CCommandPaletteDlg::GetListItemDispInfo(NMLVDISPINFO* pDispInfo)
     return 0;
 }
 
-void CCommandPaletteDlg::FillResults()
+void CCommandPaletteDlg::FillResults(bool force)
 {
     static std::wstring lastFilterText;
     auto                filterText  = GetDlgItemText(IDC_FILTER);
     std::wstring        sFilterText = filterText.get();
-    if (lastFilterText.empty() || _wcsicmp(sFilterText.c_str(), lastFilterText.c_str()))
+    if (force || lastFilterText.empty() || _wcsicmp(sFilterText.c_str(), lastFilterText.c_str()))
     {
         m_results.clear();
-        int col1Width = 0;
-        int col2Width = 0;
-        for (const auto& cmd : m_allResults)
+        int                      col1Width  = 0;
+        int                      col2Width  = 0;
+        std::vector<CmdPalData>* allResults = &m_allResults;
+        if (!m_collectionResults.empty())
+            allResults = &m_collectionResults;
+
+        for (const auto& cmd : *allResults)
         {
             if (sFilterText.empty() || StrStrIW(cmd.command.c_str(), sFilterText.c_str()))
             {
@@ -479,8 +581,7 @@ LRESULT CALLBACK CCommandPaletteDlg::EditSubClassProc(HWND hWnd, UINT uMsg, WPAR
                 auto i = ListView_GetSelectionMark(pThis->m_hResults);
                 if (i >= 0)
                 {
-                    const auto& data = pThis->m_results[i];
-                    SendMessage(pThis->m_hParent, WM_COMMAND, MAKEWPARAM(data.cmdId, 1), 0);
+                    SendMessage(*pThis, WM_COMMAND, MAKEWPARAM(IDOK, 1), 0);
                 }
             }
             break;

@@ -396,6 +396,9 @@
     <ClInclude Include="..\ext\sktoolslib\Hash.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="UICollection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -706,6 +709,9 @@
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\Monitor.cpp">
       <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="UICollection.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
