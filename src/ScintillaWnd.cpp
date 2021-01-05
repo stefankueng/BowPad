@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2020 - Stefan Kueng
+// Copyright (C) 2013-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,24 +45,6 @@ extern int                    g_searchMarkerCount; // from CmdFindReplace
 extern Scintilla::LexerModule lmSimple;
 extern Scintilla::LexerModule lmLog;
 
-namespace
-{
-typedef BOOL(WINAPI* GetGestureInfoFN)(HGESTUREINFO hGestureInfo, PGESTUREINFO pGestureInfo);
-GetGestureInfoFN GetGestureInfoFunc = nullptr;
-typedef BOOL(WINAPI* CloseGestureInfoHandleFN)(HGESTUREINFO hGestureInfo);
-CloseGestureInfoHandleFN CloseGestureInfoHandleFunc = nullptr;
-typedef BOOL(WINAPI* SetGestureConfigFN)(HWND hwnd, DWORD dwReserved, UINT cIDs, PGESTURECONFIG pGestureConfig, UINT cbSize);
-SetGestureConfigFN SetGestureConfigFunc = nullptr;
-
-typedef BOOL(WINAPI* BeginPanningFeedbackFN)(HWND hwnd);
-BeginPanningFeedbackFN BeginPanningFeedbackFunc = nullptr;
-typedef BOOL(WINAPI* EndPanningFeedbackFN)(HWND hwnd, BOOL fAnimateBack);
-EndPanningFeedbackFN EndPanningFeedbackFunc = nullptr;
-typedef BOOL(WINAPI* UpdatePanningFeedbackFN)(HWND hwnd, LONG lTotalOverpanOffsetX, LONG lTotalOverpanOffsetY, BOOL fInInertia);
-UpdatePanningFeedbackFN UpdatePanningFeedbackFunc = nullptr;
-
-CAutoLibrary hUxThemeDll = LoadLibrary(L"uxtheme.dll");
-} // namespace
 
 UINT32 g_contextID = cmdContextMap;
 
@@ -70,7 +52,6 @@ const int TIM_HIDECURSOR              = 101;
 const int TIM_BRACEHIGHLIGHTTEXT      = 102;
 const int TIM_BRACEHIGHLIGHTTEXTCLEAR = 103;
 
-static bool g_initialized          = false;
 static bool g_scintillaInitialized = false;
 
 const int    color_folding_fore_inactive    = 255;
@@ -248,25 +229,6 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     Call(SCI_SETACCESSIBILITY, SC_ACCESSIBILITY_ENABLED);
 
     SetupDefaultStyles();
-
-    if (!g_initialized)
-    {
-        // delay loaded functions, not available on Vista
-        HMODULE hDll = GetModuleHandle(TEXT("user32.dll"));
-        if (hDll)
-        {
-            GetGestureInfoFunc         = (GetGestureInfoFN)::GetProcAddress(hDll, "GetGestureInfo");
-            CloseGestureInfoHandleFunc = (CloseGestureInfoHandleFN)::GetProcAddress(hDll, "CloseGestureInfoHandle");
-            SetGestureConfigFunc       = (SetGestureConfigFN)::GetProcAddress(hDll, "SetGestureConfig");
-        }
-        if (hUxThemeDll)
-        {
-            BeginPanningFeedbackFunc  = (BeginPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "BeginPanningFeedback");
-            EndPanningFeedbackFunc    = (EndPanningFeedbackFN)::GetProcAddress(hUxThemeDll, "EndPanningFeedback");
-            UpdatePanningFeedbackFunc = (UpdatePanningFeedbackFN)::GetProcAddress(hUxThemeDll, "UpdatePanningFeedback");
-        }
-        g_initialized = true;
-    }
 
     return true;
 }
@@ -673,16 +635,13 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
         break;
         case WM_GESTURENOTIFY:
         {
-            if (SetGestureConfigFunc)
-            {
                 DWORD         panWant = GC_PAN | GC_PAN_WITH_INERTIA | GC_PAN_WITH_SINGLE_FINGER_VERTICALLY;
                 GESTURECONFIG gestureConfig[] =
                     {
                         {GID_PAN, panWant, GC_PAN_WITH_GUTTER},
                         {GID_TWOFINGERTAP, GC_TWOFINGERTAP, 0},
                     };
-                SetGestureConfigFunc(*this, 0, _countof(gestureConfig), gestureConfig, sizeof(GESTURECONFIG));
-            }
+                SetGestureConfig(*this, 0, _countof(gestureConfig), gestureConfig, sizeof(GESTURECONFIG));
             return 0;
         }
         case WM_GESTURE:
@@ -693,15 +652,10 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
             static long xOverpan = 0;
             static long yOverpan = 0;
 
-            if ((GetGestureInfoFunc == nullptr) || (CloseGestureInfoHandleFunc == nullptr) ||
-                (BeginPanningFeedbackFunc == nullptr) || (EndPanningFeedbackFunc == nullptr) ||
-                (UpdatePanningFeedbackFunc == nullptr))
-                break;
-
             GESTUREINFO gi;
             ZeroMemory(&gi, sizeof(GESTUREINFO));
             gi.cbSize    = sizeof(GESTUREINFO);
-            BOOL bResult = GetGestureInfoFunc((HGESTUREINFO)lParam, &gi);
+            BOOL bResult = GetGestureInfo((HGESTUREINFO)lParam, &gi);
 
             if (bResult)
             {
@@ -755,13 +709,13 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
 
                         if (gi.dwFlags & GF_BEGIN)
                         {
-                            BeginPanningFeedbackFunc(hwnd);
+                            BeginPanningFeedback(hwnd);
                             yOverpan = 0;
                             xOverpan = 0;
                         }
                         else if (gi.dwFlags & GF_END)
                         {
-                            EndPanningFeedbackFunc(hwnd, TRUE);
+                            EndPanningFeedback(hwnd, TRUE);
                             yOverpan = 0;
                             xOverpan = 0;
                         }
@@ -769,15 +723,15 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                         if ((siv.nPos == siv.nMin) || (siv.nPos >= (siv.nMax - int(siv.nPage))))
                         {
                             // we reached the bottom / top, pan
-                            UpdatePanningFeedbackFunc(hwnd, 0, yOverpan, gi.dwFlags & GF_INERTIA);
+                            UpdatePanningFeedback(hwnd, 0, yOverpan, gi.dwFlags & GF_INERTIA);
                         }
                         if ((sih.nPos == sih.nMin) || (sih.nPos >= (sih.nMax - int(sih.nPage))))
                         {
                             // we reached the bottom / top, pan
-                            UpdatePanningFeedbackFunc(hwnd, xOverpan, 0, gi.dwFlags & GF_INERTIA);
+                            UpdatePanningFeedback(hwnd, xOverpan, 0, gi.dwFlags & GF_INERTIA);
                         }
                         UpdateWindow(hwnd);
-                        CloseGestureInfoHandleFunc((HGESTUREINFO)lParam);
+                        CloseGestureInfoHandle((HGESTUREINFO)lParam);
                         return 0;
                     }
                     break;
