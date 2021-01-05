@@ -284,8 +284,22 @@ LRESULT CCommandPaletteDlg::DoCommand(int id, int code)
             auto i = ListView_GetSelectionMark(m_hResults);
             if (i >= 0)
             {
-                const auto& data = m_results[i];
-                auto*       cmd  = CCommandHandler::Instance().GetCommand(data.cmdId);
+                const auto& data    = m_results[i];
+                auto*       cmd     = CCommandHandler::Instance().GetCommand(data.cmdId);
+                BOOL        enabled = TRUE;
+                if (cmd)
+                {
+                    PROPVARIANT propvarCurrentValue = {};
+                    PROPVARIANT propvarNewValue     = {};
+                    if (SUCCEEDED(cmd->IUICommandHandlerUpdateProperty(UI_PKEY_Enabled, &propvarCurrentValue, &propvarNewValue)))
+                    {
+                        if (FAILED(UIPropertyToBoolean(UI_PKEY_Enabled, propvarNewValue, &enabled)))
+                            enabled = TRUE;
+                    }
+                }
+                if (!enabled)
+                    break;
+
                 if (cmd && cmd->IsItemsSourceCommand())
                 {
                     if (m_pCmd)
@@ -474,8 +488,23 @@ LRESULT CCommandPaletteDlg::DrawListItem(NMLVCUSTOMDRAW* pLVCD)
             return CDRF_NOTIFYSUBITEMDRAW;
         case CDDS_ITEMPREPAINT | CDDS_ITEM | CDDS_SUBITEM:
         {
-            pLVCD->clrText = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT));
-            if (ListView_GetItemState(m_hResults, pLVCD->nmcd.dwItemSpec, LVIS_SELECTED) & LVIS_SELECTED)
+            pLVCD->clrText      = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT));
+            const auto& data    = m_results[pLVCD->nmcd.dwItemSpec];
+            auto*       cmd     = CCommandHandler::Instance().GetCommand(data.cmdId);
+            BOOL        enabled = TRUE;
+            if (cmd)
+            {
+                PROPVARIANT propvarCurrentValue = {};
+                PROPVARIANT propvarNewValue     = {};
+                if (SUCCEEDED(cmd->IUICommandHandlerUpdateProperty(UI_PKEY_Enabled, &propvarCurrentValue, &propvarNewValue)))
+                {
+                    if (FAILED(UIPropertyToBoolean(UI_PKEY_Enabled, propvarNewValue, &enabled)))
+                        enabled = TRUE;
+                }
+            }
+            if (!enabled)
+                pLVCD->clrText = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_GRAYTEXT));
+            else if (ListView_GetItemState(m_hResults, pLVCD->nmcd.dwItemSpec, LVIS_SELECTED) & LVIS_SELECTED)
                 pLVCD->clrText = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_HOTLIGHT));
         }
         break;
