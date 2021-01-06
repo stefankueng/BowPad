@@ -828,9 +828,6 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
 {
     auto firstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
     pos.m_nFirstVisibleLine = Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine);
-    if (Call(SCI_GETWRAPMODE) != SC_WRAP_NONE || Call(SCI_GETWRAPINDENTMODE) != SC_WRAPINDENT_FIXED)
-        pos.m_nWrapLineOffset = firstVisibleLine - Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
-
     pos.m_nStartPos    = Call(SCI_GETANCHOR);
     pos.m_nEndPos      = Call(SCI_GETCURRENTPOS);
     pos.m_xOffset      = Call(SCI_GETXOFFSET);
@@ -861,7 +858,7 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     if (!pos.m_lineStateVector.empty())
     {
         auto endStyled = Call(SCI_GETENDSTYLED);
-        auto len       = Call(SCI_GETTEXTLENGTH);
+        auto len = Call(SCI_GETTEXTLENGTH);
         if (endStyled < len && pos.m_lastStyleLine)
             Call(SCI_COLOURISE, 0, Call(SCI_POSITIONFROMLINE, pos.m_lastStyleLine + 1));
     }
@@ -884,12 +881,6 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
             Call(SCI_TOGGLEFOLD, headerLine);
     }
 
-    Call(SCI_GOTOPOS, 0);
-
-    Call(SCI_SETSELECTIONMODE, pos.m_nSelMode);
-    Call(SCI_SETANCHOR, pos.m_nStartPos);
-    Call(SCI_SETCURRENTPOS, pos.m_nEndPos);
-    Call(SCI_CANCEL);
     auto wrapmode = Call(SCI_GETWRAPMODE);
     if (wrapmode == SC_WRAP_NONE)
     {
@@ -899,19 +890,18 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     }
     Call(SCI_CHOOSECARETX);
 
-    if (Call(SCI_GETLINEVISIBLE, pos.m_nFirstVisibleLine) == 0)
-        Call(SCI_ENSUREVISIBLE, pos.m_nFirstVisibleLine);
-    auto lineToShow = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
-    if (wrapmode != SC_WRAP_NONE)
-    {
-        auto visLineToScrollTo = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
-        visLineToScrollTo += pos.m_nWrapLineOffset;
-        Call(SCI_SETFIRSTVISIBLELINE, visLineToScrollTo);
-    }
-    else
-        Call(SCI_LINESCROLL, 0, lineToShow);
-    // call UpdateLineNumberWidth() here, just in case the SCI_LINESCROLL call
-    // above does not scroll the window.
+    auto fline = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
+    Call(SCI_SETFIRSTVISIBLELINE, fline);
+    auto line = Call(SCI_LINEFROMPOSITION, pos.m_nEndPos);
+    line = Call(SCI_DOCLINEFROMVISIBLE, line);
+    Call(SCI_ENSUREVISIBLE, line); // Make sure target line is unfolded.
+    Call(SCI_GOTOPOS, pos.m_nEndPos);
+    Call(SCI_SETSELECTIONMODE, pos.m_nSelMode);
+    Call(SCI_SETANCHOR, pos.m_nStartPos);
+    Call(SCI_SETCURRENTPOS, pos.m_nEndPos);
+    Call(SCI_CANCEL);
+    // Call UpdateLineNumberWidth() here, just in case the above code
+    // does not scroll the window.
     UpdateLineNumberWidth();
 }
 
