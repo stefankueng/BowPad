@@ -105,6 +105,7 @@ ICommand* CCommandHandler::GetCommand(UINT cmdId)
 
 void CCommandHandler::Init(void* obj)
 {
+    ICommand* cmd = nullptr;
     Add<CCmdMRU>(obj);
     Add<CCmdToggleTheme>(obj);
     Add<CCmdOpen>(obj);
@@ -135,8 +136,10 @@ void CCommandHandler::Init(void* obj)
     Add<CCmdSelectAll>(obj);
     Add<CCmdGotoBrace>(obj);
     Add<CCmdConfigShortcuts>(obj);
-    Add<CCmdLineWrap>(obj);
-    Add<CCmdLineWrapIndent>(obj);
+    cmd = Add<CCmdLineWrap>(obj);
+    m_loadfirstcommands.push_back(cmd);
+    cmd = Add<CCmdLineWrapIndent>(obj);
+    m_loadfirstcommands.push_back(cmd);
     Add<CCmdWhiteSpace>(obj);
     Add<CCmdLineNumbers>(obj);
     Add<CCmdUseTabs>(obj);
@@ -339,9 +342,13 @@ void CCommandHandler::OnClipboardChanged()
 
 void CCommandHandler::BeforeLoad()
 {
+    for (auto& cmd : m_loadfirstcommands)
+        cmd->BeforeLoad();
     for (auto& cmd : m_commands)
     {
-        cmd.second->BeforeLoad();
+        auto whereAt = std::find(m_loadfirstcommands.begin(), m_loadfirstcommands.end(), cmd.second.get());
+        if (whereAt == m_loadfirstcommands.end())
+            cmd.second->BeforeLoad();
     }
     for (auto& cmd : m_nodeletecommands)
     {

@@ -81,6 +81,7 @@ private:
     }
 
     std::map<UINT, std::unique_ptr<ICommand>> m_commands;
+    std::vector<ICommand*>                    m_loadfirstcommands;
     std::map<UINT, ICommand*>                 m_nodeletecommands;
     std::map<UINT, std::wstring>              m_plugins;
     std::map<std::wstring, int>               m_pluginversion;
