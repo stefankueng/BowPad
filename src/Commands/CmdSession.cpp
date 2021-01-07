@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018, 2020 - Stefan Kueng
+// Copyright (C) 2014-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ static std::wstring GetBackupPath()
 {
     auto handleModified = CIniSettings::Instance().GetInt64(sessionSection(), L"handlemodified", 1) != 0;
     handleModified      = handleModified && GetAutoLoad();
-    auto sessionPath    = CAppUtils::GetDataPath() + L"\\BowPad\\backup";
+    auto sessionPath    = CAppUtils::GetDataPath() + L"\\backup";
     CPathUtils::CreateRecursiveDirectory(sessionPath);
     if (handleModified)
         return sessionPath;
