@@ -1,0 +1,42 @@
+// returns the version of the plugin
+// this callback is not optional! If you fail to implement this, the plugin
+// config dialog won't work properly with your plugin
+function Version() { return 100; }
+
+
+// this is the main function that gets executed when the command is run, i.e.
+// the button is clicked
+function Execute()
+{
+	var s = BowPad.SciGetSelText();
+	if (s.length == 0) {
+		return;
+	}
+	var cc = 0, c = 0;
+	for (var i = 0; i < s.length; i++) {
+		c = s.charCodeAt(i);
+		if (c >= 0xDC00 && c <= 0xDFFF) {
+			if (i - 1 >= 0 && (c = s.charCodeAt(i-1)) >= 0xD800 && c <= 0xDBFF) {
+				c = (c - 0xD800) * 0x0400 + (s.charCodeAt(i) - 0xDC00) + 0x10000;
+				continue;
+			}
+		}
+		++cc;
+		continue;
+	}
+	if (cc > 1) {
+		BowPad.alert("Characters count: " + cc);
+	}
+	else {
+		BowPad.alert("Unicode of character " + s + "\n\nHEX: 0x" + c.toString(16).toUpperCase() + "\nDec: " + c.toString());
+	}
+}
+
+// return true if the plugin command is enabled (used for the button)
+// note: not used yet by BowPad, but planned for the future
+function IsEnabled() { return BowPad.HasActiveDocument; }
+
+// return true if the plugin button should appear as checked
+// note: not used yet by BowPad, but planned for the future
+function IsChecked() { return false; }
+

@@ -2,6 +2,10 @@ Calculate
 101
 200
 Calculate arithmetic expressions\nwmjordan\n
+CountCharacters
+100
+200
+Count number of literal characters\nwmjordan\n
 CsvJoinLines
 100
 200
