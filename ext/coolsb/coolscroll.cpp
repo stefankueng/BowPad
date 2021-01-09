@@ -742,7 +742,7 @@ static LRESULT PostMouseNotify0(HWND hwnd, UINT msg, UINT nBar, RECT *prect, UIN
     //fill in the standard header
     nmcb.hdr.hwndFrom   = hwnd;
     nmcb.hdr.idFrom     = GetWindowLongPtr(hwnd, GWL_ID);
-    nmcb.hdr.code       = NM_CLICK;
+    nmcb.hdr.code       = NM_COOLSB_CLICK;
 
     nmcb.nBar           = nBar;
     nmcb.uCmdId         = nCmdId;

@@ -1,4 +1,4 @@
-#ifndef _COOLSBLIB_INCLUDED
+﻿#ifndef _COOLSBLIB_INCLUDED
 #define _COOLSBLIB_INCLUDED
 
 #ifdef __cplusplus
@@ -229,6 +229,7 @@ typedef struct
 //  Define the WM_NOTIFY code value for cool-scrollbar custom drawing
 //
 #define NM_COOLSB_CUSTOMDRAW (0-0xfffU)
+#define NM_COOLSB_CLICK      (0-0xffeU)
 
 #ifdef __cplusplus
 }
