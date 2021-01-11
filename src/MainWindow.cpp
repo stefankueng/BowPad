@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2020 - Stefan Kueng
+// Copyright (C) 2013-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1023,7 +1023,11 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARA
 {
     if (nmhdr.code == NM_COOLSB_CUSTOMDRAW)
         return m_editor.HandleScrollbarCustomDraw(wParam, (NMCSBCUSTOMDRAW*)lParam);
-
+    if (nmhdr.code == NM_COOLSB_CLICK)
+    {
+        auto pnmcb = reinterpret_cast<NMCOOLBUTMSG*>(lParam);
+        return DoCommand(pnmcb->uCmdId, 0);
+    }
     SCNotification*       pScn = reinterpret_cast<SCNotification*>(lParam);
     const SCNotification& scn  = *pScn;
 
