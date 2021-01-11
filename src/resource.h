@@ -342,6 +342,7 @@
 #define IDC_RESULTS                     1110
 #define IDC_CHECK1                      1113
 #define IDC_HIDE                        1113
+#define IDC_HIGHLIGHT                   1113
 #define IDC_COLLECTIONNAME              1114
 #define IDC_STATIC                      -1
 

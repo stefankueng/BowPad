@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2020 - Stefan Kueng
+// Copyright (C) 2013-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,7 +41,8 @@ std::string        g_sHighlightString;
 static int         g_searchFlags       = 0;
 int                g_searchMarkerCount = 0;
 static std::string g_lastSelText;
-static int         g_lastSearchFlags = 0;
+static int         g_lastSearchFlags  = 0;
+static bool        g_highlightMatches = true;
 
 static std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
 
@@ -454,6 +455,7 @@ void CFindReplaceDlg::InitSizing()
     m_resizer.AddControl(hwndDlg, IDC_MATCHCASE, RESIZER_TOPLEFT);
     m_resizer.AddControl(hwndDlg, IDC_MATCHREGEX, RESIZER_TOPLEFT);
     m_resizer.AddControl(hwndDlg, IDC_FUNCTIONS, RESIZER_TOPLEFT);
+    m_resizer.AddControl(hwndDlg, IDC_HIGHLIGHT, RESIZER_TOPLEFT);
     m_resizer.AddControl(hwndDlg, IDC_SEARCHSUBFOLDERS, RESIZER_TOPRIGHT);
     m_resizer.AddControl(hwndDlg, IDC_FINDBTN, RESIZER_TOPRIGHT);
     m_resizer.AddControl(hwndDlg, IDC_FINDPREVIOUS, RESIZER_TOPRIGHT);
@@ -537,6 +539,7 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
         if (count > 0)
             ComboBox_SetCurSel(hSearchFolder, 0);
     }
+    CheckDlgButton(*this, IDC_HIGHLIGHT, g_highlightMatches ? BST_CHECKED : BST_UNCHECKED);
 
     // These routines can be made somewhat generic and go in a base class eventually.
     // But things need to settle down and it become clear what the final requirements are.
@@ -1387,6 +1390,7 @@ void CFindReplaceDlg::DoFindPrevious()
     std::wstring findText = GetDlgItemText(IDC_SEARCHCOMBO).get();
     UpdateSearchStrings(findText);
     g_findString       = CUnicodeUtils::StdGetUTF8(findText);
+    g_highlightMatches = IsDlgButtonChecked(*this, IDC_HIGHLIGHT) != 0;
     g_sHighlightString = g_findString;
     ttf.lpstrText      = g_findString.c_str();
     g_searchFlags      = GetScintillaOptions();
@@ -1469,6 +1473,7 @@ void CFindReplaceDlg::DoReplace(int id)
     UpdateReplaceStrings(replaceText);
 
     g_findString       = CUnicodeUtils::StdGetUTF8(findText);
+    g_highlightMatches = IsDlgButtonChecked(*this, IDC_HIGHLIGHT) != 0;
     g_sHighlightString = g_findString;
     g_searchFlags      = GetScintillaOptions();
 
@@ -1588,6 +1593,7 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
     std::wstring findText = GetDlgItemText(IDC_SEARCHCOMBO).get();
     UpdateSearchStrings(findText);
     g_findString       = CUnicodeUtils::StdGetUTF8(findText);
+    g_highlightMatches = IsDlgButtonChecked(*this, IDC_HIGHLIGHT) != 0;
     g_sHighlightString = g_findString;
     g_searchFlags      = GetScintillaOptions();
     if (g_findString.empty())
@@ -1726,6 +1732,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
         UpdateSearchStrings(findText);
     std::string searchfor = CUnicodeUtils::StdGetUTF8(findText);
     g_findString          = searchfor;
+    g_highlightMatches    = IsDlgButtonChecked(*this, IDC_HIGHLIGHT) != 0;
 
     int          searchflags        = GetScintillaOptions();
     unsigned int exSearchFlags      = 0;
@@ -2774,7 +2781,7 @@ void CCmdFindReplace::ScintillaNotify(SCNotification* pScn)
         ScintillaCall(SCI_INDICATORCLEARRANGE, startstylepos, len);
         ScintillaCall(SCI_INDICATORCLEARRANGE, startstylepos, len - 1);
 
-        if (g_sHighlightString.empty())
+        if (g_sHighlightString.empty() || !g_highlightMatches)
         {
             g_lastSelText.clear();
             g_searchMarkerCount = 0;
