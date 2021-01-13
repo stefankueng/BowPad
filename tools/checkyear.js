@@ -19,9 +19,10 @@ if (num !== 4 && num !== 3)
     WScript.Quit(1);
 }
 
-var re = /^\/\/ Copyright.+(2021)(.*)/;
+var currentyear = new Date().getFullYear();
+var re = new RegExp('^(\\\/\\\/|#) Copyright.+(' + currentyear + ')(.*)');
 var basere = /^\/\/ Copyright(.*)/;
-var filere = /(\.cpp$)|(\.h$)|(\.idl$)|(\.ini$)|(\.xml$)/;
+var filere = /(\.cpp$)|(\.h$)|(\.idl$)/;
 
 // readFileLines
 function readPaths(path)
