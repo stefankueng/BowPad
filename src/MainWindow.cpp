@@ -3741,7 +3741,7 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
 
     // Start a new instance and open the tab there.
     std::wstring modpath = CPathUtils::GetModulePath();
-    std::wstring cmdline = CStringUtils::Format(L"/multiple /tabmove /savepath:\"%s\" /path:\"%s\" /line:%ld /title:\"%s\"",
+    std::wstring cmdline = CStringUtils::Format(L"/multiple /tabmove /savepath:\"%s\" /path:\"%s\" /line:%lld /title:\"%s\"",
                                                 doc.m_path.c_str(), temppath.c_str(),
                                                 m_editor.GetCurrentLineNumber() + 1,
                                                 m_TabBar.GetTitle(tab).c_str());
