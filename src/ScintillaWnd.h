@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2020 - Stefan Kueng
+// Copyright (C) 2013-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -93,6 +93,7 @@ public:
     void        RestoreCurrentPos(const CPosData& pos);
     void        SetupLexerForLang(const std::string& lang);
     void        MarginClick(SCNotification* pNotification);
+    void        SelectionUpdated();
     void        MarkSelectedWord(bool clear, bool edit);
     void        MatchBraces(BraceMatch what);
     void        GotoBrace();
@@ -145,22 +146,22 @@ protected:
     void BookmarkToggle(sptr_t lineno);
 
 private:
-    SciFnDirect             m_pSciMsg;
-    sptr_t                  m_pSciWndData;
-    CDocScroll              m_docScroll;
-    CScrollTool             m_ScrollTool;
-    long                    m_selTextMarkerCount;
-    bool                    m_bCursorShown;
-    bool                    m_bScratch;
-    bool                    m_eraseBkgnd;
-    int                     m_cursorTimeout;
-    bool                    m_bInFolderMargin;
-    bool                    m_hasConsolas;
-    sptr_t                  m_LineToScrollToAfterPaint;
-    sptr_t                  m_WrapOffsetToScrollToAfterPaint;
-    int                     m_LineToScrollToAfterPaintCounter;
-    AnimationVariable       m_animVarGrayFore;
-    AnimationVariable       m_animVarGrayBack;
-    AnimationVariable       m_animVarGraySel;
-    AnimationVariable       m_animVarGrayLineNr;
+    SciFnDirect       m_pSciMsg;
+    sptr_t            m_pSciWndData;
+    CDocScroll        m_docScroll;
+    CScrollTool       m_ScrollTool;
+    long              m_selTextMarkerCount;
+    bool              m_bCursorShown;
+    bool              m_bScratch;
+    bool              m_eraseBkgnd;
+    int               m_cursorTimeout;
+    bool              m_bInFolderMargin;
+    bool              m_hasConsolas;
+    sptr_t            m_LineToScrollToAfterPaint;
+    sptr_t            m_WrapOffsetToScrollToAfterPaint;
+    int               m_LineToScrollToAfterPaintCounter;
+    AnimationVariable m_animVarGrayFore;
+    AnimationVariable m_animVarGrayBack;
+    AnimationVariable m_animVarGraySel;
+    AnimationVariable m_animVarGrayLineNr;
 };

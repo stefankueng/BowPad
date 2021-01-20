@@ -45,7 +45,6 @@ extern int                    g_searchMarkerCount; // from CmdFindReplace
 extern Scintilla::LexerModule lmSimple;
 extern Scintilla::LexerModule lmLog;
 
-
 UINT32 g_contextID = cmdContextMap;
 
 const int TIM_HIDECURSOR              = 101;
@@ -635,13 +634,13 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
         break;
         case WM_GESTURENOTIFY:
         {
-                DWORD         panWant = GC_PAN | GC_PAN_WITH_INERTIA | GC_PAN_WITH_SINGLE_FINGER_VERTICALLY;
-                GESTURECONFIG gestureConfig[] =
-                    {
-                        {GID_PAN, panWant, GC_PAN_WITH_GUTTER},
-                        {GID_TWOFINGERTAP, GC_TWOFINGERTAP, 0},
-                    };
-                SetGestureConfig(*this, 0, _countof(gestureConfig), gestureConfig, sizeof(GESTURECONFIG));
+            DWORD         panWant = GC_PAN | GC_PAN_WITH_INERTIA | GC_PAN_WITH_SINGLE_FINGER_VERTICALLY;
+            GESTURECONFIG gestureConfig[] =
+                {
+                    {GID_PAN, panWant, GC_PAN_WITH_GUTTER},
+                    {GID_TWOFINGERTAP, GC_TWOFINGERTAP, 0},
+                };
+            SetGestureConfig(*this, 0, _countof(gestureConfig), gestureConfig, sizeof(GESTURECONFIG));
             return 0;
         }
         case WM_GESTURE:
@@ -1179,6 +1178,35 @@ void CScintillaWnd::MarginClick(SCNotification* pNotification)
     if ((pNotification->margin == SC_MARGE_SYMBOL) && !pNotification->modifiers)
         BookmarkToggle(Call(SCI_LINEFROMPOSITION, pNotification->position));
     m_docScroll.VisibleLinesChanged();
+}
+
+void CScintillaWnd::SelectionUpdated()
+{
+    auto selStart     = Call(SCI_GETSELECTIONNSTART);
+    auto selEnd       = Call(SCI_GETSELECTIONEND);
+    auto selLineStart = Call(SCI_LINEFROMPOSITION, selStart);
+    auto selLineEnd   = Call(SCI_LINEFROMPOSITION, selEnd);
+    if (selLineStart == (selLineEnd - 1))
+    {
+        // whole line selected
+        if (Call(SCI_GETFOLDLEVEL, selLineStart) & SC_FOLDLEVELHEADERFLAG)
+        {
+            // line is a fold header
+            if (Call(SCI_GETLINEVISIBLE, selLineEnd) == 0)
+            {
+                if (Call(SCI_POSITIONFROMLINE, selLineEnd) == selEnd)
+                {
+                    auto lastLine = Call(SCI_GETLINECOUNT);
+                    while ((selLineEnd < lastLine) && (Call(SCI_GETLINEVISIBLE, selLineEnd) == 0))
+                        ++selLineEnd;
+                    if (selLineEnd < lastLine)
+                    {
+                        Call(SCI_SETSELECTIONEND, Call(SCI_POSITIONFROMLINE, selLineEnd));
+                    }
+                }
+            }
+        }
+    }
 }
 
 void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)

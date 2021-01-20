@@ -2953,6 +2953,8 @@ void CMainWindow::HandleUpdateUI(const SCNotification& scn)
 {
     if (scn.updated & SC_UPDATE_V_SCROLL)
         m_editor.UpdateLineNumberWidth();
+    if (scn.updated & SC_UPDATE_SELECTION)
+        m_editor.SelectionUpdated();
     const unsigned int uiflags = SC_UPDATE_SELECTION |
                                  SC_UPDATE_H_SCROLL | SC_UPDATE_V_SCROLL;
     if ((scn.updated & uiflags) != 0)
