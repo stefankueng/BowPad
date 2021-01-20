@@ -945,7 +945,7 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang)
     }
     for (const auto& it : keywords)
     {
-        Call(SCI_SETKEYWORDS, it.first - 1, (LPARAM)it.second.c_str());
+        Call(SCI_SETKEYWORDS, it.first - 1LL, (LPARAM)it.second.c_str());
     }
     Call(SCI_SETLINEENDTYPESALLOWED, Call(SCI_GETLINEENDTYPESSUPPORTED));
 }
@@ -1017,7 +1017,7 @@ void CScintillaWnd::SetupDefaultStyles()
         RGB(80, 40, 40),
         RGB(40, 80, 40),
         RGB(40, 40, 80)};
-    for (int i = INDIC_REGEXCAPTURE; i < INDIC_REGEXCAPTURE_END; ++i)
+    for (uptr_t i = INDIC_REGEXCAPTURE; i < INDIC_REGEXCAPTURE_END; ++i)
     {
         Call(SCI_INDICSETSTYLE, i, INDIC_BOX);
         Call(SCI_INDICSETFORE, i, CTheme::Instance().GetThemeColor(captureColors[i - INDIC_REGEXCAPTURE]));
@@ -1279,7 +1279,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
         return;
     }
 
-    auto          textbuffer = std::make_unique<char[]>(len + 1);
+    auto          textbuffer = std::make_unique<char[]>(len + 1LL);
     Sci_TextRange textrange{};
     textrange.lpstrText  = textbuffer.get();
     textrange.chrg.cpMin = startstylepos;
@@ -1348,15 +1348,15 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
 
 void CScintillaWnd::MatchBraces(BraceMatch what)
 {
-    static int lastIndicatorStart  = 0;
-    static int lastIndicatorLength = 0;
-    static int lastCaretPos        = 0;
+    static sptr_t lastIndicatorStart  = 0;
+    static sptr_t lastIndicatorLength = 0;
+    static sptr_t lastCaretPos        = 0;
 
-    int braceAtCaret  = -1;
-    int braceOpposite = -1;
+    sptr_t braceAtCaret  = -1;
+    sptr_t braceOpposite = -1;
 
     // find matching brace position
-    int caretPos = int(Call(SCI_GETCURRENTPOS));
+    auto caretPos = Call(SCI_GETCURRENTPOS);
 
     // setting the highlighting style triggers an UI update notification,
     // which in return calls MatchBraces(false). So to avoid an endless
@@ -1367,7 +1367,7 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
 
     WCHAR charBefore = '\0';
 
-    int lengthDoc = int(Call(SCI_GETLENGTH));
+    auto lengthDoc = Call(SCI_GETLENGTH);
 
     if ((lengthDoc > 0) && (caretPos > 0))
     {
@@ -1420,8 +1420,8 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
                 lastIndicatorStart  = braceAtCaret < braceOpposite ? braceAtCaret : braceOpposite;
                 lastIndicatorLength = braceAtCaret < braceOpposite ? braceOpposite - braceAtCaret : braceAtCaret - braceOpposite;
                 ++lastIndicatorLength;
-                int startLine = int(Call(SCI_LINEFROMPOSITION, lastIndicatorStart));
-                int endLine   = int(Call(SCI_LINEFROMPOSITION, lastIndicatorStart + lastIndicatorLength));
+                auto startLine = Call(SCI_LINEFROMPOSITION, lastIndicatorStart);
+                auto endLine   = Call(SCI_LINEFROMPOSITION, lastIndicatorStart + lastIndicatorLength);
                 if (endLine != startLine)
                     Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, CTheme::Instance().IsDarkTheme() ? 3 : 10);
                 else
@@ -1436,8 +1436,8 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
 
         if ((what == BraceMatch::Highlight) && (Call(SCI_GETINDENTATIONGUIDES) != 0))
         {
-            int columnAtCaret  = int(Call(SCI_GETCOLUMN, braceAtCaret));
-            int columnOpposite = int(Call(SCI_GETCOLUMN, braceOpposite));
+            auto columnAtCaret  = Call(SCI_GETCOLUMN, braceAtCaret);
+            auto columnOpposite = Call(SCI_GETCOLUMN, braceOpposite);
             Call(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite) ? columnAtCaret : columnOpposite);
         }
     }
@@ -1448,17 +1448,17 @@ void CScintillaWnd::GotoBrace()
 {
     static constexpr wchar_t brackets[] = L"[](){}";
 
-    int lengthDoc = int(Call(SCI_GETLENGTH));
+    auto lengthDoc = Call(SCI_GETLENGTH);
     if (lengthDoc <= 1)
         return;
 
-    int   braceAtCaret  = -1;
-    int   braceOpposite = -1;
-    WCHAR charBefore    = '\0';
-    WCHAR charAfter     = '\0';
-    bool  shift         = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+    sptr_t braceAtCaret  = -1;
+    sptr_t braceOpposite = -1;
+    WCHAR  charBefore    = '\0';
+    WCHAR  charAfter     = '\0';
+    bool   shift         = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
 
-    int caretPos = int(Call(SCI_GETCURRENTPOS));
+    auto caretPos = Call(SCI_GETCURRENTPOS);
     if (caretPos > 0)
     {
         charBefore = WCHAR(Call(SCI_GETCHARAT, caretPos - 1, 0));
@@ -1474,7 +1474,7 @@ void CScintillaWnd::GotoBrace()
     }
     if (braceAtCaret >= 0)
     {
-        braceOpposite = int(Call(SCI_BRACEMATCH, braceAtCaret, 0));
+        braceOpposite = Call(SCI_BRACEMATCH, braceAtCaret, 0);
         if (braceOpposite >= 0)
         {
             if (shift)
@@ -2058,7 +2058,7 @@ std::vector<std::pair<sptr_t, sptr_t>> CScintillaWnd::GetAttributesPos(sptr_t st
     tr.lpstrText  = buf.get();
     Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
 
-    enum
+    enum class AttrStates
     {
         attr_invalid,
         attr_key,
@@ -2067,7 +2067,7 @@ std::vector<std::pair<sptr_t, sptr_t>> CScintillaWnd::GetAttributesPos(sptr_t st
         attr_string,
         attr_value,
         attr_valid
-    } state = attr_invalid;
+    } state = AttrStates::attr_invalid;
 
     sptr_t startPos    = -1;
     int    oneMoreChar = 1;
@@ -2081,11 +2081,11 @@ std::vector<std::pair<sptr_t, sptr_t>> CScintillaWnd::GetAttributesPos(sptr_t st
             case '\n':
             case '\r':
             {
-                if (state == attr_key)
-                    state = attr_pre_assign;
-                else if (state == attr_value)
+                if (state == AttrStates::attr_key)
+                    state = AttrStates::attr_pre_assign;
+                else if (state == AttrStates::attr_value)
                 {
-                    state       = attr_valid;
+                    state       = AttrStates::attr_valid;
                     oneMoreChar = 0;
                 }
             }
@@ -2093,48 +2093,48 @@ std::vector<std::pair<sptr_t, sptr_t>> CScintillaWnd::GetAttributesPos(sptr_t st
 
             case '=':
             {
-                if (state == attr_key || state == attr_pre_assign)
-                    state = attr_assign;
-                else if (state == attr_assign || state == attr_value)
-                    state = attr_invalid;
+                if (state == AttrStates::attr_key || state == AttrStates::attr_pre_assign)
+                    state = AttrStates::attr_assign;
+                else if (state == AttrStates::attr_assign || state == AttrStates::attr_value)
+                    state = AttrStates::attr_invalid;
             }
             break;
 
             case '"':
             {
-                if (state == attr_string)
+                if (state == AttrStates::attr_string)
                 {
-                    state       = attr_valid;
+                    state       = AttrStates::attr_valid;
                     oneMoreChar = 1;
                 }
-                else if (state == attr_key || state == attr_pre_assign || state == attr_value)
-                    state = attr_invalid;
-                else if (state == attr_assign)
-                    state = attr_string;
+                else if (state == AttrStates::attr_key || state == AttrStates::attr_pre_assign || state == AttrStates::attr_value)
+                    state = AttrStates::attr_invalid;
+                else if (state == AttrStates::attr_assign)
+                    state = AttrStates::attr_string;
             }
             break;
 
             default:
             {
-                if (state == attr_invalid)
+                if (state == AttrStates::attr_invalid)
                 {
-                    state    = attr_key;
+                    state    = AttrStates::attr_key;
                     startPos = i;
                 }
-                else if (state == attr_pre_assign)
-                    state = attr_invalid;
-                else if (state == attr_assign)
-                    state = attr_value;
+                else if (state == AttrStates::attr_pre_assign)
+                    state = AttrStates::attr_invalid;
+                else if (state == AttrStates::attr_assign)
+                    state = AttrStates::attr_value;
             }
         }
 
-        if (state == attr_valid)
+        if (state == AttrStates::attr_valid)
         {
             attributes.push_back(std::pair<sptr_t, sptr_t>(start + startPos, start + i + oneMoreChar));
-            state = attr_invalid;
+            state = AttrStates::attr_invalid;
         }
     }
-    if (state == attr_value)
+    if (state == AttrStates::attr_value)
         attributes.push_back(std::pair<sptr_t, sptr_t>(start + startPos, start + i - 1));
 
     return attributes;
