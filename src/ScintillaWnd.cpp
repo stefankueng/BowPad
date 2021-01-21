@@ -1186,10 +1186,9 @@ void CScintillaWnd::SelectionUpdated()
     auto selEnd       = Call(SCI_GETSELECTIONEND);
     auto selLineStart = Call(SCI_LINEFROMPOSITION, selStart);
     auto selLineEnd   = Call(SCI_LINEFROMPOSITION, selEnd);
-    if (selLineStart == (selLineEnd - 1))
+    if (selLineStart != selLineEnd)
     {
-        // whole line selected
-        if (Call(SCI_GETFOLDLEVEL, selLineStart) & SC_FOLDLEVELHEADERFLAG)
+        if (Call(SCI_GETFOLDLEVEL, selLineEnd - 1) & SC_FOLDLEVELHEADERFLAG)
         {
             // line is a fold header
             if (Call(SCI_GETLINEVISIBLE, selLineEnd) == 0)
@@ -1201,7 +1200,10 @@ void CScintillaWnd::SelectionUpdated()
                         ++selLineEnd;
                     if (selLineEnd < lastLine)
                     {
-                        Call(SCI_SETSELECTIONEND, Call(SCI_POSITIONFROMLINE, selLineEnd));
+                        if (Call(SCI_GETANCHOR) == selStart)
+                            Call(SCI_SETCURRENTPOS, Call(SCI_POSITIONFROMLINE, selLineEnd));
+                        else
+                            Call(SCI_SETANCHOR, Call(SCI_POSITIONFROMLINE, selLineEnd));
                     }
                 }
             }
