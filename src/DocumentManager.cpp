@@ -32,9 +32,6 @@
 #include <stdexcept>
 #include <Shobjidl.h>
 
-constexpr int ReadBlockSize  = 128 * 1024; //128 kB
-constexpr int WriteBlockSize = 128 * 1024; //128 kB
-
 static CDocument g_EmptyDoc;
 
 static wchar_t inline WideCharSwap(wchar_t nValue)
@@ -341,6 +338,8 @@ CDocumentManager::CDocumentManager()
     : m_scratchScintilla(g_hRes)
 {
     m_scratchScintilla.InitScratch(g_hRes);
+    m_widebuf = std::make_unique<wchar_t[]>(m_widebufSize);
+    m_charbuf = std::make_unique<char[]>(m_charbufSize);
 }
 
 CDocumentManager::~CDocumentManager()
@@ -471,12 +470,6 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     }
     auto& edit = *pdocLoad;
 
-    char      data[ReadBlockSize + 8] = {};
-    const int widebufSize             = ReadBlockSize * 2;
-    auto      widebuf                 = std::make_unique<wchar_t[]>(widebufSize);
-    const int charbufSize             = widebufSize * 2;
-    auto      charbuf                 = std::make_unique<char[]>(charbufSize);
-
     DWORD lenFile                 = 0;
     int   incompleteMultibyteChar = 0;
     bool  bFirst                  = true;
@@ -486,14 +479,14 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     int   skip                    = 0;
     do
     {
-        if (!ReadFile(hFile, data + incompleteMultibyteChar, ReadBlockSize - incompleteMultibyteChar, &lenFile, nullptr))
+        if (!ReadFile(hFile, m_data + incompleteMultibyteChar, ReadBlockSize - incompleteMultibyteChar, &lenFile, nullptr))
             lenFile = 0;
         else
             lenFile += incompleteMultibyteChar;
 
         if ((!encodingset) || (inconclusive && encoding == CP_ACP))
         {
-            encoding = GetCodepageFromBuf(data + skip, lenFile - skip, doc.m_bHasBOM, inconclusive, skip);
+            encoding = GetCodepageFromBuf(m_data + skip, lenFile - skip, doc.m_bHasBOM, inconclusive, skip);
             if (inconclusive && encoding == CP_ACP)
                 encoding = CP_UTF8;
         }
@@ -505,28 +498,28 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
         {
             case -1:
             case CP_UTF8:
-                LoadSomeUtf8(edit, doc.m_bHasBOM, bFirst, lenFile, data, doc.m_format);
+                LoadSomeUtf8(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, doc.m_format);
                 break;
             case 1200: // UTF16_LE
-                LoadSomeUtf16le(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get(), doc.m_format);
+                LoadSomeUtf16le(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charbuf.get(), m_charbufSize, m_widebuf.get(), doc.m_format);
                 break;
             case 1201: // UTF16_BE
-                LoadSomeUtf16be(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get(), doc.m_format);
+                LoadSomeUtf16be(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charbuf.get(), m_charbufSize, m_widebuf.get(), doc.m_format);
                 break;
             case 12001:                         // UTF32_BE
-                LoadSomeUtf32be(lenFile, data); // Doesn't load, falls through to load.
+                LoadSomeUtf32be(lenFile, m_data); // Doesn't load, falls through to load.
                 // intentional fall-through
                 [[fallthrough]];
             case 12000: // UTF32_LE
-                LoadSomeUtf32le(edit, doc.m_bHasBOM, bFirst, lenFile, data, charbuf.get(), charbufSize, widebuf.get(), doc.m_format);
+                LoadSomeUtf32le(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charbuf.get(), m_charbufSize, m_widebuf.get(), doc.m_format);
                 break;
             default:
-                LoadSomeOther(edit, encoding, lenFile, incompleteMultibyteChar, data, charbuf.get(), charbufSize, widebuf.get(), doc.m_format);
+                LoadSomeOther(edit, encoding, lenFile, incompleteMultibyteChar, m_data, m_charbuf.get(), m_charbufSize, m_widebuf.get(), doc.m_format);
                 break;
         }
 
         if (incompleteMultibyteChar != 0) // copy bytes to next buffer
-            memcpy(data, data + ReadBlockSize - incompleteMultibyteChar, incompleteMultibyteChar);
+            memcpy(m_data, m_data + ReadBlockSize - incompleteMultibyteChar, incompleteMultibyteChar);
 
         bFirst = false;
     } while (lenFile == ReadBlockSize);
