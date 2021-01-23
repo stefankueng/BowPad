@@ -558,7 +558,7 @@ void CCommandPaletteDlg::FillResults(bool force)
 
         for (const auto& cmd : *allResults)
         {
-            if (sFilterText.empty() || StrStrIW(cmd.command.c_str(), sFilterText.c_str()))
+            if (sFilterText.empty() || StrStrIW(cmd.command.c_str(), sFilterText.c_str()) || StrStrIW(cmd.description.c_str(), sFilterText.c_str()))
             {
                 col1Width = max(col1Width, ListView_GetStringWidth(m_hResults, cmd.command.c_str()));
                 col2Width = max(col2Width, ListView_GetStringWidth(m_hResults, cmd.shortcut.c_str()));
