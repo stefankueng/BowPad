@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -483,6 +483,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     bool  preferutf8              = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingutf8overansi", 0) != 0;
     bool  inconclusive            = false;
     bool  encodingset             = encoding != -1;
+    int   skip                    = 0;
     do
     {
         if (!ReadFile(hFile, data + incompleteMultibyteChar, ReadBlockSize - incompleteMultibyteChar, &lenFile, nullptr))
@@ -492,7 +493,9 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
 
         if ((!encodingset) || (inconclusive && encoding == CP_ACP))
         {
-            encoding = GetCodepageFromBuf(data, lenFile, doc.m_bHasBOM, inconclusive);
+            encoding = GetCodepageFromBuf(data + skip, lenFile - skip, doc.m_bHasBOM, inconclusive, skip);
+            if (inconclusive && encoding == CP_ACP)
+                encoding = CP_UTF8;
         }
         encodingset = true;
 
