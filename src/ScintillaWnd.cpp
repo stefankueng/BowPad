@@ -1077,6 +1077,16 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_COLOURISE, 0, Call(SCI_POSITIONFROMLINE, Call(SCI_LINESONSCREEN) + 1));
     Call(SCI_SETCODEPAGE, CP_UTF8);
     Call(SCI_SETMODEVENTMASK, modEventMask);
+
+    // set up unicode representations for control chars
+    for (char c = 0; c < 0x20; ++c)
+    {
+        auto sC         = std::string(&c, 1);
+        auto sCC = std::wstring(1, 0x2400 + c);
+        Call(SCI_SETREPRESENTATION, (uptr_t)sC.c_str(), (sptr_t)CUnicodeUtils::StdGetUTF8(sCC).c_str());
+    }
+    Call(SCI_SETREPRESENTATION, (uptr_t) "\x07", (sptr_t) u8"🔔");
+    Call(SCI_SETREPRESENTATION, (uptr_t) "\x7F", (sptr_t) u8"␡");
 }
 
 void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF backsel)
