@@ -52,6 +52,24 @@ bool CCmdSelectTab::Execute()
     }
     if (GetKeyState(VK_TAB) & 0x8000)
     {
+        for (int i = 0; i < GetTabCount(); ++i)
+        {
+            DocID docId   = GetDocIDFromTabIndex(i);
+            auto  foundIt = std::find(m_docIds.begin(), m_docIds.end(), docId);
+            if (foundIt == m_docIds.end())
+                m_docIds.push_back(docId);
+        }
+        for (const auto& docId : m_docIds)
+        {
+            if (GetTabIndexFromDocID(docId) < 0)
+            {
+                auto foundIt = std::find(m_docIds.begin(), m_docIds.end(), docId);
+                if (foundIt != m_docIds.end())
+                {
+                    m_docIds.erase(foundIt);
+                }
+            }
+        }
         std::deque<std::tuple<std::wstring, DocID>> tablist;
         for (const auto& docId : m_docIds)
         {
@@ -61,7 +79,8 @@ bool CCmdSelectTab::Execute()
         if (!m_dlg)
             m_dlg = std::make_unique<TabListDialog>(GetScintillaWnd(),
                                                     [this](DocID id) { TabActivateAt(GetTabIndexFromDocID(id)); });
-
+        if (tablist.size() < 2)
+            return true;
         auto sz = m_dlg->SetTabList(std::move(tablist));
         RECT rect{};
         GetClientRect(GetScintillaWnd(), &rect);
