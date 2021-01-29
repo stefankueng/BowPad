@@ -201,6 +201,7 @@
 #define IDS_NO_PLUGINS_AVAILABLE        248
 #define IDD_COMMANDPALETTE              248
 #define IDS_STATUS_CURPOS               249
+#define IDD_EMPTYDLG                    249
 #define IDS_STATUS_CURPOSLONG           250
 #define IDS_STATUSSELECTIONLONG         251
 #define IDS_STATUS_TABSOPENLONG         252
@@ -351,7 +352,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        249
+#define _APS_NEXT_RESOURCE_VALUE        250
 #define _APS_NEXT_COMMAND_VALUE         32773
 #define _APS_NEXT_CONTROL_VALUE         1115
 #define _APS_NEXT_SYMED_VALUE           110

@@ -522,6 +522,7 @@
     <ClCompile Include="Commands\CmdRandom.cpp" />
     <ClCompile Include="Commands\CmdRegexCapture.cpp" />
     <ClCompile Include="Commands\CmdScripts.cpp" />
+    <ClCompile Include="Commands\CmdSelectTab.cpp" />
     <ClCompile Include="Commands\CmdSession.cpp" />
     <ClCompile Include="Commands\CmdSort.cpp" />
     <ClCompile Include="Commands\CmdSpellcheck.cpp" />
