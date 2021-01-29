@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2016, 2020 - Stefan Kueng
+// Copyright (C) 2013-2016, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 #include "targetver.h"
 
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
 #include <windows.h>
 #include <windowsx.h>
@@ -50,26 +50,28 @@
 // we define it here just in case:
 #include <VersionHelpers.h>
 #ifndef _WIN32_WINNT_WIN10
-#define _WIN32_WINNT_WIN10 0x0A00
-#define _WIN32_WINNT_WINTHRESHOLD 0x0A00
-#define  IsWindows10OrGreater() (IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 0))
+#    define _WIN32_WINNT_WIN10        0x0A00
+#    define _WIN32_WINNT_WINTHRESHOLD 0x0A00
+#    define IsWindows10OrGreater()    (IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 0))
 #endif
 
-#define APP_ID L"TortoiseSVN.Tools.BowPad.1"
+#define APP_ID          L"TortoiseSVN.Tools.BowPad.1"
 #define APP_ID_ELEVATED L"TortoiseSVN.Tools.BowPad_elevated.1"
 
 #ifdef _WIN64
-#define LANGPLAT L"x64"
+#    define LANGPLAT L"x64"
 #else
-#define LANGPLAT L"x86"
+#    define LANGPLAT L"x86"
 #endif
 
 // custom id for the WM_COPYDATA message
-#define CD_COMMAND_LINE 101
+#define CD_COMMAND_LINE    101
 #define CD_COMMAND_MOVETAB 102
 
-#define WM_UPDATEAVAILABLE  (WM_APP + 10)
-#define WM_AFTERINIT        (WM_APP + 11)
-#define WM_STATUSBAR_MSG    (WM_APP + 12)
-#define WM_THREADRESULTREADY    (WM_APP + 13)
-#define WM_CANHIDECURSOR    (WM_APP + 14)
+#define WM_UPDATEAVAILABLE   (WM_APP + 10)
+#define WM_AFTERINIT         (WM_APP + 11)
+#define WM_STATUSBAR_MSG     (WM_APP + 12)
+#define WM_THREADRESULTREADY (WM_APP + 13)
+#define WM_CANHIDECURSOR     (WM_APP + 14)
+#define WM_MOVETODESKTOP     (WM_APP + 15)
+#define WM_MOVETODESKTOP2    (WM_APP + 16)

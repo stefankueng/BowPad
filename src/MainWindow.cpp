@@ -696,6 +696,27 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             }
         }
         break;
+        case WM_MOVETODESKTOP:
+            PostMessage(*this, WM_MOVETODESKTOP2, wParam, lParam);
+            break;
+        case WM_MOVETODESKTOP2:
+        {
+            IVirtualDesktopManager* pvdm = nullptr;
+            if (SUCCEEDED(CoCreateInstance(CLSID_VirtualDesktopManager, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pvdm))))
+            {
+                if (pvdm)
+                {
+                    GUID guid{};
+                    auto hr = pvdm->GetWindowDesktopId((HWND)lParam, &guid);
+                    if (SUCCEEDED(pvdm->GetWindowDesktopId((HWND)lParam, &guid)))
+                        pvdm->MoveWindowToDesktop(*this, guid);
+                    SetForegroundWindow(*this);
+                }
+                pvdm->Release();
+            }
+            return TRUE;
+        }
+        break;
         case WM_UPDATEAVAILABLE:
             CAppUtils::ShowUpdateAvailableDialog(*this);
             break;

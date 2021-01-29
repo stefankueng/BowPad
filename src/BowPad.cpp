@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,11 +35,11 @@
 #include <wrl.h>
 using Microsoft::WRL::ComPtr;
 
-HINSTANCE g_hInst;
-HINSTANCE g_hRes;
-bool      firstInstance = false;
+HINSTANCE   g_hInst;
+HINSTANCE   g_hRes;
+bool        firstInstance = false;
 IUIImagePtr g_emptyIcon;
-bool g_useItemIcons = true;
+bool        g_useItemIcons = true;
 
 static void LoadLanguage(HINSTANCE hInstance)
 {
@@ -212,7 +212,32 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
     // in MainWindow.cpp hasn't finished yet. Just let that function make
     // the window visible in the right position.
     if (IsWindowVisible(hBowPadWnd))
-        ::SetForegroundWindow(hBowPadWnd);
+    {
+        // check if it's on the current virtual desktop
+        IVirtualDesktopManager* pvdm = nullptr;
+        if (SUCCEEDED(CoCreateInstance(CLSID_VirtualDesktopManager,
+                                       nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pvdm))))
+        {
+            BOOL isCurrent;
+            if (pvdm && SUCCEEDED(pvdm->IsWindowOnCurrentVirtualDesktop(hBowPadWnd, &isCurrent)))
+            {
+                if (!isCurrent)
+                {
+                    pvdm->Release();
+                    pvdm = nullptr;
+
+                    // move it to the current virtual desktop
+                    SendMessage(hBowPadWnd, WM_MOVETODESKTOP, 0, (LPARAM)GetForegroundWindow());
+                }
+                else
+                    ::SetForegroundWindow(hBowPadWnd);
+            }
+        }
+        else
+            ::SetForegroundWindow(hBowPadWnd);
+        if (pvdm)
+            pvdm->Release();
+    }
     else
         Sleep(500);
 
@@ -472,7 +497,7 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
 
     SetIcon();
 
-    auto ribbonVer = CPathUtils::GetVersionFromFile(L"UIRibbon.dll");
+    auto                      ribbonVer = CPathUtils::GetVersionFromFile(L"UIRibbon.dll");
     std::vector<std::wstring> tokens;
     stringtok(tokens, ribbonVer, false, L".");
     g_useItemIcons = true;
@@ -494,7 +519,6 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
         if (g_useItemIcons)
             CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), g_emptyIcon);
     }
-
 
     CMainWindow mainWindow(g_hRes);
 
