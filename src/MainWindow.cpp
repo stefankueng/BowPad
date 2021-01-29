@@ -707,7 +707,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 if (pvdm)
                 {
                     GUID guid{};
-                    auto hr = pvdm->GetWindowDesktopId((HWND)lParam, &guid);
                     if (SUCCEEDED(pvdm->GetWindowDesktopId((HWND)lParam, &guid)))
                         pvdm->MoveWindowToDesktop(*this, guid);
                     SetForegroundWindow(*this);
