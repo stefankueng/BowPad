@@ -1079,14 +1079,17 @@ void CScintillaWnd::SetupDefaultStyles()
     Call(SCI_SETMODEVENTMASK, modEventMask);
 
     // set up unicode representations for control chars
-    for (char c = 0; c < 0x20; ++c)
+    for (int c = 0; c < 0x20; ++c)
     {
-        auto sC         = std::string(&c, 1);
-        auto sCC = std::wstring(1, 0x2400 + c);
-        Call(SCI_SETREPRESENTATION, (uptr_t)sC.c_str(), (sptr_t)CUnicodeUtils::StdGetUTF8(sCC).c_str());
+        const char sC[2] = {static_cast<char>(c), 0};
+        Call(SCI_SETREPRESENTATION, (uptr_t)sC, (sptr_t)CStringUtils::Format("x%02X", c).c_str());
     }
-    Call(SCI_SETREPRESENTATION, (uptr_t) "\x07", (sptr_t) u8"🔔");
-    Call(SCI_SETREPRESENTATION, (uptr_t) "\x7F", (sptr_t) u8"␡");
+    for (int c = 0x80; c < 0xA0; ++c)
+    {
+        const char sC[3] = {'\xc2', static_cast<char>(c), 0};
+        Call(SCI_SETREPRESENTATION, (uptr_t)sC, (sptr_t)CStringUtils::Format("x%02X", c).c_str());
+    }
+    Call(SCI_SETREPRESENTATION, (uptr_t) "\x7F", (sptr_t) "x7F");
 }
 
 void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF backsel)
