@@ -3482,6 +3482,8 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
     {
         if (PathIsDirectory(path))
         {
+            if (!m_fileTree.GetPath().empty()) // File tree not empty: create a new empty tab first.
+                OpenNewTab();
             m_fileTree.SetPath(path);
             ShowFileTree(true);
         }
@@ -3515,6 +3517,8 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
             {
                 if (PathIsDirectory(szArglist[i]))
                 {
+                    if (!m_fileTree.GetPath().empty()) // File tree not empty: create a new empty tab first.
+                        OpenNewTab();
                     m_fileTree.SetPath(szArglist[i]);
                     ShowFileTree(true);
                 }
