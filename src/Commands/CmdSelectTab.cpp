@@ -23,6 +23,9 @@
 #include "resource.h"
 #include "BowPad.h"
 
+constexpr long margin  = 10;
+constexpr long spacing = 2;
+
 bool CCmdSelectTab::Execute()
 {
     // since this is a 'dummy' command, only executed via keyboard shortcuts
@@ -132,7 +135,6 @@ TabListDialog::TabListDialog(HWND hParent, std::function<void(DocID)>&& execFunc
     NONCLIENTMETRICS ncm{};
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
     SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
-    ncm.lfSmCaptionFont.lfWeight = FW_NORMAL;
     m_hFont                      = CreateFontIndirect(&ncm.lfCaptionFont);
 }
 
@@ -144,9 +146,9 @@ TabListDialog::~TabListDialog()
 
 SIZE TabListDialog::SetTabList(std::deque<std::tuple<std::wstring, DocID>>&& list)
 {
-    m_tabList         = list;
-    const auto twodpi = CDPIAware::Instance().Scale(*this, 2);
-    auto       dc     = CreateCompatibleDC(nullptr);
+    m_tabList             = list;
+    const auto dpiSpacing = CDPIAware::Instance().Scale(*this, spacing);
+    auto       dc         = CreateCompatibleDC(nullptr);
     OnOutOfScope(ReleaseDC(nullptr, dc));
     auto hOldFont = SelectObject(dc, m_hFont);
 
@@ -158,11 +160,12 @@ SIZE TabListDialog::SetTabList(std::deque<std::tuple<std::wstring, DocID>>&& lis
         DrawText(dc, title.c_str(), -1, &textRect, DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_CALCRECT);
         sz.cx = max(sz.cx, textRect.right);
         sz.cy += textRect.bottom;
-        sz.cy += twodpi;
+        sz.cy += dpiSpacing;
         m_textHeight = max(m_textHeight, textRect.bottom);
     }
-    sz.cy += twodpi;
-    sz.cx += 2 * twodpi;
+    auto dpiMargin = CDPIAware::Instance().Scale(*this, margin);
+    sz.cy += 2 * dpiMargin;
+    sz.cx += 2 * dpiMargin;
     SelectObject(dc, hOldFont);
     m_currentItem = 1;
     return sz;
@@ -209,15 +212,16 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
 
             RECT rect;
             GetClientRect(*this, &rect);
-            const auto twodpi       = CDPIAware::Instance().Scale(*this, 2);
-            auto       maxItems     = (rect.bottom - rect.top - twodpi - twodpi) / (m_textHeight + twodpi);
+            const auto dpiSpacing   = CDPIAware::Instance().Scale(*this, spacing);
+            auto       dpiMargin    = CDPIAware::Instance().Scale(*this, margin);
+            auto       maxItems     = (rect.bottom - rect.top - dpiMargin - dpiMargin) / (m_textHeight + dpiSpacing);
             size_t     indexToStart = 0;
             if (maxItems < m_tabList.size())
             {
                 if (maxItems <= m_currentItem)
                     indexToStart = m_currentItem - maxItems;
             }
-            auto item = pt.y / (m_textHeight + twodpi);
+            auto item = (pt.y - dpiMargin) / (m_textHeight + dpiSpacing);
             if (item >= 0 && item < m_tabList.size())
             {
                 ShowWindow(*this, SW_HIDE);
@@ -269,38 +273,38 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
             SetBkColor(hMyMemDC, backColor);
             auto hOldFont = SelectObject(hMyMemDC, m_hFont);
 
-            const auto     onedpi        = CDPIAware::Instance().Scale(*this, 1);
-            const auto     twodpi        = CDPIAware::Instance().Scale(*this, 2);
+            const auto     dpiSpacing    = CDPIAware::Instance().Scale(*this, spacing);
+            auto           dpiMargin     = CDPIAware::Instance().Scale(*this, margin);
             constexpr auto mainDrawFlags = DT_SINGLELINE | DT_NOPREFIX | DT_TOP;
 
-            auto   maxItems     = (rect.bottom - rect.top - twodpi - twodpi) / (m_textHeight + twodpi);
+            auto   maxItems     = (rect.bottom - rect.top - dpiMargin - dpiMargin) / (m_textHeight + dpiSpacing);
             size_t indexToStart = 0;
             if (maxItems < m_tabList.size())
             {
                 if (maxItems <= m_currentItem)
                     indexToStart = m_currentItem - maxItems;
             }
-            long   yPos  = 0;
+            long   yPos  = dpiMargin;
             size_t index = 0;
             for (const auto& [title, docId] : m_tabList)
             {
                 ++index;
                 if (index <= indexToStart)
                     continue;
-                RECT textRect{twodpi, yPos, rect.right - twodpi, rect.bottom};
+                RECT textRect{dpiMargin, yPos, rect.right - dpiMargin, rect.bottom};
                 DrawText(hMyMemDC, title.c_str(), -1, &textRect, mainDrawFlags);
                 yPos += m_textHeight;
-                yPos += twodpi;
+                yPos += dpiSpacing;
             }
             auto selColor     = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_HIGHLIGHT));
             auto selColorText = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_HIGHLIGHTTEXT));
             SetTextColor(hMyMemDC, selColorText);
             SetBkColor(hMyMemDC, selColor);
-            yPos = (long)(m_currentItem - indexToStart) * (m_textHeight + twodpi) - onedpi;
-            RECT textRect{0, yPos, rect.right, yPos + m_textHeight + onedpi};
+            yPos = (long)(m_currentItem - indexToStart) * (m_textHeight + dpiSpacing) - (dpiSpacing / 2) + dpiMargin;
+            RECT textRect{dpiMargin - dpiSpacing, yPos, rect.right - dpiMargin + dpiSpacing, yPos + m_textHeight + (dpiSpacing / 2)};
             const auto& [title, docId] = m_tabList[m_currentItem];
             GDIHelpers::FillSolidRect(hMyMemDC, &textRect, selColor);
-            textRect.left = twodpi;
+            textRect.left = dpiMargin;
             DrawText(hMyMemDC, title.c_str(), -1, &textRect, mainDrawFlags);
 
             // Copy the off screen bitmap onto the screen.
