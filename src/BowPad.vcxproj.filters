@@ -812,6 +812,7 @@
     <None Include="res\dropmove.cur">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\Shortcuts-internal.ini" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="compatibility.manifest">

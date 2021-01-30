@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019-2020 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -150,6 +150,16 @@ void CKeyboardShortcutHandler::Load()
     userIni.SetMultiKey(true);
     userIni.LoadFile(userFile.c_str());
     Load(userIni);
+
+    resSize = 0;
+    resData = CAppUtils::GetResourceData(L"config", IDR_SHORTCUTSINTERNAL, resSize);
+    if (resData != nullptr)
+    {
+        CSimpleIni ini;
+        ini.SetMultiKey(true);
+        ini.LoadFile(resData, resSize);
+        Load(ini);
+    }
 
     m_bLoaded = true;
 }
@@ -482,7 +492,7 @@ std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& 
         {
             buf[0] = (wchar_t)code;
             buf[1] = 0;
-            len = 1;
+            len    = 1;
         }
         if (!shortCut.empty())
             shortCut += L"+";
