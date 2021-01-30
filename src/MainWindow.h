@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ public:
     void         GoToLine(size_t line);
     bool         CloseTab(int tab, bool force = false, bool quitting = false);
     bool         CloseAllTabs(bool quitting = false);
-    void         SetFileToOpen(const std::wstring& path, size_t line = (size_t)-1) { m_pathsToOpen[path] = line; }
+    void         SetFileToOpen(const std::wstring& path, size_t line = (size_t)-1);
     void         SetFileOpenMRU(bool bUseMRU) { m_bPathsToOpenMRU = bUseMRU; }
     void         SetElevatedSave(const std::wstring& path, const std::wstring& savepath, long line);
     void         ElevatedSave(const std::wstring& path, const std::wstring& savepath, long line);
@@ -159,6 +159,7 @@ private:
     void                          HandleClipboardUpdate();
     void                          HandleGetDispInfo(int tab, LPNMTTDISPINFO lpnmtdi);
     void                          HandleTreePath(const std::wstring& path, bool isDir, bool isDot);
+    std::vector<std::wstring>     GetFileListFromGlobPath(const std::wstring& path);
 
     // Scintilla events.
     void     HandleDwellStart(const SCNotification& scn);

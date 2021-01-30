@@ -1193,6 +1193,28 @@ void CMainWindow::HandleTreePath(const std::wstring& path, bool isDir, bool isDo
     }
 }
 
+std::vector<std::wstring> CMainWindow::GetFileListFromGlobPath(const std::wstring& path)
+{
+    std::vector<std::wstring> results;
+    if (path.find_first_of(L"*?") == std::string::npos)
+    {
+        results.push_back(path);
+        return results;
+    }
+    CDirFileEnum enumerator(path);
+    bool                      bIsDir = false;
+    std::wstring              enumpath;
+    while (enumerator.NextFile(enumpath, &bIsDir, false))
+    {
+        if (!bIsDir)
+        {
+            results.push_back(enumpath);
+        }
+    }
+
+    return results;
+}
+
 void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
 {
     switch (wParam)
@@ -2160,6 +2182,15 @@ bool CMainWindow::CloseAllTabs(bool quitting)
         m_fileTree.BlockRefresh(true); // when we're quitting, don't let the file tree do a refresh
 
     return m_TabBar.GetItemCount() == 0;
+}
+
+void CMainWindow::SetFileToOpen(const std::wstring& path, size_t line)
+{
+    auto list = GetFileListFromGlobPath(path);
+    for (const auto p : list)
+    {
+        m_pathsToOpen[p] = line;
+    }
 }
 
 void CMainWindow::CloseAllButCurrentTab()
@@ -3487,11 +3518,18 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
             m_fileTree.SetPath(path);
             ShowFileTree(true);
         }
-        else if (OpenFile(path, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing) >= 0)
+        else
         {
-            if (parser.HasVal(L"line"))
+            auto list = GetFileListFromGlobPath(path);
+            for (const auto p : list)
             {
-                GoToLine(parser.GetLongLongVal(L"line") - 1);
+                if (OpenFile(p, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing) >= 0)
+                {
+                    if (parser.HasVal(L"line"))
+                    {
+                        GoToLine(parser.GetLongLongVal(L"line") - 1);
+                    }
+                }
             }
         }
     }
@@ -3522,8 +3560,15 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
                     m_fileTree.SetPath(szArglist[i]);
                     ShowFileTree(true);
                 }
-                else if (OpenFile(szArglist[i], OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing) >= 0)
-                    ++filesOpened;
+                else
+                {
+                    auto list = GetFileListFromGlobPath(szArglist[i]);
+                    for (const auto p : list)
+                    {
+                        if (OpenFile(p, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing) >= 0)
+                            ++filesOpened;
+                    }
+                }
             }
         }
 
