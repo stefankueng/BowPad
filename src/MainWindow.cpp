@@ -1202,8 +1202,8 @@ std::vector<std::wstring> CMainWindow::GetFileListFromGlobPath(const std::wstrin
         return results;
     }
     CDirFileEnum enumerator(path);
-    bool                      bIsDir = false;
-    std::wstring              enumpath;
+    bool         bIsDir = false;
+    std::wstring enumpath;
     while (enumerator.NextFile(enumpath, &bIsDir, false))
     {
         if (!bIsDir)
@@ -1256,9 +1256,11 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
                     break;
                 case STATUSBAR_EDITORCONFIG:
                 {
-                    const auto& doc                 = m_DocManager.GetDocumentFromID(m_TabBar.GetCurrentTabId());
-                    auto        editorConfigEnabled = CEditorConfigHandler::Instance().IsEnabled(doc.m_path);
+                    auto& doc                 = m_DocManager.GetModDocumentFromID(m_TabBar.GetCurrentTabId());
+                    auto  editorConfigEnabled = CEditorConfigHandler::Instance().IsEnabled(doc.m_path);
                     CEditorConfigHandler::Instance().EnableForPath(doc.m_path, !editorConfigEnabled);
+                    if (!editorConfigEnabled)
+                        CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, true);
                 }
                 break;
             }
