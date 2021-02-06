@@ -269,6 +269,16 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
             auto backColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
             GDIHelpers::FillSolidRect(hMyMemDC, &rect, backColor);
 
+            auto hBrush = CreateSolidBrush(backColor);
+            auto hPen      = CreatePen(PS_SOLID, CDPIAware::Instance().Scale(*this, 1), CTheme::Instance().GetThemeColor(GetSysColor(COLOR_GRAYTEXT)));
+            auto hOldBrush = SelectObject(hMyMemDC, hBrush);
+            auto hOldPen = SelectObject(hMyMemDC, hPen);
+            Rectangle(hMyMemDC, rect.left, rect.top, rect.right, rect.bottom);
+            SelectObject(hMyMemDC, hOldPen);
+            SelectObject(hMyMemDC, hOldBrush);
+            DeleteObject(hBrush);
+            DeleteObject(hPen);
+
             SetTextColor(hMyMemDC, foreColor);
             SetBkColor(hMyMemDC, backColor);
             auto hOldFont = SelectObject(hMyMemDC, m_hFont);
