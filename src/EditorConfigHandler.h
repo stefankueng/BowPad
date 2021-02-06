@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017, 2020 Stefan Kueng
+// Copyright (C) 2014-2017, 2020-2021 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,6 +45,8 @@ public:
 
     void ApplySettingsForPath(const std::wstring& path, CScintillaWnd * pScintilla, CDocument& doc, bool keepEncoding);
     bool IsEnabled(const std::wstring& path);
+    bool HasTabSize(const std::wstring& path);
+    bool HasTabSpace(const std::wstring& path);
     void EnableForPath(const std::wstring& path, bool enable);
 
 private:

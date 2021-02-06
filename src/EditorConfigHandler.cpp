@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -177,6 +177,60 @@ bool CEditorConfigHandler::IsEnabled(const std::wstring& path)
     {
         int name_value_count = editorconfig_handle_get_name_value_count(it->second.handle);
         return (name_value_count != 0) && it->second.enabled;
+    }
+    return false;
+}
+
+bool CEditorConfigHandler::HasTabSize(const std::wstring& path)
+{
+    if (path.empty())
+        return false;
+    auto it = m_handles.find(path);
+
+    if (it != m_handles.end())
+    {
+        int name_value_count = editorconfig_handle_get_name_value_count(it->second.handle);
+        if (it->second.enabled)
+        {
+            for (int j = 0; j < name_value_count; ++j)
+            {
+                const char* name  = nullptr;
+                const char* value = nullptr;
+                editorconfig_handle_get_name_value(it->second.handle, j, &name, &value);
+
+                if (strcmp(name, "tab_width") == 0)
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool CEditorConfigHandler::HasTabSpace(const std::wstring& path)
+{
+    if (path.empty())
+        return false;
+    auto it = m_handles.find(path);
+
+    if (it != m_handles.end())
+    {
+        int name_value_count = editorconfig_handle_get_name_value_count(it->second.handle);
+        if (it->second.enabled)
+        {
+            for (int j = 0; j < name_value_count; ++j)
+            {
+                const char* name  = nullptr;
+                const char* value = nullptr;
+                editorconfig_handle_get_name_value(it->second.handle, j, &name, &value);
+
+                if (strcmp(name, "indent_style") == 0)
+                {
+                    return true;
+                }
+            }
+        }
     }
     return false;
 }
