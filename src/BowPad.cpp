@@ -520,6 +520,35 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
             CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), g_emptyIcon);
     }
 
+    if (parser->HasKey(L"elevate") && parser->HasVal(L"savepath") && parser->HasVal(L"path"))
+    {
+        // note: MoveFileEx won't work for some reason, but
+        // writing to the target file will.
+        BOOL ret = FALSE;
+        {
+            CAutoFile hRead = CreateFile(parser->GetVal(L"path"), GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING, 0, nullptr);
+            if (hRead)
+            {
+                CAutoFile hWrite = CreateFile(parser->GetVal(L"savepath"), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+                if (hWrite)
+                {
+                    DWORD dwRead  = 0;
+                    DWORD dwWrite = 0;
+                    BYTE  buffer[4096]{};
+
+                    ret = ReadFile(hRead, buffer, sizeof(buffer) - 1, &dwRead, nullptr);
+                    while (dwRead)
+                    {
+                        WriteFile(hWrite, buffer, dwRead, &dwWrite, nullptr);
+                        ret = ReadFile(hRead, buffer, sizeof(buffer) - 1, &dwRead, nullptr);
+                    }
+                }
+            }
+        }
+        DeleteFile(parser->GetVal(L"path"));
+        return ret;
+    }
+
     CMainWindow mainWindow(g_hRes);
 
     if (!mainWindow.RegisterAndCreateWindow())

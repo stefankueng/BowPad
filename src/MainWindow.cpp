@@ -1740,8 +1740,6 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         bool bTabMoved = false;
         if (!m_DocManager.SaveFile(*this, doc, bTabMoved))
         {
-            if (bTabMoved)
-                CloseTab(m_TabBar.GetCurrentTabIndex(), true);
             return false;
         }
         if (doc.m_saveCallback)

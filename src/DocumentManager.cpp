@@ -25,6 +25,7 @@
 #include "PathUtils.h"
 #include "TempFile.h"
 #include "AppUtils.h"
+#include "OnOutOfScope.h"
 #include "ILexer.h"
 #include "ILoader.h"
 
@@ -285,19 +286,23 @@ static bool AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
     return AskToElevatePrivilege(hWnd, path, rElevate, rDontElevate);
 }
 
-static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params)
+static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params, bool wait)
 {
     std::wstring     modpath    = CPathUtils::GetModulePath();
     SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
 
     shExecInfo.hwnd         = hWnd;
+    shExecInfo.fMask        = SEE_MASK_NOCLOSEPROCESS;
     shExecInfo.lpVerb       = L"runas";
     shExecInfo.lpFile       = modpath.c_str();
     shExecInfo.lpParameters = params.c_str();
     shExecInfo.nShow        = SW_NORMAL;
-
+    OnOutOfScope(CloseHandle(shExecInfo.hProcess));
     if (!ShellExecuteEx(&shExecInfo))
         return ::GetLastError();
+
+    if (wait && shExecInfo.hProcess)
+        WaitForSingleObject(shExecInfo.hProcess, INFINITE);
 
     return 0;
 }
@@ -409,7 +414,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
                 std::wstring params = L"\"";
                 params += path;
                 params += L"\"";
-                DWORD elevationError = RunSelfElevated(hWnd, params);
+                DWORD elevationError = RunSelfElevated(hWnd, params, false);
                 // If we get no error attempting to running another instance elevated,
                 // assume any further errors that might occur completing the operation
                 // will be issued by that instance, so return now.
@@ -506,7 +511,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
             case 1201: // UTF16_BE
                 LoadSomeUtf16be(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charbuf.get(), m_charbufSize, m_widebuf.get(), doc.m_format);
                 break;
-            case 12001:                         // UTF32_BE
+            case 12001:                           // UTF32_BE
                 LoadSomeUtf32be(lenFile, m_data); // Doesn't load, falls through to load.
                 // intentional fall-through
                 [[fallthrough]];
@@ -824,36 +829,33 @@ bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved)
         CFormatMessageWrapper errMsg(err);
         if (((err == ERROR_ACCESS_DENIED) || (err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
         {
-            if (AskToElevatePrivilegeForSaving(hWnd, doc.m_path))
-            {
-                std::wstring temppath = CTempFiles::Instance().GetTempFilePath(true);
+            std::wstring temppath = CTempFiles::Instance().GetTempFilePath(true);
 
-                if (SaveDoc(hWnd, temppath, doc))
+            if (SaveDoc(hWnd, temppath, doc))
+            {
+                std::wstring cmdline        = CStringUtils::Format(L"/elevate /savepath:\"%s\" /path:\"%s\"", doc.m_path.c_str(), temppath.c_str());
+                DWORD        elevationError = RunSelfElevated(hWnd, cmdline, true);
+                // We don't know if saving worked or not.
+                // So return false since this instance didn't do the saving.
+                if (elevationError == 0)
                 {
-                    std::wstring cmdline        = CStringUtils::Format(L"/elevate /savepath:\"%s\" /path:\"%s\"", doc.m_path.c_str(), temppath.c_str());
-                    DWORD        elevationError = RunSelfElevated(hWnd, cmdline);
-                    // We don't know if saving worked or not.
-                    // So return false since this instance didn't do the saving.
-                    if (elevationError == 0)
+                    for (int i = 0; i < 20; ++i)
                     {
-                        for (int i = 0; i < 20; ++i)
+                        Sleep(100);
+                        if (!PathFileExists(temppath.c_str()))
                         {
-                            Sleep(100);
-                            if (!PathFileExists(temppath.c_str()))
-                            {
-                                bTabMoved = true;
-                                return false;
-                            }
+                            bTabMoved = true;
+                            return true;
                         }
-                        return false; // Temp path "belongs" to other instance.
                     }
-                    if (elevationError != ERROR_CANCELLED)
-                    {
-                        // Can't elevate. Explain the error,
-                        // don't refer to the temp path, that would be confusing.
-                        CFormatMessageWrapper errMsgelev(elevationError);
-                        ShowFileSaveError(hWnd, doc.m_path, errMsgelev);
-                    }
+                    return false; // Temp path "belongs" to other instance.
+                }
+                if (elevationError != ERROR_CANCELLED)
+                {
+                    // Can't elevate. Explain the error,
+                    // don't refer to the temp path, that would be confusing.
+                    CFormatMessageWrapper errMsgelev(elevationError);
+                    ShowFileSaveError(hWnd, doc.m_path, errMsgelev);
                 }
             }
         }
