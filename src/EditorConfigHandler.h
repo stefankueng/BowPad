@@ -47,6 +47,7 @@ public:
     bool IsEnabled(const std::wstring& path);
     bool HasTabSize(const std::wstring& path);
     bool HasTabSpace(const std::wstring& path);
+    bool HasOption(const std::wstring& path, const char* option);
     void EnableForPath(const std::wstring& path, bool enable);
 
 private:
