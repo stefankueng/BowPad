@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "CmdWhiteSpace.h"
 #include "IniSettings.h"
+#include "EditorConfigHandler.h"
 
 CCmdWhiteSpace::CCmdWhiteSpace(void * obj) : ICommand(obj)
 {
@@ -59,7 +60,10 @@ CCmdTabSize::CCmdTabSize(void * obj) : ICommand(obj)
 void CCmdTabSize::AfterInit()
 {
     int ve = (int)CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4);
-    ScintillaCall(SCI_SETTABWIDTH, ve);
+    auto& doc                = GetActiveDocument();
+    auto  tabSizeSet = CEditorConfigHandler::Instance().HasTabSize(doc.m_path);
+    if (!tabSizeSet)
+        ScintillaCall(SCI_SETTABWIDTH, ve);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
     UpdateStatusBar(false);
 }
