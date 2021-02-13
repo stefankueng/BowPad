@@ -277,15 +277,6 @@ static bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
     return AskToElevatePrivilege(hWnd, path, rElevate, rDontElevate);
 }
 
-static bool AskToElevatePrivilegeForSaving(HWND hWnd, const std::wstring& path)
-{
-    // access to the file is denied, and we're not running with elevated privileges
-    // offer to start BowPad with elevated privileges and open the file in that instance
-    ResString rElevate(g_hRes, IDS_ELEVATESAVE);
-    ResString rDontElevate(g_hRes, IDS_DONTELEVATESAVE);
-    return AskToElevatePrivilege(hWnd, path, rElevate, rDontElevate);
-}
-
 static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params, bool wait)
 {
     std::wstring     modpath    = CPathUtils::GetModulePath();
