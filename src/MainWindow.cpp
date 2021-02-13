@@ -229,6 +229,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     , m_normalThemeBack(0)
     , m_normalThemeHigh(0)
     , m_normalThemeText(0)
+    , m_autoCompleter(this, &m_editor)
 {
     auto cxicon = GetSystemMetrics(SM_CXSMICON);
     auto cyicon = GetSystemMetrics(SM_CYSMICON);
@@ -1052,6 +1053,7 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmhdr, WPARAM wParam, LPARA
     const SCNotification& scn  = *pScn;
 
     m_editor.ReflectEvents(pScn);
+    m_autoCompleter.HandleScintillaEvents(pScn);
 
     CCommandHandler::Instance().ScintillaNotify(pScn);
     switch (scn.nmhdr.code)
@@ -1422,6 +1424,7 @@ bool CMainWindow::Initialize()
     CCommandHandler::Instance().AddCommand(cmdAbout);
 
     m_editor.Init(hResource, *this);
+    m_autoCompleter.Init();
     m_StatusBar.Init(*this, true);
     m_StatusBar.SetHandlerFunc([](COLORREF clr) -> COLORREF {
         return CTheme::Instance().GetThemeColor(clr);
@@ -3019,14 +3022,14 @@ void CMainWindow::HandleUpdateUI(const SCNotification& scn)
 
 void CMainWindow::HandleAutoIndent(const SCNotification& scn)
 {
-    int    eolMode      = int(m_editor.Call(SCI_GETEOLMODE));
-    size_t curLine      = m_editor.GetCurrentLineNumber();
-    size_t lastLine     = curLine - 1;
-    int    indentAmount = 0;
+    int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
 
     if (((eolMode == SC_EOL_CRLF || eolMode == SC_EOL_LF) && scn.ch == '\n') ||
         (eolMode == SC_EOL_CR && scn.ch == '\r'))
     {
+        size_t curLine      = m_editor.GetCurrentLineNumber();
+        size_t lastLine     = curLine - 1;
+        int    indentAmount = 0;
         // use the same indentation as the last line
         while (lastLine > 0 && (m_editor.Call(SCI_GETLINEENDPOSITION, lastLine) - m_editor.Call(SCI_POSITIONFROMLINE, lastLine)) == 0)
             lastLine--;
@@ -4207,6 +4210,26 @@ void CMainWindow::SetFileTreeWidth(int width)
     RECT rc;
     GetClientRect(*this, &rc);
     m_treeWidth = min(m_treeWidth, rc.right - rc.left - 200);
+}
+
+void CMainWindow::AddAutoCompleteWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words)
+{
+    m_autoCompleter.AddWords(lang, words);
+}
+
+void CMainWindow::AddAutoCompleteWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words)
+{
+    m_autoCompleter.AddWords(lang, words);
+}
+
+void CMainWindow::AddAutoCompleteWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words)
+{
+    m_autoCompleter.AddWords(docID, words);
+}
+
+void CMainWindow::AddAutoCompleteWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words)
+{
+    m_autoCompleter.AddWords(docID, words);
 }
 
 void CMainWindow::SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight)

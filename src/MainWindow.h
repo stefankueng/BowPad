@@ -26,6 +26,7 @@
 #include "ProgressBar.h"
 #include "CustomTooltip.h"
 #include "CommandPaletteDlg.h"
+#include "AutoComplete.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -64,6 +65,7 @@ class CMainWindow : public CWindow
     , public IUICommandHandler
 {
     friend class ICommand;
+    friend class CAutoComplete;
 
 public:
     CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = nullptr);
@@ -98,6 +100,11 @@ public:
     std::wstring GetFileTreePath() const { return m_fileTree.GetPath(); }
     void         FileTreeBlockRefresh(bool bBlock) { m_fileTree.BlockRefresh(bBlock); }
     void         SetFileTreeWidth(int width);
+
+    void AddAutoCompleteWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words);
+    void AddAutoCompleteWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words);
+    void AddAutoCompleteWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words);
+    void AddAutoCompleteWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words);
 
     // clang-format off
     // IUnknown
@@ -236,6 +243,8 @@ private:
     UI_HSBCOLOR                                     m_normalThemeBack;
     UI_HSBCOLOR                                     m_normalThemeHigh;
     std::unique_ptr<CCommandPaletteDlg>             m_commandPaletteDlg;
+    CAutoComplete                                   m_autoCompleter;
+
     // status bar icons
     HICON m_hShieldIcon;
     HICON m_hCapslockIcon;
