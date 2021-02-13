@@ -349,6 +349,7 @@
     <ClInclude Include="..\ext\tinyexpr\tinyexpr.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppUtils.h" />
+    <ClInclude Include="AutoComplete.h" />
     <ClInclude Include="BowPadUI.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -486,6 +487,7 @@
     </ClCompile>
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AppUtils.cpp" />
+    <ClCompile Include="AutoComplete.cpp" />
     <ClCompile Include="BowPad.cpp" />
     <ClCompile Include="BPBaseDialog.cpp" />
     <ClCompile Include="ChoseDlg.cpp" />
@@ -575,10 +577,12 @@
     <Image Include="res\closeTabButton_hover.bmp" />
     <Image Include="res\closeTabButton_inact.bmp" />
     <Image Include="res\closeTabButton_push.bmp" />
+    <Image Include="res\code.ico" />
     <Image Include="res\EditorConfigActive.ico" />
     <Image Include="res\EditorConfigInactive.ico" />
     <Image Include="res\empty.bmp" />
     <Image Include="res\empty.ico" />
+    <Image Include="res\file.ico" />
     <Image Include="res\lexer.ico" />
     <Image Include="res\readonly.ico" />
     <Image Include="res\saved.ico" />

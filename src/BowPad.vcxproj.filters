@@ -399,6 +399,9 @@
     <ClInclude Include="UICollection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AutoComplete.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -716,6 +719,9 @@
     <ClCompile Include="Commands\CmdSelectTab.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
+    <ClCompile Include="AutoComplete.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc">
@@ -778,6 +784,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\EditorConfigInactive.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\code.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\file.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
