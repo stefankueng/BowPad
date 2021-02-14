@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "AutoComplete.h"
 #include "BowPad.h"
+#include "AppUtils.h"
 #include "MainWindow.h"
 #include "ScintillaWnd.h"
 #include "StringUtils.h"
@@ -185,6 +186,38 @@ void CAutoComplete::Init()
         auto      bytes = Icon2Image(hIcon);
         m_editor->Call(SCI_REGISTERRGBAIMAGE, i, (LPARAM)bytes.get());
         ++i;
+    }
+
+    std::vector<std::unique_ptr<CSimpleIni>> iniFiles;
+
+    auto iniPath = CAppUtils::GetDataPath() + L"\\autocomplete.ini";
+    iniFiles.push_back(std::make_unique<CSimpleIni>());
+    iniFiles.back()->LoadFile(iniPath.c_str());
+    DWORD       resLen  = 0;
+    const char* resData = CAppUtils::GetResourceData(L"config", IDR_AUTOCOMPLETE, resLen);
+    if (resData != nullptr && resLen)
+    {
+        iniFiles.push_back(std::make_unique<CSimpleIni>());
+        iniFiles.back()->LoadFile(resData, resLen);
+    }
+    for (const auto& ini : iniFiles)
+    {
+        std::map<std::string, AutoCompleteType> acMap;
+        std::list<const wchar_t*>               sections;
+        ini->GetAllSections(sections);
+        for (const auto& section : sections)
+        {
+            auto codeVal = ini->GetValue(section, L"code");
+            if (codeVal)
+            {
+                std::vector<std::wstring> values;
+                stringtok(values, codeVal, true, L" ");
+                for (const auto& v : values)
+                    acMap[CUnicodeUtils::StdGetUTF8(v)] = AutoCompleteType::Code;
+            }
+            std::lock_guard<std::mutex> lockGuard(m_mutex);
+            m_langWordlist[CUnicodeUtils::StdGetUTF8(section)] = std::move(acMap);
+        }
     }
 }
 

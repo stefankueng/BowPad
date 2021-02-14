@@ -825,6 +825,7 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\Shortcuts-internal.ini" />
+    <None Include="res\AutoComplete.ini" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="compatibility.manifest">

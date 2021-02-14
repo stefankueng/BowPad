@@ -615,6 +615,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\AutoComplete.ini" />
     <None Include="res\BowPad.rc2" />
     <None Include="res\darktheme.ini" />
     <None Include="res\drag.cur" />
