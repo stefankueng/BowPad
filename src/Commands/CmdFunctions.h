@@ -116,7 +116,7 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> m_funcProcessingStartTime;
     CScintillaWnd                                      m_edit;
 
-    std::unordered_set<DocID>                                        m_eventData;
+    std::deque<DocID>                                                m_eventData;
     std::list<WorkItem>                                              m_fileData;
     std::unordered_map<std::string, std::unordered_set<std::string>> m_langdata;
     std::thread                                                      m_thread;

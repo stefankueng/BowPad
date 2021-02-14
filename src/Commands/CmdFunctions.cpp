@@ -311,7 +311,30 @@ void CCmdFunctions::TabNotify(TBHDR* ptbhdr)
 {
     // Switching to this document.
     if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    {
         InvalidateFunctionsSource();
+
+        auto                         docID = GetDocIdOfCurrentTab();
+        std::unique_lock<std::mutex> lock(m_filedatamutex);
+        auto                         found = std::find_if(m_fileData.begin(), m_fileData.end(), [docID](const WorkItem& wi) {
+            return wi.m_id == docID;
+        });
+        if (found != m_fileData.end())
+        {
+            auto workItem = *found;
+            m_fileData.erase(found);
+            m_fileData.push_back(std::move(workItem));
+        }
+        else
+        {
+            auto foundEvent = std::find(m_eventData.begin(), m_eventData.end(), docID);
+            if (foundEvent != m_eventData.end())
+            {
+                m_eventData.erase(foundEvent);
+                m_eventData.push_front(docID);
+            }
+        }
+    }
 }
 
 void CCmdFunctions::ScintillaNotify(SCNotification* pScn)
@@ -335,7 +358,7 @@ void CCmdFunctions::ScintillaNotify(SCNotification* pScn)
                 const auto& doc   = GetDocumentFromID(docID);
                 if (doc.m_bIsDirty)
                 {
-                    m_eventData.insert(docID);
+                    m_eventData.push_front(docID);
                     SetWorkTimer(1000);
                     InvalidateFunctionsSource();
                 }
@@ -437,7 +460,8 @@ void CCmdFunctions::OnTimer(UINT id)
 
 void CCmdFunctions::OnDocumentOpen(DocID id)
 {
-    m_eventData.insert(id);
+    m_eventData.erase(std::remove(m_eventData.begin(), m_eventData.end(), id), m_eventData.end());
+    m_eventData.push_front(id);
     InvalidateFunctionsSource();
     SetWorkTimer(1000);
 }
@@ -478,7 +502,7 @@ void CCmdFunctions::OnDocumentClose(DocID id)
             }
         }
     }
-    m_eventData.erase(id);
+    m_eventData.erase(std::remove(m_eventData.begin(), m_eventData.end(), id), m_eventData.end());
 }
 
 void CCmdFunctions::OnClose()
@@ -498,7 +522,7 @@ void CCmdFunctions::OnDocumentSave(DocID id, bool bSaveAs)
 {
     if (bSaveAs)
     {
-        m_eventData.insert(id);
+        m_eventData.push_front(id);
         InvalidateFunctionsSource();
         SetWorkTimer(1000);
     }
@@ -506,7 +530,7 @@ void CCmdFunctions::OnDocumentSave(DocID id, bool bSaveAs)
 
 void CCmdFunctions::OnLangChanged()
 {
-    m_eventData.insert(GetDocIdOfCurrentTab());
+    m_eventData.push_front(GetDocIdOfCurrentTab());
     InvalidateFunctionsSource();
     SetWorkTimer(1000);
 }
