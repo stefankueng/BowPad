@@ -121,6 +121,7 @@ public:
     long        GetSelTextMarkerCount() const { return m_selTextMarkerCount; }
     sptr_t      GetCurrentLineNumber() const;
     void        VisibleLinesChanged() { m_docScroll.VisibleLinesChanged(); }
+    bool        IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
 
     LRESULT CALLBACK HandleScrollbarCustomDraw(WPARAM wParam, NMCSBCUSTOMDRAW* pCustDraw);
     void             ReflectEvents(SCNotification* pScn);
@@ -137,7 +138,6 @@ protected:
     sptr_t                                 FindCloseAngle(sptr_t startPosition, sptr_t endPosition);
     FindResult                             FindCloseTag(const std::string& tagName, sptr_t start, sptr_t end);
     std::vector<std::pair<sptr_t, sptr_t>> GetAttributesPos(sptr_t start, sptr_t end);
-    bool                                   IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
     bool                                   AutoBraces(WPARAM wParam);
 
     void BookmarkAdd(sptr_t lineno);

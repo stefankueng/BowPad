@@ -25,6 +25,7 @@
 #include "DirFileEnum.h"
 #include "SmartHandle.h"
 #include "OnOutOfScope.h"
+#include "SciLexer.h"
 
 #include <chrono>
 
@@ -223,7 +224,7 @@ void CAutoComplete::AddWords(const DocID& docID, const std::map<std::string, Aut
     m_docWordlist[docID].insert(words.begin(), words.end());
 }
 
-void CAutoComplete::HandleAutoComplete(const SCNotification* /*scn*/)
+void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
 {
     static constexpr auto wordSeparator = '\n';
     static constexpr auto typeSeparator = '?';
@@ -270,6 +271,55 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* /*scn*/)
                 m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), (LPARAM)pathComplete.c_str());
                 return;
             }
+        }
+    }
+
+    if (scn->ch == '/')
+    {
+        auto lexer = m_editor->Call(SCI_GETLEXER);
+        switch (lexer)
+        {
+            // add the closing tag only for xml and html lexers
+            case SCLEX_XML:
+            case SCLEX_HTML:
+            {
+                auto pos2  = pos - 2;
+                auto inner = 1;
+                if (m_editor->Call(SCI_GETCHARAT, pos2) == '<')
+                {
+                    do
+                    {
+                        pos2 = m_editor->FindText("<", pos2 - 2, 0);
+                        if (pos2)
+                        {
+                            if (m_editor->Call(SCI_GETCHARAT, pos2 + 1) == '/')
+                                ++inner;
+                            else
+                                --inner;
+                        }
+                    } while (inner && pos2 > 0);
+                    std::string tagName;
+                    auto        position = pos2 + 1;
+                    int         nextChar = (int)m_editor->Call(SCI_GETCHARAT, position);
+                    while (position < pos && !m_editor->IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
+                    {
+                        tagName.push_back((char)nextChar);
+                        ++position;
+                        nextChar = (int)m_editor->Call(SCI_GETCHARAT, position);
+                    }
+                    if (!tagName.empty())
+                    {
+                        tagName = tagName + ">" + typeSeparator + "-1";
+                        m_editor->Call(SCI_AUTOCSETSEPARATOR, (WPARAM)wordSeparator);
+                        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, (WPARAM)typeSeparator);
+                        m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), (LPARAM)tagName.c_str());
+                        return;
+                    }
+                }
+            }
+            break;
+            default:
+                break;
         }
     }
 
