@@ -18,6 +18,7 @@
 #include "Scintilla.h"
 #include "TabBar.h"
 #include "Document.h"
+#include "../AutoComplete.h"
 
 #include <vector>
 #include <string>
@@ -123,6 +124,11 @@ protected:
     bool                IsFileTreeShown() const;
     std::wstring        GetFileTreePath() const;
     void                FileTreeBlockRefresh(bool bBlock);
+
+    void                AddAutoCompleteWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words);
+    void                AddAutoCompleteWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words);
+    void                AddAutoCompleteWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words);
+    void                AddAutoCompleteWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words);
 
 
     HWND                GetHwnd() const;

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -427,6 +427,26 @@ std::wstring ICommand::GetFileTreePath() const
 void ICommand::FileTreeBlockRefresh(bool bBlock)
 {
     return m_pMainWindow->FileTreeBlockRefresh(bBlock);
+}
+
+void ICommand::AddAutoCompleteWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words)
+{
+    m_pMainWindow->AddAutoCompleteWords(lang, words);
+}
+
+void ICommand::AddAutoCompleteWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words)
+{
+    m_pMainWindow->AddAutoCompleteWords(lang, words);
+}
+
+void ICommand::AddAutoCompleteWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words)
+{
+    m_pMainWindow->AddAutoCompleteWords(docID, words);
+}
+
+void ICommand::AddAutoCompleteWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words)
+{
+    m_pMainWindow->AddAutoCompleteWords(docID, words);
 }
 
 sptr_t ICommand::GetCurrentLineNumber() const
