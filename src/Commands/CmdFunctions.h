@@ -72,6 +72,7 @@ struct WorkItem
     DocID                    m_id;
     std::string              m_lang;
     std::string              m_regex;
+    std::string              m_autocregex;
     std::string              m_data;
     std::vector<std::string> m_trimtokens;
 };

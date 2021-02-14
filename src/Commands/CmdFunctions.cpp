@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -370,10 +370,11 @@ void CCmdFunctions::OnTimer(UINT id)
                 auto langData = CLexStyles::Instance().GetLanguageData(w.m_lang);
                 if (langData != nullptr)
                 {
-                    if (!langData->functionregex.empty() && langData->userfunctions > 0)
+                    if ((!langData->functionregex.empty() && langData->userfunctions > 0) || !langData->autocompleteregex.empty())
                     {
                         w.m_regex      = langData->functionregex;
                         w.m_trimtokens = langData->functionregextrim;
+                        w.m_autocregex = langData->autocompleteregex;
 
                         ProfileTimer p(L"getting doc content");
                         size_t       lengthDoc = m_edit.Call(SCI_GETLENGTH);
@@ -534,11 +535,13 @@ void CCmdFunctions::ThreadFunc()
         }
         if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
             break;
+
+        auto sData = CUnicodeUtils::StdGetUnicode(work.m_data);
         if (!work.m_regex.empty())
         {
             auto sRegex = CUnicodeUtils::StdGetUnicode(work.m_regex);
-            auto sData  = CUnicodeUtils::StdGetUnicode(work.m_data);
 
+            std::map<std::string, AutoCompleteType> acMap;
             try
             {
                 std::wregex                       regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
@@ -560,14 +563,41 @@ void CCmdFunctions::ThreadFunc()
                     if (ParseName(sig, name))
                     {
                         std::lock_guard<std::recursive_mutex> lock(m_langdatamutex);
+                        acMap[name] = AutoCompleteType::Code;
                         m_langdata[work.m_lang].insert(std::move(name));
                     }
                 }
+                AddAutoCompleteWords(work.m_lang, std::move(acMap));
             }
             catch (const std::exception&)
             {
             }
         }
+        if (!work.m_autocregex.empty())
+        {
+            try
+            {
+                auto                                    sRegex = CUnicodeUtils::StdGetUnicode(work.m_autocregex);
+                std::wregex                             regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
+                const std::wsregex_iterator             End;
+                ProfileTimer                            timer(L"parsing words");
+                std::map<std::string, AutoCompleteType> acMap;
+                for (std::wsregex_iterator match(sData.begin(), sData.end(), regex); match != End; ++match)
+                {
+                    if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
+                        break;
+
+                    auto word = CUnicodeUtils::StdGetUTF8(match->str(1));
+
+                    acMap[word] = AutoCompleteType::Code;
+                }
+                AddAutoCompleteWords(work.m_id, std::move(acMap));
+            }
+            catch (const std::exception&)
+            {
+            }
+        }
+
         SetWorkTimer(0);
 
     } while (InterlockedExchange(&m_bRunThread, m_bRunThread));
