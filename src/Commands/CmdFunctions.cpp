@@ -529,8 +529,8 @@ void CCmdFunctions::ThreadFunc()
             });
             if (!m_fileData.empty())
             {
-                work = std::move(m_fileData.front());
-                m_fileData.pop_front();
+                work = std::move(m_fileData.back());
+                m_fileData.pop_back();
             }
         }
         if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
