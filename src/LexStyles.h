@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2016, 2019-2020 - Stefan Kueng
+// Copyright (C) 2013-2016, 2019-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ public:
     std::string                          functionregex;
     std::vector<std::string>             functionregextrim;
     int                                  functionregexsort;
+    std::string                          autocompleteregex;
     int                                  userfunctions;
     std::unordered_set<std::string>      userkeywords;
     bool                                 userkeywordsupdated = false;
@@ -108,6 +109,7 @@ public:
     const std::string&                          GetFunctionRegexForLang(const std::string& lang) const;
     int                                         GetFunctionRegexSortForLang(const std::string& lang) const;
     const std::vector<std::string>&             GetFunctionRegexTrimForLang(const std::string& lang) const;
+    const std::string&                          GetAutoCompleteRegexForLang(const std::string& lang) const;
 
     const LexerData&   GetLexerDataForLang(const std::string& lang) const;
     const LexerData&   GetLexerDataForLexer(int lexer) const;

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019-2020 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -404,6 +404,10 @@ void CLexStyles::Load()
                     std::string s = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
                     s.erase(s.find_last_not_of('~') + 1); // Erase '~'
                     stringtok(ld.functionregextrim, s, true, ",");
+                }
+                else if (_wcsicmp(L"AutoCompleteRegex", sk) == 0)
+                {
+                    ld.autocompleteregex = CUnicodeUtils::StdGetUTF8(ini->GetValue(langsect.c_str(), sk));
                 }
                 else if (_wcsicmp(L"UserFunctions", sk) == 0)
                 {
@@ -1017,6 +1021,14 @@ const std::vector<std::string>& CLexStyles::GetFunctionRegexTrimForLang(const st
     if (lt != m_Langdata.end())
         return lt->second.functionregextrim;
     return emptyStringVector;
+}
+
+const std::string& CLexStyles::GetAutoCompleteRegexForLang(const std::string& lang) const
+{
+    auto lt = m_Langdata.find(lang);
+    if (lt != m_Langdata.end())
+        return lt->second.autocompleteregex;
+    return emptyString;
 }
 
 void CLexStyles::SetLangForPath(const std::wstring& path, const std::string& language)
