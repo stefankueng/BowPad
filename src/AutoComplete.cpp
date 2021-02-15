@@ -355,44 +355,46 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 break;
         }
     }
-
-    std::map<std::string, AutoCompleteType> wordset;
+    if (CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1))
     {
-        std::lock_guard<std::mutex> lockGuard(m_mutex);
-        auto                        docID        = m_main->m_TabBar.GetCurrentTabId();
-        auto                        docAutoList  = m_docWordlist[docID];
-        auto                        langAutoList = m_langWordlist[m_main->m_DocManager.GetDocumentFromID(docID).GetLanguage()];
-        if (docAutoList.empty() && langAutoList.empty())
-            return;
-
-        for (const auto& list : {docAutoList, langAutoList})
+        std::map<std::string, AutoCompleteType> wordset;
         {
-            for (auto lowerit = list.lower_bound(word); lowerit != list.end(); ++lowerit)
+            std::lock_guard<std::mutex> lockGuard(m_mutex);
+            auto                        docID        = m_main->m_TabBar.GetCurrentTabId();
+            auto                        docAutoList  = m_docWordlist[docID];
+            auto                        langAutoList = m_langWordlist[m_main->m_DocManager.GetDocumentFromID(docID).GetLanguage()];
+            if (docAutoList.empty() && langAutoList.empty())
+                return;
+
+            for (const auto& list : {docAutoList, langAutoList})
             {
-                int compare = _strnicmp(word.c_str(), lowerit->first.c_str(), word.size());
-                if (compare > 0)
-                    continue;
-                else if (compare == 0)
+                for (auto lowerit = list.lower_bound(word); lowerit != list.end(); ++lowerit)
                 {
-                    wordset.emplace(lowerit->first, lowerit->second);
-                }
-                else
-                {
-                    break;
+                    int compare = _strnicmp(word.c_str(), lowerit->first.c_str(), word.size());
+                    if (compare > 0)
+                        continue;
+                    else if (compare == 0)
+                    {
+                        wordset.emplace(lowerit->first, lowerit->second);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
         }
+
+        std::string sAutoCompleteList;
+        for (const auto& w : wordset)
+            sAutoCompleteList += CStringUtils::Format("%s%c%d%c", w.first.c_str(), typeSeparator, static_cast<int>(w.second), wordSeparator);
+        if (sAutoCompleteList.empty())
+            return;
+        if (sAutoCompleteList.size() > 1)
+            sAutoCompleteList[sAutoCompleteList.size() - 1] = 0;
+
+        m_editor->Call(SCI_AUTOCSETSEPARATOR, (WPARAM)wordSeparator);
+        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, (WPARAM)typeSeparator);
+        m_editor->Call(SCI_AUTOCSHOW, word.size(), (LPARAM)sAutoCompleteList.c_str());
     }
-
-    std::string sAutoCompleteList;
-    for (const auto& w : wordset)
-        sAutoCompleteList += CStringUtils::Format("%s%c%d%c", w.first.c_str(), typeSeparator, static_cast<int>(w.second), wordSeparator);
-    if (sAutoCompleteList.empty())
-        return;
-    if (sAutoCompleteList.size() > 1)
-        sAutoCompleteList[sAutoCompleteList.size() - 1] = 0;
-
-    m_editor->Call(SCI_AUTOCSETSEPARATOR, (WPARAM)wordSeparator);
-    m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, (WPARAM)typeSeparator);
-    m_editor->Call(SCI_AUTOCSHOW, word.size(), (LPARAM)sAutoCompleteList.c_str());
 }

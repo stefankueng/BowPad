@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017 - Stefan Kueng
+// Copyright (C) 2014-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -209,4 +209,30 @@ void CCmdWriteProtect::ScintillaNotify(SCNotification * pScn)
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
+}
+
+CCmdAutoComplete::CCmdAutoComplete(void* obj)
+    : ICommand(obj)
+{
+}
+
+bool CCmdAutoComplete::Execute()
+{
+    CIniSettings::Instance().SetInt64(L"View", L"autocomplete", CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) ? 0 : 1);
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    return true;
+}
+
+void CCmdAutoComplete::AfterInit()
+{
+    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+}
+
+HRESULT CCmdAutoComplete::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT*, PROPVARIANT* ppropvarNewValue)
+{
+    if (UI_PKEY_BooleanValue == key)
+    {
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) != 0, ppropvarNewValue);
+    }
+    return E_NOTIMPL;
 }

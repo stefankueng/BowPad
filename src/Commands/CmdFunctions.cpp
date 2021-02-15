@@ -597,7 +597,7 @@ void CCmdFunctions::ThreadFunc()
             {
             }
         }
-        if (!work.m_autocregex.empty())
+        if (!work.m_autocregex.empty() && CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) != 0)
         {
             try
             {

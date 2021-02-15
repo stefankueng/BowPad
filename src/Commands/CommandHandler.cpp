@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -141,6 +141,7 @@ void CCommandHandler::Init(void* obj)
     Add<CCmdLineNumbers>(obj);
     Add<CCmdUseTabs>(obj);
     Add<CCmdAutoBraces>(obj);
+    Add<CCmdAutoComplete>(obj);
     Add<CCmdViewFileTree>(obj);
     Add<CCmdLanguage>(obj);
     Add<CCmdTabSize>(obj);

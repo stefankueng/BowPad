@@ -814,6 +814,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/Arrow-Right.png</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdAutocomplete" LabelTitle="Autocomplete" TooltipTitle="enable autocompletion" TooltipDescription="enable/disable autocompletion when editing" Keytip="CA">
+      <Command.SmallImages>
+        <Image>res/autocomplete.png</Image>
+      </Command.SmallImages>
+    </Command>
 
 
     <Command Name="cmdContextMap" />
@@ -1012,6 +1017,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Button CommandName="cmdFindReplace" />
               </SplitButton.ButtonItem>
               <Button CommandName="cmdRegexCapture" />
+              <Button CommandName="cmdGotoSymbol" />
             </SplitButton>
             <Button CommandName="cmdFindNext" />
             <Button CommandName="cmdFindPrev" />
@@ -1083,14 +1089,14 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <VerticalMenuLayout Gripper="None"/>
               </SplitButtonGallery.MenuLayout>
             </SplitButtonGallery>
-            <Button CommandName="cmdGotoSymbol" />
-            <Button CommandName="cmdComment" />
-            <Button CommandName="cmdUnComment" />
             <DropDownGallery CommandName="cmdCodeStyle" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout Gripper="None"/>
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
+            <Button CommandName="cmdComment" />
+            <Button CommandName="cmdUnComment" />
+            <ToggleButton CommandName="cmdAutocomplete" />
           </Group>
           <Group CommandName="cmdGroupBlanks" SizeDefinition="FiveButtons">
             <DropDownButton CommandName="cmdGroupLines">
