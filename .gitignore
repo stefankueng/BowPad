@@ -17,3 +17,5 @@
 /src/ResourceDll.vcxproj.user
 /ext/editorconfig-core/editorconfig.vcxproj.user
 /test
+/_ReSharper.Caches
+/BowPad.sln.DotSettings.user
