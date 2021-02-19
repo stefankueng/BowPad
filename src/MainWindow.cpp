@@ -3020,6 +3020,56 @@ void CMainWindow::HandleUpdateUI(const SCNotification& scn)
     UpdateStatusBar(false);
 }
 
+void CMainWindow::IndentToLastLine()
+{
+    size_t curLine      = m_editor.GetCurrentLineNumber();
+    size_t lastLine     = curLine - 1;
+    int    indentAmount = 0;
+    // use the same indentation as the last line
+    while (lastLine > 0 && (m_editor.Call(SCI_GETLINEENDPOSITION, lastLine) - m_editor.Call(SCI_POSITIONFROMLINE, lastLine)) == 0)
+        lastLine--;
+
+    indentAmount = (int)m_editor.Call(SCI_GETLINEINDENTATION, lastLine);
+
+    if (indentAmount > 0)
+    {
+        Sci_CharacterRange crange{};
+        crange.cpMin  = long(m_editor.Call(SCI_GETSELECTIONSTART));
+        crange.cpMax  = long(m_editor.Call(SCI_GETSELECTIONEND));
+        int posBefore = (int)m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);
+        m_editor.Call(SCI_SETLINEINDENTATION, curLine, indentAmount);
+        int posAfter      = (int)m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);
+        int posDifference = posAfter - posBefore;
+        if (posAfter > posBefore)
+        {
+            // Move selection on
+            if (crange.cpMin >= posBefore)
+                crange.cpMin += posDifference;
+            if (crange.cpMax >= posBefore)
+                crange.cpMax += posDifference;
+        }
+        else if (posAfter < posBefore)
+        {
+            // Move selection back
+            if (crange.cpMin >= posAfter)
+            {
+                if (crange.cpMin >= posBefore)
+                    crange.cpMin += posDifference;
+                else
+                    crange.cpMin = posAfter;
+            }
+            if (crange.cpMax >= posAfter)
+            {
+                if (crange.cpMax >= posBefore)
+                    crange.cpMax += posDifference;
+                else
+                    crange.cpMax = posAfter;
+            }
+        }
+        m_editor.Call(SCI_SETSEL, crange.cpMin, crange.cpMax);
+    }
+}
+
 void CMainWindow::HandleAutoIndent(const SCNotification& scn)
 {
     int eolMode = int(m_editor.Call(SCI_GETEOLMODE));
@@ -3027,52 +3077,7 @@ void CMainWindow::HandleAutoIndent(const SCNotification& scn)
     if (((eolMode == SC_EOL_CRLF || eolMode == SC_EOL_LF) && scn.ch == '\n') ||
         (eolMode == SC_EOL_CR && scn.ch == '\r'))
     {
-        size_t curLine      = m_editor.GetCurrentLineNumber();
-        size_t lastLine     = curLine - 1;
-        int    indentAmount = 0;
-        // use the same indentation as the last line
-        while (lastLine > 0 && (m_editor.Call(SCI_GETLINEENDPOSITION, lastLine) - m_editor.Call(SCI_POSITIONFROMLINE, lastLine)) == 0)
-            lastLine--;
-
-        indentAmount = (int)m_editor.Call(SCI_GETLINEINDENTATION, lastLine);
-
-        if (indentAmount > 0)
-        {
-            Sci_CharacterRange crange{};
-            crange.cpMin  = long(m_editor.Call(SCI_GETSELECTIONSTART));
-            crange.cpMax  = long(m_editor.Call(SCI_GETSELECTIONEND));
-            int posBefore = (int)m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);
-            m_editor.Call(SCI_SETLINEINDENTATION, curLine, indentAmount);
-            int posAfter      = (int)m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);
-            int posDifference = posAfter - posBefore;
-            if (posAfter > posBefore)
-            {
-                // Move selection on
-                if (crange.cpMin >= posBefore)
-                    crange.cpMin += posDifference;
-                if (crange.cpMax >= posBefore)
-                    crange.cpMax += posDifference;
-            }
-            else if (posAfter < posBefore)
-            {
-                // Move selection back
-                if (crange.cpMin >= posAfter)
-                {
-                    if (crange.cpMin >= posBefore)
-                        crange.cpMin += posDifference;
-                    else
-                        crange.cpMin = posAfter;
-                }
-                if (crange.cpMax >= posAfter)
-                {
-                    if (crange.cpMax >= posBefore)
-                        crange.cpMax += posDifference;
-                    else
-                        crange.cpMax = posAfter;
-                }
-            }
-            m_editor.Call(SCI_SETSEL, crange.cpMin, crange.cpMax);
-        }
+        IndentToLastLine();
     }
 }
 

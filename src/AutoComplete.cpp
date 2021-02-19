@@ -43,7 +43,7 @@ static HICON LoadIconEx(HINSTANCE hInstance, LPCWSTR lpIconName, int iconWidth, 
     if (FAILED(LoadIconWithScaleDown(hInstance, lpIconName, iconWidth, iconHeight, &hIcon)))
     {
         // fallback, just in case
-        hIcon = (HICON)LoadImage(hInstance, lpIconName, IMAGE_ICON, iconWidth, iconHeight, LR_DEFAULTCOLOR);
+        hIcon = static_cast<HICON>(LoadImage(hInstance, lpIconName, IMAGE_ICON, iconWidth, iconHeight, LR_DEFAULTCOLOR));
     }
     return hIcon;
 }
@@ -79,12 +79,12 @@ static std::unique_ptr<UINT[]> Icon2Image(HICON hIcon)
     LPBYTE alphaPixels   = pixelsIconRGB + size;
     HDC    hDC           = CreateCompatibleDC(nullptr);
     OnOutOfScope(DeleteDC(hDC));
-    HBITMAP hBmpOld = (HBITMAP)SelectObject(hDC, (HGDIOBJ)iconInfo.hbmColor);
-    if (!GetDIBits(hDC, iconInfo.hbmColor, 0, height, (LPVOID)pixelsIconRGB, &infoheader, DIB_RGB_COLORS))
+    HBITMAP hBmpOld = static_cast<HBITMAP>(SelectObject(hDC, static_cast<HGDIOBJ>(iconInfo.hbmColor)));
+    if (!GetDIBits(hDC, iconInfo.hbmColor, 0, height, static_cast<LPVOID>(pixelsIconRGB), &infoheader, DIB_RGB_COLORS))
         return nullptr;
 
     SelectObject(hDC, hBmpOld);
-    if (!GetDIBits(hDC, iconInfo.hbmMask, 0, height, (LPVOID)alphaPixels, &infoheader, DIB_RGB_COLORS))
+    if (!GetDIBits(hDC, iconInfo.hbmMask, 0, height, static_cast<LPVOID>(alphaPixels), &infoheader, DIB_RGB_COLORS))
         return nullptr;
 
     auto imagePixels = std::make_unique<UINT[]>(height * width);
@@ -98,11 +98,10 @@ static std::unique_ptr<UINT[]> Icon2Image(HICON hIcon)
         {
             int currentDestPos          = linePosDest + x;
             int currentSrcPos           = linePosSrc + x * 3;
-            imagePixels[currentDestPos] = (((UINT)(
-                                               (
-                                                   ((pixelsIconRGB[currentSrcPos + 2] /*Red*/) | (pixelsIconRGB[currentSrcPos + 1] << 8 /*Green*/)) | pixelsIconRGB[currentSrcPos] << 16 /*Blue*/
-                                                   ) |
-                                               ((alphaPixels[currentSrcPos] ? 0 : 0xff) << 24))) &
+            imagePixels[currentDestPos] = (static_cast<UINT>((
+                                                                 ((pixelsIconRGB[currentSrcPos + 2] /*Red*/) | (pixelsIconRGB[currentSrcPos + 1] << 8 /*Green*/)) | pixelsIconRGB[currentSrcPos] << 16 /*Blue*/
+                                                                 ) |
+                                                             ((alphaPixels[currentSrcPos] ? 0 : 0xff) << 24)) &
                                            0xffffffff);
         }
     }
@@ -162,8 +161,9 @@ static bool getPathsForPathCompletion(const std::wstring& input, std::wstring& p
 }
 
 CAutoComplete::CAutoComplete(CMainWindow* main, CScintillaWnd* scintilla)
-    : m_main(main)
-    , m_editor(scintilla)
+    : m_editor(scintilla)
+    , m_main(main)
+    , m_insertingSnippet(false)
 {
 }
 
@@ -178,13 +178,13 @@ void CAutoComplete::Init()
     m_editor->Call(SCI_RGBAIMAGESETWIDTH, iconWidth);
     m_editor->Call(SCI_RGBAIMAGESETHEIGHT, iconHeight);
     m_editor->Call(SCI_AUTOCSETIGNORECASE, TRUE);
-    m_editor->Call(SCI_AUTOCSETFILLUPS, 0, (LPARAM) "\t([");
+    m_editor->Call(SCI_AUTOCSETFILLUPS, 0, reinterpret_cast<sptr_t>("\t(["));
     int i = 0;
     for (auto icon : {IDI_SCI_CODE, IDI_SCI_FILE})
     {
         CAutoIcon hIcon = LoadIconEx(g_hInst, MAKEINTRESOURCE(icon), iconWidth, iconHeight);
         auto      bytes = Icon2Image(hIcon);
-        m_editor->Call(SCI_REGISTERRGBAIMAGE, i, (LPARAM)bytes.get());
+        m_editor->Call(SCI_REGISTERRGBAIMAGE, i, reinterpret_cast<sptr_t>(bytes.get()));
         ++i;
     }
 
@@ -202,21 +202,48 @@ void CAutoComplete::Init()
     }
     for (const auto& ini : iniFiles)
     {
-        std::map<std::string, AutoCompleteType> acMap;
-        std::list<const wchar_t*>               sections;
+        std::list<const wchar_t*> sections;
         ini->GetAllSections(sections);
         for (const auto& section : sections)
         {
-            auto codeVal = ini->GetValue(section, L"code");
-            if (codeVal)
             {
-                std::vector<std::wstring> values;
-                stringtok(values, codeVal, true, L" ");
-                for (const auto& v : values)
-                    acMap[CUnicodeUtils::StdGetUTF8(v)] = AutoCompleteType::Code;
+                std::map<std::string, AutoCompleteType> acMap;
+                const auto*                             codeVal = ini->GetValue(section, L"code");
+                if (codeVal)
+                {
+                    std::vector<std::wstring> values;
+                    stringtok(values, codeVal, true, L" ");
+                    for (const auto& v : values)
+                        acMap[CUnicodeUtils::StdGetUTF8(v)] = AutoCompleteType::Code;
+                }
+                std::lock_guard<std::mutex> lockGuard(m_mutex);
+                m_langWordlist[CUnicodeUtils::StdGetUTF8(section)] = std::move(acMap);
             }
-            std::lock_guard<std::mutex> lockGuard(m_mutex);
-            m_langWordlist[CUnicodeUtils::StdGetUTF8(section)] = std::move(acMap);
+
+            {
+                std::list<const wchar_t*> keys;
+                ini->GetAllKeys(section, keys);
+                auto csMap = m_langSnippetList[CUnicodeUtils::StdGetUTF8(section)];
+
+                for (const auto& key : keys)
+                {
+                    if (_wcsnicmp(key, L"snippet_", 8) == 0)
+                    {
+                        const auto* snippetVal = ini->GetValue(section, key);
+                        if (snippetVal)
+                        {
+                            auto snipp       = CUnicodeUtils::StdGetUTF8(key);
+                            auto sSnippetVal = CUnicodeUtils::StdGetUTF8(snippetVal);
+                            SearchReplace(sSnippetVal, "\\r\\n", "\n");
+                            SearchReplace(sSnippetVal, "\\n", "\n");
+                            csMap[snipp.substr(8)] = sSnippetVal;
+                        }
+                    }
+                }
+
+                std::lock_guard<std::mutex> lockGuard(m_mutex);
+                m_langSnippetList[CUnicodeUtils::StdGetUTF8(section)] = std::move(csMap);
+            }
         }
     }
 }
@@ -230,6 +257,94 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
         case SCN_CHARADDED:
             HandleAutoComplete(scn);
             break;
+        case SCN_AUTOCSELECTION:
+        {
+            m_insertingSnippet = true;
+            OnOutOfScope(m_insertingSnippet = false);
+            if (scn && scn->text)
+            {
+                std::string sText = scn->text;
+                if (!sText.empty())
+                {
+                    m_editor->Call(SCI_AUTOCCANCEL);
+
+                    auto colonPos = sText.find(':');
+                    if (colonPos != std::string::npos)
+                    {
+                        auto        sKey = sText.substr(0, colonPos);
+                        std::string sSnippet;
+                        {
+                            std::lock_guard<std::mutex> lockGuard(m_mutex);
+                            auto                        docID      = m_main->m_TabBar.GetCurrentTabId();
+                            auto                        lang       = m_main->m_DocManager.GetDocumentFromID(docID).GetLanguage();
+                            const auto&                 snippetMap = m_langSnippetList[lang];
+                            auto                        foundIt    = snippetMap.find(sKey);
+                            if (foundIt != snippetMap.end())
+                            {
+                                sSnippet = foundIt->second;
+                            }
+                        }
+                        if (!sSnippet.empty())
+                        {
+                            auto autoBrace = CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1);
+                            CIniSettings::Instance().SetInt64(L"View", L"autobrace", 0);
+                            OnOutOfScope(CIniSettings::Instance().SetInt64(L"View", L"autobrace", autoBrace));
+                            auto pos = m_editor->Call(SCI_GETCURRENTPOS);
+                            m_editor->Call(SCI_BEGINUNDOACTION);
+                            m_editor->Call(SCI_SETSELECTION, scn->position, pos);
+                            m_editor->Call(SCI_DELETERANGE, scn->position, pos - scn->position);
+                            auto eolMode = m_editor->Call(SCI_GETEOLMODE);
+
+                            sptr_t cursorPos = -1;
+                            for (const auto& c : sSnippet)
+                            {
+                                if (c == '^')
+                                    cursorPos = m_editor->Call(SCI_GETCURRENTPOS);
+                                else
+                                {
+                                    if (c == '\n')
+                                    {
+                                        switch (eolMode)
+                                        {
+                                            case SC_EOL_CRLF:
+                                            {
+                                                char text[] = {'\r', '\n', 0};
+                                                m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
+                                            }
+                                            break;
+                                            case SC_EOL_LF:
+                                            {
+                                                char text[] = {'\n', 0};
+                                                m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
+                                            }
+                                            break;
+                                            case SC_EOL_CR:
+                                            {
+                                                char text[] = {'\r', 0};
+                                                m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
+                                            }
+                                            break;
+                                        }
+                                        m_main->IndentToLastLine();
+                                    }
+                                    else
+                                    {
+                                        char text[] = {c, 0};
+                                        m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
+                                    }
+                                }
+                            }
+                            if (cursorPos >= 0)
+                            {
+                                m_editor->Call(SCI_SETSELECTION, cursorPos, cursorPos);
+                            }
+                            m_editor->Call(SCI_ENDUNDOACTION);
+                        }
+                    }
+                }
+            }
+        }
+        break;
     }
 }
 
@@ -262,7 +377,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
     static constexpr auto wordSeparator = '\n';
     static constexpr auto typeSeparator = '?';
 
-    if (m_editor->Call(SCI_AUTOCACTIVE))
+    if (m_insertingSnippet)
         return;
     auto pos = m_editor->Call(SCI_GETCURRENTPOS);
     if (pos != m_editor->Call(SCI_WORDENDPOSITION, pos, TRUE))
@@ -275,6 +390,9 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
     std::wstring pathToMatch, rawPath;
     if (getPathsForPathCompletion(currentLine, rawPath, pathToMatch))
     {
+        if (m_editor->Call(SCI_AUTOCACTIVE))
+            return;
+
         auto lineStartPos = m_editor->Call(SCI_POSITIONFROMLINE, m_editor->Call(SCI_LINEFROMPOSITION, pos));
         if (currentLine.find(rawPath) == (pos - lineStartPos - CUnicodeUtils::StdGetUTF8(rawPath).size()))
         {
@@ -299,9 +417,10 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             }
             if (!pathComplete.empty())
             {
-                m_editor->Call(SCI_AUTOCSETSEPARATOR, (WPARAM)wordSeparator);
-                m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, (WPARAM)typeSeparator);
-                m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), (LPARAM)pathComplete.c_str());
+                m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
+                m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<WPARAM>(wordSeparator));
+                m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<WPARAM>(typeSeparator));
+                m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), reinterpret_cast<LPARAM>(pathComplete.c_str()));
                 return;
             }
         }
@@ -333,19 +452,20 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                     } while (inner && pos2 > 0);
                     std::string tagName;
                     auto        position = pos2 + 1;
-                    int         nextChar = (int)m_editor->Call(SCI_GETCHARAT, position);
+                    int         nextChar = static_cast<int>(m_editor->Call(SCI_GETCHARAT, position));
                     while (position < pos && !m_editor->IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                     {
-                        tagName.push_back((char)nextChar);
+                        tagName.push_back(static_cast<char>(nextChar));
                         ++position;
-                        nextChar = (int)m_editor->Call(SCI_GETCHARAT, position);
+                        nextChar = static_cast<int>(m_editor->Call(SCI_GETCHARAT, position));
                     }
                     if (!tagName.empty())
                     {
                         tagName = tagName + ">" + typeSeparator + "-1";
-                        m_editor->Call(SCI_AUTOCSETSEPARATOR, (WPARAM)wordSeparator);
-                        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, (WPARAM)typeSeparator);
-                        m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), (LPARAM)tagName.c_str());
+                        m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
+                        m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<WPARAM>(wordSeparator));
+                        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<WPARAM>(typeSeparator));
+                        m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), reinterpret_cast<LPARAM>(tagName.c_str()));
                         return;
                     }
                 }
@@ -355,8 +475,42 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 break;
         }
     }
-    if (CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1))
+    if (word.empty() && pos > 2)
     {
+        if (m_editor->Call(SCI_GETCHARAT, pos - 1) == ' ')
+        {
+            auto startPos = m_editor->Call(SCI_WORDSTARTPOSITION, pos - 2, true);
+            auto endPos   = m_editor->Call(SCI_WORDENDPOSITION, pos - 2, true);
+            word          = m_editor->GetTextRange(startPos, endPos);
+
+            if (!word.empty())
+            {
+                std::string sAutoCompleteString;
+                {
+                    std::lock_guard<std::mutex> lockGuard(m_mutex);
+                    auto                        docID      = m_main->m_TabBar.GetCurrentTabId();
+                    auto                        lang       = m_main->m_DocManager.GetDocumentFromID(docID).GetLanguage();
+                    const auto&                 snippetMap = m_langSnippetList[lang];
+                    auto                        foundIt    = snippetMap.find(word);
+                    if (foundIt != snippetMap.end())
+                    {
+                        auto sVal = foundIt->second;
+                        SearchReplace(sVal, "\n", " ");
+                        sAutoCompleteString = CStringUtils::Format("%s: %s", foundIt->first.c_str(), sVal.c_str());
+                    }
+                }
+                m_editor->Call(SCI_AUTOCSETAUTOHIDE, FALSE);
+                m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<WPARAM>(wordSeparator));
+                m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<WPARAM>(typeSeparator));
+                m_editor->Call(SCI_AUTOCSHOW, word.size() + 1, reinterpret_cast<LPARAM>(sAutoCompleteString.c_str()));
+            }
+        }
+    }
+    else if (CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1))
+    {
+        if (m_editor->Call(SCI_AUTOCACTIVE))
+            return;
+
         std::map<std::string, AutoCompleteType> wordset;
         {
             std::lock_guard<std::mutex> lockGuard(m_mutex);
@@ -371,9 +525,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 for (auto lowerit = list.lower_bound(word); lowerit != list.end(); ++lowerit)
                 {
                     int compare = _strnicmp(word.c_str(), lowerit->first.c_str(), word.size());
-                    if (compare > 0)
-                        continue;
-                    else if (compare == 0)
+                    if (compare == 0)
                     {
                         wordset.emplace(lowerit->first, lowerit->second);
                     }
@@ -393,8 +545,9 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
         if (sAutoCompleteList.size() > 1)
             sAutoCompleteList[sAutoCompleteList.size() - 1] = 0;
 
-        m_editor->Call(SCI_AUTOCSETSEPARATOR, (WPARAM)wordSeparator);
-        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, (WPARAM)typeSeparator);
-        m_editor->Call(SCI_AUTOCSHOW, word.size(), (LPARAM)sAutoCompleteList.c_str());
+        m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
+        m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<WPARAM>(wordSeparator));
+        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<WPARAM>(typeSeparator));
+        m_editor->Call(SCI_AUTOCSHOW, word.size(), reinterpret_cast<LPARAM>(sAutoCompleteList.c_str()));
     }
 }

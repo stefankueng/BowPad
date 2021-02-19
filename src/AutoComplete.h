@@ -17,7 +17,6 @@
 #pragma once
 #include <mutex>
 
-
 class CMainWindow;
 class CScintillaWnd;
 class DocID;
@@ -34,7 +33,7 @@ class CAutoComplete
 {
 public:
     CAutoComplete(CMainWindow* main, CScintillaWnd* scintilla);
-    ~CAutoComplete();
+    virtual ~CAutoComplete();
 
     void Init();
     void HandleScintillaEvents(const SCNotification* scn);
@@ -51,6 +50,8 @@ private:
     CMainWindow*   m_main;
     // map of [language, [word, AutoCompleteType]]
     std::map<std::string, std::map<std::string, AutoCompleteType>> m_langWordlist;
+    std::map<std::string, std::map<std::string, std::string>>      m_langSnippetList;
     std::map<DocID, std::map<std::string, AutoCompleteType>>       m_docWordlist;
     std::mutex                                                     m_mutex;
+    bool                                                           m_insertingSnippet;
 };
