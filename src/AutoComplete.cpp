@@ -22,7 +22,6 @@
 #include "ScintillaWnd.h"
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
-#include "PathUtils.h"
 #include "DirFileEnum.h"
 #include "SmartHandle.h"
 #include "OnOutOfScope.h"
@@ -345,6 +344,21 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
             }
         }
         break;
+        case SCN_AUTOCSELECTIONCHANGE:
+        {
+            if (scn->text == nullptr || scn->text[0] == 0)
+            {
+                if (!m_stringToSelect.empty())
+                {
+                    m_editor->Call(SCI_AUTOCSELECT, 0, reinterpret_cast<sptr_t>(m_stringToSelect.c_str()));
+                }
+            }
+        }
+        break;
+        case SCN_AUTOCCANCELLED:
+        case SCN_AUTOCCOMPLETED:
+            m_stringToSelect.clear();
+            break;
     }
 }
 
@@ -418,8 +432,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             if (!pathComplete.empty())
             {
                 m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
-                m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<WPARAM>(wordSeparator));
-                m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<WPARAM>(typeSeparator));
+                m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
+                m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
                 m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), reinterpret_cast<LPARAM>(pathComplete.c_str()));
                 return;
             }
@@ -463,8 +477,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                     {
                         tagName = tagName + ">" + typeSeparator + "-1";
                         m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
-                        m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<WPARAM>(wordSeparator));
-                        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<WPARAM>(typeSeparator));
+                        m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
+                        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
                         m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), reinterpret_cast<LPARAM>(tagName.c_str()));
                         return;
                     }
@@ -494,15 +508,16 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                     auto                        foundIt    = snippetMap.find(word);
                     if (foundIt != snippetMap.end())
                     {
-                        auto sVal = foundIt->second;
+                        auto sVal        = foundIt->second;
+                        m_stringToSelect = foundIt->first;
                         SearchReplace(sVal, "\n", " ");
                         sAutoCompleteString = CStringUtils::Format("%s: %s", foundIt->first.c_str(), sVal.c_str());
                     }
                 }
                 m_editor->Call(SCI_AUTOCSETAUTOHIDE, FALSE);
-                m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<WPARAM>(wordSeparator));
-                m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<WPARAM>(typeSeparator));
-                m_editor->Call(SCI_AUTOCSHOW, word.size() + 1, reinterpret_cast<LPARAM>(sAutoCompleteString.c_str()));
+                m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
+                m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+                m_editor->Call(SCI_AUTOCSHOW, word.size() + 1, reinterpret_cast<sptr_t>(sAutoCompleteString.c_str()));
             }
         }
     }
@@ -546,8 +561,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             sAutoCompleteList[sAutoCompleteList.size() - 1] = 0;
 
         m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
-        m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<WPARAM>(wordSeparator));
-        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<WPARAM>(typeSeparator));
-        m_editor->Call(SCI_AUTOCSHOW, word.size(), reinterpret_cast<LPARAM>(sAutoCompleteList.c_str()));
+        m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
+        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+        m_editor->Call(SCI_AUTOCSHOW, word.size(), reinterpret_cast<sptr_t>(sAutoCompleteList.c_str()));
     }
 }

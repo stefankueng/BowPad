@@ -54,4 +54,5 @@ private:
     std::map<DocID, std::map<std::string, AutoCompleteType>>       m_docWordList;
     std::mutex                                                     m_mutex;
     bool                                                           m_insertingSnippet;
+    std::string                                                    m_stringToSelect;
 };
