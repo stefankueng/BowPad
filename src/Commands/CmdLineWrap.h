@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2019-2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2019-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,18 +39,18 @@ public:
 
     void BeforeLoad() override
     {
-        int wrapmode = (int)CIniSettings::Instance().GetInt64(L"View", L"wrapmode", 0);
+        int wrapmode = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"wrapmode", 0));
         ScintillaCall(SCI_SETWRAPMODE, wrapmode);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
     UINT GetCmdId() override { return cmdLineWrap; }
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override
     {
         if (UI_PKEY_BooleanValue == key)
         {
-            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETWRAPMODE) > 0, ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETWRAPMODE) > 0, pPropVarNewValue);
         }
         return E_NOTIMPL;
     }
@@ -81,7 +81,7 @@ public:
 
     void BeforeLoad() override
     {
-        int wrapIndent = (int)CIniSettings::Instance().GetInt64(L"View", L"wrapmodeindent", 0);
+        int wrapIndent = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"wrapmodeindent", 0));
         ScintillaCall(SCI_SETWRAPSTARTINDENT, wrapIndent ? max(1, ScintillaCall(SCI_GETTABWIDTH) / 2) : 0);
         ScintillaCall(SCI_SETWRAPINDENTMODE, wrapIndent ? SC_WRAPINDENT_INDENT : SC_WRAPINDENT_FIXED);
         ScintillaCall(SCI_SETWRAPVISUALFLAGS, wrapIndent ? SC_WRAPVISUALFLAG_START | SC_WRAPVISUALFLAG_END : SC_WRAPVISUALFLAG_END);
@@ -92,11 +92,11 @@ public:
 
     UINT GetCmdId() override { return cmdLineWrapIndent; }
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override
     {
         if (UI_PKEY_BooleanValue == key)
         {
-            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETWRAPSTARTINDENT) > 0, ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETWRAPSTARTINDENT) > 0, pPropVarNewValue);
         }
         return E_NOTIMPL;
     }

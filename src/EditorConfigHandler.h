@@ -26,8 +26,8 @@ class EditorConfigData
 {
 public:
     EditorConfigData()
-        : enabled(true)
-        , handle(nullptr)
+        : handle(nullptr)
+        , enabled(true)
     { }
 
     editorconfig_handle handle;

@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,57 +20,57 @@
 #include "BowPadUI.h"
 #include "BaseDialog.h"
 #include "DlgResizer.h"
-#include "ScintillaWnd.h"
 
 class PluginInfo
 {
 public:
     PluginInfo()
         : version(0)
-        , minversion(0200)
-        , installedversion(0)
-    {}
+        , minVersion(0200)
+        , installedVersion(0)
+    {
+    }
 
-    std::wstring        name;
-    int                 version;
-    int                 minversion;
-    int                 installedversion;
-    std::wstring        description;
+    std::wstring name;
+    int          version;
+    int          minVersion;
+    int          installedVersion;
+    std::wstring description;
 };
 
-class CPluginsConfigDlg : public CDialog, public ICommand
+class CPluginsConfigDlg : public CDialog
+    , public ICommand
 {
 public:
-    CPluginsConfigDlg(void * obj);
+    CPluginsConfigDlg(void* obj);
     ~CPluginsConfigDlg() = default;
 
 protected:
-    LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT                 DoCommand(int id, int msg);
-    LRESULT                 DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
-    void                    InitPluginsList();
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT          DoCommand(int id, int msg);
+    LRESULT          DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
+    void             InitPluginsList();
 
     bool Execute() override { return true; }
     UINT GetCmdId() override { return 0; }
-private:
-    CDlgResizer                         m_resizer;
-    std::vector<PluginInfo>             m_plugins;
-    bool                                m_threadEnded;
-};
 
+private:
+    CDlgResizer             m_resizer;
+    std::vector<PluginInfo> m_plugins;
+    bool                    m_threadEnded;
+};
 
 class CCmdPluginsConfig : public ICommand
 {
 public:
-
-    CCmdPluginsConfig(void * obj)
+    CCmdPluginsConfig(void* obj)
         : ICommand(obj)
-    {}
+    {
+    }
 
     ~CCmdPluginsConfig() = default;
 
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdPluginConfig; }
-
 };

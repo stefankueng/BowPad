@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,27 +19,25 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 #include "BaseDialog.h"
-#include "DlgResizer.h"
 
 class CGotoLineDlg : public CDialog
 {
 public:
     CGotoLineDlg();
-    ~CGotoLineDlg() = default;
+    virtual ~CGotoLineDlg() = default;
 
-    sptr_t                  line;
-    std::wstring            lineinfo;
+    sptr_t       line;
+    std::wstring lineInfo;
+
 protected:
-    LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT                 DoCommand(int id, int msg);
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT          DoCommand(int id, int msg);
 };
-
 
 class CCmdGotoLine : public ICommand
 {
 public:
-
-    CCmdGotoLine(void * obj)
+    CCmdGotoLine(void* obj)
         : ICommand(obj)
     {
     }
@@ -50,4 +48,3 @@ public:
 
     UINT GetCmdId() override { return cmdGotoLine; }
 };
-

@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,25 +19,22 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 #include "BaseDialog.h"
-#include "DlgResizer.h"
 
 class CDefaultEncodingDlg : public CDialog
 {
 public:
-    CDefaultEncodingDlg() = default;
-    ~CDefaultEncodingDlg() = default;
+    CDefaultEncodingDlg()          = default;
+    virtual ~CDefaultEncodingDlg() = default;
 
 protected:
-    LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT                 DoCommand(int id, int msg);
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT          DoCommand(int id, int msg);
 };
-
 
 class CCmdDefaultEncoding : public ICommand
 {
 public:
-
-    CCmdDefaultEncoding(void * obj)
+    CCmdDefaultEncoding(void* obj)
         : ICommand(obj)
     {
     }
@@ -48,4 +45,3 @@ public:
 
     UINT GetCmdId() override { return cmdNewDefault; }
 };
-

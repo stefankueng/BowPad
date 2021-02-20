@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013 - 2014, 2016 Stefan Kueng
+// Copyright (C) 2013 - 2014, 2016, 2021 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,9 +41,9 @@ public:
     void                            PinPath(const std::wstring& path, bool bPin);
 
 private:
-    std::wstring                    GetMRUFilename() const;
-    void                            Load();
-    void                            Save();
+    static std::wstring GetMRUFilename();
+    void                Load();
+    void                Save();
 
 private:
     bool                            m_bLoaded;

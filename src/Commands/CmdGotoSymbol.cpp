@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,11 +16,10 @@
 //
 #include "stdafx.h"
 #include "CmdGotoSymbol.h"
-#include "BowPad.h"
 #include "UnicodeUtils.h"
 #include "LexStyles.h"
 
-extern void FindReplace_FindFunction(void *mainWnd, const std::wstring& functionName);
+extern void findReplaceFindFunction(void* mainWnd, const std::wstring& functionName);
 
 CCmdGotoSymbol::CCmdGotoSymbol(void* obj)
     : ICommand(obj)
@@ -30,28 +29,28 @@ CCmdGotoSymbol::CCmdGotoSymbol(void* obj)
 bool CCmdGotoSymbol::Execute()
 {
     std::wstring symbolName = CUnicodeUtils::StdGetUnicode(GetSelectedText(true));
-    FindReplace_FindFunction(m_pMainWindow, symbolName);
+    findReplaceFindFunction(m_pMainWindow, symbolName);
     return true;
 }
 
-HRESULT CCmdGotoSymbol::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT * /*ppropvarCurrentValue*/, PROPVARIANT * ppropvarNewValue)
+HRESULT CCmdGotoSymbol::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
         if (HasActiveDocument())
         {
-            const auto& doc = GetActiveDocument();
+            const auto& doc       = GetActiveDocument();
             const auto& funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.GetLanguage());
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), pPropVarNewValue);
         }
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
 
-void CCmdGotoSymbol::TabNotify(TBHDR * ptbhdr)
+void CCmdGotoSymbol::TabNotify(TBHDR* ptbHdr)
 {
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
 }
 

@@ -49,9 +49,9 @@ private:
     CScintillaWnd* m_editor;
     CMainWindow*   m_main;
     // map of [language, [word, AutoCompleteType]]
-    std::map<std::string, std::map<std::string, AutoCompleteType>> m_langWordlist;
+    std::map<std::string, std::map<std::string, AutoCompleteType>> m_langWordList;
     std::map<std::string, std::map<std::string, std::string>>      m_langSnippetList;
-    std::map<DocID, std::map<std::string, AutoCompleteType>>       m_docWordlist;
+    std::map<DocID, std::map<std::string, AutoCompleteType>>       m_docWordList;
     std::mutex                                                     m_mutex;
     bool                                                           m_insertingSnippet;
 };

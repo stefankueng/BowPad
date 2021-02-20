@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2016-2018 - Stefan Kueng
+// Copyright (C) 2013, 2016-2018, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,21 +16,8 @@
 //
 #pragma once
 
-#include <stdlib.h>
 #include <iterator>
-#include <vector>
-#include "scintilla.h"
-#include "../ext/scintilla/include/ILoader.h"
 #define PLATFORM_ASSERT(c) ((void)0)
-#include "../ext/scintilla/src/SplitVector.h"
-#include "../ext/scintilla/src/Partitioning.h"
-#include "../ext/scintilla/src/RunStyles.h"
-#include "../ext/scintilla/src/CellBuffer.h"
-#include "../ext/scintilla/src/CharClassify.h"
-#include "../ext/scintilla/src/Decoration.h"
-#include "../ext/scintilla/src/CaseFolder.h"
-#include "ILexer.h"
-#include "../ext/scintilla/src/RESearch.h"
 #include "../ext/scintilla/src/Document.h"
 #include "../ext/scintilla/src/uniconversion.h"
 #include "../ext/scintilla/src/Position.h"
@@ -46,14 +33,16 @@ class UTF8DocumentIterator
     size_t lenCharacters;
     wchar_t buffered[2];
 public:
+    // ReSharper disable CppInconsistentNaming
     typedef std::bidirectional_iterator_tag iterator_category;
     typedef wchar_t value_type;
     typedef ptrdiff_t difference_type;
     typedef wchar_t* pointer;
     typedef wchar_t& reference;
+    // ReSharper restore CppInconsistentNaming
 
-    UTF8DocumentIterator(const Scintilla::Document *doc_ = 0, Sci::Position position_ = 0) :
-        doc(doc_), position(position_), characterIndex(0), lenBytes(0), lenCharacters(0)
+    UTF8DocumentIterator(const Scintilla::Document *doc = nullptr, Sci::Position position = 0) :
+        doc(doc), position(position), characterIndex(0), lenBytes(0), lenCharacters(0)
     {
         buffered[0] = 0;
         buffered[1] = 0;

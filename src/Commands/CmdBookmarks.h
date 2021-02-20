@@ -110,10 +110,10 @@ public:
     void ScintillaNotify(SCNotification* pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(
-        REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-    void TabNotify(TBHDR* ptbhdr) override
+        REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
+    void TabNotify(TBHDR* ptbHdr) override
     {
-        if (ptbhdr->hdr.code == TCN_SELCHANGE)
+        if (ptbHdr->hdr.code == TCN_SELCHANGE)
         {
             InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
         }
@@ -141,10 +141,10 @@ public:
     void ScintillaNotify(SCNotification* pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(
-        REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-    void TabNotify(TBHDR* ptbhdr) override
+        REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
+    void TabNotify(TBHDR* ptbHdr) override
     {
-        if (ptbhdr->hdr.code == TCN_SELCHANGE)
+        if (ptbHdr->hdr.code == TCN_SELCHANGE)
         {
             InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
         }

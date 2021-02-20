@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018, 2020 - Stefan Kueng
+// Copyright (C) 2014-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,19 +26,20 @@
 #include "CommandHandler.h"
 #include "version.h"
 #include "Theme.h"
+#include "ResString.h"
 
 #include <future>
 #include <fstream>
 #include <locale>
-#include <codecvt>
 #include <VersionHelpers.h>
 
 const int WM_INITPLUGINS = (WM_APP + 10);
 
-CPluginsConfigDlg::CPluginsConfigDlg(void * obj)
+CPluginsConfigDlg::CPluginsConfigDlg(void* obj)
     : ICommand(obj)
     , m_threadEnded(false)
-{}
+{
+}
 
 LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -61,39 +62,38 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
             SetWindowTheme(GetDlgItem(*this, IDC_PLUGINSLIST), L"Explorer", nullptr);
 
             HWND hThisWnd = *this;
-            std::thread([hThisWnd]
-            {
+            std::thread([hThisWnd] {
                 CDownloadFile filedownloader(L"BowPad", nullptr);
-                std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
+                std::wstring  tempfile = CTempFiles::Instance().GetTempFilePath(true);
                 filedownloader.DownloadFile(L"https://raw.githubusercontent.com/stefankueng/BowPad/main/plugins/plugins.txt", tempfile);
 
                 // parse the file and fill in the m_plugins set
-                auto plugins = std::make_unique<std::map<std::wstring, PluginInfo>>();
+                auto          plugins = std::make_unique<std::map<std::wstring, PluginInfo>>();
                 std::ifstream fin(tempfile);
                 if (fin.is_open())
                 {
                     std::string lineA;
                     while (std::getline(fin, lineA))
                     {
-                        auto line = CUnicodeUtils::StdGetUnicode(lineA);
+                        auto       line = CUnicodeUtils::StdGetUnicode(lineA);
                         PluginInfo info;
                         info.name = line;
                         if (std::getline(fin, lineA))
                         {
-                            line = CUnicodeUtils::StdGetUnicode(lineA);
+                            line         = CUnicodeUtils::StdGetUnicode(lineA);
                             info.version = _wtoi(line.c_str());
                             if (std::getline(fin, lineA))
                             {
-                                line = CUnicodeUtils::StdGetUnicode(lineA);
-                                info.minversion = _wtoi(line.c_str());
+                                line            = CUnicodeUtils::StdGetUnicode(lineA);
+                                info.minVersion = _wtoi(line.c_str());
                                 if (std::getline(fin, lineA))
                                 {
-                                    line = CUnicodeUtils::StdGetUnicode(lineA);
+                                    line             = CUnicodeUtils::StdGetUnicode(lineA);
                                     info.description = line;
                                     SearchReplace(info.description, L"\\n", L"\r\n");
 
-                                    info.installedversion = CCommandHandler::Instance().GetPluginVersion(info.name);
-                                    if (info.minversion <= (BP_VERMAJOR * 100 + BP_VERMINOR))
+                                    info.installedVersion = CCommandHandler::Instance().GetPluginVersion(info.name);
+                                    if (info.minVersion <= (BP_VERMAJOR * 100 + BP_VERMINOR))
                                         (*plugins)[info.name] = info;
                                 }
                             }
@@ -101,7 +101,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
                     }
                     fin.close();
                 }
-                PostMessage(hThisWnd, WM_INITPLUGINS, WPARAM(0), LPARAM(plugins.release()));
+                PostMessage(hThisWnd, WM_INITPLUGINS, 0, reinterpret_cast<LPARAM>(plugins.release()));
             }).detach();
         }
             return FALSE;
@@ -109,8 +109,8 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
         {
             std::unique_ptr<std::map<std::wstring, PluginInfo>> plugins(
                 reinterpret_cast<std::map<std::wstring, PluginInfo>*>(lParam));
-            for (const auto& plugin : *plugins)
-                m_plugins.push_back(plugin.second);
+            for (const auto& [name, pluginInfo] : *plugins)
+                m_plugins.push_back(pluginInfo);
             InitPluginsList();
             m_threadEnded = true;
             break;
@@ -124,9 +124,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
             switch (wParam)
             {
                 case IDC_PLUGINSLIST:
-                    return DoListNotify((LPNMITEMACTIVATE)lParam);
-                default:
-                    return FALSE;
+                    return DoListNotify(reinterpret_cast<LPNMITEMACTIVATE>(lParam));
             }
             return FALSE;
     }
@@ -139,24 +137,23 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
     {
         case IDOK:
         {
-            bool bChanged = false;
-            int index = 0;
+            bool bChanged  = false;
+            int  index     = 0;
             HWND hListCtrl = GetDlgItem(*this, IDC_PLUGINSLIST);
             for (const auto& info : m_plugins)
             {
-                if (info.minversion <= (BP_VERMAJOR * 100 + BP_VERMINOR))
+                if (info.minVersion <= (BP_VERMAJOR * 100 + BP_VERMINOR))
                 {
                     if (ListView_GetCheckState(hListCtrl, index))
                     {
-                        if (info.version > info.installedversion)
+                        if (info.version > info.installedVersion)
                         {
                             CDownloadFile filedownloader(L"BowPad", nullptr);
-                            std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true, L".zip");
-                            std::wstring pluginurl = L"https://raw.githubusercontent.com/stefankueng/BowPad/main/plugins/";
+                            std::wstring  tempfile  = CTempFiles::Instance().GetTempFilePath(true, L".zip");
+                            std::wstring  pluginurl = L"https://raw.githubusercontent.com/stefankueng/BowPad/main/plugins/";
                             pluginurl += info.name;
                             pluginurl += L".zip";
                             filedownloader.DownloadFile(pluginurl, tempfile);
-
 
                             //std::wstring pluginlocal = L"D:\\Development\\BowPad\\BowPad\\plugins\\";
                             //pluginlocal += info.name;
@@ -168,22 +165,22 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                             if (!CPathUtils::Unzip2Folder(tempfile.c_str(), pluginsdir.c_str()))
                             {
                                 // failed to unzip/install the plugin
-                                ResString rPluginInstallFailed(g_hRes, IDS_PLUGINS_INSTALLFAILED);
-                                std::wstring sMsg = CStringUtils::Format((LPCWSTR)rPluginInstallFailed, info.name.c_str());
+                                ResString    rPluginInstallFailed(g_hRes, IDS_PLUGINS_INSTALLFAILED);
+                                std::wstring sMsg = CStringUtils::Format(static_cast<LPCWSTR>(rPluginInstallFailed), info.name.c_str());
                                 MessageBox(GetHwnd(), sMsg.c_str(), L"BowPad", MB_ICONINFORMATION);
                             }
                             else
                                 bChanged = true;
                         }
                     }
-                    else if (info.installedversion > 0)
+                    else if (info.installedVersion > 0)
                     {
                         // remove the already installed plugin
                         std::wstring pluginsdir = CAppUtils::GetDataPath() + L"\\plugins\\";
                         pluginsdir += info.name;
 
                         IFileOperationPtr pfo = nullptr;
-                        HRESULT hr = pfo.CreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL);
+                        HRESULT           hr  = pfo.CreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL);
 
                         if (!CAppUtils::FailedShowMessage(hr))
                         {
@@ -197,7 +194,7 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                             {
                                 // Create IShellItem instance associated to file to delete
                                 IShellItemPtr psiFileToDelete = nullptr;
-                                hr = SHCreateItemFromParsingName(pluginsdir.c_str(), nullptr, IID_PPV_ARGS(&psiFileToDelete));
+                                hr                            = SHCreateItemFromParsingName(pluginsdir.c_str(), nullptr, IID_PPV_ARGS(&psiFileToDelete));
 
                                 if (!CAppUtils::FailedShowMessage(hr))
                                 {
@@ -224,10 +221,10 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
             if (bChanged)
             {
                 ResString rRestartRequired(g_hRes, IDS_PLUGINS_RESTARTREQUIRED);
-                MessageBox(GetHwnd(), (LPCWSTR)rRestartRequired, L"BowPad", MB_ICONINFORMATION);
+                MessageBox(GetHwnd(), static_cast<LPCWSTR>(rRestartRequired), L"BowPad", MB_ICONINFORMATION);
             }
         }
-            // intentional fall through
+            [[fallthrough]];
         case IDCANCEL:
             EndDialog(*this, id);
             break;
@@ -241,7 +238,7 @@ LRESULT CPluginsConfigDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
     {
         case NM_CLICK:
         {
-            if (lpNMItemActivate->iItem < 0 || lpNMItemActivate->iItem >= (int)m_plugins.size())
+            if (lpNMItemActivate->iItem < 0 || lpNMItemActivate->iItem >= static_cast<int>(m_plugins.size()))
             {
                 SetDlgItemText(*this, IDC_DESC, L"");
                 return 0;
@@ -252,26 +249,24 @@ LRESULT CPluginsConfigDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
         break;
         case LVN_GETEMPTYMARKUP:
         {
-            NMLVEMPTYMARKUP * lpNMEmptyMarkup = (NMLVEMPTYMARKUP *)lpNMItemActivate;
-            lpNMEmptyMarkup->dwFlags = EMF_CENTERED;
+            NMLVEMPTYMARKUP* lpNMEmptyMarkup = reinterpret_cast<NMLVEMPTYMARKUP*>(lpNMItemActivate);
+            lpNMEmptyMarkup->dwFlags         = EMF_CENTERED;
             ResString rThreadIsRunning(g_hRes, IDS_FETCHING_PLUGINS_LIST);
             ResString rEmpty(g_hRes, IDS_NO_PLUGINS_AVAILABLE);
             wcscpy_s(lpNMEmptyMarkup->szMarkup, m_threadEnded ? rEmpty : rThreadIsRunning);
             lpNMEmptyMarkup->szMarkup;
             return TRUE;
         }
-        break;
         default:
-        break;
+            break;
     }
     return 0;
-
 }
 
 void CPluginsConfigDlg::InitPluginsList()
 {
-    HWND hListControl = GetDlgItem(*this, IDC_PLUGINSLIST);
-    DWORD exStyle = LVS_EX_DOUBLEBUFFER | LVS_EX_INFOTIP | LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES;
+    HWND  hListControl = GetDlgItem(*this, IDC_PLUGINSLIST);
+    DWORD exStyle      = LVS_EX_DOUBLEBUFFER | LVS_EX_INFOTIP | LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES;
     SendMessage(hListControl, WM_SETREDRAW, FALSE, 0);
     ListView_DeleteAllItems(hListControl);
 
@@ -285,17 +280,17 @@ void CPluginsConfigDlg::InitPluginsList()
     ResString sVersion(g_hRes, IDS_PLUGINLIST_VERSION);
     ResString sInstVersion(g_hRes, IDS_PLUGINLIST_INSTVERSION);
 
-    LVCOLUMN lvc = { 0 };
-    lvc.mask = LVCF_TEXT | LVCF_FMT;
-    lvc.fmt = LVCFMT_LEFT;
-    lvc.cx = -1;
-    lvc.pszText = const_cast<LPWSTR>((LPCWSTR)sName);
+    LVCOLUMN lvc = {0};
+    lvc.mask     = LVCF_TEXT | LVCF_FMT;
+    lvc.fmt      = LVCFMT_LEFT;
+    lvc.cx       = -1;
+    lvc.pszText  = const_cast<LPWSTR>(static_cast<LPCWSTR>(sName));
     ListView_InsertColumn(hListControl, 0, &lvc);
-    lvc.pszText = const_cast<LPWSTR>((LPCWSTR)sVersion);
-    lvc.fmt = LVCFMT_RIGHT;
+    lvc.pszText = const_cast<LPWSTR>(static_cast<LPCWSTR>(sVersion));
+    lvc.fmt     = LVCFMT_RIGHT;
     ListView_InsertColumn(hListControl, 1, &lvc);
-    lvc.fmt = LVCFMT_LEFT;
-    lvc.pszText = const_cast<LPWSTR>((LPCWSTR)sInstVersion);
+    lvc.fmt     = LVCFMT_LEFT;
+    lvc.pszText = const_cast<LPWSTR>(static_cast<LPCWSTR>(sInstVersion));
     ListView_InsertColumn(hListControl, 2, &lvc);
 
     int index = 0;
@@ -303,16 +298,16 @@ void CPluginsConfigDlg::InitPluginsList()
     {
         wchar_t buf[1024];
         wcscpy_s(buf, info.name.c_str());
-        LVITEM item = { 0 };
-        item.iItem = index;
-        item.mask = LVIF_TEXT;
+        LVITEM item  = {0};
+        item.iItem   = index;
+        item.mask    = LVIF_TEXT;
         item.pszText = buf;
-        index = ListView_InsertItem(hListControl, &item);
+        index        = ListView_InsertItem(hListControl, &item);
         wcscpy_s(buf, CStringUtils::Format(L"%d.%d", info.version / 100, info.version % 100).c_str());
         ListView_SetItemText(hListControl, index, 1, buf);
-        wcscpy_s(buf, CStringUtils::Format(L"%d.%d", info.installedversion / 100, info.installedversion % 100).c_str());
+        wcscpy_s(buf, CStringUtils::Format(L"%d.%d", info.installedVersion / 100, info.installedVersion % 100).c_str());
         ListView_SetItemText(hListControl, index, 2, buf);
-        ListView_SetCheckState(hListControl, index, info.installedversion > 0);
+        ListView_SetCheckState(hListControl, index, info.installedVersion > 0);
         ++index;
     }
 

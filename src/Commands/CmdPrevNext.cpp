@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,11 +35,11 @@ public:
     {
     }
 
-    bool operator==(const PositionData& other)
+    bool operator==(const PositionData& other) const
     {
         return (this->id == other.id && this->line == other.line && this->column == other.column);
     }
-    bool operator!=(const PositionData& other)
+    bool operator!=(const PositionData& other) const
     {
         return (this->id != other.id || this->line != other.line || this->column != other.column);
     }
@@ -142,9 +142,9 @@ void CCmdPrevNext::ScintillaNotify(SCNotification* pScn)
     }
 }
 
-void CCmdPrevNext::TabNotify(TBHDR* ptbhdr)
+void CCmdPrevNext::TabNotify(TBHDR* ptbHdr)
 {
-    switch (ptbhdr->hdr.code)
+    switch (ptbHdr->hdr.code)
     {
         case TCN_SELCHANGE:
         {
@@ -213,12 +213,12 @@ bool CCmdPrevious::Execute()
     return false;
 }
 
-HRESULT CCmdPrevious::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdPrevious::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     // Enabled if there's something to go back to.
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, g_positions.size() > g_offsetBeforeEnd + 1, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, g_positions.size() > g_offsetBeforeEnd + 1, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
@@ -263,12 +263,12 @@ bool CCmdNext::Execute()
     return false;
 }
 
-HRESULT CCmdNext::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdNext::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     // enabled if there's something to go forward to
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, g_offsetBeforeEnd > 0, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, g_offsetBeforeEnd > 0, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }

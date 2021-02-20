@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 #include "stdafx.h"
 #include "DocScroll.h"
 #include "ScintillaWnd.h"
-#include "AppUtils.h"
 #include "Theme.h"
 #include "GDIHelpers.h"
 #include "DPIAware.h"
@@ -64,46 +63,46 @@ static void DrawTriangle(HDC hdc, COLORREF scroll, COLORREF thumb, const RECT& r
 
     Gdiplus::Graphics graphics(hdc);
     graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
-    Gdiplus::Point trianglepts[3] = {};
+    Gdiplus::Point trianglePts[3] = {};
     Gdiplus::Color c2;
     c2.SetFromCOLORREF(thumb);
-    Gdiplus::SolidBrush tribrush(c2);
+    Gdiplus::SolidBrush triBrush(c2);
     auto                margin = (rect.bottom - rect.top) / 3;
     if (uBar == SB_HORZ)
     {
-        trianglepts[0].Y = (rect.top + rect.bottom) / 2;
-        trianglepts[1].Y = rect.top + margin - 1;
-        trianglepts[2].Y = rect.bottom - margin;
-        margin += (trianglepts[2].Y - trianglepts[1].Y) / 6;
+        trianglePts[0].Y = (rect.top + rect.bottom) / 2;
+        trianglePts[1].Y = rect.top + margin - 1;
+        trianglePts[2].Y = rect.bottom - margin;
+        margin += (trianglePts[2].Y - trianglePts[1].Y) / 6;
         if (direction == HTSCROLL_LEFT)
         {
-            trianglepts[0].X = rect.left + margin;
-            trianglepts[1].X = trianglepts[2].X = rect.right - margin;
+            trianglePts[0].X = rect.left + margin;
+            trianglePts[1].X = trianglePts[2].X = rect.right - margin;
         }
         else if (direction == HTSCROLL_RIGHT)
         {
-            trianglepts[0].X = rect.right - margin;
-            trianglepts[1].X = trianglepts[2].X = rect.left + margin;
+            trianglePts[0].X = rect.right - margin;
+            trianglePts[1].X = trianglePts[2].X = rect.left + margin;
         }
     }
     else if (uBar == SB_VERT)
     {
-        trianglepts[0].X = (rect.left + rect.right) / 2;
-        trianglepts[1].X = rect.left + margin - 1;
-        trianglepts[2].X = rect.right - margin;
-        margin += (trianglepts[2].X - trianglepts[1].X) / 6;
+        trianglePts[0].X = (rect.left + rect.right) / 2;
+        trianglePts[1].X = rect.left + margin - 1;
+        trianglePts[2].X = rect.right - margin;
+        margin += (trianglePts[2].X - trianglePts[1].X) / 6;
         if (direction == HTSCROLL_UP)
         {
-            trianglepts[0].Y = rect.top + margin;
-            trianglepts[1].Y = trianglepts[2].Y = rect.bottom - margin;
+            trianglePts[0].Y = rect.top + margin;
+            trianglePts[1].Y = trianglePts[2].Y = rect.bottom - margin;
         }
         else if (direction == HTSCROLL_DOWN)
         {
-            trianglepts[0].Y = rect.bottom - margin;
-            trianglepts[1].Y = trianglepts[2].Y = rect.top + margin;
+            trianglePts[0].Y = rect.bottom - margin;
+            trianglePts[1].Y = trianglePts[2].Y = rect.top + margin;
         }
     }
-    graphics.FillPolygon(&tribrush, trianglepts, 3);
+    graphics.FillPolygon(&triBrush, trianglePts, 3);
 }
 
 CDocScroll::~CDocScroll()
@@ -112,12 +111,12 @@ CDocScroll::~CDocScroll()
 }
 
 CDocScroll::CDocScroll()
-    : m_pScintilla(nullptr)
+    : m_visibleLines(0)
     , m_lines(0)
-    , m_bDirty(false)
-    , m_visibleLines(0)
     , m_curPosVisLine(0)
     , m_curPosColor(0)
+    , m_pScintilla(nullptr)
+    , m_bDirty(false)
     , m_bHotHL(false)
     , m_bHotHR(false)
     , m_bHotHT(false)
@@ -128,12 +127,12 @@ CDocScroll::CDocScroll()
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, nullptr);
 
-    m_AnimVarHL = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
-    m_AnimVarHR = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
-    m_AnimVarHT = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
-    m_AnimVarVL = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
-    m_AnimVarVR = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
-    m_AnimVarVT = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
+    m_animVarHL = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
+    m_animVarHR = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
+    m_animVarHT = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
+    m_animVarVL = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
+    m_animVarVR = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
+    m_animVarVT = Animator::Instance().CreateAnimationVariable(0.0, 1.0);
 }
 
 void CDocScroll::InitScintilla(CScintillaWnd* pScintilla)
@@ -179,9 +178,9 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     if (m_bHotHL != hotNow)
                     {
                         m_bHotHL = hotNow;
-                        AnimateFraction(m_AnimVarHL, hotNow ? 1.0 : 0.0);
+                        AnimateFraction(m_animVarHL, hotNow ? 1.0 : 0.0);
                     }
-                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarHL));
+                    auto thumb = GetThumbColor(Animator::GetValue(m_animVarHL));
                     DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
                                  pCustDraw->nBar, pCustDraw->uItem);
                 }
@@ -192,9 +191,9 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     if (m_bHotHR != hotNow)
                     {
                         m_bHotHR = hotNow;
-                        AnimateFraction(m_AnimVarHR, hotNow ? 1.0 : 0.0);
+                        AnimateFraction(m_animVarHR, hotNow ? 1.0 : 0.0);
                     }
-                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarHR));
+                    auto thumb = GetThumbColor(Animator::GetValue(m_animVarHR));
                     DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
                                  pCustDraw->nBar, pCustDraw->uItem);
                 }
@@ -205,9 +204,9 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     if (m_bHotHT != hotNow)
                     {
                         m_bHotHT = hotNow;
-                        AnimateFraction(m_AnimVarHT, hotNow ? 1.0 : 0.0);
+                        AnimateFraction(m_animVarHT, hotNow ? 1.0 : 0.0);
                     }
-                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarHT));
+                    auto thumb = GetThumbColor(Animator::GetValue(m_animVarHT));
                     DrawThumb(pCustDraw->hdr.hwndFrom, pCustDraw->hdc, thumb, pCustDraw->rect, pCustDraw->nBar);
                 }
                 break;
@@ -228,9 +227,9 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     if (m_bHotVL != hotNow)
                     {
                         m_bHotVL = hotNow;
-                        AnimateFraction(m_AnimVarVL, hotNow ? 1.0 : 0.0);
+                        AnimateFraction(m_animVarVL, hotNow ? 1.0 : 0.0);
                     }
-                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarVL));
+                    auto thumb = GetThumbColor(Animator::GetValue(m_animVarVL));
                     DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
                                  pCustDraw->nBar, pCustDraw->uItem);
                 }
@@ -241,9 +240,9 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     if (m_bHotVR != hotNow)
                     {
                         m_bHotVR = hotNow;
-                        AnimateFraction(m_AnimVarVR, hotNow ? 1.0 : 0.0);
+                        AnimateFraction(m_animVarVR, hotNow ? 1.0 : 0.0);
                     }
-                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarVR));
+                    auto thumb = GetThumbColor(Animator::GetValue(m_animVarVR));
                     DrawTriangle(pCustDraw->hdc, scroll, thumb, pCustDraw->rect,
                                  pCustDraw->nBar, pCustDraw->uItem);
                 }
@@ -254,9 +253,9 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     if (m_bHotVT != hotNow)
                     {
                         m_bHotVT = hotNow;
-                        AnimateFraction(m_AnimVarVT, hotNow ? 1.0 : 0.0);
+                        AnimateFraction(m_animVarVT, hotNow ? 1.0 : 0.0);
                     }
-                    auto thumb = GetThumbColor(Animator::GetValue(m_AnimVarVT));
+                    auto thumb = GetThumbColor(Animator::GetValue(m_animVarVT));
                     DrawThumb(pCustDraw->hdr.hwndFrom, pCustDraw->hdc, thumb, pCustDraw->rect, pCustDraw->nBar);
                 }
                 break;
@@ -266,39 +265,42 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     Gdiplus::Color    c1;
                     c1.SetFromCOLORREF(scroll);
                     Gdiplus::SolidBrush brush(c1);
-                    graphics.FillRectangle(&brush, (INT)pCustDraw->rect.left, (INT)pCustDraw->rect.top, (INT)(pCustDraw->rect.right - pCustDraw->rect.left), (INT)(pCustDraw->rect.bottom - pCustDraw->rect.top));
+                    graphics.FillRectangle(&brush, static_cast<INT>(pCustDraw->rect.left),
+                                           static_cast<INT>(pCustDraw->rect.top),
+                                           static_cast<INT>(pCustDraw->rect.right - pCustDraw->rect.left),
+                                           static_cast<INT>(pCustDraw->rect.bottom - pCustDraw->rect.top));
 
                     if (m_bDirty)
                         CalcLines();
 
                     LONG     lastLinePos = -1;
-                    COLORREF lastColor   = (COLORREF)-1;
-                    int      colcount    = DOCSCROLLTYPE_END;
+                    COLORREF lastColor   = static_cast<COLORREF>(-1);
+                    int      colCount    = DOCSCROLLTYPE_END;
                     int      width       = pCustDraw->rect.right - pCustDraw->rect.left;
-                    int      colwidth    = width / (colcount - 1);
-                    for (int c = 1; c < colcount; ++c)
+                    int      colWidth    = width / (colCount - 1);
+                    for (int c = 1; c < colCount; ++c)
                     {
-                        int drawx = pCustDraw->rect.left + (c - 1) * colwidth;
+                        int drawX = pCustDraw->rect.left + (c - 1) * colWidth;
                         for (const auto& line : m_visibleLineColors[c])
                         {
-                            LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top) * line.first / m_visibleLines);
-                            if ((linepos > (lastLinePos + 1)) || (lastColor != line.second))
+                            LONG linePos = static_cast<LONG>(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top) * line.first / m_visibleLines);
+                            if ((linePos > (lastLinePos + 1)) || (lastColor != line.second))
                             {
                                 Gdiplus::Color c2;
                                 c2.SetFromCOLORREF(line.second);
-                                Gdiplus::SolidBrush brushline(c2);
-                                graphics.FillRectangle(&brushline, drawx, linepos, colwidth, CDPIAware::Instance().Scale(pCustDraw->hdr.hwndFrom, 2));
-                                lastLinePos = linepos;
+                                Gdiplus::SolidBrush brushLine(c2);
+                                graphics.FillRectangle(&brushLine, drawX, linePos, colWidth, CDPIAware::Instance().Scale(pCustDraw->hdr.hwndFrom, 2));
+                                lastLinePos = linePos;
                                 lastColor   = line.second;
                             }
                         }
                     }
-                    LONG linepos = LONG(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top) * m_curPosVisLine / m_visibleLines);
+                    LONG linePos = static_cast<LONG>(pCustDraw->rect.top + (pCustDraw->rect.bottom - pCustDraw->rect.top) * m_curPosVisLine / m_visibleLines);
 
                     Gdiplus::Color c3;
                     c3.SetFromCOLORREF(m_curPosColor);
-                    Gdiplus::SolidBrush brushcurline(c3);
-                    graphics.FillRectangle(&brushcurline, pCustDraw->rect.left, linepos, pCustDraw->rect.right - pCustDraw->rect.left, CDPIAware::Instance().Scale(pCustDraw->hdr.hwndFrom, 2));
+                    Gdiplus::SolidBrush brushCurLine(c3);
+                    graphics.FillRectangle(&brushCurLine, pCustDraw->rect.left, linePos, pCustDraw->rect.right - pCustDraw->rect.left, CDPIAware::Instance().Scale(pCustDraw->hdr.hwndFrom, 2));
                 }
                 break;
             }
@@ -337,12 +339,12 @@ void CDocScroll::AnimateFraction(AnimationVariable& animVar, double endVal)
     {
         storyBoard->AddTransition(animVar.m_animVar, transHot);
         Animator::Instance().RunStoryBoard(storyBoard, [this]() {
-            SetWindowPos(*m_pScintilla, 0, 0, 0, 0, 0,
+            SetWindowPos(*m_pScintilla, nullptr, 0, 0, 0, 0,
                          SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
         });
     }
     else
-        SetWindowPos(*m_pScintilla, 0, 0, 0, 0, 0,
+        SetWindowPos(*m_pScintilla, nullptr, 0, 0, 0, 0,
                      SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
@@ -370,10 +372,10 @@ void CDocScroll::RemoveLine(int type, size_t line)
 void CDocScroll::VisibleLinesChanged()
 {
     auto visibleLines = m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, m_lines);
-    if (m_visibleLines != size_t(visibleLines))
+    if (m_visibleLines != static_cast<size_t>(visibleLines))
     {
         m_bDirty = true;
-        SetWindowPos(*m_pScintilla, 0, 0, 0, 0, 0,
+        SetWindowPos(*m_pScintilla, nullptr, 0, 0, 0, 0,
                      SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_DRAWFRAME);
     }
 }

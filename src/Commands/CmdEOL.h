@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@ protected:
     // Don't do anything in this base, like call InvalidateUICommand which
     // might result in a virtual call and the derived class won't be setup.
     CCmdEOLBase(void* obj) : ICommand(obj) {}
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-    void TabNotify(TBHDR* ptbhdr) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
+    void TabNotify(TBHDR* ptbHdr) override;
     bool Execute() override;
     virtual int GetLineType() const = 0;
 };

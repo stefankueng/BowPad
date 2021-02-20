@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2020 - Stefan Kueng
+// Copyright (C) 2013-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 //
 #include "stdafx.h"
 #include "TabBar.h"
-#include "resource.h"
 #include "AppUtils.h"
 #include "Theme.h"
 #include "BowPad.h"
@@ -29,7 +28,6 @@
 #include <gdiplus.h>
 #pragma warning(pop)
 #include <Uxtheme.h>
-#include <vsstyle.h>
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 
@@ -37,8 +35,8 @@
 
 extern IUIFramework *g_pFramework;
 
-const int    TABBAR_SHOWDISKICON = 0;
-const double hoverFraction       = 0.4;
+//#define TABBAR_SHOWDISKICON 1
+const double hoverFraction = 0.4;
 
 CTabBar::CTabBar(HINSTANCE hInst)
     : CWindow(hInst)
@@ -48,17 +46,17 @@ CTabBar::CTabBar(HINSTANCE hInst)
     , m_hBoldFont(nullptr)
     , m_hSymbolFont(nullptr)
     , m_hSymbolBoldFont(nullptr)
+    , m_tabID(0)
     , m_ctrlID(-1)
     , m_bIsDragging(false)
     , m_bIsDraggingInside(false)
     , m_nSrcTab(-1)
     , m_nTabDragged(-1)
-    , m_TabBarDefaultProc(nullptr)
+    , m_tabBarDefaultProc(nullptr)
     , m_currentHoverTabItem(-1)
     , m_bIsCloseHover(false)
     , m_whichCloseClickDown(-1)
     , m_lmbdHit(false)
-    , m_tabID(0)
     , m_closeChar(L'\u274C')
     , m_modifiedChar(L'\u25CF')
 {
@@ -90,15 +88,15 @@ bool CTabBar::Init(HINSTANCE /*hInst*/, HWND hParent)
     icce.dwICC  = ICC_TAB_CLASSES;
     InitCommonControlsEx(&icce);
 
-    CreateEx(WS_EX_COMPOSITED, WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE | TCS_FOCUSNEVER | TCS_TOOLTIPS | TCS_TABS | TCS_OWNERDRAWFIXED, hParent, 0, WC_TABCONTROL);
+    CreateEx(WS_EX_COMPOSITED, WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE | TCS_FOCUSNEVER | TCS_TOOLTIPS | TCS_TABS | TCS_OWNERDRAWFIXED, hParent, nullptr, WC_TABCONTROL);
 
     if (!*this)
     {
         return false;
     }
 
-    ::SetWindowLongPtr(*this, GWLP_USERDATA, (LONG_PTR)this);
-    m_TabBarDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(*this, GWLP_WNDPROC, (LONG_PTR)TabBar_Proc));
+    ::SetWindowLongPtr(*this, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    m_tabBarDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(*this, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(TabBar_Proc)));
 
     NONCLIENTMETRICS ncm{};
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
@@ -132,12 +130,16 @@ LRESULT CALLBACK CTabBar::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 int CTabBar::InsertAtEnd(const wchar_t *subTabName)
 {
     TCITEM tie{};
-    tie.mask       = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
+    tie.mask = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
+#ifdef TABBAR_SHOWDISKICON
     int imageIndex = -1;
 
     if (m_bHasImgList)
         imageIndex = 0;
-    tie.iImage          = TABBAR_SHOWDISKICON ? imageIndex : 0;
+    tie.iImage = imageIndex;
+#else
+    tie.iImage = 0;
+#endif
     tie.pszText         = const_cast<wchar_t *>(subTabName);
     m_animVars[m_tabID] = Animator::Instance().CreateAnimationVariable(1.0, 1.0);
     tie.lParam          = m_tabID++;
@@ -154,12 +156,16 @@ int CTabBar::InsertAtEnd(const wchar_t *subTabName)
 int CTabBar::InsertAfter(int index, const wchar_t *subTabName)
 {
     TCITEM tie{};
-    tie.mask     = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
-    int imgindex = -1;
+    tie.mask = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
+#ifdef TABBAR_SHOWDISKICON
+    int imageIndex = -1;
 
     if (m_bHasImgList)
-        imgindex = 0;
-    tie.iImage          = TABBAR_SHOWDISKICON ? imgindex : 0;
+        imageIndex = 0;
+    tie.iImage = imageIndex;
+#else
+    tie.iImage = 0;
+#endif
     tie.pszText         = const_cast<wchar_t *>(subTabName);
     m_animVars[m_tabID] = Animator::Instance().CreateAnimationVariable(1.0, 1.0);
     tie.lParam          = m_tabID++;
@@ -237,7 +243,7 @@ void CTabBar::SetFont(const wchar_t *fontName, int fontSize)
     if (m_hBoldFont)
         ::DeleteObject(m_hBoldFont);
 
-    m_hFont = ::CreateFont((int)fontSize, 0,
+    m_hFont = ::CreateFont(static_cast<int>(fontSize), 0,
                            0,
                            0,
                            FW_NORMAL,
@@ -246,7 +252,7 @@ void CTabBar::SetFont(const wchar_t *fontName, int fontSize)
                            fontName);
     if (m_hFont)
         ::SendMessage(*this, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), 0);
-    m_hBoldFont = ::CreateFont((int)fontSize, 0,
+    m_hBoldFont = ::CreateFont(static_cast<int>(fontSize), 0,
                                0,
                                0,
                                FW_EXTRABOLD,
@@ -310,7 +316,7 @@ void CTabBar::DeleteItemAt(int index)
         GetClientRect(*this, &tabRect);
         TC_HITTESTINFO hti{};
         hti.pt                 = {14, 14}; // arbitrary value: just inside the first visible tab
-        LRESULT scrollTabIndex = ::SendMessage(*this, TCM_HITTEST, 0, (LPARAM)&hti);
+        LRESULT scrollTabIndex = ::SendMessage(*this, TCM_HITTEST, 0, reinterpret_cast<LPARAM>(&hti));
         do
         {
             if (itemRect.right < tabRect.right - (itemRect.right - itemRect.left))
@@ -352,7 +358,7 @@ DocID CTabBar::GetCurrentTabId() const
         assert(false);
         return {};
     }
-    return DocID((int)tci.lParam);
+    return DocID(static_cast<int>(tci.lParam));
 }
 
 void CTabBar::SetCurrentTabId(DocID id)
@@ -370,7 +376,7 @@ void CTabBar::SetCurrentTabId(DocID id)
     TabCtrl_SetItem(*this, index, &tci);
 }
 
-void CTabBar::DeletAllItems()
+void CTabBar::DeleteAllItems()
 {
     TabCtrl_DeleteAllItems(*this);
     m_nItems = 0;
@@ -383,20 +389,20 @@ HIMAGELIST CTabBar::SetImageList(HIMAGELIST himl)
     return TabCtrl_SetImageList(*this, himl);
 }
 
-LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (Message)
+    switch (message)
     {
         case WM_ERASEBKGND:
         {
-            HDC      hDC = (HDC)wParam;
-            RECT     rClient{}, rTab{}, rTotalTab{}, rBkgnd{}, rEdge{};
+            HDC      hDC = reinterpret_cast<HDC>(wParam);
+            RECT     rClient{}, rTab{}, rTotalTab{}, rBkgnd{};
             COLORREF crBack;
 
             if (CTheme::Instance().IsHighContrastMode())
-                return ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
+                return ::CallWindowProc(m_tabBarDefaultProc, hwnd, message, wParam, lParam);
             else
-                ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
+                ::CallWindowProc(m_tabBarDefaultProc, hwnd, message, wParam, lParam);
 
             // calculate total tab width
             GetClientRect(*this, &rClient);
@@ -413,7 +419,6 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             // add a bit
             InflateRect(&rTotalTab, CDPIAware::Instance().Scale(*this, 2), CDPIAware::Instance().Scale(*this, 3));
-            rEdge = rTotalTab;
 
             // then if background color is set, paint the visible background
             // area of the tabs in the bkgnd color
@@ -444,7 +449,6 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             return TRUE;
         }
-        break;
         case WM_PAINT:
         {
             PAINTSTRUCT ps; // ps is a totally out parameter, no init needed.
@@ -490,7 +494,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                     APPVERIFY(got);
                     if (got)
                     {
-                        DrawItem(&dis, (float)Animator::GetValue(m_animVars[GetIDFromIndex(nTab).GetValue()]));
+                        DrawItem(&dis, static_cast<float>(Animator::GetValue(m_animVars[GetIDFromIndex(nTab).GetValue()])));
                     }
                 }
             }
@@ -506,7 +510,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 APPVERIFY(got);
                 if (got)
                 {
-                    DrawItem(&dis, (float)Animator::GetValue(m_animVars[GetIDFromIndex(nSel).GetValue()]));
+                    DrawItem(&dis, static_cast<float>(Animator::GetValue(m_animVars[GetIDFromIndex(nSel).GetValue()])));
                 }
             }
 
@@ -520,9 +524,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 return TRUE;
 
             const short wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-            const short keyState = GET_KEYSTATE_WPARAM(wParam);
-            const int xPos = GET_X_LPARAM(lParam);
-            const int yPos = GET_Y_LPARAM(lParam);
+            const short keyState   = GET_KEYSTATE_WPARAM(wParam);
 
             // Positive wheel delta means wheel moved forward (away from user).
             // Negative wheel delta means wheel moved backward (towards user).
@@ -541,7 +543,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             // Only works if at least one tab is hidden.
             // 1.
             // Wheel forward + control + shift == focus on first tab.
-            // Wheel backward + control + shift == focus on last tab.            
+            // Wheel backward + control + shift == focus on last tab.
             // 2.
             // Wheel forward + control == focus on next tab (wrap).
             // Wheel backward + control == focus on previous tab (wrap).
@@ -588,9 +590,9 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
                 // Get index of the first visible tab.
                 TC_HITTESTINFO hti{};
-                LONG           xy      = 14; // Arbitrary value: just inside the first tab.
-                hti.pt                 = {xy, xy};
-                int scrollTabIndex     = TabCtrl_HitTest(*this, &hti);
+                LONG           xy  = 14; // Arbitrary value: just inside the first tab.
+                hti.pt             = {xy, xy};
+                int scrollTabIndex = TabCtrl_HitTest(*this, &hti);
 
                 if (scrollTabIndex < 1 && (rcLastTab.right < rcTabCtrl.right)) // Nothing to scroll.
                     return TRUE;
@@ -634,16 +636,16 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             {
                 m_whichCloseClickDown = GetTabIndexAt(xPos, yPos);
                 APPVERIFY(m_whichCloseClickDown >= 0);
-                TBHDR nmhdr{};
-                nmhdr.hdr.hwndFrom = *this;
-                nmhdr.hdr.code     = TCN_REFRESH;
-                nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
-                nmhdr.tabOrigin    = 0;
-                ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+                TBHDR nmHdr{};
+                nmHdr.hdr.hwndFrom = *this;
+                nmHdr.hdr.code     = TCN_REFRESH;
+                nmHdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
+                nmHdr.tabOrigin    = 0;
+                ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr));
                 return TRUE;
             }
 
-            ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
+            ::CallWindowProc(m_tabBarDefaultProc, hwnd, message, wParam, lParam);
             if (wParam == 2)
                 return TRUE;
             int currentTabOn = TabCtrl_GetCurSel(*this);
@@ -662,22 +664,20 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 RegisterHotKey(hwnd, 0 /* id */, 0, VK_ESCAPE);
             }
 
-            TBHDR nmhdr{};
-            nmhdr.hdr.hwndFrom = *this;
-            nmhdr.hdr.code     = NM_CLICK;
-            nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
-            nmhdr.tabOrigin    = currentTabOn;
+            TBHDR nmHdr{};
+            nmHdr.hdr.hwndFrom = *this;
+            nmHdr.hdr.code     = NM_CLICK;
+            nmHdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
+            nmHdr.tabOrigin    = currentTabOn;
 
-            ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+            ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr));
             return TRUE;
         }
-        break;
         case WM_RBUTTONDOWN: //right click selects tab as well
         {
-            ::CallWindowProc(m_TabBarDefaultProc, hwnd, WM_LBUTTONDOWN, wParam, lParam);
+            ::CallWindowProc(m_tabBarDefaultProc, hwnd, WM_LBUTTONDOWN, wParam, lParam);
             return TRUE;
         }
-        break;
         case WM_MOUSEMOVE:
         {
             int xPos = GET_X_LPARAM(lParam);
@@ -815,12 +815,12 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 // nmhdr.idFrom = this
                 // destIndex = this->_nSrcTab
                 // scrIndex  = this->_nTabDragged
-                TBHDR nmhdr{};
-                nmhdr.hdr.hwndFrom = *this;
-                nmhdr.hdr.code     = m_bIsDraggingInside ? TCN_TABDROPPED : TCN_TABDROPPEDOUTSIDE;
-                nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
-                nmhdr.tabOrigin    = m_nTabDragged;
-                ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+                TBHDR nmHdr{};
+                nmHdr.hdr.hwndFrom = *this;
+                nmHdr.hdr.code     = m_bIsDraggingInside ? TCN_TABDROPPED : TCN_TABDROPPEDOUTSIDE;
+                nmHdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
+                nmHdr.tabOrigin    = m_nTabDragged;
+                ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr));
                 return TRUE;
             }
             int currentTabOn = GetTabIndexAt(xPos, yPos);
@@ -854,7 +854,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
             //    DrawItem((DRAWITEMSTRUCT *)lParam);
             //    return TRUE;
             //}
-            break;
+            //break;
         case WM_HOTKEY:
         {
             if (m_bIsDragging &&
@@ -879,7 +879,6 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
             return TRUE;
         }
-        break;
         case WM_CONTEXTMENU:
         {
             int xPos = GET_X_LPARAM(lParam);
@@ -925,17 +924,17 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
         break;
     }
 
-    return ::CallWindowProc(m_TabBarDefaultProc, hwnd, Message, wParam, lParam);
+    return ::CallWindowProc(m_tabBarDefaultProc, hwnd, message, wParam, lParam);
 }
 
 COLORREF CTabBar::GetTabColor(UINT item) const
 {
-    TBHDR nmhdr{};
-    nmhdr.hdr.hwndFrom = *this;
-    nmhdr.hdr.code     = TCN_GETCOLOR;
-    nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
-    nmhdr.tabOrigin    = item;
-    COLORREF clr       = (COLORREF)::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+    TBHDR nmHdr{};
+    nmHdr.hdr.hwndFrom = *this;
+    nmHdr.hdr.code     = TCN_GETCOLOR;
+    nmHdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
+    nmHdr.tabOrigin    = item;
+    COLORREF clr       = static_cast<COLORREF>(::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr)));
     if (clr == 0 || CTheme::Instance().IsHighContrastMode())
     {
         clr = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
@@ -948,22 +947,20 @@ void CTabBar::DrawMainBorder(const LPDRAWITEMSTRUCT lpdis) const
     GDIHelpers::FillSolidRect(lpdis->hDC, &lpdis->rcItem, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
 }
 
-void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) const
+void CTabBar::DrawItem(const LPDRAWITEMSTRUCT lpDrawItemStruct, float fraction) const
 {
-    HIMAGELIST hilTabs = (HIMAGELIST)TabCtrl_GetImageList(*this);
-
     int  curSel    = TabCtrl_GetCurSel(*this);
-    bool bSelected = (pDrawItemStruct->itemID == (UINT)curSel);
+    bool bSelected = (lpDrawItemStruct->itemID == static_cast<UINT>(curSel));
 
-    RECT rItem(pDrawItemStruct->rcItem);
+    RECT rItem(lpDrawItemStruct->rcItem);
 
-    auto crBkgnd = GetTabColor(pDrawItemStruct->itemID);
+    auto crBkgnd = GetTabColor(lpDrawItemStruct->itemID);
 
     auto crFill = GDIHelpers::InterpolateColors(crBkgnd,
                                                 CTheme::Instance().GetThemeColor(RGB(250, 250, 250), true),
                                                 max(0.0, fraction - (bSelected ? 0.6 : 0.1)));
 
-    GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crBkgnd);
+    GDIHelpers::FillSolidRect(lpDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crBkgnd);
 
     auto borderWidth = CDPIAware::Instance().Scale(*this, 1);
     if (bSelected)
@@ -974,14 +971,14 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
     if (!bSelected)
         rItem.bottom -= (2 * borderWidth);
 
-    GDIHelpers::FillSolidRect(pDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crFill);
+    GDIHelpers::FillSolidRect(lpDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crFill);
 
     wchar_t buf[256] = {0};
     TC_ITEM tci{};
     tci.mask       = TCIF_TEXT | TCIF_IMAGE;
     tci.pszText    = buf;
     tci.cchTextMax = _countof(buf) - 2;
-    TabCtrl_GetItem(*this, pDrawItemStruct->itemID, &tci);
+    TabCtrl_GetItem(*this, lpDrawItemStruct->itemID, &tci);
 
     COLORREF textColor;
     if (tci.iImage == REDONLY_IMG_INDEX)
@@ -997,74 +994,80 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT pDrawItemStruct, float fraction) c
         textColor = CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT));
     else
         textColor = CTheme::Instance().GetThemeColor(GDIHelpers::Darker(::GetSysColor(COLOR_3DDKSHADOW), 0.5f));
-    SetTextColor(pDrawItemStruct->hDC, textColor);
+    SetTextColor(lpDrawItemStruct->hDC, textColor);
 
     const int PADDING = CDPIAware::Instance().Scale(*this, 2);
     // text & icon
     rItem.left += PADDING;
     rItem.right -= PADDING;
-    rItem.bottom = pDrawItemStruct->rcItem.bottom;
-    rItem.top    = pDrawItemStruct->rcItem.top;
+    rItem.bottom = lpDrawItemStruct->rcItem.bottom;
+    rItem.top    = lpDrawItemStruct->rcItem.top;
 
-    SetBkMode(pDrawItemStruct->hDC, TRANSPARENT);
+    SetBkMode(lpDrawItemStruct->hDC, TRANSPARENT);
 
     // draw close/active button
-    RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(pDrawItemStruct->rcItem);
+    RECT closeButtonRect = m_closeButtonZone.GetButtonRectFrom(lpDrawItemStruct->rcItem);
 
     TabButtonType buttonType = TabButtonType::None;
     if (bSelected)
         buttonType = TabButtonType::Close;
     if (tci.iImage == UNSAVED_IMG_INDEX)
         buttonType = TabButtonType::Modified;
-    else if (m_currentHoverTabItem == (int)pDrawItemStruct->itemID)
+    else if (m_currentHoverTabItem == static_cast<int>(lpDrawItemStruct->itemID))
         buttonType = TabButtonType::Close;
-    if (m_bIsCloseHover && (m_currentHoverTabItem == (int)pDrawItemStruct->itemID))
+    if (m_bIsCloseHover && (m_currentHoverTabItem == static_cast<int>(lpDrawItemStruct->itemID)))
         buttonType = TabButtonType::CloseHover;
 
     switch (buttonType)
     {
         case TabButtonType::Modified:
         {
-            auto oldFont = (HFONT)SelectObject(pDrawItemStruct->hDC, m_hSymbolFont);
-            ::DrawText(pDrawItemStruct->hDC, &m_modifiedChar, 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
-            SelectObject(pDrawItemStruct->hDC, oldFont);
+            auto oldFont = static_cast<HFONT>(SelectObject(lpDrawItemStruct->hDC, m_hSymbolFont));
+            ::DrawText(lpDrawItemStruct->hDC, &m_modifiedChar, 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
+            SelectObject(lpDrawItemStruct->hDC, oldFont);
         }
         break;
         case TabButtonType::Close:
         {
-            auto oldFont = (HFONT)SelectObject(pDrawItemStruct->hDC, m_hSymbolFont);
-            ::DrawText(pDrawItemStruct->hDC, &m_closeChar, 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
-            SelectObject(pDrawItemStruct->hDC, oldFont);
+            auto oldFont = static_cast<HFONT>(SelectObject(lpDrawItemStruct->hDC, m_hSymbolFont));
+            ::DrawText(lpDrawItemStruct->hDC, &m_closeChar, 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
+            SelectObject(lpDrawItemStruct->hDC, oldFont);
         }
         break;
         case TabButtonType::CloseHover:
         {
-            auto oldFont = (HFONT)SelectObject(pDrawItemStruct->hDC, m_hSymbolBoldFont);
-            ::DrawText(pDrawItemStruct->hDC, &m_closeChar, 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
-            SelectObject(pDrawItemStruct->hDC, oldFont);
+            auto oldFont = static_cast<HFONT>(SelectObject(lpDrawItemStruct->hDC, m_hSymbolBoldFont));
+            ::DrawText(lpDrawItemStruct->hDC, &m_closeChar, 1, &closeButtonRect, DT_SINGLELINE | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
+            SelectObject(lpDrawItemStruct->hDC, oldFont);
         }
         break;
+        case TabButtonType::None:
+            break;
+        case TabButtonType::ClosePush:
+            break;
     }
     rItem.right = closeButtonRect.left;
 
     // icon
-    if (TABBAR_SHOWDISKICON && hilTabs)
+#ifdef TABBAR_SHOWDISKICON
+    if (hilTabs)
     {
-        ImageList_Draw(hilTabs, tci.iImage, pDrawItemStruct->hDC, rItem.left, rItem.top, ILD_TRANSPARENT);
+        HIMAGELIST hilTabs = static_cast<HIMAGELIST>(TabCtrl_GetImageList(*this));
+        ImageList_Draw(hilTabs, tci.iImage, lpDrawItemStruct->hDC, rItem.left, rItem.top, ILD_TRANSPARENT);
         rItem.left += CDPIAware::Instance().Scale(*this, 16);
     }
-
+#endif
     // text
     rItem.right -= (2 * PADDING);
 
-    rItem.bottom  = pDrawItemStruct->rcItem.bottom;
-    rItem.top     = pDrawItemStruct->rcItem.top;
+    rItem.bottom  = lpDrawItemStruct->rcItem.bottom;
+    rItem.top     = lpDrawItemStruct->rcItem.top;
     HFONT oldFont = nullptr;
     if (bSelected)
-        oldFont = (HFONT)SelectObject(pDrawItemStruct->hDC, m_hBoldFont);
-    ::DrawText(pDrawItemStruct->hDC, buf, -1, &rItem, DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
+        oldFont = static_cast<HFONT>(SelectObject(lpDrawItemStruct->hDC, m_hBoldFont));
+    ::DrawText(lpDrawItemStruct->hDC, buf, -1, &rItem, DT_SINGLELINE | DT_MODIFYSTRING | DT_END_ELLIPSIS | DT_NOPREFIX | DT_CENTER | DT_VCENTER);
     if (bSelected)
-        SelectObject(pDrawItemStruct->hDC, oldFont);
+        SelectObject(lpDrawItemStruct->hDC, oldFont);
 }
 
 void CTabBar::DraggingCursor(POINT screenPoint, UINT item)
@@ -1085,12 +1088,12 @@ void CTabBar::DraggingCursor(POINT screenPoint, UINT item)
         }
         else
         {
-            TBHDR nmhdr{};
-            nmhdr.hdr.hwndFrom = *this;
-            nmhdr.hdr.code     = TCN_GETDROPICON;
-            nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
-            nmhdr.tabOrigin    = item;
-            HICON icon         = (HICON)::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+            TBHDR nmHdr{};
+            nmHdr.hdr.hwndFrom = *this;
+            nmHdr.hdr.code     = TCN_GETDROPICON;
+            nmHdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
+            nmHdr.tabOrigin    = item;
+            HICON icon         = reinterpret_cast<HICON>(::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr)));
             if (icon)
                 ::SetCursor(icon);
             else if (IsPointInParentZone(screenPoint))
@@ -1118,29 +1121,29 @@ void CTabBar::ExchangeItemData(POINT point)
             TabCtrl_SetCurSel(*this, nTab);
 
             //2. shift their data, and insert the source
-            TCITEM itemData_nDraggedTab{}, itemData_shift{};
-            itemData_nDraggedTab.mask = itemData_shift.mask = TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM;
-            const int stringSize                            = 256;
-            wchar_t   str1[stringSize]                      = {};
-            wchar_t   str2[stringSize]                      = {};
+            TCITEM itemDataNDraggedTab{}, itemDataShift{};
+            itemDataNDraggedTab.mask = itemDataShift.mask = TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM;
+            const int stringSize                          = 256;
+            wchar_t   str1[stringSize]                    = {};
+            wchar_t   str2[stringSize]                    = {};
 
-            itemData_nDraggedTab.pszText    = str1;
-            itemData_nDraggedTab.cchTextMax = (stringSize);
+            itemDataNDraggedTab.pszText    = str1;
+            itemDataNDraggedTab.cchTextMax = (stringSize);
 
-            itemData_shift.pszText    = str2;
-            itemData_shift.cchTextMax = (stringSize);
+            itemDataShift.pszText    = str2;
+            itemDataShift.cchTextMax = (stringSize);
 
             bool ok;
-            ok = TabCtrl_GetItem(*this, m_nTabDragged, &itemData_nDraggedTab) != FALSE;
+            ok = TabCtrl_GetItem(*this, m_nTabDragged, &itemDataNDraggedTab) != FALSE;
             APPVERIFY(ok);
 
             if (m_nTabDragged > nTab)
             {
                 for (int i = m_nTabDragged; i > nTab; i--)
                 {
-                    ok = TabCtrl_GetItem(*this, i - 1, &itemData_shift) != FALSE;
+                    ok = TabCtrl_GetItem(*this, i - 1, &itemDataShift) != FALSE;
                     APPVERIFY(ok);
-                    ok = TabCtrl_SetItem(*this, i, &itemData_shift) != FALSE;
+                    ok = TabCtrl_SetItem(*this, i, &itemDataShift) != FALSE;
                     APPVERIFY(ok);
                 }
             }
@@ -1148,24 +1151,24 @@ void CTabBar::ExchangeItemData(POINT point)
             {
                 for (int i = m_nTabDragged; i < nTab; i++)
                 {
-                    ok = TabCtrl_GetItem(*this, i + 1, &itemData_shift) != FALSE;
+                    ok = TabCtrl_GetItem(*this, i + 1, &itemDataShift) != FALSE;
                     APPVERIFY(ok);
-                    ok = TabCtrl_SetItem(*this, i, &itemData_shift) != FALSE;
+                    ok = TabCtrl_SetItem(*this, i, &itemDataShift) != FALSE;
                     APPVERIFY(ok);
                 }
             }
-            ok = TabCtrl_SetItem(*this, nTab, &itemData_nDraggedTab) != FALSE;
+            ok = TabCtrl_SetItem(*this, nTab, &itemDataNDraggedTab) != FALSE;
             APPVERIFY(ok);
 
             //3. update the current index
             m_nTabDragged = nTab;
 
-            TBHDR nmhdr{};
-            nmhdr.hdr.hwndFrom = *this;
-            nmhdr.hdr.code     = TCN_ORDERCHANGED;
-            nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
-            nmhdr.tabOrigin    = nTab;
-            ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+            TBHDR nmHdr{};
+            nmHdr.hdr.hwndFrom = *this;
+            nmHdr.hdr.code     = TCN_ORDERCHANGED;
+            nmHdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
+            nmHdr.tabOrigin    = nTab;
+            ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr));
         }
     }
     else
@@ -1190,9 +1193,9 @@ bool CTabBar::IsPointInParentZone(POINT screenPoint) const
             (screenPoint.y >= parentZone.top) && (screenPoint.y <= parentZone.bottom));
 }
 
-LRESULT CALLBACK CTabBar::TabBar_Proc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK CTabBar::TabBar_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    return (((CTabBar *)(::GetWindowLongPtr(hwnd, GWLP_USERDATA)))->RunProc(hwnd, Message, wParam, lParam));
+    return (reinterpret_cast<CTabBar *>(::GetWindowLongPtr(hwnd, GWLP_USERDATA))->RunProc(hwnd, message, wParam, lParam));
 }
 
 DocID CTabBar::GetIDFromIndex(int index) const
@@ -1202,7 +1205,7 @@ DocID CTabBar::GetIDFromIndex(int index) const
     auto result = TabCtrl_GetItem(*this, index, &tci);
     // Easier to set a break point on failed results.
     if (result)
-        return DocID((int)tci.lParam);
+        return DocID(static_cast<int>(tci.lParam));
     else
         return {};
 }
@@ -1222,12 +1225,12 @@ int CTabBar::GetIndexFromID(DocID id) const
 
 void CTabBar::NotifyTabDelete(int tab)
 {
-    TBHDR nmhdr{};
-    nmhdr.hdr.hwndFrom = *this;
-    nmhdr.hdr.code     = TCN_TABDELETE;
-    nmhdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
-    nmhdr.tabOrigin    = tab;
-    ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+    TBHDR nmHdr{};
+    nmHdr.hdr.hwndFrom = *this;
+    nmHdr.hdr.code     = TCN_TABDELETE;
+    nmHdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
+    nmHdr.tabOrigin    = tab;
+    ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr));
 }
 
 bool CloseButtonZone::IsHit(int x, int y, const RECT &testZone) const

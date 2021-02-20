@@ -22,8 +22,8 @@
 class CCmdDelete : public ICommand
 {
 public:
-
-    CCmdDelete(void * obj) : ICommand(obj)
+    CCmdDelete(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -38,12 +38,11 @@ public:
     UINT GetCmdId() override { return cmdDelete; }
 };
 
-
 class CCmdSelectAll : public ICommand
 {
 public:
-
-    CCmdSelectAll(void * obj) : ICommand(obj)
+    CCmdSelectAll(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -61,8 +60,8 @@ public:
 class CCmdGotoBrace : public ICommand
 {
 public:
-
-    CCmdGotoBrace(void * obj) : ICommand(obj)
+    CCmdGotoBrace(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -80,7 +79,7 @@ public:
 class CCmdToggleTheme : public ICommand
 {
 public:
-    CCmdToggleTheme(void * obj);
+    CCmdToggleTheme(void* obj);
     ~CCmdToggleTheme() = default;
 
     bool Execute() override;
@@ -88,7 +87,7 @@ public:
     UINT GetCmdId() override { return cmdToggleTheme; }
     void AfterInit() override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 
 private:
 };
@@ -96,8 +95,8 @@ private:
 class CCmdConfigShortcuts : public ICommand
 {
 public:
-
-    CCmdConfigShortcuts(void * obj) : ICommand(obj)
+    CCmdConfigShortcuts(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -111,8 +110,7 @@ public:
 class CCmdAutoBraces : public ICommand
 {
 public:
-
-    CCmdAutoBraces(void * obj);
+    CCmdAutoBraces(void* obj);
 
     ~CCmdAutoBraces() = default;
 
@@ -121,14 +119,13 @@ public:
     UINT GetCmdId() override { return cmdAutoBraces; }
     void AfterInit() override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };
 
 class CCmdViewFileTree : public ICommand
 {
 public:
-
-    CCmdViewFileTree(void * obj);
+    CCmdViewFileTree(void* obj);
 
     ~CCmdViewFileTree() = default;
 
@@ -137,13 +134,13 @@ public:
     UINT GetCmdId() override { return cmdFileTree; }
     void AfterInit() override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };
 
 class CCmdWriteProtect : public ICommand
 {
 public:
-    CCmdWriteProtect(void * obj);
+    CCmdWriteProtect(void* obj);
     ~CCmdWriteProtect() = default;
 
     bool Execute() override;
@@ -151,9 +148,9 @@ public:
     UINT GetCmdId() override { return cmdWriteProtect; }
     void AfterInit() override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
-    void TabNotify(TBHDR* ptbhdr) override;
-    void ScintillaNotify(SCNotification * pScn) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
+    void    TabNotify(TBHDR* ptbHdr) override;
+    void    ScintillaNotify(SCNotification* pScn) override;
 };
 
 class CCmdAutoComplete : public ICommand
@@ -168,5 +165,5 @@ public:
     UINT GetCmdId() override { return cmdAutocomplete; }
     void AfterInit() override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };

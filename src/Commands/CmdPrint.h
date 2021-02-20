@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 class CCmdPrint : public ICommand
 {
 public:
-
-    CCmdPrint(void * obj) : ICommand(obj)
+    CCmdPrint(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -47,8 +47,8 @@ public:
 class CCmdPrintNow : public CCmdPrint
 {
 public:
-
-    CCmdPrintNow(void * obj) : CCmdPrint(obj)
+    CCmdPrintNow(void* obj)
+        : CCmdPrint(obj)
     {
     }
 
@@ -66,8 +66,8 @@ public:
 class CCmdPageSetup : public ICommand
 {
 public:
-
-    CCmdPageSetup(void * obj) : ICommand(obj)
+    CCmdPageSetup(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -77,4 +77,3 @@ public:
 
     UINT GetCmdId() override { return cmdPageSetup; }
 };
-

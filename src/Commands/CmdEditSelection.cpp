@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 #include "stdafx.h"
 #include "CmdEditSelection.h"
 #include "LexStyles.h"
-#include "UnicodeUtils.h"
 
 bool CCmdEditSelection::Execute()
 {
@@ -34,11 +33,11 @@ void CCmdEditSelection::ScintillaNotify(SCNotification* pScn)
     }
 }
 
-HRESULT CCmdEditSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdEditSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_GETSELECTIONEMPTY) == 0), ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_GETSELECTIONEMPTY) == 0), pPropVarNewValue);
     }
     return E_NOTIMPL;
 }

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #include "stdafx.h"
-#include "BowPad.h"
 #include "BPBaseDialog.h"
 #include "StringUtils.h"
 
@@ -29,9 +28,9 @@ CBPBaseDialog::~CBPBaseDialog()
 {
 }
 
-int CBPBaseDialog::GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount) const
+int CBPBaseDialog::GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount)
 {
-    int maxCount = (int)CIniSettings::Instance().GetInt64(section.c_str(), countKey.c_str(), defaultMaxCount);
+    int maxCount = static_cast<int>(CIniSettings::Instance().GetInt64(section.c_str(), countKey.c_str(), defaultMaxCount));
     if (maxCount <= 0)
         maxCount = defaultMaxCount;
     return maxCount;
@@ -54,7 +53,7 @@ int CBPBaseDialog::LoadData(std::vector<std::wstring>& data, int defaultMaxCount
     return maxCount;
 }
 
-void CBPBaseDialog::SaveData(const std::vector<std::wstring>& data, const std::wstring& section, const std::wstring& /*countKey*/, const std::wstring& itemKeyFmt)
+void CBPBaseDialog::SaveData(const std::vector<std::wstring>& data, const std::wstring& section, const std::wstring& /*countKey*/, const std::wstring& itemKeyFmt) const
 {
     int i = 0;
     for (const auto& item : data)
@@ -69,9 +68,9 @@ void CBPBaseDialog::SaveData(const std::vector<std::wstring>& data, const std::w
     CIniSettings::Instance().SetString(section.c_str(), itemKey.c_str(), L"");
 }
 
-void CBPBaseDialog::LoadCombo(int combo_id, const std::vector<std::wstring>& data)
+void CBPBaseDialog::LoadCombo(int comboID, const std::vector<std::wstring>& data)
 {
-    HWND hCombo = GetDlgItem(*this, combo_id);
+    HWND hCombo = GetDlgItem(*this, comboID);
     for (const auto& item : data)
     {
         if (!item.empty())
@@ -79,18 +78,18 @@ void CBPBaseDialog::LoadCombo(int combo_id, const std::vector<std::wstring>& dat
     }
 }
 
-void CBPBaseDialog::SaveCombo(int combo_id, std::vector<std::wstring>& data) const
+void CBPBaseDialog::SaveCombo(int comboID, std::vector<std::wstring>& data) const
 {
     data.clear();
-    HWND hCombo = GetDlgItem(*this, combo_id);
+    HWND hCombo = GetDlgItem(*this, comboID);
     int  count  = ComboBox_GetCount(hCombo);
     for (int i = 0; i < count; ++i)
     {
         std::wstring item;
-        auto         item_size = ComboBox_GetLBTextLen(hCombo, i);
-        item.resize(item_size + 1);
+        auto         itemSize = ComboBox_GetLBTextLen(hCombo, i);
+        item.resize(itemSize + 1);
         ComboBox_GetLBText(hCombo, i, item.data());
-        item.resize(item_size);
+        item.resize(itemSize);
         data.emplace_back(std::move(item));
     }
 }
@@ -141,9 +140,9 @@ void CBPBaseDialog::UpdateCombo(int comboId, const std::wstring& item, int maxCo
     }
 }
 
-bool CBPBaseDialog::EnableComboBoxDeleteEvents(int combo_id, bool enable)
+bool CBPBaseDialog::EnableComboBoxDeleteEvents(int comboID, bool enable)
 {
-    auto hCombo = GetDlgItem(*this, combo_id);
+    auto hCombo = GetDlgItem(*this, comboID);
     APPVERIFY(hCombo != nullptr);
     if (!hCombo)
         return false;
@@ -155,10 +154,10 @@ bool CBPBaseDialog::EnableComboBoxDeleteEvents(int combo_id, bool enable)
     return RemoveWindowSubclass(comboInfo.hwndItem, ComboBoxListSubClassProc, 0) != FALSE;
 }
 
-void CBPBaseDialog::FlashWindow(HWND hwnd)
+void CBPBaseDialog::FlashWindow(HWND hWnd)
 {
     FLASHWINFO fi{sizeof(FLASHWINFO)};
-    fi.hwnd      = hwnd;
+    fi.hwnd      = hWnd;
     fi.dwFlags   = FLASHW_CAPTION;
     fi.uCount    = 5;
     fi.dwTimeout = 40;
@@ -267,7 +266,7 @@ std::string CBPBaseDialog::UnEscape(const std::string& str)
                         size_t res = 0;
                         if (ReadBase(&str[i + 1], &res, base, size))
                         {
-                            result.push_back((char)res);
+                            result.push_back(static_cast<char>(res));
                             i += size;
                             break;
                         }
@@ -290,11 +289,10 @@ bool CBPBaseDialog::ReadBase(const char* str, size_t* value, size_t base, size_t
 {
     size_t i = 0, temp = 0;
     *value   = 0;
-    char max = '0' + (char)base - 1;
-    char current;
+    char max = '0' + static_cast<char>(base) - 1;
     while (i < size)
     {
-        current = str[i];
+        char current = str[i];
         if (current >= 'A')
         {
             current &= 0xdf;

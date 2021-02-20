@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017, 2020 - Stefan Kueng
+// Copyright (C) 2014-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,16 +16,13 @@
 //
 
 #include "stdafx.h"
-
 #include "CmdRandom.h"
-
 #include "PathUtils.h"
 
 #include <random>
-#include <stdlib.h>
 #include <time.h>
 
-void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
+void CRandomFileList::InitPath(const std::wstring& path, bool noSubFolders)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
     m_arUnShownFileList.clear();
@@ -33,59 +30,59 @@ void CRandomFileList::InitPath(const std::wstring& path, bool nosubfolders)
     m_arShuffleList.clear();
     m_sPath = path;
 
-    CDirFileEnum filefinder(m_sPath);
-    FillUnShownPathList(filefinder, !m_noSubs);
+    CDirFileEnum fileFinder(m_sPath);
+    FillUnShownPathList(fileFinder, !m_noSubs);
 
-    std::wstring temppath = m_sPath + L"\\_shownfilelist";
-    if (nosubfolders)
-        temppath += L"norecurse";
-    HANDLE hFile = CreateFile(temppath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM, nullptr);
+    std::wstring tempPath = m_sPath + L"\\_shownfilelist";
+    if (noSubFolders)
+        tempPath += L"norecurse";
+    HANDLE hFile = CreateFile(tempPath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM, nullptr);
     if (hFile != INVALID_HANDLE_VALUE)
     {
-        BY_HANDLE_FILE_INFORMATION fileinfo;
-        if (GetFileInformationByHandle(hFile, &fileinfo))
+        BY_HANDLE_FILE_INFORMATION fileInfo;
+        if (GetFileInformationByHandle(hFile, &fileInfo))
         {
-            const int numberOfCharsInFile = fileinfo.nFileSizeLow / sizeof(wchar_t);
-            auto buffer = std::make_unique<wchar_t[]>(numberOfCharsInFile + 1);
-            DWORD readbytes;
-            if (ReadFile(hFile, buffer.get(), fileinfo.nFileSizeLow, &readbytes, nullptr))
+            const int numberOfCharsInFile = fileInfo.nFileSizeLow / sizeof(wchar_t);
+            auto      buffer              = std::make_unique<wchar_t[]>(numberOfCharsInFile + 1);
+            DWORD     readBytes;
+            if (ReadFile(hFile, buffer.get(), fileInfo.nFileSizeLow, &readBytes, nullptr))
             {
                 buffer[numberOfCharsInFile] = 0;
-                wchar_t * pPath = buffer.get();
-                auto pStart = buffer.get();
-                auto pEnd = pStart + numberOfCharsInFile;
-                auto lastIt = m_arShownFileList.end();
+                wchar_t* pPath              = buffer.get();
+                auto     pStart             = buffer.get();
+                auto     pEnd               = pStart + numberOfCharsInFile;
+                auto     lastIt             = m_arShownFileList.end();
                 while (pPath < pEnd)
                 {
-                    temppath = pPath;
-                    pPath += temppath.size() + 1;
-                    lastIt = m_arShownFileList.emplace_hint(lastIt, temppath);
+                    tempPath = pPath;
+                    pPath += tempPath.size() + 1;
+                    lastIt = m_arShownFileList.emplace_hint(lastIt, tempPath);
                 }
             }
         }
         CloseHandle(hFile);
     }
 
-    for (auto it = m_arShownFileList.begin(); it != m_arShownFileList.end(); )
+    for (auto it = m_arShownFileList.begin(); it != m_arShownFileList.end();)
     {
-        auto findit = m_arUnShownFileList.find(*it);
-        if (findit == m_arUnShownFileList.end())
+        auto findIt = m_arUnShownFileList.find(*it);
+        if (findIt == m_arUnShownFileList.end())
             m_arShownFileList.erase(it++);
         else
             ++it;
     }
     for (auto it = m_arShownFileList.begin(); it != m_arShownFileList.end(); ++it)
     {
-        auto findit = m_arUnShownFileList.find(*it);
-        if (findit != m_arUnShownFileList.end())
-            m_arUnShownFileList.erase(findit);
+        auto findIt = m_arUnShownFileList.find(*it);
+        if (findIt != m_arUnShownFileList.end())
+            m_arUnShownFileList.erase(findIt);
     }
 
-    for (const auto & file : m_arUnShownFileList)
+    for (const auto& file : m_arUnShownFileList)
         m_arShuffleList.push_back(file);
-    auto gen = std::default_random_engine((unsigned int)time(0));
-    shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
-    shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
+    auto gen = std::default_random_engine(static_cast<unsigned>(time(nullptr)));
+    std::shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
+    std::shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
 }
 
 std::wstring CRandomFileList::GetRandomFile()
@@ -103,21 +100,21 @@ std::wstring CRandomFileList::GetRandomFile()
             m_arUnShownFileList.clear();
             m_arShownFileList.clear();
             {
-                CDirFileEnum filefinder(m_sPath);
-                FillUnShownPathList(filefinder, !m_noSubs);
+                CDirFileEnum fileFinder(m_sPath);
+                FillUnShownPathList(fileFinder, !m_noSubs);
             }
             if (m_arUnShownFileList.size() < 5)
             {
-                CDirFileEnum filefinder(m_sPath);
-                FillUnShownPathList(filefinder, true);
+                CDirFileEnum fileFinder(m_sPath);
+                FillUnShownPathList(fileFinder, true);
             }
         }
         m_arShuffleList.clear();
-        for (const auto & file : m_arUnShownFileList)
+        for (const auto& file : m_arUnShownFileList)
             m_arShuffleList.push_back(file);
-        auto gen = std::default_random_engine((unsigned int)time(0));
-        shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
-        shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
+        auto gen = std::default_random_engine(static_cast<unsigned>(time(nullptr)));
+        std::shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
+        std::shuffle(m_arShuffleList.begin(), m_arShuffleList.end(), gen);
         m_shuffleIndex = 0;
     }
     if (m_arShuffleList.size() <= m_shuffleIndex)
@@ -142,12 +139,12 @@ std::wstring CRandomFileList::GoBack()
     return m_arShuffleList[m_shuffleIndex];
 }
 
-size_t CRandomFileList::GetCount()
+size_t CRandomFileList::GetCount() const
 {
     return (m_arUnShownFileList.size() + m_arShownFileList.size());
 }
 
-size_t CRandomFileList::GetShownCount()
+size_t CRandomFileList::GetShownCount() const
 {
     return m_arShownFileList.size();
 }
@@ -158,32 +155,32 @@ void CRandomFileList::Save()
     if (m_arShownFileList.empty() && m_arUnShownFileList.empty())
         return;
 
-    std::wstring path = m_sPath + L"\\_shownfilelist";
-    HANDLE hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN, nullptr);
+    std::wstring path  = m_sPath + L"\\_shownfilelist";
+    HANDLE       hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN, nullptr);
     if (hFile != INVALID_HANDLE_VALUE)
     {
         try
         {
-            auto buffer = std::make_unique<wchar_t[]>(MAX_PATH * m_arShownFileList.size());
-            wchar_t * pBuffer = buffer.get();
+            auto     buffer  = std::make_unique<wchar_t[]>(MAX_PATH * m_arShownFileList.size());
+            wchar_t* pBuffer = buffer.get();
             for (auto it = m_arShownFileList.begin(); it != m_arShownFileList.end(); ++it)
             {
                 wcscpy_s(pBuffer, MAX_PATH, it->c_str());
                 pBuffer += it->size() + 1;
             }
-            DWORD byteswritten;
-            WriteFile(hFile, buffer.get(), DWORD(pBuffer - buffer.get()) * sizeof(wchar_t), &byteswritten, nullptr);
+            DWORD bytesWritten;
+            WriteFile(hFile, buffer.get(), static_cast<DWORD>(pBuffer - buffer.get()) * sizeof(wchar_t), &bytesWritten, nullptr);
             CloseHandle(hFile);
         }
-        catch (std::bad_alloc &/*e*/)
+        catch (std::bad_alloc& /*e*/)
         {
             for (std::set<std::wstring>::iterator it = m_arShownFileList.begin(); it != m_arShownFileList.end(); ++it)
             {
-                wchar_t filebuffer[MAX_PATH];
-                ZeroMemory(filebuffer, sizeof(filebuffer));
-                wcscpy_s(filebuffer, it->c_str());
-                DWORD byteswritten;
-                WriteFile(hFile, filebuffer, DWORD(wcslen(filebuffer) + 1) * sizeof(wchar_t), &byteswritten, nullptr);
+                wchar_t fileBuffer[MAX_PATH];
+                ZeroMemory(fileBuffer, sizeof(fileBuffer));
+                wcscpy_s(fileBuffer, it->c_str());
+                DWORD bytesWritten;
+                WriteFile(hFile, fileBuffer, static_cast<DWORD>(wcslen(fileBuffer) + 1) * sizeof(wchar_t), &bytesWritten, nullptr);
             }
             CloseHandle(hFile);
         }
@@ -198,7 +195,7 @@ void CRandomFileList::SetShown(std::wstring file)
 
 void CRandomFileList::SetNotShown(std::wstring file)
 {
-    std::lock_guard<std::mutex> guard(m_mutex);
+    std::lock_guard<std::mutex>      guard(m_mutex);
     std::set<std::wstring>::iterator it = m_arShownFileList.find(file);
     if (it != m_arShownFileList.end())
         m_arShownFileList.erase(it);
@@ -218,28 +215,27 @@ void CRandomFileList::RemoveFromNotShown(const std::wstring& file)
     m_arShownRepeatFileList.erase(file);
 }
 
-void CRandomFileList::SetNewPath(const std::wstring& fileold, const std::wstring& filenew)
+void CRandomFileList::SetNewPath(const std::wstring& fileOld, const std::wstring& fileNew)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
-    auto foundIT = std::find(m_arShuffleList.begin(), m_arShuffleList.end(), fileold);
-    if (foundIT != m_arShuffleList.end())
+    auto                        foundIt = std::find(m_arShuffleList.begin(), m_arShuffleList.end(), fileOld);
+    if (foundIt != m_arShuffleList.end())
     {
-        (*foundIT) = filenew;
+        (*foundIt) = fileNew;
     }
 }
 
-void CRandomFileList::FillUnShownPathList(CDirFileEnum & filefinder, bool recurse)
+void CRandomFileList::FillUnShownPathList(CDirFileEnum& fileFinder, bool recurse)
 {
-    bool bIsDirectory;
-    std::wstring filename;
+    bool                    bIsDirectory;
+    std::wstring            filename;
     std::list<std::wstring> tempList;
-    while (filefinder.NextFile(filename, &bIsDirectory, recurse))
+    while (fileFinder.NextFile(filename, &bIsDirectory, recurse))
     {
         if (!bIsDirectory)
             tempList.emplace_back(filename);
     }
-    tempList.sort([](const std::wstring& a, const std::wstring& b) -> bool
-    {
+    tempList.sort([](const std::wstring& a, const std::wstring& b) -> bool {
         return _wcsicmp(a.c_str(), b.c_str()) > 0;
     });
     auto lastIt = m_arUnShownFileList.end();
@@ -251,8 +247,8 @@ bool CCmdRandom::Execute()
 {
     if (!HasActiveDocument())
         return false;
-    int tabIndex = GetActiveTabIndex();
-    const auto& doc = GetActiveDocument();
+    int         tabIndex = GetActiveTabIndex();
+    const auto& doc      = GetActiveDocument();
     if (doc.m_path.empty())
         return false;
     std::wstring dir = CPathUtils::GetParentDirectory(doc.m_path);
@@ -265,15 +261,15 @@ bool CCmdRandom::Execute()
     }
     if (dir == m_scannedDir)
     {
-        std::wstring showpath;
-        int count = (int)m_fileList.GetCount();
-        while (CPathUtils::PathCompare(CPathUtils::GetFileExtension(showpath), L"txt") && count)
+        std::wstring showPath;
+        int          count = static_cast<int>(m_fileList.GetCount());
+        while (CPathUtils::PathCompare(CPathUtils::GetFileExtension(showPath), L"txt") && count)
         {
-            showpath = m_fileList.GetRandomFile();
+            showPath = m_fileList.GetRandomFile();
             --count;
         }
         // now load that file in the same tab
-        if (OpenFile(showpath.c_str(), 0) >= 0)
+        if (OpenFile(showPath.c_str(), 0) >= 0)
         {
             CloseTab(tabIndex, false);
         }

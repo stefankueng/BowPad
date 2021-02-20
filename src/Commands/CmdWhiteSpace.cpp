@@ -20,7 +20,8 @@
 #include "IniSettings.h"
 #include "EditorConfigHandler.h"
 
-CCmdWhiteSpace::CCmdWhiteSpace(void * obj) : ICommand(obj)
+CCmdWhiteSpace::CCmdWhiteSpace(void* obj)
+    : ICommand(obj)
 {
 }
 
@@ -29,7 +30,7 @@ bool CCmdWhiteSpace::Execute()
     bool bShown = ScintillaCall(SCI_GETVIEWWS) != 0;
     ScintillaCall(SCI_SETVIEWWS, bShown ? 0 : 1);
     CIniSettings::Instance().SetInt64(L"View", L"whitespace", ScintillaCall(SCI_GETVIEWWS));
-    if (bShown || ((GetKeyState(VK_SHIFT) & 0x8000)==0))
+    if (bShown || ((GetKeyState(VK_SHIFT) & 0x8000) == 0))
         ScintillaCall(SCI_SETVIEWEOL, false);
     else
         ScintillaCall(SCI_SETVIEWEOL, true);
@@ -39,28 +40,29 @@ bool CCmdWhiteSpace::Execute()
 
 void CCmdWhiteSpace::AfterInit()
 {
-    int ws = (int)CIniSettings::Instance().GetInt64(L"View", L"whitespace", 0);
+    int ws = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"whitespace", 0));
     ScintillaCall(SCI_SETVIEWWS, ws);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-HRESULT CCmdWhiteSpace::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdWhiteSpace::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETVIEWWS) > 0, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETVIEWWS) > 0, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
 
-CCmdTabSize::CCmdTabSize(void * obj) : ICommand(obj)
+CCmdTabSize::CCmdTabSize(void* obj)
+    : ICommand(obj)
 {
 }
 
 void CCmdTabSize::AfterInit()
 {
-    int ve = (int)CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4);
-    auto& doc                = GetActiveDocument();
+    int   ve         = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
+    auto& doc        = GetActiveDocument();
     auto  tabSizeSet = CEditorConfigHandler::Instance().HasTabSize(doc.m_path);
     if (!tabSizeSet)
         ScintillaCall(SCI_SETTABWIDTH, ve);
@@ -68,50 +70,50 @@ void CCmdTabSize::AfterInit()
     UpdateStatusBar(false);
 }
 
-HRESULT CCmdTabSize::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdTabSize::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     HRESULT hr = S_OK;
     // Set the minimum value
     if (IsEqualPropertyKey(key, UI_PKEY_MinValue))
     {
-        DECIMAL decout;
-        VarDecFromI4(1, &decout);
-        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
+        DECIMAL decOut;
+        VarDecFromI4(1, &decOut);
+        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decOut, pPropVarNewValue);
     }
     // Set the maximum value
     else if (IsEqualPropertyKey(key, UI_PKEY_MaxValue))
     {
-        DECIMAL decout;
-        VarDecFromI4(20, &decout);
-        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
+        DECIMAL decOut;
+        VarDecFromI4(20, &decOut);
+        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decOut, pPropVarNewValue);
     }
     // Set the increment
     else if (IsEqualPropertyKey(key, UI_PKEY_Increment))
     {
-        DECIMAL decout;
-        VarDecFromI4(1, &decout);
-        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
+        DECIMAL decOut;
+        VarDecFromI4(1, &decOut);
+        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decOut, pPropVarNewValue);
     }
     // Set the number of decimal places
     else if (IsEqualPropertyKey(key, UI_PKEY_DecimalPlaces))
     {
-        hr = InitPropVariantFromUInt32(0, ppropvarNewValue);
+        hr = InitPropVariantFromUInt32(0, pPropVarNewValue);
     }
     // Set the initial value
     else if (IsEqualPropertyKey(key, UI_PKEY_DecimalValue))
     {
-        int ve = (int)CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4);
-        DECIMAL decout;
-        VarDecFromI4(ve, &decout);
-        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decout, ppropvarNewValue);
+        int     ve = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
+        DECIMAL decOut;
+        VarDecFromI4(ve, &decOut);
+        hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decOut, pPropVarNewValue);
     }
     return hr;
 }
 
-HRESULT CCmdTabSize::IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
+HRESULT CCmdTabSize::IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
-    ScintillaCall(SCI_SETTABWIDTH, ppropvarValue->intVal);
-    CIniSettings::Instance().SetInt64(L"View", L"tabsize", ppropvarValue->intVal);
+    ScintillaCall(SCI_SETTABWIDTH, pPropVarValue->intVal);
+    CIniSettings::Instance().SetInt64(L"View", L"tabsize", pPropVarValue->intVal);
     UpdateStatusBar(false);
     return S_OK;
 }
@@ -129,7 +131,8 @@ HRESULT CCmdTabSize::IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const P
 // to think about:
 // * only toggle the current doc settings, have the global settings toggled via a settings dialog or a separate dropdown button
 // * allow to configure the tab/space setting with file extension masks, e.g. space for all *.cpp files but tabs for all *.py files
-CCmdUseTabs::CCmdUseTabs(void * obj) : ICommand(obj)
+CCmdUseTabs::CCmdUseTabs(void* obj)
+    : ICommand(obj)
 {
 }
 
@@ -138,15 +141,15 @@ bool CCmdUseTabs::Execute()
     if (HasActiveDocument())
     {
         auto& doc = GetModActiveDocument();
-        if (doc.m_TabSpace == TabSpace::Default)
+        if (doc.m_tabSpace == TabSpace::Default)
         {
             ScintillaCall(SCI_SETUSETABS, ScintillaCall(SCI_GETUSETABS) ? 0 : 1);
         }
         else
         {
-            ScintillaCall(SCI_SETUSETABS, doc.m_TabSpace == TabSpace::Tabs ? 0 : 1);
+            ScintillaCall(SCI_SETUSETABS, doc.m_tabSpace == TabSpace::Tabs ? 0 : 1);
         }
-        doc.m_TabSpace = ScintillaCall(SCI_GETUSETABS) ? TabSpace::Tabs : TabSpace::Spaces;
+        doc.m_tabSpace = ScintillaCall(SCI_GETUSETABS) ? TabSpace::Tabs : TabSpace::Spaces;
         CIniSettings::Instance().SetInt64(L"View", L"usetabs", ScintillaCall(SCI_GETUSETABS));
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         UpdateStatusBar(false);
@@ -155,19 +158,19 @@ bool CCmdUseTabs::Execute()
     return false;
 }
 
-void CCmdUseTabs::TabNotify(TBHDR * ptbhdr)
+void CCmdUseTabs::TabNotify(TBHDR* ptbHdr)
 {
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 }
 
-HRESULT CCmdUseTabs::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdUseTabs::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETUSETABS) > 0, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETUSETABS) > 0, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }

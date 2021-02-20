@@ -32,6 +32,7 @@
 #include "version.h"
 #include "CommandHandler.h"
 #include "JumpListHelpers.h"
+#include "ResString.h"
 #include <wrl.h>
 using Microsoft::WRL::ComPtr;
 
@@ -47,11 +48,11 @@ static void LoadLanguage(HINSTANCE hInstance)
     std::wstring lang = CIniSettings::Instance().GetString(L"UI", L"language", L"");
     if (!lang.empty())
     {
-        std::wstring langdllpath = CAppUtils::GetDataPath(hInstance);
-        langdllpath += L"\\BowPad_";
-        langdllpath += lang;
-        langdllpath += L".lang";
-        if (!CAppUtils::HasSameMajorVersion(langdllpath))
+        std::wstring langDllPath = CAppUtils::GetDataPath(hInstance);
+        langDllPath += L"\\BowPad_";
+        langDllPath += lang;
+        langDllPath += L".lang";
+        if (!CAppUtils::HasSameMajorVersion(langDllPath))
         {
             // the language dll does not exist or does not match:
             // try downloading the new language dll right now
@@ -69,16 +70,16 @@ static void LoadLanguage(HINSTANCE hInstance)
             progDlg.SetTime();
             progDlg.ShowModal(nullptr);
 
-            CDownloadFile filedownloader(L"BowPad", &progDlg);
+            CDownloadFile fileDownloader(L"BowPad", &progDlg);
 
-            if (!filedownloader.DownloadFile(sLangURL, langdllpath))
+            if (!fileDownloader.DownloadFile(sLangURL, langDllPath))
             {
-                DeleteFile(langdllpath.c_str());
+                DeleteFile(langDllPath.c_str());
             }
         }
-        if (CAppUtils::HasSameMajorVersion(langdllpath))
+        if (CAppUtils::HasSameMajorVersion(langDllPath))
         {
-            g_hRes = LoadLibraryEx(langdllpath.c_str(), nullptr, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE | LOAD_LIBRARY_AS_DATAFILE);
+            g_hRes = LoadLibraryEx(langDllPath.c_str(), nullptr, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_IMAGE_RESOURCE | LOAD_LIBRARY_AS_DATAFILE);
             if (g_hRes == nullptr)
                 g_hRes = g_hInst;
         }
@@ -87,7 +88,7 @@ static void LoadLanguage(HINSTANCE hInstance)
 
 static void SetIcon()
 {
-    HKEY hKey = 0;
+    HKEY hKey = nullptr;
     if (RegOpenKey(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\BowPad.exe", &hKey) == ERROR_SUCCESS)
     {
         // registry key exists, which means at least one file type was associated with BowPad by the user
@@ -115,7 +116,7 @@ static void SetIcon()
 
 static void SetUserStringKey(LPCWSTR keyName, LPCWSTR subKeyName, const std::wstring& keyValue)
 {
-    DWORD dwSizeInBytes = DWORD((keyValue.length() + 1) * sizeof(WCHAR));
+    DWORD dwSizeInBytes = static_cast<DWORD>((keyValue.length() + 1) * sizeof(WCHAR));
     auto  status        = SHSetValue(HKEY_CURRENT_USER, keyName, subKeyName, REG_SZ, keyValue.c_str(), dwSizeInBytes);
     if (status != ERROR_SUCCESS)
     {
@@ -173,7 +174,7 @@ static void SetJumplist(LPCTSTR appID)
             return;
 
         ComPtr<IObjectCollection> poc;
-        hr = CoCreateInstance(CLSID_EnumerableObjectCollection, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(poc.GetAddressOf()));
+        hr = CoCreateInstance(CLSID_EnumerableObjectCollection, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(poc.GetAddressOf()));
         if (FAILED(hr))
             return;
 
@@ -181,11 +182,11 @@ static void SetJumplist(LPCTSTR appID)
         {
             ResString sTemp(g_hRes, IDS_RUNASADMIN);
 
-            ComPtr<IShellLink> psladmin;
-            hr = CreateShellLink(L"/multiple", sTemp, 4, true, &psladmin);
+            ComPtr<IShellLink> pslAdmin;
+            hr = CreateShellLink(L"/multiple", sTemp, 4, true, &pslAdmin);
             if (SUCCEEDED(hr))
             {
-                hr = poc->AddObject(psladmin.Get());
+                hr = poc->AddObject(pslAdmin.Get());
             }
         }
 
@@ -227,7 +228,7 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
                     pvdm = nullptr;
 
                     // move it to the current virtual desktop
-                    SendMessage(hBowPadWnd, WM_MOVETODESKTOP, 0, (LPARAM)GetForegroundWindow());
+                    SendMessage(hBowPadWnd, WM_MOVETODESKTOP, 0, reinterpret_cast<LPARAM>(GetForegroundWindow()));
                 }
                 else
                     ::SetForegroundWindow(hBowPadWnd);
@@ -253,10 +254,10 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
             int                nArgs;
             std::wstring       sCmdLine;
             const std::wstring commandLine = GetCommandLineW();
-            LPWSTR*            szArglist   = CommandLineToArgvW(commandLine.c_str(), &nArgs);
-            if (szArglist)
+            LPWSTR*            szArgList   = CommandLineToArgvW(commandLine.c_str(), &nArgs);
+            if (szArgList)
             {
-                OnOutOfScope(LocalFree(szArglist););
+                OnOutOfScope(LocalFree(szArgList););
                 bool bOmitNext = false;
                 for (int i = 0; i < nArgs; i++)
                 {
@@ -265,17 +266,17 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
                         bOmitNext = false;
                         continue;
                     }
-                    if ((szArglist[i][0] != '/') && (szArglist[i][0] != '-'))
+                    if ((szArgList[i][0] != '/') && (szArgList[i][0] != '-'))
                     {
-                        std::wstring path = szArglist[i];
+                        std::wstring path = szArgList[i];
                         CPathUtils::NormalizeFolderSeparators(path);
                         path = CPathUtils::GetLongPathname(path);
                         if (!PathFileExists(path.c_str()))
                         {
-                            auto pathpos = commandLine.find(szArglist[i]);
-                            if (pathpos != std::wstring::npos)
+                            auto pathPos = commandLine.find(szArgList[i]);
+                            if (pathPos != std::wstring::npos)
                             {
-                                auto tempPath = commandLine.substr(pathpos);
+                                auto tempPath = commandLine.substr(pathPos);
                                 if (PathFileExists(tempPath.c_str()))
                                 {
                                     CPathUtils::NormalizeFolderSeparators(tempPath);
@@ -289,11 +290,11 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
                     }
                     else
                     {
-                        if (wcscmp(&szArglist[i][1], L"z") == 0)
+                        if (wcscmp(&szArgList[i][1], L"z") == 0)
                             bOmitNext = true;
                         else
                         {
-                            sCmdLine += szArglist[i];
+                            sCmdLine += szArgList[i];
                             sCmdLine += L" ";
                         }
                     }
@@ -301,15 +302,15 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
             }
             auto ownCmdLine = std::make_unique<wchar_t[]>(sCmdLine.size() + 2);
             wcscpy_s(ownCmdLine.get(), sCmdLine.size() + 2, sCmdLine.c_str());
-            cds.cbData = (DWORD)((sCmdLine.size() + 1) * sizeof(wchar_t));
+            cds.cbData = static_cast<DWORD>((sCmdLine.size() + 1) * sizeof(wchar_t));
             cds.lpData = ownCmdLine.get();
-            SendMessage(hBowPadWnd, WM_COPYDATA, 0, (LPARAM)&cds);
+            SendMessage(hBowPadWnd, WM_COPYDATA, 0, reinterpret_cast<LPARAM>(&cds));
         }
         else
         {
-            cds.cbData = (DWORD)((cmdLineLen + 1) * sizeof(wchar_t));
-            cds.lpData = (PVOID)lpCmdLine;
-            SendMessage(hBowPadWnd, WM_COPYDATA, 0, (LPARAM)&cds);
+            cds.cbData = static_cast<DWORD>((cmdLineLen + 1) * sizeof(wchar_t));
+            cds.lpData = static_cast<PVOID>(const_cast<LPWSTR>(lpCmdLine));
+            SendMessage(hBowPadWnd, WM_COPYDATA, 0, reinterpret_cast<LPARAM>(&cds));
         }
     }
 }
@@ -319,7 +320,7 @@ static HWND FindAndWaitForBowPad()
     // don't start another instance: reuse the existing one
     // find the window of the existing instance
     ResString    clsResName(g_hInst, IDC_BOWPAD);
-    std::wstring clsName = (LPCWSTR)clsResName + CAppUtils::GetSessionID();
+    std::wstring clsName = static_cast<LPCWSTR>(clsResName) + CAppUtils::GetSessionID();
 
     HWND hBowPadWnd = ::FindWindow(clsName.c_str(), nullptr);
     // if we don't have a window yet, wait a little while
@@ -327,7 +328,7 @@ static HWND FindAndWaitForBowPad()
     for (int i = 0; !hBowPadWnd && i < 20; i++)
     {
         Sleep(100);
-        hBowPadWnd = ::FindWindow(clsName.c_str(), NULL);
+        hBowPadWnd = ::FindWindow(clsName.c_str(), nullptr);
     }
     // also wait for the window to become visible first
     for (int i = 0; !IsWindowVisible(hBowPadWnd) && i < 20; i++)
@@ -347,7 +348,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
 {
     if (parser.HasVal(L"path"))
     {
-        size_t line = (size_t)-1;
+        size_t line = static_cast<size_t>(-1);
         if (parser.HasVal(L"line"))
         {
             line = parser.GetLongVal(L"line") - 1;
@@ -355,14 +356,14 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
         mainWindow.SetFileToOpen(parser.GetVal(L"path"), line);
         if (parser.HasKey(L"elevate") && parser.HasKey(L"savepath"))
         {
-            mainWindow.SetElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"), (long)line);
+            mainWindow.SetElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"), static_cast<long>(line));
             mainWindow.SetFileOpenMRU(false);
             firstInstance = false;
         }
         if (parser.HasKey(L"tabmove") && parser.HasKey(L"savepath"))
         {
             std::wstring title = parser.HasVal(L"title") ? parser.GetVal(L"title") : L"";
-            mainWindow.SetTabMove(parser.GetVal(L"path"), parser.GetVal(L"savepath"), !!parser.HasKey(L"modified"), (long)line, title);
+            mainWindow.SetTabMove(parser.GetVal(L"path"), parser.GetVal(L"savepath"), !!parser.HasKey(L"modified"), static_cast<long>(line), title);
             mainWindow.SetFileOpenMRU(false);
         }
     }
@@ -372,11 +373,11 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
         int nArgs;
 
         const std::wstring commandLine = GetCommandLineW();
-        LPWSTR*            szArglist   = CommandLineToArgvW(commandLine.c_str(), &nArgs);
-        if (szArglist)
+        LPWSTR*            szArgList   = CommandLineToArgvW(commandLine.c_str(), &nArgs);
+        if (szArgList)
         {
-            OnOutOfScope(LocalFree(szArglist););
-            size_t line = (size_t)-1;
+            OnOutOfScope(LocalFree(szArgList););
+            size_t line = static_cast<size_t>(-1);
             if (parser.HasVal(L"line"))
             {
                 line = parser.GetLongVal(L"line") - 1;
@@ -390,12 +391,12 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
                     bOmitNext = false;
                     continue;
                 }
-                if ((szArglist[i][0] != '/') && (szArglist[i][0] != '-'))
+                if ((szArgList[i][0] != '/') && (szArgList[i][0] != '-'))
                 {
-                    auto pathpos = commandLine.find(szArglist[i]);
-                    if (pathpos != std::wstring::npos)
+                    auto pathPos = commandLine.find(szArgList[i]);
+                    if (pathPos != std::wstring::npos)
                     {
-                        auto tempPath = commandLine.substr(pathpos);
+                        auto tempPath = commandLine.substr(pathPos);
                         if (PathFileExists(tempPath.c_str()))
                         {
                             CPathUtils::NormalizeFolderSeparators(tempPath);
@@ -405,15 +406,15 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
                         }
                     }
 
-                    std::wstring path = szArglist[i];
+                    std::wstring path = szArgList[i];
                     CPathUtils::NormalizeFolderSeparators(path);
                     path = CPathUtils::GetLongPathname(path);
                     if (!PathFileExists(path.c_str()))
                     {
-                        pathpos = commandLine.find(szArglist[i]);
-                        if (pathpos != std::wstring::npos)
+                        pathPos = commandLine.find(szArgList[i]);
+                        if (pathPos != std::wstring::npos)
                         {
-                            auto tempPath = commandLine.substr(pathpos);
+                            auto tempPath = commandLine.substr(pathPos);
                             if (PathFileExists(tempPath.c_str()))
                             {
                                 CPathUtils::NormalizeFolderSeparators(tempPath);
@@ -427,7 +428,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
                 }
                 else
                 {
-                    if (wcscmp(&szArglist[i][1], L"z") == 0)
+                    if (wcscmp(&szArgList[i][1], L"z") == 0)
                         bOmitNext = true;
                 }
             }
@@ -435,7 +436,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
     }
 }
 
-int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int nCmdShow, bool bAlreadyRunning)
+int bpMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int nCmdShow, bool bAlreadyRunning)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
@@ -466,12 +467,12 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     bool isAdminMode = SysInfo::Instance().IsUACEnabled() && SysInfo::Instance().IsElevated();
     if (parser->HasKey(L"admin") && !isAdminMode)
     {
-        std::wstring     modpath    = CPathUtils::GetModulePath();
+        std::wstring     modPath    = CPathUtils::GetModulePath();
         SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
 
         shExecInfo.hwnd         = nullptr;
         shExecInfo.lpVerb       = L"runas";
-        shExecInfo.lpFile       = modpath.c_str();
+        shExecInfo.lpFile       = modPath.c_str();
         shExecInfo.lpParameters = parser->getCmdLine();
         shExecInfo.nShow        = SW_NORMAL;
 
@@ -575,7 +576,7 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     SetRelaunchCommand(mainWindow, appID, (modulePath + params).c_str(), L"BowPad", sIconPath.c_str());
 
     // Main message loop:
-    MSG   msg = {0};
+    MSG   msg = {nullptr};
     auto& kb  = CKeyboardShortcutHandler::Instance();
     while (GetMessage(&msg, nullptr, 0, 0))
     {
@@ -589,7 +590,7 @@ int BPMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     CCommandHandler::ShutDown();
     g_emptyIcon = nullptr;
     Animator::ShutDown();
-    return (int)msg.wParam;
+    return static_cast<int>(msg.wParam);
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
@@ -608,7 +609,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
     bool bAlreadyRunning = (mutexStatus == ERROR_ALREADY_EXISTS || mutexStatus == ERROR_ACCESS_DENIED);
     firstInstance        = !bAlreadyRunning;
 
-    auto mainResult = BPMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow, bAlreadyRunning);
+    auto mainResult = bpMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow, bAlreadyRunning);
 
     Scintilla_ReleaseResources();
 

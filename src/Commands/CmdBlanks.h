@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,14 +19,11 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 #include "BaseDialog.h"
-#include "DlgResizer.h"
-
 
 class CCmdTrim : public ICommand
 {
 public:
-
-    CCmdTrim(void * obj)
+    CCmdTrim(void* obj)
         : ICommand(obj)
     {
     }
@@ -36,14 +33,12 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdTrim; }
-
 };
 
 class CCmdTabs2Spaces : public ICommand
 {
 public:
-
-    CCmdTabs2Spaces(void * obj)
+    CCmdTabs2Spaces(void* obj)
         : ICommand(obj)
     {
     }
@@ -53,15 +48,12 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdTabs2Spaces; }
-
 };
-
 
 class CCmdSpaces2Tabs : public ICommand
 {
 public:
-
-    CCmdSpaces2Tabs(void * obj)
+    CCmdSpaces2Tabs(void* obj)
         : ICommand(obj)
     {
     }
@@ -71,5 +63,4 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdSpaces2Tabs; }
-
 };

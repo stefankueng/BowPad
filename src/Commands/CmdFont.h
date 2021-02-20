@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,20 +22,20 @@
 class CCmdFont : public ICommand
 {
 public:
-
-    CCmdFont(void * obj);
+    CCmdFont(void* obj);
     ~CCmdFont() = default;
 
     bool Execute() override { return true; }
 
     UINT GetCmdId() override { return cmdFontOnly; }
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
-    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* /*ppropvarValue*/, IUISimplePropertySet* pCommandExecutionProperties) override;
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* /*pPropVarValue*/, IUISimplePropertySet* pCommandExecutionProperties) override;
+
 private:
-    bool            m_bBold;
-    bool            m_bItalic;
-    int             m_size;
-    std::wstring    m_FontName;
+    bool         m_bBold;
+    bool         m_bItalic;
+    int          m_size;
+    std::wstring m_fontName;
 };

@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2017 - Stefan Kueng
+// Copyright (C) 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,9 +18,6 @@
 #include "stdafx.h"
 #include "ProgressBar.h"
 #include "Theme.h"
-#include "GDIHelpers.h"
-#include "BowPad.h"
-#include <thread>
 #include <Uxtheme.h>
 
 bool CProgressBar::Init(HINSTANCE /*hInst*/, HWND hParent)
@@ -60,7 +57,7 @@ void CProgressBar::SetPos(DWORD32 pos)
         if ((GetTickCount64() - m_delay) > m_startTicks)
         {
             auto end = SendMessage(*this, PBM_GETRANGE, 0, 0);
-            if ((double(pos) / double(end)) < 0.6)
+            if ((static_cast<double>(pos) / static_cast<double>(end)) < 0.6)
             {
                 ::ShowWindow(*this, SW_SHOW);
                 UpdateWindow(*this);
@@ -79,12 +76,12 @@ void CProgressBar::SetDarkMode(bool bDark, COLORREF bkgnd)
         // might be better than using the Windows progress bar control.
         SetWindowTheme(*this, L"", L"");
         SendMessage(*this, PBM_SETBKCOLOR, 0, bkgnd);
-        SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(BLACK_BRUSH));
+        SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, reinterpret_cast<LONG_PTR>(GetStockObject(BLACK_BRUSH)));
     }
     else
     {
         SetWindowTheme(*this, L"Explorer", nullptr);
-        SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetSysColorBrush(COLOR_3DFACE));
+        SetClassLongPtr(m_hwnd, GCLP_HBRBACKGROUND, reinterpret_cast<LONG_PTR>(GetSysColorBrush(COLOR_3DFACE)));
     }
     UpdateWindow(*this);
 }

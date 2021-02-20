@@ -23,7 +23,7 @@
 class CmdPalData
 {
 public:
-    UINT         cmdId = 0;
+    UINT         cmdId           = 0;
     int          collectionIndex = -1;
     std::wstring command;
     std::wstring description;
@@ -37,14 +37,15 @@ class CCommandPaletteDlg : public CDialog
 {
 public:
     CCommandPaletteDlg(HWND hParent);
-    ~CCommandPaletteDlg();
+    virtual ~CCommandPaletteDlg();
 
     void ClearFilterText();
+
 protected:
-    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     LRESULT          DoCommand(int id, int code);
 
-    void    InitResultsList();
+    void    InitResultsList() const;
     void    FillResults(bool force);
     LRESULT DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
     LRESULT GetListItemDispInfo(NMLVDISPINFO* pDispInfo);

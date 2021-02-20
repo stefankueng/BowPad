@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2018, 2020 - Stefan Kueng
+// Copyright (C) 2016-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,21 +28,21 @@ void CCustomToolTip::Init(HWND hParent)
 {
 #define POPUPCLASSNAME "BASEPOPUPWNDCLASS"
     // Register the window class if it has not already been registered.
-    WNDCLASSEX wndcls = {sizeof(WNDCLASSEX)};
-    if (!(::GetClassInfoEx(hResource, TEXT(POPUPCLASSNAME), &wndcls)))
+    WNDCLASSEX wndCls = {sizeof(WNDCLASSEX)};
+    if (!(::GetClassInfoEx(hResource, TEXT(POPUPCLASSNAME), &wndCls)))
     {
         // otherwise we need to register a new class
-        wndcls.style       = CS_SAVEBITS;
-        wndcls.lpfnWndProc = ::DefWindowProc;
-        wndcls.cbClsExtra = wndcls.cbWndExtra = 0;
-        wndcls.hInstance                      = hResource;
-        wndcls.hIcon                          = nullptr;
-        wndcls.hCursor                        = LoadCursor(hResource, IDC_ARROW);
-        wndcls.hbrBackground                  = nullptr;
-        wndcls.lpszMenuName                   = nullptr;
-        wndcls.lpszClassName                  = TEXT(POPUPCLASSNAME);
+        wndCls.style       = CS_SAVEBITS;
+        wndCls.lpfnWndProc = ::DefWindowProc;
+        wndCls.cbClsExtra = wndCls.cbWndExtra = 0;
+        wndCls.hInstance                      = hResource;
+        wndCls.hIcon                          = nullptr;
+        wndCls.hCursor                        = LoadCursor(hResource, IDC_ARROW);
+        wndCls.hbrBackground                  = nullptr;
+        wndCls.lpszMenuName                   = nullptr;
+        wndCls.lpszClassName                  = TEXT(POPUPCLASSNAME);
 
-        if (RegisterClassEx(&wndcls) == 0)
+        if (RegisterClassEx(&wndCls) == 0)
         {
             if (GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
                 throw std::exception("failed to register " POPUPCLASSNAME);
@@ -54,7 +54,7 @@ void CCustomToolTip::Init(HWND hParent)
 
     m_hParent = hParent;
 
-    if (!CreateEx(dwExStyle, dwStyle, hParent, 0, TEXT(POPUPCLASSNAME)))
+    if (!CreateEx(dwExStyle, dwStyle, hParent, nullptr, TEXT(POPUPCLASSNAME)))
         return;
 }
 
@@ -65,8 +65,8 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
         m_color = (*color) & 0xFFFFFF;
     m_bShowColorBox = color != nullptr;
     auto dc         = GetDC(*this);
-    auto textbuf    = std::make_unique<wchar_t[]>(m_infoText.size() + 4);
-    wcscpy_s(textbuf.get(), m_infoText.size() + 4, m_infoText.c_str());
+    auto textBuf    = std::make_unique<wchar_t[]>(m_infoText.size() + 4);
+    wcscpy_s(textBuf.get(), m_infoText.size() + 4, m_infoText.c_str());
     RECT rc{};
     rc.left   = 0;
     rc.right  = CDPIAware::Instance().Scale(*this, 800);
@@ -78,9 +78,9 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
     SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
     m_hFont = CreateFontIndirect(&ncm.lfStatusFont);
 
-    auto oldfont = SelectObject(dc, m_hFont);
-    DrawText(dc, textbuf.get(), (int)m_infoText.size(), &rc, DT_LEFT | DT_TOP | DT_CALCRECT | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);
-    SelectObject(dc, oldfont);
+    auto oldFont = SelectObject(dc, m_hFont);
+    DrawText(dc, textBuf.get(), static_cast<int>(m_infoText.size()), &rc, DT_LEFT | DT_TOP | DT_CALCRECT | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);
+    SelectObject(dc, oldFont);
 
     if (m_bShowColorBox)
     {
@@ -93,35 +93,35 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
                  rc.right + BORDER + BORDER, rc.bottom + BORDER + BORDER,
                  SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW);
 
-    auto transAlpha = Animator::Instance().CreateLinearTransition(m_AnimVarAlpha, 0.3, 255);
+    auto transAlpha = Animator::Instance().CreateLinearTransition(m_animVarAlpha, 0.3, 255);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
     if (storyBoard && transAlpha)
     {
-        storyBoard->AddTransition(m_AnimVarAlpha.m_animVar, transAlpha);
+        storyBoard->AddTransition(m_animVarAlpha.m_animVar, transAlpha);
         Animator::Instance().RunStoryBoard(storyBoard, [this]() {
-            SetTransparency((BYTE)Animator::GetIntegerValue(m_AnimVarAlpha));
+            SetTransparency(static_cast<BYTE>(Animator::GetIntegerValue(m_animVarAlpha)));
         });
     }
     else
-        SetTransparency((BYTE)Animator::GetIntegerValue(m_AnimVarAlpha));
+        SetTransparency(static_cast<BYTE>(Animator::GetIntegerValue(m_animVarAlpha)));
 }
 
 void CCustomToolTip::HideTip()
 {
-    auto transAlpha = Animator::Instance().CreateLinearTransition(m_AnimVarAlpha, 0.5, 0);
+    auto transAlpha = Animator::Instance().CreateLinearTransition(m_animVarAlpha, 0.5, 0);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
     if (storyBoard && transAlpha)
     {
-        storyBoard->AddTransition(m_AnimVarAlpha.m_animVar, transAlpha);
+        storyBoard->AddTransition(m_animVarAlpha.m_animVar, transAlpha);
         Animator::Instance().RunStoryBoard(storyBoard, [this]() {
-            auto alpha = Animator::GetIntegerValue(m_AnimVarAlpha);
-            SetTransparency((BYTE)alpha);
+            auto alpha = Animator::GetIntegerValue(m_animVarAlpha);
+            SetTransparency(static_cast<BYTE>(alpha));
             if (alpha == 0)
                 ShowWindow(*this, SW_HIDE);
         });
     }
     else
-        SetTransparency((BYTE)Animator::GetIntegerValue(m_AnimVarAlpha));
+        SetTransparency(static_cast<BYTE>(Animator::GetIntegerValue(m_animVarAlpha)));
 }
 
 void CCustomToolTip::OnPaint(HDC hdc, RECT* pRc)
@@ -133,17 +133,17 @@ void CCustomToolTip::OnPaint(HDC hdc, RECT* pRc)
     pRc->bottom -= BORDER;
     ::SetTextColor(hdc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_INFOTEXT)));
     SetBkMode(hdc, TRANSPARENT);
-    auto oldfont = SelectObject(hdc, m_hFont);
-    auto textbuf = std::make_unique<wchar_t[]>(m_infoText.size() + 4);
-    wcscpy_s(textbuf.get(), m_infoText.size() + 4, m_infoText.c_str());
-    DrawText(hdc, textbuf.get(), -1, pRc, DT_LEFT | DT_TOP | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);
+    auto oldFont = SelectObject(hdc, m_hFont);
+    auto textBuf = std::make_unique<wchar_t[]>(m_infoText.size() + 4);
+    wcscpy_s(textBuf.get(), m_infoText.size() + 4, m_infoText.c_str());
+    DrawText(hdc, textBuf.get(), -1, pRc, DT_LEFT | DT_TOP | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);
     if (m_bShowColorBox)
     {
         SelectObject(hdc, GetStockObject(GRAY_BRUSH));
         Rectangle(hdc, pRc->left, pRc->bottom - COLORBOX_SIZE, pRc->right, pRc->bottom);
         GDIHelpers::FillSolidRect(hdc, pRc->left + RECTBORDER, pRc->bottom - COLORBOX_SIZE + RECTBORDER, pRc->right - RECTBORDER, pRc->bottom - RECTBORDER, m_color);
     }
-    SelectObject(hdc, oldfont);
+    SelectObject(hdc, oldFont);
 }
 
 LRESULT CCustomToolTip::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -175,9 +175,8 @@ LRESULT CCustomToolTip::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
         case WM_PAINT:
         {
             PAINTSTRUCT ps;
-            HDC         hdc;
-            hdc = BeginPaint(hwnd, &ps);
-            RECT rc;
+            HDC         hdc = BeginPaint(hwnd, &ps);
+            RECT        rc;
             GetClientRect(hwnd, &rc);
             OnPaint(hdc, &rc);
             EndPaint(hwnd, &ps);

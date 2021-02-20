@@ -19,15 +19,11 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 
-#include <string>
-#include <vector>
-
-
 class CCmdLanguage : public ICommand
 {
 public:
-
-    CCmdLanguage(void * obj) : ICommand(obj)
+    CCmdLanguage(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -37,9 +33,7 @@ public:
     UINT GetCmdId() override { return cmdLanguage; }
     bool IsItemsSourceCommand() override { return true; }
 
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
-
-    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 };
-

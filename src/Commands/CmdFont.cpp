@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,25 +21,26 @@
 #include "AppUtils.h"
 #include "UnicodeUtils.h"
 
-CCmdFont::CCmdFont(void * obj) : ICommand(obj)
+CCmdFont::CCmdFont(void* obj)
+    : ICommand(obj)
     , m_bBold(false)
     , m_bItalic(false)
     , m_size(11)
-    , m_FontName(L"Consolas")
+    , m_fontName(L"Consolas")
 {
 }
 
-HRESULT CCmdFont::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdFont::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue)
 {
     HRESULT hr = E_FAIL;
     if (key == UI_PKEY_FontProperties)
     {
         hr = E_POINTER;
-        if (ppropvarCurrentValue != nullptr)
+        if (pPropVarCurrentValue != nullptr)
         {
             // Get the font values for the selected text in the font control.
             IPropertyStorePtr pValues;
-            hr = UIPropertyToInterface(UI_PKEY_FontProperties, *ppropvarCurrentValue, &pValues);
+            hr = UIPropertyToInterface(UI_PKEY_FontProperties, *pPropVarCurrentValue, &pValues);
             if (CAppUtils::FailedShowMessage(hr))
                 return hr;
             PROPVARIANT propvar;
@@ -59,38 +60,38 @@ HRESULT CCmdFont::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROP
             pValues->SetValue(UI_PKEY_FontProperties_Italic, propvar);
             PropVariantClear(&propvar);
 
-            m_FontName = CIniSettings::Instance().GetString(L"View", L"FontName", L"Consolas");
+            m_fontName = CIniSettings::Instance().GetString(L"View", L"FontName", L"Consolas");
             // Set the font family value to the font name.
-            UIInitPropertyFromString(UI_PKEY_FontProperties_Family, m_FontName.c_str(), &propvar);
+            UIInitPropertyFromString(UI_PKEY_FontProperties_Family, m_fontName.c_str(), &propvar);
             // Set UI_PKEY_FontProperties_Family value in property store.
             pValues->SetValue(UI_PKEY_FontProperties_Family, propvar);
             PropVariantClear(&propvar);
 
-            m_size = (int)CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11);
+            m_size = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11));
             DECIMAL decSize;
             // Font size value is available so get the font size.
-            VarDecFromR8((DOUBLE)m_size, &decSize);
+            VarDecFromR8(static_cast<DOUBLE>(m_size), &decSize);
             // Set UI_PKEY_FontProperties_Size value in property store.
             UIInitPropertyFromDecimal(UI_PKEY_FontProperties_Size, decSize, &propvar);
             pValues->SetValue(UI_PKEY_FontProperties_Size, propvar);
             PropVariantClear(&propvar);
 
             // Provide the new values to the font control.
-            hr = UIInitPropertyFromInterface(UI_PKEY_FontProperties, pValues, ppropvarNewValue);
+            hr = UIInitPropertyFromInterface(UI_PKEY_FontProperties, pValues, pPropVarNewValue);
         }
     }
     return hr;
 }
 
-HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* /*ppropvarValue*/, IUISimplePropertySet* pCommandExecutionProperties)
+HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* /*pPropVarValue*/, IUISimplePropertySet* pCommandExecutionProperties)
 {
     HRESULT hr = E_NOTIMPL;
     if (verb == UI_EXECUTIONVERB_CANCELPREVIEW)
     {
         // restore from saved values
-        std::string sFontName = CUnicodeUtils::StdGetUTF8(m_FontName);
-        CIniSettings::Instance().SetString(L"View", L"FontName", m_FontName.c_str());
-        ScintillaCall(SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)sFontName.c_str());
+        std::string sFontName = CUnicodeUtils::StdGetUTF8(m_fontName);
+        CIniSettings::Instance().SetString(L"View", L"FontName", m_fontName.c_str());
+        ScintillaCall(SCI_STYLESETFONT, STYLE_DEFAULT, reinterpret_cast<LPARAM>(sFontName.c_str()));
 
         CIniSettings::Instance().SetInt64(L"View", L"FontBold", m_bBold);
         CIniSettings::Instance().SetInt64(L"View", L"FontItalic", m_bItalic);
@@ -119,15 +120,15 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
             if (SUCCEEDED(hr))
             {
                 // Using the changed properties, set the new font on the selection on RichEdit control.
-                PROPVARIANT propvar;
-                PropVariantInit(&propvar);
+                PROPVARIANT propVar;
+                PropVariantInit(&propVar);
                 UINT uValue;
 
                 // Get the bold value from the property store.
-                if (SUCCEEDED(pChanges->GetValue(UI_PKEY_FontProperties_Bold, &propvar)))
+                if (SUCCEEDED(pChanges->GetValue(UI_PKEY_FontProperties_Bold, &propVar)))
                 {
-                    UIPropertyToUInt32(UI_PKEY_FontProperties_Bold, propvar, &uValue);
-                    if ((UI_FONTPROPERTIES) uValue != UI_FONTPROPERTIES_NOTAVAILABLE)
+                    UIPropertyToUInt32(UI_PKEY_FontProperties_Bold, propVar, &uValue);
+                    if (static_cast<UI_FONTPROPERTIES>(uValue) != UI_FONTPROPERTIES_NOTAVAILABLE)
                     {
                         if ((verb == UI_EXECUTIONVERB_EXECUTE) || (verb == UI_EXECUTIONVERB_PREVIEW))
                             CIniSettings::Instance().SetInt64(L"View", L"FontBold", uValue == UI_FONTPROPERTIES_SET);
@@ -135,13 +136,13 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
                             m_bBold = uValue == UI_FONTPROPERTIES_SET;
                     }
                 }
-                PropVariantClear(&propvar);
+                PropVariantClear(&propVar);
 
                 // Get the italic value from the property store.
-                if (SUCCEEDED(pChanges->GetValue(UI_PKEY_FontProperties_Italic, &propvar)))
+                if (SUCCEEDED(pChanges->GetValue(UI_PKEY_FontProperties_Italic, &propVar)))
                 {
-                    UIPropertyToUInt32(UI_PKEY_FontProperties_Italic, propvar, &uValue);
-                    if ((UI_FONTPROPERTIES) uValue != UI_FONTPROPERTIES_NOTAVAILABLE)
+                    UIPropertyToUInt32(UI_PKEY_FontProperties_Italic, propVar, &uValue);
+                    if (static_cast<UI_FONTPROPERTIES>(uValue) != UI_FONTPROPERTIES_NOTAVAILABLE)
                     {
                         if ((verb == UI_EXECUTIONVERB_EXECUTE) || (verb == UI_EXECUTIONVERB_PREVIEW))
                             CIniSettings::Instance().SetInt64(L"View", L"FontItalic", uValue == UI_FONTPROPERTIES_SET);
@@ -149,45 +150,45 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
                             m_bItalic = uValue == UI_FONTPROPERTIES_SET;
                     }
                 }
-                PropVariantClear(&propvar);
+                PropVariantClear(&propVar);
 
                 // Get the font family value from the property store.
-                if (SUCCEEDED(pChanges->GetValue(UI_PKEY_FontProperties_Family, &propvar)))
+                if (SUCCEEDED(pChanges->GetValue(UI_PKEY_FontProperties_Family, &propVar)))
                 {
                     // Get the string for the font family.
                     PWSTR pszFamily = nullptr;
-                    UIPropertyToStringAlloc(UI_PKEY_FontProperties_Family, propvar, &pszFamily);
+                    UIPropertyToStringAlloc(UI_PKEY_FontProperties_Family, propVar, &pszFamily);
                     // Blank string is used as "Not Available" value.
                     if (lstrcmp(pszFamily, L""))
                     {
                         if ((verb == UI_EXECUTIONVERB_EXECUTE) || (verb == UI_EXECUTIONVERB_PREVIEW))
                             CIniSettings::Instance().SetString(L"View", L"FontName", pszFamily);
                         if (verb == UI_EXECUTIONVERB_EXECUTE)
-                            m_FontName = pszFamily;
+                            m_fontName = pszFamily;
                     }
                     // Free the allocated string.
                     CoTaskMemFree(pszFamily);
                 }
-                PropVariantClear(&propvar);
+                PropVariantClear(&propVar);
 
                 // Get the font size value from the property store.
-                if (SUCCEEDED(pChanges->GetValue(UI_PKEY_FontProperties_Size, &propvar)))
+                if (SUCCEEDED(pChanges->GetValue(UI_PKEY_FontProperties_Size, &propVar)))
                 {
                     // Get the decimal font size value.
                     DECIMAL decSize;
-                    UIPropertyToDecimal(UI_PKEY_FontProperties_Size, propvar, &decSize);
+                    UIPropertyToDecimal(UI_PKEY_FontProperties_Size, propVar, &decSize);
                     DOUBLE dSize;
                     VarR8FromDec(&decSize, &dSize);
                     // Zero is used as "Not Available" value.
                     if (dSize > 0)
                     {
                         if ((verb == UI_EXECUTIONVERB_EXECUTE) || (verb == UI_EXECUTIONVERB_PREVIEW))
-                            CIniSettings::Instance().SetInt64(L"View", L"FontSize", (LONG)(dSize));
+                            CIniSettings::Instance().SetInt64(L"View", L"FontSize", static_cast<LONG>(dSize));
                         if (verb == UI_EXECUTIONVERB_EXECUTE)
-                            m_size = (int)dSize;
+                            m_size = static_cast<int>(dSize);
                     }
                 }
-                PropVariantClear(&propvar);
+                PropVariantClear(&propVar);
             }
             PropVariantClear(&varChanges);
         }

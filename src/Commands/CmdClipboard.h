@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2018, 2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,24 +22,25 @@
 class ClipboardBase : public ICommand
 {
 public:
-    ClipboardBase(void * obj) : ICommand(obj)
+    ClipboardBase(void* obj)
+        : ICommand(obj)
     {
     }
 
     virtual ~ClipboardBase() = default;
 
 protected:
-    std::string GetHtmlSelection();
-    void AddHtmlStringToClipboard(const std::string& sHtml);
-    void AddLexerToClipboard();
-    void SetLexerFromClipboard();
+    std::string GetHtmlSelection() const;
+    void        AddHtmlStringToClipboard(const std::string& sHtml) const;
+    void        AddLexerToClipboard() const;
+    void        SetLexerFromClipboard();
 };
 
 class CCmdCut : public ClipboardBase
 {
 public:
-
-    CCmdCut(void * obj) : ClipboardBase(obj)
+    CCmdCut(void* obj)
+        : ClipboardBase(obj)
     {
     }
 
@@ -49,14 +50,14 @@ public:
 
     UINT GetCmdId() override { return cmdCut; }
 
-    void ScintillaNotify(SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification* pScn) override;
 };
 
 class CCmdCutPlain : public ClipboardBase
 {
 public:
-
-    CCmdCutPlain(void * obj) : ClipboardBase(obj)
+    CCmdCutPlain(void* obj)
+        : ClipboardBase(obj)
     {
     }
 
@@ -66,15 +67,14 @@ public:
 
     UINT GetCmdId() override { return cmdCutPlain; }
 
-    void ScintillaNotify(SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification* pScn) override;
 };
-
 
 class CCmdCopy : public ClipboardBase
 {
 public:
-
-    CCmdCopy(void * obj) : ClipboardBase(obj)
+    CCmdCopy(void* obj)
+        : ClipboardBase(obj)
     {
     }
 
@@ -88,8 +88,8 @@ public:
 class CCmdCopyPlain : public ClipboardBase
 {
 public:
-
-    CCmdCopyPlain(void * obj) : ClipboardBase(obj)
+    CCmdCopyPlain(void* obj)
+        : ClipboardBase(obj)
     {
     }
 
@@ -103,8 +103,8 @@ public:
 class CCmdPaste : public ClipboardBase
 {
 public:
-
-    CCmdPaste(void * obj) : ClipboardBase(obj)
+    CCmdPaste(void* obj)
+        : ClipboardBase(obj)
     {
     }
 
@@ -116,14 +116,14 @@ public:
 
     void OnClipboardChanged() override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };
 
 class CCmdPasteHtml : public ClipboardBase
 {
 public:
-
-    CCmdPasteHtml(void * obj) : ClipboardBase(obj)
+    CCmdPasteHtml(void* obj)
+        : ClipboardBase(obj)
     {
     }
 
@@ -135,7 +135,8 @@ public:
 
     void OnClipboardChanged() override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
+
 private:
-    void HtmlExtractMetadata(const std::string& cf_html, std::string* base_url, size_t* html_start, size_t* fragment_start, size_t* fragment_end);
+    void HtmlExtractMetadata(const std::string& cfHtml, std::string* baseURL, size_t* htmlStart, size_t* fragmentStart, size_t* fragmentEnd) const;
 };

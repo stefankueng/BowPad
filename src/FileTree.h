@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2018-2020 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class FileTreeData
 public:
     FileTreeData() {}
 
-    std::wstring              refreshpath;
+    std::wstring              refreshPath;
     HTREEITEM                 refreshRoot = nullptr;
     std::vector<FileTreeItem> data;
 };
@@ -55,7 +55,7 @@ public:
 
     bool         Init(HINSTANCE hInst, HWND hParent);
     void         Clear();
-    void         SetPath(const std::wstring& path, bool forcerefresh = true);
+    void         SetPath(const std::wstring& path, bool forceRefresh = true);
     std::wstring GetPath() const { return m_path; }
     HTREEITEM    GetHitItem() const;
     void         ExpandItem(HTREEITEM hItem);
@@ -87,10 +87,10 @@ protected:
 private:
     std::wstring                       m_path;
     int                                m_nBlockRefresh;
-    volatile LONG                      m_ThreadsRunning;
+    volatile LONG                      m_threadsRunning;
     volatile LONG                      m_bStop;
     bool                               m_bRootBusy;
-    HTREEITEM                          m_ActiveItem;
+    HTREEITEM                          m_activeItem;
     bool                               m_bBlockExpansion;
     std::map<HTREEITEM, FileTreeData*> m_data;
 };

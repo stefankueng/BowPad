@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,17 +19,15 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 
-
 class CCmdSummary : public ICommand
 {
 public:
-    CCmdSummary(void* obj) : ICommand(obj)
+    CCmdSummary(void* obj)
+        : ICommand(obj)
     {
     }
     ~CCmdSummary() = default;
 
     UINT GetCmdId() override { return cmdSummary; }
     bool Execute() override;
-
-private:
 };

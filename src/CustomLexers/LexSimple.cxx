@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,12 +17,10 @@
 #include "stdafx.h"
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include <stdarg.h>
 #include <cassert>
 #include <ctype.h>
 #include <string>
-#include <map>
 #include <set>
 #include <vector>
 
@@ -34,7 +32,6 @@
 
 #include "../scintilla/lexlib/WordList.h"
 #include "../scintilla/lexlib/LexAccessor.h"
-#include "../scintilla/lexlib/Accessor.h"
 #include "../scintilla/lexlib/StyleContext.h"
 #include "../scintilla/lexlib/CharacterSet.h"
 #include "../scintilla/lexlib/LexerModule.h"
@@ -70,12 +67,12 @@ enum SimpleStyles
 
 struct OptionsSimple
 {
-    std::string stringchars;
-    bool        stylenumbers = false;
+    std::string stringChars;
+    bool        styleNumbers = false;
     std::string operators;
 
-    std::vector<std::string> linecomments;
-    std::string              linecomment;
+    std::vector<std::string> lineComments;
+    std::string              lineComment;
     std::string              inlineCommentStart;
     std::string              inlineCommentEnd;
 
@@ -93,27 +90,27 @@ struct OptionsSimple
     bool ws8CaseSensitive = false;
     bool ws9CaseSensitive = false;
 
-    std::vector<std::string> operatorsvec;
+    std::vector<std::string> operatorsVec;
 
     bool fold         = false;
     bool foldComments = false;
-    bool foldAtWS1    = false;
-    bool foldAtWS2    = false;
-    bool foldAtWS3    = false;
-    bool foldAtWS4    = false;
-    bool foldAtWS5    = false;
-    bool foldAtWS6    = false;
-    bool foldAtWS7    = false;
-    bool foldAtWS8    = false;
-    bool foldAtWS9    = false;
+    bool foldAtWs1    = false;
+    bool foldAtWs2    = false;
+    bool foldAtWs3    = false;
+    bool foldAtWs4    = false;
+    bool foldAtWs5    = false;
+    bool foldAtWs6    = false;
+    bool foldAtWs7    = false;
+    bool foldAtWs8    = false;
+    bool foldAtWs9    = false;
 
     void initOperators()
     {
-        stringtok(operatorsvec, operators, true, " \t\n");
+        stringtok(operatorsVec, operators, true, " \t\n");
     }
-    void initLinecomments()
+    void initLineComments()
     {
-        stringtok(linecomments, linecomment, true, " \t\n");
+        stringtok(lineComments, lineComment, true, " \t\n");
     }
 };
 
@@ -127,18 +124,18 @@ const char* const simpleWordLists[] = {
     "keywords 7",
     "keywords 8",
     "keywords 9",
-    0,
+    nullptr,
 };
 
 struct OptionSetSimple : public OptionSet<OptionsSimple>
 {
     OptionSetSimple()
     {
-        DefineProperty("stringchars", &OptionsSimple::stringchars);
-        DefineProperty("stylenumbers", &OptionsSimple::stylenumbers);
+        DefineProperty("stringchars", &OptionsSimple::stringChars);
+        DefineProperty("stylenumbers", &OptionsSimple::styleNumbers);
         DefineProperty("operators", &OptionsSimple::operators);
 
-        DefineProperty("linecomment", &OptionsSimple::linecomment);
+        DefineProperty("linecomment", &OptionsSimple::lineComment);
         DefineProperty("inlineCommentStart", &OptionsSimple::inlineCommentStart);
         DefineProperty("inlineCommentEnd", &OptionsSimple::inlineCommentEnd);
         DefineProperty("eol", &OptionsSimple::eol);
@@ -158,26 +155,26 @@ struct OptionSetSimple : public OptionSet<OptionsSimple>
 
         DefineProperty("fold", &OptionsSimple::fold);
         DefineProperty("foldComments", &OptionsSimple::foldComments);
-        DefineProperty("foldAtWS1", &OptionsSimple::foldAtWS1);
-        DefineProperty("foldAtWS2", &OptionsSimple::foldAtWS2);
-        DefineProperty("foldAtWS3", &OptionsSimple::foldAtWS3);
-        DefineProperty("foldAtWS4", &OptionsSimple::foldAtWS4);
-        DefineProperty("foldAtWS5", &OptionsSimple::foldAtWS5);
-        DefineProperty("foldAtWS6", &OptionsSimple::foldAtWS6);
-        DefineProperty("foldAtWS7", &OptionsSimple::foldAtWS7);
-        DefineProperty("foldAtWS8", &OptionsSimple::foldAtWS8);
-        DefineProperty("foldAtWS9", &OptionsSimple::foldAtWS9);
+        DefineProperty("foldAtWS1", &OptionsSimple::foldAtWs1);
+        DefineProperty("foldAtWS2", &OptionsSimple::foldAtWs2);
+        DefineProperty("foldAtWS3", &OptionsSimple::foldAtWs3);
+        DefineProperty("foldAtWS4", &OptionsSimple::foldAtWs4);
+        DefineProperty("foldAtWS5", &OptionsSimple::foldAtWs5);
+        DefineProperty("foldAtWS6", &OptionsSimple::foldAtWs6);
+        DefineProperty("foldAtWS7", &OptionsSimple::foldAtWs7);
+        DefineProperty("foldAtWS8", &OptionsSimple::foldAtWs8);
+        DefineProperty("foldAtWS9", &OptionsSimple::foldAtWs9);
 
         DefineWordListSets(simpleWordLists);
     }
 };
 
-static inline bool IsAWordChar(const int ch)
+bool IsAWordChar(const int ch)
 {
     return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '$');
 }
 
-static inline bool IsAnOperator(StyleContext* sc, const std::vector<std::string>& operators)
+bool IsAnOperator(StyleContext* sc, const std::vector<std::string>& operators)
 {
     if (IsAlphaNumeric(sc->ch))
         return false;
@@ -201,7 +198,7 @@ public:
         Clear();
     };
     bool caseSensitive;
-    bool Contains(const char* s)
+    bool Contains(const char* s) const
     {
         return InList(s);
     };
@@ -222,7 +219,7 @@ class LexerSimple : public DefaultLexer
     WordListAbridged keywords9;
     OptionsSimple    options;
     OptionSetSimple  osSimple;
-    std::set<int>    wordchars;
+    std::set<int>    wordChars;
 
 public:
     LexerSimple()
@@ -279,12 +276,12 @@ public:
 
     void* SCI_METHOD PrivateCall(int, void*) override
     {
-        return NULL;
+        return nullptr;
     }
 
     bool checkLineComments(Scintilla::StyleContext* sc)
     {
-        for (const auto& cs : options.linecomments)
+        for (const auto& cs : options.lineComments)
         {
             if (sc->Match(cs.c_str()))
                 return true;
@@ -308,7 +305,7 @@ Sci_Position SCI_METHOD LexerSimple::PropertySet(const char* key, const char* va
         }
         if (strcmp(key, "linecomment") == 0)
         {
-            options.initLinecomments();
+            options.initLineComments();
         }
         return 0;
     }
@@ -317,63 +314,63 @@ Sci_Position SCI_METHOD LexerSimple::PropertySet(const char* key, const char* va
 
 Sci_Position SCI_METHOD LexerSimple::WordListSet(int n, const char* wl)
 {
-    WordListAbridged* WordListAbridgedN = 0;
+    WordListAbridged* wordListAbridgedN = nullptr;
     switch (n)
     {
         case 0:
-            WordListAbridgedN                = &keywords1;
-            WordListAbridgedN->caseSensitive = options.ws1CaseSensitive;
+            wordListAbridgedN                = &keywords1;
+            wordListAbridgedN->caseSensitive = options.ws1CaseSensitive;
             break;
         case 1:
-            WordListAbridgedN                = &keywords2;
-            WordListAbridgedN->caseSensitive = options.ws2CaseSensitive;
+            wordListAbridgedN                = &keywords2;
+            wordListAbridgedN->caseSensitive = options.ws2CaseSensitive;
             break;
         case 2:
-            WordListAbridgedN                = &keywords3;
-            WordListAbridgedN->caseSensitive = options.ws3CaseSensitive;
+            wordListAbridgedN                = &keywords3;
+            wordListAbridgedN->caseSensitive = options.ws3CaseSensitive;
             break;
         case 3:
-            WordListAbridgedN                = &keywords4;
-            WordListAbridgedN->caseSensitive = options.ws4CaseSensitive;
+            wordListAbridgedN                = &keywords4;
+            wordListAbridgedN->caseSensitive = options.ws4CaseSensitive;
             break;
         case 4:
-            WordListAbridgedN                = &keywords5;
-            WordListAbridgedN->caseSensitive = options.ws5CaseSensitive;
+            wordListAbridgedN                = &keywords5;
+            wordListAbridgedN->caseSensitive = options.ws5CaseSensitive;
             break;
         case 5:
-            WordListAbridgedN                = &keywords6;
-            WordListAbridgedN->caseSensitive = options.ws6CaseSensitive;
+            wordListAbridgedN                = &keywords6;
+            wordListAbridgedN->caseSensitive = options.ws6CaseSensitive;
             break;
         case 6:
-            WordListAbridgedN                = &keywords7;
-            WordListAbridgedN->caseSensitive = options.ws7CaseSensitive;
+            wordListAbridgedN                = &keywords7;
+            wordListAbridgedN->caseSensitive = options.ws7CaseSensitive;
             break;
         case 7:
-            WordListAbridgedN                = &keywords8;
-            WordListAbridgedN->caseSensitive = options.ws8CaseSensitive;
+            wordListAbridgedN                = &keywords8;
+            wordListAbridgedN->caseSensitive = options.ws8CaseSensitive;
             break;
         case 8:
-            WordListAbridgedN                = &keywords9;
-            WordListAbridgedN->caseSensitive = options.ws9CaseSensitive;
+            wordListAbridgedN                = &keywords9;
+            wordListAbridgedN->caseSensitive = options.ws9CaseSensitive;
             break;
     }
     Sci_Position firstModification = -1;
-    if (WordListAbridgedN)
+    if (wordListAbridgedN)
     {
         WordListAbridged wlNew;
         wlNew.Set(wl);
-        if (*WordListAbridgedN != wlNew)
+        if (*wordListAbridgedN != wlNew)
         {
-            WordListAbridgedN->Set(wl);
+            wordListAbridgedN->Set(wl);
             firstModification = 0;
         }
-        wordchars.insert('_');
-        for (int i = 0; i < WordListAbridgedN->Length(); ++i)
+        wordChars.insert('_');
+        for (int i = 0; i < wordListAbridgedN->Length(); ++i)
         {
-            auto word = WordListAbridgedN->WordAt(i);
+            auto word = wordListAbridgedN->WordAt(i);
 
             if (!IsAlphaNumeric(word[0]))
-                wordchars.insert(word[0]);
+                wordChars.insert(word[0]);
         }
     }
     return firstModification;
@@ -406,11 +403,11 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
                 }
                 break;
             case SimpleStyles::Operator:
-                if (IsASpaceOrTab(sc.ch) || IsAWordChar(sc.ch) || sc.ch == '\r' || sc.ch == '\n' || IsAnOperator(&sc, options.operatorsvec))
+                if (IsASpaceOrTab(sc.ch) || IsAWordChar(sc.ch) || sc.ch == '\r' || sc.ch == '\n' || IsAnOperator(&sc, options.operatorsVec))
                     sc.SetState(SimpleStyles::Default);
                 break;
             case SimpleStyles::Number:
-                if (IsASpaceOrTab(sc.ch) || sc.ch == '\r' || sc.ch == '\n' || sc.ch == ',' || sc.ch == ';' || IsAnOperator(&sc, options.operatorsvec))
+                if (IsASpaceOrTab(sc.ch) || sc.ch == '\r' || sc.ch == '\n' || sc.ch == ',' || sc.ch == ';' || IsAnOperator(&sc, options.operatorsVec))
                 {
                     sc.SetState(SimpleStyles::Default);
                 }
@@ -473,7 +470,7 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
                 }
                 break;
             case SimpleStyles::String:
-                if (options.stringchars.find(sc.ch) != std::string::npos)
+                if (options.stringChars.find(sc.ch) != std::string::npos)
                 {
                     sc.ForwardSetState(SimpleStyles::Default);
                 }
@@ -486,7 +483,7 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
                 break;
             case SimpleStyles::MarkedWord1:
             case SimpleStyles::MarkedWord2:
-                if (IsASpaceOrTab(sc.ch) || sc.ch == '\r' || sc.ch == '\n' || IsAnOperator(&sc, options.operatorsvec))
+                if (IsASpaceOrTab(sc.ch) || sc.ch == '\r' || sc.ch == '\n' || IsAnOperator(&sc, options.operatorsVec))
                     sc.SetState(SimpleStyles::Default);
                 break;
         }
@@ -494,7 +491,7 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
         // Determine if a new state should be entered.
         if (sc.state == SimpleStyles::Default)
         {
-            if (options.stylenumbers &&
+            if (options.styleNumbers &&
                 ((IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext)) || ((sc.ch == '-' || sc.ch == '+') && (IsADigit(sc.chNext) || sc.chNext == '.')) || (MakeLowerCase(sc.ch) == 'e' && (IsADigit(sc.chNext) || sc.chNext == '+' || sc.chNext == '-')))))
             {
                 if ((sc.ch == '0' && MakeLowerCase(sc.chNext) == 'x') ||
@@ -512,15 +509,15 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
             {
                 sc.SetState(SimpleStyles::CommentLine);
             }
-            else if (iswordstart(sc.ch) || (std::find(wordchars.cbegin(), wordchars.cend(), sc.ch) != wordchars.cend()))
+            else if (iswordstart(sc.ch) || (std::find(wordChars.cbegin(), wordChars.cend(), sc.ch) != wordChars.cend()))
             {
                 sc.SetState(SimpleStyles::Identifier);
             }
-            else if (options.stringchars.find(sc.ch) != std::string::npos)
+            else if (options.stringChars.find(sc.ch) != std::string::npos)
             {
                 sc.SetState(SimpleStyles::String);
             }
-            else if (IsAnOperator(&sc, options.operatorsvec))
+            else if (IsAnOperator(&sc, options.operatorsVec))
             {
                 sc.SetState(SimpleStyles::Operator);
             }
@@ -536,7 +533,7 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
 
         if (sc.atLineEnd)
         {
-            // Reset states to begining of colourise so no surprises
+            // Reset states to beginning of colourise so no surprises
             // if different sets of lines lexed.
             visibleChars = 0;
             numberIsHex  = false;
@@ -577,15 +574,15 @@ void SCI_METHOD LexerSimple::Fold(Sci_PositionU startPos, Sci_Position length, i
     int  style         = initStyle;
     int  styleNext     = styler.StyleAt(startPos);
     bool inLineComment = false;
-    bool inWS1Fold     = false;
-    bool inWS2Fold     = false;
-    bool inWS3Fold     = false;
-    bool inWS4Fold     = false;
-    bool inWS5Fold     = false;
-    bool inWS6Fold     = false;
-    bool inWS7Fold     = false;
-    bool inWS8Fold     = false;
-    bool inWS9Fold     = false;
+    bool inWs1Fold     = false;
+    bool inWs2Fold     = false;
+    bool inWs3Fold     = false;
+    bool inWs4Fold     = false;
+    bool inWs5Fold     = false;
+    bool inWs6Fold     = false;
+    bool inWs7Fold     = false;
+    bool inWs8Fold     = false;
+    bool inWs9Fold     = false;
 
     for (Sci_PositionU i = startPos; i < endPos; ++i)
     {
@@ -621,7 +618,7 @@ void SCI_METHOD LexerSimple::Fold(Sci_PositionU startPos, Sci_Position length, i
             }
         }
 
-        auto foldAtWS = [&](bool fold, int wsStyle, bool& inFold) {
+        auto foldAtWs = [&](bool fold, int wsStyle, bool& inFold) {
             if (fold)
             {
                 if (style == wsStyle)
@@ -640,15 +637,15 @@ void SCI_METHOD LexerSimple::Fold(Sci_PositionU startPos, Sci_Position length, i
             }
         };
 
-        foldAtWS(options.foldAtWS1, SimpleStyles::Word1, inWS1Fold);
-        foldAtWS(options.foldAtWS2, SimpleStyles::Word2, inWS2Fold);
-        foldAtWS(options.foldAtWS3, SimpleStyles::Word3, inWS3Fold);
-        foldAtWS(options.foldAtWS4, SimpleStyles::Word4, inWS4Fold);
-        foldAtWS(options.foldAtWS5, SimpleStyles::Word5, inWS5Fold);
-        foldAtWS(options.foldAtWS6, SimpleStyles::Word6, inWS6Fold);
-        foldAtWS(options.foldAtWS7, SimpleStyles::Word7, inWS7Fold);
-        foldAtWS(options.foldAtWS8, SimpleStyles::Word8, inWS8Fold);
-        foldAtWS(options.foldAtWS9, SimpleStyles::Word9, inWS9Fold);
+        foldAtWs(options.foldAtWs1, SimpleStyles::Word1, inWs1Fold);
+        foldAtWs(options.foldAtWs2, SimpleStyles::Word2, inWs2Fold);
+        foldAtWs(options.foldAtWs3, SimpleStyles::Word3, inWs3Fold);
+        foldAtWs(options.foldAtWs4, SimpleStyles::Word4, inWs4Fold);
+        foldAtWs(options.foldAtWs5, SimpleStyles::Word5, inWs5Fold);
+        foldAtWs(options.foldAtWs6, SimpleStyles::Word6, inWs6Fold);
+        foldAtWs(options.foldAtWs7, SimpleStyles::Word7, inWs7Fold);
+        foldAtWs(options.foldAtWs8, SimpleStyles::Word8, inWs8Fold);
+        foldAtWs(options.foldAtWs9, SimpleStyles::Word9, inWs9Fold);
         if (atEOL || i == (endPos - 1))
         {
             int lev = levelPrev;

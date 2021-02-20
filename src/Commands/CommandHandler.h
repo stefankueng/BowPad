@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #include <string>
 #include <map>
 #include <memory>
-#include <vector>
 #include <cassert>
 
 class CCommandHandler
@@ -36,18 +35,18 @@ public:
     void        Init(void* obj);
     ICommand*   GetCommand(UINT cmdId);
     void        ScintillaNotify(SCNotification* pScn);
-    void        TabNotify(TBHDR* ptbhdr);
+    void        TabNotify(TBHDR* ptbHdr);
     void        OnClose();
-    void        OnDocumentClose(DocID id);
-    void        OnDocumentOpen(DocID id);
-    void        OnDocumentSave(DocID id, bool bSaveAs);
+    void        OnDocumentClose(DocID docId);
+    void        OnDocumentOpen(DocID docId);
+    void        OnDocumentSave(DocID docId, bool bSaveAs);
     void        OnClipboardChanged();
     void        BeforeLoad();
     void        AfterInit();
-    void        OnTimer(UINT id);
+    void        OnTimer(UINT timerId);
     void        OnThemeChanged(bool bDark);
     void        OnLangChanged();
-    const auto& GetPluginMap() { return m_plugins; }
+    const auto& GetPluginMap() const { return m_plugins; }
     int         GetPluginVersion(const std::wstring& name);
     void        AddCommand(ICommand* cmd);
     void        AddCommand(UINT cmdId);
@@ -60,19 +59,19 @@ public:
     };
     const std::map<UINT, ICommand*>& GetNoDeleteCommands() const
     {
-        return m_nodeletecommands;
+        return m_noDeleteCommands;
     };
 
 private:
-    template <typename T, typename... ARGS>
-    T* Add(ARGS... args)
+    template <typename T, typename... Args>
+    T* Add(Args... args)
     {
         // Construct the type we want. We need to get the id out of it.
         // Move it into the map, then return the pointer we got
         // out. We know it must be the type we want because we just created it.
         // We could use shared_ptr here but we control the life time so
         // no point paying the price as if we didn't.
-        auto pCmd      = std::make_unique<T>(std::forward<ARGS>(args)...);
+        auto pCmd      = std::make_unique<T>(std::forward<Args>(args)...);
         auto cmdId     = pCmd->GetCmdId();
         m_highestCmdId = max(m_highestCmdId, cmdId);
         auto at        = m_commands.emplace(cmdId, std::move(pCmd));
@@ -81,9 +80,9 @@ private:
     }
 
     std::map<UINT, std::unique_ptr<ICommand>> m_commands;
-    std::map<UINT, ICommand*>                 m_nodeletecommands;
+    std::map<UINT, ICommand*>                 m_noDeleteCommands;
     std::map<UINT, std::wstring>              m_plugins;
-    std::map<std::wstring, int>               m_pluginversion;
+    std::map<std::wstring, int>               m_pluginVersion;
     UINT                                      m_highestCmdId;
     static std::unique_ptr<CCommandHandler>   m_instance;
 };

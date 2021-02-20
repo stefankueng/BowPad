@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2020 - Stefan Kueng
+// Copyright (C) 2013-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #include "ScintillaWnd.h"
 #include "UnicodeUtils.h"
 #include "StringUtils.h"
-#include "OnOutOfScope.h"
 #include "ResString.h"
 #include "Theme.h"
 
@@ -34,7 +33,7 @@ constexpr auto TIMER_INFOSTRING           = 100;
 
 std::unique_ptr<CRegexCaptureDlg> g_pRegexCaptureDlg;
 
-void RegexCapture_Finish()
+void regexCaptureFinish()
 {
     g_pRegexCaptureDlg.reset();
 }
@@ -78,16 +77,16 @@ LRESULT CRegexCaptureDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM
             return DoCommand(LOWORD(wParam), HIWORD(wParam));
         case WM_NOTIFY:
         {
-            LPNMHDR pnmhdr = reinterpret_cast<LPNMHDR>(lParam);
-            APPVERIFY(pnmhdr != nullptr);
-            if (pnmhdr == nullptr)
+            LPNMHDR pnmHdr = reinterpret_cast<LPNMHDR>(lParam);
+            APPVERIFY(pnmHdr != nullptr);
+            if (pnmHdr == nullptr)
                 return 0;
-            const NMHDR& nmhdr = *pnmhdr;
+            const NMHDR& nmHdr = *pnmHdr;
 
-            if (nmhdr.idFrom == (UINT_PTR)&m_captureWnd || nmhdr.hwndFrom == m_captureWnd)
+            if (nmHdr.idFrom == reinterpret_cast<UINT_PTR>(&m_captureWnd) || nmHdr.hwndFrom == m_captureWnd)
             {
-                if (nmhdr.code == NM_COOLSB_CUSTOMDRAW)
-                    return m_captureWnd.HandleScrollbarCustomDraw(wParam, (NMCSBCUSTOMDRAW*)lParam);
+                if (nmHdr.code == NM_COOLSB_CUSTOMDRAW)
+                    return m_captureWnd.HandleScrollbarCustomDraw(wParam, reinterpret_cast<NMCSBCUSTOMDRAW*>(lParam));
             }
         }
         break;
@@ -224,38 +223,38 @@ void CRegexCaptureDlg::DoCapture()
             ScintillaCall(SCI_INDICATORCLEARRANGE, 0, lengthDoc);
         }
 
-        const char*                                          pText = (const char*)ScintillaCall(SCI_GETCHARACTERPOINTER);
+        const char*                                          pText = reinterpret_cast<const char*>(ScintillaCall(SCI_GETCHARACTERPOINTER));
         std::string_view                                     searchText(pText, lengthDoc);
-        std::match_results<std::string_view::const_iterator> whatc;
+        std::match_results<std::string_view::const_iterator> whatC;
         std::regex_constants::match_flag_type                flags = std::regex_constants::match_flag_type::match_default | std::regex_constants::match_flag_type::match_not_null;
         if (IsDlgButtonChecked(*this, IDC_DOTNEWLINE))
             flags |= std::regex_constants::match_flag_type::match_not_eol;
-        auto                                         start = searchText.cbegin();
-        auto                                         end   = searchText.cend();
+        auto                                            start = searchText.cbegin();
+        auto                                            end   = searchText.cend();
         std::vector<std::tuple<sptr_t, size_t, size_t>> capturePositions;
-        while (std::regex_search(start, end, whatc, rx, flags))
+        while (std::regex_search(start, end, whatC, rx, flags))
         {
-            if (whatc[0].matched)
+            if (whatC[0].matched)
             {
-                auto out = whatc.format(sCapture, flags);
-                m_captureWnd.Call(SCI_APPENDTEXT, out.size(), (sptr_t)out.c_str());
+                auto out = whatC.format(sCapture, flags);
+                m_captureWnd.Call(SCI_APPENDTEXT, out.size(), reinterpret_cast<sptr_t>(out.c_str()));
 
                 sptr_t captureCount = 0;
-                for (const auto& w : whatc)
+                for (const auto& w : whatC)
                 {
                     capturePositions.push_back(std::make_tuple(captureCount, w.first - searchText.cbegin(), w.length()));
                     ++captureCount;
                 }
             }
             // update search position:
-            if (start == whatc[0].second)
+            if (start == whatC[0].second)
             {
                 if (start == end)
                     break;
                 ++start;
             }
             else
-                start = whatc[0].second;
+                start = whatC[0].second;
             // update flags for continuation
             flags |= std::regex_constants::match_flag_type::match_prev_avail;
         }

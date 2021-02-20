@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2018, 2020 - Stefan Kueng
+// Copyright (C) 2016-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,11 +29,11 @@ bool CTabBtn::SetText(const wchar_t* str)
 bool CTabBtn::Init(HINSTANCE /*hInst*/, HWND hParent, HMENU id)
 {
     InitCommonControls();
-    CreateEx(0, WS_CHILD | WS_VISIBLE, hParent, 0, WC_BUTTON, id);
+    CreateEx(0, WS_CHILD | WS_VISIBLE, hParent, nullptr, WC_BUTTON, id);
     if (!*this)
         return false;
 
-    m_hFont = (HFONT)::SendMessage(*this, WM_GETFONT, 0, 0);
+    m_hFont = reinterpret_cast<HFONT>(::SendMessage(*this, WM_GETFONT, 0, 0));
 
     if (m_hFont == nullptr)
     {
@@ -52,7 +52,7 @@ void CTabBtn::SetFont(const wchar_t* fontName, int fontSize)
     if (m_hFont)
         ::DeleteObject(m_hFont);
 
-    m_hFont = ::CreateFont((int)fontSize, 0,
+    m_hFont = ::CreateFont(fontSize, 0,
                            0,
                            0,
                            FW_NORMAL,
@@ -92,7 +92,7 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 auto g2 = GetGValue(clr2);
                 auto b2 = GetBValue(clr2);
                 // m_AnimVarHot changes from 0.0 (not hot) to 1.0 (hot)
-                auto fraction = Animator::GetValue(m_AnimVarHot);
+                auto fraction = Animator::GetValue(m_animVarHot);
                 clr1          = RGB((r1 - r2) * fraction + r1, (g1 - g2) * fraction + g1, (b1 - b2) * fraction + b1);
                 clr2          = RGB((r1 - r2) * fraction + r2, (g1 - g2) * fraction + g2, (b1 - b2) * fraction + b2);
 
@@ -124,18 +124,17 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 EndPaint(hwnd, &ps);
                 return 0;
             }
-            break;
             case WM_ERASEBKGND:
                 return TRUE;
             case WM_MOUSEMOVE:
             {
                 if ((Button_GetState(*this) & BST_HOT) == 0)
                 {
-                    auto transHot   = Animator::Instance().CreateLinearTransition(m_AnimVarHot, 0.3, 1.0);
+                    auto transHot   = Animator::Instance().CreateLinearTransition(m_animVarHot, 0.3, 1.0);
                     auto storyBoard = Animator::Instance().CreateStoryBoard();
                     if (storyBoard && transHot)
                     {
-                        storyBoard->AddTransition(m_AnimVarHot.m_animVar, transHot);
+                        storyBoard->AddTransition(m_animVarHot.m_animVar, transHot);
                         Animator::Instance().RunStoryBoard(storyBoard, [this]() {
                             InvalidateRect(*this, nullptr, false);
                         });
@@ -158,11 +157,11 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 TrackMouseEvent(&tme);
                 if ((Button_GetState(*this) & BST_HOT) != 0)
                 {
-                    auto transHot   = Animator::Instance().CreateLinearTransition(m_AnimVarHot, 0.5, 0.0);
+                    auto transHot   = Animator::Instance().CreateLinearTransition(m_animVarHot, 0.5, 0.0);
                     auto storyBoard = Animator::Instance().CreateStoryBoard();
                     if (storyBoard && transHot)
                     {
-                        storyBoard->AddTransition(m_AnimVarHot.m_animVar, transHot);
+                        storyBoard->AddTransition(m_animVarHot.m_animVar, transHot);
                         Animator::Instance().RunStoryBoard(storyBoard, [this]() {
                             InvalidateRect(*this, nullptr, false);
                         });

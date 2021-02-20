@@ -113,7 +113,7 @@
 #define IDS_REPLACEALLINTABS            175
 #define IDS_STATUSTTDOCSIZE             176
 #define IDS_STATUSTTCURPOS              177
-#define IDS_STATUSTTEOF                 178
+#define IDS_STATUSTTEOL                 178
 #define IDS_STATUSTTTYPING              179
 #define IDS_STATUSTTTYPINGOVL           180
 #define IDS_STATUSTTTYPINGINS           181

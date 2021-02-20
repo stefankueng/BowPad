@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,17 +26,17 @@ class CBPBaseDialog : public CDialog
 {
 public:
     CBPBaseDialog();
-    ~CBPBaseDialog();
+    virtual ~CBPBaseDialog();
 
-    int  GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount) const;
-    int  LoadData(std::vector<std::wstring>& data, int defaultMaxCount, const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt) const;
-    void SaveData(const std::vector<std::wstring>& data, const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt);
-    void SaveCombo(int combo_id, std::vector<std::wstring>& data) const;
-    void LoadCombo(int combo_id, const std::vector<std::wstring>& data);
-    void UpdateCombo(int comboId, const std::wstring& item, int maxCount);
-    bool EnableComboBoxDeleteEvents(int combo_id, bool enable);
+    static int GetMaxCount(const std::wstring& section, const std::wstring& countKey, int defaultMaxCount);
+    int        LoadData(std::vector<std::wstring>& data, int defaultMaxCount, const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt) const;
+    void       SaveData(const std::vector<std::wstring>& data, const std::wstring& section, const std::wstring& countKey, const std::wstring& itemKeyFmt) const;
+    void       SaveCombo(int comboID, std::vector<std::wstring>& data) const;
+    void       LoadCombo(int comboID, const std::vector<std::wstring>& data);
+    void       UpdateCombo(int comboId, const std::wstring& item, int maxCount);
+    bool       EnableComboBoxDeleteEvents(int comboID, bool enable);
 
-    static void FlashWindow(HWND hwnd);
+    static void FlashWindow(HWND hWnd);
 
     static std::string UnEscape(const std::string& str);
     static bool        ReadBase(const char* str, size_t* value, size_t base, size_t size);

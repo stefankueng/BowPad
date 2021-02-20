@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ public:
     void                        Clear(int type);
     void                        AddLineColor(int type, size_t line, COLORREF clr);
     void                        RemoveLine(int type, size_t line);
-    void                        SetCurrentPos(size_t visibleline, COLORREF clr) { m_curPosVisLine = visibleline; m_curPosColor = clr; }
+    void                        SetCurrentPos(size_t visibleLine, COLORREF clr) { m_curPosVisLine = visibleLine; m_curPosColor = clr; }
     void                        VisibleLinesChanged();
     bool                        IsDirty() const { return m_bDirty; }
 private:
@@ -73,12 +73,12 @@ private:
     bool                                        m_bDirty;
     ULONG_PTR                                   m_gdiplusToken;
 
-    AnimationVariable                           m_AnimVarHL;
-    AnimationVariable                           m_AnimVarHR;
-    AnimationVariable                           m_AnimVarHT;
-    AnimationVariable                           m_AnimVarVL;
-    AnimationVariable                           m_AnimVarVR;
-    AnimationVariable                           m_AnimVarVT;
+    AnimationVariable                           m_animVarHL;
+    AnimationVariable                           m_animVarHR;
+    AnimationVariable                           m_animVarHT;
+    AnimationVariable                           m_animVarVL;
+    AnimationVariable                           m_animVarVR;
+    AnimationVariable                           m_animVarVT;
     bool                                        m_bHotHL;
     bool                                        m_bHotHR;
     bool                                        m_bHotHT;

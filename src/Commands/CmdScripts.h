@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2018, 2020 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 
 #pragma once
 #include "ICommand.h"
-#include "BowPadUI.h"
 
 class BasicScriptObject;
 class BasicScriptHost;
@@ -33,15 +32,15 @@ public:
     void SetDescription(const std::wstring& desc) { m_description = desc; }
 
     bool        Execute() override;
-    bool        IsEnabled();
-    bool        IsChecked();
-    IUIImagePtr getIcon();
+    bool        IsEnabled() const;
+    bool        IsChecked() const;
+    IUIImagePtr getIcon() const;
 
     UINT GetCmdId() override;
 
     void ScintillaNotify(SCNotification* pScn) override;
 
-    void TabNotify(TBHDR* ptbhdr) override;
+    void TabNotify(TBHDR* ptbHdr) override;
 
     void OnClose() override;
 
@@ -55,7 +54,7 @@ public:
 
     void OnDocumentSave(DocID id, bool bSaveAs) override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
     void OnTimer(UINT id) override;
 

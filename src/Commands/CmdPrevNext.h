@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,14 +19,11 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 
-#include <string>
-#include <vector>
-
 class CCmdPrevNext : public ICommand
 {
 public:
-
-    CCmdPrevNext(void* obj) : ICommand(obj)
+    CCmdPrevNext(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -35,18 +32,17 @@ public:
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdPrevNext; }
 
-    void ScintillaNotify(SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification* pScn) override;
 
-    void TabNotify(TBHDR* ptbhdr) override;
+    void TabNotify(TBHDR* ptbHdr) override;
     void OnDocumentClose(DocID id) override;
 };
-
 
 class CCmdPrevious : public ICommand
 {
 public:
-
-    CCmdPrevious(void* obj) : ICommand(obj)
+    CCmdPrevious(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -56,15 +52,14 @@ public:
     UINT GetCmdId() override { return cmdPrevious; }
 
     HRESULT IUICommandHandlerUpdateProperty(
-        REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
-
+        REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 };
 
 class CCmdNext : public ICommand
 {
 public:
-
-    CCmdNext(void* obj) : ICommand(obj)
+    CCmdNext(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -74,6 +69,5 @@ public:
     UINT GetCmdId() override { return cmdNext; }
 
     HRESULT IUICommandHandlerUpdateProperty(
-        REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
-
+        REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 };

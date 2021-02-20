@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,17 +27,21 @@
 class LaunchBase : public ICommand
 {
 public:
-    LaunchBase(void * obj) : ICommand(obj) {}
+    LaunchBase(void* obj)
+        : ICommand(obj)
+    {
+    }
     virtual ~LaunchBase() = default;
 
 protected:
-    bool Launch(const std::wstring& cmdline);
+    bool Launch(const std::wstring& cmdline) const;
 };
 
 class CCmdLaunchEdge : public LaunchBase
 {
 public:
-    CCmdLaunchEdge(void * obj) : LaunchBase(obj)
+    CCmdLaunchEdge(void* obj)
+        : LaunchBase(obj)
     {
     }
     ~CCmdLaunchEdge() = default;
@@ -56,27 +60,27 @@ public:
         // first try to get the ID of the Edge browser
         wchar_t pf[MAX_PATH];
         SHGetFolderPath(nullptr, CSIDL_WINDOWS, nullptr, SHGFP_TYPE_CURRENT, pf);
-        std::wstring edgepath = pf;
-        edgepath += L"\\SystemApps\\Microsoft.MicrosoftEdge*";
-        WIN32_FIND_DATA filedata = { 0 };
-        auto hSearch = FindFirstFile(edgepath.c_str(), &filedata);
+        std::wstring edgePath = pf;
+        edgePath += L"\\SystemApps\\Microsoft.MicrosoftEdge*";
+        WIN32_FIND_DATA fileData = {0};
+        auto            hSearch  = FindFirstFile(edgePath.c_str(), &fileData);
         if (hSearch != INVALID_HANDLE_VALUE)
         {
-            path = filedata.cFileName;
+            path = fileData.cFileName;
             path += L"!MicrosoftEdge";
             FindClose(hSearch);
         }
-        IApplicationActivationManager * activationManager;
-        auto hr = CoCreateInstance(CLSID_ApplicationActivationManager, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&activationManager));
-        bool succeeded = false;
+        IApplicationActivationManager* activationManager;
+        auto                           hr        = CoCreateInstance(CLSID_ApplicationActivationManager, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&activationManager));
+        bool                           succeeded = false;
         if (SUCCEEDED(hr))
         {
-            const auto& doc = GetActiveDocument();
-            std::wstring tabpath = doc.m_path;
-            SearchReplace(tabpath, L"\\", L"/");
+            const auto&  doc     = GetActiveDocument();
+            std::wstring tabPath = doc.m_path;
+            SearchReplace(tabPath, L"\\", L"/");
 
             DWORD newProcessId;
-            hr = activationManager->ActivateApplication(path.c_str(), (L"file:///" + tabpath).c_str(), AO_NONE, &newProcessId);
+            hr = activationManager->ActivateApplication(path.c_str(), (L"file:///" + tabPath).c_str(), AO_NONE, &newProcessId);
             if (SUCCEEDED(hr))
                 succeeded = true;
         }
@@ -93,22 +97,24 @@ public:
     {
         return cmdLaunchEdge;
     }
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override
     {
         if (UI_PKEY_Enabled == key)
         {
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, IsWindows10OrGreater(), ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, IsWindows10OrGreater(), pPropVarNewValue);
         }
         return E_NOTIMPL;
     }
-
 };
 
-class CCmdLaunchIE : public LaunchBase
+class CCmdLaunchIe : public LaunchBase
 {
 public:
-    CCmdLaunchIE(void * obj) : LaunchBase(obj) {}
-    ~CCmdLaunchIE() = default;
+    CCmdLaunchIe(void* obj)
+        : LaunchBase(obj)
+    {
+    }
+    ~CCmdLaunchIe() = default;
 
     bool Execute() override { return Launch(L"iexplore \"$(TAB_PATH)\""); }
     UINT GetCmdId() override { return cmdLaunchIE; }
@@ -117,7 +123,10 @@ public:
 class CCmdLaunchFirefox : public LaunchBase
 {
 public:
-    CCmdLaunchFirefox(void * obj) : LaunchBase(obj) {}
+    CCmdLaunchFirefox(void* obj)
+        : LaunchBase(obj)
+    {
+    }
     ~CCmdLaunchFirefox() = default;
 
     bool Execute() override { return Launch(L"firefox \"$(TAB_PATH)\""); }
@@ -127,7 +136,10 @@ public:
 class CCmdLaunchChrome : public LaunchBase
 {
 public:
-    CCmdLaunchChrome(void * obj) : LaunchBase(obj) {}
+    CCmdLaunchChrome(void* obj)
+        : LaunchBase(obj)
+    {
+    }
     ~CCmdLaunchChrome() = default;
 
     bool Execute() override { return Launch(L"chrome \"$(TAB_PATH)\""); }
@@ -137,7 +149,10 @@ public:
 class CCmdLaunchSafari : public LaunchBase
 {
 public:
-    CCmdLaunchSafari(void * obj) : LaunchBase(obj) {}
+    CCmdLaunchSafari(void* obj)
+        : LaunchBase(obj)
+    {
+    }
     ~CCmdLaunchSafari() = default;
 
     bool Execute() override { return Launch(L"safari \"$(TAB_PATH)\""); }
@@ -147,7 +162,10 @@ public:
 class CCmdLaunchOpera : public LaunchBase
 {
 public:
-    CCmdLaunchOpera(void * obj) : LaunchBase(obj) {}
+    CCmdLaunchOpera(void* obj)
+        : LaunchBase(obj)
+    {
+    }
     ~CCmdLaunchOpera() = default;
 
     bool Execute() override { return Launch(L"opera \"$(TAB_PATH)\""); }
@@ -157,7 +175,10 @@ public:
 class CCmdLaunchSearch : public LaunchBase
 {
 public:
-    CCmdLaunchSearch(void * obj) : LaunchBase(obj) {}
+    CCmdLaunchSearch(void* obj)
+        : LaunchBase(obj)
+    {
+    }
     ~CCmdLaunchSearch() = default;
 
     bool Execute() override;
@@ -167,7 +188,10 @@ public:
 class CCmdLaunchWikipedia : public LaunchBase
 {
 public:
-    CCmdLaunchWikipedia(void * obj) : LaunchBase(obj) {}
+    CCmdLaunchWikipedia(void* obj)
+        : LaunchBase(obj)
+    {
+    }
     ~CCmdLaunchWikipedia() = default;
 
     bool Execute() override { return Launch(L"http://en.wikipedia.org/wiki/Special:Search?search=$(SEL_TEXT_ESCAPED)"); }
@@ -177,7 +201,10 @@ public:
 class CCmdLaunchConsole : public LaunchBase
 {
 public:
-    CCmdLaunchConsole(void * obj) : LaunchBase(obj) {}
+    CCmdLaunchConsole(void* obj)
+        : LaunchBase(obj)
+    {
+    }
     ~CCmdLaunchConsole() = default;
 
     bool Execute() override
@@ -193,7 +220,10 @@ public:
 class CCmdLaunchExplorer : public LaunchBase
 {
 public:
-    CCmdLaunchExplorer(void * obj) : LaunchBase(obj) {}
+    CCmdLaunchExplorer(void* obj)
+        : LaunchBase(obj)
+    {
+    }
     ~CCmdLaunchExplorer() = default;
 
     bool Execute() override { return Launch(L"explorer \"$(TAB_DIR)\""); }
@@ -203,39 +233,42 @@ public:
 class CCmdLaunchCustom : public LaunchBase
 {
 public:
-    CCmdLaunchCustom(UINT customId, void * obj);
+    CCmdLaunchCustom(UINT customId, void* obj);
     ~CCmdLaunchCustom() = default;
 
     bool Execute() override { return Launch(CIniSettings::Instance().GetString(L"CustomLaunch", m_settingsID.c_str(), L"")); }
     UINT GetCmdId() override { return m_customCmdId; }
     void AfterInit() override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
 private:
-    UINT            m_customId;
-    UINT            m_customCmdId;
-    std::wstring    m_settingsID;
+    UINT         m_customId;
+    UINT         m_customCmdId;
+    std::wstring m_settingsID;
 };
 
 class CCustomCommandsDlg : public CDialog
 {
 public:
     CCustomCommandsDlg();
-    ~CCustomCommandsDlg() = default;
+    virtual ~CCustomCommandsDlg() = default;
 
 protected:
-    LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT                 DoCommand(int id);
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT          DoCommand(int id);
 
 private:
-    CDlgResizer             m_resizer;
+    CDlgResizer m_resizer;
 };
 
 class CCmdCustomCommands : public ICommand
 {
 public:
-    CCmdCustomCommands(void * obj) : ICommand(obj) {}
+    CCmdCustomCommands(void* obj)
+        : ICommand(obj)
+    {
+    }
     ~CCmdCustomCommands() = default;
 
     virtual bool Execute() override;

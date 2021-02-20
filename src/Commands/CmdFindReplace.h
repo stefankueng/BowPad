@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019-2020 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@
 #include <deque>
 #include <vector>
 #include <string>
-#include <utility>
 
 class CSearchResult
 {
@@ -53,7 +52,7 @@ enum class ResultsType
     Unknown,
     MatchedTerms,
     Functions,
-    Filenames,
+    FileNames,
     FirstLines
 };
 
@@ -64,10 +63,10 @@ enum class FindMode
     FindFunction
 };
 
-void FindReplace_Finish();
-void FindReplace_FindText(void* mainWnd);
-void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName);
-void FindReplace_FindFunction(void* mainWnd, const std::wstring& functionName);
+void findReplaceFinish();
+void findReplaceFindText(void* mainWnd);
+void findReplaceFindFile(void* mainWnd, const std::wstring& fileName);
+void findReplaceFindFunction(void* mainWnd, const std::wstring& functionName);
 
 class CFindReplaceDlg : public CBPBaseDialog
     , public ICommand
@@ -110,14 +109,14 @@ protected:
     void    DoReplace(int id);
 
     void SearchDocument(CScintillaWnd& searchWnd, DocID docID, const CDocument& doc,
-                        const std::string& searchfor, int searchflags, unsigned int exSearchFlags,
+                        const std::string& searchFor, int searchFlags, unsigned int exSearchFlags,
                         SearchResults& searchResults,
                         SearchPaths&   foundPaths);
 
-    int ReplaceDocument(CDocument& doc, const std::string& sFindstring,
-                        const std::string& sReplaceString, int searchflags);
+    int ReplaceDocument(CDocument& doc, const std::string& sFindString,
+                        const std::string& sReplaceString, int searchFlags);
 
-    void SearchThread(int id, const std::wstring& searchpath, const std::string& searchfor,
+    void SearchThread(int id, const std::wstring& searchPath, const std::string& searchFor,
                       int flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind);
 
     void    SortResults();
@@ -141,25 +140,25 @@ protected:
     std::wstring GetCurrentDocumentFolder() const;
 
     void FocusOn(int id);
-    void SetDefaultButton(int id, bool savePervious = false);
+    void SetDefaultButton(int id, bool savePrevious = false);
     void RestorePreviousDefaultButton();
     int  GetDefaultButton() const;
     void Clear(int id);
 
     void LoadSearchStrings();
-    void SaveSearchStrings();
+    void SaveSearchStrings() const;
     void UpdateSearchStrings(const std::wstring& item);
 
     void LoadReplaceStrings();
-    void SaveReplaceStrings();
+    void SaveReplaceStrings() const;
     void UpdateReplaceStrings(const std::wstring& item);
 
     void LoadSearchFolderStrings();
-    void SaveSearchFolderStrings();
+    void SaveSearchFolderStrings() const;
     void UpdateSearchFolderStrings(const std::wstring& target);
 
     void LoadSearchFileStrings();
-    void SaveSearchFileStrings();
+    void SaveSearchFileStrings() const;
     void UpdateSearchFilesStrings(const std::wstring& target);
 
     std::wstring OfferFileSuggestion(const std::wstring& searchFolder,
@@ -167,7 +166,7 @@ protected:
                                      const std::wstring& currentValue) const;
 
     void AcceptData();
-    void NewData(std::chrono::steady_clock::time_point& timeOfLastDataUpdate, bool finished);
+    void NewData(std::chrono::steady_clock::time_point& timeOfLastProgressUpdate, bool finished);
     void UpdateMatchCount(bool finished = true);
     void DoListItemAction(int itemIndex);
     void DoInitDialog(HWND hwndDlg);
@@ -183,7 +182,7 @@ protected:
     void OnListItemChanged(LPNMLISTVIEW pListView);
     void LetUserSelectSearchFolder();
 
-    bool EnableListEndTracking(int list_id, bool enable);
+    bool EnableListEndTracking(int listID, bool enable);
 
     void SetTheme(bool bDark);
 
@@ -194,7 +193,7 @@ protected:
 
 private:
     CDlgResizer             m_resizer;
-    bool                    m_freeresize = false;
+    bool                    m_freeResize = false;
     CScintillaWnd           m_searchWnd;
     SearchResults           m_searchResults;
     SearchPaths             m_foundPaths;
@@ -205,7 +204,7 @@ private:
     std::mutex              m_waitingDataMutex;
     std::condition_variable m_dataExchangeCondition;
     volatile bool           m_bStop                  = false;
-    volatile LONG           m_ThreadsRunning         = false;
+    volatile LONG           m_threadsRunning         = false;
     int                     m_searchType             = 0;
     ResultsType             m_resultsType            = ResultsType::Unknown;
     bool                    m_trackingOn             = true;
@@ -218,7 +217,7 @@ private:
     size_t                  m_maxSearchResults       = 10000;
     SIZE                    m_originalSize           = {0};
     bool                    m_open                   = false;
-    volatile size_t         m_foundsize              = 0;
+    volatile size_t         m_foundSize              = 0;
     int                     m_themeCallbackId        = 0;
     bool                    m_resultsListInitialized = false;
 
@@ -226,7 +225,7 @@ private:
     // The user can explicitly override these if they want them though.
     // REVIEW: consider making this list configurable?
     // NOTE: Keep filenames lower case as code assumes that.
-    const std::vector<std::wstring> excludedExtensions = {
+    const std::vector<std::wstring> m_excludedExtensions = {
         // Binary types.
         L"exe", L"dll", L"obj", L"lib", L"ilk", L"iobj", L"ipdb", L"idb",
         L"pch", L"ipch", L"sdf", L"pdb", L"res", L"sdf", L"db", L"iso",
@@ -236,7 +235,7 @@ private:
         L"svn-base",
         // Image types.
         L"bmp", L"png", L"jpg", L"ico", L"cur"};
-    const std::vector<std::wstring> excludedFolders = {
+    const std::vector<std::wstring> m_excludedFolders = {
         L".svn", L".git"};
 };
 
@@ -251,24 +250,24 @@ public:
     UINT GetCmdId() override { return cmdFindReplace; }
 
     HRESULT IUICommandHandlerUpdateProperty(
-        REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/,
-        PROPVARIANT*   ppropvarNewValue) override
+        REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/,
+        PROPVARIANT*   pPropVarNewValue) override
     {
         if (UI_PKEY_BooleanValue == key)
             return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue,
-                                             ScintillaCall(SCI_GETWRAPMODE) > 0, ppropvarNewValue);
+                                             ScintillaCall(SCI_GETWRAPMODE) > 0, pPropVarNewValue);
         return E_NOTIMPL;
     }
 
     void ScintillaNotify(SCNotification* pScn) override;
 
-    void TabNotify(TBHDR* ptbhdr) override;
+    void TabNotify(TBHDR* ptbHdr) override;
 
     void OnDocumentClose(DocID id) override;
     void OnDocumentSave(DocID id, bool saveAs) override;
 
 private:
-    void SetSearchFolderToCurrentDocument();
+    void SetSearchFolderToCurrentDocument() const;
 };
 
 class CCmdFindNext : public ICommand

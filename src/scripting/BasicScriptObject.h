@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016 - Stefan Kueng
+// Copyright (C) 2014, 2016, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,49 +16,46 @@
 //
 #pragma once
 #include "ICommand.h"
-#include <string>
-#include <comdef.h>
-#include <vector>
 
 struct ScintillaCmd
 {
-    const wchar_t*const functionname;
-    UINT            cmd;
-    UINT            cmdget;
-    VARTYPE         retval;
-    VARTYPE         p1;
-    VARTYPE         p2;
+    const wchar_t* const functionName;
+    UINT                 cmd;
+    UINT                 cmdGet;
+    VARTYPE              retVal;
+    VARTYPE              p1;
+    VARTYPE              p2;
 };
 
 // BasicScriptObject is not a command but inherits from ICommand only so
 // it gets access to all the scintilla and BP commands ICommand provides.
 // That's why the inheritance is private.
 
-class BasicScriptObject : public IDispatch, /* private */ ICommand
+class BasicScriptObject : public IDispatch
+    , /* private */ ICommand
 {
 public:
-
-    BasicScriptObject(void * obj);
+    BasicScriptObject(void* obj);
 
     virtual ~BasicScriptObject();
 
     // IUnknown implementation
-    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void ** object);
-    ULONG STDMETHODCALLTYPE AddRef();
-    ULONG STDMETHODCALLTYPE Release();
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** object) override;
+    ULONG STDMETHODCALLTYPE   AddRef() override;
+    ULONG STDMETHODCALLTYPE   Release() override;
 
     // IDispatch implementation
-    HRESULT STDMETHODCALLTYPE GetTypeInfoCount(UINT *count);
-    HRESULT STDMETHODCALLTYPE GetTypeInfo(UINT, LCID, ITypeInfo** typeInfo);
-    HRESULT STDMETHODCALLTYPE GetIDsOfNames(REFIID riid, LPOLESTR * nameList, UINT nameCount, LCID lcid, DISPID * idList);
-    HRESULT STDMETHODCALLTYPE Invoke(DISPID id, REFIID riid, LCID lcid, WORD flags, DISPPARAMS * args, VARIANT * ret, EXCEPINFO * excp, UINT * err);
+    HRESULT STDMETHODCALLTYPE GetTypeInfoCount(UINT* count) override;
+    HRESULT STDMETHODCALLTYPE GetTypeInfo(UINT, LCID, ITypeInfo** typeInfo) override;
+    HRESULT STDMETHODCALLTYPE GetIDsOfNames(REFIID riid, LPOLESTR* nameList, UINT nameCount, LCID lcid, DISPID* idList) override;
+    HRESULT STDMETHODCALLTYPE Invoke(DISPID id, REFIID riid, LCID lcid, WORD flags, DISPPARAMS* args, VARIANT* ret, EXCEPINFO* excp, UINT* err) override;
 
     // ICommand implementation
     bool Execute() override { return true; }
     UINT GetCmdId() override { return 0; }
 
 private:
-    bool ScintillaCommandsDispId(wchar_t * name, DISPID& id);
-    HRESULT ScintillaCommandInvoke(DISPID id, WORD flags, DISPPARAMS* args, VARIANT* ret);
-    ULONG                       m_refCount;
+    static bool ScintillaCommandsDispId(wchar_t* name, DISPID& id);
+    HRESULT     ScintillaCommandInvoke(DISPID id, WORD flags, DISPPARAMS* args, VARIANT* ret) const;
+    ULONG       m_refCount;
 };

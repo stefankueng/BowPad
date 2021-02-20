@@ -26,33 +26,32 @@
 #include "TempFile.h"
 #include "AppUtils.h"
 #include "OnOutOfScope.h"
-#include "ILexer.h"
 #include "ILoader.h"
+#include "ResString.h"
 
-#include <algorithm>
 #include <stdexcept>
 #include <Shobjidl.h>
 
-static CDocument g_EmptyDoc;
+static CDocument g_emptyDoc;
 
-static wchar_t inline WideCharSwap(wchar_t nValue)
+static wchar_t WideCharSwap(wchar_t nValue)
 {
     return (((nValue >> 8)) | (nValue << 8));
 }
 
-static UINT64 inline WordSwapBytes(UINT64 nValue)
+static UINT64 WordSwapBytes(UINT64 nValue)
 {
     return ((nValue & 0xff00ff00ff00ff) << 8) | ((nValue >> 8) & 0xff00ff00ff00ff); // swap BYTESs in WORDs
 }
 
-static UINT32 inline DwordSwapBytes(UINT32 nValue)
+static UINT32 DwordSwapBytes(UINT32 nValue)
 {
     UINT32 nRet = (nValue << 16) | (nValue >> 16);                     // swap WORDs
     nRet        = ((nRet & 0xff00ff) << 8) | ((nRet >> 8) & 0xff00ff); // swap BYTESs in WORDs
     return nRet;
 }
 
-static UINT64 inline DwordSwapBytes(UINT64 nValue)
+static UINT64 DwordSwapBytes(UINT64 nValue)
 {
     UINT64 nRet = ((nValue & 0xffff0000ffffL) << 16) | ((nValue >> 16) & 0xffff0000ffffL); // swap WORDs in DWORDs
     nRet        = ((nRet & 0xff00ff00ff00ff) << 8) | ((nRet >> 8) & 0xff00ff00ff00ff);     // swap BYTESs in WORDs
@@ -66,17 +65,17 @@ static EOLFormat SenseEOLFormat(const char* data, DWORD len)
         if (data[i] == '\r')
         {
             if (i + 1 < len && data[i + 1] == '\n')
-                return EOLFormat::WIN_FORMAT;
+                return EOLFormat::Win_Format;
             else
-                return EOLFormat::MAC_FORMAT;
+                return EOLFormat::Mac_Format;
         }
         if (data[i] == '\n')
-            return EOLFormat::UNIX_FORMAT;
+            return EOLFormat::Unix_Format;
     }
-    return EOLFormat::UNKNOWN_FORMAT;
+    return EOLFormat::Unknown_Format;
 }
 
-static void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data, EOLFormat& eolformat)
+static void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data, EOLFormat& eolFormat)
 {
     char* pData = data;
     // Nothing to convert, just pass it to Scintilla
@@ -85,15 +84,15 @@ static void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile
         pData += 3;
         lenFile -= 3;
     }
-    if (eolformat == EOLFormat::UNKNOWN_FORMAT)
-        eolformat = SenseEOLFormat(pData, lenFile);
+    if (eolFormat == EOLFormat::Unknown_Format)
+        eolFormat = SenseEOLFormat(pData, lenFile);
     edit.AddData(pData, lenFile);
     if (bFirst && hasBOM)
         lenFile += 3;
 }
 
-static void LoadSomeUtf16le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-                            char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat& eolformat)
+static void loadSomeUtf16Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -101,17 +100,17 @@ static void LoadSomeUtf16le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenF
         pData += 2;
         lenFile -= 2;
     }
-    memcpy(widebuf, pData, lenFile);
-    int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile / 2, charbuf, charbufSize, 0, nullptr);
-    if (eolformat == EOLFormat::UNKNOWN_FORMAT)
-        eolformat = SenseEOLFormat(charbuf, charlen);
-    edit.AddData(charbuf, charlen);
+    memcpy(wideBuf, pData, lenFile);
+    int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, lenFile / 2, charBuf, charBufSize, nullptr, nullptr);
+    if (eolFormat == EOLFormat::Unknown_Format)
+        eolFormat = SenseEOLFormat(charBuf, charLen);
+    edit.AddData(charBuf, charLen);
     if (bFirst && hasBOM)
         lenFile += 2;
 }
 
-static void LoadSomeUtf16be(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-                            char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat& eolformat)
+static void loadSomeUtf16Be(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -119,41 +118,41 @@ static void LoadSomeUtf16be(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenF
         pData += 2;
         lenFile -= 2;
     }
-    memcpy(widebuf, pData, lenFile);
+    memcpy(wideBuf, pData, lenFile);
     // make in place WORD BYTEs swap
-    UINT64* p_qw    = (UINT64*)widebuf;
-    int     nQwords = lenFile / 8;
-    for (int nQword = 0; nQword < nQwords; nQword++)
-        p_qw[nQword] = WordSwapBytes(p_qw[nQword]);
+    UINT64* pQw     = reinterpret_cast<UINT64*>(wideBuf);
+    int     nQWords = lenFile / 8;
+    for (int nQWord = 0; nQWord < nQWords; nQWord++)
+        pQw[nQWord] = WordSwapBytes(pQw[nQWord]);
 
-    wchar_t* p_w    = (wchar_t*)p_qw;
+    wchar_t* pW     = reinterpret_cast<wchar_t*>(pQw);
     int      nWords = lenFile / 2;
-    for (int nWord = nQwords * 4; nWord < nWords; nWord++)
-        p_w[nWord] = WideCharSwap(p_w[nWord]);
+    for (int nWord = nQWords * 4; nWord < nWords; nWord++)
+        pW[nWord] = WideCharSwap(pW[nWord]);
 
-    int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, lenFile / 2, charbuf, charbufSize, 0, nullptr);
-    if (eolformat == EOLFormat::UNKNOWN_FORMAT)
-        eolformat = SenseEOLFormat(charbuf, charlen);
-    edit.AddData(charbuf, charlen);
+    int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, lenFile / 2, charBuf, charBufSize, nullptr, nullptr);
+    if (eolFormat == EOLFormat::Unknown_Format)
+        eolFormat = SenseEOLFormat(charBuf, charLen);
+    edit.AddData(charBuf, charLen);
     if (bFirst && hasBOM)
         lenFile += 2;
 }
 
-static void LoadSomeUtf32be(DWORD lenFile, char* data)
+static void loadSomeUtf32Be(DWORD lenFile, char* data)
 {
-    UINT64* p64     = (UINT64*)data;
-    int     nQwords = lenFile / 8;
-    for (int nQword = 0; nQword < nQwords; nQword++)
-        p64[nQword] = DwordSwapBytes(p64[nQword]);
+    UINT64* p64     = reinterpret_cast<UINT64*>(data);
+    int     nQWords = lenFile / 8;
+    for (int nQWord = 0; nQWord < nQWords; nQWord++)
+        p64[nQWord] = DwordSwapBytes(p64[nQWord]);
 
-    UINT32* p32     = (UINT32*)p64;
-    int     nDwords = lenFile / 4;
-    for (int nDword = nQwords * 2; nDword < nDwords; nDword++)
+    UINT32* p32     = reinterpret_cast<UINT32*>(p64);
+    int     nDWords = lenFile / 4;
+    for (int nDword = nQWords * 2; nDword < nDWords; nDword++)
         p32[nDword] = DwordSwapBytes(p32[nDword]);
 }
 
-static void LoadSomeUtf32le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-                            char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat& eolformat)
+static void loadSomeUtf32Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -163,10 +162,10 @@ static void LoadSomeUtf32le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenF
     }
     // UTF32 have four bytes per char
     int     nReadChars = lenFile / 4;
-    UINT32* p32        = (UINT32*)pData;
+    UINT32* p32        = reinterpret_cast<UINT32*>(pData);
 
     // fill buffer
-    wchar_t* pOut = (wchar_t*)widebuf;
+    wchar_t* pOut = static_cast<wchar_t*>(wideBuf);
     for (int i = 0; i < nReadChars; ++i, ++pOut)
     {
         UINT32 zChar = p32[i];
@@ -183,19 +182,19 @@ static void LoadSomeUtf32le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenF
         }
         else
         {
-            *pOut = (wchar_t)zChar;
+            *pOut = static_cast<wchar_t>(zChar);
         }
     }
-    int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, nReadChars, charbuf, charbufSize, 0, nullptr);
-    if (eolformat == EOLFormat::UNKNOWN_FORMAT)
-        eolformat = SenseEOLFormat(charbuf, charlen);
-    edit.AddData(charbuf, charlen);
+    int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, nReadChars, charBuf, charBufSize, nullptr, nullptr);
+    if (eolFormat == EOLFormat::Unknown_Format)
+        eolFormat = SenseEOLFormat(charBuf, charLen);
+    edit.AddData(charBuf, charLen);
     if (bFirst && hasBOM)
         lenFile += 4;
 }
 
 static void LoadSomeOther(ILoader& edit, int encoding, DWORD lenFile,
-                          int& incompleteMultibyteChar, char* data, char* charbuf, int charbufSize, wchar_t* widebuf, EOLFormat& eolformat)
+                          int& incompleteMultiByteChar, char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat)
 {
     // For other encodings, ask system if there are any invalid characters; note that it will
     // not correctly know if the last character is cut when there are invalid characters inside the text
@@ -218,16 +217,16 @@ static void LoadSomeOther(ILoader& edit, int encoding, DWORD lenFile,
         else
         {
             // We found a valid text by removing one byte.
-            incompleteMultibyteChar = 1;
+            incompleteMultiByteChar = 1;
         }
     }
     if (wideLen > 0)
     {
-        MultiByteToWideChar(encoding, 0, data, lenFile - incompleteMultibyteChar, widebuf, wideLen);
-        int charlen = WideCharToMultiByte(CP_UTF8, 0, widebuf, wideLen, charbuf, charbufSize, 0, nullptr);
-        if (eolformat == EOLFormat::UNKNOWN_FORMAT)
-            eolformat = SenseEOLFormat(charbuf, charlen);
-        edit.AddData(charbuf, charlen);
+        MultiByteToWideChar(encoding, 0, data, lenFile - incompleteMultiByteChar, wideBuf, wideLen);
+        int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, wideLen, charBuf, charBufSize, nullptr, nullptr);
+        if (eolFormat == EOLFormat::Unknown_Format)
+            eolFormat = SenseEOLFormat(charBuf, charLen);
+        edit.AddData(charBuf, charLen);
     }
 }
 
@@ -261,7 +260,7 @@ static bool AskToElevatePrivilege(HWND hWnd, const std::wstring& path, PCWSTR sE
     int     nClickedBtn    = 0;
     HRESULT hr             = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
     if (CAppUtils::FailedShowMessage(hr))
-        return 0;
+        return false;
     // We've used TDCBF_CANCEL_BUTTON so IDCANCEL can be returned,
     // map that to don't elevate.
     bool bElevate = (nClickedBtn == 101);
@@ -279,13 +278,13 @@ static bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
 
 static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params, bool wait)
 {
-    std::wstring     modpath    = CPathUtils::GetModulePath();
+    std::wstring     modPath    = CPathUtils::GetModulePath();
     SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
 
     shExecInfo.hwnd         = hWnd;
     shExecInfo.fMask        = SEE_MASK_NOCLOSEPROCESS;
     shExecInfo.lpVerb       = L"runas";
-    shExecInfo.lpFile       = modpath.c_str();
+    shExecInfo.lpFile       = modPath.c_str();
     shExecInfo.lpParameters = params.c_str();
     shExecInfo.nShow        = SW_NORMAL;
     OnOutOfScope(CloseHandle(shExecInfo.hProcess));
@@ -302,27 +301,27 @@ static void ShowFileLoadError(HWND hWnd, const std::wstring& fileName, LPCWSTR m
 {
     ResString rTitle(g_hRes, IDS_APP_TITLE);
     ResString rLoadErr(g_hRes, IDS_FAILEDTOLOADFILE);
-    MessageBox(hWnd, CStringUtils::Format(rLoadErr, fileName.c_str(), msg).c_str(), (LPCWSTR)rTitle, MB_ICONERROR);
+    MessageBox(hWnd, CStringUtils::Format(rLoadErr, fileName.c_str(), msg).c_str(), static_cast<LPCWSTR>(rTitle), MB_ICONERROR);
 }
 
 static void ShowFileSaveError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg)
 {
     ResString rTitle(g_hRes, IDS_APP_TITLE);
     ResString rSaveErr(g_hRes, IDS_FAILEDTOSAVEFILE);
-    MessageBox(hWnd, CStringUtils::Format(rSaveErr, fileName.c_str(), msg).c_str(), (LPCWSTR)rTitle, MB_ICONERROR);
+    MessageBox(hWnd, CStringUtils::Format(rSaveErr, fileName.c_str(), msg).c_str(), static_cast<LPCWSTR>(rTitle), MB_ICONERROR);
 }
 
 static void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
 {
     switch (doc.m_format)
     {
-        case EOLFormat::WIN_FORMAT:
+        case EOLFormat::Win_Format:
             edit.SetEOLType(SC_EOL_CRLF);
             break;
-        case EOLFormat::UNIX_FORMAT:
+        case EOLFormat::Unix_Format:
             edit.SetEOLType(SC_EOL_LF);
             break;
-        case EOLFormat::MAC_FORMAT:
+        case EOLFormat::Mac_Format:
             edit.SetEOLType(SC_EOL_CR);
             break;
         default:
@@ -332,10 +331,11 @@ static void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
 
 CDocumentManager::CDocumentManager()
     : m_scratchScintilla(g_hRes)
+    , m_data{}
 {
     m_scratchScintilla.InitScratch(g_hRes);
-    m_widebuf = std::make_unique<wchar_t[]>(m_widebufSize);
-    m_charbuf = std::make_unique<char[]>(m_charbufSize);
+    m_wideBuf = std::make_unique<wchar_t[]>(m_wideBufSize);
+    m_charBuf = std::make_unique<char[]>(m_charBufSize);
 }
 
 CDocumentManager::~CDocumentManager()
@@ -355,14 +355,13 @@ bool CDocumentManager::HasDocumentID(DocID id) const
     return true;
 }
 
-// Must exist or it's a bug.
 const CDocument& CDocumentManager::GetDocumentFromID(DocID id) const
 {
     auto pos = m_documents.find(id);
     if (pos == std::end(m_documents))
     {
         APPVERIFY(false);
-        return g_EmptyDoc;
+        return g_emptyDoc;
     }
     return pos->second;
 }
@@ -373,7 +372,7 @@ CDocument& CDocumentManager::GetModDocumentFromID(DocID id)
     if (pos == std::end(m_documents))
     {
         APPVERIFY(false);
-        return g_EmptyDoc;
+        return g_emptyDoc;
     }
     return pos->second;
 }
@@ -389,7 +388,7 @@ void CDocumentManager::AddDocumentAtEnd(const CDocument& doc, DocID id)
 CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing)
 {
     CDocument doc;
-    doc.m_format = EOLFormat::UNKNOWN_FORMAT;
+    doc.m_format = EOLFormat::Unknown_Format;
 
     CAutoFile hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, createIfMissing ? CREATE_NEW : OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (!hFile.IsValid())
@@ -416,8 +415,8 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
                 // to tell them that!
                 if (elevationError != ERROR_CANCELLED)
                 {
-                    CFormatMessageWrapper errMsgelev(elevationError);
-                    ShowFileLoadError(hWnd, path, errMsgelev);
+                    CFormatMessageWrapper errMsgElev(elevationError);
+                    ShowFileLoadError(hWnd, path, errMsgElev);
                 }
                 // Exhausted all operations to work around the problem,
                 // fall through to inform that what the final outcome is
@@ -457,7 +456,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     m_scratchScintilla.Call(SCI_CLEARALL);
     m_scratchScintilla.Call(SCI_SETCODEPAGE, CP_UTF8);
 
-    ILoader* pdocLoad = reinterpret_cast<ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, (int)bufferSizeRequested));
+    ILoader* pdocLoad = reinterpret_cast<ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, static_cast<int>(bufferSizeRequested)));
     if (pdocLoad == nullptr)
     {
         ShowFileLoadError(hWnd, path,
@@ -467,26 +466,26 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     auto& edit = *pdocLoad;
 
     DWORD lenFile                 = 0;
-    int   incompleteMultibyteChar = 0;
+    int   incompleteMultiByteChar = 0;
     bool  bFirst                  = true;
-    bool  preferutf8              = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingutf8overansi", 0) != 0;
+    bool  preferUtf8              = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingutf8overansi", 0) != 0;
     bool  inconclusive            = false;
-    bool  encodingset             = encoding != -1;
+    bool  encodingSet             = encoding != -1;
     int   skip                    = 0;
     do
     {
-        if (!ReadFile(hFile, m_data + incompleteMultibyteChar, ReadBlockSize - incompleteMultibyteChar, &lenFile, nullptr))
+        if (!ReadFile(hFile, m_data + incompleteMultiByteChar, ReadBlockSize - incompleteMultiByteChar, &lenFile, nullptr))
             lenFile = 0;
         else
-            lenFile += incompleteMultibyteChar;
+            lenFile += incompleteMultiByteChar;
 
-        if ((!encodingset) || (inconclusive && encoding == CP_ACP))
+        if ((!encodingSet) || (inconclusive && encoding == CP_ACP))
         {
             encoding = GetCodepageFromBuf(m_data + skip, lenFile - skip, doc.m_bHasBOM, inconclusive, skip);
             if (inconclusive && encoding == CP_ACP)
                 encoding = CP_UTF8;
         }
-        encodingset = true;
+        encodingSet = true;
 
         doc.m_encoding = encoding;
 
@@ -497,37 +496,37 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
                 LoadSomeUtf8(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, doc.m_format);
                 break;
             case 1200: // UTF16_LE
-                LoadSomeUtf16le(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charbuf.get(), m_charbufSize, m_widebuf.get(), doc.m_format);
+                loadSomeUtf16Le(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format);
                 break;
             case 1201: // UTF16_BE
-                LoadSomeUtf16be(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charbuf.get(), m_charbufSize, m_widebuf.get(), doc.m_format);
+                loadSomeUtf16Be(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format);
                 break;
             case 12001:                           // UTF32_BE
-                LoadSomeUtf32be(lenFile, m_data); // Doesn't load, falls through to load.
+                loadSomeUtf32Be(lenFile, m_data); // Doesn't load, falls through to load.
                 // intentional fall-through
                 [[fallthrough]];
             case 12000: // UTF32_LE
-                LoadSomeUtf32le(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charbuf.get(), m_charbufSize, m_widebuf.get(), doc.m_format);
+                loadSomeUtf32Le(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format);
                 break;
             default:
-                LoadSomeOther(edit, encoding, lenFile, incompleteMultibyteChar, m_data, m_charbuf.get(), m_charbufSize, m_widebuf.get(), doc.m_format);
+                LoadSomeOther(edit, encoding, lenFile, incompleteMultiByteChar, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format);
                 break;
         }
 
-        if (incompleteMultibyteChar != 0) // copy bytes to next buffer
-            memcpy(m_data, m_data + ReadBlockSize - incompleteMultibyteChar, incompleteMultibyteChar);
+        if (incompleteMultiByteChar != 0) // copy bytes to next buffer
+            memcpy(m_data, m_data + ReadBlockSize - incompleteMultiByteChar, incompleteMultiByteChar);
 
         bFirst = false;
     } while (lenFile == ReadBlockSize);
 
-    if (preferutf8 && inconclusive && doc.m_encoding == CP_ACP)
+    if (preferUtf8 && inconclusive && doc.m_encoding == CP_ACP)
         doc.m_encoding = CP_UTF8;
 
-    if (doc.m_format == EOLFormat::UNKNOWN_FORMAT)
-        doc.m_format = EOLFormat::WIN_FORMAT;
+    if (doc.m_format == EOLFormat::Unknown_Format)
+        doc.m_format = EOLFormat::Win_Format;
 
-    sptr_t loadeddoc = (sptr_t)pdocLoad->ConvertToDocument(); // loadeddoc has reference count 1
-    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, loadeddoc); // doc in scratch has reference count 2 (loadeddoc 1, added one)
+    auto loadedDoc = reinterpret_cast<sptr_t>(pdocLoad->ConvertToDocument()); // loadedDoc has reference count 1
+    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, loadedDoc);                 // doc in scratch has reference count 2 (loadedDoc 1, added one)
     m_scratchScintilla.Call(SCI_SETUNDOCOLLECTION, 1);
     m_scratchScintilla.Call(SCI_EMPTYUNDOBUFFER);
     m_scratchScintilla.Call(SCI_SETSAVEPOINT);
@@ -542,8 +541,8 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
 
 static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
 {
-    const int writeWidebufSize = WriteBlockSize * 2;
-    auto      widebuf          = std::make_unique<wchar_t[]>(writeWidebufSize);
+    const int writeWideBufSize = WriteBlockSize * 2;
+    auto      widebuf          = std::make_unique<wchar_t[]>(writeWideBufSize);
     err.clear();
     DWORD bytesWritten = 0;
 
@@ -572,20 +571,20 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     char* writeBuf = buf;
     do
     {
-        int charStart = UTF8Helper::characterStart(writeBuf, (int)min(WriteBlockSize, lengthDoc));
-        int widelen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), writeWidebufSize);
+        int charStart = UTF8Helper::characterStart(writeBuf, static_cast<int>(min(WriteBlockSize, lengthDoc)));
+        int wideLen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), writeWideBufSize);
         if (encoding == 1201)
         {
-            UINT64* p_qw    = reinterpret_cast<UINT64*>(widebuf.get());
-            int     nQwords = widelen / 4;
-            for (int nQword = 0; nQword < nQwords; nQword++)
-                p_qw[nQword] = WordSwapBytes(p_qw[nQword]);
-            wchar_t* p_w    = (wchar_t*)p_qw;
-            int      nWords = widelen;
-            for (int nWord = nQwords * 4; nWord < nWords; nWord++)
-                p_w[nWord] = WideCharSwap(p_w[nWord]);
+            UINT64* pQw     = reinterpret_cast<UINT64*>(widebuf.get());
+            int     nQWords = wideLen / 4;
+            for (int nQWord = 0; nQWord < nQWords; nQWord++)
+                pQw[nQWord] = WordSwapBytes(pQw[nQWord]);
+            auto* pW     = reinterpret_cast<wchar_t*>(pQw);
+            int   nWords = wideLen;
+            for (int nWord = nQWords * 4; nWord < nWords; nWord++)
+                pW[nWord] = WideCharSwap(pW[nWord]);
         }
-        if (!WriteFile(hFile, widebuf.get(), widelen * 2, &bytesWritten, nullptr) || widelen != int(bytesWritten / 2))
+        if (!WriteFile(hFile, widebuf.get(), wideLen * 2, &bytesWritten, nullptr) || wideLen != static_cast<int>(bytesWritten / 2))
         {
             CFormatMessageWrapper errMsg;
             err = errMsg.c_str();
@@ -599,19 +598,15 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
 
 static bool SaveAsUtf32(const CDocument& doc, char* buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
 {
-    const int writeWidebufSize = WriteBlockSize * 2;
-    auto      writeWidebuf     = std::make_unique<wchar_t[]>(writeWidebufSize);
-    auto      writeWide32buf   = std::make_unique<wchar_t[]>(writeWidebufSize * 2);
+    const int writeWideBufSize = WriteBlockSize * 2;
+    auto      writeWideBuf     = std::make_unique<wchar_t[]>(writeWideBufSize);
+    auto      writeWide32Buf   = std::make_unique<wchar_t[]>(writeWideBufSize * 2);
     DWORD     bytesWritten     = 0;
     BOOL      result;
 
     auto encoding = doc.m_encoding;
-    auto hasBOM   = doc.m_bHasBOM;
     if (doc.m_encodingSaving != -1)
-    {
         encoding = doc.m_encodingSaving;
-        hasBOM   = doc.m_bHasBOMSaving;
-    }
 
     if (encoding == 12000)
         result = WriteFile(hFile, "\xFF\xFE\0\0", 4, &bytesWritten, nullptr);
@@ -626,40 +621,40 @@ static bool SaveAsUtf32(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     char* writeBuf = buf;
     do
     {
-        int charStart = UTF8Helper::characterStart(writeBuf, (int)min(WriteBlockSize, lengthDoc));
-        int widelen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, writeWidebuf.get(), writeWidebufSize);
+        int charStart = UTF8Helper::characterStart(writeBuf, static_cast<int>(min(WriteBlockSize, lengthDoc)));
+        int wideLen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, writeWideBuf.get(), writeWideBufSize);
 
-        LPCWSTR p_In      = (LPCWSTR)writeWidebuf.get();
-        UINT32* p_Out     = (UINT32*)writeWide32buf.get();
-        int     nOutDword = 0;
-        for (int nInWord = 0; nInWord < widelen; nInWord++, nOutDword++)
+        LPCWSTR pIn       = static_cast<LPCWSTR>(writeWideBuf.get());
+        UINT32* pOut      = reinterpret_cast<UINT32*>(writeWide32Buf.get());
+        int     nOutDWord = 0;
+        for (int nInWord = 0; nInWord < wideLen; nInWord++, nOutDWord++)
         {
-            UINT32 zChar = p_In[nInWord];
+            UINT32 zChar = pIn[nInWord];
             if ((zChar & 0xfc00) == 0xd800) // lead surrogate
             {
-                if (nInWord + 1 < widelen && (p_In[nInWord + 1] & 0xfc00) == 0xdc00) // trail surrogate follows
-                    zChar = 0x10000 + ((zChar & 0x3ff) << 10) + (p_In[++nInWord] & 0x3ff);
+                if (nInWord + 1 < wideLen && (pIn[nInWord + 1] & 0xfc00) == 0xdc00) // trail surrogate follows
+                    zChar = 0x10000 + ((zChar & 0x3ff) << 10) + (pIn[++nInWord] & 0x3ff);
                 else
                     zChar = 0xfffd; // ? mark
             }
             else if ((zChar & 0xfc00) == 0xdc00) // trail surrogate without lead
                 zChar = 0xfffd;                  // ? mark
-            p_Out[nOutDword] = zChar;
+            pOut[nOutDWord] = zChar;
         }
 
         if (encoding == 12001)
         {
-            UINT64* p64     = reinterpret_cast<UINT64*>(writeWide32buf.get());
-            int     nQwords = widelen / 2;
-            for (int nQword = 0; nQword < nQwords; nQword++)
-                p64[nQword] = DwordSwapBytes(p64[nQword]);
+            UINT64* p64     = reinterpret_cast<UINT64*>(writeWide32Buf.get());
+            int     nQWords = wideLen / 2;
+            for (int nQWord = 0; nQWord < nQWords; nQWord++)
+                p64[nQWord] = DwordSwapBytes(p64[nQWord]);
 
-            UINT32* p32     = (UINT32*)p64;
-            int     nDwords = widelen;
-            for (int nDword = nQwords * 2; nDword < nDwords; nDword++)
+            UINT32* p32     = reinterpret_cast<UINT32*>(p64);
+            int     nDWords = wideLen;
+            for (int nDword = nQWords * 2; nDword < nDWords; nDword++)
                 p32[nDword] = DwordSwapBytes(p32[nDword]);
         }
-        if (!WriteFile(hFile, writeWide32buf.get(), widelen * 4, &bytesWritten, nullptr) || widelen != int(bytesWritten / 4))
+        if (!WriteFile(hFile, writeWide32Buf.get(), wideLen * 4, &bytesWritten, nullptr) || wideLen != static_cast<int>(bytesWritten / 4))
         {
             CFormatMessageWrapper errMsg;
             err = errMsg.c_str();
@@ -675,13 +670,9 @@ static bool SaveAsUtf8(const CDocument& doc, char* buf, size_t lengthDoc, CAutoF
 {
     // UTF8: save the buffer as it is
     DWORD bytesWritten = 0;
-    auto  encoding     = doc.m_encoding;
     auto  hasBOM       = doc.m_bHasBOM;
     if (doc.m_encodingSaving != -1)
-    {
-        encoding = doc.m_encodingSaving;
-        hasBOM   = doc.m_bHasBOMSaving;
-    }
+        hasBOM = doc.m_bHasBOMSaving;
 
     if (hasBOM)
     {
@@ -694,7 +685,7 @@ static bool SaveAsUtf8(const CDocument& doc, char* buf, size_t lengthDoc, CAutoF
     }
     do
     {
-        DWORD writeLen = (DWORD)min(WriteBlockSize, lengthDoc);
+        DWORD writeLen = static_cast<DWORD>(min(WriteBlockSize, lengthDoc));
         if (!WriteFile(hFile, buf, writeLen, &bytesWritten, nullptr))
         {
             CFormatMessageWrapper errMsg;
@@ -709,26 +700,23 @@ static bool SaveAsUtf8(const CDocument& doc, char* buf, size_t lengthDoc, CAutoF
 
 static bool SaveAsOther(const CDocument& doc, char* buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
 {
-    const int widebufSize = WriteBlockSize * 2;
-    auto      widebuf     = std::make_unique<wchar_t[]>(widebufSize);
-    const int charbufSize = widebufSize * 2;
-    auto      charbuf     = std::make_unique<char[]>(charbufSize);
+    const int wideBufSize = WriteBlockSize * 2;
+    auto      wideBuf     = std::make_unique<wchar_t[]>(wideBufSize);
+    const int charBufSize = wideBufSize * 2;
+    auto      charBuf     = std::make_unique<char[]>(charBufSize);
     // first convert to wide char, then to the requested codepage
     DWORD bytesWritten = 0;
     auto  encoding     = doc.m_encoding;
-    auto  hasBOM       = doc.m_bHasBOM;
     if (doc.m_encodingSaving != -1)
-    {
         encoding = doc.m_encodingSaving;
-        hasBOM   = doc.m_bHasBOMSaving;
-    }
+
     char* writeBuf = buf;
     do
     {
-        int charStart = UTF8Helper::characterStart(writeBuf, (int)min(WriteBlockSize, lengthDoc));
-        int widelen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), widebufSize);
-        int charlen   = WideCharToMultiByte(encoding < 0 ? CP_ACP : encoding, 0, widebuf.get(), widelen, charbuf.get(), charbufSize, 0, nullptr);
-        if (!WriteFile(hFile, charbuf.get(), charlen, &bytesWritten, nullptr) || charlen != int(bytesWritten))
+        int charStart = UTF8Helper::characterStart(writeBuf, static_cast<int>(min(WriteBlockSize, lengthDoc)));
+        int wideLen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, wideBuf.get(), wideBufSize);
+        int charLen   = WideCharToMultiByte(encoding < 0 ? CP_ACP : encoding, 0, wideBuf.get(), wideLen, charBuf.get(), charBufSize, nullptr, nullptr);
+        if (!WriteFile(hFile, charBuf.get(), charLen, &bytesWritten, nullptr) || charLen != static_cast<int>(bytesWritten))
         {
             CFormatMessageWrapper errMsg;
             err = errMsg.c_str();
@@ -740,7 +728,7 @@ static bool SaveAsOther(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     return true;
 }
 
-bool CDocumentManager::SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc)
+bool CDocumentManager::SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc) const
 {
     if (path.empty())
         return false;
@@ -755,16 +743,13 @@ bool CDocumentManager::SaveDoc(HWND hWnd, const std::wstring& path, const CDocum
     m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
     size_t lengthDoc = m_scratchScintilla.Call(SCI_GETLENGTH);
     // get characters directly from Scintilla buffer
-    char*        buf = (char*)m_scratchScintilla.Call(SCI_GETCHARACTERPOINTER);
+    char*        buf = reinterpret_cast<char*>(m_scratchScintilla.Call(SCI_GETCHARACTERPOINTER));
     bool         ok  = false;
     std::wstring err;
     auto         encoding = doc.m_encoding;
-    auto         hasBOM   = doc.m_bHasBOM;
     if (doc.m_encodingSaving != -1)
-    {
         encoding = doc.m_encodingSaving;
-        hasBOM   = doc.m_bHasBOMSaving;
-    }
+
     switch (encoding)
     {
         case CP_UTF8:
@@ -787,7 +772,7 @@ bool CDocumentManager::SaveDoc(HWND hWnd, const std::wstring& path, const CDocum
     return true;
 }
 
-bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved)
+bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved) const
 {
     bTabMoved = false;
     if (doc.m_path.empty())
@@ -820,11 +805,11 @@ bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved)
         CFormatMessageWrapper errMsg(err);
         if (((err == ERROR_ACCESS_DENIED) || (err == ERROR_WRITE_PROTECT)) && (!SysInfo::Instance().IsElevated()))
         {
-            std::wstring temppath = CTempFiles::Instance().GetTempFilePath(true);
+            std::wstring tempPath = CTempFiles::Instance().GetTempFilePath(true);
 
-            if (SaveDoc(hWnd, temppath, doc))
+            if (SaveDoc(hWnd, tempPath, doc))
             {
-                std::wstring cmdline        = CStringUtils::Format(L"/elevate /savepath:\"%s\" /path:\"%s\"", doc.m_path.c_str(), temppath.c_str());
+                std::wstring cmdline        = CStringUtils::Format(L"/elevate /savepath:\"%s\" /path:\"%s\"", doc.m_path.c_str(), tempPath.c_str());
                 DWORD        elevationError = RunSelfElevated(hWnd, cmdline, true);
                 // We don't know if saving worked or not.
                 // So return false since this instance didn't do the saving.
@@ -833,7 +818,7 @@ bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved)
                     for (int i = 0; i < 20; ++i)
                     {
                         Sleep(100);
-                        if (!PathFileExists(temppath.c_str()))
+                        if (!PathFileExists(tempPath.c_str()))
                         {
                             bTabMoved = true;
                             return true;
@@ -845,8 +830,8 @@ bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved)
                 {
                     // Can't elevate. Explain the error,
                     // don't refer to the temp path, that would be confusing.
-                    CFormatMessageWrapper errMsgelev(elevationError);
-                    ShowFileSaveError(hWnd, doc.m_path, errMsgelev);
+                    CFormatMessageWrapper errMsgElev(elevationError);
+                    ShowFileSaveError(hWnd, doc.m_path, errMsgElev);
                 }
             }
         }
@@ -874,7 +859,7 @@ bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved)
     return true;
 }
 
-bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, const std::wstring& path)
+bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, const std::wstring& path) const
 {
     return SaveDoc(hWnd, path, doc);
 }
@@ -908,7 +893,7 @@ DocModifiedState CDocumentManager::HasFileChanged(DocID id) const
 {
     const auto& doc = GetDocumentFromID(id);
     if (doc.m_path.empty() || ((doc.m_lastWriteTime.dwLowDateTime == 0) && (doc.m_lastWriteTime.dwHighDateTime == 0)) || doc.m_bDoSaveAs)
-        return DocModifiedState::DM_Unmodified;
+        return DocModifiedState::Unmodified;
 
     // get the last write time of the base doc file
     CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
@@ -916,25 +901,25 @@ DocModifiedState CDocumentManager::HasFileChanged(DocID id) const
     {
         auto lastError = GetLastError();
         if ((lastError == ERROR_FILE_NOT_FOUND) || (lastError == ERROR_PATH_NOT_FOUND))
-            return DocModifiedState::DM_Removed;
-        return DocModifiedState::DM_Unknown;
+            return DocModifiedState::Removed;
+        return DocModifiedState::Unknown;
     }
     BY_HANDLE_FILE_INFORMATION fi;
     if (!GetFileInformationByHandle(hFile, &fi))
-        return DocModifiedState::DM_Unknown;
+        return DocModifiedState::Unknown;
 
     if (CompareFileTime(&doc.m_lastWriteTime, &fi.ftLastWriteTime))
-        return DocModifiedState::DM_Modified;
+        return DocModifiedState::Modified;
 
-    return DocModifiedState::DM_Unmodified;
+    return DocModifiedState::Unmodified;
 }
 
 DocID CDocumentManager::GetIdForPath(const std::wstring& path) const
 {
-    for (const auto& d : m_documents)
+    for (const auto& [docId, doc] : m_documents)
     {
-        if (CPathUtils::PathCompare(d.second.m_path, path) == 0)
-            return d.first;
+        if (CPathUtils::PathCompare(doc.m_path, path) == 0)
+            return docId;
     }
     return {};
 }

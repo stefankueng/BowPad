@@ -20,14 +20,12 @@
 #include "BowPadUI.h"
 
 #include <string>
-#include <vector>
-
 
 class CCmdCodeStyle : public ICommand
 {
 public:
-
-    CCmdCodeStyle(void * obj) : ICommand(obj)
+    CCmdCodeStyle(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -37,11 +35,10 @@ public:
     UINT GetCmdId() override { return cmdCodeStyle; }
     bool IsItemsSourceCommand() override { return true; }
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
-    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void TabNotify(TBHDR * ptbhdr) override;
+    void TabNotify(TBHDR* ptbHdr) override;
     void OnPluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data) override;
 };
-

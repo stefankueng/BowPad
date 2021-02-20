@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,37 +21,33 @@
 #include <activscp.h>
 #include <comdef.h>
 
-
 class BasicScriptObject;
-
 
 class BasicScriptHost : public IActiveScriptSite
 {
 public:
-
     typedef IActiveScriptSite Interface;
 
     explicit BasicScriptHost(const GUID& languageId);
 
     BasicScriptHost(const GUID& languageId, const std::wstring& objectName, IDispatchPtr object);
 
-
     virtual ~BasicScriptHost();
 
     // Implementation of IUnknown
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void ** object);
-    virtual ULONG STDMETHODCALLTYPE AddRef();
-    virtual ULONG STDMETHODCALLTYPE Release();
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** object) override;
+    ULONG STDMETHODCALLTYPE   AddRef() override;
+    ULONG STDMETHODCALLTYPE   Release() override;
 
     // Implementation of IActiveScriptSite
-    virtual HRESULT STDMETHODCALLTYPE GetLCID(DWORD *lcid);
-    virtual HRESULT STDMETHODCALLTYPE GetDocVersionString(BSTR* ver);
-    virtual HRESULT STDMETHODCALLTYPE OnScriptTerminate(const VARIANT *, const EXCEPINFO *);
-    virtual HRESULT STDMETHODCALLTYPE OnStateChange(SCRIPTSTATE state);
-    virtual HRESULT STDMETHODCALLTYPE OnEnterScript();
-    virtual HRESULT STDMETHODCALLTYPE OnLeaveScript();
-    virtual HRESULT STDMETHODCALLTYPE GetItemInfo(const WCHAR * name, DWORD req, IUnknown ** obj, ITypeInfo ** type);
-    virtual HRESULT STDMETHODCALLTYPE OnScriptError(IActiveScriptError *err);
+    HRESULT STDMETHODCALLTYPE GetLCID(DWORD* lcid) override;
+    HRESULT STDMETHODCALLTYPE GetDocVersionString(BSTR* ver) override;
+    HRESULT STDMETHODCALLTYPE OnScriptTerminate(const VARIANT*, const EXCEPINFO*) override;
+    HRESULT STDMETHODCALLTYPE OnStateChange(SCRIPTSTATE state) override;
+    HRESULT STDMETHODCALLTYPE OnEnterScript() override;
+    HRESULT STDMETHODCALLTYPE OnLeaveScript() override;
+    HRESULT STDMETHODCALLTYPE GetItemInfo(const WCHAR* name, DWORD req, IUnknown** obj, ITypeInfo** type) override;
+    HRESULT STDMETHODCALLTYPE OnScriptError(IActiveScriptError* err) override;
 
     // Our implementation
     virtual HRESULT Initialize();
@@ -62,14 +58,13 @@ public:
     virtual _variant_t CallFunction(const std::wstring& strFunc, const std::vector<std::wstring>& paramArray);
     virtual _variant_t CallFunction(const std::wstring& strFunc, DISPPARAMS& params);
 
-    std::wstring            m_path;
-    HWND                    m_hWnd;
-private:
+    std::wstring m_path;
+    HWND         m_hWnd;
 
-    ULONG                   m_refCount;
+private:
+    ULONG m_refCount;
 
 protected:
-
-    IActiveScriptPtr        m_scriptEngine;
-    IDispatchPtr            m_application;
+    IActiveScriptPtr m_scriptEngine;
+    IDispatchPtr     m_application;
 };

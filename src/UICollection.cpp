@@ -48,12 +48,12 @@ HRESULT __stdcall CUICollection::QueryInterface(REFIID riid, void** ppvObject)
     return S_OK;
 }
 
-ULONG __stdcall CUICollection::AddRef(void)
+ULONG __stdcall CUICollection::AddRef()
 {
     return InterlockedIncrement(&m_cRef);
 }
 
-ULONG __stdcall CUICollection::Release(void)
+ULONG __stdcall CUICollection::Release()
 {
     LONG cRef = InterlockedDecrement(&m_cRef);
     if (cRef == 0)
@@ -68,7 +68,7 @@ HRESULT __stdcall CUICollection::GetCount(UINT32* count)
         return E_POINTER;
 
     if (count)
-        *count = (UINT32)m_data.size();
+        *count = static_cast<UINT32>(m_data.size());
     return S_OK;
 }
 
@@ -119,7 +119,7 @@ HRESULT __stdcall CUICollection::Replace(UINT32 indexReplaced, IUnknown* itemRep
     return S_OK;
 }
 
-HRESULT __stdcall CUICollection::Clear(void)
+HRESULT __stdcall CUICollection::Clear()
 {
     m_data.clear();
     return S_OK;

@@ -24,7 +24,7 @@
 #include "AppUtils.h"
 #include "BowPadUI.h"
 
-#include "..\ext\scintilla\src\KeyMap.h"
+#include "../ext/scintilla/src/KeyMap.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -36,12 +36,12 @@ extern IUIFramework* g_pFramework;
 
 static BYTE GetCtrlKeys()
 {
-    BYTE ctrlkeys = (GetKeyState(VK_CONTROL) & 0x8000) ? 0x08 : 0;
+    BYTE ctrlKeys = (GetKeyState(VK_CONTROL) & 0x8000) ? 0x08 : 0;
     if (GetKeyState(VK_SHIFT) & 0x8000)
-        ctrlkeys |= 0x04;
+        ctrlKeys |= 0x04;
     if (GetKeyState(VK_MENU) & 0x8000)
-        ctrlkeys |= 0x10;
-    return ctrlkeys;
+        ctrlKeys |= 0x10;
+    return ctrlKeys;
 }
 
 CKeyboardShortcutHandler::CKeyboardShortcutHandler()
@@ -63,8 +63,8 @@ CKeyboardShortcutHandler& CKeyboardShortcutHandler::Instance()
         instance.Load();
 #ifdef _DEBUG
         // check if one of our shortcuts overrides a built-in Scintilla shortcut
-        Scintilla::KeyMap kmap;
-        const auto&       keyMap = kmap.GetKeyMap();
+        Scintilla::KeyMap kMap;
+        const auto&       keyMap = kMap.GetKeyMap();
         for (auto& k : instance.m_accelerators)
         {
             constexpr auto SCMOD_SHIFT = 1;
@@ -110,16 +110,16 @@ CKeyboardShortcutHandler& CKeyboardShortcutHandler::Instance()
                     default:
                         break;
                 }
-                const char key = (const char)sm.key;
+                const char key = static_cast<const char>(sm.key);
                 sMod += key;
                 OutputDebugString(L"\nScintilla key shortcut overridden! : ");
                 OutputDebugStringA(sMod.c_str());
-                for (const auto& r : instance.m_resourceData)
+                for (const auto& [sCmd, cmd] : instance.m_resourceData)
                 {
-                    if (r.second == (int)foundIt->second)
+                    if (cmd == static_cast<int>(foundIt->second))
                     {
                         OutputDebugString(L" - ");
-                        OutputDebugString(r.first.c_str());
+                        OutputDebugString(sCmd.c_str());
                     }
                 }
                 OutputDebugString(L"\n");
@@ -166,14 +166,14 @@ void CKeyboardShortcutHandler::Load()
 
 void CKeyboardShortcutHandler::Load(const CSimpleIni& ini)
 {
-    CSimpleIni::TNamesDepend virtkeys;
-    ini.GetAllKeys(L"virtkeys", virtkeys);
-    for (auto keyName : virtkeys)
+    CSimpleIni::TNamesDepend virtKeys;
+    ini.GetAllKeys(L"virtkeys", virtKeys);
+    for (auto keyName : virtKeys)
     {
         unsigned long  vk            = 0;
         const wchar_t* keyDataString = ini.GetValue(L"virtkeys", keyName);
         if (CAppUtils::TryParse(keyDataString, vk, false, 0, 16))
-            m_virtkeys[keyName] = (UINT)vk;
+            m_virtKeys[keyName] = static_cast<UINT>(vk);
         else
             APPVERIFYM(false, L"Invalid Virtual Key ini file. Cannot convert key '%s' to uint.", keyName);
     }
@@ -187,78 +187,78 @@ void CKeyboardShortcutHandler::Load(const CSimpleIni& ini)
         ini.GetAllValues(L"shortcuts", cmd, values);
         for (auto v : values)
         {
-            std::vector<std::wstring> keyvec;
-            stringtok(keyvec, v, false, L",");
-            KSH_Accel accel;
+            std::vector<std::wstring> keyVec;
+            stringtok(keyVec, v, false, L",");
+            KshAccel accel;
             accel.sCmd = cmd;
-            accel.cmd  = (WORD)_wtoi(cmd);
+            accel.cmd  = static_cast<WORD>(_wtoi(cmd));
             if (accel.cmd == 0)
             {
                 auto it = m_resourceData.find(cmd);
                 if (it != m_resourceData.end())
-                    accel.cmd = (WORD)it->second;
+                    accel.cmd = static_cast<WORD>(it->second);
             }
-            for (size_t i = 0; i < keyvec.size(); ++i)
+            for (size_t i = 0; i < keyVec.size(); ++i)
             {
                 switch (i)
                 {
                     case 0:
-                        if (CStringUtils::find_caseinsensitive(keyvec[i], L"alt") != std::wstring::npos)
+                        if (CStringUtils::find_caseinsensitive(keyVec[i], L"alt") != std::wstring::npos)
                             accel.fVirt |= 0x10;
-                        if (CStringUtils::find_caseinsensitive(keyvec[i], L"ctrl") != std::wstring::npos)
+                        if (CStringUtils::find_caseinsensitive(keyVec[i], L"ctrl") != std::wstring::npos)
                             accel.fVirt |= 0x08;
-                        if (CStringUtils::find_caseinsensitive(keyvec[i], L"shift") != std::wstring::npos)
+                        if (CStringUtils::find_caseinsensitive(keyVec[i], L"shift") != std::wstring::npos)
                             accel.fVirt |= 0x04;
                         break;
                     case 1:
                     {
-                        auto keyveci = keyvec[i].c_str();
-                        auto whereAt = m_virtkeys.cend();
-                        for (auto it = m_virtkeys.cbegin(); it != m_virtkeys.cend(); ++it)
+                        auto keyVecI = keyVec[i].c_str();
+                        auto whereAt = m_virtKeys.cend();
+                        for (auto it = m_virtKeys.cbegin(); it != m_virtKeys.cend(); ++it)
                         {
-                            if (_wcsicmp(keyveci, it->first.c_str()) == 0)
+                            if (_wcsicmp(keyVecI, it->first.c_str()) == 0)
                             {
                                 whereAt = it;
                                 break;
                             }
                         }
-                        if (whereAt != m_virtkeys.cend())
+                        if (whereAt != m_virtKeys.cend())
                         {
                             accel.fVirt1 = TRUE;
-                            accel.key1   = (WORD)whereAt->second;
+                            accel.key1   = static_cast<WORD>(whereAt->second);
                         }
                         else
                         {
-                            if ((keyvec[i].size() > 2) && (keyvec[i][0] == '0') && (keyvec[i][1] == 'x'))
-                                accel.key1 = (WORD)wcstol(keyvec[i].c_str(), nullptr, 0);
+                            if ((keyVec[i].size() > 2) && (keyVec[i][0] == '0') && (keyVec[i][1] == 'x'))
+                                accel.key1 = static_cast<WORD>(wcstol(keyVec[i].c_str(), nullptr, 0));
                             else
-                                accel.key1 = (WORD)::towupper(keyvec[i][0]);
+                                accel.key1 = static_cast<WORD>(::towupper(keyVec[i][0]));
                         }
                     }
                     break;
                     case 2:
                     {
-                        auto keyveci = keyvec[i].c_str();
-                        auto whereAt = m_virtkeys.cend();
-                        for (auto it = m_virtkeys.cbegin(); it != m_virtkeys.cend(); ++it)
+                        auto keyVecI = keyVec[i].c_str();
+                        auto whereAt = m_virtKeys.cend();
+                        for (auto it = m_virtKeys.cbegin(); it != m_virtKeys.cend(); ++it)
                         {
-                            if (_wcsicmp(keyveci, it->first.c_str()) == 0)
+                            if (_wcsicmp(keyVecI, it->first.c_str()) == 0)
                             {
                                 whereAt = it;
                                 break;
                             }
                         }
-                        if (whereAt != m_virtkeys.cend())
+                        if (whereAt != m_virtKeys.cend())
                         {
                             accel.fVirt2 = TRUE;
-                            accel.key2   = (WORD)whereAt->second;
+                            accel.key2   = static_cast<WORD>(whereAt->second);
                         }
                         else
                         {
-                            if ((keyvec[i].size() > 2) && (keyvec[i][0] == '0') && (keyvec[i][1] == 'x'))
-                                accel.key2 = (WORD)wcstol(keyvec[i].c_str(), nullptr, 0);
+                            if ((keyVec[i].size() > 2) && (keyVec[i][0] == '0') && (keyVec[i][1] == 'x'))
+                                accel.key2 = static_cast<WORD>(wcstol(keyVec[i].c_str(), nullptr, 0));
                             else
-                                accel.key2 = (WORD)::towupper(keyvec[i][0]);
+                                accel.key2 = static_cast<WORD>(::towupper(keyVec[i][0]));
                         }
                         break;
                     }
@@ -277,7 +277,7 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator(HWND hwnd, UINT 
         case WM_KEYDOWN:
         {
             auto ctrlkeys = GetCtrlKeys();
-            int  nonvirt  = MapVirtualKey((UINT)wParam, MAPVK_VK_TO_CHAR);
+            int  nonvirt  = MapVirtualKey(static_cast<UINT>(wParam), MAPVK_VK_TO_CHAR);
             for (auto accel = m_accelerators.crbegin(); accel != m_accelerators.crend(); ++accel)
             {
                 if (accel->fVirt == ctrlkeys)
@@ -298,7 +298,7 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator(HWND hwnd, UINT 
                         else
                         {
                             m_lastKey = accel->key1;
-                            // ignore altcodes
+                            // ignore alt codes
                             if (accel->fVirt == 0x10)
                             {
                                 if (accel->key1 >= VK_NUMPAD0 && accel->key1 <= VK_NUMPAD9)
@@ -324,8 +324,8 @@ LRESULT CALLBACK CKeyboardShortcutHandler::TranslateAccelerator(HWND hwnd, UINT 
         break;
         case WM_KEYUP:
         {
-            auto ctrlkeys = GetCtrlKeys();
-            if (ctrlkeys == 0)
+            auto ctrlKeys = GetCtrlKeys();
+            if (ctrlKeys == 0)
                 m_lastKey = 0;
         }
         break;
@@ -376,15 +376,15 @@ void CKeyboardShortcutHandler::LoadUIHeader(const char* resData, DWORD resSize)
                     continue;
                 if (sLine.find("#define") == std::string::npos)
                     continue;
-                auto spacepos = sLine.find(' ');
-                if (spacepos != std::string::npos)
+                auto spacePos = sLine.find(' ');
+                if (spacePos != std::string::npos)
                 {
-                    auto spacepos2 = sLine.find(' ', spacepos + 1);
-                    if (spacepos2 != std::string::npos)
+                    auto spacePos2 = sLine.find(' ', spacePos + 1);
+                    if (spacePos2 != std::string::npos)
                     {
-                        std::string sIDString                                   = sLine.substr(spacepos + 1, spacepos2 - spacepos - 1);
-                        int         ID                                          = atoi(sLine.substr(spacepos2).c_str());
-                        m_resourceData[CUnicodeUtils::StdGetUnicode(sIDString)] = ID;
+                        std::string sIDString                                   = sLine.substr(spacePos + 1, spacePos2 - spacePos - 1);
+                        int         id                                          = atoi(sLine.substr(spacePos2).c_str());
+                        m_resourceData[CUnicodeUtils::StdGetUnicode(sIDString)] = id;
                     }
                 }
             }
@@ -394,19 +394,19 @@ void CKeyboardShortcutHandler::LoadUIHeader(const char* resData, DWORD resSize)
 
 void CKeyboardShortcutHandler::UpdateTooltips()
 {
-    for (const auto& rsc : m_resourceData)
+    for (const auto& [sCmd, cmd] : m_resourceData)
     {
-        std::wstring sAcc = GetShortCutStringForCommand((WORD)rsc.second);
+        std::wstring sAcc = GetShortCutStringForCommand(static_cast<WORD>(cmd));
         if (!sAcc.empty())
         {
-            g_pFramework->InvalidateUICommand(rsc.second, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
+            g_pFramework->InvalidateUICommand(cmd, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_TooltipTitle);
         }
     }
 }
 
 std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand(WORD cmd) const
 {
-    std::wstring sAcc = GetShortCutStringForCommand((WORD)cmd);
+    std::wstring sAcc = GetShortCutStringForCommand(static_cast<WORD>(cmd));
     if (!sAcc.empty())
     {
         auto whereAt = std::find_if(m_resourceData.begin(), m_resourceData.end(),
@@ -431,7 +431,7 @@ std::wstring CKeyboardShortcutHandler::GetTooltipTitleForCommand(WORD cmd) const
 
 void CKeyboardShortcutHandler::ToolTipUpdated(WORD cmd)
 {
-    m_tooltiptitlestoupdate.erase(cmd);
+    m_tooltipTitlesToUpdate.erase(cmd);
 }
 
 void CKeyboardShortcutHandler::Reload()
@@ -445,13 +445,13 @@ void CKeyboardShortcutHandler::AddCommand(const std::wstring& name, int id)
     {
         if (it->sCmd.compare(name) == 0)
         {
-            it->cmd = (WORD)id;
+            it->cmd = static_cast<WORD>(id);
             break;
         }
     }
 }
 
-std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& accel)
+std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KshAccel& accel)
 {
     std::wstring shortCut;
     wchar_t      buf[128] = {};
@@ -490,7 +490,7 @@ std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KSH_Accel& 
         int len = GetKeyNameText(nScanCode, buf, _countof(buf));
         if (len == 0)
         {
-            buf[0] = (wchar_t)code;
+            buf[0] = static_cast<wchar_t>(code);
             buf[1] = 0;
             len    = 1;
         }

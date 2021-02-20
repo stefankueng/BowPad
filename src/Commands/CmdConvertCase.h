@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 class CCmdConvertUppercase : public ICommand
 {
 public:
-
-    CCmdConvertUppercase(void * obj) : ICommand(obj)
+    CCmdConvertUppercase(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -41,8 +41,8 @@ public:
 class CCmdConvertLowercase : public ICommand
 {
 public:
-
-    CCmdConvertLowercase(void * obj) : ICommand(obj)
+    CCmdConvertLowercase(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -60,8 +60,8 @@ public:
 class CCmdConvertTitlecase : public ICommand
 {
 public:
-
-    CCmdConvertTitlecase(void * obj) : ICommand(obj)
+    CCmdConvertTitlecase(void* obj)
+        : ICommand(obj)
     {
     }
 

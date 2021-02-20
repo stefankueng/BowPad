@@ -29,34 +29,34 @@ class LanguageData
 {
 public:
     LanguageData()
-        : commentlineatstart(false)
-        , functionregexsort(0)
-        , userfunctions(0)
-        , lexer(0)
+        : lexer(0)
+        , commentLineAtStart(false)
+        , functionRegexSort(0)
+        , userFunctions(0)
     {
     }
 
     int                                  lexer;
-    std::unordered_map<int, std::string> keywordlist;
-    std::string                          commentline;
-    bool                                 commentlineatstart;
-    std::string                          commentstreamstart;
-    std::string                          commentstreamend;
-    std::string                          functionregex;
-    std::vector<std::string>             functionregextrim;
-    int                                  functionregexsort;
-    std::string                          autocompleteregex;
-    int                                  userfunctions;
-    std::unordered_set<std::string>      userkeywords;
-    bool                                 userkeywordsupdated = false;
+    std::unordered_map<int, std::string> keywordList;
+    std::string                          commentLine;
+    bool                                 commentLineAtStart;
+    std::string                          commentStreamStart;
+    std::string                          commentStreamEnd;
+    std::string                          functionRegex;
+    std::vector<std::string>             functionRegexTrim;
+    int                                  functionRegexSort;
+    std::string                          autoCompleteRegex;
+    int                                  userFunctions;
+    std::unordered_set<std::string>      userKeyWords;
+    bool                                 userKeyWordsUpdated = false;
 };
 
 enum FontStyle
 {
-    FONTSTYLE_NORMAL     = 0,
-    FONTSTYLE_BOLD       = 1,
-    FONTSTYLE_ITALIC     = 2,
-    FONTSTYLE_UNDERLINED = 4
+    Fontstyle_Normal     = 0,
+    Fontstyle_Bold       = 1,
+    Fontstyle_Italic     = 2,
+    Fontstyle_Underlined = 4
 };
 
 class StyleData
@@ -64,25 +64,25 @@ class StyleData
 public:
     StyleData();
 
-    std::wstring Name;
-    COLORREF     ForegroundColor;
-    COLORREF     BackgroundColor;
-    std::wstring FontName;
-    FontStyle    FontStyle;
-    int          FontSize;
-    bool         eolfilled;
+    std::wstring name;
+    COLORREF     foregroundColor;
+    COLORREF     backgroundColor;
+    std::wstring fontName;
+    FontStyle    fontStyle;
+    int          fontSize;
+    bool         eolFilled;
 };
 
 class LexerData
 {
 public:
     LexerData()
-        : ID(0)
+        : id(0)
     {
     }
-    int                                ID;
-    std::unordered_map<int, StyleData> Styles;
-    std::map<std::string, std::string> Properties;
+    int                                id;
+    std::unordered_map<int, StyleData> styles;
+    std::map<std::string, std::string> properties;
 };
 
 class CLexStyles
@@ -96,8 +96,8 @@ public:
     std::wstring                         GetUserExtensionsForLanguage(const std::wstring& lang) const;
     bool                                 GetDefaultExtensionForLanguage(const std::string& lang, std::wstring& ext, UINT& index) const;
     bool                                 IsLanguageHidden(const std::wstring& lang) const;
-    size_t                               GetFilterSpceCount() const;
-    const COMDLG_FILTERSPEC*             GetFilterSpceData() const;
+    size_t                               GetFilterSpecCount() const;
+    const COMDLG_FILTERSPEC*             GetFilterSpecData() const;
 
     const std::unordered_map<int, std::string>& GetKeywordsForLang(const std::string& lang);
     const std::unordered_map<int, std::string>& GetKeywordsForLexer(int lexer);
@@ -117,30 +117,30 @@ public:
 
     void SetLangForPath(const std::wstring& path, const std::string& language);
 
-    void        SetUserForeground(int ID, int style, COLORREF clr);
-    void        SetUserBackground(int ID, int style, COLORREF clr);
-    void        SetUserFont(int ID, int style, const std::wstring& font);
-    void        SetUserFontSize(int ID, int style, int size);
-    void        SetUserFontStyle(int ID, int style, FontStyle fontstyle);
+    void        SetUserForeground(int id, int style, COLORREF clr);
+    void        SetUserBackground(int id, int style, COLORREF clr);
+    void        SetUserFont(int id, int style, const std::wstring& font);
+    void        SetUserFontSize(int id, int style, int size);
+    void        SetUserFontStyle(int id, int style, FontStyle fontstyle);
     void        SetUserExt(const std::wstring& ext, const std::string& lang);
     void        SetLanguageHidden(const std::wstring& lang, bool hidden);
     void        ResetUserData();
     void        SaveUserData();
     bool        AddUserFunctionForLang(const std::string& lang, const std::string& fnc);
     std::string GetLanguageForPath(const std::wstring& path);
-    void        GenerateUserKeywords(LanguageData& ld);
+    void        GenerateUserKeywords(LanguageData& ld) const;
     void        Reload();
 
 private:
     CLexStyles();
     ~CLexStyles();
 
-    void Load();
-    void ReplaceVariables(std::wstring& s, const std::unordered_map<std::wstring, std::wstring>& vars) const;
-    void ParseStyle(LPCWSTR                                               styleName,
-                    LPCWSTR                                               styleString,
-                    const std::unordered_map<std::wstring, std::wstring>& variables,
-                    StyleData&                                            style) const;
+    void        Load();
+    static void ReplaceVariables(std::wstring& s, const std::unordered_map<std::wstring, std::wstring>& vars);
+    void        ParseStyle(LPCWSTR                                               styleName,
+                           LPCWSTR                                               styleString,
+                           const std::unordered_map<std::wstring, std::wstring>& variables,
+                           StyleData&                                            style) const;
 
 private:
     bool m_bLoaded;
@@ -148,14 +148,14 @@ private:
     // Different languages may have the same file extension
     std::multimap<std::string, std::string> m_extLang;
     std::map<std::string, std::string>      m_fileLang;
-    std::map<std::string, LanguageData>     m_Langdata;
-    std::unordered_map<int, LexerData>      m_lexerdata;
+    std::map<std::string, LanguageData>     m_langData;
+    std::unordered_map<int, LexerData>      m_lexerData;
     std::unordered_map<int, std::wstring>   m_lexerSection;
     std::set<std::wstring>                  m_hiddenLangs;
 
-    std::unordered_map<int, LexerData>  m_userlexerdata;
-    std::map<std::string, std::string>  m_userextLang;
-    std::map<std::string, std::string>  m_autoextLang;
+    std::unordered_map<int, LexerData>  m_userLexerData;
+    std::map<std::string, std::string>  m_userExtLang;
+    std::map<std::string, std::string>  m_autoExtLang;
     std::map<std::wstring, std::string> m_pathsLang;
     std::list<std::wstring>             m_pathsForLang;
     // Used by the Save File Dialog filter.

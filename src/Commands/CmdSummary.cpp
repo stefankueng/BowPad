@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016, 2020 - Stefan Kueng
+// Copyright (C) 2014, 2016, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,13 +18,11 @@
 #include "stdafx.h"
 #include "CmdSummary.h"
 #include "StringUtils.h"
-#include "UnicodeUtils.h"
 #include "Resource.h"
 #include "BaseDialog.h"
 #include "DlgResizer.h"
 #include "Theme.h"
-
-#include <algorithm>
+#include "ResString.h"
 
 extern HINSTANCE g_hRes;
 
@@ -32,12 +30,12 @@ class CSummaryDlg : public CDialog
 {
 public:
     CSummaryDlg();
-    ~CSummaryDlg();
+    virtual ~CSummaryDlg();
 
     std::wstring m_sSummary;
 
 protected:
-    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     LRESULT          DoCommand(int id, int msg);
     CDlgResizer      m_resizer;
 };
@@ -73,7 +71,7 @@ LRESULT CSummaryDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPar
             break;
         case WM_GETMINMAXINFO:
         {
-            MINMAXINFO* mmi       = (MINMAXINFO*)lParam;
+            MINMAXINFO* mmi       = reinterpret_cast<MINMAXINFO*>(lParam);
             mmi->ptMinTrackSize.x = 200;
             mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
             return 0;
@@ -104,7 +102,7 @@ bool CCmdSummary::Execute()
         return false;
 
     auto   len           = ScintillaCall(SCI_GETLENGTH);
-    char*  str           = (char*)ScintillaCall(SCI_GETCHARACTERPOINTER);
+    char*  str           = reinterpret_cast<char*>(ScintillaCall(SCI_GETCHARACTERPOINTER));
     bool   inSpaces      = true;
     bool   inLine        = false;
     bool   inParagraph   = true;
@@ -189,7 +187,7 @@ bool CCmdSummary::Execute()
     std::wstring sSummary = CStringUtils::Format(rSummary,
                                                  doc.m_path.c_str(),
                                                  numWords,
-                                                 (long)ScintillaCall(SCI_GETLINECOUNT),
+                                                 static_cast<long>(ScintillaCall(SCI_GETLINECOUNT)),
                                                  numEmptyLines,
                                                  numParagraphs);
 

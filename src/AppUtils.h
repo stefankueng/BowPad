@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ public:
     static bool                     CheckForUpdate(bool force);
     static bool                     DownloadUpdate(HWND hWnd, bool bInstall);
     static bool                     ShowUpdateAvailableDialog(HWND hWnd);
-    static HRESULT CALLBACK         TDLinkClickCallback(HWND hwnd, UINT uNotification, WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData);
+    static HRESULT CALLBACK         TDLinkClickCallback(HWND hWnd, UINT uNotification, WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData);
     static bool                     HasSameMajorVersion(const std::wstring& path);
     static HRESULT                  AddResStringItem(IUICollectionPtr& collection, int resId, int cat = UI_COLLECTION_INVALIDINDEX, IUIImagePtr pImg = nullptr);
     static HRESULT                  AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int cat = UI_COLLECTION_INVALIDINDEX, IUIImagePtr pImg = nullptr);
@@ -41,9 +41,9 @@ public:
     static bool                     TryParse(const wchar_t* s, int& result, bool emptyOk = false, int def = 0, int base = 10);
     static bool                     TryParse(const wchar_t* s, unsigned long& result, bool emptyOk = false, unsigned long def = 0, int base = 10);
     static std::wstring             GetProgramFilesX86Folder();
-    static const char*              GetResourceData(const wchar_t * resname, int id, DWORD& reslen);
+    static const char*              GetResourceData(const wchar_t * resName, int id, DWORD& resLen);
 private:
-    static std::wstring             updatefilename;
-    static std::wstring             updateurl;
+    static std::wstring             m_updateFilename;
+    static std::wstring             m_updateUrl;
 };
 

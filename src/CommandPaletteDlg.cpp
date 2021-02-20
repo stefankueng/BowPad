@@ -16,6 +16,7 @@
 //
 #include "stdafx.h"
 #include "CommandPaletteDlg.h"
+#include "BowPadUI.h"
 #include "CommandHandler.h"
 #include "KeyboardShortcutHandler.h"
 #include "resource.h"
@@ -26,6 +27,7 @@
 #include "OnOutOfScope.h"
 #include "PropertySet.h"
 #include "UICollection.h"
+#include "ResString.h"
 #include <string>
 #include <algorithm>
 #include <memory>
@@ -75,32 +77,32 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             m_hResults = GetDlgItem(*this, IDC_RESULTS);
 
             ResString sFilterCue(g_hRes, IDS_COMMANDPALETTE_FILTERCUE);
-            SendMessage(m_hFilter, EM_SETCUEBANNER, 1, (LPARAM)sFilterCue.c_str());
+            SendMessage(m_hFilter, EM_SETCUEBANNER, 1, reinterpret_cast<LPARAM>(sFilterCue.c_str()));
             SetWindowSubclass(m_hFilter, EditSubClassProc, 0, reinterpret_cast<DWORD_PTR>(this));
 
             const auto& resourceData = CKeyboardShortcutHandler::Instance().GetResourceData();
             const auto& commands     = CCommandHandler::Instance().GetCommands();
-            for (const auto& cmd : commands)
+            for (const auto& [cmdId, pCommand] : commands)
             {
                 auto whereAt = std::find_if(resourceData.begin(), resourceData.end(),
-                                            [&](const auto& item) { return ((UINT)item.second == cmd.first); });
+                                            [&](const auto& item) { return (static_cast<UINT>(item.second) == cmdId); });
                 if (whereAt != resourceData.end())
                 {
-                    auto pScript = dynamic_cast<CCmdScript*>(cmd.second.get());
+                    auto pScript = dynamic_cast<CCmdScript*>(pCommand.get());
                     if (pScript)
                     {
                         CmdPalData data;
-                        data.cmdId   = cmd.first;
-                        data.command = CCommandHandler::Instance().GetPluginMap().at(cmd.first);
+                        data.cmdId   = cmdId;
+                        data.command = CCommandHandler::Instance().GetPluginMap().at(cmdId);
                         SearchReplace(data.command, L"&", L"");
-                        data.shortcut = CKeyboardShortcutHandler::Instance().GetShortCutStringForCommand((WORD)cmd.first);
+                        data.shortcut = CKeyboardShortcutHandler::Instance().GetShortCutStringForCommand(static_cast<WORD>(cmdId));
                         if (!data.command.empty())
                             m_allResults.push_back(data);
                     }
                     else
                     {
                         CmdPalData data;
-                        data.cmdId = cmd.first;
+                        data.cmdId = cmdId;
 
                         auto sID = whereAt->first + L"_TooltipDescription_RESID";
 
@@ -121,21 +123,21 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                             SearchReplace(data.command, L"&", L"");
                         }
 
-                        data.shortcut = CKeyboardShortcutHandler::Instance().GetShortCutStringForCommand((WORD)cmd.first);
+                        data.shortcut = CKeyboardShortcutHandler::Instance().GetShortCutStringForCommand(static_cast<WORD>(cmdId));
                         if (!data.command.empty())
                             m_allResults.push_back(data);
                     }
                 }
             }
             const auto& noDelCommands = CCommandHandler::Instance().GetNoDeleteCommands();
-            for (const auto& cmd : noDelCommands)
+            for (const auto& [cmdId, pCommand] : noDelCommands)
             {
                 auto whereAt = std::find_if(resourceData.begin(), resourceData.end(),
-                                            [&](const auto& item) { return ((UINT)item.second == cmd.first); });
+                                            [&](const auto& item) { return (static_cast<UINT>(item.second) == cmdId); });
                 if (whereAt != resourceData.end())
                 {
                     CmdPalData data;
-                    data.cmdId = cmd.first;
+                    data.cmdId = cmdId;
 
                     auto sID = whereAt->first + L"_TooltipDescription_RESID";
 
@@ -156,7 +158,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                         SearchReplace(data.command, L"&", L"");
                     }
 
-                    data.shortcut = CKeyboardShortcutHandler::Instance().GetShortCutStringForCommand((WORD)cmd.first);
+                    data.shortcut = CKeyboardShortcutHandler::Instance().GetShortCutStringForCommand(static_cast<WORD>(cmdId));
                     if (!data.command.empty())
                         m_allResults.push_back(data);
                 }
@@ -182,12 +184,10 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             switch (wParam)
             {
                 case IDC_RESULTS:
-                    return DoListNotify((LPNMITEMACTIVATE)lParam);
-                    break;
+                    return DoListNotify(reinterpret_cast<LPNMITEMACTIVATE>(lParam));
                 default:
                     return FALSE;
             }
-            break;
         case WM_TIMER:
         {
             FillResults(false);
@@ -233,12 +233,12 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                 {
                     ScreenToClient(m_hResults, &pt);
 
-                    LV_HITTESTINFO lvhti{};
-                    lvhti.pt = pt;
-                    ListView_HitTest(m_hResults, &lvhti);
-                    if ((lvhti.flags & LVHT_ONITEM) != 0)
+                    LV_HITTESTINFO lvHti{};
+                    lvHti.pt = pt;
+                    ListView_HitTest(m_hResults, &lvHti);
+                    if ((lvHti.flags & LVHT_ONITEM) != 0)
                     {
-                        selIndex = lvhti.iItem;
+                        selIndex = lvHti.iItem;
                     }
                     ClientToScreen(m_hResults, &pt);
                 }
@@ -255,10 +255,10 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                     auto cmd = TrackPopupMenu(hPopup, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, *this, nullptr);
                     if (cmd == IDS_ADDTOQAT)
                     {
-                        PROPVARIANT propvar;
-                        if (SUCCEEDED(g_pFramework->GetUICommandProperty(cmdQat, UI_PKEY_ItemsSource, &propvar)))
+                        PROPVARIANT propVar;
+                        if (SUCCEEDED(g_pFramework->GetUICommandProperty(cmdQat, UI_PKEY_ItemsSource, &propVar)))
                         {
-                            IUICollectionPtr pCollection = (IUICollection*)propvar.punkVal;
+                            IUICollectionPtr pCollection = static_cast<IUICollection*>(propVar.punkVal);
                             if (pCollection)
                             {
                                 const auto& data = m_results[selIndex];
@@ -289,11 +289,11 @@ LRESULT CCommandPaletteDlg::DoCommand(int id, int code)
                 BOOL        enabled = TRUE;
                 if (cmd)
                 {
-                    PROPVARIANT propvarCurrentValue = {};
-                    PROPVARIANT propvarNewValue     = {};
-                    if (SUCCEEDED(cmd->IUICommandHandlerUpdateProperty(UI_PKEY_Enabled, &propvarCurrentValue, &propvarNewValue)))
+                    PROPVARIANT propVarCurrentValue = {};
+                    PROPVARIANT propVarNewValue     = {};
+                    if (SUCCEEDED(cmd->IUICommandHandlerUpdateProperty(UI_PKEY_Enabled, &propVarCurrentValue, &propVarNewValue)))
                     {
-                        if (FAILED(UIPropertyToBoolean(UI_PKEY_Enabled, propvarNewValue, &enabled)))
+                        if (FAILED(UIPropertyToBoolean(UI_PKEY_Enabled, propVarNewValue, &enabled)))
                             enabled = TRUE;
                     }
                 }
@@ -318,21 +318,21 @@ LRESULT CCommandPaletteDlg::DoCommand(int id, int code)
                         m_pCmd = cmd;
                         SetDlgItemText(*this, IDC_COLLECTIONNAME, data.command.c_str());
                         CUICollection collection;
-                        PROPVARIANT   propvarCurrentValue = {};
-                        PROPVARIANT   propvarNewValue     = {};
-                        UIInitPropertyFromInterface(UI_PKEY_ItemsSource, &collection, &propvarCurrentValue);
-                        UIInitPropertyFromInterface(UI_PKEY_ItemsSource, &collection, &propvarNewValue);
-                        m_pCmd->IUICommandHandlerUpdateProperty(UI_PKEY_ItemsSource, &propvarCurrentValue, &propvarNewValue);
+                        PROPVARIANT   propVarCurrentValue = {};
+                        PROPVARIANT   propVarNewValue     = {};
+                        UIInitPropertyFromInterface(UI_PKEY_ItemsSource, &collection, &propVarCurrentValue);
+                        UIInitPropertyFromInterface(UI_PKEY_ItemsSource, &collection, &propVarNewValue);
+                        m_pCmd->IUICommandHandlerUpdateProperty(UI_PKEY_ItemsSource, &propVarCurrentValue, &propVarNewValue);
                         UINT32 count = 0;
                         collection.GetCount(&count);
                         if (count == 0)
                         {
-                            m_pCmd->IUICommandHandlerUpdateProperty(UI_PKEY_RecentItems, &propvarCurrentValue, &propvarNewValue);
+                            m_pCmd->IUICommandHandlerUpdateProperty(UI_PKEY_RecentItems, &propVarCurrentValue, &propVarNewValue);
                             SAFEARRAY* psa = nullptr;
-                            UIPropertyToIUnknownArrayAlloc(UI_PKEY_RecentItems, propvarNewValue, &psa);
+                            UIPropertyToIUnknownArrayAlloc(UI_PKEY_RecentItems, propVarNewValue, &psa);
                             if (psa)
                             {
-                                for (LONG a = 0; a < (LONG)psa->rgsabound->cElements; ++a)
+                                for (LONG a = 0; a < static_cast<LONG>(psa->rgsabound->cElements); ++a)
                                 {
                                     IUnknown* iu{};
                                     SafeArrayGetElement(psa, &a, &iu);
@@ -349,7 +349,7 @@ LRESULT CCommandPaletteDlg::DoCommand(int id, int code)
                             colData.cmdId                 = data.cmdId;
                             colData.collectionIndex       = c;
                             IUISimplePropertySetPtr pItem = nullptr;
-                            collection.GetItem(c, (IUnknown**)&pItem);
+                            collection.GetItem(c, reinterpret_cast<IUnknown**>(&pItem));
                             if (pItem)
                             {
                                 PROPVARIANT propVar = {};
@@ -364,8 +364,8 @@ LRESULT CCommandPaletteDlg::DoCommand(int id, int code)
                                 m_collectionResults.push_back(colData);
                             }
                         }
-                        PropVariantClear(&propvarCurrentValue);
-                        PropVariantClear(&propvarNewValue);
+                        PropVariantClear(&propVarCurrentValue);
+                        PropVariantClear(&propVarNewValue);
                     }
                     SetWindowText(m_hFilter, L"");
                     FillResults(true);
@@ -403,7 +403,7 @@ LRESULT CCommandPaletteDlg::DoCommand(int id, int code)
     return 1;
 }
 
-void CCommandPaletteDlg::InitResultsList()
+void CCommandPaletteDlg::InitResultsList() const
 {
     SetWindowTheme(m_hResults, L"Explorer", nullptr);
     ListView_SetItemCountEx(m_hResults, 0, 0);
@@ -436,9 +436,9 @@ LRESULT CCommandPaletteDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
     {
         case LVN_GETINFOTIP:
         {
-            LPNMLVGETINFOTIP tip       = (LPNMLVGETINFOTIP)lpNMItemActivate;
-            int              itemIndex = (size_t)tip->iItem;
-            if (itemIndex < 0 || itemIndex >= (int)m_results.size())
+            LPNMLVGETINFOTIP tip       = reinterpret_cast<LPNMLVGETINFOTIPW>(lpNMItemActivate);
+            int              itemIndex = static_cast<size_t>(tip->iItem);
+            if (itemIndex < 0 || itemIndex >= static_cast<int>(m_results.size()))
             {
                 assert(false);
                 return 0;
@@ -465,14 +465,13 @@ LRESULT CCommandPaletteDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
         case NM_RETURN:
         case NM_DBLCLK:
             // execute the selected command
-            if (lpNMItemActivate->iItem >= 0 && lpNMItemActivate->iItem < (int)m_results.size())
+            if (lpNMItemActivate->iItem >= 0 && lpNMItemActivate->iItem < static_cast<int>(m_results.size()))
             {
                 SendMessage(*this, WM_COMMAND, MAKEWPARAM(IDOK, 1), 0);
             }
             break;
         case NM_CUSTOMDRAW:
             return DrawListItem(reinterpret_cast<NMLVCUSTOMDRAW*>(lpNMItemActivate));
-            break;
     }
     return 0;
 }
@@ -494,11 +493,11 @@ LRESULT CCommandPaletteDlg::DrawListItem(NMLVCUSTOMDRAW* pLVCD)
             BOOL        enabled = TRUE;
             if (cmd)
             {
-                PROPVARIANT propvarCurrentValue = {};
-                PROPVARIANT propvarNewValue     = {};
-                if (SUCCEEDED(cmd->IUICommandHandlerUpdateProperty(UI_PKEY_Enabled, &propvarCurrentValue, &propvarNewValue)))
+                PROPVARIANT propVarCurrentValue = {};
+                PROPVARIANT propVarNewValue     = {};
+                if (SUCCEEDED(cmd->IUICommandHandlerUpdateProperty(UI_PKEY_Enabled, &propVarCurrentValue, &propVarNewValue)))
                 {
-                    if (FAILED(UIPropertyToBoolean(UI_PKEY_Enabled, propvarNewValue, &enabled)))
+                    if (FAILED(UIPropertyToBoolean(UI_PKEY_Enabled, propVarNewValue, &enabled)))
                         enabled = TRUE;
                 }
             }
@@ -520,7 +519,7 @@ LRESULT CCommandPaletteDlg::GetListItemDispInfo(NMLVDISPINFO* pDispInfo)
             return 0;
         pDispInfo->item.pszText[0] = 0;
         int itemIndex              = pDispInfo->item.iItem;
-        if (itemIndex >= (int)m_results.size())
+        if (itemIndex >= static_cast<int>(m_results.size()))
             return 0;
 
         std::wstring sTemp;

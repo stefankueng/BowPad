@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,12 +17,10 @@
 #include "stdafx.h"
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include <stdarg.h>
 #include <cassert>
 #include <ctype.h>
 #include <string>
-#include <map>
 #include <set>
 #include <vector>
 
@@ -32,9 +30,7 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#include "../scintilla/lexlib/WordList.h"
 #include "../scintilla/lexlib/LexAccessor.h"
-#include "../scintilla/lexlib/Accessor.h"
 #include "../scintilla/lexlib/StyleContext.h"
 #include "../scintilla/lexlib/CharacterSet.h"
 #include "../scintilla/lexlib/LexerModule.h"
@@ -75,12 +71,12 @@ enum LogStates
     Error
 };
 
-static inline bool IsAWordChar(const int ch)
-{
-    return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '$');
-}
+//static bool IsAWordChar(const int ch)
+//{
+//    return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '$');
+//}
 
-static char ascii_toupper_char(char c)
+char asciiToUpperChar(char c)
 {
     return ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ^ autovectorizes to PXOR: runs on more ports than paddb
 }
@@ -113,7 +109,7 @@ static char ascii_toupper_char(char c)
 //    return LogStates::Debug;
 //}
 
-static LogStyles GetLogStyle(LogStyles style, LogStates state)
+LogStyles GetLogStyle(LogStyles style, LogStates state)
 {
     switch (style)
     {
@@ -132,7 +128,6 @@ static LogStyles GetLogStyle(LogStyles style, LogStates state)
                 case LogStates::Error:
                     return LogStyles::ErrorDefault;
             }
-            break;
         case LogStyles::Block:
             switch (state)
             {
@@ -148,7 +143,6 @@ static LogStyles GetLogStyle(LogStyles style, LogStates state)
                 case LogStates::Error:
                     return LogStyles::ErrorBlock;
             }
-            break;
         case LogStyles::String:
             switch (state)
             {
@@ -164,7 +158,6 @@ static LogStyles GetLogStyle(LogStyles style, LogStates state)
                 case LogStates::Error:
                     return LogStyles::ErrorString;
             }
-            break;
         case LogStyles::Number:
             switch (state)
             {
@@ -180,7 +173,31 @@ static LogStyles GetLogStyle(LogStyles style, LogStates state)
                 case LogStates::Error:
                     return LogStyles::ErrorNumber;
             }
+        case InfoDefault:
             break;
+        case InfoBlock:
+            break;
+        case InfoString:
+            break;
+        case InfoNumber:
+            break;
+        case WarnDefault:
+            break;
+        case WarnBlock:
+            break;
+        case WarnString:
+            break;
+        case WarnNumber:
+            break;
+        case ErrorDefault:
+            break;
+        case ErrorBlock:
+            break;
+        case ErrorString:
+            break;
+        case ErrorNumber:
+            break;
+        default:;
     }
     return style;
 }
@@ -273,7 +290,7 @@ public:
 
     void* SCI_METHOD PrivateCall(int, void*) override
     {
-        return NULL;
+        return nullptr;
     }
 
     static ILexer5* LexerFactorySimple()
@@ -289,25 +306,25 @@ Sci_Position SCI_METHOD LexerLog::PropertySet(const char* key, const char* val)
         if (strcmp(key, "debugstrings") == 0)
         {
             for (size_t i = 0; i < options.debugstrings.size(); ++i)
-                options.debugstrings[i] = ascii_toupper_char(options.debugstrings[i]);
+                options.debugstrings[i] = asciiToUpperChar(options.debugstrings[i]);
             stringtok(options.debugTokens, options.debugstrings, true, " \t\n", false);
         }
         if (strcmp(key, "infostrings") == 0)
         {
             for (size_t i = 0; i < options.infostrings.size(); ++i)
-                options.infostrings[i] = ascii_toupper_char(options.infostrings[i]);
+                options.infostrings[i] = asciiToUpperChar(options.infostrings[i]);
             stringtok(options.infoTokens, options.infostrings, true, " \t\n", false);
         }
         if (strcmp(key, "warnstrings") == 0)
         {
             for (size_t i = 0; i < options.warnstrings.size(); ++i)
-                options.warnstrings[i] = ascii_toupper_char(options.warnstrings[i]);
+                options.warnstrings[i] = asciiToUpperChar(options.warnstrings[i]);
             stringtok(options.warnTokens, options.warnstrings, true, " \t\n", false);
         }
         if (strcmp(key, "errorstrings") == 0)
         {
             for (size_t i = 0; i < options.errorstrings.size(); ++i)
-                options.errorstrings[i] = ascii_toupper_char(options.errorstrings[i]);
+                options.errorstrings[i] = asciiToUpperChar(options.errorstrings[i]);
             stringtok(options.errorTokens, options.errorstrings, true, " \t\n", false);
         }
 
@@ -341,37 +358,37 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
             }
             pAccess->GetCharRange(line.get(), sc.currentPos, lineEnd - sc.currentPos);
             for (size_t i = 0; i < lineLen; ++i)
-                line[i] = ascii_toupper_char(line[i]);
-            std::string_view sline(line.get(), lineEnd - sc.currentPos + 2);
+                line[i] = asciiToUpperChar(line[i]);
+            std::string_view sLine(line.get(), lineEnd - sc.currentPos + 2);
             for (const auto& token : options.debugTokens)
             {
-                if (auto pos = sline.find(token); pos != std::string::npos)
+                if (auto pos = sLine.find(token); pos != std::string::npos)
                 {
-                    if (pos == 0 || ((!isalpha(sline[pos - 1]) || isalpha(sline[pos])) && sline[pos - 1] != '"'))
+                    if (pos == 0 || ((!isalpha(sLine[pos - 1]) || isalpha(sLine[pos])) && sLine[pos - 1] != '"'))
                         logState = LogStates::Debug;
                 }
             }
             for (const auto& token : options.infoTokens)
             {
-                if (auto pos = sline.find(token); pos != std::string::npos)
+                if (auto pos = sLine.find(token); pos != std::string::npos)
                 {
-                    if (pos == 0 || ((!isalpha(sline[pos - 1]) || isalpha(sline[pos])) && sline[pos - 1] != '"'))
+                    if (pos == 0 || ((!isalpha(sLine[pos - 1]) || isalpha(sLine[pos])) && sLine[pos - 1] != '"'))
                         logState = LogStates::Info;
                 }
             }
             for (const auto& token : options.warnTokens)
             {
-                if (auto pos = sline.find(token); pos != std::string::npos)
+                if (auto pos = sLine.find(token); pos != std::string::npos)
                 {
-                    if (pos == 0 || ((!isalpha(sline[pos - 1]) || isalpha(sline[pos])) && sline[pos - 1] != '"'))
+                    if (pos == 0 || ((!isalpha(sLine[pos - 1]) || isalpha(sLine[pos])) && sLine[pos - 1] != '"'))
                         logState = LogStates::Warn;
                 }
             }
             for (const auto& token : options.errorTokens)
             {
-                if (auto pos = sline.find(token); pos != std::string::npos)
+                if (auto pos = sLine.find(token); pos != std::string::npos)
                 {
-                    if (pos == 0 || ((!isalpha(sline[pos - 1]) || isalpha(sline[pos])) && sline[pos - 1] != '"'))
+                    if (pos == 0 || ((!isalpha(sLine[pos - 1]) || isalpha(sLine[pos])) && sLine[pos - 1] != '"'))
                         logState = LogStates::Error;
                 }
             }
@@ -482,4 +499,4 @@ void SCI_METHOD LexerLog::Fold(Sci_PositionU /*startPos*/, Sci_Position /*length
     // no folding : log files are usually big, and this simply is too slow
 }
 
-LexerModule lmLog(SCLEX_AUTOMATIC + 101, LexerLog::LexerFactorySimple, "log", 0);
+LexerModule lmLog(SCLEX_AUTOMATIC + 101, LexerLog::LexerFactorySimple, "log", nullptr);

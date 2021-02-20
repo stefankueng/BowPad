@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013, 2015-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "AppUtils.h"
 #include "version.h"
 #include "Theme.h"
+#include "ResString.h"
 #include <string>
 #include <Commdlg.h>
 

@@ -18,9 +18,7 @@
 #pragma once
 #include "ICommand.h"
 #include "BowPadUI.h"
-#include "BowPad.h"
 #include "ScintillaWnd.h"
-#include "LexStyles.h"
 
 #include <string>
 #include <vector>
@@ -34,7 +32,7 @@
 
 struct FunctionInfo
 {
-    inline FunctionInfo(sptr_t lineNum, std::string&& sortName, std::string&& displayName)
+    FunctionInfo(sptr_t lineNum, std::string&& sortName, std::string&& displayName)
         : lineNum(lineNum)
         , sortName(std::move(sortName))
         , displayName(std::move(displayName))
@@ -72,9 +70,9 @@ struct WorkItem
     DocID                    m_id;
     std::string              m_lang;
     std::string              m_regex;
-    std::string              m_autocregex;
+    std::string              m_autoCRegex;
     std::string              m_data;
-    std::vector<std::string> m_trimtokens;
+    std::vector<std::string> m_trimTokens;
 };
 
 class CCmdFunctions final : public ICommand
@@ -88,10 +86,10 @@ public:
     bool IsItemsSourceCommand() override { return true; }
 
 private:
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
-    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void TabNotify(TBHDR* ptbhdr) override;
+    void TabNotify(TBHDR* ptbHdr) override;
     void ScintillaNotify(SCNotification* pScn) override;
     void OnTimer(UINT id) override;
     void OnDocumentOpen(DocID id) override;
@@ -105,12 +103,12 @@ private:
     void                      InvalidateFunctionsSource();
     HRESULT                   PopulateFunctions(IUICollectionPtr& collection);
     void                      FindFunctions(const CDocument& doc, std::function<bool(const std::string&, sptr_t lineNum)>& callback) const;
-    void                      SetWorkTimer(int ms);
+    void                      SetWorkTimer(int ms) const;
     void                      ThreadFunc();
 
 private:
-    bool                                               m_autoscan;
-    size_t                                             m_autoscanlimit;
+    bool                                               m_autoScan;
+    size_t                                             m_autoScanLimit;
     UINT                                               m_timerID;
     std::vector<sptr_t>                                m_menuData;
     std::chrono::time_point<std::chrono::steady_clock> m_funcProcessingStartTime;
@@ -118,11 +116,11 @@ private:
 
     std::deque<DocID>                                                m_eventData;
     std::list<WorkItem>                                              m_fileData;
-    std::unordered_map<std::string, std::unordered_set<std::string>> m_langdata;
+    std::unordered_map<std::string, std::unordered_set<std::string>> m_langData;
     std::thread                                                      m_thread;
-    std::mutex                                                       m_filedatamutex;
-    std::condition_variable                                          m_filedatacv;
-    std::recursive_mutex                                             m_langdatamutex;
+    std::mutex                                                       m_fileDataMutex;
+    std::condition_variable                                          m_fileDataCv;
+    std::recursive_mutex                                             m_langDataMutex;
     volatile long                                                    m_bRunThread;
     volatile long                                                    m_bThreadRunning;
 };

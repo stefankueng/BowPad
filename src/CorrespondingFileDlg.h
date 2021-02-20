@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013 - 2016, 2020 Stefan Kueng
+// Copyright (C) 2013 - 2016, 2020-2021 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@
 #include "DlgResizer.h"
 #include "ICommand.h"
 
-#include <vector>
-
-struct CFFileInfo
+struct CCorFileInfo
 {
     std::wstring status;
     bool         ok       = false;
@@ -41,7 +39,7 @@ class CCorrespondingFileDlg : public CDialog
 {
 public:
     CCorrespondingFileDlg(void* obj);
-    ~CCorrespondingFileDlg();
+    virtual ~CCorrespondingFileDlg();
     void Show(HWND hParent, const std::wstring& initialPath);
 
 protected:
@@ -57,7 +55,7 @@ protected:
     void             SyncFileNameParts();
     void             SetStatus(const std::wstring& status);
     bool             CheckStatus();
-    CFFileInfo       GetCFInfo();
+    CCorFileInfo     GetCFInfo();
 
 protected:
     CDlgResizer  m_resizer;

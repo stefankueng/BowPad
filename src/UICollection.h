@@ -15,8 +15,6 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #pragma once
-#include "COMPtrs.h"
-#include <string>
 #include <vector>
 #include <UIRibbon.h>
 
@@ -28,8 +26,8 @@ public:
 
     // Inherited via IUnknown
     virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override;
-    virtual ULONG __stdcall AddRef(void) override;
-    virtual ULONG __stdcall Release(void) override;
+    virtual ULONG __stdcall AddRef() override;
+    virtual ULONG __stdcall Release() override;
     // Inherited via IUICollection
     virtual HRESULT __stdcall GetCount(UINT32* count) override;
     virtual HRESULT __stdcall GetItem(UINT32 index, IUnknown** item) override;
@@ -37,7 +35,7 @@ public:
     virtual HRESULT __stdcall Insert(UINT32 index, IUnknown* item) override;
     virtual HRESULT __stdcall RemoveAt(UINT32 index) override;
     virtual HRESULT __stdcall Replace(UINT32 indexReplaced, IUnknown* itemReplaceWith) override;
-    virtual HRESULT __stdcall Clear(void) override;
+    virtual HRESULT __stdcall Clear() override;
 
 private:
     LONG                     m_cRef;

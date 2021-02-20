@@ -21,10 +21,10 @@
 
 enum class DocModifiedState
 {
-    DM_Unmodified,
-    DM_Modified,
-    DM_Removed,
-    DM_Unknown
+    Unmodified,
+    Modified,
+    Removed,
+    Unknown
 };
 
 class DocID
@@ -64,7 +64,7 @@ namespace std
 template <>
 struct hash<DocID>
 {
-    std::size_t operator()(const DocID& cmp) const
+    std::size_t operator()(const DocID& cmp) const noexcept
     {
         using std::hash;
         using std::size_t;
@@ -85,28 +85,28 @@ public:
 
     void             AddDocumentAtEnd(const CDocument& doc, DocID id);
     void             RemoveDocument(DocID id);
-    int              GetCount() const { return (int)m_documents.size(); }
+    int              GetCount() const { return static_cast<int>(m_documents.size()); }
     DocID            GetIdForPath(const std::wstring& path) const;
     bool             HasDocumentID(DocID id) const;
     const CDocument& GetDocumentFromID(DocID id) const;
     CDocument&       GetModDocumentFromID(DocID id);
 
     CDocument        LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
-    bool             SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved);
-    bool             SaveFile(HWND hWnd, CDocument& doc, const std::wstring& path);
-    bool             UpdateFileTime(CDocument& doc, bool bIncludeReadonly);
+    bool             SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved) const;
+    bool             SaveFile(HWND hWnd, CDocument& doc, const std::wstring& path) const;
+    static bool      UpdateFileTime(CDocument& doc, bool bIncludeReadonly);
     DocModifiedState HasFileChanged(DocID id) const;
 
 private:
-    bool SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc);
+    bool SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc) const;
 
 private:
     std::map<DocID, CDocument> m_documents;
     CScintillaWnd              m_scratchScintilla;
 
     char                       m_data[ReadBlockSize + 8];
-    const int                  m_widebufSize = ReadBlockSize * 2;
-    std::unique_ptr<wchar_t[]> m_widebuf;
-    const int                  m_charbufSize = ReadBlockSize * 4;
-    std::unique_ptr<char[]>    m_charbuf;
+    const int                  m_wideBufSize = ReadBlockSize * 2;
+    std::unique_ptr<wchar_t[]> m_wideBuf;
+    const int                  m_charBufSize = ReadBlockSize * 4;
+    std::unique_ptr<char[]>    m_charBuf;
 };

@@ -65,14 +65,14 @@ static std::unique_ptr<UINT[]> Icon2Image(HICON hIcon)
     int        height           = bm.bmHeight;
     int        bytesPerScanLine = (width * 3 + 3) & 0xFFFFFFFC;
     int        size             = bytesPerScanLine * height;
-    BITMAPINFO infoheader;
-    infoheader.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
-    infoheader.bmiHeader.biWidth       = width;
-    infoheader.bmiHeader.biHeight      = height;
-    infoheader.bmiHeader.biPlanes      = 1;
-    infoheader.bmiHeader.biBitCount    = 24;
-    infoheader.bmiHeader.biCompression = BI_RGB;
-    infoheader.bmiHeader.biSizeImage   = size;
+    BITMAPINFO infoHeader;
+    infoHeader.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
+    infoHeader.bmiHeader.biWidth       = width;
+    infoHeader.bmiHeader.biHeight      = height;
+    infoHeader.bmiHeader.biPlanes      = 1;
+    infoHeader.bmiHeader.biBitCount    = 24;
+    infoHeader.bmiHeader.biCompression = BI_RGB;
+    infoHeader.bmiHeader.biSizeImage   = size;
 
     auto   ptrb          = std::make_unique<BYTE[]>(size * 2 + height * width * 4);
     LPBYTE pixelsIconRGB = ptrb.get();
@@ -80,11 +80,11 @@ static std::unique_ptr<UINT[]> Icon2Image(HICON hIcon)
     HDC    hDC           = CreateCompatibleDC(nullptr);
     OnOutOfScope(DeleteDC(hDC));
     HBITMAP hBmpOld = static_cast<HBITMAP>(SelectObject(hDC, static_cast<HGDIOBJ>(iconInfo.hbmColor)));
-    if (!GetDIBits(hDC, iconInfo.hbmColor, 0, height, static_cast<LPVOID>(pixelsIconRGB), &infoheader, DIB_RGB_COLORS))
+    if (!GetDIBits(hDC, iconInfo.hbmColor, 0, height, static_cast<LPVOID>(pixelsIconRGB), &infoHeader, DIB_RGB_COLORS))
         return nullptr;
 
     SelectObject(hDC, hBmpOld);
-    if (!GetDIBits(hDC, iconInfo.hbmMask, 0, height, static_cast<LPVOID>(alphaPixels), &infoheader, DIB_RGB_COLORS))
+    if (!GetDIBits(hDC, iconInfo.hbmMask, 0, height, static_cast<LPVOID>(alphaPixels), &infoHeader, DIB_RGB_COLORS))
         return nullptr;
 
     auto imagePixels = std::make_unique<UINT[]>(height * width);
@@ -113,7 +113,7 @@ static bool isAllowedBeforeDriveLetter(wchar_t c)
     return c == '\'' || c == '/' || c == '"' || c == '(' || c == '{' || c == '[' || std::isspace(c);
 }
 
-static bool getRawPath(const std::wstring& input, std::wstring& rawPath_out)
+static bool getRawPath(const std::wstring& input, std::wstring& rawPathOut)
 {
     // Try to find a path in the given input.
     // Algorithm: look for a colon. The colon must be preceded by an alphabetic character.
@@ -129,11 +129,11 @@ static bool getRawPath(const std::wstring& input, std::wstring& rawPath_out)
     else if (lastOccurrence >= 2 && !isAllowedBeforeDriveLetter(input[lastOccurrence - 2]))
         return false;
 
-    rawPath_out = input.substr(lastOccurrence - 1);
+    rawPathOut = input.substr(lastOccurrence - 1);
     return true;
 }
 
-static bool getPathsForPathCompletion(const std::wstring& input, std::wstring& pathRaw, std::wstring& pathToMatch_out)
+static bool getPathsForPathCompletion(const std::wstring& input, std::wstring& pathRaw, std::wstring& pathToMatchOut)
 {
     std::wstring rawPath;
     if (!getRawPath(input, rawPath))
@@ -142,19 +142,19 @@ static bool getPathsForPathCompletion(const std::wstring& input, std::wstring& p
     }
     else if (PathIsDirectory(rawPath.c_str()))
     {
-        pathToMatch_out = rawPath;
-        pathRaw         = rawPath;
+        pathToMatchOut = rawPath;
+        pathRaw        = rawPath;
         return true;
     }
     else
     {
-        auto last_occurrence = rawPath.find_last_of(L"\\/");
-        if (last_occurrence == std::string::npos) // No match.
+        auto lastOccurrence = rawPath.find_last_of(L"\\/");
+        if (lastOccurrence == std::string::npos) // No match.
             return false;
         else
         {
-            pathToMatch_out = rawPath.substr(0, last_occurrence);
-            pathRaw         = rawPath;
+            pathToMatchOut = rawPath.substr(0, lastOccurrence);
+            pathRaw        = rawPath;
             return true;
         }
     }
@@ -217,7 +217,7 @@ void CAutoComplete::Init()
                         acMap[CUnicodeUtils::StdGetUTF8(v)] = AutoCompleteType::Code;
                 }
                 std::lock_guard<std::mutex> lockGuard(m_mutex);
-                m_langWordlist[CUnicodeUtils::StdGetUTF8(section)] = std::move(acMap);
+                m_langWordList[CUnicodeUtils::StdGetUTF8(section)] = std::move(acMap);
             }
 
             {
@@ -275,8 +275,8 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                         std::string sSnippet;
                         {
                             std::lock_guard<std::mutex> lockGuard(m_mutex);
-                            auto                        docID      = m_main->m_TabBar.GetCurrentTabId();
-                            auto                        lang       = m_main->m_DocManager.GetDocumentFromID(docID).GetLanguage();
+                            auto                        docID      = m_main->m_tabBar.GetCurrentTabId();
+                            auto                        lang       = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
                             const auto&                 snippetMap = m_langSnippetList[lang];
                             auto                        foundIt    = snippetMap.find(sKey);
                             if (foundIt != snippetMap.end())
@@ -351,25 +351,25 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
 void CAutoComplete::AddWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words)
 {
     std::lock_guard<std::mutex> lockGuard(m_mutex);
-    m_langWordlist[lang].insert(words.begin(), words.end());
+    m_langWordList[lang].insert(words.begin(), words.end());
 }
 
 void CAutoComplete::AddWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words)
 {
     std::lock_guard<std::mutex> lockGuard(m_mutex);
-    m_langWordlist[lang].insert(words.begin(), words.end());
+    m_langWordList[lang].insert(words.begin(), words.end());
 }
 
 void CAutoComplete::AddWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words)
 {
     std::lock_guard<std::mutex> lockGuard(m_mutex);
-    m_docWordlist[docID].insert(words.begin(), words.end());
+    m_docWordList[docID].insert(words.begin(), words.end());
 }
 
 void CAutoComplete::AddWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words)
 {
     std::lock_guard<std::mutex> lockGuard(m_mutex);
-    m_docWordlist[docID].insert(words.begin(), words.end());
+    m_docWordList[docID].insert(words.begin(), words.end());
 }
 
 void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
@@ -400,19 +400,19 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             if (pathToMatch.ends_with(':'))
                 pathToMatch += '\\';
             SearchReplace(pathToMatch, L"/", L"\\");
-            CDirFileEnum filefinder(pathToMatch);
+            CDirFileEnum fileFinder(pathToMatch);
             bool         bIsDirectory;
             std::wstring filename;
 
             auto           startTime   = std::chrono::steady_clock::now();
             constexpr auto maxPathTime = std::chrono::milliseconds(400);
             auto           rootDir     = rawPath.substr(0, rawPath.find_last_of(L"\\/") + 1);
-            while (filefinder.NextFile(filename, &bIsDirectory, false))
+            while (fileFinder.NextFile(filename, &bIsDirectory, false))
             {
                 filename = rootDir + filename.substr(rootDir.size());
                 pathComplete += (CUnicodeUtils::StdGetUTF8(filename) + typeSeparator + std::to_string(static_cast<int>(AutoCompleteType::Path)) + wordSeparator);
-                auto ellapsedPeriod = std::chrono::steady_clock::now() - startTime;
-                if (ellapsedPeriod > maxPathTime)
+                auto elapsedPeriod = std::chrono::steady_clock::now() - startTime;
+                if (elapsedPeriod > maxPathTime)
                     break;
             }
             if (!pathComplete.empty())
@@ -488,8 +488,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 std::string sAutoCompleteString;
                 {
                     std::lock_guard<std::mutex> lockGuard(m_mutex);
-                    auto                        docID      = m_main->m_TabBar.GetCurrentTabId();
-                    auto                        lang       = m_main->m_DocManager.GetDocumentFromID(docID).GetLanguage();
+                    auto                        docID      = m_main->m_tabBar.GetCurrentTabId();
+                    auto                        lang       = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
                     const auto&                 snippetMap = m_langSnippetList[lang];
                     auto                        foundIt    = snippetMap.find(word);
                     if (foundIt != snippetMap.end())
@@ -514,20 +514,20 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
         std::map<std::string, AutoCompleteType> wordset;
         {
             std::lock_guard<std::mutex> lockGuard(m_mutex);
-            auto                        docID        = m_main->m_TabBar.GetCurrentTabId();
-            auto                        docAutoList  = m_docWordlist[docID];
-            auto                        langAutoList = m_langWordlist[m_main->m_DocManager.GetDocumentFromID(docID).GetLanguage()];
+            auto                        docID        = m_main->m_tabBar.GetCurrentTabId();
+            auto                        docAutoList  = m_docWordList[docID];
+            auto                        langAutoList = m_langWordList[m_main->m_docManager.GetDocumentFromID(docID).GetLanguage()];
             if (docAutoList.empty() && langAutoList.empty())
                 return;
 
             for (const auto& list : {docAutoList, langAutoList})
             {
-                for (auto lowerit = list.lower_bound(word); lowerit != list.end(); ++lowerit)
+                for (auto lowerIt = list.lower_bound(word); lowerIt != list.end(); ++lowerIt)
                 {
-                    int compare = _strnicmp(word.c_str(), lowerit->first.c_str(), word.size());
+                    int compare = _strnicmp(word.c_str(), lowerIt->first.c_str(), word.size());
                     if (compare == 0)
                     {
-                        wordset.emplace(lowerit->first, lowerit->second);
+                        wordset.emplace(lowerIt->first, lowerIt->second);
                     }
                     else
                     {
@@ -538,8 +538,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
         }
 
         std::string sAutoCompleteList;
-        for (const auto& w : wordset)
-            sAutoCompleteList += CStringUtils::Format("%s%c%d%c", w.first.c_str(), typeSeparator, static_cast<int>(w.second), wordSeparator);
+        for (const auto& [word2, autoCompleteType] : wordset)
+            sAutoCompleteList += CStringUtils::Format("%s%c%d%c", word2.c_str(), typeSeparator, static_cast<int>(autoCompleteType), wordSeparator);
         if (sAutoCompleteList.empty())
             return;
         if (sAutoCompleteList.size() > 1)

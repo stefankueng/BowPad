@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017 - Stefan Kueng
+// Copyright (C) 2013-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #include "MRU.h"
 #include "AppUtils.h"
 #include "PathUtils.h"
-#include "codecvt.h"
+#include "UnicodeUtils.h"
 
 #include <iostream>
 #include <fstream>
@@ -29,26 +29,24 @@
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 
+
 // Implement the properties that describe a Recent Item to the Windows Ribbon
 class CRecentFileProperties
     : public IUISimplePropertySet
 {
 public:
-
     // Static method to create an instance of the object.
-    static HRESULT CreateInstance(LPCWSTR wszFullPath, bool bPinned, CRecentFileProperties **ppProperties)
+    static HRESULT CreateInstance(LPCWSTR wszFullPath, bool bPinned, CRecentFileProperties** ppProperties)
     {
         if (!wszFullPath || !ppProperties)
             return E_POINTER;
 
         *ppProperties = nullptr;
 
-        HRESULT hr;
-
         CRecentFileProperties* pProperties = new CRecentFileProperties();
 
-        hr = ::StringCchCopyW(pProperties->m_wszFullPath, MAX_PATH, wszFullPath);
-        SHFILEINFOW sfi = {0};
+        HRESULT     hr  = ::StringCchCopyW(pProperties->m_wszFullPath, MAX_PATH, wszFullPath);
+        SHFILEINFOW sfi = {nullptr};
 
         DWORD_PTR dwPtr = 0;
         if (SUCCEEDED(hr))
@@ -69,12 +67,14 @@ public:
     }
 
     // IUnknown methods.
-    STDMETHODIMP_(ULONG) AddRef()
+    STDMETHODIMP_(ULONG)
+    AddRef() override
     {
         return InterlockedIncrement(&m_cRef);
     }
 
-    STDMETHODIMP_(ULONG) Release()
+    STDMETHODIMP_(ULONG)
+    Release() override
     {
         LONG cRef = InterlockedDecrement(&m_cRef);
         if (cRef == 0)
@@ -85,7 +85,7 @@ public:
         return cRef;
     }
 
-    STDMETHODIMP QueryInterface(REFIID iid, void** ppv)
+    STDMETHODIMP QueryInterface(REFIID iid, void** ppv) override
     {
         if (!ppv)
             return E_POINTER;
@@ -105,7 +105,7 @@ public:
     }
 
     // IUISimplePropertySet methods.
-    STDMETHODIMP GetValue(REFPROPERTYKEY key, PROPVARIANT *value)
+    STDMETHODIMP GetValue(REFPROPERTYKEY key, PROPVARIANT* value) override
     {
         HRESULT hr = HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
 
@@ -123,16 +123,16 @@ private:
         : m_cRef(1)
         , m_pinnedState(false)
     {
-        m_wszFullPath[0] = L'\0';
+        m_wszFullPath[0]    = L'\0';
         m_wszDisplayName[0] = L'\0';
     }
+    virtual ~CRecentFileProperties() = default;
 
-    LONG    m_cRef;                        // Reference count.
-    WCHAR   m_wszDisplayName[MAX_PATH];
-    WCHAR   m_wszFullPath[MAX_PATH];
-    bool    m_pinnedState;
+    LONG  m_cRef; // Reference count.
+    WCHAR m_wszDisplayName[MAX_PATH];
+    WCHAR m_wszFullPath[MAX_PATH];
+    bool  m_pinnedState;
 };
-
 
 CMRU::CMRU()
     : m_bLoaded(false)
@@ -149,7 +149,7 @@ CMRU& CMRU::Instance()
     return instance;
 }
 
-HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
+HRESULT CMRU::PopulateRibbonRecentItems(PROPVARIANT* pvarValue)
 {
     if (!m_bLoaded)
         Load();
@@ -165,12 +165,11 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
             unpinneditems.push_back(item);
     }
 
-    HRESULT hr = E_FAIL;
-    SAFEARRAY* psa = SafeArrayCreateVector(VT_UNKNOWN, 0, (ULONG)m_mruVec.size());
-    LONG i = 0;
+    HRESULT    hr  = E_FAIL;
+    SAFEARRAY* psa = SafeArrayCreateVector(VT_UNKNOWN, 0, static_cast<ULONG>(m_mruVec.size()));
+    LONG       i   = 0;
 
-    auto FillItems = [](const std::vector<MRUItem>& items, SAFEARRAY* psa, LONG& i)
-    {
+    auto fillItems = [](const std::vector<MRUItem>& items, SAFEARRAY* psa, LONG& i) {
         for (auto countPathPair = items.crbegin(); countPathPair != items.crend(); ++countPathPair)
         {
             if (i >= CIniSettings::Instance().GetInt64(L"Defaults", L"MRUSize", 20))
@@ -178,7 +177,7 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
             const MRUItem& mru = *countPathPair;
 
             CRecentFileProperties* pPropertiesObj = nullptr;
-            auto hr = CRecentFileProperties::CreateInstance(mru.path.c_str(), mru.pinned, &pPropertiesObj);
+            auto                   hr             = CRecentFileProperties::CreateInstance(mru.path.c_str(), mru.pinned, &pPropertiesObj);
             if (SUCCEEDED(hr))
             {
                 IUnknown* pUnk = nullptr;
@@ -201,11 +200,11 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
         }
     };
 
-    FillItems(pinneditems, psa, i);
-    FillItems(unpinneditems, psa, i);
+    fillItems(pinneditems, psa, i);
+    fillItems(unpinneditems, psa, i);
 
     // We will only populate items up to before the first failed item, and discard the rest.
-    SAFEARRAYBOUND sab = {ULONG(i),0};
+    SAFEARRAYBOUND sab = {static_cast<ULONG>(i), 0};
     SafeArrayRedim(psa, &sab);
     hr = UIInitPropertyFromIUnknownArray(UI_PKEY_RecentItems, psa, pvarValue);
 
@@ -213,7 +212,7 @@ HRESULT CMRU::PopulateRibbonRecentItems( PROPVARIANT* pvarValue )
     return hr;
 }
 
-void CMRU::AddPath( const std::wstring& path )
+void CMRU::AddPath(const std::wstring& path)
 {
     if (!m_bLoaded)
         Load();
@@ -232,7 +231,7 @@ void CMRU::AddPath( const std::wstring& path )
             break;
         }
     }
-    if (m_mruVec.size() >= (size_t)CIniSettings::Instance().GetInt64(L"Defaults", L"MRUSize", 20))
+    if (m_mruVec.size() >= static_cast<size_t>(CIniSettings::Instance().GetInt64(L"Defaults", L"MRUSize", 20)))
     {
         // Clear out an old entry if it's not pinned
         for (auto it = m_mruVec.begin(); it != m_mruVec.end(); ++it)
@@ -249,7 +248,7 @@ void CMRU::AddPath( const std::wstring& path )
     Save();
 }
 
-void CMRU::RemovePath( const std::wstring& path, bool removeEvenIfPinned )
+void CMRU::RemovePath(const std::wstring& path, bool removeEvenIfPinned)
 {
     if (!m_bLoaded)
         Load();
@@ -266,13 +265,12 @@ void CMRU::RemovePath( const std::wstring& path, bool removeEvenIfPinned )
     Save();
 }
 
-std::wstring CMRU::GetMRUFilename() const
+std::wstring CMRU::GetMRUFilename()
 {
     std::wstring path = CAppUtils::GetDataPath();
-    path = CPathUtils::Append(path, L"mru");
+    path              = CPathUtils::Append(path, L"mru");
     return path;
 }
-
 
 void CMRU::Load()
 {
@@ -280,38 +278,36 @@ void CMRU::Load()
 
     std::wstring path = GetMRUFilename();
 
-    std::wifstream File;
+    std::ifstream file;
     try
     {
-        File.imbue(std::locale(std::locale(), new utf8_conversion()));
-        File.open(path);
-        if (!File.good())
+        file.open(path);
+        if (!file.good())
             return;
 
-        const int maxlinelength = 1024;
-        wchar_t line[maxlinelength + 1];
+        const int maxLineLength = 1024;
+        char   line[maxLineLength + 1];
 
-        std::wstring sLine;
         for (;;)
         {
-            File.getline(line, maxlinelength);
-            if (File.gcount() <= 0)
+            file.getline(line, maxLineLength);
+            if (file.gcount() <= 0)
                 break;
-            sLine = line;
+            std::wstring sLine = CUnicodeUtils::StdGetUnicode(line);
             // Line format is : x*filename
             // Where x can be '0' (unpinned) or '1' (pinned)
             size_t pos = sLine.find(L'*');
             if (pos != std::wstring::npos)
             {
                 std::wstring sPinned = sLine.substr(0, pos);
-                std::wstring sPath = sLine.substr(pos + 1);
-                bool pinned = (sPinned == L"1");
+                std::wstring sPath   = sLine.substr(pos + 1);
+                bool         pinned  = (sPinned == L"1");
                 m_mruVec.push_back(MRUItem(sPath, pinned));
             }
         }
-        File.close();
+        file.close();
     }
-    catch (const std::ios_base::failure &)
+    catch (const std::ios_base::failure&)
     {
         return;
     }
@@ -329,42 +325,41 @@ void CMRU::Save()
 
     try
     {
-        std::wofstream File;
-        File.imbue(std::locale(std::locale(), new utf8_conversion()));
-        File.open(path);
-        if (!File.good())
+        std::ofstream file;
+        file.open(path);
+        if (!file.good())
             return;
 
         for (const auto& mru : m_mruVec)
-            File << (mru.pinned ? L"1" : L"0") << L"*" << mru.path << std::endl;
+            file << (mru.pinned ? "1" : "0") << "*" << CUnicodeUtils::StdGetUTF8(mru.path) << std::endl;
 
-        File.close();
+        file.close();
     }
-    catch (std::ios_base::failure &)
+    catch (std::ios_base::failure&)
     {
         return;
     }
-    catch (std::runtime_error &)
+    catch (std::runtime_error&)
     {
         return;
     }
 }
 
-void CMRU::PinPath( const std::wstring& path, bool bPin )
+void CMRU::PinPath(const std::wstring& path, bool bPin)
 {
     if (!m_bLoaded)
         Load();
 
     for (auto& mru : m_mruVec) // Intentionally mutable.
     {
-        if (CPathUtils::PathCompare(mru.path, path)==0)
+        if (CPathUtils::PathCompare(mru.path, path) == 0)
         {
             // Technically paths are case insensitive on the file system
             // so updating the path might is kind of updating it to itself but
             // do it anyway so it reflects the actual case used even
             // if it refers to the same file.
             bool wasPinned = mru.pinned;
-            mru = MRUItem(path, bPin); // Container update.
+            mru            = MRUItem(path, bPin); // Container update.
             if (wasPinned != bPin)
                 Save();
             break; // Assume there is only one path with the same name here.

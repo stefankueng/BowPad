@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2015-2017, 2020 - Stefan Kueng
+// Copyright (C) 2015-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 #include "stdafx.h"
 #include "CmdFolding.h"
 #include "ResString.h"
-#include "SciLexer.h"
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
 #include "BowPad.h"
@@ -51,19 +50,19 @@ public:
 };
 } // namespace
 
-static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int level2Collapse = -1)
+static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> scintillaCall, int level2Collapse = -1)
 {
     FoldLevelStack levelStack;
     ResString      rFoldText(g_hRes, IDS_FOLDTEXT);
     auto           sFoldTextA = CUnicodeUtils::StdGetUTF8(rFoldText);
 
-    ScintillaCall(SCI_SETDEFAULTFOLDDISPLAYTEXT, 0, (sptr_t) "...");
+    scintillaCall(SCI_SETDEFAULTFOLDDISPLAYTEXT, 0, reinterpret_cast<sptr_t>("..."));
 
-    auto maxLine = ScintillaCall(SCI_GETLINECOUNT, 0, 0);
+    auto maxLine = scintillaCall(SCI_GETLINECOUNT, 0, 0);
     int  mode    = 0;
     for (auto line = 0; line < maxLine; ++line)
     {
-        auto info = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
+        auto info = scintillaCall(SCI_GETFOLDLEVEL, line, 0);
         if ((info & SC_FOLDLEVELHEADERFLAG) != 0)
         {
             int level = info & SC_FOLDLEVELNUMBERMASK;
@@ -71,7 +70,7 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
             levelStack.push(level);
             if (level2Collapse < 0 || levelStack.levelCount == level2Collapse)
             {
-                mode = ScintillaCall(SCI_GETFOLDEXPANDED, line, 0) ? 0 : 1;
+                mode = scintillaCall(SCI_GETFOLDEXPANDED, line, 0) ? 0 : 1;
                 break;
             }
         }
@@ -79,7 +78,7 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
 
     for (auto line = 0; line < maxLine; ++line)
     {
-        auto info = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
+        auto info = scintillaCall(SCI_GETFOLDLEVEL, line, 0);
         if ((info & SC_FOLDLEVELHEADERFLAG) != 0)
         {
             int level = info & SC_FOLDLEVELNUMBERMASK;
@@ -87,30 +86,30 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> ScintillaCall, int l
             levelStack.push(level);
             if (level2Collapse < 0 || levelStack.levelCount == level2Collapse)
             {
-                if (ScintillaCall(SCI_GETFOLDEXPANDED, line, 0) != mode)
+                if (scintillaCall(SCI_GETFOLDEXPANDED, line, 0) != mode)
                 {
-                    auto endStyled = ScintillaCall(SCI_GETENDSTYLED, 0, 0);
-                    auto len       = ScintillaCall(SCI_GETTEXTLENGTH, 0, 0);
+                    auto endStyled = scintillaCall(SCI_GETENDSTYLED, 0, 0);
+                    auto len       = scintillaCall(SCI_GETTEXTLENGTH, 0, 0);
 
                     if (endStyled < len)
-                        ScintillaCall(SCI_COLOURISE, 0, -1);
+                        scintillaCall(SCI_COLOURISE, 0, -1);
 
                     auto headerLine = 0;
                     if (info & SC_FOLDLEVELHEADERFLAG)
                         headerLine = line;
                     else
                     {
-                        headerLine = (int)ScintillaCall(SCI_GETFOLDPARENT, line, 0);
+                        headerLine = static_cast<int>(scintillaCall(SCI_GETFOLDPARENT, line, 0));
                         if (headerLine == -1)
                             return true;
                     }
 
-                    if (ScintillaCall(SCI_GETFOLDEXPANDED, headerLine, 0) != mode)
+                    if (scintillaCall(SCI_GETFOLDEXPANDED, headerLine, 0) != mode)
                     {
-                        auto endline   = ScintillaCall(SCI_GETLASTCHILD, line, -1);
-                        auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), int(endline - line + 1));
+                        auto endLine   = scintillaCall(SCI_GETLASTCHILD, line, -1);
+                        auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), static_cast<int>(endLine - line + 1));
 
-                        ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, (sptr_t)sFoldText.c_str());
+                        scintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, reinterpret_cast<sptr_t>(sFoldText.c_str()));
                     }
                 }
             }
@@ -137,8 +136,8 @@ bool CCmdFoldAll::Execute()
 }
 
 CCmdFoldLevel::CCmdFoldLevel(UINT customId, void* obj)
-    : m_customId(customId)
-    , ICommand(obj)
+    : ICommand(obj)
+    , m_customId(customId)
 {
     m_customCmdId = cmdFoldLevel0 + customId;
 }
@@ -161,17 +160,17 @@ void CCmdInitFoldingMargin::AfterInit()
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-void CCmdInitFoldingMargin::TabNotify(TBHDR* ptbhdr)
+void CCmdInitFoldingMargin::TabNotify(TBHDR* ptbHdr)
 {
     // Switching to this document.
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         // Effectively query the margin width once and remember it.
         // Turning folding off sets the width to 0. Turning folding on restores the width to this saved value.
         if (g_marginWidth == -1)
-            g_marginWidth = (int)ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, sptr_t(0));
+            g_marginWidth = static_cast<int>(ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, 0));
 
-        bool isOn       = ((int)ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, sptr_t(0))) > 0;
+        bool isOn       = static_cast<int>(ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, 0)) > 0;
         bool shouldBeOn = CIniSettings::Instance().GetInt64(
                               ShowFoldingMarginSettingSection, ShowFoldingMarginSettingName, g_marginWidth > 0 ? 1 : 0) != 0;
         if (isOn != shouldBeOn)
@@ -209,10 +208,10 @@ void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
                 }
                 else if (ctrl)
                 {
-                    auto maxline = ScintillaCall(SCI_GETLASTCHILD, lineClick, -1);
+                    auto maxLine = ScintillaCall(SCI_GETLASTCHILD, lineClick, -1);
                     auto mode    = ScintillaCall(SCI_GETFOLDEXPANDED, lineClick, 0) ? 0 : 1;
 
-                    for (auto line = lineClick; line < maxline; ++line)
+                    for (auto line = lineClick; line < maxLine; ++line)
                     {
                         auto info = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
                         if ((info & SC_FOLDLEVELHEADERFLAG) != 0)
@@ -239,10 +238,10 @@ void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
 
                                 if (ScintillaCall(SCI_GETFOLDEXPANDED, headerLine, 0) != mode)
                                 {
-                                    auto endline   = ScintillaCall(SCI_GETLASTCHILD, line, -1);
-                                    auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), int(endline - line + 1));
+                                    auto endLine   = ScintillaCall(SCI_GETLASTCHILD, line, -1);
+                                    auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), static_cast<int>(endLine - line + 1));
 
-                                    ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, (sptr_t)sFoldText.c_str());
+                                    ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, reinterpret_cast<sptr_t>(sFoldText.c_str()));
                                 }
                             }
                         }
@@ -261,10 +260,10 @@ void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
 
                     auto headerLine = lineClick;
 
-                    auto endline   = ScintillaCall(SCI_GETLASTCHILD, lineClick, -1);
-                    auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), int(endline - lineClick + 1));
+                    auto endLine   = ScintillaCall(SCI_GETLASTCHILD, lineClick, -1);
+                    auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), static_cast<int>(endLine - lineClick + 1));
 
-                    ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, (sptr_t)sFoldText.c_str());
+                    ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, reinterpret_cast<sptr_t>(sFoldText.c_str()));
 
                     //ScintillaCall(SCI_FOLDLINE, lineClick, SC_FOLDACTION_TOGGLE);
                 }
@@ -290,7 +289,7 @@ void CCmdFoldingOn::AfterInit()
 
 bool CCmdFoldingOn::Execute()
 {
-    bool isOn = ((int)ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, sptr_t(0))) > 0;
+    bool isOn = static_cast<int>(ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, 0)) > 0;
     if (!isOn)
     {
         ScintillaCall(SCI_SETMARGINWIDTHN, SC_MARGIN_BACK, g_marginWidth);
@@ -311,7 +310,7 @@ void CCmdFoldingOff::AfterInit()
 
 bool CCmdFoldingOff::Execute()
 {
-    bool isOn = ((int)ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, sptr_t(0))) > 0;
+    bool isOn = static_cast<int>(ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, 0)) > 0;
     if (isOn)
     {
         ScintillaCall(SCI_FOLDALL, SC_FOLDACTION_EXPAND);

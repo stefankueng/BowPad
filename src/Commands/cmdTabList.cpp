@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017, 2020 - Stefan Kueng
+// Copyright (C) 2014-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ circumstances anyway.
 
 */
 
-HRESULT CCmdTabList::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdTabList::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue)
 {
     HRESULT hr = E_FAIL;
 
@@ -73,7 +73,7 @@ HRESULT CCmdTabList::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
     else if (key == UI_PKEY_ItemsSource)
     {
         IUICollectionPtr collection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&collection));
+        hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&collection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
 
@@ -108,20 +108,15 @@ HRESULT CCmdTabList::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
                 break;
         }
 
-        return UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)index, ppropvarNewValue);
+        return UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, static_cast<UINT>(index), pPropVarNewValue);
     }
     else if (key == UI_PKEY_Enabled)
     {
         bool enabled = IsServiceAvailable();
 
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, enabled, ppropvarNewValue);
-    }
-    else
-    {
-        return E_NOTIMPL;
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, enabled, pPropVarNewValue);
     }
 
-    assert(false); // No fall through expected.
     return E_NOTIMPL;
 }
 
@@ -184,7 +179,7 @@ bool CCmdTabList::PopulateMenu(IUICollectionPtr& collection)
     return true;
 }
 
-HRESULT CCmdTabList::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
+HRESULT CCmdTabList::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
     HRESULT hr = E_FAIL;
 
@@ -195,7 +190,7 @@ HRESULT CCmdTabList::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPE
             // Happens when a highlighted item is selected from the drop down
             // and clicked.
             UINT uSelected;
-            hr = UIPropertyToUInt32(*key, *ppropvarValue, &uSelected);
+            hr = UIPropertyToUInt32(*key, *pPropVarValue, &uSelected);
             if (CAppUtils::FailedShowMessage(hr))
                 return hr;
             size_t selected = static_cast<size_t>(uSelected);
@@ -249,7 +244,7 @@ bool CCmdTabList::HandleSelectedMenuItem(size_t selected)
     // with the real tab list, though we don't know how yet.
     // It might happen if we failed to trap a close event somehow for example.
     // If we reach here the likely reason is our list is out of sync however
-    // it happened so call IvalidTabList here.
+    // it happened so call InvalidTabList here.
     // Note reaching here may or may not mean a bug in this module, it could
     // be a bug elsewhere failing to notify us of events. I have fixed one
     // two problems like this so there may be more.
@@ -291,7 +286,7 @@ void CCmdTabList::OnDocumentClose(DocID /*id*/)
     InvalidateTabList();
 }
 
-void CCmdTabList::TabNotify(TBHDR* /*ptbhdr*/)
+void CCmdTabList::TabNotify(TBHDR* /*ptbHdr*/)
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
     InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);

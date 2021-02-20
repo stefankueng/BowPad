@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016, 2020 - Stefan Kueng
+// Copyright (C) 2014, 2016, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "Resource.h"
 #include "BaseDialog.h"
 #include "Theme.h"
+#include "ResString.h"
 
 #include <algorithm>
 
@@ -97,10 +98,10 @@ class CSortDlg : public CDialog // No need to be ICommand connected as yet.
 {
 public:
     CSortDlg();
-    ~CSortDlg();
+    virtual ~CSortDlg();
 
 protected:
-    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
     LRESULT          DoCommand(int id, int msg);
 
 public:
@@ -143,8 +144,6 @@ LRESULT CSortDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             return FALSE;
         case WM_COMMAND:
             return DoCommand(LOWORD(wParam), HIWORD(wParam));
-        default:
-            return FALSE;
     }
     return FALSE;
 }
@@ -236,7 +235,7 @@ bool CCmdSort::Execute()
             {
                 const auto& lineText = CUnicodeUtils::StdGetUTF8(lines[ln]);
                 ScintillaCall(SCI_DELETERANGE, positions[ln], lineText.length());
-                ScintillaCall(SCI_INSERTTEXT, positions[ln], sptr_t(lineText.c_str()));
+                ScintillaCall(SCI_INSERTTEXT, positions[ln], reinterpret_cast<sptr_t>(lineText.c_str()));
             }
             ScintillaCall(SCI_ENDUNDOACTION);
         }
@@ -275,7 +274,7 @@ bool CCmdSort::Execute()
             ScintillaCall(SCI_BEGINUNDOACTION);
             ScintillaCall(SCI_SETSEL, selStart, selEnd);
             std::string sSortedText = CUnicodeUtils::StdGetUTF8(selText);
-            ScintillaCall(SCI_REPLACESEL, 0, sptr_t(sSortedText.c_str()));
+            ScintillaCall(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(sSortedText.c_str()));
             // Put the selection back where it was so the user
             // can see still see what they sorted and possibly do more with it.
             ScintillaCall(SCI_SETSEL, selStart, selEndOriginal);
@@ -295,12 +294,12 @@ void CCmdSort::ScintillaNotify(SCNotification* pScn)
     }
 }
 
-HRESULT CCmdSort::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdSort::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     // Enabled if there's something to go back to.
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_GETSELECTIONEMPTY) == 0), ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_GETSELECTIONEMPTY) == 0), pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
@@ -336,8 +335,8 @@ bool CCmdSort::Sort(std::vector<std::wstring>& lines) const
     std::sort(std::begin(lines), std::end(lines),
               [&](const std::wstring& lhs, const std::wstring& rhs) -> bool {
                   auto res = CompareStringEx(nullptr, cmpFlags,
-                                             lhs.data(), (int)lhs.length(),
-                                             rhs.data(), (int)rhs.length(),
+                                             lhs.data(), static_cast<int>(lhs.length()),
+                                             rhs.data(), static_cast<int>(rhs.length()),
                                              nullptr, nullptr, 0);
                   return so.sortOrder == SortOrder::Ascending ? res == CSTR_LESS_THAN : res == CSTR_GREATER_THAN;
               });

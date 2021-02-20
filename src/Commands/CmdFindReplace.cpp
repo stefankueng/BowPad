@@ -35,6 +35,7 @@
 #include <algorithm>
 #include <utility>
 #include <memory>
+#include <vssym32.h>
 
 static std::string g_findString;
 std::string        g_sHighlightString;
@@ -81,17 +82,17 @@ constexpr auto MATCH_COLOR              = RGB(0xFF, 0, 0); // Red.
 bool ParseSignature(std::wstring& name, const std::wstring& sig)
 {
     // Look for a ( of perhaps void x::f(whatever)
-    auto bracepos = sig.find(L'(');
-    if (bracepos != std::wstring::npos)
+    auto bracePos = sig.find(L'(');
+    if (bracePos != std::wstring::npos)
     {
-        auto   wpos = sig.find_last_of(L"\t :,.", bracepos - 1, 5);
-        size_t spos = (wpos == std::wstring::npos) ? 0 : wpos + 1;
+        auto   wPos = sig.find_last_of(L"\t :,.", bracePos - 1, 5);
+        size_t sPos = (wPos == std::wstring::npos) ? 0 : wPos + 1;
 
         // Functions returning pointer or reference will feature these symbols
         // before the name. Ignore them. This logic is a bit C language based.
-        while (spos < bracepos && (sig[spos] == L'*' || sig[spos] == L'&' || sig[spos] == L'^'))
-            ++spos;
-        name.assign(sig, spos, bracepos - spos);
+        while (sPos < bracePos && (sig[sPos] == L'*' || sig[sPos] == L'&' || sig[sPos] == L'^'))
+            ++sPos;
+        name.assign(sig, sPos, bracePos - sPos);
         CStringUtils::trim(name);
     }
     else
@@ -104,7 +105,7 @@ void Normalize(CSearchResult& sr)
     std::wstring normalized        = sr.lineText;
     bool         bLastCharWasSpace = false;
     size_t       sLen              = 0;
-    for (sptr_t i = 0; i < (sptr_t)sr.lineText.size(); ++i)
+    for (sptr_t i = 0; i < static_cast<sptr_t>(sr.lineText.size()); ++i)
     {
         switch (sr.lineText[i])
         {
@@ -181,7 +182,7 @@ void split(std::vector<std::wstring>& v, const std::wstring& s, wchar_t delimite
 
 // Will work with vector or deque.
 template <typename T>
-static inline void move_append(T& dst, T& src)
+void moveAppend(T& dst, T& src)
 {
     if (dst.empty())
         dst = std::move(src);
@@ -207,11 +208,11 @@ std::wstring GetHomeFolder()
 }; // unnamed namespace
 
 CFindReplaceDlg::CFindReplaceDlg(void* obj)
-    : ICommand(obj)
-    , CBPBaseDialog()
+    : CBPBaseDialog()
+    , ICommand(obj)
     , m_searchWnd(g_hRes)
 {
-    m_maxSearchResults = (int)CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearchresults", MAX_SEARCHRESULTS);
+    m_maxSearchResults = static_cast<int>(CIniSettings::Instance().GetInt64(L"searchreplace", L"maxsearchresults", MAX_SEARCHRESULTS));
 }
 
 std::wstring CFindReplaceDlg::GetCurrentDocumentFolder() const
@@ -233,7 +234,7 @@ std::wstring CFindReplaceDlg::GetCurrentDocumentFolder() const
 void CFindReplaceDlg::UpdateMatchCount(bool finished)
 {
     ResString rInfo(g_hRes, IDS_FINDRESULT_COUNT);
-    auto      sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size());
+    auto      sInfo = CStringUtils::Format(rInfo, static_cast<int>(m_searchResults.size()));
     if (!finished) // Indicate more results might come.
         sInfo += L"...";
     SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
@@ -265,13 +266,13 @@ void CFindReplaceDlg::HandleButtonDropDown(const NMBCDROPDOWN* pDropDown)
     {
         auto selStart  = ScintillaCall(SCI_GETSELECTIONSTART);
         auto selEnd    = ScintillaCall(SCI_GETSELECTIONEND);
-        auto linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-        auto lineend   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+        auto lineStart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+        auto lineEnd   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
 
-        sptr_t wrapcount = 1;
-        if (linestart == lineend)
-            wrapcount = ScintillaCall(SCI_WRAPCOUNT, linestart);
-        bool bReplaceOnlyInSelection = (linestart != lineend) || ((wrapcount > 1) && (selEnd - selStart > 20));
+        sptr_t wrapCount = 1;
+        if (lineStart == lineEnd)
+            wrapCount = ScintillaCall(SCI_WRAPCOUNT, lineStart);
+        bool bReplaceOnlyInSelection = (lineStart != lineEnd) || ((wrapCount > 1) && (selEnd - selStart > 20));
 
         ResString sReplaceAll(g_hRes, IDS_REPLACEALL);
         ResString sReplaceAllInSelection(g_hRes, IDS_REPLACEALLINSELECTION);
@@ -286,9 +287,9 @@ void CFindReplaceDlg::HandleButtonDropDown(const NMBCDROPDOWN* pDropDown)
 }
 
 // The suggestion mechanism is a *basic* means to *quickly* assist
-// completing simple filenames that are just a bit long to type/remember.
+// completing simple file names that are just a bit long to type/remember.
 // It's useful for simple folder structures that can be searched fast
-// but it will not find filenames in deep folder structures that can't
+// but it will not find file names in deep folder structures that can't
 // be searched quickly. For those the user is expected to just type
 // as much of the name as they know and use * wildcard for the rest and
 // then press enter to let the normal search process find the file exactly.
@@ -296,7 +297,7 @@ void CFindReplaceDlg::HandleButtonDropDown(const NMBCDROPDOWN* pDropDown)
 // This routine somewhat mimics what the find files logic does.
 // We don't suggest things the user likely does not want as that
 // can easily get in the way of suggestions the user may want.
-// e.g. The user would likely prefer bowpad.cpp over bowpad.exe.
+// e.g. The user would likely prefer BowPad.cpp over BowPad.exe.
 // We try to find the shortest filename match in the time given
 // as the longest match will be found later if the user keeps typing.
 // If a longer match was accepted as soon as it was found we'd never
@@ -321,8 +322,8 @@ std::wstring CFindReplaceDlg::OfferFileSuggestion(
     while (enumerator.NextFile(path, &bIsDir, searchSubFoldersFlag))
     {
         // See this functions block comments for details of what's happening here.
-        auto ellapsedPeriod = std::chrono::steady_clock::now() - startTime;
-        if (ellapsedPeriod > maxSearchTime)
+        auto elapsedPeriod = std::chrono::steady_clock::now() - startTime;
+        if (elapsedPeriod > maxSearchTime)
             break;
         if (bIsDir)
         {
@@ -356,11 +357,11 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             DoInitDialog(hwndDlg);
             break;
         case WM_CTLCOLORSTATIC:
-            if (GetDlgCtrlID((HWND)lParam) == IDC_SEARCHINFO)
+            if (GetDlgCtrlID(reinterpret_cast<HWND>(lParam)) == IDC_SEARCHINFO)
             {
-                SetTextColor((HDC)wParam, RGB(0, 128, 0));
-                SetBkMode((HDC)wParam, TRANSPARENT);
-                return (LRESULT)GetSysColorBrush(COLOR_BTNFACE);
+                SetTextColor(reinterpret_cast<HDC>(wParam), RGB(0, 128, 0));
+                SetBkMode(reinterpret_cast<HDC>(wParam), TRANSPARENT);
+                return reinterpret_cast<LRESULT>(GetSysColorBrush(COLOR_BTNFACE));
             }
             break;
         case WM_ENTERSIZEMOVE:
@@ -393,9 +394,9 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             break;
         }
         case WM_GETMINMAXINFO:
-            if (!m_freeresize)
+            if (!m_freeResize)
             {
-                MINMAXINFO* mmi       = (MINMAXINFO*)lParam;
+                MINMAXINFO* mmi       = reinterpret_cast<MINMAXINFO*>(lParam);
                 mmi->ptMinTrackSize.x = m_resizer.GetDlgRectScreen()->right;
                 mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
                 return 0;
@@ -417,19 +418,18 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
             switch (wParam)
             {
                 case IDC_FINDRESULTS:
-                    return DoListNotify((LPNMITEMACTIVATE)lParam);
+                    return DoListNotify(reinterpret_cast<LPNMITEMACTIVATE>(lParam));
                 case IDC_FINDBTN:
                 case IDC_FINDALLINDIR:
                 case IDC_REPLACEALLBTN:
-                    switch (((LPNMHDR)lParam)->code)
+                    switch (reinterpret_cast<LPNMHDR>(lParam)->code)
                     {
                         case BCN_DROPDOWN:
                         {
-                            const NMBCDROPDOWN* pDropDown = (NMBCDROPDOWN*)lParam;
+                            const NMBCDROPDOWN* pDropDown = reinterpret_cast<NMBCDROPDOWN*>(lParam);
                             HandleButtonDropDown(pDropDown);
                             return TRUE;
                         }
-                        break;
                     }
                     break;
             }
@@ -470,9 +470,9 @@ void CFindReplaceDlg::InitSizing()
     m_resizer.AddControl(hwndDlg, IDC_SEARCHFOLDER, RESIZER_TOPLEFTRIGHT);
     m_resizer.AddControl(hwndDlg, IDC_SEARCHFOLDERFOLLOWTAB, RESIZER_TOPRIGHT);
     m_resizer.AddControl(hwndDlg, IDC_SEARCHINFO, RESIZER_TOPLEFT);
-    m_freeresize = true;
+    m_freeResize = true;
     ShowResults(false);
-    m_freeresize = false;
+    m_freeResize = false;
     m_resizer.AdjustMinMaxSize();
 }
 
@@ -563,7 +563,7 @@ void CFindReplaceDlg::FocusOn(int id)
 {
     HWND hWnd = GetDlgItem(*this, id);
     assert(hWnd != nullptr);
-    SendMessage(*this, WM_NEXTDLGCTL, (WPARAM)hWnd, TRUE);
+    SendMessage(*this, WM_NEXTDLGCTL, reinterpret_cast<WPARAM>(hWnd), TRUE);
 }
 
 void CFindReplaceDlg::SetDefaultButton(int id, bool savePrevious)
@@ -586,7 +586,7 @@ void CFindReplaceDlg::Clear(int id)
 
 int CFindReplaceDlg::GetDefaultButton() const
 {
-    LRESULT result = SendMessage(*this, DM_GETDEFID, WPARAM(0), LPARAM(0));
+    LRESULT result = SendMessage(*this, DM_GETDEFID, static_cast<WPARAM>(0), static_cast<LPARAM>(0));
     return (HIWORD(result) == DC_HASDEFID) ? LOWORD(result) : 0;
 }
 
@@ -627,11 +627,11 @@ void CFindReplaceDlg::FindText()
     this->ShowModeless(g_hRes, IDD_FINDREPLACEDLG, GetHwnd());
     auto selStart  = ScintillaCall(SCI_GETSELECTIONSTART);
     auto selEnd    = ScintillaCall(SCI_GETSELECTIONEND);
-    auto linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-    auto lineend   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    auto lineStart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+    auto lineEnd   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
 
     std::string sSelText;
-    if (linestart == lineend)
+    if (lineStart == lineEnd)
         sSelText = GetSelectedText(true);
 
     if (!sSelText.empty() && (sSelText.find_first_of("\r\n") == std::string::npos))
@@ -656,7 +656,7 @@ void CFindReplaceDlg::FindFunction(const std::wstring& functionToFind)
     FocusOn(IDC_SEARCHCOMBO);
     UpdateWindow(*this);
     PostMessage(*this, WM_COMMAND, MAKEWPARAM(IDC_FINDALLINTABS, BN_CLICKED),
-                LPARAM(GetDlgItem(*this, IDC_FINDALLINTABS)));
+                reinterpret_cast<LPARAM>(GetDlgItem(*this, IDC_FINDALLINTABS)));
 }
 
 void CFindReplaceDlg::FindFile(const std::wstring& fileToFind)
@@ -673,9 +673,9 @@ void CFindReplaceDlg::FindFile(const std::wstring& fileToFind)
     UpdateWindow(*this);
 }
 
-bool CFindReplaceDlg::EnableListEndTracking(int list_id, bool enable)
+bool CFindReplaceDlg::EnableListEndTracking(int listID, bool enable)
 {
-    auto hList = GetDlgItem(*this, list_id);
+    auto hList = GetDlgItem(*this, listID);
     APPVERIFY(hList != nullptr);
     if (!hList)
         return false;
@@ -696,9 +696,9 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
     {
         case LVN_GETINFOTIP:
         {
-            LPNMLVGETINFOTIP tip       = (LPNMLVGETINFOTIP)lpNMItemActivate;
-            int              itemIndex = (size_t)tip->iItem;
-            if (itemIndex < 0 || itemIndex >= (int)m_searchResults.size())
+            LPNMLVGETINFOTIP tip       = reinterpret_cast<LPNMLVGETINFOTIPW>(lpNMItemActivate);
+            int              itemIndex = static_cast<size_t>(tip->iItem);
+            if (itemIndex < 0 || itemIndex >= static_cast<int>(m_searchResults.size()))
             {
                 assert(false);
                 return 0;
@@ -749,7 +749,6 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
             break;
         case NM_CUSTOMDRAW:
             return DrawListItem(reinterpret_cast<NMLVCUSTOMDRAW*>(lpNMItemActivate));
-            break;
     }
     return 0;
 }
@@ -762,7 +761,7 @@ LRESULT CFindReplaceDlg::GetListItemDispInfo(NMLVDISPINFO* pDispInfo)
             return 0;
         pDispInfo->item.pszText[0] = 0;
         int itemIndex              = pDispInfo->item.iItem;
-        if (itemIndex >= (int)m_searchResults.size())
+        if (itemIndex >= static_cast<int>(m_searchResults.size()))
             return 0;
 
         std::wstring sTemp;
@@ -826,9 +825,9 @@ LRESULT CFindReplaceDlg::DrawListItem(NMLVCUSTOMDRAW* pLVCD)
 LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
 {
     HWND      hListControl = pLVCD->nmcd.hdr.hwndFrom;
-    const int itemIndex    = (int)pLVCD->nmcd.dwItemSpec;
-    assert(itemIndex >= 0 && itemIndex < (int)m_searchResults.size());
-    if (/*m_ThreadsRunning ||*/ itemIndex >= (int)m_searchResults.size())
+    const int itemIndex    = static_cast<int>(pLVCD->nmcd.dwItemSpec);
+    assert(itemIndex >= 0 && itemIndex < static_cast<int>(m_searchResults.size()));
+    if (/*m_ThreadsRunning ||*/ itemIndex >= static_cast<int>(m_searchResults.size()))
         return CDRF_DODEFAULT;
 
     const CSearchResult& searchResult = m_searchResults[itemIndex];
@@ -854,9 +853,9 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
     ListView_GetItemRect(hListControl, itemIndex, &boundsRC, LVIR_BOUNDS);
 
     //DrawListColumnBackground(pLVCD);
-    int leftmargin = labelRC.left - boundsRC.left;
+    int leftMargin = labelRC.left - boundsRC.left;
     if (pLVCD->iSubItem)
-        leftmargin -= (iconRC.right - iconRC.left);
+        leftMargin -= (iconRC.right - iconRC.left);
 
     if (pLVCD->iSubItem != 0)
         ListView_GetSubItemRect(hListControl, itemIndex, pLVCD->iSubItem, LVIR_BOUNDS, &rect);
@@ -878,14 +877,14 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
         // I'm not very happy about this fixed margin here but I haven't found a way
         // to ask the system what the margin really is.
         // At least it works on XP/Vista/win7 even with increased font sizes
-        leftmargin = 4;
+        leftMargin = 4;
     }
 
     LVITEM item{};
     item.iItem     = itemIndex;
     item.iSubItem  = 0;
     item.mask      = LVIF_IMAGE | LVIF_STATE;
-    item.stateMask = (UINT)-1;
+    item.stateMask = static_cast<UINT>(-1);
     ListView_GetItem(hListControl, &item);
     assert(item.iItem == itemIndex);
 
@@ -901,7 +900,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
             POINT      pt{rect.left, rect.top};
             HIMAGELIST hImgList = ListView_GetImageList(hListControl, LVSIL_SMALL);
             ImageList_Draw(hImgList, item.iImage, pLVCD->nmcd.hdc, pt.x, pt.y, ILD_TRANSPARENT);
-            leftmargin -= iconRC.left;
+            leftMargin -= iconRC.left;
         }
         else
         {
@@ -937,14 +936,14 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
     SetTextColor(pLVCD->nmcd.hdc, textColor);
     SetBkMode(pLVCD->nmcd.hdc, TRANSPARENT);
 
-    rect.left += leftmargin;
+    rect.left += leftMargin;
     RECT rc = rect;
 
-    LVCOLUMN Column{};
-    Column.mask = LVCF_FMT;
-    ListView_GetColumn(hListControl, pLVCD->iSubItem, &Column);
+    LVCOLUMN column{};
+    column.mask = LVCF_FMT;
+    ListView_GetColumn(hListControl, pLVCD->iSubItem, &column);
     // Is the column left- or right-aligned? (we don't handle centered yet).
-    if (Column.fmt & LVCFMT_RIGHT)
+    if (column.fmt & LVCFMT_RIGHT)
     {
         DrawText(pLVCD->nmcd.hdc, text.c_str(), -1, &rc, mainDrawFlags | DT_CALCRECT);
         rect.left = rect.right - (rc.right - rc.left);
@@ -957,9 +956,9 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
 
     rc = rect;
 
-    if (m_resultsType == ResultsType::Filenames || m_resultsType == ResultsType::FirstLines)
+    if (m_resultsType == ResultsType::FileNames || m_resultsType == ResultsType::FirstLines)
     {
-        DrawText(pLVCD->nmcd.hdc, text.c_str(), (int)text.size(), &rc, mainDrawFlags);
+        DrawText(pLVCD->nmcd.hdc, text.c_str(), static_cast<int>(text.size()), &rc, mainDrawFlags);
         return CDRF_SKIPDEFAULT;
     }
 
@@ -969,16 +968,16 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
     if (m_resultsType == ResultsType::Functions || invalid)
     {
         auto oldColor = SetTextColor(pLVCD->nmcd.hdc, MATCH_COLOR);
-        DrawText(pLVCD->nmcd.hdc, text.c_str(), (int)text.size(), &rc, mainDrawFlags);
+        DrawText(pLVCD->nmcd.hdc, text.c_str(), static_cast<int>(text.size()), &rc, mainDrawFlags);
         SetTextColor(pLVCD->nmcd.hdc, oldColor);
         return CDRF_SKIPDEFAULT;
     }
 
     // Regex search can match over several lines, but here we only draw one line.
     // Draw the text before the match.
-    int beforeMatchLen = int(matchStart);
-    int matchLen       = int(matchEnd - matchStart);
-    int afterMatchLen  = int(text.size() - matchEnd);
+    int beforeMatchLen = static_cast<int>(matchStart);
+    int matchLen       = static_cast<int>(matchEnd - matchStart);
+    int afterMatchLen  = static_cast<int>(text.size() - matchEnd);
 
     if (beforeMatchLen > 0) // Draw the line text before the match.
     {
@@ -1009,7 +1008,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
 RECT CFindReplaceDlg::DrawListColumnBackground(NMLVCUSTOMDRAW* pLVCD)
 {
     HWND      hListControl = pLVCD->nmcd.hdr.hwndFrom;
-    const int itemIndex    = (int)pLVCD->nmcd.dwItemSpec;
+    const int itemIndex    = static_cast<int>(pLVCD->nmcd.dwItemSpec);
 
     // Get the selected state of the item being drawn.
     LVITEM rItem{};
@@ -1102,7 +1101,7 @@ void CFindReplaceDlg::ShowResults(bool bShow)
 
 void CFindReplaceDlg::DoListItemAction(int itemIndex)
 {
-    if (itemIndex < 0 || itemIndex >= (int)m_searchResults.size())
+    if (itemIndex < 0 || itemIndex >= static_cast<int>(m_searchResults.size()))
     {
         assert(false);
         return;
@@ -1161,7 +1160,7 @@ void CFindReplaceDlg::DoListItemAction(int itemIndex)
     if (shiftDown || m_searchResults.size() == 1)
     {
         UpdateWindow(*this);
-        PostMessage(*this, WM_CLOSE, WPARAM(0), LPARAM(0));
+        PostMessage(*this, WM_CLOSE, static_cast<WPARAM>(0), static_cast<LPARAM>(0));
     }
 }
 
@@ -1170,7 +1169,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
     switch (id)
     {
         case IDCANCEL:
-            if (m_ThreadsRunning)
+            if (m_threadsRunning)
             {
                 // In async mode opening a large document can mean a wait before
                 // cancellation is possible. In non async mode the button request
@@ -1225,7 +1224,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
         case IDC_REPLACEALLINTABSBTN:
             if (msg == BN_CLICKED)
             {
-                if (m_ThreadsRunning)
+                if (m_threadsRunning)
                     return 1;
                 DoReplace(id);
             }
@@ -1235,12 +1234,12 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
             {
                 ResString    sInfo(g_hRes, IDS_REGEXTOOLTIP);
                 bool         useRegEx = IsDlgButtonChecked(*this, IDC_MATCHREGEX) == BST_CHECKED;
-                COMBOBOXINFO cinfo{sizeof(COMBOBOXINFO)};
-                GetComboBoxInfo(GetDlgItem(*this, IDC_REPLACECOMBO), &cinfo);
+                COMBOBOXINFO cInfo{sizeof(COMBOBOXINFO)};
+                GetComboBoxInfo(GetDlgItem(*this, IDC_REPLACECOMBO), &cInfo);
                 LPCWSTR tipText = useRegEx ? sInfo : L"";
-                AddToolTip(cinfo.hwndCombo, tipText);
-                AddToolTip(cinfo.hwndItem, tipText);
-                AddToolTip(cinfo.hwndList, tipText);
+                AddToolTip(cInfo.hwndCombo, tipText);
+                AddToolTip(cInfo.hwndItem, tipText);
+                AddToolTip(cInfo.hwndList, tipText);
                 AddToolTip(IDC_REPLACEWITHLABEL, tipText);
                 if (IsDlgButtonChecked(*this, IDC_MATCHREGEX) == BST_CHECKED)
                     CheckRegex();
@@ -1401,17 +1400,17 @@ void CFindReplaceDlg::DoFindPrevious()
         return;
     }
 
-    ttf.chrg.cpMin = (Sci_PositionCR)ScintillaCall(SCI_GETCURRENTPOS);
+    ttf.chrg.cpMin = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
     if (ttf.chrg.cpMin > 0)
         ttf.chrg.cpMin--;
     ttf.chrg.cpMax = 0;
-    auto findRet   = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+    auto findRet   = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
     if (findRet == -1)
     {
         // Retry from the end of the doc.
         ttf.chrg.cpMax = ttf.chrg.cpMin + 1;
-        ttf.chrg.cpMin = (Sci_PositionCR)ScintillaCall(SCI_GETLENGTH);
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+        ttf.chrg.cpMin = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
+        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
         // Only report wrap around if we found something in the other direction.
         // If we didn't find anything we'll prefer to report that no match was found.
         if (findRet >= 0)
@@ -1431,7 +1430,7 @@ void CFindReplaceDlg::SearchStringNotFound()
 
 void CFindReplaceDlg::DoFind()
 {
-    if (!m_ThreadsRunning)
+    if (!m_threadsRunning)
         DoSearch();
 }
 
@@ -1449,12 +1448,12 @@ void CFindReplaceDlg::DoReplace(int id)
 
     auto   selStart  = ScintillaCall(SCI_GETSELECTIONSTART);
     auto   selEnd    = ScintillaCall(SCI_GETSELECTIONEND);
-    auto   linestart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-    auto   lineend   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
-    sptr_t wrapcount = 1;
-    if (linestart == lineend)
-        wrapcount = ScintillaCall(SCI_WRAPCOUNT, linestart);
-    bool bReplaceOnlyInSelection = (linestart != lineend || (wrapcount > 1 && selEnd - selStart > 20)) && (id == IDC_REPLACEALLBTN);
+    auto   lineStart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+    auto   lineEnd   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    sptr_t wrapCount = 1;
+    if (lineStart == lineEnd)
+        wrapCount = ScintillaCall(SCI_WRAPCOUNT, lineStart);
+    bool bReplaceOnlyInSelection = (lineStart != lineEnd || (wrapCount > 1 && selEnd - selStart > 20)) && (id == IDC_REPLACEALLBTN);
 
     if (bReplaceOnlyInSelection)
     {
@@ -1498,15 +1497,15 @@ void CFindReplaceDlg::DoReplace(int id)
     int replaceCount = 0;
     if (id == IDC_REPLACEALLINTABSBTN)
     {
-        int tabcount = GetTabCount();
-        for (int i = 0; i < tabcount; ++i)
+        int tabCount = GetTabCount();
+        for (int i = 0; i < tabCount; ++i)
         {
             auto  docID  = GetDocIDFromTabIndex(i);
             auto& doc    = GetModDocumentFromID(docID);
-            int   rcount = ReplaceDocument(doc, g_findString, sReplaceString, g_searchFlags);
-            if (rcount)
+            int   rCount = ReplaceDocument(doc, g_findString, sReplaceString, g_searchFlags);
+            if (rCount)
             {
-                replaceCount += rcount;
+                replaceCount += rCount;
                 UpdateTab(i);
             }
         }
@@ -1518,7 +1517,7 @@ void CFindReplaceDlg::DoReplace(int id)
         ScintillaCall(SCI_BEGINUNDOACTION);
         do
         {
-            findRet = ScintillaCall(SCI_SEARCHINTARGET, g_findString.length(), (sptr_t)g_findString.c_str());
+            findRet = ScintillaCall(SCI_SEARCHINTARGET, g_findString.length(), reinterpret_cast<sptr_t>(g_findString.c_str()));
             // note: our regex search implementation returns -2 if the regex is invalid
             if (findRet == -1 && id == IDC_REPLACEBTN)
             {
@@ -1526,23 +1525,23 @@ void CFindReplaceDlg::DoReplace(int id)
                 // Retry from the start of the doc.
                 ScintillaCall(SCI_SETTARGETSTART, 0);
                 ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETCURRENTPOS));
-                findRet = ScintillaCall(SCI_SEARCHINTARGET, g_findString.length(), (sptr_t)g_findString.c_str());
+                findRet = ScintillaCall(SCI_SEARCHINTARGET, g_findString.length(), reinterpret_cast<sptr_t>(g_findString.c_str()));
             }
             if (findRet >= 0)
             {
                 auto replaceFunc = ((g_searchFlags & SCFIND_REGEXP) != 0)
                                        ? SCI_REPLACETARGETRE
                                        : SCI_REPLACETARGET;
-                ScintillaCall(replaceFunc, sReplaceString.length(), (sptr_t)sReplaceString.c_str());
+                ScintillaCall(replaceFunc, sReplaceString.length(), reinterpret_cast<sptr_t>(sReplaceString.c_str()));
                 ++replaceCount;
-                auto tstart = ScintillaCall(SCI_GETTARGETSTART);
-                auto tend   = ScintillaCall(SCI_GETTARGETEND);
+                auto targetStart = ScintillaCall(SCI_GETTARGETSTART);
+                auto targetEnd   = ScintillaCall(SCI_GETTARGETEND);
                 if (id == IDC_REPLACEBTN)
-                    Center(tstart, tend);
-                if ((tend > tstart || sReplaceString.empty()) && (tstart != tend))
-                    ScintillaCall(SCI_SETTARGETSTART, tend);
+                    Center(targetStart, targetEnd);
+                if ((targetEnd > targetStart || sReplaceString.empty()) && (targetStart != targetEnd))
+                    ScintillaCall(SCI_SETTARGETSTART, targetEnd);
                 else
-                    ScintillaCall(SCI_SETTARGETSTART, tend + 1);
+                    ScintillaCall(SCI_SETTARGETSTART, targetEnd + 1);
                 if (bReplaceOnlyInSelection)
                     ScintillaCall(SCI_SETTARGETEND, selEnd);
                 else
@@ -1612,17 +1611,17 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
     }
 
     Sci_TextToFind ttf = {0};
-    ttf.chrg.cpMin     = (Sci_PositionCR)ScintillaCall(SCI_GETCURRENTPOS);
-    ttf.chrg.cpMax     = (Sci_PositionCR)ScintillaCall(SCI_GETLENGTH);
+    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
+    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
     ttf.lpstrText      = g_findString.c_str();
 
-    auto findRet = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+    auto findRet = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
     if (findRet == -1)
     {
         // Retry from the start of the doc.
         ttf.chrg.cpMax = ttf.chrg.cpMin;
         ttf.chrg.cpMin = 0;
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
         // Only report wrap around if we found something in the other direction.
         // If we didn't find anything we'll prefer to report that no match was found.
         if (findRet >= 0)
@@ -1657,29 +1656,29 @@ void CFindReplaceDlg::SortResults()
                   int result = -1;
                   if (lhs.docID.IsValid() && rhs.docID.IsValid())
                   {
-                      const auto& ldoc = GetDocumentFromID(lhs.docID);
-                      const auto& rdoc = GetDocumentFromID(rhs.docID);
+                      const auto& lDoc = GetDocumentFromID(lhs.docID);
+                      const auto& rDoc = GetDocumentFromID(rhs.docID);
                       // If both results are associated with files...
-                      if (!ldoc.m_path.empty() && !rdoc.m_path.empty())
+                      if (!lDoc.m_path.empty() && !rDoc.m_path.empty())
                       {
                           result = CPathUtils::PathCompare(
-                              CPathUtils::GetFileName(ldoc.m_path),
-                              CPathUtils::GetFileName(rdoc.m_path));
+                              CPathUtils::GetFileName(lDoc.m_path),
+                              CPathUtils::GetFileName(rDoc.m_path));
                           if (result == 0)
                               result = CPathUtils::PathCompare(
-                                  CPathUtils::GetParentDirectory(ldoc.m_path),
-                                  CPathUtils::GetParentDirectory(rdoc.m_path));
+                                  CPathUtils::GetParentDirectory(lDoc.m_path),
+                                  CPathUtils::GetParentDirectory(rDoc.m_path));
                       }
                       // If left result is associated with a file and (implied)
                       // the other path is not associated with a file...
-                      else if (!ldoc.m_path.empty())
-                          result = CPathUtils::PathCompare(CPathUtils::GetFileName(ldoc.m_path),
+                      else if (!lDoc.m_path.empty())
+                          result = CPathUtils::PathCompare(CPathUtils::GetFileName(lDoc.m_path),
                                                            GetTitleForDocID(rhs.docID));
                       // else if right result is associated with a file and (implied)
                       // the left path is not associated with a file...
-                      else if (!rdoc.m_path.empty())
+                      else if (!rDoc.m_path.empty())
                           result = CPathUtils::PathCompare(GetTitleForDocID(lhs.docID),
-                                                           CPathUtils::GetFileName(rdoc.m_path));
+                                                           CPathUtils::GetFileName(rDoc.m_path));
                       else
                       {
                           // Otherwise (implied) neither file is associated with a file,
@@ -1714,8 +1713,8 @@ void CFindReplaceDlg::SortResults()
 void CFindReplaceDlg::DoSearchAll(int id)
 {
     // Should have stopped before searching again.
-    APPVERIFY(m_ThreadsRunning == 0);
-    if (m_ThreadsRunning)
+    APPVERIFY(m_threadsRunning == 0);
+    if (m_threadsRunning)
         return;
     // To prevent having each document activate the tab while searching,
     // we use a dummy scintilla control and do the search in there
@@ -1725,16 +1724,16 @@ void CFindReplaceDlg::DoSearchAll(int id)
     m_searchResults.clear();
     m_foundPaths.clear();
     m_bStop     = false;
-    m_foundsize = 0;
+    m_foundSize = 0;
 
     std::wstring findText = GetDlgItemText(IDC_SEARCHCOMBO).get();
     if (id != IDC_FINDFILES)
         UpdateSearchStrings(findText);
-    std::string searchfor = CUnicodeUtils::StdGetUTF8(findText);
-    g_findString          = searchfor;
+    std::string searchFor = CUnicodeUtils::StdGetUTF8(findText);
+    g_findString          = searchFor;
     g_highlightMatches    = IsDlgButtonChecked(*this, IDC_HIGHLIGHT) != 0;
 
-    int          searchflags        = GetScintillaOptions();
+    int          searchFlags        = GetScintillaOptions();
     unsigned int exSearchFlags      = 0;
     bool         searchForFunctions = IsDlgButtonChecked(*this, IDC_FUNCTIONS) == BST_CHECKED;
     if (searchForFunctions)
@@ -1744,12 +1743,12 @@ void CFindReplaceDlg::DoSearchAll(int id)
         exSearchFlags |= SF_SEARCHSUBFOLDERS;
 
     if (id == IDC_FINDFILES)
-        m_resultsType = ResultsType::Filenames;
+        m_resultsType = ResultsType::FileNames;
     else
     {
         if (searchForFunctions)
             m_resultsType = ResultsType::Functions;
-        else if (id == IDC_FINDALLINDIR && searchfor.empty())
+        else if (id == IDC_FINDALLINDIR && searchFor.empty())
             m_resultsType = ResultsType::FirstLines;
         else
             m_resultsType = ResultsType::MatchedTerms;
@@ -1761,7 +1760,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
 
     if (id == IDC_FINDALL || id == IDC_FINDALLINTABS)
     {
-        if (searchfor.empty() && !searchForFunctions)
+        if (searchFor.empty() && !searchForFunctions)
         {
             SetInfoText(IDS_FINDNOTFOUND);
             return;
@@ -1774,24 +1773,24 @@ void CFindReplaceDlg::DoSearchAll(int id)
             ResString   rInfo(g_hRes, IDS_SEARCHING_FILE);
             auto        sInfo = CStringUtils::Format(rInfo, CPathUtils::GetFileName(doc.m_path).c_str());
             SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
-            SearchDocument(m_searchWnd, docId, doc, searchfor, searchflags, exSearchFlags,
+            SearchDocument(m_searchWnd, docId, doc, searchFor, searchFlags, exSearchFlags,
                            m_searchResults, m_foundPaths);
             SortResults();
         }
         else if (id == IDC_FINDALLINTABS)
         {
             ResString rInfo(g_hRes, IDS_SEARCHING_FILE);
-            int       tabcount = GetTabCount();
-            for (int i = 0; i < tabcount; ++i)
+            int       tabCount = GetTabCount();
+            for (int i = 0; i < tabCount; ++i)
             {
                 auto        docID = GetDocIDFromTabIndex(i);
                 const auto& doc   = GetDocumentFromID(docID);
                 auto        sInfo = CStringUtils::Format(rInfo, CPathUtils::GetFileName(doc.m_path).c_str());
                 SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
                 UpdateWindow(*this);
-                SearchDocument(m_searchWnd, docID, doc, searchfor, searchflags, exSearchFlags,
+                SearchDocument(m_searchWnd, docID, doc, searchFor, searchFlags, exSearchFlags,
                                m_searchResults, m_foundPaths);
-                if (m_foundsize >= m_maxSearchResults)
+                if (m_foundSize >= m_maxSearchResults)
                 {
                     ResString rInfoMax(g_hRes, IDS_SEARCHING_FILE_MAX);
                     auto      sInfoMax = CStringUtils::Format(rInfoMax, m_maxSearchResults);
@@ -1815,7 +1814,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
             else
             {
                 ResString rInfo(g_hRes, IDS_FINDRESULT_COUNTALL);
-                sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size(), GetTabCount());
+                sInfo = CStringUtils::Format(rInfo, static_cast<int>(m_searchResults.size()), GetTabCount());
             }
         }
         else
@@ -1828,7 +1827,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
             else
             {
                 ResString rInfo(g_hRes, IDS_FINDRESULT_COUNT);
-                sInfo = CStringUtils::Format(rInfo, (int)m_searchResults.size());
+                sInfo = CStringUtils::Format(rInfo, static_cast<int>(m_searchResults.size()));
             }
         }
         // We don't action the first result because we can't consistently do that.
@@ -1870,10 +1869,10 @@ void CFindReplaceDlg::DoSearchAll(int id)
 
         UpdateMatchCount(false);
         FocusOn(IDC_FINDRESULTS);
-        InterlockedIncrement(&m_ThreadsRunning);
+        InterlockedIncrement(&m_threadsRunning);
         // Start a new thread to search all files.
         std::thread(&CFindReplaceDlg::SearchThread,
-                    this, id, searchFolder, searchfor, searchflags, exSearchFlags, filesToFind)
+                    this, id, searchFolder, searchFor, searchFlags, exSearchFlags, filesToFind)
             .detach();
         // Operation will be completed in OnSearchResultsReady which will be
         // called in the UI thread so screens results can be updated etc.
@@ -1918,7 +1917,7 @@ bool CFindReplaceDlg::IsMatchingFile(const std::wstring& path, const std::vector
 bool CFindReplaceDlg::IsExcludedFile(const std::wstring& path) const
 {
     auto ext = CPathUtils::GetFileExtension(path);
-    for (const auto& e : excludedExtensions)
+    for (const auto& e : m_excludedExtensions)
     {
         if (_wcsicmp(ext.c_str(), e.c_str()) == 0)
             return true;
@@ -1929,7 +1928,7 @@ bool CFindReplaceDlg::IsExcludedFile(const std::wstring& path) const
 bool CFindReplaceDlg::IsExcludedFolder(const std::wstring& path) const
 {
     auto targetName = CPathUtils::GetFileName(path);
-    for (const auto& e : excludedFolders)
+    for (const auto& e : m_excludedFolders)
     {
         if (_wcsicmp(targetName.c_str(), e.c_str()) == 0)
             return true;
@@ -1938,7 +1937,7 @@ bool CFindReplaceDlg::IsExcludedFolder(const std::wstring& path) const
 }
 
 void CFindReplaceDlg::SearchThread(
-    int id, const std::wstring& searchpath, const std::string& searchfor,
+    int id, const std::wstring& searchPath, const std::string& searchFor,
     int flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind)
 {
     // NOTE: all parameter validation should be done before getting here.
@@ -1955,7 +1954,7 @@ void CFindReplaceDlg::SearchThread(
     CScintillaWnd searchWnd(g_hRes);
     searchWnd.InitScratch(g_hRes);
 
-    CDirFileEnum     enumerator(searchpath);
+    CDirFileEnum     enumerator(searchPath);
     bool             bIsDir = false;
     std::wstring     path;
     CDocumentManager manager;
@@ -1997,7 +1996,7 @@ void CFindReplaceDlg::SearchThread(
             m_pendingFoundPaths.push_back(std::move(path));
             m_pendingSearchResults.push_back(std::move(result));
             NewData(timeOfLastProgressUpdate, false);
-            if (++m_foundsize >= m_maxSearchResults)
+            if (++m_foundSize >= m_maxSearchResults)
                 break;
 
             continue;
@@ -2009,7 +2008,7 @@ void CFindReplaceDlg::SearchThread(
         // BowPad doesn't appear hung while loading large files.
         CDocument doc = manager.LoadFile(nullptr, path, -1, false);
         // Don't crash if the document cannot be loaded. .e.g. if it is locked.
-        if (doc.m_document != Document(0))
+        if (doc.m_document != static_cast<Document>(0))
         {
             DocID did(1);
             manager.AddDocumentAtEnd(doc, did);
@@ -2017,19 +2016,19 @@ void CFindReplaceDlg::SearchThread(
             if (!m_bStop)
             {
                 size_t resultSizeBefore = m_pendingSearchResults.size();
-                SearchDocument(searchWnd, DocID(), doc, searchfor, flags, exSearchFlags,
+                SearchDocument(searchWnd, DocID(), doc, searchFor, flags, exSearchFlags,
                                m_pendingSearchResults, m_pendingFoundPaths);
                 if (m_pendingSearchResults.size() - resultSizeBefore > 0)
                     m_pendingFoundPaths.push_back(std::move(path));
                 NewData(timeOfLastProgressUpdate, false);
-                if (m_foundsize >= m_maxSearchResults)
+                if (m_foundSize >= m_maxSearchResults)
                     break;
             }
         }
     }
     NewData(timeOfLastProgressUpdate, true);
 
-    InterlockedDecrement(&m_ThreadsRunning);
+    InterlockedDecrement(&m_threadsRunning);
 }
 
 void CFindReplaceDlg::AcceptData()
@@ -2041,12 +2040,12 @@ void CFindReplaceDlg::AcceptData()
     // appending into rather than the list it moving from.
     for (auto& item : m_pendingSearchResults)
         item.pathIndex += m_foundPaths.size();
-    move_append(m_searchResults, m_pendingSearchResults);
+    moveAppend(m_searchResults, m_pendingSearchResults);
     // Enable this if something suspect occurs.
     //for (const auto& item : m_pendingSearchResults)
     //if (item.pathIndex < 0 || item.pathIndex >= m_foundPaths.size())
     //APPVERIFY(false);
-    move_append(m_foundPaths, m_pendingFoundPaths);
+    moveAppend(m_foundPaths, m_pendingFoundPaths);
 
     m_dataAccepted = true;
     lk.unlock();
@@ -2055,17 +2054,17 @@ void CFindReplaceDlg::AcceptData()
 
 void CFindReplaceDlg::SearchDocument(
     CScintillaWnd& searchWnd, DocID docID, const CDocument& doc,
-    const std::string& searchfor, int searchflags, unsigned int exSearchFlags,
+    const std::string& searchFor, int searchFlags, unsigned int exSearchFlags,
     SearchResults& searchResults, SearchPaths& foundPaths)
 {
     bool searchForFunctions = (exSearchFlags & SF_SEARCHFORFUNCTIONS) != 0;
 
-    auto wsearchfor = CUnicodeUtils::StdGetUnicode(searchfor);
+    auto wSearchFor = CUnicodeUtils::StdGetUnicode(searchFor);
     if (searchForFunctions)
-        searchflags |= SCFIND_REGEXP | SCFIND_CXX11REGEX;
-    bool wholeWord = (searchflags & SCFIND_WHOLEWORD) != 0;
+        searchFlags |= SCFIND_REGEXP | SCFIND_CXX11REGEX;
+    bool wholeWord = (searchFlags & SCFIND_WHOLEWORD) != 0;
     if (searchForFunctions && !wholeWord)
-        wsearchfor = L"*" + wsearchfor + L"*";
+        wSearchFor = L"*" + wSearchFor + L"*";
 
     searchWnd.Call(SCI_SETSTATUS, SC_STATUS_OK); // reset error status
     searchWnd.Call(SCI_CLEARALL);
@@ -2081,8 +2080,8 @@ void CFindReplaceDlg::SearchDocument(
 
     Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin     = 0;
-    ttf.chrg.cpMax     = (Sci_PositionCR)searchWnd.Call(SCI_GETLENGTH);
-    std::string funcregex;
+    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(searchWnd.Call(SCI_GETLENGTH));
+    std::string funcRegex;
     if (searchForFunctions)
     {
         auto lang = doc.GetLanguage();
@@ -2090,20 +2089,20 @@ void CFindReplaceDlg::SearchDocument(
             lang = CLexStyles::Instance().GetLanguageForDocument(doc, searchWnd);
         if (lang.empty())
             return;
-        funcregex = CLexStyles::Instance().GetFunctionRegexForLang(lang);
-        if (funcregex.empty())
+        funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(lang);
+        if (funcRegex.empty())
             return;
-        ttf.lpstrText = funcregex.c_str();
+        ttf.lpstrText = funcRegex.c_str();
     }
     else
-        ttf.lpstrText = searchfor.c_str();
+        ttf.lpstrText = searchFor.c_str();
 
     std::wstring funcName;
     sptr_t       findRet = -1;
-    std::string  line; // Reduce memory reallocations by keeping this out of the loop.
+    std::string  line; // Reduce memory re-allocations by keeping this out of the loop.
     do
     {
-        findRet = searchWnd.Call(SCI_FINDTEXT, searchflags, (sptr_t)&ttf);
+        findRet = searchWnd.Call(SCI_FINDTEXT, searchFlags, reinterpret_cast<sptr_t>(&ttf));
         if (findRet >= 0)
         {
             CSearchResult result;
@@ -2115,44 +2114,44 @@ void CFindReplaceDlg::SearchDocument(
                 result.docID = docID;
             result.posBegin = ttf.chrgText.cpMin;
             result.posEnd   = ttf.chrgText.cpMax;
-            char c          = (char)searchWnd.Call(SCI_GETCHARAT, result.posBegin);
+            char c          = static_cast<char>(searchWnd.Call(SCI_GETCHARAT, result.posBegin));
             while (c == '\n' || c == '\r')
             {
                 ++result.posBegin;
-                c = (char)searchWnd.Call(SCI_GETCHARAT, result.posBegin);
+                c = static_cast<char>(searchWnd.Call(SCI_GETCHARAT, result.posBegin));
             }
             result.line  = searchWnd.Call(SCI_LINEFROMPOSITION, result.posBegin);
-            auto linepos = searchWnd.Call(SCI_POSITIONFROMLINE, result.line);
+            auto linePos = searchWnd.Call(SCI_POSITIONFROMLINE, result.line);
             if (searchForFunctions)
             {
                 result.lineText = CUnicodeUtils::StdGetUnicode(searchWnd.GetTextRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax));
-                size_t linesize = result.lineText.length();
-                while (linesize > 0 && (result.lineText[linesize - 1] == L'\n' || result.lineText[linesize - 1] == L'\r'))
-                    --linesize;
-                result.lineText.resize(linesize);
+                size_t lineSize = result.lineText.length();
+                while (lineSize > 0 && (result.lineText[lineSize - 1] == L'\n' || result.lineText[lineSize - 1] == L'\r'))
+                    --lineSize;
+                result.lineText.resize(lineSize);
                 result.posInLineStart = 0;
                 result.posInLineEnd   = 0;
             }
             else
             {
-                result.posInLineStart = linepos >= 0 ? result.posBegin - linepos : 0;
-                result.posInLineEnd   = linepos >= 0 ? ttf.chrgText.cpMax - linepos : 0;
+                result.posInLineStart = linePos >= 0 ? result.posBegin - linePos : 0;
+                result.posInLineEnd   = linePos >= 0 ? ttf.chrgText.cpMax - linePos : 0;
                 auto matchLen         = result.posInLineEnd - result.posInLineStart;
-                auto linesize         = searchWnd.Call(SCI_LINELENGTH, result.line);
-                line.resize(linesize);
+                auto lineSize         = searchWnd.Call(SCI_LINELENGTH, result.line);
+                line.resize(lineSize);
                 searchWnd.Call(SCI_GETLINE, result.line, reinterpret_cast<sptr_t>(line.data()));
                 // remove EOLs
-                while (linesize > 0 && (line[linesize - 1] == '\n' || line[linesize - 1] == '\r'))
-                    --linesize;
-                line.resize(linesize);
+                while (lineSize > 0 && (line[lineSize - 1] == '\n' || line[lineSize - 1] == '\r'))
+                    --lineSize;
+                line.resize(lineSize);
                 result.lineText = CUnicodeUtils::StdGetUnicode(line, false);
                 // adjust the line positions: Scintilla uses utf8, but utf8 converted to
                 // utf16 can have different char sizes so the positions won't match anymore
                 result.posInLineStart          = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineStart);
                 result.posInLineEnd            = UTF8Helper::UTF16PosFromUTF8Pos(line.c_str(), result.posInLineEnd);
-                linesize                       = result.posInLineEnd - result.posInLineStart;
+                lineSize                       = result.posInLineEnd - result.posInLineStart;
                 constexpr int maxResultLineLen = 255;
-                if ((sptr_t)result.lineText.size() > max(linesize + 40, maxResultLineLen))
+                if (static_cast<sptr_t>(result.lineText.size()) > max(lineSize + 40, maxResultLineLen))
                 {
                     auto index      = max(0, (int)result.posInLineStart - (maxResultLineLen - matchLen - 40));
                     result.lineText = (index ? L"... " : L"") + result.lineText.substr(index, maxResultLineLen);
@@ -2164,7 +2163,7 @@ void CFindReplaceDlg::SearchDocument(
                 }
             }
 
-            // When searching for functions, we have to narrow the match down by name ourself.
+            // When searching for functions, we have to narrow the match down by name ourselves.
             bool matched = false;
             if (!searchForFunctions)
                 matched = true;
@@ -2174,20 +2173,20 @@ void CFindReplaceDlg::SearchDocument(
                 // The set of regexp expressions we use to find functions
                 // don't allow us to identify a specifically named function.
                 // They just find any function definitions.
-                // To narrow down to a particular function name means doing that ourself.
+                // To narrow down to a particular function name means doing that ourselves.
                 // We allow the user to use guess roughly the name by supporting
                 // * and ? regular expressions but offering any other options seems excessive.
                 // And by sticking to just * and ? means we can enable the use of these
                 // by default without requiring the "use regexp" checkbox to be checked
                 // because a function name can't include * or ? so the meaning
                 // of those two characters is never ambiguous.
-                if (searchfor.empty())
+                if (searchFor.empty())
                     matched = true;
                 else
                 {
                     if (ParseSignature(funcName, result.lineText))
                     {
-                        matched = wcswildicmp(wsearchfor.c_str(), funcName.c_str()) != 0;
+                        matched = wcswildicmp(wSearchFor.c_str(), funcName.c_str()) != 0;
                     }
                 }
             }
@@ -2196,7 +2195,7 @@ void CFindReplaceDlg::SearchDocument(
                 if (!docID.IsValid())
                     result.pathIndex = foundPaths.size();
                 searchResults.push_back(std::move(result));
-                if (++m_foundsize >= m_maxSearchResults)
+                if (++m_foundSize >= m_maxSearchResults)
                     break;
             }
 
@@ -2234,7 +2233,7 @@ void CFindReplaceDlg::NewData(
             m_dataReady = true;
         }
         m_dataExchangeCondition.notify_one();
-        SendMessage(*this, WM_THREADRESULTREADY, finished ? WPARAM(1) : WPARAM(0), LPARAM(0));
+        SendMessage(*this, WM_THREADRESULTREADY, finished ? static_cast<WPARAM>(1) : static_cast<WPARAM>(0), static_cast<LPARAM>(0));
 
         {
             std::unique_lock<std::mutex> lk(m_waitingDataMutex);
@@ -2248,13 +2247,13 @@ void CFindReplaceDlg::NewData(
     }
 }
 
-int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindstring, const std::string& sReplaceString, int searchflags)
+int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindString, const std::string& sReplaceString, int searchFlags)
 {
     m_searchWnd.Call(SCI_SETSTATUS, SC_STATUS_OK); // reset error status
     m_searchWnd.Call(SCI_CLEARALL);
     m_searchWnd.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
     m_searchWnd.Call(SCI_SETTARGETSTART, 0);
-    m_searchWnd.Call(SCI_SETSEARCHFLAGS, searchflags);
+    m_searchWnd.Call(SCI_SETSEARCHFLAGS, searchFlags);
     m_searchWnd.Call(SCI_SETTARGETEND, m_searchWnd.Call(SCI_GETLENGTH));
     m_searchWnd.Call(SCI_BEGINUNDOACTION);
     OnOutOfScope(
@@ -2265,20 +2264,20 @@ int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindstr
     int    replaceCount = 0;
     do
     {
-        findRet = m_searchWnd.Call(SCI_SEARCHINTARGET, sFindstring.length(), (sptr_t)sFindstring.c_str());
+        findRet = m_searchWnd.Call(SCI_SEARCHINTARGET, sFindString.length(), reinterpret_cast<sptr_t>(sFindString.c_str()));
         if (findRet >= 0)
         {
-            auto replaceFunc = ((searchflags & SCFIND_REGEXP) != 0)
+            auto replaceFunc = ((searchFlags & SCFIND_REGEXP) != 0)
                                    ? SCI_REPLACETARGETRE
                                    : SCI_REPLACETARGET;
-            m_searchWnd.Call(replaceFunc, sReplaceString.length(), (sptr_t)sReplaceString.c_str());
+            m_searchWnd.Call(replaceFunc, sReplaceString.length(), reinterpret_cast<sptr_t>(sReplaceString.c_str()));
             ++replaceCount;
-            auto tstart = m_searchWnd.Call(SCI_GETTARGETSTART);
-            auto tend   = m_searchWnd.Call(SCI_GETTARGETEND);
-            if ((tend > tstart) || (sReplaceString.empty()))
-                m_searchWnd.Call(SCI_SETTARGETSTART, tend);
+            auto targetStart = m_searchWnd.Call(SCI_GETTARGETSTART);
+            auto targetEnd   = m_searchWnd.Call(SCI_GETTARGETEND);
+            if ((targetEnd > targetStart) || (sReplaceString.empty()))
+                m_searchWnd.Call(SCI_SETTARGETSTART, targetEnd);
             else
-                m_searchWnd.Call(SCI_SETTARGETSTART, tend + 1);
+                m_searchWnd.Call(SCI_SETTARGETSTART, targetEnd + 1);
 
             m_searchWnd.Call(SCI_SETTARGETEND, m_searchWnd.Call(SCI_GETLENGTH));
             doc.m_bIsDirty = true;
@@ -2335,7 +2334,7 @@ void CFindReplaceDlg::CheckRegex()
     try
     {
         auto              findText = GetDlgItemText(IDC_SEARCHCOMBO);
-        const std::wregex ignex(findText.get(),
+        const std::wregex ignEx(findText.get(),
                                 std::regex_constants::icase | std::regex_constants::ECMAScript);
         Clear(IDC_SEARCHINFO);
     }
@@ -2414,7 +2413,7 @@ void CFindReplaceDlg::OnClose()
 {
     m_bStop    = true;
     auto start = GetTickCount64();
-    while (m_ThreadsRunning && (GetTickCount64() - start < 5000))
+    while (m_threadsRunning && (GetTickCount64() - start < 5000))
         Sleep(10);
 }
 
@@ -2491,7 +2490,7 @@ void CFindReplaceDlg::LoadSearchStrings()
     LoadCombo(IDC_SEARCHCOMBO, searchStrings);
 }
 
-void CFindReplaceDlg::SaveSearchStrings()
+void CFindReplaceDlg::SaveSearchStrings() const
 {
     std::vector<std::wstring> searchStrings;
     SaveCombo(IDC_SEARCHCOMBO, searchStrings);
@@ -2511,7 +2510,7 @@ void CFindReplaceDlg::LoadReplaceStrings()
     LoadCombo(IDC_REPLACECOMBO, replaceStrings);
 }
 
-void CFindReplaceDlg::SaveReplaceStrings()
+void CFindReplaceDlg::SaveReplaceStrings() const
 {
     std::vector<std::wstring> replaceStrings;
     SaveCombo(IDC_REPLACECOMBO, replaceStrings);
@@ -2531,7 +2530,7 @@ void CFindReplaceDlg::LoadSearchFolderStrings()
     LoadCombo(IDC_SEARCHFOLDER, searchFolderStrings);
 }
 
-void CFindReplaceDlg::SaveSearchFolderStrings()
+void CFindReplaceDlg::SaveSearchFolderStrings() const
 {
     std::vector<std::wstring> searchFolderStrings;
     SaveCombo(IDC_SEARCHFOLDER, searchFolderStrings);
@@ -2551,7 +2550,7 @@ void CFindReplaceDlg::LoadSearchFileStrings()
     LoadCombo(IDC_SEARCHFILES, searchFileStrings);
 }
 
-void CFindReplaceDlg::SaveSearchFileStrings()
+void CFindReplaceDlg::SaveSearchFileStrings() const
 {
     std::vector<std::wstring> searchFileStrings;
     SaveCombo(IDC_SEARCHFILES, searchFileStrings);
@@ -2608,7 +2607,7 @@ void CFindReplaceDlg::NotifyOnDocumentClose(DocID id)
         auto deletedCount = m_searchResults.end() - newEnd;
         m_searchResults.erase(newEnd, m_searchResults.end());
         if (deletedCount > 0)
-            ListView_SetItemCountEx(hFindResults, int(m_searchResults.size()), 0);
+            ListView_SetItemCountEx(hFindResults, static_cast<int>(m_searchResults.size()), 0);
     }
     else
     {
@@ -2625,8 +2624,8 @@ void CFindReplaceDlg::NotifyOnDocumentClose(DocID id)
         bool   found         = false;
         int    firstToRedraw = -1;
         int    redrawCount   = 0;
-        size_t newPathIndex  = (size_t)-1;
-        for (int itemIndex = 0; itemIndex < (int)m_searchResults.size(); ++itemIndex)
+        size_t newPathIndex  = static_cast<size_t>(-1);
+        for (int itemIndex = 0; itemIndex < static_cast<int>(m_searchResults.size()); ++itemIndex)
         {
             auto& item = m_searchResults[itemIndex];
             if (item.docID == id)
@@ -2644,7 +2643,7 @@ void CFindReplaceDlg::NotifyOnDocumentClose(DocID id)
                     found = true;
                 }
                 item.docID = DocID();
-                if (newPathIndex != size_t(-1))
+                if (newPathIndex != static_cast<size_t>(-1))
                     item.pathIndex = newPathIndex;
                 ++redrawCount;
             }
@@ -2665,7 +2664,7 @@ void CFindReplaceDlg::NotifyOnDocumentSave(DocID id, bool /*saveAs*/)
     int  firstItemIndex = -1;
     int  itemCount      = 0;
     bool found          = false;
-    for (int itemIndex = 0; itemIndex < (int)m_searchResults.size(); ++itemIndex)
+    for (int itemIndex = 0; itemIndex < static_cast<int>(m_searchResults.size()); ++itemIndex)
     {
         auto& item = m_searchResults[itemIndex];
         if (item.docID == id)
@@ -2721,7 +2720,7 @@ void CFindReplaceDlg::OnSearchResultsReady(bool finished)
     ListView_SetItemCountEx(hFindResults, m_searchResults.size(), 0);
     if (m_trackingOn)
     {
-        int count = int(m_searchResults.size());
+        int count = static_cast<int>(m_searchResults.size());
         if (count > 0)
         {
             SelectItem(count - 1);
@@ -2759,7 +2758,7 @@ CCmdFindReplace::CCmdFindReplace(void* obj)
 
 bool CCmdFindReplace::Execute()
 {
-    FindReplace_FindText(m_pMainWindow);
+    findReplaceFindText(m_pMainWindow);
 
     return true;
 }
@@ -2768,18 +2767,18 @@ void CCmdFindReplace::ScintillaNotify(SCNotification* pScn)
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
     {
-        LRESULT firstline     = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
-        LRESULT lastline      = firstline + ScintillaCall(SCI_LINESONSCREEN);
-        auto    startstylepos = ScintillaCall(SCI_POSITIONFROMLINE, firstline);
-        auto    endstylepos   = ScintillaCall(SCI_POSITIONFROMLINE, lastline) + ScintillaCall(SCI_LINELENGTH, lastline);
-        if (endstylepos < 0)
-            endstylepos = ScintillaCall(SCI_GETLENGTH) - startstylepos;
+        LRESULT firstLine     = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
+        LRESULT lastLine      = firstLine + ScintillaCall(SCI_LINESONSCREEN);
+        auto    startStylePos = ScintillaCall(SCI_POSITIONFROMLINE, firstLine);
+        auto    endStylePos   = ScintillaCall(SCI_POSITIONFROMLINE, lastLine) + ScintillaCall(SCI_LINELENGTH, lastLine);
+        if (endStylePos < 0)
+            endStylePos = ScintillaCall(SCI_GETLENGTH) - startStylePos;
 
-        auto len = endstylepos - startstylepos + 1;
+        auto len = endStylePos - startStylePos + 1;
         // Reset indicators.
         ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_FINDTEXT_MARK);
-        ScintillaCall(SCI_INDICATORCLEARRANGE, startstylepos, len);
-        ScintillaCall(SCI_INDICATORCLEARRANGE, startstylepos, len - 1);
+        ScintillaCall(SCI_INDICATORCLEARRANGE, startStylePos, len);
+        ScintillaCall(SCI_INDICATORCLEARRANGE, startStylePos, len - 1);
 
         if (g_sHighlightString.empty() || !g_highlightMatches)
         {
@@ -2789,33 +2788,33 @@ void CCmdFindReplace::ScintillaNotify(SCNotification* pScn)
             return;
         }
 
-        Sci_TextToFind FindText = {0};
-        FindText.chrg.cpMin     = (Sci_PositionCR)startstylepos;
-        FindText.chrg.cpMax     = (Sci_PositionCR)endstylepos;
-        FindText.lpstrText      = g_sHighlightString.c_str();
-        while (ScintillaCall(SCI_FINDTEXT, g_searchFlags, (LPARAM)&FindText) >= 0)
+        Sci_TextToFind findText = {0};
+        findText.chrg.cpMin     = static_cast<Sci_PositionCR>(startStylePos);
+        findText.chrg.cpMax     = static_cast<Sci_PositionCR>(endStylePos);
+        findText.lpstrText      = g_sHighlightString.c_str();
+        while (ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&findText)) >= 0)
         {
-            ScintillaCall(SCI_INDICATORFILLRANGE, FindText.chrgText.cpMin, FindText.chrgText.cpMax - FindText.chrgText.cpMin);
-            if (FindText.chrg.cpMin >= FindText.chrgText.cpMax)
+            ScintillaCall(SCI_INDICATORFILLRANGE, findText.chrgText.cpMin, findText.chrgText.cpMax - findText.chrgText.cpMin);
+            if (findText.chrg.cpMin >= findText.chrgText.cpMax)
                 break;
-            FindText.chrg.cpMin = FindText.chrgText.cpMax;
+            findText.chrg.cpMin = findText.chrgText.cpMax;
         }
 
         if (g_lastSelText.empty() || g_lastSelText.compare(g_sHighlightString) || (g_searchFlags != g_lastSearchFlags))
         {
             DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
             g_searchMarkerCount = 0;
-            FindText.chrg.cpMin = 0;
-            FindText.chrg.cpMax = (Sci_PositionCR)ScintillaCall(SCI_GETLENGTH);
-            FindText.lpstrText  = g_sHighlightString.c_str();
-            while (ScintillaCall(SCI_FINDTEXT, g_searchFlags, (LPARAM)&FindText) >= 0)
+            findText.chrg.cpMin = 0;
+            findText.chrg.cpMax = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
+            findText.lpstrText  = g_sHighlightString.c_str();
+            while (ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&findText)) >= 0)
             {
-                size_t line = ScintillaCall(SCI_LINEFROMPOSITION, FindText.chrgText.cpMin);
+                size_t line = ScintillaCall(SCI_LINEFROMPOSITION, findText.chrgText.cpMin);
                 DocScrollAddLineColor(DOCSCROLLTYPE_SEARCHTEXT, line, RGB(200, 200, 0));
                 ++g_searchMarkerCount;
-                if (FindText.chrg.cpMin >= FindText.chrgText.cpMax)
+                if (findText.chrg.cpMin >= findText.chrgText.cpMax)
                     break;
-                FindText.chrg.cpMin = FindText.chrgText.cpMax;
+                findText.chrg.cpMin = findText.chrgText.cpMax;
             }
             g_lastSelText     = g_sHighlightString;
             g_lastSearchFlags = g_searchFlags;
@@ -2826,9 +2825,9 @@ void CCmdFindReplace::ScintillaNotify(SCNotification* pScn)
     }
 }
 
-void CCmdFindReplace::TabNotify(TBHDR* ptbhdr)
+void CCmdFindReplace::TabNotify(TBHDR* ptbHdr)
 {
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         g_lastSelText.clear();
         if (g_pFindReplaceDlg != nullptr)
@@ -2852,7 +2851,7 @@ void CCmdFindReplace::OnDocumentSave(DocID id, bool saveAs)
         g_pFindReplaceDlg->NotifyOnDocumentSave(id, saveAs);
 }
 
-void CCmdFindReplace::SetSearchFolderToCurrentDocument()
+void CCmdFindReplace::SetSearchFolderToCurrentDocument() const
 {
     if (g_pFindReplaceDlg != nullptr)
     {
@@ -2877,16 +2876,16 @@ bool CCmdFindNext::Execute()
         return true;
     }
     Sci_TextToFind ttf = {0};
-    ttf.chrg.cpMin     = (Sci_PositionCR)ScintillaCall(SCI_GETCURRENTPOS);
-    ttf.chrg.cpMax     = (Sci_PositionCR)ScintillaCall(SCI_GETLENGTH);
+    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
+    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
     ttf.lpstrText      = g_findString.c_str();
-    auto findRet       = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+    auto findRet       = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
     if (findRet == -1)
     {
         // Retry from the start of the doc.
         ttf.chrg.cpMax = ttf.chrg.cpMin;
         ttf.chrg.cpMin = 0;
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
     }
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
@@ -2904,18 +2903,18 @@ bool CCmdFindPrev::Execute()
     }
 
     Sci_TextToFind ttf = {0};
-    ttf.chrg.cpMin     = (Sci_PositionCR)ScintillaCall(SCI_GETCURRENTPOS);
+    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
     if (ttf.chrg.cpMin > 0)
         ttf.chrg.cpMin--;
     ttf.chrg.cpMax = 0;
     ttf.lpstrText  = g_findString.c_str();
-    sptr_t findRet = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+    sptr_t findRet = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
     if (findRet == -1)
     {
         // Retry from the end of the doc.
         ttf.chrg.cpMax = ttf.chrg.cpMin + 1;
-        ttf.chrg.cpMin = (Sci_PositionCR)ScintillaCall(SCI_GETLENGTH);
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+        ttf.chrg.cpMin = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
+        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
     }
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
@@ -2933,26 +2932,26 @@ bool CCmdFindSelectedNext::Execute()
         DocScrollUpdate();
         return false;
     }
-    std::string seltext = GetSelectedText();
-    if (seltext.empty())
+    std::string selText = GetSelectedText();
+    if (selText.empty())
     {
         DocScrollUpdate();
         return false;
     }
-    g_findString       = seltext;
+    g_findString       = selText;
     g_sHighlightString = g_findString;
 
     Sci_TextToFind ttf = {0};
-    ttf.chrg.cpMin     = (Sci_PositionCR)ScintillaCall(SCI_GETCURRENTPOS);
-    ttf.chrg.cpMax     = (Sci_PositionCR)ScintillaCall(SCI_GETLENGTH);
+    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
+    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
     ttf.lpstrText      = g_findString.c_str();
-    auto findRet       = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+    auto findRet       = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
     if (findRet == -1)
     {
         // Retry from the start of the doc.
         ttf.chrg.cpMax = ttf.chrg.cpMin;
         ttf.chrg.cpMin = 0;
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
     }
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
@@ -2974,28 +2973,28 @@ bool CCmdFindSelectedPrev::Execute()
         return false;
     }
 
-    std::string seltext = GetSelectedText();
-    if (seltext.empty())
+    std::string selText = GetSelectedText();
+    if (selText.empty())
     {
         DocScrollUpdate();
         return false;
     }
-    g_findString       = seltext;
+    g_findString       = selText;
     g_sHighlightString = g_findString;
 
     Sci_TextToFind ttf = {0};
-    ttf.chrg.cpMin     = (Sci_PositionCR)ScintillaCall(SCI_GETCURRENTPOS);
+    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
     if (ttf.chrg.cpMin > 0)
         ttf.chrg.cpMin--;
     ttf.chrg.cpMax = 0;
     ttf.lpstrText  = g_findString.c_str();
-    auto findRet   = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+    auto findRet   = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
     if (findRet == -1)
     {
         // retry from the end of the doc
         ttf.chrg.cpMax = ttf.chrg.cpMin + 1;
-        ttf.chrg.cpMin = (Sci_PositionCR)ScintillaCall(SCI_GETLENGTH);
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, (sptr_t)&ttf);
+        ttf.chrg.cpMin = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
+        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
     }
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
@@ -3007,31 +3006,31 @@ bool CCmdFindSelectedPrev::Execute()
 
 bool CCmdFindFile::Execute()
 {
-    FindReplace_FindFile(m_pMainWindow, L"");
+    findReplaceFindFile(m_pMainWindow, L"");
 
     return true;
 }
 
-void FindReplace_Finish()
+void findReplaceFinish()
 {
     g_pFindReplaceDlg.reset();
 }
 
-void FindReplace_FindText(void* mainWnd)
+void findReplaceFindText(void* mainWnd)
 {
     if (!g_pFindReplaceDlg)
         g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(mainWnd);
     g_pFindReplaceDlg->FindText();
 }
 
-void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName)
+void findReplaceFindFile(void* mainWnd, const std::wstring& fileName)
 {
     if (!g_pFindReplaceDlg)
         g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(mainWnd);
     g_pFindReplaceDlg->FindFile(fileName);
 }
 
-void FindReplace_FindFunction(void* mainWnd, const std::wstring& functionName)
+void findReplaceFindFunction(void* mainWnd, const std::wstring& functionName)
 {
     if (!g_pFindReplaceDlg)
         g_pFindReplaceDlg = std::make_unique<CFindReplaceDlg>(mainWnd);

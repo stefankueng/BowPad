@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2018, 2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,74 +18,76 @@
 #include "CmdConvertCase.h"
 #include "UnicodeUtils.h"
 
-#include <algorithm>
 #include <functional>
 
-bool ChangeCase(std::function<sptr_t(int msg, uptr_t wParam, sptr_t lParam)> ScintillaCall,
-                std::function<void(std::wstring& selText)> changeFunc)
+bool ChangeCase(std::function<sptr_t(int msg, uptr_t wParam, sptr_t lParam)> scintillaCall,
+                std::function<void(std::wstring& selText)>                   changeFunc)
 {
-    ScintillaCall(SCI_BEGINUNDOACTION, 0, 0);
+    scintillaCall(SCI_BEGINUNDOACTION, 0, 0);
 
-    auto numSelections = ScintillaCall(SCI_GETSELECTIONS, 0, 0);
+    auto numSelections = scintillaCall(SCI_GETSELECTIONS, 0, 0);
     for (decltype(numSelections) i = 0; i < numSelections; ++i)
     {
-        auto selStart = ScintillaCall(SCI_GETSELECTIONNSTART, i, 0);
-        auto selEnd = ScintillaCall(SCI_GETSELECTIONNEND, i, 0);
+        auto selStart = scintillaCall(SCI_GETSELECTIONNSTART, i, 0);
+        auto selEnd   = scintillaCall(SCI_GETSELECTIONNEND, i, 0);
 
         if ((selStart == selEnd) && (numSelections == 1))
         {
-            auto curLine = ScintillaCall(SCI_LINEFROMPOSITION, ScintillaCall(SCI_GETCURRENTPOS, 0, 0), 0);
-            selStart = ScintillaCall(SCI_POSITIONFROMLINE, curLine, 0);
-            selEnd = ScintillaCall(SCI_GETLINEENDPOSITION, curLine, 0);
+            auto curLine = scintillaCall(SCI_LINEFROMPOSITION, scintillaCall(SCI_GETCURRENTPOS, 0, 0), 0);
+            selStart     = scintillaCall(SCI_POSITIONFROMLINE, curLine, 0);
+            selEnd       = scintillaCall(SCI_GETLINEENDPOSITION, curLine, 0);
         }
 
-        auto strbuf = std::make_unique<char[]>(abs(selEnd - selStart) + 5);
-        Sci_TextRange rangestart{};
-        rangestart.chrg.cpMin = Sci_PositionCR(selStart);
-        rangestart.chrg.cpMax = Sci_PositionCR(selEnd);
-        rangestart.lpstrText = strbuf.get();
-        ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&rangestart);
+        auto          strBuf = std::make_unique<char[]>(abs(selEnd - selStart) + 5);
+        Sci_TextRange rangeStart{};
+        rangeStart.chrg.cpMin = static_cast<Sci_PositionCR>(selStart);
+        rangeStart.chrg.cpMax = static_cast<Sci_PositionCR>(selEnd);
+        rangeStart.lpstrText  = strBuf.get();
+        scintillaCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&rangeStart));
 
-        std::wstring selText = CUnicodeUtils::StdGetUnicode(strbuf.get());
+        std::wstring selText = CUnicodeUtils::StdGetUnicode(strBuf.get());
         changeFunc(selText);
         std::string sUpper = CUnicodeUtils::StdGetUTF8(selText);
 
-        ScintillaCall(SCI_SETTARGETSTART, selStart, 0);
-        ScintillaCall(SCI_SETTARGETEND, selEnd, 0);
-        ScintillaCall(SCI_REPLACETARGET, (WPARAM)-1, (LPARAM)sUpper.c_str());
-        ScintillaCall(SCI_SETSELECTIONNSTART, i, selStart);
-        ScintillaCall(SCI_SETSELECTIONNEND, i, selEnd);
+        scintillaCall(SCI_SETTARGETSTART, selStart, 0);
+        scintillaCall(SCI_SETTARGETEND, selEnd, 0);
+        scintillaCall(SCI_REPLACETARGET, static_cast<uptr_t>(-1), reinterpret_cast<sptr_t>(sUpper.c_str()));
+        scintillaCall(SCI_SETSELECTIONNSTART, i, selStart);
+        scintillaCall(SCI_SETSELECTIONNEND, i, selEnd);
     }
-    ScintillaCall(SCI_ENDUNDOACTION, 0, 0);
+    scintillaCall(SCI_ENDUNDOACTION, 0, 0);
 
     return true;
 }
 
 bool CCmdConvertUppercase::Execute()
 {
-    auto SciCall = std::bind(&CCmdConvertUppercase::ScintillaCall, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    return ChangeCase(SciCall, [](auto& selText) { CharUpper(selText.data()); });
+    auto sciCall = std::bind(&CCmdConvertUppercase::ScintillaCall, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    return ChangeCase(sciCall, [](auto& selText) { CharUpper(selText.data()); });
 }
 
 bool CCmdConvertLowercase::Execute()
 {
-    auto SciCall = std::bind(&CCmdConvertLowercase::ScintillaCall, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    return ChangeCase(SciCall, [](auto& selText) { CharLower(selText.data()); });
+    auto sciCall = std::bind(&CCmdConvertLowercase::ScintillaCall, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    return ChangeCase(sciCall, [](auto& selText) { CharLower(selText.data()); });
 }
 
 bool CCmdConvertTitlecase::Execute()
 {
-    auto SciCall = std::bind(&CCmdConvertTitlecase::ScintillaCall, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    return ChangeCase(SciCall, [](auto& selText)
-    {
+    auto sciCall = std::bind(&CCmdConvertTitlecase::ScintillaCall, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    return ChangeCase(sciCall, [](auto& selText) {
         if (selText.length() > 0)
         {
-            selText[0] = (wchar_t)LOWORD(CharUpper((LPWSTR)selText[0]));
+            wchar_t upperChar[] = {selText[0], 0};
+            CharUpper(upperChar);
+            selText[0] = upperChar[0];
             for (std::wstring::iterator it = selText.begin() + 1; it != selText.end(); ++it)
             {
                 if (!IsCharAlpha(*(it - 1)) && IsCharLower(*it))
                 {
-                    *it = (wchar_t)LOWORD(CharUpper((LPWSTR)*it));
+                    upperChar[0] = *it;
+                    CharUpper(upperChar);
+                    *it = upperChar[0];
                 }
             }
         }

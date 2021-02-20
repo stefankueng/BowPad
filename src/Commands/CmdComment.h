@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 class CCmdComment : public ICommand
 {
 public:
-
-    CCmdComment(void * obj) : ICommand(obj)
+    CCmdComment(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -37,8 +37,8 @@ public:
 class CCmdUnComment : public ICommand
 {
 public:
-
-    CCmdUnComment(void * obj) : ICommand(obj)
+    CCmdUnComment(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -48,4 +48,3 @@ public:
 
     UINT GetCmdId() override { return cmdUnComment; }
 };
-

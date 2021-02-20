@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 class CCmdUndo : public ICommand
 {
 public:
-
-    CCmdUndo(void * obj) : ICommand(obj)
+    CCmdUndo(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -41,29 +41,27 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
-    void ScintillaNotify(SCNotification * pScn) override
+    void ScintillaNotify(SCNotification* pScn) override
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override
     {
         if (UI_PKEY_Enabled == key)
         {
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_CANUNDO) != 0), ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_CANUNDO) != 0), pPropVarNewValue);
         }
         return E_NOTIMPL;
     }
-
 };
-
 
 class CCmdRedo : public ICommand
 {
 public:
-
-    CCmdRedo(void * obj) : ICommand(obj)
+    CCmdRedo(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -81,19 +79,18 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
-    void ScintillaNotify(SCNotification * pScn) override
+    void ScintillaNotify(SCNotification* pScn) override
     {
         if (pScn->nmhdr.code == SCN_MODIFIED)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override
     {
         if (UI_PKEY_Enabled == key)
         {
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_CANREDO) != 0), ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_CANREDO) != 0), pPropVarNewValue);
         }
         return E_NOTIMPL;
     }
-
 };

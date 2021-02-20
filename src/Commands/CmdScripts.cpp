@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2018, 2020 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include "AppUtils.h"
 #include "UnicodeUtils.h"
 #include "OnOutOfScope.h"
-#include "BowPad.h"
+#include "BowPadUI.h"
 
 #include "scripting/BasicScriptObject.h"
 #include "scripting/BasicScriptHost.h"
@@ -32,10 +32,10 @@
 
 CCmdScript::CCmdScript(void* obj)
     : ICommand(obj)
+    , m_version(0)
     , m_appObject(new BasicScriptObject(obj))
     , m_host(nullptr)
     , m_cmdID(0)
-    , m_version(0)
     , m_image(nullptr)
 {
 }
@@ -91,15 +91,15 @@ bool CCmdScript::Create(const std::wstring& path)
             OnOutOfScope(
                 fclose(f);
                 f = nullptr;);
-            struct _stat fileinfo;
-            _wstat(path.c_str(), &fileinfo);
+            struct _stat fileInfo;
+            _wstat(path.c_str(), &fileInfo);
 
             // Read entire file contents in to memory
-            if (fileinfo.st_size > 0)
+            if (fileInfo.st_size > 0)
             {
-                source.resize(fileinfo.st_size);
-                size_t wchars_read = fread(&(source.front()), sizeof(source[0]), fileinfo.st_size, f);
-                source.resize(wchars_read);
+                source.resize(fileInfo.st_size);
+                size_t wCharsRead = fread(&(source.front()), sizeof(source[0]), fileInfo.st_size, f);
+                source.resize(wCharsRead);
                 source.shrink_to_fit();
             }
         }
@@ -112,10 +112,10 @@ bool CCmdScript::Create(const std::wstring& path)
         if (CAppUtils::FailedShowMessage(hr))
             return false;
         // get the version
-        DISPPARAMS dispparams = {0};
+        DISPPARAMS dispParams = {nullptr};
         try
         {
-            auto ret = m_host->CallFunction(L"Version", dispparams);
+            auto ret = m_host->CallFunction(L"Version", dispParams);
             if (SUCCEEDED(VariantChangeType(&ret, &ret, VARIANT_ALPHABOOL, VT_INT)))
                 m_version = ret.intVal;
         }
@@ -189,10 +189,10 @@ void CCmdScript::SetCmdId(UINT cmdId)
 
 bool CCmdScript::Execute()
 {
-    DISPPARAMS dispparams = {0};
+    DISPPARAMS dispParams = {nullptr};
     try
     {
-        m_host->CallFunction(L"Execute", dispparams);
+        m_host->CallFunction(L"Execute", dispParams);
     }
     catch (const std::exception&)
     {
@@ -200,13 +200,13 @@ bool CCmdScript::Execute()
     return true;
 }
 
-bool CCmdScript::IsEnabled()
+bool CCmdScript::IsEnabled() const
 {
-    DISPPARAMS dispparams = {0};
+    DISPPARAMS dispParams = {nullptr};
     _variant_t ret        = {0};
     try
     {
-        ret = m_host->CallFunction(L"IsEnabled", dispparams);
+        ret = m_host->CallFunction(L"IsEnabled", dispParams);
     }
     catch (const std::exception&)
     {
@@ -216,13 +216,13 @@ bool CCmdScript::IsEnabled()
     return false;
 }
 
-bool CCmdScript::IsChecked()
+bool CCmdScript::IsChecked() const
 {
-    DISPPARAMS dispparams = {0};
+    DISPPARAMS dispParams = {nullptr};
     _variant_t ret        = {0};
     try
     {
-        ret = m_host->CallFunction(L"IsChecked", dispparams);
+        ret = m_host->CallFunction(L"IsChecked", dispParams);
     }
     catch (const std::exception&)
     {
@@ -232,7 +232,7 @@ bool CCmdScript::IsChecked()
     return false;
 }
 
-IUIImagePtr CCmdScript::getIcon()
+IUIImagePtr CCmdScript::getIcon() const
 {
     return m_image;
 }
@@ -244,18 +244,18 @@ UINT CCmdScript::GetCmdId()
 
 void CCmdScript::ScintillaNotify(SCNotification* pScn)
 {
-    _bstr_t btext;
+    _bstr_t bText;
     if (pScn->text && pScn->length)
     {
         std::string text(pScn->text, pScn->length);
-        btext = text.c_str();
+        bText = text.c_str();
     }
-    DISPPARAMS dispparams = {0};
-    dispparams.cArgs      = 21;
+    DISPPARAMS dispParams = {nullptr};
+    dispParams.cArgs      = 21;
     VARIANT v[21];
     v[20].uintVal = pScn->nmhdr.code;
     v[20].vt      = VT_UINT;
-    v[19].intVal  = (int)pScn->position;
+    v[19].intVal  = static_cast<int>(pScn->position);
     v[19].vt      = VT_INT;
     v[18].intVal  = pScn->ch;
     v[18].vt      = VT_INT;
@@ -263,11 +263,11 @@ void CCmdScript::ScintillaNotify(SCNotification* pScn)
     v[17].vt      = VT_INT;
     v[16].intVal  = pScn->modificationType;
     v[16].vt      = VT_INT;
-    v[15].bstrVal = btext;
+    v[15].bstrVal = bText;
     v[15].vt      = VT_BSTR;
-    v[14].intVal  = (int)pScn->length;
+    v[14].intVal  = static_cast<int>(pScn->length);
     v[14].vt      = VT_INT;
-    v[13].intVal  = (int)pScn->linesAdded;
+    v[13].intVal  = static_cast<int>(pScn->linesAdded);
     v[13].vt      = VT_INT;
     v[12].intVal  = pScn->message;
     v[12].vt      = VT_INT;
@@ -275,7 +275,7 @@ void CCmdScript::ScintillaNotify(SCNotification* pScn)
     v[11].vt      = VT_UI8;
     v[10].ullVal  = pScn->lParam;
     v[10].vt      = VT_UI8;
-    v[9].intVal   = (int)pScn->line;
+    v[9].intVal   = static_cast<int>(pScn->line);
     v[9].vt       = VT_INT;
     v[8].intVal   = pScn->foldLevelNow;
     v[8].vt       = VT_INT;
@@ -291,34 +291,34 @@ void CCmdScript::ScintillaNotify(SCNotification* pScn)
     v[3].vt       = VT_INT;
     v[2].intVal   = pScn->token;
     v[2].vt       = VT_INT;
-    v[1].intVal   = (int)pScn->annotationLinesAdded;
+    v[1].intVal   = static_cast<int>(pScn->annotationLinesAdded);
     v[1].vt       = VT_INT;
     v[0].intVal   = pScn->updated;
     v[0].vt       = VT_INT;
 
-    dispparams.rgvarg = v;
+    dispParams.rgvarg = v;
     try
     {
-        m_host->CallFunction(L"ScintillaNotify", dispparams);
+        m_host->CallFunction(L"ScintillaNotify", dispParams);
     }
     catch (const std::exception&)
     {
     }
 }
 
-void CCmdScript::TabNotify(TBHDR* ptbhdr)
+void CCmdScript::TabNotify(TBHDR* ptbHdr)
 {
-    DISPPARAMS dispparams = {0};
-    dispparams.cArgs      = 2;
+    DISPPARAMS dispParams = {nullptr};
+    dispParams.cArgs      = 2;
     VARIANT v[2];
-    v[0].uintVal      = ptbhdr->hdr.code;
+    v[0].uintVal      = ptbHdr->hdr.code;
     v[0].vt           = VT_UINT;
-    v[1].intVal       = ptbhdr->tabOrigin;
+    v[1].intVal       = ptbHdr->tabOrigin;
     v[1].vt           = VT_INT;
-    dispparams.rgvarg = v;
+    dispParams.rgvarg = v;
     try
     {
-        m_host->CallFunction(L"TabNotify", dispparams);
+        m_host->CallFunction(L"TabNotify", dispParams);
     }
     catch (const std::exception&)
     {
@@ -327,10 +327,10 @@ void CCmdScript::TabNotify(TBHDR* ptbhdr)
 
 void CCmdScript::OnClose()
 {
-    DISPPARAMS dispparams = {0};
+    DISPPARAMS dispParams = {nullptr};
     try
     {
-        m_host->CallFunction(L"OnClose", dispparams);
+        m_host->CallFunction(L"OnClose", dispParams);
     }
     catch (const std::exception&)
     {
@@ -339,10 +339,10 @@ void CCmdScript::OnClose()
 
 void CCmdScript::BeforeLoad()
 {
-    DISPPARAMS dispparams = {0};
+    DISPPARAMS dispParams = {nullptr};
     try
     {
-        m_host->CallFunction(L"BeforeLoad", dispparams);
+        m_host->CallFunction(L"BeforeLoad", dispParams);
     }
     catch (const std::exception&)
     {
@@ -351,10 +351,10 @@ void CCmdScript::BeforeLoad()
 
 void CCmdScript::AfterInit()
 {
-    DISPPARAMS dispparams = {0};
+    DISPPARAMS dispParams = {nullptr};
     try
     {
-        m_host->CallFunction(L"AfterInit", dispparams);
+        m_host->CallFunction(L"AfterInit", dispParams);
     }
     catch (const std::exception&)
     {
@@ -363,15 +363,15 @@ void CCmdScript::AfterInit()
 
 void CCmdScript::OnDocumentClose(DocID id)
 {
-    DISPPARAMS dispparams = {0};
-    dispparams.cArgs      = 1;
+    DISPPARAMS dispParams = {nullptr};
+    dispParams.cArgs      = 1;
     VARIANT vI;
     vI.intVal         = id.GetValue();
     vI.vt             = VT_INT;
-    dispparams.rgvarg = &vI;
+    dispParams.rgvarg = &vI;
     try
     {
-        m_host->CallFunction(L"OnDocumentClose", dispparams);
+        m_host->CallFunction(L"OnDocumentClose", dispParams);
     }
     catch (const std::exception&)
     {
@@ -380,15 +380,15 @@ void CCmdScript::OnDocumentClose(DocID id)
 
 void CCmdScript::OnDocumentOpen(DocID id)
 {
-    DISPPARAMS dispparams = {0};
-    dispparams.cArgs      = 1;
+    DISPPARAMS dispParams = {nullptr};
+    dispParams.cArgs      = 1;
     VARIANT vI;
     vI.intVal         = id.GetValue();
     vI.vt             = VT_INT;
-    dispparams.rgvarg = &vI;
+    dispParams.rgvarg = &vI;
     try
     {
-        m_host->CallFunction(L"OnDocumentOpen", dispparams);
+        m_host->CallFunction(L"OnDocumentOpen", dispParams);
     }
     catch (const std::exception&)
     {
@@ -397,81 +397,81 @@ void CCmdScript::OnDocumentOpen(DocID id)
 
 void CCmdScript::OnDocumentSave(DocID id, bool bSaveAs)
 {
-    DISPPARAMS dispparams = {0};
-    dispparams.cArgs      = 2;
+    DISPPARAMS dispParams = {nullptr};
+    dispParams.cArgs      = 2;
     VARIANT v[2];
     v[0].intVal       = id.GetValue();
     v[0].vt           = VT_INT;
     v[1].boolVal      = bSaveAs ? VARIANT_TRUE : VARIANT_FALSE;
     v[1].vt           = VT_BOOL;
-    dispparams.rgvarg = v;
+    dispParams.rgvarg = v;
     try
     {
-        m_host->CallFunction(L"OnDocumentSave", dispparams);
+        m_host->CallFunction(L"OnDocumentSave", dispParams);
     }
     catch (const std::exception&)
     {
     }
 }
 
-HRESULT CCmdScript::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdScript::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
-        DISPPARAMS dispparams = {0};
+        DISPPARAMS dispParams = {nullptr};
         try
         {
-            _variant_t ret = m_host->CallFunction(L"IsEnabled", dispparams);
+            _variant_t ret = m_host->CallFunction(L"IsEnabled", dispParams);
             if (ret.vt == VT_BOOL)
-                return UIInitPropertyFromBoolean(UI_PKEY_Enabled, ret.boolVal == VARIANT_TRUE, ppropvarNewValue);
+                return UIInitPropertyFromBoolean(UI_PKEY_Enabled, ret.boolVal == VARIANT_TRUE, pPropVarNewValue);
         }
         catch (const std::exception&)
         {
         }
 
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, true, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, true, pPropVarNewValue);
     }
     else if (UI_PKEY_BooleanValue == key)
     {
-        DISPPARAMS dispparams = {0};
+        DISPPARAMS dispParams = {nullptr};
         try
         {
-            _variant_t ret = m_host->CallFunction(L"IsChecked", dispparams);
+            _variant_t ret = m_host->CallFunction(L"IsChecked", dispParams);
             if (ret.vt == VT_BOOL)
-                return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ret.boolVal == VARIANT_TRUE, ppropvarNewValue);
+                return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ret.boolVal == VARIANT_TRUE, pPropVarNewValue);
         }
         catch (const std::exception&)
         {
         }
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, false, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, false, pPropVarNewValue);
     }
     else if (UI_PKEY_Label == key)
     {
-        return UIInitPropertyFromString(UI_PKEY_Label, m_name.c_str(), ppropvarNewValue);
+        return UIInitPropertyFromString(UI_PKEY_Label, m_name.c_str(), pPropVarNewValue);
     }
     else if (UI_PKEY_LabelDescription == key)
     {
-        return UIInitPropertyFromString(UI_PKEY_LabelDescription, m_name.c_str(), ppropvarNewValue);
+        return UIInitPropertyFromString(UI_PKEY_LabelDescription, m_name.c_str(), pPropVarNewValue);
     }
     else if (UI_PKEY_TooltipDescription == key)
     {
-        return UIInitPropertyFromString(UI_PKEY_TooltipDescription, m_description.c_str(), ppropvarNewValue);
+        return UIInitPropertyFromString(UI_PKEY_TooltipDescription, m_description.c_str(), pPropVarNewValue);
     }
     else if (UI_PKEY_LargeImage == key)
     {
-        return UIInitPropertyFromImage(UI_PKEY_LargeImage, m_image, ppropvarNewValue);
+        return UIInitPropertyFromImage(UI_PKEY_LargeImage, m_image, pPropVarNewValue);
     }
     else if (UI_PKEY_SmallImage == key)
     {
-        return UIInitPropertyFromImage(UI_PKEY_SmallImage, m_image, ppropvarNewValue);
+        return UIInitPropertyFromImage(UI_PKEY_SmallImage, m_image, pPropVarNewValue);
     }
     else if (UI_PKEY_LargeHighContrastImage == key)
     {
-        return UIInitPropertyFromImage(UI_PKEY_LargeHighContrastImage, m_image, ppropvarNewValue);
+        return UIInitPropertyFromImage(UI_PKEY_LargeHighContrastImage, m_image, pPropVarNewValue);
     }
     else if (UI_PKEY_SmallHighContrastImage == key)
     {
-        return UIInitPropertyFromImage(UI_PKEY_SmallHighContrastImage, m_image, ppropvarNewValue);
+        return UIInitPropertyFromImage(UI_PKEY_SmallHighContrastImage, m_image, pPropVarNewValue);
     }
 
     return E_NOTIMPL;
@@ -479,15 +479,15 @@ HRESULT CCmdScript::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PR
 
 void CCmdScript::OnTimer(UINT id)
 {
-    DISPPARAMS dispparams = {0};
-    dispparams.cArgs      = 1;
+    DISPPARAMS dispParams = {nullptr};
+    dispParams.cArgs      = 1;
     VARIANT vI;
     vI.uintVal        = id;
     vI.vt             = VT_UINT;
-    dispparams.rgvarg = &vI;
+    dispParams.rgvarg = &vI;
     try
     {
-        m_host->CallFunction(L"OnTimer", dispparams);
+        m_host->CallFunction(L"OnTimer", dispParams);
     }
     catch (const std::exception&)
     {
@@ -496,15 +496,15 @@ void CCmdScript::OnTimer(UINT id)
 
 void CCmdScript::OnThemeChanged(bool bDark)
 {
-    DISPPARAMS dispparams = {0};
-    dispparams.cArgs      = 1;
+    DISPPARAMS dispParams = {nullptr};
+    dispParams.cArgs      = 1;
     VARIANT vI;
     vI.boolVal        = bDark ? VARIANT_TRUE : VARIANT_FALSE;
     vI.vt             = VT_BOOL;
-    dispparams.rgvarg = &vI;
+    dispParams.rgvarg = &vI;
     try
     {
-        m_host->CallFunction(L"OnThemeChanged", dispparams);
+        m_host->CallFunction(L"OnThemeChanged", dispParams);
     }
     catch (const std::exception&)
     {
@@ -513,10 +513,10 @@ void CCmdScript::OnThemeChanged(bool bDark)
 
 void CCmdScript::OnLangChanged()
 {
-    DISPPARAMS dispparams = {0};
+    DISPPARAMS dispParams = {nullptr};
     try
     {
-        m_host->CallFunction(L"OnLexerChanged", dispparams);
+        m_host->CallFunction(L"OnLexerChanged", dispParams);
     }
     catch (const std::exception&)
     {

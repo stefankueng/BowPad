@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
 bool CCmdOpen::Execute()
 {
-    PreserveChdir keepCWD;
+    PreserveChdir keepCwd;
 
     IFileOpenDialogPtr pfd;
 
@@ -64,7 +64,7 @@ bool CCmdOpen::Execute()
         const auto& doc = GetActiveDocument();
         if (!doc.m_path.empty())
         {
-            auto folder = CPathUtils::GetParentDirectory(doc.m_path);
+            auto          folder = CPathUtils::GetParentDirectory(doc.m_path);
             IShellItemPtr psiDefFolder;
             hr = SHCreateItemFromParsingName(folder.c_str(), nullptr, IID_PPV_ARGS(&psiDefFolder));
             if (!CAppUtils::FailedShowMessage(hr))
@@ -79,7 +79,7 @@ bool CCmdOpen::Execute()
 
     // Show the open file dialog, not much we can do if that doesn't work.
     hr = pfd->Show(GetHwnd());
-    if(hr == HRESULT_FROM_WIN32(ERROR_CANCELLED)) // Expected error
+    if (hr == HRESULT_FROM_WIN32(ERROR_CANCELLED)) // Expected error
         return false;
     else
     {
@@ -97,7 +97,7 @@ bool CCmdOpen::Execute()
     // We could make it an all or nothing deal but we have chosen not to.
 
     DWORD count = 0;
-    hr = psiaResults->GetCount(&count);
+    hr          = psiaResults->GetCount(&count);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
     std::vector<std::wstring> paths;
@@ -109,7 +109,7 @@ bool CCmdOpen::Execute()
         if (!CAppUtils::FailedShowMessage(hr))
         {
             PWSTR pszPath = nullptr;
-            hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
+            hr            = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
             if (!CAppUtils::FailedShowMessage(hr))
             {
                 paths.push_back(pszPath);
@@ -117,8 +117,7 @@ bool CCmdOpen::Execute()
             }
         }
     }
-    std::sort(paths.begin(), paths.end(), [](const auto& lhs, const auto& rhs)
-    {
+    std::sort(paths.begin(), paths.end(), [](const auto& lhs, const auto& rhs) {
         return CPathUtils::PathCompare(lhs, rhs) < 0;
     });
     // treat opening a single file differently so we can pass OpenFlags.
@@ -137,12 +136,12 @@ bool CCmdSave::Execute()
     return SaveCurrentTab();
 }
 
-void CCmdSave::ScintillaNotify( SCNotification * pScn )
+void CCmdSave::ScintillaNotify(SCNotification* pScn)
 {
     switch (pScn->nmhdr.code)
     {
-    case SCN_SAVEPOINTREACHED:
-    case SCN_SAVEPOINTLEFT:
+        case SCN_SAVEPOINTREACHED:
+        case SCN_SAVEPOINTLEFT:
         {
             InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
         }
@@ -150,24 +149,24 @@ void CCmdSave::ScintillaNotify( SCNotification * pScn )
     }
 }
 
-void CCmdSave::TabNotify(TBHDR * ptbhdr)
+void CCmdSave::TabNotify(TBHDR* ptbHdr)
 {
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 }
 
-HRESULT CCmdSave::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdSave::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
         if (HasActiveDocument())
         {
             const auto& doc = GetActiveDocument();
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, doc.m_bIsDirty||doc.m_bNeedsSaving, ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, doc.m_bIsDirty || doc.m_bNeedsSaving, pPropVarNewValue);
         }
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
@@ -186,12 +185,12 @@ bool CCmdSaveAll::Execute()
     return true;
 }
 
-void CCmdSaveAll::ScintillaNotify( SCNotification * pScn )
+void CCmdSaveAll::ScintillaNotify(SCNotification* pScn)
 {
     switch (pScn->nmhdr.code)
     {
-    case SCN_SAVEPOINTREACHED:
-    case SCN_SAVEPOINTLEFT:
+        case SCN_SAVEPOINTREACHED:
+        case SCN_SAVEPOINTLEFT:
         {
             InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
         }
@@ -199,77 +198,76 @@ void CCmdSaveAll::ScintillaNotify( SCNotification * pScn )
     }
 }
 
-void CCmdSaveAll::TabNotify(TBHDR * ptbhdr)
+void CCmdSaveAll::TabNotify(TBHDR* ptbHdr)
 {
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 }
 
-HRESULT CCmdSaveAll::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdSaveAll::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
-        auto docCount = GetDocumentCount();
-        int dirtycount = 0;
+        auto docCount   = GetDocumentCount();
+        int  dirtyCount = 0;
         for (decltype(docCount) i = 0; i < docCount; ++i)
         {
             const auto& doc = GetDocumentFromID(GetDocIDFromTabIndex(i));
-            if (doc.m_bIsDirty||doc.m_bNeedsSaving)
-                dirtycount++;
+            if (doc.m_bIsDirty || doc.m_bNeedsSaving)
+                dirtyCount++;
         }
 
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, dirtycount>0, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, dirtyCount > 0, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
-
 
 bool CCmdSaveAs::Execute()
 {
     return SaveCurrentTab(true);
 }
 
-HRESULT CCmdReload::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdReload::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
         if (HasActiveDocument())
         {
             const auto& doc = GetActiveDocument();
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), pPropVarNewValue);
         }
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
 
-void CCmdReload::TabNotify(TBHDR * ptbhdr)
+void CCmdReload::TabNotify(TBHDR* ptbHdr)
 {
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 }
 
-HRESULT CCmdFileDelete::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdFileDelete::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
         if (HasActiveDocument())
         {
             const auto& doc = GetActiveDocument();
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !doc.m_path.empty(), pPropVarNewValue);
         }
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
 
-void CCmdFileDelete::TabNotify(TBHDR * ptbhdr)
+void CCmdFileDelete::TabNotify(TBHDR* ptbHdr)
 {
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
@@ -283,33 +281,33 @@ bool CCmdFileDelete::Execute()
         if (!doc.m_path.empty())
         {
             // ask first
-            ResString rTitle(g_hRes, IDS_FILEDELETE_TITLE);
-            ResString rQuestion(g_hRes, IDS_FILEDELETE_ASK);
-            ResString rDelete(g_hRes, IDS_FILEDELETE_DEL);
-            ResString rCancel(g_hRes, IDS_FILEDELETE_CANCEL);
-            std::wstring filename = CPathUtils::GetFileName(doc.m_path);
+            ResString    rTitle(g_hRes, IDS_FILEDELETE_TITLE);
+            ResString    rQuestion(g_hRes, IDS_FILEDELETE_ASK);
+            ResString    rDelete(g_hRes, IDS_FILEDELETE_DEL);
+            ResString    rCancel(g_hRes, IDS_FILEDELETE_CANCEL);
+            std::wstring filename  = CPathUtils::GetFileName(doc.m_path);
             std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str());
 
-            TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+            TASKDIALOGCONFIG  tdc = {sizeof(TASKDIALOGCONFIG)};
             TASKDIALOG_BUTTON aCustomButtons[2];
-            aCustomButtons[0].nButtonID = 100;
+            aCustomButtons[0].nButtonID     = 100;
             aCustomButtons[0].pszButtonText = rDelete;
-            aCustomButtons[1].nButtonID = 101;
+            aCustomButtons[1].nButtonID     = 101;
             aCustomButtons[1].pszButtonText = rCancel;
 
-            tdc.hwndParent = GetHwnd();
-            tdc.hInstance = g_hRes;
-            tdc.dwFlags = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-            tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
-            tdc.pButtons = aCustomButtons;
-            tdc.cButtons = _countof(aCustomButtons);
-            tdc.pszWindowTitle = MAKEINTRESOURCE(IDS_APP_TITLE);
-            tdc.pszMainIcon = TD_WARNING_ICON;
+            tdc.hwndParent         = GetHwnd();
+            tdc.hInstance          = g_hRes;
+            tdc.dwFlags            = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+            tdc.dwCommonButtons    = TDCBF_CANCEL_BUTTON;
+            tdc.pButtons           = aCustomButtons;
+            tdc.cButtons           = _countof(aCustomButtons);
+            tdc.pszWindowTitle     = MAKEINTRESOURCE(IDS_APP_TITLE);
+            tdc.pszMainIcon        = TD_WARNING_ICON;
             tdc.pszMainInstruction = rTitle;
-            tdc.pszContent = sQuestion.c_str();
-            tdc.nDefaultButton = 101;
-            int nClickedBtn = 0;
-            HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
+            tdc.pszContent         = sQuestion.c_str();
+            tdc.nDefaultButton     = 101;
+            int     nClickedBtn    = 0;
+            HRESULT hr             = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
 
             if (!CAppUtils::FailedShowMessage(hr))
             {
@@ -322,7 +320,7 @@ bool CCmdFileDelete::Execute()
                         return false;
 
                     IFileOperationPtr pfo = nullptr;
-                    hr = pfo.CreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL);
+                    hr                    = pfo.CreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL);
 
                     if (!CAppUtils::FailedShowMessage(hr))
                     {
@@ -336,7 +334,7 @@ bool CCmdFileDelete::Execute()
                         {
                             // Create IShellItem instance associated to file to delete
                             IShellItemPtr psiFileToDelete = nullptr;
-                            hr = SHCreateItemFromParsingName(path.c_str(), nullptr, IID_PPV_ARGS(&psiFileToDelete));
+                            hr                            = SHCreateItemFromParsingName(path.c_str(), nullptr, IID_PPV_ARGS(&psiFileToDelete));
 
                             if (!CAppUtils::FailedShowMessage(hr))
                             {
@@ -364,31 +362,31 @@ bool CCmdFileDelete::Execute()
 
 bool CCmdSaveAuto::Execute()
 {
-    int autosave = (int)CIniSettings::Instance().GetInt64(L"View", L"autosave", 0);
-    CIniSettings::Instance().SetInt64(L"View", L"autosave", autosave ? 0 : 1);
+    int autoSave = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"autosave", 0));
+    CIniSettings::Instance().SetInt64(L"View", L"autosave", autoSave ? 0 : 1);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
 }
 
-HRESULT CCmdSaveAuto::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdSaveAuto::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        int autosave = (int)CIniSettings::Instance().GetInt64(L"View", L"autosave", 0);
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, autosave != 0, ppropvarNewValue);
+        int autoSave = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"autosave", 0));
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, autoSave != 0, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
 
-void CCmdSaveAuto::TabNotify(TBHDR * ptbhdr)
+void CCmdSaveAuto::TabNotify(TBHDR* ptbHdr)
 {
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         Save();
     }
 }
 
-void CCmdSaveAuto::ScintillaNotify(SCNotification * pScn)
+void CCmdSaveAuto::ScintillaNotify(SCNotification* pScn)
 {
     if (pScn->nmhdr.code == SCN_FOCUSOUT)
     {
@@ -396,10 +394,10 @@ void CCmdSaveAuto::ScintillaNotify(SCNotification * pScn)
     }
 }
 
-void CCmdSaveAuto::Save()
+void CCmdSaveAuto::Save() const
 {
-    int autosave = (int)CIniSettings::Instance().GetInt64(L"View", L"autosave", 0);
-    if (autosave)
+    int autoSave = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"autosave", 0));
+    if (autoSave)
     {
         const auto& doc = GetActiveDocument();
         if ((doc.m_bIsDirty || doc.m_bNeedsSaving) && !doc.m_path.empty())

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,13 +17,8 @@
 #include "stdafx.h"
 #include "CmdDefaultEncoding.h"
 #include "BowPad.h"
-#include "ScintillaWnd.h"
-#include "UnicodeUtils.h"
 #include "StringUtils.h"
 #include "Theme.h"
-
-static std::string sFindString;
-
 
 LRESULT CDefaultEncodingDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -35,10 +30,10 @@ LRESULT CDefaultEncodingDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPA
             InitDialog(hwndDlg, IDI_BOWPAD);
             CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
 
-            UINT cp = (UINT)CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP());
-            bool bom = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
-            bool preferutf8 = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingutf8overansi", 0) != 0;
-            EOLFormat eol = (EOLFormat)CIniSettings::Instance().GetInt64(L"Defaults", L"lineendingnew", (int)EOLFormat::WIN_FORMAT);
+            UINT      cp         = static_cast<UINT>(CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP()));
+            bool      bom        = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
+            bool      preferUtf8 = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingutf8overansi", 0) != 0;
+            EOLFormat eol        = static_cast<EOLFormat>(CIniSettings::Instance().GetInt64(L"Defaults", L"lineendingnew", static_cast<int>(EOLFormat::Win_Format)));
 
             if (cp == GetACP())
                 CheckRadioButton(*this, IDC_R_ANSI, IDC_R_UTF32BE, IDC_R_ANSI);
@@ -60,18 +55,18 @@ LRESULT CDefaultEncodingDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPA
             else
                 CheckRadioButton(*this, IDC_R_ANSI, IDC_R_UTF32BE, IDC_R_ANSI);
 
-            CheckDlgButton(*this, IDC_LOADASUTF8, preferutf8 ? BST_CHECKED : BST_UNCHECKED);
+            CheckDlgButton(*this, IDC_LOADASUTF8, preferUtf8 ? BST_CHECKED : BST_UNCHECKED);
 
             switch (eol)
             {
                 default:
-            case EOLFormat::WIN_FORMAT:
+                case EOLFormat::Win_Format:
                     CheckRadioButton(*this, IDC_CRLF_RADIO, IDC_CR_RADIO, IDC_CRLF_RADIO);
                     break;
-            case EOLFormat::MAC_FORMAT:
+                case EOLFormat::Mac_Format:
                     CheckRadioButton(*this, IDC_CRLF_RADIO, IDC_CR_RADIO, IDC_CR_RADIO);
                     break;
-            case EOLFormat::UNIX_FORMAT:
+                case EOLFormat::Unix_Format:
                     CheckRadioButton(*this, IDC_CRLF_RADIO, IDC_CR_RADIO, IDC_LF_RADIO);
                     break;
             }
@@ -82,7 +77,6 @@ LRESULT CDefaultEncodingDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPA
         default:
             return FALSE;
     }
-    return FALSE;
 }
 
 LRESULT CDefaultEncodingDlg::DoCommand(int id, int /*msg*/)
@@ -94,9 +88,9 @@ LRESULT CDefaultEncodingDlg::DoCommand(int id, int /*msg*/)
             break;
         case IDOK:
         {
-            UINT cp = GetACP();
-            bool bom = false;
-            bool preferutf8 = IsDlgButtonChecked(*this, IDC_LOADASUTF8) == BST_CHECKED;
+            UINT cp         = GetACP();
+            bool bom        = false;
+            bool preferUtf8 = IsDlgButtonChecked(*this, IDC_LOADASUTF8) == BST_CHECKED;
 
             if (IsDlgButtonChecked(*this, IDC_R_ANSI))
                 cp = GetACP();
@@ -104,7 +98,7 @@ LRESULT CDefaultEncodingDlg::DoCommand(int id, int /*msg*/)
                 cp = CP_UTF8;
             else if (IsDlgButtonChecked(*this, IDC_R_UTF8BOM))
             {
-                cp = CP_UTF8;
+                cp  = CP_UTF8;
                 bom = true;
             }
             else if (IsDlgButtonChecked(*this, IDC_R_UTF16LE))
@@ -117,15 +111,15 @@ LRESULT CDefaultEncodingDlg::DoCommand(int id, int /*msg*/)
                 cp = 12001;
 
             if (IsDlgButtonChecked(*this, IDC_CRLF_RADIO))
-                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", (int)EOLFormat::WIN_FORMAT);
+                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", static_cast<int>(EOLFormat::Win_Format));
             if (IsDlgButtonChecked(*this, IDC_CR_RADIO))
-                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", (int)EOLFormat::MAC_FORMAT);
+                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", static_cast<int>(EOLFormat::Mac_Format));
             if (IsDlgButtonChecked(*this, IDC_LF_RADIO))
-                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", (int)EOLFormat::UNIX_FORMAT);
+                CIniSettings::Instance().SetInt64(L"Defaults", L"lineendingnew", static_cast<int>(EOLFormat::Unix_Format));
 
             CIniSettings::Instance().SetInt64(L"Defaults", L"encodingnew", cp);
             CIniSettings::Instance().SetInt64(L"Defaults", L"encodingnewbom", bom);
-            CIniSettings::Instance().SetInt64(L"Defaults", L"encodingutf8overansi", preferutf8);
+            CIniSettings::Instance().SetInt64(L"Defaults", L"encodingutf8overansi", preferUtf8);
 
             EndDialog(*this, id);
         }
@@ -140,4 +134,3 @@ bool CCmdDefaultEncoding::Execute()
 
     return true;
 }
-

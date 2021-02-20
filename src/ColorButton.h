@@ -1,6 +1,6 @@
 // This file is part of BowPad.
 //
-// Copyright (C) 2013 - 2016 Stefan Kueng
+// Copyright (C) 2013-2016, 2021 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ private:
     }
     static LRESULT CALLBACK _ColorButtonProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
     static UINT_PTR CALLBACK CCHookProc(
-        _In_ HWND   hdlg,
+        _In_ HWND   hDlg,
         _In_ UINT   uiMsg,
         _In_ WPARAM wParam,
         _In_ LPARAM lParam

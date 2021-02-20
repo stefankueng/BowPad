@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016, 2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,14 +29,14 @@ namespace
 std::vector<std::wstring> langs;
 }
 
-HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue )
+HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue)
 {
     HRESULT hr = E_FAIL;
 
-    if(key == UI_PKEY_Categories)
+    if (key == UI_PKEY_Categories)
     {
         IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+        hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
         pCollection->Clear();
@@ -53,7 +53,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
         for (wchar_t i = 'A'; i <= 'Z'; ++i)
         {
             // Create a property set for the category.
-            CPropertySet *pCat;
+            CPropertySet* pCat;
             hr = CPropertySet::CreateInstance(&pCat);
             if (FAILED(hr))
             {
@@ -62,7 +62,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
 
             wchar_t sName[2] = {i, L'\0'};
             // Initialize the property set with the label that was just loaded and a category id of 0.
-            pCat->InitializeCategoryProperties(sName, i-'A');
+            pCat->InitializeCategoryProperties(sName, i - 'A');
             pCollection->Add(pCat);
             pCat->Release();
         }
@@ -70,7 +70,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
     else if (key == UI_PKEY_ItemsSource)
     {
         IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+        hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
 
@@ -101,14 +101,14 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
     {
         if (HasActiveDocument())
         {
-            const auto& doc = GetActiveDocument();
-            auto docLang = CUnicodeUtils::StdGetUnicode(doc.GetLanguage());
-            hr = S_FALSE;
+            const auto& doc     = GetActiveDocument();
+            auto        docLang = CUnicodeUtils::StdGetUnicode(doc.GetLanguage());
+            hr                  = S_FALSE;
             for (size_t i = 0; i < langs.size(); ++i)
             {
                 if (langs[i] == docLang)
                 {
-                    hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
+                    hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, static_cast<UINT>(i), pPropVarNewValue);
                     break;
                 }
             }
@@ -117,21 +117,21 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty( REFPROPERTYKEY key, cons
     return hr;
 }
 
-HRESULT CCmdCodeStyle::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/ )
+HRESULT CCmdCodeStyle::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
     HRESULT hr = E_FAIL;
 
     if (verb == UI_EXECUTIONVERB_EXECUTE)
     {
-        if ( key && *key == UI_PKEY_SelectedItem)
+        if (key && *key == UI_PKEY_SelectedItem)
         {
             UINT selected;
-            hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
+            hr = UIPropertyToUInt32(*key, *pPropVarValue, &selected);
             if (HasActiveDocument())
             {
                 InvalidateUICommand(cmdFunctions, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
-                auto& doc = GetModActiveDocument();
-                auto lang = CUnicodeUtils::StdGetUTF8(langs[selected]);
+                auto& doc  = GetModActiveDocument();
+                auto  lang = CUnicodeUtils::StdGetUTF8(langs[selected]);
                 SetupLexerForLang(lang);
                 CLexStyles::Instance().SetLangForPath(doc.m_path, lang);
                 // set the language last, so that the OnLanguageChanged events happen last:
@@ -146,9 +146,9 @@ HRESULT CCmdCodeStyle::IUICommandHandlerExecute( UI_EXECUTIONVERB verb, const PR
     return hr;
 }
 
-void CCmdCodeStyle::TabNotify( TBHDR * ptbhdr )
+void CCmdCodeStyle::TabNotify(TBHDR* ptbHdr)
 {
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
@@ -167,4 +167,3 @@ void CCmdCodeStyle::OnPluginNotify(UINT cmdId, const std::wstring& /*pluginName*
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Categories);
     }
 }
-

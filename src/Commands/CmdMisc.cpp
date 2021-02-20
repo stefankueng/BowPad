@@ -20,12 +20,11 @@
 #include "BowPad.h"
 #include "AppUtils.h"
 #include "Theme.h"
-#include "SysInfo.h"
 
-CCmdToggleTheme::CCmdToggleTheme(void * obj)
+CCmdToggleTheme::CCmdToggleTheme(void* obj)
     : ICommand(obj)
 {
-    int dark = (int)CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0);
+    int dark = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0));
     if (dark)
     {
         CTheme::Instance().SetDarkTheme(dark != 0);
@@ -47,11 +46,11 @@ void CCmdToggleTheme::AfterInit()
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-HRESULT CCmdToggleTheme::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdToggleTheme::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CTheme::Instance().IsDarkTheme(), ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CTheme::Instance().IsDarkTheme(), pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
@@ -61,7 +60,7 @@ bool CCmdConfigShortcuts::Execute()
     std::wstring userFile = CAppUtils::GetDataPath() + L"\\shortcuts.ini";
     if (!PathFileExists(userFile.c_str()))
     {
-        DWORD resLen = 0;
+        DWORD       resLen    = 0;
         const char* lpResLock = CAppUtils::GetResourceData(L"config", IDR_SHORTCUTS, resLen);
         if (lpResLock)
         {
@@ -75,7 +74,7 @@ bool CCmdConfigShortcuts::Execute()
                     if (hFile != INVALID_HANDLE_VALUE)
                     {
                         DWORD dwWritten = 0;
-                        WriteFile(hFile, lpStart, (DWORD)(lpEnd - lpStart), &dwWritten, nullptr);
+                        WriteFile(hFile, lpStart, static_cast<DWORD>(lpEnd - lpStart), &dwWritten, nullptr);
                         CloseHandle(hFile);
                     }
                 }
@@ -85,8 +84,8 @@ bool CCmdConfigShortcuts::Execute()
     return OpenFile(userFile.c_str(), 0) >= 0;
 }
 
-
-CCmdAutoBraces::CCmdAutoBraces(void * obj) : ICommand(obj)
+CCmdAutoBraces::CCmdAutoBraces(void* obj)
+    : ICommand(obj)
 {
 }
 
@@ -102,16 +101,17 @@ void CCmdAutoBraces::AfterInit()
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-HRESULT CCmdAutoBraces::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdAutoBraces::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1) != 0, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1) != 0, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
 
-CCmdViewFileTree::CCmdViewFileTree(void * obj) : ICommand(obj)
+CCmdViewFileTree::CCmdViewFileTree(void* obj)
+    : ICommand(obj)
 {
 }
 
@@ -126,20 +126,20 @@ void CCmdViewFileTree::AfterInit()
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-HRESULT CCmdViewFileTree::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdViewFileTree::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, IsFileTreeShown(), ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, IsFileTreeShown(), pPropVarNewValue);
     }
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, true, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, true, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
 
-CCmdWriteProtect::CCmdWriteProtect(void * obj)
+CCmdWriteProtect::CCmdWriteProtect(void* obj)
     : ICommand(obj)
 {
 }
@@ -149,7 +149,7 @@ bool CCmdWriteProtect::Execute()
     if (!HasActiveDocument())
         return false;
 
-    auto& doc = GetModActiveDocument();
+    auto& doc               = GetModActiveDocument();
     doc.m_bIsWriteProtected = !(doc.m_bIsWriteProtected || doc.m_bIsReadonly);
     if (!doc.m_bIsWriteProtected && doc.m_bIsReadonly)
         doc.m_bIsReadonly = false;
@@ -165,7 +165,7 @@ void CCmdWriteProtect::AfterInit()
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
 }
 
-HRESULT CCmdWriteProtect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdWriteProtect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
@@ -175,7 +175,7 @@ HRESULT CCmdWriteProtect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
             const auto& doc = GetActiveDocument();
             bWriteProtected = doc.m_bIsReadonly || doc.m_bIsWriteProtected;
         }
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, bWriteProtected, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, bWriteProtected, pPropVarNewValue);
     }
 
     if (UI_PKEY_Enabled == key)
@@ -184,25 +184,25 @@ HRESULT CCmdWriteProtect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
         if (HasActiveDocument())
         {
             const auto& doc = GetActiveDocument();
-            bHasPath = !doc.m_path.empty();
+            bHasPath        = !doc.m_path.empty();
         }
 
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, bHasPath, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, bHasPath, pPropVarNewValue);
     }
 
     return E_NOTIMPL;
 }
 
-void CCmdWriteProtect::TabNotify(TBHDR * ptbhdr)
+void CCmdWriteProtect::TabNotify(TBHDR* ptbHdr)
 {
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 }
 
-void CCmdWriteProtect::ScintillaNotify(SCNotification * pScn)
+void CCmdWriteProtect::ScintillaNotify(SCNotification* pScn)
 {
     if (pScn->nmhdr.code == SCN_SAVEPOINTREACHED)
     {
@@ -228,11 +228,11 @@ void CCmdAutoComplete::AfterInit()
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-HRESULT CCmdAutoComplete::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT*, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdAutoComplete::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT*, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) != 0, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) != 0, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }

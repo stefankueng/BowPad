@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017, 2020 Stefan Kueng
+// Copyright (C) 2014-2017, 2020-2021 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,15 +17,13 @@
 #include "stdafx.h"
 #include "CmdPlugins.h"
 #include "PropertySet.h"
-#include "BowPad.h"
 #include "StringUtils.h"
 #include "AppUtils.h"
-#include "ResString.h"
 #include "CommandHandler.h"
 #include "CmdScripts.h"
 
 
-HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue)
 {
     HRESULT hr = E_FAIL;
 
@@ -34,17 +32,17 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
 
     if (key == UI_PKEY_SelectedItem)
     {
-        return UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)UI_COLLECTION_INVALIDINDEX, ppropvarNewValue);
+        return UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, static_cast<UINT>(UI_COLLECTION_INVALIDINDEX), pPropVarNewValue);
     }
     if (key == UI_PKEY_Enabled)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, true, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, true, pPropVarNewValue);
     }
 
     if (key == UI_PKEY_ItemsSource)
     {
         IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+        hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (FAILED(hr))
             return hr;
 
@@ -80,7 +78,7 @@ HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
     return hr;
 }
 
-HRESULT CCmdPlugins::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
+HRESULT CCmdPlugins::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
     HRESULT hr = E_FAIL;
 
@@ -89,14 +87,14 @@ HRESULT CCmdPlugins::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPE
         if (key && *key == UI_PKEY_SelectedItem)
         {
             UINT selected;
-            hr                  = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
+            hr                  = UIPropertyToUInt32(*key, *pPropVarValue, &selected);
             UINT        count   = 0;
             const auto& plugins = CCommandHandler::Instance().GetPluginMap();
-            for (const auto& p : plugins)
+            for (const auto& [id, name] : plugins)
             {
                 if (count == selected)
                 {
-                    SendMessage(GetHwnd(), WM_COMMAND, MAKEWPARAM(p.first, 1), 0);
+                    SendMessage(GetHwnd(), WM_COMMAND, MAKEWPARAM(id, 1), 0);
                     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
                     InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);
                     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);

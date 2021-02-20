@@ -33,12 +33,13 @@ public:
 
     void InitializeCategoryProperties(PCWSTR label, int categoryId);
 
-    STDMETHOD(GetValue) (REFPROPERTYKEY key, PROPVARIANT* ppropvar);
+    STDMETHOD(GetValue)
+    (REFPROPERTYKEY key, PROPVARIANT* ppropvar) override;
 
     // IUnknown
-    IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv);
-    IFACEMETHODIMP_(ULONG) AddRef();
-    IFACEMETHODIMP_(ULONG) Release();
+    IFACEMETHODIMP QueryInterface(REFIID iid, void** ppv) override;
+    IFACEMETHODIMP_(ULONG) AddRef() override;
+    IFACEMETHODIMP_(ULONG) Release() override;
 
     const std::wstring& GetLabel() const
     {
@@ -48,7 +49,7 @@ public:
 private:
     CPropertySet()
         : m_categoryId(UI_COLLECTION_INVALIDINDEX)
-        , m_pimgItem(nullptr)
+        , m_pImgItem(nullptr)
         , m_commandId(-1)
         , m_commandType(UI_COMMANDTYPE_UNKNOWN)
         , m_cRef(1)
@@ -62,7 +63,7 @@ private:
 
     WCHAR          m_wszLabel[MAX_RESOURCE_LENGTH]; // Used for items and categories.
     int            m_categoryId;                    // Used for items, categories, and commands.
-    IUIImagePtr    m_pimgItem;                      // Used for items only.
+    IUIImagePtr    m_pImgItem;                      // Used for items only.
     int            m_commandId;                     // Used for commands only.
     UI_COMMANDTYPE m_commandType;                   // Used for commands only.
 

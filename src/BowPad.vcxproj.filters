@@ -105,9 +105,6 @@
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
-    <ClInclude Include="..\ext\sktoolslib\codecvt.h">
-      <Filter>sktoolslib</Filter>
-    </ClInclude>
     <ClInclude Include="..\ext\sktoolslib\StringUtils.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
@@ -453,9 +450,6 @@
       <Filter>sktoolslib</Filter>
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\UnicodeUtils.cpp">
-      <Filter>sktoolslib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ext\sktoolslib\codecvt.cpp">
       <Filter>sktoolslib</Filter>
     </ClCompile>
     <ClCompile Include="..\ext\sktoolslib\StringUtils.cpp">

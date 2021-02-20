@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@
 #pragma comment(lib, "Shell32.lib")
 #pragma comment(lib, "DbgHelp.lib")
 
-std::wstring CAppUtils::updatefilename;
-std::wstring CAppUtils::updateurl;
+std::wstring CAppUtils::m_updateFilename;
+std::wstring CAppUtils::m_updateUrl;
 
 CAppUtils::CAppUtils()
 {
@@ -57,22 +57,22 @@ CAppUtils::~CAppUtils()
 
 std::wstring CAppUtils::GetProgramFilesX86Folder()
 {
-    std::wstring programfiles;
+    std::wstring programFiles;
     PWSTR p = nullptr;
     HRESULT hr = SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, nullptr, &p);
     if (SUCCEEDED(hr))
     {
-        programfiles = p;
+        programFiles = p;
         CoTaskMemFree(p);
     }
-    return programfiles;
+    return programFiles;
 }
 
 
 std::wstring CAppUtils::GetDataPath(HMODULE hMod)
 {
-    static std::wstring datapath;
-    if (datapath.empty())
+    static std::wstring dataPath;
+    if (dataPath.empty())
     {
         // in case BowPad was installed with the installer, there's a registry
         // entry made by the installer.
@@ -80,25 +80,25 @@ std::wstring CAppUtils::GetDataPath(HMODULE hMod)
         LONG result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Software\\BowPad", 0, KEY_READ, &subKey);
         if (result != ERROR_SUCCESS)
         {
-            datapath = CPathUtils::GetLongPathname(CPathUtils::GetModuleDir(hMod));
+            dataPath = CPathUtils::GetLongPathname(CPathUtils::GetModuleDir(hMod));
         }
         else
         {
             RegCloseKey(subKey);
             // BowPad is installed: we must not store the application data
             // in the same directory as the exe is but in %APPDATA%\BowPad instead
-            PWSTR outpath = nullptr;
-            if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, nullptr, &outpath)))
+            PWSTR outPath = nullptr;
+            if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, nullptr, &outPath)))
             {
-                datapath = outpath;
-                CoTaskMemFree(outpath);
-                datapath += L"\\BowPad";
-                datapath = CPathUtils::GetLongPathname(datapath);
-                CreateDirectory(datapath.c_str(), nullptr);
+                dataPath = outPath;
+                CoTaskMemFree(outPath);
+                dataPath += L"\\BowPad";
+                dataPath = CPathUtils::GetLongPathname(dataPath);
+                CreateDirectory(dataPath.c_str(), nullptr);
             }
         }
     }
-    return datapath;
+    return dataPath;
 }
 
 std::wstring CAppUtils::GetSessionID()
@@ -114,8 +114,8 @@ std::wstring CAppUtils::GetSessionID()
         {
             auto data = std::make_unique<BYTE[]>(len);
             GetTokenInformation(token, TokenStatistics, data.get(), len, &len);
-            LUID uid = ((PTOKEN_STATISTICS)data.get())->AuthenticationId;
-            t = CStringUtils::Format(L"-%08x%08x", uid.HighPart, uid.LowPart);
+            LUID uid = reinterpret_cast<PTOKEN_STATISTICS>(data.get())->AuthenticationId;
+            t        = CStringUtils::Format(L"-%08x%08x", uid.HighPart, uid.LowPart);
         }
     }
     return t;
@@ -146,20 +146,20 @@ bool CAppUtils::CheckForUpdate(bool force)
             else
                 RegCloseKey(subKey);
 
-            std::wstring tempfile = CTempFiles::Instance().GetTempFilePath(true);
+            std::wstring tempFile = CTempFiles::Instance().GetTempFilePath(true);
 
             std::wstring sCheckURL = L"https://raw.githubusercontent.com/stefankueng/BowPad/main/version.txt";
-            HRESULT res = URLDownloadToFile(nullptr, sCheckURL.c_str(), tempfile.c_str(), 0, nullptr);
+            HRESULT res = URLDownloadToFile(nullptr, sCheckURL.c_str(), tempFile.c_str(), 0, nullptr);
             if (res == S_OK)
             {
                 CIniSettings::Instance().SetInt64(L"updatecheck", L"last", now);
-                std::ifstream File;
-                File.open(tempfile.c_str());
-                if (File.good())
+                std::ifstream file;
+                file.open(tempFile.c_str());
+                if (file.good())
                 {
                     char line[1024];
                     const char* pLine = line;
-                    File.getline(line, sizeof(line));
+                    file.getline(line, sizeof(line));
                     int major = 0;
                     int minor = 0;
                     int micro = 0;
@@ -193,35 +193,35 @@ bool CAppUtils::CheckForUpdate(bool force)
                     else if ((build > BP_VERBUILD)&&(micro == BP_VERMICRO)&&(minor == BP_VERMINOR)&&(major == BP_VERMAJOR))
                         bNewerAvailable = true;
 #ifdef _WIN64
-                    File.getline(line, sizeof(line));
-                    updateurl = CUnicodeUtils::StdGetUnicode(line);
-                    File.getline(line, sizeof(line));
-                    updatefilename = CUnicodeUtils::StdGetUnicode(line);
+                    file.getline(line, sizeof(line));
+                    m_updateUrl = CUnicodeUtils::StdGetUnicode(line);
+                    file.getline(line, sizeof(line));
+                    m_updateFilename = CUnicodeUtils::StdGetUnicode(line);
 #else
                     // first two lines are for the 64-bit version
                     File.getline(line, sizeof(line));
                     File.getline(line, sizeof(line));
                     // now for the 32-bit version
                     File.getline(line, sizeof(line));
-                    updateurl = CUnicodeUtils::StdGetUnicode(line);
+                    updateUrl = CUnicodeUtils::StdGetUnicode(line);
                     File.getline(line, sizeof(line));
-                    updatefilename = CUnicodeUtils::StdGetUnicode(line);
+                    updateFilename = CUnicodeUtils::StdGetUnicode(line);
 #endif
                 }
-                File.close();
-                DeleteFile(tempfile.c_str());
+                file.close();
+                DeleteFile(tempFile.c_str());
             }
         }
     }
     return bNewerAvailable;
 }
 
-HRESULT CALLBACK CAppUtils::TDLinkClickCallback(HWND hwnd, UINT uNotification, WPARAM /*wParam*/, LPARAM lParam, LONG_PTR /*dwRefData*/)
+HRESULT CALLBACK CAppUtils::TDLinkClickCallback(HWND hWnd, UINT uNotification, WPARAM /*wParam*/, LPARAM lParam, LONG_PTR /*dwRefData*/)
 {
     switch (uNotification)
     {
     case TDN_HYPERLINK_CLICKED:
-        ShellExecute(hwnd, L"open", (LPCWSTR) lParam, nullptr, nullptr, SW_SHOW);
+        ShellExecute(hWnd, L"open", reinterpret_cast<LPCWSTR>(lParam), nullptr, nullptr, SW_SHOW);
         break;
     }
 
@@ -230,17 +230,17 @@ HRESULT CALLBACK CAppUtils::TDLinkClickCallback(HWND hwnd, UINT uNotification, W
 
 bool CAppUtils::DownloadUpdate(HWND hWnd, bool bInstall)
 {
-    if (updatefilename.empty() || updateurl.empty())
+    if (m_updateFilename.empty() || m_updateUrl.empty())
         return false;
 
-    PWSTR downloadpath = nullptr;
-    HRESULT hr = SHGetKnownFolderPath(FOLDERID_Downloads, 0, nullptr, &downloadpath);
+    PWSTR downloadPath = nullptr;
+    HRESULT hr = SHGetKnownFolderPath(FOLDERID_Downloads, 0, nullptr, &downloadPath);
     if (SUCCEEDED(hr))
     {
-        std::wstring sDownloadFile = downloadpath;
-        CoTaskMemFree(downloadpath);
+        std::wstring sDownloadFile = downloadPath;
+        CoTaskMemFree(downloadPath);
         sDownloadFile += L"\\";
-        sDownloadFile += updatefilename;
+        sDownloadFile += m_updateFilename;
 
         CProgressDlg progDlg;
         progDlg.SetTitle(L"BowPad Update");
@@ -249,9 +249,9 @@ bool CAppUtils::DownloadUpdate(HWND hWnd, bool bInstall)
         progDlg.SetTime();
         progDlg.ShowModal(hWnd);
 
-        CDownloadFile filedownloader(L"BowPad", &progDlg);
+        CDownloadFile fileDownloader(L"BowPad", &progDlg);
 
-        if (filedownloader.DownloadFile(updateurl, sDownloadFile))
+        if (fileDownloader.DownloadFile(m_updateUrl, sDownloadFile))
         {
             if (bInstall)
             {
@@ -264,8 +264,8 @@ bool CAppUtils::DownloadUpdate(HWND hWnd, bool bInstall)
                 PCIDLIST_ABSOLUTE __unaligned pidl = ILCreateFromPath(sDownloadFile.c_str());
                 if (pidl)
                 {
-                    SHOpenFolderAndSelectItems(pidl,0,0,0);
-                    CoTaskMemFree((LPVOID)pidl);
+                    SHOpenFolderAndSelectItems(pidl,0,nullptr,0);
+                    CoTaskMemFree(static_cast<LPVOID>(const_cast<PIDLIST_ABSOLUTE>(pidl)));
                 }
 
             }
@@ -277,7 +277,6 @@ bool CAppUtils::DownloadUpdate(HWND hWnd, bool bInstall)
 
 bool CAppUtils::ShowUpdateAvailableDialog( HWND hWnd )
 {
-    HRESULT hr;
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
     int nClickedBtn;
     BOOL bCheckboxChecked;
@@ -302,7 +301,7 @@ bool CAppUtils::ShowUpdateAvailableDialog( HWND hWnd )
     tdc.pszFooterIcon =  TD_INFORMATION_ICON;
     tdc.pfCallback = CAppUtils::TDLinkClickCallback;
 
-    hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, &bCheckboxChecked);
+    HRESULT hr = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, &bCheckboxChecked);
     if (SUCCEEDED(hr))
     {
         if ((nClickedBtn == 1000)||(nClickedBtn == 1001))
@@ -372,9 +371,8 @@ bool CAppUtils::FailedShowMessage(HRESULT hr)
 
 HRESULT CAppUtils::AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int cat, IUIImagePtr pImg)
 {
-    HRESULT hr;
-    CPropertySet* pItem;
-    hr = CPropertySet::CreateInstance(&pItem);
+    CPropertySet* pItem=nullptr;
+    HRESULT       hr = CPropertySet::CreateInstance(&pItem);
     if (FailedShowMessage(hr))
         return hr;
     pItem->InitializeItemProperties(pImg, text, cat);
@@ -388,9 +386,8 @@ HRESULT CAppUtils::AddStringItem(IUICollectionPtr& collection, LPCWSTR text, int
 
 HRESULT CAppUtils::AddCommandItem(IUICollectionPtr& collection, int cat, int commandId, UI_COMMANDTYPE commandType)
 {
-    HRESULT hr;
-    CPropertySet* pItem;
-    hr = CPropertySet::CreateInstance(&pItem);
+    CPropertySet* pItem=nullptr;
+    HRESULT       hr = CPropertySet::CreateInstance(&pItem);
     if (FailedShowMessage(hr))
         return hr;
 
@@ -405,9 +402,9 @@ HRESULT CAppUtils::AddCommandItem(IUICollectionPtr& collection, int cat, int com
 
 HRESULT CAppUtils::AddCategory(IUICollectionPtr& coll, int catId, int catNameResId)
 {
-    // TOOD! Use a RAII type to manage life time of the category objects.
+    // TODO! Use a RAII type to manage life time of the category objects.
     // Note Categories appear in the list in the order of their creation.
-    CPropertySet* cat;
+    CPropertySet* cat=nullptr;
     HRESULT hr = CPropertySet::CreateInstance(&cat);
     if (CAppUtils::FailedShowMessage(hr))
         return hr;
@@ -427,10 +424,9 @@ HRESULT CAppUtils::AddResStringItem(IUICollectionPtr& collection, int resId, int
 
 bool CAppUtils::ShowDropDownList(HWND hWnd, LPCWSTR ctrlName)
 {
-    HRESULT hr;
     // open the dropdown gallery using windows automation
     IUIAutomationPtr pAutomation;
-    hr = CoCreateInstance(__uuidof(CUIAutomation), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), (void **)&pAutomation);
+     HRESULT hr = CoCreateInstance(__uuidof(CUIAutomation), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), reinterpret_cast<void**>(&pAutomation));
     if (CAppUtils::FailedShowMessage(hr))
         return false;
     // get the top element of this app window
@@ -472,7 +468,7 @@ bool CAppUtils::ShowDropDownList(HWND hWnd, LPCWSTR ctrlName)
     // the invoke pattern of the control so we can invoke it
     IUIAutomationInvokePatternPtr pInvoke;
     hr = pFound->GetCurrentPatternAs(UIA_InvokePatternId, __uuidof(IUIAutomationInvokePattern),
-        (void **)&pInvoke);
+        reinterpret_cast<void**>(&pInvoke));
     if (CAppUtils::FailedShowMessage(hr))
         return false;
     // finally, invoke the command which drops down the gallery
@@ -491,7 +487,7 @@ HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg, int width/
     if (SUCCEEDED(hr))
     {
         // Load the bitmap from the resource file.
-        HBITMAP hbm = (HBITMAP)LoadImage(GetModuleHandle(nullptr), resName, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+        auto hbm = static_cast<HBITMAP>(LoadImage(GetModuleHandle(nullptr), resName, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION));
         if (hbm)
         {
             // Use the factory implemented by the framework to produce an IUIImage.
@@ -523,7 +519,7 @@ HRESULT CAppUtils::CreateImage(LPCWSTR resName, IUIImagePtr& pOutImg, int width/
                     {
                         CopyMemory(pBuffer, resourceData, resLen);
 
-                        IStream* pStream = NULL;
+                        IStream* pStream = nullptr;
                         if (::CreateStreamOnHGlobal(hBuffer, FALSE, &pStream) == S_OK)
                         {
                             auto pBitmap = Gdiplus::Bitmap::FromStream(pStream);
@@ -610,17 +606,17 @@ bool CAppUtils::TryParse(const wchar_t* s, unsigned long & result, bool emptyOk,
     return true;
 }
 
-const char* CAppUtils::GetResourceData(const wchar_t * resname, int id, DWORD& reslen)
+const char* CAppUtils::GetResourceData(const wchar_t * resName, int id, DWORD& resLen)
 {
-    reslen = 0;
-    auto hResource = FindResource(nullptr, MAKEINTRESOURCE(id), resname);
+    resLen = 0;
+    auto hResource = FindResource(nullptr, MAKEINTRESOURCE(id), resName);
     if (!hResource)
         return nullptr;
     auto hResourceLoaded = LoadResource(nullptr, hResource);
     if (!hResourceLoaded)
         return nullptr;
-    auto lpResLock = (const char *)LockResource(hResourceLoaded);
-    reslen = SizeofResource(nullptr, hResource);
+    auto lpResLock = static_cast<const char*>(LockResource(hResourceLoaded));
+    resLen         = SizeofResource(nullptr, hResource);
     return lpResLock;
 }
 

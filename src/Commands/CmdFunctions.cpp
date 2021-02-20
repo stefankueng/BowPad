@@ -22,7 +22,6 @@
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
 #include "LexStyles.h"
-#include "PathUtils.h"
 #include "AppUtils.h"
 #include "OnOutOfScope.h"
 
@@ -38,22 +37,22 @@
 // Turns "Hello/* there */world" into "Helloworld"
 static void StripComments(std::string& f)
 {
-    constexpr char   comment_begin[]   = {"/*"};
-    constexpr char   comment_end[]     = {"*/"};
-    constexpr size_t comment_begin_len = std::size(comment_begin) - 1;
-    constexpr size_t comment_end_len   = std::size(comment_end) - 1;
-    size_t           comment_begin_pos = 0;
+    constexpr char   commentBegin[]  = {"/*"};
+    constexpr char   commentEnd[]    = {"*/"};
+    constexpr size_t commentBeginLen = std::size(commentBegin) - 1;
+    constexpr size_t commentEndLen   = std::size(commentEnd) - 1;
+    size_t           commentBeginPos = 0;
     for (;;)
     {
-        comment_begin_pos = f.find(comment_begin, comment_begin_pos);
-        if (comment_begin_pos == std::string::npos)
+        commentBeginPos = f.find(commentBegin, commentBeginPos);
+        if (commentBeginPos == std::string::npos)
             break;
-        auto comment_end_pos = f.find(comment_end,
-                                      comment_begin_pos + comment_begin_len);
-        if (comment_end_pos == std::string::npos)
+        auto commentEndPos = f.find(commentEnd,
+                                    commentBeginPos + commentBeginLen);
+        if (commentEndPos == std::string::npos)
             break;
-        auto e     = f.erase(f.begin() + comment_begin_pos,
-                         f.begin() + comment_end_pos + comment_end_len);
+        auto e     = f.erase(f.begin() + commentBeginPos,
+                         f.begin() + commentEndPos + commentEndLen);
         auto trash = std::remove(e, f.end(), '\0');
         f.erase(trash, f.end());
     }
@@ -72,39 +71,39 @@ static void Normalize(std::string& f)
             return c == '\n' || c == '\t';
         },
         ' ');
-    auto new_end = std::unique(f.begin(), f.end(), [](auto lhs, auto rhs) -> bool {
+    auto newEnd = std::unique(f.begin(), f.end(), [](auto lhs, auto rhs) -> bool {
         return (lhs == ' ' && rhs == ' ');
     });
-    f.erase(new_end, f.end());
+    f.erase(newEnd, f.end());
 }
 
-static bool ParseSignature(const std::string& sig, std::string& name, std::string& name_and_args)
+static bool ParseSignature(const std::string& sig, std::string& name, std::string& nameAndArgs)
 {
     bool parsed = false;
 
     // Look for a ( of perhaps void x::f(whatever)
-    auto bracepos = sig.find('(');
-    if (bracepos != std::string::npos)
+    auto bracePos = sig.find('(');
+    if (bracePos != std::string::npos)
     {
-        auto   wpos = sig.find_last_of("\t :,.", bracepos - 1, 5);
-        size_t spos = (wpos == std::string::npos) ? 0 : wpos + 1;
+        auto   wPos = sig.find_last_of("\t :,.", bracePos - 1, 5);
+        size_t sPos = (wPos == std::string::npos) ? 0 : wPos + 1;
 
         // Functions returning pointer or reference will feature these symbols
         // before the name. Ignore them. This logic is a bit C language based.
-        while (spos < bracepos && (sig[spos] == '*' || sig[spos] == '&' || sig[spos] == '^'))
-            ++spos;
-        name.assign(sig, spos, bracepos - spos);
-        name_and_args.assign(sig, spos);
+        while (sPos < bracePos && (sig[sPos] == '*' || sig[sPos] == '&' || sig[sPos] == '^'))
+            ++sPos;
+        name.assign(sig, sPos, bracePos - sPos);
+        nameAndArgs.assign(sig, sPos);
     }
     else
     {
         // some languages have functions without (), or pseudo-functions like
         // properties in c#. Deal with those here.
-        auto   wpos = sig.find_last_of("\t :,.", bracepos - 1, 5);
-        size_t spos = (wpos == std::string::npos) ? 0 : wpos + 1;
+        auto   wPos = sig.find_last_of("\t :,.", bracePos - 1, 5);
+        size_t sPos = (wPos == std::string::npos) ? 0 : wPos + 1;
 
-        name.assign(sig, spos, bracepos - spos);
-        name_and_args.assign(sig, spos);
+        name.assign(sig, sPos, bracePos - sPos);
+        nameAndArgs.assign(sig, sPos);
     }
     CStringUtils::trim(name);
     parsed = !name.empty();
@@ -114,17 +113,17 @@ static bool ParseSignature(const std::string& sig, std::string& name, std::strin
 static inline bool ParseName(const std::string& sig, std::string& name)
 {
     // Look for a ( of perhaps void x::f(whatever)
-    auto bracepos = sig.find('(');
-    if (bracepos != std::string::npos)
+    auto bracePos = sig.find('(');
+    if (bracePos != std::string::npos)
     {
-        auto   wpos = sig.find_last_of("\t :,.", bracepos - 1, 5);
-        size_t spos = (wpos == std::string::npos) ? 0 : wpos + 1;
+        auto   wPos = sig.find_last_of("\t :,.", bracePos - 1, 5);
+        size_t sPos = (wPos == std::string::npos) ? 0 : wPos + 1;
 
         // Functions returning pointer or reference will feature these symbols
         // before the name. Ignore them. This logic is a bit C language based.
-        while (spos < bracepos && (sig[spos] == '*' || sig[spos] == '&' || sig[spos] == '^'))
-            ++spos;
-        name.assign(sig, spos, bracepos - spos);
+        while (sPos < bracePos && (sig[sPos] == '*' || sig[sPos] == '&' || sig[sPos] == '^'))
+            ++sPos;
+        name.assign(sig, sPos, bracePos - sPos);
         return !name.empty();
     }
     return false;
@@ -136,43 +135,43 @@ static bool FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf,
     if (ttf.chrg.cpMax - ttf.chrg.cpMin <= 0)
         return false;
     // In debug mode, regex takes a *long* time.
-    auto findRet = edit.Call(SCI_FINDTEXT, SCFIND_REGEXP | SCFIND_CXX11REGEX, (sptr_t)&ttf);
+    auto findRet = edit.Call(SCI_FINDTEXT, SCFIND_REGEXP | SCFIND_CXX11REGEX, reinterpret_cast<sptr_t>(&ttf));
     if (findRet < 0)
         return false;
     // Skip newlines, whitespaces and possible leftover closing braces from
     // the start of the matched function text.
-    char c     = (char)edit.Call(SCI_GETCHARAT, ttf.chrgText.cpMin);
-    auto cpmin = ttf.chrgText.cpMin;
-    while ((cpmin < ttf.chrgText.cpMax) &&
+    char c     = static_cast<char>(edit.Call(SCI_GETCHARAT, ttf.chrgText.cpMin));
+    auto cpMin = ttf.chrgText.cpMin;
+    while ((cpMin < ttf.chrgText.cpMax) &&
            (c == '\r' || c == '\n' || c == ';' || c == '}' || c == ' ' || c == '\t'))
     {
-        ++cpmin;
-        c = (char)edit.Call(SCI_GETCHARAT, cpmin);
+        ++cpMin;
+        c = static_cast<char>(edit.Call(SCI_GETCHARAT, cpMin));
     }
-    auto len = ttf.chrgText.cpMax - cpmin;
+    auto len = ttf.chrgText.cpMax - cpMin;
     if (len < 0)
         return false;
     foundText.resize(len + 1);
-    Sci_TextRange r{cpmin, ttf.chrgText.cpMax, &foundText[0]};
-    edit.Call(SCI_GETTEXTRANGE, 0, (sptr_t)&r);
+    Sci_TextRange r{cpMin, ttf.chrgText.cpMax, &foundText[0]};
+    edit.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&r));
     foundText.resize(len);
 
-    *lineNum = (int)edit.Call(SCI_LINEFROMPOSITION, cpmin);
+    *lineNum = static_cast<int>(edit.Call(SCI_LINEFROMPOSITION, cpMin));
     return true;
 }
 
 CCmdFunctions::CCmdFunctions(void* obj)
     : ICommand(obj)
-    , m_autoscanlimit((size_t)-1)
+    , m_autoScanLimit(static_cast<size_t>(-1))
     , m_edit(g_hRes)
 {
     // Need to restart BP if you change these settings but helps
     // performance a little to inquire them here.
     static constexpr wchar_t functionsSection[] = {L"functions"};
-    m_autoscan                                  = CIniSettings::Instance().GetInt64(functionsSection, L"autoscan", 1) != 0;
-    m_autoscanlimit                             = (long)CIniSettings::Instance().GetInt64(functionsSection, L"autoscanlimit", 1024000);
-    if (!m_autoscanlimit)
-        m_autoscan = false;
+    m_autoScan                                  = CIniSettings::Instance().GetInt64(functionsSection, L"autoscan", 1) != 0;
+    m_autoScanLimit                             = static_cast<long>(CIniSettings::Instance().GetInt64(functionsSection, L"autoscanlimit", 1024000));
+    if (!m_autoScanLimit)
+        m_autoScan = false;
 
     m_timerID = GetTimerID();
 
@@ -185,17 +184,15 @@ CCmdFunctions::CCmdFunctions(void* obj)
     m_thread.detach();
 }
 
-HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue)
 {
-    HRESULT hr;
-
     if (key == UI_PKEY_Categories)
         return S_FALSE;
 
     if (key == UI_PKEY_ItemsSource)
     {
         IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+        HRESULT          hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
         return PopulateFunctions(pCollection);
@@ -203,7 +200,7 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
 
     if (key == UI_PKEY_SelectedItem)
     {
-        return UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)UI_COLLECTION_INVALIDINDEX, ppropvarNewValue);
+        return UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, static_cast<UINT>(UI_COLLECTION_INVALIDINDEX), pPropVarNewValue);
     }
 
     if (key == UI_PKEY_Enabled)
@@ -212,9 +209,9 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
         {
             const auto& doc       = GetActiveDocument();
             auto        funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.GetLanguage());
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), ppropvarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), pPropVarNewValue);
         }
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, pPropVarNewValue);
     }
 
     return E_NOTIMPL;
@@ -234,8 +231,7 @@ HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
 #if defined(_DEBUG) || defined(PROFILING)
     ProfileTimer profileTimer(L"FunctionParse");
 #endif
-    auto funcProcessingStartTime = std::chrono::steady_clock::now();
-    auto functions               = FindFunctionsNow();
+    auto functions = FindFunctionsNow();
     if (functions.empty())
         return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
 
@@ -258,18 +254,16 @@ HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     return S_OK;
 }
 
-HRESULT CCmdFunctions::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
+HRESULT CCmdFunctions::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
-    HRESULT hr;
-
     if (verb == UI_EXECUTIONVERB_EXECUTE)
     {
         if (key && (*key == UI_PKEY_SelectedItem))
         {
             // Happens when a highlighted item is selected from the drop down
             // and clicked.
-            UINT selected;
-            hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
+            UINT    selected;
+            HRESULT hr = UIPropertyToUInt32(*key, *pPropVarValue, &selected);
             if (CAppUtils::FailedShowMessage(hr))
                 return hr;
 
@@ -307,15 +301,15 @@ HRESULT CCmdFunctions::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PRO
     return E_FAIL;
 }
 
-void CCmdFunctions::TabNotify(TBHDR* ptbhdr)
+void CCmdFunctions::TabNotify(TBHDR* ptbHdr)
 {
     // Switching to this document.
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         InvalidateFunctionsSource();
 
         auto                         docID = GetDocIdOfCurrentTab();
-        std::unique_lock<std::mutex> lock(m_filedatamutex);
+        std::unique_lock<std::mutex> lock(m_fileDataMutex);
         auto                         found = std::find_if(m_fileData.begin(), m_fileData.end(), [docID](const WorkItem& wi) {
             return wi.m_id == docID;
         });
@@ -376,9 +370,9 @@ void CCmdFunctions::OnTimer(UINT id)
         // if necessary.
         // If data is added to the thread data list, wake up the thread.
         bool bWakeupThread = false;
-        for (const auto& docid : m_eventData)
+        for (const auto& docId : m_eventData)
         {
-            const auto& doc = GetDocumentFromID(docid);
+            const auto& doc = GetDocumentFromID(docId);
             m_edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
             m_edit.Call(SCI_CLEARALL);
             m_edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
@@ -387,27 +381,27 @@ void CCmdFunctions::OnTimer(UINT id)
 
             WorkItem w;
             w.m_lang = doc.GetLanguage();
-            w.m_id   = docid;
+            w.m_id   = docId;
             if (!w.m_lang.empty())
             {
                 auto langData = CLexStyles::Instance().GetLanguageData(w.m_lang);
                 if (langData != nullptr)
                 {
-                    if ((!langData->functionregex.empty() && langData->userfunctions > 0) || !langData->autocompleteregex.empty())
+                    if ((!langData->functionRegex.empty() && langData->userFunctions > 0) || !langData->autoCompleteRegex.empty())
                     {
-                        w.m_regex      = langData->functionregex;
-                        w.m_trimtokens = langData->functionregextrim;
-                        w.m_autocregex = langData->autocompleteregex;
+                        w.m_regex      = langData->functionRegex;
+                        w.m_trimTokens = langData->functionRegexTrim;
+                        w.m_autoCRegex = langData->autoCompleteRegex;
 
                         ProfileTimer p(L"getting doc content");
                         size_t       lengthDoc = m_edit.Call(SCI_GETLENGTH);
-                        if ((lengthDoc <= m_autoscanlimit) || (m_autoscanlimit == (size_t)-1))
+                        if ((lengthDoc <= m_autoScanLimit) || (m_autoScanLimit == static_cast<size_t>(-1)))
                         {
                             // get characters directly from Scintilla buffer
-                            char* buf = (char*)m_edit.Call(SCI_GETCHARACTERPOINTER);
+                            char* buf = reinterpret_cast<char*>(m_edit.Call(SCI_GETCHARACTERPOINTER));
                             w.m_data  = std::string(buf, lengthDoc);
 
-                            std::unique_lock<std::mutex> lock(m_filedatamutex);
+                            std::unique_lock<std::mutex> lock(m_fileDataMutex);
                             // if there's already a work item queued up for this document,
                             // remove it and add the new one
                             auto found = std::find_if(m_fileData.begin(), m_fileData.end(), [w](const WorkItem& wi) {
@@ -425,33 +419,33 @@ void CCmdFunctions::OnTimer(UINT id)
         }
         m_eventData.clear();
         if (bWakeupThread)
-            m_filedatacv.notify_one();
+            m_fileDataCv.notify_one();
 
         // now go through the lang data and see if we have to update those.
         {
-            std::lock_guard<std::recursive_mutex> lock(m_langdatamutex);
-            for (const auto& data : m_langdata)
+            std::lock_guard<std::recursive_mutex> lock(m_langDataMutex);
+            for (const auto& [lang, words] : m_langData)
             {
-                auto langData = CLexStyles::Instance().GetLanguageData(data.first);
+                auto langData = CLexStyles::Instance().GetLanguageData(lang);
                 if (langData)
                 {
-                    auto size1 = langData->userkeywords.size();
-                    langData->userkeywords.insert(data.second.begin(), data.second.end());
-                    auto size2 = langData->userkeywords.size();
+                    auto size1 = langData->userKeyWords.size();
+                    langData->userKeyWords.insert(words.begin(), words.end());
+                    auto size2 = langData->userKeyWords.size();
                     if (size1 != size2)
-                        langData->userkeywordsupdated = true;
+                        langData->userKeyWordsUpdated = true;
                 }
             }
-            m_langdata.clear();
+            m_langData.clear();
         }
 
-        // check if the userkeywords were updated for the active document:
+        // check if the userKeyWords were updated for the active document:
         // if it was, then update the lexer data
         if (HasActiveDocument())
         {
             const auto& activeDoc = GetActiveDocument();
             auto        langData  = CLexStyles::Instance().GetLanguageData(activeDoc.GetLanguage());
-            if (langData != nullptr && langData->userkeywordsupdated)
+            if (langData != nullptr && langData->userKeyWordsUpdated)
                 SetupLexerForLang(activeDoc.GetLanguage());
         }
         KillTimer(GetHwnd(), m_timerID);
@@ -494,10 +488,10 @@ void CCmdFunctions::OnDocumentClose(DocID id)
             auto langData = CLexStyles::Instance().GetLanguageData(closingDoc.GetLanguage());
             if (langData != nullptr)
             {
-                if (!langData->userkeywords.empty())
+                if (!langData->userKeyWords.empty())
                 {
-                    langData->userkeywords.clear();
-                    langData->userkeywordsupdated = true;
+                    langData->userKeyWords.clear();
+                    langData->userKeyWordsUpdated = true;
                 }
             }
         }
@@ -509,9 +503,9 @@ void CCmdFunctions::OnClose()
 {
     InterlockedExchange(&m_bRunThread, FALSE);
     {
-        std::unique_lock<std::mutex> lock(m_filedatamutex);
+        std::unique_lock<std::mutex> lock(m_fileDataMutex);
         m_fileData.push_back(WorkItem());
-        m_filedatacv.notify_one();
+        m_fileDataCv.notify_one();
     }
     int count = 200;
     while (InterlockedExchange(&m_bThreadRunning, m_bThreadRunning) && --count)
@@ -535,7 +529,8 @@ void CCmdFunctions::OnLangChanged()
     SetWorkTimer(1000);
 }
 
-void CCmdFunctions::SetWorkTimer(int ms) // 0 means as fast as possible, not never.
+void CCmdFunctions::SetWorkTimer(int ms) const
+// 0 means as fast as possible, not never.
 {
     SetTimer(GetHwnd(), m_timerID, ms, nullptr);
 }
@@ -547,8 +542,8 @@ void CCmdFunctions::ThreadFunc()
     {
         WorkItem work;
         {
-            std::unique_lock<std::mutex> lock(m_filedatamutex);
-            m_filedatacv.wait(lock, [&] {
+            std::unique_lock<std::mutex> lock(m_fileDataMutex);
+            m_fileDataCv.wait(lock, [&] {
                 return !m_fileData.empty();
             });
             if (!m_fileData.empty())
@@ -569,9 +564,9 @@ void CCmdFunctions::ThreadFunc()
             try
             {
                 std::wregex                       regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
-                const std::wsregex_token_iterator End;
+                const std::wsregex_token_iterator end;
                 ProfileTimer                      timer(L"parsing functions");
-                for (std::wsregex_token_iterator match(sData.begin(), sData.end(), regex, 0); match != End; ++match)
+                for (std::wsregex_token_iterator match(sData.begin(), sData.end(), regex, 0); match != end; ++match)
                 {
                     if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
                         break;
@@ -580,15 +575,15 @@ void CCmdFunctions::ThreadFunc()
 
                     StripComments(sig);
                     Normalize(sig);
-                    for (const auto& token : work.m_trimtokens)
+                    for (const auto& token : work.m_trimTokens)
                         SearchRemoveAll(sig, token);
                     CStringUtils::trim(sig);
                     std::string name;
                     if (ParseName(sig, name))
                     {
-                        std::lock_guard<std::recursive_mutex> lock(m_langdatamutex);
+                        std::lock_guard<std::recursive_mutex> lock(m_langDataMutex);
                         acMap[name] = AutoCompleteType::Code;
-                        m_langdata[work.m_lang].insert(std::move(name));
+                        m_langData[work.m_lang].insert(std::move(name));
                     }
                 }
                 AddAutoCompleteWords(work.m_lang, std::move(acMap));
@@ -597,16 +592,16 @@ void CCmdFunctions::ThreadFunc()
             {
             }
         }
-        if (!work.m_autocregex.empty() && CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) != 0)
+        if (!work.m_autoCRegex.empty() && CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) != 0)
         {
             try
             {
-                auto                                    sRegex = CUnicodeUtils::StdGetUnicode(work.m_autocregex);
+                auto                                    sRegex = CUnicodeUtils::StdGetUnicode(work.m_autoCRegex);
                 std::wregex                             regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
-                const std::wsregex_iterator             End;
+                const std::wsregex_iterator             end;
                 ProfileTimer                            timer(L"parsing words");
                 std::map<std::string, AutoCompleteType> acMap;
-                for (std::wsregex_iterator match(sData.begin(), sData.end(), regex); match != End; ++match)
+                for (std::wsregex_iterator match(sData.begin(), sData.end(), regex); match != end; ++match)
                 {
                     if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
                         break;
@@ -665,7 +660,7 @@ void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const
     if (!langData)
         return;
 
-    if (langData->functionregex.empty())
+    if (langData->functionRegex.empty())
         return;
 
     CScintillaWnd edit(g_hRes);
@@ -682,9 +677,9 @@ void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const
     std::string sig;
 
     Sci_TextToFind ttf{};
-    Sci_PositionCR length = (Sci_PositionCR)edit.Call(SCI_GETLENGTH);
+    Sci_PositionCR length = static_cast<Sci_PositionCR>(edit.Call(SCI_GETLENGTH));
     ttf.chrg.cpMax        = length;
-    ttf.lpstrText         = const_cast<char*>(langData->functionregex.c_str());
+    ttf.lpstrText         = const_cast<char*>(langData->functionRegex.c_str());
 
     for (;;)
     {
@@ -694,8 +689,8 @@ void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const
 
         StripComments(sig);
         Normalize(sig);
-        if (langData->functionregextrim.empty())
-            for (const auto& token : langData->functionregextrim)
+        if (langData->functionRegexTrim.empty())
+            for (const auto& token : langData->functionRegexTrim)
                 SearchRemoveAll(sig, token);
         CStringUtils::trim(sig);
         if (!callback(sig, lineNum))
@@ -712,9 +707,6 @@ void CCmdFunctions::InvalidateFunctionsSource()
 
 void CCmdFunctions::InvalidateFunctionsEnabled()
 {
-    // Note SetUICommandProperty(UI_PKEY_Enabled,en) can be useful but probably
-    // isn't what we want; and it fails when the ribbon is hidden anyway.
-    HRESULT hr;
-    hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
+    HRESULT hr = InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
     CAppUtils::FailedShowMessage(hr);
 }

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@ typedef uptr_t Document;
 
 enum class EOLFormat : int
 {
-    UNKNOWN_FORMAT,
-    WIN_FORMAT,
-    MAC_FORMAT,
-    UNIX_FORMAT
+    Unknown_Format,
+    Win_Format,
+    Mac_Format,
+    Unix_Format
 };
 enum class TabSpace : int
 {
@@ -41,9 +41,9 @@ enum class ReadDirection : int
     R2L
 };
 
-std::wstring GetEOLFormatDescription(EOLFormat ft);
-EOLFormat    ToEOLFormat(int eolMode);
-int          ToEOLMode(EOLFormat eolFormat);
+std::wstring getEolFormatDescription(EOLFormat ft);
+EOLFormat    toEolFormat(int eolMode);
+int          toEolMode(EOLFormat eolFormat);
 
 class CPosData
 {
@@ -77,20 +77,20 @@ class CDocument
 public:
     CDocument()
         : m_document(0)
-        , m_format(EOLFormat::WIN_FORMAT)
+        , m_encoding(-1)
+        , m_encodingSaving(-1)
+        , m_format(EOLFormat::Win_Format)
         , m_bHasBOM(false)
         , m_bHasBOMSaving(false)
         , m_bTrimBeforeSave(false)
         , m_bEnsureNewlineAtEnd(false)
-        , m_encoding(-1)
-        , m_encodingSaving(-1)
         , m_bIsDirty(false)
         , m_bNeedsSaving(false)
         , m_bIsReadonly(false)
         , m_bIsWriteProtected(false)
         , m_bDoSaveAs(false)
-        , m_TabSpace(TabSpace::Default)
-        , m_ReadDir(ReadDirection::Disabled)
+        , m_tabSpace(TabSpace::Default)
+        , m_readDir(ReadDirection::Disabled)
     {
         m_lastWriteTime.dwHighDateTime = 0;
         m_lastWriteTime.dwLowDateTime  = 0;
@@ -119,8 +119,8 @@ public:
     bool                  m_bDoSaveAs; ///< even if m_path is set, always ask where to save
     FILETIME              m_lastWriteTime;
     CPosData              m_position;
-    TabSpace              m_TabSpace;
-    ReadDirection         m_ReadDir;
+    TabSpace              m_tabSpace;
+    ReadDirection         m_readDir;
     std::function<void()> m_saveCallback;
 
 private:

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,19 +19,21 @@
 #include "StringUtils.h"
 #include <CommandHandler.h>
 
-std::wstring GetEOLFormatDescription(EOLFormat ft)
+std::wstring getEolFormatDescription(EOLFormat ft)
 {
     std::wstring sFt;
     switch (ft)
     {
-        case EOLFormat::WIN_FORMAT:
+        case EOLFormat::Win_Format:
             sFt = L"Windows (CRLF)";
             break;
-        case EOLFormat::MAC_FORMAT:
+        case EOLFormat::Mac_Format:
             sFt = L"Mac (CR)";
             break;
-        case EOLFormat::UNIX_FORMAT:
+        case EOLFormat::Unix_Format:
             sFt = L"Unix (LF)";
+            break;
+        case EOLFormat::Unknown_Format:
             break;
     }
     return sFt;
@@ -62,7 +64,7 @@ std::wstring CDocument::GetEncodingString() const
             sEnc = L"ANSI";
             break;
         default:
-            if ((UINT)m_encoding == GetACP())
+            if (static_cast<UINT>(m_encoding) == GetACP())
                 sEnc = L"ANSI";
             else
                 sEnc = CStringUtils::Format(L"codepage: %d", m_encoding);
@@ -96,7 +98,7 @@ std::wstring CDocument::GetEncodingString() const
                 sEnc += L"ANSI";
                 break;
             default:
-                if ((UINT)m_encoding == GetACP())
+                if (static_cast<UINT>(m_encoding) == GetACP())
                     sEnc += L"ANSI";
                 else
                     sEnc += CStringUtils::Format(L"codepage: %d", m_encoding);
@@ -117,30 +119,32 @@ void CDocument::SetLanguage(const std::string& lang)
         CCommandHandler::Instance().OnLangChanged();
 }
 
-EOLFormat ToEOLFormat(int eolMode)
+EOLFormat toEolFormat(int eolMode)
 {
     switch (eolMode)
     {
         case SC_EOL_CRLF:
-            return EOLFormat::WIN_FORMAT;
+            return EOLFormat::Win_Format;
         case SC_EOL_LF:
-            return EOLFormat::UNIX_FORMAT;
+            return EOLFormat::Unix_Format;
         case SC_EOL_CR:
-            return EOLFormat::MAC_FORMAT;
+            return EOLFormat::Mac_Format;
     }
-    return EOLFormat::UNKNOWN_FORMAT;
+    return EOLFormat::Unknown_Format;
 }
 
-int ToEOLMode(EOLFormat eolFormat)
+int toEolMode(EOLFormat eolFormat)
 {
     switch (eolFormat)
     {
-        case EOLFormat::WIN_FORMAT:
+        case EOLFormat::Win_Format:
             return SC_EOL_CRLF;
-        case EOLFormat::UNIX_FORMAT:
+        case EOLFormat::Unix_Format:
             return SC_EOL_LF;
-        case EOLFormat::MAC_FORMAT:
+        case EOLFormat::Mac_Format:
             return SC_EOL_CR;
+        case EOLFormat::Unknown_Format:
+            break;
     }
     return -1;
 }

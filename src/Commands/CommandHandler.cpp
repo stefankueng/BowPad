@@ -97,8 +97,8 @@ ICommand* CCommandHandler::GetCommand(UINT cmdId)
     auto c = m_commands.find(cmdId);
     if (c != m_commands.end())
         return c->second.get();
-    auto nc = m_nodeletecommands.find(cmdId);
-    if (nc != m_nodeletecommands.end())
+    auto nc = m_noDeleteCommands.find(cmdId);
+    if (nc != m_noDeleteCommands.end())
         return nc->second;
     return nullptr;
 }
@@ -217,14 +217,14 @@ void CCommandHandler::Init(void* obj)
     Add<CCmdHeaderSource>(obj);
     Add<CCmdOpenSelection>(obj);
 
-    Add<CCmdSpellcheck>(obj);
-    Add<CCmdSpellcheckLang>(obj);
-    Add<CCmdSpellcheckCorrect>(obj);
-    Add<CCmdSpellcheckAll>(obj);
-    Add<CCmdSpellcheckUpper>(obj);
+    Add<CCmdSpellCheck>(obj);
+    Add<CCmdSpellCheckLang>(obj);
+    Add<CCmdSpellCheckCorrect>(obj);
+    Add<CCmdSpellCheckAll>(obj);
+    Add<CCmdSpellCheckUpper>(obj);
 
     Add<CCmdLaunchEdge>(obj);
-    Add<CCmdLaunchIE>(obj);
+    Add<CCmdLaunchIe>(obj);
     Add<CCmdLaunchFirefox>(obj);
     Add<CCmdLaunchChrome>(obj);
     Add<CCmdLaunchSafari>(obj);
@@ -249,157 +249,157 @@ void CCommandHandler::Init(void* obj)
 
 void CCommandHandler::ScintillaNotify(SCNotification* pScn)
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->ScintillaNotify(pScn);
+        cmd->ScintillaNotify(pScn);
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->ScintillaNotify(pScn);
+        if (cmd)
+            cmd->ScintillaNotify(pScn);
     }
 }
 
-void CCommandHandler::TabNotify(TBHDR* ptbhdr)
+void CCommandHandler::TabNotify(TBHDR* ptbHdr)
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->TabNotify(ptbhdr);
+        cmd->TabNotify(ptbHdr);
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->TabNotify(ptbhdr);
+        if (cmd)
+            cmd->TabNotify(ptbHdr);
     }
 }
 
 void CCommandHandler::OnClose()
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->OnClose();
+        cmd->OnClose();
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->OnClose();
-    }
-}
-
-void CCommandHandler::OnDocumentClose(DocID id)
-{
-    for (auto& cmd : m_commands)
-    {
-        cmd.second->OnDocumentClose(id);
-    }
-    for (auto& cmd : m_nodeletecommands)
-    {
-        if (cmd.second)
-            cmd.second->OnDocumentClose(id);
+        if (cmd)
+            cmd->OnClose();
     }
 }
 
-void CCommandHandler::OnDocumentOpen(DocID id)
+void CCommandHandler::OnDocumentClose(DocID docId)
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->OnDocumentOpen(id);
+        cmd->OnDocumentClose(docId);
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->OnDocumentOpen(id);
+        if (cmd)
+            cmd->OnDocumentClose(docId);
     }
 }
 
-void CCommandHandler::OnDocumentSave(DocID id, bool bSaveAs)
+void CCommandHandler::OnDocumentOpen(DocID docId)
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->OnDocumentSave(id, bSaveAs);
+        cmd->OnDocumentOpen(docId);
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->OnDocumentSave(id, bSaveAs);
+        if (cmd)
+            cmd->OnDocumentOpen(docId);
+    }
+}
+
+void CCommandHandler::OnDocumentSave(DocID docId, bool bSaveAs)
+{
+    for (auto& [id, cmd] : m_commands)
+    {
+        cmd->OnDocumentSave(docId, bSaveAs);
+    }
+    for (auto& [id, cmd] : m_noDeleteCommands)
+    {
+        if (cmd)
+            cmd->OnDocumentSave(docId, bSaveAs);
     }
 }
 
 void CCommandHandler::OnClipboardChanged()
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->OnClipboardChanged();
+        cmd->OnClipboardChanged();
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->OnClipboardChanged();
+        if (cmd)
+            cmd->OnClipboardChanged();
     }
 }
 
 void CCommandHandler::BeforeLoad()
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->BeforeLoad();
+        cmd->BeforeLoad();
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->BeforeLoad();
+        if (cmd)
+            cmd->BeforeLoad();
     }
 }
 
 void CCommandHandler::AfterInit()
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->AfterInit();
+        cmd->AfterInit();
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->AfterInit();
+        if (cmd)
+            cmd->AfterInit();
     }
 }
 
-void CCommandHandler::OnTimer(UINT id)
+void CCommandHandler::OnTimer(UINT timerId)
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->OnTimer(id);
+        cmd->OnTimer(timerId);
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->OnTimer(id);
+        if (cmd)
+            cmd->OnTimer(timerId);
     }
 }
 
 void CCommandHandler::OnThemeChanged(bool bDark)
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->OnThemeChanged(bDark);
+        cmd->OnThemeChanged(bDark);
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->OnThemeChanged(bDark);
+        if (cmd)
+            cmd->OnThemeChanged(bDark);
     }
 }
 
 void CCommandHandler::OnLangChanged()
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->OnLangChanged();
+        cmd->OnLangChanged();
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->OnLangChanged();
+        if (cmd)
+            cmd->OnLangChanged();
     }
 }
 
@@ -409,25 +409,25 @@ void CCommandHandler::InsertPlugins(void* obj)
     // for every found file and store the plugin for later use
     std::wstring sPluginDir = CAppUtils::GetDataPath();
     sPluginDir += L"\\plugins";
-    CDirFileEnum filefinder(sPluginDir);
+    CDirFileEnum fileFinder(sPluginDir);
     bool         bIsDirectory;
-    std::wstring filename;
+    std::wstring fileName;
 
     std::map<std::wstring, std::unique_ptr<CCmdScript>> scripts;
-    while (filefinder.NextFile(filename, &bIsDirectory, true))
+    while (fileFinder.NextFile(fileName, &bIsDirectory, true))
     {
         if (!bIsDirectory)
         {
-            if (filename.ends_with(L"bpj") || filename.ends_with(L"bpv"))
+            if (fileName.ends_with(L"bpj") || fileName.ends_with(L"bpv"))
             {
                 try
                 {
                     auto pScript = std::make_unique<CCmdScript>(obj);
-                    if (pScript->Create(filename))
+                    if (pScript->Create(fileName))
                     {
                         try
                         {
-                            auto          descPath = CPathUtils::GetParentDirectory(filename) + L"\\" + CPathUtils::GetFileNameWithoutExtension(filename) + L".desc";
+                            auto          descPath = CPathUtils::GetParentDirectory(fileName) + L"\\" + CPathUtils::GetFileNameWithoutExtension(fileName) + L".desc";
                             std::ifstream fin(descPath);
                             if (fin.is_open())
                             {
@@ -447,7 +447,7 @@ void CCommandHandler::InsertPlugins(void* obj)
                         catch (const std::exception&)
                         {
                         }
-                        std::wstring sName = CPathUtils::GetParentDirectory(filename);
+                        std::wstring sName = CPathUtils::GetParentDirectory(fileName);
                         sName              = CPathUtils::GetFileName(sName);
                         scripts[sName]     = std::move(pScript);
                     }
@@ -472,7 +472,7 @@ void CCommandHandler::InsertPlugins(void* obj)
     std::set<UINT> usedCmdIds;
     for (const auto& [name, script] : scripts)
     {
-        auto foundCmd = (UINT)CIniSettings::Instance().GetInt64(L"pluginCmdMap", name.c_str(), 0);
+        auto foundCmd = static_cast<UINT>(CIniSettings::Instance().GetInt64(L"pluginCmdMap", name.c_str(), 0));
         if (foundCmd)
         {
             if (usedCmdIds.find(foundCmd) == usedCmdIds.end())
@@ -495,7 +495,7 @@ void CCommandHandler::InsertPlugins(void* obj)
             usedCmdIds.insert(pluginCmd);
 
             script->SetCmdId(pluginCmd);
-            m_pluginversion[name] = script->m_version;
+            m_pluginVersion[name] = script->m_version;
             m_commands[pluginCmd] = std::move(script);
             m_plugins[pluginCmd]  = name;
             CKeyboardShortcutHandler::Instance().AddCommand(name, pluginCmd);
@@ -504,7 +504,7 @@ void CCommandHandler::InsertPlugins(void* obj)
         else
         {
             auto cmdId            = script->GetCmdId();
-            m_pluginversion[name] = script->m_version;
+            m_pluginVersion[name] = script->m_version;
             m_commands[cmdId]     = std::move(script);
             m_plugins[cmdId]      = name;
             CKeyboardShortcutHandler::Instance().AddCommand(name, cmdId);
@@ -515,35 +515,35 @@ void CCommandHandler::InsertPlugins(void* obj)
 
 void CCommandHandler::PluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data)
 {
-    for (auto& cmd : m_commands)
+    for (auto& [id, cmd] : m_commands)
     {
-        cmd.second->OnPluginNotify(cmdId, pluginName, data);
+        cmd->OnPluginNotify(cmdId, pluginName, data);
     }
-    for (auto& cmd : m_nodeletecommands)
+    for (auto& [id, cmd] : m_noDeleteCommands)
     {
-        if (cmd.second)
-            cmd.second->OnPluginNotify(cmdId, pluginName, data);
+        if (cmd)
+            cmd->OnPluginNotify(cmdId, pluginName, data);
     }
 }
 
 int CCommandHandler::GetPluginVersion(const std::wstring& name)
 {
-    auto it = m_pluginversion.find(name);
-    if (it != m_pluginversion.end())
+    auto it = m_pluginVersion.find(name);
+    if (it != m_pluginVersion.end())
         return it->second;
     return 0;
 }
 
 void CCommandHandler::AddCommand(ICommand* cmd)
 {
-    m_highestCmdId = max(m_highestCmdId, cmd->GetCmdId());
-    auto at        = m_nodeletecommands.emplace(cmd->GetCmdId(), cmd);
-    assert(at.second); // Verify no command has the same ID as an existing command.
+    m_highestCmdId     = max(m_highestCmdId, cmd->GetCmdId());
+    auto [it, success] = m_noDeleteCommands.emplace(cmd->GetCmdId(), cmd);
+    assert(success); // Verify no command has the same ID as an existing command.
 }
 
 void CCommandHandler::AddCommand(UINT cmdId)
 {
-    m_highestCmdId = max(m_highestCmdId, cmdId);
-    auto at        = m_nodeletecommands.emplace(cmdId, nullptr);
-    assert(at.second); // Verify no command has the same ID as an existing command.
+    m_highestCmdId     = max(m_highestCmdId, cmdId);
+    auto [it, success] = m_noDeleteCommands.emplace(cmdId, nullptr);
+    assert(success); // Verify no command has the same ID as an existing command.
 }

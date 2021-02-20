@@ -25,12 +25,12 @@ class TabListDialog : public CDialog
 {
 public:
     TabListDialog(HWND hParent, std::function<void(DocID)>&& execFunc);
-    ~TabListDialog();
+    virtual ~TabListDialog();
 
     SIZE SetTabList(std::deque<std::tuple<std::wstring, DocID>>&& list);
 
 protected:
-    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 private:
     HWND                                        m_hParent;
@@ -55,7 +55,7 @@ public:
 
     UINT GetCmdId() override { return cmdSelectTab; }
 
-    void TabNotify(TBHDR* ptbhdr) override;
+    void TabNotify(TBHDR* ptbHdr) override;
 
     std::deque<DocID>              m_docIds;
     std::unique_ptr<TabListDialog> m_dlg;

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,16 +20,16 @@
 
 class CTabBtn : public CWindow
 {
-public :
+public:
     CTabBtn(HINSTANCE hInst)
         : CWindow(hInst)
         , m_hFont(nullptr)
-        , m_colorset(false)
         , m_color(0)
-        , m_textcolorset(false)
+        , m_colorset(false)
         , m_textcolor(0)
+        , m_textcolorset(false)
     {
-        m_AnimVarHot = Animator::Instance().CreateAnimationVariable(0.0, 0.0);
+        m_animVarHot = Animator::Instance().CreateAnimationVariable(0.0, 0.0);
     };
     virtual ~CTabBtn()
     {
@@ -41,17 +41,25 @@ public :
     void SetFont(const wchar_t *fontName, int fontSize);
     bool SetText(const wchar_t *str);
 
-    void SetColor(COLORREF clr) { m_color = clr; m_colorset = true; }
-    void SetTextColor(COLORREF clr) { m_textcolor = clr; m_textcolorset = true; }
+    void SetColor(COLORREF clr)
+    {
+        m_color    = clr;
+        m_colorset = true;
+    }
+    void SetTextColor(COLORREF clr)
+    {
+        m_textcolor    = clr;
+        m_textcolorset = true;
+    }
 
 protected:
     LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 private:
-    HFONT       m_hFont;
-    COLORREF    m_color;
-    bool        m_colorset;
-    COLORREF    m_textcolor;
-    bool        m_textcolorset;
-    AnimationVariable m_AnimVarHot;
+    HFONT             m_hFont;
+    COLORREF          m_color;
+    bool              m_colorset;
+    COLORREF          m_textcolor;
+    bool              m_textcolorset;
+    AnimationVariable m_animVarHot;
 };

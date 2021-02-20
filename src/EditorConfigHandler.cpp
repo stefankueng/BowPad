@@ -25,9 +25,9 @@ CEditorConfigHandler::CEditorConfigHandler()
 
 CEditorConfigHandler::~CEditorConfigHandler()
 {
-    for (const auto& handle : m_handles)
+    for (const auto& [path, data] : m_handles)
     {
-        editorconfig_handle_destroy(handle.second.handle);
+        editorconfig_handle_destroy(data.handle);
     }
 }
 
@@ -61,24 +61,24 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
     {
         if (!it->second.enabled)
             return;
-        int name_value_count = editorconfig_handle_get_name_value_count(it->second.handle);
-        for (int j = 0; j < name_value_count; ++j)
+        int nameValueCount = editorconfig_handle_get_name_value_count(it->second.handle);
+        for (int j = 0; j < nameValueCount; ++j)
         {
             const char* name  = nullptr;
             const char* value = nullptr;
             editorconfig_handle_get_name_value(it->second.handle, j, &name, &value);
 
-            if ((doc.m_TabSpace == TabSpace::Default) && (strcmp(name, "indent_style") == 0))
+            if ((doc.m_tabSpace == TabSpace::Default) && (strcmp(name, "indent_style") == 0))
             {
                 // tab / space
                 pScintilla->Call(SCI_SETUSETABS, strcmp(value, "tab") == 0);
             }
-            else if ((doc.m_TabSpace == TabSpace::Default) && (strcmp(name, "indent_size") == 0))
+            else if ((doc.m_tabSpace == TabSpace::Default) && (strcmp(name, "indent_size") == 0))
             {
                 // tab / number
                 pScintilla->Call(SCI_SETINDENT, strcmp(value, "tab") == 0 ? 0 : atoi(value));
             }
-            else if ((doc.m_TabSpace == TabSpace::Default) && (strcmp(name, "tab_width") == 0))
+            else if ((doc.m_tabSpace == TabSpace::Default) && (strcmp(name, "tab_width") == 0))
             {
                 // number
                 pScintilla->Call(SCI_SETTABWIDTH, atoi(value));
@@ -89,9 +89,9 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
                 if (strcmp(value, "lf") == 0)
                 {
                     pScintilla->Call(SCI_SETEOLMODE, SC_EOL_LF);
-                    if (doc.m_format != EOLFormat::UNIX_FORMAT)
+                    if (doc.m_format != EOLFormat::Unix_Format)
                     {
-                        doc.m_format = EOLFormat::UNIX_FORMAT;
+                        doc.m_format = EOLFormat::Unix_Format;
                         if (!doc.m_bIsReadonly && !doc.m_bIsWriteProtected)
                             pScintilla->Call(SCI_CONVERTEOLS, SC_EOL_LF);
                     }
@@ -99,9 +99,9 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
                 else if (strcmp(value, "cr") == 0)
                 {
                     pScintilla->Call(SCI_SETEOLMODE, SC_EOL_CR);
-                    if (doc.m_format != EOLFormat::MAC_FORMAT)
+                    if (doc.m_format != EOLFormat::Mac_Format)
                     {
-                        doc.m_format = EOLFormat::MAC_FORMAT;
+                        doc.m_format = EOLFormat::Mac_Format;
                         if (!doc.m_bIsReadonly && !doc.m_bIsWriteProtected)
                             pScintilla->Call(SCI_CONVERTEOLS, SC_EOL_CR);
                     }
@@ -109,9 +109,9 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
                 else if (strcmp(value, "crlf") == 0)
                 {
                     pScintilla->Call(SCI_SETEOLMODE, SC_EOL_CRLF);
-                    if (doc.m_format != EOLFormat::WIN_FORMAT)
+                    if (doc.m_format != EOLFormat::Win_Format)
                     {
-                        doc.m_format = EOLFormat::WIN_FORMAT;
+                        doc.m_format = EOLFormat::Win_Format;
                         if (!doc.m_bIsReadonly && !doc.m_bIsWriteProtected)
                             pScintilla->Call(SCI_CONVERTEOLS, SC_EOL_CRLF);
                     }
@@ -175,8 +175,8 @@ bool CEditorConfigHandler::IsEnabled(const std::wstring& path)
 
     if (it != m_handles.end())
     {
-        int name_value_count = editorconfig_handle_get_name_value_count(it->second.handle);
-        return (name_value_count != 0) && it->second.enabled;
+        int nameValueCount = editorconfig_handle_get_name_value_count(it->second.handle);
+        return (nameValueCount != 0) && it->second.enabled;
     }
     return false;
 }
@@ -199,10 +199,10 @@ bool CEditorConfigHandler::HasOption(const std::wstring& path, const char* optio
 
     if (it != m_handles.end())
     {
-        int name_value_count = editorconfig_handle_get_name_value_count(it->second.handle);
+        int nameValueCount = editorconfig_handle_get_name_value_count(it->second.handle);
         if (it->second.enabled)
         {
-            for (int j = 0; j < name_value_count; ++j)
+            for (int j = 0; j < nameValueCount; ++j)
             {
                 const char* name  = nullptr;
                 const char* value = nullptr;

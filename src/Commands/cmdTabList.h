@@ -25,15 +25,15 @@
 struct TabInfo
 {
     TabInfo(DocID docId, const std::wstring& title, const std::wstring& path)
-        : docId(docId)
-        , title(title)
+        : title(title)
         , path(path)
+        , docId(docId)
     {
     }
     TabInfo(DocID docId, std::wstring&& title, std::wstring&& path)
-        : docId(docId)
-        , title(std::move(title))
+        : title(std::move(title))
         , path(std::move(path))
+        , docId(docId)
     {
     }
     std::wstring title;
@@ -55,10 +55,10 @@ public:
     UINT GetCmdId() override { return cmdTabList; }
     bool IsItemsSourceCommand() override { return true; }
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
-    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void TabNotify(TBHDR* ptbhdr) override;
+    void TabNotify(TBHDR* ptbHdr) override;
     void ScintillaNotify(SCNotification* pScn) override;
 
     void OnDocumentOpen(DocID id) override;

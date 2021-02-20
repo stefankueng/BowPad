@@ -18,110 +18,102 @@
 #pragma once
 #include "ICommand.h"
 #include "BowPadUI.h"
-#include "COMPtrs.h"
 #include "LexStyles.h"
 
 #include <vector>
 #include <set>
 
-
-class CCmdSpellcheck : public ICommand
+class CCmdSpellCheck : public ICommand
 {
 public:
+    CCmdSpellCheck(void* obj);
 
-    CCmdSpellcheck(void * obj);
-
-    ~CCmdSpellcheck();
+    ~CCmdSpellCheck();
 
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdSpellCheck; }
 
-    void ScintillaNotify(SCNotification * pScn) override;
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    void    ScintillaNotify(SCNotification* pScn) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 
     void OnTimer(UINT id) override;
-protected:
-    void        Check();
 
+protected:
+    void Check();
 
 private:
-    bool                        m_enabled;
-    std::wstring                m_lang;
-    std::set<std::string>       m_keywords;
-    int                         m_activeLexer;
-    LexerData                   m_lexerData;
-    std::unique_ptr<char[]>     m_textbuffer;
-    int                         m_textbuflen;
-    sptr_t                      m_lastcheckedpos;
+    bool                    m_enabled;
+    std::wstring            m_lang;
+    std::set<std::string>   m_keywords;
+    int                     m_activeLexer;
+    LexerData               m_lexerData;
+    std::unique_ptr<char[]> m_textBuffer;
+    int                     m_textBufLen;
+    sptr_t                  m_lastCheckedPos;
 };
 
-class CCmdSpellcheckLang : public ICommand
+class CCmdSpellCheckLang : public ICommand
 {
 public:
-    CCmdSpellcheckLang(void * obj);
-    ~CCmdSpellcheckLang() = default;
+    CCmdSpellCheckLang(void* obj);
+    ~CCmdSpellCheckLang() = default;
 
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdSpellCheckLang; }
     bool IsItemsSourceCommand() override { return true; }
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
-    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
-
-private:
-
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 };
 
-class CCmdSpellcheckCorrect : public ICommand
+class CCmdSpellCheckCorrect : public ICommand
 {
 public:
-    CCmdSpellcheckCorrect(void * obj);
-    ~CCmdSpellcheckCorrect() = default;
+    CCmdSpellCheckCorrect(void* obj);
+    ~CCmdSpellCheckCorrect() = default;
 
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdSpellCheckCorrect; }
     bool IsItemsSourceCommand() override { return true; }
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
-    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
+    HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void ScintillaNotify(SCNotification * pScn) override;
+    void ScintillaNotify(SCNotification* pScn) override;
 
 private:
-    std::vector<std::wstring>   m_suggestions;
+    std::vector<std::wstring> m_suggestions;
 };
 
-class CCmdSpellcheckAll : public ICommand
+class CCmdSpellCheckAll : public ICommand
 {
 public:
+    CCmdSpellCheckAll(void* obj);
 
-    CCmdSpellcheckAll(void * obj);
-
-    ~CCmdSpellcheckAll(void) = default;
+    ~CCmdSpellCheckAll() = default;
 
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdSpellCheckAll; }
     void AfterInit() override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };
 
-class CCmdSpellcheckUpper : public ICommand
+class CCmdSpellCheckUpper : public ICommand
 {
 public:
+    CCmdSpellCheckUpper(void* obj);
 
-    CCmdSpellcheckUpper(void * obj);
-
-    ~CCmdSpellcheckUpper(void) = default;
+    ~CCmdSpellCheckUpper() = default;
 
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdSpellCheckUpper; }
     void AfterInit() override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue) override;
+    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };

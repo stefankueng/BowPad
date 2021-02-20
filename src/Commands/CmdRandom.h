@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,52 +29,51 @@ class CRandomFileList
 {
 public:
     CRandomFileList(void)
-        : m_noSubs(false)
-        , m_shuffleIndex(0)
-    {}
+        : m_shuffleIndex(0)
+        , m_noSubs(false)
+    {
+    }
     ~CRandomFileList(void)
     {
         Save();
     }
 
-public:
-    void InitPath(const std::wstring& path, bool nosubfolders);
+    void InitPath(const std::wstring& path, bool noSubFolders);
 
     std::wstring GetRandomFile();
 
     std::wstring GoBack();
 
-    size_t GetCount();
+    size_t GetCount() const;
 
-    size_t GetShownCount();
+    size_t GetShownCount() const;
 
     void Save();
     void SetShown(std::wstring file);
     void SetNotShown(std::wstring file);
     void RemoveFromShown(const std::wstring& file);
     void RemoveFromNotShown(const std::wstring& file);
-    void SetNewPath(const std::wstring& fileold, const std::wstring& filenew);
+    void SetNewPath(const std::wstring& fileOld, const std::wstring& fileNew);
 
 private:
-    void FillUnShownPathList(CDirFileEnum& filefinder, bool recurse);
+    void FillUnShownPathList(CDirFileEnum& fileFinder, bool recurse);
 
-    std::wstring                        m_sPath;
-    std::set<std::wstring, ci_lessW>    m_arShownFileList;
-    std::set<std::wstring, ci_lessW>    m_arUnShownFileList;
-    std::set<std::wstring, ci_lessW>    m_arShownRepeatFileList;
-    std::vector<std::wstring>           m_arShuffleList;
-    size_t                              m_shuffleIndex;
-    bool                                m_noSubs;
-    std::mutex                          m_mutex;
+    std::wstring                     m_sPath;
+    std::set<std::wstring, ci_lessW> m_arShownFileList;
+    std::set<std::wstring, ci_lessW> m_arUnShownFileList;
+    std::set<std::wstring, ci_lessW> m_arShownRepeatFileList;
+    std::vector<std::wstring>        m_arShuffleList;
+    size_t                           m_shuffleIndex;
+    bool                             m_noSubs;
+    std::mutex                       m_mutex;
 };
-
 
 // opens a random file from the same directory as the current file shown in the current tab
 class CCmdRandom : public ICommand
 {
 public:
-
-    CCmdRandom(void * obj) : ICommand(obj)
+    CCmdRandom(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -87,7 +86,6 @@ public:
     void OnClose() override;
 
 private:
-    std::wstring                m_scannedDir;
-    CRandomFileList             m_fileList;
+    std::wstring    m_scannedDir;
+    CRandomFileList m_fileList;
 };
-

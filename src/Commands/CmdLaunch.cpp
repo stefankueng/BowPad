@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019-2020 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,18 +22,19 @@
 #include "UnicodeUtils.h"
 #include "EscapeUtils.h"
 #include "Theme.h"
+#include "ResString.h"
 
-bool LaunchBase::Launch(const std::wstring& cmdline)
+bool LaunchBase::Launch(const std::wstring& cmdline) const
 {
     if (cmdline.empty() || !HasActiveDocument())
         return false;
     std::wstring cmd = cmdline;
-    // remove eols
+    // remove EOLs
     SearchRemoveAll(cmd, L"\n");
     SearchReplace(cmd, L"\r", L" ");
     // replace the macros in the command line
     const auto&  doc     = GetActiveDocument();
-    std::wstring tabpath = doc.m_path;
+    std::wstring tabPath = doc.m_path;
     if ((cmd.find(L"$(TAB_PATH)") != std::wstring::npos) ||
         (cmd.find(L"$(TAB_NAME)") != std::wstring::npos) ||
         (cmd.find(L"$(TAB_EXT)") != std::wstring::npos))
@@ -42,13 +43,13 @@ bool LaunchBase::Launch(const std::wstring& cmdline)
         SaveCurrentTab();
     }
 
-    auto tabdirpath = CPathUtils::GetParentDirectory(tabpath);
-    if (PathFileExists(tabpath.c_str()))
+    auto tabDirPath = CPathUtils::GetParentDirectory(tabPath);
+    if (PathFileExists(tabPath.c_str()))
     {
-        SearchReplace(cmd, L"$(TAB_PATH)", tabpath);
-        SearchReplace(cmd, L"$(TAB_DIR)", tabdirpath);
-        SearchReplace(cmd, L"$(TAB_NAME)", CPathUtils::GetFileNameWithoutExtension(tabpath));
-        SearchReplace(cmd, L"$(TAB_EXT)", CPathUtils::GetFileExtension(tabpath));
+        SearchReplace(cmd, L"$(TAB_PATH)", tabPath);
+        SearchReplace(cmd, L"$(TAB_DIR)", tabDirPath);
+        SearchReplace(cmd, L"$(TAB_NAME)", CPathUtils::GetFileNameWithoutExtension(tabPath));
+        SearchReplace(cmd, L"$(TAB_EXT)", CPathUtils::GetFileExtension(tabPath));
     }
     else
     {
@@ -57,7 +58,7 @@ bool LaunchBase::Launch(const std::wstring& cmdline)
     }
 
     SearchReplace(cmd, L"$(LINE)", std::to_wstring(GetCurrentLineNumber()));
-    SearchReplace(cmd, L"$(POS)", std::to_wstring(int(ScintillaCall(SCI_GETCURRENTPOS))));
+    SearchReplace(cmd, L"$(POS)", std::to_wstring(static_cast<int>(ScintillaCall(SCI_GETCURRENTPOS))));
     // find selected text or current word
     std::string sSelText = GetSelectedText();
     if (sSelText.empty())
@@ -74,19 +75,19 @@ bool LaunchBase::Launch(const std::wstring& cmdline)
     if (cmd[0] == '"')
     {
         cmd             = cmd.substr(1);
-        size_t quotepos = cmd.find_first_of('"');
-        if (quotepos == std::wstring::npos)
+        size_t quotePos = cmd.find_first_of('"');
+        if (quotePos == std::wstring::npos)
             return false;
-        params = cmd.substr(quotepos + 1);
-        cmd    = cmd.substr(0, quotepos);
+        params = cmd.substr(quotePos + 1);
+        cmd    = cmd.substr(0, quotePos);
     }
     else
     {
-        size_t spacepos = cmd.find_first_of(' ');
-        if (spacepos != std::wstring::npos)
+        size_t spacePos = cmd.find_first_of(' ');
+        if (spacePos != std::wstring::npos)
         {
-            params = cmd.substr(spacepos + 1);
-            cmd    = cmd.substr(0, spacepos);
+            params = cmd.substr(spacePos + 1);
+            cmd    = cmd.substr(0, spacePos);
         }
     }
 
@@ -97,7 +98,7 @@ bool LaunchBase::Launch(const std::wstring& cmdline)
     shi.lpVerb           = L"open";
     shi.lpFile           = cmd.c_str();
     shi.lpParameters     = params.empty() ? nullptr : params.c_str();
-    shi.lpDirectory      = tabdirpath.c_str();
+    shi.lpDirectory      = tabDirPath.c_str();
     shi.nShow            = SW_SHOW;
 
     return !!ShellExecuteEx(&shi);
@@ -112,8 +113,8 @@ bool CCmdLaunchSearch::Execute()
 }
 
 CCmdLaunchCustom::CCmdLaunchCustom(UINT customId, void* obj)
-    : m_customId(customId)
-    , LaunchBase(obj)
+    : LaunchBase(obj)
+    , m_customId(customId)
 {
     m_customCmdId = cmdLaunchCustom0 + customId;
     m_settingsID  = CStringUtils::Format(L"Command%u", customId);
@@ -125,7 +126,7 @@ void CCmdLaunchCustom::AfterInit()
     InvalidateUICommand(m_customCmdId, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
 }
 
-HRESULT CCmdLaunchCustom::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdLaunchCustom::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (m_customId < 9)
     {
@@ -140,19 +141,19 @@ HRESULT CCmdLaunchCustom::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
     if (UI_PKEY_Enabled == key)
     {
         size_t len = wcslen(CIniSettings::Instance().GetString(L"CustomLaunch", m_settingsID.c_str(), L""));
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, len > 0, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, len > 0, pPropVarNewValue);
     }
     if (UI_PKEY_Label == key)
     {
         std::wstring settingsIDName = m_settingsID + L"Label";
         std::wstring commandLabel   = CIniSettings::Instance().GetString(L"CustomLaunch", settingsIDName.c_str(), L"");
         if (!commandLabel.empty())
-            return UIInitPropertyFromString(UI_PKEY_Label, commandLabel.c_str(), ppropvarNewValue);
+            return UIInitPropertyFromString(UI_PKEY_Label, commandLabel.c_str(), pPropVarNewValue);
         else
         {
             ResString label(g_hRes, IDS_CUSTOMCOMMANDTITLE);
             auto      sLabel = CStringUtils::Format(label, m_customId);
-            return UIInitPropertyFromString(UI_PKEY_Label, sLabel.c_str(), ppropvarNewValue);
+            return UIInitPropertyFromString(UI_PKEY_Label, sLabel.c_str(), pPropVarNewValue);
         }
     }
     return E_FAIL;
@@ -268,12 +269,11 @@ LRESULT CALLBACK CCustomCommandsDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wPa
             break;
         case WM_GETMINMAXINFO:
         {
-            MINMAXINFO* mmi       = (MINMAXINFO*)lParam;
+            MINMAXINFO* mmi       = reinterpret_cast<MINMAXINFO*>(lParam);
             mmi->ptMinTrackSize.x = m_resizer.GetDlgRectScreen()->right;
             mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
             return 0;
         }
-        break;
         case WM_COMMAND:
             return DoCommand(LOWORD(wParam));
         default:

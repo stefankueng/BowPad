@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016 - Stefan Kueng
+// Copyright (C) 2014, 2016, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,12 +21,12 @@
 #include <stdexcept>
 
 BasicScriptHost::BasicScriptHost(const GUID& languageId, const std::wstring& objectName, IDispatchPtr object)
-    : m_refCount(1)
-    , m_hWnd(nullptr)
+    : m_hWnd(nullptr)
+    , m_refCount(1)
 {
     IActiveScriptPtr engine;
 
-    HRESULT hr = CoCreateInstance(languageId, 0, CLSCTX_INPROC_SERVER, IID_IActiveScript, reinterpret_cast<void**>(&engine));
+    HRESULT hr = CoCreateInstance(languageId, nullptr, CLSCTX_INPROC_SERVER, IID_IActiveScript, reinterpret_cast<void**>(&engine));
     if (FAILED(hr))
     {
         throw std::runtime_error("Unable to create active script object");
@@ -45,18 +45,17 @@ BasicScriptHost::BasicScriptHost(const GUID& languageId, const std::wstring& obj
     }
 
     //  Done, set the application object and engine
-    m_application = object;
+    m_application  = object;
     m_scriptEngine = engine;
 }
 
-
 BasicScriptHost::BasicScriptHost(const GUID& languageId)
-    : m_refCount(1)
-    , m_hWnd(nullptr)
+    : m_hWnd(nullptr)
+    , m_refCount(1)
 {
     IActiveScriptPtr engine;
 
-    HRESULT hr = CoCreateInstance(languageId, 0, CLSCTX_INPROC_SERVER, IID_IActiveScript, reinterpret_cast<void**>(&engine));
+    HRESULT hr = CoCreateInstance(languageId, nullptr, CLSCTX_INPROC_SERVER, IID_IActiveScript, reinterpret_cast<void**>(&engine));
     if (FAILED(hr))
     {
         throw std::runtime_error("Unable to create active script object");
@@ -72,12 +71,11 @@ BasicScriptHost::BasicScriptHost(const GUID& languageId)
     m_scriptEngine = engine.Detach();
 }
 
-
 BasicScriptHost::~BasicScriptHost()
-{}
+{
+}
 
-
-HRESULT BasicScriptHost::QueryInterface(REFIID riid, void ** object)
+HRESULT BasicScriptHost::QueryInterface(REFIID riid, void** object)
 {
     if (riid == IID_IActiveScriptSite)
     {
@@ -102,12 +100,10 @@ HRESULT BasicScriptHost::QueryInterface(REFIID riid, void ** object)
     return E_NOINTERFACE;
 }
 
-
 ULONG BasicScriptHost::AddRef()
 {
     return ::InterlockedIncrement(&m_refCount);
 }
-
 
 ULONG BasicScriptHost::Release()
 {
@@ -122,13 +118,11 @@ ULONG BasicScriptHost::Release()
     return oldCount;
 }
 
-
-HRESULT BasicScriptHost::GetLCID(DWORD *lcid)
+HRESULT BasicScriptHost::GetLCID(DWORD* lcid)
 {
     *lcid = LOCALE_USER_DEFAULT;
     return S_OK;
 }
-
 
 HRESULT BasicScriptHost::GetDocVersionString(BSTR* ver)
 {
@@ -136,35 +130,30 @@ HRESULT BasicScriptHost::GetDocVersionString(BSTR* ver)
     return S_OK;
 }
 
-
-HRESULT BasicScriptHost::OnScriptTerminate(const VARIANT *, const EXCEPINFO *)
+HRESULT BasicScriptHost::OnScriptTerminate(const VARIANT*, const EXCEPINFO*)
 {
     return S_OK;
 }
-
 
 HRESULT BasicScriptHost::OnStateChange(SCRIPTSTATE /*state*/)
 {
     return S_OK;
 }
 
-
 HRESULT BasicScriptHost::OnEnterScript()
 {
     return S_OK;
 }
-
 
 HRESULT BasicScriptHost::OnLeaveScript()
 {
     return S_OK;
 }
 
-
-HRESULT BasicScriptHost::GetItemInfo(const WCHAR*    /*name*/,
-                                     DWORD           req,
-                                     IUnknown**      obj,
-                                     ITypeInfo**     type)
+HRESULT BasicScriptHost::GetItemInfo(const WCHAR* /*name*/,
+                                     DWORD       req,
+                                     IUnknown**  obj,
+                                     ITypeInfo** type)
 {
     if (req & SCRIPTINFO_IUNKNOWN && obj != nullptr)
     {
@@ -183,12 +172,11 @@ HRESULT BasicScriptHost::GetItemInfo(const WCHAR*    /*name*/,
     return S_OK;
 }
 
-
 HRESULT BasicScriptHost::Initialize()
 {
     IActiveScriptParsePtr parse;
 
-    HRESULT hr = m_scriptEngine->QueryInterface(IID_IActiveScriptParse, reinterpret_cast<void **>(&parse));
+    HRESULT hr = m_scriptEngine->QueryInterface(IID_IActiveScriptParse, reinterpret_cast<void**>(&parse));
     if (FAILED(hr))
     {
         throw std::runtime_error("Unable to get pointer to script parsing interface");
@@ -200,7 +188,6 @@ HRESULT BasicScriptHost::Initialize()
     return hr;
 }
 
-
 HRESULT BasicScriptHost::Run()
 {
     // Sets state to SCRIPTSTATE_CONNECTED
@@ -208,7 +195,6 @@ HRESULT BasicScriptHost::Run()
 
     return hr;
 }
-
 
 HRESULT BasicScriptHost::Terminate()
 {
@@ -221,12 +207,11 @@ HRESULT BasicScriptHost::Terminate()
     return hr;
 }
 
-
 HRESULT BasicScriptHost::Parse(const std::wstring& source)
 {
     IActiveScriptParsePtr parser;
 
-    HRESULT hr = m_scriptEngine->QueryInterface(IID_IActiveScriptParse, reinterpret_cast<void **>(&parser));
+    HRESULT hr = m_scriptEngine->QueryInterface(IID_IActiveScriptParse, reinterpret_cast<void**>(&parser));
     if (FAILED(hr))
     {
         throw std::runtime_error("Unable to get pointer to script parsing interface");
@@ -245,16 +230,14 @@ HRESULT BasicScriptHost::Parse(const std::wstring& source)
     return hr;
 }
 
-
-
-HRESULT BasicScriptHost::OnScriptError(IActiveScriptError *err)
+HRESULT BasicScriptHost::OnScriptError(IActiveScriptError* err)
 {
     EXCEPINFO e;
 
     err->GetExceptionInfo(&e);
     DWORD cookie;
     ULONG line;
-    LONG charpos;
+    LONG  charpos;
     err->GetSourcePosition(&cookie, &line, &charpos);
     std::wstring sMsg = CStringUtils::Format(L"Script error in file '%s':\nline %lu, pos %ld\n%s\nscode = %xld\nwcode = %xd", m_path.c_str(), line + 1, charpos + 1, (e.bstrDescription == nullptr ? L"unknown" : e.bstrDescription), e.scode, e.wCode);
 
@@ -263,31 +246,30 @@ HRESULT BasicScriptHost::OnScriptError(IActiveScriptError *err)
     return S_OK;
 }
 
-
-_variant_t BasicScriptHost::CallFunction(const std::wstring& strFunc,
+_variant_t BasicScriptHost::CallFunction(const std::wstring&              strFunc,
                                          const std::vector<std::wstring>& paramArray)
 {
     // Putting parameters
-    DISPPARAMS dispparams = { 0 };
-    const int arraySize = (int)paramArray.size();
+    DISPPARAMS dispParams = {nullptr};
+    const int  arraySize  = static_cast<int>(paramArray.size());
 
-    auto varmem = std::make_unique<VARIANT[]>(dispparams.cArgs);
-    dispparams.cArgs = arraySize;
-    dispparams.rgvarg = varmem.get();
-    dispparams.cNamedArgs = 0;
+    auto varMem           = std::make_unique<VARIANT[]>(dispParams.cArgs);
+    dispParams.cArgs      = arraySize;
+    dispParams.rgvarg     = varMem.get();
+    dispParams.cNamedArgs = 0;
 
     for (int i = 0; i < arraySize; i++)
     {
-        _bstr_t bstr = paramArray[arraySize - 1 - i].c_str(); // back reading
-        dispparams.rgvarg[i].bstrVal = bstr.Detach();
-        dispparams.rgvarg[i].vt = VT_BSTR;
+        _bstr_t bstr                 = paramArray[arraySize - 1 - i].c_str(); // back reading
+        dispParams.rgvarg[i].bstrVal = bstr.Detach();
+        dispParams.rgvarg[i].vt      = VT_BSTR;
     }
 
-    _variant_t vaResult = CallFunction(strFunc, dispparams);
+    _variant_t vaResult = CallFunction(strFunc, dispParams);
 
     for (int i = 0; i < arraySize; i++)
     {
-        SysFreeString(dispparams.rgvarg[i].bstrVal);
+        SysFreeString(dispParams.rgvarg[i].bstrVal);
     }
 
     return vaResult;
@@ -299,19 +281,19 @@ _variant_t BasicScriptHost::CallFunction(const std::wstring& strFunc, DISPPARAMS
     m_scriptEngine->GetScriptDispatch(nullptr, &scriptDispatch);
     // Find dispid for given function in the object
     _bstr_t bstrMember(strFunc.c_str());
-    DISPID dispid = 0;
+    DISPID  dispId = 0;
 
-    HRESULT hr = scriptDispatch->GetIDsOfNames(IID_NULL, &bstrMember.GetBSTR(), 1, LOCALE_SYSTEM_DEFAULT, &dispid);
+    HRESULT hr = scriptDispatch->GetIDsOfNames(IID_NULL, &bstrMember.GetBSTR(), 1, LOCALE_SYSTEM_DEFAULT, &dispId);
     if (FAILED(hr))
     {
         throw std::runtime_error("Unable to get id of function");
     }
     // Call JavaScript function
-    EXCEPINFO excepInfo = { 0 };
+    EXCEPINFO  excepInfo = {0};
     _variant_t vaResult;
-    UINT nArgErr = (UINT)-1;  // initialize to invalid arg
+    UINT       nArgErr = static_cast<UINT>(-1); // initialize to invalid arg
 
-    hr = scriptDispatch->Invoke(dispid,
+    hr = scriptDispatch->Invoke(dispId,
                                 IID_NULL,
                                 0,
                                 DISPATCH_METHOD,

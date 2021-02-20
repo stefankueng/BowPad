@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,9 @@
 #include "UnicodeUtils.h"
 #include "PathUtils.h"
 #include "OnOutOfScope.h"
+#include "ResString.h"
 
-extern void FindReplace_FindFile(void* mainWnd, const std::wstring& fileName);
+extern void findReplaceFindFile(void* mainWnd, const std::wstring& fileName);
 
 CCmdOpenSelection::CCmdOpenSelection(void* obj)
     : ICommand(obj)
@@ -62,7 +63,7 @@ bool CCmdOpenSelection::Execute()
     }
     if (PathFileExists(path.c_str()))
         return OpenFile(path.c_str(), OpenFlags::AddToMRU) >= 0;
-    FindReplace_FindFile(m_pMainWindow, path);
+    findReplaceFindFile(m_pMainWindow, path);
     return false;
 }
 
@@ -75,11 +76,11 @@ void CCmdOpenSelection::AfterInit()
     InvalidateUICommand(cmdOpenSelection, UI_INVALIDATIONS_STATE, &UI_PKEY_Enabled);
 }
 
-HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !GetPathUnderCursor().empty(), ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !GetPathUnderCursor().empty(), pPropVarNewValue);
     }
     if (UI_PKEY_Label == key)
     {
@@ -92,11 +93,11 @@ HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
         {
             wchar_t compactPath[100] = {};
             PathCompactPathEx(compactPath, path.c_str(), 30, 0);
-            std::wstring tip = CStringUtils::Format(L"%s \"%s\"", (LPCWSTR)label, compactPath);
-            return UIInitPropertyFromString(UI_PKEY_Label, tip.c_str(), ppropvarNewValue);
+            std::wstring tip = CStringUtils::Format(L"%s \"%s\"", static_cast<LPCWSTR>(label), compactPath);
+            return UIInitPropertyFromString(UI_PKEY_Label, tip.c_str(), pPropVarNewValue);
         }
         else
-            return UIInitPropertyFromString(UI_PKEY_Label, label, ppropvarNewValue);
+            return UIInitPropertyFromString(UI_PKEY_Label, label, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
@@ -109,10 +110,10 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
     auto pathUnderCursor = CUnicodeUtils::StdGetUnicode(GetSelectedText(false));
     if (pathUnderCursor.empty())
     {
-        auto linebuffer = GetWordChars();
-        OnOutOfScope(ConstCall(SCI_SETWORDCHARS, 0, (LPARAM)linebuffer.c_str()));
+        auto lineBuffer = GetWordChars();
+        OnOutOfScope(ConstCall(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>(lineBuffer.c_str())));
 
-        ConstCall(SCI_SETWORDCHARS, 0, (LPARAM) "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
+        ConstCall(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\"));
         size_t pos = ConstCall(SCI_GETCURRENTPOS);
 
         std::string sWordA = GetTextRange(ConstCall(SCI_WORDSTARTPOSITION, pos, false),

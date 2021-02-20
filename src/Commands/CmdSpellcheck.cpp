@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2015-2017, 2020 - Stefan Kueng
+// Copyright (C) 2015-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "PropertySet.h"
 #include "SciLexer.h"
 #include "OnOutOfScope.h"
+#include "ResString.h"
 
 #include <spellcheck.h>
 #include <Richedit.h>
@@ -36,21 +37,21 @@ extern UINT32        g_contextID;
 namespace
 {
 ISpellCheckerFactoryPtr   g_spellCheckerFactory = nullptr;
-ISpellCheckerPtr          g_SpellChecker        = nullptr;
+ISpellCheckerPtr          g_spellChecker        = nullptr;
 std::vector<std::wstring> g_languages;
-UINT                      g_checktimer = 0;
-std::string               g_wordchars;
+UINT                      g_checkTimer = 0;
+std::string               g_wordChars;
 } // namespace
 
-CCmdSpellcheck::CCmdSpellcheck(void* obj)
+CCmdSpellCheck::CCmdSpellCheck(void* obj)
     : ICommand(obj)
     , m_enabled(true)
     , m_activeLexer(-1)
-    , m_textbuflen(0)
-    , m_lastcheckedpos(0)
+    , m_textBufLen(0)
+    , m_lastCheckedPos(0)
 {
     m_enabled    = CIniSettings::Instance().GetInt64(L"spellcheck", L"enabled", 1) != 0;
-    g_checktimer = GetTimerID();
+    g_checkTimer = GetTimerID();
     // try to create the spell checker factory
     HRESULT hr = CoCreateInstance(__uuidof(SpellCheckerFactory), nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&g_spellCheckerFactory));
     if (SUCCEEDED(hr))
@@ -84,11 +85,11 @@ CCmdSpellcheck::CCmdSpellcheck(void* obj)
         hr             = g_spellCheckerFactory->IsSupported(m_lang.c_str(), &supported);
         if (supported)
         {
-            g_SpellChecker = nullptr;
-            hr             = g_spellCheckerFactory->CreateSpellChecker(m_lang.c_str(), &g_SpellChecker);
+            g_spellChecker = nullptr;
+            hr             = g_spellCheckerFactory->CreateSpellChecker(m_lang.c_str(), &g_spellChecker);
         }
-        m_textbuflen = 1024;
-        m_textbuffer = std::make_unique<char[]>(m_textbuflen);
+        m_textBufLen = 1024;
+        m_textBuffer = std::make_unique<char[]>(m_textBufLen);
     }
     else
     {
@@ -96,116 +97,116 @@ CCmdSpellcheck::CCmdSpellcheck(void* obj)
     }
 
     // create a string with all the word chars
-    g_wordchars.clear();
+    g_wordChars.clear();
     for (int ch = 0; ch < 256; ++ch)
     {
         if (ch >= 0x80 || isalnum(ch) || ch == '_' || ch == '\'')
-            g_wordchars += (char)ch;
+            g_wordChars += static_cast<char>(ch);
     }
 
-    g_contextID = m_enabled && g_SpellChecker ? cmdContextSpellMap : cmdContextMap;
+    g_contextID = m_enabled && g_spellChecker ? cmdContextSpellMap : cmdContextMap;
 
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-inline CCmdSpellcheck::~CCmdSpellcheck()
+inline CCmdSpellCheck::~CCmdSpellCheck()
 {
-    g_SpellChecker        = nullptr;
+    g_spellChecker        = nullptr;
     g_spellCheckerFactory = nullptr;
 }
 
-void CCmdSpellcheck::ScintillaNotify(SCNotification* pScn)
+void CCmdSpellCheck::ScintillaNotify(SCNotification* pScn)
 {
     switch (pScn->nmhdr.code)
     {
         case SCN_UPDATEUI:
             if (m_enabled && (pScn->updated & (SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL)) != 0)
             {
-                m_lastcheckedpos = 0;
-                SetTimer(GetHwnd(), g_checktimer, 500, nullptr);
+                m_lastCheckedPos = 0;
+                SetTimer(GetHwnd(), g_checkTimer, 500, nullptr);
             }
             break;
         case SCN_MODIFIED:
             if (m_enabled && (pScn->modificationType & (SC_MOD_DELETETEXT | SC_MOD_INSERTTEXT)) != 0)
             {
-                m_lastcheckedpos = 0;
-                SetTimer(GetHwnd(), g_checktimer, 500, nullptr);
+                m_lastCheckedPos = 0;
+                SetTimer(GetHwnd(), g_checkTimer, 500, nullptr);
             }
             break;
     }
 }
 
-void CCmdSpellcheck::Check()
+void CCmdSpellCheck::Check()
 {
-    if (m_enabled && g_SpellChecker)
+    if (m_enabled && g_spellChecker)
     {
 #ifdef _DEBUG
         ProfileTimer timer(L"SpellCheck");
 #endif
-        bool CheckAll       = CIniSettings::Instance().GetInt64(L"spellcheck", L"checkall", 1) != 0;
-        bool CheckUppercase = CIniSettings::Instance().GetInt64(L"spellcheck", L"uppercase", 1) != 0;
-        if (m_activeLexer != (int)ScintillaCall(SCI_GETLEXER))
+        bool checkAll       = CIniSettings::Instance().GetInt64(L"spellcheck", L"checkall", 1) != 0;
+        bool checkUppercase = CIniSettings::Instance().GetInt64(L"spellcheck", L"uppercase", 1) != 0;
+        if (m_activeLexer != static_cast<int>(ScintillaCall(SCI_GETLEXER)))
         {
-            m_activeLexer = (int)ScintillaCall(SCI_GETLEXER);
+            m_activeLexer = static_cast<int>(ScintillaCall(SCI_GETLEXER));
             m_lexerData   = CLexStyles::Instance().GetLexerDataForLexer(m_activeLexer);
             m_keywords.clear();
             const auto& keywords = CLexStyles::Instance().GetKeywordsForLexer(m_activeLexer);
-            for (const auto& words : keywords)
+            for (const auto& [type, words] : keywords)
             {
-                stringtokset(m_keywords, words.second, true, " ", true);
+                stringtokset(m_keywords, words, true, " ", true);
             }
-            m_lastcheckedpos = 0;
+            m_lastCheckedPos = 0;
         }
 
-        auto wordcharsbuffer = GetWordChars();
-        OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, (sptr_t)wordcharsbuffer.c_str()));
+        auto wordCharsBuffer = GetWordChars();
+        OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(wordCharsBuffer.c_str())));
 
-        ScintillaCall(SCI_SETWORDCHARS, 0, (sptr_t)g_wordchars.c_str());
-        Sci_TextRange textrange{};
-        auto          firstline = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
-        auto          lastline  = firstline + ScintillaCall(SCI_LINESONSCREEN);
-        textrange.chrg.cpMin    = (Sci_PositionCR)ScintillaCall(SCI_POSITIONFROMLINE, firstline);
-        textrange.chrg.cpMax    = textrange.chrg.cpMin;
-        auto lastpos            = ScintillaCall(SCI_POSITIONFROMLINE, lastline) + ScintillaCall(SCI_LINELENGTH, lastline);
-        auto textlength         = ScintillaCall(SCI_GETLENGTH);
-        if (lastpos < 0)
-            lastpos = textlength - textrange.chrg.cpMin;
-        if (m_lastcheckedpos)
+        ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(g_wordChars.c_str()));
+        Sci_TextRange textRange{};
+        auto          firstLine = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
+        auto          lastLine  = firstLine + ScintillaCall(SCI_LINESONSCREEN);
+        textRange.chrg.cpMin    = static_cast<Sci_PositionCR>(ScintillaCall(SCI_POSITIONFROMLINE, firstLine));
+        textRange.chrg.cpMax    = textRange.chrg.cpMin;
+        auto lastPos            = ScintillaCall(SCI_POSITIONFROMLINE, lastLine) + ScintillaCall(SCI_LINELENGTH, lastLine);
+        auto textLength         = ScintillaCall(SCI_GETLENGTH);
+        if (lastPos < 0)
+            lastPos = textLength - textRange.chrg.cpMin;
+        if (m_lastCheckedPos)
         {
-            textrange.chrg.cpMax = (Sci_PositionCR)m_lastcheckedpos;
+            textRange.chrg.cpMax = static_cast<Sci_PositionCR>(m_lastCheckedPos);
         }
         auto start = GetTickCount64();
-        while (textrange.chrg.cpMax < lastpos)
+        while (textRange.chrg.cpMax < lastPos)
         {
             if (GetTickCount64() - start > 300)
             {
-                m_lastcheckedpos = textrange.chrg.cpMax;
-                if (g_checktimer)
-                    SetTimer(GetHwnd(), g_checktimer, 10, nullptr);
+                m_lastCheckedPos = textRange.chrg.cpMax;
+                if (g_checkTimer)
+                    SetTimer(GetHwnd(), g_checkTimer, 10, nullptr);
                 break;
             }
-            textrange.chrg.cpMin = (Sci_PositionCR)ScintillaCall(SCI_WORDSTARTPOSITION, textrange.chrg.cpMax + 1, TRUE);
-            if (textrange.chrg.cpMin < textrange.chrg.cpMax)
+            textRange.chrg.cpMin = static_cast<Sci_PositionCR>(ScintillaCall(SCI_WORDSTARTPOSITION, textRange.chrg.cpMax + 1, TRUE));
+            if (textRange.chrg.cpMin < textRange.chrg.cpMax)
                 break;
-            textrange.chrg.cpMax = (Sci_PositionCR)ScintillaCall(SCI_WORDENDPOSITION, textrange.chrg.cpMin, TRUE);
-            if (textrange.chrg.cpMin == textrange.chrg.cpMax)
+            textRange.chrg.cpMax = static_cast<Sci_PositionCR>(ScintillaCall(SCI_WORDENDPOSITION, textRange.chrg.cpMin, TRUE));
+            if (textRange.chrg.cpMin == textRange.chrg.cpMax)
             {
-                textrange.chrg.cpMax++;
+                textRange.chrg.cpMax++;
                 // since Scintilla squiggles to the end of the text even if told to stop one char before it,
                 // we have to clear here the squiggly lines to the end.
-                if (textrange.chrg.cpMin)
+                if (textRange.chrg.cpMin)
                 {
                     ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textrange.chrg.cpMin - 1, textrange.chrg.cpMax - textrange.chrg.cpMin + 1);
+                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin - 1, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
                 }
                 continue;
             }
-            if (ScintillaCall(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, textrange.chrg.cpMin))
+            if (ScintillaCall(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, textRange.chrg.cpMin))
                 continue;
 
-            int style = (int)ScintillaCall(SCI_GETSTYLEAT, textrange.chrg.cpMin);
+            int style = static_cast<int>(ScintillaCall(SCI_GETSTYLEAT, textRange.chrg.cpMin));
             // check if the word is text, doc or comment
-            if (!CheckAll)
+            if (!checkAll)
             {
                 bool isText = true;
                 switch (m_activeLexer)
@@ -214,9 +215,9 @@ void CCmdSpellcheck::Check()
                     case SCLEX_MARKDOWN:
                         break;
                     default:
-                        if (style < (int)m_lexerData.Styles.size())
+                        if (style < static_cast<int>(m_lexerData.styles.size()))
                         {
-                            const auto& sStyle = m_lexerData.Styles[style].Name;
+                            const auto& sStyle = m_lexerData.styles[style].name;
                             if ((sStyle.find(L"DOC") == std::wstring::npos) &&
                                 (sStyle.find(L"COMMENT") == std::wstring::npos) &&
                                 (sStyle.find(L"STRING") == std::wstring::npos) &&
@@ -227,62 +228,62 @@ void CCmdSpellcheck::Check()
                         {
                             // mark word as correct (remove the squiggle line)
                             ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                            ScintillaCall(SCI_INDICATORCLEARRANGE, textrange.chrg.cpMin, textrange.chrg.cpMax - textrange.chrg.cpMin);
-                            ScintillaCall(SCI_INDICATORCLEARRANGE, textrange.chrg.cpMin, textrange.chrg.cpMax - textrange.chrg.cpMin + 1);
+                            ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                            ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
                             continue;
                         }
                 }
             }
-            assert(textrange.chrg.cpMax >= textrange.chrg.cpMin);
-            if (m_textbuflen < (textrange.chrg.cpMax - textrange.chrg.cpMin + 2))
+            assert(textRange.chrg.cpMax >= textRange.chrg.cpMin);
+            if (m_textBufLen < (textRange.chrg.cpMax - textRange.chrg.cpMin + 2))
             {
-                m_textbuflen = textrange.chrg.cpMax - textrange.chrg.cpMin + 1024;
-                m_textbuffer = std::make_unique<char[]>(m_textbuflen);
+                m_textBufLen = textRange.chrg.cpMax - textRange.chrg.cpMin + 1024;
+                m_textBuffer = std::make_unique<char[]>(m_textBufLen);
             }
-            textrange.lpstrText = m_textbuffer.get();
-            if (textrange.chrg.cpMax < textlength)
+            textRange.lpstrText = m_textBuffer.get();
+            if (textRange.chrg.cpMax < textLength)
             {
-                textrange.chrg.cpMax++;
-                ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&textrange);
+                textRange.chrg.cpMax++;
+                ScintillaCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&textRange));
             }
             else
             {
-                ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&textrange);
-                textrange.chrg.cpMax++;
+                ScintillaCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&textRange));
+                textRange.chrg.cpMax++;
             }
-            auto len = strlen(textrange.lpstrText);
+            auto len = strlen(textRange.lpstrText);
             if (len == 0)
             {
-                textrange.chrg.cpMax--;
-                ScintillaCall(SCI_GETTEXTRANGE, 0, (sptr_t)&textrange);
-                len = strlen(textrange.lpstrText);
-                textrange.chrg.cpMax++;
+                textRange.chrg.cpMax--;
+                ScintillaCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&textRange));
+                len = strlen(textRange.lpstrText);
+                textRange.chrg.cpMax++;
                 len++;
             }
             if (len)
-                textrange.lpstrText[len - 1] = 0;
-            textrange.chrg.cpMax--;
-            if (textrange.lpstrText[0])
+                textRange.lpstrText[len - 1] = 0;
+            textRange.chrg.cpMax--;
+            if (textRange.lpstrText[0])
             {
-                auto sWord = CUnicodeUtils::StdGetUnicode(textrange.lpstrText);
+                auto sWord = CUnicodeUtils::StdGetUnicode(textRange.lpstrText);
                 // ignore words that contain numbers/digits
                 if (std::any_of(sWord.begin(), sWord.end(), ::iswdigit))
                     continue;
                 // ignore words that contain uppercase letters in the middle
-                if (!CheckUppercase && (std::any_of(sWord.begin() + 1, sWord.end(), ::iswupper)))
+                if (!checkUppercase && (std::any_of(sWord.begin() + 1, sWord.end(), ::iswupper)))
                 {
                     // mark word as correct (remove the squiggle line)
                     ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textrange.chrg.cpMin, textrange.chrg.cpMax - textrange.chrg.cpMin);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textrange.chrg.cpMin, textrange.chrg.cpMax - textrange.chrg.cpMin + 1);
+                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
                     continue;
                 }
                 // ignore keywords of the currently selected lexer
-                if (m_keywords.find(textrange.lpstrText) != m_keywords.end())
+                if (m_keywords.find(textRange.lpstrText) != m_keywords.end())
                     continue;
 
                 IEnumSpellingErrorPtr enumSpellingError = nullptr;
-                HRESULT               hr                = g_SpellChecker->Check(sWord.c_str(), &enumSpellingError);
+                HRESULT               hr                = g_spellChecker->Check(sWord.c_str(), &enumSpellingError);
                 bool                  misspelled        = false;
                 if (SUCCEEDED(hr))
                 {
@@ -297,7 +298,7 @@ void CCmdSpellcheck::Check()
                             // mark word as misspelled
                             misspelled = true;
                             ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                            ScintillaCall(SCI_INDICATORFILLRANGE, textrange.chrg.cpMin, textrange.chrg.cpMax - textrange.chrg.cpMin);
+                            ScintillaCall(SCI_INDICATORFILLRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
                         }
                     }
                 }
@@ -306,33 +307,33 @@ void CCmdSpellcheck::Check()
                 {
                     // mark word as correct (remove the squiggle line)
                     ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textrange.chrg.cpMin, textrange.chrg.cpMax - textrange.chrg.cpMin);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textrange.chrg.cpMin, textrange.chrg.cpMax - textrange.chrg.cpMin + 1);
+                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
                 }
             }
         }
     }
 }
 
-void CCmdSpellcheck::OnTimer(UINT id)
+void CCmdSpellCheck::OnTimer(UINT id)
 {
-    if (id == g_checktimer)
+    if (id == g_checkTimer)
     {
-        KillTimer(GetHwnd(), g_checktimer);
+        KillTimer(GetHwnd(), g_checkTimer);
         Check();
     }
 }
 
-HRESULT CCmdSpellcheck::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdSpellCheck::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, m_enabled, ppropvarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, m_enabled, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
 
-bool CCmdSpellcheck::Execute()
+bool CCmdSpellCheck::Execute()
 {
     // If we don't have a spell checker installed/working, we won't be enabled
     // and we don't want to allow anything to toggle us to becoming enabled
@@ -345,7 +346,7 @@ bool CCmdSpellcheck::Execute()
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     if (m_enabled)
     {
-        m_lastcheckedpos = 0;
+        m_lastCheckedPos = 0;
         Check();
     }
     else
@@ -353,23 +354,23 @@ bool CCmdSpellcheck::Execute()
         ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
         ScintillaCall(SCI_INDICATORCLEARRANGE, 0, ScintillaCall(SCI_GETLENGTH));
     }
-    g_contextID = m_enabled && g_SpellChecker ? cmdContextSpellMap : cmdContextMap;
+    g_contextID = m_enabled && g_spellChecker ? cmdContextSpellMap : cmdContextMap;
     return true;
 }
 
-CCmdSpellcheckLang::CCmdSpellcheckLang(void* obj)
+CCmdSpellCheckLang::CCmdSpellCheckLang(void* obj)
     : ICommand(obj)
 {
 }
 
-HRESULT CCmdSpellcheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdSpellCheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue)
 {
     HRESULT hr = E_FAIL;
 
     if (key == UI_PKEY_Categories)
     {
         IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+        hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
 
@@ -393,7 +394,7 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, 
     else if (key == UI_PKEY_ItemsSource)
     {
         IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+        hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
 
@@ -428,7 +429,7 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, 
         {
             if (g_languages[i] == lang)
             {
-                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)i, ppropvarNewValue);
+                hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, static_cast<UINT>(i), pPropVarNewValue);
                 break;
             }
         }
@@ -436,7 +437,7 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, 
     return hr;
 }
 
-HRESULT CCmdSpellcheckLang::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
+HRESULT CCmdSpellCheckLang::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
     HRESULT hr = E_FAIL;
 
@@ -447,7 +448,7 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, cons
             if (g_spellCheckerFactory)
             {
                 UINT selected;
-                hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
+                hr = UIPropertyToUInt32(*key, *pPropVarValue, &selected);
                 InvalidateUICommand(cmdFunctions, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
                 std::wstring lang = g_languages[selected];
 
@@ -455,8 +456,8 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, cons
                 hr             = g_spellCheckerFactory->IsSupported(lang.c_str(), &supported);
                 if (supported)
                 {
-                    g_SpellChecker = nullptr;
-                    hr             = g_spellCheckerFactory->CreateSpellChecker(lang.c_str(), &g_SpellChecker);
+                    g_spellChecker = nullptr;
+                    hr             = g_spellCheckerFactory->CreateSpellChecker(lang.c_str(), &g_spellChecker);
                     if (SUCCEEDED(hr))
                     {
                         CIniSettings::Instance().SetString(L"spellcheck", L"language", lang.c_str());
@@ -469,12 +470,12 @@ HRESULT CCmdSpellcheckLang::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, cons
     return hr;
 }
 
-CCmdSpellcheckCorrect::CCmdSpellcheckCorrect(void* obj)
+CCmdSpellCheckCorrect::CCmdSpellCheckCorrect(void* obj)
     : ICommand(obj)
 {
 }
 
-HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* ppropvarCurrentValue, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdSpellCheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue)
 {
     HRESULT hr = E_FAIL;
 
@@ -484,7 +485,7 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
         ResString sIgnore(g_hRes, IDS_SPELLCHECK_IGNORE);
 
         IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+        hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
 
@@ -508,7 +509,7 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
     {
         m_suggestions.clear();
         IUICollectionPtr pCollection;
-        hr = ppropvarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
+        hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
 
@@ -516,18 +517,18 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
         pCollection->Clear();
 
         // populate the dropdown with the suggestions
-        if (g_SpellChecker)
+        if (g_spellChecker)
         {
             std::wstring sWord;
 
             auto wordcharsbuffer = GetWordChars();
-            OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, (sptr_t)wordcharsbuffer.c_str()));
+            OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(wordcharsbuffer.c_str())));
 
-            ScintillaCall(SCI_SETWORDCHARS, 0, (sptr_t)g_wordchars.c_str());
+            ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(g_wordChars.c_str()));
             sWord = CUnicodeUtils::StdGetUnicode(GetCurrentWord());
 
             IEnumStringPtr enumSpellingSuggestions = nullptr;
-            hr                                     = g_SpellChecker->Suggest(sWord.c_str(), &enumSpellingSuggestions);
+            hr                                     = g_spellChecker->Suggest(sWord.c_str(), &enumSpellingSuggestions);
             if (SUCCEEDED(hr))
             {
                 hr = S_OK;
@@ -566,12 +567,12 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
     }
     else if (key == UI_PKEY_SelectedItem)
     {
-        return UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, (UINT)UI_COLLECTION_INVALIDINDEX, ppropvarNewValue);
+        return UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, static_cast<UINT>(UI_COLLECTION_INVALIDINDEX), pPropVarNewValue);
     }
     return hr;
 }
 
-HRESULT CCmdSpellcheckCorrect::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
+HRESULT CCmdSpellCheckCorrect::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
     HRESULT hr = E_FAIL;
 
@@ -580,7 +581,7 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, c
         if (key && *key == UI_PKEY_SelectedItem)
         {
             UINT selected;
-            hr = UIPropertyToUInt32(*key, *ppropvarValue, &selected);
+            hr = UIPropertyToUInt32(*key, *pPropVarValue, &selected);
             if (SUCCEEDED(hr))
             {
                 std::wstring sWord;
@@ -596,21 +597,21 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, c
                     auto startPos   = ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
                     auto endPos     = ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
                     ScintillaCall(SCI_SETSELECTION, startPos, endPos);
-                    ScintillaCall(SCI_REPLACESEL, 0, (sptr_t)CUnicodeUtils::StdGetUTF8(m_suggestions[selected]).c_str());
+                    ScintillaCall(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(CUnicodeUtils::StdGetUTF8(m_suggestions[selected]).c_str()));
                 }
                 else
                 {
-                    if (g_SpellChecker)
+                    if (g_spellChecker)
                     {
                         if (selected == m_suggestions.size())
                         {
                             // ignore for this session
-                            g_SpellChecker->Ignore(sWord.c_str());
+                            g_spellChecker->Ignore(sWord.c_str());
                         }
                         if (selected == (m_suggestions.size() + 1))
                         {
                             // add to Dictionary
-                            g_SpellChecker->Add(sWord.c_str());
+                            g_spellChecker->Add(sWord.c_str());
                         }
                     }
                 }
@@ -622,7 +623,7 @@ HRESULT CCmdSpellcheckCorrect::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, c
     return hr;
 }
 
-void CCmdSpellcheckCorrect::ScintillaNotify(SCNotification* pScn)
+void CCmdSpellCheckCorrect::ScintillaNotify(SCNotification* pScn)
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
     {
@@ -630,64 +631,64 @@ void CCmdSpellcheckCorrect::ScintillaNotify(SCNotification* pScn)
     }
 }
 
-CCmdSpellcheckAll::CCmdSpellcheckAll(void* obj)
+CCmdSpellCheckAll::CCmdSpellCheckAll(void* obj)
     : ICommand(obj)
 {
 }
 
-bool CCmdSpellcheckAll::Execute()
+bool CCmdSpellCheckAll::Execute()
 {
-    bool bCheckall = CIniSettings::Instance().GetInt64(L"spellcheck", L"checkall", 1) != 0;
-    bCheckall      = !bCheckall;
-    CIniSettings::Instance().SetInt64(L"spellcheck", L"checkall", bCheckall);
+    bool bCheckAll = CIniSettings::Instance().GetInt64(L"spellcheck", L"checkall", 1) != 0;
+    bCheckAll      = !bCheckAll;
+    CIniSettings::Instance().SetInt64(L"spellcheck", L"checkall", bCheckAll);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    if (g_checktimer)
-        SetTimer(GetHwnd(), g_checktimer, 1, nullptr);
+    if (g_checkTimer)
+        SetTimer(GetHwnd(), g_checkTimer, 1, nullptr);
     return true;
 }
 
-void CCmdSpellcheckAll::AfterInit()
+void CCmdSpellCheckAll::AfterInit()
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-HRESULT CCmdSpellcheckAll::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdSpellCheckAll::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        bool bCheckall = CIniSettings::Instance().GetInt64(L"spellcheck", L"checkall", 1) != 0;
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, !bCheckall, ppropvarNewValue);
+        bool bCheckAll = CIniSettings::Instance().GetInt64(L"spellcheck", L"checkall", 1) != 0;
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, !bCheckAll, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
 
-CCmdSpellcheckUpper::CCmdSpellcheckUpper(void* obj)
+CCmdSpellCheckUpper::CCmdSpellCheckUpper(void* obj)
     : ICommand(obj)
 {
 }
 
-bool CCmdSpellcheckUpper::Execute()
+bool CCmdSpellCheckUpper::Execute()
 {
-    bool bCheckupper = CIniSettings::Instance().GetInt64(L"spellcheck", L"uppercase", 1) != 0;
-    bCheckupper      = !bCheckupper;
-    CIniSettings::Instance().SetInt64(L"spellcheck", L"uppercase", bCheckupper);
+    bool bCheckUpper = CIniSettings::Instance().GetInt64(L"spellcheck", L"uppercase", 1) != 0;
+    bCheckUpper      = !bCheckUpper;
+    CIniSettings::Instance().SetInt64(L"spellcheck", L"uppercase", bCheckUpper);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
-    if (g_checktimer)
-        SetTimer(GetHwnd(), g_checktimer, 1, nullptr);
+    if (g_checkTimer)
+        SetTimer(GetHwnd(), g_checkTimer, 1, nullptr);
     return true;
 }
 
-void CCmdSpellcheckUpper::AfterInit()
+void CCmdSpellCheckUpper::AfterInit()
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-HRESULT CCmdSpellcheckUpper::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdSpellCheckUpper::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        bool bCheckupper = CIniSettings::Instance().GetInt64(L"spellcheck", L"uppercase", 1) != 0;
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, bCheckupper, ppropvarNewValue);
+        bool bCheckUpper = CIniSettings::Instance().GetInt64(L"spellcheck", L"uppercase", 1) != 0;
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, bCheckUpper, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }

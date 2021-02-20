@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018, 2020 - Stefan Kueng
+// Copyright (C) 2014-2018, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 static auto CF_HTML = RegisterClipboardFormat(L"HTML Format");
 
-static const ScintillaCmd g_ScintillaCmd[] = {
+static const ScintillaCmd g_scintillaCmd[] = {
     // SCI_GETTEXT
     // SCI_SETTEXT
     // SCI_GETSTYLEDTEXT
@@ -1082,7 +1082,6 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                 return S_OK;
             }
             return DISP_E_TYPEMISMATCH;
-            break;
         case 115: // HasActiveDocument
             if (flags == DISPATCH_PROPERTYGET)
             {
@@ -1091,7 +1090,6 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                 return S_OK;
             }
             return DISP_E_TYPEMISMATCH;
-            break;
         case 116: // HasDocumentID
             if (args->cArgs != 1)
                 return DISP_E_BADPARAMCOUNT;
@@ -1183,7 +1181,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                 return DISP_E_TYPEMISMATCH;
             if (FAILED(VariantChangeType(&p2, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
                 return DISP_E_TYPEMISMATCH;
-            SetTimer(GetHwnd(), p1.intVal, p2.intVal, NULL);
+            SetTimer(GetHwnd(), p1.intVal, p2.intVal, nullptr);
             break;
         case 128: // OpenFile
             if (args->cArgs != 2)
@@ -1219,7 +1217,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
             InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
             InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
-            InvalidateUICommand(UI_INVALIDATIONS_STATE, NULL);
+            InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
             break;
         case 132: // SaveDoc
             if (args->cArgs != 2)
@@ -1264,7 +1262,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
                 return DISP_E_TYPEMISMATCH;
             char cbuf[3] = {0};
-            cbuf[0]      = (char)ScintillaCall(SCI_GETCHARAT, p1.intVal);
+            cbuf[0]      = static_cast<char>(ScintillaCall(SCI_GETCHARAT, p1.intVal));
             ret->vt      = VT_BSTR;
             ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(cbuf).c_str()).Detach();
         }
@@ -1286,25 +1284,25 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             ttf.chrg.cpMax     = p3.intVal;
             std::string sText  = CUnicodeUtils::StdGetUTF8(p4.bstrVal);
             ttf.lpstrText      = sText.c_str();
-            auto sret          = ScintillaCall(SCI_FINDTEXT, p1.intVal, (sptr_t)&ttf);
+            auto sret          = ScintillaCall(SCI_FINDTEXT, p1.intVal, reinterpret_cast<sptr_t>(&ttf));
 
             SAFEARRAYBOUND sabounds{};
             sabounds.lLbound   = 0;
             sabounds.cElements = 2;
-            SAFEARRAY* psarray = SafeArrayCreate(VT_VARIANT, 1, &sabounds);
+            SAFEARRAY* psArray = SafeArrayCreate(VT_VARIANT, 1, &sabounds);
 
-            if (psarray != NULL)
+            if (psArray != nullptr)
             {
                 VARIANT* pInteger = nullptr;
-                SafeArrayAccessData(psarray, (void**)&pInteger);
+                SafeArrayAccessData(psArray, reinterpret_cast<void**>(&pInteger));
                 pInteger[0].intVal = sret >= 0 ? ttf.chrgText.cpMin : -1;
                 pInteger[0].vt     = VT_INT;
                 pInteger[1].intVal = sret >= 0 ? ttf.chrgText.cpMax : -1;
                 pInteger[1].vt     = VT_INT;
-                SafeArrayUnaccessData(psarray);
+                SafeArrayUnaccessData(psArray);
 
                 ret->vt     = VT_ARRAY | VT_VARIANT;
-                ret->parray = psarray;
+                ret->parray = psArray;
             }
         }
         break;
@@ -1327,7 +1325,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                 hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(wchar_t));
                 if (hClipboardData)
                 {
-                    wchar_t* pchData = (wchar_t*)GlobalLock(hClipboardData);
+                    wchar_t* pchData = static_cast<wchar_t*>(GlobalLock(hClipboardData));
                     if (pchData)
                     {
                         wcscpy_s(pchData, sLen + 1, p1.bstrVal);
@@ -1345,13 +1343,13 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                     std::string post   = "<!--EndFragment--></BODY></HTML>";
 
                     std::string sHtml     = header;
-                    int         startHtml = (int)sHtml.length();
+                    int         startHtml = static_cast<int>(sHtml.length());
                     sHtml += pre;
-                    int startFragment = (int)sHtml.length();
+                    int startFragment = static_cast<int>(sHtml.length());
                     sHtml += sHtmlFragment;
-                    int endFragment = (int)sHtml.length();
+                    int endFragment = static_cast<int>(sHtml.length());
                     sHtml += post;
-                    int endHtml = (int)sHtml.length();
+                    int endHtml = static_cast<int>(sHtml.length());
 
                     // replace back offsets
                     SearchReplace(sHtml, "<<<<<<<1", CStringUtils::Format("%08d", startHtml));
@@ -1362,7 +1360,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                     hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sHtml.size() + 1) * sizeof(char));
                     if (hClipboardData)
                     {
-                        char* pchData = (char*)GlobalLock(hClipboardData);
+                        char* pchData = static_cast<char*>(GlobalLock(hClipboardData));
                         if (pchData)
                         {
                             strcpy_s(pchData, sHtml.size() + 1, sHtml.c_str());
@@ -1387,7 +1385,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                 HANDLE hData = GetClipboardData(CF_UNICODETEXT);
                 if (hData)
                 {
-                    LPCWSTR lptstr = (LPCWSTR)GlobalLock(hData);
+                    LPCWSTR lptstr = static_cast<LPCWSTR>(GlobalLock(hData));
                     OnOutOfScope(
                         GlobalUnlock(hData););
                     if (lptstr != nullptr)
@@ -1412,7 +1410,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                 HANDLE hData = GetClipboardData(CF_HTML);
                 if (hData)
                 {
-                    LPCSTR lptstr = (LPCSTR)GlobalLock(hData);
+                    LPCSTR lptstr = static_cast<LPCSTR>(GlobalLock(hData));
                     OnOutOfScope(
                         GlobalUnlock(hData););
                     if (lptstr != nullptr)
@@ -1447,9 +1445,9 @@ bool BasicScriptObject::ScintillaCommandsDispId(wchar_t* name, DISPID& id)
 {
     // start with a disp id of 1000 for the Scintilla commands
     int index = 1000;
-    for (const auto& cmd : g_ScintillaCmd)
+    for (const auto& cmd : g_scintillaCmd)
     {
-        if (_wcsicmp(name, cmd.functionname) == 0)
+        if (_wcsicmp(name, cmd.functionName) == 0)
         {
             id = index;
             return true;
@@ -1459,19 +1457,19 @@ bool BasicScriptObject::ScintillaCommandsDispId(wchar_t* name, DISPID& id)
     return false;
 }
 
-HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPARAMS* args, VARIANT* ret)
+HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPARAMS* args, VARIANT* ret) const
 {
     size_t vectIndex = id - 1000;
-    if ((vectIndex >= 0) && (vectIndex < std::size(g_ScintillaCmd)))
+    if ((vectIndex >= 0) && (vectIndex < std::size(g_scintillaCmd)))
     {
         _variant_t p1;
         _variant_t p2;
 
-        const auto& cmd = g_ScintillaCmd[vectIndex];
+        const auto& cmd = g_scintillaCmd[vectIndex];
         // cmd(p1, p2);
-        if ((cmd.p2 != VT_NULL) || (cmd.retval == VT_BSTR))
+        if ((cmd.p2 != VT_NULL) || (cmd.retVal == VT_BSTR))
         {
-            if ((args->cArgs != 2) && (cmd.retval != VT_BSTR))
+            if ((args->cArgs != 2) && (cmd.retVal != VT_BSTR))
                 return DISP_E_BADPARAMCOUNT;
             if (cmd.p2 != VT_NULL)
             {
@@ -1493,16 +1491,15 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
             if (cmd.p2 == VT_BSTR)
             {
                 ret->vt     = VT_INT;
-                ret->intVal = (int)ScintillaCall(cmd.cmd, p1.intVal, (sptr_t)CUnicodeUtils::StdGetUTF8(p2.bstrVal).c_str());
-                VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retval);
-                return S_OK;
+                ret->intVal = static_cast<int>(ScintillaCall(cmd.cmd, p1.intVal, reinterpret_cast<sptr_t>(CUnicodeUtils::StdGetUTF8(p2.bstrVal).c_str())));
+                return VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retVal);
             }
-            else if ((cmd.p2 == VT_NULL) && (cmd.retval == VT_BSTR))
+            else if ((cmd.p2 == VT_NULL) && (cmd.retVal == VT_BSTR))
             {
                 // return value is a string
                 auto len = ScintillaCall(cmd.cmd, p1.intVal);
                 auto buf = std::make_unique<char[]>(len + 1);
-                ScintillaCall(cmd.cmd, p1.intVal, (sptr_t)buf.get());
+                ScintillaCall(cmd.cmd, p1.intVal, reinterpret_cast<sptr_t>(buf.get()));
                 buf[len]     = 0;
                 ret->vt      = VT_BSTR;
                 ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(buf.get()).c_str()).Detach();
@@ -1511,9 +1508,8 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
             else
             {
                 ret->vt     = VT_INT;
-                ret->intVal = (int)ScintillaCall(cmd.cmd, p1.intVal, p2.intVal);
-                VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retval);
-                return S_OK;
+                ret->intVal = static_cast<int>(ScintillaCall(cmd.cmd, p1.intVal, p2.intVal));
+                return VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retVal);
             }
         }
         // cmd(p1); or as a set property: cmd = p1;
@@ -1527,16 +1523,14 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
             {
                 // if the one argument is a string, pass it as the second param to ScintillaCall
                 ret->vt     = VT_INT;
-                ret->intVal = (int)ScintillaCall(cmd.cmd, 0, (sptr_t)CUnicodeUtils::StdGetUTF8(p1.bstrVal).c_str());
-                VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retval);
-                return S_OK;
+                ret->intVal = static_cast<int>(ScintillaCall(cmd.cmd, 0, reinterpret_cast<sptr_t>(CUnicodeUtils::StdGetUTF8(p1.bstrVal).c_str())));
+                return VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retVal);
             }
             else
             {
                 ret->vt     = VT_INT;
-                ret->intVal = (int)ScintillaCall(cmd.cmd, p1.intVal);
-                VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retval);
-                return S_OK;
+                ret->intVal = static_cast<int>(ScintillaCall(cmd.cmd, p1.intVal));
+                return VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retVal);
             }
         }
         else
@@ -1544,21 +1538,20 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
             // no parameters, simple function call or fetching a property
             if (args->cArgs != 0)
                 return DISP_E_BADPARAMCOUNT;
-            if (cmd.retval == VT_BSTR)
+            if (cmd.retVal == VT_BSTR)
             {
                 // return value is a string
                 auto len = ScintillaCall(cmd.cmd);
                 auto buf = std::make_unique<char[]>(len + 1);
-                ScintillaCall(cmd.cmd, len, (sptr_t)buf.get());
+                ScintillaCall(cmd.cmd, len, reinterpret_cast<sptr_t>(buf.get()));
                 buf[len]     = 0;
                 ret->vt      = VT_BSTR;
                 ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(buf.get()).c_str()).Detach();
                 return S_OK;
             }
             ret->vt     = VT_INT;
-            ret->intVal = (int)ScintillaCall(flags == DISPATCH_PROPERTYGET ? cmd.cmdget : cmd.cmd);
-            VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retval);
-            return S_OK;
+            ret->intVal = static_cast<int>(ScintillaCall(flags == DISPATCH_PROPERTYGET ? cmd.cmdGet : cmd.cmd));
+            return VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retVal);
         }
     }
     return DISP_E_MEMBERNOTFOUND;

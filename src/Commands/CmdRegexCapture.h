@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,15 +21,9 @@
 #include "ScintillaWnd.h"
 #include "BPBaseDialog.h"
 
-#include <chrono>
 #include <mutex>
-#include <condition_variable>
-#include <deque>
-#include <vector>
-#include <string>
-#include <utility>
 
-void RegexCapture_Finish();
+void regexCaptureFinish();
 
 class CRegexCaptureDlg : public CBPBaseDialog
     , public ICommand
@@ -77,19 +71,12 @@ public:
     UINT GetCmdId() override { return cmdRegexCapture; }
 
     HRESULT IUICommandHandlerUpdateProperty(
-        REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/,
-        PROPVARIANT*   ppropvarNewValue) override
+        REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/,
+        PROPVARIANT*   pPropVarNewValue) override
     {
         if (UI_PKEY_BooleanValue == key)
             return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue,
-                                             ScintillaCall(SCI_GETWRAPMODE) > 0, ppropvarNewValue);
+                                             ScintillaCall(SCI_GETWRAPMODE) > 0, pPropVarNewValue);
         return E_NOTIMPL;
     }
-
-    //void ScintillaNotify(SCNotification* pScn) override;
-
-    //void TabNotify(TBHDR* ptbhdr) override;
-
-    //void OnDocumentClose(DocID id) override;
-    //void OnDocumentSave(DocID id, bool saveAs) override;
 };

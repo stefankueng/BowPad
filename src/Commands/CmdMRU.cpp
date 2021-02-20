@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014 - Stefan Kueng
+// Copyright (C) 2014, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,43 +21,43 @@
 #include "PathUtils.h"
 #include "AppUtils.h"
 
-HRESULT CCmdMRU::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdMRU::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_RecentItems == key)
     {
-        return CMRU::Instance().PopulateRibbonRecentItems(ppropvarNewValue);
+        return CMRU::Instance().PopulateRibbonRecentItems(pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
 
-HRESULT CCmdMRU::IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* key, const PROPVARIANT* ppropvarValue, IUISimplePropertySet* pCommandExecutionProperties)
+HRESULT CCmdMRU::IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties)
 {
     HRESULT hr = E_NOTIMPL;
     if (*key == UI_PKEY_RecentItems)
     {
-        if (ppropvarValue)
+        if (pPropVarValue)
         {
-            SAFEARRAY * psa = V_ARRAY(ppropvarValue);
-            LONG lstart, lend;
-            hr = SafeArrayGetLBound( psa, 1, &lstart );
+            SAFEARRAY* psa = V_ARRAY(pPropVarValue);
+            LONG       lStart, lEnd;
+            hr = SafeArrayGetLBound(psa, 1, &lStart);
             if (CAppUtils::FailedShowMessage(hr))
                 return hr;
-            hr = SafeArrayGetUBound( psa, 1, &lend );
+            hr = SafeArrayGetUBound(psa, 1, &lEnd);
             if (CAppUtils::FailedShowMessage(hr))
                 return hr;
-            IUISimplePropertySet ** data;
-            hr = SafeArrayAccessData(psa,(void **)&data);
-            for (LONG idx = lstart; idx <= lend; ++idx)
+            IUISimplePropertySet** data;
+            hr = SafeArrayAccessData(psa, reinterpret_cast<void**>(&data));
+            for (LONG idx = lStart; idx <= lEnd; ++idx)
             {
-                IUISimplePropertySet * ppset = (IUISimplePropertySet *)data[idx];
-                if (ppset)
+                IUISimplePropertySet* ppSet = static_cast<IUISimplePropertySet*>(data[idx]);
+                if (ppSet)
                 {
                     PROPVARIANT var;
-                    ppset->GetValue(UI_PKEY_LabelDescription, &var);
+                    ppSet->GetValue(UI_PKEY_LabelDescription, &var);
                     std::wstring path = var.bstrVal;
                     PropVariantClear(&var);
-                    ppset->GetValue(UI_PKEY_Pinned, &var);
-                    bool bPinned = VARIANT_TRUE==var.boolVal;
+                    ppSet->GetValue(UI_PKEY_Pinned, &var);
+                    bool bPinned = VARIANT_TRUE == var.boolVal;
                     PropVariantClear(&var);
                     CMRU::Instance().PinPath(path, bPinned);
                 }

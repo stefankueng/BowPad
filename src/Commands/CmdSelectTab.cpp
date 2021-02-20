@@ -20,7 +20,6 @@
 #include "Theme.h"
 #include "GDIHelpers.h"
 #include "DPIAware.h"
-#include "resource.h"
 #include "BowPad.h"
 
 constexpr long margin  = 10;
@@ -97,7 +96,7 @@ bool CCmdSelectTab::Execute()
 
         m_dlg->ShowModeless(g_hRes, IDD_EMPTYDLG, GetScintillaWnd(), false);
 
-        MapWindowPoints(GetScintillaWnd(), nullptr, (LPPOINT)&wndRect, 2);
+        MapWindowPoints(GetScintillaWnd(), nullptr, reinterpret_cast<LPPOINT>(&wndRect), 2);
 
         SetWindowPos(*m_dlg, nullptr,
                      wndRect.left, wndRect.top, wndRect.right - wndRect.left, wndRect.bottom - wndRect.top,
@@ -109,9 +108,9 @@ bool CCmdSelectTab::Execute()
     return true;
 }
 
-void CCmdSelectTab::TabNotify(TBHDR* ptbhdr)
+void CCmdSelectTab::TabNotify(TBHDR* ptbHdr)
 {
-    if (ptbhdr->hdr.code == TCN_SELCHANGE)
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         DocID docId   = GetDocIDFromTabIndex(GetActiveTabIndex());
         auto  foundIt = std::find(m_docIds.begin(), m_docIds.end(), docId);
@@ -135,7 +134,7 @@ TabListDialog::TabListDialog(HWND hParent, std::function<void(DocID)>&& execFunc
     NONCLIENTMETRICS ncm{};
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
     SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
-    m_hFont                      = CreateFontIndirect(&ncm.lfCaptionFont);
+    m_hFont = CreateFontIndirect(&ncm.lfCaptionFont);
 }
 
 TabListDialog::~TabListDialog()
@@ -207,21 +206,13 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
         case WM_LBUTTONDOWN:
         {
             POINT pt{};
-            pt.x = GET_X_LPARAM(lParam);
             pt.y = GET_Y_LPARAM(lParam);
 
             RECT rect;
             GetClientRect(*this, &rect);
-            const auto dpiSpacing   = CDPIAware::Instance().Scale(*this, spacing);
-            auto       dpiMargin    = CDPIAware::Instance().Scale(*this, margin);
-            auto       maxItems     = (rect.bottom - rect.top - dpiMargin - dpiMargin) / (m_textHeight + dpiSpacing);
-            size_t     indexToStart = 0;
-            if (maxItems < m_tabList.size())
-            {
-                if (maxItems <= m_currentItem)
-                    indexToStart = m_currentItem - maxItems;
-            }
-            auto item = (pt.y - dpiMargin) / (m_textHeight + dpiSpacing);
+            const auto dpiSpacing = CDPIAware::Instance().Scale(*this, spacing);
+            auto       dpiMargin  = CDPIAware::Instance().Scale(*this, margin);
+            auto       item       = (pt.y - dpiMargin) / (m_textHeight + dpiSpacing);
             if (item >= 0 && item < m_tabList.size())
             {
                 ShowWindow(*this, SW_HIDE);
@@ -263,16 +254,16 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
 
             auto hMyMemDC   = ::CreateCompatibleDC(hdc);
             auto hBitmap    = CreateCompatibleBitmap(hdc, rect.right - rect.left, rect.bottom - rect.top);
-            auto hOldBitmap = (HBITMAP)SelectObject(hMyMemDC, hBitmap);
+            auto hOldBitmap = static_cast<HBITMAP>(SelectObject(hMyMemDC, hBitmap));
 
             auto foreColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT));
             auto backColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
             GDIHelpers::FillSolidRect(hMyMemDC, &rect, backColor);
 
-            auto hBrush = CreateSolidBrush(backColor);
+            auto hBrush    = CreateSolidBrush(backColor);
             auto hPen      = CreatePen(PS_SOLID, CDPIAware::Instance().Scale(*this, 1), CTheme::Instance().GetThemeColor(GetSysColor(COLOR_GRAYTEXT)));
             auto hOldBrush = SelectObject(hMyMemDC, hBrush);
-            auto hOldPen = SelectObject(hMyMemDC, hPen);
+            auto hOldPen   = SelectObject(hMyMemDC, hPen);
             Rectangle(hMyMemDC, rect.left, rect.top, rect.right, rect.bottom);
             SelectObject(hMyMemDC, hOldPen);
             SelectObject(hMyMemDC, hOldBrush);
@@ -310,7 +301,7 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
             auto selColorText = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_HIGHLIGHTTEXT));
             SetTextColor(hMyMemDC, selColorText);
             SetBkColor(hMyMemDC, selColor);
-            yPos = (long)(m_currentItem - indexToStart) * (m_textHeight + dpiSpacing) - (dpiSpacing / 2) + dpiMargin;
+            yPos = static_cast<long>(m_currentItem - indexToStart) * (m_textHeight + dpiSpacing) - (dpiSpacing / 2) + dpiMargin;
             RECT textRect{dpiMargin - dpiSpacing, yPos, rect.right - dpiMargin + dpiSpacing, yPos + m_textHeight + (dpiSpacing / 2)};
             const auto& [title, docId] = m_tabList[m_currentItem];
             GDIHelpers::FillSolidRect(hMyMemDC, &textRect, selColor);
@@ -328,7 +319,6 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
             EndPaint(*this, &ps);
             return 0;
         }
-        break;
         case WM_ERASEBKGND:
             return TRUE;
     }

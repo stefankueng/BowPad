@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2020 - Stefan Kueng
+// Copyright (C) 2014-2016, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,9 +15,7 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #include "stdafx.h"
-#include "BowPad.h"
 #include "CmdBookmarks.h"
-#include "OnOutOfScope.h"
 #include "ScintillaWnd.h"
 #include "StringUtils.h"
 
@@ -30,7 +28,7 @@ CCmdBookmarks::CCmdBookmarks(void* obj)
     : ICommand(obj)
 {
     auto& settings = CIniSettings::Instance();
-    int   maxFiles = (int)settings.GetInt64(L"bookmarks", L"maxfiles", 30);
+    int   maxFiles = static_cast<int>(settings.GetInt64(L"bookmarks", L"maxfiles", 30));
     m_bookmarks.clear();
     for (decltype(maxFiles) fileIndex = 0; fileIndex < maxFiles; ++fileIndex)
     {
@@ -65,41 +63,40 @@ void CCmdBookmarks::OnDocumentClose(DocID id)
     bool bModified = (m_bookmarks.erase(doc.m_path) > 0);
 
     // find all bookmarks
-    std::vector<sptr_t> bookmarklines;
+    std::vector<sptr_t> bookmarkLines;
     for (sptr_t line = -1;;)
     {
         line = ScintillaCall(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
         if (line < 0)
             break;
-        bookmarklines.push_back(line);
+        bookmarkLines.push_back(line);
     }
 
-    if (!bookmarklines.empty())
+    if (!bookmarkLines.empty())
     {
-        m_bookmarks[doc.m_path] = std::move(bookmarklines);
+        m_bookmarks[doc.m_path] = std::move(bookmarkLines);
         bModified               = true;
     }
 
     if (bModified)
     {
         // Save the bookmarks to the ini file
-        int maxFiles = (int)settings.GetInt64(L"bookmarks", L"maxfiles", 30);
+        int maxFiles = static_cast<int>(settings.GetInt64(L"bookmarks", L"maxfiles", 30));
         int fileNum  = 0;
         if (maxFiles == 0)
             return;
-        std::wstring bmvalue;
-        for (const auto& bm : m_bookmarks)
+        std::wstring bmValue;
+        for (const auto& [path, lines] : m_bookmarks)
         {
-            bmvalue = bm.first;
-            assert(!bmvalue.empty());
-            const auto& lines = bm.second;
-            for (const auto linenr : lines)
+            bmValue = path;
+            assert(!bmValue.empty());
+            for (const auto lineNr : lines)
             {
-                bmvalue += L'*';
-                bmvalue += std::to_wstring(linenr);
+                bmValue += L'*';
+                bmValue += std::to_wstring(lineNr);
             }
             std::wstring sKey = CStringUtils::Format(L"file%d", fileNum);
-            settings.SetString(L"bookmarks", sKey.c_str(), bmvalue.c_str());
+            settings.SetString(L"bookmarks", sKey.c_str(), bmValue.c_str());
             ++fileNum;
             if (fileNum >= maxFiles)
                 break;
@@ -190,12 +187,12 @@ void CCmdBookmarkNext::ScintillaNotify(SCNotification* pScn)
 }
 
 HRESULT CCmdBookmarkNext::IUICommandHandlerUpdateProperty(
-    REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+    REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
-        auto nextpos = ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, nextpos >= 0, ppropvarNewValue);
+        auto nextPos = ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, nextPos >= 0, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
@@ -226,12 +223,12 @@ void CCmdBookmarkPrev::ScintillaNotify(SCNotification* pScn)
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
 }
 
-HRESULT CCmdBookmarkPrev::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*ppropvarCurrentValue*/, PROPVARIANT* ppropvarNewValue)
+HRESULT CCmdBookmarkPrev::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_Enabled == key)
     {
-        auto nextpos = ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, nextpos >= 0, ppropvarNewValue);
+        auto nextPos = ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, nextPos >= 0, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }

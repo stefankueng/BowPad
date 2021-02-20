@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2016, 2020 - Stefan Kueng
+// Copyright (C) 2013, 2016, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,12 +29,12 @@ void CPropertySet::InitializeCommandProperties(int categoryId, int commandId, UI
 
 void CPropertySet::InitializeItemProperties(IUIImagePtr image, PCWSTR label, int categoryId)
 {
-    if (m_pimgItem)
-        m_pimgItem->Release();
-    m_pimgItem = image;
-    if (m_pimgItem)
+    if (m_pImgItem)
+        m_pImgItem->Release();
+    m_pImgItem = image;
+    if (m_pImgItem)
     {
-        m_pimgItem->AddRef();
+        m_pImgItem->AddRef();
     }
     StringCchCopyW(m_wszLabel, MAX_RESOURCE_LENGTH, label);
     m_categoryId = categoryId;
@@ -50,32 +50,32 @@ STDMETHODIMP CPropertySet::GetValue(REFPROPERTYKEY key, PROPVARIANT *ppropvar)
 {
     if (key == UI_PKEY_ItemImage)
     {
-        if (m_pimgItem)
-            return UIInitPropertyFromImage(UI_PKEY_ItemImage, m_pimgItem, ppropvar);
+        if (m_pImgItem)
+            return UIInitPropertyFromImage(UI_PKEY_ItemImage, m_pImgItem, ppropvar);
         return S_FALSE;
     }
     else if (key == UI_PKEY_SmallImage)
     {
-        if (m_pimgItem)
-            return UIInitPropertyFromImage(UI_PKEY_SmallImage, m_pimgItem, ppropvar);
+        if (m_pImgItem)
+            return UIInitPropertyFromImage(UI_PKEY_SmallImage, m_pImgItem, ppropvar);
         return S_FALSE;
     }
     else if (key == UI_PKEY_LargeImage)
     {
-        if (m_pimgItem)
-            return UIInitPropertyFromImage(UI_PKEY_LargeImage, m_pimgItem, ppropvar);
+        if (m_pImgItem)
+            return UIInitPropertyFromImage(UI_PKEY_LargeImage, m_pImgItem, ppropvar);
         return S_FALSE;
     }
     else if (key == UI_PKEY_SmallHighContrastImage)
     {
-        if (m_pimgItem)
-            return UIInitPropertyFromImage(UI_PKEY_SmallHighContrastImage, m_pimgItem, ppropvar);
+        if (m_pImgItem)
+            return UIInitPropertyFromImage(UI_PKEY_SmallHighContrastImage, m_pImgItem, ppropvar);
         return S_FALSE;
     }
     else if (key == UI_PKEY_LargeHighContrastImage)
     {
-        if (m_pimgItem)
-            return UIInitPropertyFromImage(UI_PKEY_LargeHighContrastImage, m_pimgItem, ppropvar);
+        if (m_pImgItem)
+            return UIInitPropertyFromImage(UI_PKEY_LargeHighContrastImage, m_pImgItem, ppropvar);
         return S_FALSE;
     }
     else if (key == UI_PKEY_Label)

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2016, 2020 - Stefan Kueng
+// Copyright (C) 2013, 2016, 2020.2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,25 +34,25 @@ static inline std::wstring GetWindowText(HWND hwnd)
 
 static BOOL CALLBACK EnumChildWindowProc(HWND hwnd, LPARAM lParam)
 {
-    auto& state = *reinterpret_cast<std::pair<std::wstring, std::vector<HWND>>*>(lParam);
+    auto& [wndClassName, winVec] = *reinterpret_cast<std::pair<std::wstring, std::vector<HWND>>*>(lParam);
 
-    if (state.first.empty())
-        state.second.push_back(hwnd);
+    if (wndClassName.empty())
+        winVec.push_back(hwnd);
     else
     {
         wchar_t className[257];
         auto    status = ::GetClassName(hwnd, className, _countof(className));
         if (status > 0)
         {
-            if (_wcsicmp(className, state.first.c_str()) == 0)
-                state.second.push_back(hwnd);
+            if (_wcsicmp(className, wndClassName.c_str()) == 0)
+                winVec.push_back(hwnd);
         }
     }
     return TRUE;
 }
 
 // Empty classname means match child windows of ANY classname.
-inline std::vector<HWND> GetChildWindows(HWND hwnd, const std::wstring& classname)
+std::vector<HWND> GetChildWindows(HWND hwnd, const std::wstring& classname)
 {
     std::pair<std::wstring, std::vector<HWND>> state;
     state.first = classname;
@@ -72,9 +72,9 @@ CColorButton::~CColorButton()
 bool CColorButton::ConvertToColorButton(HWND hwndCtl)
 {
     // Subclass the existing control.
-    m_pfnOrigCtlProc = (WNDPROC)GetWindowLongPtr(hwndCtl, GWLP_WNDPROC);
-    SetWindowLongPtr(hwndCtl, GWLP_WNDPROC, (LONG_PTR)_ColorButtonProc);
-    SetWindowLongPtr(hwndCtl, GWLP_USERDATA, (LPARAM)this);
+    m_pfnOrigCtlProc = reinterpret_cast<WNDPROC>(GetWindowLongPtr(hwndCtl, GWLP_WNDPROC));
+    SetWindowLongPtr(hwndCtl, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(_ColorButtonProc));
+    SetWindowLongPtr(hwndCtl, GWLP_USERDATA, reinterpret_cast<LPARAM>(this));
     m_hwnd = hwndCtl;
     return true;
 }
@@ -93,16 +93,14 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
         case WM_PAINT:
         {
             PAINTSTRUCT ps;
-            HDC         hdc;
-            hdc = BeginPaint(hwnd, &ps);
-            RECT rc;
+            HDC         hdc = BeginPaint(hwnd, &ps);
+            RECT        rc;
             GetClientRect(hwnd, &rc);
             SetBkColor(hdc, pColorButton->m_color);
             ExtTextOut(hdc, rc.left, rc.top, ETO_CLIPPED | ETO_OPAQUE, &rc, L"", 0, nullptr);
             EndPaint(hwnd, &ps);
             return 0L;
         }
-        break;
         case WM_ERASEBKGND:
             return TRUE;
         case WM_KEYUP:
@@ -118,7 +116,7 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
             cc.hwndOwner    = hwnd;
             cc.rgbResult    = pColorButton->m_color;
             cc.lpCustColors = g_acrCustClr;
-            cc.lCustData    = (LPARAM)pColorButton;
+            cc.lCustData    = reinterpret_cast<LPARAM>(pColorButton);
             cc.lpfnHook     = CCHookProc;
             cc.Flags        = CC_ANYCOLOR | CC_RGBINIT | CC_ENABLEHOOK | CC_FULLOPEN;
 
@@ -130,13 +128,12 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
             {
                 pColorButton->SetColor(cc.rgbResult);
                 pColorButton->m_dialogResult = ColorButtonDialogResult::Cancel;
-                SendMessage(GetParent(hwnd), WM_COMMAND, pColorButton->m_ctlId, (LPARAM)hwnd);
+                SendMessage(GetParent(hwnd), WM_COMMAND, pColorButton->m_ctlId, reinterpret_cast<LPARAM>(hwnd));
             }
             return 0;
         }
-        break;
         case WM_DESTROY:
-            SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)pColorButton->m_pfnOrigCtlProc);
+            SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(pColorButton->m_pfnOrigCtlProc));
             break;
     }
 
@@ -160,7 +157,7 @@ void CColorButton::SetColor(COLORREF clr)
 // in the future.
 
 UINT_PTR CALLBACK CColorButton::CCHookProc(
-    _In_ HWND   hdlg,
+    _In_ HWND   hDlg,
     _In_ UINT   uiMsg,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam)
@@ -172,10 +169,10 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
         {
             const CHOOSECOLOR& cc = *reinterpret_cast<CHOOSECOLOR*>(lParam);
             // Crude attempt to assert this data slot isn't used by anybody but us.
-            assert(GetWindowLongPtr(hdlg, GWLP_USERDATA) == LONG_PTR(0));
-            SetWindowLongPtr(hdlg, GWLP_USERDATA, cc.lCustData);
+            assert(GetWindowLongPtr(hDlg, GWLP_USERDATA) == static_cast<LONG_PTR>(0));
+            SetWindowLongPtr(hDlg, GWLP_USERDATA, cc.lCustData);
             CColorButton* pColorBtn  = reinterpret_cast<CColorButton*>(cc.lCustData);
-            auto          mainWindow = GetAncestor(hdlg, GA_ROOT);
+            auto          mainWindow = GetAncestor(hDlg, GA_ROOT);
             pColorBtn->m_colorEdits  = GetChildWindows(mainWindow, L"Edit");
             assert(pColorBtn->m_colorEdits.size() == 6);
         }
@@ -183,7 +180,7 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
         case WM_CTLCOLOREDIT:
         {
             // InitDialog should have set this.
-            CColorButton* pColorButton = GetObjectFromWindow(hdlg);
+            CColorButton* pColorButton = GetObjectFromWindow(hDlg);
             assert(pColorButton != nullptr);
             assert(pColorButton->m_colorEdits.size() == 6);
 
@@ -195,9 +192,9 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
             COLORREF color = 0;
             try
             {
-                BYTE r = (BYTE)std::stoi(colorText[3]);
-                BYTE g = (BYTE)std::stoi(colorText[4]);
-                BYTE b = (BYTE)std::stoi(colorText[5]);
+                BYTE r = static_cast<BYTE>(std::stoi(colorText[3]));
+                BYTE g = static_cast<BYTE>(std::stoi(colorText[4]));
+                BYTE b = static_cast<BYTE>(std::stoi(colorText[5]));
                 color  = RGB(r, g, b);
             }
             catch (const std::exception& /*ex*/)
@@ -210,12 +207,14 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
                 pColorButton->m_hasLastColor = true;
 #ifdef _DEBUG
                 std::wstring msg = CStringUtils::Format(L"RGB(%d,%d,%d)\n",
-                                                        (int)GetRValue(color), (int)GetGValue(color), (int)GetBValue(color));
+                                                        static_cast<int>(GetRValue(color)),
+                                                        static_cast<int>(GetGValue(color)),
+                                                        static_cast<int>(GetBValue(color)));
                 OutputDebugString(msg.c_str());
 #endif
                 pColorButton->SetColor(color);
-                SendMessage(GetParent(hdlg), WM_COMMAND,
-                            pColorButton->m_ctlId, LPARAM(GetParent(hdlg)));
+                SendMessage(GetParent(hDlg), WM_COMMAND,
+                            pColorButton->m_ctlId, reinterpret_cast<LPARAM>(GetParent(hDlg)));
             }
             break;
         }
