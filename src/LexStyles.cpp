@@ -170,7 +170,7 @@ void CLexStyles::Load()
     {
         if (CPathUtils::GetFileExtension(path) == L"bplex")
         {
-            inis.push_back(std::make_tuple(std::make_unique<CSimpleIni>(), false));
+            inis.push_back(std::make_tuple(std::make_unique<CSimpleIni>(), true));
             std::get<0>(inis.back())->LoadFile(path.c_str());
         }
     }
