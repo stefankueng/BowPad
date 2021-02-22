@@ -514,10 +514,13 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                         sAutoCompleteString = CStringUtils::Format("%s: %s", foundIt->first.c_str(), sVal.c_str());
                     }
                 }
-                m_editor->Call(SCI_AUTOCSETAUTOHIDE, FALSE);
-                m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
-                m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
-                m_editor->Call(SCI_AUTOCSHOW, word.size() + 1, reinterpret_cast<sptr_t>(sAutoCompleteString.c_str()));
+                if (!sAutoCompleteString.empty())
+                {
+                    m_editor->Call(SCI_AUTOCSETAUTOHIDE, FALSE);
+                    m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
+                    m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+                    m_editor->Call(SCI_AUTOCSHOW, word.size() + 1, reinterpret_cast<sptr_t>(sAutoCompleteString.c_str()));
+                }
             }
         }
     }
