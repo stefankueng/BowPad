@@ -607,8 +607,8 @@ void CCmdFunctions::ThreadFunc()
                         break;
 
                     auto word = CUnicodeUtils::StdGetUTF8(match->str(1));
-
-                    acMap[word] = AutoCompleteType::Code;
+                    if (word.size() > 1)
+                        acMap[word] = AutoCompleteType::Code;
                 }
                 AddAutoCompleteWords(work.m_id, std::move(acMap));
             }
