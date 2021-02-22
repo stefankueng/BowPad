@@ -265,11 +265,10 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                 std::string sText = scn->text;
                 if (!sText.empty())
                 {
-                    m_editor->Call(SCI_AUTOCCANCEL);
-
                     auto colonPos = sText.find(':');
                     if (colonPos != std::string::npos)
                     {
+                        m_editor->Call(SCI_AUTOCCANCEL);
                         auto        sKey = sText.substr(0, colonPos);
                         std::string sSnippet;
                         {
