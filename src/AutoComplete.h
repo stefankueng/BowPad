@@ -15,6 +15,7 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #pragma once
+#include "StringUtils.h"
 #include <mutex>
 
 class CMainWindow;
@@ -49,10 +50,10 @@ private:
     CScintillaWnd* m_editor;
     CMainWindow*   m_main;
     // map of [language, [word, AutoCompleteType]]
-    std::map<std::string, std::map<std::string, AutoCompleteType>> m_langWordList;
-    std::map<std::string, std::map<std::string, std::string>>      m_langSnippetList;
-    std::map<DocID, std::map<std::string, AutoCompleteType>>       m_docWordList;
-    std::mutex                                                     m_mutex;
-    bool                                                           m_insertingSnippet;
-    std::string                                                    m_stringToSelect;
+    std::map<std::string, std::map<std::string, AutoCompleteType, ci_less>> m_langWordList;
+    std::map<std::string, std::map<std::string, std::string>>               m_langSnippetList;
+    std::map<DocID, std::map<std::string, AutoCompleteType, ci_less>>       m_docWordList;
+    std::mutex                                                              m_mutex;
+    bool                                                                    m_insertingSnippet;
+    std::string                                                             m_stringToSelect;
 };

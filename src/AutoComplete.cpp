@@ -206,8 +206,8 @@ void CAutoComplete::Init()
         for (const auto& section : sections)
         {
             {
-                std::map<std::string, AutoCompleteType> acMap;
-                const auto*                             codeVal = ini->GetValue(section, L"code");
+                std::map<std::string, AutoCompleteType, ci_less> acMap;
+                const auto*                                      codeVal = ini->GetValue(section, L"code");
                 if (codeVal)
                 {
                     std::vector<std::wstring> values;
