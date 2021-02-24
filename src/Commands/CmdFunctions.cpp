@@ -382,6 +382,11 @@ void CCmdFunctions::OnTimer(UINT id)
             WorkItem w;
             w.m_lang = doc.GetLanguage();
             w.m_id   = docId;
+            if (GetDocIdOfCurrentTab() == docId)
+            {
+                w.m_currentPos = ScintillaCall(SCI_GETCURRENTPOS);
+            }
+
             if (!w.m_lang.empty())
             {
                 auto langData = CLexStyles::Instance().GetLanguageData(w.m_lang);
@@ -566,11 +571,23 @@ void CCmdFunctions::ThreadFunc()
                 std::wregex                       regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
                 const std::wsregex_token_iterator end;
                 ProfileTimer                      timer(L"parsing functions");
-                for (std::wsregex_token_iterator match(sData.begin(), sData.end(), regex, 0); match != end; ++match)
+                for (std::wsregex_token_iterator match(sData.cbegin(), sData.cend(), regex, 0); match != end; ++match)
                 {
                     if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
                         break;
-
+                    if (!match->matched)
+                        continue;
+                    if (work.m_currentPos >= 0)
+                    {
+                        auto startPos = std::distance(sData.cbegin(), match->first);
+                        auto endPos   = std::distance(sData.cbegin(), match->second);
+                        if ((std::abs(startPos - work.m_currentPos) < 10) ||
+                            (std::abs(endPos - work.m_currentPos) < 10) ||
+                            (startPos < work.m_currentPos && endPos > work.m_currentPos))
+                        {
+                            continue;
+                        }
+                    }
                     auto sig = CUnicodeUtils::StdGetUTF8(match->str());
 
                     StripComments(sig);
@@ -598,15 +615,27 @@ void CCmdFunctions::ThreadFunc()
             {
                 auto                                    sRegex = CUnicodeUtils::StdGetUnicode(work.m_autoCRegex);
                 std::wregex                             regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
-                const std::wsregex_iterator             end;
+                const std::wsregex_token_iterator       end;
                 ProfileTimer                            timer(L"parsing words");
                 std::map<std::string, AutoCompleteType> acMap;
-                for (std::wsregex_iterator match(sData.begin(), sData.end(), regex); match != end; ++match)
+                for (std::wsregex_token_iterator match(sData.begin(), sData.end(), regex, 1); match != end; ++match)
                 {
                     if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
                         break;
 
-                    auto word = CUnicodeUtils::StdGetUTF8(match->str(1));
+                    if (work.m_currentPos >= 0)
+                    {
+                        auto startPos = std::distance(sData.cbegin(), match->first);
+                        auto endPos   = std::distance(sData.cbegin(), match->second);
+                        if ((std::abs(startPos - work.m_currentPos) < 10) ||
+                            (std::abs(endPos - work.m_currentPos) < 10) ||
+                            (startPos < work.m_currentPos && endPos > work.m_currentPos))
+                        {
+                            continue;
+                        }
+                    }
+
+                    auto word = CUnicodeUtils::StdGetUTF8(match->str());
                     if (word.size() > 1)
                         acMap[word] = AutoCompleteType::Code;
                 }

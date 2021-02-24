@@ -73,6 +73,7 @@ struct WorkItem
     std::string              m_autoCRegex;
     std::string              m_data;
     std::vector<std::string> m_trimTokens;
+    sptr_t                   m_currentPos = -1;
 };
 
 class CCmdFunctions final : public ICommand
