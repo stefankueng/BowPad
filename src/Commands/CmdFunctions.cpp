@@ -615,29 +615,31 @@ void CCmdFunctions::ThreadFunc()
             {
                 auto                                    sRegex = CUnicodeUtils::StdGetUnicode(work.m_autoCRegex);
                 std::wregex                             regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
-                const std::wsregex_token_iterator       end;
+                const std::wsregex_iterator             end;
                 ProfileTimer                            timer(L"parsing words");
                 std::map<std::string, AutoCompleteType> acMap;
-                for (std::wsregex_token_iterator match(sData.begin(), sData.end(), regex, 1); match != end; ++match)
+                for (std::wsregex_iterator match(sData.begin(), sData.end(), regex); match != end; ++match)
                 {
                     if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
                         break;
 
-                    if (work.m_currentPos >= 0)
+                    for (size_t i = 1; i < match->size(); ++i)
                     {
-                        auto startPos = std::distance(sData.cbegin(), match->first);
-                        auto endPos   = std::distance(sData.cbegin(), match->second);
-                        if ((std::abs(startPos - work.m_currentPos) < 10) ||
-                            (std::abs(endPos - work.m_currentPos) < 10) ||
-                            (startPos < work.m_currentPos && endPos > work.m_currentPos))
+                        if (work.m_currentPos >= 0)
                         {
-                            continue;
+                            auto startPos = match->position(i);
+                            auto endPos   = startPos + match->length(i);
+                            if ((std::abs(startPos - work.m_currentPos) < 10) ||
+                                (std::abs(endPos - work.m_currentPos) < 10) ||
+                                (startPos < work.m_currentPos && endPos > work.m_currentPos))
+                            {
+                                continue;
+                            }
                         }
+                        auto word = CUnicodeUtils::StdGetUTF8(match->str(i));
+                        if (word.size() > 1)
+                            acMap[word] = AutoCompleteType::Code;
                     }
-
-                    auto word = CUnicodeUtils::StdGetUTF8(match->str());
-                    if (word.size() > 1)
-                        acMap[word] = AutoCompleteType::Code;
                 }
                 AddAutoCompleteWords(work.m_id, std::move(acMap));
             }
