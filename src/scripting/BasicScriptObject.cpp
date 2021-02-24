@@ -923,6 +923,10 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID /*riid*/,
             idList[i] = 905;
         else if (_wcsicmp(nameList[i], L"GetKeyState") == 0)
             idList[i] = 906;
+        else if (_wcsicmp(nameList[i], L"AddDocAutoCompleteWords") == 0)
+            idList[i] = 907;
+        else if (_wcsicmp(nameList[i], L"AddLangAutoCompleteWords") == 0)
+            idList[i] = 908;
         else if (ScintillaCommandsDispId(nameList[i], idList[i]))
             return S_OK;
         else
@@ -1432,6 +1436,38 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                 return DISP_E_TYPEMISMATCH;
             ret->vt      = VT_BOOL;
             ret->boolVal = (GetKeyState(p1.intVal) & 0x8000) != 0 ? VARIANT_TRUE : VARIANT_FALSE;
+        }
+        break;
+        case 907: // AddDocAutoCompleteWords
+        {
+            if (args->cArgs != 2)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p2, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
+                return DISP_E_TYPEMISMATCH;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[1], VARIANT_ALPHABOOL, VT_UINT)))
+                return DISP_E_TYPEMISMATCH;
+            std::vector<std::wstring>               vec;
+            std::map<std::string, AutoCompleteType> words;
+            stringtok(vec, p2.bstrVal, true, L" ", false);
+            for (const auto& word : vec)
+                words[CUnicodeUtils::StdGetUTF8(word)] = AutoCompleteType::Code;
+            AddAutoCompleteWords(DocID(p1.intVal), std::move(words));
+        }
+        break;
+        case 908: // AddLangAutoCompleteWords
+        {
+            if (args->cArgs != 2)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p2, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
+                return DISP_E_TYPEMISMATCH;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[1], VARIANT_ALPHABOOL, VT_BSTR)))
+                return DISP_E_TYPEMISMATCH;
+            std::vector<std::wstring>               vec;
+            std::map<std::string, AutoCompleteType> words;
+            stringtok(vec, p2.bstrVal, true, L" ", false);
+            for (const auto& word : vec)
+                words[CUnicodeUtils::StdGetUTF8(word)] = AutoCompleteType::Code;
+            AddAutoCompleteWords(CUnicodeUtils::StdGetUTF8(p1.bstrVal), std::move(words));
         }
         break;
         default:
