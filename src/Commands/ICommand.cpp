@@ -432,7 +432,7 @@ void ICommand::FileTreeBlockRefresh(bool bBlock) const
 
 void ICommand::AddAutoCompleteWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words) const
 {
-    m_pMainWindow->AddAutoCompleteWords(lang, words);
+    m_pMainWindow->AddAutoCompleteWords(lang, std::move(words));
 }
 
 void ICommand::AddAutoCompleteWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words) const
@@ -442,7 +442,7 @@ void ICommand::AddAutoCompleteWords(const std::string& lang, const std::map<std:
 
 void ICommand::AddAutoCompleteWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words) const
 {
-    m_pMainWindow->AddAutoCompleteWords(docID, words);
+    m_pMainWindow->AddAutoCompleteWords(docID, std::move(words));
 }
 
 void ICommand::AddAutoCompleteWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words) const
