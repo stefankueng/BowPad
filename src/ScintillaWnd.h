@@ -160,6 +160,7 @@ private:
     sptr_t            m_lineToScrollToAfterPaint;
     sptr_t            m_wrapOffsetToScrollToAfterPaint;
     int               m_lineToScrollToAfterPaintCounter;
+    sptr_t            m_lastMousePos;
     AnimationVariable m_animVarGrayFore;
     AnimationVariable m_animVarGrayBack;
     AnimationVariable m_animVarGraySel;

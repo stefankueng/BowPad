@@ -1075,8 +1075,13 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
             HandleDwellStart(scn);
             break;
         case SCN_DWELLEND:
-            m_editor.Call(SCI_CALLTIPCANCEL);
-            m_custToolTip.HideTip();
+            if ((scn.position >= 0) && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position))
+                HandleDwellStart(scn);
+            else
+            {
+                m_editor.Call(SCI_CALLTIPCANCEL);
+                m_custToolTip.HideTip();
+            }
             break;
         case SCN_ZOOM:
             m_editor.UpdateLineNumberWidth();
@@ -2676,9 +2681,24 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
     if ((scn.position >= 0) && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position))
     {
         // an url hotspot
+        // find start of url
+        auto startPos = scn.position;
+        while (startPos && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, startPos))
+            --startPos;
+        ++startPos;
+        // find end of url
+        auto endPos = scn.position;
+        auto docEnd = m_editor.Call(SCI_GETLENGTH);
+        while (endPos < docEnd && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, endPos))
+            ++endPos;
+        --endPos;
+
         ResString   str(g_hRes, IDS_HOWTOOPENURL);
-        std::string strA = CUnicodeUtils::StdGetUTF8(str);
-        m_editor.Call(SCI_CALLTIPSHOW, scn.position, reinterpret_cast<sptr_t>(strA.c_str()));
+        std::string strA         = CUnicodeUtils::StdGetUTF8(str);
+        auto        tipPos       = startPos + ((endPos - startPos) / 2) - strA.size() / 2;
+        auto        lineStartPos = m_editor.Call(SCI_POSITIONFROMPOINT, 0, scn.y);
+        tipPos                   = max(lineStartPos, tipPos);
+        m_editor.Call(SCI_CALLTIPSHOW, tipPos, reinterpret_cast<sptr_t>(strA.c_str()));
         return;
     }
 
@@ -4316,7 +4336,9 @@ void CMainWindow::GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI
 // Implementation helper only,
 // use CTheme::Instance::SetDarkTheme to actually set the theme.
 #ifndef UI_PKEY_DarkModeRibbon
+// ReSharper disable once CppInconsistentNaming
 DEFINE_UIPROPERTYKEY(UI_PKEY_DarkModeRibbon, VT_BOOL, 2004);
+// ReSharper disable once CppInconsistentNaming
 DEFINE_UIPROPERTYKEY(UI_PKEY_ApplicationButtonColor, VT_UI4, 2003);
 #endif
 void CMainWindow::SetTheme(bool dark)

@@ -75,6 +75,7 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_lineToScrollToAfterPaint(-1)
     , m_wrapOffsetToScrollToAfterPaint(0)
     , m_lineToScrollToAfterPaintCounter(0)
+    , m_lastMousePos(-1)
 {
     HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
                              OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
@@ -431,7 +432,21 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                 rc.right = rc.left;
                 for (int i = 0; i <= SC_MARGE_FOLDER; ++i)
                     rc.right += static_cast<long>(Call(SCI_GETMARGINWIDTHN, i));
-                POINT pt = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+                POINT pt       = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+                auto  mousePos = Call(SCI_POSITIONFROMPOINT, pt.x, pt.y);
+                if (mousePos != m_lastMousePos)
+                {
+                    SCNotification scn = {};
+                    scn.nmhdr.code     = SCN_DWELLEND;
+                    scn.position       = mousePos;
+                    scn.x              = static_cast<int>(pt.x);
+                    scn.y              = static_cast<int>(pt.y);
+                    scn.nmhdr.hwndFrom = *this;
+                    scn.nmhdr.idFrom   = ::GetDlgCtrlID(*this);
+                    ::SendMessage(::GetParent(*this), WM_NOTIFY,
+                                  ::GetDlgCtrlID(*this), reinterpret_cast<LPARAM>(&scn));
+                }
+                m_lastMousePos = mousePos;
                 if (PtInRect(&rc, pt))
                 {
                     if (!m_bInFolderMargin)
