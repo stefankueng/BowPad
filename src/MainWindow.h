@@ -169,7 +169,7 @@ private:
     static std::vector<std::wstring> GetFileListFromGlobPath(const std::wstring& path);
 
     // Scintilla events.
-    void        HandleDwellStart(const SCNotification& scn);
+    void        HandleDwellStart(const SCNotification& scn, bool start);
     bool        HandleDoubleClick(const SCNotification& scn);
     void        HandleCopyDataCommandLine(const COPYDATASTRUCT& cds);
     bool        HandleCopyDataMoveTab(const COPYDATASTRUCT& cds);

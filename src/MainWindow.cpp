@@ -76,6 +76,7 @@ const int STATUSBAR_SEL          = 2;
 const int STATUSBAR_EDITORCONFIG = 3;
 const int STATUSBAR_EOL_FORMAT   = 4;
 const int STATUSBAR_TABSPACE     = 5;
+// ReSharper disable once CppInconsistentNaming
 const int STATUSBAR_R2L          = 6;
 const int STATUSBAR_UNICODE_TYPE = 7;
 const int STATUSBAR_TYPING_MODE  = 8;
@@ -1072,11 +1073,11 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
         case SCN_DOUBLECLICK:
             return HandleDoubleClick(scn);
         case SCN_DWELLSTART:
-            HandleDwellStart(scn);
+            HandleDwellStart(scn, true);
             break;
         case SCN_DWELLEND:
-            if ((scn.position >= 0) && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position))
-                HandleDwellStart(scn);
+            if ((scn.position >= 0) && m_editor.Call(SCI_CALLTIPACTIVE))
+                HandleDwellStart(scn, false);
             else
             {
                 m_editor.Call(SCI_CALLTIPCANCEL);
@@ -2675,29 +2676,56 @@ void CMainWindow::PasteHistory()
 // Show Tool Tips and colors for colors and numbers and their
 // conversions to hex octal etc.
 // e.g. 0xF0F hex == 3855 decimal == 07417 octal.
-void CMainWindow::HandleDwellStart(const SCNotification& scn)
+void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
 {
     // Note style will be zero if no style or past end of the document.
-    if ((scn.position >= 0) && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position))
+    if ((scn.position >= 0) && (!start || m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position)))
     {
+        const int pixelMargin = CDPIAware::Instance().Scale(*this, 4);
         // an url hotspot
         // find start of url
-        auto startPos = scn.position;
+        auto startPos     = scn.position;
+        auto endPos       = scn.position;
+        auto lineStartPos = m_editor.Call(SCI_POSITIONFROMPOINT, 0, scn.y);
+        if (!start && !m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, startPos))
+        {
+            startPos     = m_editor.Call(SCI_POSITIONFROMPOINT, scn.x, scn.y + pixelMargin);
+            endPos       = startPos;
+            lineStartPos = m_editor.Call(SCI_POSITIONFROMPOINT, 0, scn.y + pixelMargin);
+            if (!m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, startPos))
+            {
+                m_editor.Call(SCI_CALLTIPCANCEL);
+                return;
+            }
+        }
         while (startPos && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, startPos))
             --startPos;
         ++startPos;
         // find end of url
-        auto endPos = scn.position;
         auto docEnd = m_editor.Call(SCI_GETLENGTH);
         while (endPos < docEnd && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, endPos))
             ++endPos;
         --endPos;
 
         ResString   str(g_hRes, IDS_HOWTOOPENURL);
-        std::string strA         = CUnicodeUtils::StdGetUTF8(str);
-        auto        tipPos       = startPos + ((endPos - startPos) / 2) - strA.size() / 2;
-        auto        lineStartPos = m_editor.Call(SCI_POSITIONFROMPOINT, 0, scn.y);
-        tipPos                   = max(lineStartPos, tipPos);
+        std::string strA   = CUnicodeUtils::StdGetUTF8(str);
+        auto        tipPos = startPos + ((endPos - startPos) / 2) - static_cast<sptr_t>(strA.size()) / 2;
+        if (m_editor.Call(SCI_CALLTIPACTIVE))
+        {
+            auto linePos = m_editor.Call(SCI_LINEFROMPOSITION, scn.position);
+            auto upPos   = m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_POSITIONFROMPOINT, 0, scn.y - pixelMargin));
+            if (upPos != linePos)
+            {
+                m_editor.Call(SCI_CALLTIPCANCEL);
+                return;
+            }
+        }
+        tipPos = max(lineStartPos, tipPos);
+        if (m_editor.Call(SCI_CALLTIPACTIVE) && m_editor.Call(SCI_CALLTIPPOSSTART) == tipPos)
+            return;
+        if (!start && !m_editor.Call(SCI_CALLTIPACTIVE))
+            return;
+
         m_editor.Call(SCI_CALLTIPSHOW, tipPos, reinterpret_cast<sptr_t>(strA.c_str()));
         return;
     }
