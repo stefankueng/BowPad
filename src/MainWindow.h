@@ -171,6 +171,7 @@ private:
     // Scintilla events.
     void        HandleDwellStart(const SCNotification& scn, bool start);
     bool        HandleDoubleClick(const SCNotification& scn);
+    bool        OpenUrlAtPos(Sci_Position pos);
     void        HandleCopyDataCommandLine(const COPYDATASTRUCT& cds);
     bool        HandleCopyDataMoveTab(const COPYDATASTRUCT& cds);
     void        HandleWriteProtectedEdit();
@@ -244,6 +245,7 @@ private:
     UI_HSBCOLOR                                     m_normalThemeHigh;
     std::unique_ptr<CCommandPaletteDlg>             m_commandPaletteDlg;
     CAutoComplete                                   m_autoCompleter;
+    Sci_Position                                    m_dwellStartPos;
 
     // status bar icons
     HICON m_hShieldIcon;

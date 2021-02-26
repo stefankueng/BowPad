@@ -231,6 +231,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     , m_newCount(0)
     , m_pRibbon(nullptr)
     , m_ribbonHeight(0)
+    , m_dwellStartPos(-1)
 {
     auto cxIcon = GetSystemMetrics(SM_CXSMICON);
     auto cyIcon = GetSystemMetrics(SM_CYSMICON);
@@ -1073,6 +1074,7 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
         case SCN_DOUBLECLICK:
             return HandleDoubleClick(scn);
         case SCN_DWELLSTART:
+            m_dwellStartPos = scn.position;
             HandleDwellStart(scn, true);
             break;
         case SCN_DWELLEND:
@@ -1082,7 +1084,11 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
             {
                 m_editor.Call(SCI_CALLTIPCANCEL);
                 m_custToolTip.HideTip();
+                m_dwellStartPos = -1;
             }
+            break;
+        case SCN_CALLTIPCLICK:
+            OpenUrlAtPos(m_dwellStartPos);
             break;
         case SCN_ZOOM:
             m_editor.UpdateLineNumberWidth();
@@ -2920,13 +2926,16 @@ bool CMainWindow::HandleDoubleClick(const SCNotification& scn)
 {
     if (!(scn.modifiers & SCMOD_CTRL))
         return false;
+    return OpenUrlAtPos(scn.position);
+}
 
+bool CMainWindow::OpenUrlAtPos(Sci_Position pos)
+{
     auto wordCharsBuffer = m_editor.GetWordChars();
     OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>(wordCharsBuffer.c_str())));
 
     m_editor.Call(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:;?&@=/%#()"));
 
-    Sci_Position pos      = scn.position;
     Sci_Position startPos = static_cast<Sci_Position>(m_editor.Call(SCI_WORDSTARTPOSITION, pos, false));
     Sci_Position endPos   = static_cast<Sci_Position>(m_editor.Call(SCI_WORDENDPOSITION, pos, false));
 
