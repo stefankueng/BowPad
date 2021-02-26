@@ -219,6 +219,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     , m_normalThemeBack(0)
     , m_normalThemeHigh(0)
     , m_autoCompleter(this, &m_editor)
+    , m_dwellStartPos(-1)
     , m_hShieldIcon(nullptr)
     , m_hCapsLockIcon(nullptr)
     , m_hLexerIcon(nullptr)
@@ -231,7 +232,6 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     , m_newCount(0)
     , m_pRibbon(nullptr)
     , m_ribbonHeight(0)
-    , m_dwellStartPos(-1)
 {
     auto cxIcon = GetSystemMetrics(SM_CXSMICON);
     auto cyIcon = GetSystemMetrics(SM_CYSMICON);
