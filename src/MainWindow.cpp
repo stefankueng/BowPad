@@ -2713,9 +2713,14 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
             ++endPos;
         --endPos;
 
-        ResString   str(g_hRes, IDS_HOWTOOPENURL);
-        std::string strA   = CUnicodeUtils::StdGetUTF8(str);
-        auto        tipPos = startPos + ((endPos - startPos) / 2) - static_cast<sptr_t>(strA.size()) / 2;
+        ResString          str(g_hRes, IDS_HOWTOOPENURL);
+        std::string        strA = CUnicodeUtils::StdGetUTF8(str);
+        std::istringstream is(strA);
+        std::string        part;
+        size_t             lineLength = 0;
+        while (getline(is, part, '\n'))
+            lineLength = max(lineLength, part.size());
+        auto tipPos = startPos + ((endPos - startPos) / 2) - static_cast<sptr_t>(lineLength) / 2;
         if (m_editor.Call(SCI_CALLTIPACTIVE))
         {
             auto linePos = m_editor.Call(SCI_LINEFROMPOSITION, scn.position);
