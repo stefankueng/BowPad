@@ -1014,6 +1014,10 @@ void CScintillaWnd::SetupDefaultStyles() const
     Call(SCI_INDICSETUNDER, INDIC_TAGMATCH, true);
     Call(SCI_INDICSETUNDER, INDIC_TAGATTR, true);
 
+    Call(SCI_CALLTIPUSESTYLE, 0);
+    Call(SCI_STYLESETFORE, STYLE_CALLTIP, theme.GetThemeColor(GetSysColor(COLOR_INFOTEXT)));
+    Call(SCI_STYLESETBACK, STYLE_CALLTIP, theme.GetThemeColor(GetSysColor(COLOR_INFOBK)));
+
     std::vector<COLORREF> captureColors = {
         RGB(80, 0, 0),
         RGB(0, 80, 0),
