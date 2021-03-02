@@ -1357,8 +1357,8 @@ void CFindReplaceDlg::LetUserSelectSearchFolder()
     if (!PathFileExists(currentFolder.c_str()))
         currentFolder.clear();
     bf.m_style                   = BIF_USENEWUI;
-    CBrowseFolder::retVal result = bf.Show(*this, selectedFolder, currentFolder);
-    if (result == CBrowseFolder::OK)
+    auto result = bf.Show(*this, selectedFolder, currentFolder);
+    if (result == CBrowseFolder::RetVal::Ok)
     {
         SetSearchFolder(selectedFolder);
         // If the user is changing the search folder they must
