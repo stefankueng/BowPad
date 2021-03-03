@@ -317,19 +317,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                 }
                                 else if (c == '\t')
                                 {
-                                    if (m_editor->Call(SCI_GETUSETABS))
-                                    {
-                                        char text[] = {c, 0};
-                                        m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
-                                    }
-                                    else
-                                    {
-                                        auto tabWidth= m_editor->Call(SCI_GETTABWIDTH);
-                                        std::string spaces;
-                                        for (sptr_t i = 0; i < tabWidth; ++i)
-                                            spaces.push_back(' ');
-                                        m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(spaces.c_str()));
-                                    }
+                                    m_editor->Call(SCI_TAB);
                                 }
                                 else
                                 {
