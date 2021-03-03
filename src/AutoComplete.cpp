@@ -163,6 +163,7 @@ CAutoComplete::CAutoComplete(CMainWindow* main, CScintillaWnd* scintilla)
     : m_editor(scintilla)
     , m_main(main)
     , m_insertingSnippet(false)
+    , m_currentSnippetPos(-1)
 {
 }
 
@@ -235,6 +236,7 @@ void CAutoComplete::Init()
                             auto sSnippetVal = CUnicodeUtils::StdGetUTF8(snippetVal);
                             SearchReplace(sSnippetVal, "\\r\\n", "\n");
                             SearchReplace(sSnippetVal, "\\n", "\n");
+                            SearchReplace(sSnippetVal, "\\t", "\t");
                             csMap[snipp.substr(8)] = sSnippetVal;
                         }
                     }
@@ -293,13 +295,50 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             m_editor->Call(SCI_DELETERANGE, scn->position, pos - scn->position);
                             auto eolMode = m_editor->Call(SCI_GETEOLMODE);
 
-                            sptr_t cursorPos = -1;
+                            sptr_t cursorPos  = -1;
+                            char   lastC      = 0;
+                            char   last2C     = 0;
+                            int    hotSpotNum = -1;
+                            m_snippetPositions.clear();
+                            m_currentSnippetPos = -1;
                             for (const auto& c : sSnippet)
                             {
-                                if (c == '^')
+                                if (c == '^' && lastC != '\\')
+                                {
                                     cursorPos = m_editor->Call(SCI_GETCURRENTPOS);
+                                    if (hotSpotNum >= 0)
+                                        m_snippetPositions[hotSpotNum].push_back(cursorPos);
+                                    hotSpotNum = -1;
+                                }
+                                else if (lastC == '^' && last2C != '\\' && isdigit(c))
+                                {
+                                    hotSpotNum = c - '0';
+                                    m_snippetPositions[c - '0'].push_back(cursorPos);
+                                }
+                                else if (c == '\t')
+                                {
+                                    if (m_editor->Call(SCI_GETUSETABS))
+                                    {
+                                        char text[] = {c, 0};
+                                        m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
+                                    }
+                                    else
+                                    {
+                                        auto tabWidth= m_editor->Call(SCI_GETTABWIDTH);
+                                        std::string spaces;
+                                        for (sptr_t i = 0; i < tabWidth; ++i)
+                                            spaces.push_back(' ');
+                                        m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(spaces.c_str()));
+                                    }
+                                }
                                 else
                                 {
+                                    if (lastC == '\\')
+                                    {
+                                        char text[] = {c, 0};
+                                        m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
+                                    }
+
                                     if (c == '\n')
                                     {
                                         switch (eolMode)
@@ -325,16 +364,35 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                         }
                                         m_main->IndentToLastLine();
                                     }
-                                    else
+                                    else if (c != '\\')
                                     {
                                         char text[] = {c, 0};
                                         m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
                                     }
                                 }
+                                last2C = lastC;
+                                lastC  = c;
                             }
-                            if (cursorPos >= 0)
+                            if (!m_snippetPositions.empty())
                             {
-                                m_editor->Call(SCI_SETSELECTION, cursorPos, cursorPos);
+                                const auto& [id, posVec] = *m_snippetPositions.begin();
+                                bool first               = true;
+                                for (auto it = posVec.cbegin(); it != posVec.cend(); ++it)
+                                {
+                                    auto a = *it;
+                                    ++it;
+                                    auto b = *it;
+                                    if (first)
+                                    {
+                                        m_editor->Call(SCI_SETSELECTION, a, b);
+                                        first = false;
+                                    }
+                                    else
+                                    {
+                                        m_editor->Call(SCI_ADDSELECTION, a, b);
+                                    }
+                                }
+                                m_currentSnippetPos = id;
                             }
                             m_editor->Call(SCI_ENDUNDOACTION);
                         }
@@ -358,7 +416,94 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
         case SCN_AUTOCCOMPLETED:
             m_stringToSelect.clear();
             break;
+        case SCN_MODIFIED:
+        {
+            if (scn->modificationType & (SC_MOD_DELETETEXT | SC_MOD_INSERTTEXT))
+            {
+                if (m_currentSnippetPos >= 0 && !m_snippetPositions.empty())
+                {
+                    if (scn->linesAdded != 0)
+                    {
+                        m_snippetPositions.clear();
+                        m_currentSnippetPos = -1;
+                    }
+                    else
+                    {
+                        for (auto& [id, snippetPositions] : m_snippetPositions)
+                        {
+                            for (auto& pos : snippetPositions)
+                            {
+                                if (pos > scn->position)
+                                {
+                                    if (scn->modificationType & SC_MOD_INSERTTEXT)
+                                        pos += scn->length;
+                                    else
+                                        pos -= scn->length;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        break;
     }
+}
+class MyClass
+{
+public:
+    MyClass();
+    ~MyClass();
+
+private:
+};
+
+MyClass::MyClass()
+{
+}
+
+MyClass::~MyClass()
+{
+}
+bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
+{
+    if (m_snippetPositions.empty())
+        return true;
+    if (wParam == VK_TAB || wParam == VK_RETURN)
+    {
+        if (GetKeyState(VK_SHIFT) & 0x8000)
+            --m_currentSnippetPos;
+        else
+            ++m_currentSnippetPos;
+        if (m_currentSnippetPos < 0)
+        {
+            m_snippetPositions.clear();
+            m_currentSnippetPos = -1;
+            return true;
+        }
+        if (m_currentSnippetPos < m_snippetPositions.size())
+        {
+            const auto& posVec = m_snippetPositions[m_currentSnippetPos];
+            bool        first  = true;
+            for (auto it = posVec.cbegin(); it != posVec.cend(); ++it)
+            {
+                auto a = *it;
+                ++it;
+                auto b = *it;
+                if (first)
+                {
+                    m_editor->Call(SCI_SETSELECTION, a, b);
+                    first = false;
+                }
+                else
+                {
+                    m_editor->Call(SCI_ADDSELECTION, a, b);
+                }
+            }
+            return false;
+        }
+    }
+    return true;
 }
 
 void CAutoComplete::AddWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words)
@@ -510,6 +655,17 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                         auto sVal        = foundIt->second;
                         m_stringToSelect = foundIt->first;
                         SearchReplace(sVal, "\n", " ");
+                        SearchReplace(sVal, "^0", "");
+                        SearchReplace(sVal, "^1", "");
+                        SearchReplace(sVal, "^2", "");
+                        SearchReplace(sVal, "^3", "");
+                        SearchReplace(sVal, "^4", "");
+                        SearchReplace(sVal, "^5", "");
+                        SearchReplace(sVal, "^6", "");
+                        SearchReplace(sVal, "^7", "");
+                        SearchReplace(sVal, "^8", "");
+                        SearchReplace(sVal, "^9", "");
+                        SearchReplace(sVal, "^", "");
                         sAutoCompleteString = CStringUtils::Format("%s: %s", foundIt->first.c_str(), sVal.c_str());
                     }
                 }

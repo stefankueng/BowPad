@@ -16,7 +16,9 @@
 //
 #pragma once
 #include "StringUtils.h"
+#include "../ext/scintilla/include/Sci_Position.h"
 #include <mutex>
+
 
 class CMainWindow;
 class CScintillaWnd;
@@ -38,6 +40,7 @@ public:
 
     void Init();
     void HandleScintillaEvents(const SCNotification* scn);
+    bool HandleChar(WPARAM wParam, LPARAM lParam);
     void AddWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words);
     void AddWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words);
     void AddWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words);
@@ -56,4 +59,6 @@ private:
     std::mutex                                                              m_mutex;
     bool                                                                    m_insertingSnippet;
     std::string                                                             m_stringToSelect;
+    std::map<int, std::vector<Sci_Position>>                                m_snippetPositions;
+    int                                                                     m_currentSnippetPos;
 };

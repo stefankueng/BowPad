@@ -250,7 +250,7 @@ bool CScintillaWnd::InitScratch(HINSTANCE hInst)
     return true;
 }
 
-bool bEatNextEnterKey = false;
+bool bEatNextTabOrEnterKey = false;
 
 LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -320,9 +320,9 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
         {
             if ((wParam == VK_RETURN) || (wParam == '\n'))
             {
-                if (bEatNextEnterKey)
+                if (bEatNextTabOrEnterKey)
                 {
-                    bEatNextEnterKey = false;
+                    bEatNextTabOrEnterKey = false;
                     return 0;
                 }
                 if ((GetKeyState(VK_CONTROL) & 0x8000) || (GetKeyState(VK_SHIFT) & 0x8000))
@@ -330,12 +330,24 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                     return 0;
                 }
             }
+            if (wParam == VK_TAB && bEatNextTabOrEnterKey)
+            {
+                bEatNextTabOrEnterKey = false;
+                return 0;
+            }
             if (AutoBraces(wParam))
                 return 0;
         }
         break;
         case WM_KEYDOWN:
         {
+            auto ret = SendMessage(GetParent(*this), WM_SCICHAR, wParam, lParam);
+            if (ret == 0)
+            {
+                bEatNextTabOrEnterKey = true;
+                return 0;
+            }
+
             if ((wParam == VK_RETURN) || (wParam == '\n'))
             {
                 if ((GetKeyState(VK_CONTROL) & 0x8000) || (GetKeyState(VK_SHIFT) & 0x8000))
@@ -363,7 +375,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                     Call(SCI_NEWLINE);
                     Call(SCI_TAB);
                     Call(SCI_ENDUNDOACTION);
-                    bEatNextEnterKey = true;
+                    bEatNextTabOrEnterKey = true;
                     return 0;
                 }
             }

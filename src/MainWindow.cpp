@@ -892,6 +892,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 OpenNewTab();
         }
         break;
+        case WM_SCICHAR:
+        {
+            auto ret = m_autoCompleter.HandleChar(wParam, lParam);
+            return ret ? 1 : 0;
+        }
         default:
             return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }

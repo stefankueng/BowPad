@@ -75,3 +75,4 @@
 #define WM_CANHIDECURSOR     (WM_APP + 14)
 #define WM_MOVETODESKTOP     (WM_APP + 15)
 #define WM_MOVETODESKTOP2    (WM_APP + 16)
+#define WM_SCICHAR           (WM_APP + 17)
