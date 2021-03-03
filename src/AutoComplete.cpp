@@ -293,7 +293,6 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             m_editor->Call(SCI_BEGINUNDOACTION);
                             m_editor->Call(SCI_SETSELECTION, scn->position, pos);
                             m_editor->Call(SCI_DELETERANGE, scn->position, pos - scn->position);
-                            auto eolMode = m_editor->Call(SCI_GETEOLMODE);
 
                             sptr_t cursorPos  = -1;
                             char   lastC      = 0;
@@ -315,10 +314,6 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                     hotSpotNum = c - '0';
                                     m_snippetPositions[c - '0'].push_back(cursorPos);
                                 }
-                                else if (c == '\t')
-                                {
-                                    m_editor->Call(SCI_TAB);
-                                }
                                 else
                                 {
                                     if (lastC == '\\')
@@ -326,30 +321,13 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                         char text[] = {c, 0};
                                         m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
                                     }
-
-                                    if (c == '\n')
+                                    else if (c == '\t')
                                     {
-                                        switch (eolMode)
-                                        {
-                                            case SC_EOL_CRLF:
-                                            {
-                                                char text[] = {'\r', '\n', 0};
-                                                m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
-                                            }
-                                            break;
-                                            case SC_EOL_LF:
-                                            {
-                                                char text[] = {'\n', 0};
-                                                m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
-                                            }
-                                            break;
-                                            case SC_EOL_CR:
-                                            {
-                                                char text[] = {'\r', 0};
-                                                m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
-                                            }
-                                            break;
-                                        }
+                                        m_editor->Call(SCI_TAB);
+                                    }
+                                    else if (c == '\n')
+                                    {
+                                        m_editor->Call(SCI_NEWLINE);
                                         m_main->IndentToLastLine();
                                     }
                                     else if (c != '\\')
