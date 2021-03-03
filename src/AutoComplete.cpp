@@ -237,6 +237,7 @@ void CAutoComplete::Init()
                             SearchReplace(sSnippetVal, "\\r\\n", "\n");
                             SearchReplace(sSnippetVal, "\\n", "\n");
                             SearchReplace(sSnippetVal, "\\t", "\t");
+                            SearchReplace(sSnippetVal, "\\b", "\b");
                             csMap[snipp.substr(8)] = sSnippetVal;
                         }
                     }
@@ -330,6 +331,10 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                         m_editor->Call(SCI_NEWLINE);
                                         m_main->IndentToLastLine(true);
                                     }
+                                    else if (c == '\b')
+                                    {
+                                        m_editor->Call(SCI_DELETEBACK);
+                                    }
                                     else if (c != '\\')
                                     {
                                         char text[] = {c, 0};
@@ -415,22 +420,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
         break;
     }
 }
-class MyClass
-{
-public:
-    MyClass();
-    ~MyClass();
 
-private:
-};
-
-MyClass::MyClass()
-{
-}
-
-MyClass::~MyClass()
-{
-}
 bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
 {
     if (m_snippetPositions.empty())
