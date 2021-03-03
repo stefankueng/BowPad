@@ -328,7 +328,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                     else if (c == '\n')
                                     {
                                         m_editor->Call(SCI_NEWLINE);
-                                        m_main->IndentToLastLine();
+                                        m_main->IndentToLastLine(true);
                                     }
                                     else if (c != '\\')
                                     {

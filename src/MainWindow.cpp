@@ -3080,7 +3080,7 @@ void CMainWindow::HandleUpdateUI(const SCNotification& scn)
     UpdateStatusBar(false);
 }
 
-void CMainWindow::IndentToLastLine() const
+void CMainWindow::IndentToLastLine(bool insertWhitespace) const
 {
     size_t curLine      = m_editor.GetCurrentLineNumber();
     size_t lastLine     = curLine - 1;
@@ -3093,40 +3093,48 @@ void CMainWindow::IndentToLastLine() const
 
     if (indentAmount > 0)
     {
-        Sci_CharacterRange cRange{};
-        cRange.cpMin  = static_cast<long>(m_editor.Call(SCI_GETSELECTIONSTART));
-        cRange.cpMax  = static_cast<long>(m_editor.Call(SCI_GETSELECTIONEND));
-        int posBefore = static_cast<int>(m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine));
-        m_editor.Call(SCI_SETLINEINDENTATION, curLine, indentAmount);
-        int posAfter      = static_cast<int>(m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine));
-        int posDifference = posAfter - posBefore;
-        if (posAfter > posBefore)
+        if (insertWhitespace)
         {
-            // Move selection on
-            if (cRange.cpMin >= posBefore)
-                cRange.cpMin += posDifference;
-            if (cRange.cpMax >= posBefore)
-                cRange.cpMax += posDifference;
-        }
-        else if (posAfter < posBefore)
-        {
-            // Move selection back
-            if (cRange.cpMin >= posAfter)
+            Sci_CharacterRange cRange{};
+            cRange.cpMin  = static_cast<long>(m_editor.Call(SCI_GETSELECTIONSTART));
+            cRange.cpMax  = static_cast<long>(m_editor.Call(SCI_GETSELECTIONEND));
+            int posBefore = static_cast<int>(m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine));
+            m_editor.Call(SCI_SETLINEINDENTATION, curLine, indentAmount);
+            int posAfter      = static_cast<int>(m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine));
+            int posDifference = posAfter - posBefore;
+            if (posAfter > posBefore)
             {
+                // Move selection on
                 if (cRange.cpMin >= posBefore)
                     cRange.cpMin += posDifference;
-                else
-                    cRange.cpMin = posAfter;
-            }
-            if (cRange.cpMax >= posAfter)
-            {
                 if (cRange.cpMax >= posBefore)
                     cRange.cpMax += posDifference;
-                else
-                    cRange.cpMax = posAfter;
             }
+            else if (posAfter < posBefore)
+            {
+                // Move selection back
+                if (cRange.cpMin >= posAfter)
+                {
+                    if (cRange.cpMin >= posBefore)
+                        cRange.cpMin += posDifference;
+                    else
+                        cRange.cpMin = posAfter;
+                }
+                if (cRange.cpMax >= posAfter)
+                {
+                    if (cRange.cpMax >= posBefore)
+                        cRange.cpMax += posDifference;
+                    else
+                        cRange.cpMax = posAfter;
+                }
+            }
+            m_editor.Call(SCI_SETSEL, cRange.cpMin, cRange.cpMax);
         }
-        m_editor.Call(SCI_SETSEL, cRange.cpMin, cRange.cpMax);
+        else
+        {
+            m_editor.Call(SCI_SETSELECTIONNCARETVIRTUALSPACE, 0, indentAmount);
+            m_editor.Call(SCI_SETSELECTIONNANCHORVIRTUALSPACE, 0, indentAmount);
+        }
     }
 }
 
@@ -3137,7 +3145,7 @@ void CMainWindow::HandleAutoIndent(const SCNotification& scn) const
     if (((eolMode == SC_EOL_CRLF || eolMode == SC_EOL_LF) && scn.ch == '\n') ||
         (eolMode == SC_EOL_CR && scn.ch == '\r'))
     {
-        IndentToLastLine();
+        IndentToLastLine(false);
     }
 }
 
