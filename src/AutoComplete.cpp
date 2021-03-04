@@ -648,7 +648,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             }
         }
     }
-    else if (CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) && pos > 2)
+    else if (CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) && word.size() > 1)
     {
         if (m_editor->Call(SCI_AUTOCACTIVE))
             return;
@@ -760,5 +760,10 @@ std::string CAutoComplete::SanitizeSnippetText(const std::string& text) const
     SearchReplace(sVal, "^8", "");
     SearchReplace(sVal, "^9", "");
     SearchReplace(sVal, "^", "");
+
+    const size_t maxLen = 40;
+    if (sVal.size() >= maxLen)
+        sVal = sVal.substr(0, maxLen - 3) + "...";
+
     return sVal;
 }
