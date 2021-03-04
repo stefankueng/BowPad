@@ -449,7 +449,15 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
             m_currentSnippetPos = m_snippetPositions.size() - 1;
         }
         if (m_currentSnippetPos >= m_snippetPositions.size())
-            m_currentSnippetPos = 0;
+        {
+            if (wParam == VK_TAB)
+                m_currentSnippetPos = 0;
+            else
+            {
+                ExitSnippetMode();
+                return false;
+            }
+        }
         if (m_currentSnippetPos < m_snippetPositions.size())
         {
             const auto& posVec = m_snippetPositions[m_currentSnippetPos];
