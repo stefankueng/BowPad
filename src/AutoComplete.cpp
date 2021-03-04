@@ -180,7 +180,7 @@ void CAutoComplete::Init()
     m_editor->Call(SCI_AUTOCSETIGNORECASE, TRUE);
     m_editor->Call(SCI_AUTOCSETFILLUPS, 0, reinterpret_cast<sptr_t>("\t(["));
     int i = 0;
-    for (auto icon : {IDI_SCI_CODE, IDI_SCI_FILE})
+    for (auto icon : {IDI_SCI_CODE, IDI_SCI_FILE, IDI_SCI_SNIPPET})
     {
         CAutoIcon hIcon = LoadIconEx(g_hInst, MAKEINTRESOURCE(icon), iconWidth, iconHeight);
         auto      bytes = Icon2Image(hIcon);
@@ -633,20 +633,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                     auto                        foundIt    = snippetMap.find(word);
                     if (foundIt != snippetMap.end())
                     {
-                        auto sVal        = foundIt->second;
-                        m_stringToSelect = foundIt->first;
-                        SearchReplace(sVal, "\n", " ");
-                        SearchReplace(sVal, "^0", "");
-                        SearchReplace(sVal, "^1", "");
-                        SearchReplace(sVal, "^2", "");
-                        SearchReplace(sVal, "^3", "");
-                        SearchReplace(sVal, "^4", "");
-                        SearchReplace(sVal, "^5", "");
-                        SearchReplace(sVal, "^6", "");
-                        SearchReplace(sVal, "^7", "");
-                        SearchReplace(sVal, "^8", "");
-                        SearchReplace(sVal, "^9", "");
-                        SearchReplace(sVal, "^", "");
+                        auto sVal           = SanitizeSnippetText(foundIt->second);
+                        m_stringToSelect    = foundIt->first;
                         sAutoCompleteString = CStringUtils::Format("%s: %s", foundIt->first.c_str(), sVal.c_str());
                     }
                 }
@@ -660,7 +648,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             }
         }
     }
-    else if (CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1))
+    else if (CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) && pos > 2)
     {
         if (m_editor->Call(SCI_AUTOCACTIVE))
             return;
@@ -670,7 +658,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             std::lock_guard<std::mutex> lockGuard(m_mutex);
             auto                        docID        = m_main->m_tabBar.GetCurrentTabId();
             auto                        docAutoList  = m_docWordList[docID];
-            auto                        langAutoList = m_langWordList[m_main->m_docManager.GetDocumentFromID(docID).GetLanguage()];
+            auto                        lang         = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
+            auto                        langAutoList = m_langWordList[lang];
             if (docAutoList.empty() && langAutoList.empty())
                 return;
 
@@ -687,6 +676,18 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                     {
                         break;
                     }
+                }
+            }
+
+            const auto& snippetMap = m_langSnippetList[lang];
+            for (const auto& [name, text] : snippetMap)
+            {
+                int compare = _strnicmp(word.c_str(), name.c_str(), word.size());
+                if (compare == 0)
+                {
+                    auto sVal                = SanitizeSnippetText(text);
+                    auto sAutoCompleteString = CStringUtils::Format("%s: %s", name.c_str(), sVal.c_str());
+                    wordset.emplace(sAutoCompleteString, AutoCompleteType::Snippet);
                 }
             }
         }
@@ -741,4 +742,23 @@ void CAutoComplete::MarkSnippetPositions(bool clearOnly)
             m_editor->Call(SCI_INDICATORFILLRANGE, a, b - a);
         }
     }
+}
+
+std::string CAutoComplete::SanitizeSnippetText(const std::string& text) const
+{
+    auto sVal = text;
+    SearchReplace(sVal, "\n", " ");
+    SearchReplace(sVal, "\b", " ");
+    SearchReplace(sVal, "^0", "");
+    SearchReplace(sVal, "^1", "");
+    SearchReplace(sVal, "^2", "");
+    SearchReplace(sVal, "^3", "");
+    SearchReplace(sVal, "^4", "");
+    SearchReplace(sVal, "^5", "");
+    SearchReplace(sVal, "^6", "");
+    SearchReplace(sVal, "^7", "");
+    SearchReplace(sVal, "^8", "");
+    SearchReplace(sVal, "^9", "");
+    SearchReplace(sVal, "^", "");
+    return sVal;
 }

@@ -211,6 +211,7 @@
 #define IDS_STATUS_TABSOPEN             253
 #define IDR_AUTOCOMPLETE                253
 #define IDS_STATUSSELECTIONNONE         254
+#define IDI_SCI_SNIPPET                 254
 #define IDS_EXTENSIONTOOLTIP            255
 #define IDS_STATUSTTR2L                 256
 #define IDS_RUNASADMIN                  257
@@ -356,7 +357,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        254
+#define _APS_NEXT_RESOURCE_VALUE        255
 #define _APS_NEXT_COMMAND_VALUE         32773
 #define _APS_NEXT_CONTROL_VALUE         1115
 #define _APS_NEXT_SYMED_VALUE           110

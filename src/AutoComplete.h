@@ -30,6 +30,7 @@ enum class AutoCompleteType : int
     None = -1,
     Code = 0,
     Path,
+    Snippet,
 };
 
 class CAutoComplete
@@ -50,6 +51,7 @@ private:
     void HandleAutoComplete(const SCNotification* scn);
     void ExitSnippetMode();
     void MarkSnippetPositions(bool clearOnly);
+    std::string SanitizeSnippetText(const std::string& text) const;
 
 private:
     CScintillaWnd* m_editor;
