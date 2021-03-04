@@ -653,7 +653,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
         if (m_editor->Call(SCI_AUTOCACTIVE))
             return;
 
-        std::map<std::string, AutoCompleteType> wordset;
+        std::map<std::string, AutoCompleteType> wordSet;
         {
             std::lock_guard<std::mutex> lockGuard(m_mutex);
             auto                        docID        = m_main->m_tabBar.GetCurrentTabId();
@@ -670,7 +670,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                     int compare = _strnicmp(word.c_str(), lowerIt->first.c_str(), word.size());
                     if (compare == 0)
                     {
-                        wordset.emplace(lowerIt->first, lowerIt->second);
+                        wordSet.emplace(lowerIt->first, lowerIt->second);
                     }
                     else
                     {
@@ -687,13 +687,13 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 {
                     auto sVal                = SanitizeSnippetText(text);
                     auto sAutoCompleteString = CStringUtils::Format("%s: %s", name.c_str(), sVal.c_str());
-                    wordset.emplace(sAutoCompleteString, AutoCompleteType::Snippet);
+                    wordSet.emplace(sAutoCompleteString, AutoCompleteType::Snippet);
                 }
             }
         }
 
         std::string sAutoCompleteList;
-        for (const auto& [word2, autoCompleteType] : wordset)
+        for (const auto& [word2, autoCompleteType] : wordSet)
             sAutoCompleteList += CStringUtils::Format("%s%c%d%c", word2.c_str(), typeSeparator, static_cast<int>(autoCompleteType), wordSeparator);
         if (sAutoCompleteList.empty())
             return;

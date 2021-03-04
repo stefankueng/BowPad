@@ -19,7 +19,6 @@
 #include "../ext/scintilla/include/Sci_Position.h"
 #include <mutex>
 
-
 class CMainWindow;
 class CScintillaWnd;
 class DocID;
@@ -48,9 +47,9 @@ public:
     void AddWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words);
 
 private:
-    void HandleAutoComplete(const SCNotification* scn);
-    void ExitSnippetMode();
-    void MarkSnippetPositions(bool clearOnly);
+    void        HandleAutoComplete(const SCNotification* scn);
+    void        ExitSnippetMode();
+    void        MarkSnippetPositions(bool clearOnly);
     std::string SanitizeSnippetText(const std::string& text) const;
 
 private:
