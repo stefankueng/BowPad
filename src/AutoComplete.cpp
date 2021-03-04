@@ -446,9 +446,10 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
             ++m_currentSnippetPos;
         if (m_currentSnippetPos < 0)
         {
-            ExitSnippetMode();
-            return true;
+            m_currentSnippetPos = m_snippetPositions.size() - 1;
         }
+        if (m_currentSnippetPos >= m_snippetPositions.size())
+            m_currentSnippetPos = 0;
         if (m_currentSnippetPos < m_snippetPositions.size())
         {
             const auto& posVec = m_snippetPositions[m_currentSnippetPos];
@@ -470,6 +471,10 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
             }
             return false;
         }
+    }
+    if (wParam == VK_ESCAPE)
+    {
+        ExitSnippetMode();
     }
     return true;
 }
