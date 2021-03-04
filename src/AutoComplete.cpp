@@ -446,7 +446,7 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
             ++m_currentSnippetPos;
         if (m_currentSnippetPos < 0)
         {
-            m_currentSnippetPos = m_snippetPositions.size() - 1;
+            m_currentSnippetPos = static_cast<int>(m_snippetPositions.size() - 1);
         }
         if (m_currentSnippetPos >= m_snippetPositions.size())
         {
