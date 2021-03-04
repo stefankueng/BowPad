@@ -48,6 +48,8 @@ public:
 
 private:
     void HandleAutoComplete(const SCNotification* scn);
+    void ExitSnippetMode();
+    void MarkSnippetPositions(bool clearOnly);
 
 private:
     CScintillaWnd* m_editor;

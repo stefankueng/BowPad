@@ -299,8 +299,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             char   lastC      = 0;
                             char   last2C     = 0;
                             int    hotSpotNum = -1;
-                            m_snippetPositions.clear();
-                            m_currentSnippetPos = -1;
+                            ExitSnippetMode();
                             for (const auto& c : sSnippet)
                             {
                                 if (c == '^' && lastC != '\\')
@@ -366,6 +365,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                 m_currentSnippetPos = id;
                             }
                             m_editor->Call(SCI_ENDUNDOACTION);
+                            MarkSnippetPositions(false);
                         }
                     }
                 }
@@ -395,24 +395,37 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                 {
                     if (scn->linesAdded != 0)
                     {
-                        m_snippetPositions.clear();
-                        m_currentSnippetPos = -1;
+                        ExitSnippetMode();
                     }
                     else
                     {
                         for (auto& [id, snippetPositions] : m_snippetPositions)
                         {
+                            bool odd = true;
                             for (auto& pos : snippetPositions)
                             {
-                                if (pos > scn->position)
+                                if (scn->modificationType & SC_MOD_INSERTTEXT)
                                 {
-                                    if (scn->modificationType & SC_MOD_INSERTTEXT)
-                                        pos += scn->length;
+                                    if (odd)
+                                    {
+                                        if (pos > scn->position)
+                                            pos += scn->length;
+                                    }
                                     else
+                                    {
+                                        if (pos >= scn->position)
+                                            pos += scn->length;
+                                    }
+                                }
+                                else if (scn->modificationType & SC_MOD_DELETETEXT)
+                                {
+                                    if (pos > scn->position)
                                         pos -= scn->length;
                                 }
+                                odd = !odd;
                             }
                         }
+                        MarkSnippetPositions(false);
                     }
                 }
             }
@@ -433,8 +446,7 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
             ++m_currentSnippetPos;
         if (m_currentSnippetPos < 0)
         {
-            m_snippetPositions.clear();
-            m_currentSnippetPos = -1;
+            ExitSnippetMode();
             return true;
         }
         if (m_currentSnippetPos < m_snippetPositions.size())
@@ -678,5 +690,42 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
         m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
         m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
         m_editor->Call(SCI_AUTOCSHOW, word.size(), reinterpret_cast<sptr_t>(sAutoCompleteList.c_str()));
+    }
+}
+
+void CAutoComplete::ExitSnippetMode()
+{
+    MarkSnippetPositions(true);
+    m_snippetPositions.clear();
+    m_currentSnippetPos = -1;
+}
+
+void CAutoComplete::MarkSnippetPositions(bool clearOnly)
+{
+    m_editor->Call(SCI_SETINDICATORCURRENT, INDIC_SNIPPETPOS);
+
+    Sci_Position firstPos = INT64_MAX;
+    Sci_Position lastPos  = 0;
+
+    for (const auto& [id, vec] : m_snippetPositions)
+    {
+        for (const auto& pos : vec)
+        {
+            firstPos = min(pos, firstPos);
+            lastPos  = max(pos, lastPos);
+        }
+    }
+    m_editor->Call(SCI_INDICATORCLEARRANGE, max(0, firstPos - 100), lastPos - firstPos + 200);
+    if (clearOnly)
+        return;
+    for (const auto& [id, vec] : m_snippetPositions)
+    {
+        for (auto it = vec.cbegin(); it != vec.cend(); ++it)
+        {
+            auto a = *it;
+            ++it;
+            auto b = *it;
+            m_editor->Call(SCI_INDICATORFILLRANGE, a, b - a);
+        }
     }
 }
