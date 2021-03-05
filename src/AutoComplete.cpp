@@ -660,7 +660,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             auto                        docAutoList  = m_docWordList[docID];
             auto                        lang         = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
             auto                        langAutoList = m_langWordList[lang];
-            if (docAutoList.empty() && langAutoList.empty())
+            const auto&                 snippetMap   = m_langSnippetList[lang];
+            if (docAutoList.empty() && langAutoList.empty() && snippetMap.empty())
                 return;
 
             for (const auto& list : {docAutoList, langAutoList})
@@ -679,7 +680,6 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 }
             }
 
-            const auto& snippetMap = m_langSnippetList[lang];
             for (const auto& [name, text] : snippetMap)
             {
                 int compare = _strnicmp(word.c_str(), name.c_str(), word.size());
