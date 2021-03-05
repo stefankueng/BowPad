@@ -399,9 +399,13 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                     }
                     else
                     {
+                        Sci_Position lastRootPos = -1;
+                        bool         rootPositionsAreDifferent = false;
                         for (auto& [id, snippetPositions] : m_snippetPositions)
                         {
                             bool odd = true;
+                            Sci_Position lastPos = -1;
+                            bool         positionsAreDifferent = false;
                             for (auto& pos : snippetPositions)
                             {
                                 if (scn->modificationType & SC_MOD_INSERTTEXT)
@@ -423,9 +427,18 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                         pos -= scn->length;
                                 }
                                 odd = !odd;
+                                if (lastPos >= 0 && lastPos != pos)
+                                    positionsAreDifferent = true;
+                                lastPos = pos;
                             }
+                            if (positionsAreDifferent || (lastRootPos >= 0 && lastRootPos != lastPos))
+                                rootPositionsAreDifferent = true;
+                            lastRootPos = lastPos;
                         }
-                        MarkSnippetPositions(false);
+                        if (rootPositionsAreDifferent)
+                            MarkSnippetPositions(false);
+                        else
+                            ExitSnippetMode();
                     }
                 }
             }
