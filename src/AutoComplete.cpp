@@ -216,7 +216,7 @@ void CAutoComplete::Init()
                     for (const auto& v : values)
                         acMap[CUnicodeUtils::StdGetUTF8(v)] = AutoCompleteType::Code;
                 }
-                std::lock_guard<std::mutex> lockGuard(m_mutex);
+                std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
                 m_langWordList[CUnicodeUtils::StdGetUTF8(section)] = std::move(acMap);
             }
 
@@ -243,7 +243,7 @@ void CAutoComplete::Init()
                     }
                 }
 
-                std::lock_guard<std::mutex> lockGuard(m_mutex);
+                std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
                 m_langSnippetList[CUnicodeUtils::StdGetUTF8(section)] = std::move(csMap);
             }
         }
@@ -275,11 +275,11 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                         auto        sKey = sText.substr(0, colonPos);
                         std::string sSnippet;
                         {
-                            std::lock_guard<std::mutex> lockGuard(m_mutex);
-                            auto                        docID      = m_main->m_tabBar.GetCurrentTabId();
-                            auto                        lang       = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
-                            const auto&                 snippetMap = m_langSnippetList[lang];
-                            auto                        foundIt    = snippetMap.find(sKey);
+                            std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
+                            auto                                  docID      = m_main->m_tabBar.GetCurrentTabId();
+                            auto                                  lang       = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
+                            const auto&                           snippetMap = m_langSnippetList[lang];
+                            auto                                  foundIt    = snippetMap.find(sKey);
                             if (foundIt != snippetMap.end())
                             {
                                 sSnippet = foundIt->second;
@@ -489,25 +489,25 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
 
 void CAutoComplete::AddWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words)
 {
-    std::lock_guard<std::mutex> lockGuard(m_mutex);
+    std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
     m_langWordList[lang].insert(words.begin(), words.end());
 }
 
 void CAutoComplete::AddWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words)
 {
-    std::lock_guard<std::mutex> lockGuard(m_mutex);
+    std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
     m_langWordList[lang].insert(words.begin(), words.end());
 }
 
 void CAutoComplete::AddWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words)
 {
-    std::lock_guard<std::mutex> lockGuard(m_mutex);
+    std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
     m_docWordList[docID].insert(words.begin(), words.end());
 }
 
 void CAutoComplete::AddWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words)
 {
-    std::lock_guard<std::mutex> lockGuard(m_mutex);
+    std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
     m_docWordList[docID].insert(words.begin(), words.end());
 }
 
@@ -626,11 +626,11 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             {
                 std::string sAutoCompleteString;
                 {
-                    std::lock_guard<std::mutex> lockGuard(m_mutex);
-                    auto                        docID      = m_main->m_tabBar.GetCurrentTabId();
-                    auto                        lang       = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
-                    const auto&                 snippetMap = m_langSnippetList[lang];
-                    auto                        foundIt    = snippetMap.find(word);
+                    std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
+                    auto                                  docID      = m_main->m_tabBar.GetCurrentTabId();
+                    auto                                  lang       = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
+                    const auto&                           snippetMap = m_langSnippetList[lang];
+                    auto                                  foundIt    = snippetMap.find(word);
                     if (foundIt != snippetMap.end())
                     {
                         auto sVal           = SanitizeSnippetText(foundIt->second);
@@ -655,12 +655,12 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
 
         std::map<std::string, AutoCompleteType> wordSet;
         {
-            std::lock_guard<std::mutex> lockGuard(m_mutex);
-            auto                        docID        = m_main->m_tabBar.GetCurrentTabId();
-            auto                        docAutoList  = m_docWordList[docID];
-            auto                        lang         = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
-            auto                        langAutoList = m_langWordList[lang];
-            const auto&                 snippetMap   = m_langSnippetList[lang];
+            std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
+            auto                                  docID        = m_main->m_tabBar.GetCurrentTabId();
+            auto                                  docAutoList  = m_docWordList[docID];
+            auto                                  lang         = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
+            auto                                  langAutoList = m_langWordList[lang];
+            const auto&                           snippetMap   = m_langSnippetList[lang];
             if (docAutoList.empty() && langAutoList.empty() && snippetMap.empty())
                 return;
 

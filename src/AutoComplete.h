@@ -59,7 +59,7 @@ private:
     std::map<std::string, std::map<std::string, AutoCompleteType, ci_less>> m_langWordList;
     std::map<std::string, std::map<std::string, std::string>>               m_langSnippetList;
     std::map<DocID, std::map<std::string, AutoCompleteType, ci_less>>       m_docWordList;
-    std::mutex                                                              m_mutex;
+    std::recursive_mutex                                                    m_mutex;
     bool                                                                    m_insertingSnippet;
     std::string                                                             m_stringToSelect;
     std::map<int, std::vector<Sci_Position>>                                m_snippetPositions;
