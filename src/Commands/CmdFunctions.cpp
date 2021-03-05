@@ -603,7 +603,8 @@ void CCmdFunctions::ThreadFunc()
                         m_langData[work.m_lang].insert(std::move(name));
                     }
                 }
-                AddAutoCompleteWords(work.m_lang, std::move(acMap));
+                if (!acMap.empty())
+                    AddAutoCompleteWords(work.m_lang, std::move(acMap));
             }
             catch (const std::exception&)
             {
@@ -641,7 +642,8 @@ void CCmdFunctions::ThreadFunc()
                             acMap[word] = AutoCompleteType::Code;
                     }
                 }
-                AddAutoCompleteWords(work.m_id, std::move(acMap));
+                if (!acMap.empty())
+                    AddAutoCompleteWords(work.m_id, std::move(acMap));
             }
             catch (const std::exception&)
             {
