@@ -688,6 +688,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                     auto sVal                = SanitizeSnippetText(text);
                     auto sAutoCompleteString = CStringUtils::Format("%s: %s", name.c_str(), sVal.c_str());
                     wordSet.emplace(sAutoCompleteString, AutoCompleteType::Snippet);
+                    wordSet.erase(name);
                 }
             }
         }
