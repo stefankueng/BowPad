@@ -192,12 +192,14 @@ void CAutoComplete::Init()
 
     auto iniPath = CAppUtils::GetDataPath() + L"\\autocomplete.ini";
     iniFiles.push_back(std::make_unique<CSimpleIni>());
+    iniFiles.back()->SetUnicode();
     iniFiles.back()->LoadFile(iniPath.c_str());
     DWORD       resLen  = 0;
     const char* resData = CAppUtils::GetResourceData(L"config", IDR_AUTOCOMPLETE, resLen);
     if (resData != nullptr && resLen)
     {
         iniFiles.push_back(std::make_unique<CSimpleIni>());
+        iniFiles.back()->SetUnicode();
         iniFiles.back()->LoadFile(resData, resLen);
     }
     for (const auto& ini : iniFiles)
