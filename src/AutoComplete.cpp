@@ -29,6 +29,8 @@
 
 #include <chrono>
 
+constexpr int fullSnippetPosId = 9999;
+
 static HICON LoadIconEx(HINSTANCE hInstance, LPCWSTR lpIconName, int iconWidth, int iconHeight)
 {
     // the docs for LoadIconWithScaleDown don't mention that a size of 0 will
@@ -256,8 +258,6 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
 {
     switch (scn->nmhdr.code)
     {
-        case SCN_UPDATEUI:
-            break;
         case SCN_CHARADDED:
             HandleAutoComplete(scn);
             break;
@@ -302,6 +302,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             char   last2C     = 0;
                             int    hotSpotNum = -1;
                             ExitSnippetMode();
+                            m_snippetPositions[fullSnippetPosId].push_back(m_editor->Call(SCI_GETCURRENTPOS));
                             for (const auto& c : sSnippet)
                             {
                                 if (c == '^' && lastC != '\\')
@@ -345,6 +346,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                 last2C = lastC;
                                 lastC  = c;
                             }
+                            m_snippetPositions[fullSnippetPosId].push_back(m_editor->Call(SCI_GETCURRENTPOS));
                             if (!m_snippetPositions.empty())
                             {
                                 const auto& [id, posVec] = *m_snippetPositions.begin();
@@ -401,12 +403,12 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                     }
                     else
                     {
-                        Sci_Position lastRootPos = -1;
+                        Sci_Position lastRootPos               = -1;
                         bool         rootPositionsAreDifferent = false;
                         for (auto& [id, snippetPositions] : m_snippetPositions)
                         {
-                            bool odd = true;
-                            Sci_Position lastPos = -1;
+                            bool         odd                   = true;
+                            Sci_Position lastPos               = -1;
                             bool         positionsAreDifferent = false;
                             for (auto& pos : snippetPositions)
                             {
@@ -463,7 +465,7 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
         {
             m_currentSnippetPos = static_cast<int>(m_snippetPositions.size() - 1);
         }
-        if (m_currentSnippetPos >= m_snippetPositions.size())
+        if (m_currentSnippetPos >= m_snippetPositions.size() - 1)
         {
             if (wParam == VK_TAB)
                 m_currentSnippetPos = 0;
@@ -534,6 +536,20 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
     if (m_insertingSnippet)
         return;
     auto pos = m_editor->Call(SCI_GETCURRENTPOS);
+    // if we're typing outside an active snippet, cancel
+    // the snippet editing mode
+    if (m_currentSnippetPos >= 0 && !m_snippetPositions.empty())
+    {
+        const auto& vec        = m_snippetPositions[fullSnippetPosId];
+        if (vec.size() == 2)
+        {
+            if (vec[0] > pos || vec[1] < pos)
+                ExitSnippetMode();
+        }
+        else
+            ExitSnippetMode();
+    }
+
     if (pos != m_editor->Call(SCI_WORDENDPOSITION, pos, TRUE))
         return; // don't auto complete if we're not at the end of a word
     auto word = m_editor->GetCurrentWord();
@@ -750,6 +766,8 @@ void CAutoComplete::MarkSnippetPositions(bool clearOnly)
         return;
     for (const auto& [id, vec] : m_snippetPositions)
     {
+        if (id == fullSnippetPosId)
+            continue;
         for (auto it = vec.cbegin(); it != vec.cend(); ++it)
         {
             auto a = *it;
