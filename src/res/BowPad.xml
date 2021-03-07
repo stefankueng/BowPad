@@ -819,7 +819,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/autocomplete.png</Image>
       </Command.SmallImages>
     </Command>
-
+    <Command Name="cmdSettings" LabelTitle="Advanced Settings" TooltipTitle="configure advanced settings" TooltipDescription="configure advanced settings">
+      <Command.SmallImages>
+        <Image>res/settings.png</Image>
+      </Command.SmallImages>
+    </Command>
 
     <Command Name="cmdContextMap" />
     <Command Name="cmdContextSpellMap" />
@@ -855,6 +859,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdGroupSessionAuto" Id="10015" />
     <Command Name="cmdCommandPalette" Id="10016" />
     <Command Name="cmdGroupWrapLines" Id="10017" />
+
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />
     
@@ -940,6 +945,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="cmdConfigShortcuts" />
+            <!--<Button CommandName="cmdSettings" />-->
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="cmdExit" />

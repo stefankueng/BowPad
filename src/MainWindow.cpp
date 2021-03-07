@@ -20,6 +20,7 @@
 #include "BowPad.h"
 #include "BowPadUI.h"
 #include "AboutDlg.h"
+#include "SettingsDlg.h"
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
 #include "TempFile.h"
@@ -51,6 +52,7 @@
 #include <type_traits>
 #include <future>
 #include <Shobjidl.h>
+
 
 IUIFramework* g_pFramework = nullptr; // Reference to the Ribbon framework.
 
@@ -1405,6 +1407,12 @@ LRESULT CMainWindow::DoCommand(WPARAM wParam, LPARAM lParam)
         case cmdCommandPalette:
             ShowCommandPalette();
             break;
+        case cmdSettings:
+        {
+            CSettingsDlg dlg;
+            dlg.DoModal(g_hRes, IDD_SETTINGS, *this);
+        }
+        break;
         default:
         {
             ICommand* pCmd = CCommandHandler::Instance().GetCommand(id);

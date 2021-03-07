@@ -427,6 +427,7 @@
     <ClInclude Include="ScintillaWnd.h" />
     <ClInclude Include="scripting\BasicScriptHost.h" />
     <ClInclude Include="scripting\BasicScriptObject.h" />
+    <ClInclude Include="SettingsDlg.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TabBar.h" />
     <ClInclude Include="TabBtn.h" />
@@ -550,6 +551,7 @@
     <ClCompile Include="ScintillaWnd.cpp" />
     <ClCompile Include="scripting\BasicScriptHost.cpp" />
     <ClCompile Include="scripting\BasicScriptObject.cpp" />
+    <ClCompile Include="SettingsDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -213,6 +213,7 @@
 #define IDS_STATUSSELECTIONNONE         254
 #define IDI_SCI_SNIPPET                 254
 #define IDS_EXTENSIONTOOLTIP            255
+#define IDD_SETTINGS                    255
 #define IDS_STATUSTTR2L                 256
 #define IDS_RUNASADMIN                  257
 #define IDS_FOLDTEXT                    258
@@ -223,6 +224,18 @@
 #define IDS_IMPORTBPLEX_OPEN            263
 #define IDS_COMMANDPALETTE_FILTERCUE    264
 #define IDS_ADDTOQAT                    265
+#define IDS_SETTING_SETTINGCOL          266
+#define IDS_SETTING_VALUECOL            267
+#define IDS_CHECKFORUPDATES             268
+#define IDS_CHECKFORUPDATES_DESC        269
+#define IDS_SETTINGS_SCROLLSTYLE        270
+#define IDS_SETTINGS_SCROLLSTYLE_DESC   271
+#define IDS_SETTING_D2D                 272
+#define IDS_SETTING_D2D_DESC            273
+#define IDS_SETTING_CARETLINEFRAME      274
+#define IDS_SETTING_CARETLINEFRAME_DESC 275
+#define IDS_SETTING_BRACEHIGHLIGHT      276
+#define IDS_SETTING_BRACEHIGHLIGHT_DESC 277
 #define IDC_SEARCHCOMBO                 1000
 #define IDC_FINDBTN                     1001
 #define IDC_REPLACECOMBO                1002
@@ -350,6 +363,10 @@
 #define IDC_HIDE                        1113
 #define IDC_HIGHLIGHT                   1113
 #define IDC_COLLECTIONNAME              1114
+#define IDC_SETTINGSLIST                1115
+#define IDC_LABEL                       1124
+#define IDC_EDITBOX                     1125
+#define IDC_SAVE                        1126
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -357,9 +374,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        255
+#define _APS_NEXT_RESOURCE_VALUE        256
 #define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         1115
+#define _APS_NEXT_CONTROL_VALUE         1127
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
