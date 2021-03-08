@@ -75,7 +75,7 @@ static std::unique_ptr<UINT[]> Icon2Image(HICON hIcon)
     infoHeader.bmiHeader.biCompression = BI_RGB;
     infoHeader.bmiHeader.biSizeImage   = size;
 
-    auto   ptrb          = std::make_unique<BYTE[]>(size * 2 + height * width * 4);
+    auto   ptrb          = std::make_unique<BYTE[]>(size * 2LL + height * width * 4LL);
     LPBYTE pixelsIconRGB = ptrb.get();
     LPBYTE alphaPixels   = pixelsIconRGB + size;
     HDC    hDC           = CreateCompatibleDC(nullptr);
@@ -88,7 +88,7 @@ static std::unique_ptr<UINT[]> Icon2Image(HICON hIcon)
     if (!GetDIBits(hDC, iconInfo.hbmMask, 0, height, static_cast<LPVOID>(alphaPixels), &infoHeader, DIB_RGB_COLORS))
         return nullptr;
 
-    auto imagePixels = std::make_unique<UINT[]>(height * width);
+    auto imagePixels = std::make_unique<UINT[]>(static_cast<size_t>(height) * width);
     int  lsSrc       = width * 3;
     int  vsDest      = height - 1;
     for (int y = 0; y < height; y++)
