@@ -1242,7 +1242,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
                 AddToolTip(cInfo.hwndList, tipText);
                 AddToolTip(IDC_REPLACEWITHLABEL, tipText);
                 if (IsDlgButtonChecked(*this, IDC_MATCHREGEX) == BST_CHECKED)
-                    CheckRegex();
+                    CheckRegex(true);
             }
             break;
         case IDC_SEARCHCOMBO:
@@ -1252,7 +1252,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
             if (msg == CBN_EDITCHANGE || msg == CBN_CLOSEUP)
             {
                 if (IsDlgButtonChecked(*this, IDC_MATCHREGEX) == BST_CHECKED)
-                    CheckRegex();
+                    CheckRegex(false);
                 CheckSearchOptions();
             }
         }
@@ -1356,7 +1356,7 @@ void CFindReplaceDlg::LetUserSelectSearchFolder()
     }
     if (!PathFileExists(currentFolder.c_str()))
         currentFolder.clear();
-    bf.m_style                   = BIF_USENEWUI;
+    bf.m_style  = BIF_USENEWUI;
     auto result = bf.Show(*this, selectedFolder, currentFolder);
     if (result == CBrowseFolder::RetVal::Ok)
     {
@@ -2329,7 +2329,7 @@ void CFindReplaceDlg::InitResultsList()
     m_resultsListInitialized = true;
 }
 
-void CFindReplaceDlg::CheckRegex()
+void CFindReplaceDlg::CheckRegex(bool flash)
 {
     try
     {
@@ -2340,7 +2340,7 @@ void CFindReplaceDlg::CheckRegex()
     }
     catch (const std::exception&)
     {
-        SetInfoText(IDS_REGEX_NOTOK);
+        SetInfoText(IDS_REGEX_NOTOK, flash ? AlertMode::Flash : AlertMode::None);
     }
 }
 

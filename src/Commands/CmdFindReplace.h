@@ -120,7 +120,7 @@ protected:
                       int flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind);
 
     void    SortResults();
-    void    CheckRegex();
+    void    CheckRegex(bool flash);
     void    ShowResults(bool bShow);
     void    InitResultsList();
     LRESULT DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
