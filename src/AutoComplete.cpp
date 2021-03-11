@@ -312,7 +312,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                         m_snippetPositions[hotSpotNum].push_back(cursorPos);
                                     hotSpotNum = -1;
                                 }
-                                else if (lastC == '^' && last2C != '\\' && isdigit(c))
+                                else if (lastC == '^' && last2C != '\\' && isdigit(c) && hotSpotNum < 0)
                                 {
                                     hotSpotNum = c - '0';
                                     m_snippetPositions[c - '0'].push_back(cursorPos);
@@ -347,10 +347,10 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                 lastC  = c;
                             }
                             m_snippetPositions[fullSnippetPosId].push_back(m_editor->Call(SCI_GETCURRENTPOS));
-                            if (!m_snippetPositions.empty())
+                            if (m_snippetPositions.size() > 2)
                             {
-                                const auto& [id, posVec] = *m_snippetPositions.begin();
-                                bool first               = true;
+                                const auto& posVec = m_snippetPositions[1];
+                                bool        first  = true;
                                 for (auto it = posVec.cbegin(); it != posVec.cend(); ++it)
                                 {
                                     auto a = *it;
@@ -366,7 +366,12 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                         m_editor->Call(SCI_ADDSELECTION, a, b);
                                     }
                                 }
-                                m_currentSnippetPos = id;
+                                m_currentSnippetPos = 1;
+                            }
+                            else if (m_snippetPositions.size() == 2)
+                            {
+                                m_editor->Call(SCI_SETSELECTION, *m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
+                                ExitSnippetMode();
                             }
                             m_editor->Call(SCI_ENDUNDOACTION);
                             MarkSnippetPositions(false);
@@ -461,16 +466,17 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
             --m_currentSnippetPos;
         else
             ++m_currentSnippetPos;
-        if (m_currentSnippetPos < 0)
+        if (m_currentSnippetPos <= 0)
         {
             m_currentSnippetPos = static_cast<int>(m_snippetPositions.size() - 1);
         }
         if (m_currentSnippetPos >= m_snippetPositions.size() - 1)
         {
             if (wParam == VK_TAB)
-                m_currentSnippetPos = 0;
+                m_currentSnippetPos = 1;
             else
             {
+                m_editor->Call(SCI_SETSELECTION, *m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
                 ExitSnippetMode();
                 return false;
             }
@@ -540,7 +546,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
     // the snippet editing mode
     if (m_currentSnippetPos >= 0 && !m_snippetPositions.empty())
     {
-        const auto& vec        = m_snippetPositions[fullSnippetPosId];
+        const auto& vec = m_snippetPositions[fullSnippetPosId];
         if (vec.size() == 2)
         {
             if (vec[0] > pos || vec[1] < pos)
