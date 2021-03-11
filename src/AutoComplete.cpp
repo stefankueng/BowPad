@@ -555,6 +555,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
         else
             ExitSnippetMode();
     }
+    if (m_insertingSnippet)
+        return;
 
     if (pos != m_editor->Call(SCI_WORDENDPOSITION, pos, TRUE))
         return; // don't auto complete if we're not at the end of a word
