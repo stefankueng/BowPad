@@ -862,6 +862,7 @@ LRESULT CAutoCompleteConfigDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPar
         {
             InitDialog(*this, IDI_BOWPAD);
             m_resizer.Init(*this);
+            m_scintilla.Init(g_hRes, *this, GetDlgItem(*this, IDC_SCINTILLA));
             CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
             m_resizer.AddControl(*this, IDC_LABEL1, RESIZER_TOPLEFT);
             m_resizer.AddControl(*this, IDC_LANGCOMBO, RESIZER_TOPLEFT);
@@ -874,7 +875,6 @@ LRESULT CAutoCompleteConfigDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPar
             m_resizer.AddControl(*this, IDCANCEL, RESIZER_BOTTOMRIGHT);
             m_resizer.UseSizeGrip(true);
 
-            m_scintilla.Init(g_hRes, *this, GetDlgItem(*this, IDC_SCINTILLA));
             m_scintilla.SetupLexerForLang("Text");
             m_scintilla.Call(SCI_SETEOLMODE, SC_EOL_LF);
             m_scintilla.Call(SCI_SETUSETABS, 1);
@@ -910,7 +910,17 @@ LRESULT CAutoCompleteConfigDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPar
             mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
             return 0;
         }
+        case WM_NOTIFY:
+        {
+            LPNMHDR pnmHdr = reinterpret_cast<LPNMHDR>(lParam);
 
+            if (pnmHdr->idFrom == reinterpret_cast<UINT_PTR>(&m_scintilla) || pnmHdr->hwndFrom == m_scintilla)
+            {
+                if (pnmHdr->code == NM_COOLSB_CUSTOMDRAW)
+                    return m_scintilla.HandleScrollbarCustomDraw(wParam, reinterpret_cast<NMCSBCUSTOMDRAW*>(lParam));
+            }
+        }
+        break;
         default:
             return FALSE;
     }
