@@ -65,6 +65,7 @@ class CMainWindow : public CWindow
 {
     friend class ICommand;
     friend class CAutoComplete;
+    friend class CAutoCompleteConfigDlg;
 
 public:
     CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = nullptr);

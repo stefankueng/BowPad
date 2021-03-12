@@ -26,6 +26,8 @@
 #include "SmartHandle.h"
 #include "OnOutOfScope.h"
 #include "SciLexer.h"
+#include "Theme.h"
+#include "LexStyles.h"
 
 #include <chrono>
 
@@ -175,6 +177,11 @@ CAutoComplete::~CAutoComplete()
 
 void CAutoComplete::Init()
 {
+    {
+        std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
+        m_langWordList.clear();
+        m_langSnippetList.clear();
+    }
     int iconWidth  = GetSystemMetrics(SM_CXSMICON);
     int iconHeight = GetSystemMetrics(SM_CYSMICON);
     m_editor->Call(SCI_RGBAIMAGESETWIDTH, iconWidth);
@@ -370,7 +377,8 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             }
                             else if (m_snippetPositions.size() == 2)
                             {
-                                m_editor->Call(SCI_SETSELECTION, *m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
+                                if (m_snippetPositions.find(0) != m_snippetPositions.end())
+                                    m_editor->Call(SCI_SETSELECTION, *m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
                                 ExitSnippetMode();
                             }
                             m_editor->Call(SCI_ENDUNDOACTION);
@@ -476,7 +484,8 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
                 m_currentSnippetPos = 1;
             else
             {
-                m_editor->Call(SCI_SETSELECTION, *m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
+                if (m_snippetPositions.find(0) != m_snippetPositions.end())
+                    m_editor->Call(SCI_SETSELECTION, *m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
                 ExitSnippetMode();
                 return false;
             }
@@ -808,4 +817,262 @@ std::string CAutoComplete::SanitizeSnippetText(const std::string& text) const
         sVal = sVal.substr(0, maxLen - 3) + "...";
 
     return sVal;
+}
+
+CAutoCompleteConfigDlg::CAutoCompleteConfigDlg(CMainWindow* main)
+    : m_main(main)
+    , m_scintilla(g_hInst)
+{
+}
+
+LRESULT CAutoCompleteConfigDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (uMsg)
+    {
+        case WM_NCDESTROY:
+            break;
+        case WM_INITDIALOG:
+        {
+            InitDialog(*this, IDI_BOWPAD);
+            m_resizer.Init(*this);
+            CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
+            m_resizer.AddControl(*this, IDC_LABEL1, RESIZER_TOPLEFT);
+            m_resizer.AddControl(*this, IDC_LANGCOMBO, RESIZER_TOPLEFT);
+            m_resizer.AddControl(*this, IDC_SNIPPETLIST, RESIZER_TOPLEFTBOTTOMLEFT);
+            m_resizer.AddControl(*this, IDC_DELETE, RESIZER_BOTTOMLEFT);
+            m_resizer.AddControl(*this, IDC_SCINTILLA, RESIZER_TOPLEFTBOTTOMRIGHT);
+            m_resizer.AddControl(*this, IDC_LABEL2, RESIZER_BOTTOMLEFT);
+            m_resizer.AddControl(*this, IDC_SNIPPETNAME, RESIZER_BOTTOMLEFT);
+            m_resizer.AddControl(*this, IDC_SAVE, RESIZER_BOTTOMLEFT);
+            m_resizer.AddControl(*this, IDCANCEL, RESIZER_BOTTOMRIGHT);
+            m_resizer.UseSizeGrip(true);
+
+            m_scintilla.Init(g_hRes, *this, GetDlgItem(*this, IDC_SCINTILLA));
+            m_scintilla.SetupLexerForLang("Text");
+            m_scintilla.Call(SCI_SETEOLMODE, SC_EOL_LF);
+            m_scintilla.Call(SCI_SETUSETABS, 1);
+
+            DialogEnableWindow(IDC_DELETE, false);
+
+            auto languages  = CLexStyles::Instance().GetLanguages();
+            auto hLangCombo = GetDlgItem(*this, IDC_LANGCOMBO);
+            for (const auto& langName : languages)
+                ComboBox_AddString(hLangCombo, langName.c_str());
+
+            // Select the current language.
+            auto id = m_main->m_tabBar.GetCurrentTabId();
+            if (m_main->m_docManager.HasDocumentID(id))
+            {
+                const auto& doc = m_main->m_docManager.GetDocumentFromID(m_main->m_tabBar.GetCurrentTabId());
+                ComboBox_SelectString(hLangCombo, -1, CUnicodeUtils::StdGetUnicode(doc.GetLanguage()).c_str());
+            }
+
+            DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
+        }
+            return FALSE;
+
+        case WM_COMMAND:
+            return DoCommand(LOWORD(wParam), HIWORD(wParam));
+        case WM_SIZE:
+            m_resizer.DoResize(LOWORD(lParam), HIWORD(lParam));
+            break;
+        case WM_GETMINMAXINFO:
+        {
+            MINMAXINFO* mmi       = reinterpret_cast<MINMAXINFO*>(lParam);
+            mmi->ptMinTrackSize.x = m_resizer.GetDlgRectScreen()->right;
+            mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
+            return 0;
+        }
+
+        default:
+            return FALSE;
+    }
+    return FALSE;
+}
+
+LRESULT CAutoCompleteConfigDlg::DoCommand(int id, int msg)
+{
+    switch (id)
+    {
+        case IDC_SAVE:
+        {
+            auto hLangCombo = GetDlgItem(*this, IDC_LANGCOMBO);
+            int  langSel    = ComboBox_GetCurSel(hLangCombo);
+            auto languages  = CLexStyles::Instance().GetLanguages();
+            if (langSel >= 0 && langSel < static_cast<int>(languages.size()))
+            {
+                auto currentLang = CUnicodeUtils::StdGetUTF8(languages[langSel]);
+                auto snippetName = GetDlgItemText(IDC_SNIPPETNAME);
+                if (snippetName && snippetName[0])
+                {
+                    auto         lineCount = m_scintilla.Call(SCI_GETLINECOUNT);
+                    auto         tabWidth  = m_scintilla.Call(SCI_GETTABWIDTH);
+                    std::string  snippet;
+                    Sci_Position indent = 0;
+                    for (sptr_t lineNumber = 0; lineNumber < lineCount; ++lineNumber)
+                    {
+                        if (!snippet.empty())
+                        {
+                            snippet += "\\n";
+                            auto lineIndent = m_scintilla.Call(SCI_GETLINEINDENTATION, lineNumber);
+                            if (lineIndent < indent)
+                            {
+                                auto backSpaceCount = ((indent - lineIndent) / tabWidth) + ((indent - lineIndent) % tabWidth);
+                                for (int i = 0; i < backSpaceCount; ++i)
+                                    snippet += "\\b";
+                            }
+                            indent = lineIndent;
+                        }
+                        auto line = m_scintilla.GetLine(lineNumber);
+                        for (const auto& c : line)
+                        {
+                            if (c == '\t')
+                                snippet += "\\t";
+                            else if (c != '\r' && c != '\n')
+                                snippet += c;
+                        }
+                    }
+                    auto       iniPath = CAppUtils::GetDataPath() + L"\\autocomplete.ini";
+                    CSimpleIni iniFile;
+                    iniFile.SetUnicode();
+                    iniFile.LoadFile(iniPath.c_str());
+                    auto sKey = std::wstring(L"snippet_");
+                    sKey += snippetName.get();
+                    iniFile.SetValue(CUnicodeUtils::StdGetUnicode(currentLang).c_str(), sKey.c_str(), CUnicodeUtils::StdGetUnicode(snippet).c_str());
+                    FILE* pFile = nullptr;
+                    _wfopen_s(&pFile, iniPath.c_str(), L"wb");
+                    if (pFile)
+                    {
+                        iniFile.SaveFile(pFile);
+                        fclose(pFile);
+                    }
+                    m_main->m_autoCompleter.Init();
+                    DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
+                    auto hSnippetList = GetDlgItem(*this, IDC_SNIPPETLIST);
+                    ListBox_SelectString(hSnippetList, 0, snippetName.get());
+                }
+            }
+        }
+        break;
+        case IDC_DELETE:
+        {
+            auto hLangCombo   = GetDlgItem(*this, IDC_LANGCOMBO);
+            auto hSnippetList = GetDlgItem(*this, IDC_SNIPPETLIST);
+            int  langSel      = ComboBox_GetCurSel(hLangCombo);
+            auto languages    = CLexStyles::Instance().GetLanguages();
+            if (langSel >= 0 && langSel < static_cast<int>(languages.size()))
+            {
+                auto currentLang = CUnicodeUtils::StdGetUTF8(languages[langSel]);
+                auto snippetSel  = ListBox_GetCurSel(hSnippetList);
+                if (snippetSel != CB_ERR)
+                {
+                    auto nameLen = ListBox_GetTextLen(hSnippetList, snippetSel);
+                    auto nameBuf = std::make_unique<wchar_t[]>(nameLen + 1LL);
+                    ListBox_GetText(hSnippetList, snippetSel, nameBuf.get());
+
+                    if (nameBuf[0])
+                    {
+                        auto       iniPath = CAppUtils::GetDataPath() + L"\\autocomplete.ini";
+                        CSimpleIni iniFile;
+                        iniFile.SetUnicode();
+                        iniFile.LoadFile(iniPath.c_str());
+                        auto sKey = std::wstring(L"snippet_");
+                        sKey += nameBuf.get();
+                        iniFile.Delete(CUnicodeUtils::StdGetUnicode(currentLang).c_str(), sKey.c_str(), true);
+                        FILE* pFile = nullptr;
+                        _wfopen_s(&pFile, iniPath.c_str(), L"wb");
+                        if (pFile)
+                        {
+                            iniFile.SaveFile(pFile);
+                            fclose(pFile);
+                        }
+                        m_main->m_autoCompleter.Init();
+                        DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
+                    }
+                }
+            }
+        }
+        break;
+        case IDCANCEL:
+            EndDialog(*this, id);
+            break;
+        case IDC_LANGCOMBO:
+        {
+            if (msg == CBN_SELCHANGE)
+            {
+                auto hLangCombo   = GetDlgItem(*this, IDC_LANGCOMBO);
+                int  langSel      = ComboBox_GetCurSel(hLangCombo);
+                auto hSnippetList = GetDlgItem(*this, IDC_SNIPPETLIST);
+                ListBox_ResetContent(hSnippetList);
+                auto languages = CLexStyles::Instance().GetLanguages();
+                if (langSel >= 0 && langSel < static_cast<int>(languages.size()))
+                {
+                    auto currentLang = CUnicodeUtils::StdGetUTF8(languages[langSel]);
+                    auto snippets    = m_main->m_autoCompleter.m_langSnippetList[currentLang];
+                    for (const auto& [name, snippet] : snippets)
+                    {
+                        ListBox_AddString(hSnippetList, CUnicodeUtils::StdGetUnicode(name).c_str());
+                    }
+                }
+            }
+        }
+        break;
+        case IDC_SNIPPETLIST:
+        {
+            if (msg == LBN_SELCHANGE)
+            {
+                SetDlgItemText(*this, IDC_SNIPPETNAME, L"");
+                m_scintilla.Call(SCI_CLEARALL);
+
+                auto hSnippetList = GetDlgItem(*this, IDC_SNIPPETLIST);
+                auto curSel       = ListBox_GetCurSel(hSnippetList);
+                if (curSel != LB_ERR)
+                {
+                    DialogEnableWindow(IDC_DELETE, true);
+                    auto nameLen = ListBox_GetTextLen(hSnippetList, curSel);
+                    auto nameBuf = std::make_unique<wchar_t[]>(nameLen + 1LL);
+                    ListBox_GetText(hSnippetList, curSel, nameBuf.get());
+                    if (nameBuf[0])
+                    {
+                        auto hLangCombo = GetDlgItem(*this, IDC_LANGCOMBO);
+                        int  langSel    = ComboBox_GetCurSel(hLangCombo);
+                        auto languages  = CLexStyles::Instance().GetLanguages();
+                        if (langSel >= 0 && langSel < static_cast<int>(languages.size()))
+                        {
+                            auto        currentLang = CUnicodeUtils::StdGetUTF8(languages[langSel]);
+                            auto        snippets    = m_main->m_autoCompleter.m_langSnippetList[currentLang];
+                            const auto& snippet     = snippets[CUnicodeUtils::StdGetUTF8(nameBuf.get())];
+                            SetDlgItemText(*this, IDC_SNIPPETNAME, nameBuf.get());
+                            for (const auto& c : snippet)
+                            {
+                                if (c == '\t')
+                                {
+                                    m_scintilla.Call(SCI_TAB);
+                                }
+                                else if (c == '\n')
+                                {
+                                    m_scintilla.Call(SCI_NEWLINE);
+                                    m_main->IndentToLastLine(true);
+                                }
+                                else if (c == '\b')
+                                {
+                                    m_scintilla.Call(SCI_DELETEBACK);
+                                }
+                                else
+                                {
+                                    char text[] = {c, 0};
+                                    m_scintilla.Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                    DialogEnableWindow(IDC_DELETE, false);
+            }
+        }
+        break;
+    }
+    return 1;
 }

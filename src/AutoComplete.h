@@ -15,12 +15,14 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #pragma once
+#include "BaseDialog.h"
 #include "StringUtils.h"
+#include "DlgResizer.h"
+#include "ScintillaWnd.h"
 #include "../ext/scintilla/include/Sci_Position.h"
 #include <mutex>
 
 class CMainWindow;
-class CScintillaWnd;
 class DocID;
 struct SCNotification;
 
@@ -34,6 +36,8 @@ enum class AutoCompleteType : int
 
 class CAutoComplete
 {
+    friend class CAutoCompleteConfigDlg;
+
 public:
     CAutoComplete(CMainWindow* main, CScintillaWnd* scintilla);
     virtual ~CAutoComplete();
@@ -64,4 +68,20 @@ private:
     std::string                                                             m_stringToSelect;
     std::map<int, std::vector<Sci_Position>>                                m_snippetPositions;
     int                                                                     m_currentSnippetPos;
+};
+
+class CAutoCompleteConfigDlg : public CDialog
+{
+public:
+    CAutoCompleteConfigDlg(CMainWindow* main);
+    ~CAutoCompleteConfigDlg() = default;
+
+protected:
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT          DoCommand(int id, int msg);
+
+private:
+    CMainWindow*  m_main;
+    CDlgResizer   m_resizer;
+    CScintillaWnd m_scintilla;
 };

@@ -819,6 +819,12 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/autocomplete.png</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdAutocompleteConfig" LabelTitle="Configure Code Snippets" TooltipTitle="Configure Code Snippets" TooltipDescription="configure autocompletion words and code snippets">
+      <Command.SmallImages>
+        <Image>res/autocomplete.png</Image>
+      </Command.SmallImages>
+    </Command>
+    <Command Name="cmdGroupAutocomplete" />
     <Command Name="cmdSettings" LabelTitle="Advanced Settings" TooltipTitle="configure advanced settings" TooltipDescription="configure advanced settings">
       <Command.SmallImages>
         <Image>res/settings.png</Image>
@@ -1102,7 +1108,12 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
             </DropDownGallery>
             <Button CommandName="cmdComment" />
             <Button CommandName="cmdUnComment" />
-            <ToggleButton CommandName="cmdAutocomplete" />
+            <SplitButton CommandName="cmdGroupAutocomplete">
+              <SplitButton.ButtonItem>
+                <ToggleButton CommandName="cmdAutocomplete" />
+              </SplitButton.ButtonItem>
+              <ToggleButton CommandName="cmdAutocompleteConfig" />
+            </SplitButton>
           </Group>
           <Group CommandName="cmdGroupBlanks" SizeDefinition="FiveButtons">
             <DropDownButton CommandName="cmdGroupLines">

@@ -215,6 +215,7 @@
 #define IDS_EXTENSIONTOOLTIP            255
 #define IDD_SETTINGS                    255
 #define IDS_STATUSTTR2L                 256
+#define IDD_CODESNIPPETS                256
 #define IDS_RUNASADMIN                  257
 #define IDS_FOLDTEXT                    258
 #define IDS_CUSTOMCOMMANDTITLE          259
@@ -367,6 +368,11 @@
 #define IDC_LABEL                       1124
 #define IDC_EDITBOX                     1125
 #define IDC_SAVE                        1126
+#define IDC_SNIPPETLIST                 1127
+#define IDC_DELETE                      1129
+#define IDC_LABEL2                      1130
+#define IDC_SNIPPETNAME                 1131
+#define IDC_LABEL1                      1132
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -374,9 +380,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        256
+#define _APS_NEXT_RESOURCE_VALUE        257
 #define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         1127
+#define _APS_NEXT_CONTROL_VALUE         1133
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

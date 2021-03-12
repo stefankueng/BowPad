@@ -1413,6 +1413,12 @@ LRESULT CMainWindow::DoCommand(WPARAM wParam, LPARAM lParam)
             dlg.DoModal(g_hRes, IDD_SETTINGS, *this);
         }
         break;
+        case cmdAutocompleteConfig:
+        {
+            CAutoCompleteConfigDlg dlg(this);
+            dlg.DoModal(g_hRes, IDD_CODESNIPPETS, *this);
+        }
+        break;
         default:
         {
             ICommand* pCmd = CCommandHandler::Instance().GetCommand(id);
