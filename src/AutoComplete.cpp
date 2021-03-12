@@ -875,7 +875,7 @@ LRESULT CAutoCompleteConfigDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPar
             m_resizer.AddControl(*this, IDCANCEL, RESIZER_BOTTOMRIGHT);
             m_resizer.UseSizeGrip(true);
 
-            m_scintilla.SetupLexerForLang("Text");
+            m_scintilla.SetupLexerForLang("Snippets");
             m_scintilla.Call(SCI_SETEOLMODE, SC_EOL_LF);
             m_scintilla.Call(SCI_SETUSETABS, 1);
 

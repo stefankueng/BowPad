@@ -41,6 +41,7 @@ extern std::string            g_sHighlightString;  // from CmdFindReplace
 extern int                    g_searchMarkerCount; // from CmdFindReplace
 extern Scintilla::LexerModule lmSimple;
 extern Scintilla::LexerModule lmLog;
+extern Scintilla::LexerModule lmSnippets;
 
 UINT32 g_contextID = cmdContextMap;
 
@@ -134,6 +135,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
 
     Scintilla::Catalogue::AddLexerModule(&lmSimple);
     Scintilla::Catalogue::AddLexerModule(&lmLog);
+    Scintilla::Catalogue::AddLexerModule(&lmSnippets);
 
     m_docScroll.InitScintilla(this);
 

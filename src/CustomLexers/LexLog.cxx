@@ -21,7 +21,6 @@
 #include <cassert>
 #include <ctype.h>
 #include <string>
-#include <set>
 #include <vector>
 
 #include "StringUtils.h"

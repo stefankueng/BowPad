@@ -536,6 +536,7 @@
     <ClCompile Include="CorrespondingFileDlg.cpp" />
     <ClCompile Include="CustomLexers\LexLog.cxx" />
     <ClCompile Include="CustomLexers\LexSimple.cxx" />
+    <ClCompile Include="CustomLexers\LexSnippets.cxx" />
     <ClCompile Include="CustomTooltip.cpp" />
     <ClCompile Include="DocScroll.cpp" />
     <ClCompile Include="Document.cpp" />
