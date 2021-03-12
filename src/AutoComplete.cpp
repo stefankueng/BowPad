@@ -199,10 +199,6 @@ void CAutoComplete::Init()
 
     std::vector<std::unique_ptr<CSimpleIni>> iniFiles;
 
-    auto iniPath = CAppUtils::GetDataPath() + L"\\autocomplete.ini";
-    iniFiles.push_back(std::make_unique<CSimpleIni>());
-    iniFiles.back()->SetUnicode();
-    iniFiles.back()->LoadFile(iniPath.c_str());
     DWORD       resLen  = 0;
     const char* resData = CAppUtils::GetResourceData(L"config", IDR_AUTOCOMPLETE, resLen);
     if (resData != nullptr && resLen)
@@ -211,6 +207,10 @@ void CAutoComplete::Init()
         iniFiles.back()->SetUnicode();
         iniFiles.back()->LoadFile(resData, resLen);
     }
+    auto iniPath = CAppUtils::GetDataPath() + L"\\autocomplete.ini";
+    iniFiles.push_back(std::make_unique<CSimpleIni>());
+    iniFiles.back()->SetUnicode();
+    iniFiles.back()->LoadFile(iniPath.c_str());
     for (const auto& ini : iniFiles)
     {
         std::list<const wchar_t*> sections;
@@ -299,7 +299,20 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             auto autoBrace = CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1);
                             CIniSettings::Instance().SetInt64(L"View", L"autobrace", 0);
                             OnOutOfScope(CIniSettings::Instance().SetInt64(L"View", L"autobrace", autoBrace));
-                            auto pos = m_editor->Call(SCI_GETCURRENTPOS);
+                            m_main->m_bBlockAutoIndent = true;
+                            OnOutOfScope(m_main->m_bBlockAutoIndent = false);
+                            auto pos           = m_editor->Call(SCI_GETCURRENTPOS);
+                            auto startIndent   = m_editor->Call(SCI_GETLINEINDENTATION, m_editor->GetCurrentLineNumber());
+                            auto tabWidth      = m_editor->Call(SCI_GETTABWIDTH);
+                            auto indentToStart = [&]() {
+                                auto tabCount = startIndent / tabWidth;
+                                for (int i = 0; i < tabCount; ++i)
+                                    m_editor->Call(SCI_TAB);
+                                auto spaceCount = startIndent % tabWidth;
+                                for (int i = 0; i < spaceCount; ++i)
+                                    m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(" "));
+                            };
+
                             m_editor->Call(SCI_BEGINUNDOACTION);
                             m_editor->Call(SCI_SETSELECTION, scn->position, pos);
                             m_editor->Call(SCI_DELETERANGE, scn->position, pos - scn->position);
@@ -310,6 +323,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             int    hotSpotNum = -1;
                             ExitSnippetMode();
                             m_snippetPositions[fullSnippetPosId].push_back(m_editor->Call(SCI_GETCURRENTPOS));
+                            bool lastWasNewLine = false;
                             for (const auto& c : sSnippet)
                             {
                                 if (c == '^' && lastC != '\\')
@@ -328,17 +342,25 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                 {
                                     if (lastC == '\\')
                                     {
+                                        if (lastWasNewLine)
+                                            indentToStart();
+                                        lastWasNewLine = false;
+
                                         char text[] = {c, 0};
                                         m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
                                     }
                                     else if (c == '\t')
                                     {
+                                        if (lastWasNewLine)
+                                            indentToStart();
+                                        lastWasNewLine = false;
+
                                         m_editor->Call(SCI_TAB);
                                     }
                                     else if (c == '\n')
                                     {
                                         m_editor->Call(SCI_NEWLINE);
-                                        m_main->IndentToLastLine(true);
+                                        lastWasNewLine = true;
                                     }
                                     else if (c == '\b')
                                     {
@@ -346,6 +368,10 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                     }
                                     else if (c != '\\')
                                     {
+                                        if (lastWasNewLine)
+                                            indentToStart();
+                                        lastWasNewLine = false;
+
                                         char text[] = {c, 0};
                                         m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
                                     }
@@ -906,25 +932,15 @@ LRESULT CAutoCompleteConfigDlg::DoCommand(int id, int msg)
                 auto snippetName = GetDlgItemText(IDC_SNIPPETNAME);
                 if (snippetName && snippetName[0])
                 {
-                    auto         lineCount = m_scintilla.Call(SCI_GETLINECOUNT);
-                    auto         tabWidth  = m_scintilla.Call(SCI_GETTABWIDTH);
-                    std::string  snippet;
-                    Sci_Position indent = 0;
+                    auto        lineCount = m_scintilla.Call(SCI_GETLINECOUNT);
+                    std::string snippet;
                     for (sptr_t lineNumber = 0; lineNumber < lineCount; ++lineNumber)
                     {
-                        if (!snippet.empty())
-                        {
-                            snippet += "\\n";
-                            auto lineIndent = m_scintilla.Call(SCI_GETLINEINDENTATION, lineNumber);
-                            if (lineIndent < indent)
-                            {
-                                auto backSpaceCount = ((indent - lineIndent) / tabWidth) + ((indent - lineIndent) % tabWidth);
-                                for (int i = 0; i < backSpaceCount; ++i)
-                                    snippet += "\\b";
-                            }
-                            indent = lineIndent;
-                        }
                         auto line = m_scintilla.GetLine(lineNumber);
+                        CStringUtils::trim(line, "\r\n");
+                        if (!snippet.empty())
+                            snippet += "\\n";
+
                         for (const auto& c : line)
                         {
                             if (c == '\t')
@@ -1035,6 +1051,10 @@ LRESULT CAutoCompleteConfigDlg::DoCommand(int id, int msg)
                     ListBox_GetText(hSnippetList, curSel, nameBuf.get());
                     if (nameBuf[0])
                     {
+                        auto autoBrace = CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1);
+                        CIniSettings::Instance().SetInt64(L"View", L"autobrace", 0);
+                        OnOutOfScope(CIniSettings::Instance().SetInt64(L"View", L"autobrace", autoBrace));
+
                         auto hLangCombo = GetDlgItem(*this, IDC_LANGCOMBO);
                         int  langSel    = ComboBox_GetCurSel(hLangCombo);
                         auto languages  = CLexStyles::Instance().GetLanguages();
@@ -1053,7 +1073,6 @@ LRESULT CAutoCompleteConfigDlg::DoCommand(int id, int msg)
                                 else if (c == '\n')
                                 {
                                     m_scintilla.Call(SCI_NEWLINE);
-                                    m_main->IndentToLastLine(true);
                                 }
                                 else if (c == '\b')
                                 {

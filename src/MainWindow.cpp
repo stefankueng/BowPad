@@ -222,6 +222,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     , m_normalThemeHigh(0)
     , m_autoCompleter(this, &m_editor)
     , m_dwellStartPos(-1)
+    , m_bBlockAutoIndent(false)
     , m_hShieldIcon(nullptr)
     , m_hCapsLockIcon(nullptr)
     , m_hLexerIcon(nullptr)
@@ -3154,6 +3155,8 @@ void CMainWindow::IndentToLastLine(bool insertWhitespace) const
 
 void CMainWindow::HandleAutoIndent(const SCNotification& scn) const
 {
+    if (m_bBlockAutoIndent)
+        return;
     int eolMode = static_cast<int>(m_editor.Call(SCI_GETEOLMODE));
 
     if (((eolMode == SC_EOL_CRLF || eolMode == SC_EOL_LF) && scn.ch == '\n') ||

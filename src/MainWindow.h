@@ -247,6 +247,7 @@ private:
     std::unique_ptr<CCommandPaletteDlg>             m_commandPaletteDlg;
     CAutoComplete                                   m_autoCompleter;
     Sci_Position                                    m_dwellStartPos;
+    bool                                            m_bBlockAutoIndent;
 
     // status bar icons
     HICON m_hShieldIcon;
