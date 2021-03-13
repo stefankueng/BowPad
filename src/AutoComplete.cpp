@@ -690,7 +690,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
     }
     if (word.empty() && pos > 2)
     {
-        if (m_editor->Call(SCI_GETCHARAT, pos - 1) == ' ')
+        if ((m_editor->Call(SCI_GETCHARAT, pos - 1) == ' ') && (m_editor->Call(SCI_GETCHARAT, pos - 2) != ' '))
         {
             auto startPos = m_editor->Call(SCI_WORDSTARTPOSITION, pos - 2, true);
             auto endPos   = m_editor->Call(SCI_WORDENDPOSITION, pos - 2, true);
@@ -698,35 +698,43 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
 
             if (!word.empty())
             {
-                std::string sAutoCompleteString;
+                auto trimWord = word;
+                CStringUtils::trim(trimWord);
+                if (trimWord == word)
                 {
-                    std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
-                    auto                                  docID      = m_main->m_tabBar.GetCurrentTabId();
-                    auto                                  lang       = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
-                    const auto&                           snippetMap = m_langSnippetList[lang];
-                    auto                                  foundIt    = snippetMap.find(word);
-                    if (foundIt != snippetMap.end())
+                    std::string sAutoCompleteString;
                     {
-                        auto sVal           = SanitizeSnippetText(foundIt->second);
-                        m_stringToSelect    = foundIt->first;
-                        sAutoCompleteString = CStringUtils::Format("%s: %s", foundIt->first.c_str(), sVal.c_str());
+                        std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
+                        auto                                  docID      = m_main->m_tabBar.GetCurrentTabId();
+                        auto                                  lang       = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
+                        const auto&                           snippetMap = m_langSnippetList[lang];
+                        auto                                  foundIt    = snippetMap.find(word);
+                        if (foundIt != snippetMap.end())
+                        {
+                            auto sVal           = SanitizeSnippetText(foundIt->second);
+                            m_stringToSelect    = foundIt->first;
+                            sAutoCompleteString = CStringUtils::Format("%s: %s", foundIt->first.c_str(), sVal.c_str());
+                        }
                     }
+                    if (!sAutoCompleteString.empty())
+                    {
+                        m_editor->Call(SCI_AUTOCSETAUTOHIDE, FALSE);
+                        m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
+                        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+                        m_editor->Call(SCI_AUTOCSHOW, word.size() + 1, reinterpret_cast<sptr_t>(sAutoCompleteString.c_str()));
+                    }
+                    else
+                        m_editor->Call(SCI_AUTOCCANCEL);
                 }
-                if (!sAutoCompleteString.empty())
-                {
-                    m_editor->Call(SCI_AUTOCSETAUTOHIDE, FALSE);
-                    m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
-                    m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
-                    m_editor->Call(SCI_AUTOCSHOW, word.size() + 1, reinterpret_cast<sptr_t>(sAutoCompleteString.c_str()));
-                }
+                else
+                    m_editor->Call(SCI_AUTOCCANCEL);
             }
         }
+        else
+            m_editor->Call(SCI_AUTOCCANCEL);
     }
     else if (CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) && word.size() > 1)
     {
-        if (m_editor->Call(SCI_AUTOCACTIVE))
-            return;
-
         std::map<std::string, AutoCompleteType> wordSet;
         {
             std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
@@ -766,19 +774,23 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 }
             }
         }
+        if (wordSet.empty())
+            m_editor->Call(SCI_AUTOCCANCEL);
+        else
+        {
+            std::string sAutoCompleteList;
+            for (const auto& [word2, autoCompleteType] : wordSet)
+                sAutoCompleteList += CStringUtils::Format("%s%c%d%c", word2.c_str(), typeSeparator, static_cast<int>(autoCompleteType), wordSeparator);
+            if (sAutoCompleteList.empty())
+                return;
+            if (sAutoCompleteList.size() > 1)
+                sAutoCompleteList[sAutoCompleteList.size() - 1] = 0;
 
-        std::string sAutoCompleteList;
-        for (const auto& [word2, autoCompleteType] : wordSet)
-            sAutoCompleteList += CStringUtils::Format("%s%c%d%c", word2.c_str(), typeSeparator, static_cast<int>(autoCompleteType), wordSeparator);
-        if (sAutoCompleteList.empty())
-            return;
-        if (sAutoCompleteList.size() > 1)
-            sAutoCompleteList[sAutoCompleteList.size() - 1] = 0;
-
-        m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
-        m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
-        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
-        m_editor->Call(SCI_AUTOCSHOW, word.size(), reinterpret_cast<sptr_t>(sAutoCompleteList.c_str()));
+            m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
+            m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
+            m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+            m_editor->Call(SCI_AUTOCSHOW, word.size(), reinterpret_cast<sptr_t>(sAutoCompleteList.c_str()));
+        }
     }
 }
 
