@@ -240,10 +240,10 @@ void CAutoComplete::Init()
                 {
                     if (_wcsnicmp(key, L"snippet_", 8) == 0)
                     {
-                        const auto* snippetVal = ini->GetValue(section, key);
-                        if (snippetVal)
+                        const std::wstring snippetVal = ini->GetValue(section, key, L"");
+                        auto               snipp      = CUnicodeUtils::StdGetUTF8(key);
+                        if (!snippetVal.empty())
                         {
-                            auto snipp       = CUnicodeUtils::StdGetUTF8(key);
                             auto sSnippetVal = CUnicodeUtils::StdGetUTF8(snippetVal);
                             SearchReplace(sSnippetVal, "\\r\\n", "\n");
                             SearchReplace(sSnippetVal, "\\n", "\n");
@@ -251,6 +251,8 @@ void CAutoComplete::Init()
                             SearchReplace(sSnippetVal, "\\b", "\b");
                             csMap[snipp.substr(8)] = sSnippetVal;
                         }
+                        else
+                            csMap.erase(snipp.substr(8));
                     }
                 }
 
@@ -1018,7 +1020,11 @@ LRESULT CAutoCompleteConfigDlg::DoCommand(int id, int msg)
                         iniFile.LoadFile(iniPath.c_str());
                         auto sKey = std::wstring(L"snippet_");
                         sKey += nameBuf.get();
-                        iniFile.Delete(CUnicodeUtils::StdGetUnicode(currentLang).c_str(), sKey.c_str(), true);
+                        std::wstring existingValue = iniFile.GetValue(CUnicodeUtils::StdGetUnicode(currentLang).c_str(), sKey.c_str(), L"");
+                        if (!existingValue.empty())
+                            iniFile.Delete(CUnicodeUtils::StdGetUnicode(currentLang).c_str(), sKey.c_str(), true);
+                        else
+                            iniFile.SetValue(CUnicodeUtils::StdGetUnicode(currentLang).c_str(), sKey.c_str(), L"");
                         FILE* pFile = nullptr;
                         _wfopen_s(&pFile, iniPath.c_str(), L"wb");
                         if (pFile)
