@@ -92,7 +92,7 @@ msgstr ""
 msgid "&Replace"
 msgstr ""
 
-#. Resource IDs: (107, 60047)
+#. Resource IDs: (107, 1126, 60047)
 msgid "&Save"
 msgstr ""
 
@@ -161,6 +161,10 @@ msgstr ""
 msgid "Add word to dictionary"
 msgstr ""
 
+#. Resource IDs: (255, 60642)
+msgid "Advanced Settings"
+msgstr ""
+
 #. Resource IDs: (60551)
 msgid "All plugin commands are listed here"
 msgstr ""
@@ -171,6 +175,10 @@ msgstr ""
 
 #. Resource IDs: (131)
 msgid "An update for BowPad is available"
+msgstr ""
+
+#. Resource IDs: (1126)
+msgid "Apply/Add"
 msgstr ""
 
 #. Resource IDs: (172)
@@ -213,6 +221,10 @@ msgstr ""
 
 #. Resource IDs: (60489)
 msgid "Auto-saves modified files when the session closes and restores the modified state on load"
+msgstr ""
+
+#. Resource IDs: (60633)
+msgid "Autocomplete"
 msgstr ""
 
 #. Resource IDs: (135)
@@ -271,7 +283,7 @@ msgstr ""
 msgid "C"
 msgstr ""
 
-#. Resource IDs: (60072)
+#. Resource IDs: (60072, 60634)
 msgid "CA"
 msgstr ""
 
@@ -347,6 +359,10 @@ msgstr ""
 msgid "Check for errors only in comments, strings and text"
 msgstr ""
 
+#. Resource IDs: (268)
+msgid "Check for updates"
+msgstr ""
+
 #. Resource IDs: (60615)
 msgid "Check spelling"
 msgstr ""
@@ -365,6 +381,10 @@ msgstr ""
 
 #. Resource IDs: (60010, 60083, 60088, 60093, 60098)
 msgid "Clipboard"
+msgstr ""
+
+#. Resource IDs: (2)
+msgid "Close"
 msgstr ""
 
 #. Resource IDs: (60073)
@@ -411,6 +431,10 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
+#. Resource IDs: (256)
+msgid "Code Snippets"
+msgstr ""
+
 #. Resource IDs: (113)
 msgid "Codepages/Character sets"
 msgstr ""
@@ -433,6 +457,10 @@ msgstr ""
 
 #. Resource IDs: (60225)
 msgid "Comments the selected text"
+msgstr ""
+
+#. Resource IDs: (60638, 60639)
+msgid "Configure Code Snippets"
 msgstr ""
 
 #. Resource IDs: (60522)
@@ -535,7 +563,7 @@ msgstr ""
 msgid "Corrections"
 msgstr ""
 
-#. Resource IDs: (60635)
+#. Resource IDs: (60648)
 msgid "Corresponding File"
 msgstr ""
 
@@ -574,10 +602,6 @@ msgstr ""
 
 #. Resource IDs: (60035)
 msgid "Creates a new tab with an empty document"
-msgstr ""
-
-#. Resource IDs: (114)
-msgid "Ctrl+Doubleclick to open the link in the default browser"
 msgstr ""
 
 #. Resource IDs: (259)
@@ -653,7 +677,7 @@ msgstr ""
 msgid "Defaults for new files"
 msgstr ""
 
-#. Resource IDs: (60206)
+#. Resource IDs: (1129, 60206)
 msgid "Delete"
 msgstr ""
 
@@ -740,6 +764,10 @@ msgstr ""
 msgid "Download the update\nYou have to install the update manually."
 msgstr ""
 
+#. Resource IDs: (275)
+msgid "Draws a frame around the current line"
+msgstr ""
+
 #. Resource IDs: (60263, 60265)
 msgid "Duplicate Line"
 msgstr ""
@@ -786,6 +814,10 @@ msgstr ""
 
 #. Resource IDs: (60529)
 msgid "Enable to automatically add a closing brace when an opening brace is entered"
+msgstr ""
+
+#. Resource IDs: (273)
+msgid "Enables hardware acceleration for drawing"
 msgstr ""
 
 #. Resource IDs: (60609)
@@ -1008,6 +1040,10 @@ msgstr ""
 msgid "Found: %d matches."
 msgstr ""
 
+#. Resource IDs: (274)
+msgid "Frame for current line"
+msgstr ""
+
 #. Resource IDs: (203)
 #, c-format
 msgid "Full file path:\r\n%s\r\n\r\nWord count: %ld\r\nLines: %ld\r\nEmpty lines: %ld\r\nParagraphs: %ld\r\n"
@@ -1043,6 +1079,26 @@ msgstr ""
 
 #. Resource IDs: (60025, 60097)
 msgid "H"
+msgstr ""
+
+#. Resource IDs: (272)
+msgid "Hardware acceleration"
+msgstr ""
+
+#. Resource IDs: (1113)
+msgid "Highlight all matches"
+msgstr ""
+
+#. Resource IDs: (276)
+msgid "Highlight matching braces"
+msgstr ""
+
+#. Resource IDs: (277)
+msgid "If enabled matching braces are highlighted, and non-matching ones marked red."
+msgstr ""
+
+#. Resource IDs: (271)
+msgid "If set to true, the scrollbar acts as a document bar. Set to false to get a normal scrollbar."
 msgstr ""
 
 #. Resource IDs: (214)
@@ -1154,7 +1210,7 @@ msgstr ""
 msgid "Language selected.\nYou need to restart BowPad for the changes to take effect."
 msgstr ""
 
-#. Resource IDs: (65535)
+#. Resource IDs: (1132, 65535)
 msgid "Language:"
 msgstr ""
 
@@ -1493,7 +1549,7 @@ msgstr ""
 msgid "Open Files"
 msgstr ""
 
-#. Resource IDs: (60636)
+#. Resource IDs: (60649)
 msgid "Open corresponding File"
 msgstr ""
 
@@ -1540,7 +1596,7 @@ msgstr ""
 msgid "Opens the config file to configure keyboard shortcuts for any command in BowPad"
 msgstr ""
 
-#. Resource IDs: (60637)
+#. Resource IDs: (60650)
 msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
 msgstr ""
 
@@ -1832,6 +1888,10 @@ msgstr ""
 msgid "Scintilla"
 msgstr ""
 
+#. Resource IDs: (270)
+msgid "Scrollbar style"
+msgstr ""
+
 #. Resource IDs: (60434, 60435)
 msgid "Search Web"
 msgstr ""
@@ -1931,6 +1991,10 @@ msgstr ""
 msgid "Sets the column at which the vertical edge is shown, indicating the right margin. Set to 0 to hide it."
 msgstr ""
 
+#. Resource IDs: (266)
+msgid "Setting"
+msgstr ""
+
 #. Resource IDs: (60517, 60518)
 msgid "Show Properties"
 msgstr ""
@@ -1939,7 +2003,7 @@ msgstr ""
 msgid "Show Whitespaces"
 msgstr ""
 
-#. Resource IDs: (60639)
+#. Resource IDs: (60652)
 msgid "Show clipboard history"
 msgstr ""
 
@@ -1977,6 +2041,10 @@ msgstr ""
 
 #. Resource IDs: (60555)
 msgid "Shows the list of all opened tabs."
+msgstr ""
+
+#. Resource IDs: (1130)
+msgid "Snippet Name/Key:"
 msgstr ""
 
 #. Resource IDs: (60290, 60292)
@@ -2256,6 +2324,10 @@ msgstr ""
 msgid "Use Tabs"
 msgstr ""
 
+#. Resource IDs: (1133)
+msgid "Use ^nPlaceHolder^ to mark a placeholder token, use ^0^ to mark the insertion point at the end."
+msgstr ""
+
 #. Resource IDs: (195)
 msgid "User Includes"
 msgstr ""
@@ -2266,6 +2338,10 @@ msgstr ""
 
 #. Resource IDs: (60020, 60218)
 msgid "VE"
+msgstr ""
+
+#. Resource IDs: (267)
+msgid "Value"
 msgstr ""
 
 #. Resource IDs: (190)
@@ -2374,8 +2450,32 @@ msgstr ""
 msgid "capture expression:"
 msgstr ""
 
+#. Resource IDs: (269)
+msgid "checks for new versions of BowPad once a week"
+msgstr ""
+
+#. Resource IDs: (114)
+msgid "click here to\nfollow URL"
+msgstr ""
+
+#. Resource IDs: (60643, 60644)
+msgid "configure advanced settings"
+msgstr ""
+
+#. Resource IDs: (60640)
+msgid "configure autocompletion words and code snippets"
+msgstr ""
+
 #. Resource IDs: (1105)
 msgid "dot matches newline"
+msgstr ""
+
+#. Resource IDs: (60635)
+msgid "enable autocompletion"
+msgstr ""
+
+#. Resource IDs: (60636)
+msgid "enable/disable autocompletion when editing"
 msgstr ""
 
 #. Resource IDs: (65535)
@@ -2395,6 +2495,10 @@ msgstr ""
 msgid "go to the previous cursor position"
 msgstr ""
 
+#. Resource IDs: (1113)
+msgid "hide lexer from dropdown"
+msgstr ""
+
 #. Resource IDs: (60627, 60629)
 msgid "indent wrapped lines"
 msgstr ""
@@ -2403,7 +2507,7 @@ msgstr ""
 msgid "indents wrapped sublines"
 msgstr ""
 
-#. Resource IDs: (60640)
+#. Resource IDs: (60653)
 msgid "no plugins loaded"
 msgstr ""
 
