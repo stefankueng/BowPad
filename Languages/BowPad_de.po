@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2020-12-15 21:19+0100\n"
+"PO-Revision-Date: 2021-03-13 09:55+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -115,7 +115,7 @@ msgstr "doppelte Zeilen entfernen"
 msgid "&Replace"
 msgstr "E&rsetzen"
 
-#. Resource IDs: (107, 60047)
+#. Resource IDs: (107, 1126, 60047)
 msgid "&Save"
 msgstr "&Speichern"
 
@@ -192,6 +192,10 @@ msgstr "zur Schnellzugriffsleiste hinzufügen"
 msgid "Add word to dictionary"
 msgstr "Füge Wort zum Wörterbuch hinzu"
 
+#. Resource IDs: (255, 60642)
+msgid "Advanced Settings"
+msgstr "Erweiterte Einstellungen"
+
 #. Resource IDs: (60551)
 msgid "All plugin commands are listed here"
 msgstr "Alle Plugin-Befehle werden hier aufgelistet"
@@ -203,6 +207,10 @@ msgstr "Erlaubt das Laden einer Datei mit einer bestimmten Kodierung"
 #. Resource IDs: (131)
 msgid "An update for BowPad is available"
 msgstr "Ein Update für BowPad ist erhältlich"
+
+#. Resource IDs: (1126)
+msgid "Apply/Add"
+msgstr "Neu/Übernehmen"
 
 #. Resource IDs: (172)
 #, c-format
@@ -249,6 +257,10 @@ msgid ""
 msgstr ""
 "Speichert geänderte Dateien automatisch wenn BowPad beendet wird und stellt "
 "den geänderten Zustand beim Laden wieder her"
+
+#. Resource IDs: (60633)
+msgid "Autocomplete"
+msgstr "Autovervollständigung"
 
 #. Resource IDs: (135)
 msgid "Available Languages"
@@ -306,7 +318,7 @@ msgstr "BowPad Lexerdatei"
 msgid "C"
 msgstr "C"
 
-#. Resource IDs: (60072)
+#. Resource IDs: (60072, 60634)
 msgid "CA"
 msgstr "CA"
 
@@ -403,6 +415,10 @@ msgstr "Auf Updates überprüfen"
 msgid "Check for errors only in comments, strings and text"
 msgstr "Überprüfe nur in Kommentaren, Strings und Text"
 
+#. Resource IDs: (268)
+msgid "Check for updates"
+msgstr "Auf Updates überprüfen"
+
 #. Resource IDs: (60615)
 msgid "Check spelling"
 msgstr "Rechtschreibung prüfen"
@@ -422,6 +438,10 @@ msgstr "Lösche Lesezeichen"
 #. Resource IDs: (60010, 60083, 60088, 60093, 60098)
 msgid "Clipboard"
 msgstr "Zwischenablage"
+
+#. Resource IDs: (2)
+msgid "Close"
+msgstr "Schliessen"
 
 #. Resource IDs: (60073)
 msgid "Close All Tabs"
@@ -471,6 +491,10 @@ msgstr "Cmd"
 msgid "Code"
 msgstr "Code"
 
+#. Resource IDs: (256)
+msgid "Code Snippets"
+msgstr "Code Schnippsel"
+
 #. Resource IDs: (113)
 msgid "Codepages/Character sets"
 msgstr "Codepages/Charakter Sets"
@@ -494,6 +518,10 @@ msgstr "Kommentieren"
 #. Resource IDs: (60225)
 msgid "Comments the selected text"
 msgstr "Kommentiert den ausgewählten Text"
+
+#. Resource IDs: (60638, 60639)
+msgid "Configure Code Snippets"
+msgstr "Code-Schnippsel Konfigurieren"
 
 #. Resource IDs: (60522)
 msgid "Configure Keyboard Shortcuts"
@@ -605,7 +633,7 @@ msgstr "Rechtschreibfehler korrigieren"
 msgid "Corrections"
 msgstr "Korrekturen"
 
-#. Resource IDs: (60635)
+#. Resource IDs: (60648)
 msgid "Corresponding File"
 msgstr "Entsprechende Datei"
 
@@ -649,10 +677,6 @@ msgstr "Erstellt eine Kopie des aktuellen Tabs"
 #. Resource IDs: (60035)
 msgid "Creates a new tab with an empty document"
 msgstr "Erstellt einen neuen Tab mit einem leeren Dokument"
-
-#. Resource IDs: (114)
-msgid "Ctrl+Doubleclick to open the link in the default browser"
-msgstr "Ctrl+Doppelklick um den Link im Standardbrowser zu öffnen"
 
 #. Resource IDs: (259)
 #, c-format
@@ -731,7 +755,7 @@ msgstr "Dunkler Stil"
 msgid "Defaults for new files"
 msgstr "Defaults für neue Dateien"
 
-#. Resource IDs: (60206)
+#. Resource IDs: (1129, 60206)
 msgid "Delete"
 msgstr "Löschen"
 
@@ -849,6 +873,10 @@ msgstr ""
 "Update herunterladen\n"
 "Sie müssen das Update selber installieren."
 
+#. Resource IDs: (275)
+msgid "Draws a frame around the current line"
+msgstr "Zeichnet einen Rahmen um die aktuelle Zeile"
+
 #. Resource IDs: (60263, 60265)
 msgid "Duplicate Line"
 msgstr "Zeile duplizieren"
@@ -899,6 +927,10 @@ msgid ""
 msgstr ""
 "Aktivieren um automatisch eine schliessende Klammer einzufügen sobald eine "
 "öffnende Klammer eingegeben wird"
+
+#. Resource IDs: (273)
+msgid "Enables hardware acceleration for drawing"
+msgstr "Aktiviert Hardware-beschleunigte Darstellung"
 
 #. Resource IDs: (60609)
 msgid "Enables/Disables the spell checker"
@@ -1140,6 +1172,10 @@ msgstr "Gefunden: %d in %d Tabs."
 msgid "Found: %d matches."
 msgstr "Gefunden: %d Treffer."
 
+#. Resource IDs: (274)
+msgid "Frame for current line"
+msgstr "Rahmen für aktuelle Zeile"
+
 #. Resource IDs: (203)
 #, c-format
 msgid ""
@@ -1190,6 +1226,31 @@ msgstr "Gehe zu"
 #. Resource IDs: (60025, 60097)
 msgid "H"
 msgstr "H"
+
+#. Resource IDs: (272)
+msgid "Hardware acceleration"
+msgstr "Hardware-Beschleunigung"
+
+#. Resource IDs: (1113)
+msgid "Highlight all matches"
+msgstr "Alle Treffer markieren"
+
+#. Resource IDs: (276)
+msgid "Highlight matching braces"
+msgstr "zusammengehörende Klammern markieren"
+
+#. Resource IDs: (277)
+msgid ""
+"If enabled matching braces are highlighted, and non-matching ones marked red."
+msgstr "Wenn aktiviert werden alle zugehörigen Klammern markiert."
+
+#. Resource IDs: (271)
+msgid ""
+"If set to true, the scrollbar acts as a document bar. Set to false to get a "
+"normal scrollbar."
+msgstr ""
+"Wenn true funktioniert die vertikale Scrollbar als Dokument-Bar. Auf false "
+"gesetzt als normale Scrollbar."
 
 #. Resource IDs: (214)
 msgid "Ignore"
@@ -1315,7 +1376,7 @@ msgstr ""
 "Sprache ausgewählt.\n"
 "Starten Sie BowPad erneut um die Sprache zu verwenden."
 
-#. Resource IDs: (65535)
+#. Resource IDs: (1132, 65535)
 msgid "Language:"
 msgstr "Sprache:"
 
@@ -1676,7 +1737,7 @@ msgstr "Öffne Datei an Cursorposition"
 msgid "Open Files"
 msgstr "Öffne Dateien"
 
-#. Resource IDs: (60636)
+#. Resource IDs: (60649)
 msgid "Open corresponding File"
 msgstr "Öffne zugehörige Datei"
 
@@ -1734,7 +1795,7 @@ msgid ""
 msgstr ""
 "Öffnet die Konfigurationsdatei zum konfigurieren der Tastaturkürzel in BowPad"
 
-#. Resource IDs: (60637)
+#. Resource IDs: (60650)
 msgid ""
 "Opens the corresponding file to the file in the current tab.\n"
 "(h/cpp, aspx/cs/vb)"
@@ -2052,6 +2113,10 @@ msgstr "Speichert den aktuellen Tab"
 msgid "Scintilla"
 msgstr "Scintilla"
 
+#. Resource IDs: (270)
+msgid "Scrollbar style"
+msgstr "Scrollbar-Stil"
+
 #. Resource IDs: (60434, 60435)
 msgid "Search Web"
 msgstr "Websuche"
@@ -2162,6 +2227,10 @@ msgstr ""
 "Bestimmt die Spalte an welcher eine Vertikale Linie als rechter Rand "
 "angezeigt wird. Zum nicht-Anzeigen der Linie auf 0 setzen."
 
+#. Resource IDs: (266)
+msgid "Setting"
+msgstr "Einstellung"
+
 #. Resource IDs: (60517, 60518)
 msgid "Show Properties"
 msgstr "Zeige Eigenschaften"
@@ -2170,7 +2239,7 @@ msgstr "Zeige Eigenschaften"
 msgid "Show Whitespaces"
 msgstr "Zeige Leerzeichen"
 
-#. Resource IDs: (60639)
+#. Resource IDs: (60652)
 msgid "Show clipboard history"
 msgstr "Verlauf der Zwischenablage"
 
@@ -2210,6 +2279,10 @@ msgstr "Öffnet den Windows Explorer Eigenschaftsdialog für die aktuelle Datei"
 #. Resource IDs: (60555)
 msgid "Shows the list of all opened tabs."
 msgstr "Zeigt eine Liste mit offenen Tabs."
+
+#. Resource IDs: (1130)
+msgid "Snippet Name/Key:"
+msgstr "Schnippselname/Schlüssel"
 
 #. Resource IDs: (60290, 60292)
 msgid "Sort Lines"
@@ -2499,6 +2572,14 @@ msgstr "Verwende $0 für den ganzen Match, und $1..$99 für Gruppenmatches."
 msgid "Use Tabs"
 msgstr "Tabulatoren"
 
+#. Resource IDs: (1133)
+msgid ""
+"Use ^nPlaceHolder^ to mark a placeholder token, use ^0^ to mark the "
+"insertion point at the end."
+msgstr ""
+"^nPlatzhalter^ um Platzhalter zu markieren. ^0^ markiert den Einfügepunkt am "
+"Schluss."
+
 #. Resource IDs: (195)
 msgid "User Includes"
 msgstr "User Includes"
@@ -2510,6 +2591,10 @@ msgstr "V"
 #. Resource IDs: (60020, 60218)
 msgid "VE"
 msgstr "VE"
+
+#. Resource IDs: (267)
+msgid "Value"
+msgstr "Wert"
 
 #. Resource IDs: (190)
 msgid "Version"
@@ -2636,9 +2721,37 @@ msgstr "Hintergrund:"
 msgid "capture expression:"
 msgstr "Ausdruck sammeln:"
 
+#. Resource IDs: (269)
+msgid "checks for new versions of BowPad once a week"
+msgstr "Testet auf neue Versionen einmal pro Woche"
+
+#. Resource IDs: (114)
+msgid ""
+"click here to\n"
+"follow URL"
+msgstr ""
+"hier klicken um\n"
+"URL zu öffnen"
+
+#. Resource IDs: (60643, 60644)
+msgid "configure advanced settings"
+msgstr "erweiterte Einstellungen konfigurieren"
+
+#. Resource IDs: (60640)
+msgid "configure autocompletion words and code snippets"
+msgstr "Autovervollständigung und Code-Schnippsel konfigurieren"
+
 #. Resource IDs: (1105)
 msgid "dot matches newline"
 msgstr "Punkt fasst Zeilenende"
+
+#. Resource IDs: (60635)
+msgid "enable autocompletion"
+msgstr "aktiviere Autovervollständigung"
+
+#. Resource IDs: (60636)
+msgid "enable/disable autocompletion when editing"
+msgstr "aktiviert Autovervollständigung beim Editieren"
 
 #. Resource IDs: (65535)
 msgid "foreground:"
@@ -2657,6 +2770,10 @@ msgstr "Gehe zur nächsten Cursorposition"
 msgid "go to the previous cursor position"
 msgstr "Gehe zur vorherigen Cursorposition"
 
+#. Resource IDs: (1113)
+msgid "hide lexer from dropdown"
+msgstr "Lexer aus Dropdown entfernen"
+
 #. Resource IDs: (60627, 60629)
 msgid "indent wrapped lines"
 msgstr "umbrochene Zeilen einrücken"
@@ -2665,7 +2782,7 @@ msgstr "umbrochene Zeilen einrücken"
 msgid "indents wrapped sublines"
 msgstr "rückt umbrochene Unterzeilen ein"
 
-#. Resource IDs: (60640)
+#. Resource IDs: (60653)
 msgid "no plugins loaded"
 msgstr "Keine Plugins geladen"
 
@@ -2769,6 +2886,9 @@ msgstr "Schaltet Klappung aus"
 #, c-format
 msgid "{ %d lines }"
 msgstr "{ %d Linien }"
+
+#~ msgid "Ctrl+Doubleclick to open the link in the default browser"
+#~ msgstr "Ctrl+Doppelklick um den Link im Standardbrowser zu öffnen"
 
 #~ msgid "Configure"
 #~ msgstr "Konfigurieren"
