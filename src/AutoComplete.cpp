@@ -871,6 +871,7 @@ LRESULT CAutoCompleteConfigDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPar
             m_resizer.AddControl(*this, IDC_SCINTILLA, RESIZER_TOPLEFTBOTTOMRIGHT);
             m_resizer.AddControl(*this, IDC_LABEL2, RESIZER_BOTTOMLEFT);
             m_resizer.AddControl(*this, IDC_SNIPPETNAME, RESIZER_BOTTOMLEFT);
+            m_resizer.AddControl(*this, IDC_LABEL3, RESIZER_BOTTOMLEFTRIGHT);
             m_resizer.AddControl(*this, IDC_SAVE, RESIZER_BOTTOMLEFT);
             m_resizer.AddControl(*this, IDCANCEL, RESIZER_BOTTOMRIGHT);
             m_resizer.UseSizeGrip(true);
