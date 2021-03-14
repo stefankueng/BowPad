@@ -100,7 +100,7 @@ public:
     std::wstring GetFileTreePath() const { return m_fileTree.GetPath(); }
     void         FileTreeBlockRefresh(bool bBlock) { m_fileTree.BlockRefresh(bBlock); }
     void         SetFileTreeWidth(int width);
-    void         IndentToLastLine(bool insertWhitespace) const;
+    void         IndentToLastLine() const;
 
     void AddAutoCompleteWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words);
     void AddAutoCompleteWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words);
