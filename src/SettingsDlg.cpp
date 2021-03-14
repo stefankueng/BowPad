@@ -65,6 +65,13 @@ LRESULT CSettingsDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPa
         case WM_SIZE:
             m_resizer.DoResize(LOWORD(lParam), HIWORD(lParam));
             break;
+        case WM_GETMINMAXINFO:
+        {
+            MINMAXINFO* mmi       = reinterpret_cast<MINMAXINFO*>(lParam);
+            mmi->ptMinTrackSize.x = m_resizer.GetDlgRectScreen()->right;
+            mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
+            return 0;
+        }
         case WM_COMMAND:
             return DoCommand(LOWORD(wParam), HIWORD(wParam));
         case WM_NOTIFY:
