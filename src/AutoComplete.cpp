@@ -583,17 +583,27 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
     // the snippet editing mode
     if (m_currentSnippetPos >= 0 && !m_snippetPositions.empty())
     {
-        const auto& vec = m_snippetPositions[fullSnippetPosId];
-        if (vec.size() == 2)
+        bool isInside = false;
+        for (auto& [id, snippetPositions] : m_snippetPositions)
         {
-            if (vec[0] > pos || vec[1] < pos)
-                ExitSnippetMode();
+            bool         odd     = true;
+            Sci_Position lastPos = -1;
+            for (auto& sPos : snippetPositions)
+            {
+                if (id != 0 && id != fullSnippetPosId && !odd)
+                {
+                    if (pos >= lastPos && pos <= sPos)
+                        isInside = true;
+                }
+                odd     = !odd;
+                lastPos = sPos;
+            }
         }
-        else
+        if (!isInside)
             ExitSnippetMode();
+        else
+            return;
     }
-    if (m_insertingSnippet)
-        return;
 
     if (pos != m_editor->Call(SCI_WORDENDPOSITION, pos, TRUE))
         return; // don't auto complete if we're not at the end of a word
