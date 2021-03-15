@@ -187,7 +187,7 @@ void CAutoComplete::Init()
     m_editor->Call(SCI_RGBAIMAGESETWIDTH, iconWidth);
     m_editor->Call(SCI_RGBAIMAGESETHEIGHT, iconHeight);
     m_editor->Call(SCI_AUTOCSETIGNORECASE, TRUE);
-    m_editor->Call(SCI_AUTOCSETFILLUPS, 0, reinterpret_cast<sptr_t>("\t(["));
+    m_editor->Call(SCI_AUTOCSTOPS, 0, reinterpret_cast<sptr_t>("([."));
     int i = 0;
     for (auto icon : {IDI_SCI_CODE, IDI_SCI_FILE, IDI_SCI_SNIPPET})
     {
