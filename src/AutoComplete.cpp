@@ -811,10 +811,13 @@ void CAutoComplete::ExitSnippetMode()
     MarkSnippetPositions(true);
     m_snippetPositions.clear();
     m_currentSnippetPos = -1;
+    m_editor->MarkSelectedWord(true, false);
 }
 
 void CAutoComplete::MarkSnippetPositions(bool clearOnly)
 {
+    if (m_snippetPositions.empty())
+        return;
     m_editor->Call(SCI_SETINDICATORCURRENT, INDIC_SNIPPETPOS);
 
     Sci_Position firstPos = INT64_MAX;
