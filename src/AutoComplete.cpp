@@ -498,6 +498,7 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
         return true;
     if (wParam == VK_TAB || wParam == VK_RETURN)
     {
+        auto lastSnippetPos = m_currentSnippetPos;
         if (GetKeyState(VK_SHIFT) & 0x8000)
             --m_currentSnippetPos;
         else
@@ -508,7 +509,7 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
         }
         if (m_currentSnippetPos >= m_snippetPositions.size() - 1)
         {
-            if (wParam == VK_TAB)
+            if (wParam == VK_TAB && lastSnippetPos != 1)
                 m_currentSnippetPos = 1;
             else
             {
