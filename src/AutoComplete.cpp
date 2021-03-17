@@ -894,6 +894,7 @@ LRESULT CAutoCompleteConfigDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPar
             CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
             m_resizer.AddControl(*this, IDC_LABEL1, RESIZER_TOPLEFT);
             m_resizer.AddControl(*this, IDC_LANGCOMBO, RESIZER_TOPLEFT);
+            m_resizer.AddControl(*this, IDC_SNIPPETGROUP, RESIZER_TOPLEFTBOTTOMLEFT);
             m_resizer.AddControl(*this, IDC_SNIPPETLIST, RESIZER_TOPLEFTBOTTOMLEFT);
             m_resizer.AddControl(*this, IDC_DELETE, RESIZER_BOTTOMLEFT);
             m_resizer.AddControl(*this, IDC_SCINTILLA, RESIZER_TOPLEFTBOTTOMRIGHT);
