@@ -433,6 +433,10 @@ void CLexStyles::Load()
                     stringtok(lds.extensions, sExts, true, ";");
                     lexDetectStrings.push_back(std::move(lds));
                 }
+                else if (_wcsicmp(L"autocompletion", sk) == 0)
+                {
+                    ld.autocompletionWords = CUnicodeUtils::StdGetUTF8(ini->GetValue(langSect.c_str(), sk));
+                }
             }
             langData = std::move(ld);
         }
@@ -1025,6 +1029,17 @@ const std::string& CLexStyles::GetAutoCompleteRegexForLang(const std::string& la
     if (lt != m_langData.end())
         return lt->second.autoCompleteRegex;
     return emptyString;
+}
+
+std::unordered_map<std::string, std::string> CLexStyles::GetAutoCompleteWords() const
+{
+    std::unordered_map<std::string, std::string> autocompleteWords;
+    for (const auto& [lang, data] : m_langData)
+    {
+        if (!data.autocompletionWords.empty())
+            autocompleteWords[lang] = data.autocompletionWords;
+    }
+    return autocompleteWords;
 }
 
 void CLexStyles::SetLangForPath(const std::wstring& path, const std::string& language)

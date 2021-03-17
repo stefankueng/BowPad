@@ -217,49 +217,45 @@ void CAutoComplete::Init()
         ini->GetAllSections(sections);
         for (const auto& section : sections)
         {
-            {
-                std::map<std::string, AutoCompleteType, ci_less> acMap;
-                const auto*                                      codeVal = ini->GetValue(section, L"code");
-                if (codeVal)
-                {
-                    std::vector<std::wstring> values;
-                    stringtok(values, codeVal, true, L" ");
-                    for (const auto& v : values)
-                        acMap[CUnicodeUtils::StdGetUTF8(v)] = AutoCompleteType::Code;
-                }
-                std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
-                m_langWordList[CUnicodeUtils::StdGetUTF8(section)] = std::move(acMap);
-            }
+            std::list<const wchar_t*> keys;
+            ini->GetAllKeys(section, keys);
+            auto csMap = m_langSnippetList[CUnicodeUtils::StdGetUTF8(section)];
 
+            for (const auto& key : keys)
             {
-                std::list<const wchar_t*> keys;
-                ini->GetAllKeys(section, keys);
-                auto csMap = m_langSnippetList[CUnicodeUtils::StdGetUTF8(section)];
-
-                for (const auto& key : keys)
+                if (_wcsnicmp(key, L"snippet_", 8) == 0)
                 {
-                    if (_wcsnicmp(key, L"snippet_", 8) == 0)
+                    const std::wstring snippetVal = ini->GetValue(section, key, L"");
+                    auto               snipp      = CUnicodeUtils::StdGetUTF8(key);
+                    if (!snippetVal.empty())
                     {
-                        const std::wstring snippetVal = ini->GetValue(section, key, L"");
-                        auto               snipp      = CUnicodeUtils::StdGetUTF8(key);
-                        if (!snippetVal.empty())
-                        {
-                            auto sSnippetVal = CUnicodeUtils::StdGetUTF8(snippetVal);
-                            SearchReplace(sSnippetVal, "\\r\\n", "\n");
-                            SearchReplace(sSnippetVal, "\\n", "\n");
-                            SearchReplace(sSnippetVal, "\\t", "\t");
-                            SearchReplace(sSnippetVal, "\\b", "\b");
-                            csMap[snipp.substr(8)] = sSnippetVal;
-                        }
-                        else
-                            csMap.erase(snipp.substr(8));
+                        auto sSnippetVal = CUnicodeUtils::StdGetUTF8(snippetVal);
+                        SearchReplace(sSnippetVal, "\\r\\n", "\n");
+                        SearchReplace(sSnippetVal, "\\n", "\n");
+                        SearchReplace(sSnippetVal, "\\t", "\t");
+                        SearchReplace(sSnippetVal, "\\b", "\b");
+                        csMap[snipp.substr(8)] = sSnippetVal;
                     }
+                    else
+                        csMap.erase(snipp.substr(8));
                 }
-
-                std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
-                m_langSnippetList[CUnicodeUtils::StdGetUTF8(section)] = std::move(csMap);
             }
+
+            std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
+            m_langSnippetList[CUnicodeUtils::StdGetUTF8(section)] = std::move(csMap);
         }
+    }
+
+    auto autocompleteWords = CLexStyles::Instance().GetAutoCompleteWords();
+    for (const auto& [lang, words] : autocompleteWords)
+    {
+        std::map<std::string, AutoCompleteType, ci_less> acMap;
+        std::vector<std::string>                         values;
+        stringtok(values, words, true, " ");
+        for (const auto& v : values)
+            acMap[v] = AutoCompleteType::Code;
+        std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
+        m_langWordList[lang] = std::move(acMap);
     }
 }
 

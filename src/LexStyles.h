@@ -49,6 +49,7 @@ public:
     int                                  userFunctions;
     std::unordered_set<std::string>      userKeyWords;
     bool                                 userKeyWordsUpdated = false;
+    std::string                          autocompletionWords;
 };
 
 enum FontStyle
@@ -99,17 +100,18 @@ public:
     size_t                               GetFilterSpecCount() const;
     const COMDLG_FILTERSPEC*             GetFilterSpecData() const;
 
-    const std::unordered_map<int, std::string>& GetKeywordsForLang(const std::string& lang);
-    const std::unordered_map<int, std::string>& GetKeywordsForLexer(int lexer);
-    LanguageData*                               GetLanguageData(const std::string& lang);
-    const std::string&                          GetCommentLineForLang(const std::string& lang) const;
-    const std::string&                          GetCommentStreamStartForLang(const std::string& lang) const;
-    const std::string&                          GetCommentStreamEndForLang(const std::string& lang) const;
-    bool                                        GetCommentLineAtStartForLang(const std::string& lang) const;
-    const std::string&                          GetFunctionRegexForLang(const std::string& lang) const;
-    int                                         GetFunctionRegexSortForLang(const std::string& lang) const;
-    const std::vector<std::string>&             GetFunctionRegexTrimForLang(const std::string& lang) const;
-    const std::string&                          GetAutoCompleteRegexForLang(const std::string& lang) const;
+    const std::unordered_map<int, std::string>&  GetKeywordsForLang(const std::string& lang);
+    const std::unordered_map<int, std::string>&  GetKeywordsForLexer(int lexer);
+    LanguageData*                                GetLanguageData(const std::string& lang);
+    const std::string&                           GetCommentLineForLang(const std::string& lang) const;
+    const std::string&                           GetCommentStreamStartForLang(const std::string& lang) const;
+    const std::string&                           GetCommentStreamEndForLang(const std::string& lang) const;
+    bool                                         GetCommentLineAtStartForLang(const std::string& lang) const;
+    const std::string&                           GetFunctionRegexForLang(const std::string& lang) const;
+    int                                          GetFunctionRegexSortForLang(const std::string& lang) const;
+    const std::vector<std::string>&              GetFunctionRegexTrimForLang(const std::string& lang) const;
+    const std::string&                           GetAutoCompleteRegexForLang(const std::string& lang) const;
+    std::unordered_map<std::string, std::string> GetAutoCompleteWords() const;
 
     const LexerData&   GetLexerDataForLang(const std::string& lang) const;
     const LexerData&   GetLexerDataForLexer(int lexer) const;
