@@ -257,6 +257,26 @@ void CAutoComplete::Init()
         std::lock_guard<std::recursive_mutex> lockGuard(m_mutex);
         m_langWordList[lang] = std::move(acMap);
     }
+    const auto& langDataMap = CLexStyles::Instance().GetLanguageDataMap();
+    for (const auto& [lang, data] : langDataMap)
+    {
+        if (!data.keywordList.empty())
+        {
+            std::map<std::string, AutoCompleteType, ci_less> acMap;
+            for (const auto& [id, keywordString] : data.keywordList)
+            {
+                std::vector<std::string> values;
+                stringtok(values, keywordString, true, " ");
+                for (const auto& v : values)
+                {
+                    if (v.size() > 4 && std::isalpha(v[0]))
+                        acMap[v] = AutoCompleteType::Code;
+                }
+            }
+            if (!acMap.empty())
+                m_langWordList[lang].insert(acMap.begin(), acMap.end());
+        }
+    }
 }
 
 void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
