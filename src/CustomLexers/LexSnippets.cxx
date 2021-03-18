@@ -44,6 +44,7 @@ enum SnippetsStyles
     CaretStart,
     CaretEnd,
     Mark,
+    MarkNumber,
     Mark0,
 };
 
@@ -145,12 +146,15 @@ void SCI_METHOD LexerSnippets::Lex(Sci_PositionU startPos, Sci_Position length, 
                 if (sc.ch == '0')
                     sc.SetState(SnippetsStyles::Mark0);
                 else
-                    sc.SetState(SnippetsStyles::Mark);
+                    sc.SetState(SnippetsStyles::MarkNumber);
                 break;
-            case SnippetsStyles::Mark:
             case SnippetsStyles::Mark0:
+            case SnippetsStyles::MarkNumber:
+            case SnippetsStyles::Mark:
                 if (sc.ch == '^' && sc.chPrev != '\\')
                     sc.SetState(SnippetsStyles::CaretEnd);
+                else if (sc.state == SnippetsStyles::Mark0 || sc.state == SnippetsStyles::MarkNumber)
+                    sc.SetState(SnippetsStyles::Mark);
                 break;
             case SnippetsStyles::CaretEnd:
                 if (sc.ch == '^' && sc.chPrev != '\\' && IsADigit(sc.chNext))
