@@ -828,7 +828,10 @@ void CAutoComplete::MarkSnippetPositions(bool clearOnly)
             lastPos  = max(pos, lastPos);
         }
     }
-    m_editor->Call(SCI_INDICATORCLEARRANGE, max(0, firstPos - 100), lastPos - firstPos + 200);
+    auto docLen        = m_editor->Call(SCI_GETLENGTH);
+    auto startClearPos = max(0, firstPos - 100);
+    auto endClearPos   = min(lastPos - firstPos + 200, docLen - startClearPos);
+    m_editor->Call(SCI_INDICATORCLEARRANGE, startClearPos, endClearPos);
     if (clearOnly)
         return;
     for (const auto& [id, vec] : m_snippetPositions)
