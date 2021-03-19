@@ -112,15 +112,10 @@ void CBPBaseDialog::UpdateCombo(int comboId, const std::wstring& item, int maxCo
     // If the item exists, make sure it's selected and at the top.
     if (itemExists)
     {
-        if (pos == 0) // Right position, make sure it's selected too.
-            ComboBox_SetCurSel(hCombo, 0);
-        else // Wrong position, bring it to the top by removing it and re-adding it.
-        {
-            ComboBox_DeleteString(hCombo, pos);
-            int whereAt = ComboBox_InsertString(hCombo, 0, item.c_str());
-            if (whereAt >= 0)
-                ComboBox_SetCurSel(hCombo, whereAt);
-        }
+        ComboBox_DeleteString(hCombo, pos);
+        int whereAt = ComboBox_InsertString(hCombo, 0, item.c_str());
+        if (whereAt >= 0)
+            ComboBox_SetCurSel(hCombo, whereAt);
     }
     else
     {
