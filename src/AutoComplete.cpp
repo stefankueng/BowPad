@@ -398,6 +398,11 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                 lastC  = c;
                             }
                             m_snippetPositions[fullSnippetPosId].push_back(m_editor->Call(SCI_GETCURRENTPOS));
+                            if (m_snippetPositions.find(0) == m_snippetPositions.end())
+                            {
+                                m_snippetPositions[0].push_back(-1);
+                                m_snippetPositions[0].push_back(-1);
+                            }
                             if (m_snippetPositions.size() > 2)
                             {
                                 const auto& posVec = m_snippetPositions[1];
@@ -469,6 +474,8 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             bool         positionsAreDifferent = false;
                             for (auto& pos : snippetPositions)
                             {
+                                if (pos < 0)
+                                    continue;
                                 if (scn->modificationType & SC_MOD_INSERTTEXT)
                                 {
                                     if (odd)
@@ -530,7 +537,10 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
             else
             {
                 if (m_snippetPositions.find(0) != m_snippetPositions.end())
-                    m_editor->Call(SCI_SETSELECTION, *m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
+                {
+                    if (*m_snippetPositions[0].cbegin() >= 0)
+                        m_editor->Call(SCI_SETSELECTION, *m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
+                }
                 ExitSnippetMode();
                 return false;
             }
@@ -607,6 +617,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             Sci_Position lastPos = -1;
             for (auto& sPos : snippetPositions)
             {
+                if (sPos < 0)
+                    continue;
                 if (id != 0 && id != fullSnippetPosId && !odd)
                 {
                     if (pos >= lastPos && pos <= sPos)
@@ -844,6 +856,8 @@ void CAutoComplete::MarkSnippetPositions(bool clearOnly)
     {
         for (const auto& pos : vec)
         {
+            if (pos < 0)
+                continue;
             firstPos = min(pos, firstPos);
             lastPos  = max(pos, lastPos);
         }
@@ -857,6 +871,8 @@ void CAutoComplete::MarkSnippetPositions(bool clearOnly)
     for (const auto& [id, vec] : m_snippetPositions)
     {
         if (id == fullSnippetPosId)
+            continue;
+        if (id == 0)
             continue;
         for (auto it = vec.cbegin(); it != vec.cend(); ++it)
         {
