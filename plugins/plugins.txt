@@ -1,7 +1,7 @@
 Calculate
-101
+103
 200
-Calculate arithmetic expressions\nwmjordan\n
+Calculate arithmetic expressions\nCtrl click: copy result to clipboard.\nShift click: display expression and result in a new window.\nwmjordan\n
 CountCharacters
 100
 200
