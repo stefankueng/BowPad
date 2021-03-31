@@ -868,7 +868,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
 
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />
-    
+
     <!-- commands for plugins, required so they can be added to the QAT -->
     <Command Name="cmdInvisTabForQAT" Id="39996" />
     <Command Name="cmdInvisGroupForQAT" Id="39997" />
@@ -915,7 +915,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdPluginCmd38" Id="40038"/>
     <Command Name="cmdPluginCmd39" Id="40039"/>
     <Command Name="cmdPluginCmdLast" Id="40040"/>
-    
+
   </Application.Commands>
   <Application.Views>
     <Ribbon>
@@ -1132,9 +1132,18 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
                 <Button CommandName="cmdTitlecase" />
               </MenuGroup>
             </DropDownButton>
-            <Button CommandName="cmdTrim" />
+            <SplitButton CommandName="cmdGroupWrapLines">
+              <SplitButton.ButtonItem>
+                <ToggleButton CommandName="cmdLineWrap" />
+              </SplitButton.ButtonItem>
+              <ToggleButton CommandName="cmdLineWrapIndent" />
+            </SplitButton>
             <DropDownButton CommandName="cmdWhitespacecombo">
               <MenuGroup>
+                <ToggleButton CommandName="cmdWhiteSpace" />
+              </MenuGroup>
+              <MenuGroup>
+                <Button CommandName="cmdTrim" />
                 <Button CommandName="cmdTabs2Spaces" />
                 <Button CommandName="cmdSpaces2Tabs" />
               </MenuGroup>
