@@ -352,7 +352,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
       </Command.SmallImages>
     </Command>
 
-    <Command Name="cmdGroupLines" LabelTitle="Lines">
+    <Command Name="cmdGroupLines" LabelTitle="Line handling">
       <Command.LargeImages>
         <Image>res/LineDupL.png</Image>
       </Command.LargeImages>
