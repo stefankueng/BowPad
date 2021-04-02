@@ -1,7 +1,7 @@
 // returns the version of the plugin
 // this callback is not optional! If you fail to implement this, the plugin
 // config dialog won't work properly with your plugin
-function Version() { return 103; }
+function Version() { return 201; }
 
 function Calculate(expression) {
 	return eval(expression).toFixed (10).replace (/\.([0-9]*?)0+$/g, "\.$1").replace (/\.$/, "");
@@ -24,7 +24,7 @@ function Execute()
 	if (s.length == 0) {
 		return;
 	}
-	var exp = /[\-+*\/\.\(\)^,\s\uFF0B\uFF0D\u00D7\u00F7\uFF08\uFF09\uFF0A\uFF0F\uFF3B\uFF3D\uFF5B\uFF5D\u3014\u3015]|0x[0-9a-f]+|[\d\uFF10-\uFF19]+|\bMath.(?:E|LN2|LN10|LOG2E|LOG10E|PI|SQRT1_2|SQRT2)\b|\b(?:Math.)?(?:abs|acos|asin|atan|atan2|ceil|cos|exp|floor|log|max|min|pow|random|round|sin|sqrt|tan)\b/gi;
+	var exp = /[\-+*\/\(\)^,\s\uFF0B\uFF0D\u00D7\u00F7\uFF08\uFF09\uFF0A\uFF0F\uFF3B\uFF3D\uFF5B\uFF5D\u3014\u3015]|0x[0-9a-f]+|[\.\d\uFF10-\uFF19]+|\bMath\.(?:E|LN2|LN10|LOG2E|LOG10E|PI|SQRT1_2|SQRT2)\b|\b(?:Math\.)?(?:abs|acos|asin|atan|atan2|ceil|cos|exp|floor|log|max|min|pow|random|round|sin|sqrt|tan)\b/gi;
 	var opf = "\uFF0B\uFF0D\u00D7\u00F7\uFF08\uFF09\uFF0A\uFF0F\uFF3B\uFF3D\uFF5B\uFF5D\u3014\u3015";
 	var op = "+-*/()*/()()()";
 	var m = [];
