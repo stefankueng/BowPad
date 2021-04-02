@@ -1282,6 +1282,10 @@ msgstr ""
 msgid "Line endings: %s"
 msgstr ""
 
+#. Resource IDs: (60261)
+msgid "Line handling"
+msgstr ""
+
 #. Resource IDs: (60125)
 msgid "Line numbers"
 msgstr ""
@@ -1293,10 +1297,6 @@ msgstr ""
 #. Resource IDs: (250)
 #, c-format
 msgid "Line: %%c%06X%ld%%r / %%c%06X%ld%%r   Column: %%c%06X%ld%%r"
-msgstr ""
-
-#. Resource IDs: (60261)
-msgid "Lines"
 msgstr ""
 
 #. Resource IDs: (249)
@@ -2045,6 +2045,10 @@ msgstr ""
 
 #. Resource IDs: (1130)
 msgid "Snippet Name/Key:"
+msgstr ""
+
+#. Resource IDs: (1134)
+msgid "Snippets"
 msgstr ""
 
 #. Resource IDs: (60290, 60292)
