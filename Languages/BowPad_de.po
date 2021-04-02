@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2021-03-13 09:55+0100\n"
+"PO-Revision-Date: 2021-04-02 10:05+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -1459,6 +1459,10 @@ msgstr "Zeilentext"
 msgid "Line endings: %s"
 msgstr "Zeilenenden: %s"
 
+#. Resource IDs: (60261)
+msgid "Line handling"
+msgstr "Zeilenfunktionen"
+
 #. Resource IDs: (60125)
 msgid "Line numbers"
 msgstr "Zeilennummern"
@@ -1471,10 +1475,6 @@ msgstr "Zeile:"
 #, c-format
 msgid "Line: %%c%06X%ld%%r / %%c%06X%ld%%r   Column: %%c%06X%ld%%r"
 msgstr "Linie: %%c%06X%ld%%r / %%c%06X%ld%%r   Spalte: %%c%06X%ld%%r"
-
-#. Resource IDs: (60261)
-msgid "Lines"
-msgstr "Zeilen"
 
 #. Resource IDs: (249)
 #, c-format
@@ -2282,7 +2282,11 @@ msgstr "Zeigt eine Liste mit offenen Tabs."
 
 #. Resource IDs: (1130)
 msgid "Snippet Name/Key:"
-msgstr "Schnippselname/Schlüssel"
+msgstr "Schnippselname/Schlüssel:"
+
+#. Resource IDs: (1134)
+msgid "Snippets"
+msgstr "Schnippsel"
 
 #. Resource IDs: (60290, 60292)
 msgid "Sort Lines"
@@ -2886,6 +2890,9 @@ msgstr "Schaltet Klappung aus"
 #, c-format
 msgid "{ %d lines }"
 msgstr "{ %d Linien }"
+
+#~ msgid "Lines"
+#~ msgstr "Zeilen"
 
 #~ msgid "Ctrl+Doubleclick to open the link in the default browser"
 #~ msgstr "Ctrl+Doppelklick um den Link im Standardbrowser zu öffnen"
