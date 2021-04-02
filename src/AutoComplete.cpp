@@ -663,8 +663,11 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             auto           rootDir     = rawPath.substr(0, rawPath.find_last_of(L"\\/") + 1);
             while (fileFinder.NextFile(filename, &bIsDirectory, false))
             {
-                filename = rootDir + filename.substr(rootDir.size());
-                pathComplete += (CUnicodeUtils::StdGetUTF8(filename) + typeSeparator + std::to_string(static_cast<int>(AutoCompleteType::Path)) + wordSeparator);
+                if (rootDir.size() < filename.size())
+                {
+                    filename = rootDir + filename.substr(rootDir.size());
+                    pathComplete += (CUnicodeUtils::StdGetUTF8(filename) + typeSeparator + std::to_string(static_cast<int>(AutoCompleteType::Path)) + wordSeparator);
+                }
                 auto elapsedPeriod = std::chrono::steady_clock::now() - startTime;
                 if (elapsedPeriod > maxPathTime)
                     break;
