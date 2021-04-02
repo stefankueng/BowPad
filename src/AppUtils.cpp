@@ -199,13 +199,13 @@ bool CAppUtils::CheckForUpdate(bool force)
                     m_updateFilename = CUnicodeUtils::StdGetUnicode(line);
 #else
                     // first two lines are for the 64-bit version
-                    File.getline(line, sizeof(line));
-                    File.getline(line, sizeof(line));
+                    file.getline(line, sizeof(line));
+                    file.getline(line, sizeof(line));
                     // now for the 32-bit version
-                    File.getline(line, sizeof(line));
-                    updateUrl = CUnicodeUtils::StdGetUnicode(line);
-                    File.getline(line, sizeof(line));
-                    updateFilename = CUnicodeUtils::StdGetUnicode(line);
+                    file.getline(line, sizeof(line));
+                    m_updateUrl = CUnicodeUtils::StdGetUnicode(line);
+                    file.getline(line, sizeof(line));
+                    m_updateFilename = CUnicodeUtils::StdGetUnicode(line);
 #endif
                 }
                 file.close();
