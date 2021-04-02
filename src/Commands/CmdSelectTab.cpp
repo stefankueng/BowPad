@@ -212,7 +212,7 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
             GetClientRect(*this, &rect);
             const auto dpiSpacing = CDPIAware::Instance().Scale(*this, spacing);
             auto       dpiMargin  = CDPIAware::Instance().Scale(*this, margin);
-            auto       item       = (pt.y - dpiMargin) / (m_textHeight + dpiSpacing);
+            auto       item       = static_cast<size_t>((pt.y - dpiMargin) / (m_textHeight + dpiSpacing));
             if (item >= 0 && item < m_tabList.size())
             {
                 ShowWindow(*this, SW_HIDE);
@@ -278,7 +278,7 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
             auto           dpiMargin     = CDPIAware::Instance().Scale(*this, margin);
             constexpr auto mainDrawFlags = DT_SINGLELINE | DT_NOPREFIX | DT_TOP;
 
-            auto   maxItems     = (rect.bottom - rect.top - dpiMargin - dpiMargin) / (m_textHeight + dpiSpacing);
+            auto   maxItems     = static_cast<size_t>((rect.bottom - rect.top - dpiMargin - dpiMargin) / (m_textHeight + dpiSpacing));
             size_t indexToStart = 0;
             if (maxItems < m_tabList.size())
             {

@@ -530,7 +530,7 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
         {
             m_currentSnippetPos = static_cast<int>(m_snippetPositions.size() - 1);
         }
-        if (m_currentSnippetPos >= m_snippetPositions.size() - 1)
+        if (m_currentSnippetPos >= static_cast<int>(m_snippetPositions.size() - 1))
         {
             if (wParam == VK_TAB && lastSnippetPos != 1)
                 m_currentSnippetPos = 1;
@@ -545,7 +545,7 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
                 return false;
             }
         }
-        if (m_currentSnippetPos < m_snippetPositions.size())
+        if (m_currentSnippetPos < static_cast<int>(m_snippetPositions.size()))
         {
             const auto& posVec = m_snippetPositions[m_currentSnippetPos];
             bool        first  = true;
@@ -852,7 +852,7 @@ void CAutoComplete::MarkSnippetPositions(bool clearOnly)
         return;
     m_editor->Call(SCI_SETINDICATORCURRENT, INDIC_SNIPPETPOS);
 
-    Sci_Position firstPos = INT64_MAX;
+    Sci_Position firstPos = static_cast<Sci_Position>(INT64_MAX);
     Sci_Position lastPos  = 0;
 
     for (const auto& [id, vec] : m_snippetPositions)

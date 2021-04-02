@@ -104,7 +104,7 @@ LRESULT CSettingsDlg::DoCommand(int id, int /*msg*/)
         {
             HWND hListCtrl = GetDlgItem(*this, IDC_SETTINGSLIST);
 
-            for (int i = 0; i < m_settings.size(); ++i)
+            for (size_t i = 0; i < m_settings.size(); ++i)
             {
                 wchar_t buf[1024]{};
                 ListView_GetItemText(hListCtrl, i, 0, buf, _countof(buf));

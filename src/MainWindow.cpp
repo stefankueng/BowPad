@@ -3611,7 +3611,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
                 {
                     if (parser.HasVal(L"line"))
                     {
-                        GoToLine(parser.GetLongLongVal(L"line") - 1);
+                        GoToLine(static_cast<size_t>(parser.GetLongLongVal(L"line") - 1));
                     }
                 }
             }
@@ -3658,7 +3658,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
 
         if ((filesOpened == 1) && parser.HasVal(L"line"))
         {
-            GoToLine(parser.GetLongLongVal(L"line") - 1);
+            GoToLine(static_cast<size_t>(parser.GetLongLongVal(L"line") - 1));
         }
     }
 }
