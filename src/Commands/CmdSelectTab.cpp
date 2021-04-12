@@ -44,7 +44,6 @@ bool CCmdSelectTab::Execute()
             }
         }
     }
-
     if ((GetKeyState('9') & 0x8000) || (GetKeyState(VK_NUMPAD9) & 0x8000))
     {
         auto lastTab = GetTabCount() - 1;
@@ -52,6 +51,25 @@ bool CCmdSelectTab::Execute()
             TabActivateAt(lastTab);
         return true;
     }
+
+    if (GetKeyState(VK_PRIOR) & 0x8000)
+    {
+        if (curTab > 0)
+            TabActivateAt(curTab - 1);
+        else
+            TabActivateAt(GetTabCount() - 1);
+        return true;
+    }
+    if (GetKeyState(VK_NEXT) & 0x8000)
+    {
+        auto lastTab = GetTabCount() - 1;
+        if (curTab < lastTab)
+            TabActivateAt(curTab + 1);
+        else
+            TabActivateAt(0);
+        return true;
+    }
+
     if (GetKeyState(VK_TAB) & 0x8000)
     {
         for (int i = 0; i < GetTabCount(); ++i)
