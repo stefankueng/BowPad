@@ -1496,7 +1496,7 @@ bool CMainWindow::Initialize()
     {
         // first try ChangeWindowMessageFilterEx, if it's not available (i.e., running on Vista), then
         // try ChangeWindowMessageFilter.
-        typedef BOOL(WINAPI * MESSAGEFILTERFUNCEX)(HWND hWnd, UINT message, DWORD action, VOID * pChangeFilterStruct);
+        using MESSAGEFILTERFUNCEX = BOOL(WINAPI * )(HWND hWnd, UINT message, DWORD action, VOID * pChangeFilterStruct);
         MESSAGEFILTERFUNCEX func = reinterpret_cast<MESSAGEFILTERFUNCEX>(GetProcAddress(hDll, "ChangeWindowMessageFilterEx"));
 
         constexpr UINT WM_COPYGLOBALDATA = 0x0049;

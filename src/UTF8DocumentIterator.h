@@ -34,11 +34,11 @@ class UTF8DocumentIterator
     wchar_t buffered[2];
 public:
     // ReSharper disable CppInconsistentNaming
-    typedef std::bidirectional_iterator_tag iterator_category;
-    typedef wchar_t value_type;
-    typedef ptrdiff_t difference_type;
-    typedef wchar_t* pointer;
-    typedef wchar_t& reference;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = wchar_t;
+    using difference_type = ptrdiff_t;
+    using pointer = wchar_t*;
+    using reference = wchar_t&;
     // ReSharper restore CppInconsistentNaming
 
     UTF8DocumentIterator(const Scintilla::Document *doc = nullptr, Sci::Position position = 0) :

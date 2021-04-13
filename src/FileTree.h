@@ -19,7 +19,7 @@
 #include "ICommand.h"
 #include <functional>
 
-typedef std::function<bool(HTREEITEM)> ItemHandler;
+using ItemHandler = std::function<bool(HTREEITEM)>;
 
 class FileTreeItem
 {

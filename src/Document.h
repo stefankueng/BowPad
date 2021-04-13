@@ -18,7 +18,7 @@
 #include "Scintilla.h"
 #include <functional>
 
-typedef uptr_t Document;
+using Document = uptr_t;
 
 enum class EOLFormat : int
 {

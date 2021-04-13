@@ -26,7 +26,7 @@ class BasicScriptObject;
 class BasicScriptHost : public IActiveScriptSite
 {
 public:
-    typedef IActiveScriptSite Interface;
+    using Interface = IActiveScriptSite;
 
     explicit BasicScriptHost(const GUID& languageId);
 
