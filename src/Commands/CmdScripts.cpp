@@ -311,10 +311,10 @@ void CCmdScript::TabNotify(TBHDR* ptbHdr)
     DISPPARAMS dispParams = {nullptr};
     dispParams.cArgs      = 2;
     VARIANT v[2];
-    v[0].uintVal      = ptbHdr->hdr.code;
-    v[0].vt           = VT_UINT;
-    v[1].intVal       = ptbHdr->tabOrigin;
+    v[1].intVal       = static_cast<int>(ptbHdr->hdr.code);
     v[1].vt           = VT_INT;
+    v[0].intVal       = ptbHdr->tabOrigin;
+    v[0].vt           = VT_INT;
     dispParams.rgvarg = v;
     try
     {
@@ -400,10 +400,10 @@ void CCmdScript::OnDocumentSave(DocID id, bool bSaveAs)
     DISPPARAMS dispParams = {nullptr};
     dispParams.cArgs      = 2;
     VARIANT v[2];
-    v[0].intVal       = id.GetValue();
-    v[0].vt           = VT_INT;
-    v[1].boolVal      = bSaveAs ? VARIANT_TRUE : VARIANT_FALSE;
-    v[1].vt           = VT_BOOL;
+    v[1].intVal       = id.GetValue();
+    v[1].vt           = VT_INT;
+    v[0].boolVal      = bSaveAs ? VARIANT_TRUE : VARIANT_FALSE;
+    v[0].vt           = VT_BOOL;
     dispParams.rgvarg = v;
     try
     {
