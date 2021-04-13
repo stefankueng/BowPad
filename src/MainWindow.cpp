@@ -3162,7 +3162,7 @@ void CMainWindow::OpenNewTab()
     OnOutOfScope(
         m_insertionIndex = -1;);
 
-    m_tabBar.SelectChanging();
+    m_tabBar.SelectChanging(-1);
 
     CDocument doc;
     doc.m_document = m_editor.Call(SCI_CREATEDOCUMENT);

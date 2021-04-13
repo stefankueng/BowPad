@@ -261,12 +261,13 @@ void CTabBar::SetFont(const wchar_t *fontName, int fontSize)
                                fontName);
 }
 
-void CTabBar::SelectChanging() const
+void CTabBar::SelectChanging(int index) const
 {
-    NMHDR nmhdr    = {};
-    nmhdr.hwndFrom = *this;
-    nmhdr.code     = TCN_SELCHANGING;
-    ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+    NMHDR nmHdr    = {};
+    nmHdr.hwndFrom = *this;
+    nmHdr.code     = TCN_SELCHANGING;
+    nmHdr.idFrom   = index;
+    ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr));
 }
 
 void CTabBar::SelectChange(int index) const
@@ -274,16 +275,17 @@ void CTabBar::SelectChange(int index) const
     if (index >= 0)
         TabCtrl_SetCurSel(*this, index);
 
-    NMHDR nmhdr    = {};
-    nmhdr.hwndFrom = *this;
-    nmhdr.code     = TCN_SELCHANGE;
-    ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmhdr));
+    NMHDR nmHdr    = {};
+    nmHdr.hwndFrom = *this;
+    nmHdr.code     = TCN_SELCHANGE;
+    nmHdr.idFrom   = index;
+    ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr));
     InvalidateRect(*this, nullptr, FALSE);
 }
 
 void CTabBar::ActivateAt(int index) const
 {
-    SelectChanging();
+    SelectChanging(index);
     SelectChange(index);
     InvalidateRect(*this, nullptr, FALSE);
 }
