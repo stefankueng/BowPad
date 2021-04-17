@@ -927,7 +927,7 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmHdr, WPARAM /*wParam*/, L
     const TBHDR& tbHdr  = *ptbHdr;
     assert(tbHdr.hdr.code == nmHdr.code);
 
-    CCommandHandler::Instance().TabNotify(ptbHdr);
+    OnOutOfScope(CCommandHandler::Instance().TabNotify(ptbHdr));
 
     switch (nmHdr.code)
     {
@@ -2173,7 +2173,8 @@ bool CMainWindow::CloseTab(int closingTabIndex, bool force /* = false */, bool q
         EnsureAtLeastOneTab();
         return true;
     }
-    m_tabBar.SelectChange(nextTabIndex);
+    if (nextTabIndex >= 0)
+        m_tabBar.SelectChange(nextTabIndex);
     return true;
 }
 
@@ -3431,13 +3432,13 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
 
             if (bAddToMRU)
                 SHAddToRecentDocs(SHARD_PATHW, filepath.c_str());
-            CCommandHandler::Instance().OnDocumentOpen(id);
             if (m_fileTree.GetPath().empty())
             {
                 m_fileTree.SetPath(CPathUtils::GetParentDirectory(filepath), false);
                 ResizeChildWindows();
             }
             UpdateTab(id);
+            CCommandHandler::Instance().OnDocumentOpen(id);
         }
         else
         {
