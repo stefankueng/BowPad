@@ -17,7 +17,6 @@
 #include "stdafx.h"
 #include "ICommand.h"
 #include "MainWindow.h"
-#include "StringUtils.h"
 #include "LexStyles.h"
 #include "CommandHandler.h"
 
