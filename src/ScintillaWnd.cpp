@@ -227,6 +227,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     Call(SCI_SETCHARACTERCATEGORYOPTIMIZATION, 0x10000);
     Call(SCI_SETACCESSIBILITY, SC_ACCESSIBILITY_ENABLED);
 
+    SetTabSettings(TabSpace::Default);
+
     SetupDefaultStyles();
 
     return true;
@@ -1061,7 +1063,6 @@ void CScintillaWnd::SetupDefaultStyles() const
     Call(SCI_MARKERSETFORE, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(80, 0, 0), true));
     Call(SCI_MARKERSETBACK, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(255, 0, 0), true));
 
-    SetTabSettings(TabSpace::Default);
     Call(SCI_SETINDENTATIONGUIDES, static_cast<uptr_t>(CIniSettings::Instance().GetInt64(L"View", L"indent", SC_IV_LOOKBOTH)));
 
     SetupFoldingColors(RGB(color_folding_fore_inactive, color_folding_fore_inactive, color_folding_fore_inactive),
