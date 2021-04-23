@@ -922,6 +922,10 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
     const auto& keywords  = CLexStyles::Instance().GetKeywordsForLang(lang);
     const auto& theme     = CTheme::Instance();
 
+    wchar_t localeName[100];
+    GetUserDefaultLocaleName(localeName, _countof(localeName));
+    Call(SCI_SETFONTLOCALE, 0, reinterpret_cast<sptr_t>(const_cast<char*>(CUnicodeUtils::StdGetUTF8(localeName).c_str())));
+
     // first set up only the default styles
     std::wstring defaultFont;
     if (m_hasConsolas)
