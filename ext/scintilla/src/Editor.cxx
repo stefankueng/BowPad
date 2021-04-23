@@ -708,10 +708,6 @@ void Editor::SetSelection(SelectionPosition currentPos_) {
 	QueueIdleWork(WorkItems::updateUI);
 }
 
-void Editor::SetSelection(int currentPos_) {
-	SetSelection(SelectionPosition(currentPos_));
-}
-
 void Editor::SetEmptySelection(SelectionPosition currentPos_) {
 	const Sci::Line currentLine = pdoc->SciLineFromPosition(currentPos_.Position());
 	SelectionRange rangeNew(ClampPositionIntoDocument(currentPos_));
@@ -7202,6 +7198,16 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_GETELEMENTALLOWSTRANSLUCENT:
 		return vs.ElementAllowsTranslucent(static_cast<int>(wParam));
+
+	case SCI_SETFONTLOCALE:
+		if (lParam) {
+			vs.SetFontLocaleName(CharPtrFromSPtr(lParam));
+			InvalidateStyleRedraw();
+		}
+		break;
+
+	case SCI_GETFONTLOCALE:
+		return StringResult(lParam, vs.localeName.c_str());
 
 #ifdef INCLUDE_DEPRECATED_FEATURES
 	case SCI_SETSTYLEBITS:

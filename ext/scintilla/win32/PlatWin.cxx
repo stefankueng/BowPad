@@ -313,6 +313,13 @@ struct FontDirectWrite : public FontWin {
 			static_cast<DWRITE_FONT_WEIGHT>(fp.weight),
 			style,
 			DWRITE_FONT_STRETCH_NORMAL, fHeight, wsLocale.c_str(), &pTextFormat);
+		if (hr == E_INVALIDARG) {
+			// Possibly a bad locale name like "/" so try "en-us".
+			hr = pIDWriteFactory->CreateTextFormat(wsFace.c_str(), nullptr,
+				static_cast<DWRITE_FONT_WEIGHT>(fp.weight),
+				style,
+				DWRITE_FONT_STRETCH_NORMAL, fHeight, L"en-us", &pTextFormat);
+		}
 		if (SUCCEEDED(hr)) {
 			pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 
@@ -1354,7 +1361,7 @@ public:
 
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) override;
 
-	void DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageDraw, UINT fuOptions);
+	void DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageOverride, UINT fuOptions);
 
 	void DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
 	void DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
@@ -2303,10 +2310,11 @@ std::unique_ptr<IScreenLineLayout> SurfaceD2D::Layout(const IScreenLine *screenL
 	return std::make_unique<ScreenLineLayout>(screenLine);
 }
 
-void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageDraw, UINT fuOptions) {
+void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageOverride, UINT fuOptions) {
 	SetFont(font_);
 
 	// Use Unicode calls
+	const int codePageDraw = codePageOverride ? codePageOverride : codePageText;
 	const TextWide tbuf(text, codePageDraw);
 	if (pRenderTarget && pTextFormat && pBrush) {
 		if (fuOptions & ETO_CLIPPED) {
@@ -2340,7 +2348,7 @@ void SurfaceD2D::DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION yba
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
-		DrawTextCommon(rc, font_, ybase, text, codePageText, ETO_OPAQUE);
+		DrawTextCommon(rc, font_, ybase, text, 0, ETO_OPAQUE);
 	}
 }
 
@@ -2349,7 +2357,7 @@ void SurfaceD2D::DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION yb
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
-		DrawTextCommon(rc, font_, ybase, text, codePageText, ETO_OPAQUE | ETO_CLIPPED);
+		DrawTextCommon(rc, font_, ybase, text, 0, ETO_OPAQUE | ETO_CLIPPED);
 	}
 }
 
@@ -2360,7 +2368,7 @@ void SurfaceD2D::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITIO
 		if (ch != ' ') {
 			if (pRenderTarget) {
 				D2DPenColourAlpha(fore);
-				DrawTextCommon(rc, font_, ybase, text, codePageText, 0);
+				DrawTextCommon(rc, font_, ybase, text, 0, 0);
 			}
 			return;
 		}
@@ -2392,7 +2400,7 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 		return;
 	}
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
-	FLOAT position = 0.0f;
+	XYPOSITION position = 0.0;
 	int ti=0;
 	for (unsigned int ci=0; ci<count; ci++) {
 		for (unsigned int inCluster=0; inCluster<clusterMetrics[ci].length; inCluster++) {
@@ -2403,9 +2411,8 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 	PLATFORM_ASSERT(ti == tbuf.tlen);
 	if (mode.codePage == SC_CP_UTF8) {
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
-		int ui=0;
-		size_t i=0;
-		while (ui<tbuf.tlen) {
+		size_t i = 0;
+		for (int ui = 0; ui < tbuf.tlen; ui++) {
 			const unsigned char uch = text[i];
 			const unsigned int byteCount = UTF8BytesOfLead[uch];
 			if (byteCount == 4) {	// Non-BMP
@@ -2414,11 +2421,8 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 			for (unsigned int bytePos=0; (bytePos<byteCount) && (i<text.length()) && (ui<tbuf.tlen); bytePos++) {
 				positions[i++] = poses.buffer[ui];
 			}
-			ui++;
 		}
-		XYPOSITION lastPos = 0.0f;
-		if (i > 0)
-			lastPos = positions[i-1];
+		const XYPOSITION lastPos = (i > 0) ? positions[i - 1] : 0.0;
 		while (i<text.length()) {
 			positions[i++] = lastPos;
 		}
@@ -2523,7 +2527,7 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 		return;
 	}
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
-	FLOAT position = 0.0f;
+	XYPOSITION position = 0.0;
 	int ti = 0;
 	for (unsigned int ci = 0; ci < count; ci++) {
 		for (unsigned int inCluster = 0; inCluster < clusterMetrics[ci].length; inCluster++) {
@@ -2533,22 +2537,19 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 	}
 	PLATFORM_ASSERT(ti == tbuf.tlen);
 	// Map the widths given for UTF-16 characters back onto the UTF-8 input string
-	int ui = 0;
 	size_t i = 0;
-	while (ui < tbuf.tlen) {
+	for (int ui = 0; ui < tbuf.tlen; ui++) {
 		const unsigned char uch = text[i];
 		const unsigned int byteCount = UTF8BytesOfLead[uch];
 		if (byteCount == 4) {	// Non-BMP
 			ui++;
+			PLATFORM_ASSERT(ui < ti);
 		}
 		for (unsigned int bytePos=0; (bytePos<byteCount) && (i<text.length()); bytePos++) {
 			positions[i++] = poses.buffer[ui];
 		}
-		ui++;
 	}
-	XYPOSITION lastPos = 0.0f;
-	if (i > 0)
-		lastPos = positions[i - 1];
+	const XYPOSITION lastPos = (i > 0) ? positions[i - 1] : 0.0;
 	while (i < text.length()) {
 		positions[i++] = lastPos;
 	}
