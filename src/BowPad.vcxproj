@@ -137,7 +137,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\lexilla\include;..\ext\lexilla\lexlib;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -162,7 +162,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\lexilla\include;..\ext\lexilla\lexlib;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -187,7 +187,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\lexilla\include;..\ext\lexilla\lexlib;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -214,7 +214,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\lexilla\include;..\ext\lexilla\lexlib;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -247,7 +247,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\lexilla\include;..\ext\lexilla\lexlib;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -280,7 +280,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);..\ext\sktoolslib;..\ext\scintilla\include;..\ext\lexilla\include;..\ext\lexilla\lexlib;..\ext\coolsb;..\ext\editorconfig-core\include;Commands;$(ProjectDir);last</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>

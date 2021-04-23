@@ -21,9 +21,11 @@
 #include "DocScroll.h"
 #include "ScrollTool.h"
 #include "AnimationManager.h"
+#include "../ext/scintilla/include/ILexer.h"
 
 #include <vector>
 #include <unordered_map>
+
 
 class CPosData;
 
@@ -166,4 +168,5 @@ private:
     AnimationVariable m_animVarGrayBack;
     AnimationVariable m_animVarGraySel;
     AnimationVariable m_animVarGrayLineNr;
+    std::map<std::string, Scintilla::ILexer5*> m_customLexers;
 };

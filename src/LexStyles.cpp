@@ -220,7 +220,10 @@ void CLexStyles::Load()
             int lex;
             if (!CAppUtils::TryParse(slex.c_str(), lex, false))
                 APPVERIFY(false);
-
+            std::wstring lexName = ini->GetValue(lexerName.c_str(), L"LexerName", L"");
+#ifdef _DEBUG
+            assert(!lexName.empty());
+#endif
             std::wstring v = ini->GetValue(L"lexers", lexerName.c_str(), L"");
             if (!v.empty())
             {
@@ -234,8 +237,10 @@ void CLexStyles::Load()
             // now parse all the data for this lexer
             LexerData lexerData = m_lexerData[lex];
             LexerData userLexerData;
-            lexerData.id     = lex;
-            userLexerData.id = lex;
+            lexerData.id       = lex;
+            lexerData.name     = CUnicodeUtils::StdGetUTF8(lexName);
+            userLexerData.id   = lex;
+            userLexerData.name = CUnicodeUtils::StdGetUTF8(lexName);
             CSimpleIni::TNamesDepend lexDataKeys;
             ini->GetAllKeys(lexerName.c_str(), lexDataKeys);
             for (const auto& it : lexDataKeys)
@@ -879,6 +884,7 @@ void CLexStyles::SaveUserData()
         ini.Delete(section.c_str(), nullptr);
         std::wstring v = std::to_wstring(lexerId);
         ini.SetValue(section.c_str(), L"Lexer", v.c_str());
+        ini.SetValue(section.c_str(), L"LexerName", CUnicodeUtils::StdGetUnicode(lexerData.name).c_str());
         for (const auto& [styleId, styleData] : lexerData.styles)
         {
             std::wstring style = CStringUtils::Format(L"Style%d", styleId);

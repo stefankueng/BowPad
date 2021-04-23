@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2019 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2019, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <codecvt>
 #include <memory>
 #include "scintilla.h"
-#include "../ext/scintilla/lexlib/CharacterCategory.h"
+#include "../ext/lexilla/lexlib/CharacterCategory.h"
 #include "../ext/scintilla/include/ILoader.h"
 #define PLATFORM_ASSERT(c) ((void)0)
 #include "../ext/scintilla/src/Position.h"

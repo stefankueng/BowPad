@@ -5,3 +5,6 @@
 [submodule "ext/tinyexpr"]
 	path = ext/tinyexpr
 	url = https://github.com/codeplea/tinyexpr.git
+[submodule "ext/lexilla"]
+	path = ext/lexilla
+	url = https://github.com/ScintillaOrg/lexilla.git

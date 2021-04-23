@@ -30,13 +30,13 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#include "../scintilla/lexlib/WordList.h"
-#include "../scintilla/lexlib/LexAccessor.h"
-#include "../scintilla/lexlib/StyleContext.h"
-#include "../scintilla/lexlib/CharacterSet.h"
-#include "../scintilla/lexlib/LexerModule.h"
-#include "../scintilla/lexlib/OptionSet.h"
-#include "../scintilla/lexlib/DefaultLexer.h"
+#include "../lexilla/lexlib/LexAccessor.h"
+#include "../lexilla/lexlib/StyleContext.h"
+#include "../lexilla/lexlib/CharacterSet.h"
+#include "../lexilla/lexlib/LexerModule.h"
+#include "../lexilla/lexlib/OptionSet.h"
+#include "../lexilla/lexlib/DefaultLexer.h"
+#include "../lexilla/lexlib/WordList.h"
 
 using namespace Scintilla;
 
@@ -669,4 +669,4 @@ void SCI_METHOD LexerSimple::Fold(Sci_PositionU startPos, Sci_Position length, i
     styler.SetLevel(lineCurrent, levelPrev | flagsNext);
 }
 
-LexerModule lmSimple(SCLEX_AUTOMATIC + 100, LexerSimple::LexerFactorySimple, "simple", simpleWordLists);
+LexerModule lmSimple(SCLEX_AUTOMATIC + 100, LexerSimple::LexerFactorySimple, "bp_simple", simpleWordLists);

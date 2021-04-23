@@ -82,6 +82,7 @@ public:
     {
     }
     int                                id;
+    std::string                        name;
     std::unordered_map<int, StyleData> styles;
     std::map<std::string, std::string> properties;
 };

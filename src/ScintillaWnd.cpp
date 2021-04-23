@@ -28,8 +28,8 @@
 #include "CommandHandler.h"
 #include "DPIAware.h"
 #include "../ext/scintilla/include/ILexer.h"
-#include "../ext/scintilla/lexlib/LexerModule.h"
-#include "../ext/scintilla/src/Catalogue.h"
+#include "../ext/lexilla/lexlib/LexerModule.h"
+#include "Lexilla.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -94,6 +94,9 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
 
 CScintillaWnd::~CScintillaWnd()
 {
+    for (auto& [name, lexer] : m_customLexers)
+        lexer->Release();
+    m_customLexers.clear();
     if (m_bScratch)
     {
         DestroyWindow(*this);
@@ -110,6 +113,11 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
         icce.dwSize = sizeof(icce);
         icce.dwICC  = ICC_BAR_CLASSES;
         InitCommonControlsEx(&icce);
+        CreateLexer(""); // initializes all lexers
+
+        m_customLexers["bp_simple"]   = lmSimple.Create();
+        m_customLexers["bp_log"]      = lmLog.Create();
+        m_customLexers["bp_snippets"] = lmSnippets.Create();
     }
 
     if (hWndAttachTo == nullptr)
@@ -132,10 +140,6 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
 
     if (m_pSciMsg == nullptr || m_pSciWndData == 0)
         return false;
-
-    Scintilla::Catalogue::AddLexerModule(&lmSimple);
-    Scintilla::Catalogue::AddLexerModule(&lmLog);
-    Scintilla::Catalogue::AddLexerModule(&lmSnippets);
 
     m_docScroll.InitScintilla(this);
 
@@ -942,7 +946,36 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
     SetupDefaultStyles();
 
     // and now set the lexer styles
-    Call(SCI_SETLEXER, lexerData.id);
+    Scintilla::ILexer5* lexer   = nullptr;
+    auto                lexerIt = m_customLexers.find(lexerData.name);
+    if (lexerIt != m_customLexers.end())
+        lexer = lexerIt->second;
+    if (lexerData.name.empty())
+    {
+        switch (lexerData.id)
+        {
+            case 1100:
+                lexer = m_customLexers.find("bp_simple")->second;
+                break;
+            case 1101:
+                lexer = m_customLexers.find("bp_log")->second;
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (lexerData.name == "bp_simle")
+        lexer = lmSimple.Create();
+    if (lexerData.name == "bp_log")
+        lexer = lmLog.Create();
+    if (lexerData.name == "bp_snippets")
+        lexer = lmSnippets.Create();
+
+    if (lexer == nullptr)
+        lexer = CreateLexer(lexerData.name.c_str());
+    assert(lexer);
+    Call(SCI_SETILEXER, 0, reinterpret_cast<sptr_t>(lexer));
 
     for (const auto& [propName, propValue] : lexerData.properties)
     {

@@ -48,6 +48,7 @@ xcuserdata/
 *.xcsettings
 xcschememanagement.plist
 .DS_Store
+Release
 Debug
 cocoa/build
 cocoa/ScintillaFramework/build

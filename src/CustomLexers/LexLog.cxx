@@ -29,12 +29,13 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#include "../scintilla/lexlib/LexAccessor.h"
-#include "../scintilla/lexlib/StyleContext.h"
-#include "../scintilla/lexlib/CharacterSet.h"
-#include "../scintilla/lexlib/LexerModule.h"
-#include "../scintilla/lexlib/OptionSet.h"
-#include "../scintilla/lexlib/DefaultLexer.h"
+#include "../lexilla/lexlib/LexAccessor.h"
+#include "../lexilla/lexlib/StyleContext.h"
+#include "../lexilla/lexlib/CharacterSet.h"
+#include "../lexilla/lexlib/LexerModule.h"
+#include "../lexilla/lexlib/OptionSet.h"
+#include "../lexilla/lexlib/DefaultLexer.h"
+#include "../lexilla/lexlib/WordList.h"
 
 using namespace Scintilla;
 
@@ -498,4 +499,4 @@ void SCI_METHOD LexerLog::Fold(Sci_PositionU /*startPos*/, Sci_Position /*length
     // no folding : log files are usually big, and this simply is too slow
 }
 
-LexerModule lmLog(SCLEX_AUTOMATIC + 101, LexerLog::LexerFactorySimple, "log", nullptr);
+LexerModule lmLog(SCLEX_AUTOMATIC + 101, LexerLog::LexerFactorySimple, "bp_log", nullptr);
