@@ -1156,6 +1156,21 @@ void CScintillaWnd::SetupDefaultStyles() const
         Call(SCI_SETREPRESENTATION, reinterpret_cast<uptr_t>(sC), reinterpret_cast<sptr_t>(CStringUtils::Format("x%02X", c).c_str()));
     }
     Call(SCI_SETREPRESENTATION, reinterpret_cast<uptr_t>("\x7F"), reinterpret_cast<sptr_t>("x7F"));
+
+    if (theme.IsDarkTheme())
+    {
+        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST, RGB(187, 187, 187));
+        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_BACK, RGB(15, 15, 15));
+        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED, RGB(187, 187, 187));
+        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED_BACK, RGB(80, 80, 80));
+    }
+    else
+    {
+        Call(SCI_RESETELEMENTCOLOUR, SC_ELEMENT_LIST);
+        Call(SCI_RESETELEMENTCOLOUR, SC_ELEMENT_LIST_BACK);
+        Call(SCI_RESETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED);
+        Call(SCI_RESETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED_BACK);
+    }
 }
 
 void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF backSel) const
