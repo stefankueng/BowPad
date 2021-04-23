@@ -51,10 +51,12 @@ public:
     void AddWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words);
 
 private:
-    void        HandleAutoComplete(const SCNotification* scn);
-    void        ExitSnippetMode();
-    void        MarkSnippetPositions(bool clearOnly);
-    std::string SanitizeSnippetText(const std::string& text) const;
+    void                 HandleAutoComplete(const SCNotification* scn);
+    void                 ExitSnippetMode();
+    void                 MarkSnippetPositions(bool clearOnly);
+    std::string          SanitizeSnippetText(const std::string& text) const;
+    static void          SetWindowStylesForAutocompletionPopup();
+    static BOOL CALLBACK AdjustThemeProc(HWND hwnd, LPARAM lParam);
 
 private:
     CScintillaWnd* m_editor;
