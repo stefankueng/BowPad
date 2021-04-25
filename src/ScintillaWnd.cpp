@@ -94,9 +94,6 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
 
 CScintillaWnd::~CScintillaWnd()
 {
-    for (auto& [name, lexer] : m_customLexers)
-        lexer->Release();
-    m_customLexers.clear();
     if (m_bScratch)
     {
         DestroyWindow(*this);
@@ -114,10 +111,6 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
         icce.dwICC  = ICC_BAR_CLASSES;
         InitCommonControlsEx(&icce);
         CreateLexer(""); // initializes all lexers
-
-        m_customLexers["bp_simple"]   = lmSimple.Create();
-        m_customLexers["bp_log"]      = lmLog.Create();
-        m_customLexers["bp_snippets"] = lmSnippets.Create();
     }
 
     if (hWndAttachTo == nullptr)
@@ -950,24 +943,7 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
     SetupDefaultStyles();
 
     // and now set the lexer styles
-    Scintilla::ILexer5* lexer   = nullptr;
-    auto                lexerIt = m_customLexers.find(lexerData.name);
-    if (lexerIt != m_customLexers.end())
-        lexer = lexerIt->second;
-    if (lexerData.name.empty())
-    {
-        switch (lexerData.id)
-        {
-            case 1100:
-                lexer = m_customLexers.find("bp_simple")->second;
-                break;
-            case 1101:
-                lexer = m_customLexers.find("bp_log")->second;
-                break;
-            default:
-                break;
-        }
-    }
+    Scintilla::ILexer5* lexer = nullptr;
 
     if (lexerData.name == "bp_simle")
         lexer = lmSimple.Create();
@@ -975,6 +951,20 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
         lexer = lmLog.Create();
     if (lexerData.name == "bp_snippets")
         lexer = lmSnippets.Create();
+    if (lexer == nullptr && lexerData.name.empty())
+    {
+        switch (lexerData.id)
+        {
+            case 1100:
+                lexer = lmSimple.Create();
+                break;
+            case 1101:
+                lexer = lmLog.Create();
+                break;
+            default:
+                break;
+        }
+    }
 
     if (lexer == nullptr)
         lexer = CreateLexer(lexerData.name.c_str());

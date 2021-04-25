@@ -26,7 +26,6 @@
 #include <vector>
 #include <unordered_map>
 
-
 class CPosData;
 
 #define INDIC_SELECTION_MARK   (INDIC_CONTAINER + 1)
@@ -168,5 +167,4 @@ private:
     AnimationVariable m_animVarGrayBack;
     AnimationVariable m_animVarGraySel;
     AnimationVariable m_animVarGrayLineNr;
-    std::map<std::string, Scintilla::ILexer5*> m_customLexers;
 };
