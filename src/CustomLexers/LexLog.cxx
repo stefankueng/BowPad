@@ -35,7 +35,6 @@
 #include "../lexilla/lexlib/LexerModule.h"
 #include "../lexilla/lexlib/OptionSet.h"
 #include "../lexilla/lexlib/DefaultLexer.h"
-#include "../lexilla/lexlib/WordList.h"
 
 using namespace Scintilla;
 

@@ -19,7 +19,6 @@
 #include <stdarg.h>
 #include <cassert>
 #include <ctype.h>
-#include <vector>
 
 #include "StringUtils.h"
 
@@ -31,9 +30,7 @@
 #include "../lexilla/lexlib/StyleContext.h"
 #include "../lexilla/lexlib/CharacterSet.h"
 #include "../lexilla/lexlib/LexerModule.h"
-#include "../lexilla/lexlib/OptionSet.h"
 #include "../lexilla/lexlib/DefaultLexer.h"
-#include "../lexilla/lexlib/WordList.h"
 
 using namespace Scintilla;
 
