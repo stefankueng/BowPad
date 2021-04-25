@@ -98,7 +98,7 @@ class CSortDlg : public CDialog // No need to be ICommand connected as yet.
 {
 public:
     CSortDlg();
-    virtual ~CSortDlg();
+    ~CSortDlg() override;
 
 protected:
     LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -172,9 +172,6 @@ bool CCmdSort::Execute()
     // not to bother.
     if (!HasActiveDocument())
         return false; // Need a document.
-    bool bSelEmpty = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
-    if (bSelEmpty) // Need a non empty selection.
-        return false;
 
     // We only handle single selections or rectangular ones.
     bool isRectangular = ScintillaCall(SCI_SELECTIONISRECTANGLE) != 0;
@@ -200,11 +197,16 @@ bool CCmdSort::Execute()
             APPVERIFY(false); // Shouldn't happen.
     }
 
-    auto selStart       = ScintillaCall(SCI_GETSELECTIONSTART);
-    auto selEnd         = ScintillaCall(SCI_GETSELECTIONEND);
-    auto selEndOriginal = selEnd;
-    auto lineStart      = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-    auto lineEnd        = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    auto origSelStart = ScintillaCall(SCI_GETSELECTIONSTART);
+    auto origSelEnd   = ScintillaCall(SCI_GETSELECTIONEND);
+    bool bSelEmpty    = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
+    if (bSelEmpty)
+        ScintillaCall(SCI_SELECTALL);
+
+    auto selStart  = ScintillaCall(SCI_GETSELECTIONSTART);
+    auto selEnd    = ScintillaCall(SCI_GETSELECTIONEND);
+    auto lineStart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+    auto lineEnd   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
 
     auto lineCount = lineEnd - lineStart;
     if (lineCount <= 1)
@@ -277,7 +279,7 @@ bool CCmdSort::Execute()
             ScintillaCall(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(sSortedText.c_str()));
             // Put the selection back where it was so the user
             // can see still see what they sorted and possibly do more with it.
-            ScintillaCall(SCI_SETSEL, selStart, selEndOriginal);
+            ScintillaCall(SCI_SETSEL, origSelStart, origSelEnd);
             ScintillaCall(SCI_ENDUNDOACTION);
         }
     }
@@ -299,7 +301,9 @@ HRESULT CCmdSort::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROP
     // Enabled if there's something to go back to.
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_GETSELECTIONEMPTY) == 0), pPropVarNewValue);
+        bool isRectangular = ScintillaCall(SCI_SELECTIONISRECTANGLE) != 0;
+        // Don't handle multiple selections unless it's rectangular.
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_GETSELECTIONS) > 1 && !isRectangular) ? FALSE : TRUE, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
