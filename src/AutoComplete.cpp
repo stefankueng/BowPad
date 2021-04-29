@@ -299,7 +299,6 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                     auto colonPos = sText.find(':');
                     if (colonPos != std::string::npos)
                     {
-                        m_editor->Call(SCI_AUTOCCANCEL);
                         auto        sKey = sText.substr(0, colonPos);
                         std::string sSnippet;
                         {
@@ -315,6 +314,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                         }
                         if (!sSnippet.empty())
                         {
+                            m_editor->Call(SCI_AUTOCCANCEL);
                             auto autoBrace = CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1);
                             CIniSettings::Instance().SetInt64(L"View", L"autobrace", 0);
                             OnOutOfScope(CIniSettings::Instance().SetInt64(L"View", L"autobrace", autoBrace));
@@ -433,6 +433,10 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             }
                             m_editor->Call(SCI_ENDUNDOACTION);
                             MarkSnippetPositions(false);
+                        }
+                        else if (!PathFileExists(CUnicodeUtils::StdGetUnicode(sText).c_str()))
+                        {
+                            m_editor->Call(SCI_AUTOCCANCEL);
                         }
                     }
                 }
