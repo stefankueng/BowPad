@@ -75,7 +75,22 @@ static EOLFormat SenseEOLFormat(const char* data, DWORD len)
     return EOLFormat::Unknown_Format;
 }
 
-static void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data, EOLFormat& eolFormat)
+static void CheckForTabs(const char* data, DWORD len, TabSpace& tabSpace)
+{
+    if (tabSpace != TabSpace::Tabs)
+    {
+        for (DWORD i = 0; i < len; ++i)
+        {
+            if (data[i] == '\t')
+            {
+                tabSpace = TabSpace::Tabs;
+                break;
+            }
+        }
+    }
+}
+
+static void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
     // Nothing to convert, just pass it to Scintilla
@@ -86,13 +101,14 @@ static void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile
     }
     if (eolFormat == EOLFormat::Unknown_Format)
         eolFormat = SenseEOLFormat(pData, lenFile);
+    CheckForTabs(pData, lenFile, tabSpace);
     edit.AddData(pData, lenFile);
     if (bFirst && hasBOM)
         lenFile += 3;
 }
 
 static void loadSomeUtf16Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat)
+                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -104,13 +120,14 @@ static void loadSomeUtf16Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenF
     int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, lenFile / 2, charBuf, charBufSize, nullptr, nullptr);
     if (eolFormat == EOLFormat::Unknown_Format)
         eolFormat = SenseEOLFormat(charBuf, charLen);
+    CheckForTabs(charBuf, charLen, tabSpace);
     edit.AddData(charBuf, charLen);
     if (bFirst && hasBOM)
         lenFile += 2;
 }
 
 static void loadSomeUtf16Be(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat)
+                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -133,6 +150,7 @@ static void loadSomeUtf16Be(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenF
     int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, lenFile / 2, charBuf, charBufSize, nullptr, nullptr);
     if (eolFormat == EOLFormat::Unknown_Format)
         eolFormat = SenseEOLFormat(charBuf, charLen);
+    CheckForTabs(charBuf, charLen, tabSpace);
     edit.AddData(charBuf, charLen);
     if (bFirst && hasBOM)
         lenFile += 2;
@@ -152,7 +170,7 @@ static void loadSomeUtf32Be(DWORD lenFile, char* data)
 }
 
 static void loadSomeUtf32Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat)
+                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -188,13 +206,14 @@ static void loadSomeUtf32Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenF
     int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, nReadChars, charBuf, charBufSize, nullptr, nullptr);
     if (eolFormat == EOLFormat::Unknown_Format)
         eolFormat = SenseEOLFormat(charBuf, charLen);
+    CheckForTabs(charBuf, charLen, tabSpace);
     edit.AddData(charBuf, charLen);
     if (bFirst && hasBOM)
         lenFile += 4;
 }
 
 static void LoadSomeOther(ILoader& edit, int encoding, DWORD lenFile,
-                          int& incompleteMultiByteChar, char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat)
+                          int& incompleteMultiByteChar, char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     // For other encodings, ask system if there are any invalid characters; note that it will
     // not correctly know if the last character is cut when there are invalid characters inside the text
@@ -226,6 +245,7 @@ static void LoadSomeOther(ILoader& edit, int encoding, DWORD lenFile,
         int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, wideLen, charBuf, charBufSize, nullptr, nullptr);
         if (eolFormat == EOLFormat::Unknown_Format)
             eolFormat = SenseEOLFormat(charBuf, charLen);
+        CheckForTabs(charBuf, charLen, tabSpace);
         edit.AddData(charBuf, charLen);
     }
 }
@@ -493,23 +513,22 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
         {
             case -1:
             case CP_UTF8:
-                LoadSomeUtf8(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, doc.m_format);
+                LoadSomeUtf8(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, doc.m_format, doc.m_tabSpace);
                 break;
             case 1200: // UTF16_LE
-                loadSomeUtf16Le(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format);
+                loadSomeUtf16Le(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format, doc.m_tabSpace);
                 break;
             case 1201: // UTF16_BE
-                loadSomeUtf16Be(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format);
+                loadSomeUtf16Be(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format, doc.m_tabSpace);
                 break;
             case 12001:                           // UTF32_BE
                 loadSomeUtf32Be(lenFile, m_data); // Doesn't load, falls through to load.
-                // intentional fall-through
                 [[fallthrough]];
             case 12000: // UTF32_LE
-                loadSomeUtf32Le(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format);
+                loadSomeUtf32Le(edit, doc.m_bHasBOM, bFirst, lenFile, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format, doc.m_tabSpace);
                 break;
             default:
-                LoadSomeOther(edit, encoding, lenFile, incompleteMultiByteChar, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format);
+                LoadSomeOther(edit, encoding, lenFile, incompleteMultiByteChar, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format, doc.m_tabSpace);
                 break;
         }
 
