@@ -32,33 +32,35 @@
 #include <stdexcept>
 #include <Shobjidl.h>
 
-static CDocument g_emptyDoc;
+namespace
+{
+CDocument g_emptyDoc;
 
-static wchar_t WideCharSwap(wchar_t nValue)
+wchar_t WideCharSwap(wchar_t nValue)
 {
     return (((nValue >> 8)) | (nValue << 8));
 }
 
-static UINT64 WordSwapBytes(UINT64 nValue)
+UINT64 WordSwapBytes(UINT64 nValue)
 {
     return ((nValue & 0xff00ff00ff00ff) << 8) | ((nValue >> 8) & 0xff00ff00ff00ff); // swap BYTESs in WORDs
 }
 
-static UINT32 DwordSwapBytes(UINT32 nValue)
+UINT32 DwordSwapBytes(UINT32 nValue)
 {
     UINT32 nRet = (nValue << 16) | (nValue >> 16);                     // swap WORDs
     nRet        = ((nRet & 0xff00ff) << 8) | ((nRet >> 8) & 0xff00ff); // swap BYTESs in WORDs
     return nRet;
 }
 
-static UINT64 DwordSwapBytes(UINT64 nValue)
+UINT64 DwordSwapBytes(UINT64 nValue)
 {
     UINT64 nRet = ((nValue & 0xffff0000ffffL) << 16) | ((nValue >> 16) & 0xffff0000ffffL); // swap WORDs in DWORDs
     nRet        = ((nRet & 0xff00ff00ff00ff) << 8) | ((nRet >> 8) & 0xff00ff00ff00ff);     // swap BYTESs in WORDs
     return nRet;
 }
 
-static EOLFormat SenseEOLFormat(const char* data, DWORD len)
+EOLFormat SenseEOLFormat(const char* data, DWORD len)
 {
     for (size_t i = 0; i < len; i++)
     {
@@ -75,7 +77,7 @@ static EOLFormat SenseEOLFormat(const char* data, DWORD len)
     return EOLFormat::Unknown_Format;
 }
 
-static void CheckForTabs(const char* data, DWORD len, TabSpace& tabSpace)
+void CheckForTabs(const char* data, DWORD len, TabSpace& tabSpace)
 {
     if (tabSpace != TabSpace::Tabs)
     {
@@ -90,7 +92,7 @@ static void CheckForTabs(const char* data, DWORD len, TabSpace& tabSpace)
     }
 }
 
-static void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data, EOLFormat& eolFormat, TabSpace& tabSpace)
+void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
     // Nothing to convert, just pass it to Scintilla
@@ -107,8 +109,8 @@ static void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile
         lenFile += 3;
 }
 
-static void loadSomeUtf16Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
+void loadSomeUtf16Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+                     char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -126,8 +128,8 @@ static void loadSomeUtf16Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenF
         lenFile += 2;
 }
 
-static void loadSomeUtf16Be(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
+void loadSomeUtf16Be(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+                     char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -156,7 +158,7 @@ static void loadSomeUtf16Be(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenF
         lenFile += 2;
 }
 
-static void loadSomeUtf32Be(DWORD lenFile, char* data)
+void loadSomeUtf32Be(DWORD lenFile, char* data)
 {
     UINT64* p64     = reinterpret_cast<UINT64*>(data);
     int     nQWords = lenFile / 8;
@@ -169,8 +171,8 @@ static void loadSomeUtf32Be(DWORD lenFile, char* data)
         p32[nDword] = DwordSwapBytes(p32[nDword]);
 }
 
-static void loadSomeUtf32Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
-                            char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
+void loadSomeUtf32Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+                     char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
     if (bFirst && hasBOM)
@@ -212,8 +214,8 @@ static void loadSomeUtf32Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenF
         lenFile += 4;
 }
 
-static void LoadSomeOther(ILoader& edit, int encoding, DWORD lenFile,
-                          int& incompleteMultiByteChar, char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
+void LoadSomeOther(ILoader& edit, int encoding, DWORD lenFile,
+                   int& incompleteMultiByteChar, char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     // For other encodings, ask system if there are any invalid characters; note that it will
     // not correctly know if the last character is cut when there are invalid characters inside the text
@@ -250,7 +252,7 @@ static void LoadSomeOther(ILoader& edit, int encoding, DWORD lenFile,
     }
 }
 
-static bool AskToElevatePrivilege(HWND hWnd, const std::wstring& path, PCWSTR sElevate, PCWSTR sDontElevate)
+bool AskToElevatePrivilege(HWND hWnd, const std::wstring& path, PCWSTR sElevate, PCWSTR sDontElevate)
 {
     // access to the file is denied, and we're not running with elevated privileges
     // offer to start BowPad with elevated privileges and open the file in that instance
@@ -287,7 +289,7 @@ static bool AskToElevatePrivilege(HWND hWnd, const std::wstring& path, PCWSTR sE
     return bElevate;
 }
 
-static bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
+bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
 {
     // access to the file is denied, and we're not running with elevated privileges
     // offer to start BowPad with elevated privileges and open the file in that instance
@@ -296,7 +298,7 @@ static bool AskToElevatePrivilegeForOpening(HWND hWnd, const std::wstring& path)
     return AskToElevatePrivilege(hWnd, path, rElevate, rDontElevate);
 }
 
-static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params, bool wait)
+DWORD RunSelfElevated(HWND hWnd, const std::wstring& params, bool wait)
 {
     std::wstring     modPath    = CPathUtils::GetModulePath();
     SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
@@ -317,21 +319,21 @@ static DWORD RunSelfElevated(HWND hWnd, const std::wstring& params, bool wait)
     return 0;
 }
 
-static void ShowFileLoadError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg)
+void ShowFileLoadError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg)
 {
     ResString rTitle(g_hRes, IDS_APP_TITLE);
     ResString rLoadErr(g_hRes, IDS_FAILEDTOLOADFILE);
     MessageBox(hWnd, CStringUtils::Format(rLoadErr, fileName.c_str(), msg).c_str(), static_cast<LPCWSTR>(rTitle), MB_ICONERROR);
 }
 
-static void ShowFileSaveError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg)
+void ShowFileSaveError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg)
 {
     ResString rTitle(g_hRes, IDS_APP_TITLE);
     ResString rSaveErr(g_hRes, IDS_FAILEDTOSAVEFILE);
     MessageBox(hWnd, CStringUtils::Format(rSaveErr, fileName.c_str(), msg).c_str(), static_cast<LPCWSTR>(rTitle), MB_ICONERROR);
 }
 
-static void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
+void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
 {
     switch (doc.m_format)
     {
@@ -348,6 +350,7 @@ static void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
             break;
     }
 }
+} // namespace
 
 CDocumentManager::CDocumentManager()
     : m_scratchScintilla(g_hRes)
