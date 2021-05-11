@@ -1557,7 +1557,12 @@ void CFindReplaceDlg::DoReplace(int id)
                 if (bReplaceOnlyInSelection)
                     ScintillaCall(SCI_SETTARGETEND, selEnd);
                 else
-                    ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
+                {
+                    auto docLen = ScintillaCall(SCI_GETLENGTH);
+                    ScintillaCall(SCI_SETTARGETEND, docLen);
+                    if (docLen == targetEnd)
+                        break;
+                }
             }
         } while (id == IDC_REPLACEALLBTN && findRet >= 0);
         ScintillaCall(SCI_ENDUNDOACTION);
