@@ -207,6 +207,25 @@ std::wstring GetHomeFolder()
 
 }; // unnamed namespace
 
+void adjustFindString()
+{
+    if (g_searchFlags & SCFIND_REGEXP)
+    {
+        // replace all "\n" chars with "(?:\n|\r\n|\n\r)"
+        if ((g_findString.size() > 1) && (g_findString.find("\\r") == std::wstring::npos))
+        {
+            SearchReplace(g_findString, "\\n", "(?:\\n|\\r\\n|\\n\\r)");
+        }
+        if (g_findString.ends_with('$'))
+        {
+            // the MSVC regex engine when set to ECMAScript only matches range ends with $
+            // so replace it with (\n|\r\n|\n\r)
+            g_findString = g_findString.substr(0, g_findString.size() - 1);
+            g_findString += "(?:$|\\n|\\r\\n|\\n\\r)";
+        }
+    }
+}
+
 CFindReplaceDlg::CFindReplaceDlg(void* obj)
     : CBPBaseDialog()
     , ICommand(obj)
@@ -1481,14 +1500,7 @@ void CFindReplaceDlg::DoReplace(int id)
         SearchStringNotFound();
         return; // Empty search term, nothing to find.
     }
-    if (g_searchFlags & SCFIND_REGEXP)
-    {
-        // replace all "\n" chars with "(?:\n|\r\n|\n\r)"
-        if ((g_findString.size() > 1) && (g_findString.find("\\r") == std::wstring::npos))
-        {
-            SearchReplace(g_findString, "\\n", "(!:\\n|\\r\\n|\\n\\r)");
-        }
-    }
+    adjustFindString();
 
     std::string sReplaceString = CUnicodeUtils::StdGetUTF8(replaceText);
     if ((g_searchFlags & SCFIND_REGEXP) != 0)
@@ -1601,14 +1613,7 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
         return false;
     }
 
-    if (g_searchFlags & SCFIND_REGEXP)
-    {
-        // replace all "\n" chars with "(?:\n|\r\n|\n\r)"
-        if ((g_findString.size() > 1) && (g_findString.find("\\r") == std::wstring::npos))
-        {
-            SearchReplace(g_findString, "\\n", "(!:\\n|\\r\\n|\\n\\r)");
-        }
-    }
+    adjustFindString();
 
     Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
