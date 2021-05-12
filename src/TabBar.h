@@ -27,6 +27,7 @@
 #define TCN_REFRESH           (WM_USER + 6)
 #define TCN_GETCOLOR          (WM_USER + 7)
 #define TCN_GETDROPICON       (WM_USER + 8)
+#define TCN_RELOAD            (WM_USER + 9)
 
 const int SAVED_IMG_INDEX   = 0;
 const int UNSAVED_IMG_INDEX = 1;

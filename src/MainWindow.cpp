@@ -3999,6 +3999,14 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     editor->RestoreCurrentPos(docReload.m_position);
     editor->Call(SCI_SETREADONLY, docReload.m_bIsWriteProtected);
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, editor, doc, false);
+
+    TBHDR tbHdr    = {};
+    tbHdr.hdr.hwndFrom = *this;
+    tbHdr.hdr.code     = TCN_RELOAD;
+    tbHdr.hdr.idFrom   = tab;
+    tbHdr.tabOrigin    = tab;
+    CCommandHandler::Instance().TabNotify(&tbHdr);
+
     if (bReloadCurrentTab)
         UpdateStatusBar(true);
     UpdateTab(docID);
