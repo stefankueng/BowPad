@@ -223,7 +223,7 @@ void adjustFindString()
             // note: this can be removed once std::regex_constants::syntax_option_type::multiline
             // is implemented!
             g_findString = g_findString.substr(0, g_findString.size() - 1);
-            g_findString += "(?:$|\\n|\\r\\n|\\n\\r)";
+            g_findString += "(?=$|\\n|\\r\\n|\\n\\r)";
         }
     }
 }
