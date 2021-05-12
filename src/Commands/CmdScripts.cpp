@@ -30,10 +30,10 @@
 #include <gdiplus.h>
 #pragma warning(pop)
 
-CCmdScript::CCmdScript(void* obj)
+CCmdScript::CCmdScript(void* obj, const std::wstring& path)
     : ICommand(obj)
     , m_version(0)
-    , m_appObject(new BasicScriptObject(obj))
+    , m_appObject(new BasicScriptObject(obj, path))
     , m_host(nullptr)
     , m_cmdID(0)
     , m_image(nullptr)

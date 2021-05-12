@@ -422,7 +422,7 @@ void CCommandHandler::InsertPlugins(void* obj)
             {
                 try
                 {
-                    auto pScript = std::make_unique<CCmdScript>(obj);
+                    auto pScript = std::make_unique<CCmdScript>(obj, CPathUtils::GetParentDirectory(fileName));
                     if (pScript->Create(fileName))
                     {
                         try
@@ -448,8 +448,8 @@ void CCommandHandler::InsertPlugins(void* obj)
                         {
                         }
                         std::wstring sName = CPathUtils::GetParentDirectory(fileName);
-                        sName              = CPathUtils::GetFileName(sName);
-                        scripts[sName]     = std::move(pScript);
+                        sName          = CPathUtils::GetFileName(sName);
+                        scripts[sName] = std::move(pScript);
                     }
                 }
                 catch (const std::exception& e)

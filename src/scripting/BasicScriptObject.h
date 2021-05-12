@@ -35,7 +35,7 @@ class BasicScriptObject : public IDispatch
     , /* private */ ICommand
 {
 public:
-    BasicScriptObject(void* obj);
+    BasicScriptObject(void* obj, const std::wstring& path);
 
     virtual ~BasicScriptObject();
 
@@ -58,4 +58,5 @@ private:
     static bool ScintillaCommandsDispId(wchar_t* name, DISPID& id);
     HRESULT     ScintillaCommandInvoke(DISPID id, WORD flags, DISPPARAMS* args, VARIANT* ret) const;
     ULONG       m_refCount;
+    std::wstring m_path;
 };

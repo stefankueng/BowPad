@@ -24,7 +24,7 @@ class BasicScriptHost;
 class CCmdScript : public ICommand
 {
 public:
-    CCmdScript(void* obj);
+    CCmdScript(void* obj, const std::wstring& path);
     virtual ~CCmdScript();
 
     bool Create(const std::wstring& path);

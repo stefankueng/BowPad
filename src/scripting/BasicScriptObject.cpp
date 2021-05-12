@@ -760,9 +760,10 @@ static const ScintillaCmd g_scintillaCmd[] = {
     {L"SciSetKeyWords", SCI_SETKEYWORDS, SCI_SETKEYWORDS, VT_NULL, VT_INT, VT_BSTR},
 };
 
-BasicScriptObject::BasicScriptObject(void* obj)
+BasicScriptObject::BasicScriptObject(void* obj, const std::wstring& path)
     : ICommand(obj)
     , m_refCount(1)
+    , m_path(path)
 {
 }
 
@@ -928,6 +929,8 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID /*riid*/,
             idList[i] = 907;
         else if (_wcsicmp(nameList[i], L"AddLangAutoCompleteWords") == 0)
             idList[i] = 908;
+        else if (_wcsicmp(nameList[i], L"PluginPath") == 0)
+            idList[i] = 909;
         else if (ScintillaCommandsDispId(nameList[i], idList[i]))
             return S_OK;
         else
@@ -1469,6 +1472,14 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             for (const auto& word : vec)
                 words[CUnicodeUtils::StdGetUTF8(word)] = AutoCompleteType::Code;
             AddAutoCompleteWords(CUnicodeUtils::StdGetUTF8(p1.bstrVal), std::move(words));
+        }
+        break;
+        case 909: // PluginPath
+        {
+            if (args->cArgs != 0)
+                return DISP_E_BADPARAMCOUNT;
+            ret->vt      = VT_BSTR;
+            ret->bstrVal = _bstr_t(m_path.c_str()).Detach();
         }
         break;
         default:
