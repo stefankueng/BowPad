@@ -62,6 +62,8 @@ public:
 
     void OnLangChanged() override;
 
+    void OnStylesSet() override;
+
     int m_version;
 
 private:

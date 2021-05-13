@@ -999,6 +999,7 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
         Call(SCI_SETKEYWORDS, keyWordId - 1LL, reinterpret_cast<LPARAM>(keyWord.c_str()));
     }
     Call(SCI_SETLINEENDTYPESALLOWED, Call(SCI_GETLINEENDTYPESSUPPORTED));
+    CCommandHandler::Instance().OnStylesSet();
 }
 
 void CScintillaWnd::SetupDefaultStyles() const

@@ -56,6 +56,7 @@ public:
     virtual void    BeforeLoad();
     virtual void    AfterInit();
     virtual void    OnLangChanged();
+    virtual void    OnStylesSet();
     virtual void    OnThemeChanged(bool bDark);
     virtual void    OnDocumentClose(DocID id);
     virtual void    OnDocumentOpen(DocID id);

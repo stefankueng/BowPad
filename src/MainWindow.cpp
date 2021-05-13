@@ -1496,8 +1496,8 @@ bool CMainWindow::Initialize()
     {
         // first try ChangeWindowMessageFilterEx, if it's not available (i.e., running on Vista), then
         // try ChangeWindowMessageFilter.
-        using MESSAGEFILTERFUNCEX = BOOL(WINAPI * )(HWND hWnd, UINT message, DWORD action, VOID * pChangeFilterStruct);
-        MESSAGEFILTERFUNCEX func = reinterpret_cast<MESSAGEFILTERFUNCEX>(GetProcAddress(hDll, "ChangeWindowMessageFilterEx"));
+        using MESSAGEFILTERFUNCEX = BOOL(WINAPI*)(HWND hWnd, UINT message, DWORD action, VOID * pChangeFilterStruct);
+        MESSAGEFILTERFUNCEX func  = reinterpret_cast<MESSAGEFILTERFUNCEX>(GetProcAddress(hDll, "ChangeWindowMessageFilterEx"));
 
         constexpr UINT WM_COPYGLOBALDATA = 0x0049;
         if (func)
@@ -3220,6 +3220,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.SetTabSettings(doc.m_tabSpace);
     m_editor.SetReadDirection(doc.m_readDir);
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, true);
+    CCommandHandler::Instance().OnStylesSet();
     g_pFramework->InvalidateUICommand(cmdUseTabs, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     m_editor.MarkSelectedWord(true, false);
     m_editor.MarkBookmarksInScrollbar();
@@ -4000,12 +4001,13 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     editor->Call(SCI_SETREADONLY, docReload.m_bIsWriteProtected);
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, editor, doc, false);
 
-    TBHDR tbHdr    = {};
+    TBHDR tbHdr        = {};
     tbHdr.hdr.hwndFrom = *this;
     tbHdr.hdr.code     = TCN_RELOAD;
     tbHdr.hdr.idFrom   = tab;
     tbHdr.tabOrigin    = tab;
     CCommandHandler::Instance().TabNotify(&tbHdr);
+    CCommandHandler::Instance().OnStylesSet();
 
     if (bReloadCurrentTab)
         UpdateStatusBar(true);

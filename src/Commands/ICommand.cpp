@@ -91,6 +91,10 @@ void ICommand::OnLangChanged()
 {
 }
 
+void ICommand::OnStylesSet()
+{
+}
+
 void ICommand::TabActivateAt(int index) const
 {
     m_pMainWindow->m_tabBar.ActivateAt(index);

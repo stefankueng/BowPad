@@ -522,3 +522,15 @@ void CCmdScript::OnLangChanged()
     {
     }
 }
+
+void CCmdScript::OnStylesSet()
+{
+    DISPPARAMS dispParams = {nullptr};
+    try
+    {
+        m_host->CallFunction(L"OnStylesSet", dispParams);
+    }
+    catch (const std::exception&)
+    {
+    }
+}

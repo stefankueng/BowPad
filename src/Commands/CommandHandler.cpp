@@ -403,6 +403,19 @@ void CCommandHandler::OnLangChanged()
     }
 }
 
+void CCommandHandler::OnStylesSet()
+{
+    for (auto& [id, cmd] : m_commands)
+    {
+        cmd->OnStylesSet();
+    }
+    for (auto& [id, cmd] : m_noDeleteCommands)
+    {
+        if (cmd)
+            cmd->OnStylesSet();
+    }
+}
+
 void CCommandHandler::InsertPlugins(void* obj)
 {
     // scan the paths, find all plugin files, create a plugin object
@@ -448,8 +461,8 @@ void CCommandHandler::InsertPlugins(void* obj)
                         {
                         }
                         std::wstring sName = CPathUtils::GetParentDirectory(fileName);
-                        sName          = CPathUtils::GetFileName(sName);
-                        scripts[sName] = std::move(pScript);
+                        sName              = CPathUtils::GetFileName(sName);
+                        scripts[sName]     = std::move(pScript);
                     }
                 }
                 catch (const std::exception& e)

@@ -46,6 +46,7 @@ public:
     void        OnTimer(UINT timerId);
     void        OnThemeChanged(bool bDark);
     void        OnLangChanged();
+    void        OnStylesSet();
     const auto& GetPluginMap() const { return m_plugins; }
     int         GetPluginVersion(const std::wstring& name);
     void        AddCommand(ICommand* cmd);
