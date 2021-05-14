@@ -207,9 +207,9 @@ std::wstring GetHomeFolder()
 
 }; // unnamed namespace
 
-void adjustFindString()
+void adjustFindString(int searchFlags)
 {
-    if (g_searchFlags & SCFIND_REGEXP)
+    if (searchFlags & SCFIND_REGEXP)
     {
         // replace all "\n" chars with "(?:\n|\r\n|\n\r)"
         if ((g_findString.size() > 1) && (g_findString.find("\\r") == std::wstring::npos))
@@ -1421,6 +1421,8 @@ void CFindReplaceDlg::DoFindPrevious()
         return;
     }
 
+    adjustFindString(g_searchFlags);
+
     ttf.chrg.cpMin = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
     if (ttf.chrg.cpMin > 0)
         ttf.chrg.cpMin--;
@@ -1502,7 +1504,7 @@ void CFindReplaceDlg::DoReplace(int id)
         SearchStringNotFound();
         return; // Empty search term, nothing to find.
     }
-    adjustFindString();
+    adjustFindString(g_searchFlags);
 
     std::string sReplaceString = CUnicodeUtils::StdGetUTF8(replaceText);
     if ((g_searchFlags & SCFIND_REGEXP) != 0)
@@ -1620,7 +1622,7 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
         return false;
     }
 
-    adjustFindString();
+    adjustFindString(g_searchFlags);
 
     Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
@@ -1753,6 +1755,9 @@ void CFindReplaceDlg::DoSearchAll(int id)
     bool searchSubFolders = IsDlgButtonChecked(*this, IDC_SEARCHSUBFOLDERS) == BST_CHECKED;
     if (searchSubFolders)
         exSearchFlags |= SF_SEARCHSUBFOLDERS;
+
+    adjustFindString(searchFlags);
+    searchFor = g_findString;
 
     if (id == IDC_FINDFILES)
         m_resultsType = ResultsType::FileNames;
