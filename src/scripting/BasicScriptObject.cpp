@@ -20,6 +20,7 @@
 #include "ClipboardHelper.h"
 #include "OnOutOfScope.h"
 #include "StringUtils.h"
+#include "../../ext/sktoolslib/PathUtils.h"
 
 static auto CF_HTML = RegisterClipboardFormat(L"HTML Format");
 
@@ -931,6 +932,10 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID /*riid*/,
             idList[i] = 908;
         else if (_wcsicmp(nameList[i], L"PluginPath") == 0)
             idList[i] = 909;
+        else if (_wcsicmp(nameList[i], L"ReadSetting") == 0)
+            idList[i] = 910;
+        else if (_wcsicmp(nameList[i], L"SaveSetting") == 0)
+            idList[i] = 911;
         else if (ScintillaCommandsDispId(nameList[i], idList[i]))
             return S_OK;
         else
@@ -1480,6 +1485,28 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                 return DISP_E_BADPARAMCOUNT;
             ret->vt      = VT_BSTR;
             ret->bstrVal = _bstr_t(m_path.c_str()).Detach();
+        }
+        break;
+        case 910: // ReadSetting
+        {
+            if (args->cArgs != 1)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
+                return DISP_E_TYPEMISMATCH;
+            auto val     = CIniSettings::Instance().GetString(CPathUtils::GetFileName(m_path).c_str(), p1.bstrVal, L"");
+            ret->vt      = VT_BSTR;
+            ret->bstrVal = _bstr_t(val).Detach();
+        }
+        break;
+        case 911: // SaveSetting
+        {
+            if (args->cArgs != 2)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p2, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
+                return DISP_E_TYPEMISMATCH;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[1], VARIANT_ALPHABOOL, VT_BSTR)))
+                return DISP_E_TYPEMISMATCH;
+            CIniSettings::Instance().SetString(CPathUtils::GetFileName(m_path).c_str(), p1.bstrVal, p2.bstrVal);
         }
         break;
         default:
