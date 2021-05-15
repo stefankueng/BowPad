@@ -401,8 +401,9 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             m_snippetPositions[fullSnippetPosId].push_back(m_editor->Call(SCI_GETCURRENTPOS));
                             if (m_snippetPositions.find(0) == m_snippetPositions.end())
                             {
-                                m_snippetPositions[0].push_back(-1);
-                                m_snippetPositions[0].push_back(-1);
+                                auto pos0 = m_editor->Call(SCI_GETCURRENTPOS);
+                                m_snippetPositions[0].push_back(pos0);
+                                m_snippetPositions[0].push_back(pos0);
                             }
                             if (m_snippetPositions.size() > 2)
                             {
