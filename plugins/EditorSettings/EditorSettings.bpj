@@ -15,27 +15,27 @@ var def = {
 // overriding settings for specifc programming languages
 var settings = {
     "Log": { wrapMode: 0, tabWidth: 8 },
-    "BowPadPlugin": { useTab: false, indent: 8 },
+    "BowPadPlugin": { useTab: false },
     "JavaScript": { useTab: false },
     "C Sharp": { useTab: false },
     "Java": { useTab: false },
     "Text": { tabWidth: 8 },
-    "Html": { tabWidth: 2, indent: 4 },
-    "Xaml": { tabWidth: 2, indent: 4 },
-    "Xml": { tabWidth: 2, indent: 4 }
+    "Html": { tabWidth: 2 },
+    "Xaml": { tabWidth: 2 },
+    "Xml": { tabWidth: 2 }
 };
 
 // DO NOT MODIFY FOLLOWING CODE UNLESS YOU KNOW WHAT YOU ARE DOING
 // ============================
+var docSettings = {}; // temporary settings for opened documents
 
 // returns the version of the plugin
 // this callback is not optional! If you fail to implement this, the plugin
 // config dialog won't work properly with your plugin
 function Version() { return 100; }
 
-function overrideSettings() {
-    var lexer = BowPad.GetCurrentLanguage();
-    var s = settings[lexer];
+function overrideSettings(docID) {
+    var s = typeof(docID) === "undefined" ? settings[BowPad.GetCurrentLanguage()] : docSettings[docID];
     if (s == null) {
         s = def;
     }
@@ -75,7 +75,33 @@ function AfterInit(index) {
 // notification about tabs
 function TabNotify(code, tabOrigin)
 {
-    if (code === -551 || code === 0x0409) {
-        overrideSettings();
+    switch (code) {
+        case -552:
+            var s = {
+                wrapMode: BowPad.SciGetWrapMode(),
+                tabWidth: BowPad.SciGetTabWidth(),
+                useTab: BowPad.SciGetUseTabs(),
+                caretWidth: BowPad.SciGetCaretWidth(),
+                caretFore: BowPad.SciGetCaretFore(),
+                caretLineBack: BowPad.SciGetCaretLineBack(),
+                caretLineFrame: BowPad.SciGetCaretLineFrame(),
+                viewWhitespace: BowPad.SciGetViewWs(),
+                indent: BowPad.SciGetIndent()
+            }
+			docSettings[BowPad.GetDocIdOfCurrentTab()] = s;
+            break;
+        case -551:
+        case 0x0409:
+            overrideSettings(BowPad.GetDocIdOfCurrentTab());
+            break;
     }
 }
+
+function OnDocumentClose(index) {
+    delete docSettings[BowPad.GetDocIDFromTabIndex(index)];
+}
+
+// called after styles are set, so the plugin can set its own
+//function OnStylesSet()
+//{
+//}
