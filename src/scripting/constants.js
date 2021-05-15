@@ -10,5 +10,4 @@ var TCN_TABDELETE         = 0x403 // a tab was deleted
 var TCN_ORDERCHANGED      = 0x405 // the tab order was changed
 var TCN_REFRESH           = 0x406 // tab is refreshed/reloaded
 var TCN_GETCOLOR          = 0x407 // BP asks for the tab color
-
-
+var TCN_RELOAD            = 0x409 // BP reloads an externally modified file
