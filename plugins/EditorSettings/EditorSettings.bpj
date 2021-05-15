@@ -12,7 +12,7 @@ var def = {
     caretLineFrame: 2, // 0: disable framed style caret line, use caretLineBack as background; >0: frame width
     viewWhitespace: 0 // 0: whitespace invisible; 1: dot & arrows; 2: visible after indent; 3: only in indent
 };
-// overriding settings for specifc programming languages
+// overriding settings for specific programming languages
 var settings = {
     "Log": { wrapMode: 0, tabWidth: 8 },
     "BowPadPlugin": { useTab: false },
@@ -50,6 +50,20 @@ function overrideSettings(docID) {
     BowPad.SciSetIndent(typeof(s.indent) === "undefined" ? def.indent : s.indent);
 }
 
+function getSettings() {
+    return {
+        wrapMode: BowPad.SciGetWrapMode(),
+        tabWidth: BowPad.SciGetTabWidth(),
+        useTab: BowPad.SciGetUseTabs(),
+        caretWidth: BowPad.SciGetCaretWidth(),
+        caretFore: BowPad.SciGetCaretFore(),
+        caretLineBack: BowPad.SciGetCaretLineBack(),
+        caretLineFrame: BowPad.SciGetCaretLineFrame(),
+        viewWhitespace: BowPad.SciGetViewWs(),
+        indent: BowPad.SciGetIndent()
+    };
+}
+
 // this is the main function that gets executed when the command is run, i.e.
 // the button is clicked
 function Execute()
@@ -68,7 +82,7 @@ function IsEnabled() { return true; }
 function IsChecked() { return false; }
 
 // called after a document was initialized
-function AfterInit(index) {
+function OnDocumentOpen(index) {
     overrideSettings();
 }
 
@@ -77,18 +91,7 @@ function TabNotify(code, tabOrigin)
 {
     switch (code) {
         case -552:
-            var s = {
-                wrapMode: BowPad.SciGetWrapMode(),
-                tabWidth: BowPad.SciGetTabWidth(),
-                useTab: BowPad.SciGetUseTabs(),
-                caretWidth: BowPad.SciGetCaretWidth(),
-                caretFore: BowPad.SciGetCaretFore(),
-                caretLineBack: BowPad.SciGetCaretLineBack(),
-                caretLineFrame: BowPad.SciGetCaretLineFrame(),
-                viewWhitespace: BowPad.SciGetViewWs(),
-                indent: BowPad.SciGetIndent()
-            }
-			docSettings[BowPad.GetDocIdOfCurrentTab()] = s;
+            docSettings[BowPad.GetDocIdOfCurrentTab()] = getSettings();
             break;
         case -551:
         case 0x0409:
