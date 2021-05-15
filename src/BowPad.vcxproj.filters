@@ -832,6 +832,9 @@
     </None>
     <None Include="res\Shortcuts-internal.ini" />
     <None Include="res\AutoComplete.ini" />
+    <None Include="scripting\constants.js">
+      <Filter>Scripting</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="compatibility.manifest">

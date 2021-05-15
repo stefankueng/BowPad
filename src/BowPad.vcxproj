@@ -629,6 +629,7 @@
     <None Include="res\Properties.ini" />
     <None Include="res\Shortcuts-internal.ini" />
     <None Include="res\Shortcuts.ini" />
+    <None Include="scripting\constants.js" />
     <None Include="version.in" />
   </ItemGroup>
   <ItemGroup>
