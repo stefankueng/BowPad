@@ -1734,7 +1734,12 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         title += fileName;
         // Do not change doc.m_path until the user determines to save
         if (doc.m_path.empty())
-            filePath = fileName;
+        {
+            if (m_fileTree.GetPath().empty())
+                filePath = fileName;
+            else
+                filePath = m_fileTree.GetPath() + L"\\" + fileName;
+        }
         else
             filePath = doc.m_path;
 
