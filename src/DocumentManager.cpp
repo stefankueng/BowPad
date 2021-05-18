@@ -478,8 +478,10 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     m_scratchScintilla.Call(SCI_SETUNDOCOLLECTION, 0);
     m_scratchScintilla.Call(SCI_CLEARALL);
     m_scratchScintilla.Call(SCI_SETCODEPAGE, CP_UTF8);
-
-    ILoader* pdocLoad = reinterpret_cast<ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, static_cast<int>(bufferSizeRequested)));
+    int docOptions = SC_DOCUMENTOPTION_DEFAULT;
+    if (bufferSizeRequested > INT_MAX)
+        docOptions = SC_DOCUMENTOPTION_TEXT_LARGE | SC_DOCUMENTOPTION_STYLES_NONE;
+    ILoader* pdocLoad = reinterpret_cast<ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, static_cast<uptr_t>(bufferSizeRequested), docOptions));
     if (pdocLoad == nullptr)
     {
         ShowFileLoadError(hWnd, path,
