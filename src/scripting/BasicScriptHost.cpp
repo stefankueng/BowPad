@@ -247,7 +247,8 @@ HRESULT BasicScriptHost::OnScriptError(IActiveScriptError* err)
 }
 
 _variant_t BasicScriptHost::CallFunction(const std::wstring&              strFunc,
-                                         const std::vector<std::wstring>& paramArray)
+                                         const std::vector<std::wstring>& paramArray,
+                                         bool                             doThrow)
 {
     // Putting parameters
     DISPPARAMS dispParams = {nullptr};
@@ -265,7 +266,7 @@ _variant_t BasicScriptHost::CallFunction(const std::wstring&              strFun
         dispParams.rgvarg[i].vt      = VT_BSTR;
     }
 
-    _variant_t vaResult = CallFunction(strFunc, dispParams);
+    _variant_t vaResult = CallFunction(strFunc, dispParams, doThrow);
 
     for (int i = 0; i < arraySize; i++)
     {
@@ -275,7 +276,7 @@ _variant_t BasicScriptHost::CallFunction(const std::wstring&              strFun
     return vaResult;
 }
 
-_variant_t BasicScriptHost::CallFunction(const std::wstring& strFunc, DISPPARAMS& params)
+_variant_t BasicScriptHost::CallFunction(const std::wstring& strFunc, DISPPARAMS& params, bool doThrow)
 {
     IDispatchPtr scriptDispatch;
     m_scriptEngine->GetScriptDispatch(nullptr, &scriptDispatch);
@@ -286,7 +287,9 @@ _variant_t BasicScriptHost::CallFunction(const std::wstring& strFunc, DISPPARAMS
     HRESULT hr = scriptDispatch->GetIDsOfNames(IID_NULL, &bstrMember.GetBSTR(), 1, LOCALE_SYSTEM_DEFAULT, &dispId);
     if (FAILED(hr))
     {
-        throw std::runtime_error("Unable to get id of function");
+        if (doThrow)
+            throw std::runtime_error("Unable to get id of function");
+        return {};
     }
     // Call JavaScript function
     EXCEPINFO  excepInfo = {0};
@@ -302,7 +305,7 @@ _variant_t BasicScriptHost::CallFunction(const std::wstring& strFunc, DISPPARAMS
                                 &excepInfo,
                                 &nArgErr);
 
-    if (FAILED(hr))
+    if (FAILED(hr) && doThrow)
     {
         throw std::runtime_error("Unable to get invoke function");
     }

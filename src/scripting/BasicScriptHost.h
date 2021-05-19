@@ -55,8 +55,8 @@ public:
     virtual HRESULT Run();
     virtual HRESULT Terminate();
 
-    virtual _variant_t CallFunction(const std::wstring& strFunc, const std::vector<std::wstring>& paramArray);
-    virtual _variant_t CallFunction(const std::wstring& strFunc, DISPPARAMS& params);
+    virtual _variant_t CallFunction(const std::wstring& strFunc, const std::vector<std::wstring>& paramArray, bool doThrow = true);
+    virtual _variant_t CallFunction(const std::wstring& strFunc, DISPPARAMS& params, bool doThrow = true);
 
     std::wstring m_path;
     HWND         m_hWnd;
