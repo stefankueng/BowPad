@@ -913,30 +913,32 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID /*riid*/,
             idList[i] = 134;
         else if (_wcsicmp(nameList[i], L"GetCurrentLanguage") == 0)
             idList[i] = 135;
+        else if (_wcsicmp(nameList[i], L"SetClipboardData") == 0)
+            idList[i] = 136;
+        else if (_wcsicmp(nameList[i], L"GetClipboardText") == 0)
+            idList[i] = 137;
+        else if (_wcsicmp(nameList[i], L"GetClipboardHtml") == 0)
+            idList[i] = 138;
+        else if (_wcsicmp(nameList[i], L"GetKeyState") == 0)
+            idList[i] = 139;
+        else if (_wcsicmp(nameList[i], L"AddDocAutoCompleteWords") == 0)
+            idList[i] = 140;
+        else if (_wcsicmp(nameList[i], L"AddLangAutoCompleteWords") == 0)
+            idList[i] = 141;
+        else if (_wcsicmp(nameList[i], L"PluginPath") == 0)
+            idList[i] = 142;
+        else if (_wcsicmp(nameList[i], L"ReadSetting") == 0)
+            idList[i] = 143;
+        else if (_wcsicmp(nameList[i], L"SaveSetting") == 0)
+            idList[i] = 144;
+        else if (_wcsicmp(nameList[i], L"InvalidateCommand") == 0)
+            idList[i] = 145;
         else if (_wcsicmp(nameList[i], L"SciGetTextRange") == 0)
             idList[i] = 900;
         else if (_wcsicmp(nameList[i], L"SciGetCharAt") == 0)
             idList[i] = 901;
         else if (_wcsicmp(nameList[i], L"SciFindText") == 0)
             idList[i] = 902;
-        else if (_wcsicmp(nameList[i], L"SetClipboardData") == 0)
-            idList[i] = 903;
-        else if (_wcsicmp(nameList[i], L"GetClipboardText") == 0)
-            idList[i] = 904;
-        else if (_wcsicmp(nameList[i], L"GetClipboardHtml") == 0)
-            idList[i] = 905;
-        else if (_wcsicmp(nameList[i], L"GetKeyState") == 0)
-            idList[i] = 906;
-        else if (_wcsicmp(nameList[i], L"AddDocAutoCompleteWords") == 0)
-            idList[i] = 907;
-        else if (_wcsicmp(nameList[i], L"AddLangAutoCompleteWords") == 0)
-            idList[i] = 908;
-        else if (_wcsicmp(nameList[i], L"PluginPath") == 0)
-            idList[i] = 909;
-        else if (_wcsicmp(nameList[i], L"ReadSetting") == 0)
-            idList[i] = 910;
-        else if (_wcsicmp(nameList[i], L"SaveSetting") == 0)
-            idList[i] = 911;
         else if (ScintillaCommandsDispId(nameList[i], idList[i]))
             return S_OK;
         else
@@ -1259,68 +1261,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             ret->vt      = VT_BSTR;
             ret->bstrVal = _bstr_t(GetCurrentLanguage().c_str()).Detach();
             break;
-        case 900: // SciGetTextRange
-            if (args->cArgs != 2)
-                return DISP_E_BADPARAMCOUNT;
-            if (FAILED(VariantChangeType(&p1, &args->rgvarg[1], VARIANT_ALPHABOOL, VT_INT)))
-                return DISP_E_TYPEMISMATCH;
-            if (FAILED(VariantChangeType(&p2, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
-                return DISP_E_TYPEMISMATCH;
-            ret->vt      = VT_BSTR;
-            ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(GetTextRange(p1.intVal, p2.intVal)).c_str()).Detach();
-            break;
-        case 901: // SciGetCharAt
-        {
-            if (args->cArgs != 1)
-                return DISP_E_BADPARAMCOUNT;
-            if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
-                return DISP_E_TYPEMISMATCH;
-            char cbuf[3] = {0};
-            cbuf[0]      = static_cast<char>(ScintillaCall(SCI_GETCHARAT, p1.intVal));
-            ret->vt      = VT_BSTR;
-            ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(cbuf).c_str()).Detach();
-        }
-        break;
-        case 902: // SciFindText
-        {
-            if (args->cArgs != 4)
-                return DISP_E_BADPARAMCOUNT;
-            if (FAILED(VariantChangeType(&p1, &args->rgvarg[3], VARIANT_ALPHABOOL, VT_INT)))
-                return DISP_E_TYPEMISMATCH;
-            if (FAILED(VariantChangeType(&p2, &args->rgvarg[2], VARIANT_ALPHABOOL, VT_INT)))
-                return DISP_E_TYPEMISMATCH;
-            if (FAILED(VariantChangeType(&p3, &args->rgvarg[1], VARIANT_ALPHABOOL, VT_INT)))
-                return DISP_E_TYPEMISMATCH;
-            if (FAILED(VariantChangeType(&p4, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
-                return DISP_E_TYPEMISMATCH;
-            Sci_TextToFind ttf = {0};
-            ttf.chrg.cpMin     = p2.intVal;
-            ttf.chrg.cpMax     = p3.intVal;
-            std::string sText  = CUnicodeUtils::StdGetUTF8(p4.bstrVal);
-            ttf.lpstrText      = sText.c_str();
-            auto sret          = ScintillaCall(SCI_FINDTEXT, p1.intVal, reinterpret_cast<sptr_t>(&ttf));
-
-            SAFEARRAYBOUND sabounds{};
-            sabounds.lLbound   = 0;
-            sabounds.cElements = 2;
-            SAFEARRAY* psArray = SafeArrayCreate(VT_VARIANT, 1, &sabounds);
-
-            if (psArray != nullptr)
-            {
-                VARIANT* pInteger = nullptr;
-                SafeArrayAccessData(psArray, reinterpret_cast<void**>(&pInteger));
-                pInteger[0].intVal = sret >= 0 ? ttf.chrgText.cpMin : -1;
-                pInteger[0].vt     = VT_INT;
-                pInteger[1].intVal = sret >= 0 ? ttf.chrgText.cpMax : -1;
-                pInteger[1].vt     = VT_INT;
-                SafeArrayUnaccessData(psArray);
-
-                ret->vt     = VT_ARRAY | VT_VARIANT;
-                ret->parray = psArray;
-            }
-        }
-        break;
-        case 903: // SetClipboardData
+        case 136: // SetClipboardData
         {
             if (args->cArgs != 2)
                 return DISP_E_BADPARAMCOUNT;
@@ -1388,7 +1329,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             }
         }
         break;
-        case 904: // GetClipboardText
+        case 137: // GetClipboardText
         {
             if (args->cArgs != 0)
                 return DISP_E_BADPARAMCOUNT;
@@ -1413,7 +1354,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             ret->bstrVal = _bstr_t(L"").Detach();
         }
         break;
-        case 905: // GetClipboardHtml
+        case 138: // GetClipboardHtml
         {
             if (args->cArgs != 0)
                 return DISP_E_BADPARAMCOUNT;
@@ -1438,7 +1379,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             ret->bstrVal = _bstr_t(L"").Detach();
         }
         break;
-        case 906: // GetKeyState
+        case 139: // GetKeyState
         {
             if (args->cArgs != 1)
                 return DISP_E_BADPARAMCOUNT;
@@ -1448,7 +1389,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             ret->boolVal = (GetKeyState(p1.intVal) & 0x8000) != 0 ? VARIANT_TRUE : VARIANT_FALSE;
         }
         break;
-        case 907: // AddDocAutoCompleteWords
+        case 140: // AddDocAutoCompleteWords
         {
             if (args->cArgs != 2)
                 return DISP_E_BADPARAMCOUNT;
@@ -1464,7 +1405,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             AddAutoCompleteWords(DocID(p1.intVal), std::move(words));
         }
         break;
-        case 908: // AddLangAutoCompleteWords
+        case 141: // AddLangAutoCompleteWords
         {
             if (args->cArgs != 2)
                 return DISP_E_BADPARAMCOUNT;
@@ -1480,7 +1421,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             AddAutoCompleteWords(CUnicodeUtils::StdGetUTF8(p1.bstrVal), std::move(words));
         }
         break;
-        case 909: // PluginPath
+        case 142: // PluginPath
         {
             if (args->cArgs != 0)
                 return DISP_E_BADPARAMCOUNT;
@@ -1488,7 +1429,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             ret->bstrVal = _bstr_t(m_path.c_str()).Detach();
         }
         break;
-        case 910: // ReadSetting
+        case 143: // ReadSetting
         {
             if (args->cArgs != 1)
                 return DISP_E_BADPARAMCOUNT;
@@ -1499,7 +1440,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             ret->bstrVal = _bstr_t(val).Detach();
         }
         break;
-        case 911: // SaveSetting
+        case 144: // SaveSetting
         {
             if (args->cArgs != 2)
                 return DISP_E_BADPARAMCOUNT;
@@ -1508,6 +1449,77 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[1], VARIANT_ALPHABOOL, VT_BSTR)))
                 return DISP_E_TYPEMISMATCH;
             CIniSettings::Instance().SetString(CPathUtils::GetFileName(m_path).c_str(), p1.bstrVal, p2.bstrVal);
+        }
+        break;
+        case 145: // InvalidateCommand
+            if (args->cArgs != 1)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
+                return DISP_E_TYPEMISMATCH;
+            InvalidateUICommand(p1.intVal, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+            InvalidateUICommand(p1.intVal, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
+            InvalidateUICommand(p1.intVal, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
+            InvalidateUICommand(p1.intVal, UI_INVALIDATIONS_STATE, nullptr);
+            break;
+        case 900: // SciGetTextRange
+            if (args->cArgs != 2)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[1], VARIANT_ALPHABOOL, VT_INT)))
+                return DISP_E_TYPEMISMATCH;
+            if (FAILED(VariantChangeType(&p2, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
+                return DISP_E_TYPEMISMATCH;
+            ret->vt      = VT_BSTR;
+            ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(GetTextRange(p1.intVal, p2.intVal)).c_str()).Detach();
+            break;
+        case 901: // SciGetCharAt
+        {
+            if (args->cArgs != 1)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
+                return DISP_E_TYPEMISMATCH;
+            char cbuf[3] = {0};
+            cbuf[0]      = static_cast<char>(ScintillaCall(SCI_GETCHARAT, p1.intVal));
+            ret->vt      = VT_BSTR;
+            ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(cbuf).c_str()).Detach();
+        }
+        break;
+        case 902: // SciFindText
+        {
+            if (args->cArgs != 4)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[3], VARIANT_ALPHABOOL, VT_INT)))
+                return DISP_E_TYPEMISMATCH;
+            if (FAILED(VariantChangeType(&p2, &args->rgvarg[2], VARIANT_ALPHABOOL, VT_INT)))
+                return DISP_E_TYPEMISMATCH;
+            if (FAILED(VariantChangeType(&p3, &args->rgvarg[1], VARIANT_ALPHABOOL, VT_INT)))
+                return DISP_E_TYPEMISMATCH;
+            if (FAILED(VariantChangeType(&p4, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_BSTR)))
+                return DISP_E_TYPEMISMATCH;
+            Sci_TextToFind ttf = {0};
+            ttf.chrg.cpMin     = p2.intVal;
+            ttf.chrg.cpMax     = p3.intVal;
+            std::string sText  = CUnicodeUtils::StdGetUTF8(p4.bstrVal);
+            ttf.lpstrText      = sText.c_str();
+            auto sret          = ScintillaCall(SCI_FINDTEXT, p1.intVal, reinterpret_cast<sptr_t>(&ttf));
+
+            SAFEARRAYBOUND sabounds{};
+            sabounds.lLbound   = 0;
+            sabounds.cElements = 2;
+            SAFEARRAY* psArray = SafeArrayCreate(VT_VARIANT, 1, &sabounds);
+
+            if (psArray != nullptr)
+            {
+                VARIANT* pInteger = nullptr;
+                SafeArrayAccessData(psArray, reinterpret_cast<void**>(&pInteger));
+                pInteger[0].intVal = sret >= 0 ? ttf.chrgText.cpMin : -1;
+                pInteger[0].vt     = VT_INT;
+                pInteger[1].intVal = sret >= 0 ? ttf.chrgText.cpMax : -1;
+                pInteger[1].vt     = VT_INT;
+                SafeArrayUnaccessData(psArray);
+
+                ret->vt     = VT_ARRAY | VT_VARIANT;
+                ret->parray = psArray;
+            }
         }
         break;
         default:

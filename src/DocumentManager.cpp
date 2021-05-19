@@ -103,7 +103,8 @@ void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char*
     }
     if (eolFormat == EOLFormat::Unknown_Format)
         eolFormat = SenseEOLFormat(pData, lenFile);
-    CheckForTabs(pData, lenFile, tabSpace);
+    if (tabSpace != TabSpace::Tabs)
+        CheckForTabs(pData, lenFile, tabSpace);
     edit.AddData(pData, lenFile);
     if (bFirst && hasBOM)
         lenFile += 3;
@@ -122,7 +123,8 @@ void loadSomeUtf16Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
     int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, lenFile / 2, charBuf, charBufSize, nullptr, nullptr);
     if (eolFormat == EOLFormat::Unknown_Format)
         eolFormat = SenseEOLFormat(charBuf, charLen);
-    CheckForTabs(charBuf, charLen, tabSpace);
+    if (tabSpace != TabSpace::Tabs)
+        CheckForTabs(charBuf, charLen, tabSpace);
     edit.AddData(charBuf, charLen);
     if (bFirst && hasBOM)
         lenFile += 2;
@@ -152,7 +154,8 @@ void loadSomeUtf16Be(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
     int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, lenFile / 2, charBuf, charBufSize, nullptr, nullptr);
     if (eolFormat == EOLFormat::Unknown_Format)
         eolFormat = SenseEOLFormat(charBuf, charLen);
-    CheckForTabs(charBuf, charLen, tabSpace);
+    if (tabSpace != TabSpace::Tabs)
+        CheckForTabs(charBuf, charLen, tabSpace);
     edit.AddData(charBuf, charLen);
     if (bFirst && hasBOM)
         lenFile += 2;
@@ -208,7 +211,8 @@ void loadSomeUtf32Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
     int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, nReadChars, charBuf, charBufSize, nullptr, nullptr);
     if (eolFormat == EOLFormat::Unknown_Format)
         eolFormat = SenseEOLFormat(charBuf, charLen);
-    CheckForTabs(charBuf, charLen, tabSpace);
+    if (tabSpace != TabSpace::Tabs)
+        CheckForTabs(charBuf, charLen, tabSpace);
     edit.AddData(charBuf, charLen);
     if (bFirst && hasBOM)
         lenFile += 4;
@@ -247,7 +251,8 @@ void LoadSomeOther(ILoader& edit, int encoding, DWORD lenFile,
         int charLen = WideCharToMultiByte(CP_UTF8, 0, wideBuf, wideLen, charBuf, charBufSize, nullptr, nullptr);
         if (eolFormat == EOLFormat::Unknown_Format)
             eolFormat = SenseEOLFormat(charBuf, charLen);
-        CheckForTabs(charBuf, charLen, tabSpace);
+        if (tabSpace != TabSpace::Tabs)
+            CheckForTabs(charBuf, charLen, tabSpace);
         edit.AddData(charBuf, charLen);
     }
 }
