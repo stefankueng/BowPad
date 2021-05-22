@@ -986,7 +986,7 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmHdr, WPARAM /*wParam*/, L
     return 0;
 }
 
-void CMainWindow::ShowTablistDropdown(HWND hWnd)
+void CMainWindow::ShowTablistDropdown(HWND hWnd, int offsetX, int offsetY)
 {
     if (hWnd)
     {
@@ -1033,7 +1033,7 @@ void CMainWindow::ShowTablistDropdown(HWND hWnd)
             TPMPARAMS tpm{};
             tpm.cbSize    = sizeof(TPMPARAMS);
             tpm.rcExclude = rc;
-            auto tab      = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL, rc.left, rc.bottom, *this, &tpm);
+            auto tab      = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL, rc.left + offsetX, rc.bottom + offsetY, *this, &tpm);
             if (tab > 0)
             {
                 --tab;
@@ -1234,6 +1234,21 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
 {
     switch (wParam)
     {
+        case WM_LBUTTONUP:
+        {
+            switch (lParam)
+            {
+                case STATUSBAR_TABS:
+                {
+                    auto  pos = GetMessagePos();
+                    POINT pt  = {GET_X_LPARAM(pos), GET_Y_LPARAM(pos)};
+                    ScreenToClient(m_statusBar, &pt);
+                    ShowTablistDropdown(m_statusBar, pt.x, pt.y);
+                }
+                break;
+            }
+        }
+        break;
         case WM_CONTEXTMENU:
         {
             switch (lParam)
@@ -1399,7 +1414,7 @@ LRESULT CMainWindow::DoCommand(WPARAM wParam, LPARAM lParam)
             PasteHistory();
             break;
         case cmdTabListDropdownMenu:
-            ShowTablistDropdown(reinterpret_cast<HWND>(lParam));
+            ShowTablistDropdown(reinterpret_cast<HWND>(lParam), 0, 0);
             break;
         case cmdAbout:
             About();

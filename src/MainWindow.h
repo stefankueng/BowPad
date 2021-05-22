@@ -191,7 +191,7 @@ private:
     LRESULT     HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
     LRESULT     HandleFileTreeEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
     LRESULT     HandleTabBarEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
-    void        ShowTablistDropdown(HWND hWnd);
+    void        ShowTablistDropdown(HWND hWnd, int offsetX, int offsetY);
     int         GetZoomPC() const;
     void        SetZoomPC(int zoomPC) const;
     COLORREF    GetColorForDocument(DocID id);
