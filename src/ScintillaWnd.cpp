@@ -797,7 +797,7 @@ void CScintillaWnd::UpdateLineNumberWidth() const
         }
         i = max(i, 3);
         {
-            int pixelWidth = static_cast<int>(8 + i * Call(SCI_TEXTWIDTH, STYLE_LINENUMBER, reinterpret_cast<LPARAM>("8")));
+            int pixelWidth = static_cast<int>(CDPIAware::Instance().Scale(*this, 8) + i * Call(SCI_TEXTWIDTH, STYLE_LINENUMBER, reinterpret_cast<LPARAM>("8")));
             Call(SCI_SETMARGINWIDTHN, SC_MARGE_LINENUMBER, pixelWidth);
         }
     }
