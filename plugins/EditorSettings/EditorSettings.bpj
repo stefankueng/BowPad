@@ -34,10 +34,14 @@ var docSettings = {}; // temporary settings for opened documents
 // config dialog won't work properly with your plugin
 function Version() { return 100; }
 
-function overrideSettings(docID) {
-    var s = typeof(docID) === "undefined" ? settings[BowPad.GetCurrentLanguage()] : docSettings[docID];
+function overrideSettings() {
+    var docID = BowPad.GetDocIdOfCurrentTab();
+    var s = docSettings[docID];
     if (s == null) {
-        s = def;
+        s = settings[BowPad.GetCurrentLanguage()];
+        if (s == null) {
+            s = def;
+        }
     }
     BowPad.SciSetWrapMode(typeof(s.wrapMode) === "undefined" ? def.wrapMode : s.wrapMode);
     BowPad.SciSetTabWidth(typeof(s.tabWidth) === "undefined" ? def.tabWidth : s.tabWidth);
@@ -95,7 +99,7 @@ function TabNotify(code, tabOrigin)
             break;
         case -551:
         case 0x0409:
-            overrideSettings(BowPad.GetDocIdOfCurrentTab());
+            overrideSettings();
             break;
     }
 }
@@ -107,4 +111,5 @@ function OnDocumentClose(index) {
 // called after styles are set, so the plugin can set its own
 //function OnStylesSet()
 //{
+//    overrideSettings();
 //}
