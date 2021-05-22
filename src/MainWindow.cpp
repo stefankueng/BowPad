@@ -187,7 +187,7 @@ static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const
     hr            = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
-    path = pszPath;
+    path = (pszPath ? pszPath : L"");
     CoTaskMemFree(pszPath);
     return true;
 }
@@ -879,7 +879,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             RECT rc{}, tabRc{};
             GetWindowRect(m_tabBar, &rc);
-            TabCtrl_GetItemRect(m_tabBar, m_tabBar.GetItemCount() - 1, &tabRc);
+            TabCtrl_GetItemRect(m_tabBar, m_tabBar.GetItemCount() - 1LL, &tabRc);
             MapWindowPoints(m_tabBar, nullptr, reinterpret_cast<LPPOINT>(&tabRc), 2);
             if (tabRc.right > rc.right)
                 break;
@@ -2730,7 +2730,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
     // Note style will be zero if no style or past end of the document.
     if ((scn.position >= 0) && (!start || m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position)))
     {
-        const int pixelMargin = CDPIAware::Instance().Scale(*this, 4);
+        const sptr_t pixelMargin = CDPIAware::Instance().Scale(*this, 4);
         // an url hotspot
         // find start of url
         auto startPos     = scn.position;
@@ -3048,18 +3048,15 @@ void CMainWindow::HandleWriteProtectedEdit()
 
 void CMainWindow::AddHotSpots() const
 {
-    long startPos = 0;
-    long endPos   = 0;
-
-    long firstVisibleLine = static_cast<long>(m_editor.Call(SCI_GETFIRSTVISIBLELINE));
-    startPos              = static_cast<long>(m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine)));
-    long linesOnScreen    = static_cast<long>(m_editor.Call(SCI_LINESONSCREEN));
-    long lineCount        = static_cast<long>(m_editor.Call(SCI_GETLINECOUNT));
-    endPos                = static_cast<long>(m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine + min(linesOnScreen, lineCount))));
+    auto firstVisibleLine = m_editor.Call(SCI_GETFIRSTVISIBLELINE);
+    auto startPos         = m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine));
+    auto linesOnScreen    = m_editor.Call(SCI_LINESONSCREEN);
+    auto lineCount        = m_editor.Call(SCI_GETLINECOUNT);
+    auto endPos           = m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine + min(linesOnScreen, lineCount)));
 
     // to speed up the search, first search for "://" without using the regex engine
-    long fStartPos = startPos;
-    long fEndPos   = endPos;
+    auto fStartPos = startPos;
+    auto fEndPos   = endPos;
     m_editor.Call(SCI_SETSEARCHFLAGS, 0);
     m_editor.Call(SCI_SETTARGETSTART, fStartPos);
     m_editor.Call(SCI_SETTARGETEND, fEndPos);
@@ -3067,10 +3064,10 @@ void CMainWindow::AddHotSpots() const
     while (posFoundColonSlash != -1)
     {
         // found a "://"
-        long lineFoundColonSlash = static_cast<long>(m_editor.Call(SCI_LINEFROMPOSITION, posFoundColonSlash));
-        startPos                 = static_cast<long>(m_editor.Call(SCI_POSITIONFROMLINE, lineFoundColonSlash));
-        endPos                   = static_cast<long>(m_editor.Call(SCI_GETLINEENDPOSITION, lineFoundColonSlash));
-        fStartPos                = static_cast<long>(posFoundColonSlash) + 1;
+        auto lineFoundColonSlash = m_editor.Call(SCI_LINEFROMPOSITION, posFoundColonSlash);
+        startPos                 = m_editor.Call(SCI_POSITIONFROMLINE, lineFoundColonSlash);
+        endPos                   = m_editor.Call(SCI_GETLINEENDPOSITION, lineFoundColonSlash);
+        fStartPos                = posFoundColonSlash + 1LL;
 
         m_editor.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP | SCFIND_CXX11REGEX);
 
@@ -3083,14 +3080,14 @@ void CMainWindow::AddHotSpots() const
 
         if (posFound != -1)
         {
-            long start        = static_cast<long>(m_editor.Call(SCI_GETTARGETSTART));
-            long end          = static_cast<long>(m_editor.Call(SCI_GETTARGETEND));
-            long foundTextLen = end - start;
+            auto start        = m_editor.Call(SCI_GETTARGETSTART);
+            auto end          = m_editor.Call(SCI_GETTARGETEND);
+            auto foundTextLen = end - start;
 
             // reset indicators
             m_editor.Call(SCI_SETINDICATORCURRENT, INDIC_URLHOTSPOT);
             m_editor.Call(SCI_INDICATORCLEARRANGE, start, foundTextLen);
-            m_editor.Call(SCI_INDICATORCLEARRANGE, start, foundTextLen - 1);
+            m_editor.Call(SCI_INDICATORCLEARRANGE, start, foundTextLen - 1LL);
 
             m_editor.Call(SCI_INDICATORFILLRANGE, start, foundTextLen);
         }
@@ -3120,9 +3117,9 @@ void CMainWindow::HandleUpdateUI(const SCNotification& scn)
 
 void CMainWindow::IndentToLastLine() const
 {
-    size_t curLine      = m_editor.GetCurrentLineNumber();
-    size_t lastLine     = curLine - 1;
-    int    indentAmount = 0;
+    auto curLine      = m_editor.GetCurrentLineNumber();
+    auto lastLine     = curLine - 1;
+    int  indentAmount = 0;
     // use the same indentation as the last line
     while (lastLine > 0 && (m_editor.Call(SCI_GETLINEENDPOSITION, lastLine) - m_editor.Call(SCI_POSITIONFROMLINE, lastLine)) == 0)
         lastLine--;
@@ -3132,19 +3129,19 @@ void CMainWindow::IndentToLastLine() const
     if (indentAmount > 0)
     {
         Sci_CharacterRange cRange{};
-        cRange.cpMin  = static_cast<long>(m_editor.Call(SCI_GETSELECTIONSTART));
-        cRange.cpMax  = static_cast<long>(m_editor.Call(SCI_GETSELECTIONEND));
-        int posBefore = static_cast<int>(m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine));
+        cRange.cpMin   = static_cast<Sci_PositionCR>(m_editor.Call(SCI_GETSELECTIONSTART));
+        cRange.cpMax   = static_cast<Sci_PositionCR>(m_editor.Call(SCI_GETSELECTIONEND));
+        auto posBefore = m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);
         m_editor.Call(SCI_SETLINEINDENTATION, curLine, indentAmount);
-        int posAfter      = static_cast<int>(m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine));
-        int posDifference = posAfter - posBefore;
+        auto posAfter      = m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);
+        auto posDifference = posAfter - posBefore;
         if (posAfter > posBefore)
         {
             // Move selection on
             if (cRange.cpMin >= posBefore)
-                cRange.cpMin += posDifference;
+                cRange.cpMin += static_cast<Sci_PositionCR>(posDifference);
             if (cRange.cpMax >= posBefore)
-                cRange.cpMax += posDifference;
+                cRange.cpMax += static_cast<Sci_PositionCR>(posDifference);
         }
         else if (posAfter < posBefore)
         {
@@ -3152,16 +3149,16 @@ void CMainWindow::IndentToLastLine() const
             if (cRange.cpMin >= posAfter)
             {
                 if (cRange.cpMin >= posBefore)
-                    cRange.cpMin += posDifference;
+                    cRange.cpMin += static_cast<Sci_PositionCR>(posDifference);
                 else
-                    cRange.cpMin = posAfter;
+                    cRange.cpMin = static_cast<Sci_PositionCR>(posAfter);
             }
             if (cRange.cpMax >= posAfter)
             {
                 if (cRange.cpMax >= posBefore)
-                    cRange.cpMax += posDifference;
+                    cRange.cpMax += static_cast<Sci_PositionCR>(posDifference);
                 else
-                    cRange.cpMax = posAfter;
+                    cRange.cpMax = static_cast<Sci_PositionCR>(posAfter);
             }
         }
         m_editor.Call(SCI_SETSEL, cRange.cpMin, cRange.cpMax);
