@@ -1068,17 +1068,16 @@ void CScintillaWnd::SetupDefaultStyles() const
     Call(SCI_STYLESETFORE, STYLE_CALLTIP, theme.GetThemeColor(GetSysColor(COLOR_INFOTEXT)));
     Call(SCI_STYLESETBACK, STYLE_CALLTIP, theme.GetThemeColor(GetSysColor(COLOR_INFOBK)));
 
-    std::vector<COLORREF> captureColors = {
-        RGB(80, 0, 0),
-        RGB(0, 80, 0),
-        RGB(0, 0, 80),
-        RGB(0, 80, 80),
-        RGB(80, 80, 0),
-        RGB(80, 0, 80),
-        RGB(80, 80, 80),
-        RGB(80, 40, 40),
-        RGB(40, 80, 40),
-        RGB(40, 40, 80)};
+    std::vector captureColors = {RGB(80, 0, 0),
+                                 RGB(0, 80, 0),
+                                 RGB(0, 0, 80),
+                                 RGB(0, 80, 80),
+                                 RGB(80, 80, 0),
+                                 RGB(80, 0, 80),
+                                 RGB(80, 80, 80),
+                                 RGB(80, 40, 40),
+                                 RGB(40, 80, 40),
+                                 RGB(40, 40, 80)};
     for (uptr_t i = INDIC_REGEXCAPTURE; i < INDIC_REGEXCAPTURE_END; ++i)
     {
         Call(SCI_INDICSETSTYLE, i, INDIC_BOX);
