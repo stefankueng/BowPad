@@ -252,16 +252,16 @@ _variant_t BasicScriptHost::CallFunction(const std::wstring&              strFun
 {
     // Putting parameters
     DISPPARAMS dispParams = {nullptr};
-    const int  arraySize  = static_cast<int>(paramArray.size());
+    const auto arraySize  = paramArray.size();
 
     auto varMem           = std::make_unique<VARIANT[]>(dispParams.cArgs);
-    dispParams.cArgs      = arraySize;
+    dispParams.cArgs      = static_cast<int>(arraySize);
     dispParams.rgvarg     = varMem.get();
     dispParams.cNamedArgs = 0;
 
-    for (int i = 0; i < arraySize; i++)
+    for (size_t i = 0; i < arraySize; i++)
     {
-        _bstr_t bstr                 = paramArray[arraySize - 1 - i].c_str(); // back reading
+        _bstr_t bstr                 = paramArray[arraySize - 1LL - i].c_str(); // back reading
         dispParams.rgvarg[i].bstrVal = bstr.Detach();
         dispParams.rgvarg[i].vt      = VT_BSTR;
     }
