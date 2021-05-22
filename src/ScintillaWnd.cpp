@@ -465,10 +465,10 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                     if (!m_bInFolderMargin)
                     {
                         // animate the colors of the folder margin lines and symbols
-                        auto transFore = Animator::Instance().CreateLinearTransition(m_animVarGrayFore, folding_color_animation_time, color_folding_fore_active);
-                        auto transBack = Animator::Instance().CreateLinearTransition(m_animVarGrayBack, folding_color_animation_time, color_folding_back_active);
-                        auto transSel  = Animator::Instance().CreateLinearTransition(m_animVarGraySel, folding_color_animation_time, color_folding_backsel_active);
-                        auto transNr   = Animator::Instance().CreateLinearTransition(m_animVarGrayLineNr, folding_color_animation_time, color_linenr_active);
+                        auto transFore = Animator::Instance().CreateSmoothStopTransition(m_animVarGrayFore, folding_color_animation_time, color_folding_fore_active);
+                        auto transBack = Animator::Instance().CreateSmoothStopTransition(m_animVarGrayBack, folding_color_animation_time, color_folding_back_active);
+                        auto transSel  = Animator::Instance().CreateSmoothStopTransition(m_animVarGraySel, folding_color_animation_time, color_folding_backsel_active);
+                        auto transNr   = Animator::Instance().CreateSmoothStopTransition(m_animVarGrayLineNr, folding_color_animation_time, color_linenr_active);
 
                         if (transFore && transBack && transSel && transNr)
                         {
@@ -513,10 +513,10 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                     if (m_bInFolderMargin)
                     {
                         // animate the colors of the folder margin lines and symbols
-                        auto transFore = Animator::Instance().CreateLinearTransition(m_animVarGrayFore, folding_color_animation_time, color_folding_fore_inactive);
-                        auto transBack = Animator::Instance().CreateLinearTransition(m_animVarGrayBack, folding_color_animation_time, color_folding_back_inactive);
-                        auto transSel  = Animator::Instance().CreateLinearTransition(m_animVarGraySel, folding_color_animation_time, color_folding_backsel_inactive);
-                        auto transNr   = Animator::Instance().CreateLinearTransition(m_animVarGrayLineNr, folding_color_animation_time, color_linenr_inactive);
+                        auto transFore = Animator::Instance().CreateSmoothStopTransition(m_animVarGrayFore, folding_color_animation_time, color_folding_fore_inactive);
+                        auto transBack = Animator::Instance().CreateSmoothStopTransition(m_animVarGrayBack, folding_color_animation_time, color_folding_back_inactive);
+                        auto transSel  = Animator::Instance().CreateSmoothStopTransition(m_animVarGraySel, folding_color_animation_time, color_folding_backsel_inactive);
+                        auto transNr   = Animator::Instance().CreateSmoothStopTransition(m_animVarGrayLineNr, folding_color_animation_time, color_linenr_inactive);
 
                         if (transFore && transBack && transSel && transNr)
                         {
@@ -563,10 +563,10 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
             if (m_bInFolderMargin)
             {
                 // animate the colors of the folder margin lines and symbols
-                auto transFore = Animator::Instance().CreateLinearTransition(m_animVarGrayFore, folding_color_animation_time, color_folding_fore_inactive);
-                auto transBack = Animator::Instance().CreateLinearTransition(m_animVarGrayBack, folding_color_animation_time, color_folding_back_inactive);
-                auto transSel  = Animator::Instance().CreateLinearTransition(m_animVarGraySel, folding_color_animation_time, color_folding_backsel_inactive);
-                auto transNr   = Animator::Instance().CreateLinearTransition(m_animVarGrayLineNr, folding_color_animation_time, color_linenr_inactive);
+                auto transFore = Animator::Instance().CreateSmoothStopTransition(m_animVarGrayFore, folding_color_animation_time, color_folding_fore_inactive);
+                auto transBack = Animator::Instance().CreateSmoothStopTransition(m_animVarGrayBack, folding_color_animation_time, color_folding_back_inactive);
+                auto transSel  = Animator::Instance().CreateSmoothStopTransition(m_animVarGraySel, folding_color_animation_time, color_folding_backsel_inactive);
+                auto transNr   = Animator::Instance().CreateSmoothStopTransition(m_animVarGrayLineNr, folding_color_animation_time, color_linenr_inactive);
 
                 if (transFore && transBack && transSel && transNr)
                 {

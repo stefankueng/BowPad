@@ -130,7 +130,7 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
             {
                 if ((Button_GetState(*this) & BST_HOT) == 0)
                 {
-                    auto transHot   = Animator::Instance().CreateLinearTransition(m_animVarHot, 0.3, 1.0);
+                    auto transHot   = Animator::Instance().CreateSmoothStopTransition(m_animVarHot, 0.3, 1.0);
                     auto storyBoard = Animator::Instance().CreateStoryBoard();
                     if (storyBoard && transHot)
                     {
@@ -157,7 +157,7 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 TrackMouseEvent(&tme);
                 if ((Button_GetState(*this) & BST_HOT) != 0)
                 {
-                    auto transHot   = Animator::Instance().CreateLinearTransition(m_animVarHot, 0.5, 0.0);
+                    auto transHot   = Animator::Instance().CreateSmoothStopTransition(m_animVarHot, 0.5, 0.0);
                     auto storyBoard = Animator::Instance().CreateStoryBoard();
                     if (storyBoard && transHot)
                     {

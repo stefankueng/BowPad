@@ -333,7 +333,7 @@ void CDocScroll::CalcLines()
 
 void CDocScroll::AnimateFraction(AnimationVariable& animVar, double endVal)
 {
-    auto transHot   = Animator::Instance().CreateLinearTransition(animVar, 0.3, endVal);
+    auto transHot   = Animator::Instance().CreateSmoothStopTransition(animVar, 0.3, endVal);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
     if (storyBoard && transHot)
     {

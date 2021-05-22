@@ -93,7 +93,7 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
                  rc.right + BORDER + BORDER, rc.bottom + BORDER + BORDER,
                  SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW);
 
-    auto transAlpha = Animator::Instance().CreateLinearTransition(m_animVarAlpha, 0.3, 255);
+    auto transAlpha = Animator::Instance().CreateSmoothStopTransition(m_animVarAlpha, 0.3, 255);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
     if (storyBoard && transAlpha)
     {
@@ -108,7 +108,7 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
 
 void CCustomToolTip::HideTip()
 {
-    auto transAlpha = Animator::Instance().CreateLinearTransition(m_animVarAlpha, 0.5, 0);
+    auto transAlpha = Animator::Instance().CreateSmoothStopTransition(m_animVarAlpha, 0.5, 0);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
     if (storyBoard && transAlpha)
     {

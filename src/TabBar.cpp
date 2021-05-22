@@ -737,7 +737,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     if (oldIndex != -1)
                     {
-                        auto transHot   = Animator::Instance().CreateLinearTransition(m_animVars[GetIDFromIndex(oldIndex).GetValue()], 0.3, 1.0);
+                        auto transHot   = Animator::Instance().CreateSmoothStopTransition(m_animVars[GetIDFromIndex(oldIndex).GetValue()], 0.3, 1.0);
                         auto storyBoard = Animator::Instance().CreateStoryBoard();
                         if (storyBoard && transHot)
                         {
@@ -749,7 +749,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                         else
                             InvalidateRect(hwnd, &oldRect, FALSE);
                     }
-                    auto transHot   = Animator::Instance().CreateLinearTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], 0.1, hoverFraction);
+                    auto transHot   = Animator::Instance().CreateSmoothStopTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], 0.1, hoverFraction);
                     auto storyBoard = Animator::Instance().CreateStoryBoard();
                     if (storyBoard && transHot)
                     {
@@ -764,7 +764,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             else if (m_currentHoverTabItem != index)
             {
-                auto transHot   = Animator::Instance().CreateLinearTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], 0.3, 1.0);
+                auto transHot   = Animator::Instance().CreateSmoothStopTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], 0.3, 1.0);
                 auto storyBoard = Animator::Instance().CreateStoryBoard();
                 if (storyBoard && transHot)
                 {
@@ -788,7 +788,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             tme.hwndTrack       = *this;
             TrackMouseEvent(&tme);
             m_bIsCloseHover = false;
-            auto transHot   = Animator::Instance().CreateLinearTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], 0.3, 1.0);
+            auto transHot   = Animator::Instance().CreateSmoothStopTransition(m_animVars[GetIDFromIndex(m_currentHoverTabItem).GetValue()], 0.3, 1.0);
             auto storyBoard = Animator::Instance().CreateStoryBoard();
             if (storyBoard && transHot)
             {
