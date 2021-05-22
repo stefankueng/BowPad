@@ -16,7 +16,6 @@
 //
 #include "stdafx.h"
 #include "CmdPrint.h"
-#include "UnicodeUtils.h"
 #include "Scintilla.h"
 #include "IniSettings.h"
 #include "Theme.h"
@@ -220,8 +219,8 @@ void CCmdPrint::Print(bool bShowDlg)
     {
         ::StartPage(hdc);
 
-        frPrint.chrg.cpMin = static_cast<long>(lengthPrinted);
-        frPrint.chrg.cpMax = static_cast<long>(lengthDoc);
+        frPrint.chrg.cpMin = static_cast<Sci_PositionCR>(lengthPrinted);
+        frPrint.chrg.cpMax = static_cast<Sci_PositionCR>(lengthDoc);
 
         lengthPrinted = ScintillaCall(SCI_FORMATRANGE, true, reinterpret_cast<LPARAM>(&frPrint));
 
