@@ -1978,6 +1978,9 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     auto lengthInBytes      = m_editor.Call(SCI_GETLENGTH);
     auto bidi               = m_editor.Call(SCI_GETBIDIRECTIONAL);
 
+    wchar_t readableLength[100] = {0};
+    StrFormatByteSize(lengthInBytes, readableLength, _countof(readableLength));
+
     auto numberColor = 0x600000;
     if (CTheme::Instance().IsHighContrastModeDark())
         numberColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT));
@@ -1987,7 +1990,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     m_statusBar.SetPart(STATUSBAR_CUR_POS,
                         CStringUtils::Format(rsStatusCurposLong, numberColor, line, numberColor, lineCount, numberColor, column),
                         CStringUtils::Format(rsStatusCurpos, numberColor, line, numberColor, lineCount, numberColor, column),
-                        CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, lineCount),
+                        CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, readableLength, lineCount),
                         200,
                         130,
                         0,
