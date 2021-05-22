@@ -75,7 +75,7 @@ class CScintillaWnd : public CWindow
 {
 public:
     CScintillaWnd(HINSTANCE hInst);
-    virtual ~CScintillaWnd();
+    ~CScintillaWnd() override;
 
     bool Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo = nullptr);
     bool InitScratch(HINSTANCE hInst);
@@ -120,7 +120,7 @@ public:
     std::string GetCurrentLine() const;
     std::string GetWordChars() const;
     std::string GetWhitespaceChars() const;
-    long        GetSelTextMarkerCount() const { return m_selTextMarkerCount; }
+    sptr_t      GetSelTextMarkerCount() const { return m_selTextMarkerCount; }
     sptr_t      GetCurrentLineNumber() const;
     void        VisibleLinesChanged() { m_docScroll.VisibleLinesChanged(); }
     static bool IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
@@ -152,7 +152,7 @@ private:
     sptr_t            m_pSciWndData;
     CDocScroll        m_docScroll;
     CScrollTool       m_scrollTool;
-    long              m_selTextMarkerCount;
+    sptr_t            m_selTextMarkerCount;
     bool              m_bCursorShown;
     bool              m_bScratch;
     bool              m_eraseBkgnd;

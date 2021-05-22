@@ -1986,7 +1986,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     sptr_t selByte = 0;
     sptr_t selLine = 0;
     m_editor.GetSelectedCount(selByte, selLine);
-    long selTextMarkerCount = m_editor.GetSelTextMarkerCount();
+    auto selTextMarkerCount = m_editor.GetSelTextMarkerCount();
     auto curPos             = m_editor.Call(SCI_GETCURRENTPOS);
     long line               = static_cast<long>(m_editor.Call(SCI_LINEFROMPOSITION, curPos)) + 1;
     long column             = static_cast<long>(m_editor.Call(SCI_GETCOLUMN, curPos)) + 1;

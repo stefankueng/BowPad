@@ -40,7 +40,7 @@
 static std::string g_findString;
 std::string        g_sHighlightString;
 static int         g_searchFlags       = 0;
-int                g_searchMarkerCount = 0;
+sptr_t             g_searchMarkerCount = 0;
 static std::string g_lastSelText;
 static int         g_lastSearchFlags  = 0;
 static bool        g_highlightMatches = true;

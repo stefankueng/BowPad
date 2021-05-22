@@ -38,7 +38,7 @@
 
 extern IUIFramework*          g_pFramework;
 extern std::string            g_sHighlightString;  // from CmdFindReplace
-extern int                    g_searchMarkerCount; // from CmdFindReplace
+extern sptr_t                 g_searchMarkerCount; // from CmdFindReplace
 extern Scintilla::LexerModule lmSimple;
 extern Scintilla::LexerModule lmLog;
 extern Scintilla::LexerModule lmSnippets;
@@ -1304,8 +1304,8 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
 {
     static std::string    lastSelText;
     static Sci_PositionCR lastStopPosition = 0;
-    LRESULT               firstLine        = Call(SCI_GETFIRSTVISIBLELINE);
-    LRESULT               lastLine         = firstLine + Call(SCI_LINESONSCREEN);
+    auto                  firstLine        = Call(SCI_GETFIRSTVISIBLELINE);
+    auto                  lastLine         = firstLine + Call(SCI_LINESONSCREEN);
     auto                  startStylePos    = Call(SCI_POSITIONFROMLINE, firstLine);
     startStylePos                          = max(startStylePos, 0);
     auto endStylePos                       = Call(SCI_POSITIONFROMLINE, lastLine) + Call(SCI_LINELENGTH, lastLine);
@@ -1480,7 +1480,7 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
         }
     }
     if (braceAtCaret >= 0)
-        braceOpposite = static_cast<int>(Call(SCI_BRACEMATCH, braceAtCaret, 0));
+        braceOpposite = Call(SCI_BRACEMATCH, braceAtCaret, 0);
 
     KillTimer(*this, TIM_BRACEHIGHLIGHTTEXT);
     KillTimer(*this, TIM_BRACEHIGHLIGHTTEXTCLEAR);
@@ -1728,9 +1728,9 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
             /////////////////////////////////////////////////////////////////////////
             if ('/' == nextChar)
             {
-                xmlTags.tagCloseStart  = openFound.start;
-                auto       docLength   = Call(SCI_GETLENGTH);
-                FindResult endCloseTag = FindText(">", caret, docLength, 0);
+                xmlTags.tagCloseStart = openFound.start;
+                auto docLength        = Call(SCI_GETLENGTH);
+                auto endCloseTag      = FindText(">", caret, docLength, 0);
                 if (endCloseTag.success)
                 {
                     xmlTags.tagCloseEnd = endCloseTag.end;
@@ -2161,7 +2161,7 @@ std::vector<std::pair<sptr_t, sptr_t>> CScintillaWnd::GetAttributesPos(sptr_t st
     } state = AttrStates::Attr_Invalid;
 
     sptr_t startPos    = -1;
-    int    oneMoreChar = 1;
+    sptr_t oneMoreChar = 1;
     sptr_t i           = 0;
     for (; i < bufLen; i++)
     {
@@ -2279,7 +2279,7 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam) const
             auto selEnd    = Call(SCI_GETSELECTIONEND);
             auto lineStart = Call(SCI_LINEFROMPOSITION, selStart);
             auto lineEnd   = Call(SCI_LINEFROMPOSITION, selEnd);
-            if (Call(SCI_POSITIONFROMLINE, lineEnd) == static_cast<sptr_t>(selEnd))
+            if (Call(SCI_POSITIONFROMLINE, lineEnd) == selEnd)
             {
                 --lineEnd;
                 selEnd = Call(SCI_GETLINEENDPOSITION, lineEnd);
