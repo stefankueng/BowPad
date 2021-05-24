@@ -1248,7 +1248,7 @@ msgstr ""
 
 #. Resource IDs: (176)
 #, c-format
-msgid "Length in bytes: %ld\r\nLines: %ld"
+msgid "Length in bytes: %ld (%s)\r\nLines: %ld"
 msgstr ""
 
 #. Resource IDs: (60150)
@@ -1923,7 +1923,7 @@ msgstr ""
 
 #. Resource IDs: (200)
 #, c-format
-msgid "Sel: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%ld%%r matches."
+msgid "Sel: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%lld%%r matches."
 msgstr ""
 
 #. Resource IDs: (60394)
@@ -1940,7 +1940,7 @@ msgstr ""
 
 #. Resource IDs: (251)
 #, c-format
-msgid "Selection: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%ld%%r matches."
+msgid "Selection: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%lld%%r matches."
 msgstr ""
 
 #. Resource IDs: (60613)
