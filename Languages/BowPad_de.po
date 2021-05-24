@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2021-04-02 10:05+0200\n"
+"PO-Revision-Date: 2021-05-24 17:48+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 2.4.3\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -1415,10 +1415,10 @@ msgstr "Öffne mit Safari"
 #. Resource IDs: (176)
 #, c-format
 msgid ""
-"Length in bytes: %ld\r\n"
+"Length in bytes: %ld (%s)\r\n"
 "Lines: %ld"
 msgstr ""
-"Länge in Bytes: %ld\r\n"
+"Länge in Bytes: %ld (%s)\r\n"
 "Zeilen: %ld"
 
 #. Resource IDs: (60150)
@@ -2148,8 +2148,9 @@ msgstr "Suche in Datei '%s'"
 
 #. Resource IDs: (200)
 #, c-format
-msgid "Sel: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%ld%%r matches."
-msgstr "Ausw: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r Zeilen | %%c%06X%ld%%r Mrk."
+msgid ""
+"Sel: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%lld%%r matches."
+msgstr "Ausw: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r Zeilen | %%c%06X%lld%%r Mrk."
 
 #. Resource IDs: (60394)
 msgid "Select Language"
@@ -2166,9 +2167,10 @@ msgstr "Wähle die Sprache für BowPad"
 #. Resource IDs: (251)
 #, c-format
 msgid ""
-"Selection: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%ld%%r matches."
+"Selection: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%lld%%r "
+"matches."
 msgstr ""
-"Auswahl: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r Zeilen | %%c%06X%ld%%r "
+"Auswahl: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r Zeilen | %%c%06X%lld%%r "
 "Markierungen."
 
 #. Resource IDs: (60613)
