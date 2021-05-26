@@ -2,6 +2,9 @@
 A simple and fast text editor with a ribbon UI
 
 [![Build Status](https://dev.azure.com/tortoisesvn/tortoisesvnGitHub/_apis/build/status/stefankueng.BowPad?branchName=main)](https://dev.azure.com/tortoisesvn/tortoisesvnGitHub/_build/latest?definitionId=5&branchName=main)
+
+[![CodeQL](https://github.com/stefankueng/BowPad/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/stefankueng/BowPad/actions/workflows/codeql-analysis.yml)
+
 A few notable features of BowPad:
 
 - syntax highlighting for over 100 file types and languages
@@ -15,7 +18,7 @@ A few notable features of BowPad:
 [![BowPad with dark color theme](https://github.com/stefankueng/tools/raw/main/www/source/img/bowpad/BowPadDarkTheme-small.png)](https://github.com/stefankueng/tools/raw/main/www/source/img/bowpad/BowPadDarkTheme.png)
 
 And before you ask: the name BowPad comes from the fact that it uses the ribbon user interface.
-Ribbon → Bow, Editor → NotePad = BowPad.
+Ribbon → **Bow**, Editor → Note**Pad**= **BowPad**.
 And of course we all know that [Bowties are cool!](https://www.doctorwho.tv/)
 
 Please visit the [homepage](https://tools.stefankueng.com/BowPad.html) of BowPad for more information.
