@@ -219,7 +219,7 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
         if (SUCCEEDED(CoCreateInstance(CLSID_VirtualDesktopManager,
                                        nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pvdm))))
         {
-            BOOL isCurrent;
+            BOOL isCurrent = FALSE;
             if (pvdm && SUCCEEDED(pvdm->IsWindowOnCurrentVirtualDesktop(hBowPadWnd, &isCurrent)))
             {
                 if (!isCurrent)
@@ -351,7 +351,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
         size_t line = static_cast<size_t>(-1);
         if (parser.HasVal(L"line"))
         {
-            line = parser.GetLongVal(L"line") - 1;
+            line = parser.GetLongLongVal(L"line") - 1LL;
         }
         mainWindow.SetFileToOpen(parser.GetVal(L"path"), line);
         if (parser.HasKey(L"elevate") && parser.HasKey(L"savepath"))
@@ -380,7 +380,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
             size_t line = static_cast<size_t>(-1);
             if (parser.HasVal(L"line"))
             {
-                line = parser.GetLongVal(L"line") - 1;
+                line = parser.GetLongLongVal(L"line") - 1LL;
             }
 
             bool bOmitNext = false;
@@ -538,7 +538,7 @@ int bpMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
                     BYTE  buffer[4096]{};
 
                     ret = ReadFile(hRead, buffer, sizeof(buffer) - 1, &dwRead, nullptr);
-                    while (dwRead)
+                    while (ret && dwRead)
                     {
                         WriteFile(hWrite, buffer, dwRead, &dwWrite, nullptr);
                         ret = ReadFile(hRead, buffer, sizeof(buffer) - 1, &dwRead, nullptr);

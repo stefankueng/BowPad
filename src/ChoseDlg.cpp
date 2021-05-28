@@ -86,6 +86,8 @@ LRESULT CChoseDlg::DoCommand(int id, int notify)
                 EndDialog(*this, SendDlgItemMessage(*this, IDC_LIST, LB_GETCURSEL, 0, 0));
         }
         break;
+        default:
+            break;
     }
     return 1;
 }

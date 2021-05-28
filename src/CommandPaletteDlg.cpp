@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <memory>
 #include <Commdlg.h>
+#include <strsafe.h>
 
 extern HINSTANCE     g_hRes;
 extern IUIFramework* g_pFramework;
@@ -271,6 +272,8 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             }
         }
         break;
+        default:
+            break;
     }
     return FALSE;
 }
@@ -472,6 +475,8 @@ LRESULT CCommandPaletteDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
             break;
         case NM_CUSTOMDRAW:
             return DrawListItem(reinterpret_cast<NMLVCUSTOMDRAW*>(lpNMItemActivate));
+        default:
+            break;
     }
     return 0;
 }
@@ -527,14 +532,16 @@ LRESULT CCommandPaletteDlg::GetListItemDispInfo(NMLVDISPINFO* pDispInfo)
         switch (pDispInfo->item.iSubItem)
         {
             case 0:
-                lstrcpyn(pDispInfo->item.pszText, item.command.c_str(), pDispInfo->item.cchTextMax);
+                StringCchCopy(pDispInfo->item.pszText, pDispInfo->item.cchTextMax, item.command.c_str());
                 break;
 
             case 1:
-                lstrcpyn(pDispInfo->item.pszText, item.shortcut.c_str(), pDispInfo->item.cchTextMax);
+                StringCchCopy(pDispInfo->item.pszText, pDispInfo->item.cchTextMax, item.shortcut.c_str());
                 break;
             case 2:
-                lstrcpyn(pDispInfo->item.pszText, item.description.c_str(), pDispInfo->item.cchTextMax);
+                StringCchCopy(pDispInfo->item.pszText, pDispInfo->item.cchTextMax, item.description.c_str());
+                break;
+            default:
                 break;
         }
     }
@@ -612,6 +619,8 @@ LRESULT CALLBACK CCommandPaletteDlg::EditSubClassProc(HWND hWnd, UINT uMsg, WPAR
                     SendMessage(*pThis, WM_COMMAND, MAKEWPARAM(IDOK, 1), 0);
                 }
             }
+            break;
+        default:
             break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);

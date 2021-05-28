@@ -135,6 +135,8 @@ LRESULT CALLBACK CColorButton::_ColorButtonProc(HWND hwnd, UINT message, WPARAM 
         case WM_DESTROY:
             SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(pColorButton->m_pfnOrigCtlProc));
             break;
+        default:
+            break;
     }
 
     return CallWindowProc(pColorButton->m_pfnOrigCtlProc, hwnd, message, wParam, lParam);
@@ -218,6 +220,8 @@ UINT_PTR CALLBACK CColorButton::CCHookProc(
             }
             break;
         }
+        default:
+            break;
     }
     return 0;
 }
