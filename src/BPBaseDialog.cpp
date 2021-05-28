@@ -87,7 +87,7 @@ void CBPBaseDialog::SaveCombo(int comboID, std::vector<std::wstring>& data) cons
     {
         std::wstring item;
         auto         itemSize = ComboBox_GetLBTextLen(hCombo, i);
-        item.resize(itemSize + 1);
+        item.resize(itemSize + 1LL);
         ComboBox_GetLBText(hCombo, i, item.data());
         item.resize(itemSize);
         data.emplace_back(std::move(item));
@@ -216,6 +216,8 @@ LRESULT CALLBACK CBPBaseDialog::ComboBoxListSubClassProc(HWND hWnd, UINT uMsg, W
             RemoveWindowSubclass(hWnd, ComboBoxListSubClassProc, uIdSubclass);
             break;
         }
+        default:
+            break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }
@@ -330,6 +332,8 @@ size_t CBPBaseDialog::GetBase(char current, size_t& size) noexcept
         case 'u': // 0xCDCD
             size = 4;
             return 16;
+        default:
+            break;
     }
     size = 0;
     return 0;

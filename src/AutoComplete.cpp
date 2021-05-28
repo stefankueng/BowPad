@@ -78,7 +78,7 @@ static std::unique_ptr<UINT[]> Icon2Image(HICON hIcon)
     infoHeader.bmiHeader.biCompression = BI_RGB;
     infoHeader.bmiHeader.biSizeImage   = size;
 
-    auto   ptrb          = std::make_unique<BYTE[]>(size * 2LL + height * width * 4LL);
+    auto   ptrb          = std::make_unique<BYTE[]>(2LL * size + 4LL * height * width);
     LPBYTE pixelsIconRGB = ptrb.get();
     LPBYTE alphaPixels   = pixelsIconRGB + size;
     HDC    hDC           = CreateCompatibleDC(nullptr);
@@ -518,6 +518,8 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
             }
         }
         break;
+        default:
+            break;
     }
 }
 
@@ -914,7 +916,7 @@ std::string CAutoComplete::SanitizeSnippetText(const std::string& text) const
     SearchReplace(sVal, "^9", "");
     SearchReplace(sVal, "^", "");
 
-    const size_t maxLen = 40;
+    constexpr size_t maxLen = 40;
     if (sVal.size() >= maxLen)
         sVal = sVal.substr(0, maxLen - 3) + "...";
 
@@ -1217,6 +1219,8 @@ LRESULT CAutoCompleteConfigDlg::DoCommand(int id, int msg)
             }
         }
         break;
+        default:
+            break;
     }
     return 1;
 }
