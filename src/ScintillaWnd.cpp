@@ -45,21 +45,21 @@ extern Scintilla::LexerModule lmSnippets;
 
 UINT32 g_contextID = cmdContextMap;
 
-const int TIM_HIDECURSOR              = 101;
-const int TIM_BRACEHIGHLIGHTTEXT      = 102;
-const int TIM_BRACEHIGHLIGHTTEXTCLEAR = 103;
+constexpr int TIM_HIDECURSOR              = 101;
+constexpr int TIM_BRACEHIGHLIGHTTEXT      = 102;
+constexpr int TIM_BRACEHIGHLIGHTTEXTCLEAR = 103;
 
 static bool g_scintillaInitialized = false;
 
-const int    color_folding_fore_inactive    = 255;
-const int    color_folding_back_inactive    = 220;
-const int    color_folding_backsel_inactive = 150;
-const int    color_folding_fore_active      = 250;
-const int    color_folding_back_active      = 100;
-const int    color_folding_backsel_active   = 20;
-const int    color_linenr_inactive          = 109;
-const int    color_linenr_active            = 60;
-const double folding_color_animation_time   = 0.3;
+constexpr int    color_folding_fore_inactive    = 255;
+constexpr int    color_folding_back_inactive    = 220;
+constexpr int    color_folding_backsel_inactive = 150;
+constexpr int    color_folding_fore_active      = 250;
+constexpr int    color_folding_back_active      = 100;
+constexpr int    color_folding_backsel_active   = 20;
+constexpr int    color_linenr_inactive          = 109;
+constexpr int    color_linenr_active            = 60;
+constexpr double folding_color_animation_time   = 0.3;
 
 CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     : CWindow(hInst)
@@ -436,6 +436,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                         m_scrollTool.SetText(&thumbPoint, L"Line: %lld", docLine + 1);
                     }
                     break;
+                    default:
+                        break;
                 }
             }
             if (uMsg == WM_MOUSEMOVE)
@@ -640,6 +642,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                     break;
                 case TIM_BRACEHIGHLIGHTTEXTCLEAR:
                     MatchBraces(BraceMatch::Clear);
+                    break;
+                default:
                     break;
             }
             break;
@@ -2266,6 +2270,8 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam) const
             case '[':
                 braceCloseBuf[0] = ']';
                 break;
+            default:
+                break;
         }
 
         // Get Selection
@@ -2372,6 +2378,8 @@ void CScintillaWnd::ReflectEvents(SCNotification* pScn)
                 }
                 UpdateLineNumberWidth();
             }
+            break;
+        default:
             break;
     }
 }

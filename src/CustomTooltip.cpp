@@ -182,6 +182,8 @@ LRESULT CCustomToolTip::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             EndPaint(hwnd, &ps);
             return 0L;
         }
+        default:
+            break;
     }
 
     return DefWindowProc(hwnd, uMsg, wParam, lParam);

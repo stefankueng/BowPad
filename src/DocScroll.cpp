@@ -303,6 +303,8 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
                     graphics.FillRectangle(&brushCurLine, pCustDraw->rect.left, linePos, pCustDraw->rect.right - pCustDraw->rect.left, CDPIAware::Instance().Scale(pCustDraw->hdr.hwndFrom, 2));
                 }
                 break;
+                default:
+                    break;
             }
             return CDRF_SKIPDEFAULT;
         }

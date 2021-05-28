@@ -29,14 +29,13 @@
 #pragma warning(pop)
 #include <Uxtheme.h>
 #include <UIRibbon.h>
-#include <UIRibbonPropertyHelpers.h>
 
 #pragma comment(lib, "UxTheme.lib")
 
 extern IUIFramework *g_pFramework;
 
 //#define TABBAR_SHOWDISKICON 1
-const double hoverFraction = 0.4;
+constexpr double hoverFraction = 0.4;
 
 CTabBar::CTabBar(HINSTANCE hInst)
     : CWindow(hInst)
@@ -193,8 +192,8 @@ void CTabBar::GetTitle(int index, wchar_t *title, int titleLen) const
 
 std::wstring CTabBar::GetTitle(int index) const
 {
-    wchar_t    buf[100] = {};
-    const auto bufCount = _countof(buf);
+    wchar_t        buf[100] = {};
+    constexpr auto bufCount = _countof(buf);
 
     TCITEM tci{};
     tci.mask       = TCIF_TEXT;
@@ -399,7 +398,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             HDC      hDC = reinterpret_cast<HDC>(wParam);
             RECT     rClient{}, rTab{}, rTotalTab{}, rBkgnd{};
-            COLORREF crBack;
+            COLORREF crBack{};
 
             if (CTheme::Instance().IsHighContrastMode())
                 return ::CallWindowProc(m_tabBarDefaultProc, hwnd, message, wParam, lParam);
@@ -601,7 +600,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 // Maximal width/height of the msctls_updown32 class (arrow box in the tab bar),
                 // This area may hide parts of the last tab and needs to be excluded.
-                const LONG maxLengthUpDownCtrl = 45; // sufficient static value
+                constexpr LONG maxLengthUpDownCtrl = 45; // sufficient static value
 
                 // Scroll forward as long as the last tab is hidden; scroll backward till the first tab
                 if ((rcTabCtrl.right - rcLastTab.right < maxLengthUpDownCtrl) || !scrollForward)
@@ -924,6 +923,8 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+        default:
+            break;
     }
 
     return ::CallWindowProc(m_tabBarDefaultProc, hwnd, message, wParam, lParam);
@@ -982,7 +983,7 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT lpDrawItemStruct, float fraction) 
     tci.cchTextMax = _countof(buf) - 2;
     TabCtrl_GetItem(*this, lpDrawItemStruct->itemID, &tci);
 
-    COLORREF textColor;
+    COLORREF textColor = 0;
     if (tci.iImage == REDONLY_IMG_INDEX)
     {
         if (bSelected)
@@ -1125,9 +1126,9 @@ void CTabBar::ExchangeItemData(POINT point)
             //2. shift their data, and insert the source
             TCITEM itemDataNDraggedTab{}, itemDataShift{};
             itemDataNDraggedTab.mask = itemDataShift.mask = TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM;
-            const int stringSize                          = 256;
-            wchar_t   str1[stringSize]                    = {};
-            wchar_t   str2[stringSize]                    = {};
+            constexpr int stringSize                      = 256;
+            wchar_t       str1[stringSize]                = {};
+            wchar_t       str2[stringSize]                = {};
 
             itemDataNDraggedTab.pszText    = str1;
             itemDataNDraggedTab.cchTextMax = (stringSize);
@@ -1135,8 +1136,7 @@ void CTabBar::ExchangeItemData(POINT point)
             itemDataShift.pszText    = str2;
             itemDataShift.cchTextMax = (stringSize);
 
-            bool ok;
-            ok = TabCtrl_GetItem(*this, m_nTabDragged, &itemDataNDraggedTab) != FALSE;
+            bool ok = TabCtrl_GetItem(*this, m_nTabDragged, &itemDataNDraggedTab) != FALSE;
             APPVERIFY(ok);
 
             if (m_nTabDragged > nTab)
