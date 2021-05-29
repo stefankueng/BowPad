@@ -444,6 +444,7 @@
     <ClInclude Include="LexStyles.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MRU.h" />
+    <ClInclude Include="PathWatcher.h" />
     <ClInclude Include="ProgressBar.h" />
     <ClInclude Include="PropertySet.h" />
     <ClInclude Include="Resource.h" />
@@ -571,6 +572,7 @@
     <ClCompile Include="LexStyles.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MRU.cpp" />
+    <ClCompile Include="PathWatcher.cpp" />
     <ClCompile Include="ProgressBar.cpp" />
     <ClCompile Include="PropertySet.cpp" />
     <ClCompile Include="ScintillaWnd.cpp" />
