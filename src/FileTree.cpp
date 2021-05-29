@@ -802,75 +802,86 @@ bool CFileTree::PathIsChild(const std::wstring& parent, const std::wstring& chil
 void CFileTree::HandleChangeNotifications()
 {
     auto changedPaths = m_pathWatcher.GetChangedPaths();
-    for (const auto& [action, path] : changedPaths)
+    if (changedPaths.empty())
+        return;
+    if (changedPaths.size() > 20)
     {
-        switch (action)
+        // more than twenty new and/or deleted files: just
+        // refresh the whole tree
+        Refresh(TVI_ROOT);
+    }
+    else
+    {
+        for (const auto& [action, path] : changedPaths)
         {
-            case FILE_ACTION_ADDED:
-            case FILE_ACTION_RENAMED_NEW_NAME:
+            switch (action)
             {
-                HTREEITEM hDir = nullptr;
-                if (CPathUtils::PathCompare(CPathUtils::GetParentDirectory(path), m_path) == 0)
-                    hDir = TVI_ROOT;
-                else
-                    hDir = GetItemForPath(CPathUtils::GetParentDirectory(path));
-                if (hDir)
-                {
-                    auto& data = m_data[hDir]->data;
-                    auto  fi   = std::make_unique<FileTreeItem>();
-                    fi->isDir  = PathIsDirectory(path.c_str()) != 0;
-                    fi->path   = path;
-                    data.push_back(std::move(fi));
-                    std::sort(data.begin(), data.end(), [](const auto& lhs, const auto& rhs) {
-                        if (lhs->isDot)
-                            return false;
-                        if (rhs->isDot)
-                            return true;
-
-                        if (lhs->isDir != rhs->isDir)
-                            return !lhs->isDir;
-
-                        auto res = CompareStringEx(nullptr, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS | SORT_STRINGSORT,
-                                                   lhs->path.c_str(), static_cast<int>(lhs->path.length()),
-                                                   rhs->path.c_str(), static_cast<int>(rhs->path.length()),
-                                                   nullptr, nullptr, 0);
-                        return res == CSTR_GREATER_THAN;
-                    });
-                    HTREEITEM insertAfter = TVI_FIRST;
-                    auto      foundIt     = std::find_if(data.begin(), data.end(), [&](const auto& fti) -> bool { return CPathUtils::PathCompare(fti->path, path) == 0; });
-                    auto      nextIt      = foundIt;
-                    ++nextIt;
-                    if (nextIt != data.cend())
-                    {
-                        insertAfter = GetItemForPath((*nextIt)->path);
-                    }
-                    InsertItem(*foundIt, hDir, insertAfter, {});
-                }
-            }
-            break;
-            case FILE_ACTION_REMOVED:
-            case FILE_ACTION_RENAMED_OLD_NAME:
-            {
-                auto hItem = GetItemForPath(path);
-                if (hItem)
+                case FILE_ACTION_ADDED:
+                case FILE_ACTION_RENAMED_NEW_NAME:
                 {
                     HTREEITEM hDir = nullptr;
-                    if (CPathUtils::PathCompare(path, m_path) == 0)
+                    if (CPathUtils::PathCompare(CPathUtils::GetParentDirectory(path), m_path) == 0)
                         hDir = TVI_ROOT;
                     else
                         hDir = GetItemForPath(CPathUtils::GetParentDirectory(path));
                     if (hDir)
                     {
-                        auto& data    = m_data[hDir]->data;
-                        auto  foundIt = std::find_if(data.begin(), data.end(), [&](const auto& fi) -> bool { return CPathUtils::PathCompare(fi->path, path) == 0; });
-                        data.erase(foundIt);
+                        auto& data = m_data[hDir]->data;
+                        auto  fi   = std::make_unique<FileTreeItem>();
+                        fi->isDir  = PathIsDirectory(path.c_str()) != 0;
+                        fi->path   = path;
+                        data.push_back(std::move(fi));
+                        std::sort(data.begin(), data.end(), [](const auto& lhs, const auto& rhs) {
+                            if (lhs->isDot)
+                                return false;
+                            if (rhs->isDot)
+                                return true;
+
+                            if (lhs->isDir != rhs->isDir)
+                                return !lhs->isDir;
+
+                            auto res = CompareStringEx(nullptr, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS | SORT_STRINGSORT,
+                                                       lhs->path.c_str(), static_cast<int>(lhs->path.length()),
+                                                       rhs->path.c_str(), static_cast<int>(rhs->path.length()),
+                                                       nullptr, nullptr, 0);
+                            return res == CSTR_GREATER_THAN;
+                        });
+                        HTREEITEM insertAfter = TVI_FIRST;
+                        auto      foundIt     = std::find_if(data.begin(), data.end(), [&](const auto& fti) -> bool { return CPathUtils::PathCompare(fti->path, path) == 0; });
+                        auto      nextIt      = foundIt;
+                        ++nextIt;
+                        if (nextIt != data.cend())
+                        {
+                            insertAfter = GetItemForPath((*nextIt)->path);
+                        }
+                        InsertItem(*foundIt, hDir, insertAfter, {});
                     }
-                    TreeView_DeleteItem(*this, hItem);
                 }
-            }
-            break;
-            default:
                 break;
+                case FILE_ACTION_REMOVED:
+                case FILE_ACTION_RENAMED_OLD_NAME:
+                {
+                    auto hItem = GetItemForPath(path);
+                    if (hItem)
+                    {
+                        HTREEITEM hDir = nullptr;
+                        if (CPathUtils::PathCompare(path, m_path) == 0)
+                            hDir = TVI_ROOT;
+                        else
+                            hDir = GetItemForPath(CPathUtils::GetParentDirectory(path));
+                        if (hDir)
+                        {
+                            auto& data    = m_data[hDir]->data;
+                            auto  foundIt = std::find_if(data.begin(), data.end(), [&](const auto& fi) -> bool { return CPathUtils::PathCompare(fi->path, path) == 0; });
+                            data.erase(foundIt);
+                        }
+                        TreeView_DeleteItem(*this, hItem);
+                    }
+                }
+                break;
+                default:
+                    break;
+            }
         }
     }
 }
