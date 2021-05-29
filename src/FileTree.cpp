@@ -49,10 +49,10 @@ inline bool IsFolderSeparator(wchar_t c)
 
 static HRESULT GetUIObjectOfFile(HWND hwnd, LPCWSTR pszPath, REFIID riid, void** ppv)
 {
-    *ppv            = nullptr;
-    HRESULT      hr = E_FAIL;
-    LPITEMIDLIST pidl;
-    SFGAOF       sfgao;
+    *ppv              = nullptr;
+    HRESULT      hr   = E_FAIL;
+    LPITEMIDLIST pidl = nullptr;
+    SFGAOF       sfgao{};
     if (SUCCEEDED(hr = SHParseDisplayName(pszPath, nullptr, &pidl, 0, &sfgao)))
     {
         IShellFolder* psf = nullptr;
@@ -98,6 +98,7 @@ CFileTree::~CFileTree()
 void CFileTree::Clear()
 {
     m_activeItem = nullptr;
+    m_pathWatcher.ClearPaths(true);
     for (auto& [handle, data] : m_data)
     {
         delete data;
@@ -153,6 +154,8 @@ bool CFileTree::Init(HINSTANCE /*hInst*/, HWND hParent)
     TreeView_SetImageList(*this, CSysImageList::GetInstance(), TVSIL_NORMAL);
 
     OnThemeChanged(CTheme::Instance().IsDarkTheme());
+
+    SetTimer(*this, 100, 1000, nullptr);
 
     return true;
 }
@@ -297,9 +300,6 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
             if (pData->refreshRoot != TVI_ROOT)
                 fi = GetFileTreeItem(*this, pData->refreshRoot);
 
-            auto dirIconIndex     = CSysImageList::GetInstance().GetDirIconIndex();
-            auto dirOpenIconIndex = CSysImageList::GetInstance().GetDirOpenIconIndex();
-
             if (((pData->refreshRoot == TVI_ROOT) && (CPathUtils::PathCompare(pData->refreshPath, m_path) == 0)) ||
                 (fi && (CPathUtils::PathCompare(fi->path, pData->refreshPath) == 0)))
             {
@@ -318,58 +318,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 bool activepathmarked = false;
                 for (const auto& item : pData->data)
                 {
-                    TVITEMEX       tvi    = {0};
-                    TVINSERTSTRUCT tvIns  = {nullptr};
-                    wchar_t        dots[] = L"..";
-
-                    tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
-
-                    const auto filename = CPathUtils::GetFileName(item.path);
-                    tvi.pszText         = const_cast<LPWSTR>(filename.c_str());
-                    tvi.cchTextMax      = static_cast<int>(filename.length());
-                    tvi.cChildren       = 0;
-
-                    if (item.isDir)
-                    {
-                        tvi.mask |= TVIF_EXPANDEDIMAGE;
-                        tvi.iImage         = dirIconIndex;
-                        tvi.iSelectedImage = dirIconIndex;
-                        tvi.iExpandedImage = dirOpenIconIndex;
-                        tvi.cChildren      = 1;
-                        if (item.isDot)
-                        {
-                            tvi.iImage         = 0;
-                            tvi.iSelectedImage = 0;
-                            tvi.iExpandedImage = 0;
-                            tvi.pszText        = dots;
-                            tvi.cchTextMax     = 3;
-                            tvi.cChildren      = 0;
-                        }
-                    }
-                    else
-                    {
-                        int fileIconIndex  = CSysImageList::GetInstance().GetFileIconIndex(item.path);
-                        tvi.iImage         = fileIconIndex;
-                        tvi.iSelectedImage = fileIconIndex;
-                    }
-                    if (!activePath.empty())
-                    {
-                        if (CPathUtils::PathCompare(item.path, activePath) == 0)
-                        {
-                            tvi.mask |= TVIF_STATE;
-                            tvi.state        = TVIS_BOLD;
-                            tvi.stateMask    = TVIS_BOLD;
-                            activepathmarked = true;
-                        }
-                    }
-                    tvi.lParam         = reinterpret_cast<LPARAM>(&item);
-                    tvIns.itemex       = tvi;
-                    tvIns.hInsertAfter = TVI_FIRST;
-                    tvIns.hParent      = pData->refreshRoot;
-
-                    auto hInsertedItem = TreeView_InsertItem(*this, &tvIns);
-                    if (tvi.state == TVIS_BOLD)
-                        SetActiveItem(hInsertedItem);
+                    activepathmarked = InsertItem(item, pData->refreshRoot, TVI_FIRST, activePath) || activepathmarked;
                 }
 
                 TreeView_Expand(*this, pData->refreshRoot, TVE_EXPAND);
@@ -411,6 +360,9 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
         }
             MarkActiveDocument(wParam == 0);
             break;
+        case WM_TIMER:
+            HandleChangeNotifications();
+            break;
         default:
             break;
     }
@@ -441,9 +393,15 @@ HTREEITEM CFileTree::RecurseTree(HTREEITEM hItem, ItemHandler handler)
     return nullptr;
 }
 
-void CFileTree::ExpandItem(HTREEITEM hItem)
+void CFileTree::ExpandItem(HTREEITEM hItem, bool expand)
 {
-    Refresh(hItem, false, true);
+    if (expand)
+        Refresh(hItem, false, true);
+    else
+    {
+        auto fi = GetFileTreeItem(*this, hItem);
+        m_pathWatcher.RemovePath(fi->path);
+    }
 }
 
 void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/, bool expanding /*= false*/)
@@ -470,6 +428,15 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/, bool expa
     }
     else
         m_bRootBusy = true;
+    if (refreshRoot == TVI_ROOT)
+    {
+        m_pathWatcher.ClearPaths(true);
+        m_pathWatcher.AddPath(m_path, false);
+    }
+    else
+    {
+        m_pathWatcher.AddPath(fi->path, false);
+    }
 
     TreeView_SetItemState(*this, refreshRoot, TVIS_CUT, TVIS_CUT);
 
@@ -555,13 +522,13 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
         // parent folder.
         if (refreshPath.size() > 3)
         {
-            auto         parentDir = CPathUtils::GetParentDirectory(refreshPath);
-            FileTreeItem fi;
-            fi.path  = std::move(parentDir);
-            fi.isDir = true;
-            fi.isDot = true;
+            auto parentDir = CPathUtils::GetParentDirectory(refreshPath);
+            auto fi        = std::make_unique<FileTreeItem>();
+            fi->path       = std::move(parentDir);
+            fi->isDir      = true;
+            fi->isDot      = true;
 
-            data->data.push_back(fi);
+            data->data.push_back(std::move(fi));
         }
     }
     CDirFileEnum enumerator(refreshPath);
@@ -570,11 +537,11 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
     std::wstring path;
     while (enumerator.NextFile(path, &bIsDir, false) && !m_bStop)
     {
-        FileTreeItem fi;
-        fi.path  = std::move(path);
-        fi.isDir = bIsDir;
+        auto fi   = std::make_unique<FileTreeItem>();
+        fi->path  = std::move(path);
+        fi->isDir = bIsDir;
 
-        data->data.push_back(fi);
+        data->data.push_back(std::move(fi));
     }
     if (m_bStop)
     {
@@ -583,17 +550,17 @@ void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refresh
         return;
     }
     std::sort(data->data.begin(), data->data.end(), [](const auto& lhs, const auto& rhs) {
-        if (lhs.isDot)
+        if (lhs->isDot)
             return false;
-        if (rhs.isDot)
+        if (rhs->isDot)
             return true;
 
-        if (lhs.isDir != rhs.isDir)
-            return !lhs.isDir;
+        if (lhs->isDir != rhs->isDir)
+            return !lhs->isDir;
 
         auto res = CompareStringEx(nullptr, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS | SORT_STRINGSORT,
-                                   lhs.path.c_str(), static_cast<int>(lhs.path.length()),
-                                   rhs.path.c_str(), static_cast<int>(rhs.path.length()),
+                                   lhs->path.c_str(), static_cast<int>(lhs->path.length()),
+                                   rhs->path.c_str(), static_cast<int>(rhs->path.length()),
                                    nullptr, nullptr, 0);
         return res == CSTR_GREATER_THAN;
     });
@@ -830,6 +797,143 @@ bool CFileTree::PathIsChild(const std::wstring& parent, const std::wstring& chil
             return false;
     }
     return true;
+}
+
+void CFileTree::HandleChangeNotifications()
+{
+    auto changedPaths = m_pathWatcher.GetChangedPaths();
+    for (const auto& [action, path] : changedPaths)
+    {
+        switch (action)
+        {
+            case FILE_ACTION_ADDED:
+            case FILE_ACTION_RENAMED_NEW_NAME:
+            {
+                HTREEITEM hDir = nullptr;
+                if (CPathUtils::PathCompare(CPathUtils::GetParentDirectory(path), m_path) == 0)
+                    hDir = TVI_ROOT;
+                else
+                    hDir = GetItemForPath(CPathUtils::GetParentDirectory(path));
+                if (hDir)
+                {
+                    auto& data = m_data[hDir]->data;
+                    auto  fi   = std::make_unique<FileTreeItem>();
+                    fi->isDir  = PathIsDirectory(path.c_str()) != 0;
+                    fi->path   = path;
+                    data.push_back(std::move(fi));
+                    std::sort(data.begin(), data.end(), [](const auto& lhs, const auto& rhs) {
+                        if (lhs->isDot)
+                            return false;
+                        if (rhs->isDot)
+                            return true;
+
+                        if (lhs->isDir != rhs->isDir)
+                            return !lhs->isDir;
+
+                        auto res = CompareStringEx(nullptr, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS | SORT_STRINGSORT,
+                                                   lhs->path.c_str(), static_cast<int>(lhs->path.length()),
+                                                   rhs->path.c_str(), static_cast<int>(rhs->path.length()),
+                                                   nullptr, nullptr, 0);
+                        return res == CSTR_GREATER_THAN;
+                    });
+                    HTREEITEM insertAfter = TVI_FIRST;
+                    auto      foundIt     = std::find_if(data.begin(), data.end(), [&](const auto& fti) -> bool { return CPathUtils::PathCompare(fti->path, path) == 0; });
+                    auto      nextIt      = foundIt;
+                    ++nextIt;
+                    if (nextIt != data.cend())
+                    {
+                        insertAfter = GetItemForPath((*nextIt)->path);
+                    }
+                    InsertItem(*foundIt, hDir, insertAfter, {});
+                }
+            }
+            break;
+            case FILE_ACTION_REMOVED:
+            case FILE_ACTION_RENAMED_OLD_NAME:
+            {
+                auto hItem = GetItemForPath(path);
+                if (hItem)
+                {
+                    HTREEITEM hDir = nullptr;
+                    if (CPathUtils::PathCompare(path, m_path) == 0)
+                        hDir = TVI_ROOT;
+                    else
+                        hDir = GetItemForPath(CPathUtils::GetParentDirectory(path));
+                    if (hDir)
+                    {
+                        auto& data    = m_data[hDir]->data;
+                        auto  foundIt = std::find_if(data.begin(), data.end(), [&](const auto& fi) -> bool { return CPathUtils::PathCompare(fi->path, path) == 0; });
+                        data.erase(foundIt);
+                    }
+                    TreeView_DeleteItem(*this, hItem);
+                }
+            }
+            break;
+            default:
+                break;
+        }
+    }
+}
+
+bool CFileTree::InsertItem(const std::unique_ptr<FileTreeItem>& item, HTREEITEM parent, HTREEITEM insertAfter, const std::wstring& activePath)
+{
+    TVITEMEX       tvi    = {0};
+    TVINSERTSTRUCT tvIns  = {nullptr};
+    wchar_t        dots[] = L"..";
+
+    tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
+
+    const auto filename   = CPathUtils::GetFileName(item->path);
+    tvi.pszText           = const_cast<LPWSTR>(filename.c_str());
+    tvi.cchTextMax        = static_cast<int>(filename.length());
+    tvi.cChildren         = 0;
+    auto dirIconIndex     = CSysImageList::GetInstance().GetDirIconIndex();
+    auto dirOpenIconIndex = CSysImageList::GetInstance().GetDirOpenIconIndex();
+
+    if (item->isDir)
+    {
+        tvi.mask |= TVIF_EXPANDEDIMAGE;
+        tvi.iImage         = dirIconIndex;
+        tvi.iSelectedImage = dirIconIndex;
+        tvi.iExpandedImage = dirOpenIconIndex;
+        tvi.cChildren      = 1;
+        if (item->isDot)
+        {
+            tvi.iImage         = 0;
+            tvi.iSelectedImage = 0;
+            tvi.iExpandedImage = 0;
+            tvi.pszText        = dots;
+            tvi.cchTextMax     = 3;
+            tvi.cChildren      = 0;
+        }
+    }
+    else
+    {
+        int fileIconIndex  = CSysImageList::GetInstance().GetFileIconIndex(item->path);
+        tvi.iImage         = fileIconIndex;
+        tvi.iSelectedImage = fileIconIndex;
+    }
+    bool activePathMarked = false;
+    if (!activePath.empty())
+    {
+        if (CPathUtils::PathCompare(item->path, activePath) == 0)
+        {
+            tvi.mask |= TVIF_STATE;
+            tvi.state        = TVIS_BOLD;
+            tvi.stateMask    = TVIS_BOLD;
+            activePathMarked = true;
+        }
+    }
+
+    tvi.lParam         = reinterpret_cast<LPARAM>(item.get());
+    tvIns.itemex       = tvi;
+    tvIns.hInsertAfter = insertAfter;
+    tvIns.hParent      = parent;
+
+    auto hInsertedItem = TreeView_InsertItem(*this, &tvIns);
+    if (tvi.state == TVIS_BOLD)
+        SetActiveItem(hInsertedItem);
+    return activePathMarked;
 }
 
 void CFileTree::BlockRefresh(bool bBlock)

@@ -16,6 +16,7 @@
 //
 #pragma once
 #include "BaseWindow.h"
+#include "PathWatcher.h"
 #include "ICommand.h"
 #include <functional>
 
@@ -24,16 +25,11 @@ using ItemHandler = std::function<bool(HTREEITEM)>;
 class FileTreeItem
 {
 public:
-    FileTreeItem()
-        : isDir(false)
-        , isDot(false)
-        , busy(false)
-    {
-    }
+    FileTreeItem() {}
     std::wstring path;
-    bool         isDir;
-    bool         isDot;
-    bool         busy;
+    bool         isDir = false;
+    bool         isDot = false;
+    bool         busy  = false;
 };
 
 class FileTreeData
@@ -41,24 +37,25 @@ class FileTreeData
 public:
     FileTreeData() {}
 
-    std::wstring              refreshPath;
-    HTREEITEM                 refreshRoot = nullptr;
-    std::vector<FileTreeItem> data;
+    std::wstring                               refreshPath;
+    HTREEITEM                                  refreshRoot = nullptr;
+    std::vector<std::unique_ptr<FileTreeItem>> data;
 };
 
-class CFileTree : public CWindow
+class CFileTree
+    : public CWindow
     , public ICommand
 {
 public:
     CFileTree(HINSTANCE hInst, void* obj);
-    virtual ~CFileTree();
+    ~CFileTree() override;
 
     bool         Init(HINSTANCE hInst, HWND hParent);
     void         Clear();
     void         SetPath(const std::wstring& path, bool forceRefresh = true);
     std::wstring GetPath() const { return m_path; }
     HTREEITEM    GetHitItem() const;
-    void         ExpandItem(HTREEITEM hItem);
+    void         ExpandItem(HTREEITEM hItem, bool expand);
     void         Refresh(HTREEITEM refreshRoot, bool force = false, bool expanding = false);
     std::wstring GetPathForHitItem(bool* isDir, bool* isDot) const;
     std::wstring GetPathForSelItem(bool* isDir, bool* isDot) const;
@@ -79,6 +76,8 @@ protected:
     void        MarkActiveDocument(bool ensureVisible);
     void        SetActiveItem(HTREEITEM hItem);
     static bool PathIsChild(const std::wstring& parent, const std::wstring& child);
+    void        HandleChangeNotifications();
+    bool        InsertItem(const std::unique_ptr<FileTreeItem>& item, HTREEITEM parent, HTREEITEM insertAfter, const std::wstring& activePath);
 
     void TabNotify(TBHDR* ptbhdr) override;
 
@@ -93,4 +92,5 @@ private:
     HTREEITEM                          m_activeItem;
     bool                               m_bBlockExpansion;
     std::map<HTREEITEM, FileTreeData*> m_data;
+    CPathWatcher                       m_pathWatcher;
 };

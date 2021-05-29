@@ -1145,8 +1145,7 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmHdr, WPARAM /*wParam*/,
         break;
         case TVN_ITEMEXPANDING:
         {
-            if ((pNmTv->action & TVE_EXPAND) != 0)
-                m_fileTree.ExpandItem(pNmTv->itemNew.hItem);
+            m_fileTree.ExpandItem(pNmTv->itemNew.hItem, (pNmTv->action & TVE_EXPAND) != 0);
         }
         break;
         case NM_CUSTOMDRAW:
