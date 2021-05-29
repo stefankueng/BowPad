@@ -176,7 +176,7 @@ void CPathWatcher::WorkerThread()
                                                pDirInfo->m_buffer,
                                                READ_DIR_CHANGE_BUFFER_SIZE,
                                                recursive ? TRUE : FALSE,
-                                               FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE,
+                                               FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME,
                                                &numBytes, // not used
                                                &pDirInfo->m_overlapped,
                                                nullptr)) //no completion routine!
@@ -233,7 +233,7 @@ void CPathWatcher::WorkerThread()
                                                pdi->m_buffer,
                                                READ_DIR_CHANGE_BUFFER_SIZE,
                                                pdi->m_recursive ? TRUE : FALSE,
-                                               FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE,
+                                               FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME,
                                                &numBytes, // not used
                                                &pdi->m_overlapped,
                                                nullptr)) //no completion routine!
