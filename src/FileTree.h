@@ -77,7 +77,7 @@ protected:
     void        SetActiveItem(HTREEITEM hItem);
     static bool PathIsChild(const std::wstring& parent, const std::wstring& child);
     void        HandleChangeNotifications();
-    bool        InsertItem(const std::unique_ptr<FileTreeItem>& item, HTREEITEM parent, HTREEITEM insertAfter, const std::wstring& activePath);
+    bool        InsertItem(const FileTreeItem* item, HTREEITEM parent, HTREEITEM insertAfter, const std::wstring& activePath);
 
     void TabNotify(TBHDR* ptbhdr) override;
 

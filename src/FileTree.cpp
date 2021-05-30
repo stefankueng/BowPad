@@ -318,7 +318,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 bool activepathmarked = false;
                 for (const auto& item : pData->data)
                 {
-                    activepathmarked = InsertItem(item, pData->refreshRoot, TVI_FIRST, activePath) || activepathmarked;
+                    activepathmarked = InsertItem(item.get(), pData->refreshRoot, TVI_FIRST, activePath) || activepathmarked;
                 }
 
                 TreeView_Expand(*this, pData->refreshRoot, TVE_EXPAND);
@@ -854,7 +854,7 @@ void CFileTree::HandleChangeNotifications()
                         {
                             insertAfter = GetItemForPath((*nextIt)->path);
                         }
-                        InsertItem(*foundIt, hDir, insertAfter, {});
+                        InsertItem(foundIt->get(), hDir, insertAfter, {});
                     }
                 }
                 break;
@@ -886,7 +886,7 @@ void CFileTree::HandleChangeNotifications()
     }
 }
 
-bool CFileTree::InsertItem(const std::unique_ptr<FileTreeItem>& item, HTREEITEM parent, HTREEITEM insertAfter, const std::wstring& activePath)
+bool CFileTree::InsertItem(const FileTreeItem* item, HTREEITEM parent, HTREEITEM insertAfter, const std::wstring& activePath)
 {
     TVITEMEX       tvi    = {0};
     TVINSERTSTRUCT tvIns  = {nullptr};
@@ -936,7 +936,7 @@ bool CFileTree::InsertItem(const std::unique_ptr<FileTreeItem>& item, HTREEITEM 
         }
     }
 
-    tvi.lParam         = reinterpret_cast<LPARAM>(item.get());
+    tvi.lParam         = reinterpret_cast<LPARAM>(item);
     tvIns.itemex       = tvi;
     tvIns.hInsertAfter = insertAfter;
     tvIns.hParent      = parent;
