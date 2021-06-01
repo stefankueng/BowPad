@@ -285,8 +285,8 @@ void CMRU::Load()
         if (!file.good())
             return;
 
-        const int maxLineLength = 1024;
-        char   line[maxLineLength + 1];
+        constexpr int maxLineLength = 1024;
+        char   line[maxLineLength + 1]{};
 
         for (;;)
         {

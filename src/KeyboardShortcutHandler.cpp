@@ -262,6 +262,8 @@ void CKeyboardShortcutHandler::Load(const CSimpleIni& ini)
                         }
                         break;
                     }
+                    default:
+                        break;
                 } // switch
             }
             m_accelerators.push_back(std::move(accel));
@@ -485,6 +487,9 @@ std::wstring CKeyboardShortcutHandler::MakeShortCutKeyForAccel(const KshAccel& a
             case VK_OEM_COMMA:
             case VK_OEM_PERIOD:
                 nScanCode |= 0x0100; // Add extended bit
+                break;
+            default:
+                break;
         }
         nScanCode <<= 16;
         int len = GetKeyNameText(nScanCode, buf, _countof(buf));

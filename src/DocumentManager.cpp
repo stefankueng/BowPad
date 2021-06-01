@@ -570,8 +570,8 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
 
 static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
 {
-    const int writeWideBufSize = WriteBlockSize * 2;
-    auto      widebuf          = std::make_unique<wchar_t[]>(writeWideBufSize);
+    constexpr int writeWideBufSize = WriteBlockSize * 2;
+    auto          wideBuf          = std::make_unique<wchar_t[]>(writeWideBufSize);
     err.clear();
     DWORD bytesWritten = 0;
 
@@ -585,7 +585,7 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
 
     if (hasBOM)
     {
-        BOOL result;
+        BOOL result = FALSE;
         if (encoding == 1200)
             result = WriteFile(hFile, "\xFF\xFE", 2, &bytesWritten, nullptr);
         else
@@ -601,10 +601,10 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     do
     {
         int charStart = UTF8Helper::characterStart(writeBuf, static_cast<int>(min(WriteBlockSize, lengthDoc)));
-        int wideLen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, widebuf.get(), writeWideBufSize);
+        int wideLen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, wideBuf.get(), writeWideBufSize);
         if (encoding == 1201)
         {
-            UINT64* pQw     = reinterpret_cast<UINT64*>(widebuf.get());
+            UINT64* pQw     = reinterpret_cast<UINT64*>(wideBuf.get());
             int     nQWords = wideLen / 4;
             for (int nQWord = 0; nQWord < nQWords; nQWord++)
                 pQw[nQWord] = WordSwapBytes(pQw[nQWord]);
@@ -613,7 +613,7 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
             for (int nWord = nQWords * 4; nWord < nWords; nWord++)
                 pW[nWord] = WideCharSwap(pW[nWord]);
         }
-        if (!WriteFile(hFile, widebuf.get(), wideLen * 2, &bytesWritten, nullptr) || wideLen != static_cast<int>(bytesWritten / 2))
+        if (!WriteFile(hFile, wideBuf.get(), wideLen * 2, &bytesWritten, nullptr) || wideLen != static_cast<int>(bytesWritten / 2))
         {
             CFormatMessageWrapper errMsg;
             err = errMsg.c_str();
@@ -627,11 +627,11 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
 
 static bool SaveAsUtf32(const CDocument& doc, char* buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
 {
-    const int writeWideBufSize = WriteBlockSize * 2;
-    auto      writeWideBuf     = std::make_unique<wchar_t[]>(writeWideBufSize);
-    auto      writeWide32Buf   = std::make_unique<wchar_t[]>(writeWideBufSize * 2);
-    DWORD     bytesWritten     = 0;
-    BOOL      result;
+    constexpr int writeWideBufSize = WriteBlockSize * 2;
+    auto          writeWideBuf     = std::make_unique<wchar_t[]>(writeWideBufSize);
+    auto          writeWide32Buf   = std::make_unique<wchar_t[]>(writeWideBufSize * 2);
+    DWORD         bytesWritten     = 0;
+    BOOL          result           = FALSE;
 
     auto encoding = doc.m_encoding;
     if (doc.m_encodingSaving != -1)
@@ -729,10 +729,10 @@ static bool SaveAsUtf8(const CDocument& doc, char* buf, size_t lengthDoc, CAutoF
 
 static bool SaveAsOther(const CDocument& doc, char* buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
 {
-    const int wideBufSize = WriteBlockSize * 2;
-    auto      wideBuf     = std::make_unique<wchar_t[]>(wideBufSize);
-    const int charBufSize = wideBufSize * 2;
-    auto      charBuf     = std::make_unique<char[]>(charBufSize);
+    constexpr int wideBufSize = WriteBlockSize * 2;
+    auto          wideBuf     = std::make_unique<wchar_t[]>(wideBufSize);
+    constexpr int charBufSize = wideBufSize * 2;
+    auto          charBuf     = std::make_unique<char[]>(charBufSize);
     // first convert to wide char, then to the requested codepage
     DWORD bytesWritten = 0;
     auto  encoding     = doc.m_encoding;

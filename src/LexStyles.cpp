@@ -147,6 +147,9 @@ void CLexStyles::ParseStyle(
             case 7: // eolstylefilled
                 if (!s.empty())
                     style.eolFilled = true;
+                break;
+            default:
+                break;
         }
         ++i;
     }
@@ -385,7 +388,7 @@ void CLexStyles::Load()
                 }
                 else if (_wcsicmp(L"CommentLineAtStart", sk) == 0)
                 {
-                    int vn;
+                    int vn = 0;
                     if (!CAppUtils::TryParse(
                             ini->GetValue(langSect.c_str(), sk), vn, false))
                         APPVERIFY(false);
