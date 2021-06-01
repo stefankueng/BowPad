@@ -313,7 +313,7 @@ void CTabBar::DeleteItemAt(int index)
     {
         RECT itemRect{};
         TabCtrl_GetItemRect(*this, m_nItems - 1, &itemRect);
-        RECT tabRect;
+        RECT tabRect{};
         GetClientRect(*this, &tabRect);
         TC_HITTESTINFO hti{};
         hti.pt                 = {14, 14}; // arbitrary value: just inside the first visible tab

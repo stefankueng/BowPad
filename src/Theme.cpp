@@ -485,6 +485,8 @@ LRESULT CTheme::ListViewSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
                         SetTextColor(nmcd->hdc, darkTextColor);
                         return CDRF_DODEFAULT;
                     }
+                    default:
+                        break;
                 }
             }
         }
@@ -492,6 +494,8 @@ LRESULT CTheme::ListViewSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
         case WM_DESTROY:
         case WM_NCDESTROY:
             RemoveWindowSubclass(hWnd, ListViewSubclassProc, SubclassID);
+            break;
+        default:
             break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
@@ -569,6 +573,8 @@ LRESULT CTheme::ComboBoxSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
         case WM_NCDESTROY:
             RemoveWindowSubclass(hWnd, ComboBoxSubclassProc, SubclassID);
             break;
+        default:
+            break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }
@@ -596,6 +602,8 @@ LRESULT CTheme::MainSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         case WM_DESTROY:
         case WM_NCDESTROY:
             RemoveWindowSubclass(hWnd, MainSubclassProc, SubclassID);
+            break;
+        default:
             break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
@@ -628,6 +636,8 @@ LRESULT CTheme::AutoSuggestSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         case WM_DESTROY:
         case WM_NCDESTROY:
             RemoveWindowSubclass(hWnd, AutoSuggestSubclassProc, SubclassID);
+            break;
+        default:
             break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
@@ -728,12 +738,12 @@ LRESULT CTheme::ButtonSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                             GetEditBorderColor(hWnd, &cr);
                             cr |= 0xff000000;
 
-                            std::unique_ptr<Gdiplus::Pen>      myPen(new Gdiplus::Pen(Gdiplus::Color(cr), 1));
-                            std::unique_ptr<Gdiplus::Graphics> myGraphics(new Gdiplus::Graphics(hdcPaint));
-                            int                                iY = RECTHEIGHT(rcDraw) / 2;
-                            Gdiplus::Rect                      rr = Gdiplus::Rect(rcClient.left, rcClient.top + iY,
+                            auto                  myPen      = std::make_unique<Gdiplus::Pen>(Gdiplus::Color(cr), 1);
+                            auto                  myGraphics = std::make_unique<Gdiplus::Graphics>(hdcPaint);
+                            int                   iY         = RECTHEIGHT(rcDraw) / 2;
+                            Gdiplus::Rect         rr         = Gdiplus::Rect(rcClient.left, rcClient.top + iY,
                                                              RECTWIDTH(rcClient), RECTHEIGHT(rcClient) - iY - 1);
-                            Gdiplus::GraphicsPath              path;
+                            Gdiplus::GraphicsPath path;
                             GetRoundRectPath(&path, rr, 5);
                             myGraphics->DrawPath(myPen.get(), &path);
                             myGraphics.reset();
@@ -982,6 +992,8 @@ LRESULT CTheme::ButtonSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         case WM_NCDESTROY:
             RemoveWindowSubclass(hWnd, ButtonSubclassProc, SubclassID);
             break;
+        default:
+            break;
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }
@@ -1034,6 +1046,8 @@ int GetStateFromBtnState(LONG_PTR dwStyle, BOOL bHot, BOOL bFocus, LRESULT dwChe
                     else
                         iState = RBS_UNCHECKEDNORMAL;
                     break;
+                default:
+                    break;
             }
             break;
 
@@ -1069,6 +1083,8 @@ int GetStateFromBtnState(LONG_PTR dwStyle, BOOL bHot, BOOL bFocus, LRESULT dwChe
                         iState = CBS_UNCHECKEDHOT;
                     else
                         iState = CBS_UNCHECKEDNORMAL;
+                    break;
+                default:
                     break;
             }
             break;
@@ -1116,9 +1132,9 @@ void GetRoundRectPath(Gdiplus::GraphicsPath* pPath, const Gdiplus::Rect& r, int 
 
 void DrawRect(LPRECT prc, HDC hdcPaint, Gdiplus::DashStyle dashStyle, Gdiplus::Color clr, Gdiplus::REAL width)
 {
-    std::unique_ptr<Gdiplus::Pen> myPen(new Gdiplus::Pen(clr, width));
+    auto myPen = std::make_unique<Gdiplus::Pen>(clr, width);
     myPen->SetDashStyle(dashStyle);
-    std::unique_ptr<Gdiplus::Graphics> myGraphics(new Gdiplus::Graphics(hdcPaint));
+    auto myGraphics = std::make_unique<Gdiplus::Graphics>(hdcPaint);
 
     myGraphics->DrawRectangle(myPen.get(), static_cast<INT>(prc->left), static_cast<INT>(prc->top),
                               static_cast<INT>(prc->right - 1 - prc->left), static_cast<INT>(prc->bottom - 1 - prc->top));

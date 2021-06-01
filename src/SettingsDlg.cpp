@@ -79,6 +79,8 @@ LRESULT CSettingsDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPa
             {
                 case IDC_SETTINGSLIST:
                     return DoListNotify(reinterpret_cast<LPNMITEMACTIVATE>(lParam));
+                default:
+                    break;
             }
             return FALSE;
         case WM_KEYDOWN:
@@ -90,7 +92,11 @@ LRESULT CSettingsDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPa
                     ListView_EditLabel(hListCtrl, ListView_GetSelectionMark(hListCtrl));
                 }
                 break;
+                default:
+                    break;
             }
+            break;
+        default:
             break;
     }
     return 0;
@@ -139,6 +145,8 @@ LRESULT CSettingsDlg::DoCommand(int id, int /*msg*/)
             [[fallthrough]];
         case IDCANCEL:
             EndDialog(*this, id);
+            break;
+        default:
             break;
     }
     return 1;
@@ -273,6 +281,7 @@ void CSettingsDlg::InitSettingsList()
                 auto val = CIniSettings::Instance().GetString(setting.section.c_str(), setting.key.c_str(), setting.def.s);
                 ListView_SetItemText(hListControl, index, 0, const_cast<LPWSTR>(val));
             }
+            break;
             default:
                 break;
         }

@@ -170,6 +170,9 @@ LRESULT CALLBACK CTabBtn::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                         InvalidateRect(*this, nullptr, false);
                 }
             }
+            break;
+            default:
+                break;
         }
     }
     if (prevWndProc)
