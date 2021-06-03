@@ -744,12 +744,26 @@ static bool SaveAsOther(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     {
         int charStart = UTF8Helper::characterStart(writeBuf, static_cast<int>(min(WriteBlockSize, lengthDoc)));
         int wideLen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, wideBuf.get(), wideBufSize);
-        int charLen   = WideCharToMultiByte(encoding < 0 ? CP_ACP : encoding, 0, wideBuf.get(), wideLen, charBuf.get(), charBufSize, nullptr, nullptr);
-        if (!WriteFile(hFile, charBuf.get(), charLen, &bytesWritten, nullptr) || charLen != static_cast<int>(bytesWritten))
+        BOOL usedDefaultChar = FALSE;
+        int  charLen         = WideCharToMultiByte(encoding < 0 ? CP_ACP : encoding, 0, wideBuf.get(), wideLen, charBuf.get(), charBufSize, nullptr, &usedDefaultChar);
+        if (usedDefaultChar && doc.m_encodingSaving == -1)
         {
-            CFormatMessageWrapper errMsg;
-            err = errMsg.c_str();
-            return false;
+            // stream could not be properly converted to ANSI, write it 'as is'
+            if (!WriteFile(hFile, writeBuf, charStart, &bytesWritten, nullptr) || charLen != static_cast<int>(bytesWritten))
+            {
+                CFormatMessageWrapper errMsg;
+                err = errMsg.c_str();
+                return false;
+            }
+        }
+        else
+        {
+            if (!WriteFile(hFile, charBuf.get(), charLen, &bytesWritten, nullptr) || charLen != static_cast<int>(bytesWritten))
+            {
+                CFormatMessageWrapper errMsg;
+                err = errMsg.c_str();
+                return false;
+            }
         }
         writeBuf += charStart;
         lengthDoc -= charStart;
