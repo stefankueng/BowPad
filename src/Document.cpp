@@ -60,8 +60,10 @@ std::wstring CDocument::GetEncodingString() const
             sEnc = L"UTF-32 LE";
             break;
         case 0:
-        case -1:
             sEnc = L"ANSI";
+            break;
+        case -1:
+            sEnc = L"Binary";
             break;
         default:
             if (static_cast<UINT>(m_encoding) == GetACP())
