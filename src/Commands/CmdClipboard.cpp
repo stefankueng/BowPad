@@ -140,6 +140,8 @@ std::string ClipboardBase::GetHtmlSelection() const
                 case '>':
                     cs = "&gt;";
                     break;
+                default:
+                    break;
             }
             sHtmlFragment += cs;
             ++p;

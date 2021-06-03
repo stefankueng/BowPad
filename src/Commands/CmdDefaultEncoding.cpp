@@ -17,7 +17,6 @@
 #include "stdafx.h"
 #include "CmdDefaultEncoding.h"
 #include "BowPad.h"
-#include "StringUtils.h"
 #include "Theme.h"
 
 LRESULT CDefaultEncodingDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -123,6 +122,8 @@ LRESULT CDefaultEncodingDlg::DoCommand(int id, int /*msg*/)
 
             EndDialog(*this, id);
         }
+        default:
+            break;
     }
     return 1;
 }

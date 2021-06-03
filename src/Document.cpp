@@ -131,6 +131,8 @@ EOLFormat toEolFormat(int eolMode)
             return EOLFormat::Unix_Format;
         case SC_EOL_CR:
             return EOLFormat::Mac_Format;
+        default:
+            break;
     }
     return EOLFormat::Unknown_Format;
 }

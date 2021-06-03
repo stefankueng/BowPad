@@ -21,7 +21,7 @@
 
 namespace
 {
-constexpr const auto g_bmColor = RGB(255, 0, 0);
+constexpr auto g_bmColor = RGB(255, 0, 0);
 }
 
 CCmdBookmarks::CCmdBookmarks(void* obj)

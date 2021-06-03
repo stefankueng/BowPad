@@ -45,9 +45,9 @@ struct CodePageItem
 namespace
 {
 // Don't change value, file data depends on them.
-const int CP_CATEGORY_MAIN      = 0;
-const int CP_CATEGORY_MRU       = 1;
-const int CP_CATEGORY_CODEPAGES = 2;
+constexpr int CP_CATEGORY_MAIN      = 0;
+constexpr int CP_CATEGORY_MRU       = 1;
+constexpr int CP_CATEGORY_CODEPAGES = 2;
 
 std::vector<CodePageItem> codepages;
 std::vector<UINT>         mrucodepages;

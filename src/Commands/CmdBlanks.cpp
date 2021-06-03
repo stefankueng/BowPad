@@ -79,6 +79,8 @@ bool CCmdTabs2Spaces::Execute()
         case SCLEX_HTML:
             bIgnoreQuotes = true;
             break;
+        default:
+            break;
     }
     auto source = std::make_unique<char[]>(docLength);
     ScintillaCall(SCI_GETTEXT, docLength, reinterpret_cast<sptr_t>(source.get()));
@@ -116,7 +118,7 @@ bool CCmdTabs2Spaces::Execute()
         // we have to convert all tabs
         if (*pBuf == '\t')
         {
-            inlinePos += tabSize - 1;
+            inlinePos += tabSize - 1LL;
             auto inlinePosTemp = tabSize - ((inlinePos + tabSize) % tabSize);
             if (inlinePosTemp == 0)
                 inlinePosTemp = tabSize;
@@ -201,6 +203,8 @@ bool CCmdSpaces2Tabs::Execute()
         case SCLEX_XML:
         case SCLEX_HTML:
             bIgnoreQuotes = true;
+            break;
+        default:
             break;
     }
 

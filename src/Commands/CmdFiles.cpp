@@ -146,6 +146,8 @@ void CCmdSave::ScintillaNotify(SCNotification* pScn)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
         }
         break;
+        default:
+            break;
     }
 }
 
@@ -195,6 +197,8 @@ void CCmdSaveAll::ScintillaNotify(SCNotification* pScn)
             InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
         }
         break;
+        default:
+            break;
     }
 }
 

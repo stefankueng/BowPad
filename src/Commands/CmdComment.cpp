@@ -139,6 +139,8 @@ bool CCmdUnComment::Execute()
                 --selEnd;
                 ++selEndCorr;
                 break;
+            default:
+                break;
         }
         switch (ScintillaCall(SCI_GETCHARAT, selEnd))
         {
@@ -146,6 +148,8 @@ bool CCmdUnComment::Execute()
             case '\n':
                 --selEnd;
                 ++selEndCorr;
+                break;
+            default:
                 break;
         }
 
