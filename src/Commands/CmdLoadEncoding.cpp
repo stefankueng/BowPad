@@ -156,9 +156,10 @@ HRESULT HandleItemsSource(const PROPVARIANT* pPropVarCurrentValue, bool ignoreUt
 HRESULT HandleSelectedItem(PROPVARIANT* pPropVarNewValue, int encoding, bool ignoreUtf8BOM)
 {
     auto hr = S_OK;
-    if ((encoding == -1) || (encoding == 0))
+    if (encoding == 0)
         hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, static_cast<UINT>(0), pPropVarNewValue);
-    // Return value unused, just set for debugging.
+    else if (encoding == -1)
+        hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, static_cast<UINT>(-1), pPropVarNewValue);
     else
     {
         int offset = 0;
@@ -173,7 +174,6 @@ HRESULT HandleSelectedItem(PROPVARIANT* pPropVarNewValue, int encoding, bool ign
             if (static_cast<int>(codepages[i].codepage) == encoding)
             {
                 hr = UIInitPropertyFromUInt32(UI_PKEY_SelectedItem, static_cast<UINT>(i - offset), pPropVarNewValue);
-                // Return value unused, just set for debugging.
                 break;
             }
         }
