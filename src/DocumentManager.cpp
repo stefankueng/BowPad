@@ -782,6 +782,7 @@ bool CDocumentManager::SaveDoc(HWND hWnd, const std::wstring& path, const CDocum
     switch (encoding)
     {
         case CP_UTF8:
+        case -1:
             ok = SaveAsUtf8(doc, buf, lengthDoc, hFile, err);
             break;
         case 1200: // UTF16_LE
