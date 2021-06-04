@@ -61,6 +61,11 @@ constexpr int    color_linenr_inactive          = 109;
 constexpr int    color_linenr_active            = 60;
 constexpr double folding_color_animation_time   = 0.3;
 
+COLORREF toRgba(COLORREF c, BYTE alpha = 255)
+{
+    return (c | (static_cast<DWORD>(alpha) << 24));
+}
+
 CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     : CWindow(hInst)
     , m_pSciMsg(nullptr)
@@ -178,9 +183,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     Call(SCI_STYLESETVISIBLE, STYLE_CONTROLCHAR, TRUE);
 
     Call(SCI_SETCARETSTYLE, 1);
-    Call(SCI_SETCARETLINEVISIBLE, true);
     Call(SCI_SETCARETLINEVISIBLEALWAYS, true);
-    Call(SCI_SETCARETWIDTH, bUseD2D ? 2 : 1);
+    Call(SCI_SETCARETWIDTH, CDPIAware::Instance().Scale(*this, bUseD2D ? 2 : 1));
     if (CIniSettings::Instance().GetInt64(L"View", L"caretlineframe", 1) != 0)
         Call(SCI_SETCARETLINEFRAME, CDPIAware::Instance().Scale(*this, 1));
     Call(SCI_SETWHITESPACESIZE, CDPIAware::Instance().Scale(*this, 1));
@@ -218,8 +222,6 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     Call(SCI_CALLTIPSETPOSITION, 1);
 
     Call(SCI_SETPASTECONVERTENDINGS, 1);
-
-    Call(SCI_SETSELALPHA, 128);
 
     Call(SCI_SETCHARACTERCATEGORYOPTIMIZATION, 0x10000);
     Call(SCI_SETACCESSIBILITY, SC_ACCESSIBILITY_ENABLED);
@@ -1110,30 +1112,27 @@ void CScintillaWnd::SetupDefaultStyles() const
 
     Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0), true));
     Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255), true));
-    Call(SCI_SETSELFORE, TRUE, theme.GetThemeColor(RGB(0, 0, 0), true));
-    Call(SCI_SETSELBACK, TRUE, theme.GetThemeColor(RGB(51, 153, 255), true));
-    Call(SCI_SETCARETFORE, theme.GetThemeColor(RGB(0, 0, 0), true));
-    Call(SCI_SETADDITIONALCARETFORE, theme.GetThemeColor(RGB(0, 0, 80), true));
-
+    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_SELECTION_TEXT, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true), 128));
+    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_SELECTION_BACK, toRgba(theme.GetThemeColor(RGB(51, 153, 255), true), 128));
+    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_CARET, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true)));
+    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_CARET_ADDITIONAL, toRgba(theme.GetThemeColor(RGB(0, 0, 80), true)));
+    Call(SCI_SETSELECTIONLAYER, SC_LAYER_UNDER_TEXT);
     if (CIniSettings::Instance().GetInt64(L"View", L"caretlineframe", 1) != 0)
     {
-        Call(SCI_SETCARETLINEBACK, theme.GetThemeColor(RGB(0, 0, 0), true));
-        Call(SCI_SETCARETLINEBACKALPHA, 80);
+        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_CARET_LINE_BACK, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true), 80));
     }
     else
     {
         if (theme.IsDarkTheme())
         {
-            Call(SCI_SETCARETLINEBACK, RGB(0, 0, 0));
-            Call(SCI_SETCARETLINEBACKALPHA, SC_ALPHA_NOALPHA);
+            Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_CARET_LINE_BACK, RGB(0, 0, 0));
         }
         else
         {
-            Call(SCI_SETCARETLINEBACK, theme.GetThemeColor(RGB(0, 0, 0), true));
-            Call(SCI_SETCARETLINEBACKALPHA, 25);
+            Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_CARET_LINE_BACK, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true), 25));
         }
     }
-    Call(SCI_SETWHITESPACEFORE, true, theme.IsDarkTheme() ? RGB(20, 72, 82) : RGB(43, 145, 175));
+    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_WHITE_SPACE, toRgba(theme.GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)), 80));
 
     auto modEventMask = Call(SCI_GETMODEVENTMASK);
     Call(SCI_SETMODEVENTMASK, 0);
@@ -1157,10 +1156,10 @@ void CScintillaWnd::SetupDefaultStyles() const
 
     if (theme.IsDarkTheme())
     {
-        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST, RGB(187, 187, 187));
-        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_BACK, RGB(15, 15, 15));
-        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED, RGB(187, 187, 187));
-        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED_BACK, RGB(80, 80, 80));
+        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST, toRgba(RGB(187, 187, 187)));
+        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_BACK, toRgba(RGB(15, 15, 15)));
+        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED, toRgba(RGB(187, 187, 187)));
+        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED_BACK, toRgba(RGB(80, 80, 80)));
     }
     else
     {
