@@ -24,7 +24,10 @@
 #include "AppUtils.h"
 #include "BowPadUI.h"
 
+#include "../ext/scintilla/include/ScintillaTypes.h"
+#include "../ext/scintilla/include/ScintillaMessages.h"
 #include "../ext/scintilla/src/KeyMap.h"
+#include "../ext/scintilla/include/scintilla.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
@@ -63,33 +66,29 @@ CKeyboardShortcutHandler& CKeyboardShortcutHandler::Instance()
         instance.Load();
 #ifdef _DEBUG
         // check if one of our shortcuts overrides a built-in Scintilla shortcut
-        Scintilla::KeyMap kMap;
-        const auto&       keyMap = kMap.GetKeyMap();
+        Scintilla::Internal::KeyMap kMap;
+        const auto&                 keyMap = kMap.GetKeyMap();
         for (auto& k : instance.m_accelerators)
         {
-            constexpr auto SCMOD_SHIFT = 1;
-            constexpr auto SCMOD_CTRL  = 2;
-            constexpr auto SCMOD_ALT   = 4;
-
             int         modifier = 0;
             std::string sMod;
             if (k.fVirt & 0x10)
             {
-                modifier |= SCI_ALT;
+                modifier |= SCMOD_ALT;
                 sMod += "Alt ";
             }
             if (k.fVirt & 0x08)
             {
-                modifier |= SCI_CTRL;
+                modifier |= SCMOD_CTRL;
                 sMod += "Ctrl ";
             }
             if (k.fVirt & 0x04)
             {
-                modifier |= SCI_SHIFT;
+                modifier |= SCMOD_SHIFT;
                 sMod += "Shift ";
             }
-            Scintilla::KeyModifiers sm(k.key1, modifier);
-            auto                    foundIt = keyMap.find(sm);
+            Scintilla::Internal::KeyModifiers sm(static_cast<Scintilla::Keys>(k.key1), static_cast<Scintilla::KeyMod>(modifier));
+            auto                              foundIt = keyMap.find(sm);
             if (foundIt != keyMap.end())
             {
                 // before hitting a break, check if it's a command we want to override

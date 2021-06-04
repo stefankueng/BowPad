@@ -39,6 +39,7 @@
 #include "../lexilla/lexlib/WordList.h"
 
 using namespace Scintilla;
+using namespace Lexilla;
 
 namespace
 {
@@ -279,7 +280,7 @@ public:
         return nullptr;
     }
 
-    bool checkLineComments(Scintilla::StyleContext* sc)
+    bool checkLineComments(Lexilla::StyleContext* sc)
     {
         for (const auto& cs : options.lineComments)
         {

@@ -21,7 +21,6 @@
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
 #include "BowPad.h"
-#include "../../ext/scintilla/src/KeyMap.h"
 
 #include <functional>
 
@@ -184,8 +183,8 @@ void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
     // we handle the click here separately so we can set the collapsed fold text.
     if ((pScn->nmhdr.code == SCN_MARGINCLICK) && (pScn->margin == SC_MARGE_FOLDER))
     {
-        const bool  ctrl      = (pScn->modifiers & SCI_CTRL) != 0;
-        const bool  shift     = (pScn->modifiers & SCI_SHIFT) != 0;
+        const bool  ctrl      = (pScn->modifiers & SCMOD_CTRL) != 0;
+        const bool  shift     = (pScn->modifiers & SCMOD_SHIFT) != 0;
         const auto& lineClick = ScintillaCall(SCI_LINEFROMPOSITION, pScn->position);
         if (shift && ctrl)
         {

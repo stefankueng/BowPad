@@ -36,12 +36,12 @@
 #include <uxtheme.h>
 #include <chrono>
 
-extern IUIFramework*          g_pFramework;
-extern std::string            g_sHighlightString;  // from CmdFindReplace
-extern sptr_t                 g_searchMarkerCount; // from CmdFindReplace
-extern Scintilla::LexerModule lmSimple;
-extern Scintilla::LexerModule lmLog;
-extern Scintilla::LexerModule lmSnippets;
+extern IUIFramework*        g_pFramework;
+extern std::string          g_sHighlightString;  // from CmdFindReplace
+extern sptr_t               g_searchMarkerCount; // from CmdFindReplace
+extern Lexilla::LexerModule lmSimple;
+extern Lexilla::LexerModule lmLog;
+extern Lexilla::LexerModule lmSnippets;
 
 UINT32 g_contextID = cmdContextMap;
 

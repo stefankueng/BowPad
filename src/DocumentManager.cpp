@@ -92,7 +92,7 @@ void CheckForTabs(const char* data, DWORD len, TabSpace& tabSpace)
     }
 }
 
-void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data, EOLFormat& eolFormat, TabSpace& tabSpace)
+void LoadSomeUtf8(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char* data, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
     // Nothing to convert, just pass it to Scintilla
@@ -110,7 +110,7 @@ void LoadSomeUtf8(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile, char*
         lenFile += 3;
 }
 
-void loadSomeUtf16Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+void loadSomeUtf16Le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
                      char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
@@ -130,7 +130,7 @@ void loadSomeUtf16Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
         lenFile += 2;
 }
 
-void loadSomeUtf16Be(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+void loadSomeUtf16Be(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
                      char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
@@ -174,7 +174,7 @@ void loadSomeUtf32Be(DWORD lenFile, char* data)
         p32[nDword] = DwordSwapBytes(p32[nDword]);
 }
 
-void loadSomeUtf32Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
+void loadSomeUtf32Le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
                      char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     char* pData = data;
@@ -218,7 +218,7 @@ void loadSomeUtf32Le(ILoader& edit, bool hasBOM, bool bFirst, DWORD& lenFile,
         lenFile += 4;
 }
 
-void LoadSomeOther(ILoader& edit, int encoding, DWORD lenFile,
+void LoadSomeOther(Scintilla::ILoader& edit, int encoding, DWORD lenFile,
                    int& incompleteMultiByteChar, char* data, char* charBuf, int charBufSize, wchar_t* wideBuf, EOLFormat& eolFormat, TabSpace& tabSpace)
 {
     // For other encodings, ask system if there are any invalid characters; note that it will
@@ -486,7 +486,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     int docOptions = SC_DOCUMENTOPTION_DEFAULT;
     if (bufferSizeRequested > INT_MAX)
         docOptions = SC_DOCUMENTOPTION_TEXT_LARGE | SC_DOCUMENTOPTION_STYLES_NONE;
-    ILoader* pdocLoad = reinterpret_cast<ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, static_cast<uptr_t>(bufferSizeRequested), docOptions));
+    Scintilla::ILoader* pdocLoad = reinterpret_cast<Scintilla::ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, static_cast<uptr_t>(bufferSizeRequested), docOptions));
     if (pdocLoad == nullptr)
     {
         ShowFileLoadError(hWnd, path,
@@ -742,8 +742,8 @@ static bool SaveAsOther(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     char* writeBuf = buf;
     do
     {
-        int charStart = UTF8Helper::characterStart(writeBuf, static_cast<int>(min(WriteBlockSize, lengthDoc)));
-        int wideLen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, wideBuf.get(), wideBufSize);
+        int  charStart       = UTF8Helper::characterStart(writeBuf, static_cast<int>(min(WriteBlockSize, lengthDoc)));
+        int  wideLen         = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, wideBuf.get(), wideBufSize);
         BOOL usedDefaultChar = FALSE;
         int  charLen         = WideCharToMultiByte(encoding < 0 ? CP_ACP : encoding, 0, wideBuf.get(), wideLen, charBuf.get(), charBufSize, nullptr, &usedDefaultChar);
         if (usedDefaultChar && doc.m_encodingSaving == -1)

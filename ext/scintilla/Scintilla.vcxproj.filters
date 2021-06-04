@@ -144,12 +144,6 @@
     <ClInclude Include="src\CellBuffer.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
-    <ClInclude Include="src\CharacterCategory.h">
-      <Filter>Scintilla\src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CharacterSet.h">
-      <Filter>Scintilla\src</Filter>
-    </ClInclude>
     <ClInclude Include="src\CharClassify.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
@@ -228,9 +222,23 @@
     <ClInclude Include="win32\HanjaDic.h">
       <Filter>Scintilla\win32</Filter>
     </ClInclude>
+    <ClInclude Include="include\ScintillaStructures.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ScintillaTypes.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ScintillaMessages.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CharacterCategoryMap.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CharacterType.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\StdRegexSearch.cpp" />
     <ClCompile Include="..\lexilla\lexers\LexSQL.cxx">
       <Filter>Lexilla\lexers</Filter>
     </ClCompile>
@@ -648,9 +656,6 @@
     <ClCompile Include="src\CellBuffer.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\CharacterSet.cxx">
-      <Filter>Scintilla\src</Filter>
-    </ClCompile>
     <ClCompile Include="src\CharClassify.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
@@ -714,7 +719,13 @@
     <ClCompile Include="win32\PlatWin.cxx">
       <Filter>Scintilla\win32</Filter>
     </ClCompile>
-    <ClCompile Include="src\CharacterCategory.cxx">
+    <ClCompile Include="..\lexilla\lexers\LexJulia.cxx">
+      <Filter>Lexilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CharacterType.cxx">
+      <Filter>Scintilla\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CharacterCategoryMap.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
   </ItemGroup>

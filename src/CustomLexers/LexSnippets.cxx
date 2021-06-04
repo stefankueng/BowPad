@@ -33,6 +33,7 @@
 #include "../lexilla/lexlib/DefaultLexer.h"
 
 using namespace Scintilla;
+using namespace Lexilla;
 
 namespace
 {
@@ -49,10 +50,8 @@ enum SnippetsStyles
 
 } // namespace
 
-
 class LexerSnippets : public DefaultLexer
 {
-
 public:
     LexerSnippets()
         : DefaultLexer("Snippets", SCLEX_AUTOMATIC + 102)
@@ -161,7 +160,7 @@ void SCI_METHOD LexerSnippets::Lex(Sci_PositionU startPos, Sci_Position length, 
                     sc.SetState(SnippetsStyles::CaretStart);
                 }
                 else
-                sc.SetState(SnippetsStyles::Default);
+                    sc.SetState(SnippetsStyles::Default);
                 break;
         }
     }
