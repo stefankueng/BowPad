@@ -45,6 +45,8 @@ LRESULT CGotoLineDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPa
             return FALSE;
         case WM_COMMAND:
             return DoCommand(LOWORD(wParam), HIWORD(wParam));
+        default:
+            break;
     }
     return FALSE;
 }
@@ -62,6 +64,9 @@ LRESULT CGotoLineDlg::DoCommand(int id, int /*msg*/)
             line       = _wtol(sLine.get());
             EndDialog(*this, id);
         }
+        break;
+        default:
+            break;
     }
     return 1;
 }

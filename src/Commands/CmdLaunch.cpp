@@ -338,6 +338,8 @@ LRESULT CCustomCommandsDlg::DoCommand(int id)
         case IDCANCEL:
             EndDialog(*this, id);
             break;
+        default:
+            break;
     }
     return 1;
 }

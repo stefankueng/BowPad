@@ -109,7 +109,7 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
     if (key && *key == UI_PKEY_FontProperties)
     {
         // Font properties have changed.
-        PROPVARIANT varChanges;
+        PROPVARIANT varChanges{};
         if (pCommandExecutionProperties == nullptr)
             return E_INVALIDARG;
         hr = pCommandExecutionProperties->GetValue(UI_PKEY_FontProperties_ChangedProperties, &varChanges);
@@ -122,7 +122,7 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
                 // Using the changed properties, set the new font on the selection on RichEdit control.
                 PROPVARIANT propVar;
                 PropVariantInit(&propVar);
-                UINT uValue;
+                UINT uValue = 0;
 
                 // Get the bold value from the property store.
                 if (SUCCEEDED(pChanges->GetValue(UI_PKEY_FontProperties_Bold, &propVar)))

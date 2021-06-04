@@ -34,8 +34,8 @@ namespace
 std::vector<std::wstring> gLanguages;
 std::vector<std::wstring> gRemotes;
 
-const int CAT_LANGS_AVAILABLE = 0;
-const int CAT_LANGS_REMOTE    = 1;
+constexpr int CAT_LANGS_AVAILABLE = 0;
+constexpr int CAT_LANGS_REMOTE    = 1;
 }; // namespace
 
 HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue)

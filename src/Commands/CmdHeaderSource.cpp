@@ -229,7 +229,7 @@ void CCmdHeaderSource::InvalidateMenu()
 
 HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue)
 {
-    HRESULT hr;
+    HRESULT hr{};
 
     if (key == UI_PKEY_Categories)
     {
@@ -428,7 +428,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
 
         std::wstring foundFile;
         std::wstring menuText;
-        bool         found;
+        bool         found = false;
 
         // Handle System Include Files
 
@@ -673,6 +673,8 @@ void CCmdHeaderSource::ScintillaNotify(SCNotification* pScn)
                 // Links may have changed.
                 InvalidateMenu();
             }
+            break;
+        default:
             break;
     }
 }
@@ -943,8 +945,8 @@ bool CCmdHeaderSource::ParseInclude(const std::wstring& raw, std::wstring& filen
     filename.clear();
     incType = RelatedType::Unknown;
 
-    size_t len = raw.length();
-    size_t last;
+    size_t len  = raw.length();
+    size_t last = 0;
 
     if (len == 0)
         return false;
@@ -1042,10 +1044,10 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
     ttf.lpstrText = const_cast<char*>(CPP_INCLUDE_STATEMENT_REGEX);
 
     std::string textFound;
-    size_t      lineNo;
+    size_t      lineNo = 0;
 
     std::wstring filename;
-    RelatedType  includeType;
+    RelatedType  includeType{};
 
     for (;;)
     {

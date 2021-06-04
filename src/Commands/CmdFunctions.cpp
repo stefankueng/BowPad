@@ -151,7 +151,7 @@ static bool FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf,
     auto len = ttf.chrgText.cpMax - cpMin;
     if (len < 0)
         return false;
-    foundText.resize(len + 1);
+    foundText.resize(len + 1LL);
     Sci_TextRange r{cpMin, ttf.chrgText.cpMax, &foundText[0]};
     edit.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&r));
     foundText.resize(len);
@@ -357,6 +357,8 @@ void CCmdFunctions::ScintillaNotify(SCNotification* pScn)
                     InvalidateFunctionsSource();
                 }
             }
+            break;
+        default:
             break;
     }
 }
@@ -706,7 +708,7 @@ void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const
     OnOutOfScope(
         edit.Call(SCI_SETDOCPOINTER, 0, 0););
 
-    sptr_t      lineNum;
+    sptr_t      lineNum = 0;
     std::string sig;
 
     Sci_TextToFind ttf{};

@@ -35,6 +35,7 @@
 #include <algorithm>
 #include <utility>
 #include <memory>
+#include <strsafe.h>
 #include <vssym32.h>
 
 static std::string g_findString;
@@ -49,19 +50,19 @@ static std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
 
 namespace
 {
-const int          TIMER_INFOSTRING      = 100;
-const int          TIMER_SUGGESTION      = 101;
-const unsigned int SF_SEARCHSUBFOLDERS   = 1;
-const unsigned int SF_SEARCHFORFUNCTIONS = 2;
+constexpr int          TIMER_INFOSTRING      = 100;
+constexpr int          TIMER_SUGGESTION      = 101;
+constexpr unsigned int SF_SEARCHSUBFOLDERS   = 1;
+constexpr unsigned int SF_SEARCHFORFUNCTIONS = 2;
 // Limit the max search results so as not to crash by running out of memory or allowed memory.
-const int MAX_SEARCHRESULTS = 10000;
+constexpr int MAX_SEARCHRESULTS = 10000;
 
 // The maximum for these values is set by the user in the config file.
 // These are just the default maximums.
-const int DEFAULT_MAX_SEARCH_STRINGS       = 20;
-const int DEFAULT_MAX_REPLACE_STRINGS      = 20;
-const int DEFAULT_MAX_SEARCHFOLDER_STRINGS = 20;
-const int DEFAULT_MAX_SEARCHFILE_STRINGS   = 20;
+constexpr int DEFAULT_MAX_SEARCH_STRINGS       = 20;
+constexpr int DEFAULT_MAX_REPLACE_STRINGS      = 20;
+constexpr int DEFAULT_MAX_SEARCHFOLDER_STRINGS = 20;
+constexpr int DEFAULT_MAX_SEARCHFILE_STRINGS   = 20;
 // The batch size and progress interval determine how much data to buffer up and
 // when to flush the buffer - even if it is not full by the time the interval has expired.
 // If the time limit is too high it may appear like nothing is happening
@@ -70,9 +71,9 @@ const int DEFAULT_MAX_SEARCHFILE_STRINGS   = 20;
 // If the interval time or batch size is too low, performance may be affected
 // because the message delivery and progress reporting mechanism may
 // become more of a bottle-neck in performance than time taken to find results.
-constexpr auto PROGRESS_UPDATE_INTERVAL = std::chrono::seconds(3);
-const size_t   MAX_DATA_BATCH_SIZE      = 1000;
-constexpr auto MATCH_COLOR              = RGB(0xFF, 0, 0); // Red.
+constexpr auto   PROGRESS_UPDATE_INTERVAL = std::chrono::seconds(3);
+constexpr size_t MAX_DATA_BATCH_SIZE      = 1000;
+constexpr auto   MATCH_COLOR              = RGB(0xFF, 0, 0); // Red.
 
 // A couple of functions here are similar to those in CmdFunctions.cpp.
 // Code sharing is possible but for now the preference is not to do that
@@ -198,7 +199,7 @@ void moveAppend(T& dst, T& src)
 std::wstring GetHomeFolder()
 {
     std::wstring homeFolder;
-    size_t       requiredSize;
+    size_t       requiredSize     = 0;
     wchar_t      hd[MAX_PATH + 1] = {};
     if (_wgetenv_s(&requiredSize, hd, L"USERPROFILE") == 0)
         homeFolder = hd;
@@ -451,9 +452,15 @@ LRESULT CFindReplaceDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
                             HandleButtonDropDown(pDropDown);
                             return TRUE;
                         }
+                        default:
+                            break;
                     }
                     break;
+                default:
+                    break;
             }
+            break;
+        default:
             break;
     }
     return FALSE;
@@ -770,6 +777,8 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
             break;
         case NM_CUSTOMDRAW:
             return DrawListItem(reinterpret_cast<NMLVCUSTOMDRAW*>(lpNMItemActivate));
+        default:
+            break;
     }
     return 0;
 }
@@ -794,22 +803,24 @@ LRESULT CFindReplaceDlg::GetListItemDispInfo(NMLVDISPINFO* pDispInfo)
                     sTemp = CPathUtils::GetFileName(m_foundPaths[item.pathIndex]);
                 else
                     sTemp = GetTitleForDocID(item.docID);
-                lstrcpyn(pDispInfo->item.pszText, sTemp.c_str(), pDispInfo->item.cchTextMax);
+                StringCchCopy(pDispInfo->item.pszText, pDispInfo->item.cchTextMax, sTemp.c_str());
                 break;
 
             case 1: // line
                 sTemp = std::to_wstring(item.line + 1);
-                lstrcpyn(pDispInfo->item.pszText, sTemp.c_str(), pDispInfo->item.cchTextMax);
+                StringCchCopy(pDispInfo->item.pszText, pDispInfo->item.cchTextMax, sTemp.c_str());
                 break;
 
             case 2: // line text
                 if (m_searchType == IDC_FINDFILES)
                 {
                     auto parent = CPathUtils::GetParentDirectory(m_foundPaths[item.pathIndex]);
-                    lstrcpyn(pDispInfo->item.pszText, parent.c_str(), pDispInfo->item.cchTextMax);
+                    StringCchCopy(pDispInfo->item.pszText, pDispInfo->item.cchTextMax, parent.c_str());
                 }
                 else
-                    lstrcpyn(pDispInfo->item.pszText, item.lineText.c_str(), pDispInfo->item.cchTextMax);
+                    StringCchCopy(pDispInfo->item.pszText, pDispInfo->item.cchTextMax, item.lineText.c_str());
+                break;
+            default:
                 break;
         }
     }
@@ -836,9 +847,13 @@ LRESULT CFindReplaceDlg::DrawListItem(NMLVCUSTOMDRAW* pLVCD)
 
                 case 2: // line text
                     return DrawListItemWithMatches(pLVCD);
+                default:
+                    break;
             }
             break;
         }
+        default:
+            break;
     }
     return CDRF_DODEFAULT;
 }
@@ -1350,6 +1365,8 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
         case IDC_SEARCHFOLDERFOLLOWTAB:
             if (msg == BN_CLICKED)
                 CheckSearchFolder();
+            break;
+        default:
             break;
     }
     return 1;
@@ -2456,6 +2473,8 @@ LRESULT CALLBACK CFindReplaceDlg::ListViewSubClassProc(HWND hWnd, UINT uMsg, WPA
         case WM_NCDESTROY:
             RemoveWindowSubclass(hWnd, ListViewSubClassProc, uIdSubclass);
             break;
+        default:
+            break;
     }
     auto result = DefSubclassProc(hWnd, uMsg, wParam, lParam);
     return result;
@@ -2472,6 +2491,8 @@ LRESULT CALLBACK CFindReplaceDlg::EditSubClassProc(HWND hWnd, UINT uMsg, WPARAM 
             RemoveWindowSubclass(hWnd, EditSubClassProc, uIdSubclass);
             break;
         }
+        default:
+            break;
     }
     auto result = DefSubclassProc(hWnd, uMsg, wParam, lParam);
     switch (uMsg)
@@ -2494,6 +2515,8 @@ LRESULT CALLBACK CFindReplaceDlg::EditSubClassProc(HWND hWnd, UINT uMsg, WPARAM 
                     Edit_SetSel(hWnd, currentName.size(), -1);
                 }
             }
+            break;
+        default:
             break;
     }
     return result;
