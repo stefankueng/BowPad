@@ -47,7 +47,7 @@ enum class ResponseToCloseTab
     CloseWithoutSaving
 };
 
-struct HIMAGELIST_Deleter
+struct HimagelistDeleter
 {
     void operator()(_IMAGELIST* hImageList) const
     {
@@ -236,7 +236,7 @@ private:
     int                                             m_insertionIndex;
     bool                                            m_windowRestored;
     bool                                            m_inMenuLoop;
-    std::unique_ptr<_IMAGELIST, HIMAGELIST_Deleter> m_tabBarImageList;
+    std::unique_ptr<_IMAGELIST, HimagelistDeleter> m_tabBarImageList;
     CScintillaWnd                                   m_scratchEditor;
     std::map<std::wstring, int>                     m_folderColorIndexes;
     int                                             m_lastFolderColorIndex;
