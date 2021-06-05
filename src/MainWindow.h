@@ -171,7 +171,7 @@ private:
 
     // Scintilla events.
     void        HandleDwellStart(const SCNotification& scn, bool start);
-    bool        HandleDoubleClick(const SCNotification& scn);
+    LPARAM      HandleMouseMsg(const SCNotification& scn);
     bool        OpenUrlAtPos(Sci_Position pos);
     void        HandleCopyDataCommandLine(const COPYDATASTRUCT& cds);
     bool        HandleCopyDataMoveTab(const COPYDATASTRUCT& cds);

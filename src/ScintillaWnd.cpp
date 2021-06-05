@@ -555,6 +555,33 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                     }
                 }
             }
+            {
+                RECT rc;
+                GetClientRect(*this, &rc);
+                rc.right = rc.left;
+                for (int i = 0; i <= SC_MARGE_FOLDER; ++i)
+                    rc.right += static_cast<long>(Call(SCI_GETMARGINWIDTHN, i));
+                POINT          pt       = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+                auto           mousePos = Call(SCI_POSITIONFROMPOINT, pt.x, pt.y);
+                SCNotification scn      = {};
+                scn.nmhdr.code          = SCN_BP_MOUSEMSG;
+                scn.position            = mousePos;
+                scn.x                   = static_cast<int>(pt.x);
+                scn.y                   = static_cast<int>(pt.y);
+                scn.modifiers           = 0;
+                scn.modificationType    = uMsg;
+                scn.nmhdr.hwndFrom      = *this;
+                scn.nmhdr.idFrom        = ::GetDlgCtrlID(*this);
+                if (GetKeyState(VK_SHIFT) & 0x8000)
+                    scn.modifiers |= SCMOD_SHIFT;
+                if (GetKeyState(VK_CONTROL) & 0x8000)
+                    scn.modifiers |= SCMOD_CTRL;
+                if (GetKeyState(VK_MENU) & 0x8000)
+                    scn.modifiers |= SCMOD_ALT;
+                if (::SendMessage(::GetParent(*this), WM_NOTIFY,
+                                  ::GetDlgCtrlID(*this), reinterpret_cast<LPARAM>(&scn)) == 0)
+                    return 0;
+            }
         }
         break;
         case WM_MOUSELEAVE:

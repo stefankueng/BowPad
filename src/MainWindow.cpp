@@ -1078,8 +1078,6 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
         case SCN_MODIFYATTEMPTRO:
             HandleWriteProtectedEdit();
             break;
-        case SCN_DOUBLECLICK:
-            return HandleDoubleClick(scn);
         case SCN_DWELLSTART:
             m_dwellStartPos = scn.position;
             HandleDwellStart(scn, true);
@@ -1101,6 +1099,8 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
             m_editor.UpdateLineNumberWidth();
             UpdateStatusBar(false);
             break;
+        case SCN_BP_MOUSEMSG:
+            return HandleMouseMsg(scn);
     }
     return 0;
 }
@@ -2972,11 +2972,20 @@ void CMainWindow::HandleGetDispInfo(int tab, LPNMTTDISPINFO lpNmtdi)
     }
 }
 
-bool CMainWindow::HandleDoubleClick(const SCNotification& scn)
+LPARAM CMainWindow::HandleMouseMsg(const SCNotification& scn)
 {
-    if (!(scn.modifiers & SCMOD_CTRL))
-        return false;
-    return OpenUrlAtPos(scn.position);
+    if (scn.modifiers & SCMOD_CTRL)
+    {
+        if (scn.modificationType == WM_LBUTTONDOWN)
+        {
+            if (m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position))
+            {
+                OpenUrlAtPos(scn.position);
+                return FALSE;
+            }
+        }
+    }
+    return TRUE;
 }
 
 bool CMainWindow::OpenUrlAtPos(Sci_Position pos)

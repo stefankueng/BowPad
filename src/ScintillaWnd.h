@@ -39,11 +39,13 @@ class CPosData;
 #define INDIC_REGEXCAPTURE     (INDIC_CONTAINER + 10)
 #define INDIC_REGEXCAPTURE_END (INDIC_CONTAINER + 20)
 
-const int SC_MARGE_LINENUMBER = 0;
-const int SC_MARGE_SYMBOL     = 1;
-const int SC_MARGE_FOLDER     = 2;
+constexpr int SC_MARGE_LINENUMBER = 0;
+constexpr int SC_MARGE_SYMBOL     = 1;
+constexpr int SC_MARGE_FOLDER     = 2;
 
-const int MARK_BOOKMARK = 24;
+constexpr int MARK_BOOKMARK = 24;
+
+constexpr int SCN_BP_MOUSEMSG = 4000;
 
 enum class BraceMatch
 {
