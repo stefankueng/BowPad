@@ -2762,16 +2762,19 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
         size_t             lineLength = 0;
         while (getline(is, part, '\n'))
             lineLength = max(lineLength, part.size());
-        auto tipPos = startPos + ((endPos - startPos) / 2) - static_cast<sptr_t>(lineLength) / 2;
+        auto cursorPos = m_editor.Call(SCI_POSITIONFROMPOINT, scn.x, scn.y);
+        auto tipPos    = cursorPos - static_cast<sptr_t>(lineLength) / 2;
         if (m_editor.Call(SCI_CALLTIPACTIVE))
         {
             auto linePos = m_editor.Call(SCI_LINEFROMPOSITION, scn.position);
-            auto upPos   = m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_POSITIONFROMPOINT, 0, scn.y - pixelMargin));
-            if (upPos != linePos)
+            auto upPos   = m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_POSITIONFROMPOINT, 0, scn.y + pixelMargin));
+            if (upPos < linePos)
             {
                 m_editor.Call(SCI_CALLTIPCANCEL);
                 return;
             }
+            else if (upPos == linePos)
+                return;
         }
         tipPos = max(lineStartPos, tipPos);
         if (m_editor.Call(SCI_CALLTIPACTIVE) && m_editor.Call(SCI_CALLTIPPOSSTART) == tipPos)
@@ -2991,7 +2994,7 @@ bool CMainWindow::OpenUrlAtPos(Sci_Position pos)
     auto originalSearchFlags = m_editor.Call(SCI_GETSEARCHFLAGS);
     OnOutOfScope(m_editor.Call(SCI_SETSEARCHFLAGS, originalSearchFlags));
 
-    m_editor.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP);
+    m_editor.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP | SCFIND_CXX11REGEX);
 
     Sci_Position posFound = static_cast<Sci_Position>(m_editor.Call(SCI_SEARCHINTARGET, URL_REG_EXPR_LENGTH, reinterpret_cast<LPARAM>(URL_REG_EXPR)));
     if (posFound != -1)
