@@ -25,7 +25,6 @@
 #include "Theme.h"
 
 #include <regex>
-#include <algorithm>
 #include <memory>
 
 constexpr auto DEFAULT_MAX_SEARCH_STRINGS = 20;
@@ -200,6 +199,8 @@ void CRegexCaptureDlg::DoCapture()
 
     auto sRegex   = CUnicodeUtils::StdGetUTF8(sRegexW);
     auto sCapture = UnEscape(CUnicodeUtils::StdGetUTF8(sCaptureW));
+    if (sCapture.empty())
+        sCapture = "$&";
     try
     {
         auto                  findText = GetDlgItemText(IDC_SEARCHCOMBO);
