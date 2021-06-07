@@ -363,6 +363,7 @@
 #define IDC_CHECK1                      1113
 #define IDC_HIDE                        1113
 #define IDC_HIGHLIGHT                   1113
+#define IDC_ADDNEWLINE                  1113
 #define IDC_COLLECTIONNAME              1114
 #define IDC_SETTINGSLIST                1115
 #define IDC_LABEL                       1124

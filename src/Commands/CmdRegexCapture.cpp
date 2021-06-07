@@ -156,6 +156,7 @@ void CRegexCaptureDlg::DoInitDialog(HWND hwndDlg)
 
     AdjustControlSize(IDC_ICASE);
     AdjustControlSize(IDC_DOTNEWLINE);
+    AdjustControlSize(IDC_ADDNEWLINE);
 
     m_resizer.Init(hwndDlg);
     m_resizer.UseSizeGrip(!CTheme::Instance().IsDarkTheme());
@@ -164,6 +165,7 @@ void CRegexCaptureDlg::DoInitDialog(HWND hwndDlg)
     m_resizer.AddControl(hwndDlg, IDC_REGEXCOMBO, RESIZER_TOPLEFTRIGHT);
     m_resizer.AddControl(hwndDlg, IDC_ICASE, RESIZER_TOPLEFTRIGHT);
     m_resizer.AddControl(hwndDlg, IDC_DOTNEWLINE, RESIZER_TOPLEFTRIGHT);
+    m_resizer.AddControl(hwndDlg, IDC_ADDNEWLINE, RESIZER_TOPLEFTRIGHT);
     m_resizer.AddControl(hwndDlg, IDC_CAPTURECOMBO, RESIZER_TOPLEFTRIGHT);
     m_resizer.AddControl(hwndDlg, IDOK, RESIZER_TOPRIGHT);
     m_resizer.AddControl(hwndDlg, IDC_SCINTILLA, RESIZER_TOPLEFTBOTTOMRIGHT);
@@ -201,6 +203,24 @@ void CRegexCaptureDlg::DoCapture()
     auto sCapture = UnEscape(CUnicodeUtils::StdGetUTF8(sCaptureW));
     if (sCapture.empty())
         sCapture = "$&";
+    if (IsDlgButtonChecked(*this, IDC_ADDNEWLINE))
+    {
+        switch (ScintillaCall(SCI_GETEOLMODE))
+        {
+            case SC_EOL_CRLF:
+                sCapture += "\r\n";
+                break;
+            case SC_EOL_LF:
+                sCapture += "\n";
+                break;
+            case SC_EOL_CR:
+                sCapture += "\r";
+                break;
+            default:
+                sCapture += "\r\n";
+                APPVERIFY(false); // Shouldn't happen.
+        }
+    }
     try
     {
         auto                  findText = GetDlgItemText(IDC_SEARCHCOMBO);
