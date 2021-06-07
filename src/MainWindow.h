@@ -31,7 +31,7 @@
 #include <UIRibbonPropertyHelpers.h>
 #include <list>
 
-const int COMMAND_TIMER_ID_START = 1000;
+constexpr int COMMAND_TIMER_ID_START = 1000;
 
 enum class ResponseToOutsideModifiedFile
 {
