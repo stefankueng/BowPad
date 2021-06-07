@@ -96,6 +96,8 @@ LRESULT CRegexCaptureDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM
                 SetDlgItemText(*this, IDC_INFOLABEL, L"");
             }
             break;
+        default:
+            break;
     }
     return FALSE;
 }
@@ -119,6 +121,8 @@ LRESULT CRegexCaptureDlg::DoCommand(int id, int /*msg*/)
         break;
         case IDOK:
             DoCapture();
+            break;
+        default:
             break;
     }
     return 1;
@@ -152,7 +156,7 @@ void CRegexCaptureDlg::DoInitDialog(HWND hwndDlg)
     // Try (unscientifically) to not get to close to the tab bar either.
     LONG y = rcScintilla.top + 15;
 
-    SetWindowPos(hwndDlg, HWND_TOP, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
+    SetWindowPos(hwndDlg, nullptr, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
 
     AdjustControlSize(IDC_ICASE);
     AdjustControlSize(IDC_DOTNEWLINE);
