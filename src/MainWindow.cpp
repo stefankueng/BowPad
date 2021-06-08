@@ -542,10 +542,10 @@ void CMainWindow::ShowCommandPalette()
     RECT tabrc{};
     TabCtrl_GetItemRect(m_tabBar, 0, &tabrc);
     MapWindowPoints(m_tabBar, *this, reinterpret_cast<LPPOINT>(&tabrc), 2);
-    const int  treeWidth = m_fileTreeVisible ? m_treeWidth : 0;
-    const int  marginY   = CDPIAware::Instance().Scale(*this, 10);
-    const int  marginX   = CDPIAware::Instance().Scale(*this, 30);
-    const UINT flags     = SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
+    const int      treeWidth = m_fileTreeVisible ? m_treeWidth : 0;
+    const int      marginY   = CDPIAware::Instance().Scale(*this, 10);
+    const int      marginX   = CDPIAware::Instance().Scale(*this, 30);
+    constexpr UINT flags     = SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
 
     m_commandPaletteDlg->ShowModeless(g_hRes, IDD_COMMANDPALETTE, *this, false);
     RECT thisRc{};
@@ -697,6 +697,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     break;
                 case CD_COMMAND_MOVETAB:
                     return static_cast<LRESULT>(HandleCopyDataMoveTab(cds));
+                default:
+                    break;
             }
         }
         break;
@@ -741,6 +743,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     HandleGetDispInfo(static_cast<int>(nmHdr.idFrom), lpNmtdi);
                 }
                 break;
+                default:
+                    break;
             }
 
             if (nmHdr.idFrom == reinterpret_cast<UINT_PTR>(&m_tabBar) || nmHdr.hwndFrom == m_tabBar)
@@ -982,6 +986,8 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmHdr, WPARAM /*wParam*/, L
             }
         }
         break;
+        default:
+            break;
     }
     return 0;
 }
@@ -1101,6 +1107,8 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
             break;
         case SCN_BP_MOUSEMSG:
             return HandleMouseMsg(scn);
+        default:
+            break;
     }
     return 0;
 }
@@ -1177,6 +1185,8 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmHdr, WPARAM /*wParam*/,
 
                         return CDRF_DODEFAULT;
                     }
+                    default:
+                        break;
                 }
                 return CDRF_DODEFAULT;
             }
@@ -1245,6 +1255,8 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
                     ShowTablistDropdown(m_statusBar, pt.x, pt.y);
                 }
                 break;
+                default:
+                    break;
             }
         }
         break;
@@ -1257,6 +1269,8 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
                     break;
                 case STATUSBAR_EOL_FORMAT:
                     HandleStatusBarEOLFormat();
+                    break;
+                default:
                     break;
             }
             break;
@@ -1291,10 +1305,14 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
                         CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, true);
                 }
                 break;
+                default:
+                    break;
             }
             UpdateStatusBar(true);
         }
         break;
+        default:
+            break;
     }
 }
 
@@ -1668,8 +1686,8 @@ void CMainWindow::ResizeChildWindows()
     // again.
     if (!IsRectEmpty(&rect) && IsWindowVisible(*this))
     {
-        const UINT flags       = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
-        const UINT noShowFlags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOCOPYBITS;
+        constexpr UINT flags       = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
+        constexpr UINT noShowFlags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOCOPYBITS;
 
         // note: if there are no tab items in the tab bar, the call to
         // TabCtrl_GetItemRect will return FALSE but the tabrc rect still has
@@ -2354,6 +2372,8 @@ ResponseToCloseTab CMainWindow::AskToCloseTab() const
         case 101:
             response = ResponseToCloseTab::CloseWithoutSaving;
             break;
+        default:
+            break;
     }
     return response;
 }
@@ -2410,6 +2430,8 @@ ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const 
                 break;
             case 102:
                 responseToOutsideModifiedFile = ResponseToOutsideModifiedFile::KeepOurChanges;
+                break;
+            default:
                 break;
         }
     }
@@ -2866,7 +2888,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
         // as a number in decimal, hex or octal.
         wWord = wWord.substr(rgbLen, (wWord.length() - rgbLen));
         CStringUtils::TrimLeadingAndTrailing(wWord, std::wstring(L"()"));
-        int                       r, g, b;
+        int                       r = 0, g = 0, b = 0;
         std::vector<std::wstring> vec;
         stringtok(vec, wWord, true, L",");
         if (vec.size() == 3 &&
@@ -3115,8 +3137,8 @@ void CMainWindow::HandleUpdateUI(const SCNotification& scn)
         m_editor.UpdateLineNumberWidth();
     if (scn.updated & SC_UPDATE_SELECTION)
         m_editor.SelectionUpdated();
-    const unsigned int uiFlags = SC_UPDATE_SELECTION |
-                                 SC_UPDATE_H_SCROLL | SC_UPDATE_V_SCROLL;
+    constexpr unsigned int uiFlags = SC_UPDATE_SELECTION |
+                                     SC_UPDATE_H_SCROLL | SC_UPDATE_V_SCROLL;
     if ((scn.updated & uiFlags) != 0)
         m_editor.MarkSelectedWord(false, false);
 
@@ -3530,7 +3552,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
     for (int i = 0; i < filesDropped; ++i)
     {
         UINT len     = DragQueryFile(hDrop, i, nullptr, 0);
-        auto pathBuf = std::make_unique<wchar_t[]>(len + 2);
+        auto pathBuf = std::make_unique<wchar_t[]>(len + 2LL);
         DragQueryFile(hDrop, i, pathBuf.get(), len + 1);
         files.push_back(pathBuf.get());
     }
@@ -3584,8 +3606,8 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
     ShowProgressCtrl(static_cast<UINT>(CIniSettings::Instance().GetInt64(L"View", L"progressdelay", 1000)));
     OnOutOfScope(HideProgressCtrl());
 
-    const size_t maxFiles    = 100;
-    int          fileCounter = 0;
+    constexpr size_t maxFiles    = 100;
+    int              fileCounter = 0;
     for (const auto& filename : files)
     {
         ++fileCounter;
@@ -4309,7 +4331,7 @@ void CMainWindow::ShowProgressCtrl(UINT delay)
     RECT rect;
     GetClientRect(*this, &rect);
     MapWindowPoints(*this, nullptr, reinterpret_cast<LPPOINT>(&rect), 2);
-    SetWindowPos(m_progressBar, HWND_TOP, rect.left, rect.bottom - m_statusBar.GetHeight(), rect.right - rect.left, m_statusBar.GetHeight(), SWP_NOACTIVATE | SWP_NOCOPYBITS);
+    SetWindowPos(m_progressBar, nullptr, rect.left, rect.bottom - m_statusBar.GetHeight(), rect.right - rect.left, m_statusBar.GetHeight(), SWP_NOACTIVATE | SWP_NOCOPYBITS);
 
     m_progressBar.ShowWindow(delay);
 }
@@ -4363,9 +4385,9 @@ void CMainWindow::SetRibbonColors(COLORREF text, COLORREF background, COLORREF h
     // when the Ribbon is initialized.
     if (SUCCEEDED(g_pFramework->QueryInterface(&spPropertyStore)))
     {
-        PROPVARIANT propVarBackground;
-        PROPVARIANT propVarHighlight;
-        PROPVARIANT propVarText;
+        PROPVARIANT propVarBackground{};
+        PROPVARIANT propVarHighlight{};
+        PROPVARIANT propVarText{};
 
         // UI_HSBCOLOR is a type defined in UIRibbon.h that is composed of
         // three component values: hue, saturation and brightness, respectively.
@@ -4472,7 +4494,7 @@ void CMainWindow::SetTheme(bool dark)
     Win10Colors::AccentColor accentColor;
     if (SUCCEEDED(Win10Colors::GetAccentColor(accentColor)))
     {
-        BYTE h, s, b;
+        BYTE h = 0, s = 0, b = 0;
         GDIHelpers::RGBToHSB(dark ? accentColor.accent : accentColor.accent, h, s, b);
         UI_HSBCOLOR aColor = UI_HSB(h, s, b);
 
