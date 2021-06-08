@@ -99,7 +99,7 @@ void CLexStyles::ParseStyle(
     std::vector<std::wstring> vec;
     stringtok(vec, v, false, L";");
     int      i = 0;
-    COLORREF clr;
+    COLORREF clr{};
     for (const auto& s : vec)
     {
         switch (i)

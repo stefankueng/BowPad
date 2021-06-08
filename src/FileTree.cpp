@@ -33,8 +33,8 @@
 
 #pragma comment(lib, "Uxtheme.lib")
 
-const int SCRATCH_QCM_FIRST = 1;
-const int SCRATCH_QCM_LAST  = 0x6FFF;
+constexpr int SCRATCH_QCM_FIRST = 1;
+constexpr int SCRATCH_QCM_LAST  = 0x6FFF;
 
 static IContextMenu2* g_pcm2 = nullptr;
 static IContextMenu3* g_pcm3 = nullptr;
@@ -435,7 +435,8 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/, bool expa
     }
     else
     {
-        m_pathWatcher.AddPath(fi->path, false);
+        if (fi)
+            m_pathWatcher.AddPath(fi->path, false);
     }
 
     TreeView_SetItemState(*this, refreshRoot, TVIS_CUT, TVIS_CUT);

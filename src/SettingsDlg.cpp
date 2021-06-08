@@ -135,6 +135,7 @@ LRESULT CSettingsDlg::DoCommand(int id, int /*msg*/)
                         {
                             CIniSettings::Instance().SetString(setting.section.c_str(), setting.key.c_str(), buf);
                         }
+                        break;
                         default:
                             break;
                     }
