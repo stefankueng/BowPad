@@ -7,9 +7,11 @@ var def = {
     tabWidth: 4, // tab size
     indent: 0, // size of indentation, 0: indent size = tab size
     caretWidth: 4,
-    caretFore: 0x000000, // color of caret, #BBGGRR
-    caretLineBack: 0x333333, // background or frame color of caret line, #BBGGRR
+    caretFore: (0xFF << 24) | 0x000000, // color of caret, #BBGGRR
+    caretLineBack: 0xCCCCCC, // background or frame color of caret line, #BBGGRR
     caretLineFrame: 2, // 0: disable framed style caret line, use caretLineBack as background; >0: frame width
+    selection: 0xFF << 24 | 0x333333, // color of selection
+    selectionBack: 0x99 << 24 | 0xFFCC99, // color of selection background
     viewWhitespace: 0 // 0: whitespace invisible; 1: dot & arrows; 2: visible after indent; 3: only in indent
 };
 // overriding settings for specific programming languages
@@ -32,7 +34,7 @@ var docSettings = {}; // temporary settings for opened documents
 // returns the version of the plugin
 // this callback is not optional! If you fail to implement this, the plugin
 // config dialog won't work properly with your plugin
-function Version() { return 100; }
+function Version() { return 110; }
 
 function overrideSettings() {
     var docID = BowPad.GetDocIdOfCurrentTab();
@@ -47,9 +49,11 @@ function overrideSettings() {
     BowPad.SciSetTabWidth(typeof(s.tabWidth) === "undefined" ? def.tabWidth : s.tabWidth);
     BowPad.SciSetUseTabs(typeof(s.useTab) === "undefined" ? def.useTab : s.useTab);
     BowPad.SciSetCaretWidth(typeof(s.caretWidth) === "undefined" ? def.caretWidth : s.caretWidth);
-    BowPad.SciSetCaretFore(typeof(s.caretFore) === "undefined" ? def.caretFore : s.caretFore);
-    BowPad.SciSetCaretLineBack(typeof(s.caretLineBack) === "undefined" ? def.caretLineBack : s.caretLineBack);
+    BowPad.SciSetElementColour(40, typeof(s.caretFore) === "undefined" ? def.caretFore : s.caretFore);
+    BowPad.SciSetElementColour(50, typeof(s.caretLineBack) === "undefined" ? def.caretLineBack : s.caretLineBack);
     BowPad.SciSetCaretLineFrame(typeof(s.caretLineFrame) === "undefined" ? def.caretLineFrame : s.caretLineFrame);
+    BowPad.SciSetElementColour(10, typeof(s.selection) === "undefined" ? def.selection : s.selection);
+    BowPad.SciSetElementColour(11, typeof(s.selectionBack) === "undefined" ? def.selectionBack : s.selectionBack);
     BowPad.SciSetViewWs(typeof(s.viewWhitespace) === "undefined" ? def.viewWhitespace : s.viewWhitespace);
     BowPad.SciSetIndent(typeof(s.indent) === "undefined" ? def.indent : s.indent);
 }
@@ -60,9 +64,11 @@ function getSettings() {
         tabWidth: BowPad.SciGetTabWidth(),
         useTab: BowPad.SciGetUseTabs(),
         caretWidth: BowPad.SciGetCaretWidth(),
-        caretFore: BowPad.SciGetCaretFore(),
-        caretLineBack: BowPad.SciGetCaretLineBack(),
+        caretFore: BowPad.SciGetElementColour(40),
+        caretLineBack: BowPad.SciGetElementColour(50),
         caretLineFrame: BowPad.SciGetCaretLineFrame(),
+        selection: BowPad.SciGetElementColour(10),
+        selectionBack: BowPad.SciGetElementColour(11),
         viewWhitespace: BowPad.SciGetViewWs(),
         indent: BowPad.SciGetIndent()
     };
