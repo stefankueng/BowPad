@@ -103,10 +103,10 @@ function TabNotify(code, tabOrigin)
         case -552:
             docSettings[BowPad.GetDocIdOfCurrentTab()] = getSettings();
             break;
-        case -551:
-        case 0x0409:
-            overrideSettings();
-            break;
+        //case -551:
+        //case 0x0409:
+        //    overrideSettings();
+        //    break;
     }
 }
 
@@ -115,7 +115,7 @@ function OnDocumentClose(index) {
 }
 
 // called after styles are set, so the plugin can set its own
-//function OnStylesSet()
-//{
-//    overrideSettings();
-//}
+function OnStylesSet()
+{
+    overrideSettings();
+}
