@@ -703,21 +703,27 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             {
                 auto pos2  = pos - 2;
                 auto inner = 1;
-                if (pos2 > 0)
+                if (pos2 > 2)
                 {
                     if (m_editor->Call(SCI_GETCHARAT, pos2) == '<')
                     {
+                        auto docLen = m_editor->Call(SCI_GETLENGTH);
                         do
                         {
-                            pos2 = m_editor->FindText("<", pos2 - 2, 0);
+                            auto savedPos2 = pos2;
+                            pos2           = m_editor->FindText("<", pos2 - 2, 0);
                             if (pos2)
                             {
-                                if (m_editor->Call(SCI_GETCHARAT, pos2 + 1) == '/')
-                                    ++inner;
-                                else
-                                    --inner;
+                                auto closeBracketPos = m_editor->FindText("/>", pos2, docLen);
+                                if (closeBracketPos > savedPos2 || closeBracketPos < 0)
+                                {
+                                    if (m_editor->Call(SCI_GETCHARAT, pos2 + 1) == '/')
+                                        ++inner;
+                                    else
+                                        --inner;
+                                }
                             }
-                        } while (inner && pos2 > 0);
+                        } while (inner && pos2 > 2);
                         std::string tagName;
                         auto        position = pos2 + 1;
                         int         nextChar = static_cast<int>(m_editor->Call(SCI_GETCHARAT, position));
