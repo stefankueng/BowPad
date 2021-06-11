@@ -735,6 +735,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                         }
                         if (!tagName.empty())
                         {
+                            if (tagName.starts_with("?"))
+                                tagName = tagName.substr(1);
                             tagName = tagName + ">" + typeSeparator + "-1";
                             m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
                             m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
