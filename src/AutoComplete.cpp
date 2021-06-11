@@ -703,37 +703,40 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             {
                 auto pos2  = pos - 2;
                 auto inner = 1;
-                if (m_editor->Call(SCI_GETCHARAT, pos2) == '<')
+                if (pos2 > 0)
                 {
-                    do
+                    if (m_editor->Call(SCI_GETCHARAT, pos2) == '<')
                     {
-                        pos2 = m_editor->FindText("<", pos2 - 2, 0);
-                        if (pos2)
+                        do
                         {
-                            if (m_editor->Call(SCI_GETCHARAT, pos2 + 1) == '/')
-                                ++inner;
-                            else
-                                --inner;
+                            pos2 = m_editor->FindText("<", pos2 - 2, 0);
+                            if (pos2)
+                            {
+                                if (m_editor->Call(SCI_GETCHARAT, pos2 + 1) == '/')
+                                    ++inner;
+                                else
+                                    --inner;
+                            }
+                        } while (inner && pos2 > 0);
+                        std::string tagName;
+                        auto        position = pos2 + 1;
+                        int         nextChar = static_cast<int>(m_editor->Call(SCI_GETCHARAT, position));
+                        while (position < pos && !m_editor->IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
+                        {
+                            tagName.push_back(static_cast<char>(nextChar));
+                            ++position;
+                            nextChar = static_cast<int>(m_editor->Call(SCI_GETCHARAT, position));
                         }
-                    } while (inner && pos2 > 0);
-                    std::string tagName;
-                    auto        position = pos2 + 1;
-                    int         nextChar = static_cast<int>(m_editor->Call(SCI_GETCHARAT, position));
-                    while (position < pos && !m_editor->IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
-                    {
-                        tagName.push_back(static_cast<char>(nextChar));
-                        ++position;
-                        nextChar = static_cast<int>(m_editor->Call(SCI_GETCHARAT, position));
-                    }
-                    if (!tagName.empty())
-                    {
-                        tagName = tagName + ">" + typeSeparator + "-1";
-                        m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
-                        m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
-                        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
-                        m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), reinterpret_cast<LPARAM>(tagName.c_str()));
-                        SetWindowStylesForAutocompletionPopup();
-                        return;
+                        if (!tagName.empty())
+                        {
+                            tagName = tagName + ">" + typeSeparator + "-1";
+                            m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
+                            m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
+                            m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+                            m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), reinterpret_cast<LPARAM>(tagName.c_str()));
+                            SetWindowStylesForAutocompletionPopup();
+                            return;
+                        }
                     }
                 }
             }
