@@ -20,6 +20,7 @@
 #include "ClipboardHelper.h"
 #include "OnOutOfScope.h"
 #include "StringUtils.h"
+#include "version.h"
 #include "../../ext/sktoolslib/PathUtils.h"
 
 static auto CF_HTML = RegisterClipboardFormat(L"HTML Format");
@@ -826,6 +827,14 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID /*riid*/,
             idList[i] = 1;
         else if (_wcsicmp(nameList[i], L"debugprint") == 0)
             idList[i] = 2;
+        else if (_wcsicmp(nameList[i], L"Version") == 0)
+            idList[i] = 3;
+        else if (_wcsicmp(nameList[i], L"VersionMajor") == 0)
+            idList[i] = 4;
+        else if (_wcsicmp(nameList[i], L"VersionMinor") == 0)
+            idList[i] = 5;
+        else if (_wcsicmp(nameList[i], L"VersionMicro") == 0)
+            idList[i] = 6;
         else if (_wcsicmp(nameList[i], L"SetInsertionIndex") == 0)
             idList[i] = 100;
         else if (_wcsicmp(nameList[i], L"TabActivateAt") == 0)
@@ -972,6 +981,34 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             CTraceToOutputDebugString::Instance()(L"BowPad : ");
             CTraceToOutputDebugString::Instance()(p1.bstrVal);
             CTraceToOutputDebugString::Instance()(L"\n");
+            break;
+        case 3: // Version
+            if (args->cArgs != 0)
+                return DISP_E_BADPARAMCOUNT;
+            else
+            {
+                auto sVer    = std::to_string(BP_VERMAJOR) + "." + std::to_string(BP_VERMINOR) + "." + std::to_string(BP_VERMICRO);
+                ret->vt      = VT_BSTR;
+                ret->bstrVal = _bstr_t(sVer.c_str()).Detach();
+            }
+            break;
+        case 4: // VersionMajor
+            if (args->cArgs != 0)
+                return DISP_E_BADPARAMCOUNT;
+            ret->vt     = VT_INT;
+            ret->intVal = BP_VERMAJOR;
+            break;
+        case 5: // VersionMinor
+            if (args->cArgs != 0)
+                return DISP_E_BADPARAMCOUNT;
+            ret->vt     = VT_INT;
+            ret->intVal = BP_VERMINOR;
+            break;
+        case 6: // VersionMicro
+            if (args->cArgs != 0)
+                return DISP_E_BADPARAMCOUNT;
+            ret->vt     = VT_INT;
+            ret->intVal = BP_VERMICRO;
             break;
         case 100: // SetInsertionIndex
             if (args->cArgs != 1)
