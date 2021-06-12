@@ -714,10 +714,13 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                             pos2           = m_editor->FindText("<", pos2 - 2, 0);
                             if (pos2)
                             {
+                                auto nextChar = m_editor->Call(SCI_GETCHARAT, pos2 + 1);
+                                if (nextChar == '!')
+                                    continue;
                                 auto closeBracketPos = m_editor->FindText("/>", pos2, docLen);
                                 if (closeBracketPos > savedPos2 || closeBracketPos < 0)
                                 {
-                                    if (m_editor->Call(SCI_GETCHARAT, pos2 + 1) == '/')
+                                    if (nextChar == '/')
                                         ++inner;
                                     else
                                         --inner;
