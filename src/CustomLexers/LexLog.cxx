@@ -197,7 +197,8 @@ LogStyles GetLogStyle(LogStyles style, LogStates state)
             break;
         case ErrorNumber:
             break;
-        default:;
+        default:
+            break;
     }
     return style;
 }
@@ -238,7 +239,7 @@ public:
     {
     }
 
-    virtual ~LexerLog()
+    ~LexerLog() override
     {
     }
 
@@ -448,13 +449,16 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
                         if (sc.ch == ')')
                             sc.ForwardSetState(GetLogStyle(LogStyles::Default, logState));
                         break;
+                    default:
+                        break;
                 }
                 if (sc.atLineEnd)
                 {
                     sc.ChangeState(GetLogStyle(LogStyles::Block, logState));
                     sc.ForwardSetState(GetLogStyle(LogStyles::Default, logState));
                 }
-
+                break;
+            default:
                 break;
         }
 

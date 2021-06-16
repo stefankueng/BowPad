@@ -58,7 +58,7 @@ public:
     {
     }
 
-    virtual ~LexerSnippets()
+    ~LexerSnippets() override
     {
     }
 
@@ -161,6 +161,8 @@ void SCI_METHOD LexerSnippets::Lex(Sci_PositionU startPos, Sci_Position length, 
                 }
                 else
                     sc.SetState(SnippetsStyles::Default);
+                break;
+            default:
                 break;
         }
     }

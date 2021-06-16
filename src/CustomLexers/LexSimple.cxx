@@ -228,7 +228,7 @@ public:
     {
     }
 
-    virtual ~LexerSimple()
+    ~LexerSimple() override
     {
     }
 
@@ -353,6 +353,8 @@ Sci_Position SCI_METHOD LexerSimple::WordListSet(int n, const char* wl)
         case 8:
             wordListAbridgedN                = &keywords9;
             wordListAbridgedN->caseSensitive = options.ws9CaseSensitive;
+            break;
+        default:
             break;
     }
     Sci_Position firstModification = -1;
@@ -486,6 +488,8 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
             case SimpleStyles::MarkedWord2:
                 if (IsASpaceOrTab(sc.ch) || sc.ch == '\r' || sc.ch == '\n' || IsAnOperator(&sc, options.operatorsVec))
                     sc.SetState(SimpleStyles::Default);
+                break;
+            default:
                 break;
         }
 
