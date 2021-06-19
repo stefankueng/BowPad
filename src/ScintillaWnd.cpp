@@ -1147,6 +1147,7 @@ void CScintillaWnd::SetupDefaultStyles() const
     if (CIniSettings::Instance().GetInt64(L"View", L"caretlineframe", 1) != 0)
     {
         Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_CARET_LINE_BACK, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true), 80));
+        Call(SCI_SETCARETLINELAYER, SC_LAYER_UNDER_TEXT);
     }
     else
     {
