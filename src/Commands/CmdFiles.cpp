@@ -40,8 +40,8 @@ bool CCmdOpen::Execute()
 
     // Set the dialog options, if it fails don't continue as we don't
     // know what options we're blending. Shouldn't ever fail anyway.
-    DWORD dwOptions;
-    hr = pfd->GetOptions(&dwOptions);
+    DWORD dwOptions = 0;
+    hr              = pfd->GetOptions(&dwOptions);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
 

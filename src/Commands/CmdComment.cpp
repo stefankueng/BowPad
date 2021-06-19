@@ -21,13 +21,13 @@
 bool CCmdComment::Execute()
 {
     // Get Selection
-    bool   bSelEmpty    = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
-    bool   bForceStream = false;
-    sptr_t selStart     = ScintillaCall(SCI_GETSELECTIONSTART);
-    sptr_t selEnd       = ScintillaCall(SCI_GETSELECTIONEND);
-    sptr_t lineStart    = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-    sptr_t lineEnd      = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
-    sptr_t curPos       = ScintillaCall(SCI_GETCURRENTPOS);
+    bool bSelEmpty    = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
+    bool bForceStream = false;
+    auto selStart     = ScintillaCall(SCI_GETSELECTIONSTART);
+    auto selEnd       = ScintillaCall(SCI_GETSELECTIONEND);
+    auto lineStart    = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+    auto lineEnd      = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    auto curPos       = ScintillaCall(SCI_GETCURRENTPOS);
     if (!bSelEmpty)
     {
         if (ScintillaCall(SCI_POSITIONFROMLINE, lineEnd) == selEnd)
@@ -71,7 +71,7 @@ bool CCmdComment::Execute()
         size_t insertedChars = 0;
         for (auto line = lineStart; line <= lineEnd; ++line)
         {
-            size_t pos = ScintillaCall(SCI_POSITIONFROMLINE, line);
+            auto pos = ScintillaCall(SCI_POSITIONFROMLINE, line);
             if (!commentLineAtStart)
             {
                 int tabsize = static_cast<int>(ScintillaCall(SCI_GETTABWIDTH));
@@ -188,13 +188,13 @@ bool CCmdUnComment::Execute()
             if (lineStartStart == selStart)
             {
                 // remove block comments for each selected line
-                sptr_t lineStart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-                sptr_t lineEnd   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+                auto lineStart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
+                auto lineEnd   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
                 ScintillaCall(SCI_BEGINUNDOACTION);
                 size_t removedChars = 0;
                 for (auto line = lineStart; line <= lineEnd; ++line)
                 {
-                    size_t        pos = ScintillaCall(SCI_GETLINEINDENTPOSITION, line);
+                    auto          pos = ScintillaCall(SCI_GETLINEINDENTPOSITION, line);
                     Sci_TextRange range;
                     range.chrg.cpMin = static_cast<Sci_PositionCR>(pos);
                     range.chrg.cpMax = static_cast<Sci_PositionCR>(pos + commentLine.length());

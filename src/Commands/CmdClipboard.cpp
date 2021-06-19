@@ -386,11 +386,11 @@ void CCmdPasteHtml::HtmlExtractMetadata(const std::string& cfHtml,
     if (baseURL)
     {
         static std::string srcURLStr("SourceURL:");
-        size_t             lineStart = cfHtml.find(srcURLStr);
+        auto               lineStart = cfHtml.find(srcURLStr);
         if (lineStart != std::string::npos)
         {
-            size_t srcEnd   = cfHtml.find("\n", lineStart);
-            size_t srcStart = lineStart + srcURLStr.length();
+            auto srcEnd   = cfHtml.find("\n", lineStart);
+            auto srcStart = lineStart + srcURLStr.length();
             if (srcEnd != std::string::npos && srcStart != std::string::npos)
             {
                 *baseURL = cfHtml.substr(srcStart, srcEnd - srcStart);
@@ -406,16 +406,16 @@ void CCmdPasteHtml::HtmlExtractMetadata(const std::string& cfHtml,
     std::string cfHtmlLower = cfHtml;
     std::transform(cfHtmlLower.begin(), cfHtmlLower.end(), cfHtmlLower.begin(), [](char c) { return static_cast<char>(::tolower(c)); });
 
-    size_t markupStart = cfHtmlLower.find("<html", 0);
+    auto markupStart = cfHtmlLower.find("<html", 0);
     if (htmlStart)
     {
         *htmlStart = markupStart;
     }
-    size_t tagStart = cfHtml.find("<!--StartFragment", markupStart);
+    auto tagStart = cfHtml.find("<!--StartFragment", markupStart);
     if (tagStart == std::string::npos)
     {
         static std::string startFragmentStr("StartFragment:");
-        size_t             startFragmentStart = cfHtml.find(startFragmentStr);
+        auto               startFragmentStart = cfHtml.find(startFragmentStr);
         if (startFragmentStart != std::string::npos)
         {
             *fragmentStart = static_cast<size_t>(atoi(cfHtml.c_str() +
@@ -423,7 +423,7 @@ void CCmdPasteHtml::HtmlExtractMetadata(const std::string& cfHtml,
         }
 
         static std::string endFragmentStr("EndFragment:");
-        size_t             endFragmentStart = cfHtml.find(endFragmentStr);
+        auto               endFragmentStart = cfHtml.find(endFragmentStr);
         if (endFragmentStart != std::string::npos)
         {
             *fragmentEnd = static_cast<size_t>(atoi(cfHtml.c_str() +
@@ -433,7 +433,7 @@ void CCmdPasteHtml::HtmlExtractMetadata(const std::string& cfHtml,
     else
     {
         *fragmentStart = cfHtml.find('>', tagStart) + 1;
-        size_t tagEnd  = cfHtml.rfind("<!--EndFragment", std::string::npos);
+        auto tagEnd    = cfHtml.rfind("<!--EndFragment", std::string::npos);
         *fragmentEnd   = cfHtml.rfind('<', tagEnd);
     }
 }

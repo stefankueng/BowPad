@@ -53,8 +53,8 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
         for (wchar_t i = 'A'; i <= 'Z'; ++i)
         {
             // Create a property set for the category.
-            CPropertySet* pCat;
-            hr = CPropertySet::CreateInstance(&pCat);
+            CPropertySet* pCat = nullptr;
+            hr                 = CPropertySet::CreateInstance(&pCat);
             if (FAILED(hr))
             {
                 return hr;
@@ -125,8 +125,8 @@ HRESULT CCmdCodeStyle::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PRO
     {
         if (key && *key == UI_PKEY_SelectedItem)
         {
-            UINT selected;
-            hr = UIPropertyToUInt32(*key, *pPropVarValue, &selected);
+            UINT selected = 0;
+            hr            = UIPropertyToUInt32(*key, *pPropVarValue, &selected);
             if (HasActiveDocument())
             {
                 InvalidateUICommand(cmdFunctions, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
