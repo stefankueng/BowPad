@@ -508,6 +508,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
             lenFile = 0;
         else
             lenFile += incompleteMultiByteChar;
+        incompleteMultiByteChar = 0;
 
         if ((!encodingSet) || (inconclusive && encoding == CP_ACP))
         {
