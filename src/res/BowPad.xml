@@ -865,6 +865,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdGroupSessionAuto" Id="10015" />
     <Command Name="cmdCommandPalette" Id="10016" />
     <Command Name="cmdGroupWrapLines" Id="10017" />
+    <Command Name="cmdGroupSaveAllBtn" Id="10018" />
 
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />
@@ -995,8 +996,14 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               </SplitButton.ButtonItem>
               <Button CommandName="cmdNewDefault" />
             </SplitButton>
-            <Button CommandName="cmdSave" />
             <SplitButton CommandName="cmdGroupSaveBtn">
+              <SplitButton.ButtonItem>
+                <Button CommandName="cmdSave" />
+              </SplitButton.ButtonItem>
+              <Button CommandName="cmdSave" />
+              <Button CommandName="cmdSaveAs" />
+            </SplitButton>
+            <SplitButton CommandName="cmdGroupSaveAllBtn">
               <SplitButton.ButtonItem>
                 <Button CommandName="cmdSaveAll" />
               </SplitButton.ButtonItem>
