@@ -1169,18 +1169,25 @@ void CScintillaWnd::SetupDefaultStyles() const
     Call(SCI_SETCODEPAGE, CP_UTF8);
     Call(SCI_SETMODEVENTMASK, modEventMask);
 
+    auto controlCharColor = toRgba(theme.IsDarkTheme() ? RGB(255, 255, 240) : RGB(40, 40, 0), 200);
     // set up unicode representations for control chars
     for (int c = 0; c < 0x20; ++c)
     {
         const char sC[2] = {static_cast<char>(c), 0};
         Call(SCI_SETREPRESENTATION, reinterpret_cast<uptr_t>(sC), reinterpret_cast<sptr_t>(CStringUtils::Format("x%02X", c).c_str()));
+        Call(SCI_SETREPRESENTATIONAPPEARANCE, reinterpret_cast<uptr_t>(sC), SC_REPRESENTATION_BLOB | SC_REPRESENTATION_COLOUR);
+        Call(SCI_SETREPRESENTATIONCOLOUR, reinterpret_cast<uptr_t>(sC), controlCharColor);
     }
     for (int c = 0x80; c < 0xA0; ++c)
     {
         const char sC[3] = {'\xc2', static_cast<char>(c), 0};
         Call(SCI_SETREPRESENTATION, reinterpret_cast<uptr_t>(sC), reinterpret_cast<sptr_t>(CStringUtils::Format("x%02X", c).c_str()));
+        Call(SCI_SETREPRESENTATIONAPPEARANCE, reinterpret_cast<uptr_t>(sC), SC_REPRESENTATION_BLOB | SC_REPRESENTATION_COLOUR);
+        Call(SCI_SETREPRESENTATIONCOLOUR, reinterpret_cast<uptr_t>(sC), controlCharColor);
     }
     Call(SCI_SETREPRESENTATION, reinterpret_cast<uptr_t>("\x7F"), reinterpret_cast<sptr_t>("x7F"));
+    Call(SCI_SETREPRESENTATIONAPPEARANCE, reinterpret_cast<uptr_t>("\x7F"), SC_REPRESENTATION_BLOB | SC_REPRESENTATION_COLOUR);
+    Call(SCI_SETREPRESENTATIONCOLOUR, reinterpret_cast<uptr_t>("\x7F"), controlCharColor);
 
     if (theme.IsDarkTheme())
     {
