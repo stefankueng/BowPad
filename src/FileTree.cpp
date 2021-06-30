@@ -39,8 +39,8 @@ constexpr int SCRATCH_QCM_LAST  = 0x6FFF;
 static IContextMenu2* g_pcm2 = nullptr;
 static IContextMenu3* g_pcm3 = nullptr;
 
-const wchar_t thisOsPathSeparator  = L'\\';
-const wchar_t otherOsPathSeparator = L'/';
+constexpr wchar_t thisOsPathSeparator  = L'\\';
+constexpr wchar_t otherOsPathSeparator = L'/';
 
 inline bool IsFolderSeparator(wchar_t c)
 {
