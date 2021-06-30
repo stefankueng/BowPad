@@ -813,8 +813,11 @@ void CFileTree::HandleChangeNotifications()
     }
     else
     {
+        bool refreshRoot = false;
         for (const auto& [action, path] : changedPaths)
         {
+            if (refreshRoot)
+                break;
             switch (action)
             {
                 case FILE_ACTION_ADDED:
@@ -822,12 +825,13 @@ void CFileTree::HandleChangeNotifications()
                 {
                     HTREEITEM hDir = nullptr;
                     if (CPathUtils::PathCompare(CPathUtils::GetParentDirectory(path), m_path) == 0)
-                        hDir = TVI_ROOT;
+                        refreshRoot = true;
                     else
                         hDir = GetItemForPath(CPathUtils::GetParentDirectory(path));
-                    if (hDir)
+                    auto dirIt = m_data.find(hDir);
+                    if (hDir && dirIt != m_data.end())
                     {
-                        auto& data = m_data[hDir]->data;
+                        auto& data = dirIt->second->data;
                         auto  fi   = std::make_unique<FileTreeItem>();
                         fi->isDir  = PathIsDirectory(path.c_str()) != 0;
                         fi->path   = path;
@@ -884,6 +888,8 @@ void CFileTree::HandleChangeNotifications()
                     break;
             }
         }
+        if (refreshRoot)
+            Refresh(TVI_ROOT);
     }
 }
 
