@@ -978,7 +978,7 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
     // and now set the lexer styles
     Scintilla::ILexer5* lexer = nullptr;
 
-    if (lexerData.name == "bp_simle")
+    if (lexerData.name == "bp_simple")
         lexer = lmSimple.Create();
     if (lexerData.name == "bp_log")
         lexer = lmLog.Create();
