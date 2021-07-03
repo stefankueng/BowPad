@@ -76,11 +76,6 @@ enum LogStates
 //    return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '$');
 //}
 
-char asciiToUpperChar(char c)
-{
-    return ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ^ autovectorizes to PXOR: runs on more ports than paddb
-}
-
 //static LogStates GetState(LogStyles style)
 //{
 //    switch (style)
@@ -108,6 +103,18 @@ char asciiToUpperChar(char c)
 //    }
 //    return LogStates::Debug;
 //}
+
+bool hasTokenAsWord(const std::string& token, const std::string_view& sLine)
+{
+    if (auto pos = sLine.find(token); pos != std::string::npos)
+    {
+        auto boundaryBefore = pos == 0 || !isalpha(sLine[pos - 1]);
+        auto boundaryAfter  = pos == (sLine.size() - token.size()) || !isalpha(sLine[pos + token.size()]);
+        if (boundaryBefore && boundaryAfter)
+            return true;
+    }
+    return false;
+}
 
 LogStyles GetLogStyle(LogStyles style, LogStates state)
 {
@@ -306,26 +313,22 @@ Sci_Position SCI_METHOD LexerLog::PropertySet(const char* key, const char* val)
     {
         if (strcmp(key, "debugstrings") == 0)
         {
-            for (size_t i = 0; i < options.debugstrings.size(); ++i)
-                options.debugstrings[i] = asciiToUpperChar(options.debugstrings[i]);
+            std::transform(options.debugstrings.begin(), options.debugstrings.end(), options.debugstrings.begin(), [](char c) { return static_cast<char>(::tolower(c)); });
             stringtok(options.debugTokens, options.debugstrings, true, " \t\n", false);
         }
         if (strcmp(key, "infostrings") == 0)
         {
-            for (size_t i = 0; i < options.infostrings.size(); ++i)
-                options.infostrings[i] = asciiToUpperChar(options.infostrings[i]);
+            std::transform(options.infostrings.begin(), options.infostrings.end(), options.infostrings.begin(), [](char c) { return static_cast<char>(::tolower(c)); });
             stringtok(options.infoTokens, options.infostrings, true, " \t\n", false);
         }
         if (strcmp(key, "warnstrings") == 0)
         {
-            for (size_t i = 0; i < options.warnstrings.size(); ++i)
-                options.warnstrings[i] = asciiToUpperChar(options.warnstrings[i]);
+            std::transform(options.warnstrings.begin(), options.warnstrings.end(), options.warnstrings.begin(), [](char c) { return static_cast<char>(::tolower(c)); });
             stringtok(options.warnTokens, options.warnstrings, true, " \t\n", false);
         }
         if (strcmp(key, "errorstrings") == 0)
         {
-            for (size_t i = 0; i < options.errorstrings.size(); ++i)
-                options.errorstrings[i] = asciiToUpperChar(options.errorstrings[i]);
+            std::transform(options.errorstrings.begin(), options.errorstrings.end(), options.errorstrings.begin(), [](char c) { return static_cast<char>(::tolower(c)); });
             stringtok(options.errorTokens, options.errorstrings, true, " \t\n", false);
         }
 
@@ -359,39 +362,27 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
             }
             pAccess->GetCharRange(line.get(), sc.currentPos, lineEnd - sc.currentPos);
             for (size_t i = 0; i < lineLen; ++i)
-                line[i] = asciiToUpperChar(line[i]);
+                line[i] = ::tolower(line[i]);
             std::string_view sLine(line.get(), lineEnd - sc.currentPos + 2);
             for (const auto& token : options.debugTokens)
             {
-                if (auto pos = sLine.find(token); pos != std::string::npos)
-                {
-                    if (pos == 0 || ((!isalpha(sLine[pos - 1]) || isalpha(sLine[pos])) && sLine[pos - 1] != '"'))
-                        logState = LogStates::Debug;
-                }
+                if (hasTokenAsWord(token, sLine))
+                    logState = LogStates::Debug;
             }
             for (const auto& token : options.infoTokens)
             {
-                if (auto pos = sLine.find(token); pos != std::string::npos)
-                {
-                    if (pos == 0 || ((!isalpha(sLine[pos - 1]) || isalpha(sLine[pos])) && sLine[pos - 1] != '"'))
-                        logState = LogStates::Info;
-                }
+                if (hasTokenAsWord(token, sLine))
+                    logState = LogStates::Info;
             }
             for (const auto& token : options.warnTokens)
             {
-                if (auto pos = sLine.find(token); pos != std::string::npos)
-                {
-                    if (pos == 0 || ((!isalpha(sLine[pos - 1]) || isalpha(sLine[pos])) && sLine[pos - 1] != '"'))
-                        logState = LogStates::Warn;
-                }
+                if (hasTokenAsWord(token, sLine))
+                    logState = LogStates::Warn;
             }
             for (const auto& token : options.errorTokens)
             {
-                if (auto pos = sLine.find(token); pos != std::string::npos)
-                {
-                    if (pos == 0 || ((!isalpha(sLine[pos - 1]) || isalpha(sLine[pos])) && sLine[pos - 1] != '"'))
-                        logState = LogStates::Error;
-                }
+                if (hasTokenAsWord(token, sLine))
+                    logState = LogStates::Error;
             }
             sc.SetState(GetLogStyle(LogStyles::Default, logState));
         }
