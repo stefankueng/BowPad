@@ -977,9 +977,17 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
 
     // and now set the lexer styles
     Scintilla::ILexer5* lexer = nullptr;
+    Call(SCI_EOLANNOTATIONCLEARALL);
+    Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_HIDDEN);
 
     if (lexerData.name == "bp_simple")
+    {
         lexer = lmSimple.Create();
+        lexer->PrivateCall(100, *this);
+        if (!lexerData.annotations.empty())
+            lexer->PrivateCall(101, reinterpret_cast<void*>(&const_cast<LexerData*>(&lexerData)->annotations));
+        Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_BOXED | EOLANNOTATION_ANGLE_FLAT);
+    }
     if (lexerData.name == "bp_log")
         lexer = lmLog.Create();
     if (lexerData.name == "bp_snippets")
@@ -990,6 +998,10 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
         {
             case 1100:
                 lexer = lmSimple.Create();
+                lexer->PrivateCall(100, *this);
+                if (!lexerData.annotations.empty())
+                    lexer->PrivateCall(101, reinterpret_cast<void*>(&const_cast<LexerData*>(&lexerData)->annotations));
+                Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_BOXED | EOLANNOTATION_ANGLE_FLAT);
                 break;
             case 1101:
                 lexer = lmLog.Create();

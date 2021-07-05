@@ -85,6 +85,7 @@ public:
     std::string                        name;
     std::unordered_map<int, StyleData> styles;
     std::map<std::string, std::string> properties;
+    std::map<std::string, std::string> annotations;
 };
 
 class CLexStyles

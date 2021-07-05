@@ -44,6 +44,12 @@ struct LexDetectStrings
     std::vector<std::string> extensions;
 };
 
+struct AnnotationData
+{
+    std::string sRegex;
+    std::string sText;
+};
+
 static std::vector<LexDetectStrings> lexDetectStrings = {
     // a '+' in front of the lexer name means the string can appear anywhere in the
     // first line of the document.
@@ -246,6 +252,7 @@ void CLexStyles::Load()
             userLexerData.name = CUnicodeUtils::StdGetUTF8(lexName);
             CSimpleIni::TNamesDepend lexDataKeys;
             ini->GetAllKeys(lexerName.c_str(), lexDataKeys);
+            std::map<int, AnnotationData> annotations;
             for (const auto& it : lexDataKeys)
             {
                 if (_wcsnicmp(L"Style", it, 5) == 0)
@@ -264,6 +271,25 @@ void CLexStyles::Load()
                     std::string vl                         = CUnicodeUtils::StdGetUTF8(ini->GetValue(lexerName.c_str(), it, L""));
                     lexerData.properties[n]                = vl;
                     userLexerData.properties[std::move(n)] = std::move(vl);
+                }
+                else if (_wcsnicmp(L"ann", it, 3) == 0)
+                {
+                    auto num = _wtoi(it + 3);
+                    if (_wcsicmp(it + 5, L"regex") == 0)
+                    {
+                        annotations[num].sRegex = CUnicodeUtils::StdGetUTF8(ini->GetValue(lexerName.c_str(), it, L""));
+                    }
+                    if (_wcsicmp(it + 5, L"text") == 0)
+                    {
+                        annotations[num].sText = CUnicodeUtils::StdGetUTF8(ini->GetValue(lexerName.c_str(), it, L""));
+                    }
+                }
+            }
+            if (!annotations.empty())
+            {
+                for (const auto& data : annotations)
+                {
+                    lexerData.annotations[data.second.sRegex] = data.second.sText;
                 }
             }
             m_lexerData[lexerData.id] = std::move(lexerData);

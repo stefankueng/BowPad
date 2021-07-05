@@ -23,6 +23,7 @@
 #include <string>
 #include <set>
 #include <vector>
+#include <regex>
 
 #include "StringUtils.h"
 
@@ -225,6 +226,9 @@ class LexerSimple : public DefaultLexer
 public:
     LexerSimple()
         : DefaultLexer("simple", SCLEX_AUTOMATIC + 100)
+        , m_pSciMsg(nullptr)
+        , m_pSciWndData(0)
+        , m_annotations(nullptr)
     {
     }
 
@@ -275,8 +279,20 @@ public:
 
     void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess) override;
 
-    void* SCI_METHOD PrivateCall(int, void*) override
+    void* SCI_METHOD PrivateCall(int code, void* param) override
     {
+        switch (code)
+        {
+            case 100:
+                m_pSciMsg     = reinterpret_cast<SciFnDirect>(SendMessage(static_cast<HWND>(param), SCI_GETDIRECTFUNCTION, 0, 0));
+                m_pSciWndData = static_cast<sptr_t>(SendMessage(static_cast<HWND>(param), SCI_GETDIRECTPOINTER, 0, 0));
+                break;
+            case 101:
+                m_annotations = static_cast<std::map<std::string, std::string>*>(param);
+                break;
+            default:
+                break;
+        }
         return nullptr;
     }
 
@@ -289,11 +305,20 @@ public:
         }
         return false;
     }
+    sptr_t Call(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0) const
+    {
+        return m_pSciMsg(m_pSciWndData, iMessage, wParam, lParam);
+    }
 
     static ILexer5* LexerFactorySimple()
     {
         return new LexerSimple();
     }
+
+private:
+    SciFnDirect                         m_pSciMsg;
+    sptr_t                              m_pSciWndData;
+    std::map<std::string, std::string>* m_annotations;
 };
 
 Sci_Position SCI_METHOD LexerSimple::PropertySet(const char* key, const char* val)
@@ -381,14 +406,46 @@ Sci_Position SCI_METHOD LexerSimple::WordListSet(int n, const char* wl)
 
 void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess)
 {
-    int  visibleChars = 0;
-    bool numberIsHex  = false;
+    int    visibleChars = 0;
+    bool   numberIsHex  = false;
+    size_t lineSize     = 1000;
+    auto   line         = std::make_unique<char[]>(lineSize);
 
     LexAccessor  styler(pAccess);
     StyleContext sc(startPos, length, initStyle, styler);
 
     for (; sc.More(); sc.Forward())
     {
+        if (sc.atLineStart)
+        {
+            if (m_annotations && !m_annotations->empty())
+            {
+                auto lineEnd = pAccess->LineEnd(sc.currentLine);
+                auto lineLen = lineEnd - sc.currentPos + 2;
+                if (lineSize < lineLen)
+                {
+                    lineSize = lineLen + 200;
+                    line     = std::make_unique<char[]>(lineSize);
+                }
+                pAccess->GetCharRange(line.get(), sc.currentPos, lineEnd - sc.currentPos);
+                for (size_t i = 0; i < lineLen; ++i)
+                    line[i] = ::tolower(line[i]);
+                std::string_view sLine(line.get(), lineEnd - sc.currentPos + 2);
+                bool             textSet = false;
+                for (const auto& [sRegex, annotation] : *m_annotations)
+                {
+                    std::regex rx(sRegex, std::regex_constants::icase);
+                    if (std::regex_match(sLine.begin(), sLine.end(), rx))
+                    {
+                        Call(SCI_EOLANNOTATIONSETTEXT, sc.currentLine, reinterpret_cast<sptr_t>(annotation.c_str()));
+                        textSet = true;
+                        break;
+                    }
+                }
+                if (!textSet)
+                    Call(SCI_EOLANNOTATIONSETTEXT, sc.currentLine, 0);
+            }
+        }
         // Determine if the current state should terminate.
         switch (sc.state)
         {
