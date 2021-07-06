@@ -553,8 +553,11 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
         // Determine if a new state should be entered.
         if (sc.state == SimpleStyles::Default)
         {
-            if (options.styleNumbers &&
-                ((IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext)) || ((sc.ch == '-' || sc.ch == '+') && (IsADigit(sc.chNext) || sc.chNext == '.')) || (MakeLowerCase(sc.ch) == 'e' && (IsADigit(sc.chNext) || sc.chNext == '+' || sc.chNext == '-')))))
+            if (options.styleNumbers && !IsAlphaNumeric(sc.chPrev) &&
+                (IsADigit(sc.ch) ||
+                 (sc.ch == '.' && IsADigit(sc.chNext)) ||
+                 ((sc.ch == '-' || sc.ch == '+') && (IsADigit(sc.chNext) || sc.chNext == '.')) ||
+                 (MakeLowerCase(sc.ch) == 'e' && (IsADigit(sc.chNext) || sc.chNext == '+' || sc.chNext == '-'))))
             {
                 if ((sc.ch == '0' && MakeLowerCase(sc.chNext) == 'x') ||
                     ((sc.ch == '-' || sc.ch == '+') && sc.chNext == '0' && MakeLowerCase(sc.GetRelativeCharacter(2)) == 'x'))

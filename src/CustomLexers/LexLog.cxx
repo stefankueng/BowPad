@@ -459,7 +459,11 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
             (sc.state == LogStyles::WarnDefault) ||
             (sc.state == LogStyles::ErrorDefault))
         {
-            if (((IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext)) || ((sc.ch == '-' || sc.ch == '+') && (IsADigit(sc.chNext) || sc.chNext == '.')) || (MakeLowerCase(sc.ch) == 'e' && (IsADigit(sc.chNext) || sc.chNext == '+' || sc.chNext == '-')))))
+            if (!IsAlphaNumeric(sc.chPrev) &&
+                (IsADigit(sc.ch) ||
+                 (sc.ch == '.' && IsADigit(sc.chNext)) ||
+                 ((sc.ch == '-' || sc.ch == '+') && (IsADigit(sc.chNext) || sc.chNext == '.')) ||
+                 (MakeLowerCase(sc.ch) == 'e' && (IsADigit(sc.chNext) || sc.chNext == '+' || sc.chNext == '-'))))
             {
                 if ((sc.ch == '0' && MakeLowerCase(sc.chNext) == 'x') ||
                     ((sc.ch == '-' || sc.ch == '+') && sc.chNext == '0' && MakeLowerCase(sc.GetRelative(2)) == 'x'))
