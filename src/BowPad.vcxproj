@@ -184,6 +184,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Msimg32.lib;Imm32.lib;Propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <CETCompat>true</CETCompat>
+      <Profile>true</Profile>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
@@ -280,6 +282,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>Msimg32.lib;Imm32.lib;Propsys.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SetChecksum>true</SetChecksum>
+      <CETCompat>true</CETCompat>
+      <Profile>true</Profile>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
