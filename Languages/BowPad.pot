@@ -153,6 +153,10 @@ msgstr ""
 msgid "Access to the file '%s' was denied. Do you want to try again with elevated privileges?"
 msgstr ""
 
+#. Resource IDs: (1113)
+msgid "Add newline to capture"
+msgstr ""
+
 #. Resource IDs: (265)
 msgid "Add to quick access toolbar"
 msgstr ""
@@ -602,6 +606,10 @@ msgstr ""
 
 #. Resource IDs: (60035)
 msgid "Creates a new tab with an empty document"
+msgstr ""
+
+#. Resource IDs: (114)
+msgid "Ctrl+click to follow URL\nor click here"
 msgstr ""
 
 #. Resource IDs: (259)
@@ -2456,10 +2464,6 @@ msgstr ""
 
 #. Resource IDs: (269)
 msgid "checks for new versions of BowPad once a week"
-msgstr ""
-
-#. Resource IDs: (114)
-msgid "click here to\nfollow URL"
 msgstr ""
 
 #. Resource IDs: (60643, 60644)
