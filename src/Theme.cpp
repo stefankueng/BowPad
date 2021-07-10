@@ -738,7 +738,7 @@ LRESULT CTheme::ButtonSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                             GetEditBorderColor(hWnd, &cr);
                             cr |= 0xff000000;
 
-                            auto                  myPen      = std::make_unique<Gdiplus::Pen>(Gdiplus::Color(cr), 1);
+                            auto                  myPen      = std::make_unique<Gdiplus::Pen>(Gdiplus::Color(cr), 1.0f);
                             auto                  myGraphics = std::make_unique<Gdiplus::Graphics>(hdcPaint);
                             int                   iY         = RECTHEIGHT(rcDraw) / 2;
                             Gdiplus::Rect         rr         = Gdiplus::Rect(rcClient.left, rcClient.top + iY,
