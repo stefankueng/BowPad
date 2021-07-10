@@ -88,7 +88,8 @@ const int STATUSBAR_ZOOM         = 11;
 constexpr char   URL_REG_EXPR[]      = {"\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b"};
 constexpr size_t URL_REG_EXPR_LENGTH = _countof(URL_REG_EXPR) - 1;
 
-const int TIMER_UPDATECHECK = 101;
+constexpr int TIMER_UPDATECHECK = 101;
+constexpr int TIMER_SELCHANGE   = 102;
 
 ResponseToOutsideModifiedFile responseToOutsideModifiedFile      = ResponseToOutsideModifiedFile::Reload;
 BOOL                          responseToOutsideModifiedFileDoAll = FALSE;
@@ -782,10 +783,18 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         case WM_TIMER:
             if (wParam >= COMMAND_TIMER_ID_START)
                 CCommandHandler::Instance().OnTimer(static_cast<UINT>(wParam));
-            if (wParam == TIMER_UPDATECHECK)
+            switch (wParam)
             {
-                KillTimer(*this, TIMER_UPDATECHECK);
-                CheckForOutsideChanges();
+                case TIMER_UPDATECHECK:
+                    KillTimer(*this, TIMER_UPDATECHECK);
+                    CheckForOutsideChanges();
+                    break;
+                case TIMER_SELCHANGE:
+                    KillTimer(*this, TIMER_SELCHANGE);
+                    m_editor.MarkSelectedWord(false, false);
+                    break;
+                default:
+                    break;
             }
             break;
         case WM_DESTROY:
@@ -3140,7 +3149,12 @@ void CMainWindow::HandleUpdateUI(const SCNotification& scn)
     constexpr unsigned int uiFlags = SC_UPDATE_SELECTION |
                                      SC_UPDATE_H_SCROLL | SC_UPDATE_V_SCROLL;
     if ((scn.updated & uiFlags) != 0)
-        m_editor.MarkSelectedWord(false, false);
+    {
+        if ((scn.updated & SC_UPDATE_SELECTION) && (m_editor.ConstCall(SCI_GETLENGTH) > 102400))
+            SetTimer(*this, TIMER_SELCHANGE, 500, nullptr);
+        else
+            m_editor.MarkSelectedWord(false, false);
+    }
 
     m_editor.MatchBraces(BraceMatch::Braces);
     m_editor.MatchTags();
