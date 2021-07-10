@@ -825,7 +825,7 @@ void CFileTree::HandleChangeNotifications()
                 {
                     HTREEITEM hDir = nullptr;
                     if (CPathUtils::PathCompare(CPathUtils::GetParentDirectory(path), m_path) == 0)
-                        refreshRoot = true;
+                        hDir = TVI_ROOT;
                     else
                         hDir = GetItemForPath(CPathUtils::GetParentDirectory(path));
                     auto dirIt = m_data.find(hDir);
@@ -861,6 +861,8 @@ void CFileTree::HandleChangeNotifications()
                         }
                         InsertItem(foundIt->get(), hDir, insertAfter, {});
                     }
+                    else
+                        refreshRoot = true;
                 }
                 break;
                 case FILE_ACTION_REMOVED:
