@@ -275,11 +275,12 @@ void CLexStyles::Load()
                 else if (_wcsnicmp(L"ann", it, 3) == 0)
                 {
                     auto num = _wtoi(it + 3);
-                    if (_wcsicmp(it + 5, L"regex") == 0)
+                    if (_wcsicmp(it + 6, L"regex") == 0)
                     {
+                        assert(annotations.find(num) == annotations.end());
                         annotations[num].sRegex = CUnicodeUtils::StdGetUTF8(ini->GetValue(lexerName.c_str(), it, L""));
                     }
-                    if (_wcsicmp(it + 5, L"text") == 0)
+                    if (_wcsicmp(it + 6, L"text") == 0)
                     {
                         annotations[num].sText = CUnicodeUtils::StdGetUTF8(ini->GetValue(lexerName.c_str(), it, L""));
                     }
