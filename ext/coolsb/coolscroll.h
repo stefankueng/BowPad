@@ -228,8 +228,9 @@ typedef struct
 //
 //  Define the WM_NOTIFY code value for cool-scrollbar custom drawing
 //
-#define NM_COOLSB_CUSTOMDRAW (0-0xfffU)
-#define NM_COOLSB_CLICK      (0-0xffeU)
+
+constexpr auto NM_COOLSB_CUSTOMDRAW = 0xfffff001;   // (0-0xfffU)
+constexpr auto NM_COOLSB_CLICK      = 0xfffff002;   // (0-0xffeU)
 
 #ifdef __cplusplus
 }
