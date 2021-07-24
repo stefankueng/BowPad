@@ -206,6 +206,7 @@ private:
     static void SetRibbonColorsHSB(UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight);
     static void GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight);
     void        SetTheme(bool theme);
+    void        RefreshAnnotations();
 
 private:
     CRichStatusBar                                  m_statusBar;
