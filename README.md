@@ -12,6 +12,7 @@ A few notable features of BowPad:
 - easy ribbon user interface
 - navigation hints in the vertical scrollbar
 - coloring of open tabs according to their path
+- can open files bigger than 2GB
 - extendable with [plugins](https://tools.stefankueng.com/BowPad_plugins.html) written in JScript or VBScript
 
 [![BowPad with default color theme](https://github.com/stefankueng/tools/raw/main/www/source/img/bowpad/BowPadDefaultTheme-small.png)](https://github.com/stefankueng/tools/raw/main/www/source/img/bowpad/BowPadDefaultTheme.png)
