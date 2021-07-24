@@ -416,36 +416,6 @@ void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position length, in
 
     for (; sc.More(); sc.Forward())
     {
-        if (sc.atLineStart)
-        {
-            if (m_annotations && !m_annotations->empty())
-            {
-                auto lineEnd = pAccess->LineEnd(sc.currentLine);
-                auto lineLen = lineEnd - sc.currentPos + 2;
-                if (lineSize < lineLen)
-                {
-                    lineSize = lineLen + 200;
-                    line     = std::make_unique<char[]>(lineSize);
-                }
-                pAccess->GetCharRange(line.get(), sc.currentPos, lineEnd - sc.currentPos);
-                for (size_t i = 0; i < lineLen; ++i)
-                    line[i] = ::tolower(line[i]);
-                std::string_view sLine(line.get(), lineEnd - sc.currentPos + 2);
-                bool             textSet = false;
-                for (const auto& [sRegex, annotation] : *m_annotations)
-                {
-                    std::regex rx(sRegex, std::regex_constants::icase);
-                    if (std::regex_match(sLine.begin(), sLine.end(), rx))
-                    {
-                        Call(SCI_EOLANNOTATIONSETTEXT, sc.currentLine, reinterpret_cast<sptr_t>(annotation.c_str()));
-                        textSet = true;
-                        break;
-                    }
-                }
-                if (!textSet)
-                    Call(SCI_EOLANNOTATIONSETTEXT, sc.currentLine, 0);
-            }
-        }
         // Determine if the current state should terminate.
         switch (sc.state)
         {

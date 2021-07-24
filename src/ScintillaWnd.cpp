@@ -143,7 +143,8 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
 
     Call(SCI_SETMODEVENTMASK, SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO |
                                   SC_PERFORMED_REDO | SC_MULTISTEPUNDOREDO | SC_LASTSTEPINUNDOREDO |
-                                  SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE | SC_MULTILINEUNDOREDO | SC_MOD_CHANGEFOLD);
+                                  SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE | SC_MULTILINEUNDOREDO |
+                                  SC_MOD_CHANGEFOLD | SC_MOD_CHANGESTYLE);
     bool bUseD2D = CIniSettings::Instance().GetInt64(L"View", L"d2d", 1) != 0;
     Call(SCI_SETTECHNOLOGY, bUseD2D ? SC_TECHNOLOGY_DIRECTWRITERETAIN : SC_TECHNOLOGY_DEFAULT);
 
@@ -980,13 +981,13 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
     Call(SCI_EOLANNOTATIONCLEARALL);
     Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_HIDDEN);
 
+    if (!lexerData.annotations.empty())
+        Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_BOXED | EOLANNOTATION_ANGLE_FLAT);
+
     if (lexerData.name == "bp_simple")
     {
         lexer = lmSimple.Create();
         lexer->PrivateCall(100, *this);
-        if (!lexerData.annotations.empty())
-            lexer->PrivateCall(101, reinterpret_cast<void*>(&const_cast<LexerData*>(&lexerData)->annotations));
-        Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_BOXED | EOLANNOTATION_ANGLE_FLAT);
     }
     if (lexerData.name == "bp_log")
         lexer = lmLog.Create();
@@ -999,9 +1000,6 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
             case 1100:
                 lexer = lmSimple.Create();
                 lexer->PrivateCall(100, *this);
-                if (!lexerData.annotations.empty())
-                    lexer->PrivateCall(101, reinterpret_cast<void*>(&const_cast<LexerData*>(&lexerData)->annotations));
-                Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_BOXED | EOLANNOTATION_ANGLE_FLAT);
                 break;
             case 1101:
                 lexer = lmLog.Create();

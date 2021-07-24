@@ -51,6 +51,7 @@
 #include <cassert>
 #include <type_traits>
 #include <future>
+#include <regex>
 #include <Shobjidl.h>
 
 IUIFramework* g_pFramework = nullptr; // Reference to the Ribbon framework.
@@ -90,6 +91,7 @@ constexpr size_t URL_REG_EXPR_LENGTH = _countof(URL_REG_EXPR) - 1;
 
 constexpr int TIMER_UPDATECHECK = 101;
 constexpr int TIMER_SELCHANGE   = 102;
+constexpr int TIMER_CHECKLINES  = 103;
 
 ResponseToOutsideModifiedFile responseToOutsideModifiedFile      = ResponseToOutsideModifiedFile::Reload;
 BOOL                          responseToOutsideModifiedFileDoAll = FALSE;
@@ -223,6 +225,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     , m_autoCompleter(this, &m_editor)
     , m_dwellStartPos(-1)
     , m_bBlockAutoIndent(false)
+    , m_lastCheckedLine(0)
     , m_hShieldIcon(nullptr)
     , m_hCapsLockIcon(nullptr)
     , m_hLexerIcon(nullptr)
@@ -793,6 +796,60 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     KillTimer(*this, TIMER_SELCHANGE);
                     m_editor.MarkSelectedWord(false, false);
                     break;
+                case TIMER_CHECKLINES:
+                {
+                    KillTimer(*this, TIMER_CHECKLINES);
+
+                    auto activeLexer = static_cast<int>(m_editor.Call(SCI_GETLEXER));
+                    auto lexerData   = CLexStyles::Instance().GetLexerDataForLexer(activeLexer);
+                    if (!lexerData.annotations.empty())
+                    {
+                        sptr_t lineSize = 1024;
+                        auto   pLine    = std::make_unique<char[]>(lineSize);
+
+                        auto eolBytes = 1;
+                        switch (m_editor.ConstCall(SCI_GETEOLMODE))
+                        {
+                            case SC_EOL_CRLF:
+                                eolBytes = 2;
+                                break;
+                            default:
+                                eolBytes = 1;
+                                break;
+                        }
+                        auto endLine = m_editor.ConstCall(SCI_DOCLINEFROMVISIBLE, m_editor.ConstCall(SCI_GETFIRSTVISIBLELINE)) + m_editor.ConstCall(SCI_LINESONSCREEN);
+                        for (sptr_t line = m_lastCheckedLine; line <= endLine; ++line)
+                        {
+                            auto curLineSize = m_editor.ConstCall(SCI_GETLINE, line, 0);
+                            if (curLineSize <= eolBytes)
+                                continue;
+                            if (curLineSize > lineSize)
+                            {
+                                lineSize = curLineSize + 1024;
+                                pLine    = std::make_unique<char[]>(lineSize);
+                            }
+                            m_editor.ConstCall(SCI_GETLINE, line, reinterpret_cast<sptr_t>(pLine.get()));
+                            pLine[curLineSize - eolBytes] = 0;
+                            std::string_view sLine(pLine.get(), curLineSize - eolBytes);
+                            bool             textSet = false;
+                            for (const auto& [sRegex, annotation] : lexerData.annotations)
+                            {
+                                std::regex rx(sRegex, std::regex_constants::icase);
+                                if (std::regex_match(sLine.begin(), sLine.end(), rx))
+                                {
+                                    m_editor.Call(SCI_EOLANNOTATIONSETTEXT, line, reinterpret_cast<sptr_t>(annotation.c_str()));
+                                    textSet = true;
+                                    break;
+                                }
+                            }
+                            if (!textSet)
+                                m_editor.Call(SCI_EOLANNOTATIONSETTEXT, line, 0);
+                        }
+                        if (m_lastCheckedLine < endLine)
+                            m_lastCheckedLine = endLine;
+                    }
+                }
+                break;
                 default:
                     break;
             }
@@ -1116,6 +1173,15 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
             break;
         case SCN_BP_MOUSEMSG:
             return HandleMouseMsg(scn);
+        case SCN_MODIFIED:
+        {
+            if (pScn->modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT))
+            {
+                m_lastCheckedLine = m_editor.ConstCall(SCI_LINEFROMPOSITION, pScn->position);
+                SetTimer(*this, TIMER_CHECKLINES, 300, nullptr);
+            }
+        }
+        break;
         default:
             break;
     }
@@ -3154,6 +3220,7 @@ void CMainWindow::HandleUpdateUI(const SCNotification& scn)
             SetTimer(*this, TIMER_SELCHANGE, 500, nullptr);
         else
             m_editor.MarkSelectedWord(false, false);
+        SetTimer(*this, TIMER_CHECKLINES, 300, nullptr);
     }
 
     m_editor.MatchBraces(BraceMatch::Braces);
@@ -3286,6 +3353,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.RestoreCurrentPos(doc.m_position);
     m_editor.SetTabSettings(doc.m_tabSpace);
     m_editor.SetReadDirection(doc.m_readDir);
+    m_lastCheckedLine = 0;
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, true);
     CCommandHandler::Instance().OnStylesSet();
     g_pFramework->InvalidateUICommand(cmdUseTabs, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);

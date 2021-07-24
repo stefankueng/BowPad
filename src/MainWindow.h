@@ -248,6 +248,7 @@ private:
     CAutoComplete                                   m_autoCompleter;
     Sci_Position                                    m_dwellStartPos;
     bool                                            m_bBlockAutoIndent;
+    sptr_t                                          m_lastCheckedLine;
 
     // status bar icons
     HICON m_hShieldIcon;
