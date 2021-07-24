@@ -1895,7 +1895,11 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         {
             const auto& lang = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
             if (isActiveTab)
+            {
                 m_editor.SetupLexerForLang(lang);
+                m_lastCheckedLine = 0;
+                SetTimer(*this, TIMER_CHECKLINES, 300, nullptr);
+            }
             doc.SetLanguage(lang);
         }
         // Update tab so the various states are updated (readonly, modified, ...)
@@ -1964,6 +1968,8 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savePath
     const auto&  lang      = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
     m_editor.SetupLexerForLang(lang);
     doc.SetLanguage(lang);
+    m_lastCheckedLine = 0;
+    SetTimer(*this, TIMER_CHECKLINES, 300, nullptr);
 
     if (!title.empty())
         m_tabBar.SetCurrentTitle(title.c_str());
@@ -3355,6 +3361,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.SetTabSettings(doc.m_tabSpace);
     m_editor.SetReadDirection(doc.m_readDir);
     m_lastCheckedLine = 0;
+    SetTimer(*this, TIMER_CHECKLINES, 300, nullptr);
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, true);
     CCommandHandler::Instance().OnStylesSet();
     g_pFramework->InvalidateUICommand(cmdUseTabs, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
@@ -3611,6 +3618,8 @@ bool CMainWindow::OpenFileAs(const std::wstring& tempPath, const std::wstring& r
     m_editor.SetupLexerForLang(lang);
     doc.SetLanguage(lang);
     UpdateTab(docID);
+    m_lastCheckedLine = 0;
+    SetTimer(*this, TIMER_CHECKLINES, 300, nullptr);
     if (sFileName.empty())
         m_tabBar.SetCurrentTitle(GetNewTabName().c_str());
     else
@@ -4136,6 +4145,8 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     editor->RestoreCurrentPos(docReload.m_position);
     editor->Call(SCI_SETREADONLY, docReload.m_bIsWriteProtected);
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, editor, doc, false);
+    m_lastCheckedLine = 0;
+    SetTimer(*this, TIMER_CHECKLINES, 300, nullptr);
 
     TBHDR tbHdr        = {};
     tbHdr.hdr.hwndFrom = *this;
@@ -4680,6 +4691,8 @@ void CMainWindow::SetTheme(bool dark)
         m_editor.Call(SCI_COLOURISE, 0, m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_LINESONSCREEN) + 1));
         const auto& doc = m_docManager.GetDocumentFromID(activeTabId);
         m_editor.SetupLexerForLang(doc.GetLanguage());
+        m_lastCheckedLine = 0;
+        SetTimer(*this, TIMER_CHECKLINES, 300, nullptr);
     }
     DarkModeHelper::Instance().RefreshTitleBarThemeColor(*this, dark);
     CCommandHandler::Instance().OnThemeChanged(dark);
