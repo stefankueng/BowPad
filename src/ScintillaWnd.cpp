@@ -982,7 +982,7 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
     Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_HIDDEN);
 
     if (!lexerData.annotations.empty())
-        Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_BOXED | EOLANNOTATION_ANGLE_FLAT);
+        Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_BOXED | EOLANNOTATION_ANGLE_CIRCLE);
 
     if (lexerData.name == "bp_simple")
     {
