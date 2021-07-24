@@ -838,6 +838,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                 if (std::regex_match(sLine.begin(), sLine.end(), rx))
                                 {
                                     m_editor.Call(SCI_EOLANNOTATIONSETTEXT, line, reinterpret_cast<sptr_t>(annotation.c_str()));
+                                    m_editor.Call(SCI_EOLANNOTATIONSETSTYLE, line, STYLE_FOLDDISPLAYTEXT);
                                     textSet = true;
                                     break;
                                 }
