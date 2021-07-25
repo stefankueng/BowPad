@@ -15,8 +15,8 @@ DisableClearType
 200
 Disables ClearType\nAuthor: wmjordan@163.com, Stefan Küng\n
 EditorSettings
-100
-207
+110
+208
 Overrides editor settings for universal and specific file types.\nModify EditorSettings.bpj file for customization.\nwmjordan@163.com\n
 SearchSelection
 104
