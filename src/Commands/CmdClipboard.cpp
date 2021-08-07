@@ -252,11 +252,13 @@ void ClipboardBase::SetLexerFromClipboard()
 
 bool CCmdCut::Execute()
 {
-    bool        bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-    std::string sHtml  = GetHtmlSelection();
     ScintillaCall(SCI_CUT);
+    bool bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
     if (bShift)
+    {
+        std::string sHtml = GetHtmlSelection();
         AddHtmlStringToClipboard(sHtml);
+    }
     AddLexerToClipboard();
     return true;
 }
@@ -286,11 +288,13 @@ void CCmdCutPlain::ScintillaNotify(SCNotification* pScn)
 
 bool CCmdCopy::Execute()
 {
-    bool        bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-    std::string sHtml  = GetHtmlSelection();
     ScintillaCall(SCI_COPYALLOWLINE);
+    bool bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
     if (bShift)
+    {
+        std::string sHtml = GetHtmlSelection();
         AddHtmlStringToClipboard(sHtml);
+    }
     AddLexerToClipboard();
     return true;
 }
