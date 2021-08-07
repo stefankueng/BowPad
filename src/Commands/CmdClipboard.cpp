@@ -175,7 +175,7 @@ std::string ClipboardBase::GetHtmlSelection() const
 void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml) const
 {
     CClipboardHelper clipBoard;
-    if (clipBoard.Open(GetHwnd()))
+    if (clipBoard.Open(GetScintillaWnd()))
     {
         size_t  sLen           = sHtml.length();
         HGLOBAL hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
@@ -201,7 +201,7 @@ void ClipboardBase::AddLexerToClipboard() const
     if (!lang.empty())
     {
         CClipboardHelper clipBoard;
-        if (clipBoard.Open(GetHwnd()))
+        if (clipBoard.Open(GetScintillaWnd()))
         {
             auto    sLen           = lang.length();
             HGLOBAL hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
@@ -228,7 +228,7 @@ void ClipboardBase::SetLexerFromClipboard()
     if (doc.GetLanguage().empty() || (doc.GetLanguage().compare("Text") == 0))
     {
         CClipboardHelper clipboard;
-        if (clipboard.Open(GetHwnd()))
+        if (clipboard.Open(GetScintillaWnd()))
         {
             auto CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
 
@@ -311,7 +311,7 @@ bool CCmdPaste::Execute()
     // test first if there's a file on the clipboard
     {
         CClipboardHelper clipboard;
-        if (clipboard.Open(GetHwnd()))
+        if (clipboard.Open(GetScintillaWnd()))
         {
             HANDLE hData = GetClipboardData(CF_HDROP);
             if (hData)
@@ -345,7 +345,7 @@ bool CCmdPasteHtml::Execute()
     // test first if there's a file on the clipboard
     {
         CClipboardHelper clipboard;
-        if (clipboard.Open(GetHwnd()))
+        if (clipboard.Open(GetScintillaWnd()))
         {
             HANDLE hData = GetClipboardData(CF_HTML);
             if (hData)
