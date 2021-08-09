@@ -1297,9 +1297,9 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             CClipboardHelper clipboard;
             if (clipboard.Open(GetHwnd()))
             {
-                HGLOBAL hClipboardData;
-                size_t  sLen   = wcslen(p1.bstrVal);
-                hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(wchar_t));
+                EmptyClipboard();
+                size_t sLen           = wcslen(p1.bstrVal);
+                auto   hClipboardData = GlobalAlloc(GMEM_MOVEABLE, (sLen + 1) * sizeof(wchar_t));
                 if (hClipboardData)
                 {
                     wchar_t* pchData = static_cast<wchar_t*>(GlobalLock(hClipboardData));
@@ -1334,7 +1334,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                     SearchReplace(sHtml, "<<<<<<<3", CStringUtils::Format("%08d", startFragment));
                     SearchReplace(sHtml, "<<<<<<<4", CStringUtils::Format("%08d", endFragment));
 
-                    hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sHtml.size() + 1) * sizeof(char));
+                    hClipboardData = GlobalAlloc(GMEM_MOVEABLE, (sHtml.size() + 1) * sizeof(char));
                     if (hClipboardData)
                     {
                         char* pchData = static_cast<char*>(GlobalLock(hClipboardData));

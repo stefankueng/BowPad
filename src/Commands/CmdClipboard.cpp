@@ -178,7 +178,7 @@ void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml) const
     if (clipBoard.Open(GetScintillaWnd()))
     {
         size_t  sLen           = sHtml.length();
-        HGLOBAL hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
+        HGLOBAL hClipboardData = GlobalAlloc(GMEM_MOVEABLE, (sLen + 1) * sizeof(char));
         if (hClipboardData)
         {
             char* pchData = static_cast<char*>(GlobalLock(hClipboardData));
@@ -204,7 +204,7 @@ void ClipboardBase::AddLexerToClipboard() const
         if (clipBoard.Open(GetScintillaWnd()))
         {
             auto    sLen           = lang.length();
-            HGLOBAL hClipboardData = GlobalAlloc(GMEM_DDESHARE, (sLen + 1) * sizeof(char));
+            HGLOBAL hClipboardData = GlobalAlloc(GMEM_MOVEABLE, (sLen + 1) * sizeof(char));
             if (hClipboardData)
             {
                 char* pchData = static_cast<char*>(GlobalLock(hClipboardData));
