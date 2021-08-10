@@ -185,10 +185,8 @@ void ClipboardBase::AddHtmlStringToClipboard(const std::string& sHtml) const
             if (pchData)
             {
                 strcpy_s(pchData, sLen + 1, sHtml.c_str());
-                if (GlobalUnlock(hClipboardData))
-                {
-                    SetClipboardData(CF_HTML, hClipboardData);
-                }
+                GlobalUnlock(hClipboardData);
+                SetClipboardData(CF_HTML, hClipboardData);
             }
         }
     }
@@ -211,11 +209,9 @@ void ClipboardBase::AddLexerToClipboard() const
                 if (pchData)
                 {
                     strcpy_s(pchData, sLen + 1, lang.c_str());
-                    if (GlobalUnlock(hClipboardData))
-                    {
-                        auto CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
-                        SetClipboardData(CF_LEXER, hClipboardData);
-                    }
+                    GlobalUnlock(hClipboardData);
+                    auto CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
+                    SetClipboardData(CF_LEXER, hClipboardData);
                 }
             }
         }
