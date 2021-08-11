@@ -1306,10 +1306,8 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                     if (pchData)
                     {
                         wcscpy_s(pchData, sLen + 1, p1.bstrVal);
-                        if (GlobalUnlock(hClipboardData))
-                        {
-                            SetClipboardData(CF_UNICODETEXT, hClipboardData);
-                        }
+                        GlobalUnlock(hClipboardData);
+                        SetClipboardData(CF_UNICODETEXT, hClipboardData);
                     }
                 }
                 auto sHtmlFragment = CUnicodeUtils::StdGetUTF8(p2.bstrVal);
@@ -1341,10 +1339,8 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
                         if (pchData)
                         {
                             strcpy_s(pchData, sHtml.size() + 1, sHtml.c_str());
-                            if (GlobalUnlock(hClipboardData))
-                            {
-                                SetClipboardData(CF_HTML, hClipboardData);
-                            }
+                            GlobalUnlock(hClipboardData);
+                            SetClipboardData(CF_HTML, hClipboardData);
                         }
                     }
                 }
