@@ -257,12 +257,14 @@ void CRegexCaptureDlg::DoCapture()
         auto                                            start = searchText.cbegin();
         auto                                            end   = searchText.cend();
         std::vector<std::tuple<sptr_t, size_t, size_t>> capturePositions;
+        std::string                                     resultString;
+        resultString.reserve(5 * 1024 * 1025); // reserve 5MB
         while (std::regex_search(start, end, whatC, rx, flags))
         {
             if (whatC[0].matched)
             {
                 auto out = whatC.format(sCapture, flags);
-                m_captureWnd.Call(SCI_APPENDTEXT, out.size(), reinterpret_cast<sptr_t>(out.c_str()));
+                resultString += out;
 
                 sptr_t captureCount = 0;
                 for (const auto& w : whatC)
@@ -283,6 +285,7 @@ void CRegexCaptureDlg::DoCapture()
             // update flags for continuation
             flags |= std::regex_constants::match_flag_type::match_prev_avail;
         }
+        m_captureWnd.Call(SCI_APPENDTEXT, resultString.size(), reinterpret_cast<sptr_t>(resultString.c_str()));
         m_captureWnd.UpdateLineNumberWidth();
 
         for (const auto& [num, begin, length] : capturePositions)
