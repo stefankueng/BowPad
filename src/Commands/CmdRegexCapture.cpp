@@ -264,6 +264,13 @@ void CRegexCaptureDlg::DoCapture()
             {
                 auto out = whatC.format(sCapture, flags);
                 outStream << out;
+                if (outStream.tellp() > 5 * 1024 * 1024)
+                {
+                    const auto& sOut = outStream.str();
+                    m_captureWnd.Call(SCI_APPENDTEXT, sOut.size(), reinterpret_cast<sptr_t>(sOut.c_str()));
+                    outStream.str("");
+                    outStream.clear();
+                }
 
                 sptr_t captureCount = 0;
                 for (const auto& w : whatC)
