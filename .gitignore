@@ -20,3 +20,6 @@
 /_ReSharper.Caches
 /BowPad.sln.DotSettings.user
 /enc_temp_folder
+/packages
+/src/ExplorerCommandVerb/ExplorerCommandVerb.vcxproj.user
+/src/Setup/x64
