@@ -126,7 +126,7 @@ std::wstring GetModuleDir(HMODULE hMod /*= nullptr*/)
 class ExplorerCommandBase : public RuntimeClass<RuntimeClassFlags<ClassicCom>, IExplorerCommand, IObjectWithSite>
 {
 public:
-    virtual const wchar_t* Title() = 0;
+    virtual const wchar_t* Title(IShellItemArray* items) = 0;
     virtual EXPCMDFLAGS    Flags() { return ECF_DEFAULT; }
     virtual EXPCMDSTATE    State(_In_opt_ IShellItemArray* selection) { return ECS_ENABLED; }
 
@@ -134,7 +134,7 @@ public:
     IFACEMETHODIMP GetTitle(_In_opt_ IShellItemArray* items, _Outptr_result_nullonfailure_ PWSTR* name) override
     {
         *name      = nullptr;
-        auto title = wil::make_cotaskmem_string_nothrow(Title());
+        auto title = wil::make_cotaskmem_string_nothrow(Title(items));
         RETURN_IF_NULL_ALLOC(title);
         *name = title.release();
         return S_OK;
@@ -171,7 +171,7 @@ public:
         }
 
         std::wostringstream title;
-        title << Title();
+        title << Title(selection);
 
         if (selection)
         {
@@ -215,7 +215,32 @@ protected:
 class __declspec(uuid("A2CCD0C8-0CA7-4E4C-A5E5-7B004022B19F")) BowPadExplorerCommandHandler final : public ExplorerCommandBase
 {
 public:
-    const wchar_t* Title() override { return L"Open with BowPad"; }
+    const wchar_t* Title(IShellItemArray* items) override
+    {
+        bool isFile = false;
+        if (items)
+        {
+            DWORD fileCount = 0;
+            if (SUCCEEDED(items->GetCount(&fileCount)))
+            {
+                for (DWORD i = 0; i < fileCount; i++)
+                {
+                    IShellItem* shellItem = nullptr;
+                    items->GetItemAt(i, &shellItem);
+                    DWORD attribs = 0;
+                    shellItem->GetAttributes(SFGAO_FOLDER, &attribs);
+                    if ((attribs & SFGAO_FOLDER) == 0)
+                    {
+                        isFile = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (isFile)
+            return L"Edit with BowPad";
+        return L"Open Folder with BowPad";
+    }
 
     EXPCMDSTATE State(_In_opt_ IShellItemArray* selection) override
     {
@@ -261,7 +286,6 @@ public:
             {
                 DWORD fileCount = 0;
                 RETURN_IF_FAILED(selection->GetCount(&fileCount));
-                std::wstring paths;
                 for (DWORD i = 0; i < fileCount; i++)
                 {
                     IShellItem* shellItem = nullptr;
@@ -270,23 +294,21 @@ public:
                     shellItem->GetDisplayName(SIGDN_FILESYSPATH, &itemName);
                     if (itemName)
                     {
-                        if (!paths.empty())
-                            paths += L"*";
-                        paths += itemName;
+                        std::wstring path = L"/path:\"";
+                        path += itemName;
+                        path += L"\"";
+                        SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
+
+                        shExecInfo.hwnd         = nullptr;
+                        shExecInfo.lpVerb       = L"open";
+                        shExecInfo.lpFile       = bpPath.c_str();
+                        shExecInfo.lpParameters = path.c_str();
+                        shExecInfo.nShow        = SW_NORMAL;
+                        ShellExecuteEx(&shExecInfo);
+
                         CoTaskMemFree(itemName);
                     }
                 }
-                paths = L"/path:\"" + paths + L"\"";
-
-                SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
-
-                shExecInfo.hwnd         = nullptr;
-                shExecInfo.lpVerb       = L"open";
-                shExecInfo.lpFile       = bpPath.c_str();
-                shExecInfo.lpParameters = paths.c_str();
-                shExecInfo.nShow        = SW_NORMAL;
-
-                ShellExecuteEx(&shExecInfo);
             }
 
             return S_OK;
