@@ -37,12 +37,31 @@
       <RegistrySearch Id="PreviousInstallLocationRegistrySearchMachine" Root="HKLM" Key="Software\BowPad" Name="installDir" Type="raw" Win64="yes" />
     </Property>
 
+    <!-- msiexec does not have a manifest, so it always reports the version of system dlls as
+         for Win7 (6.3.x.x). So we check for 6.3 but use the build number to actually check
+         for Win11 -->
+    <Property Id="WIN11FOUND" Secure="yes">
+      <DirectorySearch Id="searchSystem" Path="[System64Folder]" AssignToProperty="yes">
+        <FileSearch Id="searchFile" Name="shell32.dll" MinVersion="6.3.21999.0"/>
+      </DirectorySearch>
+    </Property>
+
+    <!-- properties for the custom actions to (un)register the sparse package -->
+    <Property Id="SPARSEPACKAGEFILE" Value="package.msix"  Secure="yes"/>
+    <Property Id="SPARSEPACKAGENAME" Value="2BD6356E-3263-4AA6-A5FC-C48280BE5EDD"  Secure="yes"/>
+
+    <Binary Id="CustomActions.dll"  SourceFile="../../bin/release/bin/CustomActions.dll" />
+    <CustomAction Id="RegisterSparsePackage" BinaryKey="CustomActions.dll" DllEntry="RegisterSparsePackage"/>
+    <CustomAction Id="UnregisterSparsePackage" BinaryKey="CustomActions.dll" DllEntry="UnregisterSparsePackage"/>
+
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFiles64Folder" Name="PFiles">
         <Directory Id="INSTALLDIR" Name="BowPad">
 
           <Component Id="BowPad.exe" Guid="666BFAE6-68D2-4F4E-A579-32CDDDA0BA74" Win64="yes">
             <File Id="BowPad.EXE" Name="BowPad.exe" DiskId="1" Source="../../bin/release64/bin/BowPad.exe" Vital="yes" />
+            <File Id="package.msix" Name="package.msix" DiskId="1" Source="../../bin/release64/bin/package.msix" Vital="yes" />
+            <File Id="shelldll" Name="ExplorerCommandVerb.dll" DiskId="1" Source="../../bin/release64/bin/ExplorerCommandVerb.dll" Vital="yes" />
           </Component>
           <Component Id="BowPadShellMenu" Guid="43123CE3-4D2C-4200-BB10-C128EFC6F486" Win64="yes">
             <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad" Value='Edit with BowPad' Type="string" />
@@ -112,6 +131,8 @@
       <AppSearch Sequence="1"></AppSearch>
       <LaunchConditions After="AppSearch" />
       <RemoveExistingProducts After="InstallFinalize"><![CDATA[PREVIOUSVERSIONSINSTALLED]]></RemoveExistingProducts>
+      <Custom Action="RegisterSparsePackage" After="InstallFinalize">NOT (REMOVE~="ALL") AND (NOT WIN11FOUND="")</Custom>
+      <Custom Action="UnregisterSparsePackage" Before="RemoveFiles">(REMOVE~="ALL") AND (NOT WIN11FOUND="")</Custom>
     </InstallExecuteSequence>
 
   </Product>
