@@ -1885,7 +1885,7 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         if (doc.m_saveCallback)
             doc.m_saveCallback();
 
-        if (CPathUtils::PathCompare(CIniSettings::Instance().GetIniPath(), doc.m_path))
+        if (CPathUtils::PathCompare(CIniSettings::Instance().GetIniPath(), doc.m_path) == 0)
             CIniSettings::Instance().Reload();
 
         doc.m_bIsDirty     = false;
