@@ -728,6 +728,9 @@
     <ClCompile Include="src\CharacterCategoryMap.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\lexilla\lexlib\LexAccessor.cxx">
+      <Filter>Lexilla\lexlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\lexilla\include\LexicalStyles.iface">
