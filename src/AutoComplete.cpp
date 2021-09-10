@@ -685,6 +685,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
                 m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
                 m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+                if (CTheme::Instance().IsDarkTheme())
+                    m_editor->Call(SCI_AUTOCSETOPTIONS, SC_AUTOCOMPLETE_FIXED_SIZE);
                 m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), reinterpret_cast<LPARAM>(pathComplete.c_str()));
                 SetWindowStylesForAutocompletionPopup();
                 return;
@@ -744,6 +746,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                             m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
                             m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
                             m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+                            if (CTheme::Instance().IsDarkTheme())
+                                m_editor->Call(SCI_AUTOCSETOPTIONS, SC_AUTOCOMPLETE_FIXED_SIZE);
                             m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), reinterpret_cast<LPARAM>(tagName.c_str()));
                             SetWindowStylesForAutocompletionPopup();
                             return;
@@ -789,6 +793,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                         m_editor->Call(SCI_AUTOCSETAUTOHIDE, FALSE);
                         m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
                         m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+                        if (CTheme::Instance().IsDarkTheme())
+                            m_editor->Call(SCI_AUTOCSETOPTIONS, SC_AUTOCOMPLETE_FIXED_SIZE);
                         m_editor->Call(SCI_AUTOCSHOW, word.size() + 1, reinterpret_cast<sptr_t>(sAutoCompleteString.c_str()));
                         SetWindowStylesForAutocompletionPopup();
                     }
@@ -858,6 +864,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
             m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
             m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+            if (CTheme::Instance().IsDarkTheme())
+                m_editor->Call(SCI_AUTOCSETOPTIONS, SC_AUTOCOMPLETE_FIXED_SIZE);
             m_editor->Call(SCI_AUTOCSHOW, word.size(), reinterpret_cast<sptr_t>(sAutoCompleteList.c_str()));
             SetWindowStylesForAutocompletionPopup();
         }
@@ -952,16 +960,6 @@ BOOL CAutoComplete::AdjustThemeProc(HWND hwnd, LPARAM /*lParam*/)
     if ((wcscmp(szWndClassName, L"ListBoxX") == 0) ||
         (wcscmp(szWndClassName, WC_LISTBOX) == 0))
     {
-        // in dark mode, the resizing border is visible at the top
-        // of the popup, and it's white and ugly.
-        // this removes the border, but that also means that the
-        // popup is not resizable anymore - which I think is not
-        // really necessary anyway.
-        auto dwCurStyle = static_cast<DWORD>(GetWindowLongPtr(hwnd, GWL_STYLE));
-        dwCurStyle &= ~WS_THICKFRAME;
-        dwCurStyle |= WS_BORDER;
-        SetWindowLongPtr(hwnd, GWL_STYLE, dwCurStyle);
-
         DarkModeHelper::Instance().AllowDarkModeForWindow(hwnd, TRUE);
         SetWindowTheme(hwnd, L"Explorer", nullptr);
         EnumChildWindows(hwnd, AdjustThemeProc, 0);
