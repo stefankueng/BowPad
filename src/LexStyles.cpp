@@ -233,6 +233,14 @@ void CLexStyles::Load()
 #ifdef _DEBUG
             assert(!lexName.empty());
 #endif
+            if (lexName.empty() && lex)
+            {
+                auto lexIt = m_lexerData.find(lex);
+                if (lexIt != m_lexerData.end())
+                {
+                    lexName = CUnicodeUtils::StdGetUnicode(lexIt->second.name);
+                }
+            }
             std::wstring v = ini->GetValue(L"lexers", lexerName.c_str(), L"");
             if (!v.empty())
             {
