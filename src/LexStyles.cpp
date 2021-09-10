@@ -923,6 +923,14 @@ void CLexStyles::SaveUserData()
         std::wstring v = std::to_wstring(lexerId);
         ini.SetValue(section.c_str(), L"Lexer", v.c_str());
         ini.SetValue(section.c_str(), L"LexerName", CUnicodeUtils::StdGetUnicode(lexerData.name).c_str());
+        if (lexerData.name.empty())
+        {
+            auto lexIt = m_lexerData.find(lexerId);
+            if (lexIt != m_lexerData.end())
+            {
+                ini.SetValue(section.c_str(), L"LexerName", CUnicodeUtils::StdGetUnicode(lexIt->second.name).c_str());
+            }
+        }
         for (const auto& [styleId, styleData] : lexerData.styles)
         {
             std::wstring style = CStringUtils::Format(L"Style%d", styleId);
