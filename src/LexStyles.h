@@ -64,6 +64,8 @@ class StyleData
 {
 public:
     StyleData();
+    bool operator==(const StyleData& data) const = default;
+    bool operator!=(const StyleData& data) const = default;
 
     std::wstring name;
     COLORREF     foregroundColor;
