@@ -931,6 +931,8 @@ void CLexStyles::SaveUserData()
                 ini.SetValue(section.c_str(), L"LexerName", CUnicodeUtils::StdGetUnicode(lexIt->second.name).c_str());
             }
         }
+        bool        hasChangedEntries = false;
+        const auto& origStyleData = m_lexerData[lexerId].styles;
         for (const auto& [styleId, styleData] : lexerData.styles)
         {
             std::wstring style = CStringUtils::Format(L"Style%d", styleId);
@@ -942,9 +944,21 @@ void CLexStyles::SaveUserData()
             // styleNR=name;foreground;background;fontname;fontstyle;fontsize
             const auto& name = styleData.name.empty() ? m_lexerData[lexerId].styles[styleId].name : styleData.name;
             v                = CStringUtils::Format(L"%s;%06X;%06X;%s;%d;%s", name.c_str(), fore, back, styleData.fontName.c_str(), styleData.fontStyle, sSize.c_str());
-            ini.SetValue(section.c_str(), style.c_str(), v.c_str());
+            if (auto origStyleIt = origStyleData.find(styleId); origStyleIt != origStyleData.end())
+            {
+                if (styleData != origStyleIt->second)
+                {
+                    ini.SetValue(section.c_str(), style.c_str(), v.c_str());
+                    hasChangedEntries = true;
+                }
+            }
+            else
+                ini.SetValue(section.c_str(), style.c_str(), v.c_str());
         }
+        if (!hasChangedEntries)
+            ini.Delete(section.c_str(), nullptr);
     }
+
     ini.Delete(L"hiddenLangs", nullptr);
     for (const auto& l : m_hiddenLangs)
         ini.SetValue(L"hiddenLangs", l.c_str(), L"hidden");
@@ -954,6 +968,12 @@ void CLexStyles::SaveUserData()
 
     for (const auto& [ext, name] : m_userExtLang)
     {
+        const auto&  origExtIt = m_extLang.find(ext);
+        if (origExtIt != m_extLang.end())
+        {
+            if (origExtIt->second == name)
+                continue;
+        }
         auto         lang = CUnicodeUtils::StdGetUnicode(name);
         std::wstring v    = ini.GetValue(L"language", lang.c_str(), L"");
         if (!v.empty())
