@@ -1556,6 +1556,8 @@ bool CMainWindow::Initialize()
     CCommandHandler::Instance().AddCommand(cmdAbout);
 
     m_editor.Init(hResource, *this);
+    SendMessage(m_editor, WM_SETREDRAW, FALSE, 0);
+    OnOutOfScope(SendMessage(m_editor, WM_SETREDRAW, TRUE, 0));
     m_autoCompleter.Init();
     m_statusBar.Init(*this, true);
     m_statusBar.SetHandlerFunc([](COLORREF clr) -> COLORREF {
