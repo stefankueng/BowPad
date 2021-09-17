@@ -30,38 +30,40 @@
 #include <algorithm>
 #include <regex>
 
-// IMPORTANT: Testing this module can be difficult because debug mode
-// performance can be drastically slower than release builds.
-// Regex in particular can also be slower.
+struct FunctionInfo
+{
+    sptr_t      lineNum;
+    std::string sortName;
+    std::string displayName;
+};
 
 // Turns "Hello/* there */world" into "Helloworld"
 static void StripComments(std::string& f)
 {
-    constexpr char   commentBegin[]  = {"/*"};
-    constexpr char   commentEnd[]    = {"*/"};
+    constexpr char commentBegin[]  = {"/*"};
+    constexpr char commentEnd[]    = {"*/"};
     constexpr size_t commentBeginLen = std::size(commentBegin) - 1;
     constexpr size_t commentEndLen   = std::size(commentEnd) - 1;
-    size_t           commentBeginPos = 0;
-    for (;;)
+
+    for (size_t commentBeginPos = 0; ;)
     {
         commentBeginPos = f.find(commentBegin, commentBeginPos);
         if (commentBeginPos == std::string::npos)
             break;
-        auto commentEndPos = f.find(commentEnd,
-                                    commentBeginPos + commentBeginLen);
+        size_t commentEndPos = f.find(commentEnd,
+                                      commentBeginPos + commentBeginLen);
         if (commentEndPos == std::string::npos)
             break;
-        auto e     = f.erase(f.begin() + commentBeginPos,
-                         f.begin() + commentEndPos + commentEndLen);
-        auto trash = std::remove(e, f.end(), '\0');
-        f.erase(trash, f.end());
+        f.erase(f.begin() + commentBeginPos,
+                f.begin() + commentEndPos + commentEndLen);
     }
 }
 
-static void Normalize(std::string& f)
+static void Normalize(std::string& f, const std::vector<std::string>& functionRegexTrim)
 {
     // Remove certain chars and replace adjacent whitespace inside the string.
     // Remember to patch up the size to reflect what we remove.
+    StripComments(f);
     auto e = std::remove_if(f.begin(), f.end(), [](auto c) {
         return c == '\r' || c == '{';
     });
@@ -75,17 +77,20 @@ static void Normalize(std::string& f)
         return (lhs == ' ' && rhs == ' ');
     });
     f.erase(newEnd, f.end());
+    for (const auto& token : functionRegexTrim)
+        SearchRemoveAll(f, token);
+    CStringUtils::trim(f);
 }
 
 static bool ParseSignature(const std::string& sig, std::string& name, std::string& nameAndArgs)
 {
-    bool parsed = false;
+    static constexpr char skip[] = "\t :,.";
+    static constexpr size_t skipLen = sizeof(skip) - 1;
 
     // Look for a ( of perhaps void x::f(whatever)
-    auto bracePos = sig.find('(');
-    if (bracePos != std::string::npos)
+    if (size_t bracePos = sig.find('('); bracePos != std::string::npos)
     {
-        auto   wPos = sig.find_last_of("\t :,.", bracePos - 1, 5);
+        size_t wPos = sig.find_last_of(skip, bracePos - 1, skipLen);
         size_t sPos = (wPos == std::string::npos) ? 0 : wPos + 1;
 
         // Functions returning pointer or reference will feature these symbols
@@ -97,20 +102,19 @@ static bool ParseSignature(const std::string& sig, std::string& name, std::strin
     }
     else
     {
-        // some languages have functions without (), or pseudo-functions like
+        // Some languages have functions without (), or pseudo-functions like
         // properties in c#. Deal with those here.
-        auto   wPos = sig.find_last_of("\t :,.", bracePos - 1, 5);
+        size_t wPos = sig.find_last_of(skip, std::string::npos, skipLen);
         size_t sPos = (wPos == std::string::npos) ? 0 : wPos + 1;
 
-        name.assign(sig, sPos, bracePos - sPos);
+        name.assign(sig, sPos, wPos);
         nameAndArgs.assign(sig, sPos);
     }
     CStringUtils::trim(name);
-    parsed = !name.empty();
-    return parsed;
+    return !name.empty();
 }
 
-static inline bool ParseName(const std::string& sig, std::string& name)
+static bool ParseName(const std::string& sig, std::string& name)
 {
     // Look for a ( of perhaps void x::f(whatever)
     auto bracePos = sig.find('(');
@@ -129,34 +133,37 @@ static inline bool ParseName(const std::string& sig, std::string& name)
     return false;
 }
 
-static bool FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf,
-                     std::string& foundText, sptr_t* lineNum)
+static bool FindNext(
+    CScintillaWnd& edit,
+    Sci_PositionCR searchStart, Sci_PositionCR searchEnd,
+    const char* searchTarget,
+    Sci_PositionCR& foundStart, Sci_PositionCR& foundEnd,
+    std::string& foundText, sptr_t& lineNum)
 {
-    if (ttf.chrg.cpMax - ttf.chrg.cpMin <= 0)
-        return false;
     // In debug mode, regex takes a *long* time.
+    Sci_TextToFind ttf{ {searchStart, searchEnd}, searchTarget };
     auto findRet = edit.Call(SCI_FINDTEXT, SCFIND_REGEXP | SCFIND_CXX11REGEX, reinterpret_cast<sptr_t>(&ttf));
     if (findRet < 0)
         return false;
-    // Skip newlines, whitespaces and possible leftover closing braces from
-    // the start of the matched function text.
-    char c     = static_cast<char>(edit.Call(SCI_GETCHARAT, ttf.chrgText.cpMin));
-    auto cpMin = ttf.chrgText.cpMin;
-    while ((cpMin < ttf.chrgText.cpMax) &&
+    foundStart = ttf.chrgText.cpMin;
+    char c = static_cast<char>(edit.Call(SCI_GETCHARAT, foundStart));
+    foundEnd = ttf.chrgText.cpMax;
+    auto e = foundStart;
+    while (foundStart < foundEnd &&
            (c == '\r' || c == '\n' || c == ';' || c == '}' || c == ' ' || c == '\t'))
     {
-        ++cpMin;
-        c = static_cast<char>(edit.Call(SCI_GETCHARAT, cpMin));
+        ++e;
+        c = static_cast<char>(edit.Call(SCI_GETCHARAT, e));
     }
-    auto len = ttf.chrgText.cpMax - cpMin;
-    if (len < 0)
+    foundStart = e;
+    auto matchLen = foundEnd - foundStart;
+    if (matchLen < 0)
         return false;
-    foundText.resize(len + 1LL);
-    Sci_TextRange r{cpMin, ttf.chrgText.cpMax, &foundText[0]};
-    edit.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&r));
-    foundText.resize(len);
-
-    *lineNum = static_cast<int>(edit.Call(SCI_LINEFROMPOSITION, cpMin));
+    foundText.resize(matchLen + 1LL);
+    Sci_TextRange foundRange{ foundStart, foundEnd, foundText.data() };
+    edit.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&foundRange));
+    foundText.resize(matchLen);
+    lineNum = static_cast<int>(edit.Call(SCI_LINEFROMPOSITION, foundStart));
     return true;
 }
 
@@ -174,11 +181,9 @@ CCmdFunctions::CCmdFunctions(void* obj)
         m_autoScan = false;
 
     m_timerID = GetTimerID();
-
     m_edit.InitScratch(g_hRes);
 
     InterlockedExchange(&m_bThreadRunning, FALSE);
-
     InterlockedExchange(&m_bRunThread, TRUE);
     m_thread = std::thread(&CCmdFunctions::ThreadFunc, this);
     m_thread.detach();
@@ -195,7 +200,8 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
         HRESULT          hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
-        return PopulateFunctions(pCollection);
+        PopulateFunctions(pCollection);
+        return S_OK;
     }
 
     if (key == UI_PKEY_SelectedItem)
@@ -217,41 +223,97 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
     return E_NOTIMPL;
 }
 
-HRESULT CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
+static bool SortByFunctionNameAndLineNum(const FunctionInfo& lhs, const FunctionInfo& rhs)
 {
-    HRESULT hr = S_OK;
+    // Sort by name, then by line number.
+    // Assume something starting with a tilde is a
+    // C++/C# Destructor and cause those to sort
+    // as if the tilde was not present.
+    // This puts like named entities together
+    // regardless of either is a destructor.
+    const char* lhName = lhs.sortName.c_str();
+    const char* rhName = rhs.sortName.c_str();
+    if (*lhName == '~')
+        ++lhName;
+    if (*rhName == '~')
+        ++rhName;
+    auto result = _stricmp(lhName, rhName);
+    if (result < 0)
+        return true;
+    if (result == 0)
+        if (lhs.lineNum < rhs.lineNum)
+            return true;
+    return false;
+}
+
+void CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
+{
     // The list will retain whatever from last time so clear it.
     collection->Clear();
     m_menuData.clear();
+    OnOutOfScope(
+        UINT collectionSize;
+        if (collection->GetCount(&collectionSize) == S_OK && !collectionSize)
+        {
+            HRESULT hr = CAppUtils::AddResStringItem(collection,
+                IDS_NOFUNCTIONSFOUND, UI_COLLECTION_INVALIDINDEX, EMPTY_IMAGE);
+            CAppUtils::FailedShowMessage(hr);
+        }
+    );
+    if (!HasActiveDocument())
+        return;
+    const auto& doc = GetActiveDocument();
+    const auto& docLang = doc.GetLanguage();
+    if (docLang.empty())
+        return;
+    auto* langData = CLexStyles::Instance().GetLanguageData(docLang);
+    if (!langData)
+        return;
+    if (langData->functionRegex.empty())
+        return;
 
-    auto docId = GetDocIdOfCurrentTab();
-    if (!docId.IsValid())
-        return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
+    std::vector<FunctionInfo> functions;
+    {
+        CScintillaWnd edit(g_hRes);
+        edit.InitScratch(g_hRes);
+        edit.Call(SCI_SETDOCPOINTER, 0, 0);
+        edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
+        edit.Call(SCI_CLEARALL);
+        edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+        OnOutOfScope(
+            edit.Call(SCI_SETDOCPOINTER, 0, 0););
 
 #if defined(_DEBUG) || defined(PROFILING)
-    ProfileTimer profileTimer(L"FunctionParse");
+        ProfileTimer profileTimer(L"FunctionParse");
 #endif
-    auto functions = FindFunctionsNow();
+        sptr_t lineNum = 0;
+        std::string sig;
+        Sci_PositionCR docLength = static_cast<Sci_PositionCR>(edit.Call(SCI_GETLENGTH));
+        for (Sci_PositionCR searchStart = 0, foundStart, foundEnd;
+            FindNext(edit, searchStart, docLength,
+                langData->functionRegex.c_str(),
+                foundStart, foundEnd, sig, lineNum)
+            ; searchStart = foundEnd + 1)
+        {
+            Normalize(sig, langData->functionRegexTrim);
+            std::string name;
+            std::string nameAndArgs;
+            if (ParseSignature(sig, name, nameAndArgs))
+                functions.emplace_back(lineNum, std::move(name), std::move(nameAndArgs));
+        }
+    }
     if (functions.empty())
-        return CAppUtils::AddResStringItem(collection, IDS_NOFUNCTIONSFOUND);
-
-    // Populate the dropdown with the function details.
+        return;
+    std::sort(functions.begin(), functions.end(), SortByFunctionNameAndLineNum);
+    m_menuData.reserve(functions.size());
     for (const auto& func : functions)
     {
-        hr = CAppUtils::AddStringItem(collection, CUnicodeUtils::StdGetUnicode(func.displayName).c_str());
-        // If we fail to add a function, give up and assume
-        // no others adds will work though try to hint at that.
-        // Logically though, that might well not work either.
+        HRESULT hr = CAppUtils::AddStringItem(collection,
+            CUnicodeUtils::StdGetUnicode(func.displayName).c_str(), UI_COLLECTION_INVALIDINDEX, EMPTY_IMAGE);
         if (CAppUtils::FailedShowMessage(hr))
-        {
-            HRESULT hrMissingHint = CAppUtils::AddStringItem(collection, L"...");
-            CAppUtils::FailedShowMessage(hrMissingHint);
-            return S_OK;
-        }
+            return;
         m_menuData.push_back(func.lineNum);
     }
-
-    return S_OK;
 }
 
 HRESULT CCmdFunctions::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
@@ -367,62 +429,56 @@ void CCmdFunctions::OnTimer(UINT id)
 {
     if (id == m_timerID)
     {
+        const bool limitedScan = m_autoScanLimit != static_cast<size_t>(-1);
         // first go through all events and create a WorkItem
         // for each of them, and add them to the thread data list
         // if necessary.
         // If data is added to the thread data list, wake up the thread.
         bool bWakeupThread = false;
-        for (const auto& docId : m_eventData)
+        for (const auto docId : m_eventData)
         {
             const auto& doc = GetDocumentFromID(docId);
+            auto lang = doc.GetLanguage();
+            if (lang.empty())
+                continue;
+            auto langData = CLexStyles::Instance().GetLanguageData(lang);
+            if (!langData ||
+                langData->functionRegex.empty() ||
+                langData->userFunctions <= 0 ||
+                langData->autoCompleteRegex.empty())
+                continue;
+            // Profile
+            //#if defined(_DEBUG) || defined(PROFILING)
+            ProfileTimer p(L"getting doc content");
+            //#endif
             m_edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
             m_edit.Call(SCI_CLEARALL);
             m_edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
             OnOutOfScope(
                 m_edit.Call(SCI_SETDOCPOINTER, 0, 0););
-
+            size_t lengthDoc = m_edit.Call(SCI_GETLENGTH);
+            if (limitedScan && lengthDoc > m_autoScanLimit)
+                continue;
             WorkItem w;
-            w.m_lang = doc.GetLanguage();
-            w.m_id   = docId;
+            w.m_lang = lang;
+            w.m_id = docId;
             if (GetDocIdOfCurrentTab() == docId)
-            {
                 w.m_currentPos = ScintillaCall(SCI_GETCURRENTPOS);
-            }
+            w.m_regex = langData->functionRegex;
+            w.m_trimTokens = langData->functionRegexTrim;
+            w.m_autoCRegex = langData->autoCompleteRegex;
+            // get characters directly from Scintilla buffer
+            const char* buf = reinterpret_cast<const char*>(m_edit.Call(SCI_GETCHARACTERPOINTER));
+            w.m_data  = std::string(buf, lengthDoc);
 
-            if (!w.m_lang.empty())
-            {
-                auto langData = CLexStyles::Instance().GetLanguageData(w.m_lang);
-                if (langData != nullptr)
-                {
-                    if ((!langData->functionRegex.empty() && langData->userFunctions > 0) || !langData->autoCompleteRegex.empty())
-                    {
-                        w.m_regex      = langData->functionRegex;
-                        w.m_trimTokens = langData->functionRegexTrim;
-                        w.m_autoCRegex = langData->autoCompleteRegex;
-
-                        ProfileTimer p(L"getting doc content");
-                        size_t       lengthDoc = m_edit.Call(SCI_GETLENGTH);
-                        if ((lengthDoc <= m_autoScanLimit) || (m_autoScanLimit == static_cast<size_t>(-1)))
-                        {
-                            // get characters directly from Scintilla buffer
-                            char* buf = reinterpret_cast<char*>(m_edit.Call(SCI_GETCHARACTERPOINTER));
-                            w.m_data  = std::string(buf, lengthDoc);
-
-                            std::unique_lock<std::mutex> lock(m_fileDataMutex);
-                            // if there's already a work item queued up for this document,
-                            // remove it and add the new one
-                            auto found = std::find_if(m_fileData.begin(), m_fileData.end(), [w](const WorkItem& wi) {
-                                return wi.m_id == w.m_id;
-                            });
-                            if (found != m_fileData.end())
-                                m_fileData.erase(found);
-
-                            m_fileData.push_back(std::move(w));
-                            bWakeupThread = true;
-                        }
-                    }
-                }
-            }
+            std::unique_lock<std::mutex> lock(m_fileDataMutex);
+            // if there's already a work item queued up for this document,
+            // remove it and add the new one
+            std::erase_if(m_fileData, [docId](const WorkItem& wi) {
+                return wi.m_id == docId;
+            });
+            m_fileData.push_back(std::move(w));
+            bWakeupThread = true;
         }
         m_eventData.clear();
         if (bWakeupThread)
@@ -433,8 +489,7 @@ void CCmdFunctions::OnTimer(UINT id)
             std::lock_guard<std::recursive_mutex> lock(m_langDataMutex);
             for (const auto& [lang, words] : m_langData)
             {
-                auto langData = CLexStyles::Instance().GetLanguageData(lang);
-                if (langData)
+                if (auto langData = CLexStyles::Instance().GetLanguageData(lang); langData)
                 {
                     auto size1 = langData->userKeyWords.size();
                     langData->userKeyWords.insert(words.begin(), words.end());
@@ -514,9 +569,17 @@ void CCmdFunctions::OnClose()
         m_fileData.push_back(WorkItem());
         m_fileDataCv.notify_one();
     }
-    int count = 200;
-    while (InterlockedExchange(&m_bThreadRunning, m_bThreadRunning) && --count)
-        Sleep(10);
+    // Wait for function processing to finish as exiting while a thread
+    // is running can (and has been observed to) cause a crash that can leave
+    // modified files half saved.
+    // Function processing can take a long time (though usually only in debug mode)
+    // in some situations.
+    // e.g. when loading a large number of files from a saved session and exiting or
+    // due to opening several tabs fairly quickly, such as when cursoring through files
+    // in the find/replace dialog's list view (using the find files button).
+    constexpr std::chrono::microseconds sleepPeriod(100);
+    while (InterlockedExchange(&m_bThreadRunning, m_bThreadRunning))
+        std::this_thread::sleep_for(sleepPeriod);
 }
 
 void CCmdFunctions::OnDocumentSave(DocID id, bool bSaveAs)
@@ -544,6 +607,8 @@ void CCmdFunctions::SetWorkTimer(int ms) const
 
 void CCmdFunctions::ThreadFunc()
 {
+    bool bAutoComplete = CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) != 0;
+
     InterlockedExchange(&m_bThreadRunning, TRUE);
     do
     {
@@ -572,37 +637,34 @@ void CCmdFunctions::ThreadFunc()
             {
                 std::wregex                       regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
                 const std::wsregex_token_iterator end;
+// Profile
+//#if defined(_DEBUG) || defined(PROFILING)
                 ProfileTimer                      timer(L"parsing functions");
+//#endif
                 for (std::wsregex_token_iterator match(sData.cbegin(), sData.cend(), regex, 0); match != end; ++match)
                 {
                     if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
                         break;
                     if (!match->matched)
                         continue;
+                    auto sig = CUnicodeUtils::StdGetUTF8(match->str());
+                    Normalize(sig, work.m_trimTokens);
+                    if (std::string name; ParseName(sig, name))
+                    {
+                        acMap[name] = AutoCompleteType::Code;
+                        std::lock_guard<std::recursive_mutex> lock(m_langDataMutex);
+                        m_langData[work.m_lang].insert(std::move(name));
+                    }
                     if (work.m_currentPos >= 0)
                     {
                         auto startPos = std::distance(sData.cbegin(), match->first);
-                        auto endPos   = std::distance(sData.cbegin(), match->second);
+                        auto endPos = std::distance(sData.cbegin(), match->second);
                         if ((std::abs(startPos - work.m_currentPos) < 10) ||
                             (std::abs(endPos - work.m_currentPos) < 10) ||
                             (startPos < work.m_currentPos && endPos > work.m_currentPos))
                         {
                             continue;
                         }
-                    }
-                    auto sig = CUnicodeUtils::StdGetUTF8(match->str());
-
-                    StripComments(sig);
-                    Normalize(sig);
-                    for (const auto& token : work.m_trimTokens)
-                        SearchRemoveAll(sig, token);
-                    CStringUtils::trim(sig);
-                    std::string name;
-                    if (ParseName(sig, name))
-                    {
-                        std::lock_guard<std::recursive_mutex> lock(m_langDataMutex);
-                        acMap[name] = AutoCompleteType::Code;
-                        m_langData[work.m_lang].insert(std::move(name));
                     }
                 }
                 if (!acMap.empty())
@@ -612,14 +674,17 @@ void CCmdFunctions::ThreadFunc()
             {
             }
         }
-        if (!work.m_autoCRegex.empty() && CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) != 0)
+        if (!work.m_autoCRegex.empty() && bAutoComplete)
         {
             try
             {
                 auto                                    sRegex = CUnicodeUtils::StdGetUnicode(work.m_autoCRegex);
                 std::wregex                             regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
                 const std::wsregex_iterator             end;
+// Profile
+//#if defined(_DEBUG) || defined(PROFILING)
                 ProfileTimer                            timer(L"parsing words");
+//#endif
                 std::map<std::string, AutoCompleteType> acMap;
                 for (std::wsregex_iterator match(sData.begin(), sData.end(), regex); match != end; ++match)
                 {
@@ -641,7 +706,7 @@ void CCmdFunctions::ThreadFunc()
                         }
                         auto word = CUnicodeUtils::StdGetUTF8(match->str(i));
                         if (word.size() > 1)
-                            acMap[word] = AutoCompleteType::Code;
+                            acMap[std::move(word)] = AutoCompleteType::Code;
                     }
                 }
                 if (!acMap.empty())
@@ -656,81 +721,6 @@ void CCmdFunctions::ThreadFunc()
 
     } while (InterlockedExchange(&m_bRunThread, m_bRunThread));
     InterlockedExchange(&m_bThreadRunning, FALSE);
-}
-
-std::vector<FunctionInfo> CCmdFunctions::FindFunctionsNow() const
-{
-    std::vector<FunctionInfo> functions;
-    if (!HasActiveDocument())
-        return functions;
-
-    std::function<bool(const std::string&, sptr_t)> f = [&functions](const std::string& sig, sptr_t lineNum) -> bool {
-        std::string name;
-        std::string nameAndArgs;
-        bool        parsed = ParseSignature(sig, name, nameAndArgs);
-        if (parsed)
-            functions.emplace_back(lineNum, std::move(name), std::move(nameAndArgs));
-        return true;
-    };
-    const auto& doc = GetActiveDocument();
-    FindFunctions(doc, f);
-    // Sort by name then line number.
-    std::sort(functions.begin(), functions.end(),
-              [](const FunctionInfo& lhs, const FunctionInfo& rhs) {
-                  auto result = _stricmp(lhs.sortName.c_str(), rhs.sortName.c_str());
-                  if (result != 0)
-                      return result < 0;
-                  return lhs.lineNum < rhs.lineNum;
-              });
-
-    return functions;
-}
-
-void CCmdFunctions::FindFunctions(const CDocument& doc, std::function<bool(const std::string&, sptr_t lineNum)>& callback) const
-{
-    const auto& docLang = doc.GetLanguage();
-    if (docLang.empty())
-        return;
-    auto* langData = CLexStyles::Instance().GetLanguageData(docLang);
-    if (!langData)
-        return;
-
-    if (langData->functionRegex.empty())
-        return;
-
-    CScintillaWnd edit(g_hRes);
-    edit.InitScratch(g_hRes);
-
-    edit.Call(SCI_SETDOCPOINTER, 0, 0);
-    edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
-    edit.Call(SCI_CLEARALL);
-    edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-    OnOutOfScope(
-        edit.Call(SCI_SETDOCPOINTER, 0, 0););
-
-    sptr_t      lineNum = 0;
-    std::string sig;
-
-    Sci_TextToFind ttf{};
-    Sci_PositionCR length = static_cast<Sci_PositionCR>(edit.Call(SCI_GETLENGTH));
-    ttf.chrg.cpMax        = length;
-    ttf.lpstrText         = const_cast<char*>(langData->functionRegex.c_str());
-
-    for (;;)
-    {
-        if (!FindNext(edit, ttf, sig, &lineNum))
-            break;
-        ttf.chrg.cpMin = ttf.chrgText.cpMax + 1;
-
-        StripComments(sig);
-        Normalize(sig);
-        if (langData->functionRegexTrim.empty())
-            for (const auto& token : langData->functionRegexTrim)
-                SearchRemoveAll(sig, token);
-        CStringUtils::trim(sig);
-        if (!callback(sig, lineNum))
-            break;
-    }
 }
 
 void CCmdFunctions::InvalidateFunctionsSource()

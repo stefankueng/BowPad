@@ -30,19 +30,6 @@
 #include <thread>
 #include <mutex>
 
-struct FunctionInfo
-{
-    FunctionInfo(sptr_t lineNum, std::string&& sortName, std::string&& displayName)
-        : lineNum(lineNum)
-        , sortName(std::move(sortName))
-        , displayName(std::move(displayName))
-    {
-    }
-    sptr_t      lineNum;
-    std::string sortName;
-    std::string displayName;
-};
-
 enum class DocEventType
 {
     None,
@@ -99,11 +86,9 @@ private:
     void OnDocumentClose(DocID id) override;
     void OnClose() override;
 
-    std::vector<FunctionInfo> FindFunctionsNow() const;
     void                      InvalidateFunctionsEnabled();
     void                      InvalidateFunctionsSource();
-    HRESULT                   PopulateFunctions(IUICollectionPtr& collection);
-    void                      FindFunctions(const CDocument& doc, std::function<bool(const std::string&, sptr_t lineNum)>& callback) const;
+    void                      PopulateFunctions(IUICollectionPtr& collection);
     void                      SetWorkTimer(int ms) const;
     void                      ThreadFunc();
 
