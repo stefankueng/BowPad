@@ -17,6 +17,7 @@
 
 #include "stdafx.h"
 #include "CmdRegexCapture.h"
+
 #include "BowPad.h"
 #include "ScintillaWnd.h"
 #include "UnicodeUtils.h"
@@ -26,6 +27,9 @@
 
 #include <regex>
 #include <memory>
+
+#include <dwmapi.h>
+#pragma comment(lib, "dwmapi.lib")
 
 constexpr auto DEFAULT_MAX_SEARCH_STRINGS = 20;
 constexpr auto TIMER_INFOSTRING           = 100;
@@ -94,6 +98,10 @@ LRESULT CRegexCaptureDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM
             {
                 KillTimer(*this, TIMER_INFOSTRING);
                 SetDlgItemText(*this, IDC_INFOLABEL, L"");
+#ifdef NTDDI_WIN10_CO
+                COLORREF brdClr = DWMWA_COLOR_DEFAULT;
+                DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
+#endif
             }
             break;
         default:
@@ -197,6 +205,10 @@ void CRegexCaptureDlg::SetTheme(bool bDark)
 void CRegexCaptureDlg::DoCapture()
 {
     SetDlgItemText(*this, IDC_INFOLABEL, L"");
+#ifdef NTDDI_WIN10_CO
+    COLORREF brdClr = DWMWA_COLOR_DEFAULT;
+    DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
+#endif
 
     std::wstring sRegexW = GetDlgItemText(IDC_REGEXCOMBO).get();
     UpdateCombo(IDC_REGEXCOMBO, sRegexW, m_maxRegexStrings);
@@ -319,7 +331,20 @@ void CRegexCaptureDlg::SetInfoText(UINT resid, AlertMode alertMode)
     ResString str(g_hRes, resid);
     SetDlgItemText(*this, IDC_INFOLABEL, str);
     if (alertMode == AlertMode::Flash)
+    {
         FlashWindow(*this);
+#ifdef NTDDI_WIN10_CO
+        COLORREF brdClr = RGB(255, 0, 0);
+        DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
+#endif
+    }
+    else
+    {
+#ifdef NTDDI_WIN10_CO
+        COLORREF brdClr = DWMWA_COLOR_DEFAULT;
+        DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
+#endif
+    }
     SetTimer(*this, TIMER_INFOSTRING, 5000, nullptr);
 }
 

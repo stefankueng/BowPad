@@ -38,6 +38,9 @@
 #include <strsafe.h>
 #include <vssym32.h>
 
+#include <dwmapi.h>
+#pragma comment(lib, "dwmapi.lib")
+
 static std::string g_findString;
 std::string        g_sHighlightString;
 static int         g_searchFlags       = 0;
@@ -610,6 +613,10 @@ void CFindReplaceDlg::RestorePreviousDefaultButton()
 void CFindReplaceDlg::Clear(int id)
 {
     SetDlgItemText(*this, id, L"");
+#ifdef NTDDI_WIN10_CO
+    COLORREF brdClr = DWMWA_COLOR_DEFAULT;
+    DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
+#endif
 }
 
 int CFindReplaceDlg::GetDefaultButton() const
@@ -1414,7 +1421,20 @@ void CFindReplaceDlg::SetInfoText(UINT resid, AlertMode alertMode)
     ResString str(g_hRes, resid);
     SetDlgItemText(*this, IDC_SEARCHINFO, str);
     if (alertMode == AlertMode::Flash)
+    {
         FlashWindow(*this);
+#ifdef NTDDI_WIN10_CO
+        COLORREF brdClr = RGB(255, 0, 0);
+        DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
+#endif
+    }
+    else
+    {
+#ifdef NTDDI_WIN10_CO
+        COLORREF brdClr = DWMWA_COLOR_DEFAULT;
+        DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
+#endif
+    }
     SetTimer(*this, TIMER_INFOSTRING, 5000, nullptr);
 }
 
