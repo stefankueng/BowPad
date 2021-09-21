@@ -514,7 +514,7 @@ int bpMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
         {
             if (minor > 0)
                 g_useItemIcons = false;
-            else if (micro >= 19041)
+            else if (micro >= 19041 && micro < 22000)
                 g_useItemIcons = false;
         }
         if (g_useItemIcons)
