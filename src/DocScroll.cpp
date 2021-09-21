@@ -163,7 +163,9 @@ LRESULT CALLBACK CDocScroll::HandleCustomDraw(WPARAM /*wParam*/, NMCSBCUSTOMDRAW
     if (pCustDraw->nBar == SB_BOTH)
     {
         // the sizing gripper in the bottom-right corner
-        GDIHelpers::FillSolidRect(pCustDraw->hdc, pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_SCROLLBAR)));
+        GDIHelpers::FillSolidRect(pCustDraw->hdc,
+                                  pCustDraw->rect.left, pCustDraw->rect.top, pCustDraw->rect.right, pCustDraw->rect.bottom,
+                                  CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
     }
     else if (pCustDraw->dwDrawStage == CDDS_ITEMPREPAINT)
     {
