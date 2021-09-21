@@ -29,13 +29,7 @@ void CPropertySet::InitializeCommandProperties(int categoryId, int commandId, UI
 
 void CPropertySet::InitializeItemProperties(IUIImagePtr image, PCWSTR label, int categoryId)
 {
-    if (m_pImgItem)
-        m_pImgItem->Release();
     m_pImgItem = image;
-    if (m_pImgItem)
-    {
-        m_pImgItem->AddRef();
-    }
     StringCchCopyW(m_wszLabel, MAX_RESOURCE_LENGTH, label);
     m_categoryId = categoryId;
 }

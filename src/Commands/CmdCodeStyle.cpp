@@ -85,7 +85,6 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
             }
         }
 
-        // Not a concern if it fails, just show the list without images.
         CAppUtils::FailedShowMessage(hr);
         // populate the dropdown with the code pages
         for (const auto& lang : langs)
