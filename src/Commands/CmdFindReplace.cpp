@@ -613,9 +613,11 @@ void CFindReplaceDlg::RestorePreviousDefaultButton()
 void CFindReplaceDlg::Clear(int id)
 {
     SetDlgItemText(*this, id, L"");
-#if NTDDI_VERSION >= 0x0A00000B
+#ifdef DWMWA_COLOR_DEFAULT
+#    if NTDDI_VERSION >= 0x0A00000B
     COLORREF brdClr = DWMWA_COLOR_DEFAULT;
     DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
+#    endif
 #endif
 }
 
@@ -1423,16 +1425,20 @@ void CFindReplaceDlg::SetInfoText(UINT resid, AlertMode alertMode)
     if (alertMode == AlertMode::Flash)
     {
         FlashWindow(*this);
-#if NTDDI_VERSION >= 0x0A00000B
+#ifdef DWMWA_COLOR_DEFAULT
+#    if NTDDI_VERSION >= 0x0A00000B
         COLORREF brdClr = RGB(255, 0, 0);
         DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
+#    endif
 #endif
     }
     else
     {
-#if NTDDI_VERSION >= 0x0A00000B
+#ifdef DWMWA_COLOR_DEFAULT
+#    if NTDDI_VERSION >= 0x0A00000B
         COLORREF brdClr = DWMWA_COLOR_DEFAULT;
         DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
+#    endif
 #endif
     }
     SetTimer(*this, TIMER_INFOSTRING, 5000, nullptr);
