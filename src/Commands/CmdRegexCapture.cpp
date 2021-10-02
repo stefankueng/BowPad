@@ -98,7 +98,7 @@ LRESULT CRegexCaptureDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM
             {
                 KillTimer(*this, TIMER_INFOSTRING);
                 SetDlgItemText(*this, IDC_INFOLABEL, L"");
-#ifdef NTDDI_WIN10_CO
+#if NTDDI_VERSION >= 0x0A00000B
                 COLORREF brdClr = DWMWA_COLOR_DEFAULT;
                 DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
 #endif
@@ -205,7 +205,7 @@ void CRegexCaptureDlg::SetTheme(bool bDark)
 void CRegexCaptureDlg::DoCapture()
 {
     SetDlgItemText(*this, IDC_INFOLABEL, L"");
-#ifdef NTDDI_WIN10_CO
+#if NTDDI_VERSION >= 0x0A00000B
     COLORREF brdClr = DWMWA_COLOR_DEFAULT;
     DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
 #endif
@@ -333,14 +333,14 @@ void CRegexCaptureDlg::SetInfoText(UINT resid, AlertMode alertMode)
     if (alertMode == AlertMode::Flash)
     {
         FlashWindow(*this);
-#ifdef NTDDI_WIN10_CO
+#if NTDDI_VERSION >= 0x0A00000B
         COLORREF brdClr = RGB(255, 0, 0);
         DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
 #endif
     }
     else
     {
-#ifdef NTDDI_WIN10_CO
+#if NTDDI_VERSION >= 0x0A00000B
         COLORREF brdClr = DWMWA_COLOR_DEFAULT;
         DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &brdClr, sizeof(brdClr));
 #endif
