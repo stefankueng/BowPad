@@ -1447,14 +1447,14 @@ void CMainWindow::HandleStatusBarZoom()
     {
         OnOutOfScope(
             DestroyMenu(hPopup););
-        AppendMenu(hPopup, MF_STRING, 25, L"25%");
-        AppendMenu(hPopup, MF_STRING, 50, L"50%");
-        AppendMenu(hPopup, MF_STRING, 75, L"75%");
-        AppendMenu(hPopup, MF_STRING, 100, L"100%");
-        AppendMenu(hPopup, MF_STRING, 125, L"125%");
-        AppendMenu(hPopup, MF_STRING, 150, L"150%");
-        AppendMenu(hPopup, MF_STRING, 175, L"175%");
-        AppendMenu(hPopup, MF_STRING, 200, L"200%");
+        AppendMenu(hPopup, MF_STRING, 25, GetZoomPC(25).c_str());
+        AppendMenu(hPopup, MF_STRING, 50, GetZoomPC(50).c_str());
+        AppendMenu(hPopup, MF_STRING, 75, GetZoomPC(75).c_str());
+        AppendMenu(hPopup, MF_STRING, 100, GetZoomPC(100).c_str());
+        AppendMenu(hPopup, MF_STRING, 125, GetZoomPC(125).c_str());
+        AppendMenu(hPopup, MF_STRING, 150, GetZoomPC(150).c_str());
+        AppendMenu(hPopup, MF_STRING, 175, GetZoomPC(175).c_str());
+        AppendMenu(hPopup, MF_STRING, 200, GetZoomPC(200).c_str());
 
         // Note the font point size is a factor in what determines the zoom percentage the user actually gets.
         // So the values above are estimates. However, the status bar shows the true/exact setting that resulted.
@@ -2048,8 +2048,18 @@ int CMainWindow::GetZoomPC() const
     int zoom       = static_cast<int>(m_editor.ConstCall(SCI_GETZOOM));
     int zoomFactor = (fontSize + zoom) * 100 / fontSize;
     if (zoomFactor == 0)
-        zoomFactor = 1;
+        zoomFactor = 100;
     return zoomFactor;
+}
+
+std::wstring CMainWindow::GetZoomPC(int zoom) const
+{
+    int fontSize = static_cast<int>(m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT));
+    auto zoomPt     = (fontSize * zoom / 100) - fontSize;
+    auto realZoom = (fontSize + zoomPt) * 100 / fontSize;
+    if (realZoom == 0)
+        realZoom = 100;
+    return CStringUtils::Format(L"%d%%", realZoom);
 }
 
 void CMainWindow::SetZoomPC(int zoomPC) const
