@@ -1355,6 +1355,9 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
         {
             switch (lParam)
             {
+                case STATUSBAR_CUR_POS:
+                    DoCommand(cmdGotoLine, 0);
+                    break;
                 case STATUSBAR_TABSPACE:
                     DoCommand(cmdUseTabs, 0);
                     break;
