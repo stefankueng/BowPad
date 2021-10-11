@@ -1288,6 +1288,7 @@ LRESULT CFindReplaceDlg::DoCommand(int id, int msg)
                 AddToolTip(IDC_REPLACEWITHLABEL, tipText);
                 if (IsDlgButtonChecked(*this, IDC_MATCHREGEX) == BST_CHECKED)
                     CheckRegex(true);
+                DialogEnableWindow(IDC_FINDPREVIOUS, IsDlgButtonChecked(*this, IDC_MATCHREGEX) != BST_CHECKED);
             }
             break;
         case IDC_SEARCHCOMBO:
