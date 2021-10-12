@@ -260,7 +260,7 @@ void CCmdSpellCheck::Check()
                 textRange.chrg.cpMax++;
                 len++;
             }
-            if (len)
+            if (len && textRange.lpstrText[len])
                 textRange.lpstrText[len - 1] = 0;
             textRange.chrg.cpMax--;
             if (textRange.lpstrText[0])
