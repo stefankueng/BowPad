@@ -30,12 +30,47 @@
     <ResourceCompile Include="BowPad.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\AutoComplete.ini" />
     <None Include="res\BowPad.rc2" />
+    <None Include="res\darktheme.ini" />
+    <None Include="res\drag.cur" />
+    <None Include="res\drag_interdit.cur" />
+    <None Include="res\drag_out.cur" />
+    <None Include="res\drag_plus.cur" />
+    <None Include="res\dropcopy.cur" />
+    <None Include="res\dropmove.cur" />
+    <None Include="res\Properties.ini" />
+    <None Include="res\Shortcuts-internal.ini" />
+    <None Include="res\Shortcuts.ini" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="BowPad.vcxproj">
       <Project>{f767677d-b0fe-4c4f-b886-09e501c543b2}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\BowPad.ico" />
+    <Image Include="res\BowPadDoc.ico" />
+    <Image Include="res\BowPad_elevated.ico" />
+    <Image Include="res\capslock.ico" />
+    <Image Include="res\code.ico" />
+    <Image Include="res\EditorConfigActive.ico" />
+    <Image Include="res\EditorConfigInactive.ico" />
+    <Image Include="res\empty.bmp" />
+    <Image Include="res\empty.ico" />
+    <Image Include="res\file.ico" />
+    <Image Include="res\lexer.ico" />
+    <Image Include="res\readonly.ico" />
+    <Image Include="res\saved.ico" />
+    <Image Include="res\Shield.ico" />
+    <Image Include="res\snippet.ico" />
+    <Image Include="res\unsaved.ico" />
+    <Image Include="res\zoom.ico" />
+    <Image Include="res\zoomdark.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ext\scintilla\include\Scintilla.h" />
+    <ClInclude Include="BowPadUI.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{26DD7834-6269-413C-960A-AA7CCB72243C}</ProjectGuid>

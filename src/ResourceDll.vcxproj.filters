@@ -15,5 +15,88 @@
     <None Include="res\BowPad.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\drag.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\drag_interdit.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\drag_out.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\drag_plus.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\dropcopy.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\dropmove.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\AutoComplete.ini" />
+    <None Include="res\Properties.ini" />
+    <None Include="res\Shortcuts.ini" />
+    <None Include="res\darktheme.ini" />
+    <None Include="res\Shortcuts-internal.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\BowPad.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\readonly.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\saved.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\unsaved.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\BowPad_elevated.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Shield.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\BowPadDoc.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\capslock.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\lexer.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\zoom.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\zoomdark.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\empty.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\EditorConfigActive.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\EditorConfigInactive.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\code.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\file.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\snippet.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\empty.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BowPadUI.h" />
+    <ClInclude Include="..\ext\scintilla\include\Scintilla.h" />
   </ItemGroup>
 </Project>
