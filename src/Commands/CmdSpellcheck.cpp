@@ -233,7 +233,23 @@ void CCmdSpellCheck::Check()
                 {
                     case SCLEX_NULL:   // text
                     case SCLEX_INDENT: // text
+                        break;
                     case SCLEX_MARKDOWN:
+                        switch (style)
+                        {
+                            case SCE_MARKDOWN_LINK:
+                            case SCE_MARKDOWN_CODE:
+                            case SCE_MARKDOWN_CODE2:
+                            case SCE_MARKDOWN_CODEBK:
+                                // mark word as correct (remove the squiggle line)
+                                ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
+                                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                                ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED_DEL);
+                                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                                continue;
+                        }
                         break;
                     default:
                         if (style < static_cast<int>(m_lexerData.styles.size()))
