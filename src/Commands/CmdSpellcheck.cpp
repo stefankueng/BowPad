@@ -41,12 +41,14 @@ ISpellCheckerPtr          g_spellChecker        = nullptr;
 std::vector<std::wstring> g_languages;
 UINT                      g_checkTimer = 0;
 std::string               g_wordChars;
+std::string               g_sentenceChars;
 } // namespace
 
 CCmdSpellCheck::CCmdSpellCheck(void* obj)
     : ICommand(obj)
     , m_enabled(true)
     , m_activeLexer(-1)
+    , m_useComprehensiveCheck(false)
     , m_textBufLen(0)
     , m_lastCheckedPos(0)
 {
@@ -98,11 +100,25 @@ CCmdSpellCheck::CCmdSpellCheck(void* obj)
 
     // create a string with all the word chars
     g_wordChars.clear();
+    g_sentenceChars.clear();
     for (int ch = 0; ch < 256; ++ch)
     {
         if (ch >= 0x80 || isalnum(ch) || ch == '_' || ch == '\'')
             g_wordChars += static_cast<char>(ch);
     }
+    g_sentenceChars = g_wordChars;
+    g_sentenceChars += ' ';
+    g_sentenceChars += ',';
+    g_sentenceChars += ';';
+    g_sentenceChars += '"';
+    g_sentenceChars += '\'';
+    g_sentenceChars += '%';
+    g_sentenceChars += '&';
+    g_sentenceChars += '/';
+    g_sentenceChars += '(';
+    g_sentenceChars += ')';
+    g_sentenceChars += '\r';
+    g_sentenceChars += '\n';
 
     g_contextID = m_enabled && g_spellChecker ? cmdContextSpellMap : cmdContextMap;
 
@@ -155,13 +171,17 @@ void CCmdSpellCheck::Check()
             {
                 stringtokset(m_keywords, words, true, " ", true);
             }
-            m_lastCheckedPos = 0;
+            m_lastCheckedPos        = 0;
+            m_useComprehensiveCheck = (m_activeLexer == SCLEX_NULL || m_activeLexer == SCLEX_INDENT);
         }
 
         auto wordCharsBuffer = GetWordChars();
         OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(wordCharsBuffer.c_str())));
 
-        ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(g_wordChars.c_str()));
+        if (m_useComprehensiveCheck)
+            ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(g_sentenceChars.c_str()));
+        else
+            ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(g_wordChars.c_str()));
         Sci_TextRange textRange{};
         auto          firstLine = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
         auto          lastLine  = firstLine + ScintillaCall(SCI_LINESONSCREEN);
@@ -211,7 +231,8 @@ void CCmdSpellCheck::Check()
                 bool isText = true;
                 switch (m_activeLexer)
                 {
-                    case SCLEX_NULL: // text
+                    case SCLEX_NULL:   // text
+                    case SCLEX_INDENT: // text
                     case SCLEX_MARKDOWN:
                         break;
                     default:
@@ -228,6 +249,9 @@ void CCmdSpellCheck::Check()
                         {
                             // mark word as correct (remove the squiggle line)
                             ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
+                            ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                            ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                            ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED_DEL);
                             ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
                             ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
                             continue;
@@ -276,6 +300,9 @@ void CCmdSpellCheck::Check()
                     ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
                     ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
                     ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                    ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED_DEL);
+                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
                     continue;
                 }
                 // ignore keywords of the currently selected lexer
@@ -283,32 +310,40 @@ void CCmdSpellCheck::Check()
                     continue;
 
                 IEnumSpellingErrorPtr enumSpellingError = nullptr;
-                HRESULT               hr                = g_spellChecker->Check(sWord.c_str(), &enumSpellingError);
-                bool                  misspelled        = false;
+                HRESULT               hr                = S_FALSE;
+                if (m_useComprehensiveCheck)
+                    hr = g_spellChecker->ComprehensiveCheck(sWord.c_str(), &enumSpellingError);
+                else
+                    hr = g_spellChecker->Check(sWord.c_str(), &enumSpellingError);
+
+                // first mark all text as correct (remove the squiggle lines)
+                ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
+                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED_DEL);
+                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+
                 if (SUCCEEDED(hr))
                 {
                     ISpellingErrorPtr spellingError = nullptr;
                     hr                              = enumSpellingError->Next(&spellingError);
-                    if (hr == S_OK)
+                    while (hr == S_OK)
                     {
                         CORRECTIVE_ACTION action = CORRECTIVE_ACTION_NONE;
                         spellingError->get_CorrectiveAction(&action);
                         if (action != CORRECTIVE_ACTION_NONE)
                         {
-                            // mark word as misspelled
-                            misspelled = true;
-                            ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                            ScintillaCall(SCI_INDICATORFILLRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                            // mark text as misspelled
+                            ScintillaCall(SCI_SETINDICATORCURRENT, action == CORRECTIVE_ACTION_DELETE ? INDIC_MISSPELLED_DEL : INDIC_MISSPELLED);
+                            ULONG errLen = 0;
+                            spellingError->get_Length(&errLen);
+                            ULONG errStart = 0;
+                            spellingError->get_StartIndex(&errStart);
+                            ScintillaCall(SCI_INDICATORFILLRANGE, textRange.chrg.cpMin + errStart, errLen);
                         }
+                        hr = enumSpellingError->Next(&spellingError);
                     }
-                }
-
-                if (!misspelled)
-                {
-                    // mark word as correct (remove the squiggle line)
-                    ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
                 }
             }
         }
@@ -352,6 +387,8 @@ bool CCmdSpellCheck::Execute()
     else
     {
         ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
+        ScintillaCall(SCI_INDICATORCLEARRANGE, 0, ScintillaCall(SCI_GETLENGTH));
+        ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED_DEL);
         ScintillaCall(SCI_INDICATORCLEARRANGE, 0, ScintillaCall(SCI_GETLENGTH));
     }
     g_contextID = m_enabled && g_spellChecker ? cmdContextSpellMap : cmdContextMap;

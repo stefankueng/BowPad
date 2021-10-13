@@ -47,6 +47,7 @@ private:
     std::wstring            m_lang;
     std::set<std::string>   m_keywords;
     int                     m_activeLexer;
+    bool                    m_useComprehensiveCheck;
     LexerData               m_lexerData;
     std::unique_ptr<char[]> m_textBuffer;
     int                     m_textBufLen;
