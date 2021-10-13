@@ -396,10 +396,11 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
                 if (!IsAlphaNumeric(sc.ch))
                 {
                     sc.SetState(GetLogStyle(LogStyles::Default, logState));
+                    numberIsHex = false;
                 }
                 else if ((numberIsHex && !(MakeLowerCase(sc.ch) == 'x' || MakeLowerCase(sc.ch) == 'e' ||
                                            IsADigit(sc.ch, 16) || sc.ch == '.' || sc.ch == '-' || sc.ch == '+')) ||
-                         (!numberIsHex && !(MakeLowerCase(sc.ch) == 'e' || IsADigit(sc.ch) || sc.ch == '.' || sc.ch == '-' || sc.ch == '+')))
+                         (!numberIsHex && !((MakeLowerCase(sc.ch) == 'e' && (sc.chNext == '-' || IsADigit(sc.ch))) || IsADigit(sc.ch) || sc.ch == '.' || sc.ch == '-' || sc.ch == '+')))
                 {
                     // check '-' for possible -10e-5. Add '+' as well.
                     numberIsHex    = false;
