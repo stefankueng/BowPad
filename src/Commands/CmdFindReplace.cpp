@@ -2839,7 +2839,7 @@ void CCmdFindReplace::ScintillaNotify(SCNotification* pScn)
         auto    startStylePos = ScintillaCall(SCI_POSITIONFROMLINE, firstLine);
         auto    endStylePos   = ScintillaCall(SCI_POSITIONFROMLINE, lastLine) + ScintillaCall(SCI_LINELENGTH, lastLine);
         if (endStylePos < 0)
-            endStylePos = ScintillaCall(SCI_GETLENGTH) - startStylePos;
+            endStylePos = ScintillaCall(SCI_GETLENGTH);
 
         auto len = endStylePos - startStylePos + 1;
         // Reset indicators.
