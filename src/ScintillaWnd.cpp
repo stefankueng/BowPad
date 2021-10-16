@@ -188,6 +188,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     Call(SCI_SETCARETWIDTH, CDPIAware::Instance().Scale(*this, bUseD2D ? 2 : 1));
     if (CIniSettings::Instance().GetInt64(L"View", L"caretlineframe", 1) != 0)
         Call(SCI_SETCARETLINEFRAME, CDPIAware::Instance().Scale(*this, 1));
+    Call(SCI_SETCARETLINEHIGHLIGHTSUBLINE, false);
     Call(SCI_SETWHITESPACESIZE, CDPIAware::Instance().Scale(*this, 1));
     Call(SCI_SETMULTIPLESELECTION, 1);
     Call(SCI_SETMOUSESELECTIONRECTANGULARSWITCH, true);
@@ -1174,6 +1175,7 @@ void CScintillaWnd::SetupDefaultStyles() const
         }
     }
     Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_WHITE_SPACE, toRgba(theme.GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)), 80));
+    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_FOLD_LINE, toRgba(theme.GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)), 140));
 
     auto modEventMask = Call(SCI_GETMODEVENTMASK);
     Call(SCI_SETMODEVENTMASK, 0);
