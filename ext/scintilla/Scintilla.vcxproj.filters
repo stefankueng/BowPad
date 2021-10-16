@@ -28,6 +28,9 @@
     <Filter Include="Scintilla\win32">
       <UniqueIdentifier>{9b3cbc39-882b-4747-b6a0-c256fbfc894d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scintilla\call">
+      <UniqueIdentifier>{a96c490f-3132-44c0-97b8-504fb2c648ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\lexilla\include\Lexilla.h">
@@ -233,6 +236,9 @@
     </ClInclude>
     <ClInclude Include="src\CharacterType.h">
       <Filter>Scintilla\src</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ScintillaCall.h">
+      <Filter>Scintilla\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -727,6 +733,9 @@
     </ClCompile>
     <ClCompile Include="..\lexilla\lexlib\LexAccessor.cxx">
       <Filter>Lexilla\lexlib</Filter>
+    </ClCompile>
+    <ClCompile Include="call\ScintillaCall.cxx">
+      <Filter>Scintilla\call</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

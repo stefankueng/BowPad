@@ -351,6 +351,7 @@
     <ClCompile Include="..\lexilla\lexlib\StyleContext.cxx" />
     <ClCompile Include="..\lexilla\lexlib\WordList.cxx" />
     <ClCompile Include="..\lexilla\src\Lexilla.cxx" />
+    <ClCompile Include="call\ScintillaCall.cxx" />
     <ClCompile Include="src\AutoComplete.cxx" />
     <ClCompile Include="src\CallTip.cxx" />
     <ClCompile Include="src\CaseConvert.cxx" />
@@ -410,6 +411,7 @@
     <ClInclude Include="include\ILexer.h" />
     <ClInclude Include="include\ILoader.h" />
     <ClInclude Include="include\Scintilla.h" />
+    <ClInclude Include="include\ScintillaCall.h" />
     <ClInclude Include="include\ScintillaMessages.h" />
     <ClInclude Include="include\ScintillaStructures.h" />
     <ClInclude Include="include\ScintillaTypes.h" />
