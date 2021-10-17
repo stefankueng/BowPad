@@ -327,8 +327,8 @@ HRESULT CCmdConvertEncoding::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, con
                 doc.m_bIsDirty       = true;
                 doc.m_bNeedsSaving   = true;
                 // the next two calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
-                ScintillaCall(SCI_ADDUNDOACTION, 0, 0);
-                ScintillaCall(SCI_UNDO);
+                Scintilla().AddUndoAction(0, Scintilla::UndoFlags::None);
+                Scintilla().Undo();
                 UpdateStatusBar(true);
                 AddToMRU(codepages[selected]);
             }

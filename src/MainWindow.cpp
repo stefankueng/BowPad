@@ -769,9 +769,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         case WM_SETFOCUS: // lParam HWND that is losing focus.
         {
             SetFocus(m_editor);
-            m_editor.Call(SCI_SETFOCUS, true);
+            m_editor.Scintilla().SetFocus(true);
             // the update check can show a dialog. Doing this in the
-            // WM_SETFOCUS handler causes problems due to the dialog
+            // WM_SetFocus handler causes problems due to the dialog
             // having its own message queue.
             // See issue #129 https://sourceforge.net/p/bowpad-sk/tickets/129/
             // To avoid these problems, set a timer instead. The timer
@@ -800,7 +800,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 {
                     KillTimer(*this, TIMER_CHECKLINES);
 
-                    auto activeLexer = static_cast<int>(m_editor.Call(SCI_GETLEXER));
+                    auto activeLexer = static_cast<int>(m_editor.Scintilla().Lexer());
                     auto lexerData   = CLexStyles::Instance().GetLexerDataForLexer(activeLexer);
                     if (!lexerData.annotations.empty())
                     {
@@ -808,19 +808,19 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         auto   pLine    = std::make_unique<char[]>(lineSize);
 
                         auto eolBytes = 1;
-                        switch (m_editor.ConstCall(SCI_GETEOLMODE))
+                        switch (m_editor.Scintilla().EOLMode())
                         {
-                            case SC_EOL_CRLF:
+                            case Scintilla::EndOfLine::CrLf:
                                 eolBytes = 2;
                                 break;
                             default:
                                 eolBytes = 1;
                                 break;
                         }
-                        auto endLine = m_editor.ConstCall(SCI_DOCLINEFROMVISIBLE, m_editor.ConstCall(SCI_GETFIRSTVISIBLELINE)) + m_editor.ConstCall(SCI_LINESONSCREEN);
+                        auto endLine = m_editor.Scintilla().DocLineFromVisible(m_editor.Scintilla().FirstVisibleLine()) + m_editor.Scintilla().LinesOnScreen();
                         for (sptr_t line = m_lastCheckedLine; line <= endLine; ++line)
                         {
-                            auto curLineSize = m_editor.ConstCall(SCI_GETLINE, line, 0);
+                            auto curLineSize = m_editor.Scintilla().GetLine(line, nullptr);
                             if (curLineSize <= eolBytes)
                                 continue;
                             if (curLineSize > lineSize)
@@ -828,7 +828,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                 lineSize = curLineSize + 1024;
                                 pLine    = std::make_unique<char[]>(lineSize);
                             }
-                            m_editor.ConstCall(SCI_GETLINE, line, reinterpret_cast<sptr_t>(pLine.get()));
+                            m_editor.Scintilla().GetLine(line, pLine.get());
                             pLine[curLineSize - eolBytes] = 0;
                             std::string_view sLine(pLine.get(), curLineSize - eolBytes);
                             bool             textSet = false;
@@ -837,14 +837,14 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                 std::regex rx(sRegex, std::regex_constants::icase);
                                 if (std::regex_match(sLine.begin(), sLine.end(), rx))
                                 {
-                                    m_editor.Call(SCI_EOLANNOTATIONSETTEXT, line, reinterpret_cast<sptr_t>(annotation.c_str()));
-                                    m_editor.Call(SCI_EOLANNOTATIONSETSTYLE, line, STYLE_FOLDDISPLAYTEXT);
+                                    m_editor.Scintilla().EOLAnnotationSetText(line, annotation.c_str());
+                                    m_editor.Scintilla().EOLAnnotationSetStyle(line, STYLE_FOLDDISPLAYTEXT);
                                     textSet = true;
                                     break;
                                 }
                             }
                             if (!textSet)
-                                m_editor.Call(SCI_EOLANNOTATIONSETTEXT, line, 0);
+                                m_editor.Scintilla().EOLAnnotationSetText(line, nullptr);
                         }
                         if (m_lastCheckedLine < endLine)
                             m_lastCheckedLine = endLine;
@@ -1156,11 +1156,11 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
             HandleDwellStart(scn, true);
             break;
         case SCN_DWELLEND:
-            if ((scn.position >= 0) && m_editor.Call(SCI_CALLTIPACTIVE))
+            if ((scn.position >= 0) && m_editor.Scintilla().CallTipActive())
                 HandleDwellStart(scn, false);
             else
             {
-                m_editor.Call(SCI_CALLTIPCANCEL);
+                m_editor.Scintilla().CallTipCancel();
                 m_custToolTip.HideTip();
                 m_dwellStartPos = -1;
             }
@@ -1178,7 +1178,7 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
         {
             if (pScn->modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT))
             {
-                m_lastCheckedLine = m_editor.ConstCall(SCI_LINEFROMPOSITION, pScn->position);
+                m_lastCheckedLine = m_editor.Scintilla().LineFromPosition(pScn->position);
                 SetTimer(*this, TIMER_CHECKLINES, 300, nullptr);
             }
         }
@@ -1363,17 +1363,17 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
                     break;
                 case STATUSBAR_R2L:
                 {
-                    auto biDi = m_editor.Call(SCI_GETBIDIRECTIONAL);
-                    m_editor.SetReadDirection(biDi == SC_BIDIRECTIONAL_R2L ? ReadDirection::Disabled : ReadDirection::R2L);
+                    auto biDi = m_editor.Scintilla().Bidirectional();
+                    m_editor.SetReadDirection(biDi == Scintilla::Bidirectional::R2L ? Scintilla::Bidirectional::Disabled : Scintilla::Bidirectional::R2L);
                     auto& doc     = m_docManager.GetModDocumentFromID(m_tabBar.GetCurrentTabId());
-                    doc.m_readDir = static_cast<ReadDirection>(m_editor.Call(SCI_GETBIDIRECTIONAL));
+                    doc.m_readDir = m_editor.Scintilla().Bidirectional();
                 }
                 break;
                 case STATUSBAR_TYPING_MODE:
-                    m_editor.Call(SCI_EDITTOGGLEOVERTYPE);
+                    m_editor.Scintilla().EditToggleOvertype();
                     break;
                 case STATUSBAR_ZOOM:
-                    m_editor.Call(SCI_SETZOOM, 0);
+                    m_editor.Scintilla().SetZoom(0);
                     break;
                 case STATUSBAR_EDITORCONFIG:
                 {
@@ -1406,10 +1406,10 @@ void CMainWindow::HandleStatusBarEOLFormat()
         return;
     OnOutOfScope(
         DestroyMenu(hPopup););
-    int                    currentEolMode   = static_cast<int>(m_editor.Call(SCI_GETEOLMODE));
-    EOLFormat              currentEolFormat = toEolFormat(currentEolMode);
-    static const EOLFormat options[]        = {EOLFormat::Win_Format, EOLFormat::Mac_Format, EOLFormat::Unix_Format};
-    const size_t           numOptions       = std::size(options);
+    auto                       currentEolMode   = m_editor.Scintilla().EOLMode();
+    EOLFormat                  currentEolFormat = toEolFormat(currentEolMode);
+    static constexpr EOLFormat options[]        = {EOLFormat::Win_Format, EOLFormat::Mac_Format, EOLFormat::Unix_Format};
+    constexpr size_t           numOptions       = std::size(options);
     for (size_t i = 0; i < numOptions; ++i)
     {
         std::wstring eolName       = getEolFormatDescription(options[i]);
@@ -1426,8 +1426,8 @@ void CMainWindow::HandleStatusBarEOLFormat()
         if (selectedEolFormat != currentEolFormat)
         {
             auto selectedEolMode = toEolMode(selectedEolFormat);
-            m_editor.Call(SCI_SETEOLMODE, selectedEolMode);
-            m_editor.Call(SCI_CONVERTEOLS, selectedEolMode);
+            m_editor.Scintilla().SetEOLMode(selectedEolMode);
+            m_editor.Scintilla().ConvertEOLs(selectedEolMode);
             auto id = m_tabBar.GetCurrentTabId();
             if (m_docManager.HasDocumentID(id))
             {
@@ -1797,8 +1797,8 @@ void CMainWindow::ResizeChildWindows()
 
 void CMainWindow::EnsureNewLineAtEnd(const CDocument& doc) const
 {
-    size_t endPos = m_editor.Call(SCI_GETLENGTH);
-    char   c      = static_cast<char>(m_editor.Call(SCI_GETCHARAT, endPos - 1));
+    size_t endPos = m_editor.Scintilla().Length();
+    char   c      = static_cast<char>(m_editor.Scintilla().CharAt(endPos - 1));
     if ((c != '\r') && (c != '\n'))
     {
         switch (doc.m_format)
@@ -1914,7 +1914,7 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
             m_tabBar.SetCurrentTitle(sFileName.c_str());
             UpdateCaptionBar();
             UpdateStatusBar(true);
-            m_editor.Call(SCI_SETSAVEPOINT);
+            m_editor.Scintilla().SetSavePoint();
         }
         if (updateFileTree)
         {
@@ -1966,7 +1966,7 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savePath
     doc.m_bIsDirty     = bMod;
     doc.m_bNeedsSaving = bMod;
     m_docManager.UpdateFileTime(doc, true);
-    m_editor.Call(SCI_SETREADONLY, doc.m_bIsReadonly || doc.m_bIsWriteProtected);
+    m_editor.Scintilla().SetReadOnly(doc.m_bIsReadonly || doc.m_bIsWriteProtected);
 
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
     const auto&  lang      = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
@@ -2047,8 +2047,8 @@ void CMainWindow::GoToLine(size_t line)
 
 int CMainWindow::GetZoomPC() const
 {
-    int fontSize   = static_cast<int>(m_editor.ConstCall(SCI_STYLEGETSIZE, STYLE_DEFAULT));
-    int zoom       = static_cast<int>(m_editor.ConstCall(SCI_GETZOOM));
+    int fontSize   = static_cast<int>(m_editor.Scintilla().StyleGetSize(STYLE_DEFAULT));
+    int zoom       = static_cast<int>(m_editor.Scintilla().Zoom());
     int zoomFactor = (fontSize + zoom) * 100 / fontSize;
     if (zoomFactor == 0)
         zoomFactor = 100;
@@ -2057,8 +2057,8 @@ int CMainWindow::GetZoomPC() const
 
 std::wstring CMainWindow::GetZoomPC(int zoom) const
 {
-    int fontSize = static_cast<int>(m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT));
-    auto zoomPt     = (fontSize * zoom / 100) - fontSize;
+    int  fontSize = static_cast<int>(m_editor.Scintilla().StyleGetSize(STYLE_DEFAULT));
+    auto zoomPt   = (fontSize * zoom / 100) - fontSize;
     auto realZoom = (fontSize + zoomPt) * 100 / fontSize;
     if (realZoom == 0)
         realZoom = 100;
@@ -2067,9 +2067,9 @@ std::wstring CMainWindow::GetZoomPC(int zoom) const
 
 void CMainWindow::SetZoomPC(int zoomPC) const
 {
-    int fontSize = static_cast<int>(m_editor.Call(SCI_STYLEGETSIZE, STYLE_DEFAULT));
+    int fontSize = static_cast<int>(m_editor.Scintilla().StyleGetSize(STYLE_DEFAULT));
     int zoom     = (fontSize * zoomPC / 100) - fontSize;
-    m_editor.Call(SCI_SETZOOM, zoom);
+    m_editor.Scintilla().SetZoom(zoom);
 }
 
 void CMainWindow::UpdateStatusBar(bool bEverything)
@@ -2093,17 +2093,17 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     static ResString rsStatusTabsOpenLong(g_hRes, IDS_STATUS_TABSOPENLONG);  // Ln: %ld / %ld    Col: %ld
     static ResString rsStatusTabsOpen(g_hRes, IDS_STATUS_TABSOPEN);          // Ln: %ld / %ld    Col: %ld
 
-    auto lineCount = static_cast<long>(m_editor.Call(SCI_GETLINECOUNT));
+    auto lineCount = static_cast<long>(m_editor.Scintilla().LineCount());
 
     sptr_t selByte = 0;
     sptr_t selLine = 0;
     m_editor.GetSelectedCount(selByte, selLine);
     auto selTextMarkerCount = m_editor.GetSelTextMarkerCount();
-    auto curPos             = m_editor.Call(SCI_GETCURRENTPOS);
-    long line               = static_cast<long>(m_editor.Call(SCI_LINEFROMPOSITION, curPos)) + 1;
-    long column             = static_cast<long>(m_editor.Call(SCI_GETCOLUMN, curPos)) + 1;
-    auto lengthInBytes      = m_editor.Call(SCI_GETLENGTH);
-    auto bidi               = m_editor.Call(SCI_GETBIDIRECTIONAL);
+    auto curPos             = m_editor.Scintilla().CurrentPos();
+    long line               = static_cast<long>(m_editor.Scintilla().LineFromPosition(curPos)) + 1;
+    long column             = static_cast<long>(m_editor.Scintilla().Column(curPos)) + 1;
+    auto lengthInBytes      = m_editor.Scintilla().Length();
+    auto bidi               = m_editor.Scintilla().Bidirectional();
 
     wchar_t readableLength[100] = {0};
     StrFormatByteSize(lengthInBytes, readableLength, _countof(readableLength));
@@ -2132,7 +2132,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         0,
                         true);
 
-    auto overType = m_editor.Call(SCI_GETOVERTYPE);
+    auto overType = m_editor.Scintilla().Overtype();
     m_statusBar.SetPart(STATUSBAR_TYPING_MODE,
                         overType ? L"OVR" : L"INS",
                         L"",
@@ -2155,8 +2155,8 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         nullptr,
                         bCapsLockOn ? m_hCapsLockIcon : m_hEmptyIcon);
 
-    bool usingTabs = m_editor.Call(SCI_GETUSETABS) ? true : false;
-    int  tabSize   = static_cast<int>(m_editor.Call(SCI_GETTABWIDTH));
+    bool usingTabs = m_editor.Scintilla().UseTabs() ? true : false;
+    int  tabSize   = static_cast<int>(m_editor.Scintilla().TabWidth());
     m_statusBar.SetPart(STATUSBAR_TABSPACE,
                         usingTabs ? CStringUtils::Format(L"Tabs: %%c%06X%d", numberColor, tabSize) : L"Spaces",
                         L"",
@@ -2166,7 +2166,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                         1, // center
                         true);
     m_statusBar.SetPart(STATUSBAR_R2L,
-                        bidi == SC_BIDIRECTIONAL_R2L ? L"R2L" : L"L2R",
+                        bidi == Scintilla::Bidirectional::R2L ? L"R2L" : L"L2R",
                         L"",
                         rsStatusTTR2L,
                         0,
@@ -2217,7 +2217,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
                             false,
                             editorConfigEnabled ? hEditorconfigActive : hEditorconfigInactive);
 
-        int eolMode = static_cast<int>(m_editor.Call(SCI_GETEOLMODE));
+        auto eolMode = m_editor.Scintilla().EOLMode();
         APPVERIFY(toEolMode(doc.m_format) == eolMode);
         auto eolDesc = getEolFormatDescription(doc.m_format);
         m_statusBar.SetPart(STATUSBAR_EOL_FORMAT,
@@ -2290,9 +2290,9 @@ bool CMainWindow::CloseTab(int closingTabIndex, bool force /* = false */, bool q
     // Prefer to remove the document after the tab has gone as it supports it
     // and deletion causes events that may expect it to be there.
     m_tabBar.DeleteItemAt(closingTabIndex);
-    // SCI_SETDOCPOINTER is necessary so the reference count of the document
+    // SCI_SetDocPointer is necessary so the reference count of the document
     // is decreased and the memory can be released.
-    m_editor.Call(SCI_SETDOCPOINTER, 0, 0);
+    m_editor.Scintilla().SetDocPointer(nullptr);
     m_docManager.RemoveDocument(closingTabId);
 
     int tabCount     = m_tabBar.GetItemCount();
@@ -2336,8 +2336,8 @@ bool CMainWindow::CloseAllTabs(bool quitting)
         if (!CloseTab(m_tabBar.GetCurrentTabIndex(), false, quitting))
             return false;
         if (!quitting && m_tabBar.GetItemCount() == 1 &&
-            m_editor.Call(SCI_GETTEXTLENGTH) == 0 &&
-            m_editor.Call(SCI_GETMODIFY) == 0 &&
+            m_editor.Scintilla().TextLength() == 0 &&
+            m_editor.Scintilla().Modify() == 0 &&
             m_docManager.GetDocumentFromID(m_tabBar.GetIDFromIndex(0)).m_path.empty())
             return false;
     }
@@ -2418,7 +2418,7 @@ void CMainWindow::UpdateTab(DocID docID)
     TCITEM      tie{};
     tie.lParam = -1;
     tie.mask   = TCIF_IMAGE;
-    if (doc.m_bIsReadonly || doc.m_bIsWriteProtected || (m_editor.Call(SCI_GETREADONLY) != 0))
+    if (doc.m_bIsReadonly || doc.m_bIsWriteProtected || (m_editor.Scintilla().ReadOnly() != 0))
         tie.iImage = REDONLY_IMG_INDEX;
     else
         tie.iImage = doc.m_bIsDirty || doc.m_bNeedsSaving ? UNSAVED_IMG_INDEX : SAVED_IMG_INDEX;
@@ -2796,10 +2796,10 @@ void CMainWindow::PasteHistory()
         {
             OnOutOfScope(
                 DestroyMenu(hMenu););
-            size_t pos = m_editor.Call(SCI_GETCURRENTPOS);
+            size_t pos = m_editor.Scintilla().CurrentPos();
             POINT  pt{};
-            pt.x = static_cast<LONG>(m_editor.Call(SCI_POINTXFROMPOSITION, 0, pos));
-            pt.y = static_cast<LONG>(m_editor.Call(SCI_POINTYFROMPOSITION, 0, pos));
+            pt.x = static_cast<LONG>(m_editor.Scintilla().PointXFromPosition(pos));
+            pt.y = static_cast<LONG>(m_editor.Scintilla().PointYFromPosition(pos));
             ClientToScreen(m_editor, &pt);
             int    index   = 1;
             size_t maxsize = static_cast<size_t>(CIniSettings::Instance().GetInt64(L"clipboard", L"maxuilength", 40));
@@ -2828,7 +2828,7 @@ void CMainWindow::PasteHistory()
                     if (index == selIndex)
                     {
                         WriteAsciiStringToClipboard(s.c_str(), *this);
-                        m_editor.Call(SCI_PASTE);
+                        m_editor.Scintilla().Paste();
                         break;
                     }
                     ++index;
@@ -2844,31 +2844,31 @@ void CMainWindow::PasteHistory()
 void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
 {
     // Note style will be zero if no style or past end of the document.
-    if ((scn.position >= 0) && (!start || m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position)))
+    if ((scn.position >= 0) && (!start || m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, scn.position)))
     {
-        const sptr_t pixelMargin = CDPIAware::Instance().Scale(*this, 4);
+        const int pixelMargin = CDPIAware::Instance().Scale(*this, 4);
         // an url hotspot
         // find start of url
         auto startPos     = scn.position;
         auto endPos       = scn.position;
-        auto lineStartPos = m_editor.Call(SCI_POSITIONFROMPOINT, 0, scn.y);
-        if (!start && !m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, startPos))
+        auto lineStartPos = m_editor.Scintilla().PositionFromPoint(0, scn.y);
+        if (!start && !m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, startPos))
         {
-            startPos     = m_editor.Call(SCI_POSITIONFROMPOINT, scn.x, scn.y + pixelMargin);
+            startPos     = m_editor.Scintilla().PositionFromPoint(scn.x, scn.y + pixelMargin);
             endPos       = startPos;
-            lineStartPos = m_editor.Call(SCI_POSITIONFROMPOINT, 0, scn.y + pixelMargin);
-            if (!m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, startPos))
+            lineStartPos = m_editor.Scintilla().PositionFromPoint(0, scn.y + pixelMargin);
+            if (!m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, startPos))
             {
-                m_editor.Call(SCI_CALLTIPCANCEL);
+                m_editor.Scintilla().CallTipCancel();
                 return;
             }
         }
-        while (startPos && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, startPos))
+        while (startPos && m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, startPos))
             --startPos;
         ++startPos;
         // find end of url
-        auto docEnd = m_editor.Call(SCI_GETLENGTH);
-        while (endPos < docEnd && m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, endPos))
+        auto docEnd = m_editor.Scintilla().Length();
+        while (endPos < docEnd && m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, endPos))
             ++endPos;
         --endPos;
 
@@ -2879,44 +2879,44 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
         size_t             lineLength = 0;
         while (getline(is, part, '\n'))
             lineLength = max(lineLength, part.size());
-        auto cursorPos = m_editor.Call(SCI_POSITIONFROMPOINT, scn.x, scn.y);
+        auto cursorPos = m_editor.Scintilla().PositionFromPoint(scn.x, scn.y);
         auto tipPos    = cursorPos - static_cast<sptr_t>(lineLength) / 2;
-        if (m_editor.Call(SCI_CALLTIPACTIVE))
+        if (m_editor.Scintilla().CallTipActive())
         {
-            auto linePos = m_editor.Call(SCI_LINEFROMPOSITION, scn.position);
-            auto upPos   = m_editor.Call(SCI_LINEFROMPOSITION, m_editor.Call(SCI_POSITIONFROMPOINT, 0, scn.y + pixelMargin));
+            auto linePos = m_editor.Scintilla().LineFromPosition(scn.position);
+            auto upPos   = m_editor.Scintilla().LineFromPosition(m_editor.Scintilla().PositionFromPoint(0, scn.y + pixelMargin));
             if (upPos < linePos)
             {
-                m_editor.Call(SCI_CALLTIPCANCEL);
+                m_editor.Scintilla().CallTipCancel();
                 return;
             }
             else if (upPos == linePos)
                 return;
         }
         tipPos = max(lineStartPos, tipPos);
-        if (m_editor.Call(SCI_CALLTIPACTIVE) && m_editor.Call(SCI_CALLTIPPOSSTART) == tipPos)
+        if (m_editor.Scintilla().CallTipActive() && m_editor.Scintilla().CallTipPosStart() == tipPos)
             return;
-        if (!start && !m_editor.Call(SCI_CALLTIPACTIVE))
+        if (!start && !m_editor.Scintilla().CallTipActive())
             return;
 
-        m_editor.Call(SCI_CALLTIPSHOW, tipPos, reinterpret_cast<sptr_t>(strA.c_str()));
+        m_editor.Scintilla().CallTipShow(tipPos, strA.c_str());
         return;
     }
 
     // try the users real selection first
     std::string sWord    = m_editor.GetSelectedText();
-    auto        selStart = m_editor.Call(SCI_GETSELECTIONSTART);
-    auto        selEnd   = m_editor.Call(SCI_GETSELECTIONEND);
+    auto        selStart = m_editor.Scintilla().SelectionStart();
+    auto        selEnd   = m_editor.Scintilla().SelectionEnd();
 
     if (sWord.empty() ||
         (scn.position > selEnd) || (scn.position < selStart))
     {
         auto wordCharsBuffer = m_editor.GetWordChars();
-        OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>(wordCharsBuffer.c_str())));
+        OnOutOfScope(m_editor.Scintilla().SetWordChars(wordCharsBuffer.c_str()));
 
-        m_editor.Call(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#"));
-        selStart = m_editor.Call(SCI_WORDSTARTPOSITION, scn.position, false);
-        selEnd   = m_editor.Call(SCI_WORDENDPOSITION, scn.position, false);
+        m_editor.Scintilla().SetWordChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#");
+        selStart = m_editor.Scintilla().WordStartPosition(scn.position, false);
+        selEnd   = m_editor.Scintilla().WordEndPosition(scn.position, false);
         sWord    = m_editor.GetTextRange(static_cast<long>(selStart), static_cast<long>(selEnd));
     }
     if (sWord.empty())
@@ -2970,7 +2970,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
     {
         // get the word up to the closing bracket
         int maxlength = 20;
-        while ((static_cast<char>(m_editor.Call(SCI_GETCHARAT, ++selEnd)) != ')') && --maxlength)
+        while ((static_cast<char>(m_editor.Scintilla().CharAt(++selEnd)) != ')') && --maxlength)
         {
         }
         if (maxlength == 0)
@@ -3047,11 +3047,11 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
     if (err)
     {
         auto wordCharsBuffer = m_editor.GetWordChars();
-        OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>(wordCharsBuffer.c_str())));
+        OnOutOfScope(m_editor.Scintilla().SetWordChars(wordCharsBuffer.c_str()));
 
-        m_editor.Call(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-+*/!%~()_.,"));
-        selStart = m_editor.Call(SCI_WORDSTARTPOSITION, scn.position, false);
-        selEnd   = m_editor.Call(SCI_WORDENDPOSITION, scn.position, false);
+        m_editor.Scintilla().SetWordChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-+*/!%~()_.,");
+        selStart = m_editor.Scintilla().WordStartPosition(scn.position, false);
+        selEnd   = m_editor.Scintilla().WordEndPosition(scn.position, false);
         sWord    = m_editor.GetTextRange(static_cast<long>(selStart), static_cast<long>(selEnd));
     }
     exprValue = te_interp(sWord.c_str(), &err);
@@ -3095,7 +3095,7 @@ LPARAM CMainWindow::HandleMouseMsg(const SCNotification& scn)
     {
         if (scn.modificationType == WM_LBUTTONDOWN)
         {
-            if (m_editor.Call(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, scn.position))
+            if (m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, scn.position))
             {
                 OpenUrlAtPos(scn.position);
                 return FALSE;
@@ -3108,25 +3108,25 @@ LPARAM CMainWindow::HandleMouseMsg(const SCNotification& scn)
 bool CMainWindow::OpenUrlAtPos(Sci_Position pos)
 {
     auto wordCharsBuffer = m_editor.GetWordChars();
-    OnOutOfScope(m_editor.Call(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>(wordCharsBuffer.c_str())));
+    OnOutOfScope(m_editor.Scintilla().SetWordChars(wordCharsBuffer.c_str()));
 
-    m_editor.Call(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:;?&@=/%#()"));
+    m_editor.Scintilla().SetWordChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+.,:;?&@=/%#()");
 
-    Sci_Position startPos = static_cast<Sci_Position>(m_editor.Call(SCI_WORDSTARTPOSITION, pos, false));
-    Sci_Position endPos   = static_cast<Sci_Position>(m_editor.Call(SCI_WORDENDPOSITION, pos, false));
+    Sci_Position startPos = static_cast<Sci_Position>(m_editor.Scintilla().WordStartPosition(pos, false));
+    Sci_Position endPos   = static_cast<Sci_Position>(m_editor.Scintilla().WordEndPosition(pos, false));
 
-    m_editor.Call(SCI_SETTARGETSTART, startPos);
-    m_editor.Call(SCI_SETTARGETEND, endPos);
-    auto originalSearchFlags = m_editor.Call(SCI_GETSEARCHFLAGS);
-    OnOutOfScope(m_editor.Call(SCI_SETSEARCHFLAGS, originalSearchFlags));
+    m_editor.Scintilla().SetTargetStart(startPos);
+    m_editor.Scintilla().SetTargetEnd(endPos);
+    auto originalSearchFlags = m_editor.Scintilla().SearchFlags();
+    OnOutOfScope(m_editor.Scintilla().SetSearchFlags(originalSearchFlags));
 
-    m_editor.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP | SCFIND_CXX11REGEX);
+    m_editor.Scintilla().SetSearchFlags(Scintilla::FindOption::RegExp | Scintilla::FindOption::Cxx11RegEx);
 
-    Sci_Position posFound = static_cast<Sci_Position>(m_editor.Call(SCI_SEARCHINTARGET, URL_REG_EXPR_LENGTH, reinterpret_cast<LPARAM>(URL_REG_EXPR)));
+    Sci_Position posFound = static_cast<Sci_Position>(m_editor.Scintilla().SearchInTarget(URL_REG_EXPR_LENGTH, URL_REG_EXPR));
     if (posFound != -1)
     {
-        startPos = static_cast<Sci_Position>(m_editor.Call(SCI_GETTARGETSTART));
-        endPos   = static_cast<Sci_Position>(m_editor.Call(SCI_GETTARGETEND));
+        startPos = static_cast<Sci_Position>(m_editor.Scintilla().TargetStart());
+        endPos   = static_cast<Sci_Position>(m_editor.Scintilla().TargetEnd());
     }
     else
         return false;
@@ -3160,15 +3160,15 @@ void CMainWindow::HandleWriteProtectedEdit()
     if (m_docManager.HasDocumentID(docID))
     {
         auto& doc = m_docManager.GetModDocumentFromID(docID);
-        if (!doc.m_bIsWriteProtected && (doc.m_bIsReadonly || (m_editor.Call(SCI_GETREADONLY) != 0)))
+        if (!doc.m_bIsWriteProtected && (doc.m_bIsReadonly || (m_editor.Scintilla().ReadOnly() != 0)))
         {
             // If the user really wants to edit despite it being read only, let them.
             if (AskToRemoveReadOnlyAttribute())
             {
                 doc.m_bIsReadonly = false;
                 UpdateTab(docID);
-                m_editor.Call(SCI_SETREADONLY, false);
-                m_editor.Call(SCI_SETSAVEPOINT);
+                m_editor.Scintilla().SetReadOnly(false);
+                m_editor.Scintilla().SetSavePoint();
             }
         }
     }
@@ -3176,53 +3176,53 @@ void CMainWindow::HandleWriteProtectedEdit()
 
 void CMainWindow::AddHotSpots() const
 {
-    auto firstVisibleLine = m_editor.Call(SCI_GETFIRSTVISIBLELINE);
-    auto startPos         = m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine));
-    auto linesOnScreen    = m_editor.Call(SCI_LINESONSCREEN);
-    auto lineCount        = m_editor.Call(SCI_GETLINECOUNT);
-    auto endPos           = m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine + min(linesOnScreen, lineCount)));
+    auto firstVisibleLine = m_editor.Scintilla().FirstVisibleLine();
+    auto startPos         = m_editor.Scintilla().PositionFromLine(m_editor.Scintilla().DocLineFromVisible(firstVisibleLine));
+    auto linesOnScreen    = m_editor.Scintilla().LinesOnScreen();
+    auto lineCount        = m_editor.Scintilla().LineCount();
+    auto endPos           = m_editor.Scintilla().PositionFromLine(m_editor.Scintilla().DocLineFromVisible(firstVisibleLine + min(linesOnScreen, lineCount)));
 
     // to speed up the search, first search for "://" without using the regex engine
     auto fStartPos = startPos;
     auto fEndPos   = endPos;
-    m_editor.Call(SCI_SETSEARCHFLAGS, 0);
-    m_editor.Call(SCI_SETTARGETSTART, fStartPos);
-    m_editor.Call(SCI_SETTARGETEND, fEndPos);
-    LRESULT posFoundColonSlash = m_editor.Call(SCI_SEARCHINTARGET, 3, reinterpret_cast<sptr_t>("://"));
+    m_editor.Scintilla().SetSearchFlags(Scintilla::FindOption::None);
+    m_editor.Scintilla().SetTargetStart(fStartPos);
+    m_editor.Scintilla().SetTargetEnd(fEndPos);
+    LRESULT posFoundColonSlash = m_editor.Scintilla().SearchInTarget(3, "://");
     while (posFoundColonSlash != -1)
     {
         // found a "://"
-        auto lineFoundColonSlash = m_editor.Call(SCI_LINEFROMPOSITION, posFoundColonSlash);
-        startPos                 = m_editor.Call(SCI_POSITIONFROMLINE, lineFoundColonSlash);
-        endPos                   = m_editor.Call(SCI_GETLINEENDPOSITION, lineFoundColonSlash);
+        auto lineFoundColonSlash = m_editor.Scintilla().LineFromPosition(posFoundColonSlash);
+        startPos                 = m_editor.Scintilla().PositionFromLine(lineFoundColonSlash);
+        endPos                   = m_editor.Scintilla().LineEndPosition(lineFoundColonSlash);
         fStartPos                = posFoundColonSlash + 1LL;
 
-        m_editor.Call(SCI_SETSEARCHFLAGS, SCFIND_REGEXP | SCFIND_CXX11REGEX);
+        m_editor.Scintilla().SetSearchFlags(Scintilla::FindOption::RegExp | Scintilla::FindOption::Cxx11RegEx);
 
         // 20 chars for the url protocol should be enough
-        m_editor.Call(SCI_SETTARGETSTART, max(startPos, posFoundColonSlash - 20));
+        m_editor.Scintilla().SetTargetStart(max(startPos, posFoundColonSlash - 20));
         // urls longer than 2048 are not handled by browsers
-        m_editor.Call(SCI_SETTARGETEND, min(endPos, posFoundColonSlash + 2048));
+        m_editor.Scintilla().SetTargetEnd(min(endPos, posFoundColonSlash + 2048));
 
-        LRESULT posFound = m_editor.Call(SCI_SEARCHINTARGET, URL_REG_EXPR_LENGTH, reinterpret_cast<sptr_t>(URL_REG_EXPR));
+        LRESULT posFound = m_editor.Scintilla().SearchInTarget(URL_REG_EXPR_LENGTH, URL_REG_EXPR);
 
         if (posFound != -1)
         {
-            auto start        = m_editor.Call(SCI_GETTARGETSTART);
-            auto end          = m_editor.Call(SCI_GETTARGETEND);
+            auto start        = m_editor.Scintilla().TargetStart();
+            auto end          = m_editor.Scintilla().TargetEnd();
             auto foundTextLen = end - start;
 
             // reset indicators
-            m_editor.Call(SCI_SETINDICATORCURRENT, INDIC_URLHOTSPOT);
-            m_editor.Call(SCI_INDICATORCLEARRANGE, start, foundTextLen);
-            m_editor.Call(SCI_INDICATORCLEARRANGE, start, foundTextLen - 1LL);
+            m_editor.Scintilla().SetIndicatorCurrent(INDIC_URLHOTSPOT);
+            m_editor.Scintilla().IndicatorClearRange(start, foundTextLen);
+            m_editor.Scintilla().IndicatorClearRange(start, foundTextLen - 1LL);
 
-            m_editor.Call(SCI_INDICATORFILLRANGE, start, foundTextLen);
+            m_editor.Scintilla().IndicatorFillRange(start, foundTextLen);
         }
-        m_editor.Call(SCI_SETTARGETSTART, fStartPos);
-        m_editor.Call(SCI_SETTARGETEND, fEndPos);
-        m_editor.Call(SCI_SETSEARCHFLAGS, 0);
-        posFoundColonSlash = static_cast<int>(m_editor.Call(SCI_SEARCHINTARGET, 3, reinterpret_cast<sptr_t>("://")));
+        m_editor.Scintilla().SetTargetStart(fStartPos);
+        m_editor.Scintilla().SetTargetEnd(fEndPos);
+        m_editor.Scintilla().SetSearchFlags(Scintilla::FindOption::None);
+        posFoundColonSlash = static_cast<int>(m_editor.Scintilla().SearchInTarget(3, "://"));
     }
 }
 
@@ -3236,7 +3236,7 @@ void CMainWindow::HandleUpdateUI(const SCNotification& scn)
                                      SC_UPDATE_H_SCROLL | SC_UPDATE_V_SCROLL;
     if ((scn.updated & uiFlags) != 0)
     {
-        if ((scn.updated & SC_UPDATE_SELECTION) && (m_editor.ConstCall(SCI_GETLENGTH) > 102400))
+        if ((scn.updated & SC_UPDATE_SELECTION) && (m_editor.Scintilla().Length() > 102400))
             SetTimer(*this, TIMER_SELCHANGE, 500, nullptr);
         else
             m_editor.MarkSelectedWord(false, false);
@@ -3255,19 +3255,19 @@ void CMainWindow::IndentToLastLine() const
     auto lastLine     = curLine - 1;
     int  indentAmount = 0;
     // use the same indentation as the last line
-    while (lastLine > 0 && (m_editor.Call(SCI_GETLINEENDPOSITION, lastLine) - m_editor.Call(SCI_POSITIONFROMLINE, lastLine)) == 0)
+    while (lastLine > 0 && (m_editor.Scintilla().LineEndPosition(lastLine) - m_editor.Scintilla().PositionFromLine(lastLine)) == 0)
         lastLine--;
 
-    indentAmount = static_cast<int>(m_editor.Call(SCI_GETLINEINDENTATION, lastLine));
+    indentAmount = static_cast<int>(m_editor.Scintilla().LineIndentation(lastLine));
 
     if (indentAmount > 0)
     {
         Sci_CharacterRange cRange{};
-        cRange.cpMin   = static_cast<Sci_PositionCR>(m_editor.Call(SCI_GETSELECTIONSTART));
-        cRange.cpMax   = static_cast<Sci_PositionCR>(m_editor.Call(SCI_GETSELECTIONEND));
-        auto posBefore = m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);
-        m_editor.Call(SCI_SETLINEINDENTATION, curLine, indentAmount);
-        auto posAfter      = m_editor.Call(SCI_GETLINEINDENTPOSITION, curLine);
+        cRange.cpMin   = static_cast<Sci_PositionCR>(m_editor.Scintilla().SelectionStart());
+        cRange.cpMax   = static_cast<Sci_PositionCR>(m_editor.Scintilla().SelectionEnd());
+        auto posBefore = m_editor.Scintilla().LineIndentPosition(curLine);
+        m_editor.Scintilla().SetLineIndentation(curLine, indentAmount);
+        auto posAfter      = m_editor.Scintilla().LineIndentPosition(curLine);
         auto posDifference = posAfter - posBefore;
         if (posAfter > posBefore)
         {
@@ -3295,7 +3295,7 @@ void CMainWindow::IndentToLastLine() const
                     cRange.cpMax = static_cast<Sci_PositionCR>(posAfter);
             }
         }
-        m_editor.Call(SCI_SETSEL, cRange.cpMin, cRange.cpMax);
+        m_editor.Scintilla().SetSel(cRange.cpMin, cRange.cpMax);
     }
 }
 
@@ -3303,7 +3303,7 @@ void CMainWindow::HandleAutoIndent(const SCNotification& scn) const
 {
     if (m_bBlockAutoIndent)
         return;
-    int eolMode = static_cast<int>(m_editor.Call(SCI_GETEOLMODE));
+    int eolMode = static_cast<int>(m_editor.Scintilla().EOLMode());
 
     if (((eolMode == SC_EOL_CRLF || eolMode == SC_EOL_LF) && scn.ch == '\n') ||
         (eolMode == SC_EOL_CR && scn.ch == '\r'))
@@ -3320,7 +3320,7 @@ void CMainWindow::OpenNewTab()
     m_tabBar.SelectChanging(-1);
 
     CDocument doc;
-    doc.m_document = m_editor.Call(SCI_CREATEDOCUMENT);
+    doc.m_document = m_editor.Scintilla().CreateDocument(0, Scintilla::DocumentOption::Default);
     doc.m_bHasBOM  = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
     doc.m_encoding = static_cast<UINT>(CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP()));
     doc.m_format   = static_cast<EOLFormat>(CIniSettings::Instance().GetInt64(L"Defaults", L"lineendingnew", static_cast<int>(EOLFormat::Win_Format)));
@@ -3367,7 +3367,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
         return;
 
     auto& doc = m_docManager.GetModDocumentFromID(docID);
-    m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+    m_editor.Scintilla().SetDocPointer(doc.m_document);
     m_editor.SetEOLType(toEolMode(doc.m_format));
     m_editor.SetupLexerForLang(doc.GetLanguage());
     m_editor.RestoreCurrentPos(doc.m_position);
@@ -3381,7 +3381,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.MarkBookmarksInScrollbar();
     UpdateCaptionBar();
     SetFocus(m_editor);
-    m_editor.Call(SCI_GRABFOCUS);
+    m_editor.Scintilla().GrabFocus();
     UpdateStatusBar(true);
     auto ds = m_docManager.HasFileChanged(docID);
     if (ds == DocModifiedState::Modified)
@@ -3417,7 +3417,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     {
         auto      fileName = CPathUtils::GetFileName(file);
         CDocument doc;
-        doc.m_document     = m_editor.Call(SCI_CREATEDOCUMENT);
+        doc.m_document     = m_editor.Scintilla().CreateDocument(0, Scintilla::DocumentOption::Default);
         doc.m_bHasBOM      = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnewbom", 0) != 0;
         doc.m_encoding     = static_cast<UINT>(CIniSettings::Instance().GetInt64(L"Defaults", L"encodingnew", GetACP()));
         doc.m_bNeedsSaving = true;
@@ -3502,7 +3502,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                 if (docID.IsValid())
                 {
                     const auto& existDoc = m_docManager.GetDocumentFromID(docID);
-                    if (existDoc.m_path.empty() && (m_editor.Call(SCI_GETLENGTH) == 0) && (m_editor.Call(SCI_CANUNDO) == 0))
+                    if (existDoc.m_path.empty() && (m_editor.Scintilla().Length() == 0) && (m_editor.Scintilla().CanUndo() == 0))
                     {
                         auto curTabIndex = m_tabBar.GetCurrentTabIndex();
                         CCommandHandler::Instance().OnDocumentClose(docID);
@@ -3574,14 +3574,14 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
                     m_tabBar.ActivateAt(index);
                 }
                 else
-                    // SCI_SETDOCPOINTER is necessary so the reference count of the document
+                    // SCI_SetDocPointer is necessary so the reference count of the document
                     // is decreased and the memory can be released.
-                    m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+                    m_editor.Scintilla().SetDocPointer(doc.m_document);
                 if (bResize)
                     ResizeChildWindows();
             }
             else
-                m_editor.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+                m_editor.Scintilla().SetDocPointer(doc.m_document);
 
             CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, &m_editor, doc, false);
             InvalidateRect(m_tabBar, nullptr, FALSE);
@@ -3626,7 +3626,7 @@ bool CMainWindow::OpenFileAs(const std::wstring& tempPath, const std::wstring& r
     m_docManager.UpdateFileTime(doc, true);
     std::wstring sFileName = CPathUtils::GetFileName(doc.m_path);
     const auto&  lang      = CLexStyles::Instance().GetLanguageForDocument(doc, m_scratchEditor);
-    m_editor.Call(SCI_SETREADONLY, doc.m_bIsReadonly);
+    m_editor.Scintilla().SetReadOnly(doc.m_bIsReadonly);
     m_editor.SetupLexerForLang(lang);
     doc.SetLanguage(lang);
     UpdateTab(docID);
@@ -3864,8 +3864,8 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
 // it was sent from.
 
 // TODO!: Moving a tab to another instance means losing
-// undo history.
-// Consider warning about that or if the undo history
+// Undo history.
+// Consider warning about that or if the Undo history
 // could be saved and restored.
 
 // Called when a Tab is dropped over another instance of BowPad.
@@ -4113,8 +4113,8 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
             doc.m_bIsDirty     = true;
             doc.m_bNeedsSaving = true;
             // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
-            editor->Call(SCI_ADDUNDOACTION, 0, 0);
-            editor->Call(SCI_UNDO);
+            editor->Scintilla().AddUndoAction(0, Scintilla::UndoFlags::None);
+            editor->Scintilla().Undo();
             return false;
         }
     }
@@ -4125,17 +4125,17 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     }
 
     if (!bReloadCurrentTab)
-        editor->Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+        editor->Scintilla().SetDocPointer(doc.m_document);
 
     // LoadFile increases the reference count, so decrease it here first
-    editor->Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
+    editor->Scintilla().ReleaseDocument(doc.m_document);
     CDocument docReload = m_docManager.LoadFile(*this, doc.m_path, encoding, false);
     if (!docReload.m_document)
     {
         // since we called SCI_RELEASEDOCUMENT but LoadFile did not properly load,
         // we have to increase the reference count again. Otherwise the document
         // might get completely released.
-        editor->Call(SCI_ADDREFDOCUMENT, 0, doc.m_document);
+        editor->Scintilla().AddRefDocument(doc.m_document);
         return false;
     }
 
@@ -4143,7 +4143,7 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     {
         editor->SaveCurrentPos(doc.m_position);
         // Apply the new one.
-        editor->Call(SCI_SETDOCPOINTER, 0, docReload.m_document);
+        editor->Scintilla().SetDocPointer(docReload.m_document);
     }
 
     docReload.m_position          = doc.m_position;
@@ -4154,7 +4154,7 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     editor->SetupLexerForLang(lang);
     doc.SetLanguage(lang);
     editor->RestoreCurrentPos(docReload.m_position);
-    editor->Call(SCI_SETREADONLY, docReload.m_bIsWriteProtected);
+    editor->Scintilla().SetReadOnly(docReload.m_bIsWriteProtected);
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, editor, doc, false);
     RefreshAnnotations();
 
@@ -4170,7 +4170,7 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
         UpdateStatusBar(true);
     UpdateTab(docID);
     if (bReloadCurrentTab)
-        editor->Call(SCI_SETSAVEPOINT);
+        editor->Scintilla().SetSavePoint();
 
     // refresh the file tree
     m_fileTree.SetPath(m_fileTree.GetPath(), !dueToOutsideChanges);
@@ -4199,8 +4199,8 @@ bool CMainWindow::HandleOutsideDeletedFile(int tab)
     // update the fileTime of the document to avoid this warning
     m_docManager.UpdateFileTime(doc, false);
     // the next to calls are only here to trigger SCN_SAVEPOINTLEFT/SCN_SAVEPOINTREACHED messages
-    m_editor.Call(SCI_ADDUNDOACTION, 0, 0);
-    m_editor.Call(SCI_UNDO);
+    m_editor.Scintilla().AddUndoAction(0, Scintilla::UndoFlags::None);
+    m_editor.Scintilla().Undo();
     return false;
 }
 
@@ -4697,8 +4697,8 @@ void CMainWindow::SetTheme(bool dark)
     auto activeTabId = m_tabBar.GetCurrentTabId();
     if (activeTabId.IsValid())
     {
-        m_editor.Call(SCI_CLEARDOCUMENTSTYLE);
-        m_editor.Call(SCI_COLOURISE, 0, m_editor.Call(SCI_POSITIONFROMLINE, m_editor.Call(SCI_LINESONSCREEN) + 1));
+        m_editor.Scintilla().ClearDocumentStyle();
+        m_editor.Scintilla().Colourise(0, m_editor.Scintilla().PositionFromLine(m_editor.Scintilla().LinesOnScreen() + 1));
         const auto& doc = m_docManager.GetDocumentFromID(activeTabId);
         m_editor.SetupLexerForLang(doc.GetLanguage());
         RefreshAnnotations();

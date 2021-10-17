@@ -43,7 +43,6 @@
 #include "BowPad.h"
 #include "MainWindow.h"
 #include "UnicodeUtils.h"
-#include "StringUtils.h"
 #include "LexStyles.h"
 #include "Theme.h"
 #include "OnOutOfScope.h"
@@ -142,7 +141,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
             }
             DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
 
-            int style = static_cast<int>(ScintillaCall(SCI_GETSTYLEAT, ScintillaCall(SCI_GETCURRENTPOS)));
+            int style = static_cast<int>(Scintilla().StyleAt(Scintilla().CurrentPos()));
             SelectStyle(style);
         }
             return FALSE;
@@ -184,7 +183,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
             }
             DoCommand(IDC_LANGCOMBO, CBN_SELCHANGE);
 
-            int style = static_cast<int>(ScintillaCall(SCI_GETSTYLEAT, ScintillaCall(SCI_GETCURRENTPOS)));
+            int style = static_cast<int>(Scintilla().StyleAt(Scintilla().CurrentPos()));
             SelectStyle(style);
         }
         break;
@@ -240,7 +239,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         int styleSel = ComboBox_AddString(hStyleCombo, styleData.name.c_str());
                         ComboBox_SetItemData(hStyleCombo, styleSel, lexId);
                     }
-                    int style = static_cast<int>(ScintillaCall(SCI_GETSTYLEAT, ScintillaCall(SCI_GETCURRENTPOS)));
+                    int style = static_cast<int>(Scintilla().StyleAt(Scintilla().CurrentPos()));
                     SelectStyle(style);
                     std::wstring exts = CLexStyles::Instance().GetUserExtensionsForLanguage(currentLang);
                     SetDlgItemText(*this, IDC_EXTENSIONS, exts.c_str());
@@ -346,7 +345,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         // so don't do it again here when storing the color.
                         CLexStyles::Instance().SetUserForeground(lexID, styleKey, fgcolor);
                         if (updateView)
-                            ScintillaCall(SCI_STYLESETFORE, styleKey, CTheme::Instance().GetThemeColor(fgcolor));
+                            Scintilla().StyleSetFore(styleKey, CTheme::Instance().GetThemeColor(fgcolor));
                         break;
                     }
                     case IDC_BK_BTN:
@@ -354,7 +353,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         auto bgcolor = m_bkColor.GetColor();
                         CLexStyles::Instance().SetUserBackground(lexID, styleKey, bgcolor);
                         if (updateView)
-                            ScintillaCall(SCI_STYLESETBACK, styleKey, CTheme::Instance().GetThemeColor(bgcolor));
+                            Scintilla().StyleSetBack(styleKey, CTheme::Instance().GetThemeColor(bgcolor));
                         break;
                     }
                     case IDC_FONTCOMBO:
@@ -374,14 +373,14 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                                         if (hFont)
                                         {
                                             DeleteObject(hFont);
-                                            ScintillaCall(SCI_STYLESETFONT, styleKey, reinterpret_cast<sptr_t>("Consolas"));
+                                            Scintilla().StyleSetFont(styleKey, "Consolas");
                                         }
                                         else
-                                            ScintillaCall(SCI_STYLESETFONT, styleKey, reinterpret_cast<sptr_t>("Courier New"));
+                                            Scintilla().StyleSetFont(styleKey, "Courier New");
                                     }
                                     else
                                     {
-                                        ScintillaCall(SCI_STYLESETFONT, styleKey, reinterpret_cast<sptr_t>(CUnicodeUtils::StdGetUTF8(font).c_str()));
+                                        Scintilla().StyleSetFont(styleKey, CUnicodeUtils::StdGetUTF8(font).c_str());
                                     }
                                 }
                             }
@@ -401,9 +400,9 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                                 if (updateView)
                                 {
                                     if (fontSize > 0)
-                                        ScintillaCall(SCI_STYLESETSIZE, styleKey, fontSize);
+                                        Scintilla().StyleSetSize(styleKey, fontSize);
                                     else
-                                        ScintillaCall(SCI_STYLESETSIZE, styleKey, 10);
+                                        Scintilla().StyleSetSize(styleKey, 10);
                                 }
                             }
                         }
@@ -423,9 +422,9 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         CLexStyles::Instance().SetUserFontStyle(lexData.id, styleKey, fontStyle);
                         if (updateView)
                         {
-                            ScintillaCall(SCI_STYLESETBOLD, styleKey, (fontStyle & Fontstyle_Bold) ? 1 : 0);
-                            ScintillaCall(SCI_STYLESETITALIC, styleKey, (fontStyle & Fontstyle_Italic) ? 1 : 0);
-                            ScintillaCall(SCI_STYLESETUNDERLINE, styleKey, (fontStyle & Fontstyle_Underlined) ? 1 : 0);
+                            Scintilla().StyleSetBold(styleKey, (fontStyle & Fontstyle_Bold) ? 1 : 0);
+                            Scintilla().StyleSetItalic(styleKey, (fontStyle & Fontstyle_Italic) ? 1 : 0);
+                            Scintilla().StyleSetUnderline(styleKey, (fontStyle & Fontstyle_Underlined) ? 1 : 0);
                         }
                     }
                     break;
@@ -497,7 +496,7 @@ void CCmdStyleConfigurator::ScintillaNotify(SCNotification* pScn)
         {
             if (IsWindowVisible(*g_pStyleConfiguratorDlg))
             {
-                int style = static_cast<int>(ScintillaCall(SCI_GETSTYLEAT, ScintillaCall(SCI_GETCURRENTPOS)));
+                int style = static_cast<int>(Scintilla().StyleAt(Scintilla().CurrentPos()));
                 if (style != g_lastStyle)
                 {
                     SendMessage(*g_pStyleConfiguratorDlg, WM_CURRENTSTYLECHANGED, style, 0);

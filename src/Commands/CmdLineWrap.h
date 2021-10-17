@@ -19,6 +19,11 @@
 #include "ICommand.h"
 #include "BowPadUI.h"
 
+constexpr Scintilla::WrapVisualFlag operator|(Scintilla::WrapVisualFlag a, Scintilla::WrapVisualFlag b) noexcept
+{
+    return static_cast<Scintilla::WrapVisualFlag>(static_cast<int>(a) | static_cast<int>(b));
+}
+
 class CCmdLineWrap : public ICommand
 {
 public:
@@ -31,16 +36,16 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_SETWRAPMODE, ScintillaCall(SCI_GETWRAPMODE) ? 0 : SC_WRAP_WORD);
-        CIniSettings::Instance().SetInt64(L"View", L"wrapmode", ScintillaCall(SCI_GETWRAPMODE));
+        Scintilla().SetWrapMode(Scintilla().WrapMode() != Scintilla::Wrap::None ? Scintilla::Wrap::None : Scintilla::Wrap::Word);
+        CIniSettings::Instance().SetInt64(L"View", L"wrapmode", static_cast<int>(Scintilla().WrapMode()));
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         return true;
     }
 
     void BeforeLoad() override
     {
-        int wrapmode = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"wrapmode", 0));
-        ScintillaCall(SCI_SETWRAPMODE, wrapmode);
+        Scintilla::Wrap wrapmode = static_cast<Scintilla::Wrap>(CIniSettings::Instance().GetInt64(L"View", L"wrapmode", 0));
+        Scintilla().SetWrapMode(wrapmode);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
@@ -50,7 +55,7 @@ public:
     {
         if (UI_PKEY_BooleanValue == key)
         {
-            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETWRAPMODE) > 0, pPropVarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, Scintilla().WrapMode() > Scintilla::Wrap::None, pPropVarNewValue);
         }
         return E_NOTIMPL;
     }
@@ -68,13 +73,13 @@ public:
 
     bool Execute() override
     {
-        int wrapIndent = ScintillaCall(SCI_GETWRAPSTARTINDENT) ? 0 : 1;
-        ScintillaCall(SCI_SETWRAPSTARTINDENT, wrapIndent ? max(1, ScintillaCall(SCI_GETTABWIDTH) / 2) : 0);
+        int wrapIndent = Scintilla().WrapStartIndent() ? 0 : 1;
+        Scintilla().SetWrapStartIndent(wrapIndent ? max(1, Scintilla().TabWidth() / 2) : 0);
         CIniSettings::Instance().SetInt64(L"View", L"wrapmodeindent", wrapIndent);
-        ScintillaCall(SCI_SETWRAPINDENTMODE, wrapIndent ? SC_WRAPINDENT_INDENT : SC_WRAPINDENT_FIXED);
-        ScintillaCall(SCI_SETWRAPVISUALFLAGS, wrapIndent ? SC_WRAPVISUALFLAG_START | SC_WRAPVISUALFLAG_END : SC_WRAPVISUALFLAG_END);
-        ScintillaCall(SCI_SETWRAPVISUALFLAGSLOCATION, SC_WRAPVISUALFLAGLOC_START_BY_TEXT);
-        ScintillaCall(SCI_SETMARGINOPTIONS, SC_MARGINOPTION_SUBLINESELECT);
+        Scintilla().SetWrapIndentMode(wrapIndent ? Scintilla::WrapIndentMode::Indent : Scintilla::WrapIndentMode::Fixed);
+        Scintilla().SetWrapVisualFlags(wrapIndent ? Scintilla::WrapVisualFlag::Start | Scintilla::WrapVisualFlag::End : Scintilla::WrapVisualFlag::End);
+        Scintilla().SetWrapVisualFlagsLocation(Scintilla::WrapVisualLocation::StartByText);
+        Scintilla().SetMarginOptions(Scintilla::MarginOption::SubLineSelect);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         return true;
     }
@@ -82,11 +87,11 @@ public:
     void BeforeLoad() override
     {
         int wrapIndent = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"wrapmodeindent", 0));
-        ScintillaCall(SCI_SETWRAPSTARTINDENT, wrapIndent ? max(1, ScintillaCall(SCI_GETTABWIDTH) / 2) : 0);
-        ScintillaCall(SCI_SETWRAPINDENTMODE, wrapIndent ? SC_WRAPINDENT_INDENT : SC_WRAPINDENT_FIXED);
-        ScintillaCall(SCI_SETWRAPVISUALFLAGS, wrapIndent ? SC_WRAPVISUALFLAG_START | SC_WRAPVISUALFLAG_END : SC_WRAPVISUALFLAG_END);
-        ScintillaCall(SCI_SETWRAPVISUALFLAGSLOCATION, SC_WRAPVISUALFLAGLOC_START_BY_TEXT);
-        ScintillaCall(SCI_SETMARGINOPTIONS, SC_MARGINOPTION_SUBLINESELECT);
+        Scintilla().SetWrapStartIndent(wrapIndent ? max(1, Scintilla().TabWidth() / 2) : 0);
+        Scintilla().SetWrapIndentMode(wrapIndent ? Scintilla::WrapIndentMode::Indent : Scintilla::WrapIndentMode::Fixed);
+        Scintilla().SetWrapVisualFlags(wrapIndent ? Scintilla::WrapVisualFlag::Start | Scintilla::WrapVisualFlag::End : Scintilla::WrapVisualFlag::End);
+        Scintilla().SetWrapVisualFlagsLocation(Scintilla::WrapVisualLocation::StartByText);
+        Scintilla().SetMarginOptions(Scintilla::MarginOption::SubLineSelect);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
@@ -96,7 +101,7 @@ public:
     {
         if (UI_PKEY_BooleanValue == key)
         {
-            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETWRAPSTARTINDENT) > 0, pPropVarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, Scintilla().WrapStartIndent() > 0, pPropVarNewValue);
         }
         return E_NOTIMPL;
     }

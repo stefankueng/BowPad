@@ -22,8 +22,8 @@
 bool CCmdEOLBase::Execute()
 {
     auto lineType = GetLineType();
-    ScintillaCall(SCI_SETEOLMODE, lineType);
-    ScintillaCall(SCI_CONVERTEOLS, lineType);
+    Scintilla().SetEOLMode(lineType);
+    Scintilla().ConvertEOLs(lineType);
     if (HasActiveDocument())
     {
         auto& doc    = GetModActiveDocument();
@@ -48,7 +48,7 @@ HRESULT CCmdEOLBase::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETEOLMODE) == GetLineType(), pPropVarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, Scintilla().EOLMode() == GetLineType(), pPropVarNewValue);
     }
     return E_NOTIMPL;
 }

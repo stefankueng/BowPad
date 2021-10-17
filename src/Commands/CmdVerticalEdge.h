@@ -32,8 +32,8 @@ public:
     void AfterInit() override
     {
         int ve = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"verticaledge", 0));
-        ScintillaCall(SCI_SETEDGECOLUMN, ve);
-        ScintillaCall(SCI_SETEDGEMODE, ve ? EDGE_LINE : EDGE_NONE);
+        Scintilla().SetEdgeColumn(ve);
+        Scintilla().SetEdgeMode(ve ? Scintilla::EdgeVisualStyle::Line : Scintilla::EdgeVisualStyle::None);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
     }
     bool Execute() override { return true; }
@@ -82,8 +82,8 @@ public:
 
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/) override
     {
-        ScintillaCall(SCI_SETEDGECOLUMN, pPropVarValue->intVal);
-        ScintillaCall(SCI_SETEDGEMODE, pPropVarValue->intVal ? EDGE_LINE : EDGE_NONE);
+        Scintilla().SetEdgeColumn(pPropVarValue->intVal);
+        Scintilla().SetEdgeMode(pPropVarValue->intVal ? Scintilla::EdgeVisualStyle::Line : Scintilla::EdgeVisualStyle::None);
         CIniSettings::Instance().SetInt64(L"View", L"verticaledge", pPropVarValue->intVal);
         return S_OK;
     }

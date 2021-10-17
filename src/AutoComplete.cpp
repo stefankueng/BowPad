@@ -185,16 +185,16 @@ void CAutoComplete::Init()
     }
     int iconWidth  = GetSystemMetrics(SM_CXSMICON);
     int iconHeight = GetSystemMetrics(SM_CYSMICON);
-    m_editor->Call(SCI_RGBAIMAGESETWIDTH, iconWidth);
-    m_editor->Call(SCI_RGBAIMAGESETHEIGHT, iconHeight);
-    m_editor->Call(SCI_AUTOCSETIGNORECASE, TRUE);
-    m_editor->Call(SCI_AUTOCSTOPS, 0, reinterpret_cast<sptr_t>("([."));
+    m_editor->Scintilla().RGBAImageSetWidth(iconWidth);
+    m_editor->Scintilla().RGBAImageSetHeight(iconHeight);
+    m_editor->Scintilla().AutoCSetIgnoreCase(TRUE);
+    m_editor->Scintilla().AutoCStops("([.");
     int i = 0;
     for (auto icon : {IDI_SCI_CODE, IDI_SCI_FILE, IDI_SCI_SNIPPET})
     {
         CAutoIcon hIcon = LoadIconEx(g_hInst, MAKEINTRESOURCE(icon), iconWidth, iconHeight);
         auto      bytes = Icon2Image(hIcon);
-        m_editor->Call(SCI_REGISTERRGBAIMAGE, i, reinterpret_cast<sptr_t>(bytes.get()));
+        m_editor->Scintilla().RegisterRGBAImage(i, reinterpret_cast<const char*>(bytes.get()));
         ++i;
     }
 
@@ -314,40 +314,40 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                         }
                         if (!sSnippet.empty())
                         {
-                            m_editor->Call(SCI_AUTOCCANCEL);
+                            m_editor->Scintilla().AutoCCancel();
                             auto autoBrace = CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1);
                             CIniSettings::Instance().SetInt64(L"View", L"autobrace", 0);
                             OnOutOfScope(CIniSettings::Instance().SetInt64(L"View", L"autobrace", autoBrace));
                             m_main->m_bBlockAutoIndent = true;
                             OnOutOfScope(m_main->m_bBlockAutoIndent = false);
-                            auto pos           = m_editor->Call(SCI_GETCURRENTPOS);
-                            auto startIndent   = m_editor->Call(SCI_GETLINEINDENTATION, m_editor->GetCurrentLineNumber());
-                            auto tabWidth      = m_editor->Call(SCI_GETTABWIDTH);
+                            auto pos           = m_editor->Scintilla().CurrentPos();
+                            auto startIndent   = m_editor->Scintilla().LineIndentation(m_editor->GetCurrentLineNumber());
+                            auto tabWidth      = m_editor->Scintilla().TabWidth();
                             auto indentToStart = [&]() {
                                 auto tabCount = startIndent / tabWidth;
                                 for (int i = 0; i < tabCount; ++i)
-                                    m_editor->Call(SCI_TAB);
+                                    m_editor->Scintilla().Tab();
                                 auto spaceCount = startIndent % tabWidth;
                                 for (int i = 0; i < spaceCount; ++i)
-                                    m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(" "));
+                                    m_editor->Scintilla().ReplaceSel(" ");
                             };
 
-                            m_editor->Call(SCI_BEGINUNDOACTION);
-                            m_editor->Call(SCI_SETSELECTION, scn->position, pos);
-                            m_editor->Call(SCI_DELETERANGE, scn->position, pos - scn->position);
+                            m_editor->Scintilla().BeginUndoAction();
+                            m_editor->Scintilla().SetSelection(scn->position, pos);
+                            m_editor->Scintilla().DeleteRange(scn->position, pos - scn->position);
 
                             sptr_t cursorPos  = -1;
                             char   lastC      = 0;
                             char   last2C     = 0;
                             int    hotSpotNum = -1;
                             ExitSnippetMode();
-                            m_snippetPositions[fullSnippetPosId].push_back(m_editor->Call(SCI_GETCURRENTPOS));
+                            m_snippetPositions[fullSnippetPosId].push_back(m_editor->Scintilla().CurrentPos());
                             bool lastWasNewLine = false;
                             for (const auto& c : sSnippet)
                             {
                                 if (c == '^' && lastC != '\\')
                                 {
-                                    cursorPos = m_editor->Call(SCI_GETCURRENTPOS);
+                                    cursorPos = m_editor->Scintilla().CurrentPos();
                                     if (hotSpotNum >= 0)
                                         m_snippetPositions[hotSpotNum].push_back(cursorPos);
                                     hotSpotNum = -1;
@@ -366,7 +366,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                         lastWasNewLine = false;
 
                                         char text[] = {c, 0};
-                                        m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
+                                        m_editor->Scintilla().ReplaceSel(text);
                                     }
                                     else if (c == '\t')
                                     {
@@ -374,16 +374,16 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                             indentToStart();
                                         lastWasNewLine = false;
 
-                                        m_editor->Call(SCI_TAB);
+                                        m_editor->Scintilla().Tab();
                                     }
                                     else if (c == '\n')
                                     {
-                                        m_editor->Call(SCI_NEWLINE);
+                                        m_editor->Scintilla().NewLine();
                                         lastWasNewLine = true;
                                     }
                                     else if (c == '\b')
                                     {
-                                        m_editor->Call(SCI_DELETEBACK);
+                                        m_editor->Scintilla().DeleteBack();
                                     }
                                     else if (c != '\\')
                                     {
@@ -392,16 +392,16 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                         lastWasNewLine = false;
 
                                         char text[] = {c, 0};
-                                        m_editor->Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
+                                        m_editor->Scintilla().ReplaceSel(text);
                                     }
                                 }
                                 last2C = lastC;
                                 lastC  = c;
                             }
-                            m_snippetPositions[fullSnippetPosId].push_back(m_editor->Call(SCI_GETCURRENTPOS));
+                            m_snippetPositions[fullSnippetPosId].push_back(m_editor->Scintilla().CurrentPos());
                             if (m_snippetPositions.find(0) == m_snippetPositions.end())
                             {
-                                auto pos0 = m_editor->Call(SCI_GETCURRENTPOS);
+                                auto pos0 = m_editor->Scintilla().CurrentPos();
                                 m_snippetPositions[0].push_back(pos0);
                                 m_snippetPositions[0].push_back(pos0);
                             }
@@ -416,12 +416,12 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                     auto b = *it;
                                     if (first)
                                     {
-                                        m_editor->Call(SCI_SETSELECTION, a, b);
+                                        m_editor->Scintilla().SetSelection(a, b);
                                         first = false;
                                     }
                                     else
                                     {
-                                        m_editor->Call(SCI_ADDSELECTION, a, b);
+                                        m_editor->Scintilla().AddSelection(a, b);
                                     }
                                 }
                                 m_currentSnippetPos = 1;
@@ -429,15 +429,15 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             else if (m_snippetPositions.size() == 2)
                             {
                                 if (m_snippetPositions.find(0) != m_snippetPositions.end())
-                                    m_editor->Call(SCI_SETSELECTION, *m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
+                                    m_editor->Scintilla().SetSelection(*m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
                                 ExitSnippetMode();
                             }
-                            m_editor->Call(SCI_ENDUNDOACTION);
+                            m_editor->Scintilla().EndUndoAction();
                             MarkSnippetPositions(false);
                         }
                         else if (!PathFileExists(CUnicodeUtils::StdGetUnicode(sText).c_str()))
                         {
-                            m_editor->Call(SCI_AUTOCCANCEL);
+                            m_editor->Scintilla().AutoCCancel();
                         }
                     }
                 }
@@ -450,7 +450,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
             {
                 if (!m_stringToSelect.empty())
                 {
-                    m_editor->Call(SCI_AUTOCSELECT, 0, reinterpret_cast<sptr_t>(m_stringToSelect.c_str()));
+                    m_editor->Scintilla().AutoCSelect(m_stringToSelect.c_str());
                 }
             }
         }
@@ -547,7 +547,7 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
                 if (m_snippetPositions.find(0) != m_snippetPositions.end())
                 {
                     if (*m_snippetPositions[0].cbegin() >= 0)
-                        m_editor->Call(SCI_SETSELECTION, *m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
+                        m_editor->Scintilla().SetSelection(*m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
                 }
                 ExitSnippetMode();
                 return false;
@@ -564,12 +564,12 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
                 auto b = *it;
                 if (first)
                 {
-                    m_editor->Call(SCI_SETSELECTION, a, b);
+                    m_editor->Scintilla().SetSelection(a, b);
                     first = false;
                 }
                 else
                 {
-                    m_editor->Call(SCI_ADDSELECTION, a, b);
+                    m_editor->Scintilla().AddSelection(a, b);
                 }
             }
             return false;
@@ -613,7 +613,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
 
     if (m_insertingSnippet)
         return;
-    auto pos = m_editor->Call(SCI_GETCURRENTPOS);
+    auto pos = m_editor->Scintilla().CurrentPos();
     // if we're typing outside an active snippet, cancel
     // the snippet editing mode
     if (m_currentSnippetPos >= 0 && !m_snippetPositions.empty())
@@ -642,7 +642,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             return;
     }
 
-    if (pos != m_editor->Call(SCI_WORDENDPOSITION, pos, TRUE))
+    if (pos != m_editor->Scintilla().WordEndPosition(pos, TRUE))
         return; // don't auto complete if we're not at the end of a word
     auto word = m_editor->GetCurrentWord();
 
@@ -652,10 +652,10 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
     std::wstring pathToMatch, rawPath;
     if (getPathsForPathCompletion(currentLine, rawPath, pathToMatch))
     {
-        if (m_editor->Call(SCI_AUTOCACTIVE))
+        if (m_editor->Scintilla().AutoCActive())
             return;
 
-        auto lineStartPos = m_editor->Call(SCI_POSITIONFROMLINE, m_editor->Call(SCI_LINEFROMPOSITION, pos));
+        auto lineStartPos = m_editor->Scintilla().PositionFromLine(m_editor->Scintilla().LineFromPosition(pos));
         if (currentLine.find(rawPath) == (pos - lineStartPos - CUnicodeUtils::StdGetUTF8(rawPath).size()))
         {
             std::string pathComplete;
@@ -682,12 +682,12 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             }
             if (!pathComplete.empty())
             {
-                m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
-                m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
-                m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+                m_editor->Scintilla().AutoCSetAutoHide(TRUE);
+                m_editor->Scintilla().AutoCSetSeparator(static_cast<uptr_t>(wordSeparator));
+                m_editor->Scintilla().AutoCSetTypeSeparator(static_cast<uptr_t>(typeSeparator));
                 if (CTheme::Instance().IsDarkTheme())
-                    m_editor->Call(SCI_AUTOCSETOPTIONS, SC_AUTOCOMPLETE_FIXED_SIZE);
-                m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), reinterpret_cast<LPARAM>(pathComplete.c_str()));
+                    m_editor->Scintilla().AutoCSetOptions(Scintilla::AutoCompleteOption::FixedSize);
+                m_editor->Scintilla().AutoCShow(CUnicodeUtils::StdGetUTF8(rawPath).size(), pathComplete.c_str());
                 SetWindowStylesForAutocompletionPopup();
                 return;
             }
@@ -696,7 +696,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
 
     if (scn->ch == '/')
     {
-        auto lexer = m_editor->Call(SCI_GETLEXER);
+        auto lexer = m_editor->Scintilla().Lexer();
         switch (lexer)
         {
             // add the closing tag only for xml and html lexers
@@ -707,16 +707,16 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 auto inner = 1;
                 if (pos2 > 2)
                 {
-                    if (m_editor->Call(SCI_GETCHARAT, pos2) == '<')
+                    if (m_editor->Scintilla().CharAt(pos2) == '<')
                     {
-                        auto docLen = m_editor->Call(SCI_GETLENGTH);
+                        auto docLen = m_editor->Scintilla().Length();
                         do
                         {
                             auto savedPos2 = pos2;
                             pos2           = m_editor->FindText("<", pos2 - 2, 0);
                             if (pos2)
                             {
-                                auto nextChar = m_editor->Call(SCI_GETCHARAT, pos2 + 1);
+                                auto nextChar = m_editor->Scintilla().CharAt(pos2 + 1);
                                 if (nextChar == '!')
                                     continue;
                                 auto closeBracketPos = m_editor->FindText("/>", pos2, docLen);
@@ -731,24 +731,24 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                         } while (inner && pos2 > 2);
                         std::string tagName;
                         auto        position = pos2 + 1;
-                        int         nextChar = static_cast<int>(m_editor->Call(SCI_GETCHARAT, position));
+                        int         nextChar = static_cast<int>(m_editor->Scintilla().CharAt(position));
                         while (position < pos && !m_editor->IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                         {
                             tagName.push_back(static_cast<char>(nextChar));
                             ++position;
-                            nextChar = static_cast<int>(m_editor->Call(SCI_GETCHARAT, position));
+                            nextChar = static_cast<int>(m_editor->Scintilla().CharAt(position));
                         }
                         if (!tagName.empty())
                         {
                             if (tagName.starts_with("?"))
                                 tagName = tagName.substr(1);
                             tagName = tagName + ">" + typeSeparator + "-1";
-                            m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
-                            m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
-                            m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+                            m_editor->Scintilla().AutoCSetAutoHide(TRUE);
+                            m_editor->Scintilla().AutoCSetSeparator(static_cast<uptr_t>(wordSeparator));
+                            m_editor->Scintilla().AutoCSetTypeSeparator(static_cast<uptr_t>(typeSeparator));
                             if (CTheme::Instance().IsDarkTheme())
-                                m_editor->Call(SCI_AUTOCSETOPTIONS, SC_AUTOCOMPLETE_FIXED_SIZE);
-                            m_editor->Call(SCI_AUTOCSHOW, CUnicodeUtils::StdGetUTF8(rawPath).size(), reinterpret_cast<LPARAM>(tagName.c_str()));
+                                m_editor->Scintilla().AutoCSetOptions(Scintilla::AutoCompleteOption::FixedSize);
+                            m_editor->Scintilla().AutoCShow(CUnicodeUtils::StdGetUTF8(rawPath).size(), tagName.c_str());
                             SetWindowStylesForAutocompletionPopup();
                             return;
                         }
@@ -762,10 +762,10 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
     }
     if (word.empty() && pos > 2)
     {
-        if ((m_editor->Call(SCI_GETCHARAT, pos - 1) == ' ') && (m_editor->Call(SCI_GETCHARAT, pos - 2) != ' '))
+        if ((m_editor->Scintilla().CharAt(pos - 1) == ' ') && (m_editor->Scintilla().CharAt(pos - 2) != ' '))
         {
-            auto startPos = m_editor->Call(SCI_WORDSTARTPOSITION, pos - 2, true);
-            auto endPos   = m_editor->Call(SCI_WORDENDPOSITION, pos - 2, true);
+            auto startPos = m_editor->Scintilla().WordStartPosition(pos - 2, true);
+            auto endPos   = m_editor->Scintilla().WordEndPosition(pos - 2, true);
             word          = m_editor->GetTextRange(startPos, endPos);
 
             if (!word.empty())
@@ -790,23 +790,23 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                     }
                     if (!sAutoCompleteString.empty())
                     {
-                        m_editor->Call(SCI_AUTOCSETAUTOHIDE, FALSE);
-                        m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
-                        m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+                        m_editor->Scintilla().AutoCSetAutoHide(FALSE);
+                        m_editor->Scintilla().AutoCSetSeparator(static_cast<uptr_t>(wordSeparator));
+                        m_editor->Scintilla().AutoCSetTypeSeparator(static_cast<uptr_t>(typeSeparator));
                         if (CTheme::Instance().IsDarkTheme())
-                            m_editor->Call(SCI_AUTOCSETOPTIONS, SC_AUTOCOMPLETE_FIXED_SIZE);
-                        m_editor->Call(SCI_AUTOCSHOW, word.size() + 1, reinterpret_cast<sptr_t>(sAutoCompleteString.c_str()));
+                            m_editor->Scintilla().AutoCSetOptions(Scintilla::AutoCompleteOption::FixedSize);
+                        m_editor->Scintilla().AutoCShow(word.size() + 1, sAutoCompleteString.c_str());
                         SetWindowStylesForAutocompletionPopup();
                     }
                     else
-                        m_editor->Call(SCI_AUTOCCANCEL);
+                        m_editor->Scintilla().AutoCCancel();
                 }
                 else
-                    m_editor->Call(SCI_AUTOCCANCEL);
+                    m_editor->Scintilla().AutoCCancel();
             }
         }
         else
-            m_editor->Call(SCI_AUTOCCANCEL);
+            m_editor->Scintilla().AutoCCancel();
     }
     else if (CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) && word.size() > 1)
     {
@@ -850,7 +850,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             }
         }
         if (wordSet.empty())
-            m_editor->Call(SCI_AUTOCCANCEL);
+            m_editor->Scintilla().AutoCCancel();
         else
         {
             std::string sAutoCompleteList;
@@ -861,12 +861,12 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             if (sAutoCompleteList.size() > 1)
                 sAutoCompleteList[sAutoCompleteList.size() - 1] = 0;
 
-            m_editor->Call(SCI_AUTOCSETAUTOHIDE, TRUE);
-            m_editor->Call(SCI_AUTOCSETSEPARATOR, static_cast<uptr_t>(wordSeparator));
-            m_editor->Call(SCI_AUTOCSETTYPESEPARATOR, static_cast<uptr_t>(typeSeparator));
+            m_editor->Scintilla().AutoCSetAutoHide(TRUE);
+            m_editor->Scintilla().AutoCSetSeparator(static_cast<uptr_t>(wordSeparator));
+            m_editor->Scintilla().AutoCSetTypeSeparator(static_cast<uptr_t>(typeSeparator));
             if (CTheme::Instance().IsDarkTheme())
-                m_editor->Call(SCI_AUTOCSETOPTIONS, SC_AUTOCOMPLETE_FIXED_SIZE);
-            m_editor->Call(SCI_AUTOCSHOW, word.size(), reinterpret_cast<sptr_t>(sAutoCompleteList.c_str()));
+                m_editor->Scintilla().AutoCSetOptions(Scintilla::AutoCompleteOption::FixedSize);
+            m_editor->Scintilla().AutoCShow(word.size(), sAutoCompleteList.c_str());
             SetWindowStylesForAutocompletionPopup();
         }
     }
@@ -884,7 +884,7 @@ void CAutoComplete::MarkSnippetPositions(bool clearOnly)
 {
     if (m_snippetPositions.empty())
         return;
-    m_editor->Call(SCI_SETINDICATORCURRENT, INDIC_SNIPPETPOS);
+    m_editor->Scintilla().SetIndicatorCurrent(INDIC_SNIPPETPOS);
 
     Sci_Position firstPos = static_cast<Sci_Position>(INT64_MAX);
     Sci_Position lastPos  = 0;
@@ -899,10 +899,10 @@ void CAutoComplete::MarkSnippetPositions(bool clearOnly)
             lastPos  = max(pos, lastPos);
         }
     }
-    auto docLen        = m_editor->Call(SCI_GETLENGTH);
+    auto docLen        = m_editor->Scintilla().Length();
     auto startClearPos = max(0, firstPos - 100);
     auto endClearPos   = min(lastPos - firstPos + 200, docLen - startClearPos);
-    m_editor->Call(SCI_INDICATORCLEARRANGE, startClearPos, endClearPos);
+    m_editor->Scintilla().IndicatorClearRange(startClearPos, endClearPos);
     if (clearOnly)
         return;
     for (const auto& [id, vec] : m_snippetPositions)
@@ -916,7 +916,7 @@ void CAutoComplete::MarkSnippetPositions(bool clearOnly)
             auto a = *it;
             ++it;
             auto b = *it;
-            m_editor->Call(SCI_INDICATORFILLRANGE, a, b - a);
+            m_editor->Scintilla().IndicatorFillRange(a, b - a);
         }
     }
 }
@@ -1001,8 +1001,8 @@ LRESULT CAutoCompleteConfigDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPar
             m_resizer.UseSizeGrip(true);
 
             m_scintilla.SetupLexerForLang("Snippets");
-            m_scintilla.Call(SCI_SETEOLMODE, SC_EOL_LF);
-            m_scintilla.Call(SCI_SETUSETABS, 1);
+            m_scintilla.Scintilla().SetEOLMode(Scintilla::EndOfLine::Lf);
+            m_scintilla.Scintilla().SetUseTabs(true);
 
             DialogEnableWindow(IDC_DELETE, false);
 
@@ -1067,7 +1067,7 @@ LRESULT CAutoCompleteConfigDlg::DoCommand(int id, int msg)
                 auto snippetName = GetDlgItemText(IDC_SNIPPETNAME);
                 if (snippetName && snippetName[0])
                 {
-                    auto        lineCount = m_scintilla.Call(SCI_GETLINECOUNT);
+                    auto        lineCount = m_scintilla.Scintilla().LineCount();
                     std::string snippet;
                     for (sptr_t lineNumber = 0; lineNumber < lineCount; ++lineNumber)
                     {
@@ -1178,7 +1178,7 @@ LRESULT CAutoCompleteConfigDlg::DoCommand(int id, int msg)
             if (msg == LBN_SELCHANGE)
             {
                 SetDlgItemText(*this, IDC_SNIPPETNAME, L"");
-                m_scintilla.Call(SCI_CLEARALL);
+                m_scintilla.Scintilla().ClearAll();
 
                 auto hSnippetList = GetDlgItem(*this, IDC_SNIPPETLIST);
                 auto curSel       = ListBox_GetCurSel(hSnippetList);
@@ -1207,20 +1207,20 @@ LRESULT CAutoCompleteConfigDlg::DoCommand(int id, int msg)
                             {
                                 if (c == '\t')
                                 {
-                                    m_scintilla.Call(SCI_TAB);
+                                    m_scintilla.Scintilla().Tab();
                                 }
                                 else if (c == '\n')
                                 {
-                                    m_scintilla.Call(SCI_NEWLINE);
+                                    m_scintilla.Scintilla().NewLine();
                                 }
                                 else if (c == '\b')
                                 {
-                                    m_scintilla.Call(SCI_DELETEBACK);
+                                    m_scintilla.Scintilla().DeleteBack();
                                 }
                                 else
                                 {
                                     char text[] = {c, 0};
-                                    m_scintilla.Call(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(text));
+                                    m_scintilla.Scintilla().ReplaceSel(text);
                                 }
                             }
                         }

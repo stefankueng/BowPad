@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 class CCmdLineDuplicate : public ICommand
 {
 public:
-
-    CCmdLineDuplicate(void * obj) : ICommand(obj)
+    CCmdLineDuplicate(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -31,7 +31,7 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_SELECTIONDUPLICATE);
+        Scintilla().SelectionDuplicate();
         return true;
     }
 
@@ -41,8 +41,8 @@ public:
 class CCmdLineSplit : public ICommand
 {
 public:
-
-    CCmdLineSplit(void * obj) : ICommand(obj)
+    CCmdLineSplit(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -50,19 +50,19 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_TARGETFROMSELECTION);
-        ScintillaCall(SCI_LINESSPLIT);
+        Scintilla().TargetFromSelection();
+        Scintilla().LinesSplit(0);
         return true;
     }
 
-     UINT GetCmdId() override { return cmdLineSplit; }
+    UINT GetCmdId() override { return cmdLineSplit; }
 };
 
 class CCmdLineJoin : public ICommand
 {
 public:
-
-    CCmdLineJoin(void * obj) : ICommand(obj)
+    CCmdLineJoin(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -70,8 +70,8 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_TARGETFROMSELECTION);
-        ScintillaCall(SCI_LINESJOIN);
+        Scintilla().TargetFromSelection();
+        Scintilla().LinesJoin();
         return true;
     }
 
@@ -81,8 +81,8 @@ public:
 class CCmdLineUp : public ICommand
 {
 public:
-
-    CCmdLineUp(void * obj) : ICommand(obj)
+    CCmdLineUp(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -90,7 +90,7 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_MOVESELECTEDLINESUP);
+        Scintilla().MoveSelectedLinesUp();
         return true;
     }
 
@@ -100,8 +100,8 @@ public:
 class CCmdLineDown : public ICommand
 {
 public:
-
-    CCmdLineDown(void * obj) : ICommand(obj)
+    CCmdLineDown(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -109,7 +109,7 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_MOVESELECTEDLINESDOWN);
+        Scintilla().MoveSelectedLinesDown();
         return true;
     }
 

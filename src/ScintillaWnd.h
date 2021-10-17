@@ -22,6 +22,8 @@
 #include "ScrollTool.h"
 #include "AnimationManager.h"
 #include "../ext/scintilla/include/ILexer.h"
+#include "../ext/scintilla/include/ScintillaTypes.h"
+#include "../ext/scintilla/include/ScintillaCall.h"
 
 #include <vector>
 #include <unordered_map>
@@ -84,14 +86,7 @@ public:
     bool InitScratch(HINSTANCE hInst);
     void StartupDone() { m_eraseBkgnd = false; }
 
-    sptr_t Call(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0) const
-    {
-        return m_pSciMsg(m_pSciWndData, iMessage, wParam, lParam);
-    }
-    sptr_t ConstCall(unsigned int iMessage, uptr_t wParam = 0, sptr_t lParam = 0) const
-    {
-        return m_pSciMsg(m_pSciWndData, iMessage, wParam, lParam);
-    }
+    Scintilla::ScintillaCall& Scintilla() const { return m_scintilla; }
 
     void        UpdateLineNumberWidth() const;
     void        SaveCurrentPos(CPosData& pos);
@@ -112,8 +107,8 @@ public:
     void        GotoLine(sptr_t line);
     void        Center(sptr_t posStart, sptr_t posEnd);
     void        SetTabSettings(TabSpace ts) const;
-    void        SetReadDirection(ReadDirection rd) const;
-    void        SetEOLType(int eolType) const;
+    void        SetReadDirection(Scintilla::Bidirectional rd) const;
+    void        SetEOLType(Scintilla::EndOfLine eolType) const;
     void        AppendText(sptr_t len, const char* buf) const;
     std::string GetLine(sptr_t line) const;
     std::string GetTextRange(Sci_Position startPos, Sci_Position endPos) const;
@@ -138,7 +133,7 @@ protected:
     void SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF backSel) const;
 
     bool                                   GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const;
-    FindResult                             FindText(const char* text, sptr_t start, sptr_t end, int flags) const;
+    FindResult                             FindText(const char* text, sptr_t start, sptr_t end, Scintilla::FindOption flags) const;
     FindResult                             FindOpenTag(const std::string& tagName, sptr_t start, sptr_t end) const;
     sptr_t                                 FindCloseAngle(sptr_t startPosition, sptr_t endPosition) const;
     FindResult                             FindCloseTag(const std::string& tagName, sptr_t start, sptr_t end) const;
@@ -151,23 +146,22 @@ protected:
     void BookmarkToggle(sptr_t lineNo);
 
 private:
-    SciFnDirect       m_pSciMsg;
-    sptr_t            m_pSciWndData;
-    CDocScroll        m_docScroll;
-    CScrollTool       m_scrollTool;
-    sptr_t            m_selTextMarkerCount;
-    bool              m_bCursorShown;
-    bool              m_bScratch;
-    bool              m_eraseBkgnd;
-    int               m_cursorTimeout;
-    bool              m_bInFolderMargin;
-    bool              m_hasConsolas;
-    sptr_t            m_lineToScrollToAfterPaint;
-    sptr_t            m_wrapOffsetToScrollToAfterPaint;
-    int               m_lineToScrollToAfterPaintCounter;
-    sptr_t            m_lastMousePos;
-    AnimationVariable m_animVarGrayFore;
-    AnimationVariable m_animVarGrayBack;
-    AnimationVariable m_animVarGraySel;
-    AnimationVariable m_animVarGrayLineNr;
+    mutable Scintilla::ScintillaCall m_scintilla;
+    CDocScroll                       m_docScroll;
+    CScrollTool                      m_scrollTool;
+    sptr_t                           m_selTextMarkerCount;
+    bool                             m_bCursorShown;
+    bool                             m_bScratch;
+    bool                             m_eraseBkgnd;
+    int                              m_cursorTimeout;
+    bool                             m_bInFolderMargin;
+    bool                             m_hasConsolas;
+    sptr_t                           m_lineToScrollToAfterPaint;
+    sptr_t                           m_wrapOffsetToScrollToAfterPaint;
+    int                              m_lineToScrollToAfterPaintCounter;
+    sptr_t                           m_lastMousePos;
+    AnimationVariable                m_animVarGrayFore;
+    AnimationVariable                m_animVarGrayBack;
+    AnimationVariable                m_animVarGraySel;
+    AnimationVariable                m_animVarGrayLineNr;
 };

@@ -76,7 +76,7 @@ public:
     {
         if (UI_PKEY_BooleanValue == key)
             return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue,
-                                             ScintillaCall(SCI_GETWRAPMODE) > 0, pPropVarNewValue);
+                                             Scintilla().WrapMode() > Scintilla::Wrap::None, pPropVarNewValue);
         return E_NOTIMPL;
     }
 };

@@ -338,18 +338,18 @@ void ShowFileSaveError(HWND hWnd, const std::wstring& fileName, LPCWSTR msg)
     MessageBox(hWnd, CStringUtils::Format(rSaveErr, fileName.c_str(), msg).c_str(), static_cast<LPCWSTR>(rTitle), MB_ICONERROR);
 }
 
-void SetEOLType(CScintillaWnd& edit, const CDocument& doc)
+void SetEOLType(const CScintillaWnd& edit, const CDocument& doc)
 {
     switch (doc.m_format)
     {
         case EOLFormat::Win_Format:
-            edit.SetEOLType(SC_EOL_CRLF);
+            edit.SetEOLType(Scintilla::EndOfLine::CrLf);
             break;
         case EOLFormat::Unix_Format:
-            edit.SetEOLType(SC_EOL_LF);
+            edit.SetEOLType(Scintilla::EndOfLine::Lf);
             break;
         case EOLFormat::Mac_Format:
-            edit.SetEOLType(SC_EOL_CR);
+            edit.SetEOLType(Scintilla::EndOfLine::Cr);
             break;
         default:
             break;
@@ -475,18 +475,18 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
 #endif
 
     // Setup our scratch scintilla control to load the data
-    m_scratchScintilla.Call(SCI_SETSTATUS, SC_STATUS_OK); // reset error status
-    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
-    bool ro = m_scratchScintilla.Call(SCI_GETREADONLY) != 0;
+    m_scratchScintilla.Scintilla().SetStatus(Scintilla::Status::Ok); // reset error status
+    m_scratchScintilla.Scintilla().SetDocPointer(nullptr);
+    bool ro = m_scratchScintilla.Scintilla().ReadOnly() != 0;
     if (ro)
-        m_scratchScintilla.Call(SCI_SETREADONLY, false); // we need write access
-    m_scratchScintilla.Call(SCI_SETUNDOCOLLECTION, 0);
-    m_scratchScintilla.Call(SCI_CLEARALL);
-    m_scratchScintilla.Call(SCI_SETCODEPAGE, CP_UTF8);
-    int docOptions = SC_DOCUMENTOPTION_DEFAULT;
+        m_scratchScintilla.Scintilla().SetReadOnly(false); // we need write access
+    m_scratchScintilla.Scintilla().SetUndoCollection(false);
+    m_scratchScintilla.Scintilla().ClearAll();
+    m_scratchScintilla.Scintilla().SetCodePage(CP_UTF8);
+    Scintilla::DocumentOption docOptions = Scintilla::DocumentOption::Default;
     if (bufferSizeRequested > INT_MAX)
-        docOptions = SC_DOCUMENTOPTION_TEXT_LARGE | SC_DOCUMENTOPTION_STYLES_NONE;
-    Scintilla::ILoader* pdocLoad = reinterpret_cast<Scintilla::ILoader*>(m_scratchScintilla.Call(SCI_CREATELOADER, static_cast<uptr_t>(bufferSizeRequested), docOptions));
+        docOptions = Scintilla::DocumentOption::TextLarge | Scintilla::DocumentOption::StylesNone;
+    Scintilla::ILoader* pdocLoad = static_cast<Scintilla::ILoader*>(m_scratchScintilla.Scintilla().CreateLoader(static_cast<uptr_t>(bufferSizeRequested), docOptions));
     if (pdocLoad == nullptr)
     {
         ShowFileLoadError(hWnd, path,
@@ -555,16 +555,16 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     if (doc.m_format == EOLFormat::Unknown_Format)
         doc.m_format = EOLFormat::Win_Format;
 
-    auto loadedDoc = reinterpret_cast<sptr_t>(pdocLoad->ConvertToDocument()); // loadedDoc has reference count 1
-    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, loadedDoc);                 // doc in scratch has reference count 2 (loadedDoc 1, added one)
-    m_scratchScintilla.Call(SCI_SETUNDOCOLLECTION, 1);
-    m_scratchScintilla.Call(SCI_EMPTYUNDOBUFFER);
-    m_scratchScintilla.Call(SCI_SETSAVEPOINT);
+    auto loadedDoc = pdocLoad->ConvertToDocument();          // loadedDoc has reference count 1
+    m_scratchScintilla.Scintilla().SetDocPointer(loadedDoc); // doc in scratch has reference count 2 (loadedDoc 1, added one)
+    m_scratchScintilla.Scintilla().SetUndoCollection(true);
+    m_scratchScintilla.Scintilla().EmptyUndoBuffer();
+    m_scratchScintilla.Scintilla().SetSavePoint();
     SetEOLType(m_scratchScintilla, doc);
     if (ro || doc.m_bIsReadonly || doc.m_bIsWriteProtected)
-        m_scratchScintilla.Call(SCI_SETREADONLY, true);
-    doc.m_document = m_scratchScintilla.Call(SCI_GETDOCPOINTER); // doc.m_document has reference count of 2
-    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);            // now doc.m_document has reference count of 1, and the scratch does not hold any doc anymore
+        m_scratchScintilla.Scintilla().SetReadOnly(true);
+    doc.m_document = m_scratchScintilla.Scintilla().DocPointer(); // doc.m_document has reference count of 2
+    m_scratchScintilla.Scintilla().SetDocPointer(nullptr);        // now doc.m_document has reference count of 1, and the scratch does not hold any doc anymore
 
     return doc;
 }
@@ -784,10 +784,10 @@ bool CDocumentManager::SaveDoc(HWND hWnd, const std::wstring& path, const CDocum
         return false;
     }
 
-    m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-    size_t lengthDoc = m_scratchScintilla.Call(SCI_GETLENGTH);
+    m_scratchScintilla.Scintilla().SetDocPointer(doc.m_document);
+    size_t lengthDoc = m_scratchScintilla.Scintilla().Length();
     // get characters directly from Scintilla buffer
-    char*        buf = reinterpret_cast<char*>(m_scratchScintilla.Call(SCI_GETCHARACTERPOINTER));
+    char*        buf = static_cast<char*>(m_scratchScintilla.Scintilla().CharacterPointer());
     bool         ok  = false;
     std::wstring err;
     auto         encoding = doc.m_encoding;
@@ -886,8 +886,8 @@ bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved) cons
 
     if (SaveDoc(hWnd, doc.m_path, doc))
     {
-        m_scratchScintilla.Call(SCI_SETSAVEPOINT);
-        m_scratchScintilla.Call(SCI_SETDOCPOINTER, 0, 0);
+        m_scratchScintilla.Scintilla().SetSavePoint();
+        m_scratchScintilla.Scintilla().SetDocPointer(nullptr);
         if (doc.m_encodingSaving != -1)
         {
             doc.m_encoding       = doc.m_encodingSaving;
@@ -972,6 +972,6 @@ DocID CDocumentManager::GetIdForPath(const std::wstring& path) const
 void CDocumentManager::RemoveDocument(DocID id)
 {
     const auto& doc = GetDocumentFromID(id);
-    m_scratchScintilla.Call(SCI_RELEASEDOCUMENT, 0, doc.m_document);
+    m_scratchScintilla.Scintilla().ReleaseDocument(doc.m_document);
     m_documents.erase(id);
 }

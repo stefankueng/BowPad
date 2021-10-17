@@ -90,7 +90,7 @@ private:
     void        GetFilesWithSameName(const std::wstring& targetPath, std::vector<std::wstring>& matchingFiles) const;
     static bool FindFile(const std::wstring& fileToFind, const std::vector<std::wstring>& foldersToSearch, std::wstring& foundPath);
     static bool ParseInclude(const std::wstring& raw, std::wstring& filename, RelatedType& incType);
-    bool        FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf, int flags, std::string& foundText, size_t* lineNo) const;
+    bool        FindNext(CScintillaWnd& edit, Sci_TextToFind& ttf, Scintilla::FindOption flags, std::string& foundText, size_t* lineNo) const;
     static void AttachDocument(CScintillaWnd& edit, CDocument& doc);
     bool        GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<RelatedFileItem>& includes) const;
     static bool GetDefaultCorrespondingFileExtMappings(const std::wstring& from, std::wstring& to);

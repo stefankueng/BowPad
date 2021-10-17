@@ -31,7 +31,7 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_CLEAR);
+        Scintilla().Clear();
         return true;
     }
 
@@ -50,7 +50,7 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_SELECTALL);
+        Scintilla().SelectAll();
         return true;
     }
 
@@ -88,8 +88,6 @@ public:
     void AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
-
-private:
 };
 
 class CCmdConfigShortcuts : public ICommand

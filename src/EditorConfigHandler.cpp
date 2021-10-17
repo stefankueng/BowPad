@@ -71,53 +71,53 @@ void CEditorConfigHandler::ApplySettingsForPath(const std::wstring& path, CScint
             if ((doc.m_tabSpace == TabSpace::Default) && (strcmp(name, "indent_style") == 0))
             {
                 // tab / space
-                pScintilla->Call(SCI_SETUSETABS, strcmp(value, "tab") == 0);
+                pScintilla->Scintilla().SetUseTabs(strcmp(value, "tab") == 0);
             }
             else if ((doc.m_tabSpace == TabSpace::Default) && (strcmp(name, "indent_size") == 0))
             {
                 // tab / number
-                pScintilla->Call(SCI_SETINDENT, strcmp(value, "tab") == 0 ? 0 : atoi(value));
+                pScintilla->Scintilla().SetIndent(strcmp(value, "tab") == 0 ? 0 : atoi(value));
             }
             else if ((doc.m_tabSpace == TabSpace::Default) && (strcmp(name, "tab_width") == 0))
             {
                 // number
-                pScintilla->Call(SCI_SETTABWIDTH, atoi(value));
+                pScintilla->Scintilla().SetTabWidth(atoi(value));
             }
             else if (strcmp(name, "end_of_line") == 0)
             {
                 // lf / cr / crlf
                 if (strcmp(value, "lf") == 0)
                 {
-                    pScintilla->Call(SCI_SETEOLMODE, SC_EOL_LF);
+                    pScintilla->Scintilla().SetEOLMode(Scintilla::EndOfLine::Lf);
                     if (doc.m_format != EOLFormat::Unix_Format)
                     {
                         doc.m_format = EOLFormat::Unix_Format;
                         if (!doc.m_bIsReadonly && !doc.m_bIsWriteProtected)
-                            pScintilla->Call(SCI_CONVERTEOLS, SC_EOL_LF);
+                            pScintilla->Scintilla().ConvertEOLs(Scintilla::EndOfLine::Lf);
                     }
                 }
                 else if (strcmp(value, "cr") == 0)
                 {
-                    pScintilla->Call(SCI_SETEOLMODE, SC_EOL_CR);
+                    pScintilla->Scintilla().SetEOLMode(Scintilla::EndOfLine::Cr);
                     if (doc.m_format != EOLFormat::Mac_Format)
                     {
                         doc.m_format = EOLFormat::Mac_Format;
                         if (!doc.m_bIsReadonly && !doc.m_bIsWriteProtected)
-                            pScintilla->Call(SCI_CONVERTEOLS, SC_EOL_CR);
+                            pScintilla->Scintilla().ConvertEOLs(Scintilla::EndOfLine::Cr);
                     }
                 }
                 else if (strcmp(value, "crlf") == 0)
                 {
-                    pScintilla->Call(SCI_SETEOLMODE, SC_EOL_CRLF);
+                    pScintilla->Scintilla().SetEOLMode(Scintilla::EndOfLine::CrLf);
                     if (doc.m_format != EOLFormat::Win_Format)
                     {
                         doc.m_format = EOLFormat::Win_Format;
                         if (!doc.m_bIsReadonly && !doc.m_bIsWriteProtected)
-                            pScintilla->Call(SCI_CONVERTEOLS, SC_EOL_CRLF);
+                            pScintilla->Scintilla().ConvertEOLs(Scintilla::EndOfLine::CrLf);
                     }
                 }
 
-                //pScintilla->Call(SCI_CONVERTEOLS, eol);
+                //pScintilla->Scintilla().ConvertEOLs(eol);
             }
             else if ((strcmp(name, "charset") == 0) && (!keepEncoding))
             {

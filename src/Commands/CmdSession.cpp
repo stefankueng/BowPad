@@ -96,7 +96,7 @@ void CCmdSessionLoad::OnClose()
     int saveIndex = 0;
 
     auto savePosSettings = [&](int index, const CPosData& pos) {
-        settings.SetInt64(sessionSection(), CStringUtils::Format(L"selmode%d", index).c_str(), pos.m_nSelMode);
+        settings.SetInt64(sessionSection(), CStringUtils::Format(L"selmode%d", index).c_str(), static_cast<int>(pos.m_nSelMode));
         settings.SetInt64(sessionSection(), CStringUtils::Format(L"startpos%d", index).c_str(), pos.m_nStartPos);
         settings.SetInt64(sessionSection(), CStringUtils::Format(L"endpos%d", index).c_str(), pos.m_nEndPos);
         settings.SetInt64(sessionSection(), CStringUtils::Format(L"scrollwidth%d", index).c_str(), pos.m_nScrollWidth);
@@ -239,7 +239,7 @@ void CCmdSessionLoad::RestoreSavedSession()
             continue;
         auto& doc               = GetModDocumentFromID(docId);
         auto& pos               = doc.m_position;
-        pos.m_nSelMode          = static_cast<size_t>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"selmode%d", fileNum).c_str(), 0));
+        pos.m_nSelMode          = static_cast<Scintilla::SelectionMode>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"selmode%d", fileNum).c_str(), 0));
         pos.m_nStartPos         = static_cast<size_t>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"startpos%d", fileNum).c_str(), 0));
         pos.m_nEndPos           = static_cast<size_t>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"endpos%d", fileNum).c_str(), 0));
         pos.m_nScrollWidth      = static_cast<size_t>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"scrollwidth%d", fileNum).c_str(), 0));
@@ -248,7 +248,7 @@ void CCmdSessionLoad::RestoreSavedSession()
         pos.m_nWrapLineOffset   = static_cast<size_t>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"wraplineoffset%d", fileNum).c_str(), 0));
         pos.m_lastStyleLine     = static_cast<size_t>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"laststyleline%d", fileNum).c_str(), 0));
         doc.m_tabSpace          = static_cast<TabSpace>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0));
-        doc.m_readDir           = static_cast<ReadDirection>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0));
+        doc.m_readDir           = static_cast<Scintilla::Bidirectional>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0));
         auto folds              = settings.GetString(sessionSection(), CStringUtils::Format(L"foldlines%d", fileNum).c_str(), nullptr);
         pos.m_lineStateVector.clear();
         if (folds)

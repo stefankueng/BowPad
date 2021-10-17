@@ -36,6 +36,21 @@
 #include <uxtheme.h>
 #include <chrono>
 
+constexpr Scintilla::AutomaticFold operator|(Scintilla::AutomaticFold a, Scintilla::AutomaticFold b) noexcept
+{
+    return static_cast<Scintilla::AutomaticFold>(static_cast<int>(a) | static_cast<int>(b));
+}
+
+constexpr Scintilla::EOLAnnotationVisible operator|(Scintilla::EOLAnnotationVisible a, Scintilla::EOLAnnotationVisible b) noexcept
+{
+    return static_cast<Scintilla::EOLAnnotationVisible>(static_cast<int>(a) | static_cast<int>(b));
+}
+
+constexpr Scintilla::FoldLevel operator|(Scintilla::FoldLevel a, Scintilla::FoldLevel b) noexcept
+{
+    return static_cast<Scintilla::FoldLevel>(static_cast<int>(a) | static_cast<int>(b));
+}
+
 extern IUIFramework*        g_pFramework;
 extern std::string          g_sHighlightString;  // from CmdFindReplace
 extern sptr_t               g_searchMarkerCount; // from CmdFindReplace
@@ -68,8 +83,6 @@ COLORREF toRgba(COLORREF c, BYTE alpha = 255)
 
 CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     : CWindow(hInst)
-    , m_pSciMsg(nullptr)
-    , m_pSciWndData(0)
     , m_scrollTool(hInst)
     , m_selTextMarkerCount(0)
     , m_bCursorShown(true)
@@ -133,100 +146,107 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
         return false;
     }
 
-    m_pSciMsg     = reinterpret_cast<SciFnDirect>(SendMessage(*this, SCI_GETDIRECTFUNCTION, 0, 0));
-    m_pSciWndData = static_cast<sptr_t>(SendMessage(*this, SCI_GETDIRECTPOINTER, 0, 0));
+    m_scintilla.SetFnPtr(reinterpret_cast<Scintilla::FunctionDirect>(SendMessage(*this, SCI_GETDIRECTFUNCTION, 0, 0)),
+                         static_cast<sptr_t>(SendMessage(*this, SCI_GETDIRECTPOINTER, 0, 0)));
 
-    if (m_pSciMsg == nullptr || m_pSciWndData == 0)
+    if (!m_scintilla.IsValid())
         return false;
 
     m_docScroll.InitScintilla(this);
 
-    Call(SCI_SETMODEVENTMASK, SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO |
-                                  SC_PERFORMED_REDO | SC_MULTISTEPUNDOREDO | SC_LASTSTEPINUNDOREDO |
-                                  SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE | SC_MULTILINEUNDOREDO |
-                                  SC_MOD_CHANGEFOLD | SC_MOD_CHANGESTYLE);
+    m_scintilla.SetModEventMask(Scintilla::ModificationFlags::InsertText |
+                                Scintilla::ModificationFlags::DeleteText |
+                                Scintilla::ModificationFlags::Undo |
+                                Scintilla::ModificationFlags::Redo |
+                                Scintilla::ModificationFlags::MultiStepUndoRedo |
+                                Scintilla::ModificationFlags::LastStepInUndoRedo |
+                                Scintilla::ModificationFlags::BeforeInsert |
+                                Scintilla::ModificationFlags::BeforeDelete |
+                                Scintilla::ModificationFlags::MultilineUndoRedo |
+                                Scintilla::ModificationFlags::ChangeFold |
+                                Scintilla::ModificationFlags::ChangeStyle);
     bool bUseD2D = CIniSettings::Instance().GetInt64(L"View", L"d2d", 1) != 0;
-    Call(SCI_SETTECHNOLOGY, bUseD2D ? SC_TECHNOLOGY_DIRECTWRITERETAIN : SC_TECHNOLOGY_DEFAULT);
+    m_scintilla.SetTechnology(bUseD2D ? Scintilla::Technology::DirectWriteRetain : Scintilla::Technology::Default);
 
-    Call(SCI_SETMARGINMASKN, SC_MARGE_FOLDER, SC_MASK_FOLDERS);
-    Call(SCI_SETMARGINWIDTHN, SC_MARGE_FOLDER, CDPIAware::Instance().Scale(*this, 14));
-    Call(SCI_SETMARGINCURSORN, SC_MARGE_FOLDER, SC_CURSORARROW);
-    Call(SCI_SETAUTOMATICFOLD, SC_AUTOMATICFOLD_SHOW | SC_AUTOMATICFOLD_CHANGE);
+    m_scintilla.SetMarginMaskN(SC_MARGE_FOLDER, SC_MASK_FOLDERS);
+    m_scintilla.SetMarginWidthN(SC_MARGE_FOLDER, CDPIAware::Instance().Scale(*this, 14));
+    m_scintilla.SetMarginCursorN(SC_MARGE_FOLDER, Scintilla::CursorShape::Arrow);
+    m_scintilla.SetAutomaticFold(Scintilla::AutomaticFold::Show | Scintilla::AutomaticFold::Change);
 
-    Call(SCI_SETMARGINMASKN, SC_MARGE_SYMBOL, (1 << MARK_BOOKMARK));
-    Call(SCI_SETMARGINWIDTHN, SC_MARGE_SYMBOL, CDPIAware::Instance().Scale(*this, 14));
-    Call(SCI_SETMARGINCURSORN, SC_MARGE_SYMBOL, SC_CURSORARROW);
-    Call(SCI_MARKERSETALPHA, MARK_BOOKMARK, 70);
-    Call(SCI_MARKERDEFINE, MARK_BOOKMARK, SC_MARK_VERTICALBOOKMARK);
+    m_scintilla.SetMarginMaskN(SC_MARGE_SYMBOL, (1 << MARK_BOOKMARK));
+    m_scintilla.SetMarginWidthN(SC_MARGE_SYMBOL, CDPIAware::Instance().Scale(*this, 14));
+    m_scintilla.SetMarginCursorN(SC_MARGE_SYMBOL, Scintilla::CursorShape::Arrow);
+    m_scintilla.MarkerSetAlpha(MARK_BOOKMARK, static_cast<Scintilla::Alpha>(70));
+    m_scintilla.MarkerDefine(MARK_BOOKMARK, Scintilla::MarkerSymbol::VerticalBookmark);
 
-    Call(SCI_SETMARGINSENSITIVEN, SC_MARGE_FOLDER, true);
-    Call(SCI_SETMARGINSENSITIVEN, SC_MARGE_SYMBOL, true);
+    m_scintilla.SetMarginSensitiveN(SC_MARGE_FOLDER, true);
+    m_scintilla.SetMarginSensitiveN(SC_MARGE_SYMBOL, true);
 
-    Call(SCI_SETSCROLLWIDTHTRACKING, true);
-    Call(SCI_SETSCROLLWIDTH, 1); // default empty document: override default width
+    m_scintilla.SetScrollWidthTracking(true);
+    m_scintilla.SetScrollWidth(1); // default empty document: override default width
 
-    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDEROPEN, SC_MARK_BOXMINUS);
-    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDER, SC_MARK_BOXPLUS);
-    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDERSUB, SC_MARK_VLINE);
-    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDERTAIL, SC_MARK_LCORNERCURVE);
-    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDEREND, SC_MARK_BOXPLUSCONNECTED);
-    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDEROPENMID, SC_MARK_BOXMINUSCONNECTED);
-    Call(SCI_MARKERDEFINE, SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_TCORNERCURVE);
-    Call(SCI_MARKERENABLEHIGHLIGHT, 1);
-    Call(SCI_SETFOLDFLAGS, SC_FOLDFLAG_LINEAFTER_CONTRACTED);
-    Call(SCI_FOLDDISPLAYTEXTSETSTYLE, SC_FOLDDISPLAYTEXT_STANDARD);
+    m_scintilla.MarkerDefine(SC_MARKNUM_FOLDEROPEN, Scintilla::MarkerSymbol::BoxMinus);
+    m_scintilla.MarkerDefine(SC_MARKNUM_FOLDER, Scintilla::MarkerSymbol::BoxPlus);
+    m_scintilla.MarkerDefine(SC_MARKNUM_FOLDERSUB, Scintilla::MarkerSymbol::VLine);
+    m_scintilla.MarkerDefine(SC_MARKNUM_FOLDERTAIL, Scintilla::MarkerSymbol::LCornerCurve);
+    m_scintilla.MarkerDefine(SC_MARKNUM_FOLDEREND, Scintilla::MarkerSymbol::BoxPlusConnected);
+    m_scintilla.MarkerDefine(SC_MARKNUM_FOLDEROPENMID, Scintilla::MarkerSymbol::BoxMinusConnected);
+    m_scintilla.MarkerDefine(SC_MARKNUM_FOLDERMIDTAIL, Scintilla::MarkerSymbol::TCornerCurve);
+    m_scintilla.MarkerEnableHighlight(true);
+    m_scintilla.SetFoldFlags(Scintilla::FoldFlag::LineAfterContracted);
+    m_scintilla.FoldDisplayTextSetStyle(Scintilla::FoldDisplayTextStyle::Standard);
 
-    Call(SCI_SETWRAPVISUALFLAGS, SC_WRAPVISUALFLAG_NONE);
-    Call(SCI_SETWRAPMODE, SC_WRAP_NONE);
+    m_scintilla.SetWrapVisualFlags(Scintilla::WrapVisualFlag::None);
+    m_scintilla.SetWrapMode(Scintilla::Wrap::None);
 
-    Call(SCI_SETFONTQUALITY, SC_EFF_QUALITY_LCD_OPTIMIZED);
+    m_scintilla.SetFontQuality(Scintilla::FontQuality::QualityLcdOptimized);
 
-    Call(SCI_STYLESETVISIBLE, STYLE_CONTROLCHAR, TRUE);
+    m_scintilla.StyleSetVisible(STYLE_CONTROLCHAR, TRUE);
 
-    Call(SCI_SETCARETSTYLE, 1);
-    Call(SCI_SETCARETLINEVISIBLEALWAYS, true);
-    Call(SCI_SETCARETWIDTH, CDPIAware::Instance().Scale(*this, bUseD2D ? 2 : 1));
+    m_scintilla.SetCaretStyle(Scintilla::CaretStyle::Line);
+    m_scintilla.SetCaretLineVisibleAlways(true);
+    m_scintilla.SetCaretWidth(CDPIAware::Instance().Scale(*this, bUseD2D ? 2 : 1));
     if (CIniSettings::Instance().GetInt64(L"View", L"caretlineframe", 1) != 0)
-        Call(SCI_SETCARETLINEFRAME, CDPIAware::Instance().Scale(*this, 1));
-    Call(SCI_SETCARETLINEHIGHLIGHTSUBLINE, false);
-    Call(SCI_SETWHITESPACESIZE, CDPIAware::Instance().Scale(*this, 1));
-    Call(SCI_SETMULTIPLESELECTION, 1);
-    Call(SCI_SETMOUSESELECTIONRECTANGULARSWITCH, true);
-    Call(SCI_SETADDITIONALSELECTIONTYPING, true);
-    Call(SCI_SETADDITIONALCARETSBLINK, true);
-    Call(SCI_SETMULTIPASTE, SC_MULTIPASTE_EACH);
-    Call(SCI_SETVIRTUALSPACEOPTIONS, SCVS_RECTANGULARSELECTION);
+        m_scintilla.SetCaretLineFrame(CDPIAware::Instance().Scale(*this, 1));
+    m_scintilla.SetCaretLineHighlightSubLine(false);
+    m_scintilla.SetWhitespaceSize(CDPIAware::Instance().Scale(*this, 1));
+    m_scintilla.SetMultipleSelection(true);
+    m_scintilla.SetMouseSelectionRectangularSwitch(true);
+    m_scintilla.SetAdditionalSelectionTyping(true);
+    m_scintilla.SetAdditionalCaretsBlink(true);
+    m_scintilla.SetMultiPaste(Scintilla::MultiPaste::Each);
+    m_scintilla.SetVirtualSpaceOptions(Scintilla::VirtualSpace::RectangularSelection);
 
-    Call(SCI_SETMOUSEWHEELCAPTURES, 0);
+    m_scintilla.SetMouseWheelCaptures(false);
 
     // For Ctrl+C, use SCI_COPYALLOWLINE instead of SCI_COPY
-    Call(SCI_ASSIGNCMDKEY, 'C' + (SCMOD_CTRL << 16), SCI_COPYALLOWLINE);
+    m_scintilla.AssignCmdKey('C' + (SCMOD_CTRL << 16), SCI_COPYALLOWLINE);
 
     // change the home and end key to honor wrapped lines
     // but allow the line-home and line-end to be used with the ALT key
-    Call(SCI_ASSIGNCMDKEY, SCK_HOME, SCI_VCHOMEWRAP);
-    Call(SCI_ASSIGNCMDKEY, SCK_END, SCI_LINEENDWRAP);
-    Call(SCI_ASSIGNCMDKEY, SCK_HOME + (SCMOD_SHIFT << 16), SCI_VCHOMEWRAPEXTEND);
-    Call(SCI_ASSIGNCMDKEY, SCK_END + (SCMOD_SHIFT << 16), SCI_LINEENDWRAPEXTEND);
-    Call(SCI_ASSIGNCMDKEY, SCK_HOME + (SCMOD_ALT << 16), SCI_VCHOME);
-    Call(SCI_ASSIGNCMDKEY, SCK_END + (SCMOD_ALT << 16), SCI_LINEEND);
+    m_scintilla.AssignCmdKey(SCK_HOME, SCI_VCHOMEWRAP);
+    m_scintilla.AssignCmdKey(SCK_END, SCI_LINEENDWRAP);
+    m_scintilla.AssignCmdKey(SCK_HOME + (SCMOD_SHIFT << 16), SCI_VCHOMEWRAPEXTEND);
+    m_scintilla.AssignCmdKey(SCK_END + (SCMOD_SHIFT << 16), SCI_LINEENDWRAPEXTEND);
+    m_scintilla.AssignCmdKey(SCK_HOME + (SCMOD_ALT << 16), SCI_VCHOME);
+    m_scintilla.AssignCmdKey(SCK_END + (SCMOD_ALT << 16), SCI_LINEEND);
 
     // line cut for Ctrl+L
-    Call(SCI_ASSIGNCMDKEY, 'L' + (SCMOD_CTRL << 16), SCI_LINECUT);
+    m_scintilla.AssignCmdKey('L' + (SCMOD_CTRL << 16), SCI_LINECUT);
 
-    Call(SCI_SETBUFFEREDDRAW, bUseD2D ? false : true);
-    Call(SCI_SETPHASESDRAW, bUseD2D ? SC_PHASES_MULTIPLE : SC_PHASES_TWO);
-    Call(SCI_SETLAYOUTCACHE, SC_CACHE_PAGE);
+    m_scintilla.SetBufferedDraw(bUseD2D ? false : true);
+    m_scintilla.SetPhasesDraw(bUseD2D ? Scintilla::PhasesDraw::Multiple : Scintilla::PhasesDraw::Two);
+    m_scintilla.SetLayoutCache(Scintilla::LineCache::Page);
 
-    Call(SCI_USEPOPUP, 0); // no default context menu
+    m_scintilla.UsePopUp(Scintilla::PopUp::Never); // no default context menu
 
-    Call(SCI_SETMOUSEDWELLTIME, GetDoubleClickTime());
-    Call(SCI_CALLTIPSETPOSITION, 1);
+    m_scintilla.SetMouseDwellTime(GetDoubleClickTime());
+    m_scintilla.CallTipSetPosition(true);
 
-    Call(SCI_SETPASTECONVERTENDINGS, 1);
+    m_scintilla.SetPasteConvertEndings(true);
 
-    Call(SCI_SETCHARACTERCATEGORYOPTIMIZATION, 0x10000);
-    Call(SCI_SETACCESSIBILITY, SC_ACCESSIBILITY_ENABLED);
+    m_scintilla.SetCharacterCategoryOptimization(0x10000);
+    m_scintilla.SetAccessibility(Scintilla::Accessibility::Enabled);
 
     SetTabSettings(TabSpace::Default);
 
@@ -244,10 +264,10 @@ bool CScintillaWnd::InitScratch(HINSTANCE hInst)
     if (!*this)
         return false;
 
-    m_pSciMsg     = reinterpret_cast<SciFnDirect>(SendMessage(*this, SCI_GETDIRECTFUNCTION, 0, 0));
-    m_pSciWndData = static_cast<sptr_t>(SendMessage(*this, SCI_GETDIRECTPOINTER, 0, 0));
+    m_scintilla.SetFnPtr(reinterpret_cast<Scintilla::FunctionDirect>(SendMessage(*this, SCI_GETDIRECTFUNCTION, 0, 0)),
+                         static_cast<sptr_t>(SendMessage(*this, SCI_GETDIRECTPOINTER, 0, 0)));
 
-    if (m_pSciMsg == nullptr || m_pSciWndData == 0)
+    if (!m_scintilla.IsValid())
         return false;
 
     m_bScratch = true;
@@ -357,29 +377,29 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
             {
                 if ((GetKeyState(VK_CONTROL) & 0x8000) || (GetKeyState(VK_SHIFT) & 0x8000))
                 {
-                    Call(SCI_BEGINUNDOACTION);
+                    m_scintilla.BeginUndoAction();
                     if (GetKeyState(VK_CONTROL) & 0x8000)
                     {
                         // Ctrl+Return: insert a line above the current line
                         // Cursor-Up, End, Return
-                        Call(SCI_LINEUP);
+                        m_scintilla.LineUp();
                     }
-                    Call(SCI_LINEEND);
-                    Call(SCI_NEWLINE);
-                    Call(SCI_ENDUNDOACTION);
+                    m_scintilla.LineEnd();
+                    m_scintilla.NewLine();
+                    m_scintilla.EndUndoAction();
                     return 0;
                 }
-                char c  = static_cast<char>(Call(SCI_GETCHARAT, Call(SCI_GETCURRENTPOS) - 1));
-                char c1 = static_cast<char>(Call(SCI_GETCHARAT, Call(SCI_GETCURRENTPOS)));
+                char c  = static_cast<char>(m_scintilla.CharAt(m_scintilla.CurrentPos() - 1));
+                char c1 = static_cast<char>(m_scintilla.CharAt(m_scintilla.CurrentPos()));
                 if ((c == '{') && (c1 == '}'))
                 {
-                    Call(SCI_NEWLINE);
-                    Call(SCI_BEGINUNDOACTION);
-                    Call(SCI_LINEUP);
-                    Call(SCI_LINEEND);
-                    Call(SCI_NEWLINE);
-                    Call(SCI_TAB);
-                    Call(SCI_ENDUNDOACTION);
+                    m_scintilla.NewLine();
+                    m_scintilla.BeginUndoAction();
+                    m_scintilla.LineUp();
+                    m_scintilla.LineEnd();
+                    m_scintilla.NewLine();
+                    m_scintilla.Tab();
+                    m_scintilla.EndUndoAction();
                     bEatNextTabOrEnterKey = true;
                     return 0;
                 }
@@ -405,7 +425,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                 SetTimer(*this, TIM_HIDECURSOR, elapse, nullptr);
             if (!m_bCursorShown)
             {
-                Call(SCI_SETCURSOR, static_cast<uptr_t>(-1));
+                m_scintilla.SetCursor(Scintilla::CursorShape::Normal);
                 m_bCursorShown = true;
             }
             if (uMsg == WM_VSCROLL)
@@ -427,12 +447,12 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                         si.fMask      = SIF_ALL;
                         CoolSB_GetScrollInfo(*this, SB_VERT, &si);
 
-                        auto  lineCount = Call(SCI_GETLINECOUNT);
+                        auto  lineCount = m_scintilla.LineCount();
                         auto  w         = m_scrollTool.GetTextWidth(CStringUtils::Format(L"Line: %lld", lineCount).c_str());
                         POINT thumbPoint{};
                         thumbPoint.x = thumbRect.right - w;
                         thumbPoint.y = thumbRect.top + ((thumbRect.bottom - thumbRect.top) * si.nTrackPos) / (si.nMax - si.nMin);
-                        auto docLine = Call(SCI_DOCLINEFROMVISIBLE, si.nTrackPos);
+                        auto docLine = m_scintilla.DocLineFromVisible(si.nTrackPos);
                         m_scrollTool.Init();
                         DarkModeHelper::Instance().AllowDarkModeForWindow(m_scrollTool, CTheme::Instance().IsDarkTheme());
                         SetWindowTheme(m_scrollTool, L"Explorer", nullptr);
@@ -450,9 +470,9 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                 GetClientRect(*this, &rc);
                 rc.right = rc.left;
                 for (int i = 0; i <= SC_MARGE_FOLDER; ++i)
-                    rc.right += static_cast<long>(Call(SCI_GETMARGINWIDTHN, i));
+                    rc.right += static_cast<long>(m_scintilla.MarginWidthN(i));
                 POINT pt       = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-                auto  mousePos = Call(SCI_POSITIONFROMPOINT, pt.x, pt.y);
+                auto  mousePos = m_scintilla.PositionFromPoint(pt.x, pt.y);
                 if (mousePos != m_lastMousePos)
                 {
                     SCNotification scn = {};
@@ -491,7 +511,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                                 SetupFoldingColors(RGB(gf, gf, gf),
                                                    RGB(gb, gb, gb),
                                                    RGB(sb, sb, sb));
-                                Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                                m_scintilla.StyleSetFore(STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
                             });
                         }
                         else
@@ -503,7 +523,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                             SetupFoldingColors(RGB(gf, gf, gf),
                                                RGB(gb, gb, gb),
                                                RGB(sb, sb, sb));
-                            Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                            m_scintilla.StyleSetFore(STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
                         }
 
                         m_bInFolderMargin   = true;
@@ -539,7 +559,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                                 SetupFoldingColors(RGB(gf, gf, gf),
                                                    RGB(gb, gb, gb),
                                                    RGB(sb, sb, sb));
-                                Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                                m_scintilla.StyleSetFore(STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
                             });
                         }
                         else
@@ -551,7 +571,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                             SetupFoldingColors(RGB(gf, gf, gf),
                                                RGB(gb, gb, gb),
                                                RGB(sb, sb, sb));
-                            Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                            m_scintilla.StyleSetFore(STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
                         }
                         m_bInFolderMargin = false;
                     }
@@ -562,9 +582,9 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                 GetClientRect(*this, &rc);
                 rc.right = rc.left;
                 for (int i = 0; i <= SC_MARGE_FOLDER; ++i)
-                    rc.right += static_cast<long>(Call(SCI_GETMARGINWIDTHN, i));
+                    rc.right += static_cast<long>(m_scintilla.MarginWidthN(i));
                 POINT          pt       = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-                auto           mousePos = Call(SCI_POSITIONFROMPOINT, pt.x, pt.y);
+                auto           mousePos = m_scintilla.PositionFromPoint(pt.x, pt.y);
                 SCNotification scn      = {};
                 scn.nmhdr.code          = SCN_BP_MOUSEMSG;
                 scn.position            = mousePos;
@@ -616,7 +636,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                         SetupFoldingColors(RGB(gf, gf, gf),
                                            RGB(gb, gb, gb),
                                            RGB(sb, sb, sb));
-                        Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                        m_scintilla.StyleSetFore(STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
                     });
                 }
                 else
@@ -628,7 +648,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                     SetupFoldingColors(RGB(gf, gf, gf),
                                        RGB(gb, gb, gb),
                                        RGB(sb, sb, sb));
-                    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
+                    m_scintilla.StyleSetFore(STYLE_LINENUMBER, CTheme::Instance().GetThemeColor(RGB(ln, ln, ln), true));
                 }
                 m_bInFolderMargin = false;
             }
@@ -662,7 +682,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                                 {
                                     m_bCursorShown = false;
                                     SetCursor(nullptr);
-                                    Call(SCI_SETCURSOR, static_cast<uptr_t>(-2));
+                                    m_scintilla.SetCursor(static_cast<Scintilla::CursorShape>(-2));
                                 }
                             }
                         }
@@ -683,12 +703,12 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
             if (!m_bCursorShown)
             {
                 SetCursor(nullptr);
-                Call(SCI_SETCURSOR, static_cast<uptr_t>(-2));
+                m_scintilla.SetCursor(static_cast<Scintilla::CursorShape>(-2));
             }
 
-            auto cur = Call(SCI_GETCURSOR);
-            if ((cur == 8) || (cur == 0))
-                Call(SCI_SETCURSOR, static_cast<uptr_t>(SC_CURSORNORMAL));
+            auto cur = m_scintilla.Cursor();
+            if ((cur == static_cast<Scintilla::CursorShape>(8)) || (cur == static_cast<Scintilla::CursorShape>(0)))
+                m_scintilla.SetCursor(Scintilla::CursorShape::Normal);
         }
         break;
         case WM_GESTURENOTIFY:
@@ -793,7 +813,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                         return 0;
                     }
                     case GID_TWOFINGERTAP:
-                        Call(SCI_SETZOOM, 0);
+                        m_scintilla.SetZoom(0);
                         //UpdateStatusBar(false);
                         break;
                     default:
@@ -816,13 +836,13 @@ void CScintillaWnd::UpdateLineNumberWidth() const
     bool bShowLineNumbers = CIniSettings::Instance().GetInt64(L"View", L"linenumbers", 1) != 0;
     if (!bShowLineNumbers)
     {
-        Call(SCI_SETMARGINWIDTHN, SC_MARGE_LINENUMBER, 0);
+        m_scintilla.SetMarginWidthN(SC_MARGE_LINENUMBER, 0);
         return;
     }
-    auto linesVisible = Call(SCI_LINESONSCREEN);
+    auto linesVisible = m_scintilla.LinesOnScreen();
     if (linesVisible)
     {
-        auto   firstVisibleLineVis = Call(SCI_GETFIRSTVISIBLELINE);
+        auto   firstVisibleLineVis = m_scintilla.FirstVisibleLine();
         auto   lastVisibleLineVis  = linesVisible + firstVisibleLineVis + 1;
         sptr_t i                   = 0;
         while (lastVisibleLineVis)
@@ -832,8 +852,8 @@ void CScintillaWnd::UpdateLineNumberWidth() const
         }
         i = max(i, 3);
         {
-            int pixelWidth = static_cast<int>(CDPIAware::Instance().Scale(*this, 8) + i * Call(SCI_TEXTWIDTH, STYLE_LINENUMBER, reinterpret_cast<LPARAM>("8")));
-            Call(SCI_SETMARGINWIDTHN, SC_MARGE_LINENUMBER, pixelWidth);
+            int pixelWidth = static_cast<int>(CDPIAware::Instance().Scale(*this, 8) + i * m_scintilla.TextWidth(STYLE_LINENUMBER, "8"));
+            m_scintilla.SetMarginWidthN(SC_MARGE_LINENUMBER, pixelWidth);
         }
     }
 }
@@ -846,28 +866,28 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
     // and reading the positions would be wrong.
     if (m_lineToScrollToAfterPaint == -1)
     {
-        auto firstVisibleLine   = Call(SCI_GETFIRSTVISIBLELINE);
-        pos.m_nFirstVisibleLine = Call(SCI_DOCLINEFROMVISIBLE, firstVisibleLine);
-        if (Call(SCI_GETWRAPMODE) != SC_WRAP_NONE)
-            pos.m_nWrapLineOffset = firstVisibleLine - Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
+        auto firstVisibleLine   = m_scintilla.FirstVisibleLine();
+        pos.m_nFirstVisibleLine = m_scintilla.DocLineFromVisible(firstVisibleLine);
+        if (m_scintilla.WrapMode() != Scintilla::Wrap::None)
+            pos.m_nWrapLineOffset = firstVisibleLine - m_scintilla.VisibleFromDocLine(pos.m_nFirstVisibleLine);
 
-        pos.m_nStartPos    = Call(SCI_GETANCHOR);
-        pos.m_nEndPos      = Call(SCI_GETCURRENTPOS);
-        pos.m_xOffset      = Call(SCI_GETXOFFSET);
-        pos.m_nSelMode     = Call(SCI_GETSELECTIONMODE);
-        pos.m_nScrollWidth = Call(SCI_GETSCROLLWIDTH);
+        pos.m_nStartPos    = m_scintilla.Anchor();
+        pos.m_nEndPos      = m_scintilla.CurrentPos();
+        pos.m_xOffset      = m_scintilla.XOffset();
+        pos.m_nSelMode     = m_scintilla.SelectionMode();
+        pos.m_nScrollWidth = m_scintilla.ScrollWidth();
 
         pos.m_lineStateVector.clear();
         pos.m_lastStyleLine             = 0;
         sptr_t contractedFoldHeaderLine = 0;
         do
         {
-            contractedFoldHeaderLine = static_cast<sptr_t>(Call(SCI_CONTRACTEDFOLDNEXT, contractedFoldHeaderLine));
+            contractedFoldHeaderLine = static_cast<sptr_t>(m_scintilla.ContractedFoldNext(contractedFoldHeaderLine));
             if (contractedFoldHeaderLine != -1)
             {
                 // Store contracted line
                 pos.m_lineStateVector.push_back(contractedFoldHeaderLine);
-                pos.m_lastStyleLine = max(pos.m_lastStyleLine, (sptr_t)Call(SCI_GETLASTCHILD, contractedFoldHeaderLine, -1));
+                pos.m_lastStyleLine = max(pos.m_lastStyleLine, (sptr_t)m_scintilla.LastChild(contractedFoldHeaderLine, (Scintilla::FoldLevel)-1));
                 // Start next search with next line
                 ++contractedFoldHeaderLine;
             }
@@ -885,47 +905,47 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     // otherwise restoring the folds won't work.
     if (!pos.m_lineStateVector.empty())
     {
-        auto endStyled = Call(SCI_GETENDSTYLED);
-        auto len       = Call(SCI_GETTEXTLENGTH);
+        auto endStyled = m_scintilla.EndStyled();
+        auto len       = m_scintilla.TextLength();
         if (endStyled < len && pos.m_lastStyleLine)
-            Call(SCI_COLOURISE, 0, Call(SCI_POSITIONFROMLINE, pos.m_lastStyleLine + 1));
+            m_scintilla.Colourise(0, m_scintilla.PositionFromLine(pos.m_lastStyleLine + 1));
     }
 
     for (const auto& foldLine : pos.m_lineStateVector)
     {
-        auto level = Call(SCI_GETFOLDLEVEL, foldLine);
+        auto level = m_scintilla.FoldLevel(foldLine);
 
         auto headerLine = 0;
-        if (level & SC_FOLDLEVELHEADERFLAG)
+        if ((level & Scintilla::FoldLevel::HeaderFlag) != Scintilla::FoldLevel::None)
             headerLine = static_cast<int>(foldLine);
         else
         {
-            headerLine = static_cast<int>(Call(SCI_GETFOLDPARENT, foldLine));
+            headerLine = static_cast<int>(m_scintilla.FoldParent(foldLine));
             if (headerLine == -1)
                 return;
         }
 
-        if (Call(SCI_GETFOLDEXPANDED, headerLine) != 0)
-            Call(SCI_TOGGLEFOLD, headerLine);
+        if (m_scintilla.FoldExpanded(headerLine) != 0)
+            m_scintilla.ToggleFold(headerLine);
     }
 
-    Call(SCI_GOTOPOS, 0);
+    m_scintilla.GotoPos(0);
 
-    Call(SCI_SETSELECTIONMODE, pos.m_nSelMode);
-    Call(SCI_SETANCHOR, pos.m_nStartPos);
-    Call(SCI_SETCURRENTPOS, pos.m_nEndPos);
-    Call(SCI_CANCEL);
-    auto wrapMode = Call(SCI_GETWRAPMODE);
-    if (wrapMode == SC_WRAP_NONE)
+    m_scintilla.SetSelectionMode(pos.m_nSelMode);
+    m_scintilla.SetAnchor(pos.m_nStartPos);
+    m_scintilla.SetCurrentPos(pos.m_nEndPos);
+    m_scintilla.Cancel();
+    auto wrapMode = m_scintilla.WrapMode();
+    if (wrapMode == Scintilla::Wrap::None)
     {
         // only offset if not wrapping, otherwise the offset isn't needed at all
-        Call(SCI_SETSCROLLWIDTH, pos.m_nScrollWidth);
-        Call(SCI_SETXOFFSET, pos.m_xOffset);
+        m_scintilla.SetScrollWidth(pos.m_nScrollWidth);
+        m_scintilla.SetXOffset(pos.m_xOffset);
     }
-    Call(SCI_CHOOSECARETX);
+    m_scintilla.ChooseCaretX();
 
-    auto lineToShow = Call(SCI_VISIBLEFROMDOCLINE, pos.m_nFirstVisibleLine);
-    if (wrapMode != SC_WRAP_NONE)
+    auto lineToShow = m_scintilla.VisibleFromDocLine(pos.m_nFirstVisibleLine);
+    if (wrapMode != Scintilla::Wrap::None)
     {
         // if wrapping is enabled, scrolling to a line won't work
         // properly until scintilla has painted the document, because
@@ -938,8 +958,8 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
         m_lineToScrollToAfterPaintCounter = 5;
     }
     else
-        Call(SCI_LINESCROLL, 0, lineToShow);
-    // call UpdateLineNumberWidth() here, just in case the SCI_LINESCROLL call
+        m_scintilla.LineScroll(0, lineToShow);
+    // call UpdateLineNumberWidth() here, just in case the SCI_LineScroll call
     // above does not scroll the window.
     UpdateLineNumberWidth();
 }
@@ -952,7 +972,7 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
 
     wchar_t localeName[100];
     GetUserDefaultLocaleName(localeName, _countof(localeName));
-    Call(SCI_SETFONTLOCALE, 0, reinterpret_cast<sptr_t>(const_cast<char*>(CUnicodeUtils::StdGetUTF8(localeName).c_str())));
+    m_scintilla.SetFontLocale(CUnicodeUtils::StdGetUTF8(localeName).c_str());
 
     // first set up only the default styles
     std::wstring defaultFont;
@@ -961,29 +981,29 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
     else
         defaultFont = L"Courier New";
     std::string sFontName = CUnicodeUtils::StdGetUTF8(CIniSettings::Instance().GetString(L"View", L"FontName", defaultFont.c_str()));
-    Call(SCI_STYLESETFONT, STYLE_DEFAULT, reinterpret_cast<LPARAM>(sFontName.c_str()));
+    m_scintilla.StyleSetFont(STYLE_DEFAULT, sFontName.c_str());
     bool bBold    = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
     bool bItalic  = !!CIniSettings::Instance().GetInt64(L"View", L"FontItalic", false);
     int  fontSize = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11));
-    Call(SCI_STYLESETBOLD, STYLE_DEFAULT, bBold);
-    Call(SCI_STYLESETITALIC, STYLE_DEFAULT, bItalic);
-    Call(SCI_STYLESETSIZE, STYLE_DEFAULT, fontSize);
-    Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0), true));
-    Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255), true));
+    m_scintilla.StyleSetBold(STYLE_DEFAULT, bBold);
+    m_scintilla.StyleSetItalic(STYLE_DEFAULT, bItalic);
+    m_scintilla.StyleSetSize(STYLE_DEFAULT, fontSize);
+    m_scintilla.StyleSetFore(STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0), true));
+    m_scintilla.StyleSetBack(STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255), true));
 
-    // now call SCI_STYLECLEARALL to copy the default style to all styles
-    Call(SCI_STYLECLEARALL);
+    // now call StyleClearAll to copy the default style to all styles
+    m_scintilla.StyleClearAll();
 
     // now set up the out own styles
     SetupDefaultStyles();
 
     // and now set the lexer styles
     Scintilla::ILexer5* lexer = nullptr;
-    Call(SCI_EOLANNOTATIONCLEARALL);
-    Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_HIDDEN);
+    m_scintilla.EOLAnnotationClearAll();
+    m_scintilla.EOLAnnotationSetVisible(Scintilla::EOLAnnotationVisible::Hidden);
 
     if (!lexerData.annotations.empty())
-        Call(SCI_EOLANNOTATIONSETVISIBLE, EOLANNOTATION_BOXED | EOLANNOTATION_ANGLE_CIRCLE);
+        m_scintilla.EOLAnnotationSetVisible(Scintilla::EOLAnnotationVisible::Boxed | Scintilla::EOLAnnotationVisible::AngleCircle);
 
     if (lexerData.name == "bp_simple")
     {
@@ -1013,36 +1033,36 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
     if (lexer == nullptr)
         lexer = CreateLexer(lexerData.name.c_str());
     assert(lexer);
-    Call(SCI_SETILEXER, 0, reinterpret_cast<sptr_t>(lexer));
+    m_scintilla.SetILexer(lexer);
 
     for (const auto& [propName, propValue] : lexerData.properties)
     {
-        Call(SCI_SETPROPERTY, reinterpret_cast<WPARAM>(propName.c_str()), reinterpret_cast<LPARAM>(propValue.c_str()));
+        m_scintilla.SetProperty(propName.c_str(), propValue.c_str());
     }
     for (const auto& [styleId, styleData] : lexerData.styles)
     {
-        Call(SCI_STYLESETFORE, styleId, theme.GetThemeColor(styleData.foregroundColor, true));
-        Call(SCI_STYLESETBACK, styleId, theme.GetThemeColor(styleData.backgroundColor, true));
+        m_scintilla.StyleSetFore(styleId, theme.GetThemeColor(styleData.foregroundColor, true));
+        m_scintilla.StyleSetBack(styleId, theme.GetThemeColor(styleData.backgroundColor, true));
         if (!styleData.fontName.empty())
-            Call(SCI_STYLESETFONT, styleId, reinterpret_cast<sptr_t>(CUnicodeUtils::StdGetUTF8(styleData.fontName).c_str()));
+            m_scintilla.StyleSetFont(styleId, CUnicodeUtils::StdGetUTF8(styleData.fontName).c_str());
 
         if ((styleData.fontStyle & Fontstyle_Bold) != 0)
-            Call(SCI_STYLESETBOLD, styleId, 1);
+            m_scintilla.StyleSetBold(styleId, true);
         if ((styleData.fontStyle & Fontstyle_Italic) != 0)
-            Call(SCI_STYLESETITALIC, styleId, 1);
+            m_scintilla.StyleSetItalic(styleId, true);
         if ((styleData.fontStyle & Fontstyle_Underlined) != 0)
-            Call(SCI_STYLESETUNDERLINE, styleId, 1);
+            m_scintilla.StyleSetUnderline(styleId, true);
 
         if (styleData.fontSize)
-            Call(SCI_STYLESETSIZE, styleId, styleData.fontSize);
+            m_scintilla.StyleSetSize(styleId, styleData.fontSize);
         if (styleData.eolFilled)
-            Call(SCI_STYLESETEOLFILLED, styleId, 1);
+            m_scintilla.StyleSetEOLFilled(styleId, true);
     }
     for (const auto& [keyWordId, keyWord] : keywords)
     {
-        Call(SCI_SETKEYWORDS, keyWordId - 1LL, reinterpret_cast<LPARAM>(keyWord.c_str()));
+        m_scintilla.SetKeyWords(keyWordId - 1LL, keyWord.c_str());
     }
-    Call(SCI_SETLINEENDTYPESALLOWED, Call(SCI_GETLINEENDTYPESSUPPORTED));
+    m_scintilla.SetLineEndTypesAllowed(static_cast<Scintilla::LineEndType>(m_scintilla.LineEndTypesSupported()));
     CCommandHandler::Instance().OnStylesSet();
 }
 
@@ -1055,65 +1075,65 @@ void CScintillaWnd::SetupDefaultStyles() const
     else
         defaultFont = L"Courier New";
     std::string sFontName = CUnicodeUtils::StdGetUTF8(CIniSettings::Instance().GetString(L"View", L"FontName", defaultFont.c_str()));
-    Call(SCI_STYLESETFONT, STYLE_LINENUMBER, reinterpret_cast<LPARAM>(sFontName.c_str()));
+    m_scintilla.StyleSetFont(STYLE_LINENUMBER, sFontName.c_str());
 
-    Call(SCI_STYLESETFORE, STYLE_LINENUMBER, theme.GetThemeColor(RGB(color_linenr_inactive, color_linenr_inactive, color_linenr_inactive), true));
-    Call(SCI_STYLESETBACK, STYLE_LINENUMBER, theme.GetThemeColor(RGB(230, 230, 230), true));
+    m_scintilla.StyleSetFore(STYLE_LINENUMBER, theme.GetThemeColor(RGB(color_linenr_inactive, color_linenr_inactive, color_linenr_inactive), true));
+    m_scintilla.StyleSetBack(STYLE_LINENUMBER, theme.GetThemeColor(RGB(230, 230, 230), true));
 
-    Call(SCI_INDICSETSTYLE, INDIC_SELECTION_MARK, INDIC_ROUNDBOX);
-    Call(SCI_INDICSETALPHA, INDIC_SELECTION_MARK, 50);
-    Call(SCI_INDICSETUNDER, INDIC_SELECTION_MARK, true);
-    Call(SCI_INDICSETFORE, INDIC_SELECTION_MARK, theme.GetThemeColor(RGB(0, 255, 0), true));
+    m_scintilla.IndicSetStyle(INDIC_SELECTION_MARK, Scintilla::IndicatorStyle::RoundBox);
+    m_scintilla.IndicSetAlpha(INDIC_SELECTION_MARK, static_cast<Scintilla::Alpha>(50));
+    m_scintilla.IndicSetUnder(INDIC_SELECTION_MARK, true);
+    m_scintilla.IndicSetFore(INDIC_SELECTION_MARK, theme.GetThemeColor(RGB(0, 255, 0), true));
 
-    Call(SCI_INDICSETSTYLE, INDIC_SNIPPETPOS, INDIC_ROUNDBOX);
-    Call(SCI_INDICSETALPHA, INDIC_SNIPPETPOS, 50);
-    Call(SCI_INDICSETOUTLINEALPHA, INDIC_SNIPPETPOS, 255);
-    Call(SCI_INDICSETUNDER, INDIC_SNIPPETPOS, true);
-    Call(SCI_INDICSETFORE, INDIC_SNIPPETPOS, theme.GetThemeColor(RGB(180, 180, 0), true));
+    m_scintilla.IndicSetStyle(INDIC_SNIPPETPOS, Scintilla::IndicatorStyle::RoundBox);
+    m_scintilla.IndicSetAlpha(INDIC_SNIPPETPOS, static_cast<Scintilla::Alpha>(50));
+    m_scintilla.IndicSetOutlineAlpha(INDIC_SNIPPETPOS, Scintilla::Alpha::Opaque);
+    m_scintilla.IndicSetUnder(INDIC_SNIPPETPOS, true);
+    m_scintilla.IndicSetFore(INDIC_SNIPPETPOS, theme.GetThemeColor(RGB(180, 180, 0), true));
 
-    Call(SCI_INDICSETSTYLE, INDIC_FINDTEXT_MARK, INDIC_ROUNDBOX);
-    Call(SCI_INDICSETALPHA, INDIC_FINDTEXT_MARK, theme.IsDarkTheme() ? 100 : 200);
-    Call(SCI_INDICSETUNDER, INDIC_FINDTEXT_MARK, true);
-    Call(SCI_INDICSETFORE, INDIC_FINDTEXT_MARK, theme.GetThemeColor(RGB(255, 255, 0), true));
+    m_scintilla.IndicSetStyle(INDIC_FINDTEXT_MARK, Scintilla::IndicatorStyle::RoundBox);
+    m_scintilla.IndicSetAlpha(INDIC_FINDTEXT_MARK, theme.IsDarkTheme() ? static_cast<Scintilla::Alpha>(100) : static_cast<Scintilla::Alpha>(200));
+    m_scintilla.IndicSetUnder(INDIC_FINDTEXT_MARK, true);
+    m_scintilla.IndicSetFore(INDIC_FINDTEXT_MARK, theme.GetThemeColor(RGB(255, 255, 0), true));
 
-    Call(SCI_INDICSETSTYLE, INDIC_URLHOTSPOT, INDIC_HIDDEN);
-    Call(SCI_INDICSETALPHA, INDIC_URLHOTSPOT, 5);
-    Call(SCI_INDICSETUNDER, INDIC_URLHOTSPOT, true);
-    Call(SCI_INDICSETHOVERSTYLE, INDIC_URLHOTSPOT, INDIC_DOTS);
-    Call(SCI_INDICSETHOVERFORE, INDIC_URLHOTSPOT, theme.GetThemeColor(RGB(0, 0, 255), true));
+    m_scintilla.IndicSetStyle(INDIC_URLHOTSPOT, Scintilla::IndicatorStyle::Hidden);
+    m_scintilla.IndicSetAlpha(INDIC_URLHOTSPOT, static_cast<Scintilla::Alpha>(5));
+    m_scintilla.IndicSetUnder(INDIC_URLHOTSPOT, true);
+    m_scintilla.IndicSetHoverStyle(INDIC_URLHOTSPOT, Scintilla::IndicatorStyle::Dots);
+    m_scintilla.IndicSetHoverFore(INDIC_URLHOTSPOT, theme.GetThemeColor(RGB(0, 0, 255), true));
 
-    Call(SCI_INDICSETSTYLE, INDIC_BRACEMATCH, INDIC_ROUNDBOX);
-    Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, 30);
-    Call(SCI_INDICSETOUTLINEALPHA, INDIC_BRACEMATCH, 0);
-    Call(SCI_INDICSETUNDER, INDIC_BRACEMATCH, true);
-    Call(SCI_INDICSETFORE, INDIC_BRACEMATCH, theme.GetThemeColor(RGB(0, 150, 0), true));
+    m_scintilla.IndicSetStyle(INDIC_BRACEMATCH, Scintilla::IndicatorStyle::RoundBox);
+    m_scintilla.IndicSetAlpha(INDIC_BRACEMATCH, static_cast<Scintilla::Alpha>(30));
+    m_scintilla.IndicSetOutlineAlpha(INDIC_BRACEMATCH, Scintilla::Alpha::Transparent);
+    m_scintilla.IndicSetUnder(INDIC_BRACEMATCH, true);
+    m_scintilla.IndicSetFore(INDIC_BRACEMATCH, theme.GetThemeColor(RGB(0, 150, 0), true));
 
-    Call(SCI_INDICSETSTYLE, INDIC_MISSPELLED, INDIC_SQUIGGLE);
-    Call(SCI_INDICSETFORE, INDIC_MISSPELLED, theme.GetThemeColor(RGB(255, 0, 0), true));
-    Call(SCI_INDICSETUNDER, INDIC_MISSPELLED, true);
-    Call(SCI_INDICSETSTYLE, INDIC_MISSPELLED_DEL, INDIC_SQUIGGLE);
-    Call(SCI_INDICSETFORE, INDIC_MISSPELLED_DEL, theme.GetThemeColor(RGB(100, 255, 0), true));
-    Call(SCI_INDICSETUNDER, INDIC_MISSPELLED_DEL, true);
+    m_scintilla.IndicSetStyle(INDIC_MISSPELLED, Scintilla::IndicatorStyle::Squiggle);
+    m_scintilla.IndicSetFore(INDIC_MISSPELLED, theme.GetThemeColor(RGB(255, 0, 0), true));
+    m_scintilla.IndicSetUnder(INDIC_MISSPELLED, true);
+    m_scintilla.IndicSetStyle(INDIC_MISSPELLED_DEL, Scintilla::IndicatorStyle::Squiggle);
+    m_scintilla.IndicSetFore(INDIC_MISSPELLED_DEL, theme.GetThemeColor(RGB(100, 255, 0), true));
+    m_scintilla.IndicSetUnder(INDIC_MISSPELLED_DEL, true);
 
-    Call(SCI_STYLESETFORE, STYLE_BRACELIGHT, theme.GetThemeColor(RGB(0, 150, 0), true));
-    Call(SCI_STYLESETBOLD, STYLE_BRACELIGHT, 1);
-    Call(SCI_STYLESETFORE, STYLE_BRACEBAD, theme.GetThemeColor(RGB(255, 0, 0), true));
-    Call(SCI_STYLESETBOLD, STYLE_BRACEBAD, 1);
+    m_scintilla.StyleSetFore(STYLE_BRACELIGHT, theme.GetThemeColor(RGB(0, 150, 0), true));
+    m_scintilla.StyleSetBold(STYLE_BRACELIGHT, true);
+    m_scintilla.StyleSetFore(STYLE_BRACEBAD, theme.GetThemeColor(RGB(255, 0, 0), true));
+    m_scintilla.StyleSetBold(STYLE_BRACEBAD, true);
 
-    Call(SCI_STYLESETFORE, STYLE_INDENTGUIDE, theme.GetThemeColor(RGB(200, 200, 200), true));
+    m_scintilla.StyleSetFore(STYLE_INDENTGUIDE, theme.GetThemeColor(RGB(200, 200, 200), true));
 
-    Call(SCI_INDICSETFORE, INDIC_TAGMATCH, theme.GetThemeColor(RGB(0x80, 0x00, 0xFF), true));
-    Call(SCI_INDICSETFORE, INDIC_TAGATTR, theme.GetThemeColor(RGB(0xFF, 0xFF, 0x00), true));
-    Call(SCI_INDICSETSTYLE, INDIC_TAGMATCH, INDIC_ROUNDBOX);
-    Call(SCI_INDICSETSTYLE, INDIC_TAGATTR, INDIC_ROUNDBOX);
-    Call(SCI_INDICSETALPHA, INDIC_TAGMATCH, 100);
-    Call(SCI_INDICSETALPHA, INDIC_TAGATTR, 100);
-    Call(SCI_INDICSETUNDER, INDIC_TAGMATCH, true);
-    Call(SCI_INDICSETUNDER, INDIC_TAGATTR, true);
+    m_scintilla.IndicSetFore(INDIC_TAGMATCH, theme.GetThemeColor(RGB(0x80, 0x00, 0xFF), true));
+    m_scintilla.IndicSetFore(INDIC_TAGATTR, theme.GetThemeColor(RGB(0xFF, 0xFF, 0x00), true));
+    m_scintilla.IndicSetStyle(INDIC_TAGMATCH, Scintilla::IndicatorStyle::RoundBox);
+    m_scintilla.IndicSetStyle(INDIC_TAGATTR, Scintilla::IndicatorStyle::RoundBox);
+    m_scintilla.IndicSetAlpha(INDIC_TAGMATCH, static_cast<Scintilla::Alpha>(100));
+    m_scintilla.IndicSetAlpha(INDIC_TAGATTR, static_cast<Scintilla::Alpha>(100));
+    m_scintilla.IndicSetUnder(INDIC_TAGMATCH, true);
+    m_scintilla.IndicSetUnder(INDIC_TAGATTR, true);
 
-    Call(SCI_CALLTIPUSESTYLE, 0);
-    Call(SCI_STYLESETFORE, STYLE_CALLTIP, theme.GetThemeColor(GetSysColor(COLOR_INFOTEXT)));
-    Call(SCI_STYLESETBACK, STYLE_CALLTIP, theme.GetThemeColor(GetSysColor(COLOR_INFOBK)));
+    m_scintilla.CallTipUseStyle(0);
+    m_scintilla.StyleSetFore(STYLE_CALLTIP, theme.GetThemeColor(GetSysColor(COLOR_INFOTEXT)));
+    m_scintilla.StyleSetBack(STYLE_CALLTIP, theme.GetThemeColor(GetSysColor(COLOR_INFOBK)));
 
     std::vector captureColors = {RGB(80, 0, 0),
                                  RGB(0, 80, 0),
@@ -1127,17 +1147,17 @@ void CScintillaWnd::SetupDefaultStyles() const
                                  RGB(40, 40, 80)};
     for (uptr_t i = INDIC_REGEXCAPTURE; i < INDIC_REGEXCAPTURE_END; ++i)
     {
-        Call(SCI_INDICSETSTYLE, i, INDIC_BOX);
-        Call(SCI_INDICSETFORE, i, CTheme::Instance().GetThemeColor(captureColors[i - INDIC_REGEXCAPTURE]));
+        m_scintilla.IndicSetStyle(i, Scintilla::IndicatorStyle::Box);
+        m_scintilla.IndicSetFore(i, CTheme::Instance().GetThemeColor(captureColors[i - INDIC_REGEXCAPTURE]));
     }
 
-    Call(SCI_SETFOLDMARGINCOLOUR, true, theme.GetThemeColor(RGB(240, 240, 240), true));
-    Call(SCI_SETFOLDMARGINHICOLOUR, true, theme.GetThemeColor(RGB(255, 255, 255), true));
+    m_scintilla.SetFoldMarginColour(true, theme.GetThemeColor(RGB(240, 240, 240), true));
+    m_scintilla.SetFoldMarginHiColour(true, theme.GetThemeColor(RGB(255, 255, 255), true));
 
-    Call(SCI_MARKERSETFORE, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(80, 0, 0), true));
-    Call(SCI_MARKERSETBACK, MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(255, 0, 0), true));
+    m_scintilla.MarkerSetFore(MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(80, 0, 0), true));
+    m_scintilla.MarkerSetBack(MARK_BOOKMARK, CTheme::Instance().GetThemeColor(RGB(255, 0, 0), true));
 
-    Call(SCI_SETINDENTATIONGUIDES, static_cast<uptr_t>(CIniSettings::Instance().GetInt64(L"View", L"indent", SC_IV_LOOKBOTH)));
+    m_scintilla.SetIndentationGuides(static_cast<Scintilla::IndentView>(CIniSettings::Instance().GetInt64(L"View", L"indent", SC_IV_LOOKBOTH)));
 
     SetupFoldingColors(RGB(color_folding_fore_inactive, color_folding_fore_inactive, color_folding_fore_inactive),
                        RGB(color_folding_back_inactive, color_folding_back_inactive, color_folding_back_inactive),
@@ -1145,78 +1165,78 @@ void CScintillaWnd::SetupDefaultStyles() const
 
     bool bBold    = !!CIniSettings::Instance().GetInt64(L"View", L"FontBold", false);
     int  fontSize = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"FontSize", 11));
-    Call(SCI_STYLESETBOLD, STYLE_FOLDDISPLAYTEXT, bBold);
-    Call(SCI_STYLESETITALIC, STYLE_FOLDDISPLAYTEXT, true);
-    Call(SCI_STYLESETSIZE, STYLE_FOLDDISPLAYTEXT, fontSize);
-    Call(SCI_STYLESETFORE, STYLE_FOLDDISPLAYTEXT, theme.GetThemeColor(RGB(120, 120, 120), true));
-    Call(SCI_STYLESETBACK, STYLE_FOLDDISPLAYTEXT, theme.GetThemeColor(RGB(230, 230, 230), true));
+    m_scintilla.StyleSetBold(STYLE_FOLDDISPLAYTEXT, bBold);
+    m_scintilla.StyleSetItalic(STYLE_FOLDDISPLAYTEXT, true);
+    m_scintilla.StyleSetSize(STYLE_FOLDDISPLAYTEXT, fontSize);
+    m_scintilla.StyleSetFore(STYLE_FOLDDISPLAYTEXT, theme.GetThemeColor(RGB(120, 120, 120), true));
+    m_scintilla.StyleSetBack(STYLE_FOLDDISPLAYTEXT, theme.GetThemeColor(RGB(230, 230, 230), true));
 
-    Call(SCI_STYLESETFORE, STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0), true));
-    Call(SCI_STYLESETBACK, STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255), true));
-    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_SELECTION_TEXT, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true), 128));
-    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_SELECTION_BACK, toRgba(theme.GetThemeColor(RGB(51, 153, 255), true), 128));
-    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_CARET, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true)));
-    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_CARET_ADDITIONAL, toRgba(theme.GetThemeColor(RGB(0, 0, 80), true)));
-    Call(SCI_SETSELECTIONLAYER, SC_LAYER_UNDER_TEXT);
+    m_scintilla.StyleSetFore(STYLE_DEFAULT, theme.GetThemeColor(RGB(0, 0, 0), true));
+    m_scintilla.StyleSetBack(STYLE_DEFAULT, theme.GetThemeColor(RGB(255, 255, 255), true));
+    m_scintilla.SetElementColour(Scintilla::Element::SelectionText, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true), 128));
+    m_scintilla.SetElementColour(Scintilla::Element::SelectionBack, toRgba(theme.GetThemeColor(RGB(51, 153, 255), true), 128));
+    m_scintilla.SetElementColour(Scintilla::Element::Caret, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true)));
+    m_scintilla.SetElementColour(Scintilla::Element::CaretAdditional, toRgba(theme.GetThemeColor(RGB(0, 0, 80), true)));
+    m_scintilla.SetSelectionLayer(Scintilla::Layer::UnderText);
     if (CIniSettings::Instance().GetInt64(L"View", L"caretlineframe", 1) != 0)
     {
-        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_CARET_LINE_BACK, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true), 80));
-        Call(SCI_SETCARETLINELAYER, SC_LAYER_UNDER_TEXT);
+        m_scintilla.SetElementColour(Scintilla::Element::CaretLineBack, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true), 80));
+        m_scintilla.SetCaretLineLayer(Scintilla::Layer::UnderText);
     }
     else
     {
         if (theme.IsDarkTheme())
         {
-            Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_CARET_LINE_BACK, RGB(0, 0, 0));
+            m_scintilla.SetElementColour(Scintilla::Element::CaretLineBack, RGB(0, 0, 0));
         }
         else
         {
-            Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_CARET_LINE_BACK, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true), 25));
+            m_scintilla.SetElementColour(Scintilla::Element::CaretLineBack, toRgba(theme.GetThemeColor(RGB(0, 0, 0), true), 25));
         }
     }
-    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_WHITE_SPACE, toRgba(theme.GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)), 80));
-    Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_FOLD_LINE, toRgba(theme.GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)), 140));
+    m_scintilla.SetElementColour(Scintilla::Element::WhiteSpace, toRgba(theme.GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)), 80));
+    m_scintilla.SetElementColour(Scintilla::Element::FoldLine, toRgba(theme.GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)), 140));
 
-    auto modEventMask = Call(SCI_GETMODEVENTMASK);
-    Call(SCI_SETMODEVENTMASK, 0);
+    auto modEventMask = m_scintilla.ModEventMask();
+    m_scintilla.SetModEventMask(Scintilla::ModificationFlags::None);
 
-    Call(SCI_COLOURISE, 0, Call(SCI_POSITIONFROMLINE, Call(SCI_LINESONSCREEN) + 1));
-    Call(SCI_SETCODEPAGE, CP_UTF8);
-    Call(SCI_SETMODEVENTMASK, modEventMask);
+    m_scintilla.Colourise(0, m_scintilla.PositionFromLine(m_scintilla.LinesOnScreen() + 1));
+    m_scintilla.SetCodePage(CP_UTF8);
+    m_scintilla.SetModEventMask(modEventMask);
 
     auto controlCharColor = toRgba(theme.IsDarkTheme() ? RGB(255, 255, 240) : RGB(40, 40, 0), 200);
     // set up unicode representations for control chars
     for (int c = 0; c < 0x20; ++c)
     {
         const char sC[2] = {static_cast<char>(c), 0};
-        Call(SCI_SETREPRESENTATION, reinterpret_cast<uptr_t>(sC), reinterpret_cast<sptr_t>(CStringUtils::Format("x%02X", c).c_str()));
-        Call(SCI_SETREPRESENTATIONAPPEARANCE, reinterpret_cast<uptr_t>(sC), SC_REPRESENTATION_BLOB | SC_REPRESENTATION_COLOUR);
-        Call(SCI_SETREPRESENTATIONCOLOUR, reinterpret_cast<uptr_t>(sC), controlCharColor);
+        m_scintilla.SetRepresentation(sC, CStringUtils::Format("x%02X", c).c_str());
+        m_scintilla.SetRepresentationAppearance(sC, Scintilla::RepresentationAppearance::Blob | Scintilla::RepresentationAppearance::Colour);
+        m_scintilla.SetRepresentationColour(sC, controlCharColor);
     }
     for (int c = 0x80; c < 0xA0; ++c)
     {
         const char sC[3] = {'\xc2', static_cast<char>(c), 0};
-        Call(SCI_SETREPRESENTATION, reinterpret_cast<uptr_t>(sC), reinterpret_cast<sptr_t>(CStringUtils::Format("x%02X", c).c_str()));
-        Call(SCI_SETREPRESENTATIONAPPEARANCE, reinterpret_cast<uptr_t>(sC), SC_REPRESENTATION_BLOB | SC_REPRESENTATION_COLOUR);
-        Call(SCI_SETREPRESENTATIONCOLOUR, reinterpret_cast<uptr_t>(sC), controlCharColor);
+        m_scintilla.SetRepresentation(sC, CStringUtils::Format("x%02X", c).c_str());
+        m_scintilla.SetRepresentationAppearance(sC, Scintilla::RepresentationAppearance::Blob | Scintilla::RepresentationAppearance::Colour | Scintilla::RepresentationAppearance::Blob | Scintilla::RepresentationAppearance::Colour);
+        m_scintilla.SetRepresentationColour(sC, controlCharColor);
     }
-    Call(SCI_SETREPRESENTATION, reinterpret_cast<uptr_t>("\x7F"), reinterpret_cast<sptr_t>("x7F"));
-    Call(SCI_SETREPRESENTATIONAPPEARANCE, reinterpret_cast<uptr_t>("\x7F"), SC_REPRESENTATION_BLOB | SC_REPRESENTATION_COLOUR);
-    Call(SCI_SETREPRESENTATIONCOLOUR, reinterpret_cast<uptr_t>("\x7F"), controlCharColor);
+    m_scintilla.SetRepresentation("\x7F", "x7F");
+    m_scintilla.SetRepresentationAppearance("\x7F", Scintilla::RepresentationAppearance::Blob | Scintilla::RepresentationAppearance::Colour | Scintilla::RepresentationAppearance::Blob | Scintilla::RepresentationAppearance::Colour);
+    m_scintilla.SetRepresentationColour("\x7F", controlCharColor);
 
     if (theme.IsDarkTheme())
     {
-        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST, toRgba(RGB(187, 187, 187)));
-        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_BACK, toRgba(RGB(15, 15, 15)));
-        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED, toRgba(RGB(187, 187, 187)));
-        Call(SCI_SETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED_BACK, toRgba(RGB(80, 80, 80)));
+        m_scintilla.SetElementColour(Scintilla::Element::List, toRgba(RGB(187, 187, 187)));
+        m_scintilla.SetElementColour(Scintilla::Element::ListBack, toRgba(RGB(15, 15, 15)));
+        m_scintilla.SetElementColour(Scintilla::Element::ListSelected, toRgba(RGB(187, 187, 187)));
+        m_scintilla.SetElementColour(Scintilla::Element::ListSelectedBack, toRgba(RGB(80, 80, 80)));
     }
     else
     {
-        Call(SCI_RESETELEMENTCOLOUR, SC_ELEMENT_LIST);
-        Call(SCI_RESETELEMENTCOLOUR, SC_ELEMENT_LIST_BACK);
-        Call(SCI_RESETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED);
-        Call(SCI_RESETELEMENTCOLOUR, SC_ELEMENT_LIST_SELECTED_BACK);
+        m_scintilla.ResetElementColour(Scintilla::Element::List);
+        m_scintilla.ResetElementColour(Scintilla::Element::ListBack);
+        m_scintilla.ResetElementColour(Scintilla::Element::ListSelected);
+        m_scintilla.ResetElementColour(Scintilla::Element::ListSelectedBack);
     }
 }
 
@@ -1226,41 +1246,41 @@ void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF ba
     // colors for the collapsed buttons (+ button) in the active color.
     auto foldMarkFore       = CTheme::Instance().GetThemeColor(fore, true);
     auto foldMarkForeActive = CTheme::Instance().GetThemeColor(RGB(color_folding_fore_active, color_folding_fore_active, color_folding_fore_active), true);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN, foldMarkFore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDER, foldMarkForeActive);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERSUB, foldMarkFore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERTAIL, foldMarkFore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEREND, foldMarkForeActive);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, foldMarkFore);
-    Call(SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, foldMarkFore);
+    m_scintilla.MarkerSetFore(SC_MARKNUM_FOLDEROPEN, foldMarkFore);
+    m_scintilla.MarkerSetFore(SC_MARKNUM_FOLDER, foldMarkForeActive);
+    m_scintilla.MarkerSetFore(SC_MARKNUM_FOLDERSUB, foldMarkFore);
+    m_scintilla.MarkerSetFore(SC_MARKNUM_FOLDERTAIL, foldMarkFore);
+    m_scintilla.MarkerSetFore(SC_MARKNUM_FOLDEREND, foldMarkForeActive);
+    m_scintilla.MarkerSetFore(SC_MARKNUM_FOLDEROPENMID, foldMarkFore);
+    m_scintilla.MarkerSetFore(SC_MARKNUM_FOLDERMIDTAIL, foldMarkFore);
 
     auto foldMarkBack       = CTheme::Instance().GetThemeColor(back, true);
     auto foldMarkBackActive = CTheme::Instance().GetThemeColor(RGB(color_folding_back_active, color_folding_back_active, color_folding_back_active), true);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN, foldMarkBack);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDER, foldMarkBackActive);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERSUB, foldMarkBack);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERTAIL, foldMarkBack);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEREND, foldMarkBackActive);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, foldMarkBack);
-    Call(SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, foldMarkBack);
+    m_scintilla.MarkerSetBack(SC_MARKNUM_FOLDEROPEN, foldMarkBack);
+    m_scintilla.MarkerSetBack(SC_MARKNUM_FOLDER, foldMarkBackActive);
+    m_scintilla.MarkerSetBack(SC_MARKNUM_FOLDERSUB, foldMarkBack);
+    m_scintilla.MarkerSetBack(SC_MARKNUM_FOLDERTAIL, foldMarkBack);
+    m_scintilla.MarkerSetBack(SC_MARKNUM_FOLDEREND, foldMarkBackActive);
+    m_scintilla.MarkerSetBack(SC_MARKNUM_FOLDEROPENMID, foldMarkBack);
+    m_scintilla.MarkerSetBack(SC_MARKNUM_FOLDERMIDTAIL, foldMarkBack);
 
     auto foldMarkBackSelected       = CTheme::Instance().GetThemeColor(backSel, true);
     auto foldMarkBackSelectedActive = CTheme::Instance().GetThemeColor(RGB(color_folding_backsel_active, color_folding_backsel_active, color_folding_backsel_active), true);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEROPEN, foldMarkBackSelected);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDER, foldMarkBackSelectedActive);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERSUB, foldMarkBackSelected);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERTAIL, foldMarkBackSelected);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEREND, foldMarkBackSelectedActive);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDEROPENMID, foldMarkBackSelected);
-    Call(SCI_MARKERSETBACKSELECTED, SC_MARKNUM_FOLDERMIDTAIL, foldMarkBackSelected);
+    m_scintilla.MarkerSetBackSelected(SC_MARKNUM_FOLDEROPEN, foldMarkBackSelected);
+    m_scintilla.MarkerSetBackSelected(SC_MARKNUM_FOLDER, foldMarkBackSelectedActive);
+    m_scintilla.MarkerSetBackSelected(SC_MARKNUM_FOLDERSUB, foldMarkBackSelected);
+    m_scintilla.MarkerSetBackSelected(SC_MARKNUM_FOLDERTAIL, foldMarkBackSelected);
+    m_scintilla.MarkerSetBackSelected(SC_MARKNUM_FOLDEREND, foldMarkBackSelectedActive);
+    m_scintilla.MarkerSetBackSelected(SC_MARKNUM_FOLDEROPENMID, foldMarkBackSelected);
+    m_scintilla.MarkerSetBackSelected(SC_MARKNUM_FOLDERMIDTAIL, foldMarkBackSelected);
 
-    //Call(SCI_STYLESETFORE, STYLE_FOLDDISPLAYTEXT, foldmarkfore);
-    //Call(SCI_STYLESETBACK, STYLE_FOLDDISPLAYTEXT, foldmarkback);
+    //m_scintilla.StyleSetFore(STYLE_FOLDDISPLAYTEXT, foldmarkfore);
+    //m_scintilla.StyleSetBack(STYLE_FOLDDISPLAYTEXT, foldmarkback);
 }
 
 void CScintillaWnd::GotoLine(sptr_t line)
 {
-    auto linePos = Call(SCI_POSITIONFROMLINE, line);
+    auto linePos = m_scintilla.PositionFromLine(line);
     Center(linePos, linePos);
 }
 
@@ -1269,16 +1289,16 @@ void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
     // to make sure the found result is visible
     // When searching up, the beginning of the (possible multiline) result is important, when scrolling down the end
     auto testPos = (posStart > posEnd) ? posEnd : posStart;
-    Call(SCI_SETCURRENTPOS, testPos);
-    auto currentLineNumberDoc = Call(SCI_LINEFROMPOSITION, testPos);
-    auto currentLineNumberVis = Call(SCI_VISIBLEFROMDOCLINE, currentLineNumberDoc);
-    // SCI_ENSUREVISIBLE resets the line-wrapping cache, so only
+    m_scintilla.SetCurrentPos(testPos);
+    auto currentLineNumberDoc = m_scintilla.LineFromPosition(testPos);
+    auto currentLineNumberVis = m_scintilla.VisibleFromDocLine(currentLineNumberDoc);
+    // EnsureVisible resets the line-wrapping cache, so only
     // call that if it's really necessary.
-    if (Call(SCI_GETLINEVISIBLE, currentLineNumberDoc) == 0)
-        Call(SCI_ENSUREVISIBLE, currentLineNumberDoc); // make sure target line is unfolded
+    if (m_scintilla.LineVisible(currentLineNumberDoc) == 0)
+        m_scintilla.EnsureVisible(currentLineNumberDoc); // make sure target line is unfolded
 
-    auto firstVisibleLineVis = Call(SCI_GETFIRSTVISIBLELINE);
-    auto linesVisible        = Call(SCI_LINESONSCREEN) - 1; //-1 for the scrollbar
+    auto firstVisibleLineVis = m_scintilla.FirstVisibleLine();
+    auto linesVisible        = m_scintilla.LinesOnScreen() - 1; //-1 for the scrollbar
     auto lastVisibleLineVis  = linesVisible + firstVisibleLineVis;
 
     // if out of view vertically, scroll line into (center of) view
@@ -1305,46 +1325,46 @@ void CScintillaWnd::Center(sptr_t posStart, sptr_t posEnd)
             // use center
             linesToScroll += linesVisible / 2;
         }
-        Call(SCI_LINESCROLL, 0, linesToScroll);
+        m_scintilla.LineScroll(0, linesToScroll);
     }
     // Make sure the caret is visible, scroll horizontally
-    Call(SCI_GOTOPOS, posStart);
-    Call(SCI_GOTOPOS, posEnd);
+    m_scintilla.GotoPos(posStart);
+    m_scintilla.GotoPos(posEnd);
 
-    Call(SCI_SETANCHOR, posStart);
+    m_scintilla.SetAnchor(posStart);
 }
 
 void CScintillaWnd::MarginClick(SCNotification* pNotification)
 {
     if ((pNotification->margin == SC_MARGE_SYMBOL) && !pNotification->modifiers)
-        BookmarkToggle(Call(SCI_LINEFROMPOSITION, pNotification->position));
+        BookmarkToggle(m_scintilla.LineFromPosition(pNotification->position));
     m_docScroll.VisibleLinesChanged();
 }
 
 void CScintillaWnd::SelectionUpdated() const
 {
-    auto selStart     = Call(SCI_GETSELECTIONNSTART);
-    auto selEnd       = Call(SCI_GETSELECTIONEND);
-    auto selLineStart = Call(SCI_LINEFROMPOSITION, selStart);
-    auto selLineEnd   = Call(SCI_LINEFROMPOSITION, selEnd);
+    auto selStart     = m_scintilla.SelectionStart();
+    auto selEnd       = m_scintilla.SelectionEnd();
+    auto selLineStart = m_scintilla.LineFromPosition(selStart);
+    auto selLineEnd   = m_scintilla.LineFromPosition(selEnd);
     if (selLineStart != selLineEnd)
     {
-        if (Call(SCI_GETFOLDLEVEL, selLineEnd - 1) & SC_FOLDLEVELHEADERFLAG)
+        if ((m_scintilla.FoldLevel(selLineEnd - 1) & Scintilla::FoldLevel::HeaderFlag) != Scintilla::FoldLevel::None)
         {
             // line is a fold header
-            if (Call(SCI_GETLINEVISIBLE, selLineEnd) == 0)
+            if (m_scintilla.LineVisible(selLineEnd) == 0)
             {
-                if (Call(SCI_POSITIONFROMLINE, selLineEnd) == selEnd)
+                if (m_scintilla.PositionFromLine(selLineEnd) == selEnd)
                 {
-                    auto lastLine = Call(SCI_GETLINECOUNT);
-                    while ((selLineEnd < lastLine) && (Call(SCI_GETLINEVISIBLE, selLineEnd) == 0))
+                    auto lastLine = m_scintilla.LineCount();
+                    while ((selLineEnd < lastLine) && (m_scintilla.LineVisible(selLineEnd) == 0))
                         ++selLineEnd;
                     if (selLineEnd < lastLine)
                     {
-                        if (Call(SCI_GETANCHOR) == selStart)
-                            Call(SCI_SETCURRENTPOS, Call(SCI_POSITIONFROMLINE, selLineEnd));
+                        if (m_scintilla.Anchor() == selStart)
+                            m_scintilla.SetCurrentPos(m_scintilla.PositionFromLine(selLineEnd));
                         else
-                            Call(SCI_SETANCHOR, Call(SCI_POSITIONFROMLINE, selLineEnd));
+                            m_scintilla.SetAnchor(m_scintilla.PositionFromLine(selLineEnd));
                     }
                 }
             }
@@ -1356,23 +1376,24 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
 {
     static std::string    lastSelText;
     static Sci_PositionCR lastStopPosition = 0;
-    auto                  firstLine        = Call(SCI_GETFIRSTVISIBLELINE);
-    auto                  lastLine         = firstLine + Call(SCI_LINESONSCREEN);
-    auto                  startStylePos    = Call(SCI_POSITIONFROMLINE, firstLine);
+    auto                  firstLine        = m_scintilla.FirstVisibleLine();
+    auto                  lastLine         = firstLine + m_scintilla.LinesOnScreen();
+    auto                  startStylePos    = m_scintilla.PositionFromLine(firstLine);
     startStylePos                          = max(startStylePos, 0);
-    auto endStylePos                       = Call(SCI_POSITIONFROMLINE, lastLine) + Call(SCI_LINELENGTH, lastLine);
+    auto endStylePos                       = m_scintilla.PositionFromLine(lastLine) + m_scintilla.LineLength(lastLine);
     if (endStylePos < 0)
-        endStylePos = Call(SCI_GETLENGTH);
+        endStylePos = m_scintilla.Length();
 
     int len = endStylePos - startStylePos;
     if (len <= 0)
         return;
 
     // reset indicators
-    Call(SCI_SETINDICATORCURRENT, INDIC_SELECTION_MARK);
-    Call(SCI_INDICATORCLEARRANGE, startStylePos, len);
+    m_scintilla.SetIndicatorCurrent(INDIC_SELECTION_MARK);
+    m_scintilla.IndicatorClearRange(startStylePos, len);
 
-    auto selTextLen = Call(SCI_GETSELTEXT);
+    auto sSelText   = m_scintilla.GetSelText();
+    auto selTextLen = sSelText.size();
     if ((selTextLen <= 1) || (clear)) // Includes zero terminator so 1 means 0.
     {
         lastSelText.clear();
@@ -1381,10 +1402,10 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
         SendMessage(*this, WM_NCPAINT, static_cast<WPARAM>(1), 0);
         return;
     }
-    auto origSelStart = Call(SCI_GETSELECTIONSTART);
-    auto origSelEnd   = Call(SCI_GETSELECTIONEND);
-    auto selStartLine = Call(SCI_LINEFROMPOSITION, origSelStart, 0);
-    auto selEndLine   = Call(SCI_LINEFROMPOSITION, origSelEnd, 0);
+    auto origSelStart = m_scintilla.SelectionStart();
+    auto origSelEnd   = m_scintilla.SelectionEnd();
+    auto selStartLine = m_scintilla.LineFromPosition(origSelStart);
+    auto selEndLine   = m_scintilla.LineFromPosition(origSelEnd);
     if (selStartLine != selEndLine)
     {
         lastSelText.clear();
@@ -1394,10 +1415,9 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
         return;
     }
 
-    auto selStartPos   = Call(SCI_GETSELECTIONSTART);
-    auto selTextBuffer = std::make_unique<char[]>(selTextLen + 1);
-    Call(SCI_GETSELTEXT, 0, reinterpret_cast<LPARAM>(selTextBuffer.get()));
-    if (selTextBuffer[0] == 0)
+    auto selStartPos = m_scintilla.SelectionStart();
+    auto origSelText = sSelText;
+    if (origSelText.empty())
     {
         lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
@@ -1405,7 +1425,6 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
         SendMessage(*this, WM_NCPAINT, static_cast<WPARAM>(1), 0);
         return;
     }
-    std::string sSelText = selTextBuffer.get();
     CStringUtils::trim(sSelText);
     if (sSelText.empty())
     {
@@ -1416,7 +1435,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
         return;
     }
     // don't mark the text again if it's already marked by the search feature
-    if (_stricmp(g_sHighlightString.c_str(), selTextBuffer.get()) == 0)
+    if (_stricmp(g_sHighlightString.c_str(), origSelText.c_str()) == 0)
     {
         m_selTextMarkerCount = g_searchMarkerCount;
         return;
@@ -1427,21 +1446,21 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     textRange.lpstrText  = textBuffer.get();
     textRange.chrg.cpMin = startStylePos;
     textRange.chrg.cpMax = endStylePos;
-    Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&textRange));
+    m_scintilla.GetTextRange(&textRange);
 
-    const char* startPos = strstr(textBuffer.get(), selTextBuffer.get());
+    const char* startPos = strstr(textBuffer.get(), origSelText.c_str());
     while (startPos)
     {
         // don't style the selected text itself
         if (selStartPos != static_cast<sptr_t>(startStylePos + (startPos - textBuffer.get())))
-            Call(SCI_INDICATORFILLRANGE, startStylePos + (startPos - textBuffer.get()), selTextLen - 1);
-        startPos = strstr(startPos + 1, selTextBuffer.get());
+            m_scintilla.IndicatorFillRange(startStylePos + (startPos - textBuffer.get()), selTextLen - 1);
+        startPos = strstr(startPos + 1, origSelText.c_str());
     }
 
-    auto lineCount = Call(SCI_GETLINECOUNT);
+    auto lineCount = m_scintilla.LineCount();
     if ((selTextLen > 2) || (lineCount < 100000))
     {
-        auto selTextDifferent = lastSelText.compare(selTextBuffer.get());
+        auto selTextDifferent = lastSelText.compare(origSelText.c_str());
         if (selTextDifferent || (lastStopPosition != 0) || edit)
         {
             auto start = std::chrono::steady_clock::now();
@@ -1452,18 +1471,18 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
             }
             Sci_TextToFind findText{};
             findText.chrg.cpMin     = lastStopPosition;
-            findText.chrg.cpMax     = Call(SCI_GETLENGTH);
-            findText.lpstrText      = selTextBuffer.get();
+            findText.chrg.cpMax     = m_scintilla.Length();
+            findText.lpstrText      = origSelText.c_str();
             lastStopPosition        = 0;
             const auto selTextColor = CTheme::Instance().GetThemeColor(RGB(0, 255, 0), true);
-            while (Call(SCI_FINDTEXT, SCFIND_MATCHCASE, reinterpret_cast<LPARAM>(&findText)) >= 0)
+            while (m_scintilla.FindText(Scintilla::FindOption::MatchCase, &findText) >= 0)
             {
                 if (edit)
                 {
                     if ((origSelStart != findText.chrgText.cpMin) || (origSelEnd != findText.chrgText.cpMax))
-                        Call(SCI_ADDSELECTION, findText.chrgText.cpMax, findText.chrgText.cpMin);
+                        m_scintilla.AddSelection(findText.chrgText.cpMax, findText.chrgText.cpMin);
                 }
-                auto line = Call(SCI_LINEFROMPOSITION, findText.chrgText.cpMin);
+                auto line = m_scintilla.LineFromPosition(findText.chrgText.cpMin);
                 m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, selTextColor);
                 ++m_selTextMarkerCount;
                 if (findText.chrg.cpMin >= findText.chrgText.cpMax)
@@ -1482,10 +1501,10 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
                 }
             }
             if (edit)
-                Call(SCI_ADDSELECTION, origSelEnd, origSelStart);
+                m_scintilla.AddSelection(origSelEnd, origSelStart);
             SendMessage(*this, WM_NCPAINT, static_cast<WPARAM>(1), 0);
         }
-        lastSelText = selTextBuffer.get();
+        lastSelText = origSelText.c_str();
     }
 }
 
@@ -1499,7 +1518,7 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
     sptr_t braceOpposite = -1;
 
     // find matching brace position
-    auto caretPos = Call(SCI_GETCURRENTPOS);
+    auto caretPos = m_scintilla.CurrentPos();
 
     // setting the highlighting style triggers an UI update notification,
     // which in return calls MatchBraces(false). So to avoid an endless
@@ -1510,11 +1529,11 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
 
     WCHAR charBefore = '\0';
 
-    auto lengthDoc = Call(SCI_GETLENGTH);
+    auto lengthDoc = m_scintilla.Length();
 
     if ((lengthDoc > 0) && (caretPos > 0))
     {
-        charBefore = static_cast<WCHAR>(Call(SCI_GETCHARAT, caretPos - 1, 0));
+        charBefore = static_cast<WCHAR>(m_scintilla.CharAt(caretPos - 1));
     }
     // Priority goes to character before the caret
     if (charBefore && wcschr(L"[](){}", charBefore))
@@ -1525,63 +1544,63 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
     if (lengthDoc > 0 && (braceAtCaret < 0))
     {
         // No brace found so check other side
-        WCHAR charAfter = static_cast<WCHAR>(Call(SCI_GETCHARAT, caretPos, 0));
+        WCHAR charAfter = static_cast<WCHAR>(m_scintilla.CharAt(caretPos));
         if (charAfter && wcschr(L"[](){}", charAfter))
         {
             braceAtCaret = caretPos;
         }
     }
     if (braceAtCaret >= 0)
-        braceOpposite = Call(SCI_BRACEMATCH, braceAtCaret, 0);
+        braceOpposite = m_scintilla.BraceMatch(braceAtCaret, 0);
 
     KillTimer(*this, TIM_BRACEHIGHLIGHTTEXT);
     KillTimer(*this, TIM_BRACEHIGHLIGHTTEXTCLEAR);
-    Call(SCI_SETHIGHLIGHTGUIDE, 0);
+    m_scintilla.SetHighlightGuide(0);
     if ((braceAtCaret != -1) && (braceOpposite == -1))
     {
-        Call(SCI_BRACEBADLIGHT, braceAtCaret);
+        m_scintilla.BraceBadLight(braceAtCaret);
         if (lastIndicatorLength && CIniSettings::Instance().GetInt64(L"View", L"bracehighlighttext", 1))
         {
-            Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
-            Call(SCI_INDICATORCLEARRANGE, lastIndicatorStart, lastIndicatorLength);
+            m_scintilla.SetIndicatorCurrent(INDIC_BRACEMATCH);
+            m_scintilla.IndicatorClearRange(lastIndicatorStart, lastIndicatorLength);
             lastIndicatorLength = 0;
         }
     }
     else
     {
-        Call(SCI_BRACEHIGHLIGHT, braceAtCaret, braceOpposite);
+        m_scintilla.BraceHighlight(braceAtCaret, braceOpposite);
         if (CIniSettings::Instance().GetInt64(L"View", L"bracehighlighttext", 1))
         {
             if (lastIndicatorLength)
             {
-                Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
-                Call(SCI_INDICATORCLEARRANGE, lastIndicatorStart, lastIndicatorLength);
+                m_scintilla.SetIndicatorCurrent(INDIC_BRACEMATCH);
+                m_scintilla.IndicatorClearRange(lastIndicatorStart, lastIndicatorLength);
             }
             if (what == BraceMatch::Highlight)
             {
-                Call(SCI_SETINDICATORCURRENT, INDIC_BRACEMATCH);
+                m_scintilla.SetIndicatorCurrent(INDIC_BRACEMATCH);
                 lastIndicatorStart  = braceAtCaret < braceOpposite ? braceAtCaret : braceOpposite;
                 lastIndicatorLength = braceAtCaret < braceOpposite ? braceOpposite - braceAtCaret : braceAtCaret - braceOpposite;
                 ++lastIndicatorLength;
-                auto startLine = Call(SCI_LINEFROMPOSITION, lastIndicatorStart);
-                auto endLine   = Call(SCI_LINEFROMPOSITION, lastIndicatorStart + lastIndicatorLength);
+                auto startLine = m_scintilla.LineFromPosition(lastIndicatorStart);
+                auto endLine   = m_scintilla.LineFromPosition(lastIndicatorStart + lastIndicatorLength);
                 if (endLine != startLine)
-                    Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, CTheme::Instance().IsDarkTheme() ? 3 : 10);
+                    m_scintilla.IndicSetAlpha(INDIC_BRACEMATCH, CTheme::Instance().IsDarkTheme() ? static_cast<Scintilla::Alpha>(3) : static_cast<Scintilla::Alpha>(10));
                 else
-                    Call(SCI_INDICSETALPHA, INDIC_BRACEMATCH, 40);
+                    m_scintilla.IndicSetAlpha(INDIC_BRACEMATCH, static_cast<Scintilla::Alpha>(40));
 
-                Call(SCI_INDICATORFILLRANGE, lastIndicatorStart, lastIndicatorLength);
+                m_scintilla.IndicatorFillRange(lastIndicatorStart, lastIndicatorLength);
                 SetTimer(*this, TIM_BRACEHIGHLIGHTTEXTCLEAR, 5000, nullptr);
             }
             else if (what == BraceMatch::Braces)
                 SetTimer(*this, TIM_BRACEHIGHLIGHTTEXT, 1000, nullptr);
         }
 
-        if ((what == BraceMatch::Highlight) && (Call(SCI_GETINDENTATIONGUIDES) != 0))
+        if ((what == BraceMatch::Highlight) && (m_scintilla.IndentationGuides() != Scintilla::IndentView::None))
         {
-            auto columnAtCaret  = Call(SCI_GETCOLUMN, braceAtCaret);
-            auto columnOpposite = Call(SCI_GETCOLUMN, braceOpposite);
-            Call(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite) ? columnAtCaret : columnOpposite);
+            auto columnAtCaret  = m_scintilla.Column(braceAtCaret);
+            auto columnOpposite = m_scintilla.Column(braceOpposite);
+            m_scintilla.SetHighlightGuide((columnAtCaret < columnOpposite) ? columnAtCaret : columnOpposite);
         }
     }
 }
@@ -1591,7 +1610,7 @@ void CScintillaWnd::GotoBrace() const
 {
     static constexpr wchar_t brackets[] = L"[](){}";
 
-    auto lengthDoc = Call(SCI_GETLENGTH);
+    auto lengthDoc = m_scintilla.Length();
     if (lengthDoc <= 1)
         return;
 
@@ -1601,23 +1620,23 @@ void CScintillaWnd::GotoBrace() const
     WCHAR  charAfter     = '\0';
     bool   shift         = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
 
-    auto caretPos = Call(SCI_GETCURRENTPOS);
+    auto caretPos = m_scintilla.CurrentPos();
     if (caretPos > 0)
     {
-        charBefore = static_cast<WCHAR>(Call(SCI_GETCHARAT, caretPos - 1, 0));
+        charBefore = static_cast<WCHAR>(m_scintilla.CharAt(caretPos - 1));
         if (charBefore && wcschr(brackets, charBefore)) // Priority goes to character before the caret.
             braceAtCaret = caretPos - 1;
     }
 
     if (braceAtCaret < 0) // No brace found so check other side
     {
-        charAfter = static_cast<WCHAR>(Call(SCI_GETCHARAT, caretPos, 0));
+        charAfter = static_cast<WCHAR>(m_scintilla.CharAt(caretPos));
         if (charAfter && wcschr(brackets, charAfter))
             braceAtCaret = caretPos;
     }
     if (braceAtCaret >= 0)
     {
-        braceOpposite = Call(SCI_BRACEMATCH, braceAtCaret, 0);
+        braceOpposite = m_scintilla.BraceMatch(braceAtCaret, 0);
         if (braceOpposite >= 0)
         {
             if (shift)
@@ -1636,7 +1655,7 @@ void CScintillaWnd::GotoBrace() const
 
     if (braceOpposite >= 0)
     {
-        Call(SCI_SETSEL, shift ? braceAtCaret : braceOpposite, braceOpposite);
+        m_scintilla.SetSel(shift ? braceAtCaret : braceOpposite, braceOpposite);
     }
 }
 
@@ -1646,87 +1665,87 @@ void CScintillaWnd::MatchTags() const
     // finding xml tags is harder than just finding braces...
 
     sptr_t docStart = 0;
-    sptr_t docEnd   = Call(SCI_GETLENGTH);
-    Call(SCI_SETINDICATORCURRENT, INDIC_TAGMATCH);
-    Call(SCI_INDICATORCLEARRANGE, docStart, docEnd - docStart);
-    Call(SCI_SETINDICATORCURRENT, INDIC_TAGATTR);
-    Call(SCI_INDICATORCLEARRANGE, docStart, docEnd - docStart);
+    sptr_t docEnd   = m_scintilla.Length();
+    m_scintilla.SetIndicatorCurrent(INDIC_TAGMATCH);
+    m_scintilla.IndicatorClearRange(docStart, docEnd - docStart);
+    m_scintilla.SetIndicatorCurrent(INDIC_TAGATTR);
+    m_scintilla.IndicatorClearRange(docStart, docEnd - docStart);
 
-    int lexer = static_cast<int>(Call(SCI_GETLEXER));
+    int lexer = static_cast<int>(m_scintilla.Lexer());
     if ((lexer != SCLEX_HTML) &&
         (lexer != SCLEX_XML) &&
         (lexer != SCLEX_PHPSCRIPT))
         return;
 
     // Get the original targets and search options to restore after tag matching operation
-    auto originalStartPos    = Call(SCI_GETTARGETSTART);
-    auto originalEndPos      = Call(SCI_GETTARGETEND);
-    auto originalSearchFlags = Call(SCI_GETSEARCHFLAGS);
+    auto originalStartPos    = m_scintilla.TargetStart();
+    auto originalEndPos      = m_scintilla.TargetEnd();
+    auto originalSearchFlags = m_scintilla.SearchFlags();
 
     XmlMatchedTagsPos xmlTags = {0};
 
     // Detect if it's a xml/html tag
     if (GetXmlMatchedTagsPos(xmlTags))
     {
-        Call(SCI_SETINDICATORCURRENT, INDIC_TAGMATCH);
+        m_scintilla.SetIndicatorCurrent(INDIC_TAGMATCH);
         int openTagTailLen = 2;
 
         // Coloring the close tag first
         if ((xmlTags.tagCloseStart != -1) && (xmlTags.tagCloseEnd != -1))
         {
-            Call(SCI_INDICATORFILLRANGE, xmlTags.tagCloseStart, xmlTags.tagCloseEnd - xmlTags.tagCloseStart);
+            m_scintilla.IndicatorFillRange(xmlTags.tagCloseStart, xmlTags.tagCloseEnd - xmlTags.tagCloseStart);
             // tag close is present, so it's not single tag
             openTagTailLen = 1;
         }
 
         // Coloring the open tag
-        Call(SCI_INDICATORFILLRANGE, xmlTags.tagOpenStart, xmlTags.tagNameEnd - xmlTags.tagOpenStart);
-        Call(SCI_INDICATORFILLRANGE, xmlTags.tagOpenEnd - openTagTailLen, openTagTailLen);
+        m_scintilla.IndicatorFillRange(xmlTags.tagOpenStart, xmlTags.tagNameEnd - xmlTags.tagOpenStart);
+        m_scintilla.IndicatorFillRange(xmlTags.tagOpenEnd - openTagTailLen, openTagTailLen);
 
         // Coloring its attributes
         auto attributes = GetAttributesPos(xmlTags.tagNameEnd, xmlTags.tagOpenEnd - openTagTailLen);
-        Call(SCI_SETINDICATORCURRENT, INDIC_TAGATTR);
+        m_scintilla.SetIndicatorCurrent(INDIC_TAGATTR);
         for (const auto& [startPos, endPos] : attributes)
         {
-            Call(SCI_INDICATORFILLRANGE, startPos, endPos - startPos);
+            m_scintilla.IndicatorFillRange(startPos, endPos - startPos);
         }
 
         // Coloring indent guide line position
-        if (Call(SCI_GETINDENTATIONGUIDES) != 0)
+        if (m_scintilla.IndentationGuides() != Scintilla::IndentView::None)
         {
-            auto columnAtCaret  = Call(SCI_GETCOLUMN, xmlTags.tagOpenStart);
-            auto columnOpposite = Call(SCI_GETCOLUMN, xmlTags.tagCloseStart);
+            auto columnAtCaret  = m_scintilla.Column(xmlTags.tagOpenStart);
+            auto columnOpposite = m_scintilla.Column(xmlTags.tagCloseStart);
 
-            auto lineAtCaret  = Call(SCI_LINEFROMPOSITION, xmlTags.tagOpenStart);
-            auto lineOpposite = Call(SCI_LINEFROMPOSITION, xmlTags.tagCloseStart);
+            auto lineAtCaret  = m_scintilla.LineFromPosition(xmlTags.tagOpenStart);
+            auto lineOpposite = m_scintilla.LineFromPosition(xmlTags.tagCloseStart);
 
             if (xmlTags.tagCloseStart != -1 && lineAtCaret != lineOpposite)
             {
-                Call(SCI_BRACEHIGHLIGHT, xmlTags.tagOpenStart, xmlTags.tagCloseEnd - 1);
-                Call(SCI_SETHIGHLIGHTGUIDE, (columnAtCaret < columnOpposite) ? columnAtCaret : columnOpposite);
+                m_scintilla.BraceHighlight(xmlTags.tagOpenStart, xmlTags.tagCloseEnd - 1);
+                m_scintilla.SetHighlightGuide((columnAtCaret < columnOpposite) ? columnAtCaret : columnOpposite);
             }
         }
     }
 
     // restore the original targets and search options to avoid the conflict with search/replace function
-    Call(SCI_SETTARGETSTART, originalStartPos);
-    Call(SCI_SETTARGETEND, originalEndPos);
-    Call(SCI_SETSEARCHFLAGS, originalSearchFlags);
+    m_scintilla.SetTargetStart(originalStartPos);
+    m_scintilla.SetTargetEnd(originalEndPos);
+    m_scintilla.SetSearchFlags(originalSearchFlags);
 }
 
 bool CScintillaWnd::GetSelectedCount(sptr_t& selByte, sptr_t& selLine) const
 {
-    auto selCount = Call(SCI_GETSELECTIONS);
+    auto selCount = m_scintilla.Selections();
     selByte       = 0;
     selLine       = 0;
     for (decltype(selCount) i = 0; i < selCount; ++i)
     {
-        auto start = Call(SCI_GETSELECTIONNSTART, i);
-        auto end   = Call(SCI_GETSELECTIONNEND, i);
+        auto start = m_scintilla.SelectionNStart(i);
+        auto end   = m_scintilla.SelectionNEnd(i);
         selByte += (start < end) ? end - start : start - end;
 
-        start = Call(SCI_LINEFROMPOSITION, start);
-        end   = Call(SCI_LINEFROMPOSITION, end);
+        start = m_scintilla.LineFromPosition(start);
+        end   = m_scintilla.LineFromPosition(end);
         selLine += (start < end) ? end - start : start - end;
         ++selLine;
     }
@@ -1736,15 +1755,15 @@ bool CScintillaWnd::GetSelectedCount(sptr_t& selByte, sptr_t& selLine) const
 
 LRESULT CALLBACK CScintillaWnd::HandleScrollbarCustomDraw(WPARAM wParam, NMCSBCUSTOMDRAW* pCustomDraw)
 {
-    m_docScroll.SetCurrentPos(Call(SCI_VISIBLEFROMDOCLINE, GetCurrentLineNumber()), CTheme::Instance().GetThemeColor(RGB(40, 40, 40), true));
-    m_docScroll.SetTotalLines(Call(SCI_GETLINECOUNT));
+    m_docScroll.SetCurrentPos(m_scintilla.VisibleFromDocLine(GetCurrentLineNumber()), CTheme::Instance().GetThemeColor(RGB(40, 40, 40), true));
+    m_docScroll.SetTotalLines(m_scintilla.LineCount());
     return m_docScroll.HandleCustomDraw(wParam, pCustomDraw);
 }
 
 bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
 {
     bool       tagFound         = false;
-    auto       caret            = Call(SCI_GETCURRENTPOS);
+    auto       caret            = m_scintilla.CurrentPos();
     auto       searchStartPoint = caret;
     sptr_t     styleAt          = 0;
     FindResult openFound{};
@@ -1753,8 +1772,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
     // Keep looking whilst the angle bracket found is inside an XML attribute
     do
     {
-        openFound        = FindText("<", searchStartPoint, 0, 0);
-        styleAt          = Call(SCI_GETSTYLEAT, openFound.start);
+        openFound        = FindText("<", searchStartPoint, 0, Scintilla::FindOption::None);
+        styleAt          = m_scintilla.StyleAt(openFound.start);
         searchStartPoint = openFound.start - 1;
     } while (openFound.success && (styleAt == SCE_H_DOUBLESTRING || styleAt == SCE_H_SINGLESTRING) && searchStartPoint > 0);
 
@@ -1765,15 +1784,15 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
         searchStartPoint = openFound.start;
         do
         {
-            closeFound       = FindText(">", searchStartPoint, caret, 0);
-            styleAt          = Call(SCI_GETSTYLEAT, closeFound.start);
+            closeFound       = FindText(">", searchStartPoint, caret, Scintilla::FindOption::None);
+            styleAt          = m_scintilla.StyleAt(closeFound.start);
             searchStartPoint = closeFound.end;
         } while (closeFound.success && (styleAt == SCE_H_DOUBLESTRING || styleAt == SCE_H_SINGLESTRING) && searchStartPoint <= caret);
 
         if (!closeFound.success)
         {
             // We're in a tag (either a start tag or an end tag)
-            auto nextChar = Call(SCI_GETCHARAT, openFound.start + 1);
+            auto nextChar = m_scintilla.CharAt(openFound.start + 1);
 
             /////////////////////////////////////////////////////////////////////////
             // CURSOR IN CLOSE TAG
@@ -1781,8 +1800,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
             if ('/' == nextChar)
             {
                 xmlTags.tagCloseStart = openFound.start;
-                auto docLength        = Call(SCI_GETLENGTH);
-                auto endCloseTag      = FindText(">", caret, docLength, 0);
+                auto docLength        = m_scintilla.Length();
+                auto endCloseTag      = FindText(">", caret, docLength, Scintilla::FindOption::None);
                 if (endCloseTag.success)
                 {
                     xmlTags.tagCloseEnd = endCloseTag.end;
@@ -1792,13 +1811,13 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
 
                 // UTF-8 or ASCII tag name
                 std::string tagName;
-                nextChar = Call(SCI_GETCHARAT, position);
+                nextChar = m_scintilla.CharAt(position);
                 // Checking for " or ' is actually wrong here, but it means it works better with invalid XML
                 while (position < docLength && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                 {
                     tagName.push_back(static_cast<char>(nextChar));
                     ++position;
-                    nextChar = Call(SCI_GETCHARAT, position);
+                    nextChar = m_scintilla.CharAt(position);
                 }
 
                 // Now we know where the end of the tag is, and we know what the tag is called
@@ -1886,18 +1905,18 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
                 // CURSOR IN OPEN TAG
                 /////////////////////////////////////////////////////////////////////////
                 auto position  = openFound.start + 1;
-                auto docLength = Call(SCI_GETLENGTH);
+                auto docLength = m_scintilla.Length();
 
                 xmlTags.tagOpenStart = openFound.start;
 
                 std::string tagName;
-                nextChar = Call(SCI_GETCHARAT, position);
+                nextChar = m_scintilla.CharAt(position);
                 // Checking for " or ' is actually wrong here, but it means it works better with invalid XML
                 while (position < docLength && !IsXMLWhitespace(nextChar) && nextChar != '/' && nextChar != '>' && nextChar != '\"' && nextChar != '\'')
                 {
                     tagName.push_back(static_cast<char>(nextChar));
                     ++position;
-                    nextChar = Call(SCI_GETCHARAT, position);
+                    nextChar = m_scintilla.CharAt(position);
                 }
 
                 // Now we know where the end of the tag is, and we know what the tag is called
@@ -1911,7 +1930,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
                     {
                         xmlTags.tagOpenEnd = closeAnglePosition + 1;
                         // If it's a self closing tag
-                        if (Call(SCI_GETCHARAT, closeAnglePosition - 1) == '/')
+                        if (m_scintilla.CharAt(closeAnglePosition - 1) == '/')
                         {
                             // Set it as found, and mark that there's no close tag
                             xmlTags.tagCloseEnd   = -1;
@@ -1989,7 +2008,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
     return tagFound;
 }
 
-FindResult CScintillaWnd::FindText(const char* text, sptr_t start, sptr_t end, int flags) const
+FindResult CScintillaWnd::FindText(const char* text, sptr_t start, sptr_t end, Scintilla::FindOption flags) const
 {
     FindResult returnValue = {0};
 
@@ -1997,7 +2016,7 @@ FindResult CScintillaWnd::FindText(const char* text, sptr_t start, sptr_t end, i
     search.lpstrText  = const_cast<char*>(text);
     search.chrg.cpMin = start;
     search.chrg.cpMax = end;
-    auto result       = Call(SCI_FINDTEXT, flags, reinterpret_cast<LPARAM>(&search));
+    auto result       = m_scintilla.FindText(flags, &search);
     if (-1 == result)
     {
         returnValue.success = false;
@@ -2017,7 +2036,7 @@ sptr_t CScintillaWnd::FindText(const std::string& toFind, sptr_t startPos, sptr_
     ttf.chrg.cpMin     = startPos;
     ttf.chrg.cpMax     = endPos;
     ttf.lpstrText      = const_cast<char*>(toFind.c_str());
-    return Call(SCI_FINDTEXT, 0, reinterpret_cast<sptr_t>(&ttf));
+    return m_scintilla.FindText(Scintilla::FindOption::None, &ttf);
 }
 
 FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, sptr_t start, sptr_t end) const
@@ -2034,11 +2053,11 @@ FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, sptr_t start, 
     bool       forwardSearch = (start < end);
     do
     {
-        result = FindText(search.c_str(), searchStart, searchEnd, 0);
+        result = FindText(search.c_str(), searchStart, searchEnd, Scintilla::FindOption::None);
         if (result.success)
         {
-            nextChar = static_cast<int>(Call(SCI_GETCHARAT, result.end));
-            styleAt  = Call(SCI_GETSTYLEAT, result.start);
+            nextChar = static_cast<int>(m_scintilla.CharAt(result.end));
+            styleAt  = m_scintilla.StyleAt(result.start);
             if (styleAt != SCE_H_CDATA && styleAt != SCE_H_DOUBLESTRING && styleAt != SCE_H_SINGLESTRING)
             {
                 // We've got an open tag for this tag name (i.e. nextChar was space or '>')
@@ -2053,7 +2072,7 @@ FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, sptr_t start, 
                 else if (IsXMLWhitespace(nextChar))
                 {
                     auto closeAnglePosition = FindCloseAngle(result.end, forwardSearch ? end : start);
-                    if (-1 != closeAnglePosition && '/' != Call(SCI_GETCHARAT, closeAnglePosition - 1))
+                    if (-1 != closeAnglePosition && '/' != m_scintilla.CharAt(closeAnglePosition - 1))
                     {
                         openTagFound.end     = closeAnglePosition;
                         openTagFound.success = true;
@@ -2100,10 +2119,10 @@ sptr_t CScintillaWnd::FindCloseAngle(sptr_t startPosition, sptr_t endPosition) c
     {
         isValidClose = false;
 
-        closeAngle = FindText(">", startPosition, endPosition, 0);
+        closeAngle = FindText(">", startPosition, endPosition, Scintilla::FindOption::None);
         if (closeAngle.success)
         {
-            int style = static_cast<int>(Call(SCI_GETSTYLEAT, closeAngle.start));
+            int style = static_cast<int>(m_scintilla.StyleAt(closeAngle.start));
             // As long as we're not in an attribute (  <TAGNAME attrib="val>ue"> is VALID XML. )
             if (style != SCE_H_DOUBLESTRING && style != SCE_H_SINGLESTRING)
             {
@@ -2137,11 +2156,11 @@ FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, sptr_t start,
     do
     {
         validCloseTag = false;
-        result        = FindText(search.c_str(), searchStart, searchEnd, 0);
+        result        = FindText(search.c_str(), searchStart, searchEnd, Scintilla::FindOption::None);
         if (result.success)
         {
-            nextChar = static_cast<int>(Call(SCI_GETCHARAT, result.end));
-            styleAt  = Call(SCI_GETSTYLEAT, result.start);
+            nextChar = static_cast<int>(m_scintilla.CharAt(result.end));
+            styleAt  = m_scintilla.StyleAt(result.start);
 
             // Setup the parameters for the next search, if there is one.
             if (forwardSearch)
@@ -2169,7 +2188,7 @@ FindResult CScintillaWnd::FindCloseTag(const std::string& tagName, sptr_t start,
                     do
                     {
                         ++whitespacePoint;
-                        nextChar = static_cast<int>(Call(SCI_GETCHARAT, whitespacePoint));
+                        nextChar = static_cast<int>(m_scintilla.CharAt(whitespacePoint));
 
                     } while (IsXMLWhitespace(nextChar));
 
@@ -2199,7 +2218,7 @@ std::vector<std::pair<sptr_t, sptr_t>> CScintillaWnd::GetAttributesPos(sptr_t st
     tr.chrg.cpMin = start;
     tr.chrg.cpMax = end;
     tr.lpstrText  = buf.get();
-    Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
+    m_scintilla.GetTextRange(&tr);
 
     enum class AttrStates
     {
@@ -2285,7 +2304,7 @@ std::vector<std::pair<sptr_t, sptr_t>> CScintillaWnd::GetAttributesPos(sptr_t st
 
 bool CScintillaWnd::AutoBraces(WPARAM wParam) const
 {
-    auto lexer = Call(SCI_GETLEXER);
+    auto lexer = m_scintilla.Lexer();
     switch (lexer)
     {
         case SCLEX_CONTAINER:
@@ -2324,67 +2343,67 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam) const
         }
 
         // Get Selection
-        bool   bSelEmpty      = !!Call(SCI_GETSELECTIONEMPTY);
+        bool   bSelEmpty      = !!m_scintilla.SelectionEmpty();
         sptr_t lineStartStart = 0;
         sptr_t lineEndEnd     = 0;
         if (!bSelEmpty && braceCloseBuf[0])
         {
-            auto selStart  = Call(SCI_GETSELECTIONSTART);
-            auto selEnd    = Call(SCI_GETSELECTIONEND);
-            auto lineStart = Call(SCI_LINEFROMPOSITION, selStart);
-            auto lineEnd   = Call(SCI_LINEFROMPOSITION, selEnd);
-            if (Call(SCI_POSITIONFROMLINE, lineEnd) == selEnd)
+            auto selStart  = m_scintilla.SelectionStart();
+            auto selEnd    = m_scintilla.SelectionEnd();
+            auto lineStart = m_scintilla.LineFromPosition(selStart);
+            auto lineEnd   = m_scintilla.LineFromPosition(selEnd);
+            if (m_scintilla.PositionFromLine(lineEnd) == selEnd)
             {
                 --lineEnd;
-                selEnd = Call(SCI_GETLINEENDPOSITION, lineEnd);
+                selEnd = m_scintilla.LineEndPosition(lineEnd);
             }
-            lineStartStart = Call(SCI_POSITIONFROMLINE, lineStart);
-            lineEndEnd     = Call(SCI_GETLINEENDPOSITION, lineEnd);
+            lineStartStart = m_scintilla.PositionFromLine(lineStart);
+            lineEndEnd     = m_scintilla.LineEndPosition(lineEnd);
             if ((lineStartStart != selStart) || (lineEndEnd != selEnd) || (wParam == '(') || (wParam == '['))
             {
                 // insert the brace before the selection and the closing brace after the selection
-                Call(SCI_SETSEL, static_cast<uptr_t>(-1), selStart);
-                Call(SCI_BEGINUNDOACTION);
-                Call(SCI_INSERTTEXT, selStart, reinterpret_cast<sptr_t>(braceBuf));
-                Call(SCI_INSERTTEXT, selEnd + 1, reinterpret_cast<sptr_t>(braceCloseBuf));
-                Call(SCI_SETSEL, selStart + 1, selStart + 1);
-                Call(SCI_ENDUNDOACTION);
+                m_scintilla.SetSel(static_cast<uptr_t>(-1), selStart);
+                m_scintilla.BeginUndoAction();
+                m_scintilla.InsertText(selStart, braceBuf);
+                m_scintilla.InsertText(selEnd + 1, braceCloseBuf);
+                m_scintilla.SetSel(selStart + 1, selStart + 1);
+                m_scintilla.EndUndoAction();
                 return true;
             }
             else
             {
                 // get info
-                auto tabIndent         = Call(SCI_GETTABWIDTH);
-                auto indentAmount      = Call(SCI_GETLINEINDENTATION, lineStart > 0 ? lineStart - 1 : lineStart);
-                auto indentAmountFirst = Call(SCI_GETLINEINDENTATION, lineStart);
+                auto tabIndent         = m_scintilla.TabWidth();
+                auto indentAmount      = m_scintilla.LineIndentation(lineStart > 0 ? lineStart - 1 : lineStart);
+                auto indentAmountFirst = m_scintilla.LineIndentation(lineStart);
                 if (indentAmount == 0)
                     indentAmount = indentAmountFirst;
-                Call(SCI_BEGINUNDOACTION);
+                m_scintilla.BeginUndoAction();
 
                 // insert a new line at the end of the selected lines
-                Call(SCI_SETSEL, lineEndEnd, lineEndEnd);
-                Call(SCI_NEWLINE);
+                m_scintilla.SetSel(lineEndEnd, lineEndEnd);
+                m_scintilla.NewLine();
                 // now insert the end-brace and indent it
-                Call(SCI_INSERTTEXT, static_cast<uptr_t>(-1), reinterpret_cast<sptr_t>(braceCloseBuf));
-                Call(SCI_SETLINEINDENTATION, lineEnd + 1, indentAmount);
+                m_scintilla.InsertText(static_cast<uptr_t>(-1), braceCloseBuf);
+                m_scintilla.SetLineIndentation(lineEnd + 1, indentAmount);
 
-                Call(SCI_SETSEL, lineStartStart, lineStartStart);
-                // now insert the start-brace and a newline after it
-                Call(SCI_INSERTTEXT, static_cast<uptr_t>(-1), reinterpret_cast<sptr_t>(braceBuf));
-                Call(SCI_SETSEL, lineStartStart + 1, lineStartStart + 1);
-                Call(SCI_NEWLINE);
+                m_scintilla.SetSel(lineStartStart, lineStartStart);
+                // now insert the start-brace and a NewLine after it
+                m_scintilla.InsertText(static_cast<uptr_t>(-1), braceBuf);
+                m_scintilla.SetSel(lineStartStart + 1, lineStartStart + 1);
+                m_scintilla.NewLine();
                 // now indent the line with the start brace
-                Call(SCI_SETLINEINDENTATION, lineStart, indentAmount);
+                m_scintilla.SetLineIndentation(lineStart, indentAmount);
 
                 // increase the indentation of all selected lines
                 if (indentAmount == indentAmountFirst)
                 {
                     for (sptr_t line = lineStart + 1; line <= lineEnd + 1; ++line)
                     {
-                        Call(SCI_SETLINEINDENTATION, line, Call(SCI_GETLINEINDENTATION, line) + tabIndent);
+                        m_scintilla.SetLineIndentation(line, m_scintilla.LineIndentation(line) + tabIndent);
                     }
                 }
-                Call(SCI_ENDUNDOACTION);
+                m_scintilla.EndUndoAction();
                 return true;
             }
         }
@@ -2393,14 +2412,14 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam) const
             if (wParam == '{')
             {
                 // Auto-add the closing brace, then the closing brace
-                Call(SCI_BEGINUNDOACTION);
+                m_scintilla.BeginUndoAction();
                 // insert the opening brace first
-                Call(SCI_ADDTEXT, 1, reinterpret_cast<sptr_t>(braceBuf));
+                m_scintilla.AddText(1, braceBuf);
                 // insert the closing brace
-                Call(SCI_ADDTEXT, 1, reinterpret_cast<sptr_t>(braceCloseBuf));
+                m_scintilla.AddText(1, braceCloseBuf);
                 // go back one char
-                Call(SCI_CHARLEFT);
-                Call(SCI_ENDUNDOACTION);
+                m_scintilla.CharLeft();
+                m_scintilla.EndUndoAction();
                 return true;
             }
         }
@@ -2415,11 +2434,11 @@ void CScintillaWnd::ReflectEvents(SCNotification* pScn)
         case SCN_PAINTED:
             if (m_lineToScrollToAfterPaint != -1)
             {
-                auto visLineToScrollTo = Call(SCI_VISIBLEFROMDOCLINE, m_lineToScrollToAfterPaint);
+                auto visLineToScrollTo = m_scintilla.VisibleFromDocLine(m_lineToScrollToAfterPaint);
                 visLineToScrollTo += m_wrapOffsetToScrollToAfterPaint;
-                Call(SCI_SETFIRSTVISIBLELINE, visLineToScrollTo);
+                m_scintilla.SetFirstVisibleLine(visLineToScrollTo);
                 --m_lineToScrollToAfterPaintCounter;
-                if ((m_lineToScrollToAfterPaintCounter <= 0) || ((Call(SCI_GETFIRSTVISIBLELINE) + 2) > Call(SCI_VISIBLEFROMDOCLINE, m_lineToScrollToAfterPaint)))
+                if ((m_lineToScrollToAfterPaintCounter <= 0) || ((m_scintilla.FirstVisibleLine() + 2) > m_scintilla.VisibleFromDocLine(m_lineToScrollToAfterPaint)))
                 {
                     m_lineToScrollToAfterPaint        = -1;
                     m_wrapOffsetToScrollToAfterPaint  = 0;
@@ -2435,17 +2454,17 @@ void CScintillaWnd::ReflectEvents(SCNotification* pScn)
 
 void CScintillaWnd::SetTabSettings(TabSpace ts) const
 {
-    Call(SCI_SETTABWIDTH, static_cast<uptr_t>(CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4)));
+    m_scintilla.SetTabWidth(static_cast<uptr_t>(CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4)));
     if (ts == TabSpace::Default)
-        Call(SCI_SETUSETABS, static_cast<uptr_t>(CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1)));
+        m_scintilla.SetUseTabs(static_cast<uptr_t>(CIniSettings::Instance().GetInt64(L"View", L"usetabs", 1)));
     else
-        Call(SCI_SETUSETABS, ts == TabSpace::Tabs ? 1 : 0);
-    Call(SCI_SETBACKSPACEUNINDENTS, 1);
-    Call(SCI_SETTABINDENTS, 1);
-    Call(SCI_SETTABDRAWMODE, 1);
+        m_scintilla.SetUseTabs(ts == TabSpace::Tabs ? 1 : 0);
+    m_scintilla.SetBackSpaceUnIndents(true);
+    m_scintilla.SetTabIndents(true);
+    m_scintilla.SetTabDrawMode(Scintilla::TabDrawMode::StrikeOut);
 }
 
-void CScintillaWnd::SetReadDirection(ReadDirection rd) const
+void CScintillaWnd::SetReadDirection(Scintilla::Bidirectional rd) const
 {
     //auto ex = GetWindowLongPtr(*this, GWL_EXSTYLE);
     //if (rd != R2L)
@@ -2453,7 +2472,7 @@ void CScintillaWnd::SetReadDirection(ReadDirection rd) const
     //else
     //    ex |= WS_EX_LAYOUTRTL/*WS_EX_RTLREADING*/;
     //SetWindowLongPtr(*this, GWL_EXSTYLE, ex);
-    Call(SCI_SETBIDIRECTIONAL, static_cast<int>(rd));
+    m_scintilla.SetBidirectional(rd);
 }
 
 void CScintillaWnd::BookmarkAdd(sptr_t lineNo)
@@ -2462,7 +2481,7 @@ void CScintillaWnd::BookmarkAdd(sptr_t lineNo)
         lineNo = GetCurrentLineNumber();
     if (!IsBookmarkPresent(lineNo))
     {
-        Call(SCI_MARKERADD, lineNo, MARK_BOOKMARK);
+        m_scintilla.MarkerAdd(lineNo, MARK_BOOKMARK);
         m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, lineNo, CTheme::Instance().GetThemeColor(RGB(255, 0, 0), true));
         DocScrollUpdate();
     }
@@ -2474,7 +2493,7 @@ void CScintillaWnd::BookmarkDelete(sptr_t lineNo)
         lineNo = GetCurrentLineNumber();
     if (IsBookmarkPresent(lineNo))
     {
-        Call(SCI_MARKERDELETE, lineNo, MARK_BOOKMARK);
+        m_scintilla.MarkerDelete(lineNo, MARK_BOOKMARK);
         m_docScroll.RemoveLine(DOCSCROLLTYPE_BOOKMARK, lineNo);
         DocScrollUpdate();
     }
@@ -2484,7 +2503,7 @@ bool CScintillaWnd::IsBookmarkPresent(sptr_t lineNo) const
 {
     if (lineNo == -1)
         lineNo = GetCurrentLineNumber();
-    LRESULT state = Call(SCI_MARKERGET, lineNo);
+    LRESULT state = m_scintilla.MarkerGet(lineNo);
     return ((state & (1 << MARK_BOOKMARK)) != 0);
 }
 
@@ -2505,7 +2524,7 @@ void CScintillaWnd::MarkBookmarksInScrollbar()
     m_docScroll.Clear(DOCSCROLLTYPE_BOOKMARK);
     for (sptr_t line = -1;;)
     {
-        line = Call(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
+        line = m_scintilla.MarkerNext(line + 1, (1 << MARK_BOOKMARK));
         if (line < 0)
             break;
         m_docScroll.AddLineColor(DOCSCROLLTYPE_BOOKMARK, line, bmColor);
@@ -2533,23 +2552,19 @@ void CScintillaWnd::DocScrollUpdate()
     APPVERIFY(ok);
 }
 
-void CScintillaWnd::SetEOLType(int eolType) const
+void CScintillaWnd::SetEOLType(Scintilla::EndOfLine eolType) const
 {
-    Call(SCI_SETEOLMODE, eolType);
+    m_scintilla.SetEOLMode(eolType);
 }
 
 void CScintillaWnd::AppendText(sptr_t len, const char* buf) const
 {
-    Call(SCI_APPENDTEXT, len, reinterpret_cast<LPARAM>(buf));
+    m_scintilla.AppendText(len, buf);
 }
 
 std::string CScintillaWnd::GetLine(sptr_t line) const
 {
-    auto lineSize = ConstCall(SCI_GETLINE, line, 0);
-    auto pLine    = std::make_unique<char[]>(lineSize + 1);
-    ConstCall(SCI_GETLINE, line, reinterpret_cast<sptr_t>(pLine.get()));
-    pLine[lineSize] = 0;
-    return pLine.get();
+    return m_scintilla.GetLine(line);
 }
 
 std::string CScintillaWnd::GetTextRange(Sci_Position startPos, Sci_Position endPos) const
@@ -2562,16 +2577,13 @@ std::string CScintillaWnd::GetTextRange(Sci_Position startPos, Sci_Position endP
     rangeStart.chrg.cpMin = static_cast<Sci_PositionCR>(startPos);
     rangeStart.chrg.cpMax = static_cast<Sci_PositionCR>(endPos);
     rangeStart.lpstrText  = strBuf.get();
-    ConstCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&rangeStart));
+    m_scintilla.GetTextRange(&rangeStart);
     return strBuf.get();
 }
 
 std::string CScintillaWnd::GetSelectedText(bool useCurrentWordIfSelectionEmpty) const
 {
-    auto selTextLen    = ConstCall(SCI_GETSELTEXT);
-    auto selTextBuffer = std::make_unique<char[]>(selTextLen + 1);
-    ConstCall(SCI_GETSELTEXT, 0, reinterpret_cast<LPARAM>(selTextBuffer.get()));
-    std::string selText = selTextBuffer.get();
+    auto selText = m_scintilla.GetSelText();
     if (selText.empty() && useCurrentWordIfSelectionEmpty)
     {
         selText = GetCurrentWord();
@@ -2581,38 +2593,29 @@ std::string CScintillaWnd::GetSelectedText(bool useCurrentWordIfSelectionEmpty) 
 
 std::string CScintillaWnd::GetCurrentWord() const
 {
-    auto currentPos = ConstCall(SCI_GETCURRENTPOS);
-    auto startPos   = ConstCall(SCI_WORDSTARTPOSITION, currentPos, true);
-    auto endPos     = ConstCall(SCI_WORDENDPOSITION, currentPos, true);
+    auto currentPos = m_scintilla.CurrentPos();
+    auto startPos   = m_scintilla.WordStartPosition(currentPos, true);
+    auto endPos     = m_scintilla.WordEndPosition(currentPos, true);
     return GetTextRange(startPos, endPos);
 }
 
 std::string CScintillaWnd::GetCurrentLine() const
 {
-    auto lineLen    = ConstCall(SCI_GETCURLINE);
-    auto lineBuffer = std::make_unique<char[]>(lineLen + 1);
-    ConstCall(SCI_GETCURLINE, lineLen + 1, reinterpret_cast<LPARAM>(lineBuffer.get()));
-    return lineBuffer.get();
+    auto lineLen    = m_scintilla.GetCurLine(0, nullptr);
+    return m_scintilla.GetCurLine(lineLen);
 }
 
 std::string CScintillaWnd::GetWordChars() const
 {
-    auto len        = ConstCall(SCI_GETWORDCHARS);
-    auto lineBuffer = std::make_unique<char[]>(len + 1);
-    ConstCall(SCI_GETWORDCHARS, 0, reinterpret_cast<LPARAM>(lineBuffer.get()));
-    lineBuffer[len] = '\0';
-    return lineBuffer.get();
+    return m_scintilla.WordChars();
 }
 
 std::string CScintillaWnd::GetWhitespaceChars() const
 {
-    auto len        = ConstCall(SCI_GETWHITESPACECHARS);
-    auto lineBuffer = std::make_unique<char[]>(len + 1);
-    ConstCall(SCI_GETWHITESPACECHARS, 0, reinterpret_cast<LPARAM>(lineBuffer.get()));
-    return lineBuffer.get();
+    return m_scintilla.WhitespaceChars();
 }
 
 sptr_t CScintillaWnd::GetCurrentLineNumber() const
 {
-    return ConstCall(SCI_LINEFROMPOSITION, ConstCall(SCI_GETCURRENTPOS));
+    return m_scintilla.LineFromPosition(m_scintilla.CurrentPos());
 }

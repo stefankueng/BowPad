@@ -328,9 +328,9 @@ void CDocScroll::CalcLines()
             m_visibleLineColors[i].clear();
         for (const auto& lc : m_lineColors)
         {
-            m_visibleLineColors[lc.first.type][m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, lc.first.line)] = lc.second;
+            m_visibleLineColors[lc.first.type][m_pScintilla->Scintilla().VisibleFromDocLine(lc.first.line)] = lc.second;
         }
-        m_visibleLines = m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, m_lines);
+        m_visibleLines = m_pScintilla->Scintilla().VisibleFromDocLine(m_lines);
         m_bDirty       = false;
     }
 }
@@ -375,7 +375,7 @@ void CDocScroll::RemoveLine(int type, size_t line)
 
 void CDocScroll::VisibleLinesChanged()
 {
-    auto visibleLines = m_pScintilla->Call(SCI_VISIBLEFROMDOCLINE, m_lines);
+    auto visibleLines = m_pScintilla->Scintilla().VisibleFromDocLine(m_lines);
     if (m_visibleLines != static_cast<size_t>(visibleLines))
     {
         m_bDirty = true;

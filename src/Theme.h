@@ -18,7 +18,7 @@
 #include <unordered_map>
 #include <functional>
 
-using ThemeChangeCallback = std::function<void(void)>;
+using ThemeChangeCallback = std::function<void()>;
 
 class CTheme
 {

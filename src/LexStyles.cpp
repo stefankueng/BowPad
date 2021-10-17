@@ -693,9 +693,9 @@ std::string CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaW
     // try using the file content to determine a lexer.
     // Since this needs to be fast, we don't do excessive checks but
     // keep it very, very simple.
-    edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+    edit.Scintilla().SetDocPointer(doc.m_document);
     OnOutOfScope(
-        edit.Call(SCI_SETDOCPOINTER, 0, 0););
+        edit.Scintilla().SetDocPointer(nullptr););
 
     std::string line = edit.GetLine(0);
     for (const auto& m : lexDetectStrings)
@@ -932,7 +932,7 @@ void CLexStyles::SaveUserData()
             }
         }
         bool        hasChangedEntries = false;
-        const auto& origStyleData = m_lexerData[lexerId].styles;
+        const auto& origStyleData     = m_lexerData[lexerId].styles;
         for (const auto& [styleId, styleData] : lexerData.styles)
         {
             std::wstring style = CStringUtils::Format(L"Style%d", styleId);
@@ -968,7 +968,7 @@ void CLexStyles::SaveUserData()
 
     for (const auto& [ext, name] : m_userExtLang)
     {
-        const auto&  origExtIt = m_extLang.find(ext);
+        const auto& origExtIt = m_extLang.find(ext);
         if (origExtIt != m_extLang.end())
         {
             if (origExtIt->second == name)

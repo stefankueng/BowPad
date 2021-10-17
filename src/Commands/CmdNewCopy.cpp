@@ -27,9 +27,9 @@ bool CCmdNewCopy::Execute()
     if (HasActiveDocument())
     {
         // create a copy of the active document
-        size_t len     = ScintillaCall(SCI_GETLENGTH);
+        size_t len     = Scintilla().Length();
         auto   textBuf = std::make_unique<char[]>(len + 1);
-        ScintillaCall(SCI_GETTEXT, len + 1, reinterpret_cast<sptr_t>(textBuf.get()));
+        Scintilla().GetText(len + 1, textBuf.get());
 
         auto& doc = GetModActiveDocument();
         SaveCurrentPos(doc.m_position);
@@ -44,9 +44,9 @@ bool CCmdNewCopy::Execute()
         docNew.m_bNeedsSaving = true;
 
         SetupLexerForLang(docNew.GetLanguage());
-        ScintillaCall(SCI_APPENDTEXT, len, reinterpret_cast<sptr_t>(textBuf.get()));
+        Scintilla().AppendText(len, textBuf.get());
         RestoreCurrentPos(docNew.m_position);
-        ScintillaCall(SCI_SETSAVEPOINT);
+        Scintilla().SetSavePoint();
         std::wstring sTitle = CPathUtils::GetFileName(doc.m_path);
         if (sTitle.empty())
             sTitle = GetCurrentTitle();

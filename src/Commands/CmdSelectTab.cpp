@@ -231,7 +231,7 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
             const auto dpiSpacing = CDPIAware::Instance().Scale(*this, spacing);
             auto       dpiMargin  = CDPIAware::Instance().Scale(*this, margin);
             auto       item       = static_cast<size_t>((pt.y - dpiMargin) / (m_textHeight + dpiSpacing));
-            if (item >= 0 && item < m_tabList.size())
+            if (item < m_tabList.size())
             {
                 ShowWindow(*this, SW_HIDE);
                 auto docId = std::get<1>(m_tabList[item]);

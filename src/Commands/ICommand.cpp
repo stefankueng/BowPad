@@ -162,14 +162,9 @@ bool ICommand::CloseTab(int index, bool bForce) const
     return m_pMainWindow->CloseTab(index, bForce);
 }
 
-sptr_t ICommand::ScintillaCall(unsigned int iMessage, uptr_t wParam /*= 0*/, sptr_t lParam /*= 0*/) const
+Scintilla::ScintillaCall& ICommand::Scintilla() const
 {
-    return m_pMainWindow->m_editor.Call(iMessage, wParam, lParam);
-}
-
-sptr_t ICommand::ConstCall(unsigned int iMessage, uptr_t wParam /*= 0*/, sptr_t lParam /*= 0*/) const
-{
-    return m_pMainWindow->m_editor.Call(iMessage, wParam, lParam);
+    return m_pMainWindow->m_editor.Scintilla();
 }
 
 HWND ICommand::GetHwnd() const

@@ -21,29 +21,29 @@
 bool CCmdComment::Execute()
 {
     // Get Selection
-    bool bSelEmpty    = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
+    bool bSelEmpty    = !!Scintilla().SelectionEmpty();
     bool bForceStream = false;
-    auto selStart     = ScintillaCall(SCI_GETSELECTIONSTART);
-    auto selEnd       = ScintillaCall(SCI_GETSELECTIONEND);
-    auto lineStart    = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-    auto lineEnd      = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
-    auto curPos       = ScintillaCall(SCI_GETCURRENTPOS);
+    auto selStart     = Scintilla().SelectionStart();
+    auto selEnd       = Scintilla().SelectionEnd();
+    auto lineStart    = Scintilla().LineFromPosition(selStart);
+    auto lineEnd      = Scintilla().LineFromPosition(selEnd);
+    auto curPos       = Scintilla().CurrentPos();
     if (!bSelEmpty)
     {
-        if (ScintillaCall(SCI_POSITIONFROMLINE, lineEnd) == selEnd)
+        if (Scintilla().PositionFromLine(lineEnd) == selEnd)
         {
             --lineEnd;
-            selEnd = ScintillaCall(SCI_GETLINEENDPOSITION, lineEnd);
+            selEnd = Scintilla().LineEndPosition(lineEnd);
         }
 
-        auto lineStartStart = ScintillaCall(SCI_POSITIONFROMLINE, ScintillaCall(SCI_LINEFROMPOSITION, selStart));
-        auto lineEndEnd     = ScintillaCall(SCI_GETLINEENDPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, selEnd));
+        auto lineStartStart = Scintilla().PositionFromLine(Scintilla().LineFromPosition(selStart));
+        auto lineEndEnd     = Scintilla().LineEndPosition(Scintilla().LineFromPosition(selEnd));
         bForceStream        = (lineStartStart != selStart) || (lineEndEnd != selEnd);
     }
     else
     {
-        selStart = ScintillaCall(SCI_GETLINEINDENTPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
-        selEnd   = ScintillaCall(SCI_GETLINEENDPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
+        selStart = Scintilla().LineIndentPosition(Scintilla().LineFromPosition(curPos));
+        selEnd   = Scintilla().LineEndPosition(Scintilla().LineFromPosition(curPos));
     }
     if (!HasActiveDocument())
         return false;
@@ -64,20 +64,20 @@ bool CCmdComment::Execute()
         sptr_t indent = INTPTR_MAX;
         for (auto line = lineStart; line <= lineEnd; ++line)
         {
-            indent = min(ScintillaCall(SCI_GETLINEINDENTATION, line), indent);
+            indent = min(Scintilla().LineIndentation(line), indent);
         }
         // now insert the comment marker at the leftmost indentation on every line
-        ScintillaCall(SCI_BEGINUNDOACTION);
+        Scintilla().BeginUndoAction();
         size_t insertedChars = 0;
         for (auto line = lineStart; line <= lineEnd; ++line)
         {
-            auto pos = ScintillaCall(SCI_POSITIONFROMLINE, line);
+            auto pos = Scintilla().PositionFromLine(line);
             if (!commentLineAtStart)
             {
-                int tabsize = static_cast<int>(ScintillaCall(SCI_GETTABWIDTH));
+                int tabsize = static_cast<int>(Scintilla().TabWidth());
                 for (decltype(indent) i = 0; i < indent;)
                 {
-                    char c = static_cast<char>(ScintillaCall(SCI_GETCHARAT, pos));
+                    char c = static_cast<char>(Scintilla().CharAt(pos));
                     if (c == '\t')
                         i += tabsize;
                     else
@@ -85,26 +85,26 @@ bool CCmdComment::Execute()
                     pos += 1;
                 }
             }
-            ScintillaCall(SCI_INSERTTEXT, pos, reinterpret_cast<sptr_t>(commentLine.c_str()));
+            Scintilla().InsertText(pos, commentLine.c_str());
             insertedChars += commentLine.length();
         }
-        ScintillaCall(SCI_ENDUNDOACTION);
+        Scintilla().EndUndoAction();
         if (!bSelEmpty)
-            ScintillaCall(SCI_SETSEL, selStart, selEnd + insertedChars);
+            Scintilla().SetSel(selStart, selEnd + insertedChars);
         else
-            ScintillaCall(SCI_SETSEL, curPos + insertedChars, curPos + insertedChars);
+            Scintilla().SetSel(curPos + insertedChars, curPos + insertedChars);
     }
     else if (!commentStreamStart.empty())
     {
         // insert a stream comment
-        ScintillaCall(SCI_BEGINUNDOACTION);
-        ScintillaCall(SCI_INSERTTEXT, selStart, reinterpret_cast<sptr_t>(commentStreamStart.c_str()));
-        ScintillaCall(SCI_INSERTTEXT, selEnd + commentStreamStart.length(), reinterpret_cast<sptr_t>(commentStreamEnd.c_str()));
-        ScintillaCall(SCI_ENDUNDOACTION);
+        Scintilla().BeginUndoAction();
+        Scintilla().InsertText(selStart, commentStreamStart.c_str());
+        Scintilla().InsertText(selEnd + commentStreamStart.length(), commentStreamEnd.c_str());
+        Scintilla().EndUndoAction();
         if (!bSelEmpty)
-            ScintillaCall(SCI_SETSEL, selStart + commentStreamStart.length(), selEnd + commentStreamStart.length());
+            Scintilla().SetSel(selStart + commentStreamStart.length(), selEnd + commentStreamStart.length());
         else
-            ScintillaCall(SCI_SETSEL, curPos + commentStreamStart.length(), curPos + commentStreamStart.length());
+            Scintilla().SetSel(curPos + commentStreamStart.length(), curPos + commentStreamStart.length());
     }
 
     return true;
@@ -113,7 +113,7 @@ bool CCmdComment::Execute()
 bool CCmdUnComment::Execute()
 {
     // Get Selection
-    bool   bSelEmpty      = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
+    bool   bSelEmpty      = !!Scintilla().SelectionEmpty();
     sptr_t selStart       = 0;
     sptr_t selEnd         = 0;
     sptr_t lineStartStart = 0;
@@ -128,11 +128,11 @@ bool CCmdUnComment::Execute()
 
     if (!bSelEmpty)
     {
-        selStart          = ScintillaCall(SCI_GETSELECTIONSTART);
-        selEnd            = ScintillaCall(SCI_GETSELECTIONEND);
+        selStart          = Scintilla().SelectionStart();
+        selEnd            = Scintilla().SelectionEnd();
         size_t selEndCorr = 0;
         // go back if selEnd is on an EOL char
-        switch (ScintillaCall(SCI_GETCHARAT, selEnd))
+        switch (Scintilla().CharAt(selEnd))
         {
             case '\r':
             case '\n':
@@ -142,7 +142,7 @@ bool CCmdUnComment::Execute()
             default:
                 break;
         }
-        switch (ScintillaCall(SCI_GETCHARAT, selEnd))
+        switch (Scintilla().CharAt(selEnd))
         {
             case '\r':
             case '\n':
@@ -158,7 +158,7 @@ bool CCmdUnComment::Execute()
         rangeStart.chrg.cpMin = static_cast<Sci_PositionCR>(selStart - commentstreamstart.length());
         rangeStart.chrg.cpMax = static_cast<Sci_PositionCR>(selStart);
         rangeStart.lpstrText  = strbuf.get();
-        ScintillaCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&rangeStart));
+        Scintilla().GetTextRange(&rangeStart);
         bool bRemovedStream = false;
         if (!commentstreamstart.empty() && _stricmp(commentstreamstart.c_str(), strbuf.get()) == 0)
         {
@@ -167,48 +167,48 @@ bool CCmdUnComment::Execute()
             rangeEnd.chrg.cpMin = static_cast<Sci_PositionCR>(selEnd);
             rangeEnd.chrg.cpMax = static_cast<Sci_PositionCR>(selEnd + commentstreamend.length());
             rangeEnd.lpstrText  = strbuf.get();
-            ScintillaCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&rangeEnd));
+            Scintilla().GetTextRange(&rangeEnd);
             if (_stricmp(commentstreamend.c_str(), strbuf.get()) == 0)
             {
-                ScintillaCall(SCI_BEGINUNDOACTION);
+                Scintilla().BeginUndoAction();
                 // remove the stream start marker
-                ScintillaCall(SCI_SETSEL, rangeStart.chrg.cpMin, rangeStart.chrg.cpMax);
-                ScintillaCall(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(""));
+                Scintilla().SetSel(rangeStart.chrg.cpMin, rangeStart.chrg.cpMax);
+                Scintilla().ReplaceSel("");
                 // remove the end start marker
-                ScintillaCall(SCI_SETSEL, rangeEnd.chrg.cpMin - commentstreamstart.length(), rangeEnd.chrg.cpMax - commentstreamstart.length());
-                ScintillaCall(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(""));
-                ScintillaCall(SCI_ENDUNDOACTION);
-                ScintillaCall(SCI_SETSEL, selStart - commentstreamstart.length(), selEnd - commentstreamstart.length() + selEndCorr);
+                Scintilla().SetSel(rangeEnd.chrg.cpMin - commentstreamstart.length(), rangeEnd.chrg.cpMax - commentstreamstart.length());
+                Scintilla().ReplaceSel("");
+                Scintilla().EndUndoAction();
+                Scintilla().SetSel(selStart - commentstreamstart.length(), selEnd - commentstreamstart.length() + selEndCorr);
                 bRemovedStream = true;
             }
         }
         if (!bRemovedStream)
         {
-            lineStartStart = ScintillaCall(SCI_POSITIONFROMLINE, ScintillaCall(SCI_LINEFROMPOSITION, selStart));
+            lineStartStart = Scintilla().PositionFromLine(Scintilla().LineFromPosition(selStart));
             if (lineStartStart == selStart)
             {
                 // remove block comments for each selected line
-                auto lineStart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-                auto lineEnd   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
-                ScintillaCall(SCI_BEGINUNDOACTION);
+                auto lineStart = Scintilla().LineFromPosition(selStart);
+                auto lineEnd   = Scintilla().LineFromPosition(selEnd);
+                Scintilla().BeginUndoAction();
                 size_t removedChars = 0;
                 for (auto line = lineStart; line <= lineEnd; ++line)
                 {
-                    auto          pos = ScintillaCall(SCI_GETLINEINDENTPOSITION, line);
+                    auto          pos = Scintilla().LineIndentPosition(line);
                     Sci_TextRange range;
                     range.chrg.cpMin = static_cast<Sci_PositionCR>(pos);
                     range.chrg.cpMax = static_cast<Sci_PositionCR>(pos + commentLine.length());
                     range.lpstrText  = strbuf.get();
-                    ScintillaCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&range));
+                    Scintilla().GetTextRange(&range);
                     if (_stricmp(commentLine.c_str(), strbuf.get()) == 0)
                     {
-                        ScintillaCall(SCI_SETSEL, range.chrg.cpMin, range.chrg.cpMax);
-                        ScintillaCall(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(""));
+                        Scintilla().SetSel(range.chrg.cpMin, range.chrg.cpMax);
+                        Scintilla().ReplaceSel("");
                         removedChars += commentLine.length();
                     }
                 }
-                ScintillaCall(SCI_ENDUNDOACTION);
-                ScintillaCall(SCI_SETSEL, selStart, selEnd - removedChars + selEndCorr);
+                Scintilla().EndUndoAction();
+                Scintilla().SetSel(selStart, selEnd - removedChars + selEndCorr);
             }
         }
     }
@@ -216,20 +216,20 @@ bool CCmdUnComment::Execute()
     {
         // remove block comment for the current line
         auto strBuf = std::make_unique<char[]>(commentLine.size() + 5);
-        auto curPos = ScintillaCall(SCI_GETCURRENTPOS);
-        ScintillaCall(SCI_BEGINUNDOACTION);
-        auto          pos = ScintillaCall(SCI_GETLINEINDENTPOSITION, ScintillaCall(SCI_LINEFROMPOSITION, curPos));
+        auto curPos = Scintilla().CurrentPos();
+        Scintilla().BeginUndoAction();
+        auto          pos = Scintilla().LineIndentPosition(Scintilla().LineFromPosition(curPos));
         Sci_TextRange range;
         range.chrg.cpMin = static_cast<Sci_PositionCR>(pos);
         range.chrg.cpMax = static_cast<Sci_PositionCR>(pos + commentLine.length());
         range.lpstrText  = strBuf.get();
-        ScintillaCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&range));
+        Scintilla().GetTextRange(&range);
         if (!commentLine.empty() && (_stricmp(commentLine.c_str(), strBuf.get()) == 0))
         {
-            ScintillaCall(SCI_SETSEL, range.chrg.cpMin, range.chrg.cpMax);
-            ScintillaCall(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(""));
+            Scintilla().SetSel(range.chrg.cpMin, range.chrg.cpMax);
+            Scintilla().ReplaceSel("");
             auto newCurPos = curPos > static_cast<sptr_t>(commentLine.length()) ? curPos - commentLine.length() : 0;
-            ScintillaCall(SCI_SETSEL, newCurPos, newCurPos);
+            Scintilla().SetSel(newCurPos, newCurPos);
         }
         else if (!commentstreamstart.empty() && !commentstreamend.empty())
         {
@@ -241,31 +241,31 @@ bool CCmdUnComment::Execute()
                 ttf.chrg.cpMin--;
             ttf.chrg.cpMax = 0;
             ttf.lpstrText  = const_cast<char*>(commentstreamstart.c_str());
-            auto findRet   = ScintillaCall(SCI_FINDTEXT, 0, reinterpret_cast<sptr_t>(&ttf));
+            auto findRet   = Scintilla().FindText(Scintilla::FindOption::None, &ttf);
             if (findRet >= 0)
             {
                 ttf.lpstrText = const_cast<char*>(commentstreamend.c_str());
-                auto findRet2 = ScintillaCall(SCI_FINDTEXT, 0, reinterpret_cast<sptr_t>(&ttf));
+                auto findRet2 = Scintilla().FindText(Scintilla::FindOption::None, &ttf);
                 // test if the start marker is found later than the end marker: if not, we found an independent comment outside of the current position
                 if (findRet2 < findRet)
                 {
                     // now find the end marker
                     ttf.chrg.cpMin = static_cast<Sci_PositionCR>(curPos);
-                    ttf.chrg.cpMax = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
+                    ttf.chrg.cpMax = static_cast<Sci_PositionCR>(Scintilla().Length());
                     ttf.lpstrText  = const_cast<char*>(commentstreamend.c_str());
-                    auto findRet3  = ScintillaCall(SCI_FINDTEXT, 0, reinterpret_cast<sptr_t>(&ttf));
+                    auto findRet3  = Scintilla().FindText(Scintilla::FindOption::None, &ttf);
                     if (findRet3 >= 0)
                     {
-                        ScintillaCall(SCI_SETSEL, findRet3, findRet3 + commentstreamend.length());
-                        ScintillaCall(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(""));
-                        ScintillaCall(SCI_SETSEL, findRet, findRet + commentstreamstart.length());
-                        ScintillaCall(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(""));
-                        ScintillaCall(SCI_SETSEL, curPos - commentstreamstart.length(), curPos - commentstreamstart.length());
+                        Scintilla().SetSel(findRet3, findRet3 + commentstreamend.length());
+                        Scintilla().ReplaceSel("");
+                        Scintilla().SetSel(findRet, findRet + commentstreamstart.length());
+                        Scintilla().ReplaceSel("");
+                        Scintilla().SetSel(curPos - commentstreamstart.length(), curPos - commentstreamstart.length());
                     }
                 }
             }
         }
-        ScintillaCall(SCI_ENDUNDOACTION);
+        Scintilla().EndUndoAction();
     }
 
     return true;

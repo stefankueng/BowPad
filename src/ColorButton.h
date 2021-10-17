@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2016, 2021 Stefan Kueng
 //
@@ -41,8 +41,6 @@ public:
     {
         m_hasLastColor = false;
     }
-
-protected:
 
 private:
     WNDPROC     m_pfnOrigCtlProc = nullptr;

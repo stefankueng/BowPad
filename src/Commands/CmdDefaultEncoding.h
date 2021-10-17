@@ -39,7 +39,7 @@ public:
     {
     }
 
-    ~CCmdDefaultEncoding(void) = default;
+    ~CCmdDefaultEncoding() = default;
 
     bool Execute() override;
 

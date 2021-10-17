@@ -31,7 +31,7 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_UNDO);
+        Scintilla().Undo();
         return true;
     }
 
@@ -51,7 +51,7 @@ public:
     {
         if (UI_PKEY_Enabled == key)
         {
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_CANUNDO) != 0), pPropVarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (Scintilla().CanUndo() != 0), pPropVarNewValue);
         }
         return E_NOTIMPL;
     }
@@ -69,7 +69,7 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_REDO);
+        Scintilla().Redo();
         return true;
     }
 
@@ -89,7 +89,7 @@ public:
     {
         if (UI_PKEY_Enabled == key)
         {
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_CANREDO) != 0), pPropVarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (Scintilla().CanRedo() != 0), pPropVarNewValue);
         }
         return E_NOTIMPL;
     }

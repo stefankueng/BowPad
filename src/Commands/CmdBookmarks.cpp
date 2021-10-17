@@ -66,7 +66,7 @@ void CCmdBookmarks::OnDocumentClose(DocID id)
     std::vector<sptr_t> bookmarkLines;
     for (sptr_t line = -1;;)
     {
-        line = ScintillaCall(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
+        line = Scintilla().MarkerNext(line + 1, (1 << MARK_BOOKMARK));
         if (line < 0)
             break;
         bookmarkLines.push_back(line);
@@ -118,7 +118,7 @@ void CCmdBookmarks::OnDocumentOpen(DocID id)
         const auto& lines = it->second;
         for (const auto line : lines)
         {
-            ScintillaCall(SCI_MARKERADD, line, MARK_BOOKMARK);
+            Scintilla().MarkerAdd(line, MARK_BOOKMARK);
             DocScrollAddLineColor(DOCSCROLLTYPE_BOOKMARK, line, g_bmColor);
         }
         if (!lines.empty())
@@ -132,15 +132,15 @@ bool CCmdBookmarkToggle::Execute()
 {
     auto line = GetCurrentLineNumber();
 
-    LRESULT state = ScintillaCall(SCI_MARKERGET, line);
+    LRESULT state = Scintilla().MarkerGet(line);
     if ((state & (1 << MARK_BOOKMARK)) != 0)
     {
-        ScintillaCall(SCI_MARKERDELETE, line, MARK_BOOKMARK);
+        Scintilla().MarkerDelete(line, MARK_BOOKMARK);
         DocScrollRemoveLine(DOCSCROLLTYPE_BOOKMARK, line);
     }
     else
     {
-        ScintillaCall(SCI_MARKERADD, line, MARK_BOOKMARK);
+        Scintilla().MarkerAdd(line, MARK_BOOKMARK);
         DocScrollAddLineColor(DOCSCROLLTYPE_BOOKMARK, line, g_bmColor);
     }
     DocScrollUpdate();
@@ -155,7 +155,7 @@ bool CCmdBookmarkToggle::Execute()
 
 bool CCmdBookmarkClearAll::Execute()
 {
-    ScintillaCall(SCI_MARKERDELETEALL, MARK_BOOKMARK);
+    Scintilla().MarkerDeleteAll(MARK_BOOKMARK);
     DocScrollClear(DOCSCROLLTYPE_BOOKMARK);
     return true;
 }
@@ -165,15 +165,15 @@ bool CCmdBookmarkClearAll::Execute()
 bool CCmdBookmarkNext::Execute()
 {
     auto line = GetCurrentLineNumber();
-    line      = ScintillaCall(SCI_MARKERNEXT, line + 1, (1 << MARK_BOOKMARK));
+    line      = Scintilla().MarkerNext(line + 1, (1 << MARK_BOOKMARK));
     if (line >= 0)
-        ScintillaCall(SCI_GOTOLINE, line);
+        Scintilla().GotoLine(line);
     else
     {
         // retry from the start of the document
-        line = ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
+        line = Scintilla().MarkerNext(0, (1 << MARK_BOOKMARK));
         if (line >= 0)
-            ScintillaCall(SCI_GOTOLINE, line);
+            Scintilla().GotoLine(line);
     }
     return true;
 }
@@ -191,7 +191,7 @@ HRESULT CCmdBookmarkNext::IUICommandHandlerUpdateProperty(
 {
     if (UI_PKEY_Enabled == key)
     {
-        auto nextPos = ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
+        auto nextPos = Scintilla().MarkerNext(0, (1 << MARK_BOOKMARK));
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, nextPos >= 0, pPropVarNewValue);
     }
     return E_NOTIMPL;
@@ -202,15 +202,15 @@ HRESULT CCmdBookmarkNext::IUICommandHandlerUpdateProperty(
 bool CCmdBookmarkPrev::Execute()
 {
     auto line = GetCurrentLineNumber();
-    line      = ScintillaCall(SCI_MARKERPREVIOUS, line - 1, (1 << MARK_BOOKMARK));
+    line      = Scintilla().MarkerPrevious(line - 1, (1 << MARK_BOOKMARK));
     if (line >= 0)
-        ScintillaCall(SCI_GOTOLINE, line);
+        Scintilla().GotoLine(line);
     else
     {
         // retry from the start of the document
-        line = ScintillaCall(SCI_MARKERPREVIOUS, ScintillaCall(SCI_GETLINECOUNT), (1 << MARK_BOOKMARK));
+        line = Scintilla().MarkerPrevious(Scintilla().LineCount(), (1 << MARK_BOOKMARK));
         if (line >= 0)
-            ScintillaCall(SCI_GOTOLINE, line);
+            Scintilla().GotoLine(line);
     }
     return true;
 }
@@ -227,7 +227,7 @@ HRESULT CCmdBookmarkPrev::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
 {
     if (UI_PKEY_Enabled == key)
     {
-        auto nextPos = ScintillaCall(SCI_MARKERNEXT, 0, (1 << MARK_BOOKMARK));
+        auto nextPos = Scintilla().MarkerNext(0, (1 << MARK_BOOKMARK));
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, nextPos >= 0, pPropVarNewValue);
     }
     return E_NOTIMPL;

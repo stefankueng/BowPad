@@ -27,21 +27,21 @@ CCmdWhiteSpace::CCmdWhiteSpace(void* obj)
 
 bool CCmdWhiteSpace::Execute()
 {
-    bool bShown = ScintillaCall(SCI_GETVIEWWS) != 0;
-    ScintillaCall(SCI_SETVIEWWS, bShown ? 0 : 1);
-    CIniSettings::Instance().SetInt64(L"View", L"whitespace", ScintillaCall(SCI_GETVIEWWS));
+    bool bShown = Scintilla().ViewWS() != Scintilla::WhiteSpace::Invisible;
+    Scintilla().SetViewWS(bShown ? Scintilla::WhiteSpace::Invisible : Scintilla::WhiteSpace::VisibleAlways);
+    CIniSettings::Instance().SetInt64(L"View", L"whitespace", static_cast<int>(Scintilla().ViewWS()));
     if (bShown || ((GetKeyState(VK_SHIFT) & 0x8000) == 0))
-        ScintillaCall(SCI_SETVIEWEOL, false);
+        Scintilla().SetViewEOL(false);
     else
-        ScintillaCall(SCI_SETVIEWEOL, true);
+        Scintilla().SetViewEOL(true);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
 }
 
 void CCmdWhiteSpace::AfterInit()
 {
-    int ws = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"whitespace", 0));
-    ScintillaCall(SCI_SETVIEWWS, ws);
+    auto ws = static_cast<Scintilla::WhiteSpace>(CIniSettings::Instance().GetInt64(L"View", L"whitespace", 0));
+    Scintilla().SetViewWS(ws);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
@@ -49,7 +49,7 @@ HRESULT CCmdWhiteSpace::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, cons
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETVIEWWS) > 0, pPropVarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, Scintilla().ViewWS() > Scintilla::WhiteSpace::Invisible, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
@@ -65,7 +65,7 @@ void CCmdTabSize::AfterInit()
     auto& doc        = GetActiveDocument();
     auto  tabSizeSet = CEditorConfigHandler::Instance().HasTabSize(doc.m_path);
     if (!tabSizeSet)
-        ScintillaCall(SCI_SETTABWIDTH, ve);
+        Scintilla().SetTabWidth(ve);
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
     UpdateStatusBar(false);
 }
@@ -112,7 +112,7 @@ HRESULT CCmdTabSize::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
 
 HRESULT CCmdTabSize::IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPERTYKEY* /*key*/, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* /*pCommandExecutionProperties*/)
 {
-    ScintillaCall(SCI_SETTABWIDTH, pPropVarValue->intVal);
+    Scintilla().SetTabWidth(pPropVarValue->intVal);
     CIniSettings::Instance().SetInt64(L"View", L"tabsize", pPropVarValue->intVal);
     UpdateStatusBar(false);
     return S_OK;
@@ -143,14 +143,14 @@ bool CCmdUseTabs::Execute()
         auto& doc = GetModActiveDocument();
         if (doc.m_tabSpace == TabSpace::Default)
         {
-            ScintillaCall(SCI_SETUSETABS, ScintillaCall(SCI_GETUSETABS) ? 0 : 1);
+            Scintilla().SetUseTabs(Scintilla().UseTabs() ? 0 : 1);
         }
         else
         {
-            ScintillaCall(SCI_SETUSETABS, doc.m_tabSpace == TabSpace::Tabs ? 0 : 1);
+            Scintilla().SetUseTabs(doc.m_tabSpace == TabSpace::Tabs ? 0 : 1);
         }
-        doc.m_tabSpace = ScintillaCall(SCI_GETUSETABS) ? TabSpace::Tabs : TabSpace::Spaces;
-        CIniSettings::Instance().SetInt64(L"View", L"usetabs", ScintillaCall(SCI_GETUSETABS));
+        doc.m_tabSpace = Scintilla().UseTabs() ? TabSpace::Tabs : TabSpace::Spaces;
+        CIniSettings::Instance().SetInt64(L"View", L"usetabs", Scintilla().UseTabs());
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         UpdateStatusBar(false);
         return true;
@@ -170,7 +170,7 @@ HRESULT CCmdUseTabs::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, ScintillaCall(SCI_GETUSETABS) > 0, pPropVarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, Scintilla().UseTabs(), pPropVarNewValue);
     }
     return E_NOTIMPL;
 }

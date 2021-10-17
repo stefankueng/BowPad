@@ -16,9 +16,10 @@
 //
 #pragma once
 #include "Scintilla.h"
+#include "ScintillaTypes.h"
 #include <functional>
 
-using Document = uptr_t;
+using Document = void*;
 
 enum class EOLFormat : int
 {
@@ -34,16 +35,9 @@ enum class TabSpace : int
     Spaces
 };
 
-enum class ReadDirection : int
-{
-    Disabled,
-    L2R,
-    R2L
-};
-
-std::wstring getEolFormatDescription(EOLFormat ft);
-EOLFormat    toEolFormat(int eolMode);
-int          toEolMode(EOLFormat eolFormat);
+std::wstring         getEolFormatDescription(EOLFormat ft);
+EOLFormat            toEolFormat(Scintilla::EndOfLine eolMode);
+Scintilla::EndOfLine toEolMode(EOLFormat eolFormat);
 
 class CPosData
 {
@@ -54,29 +48,29 @@ public:
         , m_nStartPos(0)
         , m_nEndPos(0)
         , m_xOffset(0)
-        , m_nSelMode(0)
+        , m_nSelMode(Scintilla::SelectionMode::Stream)
         , m_nScrollWidth(1)
         , m_lastStyleLine(0){};
     ~CPosData()
     {
     }
 
-    sptr_t              m_nFirstVisibleLine;
-    sptr_t              m_nWrapLineOffset;
-    sptr_t              m_nStartPos;
-    sptr_t              m_nEndPos;
-    sptr_t              m_xOffset;
-    sptr_t              m_nSelMode;
-    sptr_t              m_nScrollWidth;
-    std::vector<sptr_t> m_lineStateVector;
-    sptr_t              m_lastStyleLine;
+    sptr_t                   m_nFirstVisibleLine;
+    sptr_t                   m_nWrapLineOffset;
+    sptr_t                   m_nStartPos;
+    sptr_t                   m_nEndPos;
+    sptr_t                   m_xOffset;
+    Scintilla::SelectionMode m_nSelMode;
+    sptr_t                   m_nScrollWidth;
+    std::vector<sptr_t>      m_lineStateVector;
+    sptr_t                   m_lastStyleLine;
 };
 
 class CDocument
 {
 public:
     CDocument()
-        : m_document(0)
+        : m_document(nullptr)
         , m_encoding(-1)
         , m_encodingSaving(-1)
         , m_format(EOLFormat::Win_Format)
@@ -90,7 +84,7 @@ public:
         , m_bIsWriteProtected(false)
         , m_bDoSaveAs(false)
         , m_tabSpace(TabSpace::Default)
-        , m_readDir(ReadDirection::Disabled)
+        , m_readDir(Scintilla::Bidirectional::Disabled)
     {
         m_lastWriteTime.dwHighDateTime = 0;
         m_lastWriteTime.dwLowDateTime  = 0;
@@ -103,25 +97,25 @@ public:
     }
     void SetLanguage(const std::string& lang);
 
-    Document              m_document;
-    std::wstring          m_path;
-    int                   m_encoding;
-    int                   m_encodingSaving;
-    EOLFormat             m_format;
-    bool                  m_bHasBOM;
-    bool                  m_bHasBOMSaving;
-    bool                  m_bTrimBeforeSave;
-    bool                  m_bEnsureNewlineAtEnd;
-    bool                  m_bIsDirty;
-    bool                  m_bNeedsSaving;
-    bool                  m_bIsReadonly;
-    bool                  m_bIsWriteProtected;
-    bool                  m_bDoSaveAs; ///< even if m_path is set, always ask where to save
-    FILETIME              m_lastWriteTime;
-    CPosData              m_position;
-    TabSpace              m_tabSpace;
-    ReadDirection         m_readDir;
-    std::function<void()> m_saveCallback;
+    Document                 m_document;
+    std::wstring             m_path;
+    int                      m_encoding;
+    int                      m_encodingSaving;
+    EOLFormat                m_format;
+    bool                     m_bHasBOM;
+    bool                     m_bHasBOMSaving;
+    bool                     m_bTrimBeforeSave;
+    bool                     m_bEnsureNewlineAtEnd;
+    bool                     m_bIsDirty;
+    bool                     m_bNeedsSaving;
+    bool                     m_bIsReadonly;
+    bool                     m_bIsWriteProtected;
+    bool                     m_bDoSaveAs; ///< even if m_path is set, always ask where to save
+    FILETIME                 m_lastWriteTime;
+    CPosData                 m_position;
+    TabSpace                 m_tabSpace;
+    Scintilla::Bidirectional m_readDir;
+    std::function<void()>    m_saveCallback;
 
 private:
     std::string m_language;

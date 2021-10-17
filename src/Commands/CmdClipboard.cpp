@@ -39,13 +39,13 @@ std::string ClipboardBase::GetHtmlSelection() const
     int         style = 0;
 
     char fontBuf[40] = {0};
-    ScintillaCall(SCI_STYLEGETFONT, 0, reinterpret_cast<sptr_t>(fontBuf));
-    int      fontSize   = static_cast<int>(ScintillaCall(SCI_STYLEGETSIZE, 0));
-    bool     bold       = !!ScintillaCall(SCI_STYLEGETBOLD, 0);
-    bool     italic     = !!ScintillaCall(SCI_STYLEGETITALIC, 0);
-    bool     underlined = !!ScintillaCall(SCI_STYLEGETUNDERLINE, 0);
-    COLORREF fore       = static_cast<COLORREF>(ScintillaCall(SCI_STYLEGETFORE, 0));
-    COLORREF back       = static_cast<COLORREF>(ScintillaCall(SCI_STYLEGETBACK, 0));
+    Scintilla().StyleGetFont(0, fontBuf);
+    int      fontSize   = static_cast<int>(Scintilla().StyleGetSize(0));
+    bool     bold       = !!Scintilla().StyleGetBold(0);
+    bool     italic     = !!Scintilla().StyleGetItalic(0);
+    bool     underlined = !!Scintilla().StyleGetUnderline(0);
+    COLORREF fore       = static_cast<COLORREF>(Scintilla().StyleGetFore(0));
+    COLORREF back       = static_cast<COLORREF>(Scintilla().StyleGetBack(0));
     if (CTheme::Instance().IsDarkTheme())
     {
         try
@@ -69,35 +69,35 @@ std::string ClipboardBase::GetHtmlSelection() const
                                                  GetRValue(back) << 16 | GetGValue(back) << 8 | GetBValue(back));
     sHtmlFragment += styleHtml;
 
-    int  numSelections = static_cast<int>(ScintillaCall(SCI_GETSELECTIONS));
+    int  numSelections = static_cast<int>(Scintilla().Selections());
     bool spanSet       = false;
     for (int i = 0; i < numSelections; ++i)
     {
-        int selStart = static_cast<int>(ScintillaCall(SCI_GETSELECTIONNSTART, i));
-        int selEnd   = static_cast<int>(ScintillaCall(SCI_GETSELECTIONNEND, i));
+        int selStart = static_cast<int>(Scintilla().SelectionNStart(i));
+        int selEnd   = static_cast<int>(Scintilla().SelectionNEnd(i));
 
         if ((selStart == selEnd) && (numSelections == 1))
         {
             auto curLine = GetCurrentLineNumber();
-            selStart     = static_cast<int>(ScintillaCall(SCI_POSITIONFROMLINE, curLine));
-            selEnd       = static_cast<int>(ScintillaCall(SCI_GETLINEENDPOSITION, curLine));
+            selStart     = static_cast<int>(Scintilla().PositionFromLine(curLine));
+            selEnd       = static_cast<int>(Scintilla().LineEndPosition(curLine));
         }
 
         int p = selStart;
         do
         {
-            int s = static_cast<int>(ScintillaCall(SCI_GETSTYLEAT, p));
+            int s = static_cast<int>(Scintilla().StyleAt(p));
             if (s != style)
             {
                 if (spanSet)
                     sHtmlFragment += "</span>";
-                ScintillaCall(SCI_STYLEGETFONT, s, reinterpret_cast<sptr_t>(fontBuf));
-                fontSize   = static_cast<int>(ScintillaCall(SCI_STYLEGETSIZE, s));
-                bold       = !!ScintillaCall(SCI_STYLEGETBOLD, s);
-                italic     = !!ScintillaCall(SCI_STYLEGETITALIC, s);
-                underlined = !!ScintillaCall(SCI_STYLEGETUNDERLINE, s);
-                fore       = static_cast<COLORREF>(ScintillaCall(SCI_STYLEGETFORE, s));
-                back       = static_cast<COLORREF>(ScintillaCall(SCI_STYLEGETBACK, s));
+                Scintilla().StyleGetFont(s, fontBuf);
+                fontSize   = static_cast<int>(Scintilla().StyleGetSize(s));
+                bold       = !!Scintilla().StyleGetBold(s);
+                italic     = !!Scintilla().StyleGetItalic(s);
+                underlined = !!Scintilla().StyleGetUnderline(s);
+                fore       = static_cast<COLORREF>(Scintilla().StyleGetFore(s));
+                back       = static_cast<COLORREF>(Scintilla().StyleGetBack(s));
                 if (CTheme::Instance().IsDarkTheme())
                 {
                     try
@@ -123,7 +123,7 @@ std::string ClipboardBase::GetHtmlSelection() const
                 style   = s;
                 spanSet = true;
             }
-            char        c = static_cast<char>(ScintillaCall(SCI_GETCHARAT, p));
+            char        c = static_cast<char>(Scintilla().CharAt(p));
             std::string cs;
             cs += c;
             switch (c)
@@ -248,7 +248,7 @@ void ClipboardBase::SetLexerFromClipboard()
 
 bool CCmdCut::Execute()
 {
-    ScintillaCall(SCI_CUT);
+    Scintilla().Cut();
     bool bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
     if (bShift)
     {
@@ -267,11 +267,11 @@ void CCmdCut::ScintillaNotify(SCNotification* pScn)
 
 bool CCmdCutPlain::Execute()
 {
-    bool bEmpty = ScintillaCall(SCI_GETSELECTIONEMPTY) != 0;
+    bool bEmpty = Scintilla().SelectionEmpty() != 0;
     if (bEmpty)
-        ScintillaCall(SCI_LINECUT);
+        Scintilla().LineCut();
     else
-        ScintillaCall(SCI_CUT);
+        Scintilla().Cut();
     AddLexerToClipboard();
     return true;
 }
@@ -284,7 +284,7 @@ void CCmdCutPlain::ScintillaNotify(SCNotification* pScn)
 
 bool CCmdCopy::Execute()
 {
-    ScintillaCall(SCI_COPYALLOWLINE);
+    Scintilla().CopyAllowLine();
     bool bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
     if (bShift)
     {
@@ -297,7 +297,7 @@ bool CCmdCopy::Execute()
 
 bool CCmdCopyPlain::Execute()
 {
-    ScintillaCall(SCI_COPYALLOWLINE);
+    Scintilla().CopyAllowLine();
     AddLexerToClipboard();
     return true;
 }
@@ -317,7 +317,7 @@ bool CCmdPaste::Execute()
             }
         }
     }
-    ScintillaCall(SCI_PASTE);
+    Scintilla().Paste();
     SetLexerFromClipboard();
     return true;
 }
@@ -331,7 +331,7 @@ HRESULT CCmdPaste::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PRO
 {
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_CANPASTE) != 0), pPropVarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (Scintilla().CanPaste() != 0), pPropVarNewValue);
     }
     return E_NOTIMPL;
 }
@@ -355,7 +355,7 @@ bool CCmdPasteHtml::Execute()
                 size_t      fragEnd   = 0;
                 HtmlExtractMetadata(str, &baseUrl, &htmlStart, &fragStart, &fragEnd);
                 auto htmlStr = str.substr(fragStart, fragEnd - fragStart);
-                ScintillaCall(SCI_ADDTEXT, htmlStr.size(), reinterpret_cast<sptr_t>(htmlStr.c_str()));
+                Scintilla().AddText(htmlStr.size(), htmlStr.c_str());
             }
         }
     }

@@ -109,15 +109,15 @@ protected:
     void    DoReplace(int id);
 
     void SearchDocument(CScintillaWnd& searchWnd, DocID docID, const CDocument& doc,
-                        const std::string& searchFor, int searchFlags, unsigned int exSearchFlags,
+                        const std::string& searchFor, Scintilla::FindOption searchFlags, unsigned int exSearchFlags,
                         SearchResults& searchResults,
                         SearchPaths&   foundPaths);
 
     int ReplaceDocument(CDocument& doc, const std::string& sFindString,
-                        const std::string& sReplaceString, int searchFlags);
+                        const std::string& sReplaceString, Scintilla::FindOption searchFlags);
 
     void SearchThread(int id, const std::wstring& searchPath, const std::string& searchFor,
-                      int flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind);
+                      Scintilla::FindOption flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind);
 
     void    SortResults();
     void    CheckRegex(bool flash);
@@ -165,22 +165,22 @@ protected:
                                      bool                searchSubFolders,
                                      const std::wstring& currentValue) const;
 
-    void AcceptData();
-    void NewData(std::chrono::steady_clock::time_point& timeOfLastProgressUpdate, bool finished);
-    void UpdateMatchCount(bool finished = true);
-    void DoListItemAction(int itemIndex);
-    void DoInitDialog(HWND hwndDlg);
-    void DoClose();
-    void InitSizing();
-    void OnSearchResultsReady(bool finished);
-    void FocusOnFirstListItem(bool keepAnyExistingSelection = false);
-    int  GetScintillaOptions() const;
-    void CheckSearchOptions();
-    void CheckSearchFolder();
-    void SaveSettings();
-    void SelectItem(int item);
-    void OnListItemChanged(LPNMLISTVIEW pListView);
-    void LetUserSelectSearchFolder();
+    void                  AcceptData();
+    void                  NewData(std::chrono::steady_clock::time_point& timeOfLastProgressUpdate, bool finished);
+    void                  UpdateMatchCount(bool finished = true);
+    void                  DoListItemAction(int itemIndex);
+    void                  DoInitDialog(HWND hwndDlg);
+    void                  DoClose();
+    void                  InitSizing();
+    void                  OnSearchResultsReady(bool finished);
+    void                  FocusOnFirstListItem(bool keepAnyExistingSelection = false);
+    Scintilla::FindOption GetScintillaOptions() const;
+    void                  CheckSearchOptions();
+    void                  CheckSearchFolder();
+    void                  SaveSettings();
+    void                  SelectItem(int item);
+    void                  OnListItemChanged(LPNMLISTVIEW pListView);
+    void                  LetUserSelectSearchFolder();
 
     bool EnableListEndTracking(int listID, bool enable);
 
@@ -255,7 +255,7 @@ public:
     {
         if (UI_PKEY_BooleanValue == key)
             return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue,
-                                             ScintillaCall(SCI_GETWRAPMODE) > 0, pPropVarNewValue);
+                                             Scintilla().WrapMode() > Scintilla::Wrap::None, pPropVarNewValue);
         return E_NOTIMPL;
     }
 

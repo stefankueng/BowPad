@@ -121,15 +121,15 @@ void CDocument::SetLanguage(const std::string& lang)
         CCommandHandler::Instance().OnLangChanged();
 }
 
-EOLFormat toEolFormat(int eolMode)
+EOLFormat toEolFormat(Scintilla::EndOfLine eolMode)
 {
     switch (eolMode)
     {
-        case SC_EOL_CRLF:
+        case Scintilla::EndOfLine::CrLf:
             return EOLFormat::Win_Format;
-        case SC_EOL_LF:
+        case Scintilla::EndOfLine::Lf:
             return EOLFormat::Unix_Format;
-        case SC_EOL_CR:
+        case Scintilla::EndOfLine::Cr:
             return EOLFormat::Mac_Format;
         default:
             break;
@@ -137,18 +137,18 @@ EOLFormat toEolFormat(int eolMode)
     return EOLFormat::Unknown_Format;
 }
 
-int toEolMode(EOLFormat eolFormat)
+Scintilla::EndOfLine toEolMode(EOLFormat eolFormat)
 {
     switch (eolFormat)
     {
         case EOLFormat::Win_Format:
-            return SC_EOL_CRLF;
+            return Scintilla::EndOfLine::CrLf;
         case EOLFormat::Unix_Format:
-            return SC_EOL_LF;
+            return Scintilla::EndOfLine::Lf;
         case EOLFormat::Mac_Format:
-            return SC_EOL_CR;
+            return Scintilla::EndOfLine::Cr;
         case EOLFormat::Unknown_Format:
             break;
     }
-    return -1;
+    return Scintilla::EndOfLine::Lf;
 }

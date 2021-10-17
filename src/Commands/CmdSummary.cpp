@@ -101,8 +101,8 @@ bool CCmdSummary::Execute()
     if (!HasActiveDocument())
         return false;
 
-    auto   len           = ScintillaCall(SCI_GETLENGTH);
-    char*  str           = reinterpret_cast<char*>(ScintillaCall(SCI_GETCHARACTERPOINTER));
+    auto   len           = Scintilla().Length();
+    char*  str           = static_cast<char*>(Scintilla().CharacterPointer());
     bool   inSpaces      = true;
     bool   inLine        = false;
     bool   inParagraph   = true;
@@ -187,7 +187,7 @@ bool CCmdSummary::Execute()
     std::wstring sSummary = CStringUtils::Format(rSummary,
                                                  doc.m_path.c_str(),
                                                  numWords,
-                                                 static_cast<long>(ScintillaCall(SCI_GETLINECOUNT)),
+                                                 static_cast<long>(Scintilla().LineCount()),
                                                  numEmptyLines,
                                                  numParagraphs);
 

@@ -91,15 +91,15 @@ HRESULT CCmdFont::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTY
         // restore from saved values
         std::string sFontName = CUnicodeUtils::StdGetUTF8(m_fontName);
         CIniSettings::Instance().SetString(L"View", L"FontName", m_fontName.c_str());
-        ScintillaCall(SCI_STYLESETFONT, STYLE_DEFAULT, reinterpret_cast<LPARAM>(sFontName.c_str()));
+        Scintilla().StyleSetFont(STYLE_DEFAULT, sFontName.c_str());
 
         CIniSettings::Instance().SetInt64(L"View", L"FontBold", m_bBold);
         CIniSettings::Instance().SetInt64(L"View", L"FontItalic", m_bItalic);
         CIniSettings::Instance().SetInt64(L"View", L"FontSize", m_size);
 
-        ScintillaCall(SCI_STYLESETBOLD, STYLE_DEFAULT, m_bBold);
-        ScintillaCall(SCI_STYLESETITALIC, STYLE_DEFAULT, m_bItalic);
-        ScintillaCall(SCI_STYLESETSIZE, STYLE_DEFAULT, m_size);
+        Scintilla().StyleSetBold(STYLE_DEFAULT, m_bBold);
+        Scintilla().StyleSetItalic(STYLE_DEFAULT, m_bItalic);
+        Scintilla().StyleSetSize(STYLE_DEFAULT, m_size);
 
         // refresh lexer
         const auto& doc = GetActiveDocument();

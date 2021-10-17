@@ -41,15 +41,20 @@
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
 
-static std::string g_findString;
-std::string        g_sHighlightString;
-static int         g_searchFlags       = 0;
-sptr_t             g_searchMarkerCount = 0;
-static std::string g_lastSelText;
-static int         g_lastSearchFlags  = 0;
-static bool        g_highlightMatches = true;
+static std::string           g_findString;
+std::string                  g_sHighlightString;
+static Scintilla::FindOption g_searchFlags       = Scintilla::FindOption::None;
+sptr_t                       g_searchMarkerCount = 0;
+static std::string           g_lastSelText;
+static Scintilla::FindOption g_lastSearchFlags  = Scintilla::FindOption::None;
+static bool                  g_highlightMatches = true;
 
 static std::unique_ptr<CFindReplaceDlg> g_pFindReplaceDlg;
+
+constexpr Scintilla::FindOption operator&(Scintilla::FindOption lhs, Scintilla::FindOption rhs) noexcept
+{
+    return static_cast<Scintilla::FindOption>(static_cast<int>(lhs) & static_cast<int>(rhs));
+}
 
 namespace
 {
@@ -211,9 +216,9 @@ std::wstring GetHomeFolder()
 
 }; // unnamed namespace
 
-void adjustFindString(int searchFlags)
+void adjustFindString(Scintilla::FindOption searchFlags)
 {
-    if (searchFlags & SCFIND_REGEXP)
+    if ((searchFlags & Scintilla::FindOption::RegExp) != Scintilla::FindOption::None)
     {
         // replace all "\n" chars with "(?:\n|\r\n|\n\r)"
         if ((g_findString.size() > 1) && (g_findString.find("\\r") == std::wstring::npos))
@@ -289,14 +294,14 @@ void CFindReplaceDlg::HandleButtonDropDown(const NMBCDROPDOWN* pDropDown)
     }
     else if (pDropDown->hdr.hwndFrom == GetDlgItem(*this, IDC_REPLACEALLBTN))
     {
-        auto selStart  = ScintillaCall(SCI_GETSELECTIONSTART);
-        auto selEnd    = ScintillaCall(SCI_GETSELECTIONEND);
-        auto lineStart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-        auto lineEnd   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+        auto selStart  = Scintilla().SelectionStart();
+        auto selEnd    = Scintilla().SelectionEnd();
+        auto lineStart = Scintilla().LineFromPosition(selStart);
+        auto lineEnd   = Scintilla().LineFromPosition(selEnd);
 
         sptr_t wrapCount = 1;
         if (lineStart == lineEnd)
-            wrapCount = ScintillaCall(SCI_WRAPCOUNT, lineStart);
+            wrapCount = Scintilla().WrapCount(lineStart);
         bool bReplaceOnlyInSelection = (lineStart != lineEnd) || ((wrapCount > 1) && (selEnd - selStart > 20));
 
         ResString sReplaceAll(g_hRes, IDS_REPLACEALL);
@@ -662,10 +667,10 @@ void CFindReplaceDlg::CheckSearchFolder()
 void CFindReplaceDlg::FindText()
 {
     this->ShowModeless(g_hRes, IDD_FINDREPLACEDLG, GetHwnd());
-    auto selStart  = ScintillaCall(SCI_GETSELECTIONSTART);
-    auto selEnd    = ScintillaCall(SCI_GETSELECTIONEND);
-    auto lineStart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-    auto lineEnd   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    auto selStart  = Scintilla().SelectionStart();
+    auto selEnd    = Scintilla().SelectionEnd();
+    auto lineStart = Scintilla().LineFromPosition(selStart);
+    auto lineEnd   = Scintilla().LineFromPosition(selEnd);
 
     std::string sSelText;
     if (lineStart == lineEnd)
@@ -1181,9 +1186,9 @@ void CFindReplaceDlg::DoListItemAction(int itemIndex)
             DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
             g_searchMarkerCount = 0;
 
-            //std::wstring findText = GetDlgItemText(IDC_SEARCHCOMBO).get();
-            //UpdateSearchStrings(findText);
-            //g_findString = CUnicodeUtils::StdGetUTF8(findText);
+            //std::wstring FindText = GetDlgItemText(IDC_SEARCHCOMBO).get();
+            //UpdateSearchStrings(FindText);
+            //g_findString = CUnicodeUtils::StdGetUTF8(FindText);
             g_sHighlightString = g_findString;
             g_lastSelText      = g_sHighlightString;
 
@@ -1467,17 +1472,17 @@ void CFindReplaceDlg::DoFindPrevious()
 
     adjustFindString(g_searchFlags);
 
-    ttf.chrg.cpMin = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
+    ttf.chrg.cpMin = static_cast<Sci_PositionCR>(Scintilla().CurrentPos());
     if (ttf.chrg.cpMin > 0)
         ttf.chrg.cpMin--;
     ttf.chrg.cpMax = 0;
-    auto findRet   = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+    auto findRet   = Scintilla().FindText(g_searchFlags, &ttf);
     if (findRet == -1)
     {
         // Retry from the end of the doc.
         ttf.chrg.cpMax = ttf.chrg.cpMin + 1;
-        ttf.chrg.cpMin = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+        ttf.chrg.cpMin = static_cast<Sci_PositionCR>(Scintilla().Length());
+        findRet        = Scintilla().FindText(g_searchFlags, &ttf);
         // Only report wrap around if we found something in the other direction.
         // If we didn't find anything we'll prefer to report that no match was found.
         if (findRet >= 0)
@@ -1513,24 +1518,24 @@ void CFindReplaceDlg::DoReplace(int id)
         return;
     }
 
-    auto   selStart  = ScintillaCall(SCI_GETSELECTIONSTART);
-    auto   selEnd    = ScintillaCall(SCI_GETSELECTIONEND);
-    auto   lineStart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-    auto   lineEnd   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    auto   selStart  = Scintilla().SelectionStart();
+    auto   selEnd    = Scintilla().SelectionEnd();
+    auto   lineStart = Scintilla().LineFromPosition(selStart);
+    auto   lineEnd   = Scintilla().LineFromPosition(selEnd);
     sptr_t wrapCount = 1;
     if (lineStart == lineEnd)
-        wrapCount = ScintillaCall(SCI_WRAPCOUNT, lineStart);
+        wrapCount = Scintilla().WrapCount(lineStart);
     bool bReplaceOnlyInSelection = (lineStart != lineEnd || (wrapCount > 1 && selEnd - selStart > 20)) && (id == IDC_REPLACEALLBTN);
 
     if (bReplaceOnlyInSelection)
     {
-        ScintillaCall(SCI_SETTARGETSTART, selStart);
-        ScintillaCall(SCI_SETTARGETEND, selEnd);
+        Scintilla().SetTargetStart(selStart);
+        Scintilla().SetTargetEnd(selEnd);
     }
     else
     {
-        ScintillaCall(SCI_SETTARGETSTART, id == IDC_REPLACEBTN ? selStart : 0);
-        ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
+        Scintilla().SetTargetStart(id == IDC_REPLACEBTN ? selStart : 0);
+        Scintilla().SetTargetEnd(Scintilla().Length());
     }
 
     std::wstring findText    = GetDlgItemText(IDC_SEARCHCOMBO).get();
@@ -1551,7 +1556,7 @@ void CFindReplaceDlg::DoReplace(int id)
     adjustFindString(g_searchFlags);
 
     std::string sReplaceString = CUnicodeUtils::StdGetUTF8(replaceText);
-    if ((g_searchFlags & SCFIND_REGEXP) != 0)
+    if ((g_searchFlags & Scintilla::FindOption::RegExp) != Scintilla::FindOption::None)
         sReplaceString = UnEscape(sReplaceString);
 
     int replaceCount = 0;
@@ -1572,48 +1577,49 @@ void CFindReplaceDlg::DoReplace(int id)
     }
     else
     {
-        ScintillaCall(SCI_SETSEARCHFLAGS, g_searchFlags);
+        Scintilla().SetSearchFlags(g_searchFlags);
         sptr_t findRet = -1;
-        ScintillaCall(SCI_BEGINUNDOACTION);
+        Scintilla().BeginUndoAction();
         do
         {
-            findRet = ScintillaCall(SCI_SEARCHINTARGET, g_findString.length(), reinterpret_cast<sptr_t>(g_findString.c_str()));
+            findRet = Scintilla().SearchInTarget(g_findString.length(), g_findString.c_str());
             // note: our regex search implementation returns -2 if the regex is invalid
             if (findRet == -1 && id == IDC_REPLACEBTN)
             {
                 SetInfoText(IDS_FINDRETRYWRAP);
                 // Retry from the start of the doc.
-                ScintillaCall(SCI_SETTARGETSTART, 0);
-                ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETCURRENTPOS));
-                findRet = ScintillaCall(SCI_SEARCHINTARGET, g_findString.length(), reinterpret_cast<sptr_t>(g_findString.c_str()));
+                Scintilla().SetTargetStart(0);
+                Scintilla().SetTargetEnd(Scintilla().CurrentPos());
+                findRet = Scintilla().SearchInTarget(g_findString.length(), g_findString.c_str());
             }
             if (findRet >= 0)
             {
-                auto replaceFunc = ((g_searchFlags & SCFIND_REGEXP) != 0)
-                                       ? SCI_REPLACETARGETRE
-                                       : SCI_REPLACETARGET;
-                ScintillaCall(replaceFunc, sReplaceString.length(), reinterpret_cast<sptr_t>(sReplaceString.c_str()));
+                if ((g_searchFlags & Scintilla::FindOption::RegExp) != Scintilla::FindOption::None)
+                    Scintilla().ReplaceTargetRE(sReplaceString.length(), sReplaceString.c_str());
+                else
+                    Scintilla().ReplaceTarget(sReplaceString.length(), sReplaceString.c_str());
+
                 ++replaceCount;
-                auto targetStart = ScintillaCall(SCI_GETTARGETSTART);
-                auto targetEnd   = ScintillaCall(SCI_GETTARGETEND);
+                auto targetStart = Scintilla().TargetStart();
+                auto targetEnd   = Scintilla().TargetEnd();
                 if (id == IDC_REPLACEBTN)
                     Center(targetStart, targetEnd);
                 if ((targetEnd > targetStart || sReplaceString.empty()) && (targetStart != targetEnd))
-                    ScintillaCall(SCI_SETTARGETSTART, targetEnd);
+                    Scintilla().SetTargetStart(targetEnd);
                 else
-                    ScintillaCall(SCI_SETTARGETSTART, targetEnd + 1);
+                    Scintilla().SetTargetStart(targetEnd + 1);
                 if (bReplaceOnlyInSelection)
-                    ScintillaCall(SCI_SETTARGETEND, selEnd);
+                    Scintilla().SetTargetEnd(selEnd);
                 else
                 {
-                    auto docLen = ScintillaCall(SCI_GETLENGTH);
-                    ScintillaCall(SCI_SETTARGETEND, docLen);
+                    auto docLen = Scintilla().Length();
+                    Scintilla().SetTargetEnd(docLen);
                     if (docLen == targetEnd)
                         break;
                 }
             }
         } while (id == IDC_REPLACEALLBTN && findRet >= 0);
-        ScintillaCall(SCI_ENDUNDOACTION);
+        Scintilla().EndUndoAction();
     }
     if (id == IDC_REPLACEALLBTN || id == IDC_REPLACEALLINTABSBTN)
     {
@@ -1669,17 +1675,17 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
     adjustFindString(g_searchFlags);
 
     Sci_TextToFind ttf = {0};
-    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
-    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
+    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(Scintilla().CurrentPos());
+    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(Scintilla().Length());
     ttf.lpstrText      = g_findString.c_str();
 
-    auto findRet = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+    auto findRet = Scintilla().FindText(g_searchFlags, &ttf);
     if (findRet == -1)
     {
         // Retry from the start of the doc.
         ttf.chrg.cpMax = ttf.chrg.cpMin;
         ttf.chrg.cpMin = 0;
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+        findRet        = Scintilla().FindText(g_searchFlags, &ttf);
         // Only report wrap around if we found something in the other direction.
         // If we didn't find anything we'll prefer to report that no match was found.
         if (findRet >= 0)
@@ -1692,15 +1698,15 @@ bool CFindReplaceDlg::DoSearch(bool replaceMode)
     return (findRet >= 0);
 }
 
-int CFindReplaceDlg::GetScintillaOptions() const
+Scintilla::FindOption CFindReplaceDlg::GetScintillaOptions() const
 {
-    int flags = 0;
+    Scintilla::FindOption flags = Scintilla::FindOption::None;
     if (IsDlgButtonChecked(*this, IDC_MATCHCASE) == BST_CHECKED)
-        flags |= SCFIND_MATCHCASE;
+        flags |= Scintilla::FindOption::MatchCase;
     if (IsDlgButtonChecked(*this, IDC_MATCHWORD) == BST_CHECKED)
-        flags |= SCFIND_WHOLEWORD;
+        flags |= Scintilla::FindOption::WholeWord;
     if (IsDlgButtonChecked(*this, IDC_MATCHREGEX) == BST_CHECKED)
-        flags |= SCFIND_REGEXP | SCFIND_CXX11REGEX;
+        flags |= Scintilla::FindOption::RegExp | Scintilla::FindOption::Cxx11RegEx;
     return flags;
 }
 
@@ -1791,9 +1797,9 @@ void CFindReplaceDlg::DoSearchAll(int id)
     g_findString          = searchFor;
     g_highlightMatches    = IsDlgButtonChecked(*this, IDC_HIGHLIGHT) != 0;
 
-    int          searchFlags        = GetScintillaOptions();
-    unsigned int exSearchFlags      = 0;
-    bool         searchForFunctions = IsDlgButtonChecked(*this, IDC_FUNCTIONS) == BST_CHECKED;
+    Scintilla::FindOption searchFlags        = GetScintillaOptions();
+    unsigned int          exSearchFlags      = 0;
+    bool                  searchForFunctions = IsDlgButtonChecked(*this, IDC_FUNCTIONS) == BST_CHECKED;
     if (searchForFunctions)
         exSearchFlags |= SF_SEARCHFORFUNCTIONS;
     bool searchSubFolders = IsDlgButtonChecked(*this, IDC_SEARCHSUBFOLDERS) == BST_CHECKED;
@@ -1999,7 +2005,7 @@ bool CFindReplaceDlg::IsExcludedFolder(const std::wstring& path) const
 
 void CFindReplaceDlg::SearchThread(
     int id, const std::wstring& searchPath, const std::string& searchFor,
-    int flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind)
+    Scintilla::FindOption flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind)
 {
     // NOTE: all parameter validation should be done before getting here.
     auto timeOfLastProgressUpdate = std::chrono::steady_clock::now();
@@ -2069,7 +2075,7 @@ void CFindReplaceDlg::SearchThread(
         // BowPad doesn't appear hung while loading large files.
         CDocument doc = manager.LoadFile(nullptr, path, -1, false);
         // Don't crash if the document cannot be loaded. .e.g. if it is locked.
-        if (doc.m_document != static_cast<Document>(0))
+        if (doc.m_document != static_cast<Document>(nullptr))
         {
             DocID did(1);
             manager.AddDocumentAtEnd(doc, did);
@@ -2115,33 +2121,34 @@ void CFindReplaceDlg::AcceptData()
 
 void CFindReplaceDlg::SearchDocument(
     CScintillaWnd& searchWnd, DocID docID, const CDocument& doc,
-    const std::string& searchFor, int searchFlags, unsigned int exSearchFlags,
+    const std::string& searchFor, Scintilla::FindOption searchFlags, unsigned int exSearchFlags,
     SearchResults& searchResults, SearchPaths& foundPaths)
 {
     bool searchForFunctions = (exSearchFlags & SF_SEARCHFORFUNCTIONS) != 0;
 
     auto wSearchFor = CUnicodeUtils::StdGetUnicode(searchFor);
     if (searchForFunctions)
-        searchFlags |= SCFIND_REGEXP | SCFIND_CXX11REGEX;
-    bool wholeWord = (searchFlags & SCFIND_WHOLEWORD) != 0;
+        searchFlags |= Scintilla::FindOption::RegExp | Scintilla::FindOption::Cxx11RegEx;
+    bool wholeWord = (searchFlags & Scintilla::FindOption::WholeWord) != Scintilla::FindOption::None;
     if (searchForFunctions && !wholeWord)
         wSearchFor = L"*" + wSearchFor + L"*";
 
-    searchWnd.Call(SCI_SETSTATUS, SC_STATUS_OK); // reset error status
-    searchWnd.Call(SCI_CLEARALL);
-    searchWnd.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-    bool previousReadOnlyFlag = searchWnd.Call(SCI_GETREADONLY) != sptr_t{};
+    searchWnd.Scintilla().SetStatus(Scintilla::Status::Ok); // reset error status
+    searchWnd.Scintilla().ClearAll();
+    searchWnd.Scintilla().SetDocPointer(doc.m_document);
+    bool previousReadOnlyFlag = searchWnd.Scintilla().ReadOnly();
     if (!previousReadOnlyFlag)
-        searchWnd.Call(SCI_SETREADONLY, true);
+        searchWnd.Scintilla().SetReadOnly(true);
 
     OnOutOfScope(
         if (!previousReadOnlyFlag)
-            searchWnd.Call(SCI_SETREADONLY, false);
-        searchWnd.Call(SCI_SETDOCPOINTER, 0, 0););
+            searchWnd.Scintilla()
+                .SetReadOnly(false);
+        searchWnd.Scintilla().SetDocPointer(nullptr););
 
     Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin     = 0;
-    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(searchWnd.Call(SCI_GETLENGTH));
+    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(searchWnd.Scintilla().Length());
     std::string funcRegex;
     if (searchForFunctions)
     {
@@ -2163,7 +2170,7 @@ void CFindReplaceDlg::SearchDocument(
     std::string  line; // Reduce memory re-allocations by keeping this out of the loop.
     do
     {
-        findRet = searchWnd.Call(SCI_FINDTEXT, searchFlags, reinterpret_cast<sptr_t>(&ttf));
+        findRet = searchWnd.Scintilla().FindText(searchFlags, &ttf);
         if (findRet >= 0)
         {
             CSearchResult result;
@@ -2175,14 +2182,14 @@ void CFindReplaceDlg::SearchDocument(
                 result.docID = docID;
             result.posBegin = ttf.chrgText.cpMin;
             result.posEnd   = ttf.chrgText.cpMax;
-            char c          = static_cast<char>(searchWnd.Call(SCI_GETCHARAT, result.posBegin));
+            char c          = static_cast<char>(searchWnd.Scintilla().CharAt(result.posBegin));
             while (c == '\n' || c == '\r')
             {
                 ++result.posBegin;
-                c = static_cast<char>(searchWnd.Call(SCI_GETCHARAT, result.posBegin));
+                c = static_cast<char>(searchWnd.Scintilla().CharAt(result.posBegin));
             }
-            result.line  = searchWnd.Call(SCI_LINEFROMPOSITION, result.posBegin);
-            auto linePos = searchWnd.Call(SCI_POSITIONFROMLINE, result.line);
+            result.line  = searchWnd.Scintilla().LineFromPosition(result.posBegin);
+            auto linePos = searchWnd.Scintilla().PositionFromLine(result.line);
             if (searchForFunctions)
             {
                 result.lineText = CUnicodeUtils::StdGetUnicode(searchWnd.GetTextRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax));
@@ -2198,9 +2205,9 @@ void CFindReplaceDlg::SearchDocument(
                 result.posInLineStart = linePos >= 0 ? result.posBegin - linePos : 0;
                 result.posInLineEnd   = linePos >= 0 ? ttf.chrgText.cpMax - linePos : 0;
                 auto matchLen         = result.posInLineEnd - result.posInLineStart;
-                auto lineSize         = searchWnd.Call(SCI_LINELENGTH, result.line);
+                auto lineSize         = searchWnd.Scintilla().LineLength(result.line);
                 line.resize(lineSize);
-                searchWnd.Call(SCI_GETLINE, result.line, reinterpret_cast<sptr_t>(line.data()));
+                searchWnd.Scintilla().GetLine(result.line, line.data());
                 // remove EOLs
                 while (lineSize > 0 && (line[lineSize - 1] == '\n' || line[lineSize - 1] == '\r'))
                     --lineSize;
@@ -2308,39 +2315,39 @@ void CFindReplaceDlg::NewData(
     }
 }
 
-int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindString, const std::string& sReplaceString, int searchFlags)
+int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindString, const std::string& sReplaceString, Scintilla::FindOption searchFlags)
 {
-    m_searchWnd.Call(SCI_SETSTATUS, SC_STATUS_OK); // reset error status
-    m_searchWnd.Call(SCI_CLEARALL);
-    m_searchWnd.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
-    m_searchWnd.Call(SCI_SETTARGETSTART, 0);
-    m_searchWnd.Call(SCI_SETSEARCHFLAGS, searchFlags);
-    m_searchWnd.Call(SCI_SETTARGETEND, m_searchWnd.Call(SCI_GETLENGTH));
-    m_searchWnd.Call(SCI_BEGINUNDOACTION);
+    m_searchWnd.Scintilla().SetStatus(Scintilla::Status::Ok); // reset error status
+    m_searchWnd.Scintilla().ClearAll();
+    m_searchWnd.Scintilla().SetDocPointer(doc.m_document);
+    m_searchWnd.Scintilla().SetTargetStart(0);
+    m_searchWnd.Scintilla().SetSearchFlags(searchFlags);
+    m_searchWnd.Scintilla().SetTargetEnd(m_searchWnd.Scintilla().Length());
+    m_searchWnd.Scintilla().BeginUndoAction();
     OnOutOfScope(
-        m_searchWnd.Call(SCI_ENDUNDOACTION);
-        m_searchWnd.Call(SCI_SETDOCPOINTER, 0, 0););
+        m_searchWnd.Scintilla().EndUndoAction();
+        m_searchWnd.Scintilla().SetDocPointer(nullptr););
 
     sptr_t findRet      = -1;
     int    replaceCount = 0;
     do
     {
-        findRet = m_searchWnd.Call(SCI_SEARCHINTARGET, sFindString.length(), reinterpret_cast<sptr_t>(sFindString.c_str()));
+        findRet = m_searchWnd.Scintilla().SearchInTarget(sFindString.length(), sFindString.c_str());
         if (findRet >= 0)
         {
-            auto replaceFunc = ((searchFlags & SCFIND_REGEXP) != 0)
-                                   ? SCI_REPLACETARGETRE
-                                   : SCI_REPLACETARGET;
-            m_searchWnd.Call(replaceFunc, sReplaceString.length(), reinterpret_cast<sptr_t>(sReplaceString.c_str()));
-            ++replaceCount;
-            auto targetStart = m_searchWnd.Call(SCI_GETTARGETSTART);
-            auto targetEnd   = m_searchWnd.Call(SCI_GETTARGETEND);
-            if ((targetEnd > targetStart) || (sReplaceString.empty()))
-                m_searchWnd.Call(SCI_SETTARGETSTART, targetEnd);
+            if ((g_searchFlags & Scintilla::FindOption::RegExp) != Scintilla::FindOption::None)
+                m_searchWnd.Scintilla().ReplaceTargetRE(sReplaceString.length(), sReplaceString.c_str());
             else
-                m_searchWnd.Call(SCI_SETTARGETSTART, targetEnd + 1);
+                m_searchWnd.Scintilla().ReplaceTarget(sReplaceString.length(), sReplaceString.c_str());
+            ++replaceCount;
+            auto targetStart = m_searchWnd.Scintilla().TargetStart();
+            auto targetEnd   = m_searchWnd.Scintilla().TargetEnd();
+            if ((targetEnd > targetStart) || (sReplaceString.empty()))
+                m_searchWnd.Scintilla().SetTargetStart(targetEnd);
+            else
+                m_searchWnd.Scintilla().SetTargetStart(targetEnd + 1);
 
-            m_searchWnd.Call(SCI_SETTARGETEND, m_searchWnd.Call(SCI_GETLENGTH));
+            m_searchWnd.Scintilla().SetTargetEnd(m_searchWnd.Scintilla().Length());
             doc.m_bIsDirty = true;
         }
     } while (findRet >= 0);
@@ -2834,18 +2841,18 @@ void CCmdFindReplace::ScintillaNotify(SCNotification* pScn)
 {
     if (pScn->nmhdr.code == SCN_UPDATEUI)
     {
-        LRESULT firstLine     = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
-        LRESULT lastLine      = firstLine + ScintillaCall(SCI_LINESONSCREEN);
-        auto    startStylePos = ScintillaCall(SCI_POSITIONFROMLINE, firstLine);
-        auto    endStylePos   = ScintillaCall(SCI_POSITIONFROMLINE, lastLine) + ScintillaCall(SCI_LINELENGTH, lastLine);
+        LRESULT firstLine     = Scintilla().FirstVisibleLine();
+        LRESULT lastLine      = firstLine + Scintilla().LinesOnScreen();
+        auto    startStylePos = Scintilla().PositionFromLine(firstLine);
+        auto    endStylePos   = Scintilla().PositionFromLine(lastLine) + Scintilla().LineLength(lastLine);
         if (endStylePos < 0)
-            endStylePos = ScintillaCall(SCI_GETLENGTH);
+            endStylePos = Scintilla().Length();
 
         auto len = endStylePos - startStylePos + 1;
         // Reset indicators.
-        ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_FINDTEXT_MARK);
-        ScintillaCall(SCI_INDICATORCLEARRANGE, startStylePos, len);
-        ScintillaCall(SCI_INDICATORCLEARRANGE, startStylePos, len - 1);
+        Scintilla().SetIndicatorCurrent(INDIC_FINDTEXT_MARK);
+        Scintilla().IndicatorClearRange(startStylePos, len);
+        Scintilla().IndicatorClearRange(startStylePos, len - 1);
 
         if (g_sHighlightString.empty() || !g_highlightMatches)
         {
@@ -2859,9 +2866,9 @@ void CCmdFindReplace::ScintillaNotify(SCNotification* pScn)
         findText.chrg.cpMin     = static_cast<Sci_PositionCR>(startStylePos);
         findText.chrg.cpMax     = static_cast<Sci_PositionCR>(endStylePos);
         findText.lpstrText      = g_sHighlightString.c_str();
-        while (ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&findText)) >= 0)
+        while (Scintilla().FindText(g_searchFlags, &findText) >= 0)
         {
-            ScintillaCall(SCI_INDICATORFILLRANGE, findText.chrgText.cpMin, findText.chrgText.cpMax - findText.chrgText.cpMin);
+            Scintilla().IndicatorFillRange(findText.chrgText.cpMin, findText.chrgText.cpMax - findText.chrgText.cpMin);
             if (findText.chrg.cpMin >= findText.chrgText.cpMax)
                 break;
             findText.chrg.cpMin = findText.chrgText.cpMax;
@@ -2872,11 +2879,11 @@ void CCmdFindReplace::ScintillaNotify(SCNotification* pScn)
             DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
             g_searchMarkerCount = 0;
             findText.chrg.cpMin = 0;
-            findText.chrg.cpMax = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
+            findText.chrg.cpMax = static_cast<Sci_PositionCR>(Scintilla().Length());
             findText.lpstrText  = g_sHighlightString.c_str();
-            while (ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&findText)) >= 0)
+            while (Scintilla().FindText(g_searchFlags, &findText) >= 0)
             {
-                size_t line = ScintillaCall(SCI_LINEFROMPOSITION, findText.chrgText.cpMin);
+                size_t line = Scintilla().LineFromPosition(findText.chrgText.cpMin);
                 DocScrollAddLineColor(DOCSCROLLTYPE_SEARCHTEXT, line, RGB(200, 200, 0));
                 ++g_searchMarkerCount;
                 if (findText.chrg.cpMin >= findText.chrgText.cpMax)
@@ -2943,16 +2950,16 @@ bool CCmdFindNext::Execute()
         return true;
     }
     Sci_TextToFind ttf = {0};
-    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
-    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
+    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(Scintilla().CurrentPos());
+    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(Scintilla().Length());
     ttf.lpstrText      = g_findString.c_str();
-    auto findRet       = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+    auto findRet       = Scintilla().FindText(g_searchFlags, &ttf);
     if (findRet == -1)
     {
         // Retry from the start of the doc.
         ttf.chrg.cpMax = ttf.chrg.cpMin;
         ttf.chrg.cpMin = 0;
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+        findRet        = Scintilla().FindText(g_searchFlags, &ttf);
     }
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
@@ -2970,18 +2977,18 @@ bool CCmdFindPrev::Execute()
     }
 
     Sci_TextToFind ttf = {0};
-    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
+    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(Scintilla().CurrentPos());
     if (ttf.chrg.cpMin > 0)
         ttf.chrg.cpMin--;
     ttf.chrg.cpMax = 0;
     ttf.lpstrText  = g_findString.c_str();
-    sptr_t findRet = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+    sptr_t findRet = Scintilla().FindText(g_searchFlags, &ttf);
     if (findRet == -1)
     {
         // Retry from the end of the doc.
         ttf.chrg.cpMax = ttf.chrg.cpMin + 1;
-        ttf.chrg.cpMin = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+        ttf.chrg.cpMin = static_cast<Sci_PositionCR>(Scintilla().Length());
+        findRet        = Scintilla().FindText(g_searchFlags, &ttf);
     }
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
@@ -2993,7 +3000,7 @@ bool CCmdFindPrev::Execute()
 bool CCmdFindSelectedNext::Execute()
 {
     g_sHighlightString.clear();
-    auto selTextLen = ScintillaCall(SCI_GETSELTEXT);
+    auto selTextLen = Scintilla().GetSelText(nullptr);
     if (selTextLen <= 1) // Includes zero terminator so 1 means none.
     {
         DocScrollUpdate();
@@ -3009,16 +3016,16 @@ bool CCmdFindSelectedNext::Execute()
     g_sHighlightString = g_findString;
 
     Sci_TextToFind ttf = {0};
-    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
-    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
+    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(Scintilla().CurrentPos());
+    ttf.chrg.cpMax     = static_cast<Sci_PositionCR>(Scintilla().Length());
     ttf.lpstrText      = g_findString.c_str();
-    auto findRet       = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+    auto findRet       = Scintilla().FindText(g_searchFlags, &ttf);
     if (findRet == -1)
     {
         // Retry from the start of the doc.
         ttf.chrg.cpMax = ttf.chrg.cpMin;
         ttf.chrg.cpMin = 0;
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+        findRet        = Scintilla().FindText(g_searchFlags, &ttf);
     }
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
@@ -3033,7 +3040,7 @@ bool CCmdFindSelectedNext::Execute()
 bool CCmdFindSelectedPrev::Execute()
 {
     g_sHighlightString.clear();
-    auto selTextLen = ScintillaCall(SCI_GETSELTEXT);
+    auto selTextLen = Scintilla().GetSelText(nullptr);
     if (selTextLen <= 1) // Includes zero terminator so 1 means none.
     {
         DocScrollUpdate();
@@ -3050,18 +3057,18 @@ bool CCmdFindSelectedPrev::Execute()
     g_sHighlightString = g_findString;
 
     Sci_TextToFind ttf = {0};
-    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETCURRENTPOS));
+    ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(Scintilla().CurrentPos());
     if (ttf.chrg.cpMin > 0)
         ttf.chrg.cpMin--;
     ttf.chrg.cpMax = 0;
     ttf.lpstrText  = g_findString.c_str();
-    auto findRet   = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+    auto findRet   = Scintilla().FindText(g_searchFlags, &ttf);
     if (findRet == -1)
     {
         // retry from the end of the doc
         ttf.chrg.cpMax = ttf.chrg.cpMin + 1;
-        ttf.chrg.cpMin = static_cast<Sci_PositionCR>(ScintillaCall(SCI_GETLENGTH));
-        findRet        = ScintillaCall(SCI_FINDTEXT, g_searchFlags, reinterpret_cast<sptr_t>(&ttf));
+        ttf.chrg.cpMin = static_cast<Sci_PositionCR>(Scintilla().Length());
+        findRet        = Scintilla().FindText(g_searchFlags, &ttf);
     }
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);

@@ -174,22 +174,22 @@ bool CCmdSort::Execute()
         return false; // Need a document.
 
     // We only handle single selections or rectangular ones.
-    bool isRectangular = ScintillaCall(SCI_SELECTIONISRECTANGLE) != 0;
+    bool isRectangular = Scintilla().SelectionIsRectangle() != 0;
     // Don't handle multiple selections unless it's rectangular.
-    if (ScintillaCall(SCI_GETSELECTIONS) > 1 && !isRectangular)
+    if (Scintilla().Selections() > 1 && !isRectangular)
         return false;
 
     // Determine the line endings used/to use.
     std::wstring eol;
-    switch (ScintillaCall(SCI_GETEOLMODE))
+    switch (Scintilla().EOLMode())
     {
-        case SC_EOL_CRLF:
+        case Scintilla::EndOfLine::CrLf:
             eol = L"\r\n";
             break;
-        case SC_EOL_LF:
+        case Scintilla::EndOfLine::Lf:
             eol = L"\n";
             break;
-        case SC_EOL_CR:
+        case Scintilla::EndOfLine::Cr:
             eol = L"\r";
             break;
         default:
@@ -197,16 +197,16 @@ bool CCmdSort::Execute()
             APPVERIFY(false); // Shouldn't happen.
     }
 
-    auto origSelStart = ScintillaCall(SCI_GETSELECTIONSTART);
-    auto origSelEnd   = ScintillaCall(SCI_GETSELECTIONEND);
-    bool bSelEmpty    = !!ScintillaCall(SCI_GETSELECTIONEMPTY);
+    auto origSelStart = Scintilla().SelectionStart();
+    auto origSelEnd   = Scintilla().SelectionEnd();
+    bool bSelEmpty    = !!Scintilla().SelectionEmpty();
     if (bSelEmpty)
-        ScintillaCall(SCI_SELECTALL);
+        Scintilla().SelectAll();
 
-    auto selStart  = ScintillaCall(SCI_GETSELECTIONSTART);
-    auto selEnd    = ScintillaCall(SCI_GETSELECTIONEND);
-    auto lineStart = ScintillaCall(SCI_LINEFROMPOSITION, selStart);
-    auto lineEnd   = ScintillaCall(SCI_LINEFROMPOSITION, selEnd);
+    auto selStart  = Scintilla().SelectionStart();
+    auto selEnd    = Scintilla().SelectionEnd();
+    auto lineStart = Scintilla().LineFromPosition(selStart);
+    auto lineEnd   = Scintilla().LineFromPosition(selEnd);
 
     auto lineCount = lineEnd - lineStart;
     if (lineCount <= 1)
@@ -218,8 +218,8 @@ bool CCmdSort::Execute()
         std::vector<sptr_t>       positions;
         for (sptr_t lineNum = lineStart; lineNum <= lineEnd; ++lineNum)
         {
-            auto         lineSelStart = ScintillaCall(SCI_GETLINESELSTARTPOSITION, lineNum);
-            auto         lineSelEnd   = ScintillaCall(SCI_GETLINESELENDPOSITION, lineNum);
+            auto         lineSelStart = Scintilla().GetLineSelStartPosition(lineNum);
+            auto         lineSelEnd   = Scintilla().GetLineSelEndPosition(lineNum);
             std::wstring line         = CUnicodeUtils::StdGetUnicode(GetTextRange(lineSelStart, lineSelEnd));
             lines.push_back(std::move(line));
             positions.push_back(lineSelStart);
@@ -231,24 +231,24 @@ bool CCmdSort::Execute()
             // Use may want to undo this so make it possible
             // We're changing the document from here on in.
 
-            ScintillaCall(SCI_BEGINUNDOACTION);
+            Scintilla().BeginUndoAction();
             size_t ln = 0;
             for (sptr_t line = lineStart; line <= lineEnd; ++line, ++ln)
             {
                 const auto& lineText = CUnicodeUtils::StdGetUTF8(lines[ln]);
-                ScintillaCall(SCI_DELETERANGE, positions[ln], lineText.length());
-                ScintillaCall(SCI_INSERTTEXT, positions[ln], reinterpret_cast<sptr_t>(lineText.c_str()));
+                Scintilla().DeleteRange(positions[ln], lineText.length());
+                Scintilla().InsertText(positions[ln], lineText.c_str());
             }
-            ScintillaCall(SCI_ENDUNDOACTION);
+            Scintilla().EndUndoAction();
         }
     }
     else // Find an sort lines for regular (non rectangular selections).
     {
         // Avoid any trailing blank line in the users selection.
-        if (ScintillaCall(SCI_POSITIONFROMLINE, lineEnd) == selEnd)
+        if (Scintilla().PositionFromLine(lineEnd) == selEnd)
         {
             --lineEnd;
-            selEnd = ScintillaCall(SCI_GETLINEENDPOSITION, lineEnd);
+            selEnd = Scintilla().LineEndPosition(lineEnd);
         }
         std::wstring selText = CUnicodeUtils::StdGetUnicode(GetSelectedText());
         // Whatever the line breaks type is current, standardize on "\n".
@@ -273,14 +273,14 @@ bool CCmdSort::Execute()
             // Use may want to undo this so make it possible
             // We're changing the document from here on in.
 
-            ScintillaCall(SCI_BEGINUNDOACTION);
-            ScintillaCall(SCI_SETSEL, selStart, selEnd);
+            Scintilla().BeginUndoAction();
+            Scintilla().SetSel(selStart, selEnd);
             std::string sSortedText = CUnicodeUtils::StdGetUTF8(selText);
-            ScintillaCall(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(sSortedText.c_str()));
+            Scintilla().ReplaceSel(sSortedText.c_str());
             // Put the selection back where it was so the user
             // can see still see what they sorted and possibly do more with it.
-            ScintillaCall(SCI_SETSEL, origSelStart, origSelEnd);
-            ScintillaCall(SCI_ENDUNDOACTION);
+            Scintilla().SetSel(origSelStart, origSelEnd);
+            Scintilla().EndUndoAction();
         }
     }
 
@@ -301,9 +301,9 @@ HRESULT CCmdSort::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROP
     // Enabled if there's something to go back to.
     if (UI_PKEY_Enabled == key)
     {
-        bool isRectangular = ScintillaCall(SCI_SELECTIONISRECTANGLE) != 0;
+        bool isRectangular = Scintilla().SelectionIsRectangle() != 0;
         // Don't handle multiple selections unless it's rectangular.
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_GETSELECTIONS) > 1 && !isRectangular) ? FALSE : TRUE, pPropVarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (Scintilla().Selections() > 1 && !isRectangular) ? FALSE : TRUE, pPropVarNewValue);
     }
     return E_NOTIMPL;
 }

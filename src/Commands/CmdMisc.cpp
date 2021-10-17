@@ -153,7 +153,7 @@ bool CCmdWriteProtect::Execute()
     doc.m_bIsWriteProtected = !(doc.m_bIsWriteProtected || doc.m_bIsReadonly);
     if (!doc.m_bIsWriteProtected && doc.m_bIsReadonly)
         doc.m_bIsReadonly = false;
-    ScintillaCall(SCI_SETREADONLY, doc.m_bIsWriteProtected);
+    Scintilla().SetReadOnly(doc.m_bIsWriteProtected);
     UpdateTab(GetActiveTabIndex());
 
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);

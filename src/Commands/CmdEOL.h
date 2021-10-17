@@ -1,4 +1,4 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
 // Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
 //
@@ -24,36 +24,39 @@ class CCmdEOLBase : public ICommand
 protected:
     // Don't do anything in this base, like call InvalidateUICommand which
     // might result in a virtual call and the derived class won't be setup.
-    CCmdEOLBase(void* obj) : ICommand(obj) {}
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
-    void TabNotify(TBHDR* ptbHdr) override;
-    bool Execute() override;
-    virtual int GetLineType() const = 0;
+    CCmdEOLBase(void* obj)
+        : ICommand(obj)
+    {
+    }
+    HRESULT                      IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
+    void                         TabNotify(TBHDR* ptbHdr) override;
+    bool                         Execute() override;
+    virtual Scintilla::EndOfLine GetLineType() const = 0;
 };
 
 class CCmdEOLWin : public CCmdEOLBase
 {
 public:
     CCmdEOLWin(void* obj);
-    UINT GetCmdId() override { return cmdEOLWin; }
-    int GetLineType() const override { return SC_EOL_CRLF; }
-    void AfterInit() override;
+    UINT                 GetCmdId() override { return cmdEOLWin; }
+    Scintilla::EndOfLine GetLineType() const override { return Scintilla::EndOfLine::CrLf; }
+    void                 AfterInit() override;
 };
 
 class CCmdEOLUnix : public CCmdEOLBase
 {
 public:
     CCmdEOLUnix(void* obj);
-    UINT GetCmdId() override { return cmdEOLUnix; }
-    int GetLineType() const override { return SC_EOL_LF; }
-    void AfterInit() override;
+    UINT                 GetCmdId() override { return cmdEOLUnix; }
+    Scintilla::EndOfLine GetLineType() const override { return Scintilla::EndOfLine::Lf; }
+    void                 AfterInit() override;
 };
 
 class CCmdEOLMac : public CCmdEOLBase
 {
 public:
     CCmdEOLMac(void* obj);
-    UINT GetCmdId() override { return cmdEOLMac; }
-    int GetLineType() const override { return SC_EOL_CR; }
-    void AfterInit() override;
+    UINT                 GetCmdId() override { return cmdEOLMac; }
+    Scintilla::EndOfLine GetLineType() const override { return Scintilla::EndOfLine::Cr; }
+    void                 AfterInit() override;
 };

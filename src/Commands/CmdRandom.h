@@ -28,12 +28,12 @@
 class CRandomFileList
 {
 public:
-    CRandomFileList(void)
+    CRandomFileList()
         : m_shuffleIndex(0)
         , m_noSubs(false)
     {
     }
-    ~CRandomFileList(void)
+    ~CRandomFileList()
     {
         Save();
     }
@@ -77,7 +77,7 @@ public:
     {
     }
 
-    ~CCmdRandom(void) = default;
+    ~CCmdRandom() = default;
 
     bool Execute() override;
 

@@ -40,12 +40,12 @@ struct FunctionInfo
 // Turns "Hello/* there */world" into "Helloworld"
 static void StripComments(std::string& f)
 {
-    constexpr char commentBegin[]  = {"/*"};
-    constexpr char commentEnd[]    = {"*/"};
+    constexpr char   commentBegin[]  = {"/*"};
+    constexpr char   commentEnd[]    = {"*/"};
     constexpr size_t commentBeginLen = std::size(commentBegin) - 1;
     constexpr size_t commentEndLen   = std::size(commentEnd) - 1;
 
-    for (size_t commentBeginPos = 0; ;)
+    for (size_t commentBeginPos = 0;;)
     {
         commentBeginPos = f.find(commentBegin, commentBeginPos);
         if (commentBeginPos == std::string::npos)
@@ -84,7 +84,7 @@ static void Normalize(std::string& f, const std::vector<std::string>& functionRe
 
 static bool ParseSignature(const std::string& sig, std::string& name, std::string& nameAndArgs)
 {
-    static constexpr char skip[] = "\t :,.";
+    static constexpr char   skip[]  = "\t :,.";
     static constexpr size_t skipLen = sizeof(skip) - 1;
 
     // Look for a ( of perhaps void x::f(whatever)
@@ -136,34 +136,34 @@ static bool ParseName(const std::string& sig, std::string& name)
 static bool FindNext(
     CScintillaWnd& edit,
     Sci_PositionCR searchStart, Sci_PositionCR searchEnd,
-    const char* searchTarget,
+    const char*     searchTarget,
     Sci_PositionCR& foundStart, Sci_PositionCR& foundEnd,
     std::string& foundText, sptr_t& lineNum)
 {
     // In debug mode, regex takes a *long* time.
-    Sci_TextToFind ttf{ {searchStart, searchEnd}, searchTarget };
-    auto findRet = edit.Call(SCI_FINDTEXT, SCFIND_REGEXP | SCFIND_CXX11REGEX, reinterpret_cast<sptr_t>(&ttf));
+    Sci_TextToFind ttf{{searchStart, searchEnd}, searchTarget};
+    auto           findRet = edit.Scintilla().FindText(Scintilla::FindOption::RegExp | Scintilla::FindOption::Cxx11RegEx, &ttf);
     if (findRet < 0)
         return false;
     foundStart = ttf.chrgText.cpMin;
-    char c = static_cast<char>(edit.Call(SCI_GETCHARAT, foundStart));
-    foundEnd = ttf.chrgText.cpMax;
-    auto e = foundStart;
+    char c     = static_cast<char>(edit.Scintilla().CharAt(foundStart));
+    foundEnd   = ttf.chrgText.cpMax;
+    auto e     = foundStart;
     while (foundStart < foundEnd &&
            (c == '\r' || c == '\n' || c == ';' || c == '}' || c == ' ' || c == '\t'))
     {
         ++e;
-        c = static_cast<char>(edit.Call(SCI_GETCHARAT, e));
+        c = static_cast<char>(edit.Scintilla().CharAt(e));
     }
-    foundStart = e;
+    foundStart    = e;
     auto matchLen = foundEnd - foundStart;
     if (matchLen < 0)
         return false;
     foundText.resize(matchLen + 1LL);
-    Sci_TextRange foundRange{ foundStart, foundEnd, foundText.data() };
-    edit.Call(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&foundRange));
+    Sci_TextRange foundRange{foundStart, foundEnd, foundText.data()};
+    edit.Scintilla().GetTextRange(&foundRange);
     foundText.resize(matchLen);
-    lineNum = static_cast<int>(edit.Call(SCI_LINEFROMPOSITION, foundStart));
+    lineNum = static_cast<int>(edit.Scintilla().LineFromPosition(foundStart));
     return true;
 }
 
@@ -253,16 +253,14 @@ void CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     m_menuData.clear();
     OnOutOfScope(
         UINT collectionSize;
-        if (collection->GetCount(&collectionSize) == S_OK && !collectionSize)
-        {
+        if (collection->GetCount(&collectionSize) == S_OK && !collectionSize) {
             HRESULT hr = CAppUtils::AddResStringItem(collection,
-                IDS_NOFUNCTIONSFOUND, UI_COLLECTION_INVALIDINDEX, EMPTY_IMAGE);
+                                                     IDS_NOFUNCTIONSFOUND, UI_COLLECTION_INVALIDINDEX, EMPTY_IMAGE);
             CAppUtils::FailedShowMessage(hr);
-        }
-    );
+        });
     if (!HasActiveDocument())
         return;
-    const auto& doc = GetActiveDocument();
+    const auto& doc     = GetActiveDocument();
     const auto& docLang = doc.GetLanguage();
     if (docLang.empty())
         return;
@@ -276,24 +274,24 @@ void CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     {
         CScintillaWnd edit(g_hRes);
         edit.InitScratch(g_hRes);
-        edit.Call(SCI_SETDOCPOINTER, 0, 0);
-        edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
-        edit.Call(SCI_CLEARALL);
-        edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+        edit.Scintilla().SetDocPointer(nullptr);
+        edit.Scintilla().SetStatus(Scintilla::Status::Ok);
+        edit.Scintilla().ClearAll();
+        edit.Scintilla().SetDocPointer(doc.m_document);
         OnOutOfScope(
-            edit.Call(SCI_SETDOCPOINTER, 0, 0););
+            edit.Scintilla().SetDocPointer(nullptr););
 
 #if defined(_DEBUG) || defined(PROFILING)
         ProfileTimer profileTimer(L"FunctionParse");
 #endif
-        sptr_t lineNum = 0;
-        std::string sig;
-        Sci_PositionCR docLength = static_cast<Sci_PositionCR>(edit.Call(SCI_GETLENGTH));
+        sptr_t         lineNum = 0;
+        std::string    sig;
+        Sci_PositionCR docLength = static_cast<Sci_PositionCR>(edit.Scintilla().Length());
         for (Sci_PositionCR searchStart = 0, foundStart, foundEnd;
-            FindNext(edit, searchStart, docLength,
-                langData->functionRegex.c_str(),
-                foundStart, foundEnd, sig, lineNum)
-            ; searchStart = foundEnd + 1)
+             FindNext(edit, searchStart, docLength,
+                      langData->functionRegex.c_str(),
+                      foundStart, foundEnd, sig, lineNum);
+             searchStart = foundEnd + 1)
         {
             Normalize(sig, langData->functionRegexTrim);
             std::string name;
@@ -309,7 +307,7 @@ void CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     for (const auto& func : functions)
     {
         HRESULT hr = CAppUtils::AddStringItem(collection,
-            CUnicodeUtils::StdGetUnicode(func.displayName).c_str(), UI_COLLECTION_INVALIDINDEX, EMPTY_IMAGE);
+                                              CUnicodeUtils::StdGetUnicode(func.displayName).c_str(), UI_COLLECTION_INVALIDINDEX, EMPTY_IMAGE);
         if (CAppUtils::FailedShowMessage(hr))
             return;
         m_menuData.push_back(func.lineNum);
@@ -437,8 +435,8 @@ void CCmdFunctions::OnTimer(UINT id)
         bool bWakeupThread = false;
         for (const auto docId : m_eventData)
         {
-            const auto& doc = GetDocumentFromID(docId);
-            auto lang = doc.GetLanguage();
+            const auto& doc  = GetDocumentFromID(docId);
+            auto        lang = doc.GetLanguage();
             if (lang.empty())
                 continue;
             auto langData = CLexStyles::Instance().GetLanguageData(lang);
@@ -451,25 +449,25 @@ void CCmdFunctions::OnTimer(UINT id)
             //#if defined(_DEBUG) || defined(PROFILING)
             ProfileTimer p(L"getting doc content");
             //#endif
-            m_edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
-            m_edit.Call(SCI_CLEARALL);
-            m_edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+            m_edit.Scintilla().SetStatus(Scintilla::Status::Ok);
+            m_edit.Scintilla().ClearAll();
+            m_edit.Scintilla().SetDocPointer(doc.m_document);
             OnOutOfScope(
-                m_edit.Call(SCI_SETDOCPOINTER, 0, 0););
-            size_t lengthDoc = m_edit.Call(SCI_GETLENGTH);
+                m_edit.Scintilla().SetDocPointer(nullptr););
+            size_t lengthDoc = m_edit.Scintilla().Length();
             if (limitedScan && lengthDoc > m_autoScanLimit)
                 continue;
             WorkItem w;
             w.m_lang = lang;
-            w.m_id = docId;
+            w.m_id   = docId;
             if (GetDocIdOfCurrentTab() == docId)
-                w.m_currentPos = ScintillaCall(SCI_GETCURRENTPOS);
-            w.m_regex = langData->functionRegex;
+                w.m_currentPos = Scintilla().CurrentPos();
+            w.m_regex      = langData->functionRegex;
             w.m_trimTokens = langData->functionRegexTrim;
             w.m_autoCRegex = langData->autoCompleteRegex;
             // get characters directly from Scintilla buffer
-            const char* buf = reinterpret_cast<const char*>(m_edit.Call(SCI_GETCHARACTERPOINTER));
-            w.m_data  = std::string(buf, lengthDoc);
+            const char* buf = static_cast<const char*>(m_edit.Scintilla().CharacterPointer());
+            w.m_data        = std::string(buf, lengthDoc);
 
             std::unique_lock<std::mutex> lock(m_fileDataMutex);
             // if there's already a work item queued up for this document,
@@ -637,10 +635,10 @@ void CCmdFunctions::ThreadFunc()
             {
                 std::wregex                       regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
                 const std::wsregex_token_iterator end;
-// Profile
-//#if defined(_DEBUG) || defined(PROFILING)
-                ProfileTimer                      timer(L"parsing functions");
-//#endif
+                // Profile
+                //#if defined(_DEBUG) || defined(PROFILING)
+                ProfileTimer timer(L"parsing functions");
+                //#endif
                 for (std::wsregex_token_iterator match(sData.cbegin(), sData.cend(), regex, 0); match != end; ++match)
                 {
                     if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
@@ -658,7 +656,7 @@ void CCmdFunctions::ThreadFunc()
                     if (work.m_currentPos >= 0)
                     {
                         auto startPos = std::distance(sData.cbegin(), match->first);
-                        auto endPos = std::distance(sData.cbegin(), match->second);
+                        auto endPos   = std::distance(sData.cbegin(), match->second);
                         if ((std::abs(startPos - work.m_currentPos) < 10) ||
                             (std::abs(endPos - work.m_currentPos) < 10) ||
                             (startPos < work.m_currentPos && endPos > work.m_currentPos))
@@ -678,13 +676,13 @@ void CCmdFunctions::ThreadFunc()
         {
             try
             {
-                auto                                    sRegex = CUnicodeUtils::StdGetUnicode(work.m_autoCRegex);
-                std::wregex                             regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
-                const std::wsregex_iterator             end;
-// Profile
-//#if defined(_DEBUG) || defined(PROFILING)
-                ProfileTimer                            timer(L"parsing words");
-//#endif
+                auto                        sRegex = CUnicodeUtils::StdGetUnicode(work.m_autoCRegex);
+                std::wregex                 regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
+                const std::wsregex_iterator end;
+                // Profile
+                //#if defined(_DEBUG) || defined(PROFILING)
+                ProfileTimer timer(L"parsing words");
+                //#endif
                 std::map<std::string, AutoCompleteType> acMap;
                 for (std::wsregex_iterator match(sData.begin(), sData.end(), regex); match != end; ++match)
                 {

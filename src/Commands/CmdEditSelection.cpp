@@ -37,7 +37,7 @@ HRESULT CCmdEditSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
 {
     if (UI_PKEY_Enabled == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (ScintillaCall(SCI_GETSELECTIONEMPTY) == 0), pPropVarNewValue);
+        return UIInitPropertyFromBoolean(UI_PKEY_Enabled, (Scintilla().SelectionEmpty() == 0), pPropVarNewValue);
     }
     return E_NOTIMPL;
 }

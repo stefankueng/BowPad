@@ -42,7 +42,7 @@ public:
     {
     }
 
-    ~CCmdUnComment(void) = default;
+    ~CCmdUnComment() = default;
 
     bool Execute() override;
 

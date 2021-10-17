@@ -21,58 +21,58 @@
 
 bool CCmdTrim::Execute()
 {
-    if (ScintillaCall(SCI_GETSELECTIONEMPTY))
+    if (Scintilla().SelectionEmpty())
     {
-        ScintillaCall(SCI_SETTARGETSTART, 0);
-        ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
+        Scintilla().SetTargetStart(0);
+        Scintilla().SetTargetEnd(Scintilla().Length());
     }
     else
     {
-        ScintillaCall(SCI_TARGETFROMSELECTION);
+        Scintilla().TargetFromSelection();
     }
 
-    ScintillaCall(SCI_SETSEARCHFLAGS, SCFIND_REGEXP | SCFIND_CXX11REGEX);
+    Scintilla().SetSearchFlags(Scintilla::FindOption::RegExp | Scintilla::FindOption::Cxx11RegEx);
     sptr_t findRet = -1;
-    ScintillaCall(SCI_BEGINUNDOACTION);
+    Scintilla().BeginUndoAction();
     const std::string sFindString = "([ \\t]+$)|([ \\t]+\\r)|([ \\t]+\\n)";
     do
     {
-        findRet = ScintillaCall(SCI_SEARCHINTARGET, sFindString.length(), reinterpret_cast<sptr_t>(sFindString.c_str()));
+        findRet = Scintilla().SearchInTarget(sFindString.length(), sFindString.c_str());
         if (findRet >= 0)
         {
-            sptr_t endPos = ScintillaCall(SCI_GETTARGETEND);
+            sptr_t endPos = Scintilla().TargetEnd();
             char   c      = 0;
             do
             {
                 --endPos;
-                c = static_cast<char>(ScintillaCall(SCI_GETCHARAT, endPos));
+                c = static_cast<char>(Scintilla().CharAt(endPos));
             } while ((c == '\n') || (c == '\r'));
-            ScintillaCall(SCI_SETTARGETEND, endPos + 1);
-            ScintillaCall(SCI_REPLACETARGETRE, static_cast<uptr_t>(-1), reinterpret_cast<sptr_t>(""));
+            Scintilla().SetTargetEnd(endPos + 1);
+            Scintilla().ReplaceTargetRE(-1, "");
 
-            if (ScintillaCall(SCI_GETSELECTIONEMPTY))
+            if (Scintilla().SelectionEmpty())
             {
-                ScintillaCall(SCI_SETTARGETSTART, findRet + 1);
-                ScintillaCall(SCI_SETTARGETEND, ScintillaCall(SCI_GETLENGTH));
+                Scintilla().SetTargetStart(findRet + 1);
+                Scintilla().SetTargetEnd(Scintilla().Length());
             }
             else
             {
-                ScintillaCall(SCI_TARGETFROMSELECTION);
+                Scintilla().TargetFromSelection();
             }
         }
     } while (findRet != -1);
-    ScintillaCall(SCI_ENDUNDOACTION);
+    Scintilla().EndUndoAction();
     return true;
 }
 
 bool CCmdTabs2Spaces::Execute()
 {
     // convert the whole file, ignore the selection
-    int  tabSize       = static_cast<int>(ScintillaCall(SCI_GETTABWIDTH));
-    auto docLength     = ScintillaCall(SCI_GETLENGTH) + 1;
-    auto curPos        = ScintillaCall(SCI_GETCURRENTPOS);
+    int  tabSize       = static_cast<int>(Scintilla().TabWidth());
+    auto docLength     = Scintilla().Length() + 1;
+    auto curPos        = Scintilla().CurrentPos();
     bool bIgnoreQuotes = false;
-    auto lexer         = ScintillaCall(SCI_GETLEXER);
+    auto lexer         = Scintilla().Lexer();
     switch (lexer)
     {
         case SCLEX_XML:
@@ -83,7 +83,7 @@ bool CCmdTabs2Spaces::Execute()
             break;
     }
     auto source = std::make_unique<char[]>(docLength);
-    ScintillaCall(SCI_GETTEXT, docLength, reinterpret_cast<sptr_t>(source.get()));
+    Scintilla().GetText(docLength, source.get());
 
     // untabify the file
     // first find the number of spaces we have to insert.
@@ -181,9 +181,9 @@ bool CCmdTabs2Spaces::Execute()
             else
                 *pBuf++ = *pOldBuf++;
         }
-        ScintillaCall(SCI_BEGINUNDOACTION);
-        ScintillaCall(SCI_SETTEXT, 0, reinterpret_cast<sptr_t>(destination.get()));
-        ScintillaCall(SCI_ENDUNDOACTION);
+        Scintilla().BeginUndoAction();
+        Scintilla().SetText(destination.get());
+        Scintilla().EndUndoAction();
         Center(setPos, setPos);
         return true;
     }
@@ -193,11 +193,11 @@ bool CCmdTabs2Spaces::Execute()
 bool CCmdSpaces2Tabs::Execute()
 {
     // convert the whole file, ignore the selection
-    int  tabSize       = static_cast<int>(ScintillaCall(SCI_GETTABWIDTH));
-    auto docLength     = ScintillaCall(SCI_GETLENGTH) + 1;
-    auto curPos        = ScintillaCall(SCI_GETCURRENTPOS);
+    int  tabSize       = static_cast<int>(Scintilla().TabWidth());
+    auto docLength     = Scintilla().Length() + 1;
+    auto curPos        = Scintilla().CurrentPos();
     bool bIgnoreQuotes = false;
-    auto lexer         = ScintillaCall(SCI_GETLEXER);
+    auto lexer         = Scintilla().Lexer();
     switch (lexer)
     {
         case SCLEX_XML:
@@ -209,7 +209,7 @@ bool CCmdSpaces2Tabs::Execute()
     }
 
     auto source = std::make_unique<char[]>(docLength);
-    ScintillaCall(SCI_GETTEXT, docLength, reinterpret_cast<sptr_t>(source.get()));
+    Scintilla().GetText(docLength, source.get());
 
     // tabify the file
     // first find out how many spaces we have to convert into tabs
@@ -292,9 +292,9 @@ bool CCmdSpaces2Tabs::Execute()
             else
                 *pBuf++ = *pOldBuf++;
         }
-        ScintillaCall(SCI_BEGINUNDOACTION);
-        ScintillaCall(SCI_SETTEXT, 0, reinterpret_cast<sptr_t>(destination.get()));
-        ScintillaCall(SCI_ENDUNDOACTION);
+        Scintilla().BeginUndoAction();
+        Scintilla().SetText(destination.get());
+        Scintilla().EndUndoAction();
         Center(setPos, setPos);
         return true;
     }

@@ -103,7 +103,7 @@ void CCmdPrevNext::ScintillaNotify(SCNotification* pScn)
                 g_currentDocId = GetDocIdOfCurrentTab();
                 if (g_currentDocId.IsValid())
                 {
-                    auto col = ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
+                    auto col = Scintilla().Column(Scintilla().CurrentPos());
                     AddNewPosition(g_currentDocId, line, col);
                     InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, nullptr);
                     InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, nullptr);
@@ -114,7 +114,7 @@ void CCmdPrevNext::ScintillaNotify(SCNotification* pScn)
             {
                 auto mark = [&]() {
                     ResizePositionSpace();
-                    auto col = ScintillaCall(SCI_GETCOLUMN, ScintillaCall(SCI_GETCURRENTPOS));
+                    auto col = Scintilla().Column(Scintilla().CurrentPos());
                     AddNewPosition(g_currentDocId, line, col);
                     InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, nullptr);
                     InvalidateUICommand(cmdNext, UI_INVALIDATIONS_STATE, nullptr);
@@ -197,12 +197,12 @@ bool CCmdPrevious::Execute()
         if (GetDocIdOfCurrentTab() != data.id)
             TabActivateAt(GetTabIndexFromDocID(data.id));
 
-        auto pos = ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
-        ScintillaCall(SCI_SETANCHOR, pos);
-        ScintillaCall(SCI_SETCURRENTPOS, pos);
-        ScintillaCall(SCI_CANCEL);
-        ScintillaCall(SCI_SCROLLCARET);
-        ScintillaCall(SCI_GRABFOCUS);
+        auto pos = Scintilla().FindColumn(data.line, data.column);
+        Scintilla().SetAnchor(pos);
+        Scintilla().SetCurrentPos(pos);
+        Scintilla().Cancel();
+        Scintilla().ScrollCaret();
+        Scintilla().GrabFocus();
         SetCurrentLine(data.line);
         ++g_offsetBeforeEnd;
         g_ignore = false;
@@ -248,12 +248,12 @@ bool CCmdNext::Execute()
         if (GetDocIdOfCurrentTab() != data.id)
             TabActivateAt(GetTabIndexFromDocID(data.id));
         --g_offsetBeforeEnd;
-        auto pos = ScintillaCall(SCI_FINDCOLUMN, data.line, data.column);
-        ScintillaCall(SCI_SETANCHOR, pos);
-        ScintillaCall(SCI_SETCURRENTPOS, pos);
-        ScintillaCall(SCI_CANCEL);
-        ScintillaCall(SCI_SCROLLCARET);
-        ScintillaCall(SCI_GRABFOCUS);
+        auto pos = Scintilla().FindColumn(data.line, data.column);
+        Scintilla().SetAnchor(pos);
+        Scintilla().SetCurrentPos(pos);
+        Scintilla().Cancel();
+        Scintilla().ScrollCaret();
+        Scintilla().GrabFocus();
         SetCurrentLine(data.line);
         g_ignore = false;
         InvalidateUICommand(cmdPrevious, UI_INVALIDATIONS_STATE, nullptr);

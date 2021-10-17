@@ -111,13 +111,13 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
     if (pathUnderCursor.empty())
     {
         auto lineBuffer = GetWordChars();
-        OnOutOfScope(ConstCall(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>(lineBuffer.c_str())));
+        OnOutOfScope(Scintilla().SetWordChars(lineBuffer.c_str()));
 
-        ConstCall(SCI_SETWORDCHARS, 0, reinterpret_cast<LPARAM>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\"));
-        size_t pos = ConstCall(SCI_GETCURRENTPOS);
+        Scintilla().SetWordChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
+        size_t pos = Scintilla().CurrentPos();
 
-        std::string sWordA = GetTextRange(ConstCall(SCI_WORDSTARTPOSITION, pos, false),
-                                          ConstCall(SCI_WORDENDPOSITION, pos, false));
+        std::string sWordA = GetTextRange(Scintilla().WordStartPosition(pos, false),
+                                          Scintilla().WordEndPosition(pos, false));
         pathUnderCursor    = CUnicodeUtils::StdGetUnicode(sWordA);
     }
 

@@ -1,6 +1,6 @@
-// This file is part of BowPad.
+﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 class CCmdZoom100 : public ICommand
 {
 public:
-
-    CCmdZoom100(void * obj) : ICommand(obj)
+    CCmdZoom100(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -31,7 +31,7 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_SETZOOM, 0);
+        Scintilla().SetZoom(0);
         return true;
     }
 
@@ -41,8 +41,8 @@ public:
 class CCmdZoomIn : public ICommand
 {
 public:
-
-    CCmdZoomIn(void * obj) : ICommand(obj)
+    CCmdZoomIn(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -50,7 +50,7 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_ZOOMIN);
+        Scintilla().ZoomIn();
         return true;
     }
 
@@ -60,8 +60,8 @@ public:
 class CCmdZoomOut : public ICommand
 {
 public:
-
-    CCmdZoomOut(void * obj) : ICommand(obj)
+    CCmdZoomOut(void* obj)
+        : ICommand(obj)
     {
     }
 
@@ -69,7 +69,7 @@ public:
 
     bool Execute() override
     {
-        ScintillaCall(SCI_ZOOMOUT);
+        Scintilla().ZoomOut();
         return true;
     }
 

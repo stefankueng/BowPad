@@ -16,7 +16,7 @@
 //
 #pragma once
 
-const int MAX_RESOURCE_LENGTH = 256;
+constexpr int MAX_RESOURCE_LENGTH = 256;
 #include <uiribbon.h>
 
 // The implementation of IUISimplePropertySet. This handles all of the properties used for the

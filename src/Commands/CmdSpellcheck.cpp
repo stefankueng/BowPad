@@ -161,9 +161,9 @@ void CCmdSpellCheck::Check()
 #endif
         bool checkAll       = CIniSettings::Instance().GetInt64(L"spellcheck", L"checkall", 1) != 0;
         bool checkUppercase = CIniSettings::Instance().GetInt64(L"spellcheck", L"uppercase", 1) != 0;
-        if (m_activeLexer != static_cast<int>(ScintillaCall(SCI_GETLEXER)))
+        if (m_activeLexer != static_cast<int>(Scintilla().Lexer()))
         {
-            m_activeLexer = static_cast<int>(ScintillaCall(SCI_GETLEXER));
+            m_activeLexer = static_cast<int>(Scintilla().Lexer());
             m_lexerData   = CLexStyles::Instance().GetLexerDataForLexer(m_activeLexer);
             m_keywords.clear();
             const auto& keywords = CLexStyles::Instance().GetKeywordsForLexer(m_activeLexer);
@@ -176,19 +176,19 @@ void CCmdSpellCheck::Check()
         }
 
         auto wordCharsBuffer = GetWordChars();
-        OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(wordCharsBuffer.c_str())));
+        OnOutOfScope(Scintilla().SetWordChars(wordCharsBuffer.c_str()));
 
         if (m_useComprehensiveCheck)
-            ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(g_sentenceChars.c_str()));
+            Scintilla().SetWordChars(g_sentenceChars.c_str());
         else
-            ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(g_wordChars.c_str()));
+            Scintilla().SetWordChars(g_wordChars.c_str());
         Sci_TextRange textRange{};
-        auto          firstLine = ScintillaCall(SCI_GETFIRSTVISIBLELINE);
-        auto          lastLine  = firstLine + ScintillaCall(SCI_LINESONSCREEN);
-        textRange.chrg.cpMin    = static_cast<Sci_PositionCR>(ScintillaCall(SCI_POSITIONFROMLINE, firstLine));
+        auto          firstLine = Scintilla().FirstVisibleLine();
+        auto          lastLine  = firstLine + Scintilla().LinesOnScreen();
+        textRange.chrg.cpMin    = static_cast<Sci_PositionCR>(Scintilla().PositionFromLine(firstLine));
         textRange.chrg.cpMax    = textRange.chrg.cpMin;
-        auto lastPos            = ScintillaCall(SCI_POSITIONFROMLINE, lastLine) + ScintillaCall(SCI_LINELENGTH, lastLine);
-        auto textLength         = ScintillaCall(SCI_GETLENGTH);
+        auto lastPos            = Scintilla().PositionFromLine(lastLine) + Scintilla().LineLength(lastLine);
+        auto textLength         = Scintilla().Length();
         if (lastPos < 0)
             lastPos = textLength - textRange.chrg.cpMin;
         if (m_lastCheckedPos)
@@ -205,10 +205,10 @@ void CCmdSpellCheck::Check()
                     SetTimer(GetHwnd(), g_checkTimer, 10, nullptr);
                 break;
             }
-            textRange.chrg.cpMin = static_cast<Sci_PositionCR>(ScintillaCall(SCI_WORDSTARTPOSITION, textRange.chrg.cpMax + 1, TRUE));
+            textRange.chrg.cpMin = static_cast<Sci_PositionCR>(Scintilla().WordStartPosition(textRange.chrg.cpMax + 1, TRUE));
             if (textRange.chrg.cpMin < textRange.chrg.cpMax)
                 break;
-            textRange.chrg.cpMax = static_cast<Sci_PositionCR>(ScintillaCall(SCI_WORDENDPOSITION, textRange.chrg.cpMin, TRUE));
+            textRange.chrg.cpMax = static_cast<Sci_PositionCR>(Scintilla().WordEndPosition(textRange.chrg.cpMin, TRUE));
             if (textRange.chrg.cpMin == textRange.chrg.cpMax)
             {
                 textRange.chrg.cpMax++;
@@ -216,15 +216,15 @@ void CCmdSpellCheck::Check()
                 // we have to clear here the squiggly lines to the end.
                 if (textRange.chrg.cpMin)
                 {
-                    ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin - 1, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                    Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED);
+                    Scintilla().IndicatorClearRange(textRange.chrg.cpMin - 1, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
                 }
                 continue;
             }
-            if (ScintillaCall(SCI_INDICATORVALUEAT, INDIC_URLHOTSPOT, textRange.chrg.cpMin))
+            if (Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, textRange.chrg.cpMin))
                 continue;
 
-            int style = static_cast<int>(ScintillaCall(SCI_GETSTYLEAT, textRange.chrg.cpMin));
+            int style = static_cast<int>(Scintilla().StyleAt(textRange.chrg.cpMin));
             // check if the word is text, doc or comment
             if (!checkAll)
             {
@@ -242,12 +242,12 @@ void CCmdSpellCheck::Check()
                             case SCE_MARKDOWN_CODE2:
                             case SCE_MARKDOWN_CODEBK:
                                 // mark word as correct (remove the squiggle line)
-                                ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
-                                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
-                                ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED_DEL);
-                                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
-                                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                                Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED);
+                                Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                                Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                                Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED_DEL);
+                                Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                                Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
                                 continue;
                         }
                         break;
@@ -264,12 +264,12 @@ void CCmdSpellCheck::Check()
                         if (!isText)
                         {
                             // mark word as correct (remove the squiggle line)
-                            ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                            ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
-                            ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
-                            ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED_DEL);
-                            ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
-                            ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                            Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED);
+                            Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                            Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                            Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED_DEL);
+                            Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                            Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
                             continue;
                         }
                 }
@@ -284,18 +284,18 @@ void CCmdSpellCheck::Check()
             if (textRange.chrg.cpMax < textLength)
             {
                 textRange.chrg.cpMax++;
-                ScintillaCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&textRange));
+                Scintilla().GetTextRange(&textRange);
             }
             else
             {
-                ScintillaCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&textRange));
+                Scintilla().GetTextRange(&textRange);
                 textRange.chrg.cpMax++;
             }
             auto len = strlen(textRange.lpstrText);
             if (len == 0)
             {
                 textRange.chrg.cpMax--;
-                ScintillaCall(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&textRange));
+                Scintilla().GetTextRange(&textRange);
                 len = strlen(textRange.lpstrText);
                 textRange.chrg.cpMax++;
                 len++;
@@ -313,12 +313,12 @@ void CCmdSpellCheck::Check()
                 if (!checkUppercase && (std::any_of(sWord.begin() + 1, sWord.end(), ::iswupper)))
                 {
                     // mark word as correct (remove the squiggle line)
-                    ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
-                    ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED_DEL);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
-                    ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                    Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED);
+                    Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                    Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                    Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED_DEL);
+                    Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                    Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
                     continue;
                 }
                 // ignore keywords of the currently selected lexer
@@ -333,12 +333,12 @@ void CCmdSpellCheck::Check()
                     hr = g_spellChecker->Check(sWord.c_str(), &enumSpellingError);
 
                 // first mark all text as correct (remove the squiggle lines)
-                ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
-                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
-                ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED_DEL);
-                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
-                ScintillaCall(SCI_INDICATORCLEARRANGE, textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED);
+                Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
+                Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED_DEL);
+                Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
+                Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
 
                 if (SUCCEEDED(hr))
                 {
@@ -351,12 +351,12 @@ void CCmdSpellCheck::Check()
                         if (action != CORRECTIVE_ACTION_NONE)
                         {
                             // mark text as misspelled
-                            ScintillaCall(SCI_SETINDICATORCURRENT, action == CORRECTIVE_ACTION_DELETE ? INDIC_MISSPELLED_DEL : INDIC_MISSPELLED);
+                            Scintilla().SetIndicatorCurrent(action == CORRECTIVE_ACTION_DELETE ? INDIC_MISSPELLED_DEL : INDIC_MISSPELLED);
                             ULONG errLen = 0;
                             spellingError->get_Length(&errLen);
                             ULONG errStart = 0;
                             spellingError->get_StartIndex(&errStart);
-                            ScintillaCall(SCI_INDICATORFILLRANGE, textRange.chrg.cpMin + errStart, errLen);
+                            Scintilla().IndicatorFillRange(textRange.chrg.cpMin + errStart, errLen);
                         }
                         hr = enumSpellingError->Next(&spellingError);
                     }
@@ -402,10 +402,10 @@ bool CCmdSpellCheck::Execute()
     }
     else
     {
-        ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED);
-        ScintillaCall(SCI_INDICATORCLEARRANGE, 0, ScintillaCall(SCI_GETLENGTH));
-        ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_MISSPELLED_DEL);
-        ScintillaCall(SCI_INDICATORCLEARRANGE, 0, ScintillaCall(SCI_GETLENGTH));
+        Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED);
+        Scintilla().IndicatorClearRange(0, Scintilla().Length());
+        Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED_DEL);
+        Scintilla().IndicatorClearRange(0, Scintilla().Length());
     }
     g_contextID = m_enabled && g_spellChecker ? cmdContextSpellMap : cmdContextMap;
     return true;
@@ -575,9 +575,9 @@ HRESULT CCmdSpellCheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
             std::wstring sWord;
 
             auto wordcharsbuffer = GetWordChars();
-            OnOutOfScope(ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(wordcharsbuffer.c_str())));
+            OnOutOfScope(Scintilla().SetWordChars(wordcharsbuffer.c_str()));
 
-            ScintillaCall(SCI_SETWORDCHARS, 0, reinterpret_cast<sptr_t>(g_wordChars.c_str()));
+            Scintilla().SetWordChars(g_wordChars.c_str());
             sWord = CUnicodeUtils::StdGetUnicode(GetCurrentWord());
 
             IEnumStringPtr enumSpellingSuggestions = nullptr;
@@ -639,18 +639,18 @@ HRESULT CCmdSpellCheckCorrect::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, c
             {
                 std::wstring sWord;
 
-                ScintillaCall(SCI_SETCHARSDEFAULT);
+                Scintilla().SetCharsDefault();
                 sWord = CUnicodeUtils::StdGetUnicode(GetCurrentWord());
 
                 if (m_suggestions.empty())
                     ++selected; // adjust for the "no corrections found" entry
                 if (selected < m_suggestions.size())
                 {
-                    auto currentPos = ScintillaCall(SCI_GETCURRENTPOS);
-                    auto startPos   = ScintillaCall(SCI_WORDSTARTPOSITION, currentPos, true);
-                    auto endPos     = ScintillaCall(SCI_WORDENDPOSITION, currentPos, true);
-                    ScintillaCall(SCI_SETSELECTION, startPos, endPos);
-                    ScintillaCall(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(CUnicodeUtils::StdGetUTF8(m_suggestions[selected]).c_str()));
+                    auto currentPos = Scintilla().CurrentPos();
+                    auto startPos   = Scintilla().WordStartPosition(currentPos, true);
+                    auto endPos     = Scintilla().WordEndPosition(currentPos, true);
+                    Scintilla().SetSelection(startPos, endPos);
+                    Scintilla().ReplaceSel(CUnicodeUtils::StdGetUTF8(m_suggestions[selected]).c_str());
                 }
                 else
                 {

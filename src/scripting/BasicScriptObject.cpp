@@ -1496,7 +1496,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
                 return DISP_E_TYPEMISMATCH;
             char cbuf[3] = {0};
-            cbuf[0]      = static_cast<char>(ScintillaCall(SCI_GETCHARAT, p1.intVal));
+            cbuf[0]      = static_cast<char>(Scintilla().CharAt(p1.intVal));
             ret->vt      = VT_BSTR;
             ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(cbuf).c_str()).Detach();
         }
@@ -1518,7 +1518,7 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             ttf.chrg.cpMax     = p3.intVal;
             std::string sText  = CUnicodeUtils::StdGetUTF8(p4.bstrVal);
             ttf.lpstrText      = sText.c_str();
-            auto sret          = ScintillaCall(SCI_FINDTEXT, p1.intVal, reinterpret_cast<sptr_t>(&ttf));
+            auto sret          = Scintilla().FindText(static_cast<Scintilla::FindOption>(p1.intVal), &ttf);
 
             SAFEARRAYBOUND sabounds{};
             sabounds.lLbound   = 0;
@@ -1597,15 +1597,15 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
             if (cmd.p2 == VT_BSTR)
             {
                 ret->vt     = VT_INT;
-                ret->intVal = static_cast<int>(ScintillaCall(cmd.cmd, p1.intVal, reinterpret_cast<sptr_t>(CUnicodeUtils::StdGetUTF8(p2.bstrVal).c_str())));
+                ret->intVal = static_cast<int>(Scintilla().Call(static_cast<Scintilla::Message>(cmd.cmd), p1.intVal, reinterpret_cast<sptr_t>(CUnicodeUtils::StdGetUTF8(p2.bstrVal).c_str())));
                 return VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retVal);
             }
             else if ((cmd.p2 == VT_NULL) && (cmd.retVal == VT_BSTR))
             {
                 // return value is a string
-                auto len = ScintillaCall(cmd.cmd, p1.intVal);
+                auto len = Scintilla().Call(static_cast<Scintilla::Message>(cmd.cmd), p1.intVal);
                 auto buf = std::make_unique<char[]>(len + 1);
-                ScintillaCall(cmd.cmd, p1.intVal, reinterpret_cast<sptr_t>(buf.get()));
+                Scintilla().Call(static_cast<Scintilla::Message>(cmd.cmd), p1.intVal, reinterpret_cast<sptr_t>(buf.get()));
                 buf[len]     = 0;
                 ret->vt      = VT_BSTR;
                 ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(buf.get()).c_str()).Detach();
@@ -1614,7 +1614,7 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
             else
             {
                 ret->vt     = VT_INT;
-                ret->intVal = static_cast<int>(ScintillaCall(cmd.cmd, p1.intVal, p2.intVal));
+                ret->intVal = static_cast<int>(Scintilla().Call(static_cast<Scintilla::Message>(cmd.cmd), p1.intVal, p2.intVal));
                 return VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retVal);
             }
         }
@@ -1627,15 +1627,15 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
                 return DISP_E_TYPEMISMATCH;
             if (cmd.p1 == VT_BSTR)
             {
-                // if the one argument is a string, pass it as the second param to ScintillaCall
+                // if the one argument is a string, pass it as the second param to Scintilla().Call
                 ret->vt     = VT_INT;
-                ret->intVal = static_cast<int>(ScintillaCall(cmd.cmd, 0, reinterpret_cast<sptr_t>(CUnicodeUtils::StdGetUTF8(p1.bstrVal).c_str())));
+                ret->intVal = static_cast<int>(Scintilla().Call(static_cast<Scintilla::Message>(cmd.cmd), 0, reinterpret_cast<sptr_t>(CUnicodeUtils::StdGetUTF8(p1.bstrVal).c_str())));
                 return VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retVal);
             }
             else
             {
                 ret->vt     = VT_INT;
-                ret->intVal = static_cast<int>(ScintillaCall(cmd.cmd, p1.intVal));
+                ret->intVal = static_cast<int>(Scintilla().Call(static_cast<Scintilla::Message>(cmd.cmd), p1.intVal));
                 return VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retVal);
             }
         }
@@ -1647,16 +1647,16 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
             if (cmd.retVal == VT_BSTR)
             {
                 // return value is a string
-                auto len = ScintillaCall(cmd.cmd);
+                auto len = Scintilla().Call(static_cast<Scintilla::Message>(cmd.cmd));
                 auto buf = std::make_unique<char[]>(len + 1);
-                ScintillaCall(cmd.cmd, len, reinterpret_cast<sptr_t>(buf.get()));
+                Scintilla().Call(static_cast<Scintilla::Message>(cmd.cmd), len, reinterpret_cast<sptr_t>(buf.get()));
                 buf[len]     = 0;
                 ret->vt      = VT_BSTR;
                 ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(buf.get()).c_str()).Detach();
                 return S_OK;
             }
             ret->vt     = VT_INT;
-            ret->intVal = static_cast<int>(ScintillaCall(flags == DISPATCH_PROPERTYGET ? cmd.cmdGet : cmd.cmd));
+            ret->intVal = static_cast<int>(Scintilla().Call(flags == DISPATCH_PROPERTYGET ? static_cast<Scintilla::Message>(cmd.cmdGet) : static_cast<Scintilla::Message>(cmd.cmd)));
             return VariantChangeType(ret, ret, VARIANT_ALPHABOOL, cmd.retVal);
         }
     }

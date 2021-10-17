@@ -281,7 +281,7 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
 
         AttachDocument(edit, doc);
         OnOutOfScope(
-            edit.Call(SCI_SETDOCPOINTER, 0, 0); // Detach document
+            edit.Scintilla().SetDocPointer(nullptr); // Detach document
         );
 
         PopulateMenu(doc, edit, collection);
@@ -996,25 +996,25 @@ bool CCmdHeaderSource::ParseInclude(const std::wstring& raw, std::wstring& filen
     return false;
 }
 
-bool CCmdHeaderSource::FindNext(CScintillaWnd& edit, const Sci_TextToFind& ttf, int flags, std::string& foundText, size_t* lineNo) const
+bool CCmdHeaderSource::FindNext(CScintillaWnd& edit, Sci_TextToFind& ttf, Scintilla::FindOption flags, std::string& foundText, size_t* lineNo) const
 {
     foundText.clear();
     *lineNo = 0;
 
-    auto findRet = edit.Call(SCI_FINDTEXT, flags, reinterpret_cast<sptr_t>(&ttf));
+    auto findRet = edit.Scintilla().FindText(flags, &ttf);
     if (findRet < 0)
         return false;
     foundText = GetTextRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
-    *lineNo   = edit.Call(SCI_LINEFROMPOSITION, ttf.chrgText.cpMin);
+    *lineNo   = edit.Scintilla().LineFromPosition(ttf.chrgText.cpMin);
     return true;
 }
 
 void CCmdHeaderSource::AttachDocument(CScintillaWnd& edit, CDocument& doc)
 {
-    edit.Call(SCI_SETDOCPOINTER, 0, 0);
-    edit.Call(SCI_SETSTATUS, SC_STATUS_OK);
-    edit.Call(SCI_CLEARALL);
-    edit.Call(SCI_SETDOCPOINTER, 0, doc.m_document);
+    edit.Scintilla().SetDocPointer(nullptr);
+    edit.Scintilla().SetStatus(Scintilla::Status::Ok);
+    edit.Scintilla().ClearAll();
+    edit.Scintilla().SetDocPointer(doc.m_document);
 }
 
 bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<RelatedFileItem>& includes) const
@@ -1033,9 +1033,9 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
     // As we don't want to compete with that, for now just scan the first N lines.
     // We could get more creative by not using regex and just fetching and parsing
     // each line ourselves but that is unproven and this seems fine for now.
-    long length = static_cast<long>(edit.Call(SCI_GETLINEENDPOSITION, static_cast<WPARAM>(MAX_INCLUDE_SEARCH_LINES - 1))); // 0 based.
+    long length = static_cast<long>(edit.Scintilla().LineEndPosition(static_cast<WPARAM>(MAX_INCLUDE_SEARCH_LINES - 1))); // 0 based.
     // NOTE: If we want whole file scanned use:
-    // long length = (long) edit.Call(SCI_GETLENGTH);
+    // long length = (long) edit.Scintilla().Length();
 
     Sci_TextToFind ttf{}; // Zero initialize.
     ttf.chrg.cpMax = length;
@@ -1061,7 +1061,7 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
 
         // Use match case because the include keyword is case sensitive and the
         // rest of the regular expression is symbols.
-        if (!FindNext(edit, ttf, SCFIND_REGEXP | SCFIND_CXX11REGEX | SCFIND_MATCHCASE, textFound, &lineNo))
+        if (!FindNext(edit, ttf, Scintilla::FindOption::RegExp | Scintilla::FindOption::Cxx11RegEx | Scintilla::FindOption::MatchCase, textFound, &lineNo))
             break;
         ttf.chrg.cpMin = ttf.chrgText.cpMax + 1;
 

@@ -118,12 +118,12 @@ LRESULT CRegexCaptureDlg::DoCommand(int id, int /*msg*/)
     {
         case IDCANCEL:
         {
-            m_captureWnd.Call(SCI_CLEARALL);
-            size_t lengthDoc = ScintillaCall(SCI_GETLENGTH);
+            m_captureWnd.Scintilla().ClearAll();
+            size_t lengthDoc = Scintilla().Length();
             for (int i = INDIC_REGEXCAPTURE; i < INDIC_REGEXCAPTURE_END; ++i)
             {
-                ScintillaCall(SCI_SETINDICATORCURRENT, i);
-                ScintillaCall(SCI_INDICATORCLEARRANGE, 0, lengthDoc);
+                Scintilla().SetIndicatorCurrent(i);
+                Scintilla().IndicatorClearRange(0, lengthDoc);
             }
 
             ShowWindow(*this, SW_HIDE);
@@ -225,15 +225,15 @@ void CRegexCaptureDlg::DoCapture()
         sCapture = "$&";
     if (IsDlgButtonChecked(*this, IDC_ADDNEWLINE))
     {
-        switch (ScintillaCall(SCI_GETEOLMODE))
+        switch (Scintilla().EOLMode())
         {
-            case SC_EOL_CRLF:
+            case Scintilla::EndOfLine::CrLf:
                 sCapture += "\r\n";
                 break;
-            case SC_EOL_LF:
+            case Scintilla::EndOfLine::Lf:
                 sCapture += "\n";
                 break;
-            case SC_EOL_CR:
+            case Scintilla::EndOfLine::Cr:
                 sCapture += "\r";
                 break;
             default:
@@ -255,25 +255,25 @@ void CRegexCaptureDlg::DoCapture()
 
         const std::regex rx(sRegex, rxFlags);
 
-        m_captureWnd.Call(SCI_CLEARALL);
+        m_captureWnd.Scintilla().ClearAll();
 
-        size_t lengthDoc = ScintillaCall(SCI_GETLENGTH);
+        size_t lengthDoc = Scintilla().Length();
         for (int i = INDIC_REGEXCAPTURE; i < INDIC_REGEXCAPTURE_END; ++i)
         {
-            ScintillaCall(SCI_SETINDICATORCURRENT, i);
-            ScintillaCall(SCI_INDICATORCLEARRANGE, 0, lengthDoc);
+            Scintilla().SetIndicatorCurrent(i);
+            Scintilla().IndicatorClearRange(0, lengthDoc);
         }
 
-        const char*                                          pText = reinterpret_cast<const char*>(ScintillaCall(SCI_GETCHARACTERPOINTER));
+        const char*                                          pText = static_cast<const char*>(Scintilla().CharacterPointer());
         std::string_view                                     searchText(pText, lengthDoc);
         std::match_results<std::string_view::const_iterator> whatC;
         std::regex_constants::match_flag_type                flags = std::regex_constants::match_flag_type::match_default | std::regex_constants::match_flag_type::match_not_null;
         if (IsDlgButtonChecked(*this, IDC_DOTNEWLINE))
             flags |= std::regex_constants::match_flag_type::match_not_eol;
-        auto                                            start = searchText.cbegin();
-        auto                                            end   = searchText.cend();
-        std::vector<std::tuple<sptr_t, size_t, size_t>> capturePositions;
-        std::ostringstream                              outStream;
+        auto                                         start = searchText.cbegin();
+        auto                                         end   = searchText.cend();
+        std::vector<std::tuple<int, size_t, size_t>> capturePositions;
+        std::ostringstream                           outStream;
         while (std::regex_search(start, end, whatC, rx, flags))
         {
             if (whatC[0].matched)
@@ -283,12 +283,12 @@ void CRegexCaptureDlg::DoCapture()
                 if (outStream.tellp() > 5 * 1024 * 1024)
                 {
                     const auto& sOut = outStream.str();
-                    m_captureWnd.Call(SCI_APPENDTEXT, sOut.size(), reinterpret_cast<sptr_t>(sOut.c_str()));
+                    m_captureWnd.Scintilla().AppendText(sOut.size(), sOut.c_str());
                     outStream.str("");
                     outStream.clear();
                 }
 
-                sptr_t captureCount = 0;
+                int captureCount = 0;
                 for (const auto& w : whatC)
                 {
                     capturePositions.push_back(std::make_tuple(captureCount, w.first - searchText.cbegin(), w.length()));
@@ -308,13 +308,13 @@ void CRegexCaptureDlg::DoCapture()
             flags |= std::regex_constants::match_flag_type::match_prev_avail;
         }
         const auto& resultString = outStream.str();
-        m_captureWnd.Call(SCI_APPENDTEXT, resultString.size(), reinterpret_cast<sptr_t>(resultString.c_str()));
+        m_captureWnd.Scintilla().AppendText(resultString.size(), resultString.c_str());
         m_captureWnd.UpdateLineNumberWidth();
 
         for (const auto& [num, begin, length] : capturePositions)
         {
-            ScintillaCall(SCI_SETINDICATORCURRENT, INDIC_REGEXCAPTURE + num);
-            ScintillaCall(SCI_INDICATORFILLRANGE, begin, length);
+            Scintilla().SetIndicatorCurrent(INDIC_REGEXCAPTURE + num);
+            Scintilla().IndicatorFillRange(begin, length);
         }
 
         std::vector<std::wstring> regexStrings;

@@ -33,10 +33,10 @@ const wchar_t ShowFoldingMarginSettingName[]    = L"ShowFoldingMargin";
 class FoldLevelStack
 {
 public:
-    int levelCount = 0; // 1-based level number
-    int levelStack[12]{};
+    int                  levelCount = 0; // 1-based level number
+    Scintilla::FoldLevel levelStack[12]{};
 
-    void push(int level)
+    void push(Scintilla::FoldLevel level)
     {
         while (levelCount != 0 && level <= levelStack[levelCount - 1])
         {
@@ -49,27 +49,27 @@ public:
 };
 } // namespace
 
-static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> scintillaCall, int level2Collapse = -1)
+static bool Fold(Scintilla::ScintillaCall& scintilla, int level2Collapse = -1)
 {
     FoldLevelStack levelStack;
     ResString      rFoldText(g_hRes, IDS_FOLDTEXT);
     auto           sFoldTextA = CUnicodeUtils::StdGetUTF8(rFoldText);
 
-    scintillaCall(SCI_SETDEFAULTFOLDDISPLAYTEXT, 0, reinterpret_cast<sptr_t>("..."));
+    scintilla.SetDefaultFoldDisplayText("...");
 
-    auto maxLine = scintillaCall(SCI_GETLINECOUNT, 0, 0);
+    auto maxLine = scintilla.LineCount();
     int  mode    = 0;
     for (auto line = 0; line < maxLine; ++line)
     {
-        auto info = scintillaCall(SCI_GETFOLDLEVEL, line, 0);
-        if ((info & SC_FOLDLEVELHEADERFLAG) != 0)
+        auto info = scintilla.FoldLevel(line);
+        if ((info & Scintilla::FoldLevel::HeaderFlag) != Scintilla::FoldLevel::None)
         {
-            int level = info & SC_FOLDLEVELNUMBERMASK;
-            level -= SC_FOLDLEVELBASE;
+            auto level = info & Scintilla::FoldLevel::NumberMask;
+            level      = static_cast<Scintilla::FoldLevel>(static_cast<int>(level) - static_cast<int>(Scintilla::FoldLevel::Base));
             levelStack.push(level);
             if (level2Collapse < 0 || levelStack.levelCount == level2Collapse)
             {
-                mode = scintillaCall(SCI_GETFOLDEXPANDED, line, 0) ? 0 : 1;
+                mode = scintilla.FoldExpanded(line) ? 0 : 1;
                 break;
             }
         }
@@ -77,38 +77,38 @@ static bool Fold(std::function<sptr_t(int, uptr_t, sptr_t)> scintillaCall, int l
 
     for (auto line = 0; line < maxLine; ++line)
     {
-        auto info = scintillaCall(SCI_GETFOLDLEVEL, line, 0);
-        if ((info & SC_FOLDLEVELHEADERFLAG) != 0)
+        auto info = scintilla.FoldLevel(line);
+        if ((info & Scintilla::FoldLevel::HeaderFlag) != Scintilla::FoldLevel::None)
         {
-            int level = info & SC_FOLDLEVELNUMBERMASK;
-            level -= SC_FOLDLEVELBASE;
+            auto level = info & Scintilla::FoldLevel::NumberMask;
+            level      = static_cast<Scintilla::FoldLevel>(static_cast<int>(level) - static_cast<int>(Scintilla::FoldLevel::Base));
             levelStack.push(level);
             if (level2Collapse < 0 || levelStack.levelCount == level2Collapse)
             {
-                if (scintillaCall(SCI_GETFOLDEXPANDED, line, 0) != mode)
+                if (scintilla.FoldExpanded(line))
                 {
-                    auto endStyled = scintillaCall(SCI_GETENDSTYLED, 0, 0);
-                    auto len       = scintillaCall(SCI_GETTEXTLENGTH, 0, 0);
+                    auto endStyled = scintilla.EndStyled();
+                    auto len       = scintilla.TextLength();
 
                     if (endStyled < len)
-                        scintillaCall(SCI_COLOURISE, 0, -1);
+                        scintilla.Colourise(0, -1);
 
                     auto headerLine = 0;
-                    if (info & SC_FOLDLEVELHEADERFLAG)
+                    if ((info & Scintilla::FoldLevel::HeaderFlag) != Scintilla::FoldLevel::None)
                         headerLine = line;
                     else
                     {
-                        headerLine = static_cast<int>(scintillaCall(SCI_GETFOLDPARENT, line, 0));
+                        headerLine = static_cast<int>(scintilla.FoldParent(line));
                         if (headerLine == -1)
                             return true;
                     }
 
-                    if (scintillaCall(SCI_GETFOLDEXPANDED, headerLine, 0) != mode)
+                    if (scintilla.FoldExpanded(headerLine))
                     {
-                        auto endLine   = scintillaCall(SCI_GETLASTCHILD, line, -1);
+                        auto endLine   = scintilla.LastChild(line, static_cast<Scintilla::FoldLevel>(-1));
                         auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), static_cast<int>(endLine - line + 1));
 
-                        scintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, reinterpret_cast<sptr_t>(sFoldText.c_str()));
+                        scintilla.ToggleFoldShowText(headerLine, sFoldText.c_str());
                     }
                 }
             }
@@ -129,9 +129,7 @@ void CCmdFoldAll::AfterInit()
 
 bool CCmdFoldAll::Execute()
 {
-    return Fold([=](int cmd, uptr_t wParam, sptr_t lParam) -> sptr_t {
-        return ScintillaCall(cmd, wParam, lParam);
-    });
+    return Fold(Scintilla());
 }
 
 CCmdFoldLevel::CCmdFoldLevel(UINT customId, void* obj)
@@ -143,10 +141,7 @@ CCmdFoldLevel::CCmdFoldLevel(UINT customId, void* obj)
 
 bool CCmdFoldLevel::Execute()
 {
-    return Fold([=](int cmd, uptr_t wParam, sptr_t lParam) -> sptr_t {
-        return ScintillaCall(cmd, wParam, lParam);
-    },
-                m_customId);
+    return Fold(Scintilla(), m_customId);
 }
 
 CCmdInitFoldingMargin::CCmdInitFoldingMargin(void* obj)
@@ -167,13 +162,13 @@ void CCmdInitFoldingMargin::TabNotify(TBHDR* ptbHdr)
         // Effectively query the margin width once and remember it.
         // Turning folding off sets the width to 0. Turning folding on restores the width to this saved value.
         if (g_marginWidth == -1)
-            g_marginWidth = static_cast<int>(ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, 0));
+            g_marginWidth = Scintilla().MarginWidthN(SC_MARGIN_BACK);
 
-        bool isOn       = static_cast<int>(ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, 0)) > 0;
+        bool isOn       = Scintilla().MarginWidthN(SC_MARGIN_BACK) > 0;
         bool shouldBeOn = CIniSettings::Instance().GetInt64(
                               ShowFoldingMarginSettingSection, ShowFoldingMarginSettingName, g_marginWidth > 0 ? 1 : 0) != 0;
         if (isOn != shouldBeOn)
-            ScintillaCall(SCI_SETMARGINWIDTHN, SC_MARGIN_BACK, shouldBeOn ? g_marginWidth : 0);
+            Scintilla().SetMarginWidthN(SC_MARGIN_BACK, shouldBeOn ? g_marginWidth : 0);
     }
 }
 
@@ -185,17 +180,15 @@ void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
     {
         const bool  ctrl      = (pScn->modifiers & SCMOD_CTRL) != 0;
         const bool  shift     = (pScn->modifiers & SCMOD_SHIFT) != 0;
-        const auto& lineClick = ScintillaCall(SCI_LINEFROMPOSITION, pScn->position);
+        const auto& lineClick = Scintilla().LineFromPosition(pScn->position);
         if (shift && ctrl)
         {
-            Fold([=](int cmd, uptr_t wParam, sptr_t lParam) -> sptr_t {
-                return ScintillaCall(cmd, wParam, lParam);
-            });
+            Fold(Scintilla());
         }
         else
         {
-            const auto levelClick = ScintillaCall(SCI_GETFOLDLEVEL, lineClick, 0);
-            if (levelClick & SC_FOLDLEVELHEADERFLAG)
+            const auto levelClick = Scintilla().FoldLevel(lineClick);
+            if ((levelClick & Scintilla::FoldLevel::HeaderFlag) != Scintilla::FoldLevel::None)
             {
                 ResString rFoldText(g_hRes, IDS_FOLDTEXT);
                 auto      sFoldTextA = CUnicodeUtils::StdGetUTF8(rFoldText);
@@ -203,68 +196,67 @@ void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
                 if (shift)
                 {
                     // Ensure all children visible
-                    ScintillaCall(SCI_EXPANDCHILDREN, lineClick, levelClick);
+                    Scintilla().ExpandChildren(lineClick, levelClick);
                 }
                 else if (ctrl)
                 {
-                    auto maxLine = ScintillaCall(SCI_GETLASTCHILD, lineClick, -1);
-                    auto mode    = ScintillaCall(SCI_GETFOLDEXPANDED, lineClick, 0) ? 0 : 1;
+                    auto maxLine = Scintilla().LastChild(lineClick, static_cast<Scintilla::FoldLevel>(-1));
 
                     for (auto line = lineClick; line < maxLine; ++line)
                     {
-                        auto info = ScintillaCall(SCI_GETFOLDLEVEL, line, 0);
-                        if ((info & SC_FOLDLEVELHEADERFLAG) != 0)
+                        auto info = Scintilla().FoldLevel(line);
+                        if ((info & Scintilla::FoldLevel::HeaderFlag) != Scintilla::FoldLevel::None)
                         {
-                            int level = info & SC_FOLDLEVELNUMBERMASK;
-                            level -= SC_FOLDLEVELBASE;
-                            if (ScintillaCall(SCI_GETFOLDEXPANDED, line, 0) != mode)
+                            auto level = info & Scintilla::FoldLevel::NumberMask;
+                            level      = static_cast<Scintilla::FoldLevel>(static_cast<int>(level) - static_cast<int>(Scintilla::FoldLevel::Base));
+                            if (Scintilla().FoldExpanded(line))
                             {
-                                auto endStyled = ScintillaCall(SCI_GETENDSTYLED, 0, 0);
-                                auto len       = ScintillaCall(SCI_GETTEXTLENGTH, 0, 0);
+                                auto endStyled = Scintilla().EndStyled();
+                                auto len       = Scintilla().TextLength();
 
                                 if (endStyled < len)
-                                    ScintillaCall(SCI_COLOURISE, 0, -1);
+                                    Scintilla().Colourise(0, -1);
 
                                 sptr_t headerLine = 0;
-                                if (info & SC_FOLDLEVELHEADERFLAG)
+                                if ((info & Scintilla::FoldLevel::HeaderFlag) != Scintilla::FoldLevel::None)
                                     headerLine = line;
                                 else
                                 {
-                                    headerLine = ScintillaCall(SCI_GETFOLDPARENT, line, 0);
+                                    headerLine = Scintilla().FoldParent(line);
                                     if (headerLine == -1)
                                         return;
                                 }
 
-                                if (ScintillaCall(SCI_GETFOLDEXPANDED, headerLine, 0) != mode)
+                                if (Scintilla().FoldExpanded(headerLine))
                                 {
-                                    auto endLine   = ScintillaCall(SCI_GETLASTCHILD, line, -1);
+                                    auto endLine   = Scintilla().LastChild(line, static_cast<Scintilla::FoldLevel>(-1));
                                     auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), static_cast<int>(endLine - line + 1));
 
-                                    ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, reinterpret_cast<sptr_t>(sFoldText.c_str()));
+                                    Scintilla().ToggleFoldShowText(headerLine, sFoldText.c_str());
                                 }
                             }
                         }
                     }
 
-                    //ScintillaCall(SCI_FOLDCHILDREN, lineClick, SC_FOLDACTION_TOGGLE);
+                    //.Scintilla().FOLDCHILDREN(lineClick, SC_FOLDACTION_TOGGLE);
                 }
                 else
                 {
                     // Toggle this line
-                    auto endStyled = ScintillaCall(SCI_GETENDSTYLED, 0, 0);
-                    auto len       = ScintillaCall(SCI_GETTEXTLENGTH, 0, 0);
+                    auto endStyled = Scintilla().EndStyled();
+                    auto len       = Scintilla().TextLength();
 
                     if (endStyled < len)
-                        ScintillaCall(SCI_COLOURISE, 0, -1);
+                        Scintilla().Colourise(0, -1);
 
                     auto headerLine = lineClick;
 
-                    auto endLine   = ScintillaCall(SCI_GETLASTCHILD, lineClick, -1);
+                    auto endLine   = Scintilla().LastChild(lineClick, static_cast<Scintilla::FoldLevel>(-1));
                     auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), static_cast<int>(endLine - lineClick + 1));
 
-                    ScintillaCall(SCI_TOGGLEFOLDSHOWTEXT, headerLine, reinterpret_cast<sptr_t>(sFoldText.c_str()));
+                    Scintilla().ToggleFoldShowText(headerLine, sFoldText.c_str());
 
-                    //ScintillaCall(SCI_FOLDLINE, lineClick, SC_FOLDACTION_TOGGLE);
+                    //.Scintilla().FOLDLINE(lineClick, SC_FOLDACTION_TOGGLE);
                 }
             }
         }
@@ -288,10 +280,10 @@ void CCmdFoldingOn::AfterInit()
 
 bool CCmdFoldingOn::Execute()
 {
-    bool isOn = static_cast<int>(ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, 0)) > 0;
+    bool isOn = Scintilla().MarginWidthN(SC_MARGIN_BACK) > 0;
     if (!isOn)
     {
-        ScintillaCall(SCI_SETMARGINWIDTHN, SC_MARGIN_BACK, g_marginWidth);
+        Scintilla().SetMarginWidthN(SC_MARGIN_BACK, g_marginWidth);
         CIniSettings::Instance().SetInt64(ShowFoldingMarginSettingSection, ShowFoldingMarginSettingName, 1);
     }
     return true;
@@ -309,11 +301,11 @@ void CCmdFoldingOff::AfterInit()
 
 bool CCmdFoldingOff::Execute()
 {
-    bool isOn = static_cast<int>(ScintillaCall(SCI_GETMARGINWIDTHN, SC_MARGIN_BACK, 0)) > 0;
+    bool isOn = Scintilla().MarginWidthN(SC_MARGIN_BACK) > 0;
     if (isOn)
     {
-        ScintillaCall(SCI_FOLDALL, SC_FOLDACTION_EXPAND);
-        ScintillaCall(SCI_SETMARGINWIDTHN, SC_MARGIN_BACK, 0);
+        Scintilla().FoldAll(Scintilla::FoldAction::Expand);
+        Scintilla().SetMarginWidthN(SC_MARGIN_BACK, 0);
         CIniSettings::Instance().SetInt64(ShowFoldingMarginSettingSection, ShowFoldingMarginSettingName, 0);
     }
     return true;

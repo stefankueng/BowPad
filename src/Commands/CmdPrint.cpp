@@ -37,8 +37,8 @@ void CCmdPrint::Print(bool bShowDlg)
     pDlg.nStartPage  = START_PAGE_GENERAL;
 
     // See if a range has been selected
-    size_t startPos = ScintillaCall(SCI_GETSELECTIONSTART);
-    size_t endPos   = ScintillaCall(SCI_GETSELECTIONEND);
+    size_t startPos = Scintilla().SelectionStart();
+    size_t endPos   = Scintilla().SelectionEnd();
 
     if (startPos == endPos)
         pDlg.Flags |= PD_NOSELECTION;
@@ -64,18 +64,18 @@ void CCmdPrint::Print(bool bShowDlg)
                 .SetDarkTheme(dark););
 
     // reset all indicators
-    size_t length = ScintillaCall(SCI_GETLENGTH);
+    size_t length = Scintilla().Length();
     for (int i = INDIC_CONTAINER; i <= INDIC_MAX; ++i)
     {
-        ScintillaCall(SCI_SETINDICATORCURRENT, i);
-        ScintillaCall(SCI_INDICATORCLEARRANGE, 0, length);
+        Scintilla().SetIndicatorCurrent(i);
+        Scintilla().IndicatorClearRange(0, length);
     }
     // store and reset UI settings
-    int viewWs = static_cast<int>(ScintillaCall(SCI_GETVIEWWS));
-    ScintillaCall(SCI_SETVIEWWS, 0);
-    int edgeMode = static_cast<int>(ScintillaCall(SCI_GETEDGEMODE));
-    ScintillaCall(SCI_SETEDGEMODE, EDGE_NONE);
-    ScintillaCall(SCI_SETWRAPVISUALFLAGS, SC_WRAPVISUALFLAG_END);
+    auto viewWs = Scintilla().ViewWS();
+    Scintilla().SetViewWS(Scintilla::WhiteSpace::Invisible);
+    auto edgeMode = Scintilla().EdgeMode();
+    Scintilla().SetEdgeMode(Scintilla::EdgeVisualStyle::None);
+    Scintilla().SetWrapVisualFlags(Scintilla::WrapVisualFlag::End);
 
     HDC hdc = pDlg.hDC;
 
@@ -179,7 +179,7 @@ void CCmdPrint::Print(bool bShowDlg)
         return;
     }
 
-    size_t lengthDoc     = ScintillaCall(SCI_GETLENGTH);
+    size_t lengthDoc     = Scintilla().Length();
     size_t lengthDocMax  = lengthDoc;
     size_t lengthPrinted = 0;
 
@@ -222,12 +222,12 @@ void CCmdPrint::Print(bool bShowDlg)
         frPrint.chrg.cpMin = static_cast<Sci_PositionCR>(lengthPrinted);
         frPrint.chrg.cpMax = static_cast<Sci_PositionCR>(lengthDoc);
 
-        lengthPrinted = ScintillaCall(SCI_FORMATRANGE, true, reinterpret_cast<LPARAM>(&frPrint));
+        lengthPrinted = Scintilla().FormatRange(true, &frPrint);
 
         ::EndPage(hdc);
     }
 
-    ScintillaCall(SCI_FORMATRANGE, FALSE, 0);
+    Scintilla().FormatRange(FALSE, nullptr);
 
     ::EndDoc(hdc);
     ::DeleteDC(hdc);
@@ -240,9 +240,9 @@ void CCmdPrint::Print(bool bShowDlg)
         GlobalFree(pDlg.lpPageRanges);
 
     // reset the UI
-    ScintillaCall(SCI_SETVIEWWS, viewWs);
-    ScintillaCall(SCI_SETEDGEMODE, edgeMode);
-    ScintillaCall(SCI_SETWRAPVISUALFLAGS, SC_WRAPVISUALFLAG_NONE);
+    Scintilla().SetViewWS(viewWs);
+    Scintilla().SetEdgeMode(edgeMode);
+    Scintilla().SetWrapVisualFlags(Scintilla::WrapVisualFlag::None);
 }
 
 bool CCmdPageSetup::Execute()

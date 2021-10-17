@@ -26,7 +26,7 @@ CChoseDlg::CChoseDlg(HWND hParent)
 {
 }
 
-CChoseDlg::~CChoseDlg(void)
+CChoseDlg::~CChoseDlg()
 {
 }
 

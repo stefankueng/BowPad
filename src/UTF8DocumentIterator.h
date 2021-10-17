@@ -19,7 +19,6 @@
 #include <iterator>
 #define PLATFORM_ASSERT(c) ((void)0)
 #include "../ext/scintilla/src/Document.h"
-#include "../ext/scintilla/src/uniconversion.h"
 #include "../ext/scintilla/src/Position.h"
 
 class UTF8DocumentIterator

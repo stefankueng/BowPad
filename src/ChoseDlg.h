@@ -26,7 +26,7 @@ class CChoseDlg : public CDialog
 {
 public:
     CChoseDlg(HWND hParent);
-    virtual ~CChoseDlg(void);
+    virtual ~CChoseDlg();
 
     void SetList(const std::vector<std::wstring>& list) { m_list = list; }
 
