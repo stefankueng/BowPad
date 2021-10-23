@@ -67,18 +67,18 @@
             <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad" Value='Edit with BowPad' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad" Name="Icon" Value='[INSTALLDIR]BowPad.exe,-107' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad" Name="MultiSelectModel" Value='Player' Type="string" />
-            <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad\command" Value='[INSTALLDIR]BowPad.exe /path:"%1"' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Classes\*\shell\BowPad\command" Value='"[INSTALLDIR]BowPad.exe" /path:"%1"' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\Directory\shell\BowPad" Value='Open Folder with BowPad' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\Directory\shell\BowPad" Name="Icon" Value='[INSTALLDIR]BowPad.exe,-107' Type="string" />
-            <RegistryValue Root="HKLM" Key="Software\Classes\Directory\shell\BowPad\command" Value='[INSTALLDIR]BowPad.exe /path:"%1"' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Classes\Directory\shell\BowPad\command" Value='"[INSTALLDIR]BowPad.exe" /path:"%1"' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\Directory\Background\shell\BowPad" Value='Open Folder with BowPad' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\Directory\Background\shell\BowPad" Name="Icon" Value='[INSTALLDIR]BowPad.exe,-107' Type="string" />
-            <RegistryValue Root="HKLM" Key="Software\Classes\Directory\Background\shell\BowPad\command" Value='[INSTALLDIR]BowPad.exe /path:"%V"' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Classes\Directory\Background\shell\BowPad\command" Value='"[INSTALLDIR]BowPad.exe" /path:"%V"' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\BowPad" Name="installDir" Value='[INSTALLDIR]' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\*\OpenWithProgids" Name="BowPad.file" Value="" Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\BowPad.file" Name="AppUserModelID" Value='TortoiseSVN.Tools.BowPad.1' Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Classes\BowPad.file\DefaultIcon" Value='[INSTALLDIR]BowPad.exe,-155' Type="string" />
-            <RegistryValue Root="HKLM" Key="Software\Classes\BowPad.file\shell\BowPad\command" Value='[INSTALLDIR]BowPad.exe /path:"%1"' Type="string" />
+            <RegistryValue Root="HKLM" Key="Software\Classes\BowPad.file\shell\BowPad\command" Value='"[INSTALLDIR]BowPad.exe" /path:"%1"' Type="string" />
             <RegistryKey Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\BowPad.exe" />
             <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\BowPad.exe" Name="Path" Value="[INSTALLDIR]" Type="string" />
             <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\BowPad.exe" Value="[INSTALLDIR]BowPad.exe" Type="string" />
