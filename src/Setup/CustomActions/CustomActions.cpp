@@ -49,14 +49,15 @@ UINT __stdcall MsgBox(MSIHANDLE /*hModule*/)
 
 UINT __stdcall RegisterSparsePackage(MSIHANDLE hModule)
 {
-    DWORD len = 0;
-    MsiGetPropertyW(hModule, L"INSTALLDIR", L"", &len);
+    DWORD   len = 0;
+    wchar_t emptyString[1]{};
+    MsiGetPropertyW(hModule, L"INSTALLDIR", emptyString, &len);
     auto sparseExtPath = std::make_unique<wchar_t[]>(len + 1LL);
     len += 1;
     MsiGetPropertyW(hModule, L"INSTALLDIR", sparseExtPath.get(), &len);
 
     len = 0;
-    MsiGetPropertyW(hModule, L"SPARSEPACKAGEFILE", L"", &len);
+    MsiGetPropertyW(hModule, L"SPARSEPACKAGEFILE", emptyString, &len);
     auto sparsePackageFile = std::make_unique<wchar_t[]>(len + 1LL);
     len += 1;
     MsiGetPropertyW(hModule, L"SPARSEPACKAGEFILE", sparsePackageFile.get(), &len);
@@ -92,8 +93,9 @@ UINT __stdcall RegisterSparsePackage(MSIHANDLE hModule)
 
 UINT __stdcall UnregisterSparsePackage(MSIHANDLE hModule)
 {
-    DWORD len = 0;
-    MsiGetPropertyW(hModule, L"SPARSEPACKAGENAME", L"", &len);
+    DWORD   len = 0;
+    wchar_t emptyString[1]{};
+    MsiGetPropertyW(hModule, L"SPARSEPACKAGENAME", emptyString, &len);
     auto sparsePackageName = std::make_unique<wchar_t[]>(len + 1LL);
     len += 1;
     MsiGetPropertyW(hModule, L"SPARSEPACKAGENAME", sparsePackageName.get(), &len);
