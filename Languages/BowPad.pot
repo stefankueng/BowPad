@@ -124,6 +124,10 @@ msgstr ""
 msgid "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full details about this update</a>"
 msgstr ""
 
+#. Resource IDs: (1135)
+msgid "<a>(?)</a>"
+msgstr ""
+
 #. Resource IDs: (60053)
 msgid "A"
 msgstr ""

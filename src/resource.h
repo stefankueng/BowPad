@@ -217,6 +217,8 @@
 #define IDS_STATUSTTR2L                 256
 #define IDD_CODESNIPPETS                256
 #define IDS_RUNASADMIN                  257
+#define IDR_RTF1                        257
+#define IDR_REGEXHELPRTF                257
 #define IDS_FOLDTEXT                    258
 #define IDS_CUSTOMCOMMANDTITLE          259
 #define IDS_IMPORTBPLEX_TITLE           260
@@ -376,6 +378,7 @@
 #define IDC_LABEL1                      1132
 #define IDC_LABEL3                      1133
 #define IDC_SNIPPETGROUP                1134
+#define IDC_REGEXHELP                   1135
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -383,9 +386,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        257
+#define _APS_NEXT_RESOURCE_VALUE        258
 #define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         1135
+#define _APS_NEXT_CONTROL_VALUE         1136
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

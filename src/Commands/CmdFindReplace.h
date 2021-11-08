@@ -21,6 +21,7 @@
 #include "DlgResizer.h"
 #include "ScintillaWnd.h"
 #include "BPBaseDialog.h"
+#include "InfoRtfDialog.h"
 
 #include <chrono>
 #include <mutex>
@@ -41,7 +42,7 @@ public:
     sptr_t       posInLineStart = 0;
     sptr_t       posInLineEnd   = 0;
 
-    inline bool hasPath() const
+    inline bool  hasPath() const
     {
         return pathIndex != -1;
     }
@@ -100,91 +101,91 @@ protected: // override
     };
 
 protected:
-    LRESULT DoCommand(int id, int msg);
-    void    SetInfoText(UINT resid, AlertMode alertMode = AlertMode::Flash);
-    bool    DoSearch(bool replaceMode = false);
-    void    DoSearchAll(int id);
-    void    DoFind();
-    void    DoFindPrevious();
-    void    DoReplace(int id);
+    LRESULT                 DoCommand(int id, int msg);
+    void                    SetInfoText(UINT resid, AlertMode alertMode = AlertMode::Flash);
+    bool                    DoSearch(bool replaceMode = false);
+    void                    DoSearchAll(int id);
+    void                    DoFind();
+    void                    DoFindPrevious();
+    void                    DoReplace(int id);
 
-    void SearchDocument(CScintillaWnd& searchWnd, DocID docID, const CDocument& doc,
-                        const std::string& searchFor, Scintilla::FindOption searchFlags, unsigned int exSearchFlags,
-                        SearchResults& searchResults,
-                        SearchPaths&   foundPaths);
+    void                    SearchDocument(CScintillaWnd& searchWnd, DocID docID, const CDocument& doc,
+                                           const std::string& searchFor, Scintilla::FindOption searchFlags, unsigned int exSearchFlags,
+                                           SearchResults& searchResults,
+                                           SearchPaths&   foundPaths);
 
-    int ReplaceDocument(CDocument& doc, const std::string& sFindString,
-                        const std::string& sReplaceString, Scintilla::FindOption searchFlags);
+    int                     ReplaceDocument(CDocument& doc, const std::string& sFindString,
+                                            const std::string& sReplaceString, Scintilla::FindOption searchFlags);
 
-    void SearchThread(int id, const std::wstring& searchPath, const std::string& searchFor,
-                      Scintilla::FindOption flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind);
+    void                    SearchThread(int id, const std::wstring& searchPath, const std::string& searchFor,
+                                         Scintilla::FindOption flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind);
 
-    void    SortResults();
-    void    CheckRegex(bool flash);
-    void    ShowResults(bool bShow);
-    void    InitResultsList();
-    LRESULT DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
-    LRESULT DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD);
-    RECT    DrawListColumnBackground(NMLVCUSTOMDRAW* pLVCD);
-    LRESULT DrawListItem(NMLVCUSTOMDRAW* pLVCD);
-    LRESULT GetListItemDispInfo(NMLVDISPINFO* pDispInfo);
-    void    HandleButtonDropDown(const NMBCDROPDOWN* pDropDown);
+    void                    SortResults();
+    void                    CheckRegex(bool flash);
+    void                    ShowResults(bool bShow);
+    void                    InitResultsList();
+    LRESULT                 DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
+    LRESULT                 DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD);
+    RECT                    DrawListColumnBackground(NMLVCUSTOMDRAW* pLVCD);
+    LRESULT                 DrawListItem(NMLVCUSTOMDRAW* pLVCD);
+    LRESULT                 GetListItemDispInfo(NMLVDISPINFO* pDispInfo);
+    void                    HandleButtonDropDown(const NMBCDROPDOWN* pDropDown);
 
-    bool IsMatchingFile(const std::wstring& path, const std::vector<std::wstring>& filesToFind) const;
+    bool                    IsMatchingFile(const std::wstring& path, const std::vector<std::wstring>& filesToFind) const;
 
-    bool IsExcludedFile(const std::wstring& path) const;
-    bool IsExcludedFolder(const std::wstring& path) const;
+    bool                    IsExcludedFile(const std::wstring& path) const;
+    bool                    IsExcludedFolder(const std::wstring& path) const;
 
-    void         EnableControls(bool bEnable);
-    void         SearchStringNotFound();
-    std::wstring GetCurrentDocumentFolder() const;
+    void                    EnableControls(bool bEnable);
+    void                    SearchStringNotFound();
+    std::wstring            GetCurrentDocumentFolder() const;
 
-    void FocusOn(int id);
-    void SetDefaultButton(int id, bool savePrevious = false);
-    void RestorePreviousDefaultButton();
-    int  GetDefaultButton() const;
-    void Clear(int id);
+    void                    FocusOn(int id);
+    void                    SetDefaultButton(int id, bool savePrevious = false);
+    void                    RestorePreviousDefaultButton();
+    int                     GetDefaultButton() const;
+    void                    Clear(int id);
 
-    void LoadSearchStrings();
-    void SaveSearchStrings() const;
-    void UpdateSearchStrings(const std::wstring& item);
+    void                    LoadSearchStrings();
+    void                    SaveSearchStrings() const;
+    void                    UpdateSearchStrings(const std::wstring& item);
 
-    void LoadReplaceStrings();
-    void SaveReplaceStrings() const;
-    void UpdateReplaceStrings(const std::wstring& item);
+    void                    LoadReplaceStrings();
+    void                    SaveReplaceStrings() const;
+    void                    UpdateReplaceStrings(const std::wstring& item);
 
-    void LoadSearchFolderStrings();
-    void SaveSearchFolderStrings() const;
-    void UpdateSearchFolderStrings(const std::wstring& target);
+    void                    LoadSearchFolderStrings();
+    void                    SaveSearchFolderStrings() const;
+    void                    UpdateSearchFolderStrings(const std::wstring& target);
 
-    void LoadSearchFileStrings();
-    void SaveSearchFileStrings() const;
-    void UpdateSearchFilesStrings(const std::wstring& target);
+    void                    LoadSearchFileStrings();
+    void                    SaveSearchFileStrings() const;
+    void                    UpdateSearchFilesStrings(const std::wstring& target);
 
-    std::wstring OfferFileSuggestion(const std::wstring& searchFolder,
-                                     bool                searchSubFolders,
-                                     const std::wstring& currentValue) const;
+    std::wstring            OfferFileSuggestion(const std::wstring& searchFolder,
+                                                bool                searchSubFolders,
+                                                const std::wstring& currentValue) const;
 
-    void                  AcceptData();
-    void                  NewData(std::chrono::steady_clock::time_point& timeOfLastProgressUpdate, bool finished);
-    void                  UpdateMatchCount(bool finished = true);
-    void                  DoListItemAction(int itemIndex);
-    void                  DoInitDialog(HWND hwndDlg);
-    void                  DoClose();
-    void                  InitSizing();
-    void                  OnSearchResultsReady(bool finished);
-    void                  FocusOnFirstListItem(bool keepAnyExistingSelection = false);
-    Scintilla::FindOption GetScintillaOptions() const;
-    void                  CheckSearchOptions();
-    void                  CheckSearchFolder();
-    void                  SaveSettings();
-    void                  SelectItem(int item);
-    void                  OnListItemChanged(LPNMLISTVIEW pListView);
-    void                  LetUserSelectSearchFolder();
+    void                    AcceptData();
+    void                    NewData(std::chrono::steady_clock::time_point& timeOfLastProgressUpdate, bool finished);
+    void                    UpdateMatchCount(bool finished = true);
+    void                    DoListItemAction(int itemIndex);
+    void                    DoInitDialog(HWND hwndDlg);
+    void                    DoClose();
+    void                    InitSizing();
+    void                    OnSearchResultsReady(bool finished);
+    void                    FocusOnFirstListItem(bool keepAnyExistingSelection = false);
+    Scintilla::FindOption   GetScintillaOptions() const;
+    void                    CheckSearchOptions();
+    void                    CheckSearchFolder();
+    void                    SaveSettings();
+    void                    SelectItem(int item);
+    void                    OnListItemChanged(LPNMLISTVIEW pListView);
+    void                    LetUserSelectSearchFolder();
 
-    bool EnableListEndTracking(int listID, bool enable);
+    bool                    EnableListEndTracking(int listID, bool enable);
 
-    void SetTheme(bool bDark);
+    void                    SetTheme(bool bDark);
 
     static LRESULT CALLBACK ListViewSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
                                                  UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
@@ -192,40 +193,41 @@ protected:
                                              UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
 private:
-    CDlgResizer             m_resizer;
-    bool                    m_freeResize = false;
-    CScintillaWnd           m_searchWnd;
-    SearchResults           m_searchResults;
-    SearchPaths             m_foundPaths;
-    SearchResults           m_pendingSearchResults;
-    SearchPaths             m_pendingFoundPaths;
-    bool                    m_dataAccepted = false;
-    bool                    m_dataReady    = false;
-    std::mutex              m_waitingDataMutex;
-    std::condition_variable m_dataExchangeCondition;
-    volatile bool           m_bStop                  = false;
-    volatile LONG           m_threadsRunning         = false;
-    int                     m_searchType             = 0;
-    ResultsType             m_resultsType            = ResultsType::Unknown;
-    bool                    m_trackingOn             = true;
-    int                     m_previousDefaultButton  = 0;
-    int                     m_resultsWidthBefore     = 0;
-    int                     m_maxSearchStrings       = 0;
-    int                     m_maxReplaceStrings      = 0;
-    int                     m_maxSearchFolderStrings = 0;
-    int                     m_maxSearchFileStrings   = 0;
-    size_t                  m_maxSearchResults       = 10000;
-    SIZE                    m_originalSize           = {0};
-    bool                    m_open                   = false;
-    volatile size_t         m_foundSize              = 0;
-    int                     m_themeCallbackId        = 0;
-    bool                    m_resultsListInitialized = false;
+    CDlgResizer                     m_resizer;
+    bool                            m_freeResize = false;
+    CScintillaWnd                   m_searchWnd;
+    SearchResults                   m_searchResults;
+    SearchPaths                     m_foundPaths;
+    SearchResults                   m_pendingSearchResults;
+    SearchPaths                     m_pendingFoundPaths;
+    bool                            m_dataAccepted = false;
+    bool                            m_dataReady    = false;
+    std::mutex                      m_waitingDataMutex;
+    std::condition_variable         m_dataExchangeCondition;
+    volatile bool                   m_bStop                  = false;
+    volatile LONG                   m_threadsRunning         = false;
+    int                             m_searchType             = 0;
+    ResultsType                     m_resultsType            = ResultsType::Unknown;
+    bool                            m_trackingOn             = true;
+    int                             m_previousDefaultButton  = 0;
+    int                             m_resultsWidthBefore     = 0;
+    int                             m_maxSearchStrings       = 0;
+    int                             m_maxReplaceStrings      = 0;
+    int                             m_maxSearchFolderStrings = 0;
+    int                             m_maxSearchFileStrings   = 0;
+    size_t                          m_maxSearchResults       = 10000;
+    SIZE                            m_originalSize           = {0};
+    bool                            m_open                   = false;
+    volatile size_t                 m_foundSize              = 0;
+    int                             m_themeCallbackId        = 0;
+    bool                            m_resultsListInitialized = false;
+    std::unique_ptr<CInfoRtfDialog> m_regexHelpDialog        = nullptr;
 
     // Some types usually best avoided while searching.
     // The user can explicitly override these if they want them though.
     // REVIEW: consider making this list configurable?
     // NOTE: Keep filenames lower case as code assumes that.
-    const std::vector<std::wstring> m_excludedExtensions = {
+    const std::vector<std::wstring> m_excludedExtensions     = {
         // Binary types.
         L"exe", L"dll", L"obj", L"lib", L"ilk", L"iobj", L"ipdb", L"idb",
         L"pch", L"ipch", L"sdf", L"pdb", L"res", L"sdf", L"db", L"iso",
@@ -245,9 +247,9 @@ public:
     CCmdFindReplace(void* obj);
     ~CCmdFindReplace() = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdFindReplace; }
+    UINT    GetCmdId() override { return cmdFindReplace; }
 
     HRESULT IUICommandHandlerUpdateProperty(
         REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/,

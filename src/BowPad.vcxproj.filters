@@ -405,6 +405,9 @@
     <ClInclude Include="PathWatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\InfoRtfDialog.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -731,6 +734,9 @@
     <ClCompile Include="PathWatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\InfoRtfDialog.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc">
@@ -841,6 +847,7 @@
     <None Include="scripting\constants.js">
       <Filter>Scripting</Filter>
     </None>
+    <None Include="res\regexHelp.rtf" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="compatibility.manifest">

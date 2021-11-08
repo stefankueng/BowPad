@@ -352,6 +352,7 @@
     <ClInclude Include="..\ext\sktoolslib\GDIHelpers.h" />
     <ClInclude Include="..\ext\sktoolslib\Hash.h" />
     <ClInclude Include="..\ext\sktoolslib\hyperlink.h" />
+    <ClInclude Include="..\ext\sktoolslib\InfoRtfDialog.h" />
     <ClInclude Include="..\ext\sktoolslib\IniSettings.h" />
     <ClInclude Include="..\ext\sktoolslib\JumpListHelpers.h" />
     <ClInclude Include="..\ext\sktoolslib\Language.h" />
@@ -482,6 +483,7 @@
     <ClCompile Include="..\ext\sktoolslib\GDIHelpers.cpp" />
     <ClCompile Include="..\ext\sktoolslib\Hash.cpp" />
     <ClCompile Include="..\ext\sktoolslib\hyperlink.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\InfoRtfDialog.cpp" />
     <ClCompile Include="..\ext\sktoolslib\IniSettings.cpp" />
     <ClCompile Include="..\ext\sktoolslib\JumpListHelpers.cpp" />
     <ClCompile Include="..\ext\sktoolslib\Language.cpp" />
@@ -656,6 +658,7 @@
     <None Include="res\dropcopy.cur" />
     <None Include="res\dropmove.cur" />
     <None Include="res\Properties.ini" />
+    <None Include="res\regexHelp.rtf" />
     <None Include="res\Shortcuts-internal.ini" />
     <None Include="res\Shortcuts.ini" />
     <None Include="scripting\constants.js" />
