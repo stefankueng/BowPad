@@ -70,36 +70,36 @@ constexpr COLORREF folderColors[] = {
     RGB(177, 225, 253),
     RGB(247, 253, 177),
 };
-constexpr int MAX_FOLDERCOLORS = static_cast<int>(std::size(folderColors));
+constexpr int                 MAX_FOLDERCOLORS                   = static_cast<int>(std::size(folderColors));
 
-const int STATUSBAR_DOC_TYPE     = 0;
-const int STATUSBAR_CUR_POS      = 1;
-const int STATUSBAR_SEL          = 2;
-const int STATUSBAR_EDITORCONFIG = 3;
-const int STATUSBAR_EOL_FORMAT   = 4;
-const int STATUSBAR_TABSPACE     = 5;
+const int                     STATUSBAR_DOC_TYPE                 = 0;
+const int                     STATUSBAR_CUR_POS                  = 1;
+const int                     STATUSBAR_SEL                      = 2;
+const int                     STATUSBAR_EDITORCONFIG             = 3;
+const int                     STATUSBAR_EOL_FORMAT               = 4;
+const int                     STATUSBAR_TABSPACE                 = 5;
 // ReSharper disable once CppInconsistentNaming
-const int STATUSBAR_R2L          = 6;
-const int STATUSBAR_UNICODE_TYPE = 7;
-const int STATUSBAR_TYPING_MODE  = 8;
-const int STATUSBAR_CAPS         = 9;
-const int STATUSBAR_TABS         = 10;
-const int STATUSBAR_ZOOM         = 11;
+const int                     STATUSBAR_R2L                      = 6;
+const int                     STATUSBAR_UNICODE_TYPE             = 7;
+const int                     STATUSBAR_TYPING_MODE              = 8;
+const int                     STATUSBAR_CAPS                     = 9;
+const int                     STATUSBAR_TABS                     = 10;
+const int                     STATUSBAR_ZOOM                     = 11;
 
-constexpr char   URL_REG_EXPR[]      = {"\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b"};
-constexpr size_t URL_REG_EXPR_LENGTH = _countof(URL_REG_EXPR) - 1;
+constexpr char                URL_REG_EXPR[]                     = {"\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b"};
+constexpr size_t              URL_REG_EXPR_LENGTH                = _countof(URL_REG_EXPR) - 1;
 
-constexpr int TIMER_UPDATECHECK = 101;
-constexpr int TIMER_SELCHANGE   = 102;
-constexpr int TIMER_CHECKLINES  = 103;
+constexpr int                 TIMER_UPDATECHECK                  = 101;
+constexpr int                 TIMER_SELCHANGE                    = 102;
+constexpr int                 TIMER_CHECKLINES                   = 103;
 
 ResponseToOutsideModifiedFile responseToOutsideModifiedFile      = ResponseToOutsideModifiedFile::Reload;
 BOOL                          responseToOutsideModifiedFileDoAll = FALSE;
 bool                          doModifiedAll                      = FALSE;
 
-bool               doCloseAll         = false;
-BOOL               closeAllDoAll      = FALSE;
-ResponseToCloseTab responseToCloseTab = ResponseToCloseTab::CloseWithoutSaving;
+bool                          doCloseAll                         = false;
+BOOL                          closeAllDoAll                      = FALSE;
+ResponseToCloseTab            responseToCloseTab                 = ResponseToCloseTab::CloseWithoutSaving;
 } // namespace
 
 inline bool IsHexDigitString(const char* str)
@@ -117,7 +117,7 @@ static bool ShowFileSaveDialog(HWND hParentWnd, const std::wstring& title, const
     PreserveChdir      keepCwd;
     IFileSaveDialogPtr pfd;
 
-    HRESULT hr = pfd.CreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER);
+    HRESULT            hr = pfd.CreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
 
@@ -239,8 +239,8 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     , m_pRibbon(nullptr)
     , m_ribbonHeight(0)
 {
-    auto cxIcon = GetSystemMetrics(SM_CXSMICON);
-    auto cyIcon = GetSystemMetrics(SM_CYSMICON);
+    auto cxIcon           = GetSystemMetrics(SM_CXSMICON);
+    auto cyIcon           = GetSystemMetrics(SM_CYSMICON);
 
     m_hShieldIcon         = static_cast<HICON>(::LoadImage(hResource, MAKEINTRESOURCE(IDI_ELEVATED), IMAGE_ICON, cxIcon, cyIcon, LR_DEFAULTCOLOR));
     m_hCapsLockIcon       = static_cast<HICON>(::LoadImage(hResource, MAKEINTRESOURCE(IDI_CAPSLOCK), IMAGE_ICON, cxIcon, cyIcon, LR_DEFAULTCOLOR));
@@ -512,7 +512,7 @@ STDMETHODIMP CMainWindow::Execute(
     const PROPVARIANT*    pPropVarValue,
     IUISimplePropertySet* pCommandExecutionProperties)
 {
-    HRESULT hr = S_OK;
+    HRESULT   hr   = S_OK;
 
     ICommand* pCmd = CCommandHandler::Instance().GetCommand(nCmdID);
     if (pCmd)
@@ -607,7 +607,7 @@ HWND CMainWindow::FindAppMainWindow(HWND hStartWnd, bool* isThisInstance) const
 
 bool CMainWindow::RegisterAndCreateWindow()
 {
-    WNDCLASSEX wcx = {sizeof(WNDCLASSEX)}; // Set size and zero out rest.
+    WNDCLASSEX wcx             = {sizeof(WNDCLASSEX)}; // Set size and zero out rest.
 
     //wcx.style = 0; - Don't use CS_HREDRAW or CS_VREDRAW with a Ribbon
     wcx.style                  = CS_DBLCLKS;
@@ -807,7 +807,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         sptr_t lineSize = 1024;
                         auto   pLine    = std::make_unique<char[]>(lineSize);
 
-                        auto eolBytes = 1;
+                        auto   eolBytes = 1;
                         switch (m_editor.Scintilla().EOLMode())
                         {
                             case Scintilla::EndOfLine::CrLf:
@@ -1609,10 +1609,10 @@ bool CMainWindow::Initialize()
     {
         // first try ChangeWindowMessageFilterEx, if it's not available (i.e., running on Vista), then
         // try ChangeWindowMessageFilter.
-        using MESSAGEFILTERFUNCEX = BOOL(WINAPI*)(HWND hWnd, UINT message, DWORD action, VOID * pChangeFilterStruct);
-        MESSAGEFILTERFUNCEX func  = reinterpret_cast<MESSAGEFILTERFUNCEX>(GetProcAddress(hDll, "ChangeWindowMessageFilterEx"));
+        using MESSAGEFILTERFUNCEX             = BOOL(WINAPI*)(HWND hWnd, UINT message, DWORD action, VOID * pChangeFilterStruct);
+        MESSAGEFILTERFUNCEX func              = reinterpret_cast<MESSAGEFILTERFUNCEX>(GetProcAddress(hDll, "ChangeWindowMessageFilterEx"));
 
-        constexpr UINT WM_COPYGLOBALDATA = 0x0049;
+        constexpr UINT      WM_COPYGLOBALDATA = 0x0049;
         if (func)
         {
             // note:
@@ -1774,7 +1774,7 @@ void CMainWindow::ResizeChildWindows()
         // TabCtrl_GetItemRect will return FALSE but the tabrc rect still has
         // the height data filled in.
         // And we only use the height, so it makes no difference.
-        RECT tabrc{};
+        RECT           tabrc{};
         TabCtrl_GetItemRect(m_tabBar, 0, &tabrc);
         MapWindowPoints(m_tabBar, *this, reinterpret_cast<LPPOINT>(&tabrc), 2);
         const int tbHeight    = tabrc.bottom - tabrc.top;
@@ -1783,7 +1783,7 @@ void CMainWindow::ResizeChildWindows()
         const int mainWidth   = rect.right - rect.left;
         const int btnMargin   = CDPIAware::Instance().Scale(*this, 2);
 
-        HDWP hDwp = BeginDeferWindowPos(7);
+        HDWP      hDwp        = BeginDeferWindowPos(7);
         DeferWindowPos(hDwp, m_statusBar, nullptr, rect.left, rect.bottom - m_statusBar.GetHeight(), mainWidth, m_statusBar.GetHeight(), flags);
         DeferWindowPos(hDwp, m_tabBar, nullptr, treeWidth + rect.left, rect.top + m_ribbonHeight, mainWidth - treeWidth - (3 * (tabBtnWidth + btnMargin)), rect.bottom - rect.top, flags);
         DeferWindowPos(hDwp, m_tablistBtn, nullptr, mainWidth - (3 * (tabBtnWidth + btnMargin)), rect.top + m_ribbonHeight, tabBtnWidth, tbHeight, flags);
@@ -1955,7 +1955,7 @@ void CMainWindow::TabMove(const std::wstring& path, const std::wstring& savePath
 {
     std::wstring filepath = CPathUtils::GetLongPathname(path);
 
-    auto docID = m_docManager.GetIdForPath(filepath);
+    auto         docID    = m_docManager.GetIdForPath(filepath);
     if (!docID.IsValid())
         return;
 
@@ -2093,17 +2093,17 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     static ResString rsStatusTabsOpenLong(g_hRes, IDS_STATUS_TABSOPENLONG);  // Ln: %ld / %ld    Col: %ld
     static ResString rsStatusTabsOpen(g_hRes, IDS_STATUS_TABSOPEN);          // Ln: %ld / %ld    Col: %ld
 
-    auto lineCount = static_cast<long>(m_editor.Scintilla().LineCount());
+    auto             lineCount = static_cast<long>(m_editor.Scintilla().LineCount());
 
-    sptr_t selByte = 0;
-    sptr_t selLine = 0;
+    sptr_t           selByte   = 0;
+    sptr_t           selLine   = 0;
     m_editor.GetSelectedCount(selByte, selLine);
-    auto selTextMarkerCount = m_editor.GetSelTextMarkerCount();
-    auto curPos             = m_editor.Scintilla().CurrentPos();
-    long line               = static_cast<long>(m_editor.Scintilla().LineFromPosition(curPos)) + 1;
-    long column             = static_cast<long>(m_editor.Scintilla().Column(curPos)) + 1;
-    auto lengthInBytes      = m_editor.Scintilla().Length();
-    auto bidi               = m_editor.Scintilla().Bidirectional();
+    auto    selTextMarkerCount  = m_editor.GetSelTextMarkerCount();
+    auto    curPos              = m_editor.Scintilla().CurrentPos();
+    long    line                = static_cast<long>(m_editor.Scintilla().LineFromPosition(curPos)) + 1;
+    long    column              = static_cast<long>(m_editor.Scintilla().Column(curPos)) + 1;
+    auto    lengthInBytes       = m_editor.Scintilla().Length();
+    auto    bidi                = m_editor.Scintilla().Bidirectional();
 
     wchar_t readableLength[100] = {0};
     StrFormatByteSize(lengthInBytes, readableLength, _countof(readableLength));
@@ -2392,7 +2392,7 @@ void CMainWindow::UpdateCaptionBar()
 
     if (m_docManager.HasDocumentID(docID))
     {
-        const auto& doc = m_docManager.GetDocumentFromID(docID);
+        const auto&  doc    = m_docManager.GetDocumentFromID(docID);
 
         std::wstring sTitle = elev;
         if (!elev.empty())
@@ -2428,11 +2428,11 @@ void CMainWindow::UpdateTab(DocID docID)
 
 ResponseToCloseTab CMainWindow::AskToCloseTab() const
 {
-    ResString    rTitle(g_hRes, IDS_HASMODIFICATIONS);
-    ResString    rQuestion(g_hRes, IDS_DOYOUWANTOSAVE);
-    ResString    rSave(g_hRes, IDS_SAVE);
-    ResString    rDontSave(g_hRes, IDS_DONTSAVE);
-    std::wstring sQuestion = CStringUtils::Format(rQuestion, m_tabBar.GetCurrentTitle().c_str());
+    ResString         rTitle(g_hRes, IDS_HASMODIFICATIONS);
+    ResString         rQuestion(g_hRes, IDS_DOYOUWANTOSAVE);
+    ResString         rSave(g_hRes, IDS_SAVE);
+    ResString         rDontSave(g_hRes, IDS_DONTSAVE);
+    std::wstring      sQuestion         = CStringUtils::Format(rQuestion, m_tabBar.GetCurrentTitle().c_str());
 
     TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
     TASKDIALOG_BUTTON aCustomButtons[2] = {};
@@ -2443,7 +2443,7 @@ ResponseToCloseTab CMainWindow::AskToCloseTab() const
     tdc.pButtons                        = aCustomButtons;
     tdc.cButtons                        = _countof(aCustomButtons);
     assert(tdc.cButtons <= _countof(aCustomButtons));
-    tdc.nDefaultButton = 100;
+    tdc.nDefaultButton     = 100;
 
     tdc.hwndParent         = *this;
     tdc.hInstance          = g_hRes;
@@ -2480,13 +2480,13 @@ ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const 
         bool changed = doc.m_bNeedsSaving || doc.m_bIsDirty;
         if (!changed && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
             return ResponseToOutsideModifiedFile::Reload;
-        ResString rTitle(g_hRes, IDS_OUTSIDEMODIFICATIONS);
-        ResString rQuestion(g_hRes, changed ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
-        ResString rSave(g_hRes, IDS_SAVELOSTOUTSIDEMODS);
-        ResString rReload(g_hRes, changed ? IDS_RELOADLOSTMODS : IDS_RELOAD);
-        ResString rCancel(g_hRes, IDS_NORELOAD);
+        ResString         rTitle(g_hRes, IDS_OUTSIDEMODIFICATIONS);
+        ResString         rQuestion(g_hRes, changed ? IDS_DOYOUWANTRELOADBUTDIRTY : IDS_DOYOUWANTTORELOAD);
+        ResString         rSave(g_hRes, IDS_SAVELOSTOUTSIDEMODS);
+        ResString         rReload(g_hRes, changed ? IDS_RELOADLOSTMODS : IDS_RELOAD);
+        ResString         rCancel(g_hRes, IDS_NORELOAD);
         // Be specific about what they are re-loading.
-        std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
+        std::wstring      sQuestion         = CStringUtils::Format(rQuestion, doc.m_path.c_str());
 
         TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
         TASKDIALOG_BUTTON aCustomButtons[3] = {};
@@ -2503,7 +2503,7 @@ ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const 
         tdc.pButtons                       = aCustomButtons;
         tdc.cButtons                       = bi;
         assert(tdc.cButtons <= _countof(aCustomButtons));
-        tdc.nDefaultButton = 100; // default to "Cancel" in case the file is modified
+        tdc.nDefaultButton      = 100; // default to "Cancel" in case the file is modified
 
         tdc.hwndParent          = *this;
         tdc.hInstance           = g_hRes;
@@ -2535,12 +2535,12 @@ ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const 
 
 bool CMainWindow::AskToReload(const CDocument& doc) const
 {
-    ResString rTitle(g_hRes, IDS_HASMODIFICATIONS);
-    ResString rQuestion(g_hRes, IDS_RELOADREALLY);
-    ResString rReload(g_hRes, IDS_DORELOAD);
-    ResString rCancel(g_hRes, IDS_DONTRELOAD);
+    ResString         rTitle(g_hRes, IDS_HASMODIFICATIONS);
+    ResString         rQuestion(g_hRes, IDS_RELOADREALLY);
+    ResString         rReload(g_hRes, IDS_DORELOAD);
+    ResString         rCancel(g_hRes, IDS_DONTRELOAD);
     // Be specific about what they are re-loading.
-    std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
+    std::wstring      sQuestion         = CStringUtils::Format(rQuestion, doc.m_path.c_str());
 
     TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
     TASKDIALOG_BUTTON aCustomButtons[2] = {};
@@ -2551,7 +2551,7 @@ bool CMainWindow::AskToReload(const CDocument& doc) const
     tdc.pButtons                        = aCustomButtons;
     tdc.cButtons                        = _countof(aCustomButtons);
     assert(tdc.cButtons <= _countof(aCustomButtons));
-    tdc.nDefaultButton = 100; // Default to cancel
+    tdc.nDefaultButton     = 100; // Default to cancel
 
     tdc.hwndParent         = *this;
     tdc.hInstance          = g_hRes;
@@ -2570,12 +2570,12 @@ bool CMainWindow::AskToReload(const CDocument& doc) const
 
 bool CMainWindow::AskAboutOutsideDeletedFile(const CDocument& doc) const
 {
-    ResString rTitle(g_hRes, IDS_OUTSIDEREMOVEDHEAD);
-    ResString rQuestion(g_hRes, IDS_OUTSIDEREMOVED);
-    ResString rKeep(g_hRes, IDS_OUTSIDEREMOVEDKEEP);
-    ResString rClose(g_hRes, IDS_OUTSIDEREMOVEDCLOSE);
+    ResString         rTitle(g_hRes, IDS_OUTSIDEREMOVEDHEAD);
+    ResString         rQuestion(g_hRes, IDS_OUTSIDEREMOVED);
+    ResString         rKeep(g_hRes, IDS_OUTSIDEREMOVEDKEEP);
+    ResString         rClose(g_hRes, IDS_OUTSIDEREMOVEDCLOSE);
     // Be specific about what they are removing.
-    std::wstring sQuestion = CStringUtils::Format(rQuestion, doc.m_path.c_str());
+    std::wstring      sQuestion         = CStringUtils::Format(rQuestion, doc.m_path.c_str());
 
     TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
     TASKDIALOG_BUTTON aCustomButtons[2] = {};
@@ -2588,15 +2588,15 @@ bool CMainWindow::AskAboutOutsideDeletedFile(const CDocument& doc) const
     tdc.cButtons                        = _countof(aCustomButtons);
     tdc.nDefaultButton                  = 100;
 
-    tdc.hwndParent         = *this;
-    tdc.hInstance          = g_hRes;
-    tdc.dwFlags            = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-    tdc.pszWindowTitle     = MAKEINTRESOURCE(IDS_APP_TITLE);
-    tdc.pszMainIcon        = TD_INFORMATION_ICON;
-    tdc.pszMainInstruction = rTitle;
-    tdc.pszContent         = sQuestion.c_str();
-    int     nClickedBtn    = 0;
-    HRESULT hr             = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
+    tdc.hwndParent                      = *this;
+    tdc.hInstance                       = g_hRes;
+    tdc.dwFlags                         = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+    tdc.pszWindowTitle                  = MAKEINTRESOURCE(IDS_APP_TITLE);
+    tdc.pszMainIcon                     = TD_INFORMATION_ICON;
+    tdc.pszMainInstruction              = rTitle;
+    tdc.pszContent                      = sQuestion.c_str();
+    int     nClickedBtn                 = 0;
+    HRESULT hr                          = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
     if (CAppUtils::FailedShowMessage(hr))
         nClickedBtn = 0;
     bool bKeep = true;
@@ -2626,7 +2626,7 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
     tdc.pButtons                        = aCustomButtons;
     tdc.cButtons                        = _countof(aCustomButtons);
     assert(tdc.cButtons <= _countof(aCustomButtons));
-    tdc.nDefaultButton = 100; // Default to cancel
+    tdc.nDefaultButton     = 100; // Default to cancel
 
     tdc.hwndParent         = *this;
     tdc.hInstance          = g_hRes;
@@ -2646,12 +2646,12 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
 // Returns true if file exists or was created.
 bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
 {
-    ResString rTitle(g_hRes, IDS_FILE_DOESNT_EXIST);
-    ResString rQuestion(g_hRes, IDS_FILE_ASK_TO_CREATE);
-    ResString rCreate(g_hRes, IDS_FILE_CREATE);
-    ResString rCancel(g_hRes, IDS_FILE_CREATE_CANCEL);
+    ResString         rTitle(g_hRes, IDS_FILE_DOESNT_EXIST);
+    ResString         rQuestion(g_hRes, IDS_FILE_ASK_TO_CREATE);
+    ResString         rCreate(g_hRes, IDS_FILE_CREATE);
+    ResString         rCancel(g_hRes, IDS_FILE_CREATE_CANCEL);
     // Show exactly what we are creating.
-    std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
+    std::wstring      sQuestion         = CStringUtils::Format(rQuestion, path.c_str());
 
     TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
     TASKDIALOG_BUTTON aCustomButtons[2] = {};
@@ -2663,7 +2663,7 @@ bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
     tdc.pButtons                        = aCustomButtons;
     tdc.cButtons                        = bi;
     assert(tdc.cButtons <= _countof(aCustomButtons));
-    tdc.nDefaultButton = 101;
+    tdc.nDefaultButton     = 101;
 
     tdc.hwndParent         = *this;
     tdc.hInstance          = g_hRes;
@@ -2846,12 +2846,14 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
     // Note style will be zero if no style or past end of the document.
     if ((scn.position >= 0) && (!start || m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, scn.position)))
     {
-        const int pixelMargin = CDPIAware::Instance().Scale(*this, 4);
+        static int lastDwellPosX = -1;
+        static int lastDwellPosY = -1;
+        const int  pixelMargin   = CDPIAware::Instance().Scale(*this, 4);
         // an url hotspot
         // find start of url
-        auto startPos     = scn.position;
-        auto endPos       = scn.position;
-        auto lineStartPos = m_editor.Scintilla().PositionFromPoint(0, scn.y);
+        auto       startPos      = scn.position;
+        auto       endPos        = scn.position;
+        auto       lineStartPos  = m_editor.Scintilla().PositionFromPoint(0, scn.y);
         if (!start && !m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, startPos))
         {
             startPos     = m_editor.Scintilla().PositionFromPoint(scn.x, scn.y + pixelMargin);
@@ -2860,6 +2862,8 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
             if (!m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, startPos))
             {
                 m_editor.Scintilla().CallTipCancel();
+                lastDwellPosX = -1;
+                lastDwellPosY = -1;
                 return;
             }
         }
@@ -2888,6 +2892,8 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
             if (upPos < linePos)
             {
                 m_editor.Scintilla().CallTipCancel();
+                lastDwellPosX = -1;
+                lastDwellPosY = -1;
                 return;
             }
             else if (upPos == linePos)
@@ -2896,9 +2902,15 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
         tipPos = max(lineStartPos, tipPos);
         if (m_editor.Scintilla().CallTipActive() && m_editor.Scintilla().CallTipPosStart() == tipPos)
             return;
+        auto lineHeight = m_editor.Scintilla().TextHeight(0);
+        if (lastDwellPosX >= 0 && lastDwellPosY >= 0 &&
+            std::abs(lastDwellPosX - scn.x) < lineHeight &&
+            (lastDwellPosY - scn.y) < lineHeight)
+            return;
         if (!start && !m_editor.Scintilla().CallTipActive())
             return;
-
+        lastDwellPosX = scn.x;
+        lastDwellPosY = scn.y;
         m_editor.Scintilla().CallTipShow(tipPos, strA.c_str());
         return;
     }
@@ -2926,8 +2938,8 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
     // Make sure the string is hexadecimal
     if (sWord[0] == '#' && (sWord.size() == 4 || sWord.size() == 7 || sWord.size() == 9) && IsHexDigitString(sWord.c_str() + 1))
     {
-        bool     ok    = false;
-        COLORREF color = 0;
+        bool        ok     = false;
+        COLORREF    color  = 0;
 
         // Note: could use std::stoi family of functions but they throw
         // range exceptions etc. and VC reports those in the debugger output
@@ -3011,7 +3023,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
     // and as recognized as a valid format according to strtoll:
     // e.g. 0xF0F hex == 3855 decimal == 07417 octal.
     // Use long long to yield more conversion range than say just long.
-    char* ep = nullptr;
+    char* ep         = nullptr;
     // 0 base means determine base from any format in the string.
     errno            = 0;
     long long number = strtoll(CStringUtils::trim(CStringUtils::trim(CStringUtils::trim(sWord, L'('), L','), L')').c_str(), &ep, 0);
@@ -3183,8 +3195,8 @@ void CMainWindow::AddHotSpots() const
     auto endPos           = m_editor.Scintilla().PositionFromLine(m_editor.Scintilla().DocLineFromVisible(firstVisibleLine + min(linesOnScreen, lineCount)));
 
     // to speed up the search, first search for "://" without using the regex engine
-    auto fStartPos = startPos;
-    auto fEndPos   = endPos;
+    auto fStartPos        = startPos;
+    auto fEndPos          = endPos;
     m_editor.Scintilla().SetSearchFlags(Scintilla::FindOption::None);
     m_editor.Scintilla().SetTargetStart(fStartPos);
     m_editor.Scintilla().SetTargetEnd(fEndPos);
@@ -3359,9 +3371,9 @@ void CMainWindow::HandleTabChanging(const NMHDR& /*nmhdr*/)
 
 void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
 {
-    int curTab = m_tabBar.GetCurrentTabIndex();
+    int  curTab = m_tabBar.GetCurrentTabIndex();
     // document got activated
-    auto docID = m_tabBar.GetCurrentTabId();
+    auto docID  = m_tabBar.GetCurrentTabId();
     // Can't do much if no document for this tab.
     if (!m_docManager.HasDocumentID(docID))
         return;
@@ -3410,8 +3422,8 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     bool bIgnoreIfMissing      = (openFlags & OpenFlags::IgnoreIfMissing) != 0;
     bool bOpenIntoActiveTab    = (openFlags & OpenFlags::OpenIntoActiveTab) != 0;
     // Ignore no activate flag for now. It causes too many issues.
-    bool bActivate      = true; //(openFlags & OpenFlags::NoActivate) == 0;
-    bool bCreateTabOnly = (openFlags & OpenFlags::CreateTabOnly) != 0;
+    bool bActivate             = true; //(openFlags & OpenFlags::NoActivate) == 0;
+    bool bCreateTabOnly        = (openFlags & OpenFlags::CreateTabOnly) != 0;
 
     if (bCreateTabOnly)
     {
@@ -3665,11 +3677,11 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         if (CPathUtils::GetFileExtension(files[0]) == L"bplex")
         {
             // ask whether to install or open the file
-            ResString    rTitle(g_hRes, IDS_IMPORTBPLEX_TITLE);
-            ResString    rQuestion(g_hRes, IDS_IMPORTBPLEX_QUESTION);
-            ResString    rImport(g_hRes, IDS_IMPORTBPLEX_IMPORT);
-            ResString    rOpen(g_hRes, IDS_IMPORTBPLEX_OPEN);
-            std::wstring sQuestion = CStringUtils::Format(rQuestion, CPathUtils::GetFileName(files[0]).c_str());
+            ResString        rTitle(g_hRes, IDS_IMPORTBPLEX_TITLE);
+            ResString        rQuestion(g_hRes, IDS_IMPORTBPLEX_QUESTION);
+            ResString        rImport(g_hRes, IDS_IMPORTBPLEX_IMPORT);
+            ResString        rOpen(g_hRes, IDS_IMPORTBPLEX_OPEN);
+            std::wstring     sQuestion          = CStringUtils::Format(rQuestion, CPathUtils::GetFileName(files[0]).c_str());
 
             TASKDIALOGCONFIG tdc                = {sizeof(TASKDIALOGCONFIG)};
             tdc.dwFlags                         = TDF_USE_COMMAND_LINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
@@ -3681,7 +3693,7 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
             tdc.pButtons                        = aCustomButtons;
             tdc.cButtons                        = _countof(aCustomButtons);
             assert(tdc.cButtons <= _countof(aCustomButtons));
-            tdc.nDefaultButton = 100;
+            tdc.nDefaultButton     = 100;
 
             tdc.hwndParent         = *this;
             tdc.hInstance          = g_hRes;
@@ -3778,7 +3790,7 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
     else
     {
         // find out if there are paths specified without the key/value pair syntax
-        int nArgs = 0;
+        int      nArgs     = 0;
 
         LPCWSTR* szArgList = const_cast<LPCWSTR*>(CommandLineToArgvW(static_cast<LPCWSTR>(cds.lpData), &nArgs));
         OnOutOfScope(LocalFree(szArgList););
@@ -3914,12 +3926,12 @@ bool CMainWindow::HandleCopyDataMoveTab(const COPYDATASTRUCT& cds)
 
 static bool AskToCopyOrMoveFile(HWND hWnd, const std::wstring& filename, const std::wstring& hitpath, bool bCopy)
 {
-    ResString rTitle(g_hRes, IDS_FILE_DROP);
-    ResString rQuestion(g_hRes, bCopy ? IDS_FILE_DROP_COPY : IDS_FILE_DROP_MOVE);
-    ResString rDoIt(g_hRes, bCopy ? IDS_FILE_DROP_DOCOPY : IDS_FILE_DROP_DOMOVE);
-    ResString rCancel(g_hRes, IDS_FILE_DROP_CANCEL);
+    ResString         rTitle(g_hRes, IDS_FILE_DROP);
+    ResString         rQuestion(g_hRes, bCopy ? IDS_FILE_DROP_COPY : IDS_FILE_DROP_MOVE);
+    ResString         rDoIt(g_hRes, bCopy ? IDS_FILE_DROP_DOCOPY : IDS_FILE_DROP_DOMOVE);
+    ResString         rCancel(g_hRes, IDS_FILE_DROP_CANCEL);
     // Show exactly what we are creating.
-    std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str(), hitpath.c_str());
+    std::wstring      sQuestion         = CStringUtils::Format(rQuestion, filename.c_str(), hitpath.c_str());
 
     TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
     TASKDIALOG_BUTTON aCustomButtons[2] = {};
@@ -3931,7 +3943,7 @@ static bool AskToCopyOrMoveFile(HWND hWnd, const std::wstring& filename, const s
     tdc.pButtons                        = aCustomButtons;
     tdc.cButtons                        = bi;
     assert(tdc.cButtons <= _countof(aCustomButtons));
-    tdc.nDefaultButton = 101;
+    tdc.nDefaultButton     = 101;
 
     tdc.hwndParent         = hWnd;
     tdc.hInstance          = g_hRes;
@@ -4063,11 +4075,11 @@ void CMainWindow::HandleTabDroppedOutside(int tab, POINT pt)
     SHELLEXECUTEINFO shExecInfo = {};
     shExecInfo.cbSize           = sizeof(SHELLEXECUTEINFO);
 
-    shExecInfo.hwnd         = *this;
-    shExecInfo.lpVerb       = L"open";
-    shExecInfo.lpFile       = modPath.c_str();
-    shExecInfo.lpParameters = cmdLine.c_str();
-    shExecInfo.nShow        = SW_NORMAL;
+    shExecInfo.hwnd             = *this;
+    shExecInfo.lpVerb           = L"open";
+    shExecInfo.lpFile           = modPath.c_str();
+    shExecInfo.lpParameters     = cmdLine.c_str();
+    shExecInfo.nShow            = SW_NORMAL;
 
     if (ShellExecuteEx(&shExecInfo))
         CloseTab(tab, true);
@@ -4331,7 +4343,7 @@ COLORREF CMainWindow::GetColorForDocument(DocID id)
     std::wstring     folderPath = CPathUtils::GetParentDirectory(doc.m_path);
     // note: if the folder path is different in case but points to
     // the same folder on disk, the color will be different!
-    auto foundIt = m_folderColorIndexes.find(folderPath);
+    auto             foundIt    = m_folderColorIndexes.find(folderPath);
     if (foundIt != m_folderColorIndexes.end())
         return folderColors[foundIt->second % MAX_FOLDERCOLORS];
 
@@ -4495,7 +4507,7 @@ void CMainWindow::SetRibbonColors(COLORREF text, COLORREF background, COLORREF h
 
         // UI_HSBCOLOR is a type defined in UIRibbon.h that is composed of
         // three component values: hue, saturation and brightness, respectively.
-        BYTE h, s, b;
+        BYTE        h, s, b;
         GDIHelpers::RGBToHSB(text, h, s, b);
         UI_HSBCOLOR textColor = UI_HSB(h, s, b);
         GDIHelpers::RGBToHSB(background, h, s, b);
@@ -4547,7 +4559,7 @@ void CMainWindow::GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI
 
     // g_pFramework is a pointer to the IUIFramework interface that is assigned
     // when the Ribbon is initialized.
-    HRESULT hr = g_pFramework->QueryInterface(&spPropertyStore);
+    HRESULT           hr = g_pFramework->QueryInterface(&spPropertyStore);
     if (SUCCEEDED(hr))
     {
         PROPVARIANT propVarBackground;
@@ -4600,7 +4612,7 @@ void CMainWindow::SetTheme(bool dark)
     {
         BYTE h = 0, s = 0, b = 0;
         GDIHelpers::RGBToHSB(dark ? accentColor.accent : accentColor.accent, h, s, b);
-        UI_HSBCOLOR aColor = UI_HSB(h, s, b);
+        UI_HSBCOLOR       aColor = UI_HSB(h, s, b);
 
         IPropertyStorePtr spPropertyStore;
         HRESULT           hr = g_pFramework->QueryInterface(&spPropertyStore);
