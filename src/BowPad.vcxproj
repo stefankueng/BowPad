@@ -184,7 +184,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Msimg32.lib;Imm32.lib;Propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <CETCompat>true</CETCompat>
-      <Profile>true</Profile>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(IntDir);last</AdditionalIncludeDirectories>
