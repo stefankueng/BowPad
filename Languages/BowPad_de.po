@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2021-05-24 17:48+0200\n"
+"PO-Revision-Date: 2021-11-20 10:48+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -151,6 +151,10 @@ msgstr ""
 "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Mehr Info über "
 "diese Update</a>"
 
+#. Resource IDs: (1135)
+msgid "<a>(?)</a>"
+msgstr "<a>(?)</a>"
+
 #. Resource IDs: (60053)
 msgid "A"
 msgstr "A"
@@ -183,6 +187,10 @@ msgid ""
 msgstr ""
 "Zugriff auf die Datei '%s' wurde verweigert. Möchten Sie mit erhöhten "
 "Rechten erneut versuchen?"
+
+#. Resource IDs: (1113)
+msgid "Add newline to capture"
+msgstr "füge neue Zeile an Regex-Sammlung an"
 
 #. Resource IDs: (265)
 msgid "Add to quick access toolbar"
@@ -677,6 +685,14 @@ msgstr "Erstellt eine Kopie des aktuellen Tabs"
 #. Resource IDs: (60035)
 msgid "Creates a new tab with an empty document"
 msgstr "Erstellt einen neuen Tab mit einem leeren Dokument"
+
+#. Resource IDs: (114)
+msgid ""
+"Ctrl+click to follow URL\n"
+"or click here"
+msgstr ""
+"Strg+Klick um URL zu folgen\n"
+"oder hier klicken"
 
 #. Resource IDs: (259)
 #, c-format
@@ -2731,14 +2747,6 @@ msgstr "Ausdruck sammeln:"
 msgid "checks for new versions of BowPad once a week"
 msgstr "Testet auf neue Versionen einmal pro Woche"
 
-#. Resource IDs: (114)
-msgid ""
-"click here to\n"
-"follow URL"
-msgstr ""
-"hier klicken um\n"
-"URL zu öffnen"
-
 #. Resource IDs: (60643, 60644)
 msgid "configure advanced settings"
 msgstr "erweiterte Einstellungen konfigurieren"
@@ -2892,6 +2900,13 @@ msgstr "Schaltet Klappung aus"
 #, c-format
 msgid "{ %d lines }"
 msgstr "{ %d Linien }"
+
+#~ msgid ""
+#~ "click here to\n"
+#~ "follow URL"
+#~ msgstr ""
+#~ "hier klicken um\n"
+#~ "URL zu öffnen"
 
 #~ msgid "Lines"
 #~ msgstr "Zeilen"
