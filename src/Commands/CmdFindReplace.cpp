@@ -829,7 +829,7 @@ LRESULT CFindReplaceDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
     return 0;
 }
 
-LRESULT CFindReplaceDlg::GetListItemDispInfo(NMLVDISPINFO* pDispInfo)
+LRESULT CFindReplaceDlg::GetListItemDispInfo(NMLVDISPINFO* pDispInfo) const
 {
     if ((pDispInfo->item.mask & LVIF_TEXT) != 0)
     {
@@ -2092,7 +2092,7 @@ void CFindReplaceDlg::SearchThread(
             // If finding OF files, only the name is of interest so our job is done.
             CSearchResult result;
             result.pathIndex = m_pendingFoundPaths.size();
-            m_pendingFoundPaths.push_back(std::move(path));
+            m_pendingFoundPaths.push_back(path);
             m_pendingSearchResults.push_back(std::move(result));
             NewData(timeOfLastProgressUpdate, false);
             if (++m_foundSize >= m_maxSearchResults)
@@ -2347,7 +2347,7 @@ void CFindReplaceDlg::NewData(
     }
 }
 
-int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindString, const std::string& sReplaceString, Scintilla::FindOption searchFlags)
+int CFindReplaceDlg::ReplaceDocument(CDocument& doc, const std::string& sFindString, const std::string& sReplaceString, Scintilla::FindOption searchFlags) const
 {
     m_searchWnd.Scintilla().SetStatus(Scintilla::Status::Ok); // reset error status
     m_searchWnd.Scintilla().ClearAll();

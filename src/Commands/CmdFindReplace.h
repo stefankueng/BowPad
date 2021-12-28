@@ -115,7 +115,7 @@ protected:
                                            SearchPaths&   foundPaths);
 
     int                     ReplaceDocument(CDocument& doc, const std::string& sFindString,
-                                            const std::string& sReplaceString, Scintilla::FindOption searchFlags);
+                                            const std::string& sReplaceString, Scintilla::FindOption searchFlags) const;
 
     void                    SearchThread(int id, const std::wstring& searchPath, const std::string& searchFor,
                                          Scintilla::FindOption flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind);
@@ -128,7 +128,7 @@ protected:
     LRESULT                 DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD);
     RECT                    DrawListColumnBackground(NMLVCUSTOMDRAW* pLVCD);
     LRESULT                 DrawListItem(NMLVCUSTOMDRAW* pLVCD);
-    LRESULT                 GetListItemDispInfo(NMLVDISPINFO* pDispInfo);
+    LRESULT                 GetListItemDispInfo(NMLVDISPINFO* pDispInfo) const;
     void                    HandleButtonDropDown(const NMBCDROPDOWN* pDropDown);
 
     bool                    IsMatchingFile(const std::wstring& path, const std::vector<std::wstring>& filesToFind) const;
@@ -245,7 +245,7 @@ class CCmdFindReplace : public ICommand
 {
 public:
     CCmdFindReplace(void* obj);
-    ~CCmdFindReplace() = default;
+    ~CCmdFindReplace() override = default;
 
     bool    Execute() override;
 
