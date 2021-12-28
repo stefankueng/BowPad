@@ -3026,7 +3026,14 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
     char* ep         = nullptr;
     // 0 base means determine base from any format in the string.
     errno            = 0;
-    long long number = strtoll(CStringUtils::trim(CStringUtils::trim(CStringUtils::trim(sWord, L'('), L','), L')').c_str(), &ep, 0);
+    int       radix  = 0;
+    auto      trimmedWord = CStringUtils::trim(CStringUtils::trim(CStringUtils::trim(sWord, L'('), L','), L')');
+    if (trimmedWord.starts_with("0b"))
+    {
+        trimmedWord = trimmedWord.substr(2);
+        radix = 2;
+    }
+    long long number = strtoll(trimmedWord.c_str(), &ep, radix);
     // Be forgiving if given 100xyz, show 100, but
     // don't accept xyz100, show nothing.
     // Must convert some digits of string.
