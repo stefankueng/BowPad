@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019-2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -64,7 +64,8 @@ static std::vector<LexDetectStrings> lexDetectStrings = {
     {"-Html", "<html>"},
     {"-Html", "<!DOCTYPE html>"},
     {"-Java", "#!groovy"},
-    {"-Java", "#!/usr/bin/env groovy"}};
+    {"-Java", "#!/usr/bin/env groovy"},
+    {"-JavaScript", "#!/usr/bin/env zx"}};
 
 StyleData::StyleData()
     : foregroundColor(fgColor)
