@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2015-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2015-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ CCmdSpellCheck::CCmdSpellCheck(void* obj)
     m_enabled    = CIniSettings::Instance().GetInt64(L"spellcheck", L"enabled", 1) != 0;
     g_checkTimer = GetTimerID();
     // try to create the spell checker factory
-    HRESULT hr = CoCreateInstance(__uuidof(SpellCheckerFactory), nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&g_spellCheckerFactory));
+    HRESULT hr   = CoCreateInstance(__uuidof(SpellCheckerFactory), nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&g_spellCheckerFactory));
     if (SUCCEEDED(hr))
     {
         // get all available languages
@@ -221,10 +221,12 @@ void CCmdSpellCheck::Check()
                 }
                 continue;
             }
-            if (Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, textRange.chrg.cpMin))
-                continue;
+            while (textRange.chrg.cpMin < lastPos &&
+                   textRange.chrg.cpMax > textRange.chrg.cpMin &&
+                   Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, textRange.chrg.cpMin))
+                ++textRange.chrg.cpMin;
 
-            int style = static_cast<int>(Scintilla().StyleAt(textRange.chrg.cpMin));
+            int style = Scintilla().StyleAt(textRange.chrg.cpMin);
             // check if the word is text, doc or comment
             if (!checkAll)
             {
@@ -503,10 +505,10 @@ HRESULT CCmdSpellCheckLang::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, cons
                 UINT selected;
                 hr = UIPropertyToUInt32(*key, *pPropVarValue, &selected);
                 InvalidateUICommand(cmdFunctions, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_Enabled);
-                std::wstring lang = g_languages[selected];
+                std::wstring lang      = g_languages[selected];
 
-                BOOL supported = FALSE;
-                hr             = g_spellCheckerFactory->IsSupported(lang.c_str(), &supported);
+                BOOL         supported = FALSE;
+                hr                     = g_spellCheckerFactory->IsSupported(lang.c_str(), &supported);
                 if (supported)
                 {
                     g_spellChecker = nullptr;
@@ -534,8 +536,8 @@ HRESULT CCmdSpellCheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
 
     if (key == UI_PKEY_Categories)
     {
-        ResString sCorrect(g_hRes, IDS_SPELLCHECK_CORRECT);
-        ResString sIgnore(g_hRes, IDS_SPELLCHECK_IGNORE);
+        ResString        sCorrect(g_hRes, IDS_SPELLCHECK_CORRECT);
+        ResString        sIgnore(g_hRes, IDS_SPELLCHECK_IGNORE);
 
         IUICollectionPtr pCollection;
         hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
@@ -574,11 +576,11 @@ HRESULT CCmdSpellCheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
         {
             std::wstring sWord;
 
-            auto wordcharsbuffer = GetWordChars();
+            auto         wordcharsbuffer = GetWordChars();
             OnOutOfScope(Scintilla().SetWordChars(wordcharsbuffer.c_str()));
 
             Scintilla().SetWordChars(g_wordChars.c_str());
-            sWord = CUnicodeUtils::StdGetUnicode(GetCurrentWord());
+            sWord                                  = CUnicodeUtils::StdGetUnicode(GetCurrentWord());
 
             IEnumStringPtr enumSpellingSuggestions = nullptr;
             hr                                     = g_spellChecker->Suggest(sWord.c_str(), &enumSpellingSuggestions);
