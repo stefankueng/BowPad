@@ -25,7 +25,7 @@
 #define BORDER             CDPIAware::Instance().Scale(*this, 5)
 #define RECTBORDER         CDPIAware::Instance().Scale(*this, 2)
 
-void CCustomToolTip::Init(HWND hParent)
+void CCustomToolTip::Init(HWND hParent, HWND hWndFit)
 {
 #define POPUPCLASSNAME "BASEPOPUPWNDCLASS"
     // Register the window class if it has not already been registered.
@@ -54,6 +54,7 @@ void CCustomToolTip::Init(HWND hParent)
     DWORD dwExStyle = 0;
 
     m_hParent       = hParent;
+    m_hWndFit       = hWndFit;
 
     if (!CreateEx(dwExStyle, dwStyle, hParent, nullptr, TEXT(POPUPCLASSNAME)))
         return;
@@ -89,9 +90,24 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
         rc.right = max(rc.right, COLORBOX_SIZE);
     }
     SetTransparency(0);
+    RECT wndPos{};
+    wndPos.left   = screenPt.x - rc.right / 2;
+    wndPos.top    = screenPt.y - rc.bottom - COLORBOX_SIZE;
+    wndPos.right  = wndPos.left + rc.right + BORDER + BORDER;
+    wndPos.bottom = wndPos.top + rc.bottom + BORDER + BORDER;
+    RECT parentRc{};
+    GetWindowRect(m_hWndFit, &parentRc);
+    if (wndPos.left < parentRc.left)
+        OffsetRect(&wndPos, parentRc.left - wndPos.left, 0);
+    if (wndPos.top < parentRc.top)
+        OffsetRect(&wndPos, 0, parentRc.top - wndPos.top);
+    if (wndPos.right > parentRc.right)
+        OffsetRect(&wndPos, parentRc.right - wndPos.right, 0);
+    if (wndPos.bottom > parentRc.bottom)
+        OffsetRect(&wndPos, 0, parentRc.bottom - wndPos.bottom);
     SetWindowPos(*this, nullptr,
-                 screenPt.x - rc.right / 2, screenPt.y - rc.bottom - CDPIAware::Instance().Scale(*this, 20),
-                 rc.right + BORDER + BORDER, rc.bottom + BORDER + BORDER,
+                 wndPos.left, wndPos.top,
+                 wndPos.right - wndPos.left, wndPos.bottom - wndPos.top,
                  SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW);
 
     auto transAlpha = Animator::Instance().CreateSmoothStopTransition(m_animVarAlpha, 0.3, 255);

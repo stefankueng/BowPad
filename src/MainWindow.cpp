@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2021 - Stefan Kueng
+// Copyright (C) 2013-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1581,7 +1581,7 @@ bool CMainWindow::Initialize()
         m_closeTabBtn.SetText(L"X");
     m_closeTabBtn.SetTextColor(RGB(255, 0, 0));
     m_progressBar.Init(hResource, *this);
-    m_custToolTip.Init(m_editor);
+    m_custToolTip.Init(m_editor, *this);
     // Note DestroyIcon not technically needed here but we may as well leave in
     // in case someone changes things to load a non static resource.
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
