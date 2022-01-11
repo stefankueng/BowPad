@@ -307,25 +307,7 @@ void CCmdSpellCheck::Check()
             textRange.chrg.cpMax--;
             if (textRange.lpstrText[0])
             {
-                auto sWord = CUnicodeUtils::StdGetUnicode(textRange.lpstrText);
-                // ignore words that contain numbers/digits
-                if (std::any_of(sWord.begin(), sWord.end(), ::iswdigit))
-                    continue;
-                // ignore words that contain uppercase letters in the middle
-                if (!checkUppercase && (std::any_of(sWord.begin() + 1, sWord.end(), ::iswupper)))
-                {
-                    // mark word as correct (remove the squiggle line)
-                    Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED);
-                    Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
-                    Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
-                    Scintilla().SetIndicatorCurrent(INDIC_MISSPELLED_DEL);
-                    Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin);
-                    Scintilla().IndicatorClearRange(textRange.chrg.cpMin, textRange.chrg.cpMax - textRange.chrg.cpMin + 1);
-                    continue;
-                }
-                // ignore keywords of the currently selected lexer
-                if (m_keywords.find(textRange.lpstrText) != m_keywords.end())
-                    continue;
+                auto                  sWord             = CUnicodeUtils::StdGetUnicode(textRange.lpstrText);
 
                 IEnumSpellingErrorPtr enumSpellingError = nullptr;
                 HRESULT               hr                = S_FALSE;
@@ -353,12 +335,35 @@ void CCmdSpellCheck::Check()
                         if (action != CORRECTIVE_ACTION_NONE)
                         {
                             // mark text as misspelled
-                            Scintilla().SetIndicatorCurrent(action == CORRECTIVE_ACTION_DELETE ? INDIC_MISSPELLED_DEL : INDIC_MISSPELLED);
                             ULONG errLen = 0;
                             spellingError->get_Length(&errLen);
                             ULONG errStart = 0;
                             spellingError->get_StartIndex(&errStart);
-                            Scintilla().IndicatorFillRange(textRange.chrg.cpMin + errStart, errLen);
+
+                            Sci_TextRange wordRange{};
+                            wordRange.chrg.cpMin = textRange.chrg.cpMin + errStart;
+                            wordRange.chrg.cpMax = wordRange.chrg.cpMin + errLen;
+                            wordRange.lpstrText  = m_textBuffer.get();
+                            Scintilla().GetTextRange(&wordRange);
+                            sWord       = CUnicodeUtils::StdGetUnicode(wordRange.lpstrText);
+
+                            bool ignore = false;
+                            // ignore words that contain numbers/digits
+                            if (std::ranges::any_of(sWord, ::iswdigit))
+                                ignore = true;
+                            // ignore words that contain uppercase letters in the middle
+                            if (!ignore && !checkUppercase && (std::any_of(sWord.begin() + 1, sWord.end(), ::iswupper)))
+                                ignore = true;
+
+                            // ignore keywords of the currently selected lexer
+                            if (!ignore && m_keywords.contains(textRange.lpstrText))
+                                ignore = true;
+
+                            if (!ignore)
+                            {
+                                Scintilla().SetIndicatorCurrent(action == CORRECTIVE_ACTION_DELETE ? INDIC_MISSPELLED_DEL : INDIC_MISSPELLED);
+                                Scintilla().IndicatorFillRange(textRange.chrg.cpMin + errStart, errLen);
+                            }
                         }
                         hr = enumSpellingError->Next(&spellingError);
                     }
