@@ -516,6 +516,8 @@ HRESULT CCmdSpellCheckLang::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, cons
                     if (SUCCEEDED(hr))
                     {
                         CIniSettings::Instance().SetString(L"spellcheck", L"language", lang.c_str());
+                        if (g_checkTimer)
+                            SetTimer(GetHwnd(), g_checkTimer, 1, nullptr);
                     }
                 }
             }
