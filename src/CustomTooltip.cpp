@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2016-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,9 +20,10 @@
 #include "Theme.h"
 #include "DPIAware.h"
 
-#define COLORBOX_SIZE CDPIAware::Instance().Scale(*this, 20)
-#define BORDER        CDPIAware::Instance().Scale(*this, 5)
-#define RECTBORDER    CDPIAware::Instance().Scale(*this, 2)
+#define COLORBOX_SIZE      CDPIAware::Instance().Scale(*this, 20)
+#define COLORBOX_TEXTWIDTH CDPIAware::Instance().Scale(*this, 60)
+#define BORDER             CDPIAware::Instance().Scale(*this, 5)
+#define RECTBORDER         CDPIAware::Instance().Scale(*this, 2)
 
 void CCustomToolTip::Init(HWND hParent)
 {
@@ -52,7 +53,7 @@ void CCustomToolTip::Init(HWND hParent)
     DWORD dwStyle   = WS_POPUP | WS_BORDER;
     DWORD dwExStyle = 0;
 
-    m_hParent = hParent;
+    m_hParent       = hParent;
 
     if (!CreateEx(dwExStyle, dwStyle, hParent, nullptr, TEXT(POPUPCLASSNAME)))
         return;
@@ -76,7 +77,7 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
     NONCLIENTMETRICS ncm{};
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
     SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
-    m_hFont = CreateFontIndirect(&ncm.lfStatusFont);
+    m_hFont      = CreateFontIndirect(&ncm.lfStatusFont);
 
     auto oldFont = SelectObject(dc, m_hFont);
     DrawText(dc, textBuf.get(), static_cast<int>(m_infoText.size()), &rc, DT_LEFT | DT_TOP | DT_CALCRECT | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);
@@ -139,9 +140,12 @@ void CCustomToolTip::OnPaint(HDC hdc, RECT* pRc)
     DrawText(hdc, textBuf.get(), -1, pRc, DT_LEFT | DT_TOP | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);
     if (m_bShowColorBox)
     {
+        RECT clrTextRc = *pRc;
+        clrTextRc.top  = pRc->bottom - COLORBOX_SIZE;
+        DrawText(hdc, L"color:", -1, &clrTextRc, DT_LEFT | DT_TOP | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);
         SelectObject(hdc, GetStockObject(GRAY_BRUSH));
-        Rectangle(hdc, pRc->left, pRc->bottom - COLORBOX_SIZE, pRc->right, pRc->bottom);
-        GDIHelpers::FillSolidRect(hdc, pRc->left + RECTBORDER, pRc->bottom - COLORBOX_SIZE + RECTBORDER, pRc->right - RECTBORDER, pRc->bottom - RECTBORDER, m_color);
+        Rectangle(hdc, pRc->left + COLORBOX_TEXTWIDTH, pRc->bottom - COLORBOX_SIZE, pRc->right, pRc->bottom);
+        GDIHelpers::FillSolidRect(hdc, pRc->left + RECTBORDER + COLORBOX_TEXTWIDTH, pRc->bottom - COLORBOX_SIZE + RECTBORDER, pRc->right - RECTBORDER, pRc->bottom - RECTBORDER, m_color);
     }
     SelectObject(hdc, oldFont);
 }
