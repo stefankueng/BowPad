@@ -26,14 +26,15 @@ public:
     {
         m_animVarAlpha = Animator::Instance().CreateAnimationVariable(0, 1);
     }
-    virtual ~CCustomToolTip()
+
+    ~CCustomToolTip() override
     {
         DeleteObject(m_hFont);
     }
 
-    void Init(HWND hParent, HWND hWndFit);
+    void Init(HWND hParent, HWND hWndFit, const std::wstring& copyHintText);
 
-    void ShowTip(POINT screenPt, const std::wstring& text, COLORREF* color);
+    void ShowTip(POINT screenPt, const std::wstring& text, COLORREF* color, const std::wstring& copyText);
     void HideTip();
 
 protected:
@@ -45,6 +46,8 @@ private:
     COLORREF          m_color         = 0;
     HFONT             m_hFont         = nullptr;
     bool              m_bShowColorBox = false;
-    HWND              m_hWndFit       = nullptr;
+    std::wstring      m_copyText;
+    std::wstring      m_copyHintText;
+    HWND              m_hWndFit = nullptr;
     AnimationVariable m_animVarAlpha;
 };

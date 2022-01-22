@@ -1161,8 +1161,15 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
             else
             {
                 m_editor.Scintilla().CallTipCancel();
-                m_custToolTip.HideTip();
-                m_dwellStartPos = -1;
+                auto  msgPos = GetMessagePos();
+                POINT pt     = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
+                RECT  rc{};
+                GetWindowRect(m_custToolTip, &rc);
+                if (!PtInRect(&rc, pt) || !IsWindowVisible(m_custToolTip))
+                {
+                    m_custToolTip.HideTip();
+                    m_dwellStartPos = -1;
+                }
             }
             break;
         case SCN_CALLTIPCLICK:
@@ -1581,7 +1588,8 @@ bool CMainWindow::Initialize()
         m_closeTabBtn.SetText(L"X");
     m_closeTabBtn.SetTextColor(RGB(255, 0, 0));
     m_progressBar.Init(hResource, *this);
-    m_custToolTip.Init(m_editor, *this);
+    static ResString rsClickToCopy(g_hRes, IDS_CLICKTOCOPYTOCLIPBOARD);
+    m_custToolTip.Init(m_editor, *this, rsClickToCopy);
     // Note DestroyIcon not technically needed here but we may as well leave in
     // in case someone changes things to load a non static resource.
     HIMAGELIST hImgList = ImageList_Create(13, 13, ILC_COLOR32 | ILC_MASK, 0, 3);
@@ -2965,12 +2973,13 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
         {
             // Don't display hex with # as that means web color hex triplet
             // Show as hex with 0x and show what it was parsed to.
-            auto sCallTip = CStringUtils::Format(
+            auto copyTip = CStringUtils::Format(
                 L"RGB(%d, %d, %d)\nHex: 0x%06lX",
                 GetRValue(color), GetGValue(color), GetBValue(color), static_cast<DWORD>(color));
-            auto  msgPos = GetMessagePos();
-            POINT pt     = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
-            m_custToolTip.ShowTip(pt, sCallTip, &color);
+            auto  sCallTip = copyTip;
+            auto  msgPos   = GetMessagePos();
+            POINT pt       = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
+            m_custToolTip.ShowTip(pt, sCallTip, &color, copyTip);
             return;
         }
     }
@@ -3009,14 +3018,15 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
             // (since they can already see any other element type that might have used,
             // so all decimal might mean more info)
             // and as a hex color triplet which is useful using # to indicate that.
-            auto color    = RGB(r, g, b);
-            auto sCallTip = CStringUtils::Format(
+            auto color   = RGB(r, g, b);
+            auto copyTip = CStringUtils::Format(
                 L"RGB(%d, %d, %d)\n#%02X%02X%02X\nHex: 0x%06lX",
                 r, g, b, GetRValue(color), GetGValue(color), GetBValue(color), color);
+            auto  sCallTip = copyTip;
 
-            auto  msgPos = GetMessagePos();
-            POINT pt     = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
-            m_custToolTip.ShowTip(pt, sCallTip, &color);
+            auto  msgPos   = GetMessagePos();
+            POINT pt       = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
+            m_custToolTip.ShowTip(pt, sCallTip, &color, copyTip);
             return;
         }
     }
@@ -3028,12 +3038,12 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
     char* ep         = nullptr;
     // 0 base means determine base from any format in the string.
     errno            = 0;
-    int       radix  = 0;
-    auto      trimmedWord = CStringUtils::trim(CStringUtils::trim(CStringUtils::trim(sWord, L'('), L','), L')');
+    int  radix       = 0;
+    auto trimmedWord = CStringUtils::trim(CStringUtils::trim(CStringUtils::trim(sWord, L'('), L','), L')');
     if (trimmedWord.starts_with("0b"))
     {
         trimmedWord = trimmedWord.substr(2);
-        radix = 2;
+        radix       = 2;
     }
     long long number = strtoll(trimmedWord.c_str(), &ep, radix);
     // Be forgiving if given 100xyz, show 100, but
@@ -3042,8 +3052,10 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
     if (errno == 0 && (*ep == 0))
     {
         auto      bs       = to_bit_wstring(number, true);
-        auto      sCallTip = CStringUtils::Format(L"Dec: %lld\nHex: 0x%llX\nOct: %#llo\nBin: %s (%d digits)",
-                                             number, number, number, bs.c_str(), static_cast<int>(bs.size()));
+        auto      copyTip  = CStringUtils::Format(L"Dec: %lld\nHex: 0x%llX\nOct: %#llo\nBin: %s (%d digits)",
+                                            number, number, number, bs.c_str(), static_cast<int>(bs.size()));
+        auto      sCallTip = copyTip;
+
         COLORREF  color    = 0;
         COLORREF* pColor   = nullptr;
         if (sWord.size() > 7)
@@ -3060,7 +3072,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
         }
         auto  msgPos = GetMessagePos();
         POINT pt     = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
-        m_custToolTip.ShowTip(pt, sCallTip, pColor);
+        m_custToolTip.ShowTip(pt, sCallTip, pColor, copyTip);
         return;
     }
     int  err       = 0;
@@ -3081,9 +3093,11 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
         long long ulongVal = static_cast<long long>(exprValue);
         auto      sCallTip = CStringUtils::Format(L"Expr: %S\n-->\nVal: %f\nDec: %lld\nHex: 0x%llX\nOct: %#llo",
                                              sWord.c_str(), exprValue, ulongVal, ulongVal, ulongVal);
+        auto      copyTip  = CStringUtils::Format(L"Val: %f\nDec: %lld\nHex: 0x%llX\nOct: %#llo",
+                                            exprValue, ulongVal, ulongVal, ulongVal);
         auto      msgPos   = GetMessagePos();
         POINT     pt       = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
-        m_custToolTip.ShowTip(pt, sCallTip, nullptr);
+        m_custToolTip.ShowTip(pt, sCallTip, nullptr, copyTip);
     }
 }
 

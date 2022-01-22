@@ -19,13 +19,15 @@
 #include "GDIHelpers.h"
 #include "Theme.h"
 #include "DPIAware.h"
+#include "../ext/sktoolslib/StringUtils.h"
 
 #define COLORBOX_SIZE      CDPIAware::Instance().Scale(*this, 20)
 #define COLORBOX_TEXTWIDTH CDPIAware::Instance().Scale(*this, 60)
 #define BORDER             CDPIAware::Instance().Scale(*this, 5)
 #define RECTBORDER         CDPIAware::Instance().Scale(*this, 2)
+#define HOVERDISTANCE      CDPIAware::Instance().Scale(*this, 10)
 
-void CCustomToolTip::Init(HWND hParent, HWND hWndFit)
+void CCustomToolTip::Init(HWND hParent, HWND hWndFit, const std::wstring& copyHintText)
 {
 #define POPUPCLASSNAME "BASEPOPUPWNDCLASS"
     // Register the window class if it has not already been registered.
@@ -55,17 +57,24 @@ void CCustomToolTip::Init(HWND hParent, HWND hWndFit)
 
     m_hParent       = hParent;
     m_hWndFit       = hWndFit;
+    m_copyHintText  = copyHintText;
 
     if (!CreateEx(dwExStyle, dwStyle, hParent, nullptr, TEXT(POPUPCLASSNAME)))
         return;
 }
 
-void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF* color)
+void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF* color, const std::wstring& copyText)
 {
     m_infoText = text;
+    if (!copyText.empty() && !m_copyHintText.empty())
+    {
+        m_infoText += L"\n\n";
+        m_infoText += m_copyHintText;
+    }
     if (color)
         m_color = (*color) & 0xFFFFFF;
     m_bShowColorBox = color != nullptr;
+    m_copyText      = copyText;
     auto dc         = GetDC(*this);
     auto textBuf    = std::make_unique<wchar_t[]>(m_infoText.size() + 4);
     wcscpy_s(textBuf.get(), m_infoText.size() + 4, m_infoText.c_str());
@@ -92,7 +101,7 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
     SetTransparency(0);
     RECT wndPos{};
     wndPos.left   = screenPt.x - rc.right / 2;
-    wndPos.top    = screenPt.y - rc.bottom - COLORBOX_SIZE;
+    wndPos.top    = screenPt.y - rc.bottom - COLORBOX_SIZE + HOVERDISTANCE;
     wndPos.right  = wndPos.left + rc.right + BORDER + BORDER;
     wndPos.bottom = wndPos.top + rc.bottom + BORDER + BORDER;
     RECT parentRc{};
@@ -181,12 +190,19 @@ LRESULT CCustomToolTip::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             return TRUE;
         case WM_LBUTTONDOWN:
         {
-            // send the click to the parent window
-            POINT pt{};
-            pt.x = GET_X_LPARAM(lParam);
-            pt.y = GET_Y_LPARAM(lParam);
-            MapWindowPoints(m_hwnd, m_hParent, &pt, 1);
-            SendMessage(m_hParent, WM_LBUTTONDOWN, 0, MAKELPARAM(pt.x, pt.y));
+            if (!m_copyText.empty())
+            {
+                WriteAsciiStringToClipboard(m_copyText.c_str(), *this);
+            }
+            else
+            {
+                // send the click to the parent window
+                POINT pt{};
+                pt.x = GET_X_LPARAM(lParam);
+                pt.y = GET_Y_LPARAM(lParam);
+                MapWindowPoints(m_hwnd, m_hParent, &pt, 1);
+                SendMessage(m_hParent, WM_LBUTTONDOWN, 0, MAKELPARAM(pt.x, pt.y));
+            }
             return 0;
         }
         case WM_RBUTTONDOWN:
