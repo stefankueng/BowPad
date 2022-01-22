@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -179,7 +179,8 @@ bool CCmdSaveAll::Execute()
     for (decltype(docCount) i = 0; i < docCount; ++i)
     {
         auto docID = GetDocIDFromTabIndex(i);
-        if (GetDocumentFromID(docID).m_bIsDirty)
+        const auto& doc   = GetDocumentFromID(docID);
+        if (doc.m_bIsDirty || doc.m_bNeedsSaving)
         {
             SaveDoc(docID);
         }
