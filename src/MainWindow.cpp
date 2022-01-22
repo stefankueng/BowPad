@@ -3070,7 +3070,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
         auto wordCharsBuffer = m_editor.GetWordChars();
         OnOutOfScope(m_editor.Scintilla().SetWordChars(wordCharsBuffer.c_str()));
 
-        m_editor.Scintilla().SetWordChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-+*/!%~()_.,");
+        m_editor.Scintilla().SetWordChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-+*/!%~()^_.,");
         selStart = m_editor.Scintilla().WordStartPosition(scn.position, false);
         selEnd   = m_editor.Scintilla().WordEndPosition(scn.position, false);
         sWord    = m_editor.GetTextRange(static_cast<long>(selStart), static_cast<long>(selEnd));
