@@ -166,7 +166,7 @@ HRESULT CCmdSave::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROP
         if (HasActiveDocument())
         {
             const auto& doc = GetActiveDocument();
-            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, doc.m_bIsDirty || doc.m_bNeedsSaving, pPropVarNewValue);
+            return UIInitPropertyFromBoolean(UI_PKEY_Enabled, doc.m_bIsDirty || doc.m_bNeedsSaving || doc.m_path.empty(), pPropVarNewValue);
         }
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, pPropVarNewValue);
     }

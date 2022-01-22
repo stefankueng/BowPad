@@ -1831,6 +1831,8 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         return false;
 
     auto& doc = m_docManager.GetModDocumentFromID(docID);
+    if (doc.m_path.empty())
+        bSaveAs = true;
     if (!bSaveAs && !doc.m_bIsDirty && !doc.m_bNeedsSaving)
         return false;
 
