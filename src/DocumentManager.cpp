@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,12 +31,111 @@
 
 #include <stdexcept>
 #include <Shobjidl.h>
+#include <mlang.h>
+#include <wrl/client.h>
+
+#include "../ext/uchardet/src/uchardet.h"
 
 namespace
 {
+struct ICaseComp
+{
+    bool operator()(const std::string& lhs, const std::string& rhs) const
+    {
+        return _stricmp(lhs.c_str(), rhs.c_str()) < 0;
+    }
+};
+std::map<std::string, int, ICaseComp> encodings = {
+    {"csISOLatin1 ", 28591},
+    {"l1", 28591},
+    {"latin3", 28593},
+    {"csISOLatin3", 28593},
+    {"iso-ir-109", 28593},
+    {"l3", 28593},
+    {"ISO-8859-13", 28603},
+    {"ISO-8859-13", 28603},
+    {"iso-celtic", 28604},
+    {"latin8", 28604},
+    {"ISO_8859-14", 28604},
+    {"ISO-8859-14", 28604},
+    {"18", 28604},
+    {"iso-ir-199", 28604},
+    {"Latin-9", 28605},
+    {"ISO_8859-15", 28605},
+    {"ISO-8859-15", 28605},
+    {"IBM437", 437},
+    {"cp437", 437},
+    {"437", 437},
+    {"csPC8CodePage437", 437},
+    {"IBM720", 720},
+    {"cp720", 720},
+    {"oem720", 720},
+    {"720", 720},
+    {"IBM737", 737},
+    {"cp737", 737},
+    {"oem737", 737},
+    {"737", 737},
+    {"IBM775", 775},
+    {"cp775", 775},
+    {"oem775", 775},
+    {"775", 775},
+    {"IBM850", 850},
+    {"cp850", 850},
+    {"oem850", 850},
+    {"850", 850},
+    {"oem852", 852},
+    {"852", 852},
+    {"IBM855", 855},
+    {"cp855", 855},
+    {"oem855", 855},
+    {"855", 855},
+    {"csIBM855", 855},
+    {"IBM857", 857},
+    {"cp857", 857},
+    {"oem857", 857},
+    {"857", 857},
+    {"IBM858", 858},
+    {"cp858", 858},
+    {"oem858", 858},
+    {"858", 858},
+    {"IBM860", 860},
+    {"cp860", 860},
+    {"oem860", 860},
+    {"860", 860},
+    {"IBM861", 861},
+    {"cp861", 861},
+    {"oem861", 861},
+    {"861", 861},
+    {"IBM862", 862},
+    {"cp862", 862},
+    {"oem862", 862},
+    {"862", 862},
+    {"IBM863", 863},
+    {"cp863", 863},
+    {"oem863", 863},
+    {"863", 863},
+    {"IBM865", 865},
+    {"cp865", 865},
+    {"oem865", 865},
+    {"865", 865},
+    {"oem866", 866},
+    {"866", 866},
+    {"IBM869", 869},
+    {"cp869", 869},
+    {"oem869", 869},
+    {"869", 869},
+    {"gb18030", 936},
+    {"windows-949", 949},
+    {"csEUCKR", 51949},
+    {"tis-620", 874},
+    {"x-mac-cyrillic", 10007},
+    {"xmaccyrillic", 10007},
+    {"koi8_u", 21866},
+    {"koi8_r", 20866}};
+
 CDocument g_emptyDoc;
 
-wchar_t WideCharSwap(wchar_t nValue)
+wchar_t   WideCharSwap(wchar_t nValue)
 {
     return (((nValue >> 8)) | (nValue << 8));
 }
@@ -184,11 +283,11 @@ void loadSomeUtf32Le(Scintilla::ILoader& edit, bool hasBOM, bool bFirst, DWORD& 
         lenFile -= 4;
     }
     // UTF32 have four bytes per char
-    int     nReadChars = lenFile / 4;
-    UINT32* p32        = reinterpret_cast<UINT32*>(pData);
+    int      nReadChars = lenFile / 4;
+    UINT32*  p32        = reinterpret_cast<UINT32*>(pData);
 
     // fill buffer
-    wchar_t* pOut = static_cast<wchar_t*>(wideBuf);
+    wchar_t* pOut       = static_cast<wchar_t*>(wideBuf);
     for (int i = 0; i < nReadChars; ++i, ++pOut)
     {
         UINT32 zChar = p32[i];
@@ -261,9 +360,9 @@ bool AskToElevatePrivilege(HWND hWnd, const std::wstring& path, PCWSTR sElevate,
 {
     // access to the file is denied, and we're not running with elevated privileges
     // offer to start BowPad with elevated privileges and open the file in that instance
-    ResString    rTitle(g_hRes, IDS_ACCESS_ELEVATE);
-    ResString    rQuestion(g_hRes, IDS_ACCESS_ASK_ELEVATE);
-    std::wstring sQuestion = CStringUtils::Format(rQuestion, path.c_str());
+    ResString         rTitle(g_hRes, IDS_ACCESS_ELEVATE);
+    ResString         rQuestion(g_hRes, IDS_ACCESS_ASK_ELEVATE);
+    std::wstring      sQuestion         = CStringUtils::Format(rQuestion, path.c_str());
 
     TASKDIALOGCONFIG  tdc               = {sizeof(TASKDIALOGCONFIG)};
     TASKDIALOG_BUTTON aCustomButtons[2] = {};
@@ -275,17 +374,17 @@ bool AskToElevatePrivilege(HWND hWnd, const std::wstring& path, PCWSTR sElevate,
     tdc.cButtons                        = _countof(aCustomButtons);
     tdc.nDefaultButton                  = 101;
 
-    tdc.hwndParent      = hWnd;
-    tdc.hInstance       = g_hRes;
-    tdc.dwFlags         = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-    tdc.dwCommonButtons = TDCBF_CANCEL_BUTTON;
+    tdc.hwndParent                      = hWnd;
+    tdc.hInstance                       = g_hRes;
+    tdc.dwFlags                         = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+    tdc.dwCommonButtons                 = TDCBF_CANCEL_BUTTON;
 
-    tdc.pszWindowTitle     = MAKEINTRESOURCE(IDS_APP_TITLE);
-    tdc.pszMainIcon        = TD_SHIELD_ICON;
-    tdc.pszMainInstruction = rTitle;
-    tdc.pszContent         = sQuestion.c_str();
-    int     nClickedBtn    = 0;
-    HRESULT hr             = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
+    tdc.pszWindowTitle                  = MAKEINTRESOURCE(IDS_APP_TITLE);
+    tdc.pszMainIcon                     = TD_SHIELD_ICON;
+    tdc.pszMainInstruction              = rTitle;
+    tdc.pszContent                      = sQuestion.c_str();
+    int     nClickedBtn                 = 0;
+    HRESULT hr                          = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
     // We've used TDCBF_CANCEL_BUTTON so IDCANCEL can be returned,
@@ -308,12 +407,12 @@ DWORD RunSelfElevated(HWND hWnd, const std::wstring& params, bool wait)
     std::wstring     modPath    = CPathUtils::GetModulePath();
     SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
 
-    shExecInfo.hwnd         = hWnd;
-    shExecInfo.fMask        = SEE_MASK_NOCLOSEPROCESS;
-    shExecInfo.lpVerb       = L"runas";
-    shExecInfo.lpFile       = modPath.c_str();
-    shExecInfo.lpParameters = params.c_str();
-    shExecInfo.nShow        = SW_NORMAL;
+    shExecInfo.hwnd             = hWnd;
+    shExecInfo.fMask            = SEE_MASK_NOCLOSEPROCESS;
+    shExecInfo.lpVerb           = L"runas";
+    shExecInfo.lpFile           = modPath.c_str();
+    shExecInfo.lpParameters     = params.c_str();
+    shExecInfo.nShow            = SW_NORMAL;
     OnOutOfScope(CloseHandle(shExecInfo.hProcess));
     if (!ShellExecuteEx(&shExecInfo))
         return ::GetLastError();
@@ -416,7 +515,7 @@ void CDocumentManager::AddDocumentAtEnd(const CDocument& doc, DocID id)
 CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing)
 {
     CDocument doc;
-    doc.m_format = EOLFormat::Unknown_Format;
+    doc.m_format    = EOLFormat::Unknown_Format;
 
     CAutoFile hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, createIfMissing ? CREATE_NEW : OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (!hFile.IsValid())
@@ -463,10 +562,10 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
         ShowFileLoadError(hWnd, path, errMsg);
         return doc;
     }
-    doc.m_bIsReadonly         = (fi.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)) != 0;
-    doc.m_lastWriteTime       = fi.ftLastWriteTime;
-    doc.m_path                = path;
-    unsigned __int64 fileSize = static_cast<__int64>(fi.nFileSizeHigh) << 32 | fi.nFileSizeLow;
+    doc.m_bIsReadonly                    = (fi.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)) != 0;
+    doc.m_lastWriteTime                  = fi.ftLastWriteTime;
+    doc.m_path                           = path;
+    unsigned __int64 fileSize            = static_cast<__int64>(fi.nFileSizeHigh) << 32 | fi.nFileSizeLow;
     // add more room for Scintilla (usually 1/6 more for editing)
     unsigned __int64 bufferSizeRequested = fileSize + min(1 << 20, fileSize / 6);
 
@@ -493,7 +592,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
                           CLanguage::Instance().GetTranslatedString(ResString(g_hRes, IDS_ERR_FILETOOBIG)).c_str());
         return doc;
     }
-    auto& edit = *pdocLoad;
+    auto& edit                    = *pdocLoad;
 
     DWORD lenFile                 = 0;
     int   incompleteMultiByteChar = 0;
@@ -513,10 +612,40 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
         if ((!encodingSet) || (inconclusive && encoding == CP_ACP))
         {
             encoding = GetCodepageFromBuf(m_data + skip, lenFile - skip, doc.m_bHasBOM, inconclusive, skip);
-            if (inconclusive && encoding == CP_ACP)
-                encoding = CP_UTF8;
+            if (inconclusive || encoding == CP_ACP)
+            {
+                if (inconclusive && encoding == CP_ACP)
+                    encoding = CP_UTF8;
+                uchardet_t handle = uchardet_new();
+                if (int retVal = uchardet_handle_data(handle, m_data + incompleteMultiByteChar, ReadBlockSize - incompleteMultiByteChar); retVal == 0)
+                {
+                    OnOutOfScope(uchardet_delete(handle));
+                    uchardet_data_end(handle);
+                    const char* charset = uchardet_get_charset(handle);
+                    if ((_stricmp(charset, "TIS-620") != 0) && // TIS-620 detection is disabled here because uchardet detects usually wrongly UTF-8 as TIS-620
+                        (_stricmp(charset, "ASCII") != 0))
+                    {
+                        Microsoft::WRL::ComPtr<IMultiLanguage> ml;
+                        if (SUCCEEDED(CoCreateInstance(CLSID_CMultiLanguage, nullptr,
+                                                       CLSCTX_ALL,
+                                                       IID_IMultiLanguage, (void**)&ml)))
+                        {
+                            MIMECSETINFO charsetInfo{};
+                            _bstr_t      wCs = CUnicodeUtils::StdGetUnicode(charset).c_str();
+                            if (SUCCEEDED(ml->GetCharsetInfo(wCs, &charsetInfo)))
+                            {
+                                encoding = charsetInfo.uiInternetEncoding;
+                            }
+                            else if (encodings.contains(charset))
+                            {
+                                encoding = encodings.at(charset);
+                            }
+                        }
+                    }
+                }
+            }
         }
-        encodingSet = true;
+        encodingSet    = true;
 
         doc.m_encoding = encoding;
 
@@ -576,8 +705,8 @@ static bool SaveAsUtf16(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     err.clear();
     DWORD bytesWritten = 0;
 
-    auto encoding = doc.m_encoding;
-    auto hasBOM   = doc.m_bHasBOM;
+    auto  encoding     = doc.m_encoding;
+    auto  hasBOM       = doc.m_bHasBOM;
     if (doc.m_encodingSaving != -1)
     {
         encoding = doc.m_encodingSaving;
@@ -634,7 +763,7 @@ static bool SaveAsUtf32(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     DWORD         bytesWritten     = 0;
     BOOL          result           = FALSE;
 
-    auto encoding = doc.m_encoding;
+    auto          encoding         = doc.m_encoding;
     if (doc.m_encodingSaving != -1)
         encoding = doc.m_encodingSaving;
 
@@ -651,8 +780,8 @@ static bool SaveAsUtf32(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
     char* writeBuf = buf;
     do
     {
-        int charStart = UTF8Helper::characterStart(writeBuf, static_cast<int>(min(WriteBlockSize, lengthDoc)));
-        int wideLen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, writeWideBuf.get(), writeWideBufSize);
+        int     charStart = UTF8Helper::characterStart(writeBuf, static_cast<int>(min(WriteBlockSize, lengthDoc)));
+        int     wideLen   = MultiByteToWideChar(CP_UTF8, 0, writeBuf, charStart, writeWideBuf.get(), writeWideBufSize);
 
         LPCWSTR pIn       = static_cast<LPCWSTR>(writeWideBuf.get());
         UINT32* pOut      = reinterpret_cast<UINT32*>(writeWide32Buf.get());
@@ -730,13 +859,13 @@ static bool SaveAsUtf8(const CDocument& doc, char* buf, size_t lengthDoc, CAutoF
 
 static bool SaveAsOther(const CDocument& doc, char* buf, size_t lengthDoc, CAutoFile& hFile, std::wstring& err)
 {
-    constexpr int wideBufSize = WriteBlockSize * 2;
-    auto          wideBuf     = std::make_unique<wchar_t[]>(wideBufSize);
-    constexpr int charBufSize = wideBufSize * 2;
-    auto          charBuf     = std::make_unique<char[]>(charBufSize);
+    constexpr int wideBufSize  = WriteBlockSize * 2;
+    auto          wideBuf      = std::make_unique<wchar_t[]>(wideBufSize);
+    constexpr int charBufSize  = wideBufSize * 2;
+    auto          charBuf      = std::make_unique<char[]>(charBufSize);
     // first convert to wide char, then to the requested codepage
-    DWORD bytesWritten = 0;
-    auto  encoding     = doc.m_encoding;
+    DWORD         bytesWritten = 0;
+    auto          encoding     = doc.m_encoding;
     if (doc.m_encodingSaving != -1)
         encoding = doc.m_encodingSaving;
 
@@ -785,10 +914,10 @@ bool CDocumentManager::SaveDoc(HWND hWnd, const std::wstring& path, const CDocum
     }
 
     m_scratchScintilla.Scintilla().SetDocPointer(doc.m_document);
-    size_t lengthDoc = m_scratchScintilla.Scintilla().Length();
+    size_t       lengthDoc = m_scratchScintilla.Scintilla().Length();
     // get characters directly from Scintilla buffer
-    char*        buf = static_cast<char*>(m_scratchScintilla.Scintilla().CharacterPointer());
-    bool         ok  = false;
+    char*        buf       = static_cast<char*>(m_scratchScintilla.Scintilla().CharacterPointer());
+    bool         ok        = false;
     std::wstring err;
     auto         encoding = doc.m_encoding;
     if (doc.m_encodingSaving != -1)
@@ -822,10 +951,10 @@ bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved) cons
     bTabMoved = false;
     if (doc.m_path.empty())
         return false;
-    DWORD attributes = INVALID_FILE_ATTRIBUTES;
-    DWORD err        = 0;
+    DWORD     attributes = INVALID_FILE_ATTRIBUTES;
+    DWORD     err        = 0;
     // when opening files, always 'share' as much as possible to reduce problems with virus scanners
-    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+    CAutoFile hFile      = CreateFile(doc.m_path.c_str(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (!hFile.IsValid())
         err = GetLastError();
     // If the file can't be created, check if the file attributes are the reason we can't open

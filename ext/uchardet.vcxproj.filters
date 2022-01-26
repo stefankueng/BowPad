@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{d751ae5a-40cb-44ec-beaa-13131d33847e}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{eb9c805b-2e73-4e0d-977d-e935531f68b2}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Source Files\LangModels">
+      <UniqueIdentifier>{c7386344-9756-4af8-b0d2-defe61ca935b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="uchardet\src\nsPkgInt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsSBCharSetProber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsSBCSGroupProber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsSJISProber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsUniversalDetector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsUTF8Prober.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\prmem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\uchardet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\CharDistribution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\JpCntx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsBig5Prober.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsCharSetProber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsCodingStateMachine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nscore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsEscCharsetProber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsEUCJPProber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsEUCKRProber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsEUCTWProber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsGB2312Prober.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsHebrewProber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsLatin1Prober.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uchardet\src\nsMBCSGroupProber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="uchardet\src\CharDistribution.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\JpCntx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsBig5Prober.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsCharSetProber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsEscCharsetProber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsEscSM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsEUCJPProber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsEUCKRProber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsEUCTWProber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsGB2312Prober.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsHebrewProber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsLatin1Prober.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsMBCSGroupProber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsMBCSSM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsSBCharSetProber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsSBCSGroupProber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsSJISProber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsUniversalDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\nsUTF8Prober.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\uchardet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangIrishModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangItalianModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangLatvianModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangLithuanianModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangMalteseModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangPolishModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangPortugueseModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangRomanianModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangRussianModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangSlovakModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangSloveneModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangSpanishModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangSwedishModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangThaiModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangTurkishModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangVietnameseModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangArabicModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangBulgarianModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangCroatianModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangCzechModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangDanishModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangEsperantoModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangEstonianModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangFinnishModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangFrenchModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangGermanModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangGreekModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangHebrewModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+    <ClCompile Include="uchardet\src\LangModels\LangHungarianModel.cpp">
+      <Filter>Source Files\LangModels</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
