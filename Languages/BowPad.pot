@@ -2470,6 +2470,10 @@ msgstr ""
 msgid "checks for new versions of BowPad once a week"
 msgstr ""
 
+#. Resource IDs: (278)
+msgid "click to copy to clipboard"
+msgstr ""
+
 #. Resource IDs: (60643, 60644)
 msgid "configure advanced settings"
 msgstr ""
