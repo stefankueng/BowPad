@@ -1,16 +1,20 @@
 ﻿// dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
+
+#include <comutil.h>
 #include <wrl/module.h>
 #include <wrl/implements.h>
 #include <wrl/client.h>
 #include <shobjidl_core.h>
 #include <wil\resource.h>
 #include <shellapi.h>
+#include <Shlobj.h>
 #include <string>
 #include <vector>
 #include <sstream>
 
 #pragma comment(lib, "Shell32.lib")
+#pragma comment(lib, "comsupp.lib")
 
 using namespace Microsoft::WRL;
 
@@ -34,15 +38,15 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
 // These variables are not exposed as any path name handling probably
 // should be a function in here rather than be manipulating strings directly / inline.
-const wchar_t thisOsPathSeparator  = L'\\';
-const wchar_t otherOsPathSeparator = L'/';
-const wchar_t DeviceSeparator      = L':';
+constexpr wchar_t thisOsPathSeparator  = L'\\';
+constexpr wchar_t otherOsPathSeparator = L'/';
+constexpr wchar_t DeviceSeparator      = L':';
 
 // Check if the character given is either type of folder separator.
 // if we want to remove support for "other"separators we can just
 // change this function and force callers to use NormalizeFolderSeparators on
 // filenames first at first point of entry into a program.
-inline bool   IsFolderSeparator(wchar_t c)
+inline bool       IsFolderSeparator(wchar_t c)
 {
     return (c == thisOsPathSeparator || c == otherOsPathSeparator);
 }
@@ -307,16 +311,69 @@ public:
                         std::wstring path = L"/path:\"";
                         path += itemName;
                         path += L"\"";
-                        SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
-
-                        shExecInfo.hwnd             = nullptr;
-                        shExecInfo.lpVerb           = L"open";
-                        shExecInfo.lpFile           = bpPath.c_str();
-                        shExecInfo.lpParameters     = path.c_str();
-                        shExecInfo.nShow            = SW_NORMAL;
-                        ShellExecuteEx(&shExecInfo);
-
                         CoTaskMemFree(itemName);
+
+                        // try to launch the exe with the explorer instance:
+                        // this avoids that the exe is started with the identity of this dll,
+                        // starting it as if it was started the normal way.
+                        bool                     execSucceeded = false;
+                        ComPtr<IServiceProvider> serviceProvider;
+                        if (SUCCEEDED(m_site.As(&serviceProvider)))
+                        {
+                            OutputDebugString(L"got IServiceProvider");
+                            ComPtr<IShellBrowser> shellBrowser;
+                            if (SUCCEEDED(serviceProvider->QueryService(SID_SShellBrowser, IID_IShellBrowser, &shellBrowser)))
+                            {
+                                OutputDebugString(L"got IShellBrowser");
+                                ComPtr<IShellView> shellView;
+                                if (SUCCEEDED(shellBrowser->QueryActiveShellView(&shellView)))
+                                {
+                                    OutputDebugString(L"got IShellView");
+                                    ComPtr<IDispatch> spdispView;
+                                    if (SUCCEEDED(shellView->GetItemObject(SVGIO_BACKGROUND, IID_PPV_ARGS(&spdispView))))
+                                    {
+                                        OutputDebugString(L"got IDispatch");
+                                        ComPtr<IShellFolderViewDual> spFolderView;
+                                        if (SUCCEEDED(spdispView.As(&spFolderView)))
+                                        {
+                                            OutputDebugString(L"got IShellFolderViewDual");
+                                            ComPtr<IDispatch> spdispShell;
+                                            if (SUCCEEDED(spFolderView->get_Application(&spdispShell)))
+                                            {
+                                                ComPtr<IShellDispatch2> spdispShell2;
+                                                if (SUCCEEDED(spdispShell.As(&spdispShell2)))
+                                                {
+                                                    // without this, the launched app is not moved to the foreground
+                                                    AllowSetForegroundWindow(ASFW_ANY);
+
+                                                    if (SUCCEEDED(spdispShell2->ShellExecute(_bstr_t{bpPath.c_str()},
+                                                                                             _variant_t{path.c_str()},
+                                                                                             _variant_t{L""},
+                                                                                             _variant_t{L"open"},
+                                                                                             _variant_t{SW_NORMAL})))
+                                                    {
+                                                        execSucceeded = true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (!execSucceeded)
+                        {
+                            // just in case the shell execute with explorer failed
+                            SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
+
+                            shExecInfo.hwnd             = nullptr;
+                            shExecInfo.lpVerb           = L"open";
+                            shExecInfo.lpFile           = bpPath.c_str();
+                            shExecInfo.lpParameters     = path.c_str();
+                            shExecInfo.nShow            = SW_NORMAL;
+                            ShellExecuteEx(&shExecInfo);
+                        }
                     }
                 }
             }
