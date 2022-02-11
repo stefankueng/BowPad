@@ -240,6 +240,9 @@
     <ClInclude Include="include\ScintillaCall.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
+    <ClInclude Include="win32\WinTypes.h">
+      <Filter>Scintilla\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lexilla\lexers\LexSQL.cxx">
@@ -736,6 +739,12 @@
     </ClCompile>
     <ClCompile Include="call\ScintillaCall.cxx">
       <Filter>Scintilla\call</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lexilla\lexers\LexAsciidoc.cxx">
+      <Filter>Lexilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lexilla\lexers\LexGDScript.cxx">
+      <Filter>Lexilla\lexers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

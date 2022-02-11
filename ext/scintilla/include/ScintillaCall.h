@@ -682,6 +682,8 @@ public:
 	Position IndicatorEnd(int indicator, Position pos);
 	void SetPositionCache(int size);
 	int PositionCache();
+	void SetLayoutThreads(int threads);
+	int LayoutThreads();
 	void CopyAllowLine();
 	void *CharacterPointer();
 	void *RangePointer(Position start, Position lengthRange);
@@ -854,7 +856,7 @@ public:
 	std::string DescribeProperty(const char *name);
 	int DescribeKeyWordSets(char *descriptions);
 	std::string DescribeKeyWordSets();
-	int LineEndTypesSupported();
+	Scintilla::LineEndType LineEndTypesSupported();
 	int AllocateSubStyles(int styleBase, int numberStyles);
 	int SubStylesStart(int styleBase);
 	int SubStylesLength(int styleBase);

@@ -112,14 +112,16 @@ COMPONENT_OBJS = \
 	$(DIR_O)\HanjaDic.obj \
 	$(DIR_O)\PlatWin.obj \
 	$(DIR_O)\ScintillaBase.obj \
-	$(DIR_O)\ScintillaDLL.obj \
 	$(DIR_O)\ScintillaWin.obj \
 	$(SRC_OBJS)
+
+SHARED_OBJS = \
+	$(DIR_O)\ScintillaDLL.obj
 
 $(DIR_O)\ScintRes.res : ScintRes.rc
 	$(RC) -fo$@ $**
 
-$(COMPONENT): $(COMPONENT_OBJS) $(DIR_O)\ScintRes.res
+$(COMPONENT): $(COMPONENT_OBJS) $(SHARED_OBJS) $(DIR_O)\ScintRes.res
 	$(LD) $(LDFLAGS) -DEF:Scintilla.def -DLL -OUT:$@ $** $(LIBS)
 
 $(LIBSCI): $(COMPONENT_OBJS)
@@ -136,7 +138,7 @@ $(LIBSCI): $(COMPONENT_OBJS)
 
 !IF EXISTS(nmdeps.mak)
 
-# Protect with !IF EXISTS to handle accidental deletion - just 'nmake -f scintilla.mak deps'
+# Protect with !IF EXISTS to handle accidental deletion - just 'nmake -f scintilla.mak depend'
 
 !INCLUDE nmdeps.mak
 

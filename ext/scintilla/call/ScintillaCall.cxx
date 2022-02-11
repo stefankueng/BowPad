@@ -2568,6 +2568,14 @@ int ScintillaCall::PositionCache() {
 	return static_cast<int>(Call(Message::GetPositionCache));
 }
 
+void ScintillaCall::SetLayoutThreads(int threads) {
+	Call(Message::SetLayoutThreads, threads);
+}
+
+int ScintillaCall::LayoutThreads() {
+	return static_cast<int>(Call(Message::GetLayoutThreads));
+}
+
 void ScintillaCall::CopyAllowLine() {
 	Call(Message::CopyAllowLine);
 }
@@ -3256,8 +3264,8 @@ std::string ScintillaCall::DescribeKeyWordSets() {
 	return CallReturnString(Message::DescribeKeyWordSets, 0);
 }
 
-int ScintillaCall::LineEndTypesSupported() {
-	return static_cast<int>(Call(Message::GetLineEndTypesSupported));
+LineEndType ScintillaCall::LineEndTypesSupported() {
+	return static_cast<Scintilla::LineEndType>(Call(Message::GetLineEndTypesSupported));
 }
 
 int ScintillaCall::AllocateSubStyles(int styleBase, int numberStyles) {

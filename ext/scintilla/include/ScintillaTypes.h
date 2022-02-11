@@ -439,6 +439,7 @@ enum class CaretStyle {
 	Block = 2,
 	OverstrikeBar = 0,
 	OverstrikeBlock = 0x10,
+	Curses = 0x20,
 	InsMask = 0xF,
 	BlockAfter = 0x100,
 };
@@ -506,6 +507,7 @@ enum class Supports {
 	FractionalStrokeWidth = 2,
 	TranslucentStroke = 3,
 	PixelModification = 4,
+	ThreadSafeMeasureWidths = 5,
 };
 
 enum class LineCharacterIndexType {
