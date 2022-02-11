@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2021 - Stefan Kueng
+// Copyright (C) 2013-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -167,6 +167,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
                                 Scintilla::ModificationFlags::ChangeStyle);
     bool bUseD2D = CIniSettings::Instance().GetInt64(L"View", L"d2d", 1) != 0;
     m_scintilla.SetTechnology(bUseD2D ? Scintilla::Technology::DirectWriteRetain : Scintilla::Technology::Default);
+    m_scintilla.SetLayoutThreads(1000);
 
     m_scintilla.SetMarginMaskN(SC_MARGE_FOLDER, SC_MASK_FOLDERS);
     m_scintilla.SetMarginWidthN(SC_MARGE_FOLDER, CDPIAware::Instance().Scale(*this, 14));
