@@ -320,23 +320,18 @@ public:
                         ComPtr<IServiceProvider> serviceProvider;
                         if (SUCCEEDED(m_site.As(&serviceProvider)))
                         {
-                            OutputDebugString(L"got IServiceProvider");
                             ComPtr<IShellBrowser> shellBrowser;
                             if (SUCCEEDED(serviceProvider->QueryService(SID_SShellBrowser, IID_IShellBrowser, &shellBrowser)))
                             {
-                                OutputDebugString(L"got IShellBrowser");
                                 ComPtr<IShellView> shellView;
                                 if (SUCCEEDED(shellBrowser->QueryActiveShellView(&shellView)))
                                 {
-                                    OutputDebugString(L"got IShellView");
                                     ComPtr<IDispatch> spdispView;
                                     if (SUCCEEDED(shellView->GetItemObject(SVGIO_BACKGROUND, IID_PPV_ARGS(&spdispView))))
                                     {
-                                        OutputDebugString(L"got IDispatch");
                                         ComPtr<IShellFolderViewDual> spFolderView;
                                         if (SUCCEEDED(spdispView.As(&spFolderView)))
                                         {
-                                            OutputDebugString(L"got IShellFolderViewDual");
                                             ComPtr<IDispatch> spdispShell;
                                             if (SUCCEEDED(spFolderView->get_Application(&spdispShell)))
                                             {
