@@ -8,3 +8,4 @@ ro
 ru
 sv
 zh-CN
+ko
