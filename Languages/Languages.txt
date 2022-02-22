@@ -2,6 +2,7 @@ de
 fr
 it
 ja
+ko
 pt-br
 pt-pt
 ro
