@@ -1395,7 +1395,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
 
     auto sSelText   = m_scintilla.GetSelText();
     auto selTextLen = sSelText.size();
-    if ((selTextLen <= 1) || (clear)) // Includes zero terminator so 1 means 0.
+    if ((selTextLen == 0) || (clear))
     {
         lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
@@ -1454,12 +1454,12 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     {
         // don't style the selected text itself
         if (selStartPos != static_cast<sptr_t>(startStylePos + (startPos - textBuffer.get())))
-            m_scintilla.IndicatorFillRange(startStylePos + (startPos - textBuffer.get()), selTextLen - 1);
+            m_scintilla.IndicatorFillRange(startStylePos + (startPos - textBuffer.get()), selTextLen);
         startPos = strstr(startPos + 1, origSelText.c_str());
     }
 
     auto lineCount = m_scintilla.LineCount();
-    if ((selTextLen > 2) || (lineCount < 100000))
+    if ((selTextLen > 1) || (lineCount < 100000))
     {
         auto selTextDifferent = lastSelText.compare(origSelText.c_str());
         if (selTextDifferent || (lastStopPosition != 0) || edit)
