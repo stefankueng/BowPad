@@ -92,6 +92,7 @@ constexpr size_t              URL_REG_EXPR_LENGTH                = _countof(URL_
 constexpr int                 TIMER_UPDATECHECK                  = 101;
 constexpr int                 TIMER_SELCHANGE                    = 102;
 constexpr int                 TIMER_CHECKLINES                   = 103;
+constexpr int                 TIMER_DWELLEND                     = 104;
 
 ResponseToOutsideModifiedFile responseToOutsideModifiedFile      = ResponseToOutsideModifiedFile::Reload;
 BOOL                          responseToOutsideModifiedFileDoAll = FALSE;
@@ -851,6 +852,47 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     }
                 }
                 break;
+                case TIMER_DWELLEND:
+                {
+                    KillTimer(*this, TIMER_DWELLEND);
+
+                    if (m_editor.Scintilla().CallTipActive())
+                    {
+                        EnumThreadWindows(
+                            GetCurrentThreadId(),
+                            [](HWND hWnd, LPARAM lParam) -> BOOL {
+                                wchar_t szClassName[100]{};
+                                GetClassName(hWnd, szClassName, _countof(szClassName));
+                                if (wcscmp(szClassName, L"CallTip") == 0)
+                                {
+                                    auto  msgPos = GetMessagePos();
+                                    POINT pt     = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
+                                    RECT  rc{};
+                                    GetWindowRect(hWnd, &rc);
+                                    if (!PtInRect(&rc, pt))
+                                    {
+                                        auto pThis = reinterpret_cast<CMainWindow*>(lParam);
+                                        pThis->m_editor.Scintilla().CallTipCancel();
+                                    }
+                                    return FALSE;
+                                }
+                                return TRUE;
+                            },
+                            reinterpret_cast<LPARAM>(this));
+                    }
+                    auto  msgPos = GetMessagePos();
+                    POINT pt     = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
+                    RECT  rc{};
+                    GetWindowRect(m_custToolTip, &rc);
+                    if (!PtInRect(&rc, pt) || !IsWindowVisible(m_custToolTip))
+                    {
+                        m_custToolTip.HideTip();
+                        m_dwellStartPos = -1;
+                    }
+                    if (IsWindowVisible(m_custToolTip) || m_editor.Scintilla().CallTipActive())
+                        SetTimer(*this, TIMER_DWELLEND, 300, nullptr);
+                }
+                break;
                 default:
                     break;
             }
@@ -1153,24 +1195,10 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
             break;
         case SCN_DWELLSTART:
             m_dwellStartPos = scn.position;
-            HandleDwellStart(scn, true);
+            HandleDwellStart(scn);
             break;
         case SCN_DWELLEND:
-            if ((scn.position >= 0) && m_editor.Scintilla().CallTipActive())
-                HandleDwellStart(scn, false);
-            else
-            {
-                m_editor.Scintilla().CallTipCancel();
-                auto  msgPos = GetMessagePos();
-                POINT pt     = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
-                RECT  rc{};
-                GetWindowRect(m_custToolTip, &rc);
-                if (!PtInRect(&rc, pt) || !IsWindowVisible(m_custToolTip))
-                {
-                    m_custToolTip.HideTip();
-                    m_dwellStartPos = -1;
-                }
-            }
+            SetTimer(*this, TIMER_DWELLEND, 300, nullptr);
             break;
         case SCN_CALLTIPCLICK:
             OpenUrlAtPos(m_dwellStartPos);
@@ -2851,10 +2879,10 @@ void CMainWindow::PasteHistory()
 // Show Tool Tips and colors for colors and numbers and their
 // conversions to hex octal etc.
 // e.g. 0xF0F hex == 3855 decimal == 07417 octal.
-void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
+void CMainWindow::HandleDwellStart(const SCNotification& scn)
 {
     // Note style will be zero if no style or past end of the document.
-    if ((scn.position >= 0) && (!start || m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, scn.position)))
+    if ((scn.position >= 0) && (m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, scn.position)))
     {
         static int lastDwellPosX = -1;
         static int lastDwellPosY = -1;
@@ -2864,7 +2892,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
         auto       startPos      = scn.position;
         auto       endPos        = scn.position;
         auto       lineStartPos  = m_editor.Scintilla().PositionFromPoint(0, scn.y);
-        if (!start && !m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, startPos))
+        if (!m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, startPos))
         {
             startPos     = m_editor.Scintilla().PositionFromPoint(scn.x, scn.y + pixelMargin);
             endPos       = startPos;
@@ -2895,29 +2923,8 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
             lineLength = max(lineLength, part.size());
         auto cursorPos = m_editor.Scintilla().PositionFromPoint(scn.x, scn.y);
         auto tipPos    = cursorPos - static_cast<sptr_t>(lineLength) / 2;
-        if (m_editor.Scintilla().CallTipActive())
-        {
-            auto linePos = m_editor.Scintilla().LineFromPosition(scn.position);
-            auto upPos   = m_editor.Scintilla().LineFromPosition(m_editor.Scintilla().PositionFromPoint(0, scn.y + pixelMargin));
-            if (upPos < linePos)
-            {
-                m_editor.Scintilla().CallTipCancel();
-                lastDwellPosX = -1;
-                lastDwellPosY = -1;
-                return;
-            }
-            else if (upPos == linePos)
-                return;
-        }
-        tipPos = max(lineStartPos, tipPos);
+        tipPos         = max(lineStartPos, tipPos);
         if (m_editor.Scintilla().CallTipActive() && m_editor.Scintilla().CallTipPosStart() == tipPos)
-            return;
-        auto lineHeight = m_editor.Scintilla().TextHeight(0);
-        if (lastDwellPosX >= 0 && lastDwellPosY >= 0 &&
-            std::abs(lastDwellPosX - scn.x) < lineHeight &&
-            (lastDwellPosY - scn.y) < lineHeight)
-            return;
-        if (!start && !m_editor.Scintilla().CallTipActive())
             return;
         lastDwellPosX = scn.x;
         lastDwellPosY = scn.y;
@@ -2925,6 +2932,13 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
         return;
     }
 
+    auto getPos = [&]() -> POINT {
+        auto  msgPos     = GetMessagePos();
+        POINT pt         = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
+        auto  lineHeight = m_editor.Scintilla().TextHeight(0);
+        pt.y -= lineHeight;
+        return pt;
+    };
     // try the users real selection first
     std::string sWord    = m_editor.GetSelectedText();
     auto        selStart = m_editor.Scintilla().SelectionStart();
@@ -2977,8 +2991,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
                 L"RGB(%d, %d, %d)\nHex: 0x%06lX",
                 GetRValue(color), GetGValue(color), GetBValue(color), static_cast<DWORD>(color));
             auto  sCallTip = copyTip;
-            auto  msgPos   = GetMessagePos();
-            POINT pt       = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
+            POINT pt       = getPos();
             m_custToolTip.ShowTip(pt, sCallTip, &color, copyTip);
             return;
         }
@@ -3024,8 +3037,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
                 r, g, b, GetRValue(color), GetGValue(color), GetBValue(color), color);
             auto  sCallTip = copyTip;
 
-            auto  msgPos   = GetMessagePos();
-            POINT pt       = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
+            POINT pt       = getPos();
             m_custToolTip.ShowTip(pt, sCallTip, &color, copyTip);
             return;
         }
@@ -3070,8 +3082,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
                 pColor = &color;
             }
         }
-        auto  msgPos = GetMessagePos();
-        POINT pt     = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
+        POINT pt = getPos();
         m_custToolTip.ShowTip(pt, sCallTip, pColor, copyTip);
         return;
     }
@@ -3095,8 +3106,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn, bool start)
                                              sWord.c_str(), exprValue, ulongVal, ulongVal, ulongVal);
         auto      copyTip  = CStringUtils::Format(L"Val: %f\nDec: %lld\nHex: 0x%llX\nOct: %#llo",
                                             exprValue, ulongVal, ulongVal, ulongVal);
-        auto      msgPos   = GetMessagePos();
-        POINT     pt       = {GET_X_LPARAM(msgPos), GET_Y_LPARAM(msgPos)};
+        POINT     pt       = getPos();
         m_custToolTip.ShowTip(pt, sCallTip, nullptr, copyTip);
     }
 }
