@@ -474,7 +474,6 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             // draw the rest of the border
             GetClientRect(*this, &dis.rcItem);
             auto rPage   = dis.rcItem;
-            auto rClient = dis.rcItem;
             TabCtrl_AdjustRect(*this, FALSE, &rPage);
             dis.rcItem.top = rPage.top - CDPIAware::Instance().Scale(*this, 2);
 
