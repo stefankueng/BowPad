@@ -1810,10 +1810,10 @@ void CMainWindow::ResizeChildWindows()
         // TabCtrl_GetItemRect will return FALSE but the tabrc rect still has
         // the height data filled in.
         // And we only use the height, so it makes no difference.
-        RECT           tabrc{};
-        TabCtrl_GetItemRect(m_tabBar, 0, &tabrc);
-        MapWindowPoints(m_tabBar, *this, reinterpret_cast<LPPOINT>(&tabrc), 2);
-        const int tbHeight    = tabrc.bottom - tabrc.top;
+        RECT           tabRc{};
+        TabCtrl_GetItemRect(m_tabBar, 0, &tabRc);
+        MapWindowPoints(m_tabBar, *this, reinterpret_cast<LPPOINT>(&tabRc), 2);
+        const int tbHeight    = tabRc.bottom - tabRc.top;
         const int tabBtnWidth = tbHeight + CDPIAware::Instance().Scale(*this, 2);
         const int treeWidth   = m_fileTreeVisible ? m_treeWidth : 0;
         const int mainWidth   = rect.right - rect.left;
@@ -1821,7 +1821,7 @@ void CMainWindow::ResizeChildWindows()
 
         HDWP      hDwp        = BeginDeferWindowPos(7);
         DeferWindowPos(hDwp, m_statusBar, nullptr, rect.left, rect.bottom - m_statusBar.GetHeight(), mainWidth, m_statusBar.GetHeight(), flags);
-        DeferWindowPos(hDwp, m_tabBar, nullptr, treeWidth + rect.left, rect.top + m_ribbonHeight, mainWidth - treeWidth - (3 * (tabBtnWidth + btnMargin)), rect.bottom - rect.top, flags);
+        DeferWindowPos(hDwp, m_tabBar, nullptr, treeWidth + rect.left, rect.top + m_ribbonHeight, mainWidth - treeWidth - (3 * (tabBtnWidth + btnMargin)) - btnMargin, rect.bottom - rect.top, flags);
         DeferWindowPos(hDwp, m_tablistBtn, nullptr, mainWidth - (3 * (tabBtnWidth + btnMargin)), rect.top + m_ribbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_newTabBtn, nullptr, mainWidth - (2 * (tabBtnWidth + btnMargin)), rect.top + m_ribbonHeight, tabBtnWidth, tbHeight, flags);
         DeferWindowPos(hDwp, m_closeTabBtn, nullptr, mainWidth - tabBtnWidth - btnMargin, rect.top + m_ribbonHeight, tabBtnWidth, tbHeight, flags);
