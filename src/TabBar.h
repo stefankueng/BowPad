@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -113,6 +113,7 @@ public:
 
 protected:
     static LRESULT CALLBACK TabBar_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+    static LRESULT CALLBACK TabBarSpin_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
     void                    ExchangeItemData(POINT point);
     LRESULT                 RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
     COLORREF                GetTabColor(UINT item) const;
@@ -123,36 +124,41 @@ protected:
     int                     GetTabIndexAt(int x, int y) const;
     bool                    IsPointInParentZone(POINT screenPoint) const;
     void                    NotifyTabDelete(int tab);
+    void                    SubclassSpinBox();
 
 private:
-    int   m_nItems;
-    bool  m_bHasImgList;
-    HFONT m_hFont;
-    HFONT m_hBoldFont;
-    HFONT m_hSymbolFont;
-    HFONT m_hSymbolBoldFont;
-    int   m_tabID;
+    int                              m_nItems;
+    bool                             m_bHasImgList;
+    HFONT                            m_hFont;
+    HFONT                            m_hBoldFont;
+    HFONT                            m_hSymbolFont;
+    HFONT                            m_hSymbolBoldFont;
+    int                              m_tabID;
 
-    int m_ctrlID;
+    int                              m_ctrlID;
 
-    bool    m_bIsDragging;
-    bool    m_bIsDraggingInside;
-    int     m_nSrcTab;
-    int     m_nTabDragged;
-    POINT   m_draggingPoint; // screen coordinates
-    WNDPROC m_tabBarDefaultProc;
+    bool                             m_bIsDragging;
+    bool                             m_bIsDraggingInside;
+    int                              m_nSrcTab;
+    int                              m_nTabDragged;
+    POINT                            m_draggingPoint; // screen coordinates
+    WNDPROC                          m_tabBarDefaultProc;
+    WNDPROC                          m_tabBarSpinDefaultProc;
+    HWND                             m_spin;
 
-    RECT m_currentHoverTabRect;
-    int  m_currentHoverTabItem;
+    RECT                             m_currentHoverTabRect;
+    int                              m_currentHoverTabItem;
 
-    CloseButtonZone m_closeButtonZone;
-    bool            m_bIsCloseHover;
-    int             m_whichCloseClickDown;
-    bool            m_lmbdHit; // Left Mouse Button Down Hit
-    wchar_t         m_closeChar;
-    wchar_t         m_modifiedChar;
+    CloseButtonZone                  m_closeButtonZone;
+    bool                             m_bIsCloseHover;
+    int                              m_whichCloseClickDown;
+    bool                             m_lmbdHit; // Left Mouse Button Down Hit
+    wchar_t                          m_closeChar;
+    wchar_t                          m_modifiedChar;
 
     std::map<int, AnimationVariable> m_animVars;
+    AnimationVariable                m_animVarRight;
+    AnimationVariable                m_animVarLeft;
 
-    ULONG_PTR gdiplusToken;
+    ULONG_PTR                        gdiplusToken;
 };
