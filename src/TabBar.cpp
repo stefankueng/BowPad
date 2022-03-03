@@ -473,7 +473,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             // draw the rest of the border
             GetClientRect(*this, &dis.rcItem);
-            auto rPage   = dis.rcItem;
+            auto rPage = dis.rcItem;
             TabCtrl_AdjustRect(*this, FALSE, &rPage);
             dis.rcItem.top = rPage.top - CDPIAware::Instance().Scale(*this, 2);
 
@@ -500,7 +500,11 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                     APPVERIFY(got);
                     if (got)
                     {
-                        DrawItem(&dis, static_cast<float>(Animator::GetValue(m_animVars[GetIDFromIndex(nTab).GetValue()])));
+                        if (dis.rcItem.left < rPage.right && dis.rcItem.right > 0)
+                        {
+                            dis.rcItem.right = min(dis.rcItem.right, rPage.right);
+                            DrawItem(&dis, static_cast<float>(Animator::GetValue(m_animVars[GetIDFromIndex(nTab).GetValue()])));
+                        }
                     }
                 }
             }
@@ -516,7 +520,11 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                 APPVERIFY(got);
                 if (got)
                 {
-                    DrawItem(&dis, static_cast<float>(Animator::GetValue(m_animVars[GetIDFromIndex(nSel).GetValue()])));
+                    if (dis.rcItem.left < rPage.right && dis.rcItem.right > 0)
+                    {
+                        dis.rcItem.right = min(dis.rcItem.right, rPage.right);
+                        DrawItem(&dis, static_cast<float>(Animator::GetValue(m_animVars[GetIDFromIndex(nSel).GetValue()])));
+                    }
                 }
             }
 
