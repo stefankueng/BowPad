@@ -1294,12 +1294,22 @@ LRESULT CTabBar::TabBarSpin_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             xPos                = rcPaint.right - (rcPaint.right - rcPaint.left) / 2;
             POINT  rightArrow[] = {{xPos + xMargin, mPos + sizeY}, {xPos + xMargin, mPos - sizeY}, {xPos + size, mPos}};
             HBRUSH hbr          = CreateSolidBrush(CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_WINDOWTEXT)));
-            auto   oldBrush     = SelectObject(hdc, hbr);
-            if (drawLeft)
-                Polygon(hdc, leftArrow, _countof(leftArrow));
-            if (drawRight)
-                Polygon(hdc, rightArrow, _countof(rightArrow));
+            auto   grayClr      = GetSysColor(COLOR_GRAYTEXT);
+            if (isDark)
+                grayClr = GDIHelpers::Darker(grayClr, 0.7f);
+            else
+                grayClr = GDIHelpers::Lighter(grayClr, 1.5f);
+            HPEN   hPen         = CreatePen(PS_SOLID, 1, grayClr);
+            HBRUSH hbrGray  = CreateSolidBrush(grayClr);
+            auto   oldPen       = SelectObject(hdc, hPen);
+            auto   oldBrush = SelectObject(hdc, drawLeft ? hbr : hbrGray);
+            Polygon(hdc, leftArrow, _countof(leftArrow));
+            oldBrush = SelectObject(hdc, drawRight ? hbr : hbrGray);
+            Polygon(hdc, rightArrow, _countof(rightArrow));
             SelectObject(hdc, oldBrush);
+            SelectObject(hdc, oldPen);
+            DeleteObject(hPen);
+            DeleteObject(hbrGray);
             DeleteObject(hbr);
             EndPaint(hwnd, &ps);
             return FALSE;
