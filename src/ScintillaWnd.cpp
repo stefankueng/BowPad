@@ -595,6 +595,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                 scn.modificationType    = uMsg;
                 scn.nmhdr.hwndFrom      = *this;
                 scn.nmhdr.idFrom        = ::GetDlgCtrlID(*this);
+                scn.wParam              = wParam;
+                scn.lParam              = lParam;
                 if (GetKeyState(VK_SHIFT) & 0x8000)
                     scn.modifiers |= SCMOD_SHIFT;
                 if (GetKeyState(VK_CONTROL) & 0x8000)
