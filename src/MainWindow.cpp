@@ -3136,21 +3136,36 @@ void CMainWindow::HandleGetDispInfo(int tab, LPNMTTDISPINFO lpNmtdi)
 
 LPARAM CMainWindow::HandleMouseMsg(const SCNotification& scn)
 {
-    if (scn.modifiers & SCMOD_CTRL)
+    switch (scn.modificationType)
     {
-        if (scn.modificationType == WM_LBUTTONDOWN)
+        case WM_LBUTTONDOWN:
         {
-            if (m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, scn.position))
+            if (scn.modifiers & SCMOD_CTRL)
             {
-                OpenUrlAtPos(scn.position);
-                return FALSE;
+                if (m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, scn.position))
+                {
+                    OpenUrlAtPos(scn.position);
+                    return FALSE;
+                }
+            }
+            SendMessage(*this, WM_TIMER, TIMER_DWELLEND, 0);
+        }
+        break;
+        case WM_MOUSEWHEEL:
+        {
+            if (scn.modifiers == SCMOD_SHIFT)
+            {
+                SendMessage(m_editor, WM_HSCROLL, GET_WHEEL_DELTA_WPARAM(scn.wParam) < 0 ? SB_LINERIGHT : SB_LINELEFT, 0);
+                SendMessage(m_editor, WM_HSCROLL, GET_WHEEL_DELTA_WPARAM(scn.wParam) < 0 ? SB_LINERIGHT : SB_LINELEFT, 0);
+                SendMessage(m_editor, WM_HSCROLL, GET_WHEEL_DELTA_WPARAM(scn.wParam) < 0 ? SB_LINERIGHT : SB_LINELEFT, 0);
+                return TRUE;
             }
         }
+        break;
+        default:
+            break;
     }
-    if (scn.modificationType == WM_LBUTTONDOWN)
-    {
-        SendMessage(*this, WM_TIMER, TIMER_DWELLEND, 0);
-    }
+
     return TRUE;
 }
 
