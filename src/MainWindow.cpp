@@ -3147,6 +3147,10 @@ LPARAM CMainWindow::HandleMouseMsg(const SCNotification& scn)
             }
         }
     }
+    if (scn.modificationType == WM_LBUTTONDOWN)
+    {
+        SendMessage(*this, WM_TIMER, TIMER_DWELLEND, 0);
+    }
     return TRUE;
 }
 
