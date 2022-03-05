@@ -1,9 +1,8 @@
 # BowPad
 A simple and fast text editor with a ribbon UI
 
-[![Build Status](https://dev.azure.com/tortoisesvn/tortoisesvnGitHub/_apis/build/status/stefankueng.BowPad?branchName=main)](https://dev.azure.com/tortoisesvn/tortoisesvnGitHub/_build/latest?definitionId=5&branchName=main)
+[![Build](https://github.com/stefankueng/BowPad/actions/workflows/msbuild.yml/badge.svg)](https://github.com/stefankueng/BowPad/actions/workflows/msbuild.yml)
 
-[![CodeQL](https://github.com/stefankueng/BowPad/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/stefankueng/BowPad/actions/workflows/codeql-analysis.yml)
 
 A few notable features of BowPad:
 
