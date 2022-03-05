@@ -50,7 +50,6 @@ jobs:
       with:
           name: BowPad-x64
           path: bin/Release64/bin/BowPad.exe
-          target: latest
 
     - name: Build ARM64
       working-directory: ${{env.GITHUB_WORKSPACE}}
@@ -60,4 +59,3 @@ jobs:
       with:
           name: BowPad-ARM64
           path: bin/ReleaseARM64/bin/BowPad.exe
-          target: latest
