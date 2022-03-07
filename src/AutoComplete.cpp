@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2021 - Stefan Kueng
+// Copyright (C) 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,12 +29,13 @@
 #include "Theme.h"
 #include "DarkModeHelper.h"
 #include "LexStyles.h"
+#include "../ext/tinyexpr/tinyexpr.h"
 
 #include <chrono>
 
 constexpr int fullSnippetPosId = 9999;
 
-static HICON LoadIconEx(HINSTANCE hInstance, LPCWSTR lpIconName, int iconWidth, int iconHeight)
+static HICON  LoadIconEx(HINSTANCE hInstance, LPCWSTR lpIconName, int iconWidth, int iconHeight)
 {
     // the docs for LoadIconWithScaleDown don't mention that a size of 0 will
     // use the default system icon size like for e.g. LoadImage or LoadIcon.
@@ -78,10 +79,10 @@ static std::unique_ptr<UINT[]> Icon2Image(HICON hIcon)
     infoHeader.bmiHeader.biCompression = BI_RGB;
     infoHeader.bmiHeader.biSizeImage   = size;
 
-    auto   ptrb          = std::make_unique<BYTE[]>(2LL * size + 4LL * height * width);
-    LPBYTE pixelsIconRGB = ptrb.get();
-    LPBYTE alphaPixels   = pixelsIconRGB + size;
-    HDC    hDC           = CreateCompatibleDC(nullptr);
+    auto   ptrb                        = std::make_unique<BYTE[]>(2LL * size + 4LL * height * width);
+    LPBYTE pixelsIconRGB               = ptrb.get();
+    LPBYTE alphaPixels                 = pixelsIconRGB + size;
+    HDC    hDC                         = CreateCompatibleDC(nullptr);
     OnOutOfScope(DeleteDC(hDC));
     HBITMAP hBmpOld = static_cast<HBITMAP>(SelectObject(hDC, static_cast<HGDIOBJ>(iconInfo.hbmColor)));
     if (!GetDIBits(hDC, iconInfo.hbmColor, 0, height, static_cast<LPVOID>(pixelsIconRGB), &infoHeader, DIB_RGB_COLORS))
@@ -200,8 +201,8 @@ void CAutoComplete::Init()
 
     std::vector<std::unique_ptr<CSimpleIni>> iniFiles;
 
-    DWORD       resLen  = 0;
-    const char* resData = CAppUtils::GetResourceData(L"config", IDR_AUTOCOMPLETE, resLen);
+    DWORD                                    resLen  = 0;
+    const char*                              resData = CAppUtils::GetResourceData(L"config", IDR_AUTOCOMPLETE, resLen);
     if (resData != nullptr && resLen)
     {
         iniFiles.push_back(std::make_unique<CSimpleIni>());
@@ -365,7 +366,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                             indentToStart();
                                         lastWasNewLine = false;
 
-                                        char text[] = {c, 0};
+                                        char text[]    = {c, 0};
                                         m_editor->Scintilla().ReplaceSel(text);
                                     }
                                     else if (c == '\t')
@@ -391,7 +392,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                             indentToStart();
                                         lastWasNewLine = false;
 
-                                        char text[] = {c, 0};
+                                        char text[]    = {c, 0};
                                         m_editor->Scintilla().ReplaceSel(text);
                                     }
                                 }
@@ -399,7 +400,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                                 lastC  = c;
                             }
                             m_snippetPositions[fullSnippetPosId].push_back(m_editor->Scintilla().CurrentPos());
-                            if (m_snippetPositions.find(0) == m_snippetPositions.end())
+                            if (!m_snippetPositions.contains(0))
                             {
                                 auto pos0 = m_editor->Scintilla().CurrentPos();
                                 m_snippetPositions[0].push_back(pos0);
@@ -428,7 +429,7 @@ void CAutoComplete::HandleScintillaEvents(const SCNotification* scn)
                             }
                             else if (m_snippetPositions.size() == 2)
                             {
-                                if (m_snippetPositions.find(0) != m_snippetPositions.end())
+                                if (m_snippetPositions.contains(0))
                                     m_editor->Scintilla().SetSelection(*m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
                                 ExitSnippetMode();
                             }
@@ -544,7 +545,7 @@ bool CAutoComplete::HandleChar(WPARAM wParam, LPARAM /*lParam*/)
                 m_currentSnippetPos = 1;
             else
             {
-                if (m_snippetPositions.find(0) != m_snippetPositions.end())
+                if (m_snippetPositions.contains(0))
                 {
                     if (*m_snippetPositions[0].cbegin() >= 0)
                         m_editor->Scintilla().SetSelection(*m_snippetPositions[0].cbegin(), *m_snippetPositions[0].cbegin());
@@ -644,7 +645,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
 
     if (pos != m_editor->Scintilla().WordEndPosition(pos, TRUE))
         return; // don't auto complete if we're not at the end of a word
-    auto word = m_editor->GetCurrentWord();
+    auto word        = m_editor->GetCurrentWord();
 
     // path completion: get the current line
     auto currentLine = CUnicodeUtils::StdGetUnicode(m_editor->GetCurrentLine());
@@ -662,9 +663,9 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             if (pathToMatch.ends_with(':'))
                 pathToMatch += '\\';
             SearchReplace(pathToMatch, L"/", L"\\");
-            CDirFileEnum fileFinder(pathToMatch);
-            bool         bIsDirectory;
-            std::wstring filename;
+            CDirFileEnum   fileFinder(pathToMatch);
+            bool           bIsDirectory;
+            std::wstring   filename;
 
             auto           startTime   = std::chrono::steady_clock::now();
             constexpr auto maxPathTime = std::chrono::milliseconds(400);
@@ -691,6 +692,33 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 SetWindowStylesForAutocompletionPopup();
                 return;
             }
+        }
+    }
+
+    if (scn->ch == '=')
+    {
+        auto curLine   = m_editor->GetCurrentLine();
+        curLine        = curLine.substr(0, curLine.size() - 1);
+        if (!curLine.empty())
+        {
+            int  err       = 0;
+            auto exprValue = te_interp(curLine.c_str(), &err);
+            if (err == 0 && exprValue)
+            {
+                long long ulongVal       = static_cast<long long>(exprValue);
+                auto      sValueComplete = CStringUtils::Format("%f\n%lld\n0x%llX\n%#llo",
+                                                           exprValue, ulongVal, ulongVal, ulongVal);
+
+                m_editor->Scintilla().AutoCSetAutoHide(TRUE);
+                m_editor->Scintilla().AutoCSetSeparator(static_cast<uptr_t>(wordSeparator));
+                m_editor->Scintilla().AutoCSetTypeSeparator(static_cast<uptr_t>(typeSeparator));
+                if (CTheme::Instance().IsDarkTheme())
+                    m_editor->Scintilla().AutoCSetOptions(Scintilla::AutoCompleteOption::FixedSize);
+                m_editor->Scintilla().AutoCShow(CUnicodeUtils::StdGetUTF8(rawPath).size(), sValueComplete.c_str());
+                SetWindowStylesForAutocompletionPopup();
+                return;
+            }
+            curLine = curLine.substr(1);
         }
     }
 
