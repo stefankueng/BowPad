@@ -2884,6 +2884,8 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
     // Note style will be zero if no style or past end of the document.
     if ((scn.position >= 0) && (m_editor.Scintilla().IndicatorValueAt(INDIC_URLHOTSPOT, scn.position)))
     {
+        if (CIniSettings::Instance().GetInt64(L"View", L"urltooltip", 1) == 0)
+            return;
         static int lastDwellPosX = -1;
         static int lastDwellPosY = -1;
         const int  pixelMargin   = CDPIAware::Instance().Scale(*this, 4);
@@ -2931,6 +2933,9 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
         m_editor.Scintilla().CallTipShow(tipPos, strA.c_str());
         return;
     }
+
+    if (CIniSettings::Instance().GetInt64(L"View", L"numtooltip", 1) == 0)
+        return;
 
     auto getPos = [&]() -> POINT {
         auto  msgPos     = GetMessagePos();
