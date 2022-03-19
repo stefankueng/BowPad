@@ -830,8 +830,10 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/settings.png</Image>
       </Command.SmallImages>
     </Command>
+    <Command Name="cmdEditEndOfSelectedLines" LabelTitle="Edit at end" TooltipTitle="Multi-Edit" TooltipDescription="Edit at end of selected lines">
+    </Command>
 
-    <Command Name="cmdContextMap" />
+      <Command Name="cmdContextMap" />
     <Command Name="cmdContextSpellMap" />
     <Command Name="cmdTabContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />

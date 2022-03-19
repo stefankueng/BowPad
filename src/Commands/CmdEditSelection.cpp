@@ -42,3 +42,21 @@ HRESULT CCmdEditSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
     }
     return E_NOTIMPL;
 }
+
+bool CCmdEditEndOfSelectedLines::Execute()
+{
+    auto selStart = Scintilla().SelectionStart();
+    auto selEnd = Scintilla().SelectionEnd();
+    if (selStart != selEnd)
+    {
+        auto lineStart = Scintilla().LineFromPosition(selStart);
+        auto lineEnd   = Scintilla().LineFromPosition(selEnd);
+        Scintilla().ClearSelections();
+        for (Scintilla::Line line = lineStart; line <= lineEnd; ++line)
+        {
+            auto lineEndPos = Scintilla().LineEndPosition(line);
+            Scintilla().AddSelection(lineEndPos, lineEndPos);
+        }
+    }
+    return true;
+}

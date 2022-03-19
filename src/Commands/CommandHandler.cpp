@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -192,6 +192,7 @@ void CCommandHandler::Init(void* obj)
     Add<CCmdLineDown>(obj);
     Add<CCmdSort>(obj);
     Add<CCmdEditSelection>(obj);
+    Add<CCmdEditEndOfSelectedLines>(obj);
     Add<CCmdInitFoldingMargin>(obj);
     Add<CCmdFoldingOn>(obj);
     Add<CCmdFoldingOff>(obj);
