@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2020-2021 - Stefan Kueng
+// Copyright (C) 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 
 bool CCmdEditSelection::Execute()
 {
+    GetSelectedText(SelectionHandling::CurrentWordIfSelectionIsEmptyAndSelect);
     MarkSelectedWord(false, true);
     return true;
 }
