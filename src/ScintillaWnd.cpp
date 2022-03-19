@@ -58,25 +58,25 @@ extern Lexilla::LexerModule lmSimple;
 extern Lexilla::LexerModule lmLog;
 extern Lexilla::LexerModule lmSnippets;
 
-UINT32 g_contextID = cmdContextMap;
+UINT32                      g_contextID                    = cmdContextMap;
 
-constexpr int TIM_HIDECURSOR              = 101;
-constexpr int TIM_BRACEHIGHLIGHTTEXT      = 102;
-constexpr int TIM_BRACEHIGHLIGHTTEXTCLEAR = 103;
+constexpr int               TIM_HIDECURSOR                 = 101;
+constexpr int               TIM_BRACEHIGHLIGHTTEXT         = 102;
+constexpr int               TIM_BRACEHIGHLIGHTTEXTCLEAR    = 103;
 
-static bool g_scintillaInitialized = false;
+static bool                 g_scintillaInitialized         = false;
 
-constexpr int    color_folding_fore_inactive    = 255;
-constexpr int    color_folding_back_inactive    = 220;
-constexpr int    color_folding_backsel_inactive = 150;
-constexpr int    color_folding_fore_active      = 250;
-constexpr int    color_folding_back_active      = 100;
-constexpr int    color_folding_backsel_active   = 20;
-constexpr int    color_linenr_inactive          = 109;
-constexpr int    color_linenr_active            = 60;
-constexpr double folding_color_animation_time   = 0.3;
+constexpr int               color_folding_fore_inactive    = 255;
+constexpr int               color_folding_back_inactive    = 220;
+constexpr int               color_folding_backsel_inactive = 150;
+constexpr int               color_folding_fore_active      = 250;
+constexpr int               color_folding_back_active      = 100;
+constexpr int               color_folding_backsel_active   = 20;
+constexpr int               color_linenr_inactive          = 109;
+constexpr int               color_linenr_active            = 60;
+constexpr double            folding_color_animation_time   = 0.3;
 
-COLORREF toRgba(COLORREF c, BYTE alpha = 255)
+COLORREF                    toRgba(COLORREF c, BYTE alpha = 255)
 {
     return (c | (static_cast<DWORD>(alpha) << 24));
 }
@@ -276,7 +276,7 @@ bool CScintillaWnd::InitScratch(HINSTANCE hInst)
     return true;
 }
 
-bool bEatNextTabOrEnterKey = false;
+bool             bEatNextTabOrEnterKey = false;
 
 LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -756,12 +756,12 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                             break;
                         }
                         // Get all the vertical scroll bar information
-                        int scrollX = (gi.ptsLocation.x - lastX) / scale;
-                        int scrollY = (gi.ptsLocation.y - lastY) / scale;
+                        int        scrollX = (gi.ptsLocation.x - lastX) / scale;
+                        int        scrollY = (gi.ptsLocation.y - lastY) / scale;
 
-                        SCROLLINFO siv = {0};
-                        siv.cbSize     = sizeof(siv);
-                        siv.fMask      = SIF_ALL;
+                        SCROLLINFO siv     = {0};
+                        siv.cbSize         = sizeof(siv);
+                        siv.fMask          = SIF_ALL;
                         CoolSB_GetScrollInfo(*this, SB_VERT, &siv);
                         if (scrollY)
                         {
@@ -817,7 +817,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                     }
                     case GID_TWOFINGERTAP:
                         m_scintilla.SetZoom(0);
-                        //UpdateStatusBar(false);
+                        // UpdateStatusBar(false);
                         break;
                     default:
                         // You have encountered an unknown gesture
@@ -916,7 +916,7 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
 
     for (const auto& foldLine : pos.m_lineStateVector)
     {
-        auto level = m_scintilla.FoldLevel(foldLine);
+        auto level      = m_scintilla.FoldLevel(foldLine);
 
         auto headerLine = 0;
         if ((level & Scintilla::FoldLevel::HeaderFlag) != Scintilla::FoldLevel::None)
@@ -973,7 +973,7 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
     const auto& keywords  = CLexStyles::Instance().GetKeywordsForLang(lang);
     const auto& theme     = CTheme::Instance();
 
-    wchar_t localeName[100];
+    wchar_t     localeName[100];
     GetUserDefaultLocaleName(localeName, _countof(localeName));
     m_scintilla.SetFontLocale(CUnicodeUtils::StdGetUTF8(localeName).c_str());
 
@@ -1277,8 +1277,8 @@ void CScintillaWnd::SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF ba
     m_scintilla.MarkerSetBackSelected(SC_MARKNUM_FOLDEROPENMID, foldMarkBackSelected);
     m_scintilla.MarkerSetBackSelected(SC_MARKNUM_FOLDERMIDTAIL, foldMarkBackSelected);
 
-    //m_scintilla.StyleSetFore(STYLE_FOLDDISPLAYTEXT, foldmarkfore);
-    //m_scintilla.StyleSetBack(STYLE_FOLDDISPLAYTEXT, foldmarkback);
+    // m_scintilla.StyleSetFore(STYLE_FOLDDISPLAYTEXT, foldmarkfore);
+    // m_scintilla.StyleSetBack(STYLE_FOLDDISPLAYTEXT, foldmarkback);
 }
 
 void CScintillaWnd::GotoLine(sptr_t line)
@@ -1419,6 +1419,9 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     }
 
     auto selStartPos = m_scintilla.SelectionStart();
+    auto selEndPos   = m_scintilla.SelectionEnd();
+    bool wholeWord   = (selStartPos == m_scintilla.WordStartPosition(selStartPos, true)) &&
+                     (selEndPos == m_scintilla.WordEndPosition(selEndPos, true));
     auto origSelText = sSelText;
     if (origSelText.empty())
     {
@@ -1478,7 +1481,10 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
             findText.lpstrText      = origSelText.c_str();
             lastStopPosition        = 0;
             const auto selTextColor = CTheme::Instance().GetThemeColor(RGB(0, 255, 0), true);
-            while (m_scintilla.FindText(Scintilla::FindOption::MatchCase, &findText) >= 0)
+            auto       findOptions  = Scintilla::FindOption::MatchCase;
+            if (wholeWord)
+                findOptions |= Scintilla::FindOption::WholeWord;
+            while (m_scintilla.FindText(findOptions, &findText) >= 0)
             {
                 if (edit)
                 {
@@ -1517,22 +1523,22 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
     static sptr_t lastIndicatorLength = 0;
     static sptr_t lastCaretPos        = 0;
 
-    sptr_t braceAtCaret  = -1;
-    sptr_t braceOpposite = -1;
+    sptr_t        braceAtCaret        = -1;
+    sptr_t        braceOpposite       = -1;
 
     // find matching brace position
-    auto caretPos = m_scintilla.CurrentPos();
+    auto          caretPos            = m_scintilla.CurrentPos();
 
     // setting the highlighting style triggers an UI update notification,
     // which in return calls MatchBraces(false). So to avoid an endless
     // loop, we bail out if the caret position has not changed.
     if ((what == BraceMatch::Braces) && (caretPos == lastCaretPos))
         return;
-    lastCaretPos = caretPos;
+    lastCaretPos     = caretPos;
 
     WCHAR charBefore = '\0';
 
-    auto lengthDoc = m_scintilla.Length();
+    auto  lengthDoc  = m_scintilla.Length();
 
     if ((lengthDoc > 0) && (caretPos > 0))
     {
@@ -1613,7 +1619,7 @@ void CScintillaWnd::GotoBrace() const
 {
     static constexpr wchar_t brackets[] = L"[](){}";
 
-    auto lengthDoc = m_scintilla.Length();
+    auto                     lengthDoc  = m_scintilla.Length();
     if (lengthDoc <= 1)
         return;
 
@@ -1623,7 +1629,7 @@ void CScintillaWnd::GotoBrace() const
     WCHAR  charAfter     = '\0';
     bool   shift         = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
 
-    auto caretPos = m_scintilla.CurrentPos();
+    auto   caretPos      = m_scintilla.CurrentPos();
     if (caretPos > 0)
     {
         charBefore = static_cast<WCHAR>(m_scintilla.CharAt(caretPos - 1));
@@ -1681,11 +1687,11 @@ void CScintillaWnd::MatchTags() const
         return;
 
     // Get the original targets and search options to restore after tag matching operation
-    auto originalStartPos    = m_scintilla.TargetStart();
-    auto originalEndPos      = m_scintilla.TargetEnd();
-    auto originalSearchFlags = m_scintilla.SearchFlags();
+    auto              originalStartPos    = m_scintilla.TargetStart();
+    auto              originalEndPos      = m_scintilla.TargetEnd();
+    auto              originalSearchFlags = m_scintilla.SearchFlags();
 
-    XmlMatchedTagsPos xmlTags = {0};
+    XmlMatchedTagsPos xmlTags             = {0};
 
     // Detect if it's a xml/html tag
     if (GetXmlMatchedTagsPos(xmlTags))
@@ -1719,8 +1725,8 @@ void CScintillaWnd::MatchTags() const
             auto columnAtCaret  = m_scintilla.Column(xmlTags.tagOpenStart);
             auto columnOpposite = m_scintilla.Column(xmlTags.tagCloseStart);
 
-            auto lineAtCaret  = m_scintilla.LineFromPosition(xmlTags.tagOpenStart);
-            auto lineOpposite = m_scintilla.LineFromPosition(xmlTags.tagCloseStart);
+            auto lineAtCaret    = m_scintilla.LineFromPosition(xmlTags.tagOpenStart);
+            auto lineOpposite   = m_scintilla.LineFromPosition(xmlTags.tagCloseStart);
 
             if (xmlTags.tagCloseStart != -1 && lineAtCaret != lineOpposite)
             {
@@ -1810,7 +1816,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
                     xmlTags.tagCloseEnd = endCloseTag.end;
                 }
                 // Now find the tagName
-                auto position = openFound.start + 2;
+                auto        position = openFound.start + 2;
 
                 // UTF-8 or ASCII tag name
                 std::string tagName;
@@ -1907,8 +1913,8 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
                 /////////////////////////////////////////////////////////////////////////
                 // CURSOR IN OPEN TAG
                 /////////////////////////////////////////////////////////////////////////
-                auto position  = openFound.start + 1;
-                auto docLength = m_scintilla.Length();
+                auto position        = openFound.start + 1;
+                auto docLength       = m_scintilla.Length();
 
                 xmlTags.tagOpenStart = openFound.start;
 
@@ -1945,13 +1951,13 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
                             // It's a normal open tag
 
                             /* Now we need to find the close tag.  The logic here is that we search for "</TAGNAME",
-                            * then check the next character - if it's '>' or whitespace followed by '>' then we've
-                            * found a relevant tag.
-                            * We then need to check if
-                            * our tag has another opening tag after it and before the closing tag we've found
-                            *       e.g.  <TA|GNAME><TAGNAME attrib="value">some text</TAGNAME></TAGNAME>
-                            *             (cursor represented by |)
-                            */
+                             * then check the next character - if it's '>' or whitespace followed by '>' then we've
+                             * found a relevant tag.
+                             * We then need to check if
+                             * our tag has another opening tag after it and before the closing tag we've found
+                             *       e.g.  <TA|GNAME><TAGNAME attrib="value">some text</TAGNAME></TAGNAME>
+                             *             (cursor represented by |)
+                             */
                             auto       currentStartPosition = xmlTags.tagOpenEnd;
                             auto       closeTagsRemaining   = 1;
                             FindResult nextCloseTag{};
@@ -2013,7 +2019,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
 
 FindResult CScintillaWnd::FindText(const char* text, sptr_t start, sptr_t end, Scintilla::FindOption flags) const
 {
-    FindResult returnValue = {0};
+    FindResult     returnValue = {0};
 
     Sci_TextToFind search{};
     search.lpstrText  = const_cast<char*>(text);
@@ -2107,8 +2113,8 @@ sptr_t CScintillaWnd::FindCloseAngle(sptr_t startPosition, sptr_t endPosition) c
     // We'll search for the next '>', and check it's not in an attribute using the style
     FindResult closeAngle{};
 
-    bool   isValidClose   = false;
-    sptr_t returnPosition = -1;
+    bool       isValidClose   = false;
+    sptr_t     returnPosition = -1;
 
     // Only search forwards
     if (startPosition > endPosition)
@@ -2122,7 +2128,7 @@ sptr_t CScintillaWnd::FindCloseAngle(sptr_t startPosition, sptr_t endPosition) c
     {
         isValidClose = false;
 
-        closeAngle = FindText(">", startPosition, endPosition, Scintilla::FindOption::None);
+        closeAngle   = FindText(">", startPosition, endPosition, Scintilla::FindOption::None);
         if (closeAngle.success)
         {
             int style = static_cast<int>(m_scintilla.StyleAt(closeAngle.start));
@@ -2215,9 +2221,9 @@ std::vector<std::pair<sptr_t, sptr_t>> CScintillaWnd::GetAttributesPos(sptr_t st
 {
     std::vector<std::pair<sptr_t, sptr_t>> attributes;
 
-    auto          bufLen = end - start + 1;
-    auto          buf    = std::make_unique<char[]>(bufLen + 1);
-    Sci_TextRange tr{};
+    auto                                   bufLen = end - start + 1;
+    auto                                   buf    = std::make_unique<char[]>(bufLen + 1);
+    Sci_TextRange                          tr{};
     tr.chrg.cpMin = start;
     tr.chrg.cpMax = end;
     tr.lpstrText  = buf.get();
@@ -2232,7 +2238,7 @@ std::vector<std::pair<sptr_t, sptr_t>> CScintillaWnd::GetAttributesPos(sptr_t st
         Attr_String,
         Attr_Value,
         Attr_Valid
-    } state = AttrStates::Attr_Invalid;
+    } state            = AttrStates::Attr_Invalid;
 
     sptr_t startPos    = -1;
     sptr_t oneMoreChar = 1;
@@ -2469,12 +2475,12 @@ void CScintillaWnd::SetTabSettings(TabSpace ts) const
 
 void CScintillaWnd::SetReadDirection(Scintilla::Bidirectional rd) const
 {
-    //auto ex = GetWindowLongPtr(*this, GWL_EXSTYLE);
-    //if (rd != R2L)
-    //    ex &= WS_EX_LAYOUTRTL/*WS_EX_RTLREADING*/;
-    //else
-    //    ex |= WS_EX_LAYOUTRTL/*WS_EX_RTLREADING*/;
-    //SetWindowLongPtr(*this, GWL_EXSTYLE, ex);
+    // auto ex = GetWindowLongPtr(*this, GWL_EXSTYLE);
+    // if (rd != R2L)
+    //     ex &= WS_EX_LAYOUTRTL/*WS_EX_RTLREADING*/;
+    // else
+    //     ex |= WS_EX_LAYOUTRTL/*WS_EX_RTLREADING*/;
+    // SetWindowLongPtr(*this, GWL_EXSTYLE, ex);
     m_scintilla.SetBidirectional(rd);
 }
 
@@ -2606,7 +2612,7 @@ std::string CScintillaWnd::GetCurrentWord(bool select) const
 
 std::string CScintillaWnd::GetCurrentLine() const
 {
-    auto lineLen    = m_scintilla.GetCurLine(0, nullptr);
+    auto lineLen = m_scintilla.GetCurLine(0, nullptr);
     return m_scintilla.GetCurLine(lineLen);
 }
 
