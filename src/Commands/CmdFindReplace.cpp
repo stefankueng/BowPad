@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2021 - Stefan Kueng
+// Copyright (C) 2013-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -706,7 +706,7 @@ void CFindReplaceDlg::FindText()
 
     std::string sSelText;
     if (lineStart == lineEnd)
-        sSelText = GetSelectedText(true);
+        sSelText = GetSelectedText(SelectionHandling::CurrentWordIfSelectionIsEmpty);
 
     if (!sSelText.empty() && (sSelText.find_first_of("\r\n") == std::string::npos))
         SetDlgItemText(*this, IDC_SEARCHCOMBO, CUnicodeUtils::StdGetUnicode(sSelText).c_str());
@@ -3038,7 +3038,7 @@ bool CCmdFindSelectedNext::Execute()
         DocScrollUpdate();
         return false;
     }
-    std::string selText = GetSelectedText();
+    std::string selText = GetSelectedText(SelectionHandling::None);
     if (selText.empty())
     {
         DocScrollUpdate();
@@ -3079,7 +3079,7 @@ bool CCmdFindSelectedPrev::Execute()
         return false;
     }
 
-    std::string selText = GetSelectedText();
+    std::string selText = GetSelectedText(SelectionHandling::None);
     if (selText.empty())
     {
         DocScrollUpdate();

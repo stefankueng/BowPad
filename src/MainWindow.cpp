@@ -2945,7 +2945,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
         return pt;
     };
     // try the users real selection first
-    std::string sWord    = m_editor.GetSelectedText();
+    std::string sWord    = m_editor.GetSelectedText(SelectionHandling::None);
     auto        selStart = m_editor.Scintilla().SelectionStart();
     auto        selEnd   = m_editor.Scintilla().SelectionEnd();
 

@@ -2584,21 +2584,23 @@ std::string CScintillaWnd::GetTextRange(Sci_Position startPos, Sci_Position endP
     return strBuf.get();
 }
 
-std::string CScintillaWnd::GetSelectedText(bool useCurrentWordIfSelectionEmpty) const
+std::string CScintillaWnd::GetSelectedText(SelectionHandling handling) const
 {
     auto selText = m_scintilla.GetSelText();
-    if (selText.empty() && useCurrentWordIfSelectionEmpty)
+    if (selText.empty() && handling != SelectionHandling::None)
     {
-        selText = GetCurrentWord();
+        selText = GetCurrentWord(handling == SelectionHandling::CurrentWordIfSelectionIsEmptyAndSelect);
     }
     return selText;
 }
 
-std::string CScintillaWnd::GetCurrentWord() const
+std::string CScintillaWnd::GetCurrentWord(bool select) const
 {
     auto currentPos = m_scintilla.CurrentPos();
     auto startPos   = m_scintilla.WordStartPosition(currentPos, true);
     auto endPos     = m_scintilla.WordEndPosition(currentPos, true);
+    if (select)
+        m_scintilla.SetSelection(startPos, endPos);
     return GetTextRange(startPos, endPos);
 }
 

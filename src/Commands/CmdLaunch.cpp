@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019-2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -60,12 +60,7 @@ bool LaunchBase::Launch(const std::wstring& cmdline) const
     SearchReplace(cmd, L"$(LINE)", std::to_wstring(GetCurrentLineNumber()));
     SearchReplace(cmd, L"$(POS)", std::to_wstring(static_cast<int>(Scintilla().CurrentPos())));
     // find selected text or current word
-    std::string sSelText = GetSelectedText();
-    if (sSelText.empty())
-    {
-        // get the current word instead
-        sSelText = GetCurrentWord();
-    }
+    std::string  sSelText = GetSelectedText(SelectionHandling::CurrentWordIfSelectionIsEmpty);
     std::wstring selText = CUnicodeUtils::StdGetUnicode(sSelText);
     SearchReplace(cmd, L"$(SEL_TEXT)", selText);
     SearchReplace(cmd, L"$(SEL_TEXT_ESCAPED)", CEscapeUtils::EscapeString(selText));

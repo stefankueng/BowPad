@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2021 - Stefan Kueng
+// Copyright (C) 2013-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -46,15 +46,22 @@ constexpr int SC_MARGE_LINENUMBER = 0;
 constexpr int SC_MARGE_SYMBOL     = 1;
 constexpr int SC_MARGE_FOLDER     = 2;
 
-constexpr int MARK_BOOKMARK = 24;
+constexpr int MARK_BOOKMARK       = 24;
 
-constexpr int SCN_BP_MOUSEMSG = 4000;
+constexpr int SCN_BP_MOUSEMSG     = 4000;
 
 enum class BraceMatch
 {
     Braces,
     Highlight,
     Clear,
+};
+
+enum class SelectionHandling
+{
+    None,
+    CurrentWordIfSelectionIsEmpty,
+    CurrentWordIfSelectionIsEmptyAndSelect,
 };
 
 struct XmlMatchedTagsPos
@@ -82,55 +89,55 @@ public:
     CScintillaWnd(HINSTANCE hInst);
     ~CScintillaWnd() override;
 
-    bool Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo = nullptr);
-    bool InitScratch(HINSTANCE hInst);
-    void StartupDone() { m_eraseBkgnd = false; }
+    bool                      Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo = nullptr);
+    bool                      InitScratch(HINSTANCE hInst);
+    void                      StartupDone() { m_eraseBkgnd = false; }
 
     Scintilla::ScintillaCall& Scintilla() const { return m_scintilla; }
 
-    void        UpdateLineNumberWidth() const;
-    void        SaveCurrentPos(CPosData& pos);
-    void        RestoreCurrentPos(const CPosData& pos);
-    void        SetupLexerForLang(const std::string& lang) const;
-    void        MarginClick(SCNotification* pNotification);
-    void        SelectionUpdated() const;
-    void        MarkSelectedWord(bool clear, bool edit);
-    void        MatchBraces(BraceMatch what);
-    void        GotoBrace() const;
-    void        MatchTags() const;
-    bool        GetSelectedCount(sptr_t& selByte, sptr_t& selLine) const;
-    void        DocScrollClear(int type) { m_docScroll.Clear(type); }
-    void        DocScrollAddLineColor(int type, sptr_t line, COLORREF clr) { m_docScroll.AddLineColor(type, line, clr); }
-    void        DocScrollUpdate();
-    void        DocScrollRemoveLine(int type, sptr_t line) { m_docScroll.RemoveLine(type, line); }
-    void        MarkBookmarksInScrollbar();
-    void        GotoLine(sptr_t line);
-    void        Center(sptr_t posStart, sptr_t posEnd);
-    void        SetTabSettings(TabSpace ts) const;
-    void        SetReadDirection(Scintilla::Bidirectional rd) const;
-    void        SetEOLType(Scintilla::EndOfLine eolType) const;
-    void        AppendText(sptr_t len, const char* buf) const;
-    std::string GetLine(sptr_t line) const;
-    std::string GetTextRange(Sci_Position startPos, Sci_Position endPos) const;
-    sptr_t      FindText(const std::string& toFind, sptr_t startPos, sptr_t endPos) const;
-    std::string GetSelectedText(bool useCurrentWordIfSelectionEmpty = false) const;
-    std::string GetCurrentWord() const;
-    std::string GetCurrentLine() const;
-    std::string GetWordChars() const;
-    std::string GetWhitespaceChars() const;
-    sptr_t      GetSelTextMarkerCount() const { return m_selTextMarkerCount; }
-    sptr_t      GetCurrentLineNumber() const;
-    void        VisibleLinesChanged() { m_docScroll.VisibleLinesChanged(); }
-    static bool IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
+    void                      UpdateLineNumberWidth() const;
+    void                      SaveCurrentPos(CPosData& pos);
+    void                      RestoreCurrentPos(const CPosData& pos);
+    void                      SetupLexerForLang(const std::string& lang) const;
+    void                      MarginClick(SCNotification* pNotification);
+    void                      SelectionUpdated() const;
+    void                      MarkSelectedWord(bool clear, bool edit);
+    void                      MatchBraces(BraceMatch what);
+    void                      GotoBrace() const;
+    void                      MatchTags() const;
+    bool                      GetSelectedCount(sptr_t& selByte, sptr_t& selLine) const;
+    void                      DocScrollClear(int type) { m_docScroll.Clear(type); }
+    void                      DocScrollAddLineColor(int type, sptr_t line, COLORREF clr) { m_docScroll.AddLineColor(type, line, clr); }
+    void                      DocScrollUpdate();
+    void                      DocScrollRemoveLine(int type, sptr_t line) { m_docScroll.RemoveLine(type, line); }
+    void                      MarkBookmarksInScrollbar();
+    void                      GotoLine(sptr_t line);
+    void                      Center(sptr_t posStart, sptr_t posEnd);
+    void                      SetTabSettings(TabSpace ts) const;
+    void                      SetReadDirection(Scintilla::Bidirectional rd) const;
+    void                      SetEOLType(Scintilla::EndOfLine eolType) const;
+    void                      AppendText(sptr_t len, const char* buf) const;
+    std::string               GetLine(sptr_t line) const;
+    std::string               GetTextRange(Sci_Position startPos, Sci_Position endPos) const;
+    sptr_t                    FindText(const std::string& toFind, sptr_t startPos, sptr_t endPos) const;
+    std::string               GetSelectedText(SelectionHandling handling) const;
+    std::string               GetCurrentWord(bool select = false) const;
+    std::string               GetCurrentLine() const;
+    std::string               GetWordChars() const;
+    std::string               GetWhitespaceChars() const;
+    sptr_t                    GetSelTextMarkerCount() const { return m_selTextMarkerCount; }
+    sptr_t                    GetCurrentLineNumber() const;
+    void                      VisibleLinesChanged() { m_docScroll.VisibleLinesChanged(); }
+    static bool               IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
 
-    LRESULT CALLBACK HandleScrollbarCustomDraw(WPARAM wParam, NMCSBCUSTOMDRAW* pCustomDraw);
-    void             ReflectEvents(SCNotification* pScn);
+    LRESULT CALLBACK          HandleScrollbarCustomDraw(WPARAM wParam, NMCSBCUSTOMDRAW* pCustomDraw);
+    void                      ReflectEvents(SCNotification* pScn);
 
 protected:
-    virtual LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    virtual LRESULT CALLBACK               WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-    void SetupDefaultStyles() const;
-    void SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF backSel) const;
+    void                                   SetupDefaultStyles() const;
+    void                                   SetupFoldingColors(COLORREF fore, COLORREF back, COLORREF backSel) const;
 
     bool                                   GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const;
     FindResult                             FindText(const char* text, sptr_t start, sptr_t end, Scintilla::FindOption flags) const;
@@ -140,10 +147,10 @@ protected:
     std::vector<std::pair<sptr_t, sptr_t>> GetAttributesPos(sptr_t start, sptr_t end) const;
     bool                                   AutoBraces(WPARAM wParam) const;
 
-    void BookmarkAdd(sptr_t lineNo);
-    void BookmarkDelete(sptr_t lineNo);
-    bool IsBookmarkPresent(sptr_t lineNo) const;
-    void BookmarkToggle(sptr_t lineNo);
+    void                                   BookmarkAdd(sptr_t lineNo);
+    void                                   BookmarkDelete(sptr_t lineNo);
+    bool                                   IsBookmarkPresent(sptr_t lineNo) const;
+    void                                   BookmarkToggle(sptr_t lineNo);
 
 private:
     mutable Scintilla::ScintillaCall m_scintilla;

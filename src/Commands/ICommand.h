@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -114,8 +114,8 @@ protected:
     std::string               GetLine(sptr_t line) const;
     std::string               GetTextRange(sptr_t startPos, sptr_t endPos) const;
     size_t                    FindText(const std::string& toFind, sptr_t startPos, sptr_t endPos) const;
-    std::string               GetSelectedText(bool useCurrentWordIfSelectionEmpty = false) const;
-    std::string               GetCurrentWord() const;
+    std::string               GetSelectedText(SelectionHandling handling) const;
+    std::string               GetCurrentWord(bool select) const;
     std::string               GetCurrentLine() const;
     std::string               GetWordChars() const;
     void                      MarkSelectedWord(bool clear, bool edit) const;

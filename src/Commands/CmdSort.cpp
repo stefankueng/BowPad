@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014, 2016, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -250,7 +250,7 @@ bool CCmdSort::Execute()
             --lineEnd;
             selEnd = Scintilla().LineEndPosition(lineEnd);
         }
-        std::wstring selText = CUnicodeUtils::StdGetUnicode(GetSelectedText());
+        std::wstring selText = CUnicodeUtils::StdGetUnicode(GetSelectedText(SelectionHandling::None));
         // Whatever the line breaks type is current, standardize on "\n".
         // When re-inserting the lines later we'll use whatever line
         // break type is appropriate for the document.

@@ -587,7 +587,7 @@ HRESULT CCmdSpellCheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
             OnOutOfScope(Scintilla().SetWordChars(wordcharsbuffer.c_str()));
 
             Scintilla().SetWordChars(g_wordChars.c_str());
-            sWord                                  = CUnicodeUtils::StdGetUnicode(GetCurrentWord());
+            sWord                                  = CUnicodeUtils::StdGetUnicode(GetCurrentWord(false));
 
             IEnumStringPtr enumSpellingSuggestions = nullptr;
             hr                                     = g_spellChecker->Suggest(sWord.c_str(), &enumSpellingSuggestions);
@@ -649,7 +649,7 @@ HRESULT CCmdSpellCheckCorrect::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, c
                 std::wstring sWord;
 
                 Scintilla().SetCharsDefault();
-                sWord = CUnicodeUtils::StdGetUnicode(GetCurrentWord());
+                sWord = CUnicodeUtils::StdGetUnicode(GetCurrentWord(false));
 
                 if (m_suggestions.empty())
                     ++selected; // adjust for the "no corrections found" entry
