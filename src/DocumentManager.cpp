@@ -879,7 +879,7 @@ static bool SaveAsOther(const CDocument& doc, char* buf, size_t lengthDoc, CAuto
         if (usedDefaultChar && doc.m_encodingSaving == -1)
         {
             // stream could not be properly converted to ANSI, write it 'as is'
-            if (!WriteFile(hFile, writeBuf, charStart, &bytesWritten, nullptr) || charLen != static_cast<int>(bytesWritten))
+            if (!WriteFile(hFile, writeBuf, charStart, &bytesWritten, nullptr) || charStart != static_cast<int>(bytesWritten))
             {
                 CFormatMessageWrapper errMsg;
                 err = errMsg.c_str();
