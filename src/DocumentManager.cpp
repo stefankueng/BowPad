@@ -1012,7 +1012,7 @@ bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved) cons
         ShowFileSaveError(hWnd, doc.m_path, errMsg);
         return false;
     }
-
+    hFile.CloseHandle();
     if (SaveDoc(hWnd, doc.m_path, doc))
     {
         m_scratchScintilla.Scintilla().SetSavePoint();
