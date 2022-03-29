@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2021 - Stefan Kueng
+// Copyright (C) 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ private:
     std::recursive_mutex m_guard{};
     CAutoGeneralHandle   m_hThread;
     CAutoGeneralHandle   m_hCompPort;
-    volatile LONG        m_bRunning = FALSE;
+    std::atomic_bool     m_bRunning = false;
 
     std::map<std::wstring, bool> watchedPaths; ///< list of watched paths.
 

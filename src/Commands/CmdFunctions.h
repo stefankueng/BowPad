@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -106,6 +106,6 @@ private:
     std::mutex                                                       m_fileDataMutex;
     std::condition_variable                                          m_fileDataCv;
     std::recursive_mutex                                             m_langDataMutex;
-    volatile long                                                    m_bRunThread;
-    volatile long                                                    m_bThreadRunning;
+    std::atomic_bool                                                 m_bRunThread;
+    std::atomic_bool                                                 m_bThreadRunning;
 };

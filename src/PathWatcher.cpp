@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2021 - Stefan Kueng
+// Copyright (C) 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 CPathWatcher::CPathWatcher()
     : m_hCompPort(nullptr)
-    , m_bRunning(TRUE)
+    , m_bRunning(true)
 {
     // enable the required privileges for this process
 
@@ -60,7 +60,7 @@ CPathWatcher::~CPathWatcher()
 
 void CPathWatcher::Stop()
 {
-    InterlockedExchange(&m_bRunning, FALSE);
+    m_bRunning = false;
     if (m_hCompPort)
     {
         PostQueuedCompletionStatus(m_hCompPort, 0, NULL, nullptr);

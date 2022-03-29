@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2021 - Stefan Kueng
+// Copyright (C) 2014-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ void CFileTree::SetPath(const std::wstring& path, bool forceRefresh)
 {
     if (m_bRootBusy && (m_path != path))
     {
-        InterlockedExchange(&m_bStop, TRUE);
+        m_bStop     = true;
         int timeout = 100;
         while (m_bRootBusy && timeout)
         {
@@ -126,7 +126,7 @@ void CFileTree::SetPath(const std::wstring& path, bool forceRefresh)
             Sleep(20);
             --timeout;
         }
-        InterlockedExchange(&m_bStop, FALSE);
+        m_bStop = false;
         m_path = path;
         Refresh(TVI_ROOT);
     }
@@ -503,14 +503,14 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/, bool expa
         }
     }
 
-    InterlockedIncrement(&m_threadsRunning);
+    m_threadsRunning = true;
 
     std::thread(&CFileTree::RefreshThread, this, refreshRoot, refreshPath, expanding).detach();
 }
 
 void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath, bool expanding)
 {
-    OnOutOfScope(InterlockedDecrement(&m_threadsRunning););
+    OnOutOfScope(m_threadsRunning = false;);
 
     auto data         = new FileTreeData();
     data->refreshPath = refreshPath;
@@ -976,11 +976,11 @@ void CFileTree::BlockRefresh(bool bBlock)
 
 void CFileTree::OnClose()
 {
-    InterlockedExchange(&m_bStop, TRUE);
+    m_bStop    = true;
     auto start = GetTickCount64();
     while (m_threadsRunning && (GetTickCount64() - start < 5000))
         Sleep(10);
-    InterlockedExchange(&m_bStop, FALSE);
+    m_bStop = true;
 }
 
 HTREEITEM CFileTree::GetItemForPath(const std::wstring& expandpath)

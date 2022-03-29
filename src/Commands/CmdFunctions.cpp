@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -183,9 +183,9 @@ CCmdFunctions::CCmdFunctions(void* obj)
     m_timerID = GetTimerID();
     m_edit.InitScratch(g_hRes);
 
-    InterlockedExchange(&m_bThreadRunning, FALSE);
-    InterlockedExchange(&m_bRunThread, TRUE);
-    m_thread = std::thread(&CCmdFunctions::ThreadFunc, this);
+    m_bThreadRunning = false;
+    m_bRunThread     = true;
+    m_thread         = std::thread(&CCmdFunctions::ThreadFunc, this);
     m_thread.detach();
 }
 
@@ -372,7 +372,7 @@ void CCmdFunctions::TabNotify(TBHDR* ptbHdr)
         std::unique_lock<std::mutex> lock(m_fileDataMutex);
         auto                         found = std::find_if(m_fileData.begin(), m_fileData.end(), [docID](const WorkItem& wi) {
             return wi.m_id == docID;
-        });
+                                });
         if (found != m_fileData.end())
         {
             auto workItem = *found;
@@ -427,12 +427,12 @@ void CCmdFunctions::OnTimer(UINT id)
 {
     if (id == m_timerID)
     {
-        const bool limitedScan = m_autoScanLimit != static_cast<size_t>(-1);
+        const bool limitedScan   = m_autoScanLimit != static_cast<size_t>(-1);
         // first go through all events and create a WorkItem
         // for each of them, and add them to the thread data list
         // if necessary.
         // If data is added to the thread data list, wake up the thread.
-        bool bWakeupThread = false;
+        bool       bWakeupThread = false;
         for (const auto docId : m_eventData)
         {
             const auto& doc  = GetDocumentFromID(docId);
@@ -462,9 +462,9 @@ void CCmdFunctions::OnTimer(UINT id)
             w.m_id   = docId;
             if (GetDocIdOfCurrentTab() == docId)
                 w.m_currentPos = Scintilla().CurrentPos();
-            w.m_regex      = langData->functionRegex;
-            w.m_trimTokens = langData->functionRegexTrim;
-            w.m_autoCRegex = langData->autoCompleteRegex;
+            w.m_regex       = langData->functionRegex;
+            w.m_trimTokens  = langData->functionRegexTrim;
+            w.m_autoCRegex  = langData->autoCompleteRegex;
             // get characters directly from Scintilla buffer
             const char* buf = static_cast<const char*>(m_edit.Scintilla().CharacterPointer());
             w.m_data        = std::string(buf, lengthDoc);
@@ -561,7 +561,7 @@ void CCmdFunctions::OnDocumentClose(DocID id)
 
 void CCmdFunctions::OnClose()
 {
-    InterlockedExchange(&m_bRunThread, FALSE);
+    m_bRunThread = false;
     {
         std::unique_lock<std::mutex> lock(m_fileDataMutex);
         m_fileData.push_back(WorkItem());
@@ -576,7 +576,7 @@ void CCmdFunctions::OnClose()
     // due to opening several tabs fairly quickly, such as when cursoring through files
     // in the find/replace dialog's list view (using the find files button).
     constexpr std::chrono::microseconds sleepPeriod(100);
-    while (InterlockedExchange(&m_bThreadRunning, m_bThreadRunning))
+    while (m_bThreadRunning)
         std::this_thread::sleep_for(sleepPeriod);
 }
 
@@ -607,7 +607,7 @@ void CCmdFunctions::ThreadFunc()
 {
     bool bAutoComplete = CIniSettings::Instance().GetInt64(L"View", L"autocomplete", 1) != 0;
 
-    InterlockedExchange(&m_bThreadRunning, TRUE);
+    m_bThreadRunning   = true;
     do
     {
         WorkItem work;
@@ -622,13 +622,13 @@ void CCmdFunctions::ThreadFunc()
                 m_fileData.pop_back();
             }
         }
-        if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
+        if (!m_bRunThread)
             break;
 
         auto sData = CUnicodeUtils::StdGetUnicode(work.m_data);
         if (!work.m_regex.empty())
         {
-            auto sRegex = CUnicodeUtils::StdGetUnicode(work.m_regex);
+            auto                                    sRegex = CUnicodeUtils::StdGetUnicode(work.m_regex);
 
             std::map<std::string, AutoCompleteType> acMap;
             try
@@ -637,11 +637,11 @@ void CCmdFunctions::ThreadFunc()
                 const std::wsregex_token_iterator end;
                 // Profile
                 //#if defined(_DEBUG) || defined(PROFILING)
-                ProfileTimer timer(L"parsing functions");
+                ProfileTimer                      timer(L"parsing functions");
                 //#endif
                 for (std::wsregex_token_iterator match(sData.cbegin(), sData.cend(), regex, 0); match != end; ++match)
                 {
-                    if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
+                    if (!m_bRunThread)
                         break;
                     if (!match->matched)
                         continue;
@@ -676,17 +676,17 @@ void CCmdFunctions::ThreadFunc()
         {
             try
             {
-                auto                        sRegex = CUnicodeUtils::StdGetUnicode(work.m_autoCRegex);
-                std::wregex                 regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
-                const std::wsregex_iterator end;
+                auto                                    sRegex = CUnicodeUtils::StdGetUnicode(work.m_autoCRegex);
+                std::wregex                             regex(sRegex, std::regex_constants::icase | std::regex_constants::ECMAScript);
+                const std::wsregex_iterator             end;
                 // Profile
                 //#if defined(_DEBUG) || defined(PROFILING)
-                ProfileTimer timer(L"parsing words");
+                ProfileTimer                            timer(L"parsing words");
                 //#endif
                 std::map<std::string, AutoCompleteType> acMap;
                 for (std::wsregex_iterator match(sData.begin(), sData.end(), regex); match != end; ++match)
                 {
-                    if (!InterlockedExchange(&m_bRunThread, m_bRunThread))
+                    if (!m_bRunThread)
                         break;
 
                     for (size_t i = 1; i < match->size(); ++i)
@@ -717,8 +717,8 @@ void CCmdFunctions::ThreadFunc()
 
         SetWorkTimer(0);
 
-    } while (InterlockedExchange(&m_bRunThread, m_bRunThread));
-    InterlockedExchange(&m_bThreadRunning, FALSE);
+    } while (m_bRunThread);
+    m_bThreadRunning = false;
 }
 
 void CCmdFunctions::InvalidateFunctionsSource()

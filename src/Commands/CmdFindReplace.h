@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019-2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -204,8 +204,8 @@ private:
     bool                            m_dataReady    = false;
     std::mutex                      m_waitingDataMutex;
     std::condition_variable         m_dataExchangeCondition;
-    volatile bool                   m_bStop                  = false;
-    volatile LONG                   m_threadsRunning         = false;
+    std::atomic_bool                m_bStop                  = false;
+    std::atomic_bool                m_threadsRunning         = false;
     int                             m_searchType             = 0;
     ResultsType                     m_resultsType            = ResultsType::Unknown;
     bool                            m_trackingOn             = true;
@@ -218,7 +218,7 @@ private:
     size_t                          m_maxSearchResults       = 10000;
     SIZE                            m_originalSize           = {0};
     bool                            m_open                   = false;
-    volatile size_t                 m_foundSize              = 0;
+    std::atomic_size_t              m_foundSize              = 0;
     int                             m_themeCallbackId        = 0;
     bool                            m_resultsListInitialized = false;
     std::unique_ptr<CInfoRtfDialog> m_regexHelpDialog        = nullptr;

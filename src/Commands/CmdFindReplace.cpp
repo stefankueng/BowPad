@@ -596,7 +596,7 @@ void CFindReplaceDlg::DoInitDialog(HWND hwndDlg)
     // We don't make the search sub folder flag persistent as the app
     // wants to set that itself and having the app persist it's own
     // changes is confusing in the circumstances.
-    bool searchSubFolders = true; //CIniSettings::Instance().GetInt64(L"searchreplace", L"searchsubfolders", 1LL) != 0LL;
+    bool searchSubFolders = true; // CIniSettings::Instance().GetInt64(L"searchreplace", L"searchsubfolders", 1LL) != 0LL;
     Button_SetCheck(GetDlgItem(*this, IDC_SEARCHSUBFOLDERS), searchSubFolders ? BST_CHECKED : BST_UNCHECKED);
     bool followTab = CIniSettings::Instance().GetInt64(L"searchreplace", L"searchfolderfollowtab", 1LL) != 0LL;
     Button_SetCheck(GetDlgItem(*this, IDC_SEARCHFOLDERFOLLOWTAB), followTab ? BST_CHECKED : BST_UNCHECKED);
@@ -666,8 +666,8 @@ int CFindReplaceDlg::GetDefaultButton() const
 
 void CFindReplaceDlg::SaveSettings()
 {
-    //bool searchSubFolders = IsDlgButtonChecked(*this, IDC_SEARCHSUBFOLDERS) == BST_CHECKED;
-    //CIniSettings::Instance().SetInt64(L"searchreplace", L"searchsubfolders", searchSubFolders ? 1LL : 0LL);
+    // bool searchSubFolders = IsDlgButtonChecked(*this, IDC_SEARCHSUBFOLDERS) == BST_CHECKED;
+    // CIniSettings::Instance().SetInt64(L"searchreplace", L"searchsubfolders", searchSubFolders ? 1LL : 0LL);
     bool followTab = IsDlgButtonChecked(*this, IDC_SEARCHFOLDERFOLLOWTAB) == BST_CHECKED;
     CIniSettings::Instance().SetInt64(L"searchreplace", L"searchfolderfollowtab", followTab ? 1LL : 0LL);
     SaveSearchStrings();
@@ -934,7 +934,7 @@ LRESULT CFindReplaceDlg::DrawListItemWithMatches(NMLVCUSTOMDRAW* pLVCD)
     ListView_GetItemRect(hListControl, itemIndex, &iconRC, LVIR_ICON);
     ListView_GetItemRect(hListControl, itemIndex, &boundsRC, LVIR_BOUNDS);
 
-    //DrawListColumnBackground(pLVCD);
+    // DrawListColumnBackground(pLVCD);
     int leftMargin = labelRC.left - boundsRC.left;
     if (pLVCD->iSubItem)
         leftMargin -= (iconRC.right - iconRC.left);
@@ -1218,9 +1218,9 @@ void CFindReplaceDlg::DoListItemAction(int itemIndex)
             DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
             g_searchMarkerCount = 0;
 
-            //std::wstring FindText = GetDlgItemText(IDC_SEARCHCOMBO).get();
-            //UpdateSearchStrings(FindText);
-            //g_findString = CUnicodeUtils::StdGetUTF8(FindText);
+            // std::wstring FindText = GetDlgItemText(IDC_SEARCHCOMBO).get();
+            // UpdateSearchStrings(FindText);
+            // g_findString = CUnicodeUtils::StdGetUTF8(FindText);
             g_sHighlightString  = g_findString;
             g_lastSelText       = g_sHighlightString;
 
@@ -1809,7 +1809,7 @@ void CFindReplaceDlg::SortResults()
 void CFindReplaceDlg::DoSearchAll(int id)
 {
     // Should have stopped before searching again.
-    APPVERIFY(m_threadsRunning == 0);
+    APPVERIFY(m_threadsRunning == false);
     if (m_threadsRunning)
         return;
     // To prevent having each document activate the tab while searching,
@@ -1968,7 +1968,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
 
         UpdateMatchCount(false);
         FocusOn(IDC_FINDRESULTS);
-        InterlockedIncrement(&m_threadsRunning);
+        m_threadsRunning = true;
         // Start a new thread to search all files.
         std::thread(&CFindReplaceDlg::SearchThread,
                     this, id, searchFolder, searchFor, searchFlags, exSearchFlags, filesToFind)
@@ -2004,10 +2004,10 @@ bool CFindReplaceDlg::IsMatchingFile(const std::wstring& path, const std::vector
     {
         auto targetName = CPathUtils::GetFileName(path);
         auto whereAt    = std::find_if(filesToFind.begin(), filesToFind.end(),
-                                    [&](const std::wstring& fileToFind) {
+                                       [&](const std::wstring& fileToFind) {
                                         bool match = !!PathMatchSpec(targetName.c_str(), fileToFind.c_str());
                                         return match;
-                                    });
+                                       });
         matched         = (whereAt != filesToFind.end());
     }
     return matched;
@@ -2127,7 +2127,7 @@ void CFindReplaceDlg::SearchThread(
     }
     NewData(timeOfLastProgressUpdate, true);
 
-    InterlockedDecrement(&m_threadsRunning);
+    m_threadsRunning = false;
 }
 
 void CFindReplaceDlg::AcceptData()
@@ -2141,9 +2141,9 @@ void CFindReplaceDlg::AcceptData()
         item.pathIndex += m_foundPaths.size();
     moveAppend(m_searchResults, m_pendingSearchResults);
     // Enable this if something suspect occurs.
-    //for (const auto& item : m_pendingSearchResults)
-    //if (item.pathIndex < 0 || item.pathIndex >= m_foundPaths.size())
-    //APPVERIFY(false);
+    // for (const auto& item : m_pendingSearchResults)
+    // if (item.pathIndex < 0 || item.pathIndex >= m_foundPaths.size())
+    // APPVERIFY(false);
     moveAppend(m_foundPaths, m_pendingFoundPaths);
 
     m_dataAccepted = true;
@@ -2391,7 +2391,7 @@ void CFindReplaceDlg::InitResultsList()
     m_trackingOn      = true;
 
     HWND hListControl = GetDlgItem(*this, IDC_FINDRESULTS);
-    //SetWindowTheme(hListControl, L"Explorer", nullptr);
+    // SetWindowTheme(hListControl, L"Explorer", nullptr);
     ListView_SetItemCountEx(hListControl, 0, 0);
 
     if (m_resultsListInitialized)
@@ -2533,7 +2533,7 @@ void CFindReplaceDlg::SetSearchFolder(const std::wstring& folder)
 
 LRESULT CALLBACK CFindReplaceDlg::ListViewSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR /*dwRefData*/)
 {
-    //CFindReplaceDlg* pThis = reinterpret_cast<CFindReplaceDlg*>(dwRefData);
+    // CFindReplaceDlg* pThis = reinterpret_cast<CFindReplaceDlg*>(dwRefData);
     switch (uMsg)
     {
         case WM_NCDESTROY:

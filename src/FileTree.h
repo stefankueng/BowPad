@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2018-2021 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -86,8 +86,8 @@ protected:
 private:
     std::wstring                       m_path;
     int                                m_nBlockRefresh;
-    volatile LONG                      m_threadsRunning;
-    volatile LONG                      m_bStop;
+    std::atomic_bool                   m_threadsRunning;
+    std::atomic_bool                   m_bStop;
     bool                               m_bRootBusy;
     HTREEITEM                          m_activeItem;
     bool                               m_bBlockExpansion;
