@@ -333,7 +333,7 @@ HRESULT CMainWindow::SaveRibbonSettings()
     IStreamPtr   pStrm;
     std::wstring ribbonSettingsPath = CAppUtils::GetDataPath() + L"\\ribbonsettings";
     HRESULT      hr                 = SHCreateStreamOnFileEx(ribbonSettingsPath.c_str(),
-                                        STGM_WRITE | STGM_CREATE, FILE_ATTRIBUTE_NORMAL, TRUE, nullptr, &pStrm);
+                                                             STGM_WRITE | STGM_CREATE, FILE_ATTRIBUTE_NORMAL, TRUE, nullptr, &pStrm);
     if (!CAppUtils::FailedShowMessage(hr))
     {
         LARGE_INTEGER  liPos{};
@@ -455,7 +455,7 @@ STDMETHODIMP CMainWindow::UpdateProperty(
             {
                 const auto& resourceData = CKeyboardShortcutHandler::Instance().GetResourceData();
                 auto        whereAt      = std::find_if(resourceData.begin(), resourceData.end(),
-                                            [&](const auto& item) { return (static_cast<UINT>(item.second) == nCmdID); });
+                                                        [&](const auto& item) { return (static_cast<UINT>(item.second) == nCmdID); });
                 while (whereAt != resourceData.end())
                 {
                     auto sID = whereAt->first;
@@ -610,7 +610,7 @@ bool CMainWindow::RegisterAndCreateWindow()
 {
     WNDCLASSEX wcx             = {sizeof(WNDCLASSEX)}; // Set size and zero out rest.
 
-    //wcx.style = 0; - Don't use CS_HREDRAW or CS_VREDRAW with a Ribbon
+    // wcx.style = 0; - Don't use CS_HREDRAW or CS_VREDRAW with a Ribbon
     wcx.style                  = CS_DBLCLKS;
     wcx.lpfnWndProc            = stWinMsgHandler;
     wcx.hInstance              = hResource;
@@ -2319,7 +2319,7 @@ bool CMainWindow::CloseTab(int closingTabIndex, bool force /* = false */, bool q
             // Cancel And Stay Open
             // activate the tab: user might have clicked another than
             // the active tab to close: user clicked on that tab so activate that tab now
-            //m_TabBar.ActivateAt(closingTabIndex);
+            // m_TabBar.ActivateAt(closingTabIndex);
             return false;
         }
         // If the save successful or closed without saveing, the tab will be closed.
@@ -2464,7 +2464,7 @@ void CMainWindow::UpdateTab(DocID docID)
     UpdateCaptionBar();
 }
 
-ResponseToCloseTab CMainWindow::AskToCloseTab() const
+ResponseToCloseTab CMainWindow::AskToCloseTab()
 {
     ResString         rTitle(g_hRes, IDS_HASMODIFICATIONS);
     ResString         rQuestion(g_hRes, IDS_DOYOUWANTOSAVE);
@@ -2493,7 +2493,9 @@ ResponseToCloseTab CMainWindow::AskToCloseTab() const
     if (doCloseAll)
         tdc.pszVerificationText = MAKEINTRESOURCE(IDS_DOITFORALLFILES);
     int     nClickedBtn = 0;
+    auto    bc          = UnblockUI();
     HRESULT hr          = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, &closeAllDoAll);
+    ReBlockUI(bc);
     if (CAppUtils::FailedShowMessage(hr))
         nClickedBtn = 0;
     ResponseToCloseTab response = ResponseToCloseTab::StayOpen;
@@ -2511,7 +2513,7 @@ ResponseToCloseTab CMainWindow::AskToCloseTab() const
     return response;
 }
 
-ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const CDocument& doc) const
+ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const CDocument& doc)
 {
     if (!responseToOutsideModifiedFileDoAll || !doModifiedAll)
     {
@@ -2552,7 +2554,9 @@ ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const 
         tdc.pszContent          = sQuestion.c_str();
         tdc.pszVerificationText = MAKEINTRESOURCE(IDS_DOITFORALLFILES);
         int     nClickedBtn     = 0;
+        auto    bc              = UnblockUI();
         HRESULT hr              = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, &responseToOutsideModifiedFileDoAll);
+        ReBlockUI(bc);
         if (CAppUtils::FailedShowMessage(hr))
             nClickedBtn = 0;
         responseToOutsideModifiedFile = ResponseToOutsideModifiedFile::Cancel;
@@ -2571,7 +2575,7 @@ ResponseToOutsideModifiedFile CMainWindow::AskToReloadOutsideModifiedFile(const 
     return responseToOutsideModifiedFile;
 }
 
-bool CMainWindow::AskToReload(const CDocument& doc) const
+bool CMainWindow::AskToReload(const CDocument& doc)
 {
     ResString         rTitle(g_hRes, IDS_HASMODIFICATIONS);
     ResString         rQuestion(g_hRes, IDS_RELOADREALLY);
@@ -2599,14 +2603,16 @@ bool CMainWindow::AskToReload(const CDocument& doc) const
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent         = sQuestion.c_str();
     int     nClickedBtn    = 0;
+    auto    bc             = UnblockUI();
     HRESULT hr             = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
+    ReBlockUI(bc);
     if (CAppUtils::FailedShowMessage(hr))
         nClickedBtn = 0;
     bool reload = (nClickedBtn == 101);
     return reload;
 }
 
-bool CMainWindow::AskAboutOutsideDeletedFile(const CDocument& doc) const
+bool CMainWindow::AskAboutOutsideDeletedFile(const CDocument& doc)
 {
     ResString         rTitle(g_hRes, IDS_OUTSIDEREMOVEDHEAD);
     ResString         rQuestion(g_hRes, IDS_OUTSIDEREMOVED);
@@ -2634,7 +2640,9 @@ bool CMainWindow::AskAboutOutsideDeletedFile(const CDocument& doc) const
     tdc.pszMainInstruction              = rTitle;
     tdc.pszContent                      = sQuestion.c_str();
     int     nClickedBtn                 = 0;
+    auto    bc                          = UnblockUI();
     HRESULT hr                          = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
+    ReBlockUI(bc);
     if (CAppUtils::FailedShowMessage(hr))
         nClickedBtn = 0;
     bool bKeep = true;
@@ -2643,7 +2651,7 @@ bool CMainWindow::AskAboutOutsideDeletedFile(const CDocument& doc) const
     return bKeep;
 }
 
-bool CMainWindow::AskToRemoveReadOnlyAttribute() const
+bool CMainWindow::AskToRemoveReadOnlyAttribute()
 {
     ResString rTitle(g_hRes, IDS_FILEISREADONLY);
     ResString rQuestion(g_hRes, IDS_FILEMAKEWRITABLEASK);
@@ -2674,7 +2682,9 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent         = rQuestion;
     int     nClickedBtn    = 0;
+    auto    bc             = UnblockUI();
     HRESULT hr             = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
+    ReBlockUI(bc);
     if (CAppUtils::FailedShowMessage(hr))
         nClickedBtn = 0;
     bool bRemoveReadOnlyAttribute = (nClickedBtn == 101);
@@ -2682,7 +2692,7 @@ bool CMainWindow::AskToRemoveReadOnlyAttribute() const
 }
 
 // Returns true if file exists or was created.
-bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
+bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path)
 {
     ResString         rTitle(g_hRes, IDS_FILE_DOESNT_EXIST);
     ResString         rQuestion(g_hRes, IDS_FILE_ASK_TO_CREATE);
@@ -2711,7 +2721,9 @@ bool CMainWindow::AskToCreateNonExistingFile(const std::wstring& path) const
     tdc.pszMainInstruction = rTitle;
     tdc.pszContent         = sQuestion.c_str();
     int     nClickedBtn    = 0;
+    auto    bc             = UnblockUI();
     HRESULT hr             = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
+    ReBlockUI(bc);
     if (CAppUtils::FailedShowMessage(hr))
         nClickedBtn = 0;
     bool bCreate = (nClickedBtn == 101);
@@ -3070,7 +3082,7 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
     {
         auto      bs       = to_bit_wstring(number, true);
         auto      copyTip  = CStringUtils::Format(L"Dec: %lld\nHex: 0x%llX\nOct: %#llo\nBin: %s (%d digits)",
-                                            number, number, number, bs.c_str(), static_cast<int>(bs.size()));
+                                                  number, number, number, bs.c_str(), static_cast<int>(bs.size()));
         auto      sCallTip = copyTip;
 
         COLORREF  color    = 0;
@@ -3108,9 +3120,9 @@ void CMainWindow::HandleDwellStart(const SCNotification& scn)
     {
         long long ulongVal = static_cast<long long>(exprValue);
         auto      sCallTip = CStringUtils::Format(L"Expr: %S\n-->\nVal: %f\nDec: %lld\nHex: 0x%llX\nOct: %#llo",
-                                             sWord.c_str(), exprValue, ulongVal, ulongVal, ulongVal);
+                                                  sWord.c_str(), exprValue, ulongVal, ulongVal, ulongVal);
         auto      copyTip  = CStringUtils::Format(L"Val: %f\nDec: %lld\nHex: 0x%llX\nOct: %#llo",
-                                            exprValue, ulongVal, ulongVal, ulongVal);
+                                                  exprValue, ulongVal, ulongVal, ulongVal);
         POINT     pt       = getPos();
         m_custToolTip.ShowTip(pt, sCallTip, nullptr, copyTip);
     }
@@ -3411,7 +3423,7 @@ void CMainWindow::OpenNewTab()
     CCommandHandler::Instance().OnDocumentOpen(docID);
 
     m_tabBar.SelectChange(index);
-    //m_editor.GotoLine(0);
+    // m_editor.GotoLine(0);
 }
 
 void CMainWindow::HandleTabChanging(const NMHDR& /*nmhdr*/)
@@ -4654,9 +4666,9 @@ void CMainWindow::SetTheme(bool dark)
     if (tokens.size() == 4)
     {
         auto major = std::stol(tokens[0]);
-        //auto minor = std::stol(tokens[1]);
+        // auto minor = std::stol(tokens[1]);
         auto micro = std::stol(tokens[2]);
-        //auto build = std::stol(tokens[3]);
+        // auto build = std::stol(tokens[3]);
 
         // the windows 10 update 1809 has the version
         // number as 10.0.17763.10000

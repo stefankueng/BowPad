@@ -71,14 +71,14 @@ public:
     CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = nullptr);
     virtual ~CMainWindow();
 
-    bool RegisterAndCreateWindow();
-    bool Initialize();
-    bool CreateRibbon();
+    bool         RegisterAndCreateWindow();
+    bool         Initialize();
+    bool         CreateRibbon();
 
     // Load/Reload functions
-    int  OpenFile(const std::wstring& file, unsigned int openFlags);
-    bool OpenFileAs(const std::wstring& tempPath, const std::wstring& realpath, bool bModified);
-    bool ReloadTab(int tab, int encoding, bool dueToOutsideChanges = false);
+    int          OpenFile(const std::wstring& file, unsigned int openFlags);
+    bool         OpenFileAs(const std::wstring& tempPath, const std::wstring& realpath, bool bModified);
+    bool         ReloadTab(int tab, int encoding, bool dueToOutsideChanges = false);
 
     bool         SaveCurrentTab(bool bSaveAs = false);
     bool         SaveDoc(DocID docID, bool bSaveAs = false);
@@ -102,10 +102,10 @@ public:
     void         SetFileTreeWidth(int width);
     void         IndentToLastLine() const;
 
-    void AddAutoCompleteWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words);
-    void AddAutoCompleteWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words);
-    void AddAutoCompleteWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words);
-    void AddAutoCompleteWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words);
+    void         AddAutoCompleteWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words);
+    void         AddAutoCompleteWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words);
+    void         AddAutoCompleteWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words);
+    void         AddAutoCompleteWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words);
 
     // clang-format off
     // IUnknown
@@ -125,22 +125,22 @@ protected:
     LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
-    LRESULT DoCommand(WPARAM wParam, LPARAM lParam);
+    LRESULT          DoCommand(WPARAM wParam, LPARAM lParam);
 
 private:
-    std::wstring        GetWindowClassName() const;
-    static std::wstring GetAppName();
-    HWND                FindAppMainWindow(HWND hStartWnd, bool* isThisInstance = nullptr) const;
-    void                ResizeChildWindows();
-    void                UpdateStatusBar(bool bEverything);
-    void                AddHotSpots() const;
+    std::wstring                     GetWindowClassName() const;
+    static std::wstring              GetAppName();
+    HWND                             FindAppMainWindow(HWND hStartWnd, bool* isThisInstance = nullptr) const;
+    void                             ResizeChildWindows();
+    void                             UpdateStatusBar(bool bEverything);
+    void                             AddHotSpots() const;
 
-    bool                             AskToCreateNonExistingFile(const std::wstring& path) const;
-    bool                             AskToReload(const CDocument& doc) const;
-    ResponseToOutsideModifiedFile    AskToReloadOutsideModifiedFile(const CDocument& doc) const;
-    bool                             AskAboutOutsideDeletedFile(const CDocument& doc) const;
-    bool                             AskToRemoveReadOnlyAttribute() const;
-    ResponseToCloseTab               AskToCloseTab() const;
+    bool                             AskToCreateNonExistingFile(const std::wstring& path);
+    bool                             AskToReload(const CDocument& doc);
+    ResponseToOutsideModifiedFile    AskToReloadOutsideModifiedFile(const CDocument& doc);
+    bool                             AskAboutOutsideDeletedFile(const CDocument& doc);
+    bool                             AskToRemoveReadOnlyAttribute();
+    ResponseToCloseTab               AskToCloseTab();
     void                             UpdateTab(DocID docID);
     void                             CloseAllButCurrentTab();
     void                             EnsureNewLineAtEnd(const CDocument& doc) const;
@@ -170,44 +170,44 @@ private:
     static std::vector<std::wstring> GetFileListFromGlobPath(const std::wstring& path);
 
     // Scintilla events.
-    void         HandleDwellStart(const SCNotification& scn);
-    LPARAM       HandleMouseMsg(const SCNotification& scn);
-    bool         OpenUrlAtPos(Sci_Position pos);
-    void         HandleCopyDataCommandLine(const COPYDATASTRUCT& cds);
-    bool         HandleCopyDataMoveTab(const COPYDATASTRUCT& cds);
-    void         HandleWriteProtectedEdit();
-    void         HandleSavePoint(const SCNotification& scn);
-    void         HandleUpdateUI(const SCNotification& scn);
-    void         HandleAutoIndent(const SCNotification& scn) const;
-    HRESULT      LoadRibbonSettings(IUnknown* pView);
-    HRESULT      SaveRibbonSettings();
-    HRESULT      ResizeToRibbon();
-    bool         OnLButtonDown(UINT nFlags, POINT point);
-    bool         OnMouseMove(UINT nFlags, POINT point);
-    bool         OnLButtonUp(UINT nFlags, POINT point);
-    void         HandleStatusBarEOLFormat();
-    void         HandleStatusBarZoom();
-    void         HandleStatusBar(WPARAM wParam, LPARAM lParam);
-    LRESULT      HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
-    LRESULT      HandleFileTreeEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
-    LRESULT      HandleTabBarEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
-    void         ShowTablistDropdown(HWND hWnd, int offsetX, int offsetY);
-    int          GetZoomPC() const;
-    std::wstring GetZoomPC(int zoom) const;
-    void         SetZoomPC(int zoomPC) const;
-    COLORREF     GetColorForDocument(DocID id);
-    void         OpenFiles(const std::vector<std::wstring>& paths);
-    void         BlockAllUIUpdates(bool block);
-    int          UnblockUI();
-    void         ReBlockUI(int blockCount);
-    void         ShowProgressCtrl(UINT delay);
-    void         HideProgressCtrl();
-    void         SetProgress(DWORD32 pos, DWORD32 end);
-    static void  SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight);
-    static void  SetRibbonColorsHSB(UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight);
-    static void  GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight);
-    void         SetTheme(bool theme);
-    void         RefreshAnnotations();
+    void                             HandleDwellStart(const SCNotification& scn);
+    LPARAM                           HandleMouseMsg(const SCNotification& scn);
+    bool                             OpenUrlAtPos(Sci_Position pos);
+    void                             HandleCopyDataCommandLine(const COPYDATASTRUCT& cds);
+    bool                             HandleCopyDataMoveTab(const COPYDATASTRUCT& cds);
+    void                             HandleWriteProtectedEdit();
+    void                             HandleSavePoint(const SCNotification& scn);
+    void                             HandleUpdateUI(const SCNotification& scn);
+    void                             HandleAutoIndent(const SCNotification& scn) const;
+    HRESULT                          LoadRibbonSettings(IUnknown* pView);
+    HRESULT                          SaveRibbonSettings();
+    HRESULT                          ResizeToRibbon();
+    bool                             OnLButtonDown(UINT nFlags, POINT point);
+    bool                             OnMouseMove(UINT nFlags, POINT point);
+    bool                             OnLButtonUp(UINT nFlags, POINT point);
+    void                             HandleStatusBarEOLFormat();
+    void                             HandleStatusBarZoom();
+    void                             HandleStatusBar(WPARAM wParam, LPARAM lParam);
+    LRESULT                          HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
+    LRESULT                          HandleFileTreeEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
+    LRESULT                          HandleTabBarEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
+    void                             ShowTablistDropdown(HWND hWnd, int offsetX, int offsetY);
+    int                              GetZoomPC() const;
+    std::wstring                     GetZoomPC(int zoom) const;
+    void                             SetZoomPC(int zoomPC) const;
+    COLORREF                         GetColorForDocument(DocID id);
+    void                             OpenFiles(const std::vector<std::wstring>& paths);
+    void                             BlockAllUIUpdates(bool block);
+    int                              UnblockUI();
+    void                             ReBlockUI(int blockCount);
+    void                             ShowProgressCtrl(UINT delay);
+    void                             HideProgressCtrl();
+    void                             SetProgress(DWORD32 pos, DWORD32 end);
+    static void                      SetRibbonColors(COLORREF text, COLORREF background, COLORREF highlight);
+    static void                      SetRibbonColorsHSB(UI_HSBCOLOR text, UI_HSBCOLOR background, UI_HSBCOLOR highlight);
+    static void                      GetRibbonColors(UI_HSBCOLOR& text, UI_HSBCOLOR& background, UI_HSBCOLOR& highlight);
+    void                             SetTheme(bool theme);
+    void                             RefreshAnnotations();
 
 private:
     CRichStatusBar                                 m_statusBar;
@@ -253,19 +253,19 @@ private:
     sptr_t                                         m_lastCheckedLine;
 
     // status bar icons
-    HICON m_hShieldIcon;
-    HICON m_hCapsLockIcon;
-    HICON m_hLexerIcon;
-    HICON m_hZoomIcon;
-    HICON m_hZoomDarkIcon;
-    HICON m_hEmptyIcon;
-    HICON hEditorconfigActive;
-    HICON hEditorconfigInactive;
+    HICON                                          m_hShieldIcon;
+    HICON                                          m_hCapsLockIcon;
+    HICON                                          m_hLexerIcon;
+    HICON                                          m_hZoomIcon;
+    HICON                                          m_hZoomDarkIcon;
+    HICON                                          m_hEmptyIcon;
+    HICON                                          hEditorconfigActive;
+    HICON                                          hEditorconfigInactive;
 
-    std::map<int, IUIImagePtr> m_win7PNGWorkaroundData;
+    std::map<int, IUIImagePtr>                     m_win7PNGWorkaroundData;
 
-    LONG       m_cRef;
-    int        m_newCount;
-    IUIRibbon* m_pRibbon;
-    UINT       m_ribbonHeight;
+    LONG                                           m_cRef;
+    int                                            m_newCount;
+    IUIRibbon*                                     m_pRibbon;
+    UINT                                           m_ribbonHeight;
 };
