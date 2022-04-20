@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2022-02-05 14:15+0100\n"
+"PO-Revision-Date: 2022-04-20 21:25+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -641,7 +641,7 @@ msgstr "Rechtschreibfehler korrigieren"
 msgid "Corrections"
 msgstr "Korrekturen"
 
-#. Resource IDs: (60648)
+#. Resource IDs: (60651)
 msgid "Corresponding File"
 msgstr "Entsprechende Datei"
 
@@ -932,6 +932,14 @@ msgstr "Selektion editieren"
 #. Resource IDs: (60298)
 msgid "Edit all occurrences of the current selection at once"
 msgstr "Alle Vorkommnisse der aktuellen Selektion auf einmal editieren"
+
+#. Resource IDs: (60646)
+msgid "Edit at end"
+msgstr "Ändern am Ende"
+
+#. Resource IDs: (60648)
+msgid "Edit at end of selected lines"
+msgstr "Am Ende von ausgewählten Zeilen ändern"
 
 #. Resource IDs: (187)
 msgid "Elevated"
@@ -1644,7 +1652,7 @@ msgstr "Geht zum nächsten Treffer der letzten Suche"
 msgid "Moves to the previous match of the last search"
 msgstr "Geht zum vorherigen Treffer der letzten Suche"
 
-#. Resource IDs: (60297)
+#. Resource IDs: (60297, 60647)
 msgid "Multi-Edit"
 msgstr "Multi-Edit"
 
@@ -1753,7 +1761,7 @@ msgstr "Öffne Datei an Cursorposition"
 msgid "Open Files"
 msgstr "Öffne Dateien"
 
-#. Resource IDs: (60649)
+#. Resource IDs: (60652)
 msgid "Open corresponding File"
 msgstr "Öffne zugehörige Datei"
 
@@ -1811,7 +1819,7 @@ msgid ""
 msgstr ""
 "Öffnet die Konfigurationsdatei zum konfigurieren der Tastaturkürzel in BowPad"
 
-#. Resource IDs: (60650)
+#. Resource IDs: (60653)
 msgid ""
 "Opens the corresponding file to the file in the current tab.\n"
 "(h/cpp, aspx/cs/vb)"
@@ -2257,7 +2265,7 @@ msgstr "Zeige Eigenschaften"
 msgid "Show Whitespaces"
 msgstr "Zeige Leerzeichen"
 
-#. Resource IDs: (60652)
+#. Resource IDs: (60655)
 msgid "Show clipboard history"
 msgstr "Verlauf der Zwischenablage"
 
@@ -2800,7 +2808,7 @@ msgstr "umbrochene Zeilen einrücken"
 msgid "indents wrapped sublines"
 msgstr "rückt umbrochene Unterzeilen ein"
 
-#. Resource IDs: (60653)
+#. Resource IDs: (60656)
 msgid "no plugins loaded"
 msgstr "Keine Plugins geladen"
 
