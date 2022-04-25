@@ -52,6 +52,8 @@ bool CCmdEditEndOfSelectedLines::Execute()
         auto lineStart = Scintilla().LineFromPosition(selStart);
         auto lineEnd   = Scintilla().LineFromPosition(selEnd);
         Scintilla().ClearSelections();
+        auto firstLineEndPos = Scintilla().LineEndPosition(lineStart);
+        Scintilla().SetSelection(firstLineEndPos, firstLineEndPos);
         for (Scintilla::Line line = lineStart; line <= lineEnd; ++line)
         {
             auto lineEndPos = Scintilla().LineEndPosition(line);
