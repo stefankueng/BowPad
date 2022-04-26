@@ -11,7 +11,7 @@ msgstr ""
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
 "PO-Revision-Date: 2022-02-21 22:47+0900\n"
 "Last-Translator: VenusGirl-비너스걸💋 <venusgirl@outlook.com>\n"
-"Language-Team: VᴇɴᴜsGɪʀʟ <venusgirl@outlook.com>\n"
+"Language-Team: VᴇɴᴜsGɪʀʟ <https://venusgirls.tistory.com/>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -819,6 +819,14 @@ msgstr "선택 편집"
 #. Resource IDs: (60298)
 msgid "Edit all occurrences of the current selection at once"
 msgstr "현재 선택 영역의 모든 항목을 한 번에 편집"
+
+#. Resource IDs: (60646)
+msgid "Edit at end"
+msgstr "끝에서 편집"
+
+#. Resource IDs: (60648)
+msgid "Edit at end of selected lines"
+msgstr "선택한 줄의 끝에서 편집"
 
 #. Resource IDs: (187)
 msgid "Elevated"
@@ -1766,11 +1774,11 @@ msgstr "이전에 실행 취소한 작업 다시 실행"
 
 #. Resource IDs: (157)
 msgid "Regex expression is invalid!"
-msgstr "정규식 식이 잘못되었습니다!"
+msgstr "정규식이 잘못되었습니다!"
 
 #. Resource IDs: (156)
 msgid "Regex expression is valid"
-msgstr "정규식 표현식이 유효합니다"
+msgstr "정규식이 유효합니다"
 
 #. Resource IDs: (1009)
 msgid "Regex mode"
@@ -2257,7 +2265,7 @@ msgstr "자동 업데이트 확인 끄기"
 
 #. Resource IDs: (60128)
 msgid "Turns showing the line numbers on/off"
-msgstr "줄 번호를 표시 켜기/끄기"
+msgstr "줄 번호 켜기/끄기"
 
 #. Resource IDs: (60122)
 msgid "Turns showing whitespaces on/off.\nHold down the Shift key to show EOLs as well."
@@ -2419,7 +2427,7 @@ msgstr "선 줄 바꿈"
 
 #. Resource IDs: (143)
 msgid "Wrap around."
-msgstr "둘러쌉니다."
+msgstr "둘러싸기"
 
 #. Resource IDs: (60116)
 msgid "Wrap lines at the end of the window"
@@ -2492,7 +2500,7 @@ msgstr "자동 완성 사용"
 
 #. Resource IDs: (60636)
 msgid "enable/disable autocompletion when editing"
-msgstr "편집 시 자동 완성 사용/사용 안 함"
+msgstr "편집시 자동 완성 사용/사용 안 함"
 
 #. Resource IDs: (65535)
 msgid "foreground:"
