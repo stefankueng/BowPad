@@ -2333,6 +2333,8 @@ bool CScintillaWnd::AutoBraces(WPARAM wParam) const
     {
         if (CIniSettings::Instance().GetInt64(L"View", L"autobrace", 1) == 0)
             return false;
+        if (m_scintilla.Selections() > 1)
+            return false;
         char braceBuf[2]      = {0};
         braceBuf[0]           = static_cast<char>(wParam);
         char braceCloseBuf[2] = {0};
