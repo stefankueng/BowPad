@@ -36,6 +36,8 @@
 #include <uxtheme.h>
 #include <chrono>
 
+#include "../ext/scintilla/include/ScintillaStructures.h"
+
 constexpr Scintilla::AutomaticFold operator|(Scintilla::AutomaticFold a, Scintilla::AutomaticFold b) noexcept
 {
     return static_cast<Scintilla::AutomaticFold>(static_cast<int>(a) | static_cast<int>(b));
@@ -1477,7 +1479,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
                 m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
                 m_selTextMarkerCount = 0;
             }
-            Sci_TextToFind findText{};
+            Sci_TextToFindFull findText{};
             findText.chrg.cpMin     = lastStopPosition;
             findText.chrg.cpMax     = m_scintilla.Length();
             findText.lpstrText      = origSelText.c_str();
@@ -1486,7 +1488,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
             auto       findOptions  = Scintilla::FindOption::MatchCase;
             if (wholeWord)
                 findOptions |= Scintilla::FindOption::WholeWord;
-            while (m_scintilla.FindText(findOptions, &findText) >= 0)
+            while (m_scintilla.FindTextFull(findOptions, &findText) >= 0)
             {
                 if (edit)
                 {
@@ -2021,13 +2023,13 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
 
 FindResult CScintillaWnd::FindText(const char* text, sptr_t start, sptr_t end, Scintilla::FindOption flags) const
 {
-    FindResult     returnValue = {0};
+    FindResult         returnValue = {0};
 
-    Sci_TextToFind search{};
+    Sci_TextToFindFull search{};
     search.lpstrText  = const_cast<char*>(text);
     search.chrg.cpMin = start;
     search.chrg.cpMax = end;
-    auto result       = m_scintilla.FindText(flags, &search);
+    auto result       = m_scintilla.FindTextFull(flags, &search);
     if (-1 == result)
     {
         returnValue.success = false;
@@ -2043,11 +2045,11 @@ FindResult CScintillaWnd::FindText(const char* text, sptr_t start, sptr_t end, S
 
 sptr_t CScintillaWnd::FindText(const std::string& toFind, sptr_t startPos, sptr_t endPos) const
 {
-    Sci_TextToFind ttf = {0};
-    ttf.chrg.cpMin     = startPos;
-    ttf.chrg.cpMax     = endPos;
-    ttf.lpstrText      = const_cast<char*>(toFind.c_str());
-    return m_scintilla.FindText(Scintilla::FindOption::None, &ttf);
+    Sci_TextToFindFull ttf = {0};
+    ttf.chrg.cpMin         = startPos;
+    ttf.chrg.cpMax         = endPos;
+    ttf.lpstrText          = const_cast<char*>(toFind.c_str());
+    return m_scintilla.FindTextFull(Scintilla::FindOption::None, &ttf);
 }
 
 FindResult CScintillaWnd::FindOpenTag(const std::string& tagName, sptr_t start, sptr_t end) const

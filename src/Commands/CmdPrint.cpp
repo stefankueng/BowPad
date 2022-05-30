@@ -202,7 +202,7 @@ void CCmdPrint::Print(bool bShowDlg)
     }
 
     // We must subtract the physical margins from the printable area
-    Sci_RangeToFormat frPrint;
+    Sci_RangeToFormatFull frPrint;
     frPrint.hdc           = hdc;
     frPrint.hdcTarget     = hdc;
     frPrint.rc.left       = rectMargins.left - rectPhysMargins.left;
@@ -222,12 +222,12 @@ void CCmdPrint::Print(bool bShowDlg)
         frPrint.chrg.cpMin = static_cast<Sci_PositionCR>(lengthPrinted);
         frPrint.chrg.cpMax = static_cast<Sci_PositionCR>(lengthDoc);
 
-        lengthPrinted = Scintilla().FormatRange(true, &frPrint);
+        lengthPrinted = Scintilla().FormatRangeFull(true, &frPrint);
 
         ::EndPage(hdc);
     }
 
-    Scintilla().FormatRange(FALSE, nullptr);
+    Scintilla().FormatRangeFull(FALSE, nullptr);
 
     ::EndDoc(hdc);
     ::DeleteDC(hdc);
