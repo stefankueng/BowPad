@@ -36,8 +36,6 @@
 #include <uxtheme.h>
 #include <chrono>
 
-#include "../ext/scintilla/include/ScintillaStructures.h"
-
 constexpr Scintilla::AutomaticFold operator|(Scintilla::AutomaticFold a, Scintilla::AutomaticFold b) noexcept
 {
     return static_cast<Scintilla::AutomaticFold>(static_cast<int>(a) | static_cast<int>(b));
