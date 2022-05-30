@@ -86,7 +86,7 @@ msgstr "새로 고침(&R)"
 
 #. Resource IDs: (1106)
 msgid "&Remove duplicate lines"
-msgstr "중복선 제거(&R)"
+msgstr "중복줄 제거(&R)"
 
 #. Resource IDs: (1003)
 msgid "&Replace"
@@ -155,7 +155,7 @@ msgstr "접근 불가!"
 #. Resource IDs: (146)
 #, c-format
 msgid "Access to the file '%s' was denied. Do you want to try again with elevated privileges?"
-msgstr "'%s'파일에 대한 액세스가 거부되었습니다. 상승된 권한으로 다시 시도하시겠습니까?"
+msgstr "'%s'파일에 대한 접근이 거부되었습니다. 상승된 권한으로 다시 시도하시겠습니까?"
 
 #. Resource IDs: (1113)
 msgid "Add newline to capture"
@@ -229,7 +229,7 @@ msgstr "수정된 파일 자동 저장"
 
 #. Resource IDs: (60489)
 msgid "Auto-saves modified files when the session closes and restores the modified state on load"
-msgstr "세션이 닫힐 때 수정된 파일을 자동 저장하고 로드 시 수정된 상태를 복원합니다"
+msgstr "세션이 닫힐 때 수정된 파일을 자동 저장하고 로드시 수정된 상태를 복원합니다"
 
 #. Resource IDs: (60633)
 msgid "Autocomplete"
@@ -1442,7 +1442,7 @@ msgstr "파일 이동/복사"
 
 #. Resource IDs: (60326)
 msgid "Moves the cursor to the specified line"
-msgstr "커서를 지정된 선으로 이동합니다"
+msgstr "커서를 지정된 줄로 이동합니다"
 
 #. Resource IDs: (60331)
 msgid "Moves the cursor to the specified symbol"
@@ -2105,7 +2105,7 @@ msgstr "줄 분할"
 
 #. Resource IDs: (60271)
 msgid "Split long lines at the right window border"
-msgstr "오른쪽 창 테두리에서 긴 선 분할"
+msgstr "오른쪽 창 테두리에서 긴 줄 분할"
 
 #. Resource IDs: (1088)
 msgid "Status"
@@ -2423,7 +2423,7 @@ msgstr "Windows (CRLF)"
 
 #. Resource IDs: (60113, 60115)
 msgid "Wrap Lines"
-msgstr "선 줄 바꿈"
+msgstr "줄바꿈"
 
 #. Resource IDs: (143)
 msgid "Wrap around."
@@ -2431,7 +2431,7 @@ msgstr "둘러싸기"
 
 #. Resource IDs: (60116)
 msgid "Wrap lines at the end of the window"
-msgstr "창 끝에서 줄 바꿈"
+msgstr "창 끝에서 줄바꿈"
 
 #. Resource IDs: (60078)
 msgid "Write protected"
@@ -2521,15 +2521,15 @@ msgstr "이전 커서 위치로 이동"
 
 #. Resource IDs: (1113)
 msgid "hide lexer from dropdown"
-msgstr "드롭다운에서 렉서를 숨기기"
+msgstr "드롭다운에서 렉서 숨기기"
 
 #. Resource IDs: (60627, 60629)
 msgid "indent wrapped lines"
-msgstr "들여쓰기 줄바꿈된 선"
+msgstr "줄바꿈된 줄 들여쓰기"
 
 #. Resource IDs: (60630)
 msgid "indents wrapped sublines"
-msgstr "들여쓰기 줄바꿈된 하위선"
+msgstr " 줄바꿈된 하위줄 들여쓰기"
 
 #. Resource IDs: (60653)
 msgid "no plugins loaded"
