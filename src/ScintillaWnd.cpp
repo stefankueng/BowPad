@@ -1431,7 +1431,8 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
         SendMessage(*this, WM_NCPAINT, static_cast<WPARAM>(1), 0);
         return;
     }
-    CStringUtils::trim(sSelText);
+    if (!edit)
+        CStringUtils::trim(sSelText);
     if (sSelText.empty())
     {
         lastSelText.clear();
