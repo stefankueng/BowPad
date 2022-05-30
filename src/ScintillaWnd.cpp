@@ -1421,7 +1421,8 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     auto selStartPos = m_scintilla.SelectionStart();
     auto selEndPos   = m_scintilla.SelectionEnd();
     bool wholeWord   = (selStartPos == m_scintilla.WordStartPosition(selStartPos, true)) &&
-                     (selEndPos == m_scintilla.WordEndPosition(selEndPos, true));
+                     (selEndPos == m_scintilla.WordEndPosition(selEndPos, true)) &&
+                     (selEndPos == m_scintilla.WordEndPosition(selStartPos, true));
     auto origSelText = sSelText;
     if (origSelText.empty())
     {
