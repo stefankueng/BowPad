@@ -449,7 +449,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                         CoolSB_GetScrollInfo(*this, SB_VERT, &si);
 
                         auto  lineCount = m_scintilla.LineCount();
-                        auto  w         = m_scrollTool.GetTextWidth(CStringUtils::Format(L"Line: %lld", lineCount).c_str());
+                        auto  w         = m_scrollTool.GetTextWidth(CStringUtils::Format(L"Line: %Id", lineCount).c_str());
                         POINT thumbPoint{};
                         thumbPoint.x = thumbRect.right - w;
                         thumbPoint.y = thumbRect.top + ((thumbRect.bottom - thumbRect.top) * si.nTrackPos) / (si.nMax - si.nMin);
@@ -458,7 +458,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                         DarkModeHelper::Instance().AllowDarkModeForWindow(m_scrollTool, CTheme::Instance().IsDarkTheme());
                         SetWindowTheme(m_scrollTool, L"Explorer", nullptr);
 
-                        m_scrollTool.SetText(&thumbPoint, L"Line: %lld", docLine + 1);
+                        m_scrollTool.SetText(&thumbPoint, L"Line: %Id", docLine + 1);
                     }
                     break;
                     default:

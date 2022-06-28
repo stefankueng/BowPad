@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ LRESULT CGotoLineDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPa
             CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
 
             SetDlgItemText(hwndDlg, IDC_LINEINFO, lineInfo.c_str());
-            std::wstring sLine = CStringUtils::Format(L"%lld", line);
+            std::wstring sLine = CStringUtils::Format(L"%Id", line);
             SetDlgItemText(hwndDlg, IDC_LINE, sLine.c_str());
             SendDlgItemMessage(hwndDlg, IDC_LINE, EM_SETSEL, 0, -1);
         }
