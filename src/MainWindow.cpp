@@ -1871,7 +1871,7 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         bSaveAs = true;
     if (!bSaveAs && !doc.m_bIsDirty && !doc.m_bNeedsSaving)
         return false;
-
+    
     auto isActiveTab    = docID == m_tabBar.GetCurrentTabId();
     bool updateFileTree = false;
     if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
@@ -1910,6 +1910,7 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
     }
     if (!doc.m_path.empty())
     {
+        CCommandHandler::Instance().OnBeforeDocumentSave(docID);
         doc.m_bDoSaveAs = false;
         if (doc.m_bTrimBeforeSave)
         {

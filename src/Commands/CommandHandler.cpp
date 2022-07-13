@@ -80,7 +80,7 @@ CCommandHandler::CCommandHandler()
 
 std::unique_ptr<CCommandHandler> CCommandHandler::m_instance = nullptr;
 
-CCommandHandler& CCommandHandler::Instance()
+CCommandHandler&                 CCommandHandler::Instance()
 {
     if (m_instance == nullptr)
         m_instance.reset(new CCommandHandler());
@@ -313,6 +313,19 @@ void CCommandHandler::OnDocumentOpen(DocID docId)
     }
 }
 
+void CCommandHandler::OnBeforeDocumentSave(DocID docId)
+{
+    for (auto& [id, cmd] : m_commands)
+    {
+        cmd->OnBeforeDocumentSave(docId);
+    }
+    for (auto& [id, cmd] : m_noDeleteCommands)
+    {
+        if (cmd)
+            cmd->OnBeforeDocumentSave(docId);
+    }
+}
+
 void CCommandHandler::OnDocumentSave(DocID docId, bool bSaveAs)
 {
     for (auto& [id, cmd] : m_commands)
@@ -423,9 +436,9 @@ void CCommandHandler::InsertPlugins(void* obj)
     // for every found file and store the plugin for later use
     std::wstring sPluginDir = CAppUtils::GetDataPath();
     sPluginDir += L"\\plugins";
-    CDirFileEnum fileFinder(sPluginDir);
-    bool         bIsDirectory;
-    std::wstring fileName;
+    CDirFileEnum                                        fileFinder(sPluginDir);
+    bool                                                bIsDirectory;
+    std::wstring                                        fileName;
 
     std::map<std::wstring, std::unique_ptr<CCmdScript>> scripts;
     while (fileFinder.NextFile(fileName, &bIsDirectory, true))

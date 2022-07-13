@@ -67,6 +67,10 @@ void ICommand::OnDocumentOpen(DocID /*id*/)
 {
 }
 
+void ICommand::OnBeforeDocumentSave(DocID id)
+{
+}
+
 void ICommand::OnDocumentSave(DocID /*id*/, bool /*bSaveAs*/)
 {
 }

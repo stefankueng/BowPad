@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,6 +51,8 @@ public:
     void OnDocumentClose(DocID id) override;
 
     void OnDocumentOpen(DocID id) override;
+
+    void OnBeforeDocumentSave(DocID id) override;
 
     void OnDocumentSave(DocID id, bool bSaveAs) override;
 

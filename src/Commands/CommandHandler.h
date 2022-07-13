@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,30 +29,31 @@ public:
     ~CCommandHandler() = default;
 
 public:
-    static CCommandHandler& Instance();
-    static void             ShutDown();
+    static CCommandHandler&                          Instance();
+    static void                                      ShutDown();
 
-    void        Init(void* obj);
-    ICommand*   GetCommand(UINT cmdId);
-    void        ScintillaNotify(SCNotification* pScn);
-    void        TabNotify(TBHDR* ptbHdr);
-    void        OnClose();
-    void        OnDocumentClose(DocID docId);
-    void        OnDocumentOpen(DocID docId);
-    void        OnDocumentSave(DocID docId, bool bSaveAs);
-    void        OnClipboardChanged();
-    void        BeforeLoad();
-    void        AfterInit();
-    void        OnTimer(UINT timerId);
-    void        OnThemeChanged(bool bDark);
-    void        OnLangChanged();
-    void        OnStylesSet();
-    const auto& GetPluginMap() const { return m_plugins; }
-    int         GetPluginVersion(const std::wstring& name);
-    void        AddCommand(ICommand* cmd);
-    void        AddCommand(UINT cmdId);
-    void        InsertPlugins(void* obj);
-    void        PluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data);
+    void                                             Init(void* obj);
+    ICommand*                                        GetCommand(UINT cmdId);
+    void                                             ScintillaNotify(SCNotification* pScn);
+    void                                             TabNotify(TBHDR* ptbHdr);
+    void                                             OnClose();
+    void                                             OnDocumentClose(DocID docId);
+    void                                             OnDocumentOpen(DocID docId);
+    void                                             OnBeforeDocumentSave(DocID docId);
+    void                                             OnDocumentSave(DocID docId, bool bSaveAs);
+    void                                             OnClipboardChanged();
+    void                                             BeforeLoad();
+    void                                             AfterInit();
+    void                                             OnTimer(UINT timerId);
+    void                                             OnThemeChanged(bool bDark);
+    void                                             OnLangChanged();
+    void                                             OnStylesSet();
+    const auto&                                      GetPluginMap() const { return m_plugins; }
+    int                                              GetPluginVersion(const std::wstring& name);
+    void                                             AddCommand(ICommand* cmd);
+    void                                             AddCommand(UINT cmdId);
+    void                                             InsertPlugins(void* obj);
+    void                                             PluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data);
 
     const std::map<UINT, std::unique_ptr<ICommand>>& GetCommands() const
     {

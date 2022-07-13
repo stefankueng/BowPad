@@ -60,6 +60,7 @@ public:
     virtual void    OnThemeChanged(bool bDark);
     virtual void    OnDocumentClose(DocID id);
     virtual void    OnDocumentOpen(DocID id);
+    virtual void    OnBeforeDocumentSave(DocID id);
     virtual void    OnDocumentSave(DocID id, bool bSaveAs);
     virtual void    OnClipboardChanged();
     virtual HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue);

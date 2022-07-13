@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014-2016, 2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -334,6 +334,17 @@ void CCmdScript::OnDocumentOpen(DocID id)
     vI.vt             = VT_INT;
     dispParams.rgvarg = &vI;
     m_host->CallFunction(L"OnDocumentOpen", dispParams, false);
+}
+
+void CCmdScript::OnBeforeDocumentSave(DocID id)
+{
+    DISPPARAMS dispParams = {nullptr};
+    dispParams.cArgs      = 1;
+    VARIANT v[1];
+    v[0].intVal       = id.GetValue();
+    v[0].vt           = VT_INT;
+    dispParams.rgvarg = v;
+    m_host->CallFunction(L"OnBeforeDocumentSave", dispParams, false);
 }
 
 void CCmdScript::OnDocumentSave(DocID id, bool bSaveAs)
