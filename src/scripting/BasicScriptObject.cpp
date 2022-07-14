@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "StringUtils.h"
 #include "version.h"
 #include "../../ext/sktoolslib/PathUtils.h"
+#include "../Commands/CommandHandler.h"
 
 static auto CF_HTML = RegisterClipboardFormat(L"HTML Format");
 
@@ -927,6 +928,8 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID /*riid*/,
             idList[i] = 144;
         else if (_wcsicmp(nameList[i], L"InvalidateCommand") == 0)
             idList[i] = 145;
+        else if (_wcsicmp(nameList[i], L"ExecuteCommand") == 0)
+            idList[i] = 146;
         else if (_wcsicmp(nameList[i], L"SciGetTextRange") == 0)
             idList[i] = 900;
         else if (_wcsicmp(nameList[i], L"SciGetCharAt") == 0)
@@ -1479,6 +1482,17 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             InvalidateUICommand(p1.intVal, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_ItemsSource);
             InvalidateUICommand(p1.intVal, UI_INVALIDATIONS_STATE, nullptr);
             break;
+        case 146: // ExecuteCommand
+        {
+            if (args->cArgs != 1)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
+                return DISP_E_TYPEMISMATCH;
+            ICommand* pCmd = CCommandHandler::Instance().GetCommand(p1.intVal);
+            if (pCmd)
+                pCmd->Execute();
+        }
+        break;
         case 900: // SciGetTextRange
             if (args->cArgs != 2)
                 return DISP_E_BADPARAMCOUNT;
