@@ -166,7 +166,7 @@ void CPathWatcher::WorkerThread()
 
                     auto pDirInfo = std::make_unique<CDirWatchInfo>(std::move(hDir), watchedPath.c_str(), recursive);
                     m_hCompPort   = CreateIoCompletionPort(pDirInfo->m_hDir, m_hCompPort, reinterpret_cast<ULONG_PTR>(pDirInfo.get()), 0);
-                    if (m_hCompPort == NULL)
+                    if (!m_hCompPort)
                     {
                         ClearInfoMap();
                         watchedPaths.erase(watchedPath);
