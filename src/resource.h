@@ -220,6 +220,7 @@
 #define IDR_RTF1                        257
 #define IDR_REGEXHELPRTF                257
 #define IDS_FOLDTEXT                    258
+#define IDI_WORD                        258
 #define IDS_CUSTOMCOMMANDTITLE          259
 #define IDS_IMPORTBPLEX_TITLE           260
 #define IDS_IMPORTBPLEX_QUESTION        261
@@ -387,7 +388,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        258
+#define _APS_NEXT_RESOURCE_VALUE        259
 #define _APS_NEXT_COMMAND_VALUE         32773
 #define _APS_NEXT_CONTROL_VALUE         1136
 #define _APS_NEXT_SYMED_VALUE           110

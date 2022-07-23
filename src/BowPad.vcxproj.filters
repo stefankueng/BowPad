@@ -813,6 +813,9 @@
     <Image Include="res\snippet.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\word.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="res\BowPad.xml" />

@@ -192,7 +192,7 @@ void CAutoComplete::Init()
     m_editor->Scintilla().AutoCSetIgnoreCase(TRUE);
     m_editor->Scintilla().AutoCStops("([.");
     int i = 0;
-    for (auto icon : {IDI_SCI_CODE, IDI_SCI_FILE, IDI_SCI_SNIPPET})
+    for (auto icon : {IDI_SCI_CODE, IDI_SCI_FILE, IDI_SCI_SNIPPET, IDI_WORD})
     {
         CAutoIcon hIcon = LoadIconEx(g_hInst, MAKEINTRESOURCE(icon), iconWidth, iconHeight);
         auto      bytes = Icon2Image(hIcon);

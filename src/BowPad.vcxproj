@@ -621,6 +621,7 @@
     <Image Include="res\Shield.ico" />
     <Image Include="res\snippet.ico" />
     <Image Include="res\unsaved.ico" />
+    <Image Include="res\word.ico" />
     <Image Include="res\zoom.ico" />
     <Image Include="res\zoomdark.ico" />
   </ItemGroup>
