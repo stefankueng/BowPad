@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2021 - Stefan Kueng
+// Copyright (C) 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ enum class AutoCompleteType : int
     Code = 0,
     Path,
     Snippet,
+    Word,
 };
 
 class CAutoComplete
@@ -54,13 +55,15 @@ private:
     void                 HandleAutoComplete(const SCNotification* scn);
     void                 ExitSnippetMode();
     void                 MarkSnippetPositions(bool clearOnly);
+    void                 PrepareWordList(std::map<std::string, AutoCompleteType>& wordList) const;
     std::string          SanitizeSnippetText(const std::string& text) const;
+    static bool          IsWordChar(int ch);
     static void          SetWindowStylesForAutocompletionPopup();
     static BOOL CALLBACK AdjustThemeProc(HWND hwnd, LPARAM lParam);
 
 private:
-    CScintillaWnd* m_editor;
-    CMainWindow*   m_main;
+    CScintillaWnd*                                                          m_editor;
+    CMainWindow*                                                            m_main;
     // map of [language, [word, AutoCompleteType]]
     std::map<std::string, std::map<std::string, AutoCompleteType, ci_less>> m_langWordList;
     std::map<std::string, std::map<std::string, std::string>>               m_langSnippetList;

@@ -868,6 +868,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdCommandPalette" Id="10016" />
     <Command Name="cmdGroupWrapLines" Id="10017" />
     <Command Name="cmdGroupSaveAllBtn" Id="10018" />
+    <Command Name="cmdAutoComplete" Id="10019" />
 
     <!-- dummy command, does nothing. Used to disable hotkeys -->
     <Command Name="cmdNothing" Id="30000" />

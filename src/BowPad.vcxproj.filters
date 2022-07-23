@@ -408,6 +408,9 @@
     <ClInclude Include="..\ext\sktoolslib\InfoRtfDialog.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="SciTextReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

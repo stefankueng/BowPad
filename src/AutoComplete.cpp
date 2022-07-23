@@ -16,19 +16,20 @@
 //
 #include "stdafx.h"
 #include "AutoComplete.h"
-#include "BowPad.h"
 #include "AppUtils.h"
-#include "MainWindow.h"
-#include "ScintillaWnd.h"
-#include "StringUtils.h"
-#include "UnicodeUtils.h"
+#include "BowPad.h"
+#include "DarkModeHelper.h"
 #include "DirFileEnum.h"
-#include "SmartHandle.h"
+#include "LexStyles.h"
+#include "MainWindow.h"
 #include "OnOutOfScope.h"
 #include "SciLexer.h"
+#include "ScintillaWnd.h"
+#include "SmartHandle.h"
+#include "StringUtils.h"
 #include "Theme.h"
-#include "DarkModeHelper.h"
-#include "LexStyles.h"
+#include "UnicodeUtils.h"
+#include "SciTextReader.h"
 #include "../ext/tinyexpr/tinyexpr.h"
 
 #include <chrono>
@@ -697,8 +698,8 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
 
     if (scn->ch == '=')
     {
-        auto curLine   = m_editor->GetCurrentLine();
-        curLine        = curLine.substr(0, curLine.size() - 1);
+        auto curLine = m_editor->GetCurrentLine();
+        curLine      = curLine.substr(0, curLine.size() - 1);
         if (!curLine.empty())
         {
             int  err       = 0;
@@ -707,7 +708,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             {
                 long long ulongVal       = static_cast<long long>(exprValue);
                 auto      sValueComplete = CStringUtils::Format("%f\n%lld\n0x%llX\n%#llo",
-                                                           exprValue, ulongVal, ulongVal, ulongVal);
+                                                                exprValue, ulongVal, ulongVal, ulongVal);
 
                 m_editor->Scintilla().AutoCSetAutoHide(TRUE);
                 m_editor->Scintilla().AutoCSetSeparator(static_cast<uptr_t>(wordSeparator));
@@ -846,8 +847,10 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             auto                                  lang         = m_main->m_docManager.GetDocumentFromID(docID).GetLanguage();
             auto                                  langAutoList = m_langWordList[lang];
             const auto&                           snippetMap   = m_langSnippetList[lang];
-            if (docAutoList.empty() && langAutoList.empty() && snippetMap.empty())
+            if (docAutoList.empty() && langAutoList.empty() && snippetMap.empty() && (scn->ch != ' '))
                 return;
+
+            PrepareWordList(wordSet);
 
             for (const auto& list : {docAutoList, langAutoList})
             {
@@ -949,6 +952,66 @@ void CAutoComplete::MarkSnippetPositions(bool clearOnly)
     }
 }
 
+void CAutoComplete::PrepareWordList(std::map<std::string, AutoCompleteType>& wordList) const
+{
+    const bool          autoCompleteIgnoreCase = CIniSettings::Instance().GetInt64(L"View", L"autocompleteIgnorecase", 0) != 0;
+    const auto          maxSearchTime          = std::chrono::milliseconds(CIniSettings::Instance().GetInt64(L"View", L"autocompleteMaxSearchTime", 2000));
+
+    auto                lineLen                = m_editor->Scintilla().GetCurLine(0, nullptr);
+    const auto          line                   = m_editor->Scintilla().GetCurLine(lineLen);
+    const auto          caret                  = m_editor->Scintilla().CurrentPos();
+    const auto          ln                     = m_editor->Scintilla().LineFromPosition(caret);
+    const auto          lineStart              = m_editor->Scintilla().LineStart(ln);
+    const auto          current                = caret - lineStart;
+
+    Scintilla::Position startword              = current;
+    // Autocompletion of pure numbers is mostly an annoyance
+    bool                allNumber              = true;
+    while (startword > 0 && IsWordChar(line[startword - 1]))
+    {
+        startword--;
+        if (line[startword] < '0' || line[startword] > '9')
+        {
+            allNumber = false;
+        }
+    }
+    if (startword == current || allNumber)
+        return;
+
+    const auto root           = line.substr(startword, current - startword);
+    const auto rootLength     = static_cast<Scintilla::Position>(root.length());
+    const auto doclen         = m_editor->Scintilla().Length();
+    const auto flags          = Scintilla::FindOption::WordStart | (autoCompleteIgnoreCase ? Scintilla::FindOption::None : Scintilla::FindOption::MatchCase);
+    const auto posCurrentWord = m_editor->Scintilla().CurrentPos() - rootLength;
+
+    m_editor->Scintilla().SetTarget(Scintilla::Span(0, doclen));
+    m_editor->Scintilla().SetSearchFlags(flags);
+    auto          posFind = m_editor->Scintilla().SearchInTarget(root);
+    SciTextReader acc(m_editor->Scintilla());
+    auto          startTime = std::chrono::steady_clock::now();
+    // search the whole document
+    while (posFind >= 0 && posFind < doclen)
+    {
+        auto elapsedPeriod = std::chrono::steady_clock::now() - startTime;
+        if (elapsedPeriod > maxSearchTime)
+            break; // don't search for too long, some documents can be huge!
+        Scintilla::Position wordEnd = posFind + rootLength;
+        if (posFind != posCurrentWord)
+        {
+            while (IsWordChar(acc.SafeGetCharAt(wordEnd)))
+                wordEnd++;
+            const auto wordLength = wordEnd - posFind;
+            if (wordLength > rootLength)
+            {
+                const auto word = m_editor->Scintilla().StringOfSpan(Scintilla::Span(posFind, wordEnd));
+                wordList.emplace(word, AutoCompleteType::Word);
+            }
+        }
+        m_editor->Scintilla().SetTarget(Scintilla::Span(wordEnd, doclen));
+        posFind = m_editor->Scintilla().SearchInTarget(root);
+    }
+}
+
 std::string CAutoComplete::SanitizeSnippetText(const std::string& text) const
 {
     auto sVal = text;
@@ -971,6 +1034,15 @@ std::string CAutoComplete::SanitizeSnippetText(const std::string& text) const
         sVal = sVal.substr(0, maxLen - 3) + "...";
 
     return sVal;
+}
+
+bool CAutoComplete::IsWordChar(int ch)
+{
+    if (isalnum(ch))
+        return true;
+    if (ch == '_')
+        return true;
+    return false;
 }
 
 void CAutoComplete::SetWindowStylesForAutocompletionPopup()

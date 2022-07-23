@@ -453,6 +453,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="BowPad.h" />
     <ClInclude Include="ScintillaWnd.h" />
+    <ClInclude Include="SciTextReader.h" />
     <ClInclude Include="scripting\BasicScriptHost.h" />
     <ClInclude Include="scripting\BasicScriptObject.h" />
     <ClInclude Include="SettingsDlg.h" />

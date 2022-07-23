@@ -1565,6 +1565,14 @@ LRESULT CMainWindow::DoCommand(WPARAM wParam, LPARAM lParam)
             dlg.DoModal(g_hRes, IDD_CODESNIPPETS, *this);
         }
         break;
+        case cmdAutoComplete:
+        {
+            SCNotification scn{};
+            scn.ch = ' ';
+            scn.nmhdr.code = SCN_CHARADDED;
+            m_autoCompleter.HandleScintillaEvents(&scn);
+        }
+        break;
         default:
         {
             ICommand* pCmd = CCommandHandler::Instance().GetCommand(id);
