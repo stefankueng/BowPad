@@ -886,8 +886,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     GetWindowRect(m_custToolTip, &rc);
                     if (!PtInRect(&rc, pt) || !IsWindowVisible(m_custToolTip))
                     {
+                        if (IsWindowVisible(m_custToolTip))
+                            m_dwellStartPos = -1;
                         m_custToolTip.HideTip();
-                        m_dwellStartPos = -1;
                     }
                     if (IsWindowVisible(m_custToolTip) || m_editor.Scintilla().CallTipActive())
                         SetTimer(*this, TIMER_DWELLEND, 300, nullptr);
@@ -1568,7 +1569,7 @@ LRESULT CMainWindow::DoCommand(WPARAM wParam, LPARAM lParam)
         case cmdAutoComplete:
         {
             SCNotification scn{};
-            scn.ch = ' ';
+            scn.ch         = ' ';
             scn.nmhdr.code = SCN_CHARADDED;
             m_autoCompleter.HandleScintillaEvents(&scn);
         }
@@ -1879,7 +1880,7 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
         bSaveAs = true;
     if (!bSaveAs && !doc.m_bIsDirty && !doc.m_bNeedsSaving)
         return false;
-    
+
     auto isActiveTab    = docID == m_tabBar.GetCurrentTabId();
     bool updateFileTree = false;
     if (doc.m_path.empty() || bSaveAs || doc.m_bDoSaveAs)
