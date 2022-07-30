@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013, 2015-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -52,8 +52,9 @@ LRESULT CAboutDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam
             swprintf_s(verbuf, _countof(verbuf), L"BowPad version %d.%d.%d.%d", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
 #endif
             SetDlgItemText(hwndDlg, IDC_VERSIONLABEL, verbuf);
+            SetFocus(GetDlgItem(hwndDlg, IDOK));
         }
-            return TRUE;
+            return FALSE;
         case WM_COMMAND:
             return DoCommand(LOWORD(wParam));
         default:
