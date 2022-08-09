@@ -33,16 +33,16 @@
 
 #pragma comment(lib, "Uxtheme.lib")
 
-constexpr int SCRATCH_QCM_FIRST = 1;
-constexpr int SCRATCH_QCM_LAST  = 0x6FFF;
+constexpr int         SCRATCH_QCM_FIRST    = 1;
+constexpr int         SCRATCH_QCM_LAST     = 0x6FFF;
 
-static IContextMenu2* g_pcm2 = nullptr;
-static IContextMenu3* g_pcm3 = nullptr;
+static IContextMenu2* g_pcm2               = nullptr;
+static IContextMenu3* g_pcm3               = nullptr;
 
-constexpr wchar_t thisOsPathSeparator  = L'\\';
-constexpr wchar_t otherOsPathSeparator = L'/';
+constexpr wchar_t     thisOsPathSeparator  = L'\\';
+constexpr wchar_t     otherOsPathSeparator = L'/';
 
-inline bool IsFolderSeparator(wchar_t c)
+inline bool           IsFolderSeparator(wchar_t c)
 {
     return (c == thisOsPathSeparator || c == otherOsPathSeparator);
 }
@@ -127,7 +127,7 @@ void CFileTree::SetPath(const std::wstring& path, bool forceRefresh)
             --timeout;
         }
         m_bStop = false;
-        m_path = path;
+        m_path  = path;
         Refresh(TVI_ROOT);
     }
     else
@@ -901,17 +901,17 @@ bool CFileTree::InsertItem(const FileTreeItem* item, HTREEITEM parent, HTREEITEM
     TVINSERTSTRUCT tvIns  = {nullptr};
     wchar_t        dots[] = L"..";
 
-    tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
+    tvi.mask              = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
 
     const auto filename   = CPathUtils::GetFileName(item->path);
     tvi.pszText           = const_cast<LPWSTR>(filename.c_str());
     tvi.cchTextMax        = static_cast<int>(filename.length());
     tvi.cChildren         = 0;
-    auto dirIconIndex     = CSysImageList::GetInstance().GetDirIconIndex();
-    auto dirOpenIconIndex = CSysImageList::GetInstance().GetDirOpenIconIndex();
 
     if (item->isDir)
     {
+        auto dirIconIndex     = CSysImageList::GetInstance().GetDirIconIndex();
+        auto dirOpenIconIndex = CSysImageList::GetInstance().GetDirOpenIconIndex();
         tvi.mask |= TVIF_EXPANDEDIMAGE;
         tvi.iImage         = dirIconIndex;
         tvi.iSelectedImage = dirIconIndex;
