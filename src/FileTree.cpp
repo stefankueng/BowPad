@@ -316,9 +316,21 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                     }
                 }
                 bool activepathmarked = false;
-                for (const auto& item : pData->data)
+                if (pData->data.size() < static_cast<size_t>(CIniSettings::Instance().GetInt64(L"View", L"maxTreeChildren", 2000)))
                 {
-                    activepathmarked = InsertItem(item.get(), pData->refreshRoot, TVI_FIRST, activePath) || activepathmarked;
+                    for (const auto& item : pData->data)
+                    {
+                        activepathmarked = InsertItem(item.get(), pData->refreshRoot, TVI_FIRST, activePath) || activepathmarked;
+                    }
+                }
+                else
+                {
+                    auto dummyPath          = std::format(L"{0} files...", pData->data.size());
+                    auto pFi       = std::make_unique<FileTreeItem>();
+                    pFi->path = dummyPath;
+                    pFi->maxDummy = true;
+                    pData->data.push_back(std::move(pFi));
+                    activepathmarked = InsertItem(pData->data.back().get(), pData->refreshRoot, TVI_FIRST, L"");
                 }
 
                 TreeView_Expand(*this, pData->refreshRoot, TVE_EXPAND);
@@ -606,10 +618,12 @@ std::wstring CFileTree::GetPathForHitItem(bool* isDir, bool* isDot) const
                 (*isDir) = pTreeItem->isDir;
             if (isDot)
                 (*isDot) = pTreeItem->isDot;
+            if (pTreeItem->maxDummy)
+                return {};
             return pTreeItem->path;
         }
     }
-    return std::wstring();
+    return {};
 }
 
 std::wstring CFileTree::GetPathForSelItem(bool* isDir, bool* isDot) const
@@ -628,6 +642,8 @@ std::wstring CFileTree::GetPathForSelItem(bool* isDir, bool* isDot) const
                 (*isDir) = pTreeItem->isDir;
             if (isDot)
                 (*isDot) = pTreeItem->isDot;
+            if (pTreeItem->maxDummy)
+                return {};
             return pTreeItem->path;
         }
     }
@@ -644,6 +660,8 @@ std::wstring CFileTree::GetDirPathForHitItem() const
         {
             if (pTreeItem->isDir)
                 return pTreeItem->path;
+            if (pTreeItem->maxDummy)
+                return {};
             return pTreeItem->path.substr(0, pTreeItem->path.find_last_of('\\'));
         }
     }
@@ -831,35 +849,37 @@ void CFileTree::HandleChangeNotifications()
                     auto dirIt = m_data.find(hDir);
                     if (hDir && dirIt != m_data.end())
                     {
-                        auto& data = dirIt->second->data;
-                        auto  fi   = std::make_unique<FileTreeItem>();
-                        fi->isDir  = PathIsDirectory(path.c_str()) != 0;
-                        fi->path   = path;
-                        data.push_back(std::move(fi));
-                        std::sort(data.begin(), data.end(), [](const auto& lhs, const auto& rhs) {
-                            if (lhs->isDot)
-                                return false;
-                            if (rhs->isDot)
-                                return true;
-
-                            if (lhs->isDir != rhs->isDir)
-                                return !lhs->isDir;
-
-                            auto res = CompareStringEx(nullptr, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS | SORT_STRINGSORT,
-                                                       lhs->path.c_str(), static_cast<int>(lhs->path.length()),
-                                                       rhs->path.c_str(), static_cast<int>(rhs->path.length()),
-                                                       nullptr, nullptr, 0);
-                            return res == CSTR_GREATER_THAN;
-                        });
-                        HTREEITEM insertAfter = TVI_FIRST;
-                        auto      foundIt     = std::find_if(data.begin(), data.end(), [&](const auto& fti) -> bool { return CPathUtils::PathCompare(fti->path, path) == 0; });
-                        auto      nextIt      = foundIt;
-                        ++nextIt;
-                        if (nextIt != data.cend())
+                        if (auto& data = dirIt->second->data; data.size() < static_cast<size_t>(CIniSettings::Instance().GetInt64(L"View", L"maxTreeChildren", 2000)))
                         {
-                            insertAfter = GetItemForPath((*nextIt)->path);
+                            auto fi = std::make_unique<FileTreeItem>();
+                            fi->isDir  = PathIsDirectory(path.c_str()) != 0;
+                            fi->path   = path;
+                            data.push_back(std::move(fi));
+                            std::sort(data.begin(), data.end(), [](const auto& lhs, const auto& rhs) {
+                                if (lhs->isDot)
+                                    return false;
+                                if (rhs->isDot)
+                                    return true;
+
+                                if (lhs->isDir != rhs->isDir)
+                                    return !lhs->isDir;
+
+                                auto res = CompareStringEx(nullptr, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS | SORT_STRINGSORT,
+                                                           lhs->path.c_str(), static_cast<int>(lhs->path.length()),
+                                                           rhs->path.c_str(), static_cast<int>(rhs->path.length()),
+                                                           nullptr, nullptr, 0);
+                                return res == CSTR_GREATER_THAN;
+                            });
+                            HTREEITEM insertAfter = TVI_FIRST;
+                            auto      foundIt     = std::find_if(data.begin(), data.end(), [&](const auto& fti) -> bool { return CPathUtils::PathCompare(fti->path, path) == 0; });
+                            auto      nextIt      = foundIt;
+                            ++nextIt;
+                            if (nextIt != data.cend())
+                            {
+                                insertAfter = GetItemForPath((*nextIt)->path);
+                            }
+                            InsertItem(foundIt->get(), hDir, insertAfter, {});
                         }
-                        InsertItem(foundIt->get(), hDir, insertAfter, {});
                     }
                     else
                         refreshRoot = true;
@@ -932,6 +952,12 @@ bool CFileTree::InsertItem(const FileTreeItem* item, HTREEITEM parent, HTREEITEM
         int fileIconIndex  = CSysImageList::GetInstance().GetFileIconIndex(item->path);
         tvi.iImage         = fileIconIndex;
         tvi.iSelectedImage = fileIconIndex;
+    }
+    if (item->maxDummy)
+    {
+        tvi.mask |= TVIF_STATE;
+        tvi.state     = TVIS_CUT;
+        tvi.stateMask = TVIS_CUT;
     }
     bool activePathMarked = false;
     if (!activePath.empty())

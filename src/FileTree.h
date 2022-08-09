@@ -30,6 +30,7 @@ public:
     bool         isDir = false;
     bool         isDot = false;
     bool         busy  = false;
+    bool         maxDummy = false;
 };
 
 class FileTreeData
