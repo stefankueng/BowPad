@@ -103,6 +103,8 @@ void CFileTree::Clear()
     {
         delete data;
     }
+    SendMessage(*this, WM_SETREDRAW, FALSE, 0);
+    OnOutOfScope(SendMessage(*this, WM_SETREDRAW, TRUE, 0));
     TreeView_DeleteAllItems(*this);
 }
 
