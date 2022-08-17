@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <VersionHelpers.h>
 #include <Uxtheme.h>
+#include <format>
 
 #pragma comment(lib, "Uxtheme.lib")
 
