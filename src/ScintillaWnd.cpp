@@ -1570,7 +1570,7 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
     if ((braceAtCaret != -1) && (braceOpposite == -1))
     {
         m_scintilla.BraceBadLight(braceAtCaret);
-        if (lastIndicatorLength && CIniSettings::Instance().GetInt64(L"View", L"bracehighlighttext", 1))
+        if (lastIndicatorLength && CIniSettings::Instance().GetInt64(L"View", L"bracehighlightbkgnd", 1))
         {
             m_scintilla.SetIndicatorCurrent(INDIC_BRACEMATCH);
             m_scintilla.IndicatorClearRange(lastIndicatorStart, lastIndicatorLength);
@@ -1580,7 +1580,7 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
     else
     {
         m_scintilla.BraceHighlight(braceAtCaret, braceOpposite);
-        if (CIniSettings::Instance().GetInt64(L"View", L"bracehighlighttext", 1))
+        if (CIniSettings::Instance().GetInt64(L"View", L"bracehighlightbkgnd", 1))
         {
             if (lastIndicatorLength)
             {

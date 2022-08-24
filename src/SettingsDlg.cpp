@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2021 - Stefan Kueng
+// Copyright (C) 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ LRESULT CSettingsDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPa
             m_settings.push_back({L"view", L"scrollstyle", ResString(g_hRes, IDS_SETTINGS_SCROLLSTYLE), ResString(g_hRes, IDS_SETTINGS_SCROLLSTYLE_DESC), SettingType::Boolean, true});
             m_settings.push_back({L"view", L"d2d", ResString(g_hRes, IDS_SETTING_D2D), ResString(g_hRes, IDS_SETTING_D2D_DESC), SettingType::Boolean, true});
             m_settings.push_back({L"view", L"caretlineframe", ResString(g_hRes, IDS_SETTING_CARETLINEFRAME), ResString(g_hRes, IDS_SETTING_CARETLINEFRAME_DESC), SettingType::Boolean, false});
-            m_settings.push_back({L"view", L"bracehighlighttext", ResString(g_hRes, IDS_SETTING_BRACEHIGHLIGHT), ResString(g_hRes, IDS_SETTING_BRACEHIGHLIGHT_DESC), SettingType::Boolean, true});
+            m_settings.push_back({L"view", L"bracehighlightbkgnd", ResString(g_hRes, IDS_SETTING_BRACEHIGHLIGHT), ResString(g_hRes, IDS_SETTING_BRACEHIGHLIGHT_DESC), SettingType::Boolean, true});
 
             InitSettingsList();
         }
