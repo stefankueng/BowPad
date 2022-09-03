@@ -33,6 +33,15 @@
         </filterchain>
     </loadfile>
     <echo file="x64\AppxManifest.xml" message="${appxmanifest64}" encoding="utf-8"/>
+    <loadfile file="AppXManifest.xml.in" property="appxmanifestARM64" encoding="utf-8">
+        <filterchain>
+            <replacetokens begintoken="$" endtoken="$">
+                <token key="Architecture" value="arm64" />
+                <token key="Version" value="${verstring}" />
+            </replacetokens>
+        </filterchain>
+    </loadfile>
+    <echo file="ARM64\AppxManifest.xml" message="${appxmanifestARM64}" encoding="utf-8"/>
   </target>
 
   <target name="setup" depends="VersionInfo">
@@ -55,8 +64,26 @@
             <arg value="..\..\bin\release64\bin\package.msix" />
         </exec>
     </if>
+    <exec program="MakeAppX.exe">
+        <arg value="pack" />
+        <arg value="/o" />
+        <arg value="/d" />
+        <arg value="ARM64" />
+        <arg value="-p" />
+        <arg value="..\..\bin\releaseARM64\bin\package.msix" />
+        <arg value="/nv" />
+    </exec>
+    <if test="${file::exists('..\..\signinfo.txt')}">
+        <exec program="${signtool}">
+            <arg value="sign" />
+            <arg value="${signinfo}" />
+            <arg value="..\..\bin\releaseARM64\bin\package.msix" />
+        </exec>
+    </if>
 
-
+    <setenv>
+        <variable name="WixPlatform" value="x86" />
+    </setenv>
     <exec program="candle">
       <arg value="-nologo" />
       <arg value="-out" />
@@ -89,11 +116,14 @@
     </if>
     <!-- x64 -->
     <property name="msifilename64" value="BowPad64-${verstring}" />
+    <setenv>
+        <variable name="WixPlatform" value="x64" />
+    </setenv>
     <exec program="candle">
       <arg value="-nologo" />
       <arg value="-out" />
       <arg value="..\..\bin\" />
-      <arg value="Setup64.wxs" />
+      <arg value="Setup.wxs" />
     </exec>
     <exec program="light">
       <arg value="-nologo" />
@@ -104,7 +134,7 @@
       <arg value="-cultures:en-us" />
       <arg value="-out" />
       <arg value="..\..\bin\${msifilename64}.msi" />
-      <arg value="..\..\bin\Setup64.wixobj" />
+      <arg value="..\..\bin\Setup.wixobj" />
     </exec>
     <delete>
       <fileset>
@@ -117,6 +147,41 @@
         <arg value="sign" />
         <arg value="${signinfo}" />
         <arg value="..\..\bin\${msifilename64}.msi" />
+      </exec>
+    </if>
+    <!-- ARM64 -->
+    <property name="msifilenameARM64" value="BowPadARM64-${verstring}" />
+    <setenv>
+        <variable name="WixPlatform" value="arm64" />
+    </setenv>
+    <exec program="candle">
+      <arg value="-nologo" />
+      <arg value="-out" />
+      <arg value="..\..\bin\" />
+      <arg value="Setup.wxs" />
+    </exec>
+    <exec program="light">
+      <arg value="-nologo" />
+      <arg value="-ext" />
+      <arg value="WixUIExtension" />
+      <arg value="-ext" />
+      <arg value="WixUtilExtension" />
+      <arg value="-cultures:en-us" />
+      <arg value="-out" />
+      <arg value="..\..\bin\${msifilenameARM64}.msi" />
+      <arg value="..\..\bin\Setup.wixobj" />
+    </exec>
+    <delete>
+      <fileset>
+        <include name="..\..\bin\*.wixobj" />
+        <include name="..\..\bin\*.wixpdb" />
+      </fileset>
+    </delete>
+    <if test="${file::exists('..\..\signinfo.txt')}">
+      <exec program="${signtool}">
+        <arg value="sign" />
+        <arg value="${signinfo}" />
+        <arg value="..\..\bin\${msifilenameARM64}.msi" />
       </exec>
     </if>
   </target>

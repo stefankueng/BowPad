@@ -45,6 +45,14 @@
       <arg value="/verbosity:quiet" />
       <arg value="/maxcpucount" />
     </exec>
+    <exec program="msbuild.exe" >
+      <arg value="BowPad.sln" />
+      <arg value="/t:Clean" />
+      <arg value="/p:Configuration=${configuration}" />
+      <arg value="/p:Platform=ARM64" />
+      <arg value="/verbosity:quiet" />
+      <arg value="/maxcpucount" />
+    </exec>
   </target>
 
   <target name="VersionInfo" depends="VSNET,env">
@@ -92,6 +100,14 @@
       <arg value="/verbosity:minimal" />
       <arg value="/maxcpucount" />
     </exec>
+    <exec program="msbuild.exe" >
+      <arg value="BowPad.sln" />
+      <arg value="/t:Rebuild" />
+      <arg value="/p:Configuration=${configuration}" />
+      <arg value="/p:Platform=ARM64" />
+      <arg value="/verbosity:minimal" />
+      <arg value="/maxcpucount" />
+    </exec>
     <!-- sign all binaries -->
     <if test="${file::exists('signinfo.txt')}">
       <foreach item="File" property="filename">
@@ -99,6 +115,7 @@
           <items>
             <include name="bin\${configuration}\bin\*.exe" />
             <include name="bin\${configuration}64\bin\*.exe" />
+            <include name="bin\${configuration}ARM64\bin\*.exe" />
           </items>
         </in>
         <do>
@@ -130,6 +147,11 @@
     </zip>
     <zip zipfile="bin\BowPad64-${verstring}-portable.zip" ziplevel="9">
       <fileset basedir="bin\${configuration}64\bin">
+        <include name="BowPad.exe" />
+      </fileset>
+    </zip>
+    <zip zipfile="bin\BowPadARM64-${verstring}-portable.zip" ziplevel="9">
+      <fileset basedir="bin\${configuration}ARM64\bin">
         <include name="BowPad.exe" />
       </fileset>
     </zip>
@@ -223,6 +245,13 @@ BowPad-${verstring}.msi</echo>
           <arg line="${filename}" />
         </exec>
         <copy file="bin\Release64\bin\${path::get-file-name-without-extension(filename)}.lang" tofile="Languages\x64\${path::get-file-name-without-extension(filename)}.lang" overwrite="true" />
+        <exec program="tools\restext.exe">
+          <arg value="apply" />
+          <arg line="bin\ReleaseARM64\bin\Resource.dll" />
+          <arg line="bin\ReleaseARM64\bin\${path::get-file-name-without-extension(filename)}.lang" />
+          <arg line="${filename}" />
+        </exec>
+        <copy file="bin\ReleaseARM64\bin\${path::get-file-name-without-extension(filename)}.lang" tofile="Languages\ARM64\${path::get-file-name-without-extension(filename)}.lang" overwrite="true" />
         <echo message="${string::substring(path::get-file-name-without-extension(filename), 7, string::get-length(path::get-file-name-without-extension(filename))-7)}
 " append="true" file="Languages\Languages.txt"/>
       </do>

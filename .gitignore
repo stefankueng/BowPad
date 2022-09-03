@@ -25,3 +25,4 @@
 /src/Setup/x64
 /src/Setup/CustomActions/CustomActions.vcxproj.user
 /ext/uchardet.vcxproj.user
+/src/Setup/ARM64
