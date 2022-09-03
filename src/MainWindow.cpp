@@ -4233,8 +4233,36 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     if (bReloadCurrentTab)
     {
         editor->SaveCurrentPos(doc.m_position);
-        // Apply the new one.
-        editor->Scintilla().SetDocPointer(docReload.m_document);
+
+        bool withUndo      = false;
+        auto maxLenForUndo = CIniSettings::Instance().GetInt64(L"View", L"maxLenForUndo", 2 * 1024 * 1024);
+        if (editor->Scintilla().Length() < maxLenForUndo)
+        {
+            m_scratchEditor.Scintilla().SetDocPointer(docReload.m_document);
+            auto oldLen = editor->Scintilla().Length();
+            auto newLen = m_scratchEditor.Scintilla().Length();
+            if (newLen < maxLenForUndo && oldLen < maxLenForUndo)
+            {
+                auto oldText = editor->Scintilla().GetText(oldLen);
+                auto text = m_scratchEditor.Scintilla().GetText(newLen);
+                if (oldText != text)
+                {
+                    editor->Scintilla().BeginUndoAction();
+                    editor->Scintilla().ClearAll();
+                    editor->Scintilla().AppendText(text.size(), text.data());
+                    editor->RestoreCurrentPos(doc.m_position);
+                    editor->Scintilla().EndUndoAction();
+                    withUndo = true;
+                }
+            }
+            m_scratchEditor.Scintilla().SetDocPointer(nullptr);
+        }
+
+        if (!withUndo)
+        {
+            // Apply the new one.
+            editor->Scintilla().SetDocPointer(docReload.m_document);
+        }
     }
 
     docReload.m_position          = doc.m_position;
