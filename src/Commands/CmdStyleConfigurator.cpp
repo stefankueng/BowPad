@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -52,8 +52,8 @@
 
 namespace
 {
-const UINT WM_CURRENTSTYLECHANGED = (WM_APP + 1);
-const UINT WM_CURRENTDOCCHANGED   = (WM_APP + 2);
+constexpr UINT WM_CURRENTSTYLECHANGED = (WM_APP + 1);
+constexpr UINT WM_CURRENTDOCCHANGED   = (WM_APP + 2);
 
 std::unique_ptr<CStyleConfiguratorDlg> g_pStyleConfiguratorDlg;
 int                                    g_lastStyle = -1;

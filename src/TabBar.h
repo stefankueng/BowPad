@@ -29,9 +29,9 @@
 #define TCN_GETDROPICON       (WM_USER + 8)
 #define TCN_RELOAD            (WM_USER + 9)
 
-const int SAVED_IMG_INDEX   = 0;
-const int UNSAVED_IMG_INDEX = 1;
-const int REDONLY_IMG_INDEX = 2;
+constexpr int SAVED_IMG_INDEX   = 0;
+constexpr int UNSAVED_IMG_INDEX = 1;
+constexpr int REDONLY_IMG_INDEX = 2;
 
 struct TBHDR
 {
@@ -68,7 +68,7 @@ enum class TabButtonType
     ClosePush
 };
 
-const int nbCtrlMax = 10;
+constexpr int nbCtrlMax = 10;
 
 class CTabBar : public CWindow
 {

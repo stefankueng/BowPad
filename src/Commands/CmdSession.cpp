@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,9 +36,9 @@
 
 namespace
 {
-const wchar_t g_sessionSection[]         = {L"TabSession"};
-const wchar_t g_sessionSectionElevated[] = {L"TabSessionElevated"};
-const int     BP_DEFAULT_SESSION_SIZE    = 500;
+constexpr wchar_t g_sessionSection[]         = {L"TabSession"};
+constexpr wchar_t g_sessionSectionElevated[] = {L"TabSessionElevated"};
+constexpr int     BP_DEFAULT_SESSION_SIZE    = 500;
 }; // namespace
 
 static const wchar_t* sessionSection()
@@ -91,9 +91,9 @@ void CCmdSessionLoad::OnClose()
     SetAutoLoad(bAutoLoad);
     CIniSettings::Instance().SetInt64(sessionSection(), L"handlemodified", handleModified ? 1 : 0);
     // now go through all tabs and save their state
-    int tabCount  = GetTabCount();
-    int activeTab = GetActiveTabIndex();
-    int saveIndex = 0;
+    int  tabCount        = GetTabCount();
+    int  activeTab       = GetActiveTabIndex();
+    int  saveIndex       = 0;
 
     auto savePosSettings = [&](int index, const CPosData& pos) {
         settings.SetInt64(sessionSection(), CStringUtils::Format(L"selmode%d", index).c_str(), static_cast<int>(pos.m_nSelMode));
@@ -116,9 +116,9 @@ void CCmdSessionLoad::OnClose()
 
     auto sessionPath = GetBackupPath();
 
-    int sessionSize = static_cast<int>(settings.GetInt64(sessionSection(), L"session_size", BP_DEFAULT_SESSION_SIZE));
+    int  sessionSize = static_cast<int>(settings.GetInt64(sessionSection(), L"session_size", BP_DEFAULT_SESSION_SIZE));
     // No point saving more than we are prepared to load.
-    int saveCount = min(tabCount, sessionSize);
+    int  saveCount   = min(tabCount, sessionSize);
     for (int i = 0; i < saveCount; ++i)
     {
         auto  docId = GetDocIDFromTabIndex(i);
@@ -172,7 +172,7 @@ void CCmdSessionLoad::RestoreSavedSession()
     auto&        settings          = CIniSettings::Instance();
     int          numFilesToRestore = 0;
 
-    int sessionSize = static_cast<int>(settings.GetInt64(sessionSection(), L"session_size", BP_DEFAULT_SESSION_SIZE));
+    int          sessionSize       = static_cast<int>(settings.GetInt64(sessionSection(), L"session_size", BP_DEFAULT_SESSION_SIZE));
     for (int fileNum = 0; fileNum < sessionSize; ++fileNum)
     {
         std::wstring key  = CStringUtils::Format(L"path%d", fileNum);
@@ -199,7 +199,7 @@ void CCmdSessionLoad::RestoreSavedSession()
     }
 
     DocID                     activeDoc;
-    const unsigned int        openFlags   = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
+    constexpr unsigned int    openFlags   = OpenFlags::IgnoreIfMissing | OpenFlags::NoActivate;
     int                       fileCount   = 0;
     auto                      sessionPath = GetBackupPath();
     std::vector<std::wstring> filesToDelete;

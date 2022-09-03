@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2016, 2018, 2020-2021 Stefan Kueng
+// Copyright (C) 2013-2016, 2018, 2020-2022 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -217,7 +217,7 @@ LRESULT CCorrespondingFileDlg::DoCommand(int id, int msg)
                 if (info.ok)
                 {
                     ShowWindow(*this, SW_HIDE);
-                    unsigned int openFlags;
+                    unsigned int openFlags = 0;
                     if (info.create)
                         openFlags = OpenFlags::AddToMRU | OpenFlags::CreateIfMissing;
                     else

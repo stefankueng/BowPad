@@ -72,19 +72,19 @@ constexpr COLORREF folderColors[] = {
 };
 constexpr int                 MAX_FOLDERCOLORS                   = static_cast<int>(std::size(folderColors));
 
-const int                     STATUSBAR_DOC_TYPE                 = 0;
-const int                     STATUSBAR_CUR_POS                  = 1;
-const int                     STATUSBAR_SEL                      = 2;
-const int                     STATUSBAR_EDITORCONFIG             = 3;
-const int                     STATUSBAR_EOL_FORMAT               = 4;
-const int                     STATUSBAR_TABSPACE                 = 5;
+constexpr int                 STATUSBAR_DOC_TYPE                 = 0;
+constexpr int                 STATUSBAR_CUR_POS                  = 1;
+constexpr int                 STATUSBAR_SEL                      = 2;
+constexpr int                 STATUSBAR_EDITORCONFIG             = 3;
+constexpr int                 STATUSBAR_EOL_FORMAT               = 4;
+constexpr int                 STATUSBAR_TABSPACE                 = 5;
 // ReSharper disable once CppInconsistentNaming
-const int                     STATUSBAR_R2L                      = 6;
-const int                     STATUSBAR_UNICODE_TYPE             = 7;
-const int                     STATUSBAR_TYPING_MODE              = 8;
-const int                     STATUSBAR_CAPS                     = 9;
-const int                     STATUSBAR_TABS                     = 10;
-const int                     STATUSBAR_ZOOM                     = 11;
+constexpr int                 STATUSBAR_R2L                      = 6;
+constexpr int                 STATUSBAR_UNICODE_TYPE             = 7;
+constexpr int                 STATUSBAR_TYPING_MODE              = 8;
+constexpr int                 STATUSBAR_CAPS                     = 9;
+constexpr int                 STATUSBAR_TABS                     = 10;
+constexpr int                 STATUSBAR_ZOOM                     = 11;
 
 constexpr char                URL_REG_EXPR[]                     = {"\\b[A-Za-z+]{3,9}://[A-Za-z0-9_\\-+~.:?&@=/%#,;{}()[\\]|*!\\\\]+\\b"};
 constexpr size_t              URL_REG_EXPR_LENGTH                = _countof(URL_REG_EXPR) - 1;

@@ -29,13 +29,13 @@ class CMainWindow;
 
 namespace OpenFlags
 {
-const unsigned int AddToMRU             = 1;
-const unsigned int AskToCreateIfMissing = 2;
-const unsigned int IgnoreIfMissing      = 4;
-const unsigned int OpenIntoActiveTab    = 8;
-const unsigned int NoActivate           = 16;
-const unsigned int CreateTabOnly        = 32;
-const unsigned int CreateIfMissing      = 64;
+constexpr unsigned int AddToMRU             = 1;
+constexpr unsigned int AskToCreateIfMissing = 2;
+constexpr unsigned int IgnoreIfMissing      = 4;
+constexpr unsigned int OpenIntoActiveTab    = 8;
+constexpr unsigned int NoActivate           = 16;
+constexpr unsigned int CreateTabOnly        = 32;
+constexpr unsigned int CreateIfMissing      = 64;
 }; // namespace OpenFlags
 
 class ICommand
