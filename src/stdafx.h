@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2016, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2016, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -58,7 +58,9 @@
 #define APP_ID          L"TortoiseSVN.Tools.BowPad.1"
 #define APP_ID_ELEVATED L"TortoiseSVN.Tools.BowPad_elevated.1"
 
-#ifdef _WIN64
+#ifdef _M_ARM64
+#    define LANGPLAT L"ARM64"
+#elif defined _WIN64
 #    define LANGPLAT L"x64"
 #else
 #    define LANGPLAT L"x86"
