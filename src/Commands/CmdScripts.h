@@ -27,52 +27,52 @@ public:
     CCmdScript(void* obj, const std::wstring& path);
     virtual ~CCmdScript();
 
-    bool Create(const std::wstring& path);
-    void SetCmdId(UINT cmdId);
-    void SetDescription(const std::wstring& desc) { m_description = desc; }
+    bool        Create(const std::wstring& path);
+    void        SetCmdId(UINT cmdId);
+    void        SetDescription(const std::wstring& desc) { m_description = desc; }
 
     bool        Execute() override;
     bool        IsEnabled() const;
     bool        IsChecked() const;
     IUIImagePtr getIcon() const;
 
-    UINT GetCmdId() override;
+    UINT        GetCmdId() override;
 
-    void ScintillaNotify(SCNotification* pScn) override;
+    void        ScintillaNotify(SCNotification* pScn) override;
 
-    void TabNotify(TBHDR* ptbHdr) override;
+    void        TabNotify(TBHDR* ptbHdr) override;
 
-    void OnClose() override;
+    void        OnClose() override;
 
-    void BeforeLoad() override;
+    void        BeforeLoad() override;
 
-    void AfterInit() override;
+    void        AfterInit() override;
 
-    void OnDocumentClose(DocID id) override;
+    void        OnDocumentClose(DocID id) override;
 
-    void OnDocumentOpen(DocID id) override;
+    void        OnDocumentOpen(DocID id) override;
 
-    void OnBeforeDocumentSave(DocID id) override;
+    void        OnBeforeDocumentSave(DocID id) override;
 
-    void OnDocumentSave(DocID id, bool bSaveAs) override;
+    void        OnDocumentSave(DocID id, bool bSaveAs) override;
 
-    HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
+    HRESULT     IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
-    void OnTimer(UINT id) override;
+    void        OnTimer(UINT id) override;
 
-    void OnThemeChanged(bool bDark) override;
+    void        OnThemeChanged(bool bDark) override;
 
-    void OnLangChanged() override;
+    void        OnLangChanged() override;
 
-    void OnStylesSet() override;
+    void        OnStylesSet() override;
 
-    int m_version;
+    int         m_version;
 
 private:
-    BasicScriptObject* m_appObject;
-    BasicScriptHost*   m_host;
-    UINT               m_cmdID;
-    IUIImagePtr        m_image;
-    std::wstring       m_name;
-    std::wstring       m_description;
+    std::unique_ptr<BasicScriptObject> m_appObject;
+    std::unique_ptr<BasicScriptHost>   m_host;
+    UINT                               m_cmdID;
+    IUIImagePtr                        m_image;
+    std::wstring                       m_name;
+    std::wstring                       m_description;
 };

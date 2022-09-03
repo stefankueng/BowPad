@@ -33,7 +33,7 @@
 CCmdScript::CCmdScript(void* obj, const std::wstring& path)
     : ICommand(obj)
     , m_version(0)
-    , m_appObject(new BasicScriptObject(obj, path))
+    , m_appObject(std::make_unique<BasicScriptObject>(obj, path))
     , m_host(nullptr)
     , m_cmdID(0)
     , m_image(nullptr)
@@ -45,9 +45,7 @@ CCmdScript::~CCmdScript()
     if (m_host)
     {
         m_host->Terminate();
-        delete m_host;
     }
-    delete m_appObject;
 }
 
 bool CCmdScript::Create(const std::wstring& path)
@@ -74,7 +72,7 @@ bool CCmdScript::Create(const std::wstring& path)
             return false;
 
         //  Create the script site
-        m_host = new BasicScriptHost(engineID, L"BowPad", appObjectDispatch);
+        m_host = std::make_unique<BasicScriptHost>(engineID, L"BowPad", appObjectDispatch);
 
         hr = m_host->Initialize();
         if (CAppUtils::FailedShowMessage(hr))
