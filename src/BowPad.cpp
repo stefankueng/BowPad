@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -344,7 +344,7 @@ static void ShowBowPadCommandLineHelp()
     MessageBox(nullptr, sMessage.c_str(), L"BowPad", MB_ICONINFORMATION);
 }
 
-static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
+static void ParseCommandLine(CCmdLineParser& parser, CMainWindow* mainWindow)
 {
     if (parser.HasVal(L"path"))
     {
@@ -353,18 +353,18 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
         {
             line = parser.GetLongLongVal(L"line") - 1LL;
         }
-        mainWindow.SetFileToOpen(parser.GetVal(L"path"), line);
+        mainWindow->SetFileToOpen(parser.GetVal(L"path"), line);
         if (parser.HasKey(L"elevate") && parser.HasKey(L"savepath"))
         {
-            mainWindow.SetElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"), static_cast<long>(line));
-            mainWindow.SetFileOpenMRU(false);
+            mainWindow->SetElevatedSave(parser.GetVal(L"path"), parser.GetVal(L"savepath"), static_cast<long>(line));
+            mainWindow->SetFileOpenMRU(false);
             firstInstance = false;
         }
         if (parser.HasKey(L"tabmove") && parser.HasKey(L"savepath"))
         {
             std::wstring title = parser.HasVal(L"title") ? parser.GetVal(L"title") : L"";
-            mainWindow.SetTabMove(parser.GetVal(L"path"), parser.GetVal(L"savepath"), !!parser.HasKey(L"modified"), static_cast<long>(line), title);
-            mainWindow.SetFileOpenMRU(false);
+            mainWindow->SetTabMove(parser.GetVal(L"path"), parser.GetVal(L"savepath"), !!parser.HasKey(L"modified"), static_cast<long>(line), title);
+            mainWindow->SetFileOpenMRU(false);
         }
     }
     else
@@ -401,7 +401,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
                         {
                             CPathUtils::NormalizeFolderSeparators(tempPath);
                             auto path = CPathUtils::GetLongPathname(tempPath);
-                            mainWindow.SetFileToOpen(path, line);
+                            mainWindow->SetFileToOpen(path, line);
                             break;
                         }
                     }
@@ -419,12 +419,12 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow& mainWindow)
                             {
                                 CPathUtils::NormalizeFolderSeparators(tempPath);
                                 path = CPathUtils::GetLongPathname(tempPath);
-                                mainWindow.SetFileToOpen(path, line);
+                                mainWindow->SetFileToOpen(path, line);
                                 break;
                             }
                         }
                     }
-                    mainWindow.SetFileToOpen(path, line);
+                    mainWindow->SetFileToOpen(path, line);
                 }
                 else
                 {
@@ -550,12 +550,12 @@ int bpMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
         return ret;
     }
 
-    CMainWindow mainWindow(g_hRes);
+    auto        mainWindow = std::make_unique<CMainWindow>(g_hRes);
 
-    if (!mainWindow.RegisterAndCreateWindow())
+    if (!mainWindow->RegisterAndCreateWindow())
         return -1;
 
-    ParseCommandLine(*parser, mainWindow);
+    ParseCommandLine(*parser, mainWindow.get());
 
     // Don't need the parser any more so don't keep it around taking up space.
     parser.reset();
@@ -573,14 +573,14 @@ int bpMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
     std::wstring sIconPath  = CStringUtils::Format(L"%s,-%d", modulePath.c_str(), IDI_BOWPAD);
     if (modulePath.find(' ') != std::wstring::npos)
         modulePath = L"\"" + modulePath + L"\"";
-    SetRelaunchCommand(mainWindow, appID, (modulePath + params).c_str(), L"BowPad", sIconPath.c_str());
+    SetRelaunchCommand(*mainWindow.get(), appID, (modulePath + params).c_str(), L"BowPad", sIconPath.c_str());
 
     // Main message loop:
     MSG   msg = {nullptr};
     auto& kb  = CKeyboardShortcutHandler::Instance();
     while (GetMessage(&msg, nullptr, 0, 0))
     {
-        if (!kb.TranslateAccelerator(mainWindow, msg.message, msg.wParam, msg.lParam) &&
+        if (!kb.TranslateAccelerator(*mainWindow.get(), msg.message, msg.wParam, msg.lParam) &&
             !CDialog::IsDialogMessage(&msg))
         {
             TranslateMessage(&msg);

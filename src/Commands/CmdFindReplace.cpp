@@ -2007,7 +2007,7 @@ bool CFindReplaceDlg::IsMatchingFile(const std::wstring& path, const std::vector
                                        [&](const std::wstring& fileToFind) {
                                         bool match = !!PathMatchSpec(targetName.c_str(), fileToFind.c_str());
                                         return match;
-                                       });
+                                    });
         matched         = (whereAt != filesToFind.end());
     }
     return matched;
@@ -2035,9 +2035,9 @@ bool CFindReplaceDlg::IsExcludedFolder(const std::wstring& path) const
     return false;
 }
 
-void CFindReplaceDlg::SearchThread(
-    int id, const std::wstring& searchPath, const std::string& searchFor,
-    Scintilla::FindOption flags, unsigned int exSearchFlags, const std::vector<std::wstring>& filesToFind)
+void CFindReplaceDlg::SearchThread(int id, const std::wstring& searchPath, const std::string& searchFor,
+                                   Scintilla::FindOption flags, unsigned int exSearchFlags,
+                                   const std::vector<std::wstring>& filesToFind)
 {
     // NOTE: all parameter validation should be done before getting here.
     auto timeOfLastProgressUpdate = std::chrono::steady_clock::now();
@@ -2050,14 +2050,14 @@ void CFindReplaceDlg::SearchThread(
 
     // We need a Scintilla object created on the same thread as it will be used,
     // that's why we can't use the m_searchWnd object.
-    CScintillaWnd searchWnd(g_hRes);
-    searchWnd.InitScratch(g_hRes);
+    auto searchWnd = std::make_unique<CScintillaWnd>(g_hRes);
+    searchWnd->InitScratch(g_hRes);
 
-    CDirFileEnum     enumerator(searchPath);
-    bool             bIsDir = false;
-    std::wstring     path;
-    CDocumentManager manager;
-    bool             searchSubFoldersFlag = searchSubFolders;
+    CDirFileEnum enumerator(searchPath);
+    bool         bIsDir = false;
+    std::wstring path;
+    auto         manager              = std::make_unique<CDocumentManager>();
+    bool         searchSubFoldersFlag = searchSubFolders;
 
     // Note that on some versions of Windows, e.g. Window 7, paths like "*.cpp" will
     // actually match "*.cpp*" which is strange but it's seems a quirk of the OS not CDirFileEnum.
@@ -2105,17 +2105,17 @@ void CFindReplaceDlg::SearchThread(
 
         // TODO! Ideally we need a means to check for cancellation during load so that
         // BowPad doesn't appear hung while loading large files.
-        CDocument doc = manager.LoadFile(nullptr, path, -1, false);
+        CDocument doc = manager->LoadFile(nullptr, path, -1, false);
         // Don't crash if the document cannot be loaded. .e.g. if it is locked.
         if (doc.m_document != static_cast<Document>(nullptr))
         {
             DocID did(1);
-            manager.AddDocumentAtEnd(doc, did);
-            OnOutOfScope(manager.RemoveDocument(did););
+            manager->AddDocumentAtEnd(doc, did);
+            OnOutOfScope(manager->RemoveDocument(did););
             if (!m_bStop)
             {
                 size_t resultSizeBefore = m_pendingSearchResults.size();
-                SearchDocument(searchWnd, DocID(), doc, searchFor, flags, exSearchFlags,
+                SearchDocument(*searchWnd.get(), DocID(), doc, searchFor, flags, exSearchFlags,
                                m_pendingSearchResults, m_pendingFoundPaths);
                 if (m_pendingSearchResults.size() - resultSizeBefore > 0)
                     m_pendingFoundPaths.push_back(std::move(path));
