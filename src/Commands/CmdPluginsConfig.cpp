@@ -118,6 +118,13 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
         case WM_SIZE:
             m_resizer.DoResize(LOWORD(lParam), HIWORD(lParam));
             break;
+        case WM_GETMINMAXINFO:
+        {
+            MINMAXINFO* mmi       = reinterpret_cast<MINMAXINFO*>(lParam);
+            mmi->ptMinTrackSize.x = m_resizer.GetDlgRectScreen()->right;
+            mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
+            return 0;
+        }
         case WM_COMMAND:
             return DoCommand(LOWORD(wParam), HIWORD(wParam));
         case WM_NOTIFY:
@@ -155,10 +162,10 @@ LRESULT CPluginsConfigDlg::DoCommand(int id, int /*msg*/)
                             pluginurl += L".zip";
                             filedownloader.DownloadFile(pluginurl, tempfile);
 
-                            //std::wstring pluginlocal = L"D:\\Development\\BowPad\\BowPad\\plugins\\";
-                            //pluginlocal += info.name;
-                            //pluginlocal += L".zip";
-                            //CopyFile(pluginlocal.c_str(), tempfile.c_str(), FALSE);
+                            // std::wstring pluginlocal = L"D:\\Development\\BowPad\\BowPad\\plugins\\";
+                            // pluginlocal += info.name;
+                            // pluginlocal += L".zip";
+                            // CopyFile(pluginlocal.c_str(), tempfile.c_str(), FALSE);
                             CreateDirectory(CAppUtils::GetDataPath().c_str(), nullptr);
                             std::wstring pluginsdir = CAppUtils::GetDataPath() + L"\\plugins";
                             CreateDirectory(pluginsdir.c_str(), nullptr);
@@ -280,11 +287,11 @@ void CPluginsConfigDlg::InitPluginsList()
     ResString sVersion(g_hRes, IDS_PLUGINLIST_VERSION);
     ResString sInstVersion(g_hRes, IDS_PLUGINLIST_INSTVERSION);
 
-    LVCOLUMN lvc = {0};
-    lvc.mask     = LVCF_TEXT | LVCF_FMT;
-    lvc.fmt      = LVCFMT_LEFT;
-    lvc.cx       = -1;
-    lvc.pszText  = const_cast<LPWSTR>(static_cast<LPCWSTR>(sName));
+    LVCOLUMN  lvc = {0};
+    lvc.mask      = LVCF_TEXT | LVCF_FMT;
+    lvc.fmt       = LVCFMT_LEFT;
+    lvc.cx        = -1;
+    lvc.pszText   = const_cast<LPWSTR>(static_cast<LPCWSTR>(sName));
     ListView_InsertColumn(hListControl, 0, &lvc);
     lvc.pszText = const_cast<LPWSTR>(static_cast<LPCWSTR>(sVersion));
     lvc.fmt     = LVCFMT_RIGHT;

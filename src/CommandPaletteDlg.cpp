@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013, 2015-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -103,9 +103,9 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                     else
                     {
                         CmdPalData data;
-                        data.cmdId = cmdId;
+                        data.cmdId  = cmdId;
 
-                        auto sID = whereAt->first + L"_TooltipDescription_RESID";
+                        auto sID    = whereAt->first + L"_TooltipDescription_RESID";
 
                         auto ttIDit = resourceData.find(sID);
                         if (ttIDit != resourceData.end())
@@ -114,7 +114,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                             data.description = sRes;
                         }
 
-                        sID = whereAt->first + L"_LabelTitle_RESID";
+                        sID         = whereAt->first + L"_LabelTitle_RESID";
 
                         auto ltIDit = resourceData.find(sID);
                         if (ltIDit != resourceData.end())
@@ -138,9 +138,9 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                 if (whereAt != resourceData.end())
                 {
                     CmdPalData data;
-                    data.cmdId = cmdId;
+                    data.cmdId  = cmdId;
 
-                    auto sID = whereAt->first + L"_TooltipDescription_RESID";
+                    auto sID    = whereAt->first + L"_TooltipDescription_RESID";
 
                     auto ttIDit = resourceData.find(sID);
                     if (ttIDit != resourceData.end())
@@ -149,7 +149,7 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                         data.description = sRes;
                     }
 
-                    sID = whereAt->first + L"_LabelTitle_RESID";
+                    sID         = whereAt->first + L"_LabelTitle_RESID";
 
                     auto ltIDit = resourceData.find(sID);
                     if (ltIDit != resourceData.end())
@@ -215,6 +215,13 @@ LRESULT CCommandPaletteDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
             m_resizer.DoResize(newWidth, newHeight);
         }
         break;
+        case WM_GETMINMAXINFO:
+        {
+            MINMAXINFO* mmi       = reinterpret_cast<MINMAXINFO*>(lParam);
+            mmi->ptMinTrackSize.x = m_resizer.GetDlgRectScreen()->right;
+            mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
+            return 0;
+        }
         case WM_CONTEXTMENU:
         {
             if (GetFocus() == m_hResults)
