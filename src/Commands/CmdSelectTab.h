@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ class TabListDialog : public CDialog
 {
 public:
     TabListDialog(HWND hParent, std::function<void(DocID)>&& execFunc);
-    virtual ~TabListDialog();
+    ~TabListDialog() override;
 
     SIZE SetTabList(std::deque<std::tuple<std::wstring, DocID>>&& list);
 
@@ -49,13 +49,13 @@ public:
     {
     }
 
-    ~CCmdSelectTab() = default;
+    ~CCmdSelectTab() override = default;
 
-    bool Execute() override;
+    bool                           Execute() override;
 
-    UINT GetCmdId() override { return cmdSelectTab; }
+    UINT                           GetCmdId() override { return cmdSelectTab; }
 
-    void TabNotify(TBHDR* ptbHdr) override;
+    void                           TabNotify(TBHDR* ptbHdr) override;
 
     std::deque<DocID>              m_docIds;
     std::unique_ptr<TabListDialog> m_dlg;

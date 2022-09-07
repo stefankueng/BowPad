@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class CCmdBookmarks : public ICommand
 public:
     CCmdBookmarks(void* obj);
 
-    ~CCmdBookmarks() = default;
+    ~CCmdBookmarks() override = default;
 
     bool Execute() override
     {
@@ -67,7 +67,7 @@ public:
     {
     }
 
-    ~CCmdBookmarkToggle() = default;
+    ~CCmdBookmarkToggle() override = default;
 
     bool Execute() override;
 
@@ -82,7 +82,7 @@ public:
     {
     }
 
-    ~CCmdBookmarkClearAll() = default;
+    ~CCmdBookmarkClearAll() override = default;
 
     bool Execute() override;
 
@@ -97,7 +97,7 @@ public:
     {
     }
 
-    ~CCmdBookmarkNext() = default;
+    ~CCmdBookmarkNext() override = default;
 
     bool Execute() override;
 
@@ -107,7 +107,7 @@ public:
     {
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
-    void ScintillaNotify(SCNotification* pScn) override;
+    void    ScintillaNotify(SCNotification* pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(
         REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
@@ -128,7 +128,7 @@ public:
     {
     }
 
-    ~CCmdBookmarkPrev() = default;
+    ~CCmdBookmarkPrev() override = default;
 
     bool Execute() override;
 
@@ -138,7 +138,7 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
-    void ScintillaNotify(SCNotification* pScn) override;
+    void    ScintillaNotify(SCNotification* pScn) override;
 
     HRESULT IUICommandHandlerUpdateProperty(
         REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2016, 2019, 2021 - Stefan Kueng
+// Copyright (C) 2013-2016, 2019, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -153,22 +153,22 @@ bool CCmdUnComment::Execute()
                 break;
         }
 
-        auto          strbuf = std::make_unique<char[]>(commentstreamstart.size() + commentstreamend.size() + 5);
-        Sci_TextRange rangeStart;
+        auto          strBuf = std::make_unique<char[]>(commentstreamstart.size() + commentstreamend.size() + 5);
+        Sci_TextRange rangeStart{};
         rangeStart.chrg.cpMin = static_cast<Sci_PositionCR>(selStart - commentstreamstart.length());
         rangeStart.chrg.cpMax = static_cast<Sci_PositionCR>(selStart);
-        rangeStart.lpstrText  = strbuf.get();
+        rangeStart.lpstrText  = strBuf.get();
         Scintilla().GetTextRange(&rangeStart);
         bool bRemovedStream = false;
-        if (!commentstreamstart.empty() && _stricmp(commentstreamstart.c_str(), strbuf.get()) == 0)
+        if (!commentstreamstart.empty() && _stricmp(commentstreamstart.c_str(), strBuf.get()) == 0)
         {
             // find the end marker
-            Sci_TextRange rangeEnd;
+            Sci_TextRange rangeEnd{};
             rangeEnd.chrg.cpMin = static_cast<Sci_PositionCR>(selEnd);
             rangeEnd.chrg.cpMax = static_cast<Sci_PositionCR>(selEnd + commentstreamend.length());
-            rangeEnd.lpstrText  = strbuf.get();
+            rangeEnd.lpstrText  = strBuf.get();
             Scintilla().GetTextRange(&rangeEnd);
-            if (_stricmp(commentstreamend.c_str(), strbuf.get()) == 0)
+            if (_stricmp(commentstreamend.c_str(), strBuf.get()) == 0)
             {
                 Scintilla().BeginUndoAction();
                 // remove the stream start marker
@@ -195,12 +195,12 @@ bool CCmdUnComment::Execute()
                 for (auto line = lineStart; line <= lineEnd; ++line)
                 {
                     auto          pos = Scintilla().LineIndentPosition(line);
-                    Sci_TextRange range;
+                    Sci_TextRange range{};
                     range.chrg.cpMin = static_cast<Sci_PositionCR>(pos);
                     range.chrg.cpMax = static_cast<Sci_PositionCR>(pos + commentLine.length());
-                    range.lpstrText  = strbuf.get();
+                    range.lpstrText  = strBuf.get();
                     Scintilla().GetTextRange(&range);
-                    if (_stricmp(commentLine.c_str(), strbuf.get()) == 0)
+                    if (_stricmp(commentLine.c_str(), strBuf.get()) == 0)
                     {
                         Scintilla().SetSel(range.chrg.cpMin, range.chrg.cpMax);
                         Scintilla().ReplaceSel("");
@@ -219,7 +219,7 @@ bool CCmdUnComment::Execute()
         auto curPos = Scintilla().CurrentPos();
         Scintilla().BeginUndoAction();
         auto          pos = Scintilla().LineIndentPosition(Scintilla().LineFromPosition(curPos));
-        Sci_TextRange range;
+        Sci_TextRange range{};
         range.chrg.cpMin = static_cast<Sci_PositionCR>(pos);
         range.chrg.cpMax = static_cast<Sci_PositionCR>(pos + commentLine.length());
         range.lpstrText  = strBuf.get();

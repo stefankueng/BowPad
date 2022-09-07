@@ -166,7 +166,7 @@ void CCmdSessionLoad::OnClose()
     }
 }
 
-void CCmdSessionLoad::RestoreSavedSession()
+void CCmdSessionLoad::RestoreSavedSession() const
 {
     ProfileTimer profile(L"RestoreSavedSession");
     auto&        settings          = CIniSettings::Instance();

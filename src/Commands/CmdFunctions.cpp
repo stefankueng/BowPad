@@ -134,7 +134,7 @@ static bool ParseName(const std::string& sig, std::string& name)
 }
 
 static bool FindNext(
-    CScintillaWnd& edit,
+    const CScintillaWnd& edit,
     Sci_PositionCR searchStart, Sci_PositionCR searchEnd,
     const char*     searchTarget,
     Sci_PositionCR& foundStart, Sci_PositionCR& foundEnd,
@@ -214,7 +214,7 @@ HRESULT CCmdFunctions::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
         if (HasActiveDocument())
         {
             const auto& doc       = GetActiveDocument();
-            auto        funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.GetLanguage());
+            const auto& funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.GetLanguage());
             return UIInitPropertyFromBoolean(UI_PKEY_Enabled, !funcRegex.empty(), pPropVarNewValue);
         }
         return UIInitPropertyFromBoolean(UI_PKEY_Enabled, false, pPropVarNewValue);
@@ -372,7 +372,7 @@ void CCmdFunctions::TabNotify(TBHDR* ptbHdr)
         std::unique_lock<std::mutex> lock(m_fileDataMutex);
         auto                         found = std::find_if(m_fileData.begin(), m_fileData.end(), [docID](const WorkItem& wi) {
             return wi.m_id == docID;
-                                });
+        });
         if (found != m_fileData.end())
         {
             auto workItem = *found;
@@ -433,10 +433,10 @@ void CCmdFunctions::OnTimer(UINT id)
         // if necessary.
         // If data is added to the thread data list, wake up the thread.
         bool       bWakeupThread = false;
-        for (const auto docId : m_eventData)
+        for (const auto& docId : m_eventData)
         {
             const auto& doc  = GetDocumentFromID(docId);
-            auto        lang = doc.GetLanguage();
+            const auto& lang = doc.GetLanguage();
             if (lang.empty())
                 continue;
             auto langData = CLexStyles::Instance().GetLanguageData(lang);

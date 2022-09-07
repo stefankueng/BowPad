@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -49,21 +49,21 @@ public:
     {
     }
 
-    ~CCmdTabList() = default;
+    ~CCmdTabList() override = default;
 
-    bool Execute() override;
-    UINT GetCmdId() override { return cmdTabList; }
-    bool IsItemsSourceCommand() override { return true; }
+    bool    Execute() override;
+    UINT    GetCmdId() override { return cmdTabList; }
+    bool    IsItemsSourceCommand() override { return true; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void TabNotify(TBHDR* ptbHdr) override;
-    void ScintillaNotify(SCNotification* pScn) override;
+    void    TabNotify(TBHDR* ptbHdr) override;
+    void    ScintillaNotify(SCNotification* pScn) override;
 
-    void OnDocumentOpen(DocID id) override;
-    void OnDocumentClose(DocID id) override;
-    void OnDocumentSave(DocID id, bool bSaveAs) override;
+    void    OnDocumentOpen(DocID id) override;
+    void    OnDocumentClose(DocID id) override;
+    void    OnDocumentSave(DocID id, bool bSaveAs) override;
 
 private:
     void                 InvalidateTabList();

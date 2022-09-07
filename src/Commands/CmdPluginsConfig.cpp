@@ -31,6 +31,7 @@
 #include <future>
 #include <fstream>
 #include <locale>
+#include <ranges>
 #include <VersionHelpers.h>
 
 constexpr int WM_INITPLUGINS = (WM_APP + 10);
@@ -109,7 +110,7 @@ LRESULT CPluginsConfigDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
         {
             std::unique_ptr<std::map<std::wstring, PluginInfo>> plugins(
                 reinterpret_cast<std::map<std::wstring, PluginInfo>*>(lParam));
-            for (const auto& [name, pluginInfo] : *plugins)
+            for (const auto& pluginInfo : *plugins | std::views::values)
                 m_plugins.push_back(pluginInfo);
             InitPluginsList();
             m_threadEnded = true;

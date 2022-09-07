@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014, 2016, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class CSummaryDlg : public CDialog
 {
 public:
     CSummaryDlg();
-    virtual ~CSummaryDlg();
+    ~CSummaryDlg() override;
 
     std::wstring m_sSummary;
 
@@ -181,7 +181,7 @@ bool CCmdSummary::Execute()
             ++numParagraphs;
     }
 
-    const auto& doc = GetActiveDocument();
+    const auto&  doc = GetActiveDocument();
 
     ResString    rSummary(g_hRes, IDS_SUMMARY);
     std::wstring sSummary = CStringUtils::Format(rSummary,
@@ -191,7 +191,7 @@ bool CCmdSummary::Execute()
                                                  numEmptyLines,
                                                  numParagraphs);
 
-    CSummaryDlg dlg;
+    CSummaryDlg  dlg;
     dlg.m_sSummary = sSummary;
     dlg.DoModal(g_hRes, IDD_SUMMARY, GetHwnd());
 

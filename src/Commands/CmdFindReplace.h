@@ -228,7 +228,7 @@ private:
     // REVIEW: consider making this list configurable?
     // NOTE: Keep filenames lower case as code assumes that.
     const std::vector<std::wstring> m_excludedExtensions     = {
-        // Binary types.
+            // Binary types.
         L"exe", L"dll", L"obj", L"lib", L"ilk", L"iobj", L"ipdb", L"idb",
         L"pch", L"ipch", L"sdf", L"pdb", L"res", L"sdf", L"db", L"iso",
         // Common temporary VC project types.
@@ -332,7 +332,7 @@ public:
     {
     }
 
-    ~CCmdFindFile() = default;
+    ~CCmdFindFile() override = default;
 
     bool Execute() override;
 

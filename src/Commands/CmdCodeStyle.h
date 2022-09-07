@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,16 +29,16 @@ public:
     {
     }
 
-    ~CCmdCodeStyle() = default;
+    ~CCmdCodeStyle() override = default;
 
-    bool Execute() override { return false; }
-    UINT GetCmdId() override { return cmdCodeStyle; }
-    bool IsItemsSourceCommand() override { return true; }
+    bool    Execute() override { return false; }
+    UINT    GetCmdId() override { return cmdCodeStyle; }
+    bool    IsItemsSourceCommand() override { return true; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void TabNotify(TBHDR* ptbHdr) override;
-    void OnPluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data) override;
+    void    TabNotify(TBHDR* ptbHdr) override;
+    void    OnPluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data) override;
 };

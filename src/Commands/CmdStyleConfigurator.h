@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,14 +28,14 @@ class CStyleConfiguratorDlg : public CDialog
 {
 public:
     CStyleConfiguratorDlg(void* obj);
-    ~CStyleConfiguratorDlg() = default;
+    ~CStyleConfiguratorDlg() override = default;
 
 protected:
-    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-    LRESULT          DoCommand(int id, int msg);
+    LRESULT CALLBACK    DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT             DoCommand(int id, int msg);
 
-    bool Execute() override { return true; }
-    UINT GetCmdId() override { return cmdStyleConfigurator; }
+    bool                Execute() override { return true; }
+    UINT                GetCmdId() override { return cmdStyleConfigurator; }
 
     static int CALLBACK EnumFontFamExProc(const LOGFONT* lpelfe, const TEXTMETRIC* lpntme, DWORD fontType, LPARAM lParam);
     void                SelectStyle(int style);
@@ -50,7 +50,7 @@ class CCmdStyleConfigurator : public ICommand
 {
 public:
     CCmdStyleConfigurator(void* obj);
-    ~CCmdStyleConfigurator();
+    ~CCmdStyleConfigurator() override;
 
     bool Execute() override;
 

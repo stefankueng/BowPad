@@ -182,13 +182,13 @@ void CCmdSpellCheck::Check()
             Scintilla().SetWordChars(g_sentenceChars.c_str());
         else
             Scintilla().SetWordChars(g_wordChars.c_str());
-        Sci_TextRange textRange{};
-        auto          firstLine = Scintilla().FirstVisibleLine();
-        auto          lastLine  = firstLine + Scintilla().LinesOnScreen();
-        textRange.chrg.cpMin    = static_cast<Sci_PositionCR>(Scintilla().PositionFromLine(firstLine));
-        textRange.chrg.cpMax    = textRange.chrg.cpMin;
-        auto lastPos            = Scintilla().PositionFromLine(lastLine) + Scintilla().LineLength(lastLine);
-        auto textLength         = Scintilla().Length();
+        Sci_TextRangeFull textRange{};
+        auto              firstLine = Scintilla().FirstVisibleLine();
+        auto              lastLine  = firstLine + Scintilla().LinesOnScreen();
+        textRange.chrg.cpMin        = static_cast<Sci_PositionCR>(Scintilla().PositionFromLine(firstLine));
+        textRange.chrg.cpMax        = textRange.chrg.cpMin;
+        auto lastPos                = Scintilla().PositionFromLine(lastLine) + Scintilla().LineLength(lastLine);
+        auto textLength             = Scintilla().Length();
         if (lastPos < 0)
             lastPos = textLength - textRange.chrg.cpMin;
         if (m_lastCheckedPos)
@@ -340,7 +340,7 @@ void CCmdSpellCheck::Check()
                             ULONG errStart = 0;
                             spellingError->get_StartIndex(&errStart);
 
-                            Sci_TextRange wordRange{};
+                            Sci_TextRangeFull wordRange{};
                             wordRange.chrg.cpMin = textRange.chrg.cpMin + errStart;
                             wordRange.chrg.cpMax = wordRange.chrg.cpMin + errLen;
                             wordRange.lpstrText  = m_textBuffer.get();

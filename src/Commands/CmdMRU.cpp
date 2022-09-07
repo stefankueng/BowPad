@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2021 - Stefan Kueng
+// Copyright (C) 2014, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,8 +45,8 @@ HRESULT CCmdMRU::IUICommandHandlerExecute(UI_EXECUTIONVERB /*verb*/, const PROPE
             hr = SafeArrayGetUBound(psa, 1, &lEnd);
             if (CAppUtils::FailedShowMessage(hr))
                 return hr;
-            IUISimplePropertySet** data;
-            hr = SafeArrayAccessData(psa, reinterpret_cast<void**>(&data));
+            IUISimplePropertySet** data = nullptr;
+            hr                          = SafeArrayAccessData(psa, reinterpret_cast<void**>(&data));
             for (LONG idx = lStart; idx <= lEnd; ++idx)
             {
                 IUISimplePropertySet* ppSet = static_cast<IUISimplePropertySet*>(data[idx]);

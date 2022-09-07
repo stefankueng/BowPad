@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ public:
     {
     }
 
-    ~CCmdLineDuplicate() = default;
+    ~CCmdLineDuplicate() override = default;
 
     bool Execute() override
     {
@@ -46,7 +46,7 @@ public:
     {
     }
 
-    ~CCmdLineSplit() = default;
+    ~CCmdLineSplit() override = default;
 
     bool Execute() override
     {
@@ -66,7 +66,7 @@ public:
     {
     }
 
-    ~CCmdLineJoin() = default;
+    ~CCmdLineJoin() override = default;
 
     bool Execute() override
     {
@@ -86,7 +86,7 @@ public:
     {
     }
 
-    ~CCmdLineUp() = default;
+    ~CCmdLineUp() override = default;
 
     bool Execute() override
     {
@@ -105,7 +105,7 @@ public:
     {
     }
 
-    ~CCmdLineDown() = default;
+    ~CCmdLineDown() override = default;
 
     bool Execute() override
     {

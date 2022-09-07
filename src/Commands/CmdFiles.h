@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ public:
     {
     }
 
-    ~CCmdOpen() = default;
+    ~CCmdOpen() override = default;
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdOpen; }
@@ -40,7 +40,7 @@ public:
         : ICommand(obj)
     {
     }
-    ~CCmdSave() = default;
+    ~CCmdSave() override = default;
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdSave; }
@@ -49,8 +49,8 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
-    void ScintillaNotify(SCNotification* pScn) override;
-    void TabNotify(TBHDR* ptbHdr) override;
+    void    ScintillaNotify(SCNotification* pScn) override;
+    void    TabNotify(TBHDR* ptbHdr) override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 };
@@ -62,7 +62,7 @@ public:
         : ICommand(obj)
     {
     }
-    ~CCmdSaveAll() = default;
+    ~CCmdSaveAll() override = default;
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdSaveAll; }
@@ -71,8 +71,8 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_STATE, nullptr);
     }
 
-    void ScintillaNotify(SCNotification* pScn) override;
-    void TabNotify(TBHDR* ptbHdr) override;
+    void    ScintillaNotify(SCNotification* pScn) override;
+    void    TabNotify(TBHDR* ptbHdr) override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 };
@@ -84,10 +84,10 @@ public:
         : ICommand(obj)
     {
     }
-    ~CCmdSaveAuto() = default;
+    ~CCmdSaveAuto() override = default;
 
-    bool Execute() override;
-    UINT GetCmdId() override { return cmdSaveAuto; }
+    bool    Execute() override;
+    UINT    GetCmdId() override { return cmdSaveAuto; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
     void    TabNotify(TBHDR* ptbHdr) override;
@@ -104,7 +104,7 @@ public:
         : ICommand(obj)
     {
     }
-    ~CCmdSaveAs() = default;
+    ~CCmdSaveAs() override = default;
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdSaveAs; }
@@ -117,7 +117,7 @@ public:
         : ICommand(obj)
     {
     }
-    ~CCmdReload() = default;
+    ~CCmdReload() override = default;
 
     bool Execute() override
     {
@@ -127,11 +127,11 @@ public:
         }
         return true;
     }
-    UINT GetCmdId() override { return cmdReload; }
+    UINT    GetCmdId() override { return cmdReload; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
-    void TabNotify(TBHDR* ptbHdr) override;
+    void    TabNotify(TBHDR* ptbHdr) override;
 };
 
 class CCmdFileDelete : public ICommand
@@ -141,13 +141,13 @@ public:
         : ICommand(obj)
     {
     }
-    ~CCmdFileDelete() = default;
+    ~CCmdFileDelete() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdFileDelete; }
+    UINT    GetCmdId() override { return cmdFileDelete; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
-    void TabNotify(TBHDR* ptbHdr) override;
+    void    TabNotify(TBHDR* ptbHdr) override;
 };

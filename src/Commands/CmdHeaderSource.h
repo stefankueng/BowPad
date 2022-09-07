@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,26 +54,26 @@ class CCmdHeaderSource : public ICommand
 {
 public:
     CCmdHeaderSource(void* obj);
-    ~CCmdHeaderSource() = default;
+    ~CCmdHeaderSource() override = default;
 
     // Overrides
-    bool Execute() override;
-    UINT GetCmdId() override { return cmdHeaderSource; }
-    void AfterInit() override;
+    bool    Execute() override;
+    UINT    GetCmdId() override { return cmdHeaderSource; }
+    void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void TabNotify(TBHDR* ptbHdr) override;
+    void    TabNotify(TBHDR* ptbHdr) override;
 
-    void ScintillaNotify(SCNotification* pScn) override;
+    void    ScintillaNotify(SCNotification* pScn) override;
 
-    void OnDocumentOpen(DocID id) override;
+    void    OnDocumentOpen(DocID id) override;
 
-    void OnDocumentSave(DocID id, bool bSaveAs) override;
+    void    OnDocumentSave(DocID id, bool bSaveAs) override;
 
-    void OnLangChanged() override;
+    void    OnLangChanged() override;
 
 private:
     void        HandleIncludeFileMenuItem(const RelatedFileItem& item) const;
@@ -81,7 +81,7 @@ private:
     bool        PopulateMenu(const CDocument& doc, CScintillaWnd& edit, IUICollectionPtr& collection);
     void        InvalidateMenu();
     void        InvalidateMenuEnabled();
-    bool        HandleSelectedMenuItem(size_t selected);
+    bool        HandleSelectedMenuItem(size_t selected) const;
     bool        IsValidMenuItem(size_t item) const;
     bool        UserFindFile(HWND hwndParent, const std::wstring& filename, const std::wstring& defaultFolder, std::wstring& selectedFilename) const;
     bool        IsServiceAvailable() const;
@@ -91,7 +91,7 @@ private:
     static bool FindFile(const std::wstring& fileToFind, const std::vector<std::wstring>& foldersToSearch, std::wstring& foundPath);
     static bool ParseInclude(const std::wstring& raw, std::wstring& filename, RelatedType& incType);
     bool        FindNext(CScintillaWnd& edit, Sci_TextToFind& ttf, Scintilla::FindOption flags, std::string& foundText, size_t* lineNo) const;
-    static void AttachDocument(CScintillaWnd& edit, CDocument& doc);
+    static void AttachDocument(const CScintillaWnd& edit, const CDocument& doc);
     bool        GetIncludes(const CDocument& doc, CScintillaWnd& edit, std::vector<RelatedFileItem>& includes) const;
     static bool GetDefaultCorrespondingFileExtMappings(const std::wstring& from, std::wstring& to);
     void        GetCorrespondingFileMappings(const std::wstring& inputFilename, std::vector<std::wstring>& correspondingFileNames) const;

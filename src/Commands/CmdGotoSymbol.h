@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2017, 2021 - Stefan Kueng
+// Copyright (C) 2016-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,11 +23,11 @@ class CCmdGotoSymbol : public ICommand
 {
 public:
     CCmdGotoSymbol(void* obj);
-    ~CCmdGotoSymbol() = default;
+    ~CCmdGotoSymbol() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdGotoSymbol; }
+    UINT    GetCmdId() override { return cmdGotoSymbol; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
     void    TabNotify(TBHDR* ptbHdr) override;

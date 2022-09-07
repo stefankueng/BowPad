@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2020-2021 - Stefan Kueng
+// Copyright (C) 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,22 +42,22 @@ public:
     void ClearFilterText();
 
 protected:
-    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-    LRESULT          DoCommand(int id, int code);
+    LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT                 DoCommand(int id, int code);
 
-    void    InitResultsList() const;
-    void    FillResults(bool force);
-    LRESULT DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
-    LRESULT GetListItemDispInfo(NMLVDISPINFO* pDispInfo);
-    LRESULT DrawListItem(NMLVCUSTOMDRAW* pLVCD);
+    void                    InitResultsList() const;
+    void                    FillResults(bool force);
+    LRESULT                 DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
+    LRESULT                 GetListItemDispInfo(NMLVDISPINFO* pDispInfo) const;
+    LRESULT                 DrawListItem(NMLVCUSTOMDRAW* pLVCD) const;
 
     static LRESULT CALLBACK EditSubClassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
 private:
-    CDlgResizer m_resizer;
-    HWND        m_hParent;
-    HWND        m_hFilter;
-    HWND        m_hResults;
+    CDlgResizer             m_resizer;
+    HWND                    m_hParent;
+    HWND                    m_hFilter;
+    HWND                    m_hResults;
 
     std::vector<CmdPalData> m_results;
     std::vector<CmdPalData> m_allResults;

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,25 +38,25 @@ public:
         Save();
     }
 
-    void InitPath(const std::wstring& path, bool noSubFolders);
+    void         InitPath(const std::wstring& path, bool noSubFolders);
 
     std::wstring GetRandomFile();
 
     std::wstring GoBack();
 
-    size_t GetCount() const;
+    size_t       GetCount() const;
 
-    size_t GetShownCount() const;
+    size_t       GetShownCount() const;
 
-    void Save();
-    void SetShown(std::wstring file);
-    void SetNotShown(std::wstring file);
-    void RemoveFromShown(const std::wstring& file);
-    void RemoveFromNotShown(const std::wstring& file);
-    void SetNewPath(const std::wstring& fileOld, const std::wstring& fileNew);
+    void         Save();
+    void         SetShown(std::wstring file);
+    void         SetNotShown(std::wstring file);
+    void         RemoveFromShown(const std::wstring& file);
+    void         RemoveFromNotShown(const std::wstring& file);
+    void         SetNewPath(const std::wstring& fileOld, const std::wstring& fileNew);
 
 private:
-    void FillUnShownPathList(CDirFileEnum& fileFinder, bool recurse);
+    void                             FillUnShownPathList(CDirFileEnum& fileFinder, bool recurse);
 
     std::wstring                     m_sPath;
     std::set<std::wstring, ci_lessW> m_arShownFileList;
@@ -77,7 +77,7 @@ public:
     {
     }
 
-    ~CCmdRandom() = default;
+    ~CCmdRandom() override = default;
 
     bool Execute() override;
 

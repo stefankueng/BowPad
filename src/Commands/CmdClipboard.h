@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,13 +27,13 @@ public:
     {
     }
 
-    virtual ~ClipboardBase() = default;
+    ~ClipboardBase() override = default;
 
 protected:
     std::string GetHtmlSelection() const;
     void        AddHtmlStringToClipboard(const std::string& sHtml) const;
     void        AddLexerToClipboard() const;
-    void        SetLexerFromClipboard();
+    void        SetLexerFromClipboard() const;
 };
 
 class CCmdCut : public ClipboardBase
@@ -44,7 +44,7 @@ public:
     {
     }
 
-    ~CCmdCut() = default;
+    ~CCmdCut() override = default;
 
     bool Execute() override;
 
@@ -61,7 +61,7 @@ public:
     {
     }
 
-    ~CCmdCutPlain() = default;
+    ~CCmdCutPlain() override = default;
 
     bool Execute() override;
 
@@ -78,7 +78,7 @@ public:
     {
     }
 
-    ~CCmdCopy() = default;
+    ~CCmdCopy() override = default;
 
     bool Execute() override;
 
@@ -93,7 +93,7 @@ public:
     {
     }
 
-    ~CCmdCopyPlain() = default;
+    ~CCmdCopyPlain() override = default;
 
     bool Execute() override;
 
@@ -108,13 +108,13 @@ public:
     {
     }
 
-    ~CCmdPaste() = default;
+    ~CCmdPaste() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdPaste; }
+    UINT    GetCmdId() override { return cmdPaste; }
 
-    void OnClipboardChanged() override;
+    void    OnClipboardChanged() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };
@@ -127,13 +127,13 @@ public:
     {
     }
 
-    ~CCmdPasteHtml() = default;
+    ~CCmdPasteHtml() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdPasteHtml; }
+    UINT    GetCmdId() override { return cmdPasteHtml; }
 
-    void OnClipboardChanged() override;
+    void    OnClipboardChanged() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 

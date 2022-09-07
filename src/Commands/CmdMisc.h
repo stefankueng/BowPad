@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ public:
     {
     }
 
-    ~CCmdDelete() = default;
+    ~CCmdDelete() override = default;
 
     bool Execute() override
     {
@@ -46,7 +46,7 @@ public:
     {
     }
 
-    ~CCmdSelectAll() = default;
+    ~CCmdSelectAll() override = default;
 
     bool Execute() override
     {
@@ -65,7 +65,7 @@ public:
     {
     }
 
-    ~CCmdGotoBrace() = default;
+    ~CCmdGotoBrace() override = default;
 
     bool Execute() override
     {
@@ -80,12 +80,12 @@ class CCmdToggleTheme : public ICommand
 {
 public:
     CCmdToggleTheme(void* obj);
-    ~CCmdToggleTheme() = default;
+    ~CCmdToggleTheme() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdToggleTheme; }
-    void AfterInit() override;
+    UINT    GetCmdId() override { return cmdToggleTheme; }
+    void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };
@@ -98,7 +98,7 @@ public:
     {
     }
 
-    ~CCmdConfigShortcuts() = default;
+    ~CCmdConfigShortcuts() override = default;
 
     bool Execute() override;
 
@@ -110,12 +110,12 @@ class CCmdAutoBraces : public ICommand
 public:
     CCmdAutoBraces(void* obj);
 
-    ~CCmdAutoBraces() = default;
+    ~CCmdAutoBraces() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdAutoBraces; }
-    void AfterInit() override;
+    UINT    GetCmdId() override { return cmdAutoBraces; }
+    void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };
@@ -125,12 +125,12 @@ class CCmdViewFileTree : public ICommand
 public:
     CCmdViewFileTree(void* obj);
 
-    ~CCmdViewFileTree() = default;
+    ~CCmdViewFileTree() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdFileTree; }
-    void AfterInit() override;
+    UINT    GetCmdId() override { return cmdFileTree; }
+    void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };
@@ -139,12 +139,12 @@ class CCmdWriteProtect : public ICommand
 {
 public:
     CCmdWriteProtect(void* obj);
-    ~CCmdWriteProtect() = default;
+    ~CCmdWriteProtect() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdWriteProtect; }
-    void AfterInit() override;
+    UINT    GetCmdId() override { return cmdWriteProtect; }
+    void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
     void    TabNotify(TBHDR* ptbHdr) override;
@@ -156,12 +156,12 @@ class CCmdAutoComplete : public ICommand
 public:
     CCmdAutoComplete(void* obj);
 
-    ~CCmdAutoComplete() = default;
+    ~CCmdAutoComplete() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdAutocomplete; }
-    void AfterInit() override;
+    UINT    GetCmdId() override { return cmdAutocomplete; }
+    void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };

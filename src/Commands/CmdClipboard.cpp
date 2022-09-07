@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2021 - Stefan Kueng
+// Copyright (C) 2014-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 static constexpr wchar_t CF_BPLEXER[] = {L"BP Lexer"};
 static auto              CF_HTML      = RegisterClipboardFormat(L"HTML Format");
 
-std::string ClipboardBase::GetHtmlSelection() const
+std::string              ClipboardBase::GetHtmlSelection() const
 {
     if (!HasActiveDocument())
         return "";
@@ -36,9 +36,9 @@ std::string ClipboardBase::GetHtmlSelection() const
     const auto& lexerData = CLexStyles::Instance().GetLexerDataForLang(doc.GetLanguage());
 
     std::string sHtmlFragment;
-    int         style = 0;
+    int         style       = 0;
 
-    char fontBuf[40] = {0};
+    char        fontBuf[40] = {0};
     Scintilla().StyleGetFont(0, fontBuf);
     int      fontSize   = static_cast<int>(Scintilla().StyleGetSize(0));
     bool     bold       = !!Scintilla().StyleGetBold(0);
@@ -150,9 +150,9 @@ std::string ClipboardBase::GetHtmlSelection() const
     }
     sHtmlFragment += "</span></pre>";
 
-    std::string header = "Version:0.9\r\nStartHTML:<<<<<<<1\r\nEndHTML:<<<<<<<2\r\nStartFragment:<<<<<<<3\r\nEndFragment:<<<<<<<4\r\nStartSelection:<<<<<<<3\r\nEndSelection:<<<<<<<3\r\n";
-    std::string pre    = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\r\n<HTML><HEAD></HEAD>\r\n<BODY>\r\n<!--StartFragment-->";
-    std::string post   = "<!--EndFragment--></BODY></HTML>";
+    std::string header    = "Version:0.9\r\nStartHTML:<<<<<<<1\r\nEndHTML:<<<<<<<2\r\nStartFragment:<<<<<<<3\r\nEndFragment:<<<<<<<4\r\nStartSelection:<<<<<<<3\r\nEndSelection:<<<<<<<3\r\n";
+    std::string pre       = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\r\n<HTML><HEAD></HEAD>\r\n<BODY>\r\n<!--StartFragment-->";
+    std::string post      = "<!--EndFragment--></BODY></HTML>";
 
     std::string sHtml     = header;
     int         startHtml = static_cast<int>(sHtml.length());
@@ -218,7 +218,7 @@ void ClipboardBase::AddLexerToClipboard() const
     }
 }
 
-void ClipboardBase::SetLexerFromClipboard()
+void ClipboardBase::SetLexerFromClipboard() const
 {
     auto& doc = GetModActiveDocument();
     if (doc.GetLanguage().empty() || (doc.GetLanguage().compare("Text") == 0))
@@ -226,9 +226,9 @@ void ClipboardBase::SetLexerFromClipboard()
         CClipboardHelper clipboard;
         if (clipboard.Open(GetScintillaWnd()))
         {
-            auto CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
+            auto   CF_LEXER = RegisterClipboardFormat(CF_BPLEXER);
 
-            HANDLE hData = GetClipboardData(CF_LEXER);
+            HANDLE hData    = GetClipboardData(CF_LEXER);
             if (hData)
             {
                 LPCSTR lptstr = static_cast<LPCSTR>(GlobalLock(hData));

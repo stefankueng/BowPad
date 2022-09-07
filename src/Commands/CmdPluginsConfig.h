@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017, 2021 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class CPluginsConfigDlg : public CDialog
 {
 public:
     CPluginsConfigDlg(void* obj);
-    ~CPluginsConfigDlg() = default;
+    ~CPluginsConfigDlg() override = default;
 
 protected:
     LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -51,8 +51,8 @@ protected:
     LRESULT          DoListNotify(LPNMITEMACTIVATE lpNMItemActivate);
     void             InitPluginsList();
 
-    bool Execute() override { return true; }
-    UINT GetCmdId() override { return 0; }
+    bool             Execute() override { return true; }
+    UINT             GetCmdId() override { return 0; }
 
 private:
     CDlgResizer             m_resizer;
@@ -68,7 +68,7 @@ public:
     {
     }
 
-    ~CCmdPluginsConfig() = default;
+    ~CCmdPluginsConfig() override = default;
 
     bool Execute() override;
 

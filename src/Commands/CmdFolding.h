@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2015-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2015-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ class CCmdFoldAll : public ICommand
 {
 public:
     CCmdFoldAll(void* obj);
-    ~CCmdFoldAll() = default;
+    ~CCmdFoldAll() override = default;
 
     bool Execute() override;
 
@@ -35,7 +35,7 @@ class CCmdFoldLevel : public ICommand
 {
 public:
     CCmdFoldLevel(UINT customId, void* obj);
-    ~CCmdFoldLevel() = default;
+    ~CCmdFoldLevel() override = default;
 
     bool Execute() override;
     UINT GetCmdId() override { return m_customCmdId; }
@@ -49,7 +49,7 @@ class CCmdInitFoldingMargin : public ICommand
 {
 public:
     CCmdInitFoldingMargin(void* obj);
-    ~CCmdInitFoldingMargin() = default;
+    ~CCmdInitFoldingMargin() override = default;
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdInitFoldingMargin; }
@@ -62,7 +62,7 @@ class CCmdFoldingOn : public ICommand
 {
 public:
     CCmdFoldingOn(void* obj);
-    ~CCmdFoldingOn() = default;
+    ~CCmdFoldingOn() override = default;
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdFoldingOn; }
@@ -73,7 +73,7 @@ class CCmdFoldingOff : public ICommand
 {
 public:
     CCmdFoldingOff(void* obj);
-    ~CCmdFoldingOff() = default;
+    ~CCmdFoldingOff() override = default;
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdFoldingOff; }

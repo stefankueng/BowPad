@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017, 2020-2021 Stefan Kueng
+// Copyright (C) 2014-2017, 2020-2022 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,12 +16,14 @@
 //
 #include "stdafx.h"
 #include "CmdPlugins.h"
+
+#include <ranges>
+
 #include "PropertySet.h"
 #include "StringUtils.h"
 #include "AppUtils.h"
 #include "CommandHandler.h"
 #include "CmdScripts.h"
-
 
 HRESULT CCmdPlugins::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue)
 {
@@ -90,7 +92,7 @@ HRESULT CCmdPlugins::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPE
             hr                  = UIPropertyToUInt32(*key, *pPropVarValue, &selected);
             UINT        count   = 0;
             const auto& plugins = CCommandHandler::Instance().GetPluginMap();
-            for (const auto& [id, name] : plugins)
+            for (const auto& id : plugins | std::views::keys)
             {
                 if (count == selected)
                 {

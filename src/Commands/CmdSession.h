@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ public:
     {
     }
 
-    ~CCmdSessionLoad() = default;
+    ~CCmdSessionLoad() override = default;
 
     bool Execute() override;
 
@@ -38,7 +38,7 @@ public:
     void OnClose() override;
 
 protected:
-    void RestoreSavedSession();
+    void RestoreSavedSession() const;
 };
 
 class CCmdSessionAutoLoad : public CCmdSessionLoad
@@ -46,17 +46,17 @@ class CCmdSessionAutoLoad : public CCmdSessionLoad
 public:
     CCmdSessionAutoLoad(void* obj);
 
-    ~CCmdSessionAutoLoad() = default;
+    ~CCmdSessionAutoLoad() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdSessionAutoLoad; }
+    UINT    GetCmdId() override { return cmdSessionAutoLoad; }
 
-    void OnClose() override {}
+    void    OnClose() override {}
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 
-    void BeforeLoad() override;
+    void    BeforeLoad() override;
 };
 
 class CCmdSessionAutoSave : public CCmdSessionLoad
@@ -64,13 +64,13 @@ class CCmdSessionAutoSave : public CCmdSessionLoad
 public:
     CCmdSessionAutoSave(void* obj);
 
-    ~CCmdSessionAutoSave() = default;
+    ~CCmdSessionAutoSave() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdSessionAutoSave; }
+    UINT    GetCmdId() override { return cmdSessionAutoSave; }
 
-    void OnClose() override {}
+    void    OnClose() override {}
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };
@@ -94,7 +94,7 @@ public:
     {
     }
 
-    ~CCmdSessionRestoreLast() = default;
+    ~CCmdSessionRestoreLast() override = default;
 
     bool Execute() override;
 

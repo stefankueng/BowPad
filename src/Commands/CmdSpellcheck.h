@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2015-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2015-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,16 +28,16 @@ class CCmdSpellCheck : public ICommand
 public:
     CCmdSpellCheck(void* obj);
 
-    ~CCmdSpellCheck();
+    ~CCmdSpellCheck() override;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdSpellCheck; }
+    UINT    GetCmdId() override { return cmdSpellCheck; }
 
     void    ScintillaNotify(SCNotification* pScn) override;
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 
-    void OnTimer(UINT id) override;
+    void    OnTimer(UINT id) override;
 
 protected:
     void Check();
@@ -50,7 +50,7 @@ private:
     bool                    m_useComprehensiveCheck;
     LexerData               m_lexerData;
     std::unique_ptr<char[]> m_textBuffer;
-    int                     m_textBufLen;
+    Sci_Position            m_textBufLen;
     sptr_t                  m_lastCheckedPos;
 };
 
@@ -58,11 +58,11 @@ class CCmdSpellCheckLang : public ICommand
 {
 public:
     CCmdSpellCheckLang(void* obj);
-    ~CCmdSpellCheckLang() = default;
+    ~CCmdSpellCheckLang() override = default;
 
-    bool Execute() override { return false; }
-    UINT GetCmdId() override { return cmdSpellCheckLang; }
-    bool IsItemsSourceCommand() override { return true; }
+    bool    Execute() override { return false; }
+    UINT    GetCmdId() override { return cmdSpellCheckLang; }
+    bool    IsItemsSourceCommand() override { return true; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
@@ -73,17 +73,17 @@ class CCmdSpellCheckCorrect : public ICommand
 {
 public:
     CCmdSpellCheckCorrect(void* obj);
-    ~CCmdSpellCheckCorrect() = default;
+    ~CCmdSpellCheckCorrect() override = default;
 
-    bool Execute() override { return false; }
-    UINT GetCmdId() override { return cmdSpellCheckCorrect; }
-    bool IsItemsSourceCommand() override { return true; }
+    bool    Execute() override { return false; }
+    UINT    GetCmdId() override { return cmdSpellCheckCorrect; }
+    bool    IsItemsSourceCommand() override { return true; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void ScintillaNotify(SCNotification* pScn) override;
+    void    ScintillaNotify(SCNotification* pScn) override;
 
 private:
     std::vector<std::wstring> m_suggestions;
@@ -94,12 +94,12 @@ class CCmdSpellCheckAll : public ICommand
 public:
     CCmdSpellCheckAll(void* obj);
 
-    ~CCmdSpellCheckAll() = default;
+    ~CCmdSpellCheckAll() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdSpellCheckAll; }
-    void AfterInit() override;
+    UINT    GetCmdId() override { return cmdSpellCheckAll; }
+    void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };
@@ -109,12 +109,12 @@ class CCmdSpellCheckUpper : public ICommand
 public:
     CCmdSpellCheckUpper(void* obj);
 
-    ~CCmdSpellCheckUpper() = default;
+    ~CCmdSpellCheckUpper() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdSpellCheckUpper; }
-    void AfterInit() override;
+    UINT    GetCmdId() override { return cmdSpellCheckUpper; }
+    void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };

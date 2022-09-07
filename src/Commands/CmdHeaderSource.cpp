@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -144,8 +144,6 @@ but I can't make that work.
 #include "LexStyles.h"
 #include "PathUtils.h"
 #include "AppUtils.h"
-#include "PathUtils.h"
-#include "StringUtils.h"
 #include "PreserveChdir.h"
 #include "DirFileEnum.h"
 #include "Resource.h"
@@ -159,16 +157,16 @@ namespace
 {
 // We may want to use this elsewhere in the future so draw attention to it, but
 // but for now it's only needed in this module.
-constexpr char CPP_INCLUDE_STATEMENT_REGEX[] = {"^\\#include\\s+((\\\"[^\\\"]+\\\")|(<[^>]+>))"};
+constexpr char CPP_INCLUDE_STATEMENT_REGEX[]      = {"^\\#include\\s+((\\\"[^\\\"]+\\\")|(<[^>]+>))"};
 
 // Maximum number of lines to scan for include statements.
 // NOTE: This could be a configuration item but that doesn't seem necessary for now.
-constexpr int MAX_INCLUDE_SEARCH_LINES = 100;
+constexpr int  MAX_INCLUDE_SEARCH_LINES           = 100;
 
-constexpr int CREATE_CORRESPONDING_FILE_CATEGORY = 1;
-constexpr int CORRESPONDING_FILES_CATEGORY       = 2;
-constexpr int USER_INCLUDE_CATEGORY              = 3;
-constexpr int SYSTEM_INCLUDE_CATEGORY            = 4;
+constexpr int  CREATE_CORRESPONDING_FILE_CATEGORY = 1;
+constexpr int  CORRESPONDING_FILES_CATEGORY       = 2;
+constexpr int  USER_INCLUDE_CATEGORY              = 3;
+constexpr int  SYSTEM_INCLUDE_CATEGORY            = 4;
 
 }; // namespace
 
@@ -274,7 +272,7 @@ HRESULT CCmdHeaderSource::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, co
             return E_FAIL;
         if (!HasActiveDocument())
             return E_FAIL;
-        auto& doc = GetModDocumentFromID(docId);
+        auto&         doc = GetModDocumentFromID(docId);
 
         CScintillaWnd edit(g_hRes);
         edit.InitScratch(g_hRes);
@@ -323,7 +321,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
     std::wstring basePath = CPathUtils::GetParentDirectory(doc.m_path);
     std::wstring correspondingFile;
 
-    bool showCreate = true;
+    bool         showCreate = true;
 
     // If one of the corresponding files exists, don't offer to create
     // any of the others.
@@ -341,7 +339,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
                                          RelatedType::CreateCorrespondingFiles));
     ResString createCorrespondingFiles(g_hRes, IDS_NEWCORRESPONDINGFILES);
 
-    auto hr = CAppUtils::AddStringItem(collection, createCorrespondingFiles.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, EMPTY_IMAGE);
+    auto      hr = CAppUtils::AddStringItem(collection, createCorrespondingFiles.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, EMPTY_IMAGE);
     if (FAILED(hr))
     {
         m_menuInfo.pop_back();
@@ -361,7 +359,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
                 ResString    createMenuItem(g_hRes, IDS_CREATE_CORRESPONDING_FILE);
                 std::wstring menuText = CStringUtils::Format(createMenuItem, filename.c_str());
 
-                hr = CAppUtils::AddStringItem(collection, menuText.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, EMPTY_IMAGE);
+                hr                    = CAppUtils::AddStringItem(collection, menuText.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, EMPTY_IMAGE);
                 if (FAILED(hr))
                 {
                     m_menuInfo.pop_back();
@@ -381,7 +379,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
     // Corresponding File Options
     std::vector<std::wstring> matchingFiles;
 
-    std::wstring targetPath = doc.m_path;
+    std::wstring              targetPath = doc.m_path;
     // Can only get matching files for a saved document.
     if (!targetPath.empty())
     {
@@ -421,8 +419,8 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
 
         std::vector<std::wstring> systemFoldersToSearch;
 
-        std::wstring cppToolChain;
-        LPCWSTR      configItem = CIniSettings::Instance().GetString(L"cpp", L"toolchain");
+        std::wstring              cppToolChain;
+        LPCWSTR                   configItem = CIniSettings::Instance().GetString(L"cpp", L"toolchain");
         if (configItem != nullptr)
             cppToolChain = configItem;
 
@@ -434,7 +432,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
 
         // Only look for system include files if there's a tool chain defined that
         // says where they can be found.
-        configItem = nullptr;
+        configItem         = nullptr;
         if (!cppToolChain.empty())
             configItem = CIniSettings::Instance().GetString(cppToolChain.c_str(), L"systemincludepath");
         if (configItem != nullptr)
@@ -558,13 +556,13 @@ void CCmdHeaderSource::HandleIncludeFileMenuItem(const RelatedFileItem& item) co
             return;
         }
     }
-    //std::wstring defaultFolder;
-    //std::wstring fileToOpen;
+    // std::wstring defaultFolder;
+    // std::wstring fileToOpen;
 
-    //if (!UserFindFile(GetHwnd(), CPathUtils::GetFileName(item.Path), defaultFolder, fileToOpen))
-    //    return;
-    //if (!OpenFileAsLanguage(fileToOpen))
-    //    return;
+    // if (!UserFindFile(GetHwnd(), CPathUtils::GetFileName(item.Path), defaultFolder, fileToOpen))
+    //     return;
+    // if (!OpenFileAsLanguage(fileToOpen))
+    //     return;
 
     auto filename = CPathUtils::GetFileName(item.path);
     findReplaceFindFile(m_pMainWindow, filename);
@@ -576,7 +574,7 @@ void CCmdHeaderSource::HandleCorrespondingFileMenuItem(const RelatedFileItem& it
     OpenFile(item.path.c_str(), OpenFlags::AddToMRU);
 }
 
-bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
+bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected) const
 {
     if (!HasActiveDocument())
     {
@@ -605,7 +603,7 @@ bool CCmdHeaderSource::HandleSelectedMenuItem(size_t selected)
         {
             CCorrespondingFileDlg dlg(m_pMainWindow);
 
-            std::wstring initialFolder;
+            std::wstring          initialFolder;
             if (HasActiveDocument())
             {
                 const auto& doc = GetActiveDocument();
@@ -774,11 +772,11 @@ bool CCmdHeaderSource::Execute()
 
 bool CCmdHeaderSource::ShowSingleFileSelectionDialog(HWND hWndParent, const std::wstring& defaultFilename, const std::wstring& defaultFolder, std::wstring& fileChosen)
 {
-    PreserveChdir keepCwd;
+    PreserveChdir      keepCwd;
 
     IFileOpenDialogPtr pfd;
 
-    HRESULT hr = pfd.CreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER);
+    HRESULT            hr = pfd.CreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
 
@@ -799,7 +797,7 @@ bool CCmdHeaderSource::ShowSingleFileSelectionDialog(HWND hWndParent, const std:
     {
         pfd->SetFileName(defaultFilename.c_str());
         // set a filter for this as well
-        COMDLG_FILTERSPEC filters[2];
+        COMDLG_FILTERSPEC filters[2]{};
         filters[0].pszName = defaultFilename.c_str();
         filters[0].pszSpec = defaultFilename.c_str();
         filters[1].pszName = L"All files";
@@ -943,7 +941,7 @@ bool CCmdHeaderSource::FindFile(const std::wstring& fileToFind, const std::vecto
 bool CCmdHeaderSource::ParseInclude(const std::wstring& raw, std::wstring& filename, RelatedType& incType)
 {
     filename.clear();
-    incType = RelatedType::Unknown;
+    incType     = RelatedType::Unknown;
 
     size_t len  = raw.length();
     size_t last = 0;
@@ -999,7 +997,7 @@ bool CCmdHeaderSource::ParseInclude(const std::wstring& raw, std::wstring& filen
 bool CCmdHeaderSource::FindNext(CScintillaWnd& edit, Sci_TextToFind& ttf, Scintilla::FindOption flags, std::string& foundText, size_t* lineNo) const
 {
     foundText.clear();
-    *lineNo = 0;
+    *lineNo      = 0;
 
     auto findRet = edit.Scintilla().FindText(flags, &ttf);
     if (findRet < 0)
@@ -1009,7 +1007,7 @@ bool CCmdHeaderSource::FindNext(CScintillaWnd& edit, Sci_TextToFind& ttf, Scinti
     return true;
 }
 
-void CCmdHeaderSource::AttachDocument(CScintillaWnd& edit, CDocument& doc)
+void CCmdHeaderSource::AttachDocument(const CScintillaWnd& edit, const CDocument& doc)
 {
     edit.Scintilla().SetDocPointer(nullptr);
     edit.Scintilla().SetStatus(Scintilla::Status::Ok);
@@ -1033,7 +1031,7 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
     // As we don't want to compete with that, for now just scan the first N lines.
     // We could get more creative by not using regex and just fetching and parsing
     // each line ourselves but that is unproven and this seems fine for now.
-    long length = static_cast<long>(edit.Scintilla().LineEndPosition(static_cast<WPARAM>(MAX_INCLUDE_SEARCH_LINES - 1))); // 0 based.
+    long           length = static_cast<long>(edit.Scintilla().LineEndPosition(static_cast<WPARAM>(MAX_INCLUDE_SEARCH_LINES - 1))); // 0 based.
     // NOTE: If we want whole file scanned use:
     // long length = (long) edit.Scintilla().Length();
 
@@ -1041,10 +1039,10 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
     ttf.chrg.cpMax = length;
     // NOTE: Intentionally hard coded for now. See overview for reasons.
     // Match an include statement: #include <x> or #include "x" at start of line.
-    ttf.lpstrText = const_cast<char*>(CPP_INCLUDE_STATEMENT_REGEX);
+    ttf.lpstrText  = const_cast<char*>(CPP_INCLUDE_STATEMENT_REGEX);
 
-    std::string textFound;
-    size_t      lineNo = 0;
+    std::string  textFound;
+    size_t       lineNo = 0;
 
     std::wstring filename;
     RelatedType  includeType{};
@@ -1063,7 +1061,7 @@ bool CCmdHeaderSource::GetIncludes(const CDocument& doc, CScintillaWnd& edit, st
         // rest of the regular expression is symbols.
         if (!FindNext(edit, ttf, Scintilla::FindOption::RegExp | Scintilla::FindOption::Cxx11RegEx | Scintilla::FindOption::MatchCase, textFound, &lineNo))
             break;
-        ttf.chrg.cpMin = ttf.chrgText.cpMax + 1;
+        ttf.chrg.cpMin      = ttf.chrgText.cpMax + 1;
 
         std::wstring raw    = CUnicodeUtils::StdGetUnicode(textFound);
         bool         parsed = ParseInclude(raw, filename, includeType);
@@ -1104,7 +1102,7 @@ bool CCmdHeaderSource::GetDefaultCorrespondingFileExtMappings(const std::wstring
 
     // Find an entry on the left that matches the given name
     // and return the list on the right.
-    const struct
+    constexpr struct
     {
         LPCWSTR from;
         LPCWSTR to;
@@ -1171,9 +1169,9 @@ bool CCmdHeaderSource::GetCPPIncludePathsForMS(std::wstring& systemIncludePaths)
                                                       programFiles.c_str(), sdkVer.c_str());
         if (PathFileExists(sTestPath.c_str()))
         {
-            CDirFileEnum enumerator(sTestPath);
-            bool         bIsDir = false;
-            std::wstring enumPath;
+            CDirFileEnum           enumerator(sTestPath);
+            bool                   bIsDir = false;
+            std::wstring           enumPath;
             // first store the direct subfolders in a set: the set is ordered
             // so that we then can enumerate those in reverse order, i.e. to
             // get the latest version first

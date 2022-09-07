@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ public:
     {
     }
 
-    ~CCmdPrint() = default;
+    ~CCmdPrint() override = default;
 
     bool Execute() override
     {
@@ -41,7 +41,7 @@ public:
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     }
 
-    void Print(bool bShowDlg);
+    void Print(bool bShowDlg) const;
 };
 
 class CCmdPrintNow : public CCmdPrint
@@ -52,7 +52,7 @@ public:
     {
     }
 
-    ~CCmdPrintNow() = default;
+    ~CCmdPrintNow() override = default;
 
     bool Execute() override
     {
@@ -71,7 +71,7 @@ public:
     {
     }
 
-    ~CCmdPageSetup() = default;
+    ~CCmdPageSetup() override = default;
 
     bool Execute() override;
 

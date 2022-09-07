@@ -30,11 +30,11 @@
 
 bool CCmdOpen::Execute()
 {
-    PreserveChdir keepCwd;
+    PreserveChdir      keepCwd;
 
     IFileOpenDialogPtr pfd;
 
-    HRESULT hr = pfd.CreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER);
+    HRESULT            hr = pfd.CreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER);
     if (CAppUtils::FailedShowMessage(hr))
         return false;
 
@@ -178,7 +178,7 @@ bool CCmdSaveAll::Execute()
     auto docCount = GetDocumentCount();
     for (decltype(docCount) i = 0; i < docCount; ++i)
     {
-        auto docID = GetDocIDFromTabIndex(i);
+        auto        docID = GetDocIDFromTabIndex(i);
         const auto& doc   = GetDocumentFromID(docID);
         if (doc.m_bIsDirty || doc.m_bNeedsSaving)
         {
@@ -286,33 +286,33 @@ bool CCmdFileDelete::Execute()
         if (!doc.m_path.empty())
         {
             // ask first
-            ResString    rTitle(g_hRes, IDS_FILEDELETE_TITLE);
-            ResString    rQuestion(g_hRes, IDS_FILEDELETE_ASK);
-            ResString    rDelete(g_hRes, IDS_FILEDELETE_DEL);
-            ResString    rCancel(g_hRes, IDS_FILEDELETE_CANCEL);
-            std::wstring filename  = CPathUtils::GetFileName(doc.m_path);
-            std::wstring sQuestion = CStringUtils::Format(rQuestion, filename.c_str());
+            ResString         rTitle(g_hRes, IDS_FILEDELETE_TITLE);
+            ResString         rQuestion(g_hRes, IDS_FILEDELETE_ASK);
+            ResString         rDelete(g_hRes, IDS_FILEDELETE_DEL);
+            ResString         rCancel(g_hRes, IDS_FILEDELETE_CANCEL);
+            std::wstring      filename  = CPathUtils::GetFileName(doc.m_path);
+            std::wstring      sQuestion = CStringUtils::Format(rQuestion, filename.c_str());
 
-            TASKDIALOGCONFIG  tdc = {sizeof(TASKDIALOGCONFIG)};
-            TASKDIALOG_BUTTON aCustomButtons[2];
+            TASKDIALOGCONFIG  tdc       = {sizeof(TASKDIALOGCONFIG)};
+            TASKDIALOG_BUTTON aCustomButtons[2]{};
             aCustomButtons[0].nButtonID     = 100;
             aCustomButtons[0].pszButtonText = rDelete;
             aCustomButtons[1].nButtonID     = 101;
             aCustomButtons[1].pszButtonText = rCancel;
 
-            tdc.hwndParent         = GetHwnd();
-            tdc.hInstance          = g_hRes;
-            tdc.dwFlags            = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
-            tdc.dwCommonButtons    = TDCBF_CANCEL_BUTTON;
-            tdc.pButtons           = aCustomButtons;
-            tdc.cButtons           = _countof(aCustomButtons);
-            tdc.pszWindowTitle     = MAKEINTRESOURCE(IDS_APP_TITLE);
-            tdc.pszMainIcon        = TD_WARNING_ICON;
-            tdc.pszMainInstruction = rTitle;
-            tdc.pszContent         = sQuestion.c_str();
-            tdc.nDefaultButton     = 101;
-            int     nClickedBtn    = 0;
-            HRESULT hr             = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
+            tdc.hwndParent                  = GetHwnd();
+            tdc.hInstance                   = g_hRes;
+            tdc.dwFlags                     = TDF_USE_COMMAND_LINKS | TDF_ENABLE_HYPERLINKS | TDF_POSITION_RELATIVE_TO_WINDOW | TDF_SIZE_TO_CONTENT | TDF_ALLOW_DIALOG_CANCELLATION;
+            tdc.dwCommonButtons             = TDCBF_CANCEL_BUTTON;
+            tdc.pButtons                    = aCustomButtons;
+            tdc.cButtons                    = _countof(aCustomButtons);
+            tdc.pszWindowTitle              = MAKEINTRESOURCE(IDS_APP_TITLE);
+            tdc.pszMainIcon                 = TD_WARNING_ICON;
+            tdc.pszMainInstruction          = rTitle;
+            tdc.pszContent                  = sQuestion.c_str();
+            tdc.nDefaultButton              = 101;
+            int     nClickedBtn             = 0;
+            HRESULT hr                      = TaskDialogIndirect(&tdc, &nClickedBtn, nullptr, nullptr);
 
             if (!CAppUtils::FailedShowMessage(hr))
             {

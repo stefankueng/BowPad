@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2015-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2015-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@
 
 namespace
 {
-int           g_marginWidth                     = -1;
-const wchar_t ShowFoldingMarginSettingSection[] = L"View";
-const wchar_t ShowFoldingMarginSettingName[]    = L"ShowFoldingMargin";
+int               g_marginWidth                     = -1;
+constexpr wchar_t ShowFoldingMarginSettingSection[] = L"View";
+constexpr wchar_t ShowFoldingMarginSettingName[]    = L"ShowFoldingMargin";
 
 class FoldLevelStack
 {
@@ -36,7 +36,7 @@ public:
     int                  levelCount = 0; // 1-based level number
     Scintilla::FoldLevel levelStack[12]{};
 
-    void push(Scintilla::FoldLevel level)
+    void                 push(Scintilla::FoldLevel level)
     {
         while (levelCount != 0 && level <= levelStack[levelCount - 1])
         {
@@ -251,8 +251,8 @@ void CCmdInitFoldingMargin::ScintillaNotify(SCNotification* pScn)
 
                     auto headerLine = lineClick;
 
-                    auto endLine   = Scintilla().LastChild(lineClick, static_cast<Scintilla::FoldLevel>(-1));
-                    auto sFoldText = CStringUtils::Format(sFoldTextA.c_str(), static_cast<int>(endLine - lineClick + 1));
+                    auto endLine    = Scintilla().LastChild(lineClick, static_cast<Scintilla::FoldLevel>(-1));
+                    auto sFoldText  = CStringUtils::Format(sFoldTextA.c_str(), static_cast<int>(endLine - lineClick + 1));
 
                     Scintilla().ToggleFoldShowText(headerLine, sFoldText.c_str());
 

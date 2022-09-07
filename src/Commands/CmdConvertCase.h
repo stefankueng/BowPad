@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ public:
     {
     }
 
-    ~CCmdConvertUppercase() = default;
+    ~CCmdConvertUppercase() override = default;
 
     bool Execute() override;
 
@@ -46,7 +46,7 @@ public:
     {
     }
 
-    ~CCmdConvertLowercase() = default;
+    ~CCmdConvertLowercase() override = default;
 
     bool Execute() override;
 
@@ -65,7 +65,7 @@ public:
     {
     }
 
-    ~CCmdConvertTitlecase() = default;
+    ~CCmdConvertTitlecase() override = default;
 
     bool Execute() override;
 

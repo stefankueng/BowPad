@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,11 +27,11 @@ public:
     {
     }
 
-    ~CCmdLanguage() = default;
+    ~CCmdLanguage() override = default;
 
-    bool Execute() override { return false; }
-    UINT GetCmdId() override { return cmdLanguage; }
-    bool IsItemsSourceCommand() override { return true; }
+    bool    Execute() override { return false; }
+    UINT    GetCmdId() override { return cmdLanguage; }
+    bool    IsItemsSourceCommand() override { return true; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 

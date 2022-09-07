@@ -66,7 +66,7 @@ class CCmdFunctions final : public ICommand
 {
 public:
     CCmdFunctions(void* obj);
-    ~CCmdFunctions() = default;
+    ~CCmdFunctions() override = default;
 
     bool Execute() override { return false; }
     UINT GetCmdId() override { return cmdFunctions; }
@@ -76,28 +76,28 @@ private:
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
     HRESULT IUICommandHandlerExecute(UI_EXECUTIONVERB verb, const PROPERTYKEY* key, const PROPVARIANT* pPropVarValue, IUISimplePropertySet* pCommandExecutionProperties) override;
 
-    void TabNotify(TBHDR* ptbHdr) override;
-    void ScintillaNotify(SCNotification* pScn) override;
-    void OnTimer(UINT id) override;
-    void OnDocumentOpen(DocID id) override;
-    void OnDocumentSave(DocID id, bool bSaveAs) override;
-    void OnLangChanged() override;
-    void OnDocumentClose(DocID id) override;
-    void OnClose() override;
+    void    TabNotify(TBHDR* ptbHdr) override;
+    void    ScintillaNotify(SCNotification* pScn) override;
+    void    OnTimer(UINT id) override;
+    void    OnDocumentOpen(DocID id) override;
+    void    OnDocumentSave(DocID id, bool bSaveAs) override;
+    void    OnLangChanged() override;
+    void    OnDocumentClose(DocID id) override;
+    void    OnClose() override;
 
-    void                      InvalidateFunctionsEnabled();
-    void                      InvalidateFunctionsSource();
-    void                      PopulateFunctions(IUICollectionPtr& collection);
-    void                      SetWorkTimer(int ms) const;
-    void                      ThreadFunc();
+    void    InvalidateFunctionsEnabled();
+    void    InvalidateFunctionsSource();
+    void    PopulateFunctions(IUICollectionPtr& collection);
+    void    SetWorkTimer(int ms) const;
+    void    ThreadFunc();
 
 private:
-    bool                                               m_autoScan;
-    size_t                                             m_autoScanLimit;
-    UINT                                               m_timerID;
-    std::vector<sptr_t>                                m_menuData;
-    std::chrono::time_point<std::chrono::steady_clock> m_funcProcessingStartTime;
-    CScintillaWnd                                      m_edit;
+    bool                                                             m_autoScan;
+    size_t                                                           m_autoScanLimit;
+    UINT                                                             m_timerID;
+    std::vector<sptr_t>                                              m_menuData;
+    std::chrono::time_point<std::chrono::steady_clock>               m_funcProcessingStartTime;
+    CScintillaWnd                                                    m_edit;
 
     std::deque<DocID>                                                m_eventData;
     std::list<WorkItem>                                              m_fileData;

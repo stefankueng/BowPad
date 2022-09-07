@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -137,8 +137,8 @@ bool CCmdTabList::PopulateMenu(IUICollectionPtr& collection)
     for (int i = 0; i < tabCount; ++i)
     {
         // Don't store tab ids since they won't match after a tab drag.
-        auto docId = GetDocIDFromTabIndex(i);
-        auto path  = GetDocumentFromID(docId).m_path;
+        auto        docId = GetDocIDFromTabIndex(i);
+        const auto& path  = GetDocumentFromID(docId).m_path;
         m_menuInfo.push_back(TabInfo(docId, GetTitleForTabIndex(i), path));
     }
 
@@ -270,8 +270,8 @@ void CCmdTabList::ScintillaNotify(SCNotification* /*pScn*/)
     // appropriate fool proof way of doing it that yet, see OVERVIEW.
     // When a solution appears for that problem we likely want some
     // code here to invalidate the tab list on the appropriate event.
-    //if (pScn->nmhdr.code == SCN_FOCUSIN)
-    //InvalidateTabList();
+    // if (pScn->nmhdr.code == SCN_FOCUSIN)
+    // InvalidateTabList();
 }
 
 void CCmdTabList::OnDocumentOpen(DocID /*id*/)

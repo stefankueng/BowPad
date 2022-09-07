@@ -288,7 +288,7 @@ void CRegexCaptureDlg::DoCapture()
             {
                 auto out = whatC.format(sCapture, flags);
                 outStream << out;
-                if (outStream.tellp() > 5 * 1024 * 1024)
+                if (outStream.tellp() > static_cast<long long>(5 * 1024 * 1024))
                 {
                     const auto& sOut = outStream.str();
                     m_captureWnd.Scintilla().AppendText(sOut.size(), sOut.c_str());

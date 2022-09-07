@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ public:
     {
     }
 
-    ~CCmdTrim() = default;
+    ~CCmdTrim() override = default;
 
     bool Execute() override;
 
@@ -43,7 +43,7 @@ public:
     {
     }
 
-    ~CCmdTabs2Spaces() = default;
+    ~CCmdTabs2Spaces() override = default;
 
     bool Execute() override;
 
@@ -58,7 +58,7 @@ public:
     {
     }
 
-    ~CCmdSpaces2Tabs() = default;
+    ~CCmdSpaces2Tabs() override = default;
 
     bool Execute() override;
 

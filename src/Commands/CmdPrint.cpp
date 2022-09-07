@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013, 2015-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include <Commdlg.h>
 
-void CCmdPrint::Print(bool bShowDlg)
+void CCmdPrint::Print(bool bShowDlg) const
 {
     PRINTDLGEX pDlg  = {0};
     pDlg.lStructSize = sizeof(PRINTDLGEX);
@@ -37,8 +37,8 @@ void CCmdPrint::Print(bool bShowDlg)
     pDlg.nStartPage  = START_PAGE_GENERAL;
 
     // See if a range has been selected
-    size_t startPos = Scintilla().SelectionStart();
-    size_t endPos   = Scintilla().SelectionEnd();
+    size_t startPos  = Scintilla().SelectionStart();
+    size_t endPos    = Scintilla().SelectionEnd();
 
     if (startPos == endPos)
         pDlg.Flags |= PD_NOSELECTION;
@@ -77,24 +77,24 @@ void CCmdPrint::Print(bool bShowDlg)
     Scintilla().SetEdgeMode(Scintilla::EdgeVisualStyle::None);
     Scintilla().SetWrapVisualFlags(Scintilla::WrapVisualFlag::End);
 
-    HDC hdc = pDlg.hDC;
+    HDC   hdc = pDlg.hDC;
 
-    RECT  rectMargins, rectPhysMargins;
-    POINT ptPage;
-    POINT ptDpi;
+    RECT  rectMargins{}, rectPhysMargins{};
+    POINT ptPage{};
+    POINT ptDpi{};
 
     // Get printer resolution
-    ptDpi.x = GetDeviceCaps(hdc, LOGPIXELSX); // dpi in X direction
-    ptDpi.y = GetDeviceCaps(hdc, LOGPIXELSY); // dpi in Y direction
+    ptDpi.x               = GetDeviceCaps(hdc, LOGPIXELSX); // dpi in X direction
+    ptDpi.y               = GetDeviceCaps(hdc, LOGPIXELSY); // dpi in Y direction
 
     // Start by getting the physical page size (in device units).
-    ptPage.x = GetDeviceCaps(hdc, PHYSICALWIDTH);  // device units
-    ptPage.y = GetDeviceCaps(hdc, PHYSICALHEIGHT); // device units
+    ptPage.x              = GetDeviceCaps(hdc, PHYSICALWIDTH);  // device units
+    ptPage.y              = GetDeviceCaps(hdc, PHYSICALHEIGHT); // device units
 
     // Get the dimensions of the unprintable
     // part of the page (in device units).
-    rectPhysMargins.left = GetDeviceCaps(hdc, PHYSICALOFFSETX);
-    rectPhysMargins.top  = GetDeviceCaps(hdc, PHYSICALOFFSETY);
+    rectPhysMargins.left  = GetDeviceCaps(hdc, PHYSICALOFFSETX);
+    rectPhysMargins.top   = GetDeviceCaps(hdc, PHYSICALOFFSETY);
 
     // To get the right and lower unprintable area,
     // we take the entire width and height of the paper and
@@ -111,7 +111,7 @@ void CCmdPrint::Print(bool bShowDlg)
     GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, 3);
     // Metric system. '1' is US System
     int  defaultMargin = localeInfo[0] == '0' ? 2540 : 1000;
-    RECT pagesetupMargin;
+    RECT pagesetupMargin{};
     pagesetupMargin.left   = static_cast<long>(CIniSettings::Instance().GetInt64(L"print", L"pagesetupmarginleft", defaultMargin));
     pagesetupMargin.top    = static_cast<long>(CIniSettings::Instance().GetInt64(L"print", L"pagesetupmargintop", defaultMargin));
     pagesetupMargin.right  = static_cast<long>(CIniSettings::Instance().GetInt64(L"print", L"pagesetupmarginright", defaultMargin));
@@ -120,7 +120,7 @@ void CCmdPrint::Print(bool bShowDlg)
     if (pagesetupMargin.left != 0 || pagesetupMargin.right != 0 ||
         pagesetupMargin.top != 0 || pagesetupMargin.bottom != 0)
     {
-        RECT rectSetup;
+        RECT rectSetup{};
 
         // Convert the hundredths of millimeters (HiMetric) or
         // thousandths of inches (HiEnglish) margin values
@@ -202,7 +202,7 @@ void CCmdPrint::Print(bool bShowDlg)
     }
 
     // We must subtract the physical margins from the printable area
-    Sci_RangeToFormatFull frPrint;
+    Sci_RangeToFormatFull frPrint{};
     frPrint.hdc           = hdc;
     frPrint.hdcTarget     = hdc;
     frPrint.rc.left       = rectMargins.left - rectPhysMargins.left;
@@ -222,7 +222,7 @@ void CCmdPrint::Print(bool bShowDlg)
         frPrint.chrg.cpMin = static_cast<Sci_PositionCR>(lengthPrinted);
         frPrint.chrg.cpMax = static_cast<Sci_PositionCR>(lengthDoc);
 
-        lengthPrinted = Scintilla().FormatRangeFull(true, &frPrint);
+        lengthPrinted      = Scintilla().FormatRangeFull(true, &frPrint);
 
         ::EndPage(hdc);
     }
@@ -247,11 +247,11 @@ void CCmdPrint::Print(bool bShowDlg)
 
 bool CCmdPageSetup::Execute()
 {
-    PAGESETUPDLG pDlg = {0};
-    pDlg.lStructSize  = sizeof(PAGESETUPDLG);
-    pDlg.hwndOwner    = GetHwnd();
-    pDlg.hInstance    = nullptr;
-    pDlg.Flags        = PSD_DEFAULTMINMARGINS | PSD_MARGINS | PSD_DISABLEPAPER | PSD_DISABLEORIENTATION;
+    PAGESETUPDLG pDlg    = {0};
+    pDlg.lStructSize     = sizeof(PAGESETUPDLG);
+    pDlg.hwndOwner       = GetHwnd();
+    pDlg.hInstance       = nullptr;
+    pDlg.Flags           = PSD_DEFAULTMINMARGINS | PSD_MARGINS | PSD_DISABLEPAPER | PSD_DISABLEORIENTATION;
 
     pDlg.rtMargin.left   = static_cast<long>(CIniSettings::Instance().GetInt64(L"print", L"pagesetupmarginleft", 2540));
     pDlg.rtMargin.top    = static_cast<long>(CIniSettings::Instance().GetInt64(L"print", L"pagesetupmargintop", 2540));

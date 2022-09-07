@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,16 +22,15 @@
 class CCmdWhiteSpace : public ICommand
 {
 public:
+    CCmdWhiteSpace(void* obj);
 
-    CCmdWhiteSpace(void * obj);
+    ~CCmdWhiteSpace() override = default;
 
-    ~CCmdWhiteSpace() = default;
+    bool    Execute() override;
 
-    bool Execute() override;
+    void    AfterInit() override;
 
-    void AfterInit() override;
-
-    UINT GetCmdId() override { return cmdWhiteSpace; }
+    UINT    GetCmdId() override { return cmdWhiteSpace; }
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };
@@ -39,15 +38,14 @@ public:
 class CCmdTabSize : public ICommand
 {
 public:
+    CCmdTabSize(void* obj);
 
-    CCmdTabSize(void * obj);
+    ~CCmdTabSize() override = default;
 
-    ~CCmdTabSize() = default;
+    bool    Execute() override { return true; }
 
-    bool Execute() override { return true; }
-
-    UINT GetCmdId() override { return cmdTabSize; }
-    void AfterInit() override;
+    UINT    GetCmdId() override { return cmdTabSize; }
+    void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 
@@ -57,15 +55,14 @@ public:
 class CCmdUseTabs : public ICommand
 {
 public:
+    CCmdUseTabs(void* obj);
 
-    CCmdUseTabs(void * obj);
+    ~CCmdUseTabs() override = default;
 
-    ~CCmdUseTabs() = default;
+    bool    Execute() override;
 
-    bool Execute() override;
-
-    UINT GetCmdId() override { return cmdUseTabs; }
-    void TabNotify(TBHDR* ptbHdr) override;
+    UINT    GetCmdId() override { return cmdUseTabs; }
+    void    TabNotify(TBHDR* ptbHdr) override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 };

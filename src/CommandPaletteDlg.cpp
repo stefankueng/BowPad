@@ -488,7 +488,7 @@ LRESULT CCommandPaletteDlg::DoListNotify(LPNMITEMACTIVATE lpNMItemActivate)
     return 0;
 }
 
-LRESULT CCommandPaletteDlg::DrawListItem(NMLVCUSTOMDRAW* pLVCD)
+LRESULT CCommandPaletteDlg::DrawListItem(NMLVCUSTOMDRAW* pLVCD) const
 {
     switch (pLVCD->nmcd.dwDrawStage)
     {
@@ -523,7 +523,7 @@ LRESULT CCommandPaletteDlg::DrawListItem(NMLVCUSTOMDRAW* pLVCD)
     return CDRF_DODEFAULT;
 }
 
-LRESULT CCommandPaletteDlg::GetListItemDispInfo(NMLVDISPINFO* pDispInfo)
+LRESULT CCommandPaletteDlg::GetListItemDispInfo(NMLVDISPINFO* pDispInfo) const
 {
     if ((pDispInfo->item.mask & LVIF_TEXT) != 0)
     {

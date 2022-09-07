@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2021 - Stefan Kueng
+// Copyright (C) 2021-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 constexpr long margin  = 10;
 constexpr long spacing = 2;
 
-bool CCmdSelectTab::Execute()
+bool           CCmdSelectTab::Execute()
 {
     // since this is a 'dummy' command, only executed via keyboard shortcuts
     // Ctrl+1 ... Ctrl+9
@@ -234,7 +234,7 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
             if (item < m_tabList.size())
             {
                 ShowWindow(*this, SW_HIDE);
-                auto docId = std::get<1>(m_tabList[item]);
+                const auto& docId = std::get<1>(m_tabList[item]);
                 m_execFunction(docId);
             }
         }
@@ -274,8 +274,8 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
             auto hBitmap    = CreateCompatibleBitmap(hdc, rect.right - rect.left, rect.bottom - rect.top);
             auto hOldBitmap = static_cast<HBITMAP>(SelectObject(hMyMemDC, hBitmap));
 
-            auto foreColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT));
-            auto backColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
+            auto foreColor  = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT));
+            auto backColor  = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
             GDIHelpers::FillSolidRect(hMyMemDC, &rect, backColor);
 
             auto hBrush    = CreateSolidBrush(backColor);
@@ -290,14 +290,14 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
 
             SetTextColor(hMyMemDC, foreColor);
             SetBkColor(hMyMemDC, backColor);
-            auto hOldFont = SelectObject(hMyMemDC, m_hFont);
+            auto           hOldFont      = SelectObject(hMyMemDC, m_hFont);
 
             const auto     dpiSpacing    = CDPIAware::Instance().Scale(*this, spacing);
             auto           dpiMargin     = CDPIAware::Instance().Scale(*this, margin);
             constexpr auto mainDrawFlags = DT_SINGLELINE | DT_NOPREFIX | DT_TOP;
 
-            auto   maxItems     = static_cast<size_t>((rect.bottom - rect.top - dpiMargin - dpiMargin) / (m_textHeight + dpiSpacing));
-            size_t indexToStart = 0;
+            auto           maxItems      = static_cast<size_t>((rect.bottom - rect.top - dpiMargin - dpiMargin) / (m_textHeight + dpiSpacing));
+            size_t         indexToStart  = 0;
             if (maxItems < m_tabList.size())
             {
                 if (maxItems <= m_currentItem)
@@ -328,7 +328,7 @@ LRESULT TabListDialog::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
 
             // Copy the off screen bitmap onto the screen.
             BitBlt(hdc, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, hMyMemDC, rect.left, rect.top, SRCCOPY);
-            //Swap back the original bitmap.
+            // Swap back the original bitmap.
             SelectObject(hMyMemDC, hOldFont);
             SelectObject(hMyMemDC, hOldBitmap);
             DeleteObject(hBitmap);

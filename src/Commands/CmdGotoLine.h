@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class CGotoLineDlg : public CDialog
 {
 public:
     CGotoLineDlg();
-    virtual ~CGotoLineDlg() = default;
+    ~CGotoLineDlg() override = default;
 
     sptr_t       line;
     std::wstring lineInfo;
@@ -42,7 +42,7 @@ public:
     {
     }
 
-    ~CCmdGotoLine() = default;
+    ~CCmdGotoLine() override = default;
 
     bool Execute() override;
 

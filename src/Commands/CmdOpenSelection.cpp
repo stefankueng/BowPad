@@ -102,7 +102,7 @@ HRESULT CCmdOpenSelection::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, c
     return E_NOTIMPL;
 }
 
-std::wstring CCmdOpenSelection::GetPathUnderCursor()
+std::wstring CCmdOpenSelection::GetPathUnderCursor() const
 {
     if (!HasActiveDocument())
         return std::wstring();
@@ -114,7 +114,7 @@ std::wstring CCmdOpenSelection::GetPathUnderCursor()
         OnOutOfScope(Scintilla().SetWordChars(lineBuffer.c_str()));
 
         Scintilla().SetWordChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.,#/\\");
-        size_t pos = Scintilla().CurrentPos();
+        size_t      pos    = Scintilla().CurrentPos();
 
         std::string sWordA = GetTextRange(Scintilla().WordStartPosition(pos, false),
                                           Scintilla().WordEndPosition(pos, false));

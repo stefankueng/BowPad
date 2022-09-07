@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017, 2021 Stefan Kueng
+// Copyright (C) 2014-2017, 2021-2022 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,15 +24,15 @@ class CCmdOpenSelection : public ICommand
 public:
     CCmdOpenSelection(void* obj);
 
-    ~CCmdOpenSelection() = default;
+    ~CCmdOpenSelection() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdOpenSelection; }
-    void AfterInit() override;
+    UINT    GetCmdId() override { return cmdOpenSelection; }
+    void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 
 private:
-    std::wstring GetPathUnderCursor();
+    std::wstring GetPathUnderCursor() const;
 };

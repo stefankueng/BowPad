@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ void CRandomFileList::InitPath(const std::wstring& path, bool noSubFolders)
         {
             const int numberOfCharsInFile = fileInfo.nFileSizeLow / sizeof(wchar_t);
             auto      buffer              = std::make_unique<wchar_t[]>(numberOfCharsInFile + 1);
-            DWORD     readBytes;
+            DWORD     readBytes           = 0;
             if (ReadFile(hFile, buffer.get(), fileInfo.nFileSizeLow, &readBytes, nullptr))
             {
                 buffer[numberOfCharsInFile] = 0;
@@ -179,7 +179,7 @@ void CRandomFileList::Save()
                 wchar_t fileBuffer[MAX_PATH];
                 ZeroMemory(fileBuffer, sizeof(fileBuffer));
                 wcscpy_s(fileBuffer, it->c_str());
-                DWORD bytesWritten;
+                DWORD bytesWritten = 0;
                 WriteFile(hFile, fileBuffer, static_cast<DWORD>(wcslen(fileBuffer) + 1) * sizeof(wchar_t), &bytesWritten, nullptr);
             }
             CloseHandle(hFile);

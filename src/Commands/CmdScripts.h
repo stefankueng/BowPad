@@ -25,7 +25,7 @@ class CCmdScript : public ICommand
 {
 public:
     CCmdScript(void* obj, const std::wstring& path);
-    virtual ~CCmdScript();
+    ~CCmdScript() override;
 
     bool        Create(const std::wstring& path);
     void        SetCmdId(UINT cmdId);

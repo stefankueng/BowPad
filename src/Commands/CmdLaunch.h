@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,7 +31,8 @@ public:
         : ICommand(obj)
     {
     }
-    virtual ~LaunchBase() = default;
+
+    ~LaunchBase() override = default;
 
 protected:
     bool Launch(const std::wstring& cmdline) const;
@@ -44,7 +45,7 @@ public:
         : LaunchBase(obj)
     {
     }
-    ~CCmdLaunchEdge() = default;
+    ~CCmdLaunchEdge() override = default;
 
     bool Execute() override
     {
@@ -58,7 +59,7 @@ public:
         // file:/// urls anymore due to security reasons.
         std::wstring path = L"Microsoft.MicrosoftEdge_8wekyb3d8bbwe!MicrosoftEdge";
         // first try to get the ID of the Edge browser
-        wchar_t pf[MAX_PATH];
+        wchar_t      pf[MAX_PATH];
         SHGetFolderPath(nullptr, CSIDL_WINDOWS, nullptr, SHGFP_TYPE_CURRENT, pf);
         std::wstring edgePath = pf;
         edgePath += L"\\SystemApps\\Microsoft.MicrosoftEdge*";
@@ -114,7 +115,7 @@ public:
         : LaunchBase(obj)
     {
     }
-    ~CCmdLaunchIe() = default;
+    ~CCmdLaunchIe() override = default;
 
     bool Execute() override { return Launch(L"iexplore \"$(TAB_PATH)\""); }
     UINT GetCmdId() override { return cmdLaunchIE; }
@@ -127,7 +128,7 @@ public:
         : LaunchBase(obj)
     {
     }
-    ~CCmdLaunchFirefox() = default;
+    ~CCmdLaunchFirefox() override = default;
 
     bool Execute() override { return Launch(L"firefox \"$(TAB_PATH)\""); }
     UINT GetCmdId() override { return cmdLaunchFirefox; }
@@ -140,7 +141,7 @@ public:
         : LaunchBase(obj)
     {
     }
-    ~CCmdLaunchChrome() = default;
+    ~CCmdLaunchChrome() override = default;
 
     bool Execute() override { return Launch(L"chrome \"$(TAB_PATH)\""); }
     UINT GetCmdId() override { return cmdLaunchChrome; }
@@ -153,7 +154,7 @@ public:
         : LaunchBase(obj)
     {
     }
-    ~CCmdLaunchSafari() = default;
+    ~CCmdLaunchSafari() override = default;
 
     bool Execute() override { return Launch(L"safari \"$(TAB_PATH)\""); }
     UINT GetCmdId() override { return cmdLaunchSafari; }
@@ -166,7 +167,7 @@ public:
         : LaunchBase(obj)
     {
     }
-    ~CCmdLaunchOpera() = default;
+    ~CCmdLaunchOpera() override = default;
 
     bool Execute() override { return Launch(L"opera \"$(TAB_PATH)\""); }
     UINT GetCmdId() override { return cmdLaunchOpera; }
@@ -179,7 +180,7 @@ public:
         : LaunchBase(obj)
     {
     }
-    ~CCmdLaunchSearch() = default;
+    ~CCmdLaunchSearch() override = default;
 
     bool Execute() override;
     UINT GetCmdId() override { return cmdLaunchSearch; }
@@ -192,7 +193,7 @@ public:
         : LaunchBase(obj)
     {
     }
-    ~CCmdLaunchWikipedia() = default;
+    ~CCmdLaunchWikipedia() override = default;
 
     bool Execute() override { return Launch(L"http://en.wikipedia.org/wiki/Special:Search?search=$(SEL_TEXT_ESCAPED)"); }
     UINT GetCmdId() override { return cmdLaunchWikipedia; }
@@ -205,7 +206,7 @@ public:
         : LaunchBase(obj)
     {
     }
-    ~CCmdLaunchConsole() = default;
+    ~CCmdLaunchConsole() override = default;
 
     bool Execute() override
     {
@@ -224,7 +225,7 @@ public:
         : LaunchBase(obj)
     {
     }
-    ~CCmdLaunchExplorer() = default;
+    ~CCmdLaunchExplorer() override = default;
 
     bool Execute() override { return Launch(L"explorer \"$(TAB_DIR)\""); }
     UINT GetCmdId() override { return cmdLaunchExplorer; }
@@ -234,11 +235,11 @@ class CCmdLaunchCustom : public LaunchBase
 {
 public:
     CCmdLaunchCustom(UINT customId, void* obj);
-    ~CCmdLaunchCustom() = default;
+    ~CCmdLaunchCustom() override = default;
 
-    bool Execute() override { return Launch(CIniSettings::Instance().GetString(L"CustomLaunch", m_settingsID.c_str(), L"")); }
-    UINT GetCmdId() override { return m_customCmdId; }
-    void AfterInit() override;
+    bool    Execute() override { return Launch(CIniSettings::Instance().GetString(L"CustomLaunch", m_settingsID.c_str(), L"")); }
+    UINT    GetCmdId() override { return m_customCmdId; }
+    void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* pPropVarCurrentValue, PROPVARIANT* pPropVarNewValue) override;
 
@@ -252,7 +253,7 @@ class CCustomCommandsDlg : public CDialog
 {
 public:
     CCustomCommandsDlg();
-    virtual ~CCustomCommandsDlg() = default;
+    ~CCustomCommandsDlg() override = default;
 
 protected:
     LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -269,8 +270,8 @@ public:
         : ICommand(obj)
     {
     }
-    ~CCmdCustomCommands() = default;
+    ~CCmdCustomCommands() override = default;
 
-    virtual bool Execute() override;
-    virtual UINT GetCmdId() override { return cmdCustomCommands; }
+    bool Execute() override;
+    UINT GetCmdId() override { return cmdCustomCommands; }
 };

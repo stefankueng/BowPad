@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014-2016, 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ void CCmdBookmarks::OnDocumentClose(DocID id)
         return;
 
     // look if the path is already in our list
-    bool bModified = (m_bookmarks.erase(doc.m_path) > 0);
+    bool                bModified = (m_bookmarks.erase(doc.m_path) > 0);
 
     // find all bookmarks
     std::vector<sptr_t> bookmarkLines;
@@ -130,10 +130,10 @@ void CCmdBookmarks::OnDocumentOpen(DocID id)
 
 bool CCmdBookmarkToggle::Execute()
 {
-    auto line = GetCurrentLineNumber();
+    auto    line  = GetCurrentLineNumber();
 
     LRESULT state = Scintilla().MarkerGet(line);
-    if ((state & (1 << MARK_BOOKMARK)) != 0)
+    if ((state & (static_cast<long long>(1) << MARK_BOOKMARK)) != 0)
     {
         Scintilla().MarkerDelete(line, MARK_BOOKMARK);
         DocScrollRemoveLine(DOCSCROLLTYPE_BOOKMARK, line);

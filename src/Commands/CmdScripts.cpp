@@ -74,7 +74,7 @@ bool CCmdScript::Create(const std::wstring& path)
         //  Create the script site
         m_host = std::make_unique<BasicScriptHost>(engineID, L"BowPad", appObjectDispatch);
 
-        hr = m_host->Initialize();
+        hr     = m_host->Initialize();
         if (CAppUtils::FailedShowMessage(hr))
             return false;
         m_host->m_path = path;
@@ -233,49 +233,49 @@ void CCmdScript::ScintillaNotify(SCNotification* pScn)
     }
     DISPPARAMS dispParams = {nullptr};
     dispParams.cArgs      = 21;
-    VARIANT v[21];
-    v[20].uintVal = pScn->nmhdr.code;
-    v[20].vt      = VT_UINT;
-    v[19].intVal  = static_cast<int>(pScn->position);
-    v[19].vt      = VT_INT;
-    v[18].intVal  = pScn->ch;
-    v[18].vt      = VT_INT;
-    v[17].intVal  = pScn->modifiers;
-    v[17].vt      = VT_INT;
-    v[16].intVal  = pScn->modificationType;
-    v[16].vt      = VT_INT;
-    v[15].bstrVal = bText;
-    v[15].vt      = VT_BSTR;
-    v[14].intVal  = static_cast<int>(pScn->length);
-    v[14].vt      = VT_INT;
-    v[13].intVal  = static_cast<int>(pScn->linesAdded);
-    v[13].vt      = VT_INT;
-    v[12].intVal  = pScn->message;
-    v[12].vt      = VT_INT;
-    v[11].ullVal  = pScn->wParam;
-    v[11].vt      = VT_UI8;
-    v[10].ullVal  = pScn->lParam;
-    v[10].vt      = VT_UI8;
-    v[9].intVal   = static_cast<int>(pScn->line);
-    v[9].vt       = VT_INT;
-    v[8].intVal   = pScn->foldLevelNow;
-    v[8].vt       = VT_INT;
-    v[7].intVal   = pScn->foldLevelPrev;
-    v[7].vt       = VT_INT;
-    v[6].intVal   = pScn->margin;
-    v[6].vt       = VT_INT;
-    v[5].intVal   = pScn->listType;
-    v[5].vt       = VT_INT;
-    v[4].intVal   = pScn->x;
-    v[4].vt       = VT_INT;
-    v[3].intVal   = pScn->y;
-    v[3].vt       = VT_INT;
-    v[2].intVal   = pScn->token;
-    v[2].vt       = VT_INT;
-    v[1].intVal   = static_cast<int>(pScn->annotationLinesAdded);
-    v[1].vt       = VT_INT;
-    v[0].intVal   = pScn->updated;
-    v[0].vt       = VT_INT;
+    VARIANT v[21]{};
+    v[20].uintVal     = pScn->nmhdr.code;
+    v[20].vt          = VT_UINT;
+    v[19].intVal      = static_cast<int>(pScn->position);
+    v[19].vt          = VT_INT;
+    v[18].intVal      = pScn->ch;
+    v[18].vt          = VT_INT;
+    v[17].intVal      = pScn->modifiers;
+    v[17].vt          = VT_INT;
+    v[16].intVal      = pScn->modificationType;
+    v[16].vt          = VT_INT;
+    v[15].bstrVal     = bText;
+    v[15].vt          = VT_BSTR;
+    v[14].intVal      = static_cast<int>(pScn->length);
+    v[14].vt          = VT_INT;
+    v[13].intVal      = static_cast<int>(pScn->linesAdded);
+    v[13].vt          = VT_INT;
+    v[12].intVal      = pScn->message;
+    v[12].vt          = VT_INT;
+    v[11].ullVal      = pScn->wParam;
+    v[11].vt          = VT_UI8;
+    v[10].ullVal      = pScn->lParam;
+    v[10].vt          = VT_UI8;
+    v[9].intVal       = static_cast<int>(pScn->line);
+    v[9].vt           = VT_INT;
+    v[8].intVal       = pScn->foldLevelNow;
+    v[8].vt           = VT_INT;
+    v[7].intVal       = pScn->foldLevelPrev;
+    v[7].vt           = VT_INT;
+    v[6].intVal       = pScn->margin;
+    v[6].vt           = VT_INT;
+    v[5].intVal       = pScn->listType;
+    v[5].vt           = VT_INT;
+    v[4].intVal       = pScn->x;
+    v[4].vt           = VT_INT;
+    v[3].intVal       = pScn->y;
+    v[3].vt           = VT_INT;
+    v[2].intVal       = pScn->token;
+    v[2].vt           = VT_INT;
+    v[1].intVal       = static_cast<int>(pScn->annotationLinesAdded);
+    v[1].vt           = VT_INT;
+    v[0].intVal       = pScn->updated;
+    v[0].vt           = VT_INT;
 
     dispParams.rgvarg = v;
     m_host->CallFunction(L"ScintillaNotify", dispParams, false);
@@ -285,7 +285,7 @@ void CCmdScript::TabNotify(TBHDR* ptbHdr)
 {
     DISPPARAMS dispParams = {nullptr};
     dispParams.cArgs      = 2;
-    VARIANT v[2];
+    VARIANT v[2]{};
     v[1].intVal       = static_cast<int>(ptbHdr->hdr.code);
     v[1].vt           = VT_INT;
     v[0].intVal       = ptbHdr->tabOrigin;
@@ -316,7 +316,7 @@ void CCmdScript::OnDocumentClose(DocID id)
 {
     DISPPARAMS dispParams = {nullptr};
     dispParams.cArgs      = 1;
-    VARIANT vI;
+    VARIANT vI{};
     vI.intVal         = id.GetValue();
     vI.vt             = VT_INT;
     dispParams.rgvarg = &vI;
@@ -327,7 +327,7 @@ void CCmdScript::OnDocumentOpen(DocID id)
 {
     DISPPARAMS dispParams = {nullptr};
     dispParams.cArgs      = 1;
-    VARIANT vI;
+    VARIANT vI{};
     vI.intVal         = id.GetValue();
     vI.vt             = VT_INT;
     dispParams.rgvarg = &vI;
@@ -338,7 +338,7 @@ void CCmdScript::OnBeforeDocumentSave(DocID id)
 {
     DISPPARAMS dispParams = {nullptr};
     dispParams.cArgs      = 1;
-    VARIANT v[1];
+    VARIANT v[1]{};
     v[0].intVal       = id.GetValue();
     v[0].vt           = VT_INT;
     dispParams.rgvarg = v;
@@ -349,7 +349,7 @@ void CCmdScript::OnDocumentSave(DocID id, bool bSaveAs)
 {
     DISPPARAMS dispParams = {nullptr};
     dispParams.cArgs      = 2;
-    VARIANT v[2];
+    VARIANT v[2]{};
     v[1].intVal       = id.GetValue();
     v[1].vt           = VT_INT;
     v[0].boolVal      = bSaveAs ? VARIANT_TRUE : VARIANT_FALSE;
@@ -414,7 +414,7 @@ void CCmdScript::OnTimer(UINT id)
 {
     DISPPARAMS dispParams = {nullptr};
     dispParams.cArgs      = 1;
-    VARIANT vI;
+    VARIANT vI{};
     vI.uintVal        = id;
     vI.vt             = VT_UINT;
     dispParams.rgvarg = &vI;
@@ -425,7 +425,7 @@ void CCmdScript::OnThemeChanged(bool bDark)
 {
     DISPPARAMS dispParams = {nullptr};
     dispParams.cArgs      = 1;
-    VARIANT vI;
+    VARIANT vI{};
     vI.boolVal        = bDark ? VARIANT_TRUE : VARIANT_FALSE;
     vI.vt             = VT_BOOL;
     dispParams.rgvarg = &vI;

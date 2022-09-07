@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2020-2021 - Stefan Kueng
+// Copyright (C) 2020-2022 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,9 +34,9 @@ public:
     void Show();
 
 protected: // override
-    bool Execute() override { return true; }
-    UINT GetCmdId() override { return 0; }
-    //void                    OnClose() override;
+    bool             Execute() override { return true; }
+    UINT             GetCmdId() override { return 0; }
+    // void                    OnClose() override;
     LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 protected:
@@ -64,11 +64,11 @@ class CCmdRegexCapture : public ICommand
 {
 public:
     CCmdRegexCapture(void* obj);
-    ~CCmdRegexCapture() = default;
+    ~CCmdRegexCapture() override = default;
 
-    bool Execute() override;
+    bool    Execute() override;
 
-    UINT GetCmdId() override { return cmdRegexCapture; }
+    UINT    GetCmdId() override { return cmdRegexCapture; }
 
     HRESULT IUICommandHandlerUpdateProperty(
         REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/,
