@@ -32,12 +32,12 @@
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
 
-constexpr auto DEFAULT_MAX_SEARCH_STRINGS = 20;
-constexpr auto TIMER_INFOSTRING           = 100;
+constexpr auto                    DEFAULT_MAX_SEARCH_STRINGS = 20;
+constexpr auto                    TIMER_INFOSTRING           = 100;
 
 std::unique_ptr<CRegexCaptureDlg> g_pRegexCaptureDlg;
 
-void regexCaptureFinish()
+void                              regexCaptureFinish()
 {
     g_pRegexCaptureDlg.reset();
 }
@@ -63,7 +63,7 @@ LRESULT CRegexCaptureDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM
     switch (uMsg)
     {
         case WM_SHOWWINDOW:
-            //m_open = wParam != FALSE;
+            // m_open = wParam != FALSE;
             break;
         case WM_DESTROY:
             break;
@@ -76,6 +76,13 @@ LRESULT CRegexCaptureDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM
             int newHeight = HIWORD(lParam);
             m_resizer.DoResize(newWidth, newHeight);
             break;
+        }
+        case WM_GETMINMAXINFO:
+        {
+            MINMAXINFO* mmi       = reinterpret_cast<MINMAXINFO*>(lParam);
+            mmi->ptMinTrackSize.x = m_resizer.GetDlgRectScreen()->right;
+            mmi->ptMinTrackSize.y = m_resizer.GetDlgRectScreen()->bottom;
+            return 0;
         }
         case WM_COMMAND:
             return DoCommand(LOWORD(wParam), HIWORD(wParam));
@@ -158,9 +165,9 @@ void CRegexCaptureDlg::DoInitDialog(HWND hwndDlg)
     GetWindowRect(GetScintillaWnd(), &rcScintilla);
     GetWindowRect(hwndDlg, &rcDlg);
 
-    int sbVertWidth = GetSystemMetrics(SM_CXVSCROLL);
+    int  sbVertWidth = GetSystemMetrics(SM_CXVSCROLL);
 
-    LONG adjustX = 15;
+    LONG adjustX     = 15;
     if (sbVertWidth >= 0)
         adjustX += sbVertWidth;
     LONG x = rcScintilla.right - ((rcDlg.right - rcDlg.left) + adjustX);
@@ -178,9 +185,9 @@ void CRegexCaptureDlg::DoInitDialog(HWND hwndDlg)
     m_resizer.AddControl(hwndDlg, IDC_REGEXLABEL, RESIZER_TOPLEFT);
     m_resizer.AddControl(hwndDlg, IDC_CAPTURELABEL, RESIZER_TOPLEFT);
     m_resizer.AddControl(hwndDlg, IDC_REGEXCOMBO, RESIZER_TOPLEFTRIGHT);
-    m_resizer.AddControl(hwndDlg, IDC_ICASE, RESIZER_TOPLEFTRIGHT);
-    m_resizer.AddControl(hwndDlg, IDC_DOTNEWLINE, RESIZER_TOPLEFTRIGHT);
-    m_resizer.AddControl(hwndDlg, IDC_ADDNEWLINE, RESIZER_TOPLEFTRIGHT);
+    m_resizer.AddControl(hwndDlg, IDC_ICASE, RESIZER_TOPLEFT);
+    m_resizer.AddControl(hwndDlg, IDC_DOTNEWLINE, RESIZER_TOPLEFT);
+    m_resizer.AddControl(hwndDlg, IDC_ADDNEWLINE, RESIZER_TOPLEFT);
     m_resizer.AddControl(hwndDlg, IDC_CAPTURECOMBO, RESIZER_TOPLEFTRIGHT);
     m_resizer.AddControl(hwndDlg, IDOK, RESIZER_TOPRIGHT);
     m_resizer.AddControl(hwndDlg, IDC_SCINTILLA, RESIZER_TOPLEFTBOTTOMRIGHT);
