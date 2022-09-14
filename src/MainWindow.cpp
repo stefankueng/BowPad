@@ -4234,7 +4234,6 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     {
         editor->SaveCurrentPos(doc.m_position);
 
-        bool withUndo      = false;
         auto maxLenForUndo = CIniSettings::Instance().GetInt64(L"View", L"maxLenForUndo", 2 * 1024 * 1024);
         if (editor->Scintilla().Length() < maxLenForUndo)
         {
@@ -4244,25 +4243,23 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
             if (newLen < maxLenForUndo && oldLen < maxLenForUndo)
             {
                 auto oldText = editor->Scintilla().GetText(oldLen);
-                auto text = m_scratchEditor.Scintilla().GetText(newLen);
+                auto text    = m_scratchEditor.Scintilla().GetText(newLen);
                 if (oldText != text)
                 {
+                    editor->Scintilla().AddRefDocument(doc.m_document);
                     editor->Scintilla().BeginUndoAction();
                     editor->Scintilla().ClearAll();
                     editor->Scintilla().AppendText(text.size(), text.data());
                     editor->RestoreCurrentPos(doc.m_position);
                     editor->Scintilla().EndUndoAction();
-                    withUndo = true;
+                    docReload.m_document = doc.m_document;
                 }
             }
             m_scratchEditor.Scintilla().SetDocPointer(nullptr);
         }
 
-        if (!withUndo)
-        {
-            // Apply the new one.
-            editor->Scintilla().SetDocPointer(docReload.m_document);
-        }
+        // Apply the new one.
+        editor->Scintilla().SetDocPointer(docReload.m_document);
     }
 
     docReload.m_position          = doc.m_position;
