@@ -1963,6 +1963,7 @@ bool CMainWindow::SaveDoc(DocID docID, bool bSaveAs)
             UpdateCaptionBar();
             UpdateStatusBar(true);
             m_editor.Scintilla().SetSavePoint();
+            m_editor.EnableChangeHistory();
         }
         if (updateFileTree)
         {
@@ -3260,6 +3261,7 @@ void CMainWindow::HandleWriteProtectedEdit()
                 UpdateTab(docID);
                 m_editor.Scintilla().SetReadOnly(false);
                 m_editor.Scintilla().SetSavePoint();
+                m_editor.EnableChangeHistory();
             }
         }
     }
@@ -3691,6 +3693,7 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         {
             CMRU::Instance().RemovePath(filepath, false);
         }
+        m_editor.EnableChangeHistory();
     }
     m_insertionIndex = -1;
     return index;
@@ -4271,6 +4274,7 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     doc.SetLanguage(lang);
     editor->RestoreCurrentPos(docReload.m_position);
     editor->Scintilla().SetReadOnly(docReload.m_bIsWriteProtected);
+    editor->EnableChangeHistory();
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, editor, doc, false);
     RefreshAnnotations();
 
@@ -4286,8 +4290,10 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
         UpdateStatusBar(true);
     UpdateTab(docID);
     if (bReloadCurrentTab)
+    {
         editor->Scintilla().SetSavePoint();
-
+        editor->EnableChangeHistory();
+    }
     // refresh the file tree
     m_fileTree.SetPath(m_fileTree.GetPath(), !dueToOutsideChanges);
 

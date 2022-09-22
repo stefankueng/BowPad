@@ -43,8 +43,9 @@ class CPosData;
 #define INDIC_REGEXCAPTURE_END (INDIC_CONTAINER + 20)
 
 constexpr int SC_MARGE_LINENUMBER = 0;
-constexpr int SC_MARGE_SYMBOL     = 1;
-constexpr int SC_MARGE_FOLDER     = 2;
+constexpr int SC_MARGE_HISTORY    = 1;
+constexpr int SC_MARGE_SYMBOL     = 2;
+constexpr int SC_MARGE_FOLDER     = 4;
 
 constexpr int MARK_BOOKMARK       = 24;
 
@@ -128,6 +129,7 @@ public:
     sptr_t                    GetSelTextMarkerCount() const { return m_selTextMarkerCount; }
     sptr_t                    GetCurrentLineNumber() const;
     void                      VisibleLinesChanged() { m_docScroll.VisibleLinesChanged(); }
+    void                      EnableChangeHistory() const;
     static bool               IsXMLWhitespace(int ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; }
 
     LRESULT CALLBACK          HandleScrollbarCustomDraw(WPARAM wParam, NMCSBCUSTOMDRAW* pCustomDraw);

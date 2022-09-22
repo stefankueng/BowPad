@@ -689,6 +689,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     m_scratchScintilla.Scintilla().SetUndoCollection(true);
     m_scratchScintilla.Scintilla().EmptyUndoBuffer();
     m_scratchScintilla.Scintilla().SetSavePoint();
+    m_scratchScintilla.EnableChangeHistory();
     SetEOLType(m_scratchScintilla, doc);
     if (ro || doc.m_bIsReadonly || doc.m_bIsWriteProtected)
         m_scratchScintilla.Scintilla().SetReadOnly(true);
@@ -1016,6 +1017,7 @@ bool CDocumentManager::SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved) cons
     if (SaveDoc(hWnd, doc.m_path, doc))
     {
         m_scratchScintilla.Scintilla().SetSavePoint();
+        m_scratchScintilla.EnableChangeHistory();
         m_scratchScintilla.Scintilla().SetDocPointer(nullptr);
         if (doc.m_encodingSaving != -1)
         {
