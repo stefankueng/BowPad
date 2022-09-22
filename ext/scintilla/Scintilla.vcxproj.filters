@@ -243,6 +243,9 @@
     <ClInclude Include="win32\WinTypes.h">
       <Filter>Scintilla\win32</Filter>
     </ClInclude>
+    <ClInclude Include="src\ChangeHistory.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lexilla\lexers\LexSQL.cxx">
@@ -745,6 +748,9 @@
     </ClCompile>
     <ClCompile Include="..\lexilla\lexers\LexGDScript.cxx">
       <Filter>Lexilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChangeHistory.cxx">
+      <Filter>Scintilla\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
