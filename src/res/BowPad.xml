@@ -832,6 +832,11 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     </Command>
     <Command Name="cmdEditEndOfSelectedLines" LabelTitle="Edit at end" TooltipTitle="Multi-Edit" TooltipDescription="Edit at end of selected lines">
     </Command>
+    <Command Name="cmdRemoveEmptyLines" LabelTitle="Remove empty lines" TooltipTitle="Remove empty lines" TooltipDescription="Remove all empty lines or lines with only whitespace" Keytip="LR">
+        <Command.LargeImages>
+            <Image>res/RemoveEmptyL.png</Image>
+        </Command.LargeImages>
+    </Command>
 
       <Command Name="cmdContextMap" />
     <Command Name="cmdContextSpellMap" />
@@ -1134,6 +1139,7 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <Button CommandName="cmdLineJoin" />
               <Button CommandName="cmdSort" />
               <Button CommandName="cmdEditSelection" />
+              <Button CommandName="cmdRemoveEmptyLines" />
             </DropDownButton>
             <DropDownButton CommandName="cmdGroupCase">
               <MenuGroup>

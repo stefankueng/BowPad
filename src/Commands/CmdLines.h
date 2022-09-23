@@ -115,3 +115,39 @@ public:
 
     UINT GetCmdId() override { return cmdLineDown; }
 };
+
+class CCmdRemoveEmptyLines : public ICommand
+{
+public:
+    CCmdRemoveEmptyLines(void* obj)
+        : ICommand(obj)
+    {
+    }
+
+    ~CCmdRemoveEmptyLines() override = default;
+
+    bool Execute() override
+    {
+        Scintilla().BeginUndoAction();
+        auto lines = Scintilla().LineCount();
+        for (Scintilla::Line l = 0; l < lines; ++l)
+        {
+            auto sLine = Scintilla().GetLine(l);
+            SearchReplace(sLine, "\t", "");
+            SearchReplace(sLine, "\r", "");
+            SearchReplace(sLine, "\n", "");
+            SearchReplace(sLine, " ", "");
+            if (sLine.empty())
+            {
+                auto startPos = Scintilla().PositionFromLine(l);
+                Scintilla().DeleteRange(startPos, Scintilla().PositionFromLine(l + 1) - startPos);
+                --l;
+                --lines;
+            }
+        }
+        Scintilla().EndUndoAction();
+        return true;
+    }
+
+    UINT GetCmdId() override { return cmdRemoveEmptyLines; }
+};

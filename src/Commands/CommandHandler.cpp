@@ -192,6 +192,7 @@ void CCommandHandler::Init(void* obj)
     Add<CCmdLineDown>(obj);
     Add<CCmdSort>(obj);
     Add<CCmdEditSelection>(obj);
+    Add<CCmdRemoveEmptyLines>(obj);
     Add<CCmdEditEndOfSelectedLines>(obj);
     Add<CCmdInitFoldingMargin>(obj);
     Add<CCmdFoldingOn>(obj);
