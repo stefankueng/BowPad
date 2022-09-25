@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2022-04-20 21:25+0200\n"
+"PO-Revision-Date: 2022-09-25 19:37+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -641,7 +641,7 @@ msgstr "Rechtschreibfehler korrigieren"
 msgid "Corrections"
 msgstr "Korrekturen"
 
-#. Resource IDs: (60651)
+#. Resource IDs: (60656)
 msgid "Corresponding File"
 msgstr "Entsprechende Datei"
 
@@ -1376,6 +1376,10 @@ msgstr "LEX"
 msgid "LF"
 msgstr "LF"
 
+#. Resource IDs: (60650)
+msgid "LR"
+msgstr "LR"
+
 #. Resource IDs: (60269, 60393, 60477)
 msgid "LS"
 msgstr "LS"
@@ -1761,7 +1765,7 @@ msgstr "Öffne Datei an Cursorposition"
 msgid "Open Files"
 msgstr "Öffne Dateien"
 
-#. Resource IDs: (60652)
+#. Resource IDs: (60657)
 msgid "Open corresponding File"
 msgstr "Öffne zugehörige Datei"
 
@@ -1819,7 +1823,7 @@ msgid ""
 msgstr ""
 "Öffnet die Konfigurationsdatei zum konfigurieren der Tastaturkürzel in BowPad"
 
-#. Resource IDs: (60653)
+#. Resource IDs: (60658)
 msgid ""
 "Opens the corresponding file to the file in the current tab.\n"
 "(h/cpp, aspx/cs/vb)"
@@ -2022,6 +2026,16 @@ msgid ""
 msgstr ""
 "Dokument neu laden\n"
 "Nicht gespeicherte Änderungen gehen verloren!"
+
+#. Resource IDs: (60652)
+msgid "Remove all empty lines or lines with only whitespace"
+msgstr ""
+"entfernt alle leeren Zeilen oder Zeilen welche nur Leerzeichen/Tabulatoren "
+"enthalten"
+
+#. Resource IDs: (60649, 60651)
+msgid "Remove empty lines"
+msgstr "leere Zeilen entfernen"
 
 #. Resource IDs: (60373)
 msgid "Removes all bookmarks from the current file"
@@ -2265,7 +2279,7 @@ msgstr "Zeige Eigenschaften"
 msgid "Show Whitespaces"
 msgstr "Zeige Leerzeichen"
 
-#. Resource IDs: (60655)
+#. Resource IDs: (60660)
 msgid "Show clipboard history"
 msgstr "Verlauf der Zwischenablage"
 
@@ -2808,7 +2822,7 @@ msgstr "umbrochene Zeilen einrücken"
 msgid "indents wrapped sublines"
 msgstr "rückt umbrochene Unterzeilen ein"
 
-#. Resource IDs: (60656)
+#. Resource IDs: (60661)
 msgid "no plugins loaded"
 msgstr "Keine Plugins geladen"
 
