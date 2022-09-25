@@ -571,7 +571,7 @@ msgstr ""
 msgid "Corrections"
 msgstr ""
 
-#. Resource IDs: (60651)
+#. Resource IDs: (60656)
 msgid "Corresponding File"
 msgstr ""
 
@@ -1210,6 +1210,10 @@ msgstr ""
 msgid "LF"
 msgstr ""
 
+#. Resource IDs: (60650)
+msgid "LR"
+msgstr ""
+
 #. Resource IDs: (60269, 60393, 60477)
 msgid "LS"
 msgstr ""
@@ -1569,7 +1573,7 @@ msgstr ""
 msgid "Open Files"
 msgstr ""
 
-#. Resource IDs: (60652)
+#. Resource IDs: (60657)
 msgid "Open corresponding File"
 msgstr ""
 
@@ -1616,7 +1620,7 @@ msgstr ""
 msgid "Opens the config file to configure keyboard shortcuts for any command in BowPad"
 msgstr ""
 
-#. Resource IDs: (60653)
+#. Resource IDs: (60658)
 msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
 msgstr ""
 
@@ -1802,6 +1806,14 @@ msgstr ""
 
 #. Resource IDs: (166)
 msgid "Reload\nThe unsaved modifications will be lost!"
+msgstr ""
+
+#. Resource IDs: (60652)
+msgid "Remove all empty lines or lines with only whitespace"
+msgstr ""
+
+#. Resource IDs: (60649, 60651)
+msgid "Remove empty lines"
 msgstr ""
 
 #. Resource IDs: (60373)
@@ -2023,7 +2035,7 @@ msgstr ""
 msgid "Show Whitespaces"
 msgstr ""
 
-#. Resource IDs: (60655)
+#. Resource IDs: (60660)
 msgid "Show clipboard history"
 msgstr ""
 
@@ -2531,7 +2543,7 @@ msgstr ""
 msgid "indents wrapped sublines"
 msgstr ""
 
-#. Resource IDs: (60656)
+#. Resource IDs: (60661)
 msgid "no plugins loaded"
 msgstr ""
 
