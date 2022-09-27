@@ -286,18 +286,18 @@ void CCmdSpellCheck::Check()
             if (textRange.chrg.cpMax < textLength)
             {
                 textRange.chrg.cpMax++;
-                Scintilla().GetTextRange(&textRange);
+                Scintilla().GetTextRangeFull(&textRange);
             }
             else
             {
-                Scintilla().GetTextRange(&textRange);
+                Scintilla().GetTextRangeFull(&textRange);
                 textRange.chrg.cpMax++;
             }
             auto len = strlen(textRange.lpstrText);
             if (len == 0)
             {
                 textRange.chrg.cpMax--;
-                Scintilla().GetTextRange(&textRange);
+                Scintilla().GetTextRangeFull(&textRange);
                 len = strlen(textRange.lpstrText);
                 textRange.chrg.cpMax++;
                 len++;
@@ -344,7 +344,7 @@ void CCmdSpellCheck::Check()
                             wordRange.chrg.cpMin = textRange.chrg.cpMin + errStart;
                             wordRange.chrg.cpMax = wordRange.chrg.cpMin + errLen;
                             wordRange.lpstrText  = m_textBuffer.get();
-                            Scintilla().GetTextRange(&wordRange);
+                            Scintilla().GetTextRangeFull(&wordRange);
                             sWord       = CUnicodeUtils::StdGetUnicode(wordRange.lpstrText);
 
                             bool ignore = false;
