@@ -47,7 +47,7 @@ constexpr int SC_MARGE_HISTORY    = 1;
 constexpr int SC_MARGE_SYMBOL     = 2;
 constexpr int SC_MARGE_FOLDER     = 4;
 
-constexpr int MARK_BOOKMARK       = 24;
+constexpr int MARK_BOOKMARK       = 20;
 
 constexpr int SCN_BP_MOUSEMSG     = 4000;
 
