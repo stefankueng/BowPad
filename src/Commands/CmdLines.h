@@ -129,8 +129,14 @@ public:
     bool Execute() override
     {
         Scintilla().BeginUndoAction();
-        auto lines = Scintilla().LineCount();
-        for (Scintilla::Line l = 0; l < lines; ++l)
+        Scintilla::Line lineStart = Scintilla().LineFromPosition(Scintilla().SelectionStart());
+        Scintilla::Line lineEnd   = Scintilla().LineFromPosition(Scintilla().SelectionEnd());
+        if (lineStart == lineEnd)
+        {
+            lineStart = 0;
+            lineEnd   = Scintilla().LineCount();
+        }
+        for (Scintilla::Line l = lineStart; l < lineEnd; ++l)
         {
             auto sLine = Scintilla().GetLine(l);
             SearchReplace(sLine, "\t", "");
@@ -142,7 +148,7 @@ public:
                 auto startPos = Scintilla().PositionFromLine(l);
                 Scintilla().DeleteRange(startPos, Scintilla().PositionFromLine(l + 1) - startPos);
                 --l;
-                --lines;
+                --lineEnd;
             }
         }
         Scintilla().EndUndoAction();
