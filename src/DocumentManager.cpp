@@ -617,7 +617,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
                 if (inconclusive && encoding == CP_ACP)
                     encoding = CP_UTF8;
                 uchardet_t handle = uchardet_new();
-                if (int retVal = uchardet_handle_data(handle, m_data + incompleteMultiByteChar, ReadBlockSize - incompleteMultiByteChar); retVal == 0)
+                if (int retVal = uchardet_handle_data(handle, m_data + incompleteMultiByteChar, lenFile - incompleteMultiByteChar); retVal == 0)
                 {
                     OnOutOfScope(uchardet_delete(handle));
                     uchardet_data_end(handle);
