@@ -185,7 +185,8 @@ void CCmdSpellCheck::Check()
         Sci_TextRangeFull textRange{};
         auto              firstLine = Scintilla().FirstVisibleLine();
         auto              lastLine  = firstLine + Scintilla().LinesOnScreen();
-        textRange.chrg.cpMin        = static_cast<Sci_PositionCR>(Scintilla().PositionFromLine(firstLine));
+        auto              firstPos  = static_cast<Sci_Position>(Scintilla().PositionFromLine(firstLine));
+        textRange.chrg.cpMin        = firstPos;
         textRange.chrg.cpMax        = textRange.chrg.cpMin;
         auto lastPos                = Scintilla().PositionFromLine(lastLine) + Scintilla().LineLength(lastLine);
         auto textLength             = Scintilla().Length();
@@ -193,7 +194,7 @@ void CCmdSpellCheck::Check()
             lastPos = textLength - textRange.chrg.cpMin;
         if (m_lastCheckedPos)
         {
-            textRange.chrg.cpMax = static_cast<Sci_PositionCR>(m_lastCheckedPos);
+            textRange.chrg.cpMax = static_cast<Sci_Position>(m_lastCheckedPos);
         }
         auto start = GetTickCount64();
         while (textRange.chrg.cpMax < lastPos)
@@ -205,10 +206,10 @@ void CCmdSpellCheck::Check()
                     SetTimer(GetHwnd(), g_checkTimer, 10, nullptr);
                 break;
             }
-            textRange.chrg.cpMin = static_cast<Sci_PositionCR>(Scintilla().WordStartPosition(textRange.chrg.cpMax + 1, TRUE));
-            if (textRange.chrg.cpMin < textRange.chrg.cpMax)
+            textRange.chrg.cpMin = static_cast<Sci_Position>(Scintilla().WordStartPosition(textRange.chrg.cpMax + 1, TRUE));
+            if (textRange.chrg.cpMin < textRange.chrg.cpMax && textRange.chrg.cpMin >= firstPos)
                 break;
-            textRange.chrg.cpMax = static_cast<Sci_PositionCR>(Scintilla().WordEndPosition(textRange.chrg.cpMin, TRUE));
+            textRange.chrg.cpMax = static_cast<Sci_Position>(Scintilla().WordEndPosition(textRange.chrg.cpMin, TRUE));
             if (textRange.chrg.cpMin == textRange.chrg.cpMax)
             {
                 textRange.chrg.cpMax++;
