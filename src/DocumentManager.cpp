@@ -598,6 +598,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     int   incompleteMultiByteChar = 0;
     bool  bFirst                  = true;
     bool  preferUtf8              = CIniSettings::Instance().GetInt64(L"Defaults", L"encodingutf8overansi", 0) != 0;
+    bool  useUcharDet             = CIniSettings::Instance().GetInt64(L"Defaults", L"useUCharDet", 1) != 0;
     bool  inconclusive            = false;
     bool  encodingSet             = encoding != -1;
     int   skip                    = 0;
@@ -616,29 +617,32 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
             {
                 if (inconclusive && encoding == CP_ACP)
                     encoding = CP_UTF8;
-                uchardet_t handle = uchardet_new();
-                if (int retVal = uchardet_handle_data(handle, m_data + incompleteMultiByteChar, lenFile - incompleteMultiByteChar); retVal == 0)
+                if (useUcharDet)
                 {
-                    OnOutOfScope(uchardet_delete(handle));
-                    uchardet_data_end(handle);
-                    const char* charset = uchardet_get_charset(handle);
-                    if ((_stricmp(charset, "TIS-620") != 0) && // TIS-620 detection is disabled here because uchardet detects usually wrongly UTF-8 as TIS-620
-                        (_stricmp(charset, "ASCII") != 0))
+                    uchardet_t handle = uchardet_new();
+                    if (int retVal = uchardet_handle_data(handle, m_data + incompleteMultiByteChar, lenFile - incompleteMultiByteChar); retVal == 0)
                     {
-                        Microsoft::WRL::ComPtr<IMultiLanguage> ml;
-                        if (SUCCEEDED(CoCreateInstance(CLSID_CMultiLanguage, nullptr,
-                                                       CLSCTX_ALL,
-                                                       IID_IMultiLanguage, (void**)&ml)))
+                        OnOutOfScope(uchardet_delete(handle));
+                        uchardet_data_end(handle);
+                        const char* charset = uchardet_get_charset(handle);
+                        if ((_stricmp(charset, "TIS-620") != 0) && // TIS-620 detection is disabled here because uchardet detects usually wrongly UTF-8 as TIS-620
+                            (_stricmp(charset, "ASCII") != 0))
                         {
-                            MIMECSETINFO charsetInfo{};
-                            _bstr_t      wCs = CUnicodeUtils::StdGetUnicode(charset).c_str();
-                            if (SUCCEEDED(ml->GetCharsetInfo(wCs, &charsetInfo)))
+                            Microsoft::WRL::ComPtr<IMultiLanguage> ml;
+                            if (SUCCEEDED(CoCreateInstance(CLSID_CMultiLanguage, nullptr,
+                                                           CLSCTX_ALL,
+                                                           IID_IMultiLanguage, (void**)&ml)))
                             {
-                                encoding = charsetInfo.uiInternetEncoding;
-                            }
-                            else if (encodings.contains(charset))
-                            {
-                                encoding = encodings.at(charset);
+                                MIMECSETINFO charsetInfo{};
+                                _bstr_t      wCs = CUnicodeUtils::StdGetUnicode(charset).c_str();
+                                if (SUCCEEDED(ml->GetCharsetInfo(wCs, &charsetInfo)))
+                                {
+                                    encoding = charsetInfo.uiInternetEncoding;
+                                }
+                                else if (encodings.contains(charset))
+                                {
+                                    encoding = encodings.at(charset);
+                                }
                             }
                         }
                     }
