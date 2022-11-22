@@ -1244,7 +1244,7 @@ LRESULT CTabBar::TabBarSpin_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             TabCtrl_GetItemRect(*pTab, 0, &itemRect);
             bool drawLeft = (itemRect.left < 0);
             TabCtrl_GetItemRect(*pTab, TabCtrl_GetItemCount(*pTab) - 1, &itemRect);
-            bool drawRight = (itemRect.right > viewPortRect.right);
+            bool drawRight = (itemRect.right > viewPortRect.right - rcPaint.right);
 
             bool isDark    = CTheme::Instance().IsDarkTheme();
 
