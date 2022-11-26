@@ -34,7 +34,7 @@
 
 extern IUIFramework *g_pFramework;
 
-//#define TABBAR_SHOWDISKICON 1
+// #define TABBAR_SHOWDISKICON 1
 constexpr double     hoverFraction = 0.4;
 
 CTabBar::CTabBar(HINSTANCE hInst)
@@ -687,7 +687,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr));
             return TRUE;
         }
-        case WM_RBUTTONDOWN: //right click selects tab as well
+        case WM_RBUTTONDOWN: // right click selects tab as well
         {
             ::CallWindowProc(m_tabBarDefaultProc, hwnd, WM_LBUTTONDOWN, wParam, lParam);
             return TRUE;
@@ -863,12 +863,12 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
-            //case WM_DRAWITEM:
+            // case WM_DRAWITEM:
             //{
-            //    DrawItem((DRAWITEMSTRUCT *)lParam);
-            //    return TRUE;
-            //}
-            //break;
+            //     DrawItem((DRAWITEMSTRUCT *)lParam);
+            //     return TRUE;
+            // }
+            // break;
         case WM_HOTKEY:
         {
             if (m_bIsDragging &&
@@ -973,19 +973,29 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT lpDrawItemStruct, float fraction) 
     auto crBkgnd = GetTabColor(lpDrawItemStruct->itemID);
 
     auto crFill  = GDIHelpers::InterpolateColors(crBkgnd,
-                                                CTheme::Instance().GetThemeColor(RGB(250, 250, 250), true),
-                                                max(0.0, fraction - (bSelected ? 0.6 : 0.1)));
+                                                 CTheme::Instance().GetThemeColor(RGB(250, 250, 250), true),
+                                                 max(0.0, fraction - (bSelected ? 0.6 : 0.1)));
 
     GDIHelpers::FillSolidRect(lpDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crBkgnd);
 
     auto borderWidth = CDPIAware::Instance().Scale(*this, 1);
     if (bSelected)
+    {
         borderWidth *= 2;
+        auto crMark = crBkgnd;
+        if (CTheme::Instance().IsDarkTheme())
+            crMark = GDIHelpers::Lighter(crMark, 3.0);
+        else
+            crMark = GDIHelpers::Darker(crMark, 0.6);
+        GDIHelpers::FillSolidRect(lpDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.top + 2 * borderWidth, crMark);
+    }
     rItem.left += borderWidth;
     rItem.right -= borderWidth;
     rItem.top += borderWidth;
     if (!bSelected)
         rItem.bottom -= (2 * borderWidth);
+    else
+        rItem.top += borderWidth;
 
     GDIHelpers::FillSolidRect(lpDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.bottom, crFill);
 
@@ -1126,17 +1136,17 @@ void CTabBar::ExchangeItemData(POINT point)
     int nTab = GetTabIndexAt(point);
 
     // The position is over a tab.
-    //if (hitinfo.flags != TCHT_NOWHERE)
+    // if (hitinfo.flags != TCHT_NOWHERE)
     if (nTab != -1)
     {
         m_bIsDraggingInside = true;
 
         if (nTab != m_nTabDragged)
         {
-            //1. set to focus
+            // 1. set to focus
             TabCtrl_SetCurSel(*this, nTab);
 
-            //2. shift their data, and insert the source
+            // 2. shift their data, and insert the source
             TCITEM itemDataNDraggedTab{}, itemDataShift{};
             itemDataNDraggedTab.mask = itemDataShift.mask = TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM;
             constexpr int stringSize                      = 256;
@@ -1175,7 +1185,7 @@ void CTabBar::ExchangeItemData(POINT point)
             ok = TabCtrl_SetItem(*this, nTab, &itemDataNDraggedTab) != FALSE;
             APPVERIFY(ok);
 
-            //3. update the current index
+            // 3. update the current index
             m_nTabDragged = nTab;
 
             TBHDR nmHdr{};
@@ -1219,7 +1229,7 @@ LRESULT CTabBar::TabBarSpin_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
     static bool rightHot  = false;
     static bool leftDown  = false;
     static bool rightDown = false;
-    CTabBar *   pTab      = reinterpret_cast<CTabBar *>(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
+    CTabBar    *pTab      = reinterpret_cast<CTabBar *>(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
     switch (message)
     {
         case WM_PAINT:
@@ -1299,9 +1309,9 @@ LRESULT CTabBar::TabBarSpin_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
                 grayClr = GDIHelpers::Darker(grayClr, 0.7f);
             else
                 grayClr = GDIHelpers::Lighter(grayClr, 1.5f);
-            HPEN   hPen         = CreatePen(PS_SOLID, 1, grayClr);
+            HPEN   hPen     = CreatePen(PS_SOLID, 1, grayClr);
             HBRUSH hbrGray  = CreateSolidBrush(grayClr);
-            auto   oldPen       = SelectObject(hdc, hPen);
+            auto   oldPen   = SelectObject(hdc, hPen);
             auto   oldBrush = SelectObject(hdc, drawLeft ? hbr : hbrGray);
             Polygon(hdc, leftArrow, _countof(leftArrow));
             oldBrush = SelectObject(hdc, drawRight ? hbr : hbrGray);
