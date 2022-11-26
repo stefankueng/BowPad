@@ -36,6 +36,7 @@ extern IUIFramework *g_pFramework;
 
 // #define TABBAR_SHOWDISKICON 1
 constexpr double     hoverFraction = 0.4;
+constexpr long       MIN_TAB_WIDTH = 80;
 
 CTabBar::CTabBar(HINSTANCE hInst)
     : CWindow(hInst)
@@ -479,8 +480,13 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             DrawMainBorder(&dis);
 
+            RECT rcSpin{};
+            GetWindowRect(m_spin, &rcSpin);
+            MapWindowPoints(nullptr, *this, reinterpret_cast<LPPOINT>(&rcSpin), 2);
+            rPage.right      = rcSpin.left;
+            dis.rcItem.right = rcSpin.left;
             // paint the tabs first and then the borders
-            auto count = GetItemCount();
+            auto count       = GetItemCount();
             if (!count) // no pages added
             {
                 SelectObject(hDC, hOldFont);
@@ -503,7 +509,8 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                         if (dis.rcItem.left < rPage.right && dis.rcItem.right > 0)
                         {
                             dis.rcItem.right = min(dis.rcItem.right, rPage.right);
-                            DrawItem(&dis, static_cast<float>(Animator::GetValue(m_animVars[GetIDFromIndex(nTab).GetValue()])));
+                            if (dis.rcItem.right != rPage.right || (dis.rcItem.right - dis.rcItem.left) > CDPIAware::Instance().Scale(*this, MIN_TAB_WIDTH))
+                                DrawItem(&dis, static_cast<float>(Animator::GetValue(m_animVars[GetIDFromIndex(nTab).GetValue()])));
                         }
                     }
                 }
@@ -523,7 +530,8 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                     if (dis.rcItem.left < rPage.right && dis.rcItem.right > 0)
                     {
                         dis.rcItem.right = min(dis.rcItem.right, rPage.right);
-                        DrawItem(&dis, static_cast<float>(Animator::GetValue(m_animVars[GetIDFromIndex(nSel).GetValue()])));
+                        if (dis.rcItem.right != rPage.right || (dis.rcItem.right - dis.rcItem.left) > CDPIAware::Instance().Scale(*this, MIN_TAB_WIDTH))
+                            DrawItem(&dis, static_cast<float>(Animator::GetValue(m_animVars[GetIDFromIndex(nSel).GetValue()])));
                     }
                 }
             }
@@ -658,6 +666,16 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                 ::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr));
                 return TRUE;
             }
+
+            // prevent clicks on tabs we don't draw
+            auto index = GetTabIndexAt(xPos, yPos);
+            RECT rcItem{};
+            TabCtrl_GetItemRect(*this, index, &rcItem);
+            RECT rcSpin{};
+            GetWindowRect(m_spin, &rcSpin);
+            MapWindowPoints(nullptr, *this, reinterpret_cast<LPPOINT>(&rcSpin), 2);
+            if (rcItem.right > rcSpin.left && (rcSpin.left - rcItem.left) < CDPIAware::Instance().Scale(*this, MIN_TAB_WIDTH))
+                return TRUE;
 
             ::CallWindowProc(m_tabBarDefaultProc, hwnd, message, wParam, lParam);
             if (wParam == 2)
@@ -984,9 +1002,9 @@ void CTabBar::DrawItem(const LPDRAWITEMSTRUCT lpDrawItemStruct, float fraction) 
         borderWidth *= 2;
         auto crMark = crBkgnd;
         if (CTheme::Instance().IsDarkTheme())
-            crMark = GDIHelpers::Lighter(crMark, 3.0);
+            crMark = GDIHelpers::Lighter(crMark, 3.0f);
         else
-            crMark = GDIHelpers::Darker(crMark, 0.6);
+            crMark = GDIHelpers::Darker(crMark, 0.6f);
         GDIHelpers::FillSolidRect(lpDrawItemStruct->hDC, rItem.left, rItem.top, rItem.right, rItem.top + 2 * borderWidth, crMark);
     }
     rItem.left += borderWidth;
