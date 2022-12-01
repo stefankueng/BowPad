@@ -34,6 +34,8 @@
 #include <iterator>
 #include <iostream>
 
+#include "../../ext/sktoolslib/ResString.h"
+
 namespace
 {
 constexpr wchar_t g_sessionSection[]         = {L"TabSession"};
@@ -148,7 +150,23 @@ void CCmdSessionLoad::OnClose()
             auto title    = GetTitleForTabIndex(i);
             if (doc.m_path.empty())
             {
+                if (title.empty())
+                    title = L"empty tab name";
                 filename = title;
+                auto lastSpace = title.rfind(' ');
+                if (lastSpace != std::wstring::npos)
+                {
+                    ResString newRes(g_hRes, IDS_NEW_TABTITLE);
+                    std::wstring sNew = newRes;
+                    SearchReplace(sNew, L"%s", L"");
+                    CStringUtils::trim(sNew);
+
+                    if (title.substr(0, lastSpace) == sNew)
+                    {
+                        // change title to we don't get two "New 1" tabs on the next load
+                        title += L"--";
+                    }
+                }
             }
             auto backupPath = CStringUtils::Format(L"%s\\%d%s", sessionPath.c_str(), saveIndex, filename.c_str());
             settings.SetString(sessionSection(), CStringUtils::Format(L"origpath%d", saveIndex).c_str(), doc.m_path.c_str());
