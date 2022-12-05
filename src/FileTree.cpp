@@ -158,7 +158,7 @@ bool CFileTree::Init(HINSTANCE /*hInst*/, HWND hParent)
 
     OnThemeChanged(CTheme::Instance().IsDarkTheme());
 
-    SetTimer(*this, 100, 1000, nullptr);
+    SetTimer(*this, 100, 2000, nullptr);
 
     return true;
 }
