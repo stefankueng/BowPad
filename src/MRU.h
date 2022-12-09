@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013 - 2014, 2016, 2021 Stefan Kueng
+// Copyright (C) 2013 - 2014, 2016, 2021-2022 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ public:
 private:
     static std::wstring GetMRUFilename();
     void                Load();
-    void                Save();
+    void                Save() const;
 
 private:
     bool                            m_bLoaded;
