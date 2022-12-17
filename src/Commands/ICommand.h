@@ -36,6 +36,7 @@ constexpr unsigned int OpenIntoActiveTab    = 8;
 constexpr unsigned int NoActivate           = 16;
 constexpr unsigned int CreateTabOnly        = 32;
 constexpr unsigned int CreateIfMissing      = 64;
+constexpr unsigned int NewIfMissing         = 128;
 }; // namespace OpenFlags
 
 class ICommand
@@ -45,11 +46,11 @@ public:
     virtual ~ICommand() {}
 
     /// Execute the command
-    virtual bool Execute()  = 0;
-    virtual UINT GetCmdId() = 0;
-    virtual bool IsItemsSourceCommand() { return false; }
+    virtual bool    Execute()  = 0;
+    virtual UINT    GetCmdId() = 0;
+    virtual bool    IsItemsSourceCommand() { return false; }
 
-    virtual void ScintillaNotify(SCNotification* pScn);
+    virtual void    ScintillaNotify(SCNotification* pScn);
     // note: the 'tabOrigin' member of the TBHDR is only valid for TCN_GETCOLOR, TCN_TABDROPPED, TCN_TABDROPPEDOUTSIDE, TCN_ORDERCHANGED
     virtual void    TabNotify(TBHDR* ptbHdr);
     virtual void    OnClose();
@@ -69,35 +70,35 @@ public:
     virtual void    OnPluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data);
 
 protected:
-    void         SetInsertionIndex(int index) const;
-    void         TabActivateAt(int index) const;
-    void         UpdateTab(int index) const;
-    DocID        GetDocIdOfCurrentTab() const;
-    int          GetActiveTabIndex() const;
-    int          GetTabCount() const;
-    std::wstring GetCurrentTitle() const;
-    std::wstring GetTitleForTabIndex(int index) const;
-    std::wstring GetTitleForDocID(DocID id) const;
-    void         SetCurrentTitle(LPCWSTR title) const;
-    void         SetTitleForDocID(DocID id, LPCWSTR title) const;
-    int          GetSrcTab() const;
-    int          GetDstTab() const;
-    bool         CloseTab(int index, bool bForce) const;
-    DocID        GetDocIDFromTabIndex(int tab) const;
-    DocID        GetDocIDFromPath(LPCTSTR path) const;
-    int          GetTabIndexFromDocID(DocID docID) const;
-    void         OpenNewTab() const;
+    void                      SetInsertionIndex(int index) const;
+    void                      TabActivateAt(int index) const;
+    void                      UpdateTab(int index) const;
+    DocID                     GetDocIdOfCurrentTab() const;
+    int                       GetActiveTabIndex() const;
+    int                       GetTabCount() const;
+    std::wstring              GetCurrentTitle() const;
+    std::wstring              GetTitleForTabIndex(int index) const;
+    std::wstring              GetTitleForDocID(DocID id) const;
+    void                      SetCurrentTitle(LPCWSTR title) const;
+    void                      SetTitleForDocID(DocID id, LPCWSTR title) const;
+    int                       GetSrcTab() const;
+    int                       GetDstTab() const;
+    bool                      CloseTab(int index, bool bForce) const;
+    DocID                     GetDocIDFromTabIndex(int tab) const;
+    DocID                     GetDocIDFromPath(LPCTSTR path) const;
+    int                       GetTabIndexFromDocID(DocID docID) const;
+    void                      OpenNewTab() const;
 
-    int              GetDocumentCount() const;
-    bool             HasActiveDocument() const;
-    const CDocument& GetActiveDocument() const;
-    CDocument&       GetModActiveDocument() const;
-    bool             HasDocumentID(DocID id) const;
-    const CDocument& GetDocumentFromID(DocID id) const;
-    CDocument&       GetModDocumentFromID(DocID id) const;
-    void             RestoreCurrentPos(const CPosData& pos) const;
-    void             SaveCurrentPos(CPosData& pos) const;
-    bool             UpdateFileTime(CDocument& doc, bool bIncludeReadonly) const;
+    int                       GetDocumentCount() const;
+    bool                      HasActiveDocument() const;
+    const CDocument&          GetActiveDocument() const;
+    CDocument&                GetModActiveDocument() const;
+    bool                      HasDocumentID(DocID id) const;
+    const CDocument&          GetDocumentFromID(DocID id) const;
+    CDocument&                GetModDocumentFromID(DocID id) const;
+    void                      RestoreCurrentPos(const CPosData& pos) const;
+    void                      SaveCurrentPos(CPosData& pos) const;
+    bool                      UpdateFileTime(CDocument& doc, bool bIncludeReadonly) const;
 
     Scintilla::ScintillaCall& Scintilla() const;
     LRESULT                   SendMessageToMainWnd(UINT msg, WPARAM wParam, LPARAM lParam) const;
@@ -125,31 +126,31 @@ protected:
     std::wstring              GetFileTreePath() const;
     void                      FileTreeBlockRefresh(bool bBlock) const;
 
-    void AddAutoCompleteWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words) const;
-    void AddAutoCompleteWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words) const;
-    void AddAutoCompleteWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words) const;
-    void AddAutoCompleteWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words) const;
+    void                      AddAutoCompleteWords(const std::string& lang, std::map<std::string, AutoCompleteType>&& words) const;
+    void                      AddAutoCompleteWords(const std::string& lang, const std::map<std::string, AutoCompleteType>& words) const;
+    void                      AddAutoCompleteWords(const DocID& docID, std::map<std::string, AutoCompleteType>&& words) const;
+    void                      AddAutoCompleteWords(const DocID& docID, const std::map<std::string, AutoCompleteType>& words) const;
 
-    HWND           GetHwnd() const;
-    HWND           GetScintillaWnd() const;
-    static UINT    GetTimerID() { return m_nextTimerID++; }
-    int            OpenFile(LPCWSTR file, unsigned int openFlags) const;
-    void           OpenFiles(const std::vector<std::wstring>& paths) const;
-    void           OpenHDROP(HDROP hDrop) const;
-    bool           ReloadTab(int tab, int encoding = -1) const; // By default reload encoding
-    bool           SaveCurrentTab(bool bSaveAs = false) const;
-    bool           SaveDoc(DocID docID, bool bSaveAs = false) const;
-    bool           SaveDoc(DocID docID, const std::wstring& path) const;
-    HRESULT        InvalidateUICommand(UI_INVALIDATIONS flags, const PROPERTYKEY* key);
-    static HRESULT InvalidateUICommand(UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY* key);
-    static HRESULT SetUICommandProperty(UINT32 commandId, REFPROPERTYKEY key, PROPVARIANT value);
-    HRESULT        SetUICommandProperty(REFPROPERTYKEY key, PROPVARIANT value);
-    sptr_t         GetCurrentLineNumber() const;
-    void           BlockAllUIUpdates(bool block) const;
-    void           ShowProgressCtrl(UINT delay) const;
-    void           HideProgressCtrl() const;
-    void           SetProgress(DWORD32 pos, DWORD32 end) const;
-    void           NotifyPlugins(const std::wstring& pluginName, LPARAM data);
+    HWND                      GetHwnd() const;
+    HWND                      GetScintillaWnd() const;
+    static UINT               GetTimerID() { return m_nextTimerID++; }
+    int                       OpenFile(LPCWSTR file, unsigned int openFlags) const;
+    void                      OpenFiles(const std::vector<std::wstring>& paths) const;
+    void                      OpenHDROP(HDROP hDrop) const;
+    bool                      ReloadTab(int tab, int encoding = -1) const; // By default reload encoding
+    bool                      SaveCurrentTab(bool bSaveAs = false) const;
+    bool                      SaveDoc(DocID docID, bool bSaveAs = false) const;
+    bool                      SaveDoc(DocID docID, const std::wstring& path) const;
+    HRESULT                   InvalidateUICommand(UI_INVALIDATIONS flags, const PROPERTYKEY* key);
+    static HRESULT            InvalidateUICommand(UINT32 cmdId, UI_INVALIDATIONS flags, const PROPERTYKEY* key);
+    static HRESULT            SetUICommandProperty(UINT32 commandId, REFPROPERTYKEY key, PROPVARIANT value);
+    HRESULT                   SetUICommandProperty(REFPROPERTYKEY key, PROPVARIANT value);
+    sptr_t                    GetCurrentLineNumber() const;
+    void                      BlockAllUIUpdates(bool block) const;
+    void                      ShowProgressCtrl(UINT delay) const;
+    void                      HideProgressCtrl() const;
+    void                      SetProgress(DWORD32 pos, DWORD32 end) const;
+    void                      NotifyPlugins(const std::wstring& pluginName, LPARAM data);
 
 protected:
     CMainWindow* m_pMainWindow;

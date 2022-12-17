@@ -1754,7 +1754,12 @@ void CMainWindow::HandleAfterInit()
     }
     else if (m_pathsToOpen.size() > 0)
     {
-        unsigned int openFlags = OpenFlags::AskToCreateIfMissing;
+        CCmdLineParser parser(GetCommandLine());
+        unsigned int   openFlags = 0;
+        if (!parser.HasKey(L"newifmissing"))
+            openFlags |= OpenFlags::AskToCreateIfMissing;
+        else
+            openFlags |= OpenFlags::NewIfMissing;
         if (m_bPathsToOpenMRU)
             openFlags |= OpenFlags::AddToMRU;
         BlockAllUIUpdates(true);
@@ -3500,14 +3505,14 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
     bool bAddToMRU             = (openFlags & OpenFlags::AddToMRU) != 0;
     bool bAskToCreateIfMissing = (openFlags & OpenFlags::AskToCreateIfMissing) != 0;
     bool bCreateIfMissing      = (openFlags & OpenFlags::CreateIfMissing) != 0;
+    bool bNewIfMissing         = (openFlags & OpenFlags::NewIfMissing) != 0;
     bool bIgnoreIfMissing      = (openFlags & OpenFlags::IgnoreIfMissing) != 0;
     bool bOpenIntoActiveTab    = (openFlags & OpenFlags::OpenIntoActiveTab) != 0;
     // Ignore no activate flag for now. It causes too many issues.
     bool bActivate             = true; //(openFlags & OpenFlags::NoActivate) == 0;
     bool bCreateTabOnly        = (openFlags & OpenFlags::CreateTabOnly) != 0;
 
-    if (bCreateTabOnly)
-    {
+    auto createTab             = [&]() {
         auto      fileName = CPathUtils::GetFileName(file);
         CDocument doc;
         doc.m_document     = m_editor.Scintilla().CreateDocument(0, Scintilla::DocumentOption::Default);
@@ -3529,7 +3534,10 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
         CCommandHandler::Instance().OnDocumentOpen(docID);
 
         return index;
-    }
+    };
+
+    if (bCreateTabOnly)
+        return createTab();
 
     // if we're opening the first file, we have to activate it
     // to ensure all the activation stuff is handled for that first
@@ -3573,6 +3581,8 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
             }
             if (bIgnoreIfMissing)
                 return false;
+            if (bNewIfMissing)
+                return createTab();
         }
 
         CDocument doc = m_docManager.LoadFile(*this, filepath, encoding, createIfMissing);
@@ -3856,10 +3866,15 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
         }
         else
         {
-            auto list = GetFileListFromGlobPath(path);
+            auto         list      = GetFileListFromGlobPath(path);
+            unsigned int openFlags = OpenFlags::AddToMRU;
+            if (!parser.HasKey(L"newifmissing"))
+                openFlags |= OpenFlags::AskToCreateIfMissing;
+            else
+                openFlags |= OpenFlags::NewIfMissing;
             for (const auto p : list)
             {
-                if (OpenFile(p, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing) >= 0)
+                if (OpenFile(p, openFlags) >= 0)
                 {
                     if (parser.HasVal(L"line"))
                     {
@@ -3898,10 +3913,15 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
                 }
                 else
                 {
-                    auto list = GetFileListFromGlobPath(szArgList[i]);
+                    auto         list      = GetFileListFromGlobPath(szArgList[i]);
+                    unsigned int openFlags = OpenFlags::AddToMRU;
+                    if (!parser.HasKey(L"newifmissing"))
+                        openFlags |= OpenFlags::AskToCreateIfMissing;
+                    else
+                        openFlags |= OpenFlags::NewIfMissing;
                     for (const auto p : list)
                     {
-                        if (OpenFile(p, OpenFlags::AddToMRU | OpenFlags::AskToCreateIfMissing) >= 0)
+                        if (OpenFile(p, openFlags) >= 0)
                             ++filesOpened;
                     }
                 }
