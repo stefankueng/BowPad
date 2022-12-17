@@ -16,23 +16,25 @@
 //
 #include "stdafx.h"
 #include "KeyboardShortcutHandler.h"
+#include "AppUtils.h"
+#include "BowPad.h"
+#include "BowPadUI.h"
+#include "ResString.h"
 #include "SimpleIni.h"
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
-#include "BowPad.h"
-#include "ResString.h"
-#include "AppUtils.h"
-#include "BowPadUI.h"
 
+#include "../ext/scintilla/include/scintilla.h"
+// ReSharper disable once CppUnusedIncludeDirective
+#include "../ext/scintilla/include/ScintillaMessages.h"
 #include "../ext/scintilla/include/ScintillaTypes.h"
 #include "../ext/scintilla/src/KeyMap.h"
-#include "../ext/scintilla/include/scintilla.h"
 
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 
-#include <vector>
 #include <utility>
+#include <vector>
 
 extern IUIFramework* g_pFramework;
 
