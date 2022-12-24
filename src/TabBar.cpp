@@ -480,11 +480,14 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             DrawMainBorder(&dis);
 
-            RECT rcSpin{};
-            GetWindowRect(m_spin, &rcSpin);
-            MapWindowPoints(nullptr, *this, reinterpret_cast<LPPOINT>(&rcSpin), 2);
-            rPage.right      = rcSpin.left;
-            dis.rcItem.right = rcSpin.left;
+            if (m_spin)
+            {
+                RECT rcSpin{};
+                GetWindowRect(m_spin, &rcSpin);
+                MapWindowPoints(nullptr, *this, reinterpret_cast<LPPOINT>(&rcSpin), 2);
+                rPage.right      = rcSpin.left;
+                dis.rcItem.right = rcSpin.left;
+            }
             // paint the tabs first and then the borders
             auto count       = GetItemCount();
             if (!count) // no pages added
