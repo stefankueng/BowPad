@@ -537,7 +537,7 @@ msgstr "현재 파일의 경로를 클립보드에 복사합니다"
 
 #. Resource IDs: (60511)
 msgid "Copies the path of the directory of the current file to the clipboard"
-msgstr "현재 파일의 디렉토리 경로를 클립보드에 복사합니다"
+msgstr "현재 파일의 디렉터리 경로를 클립보드에 복사합니다"
 
 #. Resource IDs: (60081)
 msgid "Copy"
@@ -545,7 +545,7 @@ msgstr "복사"
 
 #. Resource IDs: (60509, 60510)
 msgid "Copy Directory"
-msgstr "디렉토리 복사"
+msgstr "디렉터리 복사"
 
 #. Resource IDs: (60505, 60506)
 msgid "Copy Name"
@@ -571,7 +571,7 @@ msgstr "맞춤법 오류 수정"
 msgid "Corrections"
 msgstr "수정사항"
 
-#. Resource IDs: (60648)
+#. Resource IDs: (60656)
 msgid "Corresponding File"
 msgstr "해당 파일"
 
@@ -750,11 +750,11 @@ msgstr "문서 요약"
 
 #. Resource IDs: (116)
 msgid "Document modified"
-msgstr "문서가 수정됨"
+msgstr "문서가 수정되었습니다"
 
 #. Resource IDs: (123)
 msgid "Document removed"
-msgstr "문서가 제거됨"
+msgstr "문서가 제거되었습니다"
 
 #. Resource IDs: (150)
 msgid "Don't Save\nThe file is not saved."
@@ -1147,7 +1147,7 @@ msgstr "모두 CAPS이거나 가운데 대문자가 있는 단어 포함"
 
 #. Resource IDs: (60563, 60564, 60565)
 msgid "Init Folding Margin"
-msgstr "시작 접이식 여백"
+msgstr "접이식 여백 초기화"
 
 #. Resource IDs: (181)
 msgid "Insert"
@@ -1176,7 +1176,7 @@ msgstr "설치된 버전"
 
 #. Resource IDs: (1021)
 msgid "Italic"
-msgstr "기울임"
+msgstr "기울임꼴"
 
 #. Resource IDs: (60275)
 msgid "JL"
@@ -1210,6 +1210,10 @@ msgstr "LEX"
 msgid "LF"
 msgstr "LF"
 
+#. Resource IDs: (60650)
+msgid "LR"
+msgstr "LR"
+
 #. Resource IDs: (60269, 60393, 60477)
 msgid "LS"
 msgstr "LS"
@@ -1224,7 +1228,7 @@ msgstr "언어"
 
 #. Resource IDs: (60152)
 msgid "Language Lexer"
-msgstr "언어 렉서"
+msgstr "렉서 언어 "
 
 #. Resource IDs: (138)
 msgid "Language selected.\nYou need to restart BowPad for the changes to take effect."
@@ -1326,39 +1330,39 @@ msgstr "줄: %%c%06X%ld%%r / %%c%06X%ld%%r    열: %%c%06X%ld%%r"
 
 #. Resource IDs: (60138, 60140)
 msgid "Load as"
-msgstr "다른 이름으로 로드"
+msgstr "다른 이름으로 불러오기"
 
 #. Resource IDs: (60478)
 msgid "Load last session"
-msgstr "마지막 세션 로드"
+msgstr "마지막 세션 불러오기"
 
 #. Resource IDs: (60483)
 msgid "Load last session on start"
-msgstr "시작할 때 마지막 세션 로드"
+msgstr "시작할 때 마지막 세션 불러오기"
 
 #. Resource IDs: (60476)
 msgid "Load session"
-msgstr "세션 로드"
+msgstr "세션 불러오기"
 
 #. Resource IDs: (60481)
 msgid "Load session on start"
-msgstr "시작할 때 세션 로드"
+msgstr "시작할 때 세션 불러오기"
 
 #. Resource IDs: (236)
 msgid "Loading files..."
-msgstr "파일 로드 중..."
+msgstr "파일 불러오는 중..."
 
 #. Resource IDs: (235)
 msgid "Loading session..."
-msgstr "세션 로드 중..."
+msgstr "세션 불러오는 중..."
 
 #. Resource IDs: (60484)
 msgid "Loads all files automatically that were open the last time BowPad got closed"
-msgstr "마지막으로 BowPad를 닫았을 때 열려 있던 모든 파일을 자동으로 로드합니다"
+msgstr "마지막으로 BowPad를 닫았을 때 열려 있던 모든 파일을 자동으로 불러옵니다"
 
 #. Resource IDs: (60479)
 msgid "Loads all files that were open the last time BowPad got closed"
-msgstr "마지막으로 BowPad를 닫았을 때 열려 있던 모든 파일을 로드합니다"
+msgstr "마지막으로 BowPad를 닫았을 때 열려 있던 모든 파일을 불러옵니다"
 
 #. Resource IDs: (60241, 60243)
 msgid "Lowercase"
@@ -1575,7 +1579,7 @@ msgstr "해당 파일 열기"
 
 #. Resource IDs: (147)
 msgid "Open elevated\nBowPad is started again with elevated privileges."
-msgstr "상승된 상태 열기\n상승된 권한으로 BowPad가 다시 시작됩니다."
+msgstr "권한 상승된 상태 열기\n상승된 권한으로 BowPad가 다시 시작됩니다."
 
 #. Resource IDs: (182)
 #, c-format
@@ -1750,7 +1754,7 @@ msgstr "바꿀 내용(&E):"
 
 #. Resource IDs: (60355)
 msgid "RELOAD"
-msgstr "다시 로드"
+msgstr "다시 불러오기"
 
 #. Resource IDs: (256)
 msgid "Reading order (left-to-right or right-to-left)"
@@ -1786,23 +1790,31 @@ msgstr "정규식 모드"
 
 #. Resource IDs: (60356)
 msgid "Reload"
-msgstr "다시 로드"
+msgstr "다시 불러오기"
 
 #. Resource IDs: (120)
 msgid "Reload document\nThe document is refreshed from disk."
-msgstr "문서 다시 로드\n디스크에서 문서가 새로 고쳐집니다."
+msgstr "문서 다시 불러오기\n디스크에서 문서가 새로 고쳐집니다."
 
 #. Resource IDs: (121)
 msgid "Reload document\nThe unsaved modifications are lost."
-msgstr "문서 다시 로드\n저장하지 않은 수정사항은 손실됩니다."
+msgstr "문서 다시 불러오기\n저장하지 않은 수정사항은 손실됩니다."
 
 #. Resource IDs: (60357)
 msgid "Reload the file from disk"
-msgstr "디스크에서 파일 다시 로드"
+msgstr "디스크에서 파일 다시 불러오기"
 
 #. Resource IDs: (166)
 msgid "Reload\nThe unsaved modifications will be lost!"
-msgstr "다시 로드\n저장하지 않은 수정사항은 손실됩니다!"
+msgstr "다시 불러오기\n저장하지 않은 수정사항은 손실됩니다!"
+
+#. Resource IDs: (60652)
+msgid "Remove all empty lines or lines with only whitespace"
+msgstr ">공백만 있는 빈 줄 또는 줄 모두 제거"
+
+#. Resource IDs: (60649, 60651)
+msgid "Remove empty lines"
+msgstr "빈 줄 제거"
 
 #. Resource IDs: (60373)
 msgid "Removes all bookmarks from the current file"
@@ -1886,11 +1898,11 @@ msgstr "다른 이름으로 저장"
 
 #. Resource IDs: (149)
 msgid "Save elevated\nBowPad is started again with elevated privileges."
-msgstr "상승된 저장\n"상승된 권한으로 BowPad가 다시 시작됩니다."
+msgstr "권한 상승된 저장\n"상승된 권한으로 BowPad가 다시 시작됩니다."
 
 #. Resource IDs: (119)
 msgid "Save modifications\nThe modifications that were made outside BowPad are overwritten."
-msgstr "수정사항 저장\nBowPad 외부에서 이루어진 수정 사항은 덮어쓰여집니다."
+msgstr "수정 사항 저장\nBowPad 외부에서 이루어진 수정 사항은 덮어쓰여집니다."
 
 #. Resource IDs: (60055)
 msgid "Saves all open files"
@@ -2161,7 +2173,7 @@ msgstr "탭"
 
 #. Resource IDs: (60344, 60346)
 msgid "Tabs to Spaces"
-msgstr "공백에 대한 탭"
+msgstr "공백으로 탭"
 
 #. Resource IDs: (117)
 #, c-format
@@ -2209,43 +2221,43 @@ msgstr "모두 접기 전환"
 
 #. Resource IDs: (60575, 60576)
 msgid "Toggle level 0"
-msgstr "레벨 0 전환"
+msgstr "수준 0 전환"
 
 #. Resource IDs: (60578, 60579)
 msgid "Toggle level 1"
-msgstr "레벨 1 전환"
+msgstr "수준 1 전환"
 
 #. Resource IDs: (60581, 60582)
 msgid "Toggle level 2"
-msgstr "레벨 2 전환"
+msgstr "수준 2 전환"
 
 #. Resource IDs: (60584, 60585)
 msgid "Toggle level 3"
-msgstr "레벨 3 전환"
+msgstr "수준 3 전환"
 
 #. Resource IDs: (60587, 60588)
 msgid "Toggle level 4"
-msgstr "레벨 4 전환"
+msgstr "수준 4 전환"
 
 #. Resource IDs: (60590, 60591)
 msgid "Toggle level 5"
-msgstr "레벨 5 전환"
+msgstr "수준 5 전환"
 
 #. Resource IDs: (60593, 60594)
 msgid "Toggle level 6"
-msgstr "레벨 6 전환"
+msgstr "수준 6 전환"
 
 #. Resource IDs: (60596, 60597)
 msgid "Toggle level 7"
-msgstr "레벨 7 전환"
+msgstr "수준 7 전환"
 
 #. Resource IDs: (60599, 60600)
 msgid "Toggle level 8"
-msgstr "레벨 8 전환"
+msgstr "수준 8 전환"
 
 #. Resource IDs: (60602, 60603)
 msgid "Toggle level 9"
-msgstr "레벨 9 전환"
+msgstr "수준 9 전환"
 
 #. Resource IDs: (60390)
 msgid "Toggles between the normal and the dark theme"
@@ -2407,7 +2419,7 @@ msgstr "%s BowPad 렉서 파일로 어떻게 하시겠습니까?"
 
 #. Resource IDs: (1094)
 msgid "When loading, prefer utf8 over ANSI/Local"
-msgstr "로드할 때 ANSI/로컬보다 utf8 선호"
+msgstr "불러올 때 ANSI/로컬보다 utf8 선호"
 
 #. Resource IDs: (60119)
 msgid "Whitespace"
@@ -2447,7 +2459,7 @@ msgstr "Y"
 
 #. Resource IDs: (142)
 msgid "You can use the following strings in the command line:\r\n$(LINE)\t\t\tThe line where the cursor is\r\n$(POS)\t\t\tthe position where the cursor is\r\n$(TAB_PATH)\t\tthe path to the file of the active tab\r\n$(TAB_NAME)\t\tthe file name without extension of the current tab\r\n$(TAB_EXT)\t\tthe file extension of the current tab\r\n$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
-msgstr "명령줄에서 다음 문자열을 사용할 수 있습니다:\r\n$(LINE)\t\t\t커서가 있는 줄\r\n$(POS)\t\t\t커서가 있는 위치\r\n$(TAB_PATH)\t\t활성 탭의 파일 경로\r\n$(TAB_NAME)\t\t현재 탭의 확장자가 없는 파일 이름\r\n$(TAB_EXT)\t\t현재 탭의 파일 확장자\r\n$(TAB_DIR)\t\t활성 탭의 파일 디렉토리\r\n$(SEL_TEXT)\t\t선택한 텍스트 또는 커서 위치의 단어\r\n$(SEL_TEXT_ESCAPED)\t$(SEL_TEXT)처럼 이스케이프되었으며 URL에 유용"
+msgstr "명령줄에서 다음 문자열을 사용할 수 있습니다:\r\n$(LINE)\t\t\t커서가 있는 줄\r\n$(POS)\t\t\t커서가 있는 위치\r\n$(TAB_PATH)\t\t활성 탭의 파일 경로\r\n$(TAB_NAME)\t\t현재 탭의 확장자가 없는 파일 이름\r\n$(TAB_EXT)\t\t현재 탭의 파일 확장자\r\n$(TAB_DIR)\t\t활성 탭의 파일 디렉터리\r\n$(SEL_TEXT)\t\t선택한 텍스트 또는 커서 위치의 단어\r\n$(SEL_TEXT_ESCAPED)\t$(SEL_TEXT)처럼 이스케이프되었으며 URL에 유용"
 
 #. Resource IDs: (192)
 msgid "You have to restart BowPad for the plugin changes to take effect."
@@ -2531,7 +2543,7 @@ msgstr "줄바꿈된 줄 들여쓰기"
 msgid "indents wrapped sublines"
 msgstr " 줄바꿈된 하위줄 들여쓰기"
 
-#. Resource IDs: (60653)
+#. Resource IDs: (60661)
 msgid "no plugins loaded"
 msgstr "플러그인이 로드되지 않음"
 
@@ -2635,3 +2647,4 @@ msgstr "접기 끄기"
 #, c-format
 msgid "{ %d lines }"
 msgstr "{ %d 줄 }"
+
