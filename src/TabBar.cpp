@@ -674,11 +674,14 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             auto index = GetTabIndexAt(xPos, yPos);
             RECT rcItem{};
             TabCtrl_GetItemRect(*this, index, &rcItem);
-            RECT rcSpin{};
-            GetWindowRect(m_spin, &rcSpin);
-            MapWindowPoints(nullptr, *this, reinterpret_cast<LPPOINT>(&rcSpin), 2);
-            if (rcItem.right > rcSpin.left && (rcSpin.left - rcItem.left) < CDPIAware::Instance().Scale(*this, MIN_TAB_WIDTH))
-                return TRUE;
+            if (m_spin)
+            {
+                RECT rcSpin{};
+                GetWindowRect(m_spin, &rcSpin);
+                MapWindowPoints(nullptr, *this, reinterpret_cast<LPPOINT>(&rcSpin), 2);
+                if (rcItem.right > rcSpin.left && (rcSpin.left - rcItem.left) < CDPIAware::Instance().Scale(*this, MIN_TAB_WIDTH))
+                    return TRUE;
+            }
 
             ::CallWindowProc(m_tabBarDefaultProc, hwnd, message, wParam, lParam);
             if (wParam == 2)
