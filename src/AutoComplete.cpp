@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2021-2022 - Stefan Kueng
+// Copyright (C) 2021-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -704,7 +704,7 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
         {
             int  err       = 0;
             auto exprValue = te_interp(curLine.c_str(), &err);
-            if (err == 0 && exprValue)
+            if (err == 0)
             {
                 long long ulongVal       = static_cast<long long>(exprValue);
                 auto      sValueComplete = CStringUtils::Format("%f\n%lld\n0x%llX\n%#llo",
