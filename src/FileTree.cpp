@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2022 - Stefan Kueng
+// Copyright (C) 2014-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,21 +16,25 @@
 //
 
 #include "stdafx.h"
-#include "BowPadUI.h"
 #include "FileTree.h"
-#include "Theme.h"
-#include "SysImageList.h"
-#include "DirFileEnum.h"
-#include "PathUtils.h"
-#include "OnOutOfScope.h"
+#include "BowPadUI.h"
 #include "DarkModeHelper.h"
+#include "DirFileEnum.h"
+#include "GDIHelpers.h"
+#include "OnOutOfScope.h"
+#include "PathUtils.h"
+#include "resource.h"
+#include "ResString.h"
+#include "SysImageList.h"
+#include "Theme.h"
 
-#include <thread>
-#include <vector>
 #include <algorithm>
-#include <VersionHelpers.h>
-#include <Uxtheme.h>
 #include <format>
+#include <thread>
+#include <Uxtheme.h>
+#include <vector>
+#include <VersionHelpers.h>
+
 
 #pragma comment(lib, "Uxtheme.lib")
 
@@ -83,16 +87,19 @@ CFileTree::CFileTree(HINSTANCE hInst, void* obj)
     : CWindow(hInst)
     , ICommand(obj)
     , m_nBlockRefresh(0)
-    , m_threadsRunning(0)
+    , m_threadsRunning(false)
     , m_bStop(false)
     , m_bRootBusy(false)
     , m_activeItem(nullptr)
     , m_bBlockExpansion(false)
+    , m_hFont(nullptr)
 {
 }
 
 CFileTree::~CFileTree()
 {
+    if (m_hFont)
+        DeleteFont(m_hFont);
     Clear();
 }
 
@@ -156,6 +163,11 @@ bool CFileTree::Init(HINSTANCE /*hInst*/, HWND hParent)
     TreeView_SetExtendedStyle(*this, TVS_EX_AUTOHSCROLL | TVS_EX_DOUBLEBUFFER, TVS_EX_AUTOHSCROLL | TVS_EX_DOUBLEBUFFER);
     TreeView_SetImageList(*this, CSysImageList::GetInstance(), TVSIL_NORMAL);
 
+    NONCLIENTMETRICS ncm{};
+    ncm.cbSize = sizeof(NONCLIENTMETRICS);
+    SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0U);
+    m_hFont = CreateFontIndirect(&ncm.lfStatusFont);
+
     OnThemeChanged(CTheme::Instance().IsDarkTheme());
 
     SetTimer(*this, 100, 2000, nullptr);
@@ -183,6 +195,29 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
 
     switch (uMsg)
     {
+        case WM_PAINT:
+            if (m_path.empty())
+            {
+                PAINTSTRUCT ps;
+                HDC         hdc = BeginPaint(hwnd, &ps);
+                RECT        rc{};
+                GetClientRect(*this, &rc);
+
+                GDIHelpers::FillSolidRect(hdc, &rc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOW)));
+                ::SetTextColor(hdc, CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT)));
+
+                ResString text(hResource, IDS_FILETREE_EMPTY);
+                auto      oldFont  = SelectObject(hdc, m_hFont);
+                RECT      textRect = rc;
+                DrawText(hdc, text, -1, &textRect, DT_CALCRECT | DT_CENTER | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);
+                auto height       = textRect.bottom - textRect.top;
+                RECT drawTextRect = rc;
+                drawTextRect.top  = rc.top + (rc.bottom - rc.top) / 2 - height / 2;
+                DrawText(hdc, text, -1, &drawTextRect, DT_CENTER | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);
+                SelectObject(hdc, oldFont);
+                EndPaint(hwnd, &ps);
+            }
+            break;
         case WM_SHOWWINDOW:
             if (wParam)
                 Refresh(TVI_ROOT, true);
@@ -328,10 +363,10 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 }
                 else
                 {
-                    auto dummyPath          = std::format(L"{0} files...", pData->data.size());
+                    auto dummyPath = std::format(L"{0} files...", pData->data.size());
                     auto pFi       = std::make_unique<FileTreeItem>();
-                    pFi->path = dummyPath;
-                    pFi->maxDummy = true;
+                    pFi->path      = dummyPath;
+                    pFi->maxDummy  = true;
                     pData->data.push_back(std::move(pFi));
                     activepathmarked = InsertItem(pData->data.back().get(), pData->refreshRoot, TVI_FIRST, L"");
                 }
@@ -341,7 +376,7 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
 
                 if (fi)
                     fi->busy = false;
-                m_bRootBusy = false;
+                m_bRootBusy                = false;
 
                 m_data[pData->refreshRoot] = std::move(pData);
 
@@ -854,9 +889,9 @@ void CFileTree::HandleChangeNotifications()
                     {
                         if (auto& data = dirIt->second->data; data.size() < static_cast<size_t>(CIniSettings::Instance().GetInt64(L"View", L"maxTreeChildren", 2000)))
                         {
-                            auto fi = std::make_unique<FileTreeItem>();
-                            fi->isDir  = PathIsDirectory(path.c_str()) != 0;
-                            fi->path   = path;
+                            auto fi   = std::make_unique<FileTreeItem>();
+                            fi->isDir = PathIsDirectory(path.c_str()) != 0;
+                            fi->path  = path;
                             data.push_back(std::move(fi));
                             std::sort(data.begin(), data.end(), [](const auto& lhs, const auto& rhs) {
                                 if (lhs->isDot)
