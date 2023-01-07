@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2022-12-28 09:35+0100\n"
+"PO-Revision-Date: 2023-01-07 10:48+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -1076,6 +1076,14 @@ msgstr ""
 msgid "File is too big to be opened by BowPad"
 msgstr "Datei ist zu gross um mit BowPad geöffnet zu werden"
 
+#. Resource IDs: (279)
+msgid ""
+"File tree is empty\r\n"
+"no files to show"
+msgstr ""
+"Dateibaum ist leer\r\n"
+"keine Dateien in der Ansicht"
+
 #. Resource IDs: (239)
 msgid "Filename required for first file."
 msgstr "Dateiname fehlt für erste Datei."
@@ -1472,7 +1480,7 @@ msgid ""
 msgstr ""
 "Zeile: %ld\r\n"
 "Spalte: %ld\r\n"
-"Selektion: %lu | %lu\r\n"
+"Selektion: %Iu | %Iu\r\n"
 "Übereinstimmungen: %ld"
 
 #. Resource IDs: (60155)
@@ -2914,6 +2922,10 @@ msgstr "Wechselt die Einklappung in Stufe 8 im ganzen Dokument"
 #. Resource IDs: (60604)
 msgid "toggles folding at level 9 in the whole document"
 msgstr "Wechselt die Einklappung in Stufe 9 im ganzen Dokument"
+
+#. Resource IDs: (280)
+msgid "too many files to show ({0})"
+msgstr "zu viele Dateien zum anzeigen ({0})"
 
 #. Resource IDs: (60568)
 msgid "turn on folding"
