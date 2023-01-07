@@ -242,6 +242,7 @@
 #define IDS_SETTING_BRACEHIGHLIGHT_DESC 277
 #define IDS_CLICKTOCOPYTOCLIPBOARD      278
 #define IDS_FILETREE_EMPTY              279
+#define IDS_FILETREE_TOO_MANY_FILES     280
 #define IDC_SEARCHCOMBO                 1000
 #define IDC_FINDBTN                     1001
 #define IDC_REPLACECOMBO                1002

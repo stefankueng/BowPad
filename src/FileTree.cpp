@@ -35,7 +35,6 @@
 #include <vector>
 #include <VersionHelpers.h>
 
-
 #pragma comment(lib, "Uxtheme.lib")
 
 constexpr int         SCRATCH_QCM_FIRST    = 1;
@@ -363,10 +362,11 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 }
                 else
                 {
-                    auto dummyPath = std::format(L"{0} files...", pData->data.size());
-                    auto pFi       = std::make_unique<FileTreeItem>();
-                    pFi->path      = dummyPath;
-                    pFi->maxDummy  = true;
+                    ResString text(hResource, IDS_FILETREE_TOO_MANY_FILES);
+                    auto      dummyPath = std::vformat(text.c_str(), std::make_wformat_args(pData->data.size()));
+                    auto      pFi       = std::make_unique<FileTreeItem>();
+                    pFi->path           = dummyPath;
+                    pFi->maxDummy       = true;
                     pData->data.push_back(std::move(pFi));
                     activepathmarked = InsertItem(pData->data.back().get(), pData->refreshRoot, TVI_FIRST, L"");
                 }
