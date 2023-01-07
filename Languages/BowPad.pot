@@ -940,6 +940,10 @@ msgstr ""
 msgid "File is too big to be opened by BowPad"
 msgstr ""
 
+#. Resource IDs: (279)
+msgid "File tree is empty\r\nno files to show"
+msgstr ""
+
 #. Resource IDs: (239)
 msgid "Filename required for first file."
 msgstr ""
@@ -2633,6 +2637,10 @@ msgstr ""
 
 #. Resource IDs: (60604)
 msgid "toggles folding at level 9 in the whole document"
+msgstr ""
+
+#. Resource IDs: (280)
+msgid "too many files to show ({0})"
 msgstr ""
 
 #. Resource IDs: (60568)
