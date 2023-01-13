@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2022 - Stefan Kueng
+// Copyright (C) 2013-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -3188,9 +3188,12 @@ LPARAM CMainWindow::HandleMouseMsg(const SCNotification& scn)
         {
             if (scn.modifiers == SCMOD_SHIFT)
             {
-                SendMessage(m_editor, WM_HSCROLL, GET_WHEEL_DELTA_WPARAM(scn.wParam) < 0 ? SB_LINERIGHT : SB_LINELEFT, 0);
-                SendMessage(m_editor, WM_HSCROLL, GET_WHEEL_DELTA_WPARAM(scn.wParam) < 0 ? SB_LINERIGHT : SB_LINELEFT, 0);
-                SendMessage(m_editor, WM_HSCROLL, GET_WHEEL_DELTA_WPARAM(scn.wParam) < 0 ? SB_LINERIGHT : SB_LINELEFT, 0);
+                static int delta         = 0;
+                delta += GET_WHEEL_DELTA_WPARAM(scn.wParam);
+                auto charsToScroll = std::abs(delta / 40);
+                for (int i = 0; i < charsToScroll; ++i)
+                    SendMessage(m_editor, WM_HSCROLL, delta < 0 ? SB_LINERIGHT : SB_LINELEFT, 0);
+                delta = delta % 40;
                 return TRUE;
             }
         }
