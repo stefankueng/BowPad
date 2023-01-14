@@ -1574,6 +1574,31 @@ LRESULT CMainWindow::DoCommand(WPARAM wParam, LPARAM lParam)
             m_autoCompleter.HandleScintillaEvents(&scn);
         }
         break;
+        case cmdNextLexer:
+        {
+#ifdef _DEBUG
+            // just for testing lexers
+            auto  ls          = CLexStyles::Instance().GetLanguages();
+            auto& doc         = m_docManager.GetModDocumentFromID(m_tabBar.GetCurrentTabId());
+            auto  currentLang = CUnicodeUtils::StdGetUnicode(doc.GetLanguage());
+            bool  found       = false;
+            for (const auto& l : ls)
+            {
+                if (found)
+                {
+                    auto lang = CUnicodeUtils::StdGetUTF8(l);
+                    m_editor.SetupLexerForLang(lang);
+                    CLexStyles::Instance().SetLangForPath(doc.m_path, lang);
+                    doc.SetLanguage(lang);
+                    UpdateStatusBar(true);
+                    break;
+                }
+                if (l == currentLang)
+                    found = true;
+            }
+#endif
+        }
+        break;
         default:
         {
             ICommand* pCmd = CCommandHandler::Instance().GetCommand(id);
@@ -3188,7 +3213,7 @@ LPARAM CMainWindow::HandleMouseMsg(const SCNotification& scn)
         {
             if (scn.modifiers == SCMOD_SHIFT)
             {
-                static int delta         = 0;
+                static int delta = 0;
                 delta += GET_WHEEL_DELTA_WPARAM(scn.wParam);
                 auto charsToScroll = std::abs(delta / 40);
                 for (int i = 0; i < charsToScroll; ++i)
