@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016, 2020-2022 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
         if (langs.empty())
         {
             auto ls = CLexStyles::Instance().GetLanguages();
+            std::ranges::sort(ls, [](const auto& l1, const auto& l2) { return _wcsicmp(l1.c_str(), l2.c_str()) < 0; });
             for (const auto& l : ls)
             {
                 if (!CLexStyles::Instance().IsLanguageHidden(l))
@@ -78,6 +79,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
         if (langs.empty())
         {
             auto ls = CLexStyles::Instance().GetLanguages();
+            std::ranges::sort(ls, [](const auto& l1, const auto& l2) { return _wcsicmp(l1.c_str(), l2.c_str()) < 0; });
             for (const auto& l : ls)
             {
                 if (!CLexStyles::Instance().IsLanguageHidden(l))
