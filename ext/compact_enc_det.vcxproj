@@ -1,25 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM64">
       <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
       <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|ARM64">
-      <Configuration>Release</Configuration>
-      <Platform>ARM64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -27,82 +27,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="uchardet\src\CharDistribution.h" />
-    <ClInclude Include="uchardet\src\JpCntx.h" />
-    <ClInclude Include="uchardet\src\nsBig5Prober.h" />
-    <ClInclude Include="uchardet\src\nsCharSetProber.h" />
-    <ClInclude Include="uchardet\src\nsCodingStateMachine.h" />
-    <ClInclude Include="uchardet\src\nscore.h" />
-    <ClInclude Include="uchardet\src\nsEscCharsetProber.h" />
-    <ClInclude Include="uchardet\src\nsEUCJPProber.h" />
-    <ClInclude Include="uchardet\src\nsEUCKRProber.h" />
-    <ClInclude Include="uchardet\src\nsEUCTWProber.h" />
-    <ClInclude Include="uchardet\src\nsGB2312Prober.h" />
-    <ClInclude Include="uchardet\src\nsHebrewProber.h" />
-    <ClInclude Include="uchardet\src\nsLatin1Prober.h" />
-    <ClInclude Include="uchardet\src\nsMBCSGroupProber.h" />
-    <ClInclude Include="uchardet\src\nsPkgInt.h" />
-    <ClInclude Include="uchardet\src\nsSBCharSetProber.h" />
-    <ClInclude Include="uchardet\src\nsSBCSGroupProber.h" />
-    <ClInclude Include="uchardet\src\nsSJISProber.h" />
-    <ClInclude Include="uchardet\src\nsUniversalDetector.h" />
-    <ClInclude Include="uchardet\src\nsUTF8Prober.h" />
-    <ClInclude Include="uchardet\src\prmem.h" />
-    <ClInclude Include="uchardet\src\uchardet.h" />
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det.h" />
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det_generated_tables.h" />
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det_generated_tables2.h" />
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det_hint_code.h" />
+    <ClInclude Include="compact_enc_det\util\encodings\encodings.h" />
+    <ClInclude Include="compact_enc_det\util\encodings\encodings.pb.h" />
+    <ClInclude Include="compact_enc_det\util\languages\languages.h" />
+    <ClInclude Include="compact_enc_det\util\languages\languages.pb.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="uchardet\src\CharDistribution.cpp" />
-    <ClCompile Include="uchardet\src\JpCntx.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangArabicModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangBulgarianModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangCroatianModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangCzechModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangDanishModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangEsperantoModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangEstonianModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangFinnishModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangFrenchModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangGermanModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangGreekModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangHebrewModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangHungarianModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangIrishModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangItalianModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangLatvianModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangLithuanianModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangMalteseModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangPolishModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangPortugueseModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangRomanianModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangRussianModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangSlovakModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangSloveneModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangSpanishModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangSwedishModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangThaiModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangTurkishModel.cpp" />
-    <ClCompile Include="uchardet\src\LangModels\LangVietnameseModel.cpp" />
-    <ClCompile Include="uchardet\src\nsBig5Prober.cpp" />
-    <ClCompile Include="uchardet\src\nsCharSetProber.cpp" />
-    <ClCompile Include="uchardet\src\nsEscCharsetProber.cpp" />
-    <ClCompile Include="uchardet\src\nsEscSM.cpp" />
-    <ClCompile Include="uchardet\src\nsEUCJPProber.cpp" />
-    <ClCompile Include="uchardet\src\nsEUCKRProber.cpp" />
-    <ClCompile Include="uchardet\src\nsEUCTWProber.cpp" />
-    <ClCompile Include="uchardet\src\nsGB2312Prober.cpp" />
-    <ClCompile Include="uchardet\src\nsHebrewProber.cpp" />
-    <ClCompile Include="uchardet\src\nsLatin1Prober.cpp" />
-    <ClCompile Include="uchardet\src\nsMBCSGroupProber.cpp" />
-    <ClCompile Include="uchardet\src\nsMBCSSM.cpp" />
-    <ClCompile Include="uchardet\src\nsSBCharSetProber.cpp" />
-    <ClCompile Include="uchardet\src\nsSBCSGroupProber.cpp" />
-    <ClCompile Include="uchardet\src\nsSJISProber.cpp" />
-    <ClCompile Include="uchardet\src\nsUniversalDetector.cpp" />
-    <ClCompile Include="uchardet\src\nsUTF8Prober.cpp" />
-    <ClCompile Include="uchardet\src\uchardet.cpp" />
+    <ClCompile Include="compact_enc_det\compact_enc_det\compact_enc_det.cc" />
+    <ClCompile Include="compact_enc_det\compact_enc_det\compact_enc_det_hint_code.cc" />
+    <ClCompile Include="compact_enc_det\util\encodings\encodings.cc" />
+    <ClCompile Include="compact_enc_det\util\languages\languages.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="compact_enc_det\compact_enc_det\detail_head_string.inc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{EDDB4F3C-6553-462B-8A75-96427C2D5155}</ProjectGuid>
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{76f5b9bf-002b-4244-b3f6-cc5ae0d0b35f}</ProjectGuid>
+    <RootNamespace>compactencdet</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -142,29 +89,25 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -206,6 +149,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(ProjectDir)\compact_enc_det;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -218,6 +162,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
+      <AdditionalIncludeDirectories>$(ProjectDir)\compact_enc_det;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -230,6 +175,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
+      <AdditionalIncludeDirectories>$(ProjectDir)\compact_enc_det;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -241,6 +187,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(ProjectDir)\compact_enc_det;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -252,6 +199,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(ProjectDir)\compact_enc_det;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -263,6 +211,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(ProjectDir)\compact_enc_det;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

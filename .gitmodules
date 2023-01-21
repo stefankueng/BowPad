@@ -8,6 +8,6 @@
 [submodule "ext/lexilla"]
 	path = ext/lexilla
 	url = https://github.com/ScintillaOrg/lexilla.git
-[submodule "ext/uchardet"]
-	path = ext/uchardet
-	url = https://github.com/freedesktop/uchardet.git
+[submodule "ext/compact_enc_det"]
+	path = ext/compact_enc_det
+	url = https://github.com/google/compact_enc_det.git
