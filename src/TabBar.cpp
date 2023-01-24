@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2022 - Stefan Kueng
+// Copyright (C) 2013-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ CTabBar::CTabBar(HINSTANCE hInst)
     , m_bIsCloseHover(false)
     , m_whichCloseClickDown(-1)
     , m_lmbdHit(false)
-    , m_closeChar(L'\u274C')
+    , m_closeChar(L'X')
     , m_modifiedChar(L'\u25CF')
 {
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
@@ -67,7 +67,10 @@ CTabBar::CTabBar(HINSTANCE hInst)
     m_draggingPoint       = {};
     m_currentHoverTabRect = {};
     if (IsWindows10OrGreater())
+    {
         m_modifiedChar = L'\u2B24';
+        m_closeChar    = L'\u274C';
+    }
     m_animVarLeft  = Animator::Instance().CreateAnimationVariable(0.0, 0.0);
     m_animVarRight = Animator::Instance().CreateAnimationVariable(0.0, 0.0);
 };
