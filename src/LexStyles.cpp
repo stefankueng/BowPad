@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019-2022 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -170,6 +170,7 @@ void CLexStyles::Load()
     if (resData != nullptr)
     {
         inis.push_back(std::make_tuple(std::make_unique<CSimpleIni>(), false));
+        std::get<0>(inis.back())->SetUnicode();
         std::get<0>(inis.back())->LoadFile(resData, resLen);
     }
 
@@ -181,6 +182,7 @@ void CLexStyles::Load()
         if (CPathUtils::GetFileExtension(path) == L"bplex")
         {
             inis.push_back(std::make_tuple(std::make_unique<CSimpleIni>(), true));
+            std::get<0>(inis.back())->SetUnicode();
             std::get<0>(inis.back())->LoadFile(path.c_str());
         }
     }
@@ -189,6 +191,7 @@ void CLexStyles::Load()
     if (PathFileExists(userStyleFile.c_str()))
     {
         inis.push_back(std::make_tuple(std::make_unique<CSimpleIni>(), true));
+        std::get<0>(inis.back())->SetUnicode();
         std::get<0>(inis.back())->LoadFile(userStyleFile.c_str());
     }
 
@@ -907,6 +910,7 @@ void CLexStyles::ResetUserData()
 void CLexStyles::SaveUserData()
 {
     CSimpleIni   ini;
+    ini.SetUnicode();
     std::wstring userStyleFile = CAppUtils::GetDataPath() + L"\\userconfig";
 
     if (PathFileExists(userStyleFile.c_str()))
