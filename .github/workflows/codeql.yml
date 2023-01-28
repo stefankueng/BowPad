@@ -19,6 +19,15 @@ on:
     branches: [ "main" ]
   schedule:
     - cron: '40 8 * * 4'
+    
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
 
 jobs:
   analyze:
