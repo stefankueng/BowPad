@@ -1,0 +1,2972 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: BowPad\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 1900-01-01 00:00+0000\n"
+"PO-Revision-Date: 2023-01-30 17:17+0200\n"
+"Last-Translator: VeikkoM <veikkko.muurikainen@kolumbus.fi>\n"
+"Language-Team: \n"
+"Language: fi_FI\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.2.2\n"
+
+# msgid/msgstr fields for Accelerator keys
+# Format is: "ID:xxxxxx:VACS+X" where:
+#    ID:xxxxx = the menu ID corresponding to the accelerator
+#    V = Virtual key (or blank if not used) - nearly always set!
+#    A = Alt key     (or blank if not used)
+#    C = Ctrl key    (or blank if not used)
+#    S = Shift key   (or blank if not used)
+#    X = upper case character
+# e.g. "V CS+Q" == Ctrl + Shift + 'Q'
+# ONLY Accelerator Keys with corresponding alphanumeric characters can be
+# updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
+# ONLY change the msgstr field. Do NOT change any other.
+# If you do not want to change an Accelerator Key, copy msgid to msgstr
+#. Resource IDs: (254)
+#, c-format
+msgid "%%i%%c%06Xno selection"
+msgstr "%%i%%c%06Xei valintaa"
+
+# msgid/msgstr fields for Accelerator keys
+# Format is: "ID:xxxxxx:VACS+X" where:
+#    ID:xxxxx = the menu ID corresponding to the accelerator
+#    V = Virtual key (or blank if not used) - nearly always set!
+#    A = Alt key     (or blank if not used)
+#    C = Ctrl key    (or blank if not used)
+#    S = Shift key   (or blank if not used)
+#    X = upper case character
+# e.g. "V CS+Q" == Ctrl + Shift + 'Q'
+# ONLY Accelerator Keys with corresponding alphanumeric characters can be
+# updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
+# ONLY change the msgstr field. Do NOT change any other.
+# If you do not want to change an Accelerator Key, copy msgid to msgstr
+#. Resource IDs: (224)
+#, c-format
+msgid "%d occurrences were replaced."
+msgstr "%d esiintymää korvattu."
+
+# msgid/msgstr fields for Accelerator keys
+# Format is: "ID:xxxxxx:VACS+X" where:
+#    ID:xxxxx = the menu ID corresponding to the accelerator
+#    V = Virtual key (or blank if not used) - nearly always set!
+#    A = Alt key     (or blank if not used)
+#    C = Ctrl key    (or blank if not used)
+#    S = Shift key   (or blank if not used)
+#    X = upper case character
+# e.g. "V CS+Q" == Ctrl + Shift + 'Q'
+# ONLY Accelerator Keys with corresponding alphanumeric characters can be
+# updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
+# ONLY change the msgstr field. Do NOT change any other.
+# If you do not want to change an Accelerator Key, copy msgid to msgstr
+#. Resource IDs: (170)
+#, c-format
+msgid "%s (copy).%s"
+msgstr "%s (kopio).%s"
+
+#. Resource IDs: (110)
+msgid "&Cancel"
+msgstr "&Peruuta"
+
+#. Resource IDs: (1)
+msgid "&Capture"
+msgstr "&Kaappaa"
+
+#. Resource IDs: (1)
+msgid "&Close"
+msgstr "&Sulje"
+
+#. Resource IDs: (60066)
+msgid "&Close Tab"
+msgstr "&Sulje välilehti"
+
+#. Resource IDs: (185)
+msgid "&Edit"
+msgstr "&Muokkaa"
+
+#. Resource IDs: (1001)
+msgid "&Find"
+msgstr "&Etsi"
+
+#. Resource IDs: (60032)
+msgid "&New"
+msgstr "&Uusi"
+
+#. Resource IDs: (60042)
+msgid "&Open"
+msgstr "&Avaa"
+
+#. Resource IDs: (60354)
+msgid "&Reload"
+msgstr "&Lataa uudelleen"
+
+#. Resource IDs: (1106)
+msgid "&Remove duplicate lines"
+msgstr "Poista kaksois&rivit"
+
+#. Resource IDs: (1003)
+msgid "&Replace"
+msgstr "Ko&rvaa"
+
+#. Resource IDs: (107, 1126, 60047)
+msgid "&Save"
+msgstr "&Tallenna"
+
+#. Resource IDs: (1081)
+msgid "&Search for:"
+msgstr "Etsittävä:"
+
+#. Resource IDs: (1083)
+msgid "&Sort Order:"
+msgstr "&Lajittelujärjestys:"
+
+#. Resource IDs: (1007)
+msgid "&Whole word"
+msgstr "&Koko sana"
+
+#. Resource IDs: (1074)
+msgid "."
+msgstr "."
+
+#. Resource IDs: (1069)
+msgid "..."
+msgstr "..."
+
+#. Resource IDs: (1080)
+msgid "<"
+msgstr "<"
+
+#. Resource IDs: (133)
+msgid ""
+"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full details "
+"about this update</a>"
+msgstr ""
+"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Täydelliset "
+"tiedot tästä päivityksestä</a>"
+
+#. Resource IDs: (1135)
+msgid "<a>(?)</a>"
+msgstr "<a>(?)</a>"
+
+#. Resource IDs: (60053)
+msgid "A"
+msgstr "A"
+
+#. Resource IDs: (60527)
+msgid "AB"
+msgstr "AB"
+
+#. Resource IDs: (1070)
+msgid "ANSI / Local encoding"
+msgstr "ANSI / Paikallinen koodaus"
+
+#. Resource IDs: (60062)
+msgid "AS"
+msgstr "AS"
+
+#. Resource IDs: (103)
+msgid "About BowPad"
+msgstr "Tietoja BowPadista"
+
+#. Resource IDs: (145)
+msgid "Access denied!"
+msgstr "Pääsy kielletty!"
+
+#. Resource IDs: (146)
+#, c-format
+msgid ""
+"Access to the file '%s' was denied. Do you want to try again with elevated "
+"privileges?"
+msgstr ""
+"Pääsy tiedostoon '%s' evättiin. Haluatko yrittää uudelleen korotetuilla "
+"oikeuksilla?"
+
+#. Resource IDs: (1113)
+msgid "Add newline to capture"
+msgstr "Lisää uusi rivi kaappaukseen"
+
+#. Resource IDs: (265)
+msgid "Add to quick access toolbar"
+msgstr "Lisää pikakäyttötyökaluriville"
+
+#. Resource IDs: (217)
+msgid "Add word to dictionary"
+msgstr "Lisää sana sanakirjaan"
+
+#. Resource IDs: (255, 60642)
+msgid "Advanced Settings"
+msgstr "Lisäasetukset"
+
+#. Resource IDs: (60551)
+msgid "All plugin commands are listed here"
+msgstr "Kaikki plugin-komennot on lueteltu tässä"
+
+#. Resource IDs: (60141)
+msgid "Allows to load a file with a specific encoding"
+msgstr "Mahdollistaa tiedoston lataamisen tietyllä koodauksella"
+
+#. Resource IDs: (131)
+msgid "An update for BowPad is available"
+msgstr "BowPadin päivitys on saatavilla"
+
+#. Resource IDs: (1126)
+msgid "Apply/Add"
+msgstr "Käytä/Lisää"
+
+#. Resource IDs: (172)
+#, c-format
+msgid "Are you sure you want to delete the file '%s'?"
+msgstr "Haluatko varmasti poistaa tiedoston '%s'?"
+
+#. Resource IDs: (165)
+#, c-format
+msgid "Are you sure you want to reload '%s'?"
+msgstr "Oletko varma, että haluat ladata '%s' uudelleen?"
+
+#. Resource IDs: (204)
+msgid "Ascending (A-Z)"
+msgstr "Nouseva (A-Z)"
+
+#. Resource IDs: (60064)
+msgid "Asks where to save the current tab"
+msgstr "Kysyy, mihin nykyinen välilehti tallennetaan"
+
+#. Resource IDs: (65535)
+msgid "Author: Stefan Küng"
+msgstr "Kirjoittaja: Stefan Küng"
+
+#. Resource IDs: (60526, 60528)
+msgid "Auto Braces"
+msgstr "Automaattiset aaltosulkeet"
+
+#. Resource IDs: (60057, 60058)
+msgid "Auto save"
+msgstr "Automaattinen tallennus"
+
+#. Resource IDs: (60486)
+msgid "Auto-save on close"
+msgstr "Tallenna automaattisesti sulkemisessa"
+
+#. Resource IDs: (60488)
+msgid "Auto-saves modified files"
+msgstr "Tallenna muutetut tiedostot automaattisesti"
+
+#. Resource IDs: (60489)
+msgid ""
+"Auto-saves modified files when the session closes and restores the modified "
+"state on load"
+msgstr ""
+"Tallentaa muutetut tiedostot automaattisesti, kun istunto suljetaan, ja "
+"palauttaa muutetun tilan latauksen yhteydessä"
+
+#. Resource IDs: (60633)
+msgid "Autocomplete"
+msgstr "Automaattinen täydennys"
+
+#. Resource IDs: (135)
+msgid "Available Languages"
+msgstr "Saatavilla olevat kielet"
+
+#. Resource IDs: (1075)
+msgid "Available plugins"
+msgstr "Käytettävissä olevat liitännäiset"
+
+#. Resource IDs: (60371)
+msgid "BC"
+msgstr "BC"
+
+#. Resource IDs: (60376)
+msgid "BN"
+msgstr "BN"
+
+#. Resource IDs: (109)
+msgid "BOWPAD"
+msgstr "BOWPAD"
+
+#. Resource IDs: (60381)
+msgid "BP"
+msgstr "BP"
+
+#. Resource IDs: (60366)
+msgid "BT"
+msgstr "BT"
+
+#. Resource IDs: (1020)
+msgid "Bold"
+msgstr "Lihavoitu"
+
+#. Resource IDs: (60365)
+msgid "Bookmark"
+msgstr "Kirjanmerkki"
+
+#. Resource IDs: (60361, 60363)
+msgid "Bookmarks"
+msgstr "Kirjanmerkit"
+
+#. Resource IDs: (103)
+msgid "BowPad"
+msgstr "BowPad"
+
+#. Resource IDs: (130)
+msgid "BowPad Text Editor"
+msgstr "BowPad Text Editor"
+
+#. Resource IDs: (260)
+msgid "BowPad lexer file"
+msgstr "BowPad lexer-tiedosto"
+
+#. Resource IDs: (60011, 60067, 60082)
+msgid "C"
+msgstr "C"
+
+#. Resource IDs: (60072, 60634)
+msgid "CA"
+msgstr "CA"
+
+#. Resource IDs: (60223)
+msgid "CC"
+msgstr "CC"
+
+#. Resource IDs: (60023)
+msgid "CO"
+msgstr "CO"
+
+#. Resource IDs: (60159)
+msgid "CR"
+msgstr "CR"
+
+#. Resource IDs: (60145)
+msgid "CT"
+msgstr "CT"
+
+#. Resource IDs: (60229)
+msgid "CU"
+msgstr "CU"
+
+#. Resource IDs: (2)
+msgid "Cancel"
+msgstr "Peruuta"
+
+#. Resource IDs: (174)
+msgid ""
+"Cancel\n"
+"Do not delete the file."
+msgstr ""
+"Peruuta\n"
+"Älä poista tiedostoa."
+
+#. Resource IDs: (223)
+msgid ""
+"Cancel\n"
+"Leave the file where it is."
+msgstr ""
+"Peruuta\n"
+"Jätä tiedosto sinne, missä se on."
+
+#. Resource IDs: (164)
+msgid ""
+"Cancel\n"
+"The file is not created."
+msgstr ""
+"Peruuta\n"
+"Tiedostoa ei ole luotu."
+
+#. Resource IDs: (122)
+msgid ""
+"Cancel\n"
+"The file is not loaded again."
+msgstr ""
+"Peruuta\n"
+"Tiedostoa ei ladata uudelleen."
+
+#. Resource IDs: (167)
+msgid ""
+"Cancel\n"
+"The unsaved modifications will be kept."
+msgstr ""
+"Peruuta\n"
+"Tallentamattomat muutokset säilytetään."
+
+#. Resource IDs: (247, 60201)
+msgid "Capture Regex"
+msgstr "Kaappaa Regex"
+
+#. Resource IDs: (60203)
+msgid "Capture regular expressions"
+msgstr "Kaappaa säännölliset lausekkeet"
+
+#. Resource IDs: (1104)
+msgid "Case insensitive"
+msgstr "Kirjainkoolla ei ole merkitystä"
+
+#. Resource IDs: (60234)
+msgid "Change Case"
+msgstr "Muuta kirjainkokoa"
+
+#. Resource IDs: (1062)
+msgid "Check a plugin to install it, uncheck it to deinstall it."
+msgstr "Valitse liitännäinen asentaaksesi ja poista valinta sen poistamiseksi."
+
+#. Resource IDs: (1027)
+msgid "Check for Updates"
+msgstr "Tarkista päivitykset"
+
+#. Resource IDs: (60621)
+msgid "Check for errors only in comments, strings and text"
+msgstr "Tarkista virheet vain kommenteista, merkkijonoista ja tekstistä"
+
+#. Resource IDs: (268)
+msgid "Check for updates"
+msgstr "Tarkista päivitykset"
+
+#. Resource IDs: (60615)
+msgid "Check spelling"
+msgstr "Tarkista oikeinkirjoitus"
+
+#. Resource IDs: (65535)
+msgid "Chose the encoding of new files"
+msgstr "Valitse uusien tiedostojen koodaus"
+
+#. Resource IDs: (65535)
+msgid "Chose the line ending of new files"
+msgstr "Valitse uusien tiedostojen rivin loppu"
+
+#. Resource IDs: (60370, 60372)
+msgid "Clear Bookmarks"
+msgstr "Tyhjennä kirjanmerkit"
+
+#. Resource IDs: (60010, 60083, 60088, 60093, 60098)
+msgid "Clipboard"
+msgstr "Leikepöytä"
+
+#. Resource IDs: (2)
+msgid "Close"
+msgstr "Sulje"
+
+#. Resource IDs: (60073)
+msgid "Close All Tabs"
+msgstr "Sulje kaikki välilehdet"
+
+#. Resource IDs: (60498)
+msgid "Close All Tabs Except This One"
+msgstr "Sulje kaikki muut välilehdet paitsi tämä"
+
+#. Resource IDs: (60068)
+msgid "Close Tab"
+msgstr "Sulje välilehti"
+
+#. Resource IDs: (60071)
+msgid "Close all"
+msgstr "Sulje kaikki"
+
+#. Resource IDs: (60497)
+msgid "Close all but this"
+msgstr "Sulje kaikki paitsi tämä"
+
+#. Resource IDs: (60069)
+msgid "Close the current tab"
+msgstr "Sulje nykyinen välilehti"
+
+#. Resource IDs: (126)
+msgid ""
+"Close the document\n"
+"The document tab is closed."
+msgstr ""
+"Sulje dokumentti\n"
+"Dokumentin välilehti suljetaan."
+
+#. Resource IDs: (60074)
+msgid "Closes all open files"
+msgstr "Sulkee kaikki avoimet tiedostot"
+
+#. Resource IDs: (60499)
+msgid "Closes all open files except the current one"
+msgstr "Sulkee kaikki avoimet tiedostot nykyistä lukuun ottamatta"
+
+#. Resource IDs: (60397)
+msgid "Cmd"
+msgstr "Cmd"
+
+#. Resource IDs: (60022)
+msgid "Code"
+msgstr "Koodi"
+
+#. Resource IDs: (256)
+msgid "Code Snippets"
+msgstr "Koodinpätkät"
+
+#. Resource IDs: (113)
+msgid "Codepages/Character sets"
+msgstr "Koodisivut/merkkijoukot"
+
+#. Resource IDs: (65535)
+msgid "Color"
+msgstr "Väri"
+
+#. Resource IDs: (1061)
+msgid "Command Line:"
+msgstr "Komentorivi:"
+
+#. Resource IDs: (1060)
+msgid "Command Name:"
+msgstr "Komennon nimi:"
+
+#. Resource IDs: (60222, 60224)
+msgid "Comment"
+msgstr "Kommentti"
+
+#. Resource IDs: (60225)
+msgid "Comments the selected text"
+msgstr "Kommentoi valitun tekstin"
+
+#. Resource IDs: (60638, 60639)
+msgid "Configure Code Snippets"
+msgstr "Määritä koodinpätkät"
+
+#. Resource IDs: (60522)
+msgid "Configure Keyboard Shortcuts"
+msgstr "Määritä näppäimistön pikavalinnat"
+
+#. Resource IDs: (154, 60546)
+msgid "Configure Plugins"
+msgstr "Määritä liitännäiset"
+
+#. Resource IDs: (60521)
+msgid "Configure Shortcuts"
+msgstr "Määritä pikavalinnat"
+
+#. Resource IDs: (60212, 60214)
+msgid "Configure Styles"
+msgstr "Määritä tyylit"
+
+#. Resource IDs: (60215)
+msgid "Configure colors, fonts, styles and sizes"
+msgstr "Määritä värit, fontit, tyylit ja koot"
+
+#. Resource IDs: (60472, 60473)
+msgid "Configure custom commands"
+msgstr "Määritä muokatut komennot"
+
+#. Resource IDs: (60545)
+msgid "Configure plugins"
+msgstr "Määritä liitännäiset"
+
+#. Resource IDs: (60144, 60146)
+msgid "Convert to"
+msgstr "Muunna muotoon"
+
+#. Resource IDs: (60352)
+msgid "Converts all spaces in the document to tabs"
+msgstr "Muuntaa kaikki asiakirjan välilyönnit sarkaimiksi"
+
+#. Resource IDs: (60347)
+msgid "Converts all tabs in the document to spaces"
+msgstr "Muuntaa kaikki asiakirjan sarkaimet välilyönneiksi"
+
+#. Resource IDs: (60147)
+msgid "Converts the file to the specified encoding"
+msgstr "Muuntaa tiedoston määritettyyn koodaukseen"
+
+#. Resource IDs: (60249)
+msgid "Converts the selection to Title Case"
+msgstr "Muuntaa valinnan otsikkokokoon"
+
+#. Resource IDs: (60239)
+msgid "Converts the selection to UPPERcase"
+msgstr "Muuntaa valinnan ISOIKSI kirjaimiksi"
+
+#. Resource IDs: (60244)
+msgid "Converts the selection to lowercase"
+msgstr "Muuntaa valinnan pieniksi kirjaimiksi"
+
+#. Resource IDs: (60507)
+msgid "Copies the name of the current file to the clipboard"
+msgstr "Kopioi nykyisen tiedoston nimen leikepöydälle"
+
+#. Resource IDs: (60503)
+msgid "Copies the path of the current file to the clipboard"
+msgstr "Kopioi nykyisen tiedoston polun leikepöydälle"
+
+#. Resource IDs: (60511)
+msgid "Copies the path of the directory of the current file to the clipboard"
+msgstr "Kopioi nykyisen tiedoston hakemistopolun leikepöydälle"
+
+#. Resource IDs: (60081)
+msgid "Copy"
+msgstr "Kopioi"
+
+#. Resource IDs: (60509, 60510)
+msgid "Copy Directory"
+msgstr "Kopioi hakemisto"
+
+#. Resource IDs: (60505, 60506)
+msgid "Copy Name"
+msgstr "Kopioi nimi"
+
+#. Resource IDs: (60501, 60502)
+msgid "Copy Path"
+msgstr "Kopioi polku"
+
+#. Resource IDs: (60084)
+msgid ""
+"Copy the current selection to the clipboard. Hold down the shift key to copy "
+"the text formatted."
+msgstr ""
+"Kopioi nykyinen valinta leikepöydälle. Pidä shift-näppäintä alhaalla "
+"kopioidaksesi muotoillun tekstin."
+
+#. Resource IDs: (221)
+msgid ""
+"Copy the file\n"
+"The copy is opened in another tab."
+msgstr ""
+"Kopioi tiedosto\n"
+"Kopio avataan toiseen välilehteen."
+
+#. Resource IDs: (60617)
+msgid "Correct spelling mistakes"
+msgstr "Korjaa oikeinkirjoitusvirheet"
+
+#. Resource IDs: (213)
+msgid "Corrections"
+msgstr "Korjaukset"
+
+#. Resource IDs: (60656)
+msgid "Corresponding File"
+msgstr "Vastaava tiedosto"
+
+#. Resource IDs: (194)
+msgid "Corresponding Files"
+msgstr "Vastaavat tiedostot"
+
+#. Resource IDs: (141)
+msgid "Could not download the language file!"
+msgstr "Kielitiedostoa ei voitu ladata!"
+
+#. Resource IDs: (201)
+#, c-format
+msgid "Create '%s'"
+msgstr "Luo '%s'"
+
+#. Resource IDs: (202)
+msgid "Create Corresponding File"
+msgstr "Luo vastaava tiedosto"
+
+#. Resource IDs: (238)
+msgid "Create corresponding files"
+msgstr "Luo vastaavat tiedostot"
+
+#. Resource IDs: (1089)
+msgid "Create files on OK."
+msgstr "Luo tiedostoja OK."
+
+#. Resource IDs: (163)
+msgid ""
+"Create\n"
+"An empty file is created."
+msgstr ""
+"Luo\n"
+"Tyhjä tiedosto luodaan."
+
+#. Resource IDs: (60541)
+msgid "Creates a copy of the current tab"
+msgstr "Luo kopion nykyisestä välilehdestä"
+
+#. Resource IDs: (60035)
+msgid "Creates a new tab with an empty document"
+msgstr "Luo uuden välilehden, jossa on tyhjä asiakirja"
+
+#. Resource IDs: (114)
+msgid ""
+"Ctrl+click to follow URL\n"
+"or click here"
+msgstr ""
+"Seuraa URL-osoitetta Ctrl+napsauttamalla\n"
+"tai klikkaa tästä"
+
+#. Resource IDs: (259)
+#, c-format
+msgid "Custom Command %d"
+msgstr "Mukautettu komento %d"
+
+#. Resource IDs: (1049, 60442)
+msgid "Custom Command 0"
+msgstr "Mukautettu komento 0"
+
+#. Resource IDs: (1050, 60445)
+msgid "Custom Command 1"
+msgstr "Mukautettu komento 1"
+
+#. Resource IDs: (1051, 60448)
+msgid "Custom Command 2"
+msgstr "Mukautettu komento 2"
+
+#. Resource IDs: (1052, 60451)
+msgid "Custom Command 3"
+msgstr "Mukautettu komento 3"
+
+#. Resource IDs: (1053, 60454)
+msgid "Custom Command 4"
+msgstr "Mukautettu komento 4"
+
+#. Resource IDs: (1054, 60457)
+msgid "Custom Command 5"
+msgstr "Mukautettu komento 5"
+
+#. Resource IDs: (1055, 60460)
+msgid "Custom Command 6"
+msgstr "Mukautettu komento 6"
+
+#. Resource IDs: (1056, 60463)
+msgid "Custom Command 7"
+msgstr "Mukautettu komento 7"
+
+#. Resource IDs: (1057, 60466)
+msgid "Custom Command 8"
+msgstr "Mukautettu komento 8"
+
+#. Resource IDs: (1058, 60469)
+msgid "Custom Command 9"
+msgstr "Mukautettu komento 9"
+
+#. Resource IDs: (149)
+msgid "Custom Commands"
+msgstr "Mukautetut komennot"
+
+#. Resource IDs: (60086)
+msgid "Cut"
+msgstr "Leikkaa"
+
+#. Resource IDs: (60089)
+msgid ""
+"Cut the current selection to the clipboard. Hold down the shift key to cut "
+"the text formatted."
+msgstr ""
+"Leikkaa nykyinen valinta leikepöydälle. Pidä Shift-näppäintä alhaalla, jos "
+"haluat leikata muotoillun tekstin."
+
+#. Resource IDs: (60264)
+msgid "DD"
+msgstr "DD"
+
+#. Resource IDs: (60207)
+msgid "DEL"
+msgstr "DEL"
+
+#. Resource IDs: (60387, 60389)
+msgid "Dark Theme"
+msgstr "Tumma teema"
+
+#. Resource IDs: (153)
+msgid "Defaults for new files"
+msgstr "Oletukset uusille tiedostoille"
+
+#. Resource IDs: (1129, 60206)
+msgid "Delete"
+msgstr "Poista"
+
+#. Resource IDs: (60535, 60536)
+msgid "Delete File"
+msgstr "Poista tiedosto"
+
+#. Resource IDs: (171)
+msgid "Delete file"
+msgstr "Poista tiedosto"
+
+#. Resource IDs: (173)
+msgid ""
+"Delete\n"
+"The file will be removed."
+msgstr ""
+"Poista\n"
+"Tiedosto poistetaan."
+
+#. Resource IDs: (60537)
+msgid "Deletes the file of the current tab"
+msgstr "Poistaa nykyisen välilehden tiedoston"
+
+#. Resource IDs: (205)
+msgid "Descending (Z-A)"
+msgstr "Laskeva (Z-A)"
+
+#. Resource IDs: (60259)
+msgid ""
+"Determines whether a tab is inserted or spaces when the tab key is pressed."
+msgstr ""
+"Määrittää, lisätäänkö sarkain tai välilyönti, kun tabulaattorinäppäintä "
+"painetaan."
+
+#. Resource IDs: (129)
+msgid ""
+"Do &not download the update\n"
+"You will be reminded again about the update in a week."
+msgstr ""
+"Älä &lataa päivitystä\n"
+"Sinua muistutetaan päivityksestä uudelleen viikon kuluttua."
+
+#. Resource IDs: (212)
+msgid "Do this for all files"
+msgstr "Tee tämä kaikille tiedostoille"
+
+#. Resource IDs: (219)
+#, c-format
+msgid "Do you want to copy the file '%s' to '%s'?"
+msgstr "Haluatko kopioida tiedoston '%s' -> '%s'?"
+
+#. Resource IDs: (220)
+#, c-format
+msgid "Do you want to move the file '%s' to '%s'?"
+msgstr "Haluatko siirtää tiedoston '%s' -> '%s'?"
+
+#. Resource IDs: (106)
+#, c-format
+msgid "Do you want to save changes to \"%s\"?"
+msgstr "Haluatko tallentaa muutokset asiakirjaan %s?"
+
+#. Resource IDs: (108)
+msgid "Do&n't save"
+msgstr "Älä talle&nna"
+
+#. Resource IDs: (60558)
+msgid "Document Summary"
+msgstr "Yhteenveto asiakirjasta"
+
+#. Resource IDs: (116)
+msgid "Document modified"
+msgstr "Asiakirjaa muutettu"
+
+#. Resource IDs: (123)
+msgid "Document removed"
+msgstr "Asiakirja poistettu"
+
+#. Resource IDs: (150)
+msgid ""
+"Don't Save\n"
+"The file is not saved."
+msgstr ""
+"Älä Tallenna\n"
+"Tiedostoa ei tallenneta."
+
+#. Resource IDs: (148)
+msgid ""
+"Don't open\n"
+"The file is not opened."
+msgstr ""
+"Älä avaa\n"
+"Tiedostoa ei ole avattu."
+
+#. Resource IDs: (127)
+msgid ""
+"Download and install the update\n"
+"Updates BowPad to the latest version."
+msgstr ""
+"Lataa ja asenna päivitys\n"
+"Päivittää BowPadin uusimpaan versioon."
+
+#. Resource IDs: (140)
+msgid ""
+"Download of language list succeeded. Now you can select a language from that "
+"list."
+msgstr ""
+"Kieliluettelon lataaminen onnistui. Nyt voit valita kielen luettelosta."
+
+#. Resource IDs: (128)
+msgid ""
+"Download the update\n"
+"You have to install the update manually."
+msgstr ""
+"Lataa päivitys\n"
+"Sinun on asennettava päivitys manuaalisesti."
+
+#. Resource IDs: (275)
+msgid "Draws a frame around the current line"
+msgstr "Piirtää kehyksen nykyisen viivan ympärille"
+
+#. Resource IDs: (60263, 60265)
+msgid "Duplicate Line"
+msgstr "Piirtää kehyksen nykyisen rivin ympärille"
+
+#. Resource IDs: (60266)
+msgid "Duplicates the current line"
+msgstr "Monistaa nykyisen rivin"
+
+#. Resource IDs: (60006)
+msgid "E"
+msgstr "E"
+
+#. Resource IDs: (60029)
+msgid "E&xit"
+msgstr "&Lopeta"
+
+#. Resource IDs: (60136)
+msgid "ENC"
+msgstr "ENC"
+
+#. Resource IDs: (60156)
+msgid "EOL"
+msgstr "EOL"
+
+#. Resource IDs: (60296)
+msgid "ES"
+msgstr "ES"
+
+#. Resource IDs: (60005)
+msgid "Edit"
+msgstr "Muokkaa"
+
+#. Resource IDs: (60295)
+msgid "Edit Selection"
+msgstr "Muokkaa valintaa"
+
+#. Resource IDs: (60298)
+msgid "Edit all occurrences of the current selection at once"
+msgstr "Muokkaa kaikkia nykyisen valinnan esiintymiä kerralla"
+
+#. Resource IDs: (60646)
+msgid "Edit at end"
+msgstr "Muokkaa lopussa"
+
+#. Resource IDs: (60648)
+msgid "Edit at end of selected lines"
+msgstr "Muokkaa valittujen rivien lopussa"
+
+#. Resource IDs: (187)
+msgid "Elevated"
+msgstr "Korotettu"
+
+#. Resource IDs: (60529)
+msgid ""
+"Enable to automatically add a closing brace when an opening brace is entered"
+msgstr ""
+"Ota käyttöön sulkeutuvan aaltosulkeen lisääminen automaattisesti, kun "
+"avaussulku syötetään"
+
+#. Resource IDs: (273)
+msgid "Enables hardware acceleration for drawing"
+msgstr "Ottaa käyttöön laitteistokiihdytyksen piirtämistä varten"
+
+#. Resource IDs: (60609)
+msgid "Enables/Disables the spell checker"
+msgstr "Ottaa oikeinkirjoituksen tarkistuksen käyttöön/pois käytöstä"
+
+#. Resource IDs: (60135)
+msgid "Encoding"
+msgstr "Koodaus"
+
+#. Resource IDs: (207)
+#, c-format
+msgid "Encoding: %s"
+msgstr "Koodaus: %s"
+
+#. Resource IDs: (264)
+msgid "Enter command name"
+msgstr "Syötä komennon nimi"
+
+#. Resource IDs: (65535)
+msgid "Extension"
+msgstr "Pääte"
+
+#. Resource IDs: (60008, 60026, 60182, 60202)
+msgid "F"
+msgstr "F"
+
+#. Resource IDs: (235)
+msgid "F&iles (e.g.: *.txt;*.dat):"
+msgstr "T&iedostot (esim. *.txt, *.dat):"
+
+#. Resource IDs: (236)
+msgid "F&older to search:"
+msgstr "Haettava kansi&o:"
+
+#. Resource IDs: (60187, 60492)
+msgid "FN"
+msgstr "FN"
+
+#. Resource IDs: (60192)
+msgid "FP"
+msgstr "FP"
+
+#. Resource IDs: (60077)
+msgid "FR"
+msgstr "FR"
+
+#. Resource IDs: (60197)
+msgid "FSN"
+msgstr "FSN"
+
+#. Resource IDs: (60131)
+msgid "FT"
+msgstr "FT"
+
+#. Resource IDs: (139)
+msgid "Failed to download the list of available languages."
+msgstr "Käytettävissä olevien kielten luettelon lataaminen epäonnistui."
+
+#. Resource IDs: (169)
+#, c-format
+msgid ""
+"Failed to load the file '%s'.\r\n"
+"\r\n"
+"The error message is:\r\n"
+"%s"
+msgstr ""
+"Tiedoston '%s' lataaminen epäonnistui.\n"
+"\n"
+"Virheilmoitus:\n"
+"%s"
+
+#. Resource IDs: (186)
+#, c-format
+msgid ""
+"Failed to save the file '%s'.\r\n"
+"\r\n"
+"The error message is:\r\n"
+"%s"
+msgstr ""
+"Tiedoston '%s' tallentaminen epäonnistui.\n"
+"\n"
+"Virheilmoitus:\n"
+"%s"
+
+#. Resource IDs: (137)
+msgid "Fetch remote languages..."
+msgstr "Nouda etäkieliä..."
+
+#. Resource IDs: (247)
+msgid "Fetching plugins list - please wait..."
+msgstr "Haetaan liitännäisluetteloa – odota..."
+
+#. Resource IDs: (152, 60007)
+msgid "File"
+msgstr "Tiedosto"
+
+#. Resource IDs: (60130)
+msgid "File Tree"
+msgstr "Tiedostopuu"
+
+#. Resource IDs: (246)
+#, c-format
+msgid "File \"%s\" already exists."
+msgstr "Tiedosto \"%s\" on jo olemassa."
+
+#. Resource IDs: (161)
+msgid "File does not exist"
+msgstr "Ttiedostoa ei ole olemassa"
+
+#. Resource IDs: (255)
+msgid ""
+"File extensions for this style, separated by semicolon.\n"
+"Example: cpp;c;h;hpp"
+msgstr ""
+"Tämän tyylin tiedostopäätteet puolipisteellä erotettuna.\n"
+"Esimerkki: cpp;c;h;hpp"
+
+#. Resource IDs: (104)
+msgid "File is too big to be opened by BowPad"
+msgstr "Tiedosto on liian suuri avattavaksi BowPadilla"
+
+#. Resource IDs: (279)
+msgid ""
+"File tree is empty\r\n"
+"no files to show"
+msgstr ""
+"Tiedostopuu on tyhjä\r\n"
+"ei näytettäviä tiedostoja"
+
+#. Resource IDs: (239)
+msgid "Filename required for first file."
+msgstr "Ensimmäisen tiedoston vaadittu tiedostonimi."
+
+#. Resource IDs: (240)
+msgid "Filename required for second file."
+msgstr "Toisen tiedoston vaadittu tiedostonimi."
+
+#. Resource IDs: (241)
+msgid "Filenames must be different."
+msgstr "Tiedostonimien on oltava erilaisia."
+
+#. Resource IDs: (245)
+#, c-format
+msgid "Files \"%s\" and \"%s\" already exist."
+msgstr "Tiedostot \"%s\" ja \"%s\" ovat jo olemassa."
+
+#. Resource IDs: (60167)
+msgid "Find"
+msgstr "Etsi"
+
+#. Resource IDs: (60183)
+msgid "Find && Replace"
+msgstr "Etsi ja ko&rvaa"
+
+#. Resource IDs: (158)
+msgid "Find &All"
+msgstr "Etsi k&aikki"
+
+#. Resource IDs: (210)
+msgid "Find All In &Folder"
+msgstr "Etsi kaikki &kansiosta"
+
+#. Resource IDs: (159)
+msgid "Find All In All &Tabs"
+msgstr "Etsi kaikki jokaiselta &välilehdeltä"
+
+#. Resource IDs: (1073)
+msgid "Find Fi&les"
+msgstr "Etsi &tiedostoja"
+
+#. Resource IDs: (225)
+msgid "Find Files"
+msgstr "Etsi tiedostoja"
+
+#. Resource IDs: (60186, 60188)
+msgid "Find Next"
+msgstr "Etsi seuraava"
+
+#. Resource IDs: (60196, 60198)
+msgid "Find Next Selected"
+msgstr "Hae seuraava valittu"
+
+#. Resource IDs: (60191, 60193)
+msgid "Find Previous"
+msgstr "Etsi edellinen"
+
+#. Resource IDs: (1016)
+msgid "Find Result Action"
+msgstr "Tuloksen etsintä"
+
+#. Resource IDs: (233)
+msgid "Find and Replace for functions is not implemented."
+msgstr "Etsi ja korvaa funktioita ei ole toteutettu."
+
+#. Resource IDs: (143)
+msgid "Find and replace"
+msgstr "Etsi ja korvaa"
+
+#. Resource IDs: (231)
+msgid "Find previous."
+msgstr "Etsi edellinen."
+
+#. Resource IDs: (60179, 60181)
+msgid "Find/Replace"
+msgstr "Etsi/korvaa"
+
+#. Resource IDs: (242)
+#, c-format
+msgid "Folder \"%s\" does not exist."
+msgstr "Kansiota \"%s\" ei ole olemassa."
+
+#. Resource IDs: (243)
+msgid "Folder required for first file."
+msgstr "Ensimmäisen tiedoston edellyttämä kansio."
+
+#. Resource IDs: (244)
+msgid "Folder required for second file."
+msgstr "Toisen tiedoston edellyttämä kansio."
+
+#. Resource IDs: (60561)
+msgid "Folding"
+msgstr "Taitto"
+
+#. Resource IDs: (60569, 60570)
+msgid "Folding Off"
+msgstr "Taitto pois"
+
+#. Resource IDs: (60566, 60567)
+msgid "Folding On"
+msgstr "Taitto päälle"
+
+#. Resource IDs: (1015)
+msgid "Follow Tab"
+msgstr "Seuraa välilehteä"
+
+#. Resource IDs: (60525, 65535)
+msgid "Font"
+msgstr "Fontti"
+
+#. Resource IDs: (199)
+#, c-format
+msgid "Found: %d matches in %d tabs."
+msgstr "Löytyi: %d osumaa %d välilehdessä."
+
+#. Resource IDs: (198)
+#, c-format
+msgid "Found: %d matches."
+msgstr "Löytyi: %d osumaa."
+
+#. Resource IDs: (274)
+msgid "Frame for current line"
+msgstr "Nykyisen rivin kehys"
+
+#. Resource IDs: (203)
+#, c-format
+msgid ""
+"Full file path:\r\n"
+"%s\r\n"
+"\r\n"
+"Word count: %ld\r\n"
+"Lines: %ld\r\n"
+"Empty lines: %ld\r\n"
+"Paragraphs: %ld\r\n"
+msgstr ""
+"Koko tiedostopolku:\r\n"
+"%s\r\n"
+"\r\n"
+"Sanojen määrä: %ld\r\n"
+"Rivit: %ld\r\n"
+"Tyhjät rivit: %ld\r\n"
+"Kappaleet: %ld\r\n"
+
+#. Resource IDs: (1010, 60491, 60493)
+msgid "Functions"
+msgstr "Funktiot"
+
+#. Resource IDs: (60324)
+msgid "GL"
+msgstr "GL"
+
+#. Resource IDs: (60329)
+msgid "GS"
+msgstr "GS"
+
+#. Resource IDs: (60204)
+msgid "Get captures of a regular expression from the current tab"
+msgstr "Säännöllisen lausekkeen kaappaukset nykyisestä välilehdestä"
+
+#. Resource IDs: (145, 60323, 60325)
+msgid "Go to line"
+msgstr "Siirry riville"
+
+#. Resource IDs: (60328, 60330)
+msgid "Go to symbol"
+msgstr "Siirry symboliin"
+
+#. Resource IDs: (60359)
+msgid "Goto"
+msgstr "Siirry"
+
+#. Resource IDs: (60025, 60097)
+msgid "H"
+msgstr "H"
+
+#. Resource IDs: (272)
+msgid "Hardware acceleration"
+msgstr "Laitteistokiihdytys"
+
+#. Resource IDs: (1113)
+msgid "Highlight all matches"
+msgstr "Korosta kaikki osumat"
+
+#. Resource IDs: (276)
+msgid "Highlight matching braces"
+msgstr "Korosta vastaavat aaltosulkeet"
+
+#. Resource IDs: (277)
+msgid ""
+"If enabled matching braces are highlighted, and non-matching ones marked red."
+msgstr ""
+"Jos tämä on käytössä, yhteensopivat hakasulkeet korostetaan, ja "
+"yhteensopimattomat hakasulkeet merkitään punaisella."
+
+#. Resource IDs: (271)
+msgid ""
+"If set to true, the scrollbar acts as a document bar. Set to false to get a "
+"normal scrollbar."
+msgstr ""
+"Jos arvoksi asetetaan 'tosi', vierityspalkki toimii asiakirjapalkkina. Aseta "
+"arvoksi 'ei tosi' saadaksesi normaalin vierityspalkin."
+
+#. Resource IDs: (214)
+msgid "Ignore"
+msgstr "Ohita"
+
+#. Resource IDs: (1079)
+msgid "Ignore &case."
+msgstr "Ohita kirjainkoko."
+
+#. Resource IDs: (216)
+msgid "Ignore word for this session"
+msgstr "Unohda tämän istunnon sana"
+
+#. Resource IDs: (262)
+msgid ""
+"Import\n"
+"The lexer file is imported. Restart BowPad to use the new lexer."
+msgstr ""
+"Tuo\n"
+"Lekseritiedosto tuodaan. Käynnistä BowPad uudelleen käyttääksesi uutta "
+"lekseriä."
+
+#. Resource IDs: (60623, 60624)
+msgid "Include uppercase"
+msgstr "Sisällytä isot kirjaimet"
+
+#. Resource IDs: (60625)
+msgid "Include words that are all CAPS or have uppercase letters in the middle"
+msgstr ""
+"Sisällytä sanat, jotka ovat kokonaan KAPITALISOITUJA tai joiden keskellä on "
+"isoja kirjaimia"
+
+#. Resource IDs: (60563, 60564, 60565)
+msgid "Init Folding Margin"
+msgstr "Alusta taittomarginaali"
+
+#. Resource IDs: (181)
+msgid "Insert"
+msgstr "Lisää"
+
+#. Resource IDs: (206)
+msgid "Insert Tabs or Spaces"
+msgstr "Lisää välilehtiä tai välilyöntejä"
+
+#. Resource IDs: (60094)
+msgid "Inserts the content of the clipboard at the cursor position"
+msgstr "Lisää leikepöydän sisällön kursorin kohdalle"
+
+#. Resource IDs: (60099)
+msgid "Inserts the html content of the clipboard at the cursor position"
+msgstr "Sisällyttää leikepöydän html-sisällön kursorin kohdalle"
+
+#. Resource IDs: (193)
+#, c-format
+msgid "Installation of plugin \"%s\" failed!"
+msgstr "Liitännäisen \"%s\" asennus epäonnistui!"
+
+#. Resource IDs: (191)
+msgid "Installed Version"
+msgstr "Asennettu versio"
+
+#. Resource IDs: (1021)
+msgid "Italic"
+msgstr "Kursiivi"
+
+#. Resource IDs: (60275)
+msgid "JL"
+msgstr "JL"
+
+#. Resource IDs: (60274, 60276)
+msgid "Join Lines"
+msgstr "Liitä rivejä"
+
+#. Resource IDs: (60277)
+msgid "Join selected lines to one long line"
+msgstr "Yhdistä valitut rivit yhdeksi pitkäksi riviksi"
+
+#. Resource IDs: (125)
+msgid ""
+"Keep the document\n"
+"The document is kept open."
+msgstr ""
+"Säilytä asiakirja\n"
+"Asiakirja pidetään auki."
+
+#. Resource IDs: (60139)
+msgid "LA"
+msgstr "LA"
+
+#. Resource IDs: (60286)
+msgid "LD"
+msgstr "LD"
+
+#. Resource IDs: (60151)
+msgid "LEX"
+msgstr "LEX"
+
+#. Resource IDs: (60162)
+msgid "LF"
+msgstr "LF"
+
+#. Resource IDs: (60650)
+msgid "LR"
+msgstr "LR"
+
+#. Resource IDs: (60269, 60393, 60477)
+msgid "LS"
+msgstr "LS"
+
+#. Resource IDs: (60281)
+msgid "LU"
+msgstr "LU"
+
+#. Resource IDs: (60392, 60611)
+msgid "Language"
+msgstr "Kieli"
+
+#. Resource IDs: (60152)
+msgid "Language Lexer"
+msgstr "Kieli-lexeri"
+
+#. Resource IDs: (138)
+msgid ""
+"Language selected.\n"
+"You need to restart BowPad for the changes to take effect."
+msgstr ""
+"Valittu kieli.\n"
+"Sinun on käynnistettävä BowPad uudelleen, jotta muutokset tulevat voimaan."
+
+#. Resource IDs: (1132, 65535)
+msgid "Language:"
+msgstr "Kieli:"
+
+#. Resource IDs: (60414)
+msgid "Launch in Chrome"
+msgstr "Käynnistä Chromessa"
+
+#. Resource IDs: (60402, 60403)
+msgid "Launch in Edge"
+msgstr "Käynnistää Edgessä"
+
+#. Resource IDs: (60410, 60411)
+msgid "Launch in Firefox"
+msgstr "Käynnistä Firefoxissa"
+
+#. Resource IDs: (60415)
+msgid "Launch in Google Chrome"
+msgstr "Käynnistä Google Chromessa"
+
+#. Resource IDs: (60406)
+msgid "Launch in IE"
+msgstr "Käynnistä IE:ssä"
+
+#. Resource IDs: (60407)
+msgid "Launch in Internet Explorer"
+msgstr "Käynnistä Internet Explorerissa"
+
+#. Resource IDs: (60422, 60423)
+msgid "Launch in Opera"
+msgstr "Käynnistäminen Operassa"
+
+#. Resource IDs: (60418, 60419)
+msgid "Launch in Safari"
+msgstr "Käynnistä Safarissa"
+
+#. Resource IDs: (176)
+#, c-format
+msgid ""
+"Length in bytes: %ld (%s)\r\n"
+"Lines: %ld"
+msgstr ""
+"Pituus tavuina: %ld (%s)\r\n"
+"Rivejä: %ld"
+
+#. Resource IDs: (60150)
+msgid "Lexer"
+msgstr "Lexer"
+
+#. Resource IDs: (238)
+#, c-format
+msgid "Limit reached of %d matches found!"
+msgstr "%d osuman raja saavutettu!"
+
+#. Resource IDs: (153)
+msgid "Line"
+msgstr "Rivi"
+
+#. Resource IDs: (177)
+#, c-format
+msgid ""
+"Line : %ld\r\n"
+"Column : %ld\r\n"
+"Selection : %Iu | %Iu\r\n"
+"Matches: %ld"
+msgstr ""
+"Rivi : %ld\r\n"
+"Sarake : %ld\r\n"
+"Valinta : %Iu | %Iu\r\n"
+"Osumat: %ld"
+
+#. Resource IDs: (60155)
+msgid "Line Endings"
+msgstr "Rivin päätteet"
+
+#. Resource IDs: (154)
+msgid "Line Text"
+msgstr "Rivin teksti"
+
+#. Resource IDs: (178)
+#, c-format
+msgid "Line endings: %s"
+msgstr "Rivin päätteet: %s"
+
+#. Resource IDs: (60261)
+msgid "Line handling"
+msgstr "Rivin käsittely"
+
+#. Resource IDs: (60125)
+msgid "Line numbers"
+msgstr "Rivinumerot"
+
+#. Resource IDs: (65535)
+msgid "Line:"
+msgstr "Rivi:"
+
+#. Resource IDs: (250)
+#, c-format
+msgid "Line: %%c%06X%ld%%r / %%c%06X%ld%%r   Column: %%c%06X%ld%%r"
+msgstr "Rivi: %%c%06X%ld%%r / %%c%06X%ld%%r Sarake: %%c%06X%ld%%r"
+
+#. Resource IDs: (249)
+#, c-format
+msgid "Ln: %%c%06X%ld%%r / %%c%06X%ld%%r    Col: %%c%06X%ld%%r"
+msgstr "Sar: %%c%06X%ld%%r / %%c%06X%ld%%r Rivi: %%c%06X%ld%%r"
+
+#. Resource IDs: (60138, 60140)
+msgid "Load as"
+msgstr "Lataa muodossa"
+
+#. Resource IDs: (60478)
+msgid "Load last session"
+msgstr "Lataa edellinen istunto"
+
+#. Resource IDs: (60483)
+msgid "Load last session on start"
+msgstr "Lataa edellinen istunto käynnistyksessä"
+
+#. Resource IDs: (60476)
+msgid "Load session"
+msgstr "Lataa istunto"
+
+#. Resource IDs: (60481)
+msgid "Load session on start"
+msgstr "Lataa istunto käynnistyksessä"
+
+#. Resource IDs: (236)
+msgid "Loading files..."
+msgstr "Ladataan  tiedostoja..."
+
+#. Resource IDs: (235)
+msgid "Loading session..."
+msgstr "Ladataan istuntoa..."
+
+#. Resource IDs: (60484)
+msgid ""
+"Loads all files automatically that were open the last time BowPad got closed"
+msgstr ""
+"Lataa automaattisesti kaikki tiedostot, jotka olivat auki, kun BowPad "
+"viimeksi suljettiin"
+
+#. Resource IDs: (60479)
+msgid "Loads all files that were open the last time BowPad got closed"
+msgstr ""
+"Lataa kaikki tiedostot, jotka olivat auki, kun BowPad viimeksi suljettiin"
+
+#. Resource IDs: (60241, 60243)
+msgid "Lowercase"
+msgstr "Pienet kirjaimet"
+
+#. Resource IDs: (60002, 60028)
+msgid "M"
+msgstr "M"
+
+#. Resource IDs: (60165)
+msgid "MAC"
+msgstr "MAC"
+
+#. Resource IDs: (60164)
+msgid "MAC (CR)"
+msgstr "MAC (CR)"
+
+#. Resource IDs: (60242, 60247)
+msgid "ML"
+msgstr "ML"
+
+#. Resource IDs: (60027)
+msgid "MRU List"
+msgstr "MRU-luettelo"
+
+#. Resource IDs: (60237)
+msgid "MU"
+msgstr "MU"
+
+#. Resource IDs: (1097)
+msgid "Mac (CR)"
+msgstr "Mac (CR)"
+
+#. Resource IDs: (60001)
+msgid "Main"
+msgstr "Pääsivu"
+
+#. Resource IDs: (112)
+msgid "Main Encodings"
+msgstr "Tärkeimmät koodaukset"
+
+#. Resource IDs: (1008)
+msgid "Match &case"
+msgstr "Sama kirjainkoko"
+
+#. Resource IDs: (60385)
+msgid "Misc"
+msgstr "Sekalaiset"
+
+#. Resource IDs: (60285)
+msgid "Move down"
+msgstr "Siirrä alas"
+
+#. Resource IDs: (60287)
+msgid "Move line down"
+msgstr "Siirrä rivi alaspäin"
+
+#. Resource IDs: (60282)
+msgid "Move line up"
+msgstr "Siirrä rivi ylöspäin"
+
+#. Resource IDs: (60378)
+msgid "Move the caret to the next bookmark"
+msgstr "Siirrä osoitin seuraavaan kirjanmerkkiin"
+
+#. Resource IDs: (60383)
+msgid "Move the caret to the previous bookmark"
+msgstr "Siirrä osoitin edelliseen kirjanmerkkiin"
+
+#. Resource IDs: (222)
+msgid ""
+"Move the file\n"
+"The file tab is updated to the new path."
+msgstr ""
+"Siirrä tiedosto\n"
+"Tiedosto-välilehti päivitetään uuteen polkuun."
+
+#. Resource IDs: (60280)
+msgid "Move up"
+msgstr "Siirrä ylös"
+
+#. Resource IDs: (218)
+msgid "Move/Copy File"
+msgstr "Siirrä/kopioi tiedosto"
+
+#. Resource IDs: (60326)
+msgid "Moves the cursor to the specified line"
+msgstr "Siirtää kohdistimen määritetylle riville"
+
+#. Resource IDs: (60331)
+msgid "Moves the cursor to the specified symbol"
+msgstr "Siirtää kursorin määritettyyn symboliin"
+
+#. Resource IDs: (60288)
+msgid "Moves the selected lines downwards"
+msgstr "Siirtää valittuja rivejä alaspäin"
+
+#. Resource IDs: (60283)
+msgid "Moves the selected lines upwards"
+msgstr "Siirtää valittuja rivejä ylöspäin"
+
+#. Resource IDs: (60189)
+msgid "Moves to the next match of the last search"
+msgstr "Siirtyy seuraavaan osumaan viimeisessä haussa"
+
+#. Resource IDs: (60194)
+msgid "Moves to the previous match of the last search"
+msgstr "Siirtyy edelliseen osumaan viimeisessä haussa"
+
+#. Resource IDs: (60297, 60647)
+msgid "Multi-Edit"
+msgstr "Monimuokkaus"
+
+#. Resource IDs: (60033)
+msgid "N"
+msgstr "N"
+
+#. Resource IDs: (60175)
+msgid "NEXT"
+msgstr "SEURAAVA"
+
+#. Resource IDs: (105)
+#, c-format
+msgid "New %d"
+msgstr "Uusi %d"
+
+#. Resource IDs: (60539, 60540)
+msgid "New Copy"
+msgstr "Uusi kopio"
+
+#. Resource IDs: (237)
+msgid "New Corresponding Files."
+msgstr "Uudet vastaavat tiedostot."
+
+#. Resource IDs: (60034)
+msgid "New Document"
+msgstr "Uusi dokumentti"
+
+#. Resource IDs: (60174, 60176, 60375)
+msgid "Next"
+msgstr "Seuraava"
+
+#. Resource IDs: (60377)
+msgid "Next Bookmark"
+msgstr "Seuraava kirjanmerkki"
+
+#. Resource IDs: (215)
+msgid "No corrections found!"
+msgstr "Korjauksia ei löytynyt!"
+
+#. Resource IDs: (197)
+msgid "No files found."
+msgstr "Tiedostoja ei löytynyt."
+
+#. Resource IDs: (151)
+msgid "No functions found!"
+msgstr "Toimintoja ei löytynyt!"
+
+#. Resource IDs: (234)
+msgid "No more occurrences to replace."
+msgstr "Korvattavia tapahtumia ei enää ole."
+
+#. Resource IDs: (248)
+msgid "No plugins found. Check your internet connection."
+msgstr "Liitännäisiä ei löytynyt. Tarkista internetyhteytesi."
+
+#. Resource IDs: (188)
+msgid "No plugins loaded"
+msgstr "Liitännäisiä ei ole ladattu"
+
+#. Resource IDs: (226)
+msgid "No search folder."
+msgstr "Hakukansiota ei ole."
+
+#. Resource IDs: (134)
+msgid ""
+"No updates available.\n"
+"You already have the current version."
+msgstr ""
+"Päivityksiä ei ole saatavilla.\n"
+"Sinulla on jo nykyinen versio."
+
+#. Resource IDs: (60043)
+msgid "O"
+msgstr "O"
+
+#. Resource IDs: (1)
+msgid "OK"
+msgstr "OK"
+
+#. Resource IDs: (136)
+msgid "Online Languages"
+msgstr "Kielet verkossa"
+
+#. Resource IDs: (60619, 60620)
+msgid "Only comments"
+msgstr "Vain kommentit"
+
+#. Resource IDs: (60430, 60431)
+msgid "Open Console"
+msgstr "Avaa konsoli"
+
+#. Resource IDs: (60426, 60427, 60513, 60514)
+msgid "Open Explorer"
+msgstr "Open Explorer"
+
+#. Resource IDs: (60531)
+msgid "Open File"
+msgstr "Avaa tiedosto"
+
+#. Resource IDs: (60532)
+msgid "Open File under cursor"
+msgstr "Avaa kursorin alla oleva tiedosto"
+
+#. Resource IDs: (60044)
+msgid "Open Files"
+msgstr "Avaa tiedostoja"
+
+#. Resource IDs: (60657)
+msgid "Open corresponding File"
+msgstr "Avaa vastaava tiedosto"
+
+#. Resource IDs: (147)
+msgid ""
+"Open elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"Avoin korotettu\n"
+"BowPad käynnistetään uudelleen korotetuilla oikeuksilla."
+
+#. Resource IDs: (182)
+#, c-format
+msgid "Open files: %d"
+msgstr "Avaa tiedostot: %d"
+
+#. Resource IDs: (252)
+#, c-format
+msgid "Open tabs: %%c%06X%ld%%r"
+msgstr "Avaa välilehdet: %%c%06X%ld%%r"
+
+#. Resource IDs: (253)
+#, c-format
+msgid "Open: %%c%06X%ld%%r"
+msgstr "Avaa: %%c%06X%ld%%ld%%r"
+
+#. Resource IDs: (263)
+msgid ""
+"Open\n"
+"The lexer file is opened in BowPad, ready for editing."
+msgstr ""
+"Avaa\n"
+"Lekseritiedosto avataan BowPadissa, ja se on valmis muokattavaksi."
+
+#. Resource IDs: (60045)
+msgid "Opens one or more files"
+msgstr "Avaa yhden tai useamman tiedoston"
+
+#. Resource IDs: (60432)
+msgid "Opens the Console at the current file location"
+msgstr "Avaa konsolin nykyisessä tiedostosijainnissa"
+
+#. Resource IDs: (60428)
+msgid "Opens the Windows Explorer at the current file location"
+msgstr "Avaa Windows Explorerin nykyisessä tiedostosijainnissa"
+
+#. Resource IDs: (60515)
+msgid "Opens the Windows Explorer at the current file path"
+msgstr "Avaa Windows Explorer -selaimen nykyiseen tiedostopolkuun"
+
+#. Resource IDs: (60523)
+msgid ""
+"Opens the config file to configure keyboard shortcuts for any command in "
+"BowPad"
+msgstr ""
+"Avaa konfigurointitiedoston, jossa voit määrittää näppäimistön pikavalinnat "
+"mille tahansa BowPadin komennolle"
+
+#. Resource IDs: (60658)
+msgid ""
+"Opens the corresponding file to the file in the current tab.\n"
+"(h/cpp, aspx/cs/vb)"
+msgstr ""
+"Avaa nykyisen välilehden tiedostoa vastaavan tiedoston.\n"
+"(h/cpp, aspx/cs/vb)"
+
+#. Resource IDs: (60404)
+msgid "Opens the current file in Microsoft Edge browser"
+msgstr "Avaa nykyisen tiedoston Microsoft Edge-selaimessa"
+
+#. Resource IDs: (60408)
+msgid "Opens the current file in Microsoft Internet Explorer"
+msgstr "Avaa nykyisen tiedoston Microsoft Internet Explorerissa"
+
+#. Resource IDs: (60412)
+msgid "Opens the current file in the Firefox browser"
+msgstr "Avaa nykyisen tiedoston Firefox-selaimessa"
+
+#. Resource IDs: (60416)
+msgid "Opens the current file in the Google Chrome browser"
+msgstr ""
+"Avaa nykyisen tiedoston Google Chrome\n"
+"-selaimessa"
+
+#. Resource IDs: (60424)
+msgid "Opens the current file in the Opera browser"
+msgstr "Avaa nykyisen tiedoston Opera-selaimessa"
+
+#. Resource IDs: (60420)
+msgid "Opens the current file in the Safari browser"
+msgstr "Avaa nykyisen tiedoston Safari-selaimessa"
+
+#. Resource IDs: (60440)
+msgid "Opens the default browser to search Wikipedia for the selected text"
+msgstr "Avaa oletusselaimen valitun tekstin etsimiseksi Wikipediasta"
+
+#. Resource IDs: (60436)
+msgid "Opens the default browser to search for the selected text"
+msgstr "Avaa oletusselaimen valitun tekstin etsimistä varten"
+
+#. Resource IDs: (60533)
+msgid "Opens the file/path that's at the cursor position"
+msgstr "Avaa kursorin kohdalla olevan tiedoston/polun"
+
+#. Resource IDs: (60316)
+msgid "Opens the printer setup dialog"
+msgstr "Avaa tulostimen asetusvalintaikkunan"
+
+#. Resource IDs: (60003)
+msgid "Other"
+msgstr "Muu"
+
+#. Resource IDs: (60333)
+msgid "Other operations"
+msgstr "Muut toiminnot"
+
+#. Resource IDs: (180)
+msgid "Overtype"
+msgstr "Ylikirjoitus"
+
+#. Resource IDs: (60301, 60304, 60307)
+msgid "P"
+msgstr "P"
+
+#. Resource IDs: (60314)
+msgid "PP"
+msgstr "PP"
+
+#. Resource IDs: (60170)
+msgid "PREV"
+msgstr "EDEL"
+
+#. Resource IDs: (60319)
+msgid "PS"
+msgstr "PS"
+
+#. Resource IDs: (60318)
+msgid "Page Setup"
+msgstr "Sivun asetukset"
+
+#. Resource IDs: (60091)
+msgid "Paste"
+msgstr "Liitä"
+
+#. Resource IDs: (60096)
+msgid "Paste Html"
+msgstr "Liitä Html"
+
+#. Resource IDs: (232)
+msgid "Please wait."
+msgstr "Odota."
+
+#. Resource IDs: (189)
+msgid "Plugin Name"
+msgstr "Liitännäisen nimi"
+
+#. Resource IDs: (60550)
+msgid "Plugin commands"
+msgstr "Liitännäiskomennot"
+
+#. Resource IDs: (60543, 60549)
+msgid "Plugins"
+msgstr "Liitännäiset"
+
+#. Resource IDs: (60079)
+msgid "Prevents editing the file"
+msgstr "Estää tiedoston muokkaamisen"
+
+#. Resource IDs: (60169, 60171, 60380)
+msgid "Previous"
+msgstr "Edellinen"
+
+#. Resource IDs: (60382)
+msgid "Previous Bookmark"
+msgstr "Edellinen kirjanmerkki"
+
+#. Resource IDs: (60300, 60303, 60306, 60309)
+msgid "Print"
+msgstr "Tulosta"
+
+#. Resource IDs: (60320)
+msgid "Print Page Setup"
+msgstr "Tulostussivun asetukset"
+
+#. Resource IDs: (60310)
+msgid "Print now"
+msgstr "Tulosta nyt"
+
+#. Resource IDs: (60313, 60315)
+msgid "Print setup"
+msgstr "Tulostusasetukset"
+
+#. Resource IDs: (1082)
+msgid "R&eplace with:"
+msgstr "&Korvaa tällä:"
+
+#. Resource IDs: (60355)
+msgid "RELOAD"
+msgstr "LATAA UUDELLEEN"
+
+#. Resource IDs: (256)
+msgid "Reading order (left-to-right or right-to-left)"
+msgstr "Lukujärjestys (vasemmalta oikealle tai oikealta vasemmalle)"
+
+#. Resource IDs: (60076)
+msgid "Readonly"
+msgstr "Vain luku"
+
+#. Resource IDs: (209)
+msgid "Recently Used Encodings"
+msgstr "Viime aikoina käytetyt koodaukset"
+
+#. Resource IDs: (60107, 60109)
+msgid "Redo"
+msgstr "Tee uudelleen"
+
+#. Resource IDs: (60110)
+msgid "Redo what was undone before"
+msgstr "Toista se, mikä kumottiin aiemmin"
+
+#. Resource IDs: (157)
+msgid "Regex expression is invalid!"
+msgstr "Regex-lauseke on virheellinen!"
+
+#. Resource IDs: (156)
+msgid "Regex expression is valid"
+msgstr "Regex-lauseke on oikein"
+
+#. Resource IDs: (1009)
+msgid "Regex mode"
+msgstr "Regex-tila"
+
+#. Resource IDs: (60356)
+msgid "Reload"
+msgstr "Lataa uudelleen"
+
+#. Resource IDs: (120)
+msgid ""
+"Reload document\n"
+"The document is refreshed from disk."
+msgstr ""
+"Lataa asiakirja uudelleen\n"
+"Asiakirja päivitetään levyltä."
+
+#. Resource IDs: (121)
+msgid ""
+"Reload document\n"
+"The unsaved modifications are lost."
+msgstr ""
+"Lataa asiakirja uudelleen\n"
+"Tallentamattomat muutokset häviävät."
+
+#. Resource IDs: (60357)
+msgid "Reload the file from disk"
+msgstr "Lataa tiedosto uudelleen levyltä"
+
+#. Resource IDs: (166)
+msgid ""
+"Reload\n"
+"The unsaved modifications will be lost!"
+msgstr ""
+"Lataa uudelleen\n"
+"Tallentamattomat muutokset menetetään!"
+
+#. Resource IDs: (60652)
+msgid "Remove all empty lines or lines with only whitespace"
+msgstr "Poista kaikki tyhjät rivit tai rivit, joissa on vain välilyöntejä"
+
+#. Resource IDs: (60649, 60651)
+msgid "Remove empty lines"
+msgstr "Poista tyhjät rivit"
+
+#. Resource IDs: (60373)
+msgid "Removes all bookmarks from the current file"
+msgstr "Poistaa kaikki kirjanmerkit nykyisestä tiedostosta"
+
+#. Resource IDs: (60341)
+msgid "Removes whitespaces at the end of lines"
+msgstr "Poistaa välilyönnit rivien lopuista"
+
+#. Resource IDs: (1004, 160)
+msgid "Replace &All"
+msgstr "Korvaa k&aikki"
+
+#. Resource IDs: (168)
+msgid "Replace &all in selection"
+msgstr "Korvaa k&aikki valinnassa"
+
+#. Resource IDs: (175)
+msgid "Replace All In All &Tabs"
+msgstr "Korvaa kaikki kaikissa &välilehdissä"
+
+#. Resource IDs: (60217, 60219)
+msgid "Right margin"
+msgstr "Oikea marginaali"
+
+#. Resource IDs: (60399)
+msgid "Run"
+msgstr "Suorita"
+
+#. Resource IDs: (257)
+msgid "Run as Administrator"
+msgstr "Suorita järjestelmänvalvojana"
+
+#. Resource IDs: (60400)
+msgid "Runs various commands"
+msgstr "Suorittaa erilaisia komentoja"
+
+#. Resource IDs: (60048)
+msgid "S"
+msgstr "S"
+
+#. Resource IDs: (60210)
+msgid "SA"
+msgstr "SA"
+
+#. Resource IDs: (60482)
+msgid "SAL"
+msgstr "SAL"
+
+#. Resource IDs: (60487)
+msgid "SAS"
+msgstr "SAS"
+
+#. Resource IDs: (60291)
+msgid "SL"
+msgstr "SL"
+
+#. Resource IDs: (60213, 60350)
+msgid "ST"
+msgstr "ST"
+
+#. Resource IDs: (60061)
+msgid "Sa&ve as"
+msgstr "Ta&llenna nimellä"
+
+#. Resource IDs: (60052)
+msgid "Save &all"
+msgstr "Tallenna k&aikki"
+
+#. Resource IDs: (60049)
+msgid "Save File"
+msgstr "Tallenna tiedosto"
+
+#. Resource IDs: (60054)
+msgid "Save Files"
+msgstr "Tallenna tiedostot"
+
+#. Resource IDs: (60063)
+msgid "Save as"
+msgstr "Tallenna nimellä"
+
+#. Resource IDs: (149)
+msgid ""
+"Save elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"Tallenna korotettu\n"
+"BowPad käynnistetään uudelleen korotetuilla oikeuksilla."
+
+#. Resource IDs: (119)
+msgid ""
+"Save modifications\n"
+"The modifications that were made outside BowPad are overwritten."
+msgstr ""
+"Tallenna muutokset\n"
+"BowPadin ulkopuolella tehdyt muutokset korvataan."
+
+#. Resource IDs: (60055)
+msgid "Saves all open files"
+msgstr "Tallentaa kaikki avoimet tiedostot"
+
+#. Resource IDs: (60059)
+msgid "Saves changes automatically when the tab is switched or closed"
+msgstr ""
+"Tallentaa muutokset automaattisesti, kun välilehti vaihdetaan tai suljetaan"
+
+#. Resource IDs: (60050)
+msgid "Saves the current tab"
+msgstr "Tallentaa nykyisen välilehden"
+
+#. Resource IDs: (1100)
+msgid "Scintilla"
+msgstr "Scintilla"
+
+#. Resource IDs: (270)
+msgid "Scrollbar style"
+msgstr "Vierityspalkin tyyli"
+
+#. Resource IDs: (60434, 60435)
+msgid "Search Web"
+msgstr "Etsi verkosta"
+
+#. Resource IDs: (60438, 60439)
+msgid "Search Wikipedia"
+msgstr "Etsi Wikipediasta"
+
+#. Resource IDs: (60184)
+msgid "Search and/or replace text in documents/tabs"
+msgstr "Etsi ja/tai korvaa tekstiä asiakirjoista/välilehdistä"
+
+#. Resource IDs: (227)
+msgid "Search folder not found."
+msgstr "Hakukansiota ei löydy."
+
+#. Resource IDs: (144)
+msgid "Search text not found!"
+msgstr "Hakutekstiä ei löydy!"
+
+#. Resource IDs: (60199)
+msgid "Searches for the next match of the selected text"
+msgstr "Etsii valitun tekstin seuraavaa vastaavuutta"
+
+#. Resource IDs: (211)
+#, c-format
+msgid "Searching in file '%s'"
+msgstr "Etsitään tiedostosta '%s'"
+
+#. Resource IDs: (200)
+#, c-format
+msgid ""
+"Sel: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%lld%%r matches."
+msgstr ""
+"Sel: %%c%06X%Iu%%r merkit | %%c%06X%Iu%%r  rivit | %%c%06X%lld%%r osumat."
+
+#. Resource IDs: (60394)
+msgid "Select Language"
+msgstr "Valitse kieli"
+
+#. Resource IDs: (60209)
+msgid "Select all"
+msgstr "Valitse kaikki"
+
+#. Resource IDs: (60395)
+msgid "Select the language for BowPad"
+msgstr "Valitse BowPadin kieli"
+
+#. Resource IDs: (251)
+#, c-format
+msgid ""
+"Selection: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%lld%%r "
+"matches."
+msgstr ""
+"Valinta: %%c%06X%Iu%%r merkit | %%c%06X%Iu%%r r rivit | %%c%06X%lld%%r "
+"osumat."
+
+#. Resource IDs: (60613)
+msgid "Selects the language for the spell checker"
+msgstr "Valitsee oikeinkirjoituksen tarkistuskielen"
+
+#. Resource IDs: (60311)
+msgid "Sends the document to the default printer"
+msgstr "Lähettää asiakirjan oletustulostimeen"
+
+#. Resource IDs: (60037)
+msgid "Set Defaults"
+msgstr "Aseta oletusasetukset"
+
+#. Resource IDs: (230)
+msgid "Set a new search folder."
+msgstr "Aseta uusi hakukansio."
+
+#. Resource IDs: (60038)
+msgid "Set default encoding and EOL"
+msgstr "Aseta oletuskoodaus ja EOL"
+
+#. Resource IDs: (228)
+msgid "Set search folder to its containing folder."
+msgstr "Aseta hakukansio sen sisältävään kansioon."
+
+#. Resource IDs: (229)
+msgid "Set search folder to the current documents folder."
+msgstr "Aseta nykyinen asiakirjakansio hakukansioksi."
+
+#. Resource IDs: (60153)
+msgid "Set the coloring according to the code language"
+msgstr "Aseta väritys koodikielen mukaan"
+
+#. Resource IDs: (60039)
+msgid ""
+"Set the default encoding (e.g. ANSI, UTF-8, ...) and end-of-line style for "
+"new files"
+msgstr ""
+"Aseta oletuskoodaus (esim. ANSI, UTF-8, ...) ja rivin lopun tyyli uusille "
+"tiedostoille"
+
+#. Resource IDs: (60254)
+msgid "Set the number of columns for one tabulator."
+msgstr "Aseta yhden tabulaattorin sarakkeiden lukumäärä."
+
+#. Resource IDs: (60321)
+msgid "Set up print margins, page size, page orientation"
+msgstr "Määritä tulostusmarginaalit, sivun koko, sivun suuntaus"
+
+#. Resource IDs: (60220)
+msgid ""
+"Sets the column at which the vertical edge is shown, indicating the right "
+"margin. Set to 0 to hide it."
+msgstr ""
+"Asettaa sarakkeen, jonka kohdalla pystysuora reuna näytetään ja joka "
+"osoittaa oikean marginaalin. Aseta 0 piilottaaksesi se."
+
+#. Resource IDs: (266)
+msgid "Setting"
+msgstr "Asetus"
+
+#. Resource IDs: (60517, 60518)
+msgid "Show Properties"
+msgstr "Näytä ominaisuudet"
+
+#. Resource IDs: (60121)
+msgid "Show Whitespaces"
+msgstr "Näytä välilyönnit"
+
+#. Resource IDs: (60660)
+msgid "Show clipboard history"
+msgstr "Näytä leikepöydän historia"
+
+#. Resource IDs: (60127)
+msgid "Show line numbers"
+msgstr "Näytä rivinumerot"
+
+#. Resource IDs: (60132)
+msgid "Show the file tree"
+msgstr "Näytä tiedostopuu"
+
+#. Resource IDs: (60474)
+msgid "Shows a dialog to configure custom commands"
+msgstr "Näyttää valintaikkunan mukautettujen komentojen määrittämiseksi"
+
+#. Resource IDs: (60547)
+msgid ""
+"Shows a dialog to configure the installed plugins and install new plugins"
+msgstr ""
+"Näyttää valintaikkunan asennettujen liitännäisten määrittämistä ja uusien "
+"liitännäisten asentamista varten"
+
+#. Resource IDs: (60494)
+msgid "Shows a list of functions/methods in the file to jump to"
+msgstr ""
+"Näyttää luettelon tiedostossa olevista funktioista/metodeista, joihin voi "
+"siirtyä"
+
+#. Resource IDs: (60133)
+msgid "Shows or hides the file tree"
+msgstr "Näyttää tai piilottaa tiedostopuun"
+
+#. Resource IDs: (60559)
+msgid "Shows statistics about the current document"
+msgstr "Näyttää nykyisen asiakirjan tilastotiedot"
+
+#. Resource IDs: (60519)
+msgid "Shows the Windows Explorer file properties dialog for the current file"
+msgstr ""
+"Näyttää Windows Explorerin tiedosto-ominaisuuksien valintaikkunan nykyiselle "
+"tiedostolle"
+
+#. Resource IDs: (60555)
+msgid "Shows the list of all opened tabs."
+msgstr "Näyttää luettelon kaikista avatuista välilehdistä."
+
+#. Resource IDs: (1130)
+msgid "Snippet Name/Key:"
+msgstr "Ohjelmapätkän nimi/avain:"
+
+#. Resource IDs: (1134)
+msgid "Snippets"
+msgstr "Ohjelmapätkät"
+
+#. Resource IDs: (60290, 60292)
+msgid "Sort Lines"
+msgstr "Lajittele rivit"
+
+#. Resource IDs: (203)
+msgid "Sort Lines - Options"
+msgstr "Lajittele rivit - Vaihtoehdot"
+
+#. Resource IDs: (60293)
+msgid "Sorts the current selection (normal or rectangular)."
+msgstr "Lajittelee nykyisen valinnan (normaali tai suorakulmainen)."
+
+#. Resource IDs: (60349, 60351)
+msgid "Spaces to Tabs"
+msgstr "Välilyönnit sarkaimiksi"
+
+#. Resource IDs: (60605)
+msgid "Spell Check"
+msgstr "Oikoluku"
+
+#. Resource IDs: (60607, 60608, 60616)
+msgid "Spell checker"
+msgstr "Oikeinkirjoitus"
+
+#. Resource IDs: (60612)
+msgid "Spell checker language"
+msgstr "Oikeinkirjoituksen kieli"
+
+#. Resource IDs: (60268, 60270)
+msgid "Split Lines"
+msgstr "Jaa rivit"
+
+#. Resource IDs: (60271)
+msgid "Split long lines at the right window border"
+msgstr "Jaa pitkät rivit ikkunan oikeassa reunassa"
+
+#. Resource IDs: (1088)
+msgid "Status"
+msgstr "Tila"
+
+#. Resource IDs: (144)
+msgid "Style Configurator"
+msgstr "Tyylin määrittelijä"
+
+#. Resource IDs: (65535)
+msgid "Style:"
+msgstr "Tyyli:"
+
+#. Resource IDs: (65535)
+msgid "Styles"
+msgstr "Tyylit"
+
+#. Resource IDs: (1012)
+msgid "Sub Folders"
+msgstr "Alikansiot"
+
+#. Resource IDs: (156, 60557)
+msgid "Summary"
+msgstr "Yhteenveto"
+
+#. Resource IDs: (196)
+msgid "System Includes"
+msgstr "Järjestelmä sisältää"
+
+#. Resource IDs: (60339)
+msgid "T"
+msgstr "T"
+
+#. Resource IDs: (60252, 60345)
+msgid "TS"
+msgstr "TS"
+
+#. Resource IDs: (60388)
+msgid "TT"
+msgstr "TT"
+
+#. Resource IDs: (60554)
+msgid "Tab List"
+msgstr "Välilehtiluettelo"
+
+#. Resource IDs: (60251, 60253)
+msgid "Tab Size"
+msgstr "Välilehden koko"
+
+#. Resource IDs: (60553)
+msgid "Tabs"
+msgstr "Välilehdet"
+
+#. Resource IDs: (60344, 60346)
+msgid "Tabs to Spaces"
+msgstr "Sarkaimet välilyönneiksi"
+
+#. Resource IDs: (117)
+#, c-format
+msgid ""
+"The document '%s' was modified outside of BowPad, but there are unsaved "
+"changes in the document."
+msgstr ""
+"Asiakirjaa '%s' on muokattu BowPadin ulkopuolella, mutta asiakirjassa on "
+"tallentamattomia muutoksia."
+
+#. Resource IDs: (118)
+#, c-format
+msgid "The document '%s' was modified outside of BowPad."
+msgstr "Asiakirjaa '%s' muutettiin BowPadin ulkopuolella."
+
+#. Resource IDs: (124)
+#, c-format
+msgid "The document '%s' was removed outside of BowPad."
+msgstr "Asiakirja '%s' poistettiin BowPadin ulkopuolelta."
+
+#. Resource IDs: (162)
+#, c-format
+msgid "The file '%s' does not exist. Do you want to create it?"
+msgstr "Tiedostoa '%s' ei ole olemassa. Haluatko luoda sen?"
+
+#. Resource IDs: (184)
+msgid ""
+"The file is marked as read only. Are you sure you want to edit this file?"
+msgstr ""
+"Tiedosto on merkitty vain luettavaksi. Haluatko varmasti muokata tätä "
+"tiedostoa?"
+
+#. Resource IDs: (183)
+msgid "The file is write protected"
+msgstr "Tiedosto on kirjoitussuojattu"
+
+#. Resource IDs: (60246, 60248)
+msgid "Titlecase"
+msgstr "Otsikkokoko"
+
+#. Resource IDs: (60367)
+msgid "Toggle Bookmark"
+msgstr "Vaihda kirjanmerkki"
+
+#. Resource IDs: (60368)
+msgid "Toggle a bookmark on the current line"
+msgstr "Vaihda kirjanmerkki nykyisellä rivillä"
+
+#. Resource IDs: (60572, 60573)
+msgid "Toggle folding all"
+msgstr "Vaihda kaikki taitot"
+
+#. Resource IDs: (60575, 60576)
+msgid "Toggle level 0"
+msgstr "Vaihda taso 0"
+
+#. Resource IDs: (60578, 60579)
+msgid "Toggle level 1"
+msgstr "Vaihda taso 1"
+
+#. Resource IDs: (60581, 60582)
+msgid "Toggle level 2"
+msgstr "Vaihda taso 2"
+
+#. Resource IDs: (60584, 60585)
+msgid "Toggle level 3"
+msgstr "Vaihda taso 3"
+
+#. Resource IDs: (60587, 60588)
+msgid "Toggle level 4"
+msgstr "Vaihda taso 4"
+
+#. Resource IDs: (60590, 60591)
+msgid "Toggle level 5"
+msgstr "Vaihda taso 5"
+
+#. Resource IDs: (60593, 60594)
+msgid "Toggle level 6"
+msgstr "Vaihda taso 6"
+
+#. Resource IDs: (60596, 60597)
+msgid "Toggle level 7"
+msgstr "Vaihda taso 7"
+
+#. Resource IDs: (60599, 60600)
+msgid "Toggle level 8"
+msgstr "Vaihda taso 8"
+
+#. Resource IDs: (60602, 60603)
+msgid "Toggle level 9"
+msgstr "Vaihda taso 9"
+
+#. Resource IDs: (60390)
+msgid "Toggles between the normal and the dark theme"
+msgstr "Vaihtaa normaalin ja tumman teeman välillä"
+
+#. Resource IDs: (1078)
+msgid "Treat digits as &numbers."
+msgstr "Käsittele numeroita &lukuina."
+
+#. Resource IDs: (60338, 60340)
+msgid "Trim Whitespaces"
+msgstr "Trimmaa välilyönnit"
+
+#. Resource IDs: (132)
+msgid "Turn off automatic update checks"
+msgstr "Poista automaattiset päivitystarkistukset käytöstä"
+
+#. Resource IDs: (60128)
+msgid "Turns showing the line numbers on/off"
+msgstr "Kytkee rivinumeroiden näyttämisen päälle/pois"
+
+#. Resource IDs: (60122)
+msgid ""
+"Turns showing whitespaces on/off.\n"
+"Hold down the Shift key to show EOLs as well."
+msgstr ""
+"Kytkee välilyöntien näyttämisen päälle/pois.\n"
+"Pitämällä Shift-näppäintä alhaalla voit näyttää myös EOL:t."
+
+#. Resource IDs: (179)
+#, c-format
+msgid "Typing mode: %s"
+msgstr "Kirjoitustila: %s"
+
+#. Resource IDs: (60014)
+msgid "U"
+msgstr "U"
+
+#. Resource IDs: (60257)
+msgid "UT"
+msgstr "UT"
+
+#. Resource IDs: (1074)
+msgid "UTF-16 Big Endian"
+msgstr "UTF-16 Big Endian"
+
+#. Resource IDs: (1073)
+msgid "UTF-16 Little Endian"
+msgstr "UTF-16 Little Endian"
+
+#. Resource IDs: (1076)
+msgid "UTF-32 Big Endian"
+msgstr "UTF-32 Big Endian"
+
+#. Resource IDs: (1075)
+msgid "UTF-32 Little Endian"
+msgstr "UTF-32 Little Endian"
+
+#. Resource IDs: (1071)
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#. Resource IDs: (1072)
+msgid "UTF-8 with BOM"
+msgstr "UTF-8 with BOM"
+
+#. Resource IDs: (60228, 60230)
+msgid "Uncomment"
+msgstr "Ei kommentteja"
+
+#. Resource IDs: (60231)
+msgid "Uncomments the selected text"
+msgstr "Poista kommentit valitusta tekstistä"
+
+#. Resource IDs: (1009)
+msgid "Underline"
+msgstr "Alleviivaus"
+
+#. Resource IDs: (60013, 60101, 60103)
+msgid "Undo"
+msgstr "Kumoa"
+
+#. Resource IDs: (60104)
+msgid "Undo the last change"
+msgstr "Kumoa viimeinen muutos"
+
+#. Resource IDs: (1096, 60161)
+msgid "Unix (LF)"
+msgstr "Unix (LF)"
+
+#. Resource IDs: (111)
+msgid "Unsaved modifications"
+msgstr "Tallentamattomat muutokset"
+
+#. Resource IDs: (60236, 60238)
+msgid "Uppercase"
+msgstr "Isot kirjaimet"
+
+#. Resource IDs: (155)
+msgid "Use $0 for the whole match, and $1..$99 for group matches."
+msgstr "Käytä $0 koko osumalle ja $1..$99 ryhmäosumalle."
+
+#. Resource IDs: (60256, 60258)
+msgid "Use Tabs"
+msgstr "Käytä välilehtiä"
+
+#. Resource IDs: (1133)
+msgid ""
+"Use ^nPlaceHolder^ to mark a placeholder token, use ^0^ to mark the "
+"insertion point at the end."
+msgstr ""
+"Käytä ^nPlaceHolder^ merkitäksesi paikanvaraaja-merkkiä, käytä ^0^ "
+"merkitäksesi lopun lisäyskohdan."
+
+#. Resource IDs: (195)
+msgid "User Includes"
+msgstr "Käyttäjä sisältää"
+
+#. Resource IDs: (60004, 60017, 60092)
+msgid "V"
+msgstr "V"
+
+#. Resource IDs: (60020, 60218)
+msgid "VE"
+msgstr "VE"
+
+#. Resource IDs: (267)
+msgid "Value"
+msgstr "Arvo"
+
+#. Resource IDs: (190)
+msgid "Version"
+msgstr "Versio"
+
+#. Resource IDs: (60019)
+msgid "Vertical Edge"
+msgstr "Pystysuora reuna"
+
+#. Resource IDs: (60016)
+msgid "View"
+msgstr "Näytä"
+
+#. Resource IDs: (1026)
+msgid "Visit our Website"
+msgstr "Vieraile verkkosivuillamme"
+
+#. Resource IDs: (60114, 60336)
+msgid "W"
+msgstr "W"
+
+#. Resource IDs: (60126)
+msgid "WL"
+msgstr "WL"
+
+#. Resource IDs: (60120, 60628)
+msgid "WS"
+msgstr "WS"
+
+#. Resource IDs: (1059)
+msgid "Web Search:"
+msgstr "Verkkohaku:"
+
+#. Resource IDs: (261)
+#, c-format
+msgid "What do you want to do with the BowPad lexer file \"%s\"?"
+msgstr "Mitä haluat tehdä BowPadin lekseritiedostolla \"%s\"?"
+
+#. Resource IDs: (1094)
+msgid "When loading, prefer utf8 over ANSI/Local"
+msgstr "Kun lataat, suosi UTF8:a ANSI/Localin sijaan"
+
+#. Resource IDs: (60119)
+msgid "Whitespace"
+msgstr "Välilyönti"
+
+#. Resource IDs: (60335)
+msgid "Whitespaces"
+msgstr "Välilyönnit"
+
+#. Resource IDs: (1095, 60158)
+msgid "Windows (CRLF)"
+msgstr "Windows (CRLF)"
+
+#. Resource IDs: (60113, 60115)
+msgid "Wrap Lines"
+msgstr "Rivitä rivit"
+
+#. Resource IDs: (143)
+msgid "Wrap around."
+msgstr "Rivitä."
+
+#. Resource IDs: (60116)
+msgid "Wrap lines at the end of the window"
+msgstr "Rivitä rivit ikkunan lopussa"
+
+#. Resource IDs: (60078)
+msgid "Write protected"
+msgstr "Kirjoitussuojattu"
+
+#. Resource IDs: (60030, 60087)
+msgid "X"
+msgstr "X"
+
+#. Resource IDs: (60108)
+msgid "Y"
+msgstr "Y"
+
+#. Resource IDs: (142)
+msgid ""
+"You can use the following strings in the command line:\r\n"
+"$(LINE)\t\t\tThe line where the cursor is\r\n"
+"$(POS)\t\t\tthe position where the cursor is\r\n"
+"$(TAB_PATH)\t\tthe path to the file of the active tab\r\n"
+"$(TAB_NAME)\t\tthe file name without extension of the current tab\r\n"
+"$(TAB_EXT)\t\tthe file extension of the current tab\r\n"
+"$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n"
+"$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n"
+"$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
+msgstr ""
+"Voit käyttää komentorivillä seuraavia merkkijonoja:\r\n"
+"$(LINE) Rivi, jolla kursori on\r\n"
+"$(POS) Sijainti, jossa kursori on\r\n"
+"$(TAB_PATH) aktiivisen välilehden tiedoston polku\r\n"
+"$(TAB_NAME) nykyisen välilehden tiedoston nimi ilman laajennusta\r\n"
+"$(TAB_EXT) nykyisen välilehden tiedostopääte\r\n"
+"$(TAB_DIR) aktiivisen välilehden tiedoston hakemisto\r\n"
+"$(SEL_TEXT) valittu teksti tai kursorin kohdalla oleva sana\r\n"
+"$(SEL_TEXT_ESCAPED) kuten $(SEL_TEXT), mutta escaped, hyödyllinen url-"
+"verkkotunnuksia varten"
+
+#. Resource IDs: (192)
+msgid "You have to restart BowPad for the plugin changes to take effect."
+msgstr ""
+"Sinun on käynnistettävä BowPad uudelleen, jotta liitännäisen muutokset "
+"tulevat voimaan."
+
+#. Resource IDs: (60102)
+msgid "Z"
+msgstr "Z"
+
+#. Resource IDs: (208)
+#, c-format
+msgid "Zoom: %%c%06X%d%%r%%"
+msgstr "Zoom: %%c%06X%d%%r%%"
+
+#. Resource IDs: (1071, 1090, 1091)
+msgid "^"
+msgstr "^"
+
+#. Resource IDs: (65535)
+msgid "background:"
+msgstr "tausta:"
+
+#. Resource IDs: (1102)
+msgid "capture expression:"
+msgstr "kaappaa ilmaisu:"
+
+#. Resource IDs: (269)
+msgid "checks for new versions of BowPad once a week"
+msgstr "tarkistaa BowPadin uudet versiot kerran viikossa"
+
+#. Resource IDs: (278)
+msgid "click to copy to clipboard"
+msgstr "kopioi leikepöydälle napsauttamalla"
+
+#. Resource IDs: (60643, 60644)
+msgid "configure advanced settings"
+msgstr "määritä lisäasetukset"
+
+#. Resource IDs: (60640)
+msgid "configure autocompletion words and code snippets"
+msgstr "määritä automaattisen täydennyksen sanat ja koodinpätkät"
+
+#. Resource IDs: (1105)
+msgid "dot matches newline"
+msgstr "piste vastaa uutta riviä"
+
+#. Resource IDs: (60635)
+msgid "enable autocompletion"
+msgstr "ota automaattinen täydennys käyttöön"
+
+#. Resource IDs: (60636)
+msgid "enable/disable autocompletion when editing"
+msgstr "ota automaattinen täydennys käyttöön/poista käytöstä muokattaessa"
+
+#. Resource IDs: (65535)
+msgid "foreground:"
+msgstr "edusta:"
+
+#. Resource IDs: (115)
+#, c-format
+msgid "from %ld to %ld"
+msgstr "%ld -> %ld"
+
+#. Resource IDs: (60177)
+msgid "go to the next cursor position"
+msgstr "siirry seuraavaan kursorin sijaintiin"
+
+#. Resource IDs: (60172)
+msgid "go to the previous cursor position"
+msgstr "siirry edelliseen kursorin sijaintiin"
+
+#. Resource IDs: (1113)
+msgid "hide lexer from dropdown"
+msgstr "piilota lekseri pudotusvalikosta"
+
+#. Resource IDs: (60627, 60629)
+msgid "indent wrapped lines"
+msgstr "sisennä rivitetyt rivit"
+
+#. Resource IDs: (60630)
+msgid "indents wrapped sublines"
+msgstr "sisentää rivitetyt alirivit"
+
+#. Resource IDs: (60661)
+msgid "no plugins loaded"
+msgstr "liitännäisiä ei ole ladattu"
+
+#. Resource IDs: (1101)
+msgid "regular expression:"
+msgstr "säännöllinen lauseke:"
+
+#. Resource IDs: (60443)
+msgid "runs the custom command 0"
+msgstr "suorittaa mukautetun komennon 0"
+
+#. Resource IDs: (60446)
+msgid "runs the custom command 1"
+msgstr "suorittaa mukautetun komennon 1"
+
+#. Resource IDs: (60449)
+msgid "runs the custom command 2"
+msgstr "suorittaa mukautetun komennon 2"
+
+#. Resource IDs: (60452)
+msgid "runs the custom command 3"
+msgstr "suorittaa mukautetun komennon 3"
+
+#. Resource IDs: (60455)
+msgid "runs the custom command 4"
+msgstr "suorittaa mukautetun komennon 4"
+
+#. Resource IDs: (60458)
+msgid "runs the custom command 5"
+msgstr "suorittaa mukautetun komennon 5"
+
+#. Resource IDs: (60461)
+msgid "runs the custom command 6"
+msgstr "suorittaa mukautetun komennon 6"
+
+#. Resource IDs: (60464)
+msgid "runs the custom command 7"
+msgstr "suorittaa mukautetun komennon 7"
+
+#. Resource IDs: (60467)
+msgid "runs the custom command 8"
+msgstr "suorittaa mukautetun komennon 8"
+
+#. Resource IDs: (60470)
+msgid "runs the custom command 9"
+msgstr "suorittaa mukautetun komennon 9"
+
+#. Resource IDs: (60574)
+msgid "toggles folding all levels in the whole document"
+msgstr "vaihtaa koko asiakirjan kaikkien tasojen taittamista"
+
+#. Resource IDs: (60577)
+msgid "toggles folding at level 0 in the whole document"
+msgstr "vaihtaa taittamisen tasolla 0 koko asiakirjassa"
+
+#. Resource IDs: (60580)
+msgid "toggles folding at level 1 in the whole document"
+msgstr "vaihtaa taittamisen tasolla 1 koko asiakirjassa"
+
+#. Resource IDs: (60583)
+msgid "toggles folding at level 2 in the whole document"
+msgstr "vaihtaa taittamisen tasolla 2 koko asiakirjassa"
+
+#. Resource IDs: (60586)
+msgid "toggles folding at level 3 in the whole document"
+msgstr "vaihtaa taittamisen tasolla 3 koko asiakirjassa"
+
+#. Resource IDs: (60589)
+msgid "toggles folding at level 4 in the whole document"
+msgstr "vaihtaa taittamisen tasolla 4 koko asiakirjassa"
+
+#. Resource IDs: (60592)
+msgid "toggles folding at level 5 in the whole document"
+msgstr "vaihtaa taittamisen tasolla 5 koko asiakirjassa"
+
+#. Resource IDs: (60595)
+msgid "toggles folding at level 6 in the whole document"
+msgstr "vaihtaa taittamisen tasolla 6 koko asiakirjassa"
+
+#. Resource IDs: (60598)
+msgid "toggles folding at level 7 in the whole document"
+msgstr "vaihtaa taittamisen tasolla 7 koko asiakirjassa"
+
+#. Resource IDs: (60601)
+msgid "toggles folding at level 8 in the whole document"
+msgstr "vaihtaa taittamisen tasolla 8 koko asiakirjassa"
+
+#. Resource IDs: (60604)
+msgid "toggles folding at level 9 in the whole document"
+msgstr "vaihtaa taittamisen tasolla 9 koko asiakirjassa"
+
+#. Resource IDs: (280)
+msgid "too many files to show ({0})"
+msgstr "liian monta tiedostoa näytettäväksi ({0})"
+
+#. Resource IDs: (60568)
+msgid "turn on folding"
+msgstr "kytke taitto päälle"
+
+#. Resource IDs: (60571)
+msgid "turns off folding"
+msgstr "kytke taitto pois"
+
+#. Resource IDs: (258)
+#, c-format
+msgid "{ %d lines }"
+msgstr "{ %d riviä }"
+
+#~ msgid ""
+#~ "click here to\n"
+#~ "follow URL"
+#~ msgstr ""
+#~ "hier klicken um\n"
+#~ "URL zu öffnen"
+
+#~ msgid "Lines"
+#~ msgstr "Zeilen"
+
+#~ msgid "Ctrl+Doubleclick to open the link in the default browser"
+#~ msgstr "Ctrl+Doppelklick um den Link im Standardbrowser zu öffnen"
+
+#~ msgid "Configure"
+#~ msgstr "Konfigurieren"
+
+#~ msgid "Default Encoding"
+#~ msgstr "Default Kodierung"
+
+#~ msgid "Set Encoding"
+#~ msgstr "Setze Kodierung"
