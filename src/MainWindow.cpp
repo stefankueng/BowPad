@@ -953,6 +953,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         }
         break;
         case WM_MOUSEWHEEL:
+        case WM_MOUSEHWHEEL:
         {
             POINT pt = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
             RECT  rc;
@@ -3210,19 +3211,19 @@ LPARAM CMainWindow::HandleMouseMsg(const SCNotification& scn)
         }
         break;
         case WM_MOUSEWHEEL:
+        case WM_MOUSEHWHEEL:
         {
-            if (scn.modifiers == SCMOD_SHIFT)
+            if (scn.modifiers == SCMOD_SHIFT || scn.modificationType == WM_MOUSEHWHEEL)
             {
                 static int delta = 0;
                 delta += GET_WHEEL_DELTA_WPARAM(scn.wParam);
                 auto charsToScroll = std::abs(delta / 40);
                 for (int i = 0; i < charsToScroll; ++i)
-                    SendMessage(m_editor, WM_HSCROLL, delta < 0 ? SB_LINERIGHT : SB_LINELEFT, 0);
+                    SendMessage(m_editor, WM_HSCROLL, (scn.modificationType == WM_MOUSEHWHEEL ? delta > 0 : delta < 0) ? SB_LINERIGHT : SB_LINELEFT, 0);
                 delta = delta % 40;
-                return TRUE;
+                return FALSE;
             }
         }
-        break;
         default:
             break;
     }
