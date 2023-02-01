@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2015-2017, 2020-2022 - Stefan Kueng
+// Copyright (C) 2015-2017, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -434,6 +434,7 @@ HRESULT CCmdSpellCheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, 
         hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
+        pCollection->Clear();
 
         for (wchar_t i = 'A'; i <= 'Z'; ++i)
         {
@@ -458,7 +459,7 @@ HRESULT CCmdSpellCheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, 
         hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
-
+        pCollection->Clear();
         // populate the dropdown with the languages
         wchar_t buf[1024] = {};
         for (const auto& lang : g_languages)
@@ -551,6 +552,7 @@ HRESULT CCmdSpellCheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
         hr = pPropVarCurrentValue->punkVal->QueryInterface(IID_PPV_ARGS(&pCollection));
         if (CAppUtils::FailedShowMessage(hr))
             return hr;
+        pCollection->Clear();
 
         // Create a property set for the category.
         CPropertySet* pCat;
