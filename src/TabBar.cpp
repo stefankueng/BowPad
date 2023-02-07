@@ -978,10 +978,6 @@ COLORREF CTabBar::GetTabColor(UINT item) const
     nmHdr.hdr.idFrom   = reinterpret_cast<UINT_PTR>(this);
     nmHdr.tabOrigin    = item;
     COLORREF clr       = static_cast<COLORREF>(::SendMessage(m_hParent, WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&nmHdr)));
-    if (clr == 0 || CTheme::Instance().IsHighContrastMode())
-    {
-        clr = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
-    }
     return clr;
 }
 

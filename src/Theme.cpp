@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020-2021, 2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -135,25 +135,30 @@ COLORREF CTheme::GetThemeColor(COLORREF clr, bool fixed /*= false*/) const
 {
     if (m_dark || (fixed && m_isHighContrastModeDark))
     {
-        auto cIt = m_colorMap.find(clr);
-        if (cIt != m_colorMap.end())
-            return cIt->second;
-
-        float h, s, l;
-        GDIHelpers::RGBtoHSL(clr, h, s, l);
-        l = 100.0f - l;
-        if (!m_isHighContrastModeDark)
-        {
-            // to avoid too much contrast, prevent
-            // too dark and too bright colors.
-            // this is because in dark mode, contrast is
-            // much more visible.
-            l = std::clamp(l, 5.0f, 90.0f);
-        }
-        return GDIHelpers::HSLtoRGB(h, s, l);
+        return GetDarkColor(clr);
     }
 
     return clr;
+}
+
+COLORREF CTheme::GetDarkColor(COLORREF clr) const
+{
+    auto cIt = m_colorMap.find(clr);
+    if (cIt != m_colorMap.end())
+        return cIt->second;
+
+    float h, s, l;
+    GDIHelpers::RGBtoHSL(clr, h, s, l);
+    l = 100.0f - l;
+    if (!m_isHighContrastModeDark)
+    {
+        // to avoid too much contrast, prevent
+        // too dark and too bright colors.
+        // this is because in dark mode, contrast is
+        // much more visible.
+        l = std::clamp(l, 5.0f, 90.0f);
+    }
+    return GDIHelpers::HSLtoRGB(h, s, l);
 }
 
 int CTheme::RegisterThemeChangeCallback(ThemeChangeCallback&& cb)

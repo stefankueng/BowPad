@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016, 2020-2021 Stefan Kueng
+// Copyright (C) 2013-2014, 2016, 2020-2021, 2023 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,20 +30,21 @@ public:
     static CTheme& Instance();
 
     /// call this on every WM_SYSCOLORCHANGED message
-    void     OnSysColorChanged();
-    void     SetDarkTheme(bool b = true);
-    bool     IsDarkTheme() const { return m_dark; }
-    bool     IsHighContrastMode() const;
-    bool     IsHighContrastModeDark() const;
-    COLORREF GetThemeColor(COLORREF clr, bool fixed = false) const;
-    int      RegisterThemeChangeCallback(ThemeChangeCallback&& cb);
-    bool     RemoveRegisteredCallback(int id);
+    void           OnSysColorChanged();
+    void           SetDarkTheme(bool b = true);
+    bool           IsDarkTheme() const { return m_dark; }
+    bool           IsHighContrastMode() const;
+    bool           IsHighContrastModeDark() const;
+    COLORREF       GetThemeColor(COLORREF clr, bool fixed = false) const;
+    COLORREF       GetDarkColor(COLORREF clr) const;
+    int            RegisterThemeChangeCallback(ThemeChangeCallback&& cb);
+    bool           RemoveRegisteredCallback(int id);
 
     /// sets the theme for a whole dialog. For dark mode, the
     /// windows are subclassed if necessary. For normal mode,
     /// subclassing is removed to ensure the behavior is
     /// identical to the original.
-    static bool SetThemeForDialog(HWND hWnd, bool bDark);
+    static bool    SetThemeForDialog(HWND hWnd, bool bDark);
 
 private:
     void                    Load();

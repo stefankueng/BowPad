@@ -53,6 +53,7 @@
 #include <future>
 #include <regex>
 #include <Shobjidl.h>
+#include <dwmapi.h>
 
 IUIFramework* g_pFramework = nullptr; // Reference to the Ribbon framework.
 
@@ -1055,6 +1056,10 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmHdr, WPARAM /*wParam*/, L
                 if (m_docManager.HasDocumentID(docId))
                 {
                     auto clr = GetColorForDocument(docId);
+                    if (clr == 0 || CTheme::Instance().IsHighContrastMode())
+                    {
+                        clr = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_3DFACE));
+                    }
                     return CTheme::Instance().GetThemeColor(clr, true);
                 }
             }
