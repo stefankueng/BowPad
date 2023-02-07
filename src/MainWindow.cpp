@@ -3515,6 +3515,23 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     SetFocus(m_editor);
     m_editor.Scintilla().GrabFocus();
     UpdateStatusBar(true);
+
+    if (IsWindows10OrGreater() && CIniSettings::Instance().GetInt64(L"View", L"CaptionColorFollowsTabColor", 0) != 0)
+    {
+        auto clr = GetColorForDocument(docID);
+        if (clr != 0 && !CTheme::Instance().IsHighContrastMode())
+        {
+            clr = CTheme::Instance().GetDarkColor(clr);
+#ifdef DWMWA_COLOR_DEFAULT
+#    if NTDDI_VERSION >= 0x0A00000B
+            DwmSetWindowAttribute(*this, DWMWA_CAPTION_COLOR, &clr, sizeof(clr));
+            DwmSetWindowAttribute(*this, DWMWA_TEXT_COLOR, &clr, sizeof(clr));
+            DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &clr, sizeof(clr));
+#    endif
+#endif
+        }
+    }
+
     auto ds = m_docManager.HasFileChanged(docID);
     if (ds == DocModifiedState::Modified)
     {
