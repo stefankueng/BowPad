@@ -199,7 +199,7 @@ void CCmdSpellCheck::Check()
         auto start = GetTickCount64();
         while (textRange.chrg.cpMax < lastPos)
         {
-            if (GetTickCount64() - start > 300)
+            if (GetTickCount64() - start > 100)
             {
                 m_lastCheckedPos = textRange.chrg.cpMax;
                 if (g_checkTimer)
