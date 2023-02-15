@@ -3525,7 +3525,6 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
 #ifdef DWMWA_COLOR_DEFAULT
 #    if NTDDI_VERSION >= 0x0A00000B
             DwmSetWindowAttribute(*this, DWMWA_CAPTION_COLOR, &clr, sizeof(clr));
-            DwmSetWindowAttribute(*this, DWMWA_TEXT_COLOR, &clr, sizeof(clr));
             DwmSetWindowAttribute(*this, DWMWA_BORDER_COLOR, &clr, sizeof(clr));
 #    endif
 #endif
