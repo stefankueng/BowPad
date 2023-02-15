@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2020-2022 - Stefan Kueng
+// Copyright (C) 2014-2016, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,8 +32,9 @@ CCmdBookmarks::CCmdBookmarks(void* obj)
     m_bookmarks.clear();
     for (decltype(maxFiles) fileIndex = 0; fileIndex < maxFiles; ++fileIndex)
     {
-        std::wstring sKey    = CStringUtils::Format(L"file%d", fileIndex);
-        std::wstring sBmData = settings.GetString(L"bookmarks", sKey.c_str(), L"");
+        std::wstring sKey           = CStringUtils::Format(L"file%d", fileIndex);
+        std::wstring sKeyLastOpened = sKey + L"LastOpened";
+        std::wstring sBmData        = settings.GetString(L"bookmarks", sKey.c_str(), L"");
         if (!sBmData.empty())
         {
             std::vector<std::wstring> tokens;
@@ -43,9 +44,10 @@ CCmdBookmarks::CCmdBookmarks(void* obj)
                 const std::wstring& filepath = tokens[0];
                 if (tokens.size() > 1)
                 {
-                    auto& lines = m_bookmarks[filepath];
+                    auto& [time, lines] = m_bookmarks[filepath];
                     for (decltype(tokens.size()) li = 1; li < tokens.size(); ++li)
                         lines.push_back(std::stoi(tokens[li]));
+                    time = settings.GetInt64(L"bookmarks", sKeyLastOpened.c_str(), 0);
                 }
             }
         }
@@ -74,7 +76,7 @@ void CCmdBookmarks::OnDocumentClose(DocID id)
 
     if (!bookmarkLines.empty())
     {
-        m_bookmarks[doc.m_path] = std::move(bookmarkLines);
+        m_bookmarks[doc.m_path] = std::make_tuple(std::time(nullptr), std::move(bookmarkLines));
         bModified               = true;
     }
 
@@ -82,21 +84,33 @@ void CCmdBookmarks::OnDocumentClose(DocID id)
     {
         // Save the bookmarks to the ini file
         int maxFiles = static_cast<int>(settings.GetInt64(L"bookmarks", L"maxfiles", 30));
+
         int fileNum  = 0;
         if (maxFiles == 0)
             return;
+        while (m_bookmarks.size() >= maxFiles)
+        {
+            // find the oldest one and remove it
+            auto lowest = std::ranges::min_element(m_bookmarks, [&](const auto& a, const auto& b) {
+                return std::get<0>(a.second) < std::get<0>(b.second);
+            });
+            m_bookmarks.erase(lowest);
+        }
+
         std::wstring bmValue;
-        for (const auto& [path, lines] : m_bookmarks)
+        for (const auto& [path, tup] : m_bookmarks)
         {
             bmValue = path;
             assert(!bmValue.empty());
-            for (const auto lineNr : lines)
+            for (const auto lineNr : std::get<1>(tup))
             {
                 bmValue += L'*';
                 bmValue += std::to_wstring(lineNr);
             }
-            std::wstring sKey = CStringUtils::Format(L"file%d", fileNum);
+            std::wstring sKey           = CStringUtils::Format(L"file%d", fileNum);
+            std::wstring sKeyLastOpened = sKey + L"LastOpened";
             settings.SetString(L"bookmarks", sKey.c_str(), bmValue.c_str());
+            settings.SetInt64(L"bookmarks", sKeyLastOpened.c_str(), std::get<0>(tup));
             ++fileNum;
             if (fileNum >= maxFiles)
                 break;
@@ -115,7 +129,7 @@ void CCmdBookmarks::OnDocumentOpen(DocID id)
     auto it = m_bookmarks.find(doc.m_path);
     if (it != m_bookmarks.end())
     {
-        const auto& lines = it->second;
+        const auto& [time, lines] = it->second;
         for (const auto line : lines)
         {
             Scintilla().MarkerAdd(line, MARK_BOOKMARK);

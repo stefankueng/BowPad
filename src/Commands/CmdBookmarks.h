@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020-2022 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class CCmdBookmarks : public ICommand
         }
     };
 
-    using BookmarkContainer = std::map<std::wstring, std::vector<sptr_t>, CaseInsensitiveLess>;
+    using BookmarkContainer = std::map<std::wstring, std::tuple<std::time_t, std::vector<sptr_t>>, CaseInsensitiveLess>;
 
 public:
     CCmdBookmarks(void* obj);
