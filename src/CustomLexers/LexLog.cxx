@@ -48,18 +48,22 @@ enum LogStyles
     Block,
     String,
     Number,
+    Date,
     InfoDefault,
     InfoBlock,
     InfoString,
     InfoNumber,
+    InfoDate,
     WarnDefault,
     WarnBlock,
     WarnString,
     WarnNumber,
+    WarnDate,
     ErrorDefault,
     ErrorBlock,
     ErrorString,
     ErrorNumber,
+    ErrorDate,
 };
 
 enum LogStates
@@ -71,38 +75,38 @@ enum LogStates
     Error
 };
 
-//static bool IsAWordChar(const int ch)
+// static bool IsAWordChar(const int ch)
 //{
-//    return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '$');
-//}
+//     return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '$');
+// }
 
-//static LogStates GetState(LogStyles style)
+// static LogStates GetState(LogStyles style)
 //{
-//    switch (style)
-//    {
-//        case LogStyles::Default:
-//        case LogStyles::Block:
-//        case LogStyles::String:
-//        case LogStyles::Number:
-//            return LogStates::Debug;
-//        case LogStyles::InfoDefault:
-//        case LogStyles::InfoBlock:
-//        case LogStyles::InfoString:
-//        case LogStyles::InfoNumber:
-//            return LogStates::Info;
-//        case LogStyles::WarnDefault:
-//        case LogStyles::WarnBlock:
-//        case LogStyles::WarnString:
-//        case LogStyles::WarnNumber:
-//            return LogStates::Warn;
-//        case LogStyles::ErrorDefault:
-//        case LogStyles::ErrorBlock:
-//        case LogStyles::ErrorString:
-//        case LogStyles::ErrorNumber:
-//            return LogStates::Error;
-//    }
-//    return LogStates::Debug;
-//}
+//     switch (style)
+//     {
+//         case LogStyles::Default:
+//         case LogStyles::Block:
+//         case LogStyles::String:
+//         case LogStyles::Number:
+//             return LogStates::Debug;
+//         case LogStyles::InfoDefault:
+//         case LogStyles::InfoBlock:
+//         case LogStyles::InfoString:
+//         case LogStyles::InfoNumber:
+//             return LogStates::Info;
+//         case LogStyles::WarnDefault:
+//         case LogStyles::WarnBlock:
+//         case LogStyles::WarnString:
+//         case LogStyles::WarnNumber:
+//             return LogStates::Warn;
+//         case LogStyles::ErrorDefault:
+//         case LogStyles::ErrorBlock:
+//         case LogStyles::ErrorString:
+//         case LogStyles::ErrorNumber:
+//             return LogStates::Error;
+//     }
+//     return LogStates::Debug;
+// }
 
 bool hasTokenAsWord(const std::string& token, const std::string_view& sLine)
 {
@@ -179,6 +183,21 @@ LogStyles GetLogStyle(LogStyles style, LogStates state)
                     return LogStyles::WarnNumber;
                 case LogStates::Error:
                     return LogStyles::ErrorNumber;
+            }
+        case LogStyles::Date:
+            switch (state)
+            {
+                default:
+                case LogStates::None:
+                    return style;
+                case LogStates::Debug:
+                    return style;
+                case LogStates::Info:
+                    return LogStyles::InfoDate;
+                case LogStates::Warn:
+                    return LogStyles::WarnDate;
+                case LogStates::Error:
+                    return LogStyles::ErrorDate;
             }
         case InfoDefault:
             break;
@@ -277,7 +296,7 @@ public:
 
     Sci_Position SCI_METHOD PropertySet(const char* key, const char* val) override;
 
-    const char* SCI_METHOD PropertyGet(const char* key) override
+    const char* SCI_METHOD  PropertyGet(const char* key) override
     {
         return osSimple.PropertyGet(key);
     }
@@ -292,9 +311,9 @@ public:
         return {};
     }
 
-    void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess) override;
+    void SCI_METHOD  Lex(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess) override;
 
-    void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess) override;
+    void SCI_METHOD  Fold(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess) override;
 
     void* SCI_METHOD PrivateCall(int, void*) override
     {
@@ -339,15 +358,15 @@ Sci_Position SCI_METHOD LexerLog::PropertySet(const char* key, const char* val)
 
 void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess)
 {
-    bool   numberIsHex = false;
-    size_t lineSize    = 1000;
-    auto   line        = std::make_unique<char[]>(lineSize);
+    bool         numberIsHex = false;
+    size_t       lineSize    = 1000;
+    auto         line        = std::make_unique<char[]>(lineSize);
 
     LexAccessor  styler(pAccess);
     StyleContext sc(startPos, length, initStyle, styler);
 
-    int       bracketStart = 0;
-    LogStates logState     = LogStates::None;
+    int          bracketStart = 0;
+    LogStates    logState     = LogStates::None;
     for (; sc.More(); sc.Forward())
     {
         if (sc.atLineStart)
@@ -384,7 +403,7 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
                 if (hasTokenAsWord(token, sLine))
                     logState = LogStates::Error;
             }
-            sc.SetState(GetLogStyle(LogStyles::Default, logState));
+            sc.SetState(GetLogStyle(IsADigit(sc.ch) ? LogStyles::Date : LogStyles::Default, logState));
         }
         // Determine if the current state should terminate.
         switch (sc.state)
@@ -447,6 +466,16 @@ void SCI_METHOD LexerLog::Lex(Sci_PositionU startPos, Sci_Position length, int i
                 if (sc.atLineEnd)
                 {
                     sc.ChangeState(GetLogStyle(LogStyles::Block, logState));
+                    sc.ForwardSetState(GetLogStyle(LogStyles::Default, logState));
+                }
+                break;
+            case LogStyles::Date:
+            case LogStyles::InfoDate:
+            case LogStyles::WarnDate:
+            case LogStyles::ErrorDate:
+                if (!IsADigit(sc.chNext) && sc.chNext != '/' && sc.chNext != '.' &&
+                    sc.chNext != ' ' && sc.chNext != ':' && sc.chNext != '-')
+                {
                     sc.ForwardSetState(GetLogStyle(LogStyles::Default, logState));
                 }
                 break;
