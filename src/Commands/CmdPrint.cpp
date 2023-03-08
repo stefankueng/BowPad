@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2017, 2020-2022 - Stefan Kueng
+// Copyright (C) 2013, 2015-2017, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,12 +16,14 @@
 //
 #include "stdafx.h"
 #include "CmdPrint.h"
-#include "Scintilla.h"
 #include "IniSettings.h"
-#include "Theme.h"
 #include "OnOutOfScope.h"
+#include "Scintilla.h"
+#include "Theme.h"
 
 #include <Commdlg.h>
+
+#include "../ext/scintilla/include/ScintillaStructures.h"
 
 void CCmdPrint::Print(bool bShowDlg) const
 {
@@ -202,7 +204,7 @@ void CCmdPrint::Print(bool bShowDlg) const
     }
 
     // We must subtract the physical margins from the printable area
-    Sci_RangeToFormatFull frPrint{};
+    Scintilla::RangeToFormatFull frPrint{};
     frPrint.hdc           = hdc;
     frPrint.hdcTarget     = hdc;
     frPrint.rc.left       = rectMargins.left - rectPhysMargins.left;

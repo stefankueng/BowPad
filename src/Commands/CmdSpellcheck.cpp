@@ -15,21 +15,22 @@
 // See <http://www.gnu.org/licenses/> for a copy of the full license text
 //
 #include "stdafx.h"
-#include "BowPad.h"
 #include "CmdSpellcheck.h"
+#include "AppUtils.h"
+#include "BowPad.h"
+#include "DebugOutput.h"
+#include "LexStyles.h"
+#include "OnOutOfScope.h"
+#include "PropertySet.h"
+#include "ResString.h"
+#include "SciLexer.h"
 #include "ScintillaWnd.h"
 #include "StringUtils.h"
 #include "UnicodeUtils.h"
-#include "LexStyles.h"
-#include "DebugOutput.h"
-#include "AppUtils.h"
-#include "PropertySet.h"
-#include "SciLexer.h"
-#include "OnOutOfScope.h"
-#include "ResString.h"
+#include "../ext/scintilla/include/ScintillaStructures.h"
 
-#include <spellcheck.h>
 #include <Richedit.h>
+#include <spellcheck.h>
 
 extern IUIFramework* g_pFramework;
 extern UINT32        g_contextID;
@@ -182,7 +183,7 @@ void CCmdSpellCheck::Check()
             Scintilla().SetWordChars(g_sentenceChars.c_str());
         else
             Scintilla().SetWordChars(g_wordChars.c_str());
-        Sci_TextRangeFull textRange{};
+        Scintilla::TextRangeFull textRange{};
         auto              firstLine = Scintilla().FirstVisibleLine();
         auto              lastLine  = firstLine + Scintilla().LinesOnScreen();
         auto              firstPos  = static_cast<Sci_Position>(Scintilla().PositionFromLine(firstLine));
@@ -341,7 +342,7 @@ void CCmdSpellCheck::Check()
                             ULONG errStart = 0;
                             spellingError->get_StartIndex(&errStart);
 
-                            Sci_TextRangeFull wordRange{};
+                            Scintilla::TextRangeFull wordRange{};
                             wordRange.chrg.cpMin = textRange.chrg.cpMin + errStart;
                             wordRange.chrg.cpMax = wordRange.chrg.cpMin + errLen;
                             wordRange.lpstrText  = m_textBuffer.get();

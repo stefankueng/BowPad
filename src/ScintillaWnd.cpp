@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2022 - Stefan Kueng
+// Copyright (C) 2013-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,24 +17,26 @@
 #include "stdafx.h"
 #include "ScintillaWnd.h"
 #include "BowPadUI.h"
-#include "UnicodeUtils.h"
+#include "CommandHandler.h"
+#include "DarkModeHelper.h"
+#include "DocScroll.h"
+#include "Document.h"
+#include "DPIAware.h"
+#include "Lexilla.h"
+#include "LexStyles.h"
+#include "SciLexer.h"
 #include "StringUtils.h"
 #include "Theme.h"
-#include "DarkModeHelper.h"
-#include "SciLexer.h"
-#include "Document.h"
-#include "LexStyles.h"
-#include "DocScroll.h"
-#include "CommandHandler.h"
-#include "DPIAware.h"
-#include "../ext/scintilla/include/ILexer.h"
+#include "UnicodeUtils.h"
 #include "../ext/lexilla/lexlib/LexerModule.h"
-#include "Lexilla.h"
+#include "../ext/scintilla/include/ILexer.h"
+#include "../ext/scintilla/include/ScintillaStructures.h"
 
+#include <chrono>
 #include <UIRibbon.h>
 #include <UIRibbonPropertyHelpers.h>
 #include <uxtheme.h>
-#include <chrono>
+
 
 constexpr Scintilla::AutomaticFold operator|(Scintilla::AutomaticFold a, Scintilla::AutomaticFold b) noexcept
 {
@@ -1497,7 +1499,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
                 m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
                 m_selTextMarkerCount = 0;
             }
-            Sci_TextToFindFull findText{};
+            Scintilla::TextToFindFull findText{};
             findText.chrg.cpMin     = lastStopPosition;
             findText.chrg.cpMax     = m_scintilla.Length();
             findText.lpstrText      = origSelText.c_str();
@@ -2043,7 +2045,7 @@ FindResult CScintillaWnd::FindText(const char* text, sptr_t start, sptr_t end, S
 {
     FindResult         returnValue = {0};
 
-    Sci_TextToFindFull search{};
+    Scintilla::TextToFindFull search{};
     search.lpstrText  = const_cast<char*>(text);
     search.chrg.cpMin = start;
     search.chrg.cpMax = end;
@@ -2063,7 +2065,7 @@ FindResult CScintillaWnd::FindText(const char* text, sptr_t start, sptr_t end, S
 
 sptr_t CScintillaWnd::FindText(const std::string& toFind, sptr_t startPos, sptr_t endPos) const
 {
-    Sci_TextToFindFull ttf = {0};
+    Scintilla::TextToFindFull ttf = {0};
     ttf.chrg.cpMin         = startPos;
     ttf.chrg.cpMax         = endPos;
     ttf.lpstrText          = const_cast<char*>(toFind.c_str());
