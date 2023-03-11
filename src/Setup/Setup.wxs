@@ -67,7 +67,7 @@
          for Win11 -->
         <?if $(env.WixPlatform) = "x64" or $(env.WixPlatform) = "arm64"?>
         <Property Id="WIN11FOUND" Secure="yes">
-            <DirectorySearch Id="searchSystem" Path="[ProgramFiles64Folder]" AssignToProperty="yes">
+            <DirectorySearch Id="searchSystem" Path="[System64Folder]" AssignToProperty="yes">
                 <FileSearch Id="searchFile" Name="shell32.dll" MinVersion="6.3.21999.0"/>
             </DirectorySearch>
         </Property>
