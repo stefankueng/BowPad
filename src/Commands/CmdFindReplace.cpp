@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2022 - Stefan Kueng
+// Copyright (C) 2013-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -3014,13 +3014,24 @@ bool CCmdFindPrev::Execute()
         ttf.chrg.cpMin--;
     ttf.chrg.cpMax = 0;
     ttf.lpstrText  = g_findString.c_str();
+    if ((g_searchFlags & Scintilla::FindOption::RegExp) != Scintilla::FindOption::None)
+    {
+        // in regex mode, always search forwards
+        ttf.chrg.cpMin = static_cast<Sci_PositionCR>(Scintilla().CurrentPos());
+        ttf.chrg.cpMax = static_cast<Sci_PositionCR>(Scintilla().Length());
+    }
     sptr_t findRet = Scintilla().FindText(g_searchFlags, &ttf);
     if (findRet == -1)
     {
         // Retry from the end of the doc.
         ttf.chrg.cpMax = ttf.chrg.cpMin + 1;
         ttf.chrg.cpMin = static_cast<Sci_PositionCR>(Scintilla().Length());
-        findRet        = Scintilla().FindText(g_searchFlags, &ttf);
+        if ((g_searchFlags & Scintilla::FindOption::RegExp) != Scintilla::FindOption::None)
+        {
+            ttf.chrg.cpMax = ttf.chrg.cpMin;
+            ttf.chrg.cpMin = 0;
+        }
+        findRet = Scintilla().FindText(g_searchFlags, &ttf);
     }
     if (findRet >= 0)
         Center(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
@@ -3046,6 +3057,8 @@ bool CCmdFindSelectedNext::Execute()
     }
     g_findString       = selText;
     g_sHighlightString = g_findString;
+    // only use basic search flags
+    g_searchFlags      = static_cast<Scintilla::FindOption>(static_cast<int>(g_searchFlags) & 0xFF);
 
     Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(Scintilla().CurrentPos());
@@ -3087,6 +3100,8 @@ bool CCmdFindSelectedPrev::Execute()
     }
     g_findString       = selText;
     g_sHighlightString = g_findString;
+    // only use basic search flags
+    g_searchFlags      = static_cast<Scintilla::FindOption>(static_cast<int>(g_searchFlags) & 0xFF);
 
     Sci_TextToFind ttf = {0};
     ttf.chrg.cpMin     = static_cast<Sci_PositionCR>(Scintilla().CurrentPos());
