@@ -37,7 +37,6 @@
 #include <UIRibbonPropertyHelpers.h>
 #include <uxtheme.h>
 
-
 constexpr Scintilla::AutomaticFold operator|(Scintilla::AutomaticFold a, Scintilla::AutomaticFold b) noexcept
 {
     return static_cast<Scintilla::AutomaticFold>(static_cast<int>(a) | static_cast<int>(b));
@@ -2043,7 +2042,7 @@ bool CScintillaWnd::GetXmlMatchedTagsPos(XmlMatchedTagsPos& xmlTags) const
 
 FindResult CScintillaWnd::FindText(const char* text, sptr_t start, sptr_t end, Scintilla::FindOption flags) const
 {
-    FindResult         returnValue = {0};
+    FindResult                returnValue = {0};
 
     Scintilla::TextToFindFull search{};
     search.lpstrText  = const_cast<char*>(text);
@@ -2066,9 +2065,9 @@ FindResult CScintillaWnd::FindText(const char* text, sptr_t start, sptr_t end, S
 sptr_t CScintillaWnd::FindText(const std::string& toFind, sptr_t startPos, sptr_t endPos) const
 {
     Scintilla::TextToFindFull ttf = {0};
-    ttf.chrg.cpMin         = startPos;
-    ttf.chrg.cpMax         = endPos;
-    ttf.lpstrText          = const_cast<char*>(toFind.c_str());
+    ttf.chrg.cpMin                = startPos;
+    ttf.chrg.cpMax                = endPos;
+    ttf.lpstrText                 = const_cast<char*>(toFind.c_str());
     return m_scintilla.FindTextFull(Scintilla::FindOption::None, &ttf);
 }
 
@@ -2670,6 +2669,9 @@ void CScintillaWnd::EnableChangeHistory() const
                                                                     static_cast<int>(Scintilla::ChangeHistoryOption::Markers));
         width         = CDPIAware::Instance().Scale(*this, 2);
     }
+
+    auto symbols = (1 << SC_MARKNUM_HISTORY_REVERTED_TO_ORIGIN) | (1 << SC_MARKNUM_HISTORY_SAVED) | (1 << SC_MARKNUM_HISTORY_MODIFIED) | (1 << SC_MARKNUM_HISTORY_REVERTED_TO_MODIFIED);
+    m_scintilla.SetMarginMaskN(SC_MARGE_HISTORY, symbols);
     m_scintilla.SetMarginWidthN(SC_MARGE_HISTORY, width);
     m_scintilla.SetChangeHistory(historyOption);
 }
