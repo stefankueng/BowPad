@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2023-01-07 10:48+0100\n"
+"PO-Revision-Date: 2023-04-15 09:47+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -1668,6 +1668,11 @@ msgstr "Geht zum vorherigen Treffer der letzten Suche"
 #. Resource IDs: (60297, 60647)
 msgid "Multi-Edit"
 msgstr "Multi-Edit"
+
+#. Resource IDs: (281)
+#, c-format
+msgid "Multiedit: %%c%06X%Iu %%rmarkers"
+msgstr "Multiedit: %%c%06X%Iu %%rPositionen"
 
 #. Resource IDs: (60033)
 msgid "N"
