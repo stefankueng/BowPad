@@ -1492,6 +1492,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
         auto selTextDifferent = lastSelText.compare(origSelText.c_str());
         if (selTextDifferent || (lastStopPosition != 0) || edit)
         {
+            int  addSelCount = 0;
             auto start = std::chrono::steady_clock::now();
             if (selTextDifferent)
             {
@@ -1512,7 +1513,10 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
                 if (edit)
                 {
                     if ((origSelStart != findText.chrgText.cpMin) || (origSelEnd != findText.chrgText.cpMax))
+                    {
                         m_scintilla.AddSelection(findText.chrgText.cpMax, findText.chrgText.cpMin);
+                        ++addSelCount;
+                    }
                 }
                 auto line = m_scintilla.LineFromPosition(findText.chrgText.cpMin);
                 m_docScroll.AddLineColor(DOCSCROLLTYPE_SELTEXT, line, selTextColor);
@@ -1532,7 +1536,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
                     }
                 }
             }
-            if (edit)
+            if (edit && addSelCount > 0)
                 m_scintilla.AddSelection(origSelEnd, origSelStart);
             SendMessage(*this, WM_NCPAINT, static_cast<WPARAM>(1), 0);
         }
