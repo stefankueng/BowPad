@@ -1476,6 +1476,11 @@ msgstr ""
 msgid "Multi-Edit"
 msgstr ""
 
+#. Resource IDs: (281)
+#, c-format
+msgid "Multiedit: %%c%06X%Iu %%rmarkers"
+msgstr ""
+
 #. Resource IDs: (60033)
 msgid "N"
 msgstr ""
