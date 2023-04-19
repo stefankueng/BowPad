@@ -373,6 +373,20 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
         break;
         case WM_KEYDOWN:
         {
+            switch (wParam)
+            {
+                case VK_RIGHT:
+                case VK_LEFT:
+                case VK_HOME:
+                case VK_END:
+                    if (Scintilla().SelectionMode() != Scintilla::SelectionMode::Stream)
+                    {
+                        // change to stream mode: converts the rectangular into a multiple selection
+                        Scintilla().SetSelectionMode(Scintilla::SelectionMode::Stream);
+                        // set stream mode again: cancels selection mode, so moving won't extend the selection anymore
+                        Scintilla().SetSelectionMode(Scintilla::SelectionMode::Stream);
+                    }
+            }
             auto ret = SendMessage(GetParent(*this), WM_SCICHAR, wParam, lParam);
             if (ret == 0)
             {
@@ -1493,7 +1507,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
         if (selTextDifferent || (lastStopPosition != 0) || edit)
         {
             int  addSelCount = 0;
-            auto start = std::chrono::steady_clock::now();
+            auto start       = std::chrono::steady_clock::now();
             if (selTextDifferent)
             {
                 m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
