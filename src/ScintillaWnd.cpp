@@ -1167,7 +1167,7 @@ void CScintillaWnd::SetupDefaultStyles() const
         m_scintilla.MarkerSetBack(SC_MARKNUM_HISTORY_SAVED, CTheme::Instance().GetThemeColor(0x00A000, true));
 
         m_scintilla.MarkerSetFore(SC_MARKNUM_HISTORY_MODIFIED, CTheme::Instance().GetThemeColor(0xA0A000, true));
-        m_scintilla.MarkerSetBack(SC_MARKNUM_HISTORY_MODIFIED, CTheme::Instance().GetThemeColor(0x00A000, true));
+        m_scintilla.MarkerSetBack(SC_MARKNUM_HISTORY_MODIFIED, CTheme::Instance().GetThemeColor(0xA0A000, true));
 
         m_scintilla.MarkerSetFore(SC_MARKNUM_HISTORY_REVERTED_TO_MODIFIED, CTheme::Instance().GetThemeColor(0xFF8000, true));
         m_scintilla.MarkerSetBack(SC_MARKNUM_HISTORY_REVERTED_TO_MODIFIED, CTheme::Instance().GetThemeColor(0xFF8000, true));
