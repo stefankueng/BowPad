@@ -940,6 +940,10 @@ msgstr "이 스타일에 대한 파일 확장자로, 세미콜론으로 구분�
 msgid "File is too big to be opened by BowPad"
 msgstr "파일이 너무 커서 BowPad에서 열 수 없습니다"
 
+#. Resource IDs: (279)
+msgid "File tree is empty\r\nno files to show"
+msgstr "파일 트리가 비어 있습니다.\r\n표시할 파일이 없습니다"
+
 #. Resource IDs: (239)
 msgid "Filename required for first file."
 msgstr "첫 번째 파일에 필요한 파일 이름입니다."
@@ -1472,6 +1476,11 @@ msgstr "마지막 검색의 이전 일치 항목으로 이동합니다"
 msgid "Multi-Edit"
 msgstr "다중 편집"
 
+#. Resource IDs: (281)
+#, c-format
+msgid "Multiedit: %%c%06X%Iu %%rmarkers"
+msgstr "다중 편집: %%c%06X%Iu %%r마커"
+
 #. Resource IDs: (60033)
 msgid "N"
 msgstr "N"
@@ -1703,6 +1712,10 @@ msgstr "붙여넣기"
 #. Resource IDs: (60096)
 msgid "Paste Html"
 msgstr "HTML 붙여넣기"
+
+#. Resource IDs: (282)
+msgid "Path"
+msgstr "경로"
 
 #. Resource IDs: (232)
 msgid "Please wait."
@@ -2635,6 +2648,10 @@ msgstr "전체 문서에서 8단계 접기 전환"
 msgid "toggles folding at level 9 in the whole document"
 msgstr "전체 문서에서 9단계 접기 전환"
 
+#. Resource IDs: (280)
+msgid "too many files to show ({0})"
+msgstr "파일이 너무 많아 표시할 수 없음 ({0})"
+
 #. Resource IDs: (60568)
 msgid "turn on folding"
 msgstr "접기 켜기"
@@ -2647,4 +2664,3 @@ msgstr "접기 끄기"
 #, c-format
 msgid "{ %d lines }"
 msgstr "{ %d 줄 }"
-
