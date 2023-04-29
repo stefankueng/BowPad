@@ -244,6 +244,7 @@
 #define IDS_FILETREE_EMPTY              279
 #define IDS_FILETREE_TOO_MANY_FILES     280
 #define IDS_STATUSMULTIEDIT             281
+#define IDS_FINDRESULT_HEADERPATH       282
 #define IDC_SEARCHCOMBO                 1000
 #define IDC_FINDBTN                     1001
 #define IDC_REPLACECOMBO                1002

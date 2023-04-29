@@ -853,17 +853,20 @@ LRESULT CFindReplaceDlg::GetListItemDispInfo(NMLVDISPINFO* pDispInfo) const
                 break;
 
             case 1: // line
-                sTemp = std::to_wstring(item.line + 1);
-                StringCchCopy(pDispInfo->item.pszText, pDispInfo->item.cchTextMax, sTemp.c_str());
-                break;
-
-            case 2: // line text
                 if (m_searchType == IDC_FINDFILES)
                 {
                     auto parent = CPathUtils::GetParentDirectory(m_foundPaths[item.pathIndex]);
                     StringCchCopy(pDispInfo->item.pszText, pDispInfo->item.cchTextMax, parent.c_str());
                 }
                 else
+                {
+                    sTemp = std::to_wstring(item.line + 1);
+                    StringCchCopy(pDispInfo->item.pszText, pDispInfo->item.cchTextMax, sTemp.c_str());
+                }
+                break;
+
+            case 2: // line text
+                if (m_searchType != IDC_FINDFILES)
                     StringCchCopy(pDispInfo->item.pszText, pDispInfo->item.cchTextMax, item.lineText.c_str());
                 break;
             default:
@@ -888,7 +891,7 @@ LRESULT CFindReplaceDlg::DrawListItem(NMLVCUSTOMDRAW* pLVCD)
             switch (pLVCD->iSubItem)
             {
                 case 0: // file
-                case 1: // line
+                case 1: // line/path
                     return CDRF_DODEFAULT;
 
                 case 2: // line text
@@ -2394,7 +2397,7 @@ void CFindReplaceDlg::InitResultsList()
     // SetWindowTheme(hListControl, L"Explorer", nullptr);
     ListView_SetItemCountEx(hListControl, 0, 0);
 
-    if (m_resultsListInitialized)
+    if (m_resultsListInitialized != ResultsType::Unknown && m_resultsListInitialized == m_resultsType)
         return;
 
     auto hListHeader = ListView_GetHeader(hListControl);
@@ -2406,8 +2409,9 @@ void CFindReplaceDlg::InitResultsList()
     ListView_SetExtendedListViewStyle(hListControl, exStyle);
 
     // NOTE: m_searchType or m_resultsType could be set here to adjust the titles if need be.
+    auto      filesOnly = m_resultsType == ResultsType::FileNames;
     ResString sFile(g_hRes, IDS_FINDRESULT_HEADERFILE);
-    ResString sLine(g_hRes, IDS_FINDRESULT_HEADERLINE);
+    ResString sLine(g_hRes, filesOnly ? IDS_FINDRESULT_HEADERPATH : IDS_FINDRESULT_HEADERLINE);
     ResString sLineText(g_hRes, IDS_FINDRESULT_HEADERLINETEXT);
 
     LVCOLUMN  lvc{};
@@ -2417,16 +2421,20 @@ void CFindReplaceDlg::InitResultsList()
     lvc.pszText = const_cast<LPWSTR>(sFile.c_str());
     ListView_InsertColumn(hListControl, 0, &lvc);
     lvc.pszText = const_cast<LPWSTR>(sLine.c_str());
-    lvc.fmt     = LVCFMT_RIGHT;
+    lvc.fmt     = filesOnly ? LVCFMT_LEFT : LVCFMT_RIGHT;
     ListView_InsertColumn(hListControl, 1, &lvc);
-    lvc.fmt     = LVCFMT_LEFT;
-    lvc.pszText = const_cast<LPWSTR>(sLineText.c_str());
-    ListView_InsertColumn(hListControl, 2, &lvc);
+    if (!filesOnly)
+    {
+        lvc.fmt     = LVCFMT_LEFT;
+        lvc.pszText = const_cast<LPWSTR>(sLineText.c_str());
+        ListView_InsertColumn(hListControl, 2, &lvc);
+    }
 
     ListView_SetColumnWidth(hListControl, 0, 200);
-    ListView_SetColumnWidth(hListControl, 1, 70);
-    ListView_SetColumnWidth(hListControl, 2, LVSCW_AUTOSIZE_USEHEADER);
-    m_resultsListInitialized = true;
+    ListView_SetColumnWidth(hListControl, 1, filesOnly ? LVSCW_AUTOSIZE_USEHEADER : 70);
+    if (!filesOnly)
+        ListView_SetColumnWidth(hListControl, 2, LVSCW_AUTOSIZE_USEHEADER);
+    m_resultsListInitialized = m_resultsType;
 }
 
 void CFindReplaceDlg::CheckRegex(bool flash)
@@ -2506,7 +2514,7 @@ void CFindReplaceDlg::DoClose()
     // Some experimentation may be required to find the best default. For now just do size.
     SetWindowPos(*this, nullptr, 0, 0, m_originalSize.cx, m_originalSize.cy,
                  SWP_NOACTIVATE | SWP_NOREDRAW | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
-    m_resultsListInitialized = false;
+    m_resultsListInitialized = ResultsType::Unknown;
 }
 
 void CFindReplaceDlg::OnClose()

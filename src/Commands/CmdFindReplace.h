@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019-2022 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -220,7 +220,7 @@ private:
     bool                            m_open                   = false;
     std::atomic_size_t              m_foundSize              = 0;
     int                             m_themeCallbackId        = 0;
-    bool                            m_resultsListInitialized = false;
+    ResultsType                     m_resultsListInitialized = ResultsType::Unknown;
     std::unique_ptr<CInfoRtfDialog> m_regexHelpDialog        = nullptr;
 
     // Some types usually best avoided while searching.
