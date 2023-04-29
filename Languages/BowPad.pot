@@ -1713,6 +1713,10 @@ msgstr ""
 msgid "Paste Html"
 msgstr ""
 
+#. Resource IDs: (282)
+msgid "Path"
+msgstr ""
+
 #. Resource IDs: (232)
 msgid "Please wait."
 msgstr ""
