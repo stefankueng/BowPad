@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2023-04-15 09:47+0200\n"
+"PO-Revision-Date: 2023-04-29 09:43+0200\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
@@ -1924,6 +1924,10 @@ msgstr "Einfügen"
 #. Resource IDs: (60096)
 msgid "Paste Html"
 msgstr "HTML Einfügen"
+
+#. Resource IDs: (282)
+msgid "Path"
+msgstr "Pfad"
 
 #. Resource IDs: (232)
 msgid "Please wait."
