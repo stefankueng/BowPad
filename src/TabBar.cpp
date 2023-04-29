@@ -751,6 +751,21 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                 bool ok;
                 ok = TabCtrl_GetItemRect(*this, index, &m_currentHoverTabRect) != FALSE;
                 APPVERIFY(ok);
+                RECT rPage{};
+                GetClientRect(*this, &rPage);
+                TabCtrl_AdjustRect(*this, FALSE, &rPage);
+                if (m_spin)
+                {
+                    RECT rcSpin{};
+                    GetWindowRect(m_spin, &rcSpin);
+                    MapWindowPoints(nullptr, *this, reinterpret_cast<LPPOINT>(&rcSpin), 2);
+                    rPage.right      = rcSpin.left;
+                }
+                if (m_currentHoverTabRect.left < rPage.right && m_currentHoverTabRect.right > 0)
+                {
+                    m_currentHoverTabRect.right = min(m_currentHoverTabRect.right, rPage.right);
+                }
+
                 if (oldIndex != -1)
                 {
                     ok = TabCtrl_GetItemRect(*this, oldIndex, &oldRect) != FALSE;
