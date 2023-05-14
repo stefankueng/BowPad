@@ -214,6 +214,7 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     , m_fileTreeVisible(true)
     , m_bPathsToOpenMRU(true)
     , m_tabMoveMod(false)
+    , m_bIgnoreFileChanges(false)
     , m_initLine(0)
     , m_insertionIndex(-1)
     , m_windowRestored(false)
@@ -3548,14 +3549,17 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
         }
     }
 
-    auto ds = m_docManager.HasFileChanged(docID);
-    if (ds == DocModifiedState::Modified)
+    if (!m_bIgnoreFileChanges)
     {
-        ReloadTab(curTab, -1, true);
-    }
-    else if (ds == DocModifiedState::Removed)
-    {
-        HandleOutsideDeletedFile(curTab);
+        auto ds = m_docManager.HasFileChanged(docID);
+        if (ds == DocModifiedState::Modified)
+        {
+            ReloadTab(curTab, -1, true);
+        }
+        else if (ds == DocModifiedState::Removed)
+        {
+            HandleOutsideDeletedFile(curTab);
+        }
     }
 }
 
@@ -3781,7 +3785,8 @@ int CMainWindow::OpenFile(const std::wstring& file, unsigned int openFlags)
 bool CMainWindow::OpenFileAs(const std::wstring& tempPath, const std::wstring& realpath, bool bModified)
 {
     // If we can't open it, not much we can do.
-    if (OpenFile(tempPath, 0) < 0)
+    m_bIgnoreFileChanges = true;
+    OnOutOfScope(m_bIgnoreFileChanges = false;) if (OpenFile(tempPath, 0) < 0)
     {
         DeleteFile(tempPath.c_str());
         return false;
