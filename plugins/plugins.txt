@@ -18,6 +18,10 @@ EditorSettings
 110
 208
 Overrides editor settings for universal and specific file types.\nModify EditorSettings.bpj file for customization.\nwmjordan@163.com\n
+HideBookmarkMargin
+100
+200
+Hides Bookmark Margin by default, click to toggle\nwmjordan@163.com\n
 SearchSelection
 104
 200
