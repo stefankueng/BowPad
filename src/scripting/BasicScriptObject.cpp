@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018, 2020-2022 - Stefan Kueng
+// Copyright (C) 2014-2018, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1619,7 +1619,7 @@ HRESULT BasicScriptObject::ScintillaCommandInvoke(DISPID id, WORD flags, DISPPAR
                 // return value is a string
                 auto len = Scintilla().Call(static_cast<Scintilla::Message>(cmd.cmd), p1.intVal);
                 auto buf = std::make_unique<char[]>(len + 1);
-                Scintilla().Call(static_cast<Scintilla::Message>(cmd.cmd), p1.intVal, reinterpret_cast<sptr_t>(buf.get()));
+                Scintilla().Call(static_cast<Scintilla::Message>(cmd.cmd), cmd.p1 == VT_NULL ? len : p1.intVal, reinterpret_cast<sptr_t>(buf.get()));
                 buf[len]     = 0;
                 ret->vt      = VT_BSTR;
                 ret->bstrVal = _bstr_t(CUnicodeUtils::StdGetUnicode(buf.get()).c_str()).Detach();
