@@ -1,0 +1,36 @@
+// returns the version of the plugin
+// this callback is not optional! If you fail to implement this, the plugin
+// config dialog won't work properly with your plugin
+function Version() { return 100; }
+
+
+// this is the main function that gets executed when the command is run, i.e.
+// the button is clicked
+function Execute()
+{
+    var t = BowPad.SciGetSelText();
+    if (t.length == 0) {
+        t = BowPad.SciGetCurLine();
+    }
+    BowPad.SetClipboardData(t, "");
+    var retry = 1000;
+    while ((t = BowPad.GetClipboardText()).length == 0 && --retry > 0) {
+        /*BowPad.sleep(10);*/
+        BowPad.SetClipboardData(t, "");
+    }
+    if (t.length == 0 && BowPad.GetClipboardText().length == 0) {
+        BowPad.alert("Copy failed");
+        return false;
+    }
+    return true;
+}
+
+// return true if the plugin command is enabled (used for the button)
+// note: not used yet by BowPad, but planned for the future
+function IsEnabled() { return true; }
+
+// return true if the plugin button should appear as checked
+// note: not used yet by BowPad, but planned for the future
+function IsChecked() { return false; }
+
+
