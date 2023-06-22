@@ -1,5 +1,5 @@
-2.8.8.3011
-https://github.com/stefankueng/BowPad/releases/download/2.8.8/BowPad64-2.8.8.msi
-BowPad64-2.8.8.msi
-https://github.com/stefankueng/BowPad/releases/download/2.8.8/BowPad-2.8.8.msi/download
-BowPad-2.8.8.msi
+2.8.9.3017
+https://github.com/stefankueng/BowPad/releases/download/2.8.9/BowPad64-2.8.9.msi
+BowPad64-2.8.9.msi
+https://github.com/stefankueng/BowPad/releases/download/2.8.9/BowPad-2.8.9.msi/download
+BowPad-2.8.9.msi
