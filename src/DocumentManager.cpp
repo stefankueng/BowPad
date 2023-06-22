@@ -324,7 +324,11 @@ void LoadSomeOther(Scintilla::ILoader& edit, int encoding, DWORD lenFile,
     // For other encodings, ask system if there are any invalid characters; note that it will
     // not correctly know if the last character is cut when there are invalid characters inside the text
     int wideLen = MultiByteToWideChar(encoding, (lenFile == -1) ? 0 : MB_ERR_INVALID_CHARS, data, lenFile, nullptr, 0);
-    if (wideLen == 0 && GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
+    auto lastErr = GetLastError();
+    if (wideLen == 0 && lastErr == ERROR_INVALID_FLAGS)
+        wideLen = MultiByteToWideChar(encoding, 0, data, lenFile, nullptr, 0);
+    lastErr = GetLastError();
+    if (wideLen == 0 && lastErr == ERROR_NO_UNICODE_TRANSLATION)
     {
         // Test without last byte
         if (lenFile > 1)
@@ -344,6 +348,11 @@ void LoadSomeOther(Scintilla::ILoader& edit, int encoding, DWORD lenFile,
             // We found a valid text by removing one byte.
             incompleteMultiByteChar = 1;
         }
+    }
+    if (wideLen == 0)
+    {
+        // screw it: load as utf8
+        wideLen = MultiByteToWideChar(CP_UTF8, 0, data, lenFile, nullptr, 0);
     }
     if (wideLen > 0)
     {
