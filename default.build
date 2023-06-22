@@ -206,10 +206,10 @@ BowPad-${verstring}.msi</echo>
     </loadfile>
     <echo file="ext\choco\package\tools\chocolateyInstall.ps1" message="${cinstfile}" />
     <echo>
-      now start an admin console in ext\choco\package and then run
+      now start console in ext\choco\package and then run
       choco pack
       to upload the package, run
-      cpush BowPad-x.x.x.nupkg
+      choco push BowPad-x.x.x.nupkg
     </echo>
   </target>
 
