@@ -60,6 +60,7 @@ public:
     void         Refresh(HTREEITEM refreshRoot, bool force = false, bool expanding = false);
     std::wstring GetPathForHitItem(bool* isDir, bool* isDot) const;
     std::wstring GetPathForSelItem(bool* isDir, bool* isDot) const;
+    std::wstring GetPathForItem(HTREEITEM hItem) const;
     std::wstring GetDirPathForHitItem() const;
 
     void OnThemeChanged(bool bDark) override;

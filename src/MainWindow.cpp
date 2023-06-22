@@ -1311,6 +1311,13 @@ LRESULT CMainWindow::HandleFileTreeEvents(const NMHDR& nmHdr, WPARAM /*wParam*/,
             }
         }
         break;
+        case TVN_GETINFOTIP:
+        {
+            auto pInfoTip = reinterpret_cast<NMTVGETINFOTIPW*>(pNmTv);
+            auto path     = m_fileTree.GetPathForItem(pInfoTip->hItem);
+            lstrcpyn(pInfoTip->pszText, path.c_str(), pInfoTip->cchTextMax);
+        }
+        break;
         default:
             break;
     }

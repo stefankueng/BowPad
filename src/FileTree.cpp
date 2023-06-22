@@ -156,7 +156,7 @@ bool CFileTree::Init(HINSTANCE /*hInst*/, HWND hParent)
     icce.dwSize               = sizeof(icce);
     icce.dwICC                = ICC_TREEVIEW_CLASSES;
     InitCommonControlsEx(&icce);
-    CreateEx(0, WS_VISIBLE | WS_CHILD | WS_TABSTOP | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_TRACKSELECT, hParent, nullptr, WC_TREEVIEW);
+    CreateEx(0, WS_VISIBLE | WS_CHILD | WS_TABSTOP | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_TRACKSELECT | TVS_INFOTIP, hParent, nullptr, WC_TREEVIEW);
     if (!*this)
         return false;
     TreeView_SetExtendedStyle(*this, TVS_EX_AUTOHSCROLL | TVS_EX_DOUBLEBUFFER, TVS_EX_AUTOHSCROLL | TVS_EX_DOUBLEBUFFER);
@@ -686,6 +686,18 @@ std::wstring CFileTree::GetPathForSelItem(bool* isDir, bool* isDot) const
         }
     }
     return std::wstring();
+}
+
+std::wstring CFileTree::GetPathForItem(HTREEITEM hItem) const
+{
+    const FileTreeItem* pTreeItem = GetFileTreeItem(*this, hItem);
+    if (pTreeItem)
+    {
+        if (pTreeItem->maxDummy)
+            return {};
+        return pTreeItem->path;
+    }
+    return {};
 }
 
 std::wstring CFileTree::GetDirPathForHitItem() const
