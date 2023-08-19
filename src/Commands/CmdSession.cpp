@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018, 2020-2022 - Stefan Kueng
+// Copyright (C) 2014-2018, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -130,6 +130,7 @@ void CCmdSessionLoad::OnClose()
             if (sessionPath.empty())
                 continue;
         }
+        auto docOrigPath = doc.m_path;
         if (i == activeTab)
         {
             CPosData pos;
@@ -152,11 +153,11 @@ void CCmdSessionLoad::OnClose()
             {
                 if (title.empty())
                     title = L"empty tab name";
-                filename = title;
+                filename       = title;
                 auto lastSpace = title.rfind(' ');
                 if (lastSpace != std::wstring::npos)
                 {
-                    ResString newRes(g_hRes, IDS_NEW_TABTITLE);
+                    ResString    newRes(g_hRes, IDS_NEW_TABTITLE);
                     std::wstring sNew = newRes;
                     SearchReplace(sNew, L"%s", L"");
                     CStringUtils::trim(sNew);
@@ -175,11 +176,12 @@ void CCmdSessionLoad::OnClose()
             doc.m_bIsDirty     = false;
             doc.m_bNeedsSaving = false;
             SaveDoc(docId, backupPath);
+            doc.m_path = CStringUtils::Format(L"%d%s", saveIndex, filename.c_str());
         }
         settings.SetString(sessionSection(), CStringUtils::Format(L"path%d", saveIndex).c_str(), doc.m_path.c_str());
         settings.SetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", saveIndex).c_str(), static_cast<int>(doc.m_tabSpace));
         settings.SetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", saveIndex).c_str(), static_cast<int>(doc.m_readDir));
-
+        doc.m_path = docOrigPath;
         ++saveIndex;
     }
 }
@@ -233,6 +235,11 @@ void CCmdSessionLoad::RestoreSavedSession() const
         auto origPath = settings.GetString(sessionSection(), CStringUtils::Format(L"origpath%d", fileNum).c_str(), nullptr);
         if (origPath)
         {
+            if (PathIsRelative(path.c_str()))
+            {
+                // the saved path is only the filename in the backup dir
+                path = GetBackupPath() + L"\\" + path;
+            }
             WIN32_FILE_ATTRIBUTE_DATA savedFileData = {};
             GetFileAttributesEx(path.c_str(), GetFileExInfoStandard, &savedFileData);
             WIN32_FILE_ATTRIBUTE_DATA origFileData = {};
