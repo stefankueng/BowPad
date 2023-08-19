@@ -92,7 +92,7 @@ HRESULT CCmdCodeStyle::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const
         for (const auto& lang : langs)
         {
             int catId = lang.c_str()[0] - 'A';
-            CAppUtils::AddStringItem(pCollection, lang.c_str(), catId, EMPTY_IMAGE);
+            CAppUtils::AddStringItem(pCollection, lang.c_str(), catId, g_emptyIcon);
         }
         hr = S_OK;
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);

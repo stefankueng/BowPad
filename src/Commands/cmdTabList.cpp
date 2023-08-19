@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017, 2020-2022 - Stefan Kueng
+// Copyright (C) 2014-2017, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -161,7 +161,7 @@ bool CCmdTabList::PopulateMenu(IUICollectionPtr& collection)
                                         tabInfo.title.c_str(),
                                         pathBuf);
         }
-        auto hr = CAppUtils::AddStringItem(collection, text.c_str(), -1, EMPTY_IMAGE);
+        auto hr = CAppUtils::AddStringItem(collection, text.c_str(), -1, g_emptyIcon);
         // If we can't add one, assume we can't add any more so quit
         // not to avoid spamming the user with a sequence of errors.
         if (FAILED(hr))

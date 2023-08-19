@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020-2021, 2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -148,7 +148,7 @@ HRESULT HandleItemsSource(const PROPVARIANT* pPropVarCurrentValue, bool ignoreUt
         if (ignoreUtf8BOM && cp.bom && cp.name.compare(L"UTF-8 BOM") == 0)
             continue;
 
-        CAppUtils::AddStringItem(pCollection, cp.name.c_str(), cp.category, EMPTY_IMAGE);
+        CAppUtils::AddStringItem(pCollection, cp.name.c_str(), cp.category, g_emptyIcon);
     }
     return S_OK;
 }

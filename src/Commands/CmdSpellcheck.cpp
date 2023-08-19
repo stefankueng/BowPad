@@ -470,14 +470,14 @@ HRESULT CCmdSpellCheckLang::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, 
                 int catId = buf[0] - 'A';
                 if (catId > 26)
                     catId = buf[0] - 'a';
-                CAppUtils::AddStringItem(pCollection, buf, catId, EMPTY_IMAGE);
+                CAppUtils::AddStringItem(pCollection, buf, catId, g_emptyIcon);
             }
             else
             {
                 int catId = lang[0] - 'A';
                 if (catId > 26)
                     catId = lang[0] - 'a';
-                CAppUtils::AddStringItem(pCollection, lang.c_str(), catId, EMPTY_IMAGE);
+                CAppUtils::AddStringItem(pCollection, lang.c_str(), catId, g_emptyIcon);
             }
         }
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
@@ -606,7 +606,7 @@ HRESULT CCmdSpellCheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
                     if (S_OK == hr)
                     {
                         m_suggestions.push_back(suggestion);
-                        CAppUtils::AddStringItem(pCollection, suggestion, 0, EMPTY_IMAGE);
+                        CAppUtils::AddStringItem(pCollection, suggestion, 0, g_emptyIcon);
 
                         CoTaskMemFree(suggestion);
                     }
@@ -616,15 +616,15 @@ HRESULT CCmdSpellCheckCorrect::IUICommandHandlerUpdateProperty(REFPROPERTYKEY ke
         if (m_suggestions.empty())
         {
             ResString sNoSuggestions(g_hRes, IDS_SPELLCHECK_NOSUGGESTIONS);
-            CAppUtils::AddStringItem(pCollection, sNoSuggestions, 0, EMPTY_IMAGE);
+            CAppUtils::AddStringItem(pCollection, sNoSuggestions, 0, g_emptyIcon);
         }
         else
         {
             ResString sIgnoreSession(g_hRes, IDS_SPELLCHECK_IGNORESESSION);
             ResString sAddToDictionary(g_hRes, IDS_SPELLCHECK_ADDTODICTIONARY);
 
-            CAppUtils::AddStringItem(pCollection, sIgnoreSession, 1, EMPTY_IMAGE);
-            CAppUtils::AddStringItem(pCollection, sAddToDictionary, 1, EMPTY_IMAGE);
+            CAppUtils::AddStringItem(pCollection, sIgnoreSession, 1, g_emptyIcon);
+            CAppUtils::AddStringItem(pCollection, sAddToDictionary, 1, g_emptyIcon);
         }
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_SelectedItem);
         InvalidateUICommand(UI_INVALIDATIONS_VALUE, &UI_PKEY_SelectedItem);

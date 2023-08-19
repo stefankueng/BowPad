@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2018, 2020-2021, 2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const 
         gLanguages.clear();
 
         // English as the first language, always installed
-        CAppUtils::AddStringItem(pCollection, L"English", CAT_LANGS_AVAILABLE, EMPTY_IMAGE);
+        CAppUtils::AddStringItem(pCollection, L"English", CAT_LANGS_AVAILABLE, g_emptyIcon);
         gLanguages.push_back(L"");
 
         std::wstring path = CAppUtils::GetDataPath();
@@ -115,7 +115,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const 
             auto langBuf = std::make_unique<wchar_t[]>(len);
             if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langBuf.get(), len))
             {
-                CAppUtils::AddStringItem(pCollection, langBuf.get(), CAT_LANGS_AVAILABLE, EMPTY_IMAGE);
+                CAppUtils::AddStringItem(pCollection, langBuf.get(), CAT_LANGS_AVAILABLE, g_emptyIcon);
                 gLanguages.push_back(sLocale);
             }
         }
@@ -123,7 +123,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const 
         if (gRemotes.empty())
         {
             // Dummy entry for fetching the remote language list
-            CAppUtils::AddResStringItem(pCollection, IDS_LANGUAGE_FETCH, CAT_LANGS_REMOTE, EMPTY_IMAGE);
+            CAppUtils::AddResStringItem(pCollection, IDS_LANGUAGE_FETCH, CAT_LANGS_REMOTE, g_emptyIcon);
             gLanguages.push_back(L"*");
         }
         else
@@ -137,7 +137,7 @@ HRESULT CCmdLanguage::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const 
                 auto langBuf = std::make_unique<wchar_t[]>(len);
                 if (GetLocaleInfoEx(sLocale.c_str(), LOCALE_SLOCALIZEDLANGUAGENAME, langBuf.get(), len))
                 {
-                    CAppUtils::AddStringItem(pCollection, langBuf.get(), CAT_LANGS_AVAILABLE, EMPTY_IMAGE);
+                    CAppUtils::AddStringItem(pCollection, langBuf.get(), CAT_LANGS_AVAILABLE, g_emptyIcon);
                     gLanguages.push_back(sLocale);
                 }
             }

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ HINSTANCE   g_hInst;
 HINSTANCE   g_hRes;
 bool        firstInstance = false;
 IUIImagePtr g_emptyIcon;
-bool        g_useItemIcons = true;
 
 static void LoadLanguage(HINSTANCE hInstance)
 {
@@ -180,7 +179,7 @@ static void SetJumplist(LPCTSTR appID)
 
         if (!SysInfo::Instance().IsElevated())
         {
-            ResString sTemp(g_hRes, IDS_RUNASADMIN);
+            ResString          sTemp(g_hRes, IDS_RUNASADMIN);
 
             ComPtr<IShellLink> pslAdmin;
             hr = CreateShellLink(L"/multiple", sTemp, 4, true, &pslAdmin);
@@ -320,9 +319,9 @@ static HWND FindAndWaitForBowPad()
     // don't start another instance: reuse the existing one
     // find the window of the existing instance
     ResString    clsResName(g_hInst, IDC_BOWPAD);
-    std::wstring clsName = static_cast<LPCWSTR>(clsResName) + CAppUtils::GetSessionID();
+    std::wstring clsName    = static_cast<LPCWSTR>(clsResName) + CAppUtils::GetSessionID();
 
-    HWND hBowPadWnd = ::FindWindow(clsName.c_str(), nullptr);
+    HWND         hBowPadWnd = ::FindWindow(clsName.c_str(), nullptr);
     // if we don't have a window yet, wait a little while
     // to give the other process time to create the window
     for (int i = 0; !hBowPadWnd && i < 20; i++)
@@ -370,7 +369,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow* mainWindow)
     else
     {
         // find out if there are paths specified without the key/value pair syntax
-        int nArgs;
+        int                nArgs;
 
         const std::wstring commandLine = GetCommandLineW();
         LPWSTR*            szArgList   = CommandLineToArgvW(commandLine.c_str(), &nArgs);
@@ -470,11 +469,11 @@ int bpMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
         std::wstring     modPath    = CPathUtils::GetModulePath();
         SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
 
-        shExecInfo.hwnd         = nullptr;
-        shExecInfo.lpVerb       = L"runas";
-        shExecInfo.lpFile       = modPath.c_str();
-        shExecInfo.lpParameters = parser->getCmdLine();
-        shExecInfo.nShow        = SW_NORMAL;
+        shExecInfo.hwnd             = nullptr;
+        shExecInfo.lpVerb           = L"runas";
+        shExecInfo.lpFile           = modPath.c_str();
+        shExecInfo.lpParameters     = parser->getCmdLine();
+        shExecInfo.nShow            = SW_NORMAL;
 
         if (ShellExecuteEx(&shExecInfo))
             return 0;
@@ -498,28 +497,7 @@ int bpMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
 
     SetIcon();
 
-    auto                      ribbonVer = CPathUtils::GetVersionFromFile(L"UIRibbon.dll");
-    std::vector<std::wstring> tokens;
-    stringtok(tokens, ribbonVer, false, L".");
-    g_useItemIcons = true;
-    if (tokens.size() == 4)
-    {
-        auto major = std::stol(tokens[0]);
-        auto minor = std::stol(tokens[1]);
-        auto micro = std::stol(tokens[2]);
-        //auto build = std::stol(tokens[3]);
-        if (major > 10)
-            g_useItemIcons = false;
-        else if (major == 10)
-        {
-            if (minor > 0)
-                g_useItemIcons = false;
-            else if (micro >= 19041 && micro < 22000)
-                g_useItemIcons = false;
-        }
-        if (g_useItemIcons)
-            CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), g_emptyIcon);
-    }
+    CAppUtils::CreateImage(MAKEINTRESOURCE(IDB_EMPTY), g_emptyIcon);
 
     if (parser->HasKey(L"elevate") && parser->HasVal(L"savepath") && parser->HasVal(L"path"))
     {
@@ -550,7 +528,7 @@ int bpMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
         return ret;
     }
 
-    auto        mainWindow = std::make_unique<CMainWindow>(g_hRes);
+    auto mainWindow = std::make_unique<CMainWindow>(g_hRes);
 
     if (!mainWindow->RegisterAndCreateWindow())
         return -1;
@@ -598,8 +576,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
                       _In_ LPTSTR        lpCmdLine,
                       _In_ int           nCmdShow)
 {
-    g_hInst = hInstance;
-    g_hRes  = hInstance;
+    g_hInst                = hInstance;
+    g_hRes                 = hInstance;
 
     const std::wstring sID = L"BowPad_EFA99E4D-68EB-4EFA-B8CE-4F5B41104540_" + CAppUtils::GetSessionID();
     ::SetLastError(NO_ERROR); // Don't do any work between these 3 statements to spoil the error code.
@@ -609,7 +587,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
     bool bAlreadyRunning = (mutexStatus == ERROR_ALREADY_EXISTS || mutexStatus == ERROR_ACCESS_DENIED);
     firstInstance        = !bAlreadyRunning;
 
-    auto mainResult = bpMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow, bAlreadyRunning);
+    auto mainResult      = bpMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow, bAlreadyRunning);
 
     Scintilla_ReleaseResources();
 

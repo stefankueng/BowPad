@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -255,7 +255,7 @@ void CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
         UINT collectionSize;
         if (collection->GetCount(&collectionSize) == S_OK && !collectionSize) {
             HRESULT hr = CAppUtils::AddResStringItem(collection,
-                                                     IDS_NOFUNCTIONSFOUND, UI_COLLECTION_INVALIDINDEX, EMPTY_IMAGE);
+                                                     IDS_NOFUNCTIONSFOUND, UI_COLLECTION_INVALIDINDEX, g_emptyIcon);
             CAppUtils::FailedShowMessage(hr);
         });
     if (!HasActiveDocument())
@@ -307,7 +307,7 @@ void CCmdFunctions::PopulateFunctions(IUICollectionPtr& collection)
     for (const auto& func : functions)
     {
         HRESULT hr = CAppUtils::AddStringItem(collection,
-                                              CUnicodeUtils::StdGetUnicode(func.displayName).c_str(), UI_COLLECTION_INVALIDINDEX, EMPTY_IMAGE);
+                                              CUnicodeUtils::StdGetUnicode(func.displayName).c_str(), UI_COLLECTION_INVALIDINDEX, g_emptyIcon);
         if (CAppUtils::FailedShowMessage(hr))
             return;
         m_menuData.push_back(func.lineNum);

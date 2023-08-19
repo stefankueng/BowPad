@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2020-2022 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -339,7 +339,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
                                          RelatedType::CreateCorrespondingFiles));
     ResString createCorrespondingFiles(g_hRes, IDS_NEWCORRESPONDINGFILES);
 
-    auto      hr = CAppUtils::AddStringItem(collection, createCorrespondingFiles.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, EMPTY_IMAGE);
+    auto      hr = CAppUtils::AddStringItem(collection, createCorrespondingFiles.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, g_emptyIcon);
     if (FAILED(hr))
     {
         m_menuInfo.pop_back();
@@ -359,7 +359,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
                 ResString    createMenuItem(g_hRes, IDS_CREATE_CORRESPONDING_FILE);
                 std::wstring menuText = CStringUtils::Format(createMenuItem, filename.c_str());
 
-                hr                    = CAppUtils::AddStringItem(collection, menuText.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, EMPTY_IMAGE);
+                hr                    = CAppUtils::AddStringItem(collection, menuText.c_str(), CREATE_CORRESPONDING_FILE_CATEGORY, g_emptyIcon);
                 if (FAILED(hr))
                 {
                     m_menuInfo.pop_back();
@@ -395,7 +395,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
         {
             matchingFileName = CPathUtils::GetFileName(matchingFile);
             m_menuInfo.push_back(RelatedFileItem(matchingFile, RelatedType::Corresponding));
-            hr = CAppUtils::AddStringItem(collection, matchingFileName.c_str(), CORRESPONDING_FILES_CATEGORY, EMPTY_IMAGE);
+            hr = CAppUtils::AddStringItem(collection, matchingFileName.c_str(), CORRESPONDING_FILES_CATEGORY, g_emptyIcon);
             if (FAILED(hr))
             {
                 m_menuInfo.pop_back();
@@ -458,7 +458,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
                 menuText = inc.path;
                 if (!found)
                     menuText += L" ...";
-                hr = CAppUtils::AddStringItem(collection, menuText.c_str(), SYSTEM_INCLUDE_CATEGORY, EMPTY_IMAGE);
+                hr = CAppUtils::AddStringItem(collection, menuText.c_str(), SYSTEM_INCLUDE_CATEGORY, g_emptyIcon);
                 if (FAILED(hr))
                 {
                     m_menuInfo.pop_back();
@@ -484,7 +484,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
                 menuText = inc.path;
                 if (!found)
                     menuText += L" ...";
-                hr = CAppUtils::AddStringItem(collection, menuText.c_str(), USER_INCLUDE_CATEGORY, EMPTY_IMAGE);
+                hr = CAppUtils::AddStringItem(collection, menuText.c_str(), USER_INCLUDE_CATEGORY, g_emptyIcon);
                 if (FAILED(hr))
                 {
                     m_menuInfo.pop_back();
@@ -501,7 +501,7 @@ bool CCmdHeaderSource::PopulateMenu(const CDocument& doc, CScintillaWnd& edit, I
         m_menuInfo.push_back(RelatedFileItem()); // No action.
         // Using CORRESPONDING_FILES_CATEGORY, but might possibly prefer no category,
         // but that doesn't appear to be possible it seems.
-        hr = CAppUtils::AddResStringItem(collection, IDS_NO_FILES_FOUND, CORRESPONDING_FILES_CATEGORY, EMPTY_IMAGE);
+        hr = CAppUtils::AddResStringItem(collection, IDS_NO_FILES_FOUND, CORRESPONDING_FILES_CATEGORY, g_emptyIcon);
         CAppUtils::FailedShowMessage(hr);
     }
 

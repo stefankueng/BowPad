@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2020 - Stefan Kueng
+// Copyright (C) 2013, 2020, 2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,7 +22,4 @@ extern HINSTANCE g_hRes;
 extern HINSTANCE g_hInst;
 extern bool firstInstance;
 extern IUIImagePtr g_emptyIcon;
-extern bool g_useItemIcons;
-
-#define EMPTY_IMAGE (g_useItemIcons ? g_emptyIcon : nullptr)
 
