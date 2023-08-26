@@ -22,6 +22,7 @@
 #include "DarkModeHelper.h"
 #include "DPIAware.h"
 #include "SmartHandle.h"
+#include "OnOutOfScope.h"
 #include <Uxtheme.h>
 #include <vssym32.h>
 #include <richedit.h>
@@ -232,6 +233,8 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
             // except in situations where both a treeview and a listview are on the same dialog
             // at the same time - then the difference is unfortunately very
             // noticeable...
+            SetWindowRedraw(hwnd, FALSE);
+            OnOutOfScope(SetWindowRedraw(hwnd, TRUE););
             SetWindowTheme(hwnd, L"Explorer", nullptr);
             auto header = ListView_GetHeader(hwnd);
             DarkModeHelper::Instance().AllowDarkModeForWindow(header, static_cast<BOOL>(lParam));
@@ -276,6 +279,8 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
                  (wcscmp(szWndClassName, L"ComboLBox") == 0) ||
                  (wcscmp(szWndClassName, WC_COMBOBOX) == 0))
         {
+            SetWindowRedraw(hwnd, FALSE);
+            OnOutOfScope(SetWindowRedraw(hwnd, TRUE););
             SetWindowTheme(hwnd, L"Explorer", nullptr);
             HWND hCombo = hwnd;
             if (wcscmp(szWndClassName, WC_COMBOBOXEX) == 0)
@@ -285,19 +290,21 @@ BOOL CTheme::AdjustThemeForChildrenProc(HWND hwnd, LPARAM lParam)
             }
             if (hCombo)
             {
-                SetWindowSubclass(hCombo, ComboBoxSubclassProc, SubclassID, reinterpret_cast<DWORD_PTR>(&m_sBackBrush));
                 COMBOBOXINFO info = {0};
                 info.cbSize       = sizeof(COMBOBOXINFO);
                 if (SendMessage(hCombo, CB_GETCOMBOBOXINFO, 0, reinterpret_cast<LPARAM>(&info)))
                 {
                     DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndList, static_cast<BOOL>(lParam));
-                    DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndItem, static_cast<BOOL>(lParam));
+                    if (info.hwndItem != info.hwndCombo)
+                        DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndItem, static_cast<BOOL>(lParam));
                     DarkModeHelper::Instance().AllowDarkModeForWindow(info.hwndCombo, static_cast<BOOL>(lParam));
 
                     SetWindowTheme(info.hwndList, L"Explorer", nullptr);
-                    SetWindowTheme(info.hwndItem, L"Explorer", nullptr);
+                    if (info.hwndItem != info.hwndCombo)
+                        SetWindowTheme(info.hwndItem, L"Explorer", nullptr);
                     SetWindowTheme(info.hwndCombo, L"CFD", nullptr);
                 }
+                SetWindowSubclass(hCombo, ComboBoxSubclassProc, SubclassID, reinterpret_cast<DWORD_PTR>(&m_sBackBrush));
             }
         }
         else if (wcscmp(szWndClassName, WC_TREEVIEW) == 0)
