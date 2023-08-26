@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -52,8 +52,8 @@
 
 namespace
 {
-constexpr UINT WM_CURRENTSTYLECHANGED = (WM_APP + 1);
-constexpr UINT WM_CURRENTDOCCHANGED   = (WM_APP + 2);
+constexpr UINT                         WM_CURRENTSTYLECHANGED = (WM_APP + 1);
+constexpr UINT                         WM_CURRENTDOCCHANGED   = (WM_APP + 2);
 
 std::unique_ptr<CStyleConfiguratorDlg> g_pStyleConfiguratorDlg;
 int                                    g_lastStyle = -1;
@@ -91,12 +91,18 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
         case WM_INITDIALOG:
         {
             InitDialog(*this, IDI_BOWPAD);
+            ResString sExtTooltip(g_hRes, IDS_EXTENSIONTOOLTIP);
+            AddToolTip(IDC_EXTENSIONS, sExtTooltip);
+
             CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
             auto languages  = CLexStyles::Instance().GetLanguages();
             auto hLangCombo = GetDlgItem(*this, IDC_LANGCOMBO);
+            SetWindowRedraw(hLangCombo, FALSE);
+            SendMessage(hLangCombo, CB_INITSTORAGE, languages.size(), languages.size() * 30 * sizeof(wchar_t));
             for (const auto& langName : languages)
                 ComboBox_AddString(hLangCombo, langName.c_str());
-
+            SetWindowRedraw(hLangCombo, TRUE);
+            InvalidateRect(hLangCombo, nullptr, TRUE);
             std::set<std::wstring> tempFonts;
             // Populates tempFonts.
             {
@@ -113,25 +119,28 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
                 m_fonts.push_back(fontName);
             tempFonts.clear(); // We don't need them any more.
             auto hFontCombo = GetDlgItem(*this, IDC_FONTCOMBO);
+            SetWindowRedraw(hFontCombo, FALSE);
+            SendMessage(hFontCombo, CB_INITSTORAGE, m_fonts.size(), m_fonts.size() * 40 * sizeof(wchar_t));
             for (const auto& fontName : m_fonts)
                 ComboBox_AddString(hFontCombo, fontName.c_str());
+            SetWindowRedraw(hFontCombo, TRUE);
+            InvalidateRect(hFontCombo, nullptr, TRUE);
 
             auto hFontSizeCombo = GetDlgItem(*this, IDC_FONTSIZECOMBO);
             int  index          = ComboBox_AddString(hFontSizeCombo, L"");
             ComboBox_SetItemData(hFontSizeCombo, 0, 0);
             static constexpr int fontSizes[] = {5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28};
+            SetWindowRedraw(hFontSizeCombo, FALSE);
             for (auto fontSize : fontSizes)
             {
                 std::wstring s = std::to_wstring(fontSize);
                 index          = static_cast<int>(ComboBox_AddString(hFontSizeCombo, s.c_str()));
                 ComboBox_SetItemData(hFontSizeCombo, index, fontSize);
             }
+            SetWindowRedraw(hFontSizeCombo, TRUE);
+            InvalidateRect(hFontSizeCombo, nullptr, TRUE);
             m_fgColor.ConvertToColorButton(*this, IDC_FG_BTN);
             m_bkColor.ConvertToColorButton(*this, IDC_BK_BTN);
-
-            ResString sExtTooltip(g_hRes, IDS_EXTENSIONTOOLTIP);
-
-            AddToolTip(IDC_EXTENSIONS, sExtTooltip);
 
             // Select the current language.
             if (HasActiveDocument())
@@ -146,7 +155,7 @@ LRESULT CStyleConfiguratorDlg::DlgFunc(HWND /*hwndDlg*/, UINT uMsg, WPARAM wPara
         }
             return FALSE;
         case WM_ACTIVATE:
-            //SetTransparency((wParam == WA_INACTIVE) ? 200 : 255);
+            // SetTransparency((wParam == WA_INACTIVE) ? 200 : 255);
             break;
 
         case WM_COMMAND:
@@ -269,7 +278,7 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                     int         styleKey    = static_cast<int>(ComboBox_GetItemData(hStyleCombo, styleSel));
                     const auto& lexData     = CLexStyles::Instance().GetLexerDataForLang(currentLang);
 
-                    auto foundStyle = lexData.styles.find(styleKey);
+                    auto        foundStyle  = lexData.styles.find(styleKey);
                     if (foundStyle != lexData.styles.end())
                     {
                         ComboBox_SelectString(GetDlgItem(*this, IDC_FONTCOMBO), -1, foundStyle->second.fontName.c_str());
@@ -345,7 +354,11 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         // so don't do it again here when storing the color.
                         CLexStyles::Instance().SetUserForeground(lexID, styleKey, fgcolor);
                         if (updateView)
+                        {
                             Scintilla().StyleSetFore(styleKey, CTheme::Instance().GetThemeColor(fgcolor));
+                            if (styleKey == 0)
+                                Scintilla().StyleSetFore(STYLE_DEFAULT, CTheme::Instance().GetThemeColor(fgcolor));
+                        }
                         break;
                     }
                     case IDC_BK_BTN:
@@ -353,7 +366,11 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                         auto bgcolor = m_bkColor.GetColor();
                         CLexStyles::Instance().SetUserBackground(lexID, styleKey, bgcolor);
                         if (updateView)
+                        {
                             Scintilla().StyleSetBack(styleKey, CTheme::Instance().GetThemeColor(bgcolor));
+                            if (styleKey == 0)
+                                Scintilla().StyleSetBack(STYLE_DEFAULT, CTheme::Instance().GetThemeColor(bgcolor));
+                        }
                         break;
                     }
                     case IDC_FONTCOMBO:

@@ -1066,6 +1066,11 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
     {
         m_scintilla.StyleSetFore(styleId, theme.GetThemeColor(styleData.foregroundColor, true));
         m_scintilla.StyleSetBack(styleId, theme.GetThemeColor(styleData.backgroundColor, true));
+        if (styleId == 0)
+        {
+            m_scintilla.StyleSetFore(STYLE_DEFAULT, theme.GetThemeColor(styleData.foregroundColor, true));
+            m_scintilla.StyleSetBack(STYLE_DEFAULT, theme.GetThemeColor(styleData.backgroundColor, true));
+        }
         if (!styleData.fontName.empty())
             m_scintilla.StyleSetFont(styleId, CUnicodeUtils::StdGetUTF8(styleData.fontName).c_str());
 
