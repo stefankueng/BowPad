@@ -1812,8 +1812,23 @@ void CMainWindow::HandleAfterInit()
         {
             ++fileCounter;
             SetProgress(fileCounter, static_cast<DWORD>(m_pathsToOpen.size()));
-            if (OpenFile(path, openFlags) >= 0)
+            auto idx = OpenFile(path, openFlags);
+            if (idx >= 0)
             {
+                if (parser.HasVal(L"waitMutex"))
+                {
+                    std::wstring mutexName = parser.GetVal(L"waitMutex");
+                    auto         docId     = m_tabBar.GetIDFromIndex(idx);
+                    auto&        doc       = m_docManager.GetModDocumentFromID(docId);
+                    doc.m_aliveMutex       = CreateMutex(nullptr, false, mutexName.c_str());
+                    assert(GetLastError() == ERROR_ALREADY_EXISTS);
+                    WaitForSingleObject(doc.m_aliveMutex, INFINITE);
+                    // now signal the waiting process that we have the mutex
+                    auto evt = CreateEvent(nullptr, TRUE, FALSE, (mutexName + L"_").c_str());
+                    SetEvent(evt);
+                    ResetEvent(evt);
+                    CloseHandle(evt);
+                }
                 if (line != static_cast<size_t>(-1))
                     GoToLine(line);
             }
@@ -3953,8 +3968,17 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
                 openFlags |= OpenFlags::NewIfMissing;
             for (const auto p : list)
             {
-                if (OpenFile(p, openFlags) >= 0)
+                auto idx = OpenFile(p, openFlags);
+                if (idx >= 0)
                 {
+                    if (parser.HasVal(L"waitMutex"))
+                    {
+                        auto  docId      = m_tabBar.GetIDFromIndex(idx);
+                        auto& doc        = m_docManager.GetModDocumentFromID(docId);
+                        doc.m_aliveMutex = CreateMutex(nullptr, true, parser.GetVal(L"waitMutex"));
+                        assert(GetLastError() == ERROR_ALREADY_EXISTS);
+                        WaitForSingleObject(doc.m_aliveMutex, INFINITE);
+                    }
                     if (parser.HasVal(L"line"))
                     {
                         GoToLine(static_cast<size_t>(parser.GetLongLongVal(L"line") - 1));
@@ -4000,8 +4024,19 @@ void CMainWindow::HandleCopyDataCommandLine(const COPYDATASTRUCT& cds)
                         openFlags |= OpenFlags::NewIfMissing;
                     for (const auto p : list)
                     {
-                        if (OpenFile(p, openFlags) >= 0)
+                        auto idx = OpenFile(p, openFlags);
+                        if (idx >= 0)
+                        {
                             ++filesOpened;
+                            if (parser.HasVal(L"waitMutex"))
+                            {
+                                auto  docId      = m_tabBar.GetIDFromIndex(idx);
+                                auto& doc        = m_docManager.GetModDocumentFromID(docId);
+                                doc.m_aliveMutex = CreateMutex(nullptr, true, parser.GetVal(L"waitMutex"));
+                                assert(GetLastError() == ERROR_ALREADY_EXISTS);
+                                WaitForSingleObject(doc.m_aliveMutex, INFINITE);
+                            }
+                        }
                     }
                 }
             }

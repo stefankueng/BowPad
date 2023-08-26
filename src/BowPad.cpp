@@ -36,6 +36,8 @@
 #include <wrl.h>
 using Microsoft::WRL::ComPtr;
 
+#pragma comment(lib, "Rpcrt4.lib")
+
 HINSTANCE   g_hInst;
 HINSTANCE   g_hRes;
 bool        firstInstance = false;
@@ -246,7 +248,7 @@ static void ForwardToOtherInstance(HWND hBowPadWnd, LPCTSTR lpCmdLine, CCmdLineP
     {
         COPYDATASTRUCT cds = {};
         cds.dwData         = CD_COMMAND_LINE;
-        if (!parser.HasVal(L"path"))
+        if (!parser.HasVal(L"path") && !parser.HasKey(L"wait"))
         {
             // create our own command line with all paths converted to long/full paths
             // since the CWD of the other instance is most likely different
@@ -435,7 +437,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow* mainWindow)
     }
 }
 
-int bpMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int nCmdShow, bool bAlreadyRunning)
+int bpMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int nCmdShow, bool bAlreadyRunning, HANDLE& hAppMutex)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
@@ -478,13 +480,96 @@ int bpMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPCTSTR lpCmdLine, int 
         if (ShellExecuteEx(&shExecInfo))
             return 0;
     }
-    if (bAlreadyRunning && !parser->HasKey(L"multiple"))
+    if (bAlreadyRunning && !parser->HasKey(L"multiple") && !parser->HasKey(L"wait"))
     {
         HWND hBowPadWnd = FindAndWaitForBowPad();
         if (hBowPadWnd)
         {
             ForwardToOtherInstance(hBowPadWnd, lpCmdLine, *parser);
             return 0;
+        }
+    }
+    if (parser->HasKey(L"wait"))
+    {
+        // create a new command line, but without
+        // the /wait switch, instead add the /newifmissing switch
+        // and of course add the name of the mutex to use for
+        // synchronisation
+        std::wstring newCommandLine = parser->getCmdLine();
+        auto         lowerCmdLine   = CStringUtils::to_lower(newCommandLine);
+        auto         pos            = lowerCmdLine.find(L"/wait");
+        if (pos != std::wstring::npos)
+            newCommandLine.erase(pos, 5);
+        else
+        {
+            pos = lowerCmdLine.find(L"-wait");
+            if (pos != std::wstring::npos)
+                newCommandLine.erase(pos, 5);
+        }
+
+        UUID uuid;
+        UuidCreate(&uuid);
+        wchar_t* wszUuid = nullptr;
+        UuidToString(&uuid, reinterpret_cast<RPC_WSTR*>(&wszUuid));
+        std::wstring sUuid = wszUuid;
+        RpcStringFree(reinterpret_cast<RPC_WSTR*>(&wszUuid));
+        std::wstring sMutex = L"BowPad_" + sUuid;
+        newCommandLine += (L" /waitMutex:" + sMutex);
+        std::wstring modPath = CPathUtils::GetModulePath();
+        newCommandLine       = L"\"" + modPath + L"\" " + newCommandLine;
+
+        if (!bAlreadyRunning)
+        {
+            // here we start a new BP instance that does the real work
+            auto hMutex = CreateMutex(nullptr, false, sMutex.c_str());
+            OnOutOfScope(CloseHandle(hMutex));
+            // close this apps single-instance mutex since this process is used only for waiting
+            CloseHandle(hAppMutex);
+            hAppMutex = nullptr;
+
+            STARTUPINFO startupInfo{};
+            startupInfo.cb = sizeof(STARTUPINFO);
+            PROCESS_INFORMATION processInfo{};
+            if (CreateProcess(modPath.c_str(), newCommandLine.data(), nullptr, nullptr, false, 0, nullptr, nullptr, &startupInfo, &processInfo))
+            {
+                OnOutOfScope(CloseHandle(processInfo.hThread);
+                             CloseHandle(processInfo.hProcess););
+                // wait for the new BP instance to start up
+                if (WaitForInputIdle(processInfo.hProcess, 10000) == 0)
+                {
+                    // wait for the document to be opened
+                    auto evt = CreateEvent(nullptr, TRUE, FALSE, (sMutex + L"_").c_str());
+                    OnOutOfScope(CloseHandle(evt));
+                    if (WaitForSingleObject(evt, 10000) == WAIT_OBJECT_0)
+                    {
+                        // now wait until the tab is closed again or the process exits
+                        HANDLE handles[2] = {hMutex, processInfo.hProcess};
+                        WaitForMultipleObjects(2, handles, FALSE, INFINITE);
+                        return 0;
+                    }
+                }
+            }
+        }
+        else
+        {
+            HWND hBowPadWnd = FindAndWaitForBowPad();
+            if (hBowPadWnd)
+            {
+                auto hMutex = CreateMutex(nullptr, false, sMutex.c_str());
+                OnOutOfScope(CloseHandle(hMutex));
+                // there's already a BP process running: tell it to open the file
+                // and then we use this process to just wait for the file to be
+                // closed
+                ForwardToOtherInstance(hBowPadWnd, newCommandLine.c_str(), *parser);
+                DWORD pid = 0;
+                GetWindowThreadProcessId(hBowPadWnd, &pid);
+                auto hProcess = OpenProcess(SYNCHRONIZE, false, pid);
+                OnOutOfScope(CloseHandle(hProcess));
+                // now wait until the tab is closed again or the process exits
+                HANDLE handles[2] = {hMutex, hProcess};
+                WaitForMultipleObjects(2, handles, FALSE, INFINITE);
+                return 0;
+            }
         }
     }
 
@@ -583,11 +668,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
     ::SetLastError(NO_ERROR); // Don't do any work between these 3 statements to spoil the error code.
     HANDLE hAppMutex   = ::CreateMutex(nullptr, false, sID.c_str());
     DWORD  mutexStatus = GetLastError();
-    OnOutOfScope(CloseHandle(hAppMutex););
+    OnOutOfScope(if (hAppMutex) CloseHandle(hAppMutex););
     bool bAlreadyRunning = (mutexStatus == ERROR_ALREADY_EXISTS || mutexStatus == ERROR_ACCESS_DENIED);
     firstInstance        = !bAlreadyRunning;
 
-    auto mainResult      = bpMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow, bAlreadyRunning);
+    auto mainResult      = bpMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow, bAlreadyRunning, hAppMutex);
 
     Scintilla_ReleaseResources();
 

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021, 2023 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -85,9 +85,18 @@ public:
         , m_bDoSaveAs(false)
         , m_tabSpace(TabSpace::Default)
         , m_readDir(Scintilla::Bidirectional::Disabled)
+        , m_aliveMutex(nullptr)
     {
         m_lastWriteTime.dwHighDateTime = 0;
         m_lastWriteTime.dwLowDateTime  = 0;
+    }
+    virtual ~CDocument()
+    {
+        if (m_aliveMutex)
+        {
+            ReleaseMutex(m_aliveMutex);
+            CloseHandle(m_aliveMutex);
+        }
     }
 
     std::wstring       GetEncodingString() const;
@@ -116,6 +125,7 @@ public:
     TabSpace                 m_tabSpace;
     Scintilla::Bidirectional m_readDir;
     std::function<void()>    m_saveCallback;
+    HANDLE                   m_aliveMutex;
 
 private:
     std::string m_language;
