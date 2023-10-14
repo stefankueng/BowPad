@@ -1750,63 +1750,63 @@ void CFindReplaceDlg::SortResults()
     // Where both are on disk files, sort by filename then folder.
     // Otherwise just order by the name.
     // Lastly after each compare, fallthrough to also sort by line number.
-    std::sort(m_searchResults.begin(), m_searchResults.end(),
-              [&](const CSearchResult& lhs, const CSearchResult& rhs) {
-                  int result = -1;
-                  if (lhs.docID.IsValid() && rhs.docID.IsValid())
-                  {
-                      const auto& lDoc = GetDocumentFromID(lhs.docID);
-                      const auto& rDoc = GetDocumentFromID(rhs.docID);
-                      // If both results are associated with files...
-                      if (!lDoc.m_path.empty() && !rDoc.m_path.empty())
-                      {
-                          result = CPathUtils::PathCompare(
-                              CPathUtils::GetFileName(lDoc.m_path),
-                              CPathUtils::GetFileName(rDoc.m_path));
-                          if (result == 0)
+    std::ranges::sort(m_searchResults,
+                      [&](const CSearchResult& lhs, const CSearchResult& rhs) {
+                          int result = -1;
+                          if (lhs.docID.IsValid() && rhs.docID.IsValid())
+                          {
+                              const auto& lDoc = GetDocumentFromID(lhs.docID);
+                              const auto& rDoc = GetDocumentFromID(rhs.docID);
+                              // If both results are associated with files...
+                              if (!lDoc.m_path.empty() && !rDoc.m_path.empty())
+                              {
+                                  result = CPathUtils::PathCompare(
+                                      CPathUtils::GetFileName(lDoc.m_path),
+                                      CPathUtils::GetFileName(rDoc.m_path));
+                                  if (result == 0)
+                                      result = CPathUtils::PathCompare(
+                                          CPathUtils::GetParentDirectory(lDoc.m_path),
+                                          CPathUtils::GetParentDirectory(rDoc.m_path));
+                              }
+                              // If left result is associated with a file and (implied)
+                              // the other path is not associated with a file...
+                              else if (!lDoc.m_path.empty())
+                                  result = CPathUtils::PathCompare(CPathUtils::GetFileName(lDoc.m_path),
+                                                                   GetTitleForDocID(rhs.docID));
+                              // else if right result is associated with a file and (implied)
+                              // the left path is not associated with a file...
+                              else if (!rDoc.m_path.empty())
+                                  result = CPathUtils::PathCompare(GetTitleForDocID(lhs.docID),
+                                                                   CPathUtils::GetFileName(rDoc.m_path));
+                              else
+                              {
+                                  // Otherwise (implied) neither file is associated with a file,
+                                  // i.e. new documents.
+                                  result = CPathUtils::PathCompare(GetTitleForDocID(lhs.docID),
+                                                                   GetTitleForDocID(rhs.docID));
+                              }
+                          }
+                          else if (lhs.docID.IsValid())
+                          {
+                              assert(rhs.hasPath());
+                              result = CPathUtils::PathCompare(GetTitleForDocID(lhs.docID),
+                                                               CPathUtils::GetFileName(m_foundPaths[rhs.pathIndex]));
+                          }
+                          else if (rhs.docID.IsValid())
+                          {
+                              assert(lhs.hasPath());
                               result = CPathUtils::PathCompare(
-                                  CPathUtils::GetParentDirectory(lDoc.m_path),
-                                  CPathUtils::GetParentDirectory(rDoc.m_path));
-                      }
-                      // If left result is associated with a file and (implied)
-                      // the other path is not associated with a file...
-                      else if (!lDoc.m_path.empty())
-                          result = CPathUtils::PathCompare(CPathUtils::GetFileName(lDoc.m_path),
-                                                           GetTitleForDocID(rhs.docID));
-                      // else if right result is associated with a file and (implied)
-                      // the left path is not associated with a file...
-                      else if (!rDoc.m_path.empty())
-                          result = CPathUtils::PathCompare(GetTitleForDocID(lhs.docID),
-                                                           CPathUtils::GetFileName(rDoc.m_path));
-                      else
-                      {
-                          // Otherwise (implied) neither file is associated with a file,
-                          // i.e. new documents.
-                          result = CPathUtils::PathCompare(GetTitleForDocID(lhs.docID),
-                                                           GetTitleForDocID(rhs.docID));
-                      }
-                  }
-                  else if (lhs.docID.IsValid())
-                  {
-                      assert(rhs.hasPath());
-                      result = CPathUtils::PathCompare(GetTitleForDocID(lhs.docID),
-                                                       CPathUtils::GetFileName(m_foundPaths[rhs.pathIndex]));
-                  }
-                  else if (rhs.docID.IsValid())
-                  {
-                      assert(lhs.hasPath());
-                      result = CPathUtils::PathCompare(
-                          CPathUtils::GetFileName(m_foundPaths[lhs.pathIndex]), GetTitleForDocID(rhs.docID));
-                  }
-                  else if (lhs.hasPath() && rhs.hasPath())
-                      result = CPathUtils::PathCompare(m_foundPaths[lhs.pathIndex], m_foundPaths[rhs.pathIndex]);
-                  else
-                      assert(false);
-                  if (result == 0)
-                      return lhs.line < rhs.line;
-                  else
-                      return result < 0;
-              });
+                                  CPathUtils::GetFileName(m_foundPaths[lhs.pathIndex]), GetTitleForDocID(rhs.docID));
+                          }
+                          else if (lhs.hasPath() && rhs.hasPath())
+                              result = CPathUtils::PathCompare(m_foundPaths[lhs.pathIndex], m_foundPaths[rhs.pathIndex]);
+                          else
+                              assert(false);
+                          if (result == 0)
+                              return lhs.line < rhs.line;
+                          else
+                              return result < 0;
+                      });
 }
 
 void CFindReplaceDlg::DoSearchAll(int id)
@@ -2006,11 +2006,11 @@ bool CFindReplaceDlg::IsMatchingFile(const std::wstring& path, const std::vector
     if (filesToFind.size() > 0)
     {
         auto targetName = CPathUtils::GetFileName(path);
-        auto whereAt    = std::find_if(filesToFind.begin(), filesToFind.end(),
-                                       [&](const std::wstring& fileToFind) {
-                                        bool match = !!PathMatchSpec(targetName.c_str(), fileToFind.c_str());
-                                        return match;
-                                    });
+        auto whereAt    = std::ranges::find_if(filesToFind,
+                                               [&](const std::wstring& fileToFind) {
+                                                bool match = !!PathMatchSpec(targetName.c_str(), fileToFind.c_str());
+                                                return match;
+                                            });
         matched         = (whereAt != filesToFind.end());
     }
     return matched;
@@ -2714,10 +2714,9 @@ void CFindReplaceDlg::NotifyOnDocumentClose(DocID id)
     {
         // This is a "new" document that has never been saved, delete it's results
         // as it's closing.
-        auto newEnd = std::remove_if(
-            m_searchResults.begin(), m_searchResults.end(), [&](const CSearchResult& item) {
-                return (item.docID == id);
-            });
+        auto newEnd       = std::ranges::remove_if(m_searchResults, [&](const CSearchResult& item) {
+                          return (item.docID == id);
+                      }).begin();
         auto deletedCount = m_searchResults.end() - newEnd;
         m_searchResults.erase(newEnd, m_searchResults.end());
         if (deletedCount > 0)
