@@ -1877,7 +1877,6 @@ void CFindReplaceDlg::DoSearchAll(int id)
             SetDlgItemText(*this, IDC_SEARCHINFO, sInfo.c_str());
             SearchDocument(m_searchWnd, docId, doc, searchFor, searchFlags, exSearchFlags,
                            m_searchResults, m_foundPaths);
-            SortResults();
         }
         else if (id == IDC_FINDALLINTABS)
         {
@@ -1900,8 +1899,8 @@ void CFindReplaceDlg::DoSearchAll(int id)
                     break;
                 }
             }
-            SortResults();
         }
+        SortResults();
         ListView_SetItemCountEx(hListControl, m_searchResults.size(), 0);
         ShowResults(true);
         UpdateWindow(*this);
@@ -1967,6 +1966,7 @@ void CFindReplaceDlg::DoSearchAll(int id)
         if (filesToFind.size() > 0)
             UpdateSearchFilesStrings(filesString);
         EnableControls(false);
+        SortResults();
         ShowResults(true);
 
         UpdateMatchCount(false);
