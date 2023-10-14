@@ -4,6 +4,7 @@ fr
 it
 ja
 ko
+pl
 pt-br
 pt-pt
 ro
