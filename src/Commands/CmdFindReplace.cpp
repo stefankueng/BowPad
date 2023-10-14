@@ -2000,7 +2000,7 @@ void CFindReplaceDlg::FocusOnFirstListItem(bool keepAnyExistingSelection)
     }
 }
 
-bool CFindReplaceDlg::IsMatchingFile(const std::wstring& path, const std::vector<std::wstring>& filesToFind) const
+bool CFindReplaceDlg::IsMatchingFile(const std::wstring& path, const std::vector<std::wstring>& filesToFind)
 {
     bool matched = false;
     if (filesToFind.size() > 0)

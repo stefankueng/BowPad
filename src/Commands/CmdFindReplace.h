@@ -131,7 +131,7 @@ protected:
     LRESULT                 GetListItemDispInfo(NMLVDISPINFO* pDispInfo) const;
     void                    HandleButtonDropDown(const NMBCDROPDOWN* pDropDown);
 
-    bool                    IsMatchingFile(const std::wstring& path, const std::vector<std::wstring>& filesToFind) const;
+    static bool                    IsMatchingFile(const std::wstring& path, const std::vector<std::wstring>& filesToFind);
 
     bool                    IsExcludedFile(const std::wstring& path) const;
     bool                    IsExcludedFolder(const std::wstring& path) const;
