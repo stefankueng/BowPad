@@ -930,6 +930,8 @@ HRESULT BasicScriptObject::GetIDsOfNames(REFIID /*riid*/,
             idList[i] = 145;
         else if (_wcsicmp(nameList[i], L"ExecuteCommand") == 0)
             idList[i] = 146;
+        else if (_wcsicmp(nameList[i], L"GetPathForDocID") == 0)
+            idList[i] = 147;
         else if (_wcsicmp(nameList[i], L"SciGetTextRange") == 0)
             idList[i] = 900;
         else if (_wcsicmp(nameList[i], L"SciGetCharAt") == 0)
@@ -1491,6 +1493,16 @@ HRESULT BasicScriptObject::Invoke(DISPID id,
             ICommand* pCmd = CCommandHandler::Instance().GetCommand(p1.intVal);
             if (pCmd)
                 pCmd->Execute();
+        }
+        break;
+        case 147: // GetPathForDocID
+        {
+            if (args->cArgs != 1)
+                return DISP_E_BADPARAMCOUNT;
+            if (FAILED(VariantChangeType(&p1, &args->rgvarg[0], VARIANT_ALPHABOOL, VT_INT)))
+                return DISP_E_TYPEMISMATCH;
+            ret->vt      = VT_BSTR;
+            ret->bstrVal = _bstr_t(GetDocumentFromID(DocID(p1.intVal)).m_path.c_str()).Detach();
         }
         break;
         case 900: // SciGetTextRange
