@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2023 - Stefan Kueng
+// Copyright (C) 2013-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -3051,7 +3051,7 @@ bool CCmdFindSelectedNext::Execute()
 {
     g_sHighlightString.clear();
     auto selTextLen = Scintilla().GetSelText(nullptr);
-    if (selTextLen <= 1) // Includes zero terminator so 1 means none.
+    if (selTextLen < 1)
     {
         DocScrollUpdate();
         return false;
@@ -3093,7 +3093,7 @@ bool CCmdFindSelectedPrev::Execute()
 {
     g_sHighlightString.clear();
     auto selTextLen = Scintilla().GetSelText(nullptr);
-    if (selTextLen <= 1) // Includes zero terminator so 1 means none.
+    if (selTextLen < 1)
     {
         DocScrollUpdate();
         return false;
