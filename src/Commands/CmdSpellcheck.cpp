@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2015-2017, 2020-2023 - Stefan Kueng
+// Copyright (C) 2015-2017, 2020-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -194,9 +194,7 @@ void CCmdSpellCheck::Check()
         if (lastPos < 0)
             lastPos = textLength - textRange.chrg.cpMin;
         if (m_lastCheckedPos)
-        {
             textRange.chrg.cpMax = static_cast<Sci_Position>(m_lastCheckedPos);
-        }
         auto start = GetTickCount64();
         while (textRange.chrg.cpMax < lastPos)
         {
@@ -207,10 +205,23 @@ void CCmdSpellCheck::Check()
                     SetTimer(GetHwnd(), g_checkTimer, 10, nullptr);
                 break;
             }
+            Scintilla().SetWordChars(g_wordChars.c_str());
             textRange.chrg.cpMin = static_cast<Sci_Position>(Scintilla().WordStartPosition(textRange.chrg.cpMax + 1, TRUE));
+            if (m_useComprehensiveCheck)
+                Scintilla().SetWordChars(g_sentenceChars.c_str());
+            else
+                Scintilla().SetWordChars(g_wordChars.c_str());
             if (textRange.chrg.cpMin < textRange.chrg.cpMax && textRange.chrg.cpMin >= firstPos)
+            {
+                DebugBreak();
                 break;
+            }
             textRange.chrg.cpMax = static_cast<Sci_Position>(Scintilla().WordEndPosition(textRange.chrg.cpMin, TRUE));
+            if (textRange.chrg.cpMax > lastPos)
+            {
+                Scintilla().SetWordChars(g_wordChars.c_str());
+                textRange.chrg.cpMax = static_cast<Sci_Position>(Scintilla().WordEndPosition(textRange.chrg.cpMin, TRUE));
+            }
             if (textRange.chrg.cpMin == textRange.chrg.cpMax)
             {
                 textRange.chrg.cpMax++;
