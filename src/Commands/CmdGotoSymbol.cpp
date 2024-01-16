@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2017, 2020-2022 - Stefan Kueng
+// Copyright (C) 2016-2017, 2020-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,9 +28,21 @@ CCmdGotoSymbol::CCmdGotoSymbol(void* obj)
 
 bool CCmdGotoSymbol::Execute()
 {
-    std::wstring symbolName = CUnicodeUtils::StdGetUnicode(GetSelectedText(SelectionHandling::CurrentWordIfSelectionIsEmpty));
-    findReplaceFindFunction(m_pMainWindow, symbolName);
-    return true;
+    if (HasActiveDocument())
+    {
+        const auto& doc       = GetActiveDocument();
+        const auto& funcRegex = CLexStyles::Instance().GetFunctionRegexForLang(doc.GetLanguage());
+        if (!funcRegex.empty())
+        {
+            std::wstring symbolName = CUnicodeUtils::StdGetUnicode(GetSelectedText(SelectionHandling::CurrentWordIfSelectionIsEmpty));
+            if (!symbolName.empty())
+            {
+                findReplaceFindFunction(m_pMainWindow, symbolName);
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 HRESULT CCmdGotoSymbol::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
