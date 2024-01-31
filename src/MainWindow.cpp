@@ -3814,9 +3814,11 @@ bool CMainWindow::OpenFileAs(const std::wstring& tempPath, const std::wstring& r
         return false;
     }
 
+    std::wstring filepath     = CPathUtils::GetLongPathname(tempPath);
+
     // Get the id for the document we just loaded,
     // it'll currently have a temporary name.
-    auto  docID        = m_docManager.GetIdForPath(tempPath);
+    auto  docID        = m_docManager.GetIdForPath(filepath);
     auto& doc          = m_docManager.GetModDocumentFromID(docID);
     doc.m_path         = CPathUtils::GetLongPathname(realpath);
     doc.m_bIsDirty     = bModified;
