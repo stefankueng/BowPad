@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -117,10 +117,10 @@ protected:
     void                    ExchangeItemData(POINT point);
     LRESULT                 RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
     COLORREF                GetTabColor(UINT item) const;
-    void                    DrawMainBorder(LPDRAWITEMSTRUCT lpDrawItemStruct) const;
+    static void             DrawMainBorder(LPDRAWITEMSTRUCT lpDrawItemStruct);
     void                    DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct, float fraction) const;
     void                    DraggingCursor(POINT screenPoint, UINT item);
-    int                     GetTabIndexAt(const POINT &p) const { return GetTabIndexAt(p.x, p.y); }
+    int                     GetTabIndexAt(const POINT & p) const { return GetTabIndexAt(p.x, p.y); }
     int                     GetTabIndexAt(int x, int y) const;
     bool                    IsPointInParentZone(POINT screenPoint) const;
     void                    NotifyTabDelete(int tab);
@@ -145,10 +145,10 @@ private:
     WNDPROC                          m_tabBarDefaultProc;
     WNDPROC                          m_tabBarSpinDefaultProc;
     HWND                             m_spin;
+    bool                             m_bIsSpinVisible;
 
     RECT                             m_currentHoverTabRect;
     int                              m_currentHoverTabItem;
-
     CloseButtonZone                  m_closeButtonZone;
     bool                             m_bIsCloseHover;
     int                              m_whichCloseClickDown;

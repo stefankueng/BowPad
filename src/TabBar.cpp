@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2023 - Stefan Kueng
+// Copyright (C) 2013-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ CTabBar::CTabBar(HINSTANCE hInst)
     , m_tabBarDefaultProc(nullptr)
     , m_tabBarSpinDefaultProc(nullptr)
     , m_spin(nullptr)
+    , m_bIsSpinVisible(false)
     , m_currentHoverTabItem(-1)
     , m_bIsCloseHover(false)
     , m_whichCloseClickDown(-1)
@@ -483,7 +484,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             DrawMainBorder(&dis);
 
-            if (m_spin)
+            if (m_bIsSpinVisible)
             {
                 RECT rcSpin{};
                 GetWindowRect(m_spin, &rcSpin);
@@ -492,7 +493,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                 dis.rcItem.right = rcSpin.left;
             }
             // paint the tabs first and then the borders
-            auto count       = GetItemCount();
+            auto count = GetItemCount();
             if (!count) // no pages added
             {
                 SelectObject(hDC, hOldFont);
@@ -677,7 +678,7 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             auto index = GetTabIndexAt(xPos, yPos);
             RECT rcItem{};
             TabCtrl_GetItemRect(*this, index, &rcItem);
-            if (m_spin)
+            if (m_bIsSpinVisible)
             {
                 RECT rcSpin{};
                 GetWindowRect(m_spin, &rcSpin);
@@ -754,12 +755,12 @@ LRESULT CTabBar::RunProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                 RECT rPage{};
                 GetClientRect(*this, &rPage);
                 TabCtrl_AdjustRect(*this, FALSE, &rPage);
-                if (m_spin)
+                if (m_bIsSpinVisible)
                 {
                     RECT rcSpin{};
                     GetWindowRect(m_spin, &rcSpin);
                     MapWindowPoints(nullptr, *this, reinterpret_cast<LPPOINT>(&rcSpin), 2);
-                    rPage.right      = rcSpin.left;
+                    rPage.right = rcSpin.left;
                 }
                 if (m_currentHoverTabRect.left < rPage.right && m_currentHoverTabRect.right > 0)
                 {
@@ -996,7 +997,7 @@ COLORREF CTabBar::GetTabColor(UINT item) const
     return clr;
 }
 
-void CTabBar::DrawMainBorder(const LPDRAWITEMSTRUCT lpdis) const
+void CTabBar::DrawMainBorder(const LPDRAWITEMSTRUCT lpdis)
 {
     GDIHelpers::FillSolidRect(lpdis->hDC, &lpdis->rcItem, CTheme::Instance().GetThemeColor(::GetSysColor(COLOR_3DFACE)));
 }
@@ -1272,10 +1273,16 @@ LRESULT CTabBar::TabBarSpin_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
     {
         case WM_PAINT:
         {
+            // as WM_SHOWWINDOW is only ever sent with wParam == FALSE, use WM_PAINT instead
+            // of WM_SHOWWINDOW with wParam == TRUE
+            // alternatives might be WM_NCPAINT or 1125, which also both seem to be only
+            // sent when updown control is unhidden
+            if (!pTab->m_bIsSpinVisible)
+                pTab->m_bIsSpinVisible = true;
+
             PAINTSTRUCT ps;
             BeginPaint(hwnd, &ps);
             HDC  hdc = ps.hdc;
-
             RECT rcPaint{};
             GetClientRect(hwnd, &rcPaint);
             auto rcLeft       = rcPaint;
@@ -1472,9 +1479,18 @@ LRESULT CTabBar::TabBarSpin_Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             InvalidateRect(hwnd, nullptr, false);
         }
         break;
+        case WM_SHOWWINDOW:
+        {
+            if (wParam == FALSE) //< checked and is only ever sent with wParam == FALSE
+                pTab->m_bIsSpinVisible = false;
+            else
+                pTab->m_bIsSpinVisible = true;
+            break;
+        }
         case WM_DESTROY:
         {
-            pTab->m_spin = nullptr;
+            pTab->m_bIsSpinVisible = false;
+            pTab->m_spin           = nullptr;
             break;
         }
         default:
@@ -1533,6 +1549,7 @@ void CTabBar::SubclassSpinBox()
 
                     pThis->m_tabBarSpinDefaultProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(hChild, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(TabBarSpin_Proc)));
                     pThis->m_spin                  = hChild;
+                    pThis->m_bIsSpinVisible        = true;
                     return FALSE;
                 }
                 return TRUE;
