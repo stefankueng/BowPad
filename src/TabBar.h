@@ -124,7 +124,7 @@ protected:
     int                     GetTabIndexAt(int x, int y) const;
     bool                    IsPointInParentZone(POINT screenPoint) const;
     void                    NotifyTabDelete(int tab);
-    void                    SubclassSpinBox();
+    bool                    IsSpinVisible() const;
 
 private:
     int                              m_nItems;
@@ -145,7 +145,6 @@ private:
     WNDPROC                          m_tabBarDefaultProc;
     WNDPROC                          m_tabBarSpinDefaultProc;
     HWND                             m_spin;
-    bool                             m_bIsSpinVisible;
 
     RECT                             m_currentHoverTabRect;
     int                              m_currentHoverTabItem;
