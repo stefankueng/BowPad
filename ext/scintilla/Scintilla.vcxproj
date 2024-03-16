@@ -344,6 +344,7 @@
     <ClCompile Include="..\lexilla\lexlib\CharacterCategory.cxx" />
     <ClCompile Include="..\lexilla\lexlib\CharacterSet.cxx" />
     <ClCompile Include="..\lexilla\lexlib\DefaultLexer.cxx" />
+    <ClCompile Include="..\lexilla\lexlib\InList.cxx" />
     <ClCompile Include="..\lexilla\lexlib\LexAccessor.cxx" />
     <ClCompile Include="..\lexilla\lexlib\LexerBase.cxx" />
     <ClCompile Include="..\lexilla\lexlib\LexerModule.cxx" />
@@ -382,6 +383,7 @@
     <ClCompile Include="src\ScintillaBase.cxx" />
     <ClCompile Include="src\Selection.cxx" />
     <ClCompile Include="src\Style.cxx" />
+    <ClCompile Include="src\UndoHistory.cxx" />
     <ClCompile Include="src\UniConversion.cxx" />
     <ClCompile Include="src\UniqueString.cxx" />
     <ClCompile Include="src\ViewStyle.cxx" />
@@ -399,6 +401,7 @@
     <ClInclude Include="..\lexilla\lexlib\CharacterCategory.h" />
     <ClInclude Include="..\lexilla\lexlib\CharacterSet.h" />
     <ClInclude Include="..\lexilla\lexlib\DefaultLexer.h" />
+    <ClInclude Include="..\lexilla\lexlib\InList.h" />
     <ClInclude Include="..\lexilla\lexlib\LexAccessor.h" />
     <ClInclude Include="..\lexilla\lexlib\LexerBase.h" />
     <ClInclude Include="..\lexilla\lexlib\LexerModule.h" />
@@ -455,6 +458,7 @@
     <ClInclude Include="src\SparseVector.h" />
     <ClInclude Include="src\SplitVector.h" />
     <ClInclude Include="src\Style.h" />
+    <ClInclude Include="src\UndoHistory.h" />
     <ClInclude Include="src\UniConversion.h" />
     <ClInclude Include="src\UniqueString.h" />
     <ClInclude Include="src\ViewStyle.h" />

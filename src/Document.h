@@ -17,9 +17,11 @@
 #pragma once
 #include "Scintilla.h"
 #include "ScintillaTypes.h"
+#include "../ext/scintilla/include/ILoader.h"
+
 #include <functional>
 
-using Document = void*;
+using Document = Scintilla::IDocumentEditable*;
 
 enum class EOLFormat : int
 {

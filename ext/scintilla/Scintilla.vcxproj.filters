@@ -246,6 +246,12 @@
     <ClInclude Include="src\ChangeHistory.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
+    <ClInclude Include="src\UndoHistory.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lexilla\lexlib\InList.h">
+      <Filter>Lexilla\lexlib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lexilla\lexers\LexSQL.cxx">
@@ -751,6 +757,12 @@
     </ClCompile>
     <ClCompile Include="src\ChangeHistory.cxx">
       <Filter>Scintilla\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UndoHistory.cxx">
+      <Filter>Scintilla\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lexilla\lexlib\InList.cxx">
+      <Filter>Lexilla\lexlib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

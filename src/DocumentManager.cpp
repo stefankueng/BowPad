@@ -704,7 +704,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
         doc.m_format = EOLFormat::Win_Format;
 
     auto loadedDoc = pdocLoad->ConvertToDocument();          // loadedDoc has reference count 1
-    m_scratchScintilla.Scintilla().SetDocPointer(loadedDoc); // doc in scratch has reference count 2 (loadedDoc 1, added one)
+    m_scratchScintilla.Scintilla().SetDocPointer(static_cast<Scintilla::IDocumentEditable*>(loadedDoc)); // doc in scratch has reference count 2 (loadedDoc 1, added one)
     m_scratchScintilla.Scintilla().SetUndoCollection(true);
     m_scratchScintilla.Scintilla().EmptyUndoBuffer();
     m_scratchScintilla.Scintilla().SetSavePoint();
