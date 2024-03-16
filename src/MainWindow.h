@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2023 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -91,8 +91,8 @@ public:
     void         SetFileOpenMRU(bool bUseMRU) { m_bPathsToOpenMRU = bUseMRU; }
     void         SetElevatedSave(const std::wstring& path, const std::wstring& savePath, long line);
     void         ElevatedSave(const std::wstring& path, const std::wstring& savePath, long line);
-    void         TabMove(const std::wstring& path, const std::wstring& savePath, bool bMod, long line, const std::wstring& title);
-    void         SetTabMove(const std::wstring& path, const std::wstring& savePath, bool bMod, long line, const std::wstring& title);
+    void         TabMove(const std::wstring& path, const std::wstring& savePath, bool bMod, long line, const std::wstring& title, const std::wstring& posInfoPath);
+    void         SetTabMove(const std::wstring& path, const std::wstring& savePath, bool bMod, long line, const std::wstring& title, const std::wstring& posInfoPath);
     void         SetInsertionIndex(int index) { m_insertionIndex = index; }
     std::wstring GetNewTabName();
     void         ShowFileTree(bool bShow);
@@ -233,6 +233,7 @@ private:
     std::wstring                                   m_tabMovePath;
     std::wstring                                   m_tabMoveSavePath;
     std::wstring                                   m_tabMoveTitle;
+    std::wstring                                   m_tabMovePosInfoPath;
     bool                                           m_tabMoveMod;
     bool                                           m_bIgnoreFileChanges;
     long                                           m_initLine;

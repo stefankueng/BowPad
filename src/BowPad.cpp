@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2023 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -364,7 +364,7 @@ static void ParseCommandLine(CCmdLineParser& parser, CMainWindow* mainWindow)
         if (parser.HasKey(L"tabmove") && parser.HasKey(L"savepath"))
         {
             std::wstring title = parser.HasVal(L"title") ? parser.GetVal(L"title") : L"";
-            mainWindow->SetTabMove(parser.GetVal(L"path"), parser.GetVal(L"savepath"), !!parser.HasKey(L"modified"), static_cast<long>(line), title);
+            mainWindow->SetTabMove(parser.GetVal(L"path"), parser.GetVal(L"savepath"), !!parser.HasKey(L"modified"), static_cast<long>(line), title, parser.GetVal(L"posinfopath"));
             mainWindow->SetFileOpenMRU(false);
         }
     }
