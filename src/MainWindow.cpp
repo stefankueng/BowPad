@@ -3596,6 +3596,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
     m_editor.SetEOLType(toEolMode(doc.m_format));
     m_editor.SetupLexerForLang(doc.GetLanguage());
     m_editor.RestoreCurrentPos(doc.m_position);
+    doc.m_position.m_undoData = {};
     m_editor.SetTabSettings(doc.m_tabSpace);
     m_editor.SetReadDirection(doc.m_readDir);
     RefreshAnnotations();
@@ -4531,6 +4532,7 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
                     editor->Scintilla().ClearAll();
                     editor->Scintilla().AppendText(text.size(), text.data());
                     editor->RestoreCurrentPos(doc.m_position);
+                    doc.m_position.m_undoData = {};
                     editor->Scintilla().EndUndoAction();
                     docReload.m_document = doc.m_document;
                 }
@@ -4550,6 +4552,7 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
     editor->SetupLexerForLang(lang);
     doc.SetLanguage(lang);
     editor->RestoreCurrentPos(docReload.m_position);
+    docReload.m_position.m_undoData = {};
     editor->Scintilla().SetReadOnly(docReload.m_bIsWriteProtected);
     editor->EnableChangeHistory();
     CEditorConfigHandler::Instance().ApplySettingsForPath(doc.m_path, editor, doc, false);

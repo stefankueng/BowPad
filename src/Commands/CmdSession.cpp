@@ -331,6 +331,7 @@ void CCmdSessionLoad::RestoreSavedSession() const
         if (static_cast<int>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"activetab%d", fileNum).c_str(), 0)))
             activeDoc = docId;
         RestoreCurrentPos(doc.m_position);
+        doc.m_position.m_undoData = {};
     }
     if (activeDoc.IsValid())
     {

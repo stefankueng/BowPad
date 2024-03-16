@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014, 2016, 2020-2021, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ bool CCmdNewCopy::Execute()
         SetupLexerForLang(docNew.GetLanguage());
         Scintilla().AppendText(len, textBuf.get());
         RestoreCurrentPos(docNew.m_position);
+        docNew.m_position.m_undoData = {};
         Scintilla().SetSavePoint();
         std::wstring sTitle = CPathUtils::GetFileName(doc.m_path);
         if (sTitle.empty())

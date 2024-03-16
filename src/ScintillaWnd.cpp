@@ -944,17 +944,20 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
 
 void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
 {
-    for (const auto& [type, position, text] : pos.m_undoData.m_actions)
+    if (!m_scintilla.CanUndo() && !m_scintilla.CanRedo() && !pos.m_undoData.m_actions.empty())
     {
-        m_scintilla.PushUndoActionType(type, position);
-        m_scintilla.ChangeLastUndoActionText(text.length(), text.c_str());
+        for (const auto& [type, position, text] : pos.m_undoData.m_actions)
+        {
+            m_scintilla.PushUndoActionType(type, position);
+            m_scintilla.ChangeLastUndoActionText(text.length(), text.c_str());
+        }
+        if (const int savePoint = pos.m_undoData.m_savePoint; savePoint != -2)
+            m_scintilla.SetUndoSavePoint(savePoint);
+        if (const int tentative = pos.m_undoData.m_tentative; tentative != -2)
+            m_scintilla.SetUndoTentative(tentative);
+        if (const int current = pos.m_undoData.m_currentAction; current != -2)
+            m_scintilla.SetUndoCurrent(current);
     }
-    if (const int savePoint = pos.m_undoData.m_savePoint; savePoint != -2)
-        m_scintilla.SetUndoSavePoint(savePoint);
-    if (const int tentative = pos.m_undoData.m_tentative; tentative != -2)
-        m_scintilla.SetUndoTentative(tentative);
-    if (const int current = pos.m_undoData.m_currentAction; current != -2)
-        m_scintilla.SetUndoCurrent(current);
 
     // if the document hasn't been styled yet, do it now
     // otherwise restoring the folds won't work.
