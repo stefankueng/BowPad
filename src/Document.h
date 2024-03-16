@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2021, 2023 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021, 2023-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,6 +41,22 @@ std::wstring         getEolFormatDescription(EOLFormat ft);
 EOLFormat            toEolFormat(Scintilla::EndOfLine eolMode);
 Scintilla::EndOfLine toEolMode(EOLFormat eolFormat);
 
+class CUndoAction
+{
+public:
+    int                 m_type     = 0;
+    Scintilla::Position m_position = {};
+    std::string         m_text;
+};
+
+class CUndoData
+{
+public:
+    int                      m_savePoint     = -2;
+    int                      m_currentAction = -2;
+    int                      m_tentative     = -2;
+    std::vector<CUndoAction> m_actions;
+};
 class CPosData
 {
 public:
@@ -52,7 +68,8 @@ public:
         , m_xOffset(0)
         , m_nSelMode(Scintilla::SelectionMode::Stream)
         , m_nScrollWidth(1)
-        , m_lastStyleLine(0){};
+        , m_lastStyleLine(0)
+        , m_undoData(){};
     ~CPosData()
     {
     }
@@ -66,6 +83,7 @@ public:
     sptr_t                   m_nScrollWidth;
     std::vector<sptr_t>      m_lineStateVector;
     sptr_t                   m_lastStyleLine;
+    CUndoData                m_undoData;
 };
 
 class CDocument
@@ -106,7 +124,7 @@ public:
     {
         return m_language;
     }
-    void SetLanguage(const std::string& lang);
+    void                     SetLanguage(const std::string& lang);
 
     Document                 m_document;
     std::wstring             m_path;

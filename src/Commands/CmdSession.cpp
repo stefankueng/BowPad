@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018, 2020-2023 - Stefan Kueng
+// Copyright (C) 2014-2018, 2020-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include <iostream>
 
 #include "../../ext/sktoolslib/ResString.h"
+#include "../../ext/sktoolslib/UnicodeUtils.h"
 
 namespace
 {
@@ -112,6 +113,21 @@ void CCmdSessionLoad::OnClose()
             std::copy(pos.m_lineStateVector.begin(), pos.m_lineStateVector.end() - 1, std::ostream_iterator<size_t, wchar_t>(out, L";"));
             out << pos.m_lineStateVector.back();
         }
+        if (!pos.m_undoData.m_actions.empty())
+        {
+            settings.SetInt64(sessionSection(), CStringUtils::Format(L"undonumactions%d", index).c_str(), static_cast<int>(pos.m_undoData.m_actions.size()));
+            settings.SetInt64(sessionSection(), CStringUtils::Format(L"undocurrentaction%d", index).c_str(), pos.m_undoData.m_currentAction);
+            settings.SetInt64(sessionSection(), CStringUtils::Format(L"undosavepoint%d", index).c_str(), pos.m_undoData.m_savePoint);
+            settings.SetInt64(sessionSection(), CStringUtils::Format(L"undotentative%d", index).c_str(), pos.m_undoData.m_tentative);
+            for (size_t undoIdx = 0; undoIdx < pos.m_undoData.m_actions.size(); ++undoIdx)
+            {
+                auto& action = pos.m_undoData.m_actions[undoIdx];
+                settings.SetInt64(sessionSection(), CStringUtils::Format(L"undoactiontype%d_%d", index, undoIdx).c_str(), action.m_type);
+                settings.SetInt64(sessionSection(), CStringUtils::Format(L"undoactionposition%d_%d", index, undoIdx).c_str(), action.m_position);
+                settings.SetString(sessionSection(), CStringUtils::Format(L"undoactiontext%d_%d", index, undoIdx).c_str(), CUnicodeUtils::StdGetUnicode(CStringUtils::base64_encode(action.m_text)).c_str());
+            }
+        }
+
         std::wstring result(out.str());
         settings.SetString(sessionSection(), CStringUtils::Format(L"foldlines%d", index).c_str(), result.c_str());
     };
@@ -279,6 +295,24 @@ void CCmdSessionLoad::RestoreSavedSession() const
         if (folds)
         {
             stringtok(pos.m_lineStateVector, folds, true, L";", false);
+        }
+        auto numUndoActions = static_cast<size_t>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undonumactions%d", fileNum).c_str(), 0));
+        if (numUndoActions)
+        {
+            CUndoData undoData;
+            undoData.m_currentAction = static_cast<int>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undocurrentaction%d", fileNum).c_str(), 0));
+            undoData.m_savePoint     = static_cast<int>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undosavepoint%d", fileNum).c_str(), 0));
+            undoData.m_tentative     = static_cast<int>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undotentative%d", fileNum).c_str(), 0));
+            for (size_t undoIdx = 0; undoIdx < numUndoActions; ++undoIdx)
+            {
+                CUndoAction action;
+                action.m_type     = static_cast<int>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undoactiontype%d_%d", fileNum, undoIdx).c_str(), 0));
+                action.m_position = static_cast<int>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undoactionposition%d_%d", fileNum, undoIdx).c_str(), 0));
+                action.m_text     = CStringUtils::base64_decode(CUnicodeUtils::StdGetUTF8(settings.GetString(sessionSection(), CStringUtils::Format(L"undoactiontext%d_%d", fileNum, undoIdx).c_str(), L"")));
+                undoData.m_actions.push_back(action);
+            }
+
+            pos.m_undoData = undoData;
         }
         if (origPath)
         {

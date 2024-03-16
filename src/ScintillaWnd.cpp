@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2023 - Stefan Kueng
+// Copyright (C) 2013-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -920,10 +920,42 @@ void CScintillaWnd::SaveCurrentPos(CPosData& pos)
     {
         m_lineToScrollToAfterPaint = -1;
     }
+
+    CUndoData undoData;
+    undoData.m_savePoint     = m_scintilla.UndoSavePoint();
+    undoData.m_currentAction = m_scintilla.UndoCurrent();
+    undoData.m_tentative     = m_scintilla.UndoTentative();
+    const int actions        = m_scintilla.UndoActions();
+    for (int act = 0; act < actions; ++act)
+    {
+        CUndoAction undoAction;
+        undoAction.m_type = m_scintilla.UndoActionType(act);
+        const int actType = undoAction.m_type & 0xff;
+        if (actType == 0 || actType == 1)
+        {
+            // Only insertions and deletions recorded, not container actions
+            undoAction.m_position = m_scintilla.UndoActionPosition(act);
+            undoAction.m_text     = m_scintilla.UndoActionText(act);
+            undoData.m_actions.push_back(undoAction);
+        }
+    }
+    pos.m_undoData = undoData;
 }
 
 void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
 {
+    for (const auto& [type, position, text] : pos.m_undoData.m_actions)
+    {
+        m_scintilla.PushUndoActionType(type, position);
+        m_scintilla.ChangeLastUndoActionText(text.length(), text.c_str());
+    }
+    if (const int savePoint = pos.m_undoData.m_savePoint; savePoint != -2)
+        m_scintilla.SetUndoSavePoint(savePoint);
+    if (const int tentative = pos.m_undoData.m_tentative; tentative != -2)
+        m_scintilla.SetUndoTentative(tentative);
+    if (const int current = pos.m_undoData.m_currentAction; current != -2)
+        m_scintilla.SetUndoCurrent(current);
+
     // if the document hasn't been styled yet, do it now
     // otherwise restoring the folds won't work.
     if (!pos.m_lineStateVector.empty())
