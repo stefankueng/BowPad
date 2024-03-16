@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2021-2023 - Stefan Kueng
+// Copyright (C) 2021-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -687,8 +687,10 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 m_editor->Scintilla().AutoCSetAutoHide(TRUE);
                 m_editor->Scintilla().AutoCSetSeparator(static_cast<uptr_t>(wordSeparator));
                 m_editor->Scintilla().AutoCSetTypeSeparator(static_cast<uptr_t>(typeSeparator));
+                auto option = Scintilla::AutoCompleteOption::SelectFirstItem;
                 if (CTheme::Instance().IsDarkTheme())
-                    m_editor->Scintilla().AutoCSetOptions(Scintilla::AutoCompleteOption::FixedSize);
+                    option = static_cast<Scintilla::AutoCompleteOption>(static_cast<int>(option) | static_cast<int>(Scintilla::AutoCompleteOption::FixedSize));
+                m_editor->Scintilla().AutoCSetOptions(option);
                 m_editor->Scintilla().AutoCShow(CUnicodeUtils::StdGetUTF8(rawPath).size(), pathComplete.c_str());
                 SetWindowStylesForAutocompletionPopup();
                 return;
@@ -713,8 +715,10 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                 m_editor->Scintilla().AutoCSetAutoHide(TRUE);
                 m_editor->Scintilla().AutoCSetSeparator(static_cast<uptr_t>(wordSeparator));
                 m_editor->Scintilla().AutoCSetTypeSeparator(static_cast<uptr_t>(typeSeparator));
+                auto option = Scintilla::AutoCompleteOption::SelectFirstItem;
                 if (CTheme::Instance().IsDarkTheme())
-                    m_editor->Scintilla().AutoCSetOptions(Scintilla::AutoCompleteOption::FixedSize);
+                    option = static_cast<Scintilla::AutoCompleteOption>(static_cast<int>(option) | static_cast<int>(Scintilla::AutoCompleteOption::FixedSize));
+                m_editor->Scintilla().AutoCSetOptions(option);
                 m_editor->Scintilla().AutoCShow(CUnicodeUtils::StdGetUTF8(rawPath).size(), sValueComplete.c_str());
                 SetWindowStylesForAutocompletionPopup();
                 return;
@@ -775,8 +779,10 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                             m_editor->Scintilla().AutoCSetAutoHide(TRUE);
                             m_editor->Scintilla().AutoCSetSeparator(static_cast<uptr_t>(wordSeparator));
                             m_editor->Scintilla().AutoCSetTypeSeparator(static_cast<uptr_t>(typeSeparator));
+                            auto option = Scintilla::AutoCompleteOption::SelectFirstItem;
                             if (CTheme::Instance().IsDarkTheme())
-                                m_editor->Scintilla().AutoCSetOptions(Scintilla::AutoCompleteOption::FixedSize);
+                                option = static_cast<Scintilla::AutoCompleteOption>(static_cast<int>(option) | static_cast<int>(Scintilla::AutoCompleteOption::FixedSize));
+                            m_editor->Scintilla().AutoCSetOptions(option);
                             m_editor->Scintilla().AutoCShow(CUnicodeUtils::StdGetUTF8(rawPath).size(), tagName.c_str());
                             SetWindowStylesForAutocompletionPopup();
                             return;
@@ -822,8 +828,10 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
                         m_editor->Scintilla().AutoCSetAutoHide(FALSE);
                         m_editor->Scintilla().AutoCSetSeparator(static_cast<uptr_t>(wordSeparator));
                         m_editor->Scintilla().AutoCSetTypeSeparator(static_cast<uptr_t>(typeSeparator));
+                        auto option = Scintilla::AutoCompleteOption::SelectFirstItem;
                         if (CTheme::Instance().IsDarkTheme())
-                            m_editor->Scintilla().AutoCSetOptions(Scintilla::AutoCompleteOption::FixedSize);
+                            option = static_cast<Scintilla::AutoCompleteOption>(static_cast<int>(option) | static_cast<int>(Scintilla::AutoCompleteOption::FixedSize));
+                        m_editor->Scintilla().AutoCSetOptions(option);
                         m_editor->Scintilla().AutoCShow(word.size() + 1, sAutoCompleteString.c_str());
                         SetWindowStylesForAutocompletionPopup();
                     }
@@ -895,8 +903,10 @@ void CAutoComplete::HandleAutoComplete(const SCNotification* scn)
             m_editor->Scintilla().AutoCSetAutoHide(TRUE);
             m_editor->Scintilla().AutoCSetSeparator(static_cast<uptr_t>(wordSeparator));
             m_editor->Scintilla().AutoCSetTypeSeparator(static_cast<uptr_t>(typeSeparator));
+            auto option = Scintilla::AutoCompleteOption::SelectFirstItem;
             if (CTheme::Instance().IsDarkTheme())
-                m_editor->Scintilla().AutoCSetOptions(Scintilla::AutoCompleteOption::FixedSize);
+                option = static_cast<Scintilla::AutoCompleteOption>(static_cast<int>(option) | static_cast<int>(Scintilla::AutoCompleteOption::FixedSize));
+            m_editor->Scintilla().AutoCSetOptions(option);
             m_editor->Scintilla().AutoCShow(word.size(), sAutoCompleteList.c_str());
             SetWindowStylesForAutocompletionPopup();
         }
