@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2016, 2021 - Stefan Kueng
+// Copyright (C) 2013, 2016, 2021, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,13 +27,16 @@ public:
     CAboutDlg(HWND hParent);
     ~CAboutDlg();
 
-    void                    SetHiddenWnd(HWND hWnd) {m_hHiddenWnd = hWnd;}
+    void SetHiddenWnd(HWND hWnd) { m_hHiddenWnd = hWnd; }
+
 protected:
-    LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-    LRESULT                 DoCommand(int id);
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT          DoCommand(int id);
+    bool             PreTranslateMessage(MSG* pMsg) override;
 
 private:
-    HWND                    m_hParent;
-    HWND                    m_hHiddenWnd;
-    CHyperLink              m_link;
+    HWND         m_hParent;
+    HWND         m_hHiddenWnd;
+    CHyperLink   m_link;
+    std::wstring m_version;
 };

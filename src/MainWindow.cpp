@@ -537,7 +537,7 @@ STDMETHODIMP CMainWindow::Execute(
 void CMainWindow::About() const
 {
     CAboutDlg dlg(*this);
-    dlg.DoModal(g_hRes, IDD_ABOUTBOX, *this);
+    dlg.DoModal(g_hRes, IDD_ABOUTBOX, *this, NULL);
 }
 
 void CMainWindow::ShowCommandPalette()

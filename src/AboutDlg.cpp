@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2017, 2020-2022 - Stefan Kueng
+// Copyright (C) 2013, 2015-2017, 2020-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,8 +21,11 @@
 #include "version.h"
 #include "Theme.h"
 #include "ResString.h"
+#include "../ext/sktoolslib/StringUtils.h"
+
 #include <string>
 #include <Commdlg.h>
+#include <format>
 
 CAboutDlg::CAboutDlg(HWND hParent)
     : m_hParent(hParent)
@@ -45,13 +48,12 @@ LRESULT CAboutDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam
             CTheme::Instance().SetThemeForDialog(*this, CTheme::Instance().IsDarkTheme());
             // initialize the controls
             m_link.ConvertStaticToHyperlink(hwndDlg, IDC_WEBLINK, L"http://tools.stefankueng.com");
-            wchar_t verbuf[1024] = {0};
 #ifdef _WIN64
-            swprintf_s(verbuf, _countof(verbuf), L"BowPad version %d.%d.%d.%d (64-bit)", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
+            m_version = std::format(L"BowPad version {}.{}.{}.{} (64-bit)", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
 #else
-            swprintf_s(verbuf, _countof(verbuf), L"BowPad version %d.%d.%d.%d", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
+            m_version = std::format(L"BowPad version {}.{}.{}.{}", BP_VERMAJOR, BP_VERMINOR, BP_VERMICRO, BP_VERBUILD);
 #endif
-            SetDlgItemText(hwndDlg, IDC_VERSIONLABEL, verbuf);
+            SetDlgItemText(hwndDlg, IDC_VERSIONLABEL, m_version.c_str());
             SetFocus(GetDlgItem(hwndDlg, IDOK));
         }
             return FALSE;
@@ -87,4 +89,18 @@ LRESULT CAboutDlg::DoCommand(int id)
         break;
     }
     return 1;
+}
+
+bool CAboutDlg::PreTranslateMessage(MSG* pMsg)
+{
+    if (pMsg->message == WM_KEYDOWN)
+    {
+        auto bCtrl  = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+        if (bCtrl && pMsg->wParam == 'C')
+        {
+            WriteAsciiStringToClipboard(m_version.c_str(), m_hwnd);
+            return true;
+        }
+    }
+    return false;
 }
