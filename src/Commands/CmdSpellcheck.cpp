@@ -414,6 +414,12 @@ void CCmdSpellCheck::OnTimer(UINT id)
     }
 }
 
+void CCmdSpellCheck::OnPluginNotify(UINT /*cmdId*/, const std::wstring& /*pluginName*/, LPARAM /*data*/)
+{
+    m_lastCheckedPos = 0;
+    SetTimer(GetHwnd(), g_checkTimer, 500, nullptr);
+}
+
 HRESULT CCmdSpellCheck::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
@@ -709,6 +715,7 @@ HRESULT CCmdSpellCheckCorrect::IUICommandHandlerExecute(UI_EXECUTIONVERB verb, c
                             // add to Dictionary
                             g_spellChecker->Add(sWord.c_str());
                         }
+                        NotifyPlugins(L"cmdSpellCheck", 1);
                     }
                 }
             }

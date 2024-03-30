@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2015-2017, 2020-2022 - Stefan Kueng
+// Copyright (C) 2015-2017, 2020-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ public:
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 
     void    OnTimer(UINT id) override;
+    void    OnPluginNotify(UINT cmdId, const std::wstring& pluginName, LPARAM data) override;
 
 protected:
     void Check();
