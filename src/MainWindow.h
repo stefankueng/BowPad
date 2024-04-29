@@ -69,7 +69,7 @@ class CMainWindow : public CWindow
 
 public:
     CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = nullptr);
-    virtual ~CMainWindow();
+    ~CMainWindow() override;
 
     bool         RegisterAndCreateWindow();
     bool         Initialize();
@@ -191,7 +191,7 @@ private:
     LRESULT                          HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
     LRESULT                          HandleFileTreeEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
     LRESULT                          HandleTabBarEvents(const NMHDR& nmHdr, WPARAM wParam, LPARAM lParam);
-    void                             ShowTablistDropdown(HWND hWnd, int offsetX, int offsetY);
+    void                             ShowTablistDropdown(HWND hWnd, int offsetX, int offsetY, bool sortByTab);
     int                              GetZoomPC() const;
     std::wstring                     GetZoomPC(int zoom) const;
     void                             SetZoomPC(int zoomPC) const;

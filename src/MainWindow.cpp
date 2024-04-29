@@ -1110,7 +1110,7 @@ LRESULT CMainWindow::HandleTabBarEvents(const NMHDR& nmHdr, WPARAM /*wParam*/, L
     return 0;
 }
 
-void CMainWindow::ShowTablistDropdown(HWND hWnd, int offsetX, int offsetY)
+void CMainWindow::ShowTablistDropdown(HWND hWnd, int offsetX, int offsetY, bool sortByTab)
 {
     if (hWnd)
     {
@@ -1128,9 +1128,10 @@ void CMainWindow::ShowTablistDropdown(HWND hWnd, int offsetX, int offsetY)
                 prepList.insert(std::make_pair(m_tabBar.GetTitle(i), i));
             }
             std::multimap<std::wstring, int, ci_lessW> tablist;
+            std::map<int, std::wstring>                tablistTab;
             for (auto& [tabTitle, tabIndex] : prepList)
             {
-                auto count = std::count_if(prepList.begin(), prepList.end(), [&](const auto& item) -> bool {
+                auto count = std::ranges::count_if(prepList, [&](const auto& item) -> bool {
                     return item.first == tabTitle;
                 });
                 if (count > 1)
@@ -1142,17 +1143,27 @@ void CMainWindow::ShowTablistDropdown(HWND hWnd, int offsetX, int offsetY)
                                                      tabTitle.c_str(),
                                                      pathBuf);
                     tablist.insert(std::make_pair(text, tabIndex + 1));
+                    tablistTab[tabIndex + 1] = text;
                 }
                 else
+                {
                     tablist.insert(std::make_pair(tabTitle, tabIndex + 1));
+                    tablistTab[tabIndex + 1] = tabTitle;
+                }
             }
-
-            for (auto& [tabTitle, tabIndex] : tablist)
+            if (sortByTab)
             {
-                if (tabIndex == (currentIndex + 1))
-                    AppendMenu(hMenu, MF_STRING | MF_CHECKED, tabIndex, tabTitle.c_str());
-                else
-                    AppendMenu(hMenu, MF_STRING, tabIndex, tabTitle.c_str());
+                for (auto& [tabIndex, tabTitle] : tablistTab)
+                {
+                    AppendMenu(hMenu, tabIndex == (currentIndex + 1) ? MF_STRING | MF_CHECKED : MF_STRING, tabIndex, tabTitle.c_str());
+                }
+            }
+            else
+            {
+                for (auto& [tabTitle, tabIndex] : tablist)
+                {
+                    AppendMenu(hMenu, tabIndex == (currentIndex + 1) ? MF_STRING | MF_CHECKED : MF_STRING, tabIndex, tabTitle.c_str());
+                }
             }
             TPMPARAMS tpm{};
             tpm.cbSize    = sizeof(TPMPARAMS);
@@ -1379,7 +1390,7 @@ void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
                     auto  pos = GetMessagePos();
                     POINT pt  = {GET_X_LPARAM(pos), GET_Y_LPARAM(pos)};
                     ScreenToClient(m_statusBar, &pt);
-                    ShowTablistDropdown(m_statusBar, pt.x, pt.y);
+                    ShowTablistDropdown(m_statusBar, pt.x, pt.y, false);
                 }
                 break;
                 default:
@@ -1561,7 +1572,7 @@ LRESULT CMainWindow::DoCommand(WPARAM wParam, LPARAM lParam)
             PasteHistory();
             break;
         case cmdTabListDropdownMenu:
-            ShowTablistDropdown(reinterpret_cast<HWND>(lParam), 0, 0);
+            ShowTablistDropdown(reinterpret_cast<HWND>(lParam), 0, 0, true);
             break;
         case cmdAbout:
             About();
