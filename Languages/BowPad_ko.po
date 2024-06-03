@@ -1,20 +1,20 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# VenusGirl <venusgirl@outlook.com>, 2019.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2022-02-21 22:47+0900\n"
+"PO-Revision-Date: 2024-06-03 23:58+0900\n"
 "Last-Translator: VenusGirl-비너스걸💋 <venusgirl@outlook.com>\n"
 "Language-Team: VᴇɴᴜsGɪʀʟ <https://venusgirls.tistory.com/>\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
 
 
 # msgid/msgstr fields for Accelerator keys
@@ -26,13 +26,10 @@ msgstr ""
 #    S = Shift key   (or blank if not used)
 #    X = upper case character
 # e.g. "V CS+Q" == Ctrl + Shift + 'Q'
-
 # ONLY Accelerator Keys with corresponding alphanumeric characters can be
 # updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
-
 # ONLY change the msgstr field. Do NOT change any other.
 # If you do not want to change an Accelerator Key, copy msgid to msgstr
-
 #. Resource IDs: (254)
 #, c-format
 msgid "%%i%%c%06Xno selection"
@@ -179,7 +176,7 @@ msgstr "모든 플러그인 명령이 여기에 나열됩니다"
 
 #. Resource IDs: (60141)
 msgid "Allows to load a file with a specific encoding"
-msgstr "특정 인코딩으로 파일을 로드할 수 있습니다"
+msgstr "특정 인코딩으로 파일을 불러올 수 있습니다"
 
 #. Resource IDs: (131)
 msgid "An update for BowPad is available"
@@ -229,7 +226,7 @@ msgstr "수정된 파일 자동 저장"
 
 #. Resource IDs: (60489)
 msgid "Auto-saves modified files when the session closes and restores the modified state on load"
-msgstr "세션이 닫힐 때 수정된 파일을 자동 저장하고 로드시 수정된 상태를 복원합니다"
+msgstr "세션이 닫힐 때 수정된 파일을 자동 저장하고 불러올 때 수정된 상태를 복원합니다"
 
 #. Resource IDs: (60633)
 msgid "Autocomplete"
@@ -320,24 +317,44 @@ msgid "Cancel"
 msgstr "취소"
 
 #. Resource IDs: (174)
-msgid "Cancel\nDo not delete the file."
-msgstr "취소\n"파일을 삭제하지 않습니다."
+msgid ""
+"Cancel\n"
+"Do not delete the file."
+msgstr ""
+"취소\n"
+"\"파일을 삭제하지 않습니다."
 
 #. Resource IDs: (223)
-msgid "Cancel\nLeave the file where it is."
-msgstr "취소\n파일을 그대로 둡니다."
+msgid ""
+"Cancel\n"
+"Leave the file where it is."
+msgstr ""
+"취소\n"
+"파일을 그대로 둡니다."
 
 #. Resource IDs: (164)
-msgid "Cancel\nThe file is not created."
-msgstr "취소\n파일이 생성되지 않았습니다."
+msgid ""
+"Cancel\n"
+"The file is not created."
+msgstr ""
+"취소\n"
+"파일이 생성되지 않았습니다."
 
 #. Resource IDs: (122)
-msgid "Cancel\nThe file is not loaded again."
-msgstr "취소\n파일이 다시 로드되지 않습니다."
+msgid ""
+"Cancel\n"
+"The file is not loaded again."
+msgstr ""
+"취소\n"
+"파일이 다시 로드되지 않습니다."
 
 #. Resource IDs: (167)
-msgid "Cancel\nThe unsaved modifications will be kept."
-msgstr "취소\n저장하지 않은 수정사항은 유지됩니다."
+msgid ""
+"Cancel\n"
+"The unsaved modifications will be kept."
+msgstr ""
+"취소\n"
+"저장하지 않은 수정사항은 유지됩니다."
 
 #. Resource IDs: (247, 60201)
 msgid "Capture Regex"
@@ -420,8 +437,12 @@ msgid "Close the current tab"
 msgstr "현재 탭 닫기"
 
 #. Resource IDs: (126)
-msgid "Close the document\nThe document tab is closed."
-msgstr "문서 닫기\n문서 탭을 닫습니다."
+msgid ""
+"Close the document\n"
+"The document tab is closed."
+msgstr ""
+"문서 닫기\n"
+"문서 탭을 닫습니다."
 
 #. Resource IDs: (60074)
 msgid "Closes all open files"
@@ -560,8 +581,12 @@ msgid "Copy the current selection to the clipboard. Hold down the shift key to c
 msgstr "현재 선택 영역을 클립보드에 복사합니다. Shift 키를 누른 채로 포맷된 텍스트를 복사합니다."
 
 #. Resource IDs: (221)
-msgid "Copy the file\nThe copy is opened in another tab."
-msgstr "파일 복사\n복사본은 다른 탭에서 열립니다."
+msgid ""
+"Copy the file\n"
+"The copy is opened in another tab."
+msgstr ""
+"파일 복사\n"
+"복사본은 다른 탭에서 열립니다."
 
 #. Resource IDs: (60617)
 msgid "Correct spelling mistakes"
@@ -601,8 +626,12 @@ msgid "Create files on OK."
 msgstr "확인에 파일을 만듭니다."
 
 #. Resource IDs: (163)
-msgid "Create\nAn empty file is created."
-msgstr "만들기\n빈 파일이 생성됩니다."
+msgid ""
+"Create\n"
+"An empty file is created."
+msgstr ""
+"만들기\n"
+"빈 파일이 생성됩니다."
 
 #. Resource IDs: (60541)
 msgid "Creates a copy of the current tab"
@@ -613,8 +642,12 @@ msgid "Creates a new tab with an empty document"
 msgstr "빈 문서로 새 탭을 만듭니다"
 
 #. Resource IDs: (114)
-msgid "Ctrl+click to follow URL\nor click here"
-msgstr "URL을 따르려면 Ctrl+클릭\n또는 여기를 클릭하십시오"
+msgid ""
+"Ctrl+click to follow URL\n"
+"or click here"
+msgstr ""
+"URL을 따르려면 Ctrl+클릭\n"
+"또는 여기를 클릭하십시오"
 
 #. Resource IDs: (259)
 #, c-format
@@ -702,8 +735,12 @@ msgid "Delete file"
 msgstr "파일 삭제"
 
 #. Resource IDs: (173)
-msgid "Delete\nThe file will be removed."
-msgstr "삭제\n파일이 제거됩니다."
+msgid ""
+"Delete\n"
+"The file will be removed."
+msgstr ""
+"삭제\n"
+"파일이 제거됩니다."
 
 #. Resource IDs: (60537)
 msgid "Deletes the file of the current tab"
@@ -718,8 +755,12 @@ msgid "Determines whether a tab is inserted or spaces when the tab key is presse
 msgstr "탭 키를 누를 때 탭을 삽입할지 공백으로 둘지를 결정합니다."
 
 #. Resource IDs: (129)
-msgid "Do &not download the update\nYou will be reminded again about the update in a week."
-msgstr "업데이트를 다운로드하지 않음(&N)\n일주일 후에 업데이트에 대해 다시 알려드리겠습니다."
+msgid ""
+"Do &not download the update\n"
+"You will be reminded again about the update in a week."
+msgstr ""
+"업데이트를 다운로드하지 않음(&N)\n"
+"일주일 후에 업데이트에 대해 다시 알려드리겠습니다."
 
 #. Resource IDs: (212)
 msgid "Do this for all files"
@@ -738,7 +779,7 @@ msgstr "'%s' 파일을 '%s'로 이동하시겠습니까?"
 #. Resource IDs: (106)
 #, c-format
 msgid "Do you want to save changes to \"%s\"?"
-msgstr "\"%s\에 대한 변경 내용을 저장하시겠습니까?"
+msgstr "\"%s\\에 대한 변경 내용을 저장하시겠습니까?"
 
 #. Resource IDs: (108)
 msgid "Do&n't save"
@@ -757,24 +798,40 @@ msgid "Document removed"
 msgstr "문서가 제거되었습니다"
 
 #. Resource IDs: (150)
-msgid "Don't Save\nThe file is not saved."
-msgstr "저장 안 함\n파일이 저장되지 않았습니다."
+msgid ""
+"Don't Save\n"
+"The file is not saved."
+msgstr ""
+"저장 안 함\n"
+"파일이 저장되지 않았습니다."
 
 #. Resource IDs: (148)
-msgid "Don't open\nThe file is not opened."
-msgstr "열지 않음\n파일이 열리지 않습니다."
+msgid ""
+"Don't open\n"
+"The file is not opened."
+msgstr ""
+"열지 않음\n"
+"파일이 열리지 않습니다."
 
 #. Resource IDs: (127)
-msgid "Download and install the update\nUpdates BowPad to the latest version."
-msgstr "업데이트 다운로드 및 설치\nBowPad를 최신 버전으로 업데이트합니다."
+msgid ""
+"Download and install the update\n"
+"Updates BowPad to the latest version."
+msgstr ""
+"업데이트 다운로드 및 설치\n"
+"BowPad를 최신 버전으로 업데이트합니다."
 
 #. Resource IDs: (140)
 msgid "Download of language list succeeded. Now you can select a language from that list."
 msgstr "언어 목록을 다운로드했습니다. 이제 해당 목록에서 언어를 선택할 수 있습니다."
 
 #. Resource IDs: (128)
-msgid "Download the update\nYou have to install the update manually."
-msgstr "업데이트 다운로드\n업데이트를 수동으로 설치해야 합니다."
+msgid ""
+"Download the update\n"
+"You have to install the update manually."
+msgstr ""
+"업데이트 다운로드\n"
+"업데이트를 수동으로 설치해야 합니다."
 
 #. Resource IDs: (275)
 msgid "Draws a frame around the current line"
@@ -782,7 +839,7 @@ msgstr "현재 줄 주위에 프레임을 그립니다"
 
 #. Resource IDs: (60263, 60265)
 msgid "Duplicate Line"
-msgstr "중복 줄"
+msgstr "줄 복제"
 
 #. Resource IDs: (60266)
 msgid "Duplicates the current line"
@@ -899,13 +956,29 @@ msgstr "사용 가능한 언어 목록을 다운로드하지 못했습니다."
 
 #. Resource IDs: (169)
 #, c-format
-msgid "Failed to load the file '%s'.\r\n\r\nThe error message is:\r\n%s"
-msgstr "'%s' 파일을 로드하지 못했습니다.\r\n\r\n오류 메시지는 다음과 같습니다:\r\n%s"
+msgid ""
+"Failed to load the file '%s'.\r\n"
+"\r\n"
+"The error message is:\r\n"
+"%s"
+msgstr ""
+"'%s' 파일을 로드하지 못했습니다.\r\n"
+"\r\n"
+"오류 메시지는 다음과 같습니다:\r\n"
+"%s"
 
 #. Resource IDs: (186)
 #, c-format
-msgid "Failed to save the file '%s'.\r\n\r\nThe error message is:\r\n%s"
-msgstr "'%s' 파일을 저장하지 못했습니다.\r\n\r\n오류 메시지는 다음과 같습니다:\r\n%s"
+msgid ""
+"Failed to save the file '%s'.\r\n"
+"\r\n"
+"The error message is:\r\n"
+"%s"
+msgstr ""
+"'%s' 파일을 저장하지 못했습니다.\r\n"
+"\r\n"
+"오류 메시지는 다음과 같습니다:\r\n"
+"%s"
 
 #. Resource IDs: (137)
 msgid "Fetch remote languages..."
@@ -933,16 +1006,24 @@ msgid "File does not exist"
 msgstr "파일이 없습니다"
 
 #. Resource IDs: (255)
-msgid "File extensions for this style, separated by semicolon.\nExample: cpp;c;h;hpp"
-msgstr "이 스타일에 대한 파일 확장자로, 세미콜론으로 구분됩니다.\n예: cpp;c;h;hpp"
+msgid ""
+"File extensions for this style, separated by semicolon.\n"
+"Example: cpp;c;h;hpp"
+msgstr ""
+"이 스타일에 대한 파일 확장자로, 세미콜론으로 구분됩니다.\n"
+"예: cpp;c;h;hpp"
 
 #. Resource IDs: (104)
 msgid "File is too big to be opened by BowPad"
 msgstr "파일이 너무 커서 BowPad에서 열 수 없습니다"
 
 #. Resource IDs: (279)
-msgid "File tree is empty\r\nno files to show"
-msgstr "파일 트리가 비어 있습니다.\r\n표시할 파일이 없습니다"
+msgid ""
+"File tree is empty\r\n"
+"no files to show"
+msgstr ""
+"파일 트리가 비어 있습니다.\r\n"
+"표시할 파일이 없습니다"
 
 #. Resource IDs: (239)
 msgid "Filename required for first file."
@@ -1070,12 +1151,26 @@ msgstr "현재 줄에 대한 프레임"
 
 #. Resource IDs: (203)
 #, c-format
-msgid "Full file path:\r\n%s\r\n\r\nWord count: %ld\r\nLines: %ld\r\nEmpty lines: %ld\r\nParagraphs: %ld\r\n"
-msgstr "전체 파일 경로:\r\n%s\r\n\r\n단어 수: %ld\r\n줄: %ld\r\n빈 줄: %ld\r\n단락: %ld\r\n"
+msgid ""
+"Full file path:\r\n"
+"%s\r\n"
+"\r\n"
+"Word count: %ld\r\n"
+"Lines: %ld\r\n"
+"Empty lines: %ld\r\n"
+"Paragraphs: %ld\r\n"
+msgstr ""
+"전체 파일 경로:\r\n"
+"%s\r\n"
+"\r\n"
+"단어 수: %ld\r\n"
+"줄: %ld\r\n"
+"빈 줄: %ld\r\n"
+"단락: %ld\r\n"
 
 #. Resource IDs: (1010, 60491, 60493)
 msgid "Functions"
-msgstr "기능"
+msgstr "함수"
 
 #. Resource IDs: (60324)
 msgid "GL"
@@ -1138,8 +1233,12 @@ msgid "Ignore word for this session"
 msgstr "이 세션의 단어 무시"
 
 #. Resource IDs: (262)
-msgid "Import\nThe lexer file is imported. Restart BowPad to use the new lexer."
-msgstr "가져오기\n렉서 파일을 가져옵니다. 새 렉서를 사용하려면 BowPad를 다시 시작하십시오."
+msgid ""
+"Import\n"
+"The lexer file is imported. Restart BowPad to use the new lexer."
+msgstr ""
+"가져오기\n"
+"렉서 파일을 가져옵니다. 새 렉서를 사용하려면 BowPad를 다시 시작하십시오."
 
 #. Resource IDs: (60623, 60624)
 msgid "Include uppercase"
@@ -1195,8 +1294,12 @@ msgid "Join selected lines to one long line"
 msgstr "선택한 줄을 하나의 긴 줄에 결합"
 
 #. Resource IDs: (125)
-msgid "Keep the document\nThe document is kept open."
-msgstr "문서 보관\n문서가 열려 있습니다."
+msgid ""
+"Keep the document\n"
+"The document is kept open."
+msgstr ""
+"문서 보관\n"
+"문서가 열려 있습니다."
 
 #. Resource IDs: (60139)
 msgid "LA"
@@ -1232,11 +1335,15 @@ msgstr "언어"
 
 #. Resource IDs: (60152)
 msgid "Language Lexer"
-msgstr "렉서 언어 "
+msgstr "렉서 언어"
 
 #. Resource IDs: (138)
-msgid "Language selected.\nYou need to restart BowPad for the changes to take effect."
-msgstr "언어를 선택했습니다.\n변경 내용을 적용하려면 BowPad를 다시 시작해야 합니다."
+msgid ""
+"Language selected.\n"
+"You need to restart BowPad for the changes to take effect."
+msgstr ""
+"언어를 선택했습니다.\n"
+"변경 내용을 적용하려면 BowPad를 다시 시작해야 합니다."
 
 #. Resource IDs: (1132, 65535)
 msgid "Language:"
@@ -1276,8 +1383,12 @@ msgstr "Safari에서 실행"
 
 #. Resource IDs: (176)
 #, c-format
-msgid "Length in bytes: %ld (%s)\r\nLines: %ld"
-msgstr "길이 (바이트): %ld (%s)\r\n"줄: %ld"
+msgid ""
+"Length in bytes: %ld (%s)\r\n"
+"Lines: %ld"
+msgstr ""
+"길이 (바이트): %ld (%s)\r\n"
+"\"줄: %ld"
 
 #. Resource IDs: (60150)
 msgid "Lexer"
@@ -1294,8 +1405,16 @@ msgstr "줄"
 
 #. Resource IDs: (177)
 #, c-format
-msgid "Line : %ld\r\nColumn : %ld\r\nSelection : %Iu | %Iu\r\nMatches: %ld"
-msgstr "줄 : %ld\r\n열 : %ld\r\n선택 : %Iu | %Iu\r\n일치: %ld"
+msgid ""
+"Line : %ld\r\n"
+"Column : %ld\r\n"
+"Selection : %Iu | %Iu\r\n"
+"Matches: %ld"
+msgstr ""
+"줄 : %ld\r\n"
+"열 : %ld\r\n"
+"선택 : %Iu | %Iu\r\n"
+"일치: %ld"
 
 #. Resource IDs: (60155)
 msgid "Line Endings"
@@ -1334,7 +1453,7 @@ msgstr "줄: %%c%06X%ld%%r / %%c%06X%ld%%r    열: %%c%06X%ld%%r"
 
 #. Resource IDs: (60138, 60140)
 msgid "Load as"
-msgstr "다른 이름으로 불러오기"
+msgstr "다른 인코딩으로 불러오기"
 
 #. Resource IDs: (60478)
 msgid "Load last session"
@@ -1437,8 +1556,12 @@ msgid "Move the caret to the previous bookmark"
 msgstr "캐럿을 이전 책갈피로 이동"
 
 #. Resource IDs: (222)
-msgid "Move the file\nThe file tab is updated to the new path."
-msgstr "파일 이동\n파일 탭이 새 경로로 업데이트됩니다."
+msgid ""
+"Move the file\n"
+"The file tab is updated to the new path."
+msgstr ""
+"파일 이동\n"
+"파일 탭이 새 경로로 업데이트됩니다."
 
 #. Resource IDs: (60280)
 msgid "Move up"
@@ -1536,15 +1659,19 @@ msgstr "플러그인을 찾을 수 없습니다. 인터넷 연결을 확인합�
 
 #. Resource IDs: (188)
 msgid "No plugins loaded"
-msgstr "로드된 플러그인이 없습니다"
+msgstr "불러온 플러그인이 없습니다"
 
 #. Resource IDs: (226)
 msgid "No search folder."
 msgstr "검색 폴더가 없습니다."
 
 #. Resource IDs: (134)
-msgid "No updates available.\nYou already have the current version."
-msgstr "사용할 수 있는 업데이트가 없습니다.\n현재 버전이 이미 있습니다."
+msgid ""
+"No updates available.\n"
+"You already have the current version."
+msgstr ""
+"사용할 수 있는 업데이트가 없습니다.\n"
+"현재 버전이 이미 있습니다."
 
 #. Resource IDs: (60043)
 msgid "O"
@@ -1587,8 +1714,12 @@ msgid "Open corresponding File"
 msgstr "해당 파일 열기"
 
 #. Resource IDs: (147)
-msgid "Open elevated\nBowPad is started again with elevated privileges."
-msgstr "권한 상승된 상태 열기\n상승된 권한으로 BowPad가 다시 시작됩니다."
+msgid ""
+"Open elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"권한 상승된 상태 열기\n"
+"상승된 권한으로 BowPad가 다시 시작됩니다."
 
 #. Resource IDs: (182)
 #, c-format
@@ -1606,8 +1737,12 @@ msgid "Open: %%c%06X%ld%%r"
 msgstr "열기: %%c%06X%ld%%r"
 
 #. Resource IDs: (263)
-msgid "Open\nThe lexer file is opened in BowPad, ready for editing."
-msgstr "열기\n렉서 파일이 BowPad에서 열려 편집할 수 있습니다."
+msgid ""
+"Open\n"
+"The lexer file is opened in BowPad, ready for editing."
+msgstr ""
+"열기\n"
+"렉서 파일이 BowPad에서 열려 편집할 수 있습니다."
 
 #. Resource IDs: (60045)
 msgid "Opens one or more files"
@@ -1630,8 +1765,12 @@ msgid "Opens the config file to configure keyboard shortcuts for any command in 
 msgstr "구성 파일을 열어 BowPad의 명령에 대한 바로 가기 키를 구성합니다"
 
 #. Resource IDs: (60650)
-msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
-msgstr "현재 탭의 파일에 해당하는 파일을 엽니다.\n(h/cpp, aspx/cs/vb)"
+msgid ""
+"Opens the corresponding file to the file in the current tab.\n"
+"(h/cpp, aspx/cs/vb)"
+msgstr ""
+"현재 탭의 파일에 해당하는 파일을 엽니다.\n"
+"(h/cpp, aspx/cs/vb)"
 
 #. Resource IDs: (60404)
 msgid "Opens the current file in Microsoft Edge browser"
@@ -1806,20 +1945,32 @@ msgid "Reload"
 msgstr "다시 불러오기"
 
 #. Resource IDs: (120)
-msgid "Reload document\nThe document is refreshed from disk."
-msgstr "문서 다시 불러오기\n디스크에서 문서가 새로 고쳐집니다."
+msgid ""
+"Reload document\n"
+"The document is refreshed from disk."
+msgstr ""
+"문서 다시 불러오기\n"
+"디스크에서 문서가 새로 고쳐집니다."
 
 #. Resource IDs: (121)
-msgid "Reload document\nThe unsaved modifications are lost."
-msgstr "문서 다시 불러오기\n저장하지 않은 수정사항은 손실됩니다."
+msgid ""
+"Reload document\n"
+"The unsaved modifications are lost."
+msgstr ""
+"문서 다시 불러오기\n"
+"저장하지 않은 수정사항은 손실됩니다."
 
 #. Resource IDs: (60357)
 msgid "Reload the file from disk"
 msgstr "디스크에서 파일 다시 불러오기"
 
 #. Resource IDs: (166)
-msgid "Reload\nThe unsaved modifications will be lost!"
-msgstr "다시 불러오기\n저장하지 않은 수정사항은 손실됩니다!"
+msgid ""
+"Reload\n"
+"The unsaved modifications will be lost!"
+msgstr ""
+"다시 불러오기\n"
+"저장하지 않은 수정사항은 손실됩니다!"
 
 #. Resource IDs: (60652)
 msgid "Remove all empty lines or lines with only whitespace"
@@ -1910,12 +2061,20 @@ msgid "Save as"
 msgstr "다른 이름으로 저장"
 
 #. Resource IDs: (149)
-msgid "Save elevated\nBowPad is started again with elevated privileges."
-msgstr "권한 상승된 저장\n"상승된 권한으로 BowPad가 다시 시작됩니다."
+msgid ""
+"Save elevated\n"
+"BowPad is started again with elevated privileges."
+msgstr ""
+"권한 상승된 저장\n"
+"\"상승된 권한으로 BowPad가 다시 시작됩니다."
 
 #. Resource IDs: (119)
-msgid "Save modifications\nThe modifications that were made outside BowPad are overwritten."
-msgstr "수정 사항 저장\nBowPad 외부에서 이루어진 수정 사항은 덮어쓰여집니다."
+msgid ""
+"Save modifications\n"
+"The modifications that were made outside BowPad are overwritten."
+msgstr ""
+"수정 사항 저장\n"
+"BowPad 외부에서 이루어진 수정 사항은 덮어쓰여집니다."
 
 #. Resource IDs: (60055)
 msgid "Saves all open files"
@@ -2026,7 +2185,7 @@ msgstr "새 파일의 기본 인코딩 예: ANSI, UTF-8, ...) 및 끝단 스타�
 
 #. Resource IDs: (60254)
 msgid "Set the number of columns for one tabulator."
-msgstr "하나의 도표작성자에 대한 열 수를 설정합니다."
+msgstr "하나의 도표 작성기에 대한 열 수를 설정합니다."
 
 #. Resource IDs: (60321)
 msgid "Set up print margins, page size, page orientation"
@@ -2293,8 +2452,12 @@ msgid "Turns showing the line numbers on/off"
 msgstr "줄 번호 켜기/끄기"
 
 #. Resource IDs: (60122)
-msgid "Turns showing whitespaces on/off.\nHold down the Shift key to show EOLs as well."
-msgstr "공백을 켜거나 끕니다.\nEOL도 표시하려면 Shift 키를 누르고 있습니다."
+msgid ""
+"Turns showing whitespaces on/off.\n"
+"Hold down the Shift key to show EOLs as well."
+msgstr ""
+"공백을 켜거나 끕니다.\n"
+"EOL도 표시하려면 Shift 키를 누르고 있습니다."
 
 #. Resource IDs: (179)
 #, c-format
@@ -2471,8 +2634,26 @@ msgid "Y"
 msgstr "Y"
 
 #. Resource IDs: (142)
-msgid "You can use the following strings in the command line:\r\n$(LINE)\t\t\tThe line where the cursor is\r\n$(POS)\t\t\tthe position where the cursor is\r\n$(TAB_PATH)\t\tthe path to the file of the active tab\r\n$(TAB_NAME)\t\tthe file name without extension of the current tab\r\n$(TAB_EXT)\t\tthe file extension of the current tab\r\n$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
-msgstr "명령줄에서 다음 문자열을 사용할 수 있습니다:\r\n$(LINE)\t\t\t커서가 있는 줄\r\n$(POS)\t\t\t커서가 있는 위치\r\n$(TAB_PATH)\t\t활성 탭의 파일 경로\r\n$(TAB_NAME)\t\t현재 탭의 확장자가 없는 파일 이름\r\n$(TAB_EXT)\t\t현재 탭의 파일 확장자\r\n$(TAB_DIR)\t\t활성 탭의 파일 디렉터리\r\n$(SEL_TEXT)\t\t선택한 텍스트 또는 커서 위치의 단어\r\n$(SEL_TEXT_ESCAPED)\t$(SEL_TEXT)처럼 이스케이프되었으며 URL에 유용"
+msgid ""
+"You can use the following strings in the command line:\r\n"
+"$(LINE)\t\t\tThe line where the cursor is\r\n"
+"$(POS)\t\t\tthe position where the cursor is\r\n"
+"$(TAB_PATH)\t\tthe path to the file of the active tab\r\n"
+"$(TAB_NAME)\t\tthe file name without extension of the current tab\r\n"
+"$(TAB_EXT)\t\tthe file extension of the current tab\r\n"
+"$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n"
+"$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n"
+"$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
+msgstr ""
+"명령줄에서 다음 문자열을 사용할 수 있습니다:\r\n"
+"$(LINE)\t\t\t커서가 있는 줄\r\n"
+"$(POS)\t\t\t커서가 있는 위치\r\n"
+"$(TAB_PATH)\t\t활성 탭의 파일 경로\r\n"
+"$(TAB_NAME)\t\t현재 탭의 확장자가 없는 파일 이름\r\n"
+"$(TAB_EXT)\t\t현재 탭의 파일 확장자\r\n"
+"$(TAB_DIR)\t\t활성 탭의 파일 디렉터리\r\n"
+"$(SEL_TEXT)\t\t선택한 텍스트 또는 커서 위치의 단어\r\n"
+"$(SEL_TEXT_ESCAPED)\t$(SEL_TEXT)처럼 이스케이프되었으며 URL에 유용"
 
 #. Resource IDs: (192)
 msgid "You have to restart BowPad for the plugin changes to take effect."
@@ -2554,7 +2735,7 @@ msgstr "줄바꿈된 줄 들여쓰기"
 
 #. Resource IDs: (60630)
 msgid "indents wrapped sublines"
-msgstr " 줄바꿈된 하위줄 들여쓰기"
+msgstr "줄바꿈된 하위줄 들여쓰기"
 
 #. Resource IDs: (60661)
 msgid "no plugins loaded"
