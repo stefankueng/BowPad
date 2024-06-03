@@ -54,9 +54,6 @@
     <ClInclude Include="..\lexilla\lexlib\LexerModule.h">
       <Filter>Lexilla\lexlib</Filter>
     </ClInclude>
-    <ClInclude Include="..\lexilla\lexlib\LexerNoExceptions.h">
-      <Filter>Lexilla\lexlib</Filter>
-    </ClInclude>
     <ClInclude Include="..\lexilla\lexlib\LexerSimple.h">
       <Filter>Lexilla\lexlib</Filter>
     </ClInclude>
@@ -609,9 +606,6 @@
       <Filter>Lexilla\lexlib</Filter>
     </ClCompile>
     <ClCompile Include="..\lexilla\lexlib\LexerModule.cxx">
-      <Filter>Lexilla\lexlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lexilla\lexlib\LexerNoExceptions.cxx">
       <Filter>Lexilla\lexlib</Filter>
     </ClCompile>
     <ClCompile Include="..\lexilla\lexlib\LexerSimple.cxx">

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2023 - Stefan Kueng
+// Copyright (C) 2014-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -363,7 +363,8 @@ LRESULT CALLBACK CFileTree::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, L
                 else
                 {
                     ResString text(hResource, IDS_FILETREE_TOO_MANY_FILES);
-                    auto      dummyPath = std::vformat(text.c_str(), std::make_wformat_args(pData->data.size()));
+                    auto      dataSize  = pData->data.size();
+                    auto      dummyPath = std::vformat(text.c_str(), std::make_wformat_args(dataSize));
                     auto      pFi       = std::make_unique<FileTreeItem>();
                     pFi->path           = dummyPath;
                     pFi->maxDummy       = true;
