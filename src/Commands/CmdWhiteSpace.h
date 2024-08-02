@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2021-2022 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ public:
 
     UINT    GetCmdId() override { return cmdTabSize; }
     void    AfterInit() override;
+    void    TabNotify(TBHDR* ptbHdr) override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 

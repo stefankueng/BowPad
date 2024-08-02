@@ -780,7 +780,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             // See issue #129 https://sourceforge.net/p/bowpad-sk/tickets/129/
             // To avoid these problems, set a timer instead. The timer
             // will fire after all messages related to the focus change have
-            // been handled, and then it is save to show a message box dialog.
+            // been handled, and then it is safe to show a message box dialog.
             SetTimer(*this, TIMER_UPDATECHECK, 200, nullptr);
         }
         break;

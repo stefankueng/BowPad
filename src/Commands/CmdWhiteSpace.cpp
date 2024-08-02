@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014, 2016-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2014, 2016-2017, 2020-2021, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -70,6 +70,14 @@ void CCmdTabSize::AfterInit()
     UpdateStatusBar(false);
 }
 
+void CCmdTabSize::TabNotify(TBHDR* ptbHdr)
+{
+    if (ptbHdr->hdr.code == TCN_SELCHANGE)
+    {
+        InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_DecimalValue);
+    }
+}
+
 HRESULT CCmdTabSize::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     HRESULT hr = S_OK;
@@ -102,9 +110,8 @@ HRESULT CCmdTabSize::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const P
     // Set the initial value
     else if (IsEqualPropertyKey(key, UI_PKEY_DecimalValue))
     {
-        int     ve = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"tabsize", 4));
         DECIMAL decOut;
-        VarDecFromI4(ve, &decOut);
+        VarDecFromI4(Scintilla().TabWidth(), &decOut);
         hr = UIInitPropertyFromDecimal(UI_PKEY_DecimalValue, decOut, pPropVarNewValue);
     }
     return hr;
