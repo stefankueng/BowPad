@@ -105,6 +105,7 @@ public:
         , m_bDoSaveAs(false)
         , m_tabSpace(TabSpace::Default)
         , m_readDir(Scintilla::Bidirectional::Disabled)
+        , m_wrapMode(Scintilla::Wrap::None)
         , m_aliveMutex(nullptr)
     {
         m_lastWriteTime.dwHighDateTime = 0;
@@ -144,6 +145,7 @@ public:
     CPosData                 m_position;
     TabSpace                 m_tabSpace;
     Scintilla::Bidirectional m_readDir;
+    Scintilla::Wrap          m_wrapMode;
     std::function<void()>    m_saveCallback;
     HANDLE                   m_aliveMutex;
 

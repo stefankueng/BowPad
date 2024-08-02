@@ -40,6 +40,7 @@ public:
         CIniSettings::Instance().SetInt64(L"View", L"wrapmode", static_cast<int>(Scintilla().WrapMode()));
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         Scintilla().SetHScrollBar(Scintilla().WrapMode() == Scintilla::Wrap::None);
+        GetModActiveDocument().m_wrapMode = Scintilla().WrapMode();
         return true;
     }
 
@@ -49,6 +50,14 @@ public:
         Scintilla().SetWrapMode(wrapmode);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         Scintilla().SetHScrollBar(Scintilla().WrapMode() == Scintilla::Wrap::None);
+    }
+    void TabNotify(TBHDR* ptbHdr) override
+    {
+        if (ptbHdr->hdr.code == TCN_SELCHANGE)
+        {
+            Scintilla().SetWrapMode(GetActiveDocument().m_wrapMode);
+            InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+        }
     }
 
     UINT    GetCmdId() override { return cmdLineWrap; }
