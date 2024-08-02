@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2019-2022 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2019-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ public:
         Scintilla().SetWrapMode(Scintilla().WrapMode() != Scintilla::Wrap::None ? Scintilla::Wrap::None : Scintilla::Wrap::Word);
         CIniSettings::Instance().SetInt64(L"View", L"wrapmode", static_cast<int>(Scintilla().WrapMode()));
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+        Scintilla().SetHScrollBar(Scintilla().WrapMode() == Scintilla::Wrap::None);
         return true;
     }
 
@@ -47,6 +48,7 @@ public:
         Scintilla::Wrap wrapmode = static_cast<Scintilla::Wrap>(CIniSettings::Instance().GetInt64(L"View", L"wrapmode", 0));
         Scintilla().SetWrapMode(wrapmode);
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+        Scintilla().SetHScrollBar(Scintilla().WrapMode() == Scintilla::Wrap::None);
     }
 
     UINT    GetCmdId() override { return cmdLineWrap; }
