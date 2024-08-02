@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2020-2021, 2023 - Stefan Kueng
+// Copyright (C) 2013-2017, 2020-2021, 2023-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,23 +36,24 @@ constexpr COLORREF darkBkColor           = 0x202020;
 constexpr COLORREF darkTextColor         = 0xDDDDDD;
 constexpr COLORREF darkDisabledTextColor = 0x808080;
 
-constexpr auto SubclassID = 1234;
+constexpr auto     SubclassID            = 1234;
 
-HBRUSH CTheme::m_sBackBrush = nullptr;
+HBRUSH             CTheme::m_sBackBrush  = nullptr;
 
-static int  GetStateFromBtnState(LONG_PTR dwStyle, BOOL bHot, BOOL bFocus, LRESULT dwCheckState, int iPartId, BOOL bHasMouseCapture);
-static void GetRoundRectPath(Gdiplus::GraphicsPath* pPath, const Gdiplus::Rect& r, int dia);
-static void DrawRect(LPRECT prc, HDC hdcPaint, Gdiplus::DashStyle dashStyle, Gdiplus::Color clr, Gdiplus::REAL width);
-static void DrawFocusRect(LPRECT prcFocus, HDC hdcPaint);
-static void PaintControl(HWND hWnd, HDC hdc, RECT* prc, bool bDrawBorder);
-static BOOL DetermineGlowSize(int* piSize, LPCWSTR pszClassIdList = nullptr);
-static BOOL GetEditBorderColor(HWND hWnd, COLORREF* pClr);
+static int         GetStateFromBtnState(LONG_PTR dwStyle, BOOL bHot, BOOL bFocus, LRESULT dwCheckState, int iPartId, BOOL bHasMouseCapture);
+static void        GetRoundRectPath(Gdiplus::GraphicsPath* pPath, const Gdiplus::Rect& r, int dia);
+static void        DrawRect(LPRECT prc, HDC hdcPaint, Gdiplus::DashStyle dashStyle, Gdiplus::Color clr, Gdiplus::REAL width);
+static void        DrawFocusRect(LPRECT prcFocus, HDC hdcPaint);
+static void        PaintControl(HWND hWnd, HDC hdc, RECT* prc, bool bDrawBorder);
+static BOOL        DetermineGlowSize(int* piSize, LPCWSTR pszClassIdList = nullptr);
+static BOOL        GetEditBorderColor(HWND hWnd, COLORREF* pClr);
 
 CTheme::CTheme()
     : m_bLoaded(false)
     , m_isHighContrastMode(false)
     , m_isHighContrastModeDark(false)
     , m_dark(false)
+    , m_system(false)
     , m_lastThemeChangeCallbackId(0)
 {
 }
@@ -72,7 +73,7 @@ CTheme& CTheme::Instance()
 
 void CTheme::Load()
 {
-    CSimpleIni themeIni;
+    CSimpleIni  themeIni;
 
     DWORD       resLen  = 0;
     const char* resData = CAppUtils::GetResourceData(L"config", IDR_DARKTHEME, resLen);
@@ -119,7 +120,9 @@ void CTheme::OnSysColorChanged()
         GDIHelpers::RGBtoHSL(::GetSysColor(COLOR_WINDOW), h2, s2, l2);
         m_isHighContrastModeDark = l2 < l1;
     }
-    m_dark = CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0) != 0 && !IsHighContrastMode();
+    Theme theme = static_cast<Theme>(CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0));
+    m_system    = theme == Theme::System;
+    m_dark      = theme == Theme::Dark || (theme == Theme::System && DarkModeHelper::Instance().ShouldSystemUseDarkMode());
 }
 
 bool CTheme::IsHighContrastMode() const
@@ -181,12 +184,13 @@ bool CTheme::RemoveRegisteredCallback(int id)
     return false;
 }
 
-void CTheme::SetDarkTheme(bool b /*= true*/)
+void CTheme::SetTheme(Theme theme)
 {
     if (IsHighContrastMode())
         return;
-    m_dark = b;
-    CIniSettings::Instance().SetInt64(L"View", L"darktheme", b ? 1 : 0);
+    m_system = theme == Theme::System;
+    m_dark   = theme == Theme::Dark || (theme == Theme::System && DarkModeHelper::Instance().ShouldSystemUseDarkMode());
+    CIniSettings::Instance().SetInt64(L"View", L"darktheme", static_cast<int>(theme));
     for (auto& [id, callBack] : m_themeChangeCallbacks)
         callBack();
 }
@@ -543,13 +547,13 @@ LRESULT CTheme::ComboBoxSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
             RECT             rc             = pDis->rcItem;
             wchar_t          itemText[1024] = {0};
 
-            COMBOBOXEXITEM cbi = {0};
-            cbi.mask           = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_OVERLAY | CBEIF_INDENT;
-            cbi.iItem          = pDis->itemID;
-            cbi.cchTextMax     = _countof(itemText);
-            cbi.pszText        = itemText;
+            COMBOBOXEXITEM   cbi            = {0};
+            cbi.mask                        = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_OVERLAY | CBEIF_INDENT;
+            cbi.iItem                       = pDis->itemID;
+            cbi.cchTextMax                  = _countof(itemText);
+            cbi.pszText                     = itemText;
 
-            auto cwnd = GetParent(hWnd);
+            auto cwnd                       = GetParent(hWnd);
 
             if (SendMessage(cwnd, CBEM_GETITEM, 0, reinterpret_cast<LPARAM>(&cbi)))
             {
@@ -698,13 +702,13 @@ LRESULT CTheme::ButtonSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                         BP_PAINTPARAMS params = {sizeof(BP_PAINTPARAMS)};
                         params.dwFlags        = BPPF_ERASE;
 
-                        RECT rcExclusion  = rcClient;
-                        params.prcExclude = &rcExclusion;
+                        RECT rcExclusion      = rcClient;
+                        params.prcExclude     = &rcExclusion;
 
                         // We have to calculate the exclusion rect and therefore
                         // calculate the font height. We select the control's font
                         // into the DC and fake a drawing operation:
-                        HFONT hFontOld = reinterpret_cast<HFONT>(SendMessage(hWnd, WM_GETFONT, 0L, NULL));
+                        HFONT hFontOld        = reinterpret_cast<HFONT>(SendMessage(hWnd, WM_GETFONT, 0L, NULL));
                         if (hFontOld)
                             hFontOld = static_cast<HFONT>(SelectObject(hdc, hFontOld));
 
@@ -757,7 +761,7 @@ LRESULT CTheme::ButtonSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                             auto                  myGraphics = std::make_unique<Gdiplus::Graphics>(hdcPaint);
                             int                   iY         = RECTHEIGHT(rcDraw) / 2;
                             Gdiplus::Rect         rr         = Gdiplus::Rect(rcClient.left, rcClient.top + iY,
-                                                             RECTWIDTH(rcClient), RECTHEIGHT(rcClient) - iY - 1);
+                                                                             RECTWIDTH(rcClient), RECTHEIGHT(rcClient) - iY - 1);
                             Gdiplus::GraphicsPath path;
                             GetRoundRectPath(&path, rr, 5);
                             myGraphics->DrawPath(myPen.get(), &path);
@@ -826,22 +830,22 @@ LRESULT CTheme::ButtonSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                             RECT    rc;
                             GetWindowRect(hWnd, &rc);
                             GetCursorPos(&pt);
-                            BOOL bHot   = PtInRect(&rc, pt);
-                            BOOL bFocus = GetFocus() == hWnd;
+                            BOOL bHot    = PtInRect(&rc, pt);
+                            BOOL bFocus  = GetFocus() == hWnd;
 
-                            int iPartId = BP_CHECKBOX;
+                            int  iPartId = BP_CHECKBOX;
                             if (dwButtonType == BS_RADIOBUTTON || dwButtonType == BS_AUTORADIOBUTTON)
                                 iPartId = BP_RADIOBUTTON;
 
-                            int iState = GetStateFromBtnState(dwStyle, bHot, bFocus, dwCheckState, iPartId, FALSE);
+                            int  iState      = GetStateFromBtnState(dwStyle, bHot, bFocus, dwCheckState, iPartId, FALSE);
 
-                            int bmWidth = static_cast<int>(ceil(13.0 * CDPIAware::Instance().GetDPI(hWnd) / 96.0));
+                            int  bmWidth     = static_cast<int>(ceil(13.0 * CDPIAware::Instance().GetDPI(hWnd) / 96.0));
 
                             UINT uiHalfWidth = (RECTWIDTH(rcClient) - bmWidth) / 2;
 
                             // we have to use the whole client area, otherwise we get only partially
                             // drawn areas:
-                            RECT rcPaint = rcClient;
+                            RECT rcPaint     = rcClient;
 
                             if (dwButtonStyle & BS_LEFTTEXT)
                             {

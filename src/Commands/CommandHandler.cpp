@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -106,7 +106,9 @@ ICommand* CCommandHandler::GetCommand(UINT cmdId)
 void CCommandHandler::Init(void* obj)
 {
     Add<CCmdMRU>(obj);
-    Add<CCmdToggleTheme>(obj);
+    Add<CCmdThemeLight>(obj);
+    Add<CCmdThemeDark>(obj);
+    Add<CCmdThemeSystem>(obj);
     Add<CCmdOpen>(obj);
     Add<CCmdSave>(obj);
     Add<CCmdSaveAll>(obj);

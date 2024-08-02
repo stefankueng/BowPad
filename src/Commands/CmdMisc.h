@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2021-2022 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2021-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 #pragma once
 #include "ICommand.h"
 #include "BowPadUI.h"
+#include "../Theme.h"
 
 class CCmdDelete : public ICommand
 {
@@ -76,18 +77,47 @@ public:
     UINT GetCmdId() override { return cmdGotoBrace; }
 };
 
-class CCmdToggleTheme : public ICommand
+class CCmdThemeBase : public ICommand
 {
 public:
-    CCmdToggleTheme(void* obj);
-    ~CCmdToggleTheme() override = default;
+    CCmdThemeBase(void* obj);
+    ~CCmdThemeBase() override = default;
 
     bool    Execute() override;
 
-    UINT    GetCmdId() override { return cmdToggleTheme; }
     void    AfterInit() override;
 
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
+
+    virtual Theme GetTheme() const = 0;
+};
+
+class CCmdThemeDark : public CCmdThemeBase
+{
+public:
+    CCmdThemeDark(void* obj)
+        : CCmdThemeBase(obj) {}
+
+    UINT GetCmdId() override { return cmdThemeDark; }
+    Theme GetTheme() const override { return Theme::Dark; }
+};
+class CCmdThemeLight : public CCmdThemeBase
+{
+public:
+    CCmdThemeLight(void* obj)
+        : CCmdThemeBase(obj) {}
+
+    UINT GetCmdId() override { return cmdThemeLight; }
+    Theme GetTheme() const override { return Theme::Light; }
+};
+class CCmdThemeSystem : public CCmdThemeBase
+{
+public:
+    CCmdThemeSystem(void* obj)
+        : CCmdThemeBase(obj) {}
+
+    UINT GetCmdId() override { return cmdThemeSystem; }
+    Theme GetTheme() const override { return Theme::System; }
 };
 
 class CCmdConfigShortcuts : public ICommand

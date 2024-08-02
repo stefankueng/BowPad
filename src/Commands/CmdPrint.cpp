@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013, 2015-2017, 2020-2023 - Stefan Kueng
+// Copyright (C) 2013, 2015-2017, 2020-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -58,12 +58,13 @@ void CCmdPrint::Print(bool bShowDlg) const
 
     // set the theme to normal
     bool dark = CTheme::Instance().IsDarkTheme();
+    bool system = CTheme::Instance().IsSystem();
     if (dark)
-        CTheme::Instance().SetDarkTheme(false);
+        CTheme::Instance().SetTheme(Theme::Light);
     OnOutOfScope(
         if (dark)
             CTheme::Instance()
-                .SetDarkTheme(dark););
+                .SetTheme(system ? Theme::System : Theme::Dark););
 
     // reset all indicators
     size_t length = Scintilla().Length();

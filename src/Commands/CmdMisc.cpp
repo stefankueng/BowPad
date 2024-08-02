@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2017, 2021 - Stefan Kueng
+// Copyright (C) 2014-2017, 2021, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,36 +21,45 @@
 #include "AppUtils.h"
 #include "Theme.h"
 
-CCmdToggleTheme::CCmdToggleTheme(void* obj)
+CCmdThemeBase::CCmdThemeBase(void* obj)
     : ICommand(obj)
 {
-    int dark = static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0));
-    if (dark)
-    {
-        CTheme::Instance().SetDarkTheme(dark != 0);
-    }
+    auto theme = static_cast<Theme>(CIniSettings::Instance().GetInt64(L"View", L"darktheme", 0));
+    CTheme::Instance().SetTheme(theme);
 }
 
-bool CCmdToggleTheme::Execute()
+bool CCmdThemeBase::Execute()
 {
     if (!HasActiveDocument())
         return false;
-    CTheme::Instance().SetDarkTheme(!CTheme::Instance().IsDarkTheme());
+    auto theme = GetTheme();
+    CTheme::Instance().SetTheme(theme);
 
-    InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    InvalidateUICommand(cmdThemeDark, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    InvalidateUICommand(cmdThemeLight, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
+    InvalidateUICommand(cmdThemeSystem, UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
     return true;
 }
 
-void CCmdToggleTheme::AfterInit()
+void CCmdThemeBase::AfterInit()
 {
     InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
 }
 
-HRESULT CCmdToggleTheme::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
+HRESULT CCmdThemeBase::IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue)
 {
     if (UI_PKEY_BooleanValue == key)
     {
-        return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CTheme::Instance().IsDarkTheme(), pPropVarNewValue);
+        auto theme = GetTheme();
+        switch (theme)
+        {
+            case Theme::Light:
+                return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, !CTheme::Instance().IsDarkTheme() && !CTheme::Instance().IsSystem(), pPropVarNewValue);
+            case Theme::Dark:
+                return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CTheme::Instance().IsDarkTheme() && !CTheme::Instance().IsSystem(), pPropVarNewValue);
+            case Theme::System:
+                return UIInitPropertyFromBoolean(UI_PKEY_BooleanValue, CTheme::Instance().IsSystem(), pPropVarNewValue);
+        }
     }
     return E_NOTIMPL;
 }

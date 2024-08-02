@@ -516,11 +516,15 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         <Image>res/LangL.png</Image>
       </Command.LargeImages>
     </Command>
-    <Command Name="cmdToggleTheme" LabelTitle="Dark Theme" TooltipTitle="Dark Theme" TooltipDescription="Toggles between the normal and the dark theme" Keytip="TT">
+    <Command Name="cmdThemeGroup" LabelTitle="Theme" TooltipTitle="Theme" TooltipDescription="Selects the UI theme" Keytip="TT">
       <Command.LargeImages>
         <Image>res/DarkThemeL.png</Image>
       </Command.LargeImages>
     </Command>
+    <Command Name="cmdThemeLight" LabelTitle="Light" TooltipTitle="Light Theme" TooltipDescription="Selects the light UI theme" Keytip="TL" />
+    <Command Name="cmdThemeDark" LabelTitle="Dark" TooltipTitle="Dark Theme" TooltipDescription="Selects the dark UI theme" Keytip="TD" />
+    <Command Name="cmdThemeSystem" LabelTitle="System" TooltipTitle="System Theme" TooltipDescription="Selects the UI theme according to the system setting" Keytip="TS" />
+
     <Command Name="cmdLanguage" LabelTitle="Language" TooltipTitle="Select Language" TooltipDescription="Select the language for BowPad" Keytip="LS">
       <Command.LargeImages>
         <Image>res/LangL.png</Image>
@@ -1335,7 +1339,13 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           </Group>
           <Group CommandName="cmdGroupMisc" SizeDefinition="ThreeButtons">
             <ToggleButton CommandName="cmdAutoBraces" />
-            <ToggleButton CommandName="cmdToggleTheme" />
+            <DropDownButton CommandName="cmdThemeGroup">
+              <MenuGroup>
+                <ToggleButton CommandName="cmdThemeLight"/>
+                <ToggleButton CommandName="cmdThemeDark"/>
+                <ToggleButton CommandName="cmdThemeSystem"/>
+              </MenuGroup>
+            </DropDownButton>
             <DropDownGallery CommandName="cmdLanguage" TextPosition="Right" Type="Items" ItemHeight="16" ItemWidth="16">
               <DropDownGallery.MenuLayout>
                 <VerticalMenuLayout />

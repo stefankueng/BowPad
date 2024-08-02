@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016, 2020-2021, 2023 Stefan Kueng
+// Copyright (C) 2013-2014, 2016, 2020-2021, 2023-2024 Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,6 +20,13 @@
 
 using ThemeChangeCallback = std::function<void()>;
 
+enum class Theme
+{
+    Light,
+    Dark,
+    System
+};
+
 class CTheme
 {
 private:
@@ -31,8 +38,9 @@ public:
 
     /// call this on every WM_SYSCOLORCHANGED message
     void           OnSysColorChanged();
-    void           SetDarkTheme(bool b = true);
+    void           SetTheme(Theme theme);
     bool           IsDarkTheme() const { return m_dark; }
+    bool           IsSystem() const { return m_system; }
     bool           IsHighContrastMode() const;
     bool           IsHighContrastModeDark() const;
     COLORREF       GetThemeColor(COLORREF clr, bool fixed = false) const;
@@ -61,6 +69,7 @@ private:
     bool                                         m_isHighContrastMode;
     bool                                         m_isHighContrastModeDark;
     bool                                         m_dark;
+    bool                                         m_system;
     std::unordered_map<int, ThemeChangeCallback> m_themeChangeCallbacks;
     int                                          m_lastThemeChangeCallbackId;
     static HBRUSH                                m_sBackBrush;
