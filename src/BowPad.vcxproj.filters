@@ -740,6 +740,9 @@
     <ClCompile Include="..\ext\sktoolslib\InfoRtfDialog.cpp">
       <Filter>sktoolslib</Filter>
     </ClCompile>
+    <ClCompile Include="CustomLexers\LexAHK.cxx">
+      <Filter>Lexer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BowPad.rc">

@@ -58,6 +58,7 @@ extern sptr_t               g_searchMarkerCount; // from CmdFindReplace
 extern Lexilla::LexerModule lmSimple;
 extern Lexilla::LexerModule lmLog;
 extern Lexilla::LexerModule lmSnippets;
+extern Lexilla::LexerModule lmAhk;
 
 UINT32                      g_contextID                    = cmdContextMap;
 
@@ -1072,6 +1073,8 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
         lexer = lmLog.Create();
     if (lexerData.name == "bp_snippets")
         lexer = lmSnippets.Create();
+    if (lexerData.name == "bp_ahk")
+        lexer = lmAhk.Create();
     if (lexer == nullptr && lexerData.name.empty())
     {
         switch (lexerData.id)
@@ -1082,6 +1085,9 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
                 break;
             case 1101:
                 lexer = lmLog.Create();
+                break;
+            case 1102:
+                lexer = lmAhk.Create();
                 break;
             default:
                 break;
