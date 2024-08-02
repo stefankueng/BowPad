@@ -2265,19 +2265,25 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     static ResString rsStatusCurpos(g_hRes, IDS_STATUS_CURPOS);              // Ln: %ld / %ld    Col: %ld
     static ResString rsStatusTabsOpenLong(g_hRes, IDS_STATUS_TABSOPENLONG);  // Ln: %ld / %ld    Col: %ld
     static ResString rsStatusTabsOpen(g_hRes, IDS_STATUS_TABSOPEN);          // Ln: %ld / %ld    Col: %ld
+    static auto      loc        = std::locale("");
+    auto             formatNum  = [](auto num) { return std::format(loc, L"{:L}", num); };
 
-    auto             lineCount = static_cast<long>(m_editor.Scintilla().LineCount());
+    auto             sLineCount = formatNum(static_cast<long>(m_editor.Scintilla().LineCount()));
 
-    sptr_t           selByte   = 0;
-    sptr_t           selLine   = 0;
+    sptr_t           selByte    = 0;
+    sptr_t           selLine    = 0;
     m_editor.GetSelectedCount(selByte, selLine);
+    auto    sSelByte            = formatNum(selByte);
+    auto    sSelLine            = formatNum(selLine);
+    auto    cp                  = m_editor.Scintilla().CurrentPos();
     auto    selTextMarkerCount  = m_editor.GetSelTextMarkerCount();
-    auto    curPos              = m_editor.Scintilla().CurrentPos();
-    long    line                = static_cast<long>(m_editor.Scintilla().LineFromPosition(curPos)) + 1;
-    long    column              = static_cast<long>(m_editor.Scintilla().Column(curPos)) + 1;
+    auto    sSelTextMarkerCount = formatNum(selTextMarkerCount);
+    auto    sCurPos             = formatNum(cp);
+    auto    sLine               = formatNum(static_cast<long>(m_editor.Scintilla().LineFromPosition(cp)) + 1);
+    auto    sColumn             = formatNum(static_cast<long>(m_editor.Scintilla().Column(cp)) + 1);
     auto    lengthInBytes       = m_editor.Scintilla().Length();
     auto    bidi                = m_editor.Scintilla().Bidirectional();
-    auto    selections          = m_editor.Scintilla().Selections();
+    auto    sSelections         = formatNum(m_editor.Scintilla().Selections());
 
     wchar_t readableLength[100] = {0};
     StrFormatByteSize(lengthInBytes, readableLength, _countof(readableLength));
@@ -2288,18 +2294,22 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     else if (CTheme::Instance().IsHighContrastMode())
         numberColor = CTheme::Instance().GetThemeColor(GetSysColor(COLOR_WINDOWTEXT));
 
-    m_statusBar.SetPart(STATUSBAR_CUR_POS,
-                        CStringUtils::Format(rsStatusCurposLong, numberColor, line, numberColor, lineCount, numberColor, column),
-                        CStringUtils::Format(rsStatusCurpos, numberColor, line, numberColor, lineCount, numberColor, column),
-                        CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, readableLength, lineCount),
-                        200,
-                        130,
-                        0,
-                        true);
-    auto sNoSel = CStringUtils::Format(rsStatusSelectionNone, GetSysColor(COLOR_GRAYTEXT));
-    if (selections > 1)
     {
-        auto text = CStringUtils::Format(rsStatusMultiEdit, numberColor, selections);
+        auto text      = CStringUtils::Format(rsStatusCurposLong, numberColor, sLine.c_str(), numberColor, sLineCount.c_str(), numberColor, sColumn.c_str());
+        auto shortText = CStringUtils::Format(rsStatusCurpos, numberColor, sLine.c_str(), numberColor, sLineCount.c_str(), numberColor, sColumn.c_str());
+        m_statusBar.SetPart(STATUSBAR_CUR_POS,
+                            text,
+                            shortText,
+                            CStringUtils::Format(rsStatusTTDocSize, lengthInBytes, readableLength, sLineCount.c_str()),
+                            200,
+                            130,
+                            0,
+                            true);
+    }
+    auto sNoSel = CStringUtils::Format(rsStatusSelectionNone, GetSysColor(COLOR_GRAYTEXT));
+    if (m_editor.Scintilla().Selections() > 1)
+    {
+        auto text = CStringUtils::Format(rsStatusMultiEdit, numberColor, sSelections.c_str());
         m_statusBar.SetPart(STATUSBAR_SEL,
                             text,
                             text,
@@ -2311,10 +2321,12 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     }
     else
     {
+        auto text    = selByte ? CStringUtils::Format(rsStatusSelectionLong, numberColor, sSelByte.c_str(), numberColor, sSelLine.c_str(), (selTextMarkerCount ? 0x008000 : numberColor), sSelTextMarkerCount.c_str()) : sNoSel;
+        auto shortText = selByte ? CStringUtils::Format(rsStatusSelection, numberColor, sSelByte.c_str(), numberColor, sSelLine.c_str(), (selTextMarkerCount ? 0x008000 : numberColor), sSelTextMarkerCount.c_str()) : sNoSel;
         m_statusBar.SetPart(STATUSBAR_SEL,
-                            selByte ? CStringUtils::Format(rsStatusSelectionLong, numberColor, selByte, numberColor, selLine, (selTextMarkerCount ? 0x008000 : numberColor), selTextMarkerCount) : sNoSel,
-                            selByte ? CStringUtils::Format(rsStatusSelection, numberColor, selByte, numberColor, selLine, (selTextMarkerCount ? 0x008000 : numberColor), selTextMarkerCount) : sNoSel,
-                            CStringUtils::Format(rsStatusTTCurPos, line, column, selByte, selLine, selTextMarkerCount),
+                            text,
+                            shortText,
+                            CStringUtils::Format(rsStatusTTCurPos, sLine.c_str(), sColumn.c_str(), sSelByte.c_str(), sSelLine.c_str(), sSelTextMarkerCount.c_str()),
                             250,
                             200,
                             0,
