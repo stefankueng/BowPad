@@ -138,5 +138,5 @@ public:
     HRESULT IUICommandHandlerUpdateProperty(REFPROPERTYKEY key, const PROPVARIANT* /*pPropVarCurrentValue*/, PROPVARIANT* pPropVarNewValue) override;
 
 private:
-    void HtmlExtractMetadata(const std::string& cfHtml, std::string* baseURL, size_t* htmlStart, size_t* fragmentStart, size_t* fragmentEnd) const;
+    static void HtmlExtractMetadata(const std::string& cfHtml, std::string* baseURL, size_t* htmlStart, size_t* fragmentStart, size_t* fragmentEnd);
 };

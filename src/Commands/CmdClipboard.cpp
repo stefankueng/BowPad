@@ -248,7 +248,7 @@ void ClipboardBase::SetLexerFromClipboard() const
 
 bool CCmdCut::Execute()
 {
-    Scintilla().Cut();
+    Scintilla().CutAllowLine();
     bool bShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
     if (bShift)
     {
@@ -267,11 +267,7 @@ void CCmdCut::ScintillaNotify(SCNotification* pScn)
 
 bool CCmdCutPlain::Execute()
 {
-    bool bEmpty = Scintilla().SelectionEmpty() != 0;
-    if (bEmpty)
-        Scintilla().LineCut();
-    else
-        Scintilla().Cut();
+    Scintilla().CutAllowLine();
     AddLexerToClipboard();
     return true;
 }
@@ -380,7 +376,7 @@ void CCmdPasteHtml::HtmlExtractMetadata(const std::string& cfHtml,
                                         std::string*       baseURL,
                                         size_t*            htmlStart,
                                         size_t*            fragmentStart,
-                                        size_t*            fragmentEnd) const
+                                        size_t*            fragmentEnd)
 {
     // Obtain base_url if present.
     if (baseURL)
