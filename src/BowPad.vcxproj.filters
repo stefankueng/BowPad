@@ -411,6 +411,9 @@
     <ClInclude Include="SciTextReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\AutoCloakWindow.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -742,6 +745,9 @@
     </ClCompile>
     <ClCompile Include="CustomLexers\LexAHK.cxx">
       <Filter>Lexer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ext\sktoolslib\AutoCloakWindow.cpp">
+      <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

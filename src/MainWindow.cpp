@@ -45,6 +45,7 @@
 #include "DPIAware.h"
 #include "Monitor.h"
 #include "ResString.h"
+#include "AutoCloakWindow.h"
 #include "../ext/tinyexpr/tinyexpr.h"
 
 #include <memory>
@@ -632,13 +633,9 @@ bool CMainWindow::RegisterAndCreateWindow()
         // monitor but that monitor is not connected now).
         if (CreateEx(WS_EX_ACCEPTFILES | WS_EX_NOINHERITLAYOUT, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, nullptr))
         {
+            CAutoCloakWindow autoCloak(*this);
+
             SetFileTreeWidth(static_cast<int>(CIniSettings::Instance().GetInt64(L"View", L"FileTreeWidth", 200)));
-            // hide the tab and status bar so they won't show right away when
-            // restoring the window: those two show a white background until properly painted.
-            // After restoring and showing the main window, ResizeChildControls() is called
-            // which will show those controls again.
-            ShowWindow(m_tabBar, SW_HIDE);
-            ShowWindow(m_statusBar, SW_HIDE);
             std::wstring winPosKey = L"MainWindow_" + GetMonitorSetupHash();
             CIniSettings::Instance().RestoreWindowPos(winPosKey.c_str(), *this, 0);
             UpdateWindow(*this);
@@ -1878,11 +1875,7 @@ void CMainWindow::ResizeChildWindows()
 {
     RECT rect;
     GetClientRect(*this, &rect);
-    // if the main window is not visible (yet) or the UI is blocked,
-    // then don't resize the child controls.
-    // as soon as the UI is unblocked, ResizeChildWindows() is called
-    // again.
-    if (!IsRectEmpty(&rect) && IsWindowVisible(*this))
+    if (!IsRectEmpty(&rect) )
     {
         constexpr UINT flags       = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
         constexpr UINT noShowFlags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOCOPYBITS;
@@ -1899,6 +1892,8 @@ void CMainWindow::ResizeChildWindows()
         const int treeWidth   = m_fileTreeVisible ? m_treeWidth : 0;
         const int mainWidth   = rect.right - rect.left;
         const int btnMargin   = CDPIAware::Instance().Scale(*this, 2);
+
+        OutputDebugString((L"ResizeChildWindows: " + std::to_wstring(treeWidth) + L" " + std::to_wstring(mainWidth) + L"\n").c_str());
 
         HDWP      hDwp        = BeginDeferWindowPos(7);
         DeferWindowPos(hDwp, m_statusBar, nullptr, rect.left, rect.bottom - m_statusBar.GetHeight(), mainWidth, m_statusBar.GetHeight(), flags);
@@ -2321,7 +2316,7 @@ void CMainWindow::UpdateStatusBar(bool bEverything)
     }
     else
     {
-        auto text    = selByte ? CStringUtils::Format(rsStatusSelectionLong, numberColor, sSelByte.c_str(), numberColor, sSelLine.c_str(), (selTextMarkerCount ? 0x008000 : numberColor), sSelTextMarkerCount.c_str()) : sNoSel;
+        auto text      = selByte ? CStringUtils::Format(rsStatusSelectionLong, numberColor, sSelByte.c_str(), numberColor, sSelLine.c_str(), (selTextMarkerCount ? 0x008000 : numberColor), sSelTextMarkerCount.c_str()) : sNoSel;
         auto shortText = selByte ? CStringUtils::Format(rsStatusSelection, numberColor, sSelByte.c_str(), numberColor, sSelLine.c_str(), (selTextMarkerCount ? 0x008000 : numberColor), sSelTextMarkerCount.c_str()) : sNoSel;
         m_statusBar.SetPart(STATUSBAR_SEL,
                             text,
@@ -4805,10 +4800,16 @@ void CMainWindow::OpenFiles(const std::vector<std::wstring>& paths)
 
 void CMainWindow::BlockAllUIUpdates(bool block)
 {
+    std::vector<HWND> windows = {m_fileTree, m_statusBar};
     if (block)
     {
         if (m_blockCount == 0)
-            SendMessage(*this, WM_SETREDRAW, FALSE, 0);
+        {
+            // don't block the main window, because WM_SETREDRAW with FALSE actually sets the WS_VISIBLE flag to false!
+            // Which for a main window means that the taskbar representation gets drawn empty.
+            for (auto window : windows)
+                SendMessage(window, WM_SETREDRAW, FALSE, 0);
+        }
         FileTreeBlockRefresh(block);
         ++m_blockCount;
     }
@@ -4819,11 +4820,12 @@ void CMainWindow::BlockAllUIUpdates(bool block)
         if (m_blockCount == 0)
         {
             // unblock
-            SendMessage(*this, WM_SETREDRAW, TRUE, 0);
+            for (auto window : windows)
+                SendMessage(window, WM_SETREDRAW, TRUE, 0);
             // force a redraw
             RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
         }
-        // FileTreeBlockRefresh maintains it's own count.
+        // FileTreeBlockRefresh maintains its own count.
         FileTreeBlockRefresh(block);
         if (m_blockCount == 0)
             ResizeChildWindows();

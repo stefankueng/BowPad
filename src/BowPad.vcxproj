@@ -335,6 +335,7 @@
     <ClInclude Include="..\ext\sktoolslib\AeroControls.h" />
     <ClInclude Include="..\ext\sktoolslib\AeroGlass.h" />
     <ClInclude Include="..\ext\sktoolslib\AnimationManager.h" />
+    <ClInclude Include="..\ext\sktoolslib\AutoCloakWindow.h" />
     <ClInclude Include="..\ext\sktoolslib\BaseDialog.h" />
     <ClInclude Include="..\ext\sktoolslib\BaseWindow.h" />
     <ClInclude Include="..\ext\sktoolslib\ClipboardHelper.h" />
@@ -470,6 +471,7 @@
     <ClCompile Include="..\ext\sktoolslib\AeroControls.cpp" />
     <ClCompile Include="..\ext\sktoolslib\AeroGlass.cpp" />
     <ClCompile Include="..\ext\sktoolslib\AnimationManager.cpp" />
+    <ClCompile Include="..\ext\sktoolslib\AutoCloakWindow.cpp" />
     <ClCompile Include="..\ext\sktoolslib\BaseDialog.cpp" />
     <ClCompile Include="..\ext\sktoolslib\BaseWindow.cpp" />
     <ClCompile Include="..\ext\sktoolslib\BrowseFolder.cpp" />
