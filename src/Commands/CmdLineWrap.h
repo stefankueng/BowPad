@@ -18,6 +18,7 @@
 #pragma once
 #include "ICommand.h"
 #include "BowPadUI.h"
+#include "../../ext/sktoolslib/PathUtils.h"
 
 constexpr Scintilla::WrapVisualFlag operator|(Scintilla::WrapVisualFlag a, Scintilla::WrapVisualFlag b) noexcept
 {
@@ -36,8 +37,14 @@ public:
 
     bool Execute() override
     {
+        auto        ext            = CPathUtils::GetFileExtension(GetActiveDocument().m_path);
         Scintilla().SetWrapMode(Scintilla().WrapMode() != Scintilla::Wrap::None ? Scintilla::Wrap::None : Scintilla::Wrap::Word);
         CIniSettings::Instance().SetInt64(L"View", L"wrapmode", static_cast<int>(Scintilla().WrapMode()));
+        if (!ext.empty())
+        {
+            auto key = L"wrapmode_" + ext;
+            CIniSettings::Instance().SetInt64(L"View", key.c_str(), static_cast<int>(Scintilla().WrapMode()));
+        }
         InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         Scintilla().SetHScrollBar(Scintilla().WrapMode() == Scintilla::Wrap::None);
         GetModActiveDocument().m_wrapMode = Scintilla().WrapMode();
@@ -55,7 +62,25 @@ public:
     {
         if (ptbHdr->hdr.code == TCN_SELCHANGE)
         {
-            Scintilla().SetWrapMode(GetActiveDocument().m_wrapMode);
+            const auto& activeDocument = GetActiveDocument();
+            if (activeDocument.m_wrapMode)
+                Scintilla().SetWrapMode(*GetActiveDocument().m_wrapMode);
+            else
+            {
+                // check if we have a wrap mode set for the file extension of the active document
+                auto ext = CPathUtils::GetFileExtension(activeDocument.m_path);
+                if (!ext.empty())
+                {
+                    auto key      = L"wrapmode_" + ext;
+                    auto wrapMode = CIniSettings::Instance().GetInt64(L"View", key.c_str(), -1);
+                    if (wrapMode >= 0)
+                        Scintilla().SetWrapMode(static_cast<Scintilla::Wrap>(wrapMode));
+                    else
+                        Scintilla().SetWrapMode(static_cast<Scintilla::Wrap>(Scintilla::Wrap::None));
+                }
+                else
+                    Scintilla().SetWrapMode(static_cast<Scintilla::Wrap>(Scintilla::Wrap::None));
+            }
             InvalidateUICommand(UI_INVALIDATIONS_PROPERTY, &UI_PKEY_BooleanValue);
         }
     }

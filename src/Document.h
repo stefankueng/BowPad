@@ -20,6 +20,7 @@
 #include "../ext/scintilla/include/ILoader.h"
 
 #include <functional>
+#include <optional>
 
 using Document = Scintilla::IDocumentEditable*;
 
@@ -105,7 +106,7 @@ public:
         , m_bDoSaveAs(false)
         , m_tabSpace(TabSpace::Default)
         , m_readDir(Scintilla::Bidirectional::Disabled)
-        , m_wrapMode(Scintilla::Wrap::None)
+        , m_wrapMode(std::nullopt)
         , m_aliveMutex(nullptr)
     {
         m_lastWriteTime.dwHighDateTime = 0;
@@ -125,29 +126,29 @@ public:
     {
         return m_language;
     }
-    void                     SetLanguage(const std::string& lang);
+    void                           SetLanguage(const std::string& lang);
 
-    Document                 m_document;
-    std::wstring             m_path;
-    int                      m_encoding;
-    int                      m_encodingSaving;
-    EOLFormat                m_format;
-    bool                     m_bHasBOM;
-    bool                     m_bHasBOMSaving;
-    bool                     m_bTrimBeforeSave;
-    bool                     m_bEnsureNewlineAtEnd;
-    bool                     m_bIsDirty;
-    bool                     m_bNeedsSaving;
-    bool                     m_bIsReadonly;
-    bool                     m_bIsWriteProtected;
-    bool                     m_bDoSaveAs; ///< even if m_path is set, always ask where to save
-    FILETIME                 m_lastWriteTime;
-    CPosData                 m_position;
-    TabSpace                 m_tabSpace;
-    Scintilla::Bidirectional m_readDir;
-    Scintilla::Wrap          m_wrapMode;
-    std::function<void()>    m_saveCallback;
-    HANDLE                   m_aliveMutex;
+    Document                       m_document;
+    std::wstring                   m_path;
+    int                            m_encoding;
+    int                            m_encodingSaving;
+    EOLFormat                      m_format;
+    bool                           m_bHasBOM;
+    bool                           m_bHasBOMSaving;
+    bool                           m_bTrimBeforeSave;
+    bool                           m_bEnsureNewlineAtEnd;
+    bool                           m_bIsDirty;
+    bool                           m_bNeedsSaving;
+    bool                           m_bIsReadonly;
+    bool                           m_bIsWriteProtected;
+    bool                           m_bDoSaveAs; ///< even if m_path is set, always ask where to save
+    FILETIME                       m_lastWriteTime;
+    CPosData                       m_position;
+    TabSpace                       m_tabSpace;
+    Scintilla::Bidirectional       m_readDir;
+    std::optional<Scintilla::Wrap> m_wrapMode;
+    std::function<void()>          m_saveCallback;
+    HANDLE                         m_aliveMutex;
 
 private:
     std::string m_language;

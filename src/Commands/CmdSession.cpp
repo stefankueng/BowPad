@@ -197,7 +197,8 @@ void CCmdSessionLoad::OnClose()
         settings.SetString(sessionSection(), CStringUtils::Format(L"path%d", saveIndex).c_str(), doc.m_path.c_str());
         settings.SetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", saveIndex).c_str(), static_cast<int>(doc.m_tabSpace));
         settings.SetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", saveIndex).c_str(), static_cast<int>(doc.m_readDir));
-        settings.SetInt64(sessionSection(), CStringUtils::Format(L"wrapmode%d", saveIndex).c_str(), static_cast<int>(doc.m_wrapMode));
+        if (doc.m_wrapMode)
+            settings.SetInt64(sessionSection(), CStringUtils::Format(L"wrapmode%d", saveIndex).c_str(), static_cast<int>(*doc.m_wrapMode));
         doc.m_path = docOrigPath;
         ++saveIndex;
     }
@@ -291,8 +292,10 @@ void CCmdSessionLoad::RestoreSavedSession() const
         pos.m_lastStyleLine     = static_cast<size_t>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"laststyleline%d", fileNum).c_str(), 0));
         doc.m_tabSpace          = static_cast<TabSpace>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", fileNum).c_str(), 0));
         doc.m_readDir           = static_cast<Scintilla::Bidirectional>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"readdir%d", fileNum).c_str(), 0));
-        doc.m_wrapMode          = static_cast<Scintilla::Wrap>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"wrapmode%d", fileNum).c_str(), 0));
-        auto folds              = settings.GetString(sessionSection(), CStringUtils::Format(L"foldlines%d", fileNum).c_str(), nullptr);
+        doc.m_wrapMode          = static_cast<Scintilla::Wrap>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"wrapmode%d", fileNum).c_str(), -1));
+        if (static_cast<int>(*doc.m_wrapMode) < 0)
+            doc.m_wrapMode = std::nullopt;
+        auto folds = settings.GetString(sessionSection(), CStringUtils::Format(L"foldlines%d", fileNum).c_str(), nullptr);
         pos.m_lineStateVector.clear();
         if (folds)
         {
