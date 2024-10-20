@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2023 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -592,9 +592,9 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     m_scratchScintilla.Scintilla().SetUndoCollection(false);
     m_scratchScintilla.Scintilla().ClearAll();
     m_scratchScintilla.Scintilla().SetCodePage(CP_UTF8);
-    Scintilla::DocumentOption docOptions = Scintilla::DocumentOption::Default;
+    Scintilla::DocumentOption docOptions = Scintilla::DocumentOption::TextLarge;
     if (bufferSizeRequested > INT_MAX)
-        docOptions = Scintilla::DocumentOption::TextLarge | Scintilla::DocumentOption::StylesNone;
+        docOptions = docOptions | Scintilla::DocumentOption::StylesNone;
     Scintilla::ILoader* pdocLoad = static_cast<Scintilla::ILoader*>(m_scratchScintilla.Scintilla().CreateLoader(static_cast<uptr_t>(bufferSizeRequested), docOptions));
     if (pdocLoad == nullptr)
     {
