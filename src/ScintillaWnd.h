@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2022 - Stefan Kueng
+// Copyright (C) 2013-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ public:
     void                      UpdateLineNumberWidth() const;
     void                      SaveCurrentPos(CPosData& pos);
     void                      RestoreCurrentPos(const CPosData& pos);
-    void                      SetupLexerForLang(const std::string& lang) const;
+    void                      SetupLexerForLang(const std::string& lang);
     void                      MarginClick(SCNotification* pNotification);
     void                      SelectionUpdated() const;
     void                      MarkSelectedWord(bool clear, bool edit);
@@ -162,6 +162,7 @@ private:
     bool                             m_bCursorShown;
     bool                             m_bScratch;
     bool                             m_eraseBkgnd;
+    bool                             m_hugeLevelReached;
     int                              m_cursorTimeout;
     bool                             m_bInFolderMargin;
     bool                             m_hasConsolas;

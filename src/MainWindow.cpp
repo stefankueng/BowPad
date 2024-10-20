@@ -3425,6 +3425,8 @@ void CMainWindow::AddHotSpots() const
     auto lineCount        = m_editor.Scintilla().LineCount();
     auto endPos           = m_editor.Scintilla().PositionFromLine(m_editor.Scintilla().DocLineFromVisible(firstVisibleLine + min(linesOnScreen, lineCount)));
 
+    if (startPos < 0 || endPos < 0)
+        return;
     // to speed up the search, first search for "://" without using the regex engine
     auto fStartPos        = startPos;
     auto fEndPos          = endPos;

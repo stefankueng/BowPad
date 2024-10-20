@@ -90,6 +90,7 @@ CScintillaWnd::CScintillaWnd(HINSTANCE hInst)
     , m_bCursorShown(true)
     , m_bScratch(false)
     , m_eraseBkgnd(true)
+    , m_hugeLevelReached(false)
     , m_cursorTimeout(-1)
     , m_bInFolderMargin(false)
     , m_hasConsolas(false)
@@ -1023,7 +1024,7 @@ void CScintillaWnd::RestoreCurrentPos(const CPosData& pos)
     UpdateLineNumberWidth();
 }
 
-void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
+void CScintillaWnd::SetupLexerForLang(const std::string& lang)
 {
     const auto& lexerData = CLexStyles::Instance().GetLexerDataForLang(lang);
     const auto& keywords  = CLexStyles::Instance().GetKeywordsForLang(lang);
@@ -1102,6 +1103,14 @@ void CScintillaWnd::SetupLexerForLang(const std::string& lang) const
     for (const auto& [propName, propValue] : lexerData.properties)
     {
         m_scintilla.SetProperty(propName.c_str(), propValue.c_str());
+    }
+    auto length = m_scintilla.Length();
+    m_hugeLevelReached = false;
+    if (length > 500 * 1024 * 1024)
+    {
+        // turn off folding
+        m_scintilla.SetProperty("fold", "0");
+        m_hugeLevelReached = true;
     }
     for (const auto& [styleId, styleData] : lexerData.styles)
     {
@@ -1476,9 +1485,8 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     m_scintilla.SetIndicatorCurrent(INDIC_SELECTION_MARK);
     m_scintilla.IndicatorClearRange(startStylePos, len);
 
-    auto sSelText   = m_scintilla.GetSelText();
-    auto selTextLen = sSelText.size();
-    if ((selTextLen == 0) || (clear))
+    auto selSpan = m_scintilla.SelectionSpan();
+    if (clear || selSpan.Length() == 0 || selSpan.Length() + 10000)
     {
         lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
@@ -1486,6 +1494,8 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
         SendMessage(*this, WM_NCPAINT, static_cast<WPARAM>(1), 0);
         return;
     }
+    auto sSelText     = m_scintilla.GetSelText();
+    auto selTextLen   = sSelText.size();
     auto origSelStart = m_scintilla.SelectionStart();
     auto origSelEnd   = m_scintilla.SelectionEnd();
     auto selStartLine = m_scintilla.LineFromPosition(origSelStart);
@@ -1692,7 +1702,8 @@ void CScintillaWnd::MatchBraces(BraceMatch what)
                 SetTimer(*this, TIM_BRACEHIGHLIGHTTEXT, 1000, nullptr);
         }
 
-        if ((what == BraceMatch::Highlight) && (m_scintilla.IndentationGuides() != Scintilla::IndentView::None))
+        if ((braceAtCaret >= 0) && (braceOpposite >= 0) && (what == BraceMatch::Highlight) &&
+            (m_scintilla.IndentationGuides() != Scintilla::IndentView::None))
         {
             auto columnAtCaret  = m_scintilla.Column(braceAtCaret);
             auto columnOpposite = m_scintilla.Column(braceOpposite);
@@ -2548,6 +2559,16 @@ void CScintillaWnd::ReflectEvents(SCNotification* pScn)
         case SCN_SAVEPOINTREACHED:
             EnableChangeHistory();
             break;
+            case SCN_MODIFIED:
+            if (pScn->modificationType & SC_MOD_INSERTTEXT)
+            {
+                if (!m_hugeLevelReached && m_scintilla.Length() > 500 * 1024 * 1024)
+                {
+                    // turn off folding
+                    m_scintilla.SetProperty("fold", "0");
+                    m_hugeLevelReached = true;
+                }
+            }
         default:
             break;
     }
