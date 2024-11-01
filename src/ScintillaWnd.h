@@ -25,8 +25,8 @@
 #include "../ext/scintilla/include/ScintillaTypes.h"
 #include "../ext/scintilla/include/ScintillaCall.h"
 
+#include <array>
 #include <vector>
-#include <unordered_map>
 
 class CPosData;
 
@@ -41,15 +41,20 @@ class CPosData;
 #define INDIC_SNIPPETPOS       (INDIC_CONTAINER + 9)
 #define INDIC_REGEXCAPTURE     (INDIC_CONTAINER + 10)
 #define INDIC_REGEXCAPTURE_END (INDIC_CONTAINER + 20)
+#define INDIC_CUSTOM_MARK_1    (INDIC_CONTAINER + 21)
+#define INDIC_CUSTOM_MARK_2    (INDIC_CONTAINER + 22)
+#define INDIC_CUSTOM_MARK_3    (INDIC_CONTAINER + 23)
+#define INDIC_CUSTOM_MARK_4    (INDIC_CONTAINER + 24)
+constexpr std::array customMarkColors    = {RGB(180, 128, 128), RGB(128, 180, 128), RGB(128, 128, 180), RGB(180, 180, 128)};
 
-constexpr int SC_MARGE_LINENUMBER = 0;
-constexpr int SC_MARGE_HISTORY    = 1;
-constexpr int SC_MARGE_SYMBOL     = 2;
-constexpr int SC_MARGE_FOLDER     = 4;
+constexpr int        SC_MARGE_LINENUMBER = 0;
+constexpr int        SC_MARGE_HISTORY    = 1;
+constexpr int        SC_MARGE_SYMBOL     = 2;
+constexpr int        SC_MARGE_FOLDER     = 4;
 
-constexpr int MARK_BOOKMARK       = 20;
+constexpr int        MARK_BOOKMARK       = 20;
 
-constexpr int SCN_BP_MOUSEMSG     = 4000;
+constexpr int        SCN_BP_MOUSEMSG     = 4000;
 
 enum class BraceMatch
 {

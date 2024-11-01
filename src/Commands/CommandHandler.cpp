@@ -171,6 +171,11 @@ void CCommandHandler::Init(void* obj)
     Add<CCmdGotoLine>(obj);
     Add<CCmdGotoSymbol>(obj);
     Add<CCmdRegexCapture>(obj);
+    Add<CCmdCustomMark1>(obj);
+    Add<CCmdCustomMark2>(obj);
+    Add<CCmdCustomMark3>(obj);
+    Add<CCmdCustomMark4>(obj);
+    Add<CCmdCustomMarkClearAll>(obj);
 
     Add<CCmdBookmarks>(obj);
     Add<CCmdBookmarkToggle>(obj);

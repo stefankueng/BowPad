@@ -32,6 +32,7 @@
 
 #include <regex>
 #include <thread>
+#include <array>
 #include <algorithm>
 #include <utility>
 #include <memory>
@@ -43,6 +44,8 @@
 
 static std::string                      g_findString;
 std::string                             g_sHighlightString;
+std::array<std::string, 4>              g_sCustomHighlightStrings;
+std::array<std::string, 4>              g_sLastCustomHighlightStrings;
 static Scintilla::FindOption            g_searchFlags       = Scintilla::FindOption::None;
 sptr_t                                  g_searchMarkerCount = 0;
 static std::string                      g_lastSelText;
@@ -2898,43 +2901,86 @@ void CCmdFindReplace::ScintillaNotify(SCNotification* pScn)
             g_lastSelText.clear();
             g_searchMarkerCount = 0;
             DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
-            return;
         }
-
-        Sci_TextToFind findText = {0};
-        findText.chrg.cpMin     = static_cast<Sci_PositionCR>(startStylePos);
-        findText.chrg.cpMax     = static_cast<Sci_PositionCR>(endStylePos);
-        findText.lpstrText      = g_sHighlightString.c_str();
-        while (Scintilla().FindText(g_searchFlags, &findText) >= 0)
+        else
         {
-            Scintilla().IndicatorFillRange(findText.chrgText.cpMin, findText.chrgText.cpMax - findText.chrgText.cpMin);
-            if (findText.chrg.cpMin >= findText.chrgText.cpMax)
-                break;
-            findText.chrg.cpMin = findText.chrgText.cpMax;
-        }
-
-        if (g_lastSelText.empty() || g_lastSelText.compare(g_sHighlightString) || (g_searchFlags != g_lastSearchFlags))
-        {
-            DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
-            g_searchMarkerCount = 0;
-            findText.chrg.cpMin = 0;
-            findText.chrg.cpMax = static_cast<Sci_PositionCR>(Scintilla().Length());
-            findText.lpstrText  = g_sHighlightString.c_str();
+            Sci_TextToFind findText = {0};
+            findText.chrg.cpMin     = static_cast<Sci_PositionCR>(startStylePos);
+            findText.chrg.cpMax     = static_cast<Sci_PositionCR>(endStylePos);
+            findText.lpstrText      = g_sHighlightString.c_str();
             while (Scintilla().FindText(g_searchFlags, &findText) >= 0)
             {
-                size_t line = Scintilla().LineFromPosition(findText.chrgText.cpMin);
-                DocScrollAddLineColor(DOCSCROLLTYPE_SEARCHTEXT, line, RGB(200, 200, 0));
-                ++g_searchMarkerCount;
+                Scintilla().IndicatorFillRange(findText.chrgText.cpMin, findText.chrgText.cpMax - findText.chrgText.cpMin);
                 if (findText.chrg.cpMin >= findText.chrgText.cpMax)
                     break;
                 findText.chrg.cpMin = findText.chrgText.cpMax;
             }
+
+            if (g_lastSelText.empty() || g_lastSelText.compare(g_sHighlightString) || (g_searchFlags != g_lastSearchFlags))
+            {
+                DocScrollClear(DOCSCROLLTYPE_SEARCHTEXT);
+                g_searchMarkerCount = 0;
+                findText.chrg.cpMin = 0;
+                findText.chrg.cpMax = static_cast<Sci_PositionCR>(Scintilla().Length());
+                findText.lpstrText  = g_sHighlightString.c_str();
+                while (Scintilla().FindText(g_searchFlags, &findText) >= 0)
+                {
+                    size_t line = Scintilla().LineFromPosition(findText.chrgText.cpMin);
+                    DocScrollAddLineColor(DOCSCROLLTYPE_SEARCHTEXT, line, RGB(200, 200, 0));
+                    ++g_searchMarkerCount;
+                    if (findText.chrg.cpMin >= findText.chrgText.cpMax)
+                        break;
+                    findText.chrg.cpMin = findText.chrgText.cpMax;
+                }
+                g_lastSelText     = g_sHighlightString;
+                g_lastSearchFlags = g_searchFlags;
+                DocScrollUpdate();
+            }
             g_lastSelText     = g_sHighlightString;
             g_lastSearchFlags = g_searchFlags;
-            DocScrollUpdate();
         }
-        g_lastSelText     = g_sHighlightString;
-        g_lastSearchFlags = g_searchFlags;
+        for (uptr_t i = INDIC_CUSTOM_MARK_1; i <= INDIC_CUSTOM_MARK_4; ++i)
+        {
+            Scintilla().SetIndicatorCurrent(i);
+            Scintilla().IndicatorClearRange(startStylePos, len);
+            Scintilla().IndicatorClearRange(startStylePos, len - 1);
+
+            auto           sHighlightString     = g_sCustomHighlightStrings[i - INDIC_CUSTOM_MARK_1];
+            auto           sLastHighlightString = g_sLastCustomHighlightStrings[i - INDIC_CUSTOM_MARK_1];
+            Sci_TextToFind findText             = {0};
+            findText.chrg.cpMin                 = static_cast<Sci_PositionCR>(startStylePos);
+            findText.chrg.cpMax                 = static_cast<Sci_PositionCR>(endStylePos);
+            findText.lpstrText                  = sHighlightString.c_str();
+            while (Scintilla().FindText(Scintilla::FindOption::None, &findText) >= 0)
+            {
+                Scintilla().IndicatorFillRange(findText.chrgText.cpMin, findText.chrgText.cpMax - findText.chrgText.cpMin);
+                if (findText.chrg.cpMin >= findText.chrgText.cpMax)
+                    break;
+                findText.chrg.cpMin = findText.chrgText.cpMax;
+            }
+
+            if (sLastHighlightString.empty() || sLastHighlightString.compare(sHighlightString))
+            {
+                auto docScrollType = DOCSCROLLTYPE_CUSTOMMARK_1 + (i - INDIC_CUSTOM_MARK_1);
+                DocScrollClear(docScrollType);
+                if (sHighlightString.empty())
+                    continue;
+                findText.chrg.cpMin = 0;
+                findText.chrg.cpMax = static_cast<Sci_PositionCR>(Scintilla().Length());
+                findText.lpstrText  = sHighlightString.c_str();
+                while (Scintilla().FindText(Scintilla::FindOption::None, &findText) >= 0)
+                {
+                    size_t line = Scintilla().LineFromPosition(findText.chrgText.cpMin);
+                    DocScrollAddLineColor(docScrollType, line,
+                        CTheme::Instance().GetThemeColor(customMarkColors[i - INDIC_CUSTOM_MARK_1]));
+                    if (findText.chrg.cpMin >= findText.chrgText.cpMax)
+                        break;
+                    findText.chrg.cpMin = findText.chrgText.cpMax;
+                }
+                g_sLastCustomHighlightStrings[i - INDIC_CUSTOM_MARK_1] = sHighlightString;
+                DocScrollUpdate();
+            }
+        }
     }
 }
 
@@ -2943,6 +2989,8 @@ void CCmdFindReplace::TabNotify(TBHDR* ptbHdr)
     if (ptbHdr->hdr.code == TCN_SELCHANGE)
     {
         g_lastSelText.clear();
+        for (size_t i = 0; i < g_sLastCustomHighlightStrings.size(); ++i)
+            g_sLastCustomHighlightStrings[i].clear();
         if (g_pFindReplaceDlg != nullptr)
         {
             bool followTab = IsDlgButtonChecked(*g_pFindReplaceDlg, IDC_SEARCHFOLDERFOLLOWTAB) == BST_CHECKED;
@@ -3136,6 +3184,45 @@ bool CCmdFindFile::Execute()
 {
     findReplaceFindFile(m_pMainWindow, L"");
 
+    return true;
+}
+
+bool CCmdCustomMark1::Execute()
+{
+    g_sCustomHighlightStrings[0] = GetSelectedText(SelectionHandling::None);
+    g_sLastCustomHighlightStrings[0].clear();
+    DocScrollUpdate();
+    return true;
+}
+bool CCmdCustomMark2::Execute()
+{
+    g_sCustomHighlightStrings[1] = GetSelectedText(SelectionHandling::None);
+    g_sLastCustomHighlightStrings[1].clear();
+    DocScrollUpdate();
+    return true;
+}
+bool CCmdCustomMark3::Execute()
+{
+    g_sCustomHighlightStrings[2] = GetSelectedText(SelectionHandling::None);
+    g_sLastCustomHighlightStrings[2].clear();
+    DocScrollUpdate();
+    return true;
+}
+bool CCmdCustomMark4::Execute()
+{
+    g_sCustomHighlightStrings[3] = GetSelectedText(SelectionHandling::None);
+    g_sLastCustomHighlightStrings[3].clear();
+    DocScrollUpdate();
+    return true;
+}
+bool CCmdCustomMarkClearAll::Execute()
+{
+    for (size_t i = 0; i < g_sCustomHighlightStrings.size(); ++i)
+    {
+        g_sCustomHighlightStrings[i].clear();
+        g_sLastCustomHighlightStrings[i].clear();
+    }
+    DocScrollUpdate();
     return true;
 }
 

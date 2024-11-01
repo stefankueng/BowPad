@@ -842,7 +842,14 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
         </Command.LargeImages>
     </Command>
 
-      <Command Name="cmdContextMap" />
+    <Command Name="cmdCustomMark1" LabelTitle="with style 1"/>
+    <Command Name="cmdCustomMark2" LabelTitle="with style 2"/>
+    <Command Name="cmdCustomMark3" LabelTitle="with style 3"/>
+    <Command Name="cmdCustomMark4" LabelTitle="with style 4"/>
+    <Command Name="cmdCustomMarkClearAll" LabelTitle="Clear all styles"/>
+    <Command Name="cmdMarkGroup" LabelTitle="Style selection"/>
+
+    <Command Name="cmdContextMap" />
     <Command Name="cmdContextSpellMap" />
     <Command Name="cmdTabContextMap" />
     <Command Name="cmdSelectTab" Id="10000" />
@@ -1493,6 +1500,17 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="cmdOpenSelection" />
+          </MenuGroup>
+          <MenuGroup>
+            <DropDownButton CommandName="cmdMarkGroup">
+              <MenuGroup>
+                <Button CommandName="cmdCustomMark1"/>
+                <Button CommandName="cmdCustomMark2"/>
+                <Button CommandName="cmdCustomMark3"/>
+                <Button CommandName="cmdCustomMark4"/>
+                <Button CommandName="cmdCustomMarkClearAll"/>
+              </MenuGroup>
+            </DropDownButton>
           </MenuGroup>
           <MenuGroup>
             <DropDownButton CommandName="cmdFoldGroup">

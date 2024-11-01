@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2021, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,11 @@
 constexpr int DOCSCROLLTYPE_SELTEXT = 1;
 constexpr int DOCSCROLLTYPE_BOOKMARK = 2;
 constexpr int DOCSCROLLTYPE_SEARCHTEXT = 3;
-constexpr int DOCSCROLLTYPE_END = 4;
+constexpr int DOCSCROLLTYPE_CUSTOMMARK_1 = 4;
+constexpr int DOCSCROLLTYPE_CUSTOMMARK_2 = 5;
+constexpr int DOCSCROLLTYPE_CUSTOMMARK_3 = 6;
+constexpr int DOCSCROLLTYPE_CUSTOMMARK_4 = 7;
+constexpr int DOCSCROLLTYPE_END = 8;
 
 struct LineColor
 {

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019-2023 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -337,4 +337,80 @@ public:
     bool Execute() override;
 
     UINT GetCmdId() override { return cmdFindFile; }
+};
+
+/////////////////////////////////////////////
+class CCmdCustomMark1 : public ICommand
+{
+public:
+    CCmdCustomMark1(void* obj)
+        : ICommand(obj)
+    {
+    }
+
+    ~CCmdCustomMark1() override = default;
+
+    bool Execute() override;
+
+    UINT GetCmdId() override { return cmdCustomMark1; }
+};
+
+class CCmdCustomMark2 : public ICommand
+{
+public:
+    CCmdCustomMark2(void* obj)
+        : ICommand(obj)
+    {
+    }
+
+    ~CCmdCustomMark2() override = default;
+
+    bool Execute() override;
+
+    UINT GetCmdId() override { return cmdCustomMark2; }
+};
+
+class CCmdCustomMark3 : public ICommand
+{
+public:
+    CCmdCustomMark3(void* obj)
+        : ICommand(obj)
+    {
+    }
+
+    ~CCmdCustomMark3() override = default;
+
+    bool Execute() override;
+
+    UINT GetCmdId() override { return cmdCustomMark3; }
+};
+
+class CCmdCustomMark4 : public ICommand
+{
+public:
+    CCmdCustomMark4(void* obj)
+        : ICommand(obj)
+    {
+    }
+
+    ~CCmdCustomMark4() override = default;
+
+    bool Execute() override;
+
+    UINT GetCmdId() override { return cmdCustomMark4; }
+};
+
+class CCmdCustomMarkClearAll : public ICommand
+{
+public:
+    CCmdCustomMarkClearAll(void* obj)
+        : ICommand(obj)
+    {
+    }
+
+    ~CCmdCustomMarkClearAll() override = default;
+
+    bool Execute() override;
+
+    UINT GetCmdId() override { return cmdCustomMarkClearAll; }
 };

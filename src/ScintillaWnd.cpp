@@ -1244,6 +1244,14 @@ void CScintillaWnd::SetupDefaultStyles() const
         m_scintilla.IndicSetFore(i, CTheme::Instance().GetThemeColor(captureColors[i - INDIC_REGEXCAPTURE]));
     }
 
+    for (uptr_t i = INDIC_CUSTOM_MARK_1; i <= INDIC_CUSTOM_MARK_4; ++i)
+    {
+        m_scintilla.IndicSetStyle(i, Scintilla::IndicatorStyle::RoundBox);
+        m_scintilla.IndicSetAlpha(i, theme.IsDarkTheme() ? static_cast<Scintilla::Alpha>(100) : static_cast<Scintilla::Alpha>(200));
+        m_scintilla.IndicSetUnder(i, true);
+        m_scintilla.IndicSetFore(i, theme.GetThemeColor(customMarkColors[i - INDIC_CUSTOM_MARK_1], true));
+    }
+
     m_scintilla.SetFoldMarginColour(true, theme.GetThemeColor(RGB(240, 240, 240), true));
     m_scintilla.SetFoldMarginHiColour(true, theme.GetThemeColor(RGB(255, 255, 255), true));
 
