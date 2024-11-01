@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2022 - Stefan Kueng
+// Copyright (C) 2014-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -305,11 +305,14 @@ bool CCmdPaste::Execute()
         CClipboardHelper clipboard;
         if (clipboard.Open(GetScintillaWnd()))
         {
-            HANDLE hData = GetClipboardData(CF_HDROP);
-            if (hData)
+            if (!IsClipboardFormatAvailable(CF_UNICODETEXT) || (GetKeyState(VK_SHIFT) & 0x8000))
             {
-                HDROP hDrop = static_cast<HDROP>(hData);
-                OpenHDROP(hDrop);
+                HANDLE hData = GetClipboardData(CF_HDROP);
+                if (hData)
+                {
+                    HDROP hDrop = static_cast<HDROP>(hData);
+                    OpenHDROP(hDrop);
+                }
             }
         }
     }
