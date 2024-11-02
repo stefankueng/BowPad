@@ -986,7 +986,10 @@ void CLexStyles::SaveUserData()
                 }
             }
             else
+            {
                 ini.SetValue(section.c_str(), style.c_str(), v.c_str());
+                hasChangedEntries = true;
+            }
         }
         if (!hasChangedEntries)
             ini.Delete(section.c_str(), nullptr);
