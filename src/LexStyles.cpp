@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2017, 2019-2023 - Stefan Kueng
+// Copyright (C) 2013-2017, 2019-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -905,6 +905,34 @@ void CLexStyles::ResetUserData()
     m_filterSpec.clear();
     m_hiddenLangs.clear();
     Load();
+}
+
+void CLexStyles::ResetUserData(const std::string& language)
+{
+    CSimpleIni ini;
+    ini.SetUnicode();
+    std::wstring userStyleFile = CAppUtils::GetDataPath() + L"\\userconfig";
+
+    if (PathFileExists(userStyleFile.c_str()))
+    {
+        ini.LoadFile(userStyleFile.c_str());
+    }
+    const auto& lexData = CLexStyles::Instance().GetLexerDataForLang(language);
+    const auto  lexID   = lexData.id;
+
+    for (const auto& [id, section] : m_lexerSection)
+    {
+        if (id == lexID)
+        {
+            ini.Delete(section.c_str(), nullptr);
+        }
+    }
+
+    FILE* pFile = nullptr;
+    _wfopen_s(&pFile, userStyleFile.c_str(), L"wb");
+    ini.SaveFile(pFile);
+    fclose(pFile);
+    ResetUserData();
 }
 
 void CLexStyles::SaveUserData()

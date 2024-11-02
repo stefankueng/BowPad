@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2023 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -331,133 +331,151 @@ LRESULT CStyleConfiguratorDlg::DoCommand(int id, int msg)
                 const auto  lexID       = lexData.id;
                 const auto  hStyleCombo = GetDlgItem(*this, IDC_STYLECOMBO);
                 const int   styleSel    = ComboBox_GetCurSel(hStyleCombo);
-                const int   styleKey    = static_cast<int>(ComboBox_GetItemData(hStyleCombo, styleSel));
-                bool        updateView  = false;
-                if (HasActiveDocument())
+                if (styleSel >= 0)
                 {
-                    const auto& doc = GetActiveDocument();
-                    if (doc.GetLanguage().compare(currentLang) == 0)
-                        updateView = true;
-                }
-                switch (id)
-                {
-                    case IDC_HIDE:
+                    const int styleKey   = static_cast<int>(ComboBox_GetItemData(hStyleCombo, styleSel));
+                    bool      updateView = false;
+                    if (HasActiveDocument())
                     {
-                        CLexStyles::Instance().SetLanguageHidden(languages[langSel], IsDlgButtonChecked(m_hwnd, IDC_HIDE) != 0);
-                        NotifyPlugins(L"cmdStyleConfigurator", 1);
-                        break;
+                        const auto& doc = GetActiveDocument();
+                        if (doc.GetLanguage().compare(currentLang) == 0)
+                            updateView = true;
                     }
-                    case IDC_FG_BTN:
+                    switch (id)
                     {
-                        auto fgcolor = m_fgColor.GetColor();
-                        // When colors are applied by SetupLexer GetThemeColor is applied,
-                        // so don't do it again here when storing the color.
-                        CLexStyles::Instance().SetUserForeground(lexID, styleKey, fgcolor);
-                        if (updateView)
+                        case IDC_HIDE:
                         {
-                            Scintilla().StyleSetFore(styleKey, CTheme::Instance().GetThemeColor(fgcolor));
-                            if (styleKey == 0)
-                                Scintilla().StyleSetFore(STYLE_DEFAULT, CTheme::Instance().GetThemeColor(fgcolor));
+                            CLexStyles::Instance().SetLanguageHidden(languages[langSel], IsDlgButtonChecked(m_hwnd, IDC_HIDE) != 0);
+                            NotifyPlugins(L"cmdStyleConfigurator", 1);
+                            break;
                         }
-                        break;
-                    }
-                    case IDC_BK_BTN:
-                    {
-                        auto bgcolor = m_bkColor.GetColor();
-                        CLexStyles::Instance().SetUserBackground(lexID, styleKey, bgcolor);
-                        if (updateView)
+                        case IDC_FG_BTN:
                         {
-                            Scintilla().StyleSetBack(styleKey, CTheme::Instance().GetThemeColor(bgcolor));
-                            if (styleKey == 0)
-                                Scintilla().StyleSetBack(STYLE_DEFAULT, CTheme::Instance().GetThemeColor(bgcolor));
-                        }
-                        break;
-                    }
-                    case IDC_FONTCOMBO:
-                    {
-                        if (msg == CBN_SELCHANGE)
-                        {
-                            int fontSel = ComboBox_GetCurSel(GetDlgItem(*this, IDC_FONTCOMBO));
-                            if (fontSel >= 0 && fontSel < static_cast<int>(m_fonts.size()))
+                            auto fgcolor = m_fgColor.GetColor();
+                            // When colors are applied by SetupLexer GetThemeColor is applied,
+                            // so don't do it again here when storing the color.
+                            CLexStyles::Instance().SetUserForeground(lexID, styleKey, fgcolor);
+                            if (updateView)
                             {
-                                std::wstring font = m_fonts[fontSel];
-                                CLexStyles::Instance().SetUserFont(lexID, styleKey, font);
-                                if (updateView)
+                                Scintilla().StyleSetFore(styleKey, CTheme::Instance().GetThemeColor(fgcolor));
+                                if (styleKey == 0)
+                                    Scintilla().StyleSetFore(STYLE_DEFAULT, CTheme::Instance().GetThemeColor(fgcolor));
+                            }
+                            break;
+                        }
+                        case IDC_BK_BTN:
+                        {
+                            auto bgcolor = m_bkColor.GetColor();
+                            CLexStyles::Instance().SetUserBackground(lexID, styleKey, bgcolor);
+                            if (updateView)
+                            {
+                                Scintilla().StyleSetBack(styleKey, CTheme::Instance().GetThemeColor(bgcolor));
+                                if (styleKey == 0)
+                                    Scintilla().StyleSetBack(STYLE_DEFAULT, CTheme::Instance().GetThemeColor(bgcolor));
+                            }
+                            break;
+                        }
+                        case IDC_FONTCOMBO:
+                        {
+                            if (msg == CBN_SELCHANGE)
+                            {
+                                int fontSel = ComboBox_GetCurSel(GetDlgItem(*this, IDC_FONTCOMBO));
+                                if (fontSel >= 0 && fontSel < static_cast<int>(m_fonts.size()))
                                 {
-                                    if (font.empty())
+                                    std::wstring font = m_fonts[fontSel];
+                                    CLexStyles::Instance().SetUserFont(lexID, styleKey, font);
+                                    if (updateView)
                                     {
-                                        HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
-                                        if (hFont)
+                                        if (font.empty())
                                         {
-                                            DeleteObject(hFont);
-                                            Scintilla().StyleSetFont(styleKey, "Consolas");
+                                            HFONT hFont = CreateFont(0, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, L"Consolas");
+                                            if (hFont)
+                                            {
+                                                DeleteObject(hFont);
+                                                Scintilla().StyleSetFont(styleKey, "Consolas");
+                                            }
+                                            else
+                                                Scintilla().StyleSetFont(styleKey, "Courier New");
                                         }
                                         else
-                                            Scintilla().StyleSetFont(styleKey, "Courier New");
-                                    }
-                                    else
-                                    {
-                                        Scintilla().StyleSetFont(styleKey, CUnicodeUtils::StdGetUTF8(font).c_str());
+                                        {
+                                            Scintilla().StyleSetFont(styleKey, CUnicodeUtils::StdGetUTF8(font).c_str());
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    break;
-                    case IDC_FONTSIZECOMBO:
-                    {
-                        if (msg == CBN_SELCHANGE)
+                        break;
+                        case IDC_FONTSIZECOMBO:
                         {
-                            auto hFontSizeCombo = GetDlgItem(*this, IDC_FONTSIZECOMBO);
-                            int  fontSizeSel    = ComboBox_GetCurSel(hFontSizeCombo);
-                            if (fontSizeSel >= 0)
+                            if (msg == CBN_SELCHANGE)
                             {
-                                int fontSize = static_cast<int>(ComboBox_GetItemData(hFontSizeCombo, fontSizeSel));
-                                CLexStyles::Instance().SetUserFontSize(lexID, styleKey, fontSize);
-                                if (updateView)
+                                auto hFontSizeCombo = GetDlgItem(*this, IDC_FONTSIZECOMBO);
+                                int  fontSizeSel    = ComboBox_GetCurSel(hFontSizeCombo);
+                                if (fontSizeSel >= 0)
                                 {
-                                    if (fontSize > 0)
-                                        Scintilla().StyleSetSize(styleKey, fontSize);
-                                    else
-                                        Scintilla().StyleSetSize(styleKey, 10);
+                                    int fontSize = static_cast<int>(ComboBox_GetItemData(hFontSizeCombo, fontSizeSel));
+                                    CLexStyles::Instance().SetUserFontSize(lexID, styleKey, fontSize);
+                                    if (updateView)
+                                    {
+                                        if (fontSize > 0)
+                                            Scintilla().StyleSetSize(styleKey, fontSize);
+                                        else
+                                            Scintilla().StyleSetSize(styleKey, 10);
+                                    }
                                 }
                             }
                         }
-                    }
-                    break;
-                    case IDC_BOLDCHECK:
-                    case IDC_ITALICCHECK:
-                    case IDC_UNDERLINECHECK:
-                    {
-                        FontStyle fontStyle = Fontstyle_Normal;
-                        if (Button_GetCheck(GetDlgItem(*this, IDC_BOLDCHECK)) == BST_CHECKED)
-                            fontStyle = static_cast<FontStyle>(fontStyle | Fontstyle_Bold);
-                        if (Button_GetCheck(GetDlgItem(*this, IDC_ITALICCHECK)) == BST_CHECKED)
-                            fontStyle = static_cast<FontStyle>(fontStyle | Fontstyle_Italic);
-                        if (Button_GetCheck(GetDlgItem(*this, IDC_UNDERLINECHECK)) == BST_CHECKED)
-                            fontStyle = static_cast<FontStyle>(fontStyle | Fontstyle_Underlined);
-                        CLexStyles::Instance().SetUserFontStyle(lexData.id, styleKey, fontStyle);
-                        if (updateView)
+                        break;
+                        case IDC_BOLDCHECK:
+                        case IDC_ITALICCHECK:
+                        case IDC_UNDERLINECHECK:
                         {
-                            Scintilla().StyleSetBold(styleKey, (fontStyle & Fontstyle_Bold) ? 1 : 0);
-                            Scintilla().StyleSetItalic(styleKey, (fontStyle & Fontstyle_Italic) ? 1 : 0);
-                            Scintilla().StyleSetUnderline(styleKey, (fontStyle & Fontstyle_Underlined) ? 1 : 0);
+                            FontStyle fontStyle = Fontstyle_Normal;
+                            if (Button_GetCheck(GetDlgItem(*this, IDC_BOLDCHECK)) == BST_CHECKED)
+                                fontStyle = static_cast<FontStyle>(fontStyle | Fontstyle_Bold);
+                            if (Button_GetCheck(GetDlgItem(*this, IDC_ITALICCHECK)) == BST_CHECKED)
+                                fontStyle = static_cast<FontStyle>(fontStyle | Fontstyle_Italic);
+                            if (Button_GetCheck(GetDlgItem(*this, IDC_UNDERLINECHECK)) == BST_CHECKED)
+                                fontStyle = static_cast<FontStyle>(fontStyle | Fontstyle_Underlined);
+                            CLexStyles::Instance().SetUserFontStyle(lexData.id, styleKey, fontStyle);
+                            if (updateView)
+                            {
+                                Scintilla().StyleSetBold(styleKey, (fontStyle & Fontstyle_Bold) ? 1 : 0);
+                                Scintilla().StyleSetItalic(styleKey, (fontStyle & Fontstyle_Italic) ? 1 : 0);
+                                Scintilla().StyleSetUnderline(styleKey, (fontStyle & Fontstyle_Underlined) ? 1 : 0);
+                            }
                         }
-                    }
-                    break;
-                    case IDC_EXTENSIONS:
-                    {
-                        if (msg == EN_KILLFOCUS)
+                        break;
+                        case IDC_EXTENSIONS:
                         {
-                            auto extText = GetDlgItemText(IDC_EXTENSIONS);
-                            CLexStyles::Instance().SetUserExt(extText.get(), currentLang);
+                            if (msg == EN_KILLFOCUS)
+                            {
+                                auto extText = GetDlgItemText(IDC_EXTENSIONS);
+                                CLexStyles::Instance().SetUserExt(extText.get(), currentLang);
+                            }
                         }
+                        break;
                     }
-                    break;
                 }
             }
         }
         break;
+        case IDC_RESETSTYLE:
+            auto hLangCombo = GetDlgItem(*this, IDC_LANGCOMBO);
+            int  langSel    = ComboBox_GetCurSel(hLangCombo);
+            auto languages  = CLexStyles::Instance().GetLanguages();
+            if (langSel >= 0 && langSel < static_cast<int>(languages.size()))
+            {
+                auto currentLang = CUnicodeUtils::StdGetUTF8(languages[langSel]);
+                CLexStyles::Instance().ResetUserData(currentLang);
+                if (HasActiveDocument())
+                {
+                    const auto& doc = GetActiveDocument();
+                    SetupLexerForLang(doc.GetLanguage());
+                }
+            }
+            break;
     }
     return 1;
 }

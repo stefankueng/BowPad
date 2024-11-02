@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2016, 2019-2021 - Stefan Kueng
+// Copyright (C) 2013-2016, 2019-2021, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -64,8 +64,8 @@ class StyleData
 {
 public:
     StyleData();
-    bool operator==(const StyleData& data) const = default;
-    bool operator!=(const StyleData& data) const = default;
+    bool         operator==(const StyleData& data) const = default;
+    bool         operator!=(const StyleData& data) const = default;
 
     std::wstring name;
     COLORREF     foregroundColor;
@@ -93,16 +93,16 @@ public:
 class CLexStyles
 {
 public:
-    static CLexStyles& Instance();
+    static CLexStyles&                           Instance();
 
-    std::vector<std::wstring>            GetLanguages() const;
-    std::map<std::string, LanguageData>& GetLanguageDataMap();
-    std::string                          GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
-    std::wstring                         GetUserExtensionsForLanguage(const std::wstring& lang) const;
-    bool                                 GetDefaultExtensionForLanguage(const std::string& lang, std::wstring& ext, UINT& index) const;
-    bool                                 IsLanguageHidden(const std::wstring& lang) const;
-    size_t                               GetFilterSpecCount() const;
-    const COMDLG_FILTERSPEC*             GetFilterSpecData() const;
+    std::vector<std::wstring>                    GetLanguages() const;
+    std::map<std::string, LanguageData>&         GetLanguageDataMap();
+    std::string                                  GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
+    std::wstring                                 GetUserExtensionsForLanguage(const std::wstring& lang) const;
+    bool                                         GetDefaultExtensionForLanguage(const std::string& lang, std::wstring& ext, UINT& index) const;
+    bool                                         IsLanguageHidden(const std::wstring& lang) const;
+    size_t                                       GetFilterSpecCount() const;
+    const COMDLG_FILTERSPEC*                     GetFilterSpecData() const;
 
     const std::unordered_map<int, std::string>&  GetKeywordsForLang(const std::string& lang);
     const std::unordered_map<int, std::string>&  GetKeywordsForLexer(int lexer);
@@ -117,25 +117,26 @@ public:
     const std::string&                           GetAutoCompleteRegexForLang(const std::string& lang) const;
     std::unordered_map<std::string, std::string> GetAutoCompleteWords() const;
 
-    const LexerData&   GetLexerDataForLang(const std::string& lang) const;
-    const LexerData&   GetLexerDataForLexer(int lexer) const;
-    const std::string& GetLanguageForLexer(int lexer) const;
+    const LexerData&                             GetLexerDataForLang(const std::string& lang) const;
+    const LexerData&                             GetLexerDataForLexer(int lexer) const;
+    const std::string&                           GetLanguageForLexer(int lexer) const;
 
-    void SetLangForPath(const std::wstring& path, const std::string& language);
+    void                                         SetLangForPath(const std::wstring& path, const std::string& language);
 
-    void        SetUserForeground(int id, int style, COLORREF clr);
-    void        SetUserBackground(int id, int style, COLORREF clr);
-    void        SetUserFont(int id, int style, const std::wstring& font);
-    void        SetUserFontSize(int id, int style, int size);
-    void        SetUserFontStyle(int id, int style, FontStyle fontstyle);
-    void        SetUserExt(const std::wstring& ext, const std::string& lang);
-    void        SetLanguageHidden(const std::wstring& lang, bool hidden);
-    void        ResetUserData();
-    void        SaveUserData();
-    bool        AddUserFunctionForLang(const std::string& lang, const std::string& fnc);
-    std::string GetLanguageForPath(const std::wstring& path);
-    void        GenerateUserKeywords(LanguageData& ld) const;
-    void        Reload();
+    void                                         SetUserForeground(int id, int style, COLORREF clr);
+    void                                         SetUserBackground(int id, int style, COLORREF clr);
+    void                                         SetUserFont(int id, int style, const std::wstring& font);
+    void                                         SetUserFontSize(int id, int style, int size);
+    void                                         SetUserFontStyle(int id, int style, FontStyle fontstyle);
+    void                                         SetUserExt(const std::wstring& ext, const std::string& lang);
+    void                                         SetLanguageHidden(const std::wstring& lang, bool hidden);
+    void                                         ResetUserData();
+    void                                         ResetUserData(const std::string& language);
+    void                                         SaveUserData();
+    bool                                         AddUserFunctionForLang(const std::string& lang, const std::string& fnc);
+    std::string                                  GetLanguageForPath(const std::wstring& path);
+    void                                         GenerateUserKeywords(LanguageData& ld) const;
+    void                                         Reload();
 
 private:
     CLexStyles();
@@ -149,21 +150,21 @@ private:
                            StyleData&                                            style) const;
 
 private:
-    bool m_bLoaded;
+    bool                                             m_bLoaded;
 
     // Different languages may have the same file extension
-    std::multimap<std::string, std::string> m_extLang;
-    std::map<std::string, std::string>      m_fileLang;
-    std::map<std::string, LanguageData>     m_langData;
-    std::unordered_map<int, LexerData>      m_lexerData;
-    std::unordered_map<int, std::wstring>   m_lexerSection;
-    std::set<std::wstring>                  m_hiddenLangs;
+    std::multimap<std::string, std::string>          m_extLang;
+    std::map<std::string, std::string>               m_fileLang;
+    std::map<std::string, LanguageData>              m_langData;
+    std::unordered_map<int, LexerData>               m_lexerData;
+    std::unordered_map<int, std::wstring>            m_lexerSection;
+    std::set<std::wstring>                           m_hiddenLangs;
 
-    std::unordered_map<int, LexerData>  m_userLexerData;
-    std::map<std::string, std::string>  m_userExtLang;
-    std::map<std::string, std::string>  m_autoExtLang;
-    std::map<std::wstring, std::string> m_pathsLang;
-    std::list<std::wstring>             m_pathsForLang;
+    std::unordered_map<int, LexerData>               m_userLexerData;
+    std::map<std::string, std::string>               m_userExtLang;
+    std::map<std::string, std::string>               m_autoExtLang;
+    std::map<std::wstring, std::string>              m_pathsLang;
+    std::list<std::wstring>                          m_pathsForLang;
     // Used by the Save File Dialog filter.
     std::list<std::pair<std::wstring, std::wstring>> m_fileTypes;
     std::vector<COMDLG_FILTERSPEC>                   m_filterSpec;

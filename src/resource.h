@@ -385,6 +385,8 @@
 #define IDC_LABEL3                      1133
 #define IDC_SNIPPETGROUP                1134
 #define IDC_REGEXHELP                   1135
+#define IDC_BUTTON1                     1136
+#define IDC_RESETSTYLE                  1136
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -394,7 +396,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        259
 #define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         1136
+#define _APS_NEXT_CONTROL_VALUE         1137
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
