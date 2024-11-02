@@ -33,8 +33,8 @@ const std::unordered_map<int, std::string> emptyUnorderedMap;
 const std::string                          emptyString;
 const std::vector<std::string>             emptyStringVector;
 
-constexpr COLORREF fgColor = RGB(0, 0, 0);
-constexpr COLORREF bgColor = RGB(255, 255, 255);
+constexpr COLORREF                         fgColor = RGB(0, 0, 0);
+constexpr COLORREF                         bgColor = RGB(255, 255, 255);
 }; // namespace
 
 struct LexDetectStrings
@@ -99,7 +99,7 @@ void CLexStyles::ParseStyle(
     LPCWSTR                                               styleName,
     LPCWSTR                                               styleString,
     const std::unordered_map<std::wstring, std::wstring>& variables,
-    StyleData&                                            style) const
+    StyleData&                                            style)
 {
     std::wstring v = styleString;
     ReplaceVariables(v, variables);
@@ -289,7 +289,7 @@ void CLexStyles::Load()
                     auto num = _wtoi(it + 3);
                     if (_wcsicmp(it + 6, L"regex") == 0)
                     {
-                        assert(annotations.find(num) == annotations.end());
+                        assert(!annotations.contains(num));
                         annotations[num].sRegex = CUnicodeUtils::StdGetUTF8(ini->GetValue(lexerName.c_str(), it, L""));
                     }
                     if (_wcsicmp(it + 6, L"text") == 0)
@@ -384,8 +384,8 @@ void CLexStyles::Load()
             if (!filters.empty())
             {
                 auto sKey    = std::wstring(langKey) + TEXT(" file");
-                auto foundIt = std::find_if(m_fileTypes.begin(), m_fileTypes.end(),
-                                            [&](const auto& item) { return (std::get<0>(item) == sKey); });
+                auto foundIt = std::ranges::find_if(m_fileTypes,
+                                                    [&](const auto& item) { return (std::get<0>(item) == sKey); });
                 if (foundIt != m_fileTypes.end())
                     m_fileTypes.erase(foundIt);
                 m_fileTypes.push_back(std::make_pair(sKey, std::move(filters)));
@@ -556,7 +556,7 @@ bool CLexStyles::AddUserFunctionForLang(const std::string& lang, const std::stri
     return false;
 }
 
-void CLexStyles::GenerateUserKeywords(LanguageData& ld) const
+void CLexStyles::GenerateUserKeywords(LanguageData& ld)
 {
     if (!ld.userKeyWordsUpdated)
         return;
@@ -624,7 +624,7 @@ const std::string& CLexStyles::GetLanguageForLexer(int lexer) const
 
 std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
 {
-    auto it = std::find_if(m_pathsLang.begin(), m_pathsLang.end(), [&](const auto& toFind) {
+    auto it = std::ranges::find_if(m_pathsLang, [&](const auto& toFind) {
         return _wcsicmp(toFind.first.c_str(), path.c_str()) == 0;
     });
     if (it != m_pathsLang.end())
@@ -643,7 +643,7 @@ std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
     }
 
     auto pathA = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileName(path));
-    auto fit   = std::find_if(m_fileLang.begin(), m_fileLang.end(), [&](const auto& toFind) {
+    auto fit   = std::ranges::find_if(m_fileLang, [&](const auto& toFind) {
         return _stricmp(toFind.first.c_str(), pathA.c_str()) == 0;
     });
 
@@ -653,7 +653,7 @@ std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
     }
     auto ext = CUnicodeUtils::StdGetUTF8(CPathUtils::GetFileExtension(path));
 
-    auto eit = std::find_if(m_extLang.begin(), m_extLang.end(), [&](const auto& toFind) {
+    auto eit = std::ranges::find_if(m_extLang, [&](const auto& toFind) {
         return _stricmp(toFind.first.c_str(), ext.c_str()) == 0;
     });
     if (eit != m_extLang.end())
@@ -661,7 +661,7 @@ std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
         return eit->second;
     }
 
-    auto ait = std::find_if(m_autoExtLang.begin(), m_autoExtLang.end(), [&](const auto& toFind) {
+    auto ait = std::ranges::find_if(m_autoExtLang, [&](const auto& toFind) {
         return _stricmp(toFind.first.c_str(), ext.c_str()) == 0;
     });
     if (ait != m_autoExtLang.end())
@@ -671,7 +671,7 @@ std::string CLexStyles::GetLanguageForPath(const std::wstring& path)
     return "";
 }
 
-std::string CLexStyles::GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit)
+std::string CLexStyles::GetLanguageForDocument(const CDocument& doc, const CScintillaWnd& edit)
 {
     if (doc.m_path.empty())
         return "Text";
@@ -766,7 +766,7 @@ bool CLexStyles::GetDefaultExtensionForLanguage(const std::string& lang, std::ws
 
 bool CLexStyles::IsLanguageHidden(const std::wstring& lang) const
 {
-    return m_hiddenLangs.find(lang) != m_hiddenLangs.end();
+    return m_hiddenLangs.contains(lang);
 }
 
 size_t CLexStyles::GetFilterSpecCount() const
@@ -817,7 +817,7 @@ void CLexStyles::ReplaceVariables(std::wstring& s, const std::unordered_map<std:
 void CLexStyles::SetUserForeground(int id, int style, COLORREF clr)
 {
     LexerData& ld = m_userLexerData[id];
-    if (ld.styles.find(style) != ld.styles.end())
+    if (ld.styles.contains(style))
     {
         StyleData& sd      = ld.styles[style];
         sd.foregroundColor = clr;
@@ -833,7 +833,7 @@ void CLexStyles::SetUserForeground(int id, int style, COLORREF clr)
 void CLexStyles::SetUserBackground(int id, int style, COLORREF clr)
 {
     LexerData& ld = m_userLexerData[id];
-    if (ld.styles.find(style) != ld.styles.end())
+    if (ld.styles.contains(style))
     {
         StyleData& sd      = ld.styles[style];
         sd.backgroundColor = clr;
@@ -849,7 +849,7 @@ void CLexStyles::SetUserBackground(int id, int style, COLORREF clr)
 void CLexStyles::SetUserFont(int id, int style, const std::wstring& font)
 {
     LexerData& ld = m_userLexerData[id];
-    if (ld.styles.find(style) != ld.styles.end())
+    if (ld.styles.contains(style))
     {
         StyleData& sd = ld.styles[style];
         sd.fontName   = font;
@@ -865,7 +865,7 @@ void CLexStyles::SetUserFont(int id, int style, const std::wstring& font)
 void CLexStyles::SetUserFontSize(int id, int style, int size)
 {
     LexerData& ld = m_userLexerData[id];
-    if (ld.styles.find(style) != ld.styles.end())
+    if (ld.styles.contains(style))
     {
         StyleData& sd = ld.styles[style];
         sd.fontSize   = size;
@@ -881,7 +881,7 @@ void CLexStyles::SetUserFontSize(int id, int style, int size)
 void CLexStyles::SetUserFontStyle(int id, int style, FontStyle fontstyle)
 {
     LexerData& ld = m_userLexerData[id];
-    if (ld.styles.find(style) != ld.styles.end())
+    if (ld.styles.contains(style))
     {
         StyleData& sd = ld.styles[style];
         sd.fontStyle  = fontstyle;
@@ -937,7 +937,7 @@ void CLexStyles::ResetUserData(const std::string& language)
 
 void CLexStyles::SaveUserData()
 {
-    CSimpleIni   ini;
+    CSimpleIni ini;
     ini.SetUnicode();
     std::wstring userStyleFile = CAppUtils::GetDataPath() + L"\\userconfig";
 
@@ -972,8 +972,8 @@ void CLexStyles::SaveUserData()
             std::wstring sSize = std::to_wstring(styleData.fontSize);
             if (styleData.fontSize == 0)
                 sSize.clear();
-            int fore = GetRValue(styleData.foregroundColor) << 16 | GetGValue(styleData.foregroundColor) << 8 | GetBValue(styleData.foregroundColor);
-            int back = GetRValue(styleData.backgroundColor) << 16 | GetGValue(styleData.backgroundColor) << 8 | GetBValue(styleData.backgroundColor);
+            int         fore = GetRValue(styleData.foregroundColor) << 16 | GetGValue(styleData.foregroundColor) << 8 | GetBValue(styleData.foregroundColor);
+            int         back = GetRValue(styleData.backgroundColor) << 16 | GetGValue(styleData.backgroundColor) << 8 | GetBValue(styleData.backgroundColor);
             // styleNR=name;foreground;background;fontname;fontstyle;fontsize
             const auto& name = styleData.name.empty() ? m_lexerData[lexerId].styles[styleId].name : styleData.name;
             v                = CStringUtils::Format(L"%s;%06X;%06X;%s;%d;%s", name.c_str(), fore, back, styleData.fontName.c_str(), styleData.fontStyle, sSize.c_str());
@@ -1052,7 +1052,7 @@ void CLexStyles::SetUserExt(const std::wstring& ext, const std::string& lang)
 {
     auto iter    = m_userExtLang.begin();
     auto endIter = m_userExtLang.end();
-    for (; iter != endIter;)
+    while (iter != endIter)
     {
         if (iter->second.compare(lang) == 0)
             iter = m_userExtLang.erase(iter);
@@ -1162,7 +1162,7 @@ void CLexStyles::SetLangForPath(const std::wstring& path, const std::string& lan
             // extension has a different language set than the user selected
             // only add this if the extension is set in m_autoExtLang
             std::string e  = CUnicodeUtils::StdGetUTF8(sExt);
-            auto        it = std::find_if(m_extLang.begin(), m_extLang.end(), [&](const auto& toFind) {
+            auto        it = std::ranges::find_if(m_extLang, [&](const auto& toFind) {
                 return _stricmp(toFind.first.c_str(), e.c_str()) == 0;
             });
             if (it == m_extLang.end())

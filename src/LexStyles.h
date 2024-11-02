@@ -97,7 +97,7 @@ public:
 
     std::vector<std::wstring>                    GetLanguages() const;
     std::map<std::string, LanguageData>&         GetLanguageDataMap();
-    std::string                                  GetLanguageForDocument(const CDocument& doc, CScintillaWnd& edit);
+    std::string                                  GetLanguageForDocument(const CDocument& doc, const CScintillaWnd& edit);
     std::wstring                                 GetUserExtensionsForLanguage(const std::wstring& lang) const;
     bool                                         GetDefaultExtensionForLanguage(const std::string& lang, std::wstring& ext, UINT& index) const;
     bool                                         IsLanguageHidden(const std::wstring& lang) const;
@@ -135,7 +135,7 @@ public:
     void                                         SaveUserData();
     bool                                         AddUserFunctionForLang(const std::string& lang, const std::string& fnc);
     std::string                                  GetLanguageForPath(const std::wstring& path);
-    void                                         GenerateUserKeywords(LanguageData& ld) const;
+    static void                                  GenerateUserKeywords(LanguageData& ld);
     void                                         Reload();
 
 private:
@@ -144,10 +144,10 @@ private:
 
     void        Load();
     static void ReplaceVariables(std::wstring& s, const std::unordered_map<std::wstring, std::wstring>& vars);
-    void        ParseStyle(LPCWSTR                                               styleName,
+    static void ParseStyle(LPCWSTR                                               styleName,
                            LPCWSTR                                               styleString,
                            const std::unordered_map<std::wstring, std::wstring>& variables,
-                           StyleData&                                            style) const;
+                           StyleData&                                            style);
 
 private:
     bool                                             m_bLoaded;
