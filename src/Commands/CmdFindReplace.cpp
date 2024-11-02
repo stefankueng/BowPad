@@ -2941,7 +2941,7 @@ void CCmdFindReplace::ScintillaNotify(SCNotification* pScn)
         }
         for (uptr_t i = INDIC_CUSTOM_MARK_1; i <= INDIC_CUSTOM_MARK_4; ++i)
         {
-            Scintilla().SetIndicatorCurrent(i);
+            Scintilla().SetIndicatorCurrent(static_cast<int>(i));
             Scintilla().IndicatorClearRange(startStylePos, len);
             Scintilla().IndicatorClearRange(startStylePos, len - 1);
 
@@ -2961,7 +2961,7 @@ void CCmdFindReplace::ScintillaNotify(SCNotification* pScn)
 
             if (sLastHighlightString.empty() || sLastHighlightString.compare(sHighlightString))
             {
-                auto docScrollType = DOCSCROLLTYPE_CUSTOMMARK_1 + (i - INDIC_CUSTOM_MARK_1);
+                int docScrollType = static_cast<int>(DOCSCROLLTYPE_CUSTOMMARK_1 + (i - INDIC_CUSTOM_MARK_1));
                 DocScrollClear(docScrollType);
                 if (sHighlightString.empty())
                     continue;
