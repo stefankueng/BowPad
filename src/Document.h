@@ -94,6 +94,7 @@ public:
         : m_document(nullptr)
         , m_encoding(-1)
         , m_encodingSaving(-1)
+        , m_fileSize(0)
         , m_format(EOLFormat::Win_Format)
         , m_bHasBOM(false)
         , m_bHasBOMSaving(false)
@@ -102,6 +103,7 @@ public:
         , m_bIsDirty(false)
         , m_bNeedsSaving(false)
         , m_bIsReadonly(false)
+        , m_bTailing(false)
         , m_bIsWriteProtected(false)
         , m_bDoSaveAs(false)
         , m_tabSpace(TabSpace::Default)
@@ -132,6 +134,7 @@ public:
     std::wstring                   m_path;
     int                            m_encoding;
     int                            m_encodingSaving;
+    unsigned __int64               m_fileSize;
     EOLFormat                      m_format;
     bool                           m_bHasBOM;
     bool                           m_bHasBOMSaving;
@@ -140,6 +143,7 @@ public:
     bool                           m_bIsDirty;
     bool                           m_bNeedsSaving;
     bool                           m_bIsReadonly;
+    bool                           m_bTailing;
     bool                           m_bIsWriteProtected;
     bool                           m_bDoSaveAs; ///< even if m_path is set, always ask where to save
     FILETIME                       m_lastWriteTime;

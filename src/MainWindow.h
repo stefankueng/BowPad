@@ -153,7 +153,6 @@ private:
     void                             PasteHistory();
     void                             About() const;
     void                             ShowCommandPalette();
-    bool                             HasOutsideChangesOccurred() const;
     void                             CheckForOutsideChanges();
     void                             UpdateCaptionBar();
     bool                             HandleOutsideDeletedFile(int docID);

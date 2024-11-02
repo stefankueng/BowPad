@@ -59,6 +59,7 @@
 #include "CmdStyleConfigurator.h"
 #include "CmdSummary.h"
 #include "CmdTabList.h"
+#include "CmdTail.h"
 #include "CmdUndo.h"
 #include "CmdVerticalEdge.h"
 #include "CmdWhiteSpace.h"
@@ -160,6 +161,7 @@ void CCommandHandler::Init(void* obj)
     Add<CCmdPrevious>(obj);
     Add<CCmdNext>(obj);
     Add<CCmdTabList>(obj);
+    Add<CCmdTail>(obj);
 
     Add<CCmdFindReplace>(obj);
     Add<CCmdFindNext>(obj);

@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2022 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -99,6 +99,7 @@ protected:
     void                      RestoreCurrentPos(const CPosData& pos) const;
     void                      SaveCurrentPos(CPosData& pos) const;
     bool                      UpdateFileTime(CDocument& doc, bool bIncludeReadonly) const;
+    std::vector<char>         ReadNewData(CDocument& doc) const;
 
     Scintilla::ScintillaCall& Scintilla() const;
     LRESULT                   SendMessageToMainWnd(UINT msg, WPARAM wParam, LPARAM lParam) const;

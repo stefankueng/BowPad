@@ -849,6 +849,14 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
     <Command Name="cmdCustomMarkClearAll" LabelTitle="Clear all styles"/>
     <Command Name="cmdMarkGroup" LabelTitle="Style selection"/>
 
+    <Command Name="cmdTail" LabelTitle="Tail -f">
+      <Command.LargeImages>
+        <Image>res/Tail.png</Image>
+      </Command.LargeImages>
+    </Command>
+    <Command Name="cmdTailGroup" />
+
+
     <Command Name="cmdContextMap" />
     <Command Name="cmdContextSpellMap" />
     <Command Name="cmdTabContextMap" />
@@ -1038,7 +1046,13 @@ Hold down the Shift key to show EOLs as well." Keytip="WS">
               <ToggleButton CommandName="cmdSessionAutoLoad" />
               <ToggleButton CommandName="cmdSessionAutoSave" />
             </SplitButton>
-            <ToggleButton CommandName="cmdWriteProtect" />
+            <SplitButton CommandName="cmdTailGroup">
+              <SplitButton.ButtonItem>
+                <ToggleButton CommandName="cmdTail" />
+              </SplitButton.ButtonItem>
+              <ToggleButton CommandName="cmdTail" />
+              <ToggleButton CommandName="cmdWriteProtect" />
+            </SplitButton>
           </Group>
           <Group CommandName="cmdGroupClipboard" SizeDefinition="FourButtons">
             <Button CommandName="cmdPaste" />

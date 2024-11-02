@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2014, 2016-2017, 2020-2021 - Stefan Kueng
+// Copyright (C) 2013-2014, 2016-2017, 2020-2021, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -74,8 +74,8 @@ struct hash<DocID>
 };
 } // namespace std
 
-constexpr int ReadBlockSize  = 128 * 1024; //128 kB
-constexpr int WriteBlockSize = 128 * 1024; //128 kB
+constexpr int ReadBlockSize  = 128 * 1024; // 128 kB
+constexpr int WriteBlockSize = 128 * 1024; // 128 kB
 
 class CDocumentManager
 {
@@ -83,19 +83,20 @@ public:
     CDocumentManager();
     ~CDocumentManager();
 
-    void             AddDocumentAtEnd(const CDocument& doc, DocID id);
-    void             RemoveDocument(DocID id);
-    int              GetCount() const { return static_cast<int>(m_documents.size()); }
-    DocID            GetIdForPath(const std::wstring& path) const;
-    bool             HasDocumentID(DocID id) const;
-    const CDocument& GetDocumentFromID(DocID id) const;
-    CDocument&       GetModDocumentFromID(DocID id);
+    void              AddDocumentAtEnd(const CDocument& doc, DocID id);
+    void              RemoveDocument(DocID id);
+    int               GetCount() const { return static_cast<int>(m_documents.size()); }
+    DocID             GetIdForPath(const std::wstring& path) const;
+    bool              HasDocumentID(DocID id) const;
+    const CDocument&  GetDocumentFromID(DocID id) const;
+    CDocument&        GetModDocumentFromID(DocID id);
 
-    CDocument        LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
-    bool             SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved) const;
-    bool             SaveFile(HWND hWnd, CDocument& doc, const std::wstring& path) const;
-    static bool      UpdateFileTime(CDocument& doc, bool bIncludeReadonly);
-    DocModifiedState HasFileChanged(DocID id) const;
+    CDocument         LoadFile(HWND hWnd, const std::wstring& path, int encoding, bool createIfMissing);
+    bool              SaveFile(HWND hWnd, CDocument& doc, bool& bTabMoved) const;
+    bool              SaveFile(HWND hWnd, CDocument& doc, const std::wstring& path) const;
+    static bool       UpdateFileTime(CDocument& doc, bool bIncludeReadonly);
+    DocModifiedState  HasFileChanged(DocID id) const;
+    std::vector<char> ReadNewData(CDocument& doc);
 
 private:
     bool SaveDoc(HWND hWnd, const std::wstring& path, const CDocument& doc) const;

@@ -3389,8 +3389,11 @@ void CMainWindow::HandleSavePoint(const SCNotification& scn)
     if (m_docManager.HasDocumentID(docID))
     {
         auto& doc      = m_docManager.GetModDocumentFromID(docID);
-        doc.m_bIsDirty = scn.nmhdr.code == SCN_SAVEPOINTLEFT;
-        UpdateTab(docID);
+        if (!doc.m_bTailing)
+        {
+            doc.m_bIsDirty = scn.nmhdr.code == SCN_SAVEPOINTLEFT;
+            UpdateTab(docID);
+        }
     }
 }
 
@@ -3402,7 +3405,7 @@ void CMainWindow::HandleWriteProtectedEdit()
     if (m_docManager.HasDocumentID(docID))
     {
         auto& doc = m_docManager.GetModDocumentFromID(docID);
-        if (!doc.m_bIsWriteProtected && (doc.m_bIsReadonly || (m_editor.Scintilla().ReadOnly() != 0)))
+        if (!doc.m_bTailing && !doc.m_bIsWriteProtected && (doc.m_bIsReadonly || (m_editor.Scintilla().ReadOnly() != 0)))
         {
             // If the user really wants to edit despite it being read only, let them.
             if (AskToRemoveReadOnlyAttribute())
@@ -3645,7 +3648,7 @@ void CMainWindow::HandleTabChange(const NMHDR& /*nmhdr*/)
         }
     }
 
-    if (!m_bIgnoreFileChanges)
+    if (!m_bIgnoreFileChanges && !doc.m_bTailing)
     {
         auto ds = m_docManager.HasFileChanged(docID);
         if (ds == DocModifiedState::Modified)
@@ -4500,7 +4503,7 @@ bool CMainWindow::ReloadTab(int tab, int encoding, bool dueToOutsideChanges)
             // update the fileTime of the document to avoid this warning
             m_docManager.UpdateFileTime(doc, false);
             // the current content of the tab is possibly different
-            // than the content on disk: mark the content as dirty
+            // from the content on disk: mark the content as dirty
             // so the user knows he can save the changes.
             doc.m_bIsDirty     = true;
             doc.m_bNeedsSaving = true;
@@ -4626,19 +4629,6 @@ bool CMainWindow::HandleOutsideDeletedFile(int tab)
     return false;
 }
 
-bool CMainWindow::HasOutsideChangesOccurred() const
-{
-    int tabCount = m_tabBar.GetItemCount();
-    for (int i = 0; i < tabCount; ++i)
-    {
-        auto docID = m_tabBar.GetIDFromIndex(i);
-        auto ds    = m_docManager.HasFileChanged(docID);
-        if (ds == DocModifiedState::Modified || ds == DocModifiedState::Removed)
-            return true;
-    }
-    return false;
-}
-
 void CMainWindow::CheckForOutsideChanges()
 {
     static bool bInsideCheckForOutsideChanges = false;
@@ -4663,15 +4653,18 @@ void CMainWindow::CheckForOutsideChanges()
             if (ds == DocModifiedState::Modified || ds == DocModifiedState::Removed)
             {
                 const auto& doc = m_docManager.GetDocumentFromID(docID);
-                if ((ds != DocModifiedState::Removed) && !doc.m_bIsDirty && !doc.m_bNeedsSaving && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
+                if (!doc.m_bTailing)
                 {
-                    ReloadTab(i, -1, true);
-                }
-                else
-                {
-                    m_tabBar.ActivateAt(i);
-                    if (i != activeTab)
-                        bChangedTab = true;
+                    if ((ds != DocModifiedState::Removed) && !doc.m_bIsDirty && !doc.m_bNeedsSaving && CIniSettings::Instance().GetInt64(L"View", L"autorefreshifnotmodified", 1))
+                    {
+                        ReloadTab(i, -1, true);
+                    }
+                    else
+                    {
+                        m_tabBar.ActivateAt(i);
+                        if (i != activeTab)
+                            bChangedTab = true;
+                    }
                 }
             }
         }

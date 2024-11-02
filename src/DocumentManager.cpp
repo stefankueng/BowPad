@@ -136,7 +136,36 @@ std::map<std::string, int, ICaseComp> encodings = {
 
 CDocument g_emptyDoc;
 
-wchar_t   WideCharSwap(wchar_t nValue)
+class VectorLoader : public Scintilla::ILoader
+{
+public:
+    VectorLoader(std::vector<char>& data)
+        : m_data(data)
+    {
+    }
+    virtual ~VectorLoader() = default;
+
+    int SCI_METHOD AddData(const char* data, Sci_Position length) override
+    {
+        m_data.insert(m_data.end(), data, data + length);
+        return static_cast<int>(m_data.size());
+    }
+
+    void* SCI_METHOD ConvertToDocument() override
+    {
+        return nullptr;
+    }
+
+    int SCI_METHOD Release() override
+    {
+        return 0;
+    }
+
+private:
+    std::vector<char>& m_data;
+};
+
+wchar_t WideCharSwap(wchar_t nValue)
 {
     return (((nValue >> 8)) | (nValue << 8));
 }
@@ -323,7 +352,7 @@ void LoadSomeOther(Scintilla::ILoader& edit, int encoding, DWORD lenFile,
 {
     // For other encodings, ask system if there are any invalid characters; note that it will
     // not correctly know if the last character is cut when there are invalid characters inside the text
-    int wideLen = MultiByteToWideChar(encoding, (lenFile == -1) ? 0 : MB_ERR_INVALID_CHARS, data, lenFile, nullptr, 0);
+    int  wideLen = MultiByteToWideChar(encoding, (lenFile == -1) ? 0 : MB_ERR_INVALID_CHARS, data, lenFile, nullptr, 0);
     auto lastErr = GetLastError();
     if (wideLen == 0 && lastErr == ERROR_INVALID_FLAGS)
         wideLen = MultiByteToWideChar(encoding, 0, data, lenFile, nullptr, 0);
@@ -703,7 +732,7 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
     if (doc.m_format == EOLFormat::Unknown_Format)
         doc.m_format = EOLFormat::Win_Format;
 
-    auto loadedDoc = pdocLoad->ConvertToDocument();          // loadedDoc has reference count 1
+    auto loadedDoc = pdocLoad->ConvertToDocument();                                                      // loadedDoc has reference count 1
     m_scratchScintilla.Scintilla().SetDocPointer(static_cast<Scintilla::IDocumentEditable*>(loadedDoc)); // doc in scratch has reference count 2 (loadedDoc 1, added one)
     m_scratchScintilla.Scintilla().SetUndoCollection(true);
     m_scratchScintilla.Scintilla().EmptyUndoBuffer();
@@ -714,6 +743,8 @@ CDocument CDocumentManager::LoadFile(HWND hWnd, const std::wstring& path, int en
         m_scratchScintilla.Scintilla().SetReadOnly(true);
     doc.m_document = m_scratchScintilla.Scintilla().DocPointer(); // doc.m_document has reference count of 2
     m_scratchScintilla.Scintilla().SetDocPointer(nullptr);        // now doc.m_document has reference count of 1, and the scratch does not hold any doc anymore
+
+    doc.m_fileSize = fileSize;
 
     return doc;
 }
@@ -1107,6 +1138,68 @@ DocModifiedState CDocumentManager::HasFileChanged(DocID id) const
         return DocModifiedState::Modified;
 
     return DocModifiedState::Unmodified;
+}
+
+std::vector<char> CDocumentManager::ReadNewData(CDocument& doc)
+{
+    std::vector<char> outVec;
+    if (doc.m_path.empty())
+        return outVec;
+    CAutoFile hFile = CreateFile(doc.m_path.c_str(), GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (!hFile.IsValid())
+        return outVec;
+    BY_HANDLE_FILE_INFORMATION fi;
+    if (!GetFileInformationByHandle(hFile, &fi))
+        return outVec;
+    unsigned __int64 fileSize = static_cast<__int64>(fi.nFileSizeHigh) << 32 | fi.nFileSizeLow;
+    if (doc.m_fileSize >= fileSize)
+        return outVec;
+    auto newDataLength = fileSize - doc.m_fileSize;
+    outVec.reserve(newDataLength);
+
+    LARGE_INTEGER li;
+    li.QuadPart = doc.m_fileSize;
+    if (!SetFilePointerEx(hFile, li, nullptr, FILE_BEGIN))
+        return outVec;
+
+    DWORD lenData                 = 0;
+    int   incompleteMultiByteChar = 0;
+
+    do
+    {
+        if (!ReadFile(hFile, m_data + incompleteMultiByteChar, ReadBlockSize - incompleteMultiByteChar, &lenData, nullptr))
+            lenData = 0;
+        else
+            lenData += incompleteMultiByteChar;
+        incompleteMultiByteChar = 0;
+
+        VectorLoader edit(outVec);
+        switch (doc.m_encoding)
+        {
+            case -1:
+            case CP_UTF8:
+                LoadSomeUtf8(edit, doc.m_bHasBOM, false, lenData, m_data, doc.m_format, doc.m_tabSpace);
+                break;
+            case 1200: // UTF16_LE
+                loadSomeUtf16Le(edit, doc.m_bHasBOM, false, lenData, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format, doc.m_tabSpace);
+                break;
+            case 1201: // UTF16_BE
+                loadSomeUtf16Be(edit, doc.m_bHasBOM, false, lenData, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format, doc.m_tabSpace);
+                break;
+            case 12001:                           // UTF32_BE
+                loadSomeUtf32Be(lenData, m_data); // Doesn't load, falls through to load.
+                [[fallthrough]];
+            case 12000: // UTF32_LE
+                loadSomeUtf32Le(edit, doc.m_bHasBOM, false, lenData, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format, doc.m_tabSpace);
+                break;
+            default:
+                LoadSomeOther(edit, doc.m_encoding, lenData, incompleteMultiByteChar, m_data, m_charBuf.get(), m_charBufSize, m_wideBuf.get(), doc.m_format, doc.m_tabSpace);
+                break;
+        }
+
+    } while (lenData == ReadBlockSize);
+    doc.m_fileSize = fileSize;
+    return outVec;
 }
 
 DocID CDocumentManager::GetIdForPath(const std::wstring& path) const
