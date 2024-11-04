@@ -758,6 +758,21 @@
     <ClCompile Include="..\lexilla\lexlib\InList.cxx">
       <Filter>Lexilla\lexlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\lexilla\lexers\LexDart.cxx">
+      <Filter>Lexilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lexilla\lexers\LexNix.cxx">
+      <Filter>Lexilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lexilla\lexers\LexTOML.cxx">
+      <Filter>Lexilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lexilla\lexers\LexTroff.cxx">
+      <Filter>Lexilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lexilla\lexers\LexZig.cxx">
+      <Filter>Lexilla\lexers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\lexilla\include\LexicalStyles.iface">
