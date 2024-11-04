@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: BowPad\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2024-08-02 22:02+0200\n"
+"PO-Revision-Date: 2024-11-04 20:23+0100\n"
 "Last-Translator: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language-Team: Stefan Küng <tortoisesvn@gmail.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.5\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -443,6 +443,10 @@ msgstr "Wähle die Zeilenenden von neuen Dateien"
 msgid "Clear Bookmarks"
 msgstr "Lösche Lesezeichen"
 
+#. Resource IDs: (60670)
+msgid "Clear all styles"
+msgstr "Alle Stile entfernen"
+
 #. Resource IDs: (60010, 60083, 60088, 60093, 60098)
 msgid "Clipboard"
 msgstr "Zwischenablage"
@@ -641,7 +645,7 @@ msgstr "Rechtschreibfehler korrigieren"
 msgid "Corrections"
 msgstr "Korrekturen"
 
-#. Resource IDs: (60668)
+#. Resource IDs: (60676)
 msgid "Corresponding File"
 msgstr "Entsprechende Datei"
 
@@ -1791,7 +1795,7 @@ msgstr "Öffne Datei an Cursorposition"
 msgid "Open Files"
 msgstr "Öffne Dateien"
 
-#. Resource IDs: (60669)
+#. Resource IDs: (60677)
 msgid "Open corresponding File"
 msgstr "Öffne zugehörige Datei"
 
@@ -1849,7 +1853,7 @@ msgid ""
 msgstr ""
 "Öffnet die Konfigurationsdatei zum konfigurieren der Tastaturkürzel in BowPad"
 
-#. Resource IDs: (60670)
+#. Resource IDs: (60678)
 msgid ""
 "Opens the corresponding file to the file in the current tab.\n"
 "(h/cpp, aspx/cs/vb)"
@@ -2087,6 +2091,10 @@ msgstr "Alle in Auswahl e&rsetzen"
 msgid "Replace All In All &Tabs"
 msgstr "Alle E&rsetzen in allen Tabs"
 
+#. Resource IDs: (1136)
+msgid "Reset lexer style to default"
+msgstr "Lexer-Stil auf Default zurücksetzen"
+
 #. Resource IDs: (60217, 60219)
 msgid "Right margin"
 msgstr "Rechter Rand"
@@ -2323,7 +2331,7 @@ msgstr "Zeige Eigenschaften"
 msgid "Show Whitespaces"
 msgstr "Zeige Leerzeichen"
 
-#. Resource IDs: (60672)
+#. Resource IDs: (60680)
 msgid "Show clipboard history"
 msgstr "Verlauf der Zwischenablage"
 
@@ -2416,6 +2424,10 @@ msgstr "Status"
 msgid "Style Configurator"
 msgstr "Stilkonfigurator"
 
+#. Resource IDs: (60671)
+msgid "Style selection"
+msgstr "Stil auswählen"
+
 #. Resource IDs: (65535)
 msgid "Style:"
 msgstr "Stil:"
@@ -2479,6 +2491,10 @@ msgstr "Tabs"
 #. Resource IDs: (60344, 60346)
 msgid "Tabs to Spaces"
 msgstr "Tabulatoren zu Leerzeichen"
+
+#. Resource IDs: (60672)
+msgid "Tail -f"
+msgstr "Tail -f"
 
 #. Resource IDs: (117)
 #, c-format
@@ -2882,7 +2898,7 @@ msgstr "umbrochene Zeilen einrücken"
 msgid "indents wrapped sublines"
 msgstr "rückt umbrochene Unterzeilen ein"
 
-#. Resource IDs: (60673)
+#. Resource IDs: (60681)
 msgid "no plugins loaded"
 msgstr "Keine Plugins geladen"
 
@@ -2985,6 +3001,22 @@ msgstr "Schaltet Klappung ein"
 #. Resource IDs: (60583)
 msgid "turns off folding"
 msgstr "Schaltet Klappung aus"
+
+#. Resource IDs: (60666)
+msgid "with style 1"
+msgstr "mit Stil 1"
+
+#. Resource IDs: (60667)
+msgid "with style 2"
+msgstr "mit Stil 2"
+
+#. Resource IDs: (60668)
+msgid "with style 3"
+msgstr "mit Stil 3"
+
+#. Resource IDs: (60669)
+msgid "with style 4"
+msgstr "mit Stil 4"
 
 #. Resource IDs: (258)
 #, c-format

@@ -387,6 +387,10 @@ msgstr ""
 msgid "Clear Bookmarks"
 msgstr ""
 
+#. Resource IDs: (60670)
+msgid "Clear all styles"
+msgstr ""
+
 #. Resource IDs: (60010, 60083, 60088, 60093, 60098)
 msgid "Clipboard"
 msgstr ""
@@ -571,7 +575,7 @@ msgstr ""
 msgid "Corrections"
 msgstr ""
 
-#. Resource IDs: (60668)
+#. Resource IDs: (60676)
 msgid "Corresponding File"
 msgstr ""
 
@@ -1594,7 +1598,7 @@ msgstr ""
 msgid "Open Files"
 msgstr ""
 
-#. Resource IDs: (60669)
+#. Resource IDs: (60677)
 msgid "Open corresponding File"
 msgstr ""
 
@@ -1641,7 +1645,7 @@ msgstr ""
 msgid "Opens the config file to configure keyboard shortcuts for any command in BowPad"
 msgstr ""
 
-#. Resource IDs: (60670)
+#. Resource IDs: (60678)
 msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
 msgstr ""
 
@@ -1861,6 +1865,10 @@ msgstr ""
 msgid "Replace All In All &Tabs"
 msgstr ""
 
+#. Resource IDs: (1136)
+msgid "Reset lexer style to default"
+msgstr ""
+
 #. Resource IDs: (60217, 60219)
 msgid "Right margin"
 msgstr ""
@@ -2076,7 +2084,7 @@ msgstr ""
 msgid "Show Whitespaces"
 msgstr ""
 
-#. Resource IDs: (60672)
+#. Resource IDs: (60680)
 msgid "Show clipboard history"
 msgstr ""
 
@@ -2168,6 +2176,10 @@ msgstr ""
 msgid "Style Configurator"
 msgstr ""
 
+#. Resource IDs: (60671)
+msgid "Style selection"
+msgstr ""
+
 #. Resource IDs: (65535)
 msgid "Style:"
 msgstr ""
@@ -2230,6 +2242,10 @@ msgstr ""
 
 #. Resource IDs: (60344, 60346)
 msgid "Tabs to Spaces"
+msgstr ""
+
+#. Resource IDs: (60672)
+msgid "Tail -f"
 msgstr ""
 
 #. Resource IDs: (117)
@@ -2600,7 +2616,7 @@ msgstr ""
 msgid "indents wrapped sublines"
 msgstr ""
 
-#. Resource IDs: (60673)
+#. Resource IDs: (60681)
 msgid "no plugins loaded"
 msgstr ""
 
@@ -2702,6 +2718,22 @@ msgstr ""
 
 #. Resource IDs: (60583)
 msgid "turns off folding"
+msgstr ""
+
+#. Resource IDs: (60666)
+msgid "with style 1"
+msgstr ""
+
+#. Resource IDs: (60667)
+msgid "with style 2"
+msgstr ""
+
+#. Resource IDs: (60668)
+msgid "with style 3"
+msgstr ""
+
+#. Resource IDs: (60669)
+msgid "with style 4"
 msgstr ""
 
 #. Resource IDs: (258)
