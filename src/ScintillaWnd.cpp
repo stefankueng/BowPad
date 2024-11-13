@@ -1494,7 +1494,7 @@ void CScintillaWnd::MarkSelectedWord(bool clear, bool edit)
     m_scintilla.IndicatorClearRange(startStylePos, len);
 
     auto selSpan = m_scintilla.SelectionSpan();
-    if (clear || selSpan.Length() == 0 || selSpan.Length() + 10000)
+    if (clear || selSpan.Length() == 0 )
     {
         lastSelText.clear();
         m_docScroll.Clear(DOCSCROLLTYPE_SELTEXT);
