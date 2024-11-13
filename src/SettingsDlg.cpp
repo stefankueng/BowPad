@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2021-2022 - Stefan Kueng
+// Copyright (C) 2021-2022, 2024 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -274,7 +274,8 @@ void CSettingsDlg::InitSettingsList()
             case SettingType::Number:
             {
                 auto val = CIniSettings::Instance().GetInt64(setting.section.c_str(), setting.key.c_str(), setting.def.l);
-                ListView_SetItemText(hListControl, index, 0, const_cast<LPWSTR>(std::to_wstring(val).c_str()));
+                auto valStr = std::to_wstring(val);
+                ListView_SetItemText(hListControl, index, 0, const_cast<LPWSTR>(valStr.c_str()));
             }
             break;
             case SettingType::String:

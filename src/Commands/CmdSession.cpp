@@ -119,7 +119,7 @@ void CCmdSessionLoad::OnClose()
             settings.SetInt64(sessionSection(), CStringUtils::Format(L"undocurrentaction%d", index).c_str(), pos.m_undoData.m_currentAction);
             settings.SetInt64(sessionSection(), CStringUtils::Format(L"undosavepoint%d", index).c_str(), pos.m_undoData.m_savePoint);
             settings.SetInt64(sessionSection(), CStringUtils::Format(L"undotentative%d", index).c_str(), pos.m_undoData.m_tentative);
-            for (size_t undoIdx = 0; undoIdx < pos.m_undoData.m_actions.size(); ++undoIdx)
+            for (int undoIdx = 0; undoIdx < static_cast<int>(pos.m_undoData.m_actions.size()); ++undoIdx)
             {
                 auto& action = pos.m_undoData.m_actions[undoIdx];
                 settings.SetInt64(sessionSection(), CStringUtils::Format(L"undoactiontype%d_%d", index, undoIdx).c_str(), action.m_type);
@@ -301,14 +301,14 @@ void CCmdSessionLoad::RestoreSavedSession() const
         {
             stringtok(pos.m_lineStateVector, folds, true, L";", false);
         }
-        auto numUndoActions = static_cast<size_t>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undonumactions%d", fileNum).c_str(), 0));
+        auto numUndoActions = static_cast<int>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undonumactions%d", fileNum).c_str(), 0));
         if (numUndoActions)
         {
             CUndoData undoData;
             undoData.m_currentAction = static_cast<int>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undocurrentaction%d", fileNum).c_str(), 0));
             undoData.m_savePoint     = static_cast<int>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undosavepoint%d", fileNum).c_str(), 0));
             undoData.m_tentative     = static_cast<int>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undotentative%d", fileNum).c_str(), 0));
-            for (size_t undoIdx = 0; undoIdx < numUndoActions; ++undoIdx)
+            for (int undoIdx = 0; undoIdx < numUndoActions; ++undoIdx)
             {
                 CUndoAction action;
                 action.m_type     = static_cast<int>(settings.GetInt64(sessionSection(), CStringUtils::Format(L"undoactiontype%d_%d", fileNum, undoIdx).c_str(), 0));

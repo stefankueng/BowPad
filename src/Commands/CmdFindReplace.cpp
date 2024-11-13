@@ -2123,7 +2123,7 @@ void CFindReplaceDlg::SearchThread(int id, const std::wstring& searchPath, const
                 size_t resultSizeBefore = m_pendingSearchResults.size();
                 SearchDocument(*searchWnd.get(), DocID(), doc, searchFor, flags, exSearchFlags,
                                m_pendingSearchResults, m_pendingFoundPaths);
-                if (m_pendingSearchResults.size() - resultSizeBefore > 0)
+                if (m_pendingSearchResults.size() - resultSizeBefore != 0)
                     m_pendingFoundPaths.push_back(std::move(path));
                 NewData(timeOfLastProgressUpdate, false);
                 if (m_foundSize >= m_maxSearchResults)
