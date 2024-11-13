@@ -1893,8 +1893,6 @@ void CMainWindow::ResizeChildWindows()
         const int mainWidth   = rect.right - rect.left;
         const int btnMargin   = CDPIAware::Instance().Scale(*this, 2);
 
-        OutputDebugString((L"ResizeChildWindows: " + std::to_wstring(treeWidth) + L" " + std::to_wstring(mainWidth) + L"\n").c_str());
-
         HDWP      hDwp        = BeginDeferWindowPos(7);
         DeferWindowPos(hDwp, m_statusBar, nullptr, rect.left, rect.bottom - m_statusBar.GetHeight(), mainWidth, m_statusBar.GetHeight(), flags);
         DeferWindowPos(hDwp, m_tabBar, nullptr, treeWidth + rect.left, rect.top + m_ribbonHeight, mainWidth - treeWidth - (3 * (tabBtnWidth + btnMargin)) - btnMargin, rect.bottom - rect.top, flags);
