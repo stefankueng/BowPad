@@ -465,7 +465,6 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Theme.h" />
     <ClInclude Include="UICollection.h" />
-    <ClInclude Include="UTF8DocumentIterator.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>

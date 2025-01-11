@@ -237,9 +237,6 @@
     <ClInclude Include="version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UTF8DocumentIterator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Commands\CmdHeaderSource.h">
       <Filter>Commands</Filter>
     </ClInclude>
