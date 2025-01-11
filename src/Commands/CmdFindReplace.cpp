@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2024 - Stefan Kueng
+// Copyright (C) 2013-2025 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1647,7 +1647,12 @@ void CFindReplaceDlg::DoReplace(int id)
                 else
                     Scintilla().SetTargetStart(targetEnd + 1);
                 if (bReplaceOnlyInSelection)
-                    Scintilla().SetTargetEnd(selEnd);
+                {
+                    auto newSelEnd = selEnd + static_cast<Scintilla::Position>(sReplaceString.length()) - static_cast<Scintilla::Position>(g_findString.length());
+                    if (newSelEnd > Scintilla().Length())
+                        newSelEnd = Scintilla().Length();
+                    Scintilla().SetTargetEnd(newSelEnd);
+                }
                 else
                 {
                     auto docLen = Scintilla().Length();
