@@ -414,6 +414,9 @@
     <ClInclude Include="Commands\CmdTail.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="..\ext\sktoolslib\Utf8ToWideIterator.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

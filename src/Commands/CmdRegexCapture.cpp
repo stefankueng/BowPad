@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2022 - Stefan Kueng
+// Copyright (C) 2013-2022, 2025 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include <sstream>
 
 #include <dwmapi.h>
+#include <Utf8ToWideIterator.h>
 #pragma comment(lib, "dwmapi.lib")
 
 constexpr auto                    DEFAULT_MAX_SEARCH_STRINGS = 20;
@@ -227,7 +228,7 @@ void CRegexCaptureDlg::DoCapture()
     std::wstring sCaptureW = GetDlgItemText(IDC_CAPTURECOMBO).get();
     UpdateCombo(IDC_CAPTURECOMBO, sCaptureW, m_maxCaptureStrings);
 
-    auto sRegex   = CUnicodeUtils::StdGetUTF8(sRegexW);
+    auto sRegex   = sRegexW; // CUnicodeUtils::StdGetUTF8(sRegexW);
     auto sCapture = UnEscape(CUnicodeUtils::StdGetUTF8(sCaptureW));
     if (sCapture.empty())
         sCapture = "$&";
@@ -249,6 +250,7 @@ void CRegexCaptureDlg::DoCapture()
                 APPVERIFY(false); // Shouldn't happen.
         }
     }
+    sCaptureW = CUnicodeUtils::StdGetUnicode(sCapture);
     try
     {
         auto                  findText = GetDlgItemText(IDC_SEARCHCOMBO);
@@ -256,12 +258,12 @@ void CRegexCaptureDlg::DoCapture()
         if (IsDlgButtonChecked(*this, IDC_ICASE))
             rxFlags |= std::regex_constants::icase;
         // replace all "\n" chars with "(?:\n|\r\n|\n\r)"
-        if ((sRegex.size() > 1) && (sRegex.find("\\r") == std::wstring::npos))
+        if ((sRegex.size() > 1) && (sRegex.find(L"\\r") == std::wstring::npos))
         {
-            SearchReplace(sRegex, "\\n", "(!:\\n|\\r\\n|\\n\\r)");
+            SearchReplace(sRegex, L"\\n", L"(!:\\n|\\r\\n|\\n\\r)");
         }
 
-        const std::regex rx(sRegex, rxFlags);
+        const std::wregex rx(sRegex, rxFlags);
 
         m_captureWnd.Scintilla().ClearAll();
 
@@ -272,34 +274,34 @@ void CRegexCaptureDlg::DoCapture()
             Scintilla().IndicatorClearRange(0, lengthDoc);
         }
 
-        const char*                                          pText = static_cast<const char*>(Scintilla().CharacterPointer());
-        std::string_view                                     searchText(pText, lengthDoc);
-        std::match_results<std::string_view::const_iterator> whatC;
-        std::regex_constants::match_flag_type                flags = std::regex_constants::match_flag_type::match_default | std::regex_constants::match_flag_type::match_not_null;
+        auto*                                  pText = static_cast<const unsigned char*>(Scintilla().CharacterPointer());
+        std::match_results<Utf8ToWideIterator> whatC;
+        std::regex_constants::match_flag_type  flags = std::regex_constants::match_flag_type::match_default | std::regex_constants::match_flag_type::match_not_null;
         if (IsDlgButtonChecked(*this, IDC_DOTNEWLINE))
             flags |= std::regex_constants::match_flag_type::match_not_eol;
-        auto                                         start = searchText.cbegin();
-        auto                                         end   = searchText.cend();
+        Utf8ToWideIterator                           start(pText, 0);
+        Utf8ToWideIterator                           end(pText, lengthDoc);
         std::vector<std::tuple<int, size_t, size_t>> capturePositions;
-        std::ostringstream                           outStream;
+        std::wostringstream                          outStream;
+
         while (std::regex_search(start, end, whatC, rx, flags))
         {
             if (whatC[0].matched)
             {
-                auto out = whatC.format(sCapture, flags);
+                auto out = whatC.format(sCaptureW, flags);
                 outStream << out;
                 if (outStream.tellp() > static_cast<long long>(5 * 1024 * 1024))
                 {
-                    const auto& sOut = outStream.str();
+                    const auto& sOut = CUnicodeUtils::StdGetUTF8(outStream.str());
                     m_captureWnd.Scintilla().AppendText(sOut.size(), sOut.c_str());
-                    outStream.str("");
+                    outStream.str(L"");
                     outStream.clear();
                 }
 
                 int captureCount = 0;
                 for (const auto& w : whatC)
                 {
-                    capturePositions.push_back(std::make_tuple(captureCount, w.first - searchText.cbegin(), w.length()));
+                    capturePositions.push_back(std::make_tuple(captureCount, w.first.CurrentPos(), CUnicodeUtils::StdGetUTF8(w.str()).length()));
                     ++captureCount;
                 }
             }
@@ -315,14 +317,17 @@ void CRegexCaptureDlg::DoCapture()
             // update flags for continuation
             flags |= std::regex_constants::match_flag_type::match_prev_avail;
         }
-        const auto& resultString = outStream.str();
+        const auto& resultString = CUnicodeUtils::StdGetUTF8(outStream.str());
         m_captureWnd.Scintilla().AppendText(resultString.size(), resultString.c_str());
         m_captureWnd.UpdateLineNumberWidth();
 
         for (const auto& [num, begin, length] : capturePositions)
         {
-            Scintilla().SetIndicatorCurrent(INDIC_REGEXCAPTURE + num);
-            Scintilla().IndicatorFillRange(begin, length);
+            if (num < (INDIC_REGEXCAPTURE_END - INDIC_REGEXCAPTURE))
+            {
+                Scintilla().SetIndicatorCurrent(INDIC_REGEXCAPTURE + num);
+                Scintilla().IndicatorFillRange(begin, length);
+            }
         }
 
         std::vector<std::wstring> regexStrings;

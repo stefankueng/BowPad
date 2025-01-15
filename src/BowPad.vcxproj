@@ -372,6 +372,7 @@
     <ClInclude Include="..\ext\sktoolslib\SysInfo.h" />
     <ClInclude Include="..\ext\sktoolslib\TempFile.h" />
     <ClInclude Include="..\ext\sktoolslib\UnicodeUtils.h" />
+    <ClInclude Include="..\ext\sktoolslib\Utf8ToWideIterator.h" />
     <ClInclude Include="..\ext\sktoolslib\Windows10Colors.h" />
     <ClInclude Include="..\ext\tinyexpr\tinyexpr.h" />
     <ClInclude Include="AboutDlg.h" />
