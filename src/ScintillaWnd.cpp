@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2024 - Stefan Kueng
+// Copyright (C) 2013-2025 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1242,6 +1242,7 @@ void CScintillaWnd::SetupDefaultStyles() const
     {
         m_scintilla.IndicSetStyle(i, Scintilla::IndicatorStyle::Box);
         m_scintilla.IndicSetFore(i, CTheme::Instance().GetThemeColor(captureColors[i - INDIC_REGEXCAPTURE]));
+        m_scintilla.IndicSetStrokeWidth(i, 300);
     }
 
     for (uptr_t i = INDIC_CUSTOM_MARK_1; i <= INDIC_CUSTOM_MARK_4; ++i)
