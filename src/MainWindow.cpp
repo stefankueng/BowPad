@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2024 - Stefan Kueng
+// Copyright (C) 2013-2025 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -230,7 +230,8 @@ CMainWindow::CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx /* = nullptr*/)
     , m_autoCompleter(this, &m_editor)
     , m_dwellStartPos(-1)
     , m_bBlockAutoIndent(false)
-    , m_lastCheckedLine(0)
+    , m_annotationsLastEndLine(0)
+    , m_annotationsLastStartLine(0)
     , m_hShieldIcon(nullptr)
     , m_hCapsLockIcon(nullptr)
     , m_hLexerIcon(nullptr)
@@ -818,8 +819,16 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                 eolBytes = 1;
                                 break;
                         }
-                        auto endLine = m_editor.Scintilla().DocLineFromVisible(m_editor.Scintilla().FirstVisibleLine()) + m_editor.Scintilla().LinesOnScreen();
-                        for (sptr_t line = m_lastCheckedLine; line <= endLine; ++line)
+                        auto firstVisibleDocLine = m_editor.Scintilla().DocLineFromVisible(m_editor.Scintilla().FirstVisibleLine());
+                        auto lastVisibleDocLine  = m_editor.Scintilla().DocLineFromVisible(m_editor.Scintilla().FirstVisibleLine() + m_editor.Scintilla().LinesOnScreen());
+                        auto startLine           = firstVisibleDocLine;
+                        auto endLine             = lastVisibleDocLine;
+                        // adjust startLine and endLine to exclude the range m_annotationsLastStartLine to m_annotationsLastEndLine
+                        if (m_annotationsLastEndLine > startLine && m_annotationsLastEndLine < endLine)
+                            startLine = m_annotationsLastEndLine;
+                        if (m_annotationsLastStartLine > startLine && m_annotationsLastStartLine < endLine)
+                            endLine = m_annotationsLastStartLine;
+                        for (sptr_t line = startLine; line <= endLine; ++line)
                         {
                             auto curLineSize = m_editor.Scintilla().GetLine(line, nullptr);
                             if (curLineSize <= eolBytes)
@@ -847,8 +856,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             if (!textSet)
                                 m_editor.Scintilla().EOLAnnotationSetText(line, nullptr);
                         }
-                        if (m_lastCheckedLine < endLine)
-                            m_lastCheckedLine = endLine;
+                        m_annotationsLastStartLine = startLine;
+                        m_annotationsLastEndLine = endLine;
                     }
                 }
                 break;
@@ -1230,8 +1239,7 @@ LRESULT CMainWindow::HandleEditorEvents(const NMHDR& nmHdr, WPARAM wParam, LPARA
         {
             if (pScn->modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT))
             {
-                m_lastCheckedLine = m_editor.Scintilla().LineFromPosition(pScn->position);
-                SetTimer(*this, TIMER_CHECKLINES, 300, nullptr);
+                RefreshAnnotations();
             }
         }
         break;
@@ -5134,6 +5142,7 @@ void CMainWindow::SetTheme(bool dark)
 
 void CMainWindow::RefreshAnnotations()
 {
-    m_lastCheckedLine = 0;
+    m_annotationsLastEndLine = 0;
+    m_editor.Scintilla().AnnotationClearAll();
     SetTimer(*this, TIMER_CHECKLINES, 300, nullptr);
 }
