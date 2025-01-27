@@ -4823,6 +4823,7 @@ void CMainWindow::BlockAllUIUpdates(bool block)
             // unblock
             for (auto window : windows)
                 SendMessage(window, WM_SETREDRAW, TRUE, 0);
+            SendMessage(*this, WM_SETREDRAW, TRUE, 0);
             // force a redraw
             RedrawWindow(*this, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_INTERNALPAINT | RDW_ALLCHILDREN | RDW_UPDATENOW);
         }
