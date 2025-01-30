@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2024 - Stefan Kueng
+// Copyright (C) 2014-2025 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -561,6 +561,7 @@ void CFileTree::Refresh(HTREEITEM refreshRoot, bool force /*= false*/, bool expa
 
 void CFileTree::RefreshThread(HTREEITEM refreshRoot, const std::wstring& refreshPath, bool expanding)
 {
+    m_bStop = false;
     OnOutOfScope(m_threadsRunning = false;);
 
     auto data         = new FileTreeData();
