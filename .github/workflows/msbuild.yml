@@ -46,7 +46,7 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 ${{env.SOLUTION_FILE_PATH}}
     - name: Upload artifacts for x64
-      uses: actions/upload-artifact@v3.1.1
+      uses: actions/upload-artifact@v4
       with:
           name: BowPad-x64
           path: bin/Release64/bin/BowPad.exe
