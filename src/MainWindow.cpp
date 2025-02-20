@@ -56,6 +56,7 @@
 #include <Shobjidl.h>
 #include <dwmapi.h>
 #include <fstream>
+#include <format>
 
 IUIFramework* g_pFramework = nullptr; // Reference to the Ribbon framework.
 
