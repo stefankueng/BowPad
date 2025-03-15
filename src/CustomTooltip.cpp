@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2016-2018, 2020-2022 - Stefan Kueng
+// Copyright (C) 2016-2018, 2020-2022, 2025 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -78,11 +78,13 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
     auto dc         = GetDC(*this);
     auto textBuf    = std::make_unique<wchar_t[]>(m_infoText.size() + 4);
     wcscpy_s(textBuf.get(), m_infoText.size() + 4, m_infoText.c_str());
+    RECT parentRc{};
+    GetWindowRect(m_hWndFit, &parentRc);
     RECT rc{};
     rc.left   = 0;
-    rc.right  = CDPIAware::Instance().Scale(*this, 800);
+    rc.right  = parentRc.right - parentRc.left - BORDER - BORDER;
     rc.top    = 0;
-    rc.bottom = CDPIAware::Instance().Scale(*this, 800);
+    rc.bottom = parentRc.bottom - parentRc.top - BORDER - BORDER;
 
     NONCLIENTMETRICS ncm{};
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
@@ -90,7 +92,7 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
     m_hFont      = CreateFontIndirect(&ncm.lfStatusFont);
 
     auto oldFont = SelectObject(dc, m_hFont);
-    DrawText(dc, textBuf.get(), static_cast<int>(m_infoText.size()), &rc, DT_LEFT | DT_TOP | DT_CALCRECT | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);
+    DrawText(dc, textBuf.get(), static_cast<int>(m_infoText.size()), &rc, DT_LEFT | DT_TOP | DT_CALCRECT | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP | DT_WORDBREAK);
     SelectObject(dc, oldFont);
 
     if (m_bShowColorBox)
@@ -104,8 +106,6 @@ void CCustomToolTip::ShowTip(POINT screenPt, const std::wstring& text, COLORREF*
     wndPos.top    = screenPt.y - rc.bottom - COLORBOX_SIZE + HOVERDISTANCE;
     wndPos.right  = wndPos.left + rc.right + BORDER + BORDER;
     wndPos.bottom = wndPos.top + rc.bottom + BORDER + BORDER;
-    RECT parentRc{};
-    GetWindowRect(m_hWndFit, &parentRc);
     if (wndPos.left < parentRc.left)
         OffsetRect(&wndPos, parentRc.left - wndPos.left, 0);
     if (wndPos.top < parentRc.top)
@@ -162,7 +162,7 @@ void CCustomToolTip::OnPaint(HDC hdc, RECT* pRc)
     auto oldFont = SelectObject(hdc, m_hFont);
     auto textBuf = std::make_unique<wchar_t[]>(m_infoText.size() + 4);
     wcscpy_s(textBuf.get(), m_infoText.size() + 4, m_infoText.c_str());
-    DrawText(hdc, textBuf.get(), -1, pRc, DT_LEFT | DT_TOP | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP);
+    DrawText(hdc, textBuf.get(), -1, pRc, DT_LEFT | DT_TOP | DT_NOPREFIX | DT_EXPANDTABS | DT_NOCLIP | DT_WORDBREAK);
     if (m_bShowColorBox)
     {
         RECT clrTextRc = *pRc;
