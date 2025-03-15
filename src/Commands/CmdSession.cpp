@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2018, 2020-2024 - Stefan Kueng
+// Copyright (C) 2014-2018, 2020-2025 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -193,6 +193,7 @@ void CCmdSessionLoad::OnClose()
             doc.m_bNeedsSaving = false;
             SaveDoc(docId, backupPath);
             doc.m_path = CStringUtils::Format(L"%d%s", saveIndex, filename.c_str());
+            doc.m_tmpSavePath = backupPath;
         }
         settings.SetString(sessionSection(), CStringUtils::Format(L"path%d", saveIndex).c_str(), doc.m_path.c_str());
         settings.SetInt64(sessionSection(), CStringUtils::Format(L"tabspace%d", saveIndex).c_str(), static_cast<int>(doc.m_tabSpace));

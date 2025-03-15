@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2013-2018, 2020-2021, 2023-2024 - Stefan Kueng
+// Copyright (C) 2013-2018, 2020-2021, 2023-2025 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -132,6 +132,7 @@ public:
 
     Document                       m_document;
     std::wstring                   m_path;
+    std::wstring                   m_tmpSavePath;
     int                            m_encoding;
     int                            m_encodingSaving;
     unsigned __int64               m_fileSize;

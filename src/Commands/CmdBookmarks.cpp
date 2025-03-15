@@ -1,6 +1,6 @@
 ﻿// This file is part of BowPad.
 //
-// Copyright (C) 2014-2016, 2020-2023 - Stefan Kueng
+// Copyright (C) 2014-2016, 2020-2023, 2025 - Stefan Kueng
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -58,11 +58,16 @@ void CCmdBookmarks::OnDocumentClose(DocID id)
 {
     auto&       settings = CIniSettings::Instance();
     const auto& doc      = GetDocumentFromID(id);
+    auto        docPath  = doc.m_path;
     if (doc.m_path.empty())
-        return;
+    {
+        docPath = doc.m_tmpSavePath;
+        if (docPath.empty())
+            return;
+    }
 
     // look if the path is already in our list
-    bool                bModified = (m_bookmarks.erase(doc.m_path) > 0);
+    bool                bModified = (m_bookmarks.erase(docPath) > 0);
 
     // find all bookmarks
     std::vector<sptr_t> bookmarkLines;
@@ -76,7 +81,7 @@ void CCmdBookmarks::OnDocumentClose(DocID id)
 
     if (!bookmarkLines.empty())
     {
-        m_bookmarks[doc.m_path] = std::make_tuple(std::time(nullptr), std::move(bookmarkLines));
+        m_bookmarks[docPath] = std::make_tuple(std::time(nullptr), std::move(bookmarkLines));
         bModified               = true;
     }
 
@@ -123,10 +128,11 @@ void CCmdBookmarks::OnDocumentClose(DocID id)
 void CCmdBookmarks::OnDocumentOpen(DocID id)
 {
     const CDocument& doc = GetDocumentFromID(id);
+    auto             docPath = doc.m_path;
     if (doc.m_path.empty())
         return;
 
-    auto it = m_bookmarks.find(doc.m_path);
+    auto it = m_bookmarks.find(docPath);
     if (it != m_bookmarks.end())
     {
         const auto& [time, lines] = it->second;
