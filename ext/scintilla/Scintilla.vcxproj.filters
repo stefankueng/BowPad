@@ -249,6 +249,15 @@
     <ClInclude Include="..\lexilla\lexlib\InList.h">
       <Filter>Lexilla\lexlib</Filter>
     </ClInclude>
+    <ClInclude Include="win32\ListBox.h">
+      <Filter>Scintilla\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\SurfaceD2D.h">
+      <Filter>Scintilla\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\SurfaceGDI.h">
+      <Filter>Scintilla\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lexilla\lexers\LexSQL.cxx">
@@ -772,6 +781,15 @@
     </ClCompile>
     <ClCompile Include="..\lexilla\lexers\LexZig.cxx">
       <Filter>Lexilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\ListBox.cxx">
+      <Filter>Scintilla\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\SurfaceD2D.cxx">
+      <Filter>Scintilla\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\SurfaceGDI.cxx">
+      <Filter>Scintilla\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

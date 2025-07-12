@@ -169,7 +169,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
                                 Scintilla::ModificationFlags::ChangeFold |
                                 Scintilla::ModificationFlags::ChangeStyle);
     bool bUseD2D = CIniSettings::Instance().GetInt64(L"View", L"d2d", 1) != 0;
-    m_scintilla.SetTechnology(bUseD2D ? Scintilla::Technology::DirectWriteRetain : Scintilla::Technology::Default);
+    m_scintilla.SetTechnology(bUseD2D ? Scintilla::Technology::DirectWrite1 : Scintilla::Technology::Default);
     m_scintilla.SetLayoutThreads(1000);
 
     m_scintilla.SetMarginMaskN(SC_MARGE_FOLDER, SC_MASK_FOLDERS);
@@ -220,6 +220,7 @@ bool CScintillaWnd::Init(HINSTANCE hInst, HWND hParent, HWND hWndAttachTo)
     m_scintilla.SetAdditionalCaretsBlink(true);
     m_scintilla.SetMultiPaste(Scintilla::MultiPaste::Each);
     m_scintilla.SetVirtualSpaceOptions(Scintilla::VirtualSpace::RectangularSelection);
+    m_scintilla.SetUndoSelectionHistory(Scintilla::UndoSelectionHistoryOption::Enabled);
 
     m_scintilla.SetMouseWheelCaptures(false);
 
