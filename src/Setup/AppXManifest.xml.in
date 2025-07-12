@@ -12,7 +12,7 @@
   xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
   IgnorableNamespaces="uap uap2 uap3 rescap desktop uap10">
   <Identity Name="2BD6356E-3263-4AA6-A5FC-C48280BE5EDD" ProcessorArchitecture="$Architecture$"
-            Publisher="CN=&quot;Open Source Developer, Stefan Kueng&quot;, O=Open Source Developer, L=Altstätten, S=St. Gallen, C=CH"
+            Publisher="CN=&quot;Open Source Developer, Küng Stefan&quot;, O=Open Source Developer, L=Altstätten, S=Sankt Gallen, C=CH"
             Version="$Version$" />
   <Properties>
     <DisplayName>BowPad</DisplayName>
