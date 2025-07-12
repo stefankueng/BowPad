@@ -9,13 +9,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 1900-01-01 00:00+0000\n"
-"PO-Revision-Date: 2024-06-03 23:58+0900\n"
-"Last-Translator: VenusGirl-비너스걸💋 <venusgirl@outlook.com>\n"
+"PO-Revision-Date: 2025-07-13 01:55+0900\n"
+"Last-Translator: 비너스걸-VenusGirl💋 <venusgirl@outlook.com>\n"
 "Language-Team: VᴇɴᴜsGɪʀʟ <https://venusgirls.tistory.com/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
 
 # msgid/msgstr fields for Accelerator keys
 # Format is: "ID:xxxxxx:VACS+X" where:
@@ -33,12 +34,12 @@ msgstr ""
 #. Resource IDs: (254)
 #, c-format
 msgid "%%i%%c%06Xno selection"
-msgstr "%%i%%c%06X선택 없음"
+msgstr "%%i%%c%06X선택 안 함"
 
 #. Resource IDs: (224)
 #, c-format
 msgid "%d occurrences were replaced."
-msgstr "%d개의 발생이 대체되었습니다."
+msgstr "%d개의 발생 항목이 대체되었습니다."
 
 #. Resource IDs: (170)
 #, c-format
@@ -118,8 +119,12 @@ msgid "<"
 msgstr "<"
 
 #. Resource IDs: (133)
-msgid "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full details about this update</a>"
-msgstr "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">이 업데이트에 대한 자세한 내용</a>"
+msgid ""
+"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full details "
+"about this update</a>"
+msgstr ""
+"<a href=\"http://tools.stefankueng.com/BowPad_history.html\">이 업데이트에 대"
+"한 자세한 내용</a>"
 
 #. Resource IDs: (1135)
 msgid "<a>(?)</a>"
@@ -129,7 +134,7 @@ msgstr "<a>(?)</a>"
 msgid "A"
 msgstr "A"
 
-#. Resource IDs: (60527)
+#. Resource IDs: (60539)
 msgid "AB"
 msgstr "AB"
 
@@ -151,8 +156,11 @@ msgstr "접근 불가!"
 
 #. Resource IDs: (146)
 #, c-format
-msgid "Access to the file '%s' was denied. Do you want to try again with elevated privileges?"
-msgstr "'%s'파일에 대한 접근이 거부되었습니다. 상승된 권한으로 다시 시도하시겠습니까?"
+msgid ""
+"Access to the file '%s' was denied. Do you want to try again with elevated "
+"privileges?"
+msgstr ""
+"'%s'파일에 대한 접근이 거부되었습니다. 상승된 권한으로 다시 시도하시겠습니까?"
 
 #. Resource IDs: (1113)
 msgid "Add newline to capture"
@@ -166,11 +174,11 @@ msgstr "빠른 액세스 도구 모음에 추가"
 msgid "Add word to dictionary"
 msgstr "사전에 단어 추가"
 
-#. Resource IDs: (255, 60642)
+#. Resource IDs: (255, 60654)
 msgid "Advanced Settings"
 msgstr "고급 설정"
 
-#. Resource IDs: (60551)
+#. Resource IDs: (60563)
 msgid "All plugin commands are listed here"
 msgstr "모든 플러그인 명령이 여기에 나열됩니다"
 
@@ -208,7 +216,7 @@ msgstr "현재 탭을 저장할 위치를 묻습니다"
 msgid "Author: Stefan Küng"
 msgstr "저자: Stefan Küng, 한국어: 비너스걸"
 
-#. Resource IDs: (60526, 60528)
+#. Resource IDs: (60538, 60540)
 msgid "Auto Braces"
 msgstr "자동 교정기"
 
@@ -216,19 +224,22 @@ msgstr "자동 교정기"
 msgid "Auto save"
 msgstr "자동 저장"
 
-#. Resource IDs: (60486)
+#. Resource IDs: (60498)
 msgid "Auto-save on close"
 msgstr "닫을 때 자동 저장"
 
-#. Resource IDs: (60488)
+#. Resource IDs: (60500)
 msgid "Auto-saves modified files"
 msgstr "수정된 파일 자동 저장"
 
-#. Resource IDs: (60489)
-msgid "Auto-saves modified files when the session closes and restores the modified state on load"
-msgstr "세션이 닫힐 때 수정된 파일을 자동 저장하고 불러올 때 수정된 상태를 복원합니다"
+#. Resource IDs: (60501)
+msgid ""
+"Auto-saves modified files when the session closes and restores the modified "
+"state on load"
+msgstr ""
+"세션이 닫힐 때 수정된 파일을 자동 저장하고 불러올 때 수정된 상태를 복원합니다"
 
-#. Resource IDs: (60633)
+#. Resource IDs: (60645)
 msgid "Autocomplete"
 msgstr "자동 완성"
 
@@ -288,7 +299,7 @@ msgstr "BowPad 렉서 파일"
 msgid "C"
 msgstr "C"
 
-#. Resource IDs: (60072, 60634)
+#. Resource IDs: (60072, 60646)
 msgid "CA"
 msgstr "CA"
 
@@ -380,7 +391,7 @@ msgstr "설치하려면 플러그인을 선택하고 제거하려면 선택 취�
 msgid "Check for Updates"
 msgstr "업데이트 확인"
 
-#. Resource IDs: (60621)
+#. Resource IDs: (60633)
 msgid "Check for errors only in comments, strings and text"
 msgstr "주석, 문자열 및 텍스트에서만 오류 확인"
 
@@ -388,7 +399,7 @@ msgstr "주석, 문자열 및 텍스트에서만 오류 확인"
 msgid "Check for updates"
 msgstr "업데이트 확인"
 
-#. Resource IDs: (60615)
+#. Resource IDs: (60627)
 msgid "Check spelling"
 msgstr "맞춤법 검사"
 
@@ -404,6 +415,10 @@ msgstr "새 파일의 줄 끝 선택"
 msgid "Clear Bookmarks"
 msgstr "책갈피 지우기"
 
+#. Resource IDs: (60670)
+msgid "Clear all styles"
+msgstr "모든 스타일 지우기"
+
 #. Resource IDs: (60010, 60083, 60088, 60093, 60098)
 msgid "Clipboard"
 msgstr "클립보드"
@@ -416,7 +431,7 @@ msgstr "닫기"
 msgid "Close All Tabs"
 msgstr "모든 탭 닫기"
 
-#. Resource IDs: (60498)
+#. Resource IDs: (60510)
 msgid "Close All Tabs Except This One"
 msgstr "이 탭을 제외한 모든 탭 닫기"
 
@@ -428,7 +443,7 @@ msgstr "탭 닫기"
 msgid "Close all"
 msgstr "모두 닫기"
 
-#. Resource IDs: (60497)
+#. Resource IDs: (60509)
 msgid "Close all but this"
 msgstr "이 항목을 제외한 모든 항목 닫기"
 
@@ -448,11 +463,11 @@ msgstr ""
 msgid "Closes all open files"
 msgstr "열려 있는 모든 파일을 닫습니다"
 
-#. Resource IDs: (60499)
+#. Resource IDs: (60511)
 msgid "Closes all open files except the current one"
 msgstr "현재 파일을 제외한 열려 있는 모든 파일을 닫습니다"
 
-#. Resource IDs: (60397)
+#. Resource IDs: (60409)
 msgid "Cmd"
 msgstr "Cmd"
 
@@ -488,19 +503,19 @@ msgstr "주석"
 msgid "Comments the selected text"
 msgstr "선택한 텍스트에 주석을 추가합니다"
 
-#. Resource IDs: (60638, 60639)
+#. Resource IDs: (60650, 60651)
 msgid "Configure Code Snippets"
 msgstr "코드 토막글 구성"
 
-#. Resource IDs: (60522)
+#. Resource IDs: (60534)
 msgid "Configure Keyboard Shortcuts"
 msgstr "바로 가기 키 구성"
 
-#. Resource IDs: (154, 60546)
+#. Resource IDs: (154, 60558)
 msgid "Configure Plugins"
 msgstr "플러그인 구성"
 
-#. Resource IDs: (60521)
+#. Resource IDs: (60533)
 msgid "Configure Shortcuts"
 msgstr "바로 가기 구성"
 
@@ -512,11 +527,11 @@ msgstr "스타일 구성"
 msgid "Configure colors, fonts, styles and sizes"
 msgstr "색상, 글꼴, 스타일 및 크기 구성"
 
-#. Resource IDs: (60472, 60473)
+#. Resource IDs: (60484, 60485)
 msgid "Configure custom commands"
 msgstr "사용자 지정 명령 구성"
 
-#. Resource IDs: (60545)
+#. Resource IDs: (60557)
 msgid "Configure plugins"
 msgstr "플러그인 구성"
 
@@ -548,15 +563,15 @@ msgstr "선택 영역을 대문자로 변환합니다"
 msgid "Converts the selection to lowercase"
 msgstr "선택 영역을 소문자로 변환합니다"
 
-#. Resource IDs: (60507)
+#. Resource IDs: (60519)
 msgid "Copies the name of the current file to the clipboard"
 msgstr "현재 파일의 이름을 클립보드에 복사합니다"
 
-#. Resource IDs: (60503)
+#. Resource IDs: (60515)
 msgid "Copies the path of the current file to the clipboard"
 msgstr "현재 파일의 경로를 클립보드에 복사합니다"
 
-#. Resource IDs: (60511)
+#. Resource IDs: (60523)
 msgid "Copies the path of the directory of the current file to the clipboard"
 msgstr "현재 파일의 디렉터리 경로를 클립보드에 복사합니다"
 
@@ -564,21 +579,25 @@ msgstr "현재 파일의 디렉터리 경로를 클립보드에 복사합니다"
 msgid "Copy"
 msgstr "복사"
 
-#. Resource IDs: (60509, 60510)
+#. Resource IDs: (60521, 60522)
 msgid "Copy Directory"
 msgstr "디렉터리 복사"
 
-#. Resource IDs: (60505, 60506)
+#. Resource IDs: (60517, 60518)
 msgid "Copy Name"
 msgstr "이름 복사"
 
-#. Resource IDs: (60501, 60502)
+#. Resource IDs: (60513, 60514)
 msgid "Copy Path"
 msgstr "경로 복사"
 
 #. Resource IDs: (60084)
-msgid "Copy the current selection to the clipboard. Hold down the shift key to copy the text formatted."
-msgstr "현재 선택 영역을 클립보드에 복사합니다. Shift 키를 누른 채로 포맷된 텍스트를 복사합니다."
+msgid ""
+"Copy the current selection to the clipboard. Hold down the shift key to copy "
+"the text formatted."
+msgstr ""
+"현재 선택 영역을 클립보드에 복사합니다. Shift 키를 누른 채로 포맷된 텍스트를 "
+"복사합니다."
 
 #. Resource IDs: (221)
 msgid ""
@@ -588,7 +607,7 @@ msgstr ""
 "파일 복사\n"
 "복사본은 다른 탭에서 열립니다."
 
-#. Resource IDs: (60617)
+#. Resource IDs: (60629)
 msgid "Correct spelling mistakes"
 msgstr "맞춤법 오류 수정"
 
@@ -596,7 +615,7 @@ msgstr "맞춤법 오류 수정"
 msgid "Corrections"
 msgstr "수정사항"
 
-#. Resource IDs: (60656)
+#. Resource IDs: (60676)
 msgid "Corresponding File"
 msgstr "해당 파일"
 
@@ -633,7 +652,7 @@ msgstr ""
 "만들기\n"
 "빈 파일이 생성됩니다."
 
-#. Resource IDs: (60541)
+#. Resource IDs: (60553)
 msgid "Creates a copy of the current tab"
 msgstr "현재 탭의 복사본을 작성합니다"
 
@@ -654,43 +673,43 @@ msgstr ""
 msgid "Custom Command %d"
 msgstr "사용자 지정 명령 %d"
 
-#. Resource IDs: (1049, 60442)
+#. Resource IDs: (1049, 60454)
 msgid "Custom Command 0"
 msgstr "사용자 지정 명령 0"
 
-#. Resource IDs: (1050, 60445)
+#. Resource IDs: (1050, 60457)
 msgid "Custom Command 1"
 msgstr "사용자 지정 명령 1"
 
-#. Resource IDs: (1051, 60448)
+#. Resource IDs: (1051, 60460)
 msgid "Custom Command 2"
 msgstr "사용자 지정 명령 2"
 
-#. Resource IDs: (1052, 60451)
+#. Resource IDs: (1052, 60463)
 msgid "Custom Command 3"
 msgstr "사용자 지정 명령 3"
 
-#. Resource IDs: (1053, 60454)
+#. Resource IDs: (1053, 60466)
 msgid "Custom Command 4"
 msgstr "사용자 지정 명령 4"
 
-#. Resource IDs: (1054, 60457)
+#. Resource IDs: (1054, 60469)
 msgid "Custom Command 5"
 msgstr "사용자 지정 명령 5"
 
-#. Resource IDs: (1055, 60460)
+#. Resource IDs: (1055, 60472)
 msgid "Custom Command 6"
 msgstr "사용자 지정 명령 6"
 
-#. Resource IDs: (1056, 60463)
+#. Resource IDs: (1056, 60475)
 msgid "Custom Command 7"
 msgstr "사용자 지정 명령 7"
 
-#. Resource IDs: (1057, 60466)
+#. Resource IDs: (1057, 60478)
 msgid "Custom Command 8"
 msgstr "사용자 지정 명령 8"
 
-#. Resource IDs: (1058, 60469)
+#. Resource IDs: (1058, 60481)
 msgid "Custom Command 9"
 msgstr "사용자 지정 명령 9"
 
@@ -703,8 +722,12 @@ msgid "Cut"
 msgstr "잘라내기"
 
 #. Resource IDs: (60089)
-msgid "Cut the current selection to the clipboard. Hold down the shift key to cut the text formatted."
-msgstr "현재 선택 영역을 클립보드로 잘라냅니다. Shift 키를 누른 채로 포맷된 텍스트를 잘라냅니다."
+msgid ""
+"Cut the current selection to the clipboard. Hold down the shift key to cut "
+"the text formatted."
+msgstr ""
+"현재 선택 영역을 클립보드로 잘라냅니다. Shift 키를 누른 채로 포맷된 텍스트를 "
+"잘라냅니다."
 
 #. Resource IDs: (60264)
 msgid "DD"
@@ -714,7 +737,11 @@ msgstr "DD"
 msgid "DEL"
 msgstr "DEL"
 
-#. Resource IDs: (60387, 60389)
+#. Resource IDs: (60396)
+msgid "Dark"
+msgstr "어두운"
+
+#. Resource IDs: (60398)
 msgid "Dark Theme"
 msgstr "어두운 테마"
 
@@ -726,7 +753,7 @@ msgstr "새 파일의 기본값"
 msgid "Delete"
 msgstr "삭제"
 
-#. Resource IDs: (60535, 60536)
+#. Resource IDs: (60547, 60548)
 msgid "Delete File"
 msgstr "파일 삭제"
 
@@ -742,7 +769,7 @@ msgstr ""
 "삭제\n"
 "파일이 제거됩니다."
 
-#. Resource IDs: (60537)
+#. Resource IDs: (60549)
 msgid "Deletes the file of the current tab"
 msgstr "현재 탭의 파일을 삭제합니다"
 
@@ -751,7 +778,8 @@ msgid "Descending (Z-A)"
 msgstr "내림차순 (Z-A)"
 
 #. Resource IDs: (60259)
-msgid "Determines whether a tab is inserted or spaces when the tab key is pressed."
+msgid ""
+"Determines whether a tab is inserted or spaces when the tab key is pressed."
 msgstr "탭 키를 누를 때 탭을 삽입할지 공백으로 둘지를 결정합니다."
 
 #. Resource IDs: (129)
@@ -785,7 +813,7 @@ msgstr "\"%s\\에 대한 변경 내용을 저장하시겠습니까?"
 msgid "Do&n't save"
 msgstr "저장 안 함(&N)"
 
-#. Resource IDs: (60558)
+#. Resource IDs: (60570)
 msgid "Document Summary"
 msgstr "문서 요약"
 
@@ -822,8 +850,11 @@ msgstr ""
 "BowPad를 최신 버전으로 업데이트합니다."
 
 #. Resource IDs: (140)
-msgid "Download of language list succeeded. Now you can select a language from that list."
-msgstr "언어 목록을 다운로드했습니다. 이제 해당 목록에서 언어를 선택할 수 있습니다."
+msgid ""
+"Download of language list succeeded. Now you can select a language from that "
+"list."
+msgstr ""
+"언어 목록을 다운로드했습니다. 이제 해당 목록에서 언어를 선택할 수 있습니다."
 
 #. Resource IDs: (128)
 msgid ""
@@ -877,11 +908,11 @@ msgstr "선택 편집"
 msgid "Edit all occurrences of the current selection at once"
 msgstr "현재 선택 영역의 모든 항목을 한 번에 편집"
 
-#. Resource IDs: (60646)
+#. Resource IDs: (60658)
 msgid "Edit at end"
 msgstr "끝에서 편집"
 
-#. Resource IDs: (60648)
+#. Resource IDs: (60660)
 msgid "Edit at end of selected lines"
 msgstr "선택한 줄의 끝에서 편집"
 
@@ -889,15 +920,18 @@ msgstr "선택한 줄의 끝에서 편집"
 msgid "Elevated"
 msgstr "권한 상승"
 
-#. Resource IDs: (60529)
-msgid "Enable to automatically add a closing brace when an opening brace is entered"
-msgstr "여는 중괄호를 입력할 때 닫는 중괄호를 자동으로 추가하려면 이 옵션을 선택합니다"
+#. Resource IDs: (60541)
+msgid ""
+"Enable to automatically add a closing brace when an opening brace is entered"
+msgstr ""
+"여는 중괄호를 입력할 때 닫는 중괄호를 자동으로 추가하려면 이 옵션을 선택합니"
+"다"
 
 #. Resource IDs: (273)
 msgid "Enables hardware acceleration for drawing"
 msgstr "그리기에 대해 하드웨어 가속을 사용합니다"
 
-#. Resource IDs: (60609)
+#. Resource IDs: (60621)
 msgid "Enables/Disables the spell checker"
 msgstr "맞춤법 검사기를 사용/사용 안 함"
 
@@ -930,7 +964,7 @@ msgstr "파일(&I) (예: *.txt;*.dat):"
 msgid "F&older to search:"
 msgstr "검색할 폴더(&F):"
 
-#. Resource IDs: (60187, 60492)
+#. Resource IDs: (60187, 60504)
 msgid "FN"
 msgstr "FN"
 
@@ -1040,7 +1074,7 @@ msgstr "파일 이름은 달라야 합니다."
 #. Resource IDs: (245)
 #, c-format
 msgid "Files \"%s\" and \"%s\" already exist."
-msgstr "\"%s\"%s 및 \"%s\" 파일이 이미 있습니다."
+msgstr "파일 \"%s\" 및 \"%s\"이 이미 존재합니다."
 
 #. Resource IDs: (60167)
 msgid "Find"
@@ -1115,15 +1149,15 @@ msgstr "첫 번째 파일에 폴더가 필요합니다."
 msgid "Folder required for second file."
 msgstr "두 번째 파일에 폴더가 필요합니다."
 
-#. Resource IDs: (60561)
+#. Resource IDs: (60573)
 msgid "Folding"
 msgstr "접기"
 
-#. Resource IDs: (60569, 60570)
+#. Resource IDs: (60581, 60582)
 msgid "Folding Off"
 msgstr "접기 끄기"
 
-#. Resource IDs: (60566, 60567)
+#. Resource IDs: (60578, 60579)
 msgid "Folding On"
 msgstr "접기 켜기"
 
@@ -1131,7 +1165,7 @@ msgstr "접기 켜기"
 msgid "Follow Tab"
 msgstr "팔로우 탭"
 
-#. Resource IDs: (60525, 65535)
+#. Resource IDs: (60537, 65535)
 msgid "Font"
 msgstr "글꼴"
 
@@ -1168,7 +1202,7 @@ msgstr ""
 "빈 줄: %ld\r\n"
 "단락: %ld\r\n"
 
-#. Resource IDs: (1010, 60491, 60493)
+#. Resource IDs: (1010, 60503, 60505)
 msgid "Functions"
 msgstr "함수"
 
@@ -1213,12 +1247,18 @@ msgid "Highlight matching braces"
 msgstr "일치하는 중괄호 강조 표시"
 
 #. Resource IDs: (277)
-msgid "If enabled matching braces are highlighted, and non-matching ones marked red."
-msgstr "일치 중괄호가 강조 표시되고 일치하지 않는 중괄호는 빨간색으로 표시됩니다."
+msgid ""
+"If enabled matching braces are highlighted, and non-matching ones marked red."
+msgstr ""
+"일치 중괄호가 강조 표시되고 일치하지 않는 중괄호는 빨간색으로 표시됩니다."
 
 #. Resource IDs: (271)
-msgid "If set to true, the scrollbar acts as a document bar. Set to false to get a normal scrollbar."
-msgstr "true로 설정하면 스크롤 막대가 문서 막대로 작동합니다. 일반 스크롤 막대를 가져오려면 false로 설정합니다."
+msgid ""
+"If set to true, the scrollbar acts as a document bar. Set to false to get a "
+"normal scrollbar."
+msgstr ""
+"true로 설정하면 스크롤 막대가 문서 막대처럼 작동합니다. false로 설정하면 일"
+"반 스크롤 막대 됩니다."
 
 #. Resource IDs: (214)
 msgid "Ignore"
@@ -1240,15 +1280,15 @@ msgstr ""
 "가져오기\n"
 "렉서 파일을 가져옵니다. 새 렉서를 사용하려면 BowPad를 다시 시작하십시오."
 
-#. Resource IDs: (60623, 60624)
+#. Resource IDs: (60635, 60636)
 msgid "Include uppercase"
 msgstr "대문자 포함"
 
-#. Resource IDs: (60625)
+#. Resource IDs: (60637)
 msgid "Include words that are all CAPS or have uppercase letters in the middle"
 msgstr "모두 CAPS이거나 가운데 대문자가 있는 단어 포함"
 
-#. Resource IDs: (60563, 60564, 60565)
+#. Resource IDs: (60575, 60576, 60577)
 msgid "Init Folding Margin"
 msgstr "접이식 여백 초기화"
 
@@ -1317,11 +1357,11 @@ msgstr "LEX"
 msgid "LF"
 msgstr "LF"
 
-#. Resource IDs: (60650)
+#. Resource IDs: (60662)
 msgid "LR"
 msgstr "LR"
 
-#. Resource IDs: (60269, 60393, 60477)
+#. Resource IDs: (60269, 60405, 60489)
 msgid "LS"
 msgstr "LS"
 
@@ -1329,7 +1369,7 @@ msgstr "LS"
 msgid "LU"
 msgstr "LU"
 
-#. Resource IDs: (60392, 60611)
+#. Resource IDs: (60404, 60623)
 msgid "Language"
 msgstr "언어"
 
@@ -1349,35 +1389,35 @@ msgstr ""
 msgid "Language:"
 msgstr "언어:"
 
-#. Resource IDs: (60414)
+#. Resource IDs: (60426)
 msgid "Launch in Chrome"
 msgstr "Chrome에서 실행"
 
-#. Resource IDs: (60402, 60403)
+#. Resource IDs: (60414, 60415)
 msgid "Launch in Edge"
 msgstr "Edge에서 실행"
 
-#. Resource IDs: (60410, 60411)
+#. Resource IDs: (60422, 60423)
 msgid "Launch in Firefox"
 msgstr "Firefox에서 실행"
 
-#. Resource IDs: (60415)
+#. Resource IDs: (60427)
 msgid "Launch in Google Chrome"
 msgstr "Google Chrome에서 실행"
 
-#. Resource IDs: (60406)
+#. Resource IDs: (60418)
 msgid "Launch in IE"
 msgstr "IE에서 실행"
 
-#. Resource IDs: (60407)
+#. Resource IDs: (60419)
 msgid "Launch in Internet Explorer"
 msgstr "Internet Explorer에서 실행"
 
-#. Resource IDs: (60422, 60423)
+#. Resource IDs: (60434, 60435)
 msgid "Launch in Opera"
 msgstr "Opera에서 실행"
 
-#. Resource IDs: (60418, 60419)
+#. Resource IDs: (60430, 60431)
 msgid "Launch in Safari"
 msgstr "Safari에서 실행"
 
@@ -1385,14 +1425,22 @@ msgstr "Safari에서 실행"
 #, c-format
 msgid ""
 "Length in bytes: %ld (%s)\r\n"
-"Lines: %ld"
+"Lines: %s"
 msgstr ""
-"길이 (바이트): %ld (%s)\r\n"
-"\"줄: %ld"
+"길이 (바이트): %ld (%s)\n"
+"줄: %s"
 
 #. Resource IDs: (60150)
 msgid "Lexer"
 msgstr "렉서"
+
+#. Resource IDs: (60392)
+msgid "Light"
+msgstr "밝은"
+
+#. Resource IDs: (60394)
+msgid "Light Theme"
+msgstr "밝은 테마"
 
 #. Resource IDs: (238)
 #, c-format
@@ -1406,15 +1454,15 @@ msgstr "줄"
 #. Resource IDs: (177)
 #, c-format
 msgid ""
-"Line : %ld\r\n"
-"Column : %ld\r\n"
-"Selection : %Iu | %Iu\r\n"
-"Matches: %ld"
+"Line : %s\r\n"
+"Column : %s\r\n"
+"Selection : %s | %s\r\n"
+"Matches: %s"
 msgstr ""
-"줄 : %ld\r\n"
-"열 : %ld\r\n"
-"선택 : %Iu | %Iu\r\n"
-"일치: %ld"
+"줄 : %s\r\n"
+"열 : %s\r\n"
+"Selection : %s | %s\n"
+"일치: %s"
 
 #. Resource IDs: (60155)
 msgid "Line Endings"
@@ -1443,31 +1491,31 @@ msgstr "줄:"
 
 #. Resource IDs: (250)
 #, c-format
-msgid "Line: %%c%06X%ld%%r / %%c%06X%ld%%r   Column: %%c%06X%ld%%r"
-msgstr "줄: %%c%06X%ld%%r / %%c%06X%ld%%r   열: %%c%06X%ld%%r"
+msgid "Line: %%c%06X%s%%r / %%c%06X%s%%r   Column: %%c%06X%s%%r"
+msgstr "줄: %%c%06X%s%%r / %%c%06X%s%%r   열: %%c%06X%s%%r"
 
 #. Resource IDs: (249)
 #, c-format
-msgid "Ln: %%c%06X%ld%%r / %%c%06X%ld%%r    Col: %%c%06X%ld%%r"
-msgstr "줄: %%c%06X%ld%%r / %%c%06X%ld%%r    열: %%c%06X%ld%%r"
+msgid "Ln: %%c%06X%s%%r / %%c%06X%s%%r    Col: %%c%06X%s%%r"
+msgstr "줄: %%c%06X%s%%r / %%c%06X%s%%r    열: %%c%06X%s%%r"
 
 #. Resource IDs: (60138, 60140)
 msgid "Load as"
 msgstr "다른 인코딩으로 불러오기"
 
-#. Resource IDs: (60478)
+#. Resource IDs: (60490)
 msgid "Load last session"
 msgstr "마지막 세션 불러오기"
 
-#. Resource IDs: (60483)
+#. Resource IDs: (60495)
 msgid "Load last session on start"
 msgstr "시작할 때 마지막 세션 불러오기"
 
-#. Resource IDs: (60476)
+#. Resource IDs: (60488)
 msgid "Load session"
 msgstr "세션 불러오기"
 
-#. Resource IDs: (60481)
+#. Resource IDs: (60493)
 msgid "Load session on start"
 msgstr "시작할 때 세션 불러오기"
 
@@ -1479,11 +1527,13 @@ msgstr "파일 불러오는 중..."
 msgid "Loading session..."
 msgstr "세션 불러오는 중..."
 
-#. Resource IDs: (60484)
-msgid "Loads all files automatically that were open the last time BowPad got closed"
-msgstr "마지막으로 BowPad를 닫았을 때 열려 있던 모든 파일을 자동으로 불러옵니다"
+#. Resource IDs: (60496)
+msgid ""
+"Loads all files automatically that were open the last time BowPad got closed"
+msgstr ""
+"마지막으로 BowPad를 닫았을 때 열려 있던 모든 파일을 자동으로 불러옵니다"
 
-#. Resource IDs: (60479)
+#. Resource IDs: (60491)
 msgid "Loads all files that were open the last time BowPad got closed"
 msgstr "마지막으로 BowPad를 닫았을 때 열려 있던 모든 파일을 불러옵니다"
 
@@ -1595,14 +1645,14 @@ msgstr "마지막 검색의 다음 일치 항목으로 이동합니다"
 msgid "Moves to the previous match of the last search"
 msgstr "마지막 검색의 이전 일치 항목으로 이동합니다"
 
-#. Resource IDs: (60297)
+#. Resource IDs: (60297, 60659)
 msgid "Multi-Edit"
 msgstr "다중 편집"
 
 #. Resource IDs: (281)
 #, c-format
-msgid "Multiedit: %%c%06X%Iu %%rmarkers"
-msgstr "다중 편집: %%c%06X%Iu %%r마커"
+msgid "Multiedit: %%c%06X%s %%rmarkers"
+msgstr "다중 편집: %%c%06X%s %%r마커"
 
 #. Resource IDs: (60033)
 msgid "N"
@@ -1617,7 +1667,7 @@ msgstr "다음"
 msgid "New %d"
 msgstr "새 문서 %d"
 
-#. Resource IDs: (60539, 60540)
+#. Resource IDs: (60551, 60552)
 msgid "New Copy"
 msgstr "새 복사"
 
@@ -1685,23 +1735,23 @@ msgstr "확인"
 msgid "Online Languages"
 msgstr "온라인 언어"
 
-#. Resource IDs: (60619, 60620)
+#. Resource IDs: (60631, 60632)
 msgid "Only comments"
 msgstr "주석만"
 
-#. Resource IDs: (60430, 60431)
+#. Resource IDs: (60442, 60443)
 msgid "Open Console"
 msgstr "콘솔 열기"
 
-#. Resource IDs: (60426, 60427, 60513, 60514)
+#. Resource IDs: (60438, 60439, 60525, 60526)
 msgid "Open Explorer"
 msgstr "탐색기 열기"
 
-#. Resource IDs: (60531)
+#. Resource IDs: (60543)
 msgid "Open File"
 msgstr "파일 열기"
 
-#. Resource IDs: (60532)
+#. Resource IDs: (60544)
 msgid "Open File under cursor"
 msgstr "커서 아래의 파일 열기"
 
@@ -1709,7 +1759,7 @@ msgstr "커서 아래의 파일 열기"
 msgid "Open Files"
 msgstr "파일 열기"
 
-#. Resource IDs: (60649)
+#. Resource IDs: (60677)
 msgid "Open corresponding File"
 msgstr "해당 파일 열기"
 
@@ -1748,23 +1798,25 @@ msgstr ""
 msgid "Opens one or more files"
 msgstr "하나 이상의 파일을 엽니다"
 
-#. Resource IDs: (60432)
+#. Resource IDs: (60444)
 msgid "Opens the Console at the current file location"
 msgstr "현재 파일 위치에서 콘솔을 엽니다"
 
-#. Resource IDs: (60428)
+#. Resource IDs: (60440)
 msgid "Opens the Windows Explorer at the current file location"
 msgstr "현재 파일 위치에서 Windows 탐색기를 엽니다"
 
-#. Resource IDs: (60515)
+#. Resource IDs: (60527)
 msgid "Opens the Windows Explorer at the current file path"
 msgstr "현재 파일 경로에서 Windows 탐색기를 엽니다"
 
-#. Resource IDs: (60523)
-msgid "Opens the config file to configure keyboard shortcuts for any command in BowPad"
+#. Resource IDs: (60535)
+msgid ""
+"Opens the config file to configure keyboard shortcuts for any command in "
+"BowPad"
 msgstr "구성 파일을 열어 BowPad의 명령에 대한 바로 가기 키를 구성합니다"
 
-#. Resource IDs: (60650)
+#. Resource IDs: (60678)
 msgid ""
 "Opens the corresponding file to the file in the current tab.\n"
 "(h/cpp, aspx/cs/vb)"
@@ -1772,39 +1824,39 @@ msgstr ""
 "현재 탭의 파일에 해당하는 파일을 엽니다.\n"
 "(h/cpp, aspx/cs/vb)"
 
-#. Resource IDs: (60404)
+#. Resource IDs: (60416)
 msgid "Opens the current file in Microsoft Edge browser"
 msgstr "Microsoft Edge 브라우저에서 현재 파일을 엽니다"
 
-#. Resource IDs: (60408)
+#. Resource IDs: (60420)
 msgid "Opens the current file in Microsoft Internet Explorer"
 msgstr "Microsoft Internet Explorer에서 현재 파일을 엽니다"
 
-#. Resource IDs: (60412)
+#. Resource IDs: (60424)
 msgid "Opens the current file in the Firefox browser"
 msgstr "Firefox 브라우저에서 현재 파일을 엽니다"
 
-#. Resource IDs: (60416)
+#. Resource IDs: (60428)
 msgid "Opens the current file in the Google Chrome browser"
 msgstr "Google Chrome 브라우저에서 현재 파일을 엽니다"
 
-#. Resource IDs: (60424)
+#. Resource IDs: (60436)
 msgid "Opens the current file in the Opera browser"
 msgstr "Opera 브라우저에서 현재 파일을 엽니다"
 
-#. Resource IDs: (60420)
+#. Resource IDs: (60432)
 msgid "Opens the current file in the Safari browser"
 msgstr "Safari 브라우저에서 현재 파일을 엽니다"
 
-#. Resource IDs: (60440)
+#. Resource IDs: (60452)
 msgid "Opens the default browser to search Wikipedia for the selected text"
 msgstr "기본 브라우저를 열어 선택한 텍스트에 대한 위키피디아를 검색합니다"
 
-#. Resource IDs: (60436)
+#. Resource IDs: (60448)
 msgid "Opens the default browser to search for the selected text"
 msgstr "선택한 텍스트를 검색할 기본 브라우저를 엽니다"
 
-#. Resource IDs: (60533)
+#. Resource IDs: (60545)
 msgid "Opens the file/path that's at the cursor position"
 msgstr "커서 위치에 있는 파일/경로를 엽니다"
 
@@ -1864,11 +1916,11 @@ msgstr "기다려 주세요."
 msgid "Plugin Name"
 msgstr "플러그인 이름"
 
-#. Resource IDs: (60550)
+#. Resource IDs: (60562)
 msgid "Plugin commands"
 msgstr "플러그인 명령"
 
-#. Resource IDs: (60543, 60549)
+#. Resource IDs: (60555, 60561)
 msgid "Plugins"
 msgstr "플러그인"
 
@@ -1972,11 +2024,11 @@ msgstr ""
 "다시 불러오기\n"
 "저장하지 않은 수정사항은 손실됩니다!"
 
-#. Resource IDs: (60652)
+#. Resource IDs: (60664)
 msgid "Remove all empty lines or lines with only whitespace"
 msgstr ">공백만 있는 빈 줄 또는 줄 모두 제거"
 
-#. Resource IDs: (60649, 60651)
+#. Resource IDs: (60661, 60663)
 msgid "Remove empty lines"
 msgstr "빈 줄 제거"
 
@@ -2000,11 +2052,15 @@ msgstr "선택 항목에서 모두 바꾸기(&A)"
 msgid "Replace All In All &Tabs"
 msgstr "모든 탭에서 모두 바꾸기(&T)"
 
+#. Resource IDs: (1136)
+msgid "Reset lexer style to default"
+msgstr "렉서 스타일을 기본값으로 재설정"
+
 #. Resource IDs: (60217, 60219)
 msgid "Right margin"
 msgstr "오른쪽 여백"
 
-#. Resource IDs: (60399)
+#. Resource IDs: (60411)
 msgid "Run"
 msgstr "실행"
 
@@ -2012,7 +2068,7 @@ msgstr "실행"
 msgid "Run as Administrator"
 msgstr "관리자로 실행"
 
-#. Resource IDs: (60400)
+#. Resource IDs: (60412)
 msgid "Runs various commands"
 msgstr "다양한 명령을 실행합니다"
 
@@ -2024,11 +2080,11 @@ msgstr "S"
 msgid "SA"
 msgstr "SA"
 
-#. Resource IDs: (60482)
+#. Resource IDs: (60494)
 msgid "SAL"
 msgstr "SAL"
 
-#. Resource IDs: (60487)
+#. Resource IDs: (60499)
 msgid "SAS"
 msgstr "SAS"
 
@@ -2096,11 +2152,11 @@ msgstr "Scintilla"
 msgid "Scrollbar style"
 msgstr "스크롤 막대 스타일"
 
-#. Resource IDs: (60434, 60435)
+#. Resource IDs: (60446, 60447)
 msgid "Search Web"
 msgstr "웹 검색"
 
-#. Resource IDs: (60438, 60439)
+#. Resource IDs: (60450, 60451)
 msgid "Search Wikipedia"
 msgstr "위키백과 검색"
 
@@ -2127,10 +2183,10 @@ msgstr "'%s' 파일에서 검색하는 중"
 
 #. Resource IDs: (200)
 #, c-format
-msgid "Sel: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%lld%%r matches."
-msgstr "선택: %%c%06X%Iu%%r 문자 | %%c%06X%Iu%%r 줄 | %%c%06X%lld%%r 일치."
+msgid "Sel: %%c%06X%s%%r chars | %%c%06X%s%%r lines | %%c%06X%s%%r matches."
+msgstr "선택: %%c%06X%s%%r 문자 | %%c%06X%s%%r 줄 | %%c%06X%s%%r 일치."
 
-#. Resource IDs: (60394)
+#. Resource IDs: (60406)
 msgid "Select Language"
 msgstr "언어 선택"
 
@@ -2138,18 +2194,35 @@ msgstr "언어 선택"
 msgid "Select all"
 msgstr "모두 선택"
 
-#. Resource IDs: (60395)
+#. Resource IDs: (60407)
 msgid "Select the language for BowPad"
 msgstr "BowPad용 언어 선택"
 
 #. Resource IDs: (251)
 #, c-format
-msgid "Selection: %%c%06X%Iu%%r chars | %%c%06X%Iu%%r lines | %%c%06X%lld%%r matches."
-msgstr "선택: %%c%06X%Iu%%r 문자 | %%c%06X%Iu%%r 줄 | %%c%06X%lld%%r 일치."
+msgid ""
+"Selection: %%c%06X%s%%r chars | %%c%06X%s%%r lines | %%c%06X%s%%r matches."
+msgstr "선택: %%c%06X%s%%r 문자 | %%c%06X%s%%r 줄 | %%c%06X%s%%r 일치."
 
-#. Resource IDs: (60613)
+#. Resource IDs: (60390)
+msgid "Selects the UI theme"
+msgstr "UI 테마 선택"
+
+#. Resource IDs: (60403)
+msgid "Selects the UI theme according to the system setting"
+msgstr "시스템 설정에 따라 UI 테마 선택"
+
+#. Resource IDs: (60399)
+msgid "Selects the dark UI theme"
+msgstr "어두운 UI 테마 선택"
+
+#. Resource IDs: (60625)
 msgid "Selects the language for the spell checker"
 msgstr "맞춤법 검사기의 언어 선택"
+
+#. Resource IDs: (60395)
+msgid "Selects the light UI theme"
+msgstr "밝은 UI 테마 선택"
 
 #. Resource IDs: (60311)
 msgid "Sends the document to the default printer"
@@ -2180,7 +2253,9 @@ msgid "Set the coloring according to the code language"
 msgstr "코드 언어에 따라 색상을 설정"
 
 #. Resource IDs: (60039)
-msgid "Set the default encoding (e.g. ANSI, UTF-8, ...) and end-of-line style for new files"
+msgid ""
+"Set the default encoding (e.g. ANSI, UTF-8, ...) and end-of-line style for "
+"new files"
 msgstr "새 파일의 기본 인코딩 예: ANSI, UTF-8, ...) 및 끝단 스타일 설정"
 
 #. Resource IDs: (60254)
@@ -2192,14 +2267,18 @@ msgid "Set up print margins, page size, page orientation"
 msgstr "인쇄 여백, 페이지 크기, 페이지 방향 설정"
 
 #. Resource IDs: (60220)
-msgid "Sets the column at which the vertical edge is shown, indicating the right margin. Set to 0 to hide it."
-msgstr "오른쪽 여백을 나타내는 수직 모서리가 표시되는 열을 설정합니다. 숨기려면 0으로 설정합니다."
+msgid ""
+"Sets the column at which the vertical edge is shown, indicating the right "
+"margin. Set to 0 to hide it."
+msgstr ""
+"오른쪽 여백을 나타내는 수직 모서리가 표시되는 열을 설정합니다. 숨기려면 0으"
+"로 설정합니다."
 
 #. Resource IDs: (266)
 msgid "Setting"
 msgstr "설정"
 
-#. Resource IDs: (60517, 60518)
+#. Resource IDs: (60529, 60530)
 msgid "Show Properties"
 msgstr "속성 표시"
 
@@ -2207,7 +2286,7 @@ msgstr "속성 표시"
 msgid "Show Whitespaces"
 msgstr "공백 표시"
 
-#. Resource IDs: (60652)
+#. Resource IDs: (60680)
 msgid "Show clipboard history"
 msgstr "클립보드 기록 표시"
 
@@ -2219,15 +2298,16 @@ msgstr "줄 번호 표시"
 msgid "Show the file tree"
 msgstr "파일 트리 표시"
 
-#. Resource IDs: (60474)
+#. Resource IDs: (60486)
 msgid "Shows a dialog to configure custom commands"
 msgstr "사용자 지정 명령을 구성할 수 있는 대화 상자 표시"
 
-#. Resource IDs: (60547)
-msgid "Shows a dialog to configure the installed plugins and install new plugins"
+#. Resource IDs: (60559)
+msgid ""
+"Shows a dialog to configure the installed plugins and install new plugins"
 msgstr "설치된 플러그인을 구성하고 새 플러그인을 설치할 수 있는 대화 상자 표시"
 
-#. Resource IDs: (60494)
+#. Resource IDs: (60506)
 msgid "Shows a list of functions/methods in the file to jump to"
 msgstr "파일에서 건너뛸 함수/방법 목록 표시"
 
@@ -2235,15 +2315,15 @@ msgstr "파일에서 건너뛸 함수/방법 목록 표시"
 msgid "Shows or hides the file tree"
 msgstr "파일 트리를 표시하거나 숨김"
 
-#. Resource IDs: (60559)
+#. Resource IDs: (60571)
 msgid "Shows statistics about the current document"
 msgstr "현재 문서에 대한 통계 표시"
 
-#. Resource IDs: (60519)
+#. Resource IDs: (60531)
 msgid "Shows the Windows Explorer file properties dialog for the current file"
 msgstr "현재 파일의 Windows 탐색기 파일 속성 대화 상자 표시"
 
-#. Resource IDs: (60555)
+#. Resource IDs: (60567)
 msgid "Shows the list of all opened tabs."
 msgstr "열려 있는 모든 탭 목록을 표시합니다."
 
@@ -2271,15 +2351,15 @@ msgstr "현재 선택 영역을 정렬합니다 일반 또는 직사각형)."
 msgid "Spaces to Tabs"
 msgstr "탭으로 공백"
 
-#. Resource IDs: (60605)
+#. Resource IDs: (60617)
 msgid "Spell Check"
 msgstr "맞춤법 검사"
 
-#. Resource IDs: (60607, 60608, 60616)
+#. Resource IDs: (60619, 60620, 60628)
 msgid "Spell checker"
 msgstr "맞춤법 검사기"
 
-#. Resource IDs: (60612)
+#. Resource IDs: (60624)
 msgid "Spell checker language"
 msgstr "맞춤법 검사 언어"
 
@@ -2299,6 +2379,10 @@ msgstr "상태"
 msgid "Style Configurator"
 msgstr "스타일 구성자"
 
+#. Resource IDs: (60671)
+msgid "Style selection"
+msgstr "스타일 선택"
+
 #. Resource IDs: (65535)
 msgid "Style:"
 msgstr "스타일:"
@@ -2311,19 +2395,35 @@ msgstr "스타일"
 msgid "Sub Folders"
 msgstr "하위 폴더"
 
-#. Resource IDs: (156, 60557)
+#. Resource IDs: (156, 60569)
 msgid "Summary"
 msgstr "요약"
+
+#. Resource IDs: (60400)
+msgid "System"
+msgstr "시스템"
 
 #. Resource IDs: (196)
 msgid "System Includes"
 msgstr "시스템 포함"
 
+#. Resource IDs: (60402)
+msgid "System Theme"
+msgstr "시스템 테마"
+
 #. Resource IDs: (60339)
 msgid "T"
 msgstr "T"
 
-#. Resource IDs: (60252, 60345)
+#. Resource IDs: (60397)
+msgid "TD"
+msgstr "TD"
+
+#. Resource IDs: (60393)
+msgid "TL"
+msgstr "TL"
+
+#. Resource IDs: (60252, 60345, 60401)
 msgid "TS"
 msgstr "TS"
 
@@ -2331,7 +2431,7 @@ msgstr "TS"
 msgid "TT"
 msgstr "TT"
 
-#. Resource IDs: (60554)
+#. Resource IDs: (60566)
 msgid "Tab List"
 msgstr "탭 목록"
 
@@ -2339,7 +2439,7 @@ msgstr "탭 목록"
 msgid "Tab Size"
 msgstr "탭 크기"
 
-#. Resource IDs: (60553)
+#. Resource IDs: (60565)
 msgid "Tabs"
 msgstr "탭"
 
@@ -2347,10 +2447,18 @@ msgstr "탭"
 msgid "Tabs to Spaces"
 msgstr "공백으로 탭"
 
+#. Resource IDs: (60672)
+msgid "Tail -f"
+msgstr "꼬리 -f"
+
 #. Resource IDs: (117)
 #, c-format
-msgid "The document '%s' was modified outside of BowPad, but there are unsaved changes in the document."
-msgstr "'%s' 문서가 BowPad 외부에서 수정되었지만 저장되지 않은 변경사항이 문서에 있습니다."
+msgid ""
+"The document '%s' was modified outside of BowPad, but there are unsaved "
+"changes in the document."
+msgstr ""
+"'%s' 문서가 BowPad 외부에서 수정되었지만 저장되지 않은 변경사항이 문서에 있습"
+"니다."
 
 #. Resource IDs: (118)
 #, c-format
@@ -2368,12 +2476,17 @@ msgid "The file '%s' does not exist. Do you want to create it?"
 msgstr "'%s' 파일이 없습니다. 생성하시겠습니까?"
 
 #. Resource IDs: (184)
-msgid "The file is marked as read only. Are you sure you want to edit this file?"
+msgid ""
+"The file is marked as read only. Are you sure you want to edit this file?"
 msgstr "파일이 읽기 전용으로 표시됩니다. 이 파일을 편집하시겠습니까?"
 
 #. Resource IDs: (183)
 msgid "The file is write protected"
 msgstr "파일이 쓰기 금지되어 있습니다"
+
+#. Resource IDs: (60387, 60389)
+msgid "Theme"
+msgstr "테마"
 
 #. Resource IDs: (60246, 60248)
 msgid "Titlecase"
@@ -2387,53 +2500,49 @@ msgstr "책갈피 전환"
 msgid "Toggle a bookmark on the current line"
 msgstr "현재 줄에서 책갈피 전환"
 
-#. Resource IDs: (60572, 60573)
+#. Resource IDs: (60584, 60585)
 msgid "Toggle folding all"
 msgstr "모두 접기 전환"
 
-#. Resource IDs: (60575, 60576)
+#. Resource IDs: (60587, 60588)
 msgid "Toggle level 0"
 msgstr "수준 0 전환"
 
-#. Resource IDs: (60578, 60579)
+#. Resource IDs: (60590, 60591)
 msgid "Toggle level 1"
 msgstr "수준 1 전환"
 
-#. Resource IDs: (60581, 60582)
+#. Resource IDs: (60593, 60594)
 msgid "Toggle level 2"
 msgstr "수준 2 전환"
 
-#. Resource IDs: (60584, 60585)
+#. Resource IDs: (60596, 60597)
 msgid "Toggle level 3"
 msgstr "수준 3 전환"
 
-#. Resource IDs: (60587, 60588)
+#. Resource IDs: (60599, 60600)
 msgid "Toggle level 4"
 msgstr "수준 4 전환"
 
-#. Resource IDs: (60590, 60591)
+#. Resource IDs: (60602, 60603)
 msgid "Toggle level 5"
 msgstr "수준 5 전환"
 
-#. Resource IDs: (60593, 60594)
+#. Resource IDs: (60605, 60606)
 msgid "Toggle level 6"
 msgstr "수준 6 전환"
 
-#. Resource IDs: (60596, 60597)
+#. Resource IDs: (60608, 60609)
 msgid "Toggle level 7"
 msgstr "수준 7 전환"
 
-#. Resource IDs: (60599, 60600)
+#. Resource IDs: (60611, 60612)
 msgid "Toggle level 8"
 msgstr "수준 8 전환"
 
-#. Resource IDs: (60602, 60603)
+#. Resource IDs: (60614, 60615)
 msgid "Toggle level 9"
 msgstr "수준 9 전환"
-
-#. Resource IDs: (60390)
-msgid "Toggles between the normal and the dark theme"
-msgstr "일반 테마와 어두운 테마 사이를 전환합니다"
 
 #. Resource IDs: (1078)
 msgid "Treat digits as &numbers."
@@ -2537,8 +2646,12 @@ msgid "Use Tabs"
 msgstr "탭 사용"
 
 #. Resource IDs: (1133)
-msgid "Use ^nPlaceHolder^ to mark a placeholder token, use ^0^ to mark the insertion point at the end."
-msgstr "자리 표시자 토큰을 표시하려면 ^nPlaceHolder^를 사용하고, 끝에 삽입 지점을 표시하려면 ^0^을 사용합니다."
+msgid ""
+"Use ^nPlaceHolder^ to mark a placeholder token, use ^0^ to mark the "
+"insertion point at the end."
+msgstr ""
+"자리 표시자 토큰을 표시하려면 ^nPlaceHolder^를 사용하고, 끝에 삽입 지점을 표"
+"시하려면 ^0^을 사용합니다."
 
 #. Resource IDs: (195)
 msgid "User Includes"
@@ -2580,7 +2693,7 @@ msgstr "W"
 msgid "WL"
 msgstr "WL"
 
-#. Resource IDs: (60120, 60628)
+#. Resource IDs: (60120, 60640)
 msgid "WS"
 msgstr "WS"
 
@@ -2615,7 +2728,7 @@ msgstr "줄바꿈"
 
 #. Resource IDs: (143)
 msgid "Wrap around."
-msgstr "둘러싸기"
+msgstr "감싸기"
 
 #. Resource IDs: (60116)
 msgid "Wrap lines at the end of the window"
@@ -2688,11 +2801,11 @@ msgstr "일주일에 한 번 BowPad의 새 버전을 확인합니다"
 msgid "click to copy to clipboard"
 msgstr "클립보드에 복사하려면 클릭"
 
-#. Resource IDs: (60643, 60644)
+#. Resource IDs: (60655, 60656)
 msgid "configure advanced settings"
 msgstr "고급 설정 구성"
 
-#. Resource IDs: (60640)
+#. Resource IDs: (60652)
 msgid "configure autocompletion words and code snippets"
 msgstr "자동 완성 단어 및 코드 조각 구성"
 
@@ -2700,11 +2813,11 @@ msgstr "자동 완성 단어 및 코드 조각 구성"
 msgid "dot matches newline"
 msgstr "점이 새 줄과 일치"
 
-#. Resource IDs: (60635)
+#. Resource IDs: (60647)
 msgid "enable autocompletion"
 msgstr "자동 완성 사용"
 
-#. Resource IDs: (60636)
+#. Resource IDs: (60648)
 msgid "enable/disable autocompletion when editing"
 msgstr "편집시 자동 완성 사용/사용 안 함"
 
@@ -2729,15 +2842,15 @@ msgstr "이전 커서 위치로 이동"
 msgid "hide lexer from dropdown"
 msgstr "드롭다운에서 렉서 숨기기"
 
-#. Resource IDs: (60627, 60629)
+#. Resource IDs: (60639, 60641)
 msgid "indent wrapped lines"
 msgstr "줄바꿈된 줄 들여쓰기"
 
-#. Resource IDs: (60630)
+#. Resource IDs: (60642)
 msgid "indents wrapped sublines"
 msgstr "줄바꿈된 하위줄 들여쓰기"
 
-#. Resource IDs: (60661)
+#. Resource IDs: (60681)
 msgid "no plugins loaded"
 msgstr "플러그인이 로드되지 않음"
 
@@ -2745,87 +2858,87 @@ msgstr "플러그인이 로드되지 않음"
 msgid "regular expression:"
 msgstr "정규식:"
 
-#. Resource IDs: (60443)
+#. Resource IDs: (60455)
 msgid "runs the custom command 0"
 msgstr "사용자 정의 명령 0 실행"
 
-#. Resource IDs: (60446)
+#. Resource IDs: (60458)
 msgid "runs the custom command 1"
 msgstr "사용자 정의 명령 1 실행"
 
-#. Resource IDs: (60449)
+#. Resource IDs: (60461)
 msgid "runs the custom command 2"
 msgstr "사용자 정의 명령 2 실행"
 
-#. Resource IDs: (60452)
+#. Resource IDs: (60464)
 msgid "runs the custom command 3"
 msgstr "사용자 정의 명령 3 실행"
 
-#. Resource IDs: (60455)
+#. Resource IDs: (60467)
 msgid "runs the custom command 4"
 msgstr "사용자 정의 명령 4 실행"
 
-#. Resource IDs: (60458)
+#. Resource IDs: (60470)
 msgid "runs the custom command 5"
 msgstr "사용자 정의 명령 5 실행"
 
-#. Resource IDs: (60461)
+#. Resource IDs: (60473)
 msgid "runs the custom command 6"
 msgstr "사용자 정의 명령 6 실행"
 
-#. Resource IDs: (60464)
+#. Resource IDs: (60476)
 msgid "runs the custom command 7"
 msgstr "사용자 정의 명령 7 실행"
 
-#. Resource IDs: (60467)
+#. Resource IDs: (60479)
 msgid "runs the custom command 8"
 msgstr "사용자 정의 명령 8 실행"
 
-#. Resource IDs: (60470)
+#. Resource IDs: (60482)
 msgid "runs the custom command 9"
 msgstr "사용자 정의 명령 9 실행"
 
-#. Resource IDs: (60574)
+#. Resource IDs: (60586)
 msgid "toggles folding all levels in the whole document"
 msgstr "전체 문서에서 모든 단계 접기 전환"
 
-#. Resource IDs: (60577)
+#. Resource IDs: (60589)
 msgid "toggles folding at level 0 in the whole document"
 msgstr "전체 문서에서 9단계 접기 전환"
 
-#. Resource IDs: (60580)
+#. Resource IDs: (60592)
 msgid "toggles folding at level 1 in the whole document"
 msgstr "전체 문서에서 1단계 접기 전환"
 
-#. Resource IDs: (60583)
+#. Resource IDs: (60595)
 msgid "toggles folding at level 2 in the whole document"
 msgstr "전체 문서에서 2단계 접기 전환"
 
-#. Resource IDs: (60586)
+#. Resource IDs: (60598)
 msgid "toggles folding at level 3 in the whole document"
 msgstr "전체 문서에서 3단계 접기 전환"
 
-#. Resource IDs: (60589)
+#. Resource IDs: (60601)
 msgid "toggles folding at level 4 in the whole document"
 msgstr "전체 문서에서 4단계 접기 전환"
 
-#. Resource IDs: (60592)
+#. Resource IDs: (60604)
 msgid "toggles folding at level 5 in the whole document"
 msgstr "전체 문서에서 5단계 접기 전환"
 
-#. Resource IDs: (60595)
+#. Resource IDs: (60607)
 msgid "toggles folding at level 6 in the whole document"
 msgstr "전체 문서에서 6단계 접기 전환"
 
-#. Resource IDs: (60598)
+#. Resource IDs: (60610)
 msgid "toggles folding at level 7 in the whole document"
 msgstr "전체 문서에서 7단계 접기 전환"
 
-#. Resource IDs: (60601)
+#. Resource IDs: (60613)
 msgid "toggles folding at level 8 in the whole document"
 msgstr "전체 문서에서 8단계 접기 전환"
 
-#. Resource IDs: (60604)
+#. Resource IDs: (60616)
 msgid "toggles folding at level 9 in the whole document"
 msgstr "전체 문서에서 9단계 접기 전환"
 
@@ -2833,15 +2946,34 @@ msgstr "전체 문서에서 9단계 접기 전환"
 msgid "too many files to show ({0})"
 msgstr "파일이 너무 많아 표시할 수 없음 ({0})"
 
-#. Resource IDs: (60568)
+#. Resource IDs: (60580)
 msgid "turn on folding"
 msgstr "접기 켜기"
 
-#. Resource IDs: (60571)
+#. Resource IDs: (60583)
 msgid "turns off folding"
 msgstr "접기 끄기"
+
+#. Resource IDs: (60666)
+msgid "with style 1"
+msgstr "스타일 1과 함께"
+
+#. Resource IDs: (60667)
+msgid "with style 2"
+msgstr "스타일 2와 함께"
+
+#. Resource IDs: (60668)
+msgid "with style 3"
+msgstr "스타일 3 함께"
+
+#. Resource IDs: (60669)
+msgid "with style 4"
+msgstr "스타일 4 함께"
 
 #. Resource IDs: (258)
 #, c-format
 msgid "{ %d lines }"
 msgstr "{ %d 줄 }"
+
+#~ msgid "Toggles between the normal and the dark theme"
+#~ msgstr "일반 테마와 어두운 테마 사이를 전환합니다"
