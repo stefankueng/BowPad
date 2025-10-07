@@ -112,7 +112,7 @@
                         <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\BowPad.exe" Name="Path" Value="[INSTALLDIR]" Type="string" />
                         <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\BowPad.exe" Value="[INSTALLDIR]BowPad.exe" Type="string" />
 
-                        <RegistryValue Root="HKLM" Key="Software\Microsoft\Active Setup\Installed Components\[UpgradeCode]" Name="Version" Value="$(var.MajorVersion).$(var.MinorVersion).$(var.BuildVersion)" Type="string" KeyPath="yes" />
+                        <RegistryValue Root="HKLM" Key="Software\Microsoft\Active Setup\Installed Components\[UpgradeCode]" Name="Version" Value="$(var.MajorVersion),$(var.MinorVersion),$(var.BuildVersion)" Type="string" KeyPath="yes" />
                         <RegistryValue Root="HKLM" Key="Software\Microsoft\Active Setup\Installed Components\[UpgradeCode]" Name="Stubpath" Value="[INSTALLDIR]BowPad.exe /registerwin11contextmenu" Type="string" />
                         <RegistryValue Root="HKLM" Key="Software\Microsoft\Active Setup\Installed Components\[UpgradeCode]" Value="[ProductName]" Type="string" />
                     </Component>
